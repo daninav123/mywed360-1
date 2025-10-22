@@ -10,7 +10,7 @@ import {
   updateDoc,
 } from 'firebase/firestore';
 // View mode string kept for internal sizing logic (no external lib)
-import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo, useLayoutEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 // Importar componentes separados
@@ -339,6 +339,21 @@ export default function TasksRefactored() {
 
   // Altura del contenedor del calendario (reactiva al tamaï½o de ventana)
   const [calendarContainerHeight, setCalendarContainerHeight] = useState(520);
+  const calendarColumnRef = useRef(null);
+  const [calendarColumnHeight, setCalendarColumnHeight] = useState(null);
+  const measureCalendarColumn = useCallback(() => {
+    if (!calendarColumnRef?.current) return;
+    const rect = calendarColumnRef.current.getBoundingClientRect();
+    if (rect?.height) setCalendarColumnHeight(rect.height);
+  }, []);
+  useLayoutEffect(() => {
+    measureCalendarColumn();
+  }, [measureCalendarColumn]);
+  useEffect(() => {
+    const onResize = () => measureCalendarColumn();
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, [measureCalendarColumn]);
   useEffect(() => {
     const compute = () => {
       const viewport = typeof window !== 'undefined' ? window.innerHeight : 800;
@@ -1556,6 +1571,18 @@ export default function TasksRefactored() {
     const b = Array.isArray(subtaskEvents) ? subtaskEvents : [];
     return [...a, ...b];
   }, [safeMeetingsFiltered, subtaskEvents]);
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => measureCalendarColumn());
+    return () => cancelAnimationFrame(raf);
+  }, [
+    measureCalendarColumn,
+    calendarContainerHeight,
+    currentView,
+    calendarDate,
+    safeMeetings,
+    sortedEvents,
+    taskListItems.length,
+  ]);
 
   // Conjunto de tareas completadas (por id o por taskId)
   const completedIdSet = useMemo(() => {
@@ -2736,42 +2763,44 @@ export default function TasksRefactored() {
         )}
       </div>
       <div className="flex flex-col lg:flex-row items-stretch gap-6">
-        <EventsCalendar
-          currentView={currentView}
-          setCurrentView={setCurrentView}
-          calendarDate={calendarDate}
-          setCalendarDate={setCalendarDate}
-          containerHeight={calendarContainerHeight}
-          monthLabel={monthLabel}
-          safeEvents={safeMeetings}
-          sortedEvents={sortedEvents}
-          categories={categories}
-          completedSet={completedIdSet}
-          onToggleComplete={(id, val) => toggleCompleteById(id, val)}
-          ErrorBoundaryComponent={ErrorBoundary}
-          localizer={localizer}
-          eventStyleGetter={eventStyleGetter}
-          EventComponent={Event}
-          onEventEdit={(event) => {
-            const eventStart = event.start instanceof Date ? event.start : new Date(event.start);
-            const eventEnd = event.end instanceof Date ? event.end : new Date(event.end);
-            setEditingId(event.id);
-            setEditingPath(event.__path || null);
-            setFormData({
-              title: event.title,
-              desc: event.desc || '',
-              category: event.category || 'OTROS',
-              startDate: eventStart.toISOString().slice(0, 10),
-              startTime: eventStart.toTimeString().slice(0, 5),
-              endDate: eventEnd.toISOString().slice(0, 10),
-              endTime: eventEnd.toTimeString().slice(0, 5),
-              long: false,
-              assignee: event.assignee || '',
-              completed: completedIdSet.has(String(event.id)),
-            });
-            setShowNewTask(true);
-          }}
-        />
+        <div className="w-full lg:flex-1 flex" ref={calendarColumnRef}>
+          <EventsCalendar
+            currentView={currentView}
+            setCurrentView={setCurrentView}
+            calendarDate={calendarDate}
+            setCalendarDate={setCalendarDate}
+            containerHeight={calendarContainerHeight}
+            monthLabel={monthLabel}
+            safeEvents={safeMeetings}
+            sortedEvents={sortedEvents}
+            categories={categories}
+            completedSet={completedIdSet}
+            onToggleComplete={(id, val) => toggleCompleteById(id, val)}
+            ErrorBoundaryComponent={ErrorBoundary}
+            localizer={localizer}
+            eventStyleGetter={eventStyleGetter}
+            EventComponent={Event}
+            onEventEdit={(event) => {
+              const eventStart = event.start instanceof Date ? event.start : new Date(event.start);
+              const eventEnd = event.end instanceof Date ? event.end : new Date(event.end);
+              setEditingId(event.id);
+              setEditingPath(event.__path || null);
+              setFormData({
+                title: event.title,
+                desc: event.desc || '',
+                category: event.category || 'OTROS',
+                startDate: eventStart.toISOString().slice(0, 10),
+                startTime: eventStart.toTimeString().slice(0, 5),
+                endDate: eventEnd.toISOString().slice(0, 10),
+                endTime: eventEnd.toTimeString().slice(0, 5),
+                long: false,
+                assignee: event.assignee || '',
+                completed: completedIdSet.has(String(event.id)),
+              });
+              setShowNewTask(true);
+            }}
+          />
+        </div>
         <div className="w-full lg:w-1/3 flex">
           <TaskList
             tasks={taskListItems}
@@ -2779,7 +2808,7 @@ export default function TasksRefactored() {
             onToggleComplete={(id, val) => toggleCompleteById(id, val)}
             parentNameMap={parentNameMap}
             dependencyStatuses={blockedTasksMap}
-            containerHeight={calendarContainerHeight}
+            containerHeight={calendarColumnHeight ?? calendarContainerHeight}
             onTaskClick={(event) => {
             if (handleTaskIntent(event)) return;
             const eventStart = event.start instanceof Date ? event.start : new Date(event.start);

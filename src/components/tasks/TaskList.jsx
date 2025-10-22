@@ -21,32 +21,27 @@ export default function TaskList({
     return base;
   }, []);
 
-  const calendarExtras = useMemo(() => {
-    if (!containerHeight) return 0;
-    return Math.round(containerHeight * 0.11);
-  }, [containerHeight]);
-
-  const totalTargetHeight = useMemo(() => {
+  const targetHeight = useMemo(() => {
     if (!containerHeight) return null;
-    return containerHeight + calendarExtras;
-  }, [containerHeight, calendarExtras]);
+    return Math.max(0, containerHeight);
+  }, [containerHeight]);
 
   const [pageSize, setPageSize] = useState(() => Math.max(1, Number(maxItems) || DEFAULT_PAGE_SIZE));
   const [page, setPage] = useState(0);
 
   useEffect(() => {
     const explicit = Math.max(1, Number(maxItems) || DEFAULT_PAGE_SIZE);
-    if (!totalTargetHeight) {
+    if (!targetHeight) {
       setPageSize(explicit);
       return;
     }
     const HEADER_RESERVE = 120;
     const FOOTER_RESERVE = 72;
     const CARD_APPROX = 122;
-    const available = Math.max(CARD_APPROX, totalTargetHeight - HEADER_RESERVE - FOOTER_RESERVE);
+    const available = Math.max(CARD_APPROX, targetHeight - HEADER_RESERVE - FOOTER_RESERVE);
     const computed = Math.max(1, Math.floor(available / CARD_APPROX));
     setPageSize(Math.max(1, Math.min(explicit, computed)));
-  }, [maxItems, totalTargetHeight]);
+  }, [maxItems, targetHeight]);
 
   const sortedTasks = useMemo(() => {
     if (!Array.isArray(tasks)) return [];
@@ -144,8 +139,8 @@ export default function TaskList({
     } catch {}
   };
 
-  const containerStyle = totalTargetHeight
-    ? { height: totalTargetHeight, minHeight: totalTargetHeight, maxHeight: totalTargetHeight }
+  const containerStyle = targetHeight
+    ? { height: targetHeight, minHeight: targetHeight, maxHeight: targetHeight }
     : undefined;
 
   return (
