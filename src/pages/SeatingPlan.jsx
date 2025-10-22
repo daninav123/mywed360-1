@@ -8,7 +8,8 @@ export default function SeatingPlan() {
   const [useModernDesign, setUseModernDesign] = useState(() => {
     // Leer preferencia del localStorage
     const saved = localStorage.getItem('seating_modern_design');
-    return saved === 'true';
+    // ACTIVADO POR DEFECTO - cambiar a 'true' para siempre usar diseño moderno
+    return saved !== null ? saved === 'true' : true; // ← true = diseño moderno por defecto
   });
 
   // Toggle con atajo de teclado: Ctrl+Shift+M
