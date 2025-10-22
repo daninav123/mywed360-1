@@ -309,6 +309,12 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
                 const as = String(av);
                 const bs = String(bv);
                 return as.localeCompare(bs) * dirMul;
+              });
+            } catch {}
+          }
+          lastLocalWriteRef.current = Date.now();
+          lsSet(weddingId, subName, arr);
+          setData(arr);
           setLoading(false);
         },
         (err) => {
