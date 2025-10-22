@@ -330,6 +330,12 @@ export default function SeatingPlanModern() {
               onCapacityChange={handleCapacityChange}
             />
           )}
+          
+          {/* Botón flotante de añadir mesa (siempre visible) */}
+          <QuickAddTableButton 
+            onAdd={handleAddTable} 
+            position="bottom-right" 
+          />
         </SeatingLayoutFloating.Main>
 
         {/* Footer */}
