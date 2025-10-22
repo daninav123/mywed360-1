@@ -1,6 +1,7 @@
 {
   "app": {
     "name": "MaLove.App",
+    "brandName": "Lovenda",
     "tagline": "Ο τέλειος γάμος σας, οργανωμένος ψηφιακά",
     "loading": "Φόρτωση...",
     "error": "Σφάλμα",
@@ -45,5 +46,1032 @@
     "emailInbox": "Εισερχόμενα",
     "darkMode": "Σκουρό θέμα",
     "userMenu": "Μενού χρήστη"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "forgotPassword": "Forgot your password?",
+    "resetPassword": "Reset Password",
+    "loginWithGoogle": "Login with Google",
+    "loginWithFacebook": "Login with Facebook",
+    "alreadyHaveAccount": "Already have an account?",
+    "dontHaveAccount": "Don't have an account?",
+    "createAccount": "Create Account",
+    "welcomeBack": "Welcome back!",
+    "createYourAccount": "Create your account",
+    "loginSuccess": "Login successful",
+    "logoutSuccess": "Logout successful",
+    "loginError": "Login error",
+    "registerError": "Registration error",
+    "invalidCredentials": "Invalid credentials",
+    "emailRequired": "Email is required",
+    "passwordRequired": "Password is required",
+    "passwordTooShort": "Password must be at least 6 characters",
+    "passwordsDoNotMatch": "Passwords do not match",
+    "invalidEmail": "Invalid email format"
+  },
+  "authLogin": {
+    "title": "Access your account",
+    "subtitle": "Use your email and password or choose a social provider.",
+    "emailLabel": "Email address",
+    "passwordLabel": "Password",
+    "emailPlaceholder": "you@example.com",
+    "passwordPlaceholder": "Your password",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot your password?",
+    "submit": "Sign in",
+    "submitting": "Signing in...",
+    "noAccount": "Don't have an account?",
+    "registerLink": "Create one",
+    "hero": {
+      "title": "Manage everything from a single dashboard",
+      "description": "Access your guests, tasks, budgets, and documents in seconds. Track event progress and keep your team in sync.",
+      "features": [
+        "Sync vendors and contracts.",
+        "Automate emails and personalized reminders.",
+        "Receive alerts when something needs your attention."
+      ]
+    },
+    "validation": {
+      "missingEmail": "Enter your email address.",
+      "missingPassword": "Enter your password."
+    },
+    "errors": {
+      "invalidCredentials": "Invalid email or password.",
+      "generic": "We couldn't sign you in. Try again or contact support."
+    },
+    "social": {
+      "divider": "or continue with",
+      "button": "Continue with {{provider}}",
+      "pending": "Continue the sign-in flow in the {{provider}} window."
+    }
+  },
+  "authSignup": {
+    "title": "Create your account",
+    "subtitle": "Register with your email or continue with your favourite social account.",
+    "emailLabel": "Email address",
+    "passwordLabel": "Password",
+    "roleLabel": "Role",
+    "emailPlaceholder": "you@example.com",
+    "passwordPlaceholder": "Minimum 8 characters",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot your password?",
+    "submit": "Create account",
+    "submitting": "Creating account...",
+    "noAccount": "Don't have an account?",
+    "registerLink": "Sign up",
+    "alreadyHaveAccount": "Already have an account?",
+    "loginLink": "Sign in",
+    "hero": {
+      "title": "Welcome to Lovenda",
+      "description": "Centralise tasks, guests, and vendors in one place. Our assistant guides you every step so your wedding runs perfectly.",
+      "features": [
+        "Smart timeline so you never miss a task.",
+        "Automated emails and reminders for guests.",
+        "Curated vendor catalogue with personalised recommendations."
+      ]
+    },
+    "roleOptions": {
+      "particular": "Couple",
+      "planner": "Wedding planner",
+      "assistant": "Assistant"
+    },
+    "validation": {
+      "missingEmail": "Enter your email address.",
+      "missingPassword": "Enter your password.",
+      "shortPassword": "Your password must be at least 8 characters long."
+    },
+    "errors": {
+      "emailInUse": "That email address is already registered.",
+      "weakPassword": "Choose a stronger password to finish signing up.",
+      "invalidEmail": "Please enter a valid email address.",
+      "generic": "We couldn't create your account. Try again or contact support."
+    },
+    "successMessage": "Account created successfully. Redirecting to your dashboard...",
+    "social": {
+      "divider": "or continue with",
+      "button": "Continue with {{provider}}",
+      "pending": "Complete the sign-up flow in the {{provider}} window."
+    }
+  },
+  "passwordStrength": {
+    "labels": {
+      "veryWeak": "Very weak",
+      "weak": "Weak",
+      "medium": "Fair",
+      "strong": "Strong",
+      "veryStrong": "Excellent"
+    },
+    "title": "Password strength",
+    "suggestions": {
+      "start": "Enter a password with at least 8 characters.",
+      "length8": "Use at least 8 characters.",
+      "length12": "Increase the length to 12 characters or more.",
+      "case": "Mix uppercase and lowercase letters.",
+      "numbers": "Add numbers to strengthen it.",
+      "symbols": "Include symbols such as !, %, # or similar.",
+      "repetition": "Avoid repeating the same character several times in a row.",
+      "common": "Avoid common words or predictable sequences."
+    }
+  },
+  "wedding": {
+    "wedding": "Wedding",
+    "weddings": "Weddings",
+    "myWedding": "My Wedding",
+    "createWedding": "Create Wedding",
+    "editWedding": "Edit Wedding",
+    "weddingName": "Wedding Name",
+    "weddingDate": "Wedding Date",
+    "weddingVenue": "Wedding Venue",
+    "bride": "Bride",
+    "groom": "Groom",
+    "couple": "Couple",
+    "ceremony": "Ceremony",
+    "reception": "Reception",
+    "weddingDetails": "Wedding Details",
+    "weddingBudget": "Wedding Budget",
+    "weddingGuests": "Wedding Guests",
+    "weddingStyle": "Wedding Style",
+    "weddingTheme": "Wedding Theme",
+    "weddingColors": "Wedding Colors"
+  },
+  "guests": {
+    "guest": "Guest",
+    "guests": "Guests",
+    "guestList": "Guest List",
+    "addGuest": "Add Guest",
+    "editGuest": "Edit Guest",
+    "deleteGuest": "Delete Guest",
+    "guestName": "Guest Name",
+    "guestEmail": "Guest Email",
+    "guestPhone": "Guest Phone",
+    "guestAddress": "Guest Address",
+    "guestTable": "Guest Table",
+    "guestStatus": "Guest Status",
+    "confirmed": "Confirmed",
+    "pending": "Pending",
+    "declined": "Declined",
+    "totalGuests": "Total Guests",
+    "confirmedGuests": "Confirmed Guests",
+    "pendingGuests": "Pending Guests",
+    "importGuests": "Import Guests",
+    "exportGuests": "Export Guests",
+    "sendInvitations": "Send Invitations",
+    "rsvp": {
+      "printPdf": "Print / PDF"
+    },
+    "plusOne": "Plus One",
+    "dietaryRestrictions": "Dietary Restrictions",
+    "specialRequests": "Special Requests",
+    "saveTheDate": {
+      "message": "Hi, we are {{p1}}{{p2Suffix}} and we have amazing news to share. We're getting married! Please save {{date}} because we really want you with us.",
+      "messageFallback": "Hi! We have exciting news to share. We're getting married! Save the date because we want you there!"
+    },
+    "groups": {
+      "title": "Group management",
+      "assignTitle": "Assign to selected",
+      "newGroup": "New groupâ€¦",
+      "groupName": "Group name",
+      "rename": "Rename group",
+      "origin": "Originâ€¦",
+      "newName": "New name",
+      "merge": "Merge groups",
+      "destination": "Destinationâ€¦",
+      "existing": "Existing groups",
+      "none": "No groups yet."
+    },
+    "selectedCount": "Selected: {{count}}"
+  },
+  "providers": {
+    "provider": "Provider",
+    "providers": "Providers",
+    "addProvider": "Add Provider",
+    "editProvider": "Edit Provider",
+    "deleteProvider": "Delete Provider",
+    "providerName": "Provider Name",
+    "providerService": "Service",
+    "providerContact": "Contact",
+    "providerEmail": "Provider Email",
+    "providerPhone": "Provider Phone",
+    "providerWebsite": "Website",
+    "providerAddress": "Address",
+    "providerBudget": "Budget",
+    "providerStatus": "Status",
+    "providerNotes": "Notes",
+    "searchProviders": "Search Providers",
+    "filterByService": "Filter by Service",
+    "photographer": "Photographer",
+    "videographer": "Videographer",
+    "florist": "Florist",
+    "caterer": "Caterer",
+    "dj": "DJ",
+    "band": "Band",
+    "venue": "Venue",
+    "decorator": "Decorator",
+    "makeup": "Makeup",
+    "hairdresser": "Hairdresser"
+  },
+  "finance": {
+    "tabs": {
+      "overview": "Overview",
+      "transactions": "Transactions",
+      "budget": "Budget",
+      "contributions": "Contributions",
+      "analytics": "Analytics"
+    },
+    "connectBank": {
+      "title": "Connect your bank to import transactions",
+      "desc": "Speed up recording income and expenses by linking your bank account.",
+      "button": "Connect bank"
+    },
+    "alerts": {
+      "budget": "Budget Alerts"
+    },
+    "overview": {
+      "title": "Financial Management",
+      "subtitle": "Full control of your wedding budget and expenses",
+      "lastSync": "Last sync",
+      "synced": "Synced",
+      "offline": "Offline",
+      "totalBudget": "Total Budget",
+      "totalSpent": "Total Spent",
+      "ofBudget": "of budget",
+      "currentBalance": "Current Balance",
+      "expectedIncome": "Expected Income",
+      "used": "used",
+      "categoryStatus": "Budget Status by Categories",
+      "progress": "Progress",
+      "exceededNote": "(Budget exceeded!)"
+    },
+    "form": {
+      "type": "Transaction type",
+      "concept": "Concept",
+      "conceptPlaceholder": "e.g., Catering payment, Wedding gift...",
+      "amount": "Amount",
+      "amountLabel": "Amount:",
+      "date": "Date",
+      "category": "Category",
+      "selectCategory": "Select a category",
+      "description": "Additional description",
+      "descriptionPlaceholder": "Additional details about the transaction...",
+      "transaction": "Transaction",
+      "provider": "Provider / Source",
+      "attachments": {
+        "title": "Attachments",
+        "help": "Attach invoices, contracts, or receipts to keep them handy.",
+        "add": "Attach document",
+        "remove": "Remove",
+        "count": "Total attachments:",
+        "attachment": "Attachment"
+      },
+      "status": {
+        "expected": "Expected",
+        "received": "Received",
+        "pending": "Pending",
+        "partial": "Partial payment",
+        "paid": "Paid"
+      },
+      "errors": {
+        "conceptRequired": "Concept is required",
+        "amountPositive": "Amount must be a positive number",
+        "dateRequired": "Date is required",
+        "categoryRequired": "Category is required",
+        "paidAmountPositive": "Paid amount must be a positive number",
+        "paidAmountExceeds": "Paid amount cannot exceed the total",
+        "paidAmountRequired": "Register how much you paid to mark the status as partial"
+      }
+    },
+    "budget": {
+      "title": "Budget management",
+      "subtitle": "Organize and control the budget by categories",
+      "newCategory": "New category",
+      "totalBudget": "Total Budget",
+      "budgeted": "Budgeted",
+      "spent": "Spent",
+      "remaining": "Remaining",
+      "progress": "Progress",
+      "categoriesTitle": "Budget categories",
+      "empty": "No budget categories yet",
+      "createFirst": "Create first category",
+      "category": "Category",
+      "overallProgress": "Budget progress",
+      "advisor": "Advisor",
+      "advisorShort": "AI",
+      "muteShort": "Mute",
+      "exceeded": "Exceeded",
+      "perGuestHint": "≈ {{value}} / guest ({{count}} events)",
+      "muteAlerts": "Mute alerts",
+      "thresholds": {
+        "warn": "Warning (at risk) %",
+        "danger": "Critical (excess) %"
+      },
+      "modal": {
+        "editTitle": "Edit category",
+        "newTitle": "New category",
+        "name": "Category name"
+      }
+    },
+    "benchmarks": {
+      "title": "Budget suggestions based on similar weddings",
+      "subtitle": "Based on {{count}} confirmed budgets. Average estimate: {{average}} Â· Confidence: {{confidence}}.",
+      "loading": "Calculating budget suggestions…",
+      "applyMedian": "Apply median (p50)",
+      "applyP75": "Apply percentile 75",
+      "saveSnapshot": "Save budget"
+    },
+    "cashflow": {
+      "title": "Cashflow timeline",
+      "subtitle": "Upcoming payments and projected balance",
+      "remaining": "Budget remaining",
+      "burnRate": "Monthly burn rate",
+      "monthsToZero": "{{months}} months until depletion",
+      "upcoming": "Upcoming payments (45 days)",
+      "noUpcoming": "No pending payments in the next weeks.",
+      "netTimeline": "Net monthly flow (6 months)",
+      "legend": "Income - Expense",
+      "noHistory": "We need more history to estimate the trend.",
+      "income": "Income",
+      "expense": "Expenses"
+    },
+    "contributions": {
+      "title": "Contributions Setup",
+      "subtitle": "Configure contributions and estimate expected income",
+      "updateGuests": "Update Guests",
+      "initial": {
+        "title": "Initial Contributions",
+        "personA": "Person A (EUR)",
+        "personB": "Person B (EUR)",
+        "total": "Initial total:"
+      },
+      "monthly": {
+        "title": "Monthly Contributions",
+        "personA": "Person A (EUR/month)",
+        "personB": "Person B (EUR/month)",
+        "total": "Monthly total:"
+      },
+      "extras": {
+        "title": "Extra Contributions",
+        "totalLabel": "Extras total (family, other income) (EUR)",
+        "help": "Include family gifts, parents' contributions, etc."
+      },
+      "gifts": {
+        "title": "Gift Estimation",
+        "giftPerGuest": "Estimated gift per guest (EUR)",
+        "guestCount": "Number of guests",
+        "loadHint": "Click the icon to auto-load from your guest list",
+        "total": "Estimated gifts total:"
+      },
+      "unsaved": "You have unsaved changes",
+      "saveChanges": "Save Changes",
+      "summary": {
+        "title": "Expected Income Summary",
+        "subtitle": "Total projection based on your settings",
+        "initial": "Initial contributions",
+        "monthly": "Monthly contributions",
+        "extras": "Extra contributions",
+        "gifts": "Estimated gifts",
+        "total": "Expected Total"
+      },
+      "tips": {
+        "title": "Financial Tips",
+        "emergencyTitle": "Emergency fund:",
+        "emergencyText": "Consider reserving 10-15% of the total budget for unexpected expenses.",
+        "giftsTitle": "Conservative gifts:",
+        "giftsText": "It's better to underestimate wedding gifts than overestimate them.",
+        "reviewTitle": "Regular review:",
+        "reviewText": "Review and update these projections monthly.",
+        "balanceTitle": "Balanced contributions:",
+        "balanceText": "Keep a fair balance between both people's contributions."
+      }
+    },
+    "charts": {
+      "title": "Financial Analysis",
+      "subtitle": "Visualizations and trends of your wedding finances",
+      "totalTransactions": "Total Transactions",
+      "activeCategories": "Active Categories",
+      "budgetEfficiency": "Budget Efficiency",
+      "projectedBalance": "Projected Balance",
+      "budgetVsSpentByCategory": "Budget vs Spent by Category",
+      "budgeted": "Budgeted",
+      "spent": "Spent",
+      "expenseDistributionByCategory": "Expense Distribution by Category",
+      "monthlyTrend": "Monthly Trend of Income and Expenses",
+      "income": "Income",
+      "expenses": "Expenses",
+      "balance": "Balance",
+      "budgetProgressByCategory": "Budget Progress by Category",
+      "used": "Used",
+      "excess": "Excess",
+      "insights": "Financial Insights",
+      "highestExpense": "Highest Expense",
+      "mostEfficient": "Most Efficient",
+      "noData": "Not enough data",
+      "currentTrend": "Current Trend",
+      "trend": {
+        "positive": "Positive",
+        "negative": "Negative"
+      },
+      "balanceLabel": "Balance:"
+    },
+    "bank": {
+      "title": "Link bank account",
+      "country": "Country",
+      "countries": {
+        "es": "Spain",
+        "fr": "France",
+        "de": "Germany",
+        "it": "Italy",
+        "pt": "Portugal"
+      },
+      "bankLabel": "Bank",
+      "selectBank": "Select a bank",
+      "selectBankPlaceholder": "Select a bank",
+      "loadBanks": "Load banks",
+      "connect": "Connect",
+      "errorLoad": "Could not load banks. Backend may not have Nordigen integration enabled or /api/bank not deployed.",
+      "errorStart": "Could not start linking",
+      "noRequisition": "No requisition started",
+      "errorCheck": "Could not check status",
+      "selectWedding": "Select an active wedding",
+      "linked": "Account linked",
+      "errorSave": "Could not save account",
+      "requirements": {
+        "title": "Backend requirements:",
+        "env": "Define NORDIGEN_SECRET_ID, NORDIGEN_SECRET_KEY and NORDIGEN_BASE_URL",
+        "route": "Backend with /api/bank route deployed"
+      },
+      "alternative": "Temporary alternative: import transactions manually from Finance > Transactions > \"Import Bank\".",
+      "requisition": "Requisition:",
+      "checkStatus": "Check status",
+      "availableAccounts": "Available accounts",
+      "useThis": "Use this account"
+    },
+    "transactions": {
+      "title": "Transactions",
+      "new": "New Transaction",
+      "empty": "No transactions to show",
+      "createFirst": "Create first transaction",
+      "searchPlaceholder": "Search by concept...",
+      "allTypes": "All types",
+      "incomes": "Incomes",
+      "expenses": "Expenses",
+      "allCategories": "All categories",
+      "allProviders": "All providers",
+      "allDays": "All days",
+      "last30": "Last 30 days",
+      "last90": "Last 90 days",
+      "onlyUncategorized": "Only uncategorized",
+      "clear": "Clear",
+      "headers": {
+        "date": "Date",
+        "concept": "Concept",
+        "category": "Category",
+        "type": "Type",
+        "amount": "Amount",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "sort": {
+        "dateDesc": "Date (newest first)",
+        "dateAsc": "Date (oldest first)",
+        "amountDesc": "Amount (highest first)",
+        "amountAsc": "Amount (lowest first)"
+      },
+      "status": {
+        "pending": "Pending",
+        "partial": "Partial payment",
+        "paid": "Paid",
+        "expected": "Expected",
+        "received": "Received"
+      },
+      "saved": "Transaction saved",
+      "deleted": "Transaction deleted",
+      "deleteErrorPrefix": "Error deleting transaction:",
+      "saveUnexpected": "Unexpected error saving the transaction",
+      "noConcept": "No concept",
+      "noCategory": "No category",
+      "dueOn": "Due:",
+      "attachment": "Attachment",
+      "balanceLabel": "Balance:",
+      "pendingAmount": "Pending:",
+      "overdueAmount": "Overdue:",
+      "outstandingExpense": "Pending:",
+      "outstandingIncome": "To receive:",
+      "alerts": {
+        "title": "Important payments",
+        "overdue": "Overdue payments:",
+        "upcoming": "Upcoming payments (7 days):"
+      },
+      "csv": {
+        "title": "Import CSV - Column mapping",
+        "fields": {
+          "date": "Date",
+          "description": "Description",
+          "amount": "Amount",
+          "type": "Type",
+          "category": "Category"
+        },
+        "none": "None",
+        "preview": "Preview"
+      }
+    }
+  },
+  "seating": {
+    "seatingPlan": "Seating Plan",
+    "table": "Table",
+    "tables": "Tables",
+    "seat": "Seat",
+    "seats": "Seats",
+    "addTable": "Add Table",
+    "editTable": "Edit Table",
+    "deleteTable": "Delete Table",
+    "tableName": "Table Name",
+    "tableCapacity": "Table Capacity",
+    "assignGuest": "Assign Guest",
+    "unassignGuest": "Unassign Guest",
+    "autoAssign": "Auto Assign",
+    "ceremonyLayout": "Ceremony Layout",
+    "receptionLayout": "Reception Layout",
+    "viewLayout": "View Layout",
+    "editLayout": "Edit Layout",
+    "saveLayout": "Save Layout",
+    "resetLayout": "Reset Layout",
+    "toolbar": {
+      "syncing": "Syncing...",
+      "synced": "Synced",
+      "syncError": "Sync error",
+      "offline": "Offline",
+      "undo": "Undo",
+      "undoTooltip": "Undo (Ctrl+Z)",
+      "redo": "Redo",
+      "redoTooltip": "Redo (Ctrl+Y)",
+      "hideTables": "Hide tables",
+      "showTables": "Show tables",
+      "hideRulers": "Hide rulers",
+      "showRulers": "Show rulers",
+      "rulers": "Rulers",
+      "snapEnabled": "Snap on",
+      "enableSnap": "Enable grid snap",
+      "disableSnap": "Disable snap",
+      "snap": "Snap",
+      "hideSeatNumbers": "Hide seat numbers",
+      "showSeatNumbers": "Show seat numbers",
+      "seatNumbers": "Numbers",
+      "disableValidations": "Disable validations",
+      "enableValidations": "Enable validations",
+      "validations": "Checks",
+      "spaceConfig": "Configure space",
+      "space": "Space",
+      "ceremonyConfig": "Configure ceremony",
+      "ceremony": "Ceremony",
+      "banquetConfig": "Configure banquet",
+      "banquet": "Banquet",
+      "clearBanquet": "Clear layout",
+      "clear": "Clear",
+      "templates": "Templates",
+      "export": "Export",
+      "capacityTooltip": "Global capacity",
+      "capacityShort": "Cap",
+      "autoAssign": "Auto-assign guests",
+      "autoAssignShort": "Auto-assign",
+      "backgroundConfig": "Configure background",
+      "background": "Background",
+      "alignMenu": "Align/Distribute",
+      "align": "Align",
+      "alignLeft": "Left",
+      "alignCenterX": "Center X",
+      "alignRight": "Right",
+      "alignTop": "Top",
+      "alignCenterY": "Center Y",
+      "alignBottom": "Bottom",
+      "distribute": "Distribute",
+      "distributeHorizontal": "Horizontal",
+      "distributeVertical": "Vertical",
+      "hotkeys": "Shortcuts"
+    },
+    "snapshots": {
+      "title": "Snapshots",
+      "button": "Snapshots",
+      "manage": "Manage snapshots",
+      "nameLabel": "Name",
+      "namePlaceholder": "e.g. Base layout",
+      "saveCurrent": "Save current",
+      "empty": "No snapshots",
+      "load": "Load",
+      "delete": "Delete",
+      "nameRequired": "Enter a name"
+    },
+    "sidebar": {
+      "tools": "Tools",
+      "pending": "Pending ({{count}})",
+      "hideGuests": "Hide guests",
+      "showGuests": "Show guests",
+      "searchGuests": "Search guests...",
+      "noResults": "No matches",
+      "allAssigned": "All guests assigned",
+      "conflictsTitle": "Conflicts",
+      "conflictPerimeter": "Perimeter",
+      "conflictObstacle": "Obstacles",
+      "conflictAisles": "Aisles",
+      "conflictOverbooking": "Overbooking",
+      "noConflicts": "No conflicts",
+      "focusTable": "Center on layout",
+      "fix": "Fix",
+      "noSuggestions": "No suggestions",
+      "assignGuestButton": "Assign",
+      "weightsTitle": "Weights",
+      "weightFit": "Fit",
+      "weightSide": "Side",
+      "weightTogether": "Seat together",
+      "weightAvoid": "Avoid",
+      "tableDefault": "Table {{id}}",
+      "configureTable": "Configure table",
+      "type": "Type",
+      "seats": "Seats",
+      "shape": "Shape",
+      "dimensions": "Dimensions",
+      "widthCm": "Width (cm)",
+      "lengthCm": "Length (cm)",
+      "assignedGuests": "Assigned guests ({{count}})",
+      "removeGuest": "Remove guest",
+      "noAssigned": "No guests assigned",
+      "usePanelToAssign": "Use this panel to assign guests.",
+      "guests": "Guests",
+      "duplicateTable": "Duplicate table",
+      "deleteTable": "Delete table"
+    },
+    "tools": {
+      "pan": "Pan",
+      "moveTables": "Move tables",
+      "boundary": "Perimeter",
+      "doors": "Doors",
+      "obstacles": "Obstacles",
+      "aisles": "Aisles",
+      "erase": "Erase"
+    },
+    "hints": {
+      "boundary": "Click and drag to outline the venue limits.",
+      "obstacle": "Click to place obstacles and drag to adjust their size.",
+      "door": "Click to add doors or access points.",
+      "aisle": "Drag to mark aisles between tables."
+    },
+    "export": {
+      "pdf": "PDF",
+      "png": "PNG",
+      "csv": "CSV"
+    },
+    "hotkeys": {
+      "title": "Keyboard Shortcuts",
+      "items": {
+        "undoRedo": "Undo / Redo",
+        "tools": "Tools (Pan, Move, Perimeter, Doors, Obstacles, Aisles)",
+        "zoomFit": "Zoom in / out / Fit",
+        "selectAll": "Select all",
+        "escape": "Clear selection / close menus",
+        "rotate": "Rotate -5Â° / +5Â° (Shift: Â±15Â°)",
+        "align": "Align (start/end)",
+        "distribute": "Distribute (X/Y)",
+        "tabs": "Switch tab (Ceremony/Banquet)",
+        "toggles": "Rules / Numbers / Validations",
+        "panels": "Templates / Space settings",
+        "drawFinalizeCancel": "Finalize / Cancel drawing",
+        "backspaceDelete": "Remove point / Delete table",
+        "tabExactLength": "Exact segment length"
+      }
+    }
+  },
+  "email": {
+    "email": "Email",
+    "emails": "Emails",
+    "inbox": "Inbox",
+    "sent": "Sent",
+    "drafts": "Drafts",
+    "trash": "Trash",
+    "compose": "Compose",
+    "reply": "Reply",
+    "forward": "Forward",
+    "delete": "Delete",
+    "archive": "Archive",
+    "markAsRead": "Mark as Read",
+    "markAsUnread": "Mark as Unread",
+    "subject": "Subject",
+    "from": "From",
+    "to": "To",
+    "cc": "CC",
+    "bcc": "BCC",
+    "attachments": "Attachments",
+    "send": "Send",
+    "saveDraft": "Save Draft",
+    "emailSettings": "Email Settings",
+    "emailSignature": "Email Signature"
+  },
+  "tasks": {
+    "task": "Task",
+    "tasks": "Tasks",
+    "addTask": "Add Task",
+    "editTask": "Edit Task",
+    "deleteTask": "Delete Task",
+    "taskTitle": "Task Title",
+    "taskDescription": "Description",
+    "taskDueDate": "Due Date",
+    "taskPriority": "Priority",
+    "taskStatus": "Status",
+    "taskAssignee": "Assigned to",
+    "completed": "Completed",
+    "inProgress": "In progress",
+    "notStarted": "Not started",
+    "overdue": "Overdue",
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low",
+    "todoList": "To-Do List",
+    "completedTasks": "Completed Tasks",
+    "upcomingTasks": "Upcoming Tasks"
+  },
+  "profile": {
+    "synced": "Synced",
+    "subscription": {
+      "type": "Subscription type",
+      "free": "Free",
+      "premium": "Premium"
+    }
+  },
+  "forms": {
+    "required": "Required",
+    "optional": "Optional",
+    "pleaseSelect": "Please select",
+    "selectOption": "Select an option",
+    "enterText": "Enter text",
+    "chooseFile": "Choose file",
+    "uploadFile": "Upload file",
+    "dragAndDrop": "Drag and drop files here",
+    "invalidFormat": "Invalid format",
+    "fileTooLarge": "File too large",
+    "fieldRequired": "This field is required",
+    "invalidEmail": "Invalid email",
+    "invalidPhone": "Invalid phone",
+    "invalidUrl": "Invalid URL",
+    "passwordTooShort": "Password too short",
+    "passwordsDoNotMatch": "Passwords do not match"
+  },
+  "messages": {
+    "saveSuccess": "Saved successfully",
+    "saveError": "Error saving",
+    "deleteSuccess": "Deleted successfully",
+    "deleteError": "Error deleting",
+    "updateSuccess": "Updated successfully",
+    "updateError": "Error updating",
+    "loadError": "Error loading data",
+    "networkError": "Network error",
+    "permissionDenied": "Permission denied",
+    "notFound": "Not found",
+    "confirmDelete": "Are you sure you want to delete?",
+    "unsavedChanges": "You have unsaved changes",
+    "sessionExpired": "Your session has expired",
+    "pleaseLogin": "Please log in"
+  },
+  "dates": {
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "tomorrow": "Tomorrow",
+    "thisWeek": "This week",
+    "nextWeek": "Next week",
+    "thisMonth": "This month",
+    "nextMonth": "Next month",
+    "selectDate": "Select date",
+    "dateFormat": "mm/dd/yyyy",
+    "timeFormat": "HH:mm"
+  },
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive",
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "draft": "Draft",
+    "published": "Published"
+  },
+  "inspiration": {
+    "alt": "inspiration",
+    "altWithTags": "inspiration: {{tags}}",
+    "aria": "Inspiration image",
+    "ariaWithTags": "Inspiration image: {{tags}}",
+    "addFav": "Add to favorites",
+    "removeFav": "Remove from favorites"
+  },
+  "compose": {
+    "toField": "Recipient field",
+    "subjectField": "Subject field",
+    "ccField": "CC field",
+    "bccField": "BCC field",
+    "insertQuickReply": "Insert suggested reply"
+  },
+  "rsvp": {
+    "section": "RSVP",
+    "simulate": "Simulate reminders",
+    "send": "Send reminders",
+    "overview": {
+      "title": "Financial Management",
+      "subtitle": "Full control of your wedding budget and expenses",
+      "lastSync": "Last sync",
+      "synced": "Synced",
+      "offline": "Offline",
+      "totalBudget": "Total Budget",
+      "totalSpent": "Total Spent",
+      "ofBudget": "of budget",
+      "currentBalance": "Current Balance",
+      "expectedIncome": "Expected Income",
+      "used": "used",
+      "categoryStatus": "Budget Status by Categories",
+      "progress": "Progress"
+    },
+    "budget": {
+      "title": "Budget Management",
+      "subtitle": "Organize and control your budget by categories",
+      "newCategory": "New category",
+      "totalBudget": "Total Budget",
+      "budgeted": "Budgeted",
+      "spent": "Spent",
+      "remaining": "Remaining",
+      "categoriesTitle": "Budget Categories",
+      "empty": "No budget categories",
+      "createFirst": "Create first category",
+      "category": "Category",
+      "exceeded": "Exceeded",
+      "perGuestHint": "≈ {{value}} / guest ({{count}} events)",
+      "progress": "Progress",
+      "overallProgress": "Budget progress",
+      "muteAlerts": "Mute alerts",
+      "thresholds": {
+        "title": "Alert thresholds (global)",
+        "warn": "Warning (at risk) %",
+        "danger": "Critical (excess) %"
+      },
+      "modal": {
+        "editTitle": "Edit category",
+        "newTitle": "New category",
+        "name": "Category name"
+      }
+    },
+    "transactions": {
+      "title": "Transactions",
+      "connectBank": "Connect Bank (Nordigen)",
+      "importCSV": "Import CSV",
+      "exportCSV": "Export CSV",
+      "new": "New Transaction",
+      "searchPlaceholder": "Search by concept...",
+      "allTypes": "All types",
+      "incomes": "Incomes",
+      "expenses": "Expenses",
+      "allCategories": "All categories",
+      "allDays": "All days",
+      "last30": "Last 30 days",
+      "last90": "Last 90 days",
+      "onlyUncategorized": "Only uncategorized",
+      "clear": "Clear",
+      "empty": "No transactions to show",
+      "createFirst": "Create first transaction",
+      "noConcept": "No concept",
+      "noCategory": "No category",
+      "income": "Income",
+      "expense": "Expense",
+      "headers": {
+        "date": "Date",
+        "concept": "Concept",
+        "category": "Category",
+        "type": "Type",
+        "amount": "Amount",
+        "actions": "Actions"
+      },
+      "sort": {
+        "dateDesc": "Date (newest first)",
+        "dateAsc": "Date (oldest first)",
+        "amountDesc": "Amount (highest first)",
+        "amountAsc": "Amount (lowest first)"
+      }
+    }
+  },
+  "common": {
+    "all": "All",
+    "none": "None",
+    "show": "Show",
+    "hide": "Hide",
+    "view": "View",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "duplicate": "Duplicate"
+  },
+  "pages": {
+    "momentos": {
+      "title": "Memories gallery",
+      "tabs": {
+        "overview": "Overview",
+        "moderation": "Moderation",
+        "slideshow": "Slideshow",
+        "downloads": "Downloads"
+      },
+      "loading": {
+        "weddings": "Loading weddings...",
+        "selectWedding": "Select a wedding to manage the memories gallery.",
+        "preparing": "Preparing your collaborative album..."
+      },
+      "banners": {
+        "contributionsClosed": "The submission window closed on {{date}}. Adjust the wedding date or contact support if you need to reopen the gallery.",
+        "compressionActive": "Storage usage passed 30Â GB. New photos are automatically compressed to optimise Firebase storage."
+      },
+      "toasts": {
+        "loadError": "We could not load the memories gallery. Check your connection or permissions.",
+        "tokenCreated": "Share link created",
+        "tokenError": "We could not generate the link, please try again later.",
+        "approved": "Photo approved",
+        "approveError": "We could not approve the photo",
+        "rejected": "Photo rejected",
+        "rejectError": "We could not reject the photo",
+        "reset": "Photo moved back to pending",
+        "resetError": "We could not restore the previous state",
+        "scenesSaved": "Scenes updated",
+        "scenesError": "We could not save the scenes",
+        "uploadSuccess": "Photo uploaded to the gallery"
+      },
+      "prompts": {
+        "rejectTitle": "Reason for rejection",
+        "rejectDefault": "Does not match the gallery guidelines",
+        "rejectFallback": "Rejected"
+      },
+      "slideshow": {
+        "title": "Live slideshow",
+        "description": "Connect a second screen and let the memories flow automatically.",
+        "stats": "{{count}} approved photos Â· {{scenes}} scenes covered"
+      },
+      "uploader": {
+        "hostFallback": "Host"
+      }
+    },
+    "momentosGuest": {
+      "badge": "Collaborative memories",
+      "greeting": "Hi, {{name}} ðŸ‘‹",
+      "remainingUploadsSingle": "You can upload 1 more photo.",
+      "remainingUploads": "You can upload up to {{count}} more photos.",
+      "remainingUploadsUnlimited": "Upload as many photos as you like.",
+      "description": "The host will review them and share the highlights with everyone.",
+      "window": {
+        "daysLeft": "You still have {{count, plural, one {1 day} other {{count} days}} to share your best photos.",
+        "deadline": "Available until {{date}}.",
+        "compression": "New photos are optimised automatically to save storage."
+      },
+      "status": {
+        "loading": "Loading gallery...",
+        "loadingMessage": "Preparing your space to share memoriesâ€¦",
+        "errorTitle": "We could not open the memories gallery",
+        "errorAction": "If you believe this is a mistake, ask the couple for a new link.",
+        "closedTitle": "The upload window has closed",
+        "closedDescription": "The upload window has closed.",
+        "closedDescriptionWithDate": "The upload window closed on {{date}}.",
+        "closedHelp": "If you still have memories to share, let the couple know so they can reopen the link.",
+        "welcomeTitle": "Thanks for capturing memories!",
+        "welcomeDescription": "Upload your favourite photos from the event. The host will review them and showcase them in the live slideshow.",
+        "uploadTitle": "Your progress",
+        "tip": "Tip: photos are grouped by scene (ceremony, reception, partyâ€¦) to help the host.",
+        "uploadedSummary": "You have shared {{count}} {{count, plural, one {photo} other {photos}}}. Thanks for contributing!",
+        "recentUploads": "Approved photos will appear in the live slideshow and final gallery. The host will let you know when they are ready."
+      },
+      "form": {
+        "nameLabel": "Full name",
+        "namePlaceholder": "e.g. Laura G.",
+        "emailLabel": "Contact email (optional)",
+        "emailPlaceholder": "We will let you know when your photos are featured",
+        "termsLabel": "I agree to share my photos with the couple and confirm I have permission to do so.",
+        "submit": "Start uploading photos"
+      },
+      "progress": {
+        "title": "Your progress",
+        "sceneLabel": "Scene: {{scene}} Â· {{size}} KB",
+        "status": "In review"
+      },
+      "toasts": {
+        "nameRequired": "Please tell us your name so we can personalise your uploads",
+        "termsRequired": "You must accept the privacy notice",
+        "windowClosed": "This gallery is no longer accepting new photos.",
+        "achievementFirst": "ðŸ… Achievement unlocked! Your first memory âœ¨",
+        "achievementEnthusiast": "ðŸŽ‰ You are a collaborative rockstar! Keep sharing memories.",
+        "achievementStar": "ðŸŒŸ Star memories! Your photos will shine in the slideshow.",
+        "upload": "Photo uploaded successfully"
+      },
+      "errors": {
+        "incompleteLink": "The link is incomplete. Ask the host for a new QR code.",
+        "invalidLink": "This link is no longer valid."
+      },
+      "scenes": {
+        "other": "Other"
+      },
+      "uploader": {
+        "guestFallback": "Guest"
+      }
+    }
   }
 }

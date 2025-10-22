@@ -101,6 +101,18 @@ const ADMIN_NAVIGATION = [
       },
     ],
   },
+  {
+    id: 'development',
+    title: 'Desarrollo',
+    items: [
+      {
+        id: 'debug-payments',
+        label: 'Debug Pagos',
+        path: '/admin/debug/payments',
+        description: 'Diagnóstico de facturación y datos de pagos en Firestore.',
+      },
+    ],
+  },
 ];
 
 const ADMIN_ALLOWED_PATHS = new Set(['/admin']);

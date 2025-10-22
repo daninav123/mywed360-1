@@ -47,6 +47,7 @@ import AdminDiscounts from './pages/admin/AdminDiscounts.jsx';
 import AdminReports from './pages/admin/AdminReports.jsx';
 import AdminSupport from './pages/admin/AdminSupport.jsx';
 import AdminTaskTemplates from './pages/admin/AdminTaskTemplates.jsx';
+import AdminDebugPayments from './pages/admin/AdminDebugPayments.jsx';
 import PartnerStats from './pages/PartnerStats.jsx';
 import WebEditor from './pages/WebEditor';
 import WeddingSite from './pages/WeddingSite';
@@ -266,6 +267,7 @@ function App() {
                   <Route path="reports" element={<AdminReports />} />
                   <Route path="support" element={<AdminSupport />} />
                   <Route path="task-templates" element={<AdminTaskTemplates />} />
+                  <Route path="debug/payments" element={<AdminDebugPayments />} />
                 </Route>
               </Route>
 
