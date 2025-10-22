@@ -27,7 +27,7 @@ describe('Seating Plan - Smoke E2E', () => {
 
     // Cambiar a herramienta Perímetro, dibujar un polígono y finalizar (cambiar a Navegar)
     cy.contains('button', 'Perímetro').click();
-    cy.get('svg').click(150, 150).click(250, 150).click(250, 230).click(150, 230);
+    cy.get('svg').first().click(150, 150, { force: true }).click(250, 150, { force: true }).click(250, 230, { force: true }).click(150, 230, { force: true });
     cy.contains('button', 'Navegar').click();
 
     // Ahora podemos deshacer y rehacer

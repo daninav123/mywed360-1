@@ -55,6 +55,64 @@ Cypress.Commands.add('seedPlannerWeddings', (plannerUid, weddings = [], activeId
 });
 
 /**
+ * Comando para configurar mock mínimo de boda sin navegar
+ * Útil para tests de seating que ya están en la página correcta
+ */
+Cypress.Commands.add('mockWeddingMinimal', () => {
+  cy.window().then((win) => {
+    const mockUser = {
+      uid: 'cypress-user-' + Date.now(),
+      email: 'test@lovenda.com',
+      displayName: 'Usuario Test',
+      emailVerified: true,
+      photoURL: null,
+      idToken: 'mock-id-token',
+    };
+
+    const mockProfile = {
+      id: mockUser.uid,
+      email: mockUser.email,
+      name: mockUser.displayName,
+      role: 'owner',
+      preferences: { theme: 'light', emailNotifications: true },
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    const mockWedding = {
+      id: 'test-wedding-' + Date.now(),
+      name: 'Boda Test',
+      date: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
+      venue: 'Lugar Test',
+      ownerIds: [mockUser.uid],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      isActive: true,
+      guestCount: 100,
+      budget: 50000,
+      status: 'planning'
+    };
+
+    // Configurar localStorage
+    win.localStorage.setItem('isLoggedIn', 'true');
+    win.localStorage.setItem('MyWed360_mock_user', JSON.stringify(mockUser));
+    win.localStorage.setItem('MyWed360_user_profile', JSON.stringify(mockProfile));
+    win.localStorage.setItem('MyWed360_auth_token', 'mock-token');
+    win.localStorage.setItem('MyWed360_active_wedding', JSON.stringify(mockWedding));
+    win.localStorage.setItem('MyWed360_weddings', JSON.stringify([mockWedding]));
+    win.localStorage.setItem('MyWed360_test_mode', 'true');
+    
+    cy.log('Mock wedding minimal configurado');
+  });
+  
+  // Interceptar Firebase/Firestore
+  cy.intercept('POST', '**googleapis.com/**', { statusCode: 200, body: {} });
+  cy.intercept('GET', '**googleapis.com/**', { statusCode: 200, body: {} });
+  cy.intercept('POST', '**firestore.googleapis.com/**', { statusCode: 200, body: {} });
+  cy.intercept('GET', '**firestore.googleapis.com/**', { statusCode: 200, body: {} });
+});
+
+/**
  * Comando para autenticarse en Lovenda usando Firebase Auth real
  * @param {string} email - Email del usuario (opcional, usa uno por defecto)
  */
