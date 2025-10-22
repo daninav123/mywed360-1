@@ -336,12 +336,20 @@ export const AuthProvider = ({ children }) => {
 
         const rawExpires = localStorage.getItem(ADMIN_SESSION_EXPIRES_KEY);
         const sessionId = localStorage.getItem(ADMIN_SESSION_ID_KEY);
-        let expiresAt = rawExpires ? new Date(rawExpires) : null;
-        if (expiresAt && Number.isNaN(expiresAt.getTime())) {
-          expiresAt = null;
+        
+        // rawExpires es un timestamp numérico, no un ISO string
+        let expiresAt = null;
+        if (rawExpires) {
+          const timestamp = parseInt(rawExpires, 10);
+          if (!isNaN(timestamp)) {
+            expiresAt = new Date(timestamp);
+          }
         }
 
+        // Verificar si la sesión ha expirado
         if (expiresAt && expiresAt.getTime() <= Date.now()) {
+          console.log('[useAuth] Sesión admin expirada, limpiando localStorage');
+
           try {
             localStorage.removeItem(ADMIN_SESSION_TOKEN_KEY);
             localStorage.removeItem(ADMIN_SESSION_EXPIRES_KEY);
@@ -372,6 +380,13 @@ export const AuthProvider = ({ children }) => {
             provider: 'admin-local',
           });
         } catch {}
+
+        console.log('[useAuth] ✅ Sesión admin restaurada correctamente', {
+          email: adminUser.email,
+          expiresAt: expiresAt ? expiresAt.toLocaleString() : 'no expira',
+          hasToken: !!storedToken,
+          sessionId: sessionId || 'ninguno',
+        });
 
         return true;
       } catch (error) {
