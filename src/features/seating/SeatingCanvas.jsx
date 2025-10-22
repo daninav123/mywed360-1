@@ -47,6 +47,7 @@ const SeatingCanvas = forwardRef(function SeatingCanvas(
     suggestions = null,
     tableLocks = new Map(),
     currentClientId = null,
+    designFocusMode = false,
   },
   _forwardedRef
 ) {
@@ -340,6 +341,7 @@ const SeatingCanvas = forwardRef(function SeatingCanvas(
               lockedBy={lockedBy}
               lockedColor={lockedColor}
               lockedIsCurrent={lockedIsCurrent}
+              designFocusMode={designFocusMode}
             />
           );
         })}

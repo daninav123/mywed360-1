@@ -1260,21 +1260,194 @@ export default function TasksRefactored() {
 
   // Subtareas (lista): combinar modelo nuevo (nested) y legacy (flat con type='subtask')
   const subtaskEvents = useMemo(() => {
+    const toNumberOrNull = (value) => {
+      if (value === null || value === undefined) return null;
+      const num = Number(value);
+      return Number.isFinite(num) ? num : null;
+    };
+
+    const getValueFromPath = (obj, path) => {
+      if (!obj || typeof obj !== 'object') return undefined;
+      if (!path || typeof path !== 'string') return undefined;
+      if (!path.includes('.')) return obj?.[path];
+      return path.split('.').reduce((acc, key) => {
+        if (acc && Object.prototype.hasOwnProperty.call(acc, key)) {
+          return acc[key];
+        }
+        return undefined;
+      }, obj);
+    };
+
+    const extractIndexFromSource = (source, keys) => {
+      for (const key of keys) {
+        const value = getValueFromPath(source, key);
+        const num = toNumberOrNull(value);
+        if (num !== null) return num;
+      }
+      return null;
+    };
+
+    const normalizeDependencyList = (list) => {
+      if (!Array.isArray(list)) return [];
+      const out = [];
+      for (const dep of list) {
+        if (!dep) continue;
+        if (typeof dep === 'string' || typeof dep === 'number') {
+          out.push({ id: String(dep) });
+          continue;
+        }
+        if (typeof dep !== 'object') continue;
+        const meta = dep;
+        const idCandidate =
+          meta.taskId ??
+          meta.taskID ??
+          meta.subtaskId ??
+          meta.subtaskID ??
+          meta.itemId ??
+          meta.id ??
+          meta.targetId ??
+          meta.targetID ??
+          meta.task?.id ??
+          meta.nodeId ??
+          meta.nodeID;
+        const blockIndex = toNumberOrNull(
+          meta.blockIndex ??
+            meta.block ??
+            meta.blockIdx ??
+            meta.parentBlockIndex ??
+            meta.block_index ??
+            meta.blockID
+        );
+        const itemIndex = toNumberOrNull(
+          meta.itemIndex ??
+            meta.item ??
+            meta.itemIdx ??
+            meta.parentItemIndex ??
+            meta.item_index ??
+            meta.taskIndex ??
+            meta.stepIndex ??
+            meta.subtaskIndex
+        );
+        const parentId =
+          meta.parentId ??
+          meta.parentID ??
+          (meta.parent && meta.parent.id ? meta.parent.id : null) ??
+          meta.taskParentId ??
+          meta.blockId ??
+          meta.blockID ??
+          null;
+        const normalized = {};
+        if (idCandidate !== undefined && idCandidate !== null && idCandidate !== '') {
+          normalized.id = String(idCandidate);
+        }
+        if (blockIndex !== null) normalized.blockIndex = blockIndex;
+        if (itemIndex !== null) normalized.itemIndex = itemIndex;
+        if (parentId) normalized.parentId = String(parentId);
+        if (
+          normalized.id === undefined &&
+          normalized.blockIndex === undefined &&
+          normalized.itemIndex === undefined &&
+          !normalized.parentId
+        ) {
+          continue;
+        }
+        normalized.raw = meta;
+        out.push(normalized);
+      }
+      return out;
+    };
+
+    const collectDependencyIds = (normalizedEntries, source) => {
+      const ids = new Set();
+      normalizedEntries.forEach((entry) => {
+        if (entry && entry.id) ids.add(String(entry.id));
+      });
+      const extras = [
+        source?.ganttDependsOnIds,
+        source?.dependsOnIds,
+        source?.dependencyIds,
+        source?.dependsOnTaskIds,
+        source?.dependsOnTaskId,
+        source?.dependsOnSubtaskIds,
+        source?.dependsOnSubtaskId,
+        source?.blockedBy,
+        source?.blocked_by,
+      ];
+      extras.forEach((candidate) => {
+        if (candidate === null || candidate === undefined) return;
+        if (Array.isArray(candidate)) {
+          candidate.forEach((value) => {
+            if (value !== null && value !== undefined && value !== '') {
+              ids.add(String(value));
+            }
+          });
+        } else if (candidate !== '') {
+          ids.add(String(candidate));
+        }
+      });
+      return Array.from(ids);
+    };
+
+    const BLOCK_INDEX_KEYS = [
+      'ganttBlockIndex',
+      'blockIndex',
+      'parentBlockIndex',
+      '__blockIndex',
+      'block_index',
+      'blockIdx',
+      'meta.blockIndex',
+      'metadata.blockIndex',
+      'admin.blockIndex',
+    ];
+
+    const ITEM_INDEX_KEYS = [
+      'ganttItemIndex',
+      'itemIndex',
+      'parentItemIndex',
+      '__itemIndex',
+      'item_index',
+      'itemIdx',
+      'taskIndex',
+      'meta.itemIndex',
+      'metadata.itemIndex',
+      'admin.itemIndex',
+      'index',
+    ];
+
+    const enrichWithDependencyMeta = (source, base) => {
+      const dependsOnRaw = Array.isArray(source?.dependsOn) ? source.dependsOn : [];
+      const normalizedDeps = normalizeDependencyList(dependsOnRaw);
+      const dependencyIds = collectDependencyIds(normalizedDeps, source || {});
+      const blockIndex = extractIndexFromSource(source || {}, BLOCK_INDEX_KEYS);
+      const itemIndex = extractIndexFromSource(source || {}, ITEM_INDEX_KEYS);
+      return {
+        ...base,
+        dependsOn: dependsOnRaw,
+        ganttDependsOn: normalizedDeps,
+        ganttDependsOnIds: dependencyIds,
+        ganttBlockIndex: blockIndex,
+        ganttItemIndex: itemIndex,
+      };
+    };
+
     try {
       // a) Subtareas planas con fechas válidas (provenientes del normalizador Gantt)
       const flatScheduled = (Array.isArray(uniqueGanttTasks) ? uniqueGanttTasks : [])
         .filter((t) => String(t.type || 'task') === 'subtask')
-        .map((t) => ({
-          id: String(t.id),
-          title: t.name || t.title || 'Subtarea',
-          desc: t.desc || '',
-          category: t.category || 'OTROS',
-          start: t.start instanceof Date ? t.start : new Date(t.start),
-          end: t.end instanceof Date ? t.end : new Date(t.end),
-          assignee: t.assignee || '',
-          parentId: t.parentId || '',
-          __kind: 'subtask',
-        }));
+        .map((t) => {
+          const base = {
+            id: String(t.id),
+            title: t.name || t.title || 'Subtarea',
+            desc: t.desc || '',
+            category: t.category || 'OTROS',
+            start: t.start instanceof Date ? t.start : new Date(t.start),
+            end: t.end instanceof Date ? t.end : new Date(t.end),
+            assignee: t.assignee || '',
+            parentId: t.parentId || '',
+            __kind: 'subtask',
+          };
+          return enrichWithDependencyMeta(t, base);
+        });
 
       // b) Subtareas anidadas (modelo nuevo)
       const nestedSource = (Array.isArray(nestedSubtasks) && nestedSubtasks.length > 0)
@@ -1306,7 +1479,7 @@ export default function TasksRefactored() {
           } catch {}
           return '';
         })();
-        return {
+        const base = {
           id: String(s.id),
           title: s.name || s.title || 'Subtarea',
           desc: s.desc || '',
@@ -1318,6 +1491,7 @@ export default function TasksRefactored() {
           __kind: 'subtask',
           __path: s.__path || undefined,
         };
+        return enrichWithDependencyMeta(s, base);
       });
 
       // c) Subtareas planas (todas, incluso sin fecha) — siempre incluir para compatibilidad
@@ -1327,7 +1501,7 @@ export default function TasksRefactored() {
         .map((t) => {
           const s = t?.start?.toDate ? t.start.toDate() : (t?.start ? new Date(t.start) : null);
           const e = t?.end?.toDate ? t.end.toDate() : (t?.end ? new Date(t.end) : (s || null));
-          return {
+          const base = {
             id: String(t.id),
             title: t.name || t.title || 'Subtarea',
             desc: t.desc || '',
@@ -1338,6 +1512,7 @@ export default function TasksRefactored() {
             parentId: t.parentId || t.parentTaskId || '',
             __kind: 'subtask',
           };
+          return enrichWithDependencyMeta(t, base);
         });
 
       // Unificar con prioridad: nested > flatScheduled > flatAll

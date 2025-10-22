@@ -47,6 +47,160 @@ const RISK_STYLES = {
 };
 
 const MIN_GANTT_COLUMN_WIDTH = 0.1;
+const DEP_BLOCK_INDEX_KEYS = [
+  'ganttBlockIndex',
+  'blockIndex',
+  'parentBlockIndex',
+  '__blockIndex',
+  'block_index',
+  'blockIdx',
+  'meta.blockIndex',
+  'metadata.blockIndex',
+  'admin.blockIndex',
+];
+const DEP_ITEM_INDEX_KEYS = [
+  'ganttItemIndex',
+  'itemIndex',
+  'parentItemIndex',
+  '__itemIndex',
+  'item_index',
+  'itemIdx',
+  'taskIndex',
+  'meta.itemIndex',
+  'metadata.itemIndex',
+  'admin.itemIndex',
+  'index',
+  'stepIndex',
+  'subtaskIndex',
+];
+
+const toGanttNumber = (value) => {
+  if (value === null || value === undefined) return null;
+  const num = Number(value);
+  return Number.isFinite(num) ? num : null;
+};
+
+const getValueByPath = (obj, path) => {
+  if (!obj || typeof obj !== 'object') return undefined;
+  if (!path || typeof path !== 'string') return undefined;
+  if (!path.includes('.')) return obj?.[path];
+  return path.split('.').reduce((acc, key) => {
+    if (acc && Object.prototype.hasOwnProperty.call(acc, key)) {
+      return acc[key];
+    }
+    return undefined;
+  }, obj);
+};
+
+const extractNumericFromKeys = (source, keys) => {
+  for (const key of keys) {
+    const value = getValueByPath(source, key);
+    const num = toGanttNumber(value);
+    if (num !== null) return num;
+  }
+  return null;
+};
+
+const normalizeGanttDependencyList = (list) => {
+  if (!Array.isArray(list)) return [];
+  const out = [];
+  for (const dep of list) {
+    if (!dep) continue;
+    if (typeof dep === 'string' || typeof dep === 'number') {
+      out.push({ id: String(dep) });
+      continue;
+    }
+    if (typeof dep !== 'object') continue;
+    const meta = dep;
+    const idCandidate =
+      meta.id ??
+      meta.taskId ??
+      meta.taskID ??
+      meta.subtaskId ??
+      meta.subtaskID ??
+      meta.itemId ??
+      meta.targetId ??
+      meta.targetID ??
+      meta.task?.id ??
+      meta.nodeId ??
+      meta.nodeID;
+    const blockIndex = toGanttNumber(
+      meta.blockIndex ??
+        meta.block ??
+        meta.blockIdx ??
+        meta.parentBlockIndex ??
+        meta.block_index ??
+        meta.blockID
+    );
+    const itemIndex = toGanttNumber(
+      meta.itemIndex ??
+        meta.item ??
+        meta.itemIdx ??
+        meta.parentItemIndex ??
+        meta.item_index ??
+        meta.taskIndex ??
+        meta.stepIndex ??
+        meta.subtaskIndex
+    );
+    const parentId =
+      meta.parentId ??
+      meta.parentID ??
+      (meta.parent && meta.parent.id ? meta.parent.id : null) ??
+      meta.taskParentId ??
+      meta.blockId ??
+      meta.blockID ??
+      null;
+    const normalized = {};
+    if (idCandidate !== undefined && idCandidate !== null && idCandidate !== '') {
+      normalized.id = String(idCandidate);
+    }
+    if (blockIndex !== null) normalized.blockIndex = blockIndex;
+    if (itemIndex !== null) normalized.itemIndex = itemIndex;
+    if (parentId) normalized.parentId = String(parentId);
+    if (
+      normalized.id === undefined &&
+      normalized.blockIndex === undefined &&
+      normalized.itemIndex === undefined &&
+      !normalized.parentId
+    ) {
+      continue;
+    }
+    normalized.raw = meta;
+    out.push(normalized);
+  }
+  return out;
+};
+
+const collectDependencyIdCandidates = (normalizedEntries, source) => {
+  const ids = new Set();
+  normalizedEntries.forEach((entry) => {
+    if (entry && entry.id) ids.add(String(entry.id));
+  });
+  const extras = [
+    source?.ganttDependsOnIds,
+    source?.dependsOnIds,
+    source?.dependencyIds,
+    source?.dependsOnTaskIds,
+    source?.dependsOnTaskId,
+    source?.dependsOnSubtaskIds,
+    source?.dependsOnSubtaskId,
+    source?.blockedBy,
+    source?.blocked_by,
+  ];
+  extras.forEach((candidate) => {
+    if (candidate === null || candidate === undefined) return;
+    if (Array.isArray(candidate)) {
+      candidate.forEach((value) => {
+        if (value !== null && value !== undefined && value !== '') {
+          ids.add(String(value));
+        }
+      });
+    } else if (candidate !== '') {
+      ids.add(String(candidate));
+    }
+  });
+  return Array.from(ids);
+};
 
 export default function LongTermTasksGantt({
   containerRef,
@@ -258,6 +412,15 @@ export default function LongTermTasksGantt({
           const end = normalizeAnyDate(s?.end);
           const parentId = String(s?.parentId || s?.parentTaskId || s?.parent || '');
           if (!start || !end || end < start || !parentId) return null;
+          const rawDependsOn = Array.isArray(s?.dependsOn) ? s.dependsOn : [];
+          const normalizedDepends =
+            Array.isArray(s?.ganttDependsOn) && s.ganttDependsOn.length > 0
+              ? s.ganttDependsOn
+              : normalizeGanttDependencyList(rawDependsOn);
+          const dependencyIds = collectDependencyIdCandidates(normalizedDepends, s);
+          const dependsOnIds = Array.from(new Set(dependencyIds.map((v) => String(v))));
+          const blockIndex = extractNumericFromKeys(s, DEP_BLOCK_INDEX_KEYS);
+          const itemIndex = extractNumericFromKeys(s, DEP_ITEM_INDEX_KEYS);
           return {
             id: String(s.id || `${parentId}-${start.getTime()}`),
             name: s.name || s.title || 'Subtarea',
@@ -266,6 +429,11 @@ export default function LongTermTasksGantt({
             parentId,
             type: 'subtask',
             progress: Number(s.progress) || 0,
+            rawDependsOn,
+            dependsOnNormalized: normalizedDepends,
+            dependsOnIds,
+            blockIndex,
+            itemIndex,
           };
         })
         .filter(Boolean)
@@ -476,27 +644,156 @@ export default function LongTermTasksGantt({
   const segmentsByParent = useMemo(() => {
     const out = new Map();
     const MS = 24 * 60 * 60 * 1000;
-    for (const p of parentTasks) {
-      const kids = (subtasksByParent.get(String(p.id)) || []).slice().sort((a, b) => a.start - b.start);
-      const segs = [];
-      let current = null;
-      for (const st of kids) {
-        if (!current) {
-          current = { id: `${p.id}-seg-0`, parentId: p.id, start: st.start, end: st.end, subtaskIds: [st.id] };
-          segs.push(current);
-        } else {
-          const gapDays = Math.round((st.start.getTime() - current.end.getTime()) / MS);
-          if (gapDays > SEGMENT_GAP_DAYS) {
-            current = { id: `${p.id}-seg-${segs.length}`, parentId: p.id, start: st.start, end: st.end, subtaskIds: [st.id] };
-            segs.push(current);
-          } else {
-            current.end = new Date(Math.max(current.end.getTime(), st.end.getTime()));
-            current.subtaskIds.push(st.id);
-          }
-        }
+
+    const resolveDependenciesWithinParent = (kid, byId, blockItemMap) => {
+      const resolved = new Set();
+      const kidId = String(kid.id);
+      const pushCandidate = (value) => {
+        if (value === null || value === undefined) return;
+        const id = String(value);
+        if (id === kidId) return;
+        if (byId.has(id)) resolved.add(id);
+      };
+
+      if (Array.isArray(kid.dependsOnIds)) {
+        kid.dependsOnIds.forEach(pushCandidate);
       }
-      out.set(String(p.id), segs);
+
+      const inspectEntry = (entry) => {
+        if (!entry) return;
+        if (entry.id) pushCandidate(entry.id);
+        const meta = entry.raw || entry;
+        const blockIndex =
+          entry.blockIndex ?? toGanttNumber(meta?.blockIndex ?? meta?.block ?? meta?.blockIdx ?? meta?.parentBlockIndex ?? meta?.block_index);
+        const itemIndex =
+          entry.itemIndex ?? toGanttNumber(meta?.itemIndex ?? meta?.item ?? meta?.itemIdx ?? meta?.parentItemIndex ?? meta?.item_index ?? meta?.taskIndex ?? meta?.stepIndex);
+        if (blockIndex !== null && itemIndex !== null) {
+          const key = `${blockIndex}:${itemIndex}`;
+          const candidateId = blockItemMap.get(key);
+          if (candidateId) pushCandidate(candidateId);
+        }
+        if (entry.parentId) pushCandidate(entry.parentId);
+      };
+
+      const normalizedList = Array.isArray(kid.dependsOnNormalized) ? kid.dependsOnNormalized : [];
+      normalizedList.forEach(inspectEntry);
+
+      const rawList = Array.isArray(kid.rawDependsOn) ? kid.rawDependsOn : [];
+      rawList.forEach((dep) => {
+        if (!dep) return;
+        if (typeof dep === 'string' || typeof dep === 'number') {
+          pushCandidate(dep);
+          return;
+        }
+        if (typeof dep !== 'object') return;
+        inspectEntry(dep);
+      });
+
+      return Array.from(resolved);
+    };
+
+    for (const p of parentTasks) {
+      const kids = (subtasksByParent.get(String(p.id)) || [])
+        .slice()
+        .filter((st) => st && st.start instanceof Date && st.end instanceof Date)
+        .sort((a, b) => a.start - b.start);
+
+      if (kids.length === 0) {
+        out.set(String(p.id), []);
+        continue;
+      }
+
+      const byId = new Map();
+      const blockItemMap = new Map();
+      kids.forEach((kid) => {
+        const id = String(kid.id);
+        byId.set(id, kid);
+        const blockIndex = toGanttNumber(kid.blockIndex);
+        const itemIndex = toGanttNumber(kid.itemIndex);
+        if (blockIndex !== null && itemIndex !== null) {
+          blockItemMap.set(`${blockIndex}:${itemIndex}`, id);
+        }
+      });
+
+      const dependencyMap = new Map();
+      kids.forEach((kid) => {
+        dependencyMap.set(
+          String(kid.id),
+          resolveDependenciesWithinParent(kid, byId, blockItemMap)
+        );
+      });
+
+      const depthCache = new Map();
+      const visiting = new Set();
+      const depthFor = (id) => {
+        if (depthCache.has(id)) return depthCache.get(id);
+        if (visiting.has(id)) return 0;
+        visiting.add(id);
+        const deps = dependencyMap.get(id) || [];
+        let depth = 0;
+        if (deps.length > 0) {
+          let max = 0;
+          for (const depId of deps) {
+            const depDepth = depthFor(depId);
+            if (depDepth > max) max = depDepth;
+          }
+          depth = max + 1;
+        }
+        visiting.delete(id);
+        depthCache.set(id, depth);
+        return depth;
+      };
+
+      const levelGroups = new Map();
+      kids.forEach((kid) => {
+        const level = depthFor(String(kid.id));
+        if (!levelGroups.has(level)) levelGroups.set(level, []);
+        levelGroups.get(level).push(kid);
+      });
+
+      const levelKeys = Array.from(levelGroups.keys()).sort((a, b) => a - b);
+      const segments = [];
+      let segmentCounter = 0;
+      const createSegment = (kid, level) => {
+        const seg = {
+          id: `${p.id}-seg-${segmentCounter}`,
+          parentId: p.id,
+          start: new Date(kid.start.getTime()),
+          end: new Date(kid.end.getTime()),
+          subtaskIds: [String(kid.id)],
+          level,
+        };
+        segmentCounter += 1;
+        segments.push(seg);
+        return seg;
+      };
+
+      levelKeys.forEach((level) => {
+        const levelKids = levelGroups.get(level).slice().sort((a, b) => a.start - b.start);
+        if (levelKids.length === 0) return;
+        let currentSegment = null;
+        levelKids.forEach((kid) => {
+          if (!currentSegment) {
+            currentSegment = createSegment(kid, level);
+            return;
+          }
+          const gapDays = Math.round(
+            (kid.start.getTime() - currentSegment.end.getTime()) / MS
+          );
+          if (gapDays > SEGMENT_GAP_DAYS) {
+            currentSegment = createSegment(kid, level);
+          } else {
+            const nextEnd = Math.max(currentSegment.end.getTime(), kid.end.getTime());
+            currentSegment.end = new Date(nextEnd);
+            currentSegment.subtaskIds.push(String(kid.id));
+          }
+        });
+      });
+
+      segments.sort((a, b) => a.start - b.start);
+      out.set(String(p.id), segments);
     }
+
     return out;
   }, [parentTasks, subtasksByParent]);
 

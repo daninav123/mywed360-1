@@ -71,6 +71,8 @@ export default function SeatingPlanQuickActions({
   onboarding = null,
   onboardingDismissed = false,
   onResetOnboarding,
+  focusMode = false,
+  onToggleFocusMode,
   onHideOverview,
   panels = {},
   smartPanelAvailable = true,

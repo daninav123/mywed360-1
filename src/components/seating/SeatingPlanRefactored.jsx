@@ -343,6 +343,9 @@ const SeatingPlanRefactored = () => {
       if (Object.prototype.hasOwnProperty.call(data, 'showOverview')) {
         setShowOverview(data.showOverview !== false);
       }
+      if (Object.prototype.hasOwnProperty.call(data, 'designFocusMode')) {
+        setDesignFocusMode(!!data.designFocusMode);
+      }
       if (Object.prototype.hasOwnProperty.call(data, 'onboarding')) {
         const next = sanitizeOnboardingState(data.onboarding);
         setOnboardingPrefs((prev) => (onboardingStatesEqual(prev, next) ? prev : next));
@@ -360,6 +363,7 @@ const SeatingPlanRefactored = () => {
       showInspectorPanel,
       showSmartPanelPinned,
       showOverview,
+      designFocusMode,
       onboarding: onboardingPrefs,
     });
   }, [
@@ -371,6 +375,7 @@ const SeatingPlanRefactored = () => {
     showInspectorPanel,
     showSmartPanelPinned,
     showOverview,
+    designFocusMode,
     onboardingPrefs,
     persistUiPrefs,
   ]);
@@ -644,6 +649,11 @@ const SeatingPlanRefactored = () => {
 
   const handleToggleGuestPanel = React.useCallback(
     () => setGuestSidebarOpen((prev) => !prev),
+    []
+  );
+
+  const handleToggleDesignFocus = React.useCallback(
+    () => setDesignFocusMode((prev) => !prev),
     []
   );
 
@@ -1475,6 +1485,7 @@ const SeatingPlanRefactored = () => {
       tableLocks={tableLocks}
       currentClientId={collabClientId}
       validationsEnabled={validationsEnabled}
+      designFocusMode={designFocusMode}
       suggestions={guidedGuestId ? suggestTablesForGuest?.(guidedGuestId) || null : null}
       focusTableId={focusTableId}
       onViewportChange={(vp) => setViewport(vp)}
@@ -1577,6 +1588,8 @@ const SeatingPlanRefactored = () => {
                 onOpenExport={() => setExportWizardOpen(true)}
                 onToggleAdvancedTools={(open) => setShowAdvancedTools(!!open)}
                 advancedOpen={showAdvancedTools}
+                focusMode={designFocusMode}
+                onToggleFocusMode={handleToggleDesignFocus}
                 onboarding={{
                   activeStep: onboardingActiveStep,
                   completed: {

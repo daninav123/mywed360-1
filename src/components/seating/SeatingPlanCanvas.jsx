@@ -41,6 +41,7 @@ const SeatingPlanCanvas = ({
   onViewportChange,
   tableLocks = new Map(),
   currentClientId = null,
+  designFocusMode = false,
 }) => {
   // DnDProvider se gestiona en el componente padre (SeatingPlanRefactored)
 
@@ -621,6 +622,7 @@ const SeatingPlanCanvas = ({
           globalMaxSeats={globalMaxSeats}
           tableLocks={tableLocks}
           currentClientId={currentClientId}
+          designFocusMode={designFocusMode}
         />
 
         {/* Rectángulo de selección */}

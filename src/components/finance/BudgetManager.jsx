@@ -31,6 +31,8 @@ export default function BudgetManager({
   onReallocateCategories,
   onUpdateCategory,
   onRemoveCategory,
+  alertThresholds,
+  onUpdateSettings,
   advisor = null,
   onRequestAdvisor,
   advisorLoading = false,
@@ -75,35 +77,19 @@ export default function BudgetManager({
   const statsTotalBudget = Number(stats?.totalBudget);
   const statsExpectedBudget = Number(stats?.expectedIncome);
   const statsTotalSpent = Number(stats?.totalSpent);
+  const totalBudgetValue =
     [computedTotal, statsTotalBudget, statsExpectedBudget, categoriesTotal].find(
       (value) => Number.isFinite(value) && value > 0
     ) || 0;
+  const totalBudgetCents = Math.max(0, Math.round(totalBudgetValue * 100));
+  const hasGlobalBudget = totalBudgetCents > 0;
+  const categoriesTotalCents = Math.max(0, Math.round(categoriesTotal * 100));
+  const baselineTotal = Number.isFinite(computedTotal) && computedTotal >= 0 ? computedTotal : categoriesTotal;
+  const thresholds = alertThresholds || { warn: 75, danger: 90 };
 
   const formatTotalInput = (value) => {
     if (!Number.isFinite(value)) return '';
     return (Math.round(value * 100) / 100).toFixed(2);
-  };  const handleChange = (event) => {
-    setDirty(true);
-    set(event.target.value);
-    setError('');
-  };
-
-  const apply = () => {
-    const normalized = parse();
-    if (!Number.isFinite(normalized) || normalized < 0) {
-      setError('Introduce un número válido mayor o igual a 0.');
-      return;
-    }
-    set(formatTotalInput(normalized));
-    setDirty(false);
-    setError('');
-    onUpdateBudget?.(normalized);
-  };
-
-  const reset = () => {
-    setDirty(false);
-    set(formatTotalInput(baselineTotal));
-    setError('');
   };
 
 /**
@@ -443,6 +429,75 @@ const distributeIncrease = (amounts, indices, delta) => {
     }
   };
 
+  const totalBudgeted = categories.reduce(
+    (sum, cat) => sum + (Number(cat.amount) || 0),
+    0
+  );
+  const totalSpent =
+    statsTotalSpent > 0
+      ? statsTotalSpent
+      : (budgetUsage || []).reduce((sum, cat) => sum + (Number(cat.spent) || 0), 0);
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center flex-wrap gap-3">
+        <div>
+          <h2 className="text-xl font-semibold text-[color:var(--color-text)]">
+            {t('finance.budget.title', { defaultValue: 'Gestión de presupuesto' })}
+          </h2>
+          <p className="text-sm text-[color:var(--color-text)]/70">
+            {t('finance.budget.subtitle', {
+              defaultValue: 'Organiza y controla el presupuesto por categorías',
+            })}
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            leftIcon={<CheckCircle size={16} />}
+            onClick={captureSnapshot}
+          >
+            {t('finance.benchmarks.saveSnapshot', { defaultValue: 'Guardar presupuesto' })}
+          </Button>
+          <Button
+            variant="outline"
+            leftIcon={
+              advisorLoading || localAdvisorLoading ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                <Sparkles size={16} />
+              )
+            }
+            onClick={handleOpenAdvisor}
+            disabled={advisorLoading || localAdvisorLoading}
+          >
+            Abrir consejero
+          </Button>
+          <Button leftIcon={<Plus size={16} />} onClick={handleAddCategory}>
+            {t('finance.budget.newCategory', { defaultValue: 'Nueva categoría' })}
+          </Button>
+        </div>
+      </div>
+
+      <Card className="overflow-hidden bg-[var(--color-surface)]/80 backdrop-blur-md border-soft p-4">
+        {categories.length === 0 ? (
+          <div className="p-8 text-center">
+            <p className="text-[color:var(--color-text)]/60">
+              {t('finance.budget.empty', { defaultValue: 'No hay categorías de presupuesto' })}
+            </p>
+            <Button
+              className="mt-4"
+              onClick={handleAddCategory}
+              leftIcon={<Plus size={16} />}
+            >
+              {t('finance.budget.newCategory', { defaultValue: 'Nueva categoría' })}
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="space-y-2">
+            {(budgetUsage || categories.map((cat) => ({ ...cat, spent: 0, percentage: 0 }))).map((category, index) => {
+              const rawCategory = categories[index];
               const assignedAmountRaw = Number(
                 rawCategory?.amount ?? category.amount ?? 0
               );
@@ -460,9 +515,9 @@ const distributeIncrease = (amounts, indices, delta) => {
               const usagePercent = Math.min(Math.max(usageBase, 0), 999);
               const progressPercent = Math.min(usagePercent, 100);
               const barColor =
-                usagePercent >= (alertThresholds.danger || 90)
+                usagePercent >= (thresholds.danger || 90)
                   ? 'bg-[var(--color-danger)]'
-                  : usagePercent >= (alertThresholds.warn || 75)
+                  : usagePercent >= (thresholds.warn || 75)
                     ? 'bg-[var(--color-warning)]'
                     : 'bg-[var(--color-success)]';
               const sliderMin = Math.max(
