@@ -2779,6 +2779,7 @@ export default function TasksRefactored() {
             onToggleComplete={(id, val) => toggleCompleteById(id, val)}
             parentNameMap={parentNameMap}
             dependencyStatuses={blockedTasksMap}
+            containerHeight={calendarContainerHeight}
             onTaskClick={(event) => {
             if (handleTaskIntent(event)) return;
             const eventStart = event.start instanceof Date ? event.start : new Date(event.start);

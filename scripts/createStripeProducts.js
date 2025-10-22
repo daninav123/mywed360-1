@@ -30,7 +30,7 @@ async function createCoupleProduct(name, price, description, priceIdKey) {
     console.log(`📦 Creando producto: ${name}`);
     
     const product = await stripe.products.create({
-      name: `${name} - MyWed360`,
+      name: `${name} - MaLoveApp`,
       description: description,
       metadata: {
         type: 'wedding_license',
@@ -69,7 +69,7 @@ async function createPlannerProduct(name, monthlyPrice, annualPrice, maxWeddings
     console.log(`📦 Creando producto: ${name}`);
     
     const product = await stripe.products.create({
-      name: `${name} - MyWed360`,
+      name: `${name} - MaLoveApp`,
       description: description,
       metadata: {
         type: 'planner_pack',

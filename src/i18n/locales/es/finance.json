@@ -225,7 +225,21 @@
     "modal": {
       "editTitle": "Editar categoría",
       "newTitle": "Nueva categoría",
-      "name": "Nombre de la categoría"
+      "name": "Nombre de la categoría",
+      "namePlaceholder": "Ej.: Catering, música, flores...",
+      "amountLabel": "Presupuesto asignado (€)",
+      "amountPlaceholder": "0,00"
+    },
+    "errors": {
+      "nameRequired": "El nombre de la categoría es obligatorio",
+      "amountInvalid": "El monto debe ser un número válido"
+    },
+    "confirmDelete": "¿Estás seguro de eliminar la categoría \"{{category}}\"?",
+    "advisorErrors": {
+      "requestFailed": "No se pudo obtener la recomendación del consejero.",
+      "refreshFailed": "No se pudo actualizar la recomendación.",
+      "applyFailed": "No se pudo aplicar el escenario recomendado.",
+      "applyFailedWithReason": "No se pudo aplicar el escenario ({{reason}})."
     }
   },
   "benchmarks": {

@@ -3,6 +3,7 @@ import { useState, useCallback } from 'react';
 import useActiveWeddingInfo from './useActiveWeddingInfo';
 import { useAuth } from './useAuth';
 import { post as apiPost, get as apiGet } from '../services/apiClient';
+import { getAdminFetchOptions } from '../services/adminSession';
 
 const slugify = (value) =>
   !value
@@ -231,12 +232,14 @@ export const useAISearch = () => {
 
       let lastError = null;
 
+      const baseFetchOptions = getAdminFetchOptions({ silent: true, auth: !!user });
+
       try {
         if (ENABLE_BACKEND_AI) {
           const res = await apiPost(
             '/api/ai-suppliers',
             { query, service: inferredService, budget, profile, location },
-            { auth: true, silent: true }
+            baseFetchOptions
           );
           if (res?.ok) {
             const data = await res.json().catch(() => null);
@@ -290,7 +293,7 @@ export const useAISearch = () => {
       try {
         const q = [query, inferredService, location].filter(Boolean).join(' ');
         const res2 = await apiGet(`/api/ai/search-suppliers?q=${encodeURIComponent(q)}`, {
-          silent: true,
+          ...getAdminFetchOptions({ silent: true, auth: !!user }),
         });
         if (res2?.ok) {
           const json = await res2.json().catch(() => null);

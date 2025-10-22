@@ -13,6 +13,7 @@ export default function TaskList({
   onToggleComplete,
   parentNameMap = {},
   dependencyStatuses = new Map(),
+  containerHeight = null,
 }) {
   const todayStart = useMemo(() => {
     const base = new Date();
@@ -20,12 +21,33 @@ export default function TaskList({
     return base;
   }, []);
 
+  const calendarExtras = useMemo(() => {
+    if (!containerHeight) return 0;
+    const base = Math.round(containerHeight * 0.24);
+    return Math.max(96, Math.min(180, base));
+  }, [containerHeight]);
+
+  const totalTargetHeight = useMemo(() => {
+    if (!containerHeight) return null;
+    return containerHeight + calendarExtras;
+  }, [containerHeight, calendarExtras]);
+
   const [pageSize, setPageSize] = useState(() => Math.max(1, Number(maxItems) || DEFAULT_PAGE_SIZE));
   const [page, setPage] = useState(0);
 
   useEffect(() => {
-    setPageSize(Math.max(1, Number(maxItems) || DEFAULT_PAGE_SIZE));
-  }, [maxItems]);
+    const explicit = Math.max(1, Number(maxItems) || DEFAULT_PAGE_SIZE);
+    if (!totalTargetHeight) {
+      setPageSize(explicit);
+      return;
+    }
+    const HEADER_RESERVE = 110;
+    const FOOTER_RESERVE = 64;
+    const CARD_APPROX = 115;
+    const available = Math.max(CARD_APPROX, totalTargetHeight - HEADER_RESERVE - FOOTER_RESERVE);
+    const computed = Math.max(1, Math.floor(available / CARD_APPROX));
+    setPageSize(Math.max(1, Math.min(explicit, computed)));
+  }, [maxItems, totalTargetHeight]);
 
   const sortedTasks = useMemo(() => {
     if (!Array.isArray(tasks)) return [];
@@ -123,8 +145,15 @@ export default function TaskList({
     } catch {}
   };
 
+  const containerStyle = totalTargetHeight
+    ? { height: totalTargetHeight, minHeight: totalTargetHeight, maxHeight: totalTargetHeight }
+    : undefined;
+
   return (
-    <div className="flex-1 rounded-xl shadow-md overflow-hidden h-full flex flex-col bg-[var(--color-surface)] text-[color:var(--color-text)] border border-[color:var(--color-text)]/10">
+    <div
+      className="flex-1 rounded-xl shadow-md overflow-hidden h-full flex flex-col bg-[var(--color-surface)] text-[color:var(--color-text)] border border-[color:var(--color-text)]/10"
+      style={containerStyle}
+    >
       <div className="px-4 py-3 border-b border-[color:var(--color-text)]/10">
         <h2 className="text-lg font-semibold">Tareas críticas de esta semana</h2>
         <div className="flex flex-wrap gap-2 mt-1 text-[10px] text-[color:var(--color-text)]/60">

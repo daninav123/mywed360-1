@@ -1,4 +1,4 @@
-﻿{
+{
   "app": {
     "name": "MaLove.App",
     "brandName": "Lovenda",
@@ -371,7 +371,21 @@
       "modal": {
         "editTitle": "Edit category",
         "newTitle": "New category",
-        "name": "Category name"
+        "name": "Category name",
+        "namePlaceholder": "e.g. Catering, Music, Flowers…",
+        "amountLabel": "Assigned budget (€)",
+        "amountPlaceholder": "0.00"
+      },
+      "errors": {
+        "nameRequired": "Category name is required",
+        "amountInvalid": "Amount must be a valid number"
+      },
+      "confirmDelete": "Are you sure you want to delete the \"{{category}}\" category?",
+      "advisorErrors": {
+        "requestFailed": "Unable to fetch advisor recommendation.",
+        "refreshFailed": "Unable to refresh advisor recommendation.",
+        "applyFailed": "Unable to apply the recommended scenario.",
+        "applyFailedWithReason": "Unable to apply the scenario ({{reason}})."
       }
     },
     "benchmarks": {
@@ -1075,4 +1089,3 @@
     }
   }
 }
-

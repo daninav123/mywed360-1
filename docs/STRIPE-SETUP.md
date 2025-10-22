@@ -1,4 +1,4 @@
-# Configuración de Stripe para MyWed360
+# Configuración de Stripe para MaLoveApp
 
 > **Modelo vigente:** Licencias por boda (octubre 2025). Cada boda se activa con un pago único. Los planners compran paquetes de licencias con modalidad mensual (12 cuotas) o anual (15% descuento).
 
@@ -45,7 +45,7 @@
 #### Wedding Pass (50 EUR)
 ```
 1. Ve a https://dashboard.stripe.com/test/products/create
-2. Product name: Wedding Pass - MyWed360
+2. Product name: Wedding Pass - MaLoveApp
 3. Description: Pago único por boda con funcionalidades completas
 4. Pricing model: One-time
 5. Price: 50 EUR
@@ -55,7 +55,7 @@
 
 #### Wedding Pass Plus (85 EUR)
 ```
-1. Product name: Wedding Pass Plus - MyWed360
+1. Product name: Wedding Pass Plus - MaLoveApp
 2. Description: Pago único premium sin marca y con ayudante
 3. Pricing model: One-time
 4. Price: 85 EUR
@@ -65,7 +65,7 @@
 
 #### Extensión post-boda (15 EUR)
 ```
-1. Product name: Extensión post-boda - MyWed360
+1. Product name: Extensión post-boda - MaLoveApp
 2. Description: 90 días extra de acceso editable
 3. Pricing model: One-time
 4. Price: 15 EUR
@@ -83,7 +83,7 @@
 
 **Versión Mensual (41,67 EUR/mes)**
 ```
-1. Product name: Planner Pack 5 - MyWed360
+1. Product name: Planner Pack 5 - MaLoveApp
 2. Description: Hasta 5 bodas activas - Pago mensual
 3. Pricing model: Recurring
 4. Price: 41.67 EUR
@@ -107,7 +107,7 @@
 
 **Versión Mensual (112,50 EUR/mes)**
 ```
-1. Product name: Planner Pack 15 - MyWed360
+1. Product name: Planner Pack 15 - MaLoveApp
 2. Description: Hasta 15 bodas activas - Pago mensual
 3. Pricing model: Recurring
 4. Price: 112.50 EUR
@@ -131,7 +131,7 @@
 
 **Versión Mensual (266,67 EUR/mes)**
 ```
-1. Product name: Teams 40 - MyWed360
+1. Product name: Teams 40 - MaLoveApp
 2. Description: 40 bodas activas por año + equipo
 3. Pricing model: Recurring
 4. Price: 266.67 EUR
@@ -155,7 +155,7 @@
 
 **Versión Mensual (416,67 EUR/mes)**
 ```
-1. Product name: Teams Ilimitado - MyWed360
+1. Product name: Teams Ilimitado - MaLoveApp
 2. Description: Bodas y perfiles ilimitados con white-label
 3. Pricing model: Recurring
 4. Price: 416.67 EUR

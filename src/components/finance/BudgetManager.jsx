@@ -349,11 +349,19 @@ const distributeIncrease = (amounts, indices, delta) => {
   const handleSaveCategory = () => {
     const amount = Number(newCategory.amount);
     if (!newCategory.name.trim()) {
-      alert('El nombre de la categoría es obligatorio');
+      alert(
+        t('finance.budget.errors.nameRequired', {
+          defaultValue: 'Category name is required',
+        })
+      );
       return;
     }
     if (isNaN(amount) || amount < 0) {
-      alert('El monto debe ser un Número valido');
+      alert(
+        t('finance.budget.errors.amountInvalid', {
+          defaultValue: 'Amount must be a valid number',
+        })
+      );
       return;
     }
     if (editingCategory) {
@@ -372,7 +380,11 @@ const distributeIncrease = (amounts, indices, delta) => {
   };
 
   const handleDeleteCategory = (index, categoryName) => {
-    if (window.confirm(`Estas seguro de eliminar la categoría "${categoryName}"?`)) {
+    const confirmMessage = t('finance.budget.confirmDelete', {
+      category: categoryName,
+      defaultValue: 'Are you sure you want to delete the category "{{category}}"?',
+    });
+    if (window.confirm(confirmMessage)) {
       onRemoveCategory(index);
     }
   };
@@ -384,7 +396,7 @@ const distributeIncrease = (amounts, indices, delta) => {
       await onRequestAdvisor();
     } catch (err) {
       console.error('[BudgetManager] advisor request failed', err);
-      alert(err?.message || 'No se pudo obtener la recomendación del consejero.');
+      alert(err?.message || t('finance.budget.advisorErrors.requestFailed', { defaultValue: 'Unable to fetch advisor recommendation.' }));
     } finally {
       setLocalAdvisorLoading(false);
     }
@@ -404,7 +416,7 @@ const distributeIncrease = (amounts, indices, delta) => {
         await onRefreshAdvisor();
       } catch (err) {
         console.error('[BudgetManager] advisor refresh failed', err);
-        alert(err?.message || 'No se pudo actualizar la recomendación.');
+        alert(err?.message || t('finance.budget.advisorErrors.refreshFailed', { defaultValue: 'Unable to refresh advisor recommendation.' }));
       } finally {
         setLocalAdvisorLoading(false);
       }
@@ -418,14 +430,21 @@ const distributeIncrease = (amounts, indices, delta) => {
     try {
       const result = await Promise.resolve(onApplyAdvisorScenario(scenarioId));
       if (result && result.ok === false) {
-        const message = result.reason ? ` (${result.reason})` : '';
-        alert(`No se pudo aplicar el escenario${message}.`);
+        const message = result.reason
+          ? t('finance.budget.advisorErrors.applyFailedWithReason', {
+              reason: result.reason,
+              defaultValue: 'Unable to apply the scenario ({{reason}}).',
+            })
+          : t('finance.budget.advisorErrors.applyFailed', {
+              defaultValue: 'Unable to apply the recommended scenario.',
+            });
+        alert(message);
       } else {
         setShowAdvisorModal(false);
       }
     } catch (err) {
       console.error('[BudgetManager] apply advisor scenario failed', err);
-      alert(err?.message || 'No se pudo aplicar el escenario recomendado.');
+      alert(err?.message || t('finance.budget.advisorErrors.applyFailed', { defaultValue: 'Unable to apply the recommended scenario.' }));
     }
   };
 
@@ -851,7 +870,7 @@ const distributeIncrease = (amounts, indices, delta) => {
               type="text"
               value={newCategory.name}
               onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })}
-              placeholder="Ej: Catering, Musica, Flores..."
+              placeholder={t('finance.budget.modal.namePlaceholder', { defaultValue: 'e.g. Catering, Music, Flowers…' })}
               className="w-full px-3 py-2 border border-[color:var(--color-text)]/20 rounded-md focus:ring-2 focus:ring-[color:var(--color-primary)] focus:border-transparent bg-[var(--color-surface)] text-[color:var(--color-text)]"
             />
           </div>
@@ -865,7 +884,7 @@ const distributeIncrease = (amounts, indices, delta) => {
               min="0"
               value={newCategory.amount}
               onChange={(e) => setNewCategory({ ...newCategory, amount: e.target.value })}
-              placeholder="0.00"
+              placeholder={t('finance.budget.modal.amountPlaceholder', { defaultValue: '0.00' })}
               className="w-full px-3 py-2 border border-[color:var(--color-text)]/20 rounded-md focus:ring-2 focus:ring-[color:var(--color-primary)] focus:border-transparent bg-[var(--color-surface)] text-[color:var(--color-text)]"
             />
           </div>
@@ -893,4 +912,3 @@ const distributeIncrease = (amounts, indices, delta) => {
     </div>
   );
 }
-
