@@ -586,10 +586,10 @@ app.use('/api/push', pushRouter);
 app.use('/api/payments', paymentsRouter);
 app.use('/api/contracts', requireAuth, contractsRouter);
 app.use('/api/payments', paymentsWebhookRouter);
-// Stripe checkout y suscripciones
-app.use('/api/stripe', requireAuth, stripeRouter);
-// Stripe webhook (debe usar raw body, configurado en stripe-webhook.js)
+// Stripe webhook (sin auth, debe ir ANTES que las rutas con auth)
 app.use('/api/stripe', stripeWebhookRouter);
+// Stripe checkout y suscripciones (requiere auth)
+app.use('/api/stripe', requireAuth, stripeRouter);
 app.use('/api/health', healthRouter);
 app.use('/health', healthRouter);
 app.use('/api/calendar', calendarFeedRouter);
