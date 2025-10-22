@@ -1,4 +1,4 @@
-﻿import express from 'express';
+import express from 'express';
 import admin from 'firebase-admin';
 import { z } from 'zod';
 
@@ -132,6 +132,191 @@ async function getCachedServiceStatus(key, provider) {
   }
 }
 
+// Verificar Firebase
+async function fetchFirebaseStatus() {
+  const startedAt = Date.now();
+  const timestamp = new Date().toISOString();
+
+  try {
+    // Intenta leer una colección para verificar conectividad
+    const testRef = db.collection('serviceStatus').limit(1);
+    await testRef.get();
+    const elapsed = Date.now() - startedAt;
+
+    return {
+      id: 'firebase',
+      name: 'Firebase',
+      status: 'operational',
+      latency: `${elapsed}ms`,
+      incidents: 0,
+      note: '',
+      lastCheckedAt: timestamp,
+    };
+  } catch (error) {
+    return {
+      id: 'firebase',
+      name: 'Firebase',
+      status: 'down',
+      latency: null,
+      incidents: 1,
+      note: truncateNote(error?.message || 'Firebase connection failed'),
+      lastCheckedAt: timestamp,
+    };
+  }
+}
+
+// Verificar Mailgun
+async function fetchMailgunStatus() {
+  const startedAt = Date.now();
+  const timestamp = new Date().toISOString();
+  const apiKey = process.env.MAILGUN_API_KEY;
+  const domain = process.env.MAILGUN_DOMAIN;
+
+  if (!apiKey || !domain) {
+    return {
+      id: 'mailgun',
+      name: 'Mailgun',
+      status: 'down',
+      latency: null,
+      incidents: 1,
+      note: 'MAILGUN_API_KEY o MAILGUN_DOMAIN no configurados',
+      lastCheckedAt: timestamp,
+    };
+  }
+
+  try {
+    // Verificar dominio en Mailgun
+    const response = await fetch(`https://api.mailgun.net/v3/domains/${domain}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Basic ${Buffer.from(`api:${apiKey}`).toString('base64')}`,
+      },
+    });
+    const elapsed = Date.now() - startedAt;
+
+    if (response.ok) {
+      return {
+        id: 'mailgun',
+        name: 'Mailgun',
+        status: 'operational',
+        latency: `${elapsed}ms`,
+        incidents: 0,
+        note: '',
+        lastCheckedAt: timestamp,
+      };
+    }
+
+    let note = `Mailgun respondió ${response.status}`;
+    try {
+      const data = await response.json();
+      note = data?.message || note;
+    } catch {}
+
+    return {
+      id: 'mailgun',
+      name: 'Mailgun',
+      status: response.status === 401 ? 'down' : 'degraded',
+      latency: null,
+      incidents: 1,
+      note: truncateNote(note),
+      lastCheckedAt: timestamp,
+    };
+  } catch (error) {
+    return {
+      id: 'mailgun',
+      name: 'Mailgun',
+      status: 'down',
+      latency: null,
+      incidents: 1,
+      note: truncateNote(error?.message || 'Mailgun connection failed'),
+      lastCheckedAt: timestamp,
+    };
+  }
+}
+
+// Verificar WhatsApp (Twilio)
+async function fetchWhatsAppStatus() {
+  const startedAt = Date.now();
+  const timestamp = new Date().toISOString();
+  const accountSid = process.env.TWILIO_ACCOUNT_SID;
+  const authToken = process.env.TWILIO_AUTH_TOKEN;
+
+  if (!accountSid || !authToken) {
+    return {
+      id: 'whatsapp',
+      name: 'WhatsApp',
+      status: 'down',
+      latency: null,
+      incidents: 1,
+      note: 'TWILIO_ACCOUNT_SID o TWILIO_AUTH_TOKEN no configurados',
+      lastCheckedAt: timestamp,
+    };
+  }
+
+  try {
+    // Verificar cuenta de Twilio
+    const response = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}.json`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Basic ${Buffer.from(`${accountSid}:${authToken}`).toString('base64')}`,
+      },
+    });
+    const elapsed = Date.now() - startedAt;
+
+    if (response.ok) {
+      const data = await response.json();
+      // Verificar que la cuenta esté activa
+      if (data.status === 'active') {
+        return {
+          id: 'whatsapp',
+          name: 'WhatsApp',
+          status: 'operational',
+          latency: `${elapsed}ms`,
+          incidents: 0,
+          note: '',
+          lastCheckedAt: timestamp,
+        };
+      } else {
+        return {
+          id: 'whatsapp',
+          name: 'WhatsApp',
+          status: 'degraded',
+          latency: `${elapsed}ms`,
+          incidents: 1,
+          note: `Cuenta Twilio en estado: ${data.status}`,
+          lastCheckedAt: timestamp,
+        };
+      }
+    }
+
+    let note = `Twilio respondió ${response.status}`;
+    try {
+      const data = await response.json();
+      note = data?.message || note;
+    } catch {}
+
+    return {
+      id: 'whatsapp',
+      name: 'WhatsApp',
+      status: response.status === 401 ? 'down' : 'degraded',
+      latency: null,
+      incidents: 1,
+      note: truncateNote(note),
+      lastCheckedAt: timestamp,
+    };
+  } catch (error) {
+    return {
+      id: 'whatsapp',
+      name: 'WhatsApp',
+      status: 'down',
+      latency: null,
+      incidents: 1,
+      note: truncateNote(error?.message || 'WhatsApp/Twilio connection failed'),
+      lastCheckedAt: timestamp,
+    };
+  }
+}
+
 async function fetchOpenAIStatus() {
   const apiKey = process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY;
   const projectId = process.env.OPENAI_PROJECT_ID || process.env.VITE_OPENAI_PROJECT_ID;
@@ -216,8 +401,20 @@ async function fetchOpenAIStatus() {
 
 async function computeLiveServiceOverrides() {
   const overrides = [];
-  const openaiStatus = await getCachedServiceStatus('openai', fetchOpenAIStatus);
+  
+  // Verificar todos los servicios en paralelo
+  const [firebaseStatus, mailgunStatus, whatsappStatus, openaiStatus] = await Promise.all([
+    getCachedServiceStatus('firebase', fetchFirebaseStatus),
+    getCachedServiceStatus('mailgun', fetchMailgunStatus),
+    getCachedServiceStatus('whatsapp', fetchWhatsAppStatus),
+    getCachedServiceStatus('openai', fetchOpenAIStatus),
+  ]);
+  
+  if (firebaseStatus) overrides.push(firebaseStatus);
+  if (mailgunStatus) overrides.push(mailgunStatus);
+  if (whatsappStatus) overrides.push(whatsappStatus);
   if (openaiStatus) overrides.push(openaiStatus);
+  
   return overrides;
 }
 
