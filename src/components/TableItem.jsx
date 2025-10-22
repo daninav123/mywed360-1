@@ -41,6 +41,7 @@ function TableItem({
   lockedColor,
   lockedIsCurrent = false,
   eventsDisabled = false,
+  designFocusMode = false,
 }) {
   // Decide qué texto mostrar en cada asiento según el nivel de zoom
   const getLabel = useCallback(
@@ -414,7 +415,7 @@ function TableItem({
           !
         </div>
       )}
-      {isLockedByOther && (
+      {!designFocusMode && isLockedByOther && (
         <div
           className="absolute top-0 left-0 m-1 px-1.5 py-0.5 rounded text-[10px] font-semibold text-white flex items-center gap-1"
           style={{ backgroundColor: lockedColor || '#6b7280', opacity: 0.9, zIndex: 30 }}
@@ -424,7 +425,7 @@ function TableItem({
           <span>{firstName(lockedBy)}</span>
         </div>
       )}
-      {isLockedBySelf && (
+      {!designFocusMode && isLockedBySelf && (
         <div
           className="absolute top-0 left-0 m-1 px-1 py-0.5 rounded text-[10px] font-semibold text-white flex items-center gap-1"
           style={{ backgroundColor: lockedColor || '#2563eb', opacity: 0.85, zIndex: 30 }}
@@ -435,7 +436,7 @@ function TableItem({
         </div>
       )}
       {/* Badge de ocupación: invitados contabilizados / capacidad (seats) */}
-      {table.seats != null && (
+      {!designFocusMode && table.seats != null && (
         <div
           className="absolute bottom-0 left-0 m-1 px-1.5 py-0.5 rounded text-[10px] font-semibold"
           style={{
@@ -451,7 +452,7 @@ function TableItem({
           {guestCount}/{parseInt(table.seats, 10) || globalMaxSeats || '—'}
         </div>
       )}
-      {(table.angle || 0) !== 0 && (
+      {!designFocusMode && (table.angle || 0) !== 0 && (
         <div
           className="absolute bottom-0 right-0 m-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-gray-800 text-white"
           title={`Rotación: ${Math.round(table.angle)}°`}
@@ -467,21 +468,57 @@ function TableItem({
         />
       )}
       {/* seats */}
-      {(() => {
-        if (seatDots === 0) return null;
-        // Función para obtener el primer nombre
-        const getFirst = (name = '?') => {
-          const first = name.trim().split(/\s+/)[0] || '?';
-          return first;
-        };
-        if (table.shape === 'rectangle') {
-          const cols = seatDots > 0 ? Math.ceil(seatDots / 2) : 0;
-          return Array.from({ length: seatDots }).map((_, i) => {
-            const isTop = i < cols;
-            const idx = isTop ? i : i - cols;
-            const px = ((sizeX * scale) / (cols + 1)) * (idx + 1);
-            const offset = 18 * scale;
-            const py = isTop ? -offset : sizeY * scale + offset; // fuera del borde
+      {!designFocusMode &&
+        (() => {
+          if (seatDots === 0) return null;
+          // Funcion para obtener el primer nombre
+          const getFirst = (name = '?') => {
+            const first = name.trim().split(/\s+/)[0] || '?';
+            return first;
+          };
+          if (table.shape === 'rectangle') {
+            const cols = seatDots > 0 ? Math.ceil(seatDots / 2) : 0;
+            return Array.from({ length: seatDots }).map((_, i) => {
+              const isTop = i < cols;
+              const idx = isTop ? i : i - cols;
+              const px = ((sizeX * scale) / (cols + 1)) * (idx + 1);
+              const offset = 18 * scale;
+              const py = isTop ? -offset : sizeY * scale + offset; // fuera del borde
+              return (
+                <div
+                  key={i}
+                  style={{
+                    position: 'absolute',
+                    minWidth: 24,
+                    width: 'auto',
+                    height: 24,
+                    background: '#2563eb',
+                    borderRadius: '9999px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#fff',
+                    fontSize: 10,
+                    fontWeight: 'bold',
+                    left: px - 12,
+                    top: py - 12,
+                  }}
+                >
+                  {getLabel(guestsList[i]?.name || guestsList[i]?.nombre || '')}
+                </div>
+              );
+            });
+          }
+          const seats = seatDots; // puntos segun invitados
+          if (seats === 0) return null;
+          const centerX = (sizeX * scale) / 2;
+          const centerY = (sizeY * scale) / 2;
+          return Array.from({ length: seats }).map((_, i) => {
+            const angle = (Math.PI * 2 * i) / seats;
+            // Radio ligeramente mayor al de la mesa, proporcional al zoom para que siempre quede fuera
+            const r = (Math.max(sizeX, sizeY) * scale) / 2 + 30 * scale; // fuera del borde
+            const sx = centerX + Math.cos(angle) * r;
+            const sy = centerY + Math.sin(angle) * r;
             return (
               <div
                 key={i}
@@ -498,53 +535,18 @@ function TableItem({
                   color: '#fff',
                   fontSize: 10,
                   fontWeight: 'bold',
-                  left: px - 12,
-                  top: py - 12,
+                  left: sx - 12,
+                  top: sy - 12,
                 }}
               >
                 {getLabel(guestsList[i]?.name || guestsList[i]?.nombre || '')}
               </div>
             );
           });
-        }
-        const seats = seatDots; // puntos según invitados
-        if (seats === 0) return null;
-        const centerX = (sizeX * scale) / 2;
-        const centerY = (sizeY * scale) / 2;
-        return Array.from({ length: seats }).map((_, i) => {
-          const angle = (Math.PI * 2 * i) / seats;
-          // Radio ligeramente mayor al de la mesa, proporcional al zoom para que siempre quede fuera
-          const r = (Math.max(sizeX, sizeY) * scale) / 2 + 30 * scale; // fuera del borde
-          const sx = centerX + Math.cos(angle) * r;
-          const sy = centerY + Math.sin(angle) * r;
-          return (
-            <div
-              key={i}
-              style={{
-                position: 'absolute',
-                minWidth: 24,
-                width: 'auto',
-                height: 24,
-                background: '#2563eb',
-                borderRadius: '9999px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#fff',
-                fontSize: 10,
-                fontWeight: 'bold',
-                left: sx - 12,
-                top: sy - 12,
-              }}
-            >
-              {getLabel(guestsList[i]?.name || guestsList[i]?.nombre || '')}
-            </div>
-          );
-        });
-      })()}
+        })()}
 
       {/* Numeración de asientos opcional */}
-      {showNumbers &&
+      {showNumbers && !designFocusMode &&
         table.seats &&
         table.seats > 0 &&
         (() => {
@@ -619,3 +621,4 @@ function TableItem({
 }
 
 export default React.memo(TableItem);
+

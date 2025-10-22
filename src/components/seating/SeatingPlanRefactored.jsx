@@ -247,6 +247,7 @@ const SeatingPlanRefactored = () => {
     createDefaultOnboardingState()
   );
   const [showOverview, setShowOverview] = React.useState(true);
+  const [designFocusMode, setDesignFocusMode] = React.useState(false);
   const smartPanelEligible = tab === 'banquet';
   const showSmartPanel = smartPanelEligible && showSmartPanelPinned;
   const showGuestSidebar = guestSidebarOpen && !isMobile;

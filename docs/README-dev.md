@@ -46,6 +46,7 @@ Este documento consolida los flujos técnicos añadidos recientemente: Seating P
 - Iconografia: seleccionar 6-8 iconos outline uniformes (mismo tamano, sin mezclar rellenos).
 - Estados vacios: componentes dedicados con ilustracion minimal y CTA central; ocultar bloques que ya no aplican (ej. onboarding completado).
 - Toggles de panel: Quick Actions expone switches para Biblioteca, Inspector, Invitados y Panel inteligente, persistidos en `uiPrefsKey`.
+- Modo boceto: Quick Actions incluye un toggle que oculta overlays (ocupacion, invitados, rotacion) para centrar el lienzo en el diseno.
 - Identificacion de mesas: cada mesa debe renderizar su numero o nombre centrado sobre la figura para facilitar la lectura del plano.
 
 ### E2E relevantes de Seating
