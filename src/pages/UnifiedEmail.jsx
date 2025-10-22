@@ -376,8 +376,8 @@ const UnifiedEmail = () => {
 
       {/* Barra superior */}
       <header className="flex items-center justify-between border-b p-4">
-        <h1 className="text-lg font-semibold">Buz)n</h1>
-        <Button variant="primary" onClick={() => setShowCompose(true)}>
+        <h1 className="text-lg font-semibold" data-testid="email-title">Buzón</h1>
+        <Button variant="primary" onClick={() => setShowCompose(true)} data-testid="compose-button">
           Redactar
         </Button>
       </header>
@@ -398,6 +398,8 @@ const UnifiedEmail = () => {
                 setActiveCustomFolder(null);
                 setActiveTagId(null);
               }}
+              data-testid="folder-item"
+              data-folder="inbox"
             >
               Recibidos
             </button>
@@ -412,6 +414,8 @@ const UnifiedEmail = () => {
                 setActiveCustomFolder(null);
                 setActiveTagId(null);
               }}
+              data-testid="folder-item"
+              data-folder="sent"
             >
               Enviados
             </button>

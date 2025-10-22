@@ -107,8 +107,9 @@ export default function MailList({
             )}
             <div
               key={mail.id}
-              className={`group relative cursor-pointer border-b p-3 hover:bg-gray-50 ${selected?.id === mail.id ? 'bg-blue-50' : ''}`}
               onClick={() => onSelect(mail)}
+              data-testid="email-list-item"
+              className={`group relative cursor-pointer border-b p-3 transition-colors ${selected && selected.id === mail.id ? 'bg-blue-50' : mail.read ? 'bg-white hover:bg-gray-50' : 'bg-blue-50/20 hover:bg-blue-50/40'}`}
             >
               <div className="flex items-start gap-2">
                 <input
@@ -284,7 +285,7 @@ export default function MailList({
         ));
 
   return (
-    <div className="h-full overflow-y-auto">
+    <div className="h-full overflow-y-auto" data-testid="email-list">
       {items.length > 0 ? items : <div className="p-4 text-sm text-gray-500">{emptyMessage}</div>}
       <div ref={bottomRef} className="h-1" />
     </div>

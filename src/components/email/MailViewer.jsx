@@ -146,7 +146,7 @@ export default function MailViewer({
         <h2 className="m-0">{mail.subject || '(Sin asunto)'}</h2>
         <div className="flex gap-2">
           {folders && folders.length > 0 && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2" data-testid="folder-menu">
               <select
                 className="border rounded px-2 py-1 text-xs"
                 onChange={(e) => {
@@ -154,10 +154,11 @@ export default function MailViewer({
                   if (fid) onMoveToFolder(mail, fid);
                 }}
                 defaultValue=""
+                data-testid="move-to-folder-button"
               >
                 <option value="">Mover a carpeta…</option>
                 {folders.map((f) => (
-                  <option key={f.id} value={f.id}>
+                  <option key={f.id} value={f.id} data-testid="folder-menu-item">
                     {f.name}
                   </option>
                 ))}

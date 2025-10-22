@@ -65,6 +65,21 @@ function TableItem({
   const ref = useRef(null);
   const isLockedByOther = !!lockedBy && !lockedIsCurrent;
   const isLockedBySelf = !!lockedBy && lockedIsCurrent;
+  const tableLabel = useMemo(() => {
+    const fallback =
+      table.displayName ||
+      table.name ||
+      (typeof table.number === 'number' ? `Mesa ${table.number}` : '') ||
+      (table.label ? String(table.label) : '');
+    const trimmed = (fallback || '').toString().trim();
+    if (trimmed) return trimmed;
+    if (table.id != null) return `Mesa ${table.id}`;
+    return 'Mesa';
+  }, [table.displayName, table.name, table.number, table.label, table.id]);
+  const tableLabelFontSize = useMemo(() => {
+    const base = 12 + (scale - 1) * 4;
+    return Math.max(10, Math.min(18, base));
+  }, [scale]);
 
   // drop logic
   const [{ isOver }, drop] = useDrop(
@@ -361,10 +376,36 @@ function TableItem({
       >
         ✖
       </button>
-      {/* Contenido central opcional: solo mostramos el número de mesa pequeño */}
-      <span style={{ fontSize: 14, fontWeight: 'bold', pointerEvents: 'none', color: '#374151' }}>
-        {table.id}
-      </span>
+      {/* Etiqueta central con nombre/número de mesa */}
+      <div
+        className="absolute top-1/2 left-1/2 pointer-events-none select-none"
+        style={{
+          transform: `translate(-50%, -50%) rotate(${-(Number(table.angle) || 0)}deg)`,
+          maxWidth: '80%',
+        }}
+      >
+        <span
+          style={{
+            display: 'inline-flex',
+            padding: '2px 8px',
+            borderRadius: '9999px',
+            backgroundColor: 'rgba(255,255,255,0.9)',
+            color: '#1f2937',
+            fontWeight: 600,
+            fontSize: tableLabelFontSize,
+            lineHeight: 1.1,
+            textAlign: 'center',
+            boxShadow: '0 2px 6px rgba(15,23,42,0.15)',
+            maxWidth: '100%',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+          title={tableLabel}
+        >
+          {tableLabel}
+        </span>
+      </div>
       {danger && (
         <div
           className="absolute top-0 left-0 m-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-red-600 text-white"

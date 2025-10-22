@@ -57,7 +57,7 @@ export default function ComposeModal({ onClose, from, initial = {}, userId = nul
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/40 overflow-y-auto p-4">
+    <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/40 overflow-y-auto p-4" data-testid="email-composer">
       <div className="w-full max-w-xl rounded-lg bg-white shadow-lg max-h-[90vh] flex flex-col">
         <div className="p-6 pb-4">
           <h2 className="text-lg font-semibold">Nuevo correo</h2>
@@ -70,6 +70,7 @@ export default function ComposeModal({ onClose, from, initial = {}, userId = nul
             className="w-full rounded border px-3 py-2 text-sm"
             value={to}
             onChange={(e) => setTo(e.target.value)}
+            data-testid="recipient-input"
           />
           <input
             type="text"
@@ -77,6 +78,7 @@ export default function ComposeModal({ onClose, from, initial = {}, userId = nul
             className="w-full rounded border px-3 py-2 text-sm"
             value={subject}
             onChange={(e) => setSubject(e.target.value)}
+            data-testid="subject-input"
           />
           {subjectSuggestions.length > 0 && (
             <div className="mt-1 flex flex-wrap gap-2">
@@ -98,9 +100,10 @@ export default function ComposeModal({ onClose, from, initial = {}, userId = nul
             className="w-full rounded border px-3 py-2 text-sm"
             value={body}
             onChange={(e) => setBody(e.target.value)}
+            data-testid="body-editor"
           />
           {error && (
-            <Alert variant="error" className="text-sm">
+            <Alert variant="error" className="text-sm" data-testid="error-message">
               {error}
             </Alert>
           )}
@@ -127,10 +130,10 @@ export default function ComposeModal({ onClose, from, initial = {}, userId = nul
           </div>
         </div>
         <div className="p-6 pt-4 mt-2 border-t flex justify-end gap-2 bg-white sticky bottom-0">
-          <Button onClick={onClose} disabled={sending} variant="ghost">
+          <Button onClick={onClose} disabled={sending} variant="ghost" data-testid="cancel-button">
             Cancelar
           </Button>
-          <Button onClick={handleSend} disabled={sending || !to} variant="primary">
+          <Button onClick={handleSend} disabled={sending || !to} variant="primary" data-testid="send-button">
             {sending ? <Spinner size="sm" /> : 'Enviar'}
           </Button>
         </div>
