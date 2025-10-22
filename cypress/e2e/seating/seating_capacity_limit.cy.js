@@ -1,4 +1,4 @@
-﻿describe('Seating Plan - Límite de capacidad por mesa', () => {
+describe('Seating Plan - Límite de capacidad por mesa', () => {
   const WID = 'test-wedding-capacity';
 
   function setActiveWeddingBeforeVisit() {
@@ -11,13 +11,18 @@
   }
 
   function ensureGuests(n = 3) {
-    const names = Array.from({ length: n }).map((_, i) => `Invitado Cap ${i + 1}`);
-    names.forEach((name, idx) => {
-      cy.request('POST', '/api/rsvp/dev/create', {
+    cy.window().then((win) => {
+      const guests = Array.from({ length: n }).map((_, i) => ({
+        id: `guest-cap-${i + 1}`,
+        name: `Invitado Cap ${i + 1}`,
+        email: `cap${i + 1}@example.com`,
+        status: 'accepted',
+        companions: 0,
         weddingId: WID,
-        name,
-        email: `cap${idx + 1}@example.com`,
-      }).its('status').should('eq', 200);
+      }));
+      // Mock guests en localStorage para que el frontend los detecte
+      win.localStorage.setItem('mock_guests_' + WID, JSON.stringify(guests));
+      cy.log(`✅ ${n} invitados mockeados para ${WID}`);
     });
   }
 

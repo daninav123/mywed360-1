@@ -9,8 +9,8 @@ describe('Seating Plan - Ceremonia E2E', () => {
     cy.get('button[title="Configurar ceremonia"]').click();
     cy.contains('h3', 'Configurar Ceremonia').should('be.visible');
 
-    cy.contains('label', 'Filas').parent().find('input').clear().type('3');
-    cy.contains('label', 'Columnas').parent().find('input').clear().type('4');
+    cy.contains('label', 'Filas').parent().find('input').first().clear().type('3');
+    cy.contains('label', 'Columnas').parent().find('input').first().clear().type('4');
 
     cy.contains('button', 'Generar').click();
 
