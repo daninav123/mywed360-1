@@ -41,29 +41,62 @@
 
 4. **Productos a crear:**
 
+> **IMPORTANTE:** Precios en stores son 30% más altos que web para compensar comisión de Apple/Google
+
 ```swift
 // Wedding Pass - Pago único
 Product ID: com.maloveapp.weddingpass
 Type: Non-consumable
-Price: 50 EUR
+Price: 65 EUR (web: 50 EUR + 30%)
 
 // Wedding Pass Plus - Pago único
 Product ID: com.maloveapp.weddingpassplus
 Type: Non-consumable
-Price: 85 EUR
+Price: 110.50 EUR (web: 85 EUR + 30%)
 
 // Planner Pack 5 - Mensual
 Product ID: com.maloveapp.plannerpack5.monthly
 Type: Auto-renewable subscription
-Price: 41.67 EUR/mes
+Price: 54.17 EUR/mes (web: 41.67 EUR + 30%)
 Free Trial: 30 días
 
 // Planner Pack 5 - Anual
 Product ID: com.maloveapp.plannerpack5.annual
 Type: Auto-renewable subscription
-Price: 425 EUR/año
+Price: 552.50 EUR/año (web: 425 EUR + 30%)
 
-// (Repetir para Pack 15, Teams 40, Teams Unlimited)
+// Planner Pack 15 - Mensual
+Product ID: com.maloveapp.plannerpack15.monthly
+Type: Auto-renewable subscription
+Price: 146.25 EUR/mes (web: 112.50 EUR + 30%)
+Free Trial: 30 días
+
+// Planner Pack 15 - Anual
+Product ID: com.maloveapp.plannerpack15.annual
+Type: Auto-renewable subscription
+Price: 1491.75 EUR/año (web: 1147.50 EUR + 30%)
+
+// Teams 40 - Mensual
+Product ID: com.maloveapp.teams40.monthly
+Type: Auto-renewable subscription
+Price: 346.67 EUR/mes (web: 266.67 EUR + 30%)
+Free Trial: 30 días
+
+// Teams 40 - Anual
+Product ID: com.maloveapp.teams40.annual
+Type: Auto-renewable subscription
+Price: 3536 EUR/año (web: 2720 EUR + 30%)
+
+// Teams Unlimited - Mensual
+Product ID: com.maloveapp.teamsunlimited.monthly
+Type: Auto-renewable subscription
+Price: 541.67 EUR/mes (web: 416.67 EUR + 30%)
+Free Trial: 30 días
+
+// Teams Unlimited - Anual
+Product ID: com.maloveapp.teamsunlimited.annual
+Type: Auto-renewable subscription
+Price: 5525 EUR/año (web: 4250 EUR + 30%)
 ```
 
 #### **Código de integración (Swift):**

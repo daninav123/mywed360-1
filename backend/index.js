@@ -36,6 +36,7 @@ import { http, requestWithRetry } from './utils/http.js';
 import { randomUUID } from 'crypto';
 // Importar middleware de autenticación (ESM) - debe cargarse antes que las rutas para inicializar Firebase Admin correctamente
 import {
+  authMiddleware,
   requireAuth,
   requireMailAccess,
   optionalAuth,
@@ -91,6 +92,8 @@ import paymentsRouter from './routes/payments.js';
 import paymentsWebhookRouter from './routes/payments-webhook.js';
 import stripeRouter from './routes/stripe.js';
 import stripeWebhookRouter from './routes/stripe-webhook.js';
+import applePaymentsRouter from './routes/apple-payments.js';
+import googlePaymentsRouter from './routes/google-payments.js';
 import contractsRouter from './routes/contracts.js';
 import healthRouter from './routes/health.js';
 import calendarFeedRouter from './routes/calendar-feed.js';
@@ -516,10 +519,10 @@ app.use('/api/notifications', requireAuth, notificationsRouter);
 app.use('/api/guests', requireAuth, guestsRouter);
 app.use('/api/events', requireAuth, eventsRouter);
 app.use('/api/roles', requireAuth, rolesRouter);
-app.use('/api/ai-image', requireAuth, aiImageRouter);
-app.use('/api/ai-suppliers', requireAuth, aiSuppliersRouter);
-app.use('/api/ai/budget-estimate', requireAuth, aiBudgetRouter);
-app.use('/api/ai', requireAuth, aiRouter);
+app.use('/api/ai-image', authMiddleware(), aiImageRouter);
+app.use('/api/ai-suppliers', authMiddleware(), aiSuppliersRouter);
+app.use('/api/ai/budget-estimate', authMiddleware(), aiBudgetRouter);
+app.use('/api/ai', authMiddleware(), aiRouter);
 app.use('/api/ai-assign', requireAuth, aiAssignRouter);
 app.use('/api/ai-songs', requireAuth, aiSongsRouter);
 app.use('/api/ai-website', requireAuth, aiWebsiteRouter);
@@ -590,6 +593,10 @@ app.use('/api/payments', paymentsWebhookRouter);
 app.use('/api/stripe', stripeWebhookRouter);
 // Stripe checkout y suscripciones (requiere auth)
 app.use('/api/stripe', requireAuth, stripeRouter);
+// Apple In-App Purchases (webhooks sin auth, verify con auth)
+app.use('/api/apple', applePaymentsRouter);
+// Google Play Billing (webhooks sin auth, verify con auth)
+app.use('/api/google', googlePaymentsRouter);
 app.use('/api/health', healthRouter);
 app.use('/health', healthRouter);
 app.use('/api/calendar', calendarFeedRouter);

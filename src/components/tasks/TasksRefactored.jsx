@@ -26,7 +26,6 @@ import AllTasksModal from './AllTasksModal.jsx';
 import TaskForm from './TaskForm.jsx';
 import TaskList from './TaskList.jsx';
 import TasksHeader from './TasksHeader.jsx';
-import DebugTasksPanel from './DebugTasksPanel.jsx';
 import TaskSidePanel from './TaskSidePanel.jsx';
 //
 
@@ -2834,20 +2833,6 @@ export default function TasksRefactored() {
         </div>
       </div>
 
-      {debugEnabled && (
-        <DebugTasksPanel
-          projectStart={projectStart}
-          projectEnd={projectEnd}
-          parentsRaw={(Array.isArray(tasksState) ? tasksState : []).filter(
-            (t) => String(t?.type || 'task') === 'task'
-          )}
-          uniqueGanttTasks={uniqueGanttTasks}
-          ganttTasksBounded={ganttTasksBounded}
-          ganttDisplayTasks={ganttDisplayTasks}
-          nestedSubtasks={nestedSubtasks}
-        />
-      )}
-      
       {showAllTasks && (
         <AllTasksModal
           isOpen={showAllTasks}

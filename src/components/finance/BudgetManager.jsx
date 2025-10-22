@@ -55,42 +55,6 @@ export default function BudgetManager({
   const benchmarkAverage = Number(benchmarkState.total?.avg) || 0;
   const benchmarkApply =
     typeof onApplyBenchmark === 'function' ? onApplyBenchmark : () => {};
-  const captureSnapshot =
-    typeof onCaptureSnapshot === 'function' ? onCaptureSnapshot : () => {};
-useEffect(() => {
-  if (typeof captureSnapshot !== 'function') return undefined;
-  if (!categoriesSignature) return undefined;
-  if (lastSnapshotSignatureRef.current === categoriesSignature) return undefined;
-
-  if (autoSaveTimeoutRef.current) {
-    clearTimeout(autoSaveTimeoutRef.current);
-  }
-  autoSaveTimeoutRef.current = setTimeout(() => {
-    captureSnapshot({ status: 'confirmed', source: 'auto' });
-    lastSnapshotSignatureRef.current = categoriesSignature;
-    autoSaveTimeoutRef.current = null;
-  }, 1500);
-
-  return () => {
-    if (autoSaveTimeoutRef.current) {
-      clearTimeout(autoSaveTimeoutRef.current);
-      autoSaveTimeoutRef.current = null;
-    }
-  };
-}, [categoriesSignature, captureSnapshot]);
-  const currentGuestCount = Number(guestCount) || 0;
-  const effectiveAdvisor = advisor && typeof advisor === 'object' ? advisor : null;
-  const advisorScenarios = Array.isArray(effectiveAdvisor?.scenarios)
-    ? effectiveAdvisor.scenarios
-    : [];
-  const selectedScenario =
-    advisorScenarios.find((scenario) => scenario.id === effectiveAdvisor?.selectedScenarioId) ||
-    advisorScenarios[0] ||
-    null;
-  const advisorTips = Array.isArray(effectiveAdvisor?.globalTips)
-    ? effectiveAdvisor.globalTips
-    : [];
-
   const categories = Array.isArray(budget?.categories) ? budget.categories : [];
   const computedTotal = Number(budget?.total);
   const categoriesTotal = categories.reduce(
@@ -119,6 +83,42 @@ useEffect(() => {
       .sort((a, b) => a.key.localeCompare(b.key));
     return JSON.stringify(normalized);
   }, [budget?.categories]);
+
+
+  const captureSnapshot = typeof onCaptureSnapshot === 'function' ? onCaptureSnapshot : () => {};
+  useEffect(() => {
+    if (typeof captureSnapshot !== 'function') return undefined;
+    if (!categoriesSignature) return undefined;
+    if (lastSnapshotSignatureRef.current === categoriesSignature) return undefined;
+  
+    if (autoSaveTimeoutRef.current) {
+      clearTimeout(autoSaveTimeoutRef.current);
+    }
+    autoSaveTimeoutRef.current = setTimeout(() => {
+      captureSnapshot({ status: 'confirmed', source: 'auto' });
+      lastSnapshotSignatureRef.current = categoriesSignature;
+      autoSaveTimeoutRef.current = null;
+    }, 1500);
+  
+    return () => {
+      if (autoSaveTimeoutRef.current) {
+        clearTimeout(autoSaveTimeoutRef.current);
+        autoSaveTimeoutRef.current = null;
+      }
+    };
+  }, [categoriesSignature, captureSnapshot]);
+  const currentGuestCount = Number(guestCount) || 0;
+  const effectiveAdvisor = advisor && typeof advisor === 'object' ? advisor : null;
+  const advisorScenarios = Array.isArray(effectiveAdvisor?.scenarios)
+    ? effectiveAdvisor.scenarios
+    : [];
+  const selectedScenario =
+    advisorScenarios.find((scenario) => scenario.id === effectiveAdvisor?.selectedScenarioId) ||
+    advisorScenarios[0] ||
+    null;
+  const advisorTips = Array.isArray(effectiveAdvisor?.globalTips)
+    ? effectiveAdvisor.globalTips
+    : [];
 
   const formatTotalInput = (value) => {
     if (!Number.isFinite(value)) return '';

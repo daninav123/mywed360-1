@@ -1087,5 +1087,144 @@
         "guestFallback": "Guest"
       }
     }
+  },
+  "pricing": {
+    "hero": {
+      "badge": "Per-event model",
+      "title": "Clear plans for every celebration.",
+      "description": "One-time payments in euros for couples and flexible packages for planners. Each license stays active for 30 days after the event and you can extend it whenever you need more time.",
+      "benefitsTitle": "Key benefits",
+      "benefits": [
+        "Licenses switch to read-only automatically once the event date passes.",
+        "Planner packs include a free month and quota tracking.",
+        "Alerts 30 / 7 / 1 days before expiration keep everything under control."
+      ],
+      "cta": "Create free account",
+      "highlights": {
+        "payPerEvent": {
+          "title": "Pay per event",
+          "description": "Activate only what you need for each wedding. No automatic renewals."
+        },
+        "collaboration": {
+          "title": "Controlled collaboration",
+          "description": "Invite helpers and suppliers with clear permissions and action tracking."
+        },
+        "syncStatus": {
+          "title": "Synced status",
+          "description": "Stripe webhooks keep licenses and packs up to date with internal alerts."
+        }
+      }
+    },
+    "sections": {
+      "couples": {
+        "label": "Couples",
+        "title": "Plans for couples",
+        "description": "Each purchase enables a full wedding until 30 days after the event. Add an extension if you need more time."
+      },
+      "planners": {
+        "label": "Planners",
+        "title": "Packages for planners",
+        "description": "Every pack includes a 1-month free trial. Choose 12 monthly payments or a single annual payment with a 15% discount. Stripe keeps the available seats updated automatically."
+      },
+      "needHelp": {
+        "title": "Need help choosing the right plan?",
+        "description": "We help you configure licenses, automations, and reports based on your workflow. Schedule a session and design a rollout that matches your pace.",
+        "cta": "Talk to a specialist"
+      },
+      "quickStart": {
+        "title": "Ready to use in minutes.",
+        "description": "Create your account, connect Stripe, and activate your licenses immediately. The system will notify renewals and you can keep closed weddings in read-only mode when they finish.",
+        "primaryCta": "Create free account",
+        "secondaryCta": "Access hub"
+      }
+    },
+    "couplePlans": {
+      "free": {
+        "name": "Free",
+        "priceLabel": "Free",
+        "priceSuffix": "per wedding",
+        "description": "Plan an intimate wedding or test the platform at no cost.",
+        "features": [
+          "1 active wedding with up to 80 guests",
+          "Basic seating plan and budget tracking",
+          "Supplier directory and visible listings",
+          "Essential templates and standard support"
+        ],
+        "cta": "Create free account"
+      },
+      "weddingPass": {
+        "name": "Wedding Pass",
+        "priceSuffix": "one-time payment per wedding",
+        "description": "Unlock every premium tool for your event without annual subscriptions.",
+        "features": [
+          "Unlimited guests and suppliers",
+          "Direct contact with suppliers and full protocol tools",
+          "Up to 50 website designs and priority support",
+          "Premium planning templates"
+        ],
+        "cta": "Buy Wedding Pass"
+      },
+      "weddingPassPlus": {
+        "name": "Wedding Pass Plus",
+        "priceSuffix": "one-time payment per wedding",
+        "description": "The most complete option for premium weddings and collaborative work with helpers.",
+        "features": [
+          "Everything included in Wedding Pass",
+          "Remove branding from invitations, PDFs, and screens",
+          "Full design library and memories gallery",
+          "1 helper with full access to the wedding"
+        ],
+        "cta": "Choose Wedding Pass Plus"
+      }
+    },
+    "plannerPlans": {
+      "cta": "Start free trial",
+      "pack5": {
+        "name": "Planner Pack 5",
+        "monthlySuffix": "/ month (12 payments)",
+        "description": "Up to 5 active weddings simultaneously with professional tools.",
+        "annualDescription": "{{amount}} one-time annual payment (15% discount).",
+        "features": [
+          "1-month free trial",
+          "Priority in the directory and priority support",
+          "Assign and reassign licenses as needed"
+        ]
+      },
+      "pack15": {
+        "name": "Planner Pack 15",
+        "monthlySuffix": "/ month (12 payments)",
+        "description": "Designed for growing planners managing multiple projects in parallel.",
+        "annualDescription": "{{amount}} one-time annual payment (15% discount).",
+        "features": [
+          "1-month free trial",
+          "Client analytics and extended visibility",
+          "Priority in the directory and priority support"
+        ]
+      },
+      "teams40": {
+        "name": "Teams 40",
+        "monthlySuffix": "/ month (12 payments)",
+        "description": "Teams coordinating many weddings and requiring advanced collaboration.",
+        "annualDescription": "{{amount}} one-time annual payment (15% discount).",
+        "features": [
+          "1-month free trial",
+          "40 active weddings per calendar year",
+          "Includes 3 additional profiles with limited access",
+          "Consolidated dashboard and advanced collaboration"
+        ]
+      },
+      "teamsUnlimited": {
+        "name": "Teams Unlimited",
+        "monthlySuffix": "/ month (12 payments)",
+        "description": "The definitive solution with unlimited weddings and profiles for large agencies.",
+        "annualDescription": "{{amount}} one-time annual payment (15% discount).",
+        "features": [
+          "1-month free trial",
+          "Full white-label and custom domain",
+          "24/7 dedicated support and tailored training",
+          "API access and expert onboarding"
+        ]
+      }
+    }
   }
 }

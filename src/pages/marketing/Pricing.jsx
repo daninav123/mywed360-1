@@ -1,135 +1,164 @@
-﻿import React from 'react';
+import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Sparkles, HeartHandshake, Users, CheckCircle2, Crown } from 'lucide-react';
 
 import MarketingLayout from '../../components/marketing/MarketingLayout';
-
-const couplePlans = [
-  {
-    name: 'Free',
-    price: 0,
-    priceSuffix: 'por boda',
-    description: 'Organiza una boda íntima o prueba la plataforma sin coste.',
-    features: [
-      '1 boda activa con hasta 80 invitados',
-      'Seating plan básico y control de presupuesto',
-      'Directorio de proveedores y anuncios visibles',
-      'Plantillas esenciales y soporte estándar',
-    ],
-    cta: 'Crear cuenta gratuita',
-    link: '/signup',
-    highlight: false,
-  },
-  {
-    name: 'Wedding Pass',
-    price: 50,
-    priceSuffix: 'pago único por boda',
-    description:
-      'Desbloquea todas las herramientas premium para tu evento sin suscripciones anuales.',
-    features: [
-      'Invitados y proveedores ilimitados',
-      'Contacto directo con proveedores y protocolo completo',
-      'Hasta 50 diseños web y soporte prioritario',
-      'Plantillas premium para planificación avanzada',
-    ],
-    cta: 'Comprar Wedding Pass',
-    link: '/signup?wedding-pass',
-    highlight: true,
-  },
-  {
-    name: 'Wedding Pass Plus',
-    price: 85,
-    priceSuffix: 'pago único por boda',
-    description:
-      'La opción más completa para bodas premium y trabajo colaborativo con ayudantes.',
-    features: [
-      'Todo lo incluido en Wedding Pass',
-      'Elimina la marca en invitaciones, PDFs y pantallas',
-      'Biblioteca completa de diseños y galería de recuerdos',
-      '1 ayudante con acceso completo a la boda',
-    ],
-    cta: 'Elegir Wedding Pass Plus',
-    link: '/signup?wedding-pass-plus',
-    highlight: false,
-  },
-];
-
-const plannerPlans = [
-  {
-    name: 'Planner Pack 5',
-    monthlyPrice: 41.67,
-    annualPrice: 425,
-    description: 'Hasta 5 bodas activas simultáneas con herramientas profesionales.',
-    features: [
-      '1 mes de prueba gratuita',
-      'Prioridad en el directorio y soporte prioritario',
-      'Gestiona y reasigna licencias según tus clientes',
-    ],
-  },
-  {
-    name: 'Planner Pack 15',
-    monthlyPrice: 112.5,
-    annualPrice: 1147.5,
-    description: 'Pensado para planners en crecimiento con múltiples proyectos en paralelo.',
-    features: [
-      '1 mes de prueba gratuita',
-      'Analytics por cliente y visibilidad extendida',
-      'Prioridad en directorio y soporte prioritario',
-    ],
-  },
-  {
-    name: 'Teams 40',
-    monthlyPrice: 266.67,
-    annualPrice: 2720,
-    description: 'Equipos que coordinan muchas bodas y requieren colaboración avanzada.',
-    features: [
-      '1 mes de prueba gratuita',
-      '40 bodas activas al año natural',
-      'Incluye 3 perfiles adicionales con acceso limitado',
-      'Dashboard consolidado y colaboración avanzada',
-    ],
-  },
-  {
-    name: 'Teams Ilimitado',
-    monthlyPrice: 416.67,
-    annualPrice: 4250,
-    description: 'La solución definitiva con bodas y perfiles ilimitados para agencias grandes.',
-    features: [
-      '1 mes de prueba gratuita',
-      'White-label completo y dominio personalizado',
-      'Soporte dedicado 24/7 y formación personalizada',
-      'Acceso API y acompañamiento experto',
-    ],
-  },
-];
-
-const featureHighlights = [
-  {
-    icon: <Sparkles className="h-5 w-5 text-[var(--color-primary)]" />,
-    title: 'Pagos por evento',
-    description: 'Activa solo lo que necesitas para cada boda. Sin renovaciones automáticas.',
-  },
-  {
-    icon: <Users className="h-5 w-5 text-[var(--color-primary)]" />,
-    title: 'Colaboración controlada',
-    description: 'Invita ayudantes y proveedores con permisos claros y seguimiento de acciones.',
-  },
-  {
-    icon: <CheckCircle2 className="h-5 w-5 text-[var(--color-primary)]" />,
-    title: 'Estado sincronizado',
-    description: 'Los webhooks de Stripe mantienen licencias y packs al día con alertas internas.',
-  },
-];
+import useTranslations from '../../hooks/useTranslations';
 
 const formatEuro = (value, minimumFractionDigits = 0) =>
   new Intl.NumberFormat('es-ES', {
     style: 'currency',
     currency: 'EUR',
     minimumFractionDigits,
-    maximumFractionDigits: minimumFractionDigits,
   }).format(value);
 
 const Pricing = () => {
+  const { t } = useTranslations();
+
+  const featureHighlights = useMemo(
+    () => [
+      {
+        icon: <Sparkles className="h-5 w-5 text-[var(--color-primary)]" />,
+        title: t('pricing.hero.highlights.payPerEvent.title'),
+        description: t('pricing.hero.highlights.payPerEvent.description'),
+      },
+      {
+        icon: <Users className="h-5 w-5 text-[var(--color-primary)]" />,
+        title: t('pricing.hero.highlights.collaboration.title'),
+        description: t('pricing.hero.highlights.collaboration.description'),
+      },
+      {
+        icon: <CheckCircle2 className="h-5 w-5 text-[var(--color-primary)]" />,
+        title: t('pricing.hero.highlights.syncStatus.title'),
+        description: t('pricing.hero.highlights.syncStatus.description'),
+      },
+    ],
+    [t]
+  );
+
+  const heroBenefits = useMemo(
+    () => t('pricing.hero.benefits', { returnObjects: true }),
+    [t]
+  );
+
+  const couplePlans = useMemo(
+    () => [
+      {
+        key: 'free',
+        name: t('pricing.couplePlans.free.name'),
+        price: 0,
+        priceLabel: t('pricing.couplePlans.free.priceLabel'),
+        priceSuffix: t('pricing.couplePlans.free.priceSuffix'),
+        description: t('pricing.couplePlans.free.description'),
+        features: t('pricing.couplePlans.free.features', { returnObjects: true }),
+        cta: t('pricing.couplePlans.free.cta'),
+        link: '/signup',
+        highlight: false,
+      },
+      {
+        key: 'weddingPass',
+        name: t('pricing.couplePlans.weddingPass.name'),
+        price: 50,
+        priceSuffix: t('pricing.couplePlans.weddingPass.priceSuffix'),
+        description: t('pricing.couplePlans.weddingPass.description'),
+        features: t('pricing.couplePlans.weddingPass.features', { returnObjects: true }),
+        cta: t('pricing.couplePlans.weddingPass.cta'),
+        link: '/signup?wedding-pass',
+        highlight: true,
+      },
+      {
+        key: 'weddingPassPlus',
+        name: t('pricing.couplePlans.weddingPassPlus.name'),
+        price: 85,
+        priceSuffix: t('pricing.couplePlans.weddingPassPlus.priceSuffix'),
+        description: t('pricing.couplePlans.weddingPassPlus.description'),
+        features: t('pricing.couplePlans.weddingPassPlus.features', { returnObjects: true }),
+        cta: t('pricing.couplePlans.weddingPassPlus.cta'),
+        link: '/signup?wedding-pass-plus',
+        highlight: false,
+      },
+    ],
+    [t]
+  );
+
+  const plannerPlans = useMemo(
+    () => [
+      {
+        key: 'pack5',
+        name: t('pricing.plannerPlans.pack5.name'),
+        monthlyPrice: 41.67,
+        monthlySuffix: t('pricing.plannerPlans.pack5.monthlySuffix'),
+        description: t('pricing.plannerPlans.pack5.description'),
+        annualDescription: t('pricing.plannerPlans.pack5.annualDescription', {
+          amount: formatEuro(425),
+        }),
+        features: t('pricing.plannerPlans.pack5.features', { returnObjects: true }),
+      },
+      {
+        key: 'pack15',
+        name: t('pricing.plannerPlans.pack15.name'),
+        monthlyPrice: 112.5,
+        monthlySuffix: t('pricing.plannerPlans.pack15.monthlySuffix'),
+        description: t('pricing.plannerPlans.pack15.description'),
+        annualDescription: t('pricing.plannerPlans.pack15.annualDescription', {
+          amount: formatEuro(1147.5),
+        }),
+        features: t('pricing.plannerPlans.pack15.features', { returnObjects: true }),
+      },
+      {
+        key: 'teams40',
+        name: t('pricing.plannerPlans.teams40.name'),
+        monthlyPrice: 266.67,
+        monthlySuffix: t('pricing.plannerPlans.teams40.monthlySuffix'),
+        description: t('pricing.plannerPlans.teams40.description'),
+        annualDescription: t('pricing.plannerPlans.teams40.annualDescription', {
+          amount: formatEuro(2720),
+        }),
+        features: t('pricing.plannerPlans.teams40.features', { returnObjects: true }),
+      },
+      {
+        key: 'teamsUnlimited',
+        name: t('pricing.plannerPlans.teamsUnlimited.name'),
+        monthlyPrice: 416.67,
+        monthlySuffix: t('pricing.plannerPlans.teamsUnlimited.monthlySuffix'),
+        description: t('pricing.plannerPlans.teamsUnlimited.description'),
+        annualDescription: t('pricing.plannerPlans.teamsUnlimited.annualDescription', {
+          amount: formatEuro(4250),
+        }),
+        features: t('pricing.plannerPlans.teamsUnlimited.features', { returnObjects: true }),
+      },
+    ],
+    [t]
+  );
+
+  const plannerCta = t('pricing.plannerPlans.cta');
+  const heroBadge = t('pricing.hero.badge');
+  const heroTitle = t('pricing.hero.title');
+  const heroDescription = t('pricing.hero.description');
+  const heroBenefitsTitle = t('pricing.hero.benefitsTitle');
+  const heroCta = t('pricing.hero.cta');
+
+  const couplesLabel = t('pricing.sections.couples.label');
+  const couplesTitle = t('pricing.sections.couples.title');
+  const couplesDescription = t('pricing.sections.couples.description');
+
+  const plannersLabel = t('pricing.sections.planners.label');
+  const plannersTitle = t('pricing.sections.planners.title');
+  const plannersDescription = t('pricing.sections.planners.description');
+
+  const needHelpSection = {
+    title: t('pricing.sections.needHelp.title'),
+    description: t('pricing.sections.needHelp.description'),
+    cta: t('pricing.sections.needHelp.cta'),
+  };
+
+  const quickStartSection = {
+    title: t('pricing.sections.quickStart.title'),
+    description: t('pricing.sections.quickStart.description'),
+    primaryCta: t('pricing.sections.quickStart.primaryCta'),
+    secondaryCta: t('pricing.sections.quickStart.secondaryCta'),
+  };
+
   return (
     <MarketingLayout>
       <div className="layout-container space-y-16">
@@ -138,14 +167,10 @@ const Pricing = () => {
             <div>
               <span className="inline-flex items-center gap-2 rounded-full bg-[var(--color-primary)]/12 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-[var(--color-primary)]">
                 <Sparkles className="h-4 w-4" />
-                Modelo por boda
+                {heroBadge}
               </span>
-              <h1 className="mt-6 text-4xl font-semibold text-body md:text-5xl">
-                Planes claros para cada evento.
-              </h1>
-              <p className="mt-4 max-w-2xl text-base text-muted md:text-lg">
-                Pagos únicos en euros para parejas y paquetes flexibles para planners. Cada licencia permanece activa hasta 30 días posteriores a la fecha del evento y puedes extenderla cuando lo necesites.
-              </p>
+              <h1 className="mt-6 text-4xl font-semibold text-body md:text-5xl">{heroTitle}</h1>
+              <p className="mt-4 max-w-2xl text-base text-muted md:text-lg">{heroDescription}</p>
               <div className="mt-6 grid gap-4 md:grid-cols-3">
                 {featureHighlights.map((item) => (
                   <div
@@ -165,27 +190,21 @@ const Pricing = () => {
             <div className="rounded-3xl border border-[var(--color-primary)]/35 bg-surface p-6 shadow-lg shadow-[var(--color-primary)]/15">
               <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-widest text-[var(--color-primary)]">
                 <HeartHandshake className="h-4 w-4" />
-                Beneficios clave
+                {heroBenefitsTitle}
               </div>
               <ul className="mt-4 space-y-3 text-sm text-muted">
-                <li className="flex items-start gap-3">
-                  <CheckCircle2 className="mt-0.5 h-4 w-4 text-[var(--color-primary)]" />
-                  Licencias en modo lectura automático tras la fecha límite del evento.
-                </li>
-                <li className="flex items-start gap-3">
-                  <CheckCircle2 className="mt-0.5 h-4 w-4 text-[var(--color-primary)]" />
-                  Packs de planners con 1 mes de prueba y control de cuota disponible.
-                </li>
-                <li className="flex items-start gap-3">
-                  <CheckCircle2 className="mt-0.5 h-4 w-4 text-[var(--color-primary)]" />
-                  Alertas 30 / 7 / 1 días antes de expirar para mantener todo bajo control.
-                </li>
+                {heroBenefits.map((benefit) => (
+                  <li key={benefit} className="flex items-start gap-3">
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 text-[var(--color-primary)]" />
+                    {benefit}
+                  </li>
+                ))}
               </ul>
               <Link
                 to="/signup"
                 className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-md bg-[var(--color-primary)] px-4 py-3 text-sm font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5 hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
               >
-                Crear cuenta gratuita
+                {heroCta}
               </Link>
             </div>
           </div>
@@ -194,13 +213,11 @@ const Pricing = () => {
         <section>
           <div className="flex flex-wrap items-center gap-3">
             <span className="rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[var(--color-primary)]">
-              Parejas
+              {couplesLabel}
             </span>
-            <h2 className="text-xl font-semibold text-body md:text-2xl">Planes para parejas</h2>
+            <h2 className="text-xl font-semibold text-body md:text-2xl">{couplesTitle}</h2>
           </div>
-          <p className="mt-2 text-sm text-muted">
-            Cada compra habilita una boda completa hasta 30 días después del evento. Añade una extensión para seguir trabajando si necesitas más tiempo.
-          </p>
+          <p className="mt-2 text-sm text-muted">{couplesDescription}</p>
 
           <div className="mt-6 grid gap-8 md:grid-cols-3">
             {couplePlans.map((plan) => {
@@ -216,25 +233,25 @@ const Pricing = () => {
               ].join(' ');
 
               return (
-                <article key={plan.name} className={cardClasses}>
+                <article key={plan.key} className={cardClasses}>
                   <div>
                     <span className="text-xs font-semibold uppercase tracking-widest text-muted">
                       {plan.name}
                     </span>
                     <h3 className="mt-4 text-3xl font-semibold text-body">
-                      {plan.price === 0 ? (
+                      {plan.price === 0 && plan.priceLabel ? (
                         <>
-                          Gratis
+                          {plan.priceLabel}
                           <span className="block text-sm font-medium text-muted">{plan.priceSuffix}</span>
                         </>
                       ) : (
                         <>
-                          {formatEuro(plan.price)}
+                          {formatEuro(plan.price)}{' '}
                           <span className="block text-sm font-medium text-muted">{plan.priceSuffix}</span>
                         </>
                       )}
                     </h3>
-                    <p className="mt-4 text-sm text-muted">{plan.description}</p>
+                    <p className="mt-2 text-sm text-muted">{plan.description}</p>
                   </div>
 
                   <ul className="mt-6 flex flex-1 flex-col gap-3 text-sm text-muted">
@@ -259,18 +276,16 @@ const Pricing = () => {
           <div className="flex flex-wrap items-center gap-3">
             <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-primary)]/12 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[var(--color-primary)]">
               <Crown className="h-3.5 w-3.5" />
-              Planners
+              {plannersLabel}
             </span>
-            <h2 className="text-xl font-semibold text-body md:text-2xl">Paquetes para planners</h2>
+            <h2 className="text-xl font-semibold text-body md:text-2xl">{plannersTitle}</h2>
           </div>
-          <p className="mt-2 text-sm text-muted">
-            Todos los packs incluyen 1 mes de prueba gratuita. Elige 12 cuotas mensuales o pago único anual con 15&nbsp;% de descuento. Las cuotas disponibles se actualizan automáticamente con Stripe.
-          </p>
+          <p className="mt-2 text-sm text-muted">{plannersDescription}</p>
 
           <div className="mt-6 grid gap-8 md:grid-cols-2">
             {plannerPlans.map((plan) => (
               <article
-                key={plan.name}
+                key={plan.key}
                 className="flex h-full flex-col rounded-3xl border border-soft bg-surface p-8 shadow-sm shadow-[var(--color-primary)]/12 transition-transform hover:-translate-y-1 hover:shadow-lg hover:shadow-[var(--color-primary)]/20"
               >
                 <div>
@@ -279,11 +294,9 @@ const Pricing = () => {
                   </span>
                   <h3 className="mt-4 text-2xl font-semibold text-body">
                     {formatEuro(plan.monthlyPrice, 2)}{' '}
-                    <span className="text-sm font-medium text-muted">/ mes (12 pagos)</span>
+                    <span className="text-sm font-medium text-muted">{plan.monthlySuffix}</span>
                   </h3>
-                  <p className="mt-1 text-sm text-muted">
-                    {formatEuro(plan.annualPrice)} pago único anual (15&nbsp;% descuento)
-                  </p>
+                  <p className="mt-1 text-sm text-muted">{plan.annualDescription}</p>
                   <p className="mt-4 text-sm text-muted">{plan.description}</p>
                 </div>
 
@@ -300,7 +313,7 @@ const Pricing = () => {
                   to="/signup?role=planner"
                   className="mt-8 inline-flex items-center justify-center rounded-md border border-[var(--color-primary)]/45 px-5 py-3 text-sm font-semibold text-body transition-colors hover:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
                 >
-                  Empezar prueba gratuita
+                  {plannerCta}
                 </Link>
               </article>
             ))}
@@ -310,18 +323,14 @@ const Pricing = () => {
         <section className="rounded-3xl border border-soft bg-surface p-10 shadow-lg shadow-[var(--color-primary)]/12">
           <div className="grid gap-8 md:grid-cols-[1.5fr,0.5fr] md:items-center">
             <div>
-              <h2 className="text-2xl font-semibold text-body md:text-3xl">
-                ¿Necesitas ayuda para elegir el plan adecuado?
-              </h2>
-              <p className="mt-4 text-base text-muted">
-                Te ayudamos a configurar licencias, automatizaciones y reportes según tu operación. Agenda una sesión y diseña un rollout acorde a tu ritmo.
-              </p>
+              <h2 className="text-2xl font-semibold text-body md:text-3xl">{needHelpSection.title}</h2>
+              <p className="mt-4 text-base text-muted">{needHelpSection.description}</p>
             </div>
             <Link
               to="/signup"
               className="inline-flex items-center justify-center rounded-md bg-[var(--color-primary)] px-5 py-3 text-sm font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5 hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
             >
-              Hablar con un especialista
+              {needHelpSection.cta}
             </Link>
           </div>
         </section>
@@ -329,23 +338,21 @@ const Pricing = () => {
         <section className="rounded-3xl border border-[var(--color-primary)]/45 bg-[var(--color-primary)] px-8 py-10 text-white shadow-lg shadow-[var(--color-primary)]/30 md:px-12">
           <div className="grid gap-10 md:grid-cols-[2fr,1fr] md:items-center">
             <div>
-              <h2 className="text-3xl font-semibold">Lista para usar en minutos.</h2>
-              <p className="mt-4 text-base text-white/85">
-                Crea tu cuenta, conecta Stripe y activa tus licencias de inmediato. El sistema notificará las renovaciones y podrás mantener bodas cerradas en modo lectura cuando terminen.
-              </p>
+              <h2 className="text-3xl font-semibold">{quickStartSection.title}</h2>
+              <p className="mt-4 text-base text-white/85">{quickStartSection.description}</p>
             </div>
             <div className="flex flex-col gap-3">
               <Link
                 to="/signup"
                 className="inline-flex items-center justify-center rounded-md bg-white px-4 py-3 text-sm font-semibold text-[var(--color-primary)] transition-transform hover:-translate-y-0.5 hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[var(--color-primary)]"
               >
-                Crear cuenta gratuita
+                {quickStartSection.primaryCta}
               </Link>
               <Link
                 to="/acceso"
                 className="inline-flex items-center justify-center rounded-md border border-white/70 px-4 py-3 text-sm font-semibold text-white/90 transition-colors hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[var(--color-primary)]"
               >
-                Centro de acceso
+                {quickStartSection.secondaryCta}
               </Link>
             </div>
           </div>
@@ -356,3 +363,4 @@ const Pricing = () => {
 };
 
 export default Pricing;
+
