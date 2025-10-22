@@ -1405,9 +1405,10 @@ async function computeRealtimeOverview() {
   if (!newWeddings30d) {
     try { newWeddings30d = await countDocuments(collections.weddingsGroup, [{ field: 'createdAt', op: '>=', value: thirtyTimestamp }]); } catch { newWeddings30d = 0; }
   }
-  let activeWeddings = await countDocuments(collections.weddings, [{ field: 'status', op: '==', value: 'active' }]);
+  // Contar bodas activas: campo 'active' (booleano), no 'status'
+  let activeWeddings = await countDocuments(collections.weddings, [{ field: 'active', op: '==', value: true }]);
   if (!activeWeddings) {
-    try { activeWeddings = await countDocuments(collections.weddingsGroup, [{ field: 'status', op: '==', value: 'active' }]); } catch { activeWeddings = 0; }
+    try { activeWeddings = await countDocuments(collections.weddingsGroup, [{ field: 'active', op: '==', value: true }]); } catch { activeWeddings = 0; }
   }
   const revenue30dRaw = await sumPaymentsLast30d();
   const downloads30d = await countDownloadsLast30d();
