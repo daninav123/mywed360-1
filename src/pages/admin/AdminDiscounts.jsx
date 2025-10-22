@@ -636,50 +636,88 @@ const AdminDiscounts = () => {
 
 
 
-  const handleEditDiscount = async (e) => {
-    e.preventDefault();
-    if (updating || !editingDiscount) return;
+  const handleEditDiscount = async (e) => {
 
-    setUpdating(true);
-    try {
-      const commissionPayload = buildCommissionPayload(formData.commissionRules);
+    e.preventDefault();
 
-      const discountData = {
-        url: formData.url.trim() || undefined,
-        type: formData.type,
-        maxUses: formData.isPermanent ? null : (parseInt(formData.maxUses) || 1),
-        discountPercentage: parseFloat(formData.discountPercentage) || 0,
-        validFrom: formData.validFrom ? new Date(formData.validFrom).toISOString() : null,
-        validUntil: formData.validUntil ? new Date(formData.validUntil).toISOString() : null,
-        assignedTo: formData.assignedTo.name || formData.assignedTo.email ? {
-          name: formData.assignedTo.name || null,
-          email: formData.assignedTo.email || null
-        } : null,
-        notes: formData.notes.trim() || undefined,
-        status: formData.status,
-        commissionRules: commissionPayload,
-      };
+    if (updating || !editingDiscount) return;
 
-      if (commissionPayload && commissionPayload.currency) {
-        discountData.currency = commissionPayload.currency;
-      }
 
-      const updatedDiscount = await updateDiscountCode(editingDiscount.id, discountData);
+    setUpdating(true);
 
-      setLinks(prev => prev.map(link =>
-        link.id === editingDiscount.id ? updatedDiscount : link
-      ));
+    try {
 
-      resetForm();
-      setShowEditModal(false);
-      setEditingDiscount(null);
-    } catch (err) {
-      console.error('[AdminDiscounts] update failed:', err);
-      alert(err.message || 'Error al actualizar el codigo de descuento');
-    } finally {
-      setUpdating(false);
-    }
-  };
+      const commissionPayload = buildCommissionPayload(formData.commissionRules);
+
+
+      const discountData = {
+
+        url: formData.url.trim() || undefined,
+
+        type: formData.type,
+
+        maxUses: formData.isPermanent ? null : (parseInt(formData.maxUses) || 1),
+
+        discountPercentage: parseFloat(formData.discountPercentage) || 0,
+
+        validFrom: formData.validFrom ? new Date(formData.validFrom).toISOString() : null,
+
+        validUntil: formData.validUntil ? new Date(formData.validUntil).toISOString() : null,
+
+        assignedTo: formData.assignedTo.name || formData.assignedTo.email ? {
+
+          name: formData.assignedTo.name || null,
+
+          email: formData.assignedTo.email || null
+
+        } : null,
+
+        notes: formData.notes.trim() || undefined,
+
+        status: formData.status,
+
+        commissionRules: commissionPayload,
+
+      };
+
+
+      if (commissionPayload && commissionPayload.currency) {
+
+        discountData.currency = commissionPayload.currency;
+
+      }
+
+
+      const updatedDiscount = await updateDiscountCode(editingDiscount.id, discountData);
+
+
+      setLinks(prev => prev.map(link =>
+
+        link.id === editingDiscount.id ? updatedDiscount : link
+
+      ));
+
+
+      resetForm();
+
+      setShowEditModal(false);
+
+      setEditingDiscount(null);
+
+    } catch (err) {
+
+      console.error('[AdminDiscounts] update failed:', err);
+
+      alert(err.message || 'Error al actualizar el codigo de descuento');
+
+    } finally {
+
+      setUpdating(false);
+
+    }
+
+  };
+
 
   const openEditModal = (discount) => {
     setEditingDiscount(discount);
@@ -1010,6 +1048,20 @@ const AdminDiscounts = () => {
                   className="w-full rounded-md border border-soft px-3 py-2 text-sm"
                 />
               </div>
+
+
+              <CommissionRulesEditor
+                value={formData.commissionRules}
+                onChange={(next) => setFormData(prev => ({ ...prev, commissionRules: next }))}
+                disabled={creating}
+              />
+
+
+              <CommissionRulesEditor
+                value={formData.commissionRules}
+                onChange={(next) => setFormData(prev => ({ ...prev, commissionRules: next }))}
+                disabled={updating}
+              />
 
               <div className="flex justify-end gap-3 pt-2">
                 <button

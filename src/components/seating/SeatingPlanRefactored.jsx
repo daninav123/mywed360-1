@@ -18,6 +18,7 @@ import SeatingMobileOverlay from './SeatingMobileOverlay';
 import SeatingSmartPanel from './SeatingSmartPanel';
 import SeatingGuestSidebar from './SeatingGuestSidebar';
 import SeatingPlanModals from './SeatingPlanModals';
+import SeatingPlanOnboardingChecklist from './SeatingPlanOnboardingChecklist';
 import SeatingPlanSummary from './SeatingPlanSummary';
 import { useWedding } from '../../context/WeddingContext';
 // Importar vía alias estable para permitir vi.mock en tests y usar el hook deshabilitado en test
@@ -80,6 +81,51 @@ const resolveAreaType = (area) => {
   normalized = AREA_ALIAS[normalized] || normalized;
   if (!AREA_TYPE_META[normalized]) return 'free';
   return normalized;
+};
+
+const createDefaultOnboardingState = () => ({
+  dismissed: false,
+  steps: {
+    spaceConfigured: false,
+    guestsImported: false,
+    firstAssignment: false,
+  },
+});
+
+const determineOnboardingStep = (steps) => {
+  if (!steps?.spaceConfigured) return 'space';
+  if (!steps?.guestsImported) return 'guests';
+  if (!steps?.firstAssignment) return 'assign';
+  return null;
+};
+
+const sanitizeOnboardingState = (value) => {
+  if (!value || typeof value !== 'object') {
+    return createDefaultOnboardingState();
+  }
+  const steps = value.steps && typeof value.steps === 'object' ? value.steps : {};
+  return {
+    dismissed: value.dismissed === true,
+    steps: {
+      spaceConfigured: steps.spaceConfigured === true,
+      guestsImported: steps.guestsImported === true,
+      firstAssignment: steps.firstAssignment === true,
+    },
+  };
+};
+
+const onboardingStatesEqual = (a, b) =>
+  a.dismissed === b.dismissed &&
+  !!a.steps?.spaceConfigured === !!b.steps?.spaceConfigured &&
+  !!a.steps?.guestsImported === !!b.steps?.guestsImported &&
+  !!a.steps?.firstAssignment === !!b.steps?.firstAssignment;
+
+const ONBOARDING_STEP_KEYS = ['spaceConfigured', 'guestsImported', 'firstAssignment'];
+
+const ONBOARDING_STEP_ID_MAP = {
+  space: 'spaceConfigured',
+  guests: 'guestsImported',
+  assign: 'firstAssignment',
 };
 
 const SeatingPlanRefactored = () => {
@@ -194,6 +240,9 @@ const SeatingPlanRefactored = () => {
   const [isMobile, setIsMobile] = React.useState(false);
   const [guestSidebarOpen, setGuestSidebarOpen] = React.useState(true);
   const [showAdvancedTools, setShowAdvancedTools] = React.useState(true);
+  const [onboardingPrefs, setOnboardingPrefs] = React.useState(() =>
+    createDefaultOnboardingState()
+  );
   const showSmartPanel = tab === 'banquet';
   const showGuestSidebar = guestSidebarOpen && !isMobile;
   const [ceremonyActiveRow, setCeremonyActiveRow] = React.useState(0);
@@ -273,6 +322,10 @@ const SeatingPlanRefactored = () => {
       if (Object.prototype.hasOwnProperty.call(data, 'showAdvancedTools')) {
         setShowAdvancedTools(!!data.showAdvancedTools);
       }
+      if (Object.prototype.hasOwnProperty.call(data, 'onboarding')) {
+        const next = sanitizeOnboardingState(data.onboarding);
+        setOnboardingPrefs((prev) => (onboardingStatesEqual(prev, next) ? prev : next));
+      }
     } catch (_) {}
   }, [uiPrefsKey]);
 
@@ -282,8 +335,16 @@ const SeatingPlanRefactored = () => {
       showSeatNumbers,
       showTables,
       showAdvancedTools,
+      onboarding: onboardingPrefs,
     });
-  }, [showRulers, showSeatNumbers, showTables, showAdvancedTools, persistUiPrefs]);
+  }, [
+    showRulers,
+    showSeatNumbers,
+    showTables,
+    showAdvancedTools,
+    onboardingPrefs,
+    persistUiPrefs,
+  ]);
 
   const isHallReady = Number.isFinite(safeHallSize?.width) && Number.isFinite(safeHallSize?.height);
 
@@ -439,6 +500,104 @@ const SeatingPlanRefactored = () => {
       banquetProgress,
     };
   }, [safeGuests, safeSeats, safeTables]);
+
+  const hasConfiguredSpace = React.useMemo(() => {
+    const widthConfigured =
+      Number.isFinite(safeHallSize?.width) &&
+      Number.isFinite(safeHallSize?.height) &&
+      (Math.round(safeHallSize.width) !== 1800 || Math.round(safeHallSize.height) !== 1200);
+    const hasAreas = safeAreas.length > 0;
+    const hasBackgroundConfigured =
+      !!background &&
+      (typeof background === 'string'
+        ? background.trim() !== ''
+        : typeof background === 'object' && Object.keys(background).length > 0);
+    const hasTablesAvailable = safeTables.length > 0;
+    return widthConfigured || hasAreas || hasBackgroundConfigured || hasTablesAvailable;
+  }, [safeHallSize, safeAreas, safeTables, background]);
+
+  const hasGuestsImported = safeGuests.length > 0;
+  const hasAssignedGuests = seatingProgress.assignedPersons > 0;
+
+  useEffect(() => {
+    setOnboardingPrefs((prev) => {
+      if (!prev || typeof prev !== 'object') return createDefaultOnboardingState();
+      let changed = false;
+      const nextSteps = { ...prev.steps };
+      if (hasConfiguredSpace && !nextSteps.spaceConfigured) {
+        nextSteps.spaceConfigured = true;
+        changed = true;
+      }
+      if (hasGuestsImported && !nextSteps.guestsImported) {
+        nextSteps.guestsImported = true;
+        changed = true;
+      }
+      if (hasAssignedGuests && !nextSteps.firstAssignment) {
+        nextSteps.firstAssignment = true;
+        changed = true;
+      }
+      const allCompleted =
+        nextSteps.spaceConfigured && nextSteps.guestsImported && nextSteps.firstAssignment;
+      const nextDismissed = allCompleted ? true : prev.dismissed;
+      if (!changed && nextDismissed === prev.dismissed) {
+        return prev;
+      }
+      return {
+        ...prev,
+        steps: nextSteps,
+        dismissed: nextDismissed,
+      };
+    });
+  }, [hasConfiguredSpace, hasGuestsImported, hasAssignedGuests]);
+
+  const onboardingActiveStep = React.useMemo(
+    () => (onboardingPrefs.dismissed ? null : determineOnboardingStep(onboardingPrefs.steps)),
+    [onboardingPrefs.dismissed, onboardingPrefs.steps]
+  );
+
+  const onboardingCompletedCount = React.useMemo(
+    () =>
+      ONBOARDING_STEP_KEYS.reduce(
+        (acc, key) => (onboardingPrefs.steps?.[key] ? acc + 1 : acc),
+        0
+      ),
+    [onboardingPrefs.steps]
+  );
+
+  const onboardingProgress = React.useMemo(() => {
+    const total = ONBOARDING_STEP_KEYS.length;
+    return {
+      completed: onboardingCompletedCount,
+      total,
+      percent: total > 0 ? Math.min(100, Math.round((onboardingCompletedCount / total) * 100)) : 0,
+    };
+  }, [onboardingCompletedCount]);
+
+  const showOnboardingChecklist =
+    !onboardingPrefs.dismissed && onboardingActiveStep !== null && onboardingProgress.total > 0;
+
+  const handleDismissOnboarding = React.useCallback(() => {
+    setOnboardingPrefs((prev) => (prev.dismissed ? prev : { ...prev, dismissed: true }));
+  }, []);
+
+  const handleCompleteOnboardingStep = React.useCallback((stepKey) => {
+    if (!ONBOARDING_STEP_KEYS.includes(stepKey)) return;
+    setOnboardingPrefs((prev) => {
+      if (prev.steps?.[stepKey]) return prev;
+      const nextSteps = { ...prev.steps, [stepKey]: true };
+      return { ...prev, steps: nextSteps };
+    });
+  }, []);
+
+  const handleCompleteOnboardingStepById = React.useCallback(
+    (stepId) => {
+      const stepKey = ONBOARDING_STEP_ID_MAP[stepId];
+      if (stepKey) {
+        handleCompleteOnboardingStep(stepKey);
+      }
+    },
+    [handleCompleteOnboardingStep]
+  );
 
   useEffect(() => {
     if (!lockEvent) return;
@@ -1309,8 +1468,67 @@ const SeatingPlanRefactored = () => {
             onOpenExport={() => setExportWizardOpen(true)}
             onToggleAdvancedTools={(open) => setShowAdvancedTools(!!open)}
             advancedOpen={showAdvancedTools}
+            onboarding={{
+              activeStep: onboardingActiveStep,
+              completed: {
+                space: !!onboardingPrefs.steps.spaceConfigured,
+                guests: !!onboardingPrefs.steps.guestsImported,
+                assign: !!onboardingPrefs.steps.firstAssignment,
+              },
+            }}
           />
         </div>
+
+        {showOnboardingChecklist ? (
+          <div className="flex-shrink-0 px-4 pb-3">
+            <SeatingPlanOnboardingChecklist
+              currentStep={onboardingActiveStep}
+              progress={onboardingProgress}
+              steps={[
+                {
+                  id: 'space',
+                  title: 'Configura el espacio',
+                  description: 'Define dimensiones, fondo o dibuja zonas clave del salón.',
+                  done: onboardingPrefs.steps.spaceConfigured,
+                  actionLabel: 'Configurar espacio',
+                  onAction: () => {
+                    handleOpenSpaceConfig();
+                  },
+                  onMarkDone: () => handleCompleteOnboardingStep('spaceConfigured'),
+                },
+                {
+                  id: 'guests',
+                  title: 'Cargar invitados',
+                  description: 'Importa tu lista o revisa los pendientes por asignar.',
+                  done: onboardingPrefs.steps.guestsImported,
+                  actionLabel: safeGuests.length > 0 ? 'Ver invitados' : 'Importar invitados',
+                  onAction: () => {
+                    setGuestDrawerOpen(true);
+                  },
+                  onMarkDone: () => handleCompleteOnboardingStep('guestsImported'),
+                },
+                {
+                  id: 'assign',
+                  title: 'Asigna mesas',
+                  description: 'Ubica a cada invitado en una mesa o fila de ceremonia.',
+                  done: onboardingPrefs.steps.firstAssignment,
+                  actionLabel:
+                    seatingProgress.assignedPersons > 0 ? 'Revisar asignaciones' : 'Asignar ahora',
+                  onAction: () => {
+                    if (pendingGuests.length > 0) {
+                      setGuidedGuestId(pendingGuests[0]?.id || null);
+                      setGuestDrawerOpen(true);
+                    } else {
+                      handleAutoAssignClick();
+                    }
+                  },
+                  onMarkDone: () => handleCompleteOnboardingStep('firstAssignment'),
+                },
+              ]}
+              onDismiss={handleDismissOnboarding}
+            />
+          </div>
+        ) : null}
 
         {/* Toolbar */}
         {showAdvancedTools ? (

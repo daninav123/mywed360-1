@@ -23,6 +23,9 @@ Este documento consolida los flujos técnicos añadidos recientemente: Seating P
   - El estado `showAdvancedTools` se persiste para mostrar u ocultar la toolbar completa.
 - Persistencia y calculos de progreso:
   - `SeatingPlanRefactored.jsx` guarda `showAdvancedTools`, `showRulers`, `showSeatNumbers` y `showTables` en `localStorage` (`uiPrefsKey`) y calcula `seatingProgress` (personas totales, asignadas, asientos habilitados y % avance).
+- Onboarding guiado para primeros pasos:
+  - Checklist y tooltips sugeridos (Configurar espacio, importar invitados, asignar mesas) con estado persistido en `uiPrefsKey`.
+  - Guardar banderas `onboardingSteps` y `onboardingDismissed` en `SeatingPlanRefactored.jsx` para reanudar o descartar el recorrido.
 - Validacion de capacidad por mesa al asignar invitados (considera acompanantes).
   - Archivo: `src/components/seating/SeatingPlanRefactored.jsx` (`handleAssignGuest`).
 - Optimizaciones de rendimiento sin cambiar UI:

@@ -60,9 +60,10 @@ export default function BudgetManager({
     0
   );
   const totalBudgetValue =
-    Number.isFinite(computedTotal) && computedTotal > 0 ? computedTotal : categoriesTotal;
+    Number.isFinite(computedTotal) && computedTotal >= 0 ? computedTotal : categoriesTotal;
   const totalBudgetCents = Math.max(0, Math.round(totalBudgetValue * 100));
   const hasGlobalBudget = totalBudgetCents > 0;
+  const categoriesTotalCents = Math.max(0, Math.round(categoriesTotal * 100));
 
   const formatTotalInput = (value) => {
     if (!Number.isFinite(value)) return '';
@@ -119,66 +120,77 @@ export default function BudgetManager({
 
 /**
  * Reduce proporcionalmente las cantidades especificadas en `indices` hasta cubrir `delta`.
+ * Respeta los mínimos definidos en `minBounds` (por ejemplo, gasto real ya registrado).
  * Mutamos el array `amounts` en céntimos para evitar problemas de precisión.
- * Devuelve el remanente que no se pudo recortar (por ejemplo, si todas las categorías llegaron a 0).
+ * Devuelve el remanente que no se pudo recortar (por ejemplo, si todas las categorías llegaron a su mínimo).
  */
-const distributeDecrease = (amounts, indices, delta) => {
-    let remaining = delta;
-    let adjustable = indices.filter((idx) => amounts[idx] > 0);
+const distributeDecrease = (amounts, indices, delta, minBounds = []) => {
+  let remaining = delta;
+  let adjustable = indices.filter((idx) => amounts[idx] > (minBounds[idx] ?? 0));
 
-    while (remaining > 0 && adjustable.length) {
-      const totalAdjustable = adjustable.reduce((sum, idx) => sum + amounts[idx], 0);
-      if (totalAdjustable <= 0) break;
+  while (remaining > 0 && adjustable.length) {
+    const totalAdjustable = adjustable.reduce(
+      (sum, idx) => sum + Math.max(0, amounts[idx] - (minBounds[idx] ?? 0)),
+      0
+    );
+    if (totalAdjustable <= 0) break;
 
-      let remainder = remaining;
-      const plan = new Map();
-      adjustable.forEach((idx) => {
-        const currentAmount = amounts[idx];
-        if (currentAmount <= 0) {
-          plan.set(idx, 0);
-          return;
+    let remainder = remaining;
+    const plan = new Map();
+    adjustable.forEach((idx) => {
+      const currentAmount = amounts[idx];
+      const minAmount = minBounds[idx] ?? 0;
+      const available = Math.max(0, currentAmount - minAmount);
+      if (available <= 0) {
+        plan.set(idx, 0);
+        return;
+      }
+      const deduction = Math.min(
+        available,
+        Math.floor((remaining * available) / Math.max(totalAdjustable, 1))
+      );
+      plan.set(idx, deduction);
+      remainder -= deduction;
+    });
+
+    if (remainder > 0) {
+      const sorted = [...adjustable].sort(
+        (a, b) =>
+          (amounts[b] - (minBounds[b] ?? 0) - (plan.get(b) || 0)) -
+          (amounts[a] - (minBounds[a] ?? 0) - (plan.get(a) || 0))
+      );
+      let pointer = 0;
+      while (remainder > 0 && sorted.length) {
+        const idx = sorted[pointer % sorted.length];
+        const minAmount = minBounds[idx] ?? 0;
+        const available = Math.max(0, amounts[idx] - minAmount - (plan.get(idx) || 0));
+        if (available <= 0) {
+          sorted.splice(pointer % sorted.length, 1);
+          continue;
         }
-        const deduction = Math.min(
-          currentAmount,
-          Math.floor((remaining * currentAmount) / totalAdjustable)
-        );
-        plan.set(idx, deduction);
-        remainder -= deduction;
-      });
-
-      if (remainder > 0) {
-        const sorted = [...adjustable].sort(
-          (a, b) =>
-            (amounts[b] - (plan.get(b) || 0)) - (amounts[a] - (plan.get(a) || 0))
-        );
-        let pointer = 0;
-        while (remainder > 0 && sorted.length) {
-          const idx = sorted[pointer % sorted.length];
-          if ((amounts[idx] - (plan.get(idx) || 0)) <= 0) {
-            sorted.splice(pointer % sorted.length, 1);
-            continue;
-          }
-          plan.set(idx, (plan.get(idx) || 0) + 1);
-          remainder -= 1;
+        plan.set(idx, (plan.get(idx) || 0) + 1);
+        remainder -= 1;
           pointer += 1;
         }
       }
 
-      let totalDeducted = 0;
-      plan.forEach((deduction, idx) => {
-        if (deduction <= 0) return;
-        const applied = Math.min(amounts[idx], deduction);
-        amounts[idx] = Math.max(0, amounts[idx] - applied);
-        totalDeducted += applied;
-      });
+    let totalDeducted = 0;
+    plan.forEach((deduction, idx) => {
+      if (deduction <= 0) return;
+      const minAmount = minBounds[idx] ?? 0;
+      const available = Math.max(0, amounts[idx] - minAmount);
+      const applied = Math.min(available, deduction);
+      amounts[idx] = Math.max(minAmount, amounts[idx] - applied);
+      totalDeducted += applied;
+    });
 
-      remaining -= totalDeducted;
-      adjustable = adjustable.filter((idx) => amounts[idx] > 0);
-      if (totalDeducted === 0) break;
-    }
+    remaining -= totalDeducted;
+    adjustable = adjustable.filter((idx) => amounts[idx] > (minBounds[idx] ?? 0));
+    if (totalDeducted === 0) break;
+  }
 
-    return remaining;
-  };
+  return remaining;
+};
 
 /**
  * Incrementa proporcionalmente las categorías en `indices` con el presupuesto disponible `delta`.
@@ -251,8 +263,28 @@ const distributeIncrease = (amounts, indices, delta) => {
   const handleAllocationChange = (index, targetCents) => {
     if (!onReallocateCategories || !categories.length) return;
 
-    const safeTarget = Math.max(0, Math.min(targetCents, totalBudgetCents));
-    const currentAmounts = categories.map((cat) =>
+    if (!hasGlobalBudget) {
+      const normalizedCentValue = Math.max(0, targetCents);
+      const nextCategories = categories.map((cat, idx) => ({
+        ...cat,
+        amount:
+          idx === index
+            ? Number((normalizedCentValue / 100).toFixed(2))
+            : Number((Math.max(0, Math.round((Number(cat?.amount) || 0) * 100)) / 100).toFixed(2)),
+      }));
+      onReallocateCategories(nextCategories);
+      return;
+    }
+
+    const minBounds = categories.map((_, idx) =>
+      Math.max(0, Math.round((Number(budgetUsage[idx]?.spent) || 0) * 100))
+    );
+
+    const safeTarget = Math.max(
+      minBounds[index] ?? 0,
+      Math.min(targetCents, totalBudgetCents)
+    );
+    const currentAmounts = categories.map((cat, idx) =>
       Math.max(0, Math.round((Number(cat?.amount) || 0) * 100))
     );
     const currentAmountCents = currentAmounts[index] || 0;
@@ -275,9 +307,9 @@ const distributeIncrease = (amounts, indices, delta) => {
         remainingIncrease -= consume;
       }
       if (remainingIncrease > 0) {
-        const leftover = distributeDecrease(nextAmounts, otherIndices, remainingIncrease);
+        const leftover = distributeDecrease(nextAmounts, otherIndices, remainingIncrease, minBounds);
         if (leftover > 0) {
-          nextAmounts[index] = Math.max(0, nextAmounts[index] - leftover);
+          nextAmounts[index] = Math.max(minBounds[index] ?? 0, nextAmounts[index] - leftover);
         }
       }
     } else {
@@ -288,14 +320,24 @@ const distributeIncrease = (amounts, indices, delta) => {
     let totalAfter = nextAmounts.reduce((sum, value) => sum + value, 0);
     if (totalAfter > totalBudgetCents) {
       let overflow = totalAfter - totalBudgetCents;
-      const reduceFromTarget = Math.min(overflow, nextAmounts[index]);
+      const reduceFromTarget = Math.min(
+        overflow,
+        Math.max(0, nextAmounts[index] - (minBounds[index] ?? 0))
+      );
       nextAmounts[index] -= reduceFromTarget;
       overflow -= reduceFromTarget;
       if (overflow > 0) {
-        distributeDecrease(nextAmounts, otherIndices, overflow);
+        distributeDecrease(nextAmounts, otherIndices, overflow, minBounds);
       }
       totalAfter = nextAmounts.reduce((sum, value) => sum + value, 0);
     }
+
+    nextAmounts.forEach((amount, idx) => {
+      const minAllowed = minBounds[idx] ?? 0;
+      if (amount < minAllowed) {
+        nextAmounts[idx] = minAllowed;
+      }
+    });
 
     const nextCategories = nextAmounts.map((amountCents, idx) => ({
       ...categories[idx],
@@ -691,10 +733,17 @@ const distributeIncrease = (amounts, indices, delta) => {
                     : 'bg-[var(--color-success)]';
               const allocationPercent =
                 totalBudgetValue > 0 ? (assignedAmount / totalBudgetValue) * 100 : 0;
-              const sliderMax = Math.max(totalBudgetCents, assignedCents, 0);
+              const sliderMin = Math.max(
+                0,
+                Math.round((Number(budgetUsage[index]?.spent) || 0) * 100)
+              );
+              const dynamicSliderBaseline = hasGlobalBudget
+                ? totalBudgetCents
+                : Math.max(categoriesTotalCents, assignedCents * 2, sliderMin + 10000);
+              const sliderMax = Math.max(dynamicSliderBaseline, assignedCents, sliderMin + 10000);
               const sliderStep = Math.max(1, Math.round(sliderMax / 1000));
-              const sliderValue = Math.min(sliderMax, assignedCents);
-              const sliderDisabled = sliderMax === 0 || !onReallocateCategories;
+              const sliderValue = Math.min(sliderMax, Math.max(sliderMin, assignedCents));
+              const sliderDisabled = !onReallocateCategories;
               const sourceTag =
                 typeof category.source === 'string' && category.source.toLowerCase() === 'advisor';
 
@@ -768,7 +817,7 @@ const distributeIncrease = (amounts, indices, delta) => {
                     <div className={`flex-1 min-w-[220px] ${sliderDisabled ? 'opacity-60' : ''}`}>
                       <input
                         type="range"
-                        min={0}
+                        min={sliderMin}
                         max={sliderMax}
                         step={sliderStep}
                         value={sliderValue}

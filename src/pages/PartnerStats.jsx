@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { TrendingUp, Users, CreditCard, Calendar, ExternalLink } from 'lucide-react';
+import { TrendingUp, Users, CreditCard, Calendar, ExternalLink, DollarSign } from 'lucide-react';
 
 const PartnerStats = () => {
   const { token } = useParams();
@@ -48,10 +48,16 @@ const PartnerStats = () => {
   }, [token]);
 
   const formatCurrency = (amount, currency = 'EUR') => {
+    const value = Number(amount) || 0;
     return new Intl.NumberFormat('es-ES', {
       style: 'currency',
       currency,
-    }).format(amount);
+    }).format(value);
+  };
+
+  const formatPercentage = (value) => {
+    if (!Number.isFinite(value)) return '0 %';
+    return `${(value * 100).toFixed(2)} %`;
   };
 
   if (loading) {
@@ -95,6 +101,12 @@ const PartnerStats = () => {
       return null;
     }
   };
+
+  const commissionTotal = data.stats?.total?.commission || null;
+  const commissionLastMonth = data.stats?.lastMonth?.commission || null;
+  const commissionCurrency = commissionTotal?.currency || data.stats?.total?.currency || 'EUR';
+  const hasCommissionRules = !!commissionTotal?.hasRules;
+  const commissionBreakdown = Array.isArray(commissionTotal?.breakdown) ? commissionTotal.breakdown : [];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-12 px-4">
@@ -146,12 +158,30 @@ const PartnerStats = () => {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+          {/* Commission */}
+          <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-indigo-500">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 mb-1">Comision Generada</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {formatCurrency(commissionTotal?.amount || 0, commissionCurrency)}
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  {hasCommissionRules ? 'Incluye porcentajes y bonus activos.' : 'Sin reglas configuradas desde el panel administrador.'}
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center">
+                <DollarSign className="w-6 h-6 text-indigo-600" />
+              </div>
+            </div>
+          </div>
+
           {/* Total Revenue */}
           <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 mb-1">Facturación Total</p>
+                <p className="text-sm text-gray-600 mb-1">Facturacion Total</p>
                 <p className="text-2xl font-bold text-gray-900">
                   {formatCurrency(data.stats.total.revenue, data.stats.total.currency)}
                 </p>
@@ -166,9 +196,12 @@ const PartnerStats = () => {
           <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 mb-1">Último Mes</p>
+                <p className="text-sm text-gray-600 mb-1">Ultimo Mes</p>
                 <p className="text-2xl font-bold text-gray-900">
                   {formatCurrency(data.stats.lastMonth.revenue, data.stats.lastMonth.currency)}
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  Comision: {formatCurrency(commissionLastMonth?.amount || 0, commissionLastMonth?.currency || commissionCurrency)}
                 </p>
               </div>
               <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
@@ -181,7 +214,7 @@ const PartnerStats = () => {
           <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-purple-500">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 mb-1">Usuarios Únicos</p>
+                <p className="text-sm text-gray-600 mb-1">Usuarios Unicos</p>
                 <p className="text-2xl font-bold text-gray-900">{data.stats.total.users}</p>
               </div>
               <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
@@ -198,10 +231,63 @@ const PartnerStats = () => {
                 <p className="text-2xl font-bold text-gray-900">{data.stats.total.uses}</p>
               </div>
               <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
-                <CreditCard className="w-6 h-6 text-orange-600" />
+                <ExternalLink className="w-6 h-6 text-orange-600" />
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Commission Breakdown */}
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden mb-8">
+          <div className="px-8 py-6 border-b border-gray-200">
+            <h2 className="text-xl font-bold text-gray-900">Detalle de comisiones</h2>
+            <p className="text-sm text-gray-600 mt-1">Periodos y tramos aplicados sobre la facturacion generada.</p>
+          </div>
+          {hasCommissionRules ? (
+            commissionBreakdown.length ? (
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Periodo</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Facturacion evaluada</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">% aplicado</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bonus fijo</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Comision</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pagos</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {commissionBreakdown.map((item) => (
+                      <tr key={item.periodId} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-6 py-4 text-sm text-gray-900">
+                          <div className="font-medium">{item.label}</div>
+                          <div className="text-xs text-gray-500">
+                            {(item.tierLabel || 'Tramo base')} - desde {formatCurrency(item.minRevenue || 0, commissionCurrency)}
+                            {item.maxRevenue !== null ? ` hasta ${formatCurrency(item.maxRevenue, commissionCurrency)}` : ' sin limite'}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-900">{formatCurrency(item.revenue, commissionCurrency)}</td>
+                        <td className="px-6 py-4 text-sm text-gray-900">{formatPercentage(item.percentageApplied || 0)}</td>
+                        <td className="px-6 py-4 text-sm text-gray-900">{formatCurrency(item.fixedApplied || 0, commissionCurrency)}</td>
+                        <td className="px-6 py-4 text-sm font-semibold text-gray-900">{formatCurrency(item.commission, commissionCurrency)}</td>
+                        <td className="px-6 py-4 text-sm text-gray-900">{item.paymentCount || 0}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="px-8 py-10 text-center text-sm text-gray-500">Aun no hay pagos dentro de los periodos definidos.</div>
+            )
+          ) : (
+            <div className="px-8 py-10 text-center text-sm text-gray-500">Configura reglas de comision desde el panel administrador para mostrar este detalle.</div>
+          )}
+          {hasCommissionRules && commissionTotal?.unassignedRevenue > 0 && (
+            <div className="px-8 py-4 bg-gray-50 text-xs text-gray-500">
+              {formatCurrency(commissionTotal.unassignedRevenue, commissionCurrency)} fuera de periodos definidos (no suma a la comision).
+            </div>
+          )}
         </div>
 
         {/* Users Table */}

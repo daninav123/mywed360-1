@@ -47,5 +47,6 @@ Ambos trabajan sobre arrays en céntimos, mutándolos directamente.
 
 - Si no queda presupuesto libre y todas las demás categorías están en cero, intentar aumentar una categoría no tendrá efecto.
 - Si solo existe una categoría, reducirla simplemente genera presupuesto libre (no hay a quién redistribuir).
-- Cuando el presupuesto total es 0, los deslizadores quedan bloqueados hasta que se defina un total desde el campo **“Presupuesto total (€)”**.
+- Cuando el presupuesto total es 0, los deslizadores siguen funcionando pero sólo actualizan la categoría editada (sin redistribución). Para activar el reequilibrio proporcional, define un total en **“Presupuesto total (€)”**.
 - Las suites de pruebas automáticas aún no cubren este comportamiento; se recomienda validar manualmente cualquier cambio significativo.
+- Ninguna categoría puede quedar por debajo del gasto real registrado (`Gastado`); el algoritmo usa ese valor como mínimo y, si el recorte no puede respetarlo, detiene la redistribución.
