@@ -45,6 +45,7 @@ export default function SeatingHeaderCompact({
   tableCount = 0,
   ceremonySeats = 0,
   userName = 'Usuario',
+  themeToggle = null, // Componente opcional para toggle de tema
 }) {
   return (
     <header className="h-14 border-b border-white/10 bg-[#0F0F10]/95 backdrop-blur-xl
@@ -75,7 +76,7 @@ export default function SeatingHeaderCompact({
         </Tab>
       </div>
 
-      {/* Stats + Usuario */}
+      {/* Stats + Theme + Usuario */}
       <div className="flex items-center gap-6">
         {/* Stats rápidos */}
         <div className="flex items-center gap-2 text-sm">
@@ -83,6 +84,13 @@ export default function SeatingHeaderCompact({
           <span className="text-gray-300 font-medium">{guestCount}</span>
           <span className="text-gray-500">invitados</span>
         </div>
+
+        {/* Theme Toggle */}
+        {themeToggle && (
+          <div className="flex items-center">
+            {themeToggle}
+          </div>
+        )}
 
         {/* Avatar */}
         <div className="flex items-center gap-2">

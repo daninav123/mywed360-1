@@ -2,7 +2,7 @@
  * SeatingPlanModern - Nueva versión con diseño flotante moderno
  * Wrapper que integra el nuevo diseño visual con la funcionalidad existente
  */
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { toast } from 'react-toastify';
@@ -14,6 +14,10 @@ import SeatingHeaderCompact from './SeatingHeaderCompact';
 import SeatingFooterStats from './SeatingFooterStats';
 import SeatingInspectorFloating from './SeatingInspectorFloating';
 
+// Componentes Fase 3 (Premium)
+import ThemeToggle from './ThemeToggle';
+import ConfettiCelebration from './ConfettiCelebration';
+
 // Componentes existentes (reutilizados)
 import SeatingPlanCanvas from './SeatingPlanCanvas';
 import SeatingPlanModals from './SeatingPlanModals';
@@ -23,6 +27,7 @@ import SeatingExportWizard from './SeatingExportWizard';
 // Hooks
 import { useSeatingPlan } from '../../hooks/useSeatingPlan';
 import { useWedding } from '../../context/WeddingContext';
+import useTheme from '../../hooks/useTheme';
 import { post as apiPost } from '../../services/apiClient';
 
 export default function SeatingPlanModern() {
@@ -98,6 +103,11 @@ export default function SeatingPlanModern() {
   const [exportWizardOpen, setExportWizardOpen] = useState(false);
   const [guestDrawerOpen, setGuestDrawerOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  
+  // Fase 3: Theme y celebración
+  const { theme, isDark, toggleTheme } = useTheme();
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [previousPercentage, setPreviousPercentage] = useState(0);
 
   // Calcular estadísticas
   const stats = useMemo(() => {
@@ -117,6 +127,17 @@ export default function SeatingPlanModern() {
       conflictCount,
     };
   }, [guests, tables, conflicts]);
+
+  // Detectar cuando llegamos a 100% y lanzar confetti
+  useEffect(() => {
+    if (stats.assignedPercentage === 100 && previousPercentage < 100 && stats.totalGuests > 0) {
+      setShowConfetti(true);
+      toast.success('🎉 ¡100% de invitados asignados! ¡Felicitaciones!', {
+        autoClose: 3000,
+      });
+    }
+    setPreviousPercentage(stats.assignedPercentage);
+  }, [stats.assignedPercentage, previousPercentage, stats.totalGuests]);
 
   // Handler para Auto-IA
   const handleAutoAssign = useCallback(async () => {
@@ -233,8 +254,17 @@ export default function SeatingPlanModern() {
             tableCount={stats.tableCount}
             ceremonySeats={seats?.length || 0}
             userName={userName}
+            themeToggle={
+              <ThemeToggle isDark={isDark} onToggle={toggleTheme} />
+            }
           />
         </SeatingLayoutFloating.Header>
+
+        {/* Confetti Celebration */}
+        <ConfettiCelebration 
+          show={showConfetti} 
+          onComplete={() => setShowConfetti(false)} 
+        />
 
         {/* Main Canvas Area */}
         <SeatingLayoutFloating.Main>
