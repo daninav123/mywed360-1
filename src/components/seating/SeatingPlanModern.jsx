@@ -88,10 +88,10 @@ export default function SeatingPlanModern() {
     // Auto-asignación
     autoAssignGuests,
     conflicts,
-    
-    // Canvas ref
-    canvasRef,
   } = useSeatingPlan();
+
+  // Crear ref local para el canvas si useSeatingPlan no lo proporciona
+  const canvasRef = React.useRef(null);
 
   // Estado local para UI
   const [autoAssignLoading, setAutoAssignLoading] = useState(false);
@@ -256,7 +256,7 @@ export default function SeatingPlanModern() {
           {/* Canvas Principal */}
           <SeatingLayoutFloating.Canvas>
             <SeatingPlanCanvas
-              ref={canvasRef}
+              canvasRef={canvasRef}
               tab={tab}
               hallSize={hallSize}
               areas={areas}
@@ -265,7 +265,8 @@ export default function SeatingPlanModern() {
               selectedTable={selectedTable}
               onSelectTable={handleSelectTable}
               drawMode={drawMode}
-              onMoveTable={moveTable}
+              guests={guests}
+              moveTable={moveTable}
               // Más props según necesites
             />
           </SeatingLayoutFloating.Canvas>
