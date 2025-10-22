@@ -108,10 +108,10 @@
 7. COPIA el Price ID → STRIPE_PRICE_PLANNER_TEAMS
 ```
 
-#### Teams Ilimitado (1500 EUR/año)
+#### Teams Wedding Planner Ilimitado (1500 EUR/año)
 ```
-1. Product name: Teams Ilimitado - MyWed360
-2. Description: Bodas y perfiles ilimitados con white-label
+1. Product name: Teams Wedding Planner Ilimitado - MyWed360
+2. Description: Bodas ilimitadas, perfiles ilimitados, white-label completo
 3. Pricing model: Recurring
 4. Price: 1500 EUR
 5. Billing period: Yearly

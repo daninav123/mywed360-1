@@ -28,9 +28,7 @@ export const STRIPE_PRODUCTS = {
       currency: 'EUR',
       type: 'subscription',
       interval: 'year',
-      stripePrice
-
-Id: process.env.STRIPE_PRICE_COUPLE_ANNUAL, // Se configura en Stripe
+      stripePriceId: process.env.STRIPE_PRICE_COUPLE_ANNUAL, // Se configura en Stripe
       features: [
         'Todo lo del plan Free',
         'Sin límite de invitados',
@@ -127,7 +125,7 @@ Id: process.env.STRIPE_PRICE_COUPLE_ANNUAL, // Se configura en Stripe
     },
     unlimited: {
       id: 'planner_unlimited',
-      name: 'Teams Ilimitado',
+      name: 'Teams Wedding Planner Ilimitado',
       price: 150000, // 1500 EUR en centavos
       currency: 'EUR',
       type: 'subscription',
@@ -135,11 +133,14 @@ Id: process.env.STRIPE_PRICE_COUPLE_ANNUAL, // Se configura en Stripe
       stripePriceId: process.env.STRIPE_PRICE_PLANNER_UNLIMITED,
       features: [
         'Bodas ilimitadas',
-        'Perfiles ilimitados',
+        'Perfiles de planners ilimitados',
         'White-label completo',
-        'Dominio personalizado',
-        'Soporte 24/7',
-        'API personalizada',
+        'Personalización completa de la interfaz',
+        'Dominio personalizado opcional',
+        'Todas las funcionalidades premium',
+        'Soporte dedicado 24/7',
+        'Integración API personalizada',
+        'Formación y onboarding personalizado',
       ],
       maxWeddings: -1, // Ilimitado
       maxUsers: -1, // Ilimitado
