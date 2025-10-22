@@ -55,6 +55,8 @@ import RequireAdmin from './routes/RequireAdmin.jsx';
 import MarketingAppOverview from './pages/marketing/AppOverview.jsx';
 import MarketingPricing from './pages/marketing/Pricing.jsx';
 import MarketingAccess from './pages/marketing/Access.jsx';
+import PaymentSuccess from './pages/payment/PaymentSuccess.jsx';
+import PaymentCancel from './pages/payment/PaymentCancel.jsx';
 // Nota: especificamos la extensi€)n .jsx para asegurar la resoluci€)n en entornos Linux/CI
 const Invitados = React.lazy(() => import('./pages/Invitados'));
 // Lazy load de páginas pesadas para reducir bundle inicial
@@ -245,6 +247,8 @@ function App() {
               <Route path="/precios" element={<MarketingPricing />} />
               <Route path="/pricing" element={<Navigate to="/precios" replace />} />
               <Route path="/acceso" element={<MarketingAccess />} />
+              <Route path="/payment/success" element={<PaymentSuccess />} />
+              <Route path="/payment/cancel" element={<PaymentCancel />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/registro" element={<Navigate to="/signup" replace />} />
