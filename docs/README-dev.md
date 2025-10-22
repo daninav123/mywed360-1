@@ -34,6 +34,18 @@ Este documento consolida los flujos técnicos añadidos recientemente: Seating P
   - `src/components/TableItem.jsx`: memo de calculos (`guestCount`, `guestsList`, `getLabel`).
 - Componentes ya memoizados: `ChairItem.jsx`, `FreeDrawCanvas.jsx`.
 
+### Guia de estilo visual (propuesta)
+- Jerarquia y espacio: fondo gris claro (`#f8fafc`), tarjetas blancas con bordes suaves (`#e2e8f0`) y padding consistente (24px).
+- Tipografia: escala corta (titulares 22px, subtitulos 16px, cuerpo 14px) con una sola familia; `font-medium` solo en titulos.
+- Colores: azul principal para acciones y verde para confirmaciones; estados informativos/peligro via badges ligeros.
+- Toolbar: barra plegable, fondo neutro, iconos outline sin cajas internas y maximo dos filas separadas por divisores sutiles.
+- Acciones rapidas: tres cards horizontales (icono circular + texto alineado) o timeline vertical limpio sin multiples badges.
+- Checklist onboarding: tarjeta unica con tres filas numeradas, barra de progreso discreta arriba.
+- Paneles laterales: aplicar fondo `#f1f5f9`, titulos en mayusculas pequenas y divisores finos para secciones.
+- Canvas: encabezado fijo con datos clave, controles fuera del lienzo y toasts discretos en la esquina inferior.
+- Iconografia: seleccionar 6-8 iconos outline uniformes (mismo tamano, sin mezclar rellenos).
+- Estados vacios: componentes dedicados con ilustracion minimal y CTA central; ocultar bloques que ya no aplican (ej. onboarding completado).
+
 ### E2E relevantes de Seating
 - Ubicación: `cypress/e2e/seating/`
   - `seating_capacity_limit.cy.js`: bloquea asignación si no hay capacidad.

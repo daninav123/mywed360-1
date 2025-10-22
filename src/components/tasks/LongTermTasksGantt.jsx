@@ -46,6 +46,8 @@ const RISK_STYLES = {
   },
 };
 
+const MIN_GANTT_COLUMN_WIDTH = 0.5;
+
 export default function LongTermTasksGantt({
   containerRef,
   tasks,
@@ -63,7 +65,7 @@ export default function LongTermTasksGantt({
   showSubtasks = false,
   onParentSelect,
 }) {
-  const colW = Math.max(60, Number(columnWidth) || 90);
+  const colW = Math.max(MIN_GANTT_COLUMN_WIDTH, Number(columnWidth) || 90);
   const HEADER_HEIGHT = 56;
   const BODY_PADDING_TOP = 16;
   const BODY_PADDING_BOTTOM = 12;

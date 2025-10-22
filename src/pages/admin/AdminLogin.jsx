@@ -29,7 +29,15 @@ const AdminLogin = () => {
   const [mfaCode, setMfaCode] = useState('');
   const [mfaError, setMfaError] = useState('');
   const [isVerifyingMfa, setIsVerifyingMfa] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
+  const [rememberMe, setRememberMe] = useState(() => {
+    // Verificar si hay cookie de remember me
+    if (typeof document !== 'undefined') {
+      const cookies = document.cookie.split('; ');
+      const rememberCookie = cookies.find(c => c.startsWith('admin_remember='));
+      return rememberCookie ? rememberCookie.split('=')[1] === '1' : false;
+    }
+    return false;
+  });
 
   const supportEmail = useMemo(
     () =>
@@ -102,7 +110,7 @@ const AdminLogin = () => {
     setIsSubmitting(true);
 
     try {
-      const result = await loginAdmin(email.trim(), password);
+      const result = await loginAdmin(email.trim(), password, rememberMe);
       if (!result.success) {
         const lockedUntilMs =
           result.code === 'locked'
@@ -159,7 +167,7 @@ const AdminLogin = () => {
     setMfaError('');
 
     try {
-      const result = await completeAdminMfa(mfaCode.trim());
+      const result = await completeAdminMfa(mfaCode.trim(), rememberMe);
       if (!result.success) {
         if (result.lockedUntil) {
           const lockedMs =
@@ -279,9 +287,14 @@ const AdminLogin = () => {
         )}
 
         <div className="text-xs text-[var(--color-text-soft,#6b7280)] flex justify-between items-center">
-          <label className="inline-flex items-center gap-2">
-            <input type="checkbox" className="rounded border-soft" disabled />
-            Recordar sesión (requiere MFA)
+          <label className="inline-flex items-center gap-2 cursor-pointer">
+            <input 
+              type="checkbox" 
+              className="rounded border-soft cursor-pointer" 
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+            />
+            <span className="select-none">Recordar este dispositivo (30 días)</span>
           </label>
           <button
             type="button"

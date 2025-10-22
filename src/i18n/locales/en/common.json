@@ -376,7 +376,7 @@
     "benchmarks": {
       "title": "Budget suggestions based on similar weddings",
       "subtitle": "Based on {{count}} confirmed budgets. Average estimate: {{average}} · Confidence: {{confidence}}.",
-      "loading": "Calculating budget suggestions…",
+      "loading": "Calculating budget suggestions�",
       "applyMedian": "Apply median (p50)",
       "applyP75": "Apply percentile 75",
       "saveSnapshot": "Save budget"

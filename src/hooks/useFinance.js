@@ -304,8 +304,11 @@ export default function useFinance() {
   const syncProviderTemplatesWithCategories = useCallback(
     async (categoriesList) => {
       const names = extractCategoryNames(categoriesList);
-      setProviderTemplates((prev) => (arraysShallowEqual(prev, names) ? prev : names));
-      if (!activeWedding) return;
+      const alreadyEqual = arraysShallowEqual(providerTemplates, names);
+      if (!alreadyEqual) {
+        setProviderTemplates(names);
+      }
+      if (!activeWedding || alreadyEqual) return;
       try {
         await saveData('wantedServices', names, {
           docPath: `weddings/${activeWedding}`,
@@ -315,7 +318,7 @@ export default function useFinance() {
         console.warn('[useFinance] No se pudieron sincronizar wantedServices', error);
       }
     },
-    [activeWedding]
+    [activeWedding, providerTemplates]
   );
 
   useEffect(() => {
@@ -1022,9 +1025,10 @@ export default function useFinance() {
       persistFinanceDoc({
         budget: { total: budget.total, categories: nextCategories },
       });
+      syncProviderTemplatesWithCategories(nextCategories);
       return { success: true };
     },
-    [budget.categories, budget.total, persistFinanceDoc]
+    [budget.categories, budget.total, persistFinanceDoc, syncProviderTemplatesWithCategories]
   );
 
   const setBudgetCategories = useCallback(
@@ -1038,8 +1042,9 @@ export default function useFinance() {
       persistFinanceDoc({
         budget: { total: budget.total, categories: sanitized },
       });
+      syncProviderTemplatesWithCategories(sanitized);
     },
-    [budget.total, persistFinanceDoc]
+    [budget.total, persistFinanceDoc, syncProviderTemplatesWithCategories]
   );
 
   const updateBudgetCategory = useCallback(
@@ -1054,8 +1059,9 @@ export default function useFinance() {
       persistFinanceDoc({
         budget: { total: budget.total, categories: nextCategories },
       });
+      syncProviderTemplatesWithCategories(nextCategories);
     },
-    [budget.categories, budget.total, persistFinanceDoc]
+    [budget.categories, budget.total, persistFinanceDoc, syncProviderTemplatesWithCategories]
   );
 
   const removeBudgetCategory = useCallback(
@@ -1065,8 +1071,9 @@ export default function useFinance() {
       persistFinanceDoc({
         budget: { total: budget.total, categories: nextCategories },
       });
+      syncProviderTemplatesWithCategories(nextCategories);
     },
-    [budget.categories, budget.total, persistFinanceDoc]
+    [budget.categories, budget.total, persistFinanceDoc, syncProviderTemplatesWithCategories]
   );
 
   const captureBudgetSnapshot = useCallback(

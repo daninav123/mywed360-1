@@ -814,7 +814,6 @@ const distributeIncrease = (amounts, indices, delta) => {
               const assignedAmount = Number.isFinite(assignedAmountRaw) ? assignedAmountRaw : 0;
               const assignedCents = Math.max(0, Math.round(assignedAmount * 100));
               const spentAmount = Number(category.spent) || 0;
-              const remaining = Number(category.remaining) || 0;
               const percentageValue = Number(category.percentage);
               const usageBase = Number.isFinite(percentageValue)
                 ? percentageValue
@@ -831,8 +830,6 @@ const distributeIncrease = (amounts, indices, delta) => {
                   : usagePercent >= (alertThresholds.warn || 75)
                     ? 'bg-[var(--color-warning)]'
                     : 'bg-[var(--color-success)]';
-              const allocationPercent =
-                totalBudgetValue > 0 ? (assignedAmount / totalBudgetValue) * 100 : 0;
               const sliderMin = Math.max(
                 0,
                 Math.round((Number(budgetUsage[index]?.spent) || 0) * 100)
@@ -918,30 +915,6 @@ const distributeIncrease = (amounts, indices, delta) => {
                         style={{ width: `${progressPercent}%` }}
                       />
                     </div>
-                  </div>
-
-                  <div className="flex items-center gap-2.5 text-[10px] text-[color:var(--color-text)]/70">
-                    <span className="min-w-[110px] text-right">
-                      <span className="font-semibold text-[color:var(--color-text)]">
-                        {formatCurrency(assignedAmount)}
-                      </span>{' '}
-                      · {allocationPercent.toFixed(1)}%
-                    </span>
-                    <span className="min-w-[90px] text-right font-semibold text-[color:var(--color-danger)]">
-                      {formatCurrency(spentAmount)}
-                    </span>
-                    <span
-                      className={`min-w-[90px] text-right font-semibold ${
-                        remaining < 0
-                          ? 'text-[var(--color-danger)]'
-                          : 'text-[color:var(--color-text)]'
-                      }`}
-                    >
-                      {formatCurrency(remaining)}
-                    </span>
-                    <span className="min-w-[54px] text-right">
-                      {Math.min(usagePercent, 999).toFixed(1)}%
-                    </span>
                   </div>
 
                   <div className="flex items-center gap-1 text-[10px] text-[color:var(--color-text)]/70">

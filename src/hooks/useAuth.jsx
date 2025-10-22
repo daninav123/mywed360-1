@@ -1046,7 +1046,7 @@ export const AuthProvider = ({ children }) => {
   );
 
   const completeAdminMfa = useCallback(
-    async (code) => {
+    async (code, rememberMe) => {
       if (!pendingAdminSession) {
         return { success: false, error: 'No hay un desafío MFA activo.' };
       }
@@ -1065,11 +1065,15 @@ export const AuthProvider = ({ children }) => {
         return { success: false, error: 'Introduce el código de verificación.' };
       }
 
+      // Usar rememberMe pasado o el guardado en pendingAdminSession
+      const shouldRemember = rememberMe !== undefined ? rememberMe : (pendingAdminSession.rememberMe || false);
+
       try {
         const response = await verifyAdminMfaRequest({
           challengeId: pendingAdminSession.challengeId,
           code: normalizedCode,
           resumeToken: pendingAdminSession.resumeToken,
+          rememberMe: shouldRemember,
         });
 
         const adminProfile = response.profile || {
@@ -1093,7 +1097,7 @@ export const AuthProvider = ({ children }) => {
         // Guardar sesión con preferencia de "recordar"
         if (typeof window !== 'undefined' && response.sessionToken) {
           const { setAdminSession } = await import('../services/adminSession');
-          setAdminSession(response.sessionToken, pendingAdminSession.rememberMe || false);
+          setAdminSession(response.sessionToken, shouldRemember);
         }
 
         setPendingAdminSession(null);

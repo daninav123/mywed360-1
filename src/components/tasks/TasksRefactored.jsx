@@ -43,7 +43,7 @@ import { seedWeddingTasksFromTemplate } from '../../services/taskTemplateSeeder'
 
 const GANTT_UNASSIGNED = '__gantt_unassigned__';
 const GANTT_ZOOM_STORAGE_KEY = 'mywed360_gantt_zoom';
-const GANTT_ZOOM_MIN = 0.05;
+const GANTT_ZOOM_MIN = 0.01;
 const GANTT_ZOOM_MAX = 2.4;
 const GANTT_ZOOM_STEP = 0.05;
 const GANTT_EXTEND_MONTHS = 1;
@@ -428,54 +428,6 @@ export default function TasksRefactored() {
 
   // Ref para medir el contenedor del Gantt y ajustar el ancho de columna
   const ganttContainerRef = useRef(null);
-  const zoomedColumnWidth = useMemo(() => {
-    const base = Math.max(12, Number(columnWidthState) || 90);
-    const width = Math.round(base * ganttZoom);
-    return Math.max(12, Math.min(360, width));
-  }, [columnWidthState, ganttZoom]);
-  const handleZoomChange = useCallback((next) => {
-    const clamped = clampZoomValue(next);
-    const normalized = Math.round(clamped * 100) / 100;
-    setGanttZoom((prev) => {
-      if (Math.abs(prev - normalized) < 0.001) return prev;
-      return normalized;
-    });
-  }, []);
-  const handleZoomIn = useCallback(() => {
-    handleZoomChange(ganttZoom + GANTT_ZOOM_STEP);
-  }, [ganttZoom, handleZoomChange]);
-  const handleZoomOut = useCallback(() => {
-    handleZoomChange(ganttZoom - GANTT_ZOOM_STEP);
-  }, [ganttZoom, handleZoomChange]);
-  const handleZoomSlider = useCallback(
-    (value) => {
-      const numeric = typeof value === 'number' ? value : Number(value);
-      handleZoomChange(numeric);
-    },
-    [handleZoomChange]
-  );
-  const zoomPercent = Math.round(ganttZoom * 100);
-  const isZoomMin = ganttZoom <= GANTT_ZOOM_MIN + 0.001;
-  const isZoomMax = ganttZoom >= GANTT_ZOOM_MAX - 0.001;
-  const computeFitZoom = useCallback(() => {
-    if (!ganttTimelineMonths || !Number.isFinite(Number(columnWidthState))) return null;
-    const containerWidth = ganttContainerRef?.current?.clientWidth || 0;
-    if (containerWidth <= 0) return null;
-    const base = Math.max(1, Number(columnWidthState));
-    const totalWidth = base * ganttTimelineMonths;
-    if (!Number.isFinite(totalWidth) || totalWidth <= 0) return null;
-    const ratio = containerWidth / totalWidth;
-    if (!Number.isFinite(ratio) || ratio <= 0) return null;
-    return clampZoomValue(ratio);
-  }, [ganttTimelineMonths, columnWidthState, ganttContainerRef]);
-  const fitZoomValue = computeFitZoom();
-  const isFitApplied = fitZoomValue !== null && Math.abs(fitZoomValue - ganttZoom) < 0.01;
-  const handleFitToScreen = useCallback(() => {
-    const fit = computeFitZoom();
-    if (fit === null) return;
-    handleZoomChange(fit);
-  }, [computeFitZoom, handleZoomChange]);
-
   // Manejar eventos de calendario externos// FunciÃ’Â³n para aÃ’Â±adir una reuniÃ’Â³n
   const addMeeting = useCallback(
     async (meeting) => {
@@ -1084,6 +1036,55 @@ export default function TasksRefactored() {
       (afterEnd.getMonth() - startMonth.getMonth());
     return Math.max(1, diff);
   }, [ganttRangeStart, ganttRangeEnd]);
+
+  const zoomedColumnWidth = useMemo(() => {
+    const base = Math.max(1, Number(columnWidthState) || 90);
+    const width = Math.max(0.5, base * ganttZoom);
+    const normalized = Math.round(width * 100) / 100;
+    return Math.max(0.5, Math.min(360, normalized));
+  }, [columnWidthState, ganttZoom]);
+  const handleZoomChange = useCallback((next) => {
+    const clamped = clampZoomValue(next);
+    const normalized = Math.round(clamped * 100) / 100;
+    setGanttZoom((prev) => {
+      if (Math.abs(prev - normalized) < 0.001) return prev;
+      return normalized;
+    });
+  }, []);
+  const handleZoomIn = useCallback(() => {
+    handleZoomChange(ganttZoom + GANTT_ZOOM_STEP);
+  }, [ganttZoom, handleZoomChange]);
+  const handleZoomOut = useCallback(() => {
+    handleZoomChange(ganttZoom - GANTT_ZOOM_STEP);
+  }, [ganttZoom, handleZoomChange]);
+  const handleZoomSlider = useCallback(
+    (value) => {
+      const numeric = typeof value === 'number' ? value : Number(value);
+      handleZoomChange(numeric);
+    },
+    [handleZoomChange]
+  );
+  const zoomPercent = Math.round(ganttZoom * 100);
+  const isZoomMin = ganttZoom <= GANTT_ZOOM_MIN + 0.001;
+  const isZoomMax = ganttZoom >= GANTT_ZOOM_MAX - 0.001;
+  const computeFitZoom = useCallback(() => {
+    if (!ganttTimelineMonths || !Number.isFinite(Number(columnWidthState))) return null;
+    const containerWidth = ganttContainerRef?.current?.clientWidth || 0;
+    if (containerWidth <= 0) return null;
+    const base = Math.max(1, Number(columnWidthState));
+    const totalWidth = base * ganttTimelineMonths;
+    if (!Number.isFinite(totalWidth) || totalWidth <= 0) return null;
+    const ratio = containerWidth / totalWidth;
+    if (!Number.isFinite(ratio) || ratio <= 0) return null;
+    return clampZoomValue(ratio);
+  }, [ganttTimelineMonths, columnWidthState, ganttContainerRef]);
+  const fitZoomValue = computeFitZoom();
+  const isFitApplied = fitZoomValue !== null && Math.abs(fitZoomValue - ganttZoom) < 0.01;
+  const handleFitToScreen = useCallback(() => {
+    const fit = computeFitZoom();
+    if (fit === null) return;
+    handleZoomChange(fit);
+  }, [computeFitZoom, handleZoomChange]);
 
   const ganttTasksBounded = useGanttBoundedTasks(
     uniqueGanttTasks,
@@ -2323,7 +2324,7 @@ export default function TasksRefactored() {
                 type="range"
                 min={GANTT_ZOOM_MIN}
                 max={GANTT_ZOOM_MAX}
-                step={GANTT_ZOOM_STEP}
+                step={0.01}
                 value={ganttZoom}
                 onChange={(e) => handleZoomSlider(e.target.value)}
                 className="w-24 accent-indigo-500"

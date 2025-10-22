@@ -6,7 +6,6 @@ import {
   initializeTestEnvironment,
   RulesTestEnvironment,
 } from '@firebase/rules-unit-testing';
-import { getFirestore, doc, setDoc, getDoc, collection } from 'firebase/firestore';
 import { readFileSync } from 'fs';
 import { beforeAll, afterAll, describe, test, expect } from 'vitest';
 
@@ -27,10 +26,9 @@ beforeAll(async () => {
 
   // Semilla de datos: crear una boda con distintos roles
   await testEnv.withSecurityRulesDisabled(async (ctx) => {
-    const db = getFirestore(ctx.app);
+    const adminDb = ctx.firestore();
 
-    const weddingDoc = doc(db, 'weddings', 'w1');
-    await setDoc(weddingDoc, {
+    await adminDb.doc('weddings/w1').set({
       ownerIds: ['owner1'],
       plannerIds: ['planner1'],
       assistantIds: ['assistant1'],
@@ -38,11 +36,14 @@ beforeAll(async () => {
     });
 
     // Subcolección de tareas
-    await setDoc(doc(db, 'weddings', 'w1', 'tasks', 't1'), {
+    await adminDb.doc('weddings/w1/tasks/t1').set({
       name: 'Reservar catering',
       completed: false,
     });
-  });
+
+    const seeded = await adminDb.doc('weddings/w1').get();
+    console.log('seeded wedding', seeded.data());
+});
 }, 60000);
 
 afterAll(async () => {
@@ -59,69 +60,69 @@ const getContext = (uid) => {
 describe('Reglas de Firestore - bodas', () => {
   test('Owner puede leer y escribir su boda', async () => {
     const ctx = getContext('owner1');
-    const db = getFirestore(ctx.app);
+    const db = ctx.firestore();
 
     // Read
-    await assertSucceeds(getDoc(doc(db, 'weddings', 'w1')));
+    const weddingRef = db.doc('weddings/w1');
+    await assertSucceeds(weddingRef.get());
     // Write (update un campo)
-    await assertSucceeds(
-      setDoc(doc(db, 'weddings', 'w1'), { updatedBy: 'owner1' }, { merge: true })
-    );
+    await assertSucceeds(weddingRef.set({ updatedBy: 'owner1' }, { merge: true }));
   });
 
   test('Planner puede leer y escribir su boda', async () => {
     const ctx = getContext('planner1');
-    const db = getFirestore(ctx.app);
-    await assertSucceeds(getDoc(doc(db, 'weddings', 'w1')));
-    await assertSucceeds(
-      setDoc(doc(db, 'weddings', 'w1'), { title: 'Planner edit' }, { merge: true })
-    );
+    const db = ctx.firestore();
+    const weddingRef = db.doc('weddings/w1');
+    await assertSucceeds(weddingRef.get());
+    await assertSucceeds(weddingRef.set({ title: 'Planner edit' }, { merge: true }));
   });
 
   test('Assistant puede leer pero no escribir', async () => {
     const ctx = getContext('assistant1');
-    const db = getFirestore(ctx.app);
-    await assertSucceeds(getDoc(doc(db, 'weddings', 'w1')));
-    await assertFails(setDoc(doc(db, 'weddings', 'w1'), { title: 'No allowed' }, { merge: true }));
+    const db = ctx.firestore();
+    const weddingRef = db.doc('weddings/w1');
+    const snap = await assertSucceeds(weddingRef.get());
+    console.log('assistant snapshot', snap.data());
+    await assertFails(weddingRef.set({ title: 'No allowed' }, { merge: true }));
   });
 
   test('Usuario externo no puede leer', async () => {
     const ctx = getContext('randomUser');
-    const db = getFirestore(ctx.app);
-    await assertFails(getDoc(doc(db, 'weddings', 'w1')));
+    const db = ctx.firestore();
+    await assertFails(db.doc('weddings/w1').get());
   });
 
   test('Planner puede leer y escribir subcolección tasks', async () => {
     const ctx = getContext('planner1');
-    const db = getFirestore(ctx.app);
-    await assertSucceeds(getDoc(doc(db, 'weddings', 'w1', 'tasks', 't1')));
-    await assertSucceeds(
-      setDoc(doc(db, 'weddings', 'w1', 'tasks', 't1'), { completed: true }, { merge: true })
-    );
+    const db = ctx.firestore();
+    const taskRef = db.doc('weddings/w1/tasks/t1');
+    await assertSucceeds(taskRef.get());
+    await assertSucceeds(taskRef.set({ completed: true }, { merge: true }));
   });
 
   test('Assistant puede leer pero no escribir subcolección', async () => {
     const ctx = getContext('assistant1');
-    const db = getFirestore(ctx.app);
-    await assertSucceeds(getDoc(doc(db, 'weddings', 'w1', 'tasks', 't1')));
-    await assertFails(
-      setDoc(doc(db, 'weddings', 'w1', 'tasks', 't1'), { completed: true }, { merge: true })
-    );
+    const db = ctx.firestore();
+    const taskRef = db.doc('weddings/w1/tasks/t1');
+    await assertSucceeds(taskRef.get());
+    await assertFails(taskRef.set({ completed: true }, { merge: true }));
   });
 });
 
 describe('Colecciones de diagnóstico', () => {
   test('_conexion_prueba lectura/escritura sin auth', async () => {
     const ctx = getContext(null); // no autenticado
-    const db = getFirestore(ctx.app);
-    await assertSucceeds(setDoc(doc(db, '_conexion_prueba', 'test'), { ok: true }));
-    await assertSucceeds(getDoc(doc(db, '_conexion_prueba', 'test')));
+    const db = ctx.firestore();
+    const ref = db.doc('_conexion_prueba/test');
+    await assertSucceeds(ref.set({ ok: true }));
+    await assertSucceeds(ref.get());
   });
 
   test('_test_connection lectura/escritura sin auth', async () => {
     const ctx = getContext(null);
-    const db = getFirestore(ctx.app);
-    await assertSucceeds(setDoc(doc(db, '_test_connection', 'test'), { ok: true }));
-    await assertSucceeds(getDoc(doc(db, '_test_connection', 'test')));
+    const db = ctx.firestore();
+    const ref = db.doc('_test_connection/test');
+    await assertSucceeds(ref.set({ ok: true }));
+    await assertSucceeds(ref.get());
   });
 });

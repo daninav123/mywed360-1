@@ -7,8 +7,17 @@ import {
   revokeAdminSession,
 } from '../services/adminSessions.js';
 import { getCookie } from '../utils/cookies.js';
+import {
+  generateDeviceId,
+  extractDeviceInfo,
+  registerTrustedDevice,
+  isTrustedDevice,
+  revokeTrustedDevice,
+} from '../services/trustedDevices.js';
 
 const ADMIN_SESSION_COOKIE = 'admin_session';
+const ADMIN_DEVICE_COOKIE = 'admin_device_id';
+const ADMIN_REMEMBER_COOKIE = 'admin_remember';
 const isProductionEnv = String(process.env.NODE_ENV || '').toLowerCase() === 'production';
 
 // Router para autenticación de administrador
@@ -67,9 +76,9 @@ function getConfig() {
   };
 }
 
-function setAdminSessionCookie(res, sessionToken, { sessionTtlMinutes }) {
+function setAdminSessionCookie(res, sessionToken, { sessionTtlMinutes, rememberMe = false }) {
   if (!res || !sessionToken) return;
-  const ttlMinutes = Number(sessionTtlMinutes || 720);
+  const ttlMinutes = rememberMe ? 30 * 24 * 60 : Number(sessionTtlMinutes || 720); // 30 días si remember me
   const maxAgeMs = Math.max(ttlMinutes, 1) * 60 * 1000;
   res.cookie(ADMIN_SESSION_COOKIE, sessionToken, {
     httpOnly: true,
@@ -80,10 +89,50 @@ function setAdminSessionCookie(res, sessionToken, { sessionTtlMinutes }) {
   });
 }
 
+function setDeviceIdCookie(res, deviceId) {
+  if (!res || !deviceId) return;
+  res.cookie(ADMIN_DEVICE_COOKIE, deviceId, {
+    httpOnly: true,
+    secure: isProductionEnv,
+    sameSite: isProductionEnv ? 'strict' : 'lax',
+    path: '/',
+    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 días
+  });
+}
+
+function setRememberMeCookie(res, value) {
+  if (!res) return;
+  res.cookie(ADMIN_REMEMBER_COOKIE, value ? '1' : '0', {
+    httpOnly: false, // Accesible desde JS para UI
+    secure: isProductionEnv,
+    sameSite: isProductionEnv ? 'strict' : 'lax',
+    path: '/',
+    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 días
+  });
+}
+
 function clearAdminSessionCookie(res) {
   if (!res) return;
   res.cookie(ADMIN_SESSION_COOKIE, '', {
     httpOnly: true,
+    secure: isProductionEnv,
+    sameSite: isProductionEnv ? 'strict' : 'lax',
+    path: '/',
+    expires: new Date(0),
+  });
+}
+
+function clearDeviceCookies(res) {
+  if (!res) return;
+  res.cookie(ADMIN_DEVICE_COOKIE, '', {
+    httpOnly: true,
+    secure: isProductionEnv,
+    sameSite: isProductionEnv ? 'strict' : 'lax',
+    path: '/',
+    expires: new Date(0),
+  });
+  res.cookie(ADMIN_REMEMBER_COOKIE, '', {
+    httpOnly: false,
     secure: isProductionEnv,
     sameSite: isProductionEnv ? 'strict' : 'lax',
     path: '/',
@@ -178,7 +227,7 @@ async function createAdminSession(profile) {
 // POST /api/admin/login
 router.post('/login', async (req, res) => {
   try {
-    const { email = '', password = '' } = req.body || {};
+    const { email = '', password = '', rememberMe = false } = req.body || {};
     const cfg = getConfig();
     const normalized = String(email || '').trim().toLowerCase();
 
@@ -213,7 +262,12 @@ router.post('/login', async (req, res) => {
     // Credenciales correctas
     resetAttempts(normalized);
 
-    if (cfg.requireMfa) {
+    // Verificar si el dispositivo es confiable
+    const existingDeviceId = getCookie(req, ADMIN_DEVICE_COOKIE);
+    const isTrusted = existingDeviceId ? await isTrustedDevice(existingDeviceId, normalized) : false;
+    const shouldSkipMfa = isTrusted && toBool(rememberMe, false);
+
+    if (cfg.requireMfa && !shouldSkipMfa) {
       const challengeId = genId('mfa');
       const resumeToken = genId('res');
       // En desarrollo, si no se definió ADMIN_MFA_TEST_CODE, usar 123456 para pruebas E2E deterministas
@@ -227,12 +281,31 @@ router.post('/login', async (req, res) => {
     const profile = buildProfile(normalized, cfg);
     const adminUser = { uid: profile.id, email: profile.email, displayName: profile.name };
     const { sessionId, sessionToken, sessionExpiresAt } = await createAdminSession(profile);
-    setAdminSessionCookie(res, sessionToken, cfg);
+    
+    // Generar o reusar device ID
+    const deviceInfo = extractDeviceInfo(req);
+    const deviceId = existingDeviceId || generateDeviceId(deviceInfo.userAgent, deviceInfo.ipAddress);
+    
+    // Si remember me, registrar como trusted device
+    if (toBool(rememberMe, false)) {
+      await registerTrustedDevice({ 
+        email: normalized, 
+        deviceId, 
+        deviceInfo,
+        ttlDays: 30 
+      });
+      setDeviceIdCookie(res, deviceId);
+      setRememberMeCookie(res, true);
+    }
+    
+    setAdminSessionCookie(res, sessionToken, { ...cfg, rememberMe: toBool(rememberMe, false) });
     return res.json({
       profile,
       adminUser,
       sessionId,
       sessionExpiresAt: sessionExpiresAt.toISOString(),
+      deviceId: toBool(rememberMe, false) ? deviceId : undefined,
+      trustedDevice: isTrusted,
     });
   } catch (e) {
     return res.status(500).json({ code: 'login_failed', message: 'No se pudo iniciar sesión' });
@@ -270,13 +343,32 @@ router.post('/login/mfa', async (req, res) => {
     const adminUser = { uid: profile.id, email: profile.email, displayName: profile.name };
     const { sessionId, sessionToken, sessionExpiresAt } = await createAdminSession(profile);
 
+    // Registrar dispositivo como confiable después de MFA exitoso
+    const rememberMe = toBool(req.body?.rememberMe, false);
+    const existingDeviceId = getCookie(req, ADMIN_DEVICE_COOKIE);
+    const deviceInfo = extractDeviceInfo(req);
+    const deviceId = existingDeviceId || generateDeviceId(deviceInfo.userAgent, deviceInfo.ipAddress);
+    
+    if (rememberMe) {
+      await registerTrustedDevice({ 
+        email: entry.email, 
+        deviceId, 
+        deviceInfo,
+        ttlDays: 30 
+      });
+      setDeviceIdCookie(res, deviceId);
+      setRememberMeCookie(res, true);
+    }
+
     challenges.delete(challengeId);
-    setAdminSessionCookie(res, sessionToken, cfg);
+    setAdminSessionCookie(res, sessionToken, { ...cfg, rememberMe });
     return res.json({
       profile,
       adminUser,
       sessionId,
       sessionExpiresAt: sessionExpiresAt.toISOString(),
+      deviceId: rememberMe ? deviceId : undefined,
+      trustedDevice: true,
     });
   } catch (e) {
     return res.status(500).json({ code: 'mfa_failed', message: 'No se pudo completar MFA' });
@@ -284,7 +376,7 @@ router.post('/login/mfa', async (req, res) => {
 });
 
 // POST /api/admin/logout
-router.post('/logout', (req, res) => {
+router.post('/logout', async (req, res) => {
   try {
     const bodyToken = req.body?.sessionToken || req.body?.token;
     const headerToken =
@@ -296,14 +388,74 @@ router.post('/logout', (req, res) => {
       (typeof bodyToken === 'string' && bodyToken.trim() ? bodyToken.trim() : null) ||
       (typeof headerToken === 'string' && headerToken.trim() ? headerToken.trim() : null) ||
       (typeof cookieToken === 'string' && cookieToken.trim() ? cookieToken.trim() : null);
+    
     if (token) {
       revokeAdminSession(token);
     }
+    
+    // Si se solicita eliminar el dispositivo confiable
+    const forgetDevice = toBool(req.body?.forgetDevice, false);
+    if (forgetDevice) {
+      const deviceId = getCookie(req, ADMIN_DEVICE_COOKIE);
+      if (deviceId) {
+        await revokeTrustedDevice(deviceId);
+      }
+      clearDeviceCookies(res);
+    }
+    
     clearAdminSessionCookie(res);
     return res.status(204).send();
   } catch {
     clearAdminSessionCookie(res);
     return res.json({ success: true });
+  }
+});
+
+// GET /api/admin/trusted-devices
+// Lista dispositivos confiables del usuario admin actual
+router.get('/trusted-devices', async (req, res) => {
+  try {
+    const sessionToken = getCookie(req, ADMIN_SESSION_COOKIE);
+    if (!sessionToken) {
+      return res.status(401).json({ code: 'no_session', message: 'No hay sesión activa' });
+    }
+
+    const { getAdminSession } = await import('../services/adminSessions.js');
+    const session = await getAdminSession(sessionToken);
+    if (!session || !session.email) {
+      return res.status(401).json({ code: 'invalid_session', message: 'Sesión inválida' });
+    }
+
+    const { listTrustedDevices } = await import('../services/trustedDevices.js');
+    const devices = await listTrustedDevices(session.email);
+
+    return res.json({ devices });
+  } catch (error) {
+    console.error('[admin-auth] Error listing trusted devices:', error);
+    return res.status(500).json({ code: 'list_failed', message: 'No se pudieron listar los dispositivos' });
+  }
+});
+
+// DELETE /api/admin/trusted-devices/:deviceId
+// Revoca un dispositivo confiable específico
+router.delete('/trusted-devices/:deviceId', async (req, res) => {
+  try {
+    const { deviceId } = req.params;
+    if (!deviceId) {
+      return res.status(400).json({ code: 'missing_device_id', message: 'Device ID requerido' });
+    }
+
+    const { revokeTrustedDevice } = await import('../services/trustedDevices.js');
+    const success = await revokeTrustedDevice(deviceId);
+
+    if (!success) {
+      return res.status(404).json({ code: 'device_not_found', message: 'Dispositivo no encontrado' });
+    }
+
+    return res.json({ success: true, message: 'Dispositivo revocado correctamente' });
+  } catch (error) {
+    console.error('[admin-auth] Error revoking trusted device:', error);
+    return res.status(500).json({ code: 'revoke_failed', message: 'No se pudo revocar el dispositivo' });
   }
 });
 

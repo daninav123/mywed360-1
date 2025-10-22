@@ -598,6 +598,16 @@ const SeatingPlanRefactored = () => {
     [handleCompleteOnboardingStep]
   );
 
+  const handleResetOnboarding = React.useCallback(() => {
+    setOnboardingPrefs((prev) => {
+      if (!prev.dismissed) return prev;
+      return {
+        ...prev,
+        dismissed: false,
+      };
+    });
+  }, []);
+
   useEffect(() => {
     if (!lockEvent) return;
     if (lockEvent.kind === 'lock-denied' && lockEvent.resourceType === 'table') {
@@ -1305,25 +1315,27 @@ const SeatingPlanRefactored = () => {
   );
 
   const libraryPanel = (
-    <SeatingLibraryPanel
-      tab={tab}
-      drawMode={drawMode}
-      onDrawModeChange={setDrawMode}
-      onOpenTemplates={handleOpenTemplates}
-      showTables={showTables}
-      onToggleShowTables={toggleShowTables}
-      showRulers={showRulers}
-      onToggleRulers={() => setShowRulers((v) => !v)}
-      snapToGrid={snapToGrid}
-      onToggleSnap={() => setSnapToGrid((v) => !v)}
-      showSeatNumbers={showSeatNumbers}
-      onToggleSeatNumbers={() => setShowSeatNumbers((v) => !v)}
-      gridStep={gridStep}
-      onAddTable={addTable}
-      onOpenGuestDrawer={() => setGuestDrawerOpen(true)}
-      pendingCount={pendingGuests.length}
-      areaSummary={areaSummary}
-    />
+    <div className="h-full rounded-3xl border border-slate-200 bg-white shadow-sm">
+      <SeatingLibraryPanel
+        tab={tab}
+        drawMode={drawMode}
+        onDrawModeChange={setDrawMode}
+        onOpenTemplates={handleOpenTemplates}
+        showTables={showTables}
+        onToggleShowTables={toggleShowTables}
+        showRulers={showRulers}
+        onToggleRulers={() => setShowRulers((v) => !v)}
+        snapToGrid={snapToGrid}
+        onToggleSnap={() => setSnapToGrid((v) => !v)}
+        showSeatNumbers={showSeatNumbers}
+        onToggleSeatNumbers={() => setShowSeatNumbers((v) => !v)}
+        gridStep={gridStep}
+        onAddTable={addTable}
+        onOpenGuestDrawer={() => setGuestDrawerOpen(true)}
+        pendingCount={pendingGuests.length}
+        areaSummary={areaSummary}
+      />
+    </div>
   );
 
   const renderCanvas = (className = 'h-full') => (
@@ -1379,26 +1391,28 @@ const SeatingPlanRefactored = () => {
   );
 
   const renderInspector = (className = 'h-full') => (
-    <SeatingInspectorPanel
-      selectedTable={selectedTable}
-      tab={tab}
-      globalMaxSeats={globalMaxSeats}
-      ceremonyRows={ceremonyRows}
-      ceremonyActiveRow={ceremonyActiveRow}
-      onSelectCeremonyRow={setCeremonyActiveRow}
-      onAssignCeremonyGuest={handleAssignGuestToCeremonyRow}
-      ceremonySuggestions={ceremonySuggestions}
-      ceremonySettings={ceremonySettings}
-      guests={safeGuests}
-      onTableDimensionChange={handleTableDimensionChange}
-      onConfigureTable={handleConfigureTable}
-      duplicateTable={duplicateTable}
-      deleteTable={deleteTable}
-      toggleTableLocked={toggleTableLocked}
-      assignedGuests={assignedToSelected}
-      onUnassignGuest={handleUnassignGuest}
-      className={className}
-    />
+    <div className="h-full rounded-3xl border border-slate-200 bg-white shadow-sm">
+      <SeatingInspectorPanel
+        selectedTable={selectedTable}
+        tab={tab}
+        globalMaxSeats={globalMaxSeats}
+        ceremonyRows={ceremonyRows}
+        ceremonyActiveRow={ceremonyActiveRow}
+        onSelectCeremonyRow={setCeremonyActiveRow}
+        onAssignCeremonyGuest={handleAssignGuestToCeremonyRow}
+        ceremonySuggestions={ceremonySuggestions}
+        ceremonySettings={ceremonySettings}
+        guests={safeGuests}
+        onTableDimensionChange={handleTableDimensionChange}
+        onConfigureTable={handleConfigureTable}
+        duplicateTable={duplicateTable}
+        deleteTable={deleteTable}
+        toggleTableLocked={toggleTableLocked}
+        assignedGuests={assignedToSelected}
+        onUnassignGuest={handleUnassignGuest}
+        className={className}
+      />
+    </div>
   );
 
   // Auto IA eliminado en la toolbar (feature desactivada en UI)
@@ -1419,7 +1433,7 @@ const SeatingPlanRefactored = () => {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className="h-full flex flex-col bg-gray-50">
+      <div className="h-full flex flex-col bg-slate-50">
         {/* Tabs */}
         <div className="flex-shrink-0 p-4 pb-0">
           <SeatingPlanTabs
@@ -1475,6 +1489,8 @@ const SeatingPlanRefactored = () => {
                 assign: !!onboardingPrefs.steps.firstAssignment,
               },
             }}
+            onboardingDismissed={onboardingPrefs.dismissed}
+            onResetOnboarding={handleResetOnboarding}
           />
         </div>
 
@@ -1487,7 +1503,7 @@ const SeatingPlanRefactored = () => {
                 {
                   id: 'space',
                   title: 'Configura el espacio',
-                  description: 'Define dimensiones, fondo o dibuja zonas clave del salón.',
+                  description: 'Define dimensiones, fondo o dibuja zonas clave del salon.',
                   done: onboardingPrefs.steps.spaceConfigured,
                   actionLabel: 'Configurar espacio',
                   onAction: () => {
@@ -1532,15 +1548,15 @@ const SeatingPlanRefactored = () => {
         {/* Toolbar */}
         {showAdvancedTools ? (
           <div className="flex-shrink-0 px-4 pb-2">
-            <div className="border border-blue-200 bg-blue-50/60 rounded-2xl p-3">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-sm font-semibold text-blue-900">Herramientas avanzadas</span>
+            <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
+              <div className="mb-3 flex items-center justify-between">
+                <span className="text-sm font-semibold text-slate-900">Herramientas avanzadas</span>
                 <button
                   type="button"
-                  className="text-xs text-blue-700 hover:text-blue-800"
+                  className="rounded-full border border-slate-300 px-3 py-1 text-xs text-slate-600 transition hover:border-slate-400 hover:text-slate-900"
                   onClick={() => setShowAdvancedTools(false)}
                 >
-                  Ocultar
+                  Ocultar toolbar
                 </button>
               </div>
               <SeatingPlanToolbar
@@ -1606,7 +1622,7 @@ const SeatingPlanRefactored = () => {
         ) : null}
         {/* Cuerpo principal: Biblioteca (izqda) Â· Canvas (centro) Â· Inspector (dcha) */}
         {isMobile ? (
-          <div className="flex-1 flex flex-col gap-3 px-4 pb-3">
+          <div className="flex-1 flex flex-col gap-4 px-4 pb-6">
             <SeatingMobileOverlay
               hallSize={safeHallSize}
               tables={safeTables}
@@ -1617,11 +1633,11 @@ const SeatingPlanRefactored = () => {
               onOpenExportWizard={() => setExportWizardOpen(true)}
             />
             <div className="max-h-60 overflow-y-auto">{libraryPanel}</div>
-            <div className="border border-gray-200 rounded-lg bg-white overflow-hidden min-h-[55vh]">
+            <div className="min-h-[55vh] overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
               {renderCanvas('h-[55vh]')}
             </div>
             {showSmartPanel && (
-              <div className="border border-gray-200 rounded-lg bg-white overflow-hidden">
+              <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
                 <SeatingSmartPanel
                   recommendations={smartRecommendations}
                   conflictSuggestions={smartConflictSuggestions}
@@ -1632,29 +1648,31 @@ const SeatingPlanRefactored = () => {
                 />
               </div>
             )}
-            <div className="max-h-60 overflow-y-auto border border-gray-200 rounded-lg bg-white">
+            <div className="max-h-60 overflow-y-auto rounded-3xl border border-slate-200 bg-white shadow-sm">
               {renderInspector('max-h-60 overflow-y-auto')}
             </div>
           </div>
         ) : (
           <div className={`flex-1 grid ${gridTemplate} gap-3 px-4 pb-3`}>
             {/* Canvas primero en el DOM para que cy.get('svg') seleccione el lienzo */}
-            <div className="border border-gray-200 rounded-lg overflow-hidden bg-white order-2">
+            <div className="order-2 rounded-3xl border border-slate-200 bg-white shadow-sm">
               {renderCanvas('h-full')}
             </div>
             {/* Biblioteca a la izquierda (order-1) */}
             <div className="min-h-0 order-1">{libraryPanel}</div>
-            {/* Panel inteligente opcional mantiene su posición relativa */}
+            {/* Panel inteligente opcional mantiene su posicion relativa */}
             {showSmartPanel && (
-              <div className="min-h-0 order-3">
-                <SeatingSmartPanel
-                  recommendations={smartRecommendations}
-                  conflictSuggestions={smartConflictSuggestions}
-                  insights={smartInsights}
-                  onAssign={handleSmartAssign}
-                  onFocusTable={focusTable}
-                  onExecuteAction={handleSmartAction}
-                />
+              <div className="order-3 min-h-0">
+                <div className="h-full rounded-3xl border border-slate-200 bg-white shadow-sm">
+                  <SeatingSmartPanel
+                    recommendations={smartRecommendations}
+                    conflictSuggestions={smartConflictSuggestions}
+                    insights={smartInsights}
+                    onAssign={handleSmartAssign}
+                    onFocusTable={focusTable}
+                    onExecuteAction={handleSmartAction}
+                  />
+                </div>
               </div>
             )}
             {/* Inspector */}
@@ -1663,21 +1681,23 @@ const SeatingPlanRefactored = () => {
             </div>
             {showGuestSidebar && (
               <div className={`min-h-0 ${showSmartPanel ? 'order-5' : 'order-4'}`}>
-                <SeatingGuestSidebar
-                  guests={safeGuests}
-                  pendingGuests={pendingGuests}
-                  recommendations={smartRecommendations}
-                  conflictSuggestions={smartConflictSuggestions}
-                  conflicts={conflicts}
-                  insights={smartInsights}
-                  onAssignRecommendation={handleSmartAssign}
-                  onFocusTable={focusTable}
-                  onExecuteAction={handleSmartAction}
-                  onOpenGuestDrawer={() => setGuestDrawerOpen(true)}
-                  listSnapshots={listSnapshots}
-                  loadSnapshot={loadSnapshot}
-                  deleteSnapshot={deleteSnapshot}
-                />
+                <div className="h-full rounded-3xl border border-slate-200 bg-white shadow-sm">
+                  <SeatingGuestSidebar
+                    guests={safeGuests}
+                    pendingGuests={pendingGuests}
+                    recommendations={smartRecommendations}
+                    conflictSuggestions={smartConflictSuggestions}
+                    conflicts={conflicts}
+                    insights={smartInsights}
+                    onAssignRecommendation={handleSmartAssign}
+                    onFocusTable={focusTable}
+                    onExecuteAction={handleSmartAction}
+                    onOpenGuestDrawer={() => setGuestDrawerOpen(true)}
+                    listSnapshots={listSnapshots}
+                    loadSnapshot={loadSnapshot}
+                    deleteSnapshot={deleteSnapshot}
+                  />
+                </div>
               </div>
             )}
           </div>
