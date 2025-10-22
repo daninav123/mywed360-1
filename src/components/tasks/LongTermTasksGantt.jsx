@@ -1308,8 +1308,11 @@ export default function LongTermTasksGantt({
         {/* Zona scrollable */}
         <div
           ref={containerRef || scrollRef}
-          className="grow overflow-y-hidden mb-4 border border-gray-100 rounded-lg"
-          style={{ height: contentHeight, overflowX: horizontalOverflow ? 'auto' : 'hidden' }}
+          className="grow overflow-y-hidden mb-4 border border-gray-100 rounded-lg shadow-sm"
+          style={{
+            height: contentHeight + 1,
+            overflowX: horizontalOverflow ? 'auto' : 'hidden',
+          }}
           data-testid="longterm-gantt-scroll"
         >
           {/* Cabecera: años + meses */}

@@ -1226,5 +1226,42 @@
         ]
       }
     }
+  },
+  "marketingAccess": {
+    "backLink": "Back to home",
+    "toggle": {
+      "login": "Sign in",
+      "signup": "Create account"
+    },
+    "loggedIn": {
+      "title": "Active session",
+      "description": "Your Lovenda account is already open. Continue with your events or sign out if you need to switch accounts.",
+      "primaryCta": "Go to dashboard",
+      "secondaryCta": "Sign out"
+    },
+    "loginForm": {
+      "emailLabel": "Email",
+      "emailPlaceholder": "your@email.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Your password",
+      "rememberMe": "Remember me",
+      "forgotPassword": "Forgot password?",
+      "submit": "Sign in",
+      "submitting": "Signing in…"
+    },
+    "signupForm": {
+      "info": "Complete the form to create your account.",
+      "successMessage": "Account created successfully. Redirecting to your dashboard…",
+      "socialPending": "Complete the sign-up flow in the {{provider}} window."
+    },
+    "switch": {
+      "noAccount": "Do not have an account?",
+      "registerLink": "Create one",
+      "alreadyHaveAccount": "Already have an account?",
+      "loginLink": "Sign in"
+    },
+    "errors": {
+      "provider": "We could not authenticate with {{provider}}."
+    }
   }
 }

@@ -23,15 +23,8 @@ const GuestFilters = React.memo(
     onOpenSaveTheDate,
     onBulkInvite,
     onOpenManualBatch,
-    onOpenRsvpSummary,
-    onBulkTableReassign,
     guestCount = 0,
     isLoading = false,
-    selectedCount = 0,
-    onSendSelectedApi,
-    onScheduleSelected,
-    onSendSelectedBroadcast,
-    showApiButtons = true,
     coupleName = '',
   }) => {
     const { t, wedding } = useTranslations();
@@ -90,18 +83,6 @@ const GuestFilters = React.memo(
     }, [guestCount, onOpenManualBatch]);
 
     const [showTemplateModal, setShowTemplateModal] = useState(false);
-
-    const handleOpenRsvp = useCallback(() => {
-      onOpenRsvpSummary?.();
-    }, [onOpenRsvpSummary]);
-
-    const handleReassignTables = useCallback(() => {
-      if (!selectedCount) {
-        alert('Selecciona invitados para reasignar mesa');
-        return;
-      }
-      onBulkTableReassign?.();
-    }, [onBulkTableReassign, selectedCount]);
 
     const handleEditTemplate = useCallback(() => {
       try {
@@ -207,10 +188,6 @@ const GuestFilters = React.memo(
               Invitaciones masivas (API)
             </Button>
 
-            <Button variant="outline" onClick={handleOpenRsvp} disabled={isLoading}>
-              Resumen RSVP
-            </Button>
-
             <Button variant="outline" onClick={handleEditTemplate} disabled={isLoading}>
               Editar mensaje (API)
             </Button>
@@ -223,54 +200,6 @@ const GuestFilters = React.memo(
             >
               Lote manual (API)
             </Button>
-
-            {/* Envío/Programación para seleccionados */}
-            <div className="flex items-center gap-2 ml-auto">
-              <span className="text-sm text-muted">Seleccionados: {selectedCount}</span>
-
-              {showApiButtons && (
-                <Button
-                  variant="outline"
-                  onClick={() => onSendSelectedApi?.()}
-                  disabled={isLoading || selectedCount === 0}
-                  className="flex items-center"
-                >
-                  <MessageSquare size={16} className="mr-2" />
-                  Enviar seleccionados (API)
-                </Button>
-              )}
-
-              {showApiButtons && (
-                <Button
-                  variant="outline"
-                  onClick={() => onScheduleSelected?.()}
-                  disabled={isLoading || selectedCount === 0}
-                >
-                  Programar seleccionados
-                </Button>
-              )}
-
-              {showApiButtons && (
-                <Button
-                  variant="outline"
-                  onClick={() => onSendSelectedBroadcast?.()}
-                  disabled={isLoading || selectedCount === 0}
-                  title="Enviar por difusión (requiere extensión)"
-                >
-                  Difusión (extensión)
-                </Button>
-              )}
-
-              <Button
-                variant="outline"
-                onClick={handleReassignTables}
-                disabled={isLoading || selectedCount === 0}
-                title="Mover invitados seleccionados a otra mesa"
-                data-testid="guest-bulk-update"
-              >
-                Reasignar mesa
-              </Button>
-            </div>
           </div>
         </div>
         <InviteTemplateModal
