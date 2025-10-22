@@ -1,4 +1,4 @@
-﻿import { Plus, ChevronUp } from 'lucide-react';
+import { Plus, ChevronUp } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 
@@ -347,7 +347,7 @@ const Proveedores = () => {
       try {
         const results = await runAISearch(enrichedQuery || trimmed, {
           service: trimmed,
-          allowFallback: false,
+          allowFallback: true,
         });
         const safeResults = Array.isArray(results) ? results : [];
         if (!safeResults.length && !silent) {

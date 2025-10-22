@@ -511,20 +511,6 @@ const distributeIncrease = (amounts, indices, delta) => {
           >
             {t('finance.benchmarks.saveSnapshot', { defaultValue: 'Guardar presupuesto' })}
           </Button>
-          <Button
-            variant="outline"
-            leftIcon={
-              advisorLoading || localAdvisorLoading ? (
-                <Loader2 size={16} className="animate-spin" />
-              ) : (
-                <Sparkles size={16} />
-              )
-            }
-            onClick={handleOpenAdvisor}
-            disabled={advisorLoading || localAdvisorLoading}
-          >
-            Abrir consejero
-          </Button>
           <Button leftIcon={<Plus size={16} />} onClick={handleAddCategory}>
             {t('finance.budget.newCategory', { defaultValue: 'Nueva categoría' })}
           </Button>
