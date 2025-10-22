@@ -3353,5 +3353,55 @@ router.post('/task-templates/:id/preview', async (req, res) => {
   }
 });
 
+// Endpoint de diagnóstico para inspeccionar pagos
+router.get('/debug/payments', async (req, res) => {
+  try {
+    const limit = Math.min(Number(req.query.limit) || 10, 100);
+    
+    // Intentar sin filtros primero
+    console.log('[DEBUG] Consultando payments sin filtros...');
+    const paymentsSnap = await db.collection('payments').limit(limit).get();
+    
+    const payments = paymentsSnap.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    
+    // Intentar también en collectionGroup
+    console.log('[DEBUG] Consultando payments via collectionGroup...');
+    const groupSnap = await db.collectionGroup('payments').limit(limit).get();
+    
+    const groupPayments = groupSnap.docs.map(doc => ({
+      id: doc.id,
+      path: doc.ref.path,
+      ...doc.data(),
+    }));
+    
+    return res.json({
+      source: 'debug',
+      rootCollection: {
+        count: payments.length,
+        sample: payments,
+      },
+      collectionGroup: {
+        count: groupPayments.length,
+        sample: groupPayments,
+      },
+      recommendations: {
+        hasRootPayments: payments.length > 0,
+        hasGroupPayments: groupPayments.length > 0,
+        needsIndexes: payments.length === 0 && groupPayments.length === 0,
+      }
+    });
+  } catch (error) {
+    logger.error('[admin-dashboard] debug payments error', error);
+    return res.status(500).json({ 
+      error: 'debug_failed',
+      message: error.message,
+      code: error.code,
+    });
+  }
+});
+
 export default router;
 
