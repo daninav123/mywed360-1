@@ -116,6 +116,50 @@ Cypress.Commands.add('deleteFirebaseTestUser', (uid) => {
   });
 });
 
+/**
+ * Obtener información de un usuario real por email
+ * @param {string} email - Email del usuario
+ * @returns {Cypress.Chainable<{uid: string, email: string, emailVerified: boolean}>}
+ */
+Cypress.Commands.add('getFirebaseUserByEmail', (email) => {
+  if (!email) {
+    return cy.wrap(null);
+  }
+
+  return cy.request({
+    method: 'GET',
+    url: 'http://localhost:4004/api/test/users/by-email',
+    qs: { email },
+    failOnStatusCode: false,
+  }).then((response) => {
+    if (response.status === 200 && response.body && response.body.uid) {
+      return cy.wrap(response.body);
+    }
+
+    if (response.status === 404) {
+      cy.log(`⚠️ Usuario no encontrado por email: ${email}`);
+      return cy.wrap(null);
+    }
+
+    cy.log(`⚠️ Error al obtener usuario por email (${email}): ${response.status}`);
+    return cy.wrap(null);
+  });
+});
+
+/**
+ * Eliminar usuario real de Firebase utilizando su email.
+ * @param {string} email
+ */
+Cypress.Commands.add('deleteFirebaseUserByEmail', (email) => {
+  if (!email) return;
+
+  cy.getFirebaseUserByEmail(email).then((user) => {
+    if (user && user.uid) {
+      cy.deleteFirebaseTestUser(user.uid);
+    }
+  });
+});
+
 // ============================================
 // GESTIÓN DE BODAS EN FIRESTORE
 // ============================================

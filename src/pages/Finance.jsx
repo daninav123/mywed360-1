@@ -60,6 +60,7 @@ function Finance() {
     hasBankAccount,
     projection,
     predictiveInsights,
+    monthlySeries,
 
     // Acciones
     updateContributions,

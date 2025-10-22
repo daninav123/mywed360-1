@@ -35,7 +35,7 @@
 
 | Módulo | Suites `*-real.cy.js` | Cobertura funcional | Notas clave |
 |--------|----------------------|---------------------|-------------|
-| **Auth** | `auth/auth-flow-real.cy.js`<br>`critical/auth-real.cy.js` | Login persistente, rutas protegidas, smoke crítico | Falta migrar `flow1-*` (signup, social, password reset) |
+| **Auth** | `auth/auth-flow-real.cy.js`<br>`auth/flow1-signup-real.cy.js`<br>`auth/flow1-password-reset-real.cy.js`<br>`auth/flow1-verify-email-real.cy.js`<br>`critical/auth-real.cy.js` | Login persistente, rutas protegidas, signup, reset y verificación de email con Firebase real | Pendiente: `flow1-social-login-real.cy.js` (OAuth real) |
 | **Dashboard** | `critical/dashboard-real.cy.js`<br>`dashboard/main-navigation-real.cy.js`<br>`dashboard/global-search-shortcuts-real.cy.js` | Navegación planner, shortcuts globales, smoke crítico | `planner-dashboard.cy.js` sigue legacy |
 | **Guests** | `critical/guests-real.cy.js` | CRUD invitados sobre Firestore | Resto de suites `guests/*.cy.js` usan mocks |
 | **Email** | `email/email-critical-real.cy.js`<br>`email/send-email-real.cy.js`<br>`email/read-email-real.cy.js`<br>`email/folders-management-real.cy.js` | Composer, lectura, carpetas y smoke crítico con backend/Mailgun reales | Suites de AI, validaciones y adjuntos permanecen mock |

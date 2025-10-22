@@ -8,7 +8,7 @@ Generado automáticamente por `scripts/aggregateRoadmap.js`. Actualiza este arch
 
 | Módulo | Suites `*-real.cy.js` | Alcance cubierto |
 |--------|----------------------|------------------|
-| Auth | `cypress/e2e/auth/auth-flow-real.cy.js`<br>`cypress/e2e/critical/auth-real.cy.js` | Login persistente, rutas protegidas, smoke crítico |
+| Auth | `cypress/e2e/auth/auth-flow-real.cy.js`<br>`cypress/e2e/auth/flow1-signup-real.cy.js`<br>`cypress/e2e/auth/flow1-password-reset-real.cy.js`<br>`cypress/e2e/auth/flow1-verify-email-real.cy.js`<br>`cypress/e2e/critical/auth-real.cy.js` | Login persistente, rutas protegidas, smoke crítico |
 | Dashboard | `cypress/e2e/critical/dashboard-real.cy.js`<br>`cypress/e2e/dashboard/main-navigation-real.cy.js`<br>`cypress/e2e/dashboard/global-search-shortcuts-real.cy.js` | Navegación planner, atajos globales, panel crítico |
 | Guests | `cypress/e2e/critical/guests-real.cy.js` | CRUD de invitados en Firestore real |
 | Email | `cypress/e2e/email/email-critical-real.cy.js`<br>`cypress/e2e/email/send-email-real.cy.js`<br>`cypress/e2e/email/read-email-real.cy.js`<br>`cypress/e2e/email/folders-management-real.cy.js` | Composer, lectura, carpetas y smoke crítico con backend/Mailgun reales |
@@ -64,6 +64,7 @@ Generado automáticamente por `scripts/aggregateRoadmap.js`. Actualiza este arch
 | flujo-6-presupuesto.md | cypress/e2e/finance/finance-flow.cy.js<br>cypress/e2e/finance/finance-flow-full.cy.js<br>cypress/e2e/finance/finance-budget.cy.js<br>cypress/e2e/finance/finance-transactions.cy.js<br>cypress/e2e/finance/finance-contributions.cy.js<br>cypress/e2e/finance/finance-analytics.cy.js<br>cypress/e2e/budget_flow.cy.js<br>cypress/e2e/finance/finance-advisor-chat.cy.js | — | Legacy (mocks) |
 
 _Nota:_ La matriz legacy refleja lo declarado en la documentación de cada flujo (`## Cobertura E2E implementada`). Si el flujo no menciona ninguna spec, aparecerá como �Sin specs en doc�. Todas estas suites (sin sufijo `-real.cy.js`) dependen de interceptores y mocks hasta completar la migración.
+
 
 
 

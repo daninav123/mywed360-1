@@ -30,7 +30,7 @@ router.use(developmentOnly);
  */
 router.post('/create-user', async (req, res) => {
   try {
-    const { email, password, displayName } = req.body;
+    const { email, password, displayName, emailVerified } = req.body;
 
     if (!email || !password) {
       return res.status(400).json({ error: 'Email y password requeridos' });
@@ -56,7 +56,7 @@ router.post('/create-user', async (req, res) => {
       email,
       password,
       displayName: displayName || email.split('@')[0],
-      emailVerified: true // Para tests, verificamos automáticamente
+      emailVerified: typeof emailVerified === 'boolean' ? emailVerified : true // Para tests, verificamos automáticamente salvo que se indique lo contrario
     });
 
     console.log(`[Test] Usuario creado: ${email} (${userRecord.uid})`);
@@ -66,6 +66,7 @@ router.post('/create-user', async (req, res) => {
       email,
       displayName: displayName || email.split('@')[0],
       role: 'owner',
+      emailVerified: typeof emailVerified === 'boolean' ? emailVerified : true,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       isTestUser: true
@@ -81,6 +82,39 @@ router.post('/create-user', async (req, res) => {
     res.status(500).json({ 
       error: 'Error al crear usuario', 
       details: error.message 
+    });
+  }
+});
+
+/**
+ * GET /api/test/users/by-email
+ * Obtener usuario de Firebase Auth por email
+ */
+router.get('/users/by-email', async (req, res) => {
+  try {
+    const { email } = req.query;
+
+    if (!email) {
+      return res.status(400).json({ error: 'Email requerido' });
+    }
+
+    const userRecord = await admin.auth().getUserByEmail(String(email));
+
+    return res.status(200).json({
+      uid: userRecord.uid,
+      email: userRecord.email,
+      emailVerified: userRecord.emailVerified,
+      displayName: userRecord.displayName || '',
+    });
+  } catch (error) {
+    if (error.code === 'auth/user-not-found') {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+
+    console.error('[Test] Error al obtener usuario por email:', error);
+    return res.status(500).json({
+      error: 'Error al obtener usuario',
+      details: error.message,
     });
   }
 });

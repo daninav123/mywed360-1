@@ -20,15 +20,18 @@
 - ✅ Documentación de estrategia (`E2E-TESTING-STRATEGY.md`)
 - ✅ Script de verificación Mailgun (`scripts/test-mailgun-config.js`)
 
-### **2. Auth Tests** 🔄 (40% del módulo)
-**Archivos migrados:** 2 de 5
+### **2. Auth Tests** 🔄 (80% del módulo)
+**Archivos migrados:** 4 de 5
 - ✅ `auth/auth-flow-real.cy.js` (4 tests)
+- ✅ `auth/flow1-signup-real.cy.js` (registro completo)
+- ✅ `auth/flow1-password-reset-real.cy.js` (solicitud de reset real)
+- ✅ `auth/flow1-verify-email-real.cy.js` (reenvío y refresco de verificación)
+
+**Suites críticas ya migradas:**
 - ✅ `critical/auth-real.cy.js` (5 tests)
 
-**Pendientes:**
-- ⏳ `auth/flow1-signup.cy.js`
-- ⏳ `auth/flow1-password-reset.cy.js`
-- ⏳ `auth/flow1-social-login.cy.js`
+**Pendiente:**
+- ⏳ `auth/flow1-social-login.cy.js` ➜ migrar a `*-real` con manejo OAuth real
 
 ### **3. Dashboard Tests** 🔄 (75% del módulo)
 **Archivos migrados:** 3 de 4
