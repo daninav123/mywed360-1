@@ -452,10 +452,30 @@ const distributeIncrease = (amounts, indices, delta) => {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button leftIcon={<Plus size={16} />} onClick={handleAddCategory}>
-            {t('finance.budget.newCategory', { defaultValue: 'Nueva categor�a' })}
+          <Button
+            variant="outline"
+            leftIcon={<CheckCircle size={16} />}
+            onClick={captureSnapshot}
+          >
+            {t('finance.benchmarks.saveSnapshot', { defaultValue: 'Guardar presupuesto' })}
           </Button>
-        </div>
+          <Button
+            variant="outline"
+            leftIcon={
+              advisorLoading || localAdvisorLoading ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                <Sparkles size={16} />
+              )
+            }
+            onClick={handleOpenAdvisor}
+            disabled={advisorLoading || localAdvisorLoading}
+          >
+            Abrir consejero
+          </Button>
+          <Button leftIcon={<Plus size={16} />} onClick={handleAddCategory}>
+            {t('finance.budget.newCategory', { defaultValue: 'Nueva categoría' })}
+          </Button>
         </div>
       </div>
 
@@ -607,6 +627,27 @@ const distributeIncrease = (amounts, indices, delta) => {
                   </div>
 
                   <div className="flex items-center gap-1 text-[10px] text-[color:var(--color-text)]/70">
+                    <label className="inline-flex items-center gap-1">
+                      <input
+                        type="checkbox"
+                        checked={Boolean(category.muted)}
+                        onChange={(e) => onUpdateCategory(index, { muted: e.target.checked })}
+                      />
+                      {t('finance.budget.muteShort', { defaultValue: 'Silenciar' })}
+                    </label>
+                    <button
+                      type="button"
+                      className="inline-flex items-center gap-1 rounded-md border border-[var(--color-primary)]/40 px-2 py-1 text-[11px] font-semibold text-[var(--color-primary)] transition hover:bg-[var(--color-primary)]/10"
+                      onClick={handleOpenAdvisor}
+                      disabled={advisorLoading || localAdvisorLoading}
+                    >
+                      {(advisorLoading || localAdvisorLoading) ? (
+                        <Loader2 size={12} className="animate-spin" />
+                      ) : (
+                        <Sparkles size={12} />
+                      )}
+                      {t('finance.budget.advisorShort', { defaultValue: 'AI' })}
+                    </button>
                     <button
                       aria-label="Editar categoría"
                       onClick={() => handleEditCategory(category, index)}
