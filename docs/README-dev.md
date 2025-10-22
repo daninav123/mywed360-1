@@ -15,12 +15,20 @@ Este documento consolida los flujos técnicos añadidos recientemente: Seating P
 ---
 
 ## Seating Plan
-- Validación de capacidad por mesa al asignar invitados (considera acompañantes).
+- Resumen visual del estado del plano:
+  - `src/components/seating/SeatingPlanSummary.jsx` centraliza tarjetas de personas ubicadas, pendientes, mesas activas y capacidad, con chips de avance (ceremonia/banquete) y glosario de areas dibujadas.
+  - Integrado tras las pestanas principales en `src/components/seating/SeatingPlanRefactored.jsx`.
+- Acciones rapidas y toggle de herramientas avanzadas:
+  - `src/components/seating/SeatingPlanQuickActions.jsx` expone Configurar espacio/banquete, pendientes, autoasignacion, plantillas, exportaciones y ajuste de vista.
+  - El estado `showAdvancedTools` se persiste para mostrar u ocultar la toolbar completa.
+- Persistencia y calculos de progreso:
+  - `SeatingPlanRefactored.jsx` guarda `showAdvancedTools`, `showRulers`, `showSeatNumbers` y `showTables` en `localStorage` (`uiPrefsKey`) y calcula `seatingProgress` (personas totales, asignadas, asientos habilitados y % avance).
+- Validacion de capacidad por mesa al asignar invitados (considera acompanantes).
   - Archivo: `src/components/seating/SeatingPlanRefactored.jsx` (`handleAssignGuest`).
 - Optimizaciones de rendimiento sin cambiar UI:
   - `src/components/seating/SeatingPlanCanvas.jsx`: backend DnD memoizado y pan con `requestAnimationFrame`.
   - `src/features/seating/SeatingCanvas.jsx`: exportado con `memo`.
-  - `src/components/TableItem.jsx`: memo de cálculos (`guestCount`, `guestsList`, `getLabel`).
+  - `src/components/TableItem.jsx`: memo de calculos (`guestCount`, `guestsList`, `getLabel`).
 - Componentes ya memoizados: `ChairItem.jsx`, `FreeDrawCanvas.jsx`.
 
 ### E2E relevantes de Seating

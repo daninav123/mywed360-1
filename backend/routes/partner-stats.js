@@ -2,8 +2,29 @@ import express from 'express';
 import crypto from 'crypto';
 import { db } from '../db.js';
 import logger from '../logger.js';
+import { calculateCommission, normalizeCommissionRules } from '../utils/commission.js';
 
 const router = express.Router();
+
+const toDateSafe = (value) => {
+  if (!value) return null;
+  if (value.toDate && typeof value.toDate === 'function') {
+    try {
+      return value.toDate();
+    } catch {
+      return null;
+    }
+  }
+  if (value instanceof Date) return value;
+  if (typeof value === 'string' || typeof value === 'number') {
+    const parsed = new Date(value);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+  }
+  if (value && value._seconds !== undefined) {
+    return new Date(value._seconds * 1000);
+  }
+  return null;
+};
 
 /**
  * Genera un token único para un código de descuento
@@ -80,7 +101,12 @@ router.get('/:token', async (req, res) => {
       .where('status', 'in', ['paid', 'succeeded', 'completed'])
       .get();
 
-    // Usar la variable 'now' ya declarada arriba
+    const currency = discountData.currency || 'EUR';
+    const commissionRules = normalizeCommissionRules(discountData.commissionRules || null, {
+      defaultCurrency: currency,
+    });
+    const commissionStartDate = toDateSafe(discountData.validFrom) || toDateSafe(discountData.createdAt);
+
     const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
     const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59);
 
@@ -90,19 +116,33 @@ router.get('/:token', async (req, res) => {
     let lastMonthUses = 0;
     const users = [];
     const userIds = new Set();
+    const paymentRecords = [];
+    const lastMonthPayments = [];
 
     for (const paymentDoc of paymentsSnapshot.docs) {
-      const payment = paymentDoc.data();
-      const amount = Number(payment.amount || payment.total || 0);
+      const rawPayment = paymentDoc.data() || {};
+      const amount = Number(rawPayment.amount ?? rawPayment.total ?? 0);
       
-      if (!isFinite(amount)) continue;
+      if (!Number.isFinite(amount) || amount <= 0) continue;
+
+      const paymentDate = toDateSafe(rawPayment.createdAt)
+        || toDateSafe(rawPayment.paidAt)
+        || toDateSafe(rawPayment.completedAt)
+        || (commissionStartDate || now);
+
+      const normalizedPayment = {
+        ...rawPayment,
+        amount,
+        createdAt: paymentDate,
+      };
+
+      paymentRecords.push(normalizedPayment);
 
       totalRevenue += amount;
       totalUses++;
 
-      // Usuario que realizó el pago
-      const userId = payment.userId || payment.uid || payment.user?.uid;
-      const userEmail = payment.email || payment.user?.email || payment.userEmail;
+      const userId = normalizedPayment.userId || normalizedPayment.uid || normalizedPayment.user?.uid;
+      const userEmail = normalizedPayment.email || normalizedPayment.user?.email || normalizedPayment.userEmail;
       
       if (userId && !userIds.has(userId)) {
         userIds.add(userId);
@@ -110,48 +150,61 @@ router.get('/:token', async (req, res) => {
           id: userId,
           email: userEmail || `${userId}@user.com`,
           amount,
-          date: payment.createdAt?.toDate?.() || payment.createdAt || new Date(),
+          date: paymentDate,
         });
       }
 
-      // Calcular mes pasado
-      const paymentDate = payment.createdAt?.toDate?.() || new Date(payment.createdAt);
       if (paymentDate >= lastMonthStart && paymentDate <= lastMonthEnd) {
         lastMonthRevenue += amount;
         lastMonthUses++;
+        lastMonthPayments.push(normalizedPayment);
       }
     }
 
-    // Formatear respuesta
+    const commissionOptions = {
+      currency,
+      startDate: commissionStartDate || null,
+    };
+
+    const commissionSummary = calculateCommission(paymentRecords, commissionRules, commissionOptions);
+    const commissionLastMonth = calculateCommission(lastMonthPayments, commissionRules, commissionOptions);
+
     const response = {
       code: discountData.code,
       type: discountData.type || 'campaign',
       assignedTo: discountData.assignedTo || { name: 'Partner', email: '' },
-      validFrom: discountData.validFrom || null,
-      validUntil: discountData.validUntil || null,
+      validFrom: toDateSafe(discountData.validFrom)?.toISOString() || null,
+      validUntil: toDateSafe(discountData.validUntil)?.toISOString() || null,
       stats: {
         total: {
           revenue: totalRevenue,
           uses: totalUses,
           users: userIds.size,
-          currency: discountData.currency || 'EUR',
+          currency,
+          commission: commissionSummary,
         },
         lastMonth: {
           revenue: lastMonthRevenue,
           uses: lastMonthUses,
-          currency: discountData.currency || 'EUR',
+          currency,
+          commission: commissionLastMonth,
         },
       },
       users: users
         .sort((a, b) => b.date - a.date)
-        .slice(0, 50) // Limitar a últimos 50 usuarios
+        .slice(0, 50)
         .map(u => ({
           email: u.email,
           amount: u.amount,
           date: u.date.toISOString().split('T')[0],
         })),
       maxUses: discountData.maxUses || null,
-      createdAt: discountData.createdAt?.toDate?.()?.toISOString?.() || null,
+      createdAt: toDateSafe(discountData.createdAt)?.toISOString() || null,
+      commissionRules,
+      debug: {
+        commissionPayments: commissionSummary.paymentsEvaluated,
+        commissionUnassignedRevenue: commissionSummary.unassignedRevenue,
+      },
     };
 
     logger.info(`[partner-stats] Token ${token.substring(0, 8)}... accessed for code ${discountData.code}`);

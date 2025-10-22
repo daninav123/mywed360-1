@@ -3,6 +3,434 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { getDiscountLinks, createDiscountCode, updateDiscountCode, generatePartnerToken } from '../../services/adminDataService';
 import { ExternalLink, Link as LinkIcon } from 'lucide-react';
 
+const makeId = () => Math.random().toString(36).slice(2, 10);
+
+const createEmptyTier = () => ({
+  id: makeId(),
+  label: '',
+  minRevenue: '0',
+  maxRevenue: '',
+  percentage: '0',
+  fixedAmount: '0',
+});
+
+const createEmptyPeriod = () => ({
+  id: makeId(),
+  label: '',
+  startMonth: '0',
+  endMonth: '',
+  tiers: [createEmptyTier()],
+});
+
+const defaultCommissionState = () => ({
+  currency: 'EUR',
+  periods: [],
+});
+
+const hydrateCommissionForm = (rules) => {
+  if (!rules || typeof rules !== 'object') {
+    return defaultCommissionState();
+  }
+
+  const currency = typeof rules.currency === 'string' && rules.currency.trim()
+    ? rules.currency.trim().toUpperCase()
+    : 'EUR';
+
+  const periods = Array.isArray(rules.periods)
+    ? rules.periods.map((period) => {
+        const periodId = typeof period.id === 'string' && period.id.trim() ? period.id.trim() : makeId();
+        const tiers = Array.isArray(period.tiers) && period.tiers.length
+          ? period.tiers.map((tier) => {
+              const tierId = typeof tier.id === 'string' && tier.id.trim() ? tier.id.trim() : makeId();
+              const pct = Number(tier.percentage ?? 0);
+              const percentageValue = Number.isFinite(pct) ? pct * 100 : 0;
+              return {
+                id: tierId,
+                label: typeof tier.label === 'string' ? tier.label : '',
+                minRevenue: tier.minRevenue !== undefined && tier.minRevenue !== null ? String(tier.minRevenue) : '0',
+                maxRevenue: tier.maxRevenue !== undefined && tier.maxRevenue !== null ? String(tier.maxRevenue) : '',
+                percentage: String(Number.isFinite(percentageValue) ? Number(percentageValue.toFixed(4)) : 0),
+                fixedAmount: tier.fixedAmount !== undefined && tier.fixedAmount !== null ? String(tier.fixedAmount) : '0',
+              };
+            })
+          : [createEmptyTier()];
+
+        return {
+          id: periodId,
+          label: typeof period.label === 'string' ? period.label : '',
+          startMonth: period.startMonth !== undefined && period.startMonth !== null ? String(period.startMonth) : '0',
+          endMonth: period.endMonth !== undefined && period.endMonth !== null ? String(period.endMonth) : '',
+          tiers,
+        };
+      })
+    : [];
+
+  return {
+    currency,
+    periods,
+  };
+};
+
+const buildCommissionPayload = (state) => {
+  if (!state || typeof state !== 'object') return null;
+
+  const currency = typeof state.currency === 'string' && state.currency.trim()
+    ? state.currency.trim().toUpperCase()
+    : 'EUR';
+
+  const periodsSource = Array.isArray(state.periods) ? state.periods : [];
+  const periods = [];
+
+  for (const period of periodsSource) {
+    const startMonth = Math.max(0, Number.parseInt(period.startMonth || '0', 10) || 0);
+    let endMonth = period.endMonth === '' || period.endMonth === null || period.endMonth === undefined
+      ? null
+      : Number.parseInt(period.endMonth, 10);
+
+    if (Number.isFinite(endMonth) && endMonth <= startMonth) {
+      throw new Error('El mes de fin debe ser mayor que el mes de inicio en cada periodo.');
+    }
+    if (!Number.isFinite(endMonth)) {
+      endMonth = null;
+    }
+
+    const tiersSource = Array.isArray(period.tiers) ? period.tiers : [];
+    const tiers = [];
+
+    for (const tier of tiersSource) {
+      const minRevenue = Number(tier.minRevenue || 0);
+      if (!Number.isFinite(minRevenue) || minRevenue < 0) {
+        throw new Error('El minimo de facturacion de un tramo no es valido.');
+      }
+
+      let maxRevenue = null;
+      if (tier.maxRevenue !== '' && tier.maxRevenue !== undefined && tier.maxRevenue !== null) {
+        const parsedMax = Number(tier.maxRevenue);
+        if (!Number.isFinite(parsedMax) || parsedMax <= minRevenue) {
+          throw new Error('El maximo de facturacion debe ser mayor que el minimo.');
+        }
+        maxRevenue = parsedMax;
+      }
+
+      let percentage = Number(tier.percentage || 0);
+      if (!Number.isFinite(percentage) || percentage < 0) {
+        throw new Error('El porcentaje de comision debe ser mayor o igual a 0.');
+      }
+      if (percentage > 1) {
+        percentage /= 100;
+      }
+      if (percentage > 1) {
+        throw new Error('El porcentaje de comision no puede superar el 100%.');
+      }
+
+      let fixedAmount = Number(tier.fixedAmount || 0);
+      if (!Number.isFinite(fixedAmount) || fixedAmount < 0) {
+        throw new Error('El bonus fijo debe ser un numero positivo.');
+      }
+
+      tiers.push({
+        id: typeof tier.id === 'string' && tier.id.trim() ? tier.id.trim() : makeId(),
+        label: typeof tier.label === 'string' ? tier.label : '',
+        minRevenue,
+        maxRevenue,
+        percentage,
+        fixedAmount,
+      });
+    }
+
+    if (!tiers.length) {
+      continue;
+    }
+
+    tiers.sort((a, b) => a.minRevenue - b.minRevenue);
+
+    periods.push({
+      id: typeof period.id === 'string' && period.id.trim() ? period.id.trim() : makeId(),
+      label: typeof period.label === 'string' ? period.label : '',
+      startMonth,
+      endMonth,
+      tiers,
+    });
+  }
+
+  if (!periods.length) {
+    return null;
+  }
+
+  periods.sort((a, b) => a.startMonth - b.startMonth);
+
+  return {
+    currency,
+    periods,
+  };
+};
+
+const CommissionRulesEditor = ({ value, onChange, disabled }) => {
+  const config = value || defaultCommissionState();
+
+  const handleCurrencyChange = (event) => {
+    const next = event.target.value.toUpperCase().slice(0, 4);
+    onChange({ ...config, currency: next || 'EUR' });
+  };
+
+  const handleAddPeriod = () => {
+    const nextPeriod = createEmptyPeriod();
+    onChange({ ...config, periods: [...(config.periods || []), nextPeriod] });
+  };
+
+  const handleRemovePeriod = (periodId) => {
+    const next = (config.periods || []).filter((period) => period.id !== periodId);
+    onChange({ ...config, periods: next });
+  };
+
+  const handlePeriodFieldChange = (periodId, field, value) => {
+    const next = (config.periods || []).map((period) =>
+      period.id === periodId ? { ...period, [field]: value } : period
+    );
+    onChange({ ...config, periods: next });
+  };
+
+  const handleAddTier = (periodId) => {
+    const next = (config.periods || []).map((period) => {
+      if (period.id !== periodId) return period;
+      return {
+        ...period,
+        tiers: [...(period.tiers || []), createEmptyTier()],
+      };
+    });
+    onChange({ ...config, periods: next });
+  };
+
+  const handleRemoveTier = (periodId, tierId) => {
+    const next = (config.periods || []).map((period) => {
+      if (period.id !== periodId) return period;
+      const remaining = (period.tiers || []).filter((tier) => tier.id !== tierId);
+      return {
+        ...period,
+        tiers: remaining.length ? remaining : [createEmptyTier()],
+      };
+    });
+    onChange({ ...config, periods: next });
+  };
+
+  const handleTierFieldChange = (periodId, tierId, field, value) => {
+    const next = (config.periods || []).map((period) => {
+      if (period.id !== periodId) return period;
+      const tiers = (period.tiers || []).map((tier) =>
+        tier.id === tierId ? { ...tier, [field]: value } : tier
+      );
+      return { ...period, tiers };
+    });
+    onChange({ ...config, periods: next });
+  };
+
+  return (
+    <div className="rounded-lg border border-soft p-4">
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <h3 className="text-sm font-semibold">Comisiones</h3>
+          <p className="text-xs text-[var(--color-text-soft,#6b7280)]">
+            Define porcentajes y bonus por periodo. Si lo dejas vacio, el enlace no mostrara comision.
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <label className="text-xs font-medium text-[var(--color-text-soft,#6b7280)]">
+            Moneda
+          </label>
+          <input
+            type="text"
+            maxLength={4}
+            value={config.currency || ''}
+            onChange={handleCurrencyChange}
+            disabled={disabled}
+            className="w-20 rounded-md border border-soft px-2 py-1 text-sm uppercase"
+          />
+        </div>
+      </div>
+
+      <div className="mt-4 space-y-4">
+        {(config.periods || []).map((period, periodIndex) => (
+          <div key={period.id} className="rounded-md border border-dashed border-soft p-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex flex-wrap gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-[var(--color-text-soft,#6b7280)]">
+                    Nombre
+                  </label>
+                  <input
+                    type="text"
+                    value={period.label || ''}
+                    onChange={(event) => handlePeriodFieldChange(period.id, 'label', event.target.value)}
+                    disabled={disabled}
+                    className="rounded-md border border-soft px-3 py-1 text-sm"
+                    placeholder={`Periodo ${periodIndex + 1}`}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-[var(--color-text-soft,#6b7280)]">
+                    Mes inicio
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={period.startMonth}
+                    onChange={(event) => handlePeriodFieldChange(period.id, 'startMonth', event.target.value)}
+                    disabled={disabled}
+                    className="w-24 rounded-md border border-soft px-3 py-1 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-[var(--color-text-soft,#6b7280)]">
+                    Mes fin
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={period.endMonth === null ? '' : period.endMonth}
+                    onChange={(event) => handlePeriodFieldChange(period.id, 'endMonth', event.target.value)}
+                    disabled={disabled}
+                    className="w-24 rounded-md border border-soft px-3 py-1 text-sm"
+                    placeholder="Sin limite"
+                  />
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => handleRemovePeriod(period.id)}
+                disabled={disabled}
+                className="text-xs text-[var(--color-text-soft,#6b7280)] hover:text-red-500"
+              >
+                Eliminar periodo
+              </button>
+            </div>
+
+            <div className="mt-3 overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200 text-xs">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-3 py-2 text-left font-medium text-gray-500">Tramo</th>
+                    <th className="px-3 py-2 text-left font-medium text-gray-500">Min facturacion</th>
+                    <th className="px-3 py-2 text-left font-medium text-gray-500">Max facturacion</th>
+                    <th className="px-3 py-2 text-left font-medium text-gray-500">% Comision</th>
+                    <th className="px-3 py-2 text-left font-medium text-gray-500">Bonus fijo</th>
+                    <th className="px-3 py-2" />
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {(period.tiers || []).map((tier, tierIndex) => (
+                    <tr key={tier.id}>
+                      <td className="px-3 py-2">
+                        <input
+                          type="text"
+                          value={tier.label || ''}
+                          onChange={(event) => handleTierFieldChange(period.id, tier.id, 'label', event.target.value)}
+                          disabled={disabled}
+                          placeholder={`Tramo ${tierIndex + 1}`}
+                          className="w-32 rounded-md border border-soft px-2 py-1 text-xs"
+                        />
+                      </td>
+                      <td className="px-3 py-2">
+                        <input
+                          type="number"
+                          min="0"
+                          value={tier.minRevenue}
+                          onChange={(event) =>
+                            handleTierFieldChange(period.id, tier.id, 'minRevenue', event.target.value)
+                          }
+                          disabled={disabled}
+                          className="w-28 rounded-md border border-soft px-2 py-1 text-xs"
+                        />
+                      </td>
+                      <td className="px-3 py-2">
+                        <input
+                          type="number"
+                          min="0"
+                          value={tier.maxRevenue === null ? '' : tier.maxRevenue}
+                          onChange={(event) =>
+                            handleTierFieldChange(period.id, tier.id, 'maxRevenue', event.target.value)
+                          }
+                          disabled={disabled}
+                          className="w-28 rounded-md border border-soft px-2 py-1 text-xs"
+                          placeholder="Sin limite"
+                        />
+                      </td>
+                      <td className="px-3 py-2">
+                        <div className="flex items-center gap-1">
+                          <input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value={tier.percentage}
+                            onChange={(event) =>
+                              handleTierFieldChange(period.id, tier.id, 'percentage', event.target.value)
+                            }
+                            disabled={disabled}
+                            className="w-20 rounded-md border border-soft px-2 py-1 text-xs"
+                          />
+                          <span>%</span>
+                        </div>
+                      </td>
+                      <td className="px-3 py-2">
+                        <input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          value={tier.fixedAmount}
+                          onChange={(event) =>
+                            handleTierFieldChange(period.id, tier.id, 'fixedAmount', event.target.value)
+                          }
+                          disabled={disabled}
+                          className="w-24 rounded-md border border-soft px-2 py-1 text-xs"
+                        />
+                      </td>
+                      <td className="px-3 py-2 text-right">
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveTier(period.id, tier.id)}
+                          disabled={disabled}
+                          className="text-xs text-[var(--color-text-soft,#6b7280)] hover:text-red-500"
+                        >
+                          Eliminar
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="mt-3 flex justify-end">
+              <button
+                type="button"
+                onClick={() => handleAddTier(period.id)}
+                disabled={disabled}
+                className="text-xs font-medium text-[color:var(--color-primary,#6366f1)] hover:underline"
+              >
+                Anadir tramo
+              </button>
+            </div>
+          </div>
+        ))}
+
+        <button
+          type="button"
+          onClick={handleAddPeriod}
+          disabled={disabled}
+          className="text-xs font-medium text-[color:var(--color-primary,#6366f1)] hover:underline"
+        >
+          Anadir periodo
+        </button>
+      </div>
+
+      {!config.periods?.length && (
+        <p className="mt-3 text-xs text-[var(--color-text-soft,#6b7280)]">
+          Agrega al menos un periodo para calcular comisiones. Los tramos aplican sobre la facturacion del periodo.
+        </p>
+      )}
+    </div>
+  );
+};
+
 const DEFAULT_SUMMARY = {
   totalLinks: 0,
   totalUses: 0,
@@ -49,7 +477,8 @@ const AdminDiscounts = () => {
     validUntil: '',
     assignedTo: { name: '', email: '' },
     notes: '',
-    status: 'activo'
+    status: 'activo',
+    commissionRules: defaultCommissionState(),
   });
 
   useEffect(() => {
@@ -116,81 +545,141 @@ const AdminDiscounts = () => {
   };
 
   const handleCreateDiscount = async (e) => {
+
     e.preventDefault();
+
     if (creating || !formData.code.trim()) return;
 
+
+
     setCreating(true);
+
     try {
+
+      const commissionPayload = buildCommissionPayload(formData.commissionRules);
+
+
+
       const discountData = {
+
         code: formData.code.trim(),
+
         url: formData.url.trim() || undefined,
+
         type: formData.type,
+
         maxUses: formData.isPermanent ? null : (parseInt(formData.maxUses) || 1),
+
         discountPercentage: parseFloat(formData.discountPercentage) || 0,
+
         validFrom: formData.validFrom ? new Date(formData.validFrom).toISOString() : null,
+
         validUntil: formData.validUntil ? new Date(formData.validUntil).toISOString() : null,
+
         assignedTo: formData.assignedTo.name || formData.assignedTo.email ? {
+
           name: formData.assignedTo.name || null,
+
           email: formData.assignedTo.email || null
+
         } : null,
-        notes: formData.notes.trim() || undefined
+
+        notes: formData.notes.trim() || undefined,
+
+        commissionRules: commissionPayload,
+
       };
+
+
+
+      if (commissionPayload && commissionPayload.currency) {
+
+        discountData.currency = commissionPayload.currency;
+
+      }
+
+
 
       const newDiscount = await createDiscountCode(discountData);
-      
+
+
+
       setLinks(prev => [newDiscount, ...prev]);
+
       setSummary(prev => ({
+
         ...prev,
+
         totalLinks: prev.totalLinks + 1
+
       }));
-      
+
+
+
       resetForm();
+
       setShowCreateModal(false);
+
     } catch (err) {
+
       console.error('[AdminDiscounts] create failed:', err);
-      alert(err.message || 'Error al crear el código de descuento');
+
+      alert(err.message || 'Error al crear el codigo de descuento');
+
     } finally {
+
       setCreating(false);
+
     }
+
   };
 
-  const handleEditDiscount = async (e) => {
-    e.preventDefault();
-    if (updating || !editingDiscount) return;
 
-    setUpdating(true);
-    try {
-      const discountData = {
-        url: formData.url.trim() || undefined,
-        type: formData.type,
-        maxUses: formData.isPermanent ? null : (parseInt(formData.maxUses) || 1),
-        discountPercentage: parseFloat(formData.discountPercentage) || 0,
-        validFrom: formData.validFrom ? new Date(formData.validFrom).toISOString() : null,
-        validUntil: formData.validUntil ? new Date(formData.validUntil).toISOString() : null,
-        assignedTo: formData.assignedTo.name || formData.assignedTo.email ? {
-          name: formData.assignedTo.name || null,
-          email: formData.assignedTo.email || null
-        } : null,
-        notes: formData.notes.trim() || undefined,
-        status: formData.status
-      };
 
-      const updatedDiscount = await updateDiscountCode(editingDiscount.id, discountData);
-      
-      setLinks(prev => prev.map(link => 
-        link.id === editingDiscount.id ? updatedDiscount : link
-      ));
-      
-      resetForm();
-      setShowEditModal(false);
-      setEditingDiscount(null);
-    } catch (err) {
-      console.error('[AdminDiscounts] update failed:', err);
-      alert(err.message || 'Error al actualizar el código de descuento');
-    } finally {
-      setUpdating(false);
-    }
-  };
+  const handleEditDiscount = async (e) => {
+    e.preventDefault();
+    if (updating || !editingDiscount) return;
+
+    setUpdating(true);
+    try {
+      const commissionPayload = buildCommissionPayload(formData.commissionRules);
+
+      const discountData = {
+        url: formData.url.trim() || undefined,
+        type: formData.type,
+        maxUses: formData.isPermanent ? null : (parseInt(formData.maxUses) || 1),
+        discountPercentage: parseFloat(formData.discountPercentage) || 0,
+        validFrom: formData.validFrom ? new Date(formData.validFrom).toISOString() : null,
+        validUntil: formData.validUntil ? new Date(formData.validUntil).toISOString() : null,
+        assignedTo: formData.assignedTo.name || formData.assignedTo.email ? {
+          name: formData.assignedTo.name || null,
+          email: formData.assignedTo.email || null
+        } : null,
+        notes: formData.notes.trim() || undefined,
+        status: formData.status,
+        commissionRules: commissionPayload,
+      };
+
+      if (commissionPayload && commissionPayload.currency) {
+        discountData.currency = commissionPayload.currency;
+      }
+
+      const updatedDiscount = await updateDiscountCode(editingDiscount.id, discountData);
+
+      setLinks(prev => prev.map(link =>
+        link.id === editingDiscount.id ? updatedDiscount : link
+      ));
+
+      resetForm();
+      setShowEditModal(false);
+      setEditingDiscount(null);
+    } catch (err) {
+      console.error('[AdminDiscounts] update failed:', err);
+      alert(err.message || 'Error al actualizar el codigo de descuento');
+    } finally {
+      setUpdating(false);
+    }
+  };
 
   const openEditModal = (discount) => {
     setEditingDiscount(discount);
@@ -208,7 +697,8 @@ const AdminDiscounts = () => {
         email: discount.assignedTo?.email || ''
       },
       notes: discount.notes || '',
-      status: discount.status || 'activo'
+      status: discount.status || 'activo',
+      commissionRules: hydrateCommissionForm(discount.commissionRules),
     });
     setShowEditModal(true);
   };
@@ -225,7 +715,8 @@ const AdminDiscounts = () => {
       validUntil: '',
       assignedTo: { name: '', email: '' },
       notes: '',
-      status: 'activo'
+      status: 'activo',
+      commissionRules: defaultCommissionState(),
     });
   };
 

@@ -15,26 +15,50 @@ import 'cypress-file-upload';
  * @param {string} password - Contraseña del usuario
  */
 Cypress.Commands.add('loginToLovendaReal', (email = 'cypress-test@malove.app', password = 'TestPassword123!') => {
-  cy.visit('/login');
+  // Verificar si ya estamos logueados
+  cy.visit('/home', { failOnStatusCode: false });
+  cy.wait(1000);
   
-  // Llenar el formulario de login
-  cy.get('input[type="email"], input[name="email"], [data-testid="email-input"]')
-    .should('be.visible')
-    .clear()
-    .type(email);
+  cy.url({ timeout: 5000 }).then((url) => {
+    if (!url.includes('/login')) {
+      // Ya estamos logueados
+      cy.log(`✅ Ya logueado (sesión activa)`);
+      return;
+    }
     
-  cy.get('input[type="password"], input[name="password"], [data-testid="password-input"]')
-    .should('be.visible')
-    .clear()
-    .type(password);
+    // No estamos logueados, ir a login
+    cy.visit('/login', { failOnStatusCode: false });
+    cy.wait(1000);
     
-  cy.get('button[type="submit"], [data-testid="login-button"], button:contains("Iniciar sesión")')
-    .should('be.visible')
-    .click();
-  
-  // Esperar redirección o mensaje de éxito
-  cy.url().should('not.include', '/login', { timeout: 10000 });
-  cy.log(`✅ Login exitoso: ${email}`);
+    // Verificar si hay formulario de login
+    cy.get('body').then($body => {
+      const hasLoginForm = $body.find('input[type="email"], input[name="email"], [data-testid="email-input"]').length > 0;
+      
+      if (!hasLoginForm) {
+        cy.log('⚠️ Formulario de login no visible, puede que ya esté logueado');
+        return;
+      }
+      
+      // Llenar el formulario de login
+      cy.get('input[type="email"], input[name="email"], [data-testid="email-input"]')
+        .should('be.visible')
+        .clear()
+        .type(email);
+        
+      cy.get('input[type="password"], input[name="password"], [data-testid="password-input"]')
+        .should('be.visible')
+        .clear()
+        .type(password);
+        
+      cy.get('button[type="submit"], [data-testid="login-button"], button:contains("Iniciar sesión")')
+        .should('be.visible')
+        .click();
+      
+      // Esperar redirección o mensaje de éxito
+      cy.url().should('not.include', '/login', { timeout: 10000 });
+      cy.log(`✅ Login exitoso: ${email}`);
+    });
+  });
 });
 
 /**

@@ -12,11 +12,13 @@ import SeatingLibraryPanel from './SeatingLibraryPanel';
 import SeatingPlanCanvas from './SeatingPlanCanvas';
 import SeatingPlanTabs from './SeatingPlanTabs';
 import SeatingPlanToolbar from './SeatingPlanToolbar';
+import SeatingPlanQuickActions from './SeatingPlanQuickActions';
 import SeatingExportWizard from './SeatingExportWizard';
 import SeatingMobileOverlay from './SeatingMobileOverlay';
 import SeatingSmartPanel from './SeatingSmartPanel';
 import SeatingGuestSidebar from './SeatingGuestSidebar';
 import SeatingPlanModals from './SeatingPlanModals';
+import SeatingPlanSummary from './SeatingPlanSummary';
 import { useWedding } from '../../context/WeddingContext';
 // Importar vía alias estable para permitir vi.mock en tests y usar el hook deshabilitado en test
 import { useSeatingPlan } from '../../hooks/useSeatingPlan';
@@ -191,6 +193,7 @@ const SeatingPlanRefactored = () => {
   const [guidedGuestId, setGuidedGuestId] = React.useState(null);
   const [isMobile, setIsMobile] = React.useState(false);
   const [guestSidebarOpen, setGuestSidebarOpen] = React.useState(true);
+  const [showAdvancedTools, setShowAdvancedTools] = React.useState(true);
   const showSmartPanel = tab === 'banquet';
   const showGuestSidebar = guestSidebarOpen && !isMobile;
   const [ceremonyActiveRow, setCeremonyActiveRow] = React.useState(0);
@@ -267,6 +270,9 @@ const SeatingPlanRefactored = () => {
       if (Object.prototype.hasOwnProperty.call(data, 'showTables')) {
         setShowTables(!!data.showTables);
       }
+      if (Object.prototype.hasOwnProperty.call(data, 'showAdvancedTools')) {
+        setShowAdvancedTools(!!data.showAdvancedTools);
+      }
     } catch (_) {}
   }, [uiPrefsKey]);
 
@@ -275,8 +281,9 @@ const SeatingPlanRefactored = () => {
       showRulers,
       showSeatNumbers,
       showTables,
+      showAdvancedTools,
     });
-  }, [showRulers, showSeatNumbers, showTables, persistUiPrefs]);
+  }, [showRulers, showSeatNumbers, showTables, showAdvancedTools, persistUiPrefs]);
 
   const isHallReady = Number.isFinite(safeHallSize?.width) && Number.isFinite(safeHallSize?.height);
 
@@ -378,6 +385,60 @@ const SeatingPlanRefactored = () => {
         return a.label.localeCompare(b.label, 'es');
       });
   }, [safeAreas]);
+
+  const seatingProgress = React.useMemo(() => {
+    const tableIds = new Set(
+      safeTables
+        .map((table) => {
+          if (table?.id == null) return null;
+          return String(table.id);
+        })
+        .filter(Boolean)
+    );
+    const tableNames = new Set(
+      safeTables
+        .map((table) => {
+          if (typeof table?.name !== 'string') return null;
+          const trimmed = table.name.trim();
+          return trimmed === '' ? null : trimmed;
+        })
+        .filter(Boolean)
+    );
+
+    let totalPersons = 0;
+    let assignedPersons = 0;
+
+    safeGuests.forEach((guest) => {
+      const companionRaw = Number.parseInt(guest?.companion, 10);
+      const companionCount = Number.isFinite(companionRaw) && companionRaw > 0 ? companionRaw : 0;
+      const persons = 1 + companionCount;
+      totalPersons += persons;
+
+      const tableId = guest?.tableId != null ? String(guest.tableId) : null;
+      const tableName =
+        typeof guest?.table === 'string' && guest.table.trim() !== '' ? guest.table.trim() : null;
+      const isAssigned =
+        (tableId && tableIds.has(tableId)) ||
+        (tableName && (tableIds.has(tableName) || tableNames.has(tableName)));
+      if (isAssigned) {
+        assignedPersons += persons;
+      }
+    });
+
+    const enabledSeats = safeSeats.filter((seat) => seat?.enabled !== false).length;
+    const ceremonyProgress =
+      totalPersons > 0 ? Math.min(100, Math.round((enabledSeats / totalPersons) * 100)) : 0;
+    const banquetProgress =
+      totalPersons > 0 ? Math.min(100, Math.round((assignedPersons / totalPersons) * 100)) : 0;
+
+    return {
+      totalPersons,
+      assignedPersons,
+      enabledSeats,
+      ceremonyProgress,
+      banquetProgress,
+    };
+  }, [safeGuests, safeSeats, safeTables]);
 
   useEffect(() => {
     if (!lockEvent) return;
@@ -1203,110 +1264,129 @@ const SeatingPlanRefactored = () => {
       <div className="h-full flex flex-col bg-gray-50">
         {/* Tabs */}
         <div className="flex-shrink-0 p-4 pb-0">
-          {(() => {
-            // Progreso por pestaña
-            const totalGuests = safeGuests.reduce(
-              (acc, g) => acc + 1 + (parseInt(g?.companion, 10) || 0),
-              0
-            );
-            const enabledSeats = safeSeats.filter((s) => s?.enabled !== false).length;
-            const ceremonyProgress =
-              totalGuests > 0 ? Math.min(100, Math.round((enabledSeats / totalGuests) * 100)) : 0;
-
-            // Invitados asignados a alguna mesa (contando companions)
-            const tableIdSet = new Set(safeTables.map((t) => String(t?.id)).filter(Boolean));
-            const tableNameSet = new Set(
-              safeTables.map((t) => String(t?.name)).filter((s) => s && s.trim() !== '')
-            );
-            const assignedPersons = safeGuests.reduce((sum, g) => {
-              const tid = g?.tableId != null ? String(g.tableId) : null;
-              const tname = g?.table != null ? String(g.table).trim() : '';
-              const isAssigned =
-                (tid && tableIdSet.has(tid)) ||
-                (tname && (tableIdSet.has(tname) || tableNameSet.has(tname)));
-              if (!isAssigned) return sum;
-              return sum + 1 + (parseInt(g?.companion, 10) || 0);
-            }, 0);
-            const banquetProgress =
-              totalGuests > 0
-                ? Math.min(100, Math.round((assignedPersons / totalGuests) * 100))
-                : 0;
-
-            return (
-              <SeatingPlanTabs
-                activeTab={tab}
-                onTabChange={setTab}
-                ceremonyCount={ceremonyCount}
-                banquetCount={banquetCount}
-                ceremonyProgress={ceremonyProgress}
-                banquetProgress={banquetProgress}
-              />
-            );
-          })()}
-        </div>
-
-        {/* Toolbar */}
-        <div className="flex-shrink-0 p-4 pb-2">
-          <SeatingPlanToolbar
-            tab={tab}
-            onUndo={undo}
-            onRedo={redo}
-            canUndo={canUndo}
-            canRedo={canRedo}
-            drawMode={drawMode}
-            onChangeDrawMode={setDrawMode}
-            onExportPDF={exportPDF}
-            onExportPNG={exportPNG}
-            onExportCSV={exportCSV}
-            onExportSVG={exportSVG}
-            onExportPlaceCards={() => exportPlaceCardsPDF?.()}
-            onExportPoster={() => exportPosterA2?.()}
-            onOpenCeremonyConfig={handleOpenCeremonyConfig}
-            onOpenBanquetConfig={handleOpenBanquetConfig}
-            onOpenSpaceConfig={handleOpenSpaceConfig}
-            onFitToContent={() => window.dispatchEvent(new Event('seating-fit'))}
-            onOpenBackground={() => setBackgroundOpen(true)}
-            onAutoAssign={handleAutoAssignClick}
-            onClearBanquet={clearBanquetLayout}
-            onOpenTemplates={handleOpenTemplates}
-            onOpenExportWizard={() => setExportWizardOpen(true)}
-            onSaveSnapshot={(name) => {
-              try {
-                saveSnapshot?.(name);
-              } catch (_) {}
-            }}
-            onLoadSnapshot={(name) => {
-              try {
-                loadSnapshot?.(name);
-              } catch (_) {}
-            }}
-            onDeleteSnapshot={(name) => {
-              try {
-                deleteSnapshot?.(name);
-              } catch (_) {}
-            }}
-            scoringWeights={scoringWeights}
-            onUpdateScoringWeights={(p) => setScoringWeights?.(p)}
-            showTables={showTables}
-            onToggleShowTables={toggleShowTables}
-            showRulers={showRulers}
-            onToggleRulers={() => setShowRulers((v) => !v)}
-            snapEnabled={!!snapToGrid}
-            onToggleSnap={() => setSnapToGrid((v) => !v)}
-            gridStep={gridStep}
-            showSeatNumbers={showSeatNumbers}
-            onToggleSeatNumbers={() => setShowSeatNumbers((v) => !v)}
-            onRotateLeft={() => rotateSelected(-5)}
-            onRotateRight={() => rotateSelected(5)}
-            onAlign={(axis, mode) => alignSelected(axis, mode)}
-            onDistribute={(axis) => distributeSelected(axis)}
-            validationsEnabled={validationsEnabled}
-            onToggleValidations={() => setValidationsEnabled((v) => !v)}
-            globalMaxSeats={globalMaxSeats}
-            onOpenCapacity={() => setCapacityOpen(true)}
+          <SeatingPlanTabs
+            activeTab={tab}
+            onTabChange={setTab}
+            ceremonyCount={ceremonyCount}
+            banquetCount={banquetCount}
+            ceremonyProgress={seatingProgress.ceremonyProgress}
+            banquetProgress={seatingProgress.banquetProgress}
           />
         </div>
 
+        {/* Summary */}
+        <div className="flex-shrink-0 px-4 pt-3">
+          <SeatingPlanSummary
+            totalGuests={safeGuests.length}
+            totalPersons={seatingProgress.totalPersons}
+            assignedPersons={seatingProgress.assignedPersons}
+            pendingGuests={pendingGuests.length}
+            tableCount={safeTables.length}
+            seatCapacity={seatingProgress.enabledSeats}
+            globalCapacity={Number.isFinite(globalMaxSeats) ? globalMaxSeats : 0}
+            ceremonyProgress={seatingProgress.ceremonyProgress}
+            banquetProgress={seatingProgress.banquetProgress}
+            areaSummary={areaSummary}
+            onOpenGuestDrawer={() => setGuestDrawerOpen(true)}
+          />
+        </div>
+
+        {/* Quick Actions */}
+        <div className="flex-shrink-0 px-4 pb-3">
+          <SeatingPlanQuickActions
+            tab={tab}
+            pendingCount={pendingGuests.length}
+            hasTables={safeTables.length > 0}
+            hasGuests={safeGuests.length > 0}
+            onAddTable={tab === 'banquet' ? addTable : undefined}
+            onOpenGuestDrawer={() => setGuestDrawerOpen(true)}
+            onAutoAssign={handleAutoAssignClick}
+            onOpenTemplates={handleOpenTemplates}
+            onOpenSpaceConfig={handleOpenSpaceConfig}
+            onOpenCeremonyConfig={handleOpenCeremonyConfig}
+            onOpenBanquetConfig={handleOpenBanquetConfig}
+            onFitToContent={() => window.dispatchEvent(new Event('seating-fit'))}
+            onOpenExport={() => setExportWizardOpen(true)}
+            onToggleAdvancedTools={(open) => setShowAdvancedTools(!!open)}
+            advancedOpen={showAdvancedTools}
+          />
+        </div>
+
+        {/* Toolbar */}
+        {showAdvancedTools ? (
+          <div className="flex-shrink-0 px-4 pb-2">
+            <div className="border border-blue-200 bg-blue-50/60 rounded-2xl p-3">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm font-semibold text-blue-900">Herramientas avanzadas</span>
+                <button
+                  type="button"
+                  className="text-xs text-blue-700 hover:text-blue-800"
+                  onClick={() => setShowAdvancedTools(false)}
+                >
+                  Ocultar
+                </button>
+              </div>
+              <SeatingPlanToolbar
+                tab={tab}
+                onUndo={undo}
+                onRedo={redo}
+                canUndo={canUndo}
+                canRedo={canRedo}
+                drawMode={drawMode}
+                onChangeDrawMode={setDrawMode}
+                onExportPDF={exportPDF}
+                onExportPNG={exportPNG}
+                onExportCSV={exportCSV}
+                onExportSVG={exportSVG}
+                onExportPlaceCards={() => exportPlaceCardsPDF?.()}
+                onExportPoster={() => exportPosterA2?.()}
+                onOpenCeremonyConfig={handleOpenCeremonyConfig}
+                onOpenBanquetConfig={handleOpenBanquetConfig}
+                onOpenSpaceConfig={handleOpenSpaceConfig}
+                onFitToContent={() => window.dispatchEvent(new Event('seating-fit'))}
+                onOpenBackground={() => setBackgroundOpen(true)}
+                onAutoAssign={handleAutoAssignClick}
+                onClearBanquet={clearBanquetLayout}
+                onOpenTemplates={handleOpenTemplates}
+                onOpenExportWizard={() => setExportWizardOpen(true)}
+                onSaveSnapshot={(name) => {
+                  try {
+                    saveSnapshot?.(name);
+                  } catch (_) {}
+                }}
+                onLoadSnapshot={(name) => {
+                  try {
+                    loadSnapshot?.(name);
+                  } catch (_) {}
+                }}
+                onDeleteSnapshot={(name) => {
+                  try {
+                    deleteSnapshot?.(name);
+                  } catch (_) {}
+                }}
+                scoringWeights={scoringWeights}
+                onUpdateScoringWeights={(p) => setScoringWeights?.(p)}
+                showTables={showTables}
+                onToggleShowTables={toggleShowTables}
+                showRulers={showRulers}
+                onToggleRulers={() => setShowRulers((v) => !v)}
+                snapEnabled={!!snapToGrid}
+                onToggleSnap={() => setSnapToGrid((v) => !v)}
+                gridStep={gridStep}
+                showSeatNumbers={showSeatNumbers}
+                onToggleSeatNumbers={() => setShowSeatNumbers((v) => !v)}
+                onRotateLeft={() => rotateSelected(-5)}
+                onRotateRight={() => rotateSelected(5)}
+                onAlign={(axis, mode) => alignSelected(axis, mode)}
+                onDistribute={(axis) => distributeSelected(axis)}
+                validationsEnabled={validationsEnabled}
+                onToggleValidations={() => setValidationsEnabled((v) => !v)}
+                globalMaxSeats={globalMaxSeats}
+                onOpenCapacity={() => setCapacityOpen(true)}
+              />
+            </div>
+          </div>
+        ) : null}
         {/* Cuerpo principal: Biblioteca (izqda) Â· Canvas (centro) Â· Inspector (dcha) */}
         {isMobile ? (
           <div className="flex-1 flex flex-col gap-3 px-4 pb-3">

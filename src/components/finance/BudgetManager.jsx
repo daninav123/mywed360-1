@@ -10,7 +10,7 @@ import {
   Info,
   CheckCircle,
 } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import useTranslations from '../../hooks/useTranslations';
 import { formatCurrency } from '../../utils/formatUtils';
@@ -62,8 +62,67 @@ export default function BudgetManager({
   const totalBudgetValue =
     Number.isFinite(computedTotal) && computedTotal > 0 ? computedTotal : categoriesTotal;
   const totalBudgetCents = Math.max(0, Math.round(totalBudgetValue * 100));
+  const hasGlobalBudget = totalBudgetCents > 0;
 
-  const distributeDecrease = (amounts, indices, delta) => {
+  const formatTotalInput = (value) => {
+    if (!Number.isFinite(value)) return '';
+    return (Math.round(value * 100) / 100).toFixed(2);
+  };
+
+  const baselineTotal = Number.isFinite(computedTotal) && computedTotal >= 0 ? computedTotal : categoriesTotal;
+  const [totalDraft, setTotalDraft] = useState(formatTotalInput(baselineTotal));
+  const [totalDraftDirty, setTotalDraftDirty] = useState(false);
+  const [totalDraftError, setTotalDraftError] = useState('');
+
+  useEffect(() => {
+    if (!totalDraftDirty) {
+      setTotalDraft(formatTotalInput(baselineTotal));
+      setTotalDraftError('');
+    }
+  }, [baselineTotal, totalDraftDirty]);
+
+  const parseTotalDraft = (value) => {
+    if (value == null) return Number.NaN;
+    const normalized = String(value).replace(/\s+/g, '').replace(',', '.');
+    if (normalized === '') return Number.NaN;
+    return Number(normalized);
+  };
+
+  const parsedDraftValue = parseTotalDraft(totalDraft);
+  const isDraftValid = Number.isFinite(parsedDraftValue) && parsedDraftValue >= 0;
+  const draftMatchesBaseline =
+    isDraftValid && Math.abs(parsedDraftValue - baselineTotal) < 0.005;
+
+  const handleTotalDraftChange = (event) => {
+    setTotalDraftDirty(true);
+    setTotalDraft(event.target.value);
+    setTotalDraftError('');
+  };
+
+  const applyTotalDraft = () => {
+    const normalized = parseTotalDraft(totalDraft);
+    if (!Number.isFinite(normalized) || normalized < 0) {
+      setTotalDraftError('Introduce un número válido mayor o igual a 0.');
+      return;
+    }
+    setTotalDraft(formatTotalInput(normalized));
+    setTotalDraftDirty(false);
+    setTotalDraftError('');
+    onUpdateBudget?.(normalized);
+  };
+
+  const resetTotalDraft = () => {
+    setTotalDraftDirty(false);
+    setTotalDraft(formatTotalInput(baselineTotal));
+    setTotalDraftError('');
+  };
+
+/**
+ * Reduce proporcionalmente las cantidades especificadas en `indices` hasta cubrir `delta`.
+ * Mutamos el array `amounts` en céntimos para evitar problemas de precisión.
+ * Devuelve el remanente que no se pudo recortar (por ejemplo, si todas las categorías llegaron a 0).
+ */
+const distributeDecrease = (amounts, indices, delta) => {
     let remaining = delta;
     let adjustable = indices.filter((idx) => amounts[idx] > 0);
 
@@ -121,7 +180,11 @@ export default function BudgetManager({
     return remaining;
   };
 
-  const distributeIncrease = (amounts, indices, delta) => {
+/**
+ * Incrementa proporcionalmente las categorías en `indices` con el presupuesto disponible `delta`.
+ * Devuelve el remanente que no logró asignarse (habitualmente porque no existen categorías destino).
+ */
+const distributeIncrease = (amounts, indices, delta) => {
     let remaining = delta;
     if (!indices.length) return remaining;
 
@@ -173,36 +236,65 @@ export default function BudgetManager({
     return remaining;
   };
 
+  /**
+   * Reasigna el presupuesto cuando el usuario mueve el slider de una categoría.
+   * Pasos principales:
+   *  1. Convertimos todas las categorías a céntimos para trabajar con enteros.
+   *  2. Intentamos satisfacer el nuevo valor utilizando primero el presupuesto libre
+   *     (total global - suma actual). Si no es suficiente, reducimos al resto de categorías
+   *     de forma proporcional mediante `distributeDecrease`.
+   *  3. Al reducir una categoría liberamos presupuesto y lo repartimos entre el resto con
+   *     `distributeIncrease`, evitando que el total global quede desbalanceado.
+   *  4. Garantizamos que la suma final nunca sobrepase el presupuesto total y normalizamos
+   *     el resultado a euros con dos decimales.
+   */
   const handleAllocationChange = (index, targetCents) => {
     if (!onReallocateCategories || !categories.length) return;
 
     const safeTarget = Math.max(0, Math.min(targetCents, totalBudgetCents));
-    const currentAmountCents = Math.max(
-      0,
-      Math.round((Number(categories[index]?.amount) || 0) * 100)
+    const currentAmounts = categories.map((cat) =>
+      Math.max(0, Math.round((Number(cat?.amount) || 0) * 100))
     );
+    const currentAmountCents = currentAmounts[index] || 0;
     if (safeTarget === currentAmountCents) return;
 
-    const nextAmounts = categories.map((cat, idx) => {
-      const base = Number(cat?.amount) || 0;
-      const cents = Math.max(0, Math.round(base * 100));
-      return idx === index ? safeTarget : cents;
-    });
     const otherIndices = categories
       .map((_, idx) => idx)
       .filter((idx) => idx !== index);
-    const delta = safeTarget - currentAmountCents;
+    const currentTotal = currentAmounts.reduce((sum, value) => sum + value, 0);
+    const availablePool = Math.max(0, totalBudgetCents - currentTotal);
 
+    const nextAmounts = currentAmounts.slice();
+    nextAmounts[index] = safeTarget;
+
+    const delta = safeTarget - currentAmountCents;
     if (delta > 0) {
-      const leftover = distributeDecrease(nextAmounts, otherIndices, delta);
-      if (leftover > 0) {
-        nextAmounts[index] = Math.max(0, nextAmounts[index] - leftover);
+      let remainingIncrease = delta;
+      if (availablePool > 0) {
+        const consume = Math.min(availablePool, remainingIncrease);
+        remainingIncrease -= consume;
+      }
+      if (remainingIncrease > 0) {
+        const leftover = distributeDecrease(nextAmounts, otherIndices, remainingIncrease);
+        if (leftover > 0) {
+          nextAmounts[index] = Math.max(0, nextAmounts[index] - leftover);
+        }
       }
     } else {
-      const leftover = distributeIncrease(nextAmounts, otherIndices, -delta);
-      if (leftover > 0) {
-        nextAmounts[index] = Math.max(0, nextAmounts[index] + leftover);
+      const remainingDecrease = -delta;
+      distributeIncrease(nextAmounts, otherIndices, remainingDecrease);
+    }
+
+    let totalAfter = nextAmounts.reduce((sum, value) => sum + value, 0);
+    if (totalAfter > totalBudgetCents) {
+      let overflow = totalAfter - totalBudgetCents;
+      const reduceFromTarget = Math.min(overflow, nextAmounts[index]);
+      nextAmounts[index] -= reduceFromTarget;
+      overflow -= reduceFromTarget;
+      if (overflow > 0) {
+        distributeDecrease(nextAmounts, otherIndices, overflow);
       }
+      totalAfter = nextAmounts.reduce((sum, value) => sum + value, 0);
     }
 
     const nextCategories = nextAmounts.map((amountCents, idx) => ({
@@ -395,6 +487,52 @@ export default function BudgetManager({
           </div>
         </div>
 
+        <div className="mt-6 space-y-2">
+          <label className="block text-sm font-medium text-[color:var(--color-text)]/80">
+            {t('finance.budget.totalBudgetInput', { defaultValue: 'Presupuesto total (€)' })}
+          </label>
+          <div className="flex flex-wrap items-center gap-2">
+            <input
+              type="text"
+              inputMode="decimal"
+              value={totalDraft}
+              onChange={handleTotalDraftChange}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter') {
+                  event.preventDefault();
+                  applyTotalDraft();
+                }
+              }}
+              className="w-full md:w-48 px-3 py-2 border border-[color:var(--color-text)]/20 rounded-md focus:ring-2 focus:ring-[color:var(--color-primary)] focus:border-transparent bg-[var(--color-surface)] text-[color:var(--color-text)]"
+              placeholder="0.00"
+            />
+            <Button
+              onClick={applyTotalDraft}
+              disabled={!onUpdateBudget || !isDraftValid || draftMatchesBaseline}
+            >
+              {t('app.save', { defaultValue: 'Guardar' })}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              leftIcon={<RefreshCw size={16} />}
+              onClick={resetTotalDraft}
+              disabled={!totalDraftDirty && !totalDraftError}
+            >
+              {t('app.reset', { defaultValue: 'Restablecer' })}
+            </Button>
+          </div>
+          {totalDraftError && (
+            <p className="text-xs text-[color:var(--color-danger)]">{totalDraftError}</p>
+          )}
+          {!hasGlobalBudget && (
+            <div className="rounded-md border border-[color:var(--color-warning)]/40 bg-[var(--color-warning)]/15 px-3 py-2 text-sm text-[color:var(--color-text)]/80">
+              Define un presupuesto total para activar la reasignación entre categorías. Los
+              deslizadores permanecen bloqueados mientras el total sea 0.
+            </div>
+          )}
+        </div>
+
         {onUpdateSettings && (
           <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="md:col-span-3">
@@ -525,7 +663,7 @@ export default function BudgetManager({
           </div>
         ) : (
           <div className="px-5 py-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+            <div className="space-y-2.5">
               {budgetUsage.map((category, index) => {
               const rawCategory = categories[index] || {};
               const assignedAmountRaw = Number(
@@ -563,31 +701,24 @@ export default function BudgetManager({
               return (
                 <div
                   key={category.name || index}
-                  className="rounded-lg border border-[color:var(--color-text)]/10 bg-white/80 shadow-sm p-3 space-y-2"
+                  className="rounded-lg border border-[color:var(--color-text)]/10 bg-white/80 shadow-sm p-3 space-y-1.5"
                 >
-                  <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <h4 className="text-base font-semibold text-[color:var(--color-text)]">
-                          {category.name}
-                        </h4>
-                        {sourceTag && (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[var(--color-primary)]/10 text-[var(--color-primary)]">
-                            <Sparkles size={11} />
-                            Consejero
-                          </span>
-                        )}
-                        {usagePercent >= 100 && (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[var(--color-danger)]/10 text-[var(--color-danger)]">
-                            <AlertTriangle size={11} />
-                            Excedido
-                          </span>
-                        )}
-                      </div>
-                      {category.description && (
-                        <p className="text-xs text-[color:var(--color-text)]/60">
-                          {category.description}
-                        </p>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex items-center gap-1.5 flex-wrap min-w-[200px]">
+                      <h4 className="text-base font-semibold text-[color:var(--color-text)]">
+                        {category.name}
+                      </h4>
+                      {sourceTag && (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[var(--color-primary)]/10 text-[var(--color-primary)]">
+                          <Sparkles size={11} />
+                          Consejero
+                        </span>
+                      )}
+                      {usagePercent >= 100 && (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[var(--color-danger)]/10 text-[var(--color-danger)]">
+                          <AlertTriangle size={11} />
+                          Excedido
+                        </span>
                       )}
                     </div>
                     <div className="flex items-center gap-1.5 flex-wrap justify-end text-[11px]">
@@ -628,35 +759,38 @@ export default function BudgetManager({
                       </button>
                     </div>
                   </div>
-                  <div className="space-y-1.5">
-                    <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-3">
-                      <div className={`flex-1 ${sliderDisabled ? 'opacity-60' : ''}`}>
-                        <input
-                          type="range"
-                          min={0}
-                          max={sliderMax}
-                          step={sliderStep}
-                          value={sliderValue}
-                          onChange={(e) => handleAllocationChange(index, Number(e.target.value))}
-                          disabled={sliderDisabled}
-                          className="w-full accent-[var(--color-primary)]"
-                          aria-label={`Reasignar presupuesto para ${category.name}`}
-                        />
-                      </div>
-                      <div className="min-w-[140px] text-right">
+                  {category.description && (
+                    <p className="text-xs text-[color:var(--color-text)]/60">
+                      {category.description}
+                    </p>
+                  )}
+                  <div className="flex flex-wrap items-center gap-3 text-[11px]">
+                    <div className={`flex-1 min-w-[220px] ${sliderDisabled ? 'opacity-60' : ''}`}>
+                      <input
+                        type="range"
+                        min={0}
+                        max={sliderMax}
+                        step={sliderStep}
+                        value={sliderValue}
+                        onChange={(e) => handleAllocationChange(index, Number(e.target.value))}
+                        disabled={sliderDisabled}
+                        className="w-full accent-[var(--color-primary)]"
+                        aria-label={`Reasignar presupuesto para ${category.name}`}
+                      />
+                    </div>
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <div className="min-w-[120px]">
                         <p className="text-[10px] uppercase tracking-wide text-[color:var(--color-text)]/60">
                           {t('finance.budget.budgeted', { defaultValue: 'Presupuestado' })}
                         </p>
-                        <p className="text-base font-semibold text-[color:var(--color-text)]">
+                        <p className="text-sm font-semibold text-[color:var(--color-text)]">
                           {formatCurrency(assignedAmount)}
                         </p>
-                        <p className="text-[11px] text-[color:var(--color-text)]/70">
+                        <p className="text-[10px] text-[color:var(--color-text)]/60">
                           {allocationPercent.toFixed(1)}% del total
                         </p>
                       </div>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5">
-                      <div>
+                      <div className="min-w-[110px]">
                         <p className="text-[10px] uppercase tracking-wide text-[color:var(--color-text)]/60">
                           {t('finance.budget.spent', { defaultValue: 'Gastado' })}
                         </p>
@@ -664,7 +798,7 @@ export default function BudgetManager({
                           {formatCurrency(spentAmount)}
                         </p>
                       </div>
-                      <div>
+                      <div className="min-w-[110px]">
                         <p className="text-[10px] uppercase tracking-wide text-[color:var(--color-text)]/60">
                           {t('finance.budget.remaining', { defaultValue: 'Restante' })}
                         </p>
@@ -678,18 +812,18 @@ export default function BudgetManager({
                           {formatCurrency(remaining)}
                         </p>
                       </div>
-                      <div>
-                        <div className="flex items-center justify-between text-[11px] text-[color:var(--color-text)]/70 mb-1">
-                          <span>{t('finance.budget.progress', { defaultValue: 'Progreso' })}</span>
-                          <span>{Math.min(usagePercent, 999).toFixed(1)}%</span>
-                        </div>
-                        <div className="w-full bg-[color:var(--color-text)]/10 rounded-full h-1.5">
-                          <div
-                            className={`${barColor} h-1.5 rounded-full transition-all duration-300`}
-                            style={{ width: `${progressPercent}%` }}
-                          />
-                        </div>
-                      </div>
+                    </div>
+                  </div>
+                  <div className="w-full">
+                    <div className="flex items-center justify-between text-[10px] text-[color:var(--color-text)]/70">
+                      <span>{t('finance.budget.progress', { defaultValue: 'Progreso' })}</span>
+                      <span>{Math.min(usagePercent, 999).toFixed(1)}%</span>
+                    </div>
+                    <div className="w-full bg-[color:var(--color-text)]/10 rounded-full h-1">
+                      <div
+                        className={`${barColor} h-1 rounded-full transition-all duration-300`}
+                        style={{ width: `${progressPercent}%` }}
+                      />
                     </div>
                   </div>
                 </div>

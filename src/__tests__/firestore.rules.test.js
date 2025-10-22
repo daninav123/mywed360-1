@@ -1,4 +1,5 @@
 /* eslint-disable no-unused-vars */
+// @vitest-environment node
 import {
   assertFails,
   assertSucceeds,

@@ -2200,7 +2200,7 @@ router.put('/discounts/:id', async (req, res) => {
       { defaultCurrency: data.currency || 'EUR' },
     );
 
-    console.log(  OK. Updated discount code: );
+    console.log(`  OK. Updated discount code: ${data.code}`);
 
     return res.json({
       id: updated.id,
@@ -2241,6 +2241,9 @@ router.post('/discounts', async (req, res) => {
         maxUses,
         assignedTo,
         notes,
+        discountPercentage,
+        validFrom,
+        validUntil,
         currency: bodyCurrency,
         commissionRules: rawCommissionRules,
       } = req.body || {};
@@ -2254,6 +2257,12 @@ router.post('/discounts', async (req, res) => {
       const cleanType = String(type || 'campaign').trim();
       const isPermanent = maxUses === null || maxUses === undefined || maxUses === 0;
       const maxUsesValue = isPermanent ? null : Math.max(1, Number(maxUses) || 1);
+      const parsedDiscount = Number(discountPercentage);
+      const cleanDiscountPercentage = Number.isFinite(parsedDiscount) ? parsedDiscount : 0;
+      const fromDate = validFrom ? new Date(validFrom) : null;
+      const untilDate = validUntil ? new Date(validUntil) : null;
+      const cleanValidFrom = fromDate && !Number.isNaN(fromDate.getTime()) ? fromDate : null;
+      const cleanValidUntil = untilDate && !Number.isNaN(untilDate.getTime()) ? untilDate : null;
 
       const normalizedCommissionRules = normalizeCommissionRules(rawCommissionRules, { defaultCurrency: 'EUR' });
       const cleanCurrency = typeof bodyCurrency === 'string' && bodyCurrency.trim()
@@ -2273,10 +2282,13 @@ router.post('/discounts', async (req, res) => {
     const newDiscount = {
       code: cleanCode,
       url: cleanUrl || `https://mywed360.com/registro?ref=${cleanCode}`,
-      type: cleanType,
-      maxUses: maxUsesValue,
-      usesCount: 0,
-      status: 'activo',
+        type: cleanType,
+        maxUses: maxUsesValue,
+        usesCount: 0,
+        status: 'activo',
+        discountPercentage: cleanDiscountPercentage,
+        validFrom: cleanValidFrom,
+        validUntil: cleanValidUntil,
         revenue: 0,
         currency: cleanCurrency,
         assignedTo: assignedTo ? {
