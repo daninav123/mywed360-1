@@ -321,34 +321,40 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
           // Silenciar errores de permisos si estamos usando admin local
           const isPermissionDenied = err.code === 'permission-denied';
           if (isPermissionDenied) {
-            // Usar fallback silenciosamente sin loguear error
+            // Intentar auto-fix de permisos
+            (async () => {
+              try {
+                const resp = await apiPost(
+                  `/api/weddings/${weddingId}/permissions/autofix`,
+                  {},
+                  { auth: true }
+                );
+                if (resp?.ok) {
+                  try {
+                    if (typeof unsub === 'function') unsub();
+                  } catch {}
+                  if (import.meta.env.DEV)
+                    console.debug(
+                      '[useWeddingCollection] reintento de listener tras autofix en 3000ms',
+                      { sub: subName, wedding: weddingId }
+                    );
+                  setTimeout(() => listen(), 3000);
+                  return;
+                } else {
+                  const text = await resp.text().catch(() => '');
+                  console.warn('[auto-fix] Backend rechazó autofix', resp?.status, text);
+                }
+              } catch (permErr) {
+                console.warn('[auto-fix] Error llamando autofix backend:', permErr);
+              }
+            })();
+            
+            // Usar fallback mientras tanto
             setData(fallback);
             setLoading(false);
             return;
-              const resp = await apiPost(
-                `/api/weddings/${weddingId}/permissions/autofix`,
-                {},
-                { auth: true }
-              );
-              if (resp?.ok) {
-                try {
-                  if (typeof unsub === 'function') unsub();
-                } catch {}
-                if (import.meta.env.DEV)
-                  console.debug(
-                    '[useWeddingCollection] reintento de listener tras autofix en 3000ms',
-                    { sub: subName, wedding: weddingId }
-                  );
-                setTimeout(() => listen(), 3000);
-                return;
-              } else {
-                const text = await resp.text().catch(() => '');
-                console.warn('[auto-fix] Backend rechazó autofix', resp?.status, text);
-              }
-            } catch (permErr) {
-              console.warn('[auto-fix] Error llamando autofix backend:', permErr);
-            }
           }
+          
           if (import.meta.env.DEV)
             console.debug('[useWeddingCollection] usando caché local por error en snapshot', {
               sub: subName,
