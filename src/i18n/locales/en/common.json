@@ -228,7 +228,10 @@
     "specialRequests": "Special Requests",
     "saveTheDate": {
       "message": "Hi, we are {{p1}}{{p2Suffix}} and we have amazing news to share. We're getting married! Please save {{date}} because we really want you with us.",
-      "messageFallback": "Hi! We have exciting news to share. We're getting married! Save the date because we want you there!"
+      "messageFallback": "Hi! We have exciting news to share. We're getting married! Save the date because we want you there!",
+      "connector": "and",
+      "primaryFallback": "us",
+      "coupleFallback": "our wedding"
     },
     "groups": {
       "title": "Group management",

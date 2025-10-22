@@ -680,7 +680,10 @@
     "specialRequests": "Peticiones especiales",
     "saveTheDate": {
       "message": "Hola somos {{p1}}{{p2Suffix}}, tenemos un notición súper importante que compartir contigo. ¡Nos casamos! Resérvate el {{date}} porque queremos contar contigo.",
-      "messageFallback": "¡Hola! Tenemos un notición súper importante que compartir contigo. ¡Nos casamos! ¡Resérvate la fecha porque queremos contar contigo!"
+      "messageFallback": "¡Hola! Tenemos un notición súper importante que compartir contigo. ¡Nos casamos! ¡Resérvate la fecha porque queremos contar contigo!",
+      "connector": "y",
+      "primaryFallback": "nosotros",
+      "coupleFallback": "nuestra boda"
     },
     "rsvp": {
       "printPdf": "Imprimir / PDF"

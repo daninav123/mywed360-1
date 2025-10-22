@@ -2,6 +2,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { useEffect, useRef } from 'react';
 
 import { auth } from '../../firebaseConfig';
+import { useWedding } from '../../context/WeddingContext';
 import {
   showNotification,
   shouldNotify,
@@ -10,6 +11,7 @@ import {
 
 // Polls backend notifications and emits toast events for meeting/budget suggestions
 export default function NotificationWatcher({ intervalMs = 20000 }) {
+  const { activeWedding } = useWedding();
   const seenRef = useRef(new Set());
   const uid = auth?.currentUser?.uid || null;
 
@@ -28,7 +30,12 @@ export default function NotificationWatcher({ intervalMs = 20000 }) {
 
     const load = async (forceRefresh = false) => {
       try {
-        const { notifications = [] } = await fetchNotifications({ forceRefresh });
+        // Si no hay weddingId activo, no hacer nada
+        if (!activeWedding) {
+          return;
+        }
+        
+        const notifications = await fetchNotifications(activeWedding);
         const list = Array.isArray(notifications) ? notifications : [];
         if (!Array.isArray(list)) return;
         for (const n of list) {

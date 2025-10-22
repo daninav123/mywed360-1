@@ -39,7 +39,8 @@ if (typeof window !== 'undefined') {
     'error',
     (event) => {
       try {
-        performanceMonitor.logError('window_error', event.error || event.message, {
+        const errorMsg = event.error || event.message || 'Unknown error';
+        performanceMonitor.logError('window_error', errorMsg, {
           filename: event.filename,
           lineno: event.lineno,
           colno: event.colno,

@@ -149,11 +149,15 @@ function Invitados() {
       const connectorRaw = t('guests.saveTheDate.connector', { defaultValue: 'and' }) || 'and';
       const connector = connectorRaw.trim() || 'and';
 
-      const primaryName = p1 || p2 || 'nosotros';
+      const defaultPrimary = t('guests.saveTheDate.primaryFallback', { defaultValue: 'us' }) || 'us';
+      const defaultCoupleLabel =
+        t('guests.saveTheDate.coupleFallback', { defaultValue: 'our wedding' }) || 'our wedding';
+
+      const primaryName = p1 || p2 || defaultPrimary;
       const secondaryName = p1 && p2 ? p2 : '';
       const p2Suffix = secondaryName ? ` ${connector} ${secondaryName}` : '';
 
-      const coupleName = secondaryName ? `${primaryName}${p2Suffix}` : primaryName || 'nuestra boda';
+      const coupleName = secondaryName ? `${primaryName}${p2Suffix}` : primaryName || defaultCoupleLabel;
 
       const dateRaw =
         wi.weddingDate || wi.date || wList.weddingDate || wList.date || wi.ceremonyDate || '';
@@ -180,7 +184,7 @@ function Invitados() {
 
       const message = t('guests.saveTheDate.message', {
         defaultValue:
-          'Hola somos {{p1}}{{p2,select, undefined|| y {{p2}} other|| y {{p2}}}}, tenemos un notición súper importante que compartir contigo. ¡Nos casamos! Resérvate el {{date}} porque queremos contar contigo.',
+          'Hola somos {{p1}}{{p2Suffix}}, tenemos un notición súper importante que compartir contigo. ¡Nos casamos! Resérvate el {{date}} porque queremos contar contigo.',
         p1: primaryName,
         p2Suffix,
         date: fechaFmt,
@@ -193,7 +197,8 @@ function Invitados() {
           defaultValue:
             '¡Hola! Tenemos un notición súper importante que compartir contigo. ¡Nos casamos! ¡Resérvate la fecha porque queremos contar contigo!',
         }),
-        coupleLabel: 'nuestra boda',
+        coupleLabel:
+          t('guests.saveTheDate.coupleFallback', { defaultValue: 'our wedding' }) || 'our wedding',
       };
     }
   }, [weddings, activeWedding, activeWeddingInfo, t]);
@@ -1613,4 +1618,3 @@ function Invitados() {
 }
 
 export default Invitados;
-
