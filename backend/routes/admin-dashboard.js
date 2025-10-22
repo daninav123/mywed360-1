@@ -1523,12 +1523,12 @@ router.get('/overview', async (_req, res) => {
       meta,
     });
   } catch (error) {
-    logger.error('[admin-dashboard] overview error', error);
-    res.status(500).json({ error: 'admin_dashboard_overview_failed' });
+    logger.error('[admin-dashboard] integrations GET error', error);
+    res.status(500).json({ error: 'admin_integrations_failed' });
   }
 });
 
-// Reintentar conexiÃ³n de un servicio de integraciones
+// Reintentar conexión de un servicio de integraciones
 router.post('/integrations/:id/retry', async (req, res) => {
   try {
     const { id } = req.params;
@@ -2255,6 +2255,34 @@ router.put('/settings/templates/:id', async (req, res) => {
   }
 });
 
+// GET /broadcasts - Obtener historial de broadcasts
+router.get('/broadcasts', async (_req, res) => {
+  try {
+    const docs = await getCollectionDocs('broadcasts', { orderBy: 'createdAt', direction: 'desc', limit: 100 });
+    
+    const broadcasts = docs.map((doc) => {
+      const data = doc.data() || {};
+      return {
+        id: doc.id,
+        type: data.type || 'email',
+        subject: data.subject || '',
+        content: data.content || '',
+        segment: data.segment || 'Todos',
+        scheduledAt: formatDateTime(data.scheduledAt) || formatDateTime(data.createdAt),
+        status: data.status || 'Pendiente',
+        stats: data.stats || { sent: 0, opened: 0, clicked: 0 },
+        createdAt: formatDateTime(data.createdAt),
+        createdBy: data.createdBy || 'Admin',
+      };
+    });
+    
+    res.json(broadcasts);
+  } catch (error) {
+    logger.error('[admin-dashboard] broadcasts GET error', error);
+    res.status(500).json({ error: 'admin_broadcasts_failed' });
+  }
+});
+
 // Crear broadcast
 router.post('/broadcasts', async (req, res) => {
   try {
@@ -2885,6 +2913,84 @@ router.post('/support/tickets/:id/respond', async (req, res) => {
   } catch (error) {
     logger.error('[admin-dashboard] ticket respond error', error);
     return res.status(500).json({ error: 'ticket_respond_failed' });
+  }
+});
+
+// GET /reports - Obtener reportes programados
+router.get('/reports', async (_req, res) => {
+  try {
+    const docs = await getCollectionDocs('reports', { orderBy: 'createdAt', direction: 'desc', limit: 100 });
+    
+    const reports = docs.map((doc) => {
+      const data = doc.data() || {};
+      return {
+        id: doc.id,
+        name: data.name || data.type || 'Reporte sin nombre',
+        cadence: data.cadence || data.frequency || 'Manual',
+        recipients: Array.isArray(data.recipients) ? data.recipients : [],
+        format: data.format || 'PDF',
+        status: data.status || 'Completado',
+        lastGenerated: formatDateTime(data.lastGenerated) || formatDateTime(data.createdAt),
+        createdAt: formatDateTime(data.createdAt),
+      };
+    });
+    
+    res.json(reports);
+  } catch (error) {
+    logger.error('[admin-dashboard] reports GET error', error);
+    res.status(500).json({ error: 'admin_reports_failed' });
+  }
+});
+
+// GET /settings - Obtener configuraciones (feature flags, secrets, templates)
+router.get('/settings', async (_req, res) => {
+  try {
+    const [flagsDocs, secretsDocs, templatesDocs] = await Promise.all([
+      getCollectionDocs('featureFlags', { limit: 100 }),
+      getCollectionDocs('secrets', { limit: 50 }),
+      getCollectionDocs('templates', { limit: 50 }),
+    ]);
+    
+    const flags = flagsDocs.map((doc) => {
+      const data = doc.data() || {};
+      return {
+        id: doc.id,
+        name: data.name || doc.id,
+        enabled: Boolean(data.enabled),
+        description: data.description || '',
+        lastModifiedBy: data.lastModifiedBy || null,
+        lastModifiedAt: formatDateTime(data.lastModifiedAt),
+      };
+    });
+    
+    const secrets = secretsDocs.map((doc) => {
+      const data = doc.data() || {};
+      return {
+        id: doc.id,
+        name: data.name || doc.id,
+        lastRotatedAt: formatDateTime(data.lastRotatedAt),
+        rotatedBy: data.rotatedBy || null,
+      };
+    });
+    
+    const templates = templatesDocs.map((doc) => {
+      const data = doc.data() || {};
+      return {
+        id: doc.id,
+        name: data.name || doc.id,
+        content: data.content || '',
+        updatedAt: formatDateTime(data.updatedAt),
+      };
+    });
+    
+    res.json({
+      flags,
+      secrets,
+      templates,
+    });
+  } catch (error) {
+    logger.error('[admin-dashboard] settings GET error', error);
+    res.status(500).json({ error: 'admin_settings_failed' });
   }
 });
 
