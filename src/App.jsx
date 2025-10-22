@@ -57,6 +57,7 @@ import MarketingPricing from './pages/marketing/Pricing.jsx';
 import MarketingAccess from './pages/marketing/Access.jsx';
 import PaymentSuccess from './pages/payment/PaymentSuccess.jsx';
 import PaymentCancel from './pages/payment/PaymentCancel.jsx';
+import SubscriptionDashboard from './pages/SubscriptionDashboard.jsx';
 // Nota: especificamos la extensi€)n .jsx para asegurar la resoluci€)n en entornos Linux/CI
 const Invitados = React.lazy(() => import('./pages/Invitados'));
 // Lazy load de páginas pesadas para reducir bundle inicial
@@ -308,6 +309,7 @@ function App() {
                   <Route path="rsvp/dashboard" element={<RSVPDashboard />} />
                   <Route path="proveedores" element={<GestionProveedores />} />
                   <Route path="proveedores/contratos" element={<Contratos />} />
+                  <Route path="subscription" element={<SubscriptionDashboard />} />
 
                   {/* Protocolo */}
                   <Route path="protocolo" element={<ProtocoloLayout />}>
