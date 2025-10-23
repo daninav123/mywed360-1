@@ -1,4 +1,4 @@
-﻿import { motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Star } from 'lucide-react';
 import { MessageSquare } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 import Spinner from './Spinner';
 import { useAuth } from '../hooks/useAuth';
 import { useWedding } from '../context/WeddingContext';
+import useTranslations from '../hooks/useTranslations';
 import {
   EVENT_STYLE_OPTIONS,
   GUEST_COUNT_OPTIONS,
@@ -51,6 +52,7 @@ const guessCategory = (title = '') => {
 export default function ChatWidget() {
   if (IS_CYPRESS_E2E) return null;
 
+  const { t, tVars, tPlural } = useTranslations();
   const { user: _user, getIdToken } = useAuth();
   const { activeWeddingData } = useWedding();
   const [open, setOpen] = useState(() => {
@@ -111,7 +113,7 @@ export default function ChatWidget() {
           notes.push({ text: copy[idx].text, date: Date.now() });
           localStorage.setItem('importantNotes', JSON.stringify(notes));
           window.dispatchEvent(new Event('mywed360-important-note'));
-          toast.success('Nota marcada como importante');
+          toast.success(t('chat.noteMarked'));
         } catch {
           /* ignore */
         }
@@ -144,7 +146,7 @@ export default function ChatWidget() {
     const toSummarize = arr.slice(0, excess);
     const rest = arr.slice(excess);
     const summaryPart = toSummarize
-      .map((m) => `${m.from === 'user' ? 'Usuario' : 'IA'}: ${m.text}`)
+      .map((m) => `${m.from === 'user' ? t('chat.messages.user') : t('chat.messages.assistant')}: ${m.text}`)
       .join('\n');
     setSummary((prev) => (prev ? `${prev}\n${summaryPart}` : summaryPart));
     return rest;
@@ -214,51 +216,51 @@ export default function ChatWidget() {
     const lower = String(text || '').toLowerCase();
     const fallback = { extracted: {}, reply: '' };
     const baseKind =
-      context?.eventType && context.eventType !== 'boda' ? 'evento' : 'boda';
+      context?.eventType && context.eventType !== 'boda' ? t('chat.defaults.event') : t('chat.defaults.wedding');
     const styleLabel = context?.styleLabel || context?.style || '';
     const descriptorParts = [];
     if (styleLabel) descriptorParts.push(`de estilo ${styleLabel}`);
     if (context?.location) descriptorParts.push(`en ${context.location}`);
     const descriptor = descriptorParts.length ? ` ${descriptorParts.join(' ')}` : '';
     const subject = `tu ${baseKind}${descriptor}`.trim();
-    const subjectDisplay = subject || 'tu planificación';
+    const subjectDisplay = subject || t('chat.defaults.yourPlanning');
 
     if (!lower.trim()) {
-      fallback.reply = `Puedo orientarte con tareas, invitados, presupuesto o proveedores para ${subjectDisplay}. Cuéntame qué necesitas.`;
+      fallback.reply = tVars('chat.messages.emptyPrompt', { subject: subjectDisplay });
       return fallback;
     }
 
     if (/\b(hola|buen[oa]s|saludos)\b/i.test(lower)) {
-      fallback.reply = `¡Hola! Estoy en modo offline temporal, pero puedo guiarte por las secciones de la app para que sigas avanzando con ${subjectDisplay}.`;
+      fallback.reply = tVars('chat.messages.greeting', { subject: subjectDisplay });
       return fallback;
     }
 
     if (lower.includes('proveedor') || lower.includes('fotogra') || lower.includes('catering')) {
-      fallback.reply = `Gestiona proveedores para ${subjectDisplay} desde la sección Proveedores: añade fichas, marca favoritos y compara presupuestos. ¿Quieres que te indique los pasos?`;
+      fallback.reply = tVars('chat.guides.suppliers', { subject: subjectDisplay });
       return fallback;
     }
 
     if (lower.includes('presupuesto') || lower.includes('gasto') || lower.includes('dinero')) {
-      fallback.reply = `El panel de Finanzas te permite registrar gastos e ingresos y ver alertas si superas tu presupuesto de ${subjectDisplay}. Abre Finanzas y pulsa "Añadir movimiento".`;
+      fallback.reply = tVars('chat.guides.finance', { subject: subjectDisplay });
       return fallback;
     }
 
     if (lower.includes('invitad') || lower.includes('rsvp')) {
-      fallback.reply = `Desde Invitados puedes importar listas, registrar confirmaciones y organizar acompañantes para ${subjectDisplay}. También puedes enviar recordatorios por email.`;
+      fallback.reply = tVars('chat.guides.guests', { subject: subjectDisplay });
       return fallback;
     }
 
     if (lower.includes('mesa') || lower.includes('seating')) {
-      fallback.reply = `Organiza las mesas de ${subjectDisplay} desde Seating Plan: arrastra invitados, detecta huecos y exporta el plano en PDF para tus proveedores.`;
+      fallback.reply = tVars('chat.guides.seating', { subject: subjectDisplay });
       return fallback;
     }
 
     if (lower.includes('tarea') || lower.includes('pendiente')) {
-      fallback.reply = `El panel de Tareas te permite marcar pendientes, crear recordatorios y coordinarlos con el timeline de ${subjectDisplay}. Revisa la pestaña de tareas para mantener todo al día.`;
+      fallback.reply = tVars('chat.guides.tasks', { subject: subjectDisplay });
       return fallback;
     }
 
-    fallback.reply = `El asistente remoto no responde, pero sigo disponible en modo guía. Pregúntame por tareas, invitados, presupuesto o proveedores y te indicaré dónde gestionarlo para ${subjectDisplay}.`;
+    fallback.reply = tVars('chat.messages.offlineMode', { subject: subjectDisplay });
     return fallback;
   };
 
@@ -286,8 +288,8 @@ export default function ChatWidget() {
             const endDate = payload.end ? new Date(payload.end) : startDate;
             meetings.push({
               id: newId,
-              title: payload.title || payload.name || (entity === 'task' ? 'Tarea' : 'Reunión'),
-              name: payload.title || payload.name || (entity === 'task' ? 'Tarea' : 'Reunión'),
+              title: payload.title || payload.name || (entity === 'task' ? t('chat.defaults.task') : t('chat.defaults.meeting')),
+              name: payload.title || payload.name || (entity === 'task' ? t('chat.defaults.task') : t('chat.defaults.meeting')),
               desc: payload.desc || '',
               start: startDate.toISOString(),
               end: endDate.toISOString(),
@@ -300,8 +302,8 @@ export default function ChatWidget() {
             try {
               const base = {
                 id: newId,
-                title: payload.title || payload.name || (entity === 'task' ? 'Tarea' : 'Reunión'),
-                name: payload.title || payload.name || (entity === 'task' ? 'Tarea' : 'Reunión'),
+                title: payload.title || payload.name || (entity === 'task' ? t('chat.defaults.task') : t('chat.defaults.meeting')),
+                name: payload.title || payload.name || (entity === 'task' ? t('chat.defaults.task') : t('chat.defaults.meeting')),
                 desc: payload.desc || '',
                 start: startDate,
                 end: endDate,
@@ -313,7 +315,7 @@ export default function ChatWidget() {
               const detail = entity === 'meeting' ? { meeting: base } : { task: base };
               window.dispatchEvent(new CustomEvent('mywed360-tasks', { detail }));
             } catch (_) {}
-            toast.success(entity === 'task' ? 'Tarea añadida' : 'Reunión añadida');
+            toast.success(entity === 'task' ? t('chat.commands.taskAdded') : t('chat.commands.meetingAdded'));
             changed = true;
             break;
           }
@@ -329,7 +331,7 @@ export default function ChatWidget() {
                 meetings[idx].start = meetings[idx].start.toISOString();
               if (meetings[idx].end instanceof Date)
                 meetings[idx].end = meetings[idx].end.toISOString();
-              toast.success('Tarea actualizada');
+              toast.success(t('chat.commands.taskUpdated'));
               // Bridge: update en Firestore
               try {
                 const base = {
@@ -355,7 +357,7 @@ export default function ChatWidget() {
                 !(m.id === payload.id || m.title?.toLowerCase() === payload.title?.toLowerCase())
             );
             if (meetings.length < before) {
-              toast.success('Tarea eliminada');
+              toast.success(t('chat.commands.taskDeleted'));
               // Bridge: delete en Firestore
               try {
                 const base = { id: payload.id || null, title: payload.title || '' };
@@ -372,7 +374,7 @@ export default function ChatWidget() {
             const idx = findTaskIndex(payload.id || payload.title);
             if (idx !== -1) {
               completed[meetings[idx].id] = true;
-              toast.success('Tarea marcada como completada');
+              toast.success(t('chat.commands.taskCompleted'));
               // Bridge: complete en Firestore (tasksCompleted)
               try {
                 const base = { id: meetings[idx].id, title: meetings[idx].title };
@@ -400,12 +402,12 @@ export default function ChatWidget() {
             const newId = payload.id || `guest-${Date.now()}`;
             const guestObj = {
               id: newId,
-              name: payload.name || 'Invitado',
+              name: payload.name || t('chat.defaults.guest'),
               phone: payload.phone || '',
               address: payload.address || '',
               companion: payload.companion ?? payload.companions ?? 0,
               table: payload.table || '',
-              response: payload.response || 'Pendiente',
+              response: payload.response || t('chat.defaults.pending'),
             };
             guests.push(guestObj);
             // Intentar persistir a Firestore vía puente de eventos
@@ -414,7 +416,7 @@ export default function ChatWidget() {
                 new CustomEvent('mywed360-guests', { detail: { guest: { ...guestObj } } })
               );
             } catch (_) {}
-            toast.success('Invitado añadido');
+            toast.success(t('chat.commands.guestAdded'));
             changedG = true;
             break;
           }
@@ -425,7 +427,7 @@ export default function ChatWidget() {
             const idx = findGuestIdx(payload.id || payload.name);
             if (idx !== -1) {
               guests[idx] = { ...guests[idx], ...payload };
-              toast.success('Invitado actualizado');
+              toast.success(t('chat.commands.guestUpdated'));
               // Bridge: update invitado
               try {
                 window.dispatchEvent(
@@ -443,7 +445,7 @@ export default function ChatWidget() {
               (g) => !(g.id === payload.id || g.name?.toLowerCase() === payload.name?.toLowerCase())
             );
             if (guests.length < before) {
-              toast.success('Invitado eliminado');
+              toast.success(t('chat.commands.guestDeleted'));
               // Bridge: delete invitado
               try {
                 window.dispatchEvent(
@@ -480,7 +482,7 @@ export default function ChatWidget() {
             const newId = payload.id || `mov-${Date.now()}`;
             const mov = {
               id: newId,
-              name: payload.concept || payload.name || 'Movimiento',
+              name: payload.concept || payload.name || t('chat.defaults.movement'),
               amount: Number(payload.amount) || 0,
               date: payload.date || new Date().toISOString().slice(0, 10),
               type: payload.type === 'income' ? 'income' : 'expense',
@@ -492,7 +494,7 @@ export default function ChatWidget() {
                 new CustomEvent('mywed360-finance', { detail: { movement: { ...mov }, action: 'add' } })
               );
             } catch (_) {}
-            toast.success('Movimiento añadido');
+            toast.success(t('chat.commands.movementAdded'));
             changedM = true;
             break;
           }
@@ -503,7 +505,7 @@ export default function ChatWidget() {
             const idx = findMovIdx(payload.id || payload.concept || payload.name);
             if (idx !== -1) {
               movements[idx] = { ...movements[idx], ...payload };
-              toast.success('Movimiento actualizado');
+              toast.success(t('chat.commands.movementUpdated'));
               // Persistir vía puente de finanzas
               try {
                 window.dispatchEvent(
@@ -527,7 +529,7 @@ export default function ChatWidget() {
                 )
             );
             if (movements.length < before) {
-              toast.success('Movimiento eliminado');
+              toast.success(t('chat.commands.movementDeleted'));
               // Persistir vía puente de finanzas (delete)
               try {
                 window.dispatchEvent(
@@ -568,25 +570,25 @@ export default function ChatWidget() {
       if (Array.isArray(dataS.results) && dataS.results.length) {
         localStorage.setItem('mywed360Suppliers', JSON.stringify(dataS.results));
         window.dispatchEvent(new Event('mywed360-suppliers'));
-        toast.success(`Encontrados ${dataS.results.length} proveedores`);
+        toast.success(tVars('chat.commands.suppliersFound', { count: dataS.results.length }));
       } else {
-        toast.info('No se encontraron proveedores');
+        toast.info(t('chat.commands.suppliersNotFound'));
       }
     } catch (err) {
-      toast.error('Error buscando proveedores');
+      toast.error(t('chat.commands.suppliersSearchError'));
     }
           }
         } else if (action === 'add') {
           const newId = payload.id || `sup-${Date.now()}`;
           const supplier = {
             id: newId,
-            name: payload.name || payload.title || payload.provider || 'Proveedor',
+            name: payload.name || payload.title || payload.provider || t('chat.defaults.supplier'),
             service: payload.service || payload.category || '',
             contact: payload.contact || '',
             email: payload.email || '',
             phone: payload.phone || '',
             link: payload.link || payload.website || payload.url || '',
-            status: payload.status || 'Nuevo',
+            status: payload.status || t('common.status.new'),
             snippet: payload.snippet || payload.desc || '',
           };
           try {
@@ -599,7 +601,7 @@ export default function ChatWidget() {
               new CustomEvent('mywed360-suppliers', { detail: { supplier: { ...supplier }, action: 'add' } })
             );
           } catch {}
-          toast.success('Proveedor añadido');
+          toast.success(t('chat.commands.supplierAdded'));
         } else if (action === 'update' || action === 'edit' || action === 'editar' || action === 'modificar') {
           try {
             const stored = JSON.parse(localStorage.getItem('mywed360Suppliers') || '[]');
@@ -621,7 +623,7 @@ export default function ChatWidget() {
                   })
                 );
               } catch {}
-              toast.success('Proveedor actualizado');
+              toast.success(t('chat.commands.supplierUpdated'));
             }
           } catch {}
         } else if (action === 'delete' || action === 'remove') {
@@ -643,7 +645,7 @@ export default function ChatWidget() {
                   })
                 );
               } catch {}
-              toast.success('Proveedor eliminado');
+              toast.success(t('chat.commands.supplierDeleted'));
             }
           } catch {}
         }
@@ -660,7 +662,7 @@ export default function ChatWidget() {
         );
         if (idx !== -1 && payload.table) {
           guests[idx].table = payload.table;
-          toast.success(`Invitado movido a mesa ${payload.table}`);
+          toast.success(tVars('chat.commands.guestMoved', { table: payload.table }));
           changedT = true;
           // Bridge: update mesa
           try {
@@ -690,7 +692,7 @@ export default function ChatWidget() {
         Object.assign(profile, payload.root || {});
         localStorage.setItem('mywed360Profile', JSON.stringify(profile));
         window.dispatchEvent(new Event('mywed360-profile'));
-        toast.success('Configuración actualizada');
+        toast.success(t('chat.commands.configUpdated'));
       }
     });
 
@@ -714,7 +716,7 @@ export default function ChatWidget() {
       const local = parseLocalCommands(input);
       if (local && local.commands && local.commands.length) {
         await applyCommands(local.commands);
-        const botMsg = { from: 'bot', text: local.reply || 'He aplicado los cambios.' };
+        const botMsg = { from: 'bot', text: local.reply || t('chat.messages.changesApplied') };
         setMessages((prev) => compactMessages([...prev, botMsg]));
         setLoading(false);
         return;
@@ -726,7 +728,7 @@ export default function ChatWidget() {
 
       const endpoint = `${apiBase.replace(/\/$/, '')}/api/ai/parse-dialog`;
       chatDebug('Llamando a la API IA en:', endpoint);
-      toast.info('Conectando con IA...', { autoClose: 2000 });
+      toast.info(t('chat.connecting'), { autoClose: 2000 });
       const fetchStart = performance.now();
 
       const recent = currentMsgs
@@ -739,13 +741,13 @@ export default function ChatWidget() {
       timeoutId = setTimeout(() => {
         controller.abort();
         console.error('Timeout en la llamada a la API de IA');
-        toast.error('La IA está tardando demasiado. Reintentando con respuesta local...');
+        toast.error(t('chat.errors.timeout') + '. Reintentando con respuesta local...');
       }, 30000); // 30 segundos máximo para mejor UX
 
       // Obtener token de autenticación usando el sistema unificado
       const token = getIdToken ? await getIdToken() : null;
       if (!token) {
-        throw new Error('No se pudo generar el token de autenticación');
+        throw new Error(t('chat.errors.noToken'));
       }
 
       const response = await apiPost(
@@ -778,7 +780,7 @@ export default function ChatWidget() {
           response.statusText,
           data.error || '(sin detalle)'
         );
-        toast.warn('El asistente IA usa modo offline temporal.', { autoClose: 2500 });
+        toast.warn(t('chat.messages.offlineTemporary'), { autoClose: 2500 });
       }
 
       // Flag para registrar si se aplicó al menos una acción
@@ -810,9 +812,7 @@ export default function ChatWidget() {
         const updated = [...stored, ...mapped];
         localStorage.setItem('mywed360Guests', JSON.stringify(updated));
         window.dispatchEvent(new Event('mywed360-guests'));
-        toast.success(
-          `${mapped.length} invitado${mapped.length > 1 ? 's' : ''} añadido${mapped.length > 1 ? 's' : ''}`
-        );
+        toast.success(tPlural('chat.plurals.guestsAdded', mapped.length));
       }
 
       // --- Persistir tareas extraídas ---
@@ -845,9 +845,7 @@ export default function ChatWidget() {
             window.dispatchEvent(new CustomEvent('mywed360-tasks', { detail: { task } }))
           );
         } catch (_) {}
-        toast.success(
-          `${mappedT.length} tarea${mappedT.length > 1 ? 's' : ''} añadida${mappedT.length > 1 ? 's' : ''}`
-        );
+        toast.success(tPlural('chat.plurals.tasksAdded', mappedT.length));
       }
 
       // --- Persistir reuniones extraídas ---
@@ -880,9 +878,7 @@ export default function ChatWidget() {
             window.dispatchEvent(new CustomEvent('mywed360-tasks', { detail: { meeting } }))
           );
         } catch (_) {}
-        toast.success(
-          `${mappedR.length} reunión${mappedR.length > 1 ? 'es' : ''} añadida${mappedR.length > 1 ? 's' : ''}`
-        );
+        toast.success(tPlural('chat.plurals.meetingsAdded', mappedR.length));
       }
 
       // --- Persistir movimientos extraídos ---
@@ -908,9 +904,7 @@ export default function ChatWidget() {
             )
           );
         } catch (_) {}
-        toast.success(
-          `${mappedMov.length} movimiento${mappedMov.length > 1 ? 's' : ''} añadido${mappedMov.length > 1 ? 's' : ''}`
-        );
+        toast.success(tPlural('chat.plurals.movementsAdded', mappedMov.length));
       }
       let text;
       // Manejar respuesta del backend (exitosa o con error)
@@ -920,12 +914,12 @@ export default function ChatWidget() {
       } else if (data.reply) {
         text = data.reply;
       } else if (data.extracted && Object.keys(data.extracted).length) {
-        text = 'Datos extraídos:\n' + JSON.stringify(data.extracted, null, 2);
+        text = t('chat.messages.dataExtracted') + ':\n' + JSON.stringify(data.extracted, null, 2);
       } else if (data.error) {
         text = 'Error: ' + data.error;
         console.error('Backend AI error:', data.error, data.details);
       } else {
-        text = 'No se detectaron datos para extraer. ¿Puedes darme más detalles?';
+        text = t('chat.messages.noDataExtracted');
       }
       const botMsg = { from: 'bot', text };
       setMessages((prev) => compactMessages([...prev, botMsg]));
@@ -941,20 +935,20 @@ export default function ChatWidget() {
         console.error('Timeout en la llamada a la API de IA:', error.message);
         errMsg = {
           from: 'assistant',
-          text: 'Parece que hay problemas de conexión con el servidor. Puedo ayudarte con consultas básicas sobre tu boda mientras se restablece la conexión. ¿Qué deseas saber?',
+          text: t('chat.messages.connectionIssue'),
         };
-        toast.error('Tiempo de espera agotado', { autoClose: 3000 });
+        toast.error(t('chat.errors.timeout'), { autoClose: 3000 });
       } else if (error.message.includes('fetch') || error.message.includes('network')) {
         console.error('Error de red en la llamada a la API de IA:', error.message);
         errMsg = {
           from: 'system',
-          text: `No se pudo conectar con el servidor de IA. Por favor, verifica tu conexión y vuelve a intentarlo.`,
+          text: t('chat.messages.connectionError'),
         };
-        toast.error('Error de conexión', { autoClose: 3000 });
+        toast.error(t('chat.errors.connection'), { autoClose: 3000 });
       } else {
         console.error('Error genérico en la API de IA:', error.message);
-        errMsg = { from: 'system', text: `Ha ocurrido un error: ${error.message}` };
-        toast.error('Error en la comunicación', { autoClose: 3000 });
+        errMsg = { from: 'system', text: tVars('chat.messages.genericError', { error: error.message }) };
+        toast.error(t('chat.errors.communication'), { autoClose: 3000 });
       }
 
       const fallback = buildLocalFallbackResponse(input, eventContext);
@@ -975,7 +969,7 @@ export default function ChatWidget() {
       {open && (
         <div className="fixed bottom-20 right-6 w-80 h-96 bg-white shadow-lg rounded-lg flex flex-col overflow-hidden z-50">
           <div className="bg-blue-600 text-white p-2 flex items-center">
-            <MessageSquare className="mr-2" /> Chat IA
+            <MessageSquare className="mr-2" /> {t('chat.title')}
           </div>
           <div className="flex-1 p-2 overflow-y-auto relative">
             {loading && (
@@ -989,7 +983,7 @@ export default function ChatWidget() {
                 <button
                   onClick={() => toggleImportant(i)}
                   className="align-middle"
-                  title={m.important ? 'Marcado como importante' : 'Marcar como importante'}
+                  title={m.important ? t('chat.markedImportant') : t('chat.markImportant')}
                 >
                   <Star
                     size={16}
@@ -1001,7 +995,7 @@ export default function ChatWidget() {
           </div>
           <div className="p-2 flex">
             <input
-              aria-label="Mensaje de chat"
+              aria-label={t('chat.sendMessage')}
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -1012,22 +1006,22 @@ export default function ChatWidget() {
                 }
               }}
               className="flex-1 border rounded px-2 py-1"
-              placeholder="Escribe..."
+              placeholder={t('chat.messagePlaceholder')}
             />
             <motion.button
               onClick={sendMessage}
-              aria-label="Enviar mensaje"
+              aria-label={t('chat.sendMessage')}
               className="ml-2 bg-blue-600 text-white px-3 rounded"
               disabled={loading}
             >
-              Enviar
+              {t('chat.send')}
             </motion.button>
           </div>
         </div>
       )}
       <motion.button
         onClick={() => setOpen(!open)}
-        aria-label={open ? 'Cerrar chat' : 'Abrir chat'}
+        aria-label={open ? t('chat.close') : t('chat.open')}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
         className="fixed bottom-6 right-6 bg-blue-600 text-white p-4 rounded-full shadow-lg z-50"

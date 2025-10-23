@@ -343,7 +343,8 @@ docs/i18n/EJEMPLO-MIGRACION-CHATWIDGET.md  (este archivo)
 
 ---
 
-**Estado:** DEMO COMPLETADA ✅  
-**Nivel de implementación:** 40% (15/37 strings)  
+**Estado:** MIGRACIÓN COMPLETA ✅  
+**Nivel de implementación:** 100% (37/37 strings migrados)  
 **Patrón de migración:** DEMOSTRADO ✅  
-**Siguientes componentes:** SeatingPlanRefactored, TasksRefactored
+**Namespace:** `chat.json` (86 claves ES + EN)  
+**Siguientes componentes:** SeatingPlanRefactored (27 strings), TasksRefactored (18 strings)
