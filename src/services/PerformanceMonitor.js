@@ -2,6 +2,9 @@ import { useEffect } from "react";
 
 import { post as apiPost } from './apiClient';
 
+// Guardar referencia al console.error original antes de que sea interceptado
+const originalConsoleError = console.error;
+
 // Detectar entorno de tests para evitar timers que mantengan vivo el proceso
 const IS_TEST = (
   (typeof globalThis !== 'undefined' && (globalThis.vi || globalThis.vitest || globalThis.jest)) ||
@@ -187,8 +190,10 @@ class PerformanceMonitor {
 
     this.metrics.errors.push(errorData);
 
-    // Siempre registrar errores en la consola
-    console.error(`❌ Error en ${errorType}:`, error);
+    // Siempre registrar errores en la consola usando el original para evitar recursión
+    if (typeof originalConsoleError === 'function') {
+      originalConsoleError(`❌ Error en ${errorType}:`, error);
+    }
 
     // Enviar inmediatamente si es un error crítico
     if (errorType === 'critical') {

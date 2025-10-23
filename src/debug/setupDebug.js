@@ -35,9 +35,15 @@ function triggerViteHardReload() {
 
 // Maneja errores de ventana (JS runtime)
 if (typeof window !== 'undefined') {
+  let isHandlingError = false;
+
   window.addEventListener(
     'error',
     (event) => {
+      // Prevenir recursión
+      if (isHandlingError) return;
+      isHandlingError = true;
+
       try {
         const errorMsg = event.error || event.message || 'Unknown error';
         performanceMonitor.logError('window_error', errorMsg, {
@@ -46,8 +52,14 @@ if (typeof window !== 'undefined') {
           colno: event.colno,
         });
       } catch (e) {
-        console.error('Error al registrar window_error', e);
+        // NO usar console.error para evitar recursión
+        if (typeof console.warn === 'function') {
+          console.warn('[setupDebug] Error al registrar window_error', e);
+        }
+      } finally {
+        isHandlingError = false;
       }
+
       if (isViteOutdatedOptimizeError(event)) {
         triggerViteHardReload();
       }
@@ -56,12 +68,24 @@ if (typeof window !== 'undefined') {
   );
 
   // Maneja rechazos de promesas no capturados
+  let isHandlingRejection = false;
+  
   window.addEventListener('unhandledrejection', (event) => {
+    // Prevenir recursión
+    if (isHandlingRejection) return;
+    isHandlingRejection = true;
+
     try {
       performanceMonitor.logError('unhandled_promise_rejection', event.reason);
     } catch (e) {
-      console.error('Error al registrar unhandledrejection', e);
+      // NO usar console.error para evitar recursión
+      if (typeof console.warn === 'function') {
+        console.warn('[setupDebug] Error al registrar unhandledrejection', e);
+      }
+    } finally {
+      isHandlingRejection = false;
     }
+
     if (isViteOutdatedOptimizeError(event)) {
       triggerViteHardReload();
     }
