@@ -20,11 +20,36 @@
       "square": "Cuadrada"
     },
     "messages": {
-      "created": "Mesa creada correctamente",
-      "updated": "Mesa actualizada correctamente",
-      "deleted": "Mesa eliminada correctamente",
-      "assigned": "Invitados asignados correctamente",
-      "error": "Error al procesar la mesa"
+      "created": "Table created successfully",
+      "updated": "Table updated successfully",
+      "deleted": "Table deleted successfully",
+      "assigned": "Guests assigned successfully",
+      "error": "Error processing table",
+      "saved": "Saved",
+      "loading": "Loading...",
+      "noGuests": "No guests",
+      "selectTable": "Select table",
+      "unassigned": "Unassigned",
+      "ceremony": "Ceremony",
+      "banquet": "Banquet",
+      "total": "Total",
+      "assigned_one": "{{count}} assigned",
+      "assigned_other": "{{count}} assigned",
+      "capacity_full": "Full",
+      "capacity_available": "{{available}} available",
+      "dragHint": "Drag guests here",
+      "autoAssignSuccess": "Auto-assignment completed",
+      "conflictDetected": "Conflict detected",
+      "validationError": "Validation error"
+    },
+    "toolbar": {
+      "save": "Save",
+      "undo": "Undo",
+      "redo": "Redo",
+      "zoom": "Zoom",
+      "export": "Export",
+      "print": "Print",
+      "settings": "Settings"
     }
   },
   "_note": "Translate from es/seating.json"

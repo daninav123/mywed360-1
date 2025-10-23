@@ -29,10 +29,32 @@
       "tags": "Etiquetas"
     },
     "messages": {
-      "created": "Tarea creada correctamente",
-      "updated": "Tarea actualizada correctamente",
-      "deleted": "Tarea eliminada correctamente",
-      "error": "Error al procesar la tarea"
+      "created": "Task created successfully",
+      "updated": "Task updated successfully",
+      "deleted": "Task deleted successfully",
+      "error": "Error processing task",
+      "completed": "Task completed",
+      "assigned": "Task assigned",
+      "overdue": "Task overdue",
+      "dueToday": "Due today",
+      "dueTomorrow": "Due tomorrow",
+      "noDueDate": "No due date"
+    },
+    "filters": {
+      "all": "All",
+      "active": "Active",
+      "completed": "Completed",
+      "overdue": "Overdue",
+      "today": "Today",
+      "thisWeek": "This week",
+      "thisMonth": "This month"
+    },
+    "calendar": {
+      "month": "Month",
+      "week": "Week",
+      "day": "Day",
+      "list": "List",
+      "today": "Today"
     }
   },
   "_note": "Translate from es/tasks.json"
