@@ -1,4 +1,4 @@
-﻿import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { Users, X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 
 import { Card, Button, Input } from '../components/ui';
 import LanguageSelector from '../components/ui/LanguageSelector';
+import SubscriptionWidget from '../components/subscription/SubscriptionWidget';
 import { useWedding } from '../context/WeddingContext';
 import { auth, db } from '../firebaseConfig';
 import { useAuth } from '../hooks/useAuth';
@@ -278,40 +279,13 @@ function Perfil() {
           </div>
         )}
       </div>
-      <Card className="space-y-4">
+      {/* Suscripción Real con Stripe */}
+      <div className="space-y-4">
         <h2 className="text-lg font-medium">
           {t('profile.subscription.type', { defaultValue: 'Tipo de suscripción' })}
         </h2>
-        <div className="flex flex-wrap gap-3">
-          <Button
-            data-testid="subscription-tier-free"
-            data-active={subscription === 'free'}
-            aria-pressed={subscription === 'free'}
-            variant={subscription === 'free' ? 'primary' : 'outline'}
-            onClick={() => setSubscription('free')}
-          >
-            {t('profile.subscription.free', { defaultValue: 'Gratis' })}
-          </Button>
-          <Button
-            data-testid="subscription-tier-premium"
-            data-active={subscription === 'premium'}
-            aria-pressed={subscription === 'premium'}
-            variant={subscription === 'premium' ? 'primary' : 'outline'}
-            onClick={() => setSubscription('premium')}
-          >
-            {t('profile.subscription.premium', { defaultValue: 'Premium' })}
-          </Button>
-          <Button
-            data-testid="subscription-tier-premium-plus"
-            data-active={subscription === 'premium_plus'}
-            aria-pressed={subscription === 'premium_plus'}
-            variant={subscription === 'premium_plus' ? 'primary' : 'outline'}
-            onClick={() => setSubscription('premium_plus')}
-          >
-            {t('profile.subscription.premiumPlus', { defaultValue: 'Premium Plus' })}
-          </Button>
-        </div>
-      </Card>
+        <SubscriptionWidget />
+      </div>
 
 
       <Card className="space-y-4">

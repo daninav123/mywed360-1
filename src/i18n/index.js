@@ -10,6 +10,7 @@ import esSeating from './locales/es/seating.json';
 import esEmail from './locales/es/email.json';
 import esAdmin from './locales/es/admin.json';
 import esMarketing from './locales/es/marketing.json';
+import esChat from './locales/es/chat.json';
 import esMxCommon from './locales/es-MX/common.json';
 import esArCommon from './locales/es-AR/common.json';
 
@@ -27,7 +28,8 @@ const SPANISH_BUNDLE = {
   seating: esSeating,
   email: esEmail,
   admin: esAdmin,
-  marketing: esMarketing
+  marketing: esMarketing,
+  chat: esChat
 };
 
 const resources = {
@@ -37,6 +39,7 @@ const resources = {
     email: esEmail,
     admin: esAdmin,
     marketing: esMarketing,
+    chat: esChat,
   }),
   es: SPANISH_BUNDLE,
   'es-MX': createResource(esMxCommon || esCommon, esFinance, {
@@ -45,6 +48,7 @@ const resources = {
     email: esEmail,
     admin: esAdmin,
     marketing: esMarketing,
+    chat: esChat,
   }),
   'es-AR': createResource(esArCommon || esCommon, esFinance, {
     tasks: esTasks,
@@ -52,6 +56,7 @@ const resources = {
     email: esEmail,
     admin: esAdmin,
     marketing: esMarketing,
+    chat: esChat,
   }),
 };
 
@@ -64,6 +69,7 @@ function createResource(commonBundle, financeBundle, fallbackBundles = {}) {
     email: fallbackBundles.email ?? {},
     admin: fallbackBundles.admin ?? {},
     marketing: fallbackBundles.marketing ?? {},
+    chat: fallbackBundles.chat ?? {},
   };
 }
 
@@ -83,7 +89,7 @@ i18n
       lookupLocalStorage: 'i18nextLng',
     },
     defaultNS: 'common',
-    ns: ['common', 'finance', 'tasks', 'seating', 'email', 'admin', 'marketing'],
+    ns: ['common', 'finance', 'tasks', 'seating', 'email', 'admin', 'marketing', 'chat'],
     fallbackNS: ['common'],
     interpolation: { escapeValue: false },
     react: { useSuspense: false },
