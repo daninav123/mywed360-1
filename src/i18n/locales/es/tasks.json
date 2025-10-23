@@ -55,6 +55,19 @@
       "day": "Día",
       "list": "Lista",
       "today": "Hoy"
-    }
+    },
+    "templates": {
+      "confirmMenu": "Confirmar menú final con catering",
+      "reviewDecoration": "Revisar decoración floral",
+      "confirmPlaylist": "Confirmar playlist con DJ",
+      "coordinatePhotographer": "Coordinar horarios con fotógrafo",
+      "verifyTransport": "Verificar transporte para invitados",
+      "confirmSeating": "Confirmar asientos para ceremonia",
+      "reviewTableSetup": "Revisar montaje de mesas",
+      "soundCheck": "Prueba de sonido",
+      "confirmKidsMenu": "Confirmar menú infantil",
+      "prepareEmergencyKit": "Preparar kit de emergencia"
+    },
+    "confirmDelete": "¿Eliminar esta tarea?"
   }
 }

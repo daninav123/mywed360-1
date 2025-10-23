@@ -1424,6 +1424,8 @@
     "nameRequired": "El nombre es obligatorio",
     "serviceRequired": "El servicio es obligatorio",
     "emailInvalid": "Email inválido",
-    "linkMustStartHttp": "El enlace debe comenzar con http:// o https://"
-  }
+    "linkMustStartHttp": "El enlace debe comenzar con http:// o https://",
+    "titleRequired": "El título es obligatorio"
+  },
+  "general": "General"
 }

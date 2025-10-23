@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { CheckSquare, Square, Calendar, User, AlertCircle, Filter, Search, Plus, Trash2 } from 'lucide-react';
 import Button from '../ui/Button';
+import useTranslations from '../../hooks/useTranslations';
 
 /**
  * Checklist maestro para gestión de tareas del evento
  */
 const MasterChecklist = ({ weddingId, onUpdate }) => {
+  const { t } = useTranslations();
   const [checklist, setChecklist] = useState([]);
   const [filter, setFilter] = useState('all'); // all, pending, completed, urgent
   const [searchQuery, setSearchQuery] = useState('');
@@ -21,28 +23,28 @@ const MasterChecklist = ({ weddingId, onUpdate }) => {
 
   // Categorías predefinidas
   const categories = {
-    ceremony: 'Ceremonia',
-    reception: 'Recepción',
-    catering: 'Catering',
-    decoration: 'Decoración',
-    music: 'Música',
-    photography: 'Fotografía',
-    transport: 'Transporte',
-    general: 'General'
+    ceremony: t('common.categories.ceremony'),
+    reception: t('common.categories.reception'),
+    catering: t('common.services.catering'),
+    decoration: t('common.services.decoration'),
+    music: t('common.services.music'),
+    photography: t('common.services.photography'),
+    transport: t('common.services.transport'),
+    general: t('common.general')
   };
 
   // Templates de tareas comunes
   const taskTemplates = [
-    { title: 'Confirmar menú final con catering', category: 'catering', priority: 'high' },
-    { title: 'Revisar decoración floral', category: 'decoration', priority: 'medium' },
-    { title: 'Confirmar playlist con DJ', category: 'music', priority: 'medium' },
-    { title: 'Coordinar horarios con fotógrafo', category: 'photography', priority: 'high' },
-    { title: 'Verificar transporte para invitados', category: 'transport', priority: 'medium' },
-    { title: 'Confirmar asientos para ceremonia', category: 'ceremony', priority: 'high' },
-    { title: 'Revisar montaje de mesas', category: 'reception', priority: 'high' },
-    { title: 'Prueba de sonido', category: 'music', priority: 'medium' },
-    { title: 'Confirmar menú infantil', category: 'catering', priority: 'low' },
-    { title: 'Preparar kit de emergencia', category: 'general', priority: 'medium' }
+    { title: t('tasks.templates.confirmMenu'), category: 'catering', priority: 'high' },
+    { title: t('tasks.templates.reviewDecoration'), category: 'decoration', priority: 'medium' },
+    { title: t('tasks.templates.confirmPlaylist'), category: 'music', priority: 'medium' },
+    { title: t('tasks.templates.coordinatePhotographer'), category: 'photography', priority: 'high' },
+    { title: t('tasks.templates.verifyTransport'), category: 'transport', priority: 'medium' },
+    { title: t('tasks.templates.confirmSeating'), category: 'ceremony', priority: 'high' },
+    { title: t('tasks.templates.reviewTableSetup'), category: 'reception', priority: 'high' },
+    { title: t('tasks.templates.soundCheck'), category: 'music', priority: 'medium' },
+    { title: t('tasks.templates.confirmKidsMenu'), category: 'catering', priority: 'low' },
+    { title: t('tasks.templates.prepareEmergencyKit'), category: 'general', priority: 'medium' }
   ];
 
   useEffect(() => {
@@ -64,7 +66,7 @@ const MasterChecklist = ({ weddingId, onUpdate }) => {
 
   const handleAddTask = () => {
     if (!formData.title) {
-      alert('El título es obligatorio');
+      alert(t('common.validation.titleRequired'));
       return;
     }
 
@@ -90,7 +92,7 @@ const MasterChecklist = ({ weddingId, onUpdate }) => {
   };
 
   const handleDeleteTask = (taskId) => {
-    if (confirm('¿Eliminar esta tarea?')) {
+    if (confirm(t('tasks.confirmDelete'))) {
       saveChecklist(checklist.filter(task => task.id !== taskId));
     }
   };
