@@ -32,7 +32,29 @@
       "created": "Tarea creada correctamente",
       "updated": "Tarea actualizada correctamente",
       "deleted": "Tarea eliminada correctamente",
-      "error": "Error al procesar la tarea"
+      "error": "Error al procesar la tarea",
+      "completed": "Tarea completada",
+      "assigned": "Tarea asignada",
+      "overdue": "Tarea atrasada",
+      "dueToday": "Vence hoy",
+      "dueTomorrow": "Vence mañana",
+      "noDueDate": "Sin fecha límite"
+    },
+    "filters": {
+      "all": "Todas",
+      "active": "Activas",
+      "completed": "Completadas",
+      "overdue": "Atrasadas",
+      "today": "Hoy",
+      "thisWeek": "Esta semana",
+      "thisMonth": "Este mes"
+    },
+    "calendar": {
+      "month": "Mes",
+      "week": "Semana",
+      "day": "Día",
+      "list": "Lista",
+      "today": "Hoy"
     }
   }
 }

@@ -24,7 +24,32 @@
       "updated": "Mesa actualizada correctamente",
       "deleted": "Mesa eliminada correctamente",
       "assigned": "Invitados asignados correctamente",
-      "error": "Error al procesar la mesa"
+      "error": "Error al procesar la mesa",
+      "saved": "Guardado",
+      "loading": "Cargando...",
+      "noGuests": "Sin invitados",
+      "selectTable": "Seleccionar mesa",
+      "unassigned": "Sin asignar",
+      "ceremony": "Ceremonia",
+      "banquet": "Banquete",
+      "total": "Total",
+      "assigned_one": "{{count}} asignado",
+      "assigned_other": "{{count}} asignados",
+      "capacity_full": "Completa",
+      "capacity_available": "{{available}} disponibles",
+      "dragHint": "Arrastra invitados aquí",
+      "autoAssignSuccess": "Asignación automática completada",
+      "conflictDetected": "Conflicto detectado",
+      "validationError": "Error de validación"
+    },
+    "toolbar": {
+      "save": "Guardar",
+      "undo": "Deshacer",
+      "redo": "Rehacer",
+      "zoom": "Zoom",
+      "export": "Exportar",
+      "print": "Imprimir",
+      "settings": "Configuración"
     }
   }
 }
