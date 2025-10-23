@@ -17,6 +17,7 @@ class ErrorLogger {
     };
     this.isInitialized = false;
     this.openAIThrottleUntil = 0;
+    this.isLoggingError = false; // Prevenir recursión
     this.setupGlobalErrorHandlers();
     this.startDiagnostics();
   }
@@ -114,36 +115,47 @@ class ErrorLogger {
    * Registra un error en el sistema
    */
   logError(type, details) {
-    const errorEntry = {
-      id: Date.now() + Math.random(),
-      timestamp: new Date().toISOString(),
-      type,
-      details,
-      userAgent: navigator.userAgent,
-      url: window.location.href,
-    };
-
-    this.errors.push(errorEntry);
-
-    // Mantener solo los últimos 100 errores para evitar memory leaks
-    if (this.errors.length > 100) {
-      this.errors = this.errors.slice(-100);
+    // Prevenir recursión infinita
+    if (this.isLoggingError) {
+      return;
     }
 
-    // Log en consola con formato mejorado evitando recursión
-    if (this.originalConsoleError) {
-      this.originalConsoleError.call(console, `🚨 ${type} - ${new Date().toLocaleTimeString()}`);
-      this.originalConsoleError.call(console, 'Details:', details);
-      this.originalConsoleError.call(console, 'Full Error Entry:', errorEntry);
-    } else {
-      console.group(`🚨 ${type} - ${new Date().toLocaleTimeString()}`);
-      console.log('Details:', details);
-      console.log('Full Error Entry:', errorEntry);
-      console.groupEnd();
-    }
+    this.isLoggingError = true;
 
-    // Actualizar diagnósticos si es necesario
-    this.updateDiagnosticsFromError(type, details);
+    try {
+      const errorEntry = {
+        id: Date.now() + Math.random(),
+        timestamp: new Date().toISOString(),
+        type,
+        details,
+        userAgent: navigator.userAgent,
+        url: window.location.href,
+      };
+
+      this.errors.push(errorEntry);
+
+      // Mantener solo los últimos 100 errores para evitar memory leaks
+      if (this.errors.length > 100) {
+        this.errors = this.errors.slice(-100);
+      }
+
+      // Log en consola con formato mejorado evitando recursión
+      if (this.originalConsoleError) {
+        this.originalConsoleError.call(console, `🚨 ${type} - ${new Date().toLocaleTimeString()}`);
+        this.originalConsoleError.call(console, 'Details:', details);
+        this.originalConsoleError.call(console, 'Full Error Entry:', errorEntry);
+      } else {
+        console.group(`🚨 ${type} - ${new Date().toLocaleTimeString()}`);
+        console.log('Details:', details);
+        console.log('Full Error Entry:', errorEntry);
+        console.groupEnd();
+      }
+
+      // Actualizar diagnósticos si es necesario
+      this.updateDiagnosticsFromError(type, details);
+    } finally {
+      this.isLoggingError = false;
+    }
   }
 
   /**
