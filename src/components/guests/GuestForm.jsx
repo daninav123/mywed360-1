@@ -1,4 +1,4 @@
-﻿import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 
 import useTranslations from '../../hooks/useTranslations';
 import { Button } from '../ui';
@@ -29,7 +29,7 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false }) => {
     companionType: guest?.companionType || 'none',
     table: guest?.table || '',
     companionGroupId: guest?.companionGroupId || '',
-    response: guest?.response || 'Pendiente',
+    response: guest?.response || t('common.status.pending'),
     status: guest?.status || 'pending',
     dietaryRestrictions: guest?.dietaryRestrictions || '',
     notes: guest?.notes || '',
@@ -70,14 +70,14 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false }) => {
     }
 
     if (formData.companion < 0) {
-      newErrors.companion = 'El nÃºmero de acompaÃ±antes no puede ser negativo';
+      newErrors.companion = t('common.validation.companionNegative');
     }
 
     if (formData.companion > 0 && formData.companionType === 'none') {
-      newErrors.companionType = 'Selecciona el tipo de acompaÃ±ante';
+      newErrors.companionType = t('common.validation.selectCompanionType');
     }
     if (formData.companion === 0 && formData.companionType !== 'none') {
-      newErrors.companionType = 'Establece "Sin acompaÃ±ante" o aÃ±ade alguno';
+      newErrors.companionType = t('common.validation.companionMismatch');
     }
 
     setErrors(newErrors);

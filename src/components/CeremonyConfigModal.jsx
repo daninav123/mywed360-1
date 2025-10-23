@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 import Modal from './Modal';
+import useTranslations from '../hooks/useTranslations';
 
 /**
  * Modal para configurar la parrilla de sillas de la ceremonia
@@ -11,6 +12,7 @@ import Modal from './Modal';
  *  - initialConfig: configuración previa de ceremoniaSettings
  */
 export default function CeremonyConfigModal({ open, onApply, onClose, initialConfig }) {
+  const { t } = useTranslations();
   const [rows, setRows] = useState(10);
   const [cols, setCols] = useState(12);
   const [gap, setGap] = useState(40);
@@ -65,11 +67,11 @@ export default function CeremonyConfigModal({ open, onApply, onClose, initialCon
   };
 
   return (
-    <Modal open={open} title="Configurar Ceremonia" onClose={onClose}>
+    <Modal open={open} title={t('seating.configureCeremony')} onClose={onClose}>
       <div className="flex flex-col space-y-3 w-full max-w-sm">
         <div className="grid grid-cols-1 gap-2">
           <label className="flex justify-between items-center">
-            <span>Filas:</span>
+            <span>{t('seating.ceremony.rows')}:</span>
             <input
               type="number"
               min="1"
@@ -80,7 +82,7 @@ export default function CeremonyConfigModal({ open, onApply, onClose, initialCon
             />
           </label>
           <label className="flex justify-between items-center">
-            <span>Sillas por fila:</span>
+            <span>{t('seating.ceremony.seatsPerRow')}:</span>
             <input
               type="number"
               min="1"
@@ -91,7 +93,7 @@ export default function CeremonyConfigModal({ open, onApply, onClose, initialCon
             />
           </label>
           <label className="flex justify-between items-center">
-            <span>Espacio entre sillas (cm):</span>
+            <span>{t('seating.ceremony.spacing')}:</span>
             <input
               type="number"
               min="20"
@@ -102,7 +104,7 @@ export default function CeremonyConfigModal({ open, onApply, onClose, initialCon
             />
           </label>
           <label className="flex justify-between items-center">
-            <span>Pasillo después de col:</span>
+            <span>{t('seating.ceremony.aisleAfter')}:</span>
             <input
               type="number"
               min="0"
@@ -115,9 +117,9 @@ export default function CeremonyConfigModal({ open, onApply, onClose, initialCon
         </div>
 
         <div className="border-t border-gray-200 pt-3 space-y-3">
-          <p className="text-sm font-semibold text-gray-900">Reservas VIP</p>
+          <p className="text-sm font-semibold text-gray-900">{t('seating.ceremony.vipReservations')}</p>
           <label className="flex flex-col text-sm text-gray-700 gap-1">
-            Filas reservadas (ej. 1,2)
+            {t('seating.ceremony.reservedRows')}
             <input
               type="text"
               value={vipRowsInput}
@@ -127,7 +129,7 @@ export default function CeremonyConfigModal({ open, onApply, onClose, initialCon
             />
           </label>
           <label className="flex flex-col text-sm text-gray-700 gap-1">
-            Etiqueta para asientos reservados
+            {t('seating.ceremony.reservedLabel')}
             <input
               type="text"
               value={vipLabel}
@@ -142,27 +144,27 @@ export default function CeremonyConfigModal({ open, onApply, onClose, initialCon
               checked={lockVipSeats}
               onChange={(e) => setLockVipSeats(e.target.checked)}
             />
-            Bloquear asientos VIP hasta asignarlos manualmente
+            {t('seating.ceremony.lockVipSeats')}
           </label>
           <label className="flex flex-col text-sm text-gray-700 gap-1">
-            Notas internas
+            {t('common.notes')}
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={2}
               className="border rounded px-2 py-1 text-sm resize-none"
-              placeholder="Ej. Reservar para padrinos y padres"
+              placeholder={t('seating.ceremony.notesPlaceholder')}
             />
           </label>
         </div>
 
-        <p className="text-sm text-gray-600 mt-1">Total de sillas: {totalSeats}</p>
+        <p className="text-sm text-gray-600 mt-1">{t('seating.ceremony.totalSeats')}: {totalSeats}</p>
         <div className="flex justify-end space-x-2 mt-2">
           <button onClick={onClose} className="px-3 py-1 bg-gray-200 rounded">
-            Cancelar
+            {t('common.cancel')}
           </button>
           <button onClick={apply} className="px-3 py-1 bg-blue-600 text-white rounded">
-            Guardar configuración
+            {t('seating.ceremony.saveConfiguration')}
           </button>
         </div>
       </div>

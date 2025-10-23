@@ -50,6 +50,20 @@
       "export": "Exportar",
       "print": "Imprimir",
       "settings": "Configuración"
+    },
+    "configureCeremony": "Configurar Ceremonia",
+    "ceremony": {
+      "rows": "Filas",
+      "seatsPerRow": "Sillas por fila",
+      "spacing": "Espacio entre sillas (cm)",
+      "aisleAfter": "Pasillo después de col",
+      "vipReservations": "Reservas VIP",
+      "reservedRows": "Filas reservadas (ej. 1,2)",
+      "reservedLabel": "Etiqueta para asientos reservados",
+      "lockVipSeats": "Bloquear asientos VIP hasta asignarlos manualmente",
+      "notesPlaceholder": "Ej. Reservar para padrinos y padres",
+      "totalSeats": "Total de sillas",
+      "saveConfiguration": "Guardar configuración"
     }
   }
 }

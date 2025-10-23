@@ -1425,7 +1425,11 @@
     "serviceRequired": "El servicio es obligatorio",
     "emailInvalid": "Email inválido",
     "linkMustStartHttp": "El enlace debe comenzar con http:// o https://",
-    "titleRequired": "El título es obligatorio"
+    "titleRequired": "El título es obligatorio",
+    "companionNegative": "El número de acompañantes no puede ser negativo",
+    "selectCompanionType": "Selecciona el tipo de acompañante",
+    "companionMismatch": "Establece \"Sin acompañante\" o añade alguno"
   },
-  "general": "General"
+  "general": "General",
+  "notes": "Notas"
 }
