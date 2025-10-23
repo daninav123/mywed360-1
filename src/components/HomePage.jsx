@@ -4,6 +4,7 @@ const normalizeLang = (l) =>
     .toLowerCase()
     .match(/^[a-z]{2}/)?.[0] || 'es';
 import { useTranslation } from 'react-i18next';
+import useTranslations from '../hooks/useTranslations';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
@@ -36,15 +37,16 @@ import { fetchWeddingNews } from '../services/blogService';
 import { fetchWall } from '../services/wallService';
 import { getSummary as getGamificationSummary } from '../services/GamificationService';
 
-const INSPIRATION_CATEGORIES = [
-  { slug: 'decoracion', label: 'Decoración' },
-  { slug: 'coctel', label: 'Cóctel' },
-  { slug: 'banquete', label: 'Banquete' },
-  { slug: 'ceremonia', label: 'Ceremonia' },
-  { slug: 'flores', label: 'Flores' },
-  { slug: 'vestido', label: 'Vestidos' },
-  { slug: 'pastel', label: 'Pasteles' },
-  { slug: 'fotografia', label: 'Fotografía' },
+// Las categorías se traducirán usando el hook useTranslations
+const getInspirationCategories = (t) => [
+  { slug: 'decoracion', label: t('common.categories.decoration') },
+  { slug: 'coctel', label: t('common.categories.cocktail') },
+  { slug: 'banquete', label: t('common.categories.banquet') },
+  { slug: 'ceremonia', label: t('common.categories.ceremony') },
+  { slug: 'flores', label: t('common.categories.flowers') },
+  { slug: 'vestido', label: t('common.categories.dress') },
+  { slug: 'pastel', label: t('common.categories.cake') },
+  { slug: 'fotografia', label: t('common.categories.photography') },
 ];
 
 const PROGRESS_STORAGE_KEY = 'mywed360_progress';
@@ -159,6 +161,9 @@ const computeExpectedProgress = (weddingData) => {
 };
 
 export default function HomePage() {
+  const { t } = useTranslations();
+  const INSPIRATION_CATEGORIES = useMemo(() => getInspirationCategories(t), [t]);
+  
   // Todo se maneja con modales locales
   const [noteText, setNoteText] = useState('');
   const [guest, setGuest] = useState({ name: '', side: 'novia', contact: '' });

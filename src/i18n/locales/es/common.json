@@ -1370,5 +1370,15 @@
       "guestsHeading": "Invitados",
       "noGuests": "No hay invitados asignados"
     }
+  },
+  "categories": {
+    "decoration": "Decoración",
+    "cocktail": "Cóctel",
+    "banquet": "Banquete",
+    "ceremony": "Ceremonia",
+    "flowers": "Flores",
+    "dress": "Vestidos",
+    "cake": "Pasteles",
+    "photography": "Fotografía"
   }
 }
