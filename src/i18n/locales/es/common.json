@@ -1431,5 +1431,7 @@
     "companionMismatch": "Establece \"Sin acompañante\" o añade alguno"
   },
   "general": "General",
-  "notes": "Notas"
+  "notes": "Notas",
+  "apply": "Aplicar",
+  "pagination": "Paginación"
 }

@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 
 import Modal from './Modal';
+import useTranslations from '../hooks/useTranslations';
 
 export default function BanquetConfigModal({ open, onApply, onClose }) {
+  const { t } = useTranslations();
   const [rows, setRows] = useState(3);
   const [cols, setCols] = useState(4);
   const [seats, setSeats] = useState(8);
@@ -15,10 +17,10 @@ export default function BanquetConfigModal({ open, onApply, onClose }) {
   };
 
   return (
-    <Modal open={open} title="Configurar Banquete" onClose={onClose}>
+    <Modal open={open} title={t('seating.configureBanquet')} onClose={onClose}>
       <div className="flex flex-col space-y-2 w-60">
         <div className="flex flex-col gap-1">
-          <label className="text-sm text-gray-700">Filas de mesas</label>
+          <label className="text-sm text-gray-700">{t('seating.banquet.tableRows')}</label>
           <input
             type="number"
             min="1"
@@ -29,7 +31,7 @@ export default function BanquetConfigModal({ open, onApply, onClose }) {
           />
         </div>
         <div className="flex flex-col gap-1">
-          <label className="text-sm text-gray-700">Columnas de mesas</label>
+          <label className="text-sm text-gray-700">{t('seating.banquet.tableCols')}</label>
           <input
             type="number"
             min="1"
@@ -40,7 +42,7 @@ export default function BanquetConfigModal({ open, onApply, onClose }) {
           />
         </div>
         <div className="flex flex-col gap-1">
-          <label className="text-sm text-gray-700">Asientos por mesa</label>
+          <label className="text-sm text-gray-700">{t('seating.banquet.seatsPerTable')}</label>
           <input
             type="number"
             min="1"
@@ -51,7 +53,7 @@ export default function BanquetConfigModal({ open, onApply, onClose }) {
           />
         </div>
         <div className="flex flex-col gap-1">
-          <label className="text-sm text-gray-700">Espacio X</label>
+          <label className="text-sm text-gray-700">{t('seating.banquet.spacingX')}</label>
           <input
             type="number"
             min="60"
@@ -62,7 +64,7 @@ export default function BanquetConfigModal({ open, onApply, onClose }) {
           />
         </div>
         <div className="flex flex-col gap-1">
-          <label className="text-sm text-gray-700">Espacio Y</label>
+          <label className="text-sm text-gray-700">{t('seating.banquet.spacingY')}</label>
           <input
             type="number"
             min="60"
@@ -74,10 +76,10 @@ export default function BanquetConfigModal({ open, onApply, onClose }) {
         </div>
         <div className="flex justify-end space-x-2 mt-4">
           <button onClick={onClose} className="px-3 py-1 bg-gray-200 rounded">
-            Cancelar
+            {t('common.cancel')}
           </button>
           <button onClick={apply} className="px-3 py-1 bg-blue-600 text-white rounded">
-            Generar
+            {t('seating.banquet.generate')}
           </button>
         </div>
       </div>

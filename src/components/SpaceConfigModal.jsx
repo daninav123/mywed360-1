@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 import Modal from './Modal';
+import useTranslations from '../hooks/useTranslations';
 
 /**
  * SpaceConfigModal
@@ -15,6 +16,7 @@ export default function SpaceConfigModal({
   onApply,
   onClose,
 }) {
+  const { t } = useTranslations();
   const [width, setWidth] = useState(defaultWidth);
   const [height, setHeight] = useState(defaultHeight);
 
@@ -34,10 +36,10 @@ export default function SpaceConfigModal({
   };
 
   return (
-    <Modal open={open} title="Dimensiones del Salón" onClose={onClose}>
+    <Modal open={open} title={t('seating.space.dimensions')} onClose={onClose}>
       <div className="flex flex-col space-y-2 w-64">
         <label className="flex justify-between items-center">
-          <span>Ancho (cm):</span>
+          <span>{t('seating.space.width')}:</span>
           <input
             type="number"
             min="100"
@@ -47,7 +49,7 @@ export default function SpaceConfigModal({
           />
         </label>
         <label className="flex justify-between items-center">
-          <span>Alto (cm):</span>
+          <span>{t('seating.space.height')}:</span>
           <input
             type="number"
             min="100"
@@ -58,10 +60,10 @@ export default function SpaceConfigModal({
         </label>
         <div className="flex justify-end space-x-2 mt-4">
           <button onClick={onClose} className="px-3 py-1 bg-gray-200 rounded">
-            Cancelar
+            {t('common.cancel')}
           </button>
           <button onClick={apply} className="px-3 py-1 bg-blue-600 text-white rounded">
-            Aplicar
+            {t('common.apply')}
           </button>
         </div>
       </div>

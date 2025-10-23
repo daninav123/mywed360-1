@@ -1,9 +1,11 @@
 import React from 'react';
+import useTranslations from '../hooks/useTranslations';
 
 export default function Pagination({ currentPage, totalPages, onPageChange }) {
+  const { t } = useTranslations();
   if (totalPages <= 1) return null;
   return (
-    <nav aria-label="Paginación">
+    <nav aria-label={t('common.pagination')}>
       <ul className="inline-flex -space-x-px">
         <li>
           <button
@@ -11,7 +13,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }) {
             onClick={() => onPageChange(currentPage - 1)}
             className="px-3 py-1 border bg-white hover:bg-gray-100 disabled:opacity-50"
           >
-            Anterior
+            {t('common.previous')}
           </button>
         </li>
         {Array.from({ length: totalPages }, (_, i) => (
@@ -30,7 +32,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }) {
             onClick={() => onPageChange(currentPage + 1)}
             className="px-3 py-1 border bg-white hover:bg-gray-100 disabled:opacity-50"
           >
-            Siguiente
+            {t('common.next')}
           </button>
         </li>
       </ul>

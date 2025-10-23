@@ -64,6 +64,20 @@
       "notesPlaceholder": "Ej. Reservar para padrinos y padres",
       "totalSeats": "Total de sillas",
       "saveConfiguration": "Guardar configuración"
+    },
+    "configureBanquet": "Configurar Banquete",
+    "banquet": {
+      "tableRows": "Filas de mesas",
+      "tableCols": "Columnas de mesas",
+      "seatsPerTable": "Asientos por mesa",
+      "spacingX": "Espacio X",
+      "spacingY": "Espacio Y",
+      "generate": "Generar"
+    },
+    "space": {
+      "dimensions": "Dimensiones del Salón",
+      "width": "Ancho (cm)",
+      "height": "Alto (cm)"
     }
   }
 }
