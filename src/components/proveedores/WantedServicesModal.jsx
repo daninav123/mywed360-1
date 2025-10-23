@@ -2,35 +2,37 @@ import React, { useEffect, useMemo, useState } from 'react';
 
 import Modal from '../Modal';
 import Button from '../ui/Button';
+import useTranslations from '../../hooks/useTranslations';
 
 export default function WantedServicesModal({ open, onClose, value = [], onSave }) {
+  const { t } = useTranslations();
   const [services, setServices] = useState([]);
   const [input, setInput] = useState('');
 
   const suggested = useMemo(
     () => [
-      'Fotografía',
-      'Vídeo',
-      'Música/DJ',
-      'Catering',
-      'Flores',
-      'Transporte',
-      'Maquillaje',
-      'Peluquería',
-      'Iluminación',
-      'Sonido',
-      'Decoración',
-      'Animación',
-      'Fotomatón',
-      'Oficiante',
-      'Alquiler mobiliario',
-      'Tarta nupcial',
-      'Invitaciones',
-      'Detalles/Regaños',
-      'Seguridad',
-      'Coordinación día B',
+      t('common.services.photography'),
+      t('common.services.video'),
+      t('common.services.musicDJ'),
+      t('common.services.catering'),
+      t('common.services.flowers'),
+      t('common.services.transport'),
+      t('common.services.makeup'),
+      t('common.services.hairdressing'),
+      t('common.services.lighting'),
+      t('common.services.sound'),
+      t('common.services.decoration'),
+      t('common.services.entertainment'),
+      t('common.services.photoBooth'),
+      t('common.services.officiant'),
+      t('common.services.furnitureRental'),
+      t('common.services.weddingCake'),
+      t('common.services.invitations'),
+      t('common.services.favors'),
+      t('common.services.security'),
+      t('common.services.dayCoordination'),
     ],
-    []
+    [t]
   );
 
   useEffect(() => {
@@ -61,10 +63,10 @@ export default function WantedServicesModal({ open, onClose, value = [], onSave 
 
   if (!open) return null;
   return (
-    <Modal open={open} onClose={onClose} title="Configurar servicios deseaños">
+    <Modal open={open} onClose={onClose} title={t('common.suppliers.configureServices')}>
       <div className="space-y-4">
         <div>
-          <p className="text-xs text-gray-500 mb-2">Sugeridos</p>
+          <p className="text-xs text-gray-500 mb-2">{t('common.suppliers.suggested')}</p>
           <div className="flex flex-wrap gap-2">
             {suggested.map((s) => {
               const active = services.includes(s);
@@ -89,18 +91,18 @@ export default function WantedServicesModal({ open, onClose, value = [], onSave 
         <div className="flex gap-2">
           <input
             className="flex-1 border rounded p-2"
-            placeholder="Añadir servicio (ej. Fotografía)"
+            placeholder={t('common.suppliers.addServicePlaceholder')}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === 'Enter') addService();
             }}
           />
-          <Button onClick={() => addService()}>Añadir</Button>
+          <Button onClick={() => addService()}>{t('common.add')}</Button>
         </div>
 
         {services.length === 0 ? (
-          <p className="text-sm text-gray-500">Aún no has añadido servicios.</p>
+          <p className="text-sm text-gray-500">{t('common.suppliers.noServicesAdded')}</p>
         ) : (
           <ul className="flex flex-wrap gap-2">
             {services.map((s) => (
@@ -112,7 +114,7 @@ export default function WantedServicesModal({ open, onClose, value = [], onSave 
                 <button
                   className="text-gray-500 hover:text-red-600"
                   onClick={() => removeService(s)}
-                  aria-label="Eliminar"
+                  aria-label={t('common.delete')}
                 >
                   ×
                 </button>
@@ -123,9 +125,9 @@ export default function WantedServicesModal({ open, onClose, value = [], onSave 
 
         <div className="flex justify-end gap-2">
           <Button variant="outline" onClick={onClose}>
-            Cancelar
+            {t('common.cancel')}
           </Button>
-          <Button onClick={save}>Guardar</Button>
+          <Button onClick={save}>{t('common.save')}</Button>
         </div>
       </div>
     </Modal>

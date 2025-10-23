@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
+import useTranslations from '../../hooks/useTranslations';
 
 /**
  * Componente de formulario para crear o editar un proveedor.
@@ -15,6 +16,7 @@ import Card from '../../components/ui/Card';
  * @returns {React.ReactElement}
  */
 const ProveedorForm = ({ onSubmit, onCancel, initialData }) => {
+  const { t } = useTranslations();
   const [formData, setFormData] = useState({
     name: '',
     service: '',
@@ -25,7 +27,7 @@ const ProveedorForm = ({ onSubmit, onCancel, initialData }) => {
     location: '',
     date: '',
     priceRange: '',
-    status: 'Pendiente',
+    status: t('common.status.pending'),
     snippet: '',
     image: '',
   });
@@ -53,11 +55,11 @@ const ProveedorForm = ({ onSubmit, onCancel, initialData }) => {
     const newErrors = {};
 
     // Validaciones básicas
-    if (!formData.name.trim()) newErrors.name = 'El nombre es obligatorio';
-    if (!formData.service.trim()) newErrors.service = 'El servicio es obligatorio';
-    if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Email inválido';
+    if (!formData.name.trim()) newErrors.name = t('common.validation.nameRequired');
+    if (!formData.service.trim()) newErrors.service = t('common.validation.serviceRequired');
+    if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = t('common.validation.emailInvalid');
     if (formData.link && !formData.link.startsWith('http'))
-      newErrors.link = 'El enlace debe comenzar con http:// o https://';
+      newErrors.link = t('common.validation.linkMustStartHttp');
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -71,33 +73,39 @@ const ProveedorForm = ({ onSubmit, onCancel, initialData }) => {
 
   // Lista de servicios disponibles
   const serviceOptions = [
-    'Catering',
-    'Fotografía',
-    'Vídeo',
-    'Música',
-    'Decoración',
-    'Flores',
-    'Transporte',
-    'Vestidos',
-    'Trajes',
-    'Pastelería',
-    'Invitaciones',
-    'Alquiler de mobiliario',
-    'Iluminación',
-    'Maquillaje',
-    'Peluquería',
-    'Joyería',
-    'Animación',
-    'Wedding Planner',
-    'Lugar de ceremonia',
-    'Lugar de celebración',
-    'Alojamiento',
-    'Viaje de novios',
-    'Otro',
+    t('common.services.catering'),
+    t('common.services.photography'),
+    t('common.services.video'),
+    t('common.services.music'),
+    t('common.services.decoration'),
+    t('common.services.flowers'),
+    t('common.services.transport'),
+    t('common.services.dresses'),
+    t('common.services.suits'),
+    t('common.services.pastry'),
+    t('common.services.invitations'),
+    t('common.services.furnitureRental'),
+    t('common.services.lighting'),
+    t('common.services.makeup'),
+    t('common.services.hairdressing'),
+    t('common.services.jewelry'),
+    t('common.services.entertainment'),
+    t('common.services.weddingPlanner'),
+    t('common.services.ceremonyVenue'),
+    t('common.services.receptionVenue'),
+    t('common.services.accommodation'),
+    t('common.services.honeymoon'),
+    t('common.services.other'),
   ];
 
   // Lista de estados disponibles
-  const statusOptions = ['Pendiente', 'Contactado', 'Seleccionado', 'Confirmado', 'Rechazado'];
+  const statusOptions = [
+    t('common.status.pending'),
+    t('common.status.contacted'),
+    t('common.status.selected'),
+    t('common.status.confirmed'),
+    t('common.status.rejected')
+  ];
 
   return (
     <div className="bg-white rounded-lg shadow-lg w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">

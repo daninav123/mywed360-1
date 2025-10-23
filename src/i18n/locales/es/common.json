@@ -1380,5 +1380,50 @@
     "dress": "Vestidos",
     "cake": "Pasteles",
     "photography": "Fotografía"
+  },
+  "services": {
+    "catering": "Catering",
+    "photography": "Fotografía",
+    "video": "Vídeo",
+    "music": "Música",
+    "musicDJ": "Música/DJ",
+    "decoration": "Decoración",
+    "flowers": "Flores",
+    "transport": "Transporte",
+    "dresses": "Vestidos",
+    "suits": "Trajes",
+    "pastry": "Pastelería",
+    "invitations": "Invitaciones",
+    "furnitureRental": "Alquiler de mobiliario",
+    "lighting": "Iluminación",
+    "makeup": "Maquillaje",
+    "hairdressing": "Peluquería",
+    "jewelry": "Joyería",
+    "entertainment": "Animación",
+    "weddingPlanner": "Wedding Planner",
+    "ceremonyVenue": "Lugar de ceremonia",
+    "receptionVenue": "Lugar de celebración",
+    "accommodation": "Alojamiento",
+    "honeymoon": "Viaje de novios",
+    "sound": "Sonido",
+    "photoBooth": "Fotomatón",
+    "officiant": "Oficiante",
+    "weddingCake": "Tarta nupcial",
+    "favors": "Detalles/Regaños",
+    "security": "Seguridad",
+    "dayCoordination": "Coordinación día B",
+    "other": "Otro"
+  },
+  "suppliers": {
+    "configureServices": "Configurar servicios deseados",
+    "suggested": "Sugeridos",
+    "addServicePlaceholder": "Añadir servicio (ej. Fotografía)",
+    "noServicesAdded": "Aún no has añadido servicios."
+  },
+  "validation": {
+    "nameRequired": "El nombre es obligatorio",
+    "serviceRequired": "El servicio es obligatorio",
+    "emailInvalid": "Email inválido",
+    "linkMustStartHttp": "El enlace debe comenzar con http:// o https://"
   }
 }
