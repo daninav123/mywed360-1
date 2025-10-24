@@ -43,7 +43,7 @@ function runTests() {
   
   const env = {
     ...process.env,
-    FIRESTORE_EMULATOR_HOST: 'localhost:8080',
+    FIRESTORE_EMULATOR_HOST: 'localhost:8288',
     FIRESTORE_RULES_TESTS: 'true'
   };
   
