@@ -1,4 +1,4 @@
-�import { saveAs } from 'file-saver';
+import { saveAs } from 'file-saver';
 import { Wand2, RefreshCcw, Download, FileDown, PenTool, Save } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';

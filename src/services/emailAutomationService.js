@@ -1,6 +1,8 @@
-�/* eslint-disable no-undef */
+/* eslint-disable no-undef */
 import { get as apiGet, post, put as apiPut, del as apiDel } from './apiClient';
 import { performanceMonitor } from './PerformanceMonitor';
+import { db } from '../firebaseConfig';
+import { formatDate } from '../utils/formatUtils';
 import { USE_BACKEND } from './emailService';
 
 const CLASSIFICATION_ENDPOINT = '/api/email-insights/classify';
@@ -907,7 +909,7 @@ async function maybeAutoReply(mail, classification, config, state, sendMail) {
     name: extractSenderName(mail.from) || senderEmail,
     category,
     subject: mail.subject || '',
-    date: new Date().toLocaleDateString('es-ES'),
+    date: formatDate(new Date(), 'short'),
   };
   const body = renderTemplate(templateMessage, context);
   if (!body.trim()) return false;

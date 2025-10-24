@@ -1,4 +1,5 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
+import { formatDate } from '../utils/formatUtils';
 
 import useActiveWeddingInfo from './useActiveWeddingInfo';
 import { useProviderEmail } from './useProviderEmail';
@@ -23,7 +24,7 @@ export const useAIProviderEmail = () => {
       if (!raw) return '';
       const d = typeof raw?.toDate === 'function' ? raw.toDate() : new Date(raw);
       if (Number.isNaN(d.getTime())) return '';
-      return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+      return formatDate(d, 'medium');
     } catch {
       return '';
     }

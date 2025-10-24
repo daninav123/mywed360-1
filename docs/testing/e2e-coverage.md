@@ -1,4 +1,4 @@
-�# Matriz de Cobertura E2E
+# Matriz de Cobertura E2E
 
 Generado autom�ticamente por `scripts/aggregateRoadmap.js`. Actualiza este archivo ejecutando el script cuando cambie la documentaci�n o los tests.
 

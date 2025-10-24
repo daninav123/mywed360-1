@@ -1,4 +1,4 @@
-�/**
+/**
  * Plantillas de email predefinidas para comunicaci�n con invitados
  */
 

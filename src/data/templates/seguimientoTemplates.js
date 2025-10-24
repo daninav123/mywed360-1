@@ -1,4 +1,4 @@
-�/**
+/**
  * Plantillas de email espec�ficas para seguimiento de eventos y tareas de la boda
  */
 

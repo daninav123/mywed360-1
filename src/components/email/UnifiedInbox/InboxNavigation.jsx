@@ -1,4 +1,4 @@
-�import {
+import {
   Inbox,
   Send,
   Star,

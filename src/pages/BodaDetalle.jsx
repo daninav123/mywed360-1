@@ -1,7 +1,8 @@
 import { doc, onSnapshot, updateDoc, serverTimestamp, deleteField } from 'firebase/firestore';
 import { ArrowLeft, CheckCircle, Circle } from 'lucide-react';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { formatDate } from '../utils/formatUtils';
 
 import PageWrapper from '../components/PageWrapper';
 import Button from '../components/ui/Button';
@@ -38,8 +39,8 @@ function formatDateEs(dateVal) {
   if (!dateVal) return '';
   try {
     if (typeof dateVal === 'string') return dateVal;
-    if (dateVal.seconds) return new Date(dateVal.seconds * 1000).toLocaleDateString('es-ES');
-    return new Date(dateVal).toLocaleDateString('es-ES');
+    if (dateVal.seconds) return formatDate(new Date(dateVal.seconds * 1000), 'short');
+    return formatDate(dateVal, 'short');
   } catch {
     return '';
   }

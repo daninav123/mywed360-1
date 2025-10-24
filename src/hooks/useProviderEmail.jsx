@@ -1,4 +1,5 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
+import { formatDate } from '../utils/formatUtils';
 
 import useActiveWeddingInfo from './useActiveWeddingInfo';
 import { useAuth } from './useAuth';
@@ -146,7 +147,7 @@ export const useProviderEmail = () => {
           if (!rawDate) return 'fecha por determinar';
           const d = typeof rawDate?.toDate === 'function' ? rawDate.toDate() : new Date(rawDate);
           if (Number.isNaN(d.getTime())) return 'fecha por determinar';
-          return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+          return formatDate(d, 'medium');
         } catch {
           return 'fecha por determinar';
         }

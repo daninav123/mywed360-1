@@ -1,4 +1,4 @@
-�import React, { useRef, useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useRef, useState, useEffect, useCallback, useMemo } from 'react';
 const normalizeLang = (l) =>
   String(l || 'es')
     .toLowerCase()
@@ -254,7 +254,7 @@ export default function HomePage() {
   }, [expectedProgress, progressDiff, progressPercent]);
 
   const progressStatusText = useMemo(() => {
-    if (progressPercent >= 100) return '�Progreso completo!';
+    if (progressPercent >= 100) return '¡Progreso completo!';
     if (expectedProgress == null) {
       return '';
     }
@@ -262,9 +262,9 @@ export default function HomePage() {
       return 'Vas adelantado al plan previsto';
     }
     if (progressDiff !== null && progressDiff < -PROGRESS_DIFF_TOLERANCE) {
-      return 'Vas por detr�s del plan. Revisa tus tareas clave.';
+      return 'Vas por detrás del plan. Revisa tus tareas clave.';
     }
-    return 'Todo en marcha seg�n el calendario';
+    return 'Todo en marcha según el calendario';
   }, [expectedProgress, progressDiff, progressPercent]);
 
   const resolvedWeddingName = useMemo(() => {

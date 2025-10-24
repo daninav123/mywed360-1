@@ -1,6 +1,8 @@
 import { Plus, ChevronUp } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { formatDate } from '../utils/formatUtils';
 
 import ProveedorForm from '../components/proveedores/ProveedorForm';
 import ServicesBoard from '../components/proveedores/ServicesBoard';
@@ -32,10 +34,10 @@ const formatShortDate = (value) => {
       typeof value?.toDate === 'function'
         ? value.toDate()
         : value instanceof Date
-        ? value
-        : new Date(value);
+          ? value
+          : new Date(value);
     if (Number.isNaN(date.getTime())) return '—';
-    return date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
+    return formatDate(date, 'custom');
   } catch (err) {
     return '—';
   }

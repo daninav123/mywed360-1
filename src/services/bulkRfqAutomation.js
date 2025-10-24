@@ -1,6 +1,7 @@
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 
 import { db } from '../firebaseConfig';
+import { formatDate } from '../utils/formatUtils';
 import { post as apiPost } from './apiClient';
 
 const DEFAULT_BODY =
@@ -17,11 +18,7 @@ const toDateString = (raw) => {
         ? raw.toDate()
         : new Date(raw);
     if (Number.isNaN(date.getTime())) return 'fecha por determinar';
-    return date.toLocaleDateString('es-ES', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-    });
+    return formatDate(date, 'medium');
   } catch {
     return 'fecha por determinar';
   }

@@ -1,4 +1,4 @@
-�import { MessageSquare, Smartphone, Send, Settings } from 'lucide-react';
+import { MessageSquare, Smartphone, Send, Settings } from 'lucide-react';
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
 
 import {

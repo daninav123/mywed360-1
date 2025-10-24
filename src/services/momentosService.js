@@ -1,5 +1,6 @@
 import {
   collection,
+  deleteDoc,
   deleteField,
   doc,
   getDoc,
@@ -16,7 +17,7 @@ import {
   updateDoc,
   where,
 } from 'firebase/firestore';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { getStorage, ref, uploadBytes, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 
 import { db, firebaseReady } from '../firebaseConfig';
 import { performanceMonitor } from './PerformanceMonitor';
@@ -113,7 +114,7 @@ const loadImageElement = (file) =>
 
 const optimizeImageFile = async (
   file,
-  { maxEdge = 2560, quality = 0.82 } = {}
+  { maxEdge = 2560, quality = 0.82, force = false } = {}
 ) => {
   if (!file || !(file.type || '').startsWith('image/')) return null;
   if (typeof window === 'undefined' || typeof document === 'undefined') return null;
@@ -163,7 +164,8 @@ const optimizeImageFile = async (
     const blob = await new Promise((resolve) =>
       canvas.toBlob(resolve, 'image/jpeg', quality)
     );
-    if (!blob || blob.size >= file.size) return null;
+    if (!blob) return null;
+    if (!force && blob.size >= file.size) return null;
 
     const filenameBase = file.name ? file.name.replace(/\.[^/.]+$/, '') : 'foto';
     const optimizedFile = new File([blob], `${filenameBase}.jpg`, {
@@ -171,7 +173,10 @@ const optimizeImageFile = async (
       lastModified: Date.now(),
     });
 
-    return { file: optimizedFile, wasCompressed: true };
+    return {
+      file: optimizedFile,
+      wasCompressed: force ? blob.size <= file.size : blob.size < file.size,
+    };
   } catch (error) {
     console.warn('[momentosService] optimizeImageFile no pudo comprimir', error);
     return null;
@@ -219,6 +224,140 @@ const normalizeScenes = (scenes) => {
     }
   });
   return map.size ? Array.from(map.values()) : DEFAULT_SCENES;
+};
+
+const readFileArrayBuffer = async (file) => {
+  if (!file || typeof file.arrayBuffer !== 'function') return null;
+  try {
+    return await file.arrayBuffer();
+  } catch {
+    return null;
+  }
+};
+
+const computeFileHash = async (file) => {
+  if (typeof crypto === 'undefined' || !crypto.subtle) return null;
+  const buffer = await readFileArrayBuffer(file);
+  if (!buffer) return null;
+  const hashBuffer = await crypto.subtle.digest('SHA-1', buffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+};
+
+const generateImageThumbnail = async (
+  file,
+  { maxEdge = 640, quality = 0.72 } = {}
+) => {
+  if (!file || !(file.type || '').startsWith('image/')) return null;
+  if (typeof window === 'undefined' || typeof document === 'undefined') return null;
+  try {
+    let bitmap = null;
+    let width = 0;
+    let height = 0;
+
+    if (typeof window.createImageBitmap === 'function') {
+      try {
+        bitmap = await window.createImageBitmap(file);
+        width = bitmap.width;
+        height = bitmap.height;
+      } catch {
+        bitmap = null;
+      }
+    }
+
+    if (!bitmap) {
+      const image = await loadImageElement(file);
+      width = image.width;
+      height = image.height;
+      bitmap = image;
+    }
+
+    if (!width || !height) return null;
+
+    const maxDimension = Math.max(width, height);
+    const ratio = maxDimension > maxEdge ? maxEdge / maxDimension : 1;
+    const targetWidth = Math.max(1, Math.round(width * ratio));
+    const targetHeight = Math.max(1, Math.round(height * ratio));
+
+    const canvas = document.createElement('canvas');
+    canvas.width = targetWidth;
+    canvas.height = targetHeight;
+    const ctx = canvas.getContext('2d', { alpha: false });
+    ctx.drawImage(bitmap, 0, 0, targetWidth, targetHeight);
+
+    if (bitmap && typeof bitmap.close === 'function') {
+      try {
+        bitmap.close();
+      } catch {
+        /* noop */
+      }
+    }
+
+    const blob = await new Promise((resolve) =>
+      canvas.toBlob(resolve, 'image/jpeg', quality)
+    );
+    if (!blob) return null;
+
+    const filenameBase = file.name ? file.name.replace(/\.[^/.]+$/, '') : 'thumb';
+    const thumbFile = new File([blob], `${filenameBase}-thumb.jpg`, {
+      type: blob.type || 'image/jpeg',
+      lastModified: Date.now(),
+    });
+    return { file: thumbFile, size: thumbFile.size };
+  } catch (error) {
+    console.warn('[momentosService] generateImageThumbnail error', error);
+    return null;
+  }
+};
+
+const reserveMediaHash = async ({ weddingId, albumId, hash, fileName }) => {
+  if (!hash) return null;
+  const dbInstance = await ensureFirebase();
+  const hashRef = doc(
+    dbInstance,
+    'weddings',
+    weddingId,
+    'albums',
+    albumId,
+    'hashes',
+    hash
+  );
+
+  try {
+    await runTransaction(dbInstance, async (tx) => {
+      const snap = await tx.get(hashRef);
+      if (snap.exists()) {
+        throw new Error('hash_exists');
+      }
+      tx.set(hashRef, {
+        hash,
+        weddingId,
+        albumId,
+        fileName: fileName || '',
+        status: 'pending',
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      });
+    });
+  } catch (error) {
+    if (error?.message === 'hash_exists') {
+      throw new Error('duplicate_media_hash');
+    }
+    throw error;
+  }
+
+  return {
+    async markSuccess(photoId) {
+      await updateDoc(hashRef, {
+        status: 'active',
+        photoId: photoId || null,
+        updatedAt: serverTimestamp(),
+      }).catch(() => {});
+    },
+    async release() {
+      await deleteDoc(hashRef).catch(() => {});
+    },
+  };
 };
 
 const nowPlusHours = (hours) => {
@@ -539,32 +678,74 @@ export const uploadMomentPhoto = async ({
 
   const existingBytes = albumData?.counters?.totalBytes || 0;
   const threshold = thresholdBytes || GALLERY_COMPRESSION_THRESHOLD_BYTES;
-  const shouldCompress =
+  const willExceedThreshold =
     existingBytes >= threshold || existingBytes + file.size > threshold;
+  const isVideo = (file.type || '').startsWith('video/');
+  const videoDurationSeconds = Number(metadata?.videoDurationSeconds || 0);
+
+  if (willExceedThreshold && isVideo && videoDurationSeconds && videoDurationSeconds > 120) {
+    throw new Error('video_exceeds_limit');
+  }
 
   const originalFile = file;
   let workingFile = file;
   let compressionApplied = false;
 
-  if (shouldCompress) {
-    const optimized = await optimizeImageFile(file, { maxEdge: 1920, quality: 0.86 });
-    if (optimized?.file && optimized.file.size < file.size) {
+  if (!isVideo) {
+    const optimized = await optimizeImageFile(file, {
+      maxEdge: 2560,
+      quality: willExceedThreshold ? 0.8 : 0.82,
+      force: true,
+    });
+    if (optimized?.file) {
       workingFile = optimized.file;
-      compressionApplied = true;
+      compressionApplied =
+        optimized.wasCompressed ||
+        (file.type && optimized.file.type && file.type !== optimized.file.type);
+    }
+  }
+
+  const mediaHash = await computeFileHash(originalFile);
+  let hashReservation = null;
+  if (mediaHash) {
+    try {
+      hashReservation = await reserveMediaHash({
+        weddingId,
+        albumId,
+        hash: mediaHash,
+        fileName: originalFile.name,
+      });
+    } catch (error) {
+      if (error?.message === 'duplicate_media_hash') {
+        throw new Error('duplicate_photo');
+      }
+      throw error;
     }
   }
 
   const photoId = generateId();
+  const originalExt =
+    (originalFile.name && originalFile.name.split('.').pop()) ||
+    (originalFile.type && originalFile.type.split('/').pop()) ||
+    'jpg';
   const workingExt =
     (workingFile.name && workingFile.name.split('.').pop()) ||
-    (originalFile.name && originalFile.name.split('.').pop()) ||
+    (workingFile.type && workingFile.type.split('/').pop()) ||
+    originalExt ||
     'jpg';
-  const normalizedExt = workingExt.toLowerCase() || 'jpg';
-  const storagePath = `weddings/${weddingId}/albums/${albumId}/photos/${photoId}.${normalizedExt}`;
-  const storageRef = ref(storage, storagePath);
 
-  const uploadTask = uploadBytesResumable(storageRef, workingFile, {
-    contentType: workingFile.type || `image/${normalizedExt}`,
+  const basePath = `weddings/${weddingId}/albums/${albumId}/photos/${photoId}`;
+  const optimizedPath = `${basePath}/optimized.${workingExt.toLowerCase() || 'jpg'}`;
+  const thumbCandidate = !isVideo ? await generateImageThumbnail(workingFile) : null;
+  const thumbPath = thumbCandidate?.file ? `${basePath}/thumb.jpg` : null;
+
+  const storagePathOptimized = optimizedPath;
+  const storageRefOptimized = ref(storage, storagePathOptimized);
+  const thumbRef = thumbPath ? ref(storage, thumbPath) : null;
+
+  const uploadTask = uploadBytesResumable(storageRefOptimized, workingFile, {
+    contentType: workingFile.type || (isVideo ? 'video/mp4' : 'image/jpeg'),
+    cacheControl: isVideo ? 'public,max-age=3600' : 'public,max-age=86400',
     customMetadata: {
       uploader: metadata?.uploaderId || '',
       weddingId,
@@ -573,7 +754,9 @@ export const uploadMomentPhoto = async ({
       originalFilename: originalFile.name || '',
       originalSize: String(originalFile.size || 0),
       storedSize: String(workingFile.size || 0),
-      compression: compressionApplied ? 'true' : 'false',
+      compression: !isVideo && compressionApplied ? 'true' : 'false',
+      hash: mediaHash || '',
+      videoDurationSeconds: videoDurationSeconds ? String(videoDurationSeconds) : '',
     },
   });
 
@@ -602,158 +785,187 @@ export const uploadMomentPhoto = async ({
       },
       (error) => {
         if (signal) signal.removeEventListener('abort', abortHandler);
+        hashReservation?.release();
         reject(error);
       },
       async () => {
         if (signal) signal.removeEventListener('abort', abortHandler);
-        const downloadUrl = await getDownloadURL(storageRef);
-        const photoRef = doc(db, 'weddings', weddingId, 'albums', albumId, 'photos', photoId);
-        const scene = (metadata?.scene || 'otro').toLowerCase();
+        try {
+          const optimizedUrl = await getDownloadURL(storageRefOptimized);
+          let thumbUrl = optimizedUrl;
 
-        const payload = {
-          uploaderType: metadata?.uploaderType || 'host',
-          uploaderId: metadata?.uploaderId || null,
-          guestName: metadata?.guestName || null,
-          source: metadata?.source || 'web',
-          scene,
-          labels: Array.from(new Set([scene, ...(metadata?.labels || [])])).filter(Boolean),
-          storagePathOriginal: storagePath,
-          storagePathOptimized: storagePath,
-          storagePathThumb: storagePath,
-          status: 'pending',
-          flagged: metadata?.flagged || { nudity: false, violence: false },
-          width: metadata?.width || null,
-          height: metadata?.height || null,
-          exif: metadata?.exif || {},
-          reactions: metadata?.reactions || { heart: 0, wow: 0 },
-          commentsCount: 0,
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp(),
-          highlight: metadata?.highlight || { score: 0, reasons: [] },
-          upload: {
-            filename: originalFile.name,
-            storedFilename: `${photoId}.${normalizedExt}`,
-            sizeOriginal: originalFile.size,
-            sizeStored: workingFile.size,
-            contentTypeOriginal: originalFile.type || null,
-            contentTypeStored: workingFile.type || null,
-            compressed: compressionApplied,
-            compressionThresholdBytes: threshold,
-          },
-          urls: {
-            original: downloadUrl,
-            optimized: downloadUrl,
-            thumb: downloadUrl,
-          },
-          moderation: {
-            auto: {
-              status: 'queued',
-              createdAt: serverTimestamp(),
-              updatedAt: serverTimestamp(),
-            },
-          },
-        };
-
-        await setDoc(photoRef, payload);
-        const albumUpdates = {
-          'counters.totalPhotos': increment(1),
-          'counters.pendingPhotos': increment(1),
-          'counters.totalBytes': increment(originalFile.size || 0),
-          'counters.optimizedBytes': increment(workingFile.size || 0),
-          lastActivityAt: serverTimestamp(),
-        };
-
-        if (shouldCompress) {
-          albumUpdates['uploadWindow.compressionActive'] = true;
-          albumUpdates['uploadWindow.lastCompressionAt'] = serverTimestamp();
-        }
-        if (threshold && !albumData?.uploadWindow?.compressionThresholdBytes) {
-          albumUpdates['uploadWindow.compressionThresholdBytes'] = threshold;
-        }
-        if (eventDate && !albumData?.eventDate) {
-          albumUpdates.eventDate = toTimestamp(eventDate);
-        }
-        if (eventDate && !albumData?.uploadWindow?.closesAt && closesAt) {
-          albumUpdates['uploadWindow.closesAt'] = toTimestamp(closesAt);
-        }
-
-        await updateDoc(albumRef, albumUpdates).catch(() => {});
-
-        if (metadata?.tokenId) {
-          const tokenRef = doc(
-            db,
-            'weddings',
-            weddingId,
-            'albums',
-            albumId,
-            'tokens',
-            metadata.tokenId
-          );
-          await updateDoc(tokenRef, {
-            usedCount: increment(1),
-            lastUsedAt: serverTimestamp(),
-          }).catch(() => {});
-        }
-
-        if (metadata?.guestId) {
-          const guestRef = doc(
-            db,
-            'weddings',
-            weddingId,
-            'albums',
-            albumId,
-            'guestProgress',
-            metadata.guestId
-          );
-          await runTransaction(db, async (tx) => {
-            const guestSnap = await tx.get(guestRef);
-            const albumSnap = await tx.get(albumRef);
-            const existing = guestSnap.exists() ? guestSnap.data() : {};
-            const nextTotal = (existing.totalUploads || 0) + 1;
-            const breakdown = existing.sceneBreakdown || {};
-            const nextBreakdown = {
-              ...breakdown,
-              [scene]: (breakdown[scene] || 0) + 1,
-            };
-            const badges = new Set(existing.badges || []);
-            if (nextTotal >= 1) badges.add('primerMomento');
-            if (nextTotal >= 3) badges.add('momentoEntusiasta');
-            if (nextTotal >= 5) badges.add('momentoEstrella');
-
-            tx.set(
-              guestRef,
-              {
-                displayName:
-                  metadata?.guestDisplayName || metadata?.guestName || 'Invitado anónimo',
-                totalUploads: nextTotal,
-                lastUploadAt: serverTimestamp(),
-                badges: Array.from(badges),
-                sceneBreakdown: nextBreakdown,
+          if (thumbCandidate?.file && thumbRef) {
+            await uploadBytes(thumbRef, thumbCandidate.file, {
+              contentType: thumbCandidate.file.type || 'image/jpeg',
+              cacheControl: 'public,max-age=31536000',
+              customMetadata: {
+                hash: mediaHash || '',
+                weddingId,
+                albumId,
+                parentId: photoId,
               },
-              { merge: true }
+            });
+            thumbUrl = await getDownloadURL(thumbRef);
+          }
+
+          const photoRef = doc(db, 'weddings', weddingId, 'albums', albumId, 'photos', photoId);
+          const scene = (metadata?.scene || 'otro').toLowerCase();
+
+          const payload = {
+            uploaderType: metadata?.uploaderType || 'host',
+            uploaderId: metadata?.uploaderId || null,
+            guestName: metadata?.guestName || null,
+            source: metadata?.source || 'web',
+            scene,
+            labels: Array.from(new Set([scene, ...(metadata?.labels || [])])).filter(Boolean),
+            storagePathOriginal: storagePathOptimized,
+            storagePathOptimized,
+            storagePathThumb: thumbPath || null,
+            status: 'pending',
+            flagged: metadata?.flagged || { nudity: false, violence: false },
+            width: metadata?.width || null,
+            height: metadata?.height || null,
+            exif: metadata?.exif || {},
+            reactions: metadata?.reactions || { heart: 0, wow: 0 },
+            commentsCount: 0,
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+            highlight: metadata?.highlight || { score: 0, reasons: [] },
+            upload: {
+              filename: originalFile.name,
+              storedFilename: `${photoId}.${workingExt.toLowerCase() || 'jpg'}`,
+              sizeOriginal: originalFile.size,
+              sizeStored: workingFile.size,
+              sizeThumbnail: thumbCandidate?.size || 0,
+              contentTypeOriginal: originalFile.type || null,
+              contentTypeStored: workingFile.type || null,
+              compressed: !isVideo && compressionApplied,
+              compressionThresholdBytes: threshold,
+              hash: mediaHash || null,
+              videoDurationSeconds: videoDurationSeconds || null,
+            },
+            urls: {
+              original: optimizedUrl,
+              optimized: optimizedUrl,
+              thumb: thumbUrl,
+            },
+            moderation: {
+              auto: {
+                status: 'queued',
+                createdAt: serverTimestamp(),
+                updatedAt: serverTimestamp(),
+              },
+            },
+          };
+
+          await setDoc(photoRef, payload);
+          const storedBytes = (workingFile.size || 0) + (thumbCandidate?.size || 0);
+          const albumUpdates = {
+            'counters.totalPhotos': increment(1),
+            'counters.pendingPhotos': increment(1),
+            'counters.totalBytes': increment(storedBytes || 0),
+            'counters.optimizedBytes': increment(storedBytes || 0),
+            lastActivityAt: serverTimestamp(),
+          };
+
+          if (willExceedThreshold || compressionApplied) {
+            albumUpdates['uploadWindow.compressionActive'] = true;
+            albumUpdates['uploadWindow.lastCompressionAt'] = serverTimestamp();
+          }
+          if (threshold && !albumData?.uploadWindow?.compressionThresholdBytes) {
+            albumUpdates['uploadWindow.compressionThresholdBytes'] = threshold;
+          }
+          if (eventDate && !albumData?.eventDate) {
+            albumUpdates.eventDate = toTimestamp(eventDate);
+          }
+          if (eventDate && !albumData?.uploadWindow?.closesAt && closesAt) {
+            albumUpdates['uploadWindow.closesAt'] = toTimestamp(closesAt);
+          }
+
+          await updateDoc(albumRef, albumUpdates).catch(() => {});
+
+          if (metadata?.tokenId) {
+            const tokenRef = doc(
+              db,
+              'weddings',
+              weddingId,
+              'albums',
+              albumId,
+              'tokens',
+              metadata.tokenId
             );
+            await updateDoc(tokenRef, {
+              usedCount: increment(1),
+              lastUsedAt: serverTimestamp(),
+            }).catch(() => {});
+          }
 
-            if (!guestSnap.exists()) {
-              tx.update(albumRef, {
-                'counters.guestContributors': increment(1),
-              });
-            }
-          }).catch(() => {});
+          if (metadata?.guestId) {
+            const guestRef = doc(
+              db,
+              'weddings',
+              weddingId,
+              'albums',
+              albumId,
+              'guestProgress',
+              metadata.guestId
+            );
+            await runTransaction(db, async (tx) => {
+              const guestSnap = await tx.get(guestRef);
+              const guestData = guestSnap.exists() ? guestSnap.data() || {} : {};
+              const nextTotal = (guestData.totalUploads || 0) + 1;
+              const sceneBreakdown = guestData.sceneBreakdown || {};
+              const nextBreakdown = {
+                ...sceneBreakdown,
+                [scene]: (sceneBreakdown[scene] || 0) + 1,
+              };
+              const badges = new Set(guestData.badges || []);
+              if (nextTotal >= 1) badges.add('primerMomento');
+              if (nextTotal >= 3) badges.add('momentoEntusiasta');
+              if (nextTotal >= 5) badges.add('momentoEstrella');
+
+              tx.set(
+                guestRef,
+                {
+                  displayName:
+                    metadata?.guestDisplayName || metadata?.guestName || 'Invitado anónimo',
+                  totalUploads: nextTotal,
+                  lastUploadAt: serverTimestamp(),
+                  badges: Array.from(badges),
+                  sceneBreakdown: nextBreakdown,
+                },
+                { merge: true }
+              );
+
+              if (!guestSnap.exists()) {
+                tx.update(albumRef, {
+                  'counters.guestContributors': increment(1),
+                });
+              }
+            }).catch(() => {});
+          }
+
+          if (hashReservation) {
+            await hashReservation.markSuccess(photoId);
+          }
+
+          performanceMonitor?.logEvent?.('momentos_upload_success', {
+            weddingId,
+            albumId,
+            scene,
+            size: workingFile.size,
+            originalSize: originalFile.size,
+            compressed: !isVideo && compressionApplied,
+          });
+
+          resolve({
+            id: photoId,
+            ...payload,
+          });
+        } catch (error) {
+          hashReservation?.release();
+          reject(error);
         }
-
-        performanceMonitor?.logEvent?.('momentos_upload_success', {
-          weddingId,
-          albumId,
-          scene,
-          size: workingFile.size,
-          originalSize: originalFile.size,
-          compressed: compressionApplied,
-        });
-
-        resolve({
-          id: photoId,
-          ...payload,
-        });
       }
     );
   });

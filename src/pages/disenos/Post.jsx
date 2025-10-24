@@ -1,4 +1,4 @@
-�import React from 'react';
+import React from 'react';
 
 import ImageGeneratorAI from '../../components/ImageGeneratorAI';
 import Card from '../../components/ui/Card';

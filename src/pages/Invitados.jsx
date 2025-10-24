@@ -4,8 +4,9 @@ import ContactsImporter from '../components/guests/ContactsImporter';
 import GuestBulkGrid from '../components/guests/GuestBulkGrid';
 import GuestFilters from '../components/guests/GuestFilters';
 import GuestForm from '../components/guests/GuestForm';
-import GuestList from '../components/guests/GuestList';
-import Modal from '../components/Modal';
+import PageWrapper from '../components/PageWrapper';
+import PageTabs from '../components/ui/PageTabs';
+import { formatDate } from '../utils/formatUtils';
 import { Button, Input } from '../components/ui';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/Tabs';
 import SaveTheDateModal from '../components/whatsapp/SaveTheDateModal';
@@ -170,11 +171,7 @@ function Invitados() {
               : dateRaw?.seconds
                 ? new Date(dateRaw.seconds * 1000)
                 : new Date(dateRaw);
-          fechaFmt = d.toLocaleDateString('es-ES', {
-            day: '2-digit',
-            month: 'long',
-            year: 'numeric',
-          });
+          fechaFmt = formatDate(d, 'medium');
         } catch {
           fechaFmt = String(dateRaw);
         }

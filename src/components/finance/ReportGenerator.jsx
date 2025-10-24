@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Download, FileText, FileSpreadsheet, Loader2, Calendar, Filter } from 'lucide-react';
 import Button from '../ui/Button';
+import { formatDate } from '../../utils/formatUtils';
 
 /**
  * Generador de reportes financieros en PDF y Excel
@@ -96,7 +97,7 @@ const ReportGenerator = ({ transactions = [], weddingInfo = {} }) => {
 
     // Tabla de transacciones
     const tableData = data.map(t => [
-      new Date(t.date).toLocaleDateString('es-ES'),
+      formatDate(t.date, 'short'),
       t.concept || t.description || '-',
       t.supplier || '-',
       t.type === 'expense' ? 'Gasto' : 'Ingreso',
@@ -124,7 +125,7 @@ const ReportGenerator = ({ transactions = [], weddingInfo = {} }) => {
         { align: 'center' }
       );
       doc.text(
-        `Generado el ${new Date().toLocaleDateString('es-ES')}`,
+        `Generado el ${formatDate(new Date(), 'short')}`,
         14,
         doc.internal.pageSize.getHeight() - 10
       );
@@ -153,7 +154,7 @@ const ReportGenerator = ({ transactions = [], weddingInfo = {} }) => {
       ['Balance', data.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0) - 
                   data.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0)],
       [],
-      ['Generado el', new Date().toLocaleDateString('es-ES')]
+      ['Generado el', formatDate(new Date(), 'short')]
     ];
 
     const wsResumen = XLSX.utils.aoa_to_sheet(summaryData);
@@ -163,7 +164,7 @@ const ReportGenerator = ({ transactions = [], weddingInfo = {} }) => {
     const transactionsData = [
       ['Fecha', 'Concepto', 'Proveedor', 'Tipo', 'Monto', 'Categoría'],
       ...data.map(t => [
-        new Date(t.date).toLocaleDateString('es-ES'),
+        formatDate(t.date, 'short'),
         t.concept || t.description || '-',
         t.supplier || '-',
         t.type === 'expense' ? 'Gasto' : 'Ingreso',

@@ -4,8 +4,16 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import Spinner from './Spinner';
 import { useAISearch } from '../hooks/useAISearch';
 import { saveData } from '../services/SyncService';
+import useTranslations from '../hooks/useTranslations';
 
 export default function ProviderSearchModal({ onClose, onSelectProvider }) {
+  const { t, tVars } = useTranslations();
+  const tEmail = useCallback((key, options) => t(key, { ns: 'email', ...options }), [t]);
+  const tEmailVars = useCallback(
+    (key, variables) => tVars(key, { ns: 'email', ...variables }),
+    [tVars]
+  );
+
   const [query, setQuery] = useState('');
   const [serviceFilter, setServiceFilter] = useState('');
   const [toast, setToast] = useState(null);
@@ -36,23 +44,15 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
   }, [onClose]);
 
   // Servicios comunes para bodas
-  const commonServices = useMemo(
-    () => [
-      'Catering',
-      'Fotografía',
-      'Música',
-      'Flores',
-      'Vestidos',
-      'Decoración',
-      'Lugar',
-      'Transporte',
-      'Invitaciones',
-      'Pasteles',
-      'Joyería',
-      'Detalles',
-    ],
-    []
-  );
+  const commonServices = useMemo(() => {
+    const services = tEmail('providerSearch.services', { returnObjects: true });
+    if (Array.isArray(services)) {
+      return services.map((service) =>
+        typeof service === 'string' ? { value: service, label: service } : service
+      );
+    }
+    return [];
+  }, [tEmail]);
 
   // Manejar búsqueda
   const handleSearch = useCallback(
@@ -63,7 +63,7 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
       }
       
       if (!query.trim()) {
-        setToast({ message: 'Por favor, ingresa un término de búsqueda', type: 'info' });
+        setToast({ message: tEmail('providerSearch.messages.missingQuery'), type: 'info' });
         return;
       }
 
@@ -88,23 +88,23 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
       } catch (err) {
         console.error('[ProviderSearchModal] Error en búsqueda:', err);
         setToast({
-          message: 'Error al buscar proveedores. Inténtalo de nuevo.',
+          message: tEmail('providerSearch.messages.errorRetry'),
           type: 'error',
         });
       }
     },
-    [query, serviceFilter, searchProviders, results]
+    [query, serviceFilter, searchProviders, results, tEmail]
   );
 
   // Mostrar mensaje de error si hay
   useEffect(() => {
     if (error) {
       setToast({
-        message: error.message || 'Error al buscar proveedores',
+        message: error.message || tEmail('providerSearch.messages.error'),
         type: 'error',
       });
     }
-  }, [error]);
+  }, [error, tEmail]);
 
   // Limpiar resultados al cerrar
   const handleClose = useCallback(() => {
@@ -137,7 +137,9 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
         className="bg-white rounded shadow-lg w-full max-w-lg max-h-[90vh] flex flex-col p-4 m-4 overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        <h3 className="text-xl font-semibold mb-4">Buscar proveedor</h3>
+        <h3 className="text-xl font-semibold mb-4">
+          {tEmail('providerSearch.title')}
+        </h3>
 
         {/* Formulario de búsqueda */}
         <form onSubmit={handleSearch} className="space-y-4 mb-6">
@@ -147,13 +149,14 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 className="w-full border rounded p-3"
-                placeholder="¿Qué buscas? Ej: Fotógrafo con experiencia en bodas al aire libre"
+                placeholder={tEmail('providerSearch.form.placeholder')}
               />
             </div>
             <button
               type="submit"
               className="bg-blue-600 text-white rounded-full p-3 flex items-center justify-center"
               disabled={loading}
+              aria-label={tEmail('providerSearch.form.searchAria')}
             >
               {loading ? <RefreshCcw className="animate-spin" /> : <Search />}
             </button>
@@ -166,10 +169,10 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
                 onChange={(e) => setServiceFilter(e.target.value)}
                 className="w-full border rounded p-3"
               >
-                <option value="">Todos los servicios</option>
-                {commonServices.map((service, idx) => (
-                  <option key={idx} value={service}>
-                    {service}
+                <option value="">{tEmail('providerSearch.form.servicesAll')}</option>
+                {commonServices.map((service) => (
+                  <option key={service.value} value={service.value}>
+                    {service.label}
                   </option>
                 ))}
               </select>
@@ -180,7 +183,7 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
         {/* Indicador de carga */}
         {loading && (
           <div className="flex-1 flex items-center justify-center">
-            <Spinner text="Buscando proveedores..." />
+            <Spinner text={tEmail('providerSearch.messages.loading')} />
           </div>
         )}
 
@@ -265,5 +268,3 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
     </div>
   );
 }
-
-

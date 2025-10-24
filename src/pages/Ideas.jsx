@@ -12,6 +12,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useWedding } from '../context/WeddingContext';
 import { uploadEmailAttachments as uploadFilesToStorage } from '../services/storageUploadService';
 import { saveData, loadData } from '../services/SyncService';
+import { formatDate } from '../utils/formatUtils';
 
 const generateNoteId = () => {
   if (typeof crypto !== 'undefined' && crypto.randomUUID) {
@@ -423,21 +424,11 @@ export default function Ideas() {
                               )}
                               <div className="flex flex-col gap-2 text-xs text-gray-500 items-end">
                                 <span>
-                                  Creada:{' '}
-                                  {new Date(note.createdAt).toLocaleDateString(undefined, {
-                                    day: '2-digit',
-                                    month: '2-digit',
-                                    year: 'numeric',
-                                  })}
+                                  Creada: {formatDate(note.createdAt, 'custom')}
                                 </span>
                                 {note.updatedAt && note.updatedAt !== note.createdAt && (
                                   <span>
-                                    Editada:{' '}
-                                    {new Date(note.updatedAt).toLocaleDateString(undefined, {
-                                      day: '2-digit',
-                                      month: '2-digit',
-                                      year: 'numeric',
-                                    })}
+                                    Editada: {formatDate(note.updatedAt, 'custom')}
                                   </span>
                                 )}
                                 <div className="flex gap-2">
@@ -716,7 +707,7 @@ function IdeasBlogSection() {
                   <div className="flex flex-col gap-1">
                     <span className="font-medium truncate">{post.title}</span>
                     <span className="text-xs text-gray-500">
-                      {new Date(post.updatedAt || post.createdAt).toLocaleDateString()}
+                      {formatDate(post.updatedAt || post.createdAt, 'short')}
                     </span>
                   </div>
                 </li>

@@ -237,11 +237,11 @@ const SmartEmailComposer = ({
 
   return (
     <Box sx={{ p: 2 }} data-testid="smart-composer-modal">
-      <Typography variant="h5" gutterBottom>
-        Redactar Correo
+      <Typography variant="h5" gutterBottom component="div">
+        {tEmail('smartComposer.title')}
         {provider && (
           <Typography component="span" variant="subtitle1" sx={{ ml: 1 }}>
-            a {provider.name}
+            {tEmailVars('smartComposer.titleWithProvider', { name: provider.name })}
           </Typography>
         )}
       </Typography>
@@ -250,9 +250,15 @@ const SmartEmailComposer = ({
         <Grid item xs={12} md={showRecommendations ? 7 : 12}>
           <Paper sx={{ p: 2 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-              <Typography variant="h6">Mensaje</Typography>
+              <Typography variant="h6">
+                {tEmail('smartComposer.sections.message')}
+              </Typography>
               <Tooltip
-                title={showRecommendations ? 'Ocultar recomendaciones' : 'Mostrar recomendaciones'}
+                title={
+                  showRecommendations
+                    ? tEmail('smartComposer.toggles.hide')
+                    : tEmail('smartComposer.toggles.show')
+                }
               >
                 <IconButton onClick={() => setShowRecommendations(!showRecommendations)}>
                   {showRecommendations ? <Lightbulb color="primary" /> : <LightbulbOutlined />}
@@ -265,11 +271,11 @@ const SmartEmailComposer = ({
               <Grid item xs={12}>
                 <TextField
                   fullWidth
-                  label="Para"
+                  label={tEmail('smartComposer.fields.to.label')}
                   value={recipient}
                   onChange={(e) => setRecipient(e.target.value)}
                   variant="outlined"
-                  placeholder="correo@dominio.com"
+                  placeholder={tEmail('smartComposer.fields.to.placeholder')}
                   inputProps={{ 'data-testid': 'smart-recipient' }}
                 />
               </Grid>
@@ -278,11 +284,11 @@ const SmartEmailComposer = ({
               <Grid item xs={12}>
                 <TextField
                   fullWidth
-                  label="Asunto"
+                  label={tEmail('smartComposer.fields.subject.label')}
                   value={subject}
                   onChange={(e) => setSubject(e.target.value)}
                   variant="outlined"
-                  placeholder="Escribe un asunto efectivo..."
+                  placeholder={tEmail('smartComposer.fields.subject.placeholder')}
                   inputProps={{ 'data-testid': 'smart-subject' }}
                 />
               </Grid>
@@ -291,15 +297,17 @@ const SmartEmailComposer = ({
               {templates.length > 0 && (
                 <Grid item xs={12}>
                   <FormControl fullWidth>
-                    <InputLabel id="template-select-label">Plantilla</InputLabel>
+                    <InputLabel id="template-select-label">
+                      {tEmail('smartComposer.templates.label')}
+                    </InputLabel>
                     <Select
                       labelId="template-select-label"
                       value={selectedTemplate}
-                      label="Plantilla"
+                      label={tEmail('smartComposer.templates.label')}
                       onChange={handleTemplateChange}
                     >
                       <MenuItem value="">
-                        <em>Ninguna</em>
+                        <em>{tEmail('smartComposer.templates.none')}</em>
                       </MenuItem>
                       {templates.map((template) => (
                         <MenuItem key={template.id} value={template.id}>
@@ -317,11 +325,11 @@ const SmartEmailComposer = ({
                   fullWidth
                   multiline
                   rows={8}
-                  label="Mensaje"
+                  label={tEmail('smartComposer.fields.message.label')}
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   variant="outlined"
-                  placeholder="Escribe tu mensaje aquí..."
+                  placeholder={tEmail('smartComposer.fields.message.placeholder')}
                   inputProps={{ 'data-testid': 'smart-body' }}
                 />
               </Grid>
@@ -331,7 +339,7 @@ const SmartEmailComposer = ({
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <AccessTime color="action" />
                   <Typography variant="body2" color="text.secondary">
-                    Programar envío:
+                    {tEmail('smartComposer.schedule.label')}
                   </Typography>
                   <TextField
                     type="datetime-local"
@@ -346,7 +354,7 @@ const SmartEmailComposer = ({
                   />
                   {scheduledTime && (
                     <Button size="small" onClick={() => setScheduledTime('')} sx={{ ml: 1 }}>
-                      Limpiar
+                      {tEmail('smartComposer.schedule.clear')}
                     </Button>
                   )}
                 </Box>
@@ -356,14 +364,16 @@ const SmartEmailComposer = ({
               <Grid item xs={12}>
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
                   <Button variant="outlined" onClick={onCancel}>
-                    Cancelar
+                    {tEmail('smartComposer.buttons.cancel')}
                   </Button>
                   <Button
                     variant="contained"
                     startIcon={scheduledTime ? <Schedule /> : <Send />}
                     onClick={handleSend}
                   >
-                    {scheduledTime ? 'Programar' : 'Enviar'}
+                    {scheduledTime
+                      ? tEmail('smartComposer.buttons.schedule')
+                      : tEmail('smartComposer.buttons.send')}
                   </Button>
                 </Box>
               </Grid>

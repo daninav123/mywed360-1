@@ -1,4 +1,4 @@
-�# 10. Gesti�n de Bodas M�ltiples (estado 2025-10-16)
+# 10. Gesti�n de Bodas M�ltiples (estado 2025-10-16)
 
 > Implementado: Bodas.jsx, BodaDetalle.jsx, WeddingSelector.jsx, WeddingFormModal.jsx, useWedding context, seeding inicial (finanzas/tareas) al crear boda desde planner, componentes MultiWeddingSummary.jsx y WeddingPortfolioTable.jsx, tablero multi-boda con KPIs/filtros y encolado CRM (crmSyncQueue), y editor de permisos por m�dulo en BodaDetalle.jsx (modulePermissions).
 > Pendiente: worker CRM (procesar crmSyncQueue), activity feed/alertas multi-boda y suites E2E espec�ficas para permisos/CRM.

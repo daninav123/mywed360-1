@@ -6,8 +6,9 @@ import {
   setDoc,
   updateDoc,
 } from 'firebase/firestore';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { formatDate } from '../utils/formatUtils';
 
 import MultiWeddingSummary from '../components/weddings/MultiWeddingSummary.jsx';
 import WeddingPortfolioTable from '../components/weddings/WeddingPortfolioTable.jsx';
@@ -465,7 +466,7 @@ export default function Bodas() {
                       {wedding.name || 'Boda sin nombre'}
                     </h2>
                     <p className="text-sm text-muted">
-                      {(wedding.weddingDateValue && wedding.weddingDateValue.toLocaleDateString('es-ES')) ||
+                      {(wedding.weddingDateValue && formatDate(wedding.weddingDateValue, 'short')) ||
                         wedding.weddingDate ||
                         'Fecha pendiente'}{' '}
                       · {wedding.location || 'Ubicación pendiente'}

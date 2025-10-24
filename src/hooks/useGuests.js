@@ -1,4 +1,5 @@
-�import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { formatDate } from '../utils/formatUtils';
 
 import useWeddingCollection from './useWeddingCollection';
 import useActiveWeddingInfo from './useActiveWeddingInfo';
@@ -256,11 +257,7 @@ const useGuests = () => {
       };
       const date = toDate(raw);
       if (!date) return String(raw);
-      return date.toLocaleDateString('es-ES', {
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric',
-      });
+      return formatDate(date, 'medium');
     } catch {
       return '';
     }

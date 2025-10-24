@@ -1,4 +1,4 @@
-�# 22. Navegacion y Panel General (estado 2025-10-07)
+# 22. Navegacion y Panel General (estado 2025-10-07)
 
 > Implementado: `HomeUser.jsx`, `Dashboard.jsx`, `More.jsx`, `Perfil.jsx`, widgets `WidgetContent.jsx`, utilidades de diagnostico (`DevEnsureFinance.jsx`, `DevSeedGuests.jsx`).
 > Pendiente: unificar dashboard con metricas en vivo, proteger herramientas internas y agregar actividad reciente + estado de sincronizacion.

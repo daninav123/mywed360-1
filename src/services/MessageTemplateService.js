@@ -1,4 +1,4 @@
-�// src/services/MessageTemplateService.js
+// src/services/MessageTemplateService.js
 // Gesti�n simple del mensaje plantilla para invitaciones por WhatsApp (API)
 
 const KEY = 'whatsapp_invite_template';

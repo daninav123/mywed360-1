@@ -21,6 +21,73 @@ const readableSize = (bytes = 0) => {
   return `${size.toFixed(1)} ${units[unitIndex]}`;
 };
 
+const readVideoDuration = async (file) =>
+  new Promise((resolve) => {
+    try {
+      const url = URL.createObjectURL(file);
+      const video = document.createElement('video');
+      const cleanup = () => {
+        try {
+          video.removeAttribute('src');
+          video.load();
+        } catch {}
+        try {
+          URL.revokeObjectURL(url);
+        } catch {}
+      };
+      video.preload = 'metadata';
+      video.onloadedmetadata = () => {
+        const duration = Number.isFinite(video.duration) ? Number(video.duration) : null;
+        cleanup();
+        resolve(duration);
+      };
+      video.onerror = () => {
+        cleanup();
+        resolve(null);
+      };
+      video.src = url;
+    } catch {
+      resolve(null);
+    }
+  });
+
+const readImageDimensions = async (file) =>
+  new Promise((resolve) => {
+    try {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        const width = img.naturalWidth || img.width || null;
+        const height = img.naturalHeight || img.height || null;
+        URL.revokeObjectURL(url);
+        resolve({ width, height });
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        resolve({ width: null, height: null });
+      };
+      img.src = url;
+    } catch {
+      resolve({ width: null, height: null });
+    }
+  });
+
+const extractUploadMetadata = async (file) => {
+  const metadata = {};
+  const type = String(file.type || '').toLowerCase();
+  if (type.startsWith('video/')) {
+    const duration = await readVideoDuration(file);
+    if (Number.isFinite(duration)) {
+      metadata.videoDurationSeconds = Math.round(duration);
+    }
+  } else if (type.startsWith('image/')) {
+    const dims = await readImageDimensions(file);
+    if (dims?.width) metadata.width = dims.width;
+    if (dims?.height) metadata.height = dims.height;
+  }
+  return metadata;
+};
+
 /**
  * UploadWidget
  * Permite subir imágenes a la galería de recuerdos con selección de escena y progreso por archivo.
@@ -94,6 +161,7 @@ export default function UploadWidget({
             typeof metadataBuilder === 'function'
               ? metadataBuilder(file, { scene })
               : {};
+          const intrinsicMeta = await extractUploadMetadata(file);
           const uploadMetadata = {
             scene,
             uploaderId: uploader?.uid || uploader?.id || null,
@@ -103,6 +171,7 @@ export default function UploadWidget({
             guestId: uploader?.guestId || null,
             tokenId: uploader?.tokenId || null,
             source: uploader?.source || 'web',
+            ...intrinsicMeta,
             ...metadataExtra,
           };
           await uploadMomentPhoto({
@@ -115,11 +184,18 @@ export default function UploadWidget({
           updateQueueItem(entry.id, { status: 'done', progress: 100 });
           onUploaded?.({ file, scene });
         } catch (error) {
-          const message =
-            error?.message ||
-            (error?.code === 'storage/canceled'
-              ? 'Subida cancelada'
-              : 'No se pudo subir la foto');
+          let message = error?.message;
+          if (message === 'duplicate_photo') {
+            message = 'Ya se subió un archivo idéntico. Evitamos duplicados automáticamente.';
+          } else if (message === 'video_exceeds_limit') {
+            message =
+              'Los vídeos de más de 2 minutos se bloquean cuando la galería supera el límite de almacenamiento.';
+          } else if (!message || message === 'undefined') {
+            message =
+              error?.code === 'storage/canceled'
+                ? 'Subida cancelada'
+                : 'No se pudo subir el archivo';
+          }
           updateQueueItem(entry.id, { status: 'error', error: message });
           toast.error(message);
         }
