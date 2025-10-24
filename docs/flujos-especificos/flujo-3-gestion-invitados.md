@@ -94,8 +94,114 @@
 - Ejecutar seeds QA (`window.__GUESTS_TEST_API__` → `loadFixture`).
 
 ## 11. Roadmap / pendientes
-- Integración seating bidireccional (guardar/recibir `seatAssignment`).
-- IA para agrupar invitados y sugerir mensajes personalizados.
-- Mensajería omnicanal (SMS/push) orquestada con automatizaciones.
-- Portal colaborador con permisos restringidos.
-- Sincronización con CRM externo.
+
+### 🔍 ESTADO REAL VERIFICADO (2025-10-24)
+
+**Implementación: ✅ 95%** | **Cobertura E2E: 🟡 65%**
+
+**✅ IMPLEMENTADO Y FUNCIONAL:**
+
+1. **CRUD Completo de Invitados** ✅
+   - `src/pages/Invitados.jsx` ✅
+   - `src/components/guests/GuestList.jsx` ✅
+   - `src/components/guests/GuestForm.jsx` ✅
+   - `src/hooks/useGuests.js` ✅
+
+2. **Importación Masiva** ✅
+   - `src/components/guests/ContactsImporter.jsx` ✅
+   - `src/components/guests/GuestBulkGrid.jsx` ✅
+   - Soporta CSV/Excel, Contact Picker API
+   - Deduplicación por email/teléfono
+
+3. **WhatsApp Batch Messaging** ✅
+   - `src/services/whatsappService.js` ✅
+   - `src/components/guests/WhatsAppModal.jsx` ✅
+   - `src/services/WhatsAppBatchService.js` ✅
+   - Programación de envíos
+   - Límite 250 mensajes por lote
+
+4. **RSVP Tracking** ✅
+   - `src/pages/RSVPDashboard.jsx` ✅
+   - Dashboard con métricas
+   - Estados: pending/confirmed/declined
+
+5. **Grupos y Asignación** ✅
+   - `src/components/guests/GroupManager.jsx` ✅
+   - Gestión de grupos
+   - Asignación de mesa básica
+
+6. **Offline-First** ✅
+   - Sincronización con localStorage
+   - `src/services/SyncService.js` ✅
+   - Eventos `mywed360-guests-updated`
+
+7. **Tests E2E** 🟡
+   - `cypress/e2e/guests/` (4 archivos)
+   - `cypress/e2e/critical/guests.cy.js` ✅
+   - `cypress/e2e/critical/guests-real.cy.js` ✅
+   - Cobertura: ~65% (tests básicos)
+
+**🟡 PARCIALMENTE IMPLEMENTADO:**
+
+1. **Integración Seating Bidireccional** 🟡
+   - Asignación a mesa: ✅ Funciona
+   - Sincronización bidireccional: ❌ Pendiente
+   - Campo `seatAssignment` existe pero no se sincroniza automáticamente
+   - Estimación: 8-12 horas
+
+2. **Manejo Defensivo de Hooks** 🟡
+   - Página usa valores mock para estabilidad (decisión temporal)
+   - Try-catch implementado pero hooks deshabilitados
+   - Reintegración gradual pendiente
+
+**❌ NO IMPLEMENTADO:**
+
+1. **IA para Agrupar Invitados** ❌
+   - Sugerencias automáticas de grupos ❌
+   - Mensajes personalizados con IA ❌
+   - Estimación: 15-20 horas
+
+2. **Mensajería Omnicanal** ❌
+   - SMS/push orquestada ❌
+   - Automatizaciones avanzadas ❌
+   - Estimación: 20-30 horas
+
+3. **Portal Colaborador** ❌
+   - Permisos restringidos ❌
+   - Vista externa ❌
+   - Estimación: 30-40 horas
+
+4. **Sincronización CRM Externo** ❌
+   - Integración CRM ❌
+   - Estimación: 25-35 horas
+
+**⚠️ TESTS FALTANTES:**
+
+1. **WhatsApp Service** ❌
+   - `whatsappService.js` sin tests E2E
+   - `WhatsAppBatchService.js` sin tests
+   - Estimación tests: 4 horas
+
+2. **Importación Masiva** 🟡
+   - Tests parciales en `guests-import.cy.js`
+   - Falta cobertura completa
+   - Estimación: 3 horas
+
+3. **Grupos** ❌
+   - `GroupManager.jsx` sin tests
+   - Estimación: 3 horas
+
+### Pendientes Priorizados:
+
+**Corto Plazo (1-2 semanas):**
+- ⏳ Sincronización bidireccional Seating (8-12h)
+- ⏳ Tests WhatsApp service (4h)
+- ⏳ Tests importación completa (3h)
+
+**Medio Plazo (1-2 meses):**
+- ⏳ IA para agrupar invitados (15-20h)
+- ⏳ Mensajería omnicanal (20-30h)
+
+**Largo Plazo (3-6 meses):**
+- ⏳ Portal colaborador (30-40h)
+- ⏳ Sincronización CRM (25-35h)

@@ -1,4 +1,4 @@
-﻿# 6. Gestion de Presupuesto (estado 2025-10-08)
+# 6. Gestion de Presupuesto (estado 2025-10-08)
 
 > Implementado: `src/pages/Finance.jsx`, componentes `src/components/finance/BudgetManager.jsx`, `FinanceOverview.jsx`, `FinanceCharts.jsx`, `PaymentSuggestions.jsx`, `TransactionManager.jsx`, hooks `useFinance`, `useSupplierBudgets`, servicios `EmailInsightsService`, `bankService`, `SyncService`.
 > Pendiente: importación CSV/Excel con mapeo, analítica predictiva con IA, ampliación de aportaciones colaborativas, reportes exportables y automatización de alertas avanzadas.
