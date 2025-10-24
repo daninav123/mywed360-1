@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { Button } from './ui';
-import { useNotifications } from '../hooks/useNotifications';
+import useNotifications from '../hooks/useNotifications';
 import { formatDate } from '../utils/formatUtils';
 
 /**
