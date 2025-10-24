@@ -76,7 +76,12 @@
     "roadmap:order": "node scripts/roadmapOrder.js",
     "roadmap:diff": "node scripts/roadmapCrossCheck.js",
     "seed:personalization": "node scripts/seedPersonalizationProfiles.js",
-    "metrics:cleanup": "node scripts/cleanupProjectMetricsEvents.js --days=30"
+    "metrics:cleanup": "node scripts/cleanupProjectMetricsEvents.js --days=30",
+    "mobile:start": "npm --prefix mobile run start",
+    "mobile:start:clean": "npm --prefix mobile run start:clean",
+    "mobile:android": "npm --prefix mobile run android",
+    "mobile:ios": "npm --prefix mobile run ios",
+    "mobile:lint": "npm --prefix mobile run lint"
   },
   "dependencies": {
     "@mui/icons-material": "^7.3.4",
