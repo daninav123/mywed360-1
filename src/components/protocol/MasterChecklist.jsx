@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { CheckSquare, Square, Calendar, User, AlertCircle, Filter, Search, Plus, Trash2 } from 'lucide-react';
-import Button from '../ui/Button';
+import { useWedding } from '../../context/WeddingContext';
+import { formatDate } from '../../utils/formatUtils';
 import useTranslations from '../../hooks/useTranslations';
 
 /**
@@ -312,7 +313,7 @@ const MasterChecklist = ({ weddingId, onUpdate }) => {
                           {task.dueDate && (
                             <div className="flex items-center gap-1">
                               <Calendar className="w-4 h-4" />
-                              <span>{new Date(task.dueDate).toLocaleDateString('es-ES')}</span>
+                              <span>{formatDate(task.dueDate, 'short')}</span>
                             </div>
                           )}
 

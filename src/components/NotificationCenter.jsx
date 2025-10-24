@@ -3,7 +3,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { Button } from './ui';
-import * as NotificationService from '../services/notificationService';
+import { useNotifications } from '../hooks/useNotifications';
+import { formatDate } from '../utils/formatUtils';
 
 /**
  * Centro de notificaciones unificado para toda la aplicación
@@ -390,12 +391,7 @@ const NotificationCenter = () => {
                         {notification.message}
                       </p>
                       <p className="text-xs text-gray-500 mt-1">
-                        {new Date(notification.timestamp).toLocaleDateString('es-ES', {
-                          day: '2-digit',
-                          month: '2-digit',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
+                        {formatDate(notification.timestamp, 'custom') + ' ' + new Date(notification.timestamp).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
                       </p>
                       {/* Acciones para notificaciones inteligentes */}
                       {notification?.payload?.kind === 'meeting_suggested' && (

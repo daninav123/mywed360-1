@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React from 'react';
+import { formatDate as formatDateUtil } from '../../utils/formatUtils';
 import { toast } from 'react-toastify';
 import QRCode from 'qrcode';
 
@@ -57,14 +58,7 @@ const formatBytes = (bytes = 0) => {
   return `${size.toFixed(precision)} ${units[idx]}`;
 };
 
-const formatDate = (date) =>
-  date
-    ? date.toLocaleDateString('es-ES', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric',
-      })
-    : 'sin definir';
+const formatDate = (date) => (date ? formatDateUtil(date, 'custom') : '');
 
 const badgeLabels = {
   primerMomento: 'Primer momento',

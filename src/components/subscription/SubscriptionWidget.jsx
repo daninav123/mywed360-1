@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { db } from '../../firebaseConfig';
+import { formatDate as formatDateUtil } from '../../utils/formatUtils';
 import { Crown, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004';
@@ -47,10 +48,7 @@ const SubscriptionWidget = () => {
   const formatDate = (timestamp) => {
     if (!timestamp) return 'N/A';
     const date = new Date(timestamp * 1000);
-    return date.toLocaleDateString('es-ES', { 
-      day: 'numeric',
-      month: 'short'
-    });
+    return formatDateUtil(date, 'custom');
   };
 
   if (loading) {

@@ -1,5 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
+import { useWedding } from '../../context/WeddingContext';
+import { formatDate } from '../../utils/formatUtils';
+
 import Modal from '../Modal';
 
 const INVITES_STORAGE_KEY = 'maloveapp_team_invites';
@@ -327,7 +330,7 @@ export default function WeddingTeamModal({ open, onClose, weddingId, weddingName
                 <span data-testid="generated-code">{generatedCode}</span>
                 {expiresAt ? (
                   <span className="ml-2 text-xs text-[color:var(--color-text)]/60" data-testid="code-expiration">
-                    expira: {new Date(expiresAt).toLocaleDateString('es-ES')}
+                    expira: {formatDate(expiresAt, 'short')}
                   </span>
                 ) : null}
               </div>

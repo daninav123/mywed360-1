@@ -5,7 +5,8 @@ import { useNavigate } from 'react-router-dom';
 
 import Spinner from './Spinner';
 import { useWedding } from '../context/WeddingContext';
-import { db, firebaseReady } from '../firebaseConfig';
+import { db, auth } from '../firebaseConfig';
+import { formatDate } from '../utils/formatUtils';
 import { post as apiPost } from '../services/apiClient';
 import { saveData, loadData } from '../services/SyncService';
 
@@ -444,7 +445,7 @@ const ImageGeneratorAI = ({
                 <div className="p-3">
                   <p className="text-sm text-gray-700 line-clamp-2">{image.prompt}</p>
                   <p className="text-xs text-gray-500 mt-1">
-                    {new Date(image.timestamp).toLocaleDateString()}{' '}
+                    {formatDate(image.timestamp, 'short')}{' '}
                     {new Date(image.timestamp).toLocaleTimeString()}
                   </p>
                 </div>

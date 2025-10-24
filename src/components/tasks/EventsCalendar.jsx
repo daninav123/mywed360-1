@@ -1,5 +1,6 @@
 import React from 'react';
-import { Calendar } from 'react-big-calendar';
+import { useWedding } from '../../context/WeddingContext';
+import { formatDate } from '../../utils/formatUtils';
 
 export default function EventsCalendar({
   currentView,
@@ -97,13 +98,7 @@ export default function EventsCalendar({
                     const eventId = event.id || '';
                     const eventTitle = event.title || event.name || 'Evento sin título';
                     const eventStart = event.start instanceof Date ? event.start : new Date();
-                    const formattedDate = eventStart.toLocaleDateString('es-ES', {
-                      weekday: 'short',
-                      day: 'numeric',
-                      month: 'short',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    });
+                    const formattedDate = formatDate(eventStart, 'custom');
                     return (
                       <div
                         key={eventId}

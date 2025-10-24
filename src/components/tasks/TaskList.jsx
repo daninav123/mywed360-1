@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
+import { useWedding } from '../../context/WeddingContext';
+import { formatDate } from '../../utils/formatUtils';
 import { categories } from './CalendarComponents.jsx';
 import { DependencyIndicator, DependencyTooltip } from './hooks/useTaskDependencies.jsx';
 
@@ -317,12 +319,7 @@ export default function TaskList({
                     </span>
                   )}
                   <div className="text-[11px] text-[color:var(--color-text)]/60">
-                    {event.start?.toLocaleDateString?.('es-ES', {
-                      day: 'numeric',
-                      month: 'short',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
+                    {event.start ? formatDate(event.start, 'custom') + ' ' + event.start.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : ''}
                   </div>
                   {event.desc && (
                     <div

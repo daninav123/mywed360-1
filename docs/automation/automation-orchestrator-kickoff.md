@@ -56,6 +56,8 @@
   Adaptadores independientes (`MailgunConnector`, `TwilioConnector`, `InAppConnector`, `WebhookConnector`) expuestos desde `backend/services/automation/channels/*.js`.
 - **Context providers**  
   Fetchers reusables para obtener estado agregado antes de ejecutar reglas (`GuestContextProvider`, `FinanceContextProvider`, `TimelineContextProvider`). Los resultados se cachean temporalmente en `automationStateCache/{weddingId}` (TTL 15 min).
+- **Panel admin**  
+  UI en `src/pages/admin/AdminAutomations.jsx` accesible desde `/admin/automations`. Permite activar/desactivar reglas globales (por ejemplo WhatsApp de aniversario), editar plantillas y lanzar ejecuciones de prueba (`/api/automation/anniversary/*`, `/api/automation/rules`, `/api/automation/logs`).
 - **Orchestrator UI (flujo 12/16)**  
   Panel en `src/pages/admin/AutomationRules.jsx` para CRUD de reglas, vista timeline y replay de eventos. Consume endpoints `/api/automation/rules`, `/api/automation/logs`, `/api/automation/test`.
 
