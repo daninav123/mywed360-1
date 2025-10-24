@@ -43,6 +43,7 @@ import AdminIntegrations from './pages/admin/AdminIntegrations.jsx';
 import AdminSettings from './pages/admin/AdminSettings.jsx';
 import AdminAlerts from './pages/admin/AdminAlerts.jsx';
 import AdminBroadcast from './pages/admin/AdminBroadcast.jsx';
+import AdminAutomations from './pages/admin/AdminAutomations.jsx';
 import AdminDiscounts from './pages/admin/AdminDiscounts.jsx';
 import AdminReports from './pages/admin/AdminReports.jsx';
 import AdminSupport from './pages/admin/AdminSupport.jsx';
@@ -268,6 +269,7 @@ function App() {
                   <Route path="settings" element={<AdminSettings />} />
                   <Route path="alerts" element={<AdminAlerts />} />
                   <Route path="broadcast" element={<AdminBroadcast />} />
+                  <Route path="automations" element={<AdminAutomations />} />
                   <Route path="commerce" element={<AdminDiscounts />} />
                   <Route path="reports" element={<AdminReports />} />
                   <Route path="support" element={<AdminSupport />} />

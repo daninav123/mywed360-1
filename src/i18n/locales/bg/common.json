@@ -2,50 +2,50 @@
   "app": {
     "name": "MaLove.App",
     "brandName": "MaLoveApp",
-    "tagline": "5@D5:B=0B0 28 A20B10, >@30=878@0=0 4838B0;=>",
-    "loading": "0@5640 A5...",
-    "error": "@5H:0",
+    "tagline": "5@D5:B=0B0 28 A20B10, >@30=878@0=0 4838B0;=>",
+    "loading": "0@5640 A5...",
+    "error": "@5H:0",
     "success": "#A?5E",
-    "cancel": "B:07",
-    "save": "0?078",
-    "delete": "7B@89",
+    "cancel": "B:07",
+    "save": "0?078",
+    "delete": "7B@89",
     "edit": " 540:F8O",
-    "add": ">1028",
+    "add": ">1028",
     "search": ""J@A8",
     "filter": "$8;B@8@09",
-    "close": "0B2>@8",
-    "open": "B2>@8",
-    "yes": "0",
-    "no": "5",
+    "close": "0B2>@8",
+    "open": "B2>@8",
+    "yes": "0",
+    "no": "5",
     "ok": "OK",
-    "back": "0704",
-    "next": "0?@54",
-    "previous": "@548H5=",
-    "continue": "@>4J;68",
-    "finish": "02J@H8"
+    "back": "0704",
+    "next": "0?@54",
+    "previous": "@548H5=",
+    "continue": "@>4J;68",
+    "finish": "02J@H8"
   },
   "navigation": {
-    "home": "0G0;>",
+    "home": "0G0;>",
     "dashboard": ""01;>",
-    "guests": ">AB8",
-    "providers": ">AB02G8F8",
+    "guests": ">AB8",
+    "providers": ">AB02G8F8",
     "finance": "$8=0=A8",
     "seating": " 07?@545;5=85",
-    "email": "<59;",
-    "protocol": "@>B>:>;",
-    "designs": "8709=8",
+    "email": "<59;",
+    "protocol": "@>B>:>;",
+    "designs": "8709=8",
     "website": "!20B15= A09B",
-    "contracts": ">3>2>@8",
-    "tasks": "040G8",
-    "profile": "@>D8;",
-    "settings": "0AB@>9:8",
-    "logout": "7E>4",
-    "more": "I5",
+    "contracts": ">3>2>@8",
+    "tasks": "040G8",
+    "profile": "@>D8;",
+    "settings": "0AB@>9:8",
+    "logout": "7E>4",
+    "more": "I5",
     "createEvent": "!J7409 =>2> AJ18B85",
     "weddings": "!20B18",
-    "emailInbox": "E>4OI8",
+    "emailInbox": "E>4OI8",
     "darkMode": ""J<5= @568<",
-    "userMenu": "5=N =0 ?>B@518B5;O"
+    "userMenu": "5=N =0 ?>B@518B5;O"
   },
   "auth": {
     "login": "Login",
@@ -1014,7 +1014,7 @@
     },
     "momentosGuest": {
       "badge": "Collaborative memories",
-      "greeting": "Hi, {{name}} �x9",
+      "greeting": "Hi, {{name}} x9",
       "remainingUploadsSingle": "You can upload 1 more photo.",
       "remainingUploads": "You can upload up to {{count}} more photos.",
       "remainingUploadsUnlimited": "Upload as many photos as you like.",
@@ -1057,9 +1057,9 @@
         "nameRequired": "Please tell us your name so we can personalise your uploads",
         "termsRequired": "You must accept the privacy notice",
         "windowClosed": "This gallery is no longer accepting new photos.",
-        "achievementFirst": "�x�& Achievement unlocked! Your first memory �S�",
-        "achievementEnthusiast": "�x}0 You are a collaborative rockstar! Keep sharing memories.",
-        "achievementStar": "�xRx Star memories! Your photos will shine in the slideshow.",
+        "achievementFirst": "x& Achievement unlocked! Your first memory S",
+        "achievementEnthusiast": "x}0 You are a collaborative rockstar! Keep sharing memories.",
+        "achievementStar": "xRx Star memories! Your photos will shine in the slideshow.",
         "upload": "Photo uploaded successfully"
       },
       "errors": {

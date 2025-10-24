@@ -18,15 +18,13 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
   const [serviceFilter, setServiceFilter] = useState('');
   const [toast, setToast] = useState(null);
 
-  // Hook de bÃƒÂºsqueda IA (con reporte de fallbacks integrado)
   const { results, loading, error, usedFallback, searchProviders, clearResults } = useAISearch();
 
   const modalRef = useRef(null);
 
-  // Cerrar al hacer clic fuera usando referencia (por si overlay pierde eventos)
   useEffect(() => {
-    const handleOutside = (e) => {
-      if (modalRef.current && !modalRef.current.contains(e.target)) {
+    const handleOutside = (event) => {
+      if (modalRef.current && !modalRef.current.contains(event.target)) {
         onClose();
       }
     };
@@ -34,16 +32,14 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
     return () => document.removeEventListener('mousedown', handleOutside);
   }, [onClose]);
 
-  // Cerrar con tecla ESC
   useEffect(() => {
-    const handleEsc = (e) => {
-      if (e.key === 'Escape') onClose();
+    const handleEsc = (event) => {
+      if (event.key === 'Escape') onClose();
     };
     document.addEventListener('keydown', handleEsc);
     return () => document.removeEventListener('keydown', handleEsc);
   }, [onClose]);
 
-  // Servicios comunes para bodas
   const commonServices = useMemo(() => {
     const services = tEmail('providerSearch.services', { returnObjects: true });
     if (Array.isArray(services)) {
@@ -54,30 +50,26 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
     return [];
   }, [tEmail]);
 
-  // Manejar bÃƒÂºsqueda
   const handleSearch = useCallback(
-    async (e) => {
-      if (e) {
-        e.preventDefault();
-        e.stopPropagation();
+    async (event) => {
+      if (event) {
+        event.preventDefault();
+        event.stopPropagation();
       }
-      
+
       if (!query.trim()) {
         setToast({ message: tEmail('providerSearch.messages.missingQuery'), type: 'info' });
         return;
       }
 
       try {
-        // Limpiar toast previo
         setToast(null);
-        
-        // Usar hook de bÃƒÂºsqueda (incluye reporte de fallbacks automÃƒÂ¡tico)
+
         await searchProviders(query, {
           service: serviceFilter,
-          allowFallback: true, // Permitir fallback a resultados demo
+          allowFallback: true,
         });
-        
-        // Guardar resultados para uso posterior (compatibilidad)
+
         if (results.length > 0) {
           saveData('mywed360Suppliers', results, {
             firestore: false,
@@ -85,8 +77,8 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
           });
           window.dispatchEvent(new Event('maloveapp-suppliers'));
         }
-      } catch (err) {
-        console.error('[ProviderSearchModal] Error en bÃƒÂºsqueda:', err);
+      } catch (searchError) {
+        console.error('[ProviderSearchModal] Search error:', searchError);
         setToast({
           message: tEmail('providerSearch.messages.errorRetry'),
           type: 'error',
@@ -96,7 +88,6 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
     [query, serviceFilter, searchProviders, results, tEmail]
   );
 
-  // Mostrar mensaje de error si hay
   useEffect(() => {
     if (error) {
       setToast({
@@ -106,7 +97,6 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
     }
   }, [error, tEmail]);
 
-  // Limpiar resultados al cerrar
   const handleClose = useCallback(() => {
     clearResults();
     setToast(null);
@@ -115,9 +105,7 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
 
   const selectProvider = useCallback(
     (item) => {
-      if (onSelectProvider) {
-        onSelectProvider(item);
-      }
+      onSelectProvider?.(item);
       onClose();
     },
     [onSelectProvider, onClose]
@@ -126,8 +114,8 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
   return (
     <div
       className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-[999]"
-      onMouseDownCapture={(e) => {
-        if (e.target === e.currentTarget) onClose();
+      onMouseDownCapture={(event) => {
+        if (event.target === event.currentTarget) onClose();
       }}
     >
       <div
@@ -135,19 +123,16 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
         role="dialog"
         aria-modal="true"
         className="bg-white rounded shadow-lg w-full max-w-lg max-h-[90vh] flex flex-col p-4 m-4 overflow-y-auto"
-        onClick={(e) => e.stopPropagation()}
+        onClick={(event) => event.stopPropagation()}
       >
-        <h3 className="text-xl font-semibold mb-4">
-          {tEmail('providerSearch.title')}
-        </h3>
+        <h3 className="text-xl font-semibold mb-4">{tEmail('providerSearch.title')}</h3>
 
-        {/* Formulario de bÃƒÂºsqueda */}
         <form onSubmit={handleSearch} className="space-y-4 mb-6">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
               <input
                 value={query}
-                onChange={(e) => setQuery(e.target.value)}
+                onChange={(event) => setQuery(event.target.value)}
                 className="w-full border rounded p-3"
                 placeholder={tEmail('providerSearch.form.placeholder')}
               />
@@ -166,7 +151,7 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
             <div className="flex-1">
               <select
                 value={serviceFilter}
-                onChange={(e) => setServiceFilter(e.target.value)}
+                onChange={(event) => setServiceFilter(event.target.value)}
                 className="w-full border rounded p-3"
               >
                 <option value="">{tEmail('providerSearch.form.servicesAll')}</option>
@@ -180,24 +165,24 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
           </div>
         </form>
 
-        {/* Indicador de carga */}
         {loading && (
           <div className="flex-1 flex items-center justify-center">
             <Spinner text={tEmail('providerSearch.messages.loading')} />
           </div>
         )}
 
-        {/* Resultados de bÃƒÂºsqueda */}
         {!loading && (
           <div className="flex-1 overflow-y-auto">
             {usedFallback && (
               <div className="mb-3 p-2 bg-blue-50 border border-blue-200 rounded text-xs text-blue-700">
-                ℹ️ {tEmail('providerSearch.messages.fallback')}
+                {tEmail('providerSearch.messages.fallback')}
               </div>
             )}
+
             <h4 className="font-medium mb-2">
               {tEmailVars('providerSearch.results.title', { count: results.length })}
             </h4>
+
             {results.length === 0 ? (
               <p className="text-gray-500">{tEmail('providerSearch.messages.noResults')}</p>
             ) : (
@@ -217,10 +202,7 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
                             {item.location || tEmail('providerSearch.messages.noLocation')}
                           </span>
                           {item.priceRange && (
-                            <span className="flex items-center">
-                              <span className="mr-1">Ã°Å¸â€™Â°</span>
-                              {item.priceRange}
-                            </span>
+                            <span className="flex items-center">{item.priceRange}</span>
                           )}
                           {item.service && (
                             <span className="bg-gray-100 px-2 py-0.5 rounded">{item.service}</span>
@@ -237,7 +219,7 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-xs text-blue-600 hover:underline mt-1 inline-block"
-                        onClick={(e) => e.stopPropagation()}
+                        onClick={(event) => event.stopPropagation()}
                       >
                         {new URL(item.link).hostname.replace('www.', '')}
                       </a>
@@ -249,7 +231,6 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
           </div>
         )}
 
-        {/* Toast para mensajes */}
         {toast && (
           <div
             className={`fixed bottom-4 right-4 px-4 py-2 rounded shadow-lg ${toast.type === 'error' ? 'bg-red-600 text-white' : toast.type === 'success' ? 'bg-green-600 text-white' : 'bg-blue-600 text-white'}`}
@@ -258,7 +239,6 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
           </div>
         )}
 
-        {/* Botones de acciÃƒÂ³n */}
         <div className="mt-4 pt-4 border-t flex justify-end space-x-2">
           <button onClick={handleClose} className="px-4 py-2 bg-gray-200 rounded">
             {tEmail('providerSearch.buttons.close')}

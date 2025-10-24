@@ -1,11 +1,11 @@
 {
   "seating": {
-    "title": "Distribuci�n de Mesas",
+    "title": "Distribucin de Mesas",
     "newTable": "Nueva mesa",
     "editTable": "Editar mesa",
     "deleteTable": "Eliminar mesa",
     "assignGuests": "Asignar invitados",
-    "autoAssign": "Asignaci�n autom�tica",
+    "autoAssign": "Asignacin automtica",
     "noTables": "No hay mesas configuradas",
     "createFirst": "Crear primera mesa",
     "form": {
@@ -37,10 +37,10 @@
       "assigned_other": "{{count}} asignados",
       "capacity_full": "Completa",
       "capacity_available": "{{available}} disponibles",
-      "dragHint": "Arrastra invitados aqu�",
-      "autoAssignSuccess": "Asignaci�n autom�tica completada",
+      "dragHint": "Arrastra invitados aqu",
+      "autoAssignSuccess": "Asignacin automtica completada",
       "conflictDetected": "Conflicto detectado",
-      "validationError": "Error de validaci�n"
+      "validationError": "Error de validacin"
     },
     "toolbar": {
       "save": "Guardar",
@@ -49,21 +49,21 @@
       "zoom": "Zoom",
       "export": "Exportar",
       "print": "Imprimir",
-      "settings": "Configuraci�n"
+      "settings": "Configuracin"
     },
     "configureCeremony": "Configurar Ceremonia",
     "ceremony": {
       "rows": "Filas",
       "seatsPerRow": "Sillas por fila",
       "spacing": "Espacio entre sillas (cm)",
-      "aisleAfter": "Pasillo despu�s de col",
+      "aisleAfter": "Pasillo despus de col",
       "vipReservations": "Reservas VIP",
       "reservedRows": "Filas reservadas (ej. 1,2)",
       "reservedLabel": "Etiqueta para asientos reservados",
       "lockVipSeats": "Bloquear asientos VIP hasta asignarlos manualmente",
       "notesPlaceholder": "Ej. Reservar para padrinos y padres",
       "totalSeats": "Total de sillas",
-      "saveConfiguration": "Guardar configuraci�n"
+      "saveConfiguration": "Guardar configuracin"
     },
     "configureBanquet": "Configurar Banquete",
     "banquet": {
@@ -75,7 +75,7 @@
       "generate": "Generar"
     },
     "space": {
-      "dimensions": "Dimensiones del Sal�n",
+      "dimensions": "Dimensiones del Saln",
       "width": "Ancho (cm)",
       "height": "Alto (cm)"
     },
@@ -87,9 +87,9 @@
         "tableName": "Mesa {{number}}"
       },
       "toasts": {
-        "fullAssignment": "<� �100% de invitados asignados! �Felicitaciones!",
-        "autoAssignSuccess": "Asignaci�n autom�tica completada",
-        "autoAssignError": "No pudimos completar la asignaci�n autom�tica. Intenta nuevamente.",
+        "fullAssignment": "< 100% de invitados asignados! Felicitaciones!",
+        "autoAssignSuccess": "Asignacin automtica completada",
+        "autoAssignError": "No pudimos completar la asignacin automtica. Intenta nuevamente.",
         "addTableSuccess": "Mesa agregada correctamente",
         "addTableError": "No pudimos agregar la mesa{{message}}",
         "capacityUpdated": "Capacidad actualizada a {{value}}",
@@ -120,7 +120,7 @@
             "pending": "Pendientes",
             "vipPending": "VIP pendientes",
             "tablesNearlyFull": "Mesas casi llenas",
-            "companionSeats": "Asientos acompa�antes",
+            "companionSeats": "Asientos acompaantes",
             "conflicts": "Conflictos",
             "snapshots": "Snapshots guardados"
           },
@@ -139,28 +139,28 @@
           "suggestedTable": "Mesa sugerida:",
           "capacityAvailable_one": "Capacidad disponible: {{count}} asiento",
           "capacityAvailable_other": "Capacidad disponible: {{count}} asientos",
-          "capacityUnknown": "Capacidad disponible:  asiento(s)"
+          "capacityUnknown": "Capacidad disponible:  asiento(s)"
         },
         "conflicts": {
           "emptyTitle": "Sin conflictos",
           "emptyDescription": "No se detectaron problemas en las mesas.",
           "tableFallback": "Mesa",
           "messageFallback": "Conflicto detectado en la mesa.",
-          "severityHigh": "Cr�tico",
-          "severityMedium": "Atenci�n",
+          "severityHigh": "Crtico",
+          "severityMedium": "Atencin",
           "actions": {
             "reassign": "Reubicar {{guest}}",
             "fixPosition": "Ajustar mesa",
-            "generic": "Acci�n sugerida"
+            "generic": "Accin sugerida"
           }
         },
         "staff": {
           "emptyTitle": "Sin staff registrado",
-          "emptyDescription": "Agrega tags o roles para identificar r�pidamente al personal y proveedores.",
+          "emptyDescription": "Agrega tags o roles para identificar rpidamente al personal y proveedores.",
           "memberFallback": "Miembro del staff",
           "assigned": "Asignado",
           "noTable": "Sin mesa",
-          "pending": "Pendiente de ubicaci�n",
+          "pending": "Pendiente de ubicacin",
           "tableLabel": "Mesa: {{table}}"
         },
         "history": {

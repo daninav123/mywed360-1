@@ -2,10 +2,10 @@
   "app": {
     "name": "MaLove.App",
     "brandName": "MaLoveApp",
-    "tagline": "Vaae perfektn� svatba, digit�ln zorganizovan�",
-    "loading": "Na�t�n�...",
+    "tagline": "Vaae perfektn svatba, digitln zorganizovan",
+    "loading": "Natn...",
     "error": "Chyba",
-    "success": "�spch",
+    "success": "spch",
     "cancel": "Zruait",
     "save": "Ulo~it",
     "delete": "Smazat",
@@ -13,39 +13,39 @@
     "add": "PYidat",
     "search": "Hledat",
     "filter": "Filtrovat",
-    "close": "ZavY�t",
-    "open": "OtevY�t",
+    "close": "ZavYt",
+    "open": "OtevYt",
     "yes": "Ano",
     "no": "Ne",
     "ok": "OK",
-    "back": "Zpt",
-    "next": "Dala�",
-    "previous": "PYedchoz�",
+    "back": "Zpt",
+    "next": "Dala",
+    "previous": "PYedchoz",
     "continue": "Pokraovat",
     "finish": "Dokonit"
   },
   "navigation": {
     "home": "Domo",
     "dashboard": "PYehled",
-    "guests": "Host�",
-    "providers": "Dodavatel�",
+    "guests": "Host",
+    "providers": "Dodavatel",
     "finance": "Finance",
-    "seating": "Zasedac� poY�dek",
+    "seating": "Zasedac poYdek",
     "email": "E-mail",
     "protocol": "Protokol",
     "designs": "Designy",
-    "website": "Svatebn� web",
+    "website": "Svatebn web",
     "contracts": "Smlouvy",
-    "tasks": "�koly",
+    "tasks": "koly",
     "profile": "Profil",
-    "settings": "Nastaven�",
-    "logout": "Odhl�sit se",
-    "more": "V�ce",
-    "createEvent": "VytvoYit novou ud�lost",
+    "settings": "Nastaven",
+    "logout": "Odhlsit se",
+    "more": "Vce",
+    "createEvent": "VytvoYit novou udlost",
     "weddings": "Svatby",
-    "emailInbox": "Doruen� poata",
-    "darkMode": "Tmav� re~im",
-    "userMenu": "U~ivatelsk� menu"
+    "emailInbox": "Doruen poata",
+    "darkMode": "Tmav re~im",
+    "userMenu": "U~ivatelsk menu"
   },
   "auth": {
     "login": "Login",
@@ -1014,7 +1014,7 @@
     },
     "momentosGuest": {
       "badge": "Collaborative memories",
-      "greeting": "Hi, {{name}} �x9",
+      "greeting": "Hi, {{name}} x9",
       "remainingUploadsSingle": "You can upload 1 more photo.",
       "remainingUploads": "You can upload up to {{count}} more photos.",
       "remainingUploadsUnlimited": "Upload as many photos as you like.",
@@ -1057,9 +1057,9 @@
         "nameRequired": "Please tell us your name so we can personalise your uploads",
         "termsRequired": "You must accept the privacy notice",
         "windowClosed": "This gallery is no longer accepting new photos.",
-        "achievementFirst": "�x�& Achievement unlocked! Your first memory �S�",
-        "achievementEnthusiast": "�x}0 You are a collaborative rockstar! Keep sharing memories.",
-        "achievementStar": "�xRx Star memories! Your photos will shine in the slideshow.",
+        "achievementFirst": "x& Achievement unlocked! Your first memory S",
+        "achievementEnthusiast": "x}0 You are a collaborative rockstar! Keep sharing memories.",
+        "achievementStar": "xRx Star memories! Your photos will shine in the slideshow.",
         "upload": "Photo uploaded successfully"
       },
       "errors": {

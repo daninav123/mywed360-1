@@ -1,6 +1,16 @@
 import express from 'express';
 import { requireAuth } from '../middleware/authMiddleware.js';
 import { listRules, upsertRule, evaluateTrigger, health } from '../services/automationService.js';
+import {
+  getAnniversaryConfig,
+  updateAnniversaryConfig,
+  runAnniversaryAutomation,
+} from '../services/automationAnniversaryService.js';
+import {
+  getPartnerSummaryConfig,
+  updatePartnerSummaryConfig,
+  runPartnerSummaryAutomation,
+} from '../services/automationPartnerSummaryService.js';
 
 const router = express.Router();
 
@@ -40,6 +50,70 @@ router.post('/evaluate', requireAuth, async (req, res) => {
 router.get('/health', async (_req, res) => {
   const h = await health();
   res.status(h.ok ? 200 : 503).json(h);
+});
+
+router.get('/anniversary/config', requireAuth, async (_req, res) => {
+  try {
+    const data = await getAnniversaryConfig();
+    res.json({ success: true, ...data });
+  } catch (error) {
+    res.status(400).json({ success: false, error: error?.message || 'anniversary_config_failed' });
+  }
+});
+
+router.put('/anniversary/config', requireAuth, async (req, res) => {
+  try {
+    const payload = req.body || {};
+    const result = await updateAnniversaryConfig(payload, req.userProfile || req.user || {});
+    res.json({ success: true, ...result });
+  } catch (error) {
+    res.status(400).json({ success: false, error: error?.message || 'anniversary_update_failed' });
+  }
+});
+
+router.post('/anniversary/run', requireAuth, async (req, res) => {
+  try {
+    const payload = req.body || {};
+    const result = await runAnniversaryAutomation(payload, req.userProfile || req.user || {});
+    res.json({ success: true, ...result });
+  } catch (error) {
+    res.status(400).json({ success: false, error: error?.message || 'anniversary_run_failed' });
+  }
+});
+
+router.get('/partner-summary/config', requireAuth, async (_req, res) => {
+  try {
+    const data = await getPartnerSummaryConfig();
+    res.json({ success: true, ...data });
+  } catch (error) {
+    res
+      .status(400)
+      .json({ success: false, error: error?.message || 'partner_summary_config_failed' });
+  }
+});
+
+router.put('/partner-summary/config', requireAuth, async (req, res) => {
+  try {
+    const payload = req.body || {};
+    const result = await updatePartnerSummaryConfig(payload, req.userProfile || req.user || {});
+    res.json({ success: true, ...result });
+  } catch (error) {
+    res
+      .status(400)
+      .json({ success: false, error: error?.message || 'partner_summary_update_failed' });
+  }
+});
+
+router.post('/partner-summary/run', requireAuth, async (req, res) => {
+  try {
+    const payload = req.body || {};
+    const result = await runPartnerSummaryAutomation(payload, req.userProfile || req.user || {});
+    res.json({ success: true, ...result });
+  } catch (error) {
+    res
+      .status(400)
+      .json({ success: false, error: error?.message || 'partner_summary_run_failed' });
+  }
 });
 
 export default router;

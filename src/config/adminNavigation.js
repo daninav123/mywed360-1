@@ -34,6 +34,12 @@ const ADMIN_NAVIGATION = [
         description: 'Comunicaciones masivas y avisos críticos controlados.',
       },
       {
+        id: 'automations',
+        label: 'Automatizaciones',
+        path: '/admin/automations',
+        description: 'Mensajería programada (WhatsApp aniversario) y reglas globales.',
+      },
+      {
         id: 'commerce',
         label: 'Comerciales',
         path: '/admin/commerce',

@@ -2,7 +2,41 @@
   "email": {
     "title": "Correo electrónico",
     "inbox": "Bandeja de entrada",
-    "compose": "Redactar",
+    "compose": {
+      "header": {
+        "title": "Nuevo correo"
+      },
+      "fields": {
+        "to": {
+          "placeholder": "Para:",
+          "aria": "Campo destinatario"
+        },
+        "subject": {
+          "placeholder": "Asunto:",
+          "aria": "Campo asunto"
+        },
+        "cc": {
+          "placeholder": "CC:",
+          "aria": "Campo con copia"
+        },
+        "bcc": {
+          "placeholder": "BCC:",
+          "aria": "Campo con copia oculta"
+        }
+      },
+      "toggle": {
+        "showCcBcc": "Añadir CC/BCC",
+        "hideCcBcc": "Ocultar CC/BCC"
+      },
+      "quickReplies": {
+        "options": [
+          "Gracias por su respuesta. Quedo atento/a a próximos pasos.",
+          "¿Podrían enviarnos un presupuesto detallado, por favor?",
+          "Confirmamos nuestra disponibilidad en la fecha indicada. Muchas gracias."
+        ],
+        "ariaLabel": "Insertar respuesta sugerida {{index}}"
+      }
+    },
     "sent": "Enviados",
     "drafts": "Borradores",
     "trash": "Papelera",
@@ -129,7 +163,11 @@
           "local",
           "ubicación"
         ],
-        "providerKeywords": ["proveedor", "servicio", "contratación"]
+        "providerKeywords": [
+          "proveedor",
+          "servicio",
+          "contratación"
+        ]
       },
       "fields": {
         "title": {
@@ -768,39 +806,78 @@
         "event": "evento"
       }
     },
-    "compose": {
-      "header": {
-        "title": "Nuevo correo"
+    "providerSearch": {
+      "title": "Buscar proveedor",
+      "form": {
+        "placeholder": "¿Qué buscas? Ej: Fotógrafo con experiencia en bodas al aire libre",
+        "servicesAll": "Todos los servicios",
+        "searchAria": "Buscar proveedores"
       },
-      "fields": {
-        "to": {
-          "placeholder": "Para:",
-          "aria": "Campo destinatario"
+      "services": [
+        {
+          "value": "Catering",
+          "label": "Catering"
         },
-        "subject": {
-          "placeholder": "Asunto:",
-          "aria": "Campo asunto"
+        {
+          "value": "Fotografía",
+          "label": "Fotografía"
         },
-        "cc": {
-          "placeholder": "CC:",
-          "aria": "Campo con copia"
+        {
+          "value": "Música",
+          "label": "Música"
         },
-        "bcc": {
-          "placeholder": "BCC:",
-          "aria": "Campo con copia oculta"
+        {
+          "value": "Flores",
+          "label": "Flores"
+        },
+        {
+          "value": "Vestidos",
+          "label": "Vestidos"
+        },
+        {
+          "value": "Decoración",
+          "label": "Decoración"
+        },
+        {
+          "value": "Lugar",
+          "label": "Lugar"
+        },
+        {
+          "value": "Transporte",
+          "label": "Transporte"
+        },
+        {
+          "value": "Invitaciones",
+          "label": "Invitaciones"
+        },
+        {
+          "value": "Pasteles",
+          "label": "Pasteles"
+        },
+        {
+          "value": "Joyería",
+          "label": "Joyería"
+        },
+        {
+          "value": "Detalles",
+          "label": "Detalles"
         }
+      ],
+      "messages": {
+        "loading": "Buscando proveedores...",
+        "fallback": "Mostramos resultados de referencia porque el servicio en vivo no está disponible.",
+        "noResults": "No se encontraron proveedores que coincidan con tu búsqueda.",
+        "noLocation": "No especificada",
+        "noDescription": "Sin descripción disponible",
+        "errorRetry": "Error al buscar proveedores. Inténtalo de nuevo.",
+        "error": "Error al buscar proveedores.",
+        "missingQuery": "Por favor, ingresa un término de búsqueda."
       },
-      "toggle": {
-        "showCcBcc": "Añadir CC/BCC",
-        "hideCcBcc": "Ocultar CC/BCC"
+      "results": {
+        "title": "Resultados ({{count}})"
       },
-      "quickReplies": {
-        "options": [
-          "Gracias por su respuesta. Quedo atento/a a próximos pasos.",
-          "¿Podrían enviarnos un presupuesto detallado, por favor?",
-          "Confirmamos nuestra disponibilidad en la fecha indicada. Muchas gracias."
-        ],
-        "ariaLabel": "Insertar respuesta sugerida {{index}}"
+      "buttons": {
+        "close": "Cerrar"
       }
     }
   }

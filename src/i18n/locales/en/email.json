@@ -2,7 +2,41 @@
   "email": {
     "title": "Correo electrónico",
     "inbox": "Bandeja de entrada",
-    "compose": "Redactar",
+    "compose": {
+      "header": {
+        "title": "New email"
+      },
+      "fields": {
+        "to": {
+          "placeholder": "To:",
+          "aria": "Recipient field"
+        },
+        "subject": {
+          "placeholder": "Subject:",
+          "aria": "Subject field"
+        },
+        "cc": {
+          "placeholder": "CC:",
+          "aria": "CC field"
+        },
+        "bcc": {
+          "placeholder": "BCC:",
+          "aria": "BCC field"
+        }
+      },
+      "toggle": {
+        "showCcBcc": "Add CC/BCC",
+        "hideCcBcc": "Hide CC/BCC"
+      },
+      "quickReplies": {
+        "options": [
+          "Thank you for your response. I look forward to the next steps.",
+          "Could you please send us a detailed quote?",
+          "We confirm our availability on the suggested date. Thank you."
+        ],
+        "ariaLabel": "Insert suggested reply {{index}}"
+      }
+    },
     "sent": "Enviados",
     "drafts": "Borradores",
     "trash": "Papelera",
@@ -120,8 +154,20 @@
         "noSubject": "(No subject)"
       },
       "detection": {
-        "locationKeywords": ["at", "located at", "address", "venue", "location", "space", "room"],
-        "providerKeywords": ["vendor", "service", "booking"]
+        "locationKeywords": [
+          "at",
+          "located at",
+          "address",
+          "venue",
+          "location",
+          "space",
+          "room"
+        ],
+        "providerKeywords": [
+          "vendor",
+          "service",
+          "booking"
+        ]
       },
       "fields": {
         "title": {
@@ -760,39 +806,78 @@
         "event": "event"
       }
     },
-    "compose": {
-      "header": {
-        "title": "New email"
+    "providerSearch": {
+      "title": "Search provider",
+      "form": {
+        "placeholder": "What are you looking for? e.g. Photographer experienced in outdoor weddings",
+        "servicesAll": "All services",
+        "searchAria": "Search providers"
       },
-      "fields": {
-        "to": {
-          "placeholder": "To:",
-          "aria": "Recipient field"
+      "services": [
+        {
+          "value": "Catering",
+          "label": "Catering"
         },
-        "subject": {
-          "placeholder": "Subject:",
-          "aria": "Subject field"
+        {
+          "value": "Photography",
+          "label": "Photography"
         },
-        "cc": {
-          "placeholder": "CC:",
-          "aria": "CC field"
+        {
+          "value": "Music",
+          "label": "Music"
         },
-        "bcc": {
-          "placeholder": "BCC:",
-          "aria": "BCC field"
+        {
+          "value": "Flowers",
+          "label": "Flowers"
+        },
+        {
+          "value": "Dresses",
+          "label": "Dresses"
+        },
+        {
+          "value": "Decoration",
+          "label": "Decoration"
+        },
+        {
+          "value": "Venue",
+          "label": "Venue"
+        },
+        {
+          "value": "Transport",
+          "label": "Transport"
+        },
+        {
+          "value": "Invitations",
+          "label": "Invitations"
+        },
+        {
+          "value": "Cakes",
+          "label": "Cakes"
+        },
+        {
+          "value": "Jewellery",
+          "label": "Jewellery"
+        },
+        {
+          "value": "Details",
+          "label": "Details"
         }
+      ],
+      "messages": {
+        "loading": "Searching providers...",
+        "fallback": "Showing reference results because the live service is not available.",
+        "noResults": "No providers matched your search.",
+        "noLocation": "Not specified",
+        "noDescription": "No description available",
+        "errorRetry": "We couldn’t search for providers. Try again.",
+        "error": "We couldn’t search for providers.",
+        "missingQuery": "Please enter a search term."
       },
-      "toggle": {
-        "showCcBcc": "Add CC/BCC",
-        "hideCcBcc": "Hide CC/BCC"
+      "results": {
+        "title": "Results ({{count}})"
       },
-      "quickReplies": {
-        "options": [
-          "Thank you for your response. I look forward to the next steps.",
-          "Could you please send us a detailed quote?",
-          "We confirm our availability on the suggested date. Thank you."
-        ],
-        "ariaLabel": "Insert suggested reply {{index}}"
+      "buttons": {
+        "close": "Close"
       }
     }
   },

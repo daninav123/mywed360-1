@@ -2,11 +2,11 @@
   "app": {
     "name": "MaLove.App",
     "brandName": "MaLoveApp",
-    "tagline": "Teie t�iuslik pulmap�ev, digitaalselt korraldatud",
+    "tagline": "Teie tiuslik pulmapev, digitaalselt korraldatud",
     "loading": "Laadimine...",
     "error": "Viga",
-    "success": "�nnestus",
-    "cancel": "T�hista",
+    "success": "nnestus",
+    "cancel": "Thista",
     "save": "Salvesta",
     "delete": "Kustuta",
     "edit": "Muuda",
@@ -19,15 +19,15 @@
     "no": "Ei",
     "ok": "OK",
     "back": "Tagasi",
-    "next": "J�rgmine",
+    "next": "Jrgmine",
     "previous": "Eelmine",
-    "continue": "J�tka",
-    "finish": "L�peta"
+    "continue": "Jtka",
+    "finish": "Lpeta"
   },
   "navigation": {
     "home": "Avaleht",
-    "dashboard": "T��laud",
-    "guests": "K�lalised",
+    "dashboard": "Tlaud",
+    "guests": "Klalised",
     "providers": "Teenusepakkujad",
     "finance": "Rahandus",
     "seating": "Istekohtade plaan",
@@ -36,16 +36,16 @@
     "designs": "Disainid",
     "website": "Pulmade veebisait",
     "contracts": "Lepingud",
-    "tasks": "�lesanded",
+    "tasks": "lesanded",
     "profile": "Profiil",
     "settings": "Seaded",
-    "logout": "Logi v�lja",
+    "logout": "Logi vlja",
     "more": "Veel",
-    "createEvent": "Loo uus s�ndmus",
+    "createEvent": "Loo uus sndmus",
     "weddings": "Pulmad",
     "emailInbox": "Postkast",
     "darkMode": "Tume re~iim",
-    "userMenu": "Kasutajamen��"
+    "userMenu": "Kasutajamen"
   },
   "auth": {
     "login": "Login",
@@ -1014,7 +1014,7 @@
     },
     "momentosGuest": {
       "badge": "Collaborative memories",
-      "greeting": "Hi, {{name}} �x9",
+      "greeting": "Hi, {{name}} x9",
       "remainingUploadsSingle": "You can upload 1 more photo.",
       "remainingUploads": "You can upload up to {{count}} more photos.",
       "remainingUploadsUnlimited": "Upload as many photos as you like.",
@@ -1057,9 +1057,9 @@
         "nameRequired": "Please tell us your name so we can personalise your uploads",
         "termsRequired": "You must accept the privacy notice",
         "windowClosed": "This gallery is no longer accepting new photos.",
-        "achievementFirst": "�x�& Achievement unlocked! Your first memory �S�",
-        "achievementEnthusiast": "�x}0 You are a collaborative rockstar! Keep sharing memories.",
-        "achievementStar": "�xRx Star memories! Your photos will shine in the slideshow.",
+        "achievementFirst": "x& Achievement unlocked! Your first memory S",
+        "achievementEnthusiast": "x}0 You are a collaborative rockstar! Keep sharing memories.",
+        "achievementStar": "xRx Star memories! Your photos will shine in the slideshow.",
         "upload": "Photo uploaded successfully"
       },
       "errors": {

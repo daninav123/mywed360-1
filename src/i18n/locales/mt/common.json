@@ -5,8 +5,8 @@
     "tagline": "{wie!ek perfett, organizzat di!italment",
     "loading": "Qed jit'addem...",
     "error": "{ball",
-    "success": "Suess",
-    "cancel": "Ikkanella",
+    "success": "Suess",
+    "cancel": "Ikkanella",
     "save": "Issejvja",
     "delete": "&assar",
     "edit": "Editja",
@@ -20,7 +20,7 @@
     "ok": "OK",
     "back": "Lura",
     "next": "Li jmiss",
-    "previous": "Ta qabel",
+    "previous": "Ta qabel",
     "continue": "Kompli",
     "finish": "Itma"
   },
@@ -44,7 +44,7 @@
     "createEvent": "O'loq avveniment !did",
     "weddings": "{wi!ijiet",
     "emailInbox": "In- inbox",
-    "darkMode": "Modalit� skura",
+    "darkMode": "Modalit skura",
     "userMenu": "Menu tal-utent"
   },
   "auth": {
@@ -1014,7 +1014,7 @@
     },
     "momentosGuest": {
       "badge": "Collaborative memories",
-      "greeting": "Hi, {{name}} �x9",
+      "greeting": "Hi, {{name}} x9",
       "remainingUploadsSingle": "You can upload 1 more photo.",
       "remainingUploads": "You can upload up to {{count}} more photos.",
       "remainingUploadsUnlimited": "Upload as many photos as you like.",
@@ -1057,9 +1057,9 @@
         "nameRequired": "Please tell us your name so we can personalise your uploads",
         "termsRequired": "You must accept the privacy notice",
         "windowClosed": "This gallery is no longer accepting new photos.",
-        "achievementFirst": "�x�& Achievement unlocked! Your first memory �S�",
-        "achievementEnthusiast": "�x}0 You are a collaborative rockstar! Keep sharing memories.",
-        "achievementStar": "�xRx Star memories! Your photos will shine in the slideshow.",
+        "achievementFirst": "x& Achievement unlocked! Your first memory S",
+        "achievementEnthusiast": "x}0 You are a collaborative rockstar! Keep sharing memories.",
+        "achievementStar": "xRx Star memories! Your photos will shine in the slideshow.",
         "upload": "Photo uploaded successfully"
       },
       "errors": {
