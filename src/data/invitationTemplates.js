@@ -1,10 +1,10 @@
-﻿// Simple invitation HTML templates with {{placeholders}}.
+�// Simple invitation HTML templates with {{placeholders}}.
 
 export const invitationTemplates = [
   {
     id: 'classic',
-    name: 'Clásico elegante',
-    category: 'clásico',
+    name: 'Cl�sico elegante',
+    category: 'cl�sico',
     color: 'pastel',
     font: 'Serif',
     html: `
@@ -22,13 +22,13 @@ export const invitationTemplates = [
 <body>
   <div class="card">
     <h1 class="title">{{coupleName}}</h1>
-    <p class="subtitle">Con mucha ilusión te invitamos a celebrar nuestra boda</p>
+    <p class="subtitle">Con mucha ilusi�n te invitamos a celebrar nuestra boda</p>
     <p>Querido/a {{guestName}},</p>
     <p>{{invitationText}}</p>
     <p><strong>Fecha:</strong> {{weddingDate}}<br/>
        <strong>Lugar:</strong> {{venue}}</p>
     {{#if rsvpLink}}<p style="text-align:center; margin-top: 16px;"><a class="btn" href="{{rsvpLink}}" target="_blank">Confirmar asistencia (RSVP)</a></p>{{/if}}
-    <p class="footer">Si tienes alguna duda, contáctanos. ¡Gracias!</p>
+    <p class="footer">Si tienes alguna duda, cont�ctanos. �Gracias!</p>
   </div>
 </body></html>`,
   },
@@ -54,13 +54,13 @@ export const invitationTemplates = [
   <div class="wrap">
     <div class="hero">
       <h1>{{coupleName}}</h1>
-      <div>¡Nos casamos!</div>
+      <div>�Nos casamos!</div>
     </div>
     <div class="block">
       <p>Hola {{guestName}},</p>
       <p>{{invitationText}}</p>
-      <p><strong>Cuándo:</strong> {{weddingDate}}<br/>
-         <strong>Dónde:</strong> {{venue}}</p>
+      <p><strong>Cu�ndo:</strong> {{weddingDate}}<br/>
+         <strong>D�nde:</strong> {{venue}}</p>
       {{#if rsvpLink}}<p style="text-align:center; margin-top: 10px;"><a class="btn" href="{{rsvpLink}}" target="_blank">Confirmar asistencia</a></p>{{/if}}
     </div>
   </div>
@@ -68,8 +68,8 @@ export const invitationTemplates = [
   },
   {
     id: 'rustic',
-    name: 'Rústico',
-    category: 'rústico',
+    name: 'R�stico',
+    category: 'r�stico',
     color: 'tierra',
     font: 'Handwriting',
     html: `
@@ -85,9 +85,9 @@ export const invitationTemplates = [
 <body>
   <div class="frame">
     <div class="tt">{{coupleName}}</div>
-    <p>¡Nos encantaría que nos acompañaras, {{guestName}}!</p>
+    <p>�Nos encantar�a que nos acompa�aras, {{guestName}}!</p>
     <p>{{invitationText}}</p>
-    <p><strong>Fecha:</strong> {{weddingDate}} — <strong>Lugar:</strong> {{venue}}</p>
+    <p><strong>Fecha:</strong> {{weddingDate}}  <strong>Lugar:</strong> {{venue}}</p>
     {{#if rsvpLink}}<p style="text-align:center; margin-top: 12px;"><a class="btn" href="{{rsvpLink}}" target="_blank">Confirmar asistencia</a></p>{{/if}}
   </div>
 </body></html>`,

@@ -26,50 +26,50 @@ const BASE_STEPS = [
   {
     id: 'eventType',
     field: 'eventType',
-    question: '¿Qué tipo de evento quieres organizar? (por ejemplo, boda u otro tipo de evento)',
+    question: '�Qu� tipo de evento quieres organizar? (por ejemplo, boda u otro tipo de evento)',
     type: 'options',
     optionsKey: 'eventType',
   },
   {
     id: 'coupleName',
     field: 'coupleName',
-    question: 'Perfecto. ¿Cómo se llama la pareja o cómo te gustaría nombrar el evento?',
+    question: 'Perfecto. �C�mo se llama la pareja o c�mo te gustar�a nombrar el evento?',
   },
   {
     id: 'weddingDate',
     field: 'weddingDate',
-    question: '¿Cuál es la fecha prevista? (formato 2025-05-17)',
+    question: '�Cu�l es la fecha prevista? (formato 2025-05-17)',
   },
   {
     id: 'location',
     field: 'location',
-    question: '¿En qué ciudad o lugar te gustaría celebrarlo?',
+    question: '�En qu� ciudad o lugar te gustar�a celebrarlo?',
   },
   {
     id: 'style',
     field: 'style',
-    question: 'Hablemos del estilo general. ¿Cuál encaja mejor?',
+    question: 'Hablemos del estilo general. �Cu�l encaja mejor?',
     type: 'options',
     optionsKey: 'style',
   },
   {
     id: 'guestCountRange',
     field: 'guestCountRange',
-    question: '¿Cuántas personas calculas que asistirán?',
+    question: '�Cu�ntas personas calculas que asistir�n?',
     type: 'options',
     optionsKey: 'guestCountRange',
   },
   {
     id: 'formalityLevel',
     field: 'formalityLevel',
-    question: '¿Qué nivel de formalidad imaginas?',
+    question: '�Qu� nivel de formalidad imaginas?',
     type: 'options',
     optionsKey: 'formalityLevel',
   },
   {
     id: 'ceremonyType',
     field: 'ceremonyType',
-    question: 'Y sobre la ceremonia, ¿cómo te gustaría que fuese?',
+    question: 'Y sobre la ceremonia, �c�mo te gustar�a que fuese?',
     type: 'options',
     optionsKey: 'ceremonyType',
     condition: (form) => form.eventType === 'boda',
@@ -77,7 +77,7 @@ const BASE_STEPS = [
   {
     id: 'notes',
     field: 'notes',
-    question: '¿Quieres añadir algún detalle importante o inspiración que debamos tener en cuenta?',
+    question: '�Quieres a�adir alg�n detalle importante o inspiraci�n que debamos tener en cuenta?',
     optional: true,
   },
 ];
@@ -154,7 +154,7 @@ const stepParsers = {
   coupleName: (input) => {
     const value = input.trim();
     if (!value) {
-      return { ok: false, message: 'Necesito algún nombre, aunque sea provisional.' };
+      return { ok: false, message: 'Necesito alg�n nombre, aunque sea provisional.' };
     }
     return { ok: true, value, display: value };
   },
@@ -216,7 +216,7 @@ export default function CreateWeddingAssistant() {
       id: 'welcome',
       role: roles.assistant,
       content:
-        '¡Hola! Soy tu asistente para crear el evento. Te iré haciendo algunas preguntas y con tus respuestas prepararé la base del proyecto.',
+        '�Hola! Soy tu asistente para crear el evento. Te ir� haciendo algunas preguntas y con tus respuestas preparar� la base del proyecto.',
     },
     {
       id: `step-${BASE_STEPS[initialStepIndex].id}`,
@@ -269,7 +269,7 @@ export default function CreateWeddingAssistant() {
         id: 'welcome',
         role: roles.assistant,
         content:
-          'Perfecto, volvamos a empezar. Te haré de nuevo las preguntas clave para preparar el evento.',
+          'Perfecto, volvamos a empezar. Te har� de nuevo las preguntas clave para preparar el evento.',
       },
       {
         id: `step-${BASE_STEPS[firstIndex].id}`,
@@ -286,7 +286,7 @@ export default function CreateWeddingAssistant() {
       appendMessage({
         role: roles.assistant,
         content:
-          'Genial, ya tengo toda la información. Aquí tienes un resumen. Si todo está correcto, creamos el evento.',
+          'Genial, ya tengo toda la informaci�n. Aqu� tienes un resumen. Si todo est� correcto, creamos el evento.',
       });
     } else {
       setCurrentStepIndex(nextIndex);
@@ -304,7 +304,7 @@ export default function CreateWeddingAssistant() {
     if (!parsed.ok) {
       appendMessage({
         role: roles.assistant,
-        content: parsed.message || 'No me ha quedado claro, ¿puedes decirlo de otra forma?',
+        content: parsed.message || 'No me ha quedado claro, �puedes decirlo de otra forma?',
       });
       return;
     }
@@ -353,7 +353,7 @@ export default function CreateWeddingAssistant() {
         value: form.weddingDate || '(por confirmar)',
       },
       {
-        label: 'Ubicación',
+        label: 'Ubicaci�n',
         value: form.location || '(por definir)',
       },
       {
@@ -361,7 +361,7 @@ export default function CreateWeddingAssistant() {
         value: optionLabel('style', form.style),
       },
       {
-        label: 'Número de invitados',
+        label: 'N�mero de invitados',
         value: optionLabel('guestCountRange', form.guestCountRange),
       },
       {
@@ -386,7 +386,7 @@ export default function CreateWeddingAssistant() {
     setCreating(true);
     setRequestError('');
     try {
-      if (!currentUser?.uid) throw new Error('No hay sesión activa');
+      if (!currentUser?.uid) throw new Error('No hay sesi�n activa');
       const fallbackName = form.eventType === 'boda' ? 'Mi Boda' : 'Mi Evento';
       const payload = {
         name: form.coupleName || fallbackName,
@@ -406,13 +406,13 @@ export default function CreateWeddingAssistant() {
       setLastCreatedId(weddingId);
       appendMessage({
         role: roles.assistant,
-        content: '¡Listo! He creado la boda y ya puedes empezar a trabajar con ella.',
+        content: '�Listo! He creado la boda y ya puedes empezar a trabajar con ella.',
       });
       setTimeout(() => {
         navigate(`/bodas/${weddingId}`);
       }, 600);
     } catch (error) {
-      const message = error?.message || 'No pude crear el evento. Inténtalo de nuevo.';
+      const message = error?.message || 'No pude crear el evento. Int�ntalo de nuevo.';
       setRequestError(message);
       appendMessage({
         role: roles.assistant,
@@ -442,7 +442,7 @@ export default function CreateWeddingAssistant() {
       <Card className="space-y-3 text-sm">
         <h2 className="text-xl font-semibold text-[color:var(--color-text)]">Acceso restringido</h2>
         <p className="text-[color:var(--color-muted)]">
-          Este asistente está reservado para propietarios del evento. Solicita acceso al owner o al
+          Este asistente est� reservado para propietarios del evento. Solicita acceso al owner o al
           administrador si necesitas crear un nuevo evento.
         </p>
         <Button type="button" onClick={() => navigate('/home')}>
@@ -456,10 +456,10 @@ export default function CreateWeddingAssistant() {
     <Card className="flex h-[70vh] flex-col gap-4 p-6 md:h-[75vh]">
       <header className="space-y-2">
         <h2 className="text-lg font-semibold text-[color:var(--color-text)]">
-          Configuración rápida con IA
+          Configuraci�n r�pida con IA
         </h2>
         <p className="text-sm text-[color:var(--color-muted)]">
-          Charlemos unos minutos y dejaré lista la base del evento con las respuestas que me
+          Charlemos unos minutos y dejar� lista la base del evento con las respuestas que me
           compartas.
         </p>
       </header>
@@ -555,7 +555,7 @@ export default function CreateWeddingAssistant() {
             <div className="text-xs text-[color:var(--color-muted)]">
               {lastCreatedId
                 ? `ID creado: ${lastCreatedId}`
-                : 'Podrás ajustar cualquier dato del evento más adelante desde su configuración.'}
+                : 'Podr�s ajustar cualquier dato del evento m�s adelante desde su configuraci�n.'}
             </div>
             <div className="flex justify-end gap-2">
               <Button

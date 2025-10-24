@@ -1,4 +1,4 @@
-﻿import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+�import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
@@ -7,7 +7,7 @@ import EmailSettings from '../../components/email/EmailSettings';
 import { useAuth } from '../../context/AuthContext';
 import { createEmailAlias, initEmailService } from '../../services/emailService';
 
-// Mock de los módulos necesarios
+// Mock de los m�dulos necesarios
 vi.mock('../../context/AuthContext', () => ({
   useAuth: vi.fn(),
 }));
@@ -32,8 +32,8 @@ describe('EmailSettings', () => {
   const mockUserProfile = {
     id: 'profile123',
     userId: 'user123',
-    brideFirstName: 'María',
-    brideLastName: 'García',
+    brideFirstName: 'Mar�a',
+    brideLastName: 'Garc�a',
     emailAlias: 'maria.garcia',
   };
 
@@ -42,7 +42,7 @@ describe('EmailSettings', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    // Configuración por defecto para los mocks
+    // Configuraci�n por defecto para los mocks
     useAuth.mockReturnValue({
       userProfile: mockUserProfile,
       currentUser: { uid: 'user123' },
@@ -63,13 +63,13 @@ describe('EmailSettings', () => {
     vi.restoreAllMocks();
   });
 
-  it('muestra correctamente la dirección de correo actual del usuario', () => {
+  it('muestra correctamente la direcci�n de correo actual del usuario', () => {
     render(<EmailSettings />);
 
-    // Verificar que se muestra la dirección actual
+    // Verificar que se muestra la direcci�n actual
     expect(screen.getByText('maria.garcia@maloveapp.com')).toBeInTheDocument();
 
-    // Verificar que se llamó a initEmailService con el perfil del usuario
+    // Verificar que se llam� a initEmailService con el perfil del usuario
     expect(initEmailService).toHaveBeenCalledWith(mockUserProfile);
   });
 
@@ -80,61 +80,61 @@ describe('EmailSettings', () => {
     expect(aliasInput).toBeInTheDocument();
   });
 
-  it('permite actualizar el alias de correo electrónico', async () => {
+  it('permite actualizar el alias de correo electr�nico', async () => {
     render(<EmailSettings />);
 
     // Obtener elementos del formulario
     const aliasInput = screen.getByLabelText('Nuevo alias de correo');
-    const submitButton = screen.getByRole('button', { name: 'Actualizar dirección' });
+    const submitButton = screen.getByRole('button', { name: 'Actualizar direcci�n' });
 
-    // El botón debe estar inicialmente deshabilitado
+    // El bot�n debe estar inicialmente deshabilitado
     expect(submitButton).toBeDisabled();
 
     // Introducir un nuevo alias
     const user = userEvent.setup();
     await user.type(aliasInput, 'nuevo.alias');
 
-    // El botón debe estar habilitado ahora
+    // El bot�n debe estar habilitado ahora
     expect(submitButton).toBeEnabled();
 
     // Enviar el formulario
     fireEvent.click(submitButton);
 
-    // Verificar que se llamó a la API con los parámetros correctos
+    // Verificar que se llam� a la API con los par�metros correctos
     expect(createEmailAlias).toHaveBeenCalledWith(mockUserProfile, 'nuevo.alias');
 
-    // Verificar que se muestra el mensaje de éxito
+    // Verificar que se muestra el mensaje de �xito
     await waitFor(() => {
       expect(
-        screen.getByText('¡Tu dirección de correo ha sido actualizada con éxito!')
+        screen.getByText('�Tu direcci�n de correo ha sido actualizada con �xito!')
       ).toBeInTheDocument();
     });
 
-    // Verificar que se llamó a la función de actualización de perfil
+    // Verificar que se llam� a la funci�n de actualizaci�n de perfil
     expect(mockUpdateProfile).toHaveBeenCalledWith({
       ...mockUserProfile,
       emailAlias: 'nuevo.alias',
     });
 
-    // Esperar a que el setTimeout interno o lógica equivalente oculten el mensaje
+    // Esperar a que el setTimeout interno o l�gica equivalente oculten el mensaje
     await waitFor(
       () => {
         expect(
-          screen.queryByText('¡Tu dirección de correo ha sido actualizada con éxito!')
+          screen.queryByText('�Tu direcci�n de correo ha sido actualizada con �xito!')
         ).not.toBeInTheDocument();
       },
       { timeout: 4000 }
     );
   });
 
-  it('muestra error cuando el alias no es válido', async () => {
+  it('muestra error cuando el alias no es v�lido', async () => {
     render(<EmailSettings />);
 
     // Obtener elementos del formulario
     const aliasInput = screen.getByLabelText('Nuevo alias de correo');
-    const submitButton = screen.getByRole('button', { name: 'Actualizar dirección' });
+    const submitButton = screen.getByRole('button', { name: 'Actualizar direcci�n' });
 
-    // Introducir un alias inválido (demasiado corto)
+    // Introducir un alias inv�lido (demasiado corto)
     const user = userEvent.setup();
     await user.type(aliasInput, 'ab');
 
@@ -144,10 +144,10 @@ describe('EmailSettings', () => {
     // Verificar que se muestra el mensaje de error
     expect(screen.getByText(/El alias debe tener al menos 3 caracteres/)).toBeInTheDocument();
 
-    // Verificar que NO se llamó a la API
+    // Verificar que NO se llam� a la API
     expect(createEmailAlias).not.toHaveBeenCalled();
 
-    // Limpiar el input e introducir otro alias inválido (caracteres no permitidos)
+    // Limpiar el input e introducir otro alias inv�lido (caracteres no permitidos)
     await user.clear(aliasInput);
     await user.type(aliasInput, 'nuevo-alias!');
 
@@ -157,19 +157,19 @@ describe('EmailSettings', () => {
     // Verificar que se muestra el mensaje de error
     expect(screen.getByText(/El alias debe tener al menos 3 caracteres/)).toBeInTheDocument();
 
-    // Verificar que NO se llamó a la API
+    // Verificar que NO se llam� a la API
     expect(createEmailAlias).not.toHaveBeenCalled();
   });
 
   it('maneja correctamente los errores de la API', async () => {
     // Configurar el mock para simular un error
-    createEmailAlias.mockRejectedValueOnce(new Error('El alias ya está en uso'));
+    createEmailAlias.mockRejectedValueOnce(new Error('El alias ya est� en uso'));
 
     render(<EmailSettings />);
 
     // Obtener elementos del formulario
     const aliasInput = screen.getByLabelText('Nuevo alias de correo');
-    const submitButton = screen.getByRole('button', { name: 'Actualizar dirección' });
+    const submitButton = screen.getByRole('button', { name: 'Actualizar direcci�n' });
 
     // Introducir un nuevo alias
     const user = userEvent.setup();
@@ -180,33 +180,33 @@ describe('EmailSettings', () => {
 
     // Verificar que se muestra el mensaje de error
     await waitFor(() => {
-      expect(screen.getByText('Error: El alias ya está en uso')).toBeInTheDocument();
+      expect(screen.getByText('Error: El alias ya est� en uso')).toBeInTheDocument();
     });
 
-    // Verificar que NO se llamó a la función de actualización de perfil
+    // Verificar que NO se llam� a la funci�n de actualizaci�n de perfil
     expect(mockUpdateProfile).not.toHaveBeenCalled();
   });
 
-  it('convierte el alias a minúsculas automáticamente', async () => {
+  it('convierte el alias a min�sculas autom�ticamente', async () => {
     render(<EmailSettings />);
 
     // Obtener el input de alias
     const aliasInput = screen.getByLabelText('Nuevo alias de correo');
 
-    // Introducir un alias con mayúsculas
+    // Introducir un alias con may�sculas
     const user = userEvent.setup();
     await user.type(aliasInput, 'NUEVO.ALIAS');
 
-    // Verificar que el valor del input se convirtió a minúsculas
+    // Verificar que el valor del input se convirti� a min�sculas
     expect(aliasInput).toHaveValue('nuevo.alias');
   });
 
-  it('incluye preferencias de notificación con valores predeterminados', () => {
+  it('incluye preferencias de notificaci�n con valores predeterminados', () => {
     render(<EmailSettings />);
 
-    // Verificar que existen las opciones de notificación
+    // Verificar que existen las opciones de notificaci�n
     expect(screen.getByLabelText('Notificarme cuando reciba nuevos correos')).toBeChecked();
-    expect(screen.getByLabelText('Notificarme cuando mis correos sean leídos')).toBeChecked();
+    expect(screen.getByLabelText('Notificarme cuando mis correos sean le�dos')).toBeChecked();
   });
 
   it('incluye el componente TagsManager', () => {
@@ -218,7 +218,7 @@ describe('EmailSettings', () => {
     expect(tagsManager.textContent).toContain('Gestor de etiquetas (Mock)');
   });
 
-  it('muestra el estado de carga durante la actualización', async () => {
+  it('muestra el estado de carga durante la actualizaci�n', async () => {
     // Crear una promesa que no se resuelve inmediatamente para simular carga
     let resolvePromise;
     const loadingPromise = new Promise((resolve) => {
@@ -230,7 +230,7 @@ describe('EmailSettings', () => {
 
     // Obtener elementos del formulario
     const aliasInput = screen.getByLabelText('Nuevo alias de correo');
-    const submitButton = screen.getByRole('button', { name: 'Actualizar dirección' });
+    const submitButton = screen.getByRole('button', { name: 'Actualizar direcci�n' });
 
     // Introducir un nuevo alias y enviar
     const user = userEvent.setup();
@@ -248,9 +248,9 @@ describe('EmailSettings', () => {
       email: 'nuevo.alias@maloveapp.com',
     });
 
-    // Verificar que el botón vuelve a su estado normal
+    // Verificar que el bot�n vuelve a su estado normal
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: 'Actualizar dirección' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Actualizar direcci�n' })).toBeInTheDocument();
     });
   });
 
@@ -264,10 +264,10 @@ describe('EmailSettings', () => {
 
     render(<EmailSettings />);
 
-    // Verificar que no se llamó a initEmailService
+    // Verificar que no se llam� a initEmailService
     expect(initEmailService).not.toHaveBeenCalled();
 
-    // La dirección de correo debería estar vacía
+    // La direcci�n de correo deber�a estar vac�a
     expect(screen.queryByText('@maloveapp.com')).toBeInTheDocument();
     expect(screen.queryByText('maria.garcia@maloveapp.com')).not.toBeInTheDocument();
   });

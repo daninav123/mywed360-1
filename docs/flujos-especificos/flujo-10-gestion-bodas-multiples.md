@@ -1,24 +1,24 @@
-﻿# 10. Gestión de Bodas Múltiples (estado 2025-10-16)
+�# 10. Gesti�n de Bodas M�ltiples (estado 2025-10-16)
 
-> Implementado: Bodas.jsx, BodaDetalle.jsx, WeddingSelector.jsx, WeddingFormModal.jsx, useWedding context, seeding inicial (finanzas/tareas) al crear boda desde planner, componentes MultiWeddingSummary.jsx y WeddingPortfolioTable.jsx, tablero multi-boda con KPIs/filtros y encolado CRM (crmSyncQueue), y editor de permisos por módulo en BodaDetalle.jsx (modulePermissions).
-> Pendiente: worker CRM (procesar crmSyncQueue), activity feed/alertas multi-boda y suites E2E específicas para permisos/CRM.
+> Implementado: Bodas.jsx, BodaDetalle.jsx, WeddingSelector.jsx, WeddingFormModal.jsx, useWedding context, seeding inicial (finanzas/tareas) al crear boda desde planner, componentes MultiWeddingSummary.jsx y WeddingPortfolioTable.jsx, tablero multi-boda con KPIs/filtros y encolado CRM (crmSyncQueue), y editor de permisos por m�dulo en BodaDetalle.jsx (modulePermissions).
+> Pendiente: worker CRM (procesar crmSyncQueue), activity feed/alertas multi-boda y suites E2E espec�ficas para permisos/CRM.
 
 ## 1. Objetivo y alcance
 - Permitir que planners/owners gestionen varias bodas, creando nuevas y alternando entre ellas.
-- Ofrecer hub de detalle con KPIs clave y navegación contextual.
+- Ofrecer hub de detalle con KPIs clave y navegaci�n contextual.
 - Sincronizar seeds iniciales (finanzas, timeline) cuando se crea boda nueva.
 
 ## 2. Trigger y rutas
-- Menú inferior (rol planner) ? pestaña **Bodas** (`/bodas`, `Bodas.jsx`) lista bodas activas y archivadas.
+- Men� inferior (rol planner) ? pesta�a **Bodas** (`/bodas`, `Bodas.jsx`) lista bodas activas y archivadas.
 - Owners acceden desde Home (widget 'Gestiona tu boda') o desde el onboarding inicial; ambos caminos aterrizan en `/bodas` con la boda actual destacada.
-- `WeddingSelector` aparece cuando hay múltiples bodas y permite saltar a `/bodas/:id` (`BodaDetalle.jsx`).
+- `WeddingSelector` aparece cuando hay m�ltiples bodas y permite saltar a `/bodas/:id` (`BodaDetalle.jsx`).
 
 ## 3. Paso a paso UX
-1. Listado y creación
+1. Listado y creaci�n
    - `Bodas.jsx` muestra tabs "Activas"/"Archivadas", tarjetas con progreso y CTA "Crear boda".
-   - `WeddingFormModal` captura nombre, fecha, ubicación; planners pueden crear bodas adicionales.
-   - Al guardar se inicializa `finance/main` y seeds básicas (tareas, timeline).
-2. Selección y navegación
+   - `WeddingFormModal` captura nombre, fecha, ubicaci�n; planners pueden crear bodas adicionales.
+   - Al guardar se inicializa `finance/main` y seeds b�sicas (tareas, timeline).
+2. Selecci�n y navegaci�n
    - `WeddingSelector` permite cambiar boda activa; al cambiar en ruta `/bodas/*` redirige a detalle.
    - Contexto `useWedding` sincroniza `activeWedding`, `weddings` y persistencia local.
 3. Hub
@@ -40,23 +40,23 @@
    - Modal mantiene tab `Assistant` para asistentes internos, permitiendo invitar por email o compartir codigo equivalente (`AST-XXXX`).
    - Validaci?n: si el correo existe se muestra el perfil asociado; si no existe se ofrece enviar invitaci?n de alta (pendiente de template). En modo codigo se valida caducidad y que no se haya usado.
    - Confirmar (o aceptar codigo) actualiza `weddings/{id}` (`ownerIds`, `plannerIds`, `assistantIds`) y crea documentos espejo en `users/{uid}/weddings/{weddingId}` con el rol asignado.
-   - Se registra evento `wedding_role_invited`, se envía correo/notificacion y se muestra toast; la invitación queda visible en Home del invitado con botones `Aceptar`/`Rechazar` cuando se usa el flujo por email.
-   - Owners pueden invitar planners o assistants; planners sólo pueden sumar assistants (upgrades a planner se documentan en el [Flujo 29](./flujo-29-upgrade-roles.md)).
-   - Al aceptar se marca `status=accepted`, se refrescan listas en `useWedding` y se activa seguimiento en dashboards; al rechazar o expirar el codigo se elimina la relación y se notifica al owner.
+   - Se registra evento `wedding_role_invited`, se env�a correo/notificacion y se muestra toast; la invitaci�n queda visible en Home del invitado con botones `Aceptar`/`Rechazar` cuando se usa el flujo por email.
+   - Owners pueden invitar planners o assistants; planners s�lo pueden sumar assistants (upgrades a planner se documentan en el [Flujo 29](./flujo-29-upgrade-roles.md)).
+   - Al aceptar se marca `status=accepted`, se refrescan listas en `useWedding` y se activa seguimiento en dashboards; al rechazar o expirar el codigo se elimina la relaci�n y se notifica al owner.
 
 5. Portfolio multi-boda
-   - Nueva pestaña "Resumen multi boda" en Bodas.jsx con tarjetas MultiWeddingSummary (activas, pr?ximas, progreso medio, archivadas).
-   - Tabla WeddingPortfolioTable con filtros (estado, rol, búsqueda, rango de fechas) y acciones r?pidas (seleccionar/archivar).
-   - Las acciones se validan según modulePermissions y el rol activo antes de archivar/restaurar o sincronizar.
+   - Nueva pesta�a "Resumen multi boda" en Bodas.jsx con tarjetas MultiWeddingSummary (activas, pr?ximas, progreso medio, archivadas).
+   - Tabla WeddingPortfolioTable con filtros (estado, rol, b�squeda, rango de fechas) y acciones r?pidas (seleccionar/archivar).
+   - Las acciones se validan seg�n modulePermissions y el rol activo antes de archivar/restaurar o sincronizar.
 ## 4. Persistencia y datos
 - Firestore `users/{uid}`: `activeWeddingId`, `weddings[]` con roles, progreso, estado.
 - `weddings/{id}`: metadata, ownerIds/plannerIds/assistantIds, estado `active|archived`, seeds creados en subcolecciones (`finance`, `tasks`).
 - `weddings/{id}/activity` (plan) para feed de eventos.
 
 ## 5. Reglas de negocio
-- Owners solo ven su boda salvo invitación; planners pueden crear nuevas y alternar.
+- Owners solo ven su boda salvo invitaci�n; planners pueden crear nuevas y alternar.
 - Archivado restringido a owner/planner; assistants quedan en lectura.
-- Creación sin fecha genera advertencia (impacta seeds timeline).
+- Creaci�n sin fecha genera advertencia (impacta seeds timeline).
 - Boda activa se guarda en contexto y localStorage para retomar.
 
 ## 6. Estados especiales y errores
@@ -65,25 +65,25 @@
 - Cambiar a boda sin permisos ? fallback a boda anterior + mensaje.
 - Archivos/actividades sin datos ? placeholders en detalle.
 
-## 7. Integración con otros flujos
+## 7. Integraci�n con otros flujos
 - Flujo 2 usa `activeWeddingId` para onboarding.
-- Flujo 6, 14, 17 cargan stats según boda activa.
+- Flujo 6, 14, 17 cargan stats seg�n boda activa.
 - Flujo 12 usa lista de bodas para preferencias de notificaciones.
-- Flujo 21 condiciona sitio público por boda seleccionada.
+- Flujo 21 condiciona sitio p�blico por boda seleccionada.
 
-## 8. Métricas y monitorización
+## 8. M�tricas y monitorizaci�n
 - Eventos: `wedding_created`, `wedding_switched`, `wedding_archived`, `wedding_restored`.
-- Indicadores: nº de bodas activas por planner, tiempo medio para crear boda, ratio archivado/restaurado y porcentaje de bodas sincronizadas (CRM ok vs en cola/error).
+- Indicadores: n� de bodas activas por planner, tiempo medio para crear boda, ratio archivado/restaurado y porcentaje de bodas sincronizadas (CRM ok vs en cola/error).
 
 ## 9. Pruebas recomendadas
-- Unitarias: context `useWedding`, reducers, creación/archivado.
+- Unitarias: context `useWedding`, reducers, creaci�n/archivado.
 - Integracion: crear boda -> seeds en finanzas/tareas -> alternar -> verificar dashboards cargan y permisos por modulo se aplican.
-- E2E: planner crea segunda boda, alterna, archiva, sincroniza CRM y valida restricciones por módulo.
+- E2E: planner crea segunda boda, alterna, archiva, sincroniza CRM y valida restricciones por m�dulo.
 
 
 ## Cobertura E2E implementada
 - `cypress/e2e/weddings/multi-weddings-flow.cy.js`: valida la vista de bodas activas/archivadas usando datos del stub de Cypress, comprueba la persistencia del `activeWedding` y la disponibilidad del CTA para planners.
-- `cypress/e2e/weddings/wedding-team-flow.cy.js`: valida asignación de roles/miembros y navegación multi-boda.
+- `cypress/e2e/weddings/wedding-team-flow.cy.js`: valida asignaci�n de roles/miembros y navegaci�n multi-boda.
 
 ## 10. Checklist de despliegue
 - Reglas Firestore para `weddings`, `users/{uid}` (permisos por rol).
@@ -92,6 +92,6 @@
 - QA de traducciones y copy en wizard.
 
 ## 11. Roadmap / pendientes
-- Worker CRM (procesamiento y reintentos), métricas de sincronización y alertas multi-boda.
+- Worker CRM (procesamiento y reintentos), m�tricas de sincronizaci�n y alertas multi-boda.
 - Activity feed con timeline consolidado y avisos en vivo.
-- Suites E2E específicas para permisos por módulo y flujos CRM.
+- Suites E2E espec�ficas para permisos por m�dulo y flujos CRM.

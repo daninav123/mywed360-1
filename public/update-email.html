@@ -105,7 +105,7 @@
 </head>
 <body>
   <div class="container">
-    <h1>🔧 Actualizar Email</h1>
+    <h1>=' Actualizar Email</h1>
     <p class="subtitle">Configura tu alias de email personalizado</p>
 
     <div id="currentEmailDiv" class="current-email" style="display:none;">
@@ -121,7 +121,7 @@
         pattern="[a-z0-9._-]{3,30}"
       >
       <small style="color: #666; display: block; margin-top: 5px;">
-        Tu email será: <strong><span id="preview">tu-alias</span>@malove.app</strong>
+        Tu email ser�: <strong><span id="preview">tu-alias</span>@malove.app</strong>
       </small>
     </div>
 
@@ -131,7 +131,7 @@
   </div>
 
   <script>
-    // Configuración de Firebase (usar la misma que en tu app)
+    // Configuraci�n de Firebase (usar la misma que en tu app)
     const firebaseConfig = {
       apiKey: "AIzaSyArwjJewGV5j_vzWjqOsQPoJMSFtaCkSZE",
       authDomain: "lovenda-98c77.firebaseapp.com",
@@ -154,7 +154,7 @@
       document.getElementById('preview').textContent = alias || 'tu-alias';
     });
 
-    // Verificar autenticación
+    // Verificar autenticaci�n
     auth.onAuthStateChanged(async (user) => {
       if (user) {
         currentUser = user;
@@ -182,7 +182,7 @@
           console.error('Error loading current email:', err);
         }
       } else {
-        showStatus('❌ No estás autenticado. Abre esta página desde tu app.', 'error');
+        showStatus('L No est�s autenticado. Abre esta p�gina desde tu app.', 'error');
         document.getElementById('updateBtn').disabled = true;
       }
     });
@@ -190,24 +190,24 @@
     async function updateEmail() {
       const alias = document.getElementById('alias').value.toLowerCase().trim();
       
-      // Validación
+      // Validaci�n
       if (!alias) {
-        showStatus('❌ Debes ingresar un alias', 'error');
+        showStatus('L Debes ingresar un alias', 'error');
         return;
       }
       
       if (alias.length < 3 || alias.length > 30) {
-        showStatus('❌ El alias debe tener entre 3 y 30 caracteres', 'error');
+        showStatus('L El alias debe tener entre 3 y 30 caracteres', 'error');
         return;
       }
       
       if (!/^[a-z0-9._-]+$/.test(alias)) {
-        showStatus('❌ Solo se permiten letras minúsculas, números, puntos, guiones', 'error');
+        showStatus('L Solo se permiten letras min�sculas, n�meros, puntos, guiones', 'error');
         return;
       }
       
       if (!currentUser) {
-        showStatus('❌ No estás autenticado', 'error');
+        showStatus('L No est�s autenticado', 'error');
         return;
       }
 
@@ -216,7 +216,7 @@
       btn.disabled = true;
       btn.textContent = 'Actualizando...';
       
-      showStatus('⏳ Actualizando tu email...', 'info');
+      showStatus('� Actualizando tu email...', 'info');
 
       try {
         // Llamar al backend para actualizar
@@ -234,18 +234,18 @@
         const result = await response.json();
 
         if (result.success) {
-          showStatus(`✅ ¡Email actualizado correctamente a ${result.email}!\n\nRecarga la página principal para que los cambios surtan efecto.`, 'success');
+          showStatus(` �Email actualizado correctamente a ${result.email}!\n\nRecarga la p�gina principal para que los cambios surtan efecto.`, 'success');
           
           // Actualizar current email
           document.getElementById('currentEmailDiv').style.display = 'block';
           document.getElementById('currentEmail').textContent = result.email;
         } else {
-          showStatus(`❌ Error: ${result.error}`, 'error');
+          showStatus(`L Error: ${result.error}`, 'error');
         }
 
       } catch (error) {
         console.error('Error:', error);
-        showStatus(`❌ Error: ${error.message}`, 'error');
+        showStatus(`L Error: ${error.message}`, 'error');
       } finally {
         btn.disabled = false;
         btn.textContent = 'Actualizar Email';

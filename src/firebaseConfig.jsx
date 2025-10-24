@@ -14,7 +14,7 @@ import {
   memoryLocalCache,
 } from 'firebase/firestore';
 
-// Configuración de Firebase desde variables de entorno (sin secretos hard-coded)
+// Configuraci�n de Firebase desde variables de entorno (sin secretos hard-coded)
 const rawFirebaseConfig = {
   apiKey: import.meta?.env?.VITE_FIREBASE_API_KEY || "",
   authDomain: import.meta?.env?.VITE_FIREBASE_AUTH_DOMAIN || "",
@@ -59,7 +59,7 @@ if (typeof window !== 'undefined') {
     .filter(([_, v]) => !v)
     .map(([k]) => k);
   if (missing.length) {
-    // Aviso en consola para facilitar configuraciÃ³n local
+    // Aviso en consola para facilitar configuración local
     // No expone valores; solo lista claves faltantes
     console.warn('[firebaseConfig] Variables VITE_* faltantes:', missing.join(', '));
   }
@@ -103,7 +103,7 @@ let db =
 let auth;
 let analytics;
 
-// Prueba la conexiÃ³n con Firestore sin requerir autenticaciÃ³n (solo lectura)
+// Prueba la conexión con Firestore sin requerir autenticación (solo lectura)
 const probarConexionFirestore = async () => {
   try {
     const docPrueba = doc(db, '_conexion_prueba', 'test');
@@ -111,12 +111,12 @@ const probarConexionFirestore = async () => {
     await getDoc(docPrueba);
     return true;
   } catch (_error) {
-    // No propagar: inicializaciÃ³n debe continuar en modo offline si falla
+    // No propagar: inicialización debe continuar en modo offline si falla
     return false;
   }
 };
 
-// Listener de estado de conexiÃ³n (opcional)
+// Listener de estado de conexión (opcional)
 const configurarListenerConexion = () => {
   if (typeof window === 'undefined') return;
   if (import.meta.env.VITE_ENABLE_REALTIME_DB !== 'true') return;
@@ -133,7 +133,7 @@ const configurarListenerConexion = () => {
       }
     });
   } catch (error) {
-    console.warn('No se pudo configurar el listener de conexiÃ³n:', error);
+    console.warn('No se pudo configurar el listener de conexión:', error);
   }
 };
 
@@ -180,7 +180,7 @@ const inicializarFirebase = async () => {
         } catch (_e2) {
           if (firestoreError?.message?.includes('has already been called')) {
             db = getFirestore(app);
-            console.warn('â„¹ï¸ Firestore ya estaba inicializado, usando instancia existente');
+            console.warn('��️ Firestore ya estaba inicializado, usando instancia existente');
           } else {
             try {
               db = initializeFirestore(app, {
@@ -189,7 +189,7 @@ const inicializarFirebase = async () => {
                 localCache: memoryLocalCache(),
               });
             } catch (_e3) {
-              console.error('âŒ Error al inicializar Firestore:', firestoreError);
+              console.error('�R Error al inicializar Firestore:', firestoreError);
               throw new Error(`Error al inicializar Firestore: ${firestoreError.message}`);
             }
           }
@@ -215,13 +215,13 @@ const inicializarFirebase = async () => {
     if (!ok) {
       if (typeof window !== 'undefined' && window.mostrarErrorUsuario) {
         window.mostrarErrorUsuario(
-          'Modo sin conexiÃ³n - Los cambios se sincronizarÃ¡n cuando se recupere la conexiÃ³n',
+          'Modo sin conexión - Los cambios se sincronizarán cuando se recupere la conexión',
           10000
         );
       }
     }
 
-    // Analytics en producciÃ³n
+    // Analytics en producción
     if (typeof window !== 'undefined' && process.env.NODE_ENV === 'production') {
       try {
         const soporteAnalytics = await isSupported();
@@ -233,13 +233,13 @@ const inicializarFirebase = async () => {
       }
     }
 
-    // Listener de conexiÃ³n
+    // Listener de conexión
     configurarListenerConexion();
   } catch (error) {
     console.error('Error al inicializar Firebase:', error);
     if (typeof window !== 'undefined' && window.mostrarErrorUsuario) {
       window.mostrarErrorUsuario(
-        'Error al conectar con el servidor. La aplicaciÃ³n funcionarÃ¡ en modo fuera de lÃ­nea.',
+        'Error al conectar con el servidor. La aplicación funcionará en modo fuera de línea.',
         0
       );
     }
@@ -247,10 +247,10 @@ const inicializarFirebase = async () => {
   }
 };
 
-// Al importar este mÃ³dulo iniciamos Firebase y exportamos la promesa
+// Al importar este módulo iniciamos Firebase y exportamos la promesa
 const firebaseReady = FIREBASE_CONFIGURED
   ? inicializarFirebase().catch((error) => {
-      console.error('Error crÃ­tico al inicializar Firebase:', error);
+      console.error('Error crítico al inicializar Firebase:', error);
       throw error;
     })
   : Promise.resolve();

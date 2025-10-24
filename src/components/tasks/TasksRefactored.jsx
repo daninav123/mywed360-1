@@ -138,7 +138,7 @@ export default function TasksRefactored() {
           }, () => {});
           nestedFallbackUnsubsRef.current.push(unsub);
         } catch {}
-        // Intentar también ruta singular 'task/{pid}/subtasks' por compatibilidad
+        // Intentar tambi�n ruta singular 'task/{pid}/subtasks' por compatibilidad
         try {
           const colRefAlt = collection(db, 'weddings', activeWedding, 'task', pid, 'subtasks');
           const unsubAlt = onSnapshot(colRefAlt, (snap) => {
@@ -185,7 +185,7 @@ export default function TasksRefactored() {
     })();
   }, [activeWedding, tasksState, nestedSubtasks]);
 
-  // (movido mÍs abajo tras declarar debugEnabled)
+  // (movido m�s abajo tras declarar debugEnabled)
 
   // --- Los hooks de Firestore gestionan la carga reactiva ---
 
@@ -309,13 +309,13 @@ export default function TasksRefactored() {
   }, [getQuickRouteForTask, navigate]);
 
   // Exponer helpers en modo debug para correccin in-situ
-  // (movido mÍs abajo tras declarar projectStart/projectEnd para evitar TDZ)
+  // (movido m�s abajo tras declarar projectStart/projectEnd para evitar TDZ)
 
   // Si no hay boda activa, mostrar aviso claro y no renderizar resto
   if (false && !activeWedding) {
     return (
       <div className="max-w-3xl mx-auto p-6">
-        <h1 className="page-title">Gestión de Tareas</h1>
+        <h1 className="page-title">Gesti�n de Tareas</h1>
         <div className="mt-6 bg-yellow-50 border border-yellow-200 text-yellow-900 rounded p-4">
           <div className="font-semibold mb-1">Selecciona o crea una boda para ver tareas</div>
           <div className="text-sm">No hay boda activa en este momento. Ve a la secci)n "Bodas" para seleccionar una existente o crear una nueva.</div>
@@ -336,7 +336,7 @@ export default function TasksRefactored() {
     }
   }, [calendarDate]);
 
-  // Altura del contenedor del calendario (reactiva al tamaï½o de ventana)
+  // Altura del contenedor del calendario (reactiva al tama�o de ventana)
   const [calendarContainerHeight, setCalendarContainerHeight] = useState(520);
   const calendarColumnRef = useRef(null);
   const [calendarColumnHeight, setCalendarColumnHeight] = useState(null);
@@ -388,7 +388,7 @@ export default function TasksRefactored() {
   }, []);
 
 
-  // Suscripcin a cambios del estado de sincronizaciónn (online/syncing/pending)
+  // Suscripcin a cambios del estado de sincronizaci�nn (online/syncing/pending)
   useEffect(() => {
     return () => {
       try {
@@ -439,7 +439,7 @@ export default function TasksRefactored() {
       window.localStorage?.setItem?.(GANTT_ZOOM_STORAGE_KEY, String(ganttZoom));
     } catch (_) {}
   }, [ganttZoom]);
-  // Calcular fechas de proyecto: registro (inicio) y boda (fin + 1 mes)// Crear/actualizar automaticamente la cita del Dï½a de la boda en el calendario (solo meetings)// Ocultar completamente la lista izquierda del Gantt
+  // Calcular fechas de proyecto: registro (inicio) y boda (fin + 1 mes)// Crear/actualizar automaticamente la cita del D�a de la boda en el calendario (solo meetings)// Ocultar completamente la lista izquierda del Gantt
   // Exponer helpers en modo debug para correccin in-situ
   useEffect(() => {
     if (!debugEnabled) return;
@@ -465,7 +465,7 @@ export default function TasksRefactored() {
 
   // Ref para medir el contenedor del Gantt y ajustar el ancho de columna
   const ganttContainerRef = useRef(null);
-  // Manejar eventos de calendario externos// FunciÃ’Â³n para aÃ’Â±adir una reuniÃ’Â³n
+  // Manejar eventos de calendario externos// Funci�³n para a�±adir una reuni�³n
   const addMeeting = useCallback(
     async (meeting) => {
       await addMeetingFS({
@@ -481,9 +481,9 @@ export default function TasksRefactored() {
   // eslint-disable-next-line no-unused-expressions
   addMeeting && null;
 
-  // GeneraciÃ’Â³n automÃ’Âtica de timeline si estÃ’Â vacÃ’Â­o// Estado para tareas completadas (inicial vacÃ’Â­o, se cargarÃ’Â asÃ’Â­ncronamente)
+  // Generaci�³n autom��tica de timeline si est�� vac�­o// Estado para tareas completadas (inicial vac�­o, se cargar�� as�­ncronamente)
 
-  // Cargar tareas completadas de Firestore/Storage sin bloquear render// Suscribirse al estado de sincronización’Â³n// Guardar cambios cuando cambie el estado (evitando sobrescribir con datos vacÃ’Â­os al inicio)// Sugerencia automÃ’Âtica de categorÃ’Â­a
+  // Cargar tareas completadas de Firestore/Storage sin bloquear render// Suscribirse al estado de sincronizaci�n³n// Guardar cambios cuando cambie el estado (evitando sobrescribir con datos vac�­os al inicio)// Sugerencia autom��tica de categor�­a
   const sugerirCategoria = (titulo, descripcion) => {
     const texto = (titulo + ' ' + (descripcion || '')).toLowerCase();
     if (
@@ -505,20 +505,20 @@ export default function TasksRefactored() {
     } else if (texto.includes('ceremon') || texto.includes('protocolo') || texto.includes('ensayo')) {
       return 'CEREMONIA';
     } else if (texto.includes('decora') || texto.includes('adorno') || texto.includes('flor')) {
-      return 'decoración';
+      return 'decoraci�n';
     } else if (
       texto.includes('invitacion') ||
       texto.includes('papel') ||
       texto.includes('tarjeta')
     ) {
-      return 'papelería';
+      return 'papeler�a';
     } else if (
-      texto.includes('mÃ’Âºsica') ||
+      texto.includes('m�ºsica') ||
       texto.includes('music') ||
       texto.includes('dj') ||
       texto.includes('band')
     ) {
-      return 'música';
+      return 'm�sica';
     } else if (texto.includes('foto') || texto.includes('video') || texto.includes('grafia')) {
       return 'FOTOGRAFO';
     } else if (texto.includes('vestido') || texto.includes('traje') || texto.includes('ropa')) {
@@ -536,7 +536,7 @@ export default function TasksRefactored() {
     setFormData((prevForm) => {
       let updated = { ...prevForm, [field]: rawValue };
 
-      // 1. Sugerir categorÃ’Â­a si se cambia el tÃ’Â­tulo y la categorÃ’Â­a es OTROS
+      // 1. Sugerir categor�­a si se cambia el t�­tulo y la categor�­a es OTROS
       if (field === 'title' && (!prevForm.category || prevForm.category === 'OTROS')) {
         const sugerida = sugerirCategoria(rawValue, prevForm.desc);
         if (sugerida !== 'OTROS') {
@@ -549,7 +549,7 @@ export default function TasksRefactored() {
         const start = new Date(rawValue);
         const end = new Date(prevForm.endDate);
         if (!prevForm.endDate || end < start) {
-          updated.endDate = rawValue; // Ajustar fin al mismo dÃ’Â­a por defecto
+          updated.endDate = rawValue; // Ajustar fin al mismo d�­a por defecto
         }
       }
 
@@ -589,7 +589,7 @@ export default function TasksRefactored() {
     resetForm();
   };
 
-  // AsignaciÃ’Â³n automÃ’Âtica de categorÃ’Â­a con IA
+  // Asignaci�³n autom��tica de categor�­a con IA
   const asignarCategoriaConIA = async (titulo, descripcion) => {
     try {
       const texto = (titulo + ' ' + (descripcion || '')).toLowerCase();
@@ -599,24 +599,24 @@ export default function TasksRefactored() {
 
       // Si las reglas simples no funcionan, usamos IA
       const palabrasClave = {
-  LUGAR: ['venue','location','lugar','sitio','espacio','salón','jardín','terraza'],
+  LUGAR: ['venue','location','lugar','sitio','espacio','sal�n','jard�n','terraza'],
   INVITADOS: ['guests','invitados','personas','asistentes','confirmaciones','lista','rsvp'],
   COMIDA: ['catering','food','comida','bebida','menu','bocadillos','pastel','torta'],
   CEREMONIA: ['ceremonia','protocolo','votos','ensayo','celebrante','testigos','expediente'],
-  DECORACION: ['decoración','flores','arreglos','centros de mesa','iluminación','ambientación'],
-  PAPELERIA: ['invitaciones','papelería','save the date','tarjetas','programa','seating plan'],
-  MUSICA: ['música','dj','banda','playlist','sonido','baile','entretenimiento'],
-  FOTOGRAFO: ['fotografía','video','recuerdos','álbum','sesión'],
-  VESTUARIO: ['vestido','traje','accesorios','zapatos','maquillaje','peluquería'],
+  DECORACION: ['decoraci�n','flores','arreglos','centros de mesa','iluminaci�n','ambientaci�n'],
+  PAPELERIA: ['invitaciones','papeler�a','save the date','tarjetas','programa','seating plan'],
+  MUSICA: ['m�sica','dj','banda','playlist','sonido','baile','entretenimiento'],
+  FOTOGRAFO: ['fotograf�a','video','recuerdos','�lbum','sesi�n'],
+  VESTUARIO: ['vestido','traje','accesorios','zapatos','maquillaje','peluquer�a'],
 };
 
-      // Contar coincidencias por categorÃ’Â­a
+      // Contar coincidencias por categor�­a
       const scores = {};
       Object.entries(palabrasClave).forEach(([cat, palabras]) => {
         scores[cat] = palabras.filter((palabra) => texto.includes(palabra)).length;
       });
 
-      // Encontrar la categorÃ’Â­a con mayor puntuaciÃ’Â³n
+      // Encontrar la categor�­a con mayor puntuaci�³n
       let maxScore = 0;
       let maxCat = 'OTROS';
       Object.entries(scores).forEach(([cat, score]) => {
@@ -628,17 +628,17 @@ export default function TasksRefactored() {
 
       return maxScore > 0 ? maxCat : 'OTROS';
     } catch (error) {
-      console.error('Error al asignar categorÃ’Â­a:', error);
+      console.error('Error al asignar categor�­a:', error);
       return 'OTROS';
     }
   };
 
-  // Guardar una tarea en la subcolecciÃ’Â³n de la boda
+  // Guardar una tarea en la subcolecci�³n de la boda
   const handleSaveTask = async () => {
     try {
-      // Validar formulario bÃ’Âsico
+      // Validar formulario b��sico
       if (!formData.title.trim()) {
-        alert('Por favor ingresa un tÃ’Â­tulo');
+        alert('Por favor ingresa un t�­tulo');
         return;
       }
 
@@ -666,7 +666,7 @@ export default function TasksRefactored() {
 
       // Validar fechas
       if (!(isSubtask && unscheduled) && (isNaN(startDate?.getTime?.() || NaN) || isNaN(endDate?.getTime?.() || NaN))) {
-        alert('Fechas no vÃ’Âlidas');
+        alert('Fechas no v��lidas');
         return;
       }
 
@@ -675,7 +675,7 @@ export default function TasksRefactored() {
         return;
       }
 
-      // Asignar categorÃ’Â­a con IA si no se especificÃ’Â³
+      // Asignar categor�­a con IA si no se especific�³
       let category = formData.category;
       if (category === 'OTROS') {
         category = await asignarCategoriaConIA(formData.title, formData.desc);
@@ -691,7 +691,7 @@ export default function TasksRefactored() {
         ...(editingId ? {} : { createdAt: serverTimestamp() }),
       };
 
-      // AÃ’Â±adir/actualizar segÃ’Âºn sea una tarea de largo plazo o una reuniÃ’Â³n
+      // A�±adir/actualizar seg�ºn sea una tarea de largo plazo o una reuni�³n
       if (formData.long) {
         // Si no se eligi tarea padre, asignar por defecto a "OTROS"
         try {
@@ -812,7 +812,7 @@ export default function TasksRefactored() {
             const docRef = await addDoc(colRef, { ...ganttTask, createdAt: serverTimestamp() });
             savedId = docRef.id;
           }
-          // Ã’ï½ï½&ÂÚltimo recurso: generar id local si todo falla
+          // ���&��ltimo recurso: generar id local si todo falla
           if (!savedId) savedId = taskData.id;
         }
         // Espejo opcional para feeds antiguos que leen users/{uid}/tasks
@@ -838,7 +838,7 @@ export default function TasksRefactored() {
             await updateMeetingFS(editingId, taskData);
           }
         } else {
-          // Nueva reunión
+          // Nueva reuni�n
           const saved = await addMeetingFS({ ...taskData, createdAt: serverTimestamp() });
           savedId = saved?.id || taskData.id;
         }
@@ -930,7 +930,7 @@ export default function TasksRefactored() {
       ops.push(Promise.resolve(deleteTaskFS(editingId)).catch(() => {}));
       ops.push(Promise.resolve(deleteMeetingFS(editingId)).catch(() => {}));
       Promise.allSettled(ops)
-        .then(() => console.log('[Tasks] EliminaciÃ’Â³n completada', editingId))
+        .then(() => console.log('[Tasks] Eliminaci�³n completada', editingId))
         .catch(() => {});
     } catch (error) {
       console.error('Error eliminando tarea/proceso:', error);
@@ -944,7 +944,7 @@ export default function TasksRefactored() {
 
   // Procesar eventos para calendario/lista: SOLO tareas puntuales (meetings)
 
-  // FunciÃ’Â³n auxiliar para validar y normalizar fechas
+  // Funci�³n auxiliar para validar y normalizar fechas
   // Eventos y listas seguras via hooks
   const { safeEvents, sortedEvents, safeMeetings, safeMeetingsFiltered } =
     useSafeEvents(meetingsState);
@@ -1240,7 +1240,7 @@ export default function TasksRefactored() {
       });
 
       // Si tras todo lo anterior no hay ninguna tarea padre en el rango,
-      // intentar un fallback directo desde tasksState (por si algn normalizador filtr de mÍs)
+      // intentar un fallback directo desde tasksState (por si algn normalizador filtr de m�s)
       const hasParent = injected.some((x) => String(x?.type || 'task') === 'task');
       if (!hasParent) {
         const raw = Array.isArray(tasksState) ? tasksState : [];
@@ -1445,7 +1445,7 @@ export default function TasksRefactored() {
     };
 
     try {
-      // a) Subtareas planas con fechas válidas (provenientes del normalizador Gantt)
+      // a) Subtareas planas con fechas v�lidas (provenientes del normalizador Gantt)
       const flatScheduled = (Array.isArray(uniqueGanttTasks) ? uniqueGanttTasks : [])
         .filter((t) => String(t.type || 'task') === 'subtask')
         .map((t) => {
@@ -1508,7 +1508,7 @@ export default function TasksRefactored() {
         return enrichWithDependencyMeta(s, base);
       });
 
-      // c) Subtareas planas (todas, incluso sin fecha) — siempre incluir para compatibilidad
+      // c) Subtareas planas (todas, incluso sin fecha)  siempre incluir para compatibilidad
       const src = Array.isArray(tasksState) ? tasksState : [];
       const flatAll = src
         .filter((t) => String(t?.type || '') === 'subtask')
@@ -1542,7 +1542,7 @@ export default function TasksRefactored() {
             return;
           }
           const cur = byStable.get(key);
-          // Reemplazar si la nueva fuente tiene mayor prioridad o aporta fecha donde antes no había
+          // Reemplazar si la nueva fuente tiene mayor prioridad o aporta fecha donde antes no hab�a
           if (
             priority < cur.priority ||
             (!cur.item?.start && item?.start)
@@ -2081,7 +2081,7 @@ export default function TasksRefactored() {
     }
   }, [activeWedding, db, projectEnd]);
 
-  // Seed automÍtico de Bloques A-I (padres + subtareas) si no hay tareas
+  // Seed autom�tico de Bloques A-I (padres + subtareas) si no hay tareas
   useEffect(() => {
     (async () => {
       try {
@@ -2119,7 +2119,7 @@ export default function TasksRefactored() {
   // Estado para notificaciones de desbloqueo
   const [unlockNotification, setUnlockNotification] = useState(null);
 
-  // Toggle rápido de completado con detección de desbloqueos
+  // Toggle r�pido de completado con detecci�n de desbloqueos
   const toggleCompleteById = useCallback(
     async (id, nextCompleted) => {
       try {
@@ -2128,7 +2128,7 @@ export default function TasksRefactored() {
         if (nextCompleted && isTaskBlocked(id)) {
           const depStatus = getTaskDependencyStatus(id);
           const missingNames = depStatus.missingDeps.map(d => d.taskTitle).join(', ');
-          alert(`🔒 No puedes completar esta tarea aún.\n\nDebes completar primero: ${missingNames}`);
+          alert(`= No puedes completar esta tarea a�n.\n\nDebes completar primero: ${missingNames}`);
           return;
         }
         
@@ -2144,7 +2144,7 @@ export default function TasksRefactored() {
           if (unblocked.length > 0) {
             const unblockedNames = unblocked.map(t => t.title).join(', ');
             setUnlockNotification({
-              message: `🎉 ¡Excelente! Ahora puedes trabajar en: ${unblockedNames}`,
+              message: `<� �Excelente! Ahora puedes trabajar en: ${unblockedNames}`,
               timestamp: Date.now()
             });
             
@@ -2175,7 +2175,7 @@ export default function TasksRefactored() {
     setGanttViewMode,
   });
 
-  // Calcular columna y vista (zoom) para que quepa todo el proceso en una vista// Ajuste reactivo del ancho mediante ResizeObserver para ocupar todo el ancho de la secciÃ’Â³n// CÃ’Âlculo de progreso - asegurando que los estados sean arrays
+  // Calcular columna y vista (zoom) para que quepa todo el proceso en una vista// Ajuste reactivo del ancho mediante ResizeObserver para ocupar todo el ancho de la secci�³n// C��lculo de progreso - asegurando que los estados sean arrays
   // Indicador de progreso eliminado
 
   // 1) Escuchar info de la boda para fijar projectEnd (weddings/{id}/weddingInfo.weddingDate)
@@ -2315,7 +2315,7 @@ export default function TasksRefactored() {
               if (!isNaN(iso.getTime())) d = iso;
               else {
                 const m = raw.match(
-                  /(\d{1,2})\s+de\s+([a-zA-ZÑÍÁÉÃÓÚ]+)\s+de\s+(\d{4})/
+                  /(\d{1,2})\s+de\s+([a-zA-Z����Í��]+)\s+de\s+(\d{4})/
                 );
                 if (m) {
                   const day = parseInt(m[1], 10);
@@ -2383,7 +2383,7 @@ export default function TasksRefactored() {
             if (!isNaN(iso.getTime())) d = iso;
             else {
               const m = raw.match(
-                /(\d{1,2})\s+de\s+([a-zA-ZÑÍÁÉÃÓÚ]+)\s+de\s+(\d{4})/
+                /(\d{1,2})\s+de\s+([a-zA-Z����Í��]+)\s+de\s+(\d{4})/
               );
               if (m) {
                 const day = parseInt(m[1], 10);
@@ -2429,7 +2429,7 @@ export default function TasksRefactored() {
     })();
   }, [auth?.currentUser?.uid, db]);
 
-  // 2) Crear/actualizar automÍticamente el evento 'wedding-day' si hay fecha
+  // 2) Crear/actualizar autom�ticamente el evento 'wedding-day' si hay fecha
   useEffect(() => {
     (async () => {
       try {
@@ -2459,7 +2459,7 @@ export default function TasksRefactored() {
         const next = {
           id: 'wedding-day',
           autoKey: 'wedding-day',
-          title: prev?.title || 'Día de la boda',
+          title: prev?.title || 'D�a de la boda',
           category: prev?.category || 'OTROS',
           start,
           end,
@@ -2549,7 +2549,7 @@ export default function TasksRefactored() {
   if (!activeWedding) {
     return (
       <div className="max-w-3xl mx-auto p-6">
-        <h1 className="page-title">Gestión de Tareas</h1>
+        <h1 className="page-title">Gesti�n de Tareas</h1>
         <div className="mt-6 bg-yellow-50 border border-yellow-200 text-yellow-900 rounded p-4">
           <div className="font-semibold mb-1">Selecciona o crea una boda para ver tareas</div>
           <div className="text-sm">No hay boda activa en este momento. Ve a la secci)n \"Bodas\" para seleccionar una existente o crear una nueva.</div>
@@ -2573,7 +2573,7 @@ export default function TasksRefactored() {
       
       <div className="mt-6 mb-8" ref={ganttContainerRef}>
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-          <h2 className="text-xl font-semibold">Planificación a Largo Plazo</h2>
+          <h2 className="text-xl font-semibold">Planificaci�n a Largo Plazo</h2>
           <div className="flex flex-wrap items-center gap-3 text-sm text-gray-600">
             <label className="inline-flex items-center gap-2 cursor-pointer select-none">
               <input
@@ -2589,10 +2589,10 @@ export default function TasksRefactored() {
               value={ganttCategoryFilter}
               onChange={(e) => setGanttCategoryFilter(e.target.value)}
             >
-              <option value="ALL">Todas las categorías</option>
+              <option value="ALL">Todas las categor�as</option>
               {ganttCategoryOptions.map((cat) => {
                 const pretty = cat ? cat.charAt(0) + cat.slice(1).toLowerCase() : '';
-                const label = pretty ? pretty.charAt(0).toUpperCase() + pretty.slice(1) : 'Sin categoría';
+                const label = pretty ? pretty.charAt(0).toUpperCase() + pretty.slice(1) : 'Sin categor�a';
                 return (
                   <option key={cat} value={cat}>
                     {label}
@@ -2619,7 +2619,7 @@ export default function TasksRefactored() {
             >
               <option value="ALL">Todos los estados</option>
               <option value="critical">Solo riesgo</option>
-              <option value="warning">Solo atención</option>
+              <option value="warning">Solo atenci�n</option>
               <option value="ok">Solo en curso</option>
             </select>
             <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
@@ -2684,7 +2684,7 @@ export default function TasksRefactored() {
           </div>
         ) : noTasksScheduled ? (
           <div className="bg-[var(--color-surface)] rounded-xl shadow-md border border-gray-100 px-6 py-10 text-center text-sm text-gray-500">
-            Aún no hay bloques planificados en el timeline. Importa una plantilla o crea una tarea padre desde la checklist para empezar.
+            A�n no hay bloques planificados en el timeline. Importa una plantilla o crea una tarea padre desde la checklist para empezar.
           </div>
         ) : (
           <LongTermTasksGantt
@@ -2734,7 +2734,7 @@ export default function TasksRefactored() {
                   normalizeDate(task.to) ||
                   eventStart;
                 if (!eventStart || !eventEnd) {
-                  console.warn('[Tasks] Gantt task sin fechas válidas al abrir detalle', task);
+                  console.warn('[Tasks] Gantt task sin fechas v�lidas al abrir detalle', task);
                   return;
                 }
                 setEditingId(task.id);

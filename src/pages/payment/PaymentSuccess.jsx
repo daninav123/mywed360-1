@@ -17,19 +17,19 @@ const PaymentSuccess = () => {
       return;
     }
 
-    // Verificar la sesión
+    // Verificar la sesi�n
     getCheckoutSession(sessionId)
       .then((data) => {
         setSessionData(data);
         setStatus('success');
         
-        // Opcional: Redirigir al dashboard después de 5 segundos
+        // Opcional: Redirigir al dashboard despu�s de 5 segundos
         setTimeout(() => {
           navigate('/dashboard');
         }, 5000);
       })
       .catch((error) => {
-        console.error('Error verificando sesión:', error);
+        console.error('Error verificando sesi�n:', error);
         setStatus('error');
       });
   }, [searchParams, navigate]);
@@ -56,7 +56,7 @@ const PaymentSuccess = () => {
             Error al verificar el pago
           </h2>
           <p className="mt-2 text-gray-600">
-            No pudimos verificar tu sesión de pago. Por favor, contacta con soporte.
+            No pudimos verificar tu sesi�n de pago. Por favor, contacta con soporte.
           </p>
           <div className="mt-8 space-y-3">
             <Link
@@ -85,11 +85,11 @@ const PaymentSuccess = () => {
         </div>
         
         <h2 className="mt-6 text-2xl font-semibold text-gray-900">
-          ¡Pago completado con éxito!
+          �Pago completado con �xito!
         </h2>
         
         <p className="mt-2 text-gray-600">
-          Tu suscripción ha sido activada correctamente.
+          Tu suscripci�n ha sido activada correctamente.
         </p>
 
         {sessionData && (
@@ -124,13 +124,13 @@ const PaymentSuccess = () => {
             Ir al Dashboard
           </Link>
           <p className="text-xs text-gray-500">
-            Serás redirigido automáticamente en 5 segundos...
+            Ser�s redirigido autom�ticamente en 5 segundos...
           </p>
         </div>
 
         <div className="mt-6 border-t border-gray-200 pt-6">
           <p className="text-sm text-gray-500">
-            Recibirás un email de confirmación con los detalles de tu compra.
+            Recibir�s un email de confirmaci�n con los detalles de tu compra.
           </p>
         </div>
       </div>

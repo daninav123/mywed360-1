@@ -1,9 +1,9 @@
-﻿// src/services/MessageTemplateService.js
-// Gestión simple del mensaje plantilla para invitaciones por WhatsApp (API)
+�// src/services/MessageTemplateService.js
+// Gesti�n simple del mensaje plantilla para invitaciones por WhatsApp (API)
 
 const KEY = 'whatsapp_invite_template';
 const DEFAULT_TEMPLATE =
-  '¡Hola {guestName}! Somos {coupleName} y nos encantaría contar contigo en nuestra boda. Para confirmar, responde "Sí" o "No" a este mensaje. Después te preguntaremos acompañantes y alergias.';
+  '�Hola {guestName}! Somos {coupleName} y nos encantar�a contar contigo en nuestra boda. Para confirmar, responde "S�" o "No" a este mensaje. Despu�s te preguntaremos acompa�antes y alergias.';
 
 export function getInviteTemplate() {
   try {

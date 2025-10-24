@@ -34,29 +34,29 @@ const DEFAULT_CONFIG = {
     enabled: false,
     subjectTemplate: 'Re: [Asunto]',
     generalMessage:
-      'Hola [Nombre],\n\nHemos recibido tu mensaje y nuestro equipo lo revisará en breve. Te contactaremos lo antes posible.\n\n¡Gracias por escribirnos!',
+      'Hola [Nombre],\n\nHemos recibido tu mensaje y nuestro equipo lo revisar� en breve. Te contactaremos lo antes posible.\n\n�Gracias por escribirnos!',
     replyIntervalHours: 24,
     excludeSenders: [],
     categories: {
       Proveedor: {
         enabled: true,
         message:
-          'Hola [Nombre],\n\nGracias por tu propuesta. Estamos revisando los detalles y te responderemos en breve con la información necesaria.\n\nUn saludo,',
+          'Hola [Nombre],\n\nGracias por tu propuesta. Estamos revisando los detalles y te responderemos en breve con la informaci�n necesaria.\n\nUn saludo,',
       },
       Invitado: {
         enabled: true,
         message:
-          'Hola [Nombre],\n\n¡Gracias por tu mensaje! Hemos tomado nota y te responderemos pronto con más detalles.\n\nUn abrazo,',
+          'Hola [Nombre],\n\n�Gracias por tu mensaje! Hemos tomado nota y te responderemos pronto con m�s detalles.\n\nUn abrazo,',
       },
       Finanzas: {
         enabled: true,
         message:
-          'Hola [Nombre],\n\nGracias por la información. Nuestro equipo financiero lo revisará y te contactará en cuanto tengamos novedades.\n\nSaludos,',
+          'Hola [Nombre],\n\nGracias por la informaci�n. Nuestro equipo financiero lo revisar� y te contactar� en cuanto tengamos novedades.\n\nSaludos,',
       },
       Contratos: {
         enabled: true,
         message:
-          'Hola [Nombre],\n\nHemos recibido el contrato y nuestro equipo legal lo está revisando. Te enviaremos la respuesta en breve.\n\nSaludos,',
+          'Hola [Nombre],\n\nHemos recibido el contrato y nuestro equipo legal lo est� revisando. Te enviaremos la respuesta en breve.\n\nSaludos,',
       },
       Facturas: {
         enabled: true,
@@ -66,12 +66,12 @@ const DEFAULT_CONFIG = {
       Reuniones: {
         enabled: true,
         message:
-          'Hola [Nombre],\n\nGracias por proponer la reunión. Revisaremos nuestra agenda y te enviaremos la confirmación muy pronto.\n\nSaludos,',
+          'Hola [Nombre],\n\nGracias por proponer la reuni�n. Revisaremos nuestra agenda y te enviaremos la confirmaci�n muy pronto.\n\nSaludos,',
       },
       RSVP: {
         enabled: true,
         message:
-          'Hola [Nombre],\n\n¡Gracias por tu confirmación! Hemos registrado tu respuesta y te mantendremos informado con las novedades.\n\nUn abrazo,',
+          'Hola [Nombre],\n\n�Gracias por tu confirmaci�n! Hemos registrado tu respuesta y te mantendremos informado con las novedades.\n\nUn abrazo,',
       },
     },
   },

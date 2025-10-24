@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from 'react';
+�import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
@@ -41,20 +41,20 @@ function RSVPConfirm() {
         allergens,
       });
       if (!res.ok) throw new Error('Error enviando respuesta');
-      toast.success('¡Respuesta registrada!');
+      toast.success('�Respuesta registrada!');
       setSubmitted(true);
     } catch (err) {
       toast.error(err.message || 'Ha ocurrido un error');
     }
   };
 
-  if (loading) return <div className="p-6 text-center">Cargando…</div>;
+  if (loading) return <div className="p-6 text-center">Cargando&</div>;
   if (!guest) return <div className="p-6 text-center">Invitado no encontrado</div>;
 
   if (submitted) {
     return (
       <div className="p-6 text-center max-w-md mx-auto">
-        <h1 className="text-2xl font-bold mb-4">¡Gracias, {guest.name}!</h1>
+        <h1 className="text-2xl font-bold mb-4">�Gracias, {guest.name}!</h1>
         <p>Hemos registrado tu respuesta. Nos vemos pronto.</p>
       </div>
     );
@@ -62,11 +62,11 @@ function RSVPConfirm() {
 
   return (
     <div className="p-6 max-w-md mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Confirmación de asistencia</h1>
-      <p className="mb-4">Hola {guest.name}, por favor confírmanos si podrás asistir.</p>
+      <h1 className="text-2xl font-bold mb-6">Confirmaci�n de asistencia</h1>
+      <p className="mb-4">Hola {guest.name}, por favor conf�rmanos si podr�s asistir.</p>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="font-medium mr-4">¿Asistirás?</label>
+          <label className="font-medium mr-4">�Asistir�s?</label>
           <label className="mr-4">
             <input
               type="radio"
@@ -74,7 +74,7 @@ function RSVPConfirm() {
               checked={status === 'accepted'}
               onChange={() => setStatus('accepted')}
             />{' '}
-            Sí
+            S�
           </label>
           <label>
             <input
@@ -87,7 +87,7 @@ function RSVPConfirm() {
           </label>
         </div>
         <div>
-          <label className="font-medium block mb-1">Número de acompañantes</label>
+          <label className="font-medium block mb-1">N�mero de acompa�antes</label>
           <input
             type="number"
             min="0"

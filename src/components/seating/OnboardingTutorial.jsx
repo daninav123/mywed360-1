@@ -21,7 +21,7 @@ import Confetti from 'react-confetti';
 const TUTORIAL_STEPS = [
   {
     id: 'welcome',
-    title: '¡Bienvenido al Seating Plan! 🎉',
+    title: '�Bienvenido al Seating Plan! <�',
     description: 'Te guiaremos paso a paso para crear el layout perfecto de tu evento.',
     icon: Sparkles,
     position: 'center',
@@ -29,17 +29,17 @@ const TUTORIAL_STEPS = [
   },
   {
     id: 'add-table',
-    title: 'Añadir Mesas',
-    description: 'Click en el botón + flotante para añadir una mesa. También puedes usar templates predefinidos.',
+    title: 'A�adir Mesas',
+    description: 'Click en el bot�n + flotante para a�adir una mesa. Tambi�n puedes usar templates predefinidos.',
     icon: Layout,
     position: 'bottom-right',
     highlight: '.quick-add-button',
-    action: 'Click en el botón +',
+    action: 'Click en el bot�n +',
   },
   {
     id: 'move-table',
     title: 'Mover Mesas',
-    description: 'Arrastra las mesas para posicionarlas. Las guías de alineación te ayudarán a mantener todo ordenado.',
+    description: 'Arrastra las mesas para posicionarlas. Las gu�as de alineaci�n te ayudar�n a mantener todo ordenado.',
     icon: Move,
     position: 'center',
     highlight: '.table-item',
@@ -47,8 +47,8 @@ const TUTORIAL_STEPS = [
   },
   {
     id: 'select-multiple',
-    title: 'Selección Múltiple',
-    description: 'Mantén Shift y arrastra para seleccionar varias mesas. Luego puedes alinearlas o distribuirlas.',
+    title: 'Selecci�n M�ltiple',
+    description: 'Mant�n Shift y arrastra para seleccionar varias mesas. Luego puedes alinearlas o distribuirlas.',
     icon: MousePointer,
     position: 'center',
     highlight: null,
@@ -57,7 +57,7 @@ const TUTORIAL_STEPS = [
   {
     id: 'assign-guests',
     title: 'Asignar Invitados',
-    description: 'Abre el panel lateral, busca un invitado y arrástralo a una mesa. Verás un preview mientras lo mueves.',
+    description: 'Abre el panel lateral, busca un invitado y arr�stralo a una mesa. Ver�s un preview mientras lo mueves.',
     icon: Users,
     position: 'left',
     highlight: '.guest-drawer',
@@ -66,7 +66,7 @@ const TUTORIAL_STEPS = [
   {
     id: 'export',
     title: 'Exportar Layout',
-    description: 'Cuando termines, exporta tu layout en PNG, PDF, SVG o CSV. ¡Listo para compartir!',
+    description: 'Cuando termines, exporta tu layout en PNG, PDF, SVG o CSV. �Listo para compartir!',
     icon: Download,
     position: 'top-right',
     highlight: '.export-button',
@@ -74,8 +74,8 @@ const TUTORIAL_STEPS = [
   },
   {
     id: 'complete',
-    title: '¡Todo Listo! 🎊',
-    description: 'Ya sabes lo básico. Explora las demás funciones y crea el layout perfecto.',
+    title: '�Todo Listo! <�',
+    description: 'Ya sabes lo b�sico. Explora las dem�s funciones y crea el layout perfecto.',
     icon: Check,
     position: 'center',
     highlight: null,
@@ -123,7 +123,7 @@ export default function OnboardingTutorial({ onComplete, onSkip }) {
     onSkip?.();
   };
 
-  // Calcular posición del tooltip
+  // Calcular posici�n del tooltip
   const getTooltipPosition = () => {
     if (!highlightedElement || step.position === 'center') {
       return 'center';
@@ -248,7 +248,7 @@ export default function OnboardingTutorial({ onComplete, onSkip }) {
             </button>
           </div>
 
-          {/* Descripción */}
+          {/* Descripci�n */}
           <p className="text-gray-700 dark:text-gray-300 mb-4">
             {step.description}
           </p>

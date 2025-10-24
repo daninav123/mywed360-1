@@ -6,13 +6,13 @@ import { safeRender, ensureNotPromise, safeMap } from '../../utils/promiseSafeRe
 import Button from '../Button';
 
 /**
- * Modal para componer y enviar un nuevo correo electrónico
+ * Modal para componer y enviar un nuevo correo electr�nico
  *
  * @param {Object} props - Propiedades del componente
- * @param {boolean} props.isOpen - Indica si el modal está abierto
- * @param {Function} props.onClose - Función para cerrar el modal
+ * @param {boolean} props.isOpen - Indica si el modal est� abierto
+ * @param {Function} props.onClose - Funci�n para cerrar el modal
  * @param {string} props.userEmail - Email del usuario remitente
- * @param {Object} [props.replyTo] - Email al que se está respondiendo (opcional)
+ * @param {Object} [props.replyTo] - Email al que se est� respondiendo (opcional)
  */
 const ComposeEmailModal = ({ isOpen, onClose, userEmail, replyTo }) => {
   const [to, setTo] = useState('');
@@ -26,7 +26,7 @@ const ComposeEmailModal = ({ isOpen, onClose, userEmail, replyTo }) => {
   // Preparar datos si es una respuesta
   useEffect(() => {
     if (replyTo) {
-      // Extraer dirección de correo del remitente original
+      // Extraer direcci�n de correo del remitente original
       const originalSender = replyTo.from;
       const originalSubject = replyTo.subject || '';
 
@@ -35,14 +35,14 @@ const ComposeEmailModal = ({ isOpen, onClose, userEmail, replyTo }) => {
 
       // Crear cita del mensaje original
       const quoteDate = new Date(replyTo.date).toLocaleString('es-ES');
-      const quoteHeader = `El ${quoteDate}, ${originalSender} escribió:`;
+      const quoteHeader = `El ${quoteDate}, ${originalSender} escribi�:`;
       const quoteBody = replyTo.body ? replyTo.body.replace(/\n/g, '\n> ') : '';
 
       setBody(`\n\n\n${quoteHeader}\n> ${quoteBody}`);
     }
   }, [replyTo]);
 
-  // Manejar envío del correo
+  // Manejar env�o del correo
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -64,7 +64,7 @@ const ComposeEmailModal = ({ isOpen, onClose, userEmail, replyTo }) => {
 
       setSuccess(true);
 
-      // Cerrar el modal después de 1.5 segundos
+      // Cerrar el modal despu�s de 1.5 segundos
       setTimeout(() => {
         onClose();
         // Reset form
@@ -88,14 +88,14 @@ const ComposeEmailModal = ({ isOpen, onClose, userEmail, replyTo }) => {
 
     if (files.length === 0) return;
 
-    // Limitar tamaño total a 10MB
+    // Limitar tama�o total a 10MB
     const totalSize = [...attachments, ...files].reduce((acc, file) => acc + (file.size || 0), 0);
     if (totalSize > 10 * 1024 * 1024) {
-      setError('El tamaño total de los adjuntos no debe superar los 10MB');
+      setError('El tama�o total de los adjuntos no debe superar los 10MB');
       return;
     }
 
-    // Añadir nuevos archivos al estado
+    // A�adir nuevos archivos al estado
     const newAttachments = files.map((file) => ({
       file,
       filename: file.name,
@@ -188,7 +188,7 @@ const ComposeEmailModal = ({ isOpen, onClose, userEmail, replyTo }) => {
                 aria-label="Mensaje"
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
-                placeholder="Escribe tu mensaje aquí..."
+                placeholder="Escribe tu mensaje aqu�..."
                 className="w-full p-2 border rounded-md min-h-[200px]"
                 rows={10}
               />
@@ -226,7 +226,7 @@ const ComposeEmailModal = ({ isOpen, onClose, userEmail, replyTo }) => {
               </div>
             )}
 
-            {/* Mensajes de error o éxito */}
+            {/* Mensajes de error o �xito */}
             {safeRender(error, '') && (
               <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-md">
                 {safeRender(error, '')}
@@ -235,7 +235,7 @@ const ComposeEmailModal = ({ isOpen, onClose, userEmail, replyTo }) => {
 
             {safeRender(success, false) && (
               <div className="p-3 bg-green-50 border border-green-200 text-green-700 rounded-md">
-                ¡Mensaje enviado con éxito!
+                �Mensaje enviado con �xito!
               </div>
             )}
           </div>

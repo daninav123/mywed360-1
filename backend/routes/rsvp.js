@@ -25,7 +25,7 @@ if (!admin.apps.length) {
 const db = admin.firestore();
 const router = express.Router();
 
-// Mailgun helper (reutiliza configuraciÃ³n como en routes/mail.js)
+// Mailgun helper (reutiliza configuración como en routes/mail.js)
 function createMailgunClients() {
   const MAILGUN_API_KEY = process.env.VITE_MAILGUN_API_KEY || process.env.MAILGUN_API_KEY;
   const MAILGUN_DOMAIN = process.env.VITE_MAILGUN_DOMAIN || process.env.MAILGUN_DOMAIN;
@@ -47,9 +47,9 @@ function createMailgunClients() {
   }
 }
 
-// Helper: localizar invitado por token usando Ã­ndice rsvpTokens o collectionGroup fallback
+// Helper: localizar invitado por token usando índice rsvpTokens o collectionGroup fallback
 async function findGuestRefByToken(token) {
-  // 1) Ãndice preferido
+  // 1) Índice preferido
   const idxRef = db.collection('rsvpTokens').doc(token);
   const idxSnap = await idxRef.get();
   if (idxSnap.exists) {
@@ -83,7 +83,7 @@ router.get('/by-token/:token', async (req, res) => {
     const snap = await guestRef.get();
     const data = snap.data() || {};
     
-    // Filtrar PII - solo exponer datos necesarios para RSVP público
+    // Filtrar PII - solo exponer datos necesarios para RSVP p�blico
     const guestData = {
       name: data.name || '',
       status: data.status || 'pending',
@@ -235,7 +235,7 @@ router.post('/generate-link', requirePlanner, async (req, res) => {
 router.post('/reminders', requirePlanner, async (req, res) => {
   try {
     let { weddingId, limit = 100, dryRun = true, minIntervalMinutes = 1440, force = false } = req.body || {};
-    // ValidaciÃ³n opcional con Zod
+    // Validación opcional con Zod
     try {
       const zod = await import('zod');
       const z = zod.z;
@@ -258,7 +258,7 @@ router.post('/reminders', requirePlanner, async (req, res) => {
       }
     }
 
-    // Rate limiting por ejecución global del recordatorio
+    // Rate limiting por ejecuci�n global del recordatorio
     const metaRef = db.collection('weddings').doc(weddingId).collection('rsvp').doc('remindersMeta');
     const metaSnap = await metaRef.get();
     const now = Date.now();
@@ -330,7 +330,7 @@ router.post('/reminders', requirePlanner, async (req, res) => {
               }
             }
           } else {
-            // Fallback: registrar en colecciÃ³n mails (simulaciÃ³n)
+            // Fallback: registrar en colección mails (simulación)
             batch.set(db.collection('mails').doc(), {
               from: 'notificaciones@maloveapp.com', to: c.email, subject,
               body: `RSVP: ${rsvpLink}`, html: bodyHtml, date: new Date().toISOString(), folder: 'sent', read: true
@@ -351,7 +351,7 @@ router.post('/reminders', requirePlanner, async (req, res) => {
     batch.set(metaRef, { lastRunAt: admin.firestore.FieldValue.serverTimestamp(), lastCount: attempted }, { merge: true });
     await batch.commit();
 
-    // MÃ©tricas de recordatorios
+    // Métricas de recordatorios
     try {
       await incCounter('rsvp_reminders_total', { type: 'attempted' }, attempted, 'RSVP reminders processed', ['type']);
       await incCounter('rsvp_reminders_total', { type: 'sent' }, sent, 'RSVP reminders processed', ['type']);
@@ -386,13 +386,13 @@ function devRoutesAllowed(req) {
 
 router.post('/dev/create', (req, res) => {
   logger.warn('rsvp-dev-create disabled: requiere flujo RSVP real');
-  return sendError(req, res, 'dev-endpoint-removed', 'El endpoint /api/rsvp/dev/create ha sido retirado. Usa la creación de invitados real.', 410);
+  return sendError(req, res, 'dev-endpoint-removed', 'El endpoint /api/rsvp/dev/create ha sido retirado. Usa la creaci�n de invitados real.', 410);
 });
 
 
 
 // Asegurar usuario mock con rol planner para E2E (retirado)
 router.post('/dev/ensure-planner', (req, res) => {
-  logger.warn('rsvp-dev-ensure-planner disabled: requiere asignación real de roles');
+  logger.warn('rsvp-dev-ensure-planner disabled: requiere asignaci�n real de roles');
   return sendError(req, res, 'dev-endpoint-removed', 'El endpoint /api/rsvp/dev/ensure-planner ha sido retirado. Configura roles planner reales.', 410);
 });

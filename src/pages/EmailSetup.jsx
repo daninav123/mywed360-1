@@ -10,8 +10,8 @@ import useEmailUsername from '../hooks/useEmailUsername';
 import { fetchMailgunDomainStatus, sendAliasVerificationEmail } from '../services/mailgunService';
 
 /**
- * Página de configuración de correo electrónico MaLove.App
- * Permite a los usuarios crear su dirección personalizada
+ * P�gina de configuraci�n de correo electr�nico MaLove.App
+ * Permite a los usuarios crear su direcci�n personalizada
  */
 const EmailSetup = () => {
   const navigate = useNavigate();
@@ -40,7 +40,7 @@ const EmailSetup = () => {
         setCurrentUsername(username);
       } catch (err) {
         console.error('Error al cargar el nombre de usuario:', err);
-        setGeneralError('Error al cargar tus datos de correo electrónico');
+        setGeneralError('Error al cargar tus datos de correo electr�nico');
       } finally {
         setIsLoading(false);
       }
@@ -53,7 +53,7 @@ const EmailSetup = () => {
       navigate('/login', {
         state: {
           returnUrl: '/email-setup',
-          message: 'Debes iniciar sesión para configurar tu correo MaLove.App',
+          message: 'Debes iniciar sesi�n para configurar tu correo MaLove.App',
         },
       });
     }
@@ -66,7 +66,7 @@ const EmailSetup = () => {
         autoTestTriggeredRef.current = false;
         setCurrentUsername(username);
         setSaveSuccess(true);
-        // Ocultar mensaje de éxito después de 5 segundos
+        // Ocultar mensaje de �xito despu�s de 5 segundos
         setTimeout(() => {
           setSaveSuccess(false);
         }, 5000);
@@ -79,7 +79,7 @@ const EmailSetup = () => {
       return success;
     } catch (err) {
       console.error('Error al guardar el nombre de usuario:', err);
-      setGeneralError('Ha ocurrido un error al guardar tu dirección de correo.');
+      setGeneralError('Ha ocurrido un error al guardar tu direcci�n de correo.');
       return false;
     }
   };
@@ -197,10 +197,10 @@ const EmailSetup = () => {
     const domain = dnsStatus?.domain || 'tu-dominio.com';
     return {
       dkim:
-        'Publica el registro CNAME indicado por Mailgun en la consola DNS de tu dominio. Una vez propagado, tus correos saldrán firmados.',
+        'Publica el registro CNAME indicado por Mailgun en la consola DNS de tu dominio. Una vez propagado, tus correos saldr�n firmados.',
       spf:
         'Actualiza el registro TXT SPF de tu dominio para incluir "include:mailgun.org" y autorizar a Mailgun a enviar en tu nombre.',
-      dmarc: `Recomendado: añade un registro TXT _dmarc.${domain} con tu política de DMARC (por ejemplo: "v=DMARC1; p=none; rua=mailto:postmaster@${domain}").`,
+      dmarc: `Recomendado: a�ade un registro TXT _dmarc.${domain} con tu pol�tica de DMARC (por ejemplo: "v=DMARC1; p=none; rua=mailto:postmaster@${domain}").`,
     };
   }, [dnsStatus?.domain]);
 
@@ -262,7 +262,7 @@ const EmailSetup = () => {
     const records = Array.isArray(status?.records) ? status.records : [];
     const helperText =
       dnsHelpTexts[sectionKey] ||
-      'Revisa tu configuración DNS y añade los valores sugeridos por Mailgun.';
+      'Revisa tu configuraci�n DNS y a�ade los valores sugeridos por Mailgun.';
     const pending = !verified;
 
     return (
@@ -290,7 +290,7 @@ const EmailSetup = () => {
           {records.length === 0 ? (
             <div className="rounded border border-dashed border-[color:var(--color-border)]/60 bg-[color:var(--color-surface)]/40 px-3 py-2">
               <p className="text-[color:var(--color-muted)]">
-                Mailgun aún no detecta registros publicados para este apartado. Añade los valores
+                Mailgun a�n no detecta registros publicados para este apartado. A�ade los valores
                 sugeridos en tu proveedor DNS y espera unos minutos.
               </p>
               {sectionKey === 'dmarc' ? (
@@ -393,7 +393,7 @@ const EmailSetup = () => {
           {pending && records.length > 0 && (
             <p className="text-[11px] text-[color:var(--color-warning)]">
               Una vez que tu proveedor DNS propague los cambios volveremos a comprobar estos valores
-              automáticamente.
+              autom�ticamente.
             </p>
           )}
         </div>
@@ -408,7 +408,7 @@ const EmailSetup = () => {
           <ArrowLeft size={16} />
         </Button>
         <h1 className="text-2xl font-semibold text-[color:var(--color-text)]">
-          Configuración de tu correo MaLove.App
+          Configuraci�n de tu correo MaLove.App
         </h1>
       </div>
 
@@ -416,7 +416,7 @@ const EmailSetup = () => {
         <div className="flex items-start gap-3">
           <Mail className="h-5 w-5 text-[var(--color-primary)]" />
           <p className="text-sm text-[color:var(--color-text)]">
-            Configura tu dirección de correo personalizada para comunicarte con proveedores y otros
+            Configura tu direcci�n de correo personalizada para comunicarte con proveedores y otros
             usuarios desde la plataforma MaLove.App.
           </p>
         </div>
@@ -442,8 +442,8 @@ const EmailSetup = () => {
           <div className="flex items-start gap-3">
             <CheckCircle className="h-5 w-5" />
             <p>
-              ¡Tu dirección de correo <strong>{currentUsername}@mywed360</strong> ha sido guardada
-              con éxito!
+              �Tu direcci�n de correo <strong>{currentUsername}@mywed360</strong> ha sido guardada
+              con �xito!
             </p>
           </div>
         </div>
@@ -458,11 +458,11 @@ const EmailSetup = () => {
           {currentUsername ? (
             <div className="mb-6 space-y-2">
               <p className="text-[color:var(--color-text)]">
-                Ya tienes configurada tu dirección de correo MaLove.App:
+                Ya tienes configurada tu direcci�n de correo MaLove.App:
                 <strong className="ml-2 text-lg">{currentUsername}@mywed360</strong>
               </p>
               <p className="text-sm text-[color:var(--color-muted)]">
-                Puedes cambiarla a continuación si deseas una dirección diferente:
+                Puedes cambiarla a continuaci�n si deseas una direcci�n diferente:
               </p>
             </div>
           ) : null}
@@ -476,7 +476,7 @@ const EmailSetup = () => {
           <div className="mt-10 border-t border-[color:var(--color-border)] pt-6">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <h2 className="text-lg font-semibold text-[color:var(--color-text)]">
-                Verificación DNS (DKIM / SPF / DMARC)
+                Verificaci�n DNS (DKIM / SPF / DMARC)
               </h2>
               <div className="mt-1 space-y-1 text-xs text-[color:var(--color-muted)]">
                 <p>
@@ -486,9 +486,9 @@ const EmailSetup = () => {
                   </span>
                 </p>
                 <p>
-                  Última comprobación:{' '}
+                  �ltima comprobaci�n:{' '}
                   {lastDnsCheckLabel || 'pendiente'}
-                  {dnsAutoRefreshing ? ' • Revisando cada 30s' : ''}
+                  {dnsAutoRefreshing ? ' " Revisando cada 30s' : ''}
                 </p>
               </div>
             </div>
@@ -509,7 +509,7 @@ const EmailSetup = () => {
                 className="flex items-center gap-2 text-[color:var(--color-muted)] hover:text-[color:var(--color-text)]"
                 onClick={() => navigate('/email/test')}
               >
-                <ExternalLink size={14} /> Diagnóstico avanzado
+                <ExternalLink size={14} /> Diagn�stico avanzado
               </Button>
             </div>
           </div>
@@ -534,7 +534,7 @@ const EmailSetup = () => {
           <div className="mt-10 border-t border-[color:var(--color-border)] pt-6">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <h2 className="text-lg font-semibold text-[color:var(--color-text)]">
-                Envío de correo de prueba
+                Env�o de correo de prueba
               </h2>
               <Button
                 variant="outline"
@@ -566,13 +566,13 @@ const EmailSetup = () => {
               )}
               {testEmailStatus.status === 'idle' && (
                 <p className="text-[color:var(--color-muted)]">
-                  Enviaremos un correo de verificación cuando DKIM y SPF estén listos. También puedes
+                  Enviaremos un correo de verificaci�n cuando DKIM y SPF est�n listos. Tambi�n puedes
                   reenviarlo manualmente en cualquier momento.
                 </p>
               )}
               {!dnsFullyVerified && (
                 <p className="mt-2 text-xs text-[color:var(--color-warning)]">
-                  Aún vemos registros DKIM/SPF pendientes. Mailgun puede rechazar el envío de prueba hasta que se propaguen los cambios.
+                  A�n vemos registros DKIM/SPF pendientes. Mailgun puede rechazar el env�o de prueba hasta que se propaguen los cambios.
                 </p>
               )}
             </div>
@@ -581,7 +581,7 @@ const EmailSetup = () => {
           {currentUsername && (
             <div className="mt-8 border-t border-[color:var(--color-border)] pt-6">
               <h2 className="mb-3 text-lg font-semibold text-[color:var(--color-text)]">
-                ¿Qué puedo hacer con mi correo MaLove.App?
+                �Qu� puedo hacer con mi correo MaLove.App?
               </h2>
               <ul className="list-disc space-y-2 pl-5 text-sm text-[color:var(--color-muted)]">
                 <li>Enviar y recibir emails desde la plataforma</li>

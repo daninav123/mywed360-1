@@ -1,6 +1,6 @@
 /**
  * Auto-Reply Service
- * Gestiona respuestas automáticas a emails
+ * Gestiona respuestas autom�ticas a emails
  * Sprint 3 - Unificar Email, Tarea S3-T003
  */
 
@@ -13,48 +13,48 @@ const { db } = require('../db');
 const AUTO_REPLY_TYPES = {
   RSVP_CONFIRMATION: {
     id: 'rsvp_confirmation',
-    name: 'Confirmación RSVP',
+    name: 'Confirmaci�n RSVP',
     trigger: 'rsvp_received',
-    defaultSubject: '¡Gracias por confirmar tu asistencia!',
+    defaultSubject: '�Gracias por confirmar tu asistencia!',
     defaultTemplate: `
-      <h2>¡Gracias {guest_name}!</h2>
-      <p>Hemos recibido tu confirmación de asistencia.</p>
+      <h2>�Gracias {guest_name}!</h2>
+      <p>Hemos recibido tu confirmaci�n de asistencia.</p>
       <p><strong>Estado:</strong> {rsvp_status}</p>
       {#if companions_count}
-      <p><strong>Acompañantes:</strong> {companions_count}</p>
+      <p><strong>Acompa�antes:</strong> {companions_count}</p>
       {/if}
-      <p>¡Nos vemos el {wedding_date}!</p>
+      <p>�Nos vemos el {wedding_date}!</p>
     `
   },
   THANK_YOU: {
     id: 'thank_you',
     name: 'Agradecimiento Post-Boda',
     trigger: 'post_wedding',
-    defaultSubject: 'Gracias por acompañarnos en nuestro día especial',
+    defaultSubject: 'Gracias por acompa�arnos en nuestro d�a especial',
     defaultTemplate: `
-      <h2>¡Gracias {guest_name}!</h2>
-      <p>Queremos agradecerte por haber sido parte de nuestro día especial.</p>
-      <p>Tu presencia hizo que este momento fuera aún más memorable.</p>
+      <h2>�Gracias {guest_name}!</h2>
+      <p>Queremos agradecerte por haber sido parte de nuestro d�a especial.</p>
+      <p>Tu presencia hizo que este momento fuera a�n m�s memorable.</p>
     `
   },
   REMINDER: {
     id: 'reminder',
     name: 'Recordatorio',
     trigger: 'days_before_wedding',
-    defaultSubject: 'Recordatorio: Nuestra boda está cerca',
+    defaultSubject: 'Recordatorio: Nuestra boda est� cerca',
     defaultTemplate: `
       <h2>Hola {guest_name}!</h2>
-      <p>Te recordamos que nuestra boda será el {wedding_date}.</p>
+      <p>Te recordamos que nuestra boda ser� el {wedding_date}.</p>
       <p><strong>Lugar:</strong> {venue_name}</p>
       <p><strong>Hora:</strong> {ceremony_time}</p>
-      <p>¡Esperamos verte allí!</p>
+      <p>�Esperamos verte all�!</p>
     `
   },
   INFO_UPDATE: {
     id: 'info_update',
-    name: 'Actualización de Información',
+    name: 'Actualizaci�n de Informaci�n',
     trigger: 'manual',
-    defaultSubject: 'Actualización sobre nuestra boda',
+    defaultSubject: 'Actualizaci�n sobre nuestra boda',
     defaultTemplate: `
       <h2>Hola {guest_name}!</h2>
       <p>Queremos informarte sobre algunos cambios:</p>
@@ -63,9 +63,9 @@ const AUTO_REPLY_TYPES = {
   },
   DIETARY_CONFIRMATION: {
     id: 'dietary_confirmation',
-    name: 'Confirmación Restricciones Dietéticas',
+    name: 'Confirmaci�n Restricciones Diet�ticas',
     trigger: 'dietary_info_received',
-    defaultSubject: 'Confirmación de preferencias alimentarias',
+    defaultSubject: 'Confirmaci�n de preferencias alimentarias',
     defaultTemplate: `
       <h2>Hola {guest_name}!</h2>
       <p>Hemos registrado tus preferencias alimentarias:</p>
@@ -101,7 +101,7 @@ class AutoReplyService {
   }
 
   /**
-   * Obtiene configuración de auto-respuesta
+   * Obtiene configuraci�n de auto-respuesta
    */
   async getAutoReplyConfig(weddingId, replyType) {
     try {
@@ -132,7 +132,7 @@ class AutoReplyService {
   }
 
   /**
-   * Guarda configuración de auto-respuesta
+   * Guarda configuraci�n de auto-respuesta
    */
   async saveAutoReplyConfig(weddingId, replyType, config) {
     try {
@@ -154,11 +154,11 @@ class AutoReplyService {
   }
 
   /**
-   * Envía auto-respuesta
+   * Env�a auto-respuesta
    */
   async sendAutoReply(weddingId, replyType, recipientEmail, variables) {
     try {
-      // Obtener configuración
+      // Obtener configuraci�n
       const config = await this.getAutoReplyConfig(weddingId, replyType);
 
       if (!config || config.enabled === false) {
@@ -200,12 +200,12 @@ class AutoReplyService {
   }
 
   /**
-   * Trigger para confirmación RSVP
+   * Trigger para confirmaci�n RSVP
    */
   async triggerRSVPConfirmation(weddingId, guestData) {
     const variables = {
       guest_name: guestData.name,
-      rsvp_status: guestData.status === 'confirmed' ? 'Confirmado' : 'No asistirá',
+      rsvp_status: guestData.status === 'confirmed' ? 'Confirmado' : 'No asistir�',
       companions_count: guestData.companions?.length || 0,
       wedding_date: guestData.weddingDate,
       venue_name: guestData.venueName
@@ -220,7 +220,7 @@ class AutoReplyService {
   }
 
   /**
-   * Trigger para confirmación de restricciones dietéticas
+   * Trigger para confirmaci�n de restricciones diet�ticas
    */
   async triggerDietaryConfirmation(weddingId, guestData) {
     const variables = {
@@ -257,7 +257,7 @@ class AutoReplyService {
   }
 
   /**
-   * Programa envío de auto-respuesta
+   * Programa env�o de auto-respuesta
    */
   async scheduleAutoReply(weddingId, replyType, recipientEmail, variables, sendAt) {
     try {

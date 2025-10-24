@@ -1,5 +1,5 @@
 /**
- * SeatingPlan refactorizado â€“ Componente principal
+ * SeatingPlan refactorizado � Componente principal
  */
 import React, { useEffect, useMemo } from 'react';
 import { DndProvider } from 'react-dnd';
@@ -21,21 +21,21 @@ import SeatingPlanModals from './SeatingPlanModals';
 import SeatingPlanOnboardingChecklist from './SeatingPlanOnboardingChecklist';
 import SeatingPlanSummary from './SeatingPlanSummary';
 import { useWedding } from '../../context/WeddingContext';
-// Importar vía alias estable para permitir vi.mock en tests y usar el hook deshabilitado en test
+// Importar v�a alias estable para permitir vi.mock en tests y usar el hook deshabilitado en test
 import { useSeatingPlan } from '../../hooks/useSeatingPlan';
 
 import { post as apiPost } from '../../services/apiClient';
 
 const AREA_TYPE_META = {
-  boundary: { label: 'Perímetro', color: '#2563eb', order: 1 },
+  boundary: { label: 'Per�metro', color: '#2563eb', order: 1 },
   aisle: { label: 'Pasillos', color: '#0ea5e9', order: 2 },
   door: { label: 'Puertas', color: '#16a34a', order: 3 },
-  obstacle: { label: 'Obstáculos', color: '#f97316', order: 4 },
+  obstacle: { label: 'Obst�culos', color: '#f97316', order: 4 },
   stage: { label: 'Escenario', color: '#9333ea', order: 5 },
   vendor: { label: 'Zona proveedor', color: '#6366f1', order: 6 },
-  kids: { label: 'Área infantil', color: '#f59e0b', order: 7 },
-  free: { label: 'Área libre', color: '#4b5563', order: 8 },
-  default: { label: 'Área', color: '#6b7280', order: 99 },
+  kids: { label: '�rea infantil', color: '#f59e0b', order: 7 },
+  free: { label: '�rea libre', color: '#4b5563', order: 8 },
+  default: { label: '�rea', color: '#6b7280', order: 99 },
 };
 
 const AREA_ALIAS = {
@@ -234,7 +234,7 @@ const SeatingPlanRefactored = () => {
   const [backgroundOpen, setBackgroundOpen] = React.useState(false);
   // Modal de capacidad global
   const [capacityOpen, setCapacityOpen] = React.useState(false);
-  // Mostrar numeración de asientos
+  // Mostrar numeraci�n de asientos
   const [showSeatNumbers, setShowSeatNumbers] = React.useState(false);
   const [guidedGuestId, setGuidedGuestId] = React.useState(null);
   const [isMobile, setIsMobile] = React.useState(false);
@@ -252,7 +252,7 @@ const SeatingPlanRefactored = () => {
   const showSmartPanel = smartPanelEligible && showSmartPanelPinned;
   const showGuestSidebar = guestSidebarOpen && !isMobile;
   const [ceremonyActiveRow, setCeremonyActiveRow] = React.useState(0);
-  // handler para fondo rápido (prompt)
+  // handler para fondo r�pido (prompt)
   // Valores seguros para evitar crashes por undefined
   const safeAreas = Array.isArray(areas) ? areas : [];
   const safeTables = Array.isArray(tables) ? tables : [];
@@ -671,7 +671,7 @@ const SeatingPlanRefactored = () => {
     if (!lockEvent) return;
     if (lockEvent.kind === 'lock-denied' && lockEvent.resourceType === 'table') {
       toast.warn(
-        `Esta mesa está en edición por ${lockEvent.ownerName || 'otro colaborador'}`
+        `Esta mesa est� en edici�n por ${lockEvent.ownerName || 'otro colaborador'}`
       );
     }
     consumeLockEvent();
@@ -810,8 +810,8 @@ const SeatingPlanRefactored = () => {
       'abuela',
       'primo',
       'prima',
-      'tío',
-      'tía',
+      't�o',
+      't�a',
       'tio',
       'tia',
     ];
@@ -836,13 +836,13 @@ const SeatingPlanRefactored = () => {
       try {
         const result = await exportAdvancedReport?.(payload);
         if (result?.exportId) {
-          toast.success('Exportación guardada y lista para descargar.');
+          toast.success('Exportaci�n guardada y lista para descargar.');
         } else {
-          toast.success('Exportación generada correctamente.');
+          toast.success('Exportaci�n generada correctamente.');
         }
       } catch (error) {
-        console.error('Error generando exportación avanzada', error);
-        toast.error('No se pudo generar la exportación avanzada.');
+        console.error('Error generando exportaci�n avanzada', error);
+        toast.error('No se pudo generar la exportaci�n avanzada.');
       }
     },
     [exportAdvancedReport]
@@ -919,7 +919,7 @@ const SeatingPlanRefactored = () => {
     [setTemplateOpen]
   );
 
-  // Atajos extra: rotación, alinear/distribuir, tabs, toggles y paneles
+  // Atajos extra: rotaci�n, alinear/distribuir, tabs, toggles y paneles
   useEffect(() => {
     const onKey = (e) => {
       try {
@@ -930,7 +930,7 @@ const SeatingPlanRefactored = () => {
         const alt = !!e?.altKey;
         const shift = !!e?.shiftKey;
 
-        // Rotación: Q/E (Shift = ±15°, normal = ±5°)
+        // Rotaci�n: Q/E (Shift = �15�, normal = �5�)
         if (!meta && !alt && (key === 'q' || key === 'e')) {
           e.preventDefault();
           const delta = shift ? 15 : 5;
@@ -959,7 +959,7 @@ const SeatingPlanRefactored = () => {
           return;
         }
 
-        // Toggles: R (reglas), N (números), V (validaciones)
+        // Toggles: R (reglas), N (n�meros), V (validaciones)
         if (!meta && !alt && key === 'r') { e.preventDefault(); setShowRulers((v) => !v); return; }
         if (!meta && !alt && key === 'n') { e.preventDefault(); setShowSeatNumbers((v) => !v); return; }
         if (!meta && !alt && key === 'v') { e.preventDefault(); setValidationsEnabled?.((v) => !v); return; }
@@ -973,7 +973,7 @@ const SeatingPlanRefactored = () => {
     return () => window.removeEventListener('keydown', onKey);
   }, [rotateSelected, alignSelected, distributeSelected, setTab, setShowRulers, setShowSeatNumbers, setValidationsEnabled, handleOpenTemplates, handleOpenSpaceConfig]);
 
-  // Backspace: eliminar mesa seleccionada (con confirmación)
+  // Backspace: eliminar mesa seleccionada (con confirmaci�n)
   useEffect(() => {
     const onKey = (e) => {
       try {
@@ -981,7 +981,7 @@ const SeatingPlanRefactored = () => {
         if (['input', 'textarea', 'select'].includes(tag) || e?.isComposing) return;
         if (e?.key === 'Backspace' && selectedTable) {
           e.preventDefault();
-          if (window.confirm('¿Eliminar la mesa seleccionada?')) {
+          if (window.confirm('�Eliminar la mesa seleccionada?')) {
             deleteTable(selectedTable.id);
           }
         }
@@ -991,7 +991,7 @@ const SeatingPlanRefactored = () => {
     return () => window.removeEventListener('keydown', onKey);
   }, [selectedTable, deleteTable]);
 
-  // Atajos de rotación: Q/E para -5Â°/+5Â°
+  // Atajos de rotaci�n: Q/E para -5°/+5°
   useEffect(() => {
     const onKey = (e) => {
       try {
@@ -1047,7 +1047,7 @@ const SeatingPlanRefactored = () => {
   const handleAssignGuest = React.useCallback(
     (tableId, guestId) => {
       if (guestId) {
-        // Capacidad: contar asientos ocupados (invitado + acompañantes)
+        // Capacidad: contar asientos ocupados (invitado + acompa�antes)
         try {
           const table = safeTables.find((t) => String(t.id) === String(tableId));
           const seatsCap = parseInt(table?.seats, 10) || 0;
@@ -1069,7 +1069,7 @@ const SeatingPlanRefactored = () => {
                 remaining === 0
                   ? 'Capacidad completa: no hay asientos disponibles en esta mesa'
                   : `Capacidad insuficiente: necesitas ${needed} asiento(s) y quedan ${remaining}`;
-              // Métrica: asignación bloqueada por capacidad (best-effort, no bloqueante)
+              // M�trica: asignaci�n bloqueada por capacidad (best-effort, no bloqueante)
               try {
                 apiPost(
                   '/api/metrics/seating',
@@ -1082,7 +1082,7 @@ const SeatingPlanRefactored = () => {
             }
           }
           moveGuest(guestId, tableId);
-          // Métrica: asignación exitosa (best-effort, no bloqueante)
+          // M�trica: asignaci�n exitosa (best-effort, no bloqueante)
           try {
             apiPost(
               '/api/metrics/seating',
@@ -1171,7 +1171,7 @@ const SeatingPlanRefactored = () => {
           if (action.tableId) focusTable(action.tableId);
         }
       } else {
-        toast.error('No se pudo aplicar la acción sugerida');
+        toast.error('No se pudo aplicar la acci�n sugerida');
       }
     },
     [executeSmartAction, focusTable]
@@ -1192,7 +1192,7 @@ const SeatingPlanRefactored = () => {
     [moveGuest]
   );
 
-  // Aplicación de plantillas (evita fallo si se usa el modal de plantillas)
+  // Aplicaci�n de plantillas (evita fallo si se usa el modal de plantillas)
   const handleApplyTemplate = React.useCallback(
     (template) => {
       if (template?.ceremony) {
@@ -1210,7 +1210,7 @@ const SeatingPlanRefactored = () => {
           vipLabel: template.ceremony.vipLabel || 'VIP',
           lockVipSeats: !!template.ceremony.lockVipSeats,
           notes: Array.isArray(template?.overlays?.notes)
-            ? template.overlays.notes.join(' · ')
+            ? template.overlays.notes.join(' � ')
             : template.ceremony.notes || '',
         };
         generateSeatGrid(ceremonyConfig);
@@ -1229,7 +1229,7 @@ const SeatingPlanRefactored = () => {
         });
       }
 
-      // Asignación automática forzada tras aplicar plantilla
+      // Asignaci�n autom�tica forzada tras aplicar plantilla
       setTimeout(async () => {
         try {
           const res = await (typeof autoAssignGuestsRules === 'function'
@@ -1238,11 +1238,11 @@ const SeatingPlanRefactored = () => {
           if (res?.ok) {
             const msg =
               res.method === 'backend'
-                ? `Asignación automática (IA): ${res.assigned} invitado(s)`
-                : `Asignación automática: ${res.assigned} invitado(s)`;
+                ? `Asignaci�n autom�tica (IA): ${res.assigned} invitado(s)`
+                : `Asignaci�n autom�tica: ${res.assigned} invitado(s)`;
             toast.info(msg);
           } else if (res?.error) {
-            toast.warn(`Autoasignación: ${res.error}`);
+            toast.warn(`Autoasignaci�n: ${res.error}`);
           }
         } catch (e) {
           // Silencioso para no molestar al usuario; solo log
@@ -1261,18 +1261,18 @@ const SeatingPlanRefactored = () => {
       if (res?.ok) {
         const msg =
           res.method === 'backend'
-            ? `Asignación automática (IA): ${res.assigned} invitado(s)`
-            : `Asignación automática: ${res.assigned} invitado(s)`;
+            ? `Asignaci�n autom�tica (IA): ${res.assigned} invitado(s)`
+            : `Asignaci�n autom�tica: ${res.assigned} invitado(s)`;
         toast.info(msg);
       } else if (res?.error) {
-        toast.warn(`Auto-asignación: ${res.error}`);
+        toast.warn(`Auto-asignaci�n: ${res.error}`);
       }
     } catch (e) {
-      toast.error('Error en auto-asignación');
+      toast.error('Error en auto-asignaci�n');
     }
   }, [autoAssignGuestsRules, autoAssignGuests]);
 
-  // Generación desde modal de banquete seguida de autoasignación forzada (silencioso a nivel de UI)
+  // Generaci�n desde modal de banquete seguida de autoasignaci�n forzada (silencioso a nivel de UI)
   const handleGenerateBanquetLayoutWithAssign = React.useCallback(
     (config) => {
       try {
@@ -1286,11 +1286,11 @@ const SeatingPlanRefactored = () => {
             if (res?.ok) {
               const msg =
                 res.method === 'backend'
-                  ? `Asignación automática (IA): ${res.assigned} invitado(s)`
-                  : `Asignación automática: ${res.assigned} invitado(s)`;
+                  ? `Asignaci�n autom�tica (IA): ${res.assigned} invitado(s)`
+                  : `Asignaci�n autom�tica: ${res.assigned} invitado(s)`;
               toast.info(msg);
             } else if (res?.error) {
-              toast.warn(`Autoasignación: ${res.error}`);
+              toast.warn(`Autoasignaci�n: ${res.error}`);
             }
           } catch (e) {
             console.warn('Auto-assign error', e);
@@ -1301,7 +1301,7 @@ const SeatingPlanRefactored = () => {
     [generateBanquetLayout, autoAssignGuestsRules, autoAssignGuests]
   );
 
-  // Generación desde modal de ceremonia seguida de autoasignación forzada
+  // Generaci�n desde modal de ceremonia seguida de autoasignaci�n forzada
   const handleGenerateCeremonyWithAssign = React.useCallback(
     (...args) => {
       const config =
@@ -1326,11 +1326,11 @@ const SeatingPlanRefactored = () => {
             if (res?.ok) {
               const msg =
                 res.method === 'backend'
-                  ? `Asignación automática (IA): ${res.assigned} invitado(s)`
-                  : `Asignación automática: ${res.assigned} invitado(s)`;
+                  ? `Asignaci�n autom�tica (IA): ${res.assigned} invitado(s)`
+                  : `Asignaci�n autom�tica: ${res.assigned} invitado(s)`;
               toast.info(msg);
             } else if (res?.error) {
-              toast.warn(`Autoasignación: ${res.error}`);
+              toast.warn(`Autoasignaci�n: ${res.error}`);
             }
           } catch (e) {
             console.warn('Auto-assign error', e);
@@ -1808,7 +1808,7 @@ const SeatingPlanRefactored = () => {
           >
             <div>Zoom: {Math.round((viewport?.scale || 1) * 100)}%</div>
             <div>
-              Dimensiones: {(safeHallSize.width / 100).toFixed(1)} ×{' '}
+              Dimensiones: {(safeHallSize.width / 100).toFixed(1)} �{' '}
               {(safeHallSize.height / 100).toFixed(1)} m
             </div>
             <div>Conflictos: {Array.isArray(conflicts) ? conflicts.length : 0}</div>
@@ -1817,9 +1817,9 @@ const SeatingPlanRefactored = () => {
               {otherCollaborators.length === 0 ? (
                 <span className="text-gray-500">
                   {collaborationStatus === 'connecting'
-                    ? 'Conectando…'
+                    ? 'Conectando&'
                     : collaborationStatus === 'online'
-                      ? 'Solo tú'
+                      ? 'Solo t�'
                       : 'Offline'}
                 </span>
               ) : (

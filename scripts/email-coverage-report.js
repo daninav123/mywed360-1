@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
 /**
- * Script para generar un informe de cobertura específico para el sistema de correo
+ * Script para generar un informe de cobertura espec�fico para el sistema de correo
  * 
- * Este script analiza los informes de cobertura y genera un resumen específico
+ * Este script analiza los informes de cobertura y genera un resumen espec�fico
  * para los componentes y servicios relacionados con el sistema de correo.
  */
 
@@ -11,11 +11,11 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
-// Configuración
+// Configuraci�n
 const EMAIL_COMPONENTS_PATH = path.join('src', 'components', 'email');
 const EMAIL_SERVICES_PATH = path.join('src', 'services');
 const EMAIL_SERVICE_FILES = ['emailService.js', 'tagService.js'];
-const COVERAGE_THRESHOLD = 80; // Porcentaje mínimo de cobertura aceptable
+const COVERAGE_THRESHOLD = 80; // Porcentaje m�nimo de cobertura aceptable
 
 // Colores para la consola
 const COLORS = {
@@ -33,12 +33,12 @@ function runTests() {
   try {
     console.log(`${COLORS.bold}Ejecutando pruebas para el sistema de correo...${COLORS.reset}`);
     
-    // Ejecutar pruebas específicas del sistema de correo
+    // Ejecutar pruebas espec�ficas del sistema de correo
     execSync('npx vitest run --coverage "src/test/services/Email*.test.js" "src/test/services/Tag*.test.js" "src/test/components/Email*.test.jsx"', { 
       stdio: 'inherit' 
     });
     
-    console.log(`\n${COLORS.green}✓ Pruebas completadas${COLORS.reset}\n`);
+    console.log(`\n${COLORS.green} Pruebas completadas${COLORS.reset}\n`);
   } catch (error) {
     console.error(`${COLORS.red} Error al ejecutar las pruebas: ${error.message}${COLORS.reset}`);
     process.exit(1);
@@ -52,11 +52,11 @@ function analyzeCoverage() {
   try {
     console.log(`${COLORS.bold}Analizando cobertura...${COLORS.reset}`);
     
-    // Leer el informe de cobertura (ajustar según el formato que genera vitest)
+    // Leer el informe de cobertura (ajustar seg�n el formato que genera vitest)
     const coveragePath = path.join('coverage', 'coverage-final.json');
     
     if (!fs.existsSync(coveragePath)) {
-      throw new Error(`No se encontró el informe de cobertura en ${coveragePath}`);
+      throw new Error(`No se encontr� el informe de cobertura en ${coveragePath}`);
     }
     
     const coverageData = JSON.parse(fs.readFileSync(coveragePath, 'utf8'));
@@ -116,22 +116,22 @@ function analyzeCoverage() {
     console.log(`COBERTURA GLOBAL: ${overallColor}${totalPercentage}%${COLORS.reset} (${totalCovered}/${totalStatements} sentencias)`);
     console.log('--------------------------------------------------------\n');
     
-    // Identificar archivos que necesitan más pruebas
+    // Identificar archivos que necesitan m�s pruebas
     const lowCoverageFiles = results.filter(r => r.percentage < COVERAGE_THRESHOLD)
       .sort((a, b) => a.percentage - b.percentage);
     
     if (lowCoverageFiles.length > 0) {
-      console.log(`${COLORS.bold}Archivos que necesitan más pruebas:${COLORS.reset}`);
+      console.log(`${COLORS.bold}Archivos que necesitan m�s pruebas:${COLORS.reset}`);
       lowCoverageFiles.forEach(result => {
         console.log(`${COLORS.yellow}${result.file}${COLORS.reset}: ${result.percentage}%`);
       });
     } else {
-      console.log(`${COLORS.green}¡Todos los archivos cumplen o superan el umbral de cobertura del ${COVERAGE_THRESHOLD}%!${COLORS.reset}`);
+      console.log(`${COLORS.green}�Todos los archivos cumplen o superan el umbral de cobertura del ${COVERAGE_THRESHOLD}%!${COLORS.reset}`);
     }
     
     // Mensaje final
     if (totalPercentage < COVERAGE_THRESHOLD) {
-      console.log(`\n${COLORS.yellow}La cobertura global (${totalPercentage}%) está por debajo del umbral recomendado (${COVERAGE_THRESHOLD}%).${COLORS.reset}`);
+      console.log(`\n${COLORS.yellow}La cobertura global (${totalPercentage}%) est� por debajo del umbral recomendado (${COVERAGE_THRESHOLD}%).${COLORS.reset}`);
     } else {
       console.log(`\n${COLORS.green}La cobertura global (${totalPercentage}%) cumple o supera el umbral recomendado (${COVERAGE_THRESHOLD}%).${COLORS.reset}`);
     }
@@ -148,10 +148,10 @@ function analyzeCoverage() {
 }
 
 /**
- * Función principal
+ * Funci�n principal
  */
 function main() {
-  console.log(`${COLORS.bold}====== ANÁLISIS DE COBERTURA DEL SISTEMA DE CORREO ======${COLORS.reset}\n`);
+  console.log(`${COLORS.bold}====== AN�LISIS DE COBERTURA DEL SISTEMA DE CORREO ======${COLORS.reset}\n`);
   
   // Ejecutar pruebas y generar cobertura
   runTests();
@@ -159,14 +159,14 @@ function main() {
   // Analizar la cobertura
   const result = analyzeCoverage();
   
-  // Generar informe HTML para visualización
+  // Generar informe HTML para visualizaci�n
   console.log('\nGenerando informe HTML de cobertura...');
   execSync('npm run test:coverage:html', { stdio: 'inherit' });
   console.log(`${COLORS.green}Informe HTML generado en: ./coverage/index.html${COLORS.reset}\n`);
   
-  // Salir con código de error si no se alcanza el umbral (útil para CI)
+  // Salir con c�digo de error si no se alcanza el umbral (�til para CI)
   if (result.belowThreshold) {
-    console.log(`${COLORS.yellow}ADVERTENCIA: La cobertura está por debajo del umbral requerido.${COLORS.reset}`);
+    console.log(`${COLORS.yellow}ADVERTENCIA: La cobertura est� por debajo del umbral requerido.${COLORS.reset}`);
     process.exit(1);
   }
   

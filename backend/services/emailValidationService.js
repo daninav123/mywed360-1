@@ -1,6 +1,6 @@
 /**
- * Servicio de validación de configuración de email (DKIM, SPF, DMARC)
- * Verifica que el dominio esté correctamente configurado para envío de emails
+ * Servicio de validaci�n de configuraci�n de email (DKIM, SPF, DMARC)
+ * Verifica que el dominio est� correctamente configurado para env�o de emails
  */
 
 import dns from 'dns/promises';
@@ -25,7 +25,7 @@ export async function validateSPF(domain) {
       return {
         valid: false,
         record: null,
-        error: 'No se encontró registro SPF en el dominio'
+        error: 'No se encontr� registro SPF en el dominio'
       };
     }
 
@@ -66,13 +66,13 @@ export async function validateDKIM(domain, selector = 'k1') {
       return {
         valid: false,
         record: null,
-        error: `No se encontró registro DKIM para el selector "${selector}"`
+        error: `No se encontr� registro DKIM para el selector "${selector}"`
       };
     }
 
     const dkimRecord = Array.isArray(records[0]) ? records[0].join('') : records[0];
     
-    // Validar que contenga las partes básicas de un registro DKIM
+    // Validar que contenga las partes b�sicas de un registro DKIM
     const hasDKIMSignature = dkimRecord.includes('v=DKIM1') || dkimRecord.includes('p=');
 
     return {
@@ -104,13 +104,13 @@ export async function validateDMARC(domain) {
       return {
         valid: false,
         record: null,
-        error: 'No se encontró registro DMARC (recomendado pero no crítico)'
+        error: 'No se encontr� registro DMARC (recomendado pero no cr�tico)'
       };
     }
 
     const dmarcRecord = Array.isArray(records[0]) ? records[0].join('') : records[0];
     
-    // Validar que sea un registro DMARC válido
+    // Validar que sea un registro DMARC v�lido
     const hasDMARCPolicy = dmarcRecord.startsWith('v=DMARC1');
 
     return {
@@ -119,7 +119,7 @@ export async function validateDMARC(domain) {
       error: hasDMARCPolicy ? null : 'El registro DMARC no tiene el formato correcto'
     };
   } catch (error) {
-    // DMARC no es crítico, solo warning
+    // DMARC no es cr�tico, solo warning
     logger.warn('DMARC validation failed (non-critical):', error);
     return {
       valid: false,
@@ -130,13 +130,13 @@ export async function validateDMARC(domain) {
 }
 
 /**
- * Validación completa de configuración de email
+ * Validaci�n completa de configuraci�n de email
  * @param {string} domain - Dominio a verificar
  * @param {string} dkimSelector - Selector DKIM (opcional, default: 'k1')
  * @returns {Promise<{overall: boolean, spf: Object, dkim: Object, dmarc: Object}>}
  */
 export async function validateEmailConfiguration(domain, dkimSelector = 'k1') {
-  logger.info(`Validando configuración de email para dominio: ${domain}`);
+  logger.info(`Validando configuraci�n de email para dominio: ${domain}`);
 
   const [spf, dkim, dmarc] = await Promise.all([
     validateSPF(domain),
@@ -144,10 +144,10 @@ export async function validateEmailConfiguration(domain, dkimSelector = 'k1') {
     validateDMARC(domain)
   ]);
 
-  // SPF y DKIM son críticos, DMARC es recomendado
+  // SPF y DKIM son cr�ticos, DMARC es recomendado
   const overall = spf.valid && dkim.valid;
 
-  logger.info(`Validación completa - SPF: ${spf.valid}, DKIM: ${dkim.valid}, DMARC: ${dmarc.valid}`);
+  logger.info(`Validaci�n completa - SPF: ${spf.valid}, DKIM: ${dkim.valid}, DMARC: ${dmarc.valid}`);
 
   return {
     overall,
@@ -168,7 +168,7 @@ export async function validateEmailConfiguration(domain, dkimSelector = 'k1') {
 }
 
 /**
- * Envía un email de prueba para validar la configuración
+ * Env�a un email de prueba para validar la configuraci�n
  * @param {string} from - Email remitente
  * @param {string} to - Email destinatario
  * @param {Object} mailgunClient - Cliente de Mailgun configurado
@@ -187,15 +187,15 @@ export async function sendTestEmail(from, to, mailgunClient) {
     const result = await mailgunClient.messages.create(process.env.MAILGUN_DOMAIN || 'maloveapp.com', {
       from,
       to,
-      subject: 'Prueba de configuración de email - MaLoveApp',
-      text: 'Este es un email de prueba para validar la configuración de SPF/DKIM.\n\n' +
-            'Si recibes este mensaje, tu configuración de email está funcionando correctamente.\n\n' +
-            '¡Felicitaciones!\n\n' +
+      subject: 'Prueba de configuraci�n de email - MaLoveApp',
+      text: 'Este es un email de prueba para validar la configuraci�n de SPF/DKIM.\n\n' +
+            'Si recibes este mensaje, tu configuraci�n de email est� funcionando correctamente.\n\n' +
+            '�Felicitaciones!\n\n' +
             'Equipo MaLoveApp',
-      html: '<h2>Prueba de configuración de email</h2>' +
-            '<p>Este es un email de prueba para validar la configuración de SPF/DKIM.</p>' +
-            '<p>Si recibes este mensaje, tu configuración de email está funcionando correctamente.</p>' +
-            '<p><strong>¡Felicitaciones!</strong></p>' +
+      html: '<h2>Prueba de configuraci�n de email</h2>' +
+            '<p>Este es un email de prueba para validar la configuraci�n de SPF/DKIM.</p>' +
+            '<p>Si recibes este mensaje, tu configuraci�n de email est� funcionando correctamente.</p>' +
+            '<p><strong>�Felicitaciones!</strong></p>' +
             '<p>Equipo MaLoveApp</p>'
     });
 

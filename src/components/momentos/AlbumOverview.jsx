@@ -93,7 +93,7 @@ export default function AlbumOverview({
     typeof uploadState?.remainingDays === 'number' ? uploadState.remainingDays : null;
   const remainingLabel =
     remainingDays !== null && remainingDays >= 0
-      ? ` (${remainingDays === 1 ? '1 día restante' : `${remainingDays} días restantes`})`
+      ? ` (${remainingDays === 1 ? '1 d�a restante' : `${remainingDays} d�as restantes`})`
       : '';
   const [qrDataUrl, setQrDataUrl] = useState('');
   const [qrError, setQrError] = useState(null);
@@ -152,14 +152,14 @@ export default function AlbumOverview({
     if (typeof window === 'undefined') return;
     const printWindow = window.open('', '_blank', 'width=480,height=640');
     if (!printWindow) {
-      toast.error('No se pudo abrir la ventana de impresión.');
+      toast.error('No se pudo abrir la ventana de impresi�n.');
       return;
     }
     printWindow.document.write(`<!DOCTYPE html>
       <html lang="es">
         <head>
           <meta charset="utf-8" />
-          <title>QR Galería de recuerdos</title>
+          <title>QR Galer�a de recuerdos</title>
           <style>
             body { font-family: Arial, sans-serif; text-align: center; padding: 24px; color: #1f2937; }
             h1 { font-size: 22px; margin-bottom: 8px; }
@@ -169,9 +169,9 @@ export default function AlbumOverview({
           </style>
         </head>
         <body>
-          <h1>Galería de recuerdos</h1>
-          <p>Escanea este código para subir tus fotos del evento.</p>
-          <img src="${qrDataUrl}" alt="Código QR Galería de recuerdos" />
+          <h1>Galer�a de recuerdos</h1>
+          <p>Escanea este c�digo para subir tus fotos del evento.</p>
+          <img src="${qrDataUrl}" alt="C�digo QR Galer�a de recuerdos" />
           <p class="note">${shareUrl}</p>
         </body>
       </html>`);
@@ -208,7 +208,7 @@ export default function AlbumOverview({
       .catch((error) => {
         if (!cancelled) {
           console.error('[AlbumOverview] Error generando QR', error);
-          setQrError('No se pudo generar el código QR');
+          setQrError('No se pudo generar el c�digo QR');
           setQrDataUrl('');
         }
       });
@@ -256,7 +256,7 @@ export default function AlbumOverview({
               </strong>
             </span>
             <span>
-              Compresión automática:{' '}
+              Compresi�n autom�tica:{' '}
               <strong>{uploadState.compressionActive ? 'activada' : 'desactivada'}</strong>
             </span>
           </div>
@@ -302,7 +302,7 @@ export default function AlbumOverview({
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-lg font-semibold text-gray-800">Top colaboradores</h3>
           <p className="text-sm text-gray-500">
-            Reconoce a quienes más aportan al álbum compartido.
+            Reconoce a quienes m�s aportan al �lbum compartido.
           </p>
         </div>
         {leaderboard.length ? (
@@ -313,17 +313,17 @@ export default function AlbumOverview({
                 className="flex items-center justify-between border border-gray-100 rounded-md px-3 py-2 bg-gray-50"
               >
                 <div className="flex items-center gap-3 min-w-0">
-                  <span className="text-sm font-semibold text-blue-600">{index + 1}º</span>
+                  <span className="text-sm font-semibold text-blue-600">{index + 1}�</span>
                   <div className="min-w-0">
                     <p className="text-sm font-medium text-gray-800 truncate">
-                      {guest.displayName || 'Invitado anónimo'}
+                      {guest.displayName || 'Invitado an�nimo'}
                     </p>
                     <p className="text-xs text-gray-400">
                       {Array.isArray(guest.badges) && guest.badges.length
                         ? guest.badges
                             .map((badge) => badgeLabels[badge] || badge)
-                            .join(' • ')
-                        : 'Sin medallas todavía'}
+                            .join(' " ')
+                        : 'Sin medallas todav�a'}
                     </p>
                   </div>
                 </div>
@@ -335,7 +335,7 @@ export default function AlbumOverview({
           </div>
         ) : (
           <div className="border border-dashed border-gray-200 rounded-md p-6 text-center text-sm text-gray-500">
-            Aún no hay suficientes aportaciones para mostrar un ranking. Comparte el QR y motiva a tus invitados.
+            A�n no hay suficientes aportaciones para mostrar un ranking. Comparte el QR y motiva a tus invitados.
           </div>
         )}
       </section>
@@ -357,7 +357,7 @@ export default function AlbumOverview({
           <div>
             <h3 className="text-lg font-semibold text-gray-800">Compartir con invitados</h3>
             <p className="text-sm text-gray-500">
-              Genera un enlace con QR para que los invitados suban fotos desde sus móviles.
+              Genera un enlace con QR para que los invitados suban fotos desde sus m�viles.
             </p>
           </div>
           <button
@@ -391,19 +391,19 @@ export default function AlbumOverview({
                 {qrDataUrl ? (
                   <img
                     src={qrDataUrl}
-                    alt="Código QR de la galería de recuerdos"
+                    alt="C�digo QR de la galer�a de recuerdos"
                     className="h-32 w-32 rounded-lg border border-gray-200 bg-white p-2 shadow-sm"
                   />
                 ) : (
                   <div className="flex h-32 w-32 items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 text-xs text-gray-400">
-                    {qrError ? 'No se pudo generar el QR' : 'Generando QR…'}
+                    {qrError ? 'No se pudo generar el QR' : 'Generando QR&'}
                   </div>
                 )}
               </div>
               <div className="space-y-2 text-sm text-gray-600 max-w-md">
                 <p>
-                  Imprime el QR para colocarlo en el evento o compártelo por chat. Tus invitados
-                  podrán subir fotos al instante sin iniciar sesión.
+                  Imprime el QR para colocarlo en el evento o comp�rtelo por chat. Tus invitados
+                  podr�n subir fotos al instante sin iniciar sesi�n.
                 </p>
                 <div className="flex flex-wrap gap-2">
                   <button
@@ -429,7 +429,7 @@ export default function AlbumOverview({
           </>
         ) : (
           <p className="text-sm text-gray-500">
-            Genera un enlace para obtener el QR que podrán escanear los invitados.
+            Genera un enlace para obtener el QR que podr�n escanear los invitados.
           </p>
         )}
 
@@ -451,12 +451,12 @@ export default function AlbumOverview({
                       {token.token?.slice(0, 12) || token.id}
                     </td>
                     <td className="px-3 py-2 text-gray-600">
-                      {token.usedCount || 0}/{token.maxUsages || '∞'}
+                      {token.usedCount || 0}/{token.maxUsages || ''}
                     </td>
                     <td className="px-3 py-2 text-gray-600">
                       {token.expiresAt?.toDate
                         ? token.expiresAt.toDate().toLocaleString()
-                        : '—'}
+                        : ''}
                     </td>
                     <td className="px-3 py-2">
                       <span
@@ -475,10 +475,10 @@ export default function AlbumOverview({
             </table>
             {lastToken && (
               <p className="text-xs text-gray-400 px-3 py-2">
-                Último token generado: {lastToken.id} ·{' '}
+                �ltimo token generado: {lastToken.id} �{' '}
                 {lastToken.createdAt?.toDate
                   ? lastToken.createdAt.toDate().toLocaleString()
-                  : '—'}
+                  : ''}
               </p>
             )}
           </div>

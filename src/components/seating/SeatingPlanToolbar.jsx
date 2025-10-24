@@ -178,7 +178,7 @@ const SeatingPlanToolbar = ({
       aria-label="Seating toolbar"
     >
       <div className="flex flex-wrap items-center gap-2 p-3">
-        {/* Grupo: Herramientas principales (Navegar / Perímetro) */}
+        {/* Grupo: Herramientas principales (Navegar / Per�metro) */}
         <div className="flex items-center gap-1 border-r pr-3">
           <button
             type="button"
@@ -193,10 +193,10 @@ const SeatingPlanToolbar = ({
             type="button"
             onClick={() => onChangeDrawMode?.('boundary')}
             className={`flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100 ${drawMode === 'boundary' ? 'bg-gray-100' : ''}`}
-            title="Perímetro"
+            title="Per�metro"
             aria-pressed={drawMode === 'boundary'}
           >
-            <span className="hidden sm:inline">Perímetro</span>
+            <span className="hidden sm:inline">Per�metro</span>
           </button>
         </div>
         {/* Grupo: Historial */}
@@ -361,7 +361,7 @@ const SeatingPlanToolbar = ({
           </button>
         </div>
 
-        {/* Grupo: Configuración */}
+        {/* Grupo: Configuraci�n */}
         <div className="flex items-center gap-1 border-r pr-3">
           <button
             type="button"
@@ -495,26 +495,26 @@ const SeatingPlanToolbar = ({
             </span>
           </button>
 
-          {/* Rotación rápida */}
+          {/* Rotaci�n r�pida */}
           {tab === 'banquet' && (
             <>
               <button
                 type="button"
                 onClick={onRotateLeft}
                 className="flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100"
-                title="Rotar -5Â°"
+                title="Rotar -5°"
               >
                 <RotateCcw className="h-4 w-4" />
-                <span className="hidden sm:inline">-5Â°</span>
+                <span className="hidden sm:inline">-5°</span>
               </button>
               <button
                 type="button"
                 onClick={onRotateRight}
                 className="flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100"
-                title="Rotar +5Â°"
+                title="Rotar +5°"
               >
                 <RotateCw className="h-4 w-4" />
-                <span className="hidden sm:inline">+5Â°</span>
+                <span className="hidden sm:inline">+5°</span>
               </button>
             </>
           )}
@@ -619,7 +619,7 @@ const SeatingPlanToolbar = ({
           )}
         </div>
 
-        {/* Grupo: Exportación (menú) */}
+        {/* Grupo: Exportaci�n (men�) */}
         <div ref={exportRef} className="flex items-center gap-1 border-r pr-3 relative">
           <button
             type="button"
@@ -693,7 +693,7 @@ const SeatingPlanToolbar = ({
                   }}
                   className="w-full text-left px-3 py-2 hover:bg-gray-50 text-sm"
                 >
-                  Póster A2
+                  P�ster A2
                 </button>
               )}
               {tab === 'banquet' && (
@@ -719,7 +719,7 @@ const SeatingPlanToolbar = ({
                 }}
                 className="w-full text-left px-3 py-2 hover:bg-blue-50 text-sm text-blue-600"
               >
-                {t('seating.export.advanced', { defaultValue: 'Exportación avanzada…' })}
+                {t('seating.export.advanced', { defaultValue: 'Exportaci�n avanzada&' })}
               </button>
             </div>
           )}
@@ -734,19 +734,19 @@ const SeatingPlanToolbar = ({
             <div className="font-semibold text-gray-800 mb-1">{t('seating.hotkeys.title', { defaultValue: 'Atajos de teclado' })}</div>
             <div className="grid grid-cols-2 gap-x-4 gap-y-1">
               <div className="text-gray-600">Ctrl/Cmd + Z / Y</div><div>{t('seating.hotkeys.items.undoRedo', { defaultValue: 'Deshacer / Rehacer' })}</div>
-              <div className="text-gray-600">1..6</div><div>{t('seating.hotkeys.items.tools', { defaultValue: 'Herramientas (Pan, Mover, Perímetro, Puertas, Obstáculos, Pasillos)' })}</div>
+              <div className="text-gray-600">1..6</div><div>{t('seating.hotkeys.items.tools', { defaultValue: 'Herramientas (Pan, Mover, Per�metro, Puertas, Obst�culos, Pasillos)' })}</div>
               <div className="text-gray-600">Ctrl/Cmd + + / - / 0</div><div>{t('seating.hotkeys.items.zoomFit', { defaultValue: 'Zoom in / out / Ajustar' })}</div>
               <div className="text-gray-600">Ctrl/Cmd + A</div><div>{t('seating.hotkeys.items.selectAll', { defaultValue: 'Seleccionar todo' })}</div>
-              <div className="text-gray-600">Esc</div><div>{t('seating.hotkeys.items.escape', { defaultValue: 'Limpiar selección / cerrar menús' })}</div>
-              <div className="text-gray-600">Q / E</div><div>{t('seating.hotkeys.items.rotate', { defaultValue: 'Rotar -5° / +5° (Shift: ±15°)' })}</div>
-              <div className="text-gray-600">Alt + ←/→/↑/↓</div><div>{t('seating.hotkeys.items.align', { defaultValue: 'Alinear (inicio/fin)' })}</div>
-              <div className="text-gray-600">Shift + Alt + ←/→/↑/↓</div><div>{t('seating.hotkeys.items.distribute', { defaultValue: 'Distribuir (X/Y)' })}</div>
-              <div className="text-gray-600">Ctrl/Cmd + ←/→</div><div>{t('seating.hotkeys.items.tabs', { defaultValue: 'Cambiar pestaña (Ceremonia/Banquete)' })}</div>
-              <div className="text-gray-600">R / N / V</div><div>{t('seating.hotkeys.items.toggles', { defaultValue: 'Reglas / Números / Validaciones' })}</div>
+              <div className="text-gray-600">Esc</div><div>{t('seating.hotkeys.items.escape', { defaultValue: 'Limpiar selecci�n / cerrar men�s' })}</div>
+              <div className="text-gray-600">Q / E</div><div>{t('seating.hotkeys.items.rotate', { defaultValue: 'Rotar -5� / +5� (Shift: �15�)' })}</div>
+              <div className="text-gray-600">Alt + �/�/�/�</div><div>{t('seating.hotkeys.items.align', { defaultValue: 'Alinear (inicio/fin)' })}</div>
+              <div className="text-gray-600">Shift + Alt + �/�/�/�</div><div>{t('seating.hotkeys.items.distribute', { defaultValue: 'Distribuir (X/Y)' })}</div>
+              <div className="text-gray-600">Ctrl/Cmd + �/�</div><div>{t('seating.hotkeys.items.tabs', { defaultValue: 'Cambiar pesta�a (Ceremonia/Banquete)' })}</div>
+              <div className="text-gray-600">R / N / V</div><div>{t('seating.hotkeys.items.toggles', { defaultValue: 'Reglas / N�meros / Validaciones' })}</div>
               <div className="text-gray-600">P / S</div><div>{t('seating.hotkeys.items.panels', { defaultValue: 'Plantillas / Configurar espacio' })}</div>
               <div className="text-gray-600">Enter / Esc</div><div>{t('seating.hotkeys.items.drawFinalizeCancel', { defaultValue: 'Finalizar / Cancelar dibujo' })}</div>
               <div className="text-gray-600">Backspace/Delete</div><div>{t('seating.hotkeys.items.backspaceDelete', { defaultValue: 'Deshacer punto / Eliminar mesa' })}</div>
-              <div className="text-gray-600">Tab (perímetro)</div><div>{t('seating.hotkeys.items.tabExactLength', { defaultValue: 'Longitud exacta del segmento' })}</div>
+              <div className="text-gray-600">Tab (per�metro)</div><div>{t('seating.hotkeys.items.tabExactLength', { defaultValue: 'Longitud exacta del segmento' })}</div>
             </div>
           </div>
         </div>

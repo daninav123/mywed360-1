@@ -71,7 +71,7 @@ function getRequestOptions(extra = {}) {
   if (IS_CYPRESS) {
     return { ...base, auth: false };
   }
-  // Siempre usar autenticación para rutas de email
+  // Siempre usar autenticaci�n para rutas de email
   return { ...base, auth: base.auth ?? true };
 }
 
@@ -170,7 +170,7 @@ function validateOutgoingMail(mail = {}) {
   const allRecipients = [...toList, ...collectRecipients(mail.cc), ...collectRecipients(mail.bcc)];
   const invalid = allRecipients.filter((email) => !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email));
   if (invalid.length) {
-    return `Direcciones inválidas: ${invalid.join(', ')}`;
+    return `Direcciones inv�lidas: ${invalid.join(', ')}`;
   }
   if (!mail.subject || !String(mail.subject).trim()) {
     return 'El asunto es obligatorio';
@@ -537,20 +537,20 @@ const DEFAULT_TEMPLATES = [
   {
     id: 'welcome-provider',
     name: 'Solicitud a proveedor',
-    subject: 'Solicitud de información para nuestra boda',
-    body: '<p>Hola {{name}},</p><p>Estamos organizando nuestra boda y nos gustaría conocer más sobre tus servicios.</p>',
+    subject: 'Solicitud de informaci�n para nuestra boda',
+    body: '<p>Hola {{name}},</p><p>Estamos organizando nuestra boda y nos gustar�a conocer m�s sobre tus servicios.</p>',
   },
   {
     id: 'thanks-meeting',
-    name: 'Agradecimiento reunión',
-    subject: '¡Gracias por tu tiempo!',
+    name: 'Agradecimiento reuni�n',
+    subject: '�Gracias por tu tiempo!',
     body: '<p>Gracias por reunirte con nosotros. Quedamos atentos a la propuesta.</p>',
   },
   {
     id: 'follow-up',
     name: 'Seguimiento de propuesta',
     subject: 'Seguimiento de nuestra solicitud',
-    body: '<p>Queríamos saber si pudiste revisar nuestra solicitud anterior.</p>',
+    body: '<p>Quer�amos saber si pudiste revisar nuestra solicitud anterior.</p>',
   },
 ];
 

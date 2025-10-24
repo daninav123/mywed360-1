@@ -96,7 +96,7 @@
     <div class="container">
         <div class="header">
             <h1>Prueba de Email Personalizado</h1>
-            <p>Sistema de envío de correos con dominio @maloveapp.com</p>
+            <p>Sistema de env�o de correos con dominio @maloveapp.com</p>
         </div>
         <div class="form-container">
             <form id="emailForm">
@@ -145,8 +145,8 @@
             <div id="result" class="result"></div>
             
             <div class="note">
-                <p>Esta herramienta permite probar el envío de correos personalizados con dominio @maloveapp.com sin necesidad de configurar previamente una dirección de correo.</p>
-                <p>Para configurar tu propia dirección personalizada, ponte en contacto con el administrador del sistema.</p>
+                <p>Esta herramienta permite probar el env�o de correos personalizados con dominio @maloveapp.com sin necesidad de configurar previamente una direcci�n de correo.</p>
+                <p>Para configurar tu propia direcci�n personalizada, ponte en contacto con el administrador del sistema.</p>
             </div>
         </div>
     </div>
@@ -203,15 +203,15 @@
                             data = JSON.parse(responseText);
                         } catch (error) {
                             console.error('Error al parsear JSON:', error);
-                            throw new Error(`Respuesta no válida del servidor: ${responseText}`);
+                            throw new Error(`Respuesta no v�lida del servidor: ${responseText}`);
                         }
                     }
                     
                     if (data.success) {
-                        // Mostrar mensaje de éxito
+                        // Mostrar mensaje de �xito
                         resultDiv.className = 'result success';
                         resultDiv.innerHTML = `
-                            <h3 style="margin-top: 0;">¡Correo enviado con éxito!</h3>
+                            <h3 style="margin-top: 0;">�Correo enviado con �xito!</h3>
                             <p>${data.message}</p>
                         `;
                     } else {
@@ -224,15 +224,15 @@
                         `;
                     }
                 } catch (error) {
-                    // Mostrar error de conexión
+                    // Mostrar error de conexi�n
                     resultDiv.className = 'result error';
                     resultDiv.innerHTML = `
-                        <h3 style="margin-top: 0;">Error de conexión</h3>
-                        <p>No se pudo conectar con el servidor. Por favor, inténtalo de nuevo más tarde.</p>
+                        <h3 style="margin-top: 0;">Error de conexi�n</h3>
+                        <p>No se pudo conectar con el servidor. Por favor, int�ntalo de nuevo m�s tarde.</p>
                         <p>${error.message}</p>
                     `;
                 } finally {
-                    // Restaurar botón y mostrar resultado
+                    // Restaurar bot�n y mostrar resultado
                     submitBtn.textContent = 'Enviar Correo de Prueba';
                     submitBtn.disabled = false;
                     resultDiv.style.display = 'block';

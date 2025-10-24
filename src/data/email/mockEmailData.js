@@ -4,7 +4,7 @@ const mockInbox = [
     from: 'proveedor@florista.com',
     to: 'maria.garcia@maloveapp.com',
     subject: 'Presupuesto de flores para boda',
-    body: `<p>Estimada María,</p><p>Adjunto el presupuesto para las flores de tu boda.</p><p>Saludos cordiales,<br/>Floristas Bella</p>`,
+    body: `<p>Estimada Mar�a,</p><p>Adjunto el presupuesto para las flores de tu boda.</p><p>Saludos cordiales,<br/>Floristas Bella</p>`,
     attachments: [
       {
         name: 'presupuesto.pdf',
@@ -23,8 +23,8 @@ const mockInbox = [
     id: 'email002',
     from: 'fotografia@capturamos.com',
     to: 'maria.garcia@maloveapp.com',
-    subject: 'Catálogo de fotos',
-    body: `<p>Hola María,</p><p>Te enviamos nuestro catálogo de fotografías.</p>`,
+    subject: 'Cat�logo de fotos',
+    body: `<p>Hola Mar�a,</p><p>Te enviamos nuestro cat�logo de fotograf�as.</p>`,
     attachments: [],
     date: '2025-07-09T10:15:30.000Z',
     read: true,
@@ -36,8 +36,8 @@ const mockInbox = [
     id: 'email003',
     from: 'catering@delicioso.com',
     to: 'maria.garcia@maloveapp.com',
-    subject: 'Menús disponibles',
-    body: `<p>Buenas tardes,</p><p>Te adjunto los diferentes menús disponibles para tu evento.</p>`,
+    subject: 'Men�s disponibles',
+    body: `<p>Buenas tardes,</p><p>Te adjunto los diferentes men�s disponibles para tu evento.</p>`,
     attachments: [
       {
         name: 'menu-bodas-2025.pdf',
@@ -62,8 +62,8 @@ const mockInbox = [
     id: 'email004',
     from: 'vestidos@elegancia.com',
     to: 'maria.garcia@maloveapp.com',
-    subject: 'Confirmación de cita para prueba',
-    body: `<p>Estimada María:</p><p>Te confirmamos la cita para la prueba del vestido el día 20 de julio a las 16:00h.</p>`,
+    subject: 'Confirmaci�n de cita para prueba',
+    body: `<p>Estimada Mar�a:</p><p>Te confirmamos la cita para la prueba del vestido el d�a 20 de julio a las 16:00h.</p>`,
     attachments: [],
     date: '2025-07-07T09:30:10.000Z',
     read: false,
@@ -76,7 +76,7 @@ const mockInbox = [
     from: 'local@jardines.com',
     to: 'maria.garcia@maloveapp.com',
     subject: 'Presupuesto actualizado para reserva',
-    body: `<p>Hola María,</p><p>Te enviamos el presupuesto actualizado para la reserva del jardín.</p>`,
+    body: `<p>Hola Mar�a,</p><p>Te enviamos el presupuesto actualizado para la reserva del jard�n.</p>`,
     attachments: [
       {
         name: 'presupuesto-jardin.pdf',
@@ -95,8 +95,8 @@ const mockInbox = [
     id: 'email006',
     from: 'eventos@coordinacion.com',
     to: 'maria.garcia@maloveapp.com',
-    subject: 'Planificación de eventos - Confirmación',
-    body: `<p>Estimados novios:</p><p>Les confirmamos la recepción del pago inicial para la coordinación del evento.</p>`,
+    subject: 'Planificaci�n de eventos - Confirmaci�n',
+    body: `<p>Estimados novios:</p><p>Les confirmamos la recepci�n del pago inicial para la coordinaci�n del evento.</p>`,
     attachments: [
       {
         name: 'recibo-pago.pdf',
@@ -115,23 +115,23 @@ const mockInbox = [
     id: 'email007',
     from: 'invitaciones@papeleria.com',
     to: 'maria.garcia@maloveapp.com',
-    subject: 'Diseños personalizados para invitaciones',
-    body: `<p>Buenas tardes María,</p><p>Te adjunto los diseños personalizados para las invitaciones que solicitaste.</p>`,
+    subject: 'Dise�os personalizados para invitaciones',
+    body: `<p>Buenas tardes Mar�a,</p><p>Te adjunto los dise�os personalizados para las invitaciones que solicitaste.</p>`,
     attachments: [
       {
-        name: 'diseño1.jpg',
+        name: 'dise�o1.jpg',
         url: 'https://example.com/diseno1.jpg',
         size: 2048,
         type: 'image/jpeg',
       },
       {
-        name: 'diseño2.jpg',
+        name: 'dise�o2.jpg',
         url: 'https://example.com/diseno2.jpg',
         size: 2048,
         type: 'image/jpeg',
       },
       {
-        name: 'diseño3.jpg',
+        name: 'dise�o3.jpg',
         url: 'https://example.com/diseno3.jpg',
         size: 2048,
         type: 'image/jpeg',
@@ -148,7 +148,7 @@ const mockInbox = [
     from: 'musica@melodias.com',
     to: 'maria.garcia@maloveapp.com',
     subject: 'Lista de canciones propuestas',
-    body: `<p>Hola María y Juan,</p><p>Les envío la lista de canciones propuestas para su evento basada en sus preferencias.</p>`,
+    body: `<p>Hola Mar�a y Juan,</p><p>Les env�o la lista de canciones propuestas para su evento basada en sus preferencias.</p>`,
     attachments: [
       {
         name: 'repertorio-bodas.xlsx',
@@ -167,8 +167,8 @@ const mockInbox = [
     id: 'email009',
     from: 'transporte@viajes.com',
     to: 'maria.garcia@maloveapp.com',
-    subject: 'Confirmación de reserva de transporte',
-    body: `<p>Estimada María:</p><p>Le confirmamos la reserva de los vehículos para el transporte de invitados.</p>`,
+    subject: 'Confirmaci�n de reserva de transporte',
+    body: `<p>Estimada Mar�a:</p><p>Le confirmamos la reserva de los veh�culos para el transporte de invitados.</p>`,
     attachments: [],
     date: '2025-07-02T10:35:20.000Z',
     read: true,
@@ -204,7 +204,7 @@ const mockSent = [
     from: 'maria.garcia@maloveapp.com',
     to: 'proveedor@florista.com',
     subject: 'Re: Presupuesto de flores para boda',
-    body: `<p>Estimada Florista Bella,</p><p>Gracias por el presupuesto. Me gustaría consultar si es posible modificar las cantidades de rosas blancas.</p><p>Saludos cordiales,<br/>María García</p>`,
+    body: `<p>Estimada Florista Bella,</p><p>Gracias por el presupuesto. Me gustar�a consultar si es posible modificar las cantidades de rosas blancas.</p><p>Saludos cordiales,<br/>Mar�a Garc�a</p>`,
     attachments: [],
     date: '2025-07-11T09:15:22.000Z',
     read: true,
@@ -216,8 +216,8 @@ const mockSent = [
     id: 'email102',
     from: 'maria.garcia@maloveapp.com',
     to: 'invitados@listado.com',
-    subject: 'Información importante sobre la boda',
-    body: `<p>Queridos invitados,</p><p>Os enviamos información importante sobre la celebración de nuestra boda.</p><p>Saludos,<br/>María y Juan</p>`,
+    subject: 'Informaci�n importante sobre la boda',
+    body: `<p>Queridos invitados,</p><p>Os enviamos informaci�n importante sobre la celebraci�n de nuestra boda.</p><p>Saludos,<br/>Mar�a y Juan</p>`,
     attachments: [
       {
         name: 'info-boda.pdf',
@@ -237,7 +237,7 @@ const mockSent = [
     from: 'maria.garcia@maloveapp.com',
     to: 'musica@melodias.com',
     subject: 'Consulta sobre repertorio',
-    body: `<p>Buenas tardes,</p><p>Hemos revisado el repertorio propuesto y nos gustaría hacer algunas modificaciones.</p><p>Saludos,<br/>María García</p>`,
+    body: `<p>Buenas tardes,</p><p>Hemos revisado el repertorio propuesto y nos gustar�a hacer algunas modificaciones.</p><p>Saludos,<br/>Mar�a Garc�a</p>`,
     attachments: [
       {
         name: 'cambios-repertorio.docx',
@@ -256,8 +256,8 @@ const mockSent = [
     id: 'email104',
     from: 'maria.garcia@maloveapp.com',
     to: 'catering@delicioso.com',
-    subject: 'Confirmación de menú',
-    body: `<p>Estimado equipo de catering,</p><p>Después de revisar las opciones, confirmamos la selección del menú número 3 con las modificaciones acordadas.</p><p>Saludos cordiales,<br/>María García</p>`,
+    subject: 'Confirmaci�n de men�',
+    body: `<p>Estimado equipo de catering,</p><p>Despu�s de revisar las opciones, confirmamos la selecci�n del men� n�mero 3 con las modificaciones acordadas.</p><p>Saludos cordiales,<br/>Mar�a Garc�a</p>`,
     attachments: [],
     date: '2025-07-08T11:30:45.000Z',
     read: true,
@@ -269,8 +269,8 @@ const mockSent = [
     id: 'email105',
     from: 'maria.garcia@maloveapp.com',
     to: 'alojamiento@hotel.com',
-    subject: 'Confirmación de reserva',
-    body: `<p>Buenos días,</p><p>Confirmamos la reserva del bloque de habitaciones según el presupuesto enviado.</p><p>Saludos,<br/>María García</p>`,
+    subject: 'Confirmaci�n de reserva',
+    body: `<p>Buenos d�as,</p><p>Confirmamos la reserva del bloque de habitaciones seg�n el presupuesto enviado.</p><p>Saludos,<br/>Mar�a Garc�a</p>`,
     attachments: [],
     date: '2025-07-07T10:15:30.000Z',
     read: true,
@@ -314,17 +314,17 @@ const mockTags = [
   { id: 'tag2', name: 'Proveedores', color: '#33FF57', systemTag: false },
   { id: 'tag3', name: 'Presupuestos', color: '#3357FF', systemTag: false },
   { id: 'tag4', name: 'Invitados', color: '#F3FF33', systemTag: false },
-  { id: 'tag5', name: 'Decoración', color: '#FF33F3', systemTag: false },
+  { id: 'tag5', name: 'Decoraci�n', color: '#FF33F3', systemTag: false },
 ];
 
 const mockTemplates = [
   {
     id: 'template-01',
-    name: 'Confirmación proveedor',
+    name: 'Confirmaci�n proveedor',
     category: 'Proveedores',
-    subjectTemplate: 'Confirmación de colaboración - [Proveedor]',
+    subjectTemplate: 'Confirmaci�n de colaboraci�n - [Proveedor]',
     messageTemplate:
-      'Hola [Proveedor],\n\nConfirmamos la colaboración para [Servicio]. Adjunto los detalles acordados.\n\nGracias,\nMaría',
+      'Hola [Proveedor],\n\nConfirmamos la colaboraci�n para [Servicio]. Adjunto los detalles acordados.\n\nGracias,\nMar�a',
   },
   {
     id: 'template-02',
@@ -332,7 +332,7 @@ const mockTemplates = [
     category: 'Invitados',
     subjectTemplate: 'Detalles importantes de la boda',
     messageTemplate:
-      'Hola [Nombre],\n\nQueríamos recordarte que la boda se celebrará el [Fecha] en [Lugar].\n\n¡Te esperamos!',
+      'Hola [Nombre],\n\nQuer�amos recordarte que la boda se celebrar� el [Fecha] en [Lugar].\n\n�Te esperamos!',
   },
   {
     id: 'template-03',
@@ -340,7 +340,7 @@ const mockTemplates = [
     category: 'Proveedores',
     subjectTemplate: 'Solicitud de presupuesto para [Servicio]',
     messageTemplate:
-      'Hola [Proveedor],\n\nEstamos interesados en recibir un presupuesto para [Servicio]. ¿Podrías indicarnos disponibilidad y precios?\n\nGracias,\nMaría',
+      'Hola [Proveedor],\n\nEstamos interesados en recibir un presupuesto para [Servicio]. �Podr�as indicarnos disponibilidad y precios?\n\nGracias,\nMar�a',
   },
 ];
 

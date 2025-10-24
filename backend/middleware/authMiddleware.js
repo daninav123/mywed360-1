@@ -1,5 +1,5 @@
 /**
- * Middleware de autenticaciÃ³n para el backend de MaLoveApp
+ * Middleware de autenticación para el backend de MaLoveApp
  * Verifica tokens de Firebase Auth y gestiona permisos
  */
 
@@ -11,10 +11,10 @@ import {
 } from '../services/adminSessions.js';
 import { getCookie } from '../utils/cookies.js';
 
-// Inicializar Firebase Admin si no estÃ¡ inicializado
+// Inicializar Firebase Admin si no está inicializado
 if (!admin.apps.length) {
   try {
-    // En producciÃ³n, usar las credenciales del entorno
+    // En producción, usar las credenciales del entorno
     if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
       let rawKey = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
       let serviceAccountObj;
@@ -57,7 +57,7 @@ if (!admin.apps.length) {
         }
       }
     } else {
-      // Buscar archivo serviceAccount.json en raÃ­z del proyecto como fallback
+      // Buscar archivo serviceAccount.json en raíz del proyecto como fallback
       try {
         const fs = await import('fs');
         const path = await import('path');
@@ -74,7 +74,7 @@ if (!admin.apps.length) {
           });
           console.log(`[AuthMiddleware] Firebase Admin inicializado con serviceAccount.json (${svcPath})`);
         } else {
-          // Ãšltimo recurso: inicializaciÃ³n sin credenciales explÃ­citas (usarÃ¡ ADC si existe)
+          // �altimo recurso: inicialización sin credenciales explícitas (usará ADC si existe)
           if (!admin.apps.length) admin.initializeApp({
             projectId: process.env.FIREBASE_PROJECT_ID || 'lovenda-98c77'
           });
@@ -95,7 +95,7 @@ if (!admin.apps.length) {
 /**
  * Extrae el token del header Authorization
  * @param {Object} req - Request object
- * @returns {string|null} - Token extraÃ­do o null
+ * @returns {string|null} - Token extraído o null
  */
 const extractToken = (req) => {
   const authHeader = req.headers.authorization;
@@ -140,15 +140,15 @@ const extractAdminSessionToken = (req) => {
  * @returns {Promise<Object>} - Datos del token decodificado
  */
 const verifyFirebaseToken = async (token) => {
-  // A partir de ahora sólo se permiten tokens reales de Firebase.
-  // El bypass con tokens mock queda deshabilitado salvo que se active de forma explícita (env)
+  // A partir de ahora s�lo se permiten tokens reales de Firebase.
+  // El bypass con tokens mock queda deshabilitado salvo que se active de forma expl�cita (env)
   if (token && token.startsWith('mock-')) {
     console.warn('[AuthMiddleware] Token mock detectado; se requiere un token real de Firebase.');
     return {
       success: false,
       error: {
         code: 'mock-token-disabled',
-        message: 'Los tokens mock están deshabilitados. Usa credenciales reales.',
+        message: 'Los tokens mock est�n deshabilitados. Usa credenciales reales.',
       },
     };
   }
@@ -163,7 +163,7 @@ const verifyFirebaseToken = async (token) => {
     console.error('[AuthMiddleware] Error verificando token:', error);
     
     let errorCode = 'invalid-token';
-    let errorMessage = 'Token invÃ¡lido';
+    let errorMessage = 'Token inválido';
     
     switch (error.code) {
       case 'auth/id-token-expired':
@@ -176,7 +176,7 @@ const verifyFirebaseToken = async (token) => {
         break;
       case 'auth/invalid-id-token':
         errorCode = 'invalid-token';
-        errorMessage = 'Token invÃ¡lido';
+        errorMessage = 'Token inválido';
         break;
       case 'auth/user-not-found':
         errorCode = 'user-not-found';
@@ -236,9 +236,9 @@ const getUserProfile = async (uid, emailHint = '') => {
 };
 
 /**
- * Middleware principal de autenticaciÃ³n
+ * Middleware principal de autenticación
  * @param {Object} options - Opciones del middleware
- * @returns {Function} - FunciÃ³n middleware
+ * @returns {Function} - Función middleware
  */
 const authMiddleware = (options = {}) => {
   const {
@@ -258,7 +258,7 @@ const authMiddleware = (options = {}) => {
           success: false,
           error: {
             code: 'no-token',
-            message: 'Token de autenticaciÃ³n requerido'
+            message: 'Token de autenticación requerido'
           }
         });
       }
@@ -282,7 +282,7 @@ const authMiddleware = (options = {}) => {
               success: false,
               error: {
                 code: 'invalid-admin-session',
-                message: 'SesiÃ³n administrativa no vÃ¡lida o expirada',
+                message: 'Sesión administrativa no válida o expirada',
               },
             });
           }
@@ -308,7 +308,7 @@ const authMiddleware = (options = {}) => {
         }
       }
 
-      // Si no habÃ­a sesiÃ³n admin vÃ¡lida, intentar con token estÃ¡ndar
+      // Si no había sesión admin válida, intentar con token estándar
       if (!resolvedUser && token) {
         const tokenResult = await verifyFirebaseToken(token);
 
@@ -340,7 +340,7 @@ const authMiddleware = (options = {}) => {
           success: false,
           error: {
             code: 'authentication-required',
-            message: 'AutenticaciÃ³n requerida'
+            message: 'Autenticación requerida'
           }
         });
       }
@@ -448,12 +448,12 @@ const authMiddleware = (options = {}) => {
 };
 
 /**
- * Middleware especÃ­fico para rutas que requieren autenticaciÃ³n
+ * Middleware específico para rutas que requieren autenticación
  */
 const requireAuth = authMiddleware({ required: true });
 
 /**
- * Middleware especÃ­fico para rutas de administrador
+ * Middleware específico para rutas de administrador
  */
 const requireAdmin = authMiddleware({ 
   required: true, 
@@ -461,7 +461,7 @@ const requireAdmin = authMiddleware({
 });
 
 /**
- * Middleware especÃ­fico para rutas de planner
+ * Middleware específico para rutas de planner
  */
 const requirePlanner = authMiddleware({ 
   required: true, 
@@ -469,7 +469,7 @@ const requirePlanner = authMiddleware({
 });
 
 /**
- * Middleware para rutas de email que requieren permisos especÃ­ficos
+ * Middleware para rutas de email que requieren permisos específicos
  */
 const requireMailAccess = authMiddleware({
   required: true,
@@ -477,7 +477,7 @@ const requireMailAccess = authMiddleware({
 });
 
 /**
- * Middleware opcional (permite acceso anÃ³nimo)
+ * Middleware opcional (permite acceso anónimo)
  */
 const optionalAuth = authMiddleware({ 
   required: false, 
@@ -495,7 +495,7 @@ const requireOwnership = (resourceIdParam = 'id', userIdField = 'userId') => {
         success: false,
         error: {
           code: 'authentication-required',
-          message: 'AutenticaciÃ³n requerida'
+          message: 'Autenticación requerida'
         }
       });
     }

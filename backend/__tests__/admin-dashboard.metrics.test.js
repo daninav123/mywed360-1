@@ -183,7 +183,7 @@ describe('admin dashboard aggregators', () => {
     expect(stats.source).toBe('firestore');
   });
 
-  it('deduplica descargas totales a travÃ©s de colecciones', async () => {
+  it('deduplica descargas totales a través de colecciones', async () => {
     mockData.appDownloads = [
       { id: 'd1', data: { createdAt: new Date('2025-09-01') } },
       { id: 'd2', data: { createdAt: new Date('2025-10-10') } },
@@ -202,7 +202,7 @@ describe('admin dashboard aggregators', () => {
     expect(total).toBe(5);
   });
 
-  it('cuenta descargas Ãºnicas en los Ãºltimos 30 dÃ­as', async () => {
+  it('cuenta descargas únicas en los últimos 30 días', async () => {
     mockData.appDownloads = [
       { id: 'l1', data: { createdAt: new Date('2025-10-20') } },
       { id: 'l2', data: { createdAt: new Date('2025-09-05') } },
@@ -235,7 +235,7 @@ describe('admin dashboard aggregators', () => {
     expect(stats.since).toBe('2025-10-02T00:00:00.000Z');
   });
 
-  it('calcula crecimiento de usuarios y proporciÃ³n premium', async () => {
+  it('calcula crecimiento de usuarios y proporción premium', async () => {
     mockData.users = [
       { id: 'u1', data: { createdAt: new Date('2025-10-10'), plan: 'Premium Plus' } },
       { id: 'u2', data: { createdAt: new Date('2025-09-01'), subscriptionPlan: 'basic' } },

@@ -8,7 +8,7 @@ import Card from '../../../components/ui/Card';
  * @typedef {import('../../../hooks/useAISearch').AISearchResult} AISearchResult
  */
 
-// Imágenes por tipo de servicio
+// Im�genes por tipo de servicio
 const SERVICE_IMAGES = {
   fotografia: 'https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=800&q=60',
   fotografo: 'https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=800&q=60',
@@ -29,16 +29,16 @@ const SERVICE_IMAGES = {
   default: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=60'
 };
 
-// Función para normalizar texto (quitar acentos)
+// Funci�n para normalizar texto (quitar acentos)
 const normalizeText = (text) => {
   return text
     .toLowerCase()
     .trim()
     .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, ''); // Elimina diacríticos
+    .replace(/[\u0300-\u036f]/g, ''); // Elimina diacr�ticos
 };
 
-// Función para obtener imagen según el servicio
+// Funci�n para obtener imagen seg�n el servicio
 const getServiceImage = (service) => {
   if (!service) return SERVICE_IMAGES.default;
   const normalized = normalizeText(service);
@@ -50,23 +50,23 @@ const getServiceImage = (service) => {
 };
 
 /**
- * Componente que muestra los resultaños de búsqueda con IA de proveedores.
- * Presenta una lista de resultaños con porcentaje de coincidencia, acciones rápidas
- * y estaños de carga. También muestra mensajes de error si los hubiera.
+ * Componente que muestra los resulta�os de b�squeda con IA de proveedores.
+ * Presenta una lista de resulta�os con porcentaje de coincidencia, acciones r�pidas
+ * y esta�os de carga. Tambi�n muestra mensajes de error si los hubiera.
  *
  * @param {Object} props - Propiedades del componente
- * @param {AISearchResult[]} [props.results=[]] - Resultaños de la búsqueda con IA
- * @param {boolean} props.isLoading - Indica si la búsqueda está en progreso
- * @param {Function} props.onSelect - Función para seleccionar un resultado
- * @param {string} props.query - Término de búsqueda original
+ * @param {AISearchResult[]} [props.results=[]] - Resulta�os de la b�squeda con IA
+ * @param {boolean} props.isLoading - Indica si la b�squeda est� en progreso
+ * @param {Function} props.onSelect - Funci�n para seleccionar un resultado
+ * @param {string} props.query - T�rmino de b�squeda original
  * @param {string} [props.error] - Mensaje de error, si existe
- * @returns {React.ReactElement} Componente de lista de resultaños de búsqueda con IA
+ * @returns {React.ReactElement} Componente de lista de resulta�os de b�squeda con IA
  */
 const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFallback }) => {
   if (isLoading) {
     return (
       <div data-testid="ai-results-list">
-        <div className="flex flex-col itemÃ¡s-center justify-center py-12">
+        <div className="flex flex-col itemás-center justify-center py-12">
           <div className="animate-spin mb-4">
             <Loader2 size={40} className="text-blue-500" />
           </div>
@@ -79,7 +79,7 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
   if (error) {
     return (
       <div data-testid="ai-results-list">
-        <div className="flex flex-col itemÃ¡s-center justify-center py-12">
+        <div className="flex flex-col itemás-center justify-center py-12">
           <div className="p-3 rounded-full bg-red-100 mb-4">
             <X size={24} className="text-red-500" />
           </div>
@@ -92,75 +92,75 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
       </div>
     );
   }
-  // Mensaje "sin resultaños" se pospone hasta después de definir displayResults
+  // Mensaje "sin resulta�os" se pospone hasta despu�s de definir displayResults
 
   if (!query) {
     return (
       <div data-testid="ai-results-list">
-        <div className="flex flex-col itemÃ¡s-center justify-center py-12">
+        <div className="flex flex-col itemás-center justify-center py-12">
           <div className="p-3 rounded-full bg-blue-100 mb-4">
             <Search size={24} className="text-blue-500" />
           </div>
           <p className="text-lg font-medium text-gray-700">Busca proveedores con IA</p>
           <p className="text-sm text-gray-500 mt-2 text-center max-w-md">
-            Describe lo que buscas en lenguaje natural y la IA encontrará los proveedores más
+            Describe lo que buscas en lenguaje natural y la IA encontrar� los proveedores m�s
             adecuados
           </p>
         </div>
       </div>
     );
   }
-  // Ejemplo de daños para mástrar en modo de demástración
+  // Ejemplo de da�os para m�strar en modo de dem�straci�n
   // DEMO DATA
   const demoResults = [
     {
       id: 1,
-      name: 'Fotografía Naturaleza Viva',
-      service: 'Fotografía',
+      name: 'Fotograf�a Naturaleza Viva',
+      service: 'Fotograf�a',
       snippet:
-        'Estudio especializado en fotografía de bodas con estilo natural y documental. Captaños los momentos más emotivos y espontáneos de tu boda.',
+        'Estudio especializado en fotograf�a de bodas con estilo natural y documental. Capta�os los momentos m�s emotivos y espont�neos de tu boda.',
       match: 95,
       image:
         'https://images.unsplash.com/photo-1537633552985-df8429e8048b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTB8fHdlZGRpbmclMjBwaG90b2dyYXBoeXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60',
       location: 'Madrid',
-      price: '1200€ - 2500€',
+      price: '1200� - 2500�',
       aiSummary:
-        'Este fotógrafo tiene un estilo natural y documental perfecto para bodas en exteriores. Sus imágenes capturan momentos espontáneos con iluminación natural, ideal para lo que buscas.',
+        'Este fot�grafo tiene un estilo natural y documental perfecto para bodas en exteriores. Sus im�genes capturan momentos espont�neos con iluminaci�n natural, ideal para lo que buscas.',
     },
     {
       id: 2,
-      name: 'Lente Azul Fotografía',
-      service: 'Fotografía',
+      name: 'Lente Azul Fotograf�a',
+      service: 'Fotograf�a',
       snippet:
-        'Más de 10 años de experiencia en fotografía de bodas en playa y espacios naturales. Ofrecemás paquetes personalizaños para cada pareja.',
+        'M�s de 10 a�os de experiencia en fotograf�a de bodas en playa y espacios naturales. Ofrecem�s paquetes personaliza�os para cada pareja.',
       match: 87,
       image:
         'https://images.unsplash.com/photo-1508435234994-67cfd7690508?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Nnx8d2VkZGluZyUyMHBob3RvZ3JhcGh5fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60',
       location: 'Barcelona',
-      price: '1500€ - 3000€',
+      price: '1500� - 3000�',
       aiSummary:
         'Especialistas en bodas en la playa con un estilo luminoso y natural. Su portfolio muestra una gran experiencia en entornos costeros y saben aprovechar la luz natural.',
     },
     {
       id: 3,
       name: 'Momentos Eternos',
-      service: 'Fotografía',
+      service: 'Fotograf�a',
       snippet:
-        'Fotografía de autor para bodas con estilo único. Combinaños fotografía documental con retraños artísticos para crear un álbum inolvidable.',
+        'Fotograf�a de autor para bodas con estilo �nico. Combina�os fotograf�a documental con retra�os art�sticos para crear un �lbum inolvidable.',
       match: 79,
       image:
         'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTR8fHdlZGRpbmclMjBwaG90b2dyYXBoeXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60',
       location: 'Valencia',
-      price: '1000€ - 2000€',
+      price: '1000� - 2000�',
       aiSummary:
-        'Ofrece un enfoque artístico con elementos documentales. Aunque su estilo es más estilizado que puramente natural, tiene experiencia en bodas al aire libre.',
+        'Ofrece un enfoque art�stico con elementos documentales. Aunque su estilo es m�s estilizado que puramente natural, tiene experiencia en bodas al aire libre.',
     },
   ];
 
-  // Usar daños reales si están disponibles, o los daños de demástración
+  // Usar da�os reales si est�n disponibles, o los da�os de dem�straci�n
   const displayResults = results.length > 0 ? results : (usedFallback ? demoResults : []);
 
-  // DEBUG: Ver qué resultados llegan
+  // DEBUG: Ver qu� resultados llegan
   if (displayResults.length > 0) {
     console.log('[AIResultList] Resultados a mostrar:', displayResults);
     console.log('[AIResultList] Primer resultado - image:', displayResults[0]?.image, 'service:', displayResults[0]?.service);
@@ -169,23 +169,23 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
   return (
     <div className="space-y-6" data-testid="ai-results-list">
       {usedFallback && query && (
-        <div className="w-full flex itemás-start gap-2 p-3 border border-amber-200 bg-amber-50 text-amber-800 rounded">
+        <div className="w-full flex item�s-start gap-2 p-3 border border-amber-200 bg-amber-50 text-amber-800 rounded">
           <AlertTriangle size={18} className="mt-0.5" />
           <div className="text-sm">
-            Mostrando resultaños locales (demo) por indisponibilidad del servidor.
+            Mostrando resulta�os locales (demo) por indisponibilidad del servidor.
           </div>
         </div>
       )}
-      {/* Resumen de la búsqueda */}
+      {/* Resumen de la b�squeda */}
       <div className="mb-4">
         <p className="text-sm text-gray-500">
           Se encontraron <span className="font-medium">{displayResults.length}</span> proveedores
-          para tu búsqueda:
+          para tu b�squeda:
         </p>
         <p className="text-lg font-medium">"{query}"</p>
       </div>
 
-      {/* Lista de resultaños */}
+      {/* Lista de resulta�os */}
       {displayResults.map((result) => (
         <Card key={result.id} className="relative overflow-hidden">
           {/* Indicador de porcentaje de coincidencia */}
@@ -198,7 +198,7 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
             <div className="w-full md:w-32 h-32 flex-shrink-0 overflow-hidden rounded-md bg-gray-100">
               <img 
                 src={(() => {
-                  // Usar imagen del resultado si existe y no es vacía, sino usar placeholder según servicio
+                  // Usar imagen del resultado si existe y no es vac�a, sino usar placeholder seg�n servicio
                   const imgSrc = (result.image && result.image.trim()) 
                     ? result.image 
                     : getServiceImage(result.service);
@@ -217,7 +217,7 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
 
             {/* Contenido principal */}
             <div className="flex-1">
-              <div className="flex flex-wrap justify-between itemás-start mb-2">
+              <div className="flex flex-wrap justify-between item�s-start mb-2">
                 <div>
                   <h3 className="text-lg font-semibold">{result.name}</h3>
                   <p className="text-sm text-gray-600">{result.service}</p>
@@ -231,16 +231,16 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
 
               {result.location && (
                 <p className="text-sm text-gray-600 mb-2">
-                  <span className="font-medium">Ubicación:</span> {result.location}
+                  <span className="font-medium">Ubicaci�n:</span> {result.location}
                 </p>
               )}
 
               <p className="text-sm text-gray-700 mb-3">{result.snippet}</p>
 
-              {/* Análisis de IA */}
+              {/* An�lisis de IA */}
               {result.aiSummary && (
                 <div className="bg-blue-50 p-3 rounded-md mb-3">
-                  <p className="text-xs font-semibold text-blue-600 mb-1">Análisis de IA</p>
+                  <p className="text-xs font-semibold text-blue-600 mb-1">An�lisis de IA</p>
                   <p className="text-sm text-gray-700">{result.aiSummary}</p>
                 </div>
               )}
@@ -251,7 +251,7 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
                   <ArrowRight size={16} className="mr-1" /> Ver detalles
                 </Button>
                 <Button onClick={() => onSelect(result, 'add')} size="sm">
-                  <Plus size={16} className="mr-1" /> Añadir
+                  <Plus size={16} className="mr-1" /> A�adir
                 </Button>
                 <Button
                   onClick={() => onSelect(result, 'email')}

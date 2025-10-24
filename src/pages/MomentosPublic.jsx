@@ -86,7 +86,7 @@ export default function MomentosPublic() {
     const initialize = async () => {
       try {
         if (!tokenParam || !weddingId) {
-          throw new Error('El enlace está incompleto. Solicita un nuevo QR al anfitrión.');
+          throw new Error('El enlace est� incompleto. Solicita un nuevo QR al anfitri�n.');
         }
         await firebaseReady;
         const tokenData = await validateGuestToken(weddingId, tokenParam, { albumId: ALBUM_ID });
@@ -163,7 +163,7 @@ export default function MomentosPublic() {
 
   const handleSceneSelect = (scene) => {
     if (uploadsClosed) {
-      toast.warn('La galería ya no acepta nuevas fotos.');
+      toast.warn('La galer�a ya no acepta nuevas fotos.');
       return;
     }
     setSelectedScene(scene);
@@ -181,7 +181,7 @@ export default function MomentosPublic() {
       return;
     }
     if (!acceptedTerms) {
-      toast.warn('Debes aceptar la política de privacidad');
+      toast.warn('Debes aceptar la pol�tica de privacidad');
       return;
     }
     persistGuestPrefs({ guestName: guestName.trim(), guestEmail, acceptedTerms: true });
@@ -198,7 +198,7 @@ export default function MomentosPublic() {
       },
       ...prev.slice(0, 4),
     ]);
-    toast.success('¡Gracias! Tu archivo se ha enviado correctamente.');
+    toast.success('�Gracias! Tu archivo se ha enviado correctamente.');
   };
 
   const handleCloseOverlay = () => {
@@ -211,7 +211,7 @@ export default function MomentosPublic() {
       <div className="min-h-screen flex items-center justify-center bg-slate-900 text-white">
         <div className="text-center space-y-3">
           <div className="animate-spin h-10 w-10 border-2 border-slate-600 border-t-transparent rounded-full mx-auto" />
-          <p className="text-sm text-slate-400">Preparando la galería…</p>
+          <p className="text-sm text-slate-400">Preparando la galer�a&</p>
         </div>
       </div>
     );
@@ -221,9 +221,9 @@ export default function MomentosPublic() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-900 text-white px-6">
         <div className="bg-white/5 backdrop-blur border border-white/10 rounded-3xl px-6 py-8 max-w-md text-center space-y-3">
-          <h1 className="text-xl font-semibold text-white">No pudimos abrir la galería</h1>
+          <h1 className="text-xl font-semibold text-white">No pudimos abrir la galer�a</h1>
           <p className="text-sm text-slate-300">
-            Este enlace ya no es válido o ha sido revocado. Contacta con la pareja anfitriona para solicitar uno nuevo.
+            Este enlace ya no es v�lido o ha sido revocado. Contacta con la pareja anfitriona para solicitar uno nuevo.
           </p>
         </div>
       </div>
@@ -237,23 +237,23 @@ export default function MomentosPublic() {
     <div className="min-h-screen bg-slate-950 text-white flex flex-col">
       <header className="px-6 pt-10 pb-6 bg-gradient-to-b from-slate-900 to-slate-950">
         <p className="text-xs uppercase tracking-[0.2em] text-blue-300 font-semibold">
-          Galería de recuerdos
+          Galer�a de recuerdos
         </p>
         <h1 className="text-3xl font-bold mt-3">
           {album?.settings?.publicTitle || 'Comparte tus mejores momentos'}
         </h1>
         <p className="text-sm text-slate-300 mt-3 max-w-sm">
-          Elige un momento para tus recuerdos y súbelos directamente desde tu móvil.
+          Elige un momento para tus recuerdos y s�belos directamente desde tu m�vil.
         </p>
         {uploadState?.closesAt && uploadState.isWindowOpen && remainingDays !== null && (
           <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-blue-500/10 border border-blue-400/40 px-4 py-2 text-xs font-medium text-blue-200">
             <Sparkles size={14} />
-            Disponible hasta {formatDate(uploadState.closesAt)} · {remainingDays === 0 ? 'Último día' : `${remainingDays} días restantes`}
+            Disponible hasta {formatDate(uploadState.closesAt)} � {remainingDays === 0 ? '�ltimo d�a' : `${remainingDays} d�as restantes`}
           </div>
         )}
         {uploadsClosed && (
           <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-amber-500/10 border border-amber-400/40 px-4 py-2 text-xs font-medium text-amber-200">
-            La subida de archivos ha finalizado para esta galería.
+            La subida de archivos ha finalizado para esta galer�a.
           </div>
         )}
       </header>
@@ -286,7 +286,7 @@ export default function MomentosPublic() {
                   <div>
                     <p className="font-semibold text-slate-900">{scene.label || scene.id}</p>
                     <p className="text-xs text-slate-500">
-                      Sube instantáneamente tus fotos o videos de este momento.
+                      Sube instant�neamente tus fotos o videos de este momento.
                     </p>
                   </div>
                 </div>
@@ -296,7 +296,7 @@ export default function MomentosPublic() {
 
             {!scenes.length && (
               <div className="rounded-2xl border border-dashed border-slate-200 px-4 py-6 text-center text-sm text-slate-500">
-                Los anfitriones aún no han configurado momentos específicos. Vuelve más tarde para compartir tus recuerdos.
+                Los anfitriones a�n no han configurado momentos espec�ficos. Vuelve m�s tarde para compartir tus recuerdos.
               </div>
             )}
           </div>
@@ -305,7 +305,7 @@ export default function MomentosPublic() {
             <section className="bg-slate-900 text-white rounded-2xl px-4 py-4">
               <div className="flex items-center gap-2 text-sm font-semibold">
                 <UploadCloud size={18} />
-                Últimas aportaciones
+                �ltimas aportaciones
               </div>
               <div className="mt-3 space-y-2">
                 {recentUploads.map((item, index) => (
@@ -316,10 +316,10 @@ export default function MomentosPublic() {
                     <div className="min-w-0">
                       <p className="truncate font-medium">{item.name}</p>
                       <p className="text-[11px] text-slate-400">
-                        {item.scene} · {Math.round(item.size / 1024)} KB
+                        {item.scene} � {Math.round(item.size / 1024)} KB
                       </p>
                     </div>
-                    <span className="text-[11px] text-green-300">En revisión</span>
+                    <span className="text-[11px] text-green-300">En revisi�n</span>
                   </div>
                 ))}
               </div>
@@ -328,7 +328,7 @@ export default function MomentosPublic() {
 
           {cleanupDays !== null && cleanupDays >= 0 && (
             <p className="text-xs text-slate-400 text-center">
-              La galería permanecerá disponible aproximadamente {cleanupDays === 0 ? 'un día más' : `${cleanupDays} días más`} antes de archivarse automáticamente.
+              La galer�a permanecer� disponible aproximadamente {cleanupDays === 0 ? 'un d�a m�s' : `${cleanupDays} d�as m�s`} antes de archivarse autom�ticamente.
             </p>
           )}
         </div>
@@ -369,7 +369,7 @@ export default function MomentosPublic() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700">Correo electrónico (opcional)</label>
+                  <label className="block text-sm font-medium text-slate-700">Correo electr�nico (opcional)</label>
                   <input
                     type="email"
                     value={guestEmail}
@@ -388,7 +388,7 @@ export default function MomentosPublic() {
                     required
                   />
                   <span>
-                    Confirmo que tengo permiso para compartir estas imágenes y acepto que la pareja anfitriona las utilice en la galería.
+                    Confirmo que tengo permiso para compartir estas im�genes y acepto que la pareja anfitriona las utilice en la galer�a.
                   </span>
                 </label>
 

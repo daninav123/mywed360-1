@@ -5,7 +5,7 @@ import { post } from '../../services/apiClient';
 import useTranslations from '../../hooks/useTranslations';
 
 /**
- * Predicción IA de gastos futuros basada en histórico
+ * Predicci�n IA de gastos futuros basada en hist�rico
  */
 const BudgetPrediction = ({ transactions = [], budget = {}, weddingDate }) => {
   const [predicting, setPredicting] = useState(false);
@@ -23,13 +23,13 @@ const BudgetPrediction = ({ transactions = [], budget = {}, weddingDate }) => {
     setPredicting(true);
 
     try {
-      // Análisis local de tendencias
+      // An�lisis local de tendencias
       const localAnalysis = analyzeLocalTrends();
       
-      // Intentar llamar a IA backend si está disponible
+      // Intentar llamar a IA backend si est� disponible
       try {
         const response = await post('/api/ai/budget-predict', {
-          transactions: transactions.slice(0, 50), // Últimas 50
+          transactions: transactions.slice(0, 50), // �ltimas 50
           budget: budget.total || 0,
           weddingDate,
           categories: budget.categories || {}
@@ -43,10 +43,10 @@ const BudgetPrediction = ({ transactions = [], budget = {}, weddingDate }) => {
           return;
         }
       } catch (err) {
-        console.log('IA backend no disponible, usando análisis local');
+        console.log('IA backend no disponible, usando an�lisis local');
       }
 
-      // Fallback: solo análisis local
+      // Fallback: solo an�lisis local
       setPrediction(localAnalysis);
     } catch (error) {
       console.error('Error generating prediction:', error);
@@ -74,7 +74,7 @@ const BudgetPrediction = ({ transactions = [], budget = {}, weddingDate }) => {
     const budgetTotal = budget.total || 0;
     const percentageSpent = budgetTotal > 0 ? (totalSpent / budgetTotal) * 100 : 0;
 
-    // Calcular días hasta la boda
+    // Calcular d�as hasta la boda
     const today = new Date();
     const weddingDateObj = weddingDate ? new Date(weddingDate) : new Date(Date.now() + 180 * 24 * 60 * 60 * 1000);
     const daysUntilWedding = Math.max(1, Math.ceil((weddingDateObj - today) / (1000 * 60 * 60 * 24)));
@@ -88,7 +88,7 @@ const BudgetPrediction = ({ transactions = [], budget = {}, weddingDate }) => {
     const daysSinceStart = Math.max(1, Math.ceil((today - earliestTransaction) / (1000 * 60 * 60 * 24)));
     const dailySpendRate = totalSpent / daysSinceStart;
 
-    // Proyección simple
+    // Proyecci�n simple
     const projectedTotal = totalSpent + (dailySpendRate * daysUntilWedding);
     const projectedOverage = projectedTotal - budgetTotal;
 
@@ -115,7 +115,7 @@ const BudgetPrediction = ({ transactions = [], budget = {}, weddingDate }) => {
         type: 'warning',
         message: t('budgetPrediction.recommendations.projectedOverage.message', {
           amount: projectedOverage.toFixed(2),
-          defaultValue: 'Se proyecta un exceso de €{{amount}}',
+          defaultValue: 'Se proyecta un exceso de �{{amount}}',
         }),
         action: t('budgetPrediction.recommendations.projectedOverage.action', {
           defaultValue: 'Considera revisar gastos discrecionales',
@@ -127,19 +127,19 @@ const BudgetPrediction = ({ transactions = [], budget = {}, weddingDate }) => {
       recommendations.push({
         type: 'info',
         message: 'Tu tasa de gasto diaria es alta',
-        action: 'Intenta espaciar más las compras grandes'
+        action: 'Intenta espaciar m�s las compras grandes'
       });
     }
 
     if (daysUntilWedding < 60 && percentageSpent < 60) {
       recommendations.push({
         type: 'success',
-        message: '¡Vas muy bien con el presupuesto!',
-        action: 'Mantén este ritmo de gasto'
+        message: '�Vas muy bien con el presupuesto!',
+        action: 'Mant�n este ritmo de gasto'
       });
     }
 
-    // Análisis por categorías
+    // An�lisis por categor�as
     const categoryAnalysis = analyzeCategorySpending();
 
     return {
@@ -196,7 +196,7 @@ const BudgetPrediction = ({ transactions = [], budget = {}, weddingDate }) => {
   const getRiskLabel = (risk) => {
     switch (risk) {
       case 'critical':
-        return 'Crítico';
+        return 'Cr�tico';
       case 'high':
         return 'Alto';
       case 'medium':
@@ -211,7 +211,7 @@ const BudgetPrediction = ({ transactions = [], budget = {}, weddingDate }) => {
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
         <Sparkles className="w-12 h-12 text-blue-600 mx-auto mb-3" />
         <h3 className="font-semibold text-blue-900 mb-2">
-          Predicciones IA disponibles próximamente
+          Predicciones IA disponibles pr�ximamente
         </h3>
         <p className="text-sm text-blue-700">
           Necesitas al menos 5 transacciones para generar predicciones.
@@ -228,10 +228,10 @@ const BudgetPrediction = ({ transactions = [], budget = {}, weddingDate }) => {
         <div>
           <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
             <Sparkles className="w-6 h-6 text-purple-600" />
-            Predicción IA
+            Predicci�n IA
           </h2>
           <p className="text-sm text-gray-600 mt-1">
-            Análisis inteligente de tu presupuesto
+            An�lisis inteligente de tu presupuesto
           </p>
         </div>
         <Button
@@ -248,7 +248,7 @@ const BudgetPrediction = ({ transactions = [], budget = {}, weddingDate }) => {
           ) : (
             <>
               <TrendingUp className="w-4 h-4" />
-              Actualizar Predicción
+              Actualizar Predicci�n
             </>
           )}
         </Button>
@@ -291,26 +291,26 @@ const BudgetPrediction = ({ transactions = [], budget = {}, weddingDate }) => {
             <div className="bg-white border border-gray-200 rounded-lg p-4">
               <p className="text-sm text-gray-600 mb-1">Gastado</p>
               <p className="text-2xl font-bold text-gray-900">
-                €{prediction.totalSpent.toFixed(0)}
+                �{prediction.totalSpent.toFixed(0)}
               </p>
             </div>
 
             <div className="bg-white border border-gray-200 rounded-lg p-4">
               <p className="text-sm text-gray-600 mb-1">Proyectado</p>
               <p className="text-2xl font-bold text-purple-700">
-                €{prediction.projectedTotal.toFixed(0)}
+                �{prediction.projectedTotal.toFixed(0)}
               </p>
             </div>
 
             <div className="bg-white border border-gray-200 rounded-lg p-4">
               <p className="text-sm text-gray-600 mb-1">Gasto Diario</p>
               <p className="text-2xl font-bold text-blue-700">
-                €{prediction.dailySpendRate.toFixed(0)}
+                �{prediction.dailySpendRate.toFixed(0)}
               </p>
             </div>
 
             <div className="bg-white border border-gray-200 rounded-lg p-4">
-              <p className="text-sm text-gray-600 mb-1">Días Restantes</p>
+              <p className="text-sm text-gray-600 mb-1">D�as Restantes</p>
               <p className="text-2xl font-bold text-green-700">
                 {prediction.daysUntilWedding}
               </p>
@@ -348,7 +348,7 @@ const BudgetPrediction = ({ transactions = [], budget = {}, weddingDate }) => {
           {prediction.categoryAnalysis?.length > 0 && (
             <div className="bg-white border border-gray-200 rounded-lg p-4">
               <h3 className="font-semibold text-gray-900 mb-3">
-                Análisis por Categoría
+                An�lisis por Categor�a
               </h3>
               <div className="space-y-2">
                 {prediction.categoryAnalysis.slice(0, 5).map((cat, idx) => (
@@ -356,7 +356,7 @@ const BudgetPrediction = ({ transactions = [], budget = {}, weddingDate }) => {
                     <span className="text-sm text-gray-700">{cat.category}</span>
                     <div className="flex items-center gap-3">
                       <span className="text-sm text-gray-900 font-medium">
-                        €{cat.spent.toFixed(0)}
+                        �{cat.spent.toFixed(0)}
                       </span>
                       <span className={`text-xs px-2 py-1 rounded ${
                         cat.percentage > 100 

@@ -347,7 +347,7 @@ const Proveedores = () => {
       try {
         const results = await runAISearch(enrichedQuery || trimmed, {
           service: trimmed,
-          allowFallback: false,
+          allowFallback: true, // Activar fallback para mostrar resultados demo si backend no está disponible
         });
         const safeResults = Array.isArray(results) ? results : [];
         if (!safeResults.length && !silent) {
@@ -384,7 +384,10 @@ const Proveedores = () => {
 
   const handleSearchSubmit = useCallback(
     async (event) => {
-      event.preventDefault();
+      if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
       await performSearch(searchInput, { saveHistory: true });
     },
     [performSearch, searchInput]

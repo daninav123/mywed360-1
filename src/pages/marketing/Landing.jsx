@@ -165,7 +165,7 @@ const Landing = () => {
             Plataforma todo en uno para planear bodas
           </span>
           <h1 className="mt-6 text-4xl font-semibold leading-tight text-body md:text-5xl">
-            Coordina tu boda soñada en menos tiempo con herramientas profesionales listas para tu equipo.
+            Coordina tu boda so�ada en menos tiempo con herramientas profesionales listas para tu equipo.
           </h1>
           <p className="mt-6 text-lg text-muted">
             MaLove.App combina planificacion, finanzas, comunicacion y diseno en un espacio centralizado.
@@ -279,7 +279,7 @@ const Landing = () => {
         <div className="grid gap-8 lg:grid-cols-[1.2fr,0.8fr] lg:items-center">
           <div>
             <span className="rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[var(--color-primary)]">
-              DiseÃ±ado para planners
+              Diseñado para planners
             </span>
             <h2 className="mt-5 text-3xl font-semibold text-body">
               Control total de tu cartera de eventos sin hojas de calculo.
@@ -321,9 +321,9 @@ const Landing = () => {
               <div className="rounded-xl border border-soft bg-white/90 p-4 shadow-sm">
                 <p className="text-xs font-medium text-muted">Estado de clientes</p>
                 <ul className="mt-2 space-y-1 text-xs text-muted">
-                  <li>â€¢ Ana & Diego - cronograma: 92%</li>
-                  <li>â€¢ Laura & Marco - pagos: 3 facturas pendientes</li>
-                  <li>â€¢ Carolina & Javier - invitados: 156 confirmados</li>
+                  <li>⬢ Ana & Diego - cronograma: 92%</li>
+                  <li>⬢ Laura & Marco - pagos: 3 facturas pendientes</li>
+                  <li>⬢ Carolina & Javier - invitados: 156 confirmados</li>
                 </ul>
               </div>
               <div className="rounded-xl border border-soft bg-white/90 p-4 shadow-sm">
@@ -331,7 +331,7 @@ const Landing = () => {
                 <div className="mt-3 h-2 w-full rounded-full bg-primary-soft">
                   <div className="h-full w-2/3 rounded-full bg-[var(--color-primary)]" />
                 </div>
-                <p className="mt-2 text-xs text-muted">Tiempo promedio por boda: 38% menos que el aÃ±o pasado.</p>
+                <p className="mt-2 text-xs text-muted">Tiempo promedio por boda: 38% menos que el año pasado.</p>
               </div>
             </div>
           </div>

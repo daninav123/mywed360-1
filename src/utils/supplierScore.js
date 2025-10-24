@@ -1,13 +1,13 @@
 /**
- * Utilidades para calcular la puntuación "inteligente" de proveedores IA.
+ * Utilidades para calcular la puntuaci�n "inteligente" de proveedores IA.
  *
- * La puntuación combina:
+ * La puntuaci�n combina:
  *  - Coincidencia IA (match) o afinidad manual.
- *  - Rating histórico y nº de valoraciones.
+ *  - Rating hist�rico y n� de valoraciones.
  *  - Experiencia (bodas servidas + estado pipeline).
  *  - Tiempo de respuesta medio.
- *  - Satisfacción reportada.
- *  - Interacción reciente vía portal.
+ *  - Satisfacci�n reportada.
+ *  - Interacci�n reciente v�a portal.
  *
  * Todas las entradas se normalizan a 0-100.
  */
@@ -38,9 +38,9 @@ function computeAverage(sum, count) {
 }
 
 /**
- * Devuelve métricas normalizadas para la puntuación IA.
+ * Devuelve m�tricas normalizadas para la puntuaci�n IA.
  * @param {object} provider Datos del proveedor.
- * @param {object|null} insights Doc con históricos (supplierInsights).
+ * @param {object|null} insights Doc con hist�ricos (supplierInsights).
  * @param {object} opts Opciones adicionales.
  */
 export function buildSupplierSignals(provider = {}, insights = null, opts = {}) {
@@ -70,7 +70,7 @@ export function buildSupplierSignals(provider = {}, insights = null, opts = {}) 
 
   const avgResponse =
     computeAverage(insights?.avgResponseTime, insights?.responsesTracked) || 0;
-  // Menos minutos = mejor. Normaliza 0-20 restando penalización.
+  // Menos minutos = mejor. Normaliza 0-20 restando penalizaci�n.
   const responseScore = clamp(20 - Math.min(20, avgResponse / 15), 0, 20);
 
   const satisfactionAvg =
@@ -138,7 +138,7 @@ export function computeSupplierScore(provider = {}, insights = null, opts = {}) 
 }
 
 /**
- * Crea estadísticas agregadas por servicio.
+ * Crea estad�sticas agregadas por servicio.
  * @param {Array<{service: string, intelligentScore?: {score:number}}>} providers
  */
 export function aggregateServiceStats(providers = []) {

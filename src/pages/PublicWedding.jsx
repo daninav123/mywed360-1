@@ -30,7 +30,7 @@ export default function PublicWedding() {
     };
   }, [slug]);
 
-  if (state.loading) return <div style={{ padding: 24, textAlign: 'center' }}>Cargando…</div>;
+  if (state.loading) return <div style={{ padding: 24, textAlign: 'center' }}>Cargando&</div>;
   if (state.error)
     return (
       <div style={{ padding: 24, textAlign: 'center', color: '#b91c1c' }}>
@@ -61,7 +61,7 @@ export default function PublicWedding() {
       <section className="min-h-[60vh] bg-gray-900 text-white flex items-center justify-center text-center px-6">
         <div>
           <h1 className="text-5xl font-bold mb-3">{w.name || 'Nuestra Boda'}</h1>
-          <p className="text-xl opacity-90">{[w.date, w.location].filter(Boolean).join(' · ')}</p>
+          <p className="text-xl opacity-90">{[w.date, w.location].filter(Boolean).join(' � ')}</p>
         </div>
       </section>
 
@@ -93,7 +93,7 @@ export default function PublicWedding() {
 
       {gallery.length > 0 && (
         <section className="py-10 max-w-5xl mx-auto px-4">
-          <h2 className="text-2xl font-semibold mb-4">Galería</h2>
+          <h2 className="text-2xl font-semibold mb-4">Galer�a</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
             {gallery.map((g) => (
               <ExternalImage
@@ -108,7 +108,7 @@ export default function PublicWedding() {
       )}
 
       <footer className="py-8 text-center text-sm text-gray-500">
-        © {new Date().getFullYear()} {w.name || ''}
+        � {new Date().getFullYear()} {w.name || ''}
       </footer>
     </div>
   );

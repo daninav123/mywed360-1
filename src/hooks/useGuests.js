@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+�import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 
 import useWeddingCollection from './useWeddingCollection';
 import useActiveWeddingInfo from './useActiveWeddingInfo';
@@ -48,7 +48,7 @@ const normalizeCheckInCode = (code) => {
 
 const nowISO = () => new Date().toISOString();
 
-// Hook personalizado para gestión optimizada de invitados
+// Hook personalizado para gesti�n optimizada de invitados
 const useGuests = () => {
   // Contexto de boda activa
   let activeWedding;
@@ -70,13 +70,13 @@ const useGuests = () => {
     return [
       {
         id: 1,
-        name: 'Ana García',
+        name: 'Ana Garc�a',
         email: 'ana@example.com',
         phone: '123456789',
         address: 'Calle Sol 1',
         companion: 1,
         table: '5',
-        response: 'Sí',
+        response: 'S�',
         status: 'confirmed',
         dietaryRestrictions: '',
         notes: '',
@@ -85,7 +85,7 @@ const useGuests = () => {
       },
       {
         id: 2,
-        name: 'Luis Martínez',
+        name: 'Luis Mart�nez',
         email: 'luis@example.com',
         phone: '987654321',
         address: 'Av. Luna 3',
@@ -94,7 +94,7 @@ const useGuests = () => {
         response: 'Pendiente',
         status: 'pending',
         dietaryRestrictions: 'Vegetariano',
-        notes: 'Llegará tarde a la ceremonia',
+        notes: 'Llegar� tarde a la ceremonia',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       },
@@ -266,7 +266,7 @@ const useGuests = () => {
     }
   }, [activeWedding, activeWeddingInfo, weddingsList]);
 
-  // Colección guests de la boda activa
+  // Colecci�n guests de la boda activa
   const {
     data: guests,
     addItem,
@@ -307,7 +307,7 @@ const useGuests = () => {
          );
           if (
             status === 'confirmed' &&
-            !(s === 'confirmed' || s === 'accepted' || r === 's' || r === 'si' || r === 'sí')
+            !(s === 'confirmed' || s === 'accepted' || r === 's' || r === 'si' || r === 's�')
           )
             return false;
           if (status === 'declined' && !(s === 'declined' || s === 'rejected' || r === 'no'))
@@ -315,7 +315,7 @@ const useGuests = () => {
           if (status === 'pending') {
             const isPending =
               !(s === 'confirmed' || s === 'accepted' || s === 'declined' || s === 'rejected') &&
-              !['s', 'si', 'sí', 'no'].includes(r);
+              !['s', 'si', 's�', 'no'].includes(r);
             if (!isPending) return false;
           }
         }
@@ -329,7 +329,7 @@ const useGuests = () => {
     }
   }, [guests, filters]);
 
-  // Sincronización con localStorage para compatibilidad
+  // Sincronizaci�n con localStorage para compatibilidad
   useEffect(() => {
     try {
       localStorage.setItem('mywed360Guests', JSON.stringify(guests));
@@ -348,7 +348,7 @@ const useGuests = () => {
       phoneClean: (str = '') => str.replace(/\s+/g, '').replace(/[^0-9+]/g, ''),
       getStatusLabel: (guest) => {
         if (guest.status) {
-          if (guest.status === 'confirmed') return 'Sí';
+          if (guest.status === 'confirmed') return 'S�';
           if (guest.status === 'declined') return 'No';
           return 'Pendiente';
         }
@@ -360,7 +360,7 @@ const useGuests = () => {
             x && x.normalize ? x.normalize('NFD').replace(/[\u0300-\u036f]/g, '') : x;
           const s = String(statusRaw || '').toLowerCase();
           const r = strip(String(responseRaw || '').toLowerCase().trim());
-          if (s === 'confirmed' || s === 'accepted' || ['s', 'si', 'sí'].includes(r)) return 'confirmed';
+          if (s === 'confirmed' || s === 'accepted' || ['s', 'si', 's�'].includes(r)) return 'confirmed';
           if (s === 'declined' || s === 'rejected' || r === 'no') return 'declined';
           return 'pending';
         } catch {
@@ -371,7 +371,7 @@ const useGuests = () => {
     []
  );
 
-  // Estadísticas
+  // Estad�sticas
   const stats = useMemo(() => {
     const totalCompanions = guests.reduce((sum, g) => sum + (parseInt(g.companion, 10) || 0), 0);
     const withDietaryRestrictions = guests.filter(
@@ -380,7 +380,7 @@ const useGuests = () => {
     const c2 = guests.filter((g) => {
       const s = String(g.status || '').toLowerCase();
       const r = String(g.response || '').toLowerCase();
-      return s === 'confirmed' || s === 'accepted' || r === 'sí' || r === 's';
+      return s === 'confirmed' || s === 'accepted' || r === 's�' || r === 's';
     }).length;
     const d2 = guests.filter((g) => {
       const s = String(g.status || '').toLowerCase();
@@ -404,7 +404,7 @@ const useGuests = () => {
     };
   }, [guests]);
 
-  // CRUD básico
+  // CRUD b�sico
   const addGuest = useCallback(
     async (guestData) => {
       try {
@@ -433,13 +433,13 @@ const useGuests = () => {
             s && s.normalize ? s.normalize('NFD').replace(/[\u0300-\u036f]/g, '') : s;
           const s = String(base.status || '').toLowerCase();
           const r = sd(String(base.response || '').toLowerCase().trim());
-          if (s === 'confirmed' || s === 'accepted' || ['s', 'si', 'sí'].includes(r)) base.status = 'confirmed';
+          if (s === 'confirmed' || s === 'accepted' || ['s', 'si', 's�'].includes(r)) base.status = 'confirmed';
           else if (s === 'declined' || s === 'rejected' || r === 'no') base.status = 'declined';
           else base.status = 'pending';
         } catch {}
         const parsed = guestSchema.safeParse(base);
         if (!parsed.success) {
-          return { success: false, error: parsed.error?.errors?.[0]?.message || 'Datos inválidos' };
+          return { success: false, error: parsed.error?.errors?.[0]?.message || 'Datos inv�lidos' };
         }
         const newGuest = parsed.data;
         await addItem(newGuest);
@@ -452,7 +452,7 @@ const useGuests = () => {
         } catch {}
         return { success: true, guest: newGuest };
       } catch (error) {
-        console.error('Error añadiendo invitado:', error);
+        console.error('Error a�adiendo invitado:', error);
         return { success: false, error: error.message };
       }
     },
@@ -487,14 +487,14 @@ const useGuests = () => {
             const sd = (s = '') => (s && s.normalize ? s.normalize('NFD').replace(/[\u0300-\u036f]/g, '') : s);
             const s = String((patch.status ?? original?.status) || '').toLowerCase();
             const r = sd(String((patch.response ?? original?.response) || '').toLowerCase().trim());
-            if (s === 'confirmed' || s === 'accepted' || ['s', 'si', 'sí'].includes(r)) patch.status = 'confirmed';
+            if (s === 'confirmed' || s === 'accepted' || ['s', 'si', 's�'].includes(r)) patch.status = 'confirmed';
             else if (s === 'declined' || s === 'rejected' || r === 'no') patch.status = 'declined';
             else patch.status = 'pending';
           }
         } catch {}
         const parsed = guestUpdateSchema.safeParse(patch);
         if (!parsed.success) {
-          return { success: false, error: parsed.error?.errors?.[0]?.message || 'Datos inválidos' };
+          return { success: false, error: parsed.error?.errors?.[0]?.message || 'Datos inv�lidos' };
         }
         const updatedGuest = parsed.data;
         await updateItem(guestId, updatedGuest);
@@ -772,7 +772,7 @@ const useGuests = () => {
     async (guest) => {
       const phone = utils.phoneClean(guest.phone);
       if (!phone) {
-        alert('El invitado no tiene número de teléfono');
+        alert('El invitado no tiene n�mero de tel�fono');
         return;
       }
       if (testApi?.logWhatsApp) {
@@ -798,8 +798,8 @@ const useGuests = () => {
         }
       } catch {}
       const text = link
-        ? `¡Hola ${guest.name}! Nos encantaría contar contigo en nuestra boda. Confirma tu asistencia aquí: ${link}`
-        : `¡Hola ${guest.name}! Nos encantaría contar contigo en nuestra boda. ¿Puedes confirmar tu asistencia?`;
+        ? `�Hola ${guest.name}! Nos encantar�a contar contigo en nuestra boda. Confirma tu asistencia aqu�: ${link}`
+        : `�Hola ${guest.name}! Nos encantar�a contar contigo en nuestra boda. �Puedes confirmar tu asistencia?`;
       const deeplink = waDeeplink(toE164Frontend(phone), text);
       window.open(deeplink, '_blank');
     },
@@ -844,8 +844,8 @@ const useGuests = () => {
             customMessage && customMessage.trim()
               ? customMessage
               : link
-                ? `¡Hola ${guest.name || ''}! Nos encantaría contar contigo en nuestra boda. Confirma tu asistencia aquí: ${link}`
-                : `¡Hola ${guest.name || ''}! Nos encantaría contar contigo en nuestra boda. ¿Puedes confirmar tu asistencia?`;
+                ? `�Hola ${guest.name || ''}! Nos encantar�a contar contigo en nuestra boda. Confirma tu asistencia aqu�: ${link}`
+                : `�Hola ${guest.name || ''}! Nos encantar�a contar contigo en nuestra boda. �Puedes confirmar tu asistencia?`;
           const phone = toE164Frontend(utils.phoneClean(guest.phone));
           const url = waDeeplink(phone, message);
           window.open(url, '_blank');
@@ -884,8 +884,8 @@ const useGuests = () => {
             customMessage && customMessage.trim()
               ? customMessage
               : link
-                ? `Hola ${guest.name || ''}! Nos encantaría contar contigo en nuestra boda. Confirma tu asistencia aquí: ${link}`
-                : `Hola ${guest.name || ''}! Nos encantaría contar contigo en nuestra boda. ¿Puedes confirmar tu asistencia?`;
+                ? `Hola ${guest.name || ''}! Nos encantar�a contar contigo en nuestra boda. Confirma tu asistencia aqu�: ${link}`
+                : `Hola ${guest.name || ''}! Nos encantar�a contar contigo en nuestra boda. �Puedes confirmar tu asistencia?`;
           const phone = toE164Frontend(utils.phoneClean(guest.phone));
           if (!phone) continue;
           items.push({ to: phone, message: msg });
@@ -899,7 +899,7 @@ const useGuests = () => {
 
   const inviteSelectedWhatsAppBroadcastViaExtension = useCallback(
     async (selectedIds = [], customMessage) => {
-      // Implementación placeholder: usa mensajes individuales como fallback
+      // Implementaci�n placeholder: usa mensajes individuales como fallback
       return inviteSelectedWhatsAppViaExtension(selectedIds, customMessage);
     },
     [inviteSelectedWhatsAppViaExtension]
@@ -1203,7 +1203,7 @@ const useGuests = () => {
           return { success: false, error: 'no-email' };
         }
         const templateSubject =
-          overrides.subject || 'Invitación a la boda de {coupleName}';
+          overrides.subject || 'Invitaci�n a la boda de {coupleName}';
         const subject = templateSubject.replace('{coupleName}', coupleName);
         const renderedBody = renderInviteMessage(target.name || '', {
           coupleName,
@@ -1337,7 +1337,7 @@ const useGuests = () => {
     async (guest, customMessage) => {
       const phone = utils.phoneClean(guest.phone);
       if (!phone) return { success: false, error: 'no-phone' };
-      const text = customMessage?.trim() || `¡Hola ${guest.name || ''}!`;
+      const text = customMessage?.trim() || `�Hola ${guest.name || ''}!`;
       if (testApi?.logWhatsApp) {
         testApi.logWhatsApp({
           mode: 'deeplink-custom',
@@ -1371,7 +1371,7 @@ const useGuests = () => {
     error: collectionError,
     reload,
 
-    // Gestión
+    // Gesti�n
     addGuest,
     updateGuest,
     removeGuest,

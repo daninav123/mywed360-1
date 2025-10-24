@@ -290,7 +290,17 @@ export const useAISearch = () => {
       } catch (backendError) {
         console.warn('Fallo consultando ai-suppliers', backendError);
         console.debug('[useAISearch] ai-suppliers excepción', backendError?.message, backendError);
-        lastError = backendError instanceof Error ? backendError : new Error(String(backendError || 'Error'));
+        
+        // Detectar error de red (backend no disponible)
+        if (backendError?.message?.includes('fetch') || backendError?.name === 'TypeError') {
+          const networkError = new Error(
+            'No se pudo conectar con el servidor. Verifica que el backend esté ejecutándose en http://localhost:4004'
+          );
+          networkError.code = 'BACKEND_OFFLINE';
+          lastError = networkError;
+        } else {
+          lastError = backendError instanceof Error ? backendError : new Error(String(backendError || 'Error'));
+        }
       }
 
       try {
@@ -341,7 +351,9 @@ export const useAISearch = () => {
         }
       }
 
-      if (allowFallback) {
+      // Si es error de backend offline, usar fallback automáticamente
+      if (lastError?.code === 'BACKEND_OFFLINE' || allowFallback) {
+        console.info('[useAISearch] Usando resultados de demostración (backend no disponible o fallback activado)');
         const demoResults = generateDemoResults(query);
         const refined = refineResults(demoResults, { service: inferredService, location, isDemoMode: true });
         setResults(refined);

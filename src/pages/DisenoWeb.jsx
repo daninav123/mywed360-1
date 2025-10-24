@@ -177,7 +177,7 @@ const buildWeddingInfoFromProfile = (profile) => {
       : [],
     contactPhone: safeProfile.contactPhone || '',
     contactEmail: safeProfile.contactEmail || '',
-    weddingStyle: safeProfile.weddingStyle || 'Clásico',
+    weddingStyle: safeProfile.weddingStyle || 'Cl�sico',
     colorScheme: safeProfile.colorScheme || 'Blanco y dorado',
     additionalInfo: safeProfile.additionalInfo || '',
     story: safeProfile.story || '',
@@ -199,11 +199,11 @@ const buildFallbackHtml = (weddingInfo, template) => {
   const styleNote = template?.tokens?.style || 'estilo personalizado';
   const ceremony = [weddingInfo.ceremonyLocation, weddingInfo.ceremonyTime]
     .filter(Boolean)
-    .join(' · ');
+    .join(' � ');
   const reception = [weddingInfo.receptionVenue, weddingInfo.receptionTime]
     .filter(Boolean)
-    .join(' · ');
-  const contact = [weddingInfo.contactEmail, weddingInfo.contactPhone].filter(Boolean).join(' · ');
+    .join(' � ');
+  const contact = [weddingInfo.contactEmail, weddingInfo.contactPhone].filter(Boolean).join(' � ');
 
   const scheduleRows = (Array.isArray(weddingInfo.shuttleSchedule)
     ? weddingInfo.shuttleSchedule
@@ -212,9 +212,9 @@ const buildFallbackHtml = (weddingInfo, template) => {
     .map(
       (item) => `
         <tr>
-          <td>${item.time || '—'}</td>
-          <td>${item.departure || item.from || '—'}</td>
-          <td>${item.destination || item.to || '—'}</td>
+          <td>${item.time || ''}</td>
+          <td>${item.departure || item.from || ''}</td>
+          <td>${item.destination || item.to || ''}</td>
           <td>${item.notes || ''}</td>
         </tr>`
     )
@@ -248,10 +248,10 @@ const buildFallbackHtml = (weddingInfo, template) => {
   const mapSection = mapAddress
     ? `
     <section data-enhanced="mapa" id="mapa">
-      <div class="maloveapp-section-heading"><span>Mapa de la celebración</span></div>
+      <div class="maloveapp-section-heading"><span>Mapa de la celebraci�n</span></div>
       <div class="maloveapp-card">
         <iframe
-          title="Ubicación de la boda"
+          title="Ubicaci�n de la boda"
           src="https://maps.google.com/maps?q=${encodeURIComponent(mapAddress)}&output=embed"
           width="100%"
           height="320"
@@ -284,16 +284,16 @@ const buildFallbackHtml = (weddingInfo, template) => {
   return `
   <main>
     <section data-enhanced="timeline">
-      <div class="maloveapp-section-heading"><span>Agenda del día</span></div>
+      <div class="maloveapp-section-heading"><span>Agenda del d�a</span></div>
       <div class="maloveapp-grid maloveapp-grid--two">
         <div class="maloveapp-card">
           <h3>Ceremonia</h3>
-          <p>${ceremony || 'Pronto más detalles'}</p>
+          <p>${ceremony || 'Pronto m�s detalles'}</p>
           ${weddingInfo.ceremonyAddress ? `<small>${weddingInfo.ceremonyAddress}</small>` : ''}
         </div>
         <div class="maloveapp-card">
-          <h3>Recepción</h3>
-          <p>${reception || 'Pronto más detalles'}</p>
+          <h3>Recepci�n</h3>
+          <p>${reception || 'Pronto m�s detalles'}</p>
           ${weddingInfo.receptionAddress ? `<small>${weddingInfo.receptionAddress}</small>` : ''}
         </div>
       </div>
@@ -302,7 +302,7 @@ const buildFallbackHtml = (weddingInfo, template) => {
     <section data-enhanced="transport" id="transporte">
       <div class="maloveapp-section-heading"><span>Transporte y autobuses</span></div>
       <div class="maloveapp-card">
-        <p>${weddingInfo.transportation || 'Habrá servicio de transporte para invitados. Consulta los horarios en la tabla.'}</p>
+        <p>${weddingInfo.transportation || 'Habr� servicio de transporte para invitados. Consulta los horarios en la tabla.'}</p>
         <div class="maloveapp-table-wrapper">
           <table>
             <thead>
@@ -316,7 +316,7 @@ const buildFallbackHtml = (weddingInfo, template) => {
             <tbody>
               ${scheduleRows || `
                 <tr>
-                  <td colspan="4">Los horarios exactos de autobuses se publicarán aquí.</td>
+                  <td colspan="4">Los horarios exactos de autobuses se publicar�n aqu�.</td>
                 </tr>
               `}
             </tbody>
@@ -326,7 +326,7 @@ const buildFallbackHtml = (weddingInfo, template) => {
     </section>
 
     <section data-enhanced="gallery">
-      <div class="maloveapp-section-heading"><span>Galería</span></div>
+      <div class="maloveapp-section-heading"><span>Galer�a</span></div>
       <div class="maloveapp-gallery">
         <div class="maloveapp-gallery__item"></div>
         <div class="maloveapp-gallery__item"></div>
@@ -337,7 +337,7 @@ const buildFallbackHtml = (weddingInfo, template) => {
     <section data-enhanced="story">
       <div class="maloveapp-section-heading"><span>Nuestra historia</span></div>
       <p>${weddingInfo.story || weddingInfo.additionalInfo || 'Pronto compartiremos detalles de nuestra historia.'}</p>
-      <p>Inspiración visual: ${styleNote}.</p>
+      <p>Inspiraci�n visual: ${styleNote}.</p>
     </section>
 
     <section data-enhanced="lodging">
@@ -345,29 +345,29 @@ const buildFallbackHtml = (weddingInfo, template) => {
       <div class="maloveapp-grid maloveapp-grid--two">
         ${lodgingCards || `
           <div class="maloveapp-card">
-            <p>Pronto añadiremos hoteles y alojamientos recomendados cercanos a la celebración.</p>
+            <p>Pronto a�adiremos hoteles y alojamientos recomendados cercanos a la celebraci�n.</p>
           </div>
         `}
       </div>
     </section>
 
     <section data-enhanced="travel-guide">
-      <div class="maloveapp-section-heading"><span>Cómo llegar</span></div>
+      <div class="maloveapp-section-heading"><span>C�mo llegar</span></div>
       <div class="maloveapp-grid maloveapp-grid--two">
         <div class="maloveapp-card">
-          <h3>En avión</h3>
-          <p>${(travel.airports || []).map((a) => `• ${a}`).join('<br/>') || 'Aeropuertos cercanos y tiempos estimados aparecerán aquí.'}</p>
+          <h3>En avi�n</h3>
+          <p>${(travel.airports || []).map((a) => `" ${a}`).join('<br/>') || 'Aeropuertos cercanos y tiempos estimados aparecer�n aqu�.'}</p>
           ${travel.byPlane ? `<p>${travel.byPlane}</p>` : ''}
         </div>
         <div class="maloveapp-card">
           <h3>En tren / bus</h3>
-          <p>${(travel.stations || []).map((s) => `• ${s}`).join('<br/>') || 'Estaciones y conexiones se publicarán pronto.'}</p>
+          <p>${(travel.stations || []).map((s) => `" ${s}`).join('<br/>') || 'Estaciones y conexiones se publicar�n pronto.'}</p>
           ${travel.byTrain ? `<p>${travel.byTrain}</p>` : ''}
         </div>
       </div>
       <div class="maloveapp-card">
         <h3>En coche</h3>
-        <p>${travel.byCar || 'Recibirás las indicaciones para llegar en coche tan pronto estén listas.'}</p>
+        <p>${travel.byCar || 'Recibir�s las indicaciones para llegar en coche tan pronto est�n listas.'}</p>
         ${travel.tips ? `<p><strong>Tips:</strong> ${travel.tips}</p>` : ''}
       </div>
     </section>
@@ -377,11 +377,11 @@ const buildFallbackHtml = (weddingInfo, template) => {
 
     <section data-enhanced="contacto" id="contacto">
       <div class="maloveapp-section-heading"><span>Contacto</span></div>
-      <div class="maloveapp-card">${contact || 'Escríbenos para más información.'}</div>
+      <div class="maloveapp-card">${contact || 'Escr�benos para m�s informaci�n.'}</div>
     </section>
   </main>
   <footer>
-    Con cariño, ${weddingInfo.bride || ''} y ${weddingInfo.groom || ''}.
+    Con cari�o, ${weddingInfo.bride || ''} y ${weddingInfo.groom || ''}.
   </footer>
   `;
 };
@@ -395,11 +395,11 @@ const ProfileSummary = ({ profile, publishDisabledReason }) => {
   const ceremonyDate = profile?.ceremonyInfo?.fecha;
   const ceremony = [profile?.ceremonyInfo?.lugar, profile?.ceremonyInfo?.hora]
     .filter(Boolean)
-    .join(' · ');
+    .join(' � ');
   const reception = [profile?.receptionInfo?.lugar, profile?.receptionInfo?.hora]
     .filter(Boolean)
-    .join(' · ');
-  const contact = [profile?.contactEmail, profile?.contactPhone].filter(Boolean).join(' · ');
+    .join(' � ');
+  const contact = [profile?.contactEmail, profile?.contactPhone].filter(Boolean).join(' � ');
 
   return (
     <div className="bg-white rounded-lg shadow p-6 mb-8">
@@ -425,7 +425,7 @@ const ProfileSummary = ({ profile, publishDisabledReason }) => {
         )}
         {reception && (
           <div>
-            <span className="text-gray-500">Recepción: </span>
+            <span className="text-gray-500">Recepci�n: </span>
             {reception}
           </div>
         )}
@@ -482,7 +482,7 @@ const VersionsTable = ({ versions, templates, onView, onEdit }) => {
               const templateName = templates?.[templateKey]?.name || 'Personalizada';
               const createdAt = version.createdAt?.seconds
                 ? new Date(version.createdAt.seconds * 1000).toLocaleString()
-                : '—';
+                : '';
 
               return (
                 <tr key={version.id} className="hover:bg-gray-50">
@@ -589,7 +589,7 @@ const PromptLibraryModal = ({
   const handleSubmit = async (event) => {
     event?.preventDefault?.();
     if (!formState.prompt.trim()) {
-      setFormError('El prompt no puede estar vacío.');
+      setFormError('El prompt no puede estar vac�o.');
       return;
     }
     try {
@@ -621,7 +621,7 @@ const PromptLibraryModal = ({
 
   const handleDelete = async (id) => {
     if (!onDelete) return;
-    const confirmDelete = window.confirm('¿Eliminar este prompt personalizado?');
+    const confirmDelete = window.confirm('�Eliminar este prompt personalizado?');
     if (!confirmDelete) return;
     try {
       setSaving(true);
@@ -653,7 +653,7 @@ const PromptLibraryModal = ({
         <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
           <section>
             <p className="text-sm text-gray-600 mb-3">
-              Selecciona un prompt para rellenar automáticamente el generador. Reemplaza las variables{' '}
+              Selecciona un prompt para rellenar autom�ticamente el generador. Reemplaza las variables{' '}
               <code className="bg-gray-100 px-1 rounded">{'{nombres}'}</code>,{' '}
               <code className="bg-gray-100 px-1 rounded">{'{fecha}'}</code> y{' '}
               <code className="bg-gray-100 px-1 rounded">{'{ubicacion}'}</code> por tus datos.
@@ -699,10 +699,10 @@ const PromptLibraryModal = ({
               </button>
             </div>
             {loading ? (
-              <p className="text-sm text-gray-500">Cargando biblioteca personal…</p>
+              <p className="text-sm text-gray-500">Cargando biblioteca personal&</p>
             ) : customPrompts.length === 0 ? (
               <p className="text-sm text-gray-500">
-                Aún no tienes prompts personalizados. Crea uno para reutilizar tus indicaciones favoritas.
+                A�n no tienes prompts personalizados. Crea uno para reutilizar tus indicaciones favoritas.
               </p>
             ) : (
               <div className="space-y-3">
@@ -713,7 +713,7 @@ const PromptLibraryModal = ({
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div>
-                        <h5 className="text-base font-semibold text-gray-800">{item.name || 'Sin título'}</h5>
+                        <h5 className="text-base font-semibold text-gray-800">{item.name || 'Sin t�tulo'}</h5>
                         <p className="text-xs text-gray-500 mt-1">
                           Plantilla sugerida:{' '}
                           {templates[item.templateKey || 'personalizada']?.name || 'Personalizada'}
@@ -800,7 +800,7 @@ const PromptLibraryModal = ({
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-600 mb-1">Descripción</label>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1">Descripci�n</label>
                   <textarea
                     value={formState.description}
                     onChange={(event) =>
@@ -808,7 +808,7 @@ const PromptLibraryModal = ({
                     }
                     className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
                     rows={2}
-                    placeholder="Detalle para identificar rápidamente el tipo de propuesta."
+                    placeholder="Detalle para identificar r�pidamente el tipo de propuesta."
                   />
                 </div>
                 <div>
@@ -837,7 +837,7 @@ const PromptLibraryModal = ({
                     className="inline-flex items-center px-5 py-2 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-colors disabled:opacity-60"
                     disabled={saving}
                   >
-                    {saving ? 'Guardando…' : 'Guardar prompt'}
+                    {saving ? 'Guardando&' : 'Guardar prompt'}
                   </button>
                 </div>
               </form>
@@ -946,9 +946,9 @@ const LogisticsEditor = ({
       <div className="bg-white w-full max-w-4xl h-full sm:h-auto sm:rounded-l-3xl shadow-2xl overflow-hidden flex flex-col">
         <header className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
           <div>
-            <h3 className="text-lg font-semibold text-gray-800">Editar logística del sitio</h3>
+            <h3 className="text-lg font-semibold text-gray-800">Editar log�stica del sitio</h3>
             <p className="text-sm text-gray-500">
-              Ajusta horarios de autobuses, hospedajes recomendados y guía de llegada. Los cambios se guardan en la boda activa.
+              Ajusta horarios de autobuses, hospedajes recomendados y gu�a de llegada. Los cambios se guardan en la boda activa.
             </p>
           </div>
           <button
@@ -969,7 +969,7 @@ const LogisticsEditor = ({
                 rows={4}
                 value={draft.story || ''}
                 onChange={(event) => updateStory(event.target.value)}
-                placeholder="Cuenta la historia de la pareja en 2-3 párrafos."
+                placeholder="Cuenta la historia de la pareja en 2-3 p�rrafos."
               />
             </div>
             <div>
@@ -979,7 +979,7 @@ const LogisticsEditor = ({
                 rows={4}
                 value={draft.additionalInfo || ''}
                 onChange={(event) => updateAdditionalInfo(event.target.value)}
-                placeholder="Incluye recomendaciones, dress code u otra información útil."
+                placeholder="Incluye recomendaciones, dress code u otra informaci�n �til."
               />
             </div>
           </section>
@@ -991,7 +991,7 @@ const LogisticsEditor = ({
               rows={3}
               value={draft.transportation}
               onChange={(event) => updateTransportation(event.target.value)}
-              placeholder="Ej: Habrá autobuses desde el hotel principal 45 minutos antes de la ceremonia..."
+              placeholder="Ej: Habr� autobuses desde el hotel principal 45 minutos antes de la ceremonia..."
             />
           </section>
 
@@ -1003,7 +1003,7 @@ const LogisticsEditor = ({
                 onClick={addScheduleItem}
                 className="text-sm text-blue-600 hover:text-blue-700"
               >
-                Añadir horario
+                A�adir horario
               </button>
             </div>
             <div className="space-y-3">
@@ -1061,7 +1061,7 @@ const LogisticsEditor = ({
                 onClick={addLodgingItem}
                 className="text-sm text-blue-600 hover:text-blue-700"
               >
-                Añadir hospedaje
+                A�adir hospedaje
               </button>
             </div>
             <div className="space-y-3">
@@ -1105,7 +1105,7 @@ const LogisticsEditor = ({
                   <textarea
                     className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
                     rows={2}
-                    placeholder="Servicios o notas (separados por coma o salto de línea)"
+                    placeholder="Servicios o notas (separados por coma o salto de l�nea)"
                     value={item.amenities}
                     onChange={(event) => updateLodgingItem(index, 'amenities', event.target.value)}
                   />
@@ -1124,7 +1124,7 @@ const LogisticsEditor = ({
           </section>
 
           <section className="space-y-3">
-            <h4 className="text-sm font-semibold text-gray-700">Guía de llegada</h4>
+            <h4 className="text-sm font-semibold text-gray-700">Gu�a de llegada</h4>
             <textarea
               className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
               rows={2}
@@ -1136,14 +1136,14 @@ const LogisticsEditor = ({
               <textarea
                 className="border border-gray-200 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
                 rows={2}
-                placeholder="Cómo llegar en avión"
+                placeholder="C�mo llegar en avi�n"
                 value={draft.travel.byPlane}
                 onChange={(event) => updateTravel('byPlane', event.target.value)}
               />
               <textarea
                 className="border border-gray-200 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
                 rows={2}
-                placeholder="Cómo llegar en tren o bus"
+                placeholder="C�mo llegar en tren o bus"
                 value={draft.travel.byTrain}
                 onChange={(event) => updateTravel('byTrain', event.target.value)}
               />
@@ -1151,7 +1151,7 @@ const LogisticsEditor = ({
             <textarea
               className="border border-gray-200 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
               rows={2}
-              placeholder="Cómo llegar en coche"
+              placeholder="C�mo llegar en coche"
               value={draft.travel.byCar}
               onChange={(event) => updateTravel('byCar', event.target.value)}
             />
@@ -1166,14 +1166,14 @@ const LogisticsEditor = ({
               <textarea
                 className="border border-gray-200 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
                 rows={3}
-                placeholder="Aeropuertos cercanos (uno por línea)"
+                placeholder="Aeropuertos cercanos (uno por l�nea)"
                 value={draft.travel.airportsText}
                 onChange={(event) => updateTravel('airportsText', event.target.value)}
               />
               <textarea
                 className="border border-gray-200 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
                 rows={3}
-                placeholder="Estaciones cercanas (uno por línea)"
+                placeholder="Estaciones cercanas (uno por l�nea)"
                 value={draft.travel.stationsText}
                 onChange={(event) => updateTravel('stationsText', event.target.value)}
               />
@@ -1188,7 +1188,7 @@ const LogisticsEditor = ({
                 onClick={addFaqItem}
                 className="text-sm text-blue-600 hover:text-blue-700"
               >
-                Añadir pregunta
+                A�adir pregunta
               </button>
             </div>
             <div className="space-y-3">
@@ -1242,7 +1242,7 @@ const LogisticsEditor = ({
               saving ? 'opacity-70 cursor-not-allowed' : ''
             }`}
           >
-            {saving ? 'Guardando…' : 'Guardar logística'}
+            {saving ? 'Guardando&' : 'Guardar log�stica'}
           </button>
         </footer>
       </div>
@@ -1297,7 +1297,7 @@ const DisenoWeb = ({ mode }) => {
     return (
       <div className="p-6 space-y-6">
         <header className="space-y-2">
-          <h1 className="text-2xl font-semibold">Diseño web</h1>
+          <h1 className="text-2xl font-semibold">Dise�o web</h1>
           <p className="text-sm text-gray-600">
             Selecciona una plantilla y genera una vista previa ficticia (modo E2E).
           </p>
@@ -1340,7 +1340,7 @@ const DisenoWeb = ({ mode }) => {
             onClick={() => setTestPreviewReady(true)}
             disabled={!testPrompt.trim()}
           >
-            Generar Página Web
+            Generar P�gina Web
           </button>
         </div>
 
@@ -1371,25 +1371,25 @@ const DisenoWeb = ({ mode }) => {
     if (!trimmedHtml) {
       return {
         publishDisabled: true,
-        publishDisabledReason: 'Genera la página antes de publicar.',
+        publishDisabledReason: 'Genera la p�gina antes de publicar.',
       };
     }
     if (!isOnline) {
       return {
         publishDisabled: true,
-        publishDisabledReason: 'Estás sin conexión. Conéctate para publicar tu sitio.',
+        publishDisabledReason: 'Est�s sin conexi�n. Con�ctate para publicar tu sitio.',
       };
     }
     if (slugStatus === 'invalid') {
       return {
         publishDisabled: true,
-        publishDisabledReason: 'El slug indicado no es válido.',
+        publishDisabledReason: 'El slug indicado no es v�lido.',
       };
     }
     if (slugUnavailable) {
       return {
         publishDisabled: true,
-        publishDisabledReason: 'El slug indicado ya está en uso. Ajusta el nombre público.',
+        publishDisabledReason: 'El slug indicado ya est� en uso. Ajusta el nombre p�blico.',
       };
     }
 
@@ -1585,11 +1585,11 @@ const DisenoWeb = ({ mode }) => {
       } catch (logErr) {
         console.warn('recordWebsiteEvent logistics', logErr);
       }
-      alert('Logística actualizada correctamente.');
+      alert('Log�stica actualizada correctamente.');
       setShowLogisticsEditor(false);
     } catch (err) {
-      console.error('Error guardando logística', err);
-      alert('No se pudo guardar la logística. Inténtalo de nuevo.');
+      console.error('Error guardando log�stica', err);
+      alert('No se pudo guardar la log�stica. Int�ntalo de nuevo.');
     } finally {
       setSavingLogistics(false);
     }
@@ -1757,7 +1757,7 @@ const DisenoWeb = ({ mode }) => {
         console.warn('Log website ai run', logErr);
       }
     } catch (err) {
-      console.error('Error en la generación de la página:', err);
+      console.error('Error en la generaci�n de la p�gina:', err);
       let fallbackReason = 'fallback-ai-error';
       if (err?.status === 503) {
         fallbackReason = 'fallback-ai-unavailable';
@@ -1770,12 +1770,12 @@ const DisenoWeb = ({ mode }) => {
       if (fallbackReason !== 'fallback-ai-unavailable' && fallbackReason !== 'fallback-ai-disabled') {
         const detail =
           fallbackReason === 'fallback-ai-rate-limit'
-            ? 'La IA está ocupada. Intenta nuevamente en unos segundos.'
-            : err?.message || 'Revisa la consola para más detalles';
+            ? 'La IA est� ocupada. Intenta nuevamente en unos segundos.'
+            : err?.message || 'Revisa la consola para m�s detalles';
         setError(`Error al generar con IA: ${detail}`);
       }
 
-      alert('Ha ocurrido un error al generar la página web. Por favor, inténtalo de nuevo.');
+      alert('Ha ocurrido un error al generar la p�gina web. Por favor, int�ntalo de nuevo.');
       try {
         await recordWebsiteEvent({
           uid,
@@ -1815,7 +1815,7 @@ const DisenoWeb = ({ mode }) => {
           reason: 'offline',
         },
       }).catch(() => {});
-      alert('Estás sin conexión. Conéctate a internet para publicar el micrositio.');
+      alert('Est�s sin conexi�n. Con�ctate a internet para publicar el micrositio.');
       return;
     }
 
@@ -1855,8 +1855,8 @@ const DisenoWeb = ({ mode }) => {
               faqEntries: logisticsMetrics.faqs.length,
             },
           }).catch(() => {});
-          console.warn('No se pudo activar la URL pública.', result.error);
-          alert('No se pudo activar la URL pública en este momento. Inténtalo de nuevo más tarde.');
+          console.warn('No se pudo activar la URL p�blica.', result.error);
+          alert('No se pudo activar la URL p�blica en este momento. Int�ntalo de nuevo m�s tarde.');
           if (versions[0]?.html) {
             setHtml(versions[0].html);
           }
@@ -1865,9 +1865,9 @@ const DisenoWeb = ({ mode }) => {
         const url = result.publicUrl || '';
         setPublicUrl(url);
         setShowQR(false);
-        alert(url ? `¡Página publicada! URL pública: ${url}` : '¡Página publicada!');
+        alert(url ? `�P�gina publicada! URL p�blica: ${url}` : '�P�gina publicada!');
       } else {
-        alert('Página guardada. No hay boda activa para publicar públicamente.');
+        alert('P�gina guardada. No hay boda activa para publicar p�blicamente.');
       }
 
       const updatedVersions = await saveWebsiteVersion({
@@ -1891,7 +1891,7 @@ const DisenoWeb = ({ mode }) => {
         },
       }).catch(() => {});
     } catch (err) {
-      console.error('Error al publicar la página', err);
+      console.error('Error al publicar la p�gina', err);
       await recordWebsiteEvent({
         uid,
         weddingId: activeWedding,
@@ -1915,12 +1915,12 @@ const DisenoWeb = ({ mode }) => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Diseño Web de Boda</h1>
+      <h1 className="text-3xl font-bold mb-6">Dise�o Web de Boda</h1>
 
       {missingBasics && (
         <div className="mb-6 border-l-4 border-amber-500 bg-amber-50 px-4 py-3 rounded">
           <p className="text-sm text-amber-700">
-            Necesitamos los nombres de la pareja y la fecha de la boda para completar la página web.
+            Necesitamos los nombres de la pareja y la fecha de la boda para completar la p�gina web.
             <Link to="/perfil" className="ml-1 underline font-medium">
               Completar datos en Perfil
             </Link>
@@ -1936,7 +1936,7 @@ const DisenoWeb = ({ mode }) => {
           onClick={() => setShowLogisticsEditor(true)}
           className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-blue-200 text-blue-700 hover:bg-blue-50 transition-colors"
         >
-          Editar logística del sitio
+          Editar log�stica del sitio
         </button>
       </div>
 

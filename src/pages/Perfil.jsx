@@ -167,10 +167,10 @@ function Perfil() {
       toast.error('No se pudo determinar tu usuario');
       return;
     }
-    // Validaciones rÃpidas
+    // Validaciones rÍpidas
     try {
       if (account.email && !/^\S+@\S+\.\S+$/.test(account.email)) {
-        toast.error('Correo electrnico invÃlido');
+        toast.error('Correo electrnico invÍlido');
         return;
       }
       if (account.whatsNumber && !/^\+?[0-9]{8,15}$/.test(account.whatsNumber.trim())) {
@@ -180,7 +180,7 @@ function Perfil() {
       if (weddingInfo.weddingDate) {
         const d = new Date(weddingInfo.weddingDate);
         if (isNaN(d.getTime())) {
-          toast.error('Fecha de boda invÃlida');
+          toast.error('Fecha de boda invÍlida');
           return;
         }
       }
@@ -274,22 +274,22 @@ function Perfil() {
         </div>
         {lastSavedAt && (
           <div className="text-sm text-muted">
-            {t('profile.lastSaved', { defaultValue: 'Último guardado:' })}{' '}
+            {t('profile.lastSaved', { defaultValue: '�ltimo guardado:' })}{' '}
             {new Date(lastSavedAt).toLocaleString()}
           </div>
         )}
       </div>
-      {/* Suscripción Real con Stripe */}
+      {/* Suscripci�n Real con Stripe */}
       <div className="space-y-4">
         <h2 className="text-lg font-medium">
-          {t('profile.subscription.type', { defaultValue: 'Tipo de suscripción' })}
+          {t('profile.subscription.type', { defaultValue: 'Tipo de suscripci�n' })}
         </h2>
         <SubscriptionWidget />
       </div>
 
 
       <Card className="space-y-4">
-        <h2 className="text-lg font-medium">{t('profile.account.title', { defaultValue: 'InformaciÃ³n de la cuenta' })}</h2>
+        <h2 className="text-lg font-medium">{t('profile.account.title', { defaultValue: 'Información de la cuenta' })}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input label="Nombre" name="name" value={account.name} onChange={handleAccountChange} />
           <Input
@@ -338,7 +338,7 @@ function Perfil() {
       </Card>
 
       <Card className="space-y-4">
-        <h2 className="text-lg font-medium">{t('profile.wedding.title', { defaultValue: 'InformaciÃ³n de la boda' })}</h2>
+        <h2 className="text-lg font-medium">{t('profile.wedding.title', { defaultValue: 'Información de la boda' })}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input
             label="Nombre de la pareja"
@@ -429,7 +429,7 @@ function Perfil() {
       </Card>
 
       <Card className="space-y-4">
-        <h2 className="text-lg font-medium">{t('profile.wedding.important', { defaultValue: 'InformaciÃ³n importante de la boda' })}</h2>
+        <h2 className="text-lg font-medium">{t('profile.wedding.important', { defaultValue: 'Información importante de la boda' })}</h2>
         <textarea
           className="w-full min-h-[150px] border rounded-md p-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder={

@@ -2,50 +2,50 @@
   "app": {
     "name": "MaLove.App",
     "brandName": "MaLoveApp",
-    "tagline": "Ваша идеальная свадьба, организованная цифрово",
-    "loading": "Загрузка...",
-    "error": "Ошибка",
-    "success": "Успех",
-    "cancel": "Отмена",
-    "save": "Сохранить",
-    "delete": "Удалить",
-    "edit": "Редактировать",
-    "add": "Добавить",
-    "search": "Поиск",
-    "filter": "Фильтр",
-    "close": "Закрыть",
-    "open": "Открыть",
-    "yes": "Да",
-    "no": "Нет",
+    "tagline": "0H0 8450;L=0O A204L10, >@30=87>20==0O F8D@>2>",
+    "loading": "03@C7:0...",
+    "error": "H81:0",
+    "success": "#A?5E",
+    "cancel": "B<5=0",
+    "save": "!>E@0=8BL",
+    "delete": "#40;8BL",
+    "edit": " 540:B8@>20BL",
+    "add": ">1028BL",
+    "search": ">8A:",
+    "filter": "$8;LB@",
+    "close": "0:@KBL",
+    "open": "B:@KBL",
+    "yes": "0",
+    "no": "5B",
     "ok": "OK",
-    "back": "Назад",
-    "next": "Далее",
-    "previous": "Предыдущий",
-    "continue": "Продолжить",
-    "finish": "Завершить"
+    "back": "0704",
+    "next": "0;55",
+    "previous": "@54K4CI89",
+    "continue": "@>4>;68BL",
+    "finish": "025@H8BL"
   },
   "navigation": {
-    "home": "Главная",
-    "dashboard": "Панель",
-    "guests": "Гости",
-    "providers": "Подрядчики",
-    "finance": "Финансы",
-    "seating": "План рассадки",
+    "home": ";02=0O",
+    "dashboard": "0=5;L",
+    "guests": ">AB8",
+    "providers": ">4@O4G8:8",
+    "finance": "$8=0=AK",
+    "seating": ";0= @0AA04:8",
     "email": "Email",
-    "protocol": "Протокол",
-    "designs": "Дизайны",
-    "website": "Свадебный сайт",
-    "contracts": "Контракты",
-    "tasks": "Задачи",
-    "profile": "Профиль",
-    "settings": "Настройки",
-    "logout": "Выйти",
-    "more": "Ещё",
-    "createEvent": "Создать новое событие",
-    "weddings": "Свадьбы",
-    "emailInbox": "Входящие",
-    "darkMode": "Тёмный режим",
-    "userMenu": "Меню пользователя"
+    "protocol": "@>B>:>;",
+    "designs": "8709=K",
+    "website": "!20451=K9 A09B",
+    "contracts": ">=B@0:BK",
+    "tasks": "040G8",
+    "profile": "@>D8;L",
+    "settings": "0AB@>9:8",
+    "logout": "K9B8",
+    "more": "IQ",
+    "createEvent": "!>740BL =>2>5 A>1KB85",
+    "weddings": "!204L1K",
+    "emailInbox": "E>4OI85",
+    "darkMode": ""Q<=K9 @568<",
+    "userMenu": "5=N ?>;L7>20B5;O"
   },
   "auth": {
     "login": "Login",
@@ -233,13 +233,13 @@
     "groups": {
       "title": "Group management",
       "assignTitle": "Assign to selected",
-      "newGroup": "New groupâ€¦",
+      "newGroup": "New group⬦",
       "groupName": "Group name",
       "rename": "Rename group",
-      "origin": "Originâ€¦",
+      "origin": "Origin⬦",
       "newName": "New name",
       "merge": "Merge groups",
-      "destination": "Destinationâ€¦",
+      "destination": "Destination⬦",
       "existing": "Existing groups",
       "none": "No groups yet."
     },
@@ -362,7 +362,7 @@
       "advisorShort": "AI",
       "muteShort": "Mute",
       "exceeded": "Exceeded",
-      "perGuestHint": "≈ {{value}} / guest ({{count}} events)",
+      "perGuestHint": "H {{value}} / guest ({{count}} events)",
       "muteAlerts": "Mute alerts",
       "thresholds": {
         "warn": "Warning (at risk) %",
@@ -376,8 +376,8 @@
     },
     "benchmarks": {
       "title": "Budget suggestions based on similar weddings",
-      "subtitle": "Based on {{count}} confirmed budgets. Average estimate: {{average}} Â· Confidence: {{confidence}}.",
-      "loading": "Calculating budget suggestions…",
+      "subtitle": "Based on {{count}} confirmed budgets. Average estimate: {{average}} · Confidence: {{confidence}}.",
+      "loading": "Calculating budget suggestions&",
       "applyMedian": "Apply median (p50)",
       "applyP75": "Apply percentile 75",
       "saveSnapshot": "Save budget"
@@ -731,7 +731,7 @@
         "zoomFit": "Zoom in / out / Fit",
         "selectAll": "Select all",
         "escape": "Clear selection / close menus",
-        "rotate": "Rotate -5Â° / +5Â° (Shift: Â±15Â°)",
+        "rotate": "Rotate -5° / +5° (Shift: ±15°)",
         "align": "Align (start/end)",
         "distribute": "Distribute (X/Y)",
         "tabs": "Switch tab (Ceremony/Banquet)",
@@ -903,7 +903,7 @@
       "createFirst": "Create first category",
       "category": "Category",
       "exceeded": "Exceeded",
-      "perGuestHint": "≈ {{value}} / guest ({{count}} events)",
+      "perGuestHint": "H {{value}} / guest ({{count}} events)",
       "progress": "Progress",
       "overallProgress": "Budget progress",
       "muteAlerts": "Mute alerts",
@@ -982,7 +982,7 @@
       },
       "banners": {
         "contributionsClosed": "The submission window closed on {{date}}. Adjust the wedding date or contact support if you need to reopen the gallery.",
-        "compressionActive": "Storage usage passed 30Â GB. New photos are automatically compressed to optimise Firebase storage."
+        "compressionActive": "Storage usage passed 30 GB. New photos are automatically compressed to optimise Firebase storage."
       },
       "toasts": {
         "loadError": "We could not load the memories gallery. Check your connection or permissions.",
@@ -1006,7 +1006,7 @@
       "slideshow": {
         "title": "Live slideshow",
         "description": "Connect a second screen and let the memories flow automatically.",
-        "stats": "{{count}} approved photos Â· {{scenes}} scenes covered"
+        "stats": "{{count}} approved photos · {{scenes}} scenes covered"
       },
       "uploader": {
         "hostFallback": "Host"
@@ -1014,7 +1014,7 @@
     },
     "momentosGuest": {
       "badge": "Collaborative memories",
-      "greeting": "Hi, {{name}} ðŸ‘‹",
+      "greeting": "Hi, {{name}} �x9",
       "remainingUploadsSingle": "You can upload 1 more photo.",
       "remainingUploads": "You can upload up to {{count}} more photos.",
       "remainingUploadsUnlimited": "Upload as many photos as you like.",
@@ -1026,7 +1026,7 @@
       },
       "status": {
         "loading": "Loading gallery...",
-        "loadingMessage": "Preparing your space to share memoriesâ€¦",
+        "loadingMessage": "Preparing your space to share memories⬦",
         "errorTitle": "We could not open the memories gallery",
         "errorAction": "If you believe this is a mistake, ask the couple for a new link.",
         "closedTitle": "The upload window has closed",
@@ -1036,7 +1036,7 @@
         "welcomeTitle": "Thanks for capturing memories!",
         "welcomeDescription": "Upload your favourite photos from the event. The host will review them and showcase them in the live slideshow.",
         "uploadTitle": "Your progress",
-        "tip": "Tip: photos are grouped by scene (ceremony, reception, partyâ€¦) to help the host.",
+        "tip": "Tip: photos are grouped by scene (ceremony, reception, party⬦) to help the host.",
         "uploadedSummary": "You have shared {{count}} {{count, plural, one {photo} other {photos}}}. Thanks for contributing!",
         "recentUploads": "Approved photos will appear in the live slideshow and final gallery. The host will let you know when they are ready."
       },
@@ -1050,16 +1050,16 @@
       },
       "progress": {
         "title": "Your progress",
-        "sceneLabel": "Scene: {{scene}} Â· {{size}} KB",
+        "sceneLabel": "Scene: {{scene}} · {{size}} KB",
         "status": "In review"
       },
       "toasts": {
         "nameRequired": "Please tell us your name so we can personalise your uploads",
         "termsRequired": "You must accept the privacy notice",
         "windowClosed": "This gallery is no longer accepting new photos.",
-        "achievementFirst": "ðŸ… Achievement unlocked! Your first memory âœ¨",
-        "achievementEnthusiast": "ðŸŽ‰ You are a collaborative rockstar! Keep sharing memories.",
-        "achievementStar": "ðŸŒŸ Star memories! Your photos will shine in the slideshow.",
+        "achievementFirst": "�x�& Achievement unlocked! Your first memory �S�",
+        "achievementEnthusiast": "�x}0 You are a collaborative rockstar! Keep sharing memories.",
+        "achievementStar": "�xRx Star memories! Your photos will shine in the slideshow.",
         "upload": "Photo uploaded successfully"
       },
       "errors": {

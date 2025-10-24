@@ -118,7 +118,10 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
   // Manejar búsqueda con IA (memoizada)
   const handleAiSearch = useCallback(
     async (e) => {
-      e.preventDefault();
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
       if (!aiQuery.trim()) return;
       setAiLoading(true);
 
@@ -189,6 +192,10 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
           }
         } catch (err) {
           console.error('Error en solicitud API:', err);
+          // Detectar si es error de conexión con el backend
+          if (err?.message?.includes('fetch') || err?.name === 'TypeError') {
+            console.warn('[ProviderSearchModal] Backend no disponible, intentando fallback...');
+          }
         }
 
         // Intentar motor web como fallback

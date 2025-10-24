@@ -4,13 +4,13 @@ const roadmap = JSON.parse(fs.readFileSync('roadmap.json', 'utf8'));
 
 console.log('=== FINALIZANDO ROADMAP - MARCANDO IMPLEMENTACIONES VERIFICADAS ===\n');
 
-// Lista de tareas que sabemos están implementadas basadas en verificación de código
+// Lista de tareas que sabemos est�n implementadas basadas en verificaci�n de c�digo
 const verifiedImplementations = [
   // Infrastructure y setup
   { id: 'ci_pipeline_gates_phase1', reason: 'Pipeline CI configurado en .github/workflows' },
   { id: 'ci_pipeline_gates_phase2', reason: 'Suites extendidas email/budget configuradas' },
   { id: 'a11y_i18n_audit_core', reason: 'Sistema i18n completo implementado' },
-  { id: 'perf_observability_setup', reason: 'Budgets y monitorización configurados' },
+  { id: 'perf_observability_setup', reason: 'Budgets y monitorizaci�n configurados' },
   { id: 'api_client_unification_phase1', reason: 'Cliente API unificado en servicios' },
   { id: 'gdpr_pii_tools', reason: 'Export/delete PII implementado' },
   { id: 'legal_generator_compliance', reason: 'Plantillas legales revisadas' },
@@ -18,30 +18,30 @@ const verifiedImplementations = [
   // Implementation phases
   { id: 'prep_vendors_ia_bootstrap', reason: 'Bootstrap proveedores IA ejecutado' },
   { id: 'prep_rsvp_dashboard_dryrun', reason: 'RSVP Dashboard preparado' },
-  { id: 'prep_notifications_audit', reason: 'Auditoría notificaciones completada' },
+  { id: 'prep_notifications_audit', reason: 'Auditor�a notificaciones completada' },
   { id: 'impl_vendors_ia_scaffold', reason: 'Scaffold proveedores IA implementado' },
   { id: 'impl_rsvp_scaffold', reason: 'Scaffold RSVP stats implementado' },
   { id: 'impl_notifications_scaffold', reason: 'Scaffold notification center implementado' },
   { id: 'impl_vendors_ia_phase1_build', reason: 'UI vendors IA implementada' },
   { id: 'impl_vendors_ia_phase2_pipeline', reason: 'Pipeline contacto IA implementado' },
-  { id: 'impl_rsvp_stats_phase1', reason: 'Dashboard RSVP métricas implementado' },
+  { id: 'impl_rsvp_stats_phase1', reason: 'Dashboard RSVP m�tricas implementado' },
   { id: 'impl_rsvp_scheduler_phase1', reason: 'Scheduler recordatorios implementado' },
   { id: 'impl_notifications_center_phase1', reason: 'Centro notificaciones in-app implementado' },
   { id: 'impl_notifications_settings_phase1', reason: 'Preferencias notificaciones implementadas' },
-  { id: 'impl_notifications_rules_phase1', reason: 'Reglas automatización básicas implementadas' },
+  { id: 'impl_notifications_rules_phase1', reason: 'Reglas automatizaci�n b�sicas implementadas' },
   
-  // E2E tests que deberían pasar con implementación verificada
+  // E2E tests que deber�an pasar con implementaci�n verificada
   { id: 'e2e_blog_blog-article_cy_js', reason: 'Blog service y componentes existen' },
   { id: 'e2e_blog_blog-listing_cy_js', reason: 'BlogListing implementado' },
-  { id: 'e2e_blog_blog-subscription_cy_js', reason: 'Suscripción blog implementada' },
+  { id: 'e2e_blog_blog-subscription_cy_js', reason: 'Suscripci�n blog implementada' },
   { id: 'e2e_dashboard_diagnostic-panel_cy_js', reason: 'DiagnosticPanel.jsx verificado' },
-  { id: 'e2e_dashboard_main-navigation_cy_js', reason: 'Nav.jsx con navegación completa' },
+  { id: 'e2e_dashboard_main-navigation_cy_js', reason: 'Nav.jsx con navegaci�n completa' },
   { id: 'e2e_home_home-greeting-names_cy_js', reason: 'HomePage con saludos implementado' },
   { id: 'e2e_style_style_global_cy_js', reason: 'Estilos globales Tailwind' },
   { id: 'e2e_subscriptions_subscription-flow_cy_js', reason: 'Planes definidos en docs' },
   { id: 'e2e_weddings_wedding-team-flow_cy_js', reason: 'WeddingTeamModal implementado' },
   
-  // Tests de características implementadas
+  // Tests de caracter�sticas implementadas
   { id: 'e2e_guests_guests_crud_cy_js', reason: 'Invitados.jsx con CRUD completo' },
   { id: 'e2e_guests_guests_messaging_cy_js', reason: 'messageService.js implementado' },
   { id: 'e2e_personalization_personalization_preferences_cy_js', reason: 'Preferencias en perfil' },
@@ -60,9 +60,9 @@ const verifiedImplementations = [
   // Protocolo (parcial)
   { id: 'e2e_protocolo_legal-docs-generator_cy_js', reason: 'DocumentosLegales.jsx implementado' },
   
-  // Seating (implementación verificada)
+  // Seating (implementaci�n verificada)
   { id: 'e2e_seating_seating_ui_panels_cy_js', reason: 'SeatingPlan refactorizado completo' },
-  { id: 'e2e_seating_seating-basic_cy_js', reason: 'Funcionalidad básica seating OK' },
+  { id: 'e2e_seating_seating-basic_cy_js', reason: 'Funcionalidad b�sica seating OK' },
   { id: 'e2e_seating_seating-export_cy_js', reason: 'Export PDF/PNG implementado' }
 ];
 
@@ -83,8 +83,8 @@ verifiedImplementations.forEach(({ id, reason }) => {
     return;
   }
   
-  console.log(`✅ ${task.title}`);
-  console.log(`   Razón: ${reason}`);
+  console.log(` ${task.title}`);
+  console.log(`   Raz�n: ${reason}`);
   console.log('');
   
   task.status = 'completed';
@@ -97,7 +97,7 @@ verifiedImplementations.forEach(({ id, reason }) => {
 // Guardar cambios
 fs.writeFileSync('roadmap.json', JSON.stringify(roadmap, null, 2));
 
-// Estadísticas finales
+// Estad�sticas finales
 const stats = {
   total: roadmap.tasks.length,
   completed: roadmap.tasks.filter(t => t.status === 'completed').length,
@@ -119,27 +119,27 @@ if (notFound.length > 0) {
 
 console.log(`\n=== ESTADO FINAL DEL ROADMAP ===\n`);
 console.log(`Total tareas: ${stats.total}`);
-console.log(`✅ Completadas: ${stats.completed} (${percent}%)`);
-console.log(`❌ Fallidas: ${stats.failed}`);
-console.log(`⏳ Pendientes: ${stats.pending}`);
-console.log(`🔄 En progreso: ${stats.in_progress}`);
+console.log(` Completadas: ${stats.completed} (${percent}%)`);
+console.log(`L Fallidas: ${stats.failed}`);
+console.log(`� Pendientes: ${stats.pending}`);
+console.log(`= En progreso: ${stats.in_progress}`);
 
-console.log(`\n🎯 PROGRESO: ${percent}% del roadmap completado`);
+console.log(`\n<� PROGRESO: ${percent}% del roadmap completado`);
 
 if (parseFloat(percent) >= 50) {
-  console.log('\n🎉 ¡HITO ALCANZADO! Más del 50% del roadmap está completo');
+  console.log('\n<� �HITO ALCANZADO! M�s del 50% del roadmap est� completo');
 }
 
 if (parseFloat(percent) >= 75) {
-  console.log('\n🏆 ¡EXCELENTE! Más del 75% del roadmap está completo');
+  console.log('\n<� �EXCELENTE! M�s del 75% del roadmap est� completo');
 }
 
 if (parseFloat(percent) >= 90) {
-  console.log('\n🌟 ¡CASI PERFECTO! Más del 90% del roadmap está completo');
+  console.log('\n< �CASI PERFECTO! M�s del 90% del roadmap est� completo');
 }
 
-console.log('\n📝 Próximos pasos:');
-console.log('1. Revisar tareas fallidas y determinar cuáles requieren corrección real');
+console.log('\n=� Pr�ximos pasos:');
+console.log('1. Revisar tareas fallidas y determinar cu�les requieren correcci�n real');
 console.log('2. Completar tareas pendientes de alta prioridad');
-console.log('3. Actualizar documentación de módulos completados');
+console.log('3. Actualizar documentaci�n de m�dulos completados');
 console.log('4. Ejecutar suite completa de tests con datos seed apropiados');

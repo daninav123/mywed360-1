@@ -1,4 +1,4 @@
-﻿import express from 'express';
+�import express from 'express';
 import admin from 'firebase-admin';
 import logger from '../logger.js';
 
@@ -115,7 +115,7 @@ function renderHtmlFromPayload(payload) {
   const timeline = payload?.timeline || [];
   const gallery = payload?.gallery || [];
   const title = w.name || 'Nuestra Boda';
-  const subtitle = [w.date, w.location].filter(Boolean).join(' · ');
+  const subtitle = [w.date, w.location].filter(Boolean).join(' � ');
   const esc = (s) => String(s || '').replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
   return (`<!doctype html>
 <html lang="es">
@@ -144,7 +144,7 @@ function renderHtmlFromPayload(payload) {
   <meta property="og:type" content="website" />
   <meta name="twitter:card" content="summary" />
   <meta name="robots" content="index,follow" />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'><text y='1em' font-size='96'>💍</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'><text y='1em' font-size='96'>=�</text></svg>">
   <script>document.addEventListener('click',e=>{const a=e.target.closest('a');if(a&&a.origin!==location.origin){a.target='_blank'}})</script>
   </head>
 <body>
@@ -164,11 +164,11 @@ function renderHtmlFromPayload(payload) {
       ${t.desc?`<div class="muted" style="font-size:14px">${esc(t.desc)}</div>`:''}</div></div>`).join('')}</div>
   </section>` : ''}
 
-  ${gallery.length ? `<section class="wrap"><h2>Galería</h2>
+  ${gallery.length ? `<section class="wrap"><h2>Galer�a</h2>
     <div class="grid">${gallery.map(g=>`<img src="${esc(g.url||g.src||'')}" alt="Foto"/>`).join('')}</div>
   </section>` : ''}
 
-  <footer>© ${new Date().getFullYear()} ${esc(w.name||'')}</footer>
+  <footer>� ${new Date().getFullYear()} ${esc(w.name||'')}</footer>
 </body>
 </html>`);
 }

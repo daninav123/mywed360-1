@@ -11,19 +11,19 @@ const COLLECTION = 'email_templates';
 const EMAIL_TEMPLATES = [
   {
     id: 'wedding-invitation',
-    name: 'Invitación de Boda',
-    subject: '¡Estás invitado/a a nuestra boda! 💕',
-    body: `¡Hola!
+    name: 'Invitaci�n de Boda',
+    subject: '�Est�s invitado/a a nuestra boda! =�',
+    body: `�Hola!
 
-Nos complace invitarte a celebrar nuestro gran día con nosotros.
+Nos complace invitarte a celebrar nuestro gran d�a con nosotros.
 
-📅 Fecha: [FECHA]
-🕐 Hora: [HORA]
-📍 Lugar: [LUGAR]
+=� Fecha: [FECHA]
+=P Hora: [HORA]
+=� Lugar: [LUGAR]
 
-Tu presencia haría que este día sea aún más especial.
+Tu presencia har�a que este d�a sea a�n m�s especial.
 
-¡Esperamos verte allí!
+�Esperamos verte all�!
 
 Con amor,
 [NOMBRES]`,
@@ -32,33 +32,33 @@ Con amor,
   {
     id: 'save-the-date',
     name: 'Reserva la Fecha',
-    subject: '¡Reserva la fecha! 📅 Nuestra boda',
-    body: `¡Hola querido/a [NOMBRE]!
+    subject: '�Reserva la fecha! =� Nuestra boda',
+    body: `�Hola querido/a [NOMBRE]!
 
 Queremos que seas uno de los primeros en saberlo...
 
-¡NOS CASAMOS! 💍
+�NOS CASAMOS! =�
 
-📅 Fecha: [FECHA]
-📍 Ciudad: [CIUDAD]
+=� Fecha: [FECHA]
+=� Ciudad: [CIUDAD]
 
-La invitación formal llegará pronto, pero queríamos asegurarnos de que reserves esta fecha especial.
+La invitaci�n formal llegar� pronto, pero quer�amos asegurarnos de que reserves esta fecha especial.
 
-¡No podemos esperar a celebrar contigo!
+�No podemos esperar a celebrar contigo!
 
-Con cariño,
+Con cari�o,
 [NOMBRES]`,
     category: 'save-the-date',
   },
   {
     id: 'thank-you',
     name: 'Agradecimiento',
-    subject: 'Gracias por hacer nuestro día tan especial ❤️',
+    subject: 'Gracias por hacer nuestro d�a tan especial d',
     body: `Querido/a [NOMBRE],
 
-No tenemos palabras para expresar lo agradecidos que estamos por haber compartido nuestro día especial con nosotros.
+No tenemos palabras para expresar lo agradecidos que estamos por haber compartido nuestro d�a especial con nosotros.
 
-Tu presencia, tu cariño y tu alegría hicieron que nuestra boda fuera perfecta.
+Tu presencia, tu cari�o y tu alegr�a hicieron que nuestra boda fuera perfecta.
 
 Gracias por ser parte de nuestra historia de amor.
 
@@ -70,19 +70,19 @@ Con todo nuestro amor,
     id: 'rsvp-reminder',
     name: 'Recordatorio RSVP',
     subject: 'Recordatorio: Confirma tu asistencia a nuestra boda',
-    body: `¡Hola [NOMBRE]!
+    body: `�Hola [NOMBRE]!
 
-Esperamos que hayas recibido nuestra invitación de boda.
+Esperamos que hayas recibido nuestra invitaci�n de boda.
 
-Nos encantaría saber si podrás acompañarnos en nuestro gran día:
+Nos encantar�a saber si podr�s acompa�arnos en nuestro gran d�a:
 
-📅 Fecha: [FECHA]
-🕐 Hora: [HORA]
-📍 Lugar: [LUGAR]
+=� Fecha: [FECHA]
+=P Hora: [HORA]
+=� Lugar: [LUGAR]
 
 Por favor, confirma tu asistencia antes del [FECHA_LIMITE].
 
-¡Esperamos celebrar contigo!
+�Esperamos celebrar contigo!
 
 Con amor,
 [NOMBRES]`,
@@ -97,15 +97,15 @@ Con amor,
 Esperamos que se encuentre bien. Nos ponemos en contacto porque estamos organizando nuestra boda y estamos interesados en sus servicios.
 
 Detalles del evento:
-📅 Fecha: [FECHA]
-👥 Número de invitados: [INVITADOS]
-📍 Ubicación: [LUGAR]
+=� Fecha: [FECHA]
+=e N�mero de invitados: [INVITADOS]
+=� Ubicaci�n: [LUGAR]
 
-Nos gustaría conocer:
+Nos gustar�a conocer:
 - Disponibilidad para la fecha
 - Paquetes disponibles
 - Precios
-- Condiciones de contratación
+- Condiciones de contrataci�n
 
 Quedamos a la espera de su respuesta.
 
@@ -194,7 +194,7 @@ router.get('/', async (req, res) => {
 
 /**
  * GET /api/email-templates/:id
- * Obtiene una plantilla específica por ID
+ * Obtiene una plantilla espec�fica por ID
  */
 router.get('/:id', async (req, res) => {
   try {
@@ -237,7 +237,7 @@ router.post('/', async (req, res) => {
       return res.status(401).json({
         success: false,
         error: 'auth-required',
-        message: 'Se requiere autenticación para crear plantillas',
+        message: 'Se requiere autenticaci�n para crear plantillas',
       });
     }
 
@@ -294,7 +294,7 @@ router.put('/:id', async (req, res) => {
       return res.status(401).json({
         success: false,
         error: 'auth-required',
-        message: 'Se requiere autenticación para actualizar plantillas',
+        message: 'Se requiere autenticaci�n para actualizar plantillas',
       });
     }
 

@@ -23,15 +23,15 @@ import { createInvitationPrintBatch } from '../services/printService';
 import { toE164, schedule as scheduleWhats } from '../services/whatsappService';
 
 /**
- * PÃ¡gina de gestiÃ³n de invitados completamente refactorizada
+ * Página de gestión de invitados completamente refactorizada
  * Arquitectura modular, optimizada y mantenible
  *
  * OPTIMIZACIONES IMPLEMENTADAS:
- * - Eliminada complejidad anterior (597 lÃ­neas â†’ 140 lÃ­neas)
+ * - Eliminada complejidad anterior (597 líneas �  140 líneas)
  * - Arquitectura modular con componentes especializados
- * - Hook personalizado useGuests para lÃ³gica centralizada
- * - MemoizaciÃ³n y optimizaciÃ³n de re-renders
- * - IntegraciÃ³n con sistema i18n
+ * - Hook personalizado useGuests para lógica centralizada
+ * - Memoización y optimización de re-renders
+ * - Integración con sistema i18n
  * - UX mejorada con atajos y paneles dedicados
  */
 function Invitados() {
@@ -184,7 +184,7 @@ function Invitados() {
 
       const message = t('guests.saveTheDate.message', {
         defaultValue:
-          'Hola somos {{p1}}{{p2Suffix}}, tenemos un notición súper importante que compartir contigo. ¡Nos casamos! Resérvate el {{date}} porque queremos contar contigo.',
+          'Hola somos {{p1}}{{p2Suffix}}, tenemos un notici�n s�per importante que compartir contigo. �Nos casamos! Res�rvate el {{date}} porque queremos contar contigo.',
         p1: primaryName,
         p2Suffix,
         date: fechaFmt,
@@ -195,7 +195,7 @@ function Invitados() {
       return {
         saveTheDateMessage: t('guests.saveTheDate.messageFallback', {
           defaultValue:
-            '¡Hola! Tenemos un notición súper importante que compartir contigo. ¡Nos casamos! ¡Resérvate la fecha porque queremos contar contigo!',
+            '�Hola! Tenemos un notici�n s�per importante que compartir contigo. �Nos casamos! �Res�rvate la fecha porque queremos contar contigo!',
         }),
         coupleLabel:
           t('guests.saveTheDate.coupleFallback', { defaultValue: 'our wedding' }) || 'our wedding',
@@ -207,7 +207,7 @@ function Invitados() {
 
   const defaultInvitationMessage = React.useMemo(
     () =>
-      '¡Hola {guestName}! Somos {coupleName} y te enviamos la invitación oficial de nuestra boda. Adjuntamos la tarjeta con todos los detalles y esperamos tu respuesta.',
+      '�Hola {guestName}! Somos {coupleName} y te enviamos la invitaci�n oficial de nuestra boda. Adjuntamos la tarjeta con todos los detalles y esperamos tu respuesta.',
     [coupleLabel]
   );
 
@@ -324,7 +324,7 @@ function Invitados() {
     }
   };
 
-  // DifusiÃ³n (lista de difusiÃ³n vÃ­a extensiÃ³n)
+  // Difusión (lista de difusión vía extensión)
   const handleSendSelectedBroadcast = async () => {
     try {
       if (import.meta.env.DEV)
@@ -336,38 +336,38 @@ function Invitados() {
         return;
       }
       const custom = window.prompt(
-        'Mensaje de difusiÃ³n (se enviarÃ¡ una sola vez a una lista de difusiÃ³n). Ten en cuenta que solo lo recibirÃ¡n quienes tengan tu nÃºmero guardado en contactos.',
+        'Mensaje de difusión (se enviará una sola vez a una lista de difusión). Ten en cuenta que solo lo recibirán quienes tengan tu número guardado en contactos.',
         ''
       );
       const r = await inviteSelectedWhatsAppBroadcastViaExtension(selectedIds, custom || undefined);
       if (r?.notAvailable) {
         const doFallback = window.confirm(
-          'No se detectÃ³ la extensiÃ³n para difusiÃ³n. Â¿Quieres intentar el envÃ­o individual (una sola acciÃ³n) en su lugar?'
+          'No se detectó la extensión para difusión. ¿Quieres intentar el envío individual (una sola acción) en su lugar?'
         );
         if (doFallback) {
           const rb = await inviteSelectedWhatsAppViaExtension(selectedIds, custom || undefined);
           if (rb?.success && !rb?.notAvailable) {
-            alert(`EnvÃ­o iniciado para ${rb?.count || selectedIds.length} invitado(s).`);
+            alert(`Envío iniciado para ${rb?.count || selectedIds.length} invitado(s).`);
           } else {
-            alert('No se pudo iniciar el envÃ­o (extensiÃ³n no disponible).');
+            alert('No se pudo iniciar el envío (extensión no disponible).');
           }
         }
         return;
       }
       if (r?.success) {
-        if (r?.mode === 'broadcast') alert(`DifusiÃ³n enviada a ${r?.count || 0} destinatarios.`);
+        if (r?.mode === 'broadcast') alert(`Difusión enviada a ${r?.count || 0} destinatarios.`);
         else if (r?.mode === 'fallback_individual')
-          alert(`EnvÃ­o individual fallback. Ã‰xitos: ${r?.sent || 0}, Fallos: ${r?.failed || 0}`);
+          alert(`Envío individual fallback. �0xitos: ${r?.sent || 0}, Fallos: ${r?.failed || 0}`);
         return;
       }
-      alert('No se pudo completar la difusiÃ³n: ' + (r?.error || 'desconocido'));
+      alert('No se pudo completar la difusión: ' + (r?.error || 'desconocido'));
     } catch (e) {
-      console.warn('Error en difusiÃ³n (MÃ³vil):', e);
-      alert('Error en la difusiÃ³n');
+      console.warn('Error en difusión (Móvil):', e);
+      alert('Error en la difusión');
     }
   };
 
-  // Manejar eliminaciÃ³n de invitado
+  // Manejar eliminación de invitado
   const handleDeleteGuest = async (guest) => {
     const result = await removeGuest(guest.id);
     if (!result.success) {
@@ -390,14 +390,14 @@ function Invitados() {
     }
   };
 
-  // EnvÃ­o masivo API para todos los invitados (usado por GuestFilters)
-  // Abrir modal de envÃ­o masivo WhatsApp
+  // Envío masivo API para todos los invitados (usado por GuestFilters)
+  // Abrir modal de envío masivo WhatsApp
   const openSaveTheDate = () => setShowSaveTheDate(true);
   const closeSaveTheDate = () => setShowSaveTheDate(false);
   const openWhatsBatch = () => setShowWhatsBatch(true);
   const closeWhatsBatch = () => setShowWhatsBatch(false);
 
-  // SelecciÃ³n mÃºltiple
+  // Selección múltiple
   const handleToggleSelect = (id, checked) => {
     setSelectedIds((prev) => {
       const set = new Set(prev);
@@ -434,7 +434,7 @@ function Invitados() {
     if (value === null) return;
     const trimmed = (value || '').trim();
     if (!trimmed) {
-      alert('Debes indicar una mesa válida.');
+      alert('Debes indicar una mesa v�lida.');
       return;
     }
     try {
@@ -493,11 +493,11 @@ function Invitados() {
   const handleStartScan = React.useCallback(async () => {
     if (typeof window === 'undefined') return;
     if (!navigator.mediaDevices?.getUserMedia) {
-      setScanError('La cámara no está disponible en este dispositivo.');
+      setScanError('La c�mara no est� disponible en este dispositivo.');
       return;
     }
     if (!('BarcodeDetector' in window)) {
-      setScanError('Este navegador no soporta lectura de códigos QR.');
+      setScanError('Este navegador no soporta lectura de c�digos QR.');
       return;
     }
     try {
@@ -530,12 +530,12 @@ function Invitados() {
             }
           }
         } catch (error) {
-          setScanError('No se pudo leer el código QR.');
+          setScanError('No se pudo leer el c�digo QR.');
         }
       }, 600);
     } catch (error) {
       console.error('[Invitados] handleStartScan error', error);
-      setScanError('No se pudo acceder a la cámara.');
+      setScanError('No se pudo acceder a la c�mara.');
       stopScanning();
     }
   }, [stopScanning]);
@@ -558,7 +558,7 @@ function Invitados() {
 
   const handleConfirmCheckIn = React.useCallback(async () => {
     if (!checkInGuest) {
-      notify('No se encontró invitado para registrar el check-in.', 'warning');
+      notify('No se encontr� invitado para registrar el check-in.', 'warning');
       return;
     }
     const code = checkInInput || checkInGuest.checkInCode || checkInGuest.id;
@@ -682,10 +682,10 @@ function Invitados() {
             })
           )
         );
-        alert(`Invitación enviada a ${res.ok ?? guestIds.length} invitado(s).`);
+        alert(`Invitaci�n enviada a ${res.ok ?? guestIds.length} invitado(s).`);
         return { success: true };
       }
-      alert(res?.error || 'No se pudo enviar la invitación');
+      alert(res?.error || 'No se pudo enviar la invitaci�n');
       return { success: false };
     } catch (error) {
       console.error('Error enviando invitaciones formales', error);
@@ -702,14 +702,14 @@ function Invitados() {
     try {
       const normalizedAsset = (assetUrl || '').trim() || defaultInvitationAsset;
       if (!normalizedAsset) {
-        alert('Añade la URL de la invitación diseñada antes de continuar.');
+        alert('A�ade la URL de la invitaci�n dise�ada antes de continuar.');
         return { success: false };
       }
       const guestsToPrint = guestIds
         .map((id) => (guests || []).find((g) => g.id === id))
         .filter(Boolean);
       if (!guestsToPrint.length) {
-        alert('No se pudo encontrar información de los invitados seleccionados.');
+        alert('No se pudo encontrar informaci�n de los invitados seleccionados.');
         return { success: false };
       }
       const finalChannel = channel || 'print_owner';
@@ -757,10 +757,10 @@ function Invitados() {
           })
         )
       );
-      alert('Pedido de impresión generado correctamente.');
+      alert('Pedido de impresi�n generado correctamente.');
       return { success: true };
     } catch (error) {
-      console.error('Error registrando entrega física', error);
+      console.error('Error registrando entrega f�sica', error);
       alert('No se pudo registrar la entrega.');
       return { success: false };
     }
@@ -782,12 +782,12 @@ function Invitados() {
       });
       if (import.meta.env.DEV) console.log('[Invitados] handleSendSelectedApi result', res);
       if (res?.cancelled) {
-        alert('AcciÃ³n cancelada');
+        alert('Acción cancelada');
         return;
       }
       if (res?.error === 'missing-couple-signature') {
         alert(
-          'El mensaje debe incluir el nombre de la pareja. Revisa la plantilla en “Editar mensaje (API)”.'
+          'El mensaje debe incluir el nombre de la pareja. Revisa la plantilla en Editar mensaje (API).'
         );
         return;
       }
@@ -803,7 +803,7 @@ function Invitados() {
       if (res?.success) {
         alert(
           t('guests.whatsapp.bulkApiDone', {
-            defaultValue: 'EnvÃ­o completado. Ã‰xitos: {{ok}}, Fallos: {{fail}}',
+            defaultValue: 'Envío completado. �0xitos: {{ok}}, Fallos: {{fail}}',
             ok: res?.ok || 0,
             fail: res?.fail || 0,
           })
@@ -812,16 +812,16 @@ function Invitados() {
       }
       alert(
         t('guests.whatsapp.apiStartFailed', {
-          defaultValue: 'No se pudo iniciar el envÃ­o por API',
+          defaultValue: 'No se pudo iniciar el envío por API',
         })
       );
     } catch (e) {
-      console.warn('Error envÃ­o seleccionados (API):', e);
+      console.warn('Error envío seleccionados (API):', e);
       alert(t('guests.whatsapp.selectedUnexpected', { defaultValue: 'Error enviando a seleccionados' }));
     }
   };
 
-  // Enviar por mÃ³vil personal (preferir "una sola acciÃ³n" vÃ­a extensiÃ³n)
+  // Enviar por móvil personal (preferir "una sola acción" vía extensión)
   const handleSendSelectedMobile = async () => {
     try {
       if (import.meta.env.DEV)
@@ -835,28 +835,28 @@ function Invitados() {
       const custom = window.prompt(
         t('guests.whatsapp.customPrompt', {
           defaultValue:
-            'Mensaje personalizado (opcional). Si lo dejas en blanco, se usarÃ¡ un mensaje por defecto con enlace RSVP cuando sea posible:',
+            'Mensaje personalizado (opcional). Si lo dejas en blanco, se usará un mensaje por defecto con enlace RSVP cuando sea posible:',
         }),
         ''
       );
-      // 1) Intentar envÃ­o en una sola acciÃ³n usando extensiÃ³n (WhatsApp Web automation)
+      // 1) Intentar envío en una sola acción usando extensión (WhatsApp Web automation)
       try {
         const r = await inviteSelectedWhatsAppViaExtension(selectedIds, custom || undefined);
         if (r?.success && !r?.notAvailable) {
           alert(
             t('guests.whatsapp.webStarted', {
-              defaultValue: 'EnvÃ­o iniciado en WhatsApp Web para {{count}} invitado(s).',
+              defaultValue: 'Envío iniciado en WhatsApp Web para {{count}} invitado(s).',
               count: r?.count || selectedIds.length,
             })
           );
           return;
         }
         if (r?.notAvailable) {
-          // 2) Fallback opcional: abrir chats en pestaÃ±as (no recomendado para >50)
+          // 2) Fallback opcional: abrir chats en pestañas (no recomendado para >50)
           const doFallback = window.confirm(
             t('guests.whatsapp.extensionMissingConfirm', {
               defaultValue:
-                'No se detectÃ³ la extensiÃ³n para enviar en una sola acciÃ³n. Â¿Quieres abrir los chats en pestaÃ±as como alternativa?',
+                'No se detectó la extensión para enviar en una sola acción. ¿Quieres abrir los chats en pestañas como alternativa?',
             })
           );
           if (doFallback) {
@@ -874,13 +874,13 @@ function Invitados() {
         // Si no es success y tampoco es notAvailable, informar del error
         alert(
           t('guests.whatsapp.oneClickFailed', {
-            defaultValue: 'No se pudo iniciar el envÃ­o en una sola acciÃ³n: {{error}}',
+            defaultValue: 'No se pudo iniciar el envío en una sola acción: {{error}}',
             error: r?.error || 'desconocido',
           })
         );
         return;
       } catch (e) {
-        console.warn('ExtensiÃ³n WhatsApp Web no disponible o fallÃ³, usando fallback:', e);
+        console.warn('Extensión WhatsApp Web no disponible o falló, usando fallback:', e);
         const fr = await inviteSelectedWhatsAppDeeplink(selectedIds, custom || undefined);
         if (fr?.success)
           alert(
@@ -892,10 +892,10 @@ function Invitados() {
         return;
       }
     } catch (e) {
-      console.warn('Error envÃ­o seleccionados (MÃ³vil):', e);
+      console.warn('Error envío seleccionados (Móvil):', e);
       alert(
         t('guests.whatsapp.mobileUnexpected', {
-          defaultValue: 'Error enviando a seleccionados (MÃ³vil)',
+          defaultValue: 'Error enviando a seleccionados (Móvil)',
         })
       );
     }
@@ -933,8 +933,8 @@ function Invitados() {
           }
         } catch {}
         const msg = link
-          ? `Â¡Hola ${g.name || ''}! Somos ${coupleLabel} y nos encantarÃ­a contar contigo en nuestra boda. Confirma tu asistencia aquÃ­: ${link}`
-          : `Â¡Hola ${g.name || ''}! Somos ${coupleLabel} y nos encantarÃ­a contar contigo en nuestra boda. Â¿Puedes confirmar tu asistencia?`;
+          ? `¡Hola ${g.name || ''}! Somos ${coupleLabel} y nos encantaría contar contigo en nuestra boda. Confirma tu asistencia aquí: ${link}`
+          : `¡Hola ${g.name || ''}! Somos ${coupleLabel} y nos encantaría contar contigo en nuestra boda. ¿Puedes confirmar tu asistencia?`;
         const to = toE164(g.phone);
         if (to)
           items.push({
@@ -946,18 +946,18 @@ function Invitados() {
           });
       }
       if (!items.length) {
-        alert('Los seleccionados no tienen telÃ©fonos vÃ¡lidos');
+        alert('Los seleccionados no tienen teléfonos válidos');
         return;
       }
       const result = await scheduleWhats(items, whenIso);
       if (result?.success) {
-        alert(`Programados ${items.length} envÃ­os para ${whenIso}`);
+        alert(`Programados ${items.length} envíos para ${whenIso}`);
       } else {
-        alert('Error programando envÃ­os: ' + (result?.error || 'desconocido'));
+        alert('Error programando envíos: ' + (result?.error || 'desconocido'));
       }
     } catch (e) {
-      console.warn('Error programando envÃ­os:', e);
-      alert('Error programando envÃ­os');
+      console.warn('Error programando envíos:', e);
+      alert('Error programando envíos');
     }
   };
 
@@ -981,7 +981,7 @@ function Invitados() {
   const handleImportedGuests = async (importedGuests) => {
     try {
       if (!importedGuests || importedGuests.length === 0) return;
-      // DeduplicaciÃ³n por email/telÃ©fono
+      // Deduplicación por email/teléfono
       const existingEmails = new Set((guests || []).map((g) => utils.normalize(g?.email || '')));
       const existingPhones = new Set((guests || []).map((g) => utils.phoneClean(g?.phone || '')));
 
@@ -1011,7 +1011,7 @@ function Invitados() {
       setShowGuestModal(false);
     } catch (error) {
       console.error('Error importando invitados:', error);
-      alert('OcurriÃ³ un error al importar los invitados');
+      alert('Ocurrió un error al importar los invitados');
     }
   };
 
@@ -1063,7 +1063,7 @@ function Invitados() {
         added++;
       }
       notify(
-        `${added} invitado${added === 1 ? '' : 's'} añadid${added === 1 ? 'o' : 'os'}${
+        `${added} invitado${added === 1 ? '' : 's'} a�adid${added === 1 ? 'o' : 'os'}${
           skipped ? `, ${skipped} duplicados omitidos` : ''
         }`,
         'success'
@@ -1071,7 +1071,7 @@ function Invitados() {
       setShowBulkModal(false);
     } catch (err) {
       console.error('Error en alta masiva:', err);
-      notify('Ocurrió un error al procesar la alta masiva', 'error');
+      notify('Ocurri� un error al procesar la alta masiva', 'error');
     }
   };
 
@@ -1087,7 +1087,7 @@ function Invitados() {
       const confirmedGuests = (guests || [])
         .filter((g) => {
           const s = String(g.status || '').toLowerCase();
-          return s === 'confirmed' || s === 'accepted' || g.response === 'Sí';
+          return s === 'confirmed' || s === 'accepted' || g.response === 'S�';
         })
         .map((g) => ({ name: g.name || '', table: g.table || '', companion: g.companion || 0 }));
 
@@ -1151,7 +1151,7 @@ function Invitados() {
                   <th>#</th>
                   <th>Nombre completo</th>
                   <th style="text-align:center;">Mesa</th>
-                  <th style="text-align:center;">Acompañantes</th>
+                  <th style="text-align:center;">Acompa�antes</th>
                 </tr>
               </thead>
               <tbody>
@@ -1171,11 +1171,11 @@ function Invitados() {
       };
     } catch (err) {
       console.error('Error generando PDF:', err);
-      alert('No se pudo generar el documento de impresión');
+      alert('No se pudo generar el documento de impresi�n');
     }
   };
 
-  // Manejar cancelaciÃ³n de modal
+  // Manejar cancelación de modal
   const handleCancelModal = () => {
     setShowGuestModal(false);
     setEditingGuest(null);
@@ -1222,7 +1222,7 @@ function Invitados() {
         {!isLoading && Array.isArray(weddings) && weddings.length === 0 && (
           <div className="text-sm text-muted">
             {activeWedding
-              ? 'No se encontraron bodas asociadas a tu cuenta o no tienes permisos sobre la boda activa. Si el problema persiste, recarga la pÃ¡gina o contacta con soporte.'
+              ? 'No se encontraron bodas asociadas a tu cuenta o no tienes permisos sobre la boda activa. Si el problema persiste, recarga la página o contacta con soporte.'
               : 'No se encontraron bodas asociadas a tu cuenta. Crea o selecciona una boda para gestionar invitados.'}
           </div>
         )}
@@ -1248,7 +1248,7 @@ function Invitados() {
         <Modal
           open={showGuestModal}
           onClose={handleCancelModal}
-          title={editingGuest ? 'Editar Invitado' : 'AÃ±adir Invitado'}
+          title={editingGuest ? 'Editar Invitado' : 'Añadir Invitado'}
           size="lg"
         >
           {editingGuest ? (
@@ -1279,7 +1279,7 @@ function Invitados() {
               <TabsContent value="import" className="pt-2">
                 <ContactsImporter onImported={handleImportedGuests} />
                 <p className="text-xs text-muted mt-3">
-                  Selecciona los contactos de tu agenda y se aÃ±adirÃ¡n como invitados.
+                  Selecciona los contactos de tu agenda y se añadirán como invitados.
                 </p>
               </TabsContent>
             </Tabs>
@@ -1357,7 +1357,7 @@ function Invitados() {
                     {(guests || [])
                       .filter((g) => {
                         const s = String(g.status || '').toLowerCase();
-                        return s === 'confirmed' || s === 'accepted' || g.response === 'Sí';
+                        return s === 'confirmed' || s === 'accepted' || g.response === 'S�';
                       })
                       .sort(
                         (a, b) =>
@@ -1416,13 +1416,13 @@ function Invitados() {
               <Input
                 value={checkInInput}
                 onChange={(e) => handleCheckInInputChange(e.target.value)}
-                placeholder="Escanea o escribe el código de check-in"
+                placeholder="Escanea o escribe el c�digo de check-in"
                 disabled={checkInLoading}
                 data-testid="guest-checkin-input"
               />
               <div className="flex flex-wrap items-center gap-2">
                 <Button variant="outline" onClick={handleStartScan} disabled={isScanning}>
-                  {isScanning ? 'Escaneando…' : 'Escanear QR'}
+                  {isScanning ? 'Escaneando&' : 'Escanear QR'}
                 </Button>
                 {isScanning && (
                   <Button variant="ghost" onClick={stopScanning}>
@@ -1441,7 +1441,7 @@ function Invitados() {
 
             {!checkInGuest ? (
               <div className="text-sm text-muted">
-                Introduce o escanea un código válido para mostrar la información del invitado.
+                Introduce o escanea un c�digo v�lido para mostrar la informaci�n del invitado.
               </div>
             ) : (
               <div className="space-y-3">
@@ -1449,7 +1449,7 @@ function Invitados() {
                   <div>
                     <h3 className="text-lg font-semibold">{checkInGuest.name || 'Invitado sin nombre'}</h3>
                     <p className="text-sm text-muted">
-                      {checkInGuest.email || 'Sin email'} · {checkInGuest.phone || 'Sin teléfono'}
+                      {checkInGuest.email || 'Sin email'} � {checkInGuest.phone || 'Sin tel�fono'}
                     </p>
                     <p className="text-sm">
                       Mesa:{' '}
@@ -1462,7 +1462,7 @@ function Invitados() {
                       </span>
                     </p>
                     <p className="text-xs text-muted">
-                      Código: {checkInGuest.checkInCode || 'No asignado'}
+                      C�digo: {checkInGuest.checkInCode || 'No asignado'}
                     </p>
                     {checkInGuest.checkedInAt && (
                       <p className="text-xs text-muted">
@@ -1509,7 +1509,7 @@ function Invitados() {
                           return (
                             <li key={`${entry.at || idx}`} className="flex justify-between gap-2">
                               <span>
-                                {formatted || 'Sin registro'} · {entry.method || 'manual'}
+                                {formatted || 'Sin registro'} � {entry.method || 'manual'}
                               </span>
                               <span className="text-muted text-xs">{entry.by || 'sistema'}</span>
                             </li>
@@ -1566,7 +1566,7 @@ function Invitados() {
           }}
         />
 
-        {/* Modal WhatsApp con dos pestaÃ±as (mÃ³vil personal / API) */}
+        {/* Modal WhatsApp con dos pestañas (móvil personal / API) */}
         <WhatsAppModal
           open={showWhatsModal}
           onClose={handleCloseWhatsModal}
@@ -1575,7 +1575,7 @@ function Invitados() {
             whatsGuest
               ? t('guests.whatsapp.dm', {
                   defaultValue:
-                    'Â¡Hola {{name}}! Nos encantarÃ­a contar contigo en nuestra boda. Â¿Puedes confirmar tu asistencia?',
+                    '¡Hola {{name}}! Nos encantaría contar contigo en nuestra boda. ¿Puedes confirmar tu asistencia?',
                   name: whatsGuest?.name || '',
                 })
               : ''
@@ -1590,7 +1590,7 @@ function Invitados() {
               const r = await inviteViaWhatsAppApi(g, msg, { coupleName: coupleLabel });
               if (r?.error === 'missing-couple-signature') {
                 alert(
-                  'El mensaje debe incluir el nombre de la pareja. Añade la firma antes de enviarlo.'
+                  'El mensaje debe incluir el nombre de la pareja. A�ade la firma antes de enviarlo.'
                 );
                 return;
               }
@@ -1607,7 +1607,7 @@ function Invitados() {
                 return;
               }
               if (res?.success) {
-                alert(`Invitación enviada a ${res.ok ?? res.count ?? 0} invitado(s).`);
+                alert(`Invitaci�n enviada a ${res.ok ?? res.count ?? 0} invitado(s).`);
               }
             } catch {}
           }}

@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+�<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diagnóstico de Mailgun</title>
+    <title>Diagn�stico de Mailgun</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -66,19 +66,19 @@
     </style>
 </head>
 <body>
-    <h1>Herramienta de Diagnóstico de Mailgun</h1>
-    <p>Esta herramienta permite probar diferentes configuraciones para el envío de correos con Mailgun.</p>
+    <h1>Herramienta de Diagn�stico de Mailgun</h1>
+    <p>Esta herramienta permite probar diferentes configuraciones para el env�o de correos con Mailgun.</p>
 
     <div class="card">
         <h2>1. Verificar Variables de Entorno</h2>
-        <p>Comprueba que las variables de entorno estén configuradas correctamente.</p>
+        <p>Comprueba que las variables de entorno est�n configuradas correctamente.</p>
         <button id="checkEnv" class="btn">Verificar Entorno</button>
         <div id="envResult" class="result"></div>
     </div>
 
     <div class="card">
-        <h2>2. Probar Múltiples Configuraciones</h2>
-        <p>Prueba el envío de correo con diferentes configuraciones de dominio y formato.</p>
+        <h2>2. Probar M�ltiples Configuraciones</h2>
+        <p>Prueba el env�o de correo con diferentes configuraciones de dominio y formato.</p>
         <form id="testForm">
             <div>
                 <label for="to">Destinatario:</label>
@@ -86,11 +86,11 @@
             </div>
             <div>
                 <label for="subject">Asunto:</label>
-                <input type="text" id="subject" name="subject" value="Prueba de diagnóstico Mailgun" required>
+                <input type="text" id="subject" name="subject" value="Prueba de diagn�stico Mailgun" required>
             </div>
             <div>
                 <label for="message">Mensaje:</label>
-                <textarea id="message" name="message" required>Este es un mensaje de prueba para diagnosticar la configuración de Mailgun.</textarea>
+                <textarea id="message" name="message" required>Este es un mensaje de prueba para diagnosticar la configuraci�n de Mailgun.</textarea>
             </div>
             <button type="submit" class="btn">Probar Todas las Configuraciones</button>
         </form>
@@ -105,11 +105,11 @@
                 const data = await response.json();
                 
                 const resultDiv = document.getElementById('envResult');
-                resultDiv.innerHTML = '<span class="success">✅ Respuesta recibida:</span>\n' + 
+                resultDiv.innerHTML = '<span class="success"> Respuesta recibida:</span>\n' + 
                                      JSON.stringify(data, null, 2);
             } catch (error) {
                 document.getElementById('envResult').innerHTML = 
-                    `<span class="error">❌ Error:</span> ${error.message}`;
+                    `<span class="error">L Error:</span> ${error.message}`;
             }
         });
 
@@ -121,7 +121,7 @@
             const subject = document.getElementById('subject').value;
             const message = document.getElementById('message').value;
             
-            document.getElementById('testResult').innerHTML = "⏳ Probando configuraciones... (puede tardar varios segundos)";
+            document.getElementById('testResult').innerHTML = "� Probando configuraciones... (puede tardar varios segundos)";
             
             try {
                 const response = await fetch('http://localhost:4004/api/mailgun-debug/test-domains', {
@@ -136,15 +136,15 @@
                 
                 const resultDiv = document.getElementById('testResult');
                 if (data.success) {
-                    resultDiv.innerHTML = '<span class="success">✅ ¡Al menos una configuración funcionó!</span>\n' + 
+                    resultDiv.innerHTML = '<span class="success"> �Al menos una configuraci�n funcion�!</span>\n' + 
                                          JSON.stringify(data, null, 2);
                 } else {
-                    resultDiv.innerHTML = '<span class="error">❌ Todas las configuraciones fallaron:</span>\n' + 
+                    resultDiv.innerHTML = '<span class="error">L Todas las configuraciones fallaron:</span>\n' + 
                                          JSON.stringify(data, null, 2);
                 }
             } catch (error) {
                 document.getElementById('testResult').innerHTML = 
-                    `<span class="error">❌ Error de conexión:</span> ${error.message}`;
+                    `<span class="error">L Error de conexi�n:</span> ${error.message}`;
             }
         });
     </script>

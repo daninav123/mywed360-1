@@ -1,4 +1,4 @@
-// Hook de GestiÃ³n del plan de asientos
+// Hook de Gestión del plan de asientos
 import {
   collection,
   deleteDoc,
@@ -539,7 +539,7 @@ const normalizeSpecialMoments = (moments = {}) => {
   const ceremonySaveTimerRef = useRef(null);
   const banquetSaveTimerRef = useRef(null);
 
-  // Estados computados basados en la pestaÃ±a activa
+  // Estados computados basados en la pestaña activa
   const areas = tab === 'ceremony' ? areasCeremony : areasBanquet;
   const setAreas = tab === 'ceremony' ? setAreasCeremony : setAreasBanquet;
   const tables = tab === 'ceremony' ? tablesCeremony : tablesBanquet;
@@ -580,7 +580,7 @@ const normalizeSpecialMoments = (moments = {}) => {
     });
   }, [snapToGrid, validationsEnabled, activeWedding]);
 
-  // Cargar dimensiones del salón (y compatibilidad con estructura nueva/legacy)
+  // Cargar dimensiones del sal�n (y compatibilidad con estructura nueva/legacy)
   useEffect(() => {
     if (!activeWedding) return;
     if (!canPersist) {
@@ -638,7 +638,7 @@ const normalizeSpecialMoments = (moments = {}) => {
           }
         }
       } catch (err) {
-        console.warn('No se pudieron cargar dimensiones del salón:', err);
+        console.warn('No se pudieron cargar dimensiones del sal�n:', err);
       }
     };
     loadHallDimensions();
@@ -707,7 +707,7 @@ const normalizeSpecialMoments = (moments = {}) => {
     };
   }, [activeWedding, canPersist, releaseLock]);
 
-  // Cargar configuración de ceremonia (seats/tables/areas/settings)
+  // Cargar configuraci�n de ceremonia (seats/tables/areas/settings)
   useEffect(() => {
     if (!activeWedding) return;
     if (!canPersist) {
@@ -772,7 +772,7 @@ const normalizeSpecialMoments = (moments = {}) => {
     };
   }, [activeWedding, canPersist]);
 
-  // Suscribirse a cambios en el estado de sincronizaciÃ³n
+  // Suscribirse a cambios en el estado de sincronización
   useEffect(() => {  }, []);
 
   // Semilla local de invitados en Cypress si no hay datos
@@ -833,7 +833,7 @@ const normalizeSpecialMoments = (moments = {}) => {
             (!payload.seats || payload.seats.length === 0) &&
             (!payload.tables || payload.tables.length === 0) &&
             (!payload.areas || payload.areas.length === 0);
-          if (isEmpty) return; // Evitar crear doc vacÃ­o
+          if (isEmpty) return; // Evitar crear doc vacío
           markPendingWrite('ceremony');
           await setDoc(ref, payload, { merge: true });
         } catch (e) {
@@ -882,7 +882,7 @@ const normalizeSpecialMoments = (moments = {}) => {
           const hasAreas = Array.isArray(payload.areas) && payload.areas.length > 0;
           const hasConfig = !!(cfg.width && cfg.height);
           const isEmpty = !hasTables && !hasAreas && !hasConfig;
-          if (isEmpty) return; // Evitar crear doc vacÃ­o
+          if (isEmpty) return; // Evitar crear doc vacío
           markPendingWrite('banquet');
           await setDoc(ref, payload, { merge: true });
         } catch (e) {
@@ -1094,7 +1094,7 @@ const pushHistory = (snapshot) => {
     return null;
   };
 
-  // GestiÃ³n de mesas
+  // Gestión de mesas
   const handleSelectTable = (id, multi = false) => {
     const table = tables.find((t) => String(t.id) === String(id));
     if (!multi) {
@@ -1102,7 +1102,7 @@ const pushHistory = (snapshot) => {
       setSelectedTable(table || null);
       return;
     }
-    // Multi-selecciÃ³n: alterna en selectedIds, mantÃ©n selectedTable como Ãºltimo clicado
+    // Multi-selección: alterna en selectedIds, mantén selectedTable como último clicado
     setSelectedIds((prev) => {
       const s = new Set((prev || []).map(String));
       const key = String(id);
@@ -1193,12 +1193,12 @@ const pushHistory = (snapshot) => {
         setTablesBanquet((prev) => {
           const newTables = [...prev, sanitized];
           console.log('[addTable] New banquet tables:', newTables);
-          console.log('[addTable] Previous count:', prev.length, '→ New count:', newTables.length);
+          console.log('[addTable] Previous count:', prev.length, '� New count:', newTables.length);
           return newTables;
         });
       }
       
-      // Añadir al historial
+      // A�adir al historial
       try {
         pushHistory();
       } catch (e) {
@@ -1210,12 +1210,12 @@ const pushHistory = (snapshot) => {
     }
   };
 
-  // Ãreas (perÃ­metro/puertas/obstÃ¡culos/pasillos)
+  // Áreas (perímetro/puertas/obstáculos/pasillos)
   const addArea = (area) => {
     const normalize = (a) => (Array.isArray(a) || a?.points ? a : []);
     if (tab === 'ceremony') setAreasCeremony((prev) => [...prev, normalize(area)]);
     else setAreasBanquet((prev) => [...prev, normalize(area)]);
-    // Guardar en historial tras aÃ±adir Ã¡rea
+    // Guardar en historial tras añadir área
     try { pushHistory(); } catch (_) {}
   };
   const deleteArea = (index) => {
@@ -1227,7 +1227,7 @@ const pushHistory = (snapshot) => {
     if (tab === 'ceremony') setAreasCeremony((prev) => upd(prev)); else setAreasBanquet((prev) => upd(prev));
   };
 
-  // GeneraciÃ³n de layouts
+  // Generación de layouts
   const generateSeatGrid = (
     configOrRows,
     maybeCols,
@@ -1387,7 +1387,7 @@ const pushHistory = (snapshot) => {
     setSeatsCeremony((prev) => prev.map((s) => (String(s.id) === String(seatId) ? { ...s, enabled: s.enabled === false ? true : !s.enabled } : s)));
   };
 
-  // SelecciÃ³n mÃºltiple directa desde el canvas (reemplazo o uniÃ³n)
+  // Selección múltiple directa desde el canvas (reemplazo o unión)
   const selectTables = (ids = [], append = false) => {
     try {
       const clean = Array.from(new Set((ids || []).map((x) => String(x))));
@@ -1407,7 +1407,7 @@ const pushHistory = (snapshot) => {
     } catch (_) {}
   };
 
-  // Auto-asignaciÃ³n y sugerencias bÃ¡sicas
+  // Auto-asignación y sugerencias básicas
   const autoAssignGuests = async () => {
     try {
       const pending = guests.filter((g) => !g.tableId && !g.table);
@@ -1509,7 +1509,7 @@ const pushHistory = (snapshot) => {
       );
     } else {
       score += 8;
-      reasons.push(buildReason('Mesa sin límite de asientos configurado', 8));
+      reasons.push(buildReason('Mesa sin l�mite de asientos configurado', 8));
     }
 
     const guestSide = String(guest?.side || '').toLowerCase();
@@ -1551,7 +1551,7 @@ const pushHistory = (snapshot) => {
         score += bonus;
         reasons.push(
           buildReason(
-            `Mesa con acompañantes del grupo ${companionGroup}`,
+            `Mesa con acompa�antes del grupo ${companionGroup}`,
             bonus
           )
         );
@@ -1621,7 +1621,7 @@ const pushHistory = (snapshot) => {
 
     if (desiredSeats > 1 && hasCapacityLimit && freeSeats - desiredSeats === 0) {
       score += 5;
-      reasons.push(buildReason('Encaja justo incluyendo acompañantes', 5));
+      reasons.push(buildReason('Encaja justo incluyendo acompa�antes', 5));
     }
 
     return { score, reasons };
@@ -1732,17 +1732,17 @@ const pushHistory = (snapshot) => {
         const box = getTableBox(t);
         const padded = expandBox(box, aisle / 2);
         const tid = String(t.id);
-        // 1) Perímetro
+        // 1) Per�metro
         if (boundary && !boxInsidePoly(box, boundary)) {
-          out.push({ type: 'perimeter', tableId: t.id, message: 'Fuera del perímetro' });
-          return; // prioriza perímetro
+          out.push({ type: 'perimeter', tableId: t.id, message: 'Fuera del per�metro' });
+          return; // prioriza per�metro
         }
-        // 2) Obstáculos/puertas
+        // 2) Obst�culos/puertas
         if (obstacles.some((o) => rectsOverlap(padded, o))) {
-          out.push({ type: 'obstacle', tableId: t.id, message: 'Colisión con obstáculo/puerta' });
+          out.push({ type: 'obstacle', tableId: t.id, message: 'Colisi�n con obst�culo/puerta' });
           return;
         }
-        // 3) Espaciado mínimo entre mesas
+        // 3) Espaciado m�nimo entre mesas
         const others = (tablesBanquet || []).filter((x) => String(x?.id) !== tid);
         const otherExpanded = others.map(getTableBox).map((b) => expandBox(b, aisle / 2));
         if (otherExpanded.some((o) => rectsOverlap(padded, o))) {
@@ -1802,11 +1802,11 @@ const pushHistory = (snapshot) => {
           const px = s.x || 0;
           const py = s.y || 0;
           if (cerBoundary && !pointInPoly(px, py, cerBoundary)) {
-            out.push({ type: 'perimeter', tableId: `S${s.id}`, message: 'Silla fuera del perímetro' });
+            out.push({ type: 'perimeter', tableId: `S${s.id}`, message: 'Silla fuera del per�metro' });
             return;
           }
           if (cerObstacles.some((o) => px >= o.minX && px <= o.maxX && py >= o.minY && py <= o.maxY)) {
-            out.push({ type: 'obstacle', tableId: `S${s.id}`, message: 'Silla sobre obstáculo/puerta' });
+            out.push({ type: 'obstacle', tableId: `S${s.id}`, message: 'Silla sobre obst�culo/puerta' });
           }
         });
       } catch (e) {
@@ -2130,7 +2130,7 @@ const smartConflictSuggestions = useMemo(() => {
   }, [guests, smartTableMeta, conflicts, smartConflictSuggestions]);
 
 
-  // Conflictos: perÃ­metro, obstÃ¡culos/puertas, pasillos (espaciado) y overbooking
+  // Conflictos: perímetro, obstáculos/puertas, pasillos (espaciado) y overbooking
   const guestMap = useMemo(() => {
     const map = new Map();
     (guests || []).forEach((guest) => {
@@ -2283,7 +2283,7 @@ const smartConflictSuggestions = useMemo(() => {
         reader.readAsDataURL(blob);
       });
     } catch (error) {
-      console.warn('No se pudo cargar el logotipo para la exportación', error);
+      console.warn('No se pudo cargar el logotipo para la exportaci�n', error);
       return null;
     }
   };
@@ -2418,8 +2418,8 @@ const smartConflictSuggestions = useMemo(() => {
       es: {
         reportTitle: 'Informe del plan de asientos',
         summary: 'Resumen general',
-        hallDimensions: 'Dimensiones del salón',
-        aisle: 'Pasillo mínimo',
+        hallDimensions: 'Dimensiones del sal�n',
+        aisle: 'Pasillo m�nimo',
         vipNotes: 'Notas de ceremonia',
         legend: 'Leyenda',
         guestList: 'Lista de invitados',
@@ -2436,9 +2436,9 @@ const smartConflictSuggestions = useMemo(() => {
         legendCapacity: 'Capacidad disponible',
         legendConflict: 'Conflictos detectados',
         legendNotes: 'Notas internas',
-        instructionsPasillos: 'Respeta el pasillo mínimo indicado para el montaje.',
+        instructionsPasillos: 'Respeta el pasillo m�nimo indicado para el montaje.',
         instructionsRevisar: 'Revisar el plano antes de la llegada de proveedores.',
-        instructionsCapacidad: 'Verificar que la capacidad asignada no exceda el máximo global.',
+        instructionsCapacidad: 'Verificar que la capacidad asignada no exceda el m�ximo global.',
         scale: 'Escala',
       },
       en: {
@@ -2690,9 +2690,9 @@ const exportDetailedPDF = async (options = {}) => {
       if (!allPoints.length) {
         pdf.text('No hay datos de mesas de banquete.', margin, margin + 10);
         renderLegend([
-          { color: [148, 163, 184], label: 'Perímetro' },
+          { color: [148, 163, 184], label: 'Per�metro' },
           { color: [203, 213, 225], label: 'Mesa' },
-          { color: [248, 113, 113], label: 'Obstáculo/Puerta' },
+          { color: [248, 113, 113], label: 'Obst�culo/Puerta' },
         ]);
         return;
       }
@@ -2760,9 +2760,9 @@ const exportDetailedPDF = async (options = {}) => {
       });
 
       renderLegend([
-        { color: [148, 163, 184], label: 'Perímetro' },
+        { color: [148, 163, 184], label: 'Per�metro' },
         { color: [203, 213, 225], label: 'Mesa' },
-        { color: [248, 113, 113], label: 'Obstáculo/Puerta' },
+        { color: [248, 113, 113], label: 'Obst�culo/Puerta' },
       ]);
     };
 
@@ -2780,7 +2780,7 @@ const exportDetailedPDF = async (options = {}) => {
         cursorY += 8;
         pdf.setFont('helvetica', 'bold');
         pdf.setFontSize(11);
-        pdf.text('Nombre  •  Estado  •  Mesa  •  Acompañantes  •  Dieta', marginX, cursorY);
+        pdf.text('Nombre  "  Estado  "  Mesa  "  Acompa�antes  "  Dieta', marginX, cursorY);
         cursorY += 6;
         pdf.setFont('helvetica', 'normal');
         pdf.setFontSize(10);
@@ -2819,14 +2819,14 @@ const exportDetailedPDF = async (options = {}) => {
           ? String(guest.table)
           : guest?.tableId != null
           ? tableNameById.get(String(guest.tableId)) || String(guest.tableId)
-          : '—';
+          : '';
         const line = [
-          guest?.name || '—',
-          guest?.response || guest?.status || '—',
+          guest?.name || '',
+          guest?.response || guest?.status || '',
           tableLabel,
           String(guest?.companion || 0),
-          guest?.dietaryRestrictions ? guest.dietaryRestrictions : '—',
-        ].join('  •  ');
+          guest?.dietaryRestrictions ? guest.dietaryRestrictions : '',
+        ].join('  "  ');
         ensureSpace(6);
         pdf.text(line, marginX, cursorY);
         cursorY += 6;
@@ -2923,14 +2923,14 @@ const exportDetailedPDF = async (options = {}) => {
         pdf.setFontSize(10);
         if (!section.guests.length) {
           ensureSpace(6);
-          pdf.text('—', marginX + 4, cursorY);
+          pdf.text('', marginX + 4, cursorY);
           cursorY += 6;
         } else {
           section.guests
             .sort((a, b) => (a?.name || '').localeCompare(b?.name || ''))
             .forEach((guest) => {
               ensureSpace(6);
-              pdf.text(`• ${guest?.name || 'Invitado sin nombre'}`, marginX + 4, cursorY);
+              pdf.text(`" ${guest?.name || 'Invitado sin nombre'}`, marginX + 4, cursorY);
               cursorY += 6;
             });
         }
@@ -2981,7 +2981,7 @@ const exportDetailedPDF = async (options = {}) => {
 
       if (!dietGroups.size) {
         ensureSpace(6);
-        pdf.text('No hay restricciones dietéticas registradas.', marginX, cursorY);
+        pdf.text('No hay restricciones diet�ticas registradas.', marginX, cursorY);
         cursorY += 6;
         return;
       }
@@ -3000,7 +3000,7 @@ const exportDetailedPDF = async (options = {}) => {
             .sort((a, b) => (a?.name || '').localeCompare(b?.name || ''))
             .forEach((guest) => {
               ensureSpace(6);
-              pdf.text(`• ${guest?.name || 'Invitado sin nombre'}`, marginX + 4, cursorY);
+              pdf.text(`" ${guest?.name || 'Invitado sin nombre'}`, marginX + 4, cursorY);
               cursorY += 6;
             });
         });
@@ -3057,7 +3057,7 @@ const exportDetailedPDF = async (options = {}) => {
           ...entry,
           guest,
           tableLabel,
-          displayName: guest?.name || entry.recipientName || '—',
+          displayName: guest?.name || entry.recipientName || '',
         };
       });
 
@@ -3077,7 +3077,7 @@ const exportDetailedPDF = async (options = {}) => {
           item.guest?.dietaryRestrictions ? `Dieta: ${item.guest.dietaryRestrictions}` : null,
         ]
           .filter(Boolean)
-          .join('  •  ');
+          .join('  "  ');
         if (details) {
           ensureSpace(6);
           pdf.text(details, marginX + 4, cursorY);
@@ -3412,7 +3412,7 @@ const exportDetailedSVG = (options = {}) => {
     };
   };
 
-  // Guardado de configuraciÃ³n
+  // Guardado de configuración
   const saveHallDimensions = async (width, height, aisleMin) => {
     const nextHall = { width, height };
     if (Number.isFinite(aisleMin)) nextHall.aisleMin = aisleMin;
@@ -3453,7 +3453,7 @@ const exportDetailedSVG = (options = {}) => {
           },
           { merge: true }
         );
-      } catch (err) { console.error('Error guardando dimensiones del salÃ³n:', err); }
+      } catch (err) { console.error('Error guardando dimensiones del salón:', err); }
     }
   };
   const saveGlobalMaxGuests = async (n) => {
@@ -3616,7 +3616,7 @@ const exportDetailedSVG = (options = {}) => {
           return { ok: true, type: action.type };
         }
         case 'focus-table': {
-          // Handler externo enfoca mesa; no mutamos estado aquí
+          // Handler externo enfoca mesa; no mutamos estado aqu�
           return { ok: true, type: action.type };
         }
         default:
@@ -3704,7 +3704,7 @@ const exportDetailedSVG = (options = {}) => {
     canvasRef,
     wsRef,
 
-    // Colaboración
+    // Colaboraci�n
     collaborators,
     collaborationStatus,
     locks,
@@ -3720,7 +3720,7 @@ const exportDetailedSVG = (options = {}) => {
     setPreview,
     setGuests,
 
-    // Funciones de gestiÃ³n
+    // Funciones de gestión
     handleSelectTable,
     handleTableDimensionChange,
     toggleSelectedTableShape,
@@ -3742,7 +3742,7 @@ const exportDetailedSVG = (options = {}) => {
     canUndo: historyPointer > 0,
     canRedo: historyPointer < history.length - 1,
 
-    // GeneraciÃ³n
+    // Generación
     generateSeatGrid,
     generateBanquetLayout,
     applyBanquetTables,
@@ -3755,7 +3755,7 @@ const exportDetailedSVG = (options = {}) => {
     exportSVG,
     exportAdvancedReport,
 
-    // ConfiguraciÃ³n
+    // Configuración
     saveHallDimensions,
     saveGlobalMaxGuests,
     saveBackground,
@@ -3778,7 +3778,7 @@ const exportDetailedSVG = (options = {}) => {
     smartInsights,
     vipRecipients,
 
-    // Invitados / auto-asignaciÃ³n / sugerencias
+    // Invitados / auto-asignación / sugerencias
     moveGuest,
     moveGuestToSeat,
     assignGuestToCeremonySeat,

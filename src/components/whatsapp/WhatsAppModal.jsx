@@ -1,4 +1,4 @@
-﻿import { MessageSquare, Smartphone, Send, Settings } from 'lucide-react';
+�import { MessageSquare, Smartphone, Send, Settings } from 'lucide-react';
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
 
 import {
@@ -12,9 +12,9 @@ import { Button } from '../ui';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../ui/Tabs';
 
 /**
- * Modal de Envío por WhatsApp
- * - Pestaña 1: Móvil personal (deeplink)
- * - Pestaña 2: Número de la app (API WhatsApp Business)
+ * Modal de Env�o por WhatsApp
+ * - Pesta�a 1: M�vil personal (deeplink)
+ * - Pesta�a 2: N�mero de la app (API WhatsApp Business)
  */
 export default function WhatsAppModal({
   open,
@@ -57,8 +57,8 @@ export default function WhatsAppModal({
   const canSend = !!guest && !!guest.phone;
 
   function buildDefaultMessage(g) {
-    if (!g) return '¡Hola! Queremos invitarte a nuestra boda. ¿Puedes confirmar tu asistencia?';
-    return `¡Hola ${g.name || ''}! Nos encantaría contar contigo en nuestra boda. ¿Puedes confirmar tu asistencia?`;
+    if (!g) return '�Hola! Queremos invitarte a nuestra boda. �Puedes confirmar tu asistencia?';
+    return `�Hola ${g.name || ''}! Nos encantar�a contar contigo en nuestra boda. �Puedes confirmar tu asistencia?`;
   }
 
   const deeplinkHref = useMemo(() => {
@@ -93,7 +93,7 @@ export default function WhatsAppModal({
   const handleSendApi = useCallback(async () => {
     if (!canSend) return;
     if (!provider.configured) {
-      alert('El proveedor de WhatsApp API aún no está configurado.');
+      alert('El proveedor de WhatsApp API a�n no est� configurado.');
       return;
     }
     await onSendApi?.(guest, message);
@@ -110,7 +110,7 @@ export default function WhatsAppModal({
             <h3 className="font-semibold">Enviar por WhatsApp</h3>
           </div>
           <button onClick={onClose} className="text-muted hover:text-body">
-            ×
+            �
           </button>
         </div>
 
@@ -118,17 +118,17 @@ export default function WhatsAppModal({
           <Tabs value={tab} onValueChange={setTab}>
             <TabsList className="flex space-x-6 border-b mb-4">
               <TabsTrigger value="personal" className="pb-2 flex items-center gap-2">
-                <Smartphone size={16} /> Móvil personal
+                <Smartphone size={16} /> M�vil personal
               </TabsTrigger>
               <TabsTrigger value="api" className="pb-2 flex items-center gap-2">
-                <Send size={16} /> Número de la app
+                <Send size={16} /> N�mero de la app
               </TabsTrigger>
             </TabsList>
 
             <TabsContent value="personal" className="space-y-4">
               <p className="text-sm text-muted">
-                Se abrirá WhatsApp en tu dispositivo con el mensaje preparado. Podrás confirmar el
-                envío manualmente.
+                Se abrir� WhatsApp en tu dispositivo con el mensaje preparado. Podr�s confirmar el
+                env�o manualmente.
               </p>
 
               <div>
@@ -164,7 +164,7 @@ export default function WhatsAppModal({
                 <div>
                   Estado del proveedor:{' '}
                   {loadingProvider
-                    ? 'Comprobando…'
+                    ? 'Comprobando&'
                     : provider.configured
                       ? 'Configurado'
                       : 'No configurado'}
@@ -191,12 +191,12 @@ export default function WhatsAppModal({
                         }
                       }}
                     >
-                      Ver métricas
+                      Ver m�tricas
                     </button>
                     {showMetrics && (
                       <div className="mt-2 border rounded p-2 bg-surface">
                         {loadingMetrics ? (
-                          <div>Cargando métricas…</div>
+                          <div>Cargando m�tricas&</div>
                         ) : metrics ? (
                           <div className="text-[11px] text-body">
                             <div>Total: {metrics.total || 0}</div>
@@ -232,12 +232,12 @@ export default function WhatsAppModal({
                   onClick={onSendApiBulk}
                   title="Enviar a invitados pendientes (API)"
                 >
-                  Másivo: pendientes
+                  M�sivo: pendientes
                 </Button>
               </div>
               {!provider.configured && (
                 <div className="mt-2 text-xs text-muted">
-                  Nota: El proveedor API no está listo. Puedes usar la pestaña &quot;Móvil
+                  Nota: El proveedor API no est� listo. Puedes usar la pesta�a &quot;M�vil
                   personal&quot; (deeplink) como alternativa.
                 </div>
               )}

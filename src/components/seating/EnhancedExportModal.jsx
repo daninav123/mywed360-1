@@ -1,6 +1,6 @@
 /**
- * EnhancedExportModal - Modal de exportación mejorado con watermark y opciones
- * FASE 3.2: Exportación Mejorada
+ * EnhancedExportModal - Modal de exportaci�n mejorado con watermark y opciones
+ * FASE 3.2: Exportaci�n Mejorada
  */
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -37,7 +37,7 @@ const EXPORT_FORMATS = [
     id: 'svg',
     name: 'SVG (Vector)',
     icon: FileImage,
-    description: 'Escalable sin pérdida',
+    description: 'Escalable sin p�rdida',
     color: 'purple',
     premium: true,
   },
@@ -52,7 +52,7 @@ const EXPORT_FORMATS = [
 ];
 
 const QUALITY_OPTIONS = [
-  { id: 'low', name: 'Baja', dpi: 72, size: 'Pequeño' },
+  { id: 'low', name: 'Baja', dpi: 72, size: 'Peque�o' },
   { id: 'medium', name: 'Media', dpi: 150, size: 'Normal' },
   { id: 'high', name: 'Alta', dpi: 300, size: 'Grande' },
   { id: 'ultra', name: 'Ultra', dpi: 600, size: 'Muy Grande', premium: true },
@@ -129,7 +129,7 @@ export default function EnhancedExportModal({
               <div>
                 <h2 className="text-xl font-bold">Exportar Layout</h2>
                 <p className="text-blue-100 text-sm">
-                  {tableCount} mesas • {guestCount} invitados
+                  {tableCount} mesas " {guestCount} invitados
                 </p>
               </div>
             </div>
@@ -146,7 +146,7 @@ export default function EnhancedExportModal({
           {/* Formato */}
           <div>
             <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-3">
-              Formato de Exportación
+              Formato de Exportaci�n
             </label>
             <div className="grid grid-cols-2 gap-3">
               {EXPORT_FORMATS.map((format) => {
@@ -196,7 +196,7 @@ export default function EnhancedExportModal({
             </div>
           </div>
 
-          {/* Calidad (solo para imágenes) */}
+          {/* Calidad (solo para im�genes) */}
           {['png', 'svg'].includes(selectedFormat) && (
             <div>
               <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-3">
@@ -248,7 +248,7 @@ export default function EnhancedExportModal({
                   className="w-4 h-4 text-blue-600 rounded"
                 />
                 <span className="text-sm text-gray-700 dark:text-gray-300">
-                  Incluir estadísticas (mesas, invitados, capacidad)
+                  Incluir estad�sticas (mesas, invitados, capacidad)
                 </span>
               </label>
 
@@ -260,7 +260,7 @@ export default function EnhancedExportModal({
                   className="w-4 h-4 text-blue-600 rounded"
                 />
                 <span className="text-sm text-gray-700 dark:text-gray-300">
-                  Incluir fecha y hora de exportación
+                  Incluir fecha y hora de exportaci�n
                 </span>
               </label>
 
@@ -309,7 +309,7 @@ export default function EnhancedExportModal({
           {/* Tema */}
           <div>
             <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-3">
-              Tema de Exportación
+              Tema de Exportaci�n
             </label>
             <div className="grid grid-cols-3 gap-2">
               {['light', 'dark', 'elegant'].map((theme) => (
@@ -324,9 +324,9 @@ export default function EnhancedExportModal({
                     }
                   `}
                 >
-                  {theme === 'light' && '☀️'}
-                  {theme === 'dark' && '🌙'}
-                  {theme === 'elegant' && '✨'}
+                  {theme === 'light' && ' '}
+                  {theme === 'dark' && '<'}
+                  {theme === 'elegant' && '('}
                   {' '}{theme}
                 </button>
               ))}
@@ -379,7 +379,7 @@ export default function EnhancedExportModal({
                 ) : exportSuccess ? (
                   <>
                     <CheckCircle2 className="w-4 h-4" />
-                    ¡Exportado!
+                    �Exportado!
                   </>
                 ) : (
                   <>

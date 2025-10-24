@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useMemo, useState } from 'react';
+�import React, { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
@@ -59,7 +59,7 @@ export default function MomentosGuest() {
     const initialize = async () => {
       try {
         if (!tokenParam || !weddingId) {
-          throw new Error('El enlace está incompleto. Solicita un nuevo QR al anfitrión.');
+          throw new Error('El enlace est� incompleto. Solicita un nuevo QR al anfitri�n.');
         }
         await firebaseReady;
         const tokenData = await validateGuestToken(weddingId, tokenParam, { albumId: ALBUM_ID });
@@ -72,8 +72,8 @@ export default function MomentosGuest() {
           ALBUM_ID
         );
       } catch (error) {
-        console.error('Validación de token de la galería de recuerdos', error);
-        setErrorMessage(error?.message || 'Este enlace ya no es válido.');
+        console.error('Validaci�n de token de la galer�a de recuerdos', error);
+        setErrorMessage(error?.message || 'Este enlace ya no es v�lido.');
         setStatus('error');
       }
     };
@@ -93,7 +93,7 @@ export default function MomentosGuest() {
     if (status === 'error') return;
     setStatus('closed');
     setErrorMessage(
-      `La galería dejó de aceptar fotos el ${formatDate(uploadState.closesAt)}.`
+      `La galer�a dej� de aceptar fotos el ${formatDate(uploadState.closesAt)}.`
     );
   }, [uploadState, status]);
 
@@ -132,11 +132,11 @@ export default function MomentosGuest() {
       return;
     }
     if (!acceptedTerms) {
-      toast.warn('Debes aceptar la política de privacidad');
+      toast.warn('Debes aceptar la pol�tica de privacidad');
       return;
     }
     if (uploadsClosed) {
-      toast.warn('Esta galería ya no acepta nuevas fotos.');
+      toast.warn('Esta galer�a ya no acepta nuevas fotos.');
       setStatus('closed');
       return;
     }
@@ -151,11 +151,11 @@ export default function MomentosGuest() {
       ...prev.slice(0, 4),
     ]);
     if (nextCount === 1) {
-      toast.success('🏅 ¡Logro desbloqueado! Primer recuerdo compartido ✨');
+      toast.success('<� �Logro desbloqueado! Primer recuerdo compartido (');
     } else if (nextCount === 3) {
-      toast.success('🎉 ¡Eres un colaborador entusiasta! Sigue compartiendo recuerdos.');
+      toast.success('<� �Eres un colaborador entusiasta! Sigue compartiendo recuerdos.');
     } else if (nextCount === 5) {
-      toast.success('🌟 ¡Recuerdos Estrella! Tus fotos darán vida al slideshow.');
+      toast.success('< �Recuerdos Estrella! Tus fotos dar�n vida al slideshow.');
     } else {
       toast.success('Foto enviada correctamente');
     }
@@ -170,7 +170,7 @@ export default function MomentosGuest() {
       <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
         <div className="bg-white border border-slate-200 rounded-xl shadow-sm px-6 py-8 space-y-3 text-center">
           <div className="animate-spin h-8 w-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto"></div>
-          <p className="text-sm text-slate-600">Preparando tu espacio para compartir recuerdos…</p>
+          <p className="text-sm text-slate-600">Preparando tu espacio para compartir recuerdos&</p>
         </div>
       </div>
     );
@@ -180,7 +180,7 @@ export default function MomentosGuest() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
         <div className="bg-white border border-red-100 rounded-xl shadow-sm px-6 py-8 max-w-md text-center space-y-3">
-          <h1 className="text-xl font-semibold text-red-600">No pudimos abrir la galería de recuerdos</h1>
+          <h1 className="text-xl font-semibold text-red-600">No pudimos abrir la galer�a de recuerdos</h1>
           <p className="text-sm text-slate-600">{errorMessage}</p>
           <p className="text-xs text-slate-400">
             Si crees que es un error, ponte en contacto con la pareja anfitriona para solicitar un nuevo enlace.
@@ -194,13 +194,13 @@ export default function MomentosGuest() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
         <div className="bg-white border border-amber-100 rounded-xl shadow-sm px-6 py-8 max-w-md text-center space-y-3">
-          <h1 className="text-xl font-semibold text-amber-600">La galería está cerrada</h1>
+          <h1 className="text-xl font-semibold text-amber-600">La galer�a est� cerrada</h1>
           <p className="text-sm text-slate-600">
             {errorMessage ||
-              `El periodo para subir fotos terminó${uploadState?.closesAt ? ` el ${formatDate(uploadState.closesAt)}` : ''}.`}
+              `El periodo para subir fotos termin�${uploadState?.closesAt ? ` el ${formatDate(uploadState.closesAt)}` : ''}.`}
           </p>
           <p className="text-xs text-slate-400">
-            Si todavía tienes recuerdos que compartir, avisa a la pareja anfitriona para que reabra el enlace.
+            Si todav�a tienes recuerdos que compartir, avisa a la pareja anfitriona para que reabra el enlace.
           </p>
         </div>
       </div>
@@ -219,24 +219,24 @@ export default function MomentosGuest() {
               Recuerdos compartidos
             </p>
             <h1 className="text-2xl font-semibold text-slate-800">
-              ¡Gracias por capturar recuerdos!
+              �Gracias por capturar recuerdos!
             </h1>
             <p className="text-sm text-slate-500">
-              Sube tus fotos favoritas del evento. El anfitrión podrá revisarlas y mostrarlas en el slideshow en vivo.
+              Sube tus fotos favoritas del evento. El anfitri�n podr� revisarlas y mostrarlas en el slideshow en vivo.
             </p>
             {uploadState?.closesAt && (
               <p className="text-xs text-slate-400">
-                La galería admite nuevas fotos hasta {formatDate(uploadState.closesAt)}.
+                La galer�a admite nuevas fotos hasta {formatDate(uploadState.closesAt)}.
               </p>
             )}
             {uploadState?.isWindowOpen && remainingDays !== null && remainingDays >= 0 && (
               <p className="text-xs text-slate-400">
-                Te quedan {remainingDays === 1 ? '1 día' : `${remainingDays} días`} para compartir recuerdos.
+                Te quedan {remainingDays === 1 ? '1 d�a' : `${remainingDays} d�as`} para compartir recuerdos.
               </p>
             )}
             {uploadState?.compressionActive && (
               <p className="text-xs text-slate-400">
-                Las fotos se optimizarán automáticamente para no ocupar tanto espacio.
+                Las fotos se optimizar�n autom�ticamente para no ocupar tanto espacio.
               </p>
             )}
           </header>
@@ -258,13 +258,13 @@ export default function MomentosGuest() {
 
             <div>
               <label className="block text-sm font-medium text-slate-700">
-                Correo electrónico (opcional)
+                Correo electr�nico (opcional)
               </label>
               <input
                 type="email"
                 value={guestEmail}
                 onChange={(event) => setGuestEmail(event.target.value)}
-                placeholder="Te avisaremos cuando tus fotos estén destacadas"
+                placeholder="Te avisaremos cuando tus fotos est�n destacadas"
                 className="mt-1 w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -290,7 +290,7 @@ export default function MomentosGuest() {
             Comenzar a subir fotos
           </button>
           <p className="text-xs text-slate-400 text-center">
-            Tip: las fotos se agrupan por escena (ceremonia, banquete, fiesta…) para ayudar al anfitrión.
+            Tip: las fotos se agrupan por escena (ceremonia, banquete, fiesta&) para ayudar al anfitri�n.
           </p>
         </form>
       </div>
@@ -310,15 +310,15 @@ export default function MomentosGuest() {
             Recuerdos colaborativos
           </p>
           <h1 className="text-xl font-semibold text-slate-800">
-            Hola, {guestName || 'Invitado'} 👋
+            Hola, {guestName || 'Invitado'} =K
           </h1>
           <p className="text-sm text-slate-600">
             Sube hasta {remainingUploads !== null ? `${remainingUploads} fotos adicionales` : 'todas las fotos que quieras'}.
-            El anfitrión revisará y las compartirá con el grupo.
+            El anfitri�n revisar� y las compartir� con el grupo.
           </p>
           {uploadState?.isWindowOpen && remainingDays !== null && remainingDays >= 0 && (
             <p className="text-xs text-slate-400">
-              Aún tienes {remainingDays === 1 ? '1 día' : `${remainingDays} días`} para enviar tus mejores fotos.
+              A�n tienes {remainingDays === 1 ? '1 d�a' : `${remainingDays} d�as`} para enviar tus mejores fotos.
             </p>
           )}
           {uploadState?.closesAt && (
@@ -328,7 +328,7 @@ export default function MomentosGuest() {
           )}
           {uploadState?.compressionActive && (
             <p className="text-xs text-slate-400">
-              Las fotos nuevas se optimizan automáticamente para ahorrar espacio.
+              Las fotos nuevas se optimizan autom�ticamente para ahorrar espacio.
             </p>
           )}
         </header>
@@ -347,7 +347,7 @@ export default function MomentosGuest() {
           <h2 className="text-lg font-semibold text-slate-800">Tus progresos</h2>
           <p className="text-sm text-slate-500">
             Has compartido <strong>{uploadedCount}</strong> {uploadedCount === 1 ? 'foto' : 'fotos'}.
-            ¡Gracias por sumar a los recuerdos!
+            �Gracias por sumar a los recuerdos!
           </p>
           {recentUploads.length > 0 && (
             <div className="space-y-2">
@@ -359,16 +359,16 @@ export default function MomentosGuest() {
                   <div className="min-w-0">
                     <p className="font-medium text-slate-700 truncate">{item.name}</p>
                     <p className="text-xs text-slate-400">
-                      Escena: {item.scene} · {Math.round(item.size / 1024)} KB
+                      Escena: {item.scene} � {Math.round(item.size / 1024)} KB
                     </p>
                   </div>
-                  <span className="text-xs text-green-600 font-semibold">En revisión</span>
+                  <span className="text-xs text-green-600 font-semibold">En revisi�n</span>
                 </div>
               ))}
             </div>
           )}
           <p className="text-xs text-slate-400">
-            Las fotos aprobadas aparecerán en el slideshow del evento y en la galería final. El anfitrión avisará cuando estén listas.
+            Las fotos aprobadas aparecer�n en el slideshow del evento y en la galer�a final. El anfitri�n avisar� cuando est�n listas.
           </p>
         </section>
       </div>

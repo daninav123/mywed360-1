@@ -1,6 +1,6 @@
 /**
  * Gamification Service
- * Sistema de gamificación con triggers para eventos
+ * Sistema de gamificaci�n con triggers para eventos
  * Sprint 2 - Completar Seating Plan
  */
 
@@ -8,7 +8,7 @@ import { doc, setDoc, getDoc, updateDoc, increment, serverTimestamp } from 'fire
 import { db } from '../firebaseConfig';
 
 /**
- * Definición de achievements/logros
+ * Definici�n de achievements/logros
  */
 export const ACHIEVEMENTS = {
   // Seating Plan
@@ -16,15 +16,15 @@ export const ACHIEVEMENTS = {
     id: 'first_table_created',
     name: 'Primera Mesa',
     description: 'Creaste tu primera mesa',
-    icon: '🪑',
+    icon: '>�',
     points: 10,
     category: 'seating'
   },
   FIRST_LAYOUT_COMPLETE: {
     id: 'first_layout_complete',
-    name: 'Distribución Completa',
+    name: 'Distribuci�n Completa',
     description: 'Completaste tu primer layout',
-    icon: '✅',
+    icon: '',
     points: 50,
     category: 'seating'
   },
@@ -32,7 +32,7 @@ export const ACHIEVEMENTS = {
     id: 'layout_ceremony_ready',
     name: 'Ceremonia Lista',
     description: 'Layout de ceremonia completado',
-    icon: '💒',
+    icon: '=�',
     points: 75,
     category: 'seating'
   },
@@ -40,7 +40,7 @@ export const ACHIEVEMENTS = {
     id: 'layout_banquet_ready',
     name: 'Banquete Listo',
     description: 'Layout de banquete completado',
-    icon: '🍽️',
+    icon: '<}',
     points: 100,
     category: 'seating'
   },
@@ -48,7 +48,7 @@ export const ACHIEVEMENTS = {
     id: 'all_guests_seated',
     name: 'Todos Sentados',
     description: 'Asignaste todos los invitados',
-    icon: '👥',
+    icon: '=e',
     points: 150,
     category: 'seating'
   },
@@ -56,7 +56,7 @@ export const ACHIEVEMENTS = {
     id: 'seating_perfectionist',
     name: 'Perfeccionista',
     description: 'Sin conflictos de asientos',
-    icon: '⭐',
+    icon: 'P',
     points: 200,
     category: 'seating'
   },
@@ -65,8 +65,8 @@ export const ACHIEVEMENTS = {
   FIRST_COLLABORATION: {
     id: 'first_collaboration',
     name: 'Trabajo en Equipo',
-    description: 'Primera colaboración en tiempo real',
-    icon: '🤝',
+    description: 'Primera colaboraci�n en tiempo real',
+    icon: '>',
     points: 25,
     category: 'collaboration'
   },
@@ -74,7 +74,7 @@ export const ACHIEVEMENTS = {
     id: 'frequent_collaborator',
     name: 'Colaborador Frecuente',
     description: '10+ sesiones colaborativas',
-    icon: '👫',
+    icon: '=k',
     points: 100,
     category: 'collaboration'
   },
@@ -84,7 +84,7 @@ export const ACHIEVEMENTS = {
     id: 'first_rsvp_sent',
     name: 'Primeras Invitaciones',
     description: 'Enviaste tus primeras invitaciones',
-    icon: '✉️',
+    icon: '	',
     points: 20,
     category: 'rsvp'
   },
@@ -92,7 +92,7 @@ export const ACHIEVEMENTS = {
     id: 'rsvp_50_percent',
     name: 'Medio Camino',
     description: '50% de respuestas RSVP',
-    icon: '📊',
+    icon: '=�',
     points: 50,
     category: 'rsvp'
   },
@@ -100,7 +100,7 @@ export const ACHIEVEMENTS = {
     id: 'rsvp_100_percent',
     name: 'Confirmaciones Completas',
     description: '100% de respuestas RSVP',
-    icon: '🎯',
+    icon: '<�',
     points: 200,
     category: 'rsvp'
   },
@@ -110,15 +110,15 @@ export const ACHIEVEMENTS = {
     id: 'budget_created',
     name: 'Presupuesto Inicial',
     description: 'Creaste tu presupuesto',
-    icon: '💰',
+    icon: '=�',
     points: 15,
     category: 'finance'
   },
   BUDGET_ON_TRACK: {
     id: 'budget_on_track',
     name: 'Bajo Control',
-    description: 'Presupuesto dentro del límite',
-    icon: '📈',
+    description: 'Presupuesto dentro del l�mite',
+    icon: '=�',
     points: 100,
     category: 'finance'
   },
@@ -128,7 +128,7 @@ export const ACHIEVEMENTS = {
     id: 'first_task_completed',
     name: 'Primera Tarea',
     description: 'Completaste tu primera tarea',
-    icon: '✓',
+    icon: '',
     points: 10,
     category: 'tasks'
   },
@@ -136,7 +136,7 @@ export const ACHIEVEMENTS = {
     id: 'task_master',
     name: 'Maestro de Tareas',
     description: '50+ tareas completadas',
-    icon: '🏆',
+    icon: '<�',
     points: 150,
     category: 'tasks'
   },
@@ -146,7 +146,7 @@ export const ACHIEVEMENTS = {
     id: 'wedding_date_set',
     name: 'Fecha Elegida',
     description: 'Estableciste la fecha de la boda',
-    icon: '📅',
+    icon: '=�',
     points: 50,
     category: 'milestone'
   },
@@ -154,39 +154,39 @@ export const ACHIEVEMENTS = {
     id: 'venue_selected',
     name: 'Lugar Reservado',
     description: 'Seleccionaste el lugar',
-    icon: '🏛️',
+    icon: '<�',
     points: 100,
     category: 'milestone'
   },
   SIX_MONTHS_TO_GO: {
     id: 'six_months_to_go',
-    name: '6 Meses Para El Día',
+    name: '6 Meses Para El D�a',
     description: 'Faltan 6 meses',
-    icon: '⏰',
+    icon: '�',
     points: 75,
     category: 'milestone'
   },
   ONE_MONTH_TO_GO: {
     id: 'one_month_to_go',
-    name: '¡Un Mes!',
+    name: '�Un Mes!',
     description: 'Falta solo un mes',
-    icon: '🎉',
+    icon: '<�',
     points: 100,
     category: 'milestone'
   }
 };
 
 /**
- * Niveles de gamificación
+ * Niveles de gamificaci�n
  */
 export const LEVELS = [
-  { level: 1, name: 'Novato', minPoints: 0, maxPoints: 99, icon: '🌱' },
-  { level: 2, name: 'Aprendiz', minPoints: 100, maxPoints: 249, icon: '📚' },
-  { level: 3, name: 'Organizador', minPoints: 250, maxPoints: 499, icon: '📋' },
-  { level: 4, name: 'Planificador', minPoints: 500, maxPoints: 999, icon: '🎯' },
-  { level: 5, name: 'Experto', minPoints: 1000, maxPoints: 1999, icon: '⭐' },
-  { level: 6, name: 'Maestro', minPoints: 2000, maxPoints: 3999, icon: '👑' },
-  { level: 7, name: 'Leyenda', minPoints: 4000, maxPoints: Infinity, icon: '🏆' }
+  { level: 1, name: 'Novato', minPoints: 0, maxPoints: 99, icon: '<1' },
+  { level: 2, name: 'Aprendiz', minPoints: 100, maxPoints: 249, icon: '=�' },
+  { level: 3, name: 'Organizador', minPoints: 250, maxPoints: 499, icon: '=�' },
+  { level: 4, name: 'Planificador', minPoints: 500, maxPoints: 999, icon: '<�' },
+  { level: 5, name: 'Experto', minPoints: 1000, maxPoints: 1999, icon: 'P' },
+  { level: 6, name: 'Maestro', minPoints: 2000, maxPoints: 3999, icon: '=Q' },
+  { level: 7, name: 'Leyenda', minPoints: 4000, maxPoints: Infinity, icon: '<�' }
 ];
 
 /**
@@ -215,7 +215,7 @@ class GamificationService {
   }
 
   /**
-   * Registra un evento de gamificación
+   * Registra un evento de gamificaci�n
    */
   async triggerEvent(userId, weddingId, eventType, metadata = {}) {
     try {
@@ -335,7 +335,7 @@ class GamificationService {
   }
 
   /**
-   * Registra un listener para eventos de gamificación
+   * Registra un listener para eventos de gamificaci�n
    */
   on(userId, callback) {
     if (!this.listeners.has(userId)) {
@@ -343,7 +343,7 @@ class GamificationService {
     }
     this.listeners.get(userId).push(callback);
 
-    // Retornar función para desregistrar
+    // Retornar funci�n para desregistrar
     return () => {
       const callbacks = this.listeners.get(userId) || [];
       const index = callbacks.indexOf(callback);
@@ -368,7 +368,7 @@ class GamificationService {
   }
 
   /**
-   * Triggers específicos para Seating Plan
+   * Triggers espec�ficos para Seating Plan
    */
   async seatingTriggers(userId, weddingId) {
     return {
@@ -388,7 +388,7 @@ const gamificationService = new GamificationService();
 export default gamificationService;
 
 /**
- * Hook de React para usar gamificación
+ * Hook de React para usar gamificaci�n
  */
 export function useGamification(userId) {
   const [progress, setProgress] = React.useState(null);
@@ -413,8 +413,8 @@ export function useGamification(userId) {
           achievements: [...(prev?.achievements || []), event.achievement.id]
         }));
 
-        // Mostrar notificación (opcional)
-        console.log('🎉 Achievement unlocked:', event.achievement.name);
+        // Mostrar notificaci�n (opcional)
+        console.log('<� Achievement unlocked:', event.achievement.name);
       }
     });
 

@@ -18,7 +18,7 @@ import { EXPENSE_CATEGORIES } from '../../services/financeService';
 /**
  * BudgetDashboard
  * @param {Object} props
- * @param {Object} props.stats - Estadísticas del presupuesto
+ * @param {Object} props.stats - Estad�sticas del presupuesto
  * @param {Object} props.budget - Datos del presupuesto
  * @param {Array} props.expenses - Lista de gastos
  */
@@ -26,7 +26,7 @@ export function BudgetDashboard({ stats, budget, expenses = [] }) {
   if (!stats) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-500">Cargando estadísticas...</p>
+        <p className="text-gray-500">Cargando estad�sticas...</p>
       </div>
     );
   }
@@ -107,7 +107,7 @@ export function BudgetDashboard({ stats, budget, expenses = [] }) {
           </div>
           {isOverBudget && (
             <div className="mt-1 text-sm text-red-500">
-              ¡Sobre presupuesto!
+              �Sobre presupuesto!
             </div>
           )}
         </div>
@@ -128,14 +128,14 @@ export function BudgetDashboard({ stats, budget, expenses = [] }) {
               <h4 className={`font-semibold ${
                 isOverBudget ? 'text-red-900 dark:text-red-200' : 'text-yellow-900 dark:text-yellow-200'
               }`}>
-                {isOverBudget ? 'Presupuesto Excedido' : 'Cerca del Límite'}
+                {isOverBudget ? 'Presupuesto Excedido' : 'Cerca del L�mite'}
               </h4>
               <p className={`text-sm mt-1 ${
                 isOverBudget ? 'text-red-700 dark:text-red-300' : 'text-yellow-700 dark:text-yellow-300'
               }`}>
                 {isOverBudget 
                   ? `Has excedido el presupuesto en $${Math.abs(stats.remaining).toLocaleString()}. Considera revisar tus gastos.`
-                  : `Has usado el ${stats.percentageUsed.toFixed(1)}% de tu presupuesto. Te acercas al límite.`
+                  : `Has usado el ${stats.percentageUsed.toFixed(1)}% de tu presupuesto. Te acercas al l�mite.`
                 }
               </p>
             </div>
@@ -167,10 +167,10 @@ export function BudgetDashboard({ stats, budget, expenses = [] }) {
         </div>
       </div>
 
-      {/* Gastos por Categoría */}
+      {/* Gastos por Categor�a */}
       <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          Gastos por Categoría
+          Gastos por Categor�a
         </h3>
         <div className="space-y-3">
           {Object.values(stats.byCategory)

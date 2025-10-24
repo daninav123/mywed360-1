@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useMemo, useState } from 'react';
+�import React, { useEffect, useMemo, useState } from 'react';
 
 import {
   getInviteTemplate,
@@ -16,13 +16,13 @@ function InviteTemplateModal({ open, onClose, onSaved, coupleName = 'Ana y Luis'
       const current = getInviteTemplate();
       setValue(current);
       try {
-        wh('TemplateModal – open', { length: current?.length || 0 });
+        wh('TemplateModal  open', { length: current?.length || 0 });
       } catch {}
     }
   }, [open]);
 
   const preview = useMemo(
-    () => renderInviteMessage('María', { coupleName }),
+    () => renderInviteMessage('Mar�a', { coupleName }),
     [value, coupleName]
   );
 
@@ -30,7 +30,7 @@ function InviteTemplateModal({ open, onClose, onSaved, coupleName = 'Ana y Luis'
     let next = value;
     if (next && !next.includes('{coupleName}')) {
       const confirmed = window.confirm(
-        'El mensaje no incluye {coupleName}. Se añadirá automáticamente para identificar a la pareja.'
+        'El mensaje no incluye {coupleName}. Se a�adir� autom�ticamente para identificar a la pareja.'
       );
       if (!confirmed) return;
       next = `${next.trim()}\n\nSomos {coupleName}`;
@@ -39,7 +39,7 @@ function InviteTemplateModal({ open, onClose, onSaved, coupleName = 'Ana y Luis'
     const ok = setInviteTemplate(next);
     if (ok) {
       try {
-        wh('TemplateModal – saved', { length: next.length });
+        wh('TemplateModal  saved', { length: next.length });
       } catch {}
       onSaved?.(next);
     } else {
@@ -59,17 +59,17 @@ function InviteTemplateModal({ open, onClose, onSaved, coupleName = 'Ana y Luis'
             rows={6}
             value={value}
             onChange={(e) => setValue(e.target.value)}
-            placeholder="¡Hola {guestName}! …"
+            placeholder="�Hola {guestName}! &"
           />
           <div className="text-xs text-gray-500 mt-1 space-y-1">
             <div>Variables disponibles:</div>
-            <div>{`{guestName}`} → María</div>
-            <div>{`{coupleName}`} → {coupleName}</div>
+            <div>{`{guestName}`} � Mar�a</div>
+            <div>{`{coupleName}`} � {coupleName}</div>
           </div>
         </div>
 
         <div>
-          <div className="text-sm font-medium text-gray-700 mb-1">Previsualización</div>
+          <div className="text-sm font-medium text-gray-700 mb-1">Previsualizaci�n</div>
           <div className="border rounded-md p-3 bg-gray-50 text-sm whitespace-pre-wrap">
             {preview}
           </div>

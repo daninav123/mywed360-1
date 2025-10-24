@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useMemo, useState } from 'react';
+�import React, { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 export default function SupplierPortal() {
@@ -70,15 +70,15 @@ export default function SupplierPortal() {
     }
   };
 
-  if (state.loading) return <div className="p-6 text-center">Cargando…</div>;
+  if (state.loading) return <div className="p-6 text-center">Cargando&</div>;
   if (state.error)
-    return <div className="p-6 text-center text-red-700">Enlace no válido o expirado</div>;
+    return <div className="p-6 text-center text-red-700">Enlace no v�lido o expirado</div>;
 
   if (sent) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
         <div className="max-w-lg w-full bg-white border rounded-xl p-6 text-center">
-          <h1 className="text-2xl font-semibold mb-2">¡Gracias!</h1>
+          <h1 className="text-2xl font-semibold mb-2">�Gracias!</h1>
           <p className="text-gray-600">
             Hemos recibido su respuesta. Nos pondremos en contacto en breve.
           </p>
@@ -93,11 +93,11 @@ export default function SupplierPortal() {
         <header className="mb-6">
           <h1 className="text-2xl font-semibold">Portal del Proveedor</h1>
           <p className="text-gray-600">
-            Boda: <strong>{w.name}</strong> {w.date ? `· ${String(w.date).slice(0, 10)}` : ''}{' '}
-            {w.location ? `· ${w.location}` : ''}
+            Boda: <strong>{w.name}</strong> {w.date ? `� ${String(w.date).slice(0, 10)}` : ''}{' '}
+            {w.location ? `� ${w.location}` : ''}
           </p>
           <p className="text-gray-600">
-            Proveedor: <strong>{s.name}</strong> {s.service ? `· ${s.service}` : ''}
+            Proveedor: <strong>{s.name}</strong> {s.service ? `� ${s.service}` : ''}
           </p>
         </header>
 
@@ -184,7 +184,7 @@ export default function SupplierPortal() {
               rows={3}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Descripción o detalle del presupuesto"
+              placeholder="Descripci�n o detalle del presupuesto"
             />
           </div>
 
@@ -194,7 +194,7 @@ export default function SupplierPortal() {
               disabled={sending}
               className="px-4 py-2 rounded bg-indigo-600 text-white disabled:opacity-50"
             >
-              {sending ? 'Enviando…' : 'Enviar'}
+              {sending ? 'Enviando&' : 'Enviar'}
             </button>
           </div>
         </form>

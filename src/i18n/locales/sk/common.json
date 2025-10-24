@@ -2,50 +2,50 @@
   "app": {
     "name": "MaLove.App",
     "brandName": "MaLoveApp",
-    "tagline": "Vaša dokonalá svadba, digitálne zorganizovaná",
-    "loading": "Načítava sa...",
+    "tagline": "Vaaa dokonal� svadba, digit�lne zorganizovan�",
+    "loading": "Na�tava sa...",
     "error": "Chyba",
-    "success": "Úspešné",
-    "cancel": "Zrušiť",
-    "save": "Uložiť",
-    "delete": "Vymazať",
-    "edit": "Upraviť",
-    "add": "Pridať",
-    "search": "Hľadať",
-    "filter": "Filtrovať",
-    "close": "Zavrieť",
-    "open": "Otvoriť",
-    "yes": "Áno",
+    "success": "�spean�",
+    "cancel": "Zruaie",
+    "save": "Ulo~ie",
+    "delete": "Vymazae",
+    "edit": "Upravie",
+    "add": "Pridae",
+    "search": "H>adae",
+    "filter": "Filtrovae",
+    "close": "Zavriee",
+    "open": "Otvorie",
+    "yes": "�no",
     "no": "Nie",
     "ok": "OK",
-    "back": "Späť",
-    "next": "Ďalej",
-    "previous": "Predchádzajúce",
-    "continue": "Pokračovať",
-    "finish": "Dokončiť"
+    "back": "Sp�e",
+    "next": "alej",
+    "previous": "Predch�dzaj�ce",
+    "continue": "Pokraovae",
+    "finish": "Dokonie"
   },
   "navigation": {
     "home": "Domov",
-    "dashboard": "Prehľad",
+    "dashboard": "Preh>ad",
     "guests": "Hostia",
-    "providers": "Dodávatelia",
+    "providers": "Dod�vatelia",
     "finance": "Financie",
-    "seating": "Zasadací poriadok",
+    "seating": "Zasadac� poriadok",
     "email": "E-mail",
     "protocol": "Protokol",
     "designs": "Dizajny",
-    "website": "Svadobná stránka",
+    "website": "Svadobn� str�nka",
     "contracts": "Zmluvy",
-    "tasks": "Úlohy",
+    "tasks": "�lohy",
     "profile": "Profil",
     "settings": "Nastavenia",
-    "logout": "Odhlásiť sa",
+    "logout": "Odhl�sie sa",
     "more": "Viac",
-    "createEvent": "Vytvoriť novú udalosť",
+    "createEvent": "Vytvorie nov� udalose",
     "weddings": "Svadby",
-    "emailInbox": "Doručená pošta",
-    "darkMode": "Tmavý režim",
-    "userMenu": "Používateľské menu"
+    "emailInbox": "Doruen� poata",
+    "darkMode": "Tmav� re~im",
+    "userMenu": "Pou~�vate>sk� menu"
   },
   "auth": {
     "login": "Login",
@@ -233,13 +233,13 @@
     "groups": {
       "title": "Group management",
       "assignTitle": "Assign to selected",
-      "newGroup": "New groupâ€¦",
+      "newGroup": "New group⬦",
       "groupName": "Group name",
       "rename": "Rename group",
-      "origin": "Originâ€¦",
+      "origin": "Origin⬦",
       "newName": "New name",
       "merge": "Merge groups",
-      "destination": "Destinationâ€¦",
+      "destination": "Destination⬦",
       "existing": "Existing groups",
       "none": "No groups yet."
     },
@@ -362,7 +362,7 @@
       "advisorShort": "AI",
       "muteShort": "Mute",
       "exceeded": "Exceeded",
-      "perGuestHint": "≈ {{value}} / guest ({{count}} events)",
+      "perGuestHint": "H {{value}} / guest ({{count}} events)",
       "muteAlerts": "Mute alerts",
       "thresholds": {
         "warn": "Warning (at risk) %",
@@ -376,8 +376,8 @@
     },
     "benchmarks": {
       "title": "Budget suggestions based on similar weddings",
-      "subtitle": "Based on {{count}} confirmed budgets. Average estimate: {{average}} Â· Confidence: {{confidence}}.",
-      "loading": "Calculating budget suggestions…",
+      "subtitle": "Based on {{count}} confirmed budgets. Average estimate: {{average}} · Confidence: {{confidence}}.",
+      "loading": "Calculating budget suggestions&",
       "applyMedian": "Apply median (p50)",
       "applyP75": "Apply percentile 75",
       "saveSnapshot": "Save budget"
@@ -731,7 +731,7 @@
         "zoomFit": "Zoom in / out / Fit",
         "selectAll": "Select all",
         "escape": "Clear selection / close menus",
-        "rotate": "Rotate -5Â° / +5Â° (Shift: Â±15Â°)",
+        "rotate": "Rotate -5° / +5° (Shift: ±15°)",
         "align": "Align (start/end)",
         "distribute": "Distribute (X/Y)",
         "tabs": "Switch tab (Ceremony/Banquet)",
@@ -903,7 +903,7 @@
       "createFirst": "Create first category",
       "category": "Category",
       "exceeded": "Exceeded",
-      "perGuestHint": "≈ {{value}} / guest ({{count}} events)",
+      "perGuestHint": "H {{value}} / guest ({{count}} events)",
       "progress": "Progress",
       "overallProgress": "Budget progress",
       "muteAlerts": "Mute alerts",
@@ -982,7 +982,7 @@
       },
       "banners": {
         "contributionsClosed": "The submission window closed on {{date}}. Adjust the wedding date or contact support if you need to reopen the gallery.",
-        "compressionActive": "Storage usage passed 30Â GB. New photos are automatically compressed to optimise Firebase storage."
+        "compressionActive": "Storage usage passed 30 GB. New photos are automatically compressed to optimise Firebase storage."
       },
       "toasts": {
         "loadError": "We could not load the memories gallery. Check your connection or permissions.",
@@ -1006,7 +1006,7 @@
       "slideshow": {
         "title": "Live slideshow",
         "description": "Connect a second screen and let the memories flow automatically.",
-        "stats": "{{count}} approved photos Â· {{scenes}} scenes covered"
+        "stats": "{{count}} approved photos · {{scenes}} scenes covered"
       },
       "uploader": {
         "hostFallback": "Host"
@@ -1014,7 +1014,7 @@
     },
     "momentosGuest": {
       "badge": "Collaborative memories",
-      "greeting": "Hi, {{name}} ðŸ‘‹",
+      "greeting": "Hi, {{name}} �x9",
       "remainingUploadsSingle": "You can upload 1 more photo.",
       "remainingUploads": "You can upload up to {{count}} more photos.",
       "remainingUploadsUnlimited": "Upload as many photos as you like.",
@@ -1026,7 +1026,7 @@
       },
       "status": {
         "loading": "Loading gallery...",
-        "loadingMessage": "Preparing your space to share memoriesâ€¦",
+        "loadingMessage": "Preparing your space to share memories⬦",
         "errorTitle": "We could not open the memories gallery",
         "errorAction": "If you believe this is a mistake, ask the couple for a new link.",
         "closedTitle": "The upload window has closed",
@@ -1036,7 +1036,7 @@
         "welcomeTitle": "Thanks for capturing memories!",
         "welcomeDescription": "Upload your favourite photos from the event. The host will review them and showcase them in the live slideshow.",
         "uploadTitle": "Your progress",
-        "tip": "Tip: photos are grouped by scene (ceremony, reception, partyâ€¦) to help the host.",
+        "tip": "Tip: photos are grouped by scene (ceremony, reception, party⬦) to help the host.",
         "uploadedSummary": "You have shared {{count}} {{count, plural, one {photo} other {photos}}}. Thanks for contributing!",
         "recentUploads": "Approved photos will appear in the live slideshow and final gallery. The host will let you know when they are ready."
       },
@@ -1050,16 +1050,16 @@
       },
       "progress": {
         "title": "Your progress",
-        "sceneLabel": "Scene: {{scene}} Â· {{size}} KB",
+        "sceneLabel": "Scene: {{scene}} · {{size}} KB",
         "status": "In review"
       },
       "toasts": {
         "nameRequired": "Please tell us your name so we can personalise your uploads",
         "termsRequired": "You must accept the privacy notice",
         "windowClosed": "This gallery is no longer accepting new photos.",
-        "achievementFirst": "ðŸ… Achievement unlocked! Your first memory âœ¨",
-        "achievementEnthusiast": "ðŸŽ‰ You are a collaborative rockstar! Keep sharing memories.",
-        "achievementStar": "ðŸŒŸ Star memories! Your photos will shine in the slideshow.",
+        "achievementFirst": "�x�& Achievement unlocked! Your first memory �S�",
+        "achievementEnthusiast": "�x}0 You are a collaborative rockstar! Keep sharing memories.",
+        "achievementStar": "�xRx Star memories! Your photos will shine in the slideshow.",
         "upload": "Photo uploaded successfully"
       },
       "errors": {

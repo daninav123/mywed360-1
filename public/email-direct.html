@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prueba Email - Versión Simple</title>
+    <title>Prueba Email - Versi�n Simple</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -60,7 +60,7 @@
     </style>
 </head>
 <body>
-    <h1>Prueba de Email Personalizado (Versión Simple)</h1>
+    <h1>Prueba de Email Personalizado (Versi�n Simple)</h1>
     <div class="form-container">
         <form id="emailForm" method="POST" action="http://localhost:4004/api/mail/test-personal-email">
             <div class="form-group">
@@ -103,11 +103,11 @@
                 message: document.getElementById('message').value
             };
             
-            // Método 1: usando XMLHttpRequest para compatibilidad máxima
+            // M�todo 1: usando XMLHttpRequest para compatibilidad m�xima
             const xhr = new XMLHttpRequest();
             xhr.open('POST', 'http://localhost:4004/api/mail/test-personal-email', true);
             xhr.setRequestHeader('Content-Type', 'application/json');
-            // No necesitamos withCredentials ya que el servidor está configurado con un origen específico
+            // No necesitamos withCredentials ya que el servidor est� configurado con un origen espec�fico
             // xhr.withCredentials = true;
             
             xhr.onload = function() {
@@ -118,7 +118,7 @@
                         const response = JSON.parse(xhr.responseText);
                         resultElement.className = 'success';
                         resultElement.innerHTML = `
-                            <h3>¡Correo enviado con éxito!</h3>
+                            <h3>�Correo enviado con �xito!</h3>
                             <p>${response.message}</p>
                             <pre>${JSON.stringify(response.data, null, 2)}</pre>
                         `;
@@ -126,7 +126,7 @@
                         resultElement.className = 'error';
                         resultElement.innerHTML = `
                             <h3>Error al procesar respuesta</h3>
-                            <p>La respuesta del servidor no es un JSON válido</p>
+                            <p>La respuesta del servidor no es un JSON v�lido</p>
                             <pre>${xhr.responseText}</pre>
                         `;
                     }
@@ -144,8 +144,8 @@
                 resultElement.style.display = 'block';
                 resultElement.className = 'error';
                 resultElement.innerHTML = `
-                    <h3>Error de conexión</h3>
-                    <p>No se pudo conectar al servidor. Verifica que el servidor backend esté en ejecución en el puerto 4004.</p>
+                    <h3>Error de conexi�n</h3>
+                    <p>No se pudo conectar al servidor. Verifica que el servidor backend est� en ejecuci�n en el puerto 4004.</p>
                 `;
             };
             

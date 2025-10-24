@@ -6,19 +6,19 @@ const getTemplate = (templateKey = 'personalizada') =>
 const coupleLabel = (weddingInfo = {}) => {
   const names = [weddingInfo.bride, weddingInfo.groom].filter(Boolean);
   if (!names.length) return 'Nuestra boda';
-  if (names.length === 1) return `Celebración de ${names[0]}`;
+  if (names.length === 1) return `Celebraci�n de ${names[0]}`;
   return `${names[0]} & ${names[1]}`;
 };
 
 const renderScheduleRows = (schedule = []) => {
   if (!Array.isArray(schedule) || schedule.length === 0) {
-    return `<tr><td colspan="4">Los horarios exactos de autobuses se publicarán aquí.</td></tr>`;
+    return `<tr><td colspan="4">Los horarios exactos de autobuses se publicar�n aqu�.</td></tr>`;
   }
   return schedule
     .map((item) => {
-      const time = item.time || item.hour || '—';
-      const from = item.departure || item.from || '—';
-      const to = item.destination || item.to || '—';
+      const time = item.time || item.hour || '';
+      const from = item.departure || item.from || '';
+      const to = item.destination || item.to || '';
       const notes = item.notes || item.details || '';
       return `<tr><td>${time}</td><td>${from}</td><td>${to}</td><td>${notes}</td></tr>`;
     })
@@ -29,7 +29,7 @@ const renderLodgingCards = (lodging = []) => {
   if (!Array.isArray(lodging) || lodging.length === 0) {
     return `
       <div class="maloveapp-card">
-        <p>Pronto añadiremos hoteles y alojamientos recomendados cercanos a la celebración.</p>
+        <p>Pronto a�adiremos hoteles y alojamientos recomendados cercanos a la celebraci�n.</p>
       </div>
     `;
   }
@@ -60,16 +60,16 @@ const renderTravelCards = (travelGuide = {}) => {
   const airports = Array.isArray(travelGuide.airports) ? travelGuide.airports : [];
   const stations = Array.isArray(travelGuide.stations) ? travelGuide.stations : [];
   return {
-    air: `${airports.length ? airports.map((a) => `• ${a}`).join('<br/>') : 'Aeropuertos cercanos y tiempos estimados aparecerán aquí.'}${travelGuide.byPlane ? `<p>${travelGuide.byPlane}</p>` : ''}`,
-    rail: `${stations.length ? stations.map((s) => `• ${s}`).join('<br/>') : 'Estaciones y conexiones se publicarán pronto.'}${travelGuide.byTrain ? `<p>${travelGuide.byTrain}</p>` : ''}`,
-    road: `${travelGuide.byCar || 'Recibirás las indicaciones para llegar en coche tan pronto estén listas.'}${travelGuide.tips ? `<p><strong>Tips:</strong> ${travelGuide.tips}</p>` : ''}`,
+    air: `${airports.length ? airports.map((a) => `" ${a}`).join('<br/>') : 'Aeropuertos cercanos y tiempos estimados aparecer�n aqu�.'}${travelGuide.byPlane ? `<p>${travelGuide.byPlane}</p>` : ''}`,
+    rail: `${stations.length ? stations.map((s) => `" ${s}`).join('<br/>') : 'Estaciones y conexiones se publicar�n pronto.'}${travelGuide.byTrain ? `<p>${travelGuide.byTrain}</p>` : ''}`,
+    road: `${travelGuide.byCar || 'Recibir�s las indicaciones para llegar en coche tan pronto est�n listas.'}${travelGuide.tips ? `<p><strong>Tips:</strong> ${travelGuide.tips}</p>` : ''}`,
   };
 };
 
 const ensureShell = (html, weddingInfo) => {
   if (!html) return '';
   let output = html.trim();
-  const title = `${coupleLabel(weddingInfo)} · Sitio de boda`;
+  const title = `${coupleLabel(weddingInfo)} � Sitio de boda`;
 
   if (!/<!doctype html/i.test(output)) {
     output = `<!doctype html>\n${output}`;
@@ -413,7 +413,7 @@ const buildFallbackSections = (weddingInfo, template) => ({
     <section data-enhanced="transport" id="transporte">
       <div class="maloveapp-section-heading"><span>Transporte y autobuses</span></div>
       <div class="maloveapp-card">
-        <p>${weddingInfo?.transportation || 'Habrá servicio de transporte para invitados. Consulta los horarios en la tabla.'}</p>
+        <p>${weddingInfo?.transportation || 'Habr� servicio de transporte para invitados. Consulta los horarios en la tabla.'}</p>
         <div class="maloveapp-table-wrapper">
           <table>
             <thead>
@@ -434,7 +434,7 @@ const buildFallbackSections = (weddingInfo, template) => ({
   `,
   gallery: () => `
     <section data-enhanced="gallery">
-      <div class="maloveapp-section-heading"><span>Galería</span></div>
+      <div class="maloveapp-section-heading"><span>Galer�a</span></div>
       <div class="maloveapp-gallery">
         <div class="maloveapp-gallery__item"></div>
         <div class="maloveapp-gallery__item"></div>
@@ -454,10 +454,10 @@ const buildFallbackSections = (weddingInfo, template) => ({
     const travelBlocks = renderTravelCards(weddingInfo?.travelGuide || {});
     return `
     <section data-enhanced="travel-guide">
-      <div class="maloveapp-section-heading"><span>Cómo llegar</span></div>
+      <div class="maloveapp-section-heading"><span>C�mo llegar</span></div>
       <div class="maloveapp-grid maloveapp-grid--two">
         <div class="maloveapp-card">
-          <h3>En avión</h3>
+          <h3>En avi�n</h3>
           <p>${travelBlocks.air}</p>
         </div>
         <div class="maloveapp-card">
@@ -479,10 +479,10 @@ const buildFallbackSections = (weddingInfo, template) => ({
     if (!addresses) return '';
     return `
     <section data-enhanced="mapa" id="mapa">
-      <div class="maloveapp-section-heading"><span>Mapa de la celebración</span></div>
+      <div class="maloveapp-section-heading"><span>Mapa de la celebraci�n</span></div>
       <div class="maloveapp-card">
         <iframe
-          title="Ubicación de la boda"
+          title="Ubicaci�n de la boda"
           src="https://maps.google.com/maps?q=${encodeURIComponent(addresses)}&output=embed"
           width="100%"
           height="320"
@@ -516,7 +516,7 @@ const buildFallbackSections = (weddingInfo, template) => ({
     `;
   },
   contact: () => {
-    const contact = [weddingInfo?.contactEmail, weddingInfo?.contactPhone].filter(Boolean).join(' · ');
+    const contact = [weddingInfo?.contactEmail, weddingInfo?.contactPhone].filter(Boolean).join(' � ');
     if (!contact) return '';
     return `
     <section data-enhanced="contacto" id="contacto">
@@ -529,7 +529,7 @@ const buildFallbackSections = (weddingInfo, template) => ({
     if (!weddingInfo?.ceremonyTime && !weddingInfo?.receptionTime) return '';
     return `
     <section data-enhanced="timeline">
-      <div class="maloveapp-section-heading"><span>Agenda del día</span></div>
+      <div class="maloveapp-section-heading"><span>Agenda del d�a</span></div>
       <div class="maloveapp-timeline">
         ${weddingInfo?.ceremonyTime ? `
         <div class="maloveapp-timeline__item">
@@ -543,7 +543,7 @@ const buildFallbackSections = (weddingInfo, template) => ({
         <div class="maloveapp-timeline__item">
           <div class="maloveapp-timeline__time">${weddingInfo.receptionTime}</div>
           <div>
-            <strong>Recepción</strong>
+            <strong>Recepci�n</strong>
             <div>${weddingInfo.receptionVenue || 'Por confirmar'}</div>
           </div>
         </div>` : ''}
@@ -558,7 +558,7 @@ const ensureHero = (html, weddingInfo, template) => {
   const dateText = weddingInfo?.date ? `<div class="maloveapp-hero__badge">${weddingInfo.date}</div>` : '';
   const location =
     weddingInfo?.ceremonyLocation || weddingInfo?.receptionVenue
-      ? `<p>${[weddingInfo.ceremonyLocation, weddingInfo.receptionVenue].filter(Boolean).join(' · ')}</p>`
+      ? `<p>${[weddingInfo.ceremonyLocation, weddingInfo.receptionVenue].filter(Boolean).join(' � ')}</p>`
       : '';
   const hero = `
   <section class="maloveapp-hero" data-enhanced="hero">
@@ -593,13 +593,13 @@ const ensureCountdownScript = (html, weddingInfo) => {
       function tick(){
         var diff = target - Date.now();
         if (diff <= 0) {
-          badge.textContent = '¡Llegó el gran día!';
+          badge.textContent = '�Lleg� el gran d�a!';
           return;
         }
         var days = Math.floor(diff / 86400000);
         var hours = Math.floor((diff % 86400000) / 3600000);
         var minutes = Math.floor((diff % 3600000) / 60000);
-        badge.textContent = 'Faltan ' + days + ' días · ' + pad(hours) + 'h ' + pad(minutes) + 'm';
+        badge.textContent = 'Faltan ' + days + ' d�as � ' + pad(hours) + 'h ' + pad(minutes) + 'm';
       }
       tick();
       setInterval(tick, 60000);

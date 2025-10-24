@@ -644,6 +644,69 @@
         }
       }
     },
+    "unifiedInbox": {
+      "folders": {
+        "inbox": "Bandeja de entrada",
+        "sent": "Enviados",
+        "trash": "Papelera",
+        "important": "Importantes",
+        "default": "Recibidos"
+      },
+      "filters": {
+        "status": {
+          "all": "Todos",
+          "unread": "No leidos",
+          "read": "Leidos"
+        },
+        "sort": {
+          "date": "Fecha",
+          "subject": "Asunto",
+          "from": "Remitente"
+        },
+        "density": {
+          "comfortable": "Comoda",
+          "compact": "Compacta"
+        }
+      },
+      "search": {
+        "placeholder": "Buscar emails..."
+      },
+      "labels": {
+        "suggestedOnly": "Solo sugeridos",
+        "sortBy": "Ordenar por"
+      },
+      "aria": {
+        "filterStatus": "Filtro por estado",
+        "sortToggle": "Invertir orden",
+        "suggestedTitle": "Mostrar solo correos con sugerencia de IA",
+        "density": "Densidad de lista"
+      },
+      "buttons": {
+        "providerAi": "IA Proveedores"
+      },
+      "emptyState": {
+        "selectEmail": "Selecciona un correo para verlo"
+      },
+      "sidebar": {
+        "inboxBadge": "{{unread}} no leidos · {{total}} totales",
+        "sentBadge": "{{total}} enviados",
+        "trashBadge": "{{total}} en papelera"
+      },
+      "summary": {
+        "visible_one": "{{count}} correo visible",
+        "visible_other": "{{count}} correos visibles",
+        "filters": {
+          "unread": "solo no leidos",
+          "read": "solo leidos",
+          "suggested": "sugerencias activas",
+          "tag": "etiqueta IA: {{tag}}"
+        }
+      },
+      "analyze": {
+        "button": "Analizar IA (carpeta actual)",
+        "loading": "Analizando..."
+      }
+    },
     "compose": {
       "header": {
         "title": "Nuevo correo"

@@ -1,4 +1,4 @@
-﻿import express from 'express';
+�import express from 'express';
 const router = express.Router();
 import dotenv from 'dotenv';
 import mailgunJs from 'mailgun-js';
@@ -29,7 +29,7 @@ function createMailgunClient(domainOverride) {
     }
 }
 
-// Ruta para diagnóstico completo
+// Ruta para diagn�stico completo
 router.get('/environment', (req, res) => {
     const MAILGUN_API_KEY = process.env.MAILGUN_API_KEY;
     const MAILGUN_DOMAIN = process.env.MAILGUN_DOMAIN;
@@ -53,7 +53,7 @@ router.post('/test-domains', async (req, res) => {
     try {
         const env = getMailgunEnv();
         if (!env.apiKey || !env.domain) {
-            return res.status(503).json({ success: false, message: 'Mailgun no está configurado en el servidor' });
+            return res.status(503).json({ success: false, message: 'Mailgun no est� configurado en el servidor' });
         }
 
         const { to, subject, message } = req.body;
@@ -99,7 +99,7 @@ router.post('/test-domains', async (req, res) => {
         
         const results = [];
         
-        // Probar cada configuración
+        // Probar cada configuraci�n
         for (const config of testConfigs) {
             try {
                 console.log(`Probando: ${config.description} (${config.from})`);
@@ -110,12 +110,12 @@ router.post('/test-domains', async (req, res) => {
                     subject: `[Prueba] ${subject} - ${config.description}`,
                     text: message,
                     html: `<div style="font-family: Arial, sans-serif; line-height: 1.6;">
-                           <p><strong>Configuración de prueba:</strong> ${config.description}</p>
+                           <p><strong>Configuraci�n de prueba:</strong> ${config.description}</p>
                            <p>${message.replace(/\n/g, '<br>')}</p>
                            </div>`
                 };
                 if (!config.client) {
-                    throw new Error('Cliente Mailgun no disponible para esta configuración');
+                    throw new Error('Cliente Mailgun no disponible para esta configuraci�n');
                 }
                 const result = await config.client.messages().send(mailData);
                 
@@ -127,10 +127,10 @@ router.post('/test-domains', async (req, res) => {
                     result: result
                 });
                 
-                console.log(`✅ Éxito con ${config.description}`);
+                console.log(` �xito con ${config.description}`);
                 
             } catch (error) {
-                console.error(`❌ Error con ${config.description}:`, error.message);
+                console.error(`L Error con ${config.description}:`, error.message);
                 
                 results.push({
                     success: false,
@@ -143,13 +143,13 @@ router.post('/test-domains', async (req, res) => {
             }
         }
         
-        // Determinar si al menos una configuración tuvo éxito
+        // Determinar si al menos una configuraci�n tuvo �xito
         const anySuccess = results.some(r => r.success);
         
         return res.status(anySuccess ? 200 : 500).json({
             success: anySuccess,
             message: anySuccess 
-                ? '¡Al menos una configuración funcionó! Revisa los detalles.' 
+                ? '�Al menos una configuraci�n funcion�! Revisa los detalles.' 
                 : 'Todas las configuraciones fallaron. Revisa los detalles de cada error.',
             results: results
         });

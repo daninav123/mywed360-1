@@ -1,9 +1,9 @@
-﻿import logger from '../logger.js';
+�import logger from '../logger.js';
 import admin from 'firebase-admin';
 
 let twilioClient = null;
 
-// Asegurar inicialización de Firebase Admin si aún no está
+// Asegurar inicializaci�n de Firebase Admin si a�n no est�
 if (!admin.apps.length) {
   try {
     admin.initializeApp({
@@ -59,7 +59,7 @@ export async function sendWhatsAppText({ to, message, weddingId, guestId, templa
   try {
     const { client, from } = await ensureTwilio();
     const normalized = toE164(to, process.env.DEFAULT_COUNTRY_CODE || '');
-    if (!normalized) return { success: false, error: 'Teléfono inválido' };
+    if (!normalized) return { success: false, error: 'Tel�fono inv�lido' };
     const toE = normalized.startsWith('whatsapp:') ? normalized : `whatsapp:${normalized}`;
     const statusCallback = buildStatusCallbackUrl();
 
@@ -70,7 +70,7 @@ export async function sendWhatsAppText({ to, message, weddingId, guestId, templa
       statusCallback,
     };
 
-    // Twilio no soporta schedule en WhatsApp aún de forma nativa
+    // Twilio no soporta schedule en WhatsApp a�n de forma nativa
     const resp = await client.messages.create(createParams);
 
     // Guardar log inicial
@@ -98,7 +98,7 @@ export async function sendWhatsAppText({ to, message, weddingId, guestId, templa
       logger.warn('[whatsappService] No se pudo escribir en mensajeria_log:', e);
     }
 
-    // Crear/actualizar sesión de conversación (RSVP) si aplica
+    // Crear/actualizar sesi�n de conversaci�n (RSVP) si aplica
     try {
       await upsertInviteSession({
         toE164: normalized,
@@ -167,10 +167,10 @@ export function providerStatus() {
   };
 }
 
-// ----------------- Conversación entrante (RSVP) -----------------
+// ----------------- Conversaci�n entrante (RSVP) -----------------
 
 function normalizeFromWhatsApp(from = '') {
-  // from típico: "whatsapp:+34123456789"
+  // from t�pico: "whatsapp:+34123456789"
   try {
     const f = String(from || '').trim();
     const p = f.replace(/^whatsapp:/i, '');
@@ -217,7 +217,7 @@ async function upsertInviteSession({ toE164, weddingId, guestId, rsvpFlow = fals
 
 function parseYesNo(text = '') {
   const t = String(text || '').trim().toLowerCase();
-  const yes = ['1', 'si', 'sí', 'acepto', 'confirmo', 'voy', 'asisto', 'sí voy', 'si voy', 'confirmada', 'confirmado'];
+  const yes = ['1', 'si', 's�', 'acepto', 'confirmo', 'voy', 'asisto', 's� voy', 'si voy', 'confirmada', 'confirmado'];
   const no = ['2', 'no', 'rechazo', 'no voy', 'no asisto', 'no puedo', 'cancelo'];
   if (yes.some((k) => t === k || t.includes(k))) return 'yes';
   if (no.some((k) => t === k || t.includes(k))) return 'no';
@@ -229,7 +229,7 @@ function parseCompanions(text = '') {
   if (!m) return null;
   const n = parseInt(m[0], 10);
   if (isNaN(n) || n < 0) return 0;
-  if (n > 20) return 20; // límite razonable
+  if (n > 20) return 20; // l�mite razonable
   return n;
 }
 
@@ -295,8 +295,8 @@ export async function handleIncomingMessage(payload, opts = {}) {
     await logInbound({ sid: payload.MessageSid || payload.SmsSid || null, fromE164, toE164: (payload.To || '').replace(/^whatsapp:/i, ''), body, weddingId: session?.weddingId || null, guestId: session?.guestId || null, waId, profileName });
 
     if (!session) {
-      // Sin sesión conocida: pedir identificación
-      const msg = 'Hola, no pudimos identificar tu invitación. Responde con "AYUDA" para asistencia o espera a recibir un mensaje de invitación para iniciar el cuestionario.';
+      // Sin sesi�n conocida: pedir identificaci�n
+      const msg = 'Hola, no pudimos identificar tu invitaci�n. Responde con "AYUDA" para asistencia o espera a recibir un mensaje de invitaci�n para iniciar el cuestionario.';
       try { await reply(fromE164, msg); } catch {}
       return;
     }
@@ -305,7 +305,7 @@ export async function handleIncomingMessage(payload, opts = {}) {
     const weddingId = session.weddingId || null;
     const guestId = session.guestId || null;
 
-    // Helper para actualizar sesión
+    // Helper para actualizar sesi�n
     const updateSession = async (patch) => {
       try {
         await ref.set({ ...patch, updatedAt: admin.firestore.FieldValue.serverTimestamp() }, { merge: true });
@@ -318,30 +318,30 @@ export async function handleIncomingMessage(payload, opts = {}) {
       const yn = parseYesNo(body);
       if (yn === 'yes') {
         // Actualizar invitado como confirmado (compat con UI + RSVP)
-        await updateGuestDoc({ weddingId, guestId, patch: { status: 'confirmed', status_rsvp: 'accepted', response: 'Sí' } });
+        await updateGuestDoc({ weddingId, guestId, patch: { status: 'confirmed', status_rsvp: 'accepted', response: 'S�' } });
         await updateSession({ state: 'awaiting_companions', lastPrompt: 'ask_companions' });
-        await reply(fromE164, '¡Genial! ¿Vendrás con acompañantes? Responde únicamente con un número (0 si vienes sin acompañante).');
+        await reply(fromE164, '�Genial! �Vendr�s con acompa�antes? Responde �nicamente con un n�mero (0 si vienes sin acompa�ante).');
         return;
       }
       if (yn === 'no') {
         await updateGuestDoc({ weddingId, guestId, patch: { status: 'declined', status_rsvp: 'rejected', response: 'No', companions: 0, companion: 0 } });
         await updateSession({ state: 'completed', lastPrompt: 'completed' });
-        await reply(fromE164, 'Gracias por responder. Hemos registrado que no podrás asistir. Si cambia tu situación, avísanos.');
+        await reply(fromE164, 'Gracias por responder. Hemos registrado que no podr�s asistir. Si cambia tu situaci�n, av�sanos.');
         return;
       }
-      await reply(fromE164, 'Por favor responde "Sí" o "No" (también puedes responder 1 para Sí o 2 para No).');
+      await reply(fromE164, 'Por favor responde "S�" o "No" (tambi�n puedes responder 1 para S� o 2 para No).');
       return;
     }
 
     if (state === 'awaiting_companions') {
       const n = parseCompanions(body);
       if (n === null) {
-        await reply(fromE164, 'No entendí el número de acompañantes. Responde solo con un número (0, 1, 2, ...).');
+        await reply(fromE164, 'No entend� el n�mero de acompa�antes. Responde solo con un n�mero (0, 1, 2, ...).');
         return;
       }
       await updateGuestDoc({ weddingId, guestId, patch: { companions: n, companion: n } });
       await updateSession({ state: 'awaiting_allergens', lastPrompt: 'ask_allergens', companions: n });
-      await reply(fromE164, '¿Alguna restricción alimentaria o alergia? Responde "ninguna" si no tienes.');
+      await reply(fromE164, '�Alguna restricci�n alimentaria o alergia? Responde "ninguna" si no tienes.');
       return;
     }
 
@@ -354,7 +354,7 @@ export async function handleIncomingMessage(payload, opts = {}) {
 
       // Mensaje de cierre con resumen
       const n = session.companions ?? 0;
-      const resumen = `¡Gracias! Hemos registrado tu confirmación${n ? ` con ${n} acompañante(s)` : ''}${allergens ? ` y alergias/restricciones: ${allergens}` : ''}.`;
+      const resumen = `�Gracias! Hemos registrado tu confirmaci�n${n ? ` con ${n} acompa�ante(s)` : ''}${allergens ? ` y alergias/restricciones: ${allergens}` : ''}.`;
       await reply(fromE164, resumen);
       return;
     }
@@ -366,7 +366,7 @@ export async function handleIncomingMessage(payload, opts = {}) {
   }
 }
 
-// Helper para modo test: crea sesión si no existe
+// Helper para modo test: crea sesi�n si no existe
 export async function ensureTestSession({ phoneE164, weddingId = null, guestId = null, rsvpFlow = true }) {
   try {
     if (!phoneE164) return false;

@@ -1,4 +1,4 @@
-﻿import React, { useMemo, useState } from 'react';
+�import React, { useMemo, useState } from 'react';
 
 import { sendBatch } from '../../services/WhatsAppBatchService';
 import Modal from '../Modal';
@@ -29,7 +29,7 @@ export default function WhatsAppSender({
   const [selectedIds, setSelectedIds] = useState(() => new Set(guestsWithPhone.map((g) => g.id)));
   const [message, setMessage] = useState(
     defaultMessage ||
-      '¡Hola {guestName}! Somos {coupleName} y nos encantaría contar contigo en nuestra boda. ¿Puedes confirmar tu asistencia?'
+      '�Hola {guestName}! Somos {coupleName} y nos encantar�a contar contigo en nuestra boda. �Puedes confirmar tu asistencia?'
   );
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
@@ -55,7 +55,7 @@ export default function WhatsAppSender({
     }
     const trimmed = (message || '').trim();
     if (!trimmed) {
-      setError('El mensaje no puede estar vacío');
+      setError('El mensaje no puede estar vac�o');
       return;
     }
     if (!coupleName) {
@@ -100,7 +100,7 @@ export default function WhatsAppSender({
           onChange={(e) => setMessage(e.target.value)}
         />
         <div className="text-xs text-gray-500">
-          Puedes usar las variables {'{guestName}'} y {'{coupleName}'} que se reemplazarán automáticamente.
+          Puedes usar las variables {'{guestName}'} y {'{coupleName}'} que se reemplazar�n autom�ticamente.
         </div>
 
         <div className="max-h-60 overflow-auto border rounded-md">
@@ -115,7 +115,7 @@ export default function WhatsAppSender({
                   />
                 </th>
                 <th className="px-2 py-1 text-left">Nombre</th>
-                <th className="px-2 py-1">Teléfono</th>
+                <th className="px-2 py-1">Tel�fono</th>
               </tr>
             </thead>
             <tbody>

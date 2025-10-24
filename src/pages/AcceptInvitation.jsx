@@ -14,12 +14,12 @@ export default function AcceptInvitation() {
     if (!code || !currentUser) return;
     acceptInvitation(code, currentUser.uid)
       .then((weddingId) => {
-        setStatus('¡Invitación aceptada! Redirigiendo...');
+        setStatus('�Invitaci�n aceptada! Redirigiendo...');
         setTimeout(() => navigate(`/bodas/${weddingId}`), 2000);
       })
       .catch((err) => {
         console.error(err);
-        setStatus('No se pudo aceptar la invitación: ' + err.message);
+        setStatus('No se pudo aceptar la invitaci�n: ' + err.message);
       });
   }, [code, currentUser, navigate]);
 

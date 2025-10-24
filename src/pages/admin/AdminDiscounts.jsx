@@ -499,7 +499,7 @@ const summarizeCommissionRules = (rules) => {
   if (!rules || !Array.isArray(rules.periods) || rules.periods.length === 0) {
     return {
       label: 'Sin reglas',
-      description: 'Este enlace no tiene comisiones configuradas. Usa el modal de ediciÃ³n para aÃ±adirlas.',
+      description: 'Este enlace no tiene comisiones configuradas. Usa el modal de edición para añadirlas.',
       hasRules: false,
     };
   }
@@ -550,7 +550,7 @@ const TYPE_LABELS = {
   planner: 'Planner',
   influencer: 'Influencer',
   partner: 'Partner',
-  campaign: 'CampaÃ±a',
+  campaign: 'Campaña',
 };
 
 const AdminDiscounts = () => {
@@ -678,7 +678,7 @@ const AdminDiscounts = () => {
   };
 
   const handleGeneratePartnerLink = async (discountId, code) => {
-    if (!confirm(`Â¿Generar enlace de estadÃ­sticas para el cÃ³digo ${code}?`)) return;
+    if (!confirm(`¿Generar enlace de estadísticas para el código ${code}?`)) return;
     
     try {
       const result = await generatePartnerToken(discountId);
@@ -850,7 +850,7 @@ const AdminDiscounts = () => {
         <div>
           <h1 className="text-xl font-semibold">Descuentos y enlaces comerciales</h1>
           <p className="text-sm text-[var(--color-text-soft,#6b7280)]">
-            Seguimiento de enlaces de descuento, asignaciones y facturaciÃ³n asociada.
+            Seguimiento de enlaces de descuento, asignaciones y facturación asociada.
           </p>
         </div>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
@@ -858,7 +858,7 @@ const AdminDiscounts = () => {
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Buscar por cÃ³digo, URL o responsable"
+            placeholder="Buscar por código, URL o responsable"
             className="rounded-md border border-soft px-3 py-2 text-sm"
           />
           <select
@@ -879,7 +879,7 @@ const AdminDiscounts = () => {
             }}
             className="rounded-md bg-[color:var(--color-primary,#6366f1)] px-4 py-2 text-sm font-semibold text-white hover:bg-[color:var(--color-primary-dark,#4f46e5)]"
           >
-            + Crear cÃ³digo
+            + Crear código
           </button>
         </div>
       </header>
@@ -902,7 +902,7 @@ const AdminDiscounts = () => {
               <p className="mt-2 text-2xl font-semibold">{summary.totalUses}</p>
             </article>
             <article className="rounded-xl border border-soft bg-surface px-4 py-5 shadow-sm">
-              <p className="text-xs uppercase text-[var(--color-text-soft,#6b7280)]">FacturaciÃ³n asociada</p>
+              <p className="text-xs uppercase text-[var(--color-text-soft,#6b7280)]">Facturación asociada</p>
               <p className="mt-2 text-2xl font-semibold">
                 {formatCurrency(summary.totalRevenue, summary.currency)}
               </p>
@@ -935,7 +935,7 @@ const AdminDiscounts = () => {
               <table className="min-w-full divide-y divide-soft text-sm" data-testid="admin-discounts-table">
                 <thead className="bg-[var(--color-bg-soft,#f3f4f6)] text-xs uppercase text-[var(--color-text-soft,#6b7280)]">
                   <tr>
-                    <th className="px-4 py-3 text-left">CÃ³digo</th>
+                    <th className="px-4 py-3 text-left">Código</th>
                     <th className="px-4 py-3 text-left">Tipo</th>
                     <th className="px-4 py-3 text-left">% Desc.</th>
                     <th className="px-4 py-3 text-left">Usos</th>
@@ -988,7 +988,7 @@ const AdminDiscounts = () => {
                           <button
                             onClick={() => handleGeneratePartnerLink(link.id, link.code)}
                             className="flex items-center gap-1 text-purple-600 hover:text-purple-800 font-medium text-sm"
-                            title="Generar enlace de estadísticas"
+                            title="Generar enlace de estad�sticas"
                           >
                             <ExternalLink className="w-4 h-4" />
                             Generar
@@ -1025,20 +1025,20 @@ const AdminDiscounts = () => {
         </>
       )}
 
-      {/* Modal crear código */}
+      {/* Modal crear c�digo */}
       {showCreateModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-8">
           <div className="w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-xl bg-surface p-6 shadow-xl">
             <header className="mb-4">
-              <h2 className="text-lg font-semibold">Crear código de descuento</h2>
+              <h2 className="text-lg font-semibold">Crear c�digo de descuento</h2>
               <p className="text-sm text-[var(--color-text-soft,#6b7280)]">
-                Genera un nuevo código promocional o enlace comercial
+                Genera un nuevo c�digo promocional o enlace comercial
               </p>
             </header>
 
             <form onSubmit={handleCreateDiscount} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Código *</label>
+                <label className="block text-sm font-medium mb-1">C�digo *</label>
                 <input
                   type="text"
                   value={formData.code}
@@ -1056,7 +1056,7 @@ const AdminDiscounts = () => {
                   onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value }))}
                   className="w-full rounded-md border border-soft px-3 py-2 text-sm"
                 >
-                  <option value="campaign">Campaña</option>
+                  <option value="campaign">Campa�a</option>
                   <option value="planner">Planner</option>
                   <option value="influencer">Influencer</option>
                   <option value="partner">Partner</option>
@@ -1077,6 +1077,198 @@ const AdminDiscounts = () => {
                     placeholder="10"
                     className="w-full rounded-md border border-soft px-3 py-2 pr-8 text-sm"
                     required
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-500">%</span>
+                </div>
+              </div>
+
+              <div>
+                <label className="flex items-center gap-2 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={formData.isPermanent}
+                    onChange={(e) => setFormData(prev => ({ ...prev, isPermanent: e.target.checked }))}
+                  />
+                  C�digo permanente (sin l�mite de usos)
+                </label>
+              </div>
+
+              {!formData.isPermanent && (
+                <div>
+                  <label className="block text-sm font-medium mb-1">M�ximo de usos</label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={formData.maxUses}
+                    onChange={(e) => setFormData(prev => ({ ...prev, maxUses: e.target.value }))}
+                    placeholder="100"
+                    className="w-full rounded-md border border-soft px-3 py-2 text-sm"
+                  />
+                </div>
+              )}
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Fecha inicio validez</label>
+                  <input
+                    type="date"
+                    value={formData.validFrom}
+                    onChange={(e) => setFormData(prev => ({ ...prev, validFrom: e.target.value }))}
+                    className="w-full rounded-md border border-soft px-3 py-2 text-sm"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Opcional: desde cu�ndo es v�lido</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Fecha fin validez</label>
+                  <input
+                    type="date"
+                    value={formData.validUntil}
+                    onChange={(e) => setFormData(prev => ({ ...prev, validUntil: e.target.value }))}
+                    className="w-full rounded-md border border-soft px-3 py-2 text-sm"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Opcional: hasta cu�ndo es v�lido</p>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">URL personalizada (opcional)</label>
+                <input
+                  type="url"
+                  value={formData.url}
+                  onChange={(e) => setFormData(prev => ({ ...prev, url: e.target.value }))}
+                  placeholder="https://maloveapp.com/registro?ref=CODIGO"
+                  className="w-full rounded-md border border-soft px-3 py-2 text-sm"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">Asignado a (opcional)</label>
+                <div className="grid grid-cols-2 gap-2">
+                  <input
+                    type="text"
+                    value={formData.assignedTo.name}
+                    onChange={(e) => setFormData(prev => ({ ...prev, assignedTo: { ...prev.assignedTo, name: e.target.value } }))}
+                    placeholder="Nombre"
+                    className="rounded-md border border-soft px-3 py-2 text-sm"
+                  />
+                  <input
+                    type="email"
+                    value={formData.assignedTo.email}
+                    onChange={(e) => setFormData(prev => ({ ...prev, assignedTo: { ...prev.assignedTo, email: e.target.value } }))}
+                    placeholder="Email"
+                    className="rounded-md border border-soft px-3 py-2 text-sm"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">Notas (opcional)</label>
+                <textarea
+                  value={formData.notes}
+                  onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
+                  placeholder="Detalles adicionales sobre este c�digo..."
+                  rows="2"
+                  className="w-full rounded-md border border-soft px-3 py-2 text-sm"
+                />
+              </div>
+
+              <CommissionRulesEditor
+                value={formData.commissionRules}
+                onChange={(next) => setFormData(prev => ({ ...prev, commissionRules: next }))}
+                disabled={creating}
+              />
+
+              {formError && (
+                <p className="text-sm text-red-600">{formError}</p>
+              )}
+
+              <div className="flex justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowCreateModal(false);
+                    resetForm();
+                  }}
+                  disabled={creating}
+                  className="rounded-md border border-soft px-4 py-2 text-sm hover:bg-[var(--color-bg-soft,#f3f4f6)]"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={creating || !formData.code.trim()}
+                  className="rounded-md bg-[color:var(--color-primary,#6366f1)] px-4 py-2 text-sm font-semibold text-white hover:bg-[color:var(--color-primary-dark,#4f46e5)] disabled:opacity-50"
+                >
+                  {creating ? 'Creando...' : 'Crear c�digo'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal editar c�digo */}
+      {showEditModal && editingDiscount && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-8">
+          <div className="w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-xl bg-surface p-6 shadow-xl">
+            <header className="mb-4">
+              <h2 className="text-lg font-semibold">Editar c�digo: {editingDiscount.code}</h2>
+              <p className="text-sm text-[var(--color-text-soft,#6b7280)]">
+                Modifica los detalles del c�digo promocional
+              </p>
+            </header>
+
+            <form onSubmit={handleEditDiscount} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Código</label>
+                <input
+                  type="text"
+                  value={formData.code}
+                  disabled
+                  className="w-full rounded-md border border-soft px-3 py-2 text-sm bg-gray-50 cursor-not-allowed"
+                />
+                <p className="text-xs text-[var(--color-text-soft,#6b7280)] mt-1">El código no se puede modificar</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">Estado</label>
+                <select
+                  value={formData.status}
+                  onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value }))}
+                  className="w-full rounded-md border border-soft px-3 py-2 text-sm"
+                >
+                  <option value="activo">Activo</option>
+                  <option value="agotado">Agotado</option>
+                  <option value="caducado">Caducado</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">Tipo</label>
+                <select
+                  value={formData.type}
+                  onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value }))}
+                  className="w-full rounded-md border border-soft px-3 py-2 text-sm"
+                >
+                  <option value="campaign">Campaña</option>
+                  <option value="planner">Planner</option>
+                  <option value="influencer">Influencer</option>
+                  <option value="partner">Partner</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">Porcentaje de descuento</label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.01"
+                    value={formData.discountPercentage}
+                    onChange={(e) => setFormData(prev => ({ ...prev, discountPercentage: e.target.value }))}
+                    placeholder="10"
+                    className="w-full rounded-md border border-soft px-3 py-2 pr-8 text-sm"
                   />
                   <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-500">%</span>
                 </div>
@@ -1167,198 +1359,6 @@ const AdminDiscounts = () => {
                   value={formData.notes}
                   onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
                   placeholder="Detalles adicionales sobre este código..."
-                  rows="2"
-                  className="w-full rounded-md border border-soft px-3 py-2 text-sm"
-                />
-              </div>
-
-              <CommissionRulesEditor
-                value={formData.commissionRules}
-                onChange={(next) => setFormData(prev => ({ ...prev, commissionRules: next }))}
-                disabled={creating}
-              />
-
-              {formError && (
-                <p className="text-sm text-red-600">{formError}</p>
-              )}
-
-              <div className="flex justify-end gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowCreateModal(false);
-                    resetForm();
-                  }}
-                  disabled={creating}
-                  className="rounded-md border border-soft px-4 py-2 text-sm hover:bg-[var(--color-bg-soft,#f3f4f6)]"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  disabled={creating || !formData.code.trim()}
-                  className="rounded-md bg-[color:var(--color-primary,#6366f1)] px-4 py-2 text-sm font-semibold text-white hover:bg-[color:var(--color-primary-dark,#4f46e5)] disabled:opacity-50"
-                >
-                  {creating ? 'Creando...' : 'Crear código'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Modal editar código */}
-      {showEditModal && editingDiscount && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-8">
-          <div className="w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-xl bg-surface p-6 shadow-xl">
-            <header className="mb-4">
-              <h2 className="text-lg font-semibold">Editar código: {editingDiscount.code}</h2>
-              <p className="text-sm text-[var(--color-text-soft,#6b7280)]">
-                Modifica los detalles del código promocional
-              </p>
-            </header>
-
-            <form onSubmit={handleEditDiscount} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">CÃ³digo</label>
-                <input
-                  type="text"
-                  value={formData.code}
-                  disabled
-                  className="w-full rounded-md border border-soft px-3 py-2 text-sm bg-gray-50 cursor-not-allowed"
-                />
-                <p className="text-xs text-[var(--color-text-soft,#6b7280)] mt-1">El cÃ³digo no se puede modificar</p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-1">Estado</label>
-                <select
-                  value={formData.status}
-                  onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value }))}
-                  className="w-full rounded-md border border-soft px-3 py-2 text-sm"
-                >
-                  <option value="activo">Activo</option>
-                  <option value="agotado">Agotado</option>
-                  <option value="caducado">Caducado</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-1">Tipo</label>
-                <select
-                  value={formData.type}
-                  onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value }))}
-                  className="w-full rounded-md border border-soft px-3 py-2 text-sm"
-                >
-                  <option value="campaign">CampaÃ±a</option>
-                  <option value="planner">Planner</option>
-                  <option value="influencer">Influencer</option>
-                  <option value="partner">Partner</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-1">Porcentaje de descuento</label>
-                <div className="relative">
-                  <input
-                    type="number"
-                    min="0"
-                    max="100"
-                    step="0.01"
-                    value={formData.discountPercentage}
-                    onChange={(e) => setFormData(prev => ({ ...prev, discountPercentage: e.target.value }))}
-                    placeholder="10"
-                    className="w-full rounded-md border border-soft px-3 py-2 pr-8 text-sm"
-                  />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-500">%</span>
-                </div>
-              </div>
-
-              <div>
-                <label className="flex items-center gap-2 text-sm">
-                  <input
-                    type="checkbox"
-                    checked={formData.isPermanent}
-                    onChange={(e) => setFormData(prev => ({ ...prev, isPermanent: e.target.checked }))}
-                  />
-                  CÃ³digo permanente (sin lÃ­mite de usos)
-                </label>
-              </div>
-
-              {!formData.isPermanent && (
-                <div>
-                  <label className="block text-sm font-medium mb-1">MÃ¡ximo de usos</label>
-                  <input
-                    type="number"
-                    min="1"
-                    value={formData.maxUses}
-                    onChange={(e) => setFormData(prev => ({ ...prev, maxUses: e.target.value }))}
-                    placeholder="100"
-                    className="w-full rounded-md border border-soft px-3 py-2 text-sm"
-                  />
-                </div>
-              )}
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">Fecha inicio validez</label>
-                  <input
-                    type="date"
-                    value={formData.validFrom}
-                    onChange={(e) => setFormData(prev => ({ ...prev, validFrom: e.target.value }))}
-                    className="w-full rounded-md border border-soft px-3 py-2 text-sm"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">Opcional: desde cuÃ¡ndo es vÃ¡lido</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Fecha fin validez</label>
-                  <input
-                    type="date"
-                    value={formData.validUntil}
-                    onChange={(e) => setFormData(prev => ({ ...prev, validUntil: e.target.value }))}
-                    className="w-full rounded-md border border-soft px-3 py-2 text-sm"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">Opcional: hasta cuÃ¡ndo es vÃ¡lido</p>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-1">URL personalizada (opcional)</label>
-                <input
-                  type="url"
-                  value={formData.url}
-                  onChange={(e) => setFormData(prev => ({ ...prev, url: e.target.value }))}
-                  placeholder="https://maloveapp.com/registro?ref=CODIGO"
-                  className="w-full rounded-md border border-soft px-3 py-2 text-sm"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-1">Asignado a (opcional)</label>
-                <div className="grid grid-cols-2 gap-2">
-                  <input
-                    type="text"
-                    value={formData.assignedTo.name}
-                    onChange={(e) => setFormData(prev => ({ ...prev, assignedTo: { ...prev.assignedTo, name: e.target.value } }))}
-                    placeholder="Nombre"
-                    className="rounded-md border border-soft px-3 py-2 text-sm"
-                  />
-                  <input
-                    type="email"
-                    value={formData.assignedTo.email}
-                    onChange={(e) => setFormData(prev => ({ ...prev, assignedTo: { ...prev.assignedTo, email: e.target.value } }))}
-                    placeholder="Email"
-                    className="rounded-md border border-soft px-3 py-2 text-sm"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-1">Notas (opcional)</label>
-                <textarea
-                  value={formData.notes}
-                  onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
-                  placeholder="Detalles adicionales sobre este cÃ³digo..."
                   rows="2"
                   className="w-full rounded-md border border-soft px-3 py-2 text-sm"
                 />

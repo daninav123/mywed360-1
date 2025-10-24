@@ -5,8 +5,8 @@ import { Button } from '../ui';
 import { Input } from '../ui';
 
 /**
- * Formulario optimizado para añadir/editar invitados
- * Componente reutilizable con validación y UX mejorada
+ * Formulario optimizado para a�adir/editar invitados
+ * Componente reutilizable con validaci�n y UX mejorada
  */
 const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false }) => {
   const { t, wedding } = useTranslations();
@@ -17,7 +17,7 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false }) => {
     email: guest?.email || '',
     phone: guest?.phone || '',
     address: guest?.address || '',
-    // Campos de dirección detallada (opcionales)
+    // Campos de direcci�n detallada (opcionales)
     addressStreet: guest?.addressStreet || '',
     addressStreet2: guest?.addressStreet2 || '',
     addressCity: guest?.addressCity || '',
@@ -35,10 +35,10 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false }) => {
     notes: guest?.notes || '',
   });
 
-  // Estado de validación
+  // Estado de validaci�n
   const [errors, setErrors] = useState({});
 
-  // Dirección completa (desplegable) y helper para componer
+  // Direcci�n completa (desplegable) y helper para componer
   const [showAddressDetails, setShowAddressDetails] = useState(false);
   const composeAddress = (fd) => {
     const parts = [];
@@ -48,7 +48,7 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false }) => {
     const stateLine = [fd.addressState, fd.addressCountry].filter(Boolean).join(', ').trim();
     if (cityLine) parts.push(cityLine);
     if (stateLine) parts.push(stateLine);
-    return parts.join(' · ');
+    return parts.join(' � ');
   };
 
   // Validar formulario
@@ -83,7 +83,7 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false }) => {
     (field, value) => {
       setFormData((prev) => {
         const next = { ...prev, [field]: value };
-        // Si se editan campos de dirección detallada, recomponer 'address'
+        // Si se editan campos de direcci�n detallada, recomponer 'address'
         if (
           field === 'addressStreet' ||
           field === 'addressStreet2' ||
@@ -111,7 +111,7 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false }) => {
     [errors]
   );
 
-  // Manejar envío del formulario
+  // Manejar env�o del formulario
   const handleSubmit = useCallback(
     (e) => {
       e.preventDefault();
@@ -128,7 +128,7 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false }) => {
         createdAt: guest?.createdAt || new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
-      // Si hay dirección detallada y el resumen está vacío, componerlo
+      // Si hay direcci�n detallada y el resumen est� vac�o, componerlo
       const hasDetailed =
         formData.addressStreet ||
         formData.addressStreet2 ||
@@ -171,7 +171,7 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false }) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {/* Información básica */}
+      {/* Informaci�n b�sica */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-body mb-1">
@@ -226,7 +226,7 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false }) => {
         </div>
       </div>
 
-      {/* Dirección */}
+      {/* Direcci�n */}
       <div>
         <label className="block text-sm font-medium text-body mb-1">
           {t('guests.guestAddress')}
@@ -235,7 +235,7 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false }) => {
           type="text"
           value={formData.address}
           onChange={(e) => handleChange('address', e.target.value)}
-          placeholder="Dirección completa (opcional)"
+          placeholder="Direcci�n completa (opcional)"
           disabled={isLoading}
         />
         <div className="mt-2">
@@ -245,13 +245,13 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false }) => {
             onClick={() => setShowAddressDetails((v) => !v)}
             disabled={isLoading}
           >
-            {showAddressDetails ? 'Ocultar dirección completa' : 'Añadir dirección completa'}
+            {showAddressDetails ? 'Ocultar direcci�n completa' : 'A�adir direcci�n completa'}
           </button>
           {showAddressDetails && (
             <div className="mt-3 p-3 border rounded-md bg-gray-50">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-body mb-1">Calle y número</label>
+                  <label className="block text-xs font-medium text-body mb-1">Calle y n�mero</label>
                   <Input
                     type="text"
                     value={formData.addressStreet}
@@ -266,7 +266,7 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false }) => {
                     type="text"
                     value={formData.addressStreet2}
                     onChange={(e) => handleChange('addressStreet2', e.target.value)}
-                    placeholder="Ej. 3ºB"
+                    placeholder="Ej. 3�B"
                     disabled={isLoading}
                   />
                 </div>
@@ -291,7 +291,7 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false }) => {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-body mb-1">Código Postal</label>
+                  <label className="block text-xs font-medium text-body mb-1">C�digo Postal</label>
                   <Input
                     type="text"
                     value={formData.addressZip}
@@ -301,24 +301,24 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false }) => {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-body mb-1">País</label>
+                  <label className="block text-xs font-medium text-body mb-1">Pa�s</label>
                   <Input
                     type="text"
                     value={formData.addressCountry}
                     onChange={(e) => handleChange('addressCountry', e.target.value)}
-                    placeholder="Ej. España"
+                    placeholder="Ej. Espa�a"
                     disabled={isLoading}
                   />
                 </div>
               </div>
               <p className="text-[11px] text-muted mt-2">
-                El campo "Dirección" se compone automáticamente a partir de estos datos.
+                El campo "Direcci�n" se compone autom�ticamente a partir de estos datos.
               </p>
             </div>
           )}
         </div>
       </div>
-      {/* Acompañantes y mesa */}
+      {/* Acompa�antes y mesa */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
           <label className="block text-sm font-medium text-body mb-1">
@@ -337,10 +337,10 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false }) => {
           {errors.companion && <p className="text-red-500 text-xs mt-1">{errors.companion}</p>}
         </div>
 
-        {/* Grupo de acompañantes */}
+        {/* Grupo de acompa�antes */}
         <div>
           <label className="block text-sm font-medium text-body mb-1">
-            Grupo de acompañantes
+            Grupo de acompa�antes
           </label>
           <div className="flex space-x-2">
             <Input
@@ -362,7 +362,7 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false }) => {
 
         <div>
           <label className="block text-sm font-medium text-body mb-1">
-            Tipo de acompañante
+            Tipo de acompa�ante
           </label>
           <select
             value={formData.companionType}
@@ -370,7 +370,7 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false }) => {
             className={`w-full border border-soft rounded-md px-3 py-2 focus:outline-none focus:ring-2 ring-primary ${errors.companionType ? 'border-red-500' : ''}`}
             disabled={isLoading}
           >
-            <option value="none">Sin acompañante</option>
+            <option value="none">Sin acompa�ante</option>
             <option value="partner">Pareja</option>
             <option value="child">Hijo/a(s)</option>
             <option value="plus_one">+1</option>
@@ -388,13 +388,13 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false }) => {
             type="text"
             value={formData.table}
             onChange={(e) => handleChange('table', e.target.value)}
-            placeholder="Número o nombre de mesa"
+            placeholder="N�mero o nombre de mesa"
             disabled={isLoading}
           />
         </div>
       </div>
 
-      {/* Restricciones dietéticas */}
+      {/* Restricciones diet�ticas */}
       <div>
         <label className="block text-sm font-medium text-body mb-1">
           {t('guests.dietaryRestrictions')}
@@ -415,14 +415,14 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false }) => {
         <textarea
           value={formData.notes}
           onChange={(e) => handleChange('notes', e.target.value)}
-          placeholder="Información adicional sobre el invitado..."
+          placeholder="Informaci�n adicional sobre el invitado..."
           className="w-full border border-soft rounded-md px-3 py-2 focus:outline-none focus:ring-2 ring-primary resize-none"
           rows="2"
           disabled={isLoading}
         />
       </div>
 
-      {/* Botones de acción */}
+      {/* Botones de acci�n */}
       <div className="flex justify-end space-x-3 pt-4 border-t">
         <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>
           {t('app.cancel')}

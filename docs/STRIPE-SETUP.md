@@ -1,8 +1,8 @@
-# Configuración de Stripe para MaLoveApp
+# Configuraci�n de Stripe para MaLoveApp
 
-> **Modelo vigente:** Licencias por boda (octubre 2025). Cada boda se activa con un pago único. Los planners compran paquetes de licencias con modalidad mensual (12 cuotas) o anual (15% descuento).
+> **Modelo vigente:** Licencias por boda (octubre 2025). Cada boda se activa con un pago �nico. Los planners compran paquetes de licencias con modalidad mensual (12 cuotas) o anual (15% descuento).
 
-## 📋 Índice
+## =� �ndice
 
 1. [Crear cuenta de Stripe](#1-crear-cuenta-de-stripe)
 2. [Obtener claves de API](#2-obtener-claves-de-api)
@@ -10,15 +10,15 @@
 4. [Configurar webhook](#4-configurar-webhook)
 5. [Variables de entorno](#5-variables-de-entorno)
 6. [Pruebas](#6-pruebas)
-7. [Producción](#7-producción)
+7. [Producci�n](#7-producci�n)
 
 ---
 
 ## 1. Crear Cuenta de Stripe
 
-1. Regístrate en [https://dashboard.stripe.com/register](https://dashboard.stripe.com/register)
-2. Completa la verificación de cuenta
-3. Activa tu cuenta (necesitarás datos fiscales para producción)
+1. Reg�strate en [https://dashboard.stripe.com/register](https://dashboard.stripe.com/register)
+2. Completa la verificaci�n de cuenta
+3. Activa tu cuenta (necesitar�s datos fiscales para producci�n)
 
 ---
 
@@ -31,7 +31,7 @@
    - **Publishable key** (comienza con `pk_test_`)
    - **Secret key** (haz click en "Reveal" y copia, comienza con `sk_test_`)
 
-### Modo Live (Producción)
+### Modo Live (Producci�n)
 
 1. Ve a [https://dashboard.stripe.com/apikeys](https://dashboard.stripe.com/apikeys)
 2. Copia las mismas claves pero en modo live (`pk_live_` y `sk_live_`)
@@ -40,27 +40,27 @@
 
 ## 3. Crear Productos y Precios
 
-### 3.1. Planes para Parejas (Pago Único)
+### 3.1. Planes para Parejas (Pago �nico)
 
 #### Wedding Pass (50 EUR)
 ```
 1. Ve a https://dashboard.stripe.com/test/products/create
 2. Product name: Wedding Pass - MaLoveApp
-3. Description: Pago único por boda con funcionalidades completas
+3. Description: Pago �nico por boda con funcionalidades completas
 4. Pricing model: One-time
 5. Price: 50 EUR
 6. Click "Save product"
-7. COPIA el Price ID (empieza con price_) → STRIPE_PRICE_WEDDING_PASS
+7. COPIA el Price ID (empieza con price_) � STRIPE_PRICE_WEDDING_PASS
 ```
 
 #### Wedding Pass Plus (85 EUR)
 ```
 1. Product name: Wedding Pass Plus - MaLoveApp
-2. Description: Pago único premium sin marca y con ayudante
+2. Description: Pago �nico premium sin marca y con ayudante
 3. Pricing model: One-time
 4. Price: 85 EUR
 5. Click "Save product"
-6. COPIA el Price ID → STRIPE_PRICE_WEDDING_PASS_PLUS
+6. COPIA el Price ID � STRIPE_PRICE_WEDDING_PASS_PLUS
 ```
 
 ---
@@ -71,98 +71,98 @@
 
 #### Planner Pack 5
 
-**Versión Mensual (41,67 EUR/mes)**
+**Versi�n Mensual (41,67 EUR/mes)**
 ```
 1. Product name: Planner Pack 5 - MaLoveApp
 2. Description: Hasta 5 bodas activas - Pago mensual
 3. Pricing model: Recurring
 4. Price: 41.67 EUR
 5. Billing period: Monthly
-6. Add a free trial: YES → Trial period: 30 days
+6. Add a free trial: YES � Trial period: 30 days
 7. Click "Save product"
-8. COPIA el Price ID → STRIPE_PRICE_PLANNER_PACK5_MONTHLY
+8. COPIA el Price ID � STRIPE_PRICE_PLANNER_PACK5_MONTHLY
 ```
 
-**Versión Anual (425 EUR - 15% descuento)**
+**Versi�n Anual (425 EUR - 15% descuento)**
 ```
 1. En el mismo producto "Planner Pack 5", click "Add another price"
 2. Pricing model: One-time
 3. Price: 425 EUR
 4. Description: Pago anual (15% descuento vs mensual)
 5. Click "Save price"
-6. COPIA el Price ID → STRIPE_PRICE_PLANNER_PACK5_ANNUAL
+6. COPIA el Price ID � STRIPE_PRICE_PLANNER_PACK5_ANNUAL
 ```
 
 #### Planner Pack 15
 
-**Versión Mensual (112,50 EUR/mes)**
+**Versi�n Mensual (112,50 EUR/mes)**
 ```
 1. Product name: Planner Pack 15 - MaLoveApp
 2. Description: Hasta 15 bodas activas - Pago mensual
 3. Pricing model: Recurring
 4. Price: 112.50 EUR
 5. Billing period: Monthly
-6. Add a free trial: YES → Trial period: 30 days
+6. Add a free trial: YES � Trial period: 30 days
 7. Click "Save product"
-8. COPIA el Price ID → STRIPE_PRICE_PLANNER_PACK15_MONTHLY
+8. COPIA el Price ID � STRIPE_PRICE_PLANNER_PACK15_MONTHLY
 ```
 
-**Versión Anual (1.147,50 EUR)**
+**Versi�n Anual (1.147,50 EUR)**
 ```
 1. Add another price al producto "Planner Pack 15"
 2. Pricing model: One-time
 3. Price: 1147.50 EUR
 4. Description: Pago anual (15% descuento)
 5. Click "Save price"
-6. COPIA el Price ID → STRIPE_PRICE_PLANNER_PACK15_ANNUAL
+6. COPIA el Price ID � STRIPE_PRICE_PLANNER_PACK15_ANNUAL
 ```
 
 #### Teams 40
 
-**Versión Mensual (266,67 EUR/mes)**
+**Versi�n Mensual (266,67 EUR/mes)**
 ```
 1. Product name: Teams 40 - MaLoveApp
-2. Description: 40 bodas activas por año + equipo
+2. Description: 40 bodas activas por a�o + equipo
 3. Pricing model: Recurring
 4. Price: 266.67 EUR
 5. Billing period: Monthly
-6. Add a free trial: YES → Trial period: 30 days
+6. Add a free trial: YES � Trial period: 30 days
 7. Click "Save product"
-8. COPIA el Price ID → STRIPE_PRICE_TEAMS40_MONTHLY
+8. COPIA el Price ID � STRIPE_PRICE_TEAMS40_MONTHLY
 ```
 
-**Versión Anual (2.720 EUR)**
+**Versi�n Anual (2.720 EUR)**
 ```
 1. Add another price al producto "Teams 40"
 2. Pricing model: One-time
 3. Price: 2720 EUR
 4. Description: Pago anual (15% descuento)
 5. Click "Save price"
-6. COPIA el Price ID → STRIPE_PRICE_TEAMS40_ANNUAL
+6. COPIA el Price ID � STRIPE_PRICE_TEAMS40_ANNUAL
 ```
 
 #### Teams Ilimitado
 
-**Versión Mensual (416,67 EUR/mes)**
+**Versi�n Mensual (416,67 EUR/mes)**
 ```
 1. Product name: Teams Ilimitado - MaLoveApp
 2. Description: Bodas y perfiles ilimitados con white-label
 3. Pricing model: Recurring
 4. Price: 416.67 EUR
 5. Billing period: Monthly
-6. Add a free trial: YES → Trial period: 30 days
+6. Add a free trial: YES � Trial period: 30 days
 7. Click "Save product"
-8. COPIA el Price ID → STRIPE_PRICE_TEAMS_UNLIMITED_MONTHLY
+8. COPIA el Price ID � STRIPE_PRICE_TEAMS_UNLIMITED_MONTHLY
 ```
 
-**Versión Anual (4.250 EUR)**
+**Versi�n Anual (4.250 EUR)**
 ```
 1. Add another price al producto "Teams Ilimitado"
 2. Pricing model: One-time
 3. Price: 4250 EUR
 4. Description: Pago anual (15% descuento)
 5. Click "Save price"
-6. COPIA el Price ID → STRIPE_PRICE_TEAMS_UNLIMITED_ANNUAL
+6. COPIA el Price ID � STRIPE_PRICE_TEAMS_UNLIMITED_ANNUAL
 ```
 
 ---
@@ -194,28 +194,28 @@
 2. Click en "Add endpoint"
 3. Endpoint URL:
    - **Desarrollo local:** `https://tu-ngrok-url.ngrok.io/api/stripe/webhook`
-   - **Producción:** `https://tu-dominio.com/api/stripe/webhook`
+   - **Producci�n:** `https://tu-dominio.com/api/stripe/webhook`
 
 ### 4.2. Eventos a Escuchar
 
 Selecciona estos eventos:
 
 ```
-✓ checkout.session.completed
-✓ customer.subscription.created
-✓ customer.subscription.updated
-✓ customer.subscription.deleted
-✓ customer.subscription.trial_will_end
-✓ invoice.payment_succeeded
-✓ invoice.payment_failed
+ checkout.session.completed
+ customer.subscription.created
+ customer.subscription.updated
+ customer.subscription.deleted
+ customer.subscription.trial_will_end
+ invoice.payment_succeeded
+ invoice.payment_failed
 ```
 
 ### 4.3. Obtener Signing Secret
 
-1. Después de crear el webhook, haz click en él
-2. Ve a la sección "Signing secret"
+1. Despu�s de crear el webhook, haz click en �l
+2. Ve a la secci�n "Signing secret"
 3. Click en "Reveal"
-4. COPIA el secret (comienza con `whsec_`) → `STRIPE_WEBHOOK_SECRET`
+4. COPIA el secret (comienza con `whsec_`) � `STRIPE_WEBHOOK_SECRET`
 
 ### 4.4. Testing Local con Stripe CLI
 
@@ -230,8 +230,8 @@ stripe login
 # Forward webhooks a tu localhost
 stripe listen --forward-to localhost:4004/api/stripe/webhook
 
-# El CLI te dará un webhook secret temporal: whsec_...
-# Úsalo en tu .env para pruebas locales
+# El CLI te dar� un webhook secret temporal: whsec_...
+# �salo en tu .env para pruebas locales
 ```
 
 ---
@@ -246,7 +246,7 @@ STRIPE_SECRET_KEY=sk_test_51...
 STRIPE_PUBLISHABLE_KEY=pk_test_51...
 STRIPE_WEBHOOK_SECRET=whsec_...
 
-# Price IDs - Parejas (pago único)
+# Price IDs - Parejas (pago �nico)
 STRIPE_PRICE_WEDDING_PASS=price_1...
 STRIPE_PRICE_WEDDING_PASS_PLUS=price_1...
 STRIPE_PRICE_POST_WEDDING_EXTENSION=price_1...
@@ -267,7 +267,7 @@ STRIPE_PRICE_TEAMS_UNLIMITED_ANNUAL=price_1...
 ### .env (frontend)
 
 ```bash
-# Clave pública para Stripe.js (frontend)
+# Clave p�blica para Stripe.js (frontend)
 VITE_STRIPE_PUBLISHABLE_KEY=pk_test_51...
 ```
 
@@ -275,10 +275,10 @@ VITE_STRIPE_PUBLISHABLE_KEY=pk_test_51...
 
 ## 6. Pruebas
 
-### 6.1. Verificar Configuración
+### 6.1. Verificar Configuraci�n
 
 ```bash
-# Verificar que las claves están configuradas
+# Verificar que las claves est�n configuradas
 curl http://localhost:4004/api/stripe/test
 ```
 
@@ -298,40 +298,40 @@ Respuesta esperada:
 
 Usa estas tarjetas en modo test:
 
-| Tipo | Número | Resultado |
+| Tipo | N�mero | Resultado |
 |------|--------|-----------|
-| Éxito | `4242 4242 4242 4242` | Pago exitoso |
+| �xito | `4242 4242 4242 4242` | Pago exitoso |
 | Rechazado | `4000 0000 0000 0002` | Pago rechazado |
-| SCA requerido | `4000 0025 0000 3155` | Requiere autenticación 3D Secure |
+| SCA requerido | `4000 0025 0000 3155` | Requiere autenticaci�n 3D Secure |
 | Insuficientes fondos | `4000 0000 0000 9995` | Fondos insuficientes |
 
 **Datos adicionales:**
-- Fecha de expiración: Cualquier fecha futura (ej: 12/30)
-- CVC: Cualquier 3 dígitos (ej: 123)
-- ZIP: Cualquier código postal válido
+- Fecha de expiraci�n: Cualquier fecha futura (ej: 12/30)
+- CVC: Cualquier 3 d�gitos (ej: 123)
+- ZIP: Cualquier c�digo postal v�lido
 
 ---
 
-## 7. Producción
+## 7. Producci�n
 
 ### 7.1. Activar Cuenta
 
-1. Completa el formulario de activación en Stripe
+1. Completa el formulario de activaci�n en Stripe
 2. Proporciona:
-   - Información de la empresa
+   - Informaci�n de la empresa
    - Datos fiscales
    - Cuenta bancaria para recibir pagos
 
 ### 7.2. Cambiar a Claves Live
 
-1. Obtén las claves live de [https://dashboard.stripe.com/apikeys](https://dashboard.stripe.com/apikeys)
+1. Obt�n las claves live de [https://dashboard.stripe.com/apikeys](https://dashboard.stripe.com/apikeys)
 2. **Recrea todos los productos** en modo live (los de test no se transfieren)
-3. Actualiza el webhook con la URL de producción
+3. Actualiza el webhook con la URL de producci�n
 4. Actualiza las variables de entorno en tu servidor
 
 ---
 
-## 8. Checklist de Implementación
+## 8. Checklist de Implementaci�n
 
 ### Desarrollo
 
@@ -347,14 +347,14 @@ Usa estas tarjetas en modo test:
 - [ ] Test de checkout completado con tarjeta 4242...
 - [ ] Pago visible en Firestore (`weddingLicenses` o `plannerPacks`)
 
-### Producción
+### Producci�n
 
 - [ ] Cuenta de Stripe activada
 - [ ] Datos fiscales completados
 - [ ] Cuenta bancaria vinculada
 - [ ] 11 productos recreados en modo live
 - [ ] Price IDs live copiados
-- [ ] Webhook de producción configurado
+- [ ] Webhook de producci�n configurado
 - [ ] Variables de entorno actualizadas en servidor
 - [ ] Test de pago real completado
 - [ ] Monitoreo configurado
@@ -363,7 +363,7 @@ Usa estas tarjetas en modo test:
 
 ## 9. Recursos
 
-- **Documentación de Stripe:** [https://stripe.com/docs](https://stripe.com/docs)
+- **Documentaci�n de Stripe:** [https://stripe.com/docs](https://stripe.com/docs)
 - **API Reference:** [https://stripe.com/docs/api](https://stripe.com/docs/api)
 - **Webhooks Guide:** [https://stripe.com/docs/webhooks](https://stripe.com/docs/webhooks)
 - **Testing Guide:** [https://stripe.com/docs/testing](https://stripe.com/docs/testing)
@@ -373,4 +373,4 @@ Usa estas tarjetas en modo test:
 
 ---
 
-**🎉 ¡Listo! Tu integración de Stripe con el modelo de licencias por boda está completa.**
+**<� �Listo! Tu integraci�n de Stripe con el modelo de licencias por boda est� completa.**

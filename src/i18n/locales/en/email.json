@@ -636,6 +636,69 @@
         }
       }
     },
+    "unifiedInbox": {
+      "folders": {
+        "inbox": "Inbox",
+        "sent": "Sent",
+        "trash": "Trash",
+        "important": "Important",
+        "default": "Received"
+      },
+      "filters": {
+        "status": {
+          "all": "All",
+          "unread": "Unread",
+          "read": "Read"
+        },
+        "sort": {
+          "date": "Date",
+          "subject": "Subject",
+          "from": "Sender"
+        },
+        "density": {
+          "comfortable": "Comfortable",
+          "compact": "Compact"
+        }
+      },
+      "search": {
+        "placeholder": "Search emails..."
+      },
+      "labels": {
+        "suggestedOnly": "Suggested only",
+        "sortBy": "Sort by"
+      },
+      "aria": {
+        "filterStatus": "Filter by status",
+        "sortToggle": "Toggle sort direction",
+        "suggestedTitle": "Show only emails with AI suggestions",
+        "density": "List density"
+      },
+      "buttons": {
+        "providerAi": "AI Providers"
+      },
+      "emptyState": {
+        "selectEmail": "Select an email to view it"
+      },
+      "sidebar": {
+        "inboxBadge": "{{unread}} unread · {{total}} total",
+        "sentBadge": "{{total}} sent",
+        "trashBadge": "{{total}} in trash"
+      },
+      "summary": {
+        "visible_one": "{{count}} email visible",
+        "visible_other": "{{count}} emails visible",
+        "filters": {
+          "unread": "only unread",
+          "read": "only read",
+          "suggested": "AI suggestions active",
+          "tag": "AI tag: {{tag}}"
+        }
+      },
+      "analyze": {
+        "button": "Run AI analysis (current folder)",
+        "loading": "Analysing..."
+      }
+    },
     "compose": {
       "header": {
         "title": "New email"

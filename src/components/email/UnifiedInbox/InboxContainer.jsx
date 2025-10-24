@@ -3,6 +3,7 @@ import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import EmailDetail from './EmailDetail';
 import EmailList from './EmailList';
 import { useAuth } from '../../../hooks/useAuth';
+import useTranslations from '../../../hooks/useTranslations';
 import { useEmailMonitoring } from '../../../hooks/useEmailMonitoring';
 import { get as apiGet, post as apiPost, del as apiDel } from '../../../services/apiClient';
 import EmailService, { USE_BACKEND } from '../../../services/emailService';
@@ -42,23 +43,6 @@ import {
 
 const IS_CYPRESS_E2E = typeof window !== 'undefined' && typeof window.Cypress !== 'undefined';
 
-const STATUS_FILTERS = [
-  { id: 'all', label: 'Todos' },
-  { id: 'unread', label: 'No leídos' },
-  { id: 'read', label: 'Leídos' },
-];
-
-const SORT_OPTIONS = [
-  { id: 'date', label: 'Fecha' },
-  { id: 'subject', label: 'Asunto' },
-  { id: 'from', label: 'Remitente' },
-];
-
-const DENSITY_OPTIONS = [
-  { id: 'comfortable', label: 'Cómoda' },
-  { id: 'compact', label: 'Compacta' },
-];
-
 const apiAuthOptions = (extra = {}) => ({
   ...(extra || {}),
   auth: IS_CYPRESS_E2E ? false : extra?.auth ?? true,
@@ -71,6 +55,50 @@ const apiAuthOptions = (extra = {}) => ({
  */
 const InboxContainer = () => {
   const authContext = useAuth();
+  const { t, tVars } = useTranslations();
+  const tEmail = useCallback((key, options) => t(key, { ns: 'email', ...options }), [t]);
+  const tEmailVars = useCallback(
+    (key, variables) => tVars(key, { ns: 'email', ...variables }),
+    [tVars]
+  );
+
+  const systemFolderLabels = useMemo(
+    () => ({
+      inbox: tEmail('unifiedInbox.folders.inbox'),
+      sent: tEmail('unifiedInbox.folders.sent'),
+      trash: tEmail('unifiedInbox.folders.trash'),
+      important: tEmail('unifiedInbox.folders.important'),
+      default: tEmail('unifiedInbox.folders.default'),
+    }),
+    [tEmail]
+  );
+
+  const statusFilters = useMemo(
+    () => [
+      { id: 'all', label: tEmail('unifiedInbox.filters.status.all') },
+      { id: 'unread', label: tEmail('unifiedInbox.filters.status.unread') },
+      { id: 'read', label: tEmail('unifiedInbox.filters.status.read') },
+    ],
+    [tEmail]
+  );
+
+  const sortOptions = useMemo(
+    () => [
+      { id: 'date', label: tEmail('unifiedInbox.filters.sort.date') },
+      { id: 'subject', label: tEmail('unifiedInbox.filters.sort.subject') },
+      { id: 'from', label: tEmail('unifiedInbox.filters.sort.from') },
+    ],
+    [tEmail]
+  );
+
+  const densityOptions = useMemo(
+    () => [
+      { id: 'comfortable', label: tEmail('unifiedInbox.filters.density.comfortable') },
+      { id: 'compact', label: tEmail('unifiedInbox.filters.density.compact') },
+    ],
+    [tEmail]
+  );
+
   const { user } = authContext;
   const { trackOperation } = useEmailMonitoring();
   const resolvedUserId = user?.uid || 'mock-user';
@@ -149,12 +177,26 @@ const InboxContainer = () => {
   const isTrash = folder === 'trash';
   const systemFolders = useMemo(
     () => [
-      { id: 'inbox', name: 'Bandeja de entrada', system: true },
-      { id: 'sent', name: 'Enviados', system: true },
-      { id: 'trash', name: 'Papelera', system: true },
+      { id: 'inbox', name: systemFolderLabels.inbox, system: true },
+      { id: 'sent', name: systemFolderLabels.sent, system: true },
+      { id: 'trash', name: systemFolderLabels.trash, system: true },
     ],
-    []
+    [systemFolderLabels]
   );
+
+  const folderSynonyms = useMemo(() => {
+    const normalize = (value) => (value || '').trim().toLowerCase();
+    return {
+      inbox: new Set(
+        ['inbox', 'bandeja de entrada', 'recibidos', systemFolderLabels.inbox, systemFolderLabels.default].map(
+          normalize
+        )
+      ),
+      sent: new Set(['sent', 'enviados', systemFolderLabels.sent].map(normalize)),
+      trash: new Set(['trash', 'papelera', systemFolderLabels.trash].map(normalize)),
+      important: new Set(['important', 'importantes', systemFolderLabels.important].map(normalize)),
+    };
+  }, [systemFolderLabels]);
 
   useEffect(() => {
     customFoldersRef.current = customFolders;
@@ -187,33 +229,40 @@ const InboxContainer = () => {
     () => [
       {
         id: 'inbox',
-        label: 'Bandeja de entrada',
+        label: systemFolderLabels.inbox,
         icon: InboxIcon,
         badge: inboxCounts.unread > 0 ? inboxCounts.unread : inboxCounts.total,
-        badgeTitle: `${inboxCounts.unread} no leídos · ${inboxCounts.total} totales`,
+        badgeTitle: tEmailVars('unifiedInbox.sidebar.inboxBadge', {
+          unread: inboxCounts.unread,
+          total: inboxCounts.total,
+        }),
         badgeTone: 'bg-blue-600 text-white',
         ia: iaCounts.inbox,
       },
       {
         id: 'sent',
-        label: 'Enviados',
+        label: systemFolderLabels.sent,
         icon: SendIcon,
         badge: sentCounts.total,
-        badgeTitle: `${sentCounts.total} enviados`,
+        badgeTitle: tEmailVars('unifiedInbox.sidebar.sentBadge', {
+          total: sentCounts.total,
+        }),
         badgeTone: 'bg-gray-700 text-white',
         ia: iaCounts.sent,
       },
       {
         id: 'trash',
-        label: 'Papelera',
+        label: systemFolderLabels.trash,
         icon: TrashIcon,
         badge: trashCounts.total,
-        badgeTitle: `${trashCounts.total} en papelera`,
+        badgeTitle: tEmailVars('unifiedInbox.sidebar.trashBadge', {
+          total: trashCounts.total,
+        }),
         badgeTone: 'bg-gray-300 text-gray-800',
         ia: 0,
       },
     ],
-    [inboxCounts, sentCounts, trashCounts, iaCounts]
+    [inboxCounts, sentCounts, trashCounts, iaCounts, systemFolderLabels, tEmailVars]
   );
 
   const folderNameResolver = useMemo(() => {
@@ -224,7 +273,7 @@ const InboxContainer = () => {
         map.set(`custom:${folderItem.id}`, folderItem.name);
       }
     });
-    map.set('important', 'Importantes');
+    map.set('important', systemFolderLabels.important);
     return (folderId) => {
       if (!folderId) return null;
       if (map.has(folderId)) return map.get(folderId);
@@ -234,21 +283,21 @@ const InboxContainer = () => {
       }
       return null;
     };
-  }, [manageFoldersList]);
+  }, [manageFoldersList, systemFolderLabels]);
 
   const activeFolderLabel = useMemo(() => {
     if (folder === 'important') {
-      return 'Importantes';
+      return systemFolderLabels.important;
     }
     const resolved = folderNameResolver ? folderNameResolver(folder) : null;
     if (resolved) return resolved;
     if (folder.startsWith('custom:')) {
       return folder.slice(7);
     }
-    if (folder === 'sent') return 'Enviados';
-    if (folder === 'trash') return 'Papelera';
-    return 'Recibidos';
-  }, [folder, folderNameResolver]);
+    if (folder === 'sent') return systemFolderLabels.sent;
+    if (folder === 'trash') return systemFolderLabels.trash;
+    return systemFolderLabels.default;
+  }, [folder, folderNameResolver, systemFolderLabels]);
 
   const mapSuggestedFolder = useCallback(
     (suggestion) => {
@@ -260,14 +309,17 @@ const InboxContainer = () => {
         return { label: null, targetKey: null };
       }
       const lower = trimmed.toLowerCase();
-      if (lower === 'inbox' || lower === 'bandeja de entrada' || lower === 'recibidos') {
-        return { label: 'Bandeja de entrada', targetKey: 'inbox' };
+      if (folderSynonyms.inbox.has(lower)) {
+        return { label: systemFolderLabels.inbox, targetKey: 'inbox' };
       }
-      if (lower === 'sent' || lower === 'enviados') {
-        return { label: 'Enviados', targetKey: 'sent' };
+      if (folderSynonyms.sent.has(lower)) {
+        return { label: systemFolderLabels.sent, targetKey: 'sent' };
       }
-      if (lower === 'trash' || lower === 'papelera') {
-        return { label: 'Papelera', targetKey: 'trash' };
+      if (folderSynonyms.trash.has(lower)) {
+        return { label: systemFolderLabels.trash, targetKey: 'trash' };
+      }
+      if (folderSynonyms.important.has(lower)) {
+        return { label: systemFolderLabels.important, targetKey: 'important' };
       }
       const list = customFoldersRef.current || [];
       const matched = list.find(
@@ -278,7 +330,7 @@ const InboxContainer = () => {
       }
       return { label: trimmed, targetKey: null };
     },
-    [customFoldersRef]
+    [customFoldersRef, folderSynonyms, systemFolderLabels]
   );
 
   const filterSummary = useMemo(() => {
@@ -1146,7 +1198,7 @@ const InboxContainer = () => {
               />
               <input
                 type="text"
-                placeholder="Buscar emails..."
+                placeholder={tEmail('unifiedInbox.search.placeholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 data-testid="email-search-input"
@@ -1156,9 +1208,9 @@ const InboxContainer = () => {
             <div
               className="flex items-center gap-1 rounded-full bg-gray-100 p-1"
               role="group"
-              aria-label="Filtro por estado"
+              aria-label={tEmail('unifiedInbox.aria.filterStatus')}
             >
-              {STATUS_FILTERS.map((option) => (
+              {statusFilters.map((option) => (
                 <button
                   key={option.id}
                   type="button"
@@ -1185,17 +1237,17 @@ const InboxContainer = () => {
               }`}
               aria-pressed={showSuggestedOnly}
               data-testid="toggle-suggested-only"
-              title="Mostrar solo correos con sugerencia de IA"
+              title={tEmail('unifiedInbox.aria.suggestedTitle')}
             >
               <Sparkles size={16} />
-              Solo sugeridos
+              {tEmail('unifiedInbox.labels.suggestedOnly')}
             </button>
           </div>
 
           <div className="flex flex-wrap items-center gap-3 text-sm">
             <div className="flex items-center gap-2">
               <label htmlFor="email-sort" className="hidden text-muted sm:block">
-                Ordenar por
+                {tEmail('unifiedInbox.labels.sortBy')}
               </label>
               <select
                 id="email-sort"
@@ -1203,7 +1255,7 @@ const InboxContainer = () => {
                 onChange={(e) => setSortField(e.target.value)}
                 className="rounded-lg border border-soft px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
               >
-                {SORT_OPTIONS.map((option) => (
+                {sortOptions.map((option) => (
                   <option key={option.id} value={option.id}>
                     {option.label}
                   </option>
@@ -1213,7 +1265,7 @@ const InboxContainer = () => {
                 type="button"
                 onClick={() => setSortDirection((prev) => (prev === 'asc' ? 'desc' : 'asc'))}
                 className="inline-flex items-center justify-center rounded-lg border border-soft px-2 py-2 text-muted hover:bg-gray-100"
-                aria-label="Invertir orden"
+                aria-label={tEmail('unifiedInbox.aria.sortToggle')}
               >
                 <ArrowUpDown size={16} />
               </button>
@@ -1222,9 +1274,9 @@ const InboxContainer = () => {
             <div
               className="flex items-center gap-1 rounded-full bg-gray-100 p-1"
               role="group"
-              aria-label="Densidad de lista"
+              aria-label={tEmail('unifiedInbox.aria.density')}
             >
-              {DENSITY_OPTIONS.map((option) => (
+              {densityOptions.map((option) => (
                 <button
                   key={option.id}
                   type="button"
@@ -1521,7 +1573,7 @@ const InboxContainer = () => {
               />
             ) : (
               <div className="h-full flex items-center justify-center text-muted">
-                Selecciona un correo para verlo
+                {tEmail('unifiedInbox.emptyState.selectEmail')}
               </div>
             )}
           </div>
@@ -1561,7 +1613,7 @@ const InboxContainer = () => {
         className="fixed bottom-4 right-4 z-10 px-3 py-2 text-sm rounded border bg-white shadow hover:bg-gray-50"
         title="Buscar proveedores con IA"
       >
-        IA Proveedores
+        {tEmail('unifiedInbox.buttons.providerAi')}
       </button>
 
       {/* Modal de busqueda IA de proveedores */}
@@ -1629,17 +1681,3 @@ const InboxContainer = () => {
 };
 
 export default InboxContainer;
-
-
-
-
-
-
-
-
-
-
-
-
-
-

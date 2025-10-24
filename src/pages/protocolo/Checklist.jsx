@@ -79,7 +79,7 @@ export default function Checklist() {
     },
   ]);
 
-  // Datos del nuevo ítem
+  // Datos del nuevo �tem
   const [newItemData, setNewItemData] = useState({
     label: '',
     category: CATEGORIES.PERSONAL,
@@ -111,7 +111,7 @@ export default function Checklist() {
   const summary = useMemo(() => getChecklistSummary(), [getChecklistSummary]);
   const readiness = useMemo(() => validateReadiness(), [validateReadiness]);
 
-  // Filtrar ítems
+  // Filtrar �tems
   const filteredItems = useMemo(() => {
     let filtered = [...items];
 
@@ -120,12 +120,12 @@ export default function Checklist() {
       filtered = filtered.filter(item => item.status === filterStatus);
     }
 
-    // Filtro por categoría
+    // Filtro por categor�a
     if (filterCategory !== 'all') {
       filtered = filtered.filter(item => item.category === filterCategory);
     }
 
-    // Búsqueda por texto
+    // B�squeda por texto
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       filtered = filtered.filter(item => 
@@ -137,7 +137,7 @@ export default function Checklist() {
     return filtered;
   }, [items, filterStatus, filterCategory, searchTerm]);
 
-  // Agrupar ítems por categoría
+  // Agrupar �tems por categor�a
   const groupedItems = useMemo(() => {
     const groups = {};
     Object.values(CATEGORIES).forEach(cat => {
@@ -146,7 +146,7 @@ export default function Checklist() {
     return groups;
   }, [filteredItems, CATEGORIES]);
 
-  // Manejar cambio de estado de ítem
+  // Manejar cambio de estado de �tem
   const handleStatusChange = useCallback((itemId, status) => {
     setItemStatus(itemId, status);
     
@@ -161,18 +161,18 @@ export default function Checklist() {
     }
   }, [setItemStatus, items, ITEM_STATUS]);
 
-  // Añadir nuevo ítem personalizado
+  // A�adir nuevo �tem personalizado
   const handleAddCustomItem = useCallback(() => {
     const { label, category, dueDate } = newItemData;
 
     if (!label.trim()) {
-      toast.error('Ingresa un nombre para el ítem');
+      toast.error('Ingresa un nombre para el �tem');
       return;
     }
 
     try {
       const newItem = addCustomItem(label, category, dueDate || null);
-      toast.success(`Ítem "${label}" añadido`);
+      toast.success(`�tem "${label}" a�adido`);
       setShowAddModal(false);
       setNewItemData({ label: '', category: CATEGORIES.PERSONAL, dueDate: '' });
     } catch (error) {
@@ -180,15 +180,15 @@ export default function Checklist() {
     }
   }, [newItemData, addCustomItem, CATEGORIES]);
 
-  // Eliminar ítem personalizado
+  // Eliminar �tem personalizado
   const handleRemoveCustomItem = useCallback((itemId) => {
     const item = items.find(i => i.id === itemId);
     if (!item) return;
 
-    if (confirm(`¿Eliminar "${item.label}"?`)) {
+    if (confirm(`�Eliminar "${item.label}"?`)) {
       try {
         removeCustomItem(itemId);
-        toast.success('Ítem eliminado');
+        toast.success('�tem eliminado');
       } catch (error) {
         toast.error(error.message);
       }
@@ -225,10 +225,10 @@ export default function Checklist() {
       try {
         const data = JSON.parse(e.target.result);
         if (!data.items || !Array.isArray(data.items)) {
-          throw new Error('Formato de archivo inválido');
+          throw new Error('Formato de archivo inv�lido');
         }
 
-        // Importar solo ítems personalizados
+        // Importar solo �tems personalizados
         const customItems = data.items.filter(item => item.custom);
         customItems.forEach(item => {
           try {
@@ -238,7 +238,7 @@ export default function Checklist() {
           }
         });
 
-        toast.success(`${customItems.length} ítems personalizados importados`);
+        toast.success(`${customItems.length} �tems personalizados importados`);
       } catch (error) {
         toast.error('Error al importar el archivo');
       }
@@ -258,20 +258,20 @@ export default function Checklist() {
     return <Icon className={color} size={20} />;
   }, [ITEM_STATUS]);
 
-  // Renderizar categoría
+  // Renderizar categor�a
   const renderCategoryLabel = useCallback((category) => {
     const labels = {
-      [CATEGORIES.DOCUMENTATION]: 'Documentación',
+      [CATEGORIES.DOCUMENTATION]: 'Documentaci�n',
       [CATEGORIES.PROVIDERS]: 'Proveedores',
       [CATEGORIES.CEREMONY]: 'Ceremonia',
       [CATEGORIES.CONTINGENCY]: 'Contingencia',
       [CATEGORIES.PERSONAL]: 'Personal',
-      [CATEGORIES.TECHNICAL]: 'Técnico',
+      [CATEGORIES.TECHNICAL]: 'T�cnico',
     };
     return labels[category] || category;
   }, [CATEGORIES]);
 
-  // Renderizar ítem del checklist
+  // Renderizar �tem del checklist
   const renderChecklistItem = useCallback((item) => {
     const isEditing = editingItem === item.id;
     const itemDocs = getItemDocuments(item.id);
@@ -312,7 +312,7 @@ export default function Checklist() {
               {item.critical && (
                 <Badge type="error" size="sm">
                   <Shield size={12} className="inline mr-1" />
-                  Crítico
+                  Cr�tico
                 </Badge>
               )}
               {item.custom && (
@@ -326,12 +326,12 @@ export default function Checklist() {
               )}
             </div>
 
-            {/* Fecha límite */}
+            {/* Fecha l�mite */}
             {item.dueDate && (
               <div className="text-sm text-gray-600 mt-1">
                 <Calendar size={14} className="inline mr-1" />
                 Vence: {new Date(item.dueDate).toLocaleDateString('es-ES')}
-                {isOverdue && <span className="text-red-600 ml-2">¡Vencido!</span>}
+                {isOverdue && <span className="text-red-600 ml-2">�Vencido!</span>}
               </div>
             )}
 
@@ -339,7 +339,7 @@ export default function Checklist() {
             {isEditing ? (
               <textarea
                 className="w-full mt-2 p-2 border rounded text-sm"
-                placeholder="Añadir notas..."
+                placeholder="A�adir notas..."
                 value={item.notes || ''}
                 onChange={(e) => setItemNotes(item.id, e.target.value)}
                 rows={2}
@@ -372,7 +372,7 @@ export default function Checklist() {
             <button
               onClick={() => toggleItemCritical(item.id)}
               className={`p-1 ${item.critical ? 'text-red-500' : 'text-gray-400'} hover:text-red-600`}
-              title="Marcar como crítico"
+              title="Marcar como cr�tico"
             >
               <Flag size={16} />
             </button>
@@ -421,7 +421,7 @@ export default function Checklist() {
   };
 
   const AddCheckpointModal = () => (
-    <Modal open={showAddModal} title="Añadir checkpoint" onClose={() => setShowAddModal(false)}>
+    <Modal open={showAddModal} title="A�adir checkpoint" onClose={() => setShowAddModal(false)}>
       <div className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -461,15 +461,15 @@ export default function Checklist() {
   );
 
   return (
-    <PageWrapper title="Checklist de última hora">
+    <PageWrapper title="Checklist de �ltima hora">
       <CeremonyChecklist />
 
       <div className="space-y-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-          <p className="text-gray-600">Resumen rápido de lo imprescindible a última hora.</p>
+          <p className="text-gray-600">Resumen r�pido de lo imprescindible a �ltima hora.</p>
           <div className="flex items-center gap-2">
             <Button onClick={() => setShowAddModal(true)} leftIcon={<Plus size={16} />}>
-              Añadir checkpoint
+              A�adir checkpoint
             </Button>
           </div>
         </div>
@@ -489,7 +489,7 @@ export default function Checklist() {
             </div>
             <div className="mt-2 text-sm text-gray-700">
               {providersLoading ? (
-                <span>Cargando…</span>
+                <span>Cargando&</span>
               ) : (
                 (() => {
                   const total = providers?.length || 0;
@@ -510,12 +510,12 @@ export default function Checklist() {
             </div>
           </Card>
 
-          {/* Música momentos especiales */}
+          {/* M�sica momentos especiales */}
           <Card className="p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Music2 size={18} className="text-purple-600" />
-                <div className="font-medium">Momentos (música)</div>
+                <div className="font-medium">Momentos (m�sica)</div>
               </div>
               <Link to="/protocolo/momentos-especiales" className="text-sm text-blue-600 underline">
                 Ver
@@ -545,7 +545,7 @@ export default function Checklist() {
             <div className="mt-2">
               {!Array.isArray(manualChecks) || manualChecks.length === 0 ? (
                 <div className="text-sm text-gray-500">
-                  Añade checkpoints con el botón “Añadir checkpoint”.
+                  A�ade checkpoints con el bot�n A�adir checkpoint.
                 </div>
               ) : (
                 <ul className="space-y-2">
@@ -592,7 +592,7 @@ export default function Checklist() {
           </Card>
         </div>
 
-        {/* Modal para añadir checkpoint */}
+        {/* Modal para a�adir checkpoint */}
         <AddCheckpointModal />
       </div>
     </PageWrapper>

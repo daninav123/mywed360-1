@@ -9,9 +9,9 @@ import { db } from '../lib/firebase';
 import sanitizeHtml from '../utils/sanitizeHtml';
 
 /*
-  Página pública one-page con la información de la boda.
+  P�gina p�blica one-page con la informaci�n de la boda.
   Ruta: /w/:uid  (ej. https://example.com/w/abc123)
-  El hosting podrá mapear subdominios a esta ruta.
+  El hosting podr� mapear subdominios a esta ruta.
 */
 
 export default function WeddingSite() {
@@ -20,7 +20,7 @@ export default function WeddingSite() {
   const [customHtml, setCustomHtml] = useState('');
   const [gallery, setGallery] = useState([]);
   const [schedule, setSchedule] = useState([]);
-  const [rsvp, setRsvp] = useState({ name: '', guests: 1, response: 'Sí', message: '' });
+  const [rsvp, setRsvp] = useState({ name: '', guests: 1, response: 'S�', message: '' });
   const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
   // Cargar datos
@@ -46,7 +46,7 @@ export default function WeddingSite() {
     })();
   }, [uid]);
 
-  // Cuenta atrás
+  // Cuenta atr�s
   useEffect(() => {
     if (!profile?.date) return;
     const target = new Date(profile.date);
@@ -66,8 +66,8 @@ export default function WeddingSite() {
     e.preventDefault();
     try {
       await addDoc(collection(db, 'users', uid, 'rsvp'), { ...rsvp, createdAt: serverTimestamp() });
-      alert('¡Gracias por tu respuesta!');
-      setRsvp({ name: '', guests: 1, response: 'Sí', message: '' });
+      alert('�Gracias por tu respuesta!');
+      setRsvp({ name: '', guests: 1, response: 'S�', message: '' });
     } catch (err) {
       console.error(err);
       alert('Error al enviar.');
@@ -76,7 +76,7 @@ export default function WeddingSite() {
 
   if (customHtml) return <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(customHtml) }} />;
 
-  if (!profile) return <p style={{ textAlign: 'center', marginTop: 40 }}>Cargando…</p>;
+  if (!profile) return <p style={{ textAlign: 'center', marginTop: 40 }}>Cargando&</p>;
 
   return (
     <div className="font-sans text-gray-800">
@@ -122,10 +122,10 @@ export default function WeddingSite() {
         </section>
       )}
 
-      {/* Galería */}
+      {/* Galer�a */}
       {gallery.length > 0 && (
         <section className="py-8 max-w-5xl mx-auto px-4">
-          <h2 className="text-3xl font-semibold text-center mb-6">Galería</h2>
+          <h2 className="text-3xl font-semibold text-center mb-6">Galer�a</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
             {gallery.map((g, i) => (
               <ExternalImage
@@ -162,8 +162,8 @@ export default function WeddingSite() {
             value={rsvp.response}
             onChange={(e) => setRsvp({ ...rsvp, response: e.target.value })}
           >
-            <option value="Sí">Asistiré</option>
-            <option value="No">No podré asistir</option>
+            <option value="S�">Asistir�</option>
+            <option value="No">No podr� asistir</option>
           </select>
           <textarea
             placeholder="Mensaje"
@@ -188,7 +188,7 @@ export default function WeddingSite() {
       {/* Mapa / alojamiento */}
       {profile.celebrationPlace && (
         <section className="py-8 bg-gray-100 px-4">
-          <h2 className="text-3xl font-semibold text-center mb-6">Cómo llegar</h2>
+          <h2 className="text-3xl font-semibold text-center mb-6">C�mo llegar</h2>
           <div className="max-w-4xl mx-auto">
             <iframe
               title="Mapa"
@@ -202,7 +202,7 @@ export default function WeddingSite() {
       )}
 
       <footer className="py-6 text-center text-sm text-gray-500">
-        © {new Date().getFullYear()} {profile.coupleName || ''}
+        � {new Date().getFullYear()} {profile.coupleName || ''}
       </footer>
     </div>
   );

@@ -1,4 +1,4 @@
-﻿/* eslint-disable no-undef */
+�/* eslint-disable no-undef */
 import { get as apiGet, post, put as apiPut, del as apiDel } from './apiClient';
 import { performanceMonitor } from './PerformanceMonitor';
 import { USE_BACKEND } from './emailService';
@@ -532,7 +532,7 @@ function fallbackClassification(mail) {
     const tags = new Set();
     let folder = null;
 
-    if (/rsvp|confirmaci(?:ó|o)n|asistencia|save the date/.test(textContent)) {
+    if (/rsvp|confirmaci(?:�|o)n|asistencia|save the date/.test(textContent)) {
       tags.add('RSVP');
       folder = folder || 'RSVP';
     }
@@ -556,13 +556,13 @@ function fallbackClassification(mail) {
       folder = folder || 'Contratos';
     }
 
-    if (/reuni(?:ó|o)n|meeting|cita|llamada|videollamada/.test(textContent)) {
+    if (/reuni(?:�|o)n|meeting|cita|llamada|videollamada/.test(textContent)) {
       tags.add('Reuniones');
       folder = folder || 'Reuniones';
     }
 
     if (
-      /proveedor|catering|fot(?:ó|o)grafo|dj|m(?:ú|u)sica|flor|banquete|venue|servicio/.test(
+      /proveedor|catering|fot(?:�|o)grafo|dj|m(?:�|u)sica|flor|banquete|venue|servicio/.test(
         textContent
       )
     ) {
@@ -570,7 +570,7 @@ function fallbackClassification(mail) {
       folder = folder || 'Proveedores';
     }
 
-    if (/invitaci(?:ó|o)n|save the date/.test(textContent)) {
+    if (/invitaci(?:�|o)n|save the date/.test(textContent)) {
       tags.add('Invitaciones');
       folder = folder || 'RSVP';
     }
@@ -824,17 +824,17 @@ function mapTagToCategory(tags = [], folder = null) {
 
   if (has('contrato', 'legal')) return 'Contratos';
   if (has('factura', 'invoice', 'recibo')) return 'Facturas';
-  if (has('reuniá³n', 'reunion', 'meeting', 'cita', 'llamada')) return 'Reuniones';
-  if (has('rsvp', 'invitaciá³n', 'invitacion', 'confirmaciá³n', 'confirmacion')) return 'RSVP';
+  if (has('reuni�n', 'reunion', 'meeting', 'cita', 'llamada')) return 'Reuniones';
+  if (has('rsvp', 'invitaci�n', 'invitacion', 'confirmaci�n', 'confirmacion')) return 'RSVP';
   if (has('guest', 'invitado')) return 'Invitado';
   if (
     has(
       'proveedor',
       'catering',
-      'fotá³grafo',
+      'fot�grafo',
       'fotografo',
       'dj',
-      'máºsica',
+      'm�sica',
       'musica',
       'flor',
       'banquete',
@@ -1050,10 +1050,10 @@ export async function scheduleEmailSend(payload, scheduledAt) {
   if (!scheduledAt) throw new Error('scheduledAt requerido');
   const date = new Date(scheduledAt);
   if (Number.isNaN(date.getTime())) {
-    throw new Error('Fecha programada no válida');
+    throw new Error('Fecha programada no v�lida');
   }
   if (payload?.attachments && payload.attachments.length) {
-    throw new Error('La programación con adjuntos no está soportada todavía');
+    throw new Error('La programaci�n con adjuntos no est� soportada todav�a');
   }
   const now = Date.now();
   if (date.getTime() < now + 60 * 1000) {
