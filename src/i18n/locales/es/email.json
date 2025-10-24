@@ -461,6 +461,39 @@
         "unavailable": "El nombre de usuario \"{{username}}@maloveapp.com\" ya esta en uso"
       }
     },
+    "filters": {
+      "header": "Filtros avanzados",
+      "fields": {
+        "from": {
+          "label": "De (Remitente)",
+          "placeholder": "correo@ejemplo.com"
+        },
+        "to": {
+          "label": "Para (Destinatario)",
+          "placeholder": "correo@ejemplo.com"
+        },
+        "subject": {
+          "label": "Asunto",
+          "placeholder": "Palabras clave en el asunto"
+        },
+        "dateFrom": "Desde fecha",
+        "dateTo": "Hasta fecha",
+        "hasAttachment": "Con archivos adjuntos",
+        "isUnread": "Solo no leidos"
+      },
+      "labels": {
+        "title": "Etiquetas",
+        "important": "Importante",
+        "work": "Trabajo",
+        "personal": "Personal",
+        "invitation": "Invitacion",
+        "provider": "Proveedor"
+      },
+      "buttons": {
+        "clear": "Limpiar filtros",
+        "apply": "Aplicar filtros"
+      }
+    },
     "compose": {
       "header": {
         "title": "Nuevo correo"

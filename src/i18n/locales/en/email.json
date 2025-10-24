@@ -453,6 +453,39 @@
         "unavailable": "The username \"{{username}}@maloveapp.com\" is already taken"
       }
     },
+    "filters": {
+      "header": "Advanced filters",
+      "fields": {
+        "from": {
+          "label": "From (sender)",
+          "placeholder": "user@example.com"
+        },
+        "to": {
+          "label": "To (recipient)",
+          "placeholder": "user@example.com"
+        },
+        "subject": {
+          "label": "Subject",
+          "placeholder": "Subject keywords"
+        },
+        "dateFrom": "From date",
+        "dateTo": "To date",
+        "hasAttachment": "With attachments",
+        "isUnread": "Only unread"
+      },
+      "labels": {
+        "title": "Labels",
+        "important": "Important",
+        "work": "Work",
+        "personal": "Personal",
+        "invitation": "Invitation",
+        "provider": "Vendor"
+      },
+      "buttons": {
+        "clear": "Clear filters",
+        "apply": "Apply filters"
+      }
+    },
     "compose": {
       "header": {
         "title": "New email"

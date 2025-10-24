@@ -1,13 +1,17 @@
-import { Filter, X, ChevronDown, ChevronUp } from 'lucide-react';
-import React, { useState } from 'react';
+import { ChevronDown, ChevronUp, Filter, X } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
 
 import Button from '../Button';
+import useTranslations from '../../hooks/useTranslations';
 
 /**
- * Componente para filtros avanzados de correo electrónico
- * Permite filtrar por fecha, remitente, etiquetas, etc.
+ * Componente para filtros avanzados de correo electronico.
+ * Permite filtrar por remitente, destinatario, periodo, etiquetas, etc.
  */
 const EmailFilters = ({ onApplyFilters, onResetFilters, initialFilters = {} }) => {
+  const { t, i18n } = useTranslations();
+  const tEmail = (key, options) => t(key, { ns: 'email', ...options });
+
   const [expanded, setExpanded] = useState(false);
   const [filters, setFilters] = useState({
     from: initialFilters.from || '',
@@ -20,41 +24,38 @@ const EmailFilters = ({ onApplyFilters, onResetFilters, initialFilters = {} }) =
     labels: initialFilters.labels || [],
   });
 
-  // Etiquetas predefinidas para el filtrado
-  const availableLabels = [
-    { id: 'important', name: 'Importante', color: 'bg-red-500' },
-    { id: 'work', name: 'Trabajo', color: 'bg-blue-500' },
-    { id: 'personal', name: 'Personal', color: 'bg-green-500' },
-    { id: 'invitation', name: 'Invitación', color: 'bg-purple-500' },
-    { id: 'provider', name: 'Proveedor', color: 'bg-yellow-500' },
-  ];
+  const availableLabels = useMemo(
+    () => [
+      { id: 'important', name: tEmail('filters.labels.important'), color: 'bg-red-500' },
+      { id: 'work', name: tEmail('filters.labels.work'), color: 'bg-blue-500' },
+      { id: 'personal', name: tEmail('filters.labels.personal'), color: 'bg-green-500' },
+      { id: 'invitation', name: tEmail('filters.labels.invitation'), color: 'bg-purple-500' },
+      { id: 'provider', name: tEmail('filters.labels.provider'), color: 'bg-yellow-500' },
+    ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [i18n.language]
+  );
 
-  // Manejar cambios en los filtros
-  const handleFilterChange = (e) => {
-    const { name, value, type, checked } = e.target;
+  const handleFilterChange = (event) => {
+    const { name, value, type, checked } = event.target;
     setFilters({
       ...filters,
       [name]: type === 'checkbox' ? checked : value,
     });
   };
 
-  // Manejar selección de etiquetas
   const handleLabelToggle = (labelId) => {
-    setFilters((prev) => {
-      if (prev.labels.includes(labelId)) {
-        return { ...prev, labels: prev.labels.filter((id) => id !== labelId) };
-      } else {
-        return { ...prev, labels: [...prev.labels, labelId] };
-      }
-    });
+    setFilters((prev) =>
+      prev.labels.includes(labelId)
+        ? { ...prev, labels: prev.labels.filter((id) => id !== labelId) }
+        : { ...prev, labels: [...prev.labels, labelId] }
+    );
   };
 
-  // Aplicar filtros
   const handleApply = () => {
     onApplyFilters(filters);
   };
 
-  // Resetear filtros
   const handleReset = () => {
     setFilters({
       from: '',
@@ -71,14 +72,13 @@ const EmailFilters = ({ onApplyFilters, onResetFilters, initialFilters = {} }) =
 
   return (
     <div className="bg-white border rounded-md shadow-sm mb-4">
-      {/* Cabecera de filtros */}
       <div
         className="flex justify-between items-center p-3 cursor-pointer"
         onClick={() => setExpanded(!expanded)}
       >
         <div className="flex items-center">
           <Filter size={16} className="text-gray-500 mr-2" />
-          <h3 className="font-medium">Filtros avanzados</h3>
+          <h3 className="font-medium">{tEmail('filters.header')}</h3>
         </div>
         <div>
           {expanded ? (
@@ -89,14 +89,12 @@ const EmailFilters = ({ onApplyFilters, onResetFilters, initialFilters = {} }) =
         </div>
       </div>
 
-      {/* Panel de filtros expandible */}
       {expanded && (
         <div className="p-4 border-t">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Filtro: De */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="filter-from">
-                De (Remitente)
+                {tEmail('filters.fields.from.label')}
               </label>
               <input
                 id="filter-from"
@@ -105,14 +103,13 @@ const EmailFilters = ({ onApplyFilters, onResetFilters, initialFilters = {} }) =
                 value={filters.from}
                 onChange={handleFilterChange}
                 className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
-                placeholder="correo@ejemplo.com"
+                placeholder={tEmail('filters.fields.from.placeholder')}
               />
             </div>
 
-            {/* Filtro: Para */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="filter-to">
-                Para (Destinatario)
+                {tEmail('filters.fields.to.label')}
               </label>
               <input
                 id="filter-to"
@@ -121,17 +118,16 @@ const EmailFilters = ({ onApplyFilters, onResetFilters, initialFilters = {} }) =
                 value={filters.to}
                 onChange={handleFilterChange}
                 className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
-                placeholder="correo@ejemplo.com"
+                placeholder={tEmail('filters.fields.to.placeholder')}
               />
             </div>
 
-            {/* Filtro: Asunto */}
-            <div className="md:col-span-2">
+            <div>
               <label
                 className="block text-sm font-medium text-gray-700 mb-1"
                 htmlFor="filter-subject"
               >
-                Asunto contiene
+                {tEmail('filters.fields.subject.label')}
               </label>
               <input
                 id="filter-subject"
@@ -140,17 +136,16 @@ const EmailFilters = ({ onApplyFilters, onResetFilters, initialFilters = {} }) =
                 value={filters.subject}
                 onChange={handleFilterChange}
                 className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
-                placeholder="Palabras clave en el asunto"
+                placeholder={tEmail('filters.fields.subject.placeholder')}
               />
             </div>
 
-            {/* Filtro: Rango de fechas */}
             <div>
               <label
                 className="block text-sm font-medium text-gray-700 mb-1"
                 htmlFor="filter-date-from"
               >
-                Desde fecha
+                {tEmail('filters.fields.dateFrom')}
               </label>
               <input
                 id="filter-date-from"
@@ -167,7 +162,7 @@ const EmailFilters = ({ onApplyFilters, onResetFilters, initialFilters = {} }) =
                 className="block text-sm font-medium text-gray-700 mb-1"
                 htmlFor="filter-date-to"
               >
-                Hasta fecha
+                {tEmail('filters.fields.dateTo')}
               </label>
               <input
                 id="filter-date-to"
@@ -179,7 +174,6 @@ const EmailFilters = ({ onApplyFilters, onResetFilters, initialFilters = {} }) =
               />
             </div>
 
-            {/* Filtros tipo checkbox */}
             <div className="flex items-center">
               <input
                 id="filter-attachment"
@@ -190,7 +184,7 @@ const EmailFilters = ({ onApplyFilters, onResetFilters, initialFilters = {} }) =
                 className="w-4 h-4 text-blue-600 border-gray-300 rounded"
               />
               <label htmlFor="filter-attachment" className="ml-2 block text-sm text-gray-700">
-                Con archivos adjuntos
+                {tEmail('filters.fields.hasAttachment')}
               </label>
             </div>
 
@@ -204,28 +198,30 @@ const EmailFilters = ({ onApplyFilters, onResetFilters, initialFilters = {} }) =
                 className="w-4 h-4 text-blue-600 border-gray-300 rounded"
               />
               <label htmlFor="filter-unread" className="ml-2 block text-sm text-gray-700">
-                Solo no leídos
+                {tEmail('filters.fields.isUnread')}
               </label>
             </div>
 
-            {/* Filtro: Etiquetas */}
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Etiquetas</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {tEmail('filters.labels.title')}
+              </label>
               <div className="flex flex-wrap gap-2">
                 {availableLabels.map((label) => (
                   <button
                     key={label.id}
                     type="button"
                     onClick={() => handleLabelToggle(label.id)}
-                    className={`px-2 py-1 rounded-full text-xs flex items-center
-                      ${
-                        filters.labels.includes(label.id)
-                          ? `${label.color} text-white`
-                          : 'bg-gray-100 text-gray-800'
-                      }`}
+                    className={`px-2 py-1 rounded-full text-xs flex items-center ${
+                      filters.labels.includes(label.id)
+                        ? `${label.color} text-white`
+                        : 'bg-gray-100 text-gray-800'
+                    }`}
                   >
                     <span
-                      className={`w-2 h-2 rounded-full mr-1 ${filters.labels.includes(label.id) ? 'bg-white' : label.color}`}
+                      className={`w-2 h-2 rounded-full mr-1 ${
+                        filters.labels.includes(label.id) ? 'bg-white' : label.color
+                      }`}
                     ></span>
                     {label.name}
                   </button>
@@ -234,7 +230,6 @@ const EmailFilters = ({ onApplyFilters, onResetFilters, initialFilters = {} }) =
             </div>
           </div>
 
-          {/* Botones de acción */}
           <div className="flex justify-end mt-4 space-x-2">
             <Button
               type="button"
@@ -242,7 +237,7 @@ const EmailFilters = ({ onApplyFilters, onResetFilters, initialFilters = {} }) =
               onClick={handleReset}
               className="flex items-center"
             >
-              <X size={14} className="mr-1" /> Limpiar filtros
+              <X size={14} className="mr-1" /> {tEmail('filters.buttons.clear')}
             </Button>
             <Button
               type="button"
@@ -250,7 +245,7 @@ const EmailFilters = ({ onApplyFilters, onResetFilters, initialFilters = {} }) =
               onClick={handleApply}
               className="flex items-center"
             >
-              <Filter size={14} className="mr-1" /> Aplicar filtros
+              <Filter size={14} className="mr-1" /> {tEmail('filters.buttons.apply')}
             </Button>
           </div>
         </div>

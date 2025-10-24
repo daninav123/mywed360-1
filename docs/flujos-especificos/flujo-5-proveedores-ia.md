@@ -1,4 +1,4 @@
-﻿# 5. Proveedores con IA (estado 2025-10-07)
+# 5. Proveedores con IA (estado 2025-10-07)
 
 > Implementado: `GestionProveedores.jsx` (panel superior plegable con zona de confirmados), `ProveedorList.jsx`, `ProveedorCard.jsx`, `ProveedorDetail.jsx`, `GroupAllocationModal.jsx`, `GroupCreateModal.jsx`, `GroupSuggestions.jsx`, `DuplicateDetectorModal.jsx`, `CompareSelectedModal.jsx`, `ProviderSearchDrawer.jsx`, modales IA (`AIBusquedaModal.jsx`, `AISearchModal.jsx`, `AIEmailModal.jsx`), servicios `aiSuppliersService.js`, `supplierEventBridge`, `EmailTrackingList.jsx`, `ProviderEmailModal.jsx`, `RFQModal.jsx`, `ReservationModal.jsx`.
 > Pendiente: scoring inteligente consolidado, portal proveedor completamente funcional, automatización de RFQ multi-proveedor y reportes comparativos.
@@ -275,3 +275,95 @@
 - Reportes comparativos y analítica de mercado (incluyendo cobertura de servicios pendientes).
 - Integración con marketplaces externos y recomendaciones en sitio público.
 
+
+### 🔍 ESTADO REAL VERIFICADO (2025-10-24)
+
+**✅ IMPLEMENTADO Y FUNCIONAL:**
+
+1. **useAISearch Hook** - `src/hooks/useAISearch.jsx` ✅ (439 líneas)
+   - Búsqueda IA con OpenAI integrada
+   - Normalización de resultados (`normalizeResult()`)
+   - Match scoring automático
+   - Generación de resúmenes IA
+   - Funciones: `guessServiceFromQuery()`, `ensureMatchScore()`, `generateAISummary()`
+
+2. **Componentes IA** ✅
+   - `src/components/proveedores/ai/AISearchModal.jsx` ✅
+   - `src/components/proveedores/ai/AIEmailModal.jsx` ✅ (6103 bytes)
+   - `src/components/proveedores/ai/AIResultList.jsx` ✅ (13425 bytes)
+
+3. **Componentes Core** ✅
+   - `src/components/proveedores/ProveedorList.jsx` ✅ (CORREGIDO)
+   - `src/components/proveedores/ProveedorCard.jsx` ✅
+
+4. **Tests E2E** ✅
+   - `cypress/e2e/ai-supplier-search.cy.js` ✅ (252 líneas)
+   - `cypress/e2e/proveedores_flow.cy.js` ✅
+   - `cypress/e2e/proveedores_smoke.cy.js` ✅
+
+**❌ NO IMPLEMENTADO:**
+
+1. **Portal Proveedor Completo** ❌
+   - Autenticación de proveedores ❌
+   - Feedback bidireccional ❌
+   - Vista de estado por servicio ❌
+   - Estimación: 40-60 horas
+
+2. **RFQ Multi-Proveedor Automatizado** ❌
+   - RFQ masivo ❌
+   - Recordatorios automáticos ❌
+   - Estimación: 20-30 horas
+
+3. **Scoring IA Consolidado** ❌
+   - Métricas históricas ❌
+   - Análisis predictivo ❌
+   - Estimación: 15-20 horas
+
+4. **Reportes Comparativos Avanzados** ❌
+   - Analítica de mercado ❌
+   - Cobertura de servicios ❌
+   - Estimación: 12-15 horas
+
+5. **Integración Marketplaces Externos** ❌
+   - Conectores externos ❌
+   - Recomendaciones sitio público ❌
+   - Estimación: 30-40 horas
+
+**🟡 PARCIALMENTE IMPLEMENTADO:**
+
+1. **Tests** 🟡
+   - Tests E2E básicos: ✅ (navegación, autenticación)
+   - Tests de lógica IA: ❌ (useAISearch sin tests unitarios)
+   - Tests de modales: ❌ (AISearchModal, AIEmailModal sin tests)
+   - Cobertura E2E: ~50%
+
+### Implementación Actual: **70%**
+
+**Código verificado:**
+```javascript
+// useAISearch.jsx - Líneas 46-66
+const normalizeResult = (item, index, query, source) => {
+  const name = (item?.name || item?.title || `Proveedor sugerido ${index + 1}`).trim();
+  const service = (item?.service || item?.category || guessServiceFromQuery(query)).trim();
+  const location = item?.location || item?.city || '';
+  const priceRange = item?.priceRange || item?.price || '';
+  // ... normalización completa con 15+ campos
+  return { id, name, service, location, priceRange, description, tags, 
+           image, website, email, phone, match, aiSummary, source };
+};
+```
+
+### Pendientes Priorizados:
+
+**Corto Plazo (1-2 meses):**
+- ⏳ Tests unitarios para useAISearch (4h)
+- ⏳ Tests para modales IA (6h)
+- ⏳ Scoring IA consolidado (15-20h)
+
+**Medio Plazo (3-6 meses):**
+- ⏳ Portal proveedor MVP (40-60h)
+- ⏳ RFQ multi-proveedor (20-30h)
+- ⏳ Reportes comparativos (12-15h)
+
+**Largo Plazo (6-12 meses):**
+- ⏳ Integración marketplaces externos (30-40h)
