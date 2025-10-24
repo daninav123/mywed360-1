@@ -262,17 +262,15 @@ service cloud.firestore {
     }
 
     function isValidBanquetData(data) {
-      // Accept nested config or flat for compatibility
       return listFieldValid(data, 'tables') &&
              listFieldValid(data, 'areas') &&
              (
-               (data.keys().hasAny(['config']) && isValidConfig(data.config)) ||
-               (
-                 // fallback compat: width/height/aisleMin at root
-                 (data.keys().hasAny(['width']) || data.keys().hasAny(['height']) || data.keys().hasAny(['aisleMin']))
-                 ? isValidConfig(data)
-                 : true
-               )
+               // Require config validation if config field exists
+               (data.keys().hasAny(['config']) && data.config is map && isValidConfig(data.config)) ||
+               // Or flat config at root
+               (data.keys().hasAny(['width', 'height', 'aisleMin']) && isValidConfig(data)) ||
+               // Or no config at all (allow for incomplete docs)
+               (!data.keys().hasAny(['config', 'width', 'height', 'aisleMin']))
              );
     }
 
