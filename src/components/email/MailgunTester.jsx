@@ -1,73 +1,93 @@
 import {
+  Alert,
   Box,
   Button,
-  TextField,
-  Typography,
-  Paper,
-  Grid,
-  Snackbar,
-  Alert,
   CircularProgress,
   Divider,
+  Grid,
+  Paper,
+  Snackbar,
+  TextField,
+  Typography,
 } from '@mui/material';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
-import { sendEmail, validateEmail, checkUsernameAvailability } from '../../services/mailgunService';
+import useTranslations from '../../hooks/useTranslations';
+import {
+  checkUsernameAvailability,
+  sendEmail,
+  validateEmail,
+} from '../../services/mailgunService';
 
 /**
- * Componente para probar las funcionalidades de Mailgun
- * Permite probar envío de emails, validación y disponibilidad de nombres de usuario
+ * Herramienta para verificar la integracion con Mailgun:
+ * - Envio de emails
+ * - Validacion de direcciones
+ * - Comprobacion de disponibilidad de alias
  */
 function MailgunTester() {
-  // Estado para formulario de envío de email
-  const [sending, setSending] = useState(false);
-  const [emailForm, setEmailForm] = useState({
-    from: `Test <test@mg.maloveapp.com>`,
-    to: '',
-    subject: 'Prueba de Mailgun desde myWed360',
-    text: 'Este es un correo de prueba enviado desde la aplicación myWed360.',
-  });
+  const { t, tVars, i18n } = useTranslations();
+  const tEmail = (key, options) => t(key, { ns: 'email', ...options });
+  const tEmailVars = (key, variables) => tVars(key, { ns: 'email', ...variables });
 
-  // Estado para validación de email
+  const sendPlaceholders = useMemo(
+    () => ({
+      from: tEmail('mailgunTester.sections.send.placeholders.from'),
+      to: tEmail('mailgunTester.sections.send.placeholders.to'),
+      subject: tEmail('mailgunTester.sections.send.placeholders.subject'),
+      text: tEmail('mailgunTester.sections.send.placeholders.text'),
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [i18n.language]
+  );
+
+  const [sending, setSending] = useState(false);
+  const [emailForm, setEmailForm] = useState(() => ({
+    from: sendPlaceholders.from,
+    to: '',
+    subject: sendPlaceholders.subject,
+    text: sendPlaceholders.text,
+  }));
+
   const [validating, setValidating] = useState(false);
   const [emailToValidate, setEmailToValidate] = useState('');
   const [validationResult, setValidationResult] = useState(null);
 
-  // Estado para verificación de disponibilidad de username
   const [checking, setChecking] = useState(false);
   const [usernameToCheck, setUsernameToCheck] = useState('');
   const [availabilityResult, setAvailabilityResult] = useState(null);
 
-  // Estado para notificaciones
   const [notification, setNotification] = useState({
     open: false,
     message: '',
     severity: 'info',
   });
 
-  // Manejar cambios en el formulario de email
-  const handleEmailFormChange = (e) => {
-    const { name, value } = e.target;
+  const handleEmailFormChange = (event) => {
+    const { name, value } = event.target;
     setEmailForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Enviar email de prueba
-  const handleSendEmail = async (e) => {
-    e.preventDefault();
+  const handleSendEmail = async (event) => {
+    event.preventDefault();
     setSending(true);
 
     try {
       const result = await sendEmail(emailForm);
       setNotification({
         open: true,
-        message: `Email enviado correctamente! ID: ${result.messageId}`,
+        message: tEmailVars('mailgunTester.notifications.sendSuccess', {
+          id: result?.messageId ?? 'N/A',
+        }),
         severity: 'success',
       });
       console.log('Respuesta del servidor:', result);
     } catch (error) {
       setNotification({
         open: true,
-        message: `Error al enviar email: ${error.message}`,
+        message: tEmailVars('mailgunTester.notifications.sendError', {
+          message: error?.message ?? 'unknown',
+        }),
         severity: 'error',
       });
       console.error('Error al enviar:', error);
@@ -76,9 +96,8 @@ function MailgunTester() {
     }
   };
 
-  // Validar email
-  const handleValidateEmail = async (e) => {
-    e.preventDefault();
+  const handleValidateEmail = async (event) => {
+    event.preventDefault();
     setValidating(true);
 
     try {
@@ -87,14 +106,20 @@ function MailgunTester() {
       setNotification({
         open: true,
         message: result.isValid
-          ? 'El email es válido'
-          : `El email no es válido: ${result.reason || 'formato incorrecto'}`,
+          ? tEmail('mailgunTester.validation.success')
+          : tEmailVars('mailgunTester.validation.invalid', {
+              reason:
+                result.reason ||
+                tEmail('mailgunTester.sections.validate.defaultReason'),
+            }),
         severity: result.isValid ? 'success' : 'warning',
       });
     } catch (error) {
       setNotification({
         open: true,
-        message: `Error al validar: ${error.message}`,
+        message: tEmailVars('mailgunTester.notifications.validateError', {
+          message: error?.message ?? 'unknown',
+        }),
         severity: 'error',
       });
       setValidationResult(null);
@@ -103,9 +128,8 @@ function MailgunTester() {
     }
   };
 
-  // Verificar disponibilidad de nombre de usuario
-  const handleCheckAvailability = async (e) => {
-    e.preventDefault();
+  const handleCheckAvailability = async (event) => {
+    event.preventDefault();
     setChecking(true);
 
     try {
@@ -114,14 +138,20 @@ function MailgunTester() {
       setNotification({
         open: true,
         message: isAvailable
-          ? `El nombre de usuario "${usernameToCheck}" está disponible`
-          : `El nombre de usuario "${usernameToCheck}" ya está en uso`,
+          ? tEmailVars('mailgunTester.availability.available', {
+              username: usernameToCheck,
+            })
+          : tEmailVars('mailgunTester.availability.unavailable', {
+              username: usernameToCheck,
+            }),
         severity: isAvailable ? 'success' : 'warning',
       });
     } catch (error) {
       setNotification({
         open: true,
-        message: `Error al verificar disponibilidad: ${error.message}`,
+        message: tEmailVars('mailgunTester.notifications.availabilityError', {
+          message: error?.message ?? 'unknown',
+        }),
         severity: 'error',
       });
       setAvailabilityResult(null);
@@ -131,49 +161,55 @@ function MailgunTester() {
   };
 
   return (
-    <Box sx={{ p: 3, maxWidth: 800, mx: 'auto' }}>
+    <Box sx={{ p: 4 }}>
       <Typography variant="h4" gutterBottom>
-        Probador de Mailgun myWed360
+        {tEmail('mailgunTester.title')}
+      </Typography>
+      <Typography variant="body1" color="textSecondary" gutterBottom>
+        {tEmail('mailgunTester.subtitle')}
       </Typography>
 
-      <Grid container spacing={4}>
-        {/* Sección de envío de correo */}
-        <Grid item xs={12}>
-          <Paper elevation={3} sx={{ p: 3 }}>
+      <Divider sx={{ my: 3 }} />
+
+      <Grid container spacing={3}>
+        <Grid item xs={12} md={6}>
+          <Paper elevation={3} sx={{ p: 3, height: '100%' }}>
             <Typography variant="h6" gutterBottom>
-              1. Enviar Email de Prueba
+              {tEmail('mailgunTester.sections.send.title')}
             </Typography>
-            <Box component="form" onSubmit={handleSendEmail} sx={{ mt: 2 }}>
+            <Box component="form" onSubmit={handleSendEmail}>
               <TextField
-                label="Desde"
+                label={tEmail('mailgunTester.sections.send.fields.from')}
                 name="from"
                 value={emailForm.from}
                 onChange={handleEmailFormChange}
                 fullWidth
                 margin="normal"
+                placeholder={sendPlaceholders.from}
                 required
               />
               <TextField
-                label="Para"
+                label={tEmail('mailgunTester.sections.send.fields.to')}
                 name="to"
                 value={emailForm.to}
                 onChange={handleEmailFormChange}
                 fullWidth
                 margin="normal"
+                placeholder={sendPlaceholders.to}
                 required
-                placeholder="ejemplo@gmail.com"
               />
               <TextField
-                label="Asunto"
+                label={tEmail('mailgunTester.sections.send.fields.subject')}
                 name="subject"
                 value={emailForm.subject}
                 onChange={handleEmailFormChange}
                 fullWidth
                 margin="normal"
+                placeholder={sendPlaceholders.subject}
                 required
               />
               <TextField
-                label="Mensaje"
+                label={tEmail('mailgunTester.sections.send.fields.text')}
                 name="text"
                 value={emailForm.text}
                 onChange={handleEmailFormChange}
@@ -181,6 +217,7 @@ function MailgunTester() {
                 margin="normal"
                 multiline
                 rows={4}
+                placeholder={sendPlaceholders.text}
                 required
               />
               <Button
@@ -190,27 +227,33 @@ function MailgunTester() {
                 sx={{ mt: 2 }}
                 disabled={sending}
               >
-                {sending ? <CircularProgress size={24} /> : 'Enviar Email'}
+                {sending ? (
+                  <>
+                    <CircularProgress size={24} sx={{ mr: 1 }} />
+                    {tEmail('mailgunTester.sections.send.button.loading')}
+                  </>
+                ) : (
+                  tEmail('mailgunTester.sections.send.button.default')
+                )}
               </Button>
             </Box>
           </Paper>
         </Grid>
 
-        {/* Sección de validación de email */}
         <Grid item xs={12} md={6}>
           <Paper elevation={3} sx={{ p: 3, height: '100%' }}>
             <Typography variant="h6" gutterBottom>
-              2. Validar Email
+              {tEmail('mailgunTester.sections.validate.title')}
             </Typography>
             <Box component="form" onSubmit={handleValidateEmail}>
               <TextField
-                label="Email para validar"
+                label={tEmail('mailgunTester.sections.validate.field')}
                 value={emailToValidate}
-                onChange={(e) => setEmailToValidate(e.target.value)}
+                onChange={(event) => setEmailToValidate(event.target.value)}
                 fullWidth
                 margin="normal"
                 required
-                placeholder="ejemplo@gmail.com"
+                placeholder={tEmail('mailgunTester.sections.validate.placeholder')}
               />
               <Button
                 type="submit"
@@ -219,7 +262,14 @@ function MailgunTester() {
                 sx={{ mt: 2 }}
                 disabled={validating}
               >
-                {validating ? <CircularProgress size={24} /> : 'Validar'}
+                {validating ? (
+                  <>
+                    <CircularProgress size={24} sx={{ mr: 1 }} />
+                    {tEmail('mailgunTester.sections.validate.button.loading')}
+                  </>
+                ) : (
+                  tEmail('mailgunTester.sections.validate.button.default')
+                )}
               </Button>
 
               {validationResult && (
@@ -228,7 +278,9 @@ function MailgunTester() {
                     variant="body1"
                     color={validationResult.isValid ? 'success.main' : 'error.main'}
                   >
-                    {validationResult.isValid ? '✅ Email válido' : '❌ Email inválido'}
+                    {validationResult.isValid
+                      ? tEmail('mailgunTester.validation.resultValid')
+                      : tEmail('mailgunTester.validation.resultInvalid')}
                   </Typography>
                 </Box>
               )}
@@ -236,22 +288,21 @@ function MailgunTester() {
           </Paper>
         </Grid>
 
-        {/* Sección de verificación de disponibilidad */}
         <Grid item xs={12} md={6}>
           <Paper elevation={3} sx={{ p: 3, height: '100%' }}>
             <Typography variant="h6" gutterBottom>
-              3. Verificar Disponibilidad
+              {tEmail('mailgunTester.sections.availability.title')}
             </Typography>
             <Box component="form" onSubmit={handleCheckAvailability}>
               <TextField
-                label="Nombre de usuario"
+                label={tEmail('mailgunTester.sections.availability.field')}
                 value={usernameToCheck}
-                onChange={(e) => setUsernameToCheck(e.target.value)}
+                onChange={(event) => setUsernameToCheck(event.target.value)}
                 fullWidth
                 margin="normal"
                 required
-                placeholder="nombre"
-                helperText="Solo el nombre sin @maloveapp.com"
+                placeholder={tEmail('mailgunTester.sections.availability.placeholder')}
+                helperText={tEmail('mailgunTester.sections.availability.helper')}
               />
               <Button
                 type="submit"
@@ -260,7 +311,14 @@ function MailgunTester() {
                 sx={{ mt: 2 }}
                 disabled={checking}
               >
-                {checking ? <CircularProgress size={24} /> : 'Verificar Disponibilidad'}
+                {checking ? (
+                  <>
+                    <CircularProgress size={24} sx={{ mr: 1 }} />
+                    {tEmail('mailgunTester.sections.availability.button.loading')}
+                  </>
+                ) : (
+                  tEmail('mailgunTester.sections.availability.button.default')
+                )}
               </Button>
 
               {availabilityResult !== null && (
@@ -270,8 +328,12 @@ function MailgunTester() {
                     color={availabilityResult ? 'success.main' : 'error.main'}
                   >
                     {availabilityResult
-                      ? `✅ "${usernameToCheck}@maloveapp.com" está disponible`
-                      : `❌ "${usernameToCheck}@maloveapp.com" ya está en uso`}
+                      ? tEmailVars('mailgunTester.availability.available', {
+                          username: usernameToCheck,
+                        })
+                      : tEmailVars('mailgunTester.availability.unavailable', {
+                          username: usernameToCheck,
+                        })}
                   </Typography>
                 </Box>
               )}

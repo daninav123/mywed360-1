@@ -400,6 +400,67 @@
         "testSendFailed": "Error al enviar email de prueba"
       }
     },
+    "mailgunTester": {
+      "title": "Tester de Mailgun",
+      "subtitle": "Utiliza estas herramientas para probar la integracion con Mailgun.",
+      "sections": {
+        "send": {
+          "title": "1. Enviar Email",
+          "fields": {
+            "from": "Remitente",
+            "to": "Destinatario",
+            "subject": "Asunto",
+            "text": "Mensaje"
+          },
+          "placeholders": {
+            "from": "Test <test@mg.maloveapp.com>",
+            "to": "destinatario@ejemplo.com",
+            "subject": "Prueba de Mailgun desde MaLoveApp",
+            "text": "Este es un correo de prueba enviado desde la aplicacion MaLoveApp."
+          },
+          "button": {
+            "default": "Enviar Email",
+            "loading": "Enviando..."
+          }
+        },
+        "validate": {
+          "title": "2. Validar Email",
+          "field": "Email para validar",
+          "placeholder": "ejemplo@gmail.com",
+          "button": {
+            "default": "Validar",
+            "loading": "Validando..."
+          },
+          "defaultReason": "formato incorrecto"
+        },
+        "availability": {
+          "title": "3. Verificar Disponibilidad",
+          "field": "Nombre de usuario",
+          "placeholder": "nombre",
+          "helper": "Solo el nombre sin @maloveapp.com",
+          "button": {
+            "default": "Verificar Disponibilidad",
+            "loading": "Verificando..."
+          }
+        }
+      },
+      "notifications": {
+        "sendSuccess": "Email enviado correctamente. ID: {{id}}",
+        "sendError": "Error al enviar email: {{message}}",
+        "validateError": "Error al validar: {{message}}",
+        "availabilityError": "Error al verificar disponibilidad: {{message}}"
+      },
+      "validation": {
+        "success": "El email es valido",
+        "invalid": "El email no es valido: {{reason}}",
+        "resultValid": "✅ Email valido",
+        "resultInvalid": "❌ Email invalido"
+      },
+      "availability": {
+        "available": "El nombre de usuario \"{{username}}@maloveapp.com\" esta disponible",
+        "unavailable": "El nombre de usuario \"{{username}}@maloveapp.com\" ya esta en uso"
+      }
+    },
     "compose": {
       "header": {
         "title": "Nuevo correo"

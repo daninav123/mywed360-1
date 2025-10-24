@@ -392,6 +392,67 @@
         "testSendFailed": "We could not send the test email"
       }
     },
+    "mailgunTester": {
+      "title": "Mailgun Tester",
+      "subtitle": "Use these tools to verify the Mailgun integration.",
+      "sections": {
+        "send": {
+          "title": "1. Send Email",
+          "fields": {
+            "from": "Sender",
+            "to": "Recipient",
+            "subject": "Subject",
+            "text": "Message"
+          },
+          "placeholders": {
+            "from": "Test <test@mg.maloveapp.com>",
+            "to": "recipient@example.com",
+            "subject": "Mailgun test from MaLoveApp",
+            "text": "This is a test email sent from the MaLoveApp console."
+          },
+          "button": {
+            "default": "Send email",
+            "loading": "Sending..."
+          }
+        },
+        "validate": {
+          "title": "2. Validate Email",
+          "field": "Email to validate",
+          "placeholder": "example@gmail.com",
+          "button": {
+            "default": "Validate",
+            "loading": "Validating..."
+          },
+          "defaultReason": "invalid format"
+        },
+        "availability": {
+          "title": "3. Check availability",
+          "field": "Username",
+          "placeholder": "username",
+          "helper": "Enter the name without @maloveapp.com",
+          "button": {
+            "default": "Check availability",
+            "loading": "Checking..."
+          }
+        }
+      },
+      "notifications": {
+        "sendSuccess": "Email sent successfully. ID: {{id}}",
+        "sendError": "We could not send the email: {{message}}",
+        "validateError": "We could not validate the email: {{message}}",
+        "availabilityError": "We could not check availability: {{message}}"
+      },
+      "validation": {
+        "success": "The email is valid",
+        "invalid": "The email is not valid: {{reason}}",
+        "resultValid": "✅ Valid email",
+        "resultInvalid": "❌ Invalid email"
+      },
+      "availability": {
+        "available": "The username \"{{username}}@maloveapp.com\" is available",
+        "unavailable": "The username \"{{username}}@maloveapp.com\" is already taken"
+      }
+    },
     "compose": {
       "header": {
         "title": "New email"
