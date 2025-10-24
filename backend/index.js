@@ -1,4 +1,4 @@
-// Express backend for MaLoveApp
+﻿// Express backend for MaLoveApp
 
 // Provides:
 //   GET /api/transactions - proxy or mock to bank aggregator (Nordigen)
@@ -115,6 +115,7 @@ import projectMetricsRouter from './routes/project-metrics.js';
 import weddingsRouter from './routes/weddings.js';
 import usersRouter from './routes/users.js';
 import taskTemplatesRouter from './routes/task-templates.js';
+import mobileRouter from './routes/mobile.js';
 
 import ipAllowlist from './middleware/ipAllowlist.js';
 import adminAuthRouter from './routes/admin-auth.js';
