@@ -494,6 +494,87 @@
         "apply": "Aplicar filtros"
       }
     },
+    "settings": {
+      "title": "Configuracion de correo electronico",
+      "address": {
+        "title": "Tu direccion de correo",
+        "description": "Esta es tu direccion de correo electronico actual en MaLoveApp:"
+      },
+      "alias": {
+        "title": "Personaliza tu direccion de correo",
+        "description": "Puedes personalizar la parte inicial de tu direccion de correo para hacerla mas facil de recordar.",
+        "label": "Nuevo alias de correo",
+        "placeholder": "tunombre",
+        "suffix": "@maloveapp.com",
+        "helper": "Solo letras minusculas, numeros y puntos. Minimo 3 caracteres.",
+        "validationError": "El alias debe tener al menos 3 caracteres y solo puede contener letras, numeros y puntos.",
+        "success": "Tu direccion de correo ha sido actualizada con exito.",
+        "button": {
+          "default": "Actualizar direccion",
+          "loading": "Actualizando..."
+        },
+        "changeError": "Error: {{message}}"
+      },
+      "notifications": {
+        "title": "Preferencias de notificacion",
+        "newEmail": "Notificarme cuando reciba nuevos correos",
+        "read": "Notificarme cuando mis correos sean leidos"
+      },
+      "autoReply": {
+        "title": "Respuestas automaticas inteligentes",
+        "lastSync": "Ultima sincronizacion: {{value}}",
+        "lastSyncPending": "pendiente",
+        "syncing": "Sincronizando...",
+        "description": "Configura mensajes automaticos segun el tipo de correo mientras la IA analiza los emails entrantes.",
+        "success": "Configuracion guardada correctamente.",
+        "errors": {
+          "sync": "No se pudo sincronizar la configuracion de auto-respuestas.",
+          "save": "No se pudo guardar la configuracion."
+        },
+        "enable": "Activar respuestas automaticas",
+        "defaultSubject": "Re: [Asunto]",
+        "generalDefault": "Hola [Nombre],\\n\\nHemos recibido tu mensaje y te responderemos en breve.\\n\\nGracias!",
+        "helper": "Puedes usar [Nombre], [Categoria] y [Asunto] como variables.",
+        "fields": {
+          "general": "Mensaje general",
+          "subject": "Asunto automatico",
+          "interval": {
+            "label": "Intervalo (horas)"
+          },
+          "exclusions": {
+            "label": "Remitentes excluidos",
+            "placeholder": "correo1@dominio.com, correo2@dominio.com"
+          }
+        },
+        "categories": {
+          "provider": "Mensaje para proveedores",
+          "guest": "Mensaje para invitados",
+          "finance": "Mensaje para finanzas",
+          "contract": "Mensaje para contratos",
+          "invoice": "Mensaje para facturas",
+          "meeting": "Mensaje para reuniones",
+          "rsvp": "Mensaje para confirmaciones (RSVP)"
+        },
+        "buttons": {
+          "save": "Guardar respuestas automaticas",
+          "saving": "Guardando..."
+        }
+      },
+      "scheduled": {
+        "title": "Correos programados",
+        "description": "Consulta y gestiona los envios que has programado desde el compositor.",
+        "empty": "No tienes correos programados actualmente.",
+        "subjectFallback": "(Sin asunto)",
+        "toLabel": "Para: {{value}}",
+        "toFallback": "Sin destinatario",
+        "scheduledLabel": "Programado: {{value}}",
+        "scheduledFallback": "Sin fecha",
+        "buttons": {
+          "cancel": "Cancelar",
+          "refresh": "Actualizar lista"
+        }
+      }
+    },
     "compose": {
       "header": {
         "title": "Nuevo correo"

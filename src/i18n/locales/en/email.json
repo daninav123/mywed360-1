@@ -486,6 +486,87 @@
         "apply": "Apply filters"
       }
     },
+    "settings": {
+      "title": "Email configuration",
+      "address": {
+        "title": "Your email address",
+        "description": "This is your current email address in MaLoveApp:"
+      },
+      "alias": {
+        "title": "Customise your email address",
+        "description": "You can customise the first part of your address to make it easier to remember.",
+        "label": "New email alias",
+        "placeholder": "yourname",
+        "suffix": "@maloveapp.com",
+        "helper": "Lowercase letters, numbers and dots only. Minimum 3 characters.",
+        "validationError": "The alias must be at least 3 characters long and can only contain letters, numbers and dots.",
+        "success": "Your email address was updated successfully.",
+        "button": {
+          "default": "Update address",
+          "loading": "Updating..."
+        },
+        "changeError": "Error: {{message}}"
+      },
+      "notifications": {
+        "title": "Notification preferences",
+        "newEmail": "Notify me when I receive new emails",
+        "read": "Notify me when my emails are read"
+      },
+      "autoReply": {
+        "title": "Smart auto replies",
+        "lastSync": "Last sync: {{value}}",
+        "lastSyncPending": "pending",
+        "syncing": "Syncing...",
+        "description": "Configure automatic messages by email type while AI analyses incoming mail.",
+        "success": "Settings saved successfully.",
+        "errors": {
+          "sync": "We could not sync the auto-reply settings.",
+          "save": "We could not save the settings."
+        },
+        "enable": "Enable auto replies",
+        "defaultSubject": "Re: [Subject]",
+        "generalDefault": "Hi [Name],\\n\\nWe received your message and will reply soon.\\n\\nThank you!",
+        "helper": "You can use [Name], [Category] and [Subject] as variables.",
+        "fields": {
+          "general": "General message",
+          "subject": "Auto subject",
+          "interval": {
+            "label": "Interval (hours)"
+          },
+          "exclusions": {
+            "label": "Excluded senders",
+            "placeholder": "mail1@example.com, mail2@example.com"
+          }
+        },
+        "categories": {
+          "provider": "Message for vendors",
+          "guest": "Message for guests",
+          "finance": "Message for finance",
+          "contract": "Message for contracts",
+          "invoice": "Message for invoices",
+          "meeting": "Message for meetings",
+          "rsvp": "Message for confirmations (RSVP)"
+        },
+        "buttons": {
+          "save": "Save auto replies",
+          "saving": "Saving..."
+        }
+      },
+      "scheduled": {
+        "title": "Scheduled emails",
+        "description": "Review and manage the emails you scheduled from the composer.",
+        "empty": "You do not have scheduled emails right now.",
+        "subjectFallback": "(No subject)",
+        "toLabel": "To: {{value}}",
+        "toFallback": "No recipient",
+        "scheduledLabel": "Scheduled: {{value}}",
+        "scheduledFallback": "No date",
+        "buttons": {
+          "cancel": "Cancel",
+          "refresh": "Refresh list"
+        }
+      }
+    },
     "compose": {
       "header": {
         "title": "New email"

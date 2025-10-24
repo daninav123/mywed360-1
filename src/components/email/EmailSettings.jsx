@@ -1,4 +1,4 @@
-﻿import { Check, AlertTriangle, Loader2 } from 'lucide-react';
+import { Check, AlertTriangle, Loader2 } from 'lucide-react';
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 
 import TagsManager from './TagsManager';
@@ -16,28 +16,35 @@ import { createEmailAlias, initEmailService } from '../../services/emailService'
 import Button from '../Button';
 import WeddingAccountLink from '../settings/WeddingAccountLink';
 import Card from '../ui/Card';
+import useTranslations from '../../hooks/useTranslations';
 
-const DEFAULT_GENERAL_AUTO_REPLY = `Hola [Nombre],
-
-Hemos recibido tu mensaje y te responderemos en breve.
-
-¡Gracias!`;
-
-/**
- * Componente para gestionar la configuración de correo electrónico del usuario
- * Permite personalizar su dirección de correo y gestionar preferencias
- */
 const EmailSettings = () => {
+  const { t, tVars, format } = useTranslations();
+  const tEmail = useCallback((key, options) => t(key, { ns: 'email', ...options }), [t]);
+  const tEmailVars = useCallback(
+    (key, variables) => tVars(key, { ns: 'email', ...variables }),
+    [tVars]
+  );
+
+  const defaultSubject = useMemo(
+    () => tEmail('settings.autoReply.defaultSubject'),
+    [tEmail]
+  );
+  const defaultGeneralAutoReply = useMemo(
+    () => tEmail('settings.autoReply.generalDefault'),
+    [tEmail]
+  );
+
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
   const [emailAddress, setEmailAddress] = useState('');
   const [emailAlias, setEmailAlias] = useState('');
   const [newAlias, setNewAlias] = useState('');
-  const { currentUser, userProfile, updateUserProfile } = useAuth();
+  const { userProfile, updateUserProfile } = useAuth();
   const [autoReplyEnabled, setAutoReplyEnabled] = useState(false);
-  const [autoReplySubject, setAutoReplySubject] = useState('Re: [Asunto]');
-const [generalAutoReply, setGeneralAutoReply] = useState(DEFAULT_GENERAL_AUTO_REPLY);
+  const [autoReplySubject, setAutoReplySubject] = useState(defaultSubject);
+  const [generalAutoReply, setGeneralAutoReply] = useState(defaultGeneralAutoReply);
   const [providerAutoReply, setProviderAutoReply] = useState('');
   const [guestAutoReply, setGuestAutoReply] = useState('');
   const [financeAutoReply, setFinanceAutoReply] = useState('');
@@ -55,48 +62,66 @@ const [generalAutoReply, setGeneralAutoReply] = useState(DEFAULT_GENERAL_AUTO_RE
   const [configSyncError, setConfigSyncError] = useState('');
   const [lastConfigSync, setLastConfigSync] = useState(getAutomationConfigLastSync());
   const isMountedRef = useRef(true);
-  const lastConfigSyncLabel = useMemo(() => {
-    if (!lastConfigSync) return 'pendiente';
-    try {
-      return new Date(lastConfigSync).toLocaleString('es-ES');
-    } catch {
-      return lastConfigSync;
-    }
-  }, [lastConfigSync]);
-
-  const applyAutomationConfig = (config) => {
-    if (!config || typeof config !== 'object') return;
-    const auto = config.autoReply || {};
-    const generalMessage =
-      auto.generalMessage && auto.generalMessage.trim()
-        ? auto.generalMessage
-        : DEFAULT_GENERAL_AUTO_REPLY;
-
-    setAutoReplyEnabled(Boolean(auto.enabled));
-    setAutoReplySubject(auto.subjectTemplate || 'Re: [Asunto]');
-    setGeneralAutoReply(generalMessage);
-    setAutoReplyInterval(Number(auto.replyIntervalHours) || 24);
-    setAutoReplyExclusions(
-      Array.isArray(auto.excludeSenders) ? auto.excludeSenders.join(', ') : ''
-    );
-
-    const ensureMessage = (value) => (value && value.trim() ? value : generalMessage);
-    const categories = auto.categories || {};
-
-    setProviderAutoReply(ensureMessage(categories.Proveedor?.message));
-    setGuestAutoReply(ensureMessage(categories.Invitado?.message));
-    setFinanceAutoReply(ensureMessage(categories.Finanzas?.message));
-    setContractAutoReply(ensureMessage(categories.Contratos?.message));
-    setInvoiceAutoReply(ensureMessage(categories.Facturas?.message));
-    setMeetingAutoReply(ensureMessage(categories.Reuniones?.message));
-    setRsvpAutoReply(ensureMessage(categories.RSVP?.message));
-  };
+  const previousDefaultSubject = useRef(defaultSubject);
+  const previousDefaultMessage = useRef(defaultGeneralAutoReply);
 
   useEffect(() => {
-    return () => {
-      isMountedRef.current = false;
-    };
-  }, []);
+    setAutoReplySubject((prev) =>
+      !prev || prev === previousDefaultSubject.current ? defaultSubject : prev
+    );
+    previousDefaultSubject.current = defaultSubject;
+  }, [defaultSubject]);
+
+  useEffect(() => {
+    setGeneralAutoReply((prev) =>
+      !prev || prev === previousDefaultMessage.current ? defaultGeneralAutoReply : prev
+    );
+    previousDefaultMessage.current = defaultGeneralAutoReply;
+  }, [defaultGeneralAutoReply]);
+
+  const lastConfigSyncLabel = useMemo(() => {
+    if (!lastConfigSync) {
+      return tEmail('settings.autoReply.lastSyncPending');
+    }
+    try {
+      return format.datetime(lastConfigSync);
+    } catch {
+      return String(lastConfigSync);
+    }
+  }, [lastConfigSync, format, tEmail]);
+
+  const applyAutomationConfig = useCallback(
+    (config) => {
+      if (!config || typeof config !== 'object') return;
+      const auto = config.autoReply || {};
+      const generalMessage =
+        auto.generalMessage && auto.generalMessage.trim()
+          ? auto.generalMessage
+          : defaultGeneralAutoReply;
+
+      setAutoReplyEnabled(Boolean(auto.enabled));
+      setAutoReplySubject(auto.subjectTemplate || defaultSubject);
+      setGeneralAutoReply(generalMessage);
+      setAutoReplyInterval(Number(auto.replyIntervalHours) || 24);
+      setAutoReplyExclusions(
+        Array.isArray(auto.excludeSenders) ? auto.excludeSenders.join(', ') : ''
+      );
+
+      const ensureMessage = (value) => (value && value.trim() ? value : generalMessage);
+      const categories = auto.categories || {};
+
+      setProviderAutoReply(ensureMessage(categories.Proveedor?.message));
+      setGuestAutoReply(ensureMessage(categories.Invitado?.message));
+      setFinanceAutoReply(ensureMessage(categories.Finanzas?.message));
+      setContractAutoReply(ensureMessage(categories.Contratos?.message));
+      setInvoiceAutoReply(ensureMessage(categories.Facturas?.message));
+      setMeetingAutoReply(ensureMessage(categories.Reuniones?.message));
+      setRsvpAutoReply(ensureMessage(categories.RSVP?.message));
+    },
+    [defaultGeneralAutoReply, defaultSubject]
+  );
+
+  useEffect(() => () => { isMountedRef.current = false; }, []);
 
   const refreshScheduledEmailsState = useCallback(
     async (force = false) => {
@@ -106,20 +131,17 @@ const [generalAutoReply, setGeneralAutoReply] = useState(DEFAULT_GENERAL_AUTO_RE
           setScheduledEmails(Array.isArray(scheduled) ? scheduled : []);
         }
       } catch (error) {
-        console.error('No se pudo cargar la cola de correos programados', error);
+        console.error('Unable to load scheduled emails queue', error);
       }
     },
     []
   );
 
-  // Cargar datos del usuario
   useEffect(() => {
-    if (userProfile) {
-      // Inicializar el servicio de email y obtener la dirección actual
-      const currentEmail = initEmailService(userProfile);
-      setEmailAddress(currentEmail);
-      setEmailAlias(userProfile.emailAlias || '');
-    }
+    if (!userProfile) return;
+    const currentEmail = initEmailService(userProfile);
+    setEmailAddress(currentEmail);
+    setEmailAlias(userProfile.emailAlias || '');
   }, [userProfile]);
 
   useEffect(() => {
@@ -136,7 +158,7 @@ const [generalAutoReply, setGeneralAutoReply] = useState(DEFAULT_GENERAL_AUTO_RE
       try {
         await refreshScheduledEmailsState(true);
       } catch (error) {
-        console.error('No se pudo cargar la cola de correos programados', error);
+        console.error('Unable to load scheduled emails queue', error);
       }
 
       try {
@@ -151,8 +173,8 @@ const [generalAutoReply, setGeneralAutoReply] = useState(DEFAULT_GENERAL_AUTO_RE
         }
       } catch (error) {
         if (!cancelled) {
-          console.error('No se pudo sincronizar la configuración de automatización', error);
-          setConfigSyncError('No se pudo sincronizar la configuración de auto-respuestas.');
+          console.error('Unable to sync automation configuration', error);
+          setConfigSyncError(tEmail('settings.autoReply.errors.sync'));
         }
       } finally {
         if (!cancelled) {
@@ -166,24 +188,21 @@ const [generalAutoReply, setGeneralAutoReply] = useState(DEFAULT_GENERAL_AUTO_RE
     return () => {
       cancelled = true;
     };
-  }, [refreshScheduledEmailsState]);
+  }, [applyAutomationConfig, refreshScheduledEmailsState, tEmail]);
 
-  // Validar formato de alias
   const validateAlias = (alias) => {
     if (!alias) return false;
     if (alias.length < 3) return false;
-
-    // Comprobar que solo contiene caracteres válidos (letras, números, puntos)
     const validAliasRegex = /^[a-z0-9.]+$/;
     return validAliasRegex.test(alias);
   };
 
-  // Manejar cambio de alias
   const handleSaveAutoReply = async (event) => {
     event.preventDefault();
     setAutoReplyError('');
     setConfigSyncError('');
     setAutoReplySaving(true);
+
     try {
       const ensureMessage = (value) => (value && value.trim() ? value : generalAutoReply);
       const exclusions = autoReplyExclusions
@@ -193,7 +212,7 @@ const [generalAutoReply, setGeneralAutoReply] = useState(DEFAULT_GENERAL_AUTO_RE
       const updatedConfig = await updateAutomationConfig({
         autoReply: {
           enabled: autoReplyEnabled,
-          subjectTemplate: autoReplySubject || 'Re: [Asunto]',
+          subjectTemplate: autoReplySubject || defaultSubject,
           generalMessage: generalAutoReply,
           replyIntervalHours: Number(autoReplyInterval) || 24,
           excludeSenders: exclusions,
@@ -214,9 +233,11 @@ const [generalAutoReply, setGeneralAutoReply] = useState(DEFAULT_GENERAL_AUTO_RE
       setLastConfigSync(getAutomationConfigLastSync() || new Date().toISOString());
       setTimeout(() => setAutoReplySuccess(false), 2500);
     } catch (automationError) {
-      setAutoReplyError(automationError?.message || 'No se pudo guardar la configuración.');
+      setAutoReplyError(
+        automationError?.message || tEmail('settings.autoReply.errors.save')
+      );
       setAutoReplySuccess(false);
-      setConfigSyncError('No se pudo sincronizar la configuración de auto-respuestas.');
+      setConfigSyncError(tEmail('settings.autoReply.errors.sync'));
     } finally {
       setAutoReplySaving(false);
     }
@@ -226,83 +247,82 @@ const [generalAutoReply, setGeneralAutoReply] = useState(DEFAULT_GENERAL_AUTO_RE
     try {
       await cancelScheduledEmail(id);
     } catch (error) {
-      console.error('No se pudo cancelar la programación de correo', error);
+      console.error('Unable to cancel scheduled email', error);
     } finally {
       await refreshScheduledEmailsState(true);
     }
   };
 
-  const handleChangeAlias = async (e) => {
-    e.preventDefault();
+  const handleChangeAlias = async (event) => {
+    event.preventDefault();
 
     if (!validateAlias(newAlias)) {
-      setError(
-        'El alias debe tener al menos 3 caracteres y solo puede contener letras, números y puntos.'
-      );
+      setError(tEmail('settings.alias.validationError'));
       return;
     }
+
+    if (!userProfile) return;
 
     try {
       setLoading(true);
       setError('');
 
-      // Crear el nuevo alias
       const result = await createEmailAlias(userProfile, newAlias);
 
       if (result.success) {
-        // Actualizar perfil de usuario con el nuevo alias
         const updatedProfile = {
           ...userProfile,
           emailAlias: result.alias,
         };
-
-        // Actualizar en backend/estado
         await updateUserProfile(updatedProfile);
 
         setEmailAddress(result.email);
         setEmailAlias(result.alias);
         setNewAlias('');
         setSuccess(true);
-
-        // Ocultar mensaje de éxito después de 3 segundos
         setTimeout(() => setSuccess(false), 3000);
       }
-    } catch (error) {
-      console.error('Error al cambiar alias de correo:', error);
-      setError(`Error: ${error.message}`);
+    } catch (aliasError) {
+      console.error('Error changing email alias:', aliasError);
+      setError(
+        tEmailVars('settings.alias.changeError', {
+          message: aliasError?.message || 'unknown',
+        })
+      );
     } finally {
       setLoading(false);
     }
   };
 
+  const aliasPlaceholder = emailAlias || tEmail('settings.alias.placeholder');
+  const scheduledSubjectFallback = tEmail('settings.scheduled.subjectFallback');
+  const scheduledToFallback = tEmail('settings.scheduled.toFallback');
+  const scheduledDateFallback = tEmail('settings.scheduled.scheduledFallback');
+
   return (
     <Card className="p-4">
-      <h2 className="text-xl font-semibold mb-4">Configuración de Correo Electrónico</h2>
+      <h2 className="text-xl font-semibold mb-4">{tEmail('settings.title')}</h2>
 
       <div className="space-y-6">
-        {/* Dirección de correo actual */}
         <div>
-          <h3 className="text-md font-medium mb-2">Tu dirección de correo</h3>
-          <p className="text-gray-600 mb-1">
-            Esta es tu dirección de correo electrónico actual en MaLoveApp:
-          </p>
+          <h3 className="text-md font-medium mb-2">{tEmail('settings.address.title')}</h3>
+          <p className="text-gray-600 mb-1">{tEmail('settings.address.description')}</p>
           <div className="bg-gray-50 p-3 rounded-md border">
             <p className="font-medium">{emailAddress}</p>
           </div>
         </div>
 
-        {/* Cambiar alias */}
         <div>
-          <h3 className="text-md font-medium mb-2">Personalizar dirección de correo</h3>
-          <p className="text-gray-600 mb-3">
-            Puedes personalizar la parte inicial de tu dirección de correo para hacerla más fácil de
-            recordar.
-          </p>
+          <h3 className="text-md font-medium mb-2">{tEmail('settings.alias.title')}</h3>
+          <p className="text-gray-600 mb-3">{tEmail('settings.alias.description')}</p>
 
           <form onSubmit={handleChangeAlias} className="space-y-3">
             <div>
-              <label htmlFor="email-alias" className="block text-sm font-medium text-gray-700 mb-1">
-                Nuevo alias de correo
+              <label
+                htmlFor="email-alias"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                {tEmail('settings.alias.label')}
               </label>
               <div className="flex">
                 <input
@@ -311,15 +331,13 @@ const [generalAutoReply, setGeneralAutoReply] = useState(DEFAULT_GENERAL_AUTO_RE
                   value={newAlias}
                   onChange={(e) => setNewAlias(e.target.value.toLowerCase())}
                   className="flex-grow p-2 border rounded-l-md focus:ring-2 focus:ring-blue-500"
-                  placeholder={emailAlias || 'tunombre'}
+                  placeholder={aliasPlaceholder}
                 />
                 <span className="bg-gray-100 p-2 border-r border-t border-b rounded-r-md flex items-center">
-                  @MaLoveApp.com
+                  {tEmail('settings.alias.suffix')}
                 </span>
               </div>
-              <p className="text-xs text-gray-500 mt-1">
-                Solo letras minúsculas, números y puntos. Mínimo 3 caracteres.
-              </p>
+              <p className="text-xs text-gray-500 mt-1">{tEmail('settings.alias.helper')}</p>
             </div>
 
             {error && (
@@ -332,42 +350,41 @@ const [generalAutoReply, setGeneralAutoReply] = useState(DEFAULT_GENERAL_AUTO_RE
             {success && (
               <div className="p-3 bg-green-50 border border-green-200 text-green-700 rounded-md flex items-start">
                 <Check size={16} className="mr-2 mt-0.5" />
-                <p className="text-sm">¡Tu dirección de correo ha sido actualizada con éxito!</p>
+                <p className="text-sm">{tEmail('settings.alias.success')}</p>
               </div>
             )}
 
             <Button type="submit" variant="default" disabled={loading || !newAlias}>
-              {loading ? 'Actualizando...' : 'Actualizar dirección'}
+              {loading
+                ? tEmail('settings.alias.button.loading')
+                : tEmail('settings.alias.button.default')}
             </Button>
           </form>
         </div>
 
-        {/* Opciones adicionales */}
         <div>
-          <h3 className="text-md font-medium mb-2">Preferencias de notificación</h3>
-
+          <h3 className="text-md font-medium mb-2">{tEmail('settings.notifications.title')}</h3>
           <div className="space-y-2">
             <div className="flex items-center">
               <input
                 type="checkbox"
                 id="notify-new-email"
-                defaultChecked={true}
+                defaultChecked
                 className="w-4 h-4 text-blue-600 border-gray-300 rounded"
               />
               <label htmlFor="notify-new-email" className="ml-2 block text-sm text-gray-700">
-                Notificarme cuando reciba nuevos correos
+                {tEmail('settings.notifications.newEmail')}
               </label>
             </div>
-
             <div className="flex items-center">
               <input
                 type="checkbox"
                 id="notify-read"
-                defaultChecked={true}
+                defaultChecked
                 className="w-4 h-4 text-blue-600 border-gray-300 rounded"
               />
               <label htmlFor="notify-read" className="ml-2 block text-sm text-gray-700">
-                Notificarme cuando mis correos sean leídos
+                {tEmail('settings.notifications.read')}
               </label>
             </div>
           </div>
@@ -376,20 +393,22 @@ const [generalAutoReply, setGeneralAutoReply] = useState(DEFAULT_GENERAL_AUTO_RE
         <div className="mt-6 pt-6 border-t border-gray-200">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h3 className="text-md font-medium">Respuestas automáticas inteligentes</h3>
+              <h3 className="text-md font-medium">
+                {tEmail('settings.autoReply.title')}
+              </h3>
               <p className="text-xs text-gray-500">
-                Última sincronización: {lastConfigSyncLabel}
+                {tEmailVars('settings.autoReply.lastSync', { value: lastConfigSyncLabel })}
               </p>
             </div>
             {configLoading && (
               <span className="flex items-center gap-1 text-xs text-gray-500">
-                <Loader2 size={12} className="animate-spin" /> Sincronizando...
+                <Loader2 size={12} className="animate-spin" />{' '}
+                {tEmail('settings.autoReply.syncing')}
               </span>
             )}
           </div>
           <p className="mt-2 mb-4 text-sm text-gray-600">
-            Configura mensajes automáticos según el tipo de correo mientras la IA analiza los emails
-            entrantes.
+            {tEmail('settings.autoReply.description')}
           </p>
           {configSyncError && (
             <div className="mt-3 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-700">
@@ -403,7 +422,7 @@ const [generalAutoReply, setGeneralAutoReply] = useState(DEFAULT_GENERAL_AUTO_RE
           )}
           {autoReplySuccess && (
             <div className="mb-3 rounded-md border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-700">
-              Configuración guardada correctamente.
+              {tEmail('settings.autoReply.success')}
             </div>
           )}
           <form className="space-y-4" onSubmit={handleSaveAutoReply}>
@@ -414,13 +433,13 @@ const [generalAutoReply, setGeneralAutoReply] = useState(DEFAULT_GENERAL_AUTO_RE
                 checked={autoReplyEnabled}
                 onChange={(e) => setAutoReplyEnabled(e.target.checked)}
               />
-              <span>Activar respuestas automáticas</span>
+              <span>{tEmail('settings.autoReply.enable')}</span>
             </label>
 
             <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Asunto automático
+                  {tEmail('settings.autoReply.fields.subject')}
                 </label>
                 <input
                   type="text"
@@ -431,7 +450,7 @@ const [generalAutoReply, setGeneralAutoReply] = useState(DEFAULT_GENERAL_AUTO_RE
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Intervalo (horas)
+                  {tEmail('settings.autoReply.fields.interval.label')}
                 </label>
                 <input
                   type="number"
@@ -445,7 +464,7 @@ const [generalAutoReply, setGeneralAutoReply] = useState(DEFAULT_GENERAL_AUTO_RE
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Mensaje general
+                {tEmail('settings.autoReply.fields.general')}
               </label>
               <textarea
                 value={generalAutoReply}
@@ -453,15 +472,13 @@ const [generalAutoReply, setGeneralAutoReply] = useState(DEFAULT_GENERAL_AUTO_RE
                 rows={4}
                 className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
               />
-              <p className="mt-1 text-xs text-gray-500">
-                Puedes usar [Nombre], [Categoría] y [Asunto] como variables.
-              </p>
+              <p className="mt-1 text-xs text-gray-500">{tEmail('settings.autoReply.helper')}</p>
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Mensaje para proveedores
+                  {tEmail('settings.autoReply.categories.provider')}
                 </label>
                 <textarea
                   value={providerAutoReply}
@@ -472,7 +489,7 @@ const [generalAutoReply, setGeneralAutoReply] = useState(DEFAULT_GENERAL_AUTO_RE
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Mensaje para invitados
+                  {tEmail('settings.autoReply.categories.guest')}
                 </label>
                 <textarea
                   value={guestAutoReply}
@@ -483,7 +500,7 @@ const [generalAutoReply, setGeneralAutoReply] = useState(DEFAULT_GENERAL_AUTO_RE
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Mensaje para finanzas
+                  {tEmail('settings.autoReply.categories.finance')}
                 </label>
                 <textarea
                   value={financeAutoReply}
@@ -494,7 +511,7 @@ const [generalAutoReply, setGeneralAutoReply] = useState(DEFAULT_GENERAL_AUTO_RE
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Mensaje para contratos
+                  {tEmail('settings.autoReply.categories.contract')}
                 </label>
                 <textarea
                   value={contractAutoReply}
@@ -505,7 +522,7 @@ const [generalAutoReply, setGeneralAutoReply] = useState(DEFAULT_GENERAL_AUTO_RE
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Mensaje para facturas
+                  {tEmail('settings.autoReply.categories.invoice')}
                 </label>
                 <textarea
                   value={invoiceAutoReply}
@@ -516,7 +533,7 @@ const [generalAutoReply, setGeneralAutoReply] = useState(DEFAULT_GENERAL_AUTO_RE
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Mensaje para reuniones
+                  {tEmail('settings.autoReply.categories.meeting')}
                 </label>
                 <textarea
                   value={meetingAutoReply}
@@ -527,7 +544,7 @@ const [generalAutoReply, setGeneralAutoReply] = useState(DEFAULT_GENERAL_AUTO_RE
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Mensaje para confirmaciones (RSVP)
+                  {tEmail('settings.autoReply.categories.rsvp')}
                 </label>
                 <textarea
                   value={rsvpAutoReply}
@@ -540,62 +557,68 @@ const [generalAutoReply, setGeneralAutoReply] = useState(DEFAULT_GENERAL_AUTO_RE
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Remitentes excluidos
+                {tEmail('settings.autoReply.fields.exclusions.label')}
               </label>
               <input
                 type="text"
                 value={autoReplyExclusions}
                 onChange={(e) => setAutoReplyExclusions(e.target.value)}
-                placeholder="correo1@dominio.com, correo2@dominio.com"
+                placeholder={tEmail('settings.autoReply.fields.exclusions.placeholder')}
                 className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
               />
             </div>
 
             <div className="flex justify-end">
               <Button type="submit" disabled={autoReplySaving || configLoading}>
-                {autoReplySaving ? 'Guardando...' : 'Guardar respuestas automáticas'}
+                {autoReplySaving
+                  ? tEmail('settings.autoReply.buttons.saving')
+                  : tEmail('settings.autoReply.buttons.save')}
               </Button>
             </div>
           </form>
         </div>
 
         <div className="mt-6 pt-6 border-t border-gray-200">
-          <h3 className="text-md font-medium mb-2">Correos programados</h3>
+          <h3 className="text-md font-medium mb-2">{tEmail('settings.scheduled.title')}</h3>
           <p className="text-sm text-gray-600 mb-3">
-            Consulta y gestiona los envíos que has programado desde el compositor.
+            {tEmail('settings.scheduled.description')}
           </p>
           {scheduledEmails.length === 0 ? (
-            <p className="text-sm text-gray-500">No tienes correos programados actualmente.</p>
+            <p className="text-sm text-gray-500">{tEmail('settings.scheduled.empty')}</p>
           ) : (
             <ul className="space-y-2">
-              {scheduledEmails.map((item) => (
-                <li
-                  key={item.id}
-                  className="flex items-start justify-between rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm"
-                >
-                  <div>
-                    <p className="font-medium text-gray-800">
-                      {item.payload?.subject || '(Sin asunto)'}
-                    </p>
-                    <p className="text-xs text-gray-600">
-                      Para: {item.payload?.to || 'Sin destinatario'}
-                    </p>
-                    <p className="text-xs text-gray-600">
-                      Programado:{' '}
-                      {item.scheduledAt
-                        ? new Date(item.scheduledAt).toLocaleString('es-ES')
-                        : 'Sin fecha'}
-                    </p>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="xs"
-                    onClick={() => handleCancelScheduledEmail(item.id)}
+              {scheduledEmails.map((item) => {
+                const subject = item.payload?.subject || scheduledSubjectFallback;
+                const toValue = item.payload?.to || scheduledToFallback;
+                const scheduledValue = item.scheduledAt
+                  ? format.datetime(item.scheduledAt)
+                  : scheduledDateFallback;
+                return (
+                  <li
+                    key={item.id}
+                    className="flex items-start justify-between rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm"
                   >
-                    Cancelar
-                  </Button>
-                </li>
-              ))}
+                    <div>
+                      <p className="font-medium text-gray-800">{subject}</p>
+                      <p className="text-xs text-gray-600">
+                        {tEmailVars('settings.scheduled.toLabel', { value: toValue })}
+                      </p>
+                      <p className="text-xs text-gray-600">
+                        {tEmailVars('settings.scheduled.scheduledLabel', {
+                          value: scheduledValue,
+                        })}
+                      </p>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="xs"
+                      onClick={() => handleCancelScheduledEmail(item.id)}
+                    >
+                      {tEmail('settings.scheduled.buttons.cancel')}
+                    </Button>
+                  </li>
+                );
+              })}
             </ul>
           )}
           <div className="mt-3 flex justify-end">
@@ -604,17 +627,15 @@ const [generalAutoReply, setGeneralAutoReply] = useState(DEFAULT_GENERAL_AUTO_RE
               size="sm"
               onClick={() => refreshScheduledEmailsState(true)}
             >
-              Actualizar lista
+              {tEmail('settings.scheduled.buttons.refresh')}
             </Button>
           </div>
         </div>
 
-        {/* Gestor de etiquetas */}
         <div className="mt-6 pt-6 border-t border-gray-200">
           <TagsManager />
         </div>
 
-        {/* Vincular cuentas de boda */}
         <div className="mt-6 pt-6 border-t border-gray-200">
           <WeddingAccountLink />
         </div>
@@ -624,5 +645,3 @@ const [generalAutoReply, setGeneralAutoReply] = useState(DEFAULT_GENERAL_AUTO_RE
 };
 
 export default EmailSettings;
-
-
