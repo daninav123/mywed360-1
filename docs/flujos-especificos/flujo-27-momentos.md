@@ -1,6 +1,6 @@
-# 27. Momentos (Álbum Compartido) — estado 2025-10-15
+# 27. Momentos (Álbum Compartido) — estado 2025-10-24
 
-> Estatus del producto (2025-10-15): **Sí (en curso)**. Se ejecuta la experiencia anfitrión/invitados en código (`/momentos`), rebautizada en UI como **Galería de recuerdos**, con generación de código QR descargable, ventana de aportaciones acotada (hasta 30 días posteriores al evento) y compresión automática tras superar 30&nbsp;GB. Siguen pendientes evoluciones sobre gamificación, slideshow público y automatización de moderación.
+> Estatus del producto (2025-10-24): **Sí (en curso)**. Se ejecuta la experiencia anfitrión/invitados en código (`/momentos`), rebautizada en UI como **Galería de recuerdos**, con generación de código QR descargable, ventana de aportaciones acotada (hasta 30 días posteriores al evento) y compresión automática tras superar 30&nbsp;GB. Desde octubre 2025 aplicamos **límite técnico suave**: al superar el umbral se recomprimen las fotos (JPEG 80 %), se bloquean vídeos de más de 120 s y se generan miniaturas dedicadas para acelerar la galería. Cada subida queda identificada por hash SHA-1 (anti duplicados) y se prepara para cache CDN. Siguen pendientes evoluciones sobre gamificación, slideshow público y automatización de moderación.
 >
 > Alcance: Experiencia anfitrión e invitados para capturar, moderar y compartir fotos del evento mediante una página dedicada (`/momentos`) vinculada a cada boda. Incluye subida multi-dispositivo, revisión, slideshow en vivo, descarga masiva y distribución del enlace/QR listo para imprimir.
 > Pendiente: reforzar métricas y observabilidad, además de endurecer la experiencia QR pública.
@@ -11,7 +11,8 @@
 - Facilitar la contribución de invitados con fricción mínima (QR/código), incluso sin cuenta previa.
 - Habilitar experiencias adicionales: slideshow en vivo, selección de destacados, exportación en ZIP y métricas de participación.
 - Permitir a la pareja anfitriona generar un código QR descargable/imprimible y compartir el enlace con antelación.
-- Controlar la ventana de aportaciones (antes de la boda y hasta 30 días después) y optimizar el almacenamiento en Firebase con compresión progresiva.
+- Controlar la ventana de aportaciones (antes de la boda y hasta 30 días después) y optimizar el almacenamiento en Firebase con compresión progresiva (umbral 30 GB, recompresión automática, bloqueo de vídeos largos).
+- Minimizar coste de media generando miniaturas ligeras, evitando duplicados por hash y utilizando CDN para descargas.
 - Garantizar cumplimiento legal (privacidad), seguridad de subidas y trazabilidad de cada foto y autor.
 
 ## 2. Usuarios y roles
@@ -34,7 +35,7 @@
   - `pages/MomentosPublic.jsx`: experiencia pública mobile-first con tarjetas de momentos y subida directa (foto/video) por escena.
   - `components/momentos/AlbumOverview.jsx`: totales, actividad reciente, QR descargable/imprimible y estado de almacenamiento (umbral 30&nbsp;GB).
   - `components/momentos/HighlightRail.tsx`: carrusel con auto-highlights sugeridos y botones aprobar/descartar rápidos.
-  - `components/momentos/UploadWidget.jsx`: dropzone, preview, extracción mínima de metadatos y compresión cliente automática cuando la boda supera 30&nbsp;GB.
+  - `components/momentos/UploadWidget.jsx`: dropzone, preview, extracción de metadatos (hash SHA-1, duración de vídeo) y compresión cliente automática cuando la boda supera 30&nbsp;GB (JPEG 80 %, bloqueo vídeo >120 s).
   - `components/momentos/SceneSelector.tsx`: selector de escenas configurables (`Ceremonia`, `Banquete`, `Fiesta`, etc.) aplicado al lote de fotos.
   - `components/momentos/ModerationBoard.tsx`: columnas `Pendientes`, `Aprobadas`, `Rechazadas`, drag & drop (`react-beautiful-dnd`), filtros por invitado/label.
   - `components/momentos/LiveWall.tsx`: feed masonry + toggle slideshow; escucha canal realtime.
@@ -55,7 +56,7 @@
 ## 4.1 Ventana de aportaciones y almacenamiento
 - La fecha de la boda (`weddingDate`) marca el calendario de la galería. Las subidas están permitidas desde la planificación y se cierran automáticamente **30 días después del evento** (`uploadWindow.closesAt`). El cierre se refleja en la UI y bloquea nuevas subidas.
 - `createGuestToken` recorta la caducidad de cada enlace/QR a la fecha de cierre efectiva. Si la ventana expiró no se generan nuevos tokens y los invitados visualizan un estado “Galería cerrada”.
-- Se controlan los volúmenes mediante `counters.totalBytes` y `counters.optimizedBytes`. A partir de **30 GB** se activa compresión cliente (JPEG ~0.82, máx. 2560 px) antes de subir a Firebase Storage, registrando en los metadatos si la foto fue optimizada.
+- Se controlan los volúmenes mediante `counters.totalBytes` y `counters.optimizedBytes`. A partir de **30 GB** se activa compresión cliente (JPEG 80 %, máx. 2560 px) antes de subir a Firebase Storage; también se bloquean vídeos de más de 120 s y se generan miniaturas (`thumb`) independientes. Cada subida queda asociada a un hash SHA-1 para evitar duplicados.
 - Hosts e invitados ven un contador con los **días restantes** para aportar fotos; cuando la ventana está activa, la vista anfitrión muestra la fecha límite más el contador, y el portal público recuerda a los invitados cuánto tiempo queda.
 - Tras **365 días** desde la fecha del evento, la plataforma automatiza la limpieza: se elimina el contenido del álbum de Firebase Storage y se archiva el registro manteniendo un resumen mínimo.
 - Hosts e invitados reciben mensajes contextuales: progreso de almacenamiento, activación de compresión y fecha límite de aportaciones. Los hosts pueden reabrir la galería ajustando la fecha del evento.

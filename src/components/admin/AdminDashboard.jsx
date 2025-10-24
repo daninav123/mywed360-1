@@ -17,6 +17,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { get as apiGet } from '../../services/apiClient';
 import { resolveAdminAlert } from '../../services/adminDataService';
 import { getAdminFetchOptions } from '../../services/adminSession';
+import { decodeMojibakeDeep } from '../../utils/mojibake';
 
 const KPI_CONFIG = {
   'active-weddings': { icon: <Calendar size={24} />, color: 'rgb(37, 99, 235)' },
@@ -121,10 +122,11 @@ const AdminDashboard = () => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         if (cancelled) return;
-        setOverview(data);
-        setServices(Array.isArray(data?.services) ? data.services : []);
-        setAlerts(Array.isArray(data?.alerts) ? data.alerts : []);
-        setNewTasks(Array.isArray(data?.newTasks) ? data.newTasks : []);
+        const normalized = decodeMojibakeDeep(data);
+        setOverview(normalized);
+        setServices(Array.isArray(normalized?.services) ? normalized.services : []);
+        setAlerts(Array.isArray(normalized?.alerts) ? normalized.alerts : []);
+        setNewTasks(Array.isArray(normalized?.newTasks) ? normalized.newTasks : []);
         setOverviewError('');
       } catch (error) {
         if (cancelled) return;

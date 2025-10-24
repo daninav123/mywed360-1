@@ -718,6 +718,56 @@
         "chip": "Bandeja unificada"
       }
     },
+    "smartComposer": {
+      "title": "Redactar correo",
+      "titleWithProvider": "a {{name}}",
+      "sections": {
+        "message": "Mensaje"
+      },
+      "toggles": {
+        "show": "Mostrar recomendaciones",
+        "hide": "Ocultar recomendaciones"
+      },
+      "fields": {
+        "to": {
+          "label": "Para",
+          "placeholder": "correo@dominio.com"
+        },
+        "subject": {
+          "label": "Asunto",
+          "placeholder": "Escribe un asunto efectivo..."
+        },
+        "message": {
+          "label": "Mensaje",
+          "placeholder": "Escribe tu mensaje aquí..."
+        }
+      },
+      "templates": {
+        "label": "Plantilla",
+        "none": "Ninguna"
+      },
+      "schedule": {
+        "label": "Programar envío:",
+        "clear": "Limpiar"
+      },
+      "buttons": {
+        "cancel": "Cancelar",
+        "send": "Enviar",
+        "schedule": "Programar"
+      },
+      "feedback": {
+        "missingFields": "Completa destinatario, asunto y mensaje antes de enviar.",
+        "subjectApplied": "Línea de asunto actualizada con la recomendación.",
+        "templateApplied": "Plantilla \"{{name}}\" aplicada.",
+        "timeApplied": "Correo programado para mañana a las {{hour}}:00h ({{slot}})."
+      },
+      "placeholders": {
+        "provider": "proveedor",
+        "service": "servicio",
+        "date": "próximamente",
+        "event": "evento"
+      }
+    },
     "compose": {
       "header": {
         "title": "Nuevo correo"

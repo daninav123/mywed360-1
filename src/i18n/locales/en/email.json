@@ -710,6 +710,56 @@
         "chip": "Unified inbox"
       }
     },
+    "smartComposer": {
+      "title": "Compose email",
+      "titleWithProvider": "to {{name}}",
+      "sections": {
+        "message": "Message"
+      },
+      "toggles": {
+        "show": "Show recommendations",
+        "hide": "Hide recommendations"
+      },
+      "fields": {
+        "to": {
+          "label": "To",
+          "placeholder": "email@example.com"
+        },
+        "subject": {
+          "label": "Subject",
+          "placeholder": "Write an effective subject..."
+        },
+        "message": {
+          "label": "Message",
+          "placeholder": "Write your message here..."
+        }
+      },
+      "templates": {
+        "label": "Template",
+        "none": "None"
+      },
+      "schedule": {
+        "label": "Schedule send:",
+        "clear": "Clear"
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "send": "Send",
+        "schedule": "Schedule"
+      },
+      "feedback": {
+        "missingFields": "Complete recipient, subject and message before sending.",
+        "subjectApplied": "Subject line updated with the recommendation.",
+        "templateApplied": "Template \"{{name}}\" applied.",
+        "timeApplied": "Email scheduled for tomorrow at {{hour}}:00 ({{slot}})."
+      },
+      "placeholders": {
+        "provider": "provider",
+        "service": "service",
+        "date": "soon",
+        "event": "event"
+      }
+    },
     "compose": {
       "header": {
         "title": "New email"

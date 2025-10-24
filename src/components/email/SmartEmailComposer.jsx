@@ -18,11 +18,12 @@ import {
   MenuItem,
 } from '@mui/material';
 import LightbulbOutlined from '@mui/icons-material/LightbulbOutlined';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 
 import EmailRecommendationsPanel from './EmailRecommendationsPanel';
 import EmailRecommendationService from '../../services/EmailRecommendationService';
 import { safeRender, ensureNotPromise, safeMap } from '../../utils/promiseSafeRenderer';
+import useTranslations from '../../hooks/useTranslations';
 
 /**
  * Componente para componer correos con recomendaciones inteligentes integradas
@@ -41,6 +42,33 @@ const SmartEmailComposer = ({
   templates = [],
   initialValues = {},
 }) => {
+  const { t, tVars } = useTranslations();
+  const tEmail = useCallback((key, options) => t(key, { ns: 'email', ...options }), [t]);
+  const tEmailVars = useCallback(
+    (key, variables) => tVars(key, { ns: 'email', ...variables }),
+    [tVars]
+  );
+  const placeholders = useMemo(
+    () => ({
+      provider: tEmail('smartComposer.placeholders.provider'),
+      service: tEmail('smartComposer.placeholders.service'),
+      date: tEmail('smartComposer.placeholders.date'),
+      event: tEmail('smartComposer.placeholders.event'),
+    }),
+    [tEmail]
+  );
+  const applyTemplateTokens = useCallback(
+    (templateStr) => {
+      if (typeof templateStr !== 'string') return templateStr;
+      return templateStr
+        .replace(/\[Proveedor\]/g, provider?.name || placeholders.provider)
+        .replace(/\[Servicio\]/g, provider?.service || placeholders.service)
+        .replace(/\[Fecha\]/g, placeholders.date)
+        .replace(/\[Evento\]/g, placeholders.event);
+    },
+    [provider, placeholders]
+  );
+
   // Estado del formulario
   const [recipient, setRecipient] = useState(initialValues.to || provider?.email || '');
   const [subject, setSubject] = useState(initialValues.subject || '');
@@ -82,29 +110,18 @@ const SmartEmailComposer = ({
       const categoryTemplate = templates.find((t) => t.category === category);
       if (categoryTemplate) {
         setSelectedTemplate(categoryTemplate.id);
-
-        // Pre-rellenar el asunto y mensaje con la plantilla
-        setSubject(
-          categoryTemplate.subjectTemplate
-            .replace('[Proveedor]', provider.name || 'proveedor')
-            .replace('[Servicio]', provider.service || 'servicio')
-        );
-
-        setMessage(
-          categoryTemplate.messageTemplate
-            .replace('[Proveedor]', provider.name || 'proveedor')
-            .replace('[Servicio]', provider.service || 'servicio')
-        );
+        setSubject(applyTemplateTokens(categoryTemplate.subjectTemplate));
+        setMessage(applyTemplateTokens(categoryTemplate.messageTemplate));
       }
     }
-  }, [provider, category, templates]);
+  }, [provider, category, templates, applyTemplateTokens]);
 
   // Manejar envío del correo
   const handleSend = () => {
     if (!recipient || !subject || !message) {
       setFeedback({
         type: 'error',
-        message: 'Completa destinatario, asunto y mensaje antes de enviar.',
+        message: tEmail('smartComposer.feedback.missingFields'),
       });
       return;
     }
@@ -138,16 +155,14 @@ const SmartEmailComposer = ({
     // Aplicar la recomendación según su tipo
     switch (type) {
       case 'subject': {
-        const newSubject = data
-          .replace('[Servicio]', provider?.service || 'servicio')
-          .replace('[Fecha]', 'próximamente')
-          .replace('[Evento]', 'evento');
-
-        setSubject(newSubject);
-        setFeedback({
-          type: 'success',
-          message: 'Línea de asunto actualizada con la recomendación',
-        });
+        const newSubject = applyTemplateTokens(data);
+        if (newSubject) {
+          setSubject(newSubject);
+          setFeedback({
+            type: 'success',
+            message: tEmail('smartComposer.feedback.subjectApplied'),
+          });
+        }
         break;
       }
 
@@ -156,14 +171,14 @@ const SmartEmailComposer = ({
         if (template) {
           setSelectedTemplate(template.id);
 
-          const templateMessage = template.messageTemplate
-            .replace('[Proveedor]', provider?.name || 'proveedor')
-            .replace('[Servicio]', provider?.service || 'servicio');
+          const templateMessage = applyTemplateTokens(template.messageTemplate);
 
           setMessage(templateMessage);
           setFeedback({
             type: 'success',
-            message: `Plantilla &quot;${template.name}&quot; aplicada`,
+            message: tEmailVars('smartComposer.feedback.templateApplied', {
+              name: template.name,
+            }),
           });
         }
         break;
@@ -184,7 +199,10 @@ const SmartEmailComposer = ({
         setScheduledTime(scheduledDate);
         setFeedback({
           type: 'success',
-          message: `Correo programado para mañana a las ${hour}:00h (${data.bestTimeSlotName})`,
+          message: tEmailVars('smartComposer.feedback.timeApplied', {
+            hour,
+            slot: data.bestTimeSlotName,
+          }),
         });
         break;
       }
@@ -205,9 +223,7 @@ const SmartEmailComposer = ({
       const template = templates.find((t) => t.id === templateId);
       if (template) {
         // Actualizar el mensaje con la plantilla
-        const templateMessage = template.messageTemplate
-          .replace('[Proveedor]', provider?.name || 'proveedor')
-          .replace('[Servicio]', provider?.service || 'servicio');
+        const templateMessage = applyTemplateTokens(template.messageTemplate);
 
         setMessage(templateMessage);
       }
