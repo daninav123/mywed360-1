@@ -5,6 +5,7 @@ import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 import useActiveWeddingInfo from '../../hooks/useActiveWeddingInfo';
 import { useAuth } from '../../hooks/useAuth';
+import { formatDate } from '../../utils/formatUtils';
 import { useProviderEmail } from '../../hooks/useProviderEmail';
 import * as EmailService from '../../services/EmailService';
 
@@ -57,7 +58,7 @@ const ProviderEmailModal = ({ open, onClose, provider, onSent }) => {
         if (!d) return '';
         const dt = typeof d?.toDate === 'function' ? d.toDate() : new Date(d);
         if (Number.isNaN(dt.getTime())) return '';
-        return dt.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+        return formatDate(dt, 'medium');
       } catch {
         return '';
       }

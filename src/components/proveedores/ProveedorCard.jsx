@@ -9,6 +9,8 @@ import Alert from '../../components/ui/Alert';
 import useProviderEmail from '../../hooks/useProviderEmail.jsx';
 import useSupplierBudgets from '../../hooks/useSupplierBudgets';
 import { useAuth } from '../../hooks/useAuth';
+import { useWedding } from '../../context/WeddingContext';
+import { formatDate } from '../../utils/formatUtils';
 import * as EmailService from '../../services/emailService';
 import EmailTemplateService from '../../services/EmailTemplateService';
 import { loadTrackingRecords } from '../../services/EmailTrackingService';
@@ -206,11 +208,7 @@ const ProveedorCard = ({
     try {
       const date = typeof value?.toDate === 'function' ? value.toDate() : new Date(value);
       if (Number.isNaN(date.getTime())) return '';
-      return date.toLocaleDateString('es-ES', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-      });
+      return formatDate(date, 'medium');
     } catch {
       return '';
     }
@@ -808,7 +806,7 @@ const ProveedorCard = ({
                 {emails.map((m) => (
                   <li key={m.id} className="flex items-center justify-between gap-2">
                     <span className="truncate" title={m.subject}>{m.subject || '(Sin asunto)'}</span>
-                    <span className="text-gray-500 whitespace-nowrap">{new Date(m.date).toLocaleDateString()}</span>
+                    <span className="text-gray-500 whitespace-nowrap">{formatDate(m.date, 'short')}</span>
                   </li>
                 ))}
               </ul>

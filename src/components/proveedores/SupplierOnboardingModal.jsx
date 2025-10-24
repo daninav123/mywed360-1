@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 
-import Button from '../ui/Button';
+import { useWedding } from '../../context/WeddingContext';
+import { formatDate } from '../../utils/formatUtils';
 import Card from '../ui/Card';
 import Loader from '../ui/Loader';
 
@@ -67,11 +68,7 @@ export default function SupplierOnboardingModal({
     if (!weddingInfo) return null;
     const date = weddingInfo.date || weddingInfo.weddingDate || weddingInfo.eventDate;
     const formattedDate = date
-      ? new Date(date).toLocaleDateString('es-ES', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-        })
+      ? formatDate(date, 'medium')
       : null;
     return {
       couple:

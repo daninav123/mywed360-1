@@ -28,7 +28,8 @@ import {
 import { Search, Edit, Delete, Mail, Key, Shield, Download } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 
-import { useAuth } from '../../hooks/useAuth';
+import { db } from '../../firebaseConfig';
+import { formatDate } from '../../utils/formatUtils';
 
 /**
  * Panel de gestión de usuarios para administradores
@@ -270,7 +271,7 @@ const UserManagement = () => {
                 <TableCell>{user.email}</TableCell>
                 <TableCell>{renderRoleChip(user.role)}</TableCell>
                 <TableCell>{renderStatusChip(user.status)}</TableCell>
-                <TableCell>{new Date(user.createdAt).toLocaleDateString()}</TableCell>
+                <TableCell>{formatDate(new Date(user.createdAt._seconds * 1000), 'short')}</TableCell>
                 <TableCell>
                   {user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : 'Nunca'}
                 </TableCell>

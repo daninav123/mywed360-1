@@ -12,6 +12,8 @@ import {
 } from '@mui/material';
 import { RefreshCw, DollarSign, Database, AlertCircle } from 'lucide-react';
 
+import { db } from '../../firebaseConfig';
+import { formatDate } from '../../utils/formatUtils';
 import { get as apiGet } from '../../services/apiClient';
 import { getAdminFetchOptions } from '../../services/adminSession';
 
@@ -177,7 +179,7 @@ const AdminDebugPayments = () => {
                       </Typography>
                       {payment.createdAt && (
                         <Typography variant="caption" color="textSecondary">
-                          Creado: {new Date(payment.createdAt._seconds * 1000).toLocaleDateString()}
+                          Creado: {formatDate(new Date(payment.createdAt._seconds * 1000), 'short')}
                         </Typography>
                       )}
                     </Box>

@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
+import { formatDate } from '../../utils/formatUtils';
 import {
   LineChart,
   Line,
@@ -628,8 +629,8 @@ function MetricsDashboard() {
 
       {/* altima actualizacin */}
       <div className="mt-6 text-right text-sm text-gray-500">
-        altima actualizacin:{' '}
-        {metrics?.timestamp ?new Date(metrics.timestamp).toLocaleString() : 'N/A'}
+        const date = new Date();
+        return `${formatDate(date, 'short')} ${date.toLocaleTimeString()}`; : 'N/A'}
       </div>
     </div>
   );

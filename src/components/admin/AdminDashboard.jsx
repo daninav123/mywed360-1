@@ -13,7 +13,8 @@ import {
 import { Calendar, Coins, Download, Bell, Shield } from 'lucide-react';
 import React, { useEffect, useMemo, useState } from 'react';
 
-import { useAuth } from '../../hooks/useAuth';
+import { db } from '../../firebaseConfig';
+import { formatDate } from '../../utils/formatUtils';
 import { get as apiGet } from '../../services/apiClient';
 import { resolveAdminAlert } from '../../services/adminDataService';
 import { getAdminFetchOptions } from '../../services/adminSession';
@@ -58,9 +59,7 @@ const formatSourceLabel = (value) => {
 
 const formatSinceDate = (value) => {
   if (!value) return 'sin datos';
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return 'sin datos';
-  return date.toLocaleDateString('es-ES');
+  return formatDate(value, 'short');
 };
 
 const AdminDashboard = () => {

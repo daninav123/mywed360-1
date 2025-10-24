@@ -1,5 +1,6 @@
 import { Star, Bookmark, Phone, Mail, Calendar, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
-import React from 'react';
+import { useWedding } from '../../context/WeddingContext';
+import { formatDate } from '../../utils/formatUtils';
 
 /**
  * Componente de tarjeta para mostrar información básica de un proveedor.
@@ -135,7 +136,7 @@ const ProveedorCardNuevo = ({ proveedor, onClick, onToggleFavorito, onEditar, on
               <Calendar size={16} className="text-gray-400 mr-1" />
               <span className="text-xs text-gray-500">
                 {proveedor.fechaCita
-                  ? new Date(proveedor.fechaCita).toLocaleDateString()
+                  ? formatDate(proveedor.fechaCita, 'short')
                   : 'Sin cita'}
               </span>
             </div>

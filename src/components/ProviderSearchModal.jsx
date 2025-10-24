@@ -18,7 +18,7 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
   const [serviceFilter, setServiceFilter] = useState('');
   const [toast, setToast] = useState(null);
 
-  // Hook de búsqueda IA (con reporte de fallbacks integrado)
+  // Hook de bÃƒÂºsqueda IA (con reporte de fallbacks integrado)
   const { results, loading, error, usedFallback, searchProviders, clearResults } = useAISearch();
 
   const modalRef = useRef(null);
@@ -54,7 +54,7 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
     return [];
   }, [tEmail]);
 
-  // Manejar búsqueda
+  // Manejar bÃƒÂºsqueda
   const handleSearch = useCallback(
     async (e) => {
       if (e) {
@@ -71,7 +71,7 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
         // Limpiar toast previo
         setToast(null);
         
-        // Usar hook de búsqueda (incluye reporte de fallbacks automático)
+        // Usar hook de bÃƒÂºsqueda (incluye reporte de fallbacks automÃƒÂ¡tico)
         await searchProviders(query, {
           service: serviceFilter,
           allowFallback: true, // Permitir fallback a resultados demo
@@ -86,7 +86,7 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
           window.dispatchEvent(new Event('maloveapp-suppliers'));
         }
       } catch (err) {
-        console.error('[ProviderSearchModal] Error en búsqueda:', err);
+        console.error('[ProviderSearchModal] Error en bÃƒÂºsqueda:', err);
         setToast({
           message: tEmail('providerSearch.messages.errorRetry'),
           type: 'error',
@@ -141,7 +141,7 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
           {tEmail('providerSearch.title')}
         </h3>
 
-        {/* Formulario de búsqueda */}
+        {/* Formulario de bÃƒÂºsqueda */}
         <form onSubmit={handleSearch} className="space-y-4 mb-6">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
@@ -187,7 +187,7 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
           </div>
         )}
 
-        {/* Resultados de búsqueda */}
+        {/* Resultados de bÃƒÂºsqueda */}
         {!loading && (
           <div className="flex-1 overflow-y-auto">
             {usedFallback && (
@@ -218,7 +218,7 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
                           </span>
                           {item.priceRange && (
                             <span className="flex items-center">
-                              <span className="mr-1">💰</span>
+                              <span className="mr-1">Ã°Å¸â€™Â°</span>
                               {item.priceRange}
                             </span>
                           )}
@@ -258,7 +258,7 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
           </div>
         )}
 
-        {/* Botones de acción */}
+        {/* Botones de acciÃƒÂ³n */}
         <div className="mt-4 pt-4 border-t flex justify-end space-x-2">
           <button onClick={handleClose} className="px-4 py-2 bg-gray-200 rounded">
             {tEmail('providerSearch.buttons.close')}

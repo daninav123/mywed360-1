@@ -1,5 +1,7 @@
 import { X, Star, Phone, Mail, Globe, Calendar, Edit2, MapPin } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { formatDate } from '../../utils/formatUtils';
 import { useNavigate } from 'react-router-dom';
 
 import AssignSupplierToGroupModal from './AssignSupplierToGroupModal';
@@ -386,7 +388,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
     if (!dateStr) return '';
     try {
       const date = new Date(dateStr);
-      return date.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+      return formatDate(date, 'medium');
     } catch (e) {
       return dateStr;
     }
@@ -944,7 +946,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                         <li key={idx} className="p-2 border rounded flex items-center justify-between text-sm">
                           <div className="min-w-0">
                             <div className="font-medium truncate" title={s.subject}>{s.subject || '(Sin asunto)'}</div>
-                            <div className="text-gray-600">{s.rawAmount || s.amount} {s.currency || ''} · {new Date(s.date).toLocaleDateString()}</div>
+                            <div className="text-gray-600">{s.rawAmount || s.amount} {s.currency || ''} · {formatDate(s.date, 'short')}</div>
                           </div>
                           <Button size="sm" onClick={() => {
                             const isIncome = (s.direction || 'outgoing') === 'incoming';

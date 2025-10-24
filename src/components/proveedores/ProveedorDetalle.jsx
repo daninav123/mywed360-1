@@ -7,12 +7,10 @@ import {
   Globe,
   MapPin,
   Edit,
-  Bookmark,
-  ChevronRight,
-  CheckCheck,
-  MessageSquare,
 } from 'lucide-react';
 import React, { useState } from 'react';
+import { useWedding } from '../../context/WeddingContext';
+import { formatDate } from '../../utils/formatUtils';
 
 /**
  * Componente para mostrar el detalle completo de un proveedor con pestañas
@@ -40,11 +38,7 @@ const ProveedorDetalle = ({
   // Formatear fecha
   const formatearFecha = (fecha) => {
     if (!fecha) return 'Sin fecha';
-    return new Date(fecha).toLocaleDateString('es-ES', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-    });
+    return formatDate(fecha, 'medium');
   };
 
   // Formatear precio

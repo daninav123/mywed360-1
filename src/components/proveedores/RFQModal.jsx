@@ -5,6 +5,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useWedding } from '../../context/WeddingContext';
 import { db } from '../../firebaseConfig';
 import useActiveWeddingInfo from '../../hooks/useActiveWeddingInfo';
+import { formatDate } from '../../utils/formatUtils';
 import useRFQTemplates from '../../hooks/useRFQTemplates';
 import { post as apiPost } from '../../services/apiClient';
 import Modal from '../Modal';
@@ -80,7 +81,7 @@ export default function RFQModal({
       try {
         const d = typeof dateVal?.toDate === 'function' ? dateVal.toDate() : new Date(dateVal);
         if (Number.isNaN(d.getTime())) return 'fecha por determinar';
-        return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+        return formatDate(d, 'medium');
       } catch {
         return 'fecha por determinar';
       }

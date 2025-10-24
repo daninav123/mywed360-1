@@ -1,6 +1,7 @@
 import React from 'react';
 
-import Button from '../ui/Button';
+import { db } from '../../firebaseConfig';
+import { formatDate } from '../../utils/formatUtils';
 import Card from '../ui/Card';
 
 export default function ShortlistBoard({
@@ -113,7 +114,7 @@ const formatDate = (value) => {
             ? value
             : new Date(value);
     if (Number.isNaN(date.getTime())) return '—';
-    return date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
+    return formatDate(date, 'custom');
   } catch {
     return '—';
   }
