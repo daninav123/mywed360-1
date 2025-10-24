@@ -195,6 +195,203 @@
         "saving": "Saving..."
       }
     },
+    "configValidation": {
+      "title": "Email configuration check",
+      "subtitle": "Verify your domain is ready to send emails",
+      "buttons": {
+        "validate": "Validate configuration",
+        "validating": "Validating...",
+        "sendTest": "Send test email",
+        "sendingTest": "Sending...",
+        "sent": "Email sent"
+      },
+      "current": {
+        "domain": "Domain:",
+        "email": "Email:"
+      },
+      "errorTitle": "Error",
+      "errors": {
+        "invalidEmail": "Invalid email address",
+        "validateGeneric": "We could not validate the configuration. Try again.",
+        "sendTestGeneric": "We could not send the test email. Check your configuration."
+      },
+      "summary": {
+        "successTitle": "Configuration ready",
+        "warningTitle": "Configuration incomplete",
+        "cta": "Your configuration looks good. Send a test email to confirm everything works."
+      },
+      "checks": {
+        "spfTitle": "SPF (Sender Policy Framework)",
+        "spfValid": "SPF record configured correctly",
+        "dkimTitle": "DKIM (DomainKeys Identified Mail)",
+        "dkimValid": "DKIM record configured correctly",
+        "dmarcTitle": "DMARC (Recommended)",
+        "dmarcValid": "DMARC record configured (improves deliverability)"
+      },
+      "successNotice": {
+        "description": "Test email sent to {{email}}. Check your inbox."
+      },
+      "help": {
+        "title": "What we validate",
+        "spf": "Ensures your domain authorises MaLoveApp to send emails",
+        "dkim": "Confirms emails are digitally signed",
+        "dmarc": "Improves deliverability and protects against spoofing"
+      }
+    },
+    "feedback": {
+      "header": {
+        "title": "We value your feedback",
+        "toggleAria": "Share feedback about the email system",
+        "closeAria": "Close feedback form"
+      },
+      "thanks": {
+        "title": "Thanks for your feedback",
+        "subtitle": "Your insights help us improve the MaLoveApp email experience."
+      },
+      "common": {
+        "next": "Next",
+        "back": "Back",
+        "selectOption": "Select an option",
+        "sending": "Sending..."
+      },
+      "messages": {
+        "submitError": "We could not send your feedback. Please try again later."
+      },
+      "options": {
+        "features": {
+          "alias": "Email alias",
+          "templates": "Email templates",
+          "tracking": "Email tracking",
+          "events": "Event detection",
+          "search": "Email search",
+          "notifications": "Notifications"
+        },
+        "performance": {
+          "verySlow": "Very slow",
+          "slow": "Somewhat slow",
+          "acceptable": "Acceptable",
+          "fast": "Fast",
+          "veryFast": "Very fast"
+        },
+        "usability": {
+          "veryDifficult": "Very hard to use",
+          "difficult": "Somewhat hard",
+          "neutral": "Neutral",
+          "easy": "Easy to use",
+          "veryEasy": "Very easy to use"
+        }
+      },
+      "steps": {
+        "rating": {
+          "question": "How would you rate your experience with MaLoveApp email?",
+          "scaleStart": "Poor",
+          "scaleEnd": "Excellent",
+          "ratingAria": "Select score {{value}}"
+        },
+        "usability": {
+          "title": "Usability and performance",
+          "usabilityLabel": "How easy is the email system to use?",
+          "performanceLabel": "How would you rate the email system speed?"
+        },
+        "features": {
+          "title": "Features and suggestions",
+          "featureLabel": "Which features have you used? (select all that apply)",
+          "improvementLabel": "What could we improve in our email system?",
+          "improvementPlaceholder": "Share your suggestions...",
+          "featureRequestLabel": "Which feature would you like to see added?",
+          "featureRequestPlaceholder": "Your ideas help us plan the roadmap...",
+          "submit": "Send feedback"
+        }
+      }
+    },
+    "onboarding": {
+      "steps": {
+        "welcome": {
+          "title": "Welcome to Email",
+          "description": "Set up your email system in three simple steps"
+        },
+        "domain": {
+          "title": "Domain setup",
+          "description": "Configure the sender domain"
+        },
+        "validation": {
+          "title": "DNS validation",
+          "description": "We will verify your DKIM and SPF configuration"
+        },
+        "test": {
+          "title": "Test email",
+          "description": "Send a test email"
+        },
+        "complete": {
+          "title": "All set",
+          "description": "Your email system is ready"
+        }
+      },
+      "welcome": {
+        "intro": "We will configure your email so you can send invitations and stay in touch with your guests.",
+        "noteLabel": "Note:",
+        "noteText": "You will need access to your domain DNS settings."
+      },
+      "domain": {
+        "fields": {
+          "domain": {
+            "label": "Domain *",
+            "placeholder": "mywedding.com"
+          },
+          "fromEmail": {
+            "label": "Sender email *",
+            "placeholder": "invitations@mywedding.com"
+          },
+          "fromName": {
+            "label": "Sender name *",
+            "placeholder": "Maria & John"
+          },
+          "replyTo": {
+            "label": "Reply-to email (optional)",
+            "placeholder": "contact@mywedding.com"
+          }
+        }
+      },
+      "validation": {
+        "title": "Required DNS records:",
+        "button": {
+          "validate": "Validate DNS",
+          "validating": "Validating..."
+        },
+        "errors": {
+          "recordsMissing": "Double-check that the DNS records were added correctly",
+          "generic": "We could not validate the DNS records. Try again."
+        }
+      },
+      "test": {
+        "description": "Send a test email to confirm everything works correctly.",
+        "fields": {
+          "recipient": {
+            "label": "Recipient email",
+            "placeholder": "you@email.com"
+          }
+        },
+        "button": "Send test email",
+        "success": "Test email sent successfully. Check your inbox."
+      },
+      "complete": {
+        "message": "Your email configuration is complete. You can start sending invitations now.",
+        "reminder": "Remember: you can update this configuration from Settings at any time."
+      },
+      "actions": {
+        "skip": "Skip for now",
+        "back": "Back",
+        "next": "Next",
+        "finish": "Finish"
+      },
+      "errors": {
+        "missingDomainFields": "Please fill in all required fields",
+        "dnsIncomplete": "Complete the DNS setup before continuing",
+        "testNotSent": "Send a test email before continuing",
+        "missingTestRecipient": "Enter a destination email",
+        "testSendFailed": "We could not send the test email"
+      }
+    },
     "compose": {
       "header": {
         "title": "New email"

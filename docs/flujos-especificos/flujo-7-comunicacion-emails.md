@@ -82,8 +82,8 @@
   - Los contadores de carpetas personalizadas dependen de `folderService` en localStorage; no existe sincronización de `unread` ni métricas agregadas en backend.
 - **Pendientes (diseño acordado):**
   - Drag & drop de carpetas personalizadas: el objetivo es usar `FolderSelectionModal` + `folderService.reorderFolders()` para reflejar orden en `users/{uid}/emailFolders.order`.
-  - Contadores `unread` en backend: cada movimiento de correo actualizará `emailFolderStats/{folderId}.unread` mediante Cloud Function `onMailUpdated`.
-  - Retención automática: job `emailTrashRetention` ejecutado diariamente purgará correos con `deletedAt` > 30 días y registrará métricas en `emailRetentionAudit`.
+  - ✅ Contadores `unread` en backend: IMPLEMENTADO - Cloud Function `onMailUpdated` en `functions/index.js:23-97` actualiza `emailFolderStats` automáticamente en cada cambio de carpeta o estado read.
+  - ✅ Retención automática: job `emailTrashRetention` YA IMPLEMENTADO en `backend/jobs/emailTrashRetention.js` - purga correos con `deletedAt` > 30 días y registra en `emailRetentionAudit`. Solo falta configurar cron diario.
   - UI de mover entre carpetas personalizadas desde lista/detalle (menú contextual + atajos teclado).
 
 ## 4. Persistencia y datos
@@ -237,11 +237,54 @@ svp). |
 - **Frontend:** exponer data-testids alineados con Cypress, asegurar que `UnifiedInbox` reemplaza completamente al legacy y limpiar scripts/estilos duplicados antes de release.
 
 ## 11. Roadmap / pendientes
-1. **Automatización y backend (Owner: Backend Squad, ETA Q4 2025)**
-   - ✅ 2025-10-20: callClassificationAPI con monitorización de latencia y fallback documentado (`confidence` + evento `email_classification_api`). Responsable: Backend Squad / SRE.
-   - ✅ 2025-10-20: emailSchedulerWorker desplegado con cron, registro `emailScheduledAudit` y endpoint `/api/email/scheduled/status`. Responsable: Backend Squad.
-   - Persistir auto-respuestas y clasificación en Firestore (users/{uid}/emailAutomation) y APIs REST. Responsable: Backend Squad.
-   - ? 2025-10-20: Webhooks markEmailDelivered/markEmailBounced registrando `emailDeliverability/{messageId}` y alimentando alertas. Responsable: Integraciones.
+
+### 🔍 ESTADO REAL VERIFICADO (2025-10-24)
+
+**✅ IMPLEMENTADO Y FUNCIONAL:**
+1. **emailSchedulerCron** - `backend/jobs/emailSchedulerCron.js` ✅
+   - Código completo con `runEmailSchedulerJob()`
+   - Exporta función ejecutable manualmente o vía cron
+   - Integrado con `processScheduledEmailQueue`
+   - ⚠️ FALTA: Configurar en Cloud Scheduler/Render Cron para ejecución automática
+
+2. **emailTrashRetention** - `backend/jobs/emailTrashRetention.js` ✅
+   - Job de limpieza automática implementado
+   - Elimina emails con más de 30 días en papelera
+   - Auditoría en colección `emailRetentionAudit`
+   - ⚠️ FALTA: Configurar cron diario (0 2 * * *)
+
+3. **onMailUpdated Cloud Function** - `functions/index.js:23-97` ✅
+   - Actualiza contadores de carpetas automáticamente
+   - Maneja cambios en folder y estado read
+   - Colección `emailFolderStats` con totalCount y unreadCount
+   - Función auxiliar `updateFolderCount()` completa
+
+4. **Webhooks Mailgun** - `backend/routes/mailgun-webhook.js` ✅
+   - Endpoint `/webhooks/deliverability` funcional
+   - Verificación de firma Mailgun implementada
+   - Registro de eventos básicos
+
+**❌ NO IMPLEMENTADO:**
+1. **callClassificationAPI** - ❌ NO EXISTE
+   - No hay archivo `backend/services/emailClassificationService.js`
+   - No hay integración con OpenAI para clasificación
+   - La documentación marcaba esto como "✅ 2025-10-20" INCORRECTAMENTE
+   - Impacto: Clasificación solo usa heurísticas locales básicas
+
+**🟡 PARCIALMENTE IMPLEMENTADO:**
+1. **Auto-respuestas sincronización**
+   - Backend endpoints: `GET/PUT /api/email-automation/config` ✅
+   - Persistencia en Firestore ✅
+   - Frontend aún usa localStorage como primario 🟡
+
+### Roadmap Actualizado:
+
+1. **Automatización y backend (Owner: Backend Squad)**
+   - ⏳ PENDIENTE: callClassificationAPI con OpenAI (estimado: 8-12h)
+   - ✅ CÓDIGO LISTO: emailSchedulerCron (solo falta configurar cron externo)
+   - ✅ CÓDIGO LISTO: emailTrashRetention (solo falta configurar cron diario)
+   - ✅ IMPLEMENTADO: onMailUpdated Cloud Function
+   - 🟡 MEJORAR: Webhooks Mailgun (completar procesamiento de deliverability)
 2. **UX / funcionalidad (Owner: Frontend Squad, ETA Q1 2026)**
    - Drag & drop y reorder de carpetas personalizadas con sincronización emailFolderStats.
    - Papelera avanzada: restaurar carpeta original, métricas de retención y vaciado masivo.

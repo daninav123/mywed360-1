@@ -203,6 +203,203 @@
         "saving": "Guardando..."
       }
     },
+    "configValidation": {
+      "title": "Validacion de configuracion",
+      "subtitle": "Verifica que tu dominio este configurado para enviar emails",
+      "buttons": {
+        "validate": "Validar configuracion",
+        "validating": "Validando...",
+        "sendTest": "Enviar email de prueba",
+        "sendingTest": "Enviando...",
+        "sent": "Email enviado"
+      },
+      "current": {
+        "domain": "Dominio:",
+        "email": "Email:"
+      },
+      "errorTitle": "Error",
+      "errors": {
+        "invalidEmail": "Email no valido",
+        "validateGeneric": "Error al validar configuracion. Intenta nuevamente.",
+        "sendTestGeneric": "Error al enviar email de prueba. Verifica tu configuracion."
+      },
+      "summary": {
+        "successTitle": "Configuracion correcta",
+        "warningTitle": "Configuracion incompleta",
+        "cta": "Tu configuracion esta lista. Envia un email de prueba para verificar que todo funciona correctamente."
+      },
+      "checks": {
+        "spfTitle": "SPF (Sender Policy Framework)",
+        "spfValid": "Registro SPF configurado correctamente",
+        "dkimTitle": "DKIM (DomainKeys Identified Mail)",
+        "dkimValid": "Registro DKIM configurado correctamente",
+        "dmarcTitle": "DMARC (Recomendado)",
+        "dmarcValid": "Registro DMARC configurado (mejora deliverability)"
+      },
+      "successNotice": {
+        "description": "Email de prueba enviado a {{email}}. Revisa tu bandeja de entrada."
+      },
+      "help": {
+        "title": "Que se valida",
+        "spf": "Verifica que tu dominio autorice a MaLoveApp para enviar emails",
+        "dkim": "Confirma que los emails estan firmados digitalmente",
+        "dmarc": "Mejora la entregabilidad y protege contra suplantacion"
+      }
+    },
+    "feedback": {
+      "header": {
+        "title": "Tu opinion importa",
+        "toggleAria": "Dar feedback sobre el sistema de email",
+        "closeAria": "Cerrar formulario de feedback"
+      },
+      "thanks": {
+        "title": "Gracias por tu feedback",
+        "subtitle": "Tu opinion nos ayuda a mejorar el sistema de emails de MaLoveApp."
+      },
+      "common": {
+        "next": "Siguiente",
+        "back": "Atras",
+        "selectOption": "Selecciona una opcion",
+        "sending": "Enviando..."
+      },
+      "messages": {
+        "submitError": "No se pudo enviar tu feedback. Intentalo mas tarde."
+      },
+      "options": {
+        "features": {
+          "alias": "Alias de correo",
+          "templates": "Plantillas de email",
+          "tracking": "Seguimiento de emails",
+          "events": "Deteccion de eventos",
+          "search": "Busqueda en emails",
+          "notifications": "Notificaciones"
+        },
+        "performance": {
+          "verySlow": "Muy lento",
+          "slow": "Algo lento",
+          "acceptable": "Aceptable",
+          "fast": "Rapido",
+          "veryFast": "Muy rapido"
+        },
+        "usability": {
+          "veryDifficult": "Muy dificil de usar",
+          "difficult": "Algo dificil",
+          "neutral": "Neutral",
+          "easy": "Facil de usar",
+          "veryEasy": "Muy facil de usar"
+        }
+      },
+      "steps": {
+        "rating": {
+          "question": "Como valorarias tu experiencia con el email de MaLoveApp?",
+          "scaleStart": "Muy malo",
+          "scaleEnd": "Excelente",
+          "ratingAria": "Seleccionar puntuacion {{value}}"
+        },
+        "usability": {
+          "title": "Sobre la usabilidad y rendimiento",
+          "usabilityLabel": "Que tan facil es usar el sistema de email?",
+          "performanceLabel": "Como valoras la velocidad del sistema de email?"
+        },
+        "features": {
+          "title": "Funcionalidades y sugerencias",
+          "featureLabel": "Que funcionalidades has utilizado? (selecciona todas las que apliquen)",
+          "improvementLabel": "Que podemos mejorar en nuestro sistema de email?",
+          "improvementPlaceholder": "Comparte tus sugerencias...",
+          "featureRequestLabel": "Hay alguna funcionalidad que te gustaria ver en el futuro?",
+          "featureRequestPlaceholder": "Tus ideas son importantes para nosotros...",
+          "submit": "Enviar feedback"
+        }
+      }
+    },
+    "onboarding": {
+      "steps": {
+        "welcome": {
+          "title": "Bienvenido a Email",
+          "description": "Configura tu sistema de correo en 3 simples pasos"
+        },
+        "domain": {
+          "title": "Configuracion de Dominio",
+          "description": "Configura tu dominio de envio"
+        },
+        "validation": {
+          "title": "Validacion DNS",
+          "description": "Verificaremos tu configuracion DKIM y SPF"
+        },
+        "test": {
+          "title": "Envio de Prueba",
+          "description": "Envia un email de prueba"
+        },
+        "complete": {
+          "title": "Listo",
+          "description": "Tu email esta configurado correctamente"
+        }
+      },
+      "welcome": {
+        "intro": "Vamos a configurar tu sistema de correo para que puedas enviar invitaciones y comunicarte con tus invitados.",
+        "noteLabel": "Nota:",
+        "noteText": "Necesitaras acceso a la configuracion DNS de tu dominio."
+      },
+      "domain": {
+        "fields": {
+          "domain": {
+            "label": "Dominio *",
+            "placeholder": "miboda.com"
+          },
+          "fromEmail": {
+            "label": "Email de Envio *",
+            "placeholder": "invitaciones@miboda.com"
+          },
+          "fromName": {
+            "label": "Nombre del Remitente *",
+            "placeholder": "Maria & Juan"
+          },
+          "replyTo": {
+            "label": "Email de Respuesta (opcional)",
+            "placeholder": "contacto@miboda.com"
+          }
+        }
+      },
+      "validation": {
+        "title": "Registros DNS Requeridos:",
+        "button": {
+          "validate": "Validar DNS",
+          "validating": "Validando..."
+        },
+        "errors": {
+          "recordsMissing": "Verifica que hayas anadido correctamente los registros DNS",
+          "generic": "Error al validar DNS. Intenta de nuevo."
+        }
+      },
+      "test": {
+        "description": "Envia un email de prueba para verificar que todo funciona correctamente.",
+        "fields": {
+          "recipient": {
+            "label": "Email de Destino",
+            "placeholder": "tu@email.com"
+          }
+        },
+        "button": "Enviar Email de Prueba",
+        "success": "Email de prueba enviado correctamente. Revisa tu bandeja de entrada."
+      },
+      "complete": {
+        "message": "Tu configuracion de email esta completa. Ya puedes empezar a enviar invitaciones.",
+        "reminder": "Recuerda: Puedes cambiar esta configuracion en cualquier momento desde Ajustes."
+      },
+      "actions": {
+        "skip": "Saltar por ahora",
+        "back": "Atras",
+        "next": "Siguiente",
+        "finish": "Finalizar"
+      },
+      "errors": {
+        "missingDomainFields": "Por favor completa todos los campos obligatorios",
+        "dnsIncomplete": "Por favor completa la configuracion DNS antes de continuar",
+        "testNotSent": "Por favor envia un email de prueba antes de continuar",
+        "missingTestRecipient": "Por favor ingresa un email de destino",
+        "testSendFailed": "Error al enviar email de prueba"
+      }
+    },
     "compose": {
       "header": {
         "title": "Nuevo correo"

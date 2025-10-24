@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { CheckCircle, XCircle, AlertCircle, Loader2, Mail, Send } from 'lucide-react';
+
 import Button from '../ui/Button';
 import { post } from '../../services/apiClient';
+import useTranslations from '../../hooks/useTranslations';
 
 /**
- * Componente para validar configuración de email (SPF, DKIM, DMARC)
- * y enviar email de prueba
+ * Valida la configuracion de email (SPF, DKIM, DMARC) y permite enviar un correo de prueba.
  */
 const EmailConfigValidation = ({ emailAddress, onValidationComplete }) => {
   const [validating, setValidating] = useState(false);
@@ -14,12 +15,15 @@ const EmailConfigValidation = ({ emailAddress, onValidationComplete }) => {
   const [testEmailSent, setTestEmailSent] = useState(false);
   const [error, setError] = useState('');
 
-  // Extraer dominio del email
+  const { t, tVars } = useTranslations();
+  const tEmail = (key, options) => t(key, { ns: 'email', ...options });
+  const tEmailVars = (key, variables) => tVars(key, { ns: 'email', ...variables });
+
   const domain = emailAddress?.split('@')[1] || '';
 
   const validateConfiguration = async () => {
     if (!domain) {
-      setError('Email no válido');
+      setError(tEmail('configValidation.errors.invalidEmail'));
       return;
     }
 
@@ -30,22 +34,22 @@ const EmailConfigValidation = ({ emailAddress, onValidationComplete }) => {
     try {
       const response = await post('/api/email/validate/validate-configuration', {
         domain,
-        dkimSelector: 'k1' // Selector por defecto, puede ser configurable
+        dkimSelector: 'k1',
       });
 
       if (response.success) {
         setResults(response.data);
-        
-        // Llamar callback si está configurado
         if (onValidationComplete && typeof onValidationComplete === 'function') {
           onValidationComplete(response.data);
         }
       } else {
-        setError(response.error?.message || 'Error al validar configuración');
+        setError(
+          response.error?.message || tEmail('configValidation.errors.validateGeneric')
+        );
       }
     } catch (err) {
       console.error('Error validating email config:', err);
-      setError('Error al validar configuración. Por favor, intenta nuevamente.');
+      setError(tEmail('configValidation.errors.validateGeneric'));
     } finally {
       setValidating(false);
     }
@@ -53,7 +57,7 @@ const EmailConfigValidation = ({ emailAddress, onValidationComplete }) => {
 
   const sendTestEmail = async () => {
     if (!emailAddress) {
-      setError('Email no válido');
+      setError(tEmail('configValidation.errors.invalidEmail'));
       return;
     }
 
@@ -63,43 +67,43 @@ const EmailConfigValidation = ({ emailAddress, onValidationComplete }) => {
     try {
       const response = await post('/api/email/validate/send-test', {
         from: `noreply@${domain}`,
-        to: emailAddress
+        to: emailAddress,
       });
 
       if (response.success) {
         setTestEmailSent(true);
       } else {
-        setError(response.error?.message || 'Error al enviar email de prueba');
+        setError(
+          response.error?.message || tEmail('configValidation.errors.sendTestGeneric')
+        );
       }
     } catch (err) {
       console.error('Error sending test email:', err);
-      setError('Error al enviar email de prueba. Verifica tu configuración.');
+      setError(tEmail('configValidation.errors.sendTestGeneric'));
     } finally {
       setSendingTest(false);
     }
   };
 
-  const getStatusIcon = (valid) => {
-    if (valid) {
-      return <CheckCircle className="w-5 h-5 text-green-600" />;
-    }
-    return <XCircle className="w-5 h-5 text-red-600" />;
-  };
+  const getStatusIcon = (valid) =>
+    valid ? (
+      <CheckCircle className="w-5 h-5 text-green-600" />
+    ) : (
+      <XCircle className="w-5 h-5 text-red-600" />
+    );
 
-  const getStatusColor = (valid) => {
-    return valid ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200';
-  };
+  const getStatusColor = (valid) =>
+    valid ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200';
 
   return (
     <div className="space-y-4">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-semibold text-gray-900">
-            Validación de Configuración
+            {tEmail('configValidation.title')}
           </h3>
           <p className="text-sm text-gray-600 mt-1">
-            Verifica que tu dominio esté correctamente configurado para enviar emails
+            {tEmail('configValidation.subtitle')}
           </p>
         </div>
         <Button
@@ -111,69 +115,68 @@ const EmailConfigValidation = ({ emailAddress, onValidationComplete }) => {
           {validating ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin" />
-              Validando...
+              {tEmail('configValidation.buttons.validating')}
             </>
           ) : (
             <>
               <Mail className="w-4 h-4" />
-              Validar Configuración
+              {tEmail('configValidation.buttons.validate')}
             </>
           )}
         </Button>
       </div>
 
-      {/* Email que se está validando */}
       {domain && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
           <p className="text-sm text-blue-800">
-            <strong>Dominio:</strong> {domain}
+            <strong>{tEmail('configValidation.current.domain')}</strong> {domain}
           </p>
           <p className="text-sm text-blue-800">
-            <strong>Email:</strong> {emailAddress}
+            <strong>{tEmail('configValidation.current.email')}</strong> {emailAddress}
           </p>
         </div>
       )}
 
-      {/* Error */}
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-2">
           <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm font-medium text-red-800">Error</p>
+            <p className="text-sm font-medium text-red-800">
+              {tEmail('configValidation.errorTitle')}
+            </p>
             <p className="text-sm text-red-700">{error}</p>
           </div>
         </div>
       )}
 
-      {/* Resultados */}
       {results && (
         <div className="space-y-4">
-          {/* Resumen general */}
-          <div className={`border rounded-lg p-4 ${
-            results.overall ? 'bg-green-50 border-green-200' : 'bg-yellow-50 border-yellow-200'
-          }`}>
+          <div
+            className={`border rounded-lg p-4 ${
+              results.overall ? 'bg-green-50 border-green-200' : 'bg-yellow-50 border-yellow-200'
+            }`}
+          >
             <div className="flex items-center gap-3 mb-2">
               {results.overall ? (
                 <>
                   <CheckCircle className="w-6 h-6 text-green-600" />
                   <h4 className="font-semibold text-green-900">
-                    ¡Configuración correcta!
+                    {tEmail('configValidation.summary.successTitle')}
                   </h4>
                 </>
               ) : (
                 <>
                   <AlertCircle className="w-6 h-6 text-yellow-600" />
                   <h4 className="font-semibold text-yellow-900">
-                    Configuración incompleta
+                    {tEmail('configValidation.summary.warningTitle')}
                   </h4>
                 </>
               )}
             </div>
-            
             {results.summary?.warnings?.length > 0 && (
               <ul className="list-disc list-inside space-y-1 mt-2">
-                {results.summary.warnings.map((warning, idx) => (
-                  <li key={idx} className="text-sm text-gray-700">
+                {results.summary.warnings.map((warning, index) => (
+                  <li key={index} className="text-sm text-gray-700">
                     {warning}
                   </li>
                 ))}
@@ -181,50 +184,42 @@ const EmailConfigValidation = ({ emailAddress, onValidationComplete }) => {
             )}
           </div>
 
-          {/* SPF */}
           <div className={`border rounded-lg p-4 ${getStatusColor(results.spf?.valid)}`}>
             <div className="flex items-start gap-3">
               {getStatusIcon(results.spf?.valid)}
               <div className="flex-1">
                 <h5 className="font-semibold text-gray-900 mb-1">
-                  SPF (Sender Policy Framework)
+                  {tEmail('configValidation.checks.spfTitle')}
                 </h5>
                 {results.spf?.valid ? (
                   <p className="text-sm text-green-700">
-                    Registro SPF configurado correctamente
+                    {tEmail('configValidation.checks.spfValid')}
                   </p>
                 ) : (
-                  <p className="text-sm text-red-700">
-                    {results.spf?.error}
-                  </p>
+                  <p className="text-sm text-red-700">{results.spf?.error}</p>
                 )}
                 {results.spf?.record && (
                   <div className="mt-2 p-2 bg-white rounded border border-gray-200">
-                    <code className="text-xs text-gray-700 break-all">
-                      {results.spf.record}
-                    </code>
+                    <code className="text-xs text-gray-700 break-all">{results.spf.record}</code>
                   </div>
                 )}
               </div>
             </div>
           </div>
 
-          {/* DKIM */}
           <div className={`border rounded-lg p-4 ${getStatusColor(results.dkim?.valid)}`}>
             <div className="flex items-start gap-3">
               {getStatusIcon(results.dkim?.valid)}
               <div className="flex-1">
                 <h5 className="font-semibold text-gray-900 mb-1">
-                  DKIM (DomainKeys Identified Mail)
+                  {tEmail('configValidation.checks.dkimTitle')}
                 </h5>
                 {results.dkim?.valid ? (
                   <p className="text-sm text-green-700">
-                    Registro DKIM configurado correctamente
+                    {tEmail('configValidation.checks.dkimValid')}
                   </p>
                 ) : (
-                  <p className="text-sm text-red-700">
-                    {results.dkim?.error}
-                  </p>
+                  <p className="text-sm text-red-700">{results.dkim?.error}</p>
                 )}
                 {results.dkim?.record && (
                   <div className="mt-2 p-2 bg-white rounded border border-gray-200">
@@ -238,7 +233,6 @@ const EmailConfigValidation = ({ emailAddress, onValidationComplete }) => {
             </div>
           </div>
 
-          {/* DMARC */}
           <div className={`border rounded-lg p-4 ${getStatusColor(results.dmarc?.valid)}`}>
             <div className="flex items-start gap-3">
               {results.dmarc?.valid ? (
@@ -248,33 +242,28 @@ const EmailConfigValidation = ({ emailAddress, onValidationComplete }) => {
               )}
               <div className="flex-1">
                 <h5 className="font-semibold text-gray-900 mb-1">
-                  DMARC (Recomendado)
+                  {tEmail('configValidation.checks.dmarcTitle')}
                 </h5>
                 {results.dmarc?.valid ? (
                   <p className="text-sm text-green-700">
-                    Registro DMARC configurado (mejora deliverability)
+                    {tEmail('configValidation.checks.dmarcValid')}
                   </p>
                 ) : (
-                  <p className="text-sm text-yellow-700">
-                    {results.dmarc?.error}
-                  </p>
+                  <p className="text-sm text-yellow-700">{results.dmarc?.error}</p>
                 )}
                 {results.dmarc?.record && (
                   <div className="mt-2 p-2 bg-white rounded border border-gray-200">
-                    <code className="text-xs text-gray-700 break-all">
-                      {results.dmarc.record}
-                    </code>
+                    <code className="text-xs text-gray-700 break-all">{results.dmarc.record}</code>
                   </div>
                 )}
               </div>
             </div>
           </div>
 
-          {/* Botón de email de prueba */}
           {results.overall && (
             <div className="border-t pt-4">
               <p className="text-sm text-gray-700 mb-3">
-                Tu configuración está lista. Envía un email de prueba para verificar que todo funciona correctamente.
+                {tEmail('configValidation.summary.cta')}
               </p>
               <Button
                 onClick={sendTestEmail}
@@ -285,24 +274,25 @@ const EmailConfigValidation = ({ emailAddress, onValidationComplete }) => {
                 {sendingTest ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    Enviando...
+                    {tEmail('configValidation.buttons.sendingTest')}
                   </>
                 ) : testEmailSent ? (
                   <>
                     <CheckCircle className="w-4 h-4" />
-                    Email enviado
+                    {tEmail('configValidation.buttons.sent')}
                   </>
                 ) : (
                   <>
                     <Send className="w-4 h-4" />
-                    Enviar email de prueba
+                    {tEmail('configValidation.buttons.sendTest')}
                   </>
                 )}
               </Button>
-              
               {testEmailSent && (
                 <p className="text-sm text-green-700 mt-2">
-                  ✓ Email de prueba enviado a {emailAddress}. Revisa tu bandeja de entrada.
+                  {tEmailVars('configValidation.successNotice.description', {
+                    email: emailAddress,
+                  })}
                 </p>
               )}
             </div>
@@ -310,21 +300,20 @@ const EmailConfigValidation = ({ emailAddress, onValidationComplete }) => {
         </div>
       )}
 
-      {/* Información de ayuda */}
       {!results && !validating && (
         <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
           <h5 className="font-semibold text-gray-900 mb-2">
-            ¿Qué se valida?
+            {tEmail('configValidation.help.title')}
           </h5>
           <ul className="list-disc list-inside space-y-1 text-sm text-gray-700">
             <li>
-              <strong>SPF:</strong> Verifica que tu dominio autorice a MaLoveApp para enviar emails
+              <strong>SPF:</strong> {tEmail('configValidation.help.spf')}
             </li>
             <li>
-              <strong>DKIM:</strong> Confirma que los emails estén firmados digitalmente
+              <strong>DKIM:</strong> {tEmail('configValidation.help.dkim')}
             </li>
             <li>
-              <strong>DMARC:</strong> Mejora la entregabilidad y protege contra suplantación
+              <strong>DMARC:</strong> {tEmail('configValidation.help.dmarc')}
             </li>
           </ul>
         </div>

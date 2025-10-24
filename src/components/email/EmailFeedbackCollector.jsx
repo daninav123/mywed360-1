@@ -1,21 +1,14 @@
-﻿import PropTypes from 'prop-types';
+import PropTypes from 'prop-types';
 import React, { useState } from 'react';
+import { Loader2 } from 'lucide-react';
 
+import useTranslations from '../../hooks/useTranslations';
 import { performanceMonitor } from '../../services/PerformanceMonitor';
 
-/**
- * Componente para recopilar feedback de usuarios sobre el sistema de emails
- *
- * @component
- * @example
- * ```jsx
- * <EmailFeedbackCollector
- *   onSubmit={(feedback) => saveFeedback(feedback)}
- *   isMinimized={false}
- * />
- * ```
- */
-function EmailFeedbackCollector({ onSubmit, isMinimized = false, emailId = null }) {
+const EmailFeedbackCollector = ({ onSubmit, isMinimized = false, emailId = null }) => {
+  const { t } = useTranslations();
+  const tEmail = (key, options) => t(key, { ns: 'email', ...options });
+
   const [formData, setFormData] = useState({
     rating: 0,
     usability: null,
@@ -29,78 +22,58 @@ function EmailFeedbackCollector({ onSubmit, isMinimized = false, emailId = null 
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Opciones para las preguntas
   const featureOptions = [
-    { id: 'alias', label: 'Alias de correo' },
-    { id: 'templates', label: 'Plantillas de email' },
-    { id: 'tracking', label: 'Seguimiento de emails' },
-    { id: 'events', label: 'Detección de eventos' },
-    { id: 'search', label: 'Búsqueda en emails' },
-    { id: 'notifications', label: 'Notificaciones' },
+    { id: 'alias', label: tEmail('feedback.options.features.alias') },
+    { id: 'templates', label: tEmail('feedback.options.features.templates') },
+    { id: 'tracking', label: tEmail('feedback.options.features.tracking') },
+    { id: 'events', label: tEmail('feedback.options.features.events') },
+    { id: 'search', label: tEmail('feedback.options.features.search') },
+    { id: 'notifications', label: tEmail('feedback.options.features.notifications') },
   ];
 
   const performanceOptions = [
-    { value: 'very_slow', label: 'Muy lento' },
-    { value: 'slow', label: 'Algo lento' },
-    { value: 'acceptable', label: 'Aceptable' },
-    { value: 'fast', label: 'Rápido' },
-    { value: 'very_fast', label: 'Muy rápido' },
+    { value: 'very_slow', label: tEmail('feedback.options.performance.verySlow') },
+    { value: 'slow', label: tEmail('feedback.options.performance.slow') },
+    { value: 'acceptable', label: tEmail('feedback.options.performance.acceptable') },
+    { value: 'fast', label: tEmail('feedback.options.performance.fast') },
+    { value: 'very_fast', label: tEmail('feedback.options.performance.veryFast') },
   ];
 
   const usabilityOptions = [
-    { value: 'very_difficult', label: 'Muy difícil de usar' },
-    { value: 'difficult', label: 'Algo difícil' },
-    { value: 'neutral', label: 'Neutral' },
-    { value: 'easy', label: 'Fácil de usar' },
-    { value: 'very_easy', label: 'Muy fácil de usar' },
+    { value: 'very_difficult', label: tEmail('feedback.options.usability.veryDifficult') },
+    { value: 'difficult', label: tEmail('feedback.options.usability.difficult') },
+    { value: 'neutral', label: tEmail('feedback.options.usability.neutral') },
+    { value: 'easy', label: tEmail('feedback.options.usability.easy') },
+    { value: 'very_easy', label: tEmail('feedback.options.usability.veryEasy') },
   ];
 
-  // Manejador de cambios en los campos del formulario
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+  const handleChange = (event) => {
+    const { name, value, type, checked } = event.target;
 
     if (type === 'checkbox') {
       const updatedFeatures = checked
         ? [...formData.features, value]
         : formData.features.filter((feature) => feature !== value);
-
-      setFormData((prev) => ({
-        ...prev,
-        features: updatedFeatures,
-      }));
-    } else {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
+      setFormData((prev) => ({ ...prev, features: updatedFeatures }));
+      return;
     }
+
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Manejador para establecer la calificación
-  const handleSetRating = (rating) => {
-    setFormData((prev) => ({
-      ...prev,
-      rating,
-    }));
+  const handleSetRating = (ratingValue) => {
+    setFormData((prev) => ({ ...prev, rating: ratingValue }));
   };
 
-  // Avanzar al siguiente paso
-  const handleNextStep = () => {
-    setStep((prev) => prev + 1);
-  };
+  const handleNextStep = () => setStep((prev) => prev + 1);
+  const handlePrevStep = () => setStep((prev) => prev - 1);
+  const toggleExpanded = () => setIsExpanded((prev) => !prev);
 
-  // Retroceder al paso anterior
-  const handlePrevStep = () => {
-    setStep((prev) => prev - 1);
-  };
-
-  // Enviar el formulario
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     setIsSubmitting(true);
 
     try {
-      // Registrar evento en el monitor de rendimiento
       performanceMonitor.logEvent('email_feedback_submitted', {
         rating: formData.rating,
         usability: formData.usability,
@@ -108,7 +81,6 @@ function EmailFeedbackCollector({ onSubmit, isMinimized = false, emailId = null 
         emailId,
       });
 
-      // Llamar a la función de envío proporcionada por el padre
       if (onSubmit) {
         await onSubmit({
           ...formData,
@@ -117,35 +89,27 @@ function EmailFeedbackCollector({ onSubmit, isMinimized = false, emailId = null 
         });
       }
 
-      // Marcar como enviado y mostrar agradecimiento
       setIsSubmitted(true);
 
-      // Después de 3 segundos, minimizar el componente
       setTimeout(() => {
         setIsExpanded(false);
       }, 3000);
     } catch (error) {
       console.error('Error al enviar feedback:', error);
       performanceMonitor.logError('feedback_submission', error, { emailId });
-      alert('No se pudo enviar tu feedback. Por favor, inténtalo de nuevo más tarde.');
+      alert(tEmail('feedback.messages.submitError'));
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Alternar la visibilidad del formulario
-  const toggleExpanded = () => {
-    setIsExpanded((prev) => !prev);
-  };
-
-  // Si está minimizado, mostrar solo botón para expandir
   if (!isExpanded) {
     return (
       <button
         data-testid="feedback-toggle"
         onClick={toggleExpanded}
         className="fixed bottom-4 right-4 bg-indigo-600 text-white rounded-full p-3 shadow-lg hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-400 z-50"
-        aria-label="Dar feedback sobre el sistema de email"
+        aria-label={tEmail('feedback.header.toggleAria')}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -166,13 +130,16 @@ function EmailFeedbackCollector({ onSubmit, isMinimized = false, emailId = null 
   }
 
   return (
-    <div className="fixed bottom-4 right-4 w-80 md:w-96 bg-white rounded-lg shadow-xl z-50 border border-gray-200 overflow-hidden" data-testid="feedback-form">
+    <div
+      className="fixed bottom-4 right-4 w-80 md:w-96 bg-white rounded-lg shadow-xl z-50 border border-gray-200 overflow-hidden"
+      data-testid="feedback-form"
+    >
       <div className="bg-indigo-600 text-white px-4 py-3 flex justify-between items-center">
-        <h3 className="font-medium text-lg">Tu opinión importa</h3>
+        <h3 className="font-medium text-lg">{tEmail('feedback.header.title')}</h3>
         <button
           onClick={toggleExpanded}
           className="text-white hover:text-indigo-200 focus:outline-none"
-          aria-label="Cerrar formulario de feedback"
+          aria-label={tEmail('feedback.header.closeAria')}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -206,37 +173,40 @@ function EmailFeedbackCollector({ onSubmit, isMinimized = false, emailId = null 
                 d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            <h4 className="mt-3 text-xl font-medium text-gray-800">¡Gracias por tu feedback!</h4>
-            <p className="mt-1 text-gray-600">
-              Tu opinión nos ayuda a mejorar el sistema de emails de MaLoveApp.
-            </p>
+            <h4 className="mt-3 text-xl font-medium text-gray-800">
+              {tEmail('feedback.thanks.title')}
+            </h4>
+            <p className="mt-1 text-gray-600">{tEmail('feedback.thanks.subtitle')}</p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} data-testid="feedback-form-inner">
             {step === 1 && (
               <div>
                 <h4 className="font-medium mb-3">
-                  ¿Cómo valorarías tu experiencia con el email de MaLoveApp?
+                  {tEmail('feedback.steps.rating.question')}
                 </h4>
                 <div className="flex justify-center space-x-4 mb-4">
-                  {[1, 2, 3, 4, 5].map((rating) => (
+                  {[1, 2, 3, 4, 5].map((ratingValue) => (
                     <button
-                      key={rating}
+                      key={ratingValue}
                       type="button"
-                      onClick={() => handleSetRating(rating)}
+                      onClick={() => handleSetRating(ratingValue)}
                       className={`w-12 h-12 rounded-full flex items-center justify-center text-xl ${
-                        formData.rating === rating
+                        formData.rating === ratingValue
                           ? 'bg-indigo-600 text-white'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
+                      aria-label={tEmail('feedback.steps.rating.ratingAria', {
+                        value: ratingValue,
+                      })}
                     >
-                      {rating}
+                      {ratingValue}
                     </button>
                   ))}
                 </div>
                 <div className="flex justify-between text-sm text-gray-500 px-2 mb-4">
-                  <span>Muy malo</span>
-                  <span>Excelente</span>
+                  <span>{tEmail('feedback.steps.rating.scaleStart')}</span>
+                  <span>{tEmail('feedback.steps.rating.scaleEnd')}</span>
                 </div>
                 <div className="flex justify-end">
                   <button
@@ -249,7 +219,7 @@ function EmailFeedbackCollector({ onSubmit, isMinimized = false, emailId = null 
                         : 'bg-indigo-600 text-white hover:bg-indigo-700'
                     }`}
                   >
-                    Siguiente
+                    {tEmail('feedback.common.next')}
                   </button>
                 </div>
               </div>
@@ -257,11 +227,13 @@ function EmailFeedbackCollector({ onSubmit, isMinimized = false, emailId = null 
 
             {step === 2 && (
               <div>
-                <h4 className="font-medium mb-3">Sobre la usabilidad y rendimiento</h4>
+                <h4 className="font-medium mb-3">
+                  {tEmail('feedback.steps.usability.title')}
+                </h4>
 
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    ¿Qué tan fácil es usar el sistema de email?
+                    {tEmail('feedback.steps.usability.usabilityLabel')}
                   </label>
                   <select
                     name="usability"
@@ -269,7 +241,7 @@ function EmailFeedbackCollector({ onSubmit, isMinimized = false, emailId = null 
                     onChange={handleChange}
                     className="block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                   >
-                    <option value="">Selecciona una opción</option>
+                    <option value="">{tEmail('feedback.common.selectOption')}</option>
                     {usabilityOptions.map((option) => (
                       <option key={option.value} value={option.value}>
                         {option.label}
@@ -280,7 +252,7 @@ function EmailFeedbackCollector({ onSubmit, isMinimized = false, emailId = null 
 
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    ¿Cómo valoras la velocidad del sistema de email?
+                    {tEmail('feedback.steps.usability.performanceLabel')}
                   </label>
                   <select
                     name="performance"
@@ -288,7 +260,7 @@ function EmailFeedbackCollector({ onSubmit, isMinimized = false, emailId = null 
                     onChange={handleChange}
                     className="block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                   >
-                    <option value="">Selecciona una opción</option>
+                    <option value="">{tEmail('feedback.common.selectOption')}</option>
                     {performanceOptions.map((option) => (
                       <option key={option.value} value={option.value}>
                         {option.label}
@@ -303,7 +275,7 @@ function EmailFeedbackCollector({ onSubmit, isMinimized = false, emailId = null 
                     onClick={handlePrevStep}
                     className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
                   >
-                    Atrás
+                    {tEmail('feedback.common.back')}
                   </button>
                   <button
                     type="button"
@@ -315,7 +287,7 @@ function EmailFeedbackCollector({ onSubmit, isMinimized = false, emailId = null 
                         : 'bg-indigo-600 text-white hover:bg-indigo-700'
                     }`}
                   >
-                    Siguiente
+                    {tEmail('feedback.common.next')}
                   </button>
                 </div>
               </div>
@@ -323,11 +295,13 @@ function EmailFeedbackCollector({ onSubmit, isMinimized = false, emailId = null 
 
             {step === 3 && (
               <div>
-                <h4 className="font-medium mb-3">Funcionalidades y sugerencias</h4>
+                <h4 className="font-medium mb-3">
+                  {tEmail('feedback.steps.features.title')}
+                </h4>
 
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    ¿Qué funcionalidades has utilizado? (selecciona todas las que apliquen)
+                    {tEmail('feedback.steps.features.featureLabel')}
                   </label>
                   <div className="space-y-2">
                     {featureOptions.map((option) => (
@@ -354,7 +328,7 @@ function EmailFeedbackCollector({ onSubmit, isMinimized = false, emailId = null 
                     htmlFor="improvement"
                     className="block text-sm font-medium text-gray-700 mb-1"
                   >
-                    ¿Qué podemos mejorar en nuestro sistema de email?
+                    {tEmail('feedback.steps.features.improvementLabel')}
                   </label>
                   <textarea
                     id="improvement"
@@ -363,7 +337,7 @@ function EmailFeedbackCollector({ onSubmit, isMinimized = false, emailId = null 
                     onChange={handleChange}
                     rows="2"
                     className="block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                    placeholder="Comparte tus sugerencias..."
+                    placeholder={tEmail('feedback.steps.features.improvementPlaceholder')}
                   />
                 </div>
 
@@ -372,7 +346,7 @@ function EmailFeedbackCollector({ onSubmit, isMinimized = false, emailId = null 
                     htmlFor="featureRequest"
                     className="block text-sm font-medium text-gray-700 mb-1"
                   >
-                    ¿Hay alguna funcionalidad que te gustaría ver en el futuro?
+                    {tEmail('feedback.steps.features.featureRequestLabel')}
                   </label>
                   <textarea
                     id="featureRequest"
@@ -381,7 +355,7 @@ function EmailFeedbackCollector({ onSubmit, isMinimized = false, emailId = null 
                     onChange={handleChange}
                     rows="2"
                     className="block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                    placeholder="Tus ideas son importantes para nosotros..."
+                    placeholder={tEmail('feedback.steps.features.featureRequestPlaceholder')}
                   />
                 </div>
 
@@ -391,24 +365,24 @@ function EmailFeedbackCollector({ onSubmit, isMinimized = false, emailId = null 
                     onClick={handlePrevStep}
                     className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
                   >
-                    Atrás
+                    {tEmail('feedback.common.back')}
                   </button>
                   <button
                     type="submit"
                     disabled={isSubmitting}
                     className={`px-4 py-2 rounded-md ${
                       isSubmitting
-                        ? 'bg-indigo-400 cursor-not-allowed'
-                        : 'bg-indigo-600 hover:bg-indigo-700'
-                    } text-white`}
+                        ? 'bg-indigo-400 cursor-not-allowed text-white'
+                        : 'bg-indigo-600 text-white hover:bg-indigo-700'
+                    }`}
                   >
                     {isSubmitting ? (
                       <>
-                        <span className="inline-block animate-spin mr-2">⟳</span>
-                        Enviando...
+                        <Loader2 className="inline-block w-4 h-4 mr-2 animate-spin" />
+                        {tEmail('feedback.common.sending')}
                       </>
                     ) : (
-                      'Enviar feedback'
+                      tEmail('feedback.steps.features.submit')
                     )}
                   </button>
                 </div>
@@ -419,18 +393,12 @@ function EmailFeedbackCollector({ onSubmit, isMinimized = false, emailId = null 
       </div>
     </div>
   );
-}
+};
 
 EmailFeedbackCollector.propTypes = {
-  /** Función a llamar cuando se envía el formulario de feedback */
   onSubmit: PropTypes.func.isRequired,
-  /** Si el componente debe mostrarse minimizado inicialmente */
   isMinimized: PropTypes.bool,
-  /** ID del email relacionado con el feedback (opcional) */
   emailId: PropTypes.string,
 };
 
 export default EmailFeedbackCollector;
-
-
-

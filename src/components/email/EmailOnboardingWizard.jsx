@@ -1,62 +1,45 @@
 /**
  * EmailOnboardingWizard Component
- * Wizard de configuración inicial de email con validaciones
+ * Wizard de configuracion inicial de email con validaciones
  * Sprint 3 - Unificar Email
  */
 
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useMemo, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
-  Mail,
-  CheckCircle,
   AlertCircle,
-  ArrowRight,
   ArrowLeft,
+  ArrowRight,
+  CheckCircle,
   Loader,
-  Shield,
+  Mail,
   Send,
-  Settings
+  Settings,
+  Shield,
 } from 'lucide-react';
 
-const STEPS = [
-  {
-    id: 'welcome',
-    title: 'Bienvenido a Email',
-    description: 'Configura tu sistema de correo en 3 simples pasos',
-    icon: Mail
-  },
-  {
-    id: 'domain',
-    title: 'Configuración de Dominio',
-    description: 'Configura tu dominio de envío',
-    icon: Settings
-  },
-  {
-    id: 'validation',
-    title: 'Validación DNS',
-    description: 'Verificaremos tu configuración DKIM y SPF',
-    icon: Shield
-  },
-  {
-    id: 'test',
-    title: 'Envío de Prueba',
-    description: 'Envía un email de prueba',
-    icon: Send
-  },
-  {
-    id: 'complete',
-    title: '¡Listo!',
-    description: 'Tu email está configurado correctamente',
-    icon: CheckCircle
-  }
+import useTranslations from '../../hooks/useTranslations';
+
+const STEP_CONFIG = [
+  { id: 'welcome', icon: Mail },
+  { id: 'domain', icon: Settings },
+  { id: 'validation', icon: Shield },
+  { id: 'test', icon: Send },
+  { id: 'complete', icon: CheckCircle },
 ];
+
+const STATUS_SYMBOL = {
+  valid: '✓',
+  invalid: '!',
+  error: '!',
+};
 
 /**
  * EmailOnboardingWizard
  * @param {Object} props
  * @param {Function} props.onComplete - Callback al completar
  * @param {Function} props.onSkip - Callback para saltar
- * @param {Object} props.initialConfig - Configuración inicial
+ * @param {Object} props.initialConfig - Configuracion inicial
  */
 export function EmailOnboardingWizard({ onComplete, onSkip, initialConfig = {} }) {
   const [currentStep, setCurrentStep] = useState(0);
@@ -65,29 +48,39 @@ export function EmailOnboardingWizard({ onComplete, onSkip, initialConfig = {} }
     fromEmail: initialConfig.fromEmail || '',
     fromName: initialConfig.fromName || '',
     replyTo: initialConfig.replyTo || '',
-    ...initialConfig
+    ...initialConfig,
   });
   const [validation, setValidation] = useState({
     dkim: null,
     spf: null,
     loading: false,
-    errors: []
+    errors: [],
   });
   const [testEmail, setTestEmail] = useState('');
   const [testSent, setTestSent] = useState(false);
 
-  const step = STEPS[currentStep];
-  const isLastStep = currentStep === STEPS.length - 1;
+  const { t, i18n } = useTranslations();
+  const tEmail = (key, options) => t(key, { ns: 'email', ...options });
+
+  const steps = useMemo(
+    () =>
+      STEP_CONFIG.map((step) => ({
+        ...step,
+        title: tEmail(`onboarding.steps.${step.id}.title`),
+        description: tEmail(`onboarding.steps.${step.id}.description`),
+      })),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [t, i18n.language]
+  );
+
+  const step = steps[currentStep];
+  const isLastStep = currentStep === steps.length - 1;
   const isFirstStep = currentStep === 0;
 
-  /**
-   * Avanzar al siguiente paso
-   */
   const handleNext = async () => {
-    // Validar antes de avanzar
     if (step.id === 'domain') {
       if (!config.domain || !config.fromEmail || !config.fromName) {
-        alert('Por favor completa todos los campos obligatorios');
+        alert(tEmail('onboarding.errors.missingDomainFields'));
         return;
       }
     }
@@ -95,45 +88,35 @@ export function EmailOnboardingWizard({ onComplete, onSkip, initialConfig = {} }
     if (step.id === 'validation') {
       await validateDNS();
       if (validation.dkim !== 'valid' || validation.spf !== 'valid') {
-        alert('Por favor completa la configuración DNS antes de continuar');
+        alert(tEmail('onboarding.errors.dnsIncomplete'));
         return;
       }
     }
 
-    if (step.id === 'test') {
-      if (!testSent) {
-        alert('Por favor envía un email de prueba antes de continuar');
-        return;
-      }
+    if (step.id === 'test' && !testSent) {
+      alert(tEmail('onboarding.errors.testNotSent'));
+      return;
     }
 
     if (isLastStep) {
       onComplete?.(config);
     } else {
-      setCurrentStep(prev => prev + 1);
+      setCurrentStep((prev) => prev + 1);
     }
   };
 
-  /**
-   * Retroceder al paso anterior
-   */
   const handleBack = () => {
     if (!isFirstStep) {
-      setCurrentStep(prev => prev - 1);
+      setCurrentStep((prev) => prev - 1);
     }
   };
 
-  /**
-   * Validar configuración DNS
-   */
   const validateDNS = async () => {
-    setValidation(prev => ({ ...prev, loading: true, errors: [] }));
+    setValidation((prev) => ({ ...prev, loading: true, errors: [] }));
 
     try {
-      // Simular validación DNS (en producción, llamar a API backend)
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
 
-      // Mock validation
       const dkimValid = config.domain.includes('.');
       const spfValid = config.domain.includes('.');
 
@@ -141,37 +124,36 @@ export function EmailOnboardingWizard({ onComplete, onSkip, initialConfig = {} }
         dkim: dkimValid ? 'valid' : 'invalid',
         spf: spfValid ? 'valid' : 'invalid',
         loading: false,
-        errors: !dkimValid || !spfValid 
-          ? ['Verifica que hayas añadido correctamente los registros DNS']
-          : []
+        errors:
+          !dkimValid || !spfValid
+            ? [tEmail('onboarding.validation.errors.recordsMissing')]
+            : [],
       });
     } catch (error) {
       setValidation({
         dkim: 'error',
         spf: 'error',
         loading: false,
-        errors: ['Error al validar DNS. Intenta de nuevo.']
+        errors: [tEmail('onboarding.validation.errors.generic')],
       });
     }
   };
 
-  /**
-   * Enviar email de prueba
-   */
   const sendTestEmail = async () => {
     if (!testEmail) {
-      alert('Por favor ingresa un email de destino');
+      alert(tEmail('onboarding.errors.missingTestRecipient'));
       return;
     }
 
     try {
-      // Simular envío (en producción, llamar a API backend)
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await new Promise((resolve) => setTimeout(resolve, 1500));
       setTestSent(true);
     } catch (error) {
-      alert('Error al enviar email de prueba');
+      alert(tEmail('onboarding.errors.testSendFailed'));
     }
   };
+
+  const renderStatusSymbol = (status) => STATUS_SYMBOL[status] || '?';
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -180,19 +162,16 @@ export function EmailOnboardingWizard({ onComplete, onSkip, initialConfig = {} }
         animate={{ opacity: 1, scale: 1 }}
         className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden"
       >
-        {/* Progress Bar */}
         <div className="h-2 bg-gray-200 dark:bg-gray-700">
           <motion.div
             className="h-full bg-blue-500"
             initial={{ width: 0 }}
-            animate={{ width: `${((currentStep + 1) / STEPS.length) * 100}%` }}
+            animate={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
             transition={{ duration: 0.3 }}
           />
         </div>
 
-        {/* Content */}
         <div className="p-8">
-          {/* Header */}
           <div className="text-center mb-8">
             <div className="w-16 h-16 mx-auto mb-4 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
               <step.icon className="w-8 h-8 text-blue-600 dark:text-blue-400" />
@@ -200,12 +179,9 @@ export function EmailOnboardingWizard({ onComplete, onSkip, initialConfig = {} }
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
               {step.title}
             </h2>
-            <p className="text-gray-600 dark:text-gray-400">
-              {step.description}
-            </p>
+            <p className="text-gray-600 dark:text-gray-400">{step.description}</p>
           </div>
 
-          {/* Step Content */}
           <AnimatePresence mode="wait">
             <motion.div
               key={step.id}
@@ -214,117 +190,125 @@ export function EmailOnboardingWizard({ onComplete, onSkip, initialConfig = {} }
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.2 }}
             >
-              {/* Welcome Step */}
               {step.id === 'welcome' && (
                 <div className="text-center space-y-4">
                   <p className="text-gray-700 dark:text-gray-300">
-                    Vamos a configurar tu sistema de correo para que puedas enviar invitaciones y comunicarte con tus invitados.
+                    {tEmail('onboarding.welcome.intro')}
                   </p>
                   <div className="bg-blue-50 dark:bg-blue-900 p-4 rounded-lg">
                     <p className="text-sm text-blue-800 dark:text-blue-200">
-                      <strong>Nota:</strong> Necesitarás acceso a la configuración DNS de tu dominio.
+                      <strong>{tEmail('onboarding.welcome.noteLabel')}</strong>{' '}
+                      {tEmail('onboarding.welcome.noteText')}
                     </p>
                   </div>
                 </div>
               )}
 
-              {/* Domain Configuration */}
               {step.id === 'domain' && (
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Dominio *
+                      {tEmail('onboarding.domain.fields.domain.label')}
                     </label>
                     <input
                       type="text"
                       value={config.domain}
                       onChange={(e) => setConfig({ ...config, domain: e.target.value })}
-                      placeholder="miboda.com"
+                      placeholder={tEmail('onboarding.domain.fields.domain.placeholder')}
                       className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700"
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Email de Envío *
+                      {tEmail('onboarding.domain.fields.fromEmail.label')}
                     </label>
                     <input
                       type="email"
                       value={config.fromEmail}
                       onChange={(e) => setConfig({ ...config, fromEmail: e.target.value })}
-                      placeholder="invitaciones@miboda.com"
+                      placeholder={tEmail(
+                        'onboarding.domain.fields.fromEmail.placeholder'
+                      )}
                       className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700"
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Nombre del Remitente *
+                      {tEmail('onboarding.domain.fields.fromName.label')}
                     </label>
                     <input
                       type="text"
                       value={config.fromName}
                       onChange={(e) => setConfig({ ...config, fromName: e.target.value })}
-                      placeholder="María & Juan"
+                      placeholder={tEmail(
+                        'onboarding.domain.fields.fromName.placeholder'
+                      )}
                       className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700"
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Email de Respuesta (opcional)
+                      {tEmail('onboarding.domain.fields.replyTo.label')}
                     </label>
                     <input
                       type="email"
                       value={config.replyTo}
                       onChange={(e) => setConfig({ ...config, replyTo: e.target.value })}
-                      placeholder="contacto@miboda.com"
+                      placeholder={tEmail(
+                        'onboarding.domain.fields.replyTo.placeholder'
+                      )}
                       className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700"
                     />
                   </div>
                 </div>
               )}
 
-              {/* DNS Validation */}
               {step.id === 'validation' && (
                 <div className="space-y-4">
                   <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg space-y-3">
                     <h3 className="font-semibold text-gray-900 dark:text-white">
-                      Registros DNS Requeridos:
+                      {tEmail('onboarding.validation.title')}
                     </h3>
-                    
-                    {/* DKIM */}
+
                     <div className="flex items-start gap-3">
-                      <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${
-                        validation.dkim === 'valid' ? 'bg-green-500' :
-                        validation.dkim === 'invalid' ? 'bg-red-500' :
-                        validation.dkim === 'error' ? 'bg-red-500' :
-                        'bg-gray-400'
-                      }`}>
-                        {validation.dkim === 'valid' ? '✓' : '?'}
+                      <div
+                        className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${
+                          validation.dkim === 'valid'
+                            ? 'bg-green-500 text-white'
+                            : validation.dkim === 'invalid' || validation.dkim === 'error'
+                              ? 'bg-red-500 text-white'
+                              : 'bg-gray-400 text-white'
+                        }`}
+                      >
+                        {renderStatusSymbol(validation.dkim)}
                       </div>
                       <div>
                         <p className="font-medium text-gray-900 dark:text-white">DKIM</p>
                         <code className="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
-                          TXT @ "v=DKIM1; k=rsa; p=..."
+                          TXT @ &quot;v=DKIM1; k=rsa; p=...&quot;
                         </code>
                       </div>
                     </div>
 
-                    {/* SPF */}
                     <div className="flex items-start gap-3">
-                      <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${
-                        validation.spf === 'valid' ? 'bg-green-500' :
-                        validation.spf === 'invalid' ? 'bg-red-500' :
-                        validation.spf === 'error' ? 'bg-red-500' :
-                        'bg-gray-400'
-                      }`}>
-                        {validation.spf === 'valid' ? '✓' : '?'}
+                      <div
+                        className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${
+                          validation.spf === 'valid'
+                            ? 'bg-green-500 text-white'
+                            : validation.spf === 'invalid' || validation.spf === 'error'
+                              ? 'bg-red-500 text-white'
+                              : 'bg-gray-400 text-white'
+                        }`}
+                      >
+                        {renderStatusSymbol(validation.spf)}
                       </div>
                       <div>
                         <p className="font-medium text-gray-900 dark:text-white">SPF</p>
                         <code className="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
-                          TXT @ "v=spf1 include:mailgun.org ~all"
+                          TXT @ &quot;v=spf1 include:mailgun.org ~all&quot;
                         </code>
                       </div>
                     </div>
@@ -332,8 +316,8 @@ export function EmailOnboardingWizard({ onComplete, onSkip, initialConfig = {} }
 
                   {validation.errors.length > 0 && (
                     <div className="bg-red-50 dark:bg-red-900 p-4 rounded-lg">
-                      {validation.errors.map((error, i) => (
-                        <p key={i} className="text-sm text-red-800 dark:text-red-200">
+                      {validation.errors.map((error, index) => (
+                        <p key={index} className="text-sm text-red-800 dark:text-red-200">
                           {error}
                         </p>
                       ))}
@@ -348,34 +332,33 @@ export function EmailOnboardingWizard({ onComplete, onSkip, initialConfig = {} }
                     {validation.loading ? (
                       <>
                         <Loader className="w-5 h-5 animate-spin" />
-                        Validando...
+                        {tEmail('onboarding.validation.button.validating')}
                       </>
                     ) : (
                       <>
                         <Shield className="w-5 h-5" />
-                        Validar DNS
+                        {tEmail('onboarding.validation.button.validate')}
                       </>
                     )}
                   </button>
                 </div>
               )}
 
-              {/* Test Email */}
               {step.id === 'test' && (
                 <div className="space-y-4">
                   <p className="text-gray-700 dark:text-gray-300">
-                    Envía un email de prueba para verificar que todo funciona correctamente.
+                    {tEmail('onboarding.test.description')}
                   </p>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Email de Destino
+                      {tEmail('onboarding.test.fields.recipient.label')}
                     </label>
                     <input
                       type="email"
                       value={testEmail}
                       onChange={(e) => setTestEmail(e.target.value)}
-                      placeholder="tu@email.com"
+                      placeholder={tEmail('onboarding.test.fields.recipient.placeholder')}
                       className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700"
                     />
                   </div>
@@ -386,32 +369,31 @@ export function EmailOnboardingWizard({ onComplete, onSkip, initialConfig = {} }
                     className="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium disabled:opacity-50 flex items-center justify-center gap-2"
                   >
                     <Send className="w-5 h-5" />
-                    Enviar Email de Prueba
+                    {tEmail('onboarding.test.button')}
                   </button>
 
                   {testSent && (
                     <div className="bg-green-50 dark:bg-green-900 p-4 rounded-lg flex items-center gap-3">
                       <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
                       <p className="text-sm text-green-800 dark:text-green-200">
-                        Email de prueba enviado correctamente. Revisa tu bandeja de entrada.
+                        {tEmail('onboarding.test.success')}
                       </p>
                     </div>
                   )}
                 </div>
               )}
 
-              {/* Complete Step */}
               {step.id === 'complete' && (
                 <div className="text-center space-y-4">
                   <div className="w-20 h-20 mx-auto bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
                     <CheckCircle className="w-12 h-12 text-green-600 dark:text-green-400" />
                   </div>
                   <p className="text-gray-700 dark:text-gray-300">
-                    Tu configuración de email está completa. Ya puedes empezar a enviar invitaciones.
+                    {tEmail('onboarding.complete.message')}
                   </p>
                   <div className="bg-blue-50 dark:bg-blue-900 p-4 rounded-lg">
                     <p className="text-sm text-blue-800 dark:text-blue-200">
-                      Recuerda: Puedes cambiar esta configuración en cualquier momento desde Ajustes.
+                      {tEmail('onboarding.complete.reminder')}
                     </p>
                   </div>
                 </div>
@@ -419,13 +401,13 @@ export function EmailOnboardingWizard({ onComplete, onSkip, initialConfig = {} }
             </motion.div>
           </AnimatePresence>
 
-          {/* Actions */}
           <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
             <button
               onClick={onSkip}
-              className="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
+              className="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 flex items-center gap-2"
             >
-              Saltar por ahora
+              <AlertCircle className="w-4 h-4" />
+              {tEmail('onboarding.actions.skip')}
             </button>
 
             <div className="flex gap-3">
@@ -435,7 +417,7 @@ export function EmailOnboardingWizard({ onComplete, onSkip, initialConfig = {} }
                   className="px-6 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2"
                 >
                   <ArrowLeft className="w-4 h-4" />
-                  Atrás
+                  {tEmail('onboarding.actions.back')}
                 </button>
               )}
 
@@ -443,7 +425,9 @@ export function EmailOnboardingWizard({ onComplete, onSkip, initialConfig = {} }
                 onClick={handleNext}
                 className="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium flex items-center gap-2"
               >
-                {isLastStep ? 'Finalizar' : 'Siguiente'}
+                {isLastStep
+                  ? tEmail('onboarding.actions.finish')
+                  : tEmail('onboarding.actions.next')}
                 {!isLastStep && <ArrowRight className="w-4 h-4" />}
               </button>
             </div>
