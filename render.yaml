@@ -39,3 +39,36 @@ services:
         sync: false
       - key: VITE_FIREBASE_MEASUREMENT_ID
         sync: false
+
+  # Cron Jobs para automatización de emails
+  - type: cron
+    name: email-scheduler-cron
+    env: node
+    plan: free
+    schedule: "*/5 * * * *"  # Cada 5 minutos
+    buildCommand: npm ci --omit=dev --ignore-scripts
+    startCommand: node backend/jobs/emailSchedulerCron.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MAILGUN_API_KEY
+        sync: false
+      - key: MAILGUN_DOMAIN
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: GOOGLE_APPLICATION_CREDENTIALS
+        sync: false
+
+  - type: cron
+    name: email-trash-retention
+    env: node
+    plan: free
+    schedule: "0 2 * * *"  # Diario a las 2am UTC
+    buildCommand: npm ci --omit=dev --ignore-scripts
+    startCommand: node backend/jobs/emailTrashRetention.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: GOOGLE_APPLICATION_CREDENTIALS
+        sync: false

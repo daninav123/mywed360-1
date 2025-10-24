@@ -567,6 +567,75 @@
         }
       }
     },
+    "recommendations": {
+      "title": "Personalised recommendations",
+      "tooltip": "Recommendations are based on historical effectiveness data",
+      "loading": "Analysing data and generating recommendations...",
+      "empty": "There is not enough data to build personalised recommendations yet.",
+      "errors": {
+        "generate": "We could not generate the recommendations. Please try again later."
+      },
+      "confidence": {
+        "label": "Confidence in recommendations:",
+        "levels": {
+          "low": "Low",
+          "medium": "Medium",
+          "high": "High"
+        },
+        "chip": "{{label}} ({{score}}%)"
+      },
+      "sections": {
+        "bestTime": {
+          "title": "Best time to send",
+          "result": "The best time to send emails is around {{time}} with a response rate of {{rate}}%",
+          "button": "Schedule at this time",
+          "fallback": "There is not enough data to determine the best time. For now, we suggest sending in the morning (8-12h)."
+        },
+        "subject": {
+          "title": "Effective subject line",
+          "label": "Recommended patterns:",
+          "length": "Optimal length: between {{min}} and {{max}} characters",
+          "button": "Use"
+        },
+        "customization": {
+          "title": "Personalisation impact",
+          "summary": "Personalised emails have a response rate of {{customized}}%, compared with {{plain}}% for non personalised messages.",
+          "labels": {
+            "customized": "Personalised",
+            "nonCustomized": "Not personalised"
+          },
+          "fallback": {
+            "recommend": "We recommend personalising your messages to improve the response rate.",
+            "insufficient": "There is not enough data to measure the impact of personalisation."
+          }
+        },
+        "templates": {
+          "title": "Recommended template",
+          "summary": "The best performing template is {{template}} with a response rate of {{rate}}%.",
+          "category": "For the {{category}} category: response rate of {{rate}}%",
+          "button": "Apply recommended template",
+          "fallback": "There is not enough data to recommend a specific template. For now, we suggest using the general template."
+        },
+        "responseTime": {
+          "title": "Expected response time",
+          "average": "Average response time: {{value}} hours",
+          "median": "Median time: {{value}} hours",
+          "fastest": "Fastest response: {{value}}h",
+          "slowest": "Slowest response: {{value}}h",
+          "category": "For this specific category: {{value}} hours",
+          "fallback": "Based on general averages, expect a reply in approximately 24-48 hours."
+        },
+        "categorySpecific": {
+          "title": "Recommendations for {{category}}",
+          "generic": "this category",
+          "responseRate": "Response rate in this category: {{rate}}%",
+          "fallback": "There is not enough data for category-specific recommendations."
+        },
+        "querySpecific": {
+          "title": "Based on your search"
+        }
+      }
+    },
     "compose": {
       "header": {
         "title": "New email"

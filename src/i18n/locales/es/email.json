@@ -575,6 +575,75 @@
         }
       }
     },
+    "recommendations": {
+      "title": "Recomendaciones personalizadas",
+      "tooltip": "Las recomendaciones se basan en datos historicos de efectividad",
+      "loading": "Analizando datos y generando recomendaciones...",
+      "empty": "No hay suficientes datos para generar recomendaciones personalizadas.",
+      "errors": {
+        "generate": "No se pudieron generar las recomendaciones. Intentalo de nuevo mas tarde."
+      },
+      "confidence": {
+        "label": "Confianza en recomendaciones:",
+        "levels": {
+          "low": "Baja",
+          "medium": "Media",
+          "high": "Alta"
+        },
+        "chip": "{{label}} ({{score}}%)"
+      },
+      "sections": {
+        "bestTime": {
+          "title": "Mejor momento para enviar",
+          "result": "El mejor momento para enviar correos es por la {{time}} con una tasa de respuesta del {{rate}}%",
+          "button": "Programar en este horario",
+          "fallback": "No hay suficientes datos para determinar el mejor momento. Por ahora, recomendamos enviar por la manana (8-12h)."
+        },
+        "subject": {
+          "title": "Linea de asunto efectiva",
+          "label": "Patrones recomendados:",
+          "length": "Longitud optima: entre {{min}} y {{max}} caracteres",
+          "button": "Usar"
+        },
+        "customization": {
+          "title": "Impacto de personalizacion",
+          "summary": "Los correos personalizados tienen una tasa de respuesta del {{customized}}%, frente al {{plain}}% de correos sin personalizar.",
+          "labels": {
+            "customized": "Personalizados",
+            "nonCustomized": "No personalizados"
+          },
+          "fallback": {
+            "recommend": "Recomendamos personalizar tus mensajes para aumentar la tasa de respuesta.",
+            "insufficient": "No hay suficientes datos para medir el impacto de la personalizacion."
+          }
+        },
+        "templates": {
+          "title": "Plantilla recomendada",
+          "summary": "La plantilla con mejor rendimiento es {{template}} con una tasa de respuesta del {{rate}}%.",
+          "category": "Para la categoria {{category}}: Tasa de respuesta del {{rate}}%",
+          "button": "Aplicar plantilla recomendada",
+          "fallback": "No hay suficientes datos para recomendar una plantilla especifica. Por ahora, recomendamos usar la plantilla general."
+        },
+        "responseTime": {
+          "title": "Tiempo de respuesta esperado",
+          "average": "Tiempo promedio de respuesta: {{value}} horas",
+          "median": "Tiempo mediano: {{value}} horas",
+          "fastest": "Respuesta mas rapida: {{value}}h",
+          "slowest": "Respuesta mas lenta: {{value}}h",
+          "category": "Para esta categoria especifica: {{value}} horas",
+          "fallback": "Con base en promedios generales, espera una respuesta en aproximadamente 24-48 horas."
+        },
+        "categorySpecific": {
+          "title": "Recomendaciones para {{category}}",
+          "generic": "esta categoria",
+          "responseRate": "Tasa de respuesta en esta categoria: {{rate}}%",
+          "fallback": "No hay suficientes datos para recomendaciones especificas en esta categoria."
+        },
+        "querySpecific": {
+          "title": "Basado en tu busqueda"
+        }
+      }
+    },
     "compose": {
       "header": {
         "title": "Nuevo correo"

@@ -11,7 +11,6 @@ import VerifiedUser from '@mui/icons-material/VerifiedUser';
 import {
   Box,
   Typography,
-  Paper,
   Divider,
   Chip,
   List,
@@ -28,93 +27,85 @@ import {
   Rating,
   Grid,
 } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import EmailRecommendationService from '../../services/EmailRecommendationService';
+import useTranslations from '../../hooks/useTranslations';
 
-/**
- * Componente que muestra recomendaciones personalizadas para mejorar la efectividad
- * de los correos electrónicos enviados a proveedores
- */
 const EmailRecommendationsPanel = ({ category, searchQuery, onApplyRecommendation }) => {
+  const { t, tVars } = useTranslations();
+  const tEmail = useCallback((key, options) => t(key, { ns: 'email', ...options }), [t]);
+  const tEmailVars = useCallback(
+    (key, variables) => tVars(key, { ns: 'email', ...variables }),
+    [tVars]
+  );
+
   const [loading, setLoading] = useState(true);
   const [recommendations, setRecommendations] = useState(null);
   const [error, setError] = useState(null);
 
-  // Instanciar el servicio de recomendaciones
-  const recommendationService = new EmailRecommendationService();
+  const recommendationService = useMemo(() => new EmailRecommendationService(), []);
 
   useEffect(() => {
     const generateRecommendations = async () => {
       try {
         setLoading(true);
         setError(null);
-
-        // Generar recomendaciones basadas en el contexto proporcionado
         const data = recommendationService.generateRecommendations(category, searchQuery);
         setRecommendations(data);
       } catch (err) {
-        console.error('Error generando recomendaciones:', err);
-        setError('No se pudieron generar las recomendaciones. Inténtalo de nuevo más tarde.');
+        console.error('Error generating recommendations:', err);
+        setError(tEmail('recommendations.errors.generate'));
       } finally {
         setLoading(false);
       }
     };
 
     generateRecommendations();
-  }, [category, searchQuery]);
+  }, [category, searchQuery, recommendationService, tEmail]);
 
-  // Función para aplicar una recomendación
   const handleApplyRecommendation = (type, data) => {
     if (onApplyRecommendation) {
       onApplyRecommendation(type, data);
     }
   };
 
-  // Renderiza el indicador de confianza
   const renderConfidenceIndicator = () => {
     if (!recommendations) return null;
 
     const score = recommendations.confidenceScore || 0;
-    let color = 'error';
-    let label = 'Baja';
-
-    if (score >= 70) {
-      color = 'success';
-      label = 'Alta';
-    } else if (score >= 40) {
-      color = 'warning';
-      label = 'Media';
-    }
+    const level =
+      score >= 70 ? 'high' : score >= 40 ? 'medium' : 'low';
+    const chipColor =
+      level === 'high' ? 'success' : level === 'medium' ? 'warning' : 'error';
+    const label = tEmail(`recommendations.confidence.levels.${level}`);
 
     return (
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
         <Typography variant="body2" color="text.secondary" mr={1}>
-          Confianza en recomendaciones:
+          {tEmail('recommendations.confidence.label')}
         </Typography>
         <Chip
           size="small"
-          label={`${label} (${score}%)`}
-          color={color}
+          label={tEmailVars('recommendations.confidence.chip', { label, score })}
+          color={chipColor}
           icon={<VerifiedUser fontSize="small" />}
         />
       </Box>
     );
   };
 
-  // Si está cargando, mostrar indicador
   if (loading) {
     return (
       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', p: 3 }}>
         <CircularProgress size={40} />
         <Typography variant="body2" color="text.secondary" mt={2}>
-          Analizando datos y generando recomendaciones...
+          {tEmail('recommendations.loading')}
         </Typography>
       </Box>
     );
   }
 
-  // Si hay error, mostrar mensaje
   if (error) {
     return (
       <Alert severity="error" sx={{ m: 2 }}>
@@ -123,22 +114,31 @@ const EmailRecommendationsPanel = ({ category, searchQuery, onApplyRecommendatio
     );
   }
 
-  // Si no hay recomendaciones, mostrar mensaje
   if (!recommendations) {
     return (
       <Alert severity="info" sx={{ m: 2 }}>
-        No hay suficientes datos para generar recomendaciones personalizadas.
+        {tEmail('recommendations.empty')}
       </Alert>
     );
   }
+
+  const bestTime = recommendations.bestTimeToSend;
+  const subjectLine = recommendations.subjectLineRecommendations;
+  const customization = recommendations.customizationImpact;
+  const templateRecommendations = recommendations.templateRecommendations;
+  const responseTimes = recommendations.responseTimeExpectations;
+  const categorySpecific = recommendations.categorySpecific;
+  const querySpecific = recommendations.querySpecific;
+
+  const categoryLabel = category || tEmail('recommendations.sections.categorySpecific.generic');
 
   return (
     <Box sx={{ p: 2 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
         <Typography variant="h5" gutterBottom>
-          Recomendaciones Personalizadas
+          {tEmail('recommendations.title')}
         </Typography>
-        <Tooltip title="Las recomendaciones se basan en datos históricos de efectividad">
+        <Tooltip title={tEmail('recommendations.tooltip')}>
           <TipsAndUpdates color="primary" />
         </Tooltip>
       </Box>
@@ -146,39 +146,38 @@ const EmailRecommendationsPanel = ({ category, searchQuery, onApplyRecommendatio
       {renderConfidenceIndicator()}
 
       <Grid container spacing={2}>
-        {/* Mejor momento para enviar */}
         <Grid item xs={12} md={6}>
           <Accordion defaultExpanded>
             <AccordionSummary expandIcon={<ExpandMore />}>
               <AccessTime color="primary" sx={{ mr: 1 }} />
-              <Typography variant="subtitle1">Mejor momento para enviar</Typography>
+              <Typography variant="subtitle1">
+                {tEmail('recommendations.sections.bestTime.title')}
+              </Typography>
             </AccordionSummary>
             <AccordionDetails>
               <Box>
-                {recommendations.bestTimeToSend.hasSufficientData ? (
+                {bestTime?.hasSufficientData ? (
                   <>
                     <Typography variant="body1">
-                      El mejor momento para enviar correos es por la{' '}
-                      <strong>{recommendations.bestTimeToSend.bestTimeSlotName}</strong> con una
-                      tasa de respuesta del {recommendations.bestTimeToSend.bestRate}%
+                      {tEmailVars('recommendations.sections.bestTime.result', {
+                        time: bestTime.bestTimeSlotName,
+                        rate: bestTime.bestRate,
+                      })}
                     </Typography>
                     <Box sx={{ mt: 1, display: 'flex', alignItems: 'center' }}>
                       <Button
                         size="small"
                         variant="outlined"
                         startIcon={<Schedule />}
-                        onClick={() =>
-                          handleApplyRecommendation('time', recommendations.bestTimeToSend)
-                        }
+                        onClick={() => handleApplyRecommendation('time', bestTime)}
                       >
-                        Programar en este horario
+                        {tEmail('recommendations.sections.bestTime.button')}
                       </Button>
                     </Box>
                   </>
                 ) : (
                   <Alert severity="info" sx={{ mt: 1 }}>
-                    No hay suficientes datos para determinar el mejor momento. Por ahora,
-                    recomendamos enviar por la mañana (8-12h).
+                    {tEmail('recommendations.sections.bestTime.fallback')}
                   </Alert>
                 )}
               </Box>
@@ -186,140 +185,124 @@ const EmailRecommendationsPanel = ({ category, searchQuery, onApplyRecommendatio
           </Accordion>
         </Grid>
 
-        {/* Línea de asunto */}
         <Grid item xs={12} md={6}>
           <Accordion defaultExpanded>
             <AccordionSummary expandIcon={<ExpandMore />}>
               <Subject color="primary" sx={{ mr: 1 }} />
-              <Typography variant="subtitle1">Línea de asunto efectiva</Typography>
+              <Typography variant="subtitle1">
+                {tEmail('recommendations.sections.subject.title')}
+              </Typography>
             </AccordionSummary>
             <AccordionDetails>
               <Typography variant="body2" color="text.secondary" gutterBottom>
-                Patrones recomendados:
+                {tEmail('recommendations.sections.subject.label')}
               </Typography>
               <List dense disablePadding>
-                {recommendations.subjectLineRecommendations.recommendedPatterns.map(
-                  (pattern, idx) => (
-                    <ListItem key={idx} disablePadding sx={{ py: 0.5 }}>
-                      <ListItemIcon sx={{ minWidth: 30 }}>
-                        <CheckCircle fontSize="small" color="success" />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={pattern}
-                        primaryTypographyProps={{ variant: 'body2' }}
-                      />
-                      <Button
-                        size="small"
-                        onClick={() => handleApplyRecommendation('subject', pattern)}
-                      >
-                        Usar
-                      </Button>
-                    </ListItem>
-                  )
-                )}
+                {subjectLine?.recommendedPatterns?.map((pattern, idx) => (
+                  <ListItem key={idx} disablePadding sx={{ py: 0.5 }}>
+                    <ListItemIcon sx={{ minWidth: 30 }}>
+                      <CheckCircle fontSize="small" color="success" />
+                    </ListItemIcon>
+                    <ListItemText primary={pattern} primaryTypographyProps={{ variant: 'body2' }} />
+                    <Button size="small" onClick={() => handleApplyRecommendation('subject', pattern)}>
+                      {tEmail('recommendations.sections.subject.button')}
+                    </Button>
+                  </ListItem>
+                ))}
               </List>
 
               <Typography variant="body2" color="text.secondary" gutterBottom sx={{ mt: 1 }}>
-                Longitud óptima: entre{' '}
-                {recommendations.subjectLineRecommendations.optimalLength.min} y{' '}
-                {recommendations.subjectLineRecommendations.optimalLength.max} caracteres
+                {tEmailVars('recommendations.sections.subject.length', {
+                  min: subjectLine?.optimalLength?.min ?? 0,
+                  max: subjectLine?.optimalLength?.max ?? 0,
+                })}
               </Typography>
             </AccordionDetails>
           </Accordion>
         </Grid>
 
-        {/* Personalización */}
         <Grid item xs={12} md={6}>
           <Accordion>
             <AccordionSummary expandIcon={<ExpandMore />}>
               <Edit color="primary" sx={{ mr: 1 }} />
-              <Typography variant="subtitle1">Impacto de personalización</Typography>
+              <Typography variant="subtitle1">
+                {tEmail('recommendations.sections.customization.title')}
+              </Typography>
             </AccordionSummary>
             <AccordionDetails>
-              {recommendations.customizationImpact.hasSufficientData ? (
+              {customization?.hasSufficientData ? (
                 <>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                     <Typography variant="body1" mr={1}>
-                      Los mensajes personalizados tienen un
+                      {tEmailVars('recommendations.sections.customization.summary', {
+                        customized: customization.customized?.rate ?? 0,
+                        plain: customization.nonCustomized?.rate ?? 0,
+                      })}
                     </Typography>
-                    <Chip
-                      label={`+${recommendations.customizationImpact.impact}%`}
-                      color={
-                        parseFloat(recommendations.customizationImpact.impact) > 0
-                          ? 'success'
-                          : 'default'
-                      }
+                    <Rating
+                      value={customization.impactScore || 0}
+                      max={5}
+                      readOnly
                       size="small"
+                      precision={0.1}
                     />
-                    <Typography variant="body1" ml={1}>
-                      de tasa de respuesta
-                    </Typography>
                   </Box>
-
+                  <Divider sx={{ mx: 2 }} />
                   <Box sx={{ display: 'flex', mt: 2, justifyContent: 'space-around' }}>
                     <Box sx={{ textAlign: 'center' }}>
-                      <Typography variant="h6">
-                        {recommendations.customizationImpact.customized.rate}%
-                      </Typography>
+                      <Typography variant="h6">{customization.customized?.rate ?? 0}%</Typography>
                       <Typography variant="body2" color="text.secondary">
-                        Personalizados
+                        {tEmail('recommendations.sections.customization.labels.customized')}
                       </Typography>
                     </Box>
                     <Divider orientation="vertical" flexItem sx={{ mx: 2 }} />
                     <Box sx={{ textAlign: 'center' }}>
                       <Typography variant="h6">
-                        {recommendations.customizationImpact.nonCustomized.rate}%
+                        {customization.nonCustomized?.rate ?? 0}%
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
-                        No personalizados
+                        {tEmail('recommendations.sections.customization.labels.nonCustomized')}
                       </Typography>
                     </Box>
                   </Box>
                 </>
               ) : (
                 <Alert severity="info">
-                  {recommendations.customizationImpact.recommendCustomization
-                    ? 'Recomendamos personalizar tus mensajes para aumentar la tasa de respuesta.'
-                    : 'No hay suficientes datos para medir el impacto de la personalización.'}
+                  {customization?.recommendCustomization
+                    ? tEmail('recommendations.sections.customization.fallback.recommend')
+                    : tEmail('recommendations.sections.customization.fallback.insufficient')}
                 </Alert>
               )}
             </AccordionDetails>
           </Accordion>
         </Grid>
 
-        {/* Plantillas */}
         <Grid item xs={12} md={6}>
           <Accordion>
             <AccordionSummary expandIcon={<ExpandMore />}>
               <Category color="primary" sx={{ mr: 1 }} />
-              <Typography variant="subtitle1">Plantilla recomendada</Typography>
+              <Typography variant="subtitle1">
+                {tEmail('recommendations.sections.templates.title')}
+              </Typography>
             </AccordionSummary>
             <AccordionDetails>
-              {recommendations.templateRecommendations.hasSufficientData ? (
+              {templateRecommendations?.hasSufficientData ? (
                 <>
                   <Typography variant="body1">
-                    La plantilla con mejor rendimiento es{' '}
-                    <strong>{recommendations.templateRecommendations.bestOverallTemplate}</strong>{' '}
-                    con una tasa de respuesta del{' '}
-                    {recommendations.templateRecommendations.bestOverallResponseRate}%
+                    {tEmailVars('recommendations.sections.templates.summary', {
+                      template: templateRecommendations.bestOverallTemplate,
+                      rate: templateRecommendations.bestOverallResponseRate,
+                    })}
                   </Typography>
 
-                  {recommendations.templateRecommendations.categorySpecificTemplate && (
+                  {templateRecommendations.categorySpecificTemplate && (
                     <Box sx={{ mt: 1 }}>
                       <Typography variant="body2">
-                        Para la categoría{' '}
-                        <strong>
-                          {
-                            recommendations.templateRecommendations.categorySpecificTemplate
-                              .category
-                          }
-                        </strong>
-                        : Tasa de respuesta del{' '}
-                        {
-                          recommendations.templateRecommendations.categorySpecificTemplate
-                            .responseRate
-                        }
-                        %
+                        {tEmailVars('recommendations.sections.templates.category', {
+                          category:
+                            templateRecommendations.categorySpecificTemplate.category || categoryLabel,
+                          rate: templateRecommendations.categorySpecificTemplate.responseRate,
+                        })}
                       </Typography>
                     </Box>
                   )}
@@ -331,92 +314,94 @@ const EmailRecommendationsPanel = ({ category, searchQuery, onApplyRecommendatio
                       onClick={() =>
                         handleApplyRecommendation(
                           'template',
-                          recommendations.templateRecommendations.bestOverallTemplate
+                          templateRecommendations.bestOverallTemplate
                         )
                       }
                     >
-                      Aplicar plantilla recomendada
+                      {tEmail('recommendations.sections.templates.button')}
                     </Button>
                   </Box>
                 </>
               ) : (
                 <Alert severity="info">
-                  No hay suficientes datos para recomendar una plantilla específica. Por ahora,
-                  recomendamos usar la plantilla general.
+                  {tEmail('recommendations.sections.templates.fallback')}
                 </Alert>
               )}
             </AccordionDetails>
           </Accordion>
         </Grid>
 
-        {/* Tiempo de respuesta esperado */}
         <Grid item xs={12} md={6}>
           <Accordion>
             <AccordionSummary expandIcon={<ExpandMore />}>
               <Schedule color="primary" sx={{ mr: 1 }} />
-              <Typography variant="subtitle1">Tiempo de respuesta esperado</Typography>
+              <Typography variant="subtitle1">
+                {tEmail('recommendations.sections.responseTime.title')}
+              </Typography>
             </AccordionSummary>
             <AccordionDetails>
-              {recommendations.responseTimeExpectations.hasSufficientData ? (
+              {responseTimes?.hasSufficientData ? (
                 <>
                   <Typography variant="body1">
-                    Tiempo promedio de respuesta:{' '}
-                    <strong>{recommendations.responseTimeExpectations.averageTime} horas</strong>
+                    {tEmailVars('recommendations.sections.responseTime.average', {
+                      value: responseTimes.averageTime,
+                    })}
                   </Typography>
-
                   <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                    Tiempo mediano: {recommendations.responseTimeExpectations.medianTime} horas
+                    {tEmailVars('recommendations.sections.responseTime.median', {
+                      value: responseTimes.medianTime,
+                    })}
                   </Typography>
-
                   <Box sx={{ display: 'flex', mt: 1, justifyContent: 'space-between' }}>
                     <Typography variant="body2" color="text.secondary">
-                      Respuesta más rápida:{' '}
-                      {recommendations.responseTimeExpectations.fastestResponse}h
+                      {tEmailVars('recommendations.sections.responseTime.fastest', {
+                        value: responseTimes.fastestResponse,
+                      })}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      Respuesta más lenta:{' '}
-                      {recommendations.responseTimeExpectations.slowestResponse}h
+                      {tEmailVars('recommendations.sections.responseTime.slowest', {
+                        value: responseTimes.slowestResponse,
+                      })}
                     </Typography>
                   </Box>
-
-                  {recommendations.responseTimeExpectations.categoryAverageTime && (
+                  {responseTimes.categoryAverageTime && (
                     <Typography variant="body2" sx={{ mt: 1 }}>
-                      Para esta categoría específica:{' '}
-                      <strong>
-                        {recommendations.responseTimeExpectations.categoryAverageTime} horas
-                      </strong>
+                      {tEmailVars('recommendations.sections.responseTime.category', {
+                        value: responseTimes.categoryAverageTime,
+                      })}
                     </Typography>
                   )}
                 </>
               ) : (
                 <Alert severity="info">
-                  Con base en promedios generales, espera una respuesta en aproximadamente 24-48
-                  horas.
+                  {tEmail('recommendations.sections.responseTime.fallback')}
                 </Alert>
               )}
             </AccordionDetails>
           </Accordion>
         </Grid>
 
-        {/* Recomendaciones específicas de categoría */}
-        {recommendations.categorySpecific && (
+        {categorySpecific && (
           <Grid item xs={12}>
             <Accordion>
               <AccordionSummary expandIcon={<ExpandMore />}>
                 <Lightbulb color="primary" sx={{ mr: 1 }} />
                 <Typography variant="subtitle1">
-                  Recomendaciones para {category || 'esta categoría'}
+                  {tEmailVars('recommendations.sections.categorySpecific.title', {
+                    category: categoryLabel,
+                  })}
                 </Typography>
               </AccordionSummary>
               <AccordionDetails>
-                {recommendations.categorySpecific.hasSufficientData ? (
+                {categorySpecific.hasSufficientData ? (
                   <>
                     <Typography variant="body2" gutterBottom>
-                      Tasa de respuesta en esta categoría:{' '}
-                      {recommendations.categorySpecific.responseRate}%
+                      {tEmailVars('recommendations.sections.categorySpecific.responseRate', {
+                        rate: categorySpecific.responseRate,
+                      })}
                     </Typography>
                     <List dense>
-                      {recommendations.categorySpecific.recommendations.map((rec, idx) => (
+                      {categorySpecific.recommendations.map((rec, idx) => (
                         <ListItem key={idx}>
                           <ListItemIcon>
                             <CheckCircle color="success" />
@@ -428,7 +413,7 @@ const EmailRecommendationsPanel = ({ category, searchQuery, onApplyRecommendatio
                   </>
                 ) : (
                   <Alert severity="info">
-                    No hay suficientes datos para recomendaciones específicas en esta categoría.
+                    {tEmail('recommendations.sections.categorySpecific.fallback')}
                   </Alert>
                 )}
               </AccordionDetails>
@@ -436,30 +421,30 @@ const EmailRecommendationsPanel = ({ category, searchQuery, onApplyRecommendatio
           </Grid>
         )}
 
-        {/* Recomendaciones basadas en la consulta */}
-        {recommendations.querySpecific &&
-          recommendations.querySpecific.recommendations.length > 0 && (
-            <Grid item xs={12}>
-              <Accordion>
-                <AccordionSummary expandIcon={<ExpandMore />}>
-                  <Lightbulb color="primary" sx={{ mr: 1 }} />
-                  <Typography variant="subtitle1">Basado en tu búsqueda</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <List dense>
-                    {recommendations.querySpecific.recommendations.map((rec, idx) => (
-                      <ListItem key={idx}>
-                        <ListItemIcon>
-                          <CheckCircle color="success" />
-                        </ListItemIcon>
-                        <ListItemText primary={rec} />
-                      </ListItem>
-                    ))}
-                  </List>
-                </AccordionDetails>
-              </Accordion>
-            </Grid>
-          )}
+        {querySpecific && querySpecific.recommendations.length > 0 && (
+          <Grid item xs={12}>
+            <Accordion>
+              <AccordionSummary expandIcon={<ExpandMore />}>
+                <Lightbulb color="primary" sx={{ mr: 1 }} />
+                <Typography variant="subtitle1">
+                  {tEmail('recommendations.sections.querySpecific.title')}
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <List dense>
+                  {querySpecific.recommendations.map((rec, idx) => (
+                    <ListItem key={idx}>
+                      <ListItemIcon>
+                        <CheckCircle color="success" />
+                      </ListItemIcon>
+                      <ListItemText primary={rec} />
+                    </ListItem>
+                  ))}
+                </List>
+              </AccordionDetails>
+            </Accordion>
+          </Grid>
+        )}
       </Grid>
     </Box>
   );
