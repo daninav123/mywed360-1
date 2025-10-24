@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import PageWrapper from '../components/PageWrapper';
+import { db } from '../firebaseConfig';
+import { formatDate } from '../utils/formatUtils';
 import Spinner from '../components/Spinner';
 import { fetchWeddingNews } from '../services/blogService';
 import { translateText } from '../services/translationService';
@@ -71,7 +73,7 @@ const ArticleCard = React.forwardRef(({ post }, ref) => {
         ) : null}
         <div className="flex justify-between text-xs text-gray-500">
           <span>{post?.source}</span>
-          {published ? <span>{published.toLocaleDateString()}</span> : null}
+          {published ? <span>{formatDate(published, 'short')}</span> : null}
         </div>
         {post?.url ? (
           <span className="inline-flex text-sm text-[var(--color-primary)] hover:text-[var(--color-primary-dark)]">

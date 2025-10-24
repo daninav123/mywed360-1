@@ -27,7 +27,8 @@ import {
   updatePhotoStatus,
 } from '@/services/momentosService';
 import { useAuth } from '@/hooks/useAuth';
-import { useWedding } from '@/context/WeddingContext';
+import { useWedding } from '../context/WeddingContext';
+import { formatDate as formatDateUtil } from '../utils/formatUtils';
 
 const ALBUM_ID = 'momentos';
 
@@ -64,14 +65,7 @@ const normalizeWeddingDate = (value) => {
   return parsed;
 };
 
-const formatDate = (date) =>
-  date
-    ? date.toLocaleDateString('es-ES', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric',
-      })
-    : '';
+const formatDate = (date) => date ? formatDateUtil(date, 'custom') : '';
 
 export default function Momentos() {
   const { activeWedding, weddingsReady, activeWeddingData } = useWedding();

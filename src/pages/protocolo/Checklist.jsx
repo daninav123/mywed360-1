@@ -32,6 +32,7 @@ import { Card } from '../../components/ui';
 import { Button } from '../../components/ui';
 import Badge from '../../components/ui/Badge';
 import { useWedding } from '../../context/WeddingContext';
+import { formatDate } from '../../utils/formatUtils';
 import { useProveedores } from '../../hooks/useProveedores';
 import useSpecialMoments from '../../hooks/useSpecialMoments';
 import useChecklist from '../../hooks/useChecklist';
@@ -330,7 +331,7 @@ export default function Checklist() {
             {item.dueDate && (
               <div className="text-sm text-gray-600 mt-1">
                 <Calendar size={14} className="inline mr-1" />
-                Vence: {new Date(item.dueDate).toLocaleDateString('es-ES')}
+                Vence: {formatDate(item.dueDate, 'short')}
                 {isOverdue && <span className="text-red-600 ml-2">�Vencido!</span>}
               </div>
             )}

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { TrendingUp, Users, CreditCard, Calendar, ExternalLink, DollarSign, Link2, Copy } from 'lucide-react';
+import { db } from '../firebaseConfig';
+import { formatDate as formatDateUtil } from '../utils/formatUtils';
 
 const PartnerStats = () => {
   const { token } = useParams();
@@ -92,11 +94,7 @@ const PartnerStats = () => {
   const formatDate = (dateString) => {
     if (!dateString) return null;
     try {
-      return new Date(dateString).toLocaleDateString('es-ES', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      });
+      return formatDateUtil(dateString, 'long');
     } catch {
       return null;
     }

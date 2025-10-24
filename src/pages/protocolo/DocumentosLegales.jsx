@@ -18,6 +18,7 @@ import useActiveWeddingInfo from '../../hooks/useActiveWeddingInfo';
 import useTranslations from '../../hooks/useTranslations';
 import { uploadEmailAttachments } from '../../services/storageUploadService';
 import { db } from '../../firebaseConfig';
+import { formatDate } from '../../utils/formatUtils';
 import { useAuth } from '../../hooks/useAuth';
 import { performanceMonitor } from '../../services/PerformanceMonitor';
 import legalCatalog from '../../data/legalRequirementsCatalog.json';
@@ -147,7 +148,7 @@ function guessRelatedCeremonyId(label = '') {
 
 // Plantillas HTML para .doc / PDF con prefill básico
 function generateTemplateHTML(id, region = 'ES', data = {}) {
-  const today = new Date().toLocaleDateString();
+  const today = formatDate(new Date(), 'short');
   const styles = `body{font-family:Calibri,Arial,sans-serif;line-height:1.4;color:#222}h1{font-size:20pt;margin:0 0 6pt}h2{font-size:14pt;margin:14pt 0 6pt}p{margin:6pt 0}ul{margin:6pt 0 6pt 18pt}`;
   const couple = data.couple || '______________________ y ______________________';
   const bride = data.bride || '______________________';

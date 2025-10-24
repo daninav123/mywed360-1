@@ -4,6 +4,8 @@ import { toast } from 'react-toastify';
 import { Camera, Sparkles, ChevronRight, UploadCloud, X } from 'lucide-react';
 
 import UploadWidget from '@/components/momentos/UploadWidget';
+import { db } from '../firebaseConfig';
+import { formatDate } from '../utils/formatUtils';
 import {
   getAlbumScenes,
   getGalleryUploadState,
@@ -23,10 +25,7 @@ const formatDate = (value) => {
       ? value.toDate()
       : new Date(value);
   if (Number.isNaN(date.getTime())) return '';
-  return date.toLocaleDateString('es-ES', {
-    day: '2-digit',
-    month: 'long',
-  });
+  return formatDate(date, 'medium');
 };
 
 export default function MomentosPublic() {

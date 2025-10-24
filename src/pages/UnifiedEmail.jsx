@@ -2,7 +2,8 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 
 import ChipToggle from '../components/email/ChipToggle';
-import EmailComposeModal from '../components/email/ComposeModal';
+import EmailSidebar from '../components/email/EmailSidebar';
+import { formatDate } from '../utils/formatUtils';
 import MailListComponent from '../components/email/MailList';
 import MailViewerComponent from '../components/email/MailViewer';
 import EmailInsights from '../components/EmailInsights';
@@ -624,7 +625,7 @@ const formatDateShort = (d) => {
   const now = new Date();
   const sameDay = dt.toDateString() === now.toDateString();
   if (sameDay) return dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  return dt.toLocaleDateString();
+  return formatDate(dt, 'short');
 };
 
 // Avatar y ChipToggle se han extra)do a componentes reutilizables

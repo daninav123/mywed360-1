@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { db } from '../firebaseConfig';
+import { formatDate as formatDateUtil } from '../utils/formatUtils';
 import { Link } from 'react-router-dom';
 import { 
   CreditCard, 
@@ -107,11 +109,7 @@ const SubscriptionDashboard = () => {
   const formatDate = (timestamp) => {
     if (!timestamp) return 'N/A';
     const date = new Date(timestamp * 1000);
-    return date.toLocaleDateString('es-ES', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
+    return formatDateUtil(date, 'long');
   };
 
   const formatPrice = (amount, currency = 'EUR') => {

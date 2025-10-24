@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import { formatDate } from '../utils/formatUtils';
 import { toast } from 'react-toastify';
 
 import UploadWidget from '@/components/momentos/UploadWidget';
@@ -23,16 +24,12 @@ const slugifyGuest = (value = '') =>
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)/g, '') || 'invitado';
 
-const formatDate = (dateLike) => {
+const formatDateLocal = (dateLike) => {
   if (!dateLike) return '';
   const date =
     dateLike instanceof Date ? dateLike : new Date(dateLike?.toDate ? dateLike.toDate() : dateLike);
   if (Number.isNaN(date.getTime())) return '';
-  return date.toLocaleDateString('es-ES', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  });
+  return formatDate(date, 'custom');
 };
 
 export default function MomentosGuest() {
@@ -197,7 +194,7 @@ export default function MomentosGuest() {
           <h1 className="text-xl font-semibold text-amber-600">La galer�a est� cerrada</h1>
           <p className="text-sm text-slate-600">
             {errorMessage ||
-              `El periodo para subir fotos termin�${uploadState?.closesAt ? ` el ${formatDate(uploadState.closesAt)}` : ''}.`}
+              `El periodo para subir fotos terminó${uploadState?.closesAt ? ` el ${formatDateLocal(uploadState.closesAt)}` : ''}.`}
           </p>
           <p className="text-xs text-slate-400">
             Si todav�a tienes recuerdos que compartir, avisa a la pareja anfitriona para que reabra el enlace.
