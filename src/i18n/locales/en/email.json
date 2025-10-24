@@ -665,7 +665,9 @@
       },
       "labels": {
         "suggestedOnly": "Suggested only",
-        "sortBy": "Sort by"
+        "sortBy": "Sort by",
+        "aiTags": "AI tags",
+        "allTags": "All"
       },
       "aria": {
         "filterStatus": "Filter by status",
@@ -692,11 +694,20 @@
           "read": "only read",
           "suggested": "AI suggestions active",
           "tag": "AI tag: {{tag}}"
+        },
+        "important": {
+          "label": "Starred",
+          "unread": "{{count}} unread",
+          "total": "{{count}}"
         }
       },
       "analyze": {
         "button": "Run AI analysis (current folder)",
-        "loading": "Analysing..."
+        "loading": "Analysing...",
+        "title": "AI analysis (dev only)"
+      },
+      "header": {
+        "chip": "Unified inbox"
       }
     },
     "compose": {

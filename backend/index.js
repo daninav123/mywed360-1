@@ -627,6 +627,15 @@ try {
   console.error('[backend] Failed to load admin dashboard routes:', error.message);
 }
 
+// Fallback monitor (requiere autenticación, admins para stats)
+try {
+  const fallbackMonitorRouter = (await import('./routes/fallback-monitor.js')).default;
+  app.use('/api/fallback-monitor', authMiddleware(), fallbackMonitorRouter);
+  console.log('[backend] Fallback monitor routes mounted on /api/fallback-monitor');
+} catch (error) {
+  console.error('[backend] Failed to load fallback monitor routes:', error.message);
+}
+
 // Partner stats (público, solo requiere token válido)
 app.use('/api/partner', partnerStatsRouter);
 console.log('[backend] Partner stats routes mounted on /api/partner');

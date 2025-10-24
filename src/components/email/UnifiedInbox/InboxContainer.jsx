@@ -336,18 +336,20 @@ const InboxContainer = () => {
   const filterSummary = useMemo(() => {
     const parts = [];
     if (filterStatus === 'unread') {
-      parts.push('solo no leídos');
+      parts.push(tEmail('unifiedInbox.summary.filters.unread'));
     } else if (filterStatus === 'read') {
-      parts.push('solo leídos');
+      parts.push(tEmail('unifiedInbox.summary.filters.read'));
     }
     if (classificationTagFilter !== 'all') {
-      parts.push(`etiqueta IA: ${classificationTagFilter}`);
+      parts.push(
+        tEmailVars('unifiedInbox.summary.filters.tag', { tag: classificationTagFilter })
+      );
     }
     if (showSuggestedOnly) {
-      parts.push('sugerencias activas');
+      parts.push(tEmail('unifiedInbox.summary.filters.suggested'));
     }
     return parts.join(' · ');
-  }, [filterStatus, classificationTagFilter, showSuggestedOnly]);
+  }, [filterStatus, classificationTagFilter, showSuggestedOnly, tEmail, tEmailVars]);
 
   // Cargar emails al montar el componente
   const loadCustomFolders = useCallback(async () => {
@@ -1140,7 +1142,7 @@ const InboxContainer = () => {
             <div className="min-w-[220px] space-y-1">
               <p className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted">
                 <SlidersHorizontal size={14} className="text-primary" />
-                Bandeja unificada
+                {tEmail('unifiedInbox.header.chip')}
               </p>
               <h1
                 data-testid="email-title"
@@ -1149,12 +1151,20 @@ const InboxContainer = () => {
                 {activeFolderLabel}
               </h1>
               <p className="text-sm text-muted">
-                {visibleEmailCount}{' '}
-                {visibleEmailCount === 1 ? 'correo visible' : 'correos visibles'}
+                {tEmailVars(
+                  `unifiedInbox.summary.visible_${visibleEmailCount === 1 ? 'one' : 'other'}`,
+                  { count: visibleEmailCount }
+                )}
                 {filterSummary ? ` · ${filterSummary}` : ''}
                 {importantCounts.total
-                  ? ` · Destacados: ${
-                      importantCounts.unread > 0 ? `${importantCounts.unread} sin leer` : importantCounts.total
+                  ? ` · ${tEmail('unifiedInbox.summary.important.label')}: ${
+                      importantCounts.unread > 0
+                        ? tEmailVars('unifiedInbox.summary.important.unread', {
+                            count: importantCounts.unread,
+                          })
+                        : tEmailVars('unifiedInbox.summary.important.total', {
+                            count: importantCounts.total,
+                          })
                     }`
                   : ''}
                 {user?.email ? ` · ${user.email}` : ''}
@@ -1304,7 +1314,7 @@ const InboxContainer = () => {
             <div className="flex flex-wrap items-center gap-2 overflow-x-auto pt-1 text-sm text-muted">
               <span className="flex items-center gap-1 text-xs uppercase tracking-wide">
                 <TagIcon size={14} className="text-primary" />
-                Etiquetas IA
+                {tEmail('unifiedInbox.labels.aiTags')}
               </span>
               <div className="flex items-center gap-2">
                 <button
@@ -1317,7 +1327,7 @@ const InboxContainer = () => {
                   }`}
                   aria-pressed={classificationTagFilter === 'all'}
                 >
-                  Todas
+                  {tEmail('unifiedInbox.labels.allTags')}
                 </button>
                 {availableClassificationTags.map((tag) => (
                   <button
@@ -1421,10 +1431,12 @@ const InboxContainer = () => {
                   }
                 }}
                 className={`mt-2 px-3 py-2 text-xs border rounded ${analyzing ? 'opacity-60 cursor-not-allowed' : 'hover:bg-primary-soft'}`}
-                title="Analizar correos (IA) - sólo en desarrollo"
+                title={tEmail('unifiedInbox.analyze.title')}
                 disabled={analyzing}
               >
-                {analyzing ? 'Analizando...' : 'Analizar IA (carpeta actual)'}
+                {analyzing
+                  ? tEmail('unifiedInbox.analyze.loading')
+                  : tEmail('unifiedInbox.analyze.button')}
               </button>
             </div>
           )}

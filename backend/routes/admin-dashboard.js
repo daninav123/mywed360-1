@@ -837,9 +837,15 @@ function mapAlertDoc(doc) {
     id: doc.id,
     severity: data.severity || data.level || 'medium',
     module: data.module || data.category || 'General',
+    service: data.service || null,
+    type: data.type || null,
     message: data.message || data.title || '',
     timestamp: formatDateTime(data.createdAt || data.timestamp || data.updatedAt),
     resolved: Boolean(data.resolved),
+    count: data.count || null,
+    threshold: data.threshold || null,
+    actions: data.actions || [],
+    metadata: data.metadata || {},
   };
 }
 
@@ -1705,7 +1711,41 @@ router.get('/overview', async (_req, res) => {
   }
 });
 
-// Reintentar conexi�n de un servicio de integraciones
+router.get('/alerts', async (req, res) => {
+  try {
+    const limit = Math.min(Number(req.query.limit) || 50, MAX_LIMIT);
+    const includeResolved = req.query.resolved === 'true';
+    
+    // Construir query base
+    let query = collections.alerts().orderBy('createdAt', 'desc');
+    
+    // Filtrar por estado si no se incluyen resueltas
+    if (!includeResolved) {
+      query = query.where('resolved', '==', false);
+    }
+    
+    query = query.limit(limit);
+    
+    const alertDocs = await query.get();
+    const alerts = alertDocs.docs.map(mapAlertDoc);
+    
+    // Ordenar por severidad y timestamp
+    const severityOrder = { critical: 0, high: 1, medium: 2, low: 3 };
+    alerts.sort((a, b) => {
+      const severityDiff = (severityOrder[a.severity] || 99) - (severityOrder[b.severity] || 99);
+      if (severityDiff !== 0) return severityDiff;
+      // Si tienen la misma severidad, ordenar por timestamp (más reciente primero)
+      return new Date(b.timestamp) - new Date(a.timestamp);
+    });
+    
+    res.json(alerts);
+  } catch (error) {
+    logger.error('[admin-dashboard] alerts GET error', error);
+    res.status(500).json({ error: 'admin_alerts_failed' });
+  }
+});
+
+// Reintentar conexión de un servicio de integraciones
 router.post('/integrations/:id/retry', async (req, res) => {
   try {
     const { id } = req.params;

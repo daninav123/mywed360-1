@@ -673,7 +673,9 @@
       },
       "labels": {
         "suggestedOnly": "Solo sugeridos",
-        "sortBy": "Ordenar por"
+        "sortBy": "Ordenar por",
+        "aiTags": "Etiquetas IA",
+        "allTags": "Todas"
       },
       "aria": {
         "filterStatus": "Filtro por estado",
@@ -700,11 +702,20 @@
           "read": "solo leidos",
           "suggested": "sugerencias activas",
           "tag": "etiqueta IA: {{tag}}"
+        },
+        "important": {
+          "label": "Destacados",
+          "unread": "{{count}} sin leer",
+          "total": "{{count}}"
         }
       },
       "analyze": {
         "button": "Analizar IA (carpeta actual)",
-        "loading": "Analizando..."
+        "loading": "Analizando...",
+        "title": "Analizar correos (IA) - solo en desarrollo"
+      },
+      "header": {
+        "chip": "Bandeja unificada"
       }
     },
     "compose": {

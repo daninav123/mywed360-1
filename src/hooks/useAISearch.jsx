@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 
 import useActiveWeddingInfo from './useActiveWeddingInfo';
 import { useAuth } from './useAuth';
+import { useFallbackReporting } from './useFallbackReporting';
 import { post as apiPost, get as apiGet } from '../services/apiClient';
 
 const slugify = (value) =>
@@ -206,6 +207,7 @@ export const useAISearch = () => {
   const [usedFallback, setUsedFallback] = useState(false);
   const { user } = useAuth();
   const { info: weddingDoc } = useActiveWeddingInfo();
+  const { reportFallback } = useFallbackReporting();
 
   const searchProviders = useCallback(
     async (query, opts = {}) => {
@@ -298,8 +300,22 @@ export const useAISearch = () => {
           );
           networkError.code = 'BACKEND_OFFLINE';
           lastError = networkError;
+          
+          // Reportar fallback al sistema de monitoreo
+          await reportFallback('ai-suppliers', networkError, {
+            endpoint: '/api/ai-suppliers',
+            query: enrichedQuery || query,
+            service: inferredService,
+          });
         } else {
           lastError = backendError instanceof Error ? backendError : new Error(String(backendError || 'Error'));
+          
+          // Reportar otros errores de API
+          await reportFallback('ai-suppliers', lastError, {
+            endpoint: '/api/ai-suppliers',
+            query: enrichedQuery || query,
+            service: inferredService,
+          });
         }
       }
 
@@ -373,7 +389,7 @@ export const useAISearch = () => {
       setLoading(false);
       return [];
     },
-    [user, weddingDoc]
+    [user, weddingDoc, reportFallback]
   );
 
   const clearResults = useCallback(() => {

@@ -6,6 +6,21 @@ const severityLabels = {
   critical: 'Crítica',
   high: 'Alta',
   medium: 'Media',
+  low: 'Baja',
+};
+
+const severityColors = {
+  critical: 'bg-red-100 text-red-800 border-red-300',
+  high: 'bg-orange-100 text-orange-800 border-orange-300',
+  medium: 'bg-yellow-100 text-yellow-800 border-yellow-300',
+  low: 'bg-blue-100 text-blue-800 border-blue-300',
+};
+
+const alertTypeLabels = {
+  fallback: '🔔 Fallback',
+  system: '⚙️ Sistema',
+  security: '🔒 Seguridad',
+  performance: '⚡ Rendimiento',
 };
 
 const AdminAlerts = () => {
@@ -51,9 +66,21 @@ const AdminAlerts = () => {
                 data-testid="admin-alert-item"
               >
                 <div className="flex items-center justify-between gap-3">
-                  <div className="flex-1" onClick={() => setSelected(alert)}>
-                    <p className="font-medium">{alert.module}</p>
-                    <p className="text-xs text-[var(--color-text-soft,#6b7280)]">{severityLabels[alert.severity]} · {alert.timestamp}</p>
+                  <div className="flex-1 cursor-pointer" onClick={() => setSelected(alert)}>
+                    <div className="flex items-center gap-2">
+                      {alert.type && (
+                        <span className="text-xs">{alertTypeLabels[alert.type] || '📌'}</span>
+                      )}
+                      <p className="font-medium">{alert.service || alert.module}</p>
+                    </div>
+                    <p className="text-xs text-[var(--color-text-soft,#6b7280)] mt-1">
+                      {severityLabels[alert.severity]} · {alert.timestamp}
+                    </p>
+                    {alert.count && (
+                      <p className="text-xs text-[var(--color-text-soft,#6b7280)] mt-0.5">
+                        {alert.count} activaciones
+                      </p>
+                    )}
                   </div>
                   {!alert.resolved && (
                     <button
@@ -77,30 +104,74 @@ const AdminAlerts = () => {
         </aside>
         <div className="rounded-xl border border-soft bg-surface shadow-sm p-6" data-testid="admin-alert-detail">
           {selected ? (
-            <div className="space-y-3 text-sm">
+            <div className="space-y-4 text-sm">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold">{selected.module}</h2>
-                <span className="text-xs uppercase text-[var(--color-text-soft,#6b7280)]">
+                <div>
+                  <div className="flex items-center gap-2">
+                    {selected.type && (
+                      <span className="text-lg">{alertTypeLabels[selected.type] || '📌'}</span>
+                    )}
+                    <h2 className="text-lg font-semibold">{selected.service || selected.module}</h2>
+                  </div>
+                  {selected.module && selected.service && (
+                    <p className="text-xs text-[var(--color-text-soft,#6b7280)] mt-1">
+                      Categoría: {selected.module}
+                    </p>
+                  )}
+                </div>
+                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${severityColors[selected.severity] || 'bg-gray-100 text-gray-800'}`}>
                   {severityLabels[selected.severity]}
                 </span>
               </div>
-              <p>{selected.message}</p>
-              <p className="text-xs text-[var(--color-text-soft,#6b7280)]">{selected.timestamp}</p>
+              
+              <div className="p-3 bg-[var(--color-bg-soft,#f3f4f6)] rounded-lg">
+                <p className="text-sm">{selected.message}</p>
+              </div>
+              
+              {selected.count && (
+                <div className="flex items-center gap-4 text-xs text-[var(--color-text-soft,#6b7280)]">
+                  <span>📊 Activaciones: <strong>{selected.count}</strong></span>
+                  {selected.threshold && (
+                    <span>⚠️ Umbral: {selected.threshold}/hora</span>
+                  )}
+                </div>
+              )}
+              
+              <p className="text-xs text-[var(--color-text-soft,#6b7280)]">
+                📅 {selected.timestamp}
+              </p>
+              
+              {selected.actions && selected.actions.length > 0 && (
+                <div className="border-t pt-3">
+                  <p className="text-sm font-semibold mb-2">🔧 Acciones recomendadas:</p>
+                  <ul className="space-y-1.5 text-sm">
+                    {selected.actions.map((action, idx) => (
+                      <li key={idx} className="flex items-start gap-2">
+                        <span className="text-[var(--color-text-soft,#6b7280)] mt-0.5">•</span>
+                        <span className={action.startsWith('🚨') ? 'font-semibold text-red-700' : ''}>
+                          {action}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              
               {!selected.resolved && (
-                <div className="pt-2">
+                <div className="pt-2 border-t">
                   <button
                     type="button"
                     data-testid="admin-alert-resolve"
-                    className="rounded-md border border-soft px-3 py-1 text-xs font-medium text-[color:var(--color-primary,#6366f1)] hover:bg-[var(--color-bg-soft,#f3f4f6)]"
+                    className="rounded-md border border-soft px-4 py-2 text-sm font-medium text-[color:var(--color-primary,#6366f1)] hover:bg-[var(--color-bg-soft,#f3f4f6)]"
                     onClick={() => setShowResolve(true)}
                   >
-                    Marcar resuelta
+                    ✓ Marcar como resuelta
                   </button>
                 </div>
               )}
             </div>
           ) : (
-            <p className="text-sm text-[var(--color-text-soft,#6b7280)]">Selecciona una alerta.</p>
+            <p className="text-sm text-[var(--color-text-soft,#6b7280)]">Selecciona una alerta para ver los detalles.</p>
           )}
         </div>
       </div>
