@@ -264,10 +264,15 @@ svp). |
    - Verificación de firma Mailgun implementada
    - Registro de eventos básicos
 
-**❌ NO IMPLEMENTADO:**
-1. **callClassificationAPI** - ❌ NO EXISTE
-   - No hay archivo `backend/services/emailClassificationService.js`
-   - No hay integración con OpenAI para clasificación
+**✅ IMPLEMENTADO (CORRECCIÓN):**
+
+1. **callClassificationAPI** ✅ - `backend/services/emailClassificationService.js`
+   - **Estado:** EXISTE Y FUNCIONAL (351 líneas)
+   - Clasificación con OpenAI GPT-4o-mini
+   - Fallback heurístico local
+   - 8 categorías: Proveedor, Invitado, Finanzas, Contratos, Facturas, Reuniones, RSVP, General
+   - Métricas y auditoría completa
+   - **Nota:** Error en análisis anterior - esta funcionalidad SÍ está implementada con OpenAI para clasificación
    - La documentación marcaba esto como "✅ 2025-10-20" INCORRECTAMENTE
    - Impacto: Clasificación solo usa heurísticas locales básicas
 
