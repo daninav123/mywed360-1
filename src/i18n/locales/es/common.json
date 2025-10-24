@@ -1433,5 +1433,35 @@
   "general": "General",
   "notes": "Notas",
   "apply": "Aplicar",
-  "pagination": "Paginacin"
+  "pagination": "Paginacin",
+  "chat": {
+    "open": "Abrir chat"
+  },
+  "pages": {
+    "more": {
+      "title": "Más opciones",
+      "sections": {
+        "guests": {
+          "title": "Invitados",
+          "description": "Gestiona tu lista de invitados",
+          "links": {
+            "guests": "Lista de invitados",
+            "seating": "Plan de asientos"
+          }
+        },
+        "providers": {
+          "title": "Proveedores",
+          "description": "Administra tus proveedores"
+        },
+        "protocol": {
+          "title": "Protocolo",
+          "description": "Documentos y protocolo"
+        },
+        "extras": {
+          "title": "Extras",
+          "description": "Funciones adicionales"
+        }
+      }
+    }
+  }
 }
