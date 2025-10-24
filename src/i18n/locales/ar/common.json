@@ -2,7 +2,7 @@
   "app": {
     "name": "MaLove.App",
     "brandName": "MaLoveApp",
-    "tagline": "2A'ACE 'DE+'DJ EF8E 1BEJ'K",
+    "tagline": "2A'ACE 'DE+'DJ EF8E 1BEJ'K",
     "loading": ",'1M 'D*-EJD...",
     "error": ".7#",
     "success": "*E (F,'-",
@@ -1014,7 +1014,7 @@
     },
     "momentosGuest": {
       "badge": "Collaborative memories",
-      "greeting": "Hi, {{name}} �x9",
+      "greeting": "Hi, {{name}} �x9",
       "remainingUploadsSingle": "You can upload 1 more photo.",
       "remainingUploads": "You can upload up to {{count}} more photos.",
       "remainingUploadsUnlimited": "Upload as many photos as you like.",
