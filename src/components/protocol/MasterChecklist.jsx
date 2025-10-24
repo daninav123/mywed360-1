@@ -26,11 +26,11 @@ const MasterChecklist = ({ weddingId, onUpdate }) => {
   const categories = {
     ceremony: t('common.categories.ceremony'),
     reception: t('common.categories.reception'),
-    catering: t('common.services.catering'),
-    decoration: t('common.services.decoration'),
-    music: t('common.services.music'),
-    photography: t('common.services.photography'),
-    transport: t('common.services.transport'),
+    catering: t('services.catering'),
+    decoration: t('services.decoration'),
+    music: t('services.music'),
+    photography: t('services.photography'),
+    transport: t('services.transport'),
     general: t('common.general')
   };
 
