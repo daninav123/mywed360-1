@@ -4,6 +4,7 @@ import ContactsImporter from '../components/guests/ContactsImporter';
 import GuestBulkGrid from '../components/guests/GuestBulkGrid';
 import GuestFilters from '../components/guests/GuestFilters';
 import GuestForm from '../components/guests/GuestForm';
+import GuestList from '../components/guests/GuestList';
 import PageWrapper from '../components/PageWrapper';
 import PageTabs from '../components/ui/PageTabs';
 import { formatDate } from '../utils/formatUtils';
