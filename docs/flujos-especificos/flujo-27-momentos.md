@@ -25,8 +25,8 @@
 - **Planner web**: `Dashboard -> Momentos` (nueva tarjeta) abre `/momentos`. Cada boda activa añade CTA “Comparte el QR” y estado de subidas.
 - **Menú Más**: bloque “Extras” se amplía con “Momentos” para anfitriones y colaboradores.
 - **Sitio público del evento**: nueva sección opcional “Galería Momentos” con botón `Sube tus fotos` (enlace al flujo público).
-- **Enlace/QR público**: `https://mywed360.app/momentos/{weddingSlug}?token=<signed>`; detecta rol y redirige a versión invitado responsive.
-- **Slideshow**: `https://mywed360.app/momentos/{weddingSlug}/slideshow?token=<host>` vista full-screen.
+- **Enlace/QR público**: `https://maloveapp.app/momentos/{weddingSlug}?token=<signed>`; detecta rol y redirige a versión invitado responsive.
+- **Slideshow**: `https://maloveapp.app/momentos/{weddingSlug}/slideshow?token=<host>` vista full-screen.
 
 ## 4. Arquitectura y piezas clave
 - **Frontend (React)**:
@@ -360,6 +360,6 @@ weddings/{weddingId}
 
 ---
 
-> Contacto responsable: Equipo Producto Moments (pendiente asignar). Coordinación técnica con squads Frontend (MyWed360 App) y Backend Firebase.
+> Contacto responsable: Equipo Producto Moments (pendiente asignar). Coordinación técnica con squads Frontend (MaLoveApp App) y Backend Firebase.
 ## Cobertura E2E implementada
 - `cypress/e2e/moments/moments-empty-state.cy.js`: valida el estado de acceso cuando no existe una boda activa antes de cargar Momentos, garantizando que el usuario reciba la guía adecuada antes de habilitar la colaboración.

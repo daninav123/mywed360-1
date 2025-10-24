@@ -1136,7 +1136,7 @@ const AdminDiscounts = () => {
                   type="url"
                   value={formData.url}
                   onChange={(e) => setFormData(prev => ({ ...prev, url: e.target.value }))}
-                  placeholder="https://mywed360.com/registro?ref=CODIGO"
+                  placeholder="https://maloveapp.com/registro?ref=CODIGO"
                   className="w-full rounded-md border border-soft px-3 py-2 text-sm"
                 />
               </div>
@@ -1328,7 +1328,7 @@ const AdminDiscounts = () => {
                   type="url"
                   value={formData.url}
                   onChange={(e) => setFormData(prev => ({ ...prev, url: e.target.value }))}
-                  placeholder="https://mywed360.com/registro?ref=CODIGO"
+                  placeholder="https://maloveapp.com/registro?ref=CODIGO"
                   className="w-full rounded-md border border-soft px-3 py-2 text-sm"
                 />
               </div>

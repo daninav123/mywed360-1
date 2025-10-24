@@ -16,8 +16,8 @@ import {
 describe('tagService', () => {
   // Constantes para pruebas
   const USER_ID = 'testuser123';
-  const TAGS_STORAGE_KEY = 'mywed360_email_tags_testuser123';
-  const EMAIL_TAGS_MAPPING_KEY = 'mywed360_email_tags_mapping_testuser123';
+  const TAGS_STORAGE_KEY = 'maloveapp_email_tags_testuser123';
+  const EMAIL_TAGS_MAPPING_KEY = 'maloveapp_email_tags_mapping_testuser123';
 
   // Mock para localStorage
   const localStorageMock = (() => {

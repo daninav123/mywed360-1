@@ -1,4 +1,4 @@
-﻿# Plan de Consolidación de Documentación - MyWed360
+﻿# Plan de Consolidación de Documentación - MaLoveApp
 
 ## 🎯 Objetivo
 Eliminar duplicación y crear estructura documental clara y mantenible.

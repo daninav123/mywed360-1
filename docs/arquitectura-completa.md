@@ -1,4 +1,4 @@
-# Documentación Arquitectónica Completa de MyWed360
+# Documentación Arquitectónica Completa de MaLoveApp
 
 ## Diagrama de Arquitectura
 
@@ -33,7 +33,7 @@ El frontend (SPA) se comunica directamente con Firebase mediante el SDK y, para 
 
 ## Contextos de Usuario
 
-En el proyecto MyWed360 existen dos contextos separados para gestionar diferentes aspectos del usuario:
+En el proyecto MaLoveApp existen dos contextos separados para gestionar diferentes aspectos del usuario:
 
 ### 1. Contexto de Autenticación (`/src/context/UserContext.jsx`)
 

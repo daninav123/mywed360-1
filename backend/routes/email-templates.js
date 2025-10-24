@@ -7,7 +7,7 @@ import { db } from '../db.js';
 const router = express.Router();
 const COLLECTION = 'email_templates';
 
-// Plantillas de email predefinidas para MyWed360
+// Plantillas de email predefinidas para MaLoveApp
 const EMAIL_TEMPLATES = [
   {
     id: 'wedding-invitation',

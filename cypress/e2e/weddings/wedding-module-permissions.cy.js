@@ -9,7 +9,7 @@ describe('Flujo 10 - Permisos por módulo en detalle de boda', () => {
     cy.loginToLovenda('planner.permisos@lovenda.test', 'planner');
 
     cy.window().then((win) => {
-      const profileRaw = win.localStorage.getItem('MyWed360_user_profile');
+      const profileRaw = win.localStorage.getItem('MaLoveApp_user_profile');
       const profile = profileRaw ? JSON.parse(profileRaw) : {};
       const plannerProfile = {
         ...profile,
@@ -17,7 +17,7 @@ describe('Flujo 10 - Permisos por módulo en detalle de boda', () => {
         role: 'planner',
         emailVerified: true,
       };
-      win.localStorage.setItem('MyWed360_user_profile', JSON.stringify(plannerProfile));
+      win.localStorage.setItem('MaLoveApp_user_profile', JSON.stringify(plannerProfile));
     });
 
     cy.seedPlannerWeddings(

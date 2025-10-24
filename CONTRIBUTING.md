@@ -1,4 +1,4 @@
-# Guía de Contribución — MyWed360
+# Guía de Contribución — MaLoveApp
 
 Gracias por tu interés en contribuir. Esta guía resume cómo trabajar con el repositorio y qué esperamos en los PRs.
 

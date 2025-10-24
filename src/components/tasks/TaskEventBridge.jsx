@@ -15,7 +15,7 @@ import { useEffect } from 'react';
 import { useWedding } from '../../context/WeddingContext';
 import { db, auth } from '../../firebaseConfig';
 
-// Listens to window 'mywed360-tasks' events and persists tasks/meetings in Firestore
+// Listens to window 'maloveapp-tasks' events and persists tasks/meetings in Firestore
 // Supports actions: add (default), update, delete, complete (only for tasks)
 export default function TaskEventBridge() {
   const { activeWedding } = useWedding();
@@ -175,8 +175,8 @@ export default function TaskEventBridge() {
       }
     };
 
-    window.addEventListener('mywed360-tasks', handler);
-    return () => window.removeEventListener('mywed360-tasks', handler);
+    window.addEventListener('maloveapp-tasks', handler);
+    return () => window.removeEventListener('maloveapp-tasks', handler);
   }, [activeWedding]);
 
   return null;

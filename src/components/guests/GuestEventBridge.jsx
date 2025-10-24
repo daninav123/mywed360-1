@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useWedding } from '../../context/WeddingContext';
 import { db } from '../../firebaseConfig';
 
-// Listens to window 'mywed360-guests' events and persists guests in Firestore
+// Listens to window 'maloveapp-guests' events and persists guests in Firestore
 export default function GuestEventBridge() {
   const { activeWedding } = useWedding();
 
@@ -81,8 +81,8 @@ export default function GuestEventBridge() {
       }
     };
 
-    window.addEventListener('mywed360-guests', handler);
-    return () => window.removeEventListener('mywed360-guests', handler);
+    window.addEventListener('maloveapp-guests', handler);
+    return () => window.removeEventListener('maloveapp-guests', handler);
   }, [activeWedding]);
 
   return null;

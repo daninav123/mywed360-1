@@ -125,7 +125,7 @@ const DiagnosticPanel = () => {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden">
         <div className="bg-gray-800 text-white p-4 flex justify-between items-center">
-          <h2 className="text-xl font-bold">🔍 Panel de Diagnóstico MyWed360</h2>
+          <h2 className="text-xl font-bold">🔍 Panel de Diagnóstico MaLoveApp</h2>
           <button onClick={toggleVisibility} className="text-gray-300 hover:text-white text-2xl">
             ×
           </button>

@@ -10,7 +10,7 @@ describe('Flujo 2 - Wizard creación de evento', () => {
     });
     cy.loginToLovenda('owner.e2e@lovenda.test');
     cy.window().then((win) => {
-      const profileRaw = win.localStorage.getItem('MyWed360_user_profile');
+      const profileRaw = win.localStorage.getItem('MaLoveApp_user_profile');
       const profile = profileRaw ? JSON.parse(profileRaw) : {};
       const ownerProfile = {
         ...profile,
@@ -18,9 +18,9 @@ describe('Flujo 2 - Wizard creación de evento', () => {
         role: 'owner',
         emailVerified: true,
       };
-      win.localStorage.setItem('MyWed360_user_profile', JSON.stringify(ownerProfile));
-      win.localStorage.removeItem('mywed360_active_wedding');
-      win.localStorage.removeItem('lovenda_active_wedding');
+      win.localStorage.setItem('MaLoveApp_user_profile', JSON.stringify(ownerProfile));
+      win.localStorage.removeItem('maloveapp_active_wedding');
+      win.localStorage.removeItem('maloveapp_active_wedding');
       win.__MOCK_WEDDING__ = { weddings: [], activeWedding: null };
     });
   });

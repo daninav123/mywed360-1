@@ -261,4 +261,4 @@ npm run cypress:run -- --spec "cypress/e2e/seating/**/*.cy.js"
 
 ---
 
-**Conclusión:** El proyecto MyWed360 tiene una base sólida con 56% de módulos funcionales. Para alcanzar el 100%, se requiere enfoque en completar módulos pendientes críticos y corregir configuración de tests, más que implementar desde cero.
+**Conclusión:** El proyecto MaLoveApp tiene una base sólida con 56% de módulos funcionales. Para alcanzar el 100%, se requiere enfoque en completar módulos pendientes críticos y corregir configuración de tests, más que implementar desde cero.

@@ -211,7 +211,7 @@ export default function Inspiration() {
     trackInteraction(userId, item, 0, true);
     if (isAdding) {
       try {
-        window.dispatchEvent(new Event('mywed360-important-note'));
+        window.dispatchEvent(new Event('maloveapp-important-note'));
       } catch (_) {
         // no-op si el entorno bloquea eventos personalizados
       }

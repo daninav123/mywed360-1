@@ -140,19 +140,19 @@ function ProtectedRoute() {
   const isTestMode =
     (typeof window !== 'undefined' && window.Cypress) ||
     import.meta.env.VITE_TEST_MODE === 'true' ||
-    (typeof window !== 'undefined' && window.__MYWED360_TEST_MODE__ === true);
+    (typeof window !== 'undefined' && window.__MALOVEAPP_TEST_MODE__ === true);
 
   // Bypass in tests unless explicitly disabled
   const shouldBypassProtectedRoute =
     isTestMode &&
-    (typeof window === 'undefined' || window.__MYWED360_DISABLE_PROTECTED_BYPASS__ !== true);
+    (typeof window === 'undefined' || window.__MALOVEAPP_DISABLE_PROTECTED_BYPASS__ !== true);
 
   // Also bypass if user is "logged in" via localStorage (for Cypress)
   const hasStoredAuth = () => {
     try {
       const isLoggedIn = window.localStorage.getItem('isLoggedIn');
-      const userProfile = window.localStorage.getItem('MyWed360_user_profile');
-      const mockUser = window.localStorage.getItem('MyWed360_mock_user');
+      const userProfile = window.localStorage.getItem('MaLoveApp_user_profile');
+      const mockUser = window.localStorage.getItem('MaLoveApp_mock_user');
       return isLoggedIn === 'true' || userProfile || mockUser;
     } catch (e) {
       return false;

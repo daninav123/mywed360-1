@@ -1,5 +1,5 @@
 /**
- * Script de pruebas de rendimiento para el sistema de emails de MyWed360
+ * Script de pruebas de rendimiento para el sistema de emails de MaLoveApp
  *
  * Este script simula cargas de datos y uso intensivo para evaluar
  * el rendimiento y la escalabilidad de los componentes implementados.
@@ -80,7 +80,7 @@ function generateTestData(type, size = 'medium') {
         result.push({
           id: `email_${i}`,
           from: `sender${i % 100}@example.com`,
-          to: 'usuario@mywed360.com',
+          to: 'usuario@maloveapp.com',
           subject: `Asunto de prueba #${i} para evaluación de rendimiento`,
           body: generateRandomText(CONFIG.emailBodySize[size]),
           date: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
@@ -522,7 +522,7 @@ async function testNotificationRendering(params) {
 async function runAllTests() {
   console.log(`
   =======================================================
-  🚀 INICIANDO PRUEBAS DE RENDIMIENTO DE MYWED360 EMAIL
+  🚀 INICIANDO PRUEBA DE MALOVEAPP EMAIL
   =======================================================
   
   Configuración:

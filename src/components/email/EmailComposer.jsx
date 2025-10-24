@@ -1,5 +1,5 @@
-﻿import { X, Paperclip, AlertCircle, CheckCircle, ChevronDown } from 'lucide-react';
-import React, { useState, useEffect } from 'react';
+import { X, Paperclip, AlertCircle, CheckCircle, ChevronDown } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
 
 import { useAuth } from '../../hooks/useAuth';
 import { scheduleEmailSend } from '../../services/emailAutomationService';
@@ -7,6 +7,7 @@ import * as EmailService from '../../services/EmailService';
 import { safeRender } from '../../utils/promiseSafeRenderer';
 import Button from '../Button';
 import Card from '../ui/Card';
+import useTranslations from '../../hooks/useTranslations';
 
 /**
  * Componente para redactar y enviar nuevos emails desde la dirección personalizada del usuario
@@ -32,14 +33,18 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
   );
   const authContext = useAuth();
   const { userProfile } = authContext;
+  const { t, tVars, tPlural } = useTranslations();
+  const tEmail = (key, options) => t(`email.${key}`, { ns: 'email', ...options });
+  const tEmailVars = (key, variables) => tVars(`email.${key}`, { ns: 'email', ...variables });
+  const tEmailPlural = (key, count, variables) =>
+    tPlural(`email.${key}`, count, { ns: 'email', ...variables });
 
-  // Establecer el contexto de autenticación en EmailService (si está disponible en el mock)
+  // Establecer el contexto de autenticación en EmailService
   useEffect(() => {
     try {
       EmailService?.setAuthContext?.(authContext);
     } catch (e) {
-      // En entorno de test, algunos mocks no proveen setAuthContext: ignorar de forma segura
-      // console.debug('setAuthContext no disponible en EmailService mock');
+      console.error('[EmailComposer] Error setting auth context:', e);
     }
   }, [authContext]);
   const [to, setTo] = useState(initialValues.to || '');
@@ -56,6 +61,7 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
   const [userEmail, setUserEmail] = useState('');
   const [templates, setTemplates] = useState([]);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
+  const sendingRef = useRef(false);
 
   // Inicializar el email del usuario
   useEffect(() => {
@@ -74,7 +80,7 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
         const availableTemplates = await EmailService.getEmailTemplates();
         setTemplates(availableTemplates || []);
       } catch (err) {
-        console.error('Error al cargar plantillas:', err);
+        console.error('[EmailComposer] Failed to load templates:', err);
       }
     };
 
@@ -113,7 +119,10 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
     const invalidFiles = files.filter((file) => file.size > 10 * 1024 * 1024);
     if (invalidFiles.length > 0) {
       setError(
-        `Algunos archivos exceden el tamaño máximo de 10MB: ${invalidFiles.map((f) => f.name).join(', ')}`
+        tEmailVars('composer.errors.invalidAttachments', {
+          maxSize: '10MB',
+          names: invalidFiles.map((f) => f.name).join(', '),
+        })
       );
       return;
     }
@@ -144,17 +153,17 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
   // Validar email antes de enviar
   const validateEmail = () => {
     if (!to) {
-      setError('Debes especificar al menos un destinatario');
+      setError(tEmail('composer.errors.missingRecipient'));
       return false;
     }
 
     if (!subject) {
-      setError('Por favor, añade un asunto al email');
+      setError(tEmail('composer.errors.missingSubject'));
       return false;
     }
 
     if (!body || body.trim().length === 0) {
-      setError('El mensaje no puede estar vacío');
+      setError(tEmail('composer.errors.emptyBody'));
       return false;
     }
 
@@ -164,7 +173,11 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
     const invalidEmails = toEmails.filter((email) => !emailRegex.test(email));
 
     if (invalidEmails.length > 0) {
-      setError(`Algunas direcciones de email no son válidas: ${invalidEmails.join(', ')}`);
+      setError(
+        tEmailVars('composer.errors.invalidRecipients', {
+          emails: invalidEmails.join(', '),
+        })
+      );
       return false;
     }
 
@@ -173,7 +186,11 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
       const invalidCcEmails = ccEmails.filter((email) => !emailRegex.test(email));
 
       if (invalidCcEmails.length > 0) {
-        setError(`Algunas direcciones CC no son válidas: ${invalidCcEmails.join(', ')}`);
+        setError(
+          tEmailVars('composer.errors.invalidCc', {
+            emails: invalidCcEmails.join(', '),
+          })
+        );
         return false;
       }
     }
@@ -183,16 +200,18 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
 
   // Enviar el email
   const handleSend = async () => {
-    // Prevenir envío duplicado
-    if (sending) {
-      console.log('Envío ya en progreso, ignorando...');
+    // Prevenir envío duplicado con referencia (más robusto que state)
+    if (sending || sendingRef.current) {
+      console.log('[EmailComposer] Send already in progress, ignoring.');
       return;
     }
+    sendingRef.current = true;
 
     setError('');
     setSuccess('');
 
     if (!validateEmail()) {
+      sendingRef.current = false;
       return;
     }
 
@@ -206,11 +225,14 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
     ) {
       if (typeof window !== 'undefined' && typeof window.confirm === 'function') {
         if (
-          window.confirm(
-            'No tienes configurada una dirección de correo personalizada. ¿Deseas configurarla ahora?'
-          )
+          window.confirm(tEmail('composer.prompts.setupCustomAddress'))
         ) {
+          sendingRef.current = false;
           window.location.href = '/email/setup';
+          return;
+        } else {
+          // Usuario canceló la configuración
+          sendingRef.current = false;
           return;
         }
       }
@@ -218,21 +240,23 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
 
     if (scheduleEnabled) {
       if (!scheduledAt) {
-        setError('Selecciona una fecha y hora para programar el envío');
+        setError(tEmail('composer.errors.missingSchedule'));
+        sendingRef.current = false;
         return;
       }
       if (attachments.length > 0) {
-        setError('Actualmente no es posible programar correos con adjuntos.');
+        setError(tEmail('composer.errors.attachmentsNotSupported'));
+        sendingRef.current = false;
         return;
       }
       setSending(true);
       try {
         const scheduleDate = new Date(scheduledAt);
         if (Number.isNaN(scheduleDate.getTime())) {
-          throw new Error('Fecha y hora no válidas');
+          throw new Error(tEmail('composer.errors.invalidScheduleDate'));
         }
         await scheduleEmailSend({ to, cc, subject, body }, scheduleDate.toISOString());
-        setSuccess('Correo programado correctamente');
+        setSuccess(tEmail('composer.success.scheduled'));
         if (onSend) {
           onSend({ scheduled: true, scheduledAt: scheduleDate.toISOString() });
         }
@@ -244,9 +268,10 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
           }
         }, 600);
       } catch (scheduleError) {
-        setError(scheduleError?.message || 'No se pudo programar el correo.');
+        setError(scheduleError?.message || tEmail('composer.errors.scheduleFailed'));
       } finally {
         setSending(false);
+        sendingRef.current = false;
       }
       return;
     }
@@ -263,7 +288,7 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
       });
 
       if (result && (result.success || result.id)) {
-        setSuccess('Correo enviado correctamente');
+        setSuccess(tEmail('composer.success.sent'));
 
         if (onSend) {
           onSend(result);
@@ -277,13 +302,19 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
           resetForm();
         }, 1500);
       } else {
-        throw new Error('Error al enviar el email');
+        throw new Error(tEmail('composer.errors.sendFailed'));
       }
     } catch (err) {
-      console.error('Error al enviar email:', err);
-      setError(`Error al enviar: ${err.message}`);
+      console.error('[EmailComposer] Failed to send email:', err);
+      sendingRef.current = false;
+      setError(
+        tEmailVars('composer.errors.sendFailedWithDetails', {
+          details: err.message,
+        })
+      );
     } finally {
       setSending(false);
+      sendingRef.current = false;
     }
   };
 
@@ -297,6 +328,7 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
     setShowCc(false);
     setError('');
     setSelectedTemplate(null);
+    sendingRef.current = false;
   };
 
   // Cerrar y resetear
@@ -307,6 +339,7 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
     resetForm();
     setScheduleEnabled(false);
     setScheduledAt('');
+    sendingRef.current = false;
   };
 
   // Si isOpen no se pasa, asumimos que debe mostrarse
@@ -316,8 +349,13 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center p-4">
       <Card className="w-full max-w-4xl max-h-[90vh] flex flex-col" data-testid="email-composer">
         <div className="flex items-center justify-between border-b border-gray-200 p-4">
-          <h2 className="text-xl font-bold">Nuevo mensaje</h2>
-          <Button variant="ghost" size="sm" onClick={handleClose} aria-label="Cerrar">
+          <h2 className="text-xl font-bold">{tEmail('composer.header.title')}</h2>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleClose}
+            aria-label={tEmail('composer.header.closeAria')}
+          >
             <X size={20} />
           </Button>
         </div>
@@ -345,7 +383,9 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
 
           <div className="mb-2">
             <div className="flex items-center justify-between">
-              <label className="block text-sm font-medium text-gray-700 mb-1">De:</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {tEmail('composer.fields.from.label')}
+              </label>
               {templates.length > 0 && (
                 <div className="relative">
                   <select
@@ -356,7 +396,7 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
                     }}
                     className="text-sm border border-gray-300 rounded-md py-1 pl-2 pr-8"
                   >
-                    <option value="">Plantillas</option>
+                    <option value="">{tEmail('composer.templates.placeholder')}</option>
                     {templates.map((template, index) => (
                       <option key={index} value={index}>
                         {template.name}
@@ -371,17 +411,19 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
               )}
             </div>
             <div className="border border-gray-300 rounded-md p-2 bg-gray-50 flex justify-between">
-              <span className="text-gray-800">{userEmail || 'cargando...'}</span>
-              {userEmail && userEmail.includes('@mywed360') ? (
+              <span className="text-gray-800">
+                {userEmail || tEmail('composer.status.loadingEmail')}
+              </span>
+              {userEmail && userEmail.includes('@malove.app') ? (
                 <span className="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">
-                  myWed360
+                  MaLoveApp
                 </span>
               ) : userProfile && !userProfile.emailUsername ? (
                 <a
                   href="/email/setup"
                   className="text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full hover:bg-amber-200 transition-colors"
                 >
-                  Configurar correo
+                  {tEmail('composer.actions.configureEmail')}
                 </a>
               ) : null}
             </div>
@@ -389,16 +431,16 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
 
           <div className="mb-2">
             <label htmlFor="to-input" className="block text-sm font-medium text-gray-700 mb-1">
-              Para:
+              {tEmail('composer.fields.to.label')}
             </label>
             <input
               id="to-input"
-              aria-label="Para Destinatario"
+              aria-label={tEmail('composer.fields.to.label')}
               type="text"
               value={to}
               onChange={(e) => setTo(e.target.value)}
               className="w-full border border-gray-300 rounded-md p-2"
-              placeholder="Destinatarios (email@ejemplo.com, email2@ejemplo.com)"
+              placeholder={tEmail('composer.fields.to.placeholder')}
               disabled={sending}
               data-testid="recipient-input"
             />
@@ -407,16 +449,16 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
           {showCc && (
             <div className="mb-2">
               <label htmlFor="cc-input" className="block text-sm font-medium text-gray-700 mb-1">
-                CC:
+                {tEmail('composer.fields.cc.label')}
               </label>
               <input
                 id="cc-input"
-                aria-label="CC"
+                aria-label={tEmail('composer.fields.cc.label')}
                 type="text"
                 value={cc}
                 onChange={(e) => setCc(e.target.value)}
                 className="w-full border border-gray-300 rounded-md p-2"
-                placeholder="CC (email@ejemplo.com, email2@ejemplo.com)"
+                placeholder={tEmail('composer.fields.cc.placeholder')}
                 disabled={sending}
               />
             </div>
@@ -429,23 +471,23 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
                 onClick={() => setShowCc(true)}
                 className="text-sm text-blue-600 hover:text-blue-800"
               >
-                Añadir CC
+                {tEmail('composer.actions.addCc')}
               </button>
             )}
           </div>
 
           <div className="mb-4">
             <label htmlFor="subject-input" className="block text-sm font-medium text-gray-700 mb-1">
-              Asunto:
+              {tEmail('composer.fields.subject.label')}
             </label>
             <input
               id="subject-input"
-              aria-label="Asunto"
+              aria-label={tEmail('composer.fields.subject.label')}
               type="text"
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
               className="w-full border border-gray-300 rounded-md p-2"
-              placeholder="Asunto del email"
+              placeholder={tEmail('composer.fields.subject.placeholder')}
               disabled={sending}
               data-testid="subject-input"
             />
@@ -453,16 +495,16 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
 
           <div className="mb-4">
             <label htmlFor="body-input" className="block text-sm font-medium text-gray-700 mb-1">
-              Mensaje:
+              {tEmail('composer.fields.body.label')}
             </label>
             <textarea
               id="body-input"
-              aria-label="Mensaje"
+              aria-label={tEmail('composer.fields.body.label')}
               value={body}
               onChange={(e) => setBody(e.target.value)}
               className="w-full border border-gray-300 rounded-md p-2"
               rows="12"
-              placeholder="Escribe tu mensaje aquí..."
+              placeholder={tEmail('composer.fields.body.placeholder')}
               disabled={sending}
               data-testid="body-editor"
             />
@@ -470,29 +512,34 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
 
           {/* Sección de adjuntos */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Adjuntos:</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              {tEmail('composer.attachments.label')}
+            </label>
 
             <div className="mb-2">
               <label className="cursor-pointer inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
                 <Paperclip size={18} className="mr-2" />
-                Adjuntar archivo
+                {tEmail('composer.attachments.addFile')}
                 <input
                   type="file"
-                  aria-label="Adjuntar archivo"
+                  aria-label={tEmail('composer.attachments.addFile')}
                   className="hidden"
                   multiple
                   onChange={handleFileUpload}
                   disabled={sending}
                 />
               </label>
-              <span className="ml-2 text-xs text-gray-500">Máximo 10MB por archivo</span>
+              <span className="ml-2 text-xs text-gray-500">
+                {tEmail('composer.attachments.maxSizeHint')}
+              </span>
             </div>
 
             {attachments.length > 0 && (
               <div className="border border-gray-200 rounded-md p-2">
                 <p className="text-xs text-gray-500 mb-2">
-                  {attachments.length}{' '}
-                  {attachments.length === 1 ? 'archivo adjunto' : 'archivos adjuntos'}
+                  {tEmailPlural('composer.attachments.count', attachments.length, {
+                    count: attachments.length,
+                  })}
                 </p>
 
                 <ul className="space-y-1">
@@ -507,7 +554,7 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
                       <Button
                         variant="ghost"
                         size="xs"
-                        aria-label="Eliminar adjunto"
+                        aria-label={tEmail('composer.attachments.removeAria')}
                         className="text-gray-500"
                         onClick={() => removeAttachment(index)}
                         disabled={sending}
@@ -535,7 +582,7 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
                 }
               }}
             />
-            <span>Programar el envío</span>
+            <span>{tEmail('composer.schedule.label')}</span>
           </label>
           {scheduleEnabled && (
             <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center">
@@ -547,7 +594,7 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
                 className="w-full sm:w-auto border border-blue-200 rounded-md px-3 py-2 text-sm focus:border-blue-400 focus:ring-2 focus:ring-blue-200"
               />
               <p className="text-xs text-blue-700 sm:ml-3">
-                Selecciona día y hora para enviar automáticamente.
+                {tEmail('composer.schedule.helper')}
               </p>
             </div>
           )}
@@ -556,16 +603,16 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
         <div className="border-t border-gray-200 p-4 flex justify-end">
           <div className="flex space-x-3">
             <Button variant="outline" onClick={handleClose} disabled={sending}>
-              Cancelar
+              {tEmail('composer.buttons.cancel')}
             </Button>
             <Button onClick={handleSend} disabled={sending} data-testid="send-button">
               {sending
                 ? scheduleEnabled
-                  ? 'Programando...'
-                  : 'Enviando...'
+                  ? tEmail('composer.buttons.scheduling')
+                  : tEmail('composer.buttons.sending')
                 : scheduleEnabled
-                  ? 'Programar'
-                  : 'Enviar'}
+                  ? tEmail('composer.buttons.schedule')
+                  : tEmail('composer.buttons.send')}
             </Button>
           </div>
         </div>

@@ -318,7 +318,7 @@ const EmailConfigValidation = ({ emailAddress, onValidationComplete }) => {
           </h5>
           <ul className="list-disc list-inside space-y-1 text-sm text-gray-700">
             <li>
-              <strong>SPF:</strong> Verifica que tu dominio autorice a MyWed360 para enviar emails
+              <strong>SPF:</strong> Verifica que tu dominio autorice a MaLoveApp para enviar emails
             </li>
             <li>
               <strong>DKIM:</strong> Confirma que los emails estén firmados digitalmente

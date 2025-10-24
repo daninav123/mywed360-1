@@ -54,12 +54,12 @@ describe('API Mocks y Interceptors', () => {
 
   it('puede mockar autenticación', () => {
     cy.window().then((win) => {
-      win.localStorage.setItem('MyWed360_auth_token', 'mock-token-123');
+      win.localStorage.setItem('MaLoveApp_auth_token', 'mock-token-123');
       win.localStorage.setItem('isLoggedIn', 'true');
     });
     cy.reload();
     cy.window().then((win) => {
-      expect(win.localStorage.getItem('MyWed360_auth_token')).to.equal('mock-token-123');
+      expect(win.localStorage.getItem('MaLoveApp_auth_token')).to.equal('mock-token-123');
     });
   });
 
@@ -94,14 +94,14 @@ describe('API Mocks y Interceptors', () => {
     // Simular owner
     cy.loginToLovenda('owner@test.com', 'owner');
     cy.window().then((win) => {
-      const profile = JSON.parse(win.localStorage.getItem('MyWed360_user_profile'));
+      const profile = JSON.parse(win.localStorage.getItem('MaLoveApp_user_profile'));
       expect(profile.role).to.equal('owner');
     });
     
     // Simular assistant
     cy.loginToLovenda('assistant@test.com', 'assistant');
     cy.window().then((win) => {
-      const profile = JSON.parse(win.localStorage.getItem('MyWed360_user_profile'));
+      const profile = JSON.parse(win.localStorage.getItem('MaLoveApp_user_profile'));
       expect(profile.role).to.equal('assistant');
     });
   });

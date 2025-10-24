@@ -1,4 +1,4 @@
-﻿// Lightweight API client with optional auth header
+// Lightweight API client with optional auth header
 import { auth } from '../firebaseConfig';
 import { performanceMonitor } from './PerformanceMonitor';
 
@@ -32,50 +32,89 @@ function readStoredToken() {
 }
 
 async function getAuthToken({ refresh = true } = {}) {
+  const DEBUG = false; // Cambiar a true para debugging detallado
+  
   try {
-    const stored = readStoredToken();
-    if (stored) return stored;
-  } catch {}
+    // Verificar que auth esté disponible
+    if (!auth) {
+      console.error('[apiClient] Firebase auth no está inicializado');
+      return null;
+    }
+    
+    const user = auth.currentUser;
+    if (!user) {
+      if (DEBUG) console.log('[apiClient] No hay usuario autenticado');
+      // Si no hay usuario, limpiar token almacenado
+      try {
+        window.localStorage.removeItem(TOKEN_STORAGE_KEY);
+      } catch {}
+      return null;
+    }
 
-  try {
-    const user = auth?.currentUser;
-    if (!user) return null;
+    if (DEBUG) console.log('[apiClient] Usuario encontrado:', user.uid);
 
+    // Siempre intentar obtener token fresco de Firebase
+    // No confiar en el token almacenado porque puede estar expirado
     if (user.getIdToken) {
       try {
-        const token = await user.getIdToken(refresh);
+        if (DEBUG) console.log('[apiClient] Solicitando token fresco...');
+        const token = await user.getIdToken(true); // Siempre refrescar
         if (token) {
+          if (DEBUG) {
+            // Decodificar y mostrar expiración
+            try {
+              const payload = JSON.parse(atob(token.split('.')[1]));
+              const exp = new Date(payload.exp * 1000);
+              console.log('[apiClient] Token obtenido, expira:', exp.toLocaleString());
+            } catch {}
+          }
           rememberToken(token);
           return token;
         }
       } catch (err) {
-        console.warn('[apiClient] Error refreshing auth token:', err);
+        console.error('[apiClient] Error refreshing auth token:', err.message || err);
+        // Limpiar token expirado
         try {
+          window.localStorage.removeItem(TOKEN_STORAGE_KEY);
+        } catch {}
+        
+        // Intentar obtener token sin refrescar (puede fallar si está expirado)
+        try {
+          if (DEBUG) console.log('[apiClient] Intentando token sin refresh...');
           const fallbackToken = await user.getIdToken(false);
           if (fallbackToken) {
             rememberToken(fallbackToken);
             return fallbackToken;
           }
         } catch (fallbackErr) {
-          console.warn('[apiClient] Error obtaining cached auth token:', fallbackErr);
+          console.error('[apiClient] Error obtaining cached auth token:', fallbackErr.message || fallbackErr);
         }
       }
     }
   } catch (err) {
-    console.warn('[apiClient] No se pudo obtener token de autenticación:', err);
+    console.error('[apiClient] No se pudo obtener token de autenticación:', err);
   }
   return null;
 }
 
 async function buildHeaders(opts = {}) {
   const base = { 'Content-Type': 'application/json', ...(opts.headers || {}) };
-  if (opts.auth) {
+  
+  // Por defecto, intentar enviar token si hay usuario autenticado
+  // Solo NO enviar si explícitamente se pasa auth: false
+  const shouldAuth = opts.auth !== false;
+  
+  if (shouldAuth) {
     const token = await getAuthToken();
-    if (!token) {
+    if (token) {
+      return { ...base, Authorization: `Bearer ${token}` };
+    }
+    // Si auth era explícitamente true (requerido) y no hay token, error
+    if (opts.auth === true) {
       throw new Error('[apiClient] Authentication required to call this endpoint');
     }
-    return { ...base, Authorization: `Bearer ${token}` };
   }
+  
   return base;
 }
 

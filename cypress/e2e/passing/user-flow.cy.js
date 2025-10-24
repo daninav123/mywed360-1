@@ -67,7 +67,7 @@ describe('Flujo de Usuario Básico', () => {
     
     // Verificar que el usuario sigue logueado
     cy.window().then((win) => {
-      const profile = win.localStorage.getItem('MyWed360_user_profile');
+      const profile = win.localStorage.getItem('MaLoveApp_user_profile');
       expect(profile).to.exist;
       const parsed = JSON.parse(profile);
       expect(parsed.email).to.equal('test@user.com');

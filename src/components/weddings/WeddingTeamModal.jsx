@@ -2,8 +2,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 
 import Modal from '../Modal';
 
-const INVITES_STORAGE_KEY = 'mywed360_team_invites';
-const CODES_STORAGE_KEY = 'mywed360_team_codes';
+const INVITES_STORAGE_KEY = 'maloveapp_team_invites';
+const CODES_STORAGE_KEY = 'maloveapp_team_codes';
 
 const DEFAULT_PLANNERS = [
   {

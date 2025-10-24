@@ -150,7 +150,7 @@ app.get('/api/mailgun/events', async (req, res) => {
     return res.status(503).json({
       success: false,
       message: 'MAILGUN_DOMAIN inválido',
-      hint: 'Usa solo el dominio verificado (hostname), p.ej. mg.mywed360.com',
+      hint: 'Usa solo el dominio verificado (hostname), p.ej. mg.maloveapp.com',
     });
   }
 

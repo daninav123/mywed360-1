@@ -18,7 +18,7 @@ describe('ComposeEmailModal', () => {
   const defaultProps = {
     isOpen: true,
     onClose: vi.fn(),
-    userEmail: 'usuario@mywed360.com',
+    userEmail: 'usuario@maloveapp.com',
   };
 
   beforeEach(() => {

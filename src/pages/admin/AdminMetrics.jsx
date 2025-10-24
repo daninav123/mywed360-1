@@ -90,7 +90,7 @@ const AdminMetrics = () => {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-xl font-semibold mb-4">Métricas MyWed360</h1>
+        <h1 className="text-xl font-semibold mb-4">Métricas MaLoveApp</h1>
         {renderTabs()}
       </header>
 

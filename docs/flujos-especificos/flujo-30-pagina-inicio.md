@@ -21,7 +21,7 @@
    - Encabezado muestra mensaje "Bienvenidos" junto al nombre de la boda.
    - Muestra el logotipo cargado desde `logo-app.png` (assets públicos).
 3. **Progreso**  
-   - Card `Progress` consulta `GamificationService.getSummary` (puntos totales de la boda) y traduce el resultado a un porcentaje 0-100 (`mywed360_progress`) que se guarda como snapshot en `localStorage`.
+   - Card `Progress` consulta `GamificationService.getSummary` (puntos totales de la boda) y traduce el resultado a un porcentaje 0-100 (`maloveapp_progress`) que se guarda como snapshot en `localStorage`.
    - La barra se colorea según el desfase respecto al plan temporal de la boda (adelantado -> verde, en ritmo -> ámbar, por detrás -> rojo) y muestra el porcentaje esperado para la fecha actual.
 4. **Acciones rapidas**  
    - Tarjetas clicables abren modales para buscar proveedor, anadir invitado, registrar movimiento o crear nota.
@@ -52,7 +52,7 @@
 
 ## 4. Persistencia y datos
 - `localStorage`
-  - `mywed360_active_wedding_name`, `mywed360_progress` (snapshot de Gamificación + cálculo temporal): saludo y progreso.
+  - `maloveapp_active_wedding_name`, `maloveapp_progress` (snapshot de Gamificación + cálculo temporal): saludo y progreso.
   - `mywed360Guests`: lista de invitados; cada modal de invitado incorpora registros con `id` (timestamp).
   - `lovendaProviders`: proveedores contratados; usado para conteo.
   - `tasksCompleted`, `mywed360Meetings`, `lovendaLongTasks`: fuentes para tareas totales/completadas.

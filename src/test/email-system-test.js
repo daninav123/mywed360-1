@@ -1,4 +1,4 @@
-// Script de validación del sistema de emails personalizado de MyWed360
+// Script de validación del sistema de emails personalizado de MaLoveApp
 // Ejecutar con: node email-system-test.js
 
 // Nota: Este script está diseñado para probar la lógica, pero requiere adaptaciones
@@ -9,7 +9,7 @@ const EmailService = {
   initEmailService: (profile) => {
     // Simula la lógica de generación de emails
     if (profile.emailAlias) {
-      return `${profile.emailAlias}@mywed360.com`;
+      return `${profile.emailAlias}@maloveapp.com`;
     }
 
     if (profile.brideFirstName && profile.brideLastName) {
@@ -18,10 +18,10 @@ const EmailService = {
           .normalize('NFD')
           .replace(/[\u0300-\u036f]/g, '') // Eliminar acentos
           .replace(/[^a-z0-9.]/g, '.'); // Reemplazar caracteres no permitidos
-      return `${normalizedName}@mywed360.com`;
+      return `${normalizedName}@maloveapp.com`;
     }
 
-    return `user${profile.userId}@mywed360.com`;
+    return `user${profile.userId}@maloveapp.com`;
   },
 
   sendMail: async ({ to, subject, body }) => {
@@ -34,7 +34,7 @@ const EmailService = {
     // Simular respuesta exitosa
     return {
       id: 'email_' + Math.random().toString(36).substring(2, 10),
-      from: 'usuario@mywed360.com',
+      from: 'usuario@maloveapp.com',
       to,
       subject,
       date: new Date().toISOString(),
@@ -82,7 +82,7 @@ const testProvider = {
 
 // Inicializa la prueba
 async function runEmailTest() {
-  console.log('=== Iniciando prueba del sistema de emails de MyWed360 ===');
+  console.log('=== Iniciando prueba del sistema de emails de MaLoveApp ===');
 
   try {
     // 1. Inicializar el servicio con el perfil de usuario
@@ -102,7 +102,7 @@ async function runEmailTest() {
       <p>Saludos cordiales,<br>
       ${testUserProfile.brideFirstName}</p>
       
-      <p style="color:#888; font-size:12px;">Email de prueba - Sistema MyWed360</p>
+      <p style="color:#888; font-size:12px;">Email de prueba - Sistema MaLoveApp</p>
     `;
 
     const emailResult = await EmailService.sendMail({

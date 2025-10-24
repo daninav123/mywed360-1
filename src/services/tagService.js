@@ -13,8 +13,8 @@ import { _getStorage, loadJson, saveJson } from '../utils/storage.js';
 const runtimeCustomTags = {};
 
 // Claves para almacenamiento local
-const TAGS_STORAGE_KEY = 'mywed360_email_tags';
-const EMAIL_TAGS_MAPPING_KEY = 'mywed360_email_tags_mapping';
+const TAGS_STORAGE_KEY = 'maloveapp_email_tags';
+const EMAIL_TAGS_MAPPING_KEY = 'maloveapp_email_tags_mapping';
 
 // Etiquetas predefinidas por el sistema
 export const SYSTEM_TAGS = [

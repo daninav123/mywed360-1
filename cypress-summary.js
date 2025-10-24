@@ -46,7 +46,7 @@ function summarizeResults() {
     const passRate = total > 0 ? ((totalPass / total) * 100).toFixed(2) : 0;
     
     console.log('\n========================================');
-    console.log('📊 RESUMEN DE TESTS E2E - MyWed360');
+    console.log('📊 RESUMEN DE TESTS E2E - MaLoveApp');
     console.log('========================================');
     console.log(`✅ Tests Pasando:  ${totalPass}`);
     console.log(`❌ Tests Fallando: ${totalFail}`);

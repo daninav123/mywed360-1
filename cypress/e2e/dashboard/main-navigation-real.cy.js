@@ -147,8 +147,8 @@ describe('Dashboard - Navegación Principal (Real)', () => {
     
     // Verificar que la boda activa se mantiene en localStorage
     cy.window().then((win) => {
-      const activeWedding = win.localStorage.getItem('mywed360_active_wedding') ||
-                           win.localStorage.getItem('MyWed360_active_wedding');
+      const activeWedding = win.localStorage.getItem('maloveapp_active_wedding') ||
+                           win.localStorage.getItem('MaLoveApp_active_wedding');
       
       if (activeWedding) {
         cy.log(`✅ Boda activa mantenida: ${activeWedding}`);

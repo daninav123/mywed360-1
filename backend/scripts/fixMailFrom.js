@@ -1,10 +1,10 @@
 // Fix "from" field for legacy mails that were stored with a placeholder sender
 // Usage examples:
-//   node backend/scripts/fixMailFrom.js --toEmail=dani@mywed360.com --setFrom=dani@mywed360.com
-//   node backend/scripts/fixMailFrom.js --domain=mywed360.com --setFromDefault=no-reply@mywed360.com --dry
+//   node backend/scripts/fixMailFrom.js --toEmail=dani@maloveapp.com --setFrom=dani@maloveapp.com
+//   node backend/scripts/fixMailFrom.js --domain=maloveapp.com --setFromDefault=no-reply@maloveapp.com --dry
 // Notes:
-// - If --toEmail is provided, only updates mails where to == toEmail and from == 'yo@mywed360.com'
-// - If --domain is provided, updates mails where to endsWith('@<domain>') and from == 'yo@mywed360.com'
+// - If --toEmail is provided, only updates mails where to == toEmail and from == 'yo@maloveapp.com'
+// - If --domain is provided, updates mails where to endsWith('@<domain>') and from == 'yo@maloveapp.com'
 // - Will also try to update users/{uid}/mails/{id} when the owner can be resolved by myWed360Email or email
 
 import dotenv from 'dotenv';
@@ -35,7 +35,7 @@ if (!setFrom && !setFromDefault) {
 function shouldFix(doc) {
   const d = doc.data() || {};
   if (d.folder !== 'inbox') return false;
-  if (d.from !== 'yo@mywed360.com') return false;
+  if (d.from !== 'yo@maloveapp.com') return false;
   if (toEmail) return (d.to === toEmail);
   if (domain) return (typeof d.to === 'string' && d.to.endsWith(`@${domain}`));
   return false;

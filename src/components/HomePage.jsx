@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, useCallback, useMemo } from 'react';
+﻿import React, { useRef, useState, useEffect, useCallback, useMemo } from 'react';
 const normalizeLang = (l) =>
   String(l || 'es')
     .toLowerCase()
@@ -37,7 +37,7 @@ import { fetchWeddingNews } from '../services/blogService';
 import { fetchWall } from '../services/wallService';
 import { getSummary as getGamificationSummary } from '../services/GamificationService';
 
-// Las categorías se traducirán usando el hook useTranslations
+// Las categorÃ­as se traducirÃ¡n usando el hook useTranslations
 const getInspirationCategories = (t) => [
   { slug: 'decoracion', label: t('common.categories.decoration') },
   { slug: 'coctel', label: t('common.categories.cocktail') },
@@ -49,10 +49,10 @@ const getInspirationCategories = (t) => [
   { slug: 'fotografia', label: t('common.categories.photography') },
 ];
 
-const PROGRESS_STORAGE_KEY = 'mywed360_progress';
-// 2500 coincide con el límite superior del nivel 6 (Experto Wedding) en backend/services/gamificationService.js.
+const PROGRESS_STORAGE_KEY = 'maloveapp_progress';
+// 2500 coincide con el lÃ­mite superior del nivel 6 (Experto Wedding) en backend/services/gamificationService.js.
 const PROGRESS_COMPLETION_TARGET = 2500;
-// Diferencia mínima (en puntos porcentuales) para considerar que se va adelantado o retrasado.
+// Diferencia mÃ­nima (en puntos porcentuales) para considerar que se va adelantado o retrasado.
 const PROGRESS_DIFF_TOLERANCE = 5;
 const YEAR_IN_MS = 365 * 24 * 60 * 60 * 1000;
 
@@ -78,7 +78,7 @@ const writeStoredProgress = (value) => {
   try {
     window.localStorage.setItem(PROGRESS_STORAGE_KEY, String(clampPercent(value)));
   } catch {
-    // Ignorar errores de almacenamiento (modo incógnito, etc.)
+    // Ignorar errores de almacenamiento (modo incÃ³gnito, etc.)
   }
 };
 
@@ -221,7 +221,7 @@ export default function HomePage() {
         }
       } catch (error) {
         if (!cancelled) {
-          console.warn('[HomePage] No se pudo obtener el resumen de gamificación.', error);
+          console.warn('[HomePage] No se pudo obtener el resumen de gamificaciÃ³n.', error);
           setProgressError(error);
         }
       } finally {
@@ -256,7 +256,7 @@ export default function HomePage() {
   const progressStatusText = useMemo(() => {
     if (progressPercent >= 100) return '¡Progreso completo!';
     if (expectedProgress == null) {
-      return 'Progreso sin referencia temporal';
+      return '';
     }
     if (progressDiff !== null && progressDiff > PROGRESS_DIFF_TOLERANCE) {
       return 'Vas adelantado al plan previsto';
@@ -338,7 +338,7 @@ export default function HomePage() {
   }, [activeWeddingData, displayName]);
   const legacyWeddingName =
     typeof window !== 'undefined'
-      ? localStorage.getItem('mywed360_active_wedding_name') || ''
+      ? localStorage.getItem('maloveapp_active_wedding_name') || ''
       : '';
   const weddingName = resolvedWeddingName || legacyWeddingName || displayName;
   const logoUrl = userProfile?.logoUrl || '';
@@ -358,7 +358,7 @@ export default function HomePage() {
     if (!resolvedWeddingName) return;
     if (typeof window === 'undefined') return;
     try {
-      localStorage.setItem('mywed360_active_wedding_name', resolvedWeddingName);
+      localStorage.setItem('maloveapp_active_wedding_name', resolvedWeddingName);
     } catch {
       /* ignore storage errors */
     }
@@ -375,7 +375,7 @@ export default function HomePage() {
     return false;
   }, []);
 
-  // Cargar primera imagen de cada categoría destacada
+  // Cargar primera imagen de cada categorÃ­a destacada
   useEffect(() => {
     Promise.all(INSPIRATION_CATEGORIES.map(({ slug }) => fetchWall(1, slug)))
       .then((results) => {
@@ -394,7 +394,7 @@ export default function HomePage() {
         setCategoryImages(imgs);
       })
       .catch((error) => {
-        console.error('[HomePage] No se pudo precargar la galería de inspiración:', error);
+        console.error('[HomePage] No se pudo precargar la galerÃ­a de inspiraciÃ³n:', error);
       });
   }, []);
 
@@ -461,7 +461,7 @@ export default function HomePage() {
       } else {
         setNewsPosts([]);
         setNewsError(
-          'No se pudieron encontrar cuatro noticias con imagen en tu idioma en este momento. Inténtalo más tarde.'
+          'No se pudieron encontrar cuatro noticias con imagen en tu idioma en este momento. IntÃ©ntalo mÃ¡s tarde.'
         );
       }
     };
@@ -596,8 +596,8 @@ export default function HomePage() {
         };
         const updated = [normalized, ...existing].slice(0, 25);
         localStorage.setItem('lovendaProviders', JSON.stringify(updated));
-        window.dispatchEvent(new Event('mywed360-providers'));
-        toast.success('Proveedor añadido al panel rápido');
+        window.dispatchEvent(new Event('maloveapp-providers'));
+        toast.success('Proveedor aÃ±adido al panel rÃ¡pido');
       } catch (error) {
         console.warn('[HomePage] No se pudo guardar el proveedor seleccionado', error);
         toast.error('No se pudo guardar el proveedor seleccionado');
@@ -662,14 +662,14 @@ export default function HomePage() {
               </p>
               <p className="text-xs text-[color:var(--color-text)]/60" data-testid="home-progress-status">
                 {progressStatusText}
-                {expectedProgress != null ? ` · Esperado: ${expectedProgress}%` : ''}
+                {expectedProgress != null ? ` Â· Esperado: ${expectedProgress}%` : ''}
               </p>
               {progressLoading && (
                 <p className="text-xs text-[color:var(--color-text)]/40">Actualizando progreso...</p>
               )}
               {progressError && !progressLoading && (
                 <p className="text-xs text-[color:var(--color-danger)]">
-                  No pudimos sincronizar el avance. Se muestra el último valor guardado.
+                  No pudimos sincronizar el avance. Se muestra el Ãºltimo valor guardado.
                 </p>
               )}
             </div>
@@ -680,8 +680,8 @@ export default function HomePage() {
         <section className="z-10 p-6 grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
           {[
             { key: 'proveedor', label: 'Buscar proveedor', icon: User },
-            { key: 'invitado', label: 'Añadir invitado', icon: Users },
-            { key: 'movimiento', label: 'Añadir movimiento', icon: DollarSign },
+            { key: 'invitado', label: 'AÃ±adir invitado', icon: Users },
+            { key: 'movimiento', label: 'AÃ±adir movimiento', icon: DollarSign },
             { key: 'nota', label: 'Nueva nota', icon: Plus },
           ].map((action, idx) => {
             const Icon = action.icon;
@@ -728,7 +728,7 @@ export default function HomePage() {
           <div className="flex justify-between items-center mb-4">
             <Link to="/inspiracion">
               <button className="text-xl font-bold text-[var(--color-text)] hover:text-[var(--color-primary)]">
-                Inspiración para tu boda
+                InspiraciÃ³n para tu boda
               </button>
             </Link>
             <div className="flex space-x-2">
@@ -835,7 +835,7 @@ export default function HomePage() {
       {activeModal === 'invitado' && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-[var(--color-surface)] p-6 rounded-lg w-96 max-w-full">
-            <h2 className="text-xl font-bold mb-4">Añadir Invitado</h2>
+            <h2 className="text-xl font-bold mb-4">AÃ±adir Invitado</h2>
             <div className="space-y-4">
               <Input
                 label="Nombre"
@@ -876,13 +876,72 @@ export default function HomePage() {
                 Ir a invitados
               </button>
               <button
-                onClick={() => {
-                  const guests = JSON.parse(localStorage.getItem('mywed360Guests') || '[]');
-                  guests.push({ ...guest, id: Date.now() });
-                  localStorage.setItem('mywed360Guests', JSON.stringify(guests));
-                  setGuest({ name: '', side: 'novia', contact: '' });
-                  setActiveModal(null);
-                  toast.success('Invitado añadido');
+                onClick={async () => {
+                  const trimmedName = guest.name.trim();
+                  if (!trimmedName) {
+                    toast.error('AÃ±ade un nombre para el invitado.');
+                    return;
+                  }
+
+                  const contact = guest.contact.trim();
+                  const payload = {
+                    name: trimmedName,
+                    tags: guest.side ? [guest.side] : [],
+                    status: 'pending',
+                  };
+
+                  const notes = [];
+                  if (contact) {
+                    if (contact.includes('@')) {
+                      payload.email = contact;
+                    } else if (/^\+?\d[\d\s()-]{3,}$/.test(contact)) {
+                      payload.phone = contact;
+                    } else {
+                      notes.push(`Contacto: ${contact}`);
+                    }
+                  }
+                  notes.push('AÃ±adido desde la pantalla principal');
+                  payload.notes = notes.join(' Â· ');
+
+                  try {
+                    const result = await addGuestRecord(payload);
+                    if (result?.success) {
+                      const newGuest = result.guest || {
+                        ...payload,
+                        id: Date.now(),
+                        email: payload.email || '',
+                        phone: payload.phone || '',
+                      };
+
+                      try {
+                        const legacy = JSON.parse(localStorage.getItem('mywed360Guests') || '[]');
+                        legacy.push({
+                          id: newGuest.id,
+                          name: newGuest.name,
+                          side: guest.side,
+                          contact: guest.contact,
+                          status: newGuest.status || 'pending',
+                          email: newGuest.email || '',
+                          phone: newGuest.phone || '',
+                          notes: newGuest.notes || '',
+                        });
+                        localStorage.setItem('mywed360Guests', JSON.stringify(legacy));
+                      } catch {}
+
+                      try {
+                        await reloadGuests();
+                      } catch {}
+
+                      setGuest({ name: '', side: 'novia', contact: '' });
+                      setActiveModal(null);
+                      toast.success('Invitado aÃ±adido');
+                    } else {
+                      toast.error(result?.error || 'No se pudo aÃ±adir el invitado');
+                    }
+                  } catch (err) {
+                    console.error('[Home] addGuest quick action failed', err);
+                    toast.error('OcurriÃ³ un error al aÃ±adir el invitado.');
+                  }
                 }}
                 className="px-4 py-2 bg-[var(--color-primary)] text-white rounded"
               >
@@ -1005,3 +1064,4 @@ export default function HomePage() {
     </React.Fragment>
   );
 }
+

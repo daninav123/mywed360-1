@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useWedding } from '../../context/WeddingContext';
 import { db, auth } from '../../firebaseConfig';
 
-// Listens to 'mywed360-profile' changes and persists wedding/user config to Firestore
+// Listens to 'maloveapp-profile' changes and persists wedding/user config to Firestore
 export default function ConfigEventBridge() {
   const { activeWedding } = useWedding();
 
@@ -47,8 +47,8 @@ export default function ConfigEventBridge() {
       }
     };
 
-    window.addEventListener('mywed360-profile', handler);
-    return () => window.removeEventListener('mywed360-profile', handler);
+    window.addEventListener('maloveapp-profile', handler);
+    return () => window.removeEventListener('maloveapp-profile', handler);
   }, [activeWedding]);
 
   return null;

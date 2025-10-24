@@ -94,7 +94,7 @@ const LanguageSelector = ({
         </button>
 
         {isOpen && (
-          <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-50 min-w-[150px]">
+          <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-50 min-w-[150px] max-h-80 overflow-y-auto">
             {availableLanguages.map((language) => (
               <button
                 key={language.code}
@@ -130,7 +130,7 @@ const LanguageSelector = ({
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-50 min-w-full">
+        <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-50 min-w-full max-h-80 overflow-y-auto">
           {availableLanguages.map((language) => (
             <button
               key={language.code}

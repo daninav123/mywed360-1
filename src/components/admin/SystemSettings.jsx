@@ -34,25 +34,25 @@ function SystemSettings() {
 
   // Estados para las diferentes configuraciones
   const [generalSettings, setGeneralSettings] = useState({
-    siteName: 'MyWed360',
+    siteName: 'MaLoveApp',
     siteDescription: 'Plataforma de conexión con proveedores',
     maxUploadSize: 10,
     allowedFileTypes: '.jpg,.png,.pdf,.docx,.xlsx',
     enableUserRegistration: true,
     maintenanceMode: false,
-    contactEmail: 'soporte@mywed360.com',
+    contactEmail: 'soporte@maloveapp.com',
   });
 
   const [emailSettings, setEmailSettings] = useState({
-    defaultEmailDomain: 'mywed360.com',
-    smtpServer: 'smtp.mywed360.com',
+    defaultEmailDomain: 'maloveapp.com',
+    smtpServer: 'smtp.maloveapp.com',
     smtpPort: 587,
     smtpUseSSL: true,
     smtpUsername: '',
     smtpPassword: '',
     emailsPerHour: 100,
     maxAttachmentSize: 5,
-    defaultSignature: '-- Enviado desde MyWed360',
+    defaultSignature: '-- Enviado desde MaLoveApp',
   });
 
   const [securitySettings, setSecuritySettings] = useState({

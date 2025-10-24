@@ -432,7 +432,7 @@ Cypress.Commands.add('loginToLovenda', (email, password) => {
 /**
  * Comando para login como admin
  */
-Cypress.Commands.add('loginAsAdmin', (username = 'admin@lovenda.com', password = 'AdminPass123!') => {
+Cypress.Commands.add('loginAsAdmin', (username = 'admin@maloveapp.com', password = 'AdminPass123!') => {
   cy.visit('/admin/login');
   
   cy.get('input[type="email"], input[name="username"], [data-testid="admin-username"]')

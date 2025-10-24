@@ -211,8 +211,8 @@ describe('Flujo de Autenticación Real (Login/Logout)', () => {
 
     // Verificar que el email se guardó en localStorage
     cy.window().then((win) => {
-      const savedEmail = win.localStorage.getItem('mywed360_login_email') ||
-                        win.localStorage.getItem('lovenda_login_email') ||
+      const savedEmail = win.localStorage.getItem('maloveapp_login_email') ||
+                        win.localStorage.getItem('maloveapp_login_email') ||
                         win.localStorage.getItem('rememberedEmail');
       
       if (savedEmail) {

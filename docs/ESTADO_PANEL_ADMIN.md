@@ -1,4 +1,4 @@
-# 📊 Estado del Panel de Administrador - MyWed360
+# 📊 Estado del Panel de Administrador - MaLoveApp
 
 Última actualización: 21 octubre 2025, 00:37
 

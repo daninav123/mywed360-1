@@ -1,5 +1,5 @@
 /**
- * Service Worker para PWA - MyWed360
+ * Service Worker para PWA - MaLoveApp
  * Proporciona funcionalidad offline y caché inteligente
  */
 
@@ -8,12 +8,12 @@ import { precacheAndRoute } from 'workbox-precaching';
 // self.__WB_MANIFEST será reemplazado en build con la lista de assets
 precacheAndRoute(self.__WB_MANIFEST || []);
 
-const CACHE_NAME = 'mywed360-v1.0.0';
-const STATIC_CACHE = 'mywed360-static-v1';
-const DYNAMIC_CACHE = 'mywed360-dynamic-v1';
-const API_CACHE = 'mywed360-api-v1';
+const CACHE_NAME = 'maloveapp-v1.0.0';
+const STATIC_CACHE = 'maloveapp-static-v1';
+const DYNAMIC_CACHE = 'maloveapp-dynamic-v1';
+const API_CACHE = 'maloveapp-api-v1';
 // Share Target storage
-const SHARE_DB_NAME = 'mywed360-share-target';
+const SHARE_DB_NAME = 'maloveapp-share-target';
 const SHARE_STORE = 'shares';
 const SHARE_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 días
 
@@ -133,9 +133,9 @@ self.addEventListener('push', (event) => {
           : JSON.parse(event.data.text())
         : {};
     } catch {
-      data = { title: 'MyWed360', body: event.data?.text() };
+      data = { title: 'MaLoveApp', body: event.data?.text() };
     }
-    const title = data.title || 'MyWed360';
+    const title = data.title || 'MaLoveApp';
     const options = {
       body: data.body || 'Tienes una nueva notificación',
       icon: '/icon-192.png',

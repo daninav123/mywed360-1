@@ -1,4 +1,4 @@
-# Progreso Fase 2: Tests E2E Críticos - MyWed360
+# Progreso Fase 2: Tests E2E Críticos - MaLoveApp
 
 **Fecha inicio:** 21 de Octubre 2025, 6:00 PM  
 **Última actualización:** 21 de Octubre 2025, 6:30 PM  

@@ -49,7 +49,7 @@ function resolveShareUrl(token, weddingId) {
   if (!token || !weddingId) return '';
   const base =
     PUBLIC_BASE ||
-    (typeof window !== 'undefined' ? window.location.origin : 'https://mywed360.app');
+    (typeof window !== 'undefined' ? window.location.origin : 'https://maloveapp.app');
   return buildGuestShareUrl({
     baseUrl: base,
     token: token.token || token.id,

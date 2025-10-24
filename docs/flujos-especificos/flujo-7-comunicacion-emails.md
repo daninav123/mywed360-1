@@ -49,7 +49,7 @@
 - `UnifiedInbox/EmailList.jsx`:
   - Gestiona selección múltiple y “Eliminar” respetando la carpeta actual (mueve a papelera o elimina permanente en `trash`). Añade `data-testid` (`email-list-item`, `empty-folder-message`) para soportar Cypress.
   - Búsqueda: `searchTerm` dispara `debouncedSearchEmails` filtrando asunto, remitente y etiquetas en el estado global (`emailStore`). Se sincroniza con la query `?q=` para enlaces compartidos.
-  - Orden secundario: `sortMode` (`recent`, `oldest`, `bySender`) se almacena en estado global y localStorage (`mywed360_email_sort`). Falta cablear el menú de UI (TODO histórico) → ahora se definió que debe leer/escribir este estado.
+  - Orden secundario: `sortMode` (`recent`, `oldest`, `bySender`) se almacena en estado global y localStorage (`maloveapp_email_sort`). Falta cablear el menú de UI (TODO histórico) → ahora se definió que debe leer/escribir este estado.
   - TODO pendiente: mover la lógica de orden/búsqueda al backend (`GET /api/mail?search=&sort=`) cuando esté disponible.
 - - `UnifiedInbox/EmailDetail.jsx`:
   - Acciones según carpeta: en `trash` aparecen `Restaurar` y `Eliminar permanentemente`; fuera de `trash` se muestran `Mover a carpeta`, `Marcar importante` y `Agregar comentario`.
@@ -91,10 +91,10 @@
 - Alias: `hooks/useEmailUsername.jsx` escribe en `emailUsernames/{alias}` y `users/{uid}` (`emailUsername`, `myWed360Email`).
 - Configuración auto-respuesta / clasificación / cola: claves en `localStorage` (`mywed360.email.automation.*`, `mywed360.email.automation.schedule`…).
 - Contexto de personalización: `emailContext` se persistirá en `weddings/{id}/emailContext` con `{ language, tone, vibeKeywords[], specialInterests[], noGoItems[], contrastNotes[] }`. Se actualizará cuando cambien `weddingInsights` y expondrá versión para cache (`version`).
-- Etiquetas y carpetas personalizadas: `tagService.js` (`mywed360_email_tags_*`) y `folderService.js` (`mywed360_email_folders_{uid}` + `mywed360_email_folder_mapping_{uid}`) almacenan en `localStorage` con espejo opcional a Firestore; la UI principal todavía no consume dichos datos.
+- Etiquetas y carpetas personalizadas: `tagService.js` (`maloveapp_email_tags_*`) y `folderService.js` (`maloveapp_email_folders_{uid}` + `maloveapp_email_folder_mapping_{uid}`) almacenan en `localStorage` con espejo opcional a Firestore; la UI principal todavía no consume dichos datos.
 - Plantillas: API `/api/email-templates` (via `services/emailTemplatesService.js`); fallback a catálogo estático `services/emailTemplates.js`. No existe sincronización automática con Firestore.
-- Métricas agregadas: Firestore `emailMetrics/{userId}` (+ subcolección `daily`). El cálculo local guarda copia en `localStorage` (`mywed360_email_stats_{userId}`).
-- Tracking de proveedores/campañas AI: `services/EmailTrackingService.js` y `AIEmailTrackingService.js` usan `localStorage` (claves `mywed360_email_tracking`, `aiEmailActivities`, etc.). No hay persistencia servidor.
+- Métricas agregadas: Firestore `emailMetrics/{userId}` (+ subcolección `daily`). El cálculo local guarda copia en `localStorage` (`maloveapp_email_stats_{userId}`).
+- Tracking de proveedores/campañas AI: `services/EmailTrackingService.js` y `AIEmailTrackingService.js` usan `localStorage` (claves `maloveapp_email_tracking`, `aiEmailActivities`, etc.). No hay persistencia servidor.
 - Caché local: `utils/EmailCache.js` guarda correos por carpeta (`folder_inbox`, `folder_sent`, `folder_trash`, etc.) con límites configurables y debe invalidarse al mover o eliminar correos.
 
 ### 4.1 Modelo de correo (backend)
@@ -125,7 +125,7 @@ svp). |
 - users/{uid}/emailFolders/{folderId}: { name, color, unreadCount, system }.
 - users/{uid}/emailTags/{tagId}: { name, color, automationRule? }.
 - users/{uid}/emailFolderAssignments/{emailId}: preserva carpeta original para restauraciones.
-- olderService y 	agService mantienen espejo local (mywed360_email_*) mientras se consolida backend.
+- olderService y 	agService mantienen espejo local (maloveapp_email_*) mientras se consolida backend.
 
 ### 4.4 Eventos derivados
 - `emailEvents/{eventId}`: `{ emailId, weddingId, title, startAt, endAt, location, attendees[], status, taskId? }` (creados desde CalendarIntegration.jsx).
@@ -169,7 +169,7 @@ svp). |
 ## 7. Integración con otros flujos
 - **Flujo 3/9 (Invitaciones & RSVP):** `pages/Invitaciones.jsx` usa `EmailService.sendMail` para enviar invitaciones. Cada correo incluye `metadata = { guestId, weddingId, token }`; las auto-respuestas registran `rsvp_auto_reply_sent` y actualizan `guests/{guestId}.communicationLog`. Accesos limitados a owner/planner.
 - **Flujo 5 (Proveedores IA):** `ProviderSearchModal.jsx` busca proveedores (`/api/ai-suppliers` o OpenAI directo) y pre-carga el Smart Composer; `EmailTrackingService` etiqueta correos enviados a proveedores.
-- **Flujo 6 (Presupuesto/tareas):** `EmailInsights.jsx` dispara eventos (`window.dispatchEvent('mywed360-tasks')`) y botones de acceso rápido a `/tasks` y `/protocolo/timing`.
+- **Flujo 6 (Presupuesto/tareas):** `EmailInsights.jsx` dispara eventos (`window.dispatchEvent('maloveapp-tasks')`) y botones de acceso rápido a `/tasks` y `/protocolo/timing`.
 - **Flujo 12 (Notificaciones):** `EmailSettings` sincroniza categorías con `notificationPreferences` (`email.dailyDigest`, `email.immediateAlerts`). Cambios generan `notification_preferences_updated` y el backend ajusta campañas multicanal.
 - **Flujo 16 (IA Orquestador):** `automationEngine` puede crear borradores (`state=draft`) y sugerir respuestas. Eventos `automation_email_draft_created`, `automation_email_sent`, `automation_email_failed` alimentan auditoría. Si el orquestador cae, el inbox recurre a recomendaciones locales (`source=localFallback`).
 - **Flujo 2C (Personalización continua):** `EmailRecommendationService` escucha `weddingInsights` para adaptar copy y dispara eventos `email_contrast_message_sent` y `email_contrast_message_rejected` que alimentan el mapa de preferencias.

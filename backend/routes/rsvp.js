@@ -314,12 +314,12 @@ router.post('/reminders', requirePlanner, async (req, res) => {
             <p>Te recordamos confirmar tu asistencia a la boda. Puedes hacerlo en el siguiente enlace:</p>
             <p><a href="${rsvpLink}" target="_blank">Confirmar asistencia</a></p>
             <p>Gracias,</p>
-            <p>MyWed360</p>
+            <p>MaLoveApp</p>
           </div>`;
 
         if (!dryRun) {
           if (mailgun) {
-            const mailData = { from: 'notificaciones@mywed360.com', to: c.email, subject, html: bodyHtml, text: rsvpLink };
+            const mailData = { from: 'notificaciones@maloveapp.com', to: c.email, subject, html: bodyHtml, text: rsvpLink };
             try {
               await mailgun.messages().send(mailData);
             } catch (e1) {
@@ -332,7 +332,7 @@ router.post('/reminders', requirePlanner, async (req, res) => {
           } else {
             // Fallback: registrar en colecciÃ³n mails (simulaciÃ³n)
             batch.set(db.collection('mails').doc(), {
-              from: 'notificaciones@mywed360.com', to: c.email, subject,
+              from: 'notificaciones@maloveapp.com', to: c.email, subject,
               body: `RSVP: ${rsvpLink}`, html: bodyHtml, date: new Date().toISOString(), folder: 'sent', read: true
             });
           }

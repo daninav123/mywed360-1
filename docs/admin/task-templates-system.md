@@ -2,7 +2,7 @@
 
 ## Descripción General
 
-Sistema que permite a los administradores modificar desde el panel admin el seed de tareas (bloques y subtareas) que se aplica automáticamente a cada nueva boda creada en MyWed360.
+Sistema que permite a los administradores modificar desde el panel admin el seed de tareas (bloques y subtareas) que se aplica automáticamente a cada nueva boda creada en MaLoveApp.
 
 ## Arquitectura
 
@@ -54,7 +54,7 @@ Sistema que permite a los administradores modificar desde el panel admin el seed
   "notes": "Primera versión migrada desde defaultWeddingTasks.js",
   "updatedAt": "2025-10-20T19:30:00Z",
   "publishedAt": "2025-10-20T19:30:00Z",
-  "updatedBy": "admin@mywed360.com",
+  "updatedBy": "admin@maloveapp.com",
   "totals": {
     "blocks": 9,
     "subtasks": 42

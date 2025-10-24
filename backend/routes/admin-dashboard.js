@@ -89,6 +89,8 @@ const collections = {
   appDownloadEvents: () => db.collection('appDownloadEvents'),
   mobileDownloads: () => db.collection('mobileDownloads'),
   analyticsAppDownloads: () => db.collection('analyticsAppDownloads'),
+  webVisits: () => db.collection('webVisits'),
+  analyticsWebVisits: () => db.collection('analyticsWebVisits'),
   // ColecciÃ³n compuesta de tareas creadas por usuarios en bodas
   tasksGroup: () => db.collectionGroup('tasks'),
   // Plantillas de tareas administrativas
@@ -669,9 +671,9 @@ function serverTs() {
 
 function getActor(req) {
   try {
-    return String(req?.userProfile?.email || req?.user?.email || 'admin@lovenda.com');
+    return String(req?.userProfile?.email || req?.user?.email || 'admin@maloveapp.com');
   } catch {
-    return 'admin@lovenda.com';
+    return 'admin@maloveapp.com';
   }
 }
 
@@ -868,7 +870,7 @@ function mapWeddingDoc(doc) {
   return {
     id: doc.id,
     couple,
-    owner: ownerEmail || 'sin-owner@lovenda.com',
+    owner: ownerEmail || 'sin-owner@maloveapp.com',
     eventDate: formatDateOnly(eventDate) || '',
     status: data.status || 'draft',
     confirmedGuests: normalizeNumber(data.confirmedGuests ?? data.guestsConfirmed) ?? 0,
@@ -1112,6 +1114,180 @@ async function countDownloadsLast30d() {
   }
   
   return ids.size;
+}
+
+const BYTES_IN_GB = 1024 * 1024 * 1024;
+
+const normalizePlan = (value) => {
+  if (!value) return '';
+  return String(value).toLowerCase();
+};
+
+const isPremiumPlan = (planValue) => {
+  const normalized = normalizePlan(planValue);
+  if (!normalized) return false;
+  return (
+    normalized.includes('premium') ||
+    normalized.includes('pro') ||
+    normalized.includes('business') ||
+    normalized.includes('plan_b')
+  );
+};
+
+async function calculateStorageUsageStats() {
+  let totalBytes = 0;
+  let premiumBytes = 0;
+  let premiumCount = 0;
+  let source = 'fallback';
+
+  try {
+    const snapshot = await collections.weddings().get();
+    snapshot.forEach((doc) => {
+      const data = doc.data() || {};
+      const usage =
+        Number(data?.storageUsage?.bytes ?? data?.storage?.usageBytes ?? data?.storage?.totalBytes ?? 0) || 0;
+      totalBytes += usage;
+      const plan = data?.plan || data?.subscriptionPlan || data?.subscription?.planId || data?.subscription?.currentPlan?.id;
+      if (isPremiumPlan(plan)) {
+        premiumBytes += usage;
+        premiumCount += 1;
+      }
+    });
+    source = 'firestore';
+  } catch (error) {
+    logger.warn('[admin-dashboard] storage usage aggregation failed', { message: error?.message });
+  }
+
+  const premiumAverageBytes = premiumCount > 0 ? premiumBytes / premiumCount : 0;
+  return {
+    totalBytes,
+    totalGigabytes: totalBytes / BYTES_IN_GB,
+    premiumAverageBytes,
+    premiumAverageGigabytes: premiumAverageBytes / BYTES_IN_GB,
+    premiumCount,
+    source,
+  };
+}
+
+async function countDownloadsTotal() {
+  const candidates = [
+    { key: 'appDownloads' },
+    { key: 'appDownloadEvents' },
+    { key: 'mobileDownloads' },
+    { key: 'analyticsAppDownloads' },
+  ];
+  const ids = new Set();
+  for (const candidate of candidates) {
+    const factory = collections[candidate.key];
+    if (typeof factory !== 'function') continue;
+    try {
+      const docs = await fetchDocuments(() => factory(), [], 5000);
+      docs.forEach((doc) => ids.add(doc.id));
+    } catch (error) {
+      logger.warn('[admin-dashboard] total downloads aggregation failed', {
+        collection: candidate.key,
+        message: error?.message,
+      });
+    }
+  }
+  return ids.size;
+}
+
+function isPremiumUserDoc(data) {
+  if (!data || typeof data !== 'object') return false;
+  const plan =
+    data.plan ||
+    data.planType ||
+    data.subscriptionPlan ||
+    data.subscription?.planId ||
+    data.subscription?.currentPlan?.id ||
+    data.billing?.plan;
+  return isPremiumPlan(plan);
+}
+
+async function aggregateWebVisitStats(days = 30) {
+  const sinceDate = new Date(Date.now() - days * DAY_MS);
+  const sinceTimestamp = admin.firestore.Timestamp.fromDate(sinceDate);
+  const candidates = [
+    { key: 'analyticsWebVisits', fields: ['createdAt', 'eventAt', 'timestamp', 'visitedAt'] },
+    { key: 'webVisits', fields: ['createdAt', 'eventAt', 'timestamp', 'visitedAt'] },
+  ];
+
+  let total = 0;
+  const recentIds = new Set();
+  let source = 'fallback';
+
+  for (const candidate of candidates) {
+    const factory = collections[candidate.key];
+    if (typeof factory !== 'function') continue;
+
+    try {
+      const docs = await fetchDocuments(() => factory(), [], 5000);
+      if (docs.length > 0) source = candidate.key;
+      total += docs.length;
+      docs.forEach((doc) => {
+        const data = doc.data() || {};
+        const matchField = candidate.fields.find((field) => data[field]);
+        if (!matchField) return;
+        const visitDate = toDate(data[matchField]);
+        if (visitDate && visitDate >= sinceDate) {
+          recentIds.add(doc.id);
+        }
+      });
+    } catch (error) {
+      logger.warn('[admin-dashboard] web visits aggregation failed', {
+        collection: candidate.key,
+        message: error?.message,
+      });
+    }
+  }
+
+  return {
+    totalVisits: total,
+    newVisits: recentIds.size,
+    since: sinceDate.toISOString(),
+    source,
+  };
+}
+
+async function aggregateUserGrowthMetrics(days = 30) {
+  const sinceDate = new Date(Date.now() - days * DAY_MS);
+  const sinceTimestamp = admin.firestore.Timestamp.fromDate(sinceDate);
+  let newUsers = 0;
+  let newPremiumUsers = 0;
+  let source = 'firestore';
+
+  try {
+    const users = await fetchDocuments(
+      collections.users,
+      [{ field: 'createdAt', op: '>=', value: sinceTimestamp }],
+      5000,
+    );
+    newUsers = users.length;
+    users.forEach((doc) => {
+      const data = doc.data() || {};
+      if (isPremiumUserDoc(data)) newPremiumUsers += 1;
+    });
+  } catch (error) {
+    logger.warn('[admin-dashboard] new users aggregation failed', { message: error?.message });
+    source = 'fallback';
+  }
+
+  let totalUsers = 0;
+  try {
+    totalUsers = await countDocuments(collections.users);
+  } catch (error) {
+    logger.warn('[admin-dashboard] total users count failed', { message: error?.message });
+  }
+
+  return {
+    since: sinceDate.toISOString(),
+    newUsers,
+    newPremiumUsers,
+    newPremiumShare: newUsers > 0 ? newPremiumUsers / newUsers : 0,
+    totalUsers,
+    source,
+  };
 }
 
 async function countOpenAlertsRealtime() {
@@ -1586,10 +1762,24 @@ router.get('/metrics', async (_req, res) => {
     const supportMetrics = latest?.supportMetrics || null;
     
     // MÃ©tricas avanzadas en tiempo real
-    const [conversionMetrics, recurringRevenue, retentionData] = await Promise.all([
+    const [
+      conversionMetrics,
+      recurringRevenue,
+      retentionData,
+      storageMetrics,
+      totalDownloads,
+      trafficMetrics,
+      userGrowthMetrics,
+      downloadsLast30d
+    ] = await Promise.all([
       calculateConversionMetrics(),
       calculateRecurringRevenue(),
-      calculateRetentionMetrics(30)
+      calculateRetentionMetrics(30),
+      calculateStorageUsageStats(),
+      countDownloadsTotal(),
+      aggregateWebVisitStats(30),
+      aggregateUserGrowthMetrics(30),
+      countDownloadsLast30d(),
     ]);
     
     // userStats / weddingStats en tiempo real (best-effort)
@@ -1677,7 +1867,14 @@ router.get('/metrics', async (_req, res) => {
       weddingStats, 
       conversionMetrics, 
       recurringRevenue, 
-      retentionData 
+      retentionData,
+      storage: storageMetrics,
+      downloads: {
+        total: totalDownloads,
+        last30d: downloadsLast30d,
+      },
+      traffic: trafficMetrics,
+      userGrowth: userGrowthMetrics,
     });
   } catch (error) {
     logger.error('[admin-dashboard] metrics error', error);
@@ -2744,7 +2941,7 @@ router.post('/discounts', async (req, res) => {
     
     const newDiscount = {
       code: cleanCode,
-      url: cleanUrl || `https://mywed360.com/registro?ref=${cleanCode}`,
+      url: cleanUrl || `https://maloveapp.com/registro?ref=${cleanCode}`,
         type: cleanType,
         maxUses: maxUsesValue,
         usesCount: 0,
@@ -3022,7 +3219,7 @@ router.post('/reports/generate', async (req, res) => {
       await reportRef.set({
         status: 'completed',
         completedAt: serverTs(),
-        fileUrl: `https://mywed360-backend.onrender.com/api/reports/${reportRef.id}/download`
+        fileUrl: `https://maloveapp-backend.onrender.com/api/reports/${reportRef.id}/download`
       }, { merge: true });
     }, 2000);
     
@@ -3074,7 +3271,7 @@ router.post('/portfolio/export-pdf', async (req, res) => {
     
     // Generar contenido del PDF (formato simple)
     const pdfContent = {
-      title: 'Portfolio de Bodas - MyWed360',
+      title: 'Portfolio de Bodas - MaLoveApp',
       generatedAt: new Date().toISOString(),
       filters: { status: statusFilter || 'all', order, limit },
       total: weddings.length,
@@ -3403,5 +3600,12 @@ router.get('/debug/payments', async (req, res) => {
   }
 });
 
-export default router;
+export {
+  calculateStorageUsageStats,
+  countDownloadsTotal,
+  countDownloadsLast30d,
+  aggregateWebVisitStats,
+  aggregateUserGrowthMetrics,
+};
 
+export default router;

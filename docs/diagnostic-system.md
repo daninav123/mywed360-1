@@ -1,8 +1,8 @@
-# Sistema de Diagnóstico y Logging de Errores - MyWed360
+# Sistema de Diagnóstico y Logging de Errores - MaLoveApp
 
 ## Descripción General
 
-Se ha implementado un sistema completo de diagnóstico y logging de errores para identificar y resolver problemas en el proyecto MyWed360. Este sistema captura automáticamente todos los errores del frontend y backend, proporciona diagnósticos detallados de servicios críticos, y ofrece herramientas fáciles de usar desde la consola del navegador.
+Se ha implementado un sistema completo de diagnóstico y logging de errores para identificar y resolver problemas en el proyecto MaLoveApp. Este sistema captura automáticamente todos los errores del frontend y backend, proporciona diagnósticos detallados de servicios críticos, y ofrece herramientas fáciles de usar desde la consola del navegador.
 
 ## Características Principales
 
@@ -235,4 +235,4 @@ Para problemas adicionales:
 2. Ejecutar `mywed.copyErrors()` para obtener el reporte completo
 3. Enviar ambos reportes al equipo de desarrollo
 
-El sistema está diseñado para ser autosuficiente y proporcionar toda la información necesaria para diagnosticar y resolver problemas comunes en MyWed360.
+El sistema está diseñado para ser autosuficiente y proporcionar toda la información necesaria para diagnosticar y resolver problemas comunes en MaLoveApp.

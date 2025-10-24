@@ -53,7 +53,7 @@ describe('TagService', () => {
       ];
 
       // Guardar en localStorage
-      localStorage.setItem(`mywed360_email_tags_${userId}`, JSON.stringify(customTags));
+      localStorage.setItem(`maloveapp_email_tags_${userId}`, JSON.stringify(customTags));
 
       // Obtener todas las etiquetas
       const tags = TagService.getUserTags(userId);
@@ -91,7 +91,7 @@ describe('TagService', () => {
       const customTags = [{ id: 'custom1', name: 'Familia', color: '#F59E0B' }];
 
       // Guardar en localStorage
-      localStorage.setItem(`mywed360_email_tags_${userId}`, JSON.stringify(customTags));
+      localStorage.setItem(`maloveapp_email_tags_${userId}`, JSON.stringify(customTags));
 
       const tags = TagService.getCustomTags(userId);
 

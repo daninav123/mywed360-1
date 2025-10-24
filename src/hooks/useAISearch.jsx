@@ -3,7 +3,6 @@ import { useState, useCallback } from 'react';
 import useActiveWeddingInfo from './useActiveWeddingInfo';
 import { useAuth } from './useAuth';
 import { post as apiPost, get as apiGet } from '../services/apiClient';
-import { getAdminFetchOptions } from '../services/adminSession';
 
 const slugify = (value) =>
   !value
@@ -232,7 +231,11 @@ export const useAISearch = () => {
 
       let lastError = null;
 
-      const baseFetchOptions = getAdminFetchOptions({ silent: true, auth: !!user });
+      // Opciones de autenticación para llamadas a la API
+      const baseFetchOptions = {
+        auth: true, // Siempre enviar token de autenticación
+        silent: true,
+      };
 
       try {
         if (ENABLE_BACKEND_AI) {

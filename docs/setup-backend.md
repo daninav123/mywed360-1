@@ -2,7 +2,7 @@
 description: Guía de configuración Backend en nuevo entorno
 ---
 
-# Configuración rápida del Backend MyWed360 (Express)
+# Configuración rápida del Backend MaLoveApp (Express)
 
 > Sigue estos pasos después de clonar el repositorio para levantar el backend en un nuevo ordenador.
 

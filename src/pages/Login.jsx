@@ -25,7 +25,7 @@ export default function Login() {
   const { t } = useTranslations();
 
   const savedEmail =
-    typeof window !== 'undefined' ? window.localStorage.getItem('mywed360_login_email') || '' : '';
+    typeof window !== 'undefined' ? window.localStorage.getItem('maloveapp_login_email') || '' : '';
 
   const [username, setUsername] = useState(savedEmail);
   const [password, setPassword] = useState('');
@@ -54,7 +54,7 @@ export default function Login() {
   const shouldSkipCypressRedirect = () =>
     typeof window !== 'undefined' &&
     !!window.Cypress &&
-    window.__MYWED360_DISABLE_LOGIN_REDIRECT__ === true;
+    window.__MALOVEAPP_DISABLE_LOGIN_REDIRECT__ === true;
 
   useEffect(() => {
     if (isLoading) return;
@@ -147,9 +147,9 @@ export default function Login() {
       const result = await emailLogin(trimmedEmail, password, remember);
       if (result?.success) {
         if (remember) {
-          window.localStorage.setItem('mywed360_login_email', trimmedEmail);
+          window.localStorage.setItem('maloveapp_login_email', trimmedEmail);
         } else {
-          window.localStorage.removeItem('mywed360_login_email');
+          window.localStorage.removeItem('maloveapp_login_email');
         }
 
         performanceMonitor?.logEvent?.('login_success', {
@@ -199,7 +199,7 @@ export default function Login() {
       const result = await loginWithProvider(providerKey, {});
       if (result?.success) {
         if (remember && result.user?.email) {
-          window.localStorage.setItem('mywed360_login_email', result.user.email);
+          window.localStorage.setItem('maloveapp_login_email', result.user.email);
         }
 
         if (result.pendingRedirect) {
@@ -321,7 +321,7 @@ export default function Login() {
                       const isChecked = event.target.checked;
                       setRemember(isChecked);
                       if (!isChecked) {
-                        window.localStorage.removeItem('mywed360_login_email');
+                        window.localStorage.removeItem('maloveapp_login_email');
                       }
                     }}
                     className="rounded border-soft text-[color:var(--color-primary,#6366f1)] focus:ring-[color:var(--color-primary,#6366f1)]"

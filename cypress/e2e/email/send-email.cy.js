@@ -1,6 +1,6 @@
 describe('Flujo de envío de correo electrónico', () => {
   const testUser = {
-    email: 'usuario.test@lovenda.com',
+    email: 'usuario.test@maloveapp.com',
     password: 'contraseña123',
   };
 
@@ -39,7 +39,7 @@ describe('Flujo de envío de correo electrónico', () => {
         success: true,
         data: {
           id: 'email123',
-          from: 'maria.juan@lovenda.com',
+          from: 'maria.juan@maloveapp.com',
           to: testEmail.recipient,
           subject: testEmail.subject,
           date: new Date().toISOString(),

@@ -1,4 +1,4 @@
-# Guía de Onboarding — MyWed360
+# Guía de Onboarding — MaLoveApp
 
 Objetivo: que cualquier persona nueva pueda instalar, configurar y ejecutar el proyecto localmente con el menor roce posible.
 

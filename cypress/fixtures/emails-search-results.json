@@ -2,7 +2,7 @@
   {
     "id": "email001",
     "from": "proveedor@florista.com",
-    "to": "maria.garcia@lovenda.com",
+    "to": "maria.garcia@maloveapp.com",
     "subject": "Presupuesto de flores para boda",
     "body": "<p>Estimada María,</p><p>Adjunto el presupuesto para las flores de tu boda.</p><p>Saludos cordiales,<br/>Floristas Bella</p>",
     "attachments": [
@@ -21,7 +21,7 @@
   {
     "id": "email005",
     "from": "local@jardines.com",
-    "to": "maria.garcia@lovenda.com",
+    "to": "maria.garcia@maloveapp.com",
     "subject": "Presupuesto actualizado para reserva",
     "body": "<p>Hola María,</p><p>Te enviamos el presupuesto actualizado para la reserva del jardín.</p>",
     "attachments": [
@@ -40,7 +40,7 @@
   {
     "id": "email010",
     "from": "alojamiento@hotel.com",
-    "to": "maria.garcia@lovenda.com",
+    "to": "maria.garcia@maloveapp.com",
     "subject": "Presupuesto de habitaciones para invitados",
     "body": "<p>Buenas tardes,</p><p>Le adjuntamos el presupuesto para el bloque de habitaciones reservado para sus invitados.</p>",
     "attachments": [

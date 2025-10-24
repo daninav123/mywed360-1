@@ -7,13 +7,14 @@ import {
   Users,
 } from 'lucide-react';
 import React, { useEffect, useMemo, useState } from 'react';
+import useTranslations from '../../hooks/useTranslations';
 
 const TABS = [
-  { id: 'summary', label: 'Resumen', icon: Users },
-  { id: 'recommendations', label: 'Recomendaciones', icon: Lightbulb },
-  { id: 'conflicts', label: 'Conflictos', icon: AlertTriangle },
-  { id: 'staff', label: 'Staff', icon: ShieldCheck },
-  { id: 'history', label: 'Historial', icon: Clock },
+  { id: 'summary', icon: Users },
+  { id: 'recommendations', icon: Lightbulb },
+  { id: 'conflicts', icon: AlertTriangle },
+  { id: 'staff', icon: ShieldCheck },
+  { id: 'history', icon: Clock },
 ];
 
 const metricTone = (value, warnThreshold = null) => {
@@ -45,36 +46,55 @@ const isStaffGuest = (guest) => {
   ]
     .filter(Boolean)
     .map((value) => normalize(value));
-  const keywords = ['staff', 'proveedor', 'vendor', 'supplier', 'crew', 'catering', 'fotógrafo', 'fotografo', 'video', 'dj', 'musica', 'música'];
+  const keywords = ['staff', 'proveedor', 'vendor', 'supplier', 'crew', 'catering', 'fotografo', 'video', 'dj', 'musica'];
   return haystack.some((field) => keywords.some((keyword) => field.includes(keyword)));
 };
 
-const RecommendationCard = ({ item, onAssign, onFocus }) => {
+const RecommendationCard = ({ item, onAssign, onFocus, t, tPlural }) => {
   if (!item || !item.guest) return null;
   const top = Array.isArray(item.topRecommendations) ? item.topRecommendations[0] : null;
   if (!top) return null;
+  const guestName =
+    item.guest.name || t('planModern.guestSidebar.recommendations.guestFallback', { ns: 'seating' });
+  const clusterKey =
+    item.cluster === 'vip'
+      ? 'vip'
+      : item.cluster === 'familia'
+        ? 'familia'
+        : 'pending';
+  const clusterLabel = t(`planModern.guestSidebar.recommendations.clusters.${clusterKey}`, { ns: 'seating' });
+  const scoreLabel = t('planModern.guestSidebar.recommendations.score', {
+    ns: 'seating',
+    value: Math.round(top.score || 0),
+  });
+  const freeSeats = Number.isFinite(top.freeSeats) ? top.freeSeats : null;
+  const capacityText =
+    freeSeats == null
+      ? t('planModern.guestSidebar.recommendations.capacityUnknown', { ns: 'seating' })
+      : tPlural('planModern.guestSidebar.recommendations.capacityAvailable', freeSeats, {
+          ns: 'seating',
+          count: freeSeats,
+        });
   return (
     <article className="border border-slate-200 rounded-lg p-2 text-xs bg-slate-50/80 hover:bg-white transition shadow-sm">
       <header className="flex items-start justify-between gap-2">
         <div className="space-y-0.5">
-          <p className="text-sm font-semibold text-slate-900">{item.guest.name || 'Invitado'}</p>
+          <p className="text-sm font-semibold text-slate-900">{guestName}</p>
           {item.cluster && (
             <p className="text-[11px] uppercase tracking-wide text-slate-500">
-              {item.cluster === 'vip'
-                ? 'VIP pendiente'
-                : item.cluster === 'familia'
-                ? 'Familia cercana'
-                : 'Pendiente'}
+              {clusterLabel}
             </p>
           )}
         </div>
         <span className="px-2 py-0.5 rounded-full text-[10px] bg-emerald-50 text-emerald-600 font-semibold">
-          Score {Math.round(top.score || 0)}
+          {scoreLabel}
         </span>
       </header>
       <div className="mt-2 space-y-1">
         <div className="flex items-baseline gap-1">
-          <span className="font-medium text-slate-700">Mesa sugerida:</span>
+          <span className="font-medium text-slate-700">
+            {t('planModern.guestSidebar.recommendations.suggestedTable', { ns: 'seating' })}
+          </span>
           <button
             type="button"
             className="text-xs text-blue-600 hover:underline"
@@ -83,9 +103,7 @@ const RecommendationCard = ({ item, onAssign, onFocus }) => {
             {top.tableName || top.tableId}
           </button>
         </div>
-        <p className="text-[11px] text-slate-500">
-          Capacidad disponible: {top.freeSeats ?? '—'} asiento(s)
-        </p>
+        <p className="text-[11px] text-slate-500">{capacityText}</p>
       </div>
       <div className="mt-3 flex items-center justify-end gap-2">
         <button
@@ -93,37 +111,45 @@ const RecommendationCard = ({ item, onAssign, onFocus }) => {
           className="px-2 py-1 border border-slate-200 rounded text-[11px] text-slate-600 hover:bg-slate-100"
           onClick={() => onFocus?.(top.tableId)}
         >
-          Ver mesa
+          {t('planModern.guestSidebar.actions.viewTable', { ns: 'seating' })}
         </button>
         <button
           type="button"
           className="px-2 py-1 bg-emerald-600 text-white rounded text-[11px] hover:bg-emerald-700"
           onClick={() => onAssign?.(item.guest.id, top.tableId)}
         >
-          Asignar
+          {t('planModern.guestSidebar.actions.assign', { ns: 'seating' })}
         </button>
       </div>
     </article>
   );
 };
 
-const ConflictCard = ({ suggestion, onExecute, onFocus }) => {
+const ConflictCard = ({ suggestion, onExecute, onFocus, t }) => {
   if (!suggestion) return null;
   const severity =
     suggestion.severity === 'high'
       ? 'bg-red-50 border-red-100 text-red-700'
       : 'bg-amber-50 border-amber-100 text-amber-700';
+  const severityLabel =
+    suggestion.severity === 'high'
+      ? t('planModern.guestSidebar.conflicts.severityHigh', { ns: 'seating' })
+      : t('planModern.guestSidebar.conflicts.severityMedium', { ns: 'seating' });
+  const tableName =
+    suggestion.tableName ||
+    t('planModern.guestSidebar.conflicts.tableFallback', { ns: 'seating' });
+  const conflictMessage =
+    suggestion.conflict?.message ||
+    t('planModern.guestSidebar.conflicts.messageFallback', { ns: 'seating' });
   return (
     <article className="border border-slate-200 rounded-lg p-2 bg-white shadow-sm text-xs text-slate-700">
       <header className="flex items-start justify-between gap-2">
         <div>
-          <p className="text-sm font-semibold text-slate-900">{suggestion.tableName || 'Mesa'}</p>
-          <p className="text-[11px] text-slate-500">
-            {suggestion.conflict?.message || 'Conflicto detectado en la mesa.'}
-          </p>
+          <p className="text-sm font-semibold text-slate-900">{tableName}</p>
+          <p className="text-[11px] text-slate-500">{conflictMessage}</p>
         </div>
         <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${severity}`}>
-          {suggestion.severity === 'high' ? 'Crítico' : 'Atención'}
+          {severityLabel}
         </span>
       </header>
       {Array.isArray(suggestion.actions) && suggestion.actions.length > 0 && (
@@ -139,10 +165,13 @@ const ConflictCard = ({ suggestion, onExecute, onFocus }) => {
               }}
             >
               {action.type === 'reassign' && action.guestName
-                ? `Reubicar ${action.guestName}`
+                ? t('planModern.guestSidebar.conflicts.actions.reassign', {
+                    ns: 'seating',
+                    guest: action.guestName,
+                  })
                 : action.type === 'fix-position'
-                ? 'Ajustar mesa'
-                : 'Acción sugerida'}
+                  ? t('planModern.guestSidebar.conflicts.actions.fixPosition', { ns: 'seating' })
+                  : t('planModern.guestSidebar.conflicts.actions.generic', { ns: 'seating' })}
             </button>
           ))}
         </div>
@@ -151,34 +180,43 @@ const ConflictCard = ({ suggestion, onExecute, onFocus }) => {
   );
 };
 
-const StaffCard = ({ guest, onFocus }) => {
+const StaffCard = ({ guest, onFocus, t }) => {
   if (!guest) return null;
   const assigned = guest.tableId || guest.table;
   const badge = assigned ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-600';
+  const guestName =
+    guest.name || t('planModern.guestSidebar.staff.memberFallback', { ns: 'seating' });
+  const statusLabel = assigned
+    ? t('planModern.guestSidebar.staff.assigned', { ns: 'seating' })
+    : t('planModern.guestSidebar.staff.noTable', { ns: 'seating' });
+  const locationText = assigned
+    ? t('planModern.guestSidebar.staff.tableLabel', {
+        ns: 'seating',
+        table: guest.tableName || guest.tableId || guest.table,
+      })
+    : t('planModern.guestSidebar.staff.pending', { ns: 'seating' });
   return (
     <article className="border border-slate-200 rounded-lg p-2 text-xs bg-white shadow-sm">
       <header className="flex items-center justify-between gap-2">
         <div>
-          <p className="text-sm font-semibold text-slate-900">{guest.name || 'Miembro del staff'}</p>
+          <p className="text-sm font-semibold text-slate-900">{guestName}</p>
           {guest.role && (
             <p className="text-[11px] text-slate-500 capitalize">{guest.role}</p>
           )}
         </div>
         <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${badge}`}>
-          {assigned ? 'Asignado' : 'Sin mesa'}
+          {statusLabel}
         </span>
       </header>
       <div className="mt-2 flex items-center justify-between">
-        <p className="text-[11px] text-slate-500">
-          {assigned ? `Mesa: ${guest.tableName || guest.tableId || guest.table}` : 'Pendiente de ubicación'}
-        </p>
+        <p className="text-[11px] text-slate-500">{locationText}</p>
         {assigned && (
           <button
             type="button"
             className="text-[11px] text-blue-600 hover:underline"
             onClick={() => onFocus?.(guest.tableId || guest.table)}
           >
-            Ver mesa
+            {t('planModern.guestSidebar.actions.viewTable', { ns: 'seating' })}
           </button>
         )}
       </div>
@@ -186,7 +224,7 @@ const StaffCard = ({ guest, onFocus }) => {
   );
 };
 
-const HistoryEntry = ({ name, onLoad, onDelete }) => (
+const HistoryEntry = ({ name, onLoad, onDelete, t }) => (
   <li className="flex items-center justify-between gap-2 text-xs px-2 py-1.5 border border-slate-200 rounded-md bg-white shadow-sm">
     <span className="text-slate-700 truncate">{name}</span>
     <div className="flex items-center gap-2">
@@ -195,14 +233,14 @@ const HistoryEntry = ({ name, onLoad, onDelete }) => (
         className="text-[11px] text-blue-600 hover:underline"
         onClick={() => onLoad?.(name)}
       >
-        Cargar
+        {t('planModern.guestSidebar.history.load', { ns: 'seating' })}
       </button>
       <button
         type="button"
         className="text-[11px] text-rose-600 hover:underline"
         onClick={() => onDelete?.(name)}
       >
-        Eliminar
+        {t('planModern.guestSidebar.history.delete', { ns: 'seating' })}
       </button>
     </div>
   </li>
@@ -223,6 +261,7 @@ export default function SeatingGuestSidebar({
   loadSnapshot,
   deleteSnapshot,
 }) {
+  const { t, tPlural } = useTranslations();
   const [activeTab, setActiveTab] = useState('summary');
   const [snapshots, setSnapshots] = useState(() => {
     try {
@@ -301,21 +340,48 @@ export default function SeatingGuestSidebar({
   const renderSummary = () => (
     <div className="space-y-3">
       <div className="grid grid-cols-2 gap-2">
-        <Metric label="Invitados totales" value={stats.totalGuests} />
-        <Metric label="Asignados" value={stats.assignedGuests} />
-        <Metric label="Pendientes" value={stats.pendingGuests} tone={metricTone(stats.pendingGuests, 0)} />
-        <Metric label="VIP pendientes" value={stats.vipPending} tone={metricTone(stats.vipPending, 0)} />
-        <Metric label="Mesas casi llenas" value={stats.tablesNearlyFull} />
-        <Metric label="Asientos acompañantes" value={stats.companionSeats} />
-        <Metric label="Conflictos" value={stats.conflicts} tone={metricTone(stats.conflicts, 0)} />
-        <Metric label="Snapshots guardados" value={stats.snapshots} />
+        <Metric
+          label={t('planModern.guestSidebar.summary.metrics.totalGuests', { ns: 'seating' })}
+          value={stats.totalGuests}
+        />
+        <Metric
+          label={t('planModern.guestSidebar.summary.metrics.assigned', { ns: 'seating' })}
+          value={stats.assignedGuests}
+        />
+        <Metric
+          label={t('planModern.guestSidebar.summary.metrics.pending', { ns: 'seating' })}
+          value={stats.pendingGuests}
+          tone={metricTone(stats.pendingGuests, 0)}
+        />
+        <Metric
+          label={t('planModern.guestSidebar.summary.metrics.vipPending', { ns: 'seating' })}
+          value={stats.vipPending}
+          tone={metricTone(stats.vipPending, 0)}
+        />
+        <Metric
+          label={t('planModern.guestSidebar.summary.metrics.tablesNearlyFull', { ns: 'seating' })}
+          value={stats.tablesNearlyFull}
+        />
+        <Metric
+          label={t('planModern.guestSidebar.summary.metrics.companionSeats', { ns: 'seating' })}
+          value={stats.companionSeats}
+        />
+        <Metric
+          label={t('planModern.guestSidebar.summary.metrics.conflicts', { ns: 'seating' })}
+          value={stats.conflicts}
+          tone={metricTone(stats.conflicts, 0)}
+        />
+        <Metric
+          label={t('planModern.guestSidebar.summary.metrics.snapshots', { ns: 'seating' })}
+          value={stats.snapshots}
+        />
       </div>
       <button
         type="button"
         className="w-full flex items-center justify-center gap-2 px-3 py-2 border border-slate-200 rounded-lg text-sm text-slate-600 hover:bg-slate-100"
         onClick={onOpenGuestDrawer}
       >
-        Ver pendientes en detalle
+        {t('planModern.guestSidebar.summary.viewPending', { ns: 'seating' })}
         <Sparkles className="h-4 w-4 text-amber-500" />
       </button>
     </div>
@@ -326,8 +392,8 @@ export default function SeatingGuestSidebar({
       {topRecommendations.length === 0 ? (
         <EmptyState
           icon={Lightbulb}
-          title="Sin recomendaciones"
-          description="Todos los invitados pendientes ya tienen sugerencias aplicadas."
+          title={t('planModern.guestSidebar.recommendations.emptyTitle', { ns: 'seating' })}
+          description={t('planModern.guestSidebar.recommendations.emptyDescription', { ns: 'seating' })}
         />
       ) : (
         topRecommendations.map((item, index) => (
@@ -336,6 +402,8 @@ export default function SeatingGuestSidebar({
             item={item}
             onAssign={onAssignRecommendation}
             onFocus={onFocusTable}
+            t={t}
+            tPlural={tPlural}
           />
         ))
       )}
@@ -347,8 +415,8 @@ export default function SeatingGuestSidebar({
       {topConflicts.length === 0 ? (
         <EmptyState
           icon={AlertTriangle}
-          title="Sin conflictos"
-          description="No se detectaron problemas en las mesas."
+          title={t('planModern.guestSidebar.conflicts.emptyTitle', { ns: 'seating' })}
+          description={t('planModern.guestSidebar.conflicts.emptyDescription', { ns: 'seating' })}
         />
       ) : (
         topConflicts.map((item) => (
@@ -357,6 +425,7 @@ export default function SeatingGuestSidebar({
             suggestion={item}
             onExecute={onExecuteAction}
             onFocus={onFocusTable}
+            t={t}
           />
         ))
       )}
@@ -368,12 +437,12 @@ export default function SeatingGuestSidebar({
       {staffGuests.length === 0 ? (
         <EmptyState
           icon={ShieldCheck}
-          title="Sin staff registrado"
-          description="Agrega tags o roles para identificar rápidamente al personal y proveedores."
+          title={t('planModern.guestSidebar.staff.emptyTitle', { ns: 'seating' })}
+          description={t('planModern.guestSidebar.staff.emptyDescription', { ns: 'seating' })}
         />
       ) : (
         staffGuests.map((guest) => (
-          <StaffCard key={guest.id || guest.email || guest.phone} guest={guest} onFocus={onFocusTable} />
+          <StaffCard key={guest.id || guest.email || guest.phone} guest={guest} onFocus={onFocusTable} t={t} />
         ))
       )}
     </div>
@@ -384,8 +453,8 @@ export default function SeatingGuestSidebar({
       {snapshots.length === 0 ? (
         <EmptyState
           icon={Clock}
-          title="Sin snapshots guardados"
-          description="Guarda un snapshot desde la barra de herramientas para crear un historial de avances."
+          title={t('planModern.guestSidebar.history.emptyTitle', { ns: 'seating' })}
+          description={t('planModern.guestSidebar.history.emptyDescription', { ns: 'seating' })}
         />
       ) : (
         <ul className="space-y-2">
@@ -405,6 +474,7 @@ export default function SeatingGuestSidebar({
                   if (ok !== false) refreshSnapshots();
                 }
               }}
+              t={t}
             />
           ))}
         </ul>
@@ -432,8 +502,12 @@ export default function SeatingGuestSidebar({
   return (
     <aside className="bg-white border rounded-lg h-full flex flex-col overflow-hidden">
       <header className="border-b px-4 py-3">
-        <h3 className="text-sm font-semibold text-slate-900">Guest Sidebar</h3>
-        <p className="text-xs text-slate-500">Controla pendientes, recomendaciones y actividades del equipo.</p>
+        <h3 className="text-sm font-semibold text-slate-900">
+          {t('planModern.guestSidebar.header.title', { ns: 'seating' })}
+        </h3>
+        <p className="text-xs text-slate-500">
+          {t('planModern.guestSidebar.header.subtitle', { ns: 'seating' })}
+        </p>
       </header>
 
       <nav className="flex border-b border-slate-200 px-3 py-2 gap-2 overflow-x-auto">
@@ -450,7 +524,7 @@ export default function SeatingGuestSidebar({
               onClick={() => setActiveTab(tab.id)}
             >
               <Icon className="h-3.5 w-3.5" />
-              {tab.label}
+              {t(`planModern.guestSidebar.tabs.${tab.id}`, { ns: 'seating' })}
             </button>
           );
         })}

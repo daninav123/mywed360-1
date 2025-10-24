@@ -1,4 +1,4 @@
-﻿import express from 'express';
+import express from 'express';
 import crypto from 'crypto';
 import multer from 'multer';
 import { db } from '../db.js'; // Firestore
@@ -150,14 +150,22 @@ router.post('/', upload.any(), async (req, res) => {
         console.warn('Could not persist inbound attachments:', attErr?.message || attErr);
       }
 
-      // Guardar copia bajo subcolecciÃ³n del usuario si podemos resolverlo por email
+      // Guardar copia bajo subcolección del usuario si podemos resolverlo por email
       let ownerUid = null;
       try {
-        let userSnap = await db.collection('users').where('myWed360Email', '==', rcpt).limit(1).get();
+        // Buscar por maLoveEmail primero (nuevo sistema)
+        let userSnap = await db.collection('users').where('maLoveEmail', '==', rcpt).limit(1).get();
+        
+        // Fallback a myWed360Email (legacy)
         if (userSnap.empty) {
-          const legacy = rcpt.replace(/@mywed360\.com$/i, '@mywed360');
-          userSnap = await db.collection('users').where('myWed360Email', '==', legacy).limit(1).get();
+          userSnap = await db.collection('users').where('myWed360Email', '==', rcpt).limit(1).get();
         }
+        
+        // Fallback a email login
+        if (userSnap.empty) {
+          userSnap = await db.collection('users').where('email', '==', rcpt).limit(1).get();
+        }
+        
         if (!userSnap.empty) {
           ownerUid = userSnap.docs[0].id;
           await db.collection('users')
@@ -221,16 +229,21 @@ router.post('/', upload.any(), async (req, res) => {
             // Intentar resolver weddingId desde el propietario del correo
             let uid = ownerUid;
             if (!uid) {
-              let userSnap = await db.collection('users').where('myWed360Email', '==', rcpt).limit(1).get();
+              // Buscar por maLoveEmail primero
+              let userSnap = await db.collection('users').where('maLoveEmail', '==', rcpt).limit(1).get();
+              
+              // Fallback a myWed360Email
               if (userSnap.empty) {
-                const legacy = rcpt.replace(/@mywed360\.com$/i, '@mywed360');
-                userSnap = await db.collection('users').where('myWed360Email', '==', legacy).limit(1).get();
+                userSnap = await db.collection('users').where('myWed360Email', '==', rcpt).limit(1).get();
               }
+              
+              // Fallback a email login
+              if (userSnap.empty) {
+                userSnap = await db.collection('users').where('email', '==', rcpt).limit(1).get();
+              }
+              
               if (!userSnap.empty) {
                 uid = userSnap.docs[0].id;
-              } else {
-                const byLogin = await db.collection('users').where('email', '==', rcpt).limit(1).get();
-                if (!byLogin.empty) uid = byLogin.docs[0].id;
               }
               if (uid && !ownerUid) {
                 ownerUid = uid;

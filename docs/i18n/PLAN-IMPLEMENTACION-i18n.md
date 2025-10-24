@@ -1,6 +1,6 @@
 # 🌍 Plan de Implementación Multilenguaje
 
-**Proyecto:** MyWed360  
+**Proyecto:** MaLoveApp  
 **Fecha:** Octubre 2025  
 **Estado Actual:** 30% implementado  
 **Objetivo:** 100% multilenguaje en 4 idiomas principales

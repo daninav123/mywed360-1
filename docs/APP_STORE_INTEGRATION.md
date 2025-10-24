@@ -90,7 +90,7 @@ Añade a tu archivo `.env` del backend:
 APP_STORE_SHARED_SECRET=tu_shared_secret_aquí
 
 # Opcional: Configuración adicional
-APP_STORE_BUNDLE_ID=com.mywed360.app
+APP_STORE_BUNDLE_ID=com.maloveapp.app
 NODE_ENV=production
 ```
 
@@ -221,7 +221,7 @@ let base64Receipt = receiptData.base64EncodedString()
   currency: "EUR",
   
   // Metadata
-  bundleId: "com.mywed360.app",
+  bundleId: "com.maloveapp.app",
   environment: "Production" | "Sandbox",
   lastNotificationType: "SUBSCRIBED",
   lastNotificationAt: Timestamp

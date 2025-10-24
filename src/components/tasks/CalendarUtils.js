@@ -8,7 +8,7 @@ export function formatICalDate(date) {
 
 // Genera un archivo ICS completo a partir de eventos
 export function generateFullICS(events) {
-  const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//MyWed360//WeddingApp//ES'];
+  const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//MaLoveApp//WeddingApp//ES'];
   events.forEach((evt) => {
     lines.push('BEGIN:VEVENT');
     lines.push(`UID:${evt.id}`);
@@ -30,7 +30,7 @@ export function downloadAllICS(events) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'mywed360-eventos.ics';
+  a.download = 'maloveapp-eventos.ics';
   a.click();
   URL.revokeObjectURL(url);
 }

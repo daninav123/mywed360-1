@@ -20,7 +20,7 @@ export default function GamificationPanel({ embed = false, className = '' }) {
     let storedWeddingId = null;
     if (typeof window !== 'undefined') {
       try {
-        storedWeddingId = window.localStorage.getItem('mywed360_active_wedding');
+        storedWeddingId = window.localStorage.getItem('maloveapp_active_wedding');
       } catch (_) {
         storedWeddingId = null;
       }

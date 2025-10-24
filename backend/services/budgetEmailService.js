@@ -40,7 +40,7 @@ export async function sendBudgetStatusEmail({
   const text = template({ supplierName, description, amount, currency, statusText });
 
   const data = {
-    from: 'MyWed360 <info@mywed360.com>',
+    from: 'MaLoveApp <info@maloveapp.com>',
     to: supplierEmail,
     subject: `Presupuesto ${statusText}`,
     text,

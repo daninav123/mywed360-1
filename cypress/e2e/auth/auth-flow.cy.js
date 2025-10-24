@@ -6,7 +6,7 @@
 // - Logout desde el menú de usuario
 
 describe('Flujo 1 - Autenticación (login/logout)', () => {
-  const email = 'planner.e2e@lovenda.com';
+  const email = 'planner.e2e@maloveapp.com';
   const password = 'password123';
 
   beforeEach(() => {
@@ -36,8 +36,8 @@ describe('Flujo 1 - Autenticación (login/logout)', () => {
       onBeforeLoad: (win) => {
         try {
           forceCleanAuthPersistence(win);
-          win.__MYWED360_DISABLE_AUTOLOGIN__ = true;
-          win.__MYWED360_DISABLE_LOGIN_REDIRECT__ = true;
+          win.__MALOVEAPP_DISABLE_AUTOLOGIN__ = true;
+          win.__MALOVEAPP_DISABLE_LOGIN_REDIRECT__ = true;
         } catch (_) {}
       },
     });
@@ -69,20 +69,20 @@ describe('Flujo 1 - Autenticación (login/logout)', () => {
     // Desactivar el bypass de rutas protegidas para validar logout real
     cy.window().then((win) => {
       try {
-        win.__MYWED360_DISABLE_PROTECTED_BYPASS__ = true;
+        win.__MALOVEAPP_DISABLE_PROTECTED_BYPASS__ = true;
       } catch (_) {}
     });
 
     // El email debe persistirse por remember me
     cy.window().then((win) => {
       const rememberedEmail =
-        win.localStorage.getItem('mywed360_login_email') ||
-        win.localStorage.getItem('lovenda_login_email');
+        win.localStorage.getItem('maloveapp_login_email') ||
+        win.localStorage.getItem('maloveapp_login_email');
       expect(rememberedEmail).to.eq(email);
       // También debe existir sesión mock del hook unificado
       const profile =
-        win.localStorage.getItem('MyWed360_user_profile') ||
-        win.localStorage.getItem('lovenda_user');
+        win.localStorage.getItem('MaLoveApp_user_profile') ||
+        win.localStorage.getItem('maloveapp_user');
       expect(profile).to.exist;
     });
 
@@ -95,9 +95,9 @@ describe('Flujo 1 - Autenticación (login/logout)', () => {
 
     cy.window().then((win) => {
       try {
-        win.__MYWED360_DISABLE_LOGIN_REDIRECT__ = false;
-        win.__MYWED360_DISABLE_AUTOLOGIN__ = false;
-        win.__MYWED360_DISABLE_PROTECTED_BYPASS__ = false;
+        win.__MALOVEAPP_DISABLE_LOGIN_REDIRECT__ = false;
+        win.__MALOVEAPP_DISABLE_AUTOLOGIN__ = false;
+        win.__MALOVEAPP_DISABLE_PROTECTED_BYPASS__ = false;
       } catch (_) {}
     });
   });

@@ -184,19 +184,19 @@ export async function sendTestEmail(from, to, mailgunClient) {
       };
     }
 
-    const result = await mailgunClient.messages.create(process.env.MAILGUN_DOMAIN || 'mywed360.com', {
+    const result = await mailgunClient.messages.create(process.env.MAILGUN_DOMAIN || 'maloveapp.com', {
       from,
       to,
-      subject: 'Prueba de configuración de email - MyWed360',
+      subject: 'Prueba de configuración de email - MaLoveApp',
       text: 'Este es un email de prueba para validar la configuración de SPF/DKIM.\n\n' +
             'Si recibes este mensaje, tu configuración de email está funcionando correctamente.\n\n' +
             '¡Felicitaciones!\n\n' +
-            'Equipo MyWed360',
+            'Equipo MaLoveApp',
       html: '<h2>Prueba de configuración de email</h2>' +
             '<p>Este es un email de prueba para validar la configuración de SPF/DKIM.</p>' +
             '<p>Si recibes este mensaje, tu configuración de email está funcionando correctamente.</p>' +
             '<p><strong>¡Felicitaciones!</strong></p>' +
-            '<p>Equipo MyWed360</p>'
+            '<p>Equipo MaLoveApp</p>'
     });
 
     logger.info(`Email de prueba enviado: ${result.id}`);

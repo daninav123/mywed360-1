@@ -76,10 +76,17 @@ async function resolveRecipientUid(addresses) {
   const candidates = normalizeAddressList(addresses);
   for (const email of candidates) {
     try {
-      const aliasSnap = await db.collection('users').where('myWed360Email', '==', email).limit(1).get();
-      if (!aliasSnap.empty) return aliasSnap.docs[0].id;
-      const loginSnap = await db.collection('users').where('email', '==', email).limit(1).get();
-      if (!loginSnap.empty) return loginSnap.docs[0].id;
+      // Buscar por maLoveEmail primero (nuevo sistema)
+      let userSnap = await db.collection('users').where('maLoveEmail', '==', email).limit(1).get();
+      if (!userSnap.empty) return userSnap.docs[0].id;
+      
+      // Fallback a myWed360Email (legacy)
+      userSnap = await db.collection('users').where('myWed360Email', '==', email).limit(1).get();
+      if (!userSnap.empty) return userSnap.docs[0].id;
+      
+      // Fallback a email login
+      userSnap = await db.collection('users').where('email', '==', email).limit(1).get();
+      if (!userSnap.empty) return userSnap.docs[0].id;
     } catch (error) {
       console.warn('[mailSendService] No se pudo resolver el destinatario', email, error?.message || error);
     }
@@ -116,6 +123,7 @@ export async function sendMailAndPersist({
 
   const resolvedFrom =
     fromOverride ||
+    profile?.maLoveEmail ||
     profile?.myWed360Email ||
     profile?.email ||
     process.env.DEFAULT_EMAIL_SENDER ||

@@ -57,8 +57,8 @@ function getConfig() {
   const windowMinutes = Number(process.env.ADMIN_LOGIN_WINDOW_MINUTES || '60');
   const lockMinutes = Number(process.env.ADMIN_LOGIN_LOCK_MINUTES || '15');
   const sessionTtlMinutes = Number(process.env.ADMIN_SESSION_TTL_MINUTES || '720');
-  const adminEmail = process.env.ADMIN_EMAIL || 'admin@lovenda.com';
-  const adminName = process.env.ADMIN_NAME || 'Administrador Lovenda';
+  const adminEmail = process.env.ADMIN_EMAIL || 'admin@maloveapp.com';
+  const adminName = process.env.ADMIN_NAME || 'Administrador MaLoveApp';
   // En desarrollo, si no hay contraseña definida, usar un valor por defecto compatible con E2E
   const adminPassword = process.env.ADMIN_PASSWORD || (process.env.NODE_ENV !== 'production' ? 'AdminPass123!' : '');
   const adminPasswordHash = process.env.ADMIN_PASSWORD_HASH || '';

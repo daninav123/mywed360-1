@@ -13,7 +13,7 @@ describe('Tareas - Modal "Ver todas las tareas" muestra subtareas', () => {
         const mockWeddingId = 'w1';
         const mockUser = {
           uid: 'cypress-test',
-          email: 'usuario.test@lovenda.com',
+          email: 'usuario.test@maloveapp.com',
           displayName: 'Usuario Test Cypress',
         };
 
@@ -25,12 +25,12 @@ describe('Tareas - Modal "Ver todas las tareas" muestra subtareas', () => {
         try {
           win.localStorage.setItem('userEmail', mockUser.email);
           win.localStorage.setItem('isLoggedIn', 'true');
-          win.localStorage.setItem('lovenda_user', JSON.stringify(mockUser));
-          win.localStorage.setItem('mywed360_user', JSON.stringify(mockUser));
-          win.localStorage.setItem('MyWed360_user_profile', JSON.stringify(mockUser));
-          win.localStorage.setItem('mywed360_active_wedding', mockWeddingId);
-          win.localStorage.setItem('lovenda_active_wedding', mockWeddingId);
-          win.localStorage.setItem('mywed360_login_email', mockUser.email);
+          win.localStorage.setItem('maloveapp_user', JSON.stringify(mockUser));
+          win.localStorage.setItem('maloveapp_user', JSON.stringify(mockUser));
+          win.localStorage.setItem('MaLoveApp_user_profile', JSON.stringify(mockUser));
+          win.localStorage.setItem('maloveapp_active_wedding', mockWeddingId);
+          win.localStorage.setItem('maloveapp_active_wedding', mockWeddingId);
+          win.localStorage.setItem('maloveapp_login_email', mockUser.email);
         } catch (error) {
           // eslint-disable-next-line no-console
           console.warn('[tasks E2E] No se pudo hidratar localStorage mock:', error);

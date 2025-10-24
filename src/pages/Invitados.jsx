@@ -36,7 +36,7 @@ import { toE164, schedule as scheduleWhats } from '../services/whatsappService';
  */
 function Invitados() {
   // Detectar si estamos en modo test
-  const isTestMode = typeof window !== 'undefined' && (window.Cypress || window.__MYWED360_TEST_MODE__);
+  const isTestMode = typeof window !== 'undefined' && (window.Cypress || window.__MALOVEAPP_TEST_MODE__);
   
   // Estados para modales
   const [showGuestModal, setShowGuestModal] = useState(false);

@@ -1,6 +1,6 @@
-# Guía de usuario · MyWed360 Planner Digital
+# Guía de usuario · MaLoveApp Planner Digital
 
-MyWed360 captura el estilo y las necesidades únicas de tu boda para guiarte paso a paso. Esta guía resume la experiencia completa, desde el descubrimiento inicial hasta las recomendaciones personalizadas y la coordinación del día B.
+MaLoveApp captura el estilo y las necesidades únicas de tu boda para guiarte paso a paso. Esta guía resume la experiencia completa, desde el descubrimiento inicial hasta las recomendaciones personalizadas y la coordinación del día B.
 
 ---
 
@@ -48,7 +48,7 @@ MyWed360 captura el estilo y las necesidades únicas de tu boda para guiarte pas
 
 ## 5. Comunicación Centralizada
 - **Email personalizado**  
-  Tu dirección `tunombre@mywed360.com` agrupa toda la comunicación de la boda. Sigue usando las opciones de plantillas, alias y calendario automático.
+  Tu dirección `tunombre@maloveapp.com` agrupa toda la comunicación de la boda. Sigue usando las opciones de plantillas, alias y calendario automático.
 - **Mensajería inteligente**  
   El asistente IA propone borradores basados en el perfil y el historial: agradecimientos, recordatorios de RSVP, confirmaciones de proveedores.
 - **Notificaciones**  
@@ -77,8 +77,8 @@ MyWed360 captura el estilo y las necesidades únicas de tu boda para guiarte pas
 ---
 
 ## 8. Soporte y Recursos
-- Centro de ayuda: [ayuda.mywed360.com](https://ayuda.mywed360.com)
-- Soporte directo: `soporte@mywed360.com`
+- Centro de ayuda: [ayuda.maloveapp.com](https://ayuda.maloveapp.com)
+- Soporte directo: `soporte@maloveapp.com`
 - Guía de diseño y inspiración: `docs/diseno/README.md`
 - Tono y storytelling: `docs/personalizacion/tono-mensajes.md`
 

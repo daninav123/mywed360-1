@@ -38,11 +38,11 @@ const prepareSession = (visitUrl) => {
   cy.visit(visitUrl, {
     onBeforeLoad(win) {
       win.localStorage.clear();
-      win.localStorage.setItem('MyWed360_user_profile', JSON.stringify(mockProfile));
-      win.localStorage.setItem('mywed360_active_wedding', 'w-proto');
-      win.localStorage.setItem('lovenda_active_wedding', 'w-proto');
+      win.localStorage.setItem('MaLoveApp_user_profile', JSON.stringify(mockProfile));
+      win.localStorage.setItem('maloveapp_active_wedding', 'w-proto');
+      win.localStorage.setItem('maloveapp_active_wedding', 'w-proto');
       win.localStorage.setItem('mywed360SpecialMoments', JSON.stringify(mockSpecialMoments));
-      win.localStorage.setItem('mywed360_manual_checkpoints_w-proto', JSON.stringify(mockManualChecklist));
+      win.localStorage.setItem('maloveapp_manual_checkpoints_w-proto', JSON.stringify(mockManualChecklist));
       win.__MOCK_WEDDING__ = {
         weddings: [{ id: 'w-proto', name: 'Boda Protocolaria', location: 'Valencia' }],
         activeWedding: { id: 'w-proto' },

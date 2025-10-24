@@ -60,7 +60,7 @@ vi.mock('../../hooks/useAuth', () => ({
 const mockEmail = {
   id: 'email123',
   from: 'proveedor@florista.com',
-  to: 'maria.garcia@mywed360.com',
+  to: 'maria.garcia@maloveapp.com',
   subject: 'Presupuesto de flores para boda',
   body: '<p>Estimada María,</p><p>Adjunto el presupuesto para las flores de tu boda.</p><p>Saludos cordiales,<br/>Floristas Bella</p>',
   attachments: [
@@ -82,7 +82,7 @@ const mockEmails = [
   {
     id: 'email456',
     from: 'fotografia@capturamos.com',
-    to: 'maria.garcia@mywed360.com',
+    to: 'maria.garcia@maloveapp.com',
     subject: 'Catálogo de fotos',
     body: '<p>Hola María,</p><p>Te enviamos nuestro catálogo de fotografías.</p>',
     attachments: [],

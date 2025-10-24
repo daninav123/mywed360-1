@@ -16,7 +16,7 @@ export default function TaskNotificationWatcher({ intervalMs = 5 * 60 * 1000 }) 
     let running = false;
     if (!db || !activeWedding || !firebaseUid) return;
 
-    const seenKey = 'mywed360_tasks_notif_seen';
+    const seenKey = 'maloveapp_tasks_notif_seen';
     const loadSeen = () => {
       try { return JSON.parse(localStorage.getItem(seenKey) || '{}'); } catch { return {}; }
     };

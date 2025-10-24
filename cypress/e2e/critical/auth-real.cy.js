@@ -204,8 +204,8 @@ describe('Tests Críticos de Autenticación (Real)', () => {
       const noFirebaseUser = !win.firebaseAuth?.currentUser;
       
       // Verificar localStorage limpio
-      const noLocalUser = !win.localStorage.getItem('MyWed360_user_profile') &&
-                         !win.localStorage.getItem('MyWed360_mock_user');
+      const noLocalUser = !win.localStorage.getItem('MaLoveApp_user_profile') &&
+                         !win.localStorage.getItem('MaLoveApp_mock_user');
       
       // Al menos uno debe ser verdad (sesión limpiada)
       if (noFirebaseUser || noLocalUser) {

@@ -44,7 +44,7 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  🏠 MyWed360    Banquete · Ceremonia    120 invitados    María & Juan │ ← Header 50px
+│  🏠 MaLoveApp    Banquete · Ceremonia    120 invitados    María & Juan │ ← Header 50px
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                   │
 │  ┌────┐                   CANVAS INFINITO                        │
@@ -258,7 +258,7 @@ const [snapGuides, setSnapGuides] = useState([]);
 <header className="h-12 border-b border-white/10 
                    flex items-center justify-between px-4">
   <div className="flex items-center gap-4">
-    <HomeIcon /> MyWed360 / Seating
+    <HomeIcon /> MaLoveApp / Seating
   </div>
   
   <Tabs value={tab} onChange={setTab} />

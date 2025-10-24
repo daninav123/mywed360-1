@@ -7,6 +7,6 @@ describe('GET / (health check)', () => {
   it('debe responder con status ok', async () => {
     const res = await request(app).get('/');
     expect(res.status).toBe(200);
-    expect(res.body).toEqual({ status: 'ok', service: 'mywed360-backend' });
+    expect(res.body).toEqual({ status: 'ok', service: 'maloveapp-backend' });
   });
 });

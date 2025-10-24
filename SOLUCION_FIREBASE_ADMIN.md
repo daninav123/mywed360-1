@@ -36,7 +36,7 @@ Si la Solución 1 no funciona, necesitas una nueva clave:
 ### Pasos:
 
 1. **Ve a Firebase Console:**
-   https://console.firebase.google.com/u/0/project/lovenda-98c77/settings/serviceaccounts/adminsdk
+   https://console.firebase.google.com/u/0/project/maloveapp-98c77/settings/serviceaccounts/adminsdk
 
 2. **Genera nueva clave:**
    - Click en "Generate new private key"

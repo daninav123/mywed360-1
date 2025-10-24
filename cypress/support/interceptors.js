@@ -12,7 +12,7 @@ export function setupGlobalInterceptors() {
       refreshToken: 'mock-refresh-token',
       expiresIn: '3600',
       localId: 'mock-user-id',
-      email: 'test@lovenda.com',
+      email: 'test@maloveapp.com',
     },
   });
 
@@ -64,7 +64,7 @@ export function setupGlobalInterceptors() {
         statusCode: 200,
         body: {
           id: 'cypress-user',
-          email: 'test@lovenda.com',
+          email: 'test@maloveapp.com',
           role: 'owner',
         },
       });
@@ -138,7 +138,7 @@ export function setupAdminInterceptors() {
       token: 'mock-admin-token',
       user: {
         id: 'admin-1',
-        email: 'admin@lovenda.com',
+        email: 'admin@maloveapp.com',
         role: 'admin',
       },
     },

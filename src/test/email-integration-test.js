@@ -1,6 +1,6 @@
 /**
  * Script de prueba de integración para validar el funcionamiento conjunto
- * del sistema de emails, calendario y plantillas de MyWed360.
+ * del sistema de emails, calendario y plantillas de MaLoveApp.
  *
  * Este script simula un flujo completo de usuario, desde recepción de emails
  * hasta la creación de eventos en calendario y uso de plantillas.
@@ -14,7 +14,7 @@ const mockServices = {
       {
         id: 'email_001',
         from: 'fotografo@ejemplo.com',
-        to: 'maria.garcia@mywed360.com',
+        to: 'maria.garcia@maloveapp.com',
         subject: 'Disponibilidad para sesión de fotos',
         body: `<p>Hola María,</p>
         <p>Te confirmo que tengo disponibilidad para la sesión de fotos que solicitaste el 15/09/2025 a las 16:30.</p>
@@ -30,7 +30,7 @@ const mockServices = {
       {
         id: 'email_002',
         from: 'catering@ejemplo.com',
-        to: 'maria.garcia@mywed360.com',
+        to: 'maria.garcia@maloveapp.com',
         subject: 'Presupuesto para tu boda',
         body: `<p>Hola María,</p>
         <p>Adjunto encontrarás el presupuesto detallado para el servicio de catering que solicitaste.</p>
@@ -55,7 +55,7 @@ const mockServices = {
     sentEmails: [
       {
         id: 'email_003',
-        from: 'maria.garcia@mywed360.com',
+        from: 'maria.garcia@maloveapp.com',
         to: 'florista@ejemplo.com',
         subject: 'Consulta sobre arreglos florales',
         body: `<p>Estimados,</p>
@@ -132,7 +132,7 @@ const mockServices = {
       console.log('Enviando email:', mailData);
       return {
         id: `email_${Date.now()}`,
-        from: 'maria.garcia@mywed360.com',
+        from: 'maria.garcia@maloveapp.com',
         to: mailData.to,
         subject: mailData.subject,
         body: mailData.body,
@@ -331,7 +331,7 @@ const mockComponents = {
 // Ejecutar prueba completa de integración
 async function runIntegrationTest() {
   console.log('==========================================================');
-  console.log('= PRUEBA DE INTEGRACIÓN DEL SISTEMA DE EMAILS DE MYWED360 =');
+  console.log('= PRUEBA DE MALOVEAPP =');
   console.log('==========================================================');
 
   try {
@@ -355,7 +355,7 @@ async function runIntegrationTest() {
     );
 
     console.log('\nPrueba de integración completada correctamente.');
-    console.log('El sistema de emails personalizado de MyWed360 funciona según lo esperado.');
+    console.log('El sistema de emails personalizado de MaLoveApp funciona según lo esperado.');
   } catch (error) {
     console.error('\n❌ ERROR EN LA PRUEBA DE INTEGRACIÓN:', error);
   }

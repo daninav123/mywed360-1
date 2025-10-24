@@ -10,7 +10,7 @@ import {
 } from '../services/EmailTrackingService';
 
 // Clave usada por el servicio
-const KEY = 'mywed360_email_tracking';
+const KEY = 'maloveapp_email_tracking';
 
 describe('EmailTrackingService (mínimo)', () => {
   beforeEach(() => {

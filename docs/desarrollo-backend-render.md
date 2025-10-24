@@ -8,8 +8,8 @@ Este proyecto está preparado para desarrollar el frontend contra el backend des
 
 ## Configuración local rápida
 - `.env.example` ya apunta por defecto a Render:
-  - `VITE_BACKEND_BASE_URL=https://mywed360-backend.onrender.com`
-  - `VITE_BANK_API_BASE_URL=https://mywed360-backend.onrender.com/api`
+  - `VITE_BACKEND_BASE_URL=https://maloveapp-backend.onrender.com`
+  - `VITE_BANK_API_BASE_URL=https://maloveapp-backend.onrender.com/api`
   - `VITE_ENABLE_DIRECT_OPENAI=false` (recomendado mantenerlo así)
 
 ## Levantar el frontend

@@ -1,6 +1,6 @@
-# 📊 Informe Final de Entrega - Sistema i18n MyWed360
+# 📊 Informe Final de Entrega - Sistema i18n MaLoveApp
 
-**Proyecto:** MyWed360  
+**Proyecto:** MaLoveApp  
 **Cliente:** Daniel Navarro  
 **Fecha:** 23 Octubre 2025  
 **Duración:** 3 horas

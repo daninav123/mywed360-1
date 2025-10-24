@@ -21,8 +21,8 @@ describe('Flujo 6 - Finanzas completo', () => {
     cy.loginToLovenda();
     // Eliminar boda activa para forzar modo local/offline
     cy.window().then((win) => {
-      win.localStorage.removeItem('mywed360_active_wedding');
-      win.localStorage.removeItem('lovenda_active_wedding');
+      win.localStorage.removeItem('maloveapp_active_wedding');
+      win.localStorage.removeItem('maloveapp_active_wedding');
     });
 
     // Stub de bandeja de entrada y análisis de pagos desde email
@@ -35,7 +35,7 @@ describe('Flujo 6 - Finanzas completo', () => {
             subject: 'Factura Catering Deluxe',
             date: '2025-05-15T10:00:00Z',
             from: 'facturacion@cateringdeluxe.test',
-            to: 'usuario.test@lovenda.com',
+            to: 'usuario.test@maloveapp.com',
           },
         ],
       },

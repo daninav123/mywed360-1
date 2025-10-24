@@ -196,7 +196,7 @@ export default function EmailInsights({ mailId, userId, email }) {
             start: startDate.toISOString(),
             end: endDate.toISOString(),
           };
-          window.dispatchEvent(new CustomEvent('mywed360-tasks', { detail: { meeting } }));
+          window.dispatchEvent(new CustomEvent('maloveapp-tasks', { detail: { meeting } }));
         } catch (err) {
           console.warn('No se pudo despachar Reunión:', err);
         }
@@ -284,7 +284,7 @@ export default function EmailInsights({ mailId, userId, email }) {
               const title = prompt('Título de la tarea', defaultTitle);
               if (!title) return;
               const task = { title, due: tasks && tasks[0]?.due ? tasks[0].due : null };
-              window.dispatchEvent(new CustomEvent('mywed360-tasks', { detail: { task } }));
+              window.dispatchEvent(new CustomEvent('maloveapp-tasks', { detail: { task } }));
             } catch (_) {}
           }}
         >
@@ -310,7 +310,7 @@ export default function EmailInsights({ mailId, userId, email }) {
                 start: startIso,
                 end: endIso,
               };
-              window.dispatchEvent(new CustomEvent('mywed360-tasks', { detail: { meeting } }));
+              window.dispatchEvent(new CustomEvent('maloveapp-tasks', { detail: { meeting } }));
             } catch (_) {}
           }}
         >

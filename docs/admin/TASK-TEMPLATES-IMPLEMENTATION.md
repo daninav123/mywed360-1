@@ -2,7 +2,7 @@
 
 ## Resumen
 
-Se ha implementado un sistema completo que permite a los administradores modificar desde el panel admin el seed de tareas (bloques y subtareas) que se aplica automáticamente a cada nueva boda creada en MyWed360.
+Se ha implementado un sistema completo que permite a los administradores modificar desde el panel admin el seed de tareas (bloques y subtareas) que se aplica automáticamente a cada nueva boda creada en MaLoveApp.
 
 ## ✅ Componentes Implementados
 
@@ -125,7 +125,7 @@ No se requieren nuevas variables. Usa las existentes:
 
 ```env
 # Backend
-VITE_BACKEND_URL=https://mywed360-backend.onrender.com
+VITE_BACKEND_URL=https://maloveapp-backend.onrender.com
 
 # Firebase (ya configurado)
 VITE_FIREBASE_PROJECT_ID=...

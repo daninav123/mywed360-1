@@ -16,7 +16,7 @@ import { getUserTags, getEmailsByTag, getEmailTagsDetails } from './tagService';
  */
 const saveUserStats = (userId, stats) => {
   if (!userId) return;
-  localStorage.setItem(`mywed360_email_stats_${userId}`, JSON.stringify(stats));
+  localStorage.setItem(`maloveapp_email_stats_${userId}`, JSON.stringify(stats));
 };
 
 /**
@@ -27,7 +27,7 @@ const saveUserStats = (userId, stats) => {
 const getUserStats = (userId) => {
   if (!userId) return {};
   try {
-    const stats = localStorage.getItem(`mywed360_email_stats_${userId}`);
+    const stats = localStorage.getItem(`maloveapp_email_stats_${userId}`);
     return stats ? JSON.parse(stats) : {};
   } catch (error) {
     console.error('Error al recuperar estadísticas:', error);
@@ -136,7 +136,7 @@ const calculateActivityMetrics = (emails) => {
     const emailDate = new Date(email.date);
 
     // Determinar si es enviado o recibido
-    const isSent = email.from && email.from.includes('@mywed360.com');
+    const isSent = email.from && email.from.includes('@maloveapp.com');
 
     // Contar por período
     if (emailDate >= today) {
@@ -252,7 +252,7 @@ const analyzeContacts = (emails) => {
 
   emails.forEach((email) => {
     // Procesar remitente
-    if (email.from && !email.from.includes('@mywed360.com')) {
+    if (email.from && !email.from.includes('@maloveapp.com')) {
       const senderName = extractNameFromEmail(email.from);
       const senderContact = contactMap.get(senderName) || {
         name: senderName,
@@ -274,7 +274,7 @@ const analyzeContacts = (emails) => {
     }
 
     // Procesar destinatario
-    if (email.to && !email.to.includes('@mywed360.com')) {
+    if (email.to && !email.to.includes('@maloveapp.com')) {
       const recipientName = extractNameFromEmail(email.to);
       const recipientContact = contactMap.get(recipientName) || {
         name: recipientName,

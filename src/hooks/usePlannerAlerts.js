@@ -64,12 +64,12 @@ export default function usePlannerAlerts({ refreshOnWindowEvent = true } = {}) {
     let listener = null;
     if (refreshOnWindowEvent && typeof window !== 'undefined') {
       listener = () => compute({ silent: true });
-      window.addEventListener('mywed360-notif', listener);
+      window.addEventListener('maloveapp-notif', listener);
     }
 
     return () => {
       abortRef.current.cancelled = true;
-      if (listener) window.removeEventListener('mywed360-notif', listener);
+      if (listener) window.removeEventListener('maloveapp-notif', listener);
     };
   }, [weddingIds, refreshOnWindowEvent]);
 

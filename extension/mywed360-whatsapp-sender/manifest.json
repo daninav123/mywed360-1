@@ -9,12 +9,12 @@
     "http://localhost/*",
     "https://localhost/*",
     "http://187.33.157.13/*",
-    "https://mywed360.com/*"
+    "https://maloveapp.com/*"
   ],
   "background": { "service_worker": "background.js" },
   "content_scripts": [
     {
-      "matches": ["http://localhost/*", "https://localhost/*", "http://187.33.157.13/*", "https://mywed360.com/*"],
+      "matches": ["http://localhost/*", "https://localhost/*", "http://187.33.157.13/*", "https://maloveapp.com/*"],
       "js": ["contentScriptHost.js"],
       "run_at": "document_start"
     },

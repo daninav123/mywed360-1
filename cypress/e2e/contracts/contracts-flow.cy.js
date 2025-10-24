@@ -10,8 +10,8 @@ describe('Flujo 16 - Contratos y Documentos', () => {
     cy.loginToLovenda();
     // Forzar modo local (sin boda activa)
     cy.window().then((win) => {
-      win.localStorage.removeItem('mywed360_active_wedding');
-      win.localStorage.removeItem('lovenda_active_wedding');
+      win.localStorage.removeItem('maloveapp_active_wedding');
+      win.localStorage.removeItem('maloveapp_active_wedding');
     });
   });
 

@@ -6,7 +6,7 @@ import { sendMailAndPersist } from './mailSendService.js';
 const weddingsCollection = () => admin.firestore().collection('weddings');
 const weddingDoc = (weddingId) => weddingsCollection().doc(String(weddingId));
 
-const DEFAULT_PORTAL = 'https://app.mywed360.com/firma';
+const DEFAULT_PORTAL = 'https://app.maloveapp.com/firma';
 
 function sanitizeObject(value) {
   if (!value || typeof value !== 'object') return null;
@@ -90,7 +90,7 @@ async function getWeddingInfo(weddingId) {
 }
 
 function buildEmailBody({ signerName, docTitle, signUrl, actorName, weddingName }) {
-  const safeActor = actorName || 'el equipo de MyWed360';
+  const safeActor = actorName || 'el equipo de MaLoveApp';
   const safeTitle = docTitle || 'Documento a firmar';
   const safeSigner = signerName || 'Hola';
   const lines = [
@@ -159,7 +159,7 @@ async function dispatchSignatureEmails({ signers, documentMeta, weddingId, reque
   const portalBase = getSignaturePortalBase();
   const weddingInfo = await getWeddingInfo(weddingId);
   const docTitle = documentMeta?.title || documentMeta?.name || 'Documento a firmar';
-  const actorName = actor?.name || actor?.email || 'Equipo MyWed360';
+  const actorName = actor?.name || actor?.email || 'Equipo MaLoveApp';
   const sentIds = new Set();
 
   await Promise.all(

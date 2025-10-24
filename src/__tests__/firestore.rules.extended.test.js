@@ -10,7 +10,7 @@ import { readFileSync } from 'fs';
 import { beforeAll, afterAll, describe, test } from 'vitest';
 
 let testEnv;
-const PROJECT_ID = 'mywed360-test-extended';
+const PROJECT_ID = 'maloveapp-test-extended';
 const RUN_FIRESTORE_RULES =
   process.env.FIRESTORE_RULES_TESTS === 'true' || !!process.env.FIRESTORE_EMULATOR_HOST;
 const D = RUN_FIRESTORE_RULES ? describe : describe.skip;

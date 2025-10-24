@@ -11,7 +11,7 @@ try {
   
   // Configuración básica
   const apiKey = 'a42e6604fb3e4b737f281cd3dbc6309a-0ce15100-24828154';
-  const domain = 'mywed360.com';
+  const domain = 'maloveapp.com';
   
   console.log('Configuración:');
   console.log(`- API Key: ${apiKey.substring(0, 6)}...${apiKey.slice(-8)}`);

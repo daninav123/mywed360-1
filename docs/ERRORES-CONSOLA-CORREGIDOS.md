@@ -111,7 +111,7 @@ Estos son **normales** y útiles para desarrollo:
 ✅ i18next: initialized
 ✅ [perfmon] Monitor de rendimiento inicializado
 ✅ 🔍 Iniciando diagnósticos del sistema...
-✅ 🚀 MyWed360 - Sistema de Diagnóstico Activado
+✅ 🚀 MaLoveApp - Sistema de Diagnóstico Activado
 ```
 
 ### **Reportes de Diagnóstico:**

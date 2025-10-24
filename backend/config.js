@@ -54,10 +54,10 @@ const DEFAULT_ALLOWED_ORIGINS = [
   'http://127.0.0.1:5173',
   'http://localhost:4173',
   'http://127.0.0.1:4173',
-  'https://mywed360.netlify.app',
-  'https://mywed360.web.app',
-  'https://app.mywed360.com',
-  'https://lovenda.mywed360.com',
+  'https://maloveapp.netlify.app',
+  'https://maloveapp.web.app',
+  'https://app.maloveapp.com',
+  'https://lovenda.maloveapp.com',
 ].filter(Boolean);
 
 // Derived values

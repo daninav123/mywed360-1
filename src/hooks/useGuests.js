@@ -158,7 +158,7 @@ const useGuests = () => {
       };
       if (isBrowserEnvironment) {
         try {
-          window.dispatchEvent(new CustomEvent('mywed360-assistant-sync', { detail: payload }));
+          window.dispatchEvent(new CustomEvent('maloveapp-assistant-sync', { detail: payload }));
         } catch (error) {
           if (import.meta.env.DEV) {
             console.warn('[useGuests] notifyAssistant error', error);
@@ -181,7 +181,7 @@ const useGuests = () => {
       };
       if (isBrowserEnvironment) {
         try {
-          window.dispatchEvent(new CustomEvent('mywed360-seating-sync', { detail: payload }));
+          window.dispatchEvent(new CustomEvent('maloveapp-seating-sync', { detail: payload }));
         } catch (error) {
           if (import.meta.env.DEV) {
             console.warn('[useGuests] broadcastSeatingSync error', error);
@@ -334,7 +334,7 @@ const useGuests = () => {
     try {
       localStorage.setItem('mywed360Guests', JSON.stringify(guests));
       window.dispatchEvent(
-        new CustomEvent('mywed360-guests-updated', { detail: { guests, count: guests.length } })
+        new CustomEvent('maloveapp-guests-updated', { detail: { guests, count: guests.length } })
      );
     } catch (error) {
       console.error('Error sincronizando invitados:', error);
@@ -763,8 +763,8 @@ const useGuests = () => {
         }
       }
     };
-    window.addEventListener('mywed360-seating-sync', handler);
-    return () => window.removeEventListener('mywed360-seating-sync', handler);
+    window.addEventListener('maloveapp-seating-sync', handler);
+    return () => window.removeEventListener('maloveapp-seating-sync', handler);
   }, [removeGuest, updateGuest]);
 
   // WhatsApp helpers

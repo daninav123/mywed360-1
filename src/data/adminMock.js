@@ -90,7 +90,7 @@ export const adminPortfolio = [
   {
     id: 'wed-001',
     couple: 'Lucía & Marco',
-    owner: 'lucia@lovenda.com',
+    owner: 'lucia@maloveapp.com',
     eventDate: '2025-11-12',
     status: 'active',
     confirmedGuests: 154,
@@ -100,7 +100,7 @@ export const adminPortfolio = [
   {
     id: 'wed-002',
     couple: 'Ari & Bea',
-    owner: 'ari@lovenda.com',
+    owner: 'ari@maloveapp.com',
     eventDate: '2026-04-22',
     status: 'draft',
     confirmedGuests: 0,
@@ -112,7 +112,7 @@ export const adminPortfolio = [
 export const adminUsersList = [
   {
     id: 'usr-001',
-    email: 'planner.vera@lovenda.com',
+    email: 'planner.vera@maloveapp.com',
     role: 'planner',
     status: 'active',
     lastAccess: '2025-10-07 18:45',
@@ -121,7 +121,7 @@ export const adminUsersList = [
   },
   {
     id: 'usr-002',
-    email: 'owner.luis@lovenda.com',
+    email: 'owner.luis@maloveapp.com',
     role: 'owner',
     status: 'active',
     lastAccess: '2025-10-08 09:12',
@@ -149,7 +149,7 @@ export const featureFlags = [
     description: 'Habilita la nueva galería de plantillas web',
     domain: 'web',
     enabled: true,
-    lastModifiedBy: 'admin@lovenda.com',
+    lastModifiedBy: 'admin@maloveapp.com',
     lastModifiedAt: '2025-10-07',
   },
   {
@@ -158,7 +158,7 @@ export const featureFlags = [
     description: 'Motor IA de matching proveedores',
     domain: 'ia',
     enabled: false,
-    lastModifiedBy: 'admin@lovenda.com',
+    lastModifiedBy: 'admin@maloveapp.com',
     lastModifiedAt: '2025-09-30',
   },
 ];
@@ -205,7 +205,7 @@ export const auditLogs = [
   {
     id: 'audit-1',
     createdAt: '2025-10-08 09:30',
-    actor: 'admin@lovenda.com',
+    actor: 'admin@maloveapp.com',
     action: 'FLAG_UPDATE',
     resourceType: 'featureFlag',
     resourceId: 'webbuilder.newTemplates',
@@ -214,7 +214,7 @@ export const auditLogs = [
   {
     id: 'audit-2',
     createdAt: '2025-10-07 16:12',
-    actor: 'admin@lovenda.com',
+    actor: 'admin@maloveapp.com',
     action: 'USER_SUSPEND',
     resourceType: 'user',
     resourceId: 'usr-003',
@@ -227,7 +227,7 @@ export const reportsScheduled = [
     id: 'report-1',
     name: 'Métricas globales',
     cadence: 'Semanal',
-    recipients: ['direccion@lovenda.com'],
+    recipients: ['direccion@maloveapp.com'],
     format: 'PDF',
     status: 'Activo',
   },
@@ -245,14 +245,14 @@ export const supportTickets = [
   {
     id: 'ticket-1',
     subject: 'Error al sincronizar invitados',
-    requester: 'planner.vera@lovenda.com',
+    requester: 'planner.vera@maloveapp.com',
     status: 'Abierto',
     updatedAt: '2025-10-08 10:12',
   },
   {
     id: 'ticket-2',
     subject: 'Duda sobre plantillas',
-    requester: 'owner.luis@lovenda.com',
+    requester: 'owner.luis@maloveapp.com',
     status: 'Pendiente',
     updatedAt: '2025-10-07 18:02',
   },

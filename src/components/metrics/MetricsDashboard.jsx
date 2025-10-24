@@ -64,7 +64,7 @@ const MetricsDashboard = () => {
       // Por ahora usamos las métricas almacenadas en localStorage por el monitor
       let rawMetrics;
       try {
-        rawMetrics = JSON.parse(localStorage.getItem('mywed360_last_metrics') || '{}');
+        rawMetrics = JSON.parse(localStorage.getItem('maloveapp_last_metrics') || '{}');
       } catch (e) {
         rawMetrics = {
           counters: {},
@@ -226,7 +226,7 @@ const MetricsDashboard = () => {
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `mywed360_metrics_${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute('download', `maloveapp_metrics_${new Date().toISOString().split('T')[0]}.csv`);
     document.body.appendChild(link);
 
     // Simular clic en el enlace

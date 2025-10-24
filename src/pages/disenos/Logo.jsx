@@ -103,7 +103,7 @@ export default function Logo() {
             // Guardar logo en el campo anidado weddingInfo.logoUrl del doc principal
             await updateDoc(doc(db, 'weddings', activeWedding), { 'weddingInfo.logoUrl': image.url });
             // Notificar a la aplicación que el logo ha cambiado
-            window.dispatchEvent(new Event('mywed360-profile-updated'));
+            window.dispatchEvent(new Event('maloveapp-profile-updated'));
           } catch (err) {
             console.error('Error al guardar el logo en el perfil:', err);
           }

@@ -10,7 +10,7 @@ export default function RoleUpgradeHarness() {
   // Leer el rol inicial del localStorage si existe
   const getInitialRole = () => {
     try {
-      const profile = window.localStorage.getItem('MyWed360_user_profile');
+      const profile = window.localStorage.getItem('MaLoveApp_user_profile');
       if (profile) {
         const parsed = JSON.parse(profile);
         return parsed.role || 'owner';
@@ -28,10 +28,10 @@ export default function RoleUpgradeHarness() {
   // Sincronizar con localStorage cuando cambie el rol
   useEffect(() => {
     try {
-      const profile = window.localStorage.getItem('MyWed360_user_profile') || '{}';
+      const profile = window.localStorage.getItem('MaLoveApp_user_profile') || '{}';
       const parsed = JSON.parse(profile);
       window.localStorage.setItem(
-        'MyWed360_user_profile',
+        'MaLoveApp_user_profile',
         JSON.stringify({ ...parsed, role: currentRole })
       );
     } catch (e) {

@@ -163,7 +163,7 @@ const VectorEditor = forwardRef(function VectorEditor({ svg, onExport, palette =
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `mywed360-vector-${Date.now()}.svg`;
+    a.download = `maloveapp-vector-${Date.now()}.svg`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -181,7 +181,7 @@ const VectorEditor = forwardRef(function VectorEditor({ svg, onExport, palette =
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `mywed360-vector-${Date.now()}.pdf`;
+      a.download = `maloveapp-vector-${Date.now()}.pdf`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);

@@ -178,7 +178,7 @@ async function upsertSubscription(transactionInfo, notificationType, userId = nu
       currency: 'EUR', // Ajustar según tu región
       
       // Metadata
-      bundleId: bundleId || 'com.mywed360.app',
+      bundleId: bundleId || 'com.maloveapp.app',
       environment: environment || 'Production',
       lastNotificationType: notificationType,
       lastNotificationAt: admin.firestore.FieldValue.serverTimestamp(),

@@ -208,7 +208,7 @@ function EmailFeedbackCollector({ onSubmit, isMinimized = false, emailId = null 
             </svg>
             <h4 className="mt-3 text-xl font-medium text-gray-800">¡Gracias por tu feedback!</h4>
             <p className="mt-1 text-gray-600">
-              Tu opinión nos ayuda a mejorar el sistema de emails de MyWed360.
+              Tu opinión nos ayuda a mejorar el sistema de emails de MaLoveApp.
             </p>
           </div>
         ) : (
@@ -216,7 +216,7 @@ function EmailFeedbackCollector({ onSubmit, isMinimized = false, emailId = null 
             {step === 1 && (
               <div>
                 <h4 className="font-medium mb-3">
-                  ¿Cómo valorarías tu experiencia con el email de MyWed360?
+                  ¿Cómo valorarías tu experiencia con el email de MaLoveApp?
                 </h4>
                 <div className="flex justify-center space-x-4 mb-4">
                   {[1, 2, 3, 4, 5].map((rating) => (

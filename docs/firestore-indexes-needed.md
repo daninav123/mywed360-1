@@ -14,7 +14,7 @@ Campos:
 ```
 
 **Link de creación rápida:**
-https://console.firebase.google.com/v1/r/project/lovenda-98c77/firestore/indexes?create_composite=Ck5wcm9qZWN0cy9sb3ZlbmRhLTk4Yzc3L2RhdGFiYXNlcy8oZGVmYXVsdCkvY29sbGVjdGlvbkdyb3Vwcy9wYXltZW50cy9pbmRleGVzL18QARoKCgZzdGF0dXMQARoNCgl1cGRhdGVkQXQQARoMCghfX25hbWVfXxAB
+https://console.firebase.google.com/v1/r/project/maloveapp-98c77/firestore/indexes?create_composite=Ck5wcm9qZWN0cy9sb3ZlbmRhLTk4Yzc3L2RhdGFiYXNlcy8oZGVmYXVsdCkvY29sbGVjdGlvbkdyb3Vwcy9wYXltZW50cy9pbmRleGVzL18QARoKCgZzdGF0dXMQARoNCgl1cGRhdGVkQXQQARoMCghfX25hbWVfXxAB
 
 ### 2. Índice para payments por status + createdAt
 ```
@@ -25,7 +25,7 @@ Campos:
 ```
 
 **Link de creación rápida:**
-https://console.firebase.google.com/v1/r/project/lovenda-98c77/firestore/indexes?create_composite=Ck5wcm9qZWN0cy9sb3ZlbmRhLTk4Yzc3L2RhdGFiYXNlcy8oZGVmYXVsdCkvY29sbGVjdGlvbkdyb3Vwcy9wYXltZW50cy9pbmRleGVzL18QARoKCgZzdGF0dXMQARoNCgljcmVhdGVkQXQQARoMCghfX25hbWVfXhAB
+https://console.firebase.google.com/v1/r/project/maloveapp-98c77/firestore/indexes?create_composite=Ck5wcm9qZWN0cy9sb3ZlbmRhLTk4Yzc3L2RhdGFiYXNlcy8oZGVmYXVsdCkvY29sbGVjdGlvbkdyb3Vwcy9wYXltZW50cy9pbmRleGVzL18QARoKCgZzdGF0dXMQARoNCgljcmVhdGVkQXQQARoMCghfX25hbWVfXhAB
 
 ## Cómo Crearlos
 
@@ -35,7 +35,7 @@ https://console.firebase.google.com/v1/r/project/lovenda-98c77/firestore/indexes
 3. Espera 2-5 minutos a que se construyan
 
 ### Método 2: Firebase Console Manual
-1. Abre https://console.firebase.google.com/project/lovenda-98c77/firestore/indexes
+1. Abre https://console.firebase.google.com/project/maloveapp-98c77/firestore/indexes
 2. Click en "Create Index"
 3. Configura:
    - Collection ID: `payments`

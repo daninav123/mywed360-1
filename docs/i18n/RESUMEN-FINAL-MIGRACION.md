@@ -1,4 +1,4 @@
-# ✅ Resumen Final - Migración i18n MyWed360
+# ✅ Resumen Final - Migración i18n MaLoveApp
 
 **Fecha:** 23 Octubre 2025  
 **Estado:** INFRAESTRUCTURA COMPLETA + EJEMPLOS DEMOSTRADOS

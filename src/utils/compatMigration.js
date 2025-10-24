@@ -1,5 +1,5 @@
 /*
-  Compat migration for internal keys/events from 'lovenda' -> 'mywed360'.
+  Compat migration (legacy: lovenda/mywed360 -> maloveapp).
   - Migrates localStorage keys on load (one-shot, idempotent)
   - Mirrors CustomEvents both ways to keep old/new listeners working
 */
@@ -18,7 +18,7 @@
         const mapPrefix = (key) =>
           key
             .replace(/^lovenda([._-])/, 'mywed360$1')
-            .replace(/^lovenda/, 'mywed360');
+            .replace(/^lovenda/, 'maloveapp');
         ls.setItem = function (key, value) {
           try { origSet(key, value); } catch {}
           try {
@@ -47,8 +47,8 @@
       const seen = new Set(keys);
       const mapPrefix = (key) =>
         key
-          .replace(/^lovenda([._-])/, 'mywed360$1') // lovenda_ lovenda- lovenda.
-          .replace(/^lovenda/, 'mywed360'); // lovendaSomething -> mywed360Something
+          .replace(/^lovenda([._-])/, 'mywed360$1') // maloveapp_ maloveapp- lovenda.
+          .replace(/^lovenda/, 'maloveapp'); // lovendaSomething -> mywed360Something
 
       for (const key of keys) {
         if (/^lovenda/i.test(key)) {
@@ -73,11 +73,11 @@
     const mirrorType = (type) => {
       // lovenda* -> mywed360*
       if (/^lovenda[_.-]?/i.test(type)) {
-        return type.replace(/^lovenda/i, 'mywed360');
+        return type.replace(/^lovenda/i, 'maloveapp');
       }
       // mywed360* -> lovenda*
       if (/^mywed360[_.-]?/i.test(type)) {
-        return type.replace(/^mywed360/i, 'lovenda');
+        return type.replace(/^mywed360/i, 'maloveapp');
       }
       return null;
     };

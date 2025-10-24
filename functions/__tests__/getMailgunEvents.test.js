@@ -69,7 +69,7 @@ describe('getMailgunEvents auth and params', () => {
     const res = await callHandler(handler, {
       method: 'GET',
       headers: { origin: 'http://localhost:5173', Authorization: 'Bearer mock-uid-u@e' },
-      query: { recipient: 'user@mywed360.com', limit: '9999' },
+      query: { recipient: 'user@maloveapp.com', limit: '9999' },
     });
     expect(res.status).toBe(200);
     expect(fetchSpy).toHaveBeenCalledTimes(1);

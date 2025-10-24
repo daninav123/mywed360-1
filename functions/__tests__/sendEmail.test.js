@@ -42,7 +42,7 @@ describe('sendEmail CORS and auth', () => {
     process.env.NODE_ENV = 'test';
     process.env.ALLOW_MOCK_TOKENS = 'true';
     process.env.MAILGUN_API_KEY = 'test';
-    process.env.MAILGUN_DOMAIN = 'mywed360.com';
+    process.env.MAILGUN_DOMAIN = 'maloveapp.com';
     process.env.MAILGUN_BASE_URL = 'https://api.mailgun.net/v3';
   });
 
@@ -64,7 +64,7 @@ describe('sendEmail CORS and auth', () => {
     const res = await callHandler(handler, {
       method: 'POST',
       headers: { origin: 'http://localhost:5173', Authorization: 'Bearer mock-uid-u@e' },
-      body: { from: 'a@mywed360.com', to: 'b@mywed360.com', subject: 's', body: 'hi' },
+      body: { from: 'a@maloveapp.com', to: 'b@maloveapp.com', subject: 's', body: 'hi' },
     });
     expect(res.status).toBe(200);
     expect(fetchSpy).toHaveBeenCalledTimes(1);
@@ -87,7 +87,7 @@ describe('sendEmail CORS and auth', () => {
       method: 'POST',
       headers: { origin: 'http://localhost:5173', Authorization: 'Bearer mock-uid-u@e' },
       body: {
-        from: 'a@mywed360.com', to: 'b@mywed360.com', subject: 's', html: '<b>hi</b>',
+        from: 'a@maloveapp.com', to: 'b@maloveapp.com', subject: 's', html: '<b>hi</b>',
         attachments: [{ url: 'https://example.com/file.pdf', filename: 'f.pdf' }],
       },
     });
@@ -111,7 +111,7 @@ describe('sendEmail CORS and auth', () => {
       method: 'POST',
       headers: { origin: 'http://localhost:5173', Authorization: 'Bearer mock-uid-u@e' },
       body: {
-        from: 'a@mywed360.com', to: 'b@mywed360.com', subject: 's', html: '<b>hi</b>',
+        from: 'a@maloveapp.com', to: 'b@maloveapp.com', subject: 's', html: '<b>hi</b>',
         attachments: [{ url: 'https://example.com/bad.exe', filename: 'bad.exe' }],
       },
     });
@@ -140,7 +140,7 @@ describe('sendEmail CORS and auth', () => {
       method: 'POST',
       headers: { origin: 'http://localhost:5173', Authorization: 'Bearer mock-uid-u@e' },
       body: {
-        from: 'a@mywed360.com', to: 'b@mywed360.com', subject: 's', html: '<b>hi</b>',
+        from: 'a@maloveapp.com', to: 'b@maloveapp.com', subject: 's', html: '<b>hi</b>',
         attachments: [{ url: 'https://example.com/too-big.bin', filename: 'big.bin' }],
       },
     });
@@ -170,7 +170,7 @@ describe('sendEmail CORS and auth', () => {
       method: 'POST',
       headers: { origin: 'http://localhost:5173', Authorization: 'Bearer mock-uid-u@e' },
       body: {
-        from: 'a@mywed360.com', to: 'b@mywed360.com', subject: 's', body: 'hi',
+        from: 'a@maloveapp.com', to: 'b@maloveapp.com', subject: 's', body: 'hi',
         attachments: [{ url: 'https://example.com/file-timeout.bin', filename: 't.bin' }],
       },
     });

@@ -1,4 +1,4 @@
-/* Background service worker for MyWed360 WhatsApp Sender */
+/* Background service worker for MaLoveApp WhatsApp Sender */
 const REQUESTS = new Map(); // requestId -> { tabId }
 
 function ensureWhatsAppTab(callback) {

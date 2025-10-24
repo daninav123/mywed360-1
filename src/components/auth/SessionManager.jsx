@@ -322,7 +322,7 @@ const SessionManager = ({ children }) => {
     const checkSessionTime = () => {
       // Simular tiempo restante de sesion (en una app real vendria del token)
       const now = Date.now();
-      const sessionStart = localStorage.getItem('mywed360_last_activity');
+      const sessionStart = localStorage.getItem('maloveapp_last_activity');
 
       if (sessionStart) {
         const elapsed = now - parseInt(sessionStart);

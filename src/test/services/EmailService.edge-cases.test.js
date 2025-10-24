@@ -33,9 +33,9 @@ vi.mock('../../services/EmailService', async (importOriginal) => {
   return {
     ...actual,
     // Variables de entorno simuladas
-    BASE: 'https://api.test.mywed360.com',
+    BASE: 'https://api.test.maloveapp.com',
     MAILGUN_API_KEY: 'key-test123456789',
-    MAILGUN_DOMAIN: 'test.mywed360.com',
+    MAILGUN_DOMAIN: 'test.maloveapp.com',
     USE_MAILGUN: true,
     USE_BACKEND: false,
     MAX_ATTACHMENT_SIZE_MB: 10, // 10MB límite para pruebas
@@ -54,7 +54,7 @@ describe('EmailService - Casos Límite y Manejo de Errores', () => {
   const mockEmail = {
     id: 'email123',
     from: 'remitente@example.com',
-    to: 'usuario@test.mywed360.com',
+    to: 'usuario@test.maloveapp.com',
     subject: 'Asunto de prueba',
     body: '<p>Contenido de prueba</p>',
     date: '2025-07-10T10:00:00Z',
@@ -117,7 +117,7 @@ describe('EmailService - Casos Límite y Manejo de Errores', () => {
       expect(result.success).toBe(true);
 
       // Obtener el correo guardado y verificar que se sanitizó el contenido
-      const saved = JSON.parse(localStorage.getItem('mywed360_mails'));
+      const saved = JSON.parse(localStorage.getItem('maloveapp_mails'));
       expect(saved[0].body).not.toContain('<script>');
       expect(saved[0].body).toContain('Contenido normal');
     });
@@ -140,7 +140,7 @@ describe('EmailService - Casos Límite y Manejo de Errores', () => {
       expect(result.success).toBe(true);
 
       // Obtener el correo guardado y verificar que se truncó el asunto
-      const saved = JSON.parse(localStorage.getItem('mywed360_mails'));
+      const saved = JSON.parse(localStorage.getItem('maloveapp_mails'));
       expect(saved[0].subject.length).toBeLessThanOrEqual(255);
     });
 
@@ -176,7 +176,7 @@ describe('EmailService - Casos Límite y Manejo de Errores', () => {
       global.fetch.mockRejectedValueOnce(new Error('Network error'));
 
       // Guardar emails en localStorage como fallback
-      localStorage.setItem('mywed360_mails', JSON.stringify([mockEmail]));
+      localStorage.setItem('maloveapp_mails', JSON.stringify([mockEmail]));
 
       // Debería usar los datos locales como fallback
       const result = await EmailService.getMails('inbox');
@@ -239,7 +239,7 @@ describe('EmailService - Casos Límite y Manejo de Errores', () => {
       global.fetch.mockImplementationOnce(() => timeoutPromise);
 
       // Guardar emails en localStorage como fallback
-      localStorage.setItem('mywed360_mails', JSON.stringify([mockEmail]));
+      localStorage.setItem('maloveapp_mails', JSON.stringify([mockEmail]));
 
       const result = await EmailService.getMails('inbox');
 
@@ -338,7 +338,7 @@ describe('EmailService - Casos Límite y Manejo de Errores', () => {
       expect(result.success).toBe(true);
 
       // Verificar que el adjunto se guardó correctamente
-      const saved = JSON.parse(localStorage.getItem('mywed360_mails'));
+      const saved = JSON.parse(localStorage.getItem('maloveapp_mails'));
       expect(saved[0].attachments).toHaveLength(1);
       expect(saved[0].attachments[0].name).toBe('archivo_valido.pdf');
     });
@@ -378,7 +378,7 @@ describe('EmailService - Casos Límite y Manejo de Errores', () => {
       });
 
       // Guardar emails en localStorage como fallback
-      localStorage.setItem('mywed360_mails', JSON.stringify([mockEmail]));
+      localStorage.setItem('maloveapp_mails', JSON.stringify([mockEmail]));
 
       const result = await EmailService.getMails('inbox');
 
@@ -399,7 +399,7 @@ describe('EmailService - Casos Límite y Manejo de Errores', () => {
       });
 
       // Guardar emails en localStorage como fallback
-      localStorage.setItem('mywed360_mails', JSON.stringify([mockEmail]));
+      localStorage.setItem('maloveapp_mails', JSON.stringify([mockEmail]));
 
       const result = await EmailService.getMails('inbox');
 

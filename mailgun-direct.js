@@ -6,7 +6,7 @@ console.log('====== PRUEBA DIRECTA DE MAILGUN ======');
 
 // Configuración directa (sin depender de dotenv)
 const MAILGUN_API_KEY = 'a42e6604fb3e4b737f281cd3dbc6309a-0ce15100-24828154'; // Usar la misma API key que está en .env
-const MAILGUN_DOMAIN = 'mywed360.com';
+const MAILGUN_DOMAIN = 'maloveapp.com';
 const MAILGUN_EU_REGION = true;
 
 console.log('Configuración de Mailgun:');

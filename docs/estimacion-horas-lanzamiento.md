@@ -1,4 +1,4 @@
-# Estimación de Horas de Desarrollo para Lanzamiento - MyWed360
+# Estimación de Horas de Desarrollo para Lanzamiento - MaLoveApp
 
 ## 📊 Estado Actual de Implementación
 

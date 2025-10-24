@@ -1,4 +1,4 @@
-﻿# TODO - Lovenda/MyWed360
+﻿# TODO - Lovenda/MaLoveApp
 
 > Lista única de pendientes operativos consolidada con análisis de gaps de implementación.
 > Usa `docs/ROADMAP.md` para la perspectiva estratégica y `docs/ANALYSIS_GAPS_CONSOLIDATED.md` para análisis detallado.

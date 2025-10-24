@@ -25,8 +25,8 @@ beforeEach(() => {
 Cypress.Commands.add('setupTestMode', () => {
   cy.window().then((win) => {
     if (win) {
-      win.__MYWED360_TEST_MODE__ = true;
-      win.__MYWED360_DISABLE_PROTECTED_BYPASS__ = false;
+      win.__MALOVEAPP_TEST_MODE__ = true;
+      win.__MALOVEAPP_DISABLE_PROTECTED_BYPASS__ = false;
     }
   });
 });

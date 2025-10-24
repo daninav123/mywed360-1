@@ -1,8 +1,8 @@
-# Arquitectura — MyWed360
+# Arquitectura — MaLoveApp
 
 ## Visión General
 
-MyWed360 es una aplicación web React (Vite) que utiliza Firebase (Auth + Firestore) como backend primario de datos y un backend adicional (Render) para integraciones/servicios que requieren claves privadas (WhatsApp, automatizaciones, etc.). Incluye servicios externos como Mailgun (email) y OpenAI (características IA).
+MaLoveApp es una aplicación web React (Vite) que utiliza Firebase (Auth + Firestore) como backend primario de datos y un backend adicional (Render) para integraciones/servicios que requieren claves privadas (WhatsApp, automatizaciones, etc.). Incluye servicios externos como Mailgun (email) y OpenAI (características IA).
 
 Componentes clave:
 - Frontend: React + Vite, rutas SPA.

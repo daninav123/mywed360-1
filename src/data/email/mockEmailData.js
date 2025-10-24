@@ -2,7 +2,7 @@ const mockInbox = [
   {
     id: 'email001',
     from: 'proveedor@florista.com',
-    to: 'maria.garcia@lovenda.com',
+    to: 'maria.garcia@maloveapp.com',
     subject: 'Presupuesto de flores para boda',
     body: `<p>Estimada María,</p><p>Adjunto el presupuesto para las flores de tu boda.</p><p>Saludos cordiales,<br/>Floristas Bella</p>`,
     attachments: [
@@ -22,7 +22,7 @@ const mockInbox = [
   {
     id: 'email002',
     from: 'fotografia@capturamos.com',
-    to: 'maria.garcia@lovenda.com',
+    to: 'maria.garcia@maloveapp.com',
     subject: 'Catálogo de fotos',
     body: `<p>Hola María,</p><p>Te enviamos nuestro catálogo de fotografías.</p>`,
     attachments: [],
@@ -35,7 +35,7 @@ const mockInbox = [
   {
     id: 'email003',
     from: 'catering@delicioso.com',
-    to: 'maria.garcia@lovenda.com',
+    to: 'maria.garcia@maloveapp.com',
     subject: 'Menús disponibles',
     body: `<p>Buenas tardes,</p><p>Te adjunto los diferentes menús disponibles para tu evento.</p>`,
     attachments: [
@@ -61,7 +61,7 @@ const mockInbox = [
   {
     id: 'email004',
     from: 'vestidos@elegancia.com',
-    to: 'maria.garcia@lovenda.com',
+    to: 'maria.garcia@maloveapp.com',
     subject: 'Confirmación de cita para prueba',
     body: `<p>Estimada María:</p><p>Te confirmamos la cita para la prueba del vestido el día 20 de julio a las 16:00h.</p>`,
     attachments: [],
@@ -74,7 +74,7 @@ const mockInbox = [
   {
     id: 'email005',
     from: 'local@jardines.com',
-    to: 'maria.garcia@lovenda.com',
+    to: 'maria.garcia@maloveapp.com',
     subject: 'Presupuesto actualizado para reserva',
     body: `<p>Hola María,</p><p>Te enviamos el presupuesto actualizado para la reserva del jardín.</p>`,
     attachments: [
@@ -94,7 +94,7 @@ const mockInbox = [
   {
     id: 'email006',
     from: 'eventos@coordinacion.com',
-    to: 'maria.garcia@lovenda.com',
+    to: 'maria.garcia@maloveapp.com',
     subject: 'Planificación de eventos - Confirmación',
     body: `<p>Estimados novios:</p><p>Les confirmamos la recepción del pago inicial para la coordinación del evento.</p>`,
     attachments: [
@@ -114,7 +114,7 @@ const mockInbox = [
   {
     id: 'email007',
     from: 'invitaciones@papeleria.com',
-    to: 'maria.garcia@lovenda.com',
+    to: 'maria.garcia@maloveapp.com',
     subject: 'Diseños personalizados para invitaciones',
     body: `<p>Buenas tardes María,</p><p>Te adjunto los diseños personalizados para las invitaciones que solicitaste.</p>`,
     attachments: [
@@ -146,7 +146,7 @@ const mockInbox = [
   {
     id: 'email008',
     from: 'musica@melodias.com',
-    to: 'maria.garcia@lovenda.com',
+    to: 'maria.garcia@maloveapp.com',
     subject: 'Lista de canciones propuestas',
     body: `<p>Hola María y Juan,</p><p>Les envío la lista de canciones propuestas para su evento basada en sus preferencias.</p>`,
     attachments: [
@@ -166,7 +166,7 @@ const mockInbox = [
   {
     id: 'email009',
     from: 'transporte@viajes.com',
-    to: 'maria.garcia@lovenda.com',
+    to: 'maria.garcia@maloveapp.com',
     subject: 'Confirmación de reserva de transporte',
     body: `<p>Estimada María:</p><p>Le confirmamos la reserva de los vehículos para el transporte de invitados.</p>`,
     attachments: [],
@@ -179,7 +179,7 @@ const mockInbox = [
   {
     id: 'email010',
     from: 'alojamiento@hotel.com',
-    to: 'maria.garcia@lovenda.com',
+    to: 'maria.garcia@maloveapp.com',
     subject: 'Bloque de habitaciones reservado',
     body: `<p>Buenas tardes,</p><p>Le informamos que el bloque de habitaciones para sus invitados ha sido reservado correctamente.</p>`,
     attachments: [
@@ -201,7 +201,7 @@ const mockInbox = [
 const mockSent = [
   {
     id: 'email101',
-    from: 'maria.garcia@lovenda.com',
+    from: 'maria.garcia@maloveapp.com',
     to: 'proveedor@florista.com',
     subject: 'Re: Presupuesto de flores para boda',
     body: `<p>Estimada Florista Bella,</p><p>Gracias por el presupuesto. Me gustaría consultar si es posible modificar las cantidades de rosas blancas.</p><p>Saludos cordiales,<br/>María García</p>`,
@@ -214,7 +214,7 @@ const mockSent = [
   },
   {
     id: 'email102',
-    from: 'maria.garcia@lovenda.com',
+    from: 'maria.garcia@maloveapp.com',
     to: 'invitados@listado.com',
     subject: 'Información importante sobre la boda',
     body: `<p>Queridos invitados,</p><p>Os enviamos información importante sobre la celebración de nuestra boda.</p><p>Saludos,<br/>María y Juan</p>`,
@@ -234,7 +234,7 @@ const mockSent = [
   },
   {
     id: 'email103',
-    from: 'maria.garcia@lovenda.com',
+    from: 'maria.garcia@maloveapp.com',
     to: 'musica@melodias.com',
     subject: 'Consulta sobre repertorio',
     body: `<p>Buenas tardes,</p><p>Hemos revisado el repertorio propuesto y nos gustaría hacer algunas modificaciones.</p><p>Saludos,<br/>María García</p>`,
@@ -254,7 +254,7 @@ const mockSent = [
   },
   {
     id: 'email104',
-    from: 'maria.garcia@lovenda.com',
+    from: 'maria.garcia@maloveapp.com',
     to: 'catering@delicioso.com',
     subject: 'Confirmación de menú',
     body: `<p>Estimado equipo de catering,</p><p>Después de revisar las opciones, confirmamos la selección del menú número 3 con las modificaciones acordadas.</p><p>Saludos cordiales,<br/>María García</p>`,
@@ -267,7 +267,7 @@ const mockSent = [
   },
   {
     id: 'email105',
-    from: 'maria.garcia@lovenda.com',
+    from: 'maria.garcia@maloveapp.com',
     to: 'alojamiento@hotel.com',
     subject: 'Confirmación de reserva',
     body: `<p>Buenos días,</p><p>Confirmamos la reserva del bloque de habitaciones según el presupuesto enviado.</p><p>Saludos,<br/>María García</p>`,
@@ -284,7 +284,7 @@ const mockTrash = [
   {
     id: 'email201',
     from: 'newsletter@moda.com',
-    to: 'maria.garcia@lovenda.com',
+    to: 'maria.garcia@maloveapp.com',
     subject: 'Ofertas de temporada',
     body: `<p>Descubre las nuevas ofertas de vestidos para invitadas.</p>`,
     attachments: [],
@@ -297,7 +297,7 @@ const mockTrash = [
   {
     id: 'email202',
     from: 'spam@random.com',
-    to: 'maria.garcia@lovenda.com',
+    to: 'maria.garcia@maloveapp.com',
     subject: 'Gana un viaje a la playa',
     body: `<p>Participa en nuestro sorteo y gana un viaje.</p>`,
     attachments: [],

@@ -1,5 +1,5 @@
-﻿/**
- * Middleware de autenticaciÃ³n para el backend de MyWed360
+/**
+ * Middleware de autenticaciÃ³n para el backend de MaLoveApp
  * Verifica tokens de Firebase Auth y gestiona permisos
  */
 
@@ -31,7 +31,7 @@ if (!admin.apps.length) {
       if (serviceAccountObj) {
         if (!admin.apps.length) admin.initializeApp({
           credential: admin.credential.cert(serviceAccountObj),
-          projectId: process.env.FIREBASE_PROJECT_ID || serviceAccountObj.project_id || 'mywed360'
+          projectId: process.env.FIREBASE_PROJECT_ID || serviceAccountObj.project_id || 'lovenda-98c77'
         });
       } else {
         // Fallback a archivo
@@ -47,12 +47,12 @@ if (!admin.apps.length) {
           if (!admin.apps.length) admin.initializeApp({
             credential: admin.credential.cert(serviceAccountFile),
             projectId:
-              process.env.FIREBASE_PROJECT_ID || serviceAccountFile.project_id || 'mywed360'
+              process.env.FIREBASE_PROJECT_ID || serviceAccountFile.project_id || 'lovenda-98c77'
           });
           console.log(`[AuthMiddleware] Firebase Admin inicializado con serviceAccount.json (${svcPath})`);
         } else {
           if (!admin.apps.length) admin.initializeApp({
-            projectId: process.env.FIREBASE_PROJECT_ID || 'mywed360'
+            projectId: process.env.FIREBASE_PROJECT_ID || 'lovenda-98c77'
           });
         }
       }
@@ -70,19 +70,19 @@ if (!admin.apps.length) {
           const serviceAccountFile = JSON.parse(fs.readFileSync(svcPath, 'utf8'));
           if (!admin.apps.length) admin.initializeApp({
             credential: admin.credential.cert(serviceAccountFile),
-            projectId: process.env.FIREBASE_PROJECT_ID || serviceAccountFile.project_id || 'mywed360'
+            projectId: process.env.FIREBASE_PROJECT_ID || serviceAccountFile.project_id || 'lovenda-98c77'
           });
           console.log(`[AuthMiddleware] Firebase Admin inicializado con serviceAccount.json (${svcPath})`);
         } else {
           // Ãšltimo recurso: inicializaciÃ³n sin credenciales explÃ­citas (usarÃ¡ ADC si existe)
           if (!admin.apps.length) admin.initializeApp({
-            projectId: process.env.FIREBASE_PROJECT_ID || 'mywed360'
+            projectId: process.env.FIREBASE_PROJECT_ID || 'lovenda-98c77'
           });
         }
       } catch (fileErr) {
         console.error('[AuthMiddleware] Error leyendo serviceAccount.json:', fileErr);
         if (!admin.apps.length) admin.initializeApp({
-          projectId: process.env.FIREBASE_PROJECT_ID || 'mywed360'
+          projectId: process.env.FIREBASE_PROJECT_ID || 'lovenda-98c77'
         });
       }
     }
@@ -210,14 +210,21 @@ const getUserProfile = async (uid, emailHint = '') => {
     // Asegurar campos esenciales derivados del token cuando falten en Firestore
     const email = String(baseProfile.email || emailHint || '').toLowerCase();
     let myWed360Email = String(baseProfile.myWed360Email || '').toLowerCase();
+    let maLoveEmail = String(baseProfile.maLoveEmail || '').toLowerCase();
+    
+    // Si no tiene maLoveEmail pero tiene emailUsername, construirlo
+    if (!maLoveEmail && baseProfile.emailUsername) {
+      maLoveEmail = `${baseProfile.emailUsername}@malove.app`;
+    }
+    
     if (!myWed360Email && email) {
       try {
         const loginPrefix = email.split('@')[0].slice(0, 4).toLowerCase();
-        if (loginPrefix) myWed360Email = `${loginPrefix}@mywed360.com`;
+        if (loginPrefix) myWed360Email = `${loginPrefix}@maloveapp.com`;
       } catch {}
     }
 
-    return { ...baseProfile, email, myWed360Email };
+    return { ...baseProfile, email, myWed360Email, maLoveEmail };
   } catch (error) {
     console.error('[AuthMiddleware] Error obteniendo perfil:', error);
     return {
@@ -281,7 +288,7 @@ const authMiddleware = (options = {}) => {
           }
         } else {
           resolvedSource = 'admin-session';
-          const email = session.email || session.profile?.email || 'admin@lovenda.com';
+          const email = session.email || session.profile?.email || 'admin@maloveapp.com';
           resolvedUser = {
             uid: session.profile?.id || 'admin-local',
             email,

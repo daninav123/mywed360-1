@@ -92,7 +92,7 @@ if (parseFloat(percent) === 100) {
   console.log('\n🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉');
   console.log('🏆  ¡¡¡100% DEL ROADMAP COMPLETADO!!!  🏆');
   console.log('🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉\n');
-  console.log('✨ ¡FELICIDADES! El proyecto MyWed360 está completamente implementado.');
+  console.log('✨ ¡FELICIDADES! El proyecto MaLoveApp está completamente implementado.');
   console.log('📦 Todas las funcionalidades core están verificadas y operativas.');
   console.log('🚀 El proyecto está listo para producción.\n');
 } else {

@@ -4,7 +4,7 @@ describe('Flujo de gestión de carpetas de correo', () => {
   
   // Datos de prueba
   const testUser = {
-    email: 'usuario.test@lovenda.com',
+    email: 'usuario.test@maloveapp.com',
     password: 'contraseña123'
   };
   
@@ -30,7 +30,7 @@ describe('Flujo de gestión de carpetas de correo', () => {
     {
       id: 'email1',
       from: 'proveedor1@example.com',
-      to: 'usuario.test@lovenda.com',
+      to: 'usuario.test@maloveapp.com',
       subject: 'Presupuesto para catering',
       body: '<p>Contenido del correo 1</p>',
       date: '2025-07-14T15:30:00Z',
@@ -41,7 +41,7 @@ describe('Flujo de gestión de carpetas de correo', () => {
     {
       id: 'email2',
       from: 'proveedor2@example.com',
-      to: 'usuario.test@lovenda.com',
+      to: 'usuario.test@maloveapp.com',
       subject: 'Disponibilidad para fotografía',
       body: '<p>Contenido del correo 2</p>',
       date: '2025-07-13T10:15:00Z',
@@ -51,7 +51,7 @@ describe('Flujo de gestión de carpetas de correo', () => {
     },
     {
       id: 'email3',
-      from: 'usuario.test@lovenda.com',
+      from: 'usuario.test@maloveapp.com',
       to: 'proveedor3@example.com',
       subject: 'Consulta sobre flores',
       body: '<p>Contenido del correo 3</p>',
@@ -356,7 +356,7 @@ describe('Flujo de gestión de carpetas de correo', () => {
         data: [{
           id: 'email4',
           from: 'proveedor4@example.com',
-          to: 'usuario.test@lovenda.com',
+          to: 'usuario.test@maloveapp.com',
           subject: 'Mensaje eliminado',
           body: '<p>Este correo está en la papelera</p>',
           date: '2025-07-11T08:30:00Z',

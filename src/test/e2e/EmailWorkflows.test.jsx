@@ -75,7 +75,7 @@ describe('Flujos completos del sistema de correo (E2E)', () => {
     {
       id: 'email1',
       from: 'remitente@example.com',
-      to: 'maria.garcia@mywed360.com',
+      to: 'maria.garcia@maloveapp.com',
       subject: 'Presupuesto fotografía',
       body: '<p>Hola María, te envío el presupuesto para las fotos de la boda.</p>',
       date: '2025-07-12T15:30:00Z',
@@ -85,7 +85,7 @@ describe('Flujos completos del sistema de correo (E2E)', () => {
     },
     {
       id: 'email2',
-      from: 'maria.garcia@mywed360.com',
+      from: 'maria.garcia@maloveapp.com',
       to: 'florista@example.com',
       subject: 'Consulta sobre centros de mesa',
       body: '<p>Hola, estoy interesada en vuestros servicios para mi boda.</p>',
@@ -114,7 +114,7 @@ describe('Flujos completos del sistema de correo (E2E)', () => {
     localStorage.clear();
 
     // Configurar mocks para los servicios
-    EmailService.initEmailService.mockReturnValue('maria.garcia@mywed360.com');
+    EmailService.initEmailService.mockReturnValue('maria.garcia@maloveapp.com');
     EmailService.getMails.mockResolvedValue(mockEmails);
     EmailService.getUnreadCount.mockResolvedValue(1);
     EmailService.sendMail.mockImplementation(async (email) => {

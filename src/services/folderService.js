@@ -21,8 +21,8 @@ import { USE_BACKEND } from './emailService';
 import { _getStorage } from '../utils/storage.js';
 
 // Clave para almacenamiento local
-const FOLDERS_STORAGE_KEY = 'mywed360_email_folders';
-const EMAIL_FOLDER_MAPPING_KEY = 'mywed360_email_folder_mapping';
+const FOLDERS_STORAGE_KEY = 'maloveapp_email_folders';
+const EMAIL_FOLDER_MAPPING_KEY = 'maloveapp_email_folder_mapping';
 
 function fireAndForget(promise) {
   if (promise && typeof promise.then === 'function' && typeof promise.catch === 'function') {
@@ -39,7 +39,7 @@ export const getUserFolders = (userId) => {
   try {
     // Best‑effort: refrescar desde Firestore sin bloquear
     fireAndForget(refreshFoldersFromCloud(userId));
-    // Formato de clave: mywed360_email_folders_[userId]
+    // Formato de clave: maloveapp_email_folders_[userId]
     const storageKey = `${FOLDERS_STORAGE_KEY}_${userId}`;
     const foldersJson = _getStorage().getItem(storageKey);
 

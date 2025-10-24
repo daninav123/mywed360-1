@@ -2,7 +2,7 @@
 
 describe('Composer inteligente y automatizaciones de email', () => {
   beforeEach(() => {
-    cy.loginToLovenda('usuario.test@lovenda.com', 'password');
+    cy.loginToLovenda('usuario.test@maloveapp.com', 'password');
   });
 
   const stubEmptyMailApi = () => {
@@ -57,7 +57,7 @@ describe('Composer inteligente y automatizaciones de email', () => {
       id: 'mail-1',
       subject: 'Reunión con proveedor',
       from: 'contacto@proveedor.com',
-      to: 'usuario.test@lovenda.com',
+      to: 'usuario.test@maloveapp.com',
       body: 'Confirmamos la reunión el 15/10/2025 a las 17:00 en Madrid.',
       read: false,
       date: new Date().toISOString(),

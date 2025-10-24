@@ -22,8 +22,8 @@ export function getBackendBase() {
     }
 
     // 3. Producción Netlify → backend en Render (dominio conocido)
-    if (hostname.endsWith('mywed360.netlify.app') || hostname.endsWith('mywed360.web.app')) {
-      return 'https://mywed360-backend.onrender.com';
+    if (hostname.endsWith('maloveapp.netlify.app') || hostname.endsWith('maloveapp.web.app')) {
+      return 'https://maloveapp-backend.onrender.com';
     }
 
     // 4. Fallback al mismo origen

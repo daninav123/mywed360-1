@@ -9,7 +9,7 @@
 const path = require('path');
 const admin = require('firebase-admin');
 
-const keyPath = path.resolve(__dirname, '..', 'mywed360-firebase-adminsdk.json');
+const keyPath = path.resolve(__dirname, '..', 'maloveapp-firebase-adminsdk.json');
 if (!admin.apps.length) {
   admin.initializeApp({ credential: admin.credential.cert(require(keyPath)) });
 }

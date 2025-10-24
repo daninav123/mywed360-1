@@ -1,0 +1,289 @@
+# Configuración de Cron Jobs para MaLoveApp
+# 
+# Este archivo define los trabajos programados (cron jobs) que deben
+# ejecutarse automáticamente en el backend.
+#
+# Para Render.com: Configurar en Dashboard → Cron Jobs
+# Para Cloud Scheduler (GCP): usar gcloud scheduler jobs create
+# Para Heroku: usar Heroku Scheduler addon
+
+jobs:
+  # Job 1: Procesar Emails Programados
+  - name: email-scheduler-worker
+    description: Procesa la cola de emails programados y los envía
+    schedule: "*/5 * * * *"  # Cada 5 minutos
+    # Para ejecución más frecuente: "*/1 * * * *" (cada minuto)
+    
+    command: node backend/jobs/emailSchedulerCron.js
+    # O si usas endpoint HTTP:
+    url: https://maloveapp-backend.onrender.com/api/email-automation/schedule/process
+    method: POST
+    headers:
+      x-cron-key: ${EMAIL_AUTOMATION_CRON_KEY}
+      Content-Type: application/json
+    body: |
+      {
+        "limit": 25,
+        "dryRun": false
+      }
+    
+    # Configuración adicional
+    timeout: 300  # 5 minutos máximo
+    retries: 2
+    retry_delay: 60  # 1 minuto entre reintentos
+    
+    # Alertas
+    on_failure:
+      - email: devops@maloveapp.com
+      - slack: #alerts-backend
+    
+    # Variables de entorno requeridas
+    env:
+      - EMAIL_AUTOMATION_CRON_KEY
+      - MAILGUN_API_KEY
+      - MAILGUN_DOMAIN
+      - MAILGUN_EU_REGION
+
+  # Job 2: Limpieza Automática de Papelera (Retención)
+  - name: email-trash-retention
+    description: Elimina emails en papelera con más de 30 días
+    schedule: "0 2 * * *"  # Diario a las 2am
+    
+    command: node backend/jobs/emailTrashRetention.js
+    
+    timeout: 600  # 10 minutos máximo
+    retries: 1
+    
+    on_failure:
+      - email: devops@maloveapp.com
+
+  # Job 3: Actualizar Métricas de Email (Agregación)
+  - name: email-metrics-aggregation
+    description: Agrega métricas diarias de emails
+    schedule: "0 1 * * *"  # Diario a la 1am
+    
+    command: node backend/jobs/emailMetricsAggregation.js
+    
+    timeout: 300
+    retries: 1
+
+---
+
+# INSTRUCCIONES DE CONFIGURACIÓN POR PLATAFORMA
+
+## Render.com
+
+1. Dashboard → tu servicio → Cron Jobs
+2. Click "Add Cron Job"
+3. Para cada job:
+   - **Name:** email-scheduler-worker
+   - **Command:** curl -X POST https://tu-backend.onrender.com/api/email-automation/schedule/process -H "x-cron-key: ${EMAIL_AUTOMATION_CRON_KEY}" -H "Content-Type: application/json" -d '{"limit":25}'
+   - **Schedule:** Every 5 minutes
+   - **Region:** Same as service
+
+## Cloud Scheduler (GCP)
+
+```bash
+# Job 1: Email Scheduler
+gcloud scheduler jobs create http email-scheduler-worker \
+  --schedule="*/5 * * * *" \
+  --uri="https://maloveapp-backend.onrender.com/api/email-automation/schedule/process" \
+  --http-method=POST \
+  --headers="x-cron-key=${EMAIL_AUTOMATION_CRON_KEY},Content-Type=application/json" \
+  --message-body='{"limit":25,"dryRun":false}' \
+  --time-zone="Europe/Madrid"
+
+# Job 2: Trash Retention
+gcloud scheduler jobs create http email-trash-retention \
+  --schedule="0 2 * * *" \
+  --uri="https://maloveapp-backend.onrender.com/api/email-automation/trash/cleanup" \
+  --http-method=POST \
+  --headers="x-cron-key=${EMAIL_AUTOMATION_CRON_KEY}" \
+  --time-zone="Europe/Madrid"
+```
+
+## Heroku Scheduler
+
+1. Dashboard → Resources → Heroku Scheduler
+2. Añadir job:
+   ```
+   Command: node backend/jobs/emailSchedulerCron.js
+   Frequency: Every 10 minutes
+   ```
+
+## Docker / Kubernetes
+
+```yaml
+# CronJob para Kubernetes
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: email-scheduler-worker
+spec:
+  schedule: "*/5 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: email-scheduler
+            image: mywed360/backend:latest
+            command: ["node", "backend/jobs/emailSchedulerCron.js"]
+            env:
+            - name: EMAIL_AUTOMATION_CRON_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secrets
+                  key: cron-key
+          restartPolicy: OnFailure
+```
+
+## Sistema (crontab)
+
+```bash
+# Editar crontab
+crontab -e
+
+# Añadir:
+*/5 * * * * cd /path/to/mywed360 && node backend/jobs/emailSchedulerCron.js >> /var/log/email-scheduler.log 2>&1
+0 2 * * * cd /path/to/mywed360 && node backend/jobs/emailTrashRetention.js >> /var/log/email-retention.log 2>&1
+```
+
+---
+
+## VARIABLES DE ENTORNO REQUERIDAS
+
+Asegúrate de tener configuradas:
+
+```env
+# Cron Key para autenticación
+EMAIL_AUTOMATION_CRON_KEY=genera_una_clave_segura_aqui
+
+# Mailgun (necesario para enviar emails)
+MAILGUN_API_KEY=tu_api_key_sin_prefijo_key
+MAILGUN_DOMAIN=malove.app
+MAILGUN_EU_REGION=true
+
+# Firebase Admin (necesario para Firestore)
+GOOGLE_APPLICATION_CREDENTIALS=/path/to/serviceAccount.json
+FIREBASE_PROJECT_ID=maloveapp-98c77
+```
+
+---
+
+## MONITOREO Y LOGS
+
+### Ver logs en tiempo real
+
+```bash
+# Render
+render logs --tail
+
+# Heroku
+heroku logs --tail --app mywed360
+
+# GCP
+gcloud logging read "resource.type=cloud_scheduler_job" --limit 50
+
+# Sistema
+tail -f /var/log/email-scheduler.log
+```
+
+### Verificar estado de cola
+
+```bash
+# Check cuántos emails están pendientes
+curl https://maloveapp-backend.onrender.com/api/email-automation/scheduled/status
+
+# Respuesta esperada:
+# {
+#   "metrics": {
+#     "pending": 5,
+#     "processing": 0,
+#     "failed": 1
+#   },
+#   "upcoming": [...],
+#   "lastRun": {...}
+# }
+```
+
+---
+
+## TROUBLESHOOTING
+
+### Job no se ejecuta
+
+1. **Verificar que el job está activo:**
+   - Render: Dashboard → Cron Jobs → Check status
+   - GCP: `gcloud scheduler jobs describe email-scheduler-worker`
+
+2. **Verificar logs:**
+   - Buscar errores en logs del job
+   - Verificar que EMAIL_AUTOMATION_CRON_KEY coincide
+
+3. **Test manual:**
+   ```bash
+   curl -X POST https://tu-backend.onrender.com/api/email-automation/schedule/process \
+     -H "x-cron-key: TU_CRON_KEY" \
+     -H "Content-Type: application/json" \
+     -d '{"limit":5,"dryRun":true}'
+   ```
+
+### Emails no se envían
+
+1. **Verificar que están en cola:**
+   ```bash
+   # En backend, ejecutar:
+   node -e "
+   const admin = require('firebase-admin');
+   admin.initializeApp();
+   admin.firestore().collection('emailAutomationQueue')
+     .where('status', '==', 'scheduled')
+     .get()
+     .then(snap => console.log('Pending:', snap.size));
+   "
+   ```
+
+2. **Ejecutar job manualmente:**
+   ```bash
+   node backend/jobs/emailSchedulerCron.js
+   ```
+
+3. **Revisar logs de errores:**
+   - Collection: emailScheduledAudit
+   - Buscar entries con `failedCount > 0`
+
+---
+
+## MÉTRICAS Y ALERTAS
+
+### KPIs a Monitorear
+
+- **Tasa de éxito:** successCount / processed > 95%
+- **Latencia:** durationMs < 30000 (30s)
+- **Fallos consecutivos:** < 3
+
+### Configurar Alertas
+
+**Ejemplo con Datadog:**
+```yaml
+name: "Email Scheduler - High Failure Rate"
+query: "avg(last_5m):sum:email.scheduler.failed / sum:email.scheduler.processed > 0.1"
+message: "Email scheduler tiene tasa de fallos >10% @devops-team"
+```
+
+**Ejemplo con Prometheus:**
+```yaml
+- alert: EmailSchedulerHighFailureRate
+  expr: rate(email_scheduler_failed_total[5m]) / rate(email_scheduler_processed_total[5m]) > 0.1
+  for: 5m
+  labels:
+    severity: warning
+  annotations:
+    summary: "Email scheduler failure rate is high"
+```
+
+---
+
+**Última actualización:** 23 Oct 2025, 5:40am  
+**Próxima revisión:** Tras desplegar cron jobs

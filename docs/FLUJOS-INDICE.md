@@ -1,6 +1,6 @@
 ---
 title: Índice de flujos funcionales
-description: Índice maestro de flujos funcionales MyWed360
+description: Índice maestro de flujos funcionales MaLoveApp
 ---
 
 # Índice de flujos funcionales

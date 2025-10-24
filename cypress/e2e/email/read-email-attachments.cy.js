@@ -1,6 +1,6 @@
 describe('Descarga de adjuntos en correos', () => {
   const testUser = {
-    email: 'usuario.test@lovenda.com',
+    email: 'usuario.test@maloveapp.com',
     password: 'contraseña123',
   };
 

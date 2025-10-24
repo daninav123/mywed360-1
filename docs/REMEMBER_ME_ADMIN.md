@@ -38,7 +38,7 @@ El sistema de "Recordar Dispositivo" permite que el panel de administración rec
 
 ```
 ┌─────────────────────────────────────┐
-│  Email: admin@lovenda.com          │
+│  Email: admin@maloveapp.com          │
 │  Contraseña: ●●●●●●●●              │
 │  ☑ Recordar este dispositivo (30d) │  ← MARCAR AQUÍ
 │         [ Acceder ]                 │
@@ -233,7 +233,7 @@ Esto:
 │                                             │
 │   Email corporativo                         │
 │   ┌─────────────────────────────────────┐  │
-│   │ admin@lovenda.com                   │  │
+│   │ admin@maloveapp.com                   │  │
 │   └─────────────────────────────────────┘  │
 │                                             │
 │   Contraseña                                │
@@ -285,7 +285,7 @@ Esto:
 curl -X POST http://localhost:4004/api/admin/login \
   -H "Content-Type: application/json" \
   -d '{
-    "email": "admin@lovenda.com",
+    "email": "admin@maloveapp.com",
     "password": "AdminPass123!",
     "rememberMe": true
   }'
@@ -325,7 +325,7 @@ curl -X POST http://localhost:4004/api/admin/logout \
 ADMIN_REQUIRE_MFA=true                    # Requiere MFA (default: true)
 ADMIN_SESSION_TTL_MINUTES=43200           # 30 días (default: 720 = 12h)
 ADMIN_MFA_WINDOW_SECONDS=90               # Ventana MFA (default: 90s)
-ADMIN_EMAIL=admin@lovenda.com             # Email del admin
+ADMIN_EMAIL=admin@maloveapp.com             # Email del admin
 ADMIN_PASSWORD=AdminPass123!              # Contraseña (o usa ADMIN_PASSWORD_HASH)
 ADMIN_MFA_TEST_CODE=123456                # Código MFA de prueba (dev only)
 ```
@@ -336,7 +336,7 @@ ADMIN_MFA_TEST_CODE=123456                # Código MFA de prueba (dev only)
 adminTrustedDevices/
   dev_abc123456.../
     deviceId: "dev_abc123456..."
-    email: "admin@lovenda.com"
+    email: "admin@maloveapp.com"
     userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64)..."
     ipAddress: "192.168.1.100"
     browser: "Chrome"

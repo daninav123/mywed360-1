@@ -29,7 +29,7 @@ Para que el buscador de proveedores funcione con datos reales necesitas:
 
 1. Ve a: https://platform.openai.com/api-keys
 2. Click en **"Create new secret key"**
-3. Dale un nombre (ej: "MyWed360-Proveedores")
+3. Dale un nombre (ej: "MaLoveApp-Proveedores")
 4. **Copia la key** (empieza con `sk-...`)
 5. ⚠️ **IMPORTANTE:** Guárdala en un lugar seguro, solo se muestra una vez
 

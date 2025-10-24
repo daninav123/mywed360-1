@@ -49,12 +49,12 @@ describe('EmailSettings', () => {
       updateUserProfile: mockUpdateProfile,
     });
 
-    initEmailService.mockReturnValue('maria.garcia@mywed360.com');
+    initEmailService.mockReturnValue('maria.garcia@maloveapp.com');
 
     createEmailAlias.mockResolvedValue({
       success: true,
       alias: 'nuevo.alias',
-      email: 'nuevo.alias@mywed360.com',
+      email: 'nuevo.alias@maloveapp.com',
     });
   });
 
@@ -67,7 +67,7 @@ describe('EmailSettings', () => {
     render(<EmailSettings />);
 
     // Verificar que se muestra la dirección actual
-    expect(screen.getByText('maria.garcia@mywed360.com')).toBeInTheDocument();
+    expect(screen.getByText('maria.garcia@maloveapp.com')).toBeInTheDocument();
 
     // Verificar que se llamó a initEmailService con el perfil del usuario
     expect(initEmailService).toHaveBeenCalledWith(mockUserProfile);
@@ -245,7 +245,7 @@ describe('EmailSettings', () => {
     resolvePromise({
       success: true,
       alias: 'nuevo.alias',
-      email: 'nuevo.alias@mywed360.com',
+      email: 'nuevo.alias@maloveapp.com',
     });
 
     // Verificar que el botón vuelve a su estado normal
@@ -268,8 +268,8 @@ describe('EmailSettings', () => {
     expect(initEmailService).not.toHaveBeenCalled();
 
     // La dirección de correo debería estar vacía
-    expect(screen.queryByText('@mywed360.com')).toBeInTheDocument();
-    expect(screen.queryByText('maria.garcia@mywed360.com')).not.toBeInTheDocument();
+    expect(screen.queryByText('@maloveapp.com')).toBeInTheDocument();
+    expect(screen.queryByText('maria.garcia@maloveapp.com')).not.toBeInTheDocument();
   });
 });
 

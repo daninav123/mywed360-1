@@ -346,7 +346,7 @@ import PartnerStats from './pages/PartnerStats.jsx';
 
 ### Para Partners
 
-1. Recibir enlace único: `https://mywed360.com/partner/a3f5b9c2...`
+1. Recibir enlace único: `https://maloveapp.com/partner/a3f5b9c2...`
 2. Abrir en navegador (sin login)
 3. Ver dashboard con estadísticas en tiempo real:
    - Facturación total y mensual
@@ -470,7 +470,7 @@ Recomendado trackear:
 
 ```env
 JWT_SECRET=<secret-para-generar-tokens>
-VITE_APP_URL=https://mywed360.com
+VITE_APP_URL=https://maloveapp.com
 ```
 
 ### Dependencias

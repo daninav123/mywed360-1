@@ -15,7 +15,7 @@ dotenv.config({ path: envPath });
 
 // Obtener configuración de Mailgun
 const API_KEY = process.env.VITE_MAILGUN_API_KEY || 'a42e6604fb3e4b737f281cd3dbc6309a-0ce15100-24828154';
-const DOMAIN = process.env.VITE_MAILGUN_SENDING_DOMAIN || 'mg.mywed360.com';
+const DOMAIN = process.env.VITE_MAILGUN_SENDING_DOMAIN || 'mg.maloveapp.com';
 const EU_REGION = process.env.VITE_MAILGUN_EU_REGION === 'true';
 
 console.log('Configuración actual:');
@@ -44,7 +44,7 @@ async function checkMailgunConnection() {
     console.log('- Registros DNS creados:', domainInfo.domain.created_at);
     
     // Verificar si el correo personalizado existe/está autorizado
-    const testEmail = 'danielnavarrocampos@mywed360.com';
+    const testEmail = 'danielnavarrocampos@maloveapp.com';
     console.log('\nVerificando autorización para correo personalizado:', testEmail);
     
     // Intentar enviar un correo de prueba interno

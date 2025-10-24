@@ -19,6 +19,216 @@
       "saved": "Borrador guardado",
       "deleted": "Correo eliminado",
       "error": "Error al enviar el correo"
+    },
+    "composer": {
+      "header": {
+        "title": "New message",
+        "closeAria": "Close composer"
+      },
+      "fields": {
+        "from": {
+          "label": "From"
+        },
+        "to": {
+          "label": "To",
+          "placeholder": "Recipients (email@example.com, email2@example.com)"
+        },
+        "cc": {
+          "label": "CC",
+          "placeholder": "CC (email@example.com, email2@example.com)"
+        },
+        "subject": {
+          "label": "Subject",
+          "placeholder": "Email subject"
+        },
+        "body": {
+          "label": "Message",
+          "placeholder": "Write your message here..."
+        }
+      },
+      "templates": {
+        "placeholder": "Templates"
+      },
+      "status": {
+        "loadingEmail": "loading..."
+      },
+      "actions": {
+        "configureEmail": "Set up email",
+        "addCc": "Add CC"
+      },
+      "attachments": {
+        "label": "Attachments",
+        "addFile": "Attach file",
+        "maxSizeHint": "Max 10MB per file",
+        "count_one": "{{count}} attachment",
+        "count_other": "{{count}} attachments",
+        "removeAria": "Remove attachment"
+      },
+      "schedule": {
+        "label": "Schedule send",
+        "helper": "Choose a date and time to send automatically."
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "schedule": "Schedule",
+        "send": "Send",
+        "scheduling": "Scheduling...",
+        "sending": "Sending..."
+      },
+      "success": {
+        "scheduled": "Email scheduled successfully",
+        "sent": "Email sent successfully"
+      },
+      "errors": {
+        "invalidAttachments": "Some files exceed the maximum size of {{maxSize}}: {{names}}",
+        "missingRecipient": "Please add at least one recipient.",
+        "missingSubject": "Please add a subject to the email.",
+        "emptyBody": "Message cannot be empty.",
+        "invalidRecipients": "Some email addresses are not valid: {{emails}}",
+        "invalidCc": "Some CC addresses are not valid: {{emails}}",
+        "missingSchedule": "Select a date and time to schedule the send.",
+        "attachmentsNotSupported": "Scheduling emails with attachments is not available yet.",
+        "invalidScheduleDate": "Date and time are not valid.",
+        "scheduleFailed": "We couldn’t schedule the email.",
+        "sendFailed": "We couldn’t send the email.",
+        "sendFailedWithDetails": "We couldn’t send the email: {{details}}"
+      },
+      "prompts": {
+        "setupCustomAddress": "You haven’t configured a custom email address yet. Do you want to set it up now?"
+      }
+    },
+    "calendarIntegration": {
+      "header": "Add event to calendar",
+      "status": {
+        "analyzing": "Analyzing email content...",
+        "detectedInfo": "Information detected in the email:"
+      },
+      "tooltips": {
+        "useDate": "Use this date",
+        "useTime": "Use this time",
+        "useLocation": "Use this location",
+        "useAttendee": "Use this attendee"
+      },
+      "errors": {
+        "noEmail": "No email available to analyze",
+        "analyzeFailed": "We couldn't analyze the email content.",
+        "missingTitle": "Event title is required.",
+        "missingDate": "Please select a date for the event."
+      },
+      "defaults": {
+        "description": "Event created from email: \"{{subject}}\"",
+        "noSubject": "(No subject)"
+      },
+      "detection": {
+        "locationKeywords": ["at", "located at", "address", "venue", "location", "space", "room"],
+        "providerKeywords": ["vendor", "service", "booking"]
+      },
+      "fields": {
+        "title": {
+          "label": "Event title:",
+          "placeholder": "Event title"
+        },
+        "date": {
+          "label": "Date:"
+        },
+        "time": {
+          "label": "Time:"
+        },
+        "location": {
+          "label": "Location:",
+          "placeholder": "Event location"
+        },
+        "description": {
+          "label": "Description:",
+          "placeholder": "Event description"
+        }
+      },
+      "attendees": {
+        "label": "Attendees:",
+        "placeholder": "Attendee name"
+      },
+      "checkbox": {
+        "providerRelated": "This event is related to a vendor"
+      },
+      "buttons": {
+        "addAttendee": "Add attendee",
+        "cancel": "Cancel",
+        "save": "Save event"
+      }
+    },
+    "aliasConfig": {
+      "header": {
+        "title": "Set up your email",
+        "subtitle": "Choose your custom alias"
+      },
+      "currentEmail": {
+        "label": "Current email:"
+      },
+      "fields": {
+        "alias": {
+          "label": "Your email alias",
+          "placeholder": "example: ana, pedro, wedding2025"
+        }
+      },
+      "rules": [
+        "Between 3 and 30 characters",
+        "Lowercase letters, numbers, dots (.), hyphens (-) and underscores (_)",
+        "Examples: ana, pedro-2025, my.wedding"
+      ],
+      "preview": {
+        "label": "Your new email will be:"
+      },
+      "errors": {
+        "required": "Alias is required.",
+        "minLength": "At least 3 characters.",
+        "maxLength": "Up to 30 characters.",
+        "invalidChars": "Only lowercase letters, numbers, dots (.), hyphens (-), and underscores (_) are allowed.",
+        "aliasUsed": "This alias is already in use.",
+        "checkFailed": "We couldn't verify the availability.",
+        "config": "Configuration error. Please reload the page.",
+        "unavailable": "This alias is not available.",
+        "saveFailed": "We couldn't save the alias. Please try again."
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "save": "Save",
+        "saving": "Saving..."
+      }
+    },
+    "compose": {
+      "header": {
+        "title": "New email"
+      },
+      "fields": {
+        "to": {
+          "placeholder": "To:",
+          "aria": "Recipient field"
+        },
+        "subject": {
+          "placeholder": "Subject:",
+          "aria": "Subject field"
+        },
+        "cc": {
+          "placeholder": "CC:",
+          "aria": "CC field"
+        },
+        "bcc": {
+          "placeholder": "BCC:",
+          "aria": "BCC field"
+        }
+      },
+      "toggle": {
+        "showCcBcc": "Add CC/BCC",
+        "hideCcBcc": "Hide CC/BCC"
+      },
+      "quickReplies": {
+        "options": [
+          "Thank you for your response. I look forward to the next steps.",
+          "Could you please send us a detailed quote?",
+          "We confirm our availability on the suggested date. Thank you."
+        ],
+        "ariaLabel": "Insert suggested reply {{index}}"
+      }
     }
   },
   "_note": "Translate from es/email.json"

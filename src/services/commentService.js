@@ -16,7 +16,7 @@ import { db } from '../firebaseConfig';
  * Sincroniza contra Firestore cuando está disponible y mantiene un fallback local.
  */
 
-const COMMENTS_KEY_PREFIX = 'mywed360_email_comments_';
+const COMMENTS_KEY_PREFIX = 'maloveapp_email_comments_';
 
 const getStorageKey = (userId) => `${COMMENTS_KEY_PREFIX}${userId}`;
 

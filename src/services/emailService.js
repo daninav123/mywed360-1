@@ -38,6 +38,13 @@ function buildEmailFromProfile(profile = {}) {
   if (!profile || typeof profile !== 'object') {
     return `usuario@${MAILGUN_DOMAIN}`;
   }
+  
+  // Prioridad 1: Si ya tiene maLoveEmail configurado, usarlo
+  if (profile.maLoveEmail && profile.maLoveEmail.includes('@')) {
+    return profile.maLoveEmail;
+  }
+  
+  // Prioridad 2: Construir desde emailUsername
   const alias = slugify(profile.emailAlias || profile.emailUsername || '');
   if (alias) {
     return `${alias}@${MAILGUN_DOMAIN}`;
@@ -64,10 +71,8 @@ function getRequestOptions(extra = {}) {
   if (IS_CYPRESS) {
     return { ...base, auth: false };
   }
-  if (authContextRef && authContextRef.user) {
-    return { ...base, auth: base.auth ?? true };
-  }
-  return { ...base, auth: base.auth ?? false };
+  // Siempre usar autenticación para rutas de email
+  return { ...base, auth: base.auth ?? true };
 }
 
 async function safeJson(response) {

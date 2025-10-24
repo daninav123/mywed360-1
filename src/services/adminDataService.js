@@ -16,6 +16,37 @@ const DEFAULT_OVERVIEW = {
   meta: null,
 };
 
+const DEFAULT_STORAGE_METRICS = {
+  totalBytes: 0,
+  totalGigabytes: 0,
+  premiumAverageBytes: 0,
+  premiumAverageGigabytes: 0,
+  premiumCount: 0,
+  source: 'fallback',
+};
+
+const DEFAULT_DOWNLOAD_METRICS = {
+  total: 0,
+  last30d: 0,
+  source: 'fallback',
+};
+
+const DEFAULT_TRAFFIC_METRICS = {
+  totalVisits: 0,
+  newVisits: 0,
+  since: null,
+  source: 'fallback',
+};
+
+const DEFAULT_USER_GROWTH_METRICS = {
+  newUsers: 0,
+  newPremiumUsers: 0,
+  newPremiumShare: 0,
+  totalUsers: 0,
+  since: null,
+  source: 'fallback',
+};
+
 const DEFAULT_METRICS = {
   series: [],
   funnel: null,
@@ -42,6 +73,10 @@ const DEFAULT_METRICS = {
   acquisition: [],
   retention: [],
   engagement: [],
+  storage: { ...DEFAULT_STORAGE_METRICS },
+  downloads: { ...DEFAULT_DOWNLOAD_METRICS },
+  traffic: { ...DEFAULT_TRAFFIC_METRICS },
+  userGrowth: { ...DEFAULT_USER_GROWTH_METRICS },
 };
 
 const DEFAULT_INTEGRATIONS = {
@@ -132,6 +167,61 @@ const normalizeWeddingStats = (stats) => {
     withPlanner: normalizeMetricNumber(stats.withPlanner),
     withoutPlanner: normalizeMetricNumber(stats.withoutPlanner),
     source: typeof stats.source === 'string' && stats.source ? stats.source : 'fallback',
+  };
+};
+
+const normalizeStorageMetrics = (metrics) => {
+  if (!metrics || typeof metrics !== 'object') return { ...DEFAULT_STORAGE_METRICS };
+  return {
+    totalBytes: normalizeMetricNumber(metrics.totalBytes),
+    totalGigabytes: normalizeMetricNumber(metrics.totalGigabytes),
+    premiumAverageBytes: normalizeMetricNumber(metrics.premiumAverageBytes),
+    premiumAverageGigabytes: normalizeMetricNumber(metrics.premiumAverageGigabytes),
+    premiumCount: normalizeMetricNumber(metrics.premiumCount),
+    source:
+      typeof metrics.source === 'string' && metrics.source
+        ? metrics.source
+        : 'fallback',
+  };
+};
+
+const normalizeDownloadMetrics = (metrics) => {
+  if (!metrics || typeof metrics !== 'object') return { ...DEFAULT_DOWNLOAD_METRICS };
+  return {
+    total: normalizeMetricNumber(metrics.total),
+    last30d: normalizeMetricNumber(metrics.last30d),
+    source:
+      typeof metrics.source === 'string' && metrics.source
+        ? metrics.source
+        : 'fallback',
+  };
+};
+
+const normalizeTrafficMetrics = (metrics) => {
+  if (!metrics || typeof metrics !== 'object') return { ...DEFAULT_TRAFFIC_METRICS };
+  return {
+    totalVisits: normalizeMetricNumber(metrics.totalVisits),
+    newVisits: normalizeMetricNumber(metrics.newVisits),
+    since: metrics.since || null,
+    source:
+      typeof metrics.source === 'string' && metrics.source
+        ? metrics.source
+        : 'fallback',
+  };
+};
+
+const normalizeUserGrowthMetrics = (metrics) => {
+  if (!metrics || typeof metrics !== 'object') return { ...DEFAULT_USER_GROWTH_METRICS };
+  return {
+    newUsers: normalizeMetricNumber(metrics.newUsers),
+    newPremiumUsers: normalizeMetricNumber(metrics.newPremiumUsers),
+    newPremiumShare: Number.isFinite(metrics.newPremiumShare) ? metrics.newPremiumShare : 0,
+    totalUsers: normalizeMetricNumber(metrics.totalUsers),
+    since: metrics.since || null,
+    source:
+      typeof metrics.source === 'string' && metrics.source
+        ? metrics.source
+        : 'fallback',
   };
 };
 
@@ -298,6 +388,10 @@ export const getMetricsData = async () => {
     acquisition: toArray(data.acquisition),
     retention: toArray(data.retention),
     engagement: toArray(data.engagement),
+    storage: normalizeStorageMetrics(data.storage),
+    downloads: normalizeDownloadMetrics(data.downloads),
+    traffic: normalizeTrafficMetrics(data.traffic),
+    userGrowth: normalizeUserGrowthMetrics(data.userGrowth),
   };
 };
 

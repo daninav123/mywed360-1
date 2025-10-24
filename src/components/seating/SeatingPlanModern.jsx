@@ -1,25 +1,25 @@
-/**
- * SeatingPlanModern - Nueva versión con diseño flotante moderno
- * Wrapper que integra el nuevo diseño visual con la funcionalidad existente
+﻿/**
+ * SeatingPlanModern - New floating layout version
+ * Wrapper integrating the new visual design with existing functionality
  */
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { toast } from 'react-toastify';
 
-// Nuevos componentes de diseño
+// New design components
 import SeatingLayoutFloating from './SeatingLayoutFloating';
 import SeatingToolbarFloating from './SeatingToolbarFloating';
 import SeatingHeaderCompact from './SeatingHeaderCompact';
 import SeatingFooterStats from './SeatingFooterStats';
 import SeatingInspectorFloating from './SeatingInspectorFloating';
 
-// Componentes Fase 3 (Premium)
+// Phase 3 components (Premium)
 import ThemeToggle from './ThemeToggle';
 import ConfettiCelebration from './ConfettiCelebration';
 import QuickAddTableButton from './QuickAddTableButton';
 
-// Componentes existentes (reutilizados)
+// Existing components (reused)
 import SeatingPlanCanvas from './SeatingPlanCanvas';
 import SeatingPlanModals from './SeatingPlanModals';
 import SeatingGuestDrawer from './SeatingGuestDrawer';
@@ -30,13 +30,15 @@ import { useSeatingPlan } from '../../hooks/useSeatingPlan';
 import { useWedding } from '../../context/WeddingContext';
 import useTheme from '../../hooks/useTheme';
 import { post as apiPost } from '../../services/apiClient';
+import useTranslations from '../../hooks/useTranslations';
 
 export default function SeatingPlanModern() {
+  const { t } = useTranslations();
   const { activeWedding } = useWedding();
   
   // Hook principal de seating
   const {
-    // Estado básico
+    // Basic state
     tab,
     setTab,
     hallSize,
@@ -46,7 +48,7 @@ export default function SeatingPlanModern() {
     selectedTable,
     guests,
     
-    // Modales
+    // Modals
     ceremonyConfigOpen,
     setCeremonyConfigOpen,
     banquetConfigOpen,
@@ -56,7 +58,7 @@ export default function SeatingPlanModern() {
     templateOpen,
     setTemplateOpen,
     
-    // Acciones principales
+    // Main actions
     handleSelectTable,
     addTable,
     deleteTable,
@@ -67,31 +69,31 @@ export default function SeatingPlanModern() {
     canUndo,
     canRedo,
     
-    // Generación
+    // Generation
     generateSeatGrid,
     generateBanquetLayout,
     
-    // Exportación
+    // Export
     exportPDF,
     exportPNG,
     exportCSV,
     
-    // Dimensiones
+    // Dimensions
     saveHallDimensions,
     
-    // Modo de dibujo
+    // Draw mode
     drawMode,
     setDrawMode,
     
-    // Transformaciones
+    // Transformations
     moveTable,
     rotateSelected,
     
-    // Invitados
+    // Guests
     moveGuest,
     moveGuestToSeat,
     
-    // Auto-asignación
+    // Auto-assignment
     autoAssignGuests,
     conflicts,
   } = useSeatingPlan();
@@ -105,12 +107,12 @@ export default function SeatingPlanModern() {
   const [guestDrawerOpen, setGuestDrawerOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   
-  // Fase 3: Theme y celebración
+  // Phase 3: Theme and celebration
   const { theme, isDark, toggleTheme } = useTheme();
   const [showConfetti, setShowConfetti] = useState(false);
   const [previousPercentage, setPreviousPercentage] = useState(0);
 
-  // Calcular estadísticas
+  // Calculate statistics
   const stats = useMemo(() => {
     const totalGuests = guests?.length || 0;
     const assignedGuests = guests?.filter(g => g.tableId || g.table)?.length || 0;
@@ -133,44 +135,44 @@ export default function SeatingPlanModern() {
   useEffect(() => {
     if (stats.assignedPercentage === 100 && previousPercentage < 100 && stats.totalGuests > 0) {
       setShowConfetti(true);
-      toast.success('🎉 ¡100% de invitados asignados! ¡Felicitaciones!', {
+      toast.success(t('planModern.toasts.fullAssignment'), {
         autoClose: 3000,
       });
     }
     setPreviousPercentage(stats.assignedPercentage);
-  }, [stats.assignedPercentage, previousPercentage, stats.totalGuests]);
+  }, [stats.assignedPercentage, previousPercentage, stats.totalGuests, t]);
 
   // Handler para Auto-IA
   const handleAutoAssign = useCallback(async () => {
     setAutoAssignLoading(true);
     try {
       await autoAssignGuests();
-      toast.success('✨ Asignación automática completada');
+      toast.success(t('planModern.toasts.autoAssignSuccess'));
     } catch (error) {
-      console.error('Error en auto-asignación:', error);
-      toast.error('Error en la asignación automática');
+      console.error('[auto-assign] error:', error);
+      toast.error(t('planModern.toasts.autoAssignError'));
     } finally {
       setAutoAssignLoading(false);
     }
-  }, [autoAssignGuests]);
+  }, [autoAssignGuests, t]);
 
-  // Handler para añadir mesa
+  // Handler to add a table
   const handleAddTable = useCallback(() => {
     try {
-      console.log('[handleAddTable] Estado antes de añadir:');
+      console.log('[handleAddTable] state before adding:');
       console.log('- tab:', tab);
       console.log('- tables.length:', tables?.length || 0);
-      console.log('- addTable disponible:', !!addTable);
+      console.log('- addTable available:', !!addTable);
       
       if (!addTable) {
-        toast.error('La función addTable no está disponible');
-        console.error('addTable no está en useSeatingPlan');
+        toast.error(t('planModern.errors.addTableUnavailable'));
+        console.error('[addTable] handler missing in useSeatingPlan');
         return;
       }
       
       // Asegurar que estamos en tab banquet
       if (tab !== 'banquet') {
-        console.warn('[handleAddTable] No estamos en banquet, cambiando...');
+        console.warn('[handleAddTable] Not in banquet tab, switching...');
         setTab('banquet');
       }
       
@@ -184,27 +186,28 @@ export default function SeatingPlanModern() {
         capacity: 8,
         seats: 8,
         number: (tables?.length || 0) + 1,
-        name: `Mesa ${(tables?.length || 0) + 1}`,
+        name: t('planModern.defaults.tableName', { number: (tables?.length || 0) + 1 }),
       };
       
-      console.log('[handleAddTable] Añadiendo mesa:', newTable);
+      console.log('[handleAddTable] adding table:', newTable);
       addTable(newTable);
-      toast.success('✨ Mesa añadida - Arrástrala para posicionarla');
+      toast.success(t('planModern.toasts.addTableSuccess'));
       
-      // Verificar estado después
+      // Verify state after the async update
       setTimeout(() => {
-        console.log('[handleAddTable] Estado después (async check):');
+        console.log('[handleAddTable] state after async check:');
         console.log('- tables.length:', tables?.length || 0);
       }, 100);
     } catch (error) {
       console.error('[handleAddTable] Error:', error);
-      toast.error('Error al añadir mesa: ' + error.message);
+      const details = error?.message ? `: ${error.message}` : '';
+      toast.error(t('planModern.toasts.addTableError', { message: details }));
     }
-  }, [addTable, hallSize, tables, tab, setTab]);
+  }, [addTable, hallSize, tables, tab, setTab, t]);
   
   // Debug: Detectar cambios en tables
   useEffect(() => {
-    console.log('[SeatingPlanModern] tables cambió:', {
+    console.log('[SeatingPlanModern] tables changed:', {
       length: tables?.length || 0,
       tab,
       tables: tables?.map(t => ({ id: t.id, name: t.name, x: t.x, y: t.y }))
@@ -214,14 +217,14 @@ export default function SeatingPlanModern() {
   // Handler para duplicar mesa
   const handleDuplicate = useCallback((tableId) => {
     duplicateTable(tableId);
-    toast.success('Mesa duplicada');
-  }, [duplicateTable]);
+    toast.success(t('planModern.toasts.duplicateTable'));
+  }, [duplicateTable, t]);
 
   // Handler para rotar mesa
   const handleRotate = useCallback((tableId) => {
     rotateSelected();
-    toast.success('Mesa rotada');
-  }, [rotateSelected]);
+    toast.success(t('planModern.toasts.rotateTable'));
+  }, [rotateSelected, t]);
 
   // Handler para toggle lock
   const handleToggleLock = useCallback((tableId) => {
@@ -231,19 +234,19 @@ export default function SeatingPlanModern() {
   // Handler para eliminar mesa
   const handleDelete = useCallback((tableId) => {
     deleteTable(tableId);
-    toast.success('Mesa eliminada');
-  }, [deleteTable]);
+    toast.success(t('planModern.toasts.deleteTable'));
+  }, [deleteTable, t]);
 
   // Handler para cambiar capacidad
   const handleCapacityChange = useCallback((tableId, newCapacity) => {
     // Buscar la mesa y actualizar
     const tableToUpdate = tables?.find(t => t.id === tableId);
     if (tableToUpdate) {
-      // Aquí deberías tener un método updateTable en useSeatingPlan
+      // TODO: provide an updateTable method in useSeatingPlan
       // Por ahora solo mostramos feedback
-      toast.info(`Capacidad actualizada: ${newCapacity}`);
+      toast.info(t('planModern.toasts.capacityUpdated', { value: newCapacity }));
     }
-  }, [tables]);
+  }, [tables, t]);
 
   // Handler para remover invitado
   const handleRemoveGuest = useCallback((tableId, guestId) => {
@@ -251,9 +254,9 @@ export default function SeatingPlanModern() {
     const guest = guests?.find(g => g.id === guestId);
     if (guest) {
       moveGuest(guestId, null, null);
-      toast.success('Invitado removido de la mesa');
+      toast.success(t('planModern.toasts.removeGuest'));
     }
-  }, [guests, moveGuest]);
+  }, [guests, moveGuest, t]);
 
   // Handler para abrir drawer de invitados
   const handleOpenDrawMode = useCallback(() => {
@@ -280,9 +283,9 @@ export default function SeatingPlanModern() {
 
   // Nombre del usuario para el header
   const userName = useMemo(() => {
-    // Aquí podrías obtener el nombre real del usuario del contexto
-    return 'Usuario';
-  }, []);
+    // Obtain the actual user name from context if needed
+    return t('planModern.header.userFallback');
+  }, [t]);
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -339,7 +342,7 @@ export default function SeatingPlanModern() {
               drawMode={drawMode}
               guests={guests}
               moveTable={moveTable}
-              // Más props según necesites
+              // Additional props as needed
             />
           </SeatingLayoutFloating.Canvas>
 

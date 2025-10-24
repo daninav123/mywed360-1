@@ -1,5 +1,5 @@
-const STORE_KEY = 'lovenda_local_weddings';
-export const LOCAL_WEDDINGS_EVENT = 'lovenda:local-weddings-updated';
+const STORE_KEY = 'maloveapp_local_weddings';
+export const LOCAL_WEDDINGS_EVENT = 'maloveapp:local-weddings-updated';
 
 const getGlobal = () => {
   if (typeof window !== 'undefined') return window;

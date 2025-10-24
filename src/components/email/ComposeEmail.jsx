@@ -1,15 +1,15 @@
 import { AlertCircle, Paperclip } from 'lucide-react';
 import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
 import { useAuth } from '../../hooks/useAuth';
 import * as EmailService from '../../services/emailService';
 import { uploadEmailAttachments } from '../../services/storageUploadService';
-import { safeRender, ensureNotPromise, safeMap } from '../../utils/promiseSafeRenderer';
+import { safeRender } from '../../utils/promiseSafeRenderer';
 import sanitizeHtml from '../../utils/sanitizeHtml';
 import Button from '../Button';
 import Card from '../ui/Card';
+import useTranslations from '../../hooks/useTranslations';
 
 /**
  * Página de composición de correo electrónico pensada para las rutas
@@ -18,7 +18,10 @@ import Card from '../ui/Card';
  * con data-testid="email-body-editor" que esperan los tests.
  */
 const ComposeEmail = () => {
-  const { t } = useTranslation('common');
+  const { t, tVars } = useTranslations();
+  const tEmail = (key, options = {}) => t(`email.${key}`, { ns: 'email', ...options });
+  const tEmailVars = (key, variables = {}) =>
+    tVars(`email.${key}`, { ns: 'email', ...variables });
   const [sentSuccess, setSentSuccess] = useState(false);
   const navigate = useNavigate();
   const { action, id } = useParams();
@@ -35,11 +38,10 @@ const ComposeEmail = () => {
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
   const [showCcBcc, setShowCcBcc] = useState(false);
-  const [quickReplies, setQuickReplies] = useState([
-    'Gracias por su respuesta. Quedo atento/a a próximos pasos.',
-    '¿Podrían enviarnos un presupuesto detallado, por favor?',
-    'Confirmamos nuestra disponibilidad en la fecha indicada. Muchas gracias.',
-  ]);
+  const rawQuickReplies = tEmail('compose.quickReplies.options', {
+    returnObjects: true,
+  });
+  const quickReplies = Array.isArray(rawQuickReplies) ? rawQuickReplies.filter(Boolean) : [];
 
   // Inicializar desde query params (mailto:, atajos, etc.) y cargar borrador si aplica
   React.useEffect(() => {
@@ -72,7 +74,7 @@ const ComposeEmail = () => {
     const loadShared = async () => {
       try {
         const db = await new Promise((resolve, reject) => {
-          const req = indexedDB.open('mywed360-share-target', 1);
+          const req = indexedDB.open('maloveapp-share-target', 1);
           req.onupgradeneeded = () => {
             const db = req.result;
             if (!db.objectStoreNames.contains('shares')) {
@@ -100,7 +102,7 @@ const ComposeEmail = () => {
         );
         setAttachments((prev) => [...prev, ...files]);
       } catch (e) {
-        console.warn('No se pudieron cargar archivos compartidos', e);
+        console.warn('[ComposeEmail] Failed to load shared files', e);
       }
     };
 
@@ -117,7 +119,12 @@ const ComposeEmail = () => {
     // Validar tamaño máximo 10MB cada archivo
     const invalid = files.filter((f) => f.size > 10 * 1024 * 1024);
     if (invalid.length > 0) {
-      setError('Algunos archivos exceden el tamaño máximo de 10MB');
+      setError(
+        tEmailVars('composer.errors.invalidAttachments', {
+          maxSize: '10MB',
+          names: invalid.map((f) => f.name).join(', '),
+        })
+      );
       return;
     }
 
@@ -127,11 +134,11 @@ const ComposeEmail = () => {
 
   const validate = () => {
     if (!to) {
-      setError('Debes especificar un destinatario');
+      setError(tEmail('composer.errors.missingRecipient'));
       return false;
     }
     if (!subject) {
-      setError('Por favor, añade un asunto al email');
+      setError(tEmail('composer.errors.missingSubject'));
       return false;
     }
     return true;
@@ -160,8 +167,12 @@ const ComposeEmail = () => {
       // Redirigir tras breve demora
       setTimeout(() => navigate('/'), 500);
     } catch (err) {
-      console.error(err);
-      setError(`Error al enviar correo: ${err.message}`);
+      console.error('[ComposeEmail] Failed to send email:', err);
+      setError(
+        tEmailVars('composer.errors.sendFailedWithDetails', {
+          details: err?.message || '',
+        })
+      );
     } finally {
       setSending(false);
     }
@@ -171,7 +182,7 @@ const ComposeEmail = () => {
     <div className="p-4 max-w-4xl mx-auto">
       <Card className="flex flex-col">
         <div className="border-b border-gray-200 p-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold">Nuevo correo</h2>
+          <h2 className="text-xl font-bold">{tEmail('compose.header.title')}</h2>
         </div>
         <div className="p-4 space-y-4">
           {safeRender(error, '') && (
@@ -185,13 +196,13 @@ const ComposeEmail = () => {
           <div>
             <input
               type="text"
-              placeholder="Para:"
+              placeholder={tEmail('compose.fields.to.placeholder')}
               value={to}
               onChange={(e) => setTo(e.target.value)}
               className="w-full border border-gray-300 rounded-md p-2"
               disabled={sending}
               data-testid="recipient-input"
-              aria-label={t('compose.toField', 'Campo destinatario')}
+              aria-label={tEmail('compose.fields.to.aria')}
             />
           </div>
 
@@ -199,13 +210,13 @@ const ComposeEmail = () => {
           <div>
             <input
               type="text"
-              placeholder="Asunto:"
+              placeholder={tEmail('compose.fields.subject.placeholder')}
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
               className="w-full border border-gray-300 rounded-md p-2"
               disabled={sending}
               data-testid="subject-input"
-              aria-label={t('compose.subjectField', 'Campo asunto')}
+              aria-label={tEmail('compose.fields.subject.aria')}
             />
           </div>
 
@@ -214,27 +225,29 @@ const ComposeEmail = () => {
             className="text-sm text-blue-600 cursor-pointer select-none"
             onClick={() => setShowCcBcc((v) => !v)}
           >
-            {showCcBcc ? 'Ocultar CC/BCC' : 'Añadir CC/BCC'}
+            {showCcBcc
+              ? tEmail('compose.toggle.hideCcBcc')
+              : tEmail('compose.toggle.showCcBcc')}
           </div>
           {showCcBcc && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <input
                 type="text"
-                placeholder="CC:"
+                placeholder={tEmail('compose.fields.cc.placeholder')}
                 value={cc}
                 onChange={(e) => setCc(e.target.value)}
                 className="w-full border border-gray-300 rounded-md p-2"
                 disabled={sending}
-                aria-label={t('compose.ccField', 'Campo con copia')}
+                aria-label={tEmail('compose.fields.cc.aria')}
               />
               <input
                 type="text"
-                placeholder="BCC:"
+                placeholder={tEmail('compose.fields.bcc.placeholder')}
                 value={bcc}
                 onChange={(e) => setBcc(e.target.value)}
                 className="w-full border border-gray-300 rounded-md p-2"
                 disabled={sending}
-                aria-label={t('compose.bccField', 'Campo con copia oculta')}
+                aria-label={tEmail('compose.fields.bcc.aria')}
               />
             </div>
           )}
@@ -260,7 +273,9 @@ const ComposeEmail = () => {
                     const br = body && body.trim() ? '<br/><br/>' : '';
                     setBody((prev) => (prev || '') + br + qr);
                   }}
-                  aria-label={`Insertar respuesta sugerida ${i + 1}`}
+                  aria-label={tEmailVars('compose.quickReplies.ariaLabel', {
+                    index: i + 1,
+                  })}
                 >
                   {qr}
                 </button>
@@ -272,9 +287,9 @@ const ComposeEmail = () => {
           <div>
             <label
               className="cursor-pointer inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm bg-white hover:bg-gray-50"
-              aria-label="Adjuntar archivo"
+              aria-label={tEmail('composer.attachments.addFile')}
             >
-              <Paperclip size={16} className="mr-1" /> Adjuntar archivo
+              <Paperclip size={16} className="mr-1" /> {tEmail('composer.attachments.addFile')}
               <input type="file" className="hidden" multiple onChange={handleFileUpload} />
             </label>
             {attachments.length > 0 && (
@@ -288,7 +303,7 @@ const ComposeEmail = () => {
         </div>
         <div className="border-t border-gray-200 p-4 flex justify-end">
           <Button onClick={handleSend} disabled={sending} data-testid="send-button">
-            {sending ? 'Enviando...' : 'Enviar'}
+            {sending ? tEmail('composer.buttons.sending') : tEmail('composer.buttons.send')}
           </Button>
         </div>
         {sentSuccess && (
@@ -296,7 +311,7 @@ const ComposeEmail = () => {
             data-testid="success-message"
             className="text-green-700 bg-green-50 border border-green-200 p-2 rounded-md mt-2"
           >
-            Correo enviado correctamente
+            {tEmail('composer.success.sent')}
           </div>
         )}
       </Card>
@@ -305,4 +320,3 @@ const ComposeEmail = () => {
 };
 
 export default ComposeEmail;
-

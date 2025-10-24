@@ -21,7 +21,7 @@ async function main() {
   }
 
   // Ruta al archivo de clave de servicio. Ajustar si es diferente.
-  const keyPath = path.resolve(__dirname, '..', 'mywed360-firebase-adminsdk.json');
+  const keyPath = path.resolve(__dirname, '..', 'maloveapp-firebase-adminsdk.json');
 
   // Inicializar firebase-admin si no está ya inicializado
   if (!admin.apps.length) {

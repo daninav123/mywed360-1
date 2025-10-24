@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useWedding } from '../../context/WeddingContext';
 import { db } from '../../firebaseConfig';
 
-// Listens to 'mywed360-finance' custom events and creates transactions in Firestore
+// Listens to 'maloveapp-finance' custom events and creates transactions in Firestore
 export default function FinanceEventBridge() {
   const { activeWedding } = useWedding();
 
@@ -83,8 +83,8 @@ export default function FinanceEventBridge() {
       }
     };
 
-    window.addEventListener('mywed360-finance', handler);
-    return () => window.removeEventListener('mywed360-finance', handler);
+    window.addEventListener('maloveapp-finance', handler);
+    return () => window.removeEventListener('maloveapp-finance', handler);
   }, [activeWedding]);
 
   return null;

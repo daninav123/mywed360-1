@@ -1,10 +1,10 @@
-# Política de Seguridad — MyWed360
+# Política de Seguridad — MaLoveApp
 
 Gracias por ayudarnos a mantener segura la plataforma.
 
 ## Reporte de Vulnerabilidades
 - Preferencia: abre un Security Advisory privado en GitHub (Security > Advisories).
-- Alternativa: envía un correo a security@mywed360.com (si falla el advisory).
+- Alternativa: envía un correo a security@maloveapp.com (si falla el advisory).
 - Incluye pasos de reproducción, impacto y versión/commit afectado.
 
 Por favor no publiques la vulnerabilidad ni abras issues públicos hasta que confirmemos y publiquemos un parche.

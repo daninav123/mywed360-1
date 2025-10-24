@@ -3,7 +3,7 @@
    Each item: { to: "+34123456789", message: "texto", meta?: any }
 */
 (function() {
-  const log = (...args) => console.log('[MyWed360 WA CS]', ...args);
+  const log = (...args) => console.log('[MaLoveApp WA CS]', ...args);
 
   let busy = false;
 

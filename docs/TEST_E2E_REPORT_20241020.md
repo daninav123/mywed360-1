@@ -1,10 +1,10 @@
-# 📊 Reporte de Tests E2E - MyWed360
+# 📊 Reporte de Tests E2E - MaLoveApp
 **Fecha:** 20 de Octubre de 2024
 **Estado:** ✅ MEJORADO SIGNIFICATIVAMENTE
 
 ## 🎯 Resumen Ejecutivo
 
-Se ha logrado mejorar significativamente la tasa de éxito de los tests E2E del proyecto MyWed360, pasando de un **26% de tests pasando** a un **70.73% de tests pasando**.
+Se ha logrado mejorar significativamente la tasa de éxito de los tests E2E del proyecto MaLoveApp, pasando de un **26% de tests pasando** a un **70.73% de tests pasando**.
 
 ### 📈 Métricas Principales
 
@@ -135,6 +135,6 @@ El proyecto ha experimentado una **mejora significativa** en la calidad y confia
 
 ---
 
-**Generado por:** Sistema de CI/CD MyWed360
+**Generado por:** Sistema de CI/CD MaLoveApp
 **Versión:** 1.0.0
 **Build:** #2024-10-20

@@ -57,7 +57,7 @@
 
    - Layout espejo de Signup con panel informativo y formulario principal.
 
-   - Campo de email (`username`) precargado con `localStorage.mywed360_login_email` cuando el usuario marc? ?Recu?rdame?.
+   - Campo de email (`username`) precargado con `localStorage.maloveapp_login_email` cuando el usuario marc? ?Recu?rdame?.
 
    - Checkbox `remember` controla la persistencia del correo; al desactivarlo elimina la clave en `localStorage`.
 
@@ -94,7 +94,7 @@
 
    - `ProtectedRoute` (en `App.jsx`) usa `useAuth()` para bloquear acceso mientras `isLoading` o `!isAuthenticated`, mostrando `Loader` mientras se resuelve el estado.
 
-   - `AuthProvider` encapsula `onAuthStateChanged`, sincroniza `userProfile` (incluyendo `providerData`) con `localStorage.MyWed360_user_profile` y registra contexto para servicios (`emailService`, `notificationService`, `whatsappService`).
+   - `AuthProvider` encapsula `onAuthStateChanged`, sincroniza `userProfile` (incluyendo `providerData`) con `localStorage.MaLoveApp_user_profile` y registra contexto para servicios (`emailService`, `notificationService`, `whatsappService`).
 
 
 
@@ -108,11 +108,11 @@
 
 - LocalStorage:
 
-  - `MyWed360_user_profile`: snapshot del perfil completo gestionado por `useAuth`.
+  - `MaLoveApp_user_profile`: snapshot del perfil completo gestionado por `useAuth`.
 
-  - `mywed360_login_email`: email recordado en `Login.jsx`.
+  - `maloveapp_login_email`: email recordado en `Login.jsx`.
 
-  - Claves heredadas (`mywed360_active_wedding`, `auth_debug_last_error`) se limpian en logout por compatibilidad.
+  - Claves heredadas (`maloveapp_active_wedding`, `auth_debug_last_error`) se limpian en logout por compatibilidad.
 
 
 
@@ -178,7 +178,7 @@
 
 - `flow1-login-happy`: credenciales válidas, remember-me marcado, redirección a `/home`, presencia de sesión en storage, logout correcto.
 
-- `flow1-login-remember-me`: marca/deselecciona el checkbox y verifica que `localStorage.mywed360_login_email` se cree y elimine correctamente.
+- `flow1-login-remember-me`: marca/deselecciona el checkbox y verifica que `localStorage.maloveapp_login_email` se cree y elimine correctamente.
 
 - `flow1-login-wrong-password`: contraseña incorrecta, muestra error y evita bloqueo de interfaz.
 

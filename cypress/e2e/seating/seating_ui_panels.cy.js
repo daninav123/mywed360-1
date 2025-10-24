@@ -4,8 +4,8 @@ const WEDDING_ID = 'cypress-wedding';
 
 const seedBanquetState = (win) => {
   win.localStorage.clear();
-  win.localStorage.setItem('mywed360_active_wedding', WEDDING_ID);
-  win.localStorage.setItem('lovenda_active_wedding', WEDDING_ID);
+  win.localStorage.setItem('maloveapp_active_wedding', WEDDING_ID);
+  win.localStorage.setItem('maloveapp_active_wedding', WEDDING_ID);
   const banquetState = {
     config: { width: 1800, height: 1200 },
     areas: [

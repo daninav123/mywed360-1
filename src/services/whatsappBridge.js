@@ -22,7 +22,7 @@ export function sendBroadcastMessages(numbers = [], message = '', options = {}) 
       };
       window.addEventListener('message', onMsg);
       window.postMessage(
-        { source: 'mywed360', type: 'MYWED360_WHATSAPP_BROADCAST', id, numbers, message, options },
+        { source: 'maloveapp', type: 'MALOVEAPP_WHATSAPP_BROADCAST', id, numbers, message, options },
         '*'
       );
       setTimeout(() => {
@@ -38,10 +38,10 @@ export function sendBroadcastMessages(numbers = [], message = '', options = {}) 
 }
 
 const EVENTS = {
-  PING: 'MYWED360_PING',
-  PONG: 'MYWED360_PONG',
-  SEND_BATCH: 'MYWED360_WHATSAPP_SEND_BATCH',
-  RESULT: 'MYWED360_WHATSAPP_RESULT',
+  PING: 'MALOVEAPP_PING',
+  PONG: 'MALOVEAPP_PONG',
+  SEND_BATCH: 'MALOVEAPP_WHATSAPP_SEND_BATCH',
+  RESULT: 'MALOVEAPP_WHATSAPP_RESULT',
 };
 
 function uuid() {
@@ -60,7 +60,7 @@ export function ensureExtensionAvailable(timeoutMs = 1500) {
         }
       };
       window.addEventListener('message', onMsg);
-      window.postMessage({ source: 'mywed360', type: EVENTS.PING, id }, '*');
+      window.postMessage({ source: 'maloveapp', type: EVENTS.PING, id }, '*');
       setTimeout(() => {
         try {
           window.removeEventListener('message', onMsg);
@@ -83,7 +83,7 @@ export function sendBatchMessages(items = [], options = {}) {
     }
     try {
       const id = uuid();
-      const payload = { source: 'mywed360', type: EVENTS.SEND_BATCH, id, items, options };
+      const payload = { source: 'maloveapp', type: EVENTS.SEND_BATCH, id, items, options };
       const onMsg = (ev) => {
         const data = ev?.data || {};
         if (data && data.type === EVENTS.RESULT && data.id === id) {

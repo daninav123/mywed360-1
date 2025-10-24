@@ -9,10 +9,15 @@ import ErrorBoundary from './components/debug/ErrorBoundary';
 import './debug/setupDebug';
 // Registrar comandos de diagnóstico globales antes de montar la aplicación
 import './utils/consoleCommands';
-// Compat: migración de claves/eventos lovenda_* -> mywed360_*
+// Auto-fix: Limpiar tokens expirados automáticamente
+import { setupAutoFix } from './services/autoFixAuth';
+// Compat: migración de claves/eventos maloveapp_* -> maloveapp_*
 import './utils/compatMigration';
 import './index.css';
 import './debug/devServiceWorkerCleanup';
+
+// Ejecutar auto-fix de autenticación
+setupAutoFix();
 // Registrar SW solo si PWA está habilitado
 if (import.meta.env?.VITE_ENABLE_PWA === '1') {
   import('./pwa/registerServiceWorker');

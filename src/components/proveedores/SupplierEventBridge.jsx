@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useWedding } from '../../context/WeddingContext';
 import { db } from '../../firebaseConfig';
 
-// Listens to 'mywed360-suppliers' events and persists suppliers in Firestore
+// Listens to 'maloveapp-suppliers' events and persists suppliers in Firestore
 export default function SupplierEventBridge() {
   const { activeWedding } = useWedding();
 
@@ -83,8 +83,8 @@ export default function SupplierEventBridge() {
       }
     };
 
-    window.addEventListener('mywed360-suppliers', handler);
-    return () => window.removeEventListener('mywed360-suppliers', handler);
+    window.addEventListener('maloveapp-suppliers', handler);
+    return () => window.removeEventListener('maloveapp-suppliers', handler);
   }, [activeWedding]);
 
   return null;

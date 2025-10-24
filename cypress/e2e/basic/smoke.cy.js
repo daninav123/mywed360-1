@@ -7,7 +7,7 @@ describe('Smoke Tests Básicos', () => {
 
   it('carga la página principal', () => {
     cy.get('body').should('be.visible');
-    cy.contains(/MyWed360|Lovenda|Boda/i).should('exist');
+    cy.contains(/MaLoveApp|Lovenda|Boda/i).should('exist');
   });
 
   it('puede navegar al login', () => {

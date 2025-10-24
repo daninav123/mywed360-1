@@ -1,6 +1,6 @@
 describe('Lectura de un correo', () => {
   const testUser = {
-    email: 'usuario.test@lovenda.com',
+    email: 'usuario.test@maloveapp.com',
     password: 'contraseña123',
   };
 

@@ -232,7 +232,7 @@ const GlobalSearch = () => {
       <button
         onClick={handleOpen}
         className="flex items-center text-gray-600 hover:text-gray-900 focus:outline-none"
-        aria-label="Buscar en MyWed360"
+        aria-label="Buscar en MaLoveApp"
       >
         <Search size={20} />
         <span className="ml-2 hidden md:inline">Buscar</span>

@@ -20,7 +20,7 @@ import {
 const resolveLocalUid = () => {
   if (typeof window === 'undefined') return null;
   try {
-    const raw = window.localStorage.getItem('MyWed360_user_profile');
+    const raw = window.localStorage.getItem('MaLoveApp_user_profile');
     if (!raw) return null;
     const data = JSON.parse(raw);
     return data?.uid || data?.id || null;
@@ -1551,7 +1551,7 @@ export default function useFinance() {
           docPath: activeWedding ? `weddings/${activeWedding}/finance/main` : undefined,
           showNotification: false,
         });
-        window.dispatchEvent(new Event('mywed360-movements'));
+        window.dispatchEvent(new Event('maloveapp-movements'));
 
         return { success: true, data: saved };
       } catch (err) {
@@ -1885,7 +1885,7 @@ export default function useFinance() {
           docPath: activeWedding ? `weddings/${activeWedding}/finance/main` : undefined,
           showNotification: false,
         });
-        window.dispatchEvent(new Event('mywed360-movements'));
+        window.dispatchEvent(new Event('maloveapp-movements'));
       }
       return { success: errors.length === 0, imported: successes.length, errors };
     },

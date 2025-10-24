@@ -21,10 +21,10 @@ describe('Home - saludo muestra nombres actualizados', () => {
         name: initialAlias,
         displayName: initialAlias,
       };
-      win.localStorage.setItem('MyWed360_user_profile', JSON.stringify(baseProfile));
-      win.localStorage.setItem('mywed360_active_wedding', 'w-profile');
-      win.localStorage.setItem('lovenda_active_wedding', 'w-profile');
-      win.localStorage.setItem('mywed360_active_wedding_name', initialCoupleName);
+      win.localStorage.setItem('MaLoveApp_user_profile', JSON.stringify(baseProfile));
+      win.localStorage.setItem('maloveapp_active_wedding', 'w-profile');
+      win.localStorage.setItem('maloveapp_active_wedding', 'w-profile');
+      win.localStorage.setItem('maloveapp_active_wedding_name', initialCoupleName);
       win.__MOCK_WEDDING__ = {
         weddings: [
           {
@@ -69,14 +69,14 @@ describe('Home - saludo muestra nombres actualizados', () => {
 
     cy.window().then((win) => {
       try {
-        const profileRaw = win.localStorage.getItem('MyWed360_user_profile');
+        const profileRaw = win.localStorage.getItem('MaLoveApp_user_profile');
         const profile = profileRaw ? JSON.parse(profileRaw) : {};
         const updatedProfile = {
           ...profile,
           name: updatedUserName,
           displayName: updatedUserName,
         };
-        win.localStorage.setItem('MyWed360_user_profile', JSON.stringify(updatedProfile));
+        win.localStorage.setItem('MaLoveApp_user_profile', JSON.stringify(updatedProfile));
       } catch {}
 
       const updatedWedding = {
@@ -92,7 +92,7 @@ describe('Home - saludo muestra nombres actualizados', () => {
         activeWedding: { id: 'w-profile', name: 'Boda Perfil' },
       };
       try {
-        win.localStorage.setItem('mywed360_active_wedding_name', updatedCoupleName);
+        win.localStorage.setItem('maloveapp_active_wedding_name', updatedCoupleName);
       } catch {}
     });
 

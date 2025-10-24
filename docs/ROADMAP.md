@@ -1,4 +1,4 @@
-# Roadmap - Lovenda/MyWed360
+# Roadmap - Lovenda/MaLoveApp
 
 > Documento canonico que integra backlog, plan de sprints y estado por flujo. Actualiza esta fuente unica cuando haya cambios para evitar divergencias.
 >

@@ -30,10 +30,10 @@ export default function RoleUpgradeHarness() {
         setCurrentRole(nextRole);
         setStatus(`ok:${nextRole}`);
         try {
-          const rawProfile = window.localStorage.getItem('MyWed360_user_profile');
+          const rawProfile = window.localStorage.getItem('MaLoveApp_user_profile');
           const parsed = rawProfile ? JSON.parse(rawProfile) : {};
           window.localStorage.setItem(
-            'MyWed360_user_profile',
+            'MaLoveApp_user_profile',
             JSON.stringify({ ...parsed, role: nextRole })
           );
         } catch (_) {}

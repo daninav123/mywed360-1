@@ -47,8 +47,8 @@ describe('Flujo 1 - Social login (integración real)', () => {
       failOnStatusCode: false,
       onBeforeLoad(win) {
         try {
-          win.__MYWED360_DISABLE_AUTOLOGIN__ = true;
-          win.__MYWED360_DISABLE_LOGIN_REDIRECT__ = true;
+          win.__MALOVEAPP_DISABLE_AUTOLOGIN__ = true;
+          win.__MALOVEAPP_DISABLE_LOGIN_REDIRECT__ = true;
         } catch (error) {
           // Los flags son opcionales; continuar aunque no existan.
         }

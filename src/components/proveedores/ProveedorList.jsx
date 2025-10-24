@@ -65,10 +65,10 @@ const ProveedorList = ({
     });
   };
 
-  const itemás = providers || [];
-  const shouldVirtualize = itemás.length > 120;
+  const items = providers || [];
+  const shouldVirtualize = items.length > 120;
   const containerRef = useRef(null);
-  const [dimás, setDimás] = useState({ width: 0, height: 0 });
+  const [dims, setDims] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
     if (!shouldVirtualize) return;
@@ -76,11 +76,11 @@ const ProveedorList = ({
     if (!el) return;
     const ro = new ResizeObserver(() => {
       const rect = el.getBoundingClientRect();
-      setDimás({ width: Math.max(320, rect.width), height: Math.max(300, rect.height) });
+      setDims({ width: Math.max(320, rect.width), height: Math.max(300, rect.height) });
     });
     ro.observe(el);
     const rect = el.getBoundingClientRect();
-    setDimás({ width: Math.max(320, rect.width), height: Math.max(300, rect.height) });
+    setDims({ width: Math.max(320, rect.width), height: Math.max(300, rect.height) });
     return () => ro.disconnect();
   }, [shouldVirtualize]);
 
@@ -95,7 +95,7 @@ const ProveedorList = ({
     if (typeof setTab !== 'function') return null;
     const activeTab = tab || 'contratados';
     return (
-      <div className="flex flex-wrap itemás-center gap-3">
+      <div className="flex flex-wrap items-center gap-3">
         <nav className="flex gap-2 border-b border-gray-200" aria-label="Filtros de proveedores">
           {tabOptions.map((opt) => (
             <button
@@ -121,7 +121,7 @@ const ProveedorList = ({
     const statuses = ['Pendiente', 'Contactado', 'Seleccionado', 'Confirmado', 'Rechazado'];
     return (
       <div className="w-full border rounded-md p-3 bg-white">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-3 itemás-end">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-3 items-end">
           <div className="col-span-2">
             <label className="block text-xs text-gray-500 mb-1">Buscar</label>
             <input
@@ -210,7 +210,7 @@ const ProveedorList = ({
     if (!selectedCount) return null;
     return (
       <div
-        className="flex flex-wrap itemás-center gap-2 text-sm text-gray-600"
+        className="flex flex-wrap items-center gap-2 text-sm text-gray-600"
         data-cy="selection-bar"
       >
         <span>{selectedCount} seleccionados</span>
@@ -278,8 +278,8 @@ const ProveedorList = ({
       return (
         <div className="w-full">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {itemás.length > 0 ? (
-              itemás.map((provider) => (
+            {items.length > 0 ? (
+              items.map((provider) => (
                 <ProveedorCard
                   key={provider.id}
                   provider={provider}
@@ -309,7 +309,7 @@ const ProveedorList = ({
     const ITEM_SIZE = 260;
 
     const Row = ({ index, style }) => {
-      const provider = itemás[index];
+      const provider = items[index];
       if (!provider) return null;
       return (
         <div style={style} className="px-1 md:px-2">
@@ -339,11 +339,11 @@ const ProveedorList = ({
           style={{ height: '70vh' }}
           className="border border-gray-200 rounded-md"
         >
-          {dimás.height > 0 ? (
+          {dims.height > 0 ? (
             <List
-              height={dimás.height}
-              width={dimás.width}
-              itemCount={itemás.length}
+              height={dims.height}
+              width={dims.width}
+              itemCount={items.length}
               itemSize={ITEM_SIZE}
             >
               {Row}

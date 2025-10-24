@@ -107,7 +107,7 @@ location.reload();
 ```
 1. Ir a /admin/login
 2. Ingresar credenciales:
-   - Email: admin@lovenda.com
+   - Email: admin@maloveapp.com
    - Contraseña: [tu contraseña admin]
 3. Completar MFA si está habilitado
 ```
@@ -119,7 +119,7 @@ Después del login, verifica que:
 ✅ **Token guardado correctamente:**
 ```javascript
 // DevTools Console (F12):
-localStorage.getItem('MyWed360_admin_session_token')
+localStorage.getItem('MaLoveApp_admin_session_token')
 // Debe devolver un string largo (el token)
 ```
 
@@ -141,9 +141,9 @@ localStorage.getItem('MyWed360_admin_session_token')
 // 2. Tab "Application" > "Local Storage" > localhost:5173
 
 // Debe existir:
-MyWed360_admin_session_token: "abc123..." // ✓ Token presente
+MaLoveApp_admin_session_token: "abc123..." // ✓ Token presente
 isAdminAuthenticated: "true"              // ✓ Flag activo
-MyWed360_admin_profile: "{...}"           // ✓ Perfil guardado
+MaLoveApp_admin_profile: "{...}"           // ✓ Perfil guardado
 ```
 
 ### Verificar Headers en Network
@@ -213,13 +213,13 @@ console.log('Headers:', options.headers);
 # Backend debe estar en:
 http://localhost:3001
 # o
-https://mywed360-backend.onrender.com
+https://maloveapp-backend.onrender.com
 ```
 
 **Verificar logs del backend:**
 ```
 [AuthMiddleware] Token admin validado correctamente
-[requireAdmin] Usuario autorizado: admin@lovenda.com
+[requireAdmin] Usuario autorizado: admin@maloveapp.com
 ```
 
 Si aparece:

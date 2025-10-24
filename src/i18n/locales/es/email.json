@@ -19,6 +19,224 @@
       "saved": "Borrador guardado",
       "deleted": "Correo eliminado",
       "error": "Error al enviar el correo"
+    },
+    "composer": {
+      "header": {
+        "title": "Nuevo mensaje",
+        "closeAria": "Cerrar compositor"
+      },
+      "fields": {
+        "from": {
+          "label": "De"
+        },
+        "to": {
+          "label": "Para",
+          "placeholder": "Destinatarios (email@ejemplo.com, email2@ejemplo.com)"
+        },
+        "cc": {
+          "label": "CC",
+          "placeholder": "CC (email@ejemplo.com, email2@ejemplo.com)"
+        },
+        "subject": {
+          "label": "Asunto",
+          "placeholder": "Asunto del correo"
+        },
+        "body": {
+          "label": "Mensaje",
+          "placeholder": "Escribe tu mensaje aquí..."
+        }
+      },
+      "templates": {
+        "placeholder": "Plantillas"
+      },
+      "status": {
+        "loadingEmail": "cargando..."
+      },
+      "actions": {
+        "configureEmail": "Configurar correo",
+        "addCc": "Añadir CC"
+      },
+      "attachments": {
+        "label": "Adjuntos",
+        "addFile": "Adjuntar archivo",
+        "maxSizeHint": "Máximo 10MB por archivo",
+        "count_one": "{{count}} archivo adjunto",
+        "count_other": "{{count}} archivos adjuntos",
+        "removeAria": "Eliminar adjunto"
+      },
+      "schedule": {
+        "label": "Programar el envío",
+        "helper": "Selecciona día y hora para enviar automáticamente."
+      },
+      "buttons": {
+        "cancel": "Cancelar",
+        "schedule": "Programar",
+        "send": "Enviar",
+        "scheduling": "Programando...",
+        "sending": "Enviando..."
+      },
+      "success": {
+        "scheduled": "Correo programado correctamente",
+        "sent": "Correo enviado correctamente"
+      },
+      "errors": {
+        "invalidAttachments": "Algunos archivos exceden el tamaño máximo de {{maxSize}}: {{names}}",
+        "missingRecipient": "Debes especificar al menos un destinatario.",
+        "missingSubject": "Añade un asunto al correo.",
+        "emptyBody": "El mensaje no puede estar vacío.",
+        "invalidRecipients": "Algunas direcciones de correo no son válidas: {{emails}}",
+        "invalidCc": "Algunas direcciones CC no son válidas: {{emails}}",
+        "missingSchedule": "Selecciona una fecha y hora para programar el envío.",
+        "attachmentsNotSupported": "Actualmente no es posible programar correos con adjuntos.",
+        "invalidScheduleDate": "Fecha y hora no válidas.",
+        "scheduleFailed": "No se pudo programar el correo.",
+        "sendFailed": "No se pudo enviar el correo.",
+        "sendFailedWithDetails": "No se pudo enviar el correo: {{details}}"
+      },
+      "prompts": {
+        "setupCustomAddress": "No tienes configurada una dirección de correo personalizada. ¿Deseas configurarla ahora?"
+      }
+    },
+    "calendarIntegration": {
+      "header": "Añadir evento al calendario",
+      "status": {
+        "analyzing": "Analizando contenido del email...",
+        "detectedInfo": "Información detectada en el email:"
+      },
+      "tooltips": {
+        "useDate": "Usar esta fecha",
+        "useTime": "Usar esta hora",
+        "useLocation": "Usar esta ubicación",
+        "useAttendee": "Usar este asistente"
+      },
+      "errors": {
+        "noEmail": "No hay un email para analizar.",
+        "analyzeFailed": "No se pudo analizar correctamente el contenido del email.",
+        "missingTitle": "El título del evento es obligatorio.",
+        "missingDate": "Debes seleccionar una fecha para el evento."
+      },
+      "defaults": {
+        "description": "Evento creado a partir del email: \"{{subject}}\"",
+        "noSubject": "(Sin asunto)"
+      },
+      "detection": {
+        "locationKeywords": [
+          "en",
+          "ubicado en",
+          "ubicada en",
+          "dirección",
+          "lugar",
+          "local",
+          "ubicación"
+        ],
+        "providerKeywords": ["proveedor", "servicio", "contratación"]
+      },
+      "fields": {
+        "title": {
+          "label": "Título del evento:",
+          "placeholder": "Título del evento"
+        },
+        "date": {
+          "label": "Fecha:"
+        },
+        "time": {
+          "label": "Hora:"
+        },
+        "location": {
+          "label": "Ubicación:",
+          "placeholder": "Ubicación del evento"
+        },
+        "description": {
+          "label": "Descripción:",
+          "placeholder": "Descripción del evento"
+        }
+      },
+      "attendees": {
+        "label": "Asistentes:",
+        "placeholder": "Nombre del asistente"
+      },
+      "checkbox": {
+        "providerRelated": "Este evento está relacionado con un proveedor"
+      },
+      "buttons": {
+        "addAttendee": "Añadir asistente",
+        "cancel": "Cancelar",
+        "save": "Guardar evento"
+      }
+    },
+    "aliasConfig": {
+      "header": {
+        "title": "Configura tu email",
+        "subtitle": "Elige tu alias personalizado"
+      },
+      "currentEmail": {
+        "label": "Email actual:"
+      },
+      "fields": {
+        "alias": {
+          "label": "Tu alias de email",
+          "placeholder": "ejemplo: ana, pedro, boda2025"
+        }
+      },
+      "rules": [
+        "Entre 3 y 30 caracteres",
+        "Solo letras minúsculas, números, puntos (.), guiones (-) y guiones bajos (_)",
+        "Ejemplos: ana, pedro-2025, mi.boda"
+      ],
+      "preview": {
+        "label": "Tu nuevo email será:"
+      },
+      "errors": {
+        "required": "El alias es obligatorio.",
+        "minLength": "Mínimo 3 caracteres.",
+        "maxLength": "Máximo 30 caracteres.",
+        "invalidChars": "Solo se permiten letras minúsculas, números, puntos (.), guiones (-) y guiones bajos (_).",
+        "aliasUsed": "Este alias ya está en uso.",
+        "checkFailed": "Error al verificar la disponibilidad.",
+        "config": "Error de configuración. Recarga la página.",
+        "unavailable": "El alias no está disponible.",
+        "saveFailed": "No se pudo guardar el alias. Inténtalo de nuevo."
+      },
+      "buttons": {
+        "cancel": "Cancelar",
+        "save": "Guardar",
+        "saving": "Guardando..."
+      }
+    },
+    "compose": {
+      "header": {
+        "title": "Nuevo correo"
+      },
+      "fields": {
+        "to": {
+          "placeholder": "Para:",
+          "aria": "Campo destinatario"
+        },
+        "subject": {
+          "placeholder": "Asunto:",
+          "aria": "Campo asunto"
+        },
+        "cc": {
+          "placeholder": "CC:",
+          "aria": "Campo con copia"
+        },
+        "bcc": {
+          "placeholder": "BCC:",
+          "aria": "Campo con copia oculta"
+        }
+      },
+      "toggle": {
+        "showCcBcc": "Añadir CC/BCC",
+        "hideCcBcc": "Ocultar CC/BCC"
+      },
+      "quickReplies": {
+        "options": [
+          "Gracias por su respuesta. Quedo atento/a a próximos pasos.",
+          "¿Podrían enviarnos un presupuesto detallado, por favor?",
+          "Confirmamos nuestra disponibilidad en la fecha indicada. Muchas gracias."
+        ],
+        "ariaLabel": "Insertar respuesta sugerida {{index}}"
+      }
     }
   }
 }

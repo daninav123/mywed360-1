@@ -32,7 +32,7 @@ export async function generateContract(weddingId, payload = {}) {
           id,
           type: payload.type || 'provider_contract',
           subtype: payload.subtype || 'general',
-          title: payload.title || 'Documento Legal MyWed360',
+          title: payload.title || 'Documento Legal MaLoveApp',
           createdAt: new Date().toISOString(),
           status: 'draft',
           size: pdfBuffer.length,
@@ -41,12 +41,12 @@ export async function generateContract(weddingId, payload = {}) {
       });
 
       // Contenido mínimo
-      doc.fontSize(18).text('Documento Legal - MyWed360', { align: 'center' });
+      doc.fontSize(18).text('Documento Legal - MaLoveApp', { align: 'center' });
       doc.moveDown();
       doc.fontSize(12).text(`Boda: ${weddingId}`);
       doc.text(`Tipo: ${payload.type || 'provider_contract'}`);
       if (payload.subtype) doc.text(`Subtipo: ${payload.subtype}`);
-      doc.text(`Título: ${payload.title || 'Documento Legal MyWed360'}`);
+      doc.text(`Título: ${payload.title || 'Documento Legal MaLoveApp'}`);
       doc.moveDown();
       doc.fontSize(11).text('Datos del servicio:', { underline: true });
       const lines = JSON.stringify(payload.data || {}, null, 2).split('\n');

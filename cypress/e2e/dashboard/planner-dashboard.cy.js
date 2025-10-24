@@ -53,7 +53,7 @@ const blogStub = [
     id: 'blog-1',
     title: 'Tendencias de decoración 2026',
     url: 'https://blog.example.com/tendencias-2026',
-    source: 'MyWed360 Editorial',
+    source: 'MaLoveApp Editorial',
   },
   {
     id: 'blog-2',
@@ -102,15 +102,15 @@ function configurePlannerSession({
       activeWedding: { id: activeWeddingId },
     };
     try {
-      win.localStorage.setItem('MyWed360_user_profile', JSON.stringify(profile));
-      win.localStorage.setItem('lovenda_user', JSON.stringify(profile));
-      win.localStorage.setItem('mywed360_user', JSON.stringify(profile));
-      win.localStorage.setItem('mywed360_active_wedding', activeWeddingId || '');
-      win.localStorage.setItem('lovenda_active_wedding', activeWeddingId || '');
-      win.localStorage.setItem('mywed360_cached_weddings', JSON.stringify(weddings));
-      win.localStorage.setItem('lovenda_stub_weddings_enabled', 'true');
+      win.localStorage.setItem('MaLoveApp_user_profile', JSON.stringify(profile));
+      win.localStorage.setItem('maloveapp_user', JSON.stringify(profile));
+      win.localStorage.setItem('maloveapp_user', JSON.stringify(profile));
+      win.localStorage.setItem('maloveapp_active_wedding', activeWeddingId || '');
+      win.localStorage.setItem('maloveapp_active_wedding', activeWeddingId || '');
+      win.localStorage.setItem('maloveapp_cached_weddings', JSON.stringify(weddings));
+      win.localStorage.setItem('maloveapp_stub_weddings_enabled', 'true');
       win.localStorage.setItem(
-        '__lovenda_stub_weddings_store__',
+        '__maloveapp_stub_weddings_store__',
         JSON.stringify({
           users: {
             [profile.uid]: {
@@ -122,11 +122,11 @@ function configurePlannerSession({
       );
       if (activeWeddingId) {
         win.localStorage.setItem(
-          `mywed360_${activeWeddingId}_meetings`,
+          `maloveapp_${activeWeddingId}_meetings`,
           JSON.stringify(meetings)
         );
         win.localStorage.setItem(
-          `mywed360_${activeWeddingId}_suppliers`,
+          `maloveapp_${activeWeddingId}_suppliers`,
           JSON.stringify(suppliers)
         );
       }

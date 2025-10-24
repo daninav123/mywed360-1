@@ -18,7 +18,7 @@ const AdminLogin = () => {
     isLoading,
   } = useAuth();
 
-  const [email, setEmail] = useState('admin@lovenda.com');
+  const [email, setEmail] = useState('admin@maloveapp.com');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [blockedUntil, setBlockedUntil] = useState(null);
@@ -42,7 +42,7 @@ const AdminLogin = () => {
   const supportEmail = useMemo(
     () =>
       (typeof import.meta !== 'undefined' && import.meta.env?.VITE_ADMIN_SUPPORT_EMAIL) ||
-      'soporte@lovenda.com',
+      'soporte@maloveapp.com',
     []
   );
   const supportPhone = useMemo(

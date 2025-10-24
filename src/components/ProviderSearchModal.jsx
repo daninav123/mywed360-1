@@ -184,7 +184,7 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
               firestore: false,
               showNotification: false,
             });
-            window.dispatchEvent(new Event('mywed360-suppliers'));
+            window.dispatchEvent(new Event('maloveapp-suppliers'));
             return;
           }
         } catch (err) {
@@ -204,7 +204,7 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
               setAiResults(verifiedResults);
               setShowResults(true);
               saveData('mywed360Suppliers', verifiedResults, { firestore: false, showNotification: false });
-              window.dispatchEvent(new Event('mywed360-suppliers'));
+              window.dispatchEvent(new Event('maloveapp-suppliers'));
               return;
             }
           }
@@ -422,7 +422,7 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
         setAiResults(validResults);
         setShowResults(true);
         saveData('mywed360Suppliers', validResults, { firestore: false, showNotification: false });
-        window.dispatchEvent(new Event('mywed360-suppliers'));
+        window.dispatchEvent(new Event('maloveapp-suppliers'));
       } else {
         setToast({
           message:

@@ -112,7 +112,7 @@ export default function ChatWidget() {
           const notes = JSON.parse(localStorage.getItem('importantNotes') || '[]');
           notes.push({ text: copy[idx].text, date: Date.now() });
           localStorage.setItem('importantNotes', JSON.stringify(notes));
-          window.dispatchEvent(new Event('mywed360-important-note'));
+          window.dispatchEvent(new Event('maloveapp-important-note'));
           toast.success(t('chat.noteMarked'));
         } catch {
           /* ignore */
@@ -313,7 +313,7 @@ export default function ChatWidget() {
                 ),
               };
               const detail = entity === 'meeting' ? { meeting: base } : { task: base };
-              window.dispatchEvent(new CustomEvent('mywed360-tasks', { detail }));
+              window.dispatchEvent(new CustomEvent('maloveapp-tasks', { detail }));
             } catch (_) {}
             toast.success(entity === 'task' ? t('chat.commands.taskAdded') : t('chat.commands.meetingAdded'));
             changed = true;
@@ -343,7 +343,7 @@ export default function ChatWidget() {
                   category: meetings[idx].category,
                 };
                 const detail = entity === 'meeting' ? { meeting: base, action: 'update' } : { task: base, action: 'update' };
-                window.dispatchEvent(new CustomEvent('mywed360-tasks', { detail }));
+                window.dispatchEvent(new CustomEvent('maloveapp-tasks', { detail }));
               } catch (_) {}
               changed = true;
             }
@@ -362,7 +362,7 @@ export default function ChatWidget() {
               try {
                 const base = { id: payload.id || null, title: payload.title || '' };
                 const detail = entity === 'meeting' ? { meeting: base, action: 'delete' } : { task: base, action: 'delete' };
-                window.dispatchEvent(new CustomEvent('mywed360-tasks', { detail }));
+                window.dispatchEvent(new CustomEvent('maloveapp-tasks', { detail }));
               } catch (_) {}
               changed = true;
             }
@@ -379,7 +379,7 @@ export default function ChatWidget() {
               try {
                 const base = { id: meetings[idx].id, title: meetings[idx].title };
                 const detail = entity === 'meeting' ? { meeting: base, action: 'complete' } : { task: base, action: 'complete' };
-                window.dispatchEvent(new CustomEvent('mywed360-tasks', { detail }));
+                window.dispatchEvent(new CustomEvent('maloveapp-tasks', { detail }));
               } catch (_) {}
               changed = true;
             }
@@ -413,7 +413,7 @@ export default function ChatWidget() {
             // Intentar persistir a Firestore vía puente de eventos
             try {
               window.dispatchEvent(
-                new CustomEvent('mywed360-guests', { detail: { guest: { ...guestObj } } })
+                new CustomEvent('maloveapp-guests', { detail: { guest: { ...guestObj } } })
               );
             } catch (_) {}
             toast.success(t('chat.commands.guestAdded'));
@@ -431,7 +431,7 @@ export default function ChatWidget() {
               // Bridge: update invitado
               try {
                 window.dispatchEvent(
-                  new CustomEvent('mywed360-guests', { detail: { guest: { ...guests[idx] }, action: 'update' } })
+                  new CustomEvent('maloveapp-guests', { detail: { guest: { ...guests[idx] }, action: 'update' } })
                 );
               } catch (_) {}
               changedG = true;
@@ -449,7 +449,7 @@ export default function ChatWidget() {
               // Bridge: delete invitado
               try {
                 window.dispatchEvent(
-                  new CustomEvent('mywed360-guests', { detail: { guest: { id: payload.id || null, name: payload.name || '' }, action: 'delete' } })
+                  new CustomEvent('maloveapp-guests', { detail: { guest: { id: payload.id || null, name: payload.name || '' }, action: 'delete' } })
                 );
               } catch (_) {}
               changedG = true;
@@ -461,7 +461,7 @@ export default function ChatWidget() {
         }
         if (changedG) {
           localStorage.setItem('mywed360Guests', JSON.stringify(guests));
-          window.dispatchEvent(new Event('mywed360-guests'));
+          window.dispatchEvent(new Event('maloveapp-guests'));
         }
       } else if (
         entity === 'movement' ||
@@ -491,7 +491,7 @@ export default function ChatWidget() {
             // Persistir vía puente de finanzas
             try {
               window.dispatchEvent(
-                new CustomEvent('mywed360-finance', { detail: { movement: { ...mov }, action: 'add' } })
+                new CustomEvent('maloveapp-finance', { detail: { movement: { ...mov }, action: 'add' } })
               );
             } catch (_) {}
             toast.success(t('chat.commands.movementAdded'));
@@ -509,7 +509,7 @@ export default function ChatWidget() {
               // Persistir vía puente de finanzas
               try {
                 window.dispatchEvent(
-                  new CustomEvent('mywed360-finance', {
+                  new CustomEvent('maloveapp-finance', {
                     detail: { movement: { ...movements[idx] }, action: 'update' },
                   })
                 );
@@ -533,7 +533,7 @@ export default function ChatWidget() {
               // Persistir vía puente de finanzas (delete)
               try {
                 window.dispatchEvent(
-                  new CustomEvent('mywed360-finance', {
+                  new CustomEvent('maloveapp-finance', {
                     detail: {
                       movement: { id: payload.id || null, name: payload.concept || payload.name || '' },
                       action: 'delete',
@@ -550,7 +550,7 @@ export default function ChatWidget() {
         }
         if (changedM) {
           localStorage.setItem('mywed360Movements', JSON.stringify(movements));
-          window.dispatchEvent(new Event('mywed360-movements'));
+          window.dispatchEvent(new Event('maloveapp-movements'));
         }
       } else if (entity === 'supplier') {
         // ----- SUPPLIER LOGIC -----
@@ -569,7 +569,7 @@ export default function ChatWidget() {
       const dataS = await resp.json();
       if (Array.isArray(dataS.results) && dataS.results.length) {
         localStorage.setItem('mywed360Suppliers', JSON.stringify(dataS.results));
-        window.dispatchEvent(new Event('mywed360-suppliers'));
+        window.dispatchEvent(new Event('maloveapp-suppliers'));
         toast.success(tVars('chat.commands.suppliersFound', { count: dataS.results.length }));
       } else {
         toast.info(t('chat.commands.suppliersNotFound'));
@@ -594,11 +594,11 @@ export default function ChatWidget() {
           try {
             const stored = JSON.parse(localStorage.getItem('mywed360Suppliers') || '[]');
             localStorage.setItem('mywed360Suppliers', JSON.stringify([supplier, ...stored]));
-            window.dispatchEvent(new Event('mywed360-suppliers'));
+            window.dispatchEvent(new Event('maloveapp-suppliers'));
           } catch {}
           try {
             window.dispatchEvent(
-              new CustomEvent('mywed360-suppliers', { detail: { supplier: { ...supplier }, action: 'add' } })
+              new CustomEvent('maloveapp-suppliers', { detail: { supplier: { ...supplier }, action: 'add' } })
             );
           } catch {}
           toast.success(t('chat.commands.supplierAdded'));
@@ -615,10 +615,10 @@ export default function ChatWidget() {
               const updated = { ...stored[idx], ...payload };
               stored[idx] = updated;
               localStorage.setItem('mywed360Suppliers', JSON.stringify(stored));
-              window.dispatchEvent(new Event('mywed360-suppliers'));
+              window.dispatchEvent(new Event('maloveapp-suppliers'));
               try {
                 window.dispatchEvent(
-                  new CustomEvent('mywed360-suppliers', {
+                  new CustomEvent('maloveapp-suppliers', {
                     detail: { supplier: { ...updated }, action: 'update' },
                   })
                 );
@@ -637,10 +637,10 @@ export default function ChatWidget() {
             );
             if (filtered.length < before) {
               localStorage.setItem('mywed360Suppliers', JSON.stringify(filtered));
-              window.dispatchEvent(new Event('mywed360-suppliers'));
+              window.dispatchEvent(new Event('maloveapp-suppliers'));
               try {
                 window.dispatchEvent(
-                  new CustomEvent('mywed360-suppliers', {
+                  new CustomEvent('maloveapp-suppliers', {
                     detail: { supplier: { id: payload.id || null, name: payload.name || payload.title || payload.provider || '' }, action: 'delete' },
                   })
                 );
@@ -667,7 +667,7 @@ export default function ChatWidget() {
           // Bridge: update mesa
           try {
             window.dispatchEvent(
-              new CustomEvent('mywed360-guests', {
+              new CustomEvent('maloveapp-guests', {
                 detail: { guest: { ...guests[idx] }, action: 'update' },
               })
             );
@@ -675,7 +675,7 @@ export default function ChatWidget() {
         }
         if (changedT) {
           localStorage.setItem('mywed360Guests', JSON.stringify(guests));
-          window.dispatchEvent(new Event('mywed360-guests'));
+          window.dispatchEvent(new Event('maloveapp-guests'));
         }
       } else if (entity === 'config') {
         // ----- CONFIG LOGIC -----
@@ -691,7 +691,7 @@ export default function ChatWidget() {
         profile.weddingInfo = { ...profile.weddingInfo, ...payload };
         Object.assign(profile, payload.root || {});
         localStorage.setItem('mywed360Profile', JSON.stringify(profile));
-        window.dispatchEvent(new Event('mywed360-profile'));
+        window.dispatchEvent(new Event('maloveapp-profile'));
         toast.success(t('chat.commands.configUpdated'));
       }
     });
@@ -699,7 +699,7 @@ export default function ChatWidget() {
     if (changed) {
       localStorage.setItem('mywed360Meetings', JSON.stringify(meetings));
       localStorage.setItem('tasksCompleted', JSON.stringify(completed));
-      window.dispatchEvent(new Event('mywed360-tasks'));
+      window.dispatchEvent(new Event('maloveapp-tasks'));
     }
   };
 
@@ -811,7 +811,7 @@ export default function ChatWidget() {
         }));
         const updated = [...stored, ...mapped];
         localStorage.setItem('mywed360Guests', JSON.stringify(updated));
-        window.dispatchEvent(new Event('mywed360-guests'));
+        window.dispatchEvent(new Event('maloveapp-guests'));
         toast.success(tPlural('chat.plurals.guestsAdded', mapped.length));
       }
 
@@ -837,12 +837,12 @@ export default function ChatWidget() {
         });
         const updatedM = [...storedMeetings, ...mappedT];
         localStorage.setItem('mywed360Meetings', JSON.stringify(updatedM));
-        window.dispatchEvent(new Event('mywed360-tasks'));
-        window.dispatchEvent(new Event('mywed360-meetings'));
+        window.dispatchEvent(new Event('maloveapp-tasks'));
+        window.dispatchEvent(new Event('maloveapp-meetings'));
         // Disparar eventos detallados para persistir en Firestore
         try {
           mappedT.forEach((task) =>
-            window.dispatchEvent(new CustomEvent('mywed360-tasks', { detail: { task } }))
+            window.dispatchEvent(new CustomEvent('maloveapp-tasks', { detail: { task } }))
           );
         } catch (_) {}
         toast.success(tPlural('chat.plurals.tasksAdded', mappedT.length));
@@ -870,12 +870,12 @@ export default function ChatWidget() {
         });
         const updatedR = [...storedMeetings, ...mappedR];
         localStorage.setItem('mywed360Meetings', JSON.stringify(updatedR));
-        window.dispatchEvent(new Event('mywed360-tasks'));
-        window.dispatchEvent(new Event('mywed360-meetings'));
+        window.dispatchEvent(new Event('maloveapp-tasks'));
+        window.dispatchEvent(new Event('maloveapp-meetings'));
         // Disparar eventos detallados para el bridge
         try {
           mappedR.forEach((meeting) =>
-            window.dispatchEvent(new CustomEvent('mywed360-tasks', { detail: { meeting } }))
+            window.dispatchEvent(new CustomEvent('maloveapp-tasks', { detail: { meeting } }))
           );
         } catch (_) {}
         toast.success(tPlural('chat.plurals.meetingsAdded', mappedR.length));
@@ -895,12 +895,12 @@ export default function ChatWidget() {
         }));
         const updatedMov = [...storedMov, ...mappedMov];
         localStorage.setItem('mywed360Movements', JSON.stringify(updatedMov));
-        window.dispatchEvent(new Event('mywed360-movements'));
+        window.dispatchEvent(new Event('maloveapp-movements'));
         // Disparar eventos detallados para persistencia
         try {
           mappedMov.forEach((movement) =>
             window.dispatchEvent(
-              new CustomEvent('mywed360-finance', { detail: { movement, action: 'add' } })
+              new CustomEvent('maloveapp-finance', { detail: { movement, action: 'add' } })
             )
           );
         } catch (_) {}

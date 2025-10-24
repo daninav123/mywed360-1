@@ -29,7 +29,7 @@ const ROADMAP_PATH = path.join(repoRoot, 'roadmap.json');
 
 // Defaults de entorno para ejecución autónoma
 if (!process.env.BACKEND_BASE_URL && !process.env.VITE_BACKEND_BASE_URL) {
-  process.env.BACKEND_BASE_URL = 'https://mywed360-backend.onrender.com';
+  process.env.BACKEND_BASE_URL = 'https://maloveapp-backend.onrender.com';
 }
 if (!process.env.RUN_TASK_SEATING_ONLY) {
   process.env.RUN_TASK_SEATING_ONLY = 'true';

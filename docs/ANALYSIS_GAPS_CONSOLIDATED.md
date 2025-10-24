@@ -1,4 +1,4 @@
-# Análisis Consolidado de Gaps - MyWed360/Lovenda
+# Análisis Consolidado de Gaps - MaLoveApp/Lovenda
 
 **Fecha:** 20 de octubre de 2025  
 **Objetivo:** Consolidar todos los gaps entre documentación e implementación para crear un roadmap ejecutable

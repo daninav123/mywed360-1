@@ -22,7 +22,7 @@ function MailgunTester() {
   // Estado para formulario de envío de email
   const [sending, setSending] = useState(false);
   const [emailForm, setEmailForm] = useState({
-    from: `Test <test@mg.mywed360.com>`,
+    from: `Test <test@mg.maloveapp.com>`,
     to: '',
     subject: 'Prueba de Mailgun desde myWed360',
     text: 'Este es un correo de prueba enviado desde la aplicación myWed360.',
@@ -251,7 +251,7 @@ function MailgunTester() {
                 margin="normal"
                 required
                 placeholder="nombre"
-                helperText="Solo el nombre sin @mywed360.com"
+                helperText="Solo el nombre sin @maloveapp.com"
               />
               <Button
                 type="submit"
@@ -270,8 +270,8 @@ function MailgunTester() {
                     color={availabilityResult ? 'success.main' : 'error.main'}
                   >
                     {availabilityResult
-                      ? `✅ "${usernameToCheck}@mywed360.com" está disponible`
-                      : `❌ "${usernameToCheck}@mywed360.com" ya está en uso`}
+                      ? `✅ "${usernameToCheck}@maloveapp.com" está disponible`
+                      : `❌ "${usernameToCheck}@maloveapp.com" ya está en uso`}
                   </Typography>
                 </Box>
               )}

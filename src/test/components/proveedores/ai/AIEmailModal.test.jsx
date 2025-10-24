@@ -15,7 +15,7 @@ vi.mock('../../../../hooks/useAIProviderEmail', () => ({
 
 // Mock de autenticación para evitar error del AuthProvider
 vi.mock('../../../../hooks/useAuth', () => ({
-  useAuth: () => ({ user: { uid: 'user123', email: 'usuario.test@mywed360.com' } }),
+  useAuth: () => ({ user: { uid: 'user123', email: 'usuario.test@maloveapp.com' } }),
 }));
 
 // Mock del componente Alert para simplificar assertions
@@ -42,7 +42,7 @@ const defaultAIResult = {
 };
 
 const baseHookState = {
-  userEmail: 'usuario.test@mywed360.com',
+  userEmail: 'usuario.test@maloveapp.com',
   isSending: false,
   error: null,
   sendEmailFromAIResult: mockSendEmail,
@@ -81,7 +81,7 @@ describe('AIEmailModal', () => {
   it('muestra la información del proveedor y los campos precargados', () => {
     renderModal();
     expect(screen.getByText(/Contactar a Fotógrafo Prueba/i)).toBeInTheDocument();
-    expect(screen.getByText(/usuario.test@mywed360.com/i)).toBeInTheDocument();
+    expect(screen.getByText(/usuario.test@maloveapp.com/i)).toBeInTheDocument();
     expect(screen.getByText(/fotografo@prueba.com/i)).toBeInTheDocument();
     expect(screen.getByTestId('email-subject')).toHaveValue(
       'Consulta sobre Fotografía para boda - Fotógrafo Prueba'

@@ -179,7 +179,7 @@ const MomentosEspeciales = () => {
   // Cargar preferencias guardadas en Perfil desde localStorage si existen
   useEffect(() => {
     try {
-      const raw = localStorage.getItem('mywed360_music_prefs');
+      const raw = localStorage.getItem('maloveapp_music_prefs');
       if (raw) {
         const parsed = JSON.parse(raw);
         setProfilePrefs({
@@ -260,7 +260,7 @@ const MomentosEspeciales = () => {
   // Guardar Preferencias msi$1les en localStorage
   const saveProfilePrefs = () => {
     try {
-      localStorage.setItem('mywed360_music_prefs', JSON.stringify(profilePrefs));
+      localStorage.setItem('maloveapp_music_prefs', JSON.stringify(profilePrefs));
       if (Array.isArray(profilePrefs.languages) && profilePrefs.languages.length) {
         setAiLanguage(profilePrefs.languages[0]);
       }

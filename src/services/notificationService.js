@@ -116,7 +116,7 @@ export const getNotifications = async (weddingId) => {
 export const getNotificationPrefs = () => {
   // Obtener preferencias de notificación desde localStorage
   try {
-    const stored = localStorage.getItem('mywed360_notification_prefs');
+    const stored = localStorage.getItem('maloveapp_notification_prefs');
     if (stored) {
       return { ...DEFAULT_NOTIFICATION_PREFS, ...JSON.parse(stored) };
     }
@@ -129,7 +129,7 @@ export const getNotificationPrefs = () => {
 export const saveNotificationPrefs = (prefs) => {
   // Guardar preferencias de notificación en localStorage
   try {
-    localStorage.setItem('mywed360_notification_prefs', JSON.stringify(prefs));
+    localStorage.setItem('maloveapp_notification_prefs', JSON.stringify(prefs));
     return true;
   } catch (error) {
     console.error('Error guardando preferencias:', error);
@@ -177,7 +177,7 @@ export const showNotification = (notification) => {
   
   // También podríamos emitir un evento personalizado para que otros componentes lo escuchen
   if (typeof window !== 'undefined') {
-    window.dispatchEvent(new CustomEvent('mywed360:notification', { detail: notification }));
+    window.dispatchEvent(new CustomEvent('maloveapp:notification', { detail: notification }));
   }
   
   return notification;

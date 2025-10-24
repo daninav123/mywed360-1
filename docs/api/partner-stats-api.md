@@ -3,7 +3,7 @@
 ## Base URL
 
 ```
-https://mywed360.com/api/partner
+https://maloveapp.com/api/partner
 ```
 
 ## Endpoints
@@ -95,12 +95,12 @@ GET /api/partner/:token
 #### Ejemplo
 
 ```bash
-curl https://mywed360.com/api/partner/a3f5b9c2d8e1f4g7h6j5k4l3m2n1
+curl https://maloveapp.com/api/partner/a3f5b9c2d8e1f4g7h6j5k4l3m2n1
 ```
 
 ```javascript
 // JavaScript
-const response = await fetch('https://mywed360.com/api/partner/a3f5b9c2d8e1f4g7h6j5k4l3m2n1');
+const response = await fetch('https://maloveapp.com/api/partner/a3f5b9c2d8e1f4g7h6j5k4l3m2n1');
 const data = await response.json();
 console.log(data.stats.total.revenue); // 2450.75
 ```
@@ -136,7 +136,7 @@ Content-Type: application/json
 ```json
 {
   "token": "a3f5b9c2d8e1f4g7h6j5k4l3m2n1",
-  "url": "https://mywed360.com/partner/a3f5b9c2d8e1f4g7h6j5k4l3m2n1",
+  "url": "https://maloveapp.com/partner/a3f5b9c2d8e1f4g7h6j5k4l3m2n1",
   "code": "INFLUENCER2025"
 }
 ```
@@ -168,7 +168,7 @@ Content-Type: application/json
 #### Ejemplo
 
 ```bash
-curl -X POST https://mywed360.com/api/partner/generate-token \
+curl -X POST https://maloveapp.com/api/partner/generate-token \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <admin-token>" \
   -d '{"discountId":"abc123def456"}'
@@ -176,7 +176,7 @@ curl -X POST https://mywed360.com/api/partner/generate-token \
 
 ```javascript
 // JavaScript
-const response = await fetch('https://mywed360.com/api/partner/generate-token', {
+const response = await fetch('https://maloveapp.com/api/partner/generate-token', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -311,6 +311,6 @@ token = SHA256(code + "-mywed360-partner-" + JWT_SECRET).substring(0, 32)
 ## Soporte
 
 Para dudas o incidencias:
-- **Email:** soporte@mywed360.com
+- **Email:** soporte@maloveapp.com
 - **Documentación:** `/docs/partner-stats-system.md`
 - **Repositorio:** https://github.com/Daniel-Navarro-Campos/mywed360

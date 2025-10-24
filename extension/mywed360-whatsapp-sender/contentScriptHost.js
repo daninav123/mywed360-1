@@ -1,22 +1,22 @@
-/* Content script injected into the host app pages (localhost:5173 / mywed360.com)
+/* Content script injected into the host app pages (localhost:5173 / maloveapp.com)
    Bridges window.postMessage <-> extension background
 */
 (function() {
   const EVENTS = {
-    PING: 'MYWED360_PING',
-    PONG: 'MYWED360_PONG',
-    SEND_BATCH: 'MYWED360_WHATSAPP_SEND_BATCH',
-    RESULT: 'MYWED360_WHATSAPP_RESULT',
+    PING: 'MALOVEAPP_PING',
+    PONG: 'MALOVEAPP_PONG',
+    SEND_BATCH: 'MALOVEAPP_WHATSAPP_SEND_BATCH',
+    RESULT: 'MALOVEAPP_WHATSAPP_RESULT',
   };
 
-  console.log('[MyWed360 Host CS] page registered successfully!');
+  console.log('[MaLoveApp Host CS] page registered successfully!');
 
   function onWindowMessage(ev) {
     try {
       const data = ev && ev.data;
-      if (!data || data.source !== 'mywed360' || !data.type) return;
+      if (!data || data.source !== 'maloveapp' || !data.type) return;
       if (data.type === EVENTS.PING) {
-        window.postMessage({ source: 'mywed360', type: EVENTS.PONG, id: data.id }, '*');
+        window.postMessage({ source: 'maloveapp', type: EVENTS.PONG, id: data.id }, '*');
         return;
       }
       if (data.type === EVENTS.SEND_BATCH) {
@@ -29,7 +29,7 @@
         });
         return;
       }
-      if (data.type === 'MYWED360_WHATSAPP_BROADCAST') {
+      if (data.type === 'MALOVEAPP_WHATSAPP_BROADCAST') {
         const { id, numbers, message, options } = data;
         chrome.runtime.sendMessage({ type: 'START_BROADCAST', requestId: id, numbers, message, options }, (resp) => {
           if (chrome.runtime.lastError) {
@@ -50,11 +50,11 @@
       if (!msg || !msg.type) return;
       if (msg.type === 'BATCH_DONE') {
         const { requestId, result } = msg;
-        window.postMessage({ source: 'mywed360', type: EVENTS.RESULT, id: requestId, result }, '*');
+        window.postMessage({ source: 'maloveapp', type: EVENTS.RESULT, id: requestId, result }, '*');
       }
       if (msg.type === 'BROADCAST_DONE') {
         const { requestId, result } = msg;
-        window.postMessage({ source: 'mywed360', type: EVENTS.RESULT, id: requestId, result }, '*');
+        window.postMessage({ source: 'maloveapp', type: EVENTS.RESULT, id: requestId, result }, '*');
       }
     } catch (e) {
       console.warn('[Host CS] onRuntimeMessage error', e);

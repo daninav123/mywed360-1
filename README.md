@@ -42,6 +42,8 @@ Resumen de módulos:
    - Health: backend `GET /health` y `GET /api/health`, métricas `GET /metrics`
 
 4) Documentación clave
+   - **Cumplimiento de requisitos:** `docs/CUMPLIMIENTO-REQUISITOS.md` ⭐
+   - **Automatización de tareas:** `docs/AUTOMATIZACION-TAREAS.md` ⭐
    - Arquitectura: `docs/ARCHITECTURE.md`
    - Personalización y recomendaciones: `docs/personalizacion/README.md`
    - Onboarding: `docs/ONBOARDING.md`
@@ -51,7 +53,9 @@ Resumen de módulos:
    - Roadmap: `docs/roadmap-2025-v2.md`
    - CI/CD: `docs/DEPLOYMENT_CI.md`
    - Testing (incluye webhook pagos en CI): `docs/TESTING.md`
+   - Seguridad: `docs/SECURITY_PRIVACY.md`
    - Diseño / Prototipos Figma: `docs/diseno/README.md`
+   - i18n: `docs/i18n/README-i18n.md`
 
 ## Características
 

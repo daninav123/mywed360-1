@@ -9,7 +9,7 @@ import Spinner from './ui/Spinner';
 
 /**
  * Muestra un modal la primera vez que el usuario accede para que elija su nombre
- * de correo @mywed360.com. Una vez configurado desaparece para siempre.
+ * de correo @maloveapp.com. Una vez configurado desaparece para siempre.
  */
 const UsernameWizard = () => {
   const { checkUsernameAvailability, reserveUsername, getCurrentUsername, loading, error } =
@@ -74,7 +74,7 @@ const UsernameWizard = () => {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
       <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
         <h2 className="mb-4 text-xl font-semibold text-gray-700">
-          Configura tu correo @mywed360.com
+          Configura tu correo @maloveapp.com
         </h2>
         <p className="mb-4 text-sm text-gray-600">
           Elige tu nombre de usuario. Solo podrás configurarlo una vez.
@@ -92,7 +92,7 @@ const UsernameWizard = () => {
               setFeedback(null);
             }}
           />
-          <span className="self-center text-sm text-gray-700">@mywed360.com</span>
+          <span className="self-center text-sm text-gray-700">@maloveapp.com</span>
         </div>
 
         {feedback && (

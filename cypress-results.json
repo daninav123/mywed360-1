@@ -2188,7 +2188,7 @@ Error: Command failed: C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.
           "originalFile": "cypress/e2e/admin/admin-flow.cy.js",
           "relativeFile": "cypress/e2e/admin/admin-flow.cy.js",
           "absoluteFile": "C:\\Users\\Administrator\\Documents\\Lovenda\\lovenda13123123 - copia/cypress/e2e/admin/admin-flow.cy.js",
-          "frame": "  42 |     cy.visit('/admin/login');\n  43 |     for (let i = 0; i < 5; i += 1) {\n> 44 |       cy.get('[data-testid=\"admin-login-email\"]').clear().type('admin@lovenda.com');\n     |                                                   ^\n  45 |       cy.get('[data-testid=\"admin-login-password\"]').clear().type(`WrongPass${i}!`);\n  46 |       cy.get('[data-testid=\"admin-login-submit\"]').click();\n  47 |     }",
+          "frame": "  42 |     cy.visit('/admin/login');\n  43 |     for (let i = 0; i < 5; i += 1) {\n> 44 |       cy.get('[data-testid=\"admin-login-email\"]').clear().type('admin@maloveapp.com');\n     |                                                   ^\n  45 |       cy.get('[data-testid=\"admin-login-password\"]').clear().type(`WrongPass${i}!`);\n  46 |       cy.get('[data-testid=\"admin-login-submit\"]').click();\n  47 |     }",
           "language": "js"
         }
       }
@@ -2710,7 +2710,7 @@ Error: Command failed: C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.
           "originalFile": "cypress/e2e/admin/admin-flow.cy.js",
           "relativeFile": "cypress/e2e/admin/admin-flow.cy.js",
           "absoluteFile": "C:\\Users\\Administrator\\Documents\\Lovenda\\lovenda13123123 - copia/cypress/e2e/admin/admin-flow.cy.js",
-          "frame": "  42 |     cy.visit('/admin/login');\n  43 |     for (let i = 0; i < 5; i += 1) {\n> 44 |       cy.get('[data-testid=\"admin-login-email\"]').clear().type('admin@lovenda.com');\n     |                                                   ^\n  45 |       cy.get('[data-testid=\"admin-login-password\"]').clear().type(`WrongPass${i}!`);\n  46 |       cy.get('[data-testid=\"admin-login-submit\"]').click();\n  47 |     }",
+          "frame": "  42 |     cy.visit('/admin/login');\n  43 |     for (let i = 0; i < 5; i += 1) {\n> 44 |       cy.get('[data-testid=\"admin-login-email\"]').clear().type('admin@maloveapp.com');\n     |                                                   ^\n  45 |       cy.get('[data-testid=\"admin-login-password\"]').clear().type(`WrongPass${i}!`);\n  46 |       cy.get('[data-testid=\"admin-login-submit\"]').click();\n  47 |     }",
           "language": "js"
         }
       }

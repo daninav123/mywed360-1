@@ -15,7 +15,7 @@ import 'dotenv/config';
 import admin from 'firebase-admin';
 
 const BACKEND = process.env.VITE_BACKEND_BASE_URL || process.env.BACKEND_BASE_URL || 'http://localhost:4004';
-const AUTH = 'Bearer mock-scheduler-scheduler@mywed360.com';
+const AUTH = 'Bearer mock-scheduler-scheduler@maloveapp.com';
 
 // Inicializar Admin (Application Default Credentials o variables de entorno)
 if (!admin.apps.length) {

@@ -51,7 +51,7 @@ export const STRIPE_PRODUCTS = {
       stripePriceId: process.env.STRIPE_PRICE_WEDDING_PASS_PLUS,
       features: [
         'Todo lo de Wedding Pass',
-        'Sin marca MyWed360',
+        'Sin marca MaLoveApp',
         'Biblioteca completa de diseños',
         'Editor web premium',
         'Galería de recuerdos',

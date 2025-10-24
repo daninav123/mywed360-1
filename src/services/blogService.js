@@ -53,7 +53,7 @@ async function fetchFromBackend({ page, pageSize, language, skipLocalCandidates 
     normalizedDerivedBase,
     'http://localhost:4004',
     '', // Proxy de Vite o mismo origen como penúltimo recurso
-    'https://mywed360-backend.onrender.com',
+    'https://maloveapp-backend.onrender.com',
   ];
   let candidates = Array.from(new Set(rawCandidates.filter((v) => v !== undefined && v !== null)));
   if (skipLocalCandidates) {
@@ -72,7 +72,7 @@ async function fetchFromBackend({ page, pageSize, language, skipLocalCandidates 
   // En producción priorizamos Render por fiabilidad; en desarrollo mantenemos prioridad local/env
   if (import.meta?.env?.PROD) {
     try {
-      const RENDER_BASE = 'https://mywed360-backend.onrender.com';
+      const RENDER_BASE = 'https://maloveapp-backend.onrender.com';
       if (candidates.includes(RENDER_BASE)) {
         candidates = [RENDER_BASE, ...candidates.filter((b) => b !== RENDER_BASE)];
       }

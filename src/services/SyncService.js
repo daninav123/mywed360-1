@@ -62,7 +62,7 @@ export const saveData = async (key, data, userOptions = {}) => {
         }
         if (!docRef) {
           if (options.collection === 'userProfile') {
-            const wid = localStorage.getItem('mywed360_active_wedding');
+            const wid = localStorage.getItem('maloveapp_active_wedding');
             if (wid) {
               // Guardar como campo dentro del documento principal de la boda
               docRef = doc(db, 'weddings', wid);
@@ -174,7 +174,7 @@ export const loadData = async (key, userOptions = {}) => {
           }
           if (!docRef) {
             if (options.collection === 'userProfile') {
-              const wid = localStorage.getItem('mywed360_active_wedding');
+              const wid = localStorage.getItem('maloveapp_active_wedding');
               if (wid) {
                 docRef = doc(db, 'weddings', wid);
               } else {

@@ -95,7 +95,7 @@ router.post('/test', async (req, res) => {
     } catch (e) {
       return res.status(503).json({ error: 'web-push-not-installed' });
     }
-    webpush.setVapidDetails('mailto:admin@mywed360.com', VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
+    webpush.setVapidDetails('mailto:admin@maloveapp.com', VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
     const { endpoint } = req.body || {};
     let subDoc;
     if (endpoint) {
@@ -108,7 +108,7 @@ router.post('/test', async (req, res) => {
     if (!subDoc || !subDoc.exists) return res.status(404).json({ error: 'no-subscription' });
     const subscription = subDoc.data().subscription;
     await webpush.sendNotification(subscription, JSON.stringify({
-      title: 'MyWed360',
+      title: 'MaLoveApp',
       body: 'Notificación de prueba',
       url: process.env.FRONTEND_BASE_URL || 'http://localhost:5173/home'
     }));

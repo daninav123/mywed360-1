@@ -1,7 +1,7 @@
 {
   "app": {
     "name": "MaLove.App",
-    "brandName": "Lovenda",
+    "brandName": "MaLoveApp",
     "tagline": "Your perfect wedding, digitally organized",
     "loading": "Loading...",
     "error": "Error",
@@ -126,7 +126,7 @@
     "alreadyHaveAccount": "Already have an account?",
     "loginLink": "Sign in",
     "hero": {
-      "title": "Welcome to Lovenda",
+      "title": "Welcome to MaLoveApp",
       "description": "Centralise tasks, guests, and vendors in one place. Our assistant guides you every step so your wedding runs perfectly.",
       "features": [
         "Smart timeline so you never miss a task.",
@@ -1233,7 +1233,7 @@
   "marketingAccess": {
     "backLink": "Back to home",
     "hero": {
-      "badge": "Lovenda Access",
+      "badge": "MaLoveApp Access",
       "login": {
         "title": "Manage everything from one place",
         "description": "Access your guests, tasks, budgets, and documents in seconds. Keep your team in sync across every event.",
@@ -1244,7 +1244,7 @@
         ]
       },
       "signup": {
-        "title": "Welcome to Lovenda",
+        "title": "Welcome to MaLoveApp",
         "description": "Centralise planning, automate reminders, and let our assistant guide you every step of the way.",
         "features": [
           "Onboarding guided by our planning assistant",
@@ -1259,7 +1259,7 @@
     },
     "loggedIn": {
       "title": "Active session",
-      "description": "Your Lovenda account is already open. Continue with your events or sign out if you need to switch accounts.",
+      "description": "Your MaLoveApp account is already open. Continue with your events or sign out if you need to switch accounts.",
       "primaryCta": "Go to dashboard",
       "secondaryCta": "Sign out"
     },

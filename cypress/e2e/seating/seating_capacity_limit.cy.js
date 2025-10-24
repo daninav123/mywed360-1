@@ -4,8 +4,8 @@ describe('Seating Plan - Límite de capacidad por mesa', () => {
   function setActiveWeddingBeforeVisit() {
     cy.visit('/invitados/seating', {
       onBeforeLoad(win) {
-        win.localStorage.setItem('lovenda_active_wedding', WID);
-        win.localStorage.setItem('mywed360_active_wedding', WID);
+        win.localStorage.setItem('maloveapp_active_wedding', WID);
+        win.localStorage.setItem('maloveapp_active_wedding', WID);
       },
     });
   }

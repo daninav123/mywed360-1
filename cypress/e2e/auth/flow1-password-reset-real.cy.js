@@ -36,7 +36,7 @@ describe('Flujo 1 - Recuperación de contraseña (real)', () => {
       failOnStatusCode: false,
       onBeforeLoad(win) {
         try {
-          win.__MYWED360_DISABLE_AUTOLOGIN__ = true;
+          win.__MALOVEAPP_DISABLE_AUTOLOGIN__ = true;
         } catch (error) {
           // Ignorar si los flags no existen
         }

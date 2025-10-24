@@ -357,7 +357,7 @@ function EmailAdminDashboard() {
               </thead>
               <tbody>
                 <tr>
-                  <td>juan@mywed360.com</td>
+                  <td>juan@maloveapp.com</td>
                   <td>Juan Prez</td>
                   <td>10/06/2025</td>
                   <td>
@@ -373,7 +373,7 @@ function EmailAdminDashboard() {
                   </td>
                 </tr>
                 <tr>
-                  <td>maria@mywed360.com</td>
+                  <td>maria@maloveapp.com</td>
                   <td>Mara Garca</td>
                   <td>15/06/2025</td>
                   <td>
@@ -389,7 +389,7 @@ function EmailAdminDashboard() {
                   </td>
                 </tr>
                 <tr>
-                  <td>carlos@mywed360.com</td>
+                  <td>carlos@maloveapp.com</td>
                   <td>Carlos Lpez</td>
                   <td>20/06/2025</td>
                   <td>

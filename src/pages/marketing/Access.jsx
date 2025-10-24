@@ -35,7 +35,7 @@ const Access = ({ defaultMode = 'login' }) => {
   const [mode, setMode] = useState(initialMode === 'signup' ? 'signup' : 'login');
 
   const savedEmail =
-    typeof window !== 'undefined' ? window.localStorage.getItem('mywed360_login_email') || '' : '';
+    typeof window !== 'undefined' ? window.localStorage.getItem('maloveapp_login_email') || '' : '';
 
   const [loginEmail, setLoginEmail] = useState(savedEmail);
   const [loginPassword, setLoginPassword] = useState('');
@@ -137,12 +137,12 @@ const Access = ({ defaultMode = 'login' }) => {
   );
 
   const heroCopy = t(`marketingAccess.hero.${mode}`, { returnObjects: true });
-  const heroBadge = t('marketingAccess.hero.badge', { defaultValue: 'Lovenda Access' });
+  const heroBadge = t('marketingAccess.hero.badge', { defaultValue: 'MaLoveApp Access' });
   const heroFeatures = Array.isArray(heroCopy?.features) ? heroCopy.features : [];
   const heroTitle =
     heroCopy?.title ||
     (mode === 'signup'
-      ? t('marketingAccess.hero.signup.title', { defaultValue: 'Welcome to Lovenda' })
+      ? t('marketingAccess.hero.signup.title', { defaultValue: 'Welcome to MaLoveApp' })
       : t('marketingAccess.hero.login.title', { defaultValue: 'Manage everything from one place' }));
   const heroDescription =
     heroCopy?.description ||
@@ -191,9 +191,9 @@ const Access = ({ defaultMode = 'login' }) => {
       if (result?.success) {
         if (typeof window !== 'undefined') {
           if (rememberLogin) {
-            window.localStorage.setItem('mywed360_login_email', trimmedEmail);
+            window.localStorage.setItem('maloveapp_login_email', trimmedEmail);
           } else {
-            window.localStorage.removeItem('mywed360_login_email');
+            window.localStorage.removeItem('maloveapp_login_email');
           }
         }
         navigate(redirectPath, { replace: true });
@@ -349,7 +349,7 @@ const Access = ({ defaultMode = 'login' }) => {
                     <p className="mt-2 text-sm text-muted">
                       {t('marketingAccess.loggedIn.description', {
                         defaultValue:
-                          'Your Lovenda account is already open. Continue with your events or sign out if you need to switch accounts.',
+                          'Your MaLoveApp account is already open. Continue with your events or sign out if you need to switch accounts.',
                       })}
                     </p>
                   </div>

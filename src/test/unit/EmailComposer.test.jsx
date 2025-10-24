@@ -6,7 +6,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 // Mock de los hooks y servicios (deben declararse ANTES de importar los módulos a testear)
 vi.mock('../../hooks/useAuth', () => ({ useAuth: vi.fn() }));
 vi.mock('../../services/EmailService', () => ({
-  initEmailService: vi.fn().mockReturnValue('usuario@mywed360.com'),
+  initEmailService: vi.fn().mockReturnValue('usuario@maloveapp.com'),
   getEmailTemplates: vi.fn().mockResolvedValue([
     {
       id: 'template1',

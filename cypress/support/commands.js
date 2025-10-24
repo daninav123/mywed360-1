@@ -39,13 +39,13 @@ Cypress.Commands.add('seedPlannerWeddings', (plannerUid, weddings = [], activeId
     };
 
     try {
-      win.localStorage.setItem('lovenda_local_weddings', JSON.stringify(store));
+      win.localStorage.setItem('maloveapp_local_weddings', JSON.stringify(store));
       const activeWeddingId = activeId || normalized[0]?.id || '';
       if (activeWeddingId) {
-        win.localStorage.setItem(`mywed360_active_wedding_user_${uid}`, activeWeddingId);
-        win.localStorage.setItem('mywed360_active_wedding', activeWeddingId);
+        win.localStorage.setItem(`maloveapp_active_wedding_user_${uid}`, activeWeddingId);
+        win.localStorage.setItem('maloveapp_active_wedding', activeWeddingId);
       }
-      win.dispatchEvent?.(new win.CustomEvent('lovenda:local-weddings-updated'));
+      win.dispatchEvent?.(new win.CustomEvent('maloveapp:local-weddings-updated'));
     } catch (error) {
       // No interrumpir el test si el seed falla
       // eslint-disable-next-line no-console
@@ -62,7 +62,7 @@ Cypress.Commands.add('mockWeddingMinimal', () => {
   cy.window().then((win) => {
     const mockUser = {
       uid: 'cypress-user-' + Date.now(),
-      email: 'test@lovenda.com',
+      email: 'test@maloveapp.com',
       displayName: 'Usuario Test',
       emailVerified: true,
       photoURL: null,
@@ -95,12 +95,12 @@ Cypress.Commands.add('mockWeddingMinimal', () => {
 
     // Configurar localStorage
     win.localStorage.setItem('isLoggedIn', 'true');
-    win.localStorage.setItem('MyWed360_mock_user', JSON.stringify(mockUser));
-    win.localStorage.setItem('MyWed360_user_profile', JSON.stringify(mockProfile));
-    win.localStorage.setItem('MyWed360_auth_token', 'mock-token');
-    win.localStorage.setItem('MyWed360_active_wedding', JSON.stringify(mockWedding));
-    win.localStorage.setItem('MyWed360_weddings', JSON.stringify([mockWedding]));
-    win.localStorage.setItem('MyWed360_test_mode', 'true');
+    win.localStorage.setItem('MaLoveApp_mock_user', JSON.stringify(mockUser));
+    win.localStorage.setItem('MaLoveApp_user_profile', JSON.stringify(mockProfile));
+    win.localStorage.setItem('MaLoveApp_auth_token', 'mock-token');
+    win.localStorage.setItem('MaLoveApp_active_wedding', JSON.stringify(mockWedding));
+    win.localStorage.setItem('MaLoveApp_weddings', JSON.stringify([mockWedding]));
+    win.localStorage.setItem('MaLoveApp_test_mode', 'true');
     
     cy.log('Mock wedding minimal configurado');
   });
@@ -116,14 +116,14 @@ Cypress.Commands.add('mockWeddingMinimal', () => {
  * Comando para autenticarse en Lovenda usando Firebase Auth real
  * @param {string} email - Email del usuario (opcional, usa uno por defecto)
  */
-Cypress.Commands.add('loginToLovenda', (email = 'test@lovenda.com', role = 'owner') => {
+Cypress.Commands.add('loginToLovenda', (email = 'test@maloveapp.com', role = 'owner') => {
   cy.visit('/');
   
   cy.window().then((win) => {
     // Simular usuario logueado
     const mockUser = {
       uid: 'cypress-user-' + Date.now(),
-      email: email || 'test@lovenda.com',
+      email: email || 'test@maloveapp.com',
       displayName: email.split('@')[0] || 'Usuario Test E2E',
       emailVerified: true,
       photoURL: null,
@@ -160,16 +160,16 @@ Cypress.Commands.add('loginToLovenda', (email = 'test@lovenda.com', role = 'owne
 
     // Configurar las claves que useAuth busca para sesiones presembradas
     win.localStorage.setItem('isLoggedIn', 'true');
-    win.localStorage.setItem('MyWed360_mock_user', JSON.stringify(mockUser));
-    win.localStorage.setItem('MyWed360_user_profile', JSON.stringify(mockProfile));
-    win.localStorage.setItem('MyWed360_auth_token', 'mock-token');
+    win.localStorage.setItem('MaLoveApp_mock_user', JSON.stringify(mockUser));
+    win.localStorage.setItem('MaLoveApp_user_profile', JSON.stringify(mockProfile));
+    win.localStorage.setItem('MaLoveApp_auth_token', 'mock-token');
     
     // Guardar la boda activa
-    win.localStorage.setItem('MyWed360_active_wedding', JSON.stringify(mockWedding));
-    win.localStorage.setItem('MyWed360_weddings', JSON.stringify([mockWedding]));
+    win.localStorage.setItem('MaLoveApp_active_wedding', JSON.stringify(mockWedding));
+    win.localStorage.setItem('MaLoveApp_weddings', JSON.stringify([mockWedding]));
     
     // Agregar flag para indicar que es un usuario de prueba
-    win.localStorage.setItem('MyWed360_test_mode', 'true');
+    win.localStorage.setItem('MaLoveApp_test_mode', 'true');
     
     cy.log(`Usuario ${email} logueado con rol ${role || 'owner'} y boda activa creada`);
   });
@@ -207,7 +207,7 @@ Cypress.Commands.add('mockWeddingNews', (pages = {}, options = {}) => {
     '**/api/wedding-news*',
     '**/wedding-news*',
     '**localhost:4004/api/wedding-news*',
-    '**mywed360-backend.onrender.com/api/wedding-news*'
+    '**maloveapp-backend.onrender.com/api/wedding-news*'
   ];
   
   interceptPaths.forEach(path => {
@@ -258,7 +258,7 @@ Cypress.Commands.add('mockWeddingNews', (pages = {}, options = {}) => {
  * @param {string} username - Usuario admin (opcional)
  * @param {string} password - Contraseña admin (opcional)
  */
-Cypress.Commands.add('loginAsAdmin', (username = 'admin@lovenda.com', password = 'admin123') => {
+Cypress.Commands.add('loginAsAdmin', (username = 'admin@maloveapp.com', password = 'admin123') => {
   cy.visit('/admin/login');
   
   cy.window().then((win) => {

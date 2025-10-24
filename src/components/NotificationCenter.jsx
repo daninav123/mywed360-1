@@ -50,10 +50,10 @@ const NotificationCenter = () => {
       }
     };
 
-    window.addEventListener('mywed360-toast', handleToastEvent);
+    window.addEventListener('maloveapp-toast', handleToastEvent);
 
     return () => {
-      window.removeEventListener('mywed360-toast', handleToastEvent);
+      window.removeEventListener('maloveapp-toast', handleToastEvent);
     };
   }, []);
 

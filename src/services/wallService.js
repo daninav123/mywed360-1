@@ -38,7 +38,7 @@ const DEMO_IMAGES = [
  * @param {string} query
  * @returns {Promise<Array<{id:string, html:string, score:number}>>}
  */
-const API_BASE = import.meta.env.VITE_BACKEND_BASE_URL || 'https://mywed360-backend.onrender.com';
+const API_BASE = import.meta.env.VITE_BACKEND_BASE_URL || 'https://maloveapp-backend.onrender.com';
 
 export async function fetchWall(page = 1, query = 'wedding') {
   const proxify = (url) => {

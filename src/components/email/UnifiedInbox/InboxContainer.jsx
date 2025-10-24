@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 
 import EmailDetail from './EmailDetail';
 import EmailList from './EmailList';
@@ -22,11 +22,13 @@ import {
   RefreshCcw,
   ArrowUpDown,
   Tag as TagIcon,
+  // Mail, // TEMPORALMENTE DESACTIVADO
 } from 'lucide-react';
 import ProviderSearchModal from '../../ProviderSearchModal';
 import CustomFolders from '../CustomFolders';
 import ManageFoldersModal from '../ManageFoldersModal';
 import EmptyTrashModal from '../EmptyTrashModal';
+// import EmailAliasConfig from '../EmailAliasConfig'; // TEMPORALMENTE DESACTIVADO
 import {
   getUserFolders,
   createFolder as createCustomFolder,
@@ -131,6 +133,7 @@ const InboxContainer = () => {
   const customFoldersRef = useRef([]);
   const [showManageFolders, setShowManageFolders] = useState(false);
   const [showEmptyTrashModal, setShowEmptyTrashModal] = useState(false);
+  // const [showEmailAliasConfig, setShowEmailAliasConfig] = useState(false); // TEMPORALMENTE DESACTIVADO
   const [selectedEmailId, setSelectedEmailId] = useState(null);
   const [showComposer, setShowComposer] = useState(false);
   const [composerInitial, setComposerInitial] = useState({});
@@ -527,7 +530,7 @@ const InboxContainer = () => {
           } catch {}
           return '';
         })();
-        const emailToUse = (user && user.email) || localMockEmail || 'usuario.test@lovenda.com';
+        const emailToUse = (user && user.email) || localMockEmail || 'usuario.test@maloveapp.com';
         await EmailService.initEmailService({ email: emailToUse, ...(user || {}) });
         if (!cancelled) {
           await Promise.all([refreshEmails(folder), refreshCounts()]);
@@ -1441,6 +1444,17 @@ const InboxContainer = () => {
           </div>
 
           <div className="mt-auto pt-4 border-t space-y-2">
+            {/* TEMPORALMENTE DESACTIVADO - Causa bucle infinito
+            <button
+              type="button"
+              className="w-full px-3 py-2 text-sm text-body border rounded hover:bg-primary-soft flex items-center justify-center gap-2"
+              onClick={() => setShowEmailAliasConfig(true)}
+              data-testid="config-email-button"
+            >
+              <Mail size={16} />
+              Configurar mi email
+            </button>
+            */}
             <button
               type="button"
               className="w-full px-3 py-2 text-sm text-body border rounded hover:bg-primary-soft"
@@ -1596,6 +1610,20 @@ const InboxContainer = () => {
         onConfirm={handleEmptyTrash}
         onClose={() => setShowEmptyTrashModal(false)}
       />
+
+      {/* TEMPORALMENTE DESACTIVADO - Causa bucle infinito
+      {showEmailAliasConfig && (
+        <EmailAliasConfig
+          user={user}
+          onClose={() => setShowEmailAliasConfig(false)}
+          onSuccess={(newEmail) => {
+            console.log('✅ Email configurado:', newEmail);
+            alert(`Email configurado correctamente: ${newEmail}\n\nRecarga la página para que los cambios surtan efecto.`);
+            setShowEmailAliasConfig(false);
+          }}
+        />
+      )}
+      */}
     </div>
   );
 };

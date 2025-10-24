@@ -146,7 +146,7 @@ Convertir todos los tests E2E de mocks/stubs a tests que usen **integración rea
 CYPRESS_BASE_URL=http://localhost:5173
 CYPRESS_BACKEND_URL=http://localhost:4004
 CYPRESS_USE_REAL_FIREBASE=true
-CYPRESS_FIREBASE_PROJECT_ID=lovenda-98c77
+CYPRESS_FIREBASE_PROJECT_ID=maloveapp-98c77
 CYPRESS_TEST_USER_EMAIL=cypress-test@malove.app
 CYPRESS_TEST_USER_PASSWORD=TestPassword123!
 ```

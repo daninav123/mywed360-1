@@ -13,7 +13,7 @@
 const DOMAIN = import.meta.env.VITE_MAILGUN_DOMAIN || 'malove.app';
 const FUNCTIONS_URL =
   import.meta.env.VITE_FIREBASE_FUNCTIONS_URL ||
-  'https://us-central1-mywed360.cloudfunctions.net';
+  'https://us-central1-maloveapp.cloudfunctions.net';
 
 /**
  * Verifica si Mailgun está configurado correctamente
@@ -178,7 +178,7 @@ export async function checkUsernameAvailability(username) {
 
 /**
  * Crea una ruta de reenvío de correo en Mailgun
- * @param {string} address - Dirección de correo completa (ejemplo@mywed360.com)
+ * @param {string} address - Dirección de correo completa (ejemplo@maloveapp.com)
  * @param {string} forwardTo - Dirección a la que reenviar (usuario@gmail.com)
  * @returns {Promise<Object>} - Respuesta de la API
  */

@@ -9,7 +9,7 @@ describe('Flujo 10 - Gestión de bodas múltiples', () => {
     });
     cy.loginToLovenda('planner.multi@lovenda.test');
     cy.window().then((win) => {
-      const profileRaw = win.localStorage.getItem('MyWed360_user_profile');
+      const profileRaw = win.localStorage.getItem('MaLoveApp_user_profile');
       const profile = profileRaw ? JSON.parse(profileRaw) : {};
       const plannerProfile = {
         ...profile,
@@ -17,7 +17,7 @@ describe('Flujo 10 - Gestión de bodas múltiples', () => {
         role: 'planner',
         emailVerified: true,
       };
-      win.localStorage.setItem('MyWed360_user_profile', JSON.stringify(plannerProfile));
+      win.localStorage.setItem('MaLoveApp_user_profile', JSON.stringify(plannerProfile));
     });
     cy.seedPlannerWeddings('planner-multi-e2e', [
       {
@@ -81,7 +81,7 @@ describe('Flujo 10 - Gestión de bodas múltiples', () => {
     cy.contains(/\+?\s*Crear nueva boda/i).should('be.visible');
 
     cy.window().should((win) => {
-      expect(win.localStorage.getItem('mywed360_active_wedding')).to.eq('w1');
+      expect(win.localStorage.getItem('maloveapp_active_wedding')).to.eq('w1');
     });
 
     cy.contains(/Bodas activas/i).should('have.class', /bg-blue-50/);

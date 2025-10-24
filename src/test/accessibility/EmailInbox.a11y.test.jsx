@@ -12,7 +12,7 @@ vi.mock('../../services/EmailService', () => ({
     {
       id: 'email1',
       from: 'remitente@example.com',
-      to: 'usuario@mywed360.com',
+      to: 'usuario@maloveapp.com',
       subject: 'Asunto de prueba',
       body: '<p>Contenido de prueba</p>',
       date: '2025-07-10T15:30:00Z',
@@ -23,7 +23,7 @@ vi.mock('../../services/EmailService', () => ({
     {
       id: 'email2',
       from: 'otro@example.com',
-      to: 'usuario@mywed360.com',
+      to: 'usuario@maloveapp.com',
       subject: 'Segundo email',
       body: '<p>Otro contenido de prueba</p>',
       date: '2025-07-09T10:15:00Z',

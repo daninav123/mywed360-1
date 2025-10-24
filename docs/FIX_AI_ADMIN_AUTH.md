@@ -14,7 +14,7 @@ POST http://localhost:4004/api/ai-suppliers 401 (Unauthorized)
 
 ### Logs Relevantes
 ```
-[useAuth] ✅ Sesión admin restaurada correctamente {email: 'admin@lovenda.com', ...}
+[useAuth] ✅ Sesión admin restaurada correctamente {email: 'admin@maloveapp.com', ...}
 [useAuth] Sesión admin restaurada, ignorando usuario Firebase
 ```
 
@@ -24,7 +24,7 @@ POST http://localhost:4004/api/ai-suppliers 401 (Unauthorized)
 
 ```
 Usuario actual:
-✅ Sesión admin activa (admin@lovenda.com)
+✅ Sesión admin activa (admin@maloveapp.com)
 ❌ auth.currentUser = null (NO hay usuario Firebase)
 
 Frontend intenta llamar:
@@ -274,7 +274,7 @@ Deberías ver:
 
 ```javascript
 // 1. Verificar tipo de usuario
-console.log('Admin session:', localStorage.getItem('MyWed360_admin_session_token'));
+console.log('Admin session:', localStorage.getItem('MaLoveApp_admin_session_token'));
 console.log('Firebase user:', firebase.auth().currentUser);
 
 // 2. Verificar headers enviados

@@ -1,7 +1,7 @@
 {
   "app": {
     "name": "MaLove.App",
-    "brandName": "Lovenda",
+    "brandName": "MaLoveApp",
     "tagline": "Seu casamento perfeito, organizado digitalmente",
     "loading": "Carregando...",
     "error": "Erro",
@@ -126,7 +126,7 @@
     "alreadyHaveAccount": "Already have an account?",
     "loginLink": "Sign in",
     "hero": {
-      "title": "Welcome to Lovenda",
+      "title": "Welcome to MaLoveApp",
       "description": "Centralise tasks, guests, and vendors in one place. Our assistant guides you every step so your wedding runs perfectly.",
       "features": [
         "Smart timeline so you never miss a task.",

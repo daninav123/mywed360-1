@@ -1,4 +1,4 @@
-# Automatización MyWed360
+# Automatización MaLoveApp
 
 Este documento resume cómo ejecutar tareas automáticas, validar el estado del repo y programar recordatorios RSVP, cumpliendo con el flujo 1.1 y 1.2.
 

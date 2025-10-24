@@ -1,4 +1,4 @@
-﻿# Análisis de Flujos Faltantes - MyWed360
+﻿# Análisis de Flujos Faltantes - MaLoveApp
 
 > Actualización (2025-09-11): Este documento consolida el estado actual tras normalizar el índice de flujos y añadir secciones de estado. Usa `docs/FLUJOS-INDICE.md` como fuente de verdad.
 

@@ -104,7 +104,7 @@ router.get('/', async (req, res) => {
       responseType: 'stream',
       headers: {
         // “browser-like” headers para mejorar compatibilidad con CDNs
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 MyWed360/1.0',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 MaLoveApp/1.0',
         'Accept': 'image/avif,image/webp,image/*,*/*;q=0.8',
       },
       timeout: 15000,

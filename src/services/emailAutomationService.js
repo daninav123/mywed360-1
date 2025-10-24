@@ -458,7 +458,7 @@ function shouldAutoProcessQueue() {
   try {
     if (supportsRemoteScheduler()) return false;
     if (typeof window === 'undefined') return false;
-    if (window.__LOVENDA_DISABLE_EMAIL_SCHEDULER__) return false;
+    if (window.__MALOVEAPP_DISABLE_EMAIL_SCHEDULER__) return false;
     if (typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'test') {
       return false;
     }

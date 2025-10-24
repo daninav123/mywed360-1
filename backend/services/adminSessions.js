@@ -30,10 +30,10 @@ const toMillis = (value) => {
   return Number.isNaN(parsed.getTime()) ? null : parsed.getTime();
 };
 
-const normalizeProfile = (profile = {}, emailFallback = 'admin@lovenda.com') => ({
+const normalizeProfile = (profile = {}, emailFallback = 'admin@maloveapp.com') => ({
   id: profile.id || 'admin-local',
   email: profile.email || emailFallback,
-  name: profile.name || 'Administrador Lovenda',
+  name: profile.name || 'Administrador MaLoveApp',
   role: 'admin',
   isAdmin: true,
   preferences: profile.preferences || { theme: 'dark', emailNotifications: false },
@@ -162,7 +162,7 @@ export async function getAdminSession(sessionToken) {
     return {
       sessionId: data.sessionId,
       sessionToken,
-      email: data.email || 'admin@lovenda.com',
+      email: data.email || 'admin@maloveapp.com',
       profile: normalizeProfile(data.profile, data.email),
       expiresAt: expiresAtMs,
       createdAt: toMillis(data.createdAt),

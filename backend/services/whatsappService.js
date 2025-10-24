@@ -46,7 +46,7 @@ export function toE164(phone, defaultCountryCode = '') {
 function buildStatusCallbackUrl() {
   const envUrl = process.env.WHATSAPP_STATUS_CALLBACK_URL;
   if (envUrl) return envUrl;
-  const renderUrl = process.env.BACKEND_BASE_URL || 'https://mywed360-backend.onrender.com';
+  const renderUrl = process.env.BACKEND_BASE_URL || 'https://maloveapp-backend.onrender.com';
   return `${renderUrl.replace(/\/$/, '')}/api/whatsapp/webhook/twilio`;
 }
 

@@ -11,8 +11,8 @@ describe('Flujo 6 - Finanzas (transacciones y presupuesto)', () => {
     cy.loginToLovenda();
     // Forzar modo local (sin boda activa) para usar LocalStorage y evitar Firestore
     cy.window().then((win) => {
-      win.localStorage.removeItem('mywed360_active_wedding');
-      win.localStorage.removeItem('lovenda_active_wedding');
+      win.localStorage.removeItem('maloveapp_active_wedding');
+      win.localStorage.removeItem('maloveapp_active_wedding');
     });
   });
 

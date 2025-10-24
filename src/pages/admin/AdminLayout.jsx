@@ -23,7 +23,7 @@ const AdminLayout = () => {
   const supportEmail = useMemo(
     () =>
       (typeof import.meta !== 'undefined' && import.meta.env?.VITE_ADMIN_SUPPORT_EMAIL) ||
-      'soporte@lovenda.com',
+      'soporte@maloveapp.com',
     [],
   );
   const supportPhone = useMemo(

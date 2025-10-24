@@ -322,7 +322,7 @@ const ProveedorCard = ({
       if (baseBodyHtml) {
         const signature =
           userProfile?.preferences?.emailSignature ||
-          'Enviado automaticamente desde MyWed360';
+          'Enviado automaticamente desde MaLoveApp';
         body = `${baseBodyHtml}${appended}${closing}<p style="color:#888; font-size:12px;">${signature}</p>`;
       } else {
         const fallback = generateDefaultEmailBody(provider) || '';

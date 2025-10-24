@@ -4,7 +4,7 @@ describe('Flujo de etiquetado y filtrado de correos', () => {
   
   // Datos de prueba
   const testUser = {
-    email: 'usuario.test@lovenda.com',
+    email: 'usuario.test@maloveapp.com',
     password: 'contraseña123'
   };
   
@@ -18,7 +18,7 @@ describe('Flujo de etiquetado y filtrado de correos', () => {
     {
       id: 'email1',
       from: 'proveedor1@example.com',
-      to: 'usuario.test@lovenda.com',
+      to: 'usuario.test@maloveapp.com',
       subject: 'Presupuesto para catering',
       body: '<p>Adjunto encontrarás el presupuesto para el servicio de catering que solicitaste.</p>',
       date: '2025-07-14T15:30:00Z',
@@ -37,7 +37,7 @@ describe('Flujo de etiquetado y filtrado de correos', () => {
     {
       id: 'email2',
       from: 'proveedor2@example.com',
-      to: 'usuario.test@lovenda.com',
+      to: 'usuario.test@maloveapp.com',
       subject: 'Disponibilidad para fotografía',
       body: '<p>Gracias por tu interés en nuestros servicios de fotografía. Te confirmo que tenemos disponibilidad para la fecha de tu boda.</p>',
       date: '2025-07-13T10:15:00Z',
@@ -49,7 +49,7 @@ describe('Flujo de etiquetado y filtrado de correos', () => {
     {
       id: 'email3',
       from: 'proveedor3@example.com',
-      to: 'usuario.test@lovenda.com',
+      to: 'usuario.test@maloveapp.com',
       subject: 'Catálogo de decoración',
       body: '<p>Te comparto nuestro catálogo de decoración para bodas.</p>',
       date: '2025-07-12T09:45:00Z',
@@ -68,7 +68,7 @@ describe('Flujo de etiquetado y filtrado de correos', () => {
     {
       id: 'email4',
       from: 'proveedor4@example.com',
-      to: 'usuario.test@lovenda.com',
+      to: 'usuario.test@maloveapp.com',
       subject: 'Consulta sobre fecha',
       body: '<p>He recibido tu consulta sobre la fecha de disponibilidad.</p>',
       date: '2025-07-10T14:20:00Z',

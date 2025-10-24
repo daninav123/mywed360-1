@@ -7,7 +7,7 @@
 - Recordar siempre que se puede ajustar el perfil de la boda.
 
 ## Copy de bienvenida
-> “Hola, soy tu planning partner en MyWed360. Cuéntame cómo imaginan su boda y te mostraré recomendaciones hechas a su medida.”
+> “Hola, soy tu planning partner en MaLoveApp. Cuéntame cómo imaginan su boda y te mostraré recomendaciones hechas a su medida.”
 
 ## Plantilla de recomendación
 ```

@@ -62,7 +62,7 @@ async function getQuickTestMetrics() {
 async function main() {
   console.log(`${colors.bright}${colors.cyan}
 =====================================
-📊 RESUMEN DE TESTS E2E - MyWed360
+📊 RESUMEN DE TESTS E2E - MaLoveApp
 =====================================
 ${colors.reset}`);
 

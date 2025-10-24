@@ -46,7 +46,7 @@ import {
 import sanitizeHtml from '../utils/sanitizeHtml';
 
 /**
- * P)gina principal de Buz)n (correo interno @mywed360.com)
+ * P)gina principal de Buz)n (correo interno @maloveapp.com)
  * Incluye: Sidebar de carpetas, lista de correos, visor del correo y modal para redactar.
  * Email backend:
  *  - GET  /getMailgunEvents  -> lista de eventos (funci)n Cloud)
@@ -144,7 +144,7 @@ const UnifiedEmail = () => {
       if (!emails || emails.length === 0) return;
       if (!providers || providers.length === 0) return;
 
-      const processedKey = 'mywed360_provider_response_checked';
+      const processedKey = 'maloveapp_provider_response_checked';
       const processed = new Set(JSON.parse(localStorage.getItem(processedKey) || '[]'));
       let changed = false;
 
@@ -164,7 +164,7 @@ const UnifiedEmail = () => {
       }
       if (changed) {
         try {
-          window.dispatchEvent(new Event('mywed360-tracking-updated'));
+          window.dispatchEvent(new Event('maloveapp-tracking-updated'));
         } catch {}
       }
     } catch (e) {
@@ -180,7 +180,7 @@ const UnifiedEmail = () => {
       let resolvedEmail;
 
       if (username) {
-        resolvedEmail = `${username}@mywed360.com`;
+        resolvedEmail = `${username}@maloveapp.com`;
         await initEmailService({
           uid: user.uid,
           emailUsername: username,

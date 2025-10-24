@@ -1,8 +1,8 @@
-# Métricas Recomendadas - Panel Admin MyWed360
+# Métricas Recomendadas - Panel Admin MaLoveApp
 
 ## 📊 Resumen Ejecutivo
 
-Este documento define las métricas clave para monitorear la salud del negocio, producto y operaciones de MyWed360.
+Este documento define las métricas clave para monitorear la salud del negocio, producto y operaciones de MaLoveApp.
 
 ---
 

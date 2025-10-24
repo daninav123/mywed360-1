@@ -1,7 +1,7 @@
 # 📊 AUDITORÍA MULTILENGUAJE - RESULTADOS COMPLETOS
 
 **Fecha:** 23 Octubre 2025  
-**Proyecto:** MyWed360  
+**Proyecto:** MaLoveApp  
 **Herramientas:** findHardcodedStrings.js + validateTranslations.js
 
 ---

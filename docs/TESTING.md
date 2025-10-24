@@ -1,6 +1,6 @@
 # Testing
 
-Guía consolidada para ejecutar y mantener las suites de pruebas de MyWed360. Complementa la documentación específica de cada flujo (`docs/flujos-especificos/*`) y los scripts de semillas descritos en `docs/personalizacion/README.md`.
+Guía consolidada para ejecutar y mantener las suites de pruebas de MaLoveApp. Complementa la documentación específica de cada flujo (`docs/flujos-especificos/*`) y los scripts de semillas descritos en `docs/personalizacion/README.md`.
 
 ## 1. Configuración rápida
 
@@ -21,7 +21,7 @@ Guía consolidada para ejecutar y mantener las suites de pruebas de MyWed360. Co
 | Comunicaciones (flujos 7/20) | Antes de releases email/inbox | `cypress/e2e/email/*.cy.js`, `compose_quick_replies.cy.js` | `MAILGUN_TEST_MODE`, `seedTestDataForPlanner`. |
 | Protocolo (flujos 11A–11E) | Cada iteración de protocolo | `cypress/e2e/protocolo/*.cy.js` | Seeds planner + `seedPersonalizationProfiles` (moments). |
 | Dashboard/Home/Gamificación (flujos 22/17/30) | Nightly | `cypress/e2e/dashboard/*.cy.js`, `cypress/e2e/home/*.cy.js`, `cypress/e2e/gamification/*.cy.js` | `seedTestDataForPlanner`, `seedPersonalizationProfiles`, set `window.__GAMIFICATION_TEST_SUMMARY__`. |
-| Admin/Automation (flujos 0/12/16) | Bajo demanda | `cypress/e2e/admin/*.cy.js`, `cypress/e2e/notifications/*.cy.js`, `cypress/e2e/assistant/*.cy.js` | `seedAdminData.js`, definir `ADMIN_MFA_TEST_CODE`, habilitar `window.__MYWED360_TEST_MODE__`. |
+| Admin/Automation (flujos 0/12/16) | Bajo demanda | `cypress/e2e/admin/*.cy.js`, `cypress/e2e/notifications/*.cy.js`, `cypress/e2e/assistant/*.cy.js` | `seedAdminData.js`, definir `ADMIN_MFA_TEST_CODE`, habilitar `window.__MALOVEAPP_TEST_MODE__`. |
 
 > Consulta la carpeta `cypress/e2e/<módulo>` para specs adicionales (blog, inspiración, subscriptions, web). Cada spec incluye comentarios con precondiciones y seeds específicos si difieren de la tabla.
 
@@ -83,7 +83,7 @@ Siempre establece `STRIPE_TEST_DISABLE_SIGNATURE=true` y `ADMIN_MFA_TEST_CODE=12
 
 - `STRIPE_TEST_DISABLE_SIGNATURE=true` → omite verificación HMAC en `POST /api/payments/webhook`.
 - `ADMIN_MFA_TEST_CODE` → código fijo (123456 por defecto en no producción) para aprobar MFA admin en E2E.
-- `window.__MYWED360_TEST_MODE__ = true` (se inyecta desde `cypress/support/e2e.js`) habilita mocks globales.
+- `window.__MALOVEAPP_TEST_MODE__ = true` (se inyecta desde `cypress/support/e2e.js`) habilita mocks globales.
 - `window.__GUESTS_TEST_API__` → permite resetear fixtures de invitados desde Cypress (ver `useGuests.js`).
 - `window.__ENABLE_ONBOARDING_TEST__ = true` → desbloquea rutas internas del wizard de descubrimiento.
 - `window.__GAMIFICATION_TEST_SUMMARY__` → devoluciones deterministas en `GamificationService`.

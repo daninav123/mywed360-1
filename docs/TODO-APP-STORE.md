@@ -48,7 +48,7 @@ El código backend está **100% listo y funcional**. Solo necesita configuració
 - [ ] Añadir a `.env`:
   ```env
   APP_STORE_SHARED_SECRET=tu_shared_secret_aqui
-  APP_STORE_BUNDLE_ID=com.mywed360.app
+  APP_STORE_BUNDLE_ID=com.maloveapp.app
   ```
 - [ ] Reiniciar backend
 - [ ] Verificar logs: `[backend] App Store webhook routes mounted`

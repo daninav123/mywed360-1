@@ -37,8 +37,8 @@ export default function MailList({
 
   useEffect(() => {
     const h = () => setTick((t) => t + 1);
-    window.addEventListener('mywed360-email-tags', h);
-    return () => window.removeEventListener('mywed360-email-tags', h);
+    window.addEventListener('maloveapp-email-tags', h);
+    return () => window.removeEventListener('maloveapp-email-tags', h);
   }, []);
 
   useEffect(() => {

@@ -15,7 +15,7 @@
 
 ## 3. Paso a paso UX actual
 1. **Carga inicial**
-   - `WeddingContext` asegura listado de bodas (`users/{uid}/weddings`) y selecciona `activeWedding` desde localStorage (`mywed360_active_wedding_user_{uid}`) o primer resultado.
+   - `WeddingContext` asegura listado de bodas (`users/{uid}/weddings`) y selecciona `activeWedding` desde localStorage (`maloveapp_active_wedding_user_{uid}`) o primer resultado.
    - El dashboard se presenta en contenedor centrado con título “Panel de Wedding Planner”.
 2. **Tarjetas métricas**
    - `DashCard` (componente inline) muestra cuatro KPIs:
@@ -31,9 +31,9 @@
    - Obtiene las últimas noticias con `fetchWeddingNews(page=1,pageSize=10,lang)` y muestra 3 entradas (link externo + fuente). Skeletons en carga, mensaje claro en caso de error.
 
 ## 4. Persistencia y datos
-- **Listado de bodas**: `WeddingContext.jsx` suscribe `users/{uid}/weddings` (Firestore) y normaliza permisos con `ensureWeddingAccessMetadata`. Cachea resultado en localStorage `mywed360_cached_weddings`.
-- **Boda activa**: se persiste en `mywed360_active_wedding` + clave por usuario; al cambiarla se sincroniza `users/{uid}` y `users/{uid}/weddings/{id}` (`lastAccessedAt`).
-- **Subcolecciones**: `useFirestoreCollection('meetings')` y `'suppliers'` delegan en `useWeddingCollection` para leer `weddings/{activeWedding}/meetings|suppliers`, con fallback offline localStorage (`mywed360_{wid}_{sub}`) y suscripción `onSnapshot`.
+- **Listado de bodas**: `WeddingContext.jsx` suscribe `users/{uid}/weddings` (Firestore) y normaliza permisos con `ensureWeddingAccessMetadata`. Cachea resultado en localStorage `maloveapp_cached_weddings`.
+- **Boda activa**: se persiste en `maloveapp_active_wedding` + clave por usuario; al cambiarla se sincroniza `users/{uid}` y `users/{uid}/weddings/{id}` (`lastAccessedAt`).
+- **Subcolecciones**: `useFirestoreCollection('meetings')` y `'suppliers'` delegan en `useWeddingCollection` para leer `weddings/{activeWedding}/meetings|suppliers`, con fallback offline localStorage (`maloveapp_{wid}_{sub}`) y suscripción `onSnapshot`.
 - **Alertas**: `usePlannerAlerts` agrega notificaciones sin leer para las bodas del planner filtrando `payload.weddingId`; escucha `window` `mywed360-notif` para refrescos rápidos.
 - **Notificaciones**: `notifications` (colección global + caché local) guarda `payload` enriquecido (weddingId, category, severity, source). Opción: contadores agregados `weddings/{id}/counters/alerts` para evitar agregados costosos.
 

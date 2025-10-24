@@ -1,5 +1,5 @@
 describe('RSVP - Recordatorios por email (protegido)', () => {
-  const AUTH = { Authorization: 'Bearer mock-planner-automation@mywed360.com' };
+  const AUTH = { Authorization: 'Bearer mock-planner-automation@maloveapp.com' };
   const weddingId = 'test-wedding-reminders';
   const token = 'stub-token-123';
 

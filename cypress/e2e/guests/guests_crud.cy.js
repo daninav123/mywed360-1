@@ -54,8 +54,8 @@ describe('Invitados — Gestión básica', () => {
     cy.visit('/', {
       onBeforeLoad(win) {
         win.localStorage.clear();
-        win.localStorage.setItem('mywed360_w1_guests', JSON.stringify(guests));
-        win.localStorage.setItem('mywed360_active_wedding', 'w1');
+        win.localStorage.setItem('maloveapp_w1_guests', JSON.stringify(guests));
+        win.localStorage.setItem('maloveapp_active_wedding', 'w1');
         win.localStorage.setItem('i18nextLng', 'es');
         win.__MOCK_WEDDING__ = {
           weddings: [

@@ -28,7 +28,7 @@ const renderScheduleRows = (schedule = []) => {
 const renderLodgingCards = (lodging = []) => {
   if (!Array.isArray(lodging) || lodging.length === 0) {
     return `
-      <div class="lovenda-card">
+      <div class="maloveapp-card">
         <p>Pronto añadiremos hoteles y alojamientos recomendados cercanos a la celebración.</p>
       </div>
     `;
@@ -43,13 +43,13 @@ const renderLodgingCards = (lodging = []) => {
       const amenities = Array.isArray(hotel.amenities) ? hotel.amenities.join(', ') : hotel.amenities || '';
 
       return `
-        <div class="lovenda-card">
+        <div class="maloveapp-card">
           <h3>${title}</h3>
           ${type ? `<p>${type}</p>` : ''}
           ${distance ? `<p><strong>Distancia:</strong> ${distance}</p>` : ''}
           ${price ? `<p><strong>Precio:</strong> ${price}</p>` : ''}
           ${amenities ? `<p><strong>Servicios:</strong> ${amenities}</p>` : ''}
-          ${link ? `<a class="lovenda-button-secondary" href="${link}" target="_blank" rel="noopener">Ver sitio</a>` : ''}
+          ${link ? `<a class="maloveapp-button-secondary" href="${link}" target="_blank" rel="noopener">Ver sitio</a>` : ''}
         </div>
       `;
     })
@@ -183,12 +183,12 @@ const buildStyleBlock = (template) => {
     box-shadow: var(--shadow-soft);
   }
 
-  .lovenda-table-wrapper {
+  .maloveapp-table-wrapper {
     overflow-x: auto;
     margin-top: 16px;
   }
 
-  .lovenda-hero {
+  .maloveapp-hero {
     position: relative;
     padding: clamp(48px, 10vw, 96px) 24px clamp(40px, 8vw, 80px);
     text-align: center;
@@ -196,7 +196,7 @@ const buildStyleBlock = (template) => {
     overflow: hidden;
   }
 
-  .lovenda-hero__badge {
+  .maloveapp-hero__badge {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -208,7 +208,7 @@ const buildStyleBlock = (template) => {
     font-size: 0.85rem;
   }
 
-  .lovenda-hero__names {
+  .maloveapp-hero__names {
     font-family: var(--font-accent);
     font-size: clamp(48px, 10vw, 96px);
     margin: clamp(12px, 4vw, 32px) 0 12px;
@@ -216,7 +216,7 @@ const buildStyleBlock = (template) => {
     text-shadow: 0 16px 32px rgba(0,0,0,0.08);
   }
 
-  .lovenda-hero__cta {
+  .maloveapp-hero__cta {
     margin-top: clamp(24px, 4vw, 40px);
     display: inline-flex;
     gap: 16px;
@@ -224,7 +224,7 @@ const buildStyleBlock = (template) => {
     justify-content: center;
   }
 
-  .lovenda-button-primary {
+  .maloveapp-button-primary {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -239,12 +239,12 @@ const buildStyleBlock = (template) => {
     box-shadow: 0 16px 32px rgba(0,0,0,0.12);
   }
 
-  .lovenda-button-primary:hover {
+  .maloveapp-button-primary:hover {
     transform: translateY(-2px);
     box-shadow: 0 20px 40px rgba(0,0,0,0.14);
   }
 
-  .lovenda-button-secondary {
+  .maloveapp-button-secondary {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -257,18 +257,18 @@ const buildStyleBlock = (template) => {
     text-decoration: none;
   }
 
-  .lovenda-grid {
+  .maloveapp-grid {
     display: grid;
     gap: clamp(16px, 3vw, 32px);
   }
 
   @media (min-width: 768px) {
-    .lovenda-grid--two {
+    .maloveapp-grid--two {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
-  .lovenda-card {
+  .maloveapp-card {
     background: var(--color-surface);
     border-radius: clamp(18px, 4vw, 26px);
     border: 1px solid rgba(0,0,0,0.05);
@@ -276,13 +276,13 @@ const buildStyleBlock = (template) => {
     box-shadow: var(--shadow-soft);
   }
 
-  .lovenda-gallery {
+  .maloveapp-gallery {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: clamp(12px, 3vw, 28px);
   }
 
-  .lovenda-gallery__item {
+  .maloveapp-gallery__item {
     position: relative;
     border-radius: 24px;
     overflow: hidden;
@@ -291,19 +291,19 @@ const buildStyleBlock = (template) => {
     box-shadow: var(--shadow-soft);
   }
 
-  .lovenda-gallery__item img {
+  .maloveapp-gallery__item img {
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
 
-  .lovenda-section-heading {
+  .maloveapp-section-heading {
     font-size: clamp(26px, 4vw, 36px);
     margin-bottom: clamp(16px, 3vw, 28px);
     position: relative;
   }
 
-  .lovenda-section-heading span {
+  .maloveapp-section-heading span {
     display: inline-block;
     padding-bottom: 12px;
     border-bottom: 2px solid rgba(0,0,0,0.1);
@@ -337,37 +337,37 @@ const buildStyleBlock = (template) => {
   }
 
 
-  .lovenda-timeline {
+  .maloveapp-timeline {
     display: grid;
     gap: 18px;
   }
 
-  .lovenda-timeline__item {
+  .maloveapp-timeline__item {
     display: grid;
     grid-template-columns: auto 1fr;
     gap: 12px 24px;
     align-items: center;
   }
 
-  .lovenda-timeline__time {
+  .maloveapp-timeline__time {
     font-weight: 600;
     color: var(--color-primary);
     min-width: 80px;
   }
 
-  .lovenda-faq {
+  .maloveapp-faq {
     display: grid;
     gap: 16px;
   }
 
-  .lovenda-faq__item {
+  .maloveapp-faq__item {
     padding: 16px 20px;
     border-radius: 16px;
     background: var(--color-surface-alt);
   }
   `;
 
-  return `<style id="lovenda-wedding-theme">${baseStyles}</style>`;
+  return `<style id="maloveapp-wedding-theme">${baseStyles}</style>`;
 };
 
 const injectFonts = (html, template) => {
@@ -404,17 +404,17 @@ const buildFallbackSections = (weddingInfo, template) => ({
     if (!weddingInfo?.additionalInfo && !weddingInfo?.story) return '';
     return `
     <section data-enhanced="story">
-      <div class="lovenda-section-heading"><span>Nuestra historia</span></div>
+      <div class="maloveapp-section-heading"><span>Nuestra historia</span></div>
       <p>${weddingInfo.story || weddingInfo.additionalInfo}</p>
     </section>
     `;
   },
   transport: () => `
     <section data-enhanced="transport" id="transporte">
-      <div class="lovenda-section-heading"><span>Transporte y autobuses</span></div>
-      <div class="lovenda-card">
+      <div class="maloveapp-section-heading"><span>Transporte y autobuses</span></div>
+      <div class="maloveapp-card">
         <p>${weddingInfo?.transportation || 'Habrá servicio de transporte para invitados. Consulta los horarios en la tabla.'}</p>
-        <div class="lovenda-table-wrapper">
+        <div class="maloveapp-table-wrapper">
           <table>
             <thead>
               <tr>
@@ -434,18 +434,18 @@ const buildFallbackSections = (weddingInfo, template) => ({
   `,
   gallery: () => `
     <section data-enhanced="gallery">
-      <div class="lovenda-section-heading"><span>Galería</span></div>
-      <div class="lovenda-gallery">
-        <div class="lovenda-gallery__item"></div>
-        <div class="lovenda-gallery__item"></div>
-        <div class="lovenda-gallery__item"></div>
+      <div class="maloveapp-section-heading"><span>Galería</span></div>
+      <div class="maloveapp-gallery">
+        <div class="maloveapp-gallery__item"></div>
+        <div class="maloveapp-gallery__item"></div>
+        <div class="maloveapp-gallery__item"></div>
       </div>
     </section>
   `,
   lodging: () => `
     <section data-enhanced="lodging">
-      <div class="lovenda-section-heading"><span>Hospedaje cercano</span></div>
-      <div class="lovenda-grid lovenda-grid--two">
+      <div class="maloveapp-section-heading"><span>Hospedaje cercano</span></div>
+      <div class="maloveapp-grid maloveapp-grid--two">
         ${renderLodgingCards(weddingInfo?.lodgingOptions)}
       </div>
     </section>
@@ -454,18 +454,18 @@ const buildFallbackSections = (weddingInfo, template) => ({
     const travelBlocks = renderTravelCards(weddingInfo?.travelGuide || {});
     return `
     <section data-enhanced="travel-guide">
-      <div class="lovenda-section-heading"><span>Cómo llegar</span></div>
-      <div class="lovenda-grid lovenda-grid--two">
-        <div class="lovenda-card">
+      <div class="maloveapp-section-heading"><span>Cómo llegar</span></div>
+      <div class="maloveapp-grid maloveapp-grid--two">
+        <div class="maloveapp-card">
           <h3>En avión</h3>
           <p>${travelBlocks.air}</p>
         </div>
-        <div class="lovenda-card">
+        <div class="maloveapp-card">
           <h3>En tren / bus</h3>
           <p>${travelBlocks.rail}</p>
         </div>
       </div>
-      <div class="lovenda-card">
+      <div class="maloveapp-card">
         <h3>En coche</h3>
         <p>${travelBlocks.road}</p>
       </div>
@@ -479,8 +479,8 @@ const buildFallbackSections = (weddingInfo, template) => ({
     if (!addresses) return '';
     return `
     <section data-enhanced="mapa" id="mapa">
-      <div class="lovenda-section-heading"><span>Mapa de la celebración</span></div>
-      <div class="lovenda-card">
+      <div class="maloveapp-section-heading"><span>Mapa de la celebración</span></div>
+      <div class="maloveapp-card">
         <iframe
           title="Ubicación de la boda"
           src="https://maps.google.com/maps?q=${encodeURIComponent(addresses)}&output=embed"
@@ -500,7 +500,7 @@ const buildFallbackSections = (weddingInfo, template) => ({
     const items = faqs
       .map(
         (faq) => `
-        <div class="lovenda-faq__item">
+        <div class="maloveapp-faq__item">
           <div class="font-semibold text-gray-800 mb-1">${faq.question || ''}</div>
           <p class="text-sm text-gray-600">${faq.answer || ''}</p>
         </div>`
@@ -508,8 +508,8 @@ const buildFallbackSections = (weddingInfo, template) => ({
       .join('');
     return `
     <section data-enhanced="faq" id="faq">
-      <div class="lovenda-section-heading"><span>Preguntas frecuentes</span></div>
-      <div class="lovenda-card lovenda-faq">
+      <div class="maloveapp-section-heading"><span>Preguntas frecuentes</span></div>
+      <div class="maloveapp-card maloveapp-faq">
         ${items}
       </div>
     </section>
@@ -520,8 +520,8 @@ const buildFallbackSections = (weddingInfo, template) => ({
     if (!contact) return '';
     return `
     <section data-enhanced="contacto" id="contacto">
-      <div class="lovenda-section-heading"><span>Contacto</span></div>
-      <div class="lovenda-card">${contact}</div>
+      <div class="maloveapp-section-heading"><span>Contacto</span></div>
+      <div class="maloveapp-card">${contact}</div>
     </section>
     `;
   },
@@ -529,19 +529,19 @@ const buildFallbackSections = (weddingInfo, template) => ({
     if (!weddingInfo?.ceremonyTime && !weddingInfo?.receptionTime) return '';
     return `
     <section data-enhanced="timeline">
-      <div class="lovenda-section-heading"><span>Agenda del día</span></div>
-      <div class="lovenda-timeline">
+      <div class="maloveapp-section-heading"><span>Agenda del día</span></div>
+      <div class="maloveapp-timeline">
         ${weddingInfo?.ceremonyTime ? `
-        <div class="lovenda-timeline__item">
-          <div class="lovenda-timeline__time">${weddingInfo.ceremonyTime}</div>
+        <div class="maloveapp-timeline__item">
+          <div class="maloveapp-timeline__time">${weddingInfo.ceremonyTime}</div>
           <div>
             <strong>Ceremonia</strong>
             <div>${weddingInfo.ceremonyLocation || 'Por confirmar'}</div>
           </div>
         </div>` : ''}
         ${weddingInfo?.receptionTime ? `
-        <div class="lovenda-timeline__item">
-          <div class="lovenda-timeline__time">${weddingInfo.receptionTime}</div>
+        <div class="maloveapp-timeline__item">
+          <div class="maloveapp-timeline__time">${weddingInfo.receptionTime}</div>
           <div>
             <strong>Recepción</strong>
             <div>${weddingInfo.receptionVenue || 'Por confirmar'}</div>
@@ -554,20 +554,20 @@ const buildFallbackSections = (weddingInfo, template) => ({
 });
 
 const ensureHero = (html, weddingInfo, template) => {
-  if (/lovenda-hero/i.test(html) || /data-enhanced="hero"/i.test(html)) return html;
-  const dateText = weddingInfo?.date ? `<div class="lovenda-hero__badge">${weddingInfo.date}</div>` : '';
+  if (/maloveapp-hero/i.test(html) || /data-enhanced="hero"/i.test(html)) return html;
+  const dateText = weddingInfo?.date ? `<div class="maloveapp-hero__badge">${weddingInfo.date}</div>` : '';
   const location =
     weddingInfo?.ceremonyLocation || weddingInfo?.receptionVenue
       ? `<p>${[weddingInfo.ceremonyLocation, weddingInfo.receptionVenue].filter(Boolean).join(' · ')}</p>`
       : '';
   const hero = `
-  <section class="lovenda-hero" data-enhanced="hero">
+  <section class="maloveapp-hero" data-enhanced="hero">
     ${dateText}
-    <div class="lovenda-hero__names">${coupleLabel(weddingInfo)}</div>
+    <div class="maloveapp-hero__names">${coupleLabel(weddingInfo)}</div>
     ${location}
-    <div class="lovenda-hero__cta">
-      <a class="lovenda-button-primary" href="#transporte">Ver transporte</a>
-      <a class="lovenda-button-secondary" href="#contacto">Contactar a la pareja</a>
+    <div class="maloveapp-hero__cta">
+      <a class="maloveapp-button-primary" href="#transporte">Ver transporte</a>
+      <a class="maloveapp-button-secondary" href="#contacto">Contactar a la pareja</a>
     </div>
   </section>
   `;
@@ -583,11 +583,11 @@ const ensureCountdownScript = (html, weddingInfo) => {
   if (/lovendaCountdown/i.test(html)) return html;
 
   const script = `
-  <script id="lovendaCountdown">
+  <script id="maloveappCountdown">
     (function(){
       var target = new Date('${weddingInfo.date}').getTime();
       if (!target || isNaN(target)) return;
-      var badge = document.querySelector('.lovenda-hero__badge');
+      var badge = document.querySelector('.maloveapp-hero__badge');
       if (!badge) return;
       function pad(n){ return (n<10 ? '0' : '') + n; }
       function tick(){
@@ -620,7 +620,7 @@ export const enhanceWeddingHtml = (html, { templateKey = 'personalizada', weddin
   let output = ensureShell(html, weddingInfo);
   output = injectFonts(output, template);
 
-  if (!/id="lovenda-wedding-theme"/i.test(output)) {
+  if (!/id="maloveapp-wedding-theme"/i.test(output)) {
     output = insertIntoHead(output, buildStyleBlock(template));
   }
 

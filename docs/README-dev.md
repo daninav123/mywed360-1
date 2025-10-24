@@ -1,4 +1,4 @@
-# Guía de Desarrollo (MyWed360)
+# Guía de Desarrollo (MaLoveApp)
 
 Este documento consolida los flujos técnicos añadidos recientemente: Seating Plan, Automatización, RSVP Scheduler y Monitorización.
 

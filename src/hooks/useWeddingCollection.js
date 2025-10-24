@@ -13,7 +13,7 @@ import { auth, db, firebaseReady } from '../firebaseConfig';
 import { post as apiPost } from '../services/apiClient';
 
 // Helpers para localStorage (caché offline por boda)
-const localKey = (wid, name) => `mywed360_${wid}_${name}`;
+const localKey = (wid, name) => `maloveapp_${wid}_${name}`;
 const lsGet = (wid, name, fallback) => {
   try {
     const stored = localStorage.getItem(localKey(wid, name));

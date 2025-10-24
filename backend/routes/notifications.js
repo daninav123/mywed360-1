@@ -70,7 +70,7 @@ router.post('/', async (req, res) => {
         const mod2 = await import('web-push').catch(() => null);
         const webpush = mod2 && (mod2.default || mod2);
         if (!webpush || !webpush.setVapidDetails) return;
-        webpush.setVapidDetails('mailto:admin@mywed360.com', VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
+        webpush.setVapidDetails('mailto:admin@maloveapp.com', VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
 
         // Seleccionar suscripciones (del usuario si disponible; si no, una muestra global)
         let subsSnap;
@@ -83,7 +83,7 @@ router.post('/', async (req, res) => {
 
         const url = process.env.FRONTEND_BASE_URL || 'http://localhost:5173/home';
         const payloadPush = JSON.stringify({
-          title: 'MyWed360',
+          title: 'MaLoveApp',
           body: message,
           url,
           tag: 'notification',

@@ -230,12 +230,12 @@ const buildFallbackHtml = (weddingInfo, template) => {
       const type = hotel.type || hotel.category || '';
       const link = hotel.link || hotel.url;
       return `
-        <div class="lovenda-card">
+        <div class="maloveapp-card">
           <h3>${title}</h3>
           ${type ? `<p>${type}</p>` : ''}
           ${distance ? `<p><strong>Distancia:</strong> ${distance}</p>` : ''}
           ${hotel.priceRange ? `<p><strong>Precio:</strong> ${hotel.priceRange}</p>` : ''}
-          ${link ? `<a class="lovenda-button-secondary" href="${link}" target="_blank" rel="noopener">Ver sitio</a>` : ''}
+          ${link ? `<a class="maloveapp-button-secondary" href="${link}" target="_blank" rel="noopener">Ver sitio</a>` : ''}
         </div>
       `;
     })
@@ -248,8 +248,8 @@ const buildFallbackHtml = (weddingInfo, template) => {
   const mapSection = mapAddress
     ? `
     <section data-enhanced="mapa" id="mapa">
-      <div class="lovenda-section-heading"><span>Mapa de la celebración</span></div>
-      <div class="lovenda-card">
+      <div class="maloveapp-section-heading"><span>Mapa de la celebración</span></div>
+      <div class="maloveapp-card">
         <iframe
           title="Ubicación de la boda"
           src="https://maps.google.com/maps?q=${encodeURIComponent(mapAddress)}&output=embed"
@@ -265,7 +265,7 @@ const buildFallbackHtml = (weddingInfo, template) => {
   const faqEntries = (Array.isArray(weddingInfo.faqs) ? weddingInfo.faqs : [])
     .map(
       (faq) => `
-      <div class="lovenda-faq__item">
+      <div class="maloveapp-faq__item">
         <div class="font-semibold text-gray-800 mb-1">${faq.question || ''}</div>
         <p class="text-sm text-gray-600">${faq.answer || ''}</p>
       </div>`
@@ -274,8 +274,8 @@ const buildFallbackHtml = (weddingInfo, template) => {
   const faqSection = faqEntries
     ? `
     <section data-enhanced="faq" id="faq">
-      <div class="lovenda-section-heading"><span>Preguntas frecuentes</span></div>
-      <div class="lovenda-card lovenda-faq">
+      <div class="maloveapp-section-heading"><span>Preguntas frecuentes</span></div>
+      <div class="maloveapp-card maloveapp-faq">
         ${faqEntries}
       </div>
     </section>`
@@ -284,14 +284,14 @@ const buildFallbackHtml = (weddingInfo, template) => {
   return `
   <main>
     <section data-enhanced="timeline">
-      <div class="lovenda-section-heading"><span>Agenda del día</span></div>
-      <div class="lovenda-grid lovenda-grid--two">
-        <div class="lovenda-card">
+      <div class="maloveapp-section-heading"><span>Agenda del día</span></div>
+      <div class="maloveapp-grid maloveapp-grid--two">
+        <div class="maloveapp-card">
           <h3>Ceremonia</h3>
           <p>${ceremony || 'Pronto más detalles'}</p>
           ${weddingInfo.ceremonyAddress ? `<small>${weddingInfo.ceremonyAddress}</small>` : ''}
         </div>
-        <div class="lovenda-card">
+        <div class="maloveapp-card">
           <h3>Recepción</h3>
           <p>${reception || 'Pronto más detalles'}</p>
           ${weddingInfo.receptionAddress ? `<small>${weddingInfo.receptionAddress}</small>` : ''}
@@ -300,10 +300,10 @@ const buildFallbackHtml = (weddingInfo, template) => {
     </section>
 
     <section data-enhanced="transport" id="transporte">
-      <div class="lovenda-section-heading"><span>Transporte y autobuses</span></div>
-      <div class="lovenda-card">
+      <div class="maloveapp-section-heading"><span>Transporte y autobuses</span></div>
+      <div class="maloveapp-card">
         <p>${weddingInfo.transportation || 'Habrá servicio de transporte para invitados. Consulta los horarios en la tabla.'}</p>
-        <div class="lovenda-table-wrapper">
+        <div class="maloveapp-table-wrapper">
           <table>
             <thead>
               <tr>
@@ -326,25 +326,25 @@ const buildFallbackHtml = (weddingInfo, template) => {
     </section>
 
     <section data-enhanced="gallery">
-      <div class="lovenda-section-heading"><span>Galería</span></div>
-      <div class="lovenda-gallery">
-        <div class="lovenda-gallery__item"></div>
-        <div class="lovenda-gallery__item"></div>
-        <div class="lovenda-gallery__item"></div>
+      <div class="maloveapp-section-heading"><span>Galería</span></div>
+      <div class="maloveapp-gallery">
+        <div class="maloveapp-gallery__item"></div>
+        <div class="maloveapp-gallery__item"></div>
+        <div class="maloveapp-gallery__item"></div>
       </div>
     </section>
 
     <section data-enhanced="story">
-      <div class="lovenda-section-heading"><span>Nuestra historia</span></div>
+      <div class="maloveapp-section-heading"><span>Nuestra historia</span></div>
       <p>${weddingInfo.story || weddingInfo.additionalInfo || 'Pronto compartiremos detalles de nuestra historia.'}</p>
       <p>Inspiración visual: ${styleNote}.</p>
     </section>
 
     <section data-enhanced="lodging">
-      <div class="lovenda-section-heading"><span>Hospedaje cercano</span></div>
-      <div class="lovenda-grid lovenda-grid--two">
+      <div class="maloveapp-section-heading"><span>Hospedaje cercano</span></div>
+      <div class="maloveapp-grid maloveapp-grid--two">
         ${lodgingCards || `
-          <div class="lovenda-card">
+          <div class="maloveapp-card">
             <p>Pronto añadiremos hoteles y alojamientos recomendados cercanos a la celebración.</p>
           </div>
         `}
@@ -352,20 +352,20 @@ const buildFallbackHtml = (weddingInfo, template) => {
     </section>
 
     <section data-enhanced="travel-guide">
-      <div class="lovenda-section-heading"><span>Cómo llegar</span></div>
-      <div class="lovenda-grid lovenda-grid--two">
-        <div class="lovenda-card">
+      <div class="maloveapp-section-heading"><span>Cómo llegar</span></div>
+      <div class="maloveapp-grid maloveapp-grid--two">
+        <div class="maloveapp-card">
           <h3>En avión</h3>
           <p>${(travel.airports || []).map((a) => `• ${a}`).join('<br/>') || 'Aeropuertos cercanos y tiempos estimados aparecerán aquí.'}</p>
           ${travel.byPlane ? `<p>${travel.byPlane}</p>` : ''}
         </div>
-        <div class="lovenda-card">
+        <div class="maloveapp-card">
           <h3>En tren / bus</h3>
           <p>${(travel.stations || []).map((s) => `• ${s}`).join('<br/>') || 'Estaciones y conexiones se publicarán pronto.'}</p>
           ${travel.byTrain ? `<p>${travel.byTrain}</p>` : ''}
         </div>
       </div>
-      <div class="lovenda-card">
+      <div class="maloveapp-card">
         <h3>En coche</h3>
         <p>${travel.byCar || 'Recibirás las indicaciones para llegar en coche tan pronto estén listas.'}</p>
         ${travel.tips ? `<p><strong>Tips:</strong> ${travel.tips}</p>` : ''}
@@ -376,8 +376,8 @@ const buildFallbackHtml = (weddingInfo, template) => {
     ${faqSection}
 
     <section data-enhanced="contacto" id="contacto">
-      <div class="lovenda-section-heading"><span>Contacto</span></div>
-      <div class="lovenda-card">${contact || 'Escríbenos para más información.'}</div>
+      <div class="maloveapp-section-heading"><span>Contacto</span></div>
+      <div class="maloveapp-card">${contact || 'Escríbenos para más información.'}</div>
     </section>
   </main>
   <footer>
@@ -1985,7 +1985,7 @@ const DisenoWeb = ({ mode }) => {
         templates={templates}
         onView={(version, templateKey) => {
           const enhanced =
-            /lovenda-wedding-theme/i.test(version.html || '')
+            /maloveapp-wedding-theme/i.test(version.html || '')
               ? version.html
               : enhanceWeddingHtml(version.html || '', {
                   templateKey,
@@ -1998,7 +1998,7 @@ const DisenoWeb = ({ mode }) => {
         onEdit={(version, templateKey) => {
           setPrompt(version.prompt || '');
           const enhanced =
-            /lovenda-wedding-theme/i.test(version.html || '')
+            /maloveapp-wedding-theme/i.test(version.html || '')
               ? version.html
               : enhanceWeddingHtml(version.html || '', {
                   templateKey,

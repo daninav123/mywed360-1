@@ -13,7 +13,7 @@
 - `CYPRESS_BASE_URL`: base de la app.
   - Ej: `http://localhost:5173` (por defecto ya configurado).
 - `BACKEND_BASE_URL`: backend a usar para prefijos `/api/*` (por comandos de Cypress).
-  - Por defecto: `https://mywed360-backend.onrender.com` (ver `cypress.config.js`).
+  - Por defecto: `https://maloveapp-backend.onrender.com` (ver `cypress.config.js`).
 - `STUB_RSVP` (true/false): si es `true` y `BACKEND_BASE_URL` apunta a `onrender.com`, se stubbean en `cypress/support/e2e.js` los endpoints dev de RSVP:
   - `POST **/api/rsvp/dev/ensure-planner`
   - `POST **/api/rsvp/dev/create`

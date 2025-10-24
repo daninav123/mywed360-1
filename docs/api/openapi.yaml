@@ -1,9 +1,9 @@
 openapi: 3.0.3
 info:
-  title: MyWed360 Backend API
+  title: MaLoveApp Backend API
   version: 0.1.0
   description: |
-    Especificación OpenAPI 3 del backend de MyWed360.
+    Especificación OpenAPI 3 del backend de MaLoveApp.
 
     Seguridad principal: Firebase Auth (Bearer token). En desarrollo puede estar activo el bypass de tokens mock (`ALLOW_MOCK_TOKENS`).
 
@@ -14,7 +14,7 @@ info:
 servers:
   - url: http://localhost:4004
     description: Local (desarrollo)
-  - url: https://mywed360-backend.onrender.com
+  - url: https://maloveapp-backend.onrender.com
     description: Render (staging/producción)
 
 tags:

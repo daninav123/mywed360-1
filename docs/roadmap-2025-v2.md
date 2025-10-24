@@ -1,4 +1,4 @@
-﻿# Roadmap Estratégico MyWed360 - 2025 v2
+﻿# Roadmap Estratégico MaLoveApp - 2025 v2
 
 > ⚠️ **Documento congelado (snapshot 2025-10-09).** Usa [`docs/ROADMAP.md`](./ROADMAP.md) para el estado y los planes vigentes.
 
@@ -158,7 +158,7 @@
 
 **Última actualización**: 2025-10-09  
 **Próxima revisión**: 2025-11-15  
-**Responsable**: Equipo de Desarrollo MyWed360  
+**Responsable**: Equipo de Desarrollo MaLoveApp  
 **Documentación**: 18 flujos específicos + sistema de roles técnico + planes de suscripción
 
 ## Plan de Sprints (8 semanas)

@@ -228,7 +228,7 @@ export default function LongTermTasksGantt({
     try {
       const env = typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env : (typeof process !== 'undefined' ? process.env : {});
       const isDev = String(env?.MODE || env?.NODE_ENV || '').toLowerCase() !== 'production';
-      const flag = typeof localStorage !== 'undefined' ? localStorage.getItem('mywed360_gantt_debug') : null;
+      const flag = typeof localStorage !== 'undefined' ? localStorage.getItem('maloveapp_gantt_debug') : null;
       return isDev || flag === '1' || /^true$/i.test(String(flag || ''));
     } catch {
       return false;

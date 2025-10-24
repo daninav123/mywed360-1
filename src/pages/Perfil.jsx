@@ -104,8 +104,8 @@ function Perfil() {
       setWeddingInfo((w) => ({ ...w, numGuests: total }));
     }
     updateGuestCount();
-    window.addEventListener('mywed360-guests', updateGuestCount);
-    return () => window.removeEventListener('mywed360-guests', updateGuestCount);
+    window.addEventListener('maloveapp-guests', updateGuestCount);
+    return () => window.removeEventListener('maloveapp-guests', updateGuestCount);
   }, []);
 
   // Notas importantes (desde eventos externos)
@@ -115,8 +115,8 @@ function Perfil() {
       if (p && typeof p.then === 'function') p.then((val) => setImportantInfo(val ?? ''));
       else setImportantInfo(p ?? '');
     }
-    window.addEventListener('mywed360-important-note', updateNotes);
-    return () => window.removeEventListener('mywed360-important-note', updateNotes);
+    window.addEventListener('maloveapp-important-note', updateNotes);
+    return () => window.removeEventListener('maloveapp-important-note', updateNotes);
   }, []);
 
   const handleAccountChange = (e) =>

@@ -31,11 +31,11 @@ function seedSession(win) {
   win.localStorage.setItem('forceOnboarding', '1');
   win.localStorage.setItem('userEmail', email);
   win.localStorage.setItem('isLoggedIn', 'true');
-  win.localStorage.setItem('mywed360_active_wedding', ACTIVE_WEDDING_ID);
-  win.localStorage.setItem('lovenda_active_wedding', ACTIVE_WEDDING_ID);
-  win.localStorage.setItem('MyWed360_user_profile', JSON.stringify(baseProfile));
-  win.localStorage.setItem('lovenda_user', JSON.stringify(baseProfile));
-  win.localStorage.setItem('mywed360_user', JSON.stringify(baseProfile));
+  win.localStorage.setItem('maloveapp_active_wedding', ACTIVE_WEDDING_ID);
+  win.localStorage.setItem('maloveapp_active_wedding', ACTIVE_WEDDING_ID);
+  win.localStorage.setItem('MaLoveApp_user_profile', JSON.stringify(baseProfile));
+  win.localStorage.setItem('maloveapp_user', JSON.stringify(baseProfile));
+  win.localStorage.setItem('maloveapp_user', JSON.stringify(baseProfile));
 
   const store = {
     users: {
@@ -45,7 +45,7 @@ function seedSession(win) {
       },
     },
   };
-  win.localStorage.setItem('lovenda_local_weddings', JSON.stringify(store));
+  win.localStorage.setItem('maloveapp_local_weddings', JSON.stringify(store));
 }
 
 describe('Flujo 2 – Descubrimiento personalizado', () => {
@@ -57,7 +57,7 @@ describe('Flujo 2 – Descubrimiento personalizado', () => {
       },
     });
     cy.closeDiagnostic();
-    cy.contains('Bienvenido a MyWed360!', { timeout: 20000 }).should('be.visible');
+    cy.contains('Bienvenido a MaLoveApp!', { timeout: 20000 }).should('be.visible');
   });
 
   it('recorre y completa el tutorial de descubrimiento', () => {
@@ -92,7 +92,7 @@ describe('Flujo 2 – Descubrimiento personalizado', () => {
 
     cy.contains('button', 'Finalizar').should('be.visible').click();
 
-    cy.get('body').should('not.contain', 'Bienvenido a MyWed360!');
+    cy.get('body').should('not.contain', 'Bienvenido a MaLoveApp!');
     cy.get('body', { timeout: 10000 }).should('not.contain', 'Comienza a planificar tu boda!');
 
     cy.window().then((win) => {

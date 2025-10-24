@@ -82,8 +82,8 @@ describe('Invitados — Importaciones y resumen RSVP', () => {
     cy.visit('/', {
       onBeforeLoad(win) {
         win.localStorage.clear();
-        win.localStorage.setItem('mywed360_w1_guests', JSON.stringify(guests));
-        win.localStorage.setItem('mywed360_active_wedding', 'w1');
+        win.localStorage.setItem('maloveapp_w1_guests', JSON.stringify(guests));
+        win.localStorage.setItem('maloveapp_active_wedding', 'w1');
         win.localStorage.setItem('i18nextLng', 'es');
         win.__GUESTS_TEST_API__ = {
           reset() {},
@@ -136,8 +136,8 @@ describe('Invitados — Importaciones y resumen RSVP', () => {
       timeout: 20000,
     }).should('be.visible');
     cy.window().then((win) => {
-      win.localStorage.setItem('mywed360_w1_guests', JSON.stringify(guests));
-      win.dispatchEvent(new Event('mywed360-w1-guests'));
+      win.localStorage.setItem('maloveapp_w1_guests', JSON.stringify(guests));
+      win.dispatchEvent(new Event('maloveapp-w1-guests'));
     });
   };
 

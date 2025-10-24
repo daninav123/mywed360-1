@@ -248,7 +248,7 @@ export default function Buzon() {
 
       const result = applyTemplate(templateId, {
         userName: profile?.name || 'Usuario',
-      companyName: 'MyWed360',
+      companyName: 'MaLoveApp',
         providerName: form.to.split('@')[0] || 'Proveedor',
       });
 

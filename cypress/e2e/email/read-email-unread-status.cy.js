@@ -1,6 +1,6 @@
 describe('Estado leído/no leído en bandeja', () => {
   const testUser = {
-    email: 'usuario.test@lovenda.com',
+    email: 'usuario.test@maloveapp.com',
     password: 'contraseña123',
   };
 

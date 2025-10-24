@@ -68,7 +68,7 @@ describe('mailgunWebhook signature verification', () => {
     const signature = makeSignature(process.env.MAILGUN_SIGNING_KEY, token, timestamp);
     const payload = {
       signature: { token, timestamp, signature },
-      'event-data': { id: 'evt1', event: 'delivered', recipient: 'user@mywed360.com' },
+      'event-data': { id: 'evt1', event: 'delivered', recipient: 'user@maloveapp.com' },
     };
     const mod = await import('../index.js');
     const mailgunWebhook = mod.mailgunWebhook || (mod.default && mod.default.mailgunWebhook);
@@ -81,7 +81,7 @@ describe('mailgunWebhook signature verification', () => {
 
   it('rejects when signature missing', async () => {
     const payload = {
-      'event-data': { id: 'evt2', event: 'delivered', recipient: 'user@mywed360.com' },
+      'event-data': { id: 'evt2', event: 'delivered', recipient: 'user@maloveapp.com' },
     };
     const mod = await import('../index.js');
     const mailgunWebhook = mod.mailgunWebhook || (mod.default && mod.default.mailgunWebhook);

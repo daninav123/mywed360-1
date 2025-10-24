@@ -1,4 +1,4 @@
-# 📊 Progreso Migración i18n - MyWed360
+# 📊 Progreso Migración i18n - MaLoveApp
 
 **Fecha inicio:** 23 Octubre 2025  
 **Estado:** EN PROGRESO 🔄  

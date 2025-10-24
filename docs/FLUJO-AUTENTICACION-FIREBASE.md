@@ -1,8 +1,8 @@
-# FLUJO DE AUTENTICACIÓN Y ACCESO A FIREBASE - MYWED360
+# FLUJO DE AUTENTICACIÓN Y ACCESO A FIREBASE - MALOVEAPP
 
 ## 📋 RESUMEN EJECUTIVO
 
-Este documento especifica el flujo completo de autenticación y acceso a Firebase para la aplicación MyWed360, incluyendo la estructura de datos, permisos de Firestore, y la gestión de contextos de React.
+Este documento especifica el flujo completo de autenticación y acceso a Firebase para la aplicación MaLoveApp, incluyendo la estructura de datos, permisos de Firestore, y la gestión de contextos de React.
 
 ## 🔐 1. FLUJO DE AUTENTICACIÓN
 
@@ -15,7 +15,7 @@ import { getAuth, connectAuthEmulator } from 'firebase/auth';
 import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
 
 const firebaseConfig = {
-  projectId: 'mywed360',
+  projectId: 'maloveapp',
   authDomain: 'mywed360.firebaseapp.com',
   // ... resto de configuración
 };
@@ -398,5 +398,5 @@ deleteGuest → deleteDoc(doc(db, 'weddings', weddingId, 'guests', guestId))
 
 **Última actualización:** 2025-09-03  
 **Versión:** 1.0  
-**Autor:** Sistema MyWed360
+**Autor:** Sistema MaLoveApp
 

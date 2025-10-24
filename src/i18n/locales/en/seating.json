@@ -50,6 +50,102 @@
       "export": "Export",
       "print": "Print",
       "settings": "Settings"
+    },
+    "planModern": {
+      "header": {
+        "userFallback": "User"
+      },
+      "defaults": {
+        "tableName": "Table {{number}}"
+      },
+      "toasts": {
+        "fullAssignment": "🎉 100% of guests assigned! Congratulations!",
+        "autoAssignSuccess": "Automatic assignment completed",
+        "autoAssignError": "We couldn't finish the automatic assignment. Please try again.",
+        "addTableSuccess": "Table added successfully",
+        "addTableError": "We couldn't add the table{{message}}",
+        "capacityUpdated": "Capacity updated to {{value}}",
+        "duplicateTable": "Table duplicated",
+        "rotateTable": "Table rotated",
+        "deleteTable": "Table deleted",
+        "removeGuest": "Guest removed from the table"
+      },
+      "errors": {
+        "addTableUnavailable": "This action is temporarily unavailable. Reload and try again."
+      },
+      "guestSidebar": {
+        "header": {
+          "title": "Guest Sidebar",
+          "subtitle": "Track pending items, recommendations, and team activity."
+        },
+        "tabs": {
+          "summary": "Summary",
+          "recommendations": "Recommendations",
+          "conflicts": "Conflicts",
+          "staff": "Staff",
+          "history": "History"
+        },
+        "summary": {
+          "metrics": {
+            "totalGuests": "Total guests",
+            "assigned": "Assigned",
+            "pending": "Pending",
+            "vipPending": "VIP pending",
+            "tablesNearlyFull": "Tables nearly full",
+            "companionSeats": "Companion seats",
+            "conflicts": "Conflicts",
+            "snapshots": "Saved snapshots"
+          },
+          "viewPending": "View pending details"
+        },
+        "recommendations": {
+          "emptyTitle": "No recommendations",
+          "emptyDescription": "All pending guests already have suggestions applied.",
+          "guestFallback": "Guest",
+          "clusters": {
+            "vip": "VIP pending",
+            "familia": "Close family",
+            "pending": "Pending"
+          },
+          "score": "Score {{value}}",
+          "suggestedTable": "Suggested table:",
+          "capacityAvailable_one": "Capacity available: {{count}} seat",
+          "capacityAvailable_other": "Capacity available: {{count}} seats",
+          "capacityUnknown": "Capacity available: — seat(s)"
+        },
+        "conflicts": {
+          "emptyTitle": "No conflicts",
+          "emptyDescription": "No table issues detected.",
+          "tableFallback": "Table",
+          "messageFallback": "Conflict detected on the table.",
+          "severityHigh": "Critical",
+          "severityMedium": "Attention",
+          "actions": {
+            "reassign": "Reassign {{guest}}",
+            "fixPosition": "Adjust table",
+            "generic": "Suggested action"
+          }
+        },
+        "staff": {
+          "emptyTitle": "No staff registered",
+          "emptyDescription": "Add tags or roles to quickly identify staff and vendors.",
+          "memberFallback": "Staff member",
+          "assigned": "Assigned",
+          "noTable": "No table",
+          "pending": "Pending assignment",
+          "tableLabel": "Table: {{table}}"
+        },
+        "history": {
+          "emptyTitle": "No snapshots saved",
+          "emptyDescription": "Save a snapshot from the toolbar to build a history of progress.",
+          "load": "Load",
+          "delete": "Delete"
+        },
+        "actions": {
+          "viewTable": "View table",
+          "assign": "Assign"
+        }
+      }
     }
   },
   "_note": "Translate from es/seating.json"

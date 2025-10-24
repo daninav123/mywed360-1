@@ -14,7 +14,7 @@ router.post('/alias', requireMailAccess, async (req, res) => {
     if (!user?.uid) return res.status(401).json({ success: false, error: 'unauthorized' });
     const raw = String(alias || '').trim().toLowerCase();
     const usernameRegex = /^[a-z0-9][a-z0-9._-]{2,29}$/i;
-    const RESERVED = new Set(['admin','soporte','noreply','contacto','info','ayuda','sistema','mywed360','staff','test','prueba']);
+    const RESERVED = new Set(['admin','soporte','noreply','contacto','info','ayuda','sistema','maloveapp','staff','test','prueba']);
     if (!raw || !usernameRegex.test(raw) || RESERVED.has(raw)) {
       return res.status(400).json({ success: false, error: 'invalid_alias' });
     }
@@ -26,7 +26,7 @@ router.post('/alias', requireMailAccess, async (req, res) => {
         return res.status(409).json({ success: false, error: 'alias_taken' });
       }
     }
-    const DOMAIN = (process.env.MY_EMAIL_DOMAIN || 'mywed360.com').toLowerCase();
+    const DOMAIN = (process.env.MY_EMAIL_DOMAIN || 'maloveapp.com').toLowerCase();
     const email = `${raw}@${DOMAIN}`;
 
     await db.collection('emailUsernames').doc(raw).set(

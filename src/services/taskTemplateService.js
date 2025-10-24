@@ -4,7 +4,7 @@ import defaultWeddingTasks from './defaultWeddingTasks';
 import errorLogger from '../utils/errorLogger';
 
 const COLLECTION_NAME = 'adminTaskTemplates';
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://mywed360-backend.onrender.com';
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://maloveapp-backend.onrender.com';
 
 /**
  * Obtiene la plantilla de tareas actualmente publicada

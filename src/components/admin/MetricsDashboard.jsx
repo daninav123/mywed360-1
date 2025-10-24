@@ -63,7 +63,7 @@ function MetricsDashboard() {
         // Intentar obtener mtricas de localStorage (modo desarrollo)
         let localMetrics = null;
         try {
-          const storedMetrics = localStorage.getItem('mywed360_last_metrics');
+          const storedMetrics = localStorage.getItem('maloveapp_last_metrics');
           if (storedMetrics) {
             localMetrics = JSON.parse(storedMetrics);
           }

@@ -1,9 +1,9 @@
-const ADMIN_SESSION_TOKEN_KEY = 'MyWed360_admin_session_token';
+const ADMIN_SESSION_TOKEN_KEY = 'MaLoveApp_admin_session_token';
 const ADMIN_SESSION_FLAG_KEY = 'isAdminAuthenticated';
-const ADMIN_REMEMBER_ME_KEY = 'MyWed360_admin_remember_me';
-const ADMIN_SESSION_EXPIRY_KEY = 'MyWed360_admin_session_expires'; // Cambio: 'expires' no 'expiry'
-const ADMIN_PROFILE_KEY = 'MyWed360_admin_profile';
-const ADMIN_SESSION_ID_KEY = 'MyWed360_admin_session_id';
+const ADMIN_REMEMBER_ME_KEY = 'MaLoveApp_admin_remember_me';
+const ADMIN_SESSION_EXPIRY_KEY = 'MaLoveApp_admin_session_expires'; // Cambio: 'expires' no 'expiry'
+const ADMIN_PROFILE_KEY = 'MaLoveApp_admin_profile';
+const ADMIN_SESSION_ID_KEY = 'MaLoveApp_admin_session_id';
 
 export function getAdminSessionToken() {
   if (typeof window === 'undefined') return null;

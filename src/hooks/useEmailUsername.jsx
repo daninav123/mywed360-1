@@ -41,7 +41,7 @@ const useEmailUsername = () => {
         'info',
         'ayuda',
         'sistema',
-        'mywed360',
+        'maloveapp',
         'staff',
         'test',
         'prueba',
@@ -101,7 +101,7 @@ const useEmailUsername = () => {
           username: normalizedUsername,
           userId: currentUser.uid,
           createdAt: new Date(),
-          email: `${normalizedUsername}@mywed360.com`,
+          email: `${normalizedUsername}@maloveapp.com`,
         });
 
         // Actualizar el perfil del usuario con su correo myWed360
@@ -109,7 +109,7 @@ const useEmailUsername = () => {
           doc(firestore, 'users', currentUser.uid),
           {
             emailUsername: normalizedUsername,
-            myWed360Email: `${normalizedUsername}@mywed360.com`,
+            myWed360Email: `${normalizedUsername}@maloveapp.com`,
           },
           { merge: true }
         );

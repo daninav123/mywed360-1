@@ -4,7 +4,7 @@
 > Pendiente: implementación técnica del cobro único por boda, automatizaciones de upgrade/downgrade, telemetría operativa y paneles de rentabilidad.
 
 ## 1. Objetivo y alcance
-- Definir cómo MyWed360 monetiza cada boda mediante planes Gratis, Premium y Premium Plus, manteniendo una propuesta clara para planners profesionales.
+- Definir cómo MaLoveApp monetiza cada boda mediante planes Gratis, Premium y Premium Plus, manteniendo una propuesta clara para planners profesionales.
 - Establecer el journey completo (descubrimiento → activación → retención → cierre) y qué equipos intervienen en cada etapa.
 - Servir como documento maestro para coordinar automatizaciones, métricas, pricing y materiales de soporte relacionados con suscripciones y upgrades.
 
@@ -114,8 +114,8 @@
 
 ## 14. Límites por plan y rol
 ### Owner (pareja)
-- `Gratis`: 1 boda activa, hasta 80 invitados y un único evento (ceremonia). Checklist básica, presupuesto manual y 5 diseños web con marca MyWed360. Sin exportaciones ni seating avanzado, sin asistentes adicionales ni IA.
-- `Premium`: 1 boda premium con invitados ilimitados y hasta 3 eventos (ceremonia, cóctel, banquete). Seating avanzado, timeline con IA, documentos legales y automatizaciones email. Hasta 3 asistentes con permisos completos, portal web con 20 diseños, exportaciones PDF/Excel y soporte chat SLA 4h. Marca MyWed360 sigue visible. El pago queda vinculado al `weddingId`; si se archiva la boda pasa a sólo lectura.
+- `Gratis`: 1 boda activa, hasta 80 invitados y un único evento (ceremonia). Checklist básica, presupuesto manual y 5 diseños web con marca MaLoveApp. Sin exportaciones ni seating avanzado, sin asistentes adicionales ni IA.
+- `Premium`: 1 boda premium con invitados ilimitados y hasta 3 eventos (ceremonia, cóctel, banquete). Seating avanzado, timeline con IA, documentos legales y automatizaciones email. Hasta 3 asistentes con permisos completos, portal web con 20 diseños, exportaciones PDF/Excel y soporte chat SLA 4h. Marca MaLoveApp sigue visible. El pago queda vinculado al `weddingId`; si se archiva la boda pasa a sólo lectura.
 - `Premium Plus`: todo lo anterior más white-label total (web, PDFs, seating), concierge 1:1, integraciones externas (Google Calendar, Zapier), paquetes exclusivos de plantillas y hasta 10 asistentes. Incluye sesiones periódicas con especialistas. Cada nueva boda requiere nuevo pago.
 - **Propietarios compartidos:** bodas con dos owners heredan el plan contratado; ambos comparten límites y permisos. Si se degrada la cuenta principal, ambos bajan de nivel; en modo sólo lectura post-boda mantienen acceso histórico.
 

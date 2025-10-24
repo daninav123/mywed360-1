@@ -1,6 +1,6 @@
 /// <reference types="Cypress" />
 
-describe('Funcionalidad Core de MyWed360', () => {
+describe('Funcionalidad Core de MaLoveApp', () => {
   beforeEach(() => {
     cy.loginToLovenda('test@example.com', 'owner');
   });
@@ -14,14 +14,14 @@ describe('Funcionalidad Core de MyWed360', () => {
   it('mantiene datos en localStorage', () => {
     cy.window().then((win) => {
       expect(win.localStorage.getItem('isLoggedIn')).to.equal('true');
-      expect(win.localStorage.getItem('MyWed360_mock_user')).to.exist;
-      expect(win.localStorage.getItem('MyWed360_user_profile')).to.exist;
+      expect(win.localStorage.getItem('MaLoveApp_mock_user')).to.exist;
+      expect(win.localStorage.getItem('MaLoveApp_user_profile')).to.exist;
     });
   });
 
   it('tiene boda activa configurada', () => {
     cy.window().then((win) => {
-      const wedding = win.localStorage.getItem('MyWed360_active_wedding');
+      const wedding = win.localStorage.getItem('MaLoveApp_active_wedding');
       expect(wedding).to.exist;
       const parsed = JSON.parse(wedding);
       expect(parsed).to.have.property('id');

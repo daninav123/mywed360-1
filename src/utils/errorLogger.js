@@ -542,7 +542,7 @@ class ErrorLogger {
     } else {
       console.log('—— (console.clear() omitido en DEV) ——');
     }
-    console.log('🔍 REPORTE DE DIAGNÓSTICOS MYWED360');
+    console.log('🔍 REPORTE DE DIAGNÓSTICOS MALOVEAPP');
     console.log('=====================================');
     console.log('Timestamp:', new Date().toLocaleString());
     console.log('');

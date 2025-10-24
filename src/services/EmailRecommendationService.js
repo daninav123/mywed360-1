@@ -160,14 +160,14 @@ class EmailRecommendationService {
       recommendedPatterns: [
         'Consulta sobre [Servicio] para evento el [Fecha]',
         'Disponibilidad y presupuesto para [Evento]',
-        'Interés en contratar [Servicio] - MyWed360',
+        'Interés en contratar [Servicio] - MaLoveApp',
       ],
       avoidPatterns: ['Consulta', 'Información', 'Hola'],
       optimalLength: {
         min: 30,
         max: 60,
       },
-      includeElements: ['Fecha del evento', 'Tipo de servicio', 'Mención de MyWed360'],
+      includeElements: ['Fecha del evento', 'Tipo de servicio', 'Mención de MaLoveApp'],
     };
   }
 
@@ -593,7 +593,7 @@ class EmailRecommendationService {
         recommendedPatterns: [
           'Consulta sobre [Servicio] para evento el [Fecha]',
           'Disponibilidad y presupuesto para [Evento]',
-          'Interés en contratar [Servicio] - MyWed360',
+          'Interés en contratar [Servicio] - MaLoveApp',
         ],
         optimalLength: {
           min: 30,

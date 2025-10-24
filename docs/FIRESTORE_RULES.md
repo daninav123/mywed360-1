@@ -1,4 +1,4 @@
-# Firestore Rules — MyWed360
+# Firestore Rules — MaLoveApp
 
 Este documento explica las reglas reales del proyecto (ver `firestore.rules`) y su intención. No inventa políticas nuevas: describe y aclara lo existente.
 

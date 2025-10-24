@@ -25,7 +25,7 @@ describeIf('Firestore rules - seatingPlan (banquet/ceremony)', () => {
     const rulesPath = path.resolve(__dirname, '../../firestore.rules');
     const rules = await fs.readFile(rulesPath, 'utf8');
     testEnv = await initializeTestEnvironment({
-      projectId: 'mywed360-rules-test',
+      projectId: 'maloveapp-rules-test',
       firestore: { rules },
     });
   }, 30000);

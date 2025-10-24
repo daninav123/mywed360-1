@@ -11,7 +11,7 @@ describe('Email - lectura básica', () => {
     {
       id: 'mail_1',
       from: 'proveedor@example.com',
-      to: 'usuario@mywed360.com',
+      to: 'usuario@maloveapp.com',
       subject: 'Presupuesto de fotografía',
       body: '<p>Adjuntamos propuesta de presupuesto.</p>',
       folder: 'inbox',
@@ -22,7 +22,7 @@ describe('Email - lectura básica', () => {
     {
       id: 'mail_2',
       from: 'invitado@example.com',
-      to: 'usuario@mywed360.com',
+      to: 'usuario@maloveapp.com',
       subject: 'Confirmación de asistencia',
       body: '<p>Confirmamos asistencia (2 personas).</p>',
       folder: 'inbox',
@@ -33,8 +33,8 @@ describe('Email - lectura básica', () => {
   ]);
 
   const seedAuth = () => ({
-    myWed360Email: 'usuario@mywed360.com',
-    email: 'usuario@mywed360.com',
+    myWed360Email: 'usuario@maloveapp.com',
+    email: 'usuario@maloveapp.com',
     userId: 'e2e-user',
   });
 
@@ -48,7 +48,7 @@ describe('Email - lectura básica', () => {
       }
     }).as('getEmails');
     
-    cy.loginToLovenda('usuario@mywed360.com', 'password123');
+    cy.loginToLovenda('usuario@maloveapp.com', 'password123');
   });
 
   it('Lista correos y abre un email mostrando el detalle', () => {

@@ -17,7 +17,7 @@
 ### 3.1 Owner ? Assistant
 1. Usuario owner abre Perfil > bloque de suscripción y elige “Plan Ayudante”.
 2. Modal `RoleUpgradeModal` muestra beneficios, precio y detalla que podrá ayudar en 1 boda ajena. CTA “Continuar” inicia checkout (Stripe/RevenueCat TBD).
-3. Tras pago exitoso, `updateUserProfile` escribe `{ role: 'assistant', subscription: { tier: 'assistant', renewedAt } }` y se sincroniza a Firestore (`users/{uid}`) y localStorage (`MyWed360_user_profile`).
+3. Tras pago exitoso, `updateUserProfile` escribe `{ role: 'assistant', subscription: { tier: 'assistant', renewedAt } }` y se sincroniza a Firestore (`users/{uid}`) y localStorage (`MaLoveApp_user_profile`).
 4. El dashboard muestra resumen rápido del perfil de la boda (`stylePrimary`, `specialInterests`, `profileGaps`) para que el assistant conozca el contexto antes de aceptar invitaciones.
 5. El usuario recibe instrucciones para solicitar invitación; `WeddingAccountLink` añade campo “Código de invitación” visible para assistants.
 6. Al introducir código, se llama `acceptInvitation(code)` (`src/services/WeddingService.js:510`) y se agrega el uid a `assistantIds`. Se crea/actualiza enlace en `users/{uid}/weddings/{weddingId}` con rol `assistant`.
@@ -47,8 +47,8 @@
   - Arrays `ownerIds`, `assistantIds`, `plannerIds`.
   - `subscription.tier` y `plannerTier` para reflejar plan del profesional si corresponde.
 - LocalStorage:
-  - `MyWed360_user_profile` (rol actual, `useAuth.jsx:180`).
-  - `mywed360_active_wedding` + claves por usuario para selección (`WeddingContext.jsx:235`).
+  - `MaLoveApp_user_profile` (rol actual, `useAuth.jsx:180`).
+  - `maloveapp_active_wedding` + claves por usuario para selección (`WeddingContext.jsx:235`).
 - Analytics: `performanceMonitor.logEvent('wedding_switched', ...)` ya registra cambios de boda; añadir `role_upgraded`, `role_downgraded`, `role_personalization_summary_opened`.
 
 ## 5. Reglas de negocio
@@ -65,7 +65,7 @@
 - Invitación aceptada sin upgrade ? error `plan_required` desde backend; UI muestra CTA a upgrade.
 - Exceso de bodas ? bloquear `createWedding`, `addPlannerToWedding` con error descriptivo.
 - Inconsistencias localStorage vs Firestore: forzar `reloadUserProfile` tras upgrade (nuevo método en `useAuth`).
-- Sesiones múltiples: si el usuario abre en otro dispositivo, el rol se sincroniza gracias a `MyWed360_user_profile`; añadir listener `storage` para refrescar.
+- Sesiones múltiples: si el usuario abre en otro dispositivo, el rol se sincroniza gracias a `MaLoveApp_user_profile`; añadir listener `storage` para refrescar.
 
 ## 7. Integraciones y dependencias
 - **Auth**: `useAuth.register` (`src/hooks/useAuth.jsx:593`) y `persistProfileForUser` (línea 180) deben aceptar actualizaciones de rol posteriores y escribir en Firestore (actualmente solo local).

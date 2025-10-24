@@ -130,12 +130,12 @@ vi.mock('axios', () => ({
 // eslint-disable-next-line no-undef
 globalThis.EmailService = {
   __esModule: true,
-  initEmailService: vi.fn(async () => 'usuario@mywed360.com'),
+  initEmailService: vi.fn(async () => 'usuario@maloveapp.com'),
   getMails: vi.fn(async () => []),
   deleteMail: vi.fn(async () => true),
   markAsRead: vi.fn(async () => {}),
   sendMail: vi.fn(async () => ({ success: true })),
-  createEmailAlias: vi.fn(async () => ({ success: true, email: 'usuario@mywed360.com' })),
+  createEmailAlias: vi.fn(async () => ({ success: true, email: 'usuario@maloveapp.com' })),
   setAuthContext: vi.fn(),
 };
 
@@ -169,13 +169,13 @@ const useAuthMock = vi.fn(() => ({
   isLoading: false,
   userProfile: { email: 'test@mock.com' },
   // Compatibilidad con componentes que esperan estas claves
-  user: { uid: 'user123', email: 'usuario@mywed360.com' },
+  user: { uid: 'user123', email: 'usuario@maloveapp.com' },
   profile: {
     id: 'profile123',
-    email: 'usuario@mywed360.com',
+    email: 'usuario@maloveapp.com',
     name: 'Usuario Test',
     emailUsername: 'usuario',
-    myWed360Email: 'usuario@mywed360.com'
+    myWed360Email: 'usuario@maloveapp.com'
   },
 }));
 

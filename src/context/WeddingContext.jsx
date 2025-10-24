@@ -80,14 +80,14 @@ export function WeddingProvider({ children }) {
   const { currentUser, userProfile } = useAuth();
   
   // Detectar si estamos en modo test y cargar datos mock
-  const isTestMode = typeof window !== 'undefined' && (window.Cypress || window.__MYWED360_TEST_MODE__);
+  const isTestMode = typeof window !== 'undefined' && (window.Cypress || window.__MALOVEAPP_TEST_MODE__);
   
   // Cargar bodas mock de localStorage si estamos en tests
   const loadTestWeddings = () => {
     if (!isTestMode) return { weddings: [], activeWedding: '' };
     try {
-      const storedWeddings = window.localStorage.getItem('MyWed360_weddings');
-      const storedActive = window.localStorage.getItem('MyWed360_active_wedding');
+      const storedWeddings = window.localStorage.getItem('MaLoveApp_weddings');
+      const storedActive = window.localStorage.getItem('MaLoveApp_active_wedding');
       const weddings = storedWeddings ? JSON.parse(storedWeddings) : [];
       const activeWedding = storedActive ? JSON.parse(storedActive) : null;
       return {
@@ -115,7 +115,7 @@ export function WeddingProvider({ children }) {
 
   const getLocalProfileUid = useCallback(() => {
     try {
-      const raw = window.localStorage.getItem('MyWed360_user_profile');
+      const raw = window.localStorage.getItem('MaLoveApp_user_profile');
       if (!raw) return null;
       const parsed = JSON.parse(raw);
       return parsed?.id || parsed?.uid || null;
@@ -125,7 +125,7 @@ export function WeddingProvider({ children }) {
   }, []);
 
   const storageKeyForUser = useCallback(
-    (uid) => (uid ? `mywed360_active_wedding_user_${uid}` : 'mywed360_active_wedding'),
+    (uid) => (uid ? `maloveapp_active_wedding_user_${uid}` : 'maloveapp_active_wedding'),
     []
   );
 

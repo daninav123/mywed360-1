@@ -10,7 +10,7 @@ describe('Asistente IA - Fallback contextual', () => {
     });
     cy.loginToLovenda('owner.chat@lovenda.test');
     cy.window().then((win) => {
-      const profileRaw = win.localStorage.getItem('MyWed360_user_profile');
+      const profileRaw = win.localStorage.getItem('MaLoveApp_user_profile');
       const profile = profileRaw ? JSON.parse(profileRaw) : {};
       const ownerProfile = {
         ...profile,
@@ -18,9 +18,9 @@ describe('Asistente IA - Fallback contextual', () => {
         role: 'owner',
         emailVerified: true,
       };
-      win.localStorage.setItem('MyWed360_user_profile', JSON.stringify(ownerProfile));
-      win.localStorage.setItem('mywed360_active_wedding', 'evt-1');
-      win.localStorage.setItem('lovenda_active_wedding', 'evt-1');
+      win.localStorage.setItem('MaLoveApp_user_profile', JSON.stringify(ownerProfile));
+      win.localStorage.setItem('maloveapp_active_wedding', 'evt-1');
+      win.localStorage.setItem('maloveapp_active_wedding', 'evt-1');
       win.__MOCK_WEDDING__ = {
         weddings: [
           {

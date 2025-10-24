@@ -4,8 +4,8 @@ const loginAndReset = () => {
   cy.window().then((win) => win.localStorage.clear());
   cy.loginToLovenda();
   cy.window().then((win) => {
-    win.localStorage.removeItem('mywed360_active_wedding');
-    win.localStorage.removeItem('lovenda_active_wedding');
+    win.localStorage.removeItem('maloveapp_active_wedding');
+    win.localStorage.removeItem('maloveapp_active_wedding');
   });
 };
 
@@ -21,7 +21,7 @@ const stubEmailInsights = () => {
           subject: 'Factura DJ Groove',
           date: '2025-04-20T18:00:00Z',
           from: 'facturas@djgroove.test',
-          to: 'usuario.test@lovenda.com',
+          to: 'usuario.test@maloveapp.com',
         },
       ],
     },

@@ -1,4 +1,4 @@
-# CHANGELOG — MyWed360
+# CHANGELOG — MaLoveApp
 
 Formato: entradas agrupadas por fecha (YYYY-MM-DD). Referencias a documentación y módulos.
 

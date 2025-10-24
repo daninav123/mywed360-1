@@ -16,8 +16,8 @@ router.post('/test-personal-email', requireMailAccess, async (req, res) => {
 
     const fromUser = String(from).split('@')[0];
     const emailDomain = String(from).split('@')[1];
-    if (!emailDomain || emailDomain !== 'mywed360.com') {
-      return res.status(400).json({ success: false, message: 'El remitente debe ser una dirección de correo de mywed360.com' });
+    if (!emailDomain || emailDomain !== 'maloveapp.com') {
+      return res.status(400).json({ success: false, message: 'El remitente debe ser una dirección de correo de maloveapp.com' });
     }
 
     try {

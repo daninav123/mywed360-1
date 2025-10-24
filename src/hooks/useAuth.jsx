@@ -1,5 +1,5 @@
 /**
- * Hook centralizado para la autenticación en MyWed360
+ * Hook centralizado para la autenticación en MaLoveApp
  * Este hook proporciona funcionalidades de autenticación y gestión de perfil de usuario
  */
 
@@ -64,12 +64,12 @@ const isMockAuthEnabled = () => {
   return getEnv('VITE_MOCK_AUTH', 'false') === 'true' || isTestMode();
 };
 
-const ADMIN_EMAIL = getEnv('VITE_ADMIN_EMAIL', 'admin@lovenda.com');
-const ADMIN_PROFILE_KEY = 'MyWed360_admin_profile';
+const ADMIN_EMAIL = getEnv('VITE_ADMIN_EMAIL', 'admin@maloveapp.com');
+const ADMIN_PROFILE_KEY = 'MaLoveApp_admin_profile';
 const ADMIN_SESSION_FLAG = 'isAdminAuthenticated';
-const ADMIN_SESSION_TOKEN_KEY = 'MyWed360_admin_session_token';
-const ADMIN_SESSION_EXPIRES_KEY = 'MyWed360_admin_session_expires';
-const ADMIN_SESSION_ID_KEY = 'MyWed360_admin_session_id';
+const ADMIN_SESSION_TOKEN_KEY = 'MaLoveApp_admin_session_token';
+const ADMIN_SESSION_EXPIRES_KEY = 'MaLoveApp_admin_session_expires';
+const ADMIN_SESSION_ID_KEY = 'MaLoveApp_admin_session_id';
 const ADMIN_ALLOWED_DOMAINS = getEnv('VITE_ADMIN_ALLOWED_DOMAINS', 'lovenda.com');
 const isCypressRuntime = () => typeof window !== 'undefined' && !!window.Cypress;
 // Flag para desactivar explícitamente el autologin/mock en Cypress (por defecto desactivado)
@@ -94,7 +94,7 @@ const resolveAuth = () => {
 
 const DEFAULT_PROFILE_PREFERENCES = {
   emailNotifications: true,
-  emailSignature: 'Enviado desde MyWed360',
+  emailSignature: 'Enviado desde MaLoveApp',
   theme: 'light',
   remindersEnabled: true,
   reminderDays: 3,
@@ -172,7 +172,7 @@ export const AuthProvider = ({ children }) => {
         return null;
       }
 
-      const storedRaw = window.localStorage.getItem('MyWed360_user_profile');
+      const storedRaw = window.localStorage.getItem('MaLoveApp_user_profile');
       let storedProfile = null;
 
       if (storedRaw) {
@@ -180,14 +180,14 @@ export const AuthProvider = ({ children }) => {
           storedProfile = JSON.parse(storedRaw);
         } catch (parseError) {
           console.warn('[useAuth] No se pudo parsear el perfil guardado. Se generará uno nuevo.');
-          window.localStorage.removeItem('MyWed360_user_profile');
+          window.localStorage.removeItem('MaLoveApp_user_profile');
         }
       }
 
       if (storedProfile && storedProfile.id && storedProfile.id !== firebaseUser.uid) {
         // Perfil de otro usuario: limpiar para evitar fugas de datos entre sesiones
         storedProfile = null;
-        window.localStorage.removeItem('MyWed360_user_profile');
+        window.localStorage.removeItem('MaLoveApp_user_profile');
       }
 
       const providerData =
@@ -203,7 +203,7 @@ export const AuthProvider = ({ children }) => {
         (forceRole && role) ||
         storedProfile?.role ||
         role ||
-        (firebaseUser.email?.endsWith('@mywed360.com') ? 'assistant' : 'particular');
+        (firebaseUser.email?.endsWith('@maloveapp.com') ? 'assistant' : 'particular');
 
       const baseProfile = storedProfile || {};
       const baseName =
@@ -238,12 +238,12 @@ export const AuthProvider = ({ children }) => {
       if (!profile.myWed360Email) {
         const loginPrefix = (firebaseUser.email || '').split('@')[0]?.slice(0, 4)?.toLowerCase();
         if (loginPrefix) {
-          profile.myWed360Email = `${loginPrefix}@mywed360.com`;
+          profile.myWed360Email = `${loginPrefix}@maloveapp.com`;
         }
       }
 
       try {
-        window.localStorage.setItem('MyWed360_user_profile', JSON.stringify(profile));
+        window.localStorage.setItem('MaLoveApp_user_profile', JSON.stringify(profile));
       } catch (storageError) {
         console.warn('[useAuth] No se pudo guardar el perfil en localStorage:', storageError);
       }
@@ -363,7 +363,7 @@ export const AuthProvider = ({ children }) => {
         const adminUser = {
           uid: profile.id || 'admin-local',
           email: profile.email || ADMIN_EMAIL,
-          displayName: profile.name || 'Administrador Lovenda',
+          displayName: profile.name || 'Administrador MaLoveApp',
         };
 
         setCurrentUser(adminUser);
@@ -399,7 +399,7 @@ export const AuthProvider = ({ children }) => {
       if (typeof window === 'undefined') {
         return false;
       }
-      if (window.__MYWED360_DISABLE_AUTOLOGIN__ === true) {
+      if (window.__MALOVEAPP_DISABLE_AUTOLOGIN__ === true) {
         return false;
       }
 
@@ -418,7 +418,7 @@ export const AuthProvider = ({ children }) => {
               setCurrentUser(parsed);
               
               // Restaurar el perfil también
-              const profileRaw = ls.getItem('MyWed360_user_profile');
+              const profileRaw = ls.getItem('MaLoveApp_user_profile');
               if (profileRaw) {
                 try {
                   const profile = JSON.parse(profileRaw);
@@ -431,9 +431,9 @@ export const AuthProvider = ({ children }) => {
         }
         
         const rawUser =
-          ls.getItem('lovenda_user') ||
-          ls.getItem('mywed360_user') ||
-          ls.getItem('MyWed360_user_profile');
+          ls.getItem('maloveapp_user') ||
+          ls.getItem('maloveapp_user') ||
+          ls.getItem('MaLoveApp_user_profile');
         const isLoggedFlag = ls.getItem('isLoggedIn') === 'true';
 
         let parsedUser = null;
@@ -441,7 +441,7 @@ export const AuthProvider = ({ children }) => {
           try {
             parsedUser = JSON.parse(rawUser);
           } catch (err) {
-            console.warn('[useAuth] No se pudo parsear lovenda_user:', err);
+            console.warn('[useAuth] No se pudo parsear maloveapp_user:', err);
           }
         }
 
@@ -459,7 +459,7 @@ export const AuthProvider = ({ children }) => {
         setCurrentUser(mockUser);
 
         let storedProfile = null;
-        const rawProfile = ls.getItem('MyWed360_user_profile');
+        const rawProfile = ls.getItem('MaLoveApp_user_profile');
         if (rawProfile) {
           try {
             storedProfile = JSON.parse(rawProfile);
@@ -485,7 +485,7 @@ export const AuthProvider = ({ children }) => {
 
         setUserProfile(resolvedProfile);
         try {
-          ls.setItem('MyWed360_user_profile', JSON.stringify(resolvedProfile));
+          ls.setItem('MaLoveApp_user_profile', JSON.stringify(resolvedProfile));
         } catch (storageError) {
           console.warn('[useAuth] No se pudo persistir el perfil mock en localStorage:', storageError);
         }
@@ -516,13 +516,13 @@ export const AuthProvider = ({ children }) => {
       const shouldDisableCypressAutoLogin = () =>
         typeof window !== 'undefined' &&
         !!window.Cypress &&
-        window.__MYWED360_DISABLE_AUTOLOGIN__ === true;
+        window.__MALOVEAPP_DISABLE_AUTOLOGIN__ === true;
 
       // En modo test o Cypress, usar autenticación mock
       if (isCypressEnv || testMode) {
         // 1) Respeta el flag de ventana para desactivar explícitamente el autologin (tests que validan la UI de login)
         if (shouldDisableCypressAutoLogin()) {
-          window.__MYWED360_DISABLE_AUTOLOGIN__ = false;
+          window.__MALOVEAPP_DISABLE_AUTOLOGIN__ = false;
           console.info('[useAuth] Cypress auto-login deshabilitado por flag.');
           setCurrentUser(null);
           setUserProfile(null);
@@ -537,10 +537,10 @@ export const AuthProvider = ({ children }) => {
             if (!ls) return false;
             return (
               ls.getItem('isLoggedIn') === 'true' ||
-              !!ls.getItem('MyWed360_user_profile') ||
-              !!ls.getItem('mywed360_user') ||
-              !!ls.getItem('lovenda_user') ||
-              ls.getItem('mywed360_cypress_auth') === 'true' ||
+              !!ls.getItem('MaLoveApp_user_profile') ||
+              !!ls.getItem('maloveapp_user') ||
+              !!ls.getItem('maloveapp_user') ||
+              ls.getItem('maloveapp_cypress_auth') === 'true' ||
               ls.getItem('mockAuthEnabled') === 'true'
             );
           } catch (_) {
@@ -563,7 +563,7 @@ export const AuthProvider = ({ children }) => {
           try {
             const ls = typeof window !== 'undefined' ? window.localStorage : null;
             const fallbackEmail =
-              (ls && (ls.getItem('mywed360_login_email') || ls.getItem('userEmail'))) ||
+              (ls && (ls.getItem('maloveapp_login_email') || ls.getItem('userEmail'))) ||
               'planner.cypress@lovenda.test';
             const displayName = fallbackEmail.split('@')[0] || 'Usuario Cypress';
             const mockUser = {
@@ -588,8 +588,8 @@ export const AuthProvider = ({ children }) => {
             });
 
             if (ls) {
-              ls.setItem('lovenda_user', JSON.stringify(mockUser));
-              ls.setItem('mywed360_user', JSON.stringify(mockUser));
+              ls.setItem('maloveapp_user', JSON.stringify(mockUser));
+              ls.setItem('maloveapp_user', JSON.stringify(mockUser));
               ls.setItem('isLoggedIn', 'true');
             }
           } catch (mockError) {
@@ -753,7 +753,7 @@ export const AuthProvider = ({ children }) => {
       const isCypressEnv = typeof window !== 'undefined' && !!window.Cypress;
       const shouldBypassCypressMock = (() => {
         try {
-          if (typeof window !== 'undefined' && window.__MYWED360_DISABLE_AUTOLOGIN__ === true) return true;
+          if (typeof window !== 'undefined' && window.__MALOVEAPP_DISABLE_AUTOLOGIN__ === true) return true;
         } catch {}
         const v = String(getEnv('VITE_DISABLE_CYPRESS_AUTOLOGIN', '1')).toLowerCase();
         return v === '1' || v === 'true';
@@ -769,11 +769,11 @@ export const AuthProvider = ({ children }) => {
           };
           setCurrentUser(mockUser);
           if (ls) {
-            ls.setItem('lovenda_user', JSON.stringify(mockUser));
-            ls.setItem('mywed360_user', JSON.stringify(mockUser));
+            ls.setItem('maloveapp_user', JSON.stringify(mockUser));
+            ls.setItem('maloveapp_user', JSON.stringify(mockUser));
             ls.setItem('isLoggedIn', 'true');
             if (remember) {
-              ls.setItem('mywed360_login_email', email || '');
+              ls.setItem('maloveapp_login_email', email || '');
             }
           }
           const pseudoFirebaseUser = {
@@ -811,8 +811,8 @@ export const AuthProvider = ({ children }) => {
             };
             setCurrentUser(mockUser);
             if (ls) {
-              ls.setItem('lovenda_user', JSON.stringify(mockUser));
-              ls.setItem('mywed360_user', JSON.stringify(mockUser));
+              ls.setItem('maloveapp_user', JSON.stringify(mockUser));
+              ls.setItem('maloveapp_user', JSON.stringify(mockUser));
               ls.setItem('isLoggedIn', 'true');
             }
             const pseudoFirebaseUser = {
@@ -857,8 +857,8 @@ export const AuthProvider = ({ children }) => {
             };
             setCurrentUser(mockUser);
             if (ls) {
-              ls.setItem('lovenda_user', JSON.stringify(mockUser));
-              ls.setItem('mywed360_user', JSON.stringify(mockUser));
+              ls.setItem('maloveapp_user', JSON.stringify(mockUser));
+              ls.setItem('maloveapp_user', JSON.stringify(mockUser));
               ls.setItem('isLoggedIn', 'true');
             }
             const pseudoFirebaseUser = {
@@ -1097,7 +1097,7 @@ export const AuthProvider = ({ children }) => {
         const adminProfile = response.profile || {
           id: 'admin-local',
           email: pendingAdminSession.email || ADMIN_EMAIL,
-          name: 'Administrador Lovenda',
+          name: 'Administrador MaLoveApp',
           role: 'admin',
           isAdmin: true,
           preferences: {
@@ -1109,7 +1109,7 @@ export const AuthProvider = ({ children }) => {
         const adminUser = response.adminUser || {
           uid: adminProfile.id || 'admin-local',
           email: adminProfile.email || ADMIN_EMAIL,
-          displayName: adminProfile.name || 'Administrador Lovenda',
+          displayName: adminProfile.name || 'Administrador MaLoveApp',
         };
 
         setPendingAdminSession(null);
@@ -1320,18 +1320,18 @@ export const AuthProvider = ({ children }) => {
       if (typeof window !== 'undefined' && window.localStorage) {
         const storage = window.localStorage;
         const legacyKeys = [
-          'MyWed360_user_profile',
+          'MaLoveApp_user_profile',
           ADMIN_PROFILE_KEY,
           ADMIN_SESSION_FLAG,
           ADMIN_SESSION_TOKEN_KEY,
           ADMIN_SESSION_EXPIRES_KEY,
           ADMIN_SESSION_ID_KEY,
-          'lovenda_user',
-          'mywed360_user',
+          'maloveapp_user',
+          'maloveapp_user',
           'userEmail',
           'isLoggedIn',
-          'mywed360_notif_seen',
-          'mywed360_notifications',
+          'maloveapp_notif_seen',
+          'maloveapp_notifications',
           'mw360_auth_token',
         ];
         legacyKeys.forEach((key) => {
@@ -1387,7 +1387,7 @@ export const AuthProvider = ({ children }) => {
       const data = snap.data() || {};
       const merged = { ...(userProfile || {}), ...data, id: uid };
       setUserProfile(merged);
-      try { window.localStorage.setItem('MyWed360_user_profile', JSON.stringify(merged)); } catch {}
+      try { window.localStorage.setItem('MaLoveApp_user_profile', JSON.stringify(merged)); } catch {}
       return { success: true, profile: merged };
     } catch (e) {
       console.warn('[useAuth] reloadUserProfile failed:', e);
@@ -1410,7 +1410,7 @@ export const AuthProvider = ({ children }) => {
           
           // Persistir en localStorage
           try {
-            window.localStorage.setItem('MyWed360_user_profile', JSON.stringify(updatedProfile));
+            window.localStorage.setItem('MaLoveApp_user_profile', JSON.stringify(updatedProfile));
           } catch {}
           
           return { 
@@ -1459,7 +1459,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const updatedProfile = { ...userProfile, ...profileData };
       setUserProfile(updatedProfile);
-      localStorage.setItem('MyWed360_user_profile', JSON.stringify(updatedProfile));
+      localStorage.setItem('MaLoveApp_user_profile', JSON.stringify(updatedProfile));
       try {
         if (db && currentUser?.uid) {
           const userRef = doc(db, 'users', currentUser.uid);

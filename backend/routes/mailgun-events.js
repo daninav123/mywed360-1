@@ -87,7 +87,7 @@ router.get('/', async (req, res) => {
       return res.status(503).json({
         success: false,
         message: 'MAILGUN_DOMAIN inválido',
-        hint: 'Usa solo el dominio verificado (hostname), p.ej. mg.mywed360.com. No incluyas https:// ni rutas.'
+        hint: 'Usa solo el dominio verificado (hostname), p.ej. mg.maloveapp.com. No incluyas https:// ni rutas.'
       });
     }
 
@@ -115,7 +115,7 @@ router.get('/', async (req, res) => {
         success: false,
         message: 'Fallo consultando eventos de Mailgun',
         error: msg,
-        hint: 'Verifica MAILGUN_API_KEY, MAILGUN_DOMAIN (p.ej. mg.mywed360.com) y MAILGUN_EU_REGION=true',
+        hint: 'Verifica MAILGUN_API_KEY, MAILGUN_DOMAIN (p.ej. mg.maloveapp.com) y MAILGUN_EU_REGION=true',
       });
     }
 

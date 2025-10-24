@@ -52,7 +52,7 @@ describe('Flujo 10 - Gestion de equipo (planner marketplace y codigo externo)', 
       .and('contain', 'invitacion enviada a');
 
     cy.window().then((win) => {
-      const stored = win.localStorage.getItem('mywed360_team_invites');
+      const stored = win.localStorage.getItem('maloveapp_team_invites');
       expect(stored, 'invitaciones almacenadas').to.be.a('string');
       const invites = JSON.parse(stored);
       expect(invites).to.have.length(1);
@@ -78,7 +78,7 @@ describe('Flujo 10 - Gestion de equipo (planner marketplace y codigo externo)', 
       });
 
     cy.window().then((win) => {
-      const stored = win.localStorage.getItem('mywed360_team_codes');
+      const stored = win.localStorage.getItem('maloveapp_team_codes');
       expect(stored, 'codigos almacenados').to.be.a('string');
       const codes = JSON.parse(stored);
       expect(codes).to.have.property('w-harness');

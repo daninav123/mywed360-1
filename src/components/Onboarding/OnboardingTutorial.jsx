@@ -59,15 +59,15 @@ const OnboardingTutorial = ({ onComplete }) => {
 
   const steps = [
     {
-      title: 'Bienvenido a MyWed360!',
+      title: 'Bienvenido a MaLoveApp!',
       content: (
         <div className="text-center">
           <div className="mx-auto w-32 h-32 bg-blue-100 rounded-full flex items-center justify-center mb-6">
-            <img src="/icon-192.png" alt="MyWed360" className="w-20 h-20" />
+            <img src="/icon-192.png" alt="MaLoveApp" className="w-20 h-20" />
           </div>
           <h2 className="text-2xl font-bold mb-4">Comienza a planificar tu boda!</h2>
           <p className="mb-6 text-gray-600">
-            Te guiaremos a travs de los primeros pasos para configurar tu boda en MyWed360. Este
+            Te guiaremos a travs de los primeros pasos para configurar tu boda en MaLoveApp. Este
             tutorial te ayudar a personalizar la app y conocer sus funcionalidades principales.
           </p>
         </div>
@@ -263,7 +263,7 @@ const OnboardingTutorial = ({ onComplete }) => {
           <h2 className="text-2xl font-bold mb-4">Todo listo!</h2>
           <p className="mb-6 text-gray-600">
             Has completado el tutorial inicial. Ya puedes comenzar a utilizar todas las funciones de
-            MyWed360 para planificar la boda de tus sueos.
+            MaLoveApp para planificar la boda de tus sueos.
           </p>
           <p className="text-sm text-gray-500">
             Recuerda que puedes acceder a la Configuracin en cualquier momento para modificar tus
@@ -359,7 +359,7 @@ const OnboardingTutorial = ({ onComplete }) => {
             const endDate = new Date(startDate.getTime() + 2 * 60 * 60 * 1000);
             await googleCalendarService.createEvent({
               title: 'Boda',
-              desc: 'Fecha de la boda planificada en MyWed360',
+              desc: 'Fecha de la boda planificada en MaLoveApp',
               start: startDate,
               end: endDate,
               location: profileData.lugar || undefined,

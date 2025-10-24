@@ -13,7 +13,7 @@ let testEnv;
 
 /** @type {RulesTestEnvironment} */
 
-const PROJECT_ID = 'mywed360-test';
+const PROJECT_ID = 'maloveapp-test';
 
 beforeAll(async () => {
   // Carga las reglas del archivo real del proyecto

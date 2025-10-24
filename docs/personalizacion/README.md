@@ -1,6 +1,6 @@
 # Hub de Personalización de Bodas
 
-Este espacio centraliza cómo MyWed360 detecta las necesidades únicas de cada boda y distribuye ese conocimiento al resto de la plataforma.
+Este espacio centraliza cómo MaLoveApp detecta las necesidades únicas de cada boda y distribuye ese conocimiento al resto de la plataforma.
 
 ## Objetivos
 - Capturar estilo, prioridades, restricciones y momentos clave de cada evento.
@@ -35,10 +35,10 @@ Este espacio centraliza cómo MyWed360 detecta las necesidades únicas de cada b
    - `node scripts/seedPersonalizationProfiles.js --prefix=qa-personalizacion --force`  
    - Confirma en Firestore que existen `weddings/qa-personalizacion-*`.
 3. **Extender para planners** (opcional)  
-   - `node scripts/seedTestDataForPlanner.js --email=planner.demo@mywed360.com --keyPath=./serviceAccount.json`  
+   - `node scripts/seedTestDataForPlanner.js --email=planner.demo@maloveapp.com --keyPath=./serviceAccount.json`  
    - Usa el `weddingId` que imprime el script para futuras semillas.
 4. **Completar proveedores y finanzas**  
-   - `node scripts/seedSuppliersSimple.js planner.demo@mywed360.com <weddingId>`  
+   - `node scripts/seedSuppliersSimple.js planner.demo@maloveapp.com <weddingId>`  
    - `node scripts/seedFinanceMovements.js --weddingId=<weddingId> --months=6`
 5. **Limpiar al finalizar**  
    - Ejecuta `firebase firestore:delete --project <id> --recursive /weddings/<slug>` o usa `--force` en los scripts para regenerar los datos con el mismo prefijo.

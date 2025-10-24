@@ -1,6 +1,6 @@
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "📊 RESUMEN DE TESTS E2E - MyWed360" -ForegroundColor Yellow
+Write-Host "📊 RESUMEN DE TESTS E2E - MaLoveApp" -ForegroundColor Yellow
 Write-Host "========================================" -ForegroundColor Cyan
 
 # Tests que sabemos que pasan

@@ -17,7 +17,7 @@ try {
 // 2. Variables de entorno y configuración
 console.log('\n----- VARIABLES DE ENTORNO Y CONFIGURACIÓN -----');
 const MAILGUN_API_KEY = process.env.MAILGUN_API_KEY || 'a42e6604fb3e4b737f281cd3dbc6309a-0ce15100-24828154';
-const MAILGUN_DOMAIN = process.env.MAILGUN_DOMAIN || 'mywed360.com';
+const MAILGUN_DOMAIN = process.env.MAILGUN_DOMAIN || 'maloveapp.com';
 
 console.log(`API Key: ${MAILGUN_API_KEY.substring(0, 6)}...${MAILGUN_API_KEY.slice(-8)}`);
 console.log(`Dominio: ${MAILGUN_DOMAIN}`);

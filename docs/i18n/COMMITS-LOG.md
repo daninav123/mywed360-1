@@ -1,6 +1,6 @@
 # 📝 Log de Commits - Migración i18n
 
-**Proyecto:** MyWed360  
+**Proyecto:** MaLoveApp  
 **Rama:** windows
 
 ---

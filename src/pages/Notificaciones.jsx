@@ -35,8 +35,8 @@ export default function Notificaciones() {
   useEffect(() => {
     refresh();
     const handler = () => refresh();
-    window.addEventListener('mywed360-notif', handler);
-    return () => window.removeEventListener('mywed360-notif', handler);
+    window.addEventListener('maloveapp-notif', handler);
+    return () => window.removeEventListener('maloveapp-notif', handler);
   }, []);
 
   useEffect(() => {

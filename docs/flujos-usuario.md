@@ -1,4 +1,4 @@
-# Flujos de Usuario — MyWed360
+# Flujos de Usuario — MaLoveApp
 
 > Este documento actúa como mapa maestro de experiencias. Resume qué cubre cada grupo de flujos, su estado actual y dónde ampliar información. Usa `docs/FLUJOS-INDICE.md` como fuente de verdad para estados y numeración; aquí encontrarás el contexto funcional y técnico rápido para orientarte.
 

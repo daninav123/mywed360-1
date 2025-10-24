@@ -1,4 +1,4 @@
-// Express backend for MyWed360
+// Express backend for MaLoveApp
 
 // Provides:
 //   GET /api/transactions - proxy or mock to bank aggregator (Nordigen)
@@ -108,6 +108,7 @@ import emailValidationRouter from './routes/email-validation.js';
 import partnerStatsRouter from './routes/partner-stats.js';
 import appStoreWebhookRouter from './routes/app-store-webhook.js';
 import emailTagsRouter from './routes/email-tags.js';
+import emailAliasRouter from './routes/email-alias.js';
 import crmRouter from './routes/crm.js';
 import providersRouter from './routes/providers.js';
 import projectMetricsRouter from './routes/project-metrics.js';
@@ -505,6 +506,7 @@ app.use('/api/email/tags', requireMailAccess, emailTagsRouter);
 app.use('/api/email/validate', requireAuth, emailValidationRouter); // Validación DKIM/SPF
 app.use('/api/email', emailDocsRouter);
 app.use('/api/email-templates', optionalAuth, emailTemplatesRouter); // Plantillas de email
+app.use('/api/email-alias', optionalAuth, emailAliasRouter); // Actualizar alias de email
 
 // IMPORTANTE: Las rutas más específicas (/api/mailgun/events) deben ir ANTES que las generales (/api/mailgun)
 app.use('/api/mailgun/events', requireMailAccess, mailgunEventsRouter); // Eventos de Mailgun
@@ -641,7 +643,7 @@ app.use('/api/test', testHelpersRouter); // Test helpers para E2E (solo en desar
 app.use('/api/metrics', metricsSeatingRouter);
 
 app.get('/', (_req, res) => {
-  res.send({ status: 'ok', service: 'mywed360-backend' });
+  res.send({ status: 'ok', service: 'maloveapp-backend' });
 });
 
 // Health check explícito para plataformas de despliegue
@@ -774,7 +776,7 @@ if (process.env.NODE_ENV !== 'test') {
 
 if (process.env.NODE_ENV !== 'test') {
   app.listen(PORT, () => {
-    console.log(`MyWed360 backend up on http://localhost:${PORT}`);
+    console.log(`MaLoveApp backend up on http://localhost:${PORT}`);
   });
 }
 

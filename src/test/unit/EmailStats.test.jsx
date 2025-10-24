@@ -56,7 +56,7 @@ describe('EmailStats', () => {
       received: [15, 25, 20, 45, 55, 120],
     },
     contacts: [
-      { name: 'example@mywed360.com', count: 45 },
+      { name: 'example@maloveapp.com', count: 45 },
       { name: 'contact@example.com', count: 32 },
       { name: 'info@provider.com', count: 28 },
     ],

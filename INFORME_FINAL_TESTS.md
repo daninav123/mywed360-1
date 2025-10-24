@@ -1,4 +1,4 @@
-# 📊 INFORME DE ESTADO DE TESTS - MyWed360
+# 📊 INFORME DE ESTADO DE TESTS - MaLoveApp
 
 **Última actualización:** 21 de Octubre de 2025  
 **Hora:** 5:50 PM UTC+02:00  
@@ -109,7 +109,7 @@ const isTestMode = () => {
 // Carga de bodas mock en tests
 const loadTestWeddings = () => {
   if (!isTestMode) return { weddings: [], activeWedding: '' };
-  const storedWeddings = window.localStorage.getItem('MyWed360_weddings');
+  const storedWeddings = window.localStorage.getItem('MaLoveApp_weddings');
   // ...
 };
 ```

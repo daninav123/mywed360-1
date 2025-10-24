@@ -172,7 +172,7 @@ const AdminReports = () => {
               onChange={(event) => setRecipients(event.target.value)}
               disabled={generating}
               className="w-full rounded-md border border-soft px-3 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              placeholder="direccion@lovenda.com, admin@lovenda.com"
+              placeholder="direccion@maloveapp.com, admin@maloveapp.com"
             />
           </div>
 

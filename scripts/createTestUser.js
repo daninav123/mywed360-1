@@ -21,7 +21,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 async function createTestUser() {
-  const testEmail = 'test@mywed360.com';
+  const testEmail = 'test@maloveapp.com';
   const testPassword = 'test123456';
   
   try {

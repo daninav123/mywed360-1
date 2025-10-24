@@ -39,8 +39,8 @@ export default function WeddingTeamHarness() {
             type="button"
             onClick={() => {
               if (typeof window !== 'undefined') {
-                window.localStorage.removeItem('mywed360_team_invites');
-                window.localStorage.removeItem('mywed360_team_codes');
+                window.localStorage.removeItem('maloveapp_team_invites');
+                window.localStorage.removeItem('maloveapp_team_codes');
               }
             }}
             className="px-4 py-2 bg-[var(--color-accent)]/40 text-[color:var(--color-text)] rounded-md text-sm font-semibold hover:bg-[var(--color-accent)]/60 transition"

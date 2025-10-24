@@ -70,7 +70,7 @@ const PLAN_LIMITS = {
       integrations: false,
       supportLevel: 'community',
       supportSLA: null,
-      branding: 'mywed360' // Marca MyWed360 visible
+      branding: 'maloveapp' // Marca MaLoveApp visible
     },
     features: {
       basicChecklist: true,
@@ -104,7 +104,7 @@ const PLAN_LIMITS = {
       integrations: false,
       supportLevel: 'community',
       supportSLA: null,
-      branding: 'mywed360'
+      branding: 'maloveapp'
     },
     features: {
       basicChecklist: true,
@@ -138,7 +138,7 @@ const PLAN_LIMITS = {
       integrations: false,
       supportLevel: 'priority',
       supportSLA: '4h',
-      branding: 'mywed360'
+      branding: 'maloveapp'
     },
     features: {
       basicChecklist: true,
@@ -172,7 +172,7 @@ const PLAN_LIMITS = {
       integrations: false,
       supportLevel: 'priority',
       supportSLA: '4h',
-      branding: 'mywed360'
+      branding: 'maloveapp'
     },
     features: {
       advancedChecklist: true,
@@ -202,7 +202,7 @@ const PLAN_LIMITS = {
       legalDocuments: true,
       emailAutomations: true,
       webDesigns: 50,
-      whiteLabel: true, // Sin marca MyWed360
+      whiteLabel: true, // Sin marca MaLoveApp
       exportsPDF: true,
       exportsExcel: true,
       concierge: false,

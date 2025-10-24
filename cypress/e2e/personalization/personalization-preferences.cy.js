@@ -11,10 +11,10 @@ describe('Personalización IA continua - captura de estilo', () => {
     cy.window().then((win) => win.localStorage.clear());
     cy.loginToLovenda('owner.personalizacion@lovenda.test');
     cy.window().then((win) => {
-      const profileRaw = win.localStorage.getItem('MyWed360_user_profile');
+      const profileRaw = win.localStorage.getItem('MaLoveApp_user_profile');
       const profile = profileRaw ? JSON.parse(profileRaw) : {};
       win.localStorage.setItem(
-        'MyWed360_user_profile',
+        'MaLoveApp_user_profile',
         JSON.stringify({
           ...profile,
           uid: 'owner-personalizacion',

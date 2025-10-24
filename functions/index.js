@@ -3,7 +3,7 @@ const createCors = require('cors');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const { authenticator } = require('otplib');
-const { z } = require('zod');
+const { z} = require('zod');
 // Usar fetch nativo de Node 18+ (Cloud Functions Node 20)
 const fetch = globalThis.fetch;
 let FormDataLib = null;
@@ -14,6 +14,119 @@ if (!admin.apps?.length) {
   admin.initializeApp();
 }
 const db = admin.firestore();
+
+// ==========================================
+// ✅ NUEVA CLOUD FUNCTION: onMailUpdated
+// ==========================================
+// Actualiza contadores de carpetas cuando un email cambia
+
+exports.onMailUpdated = functions.firestore
+  .document('users/{uid}/mails/{emailId}')
+  .onUpdate(async (change, context) => {
+    const before = change.before.data();
+    const after = change.after.data();
+    const uid = context.params.uid;
+    
+    console.log('[onMailUpdated] Procesando cambio', { uid, emailId: context.params.emailId });
+    
+    try {
+      // Si cambió la carpeta
+      if (before.folder !== after.folder) {
+        console.log('[onMailUpdated] Carpeta cambió:', before.folder, '->', after.folder);
+        
+        // Decrementar contador de carpeta anterior
+        if (before.folder) {
+          await updateFolderCount(uid, before.folder, -1, before.read ? 0 : -1);
+        }
+        
+        // Incrementar contador de carpeta nueva
+        if (after.folder) {
+          await updateFolderCount(uid, after.folder, 1, after.read ? 0 : 1);
+        }
+      }
+      
+      // Si cambió el estado de leído (dentro de la misma carpeta)
+      else if (before.read !== after.read && after.folder) {
+        console.log('[onMailUpdated] Estado read cambió:', before.read, '->', after.read);
+        
+        const unreadDelta = after.read ? -1 : 1; // Si se marcó como leído, decrementar unread
+        await updateFolderCount(uid, after.folder, 0, unreadDelta);
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('[onMailUpdated] Error:', error);
+      // No throw, para no fallar la Cloud Function
+      return null;
+    }
+  });
+
+/**
+ * Actualiza los contadores de una carpeta
+ * @param {string} uid - ID del usuario
+ * @param {string} folder - ID de la carpeta (inbox, sent, trash, custom:xxx)
+ * @param {number} totalDelta - Cambio en total de emails (-1, 0, +1)
+ * @param {number} unreadDelta - Cambio en no leídos
+ */
+async function updateFolderCount(uid, folder, totalDelta, unreadDelta) {
+  if (!folder) return;
+  
+  try {
+    const statsRef = db.collection('emailFolderStats').doc(`${uid}_${folder}`);
+    
+    const updates = {
+      uid,
+      folder,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    };
+    
+    if (totalDelta !== 0) {
+      updates.totalCount = admin.firestore.FieldValue.increment(totalDelta);
+    }
+    
+    if (unreadDelta !== 0) {
+      updates.unreadCount = admin.firestore.FieldValue.increment(unreadDelta);
+    }
+    
+    await statsRef.set(updates, { merge: true });
+    
+    console.log(`[updateFolderCount] Actualizado ${uid}/${folder}:`, { totalDelta, unreadDelta });
+  } catch (error) {
+    console.error('[updateFolderCount] Error:', error);
+  }
+}
+
+// Función auxiliar para obtener contadores de una carpeta
+exports.getFolderStats = functions.https.onCall(async (data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError('unauthenticated', 'Usuario no autenticado');
+  }
+  
+  const uid = context.auth.uid;
+  const folder = data.folder || 'inbox';
+  
+  try {
+    const doc = await db.collection('emailFolderStats').doc(`${uid}_${folder}`).get();
+    
+    if (!doc.exists) {
+      return { totalCount: 0, unreadCount: 0 };
+    }
+    
+    const data = doc.data();
+    return {
+      totalCount: data.totalCount || 0,
+      unreadCount: data.unreadCount || 0,
+      updatedAt: data.updatedAt?.toDate?.()?.toISOString?.() || null,
+    };
+  } catch (error) {
+    console.error('[getFolderStats] Error:', error);
+    throw new functions.https.HttpsError('internal', 'Error obteniendo estadísticas');
+  }
+});
+
+// ==========================================
+// FIN DE NUEVA CLOUD FUNCTION
+// ==========================================
 
 const BUDGET_CATEGORY_ALIASES = new Map([
   [
@@ -37,7 +150,7 @@ const BUDGET_CATEGORY_ALIASES = new Map([
 // ----- CORS estricto para Functions -----
 const DEFAULT_ALLOWED_ORIGINS = [
   'http://localhost:5173',
-  'https://mywed360.netlify.app',
+  'https://maloveapp.netlify.app',
 ];
 const ALLOWED_ORIGINS = String(
   process.env.FUNCTIONS_ALLOWED_ORIGINS || process.env.ALLOWED_ORIGIN || DEFAULT_ALLOWED_ORIGINS.join(',')
@@ -61,14 +174,14 @@ const ADMIN_EMAIL = String(
   process.env.ADMIN_EMAIL ||
     process.env.VITE_ADMIN_EMAIL ||
     process.env.ADMIN_USER_EMAIL ||
-    'admin@lovenda.com'
+    'admin@maloveapp.com'
 )
   .trim()
   .toLowerCase();
 const ADMIN_NAME =
   process.env.ADMIN_NAME ||
   process.env.VITE_ADMIN_NAME ||
-  'Administrador Lovenda';
+  'Administrador MaLoveApp';
 const ADMIN_PASSWORD_HASH =
   process.env.ADMIN_PASSWORD_HASH || process.env.VITE_ADMIN_PASSWORD_HASH || '';
 const ADMIN_PASSWORD_FALLBACK =
@@ -438,7 +551,7 @@ async function verifyIdTokenOrMock(req) {
 // Configuración para Mailgun
 // Usar variable de entorno primero; si no existe, intentar leer de funciones config y evitar TypeError
 const MAILGUN_API_KEY = process.env.MAILGUN_API_KEY || functions.config().mailgun?.key || '';
-const MAILGUN_DOMAIN = process.env.MAILGUN_DOMAIN || functions.config().mailgun?.domain || 'mywed360.com';
+const MAILGUN_DOMAIN = process.env.MAILGUN_DOMAIN || functions.config().mailgun?.domain || 'maloveapp.com';
 // Permitir sobreescribir la URL base (soporta US y EU)
 const MAILGUN_BASE_URL = process.env.MAILGUN_BASE_URL || functions.config().mailgun?.base_url || 'https://api.mailgun.net/v3';
 const MAILGUN_SIGNING_KEY = process.env.MAILGUN_SIGNING_KEY || functions.config().mailgun?.signing_key || '';
@@ -474,15 +587,15 @@ exports.getMailgunEvents = functions.https.onRequest((request, response) => {
       if (recipient) params.append('recipient', recipient);
       if (from) params.append('from', from);
 
-      // Determinar dominio a consultar: si el email pertenece a mywed360.com usar dominio raíz, si es mg.mywed360.com usar subdominio
+      // Determinar dominio a consultar: si el email pertenece a maloveapp.com usar dominio raíz, si es mg.maloveapp.com usar subdominio
       let targetDomain = MAILGUN_DOMAIN;
       const sampleEmail = recipient || from;
       if (sampleEmail) {
         const domainPart = sampleEmail.split('@')[1] || '';
-        if (domainPart === 'mywed360.com') {
-          targetDomain = 'mywed360.com';
-        } else if (domainPart === 'mg.mywed360.com') {
-          targetDomain = 'mg.mywed360.com';
+        if (domainPart === 'maloveapp.com') {
+          targetDomain = 'maloveapp.com';
+        } else if (domainPart === 'mg.maloveapp.com') {
+          targetDomain = 'mg.maloveapp.com';
         }
       }
       

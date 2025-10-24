@@ -2,7 +2,7 @@
 
 ## Descripción
 
-El sistema de **Plantillas de Tareas** permite a los administradores de MyWed360 modificar el conjunto de tareas (bloques y subtareas) que se aplica automáticamente a cada nueva boda creada en la plataforma.
+El sistema de **Plantillas de Tareas** permite a los administradores de MaLoveApp modificar el conjunto de tareas (bloques y subtareas) que se aplica automáticamente a cada nueva boda creada en la plataforma.
 
 ## Acceso al Panel
 

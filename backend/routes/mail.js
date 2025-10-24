@@ -5,10 +5,12 @@ import attachments from './mail/attachments.js';
 import readStatus from './mail/readStatus.js';
 import alias from './mail/alias.js';
 import testPersonalEmail from './mail/testPersonalEmail.js';
+import templates from './mail/templates.js';
 
 const router = express.Router();
 
 // Orden de montaje: rutas fijas -> dinámicas
+router.use('/', templates);
 router.use('/', getRoutes);
 router.use('/', attachments);
 router.use('/', readStatus);

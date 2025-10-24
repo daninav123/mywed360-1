@@ -1184,7 +1184,7 @@ export const buildGuestShareUrl = ({ baseUrl, token, weddingId }) => {
   if (!token || !weddingId) return '';
   const origin =
     baseUrl ||
-    (typeof window !== 'undefined' ? window.location.origin : 'https://mywed360.app');
+    (typeof window !== 'undefined' ? window.location.origin : 'https://maloveapp.app');
   const normalized = origin.replace(/\/$/, '');
   return `${normalized}/momentos/recuerdos?w=${encodeURIComponent(
     weddingId

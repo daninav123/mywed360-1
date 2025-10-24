@@ -40,7 +40,7 @@ if (typeof window !== 'undefined') {
   };
 
   console.info(
-    '🛠️  Comandos de consola MyWed360 registrados: mywed.checkAll(), mywed.clearDiagnostics()'
+    '🛠️  Comandos de consola MaLoveApp registrados: mywed.checkAll(), mywed.clearDiagnostics()'
   );
 }
 
@@ -110,7 +110,7 @@ class ConsoleCommands {
 
   showWelcomeMessage() {
     console.log(`
-🚀 MyWed360 - Sistema de Diagnóstico Activado
+🚀 MaLoveApp - Sistema de Diagnóstico Activado
 ===
 
 Comandos disponibles:
@@ -331,7 +331,7 @@ Comandos disponibles:
 
   showHelp() {
     console.log(`
-🔍 MyWed360 - Comandos de Diagnóstico
+🔍 MaLoveApp - Comandos de Diagnóstico
 =
 
 DIAGNÓSTICOS:
@@ -387,10 +387,10 @@ EJEMPLOS DE USO:
     console.group('🔐 DIAGNÓSTICO COMPLETO DE SESIÓN ADMIN');
     
     const ADMIN_SESSION_FLAG = 'isAdminAuthenticated';
-    const ADMIN_PROFILE_KEY = 'MyWed360_admin_profile';
-    const ADMIN_SESSION_TOKEN_KEY = 'MyWed360_admin_session_token';
-    const ADMIN_SESSION_EXPIRES_KEY = 'MyWed360_admin_session_expires';
-    const ADMIN_SESSION_ID_KEY = 'MyWed360_admin_session_id';
+    const ADMIN_PROFILE_KEY = 'MaLoveApp_admin_profile';
+    const ADMIN_SESSION_TOKEN_KEY = 'MaLoveApp_admin_session_token';
+    const ADMIN_SESSION_EXPIRES_KEY = 'MaLoveApp_admin_session_expires';
+    const ADMIN_SESSION_ID_KEY = 'MaLoveApp_admin_session_id';
     
     // 1. Verificar existencia de claves
     console.log('\n📦 1. CLAVES EN LOCALSTORAGE:');
@@ -517,10 +517,10 @@ EJEMPLOS DE USO:
     console.group('🧪 TEST DE RESTAURACIÓN DE SESIÓN ADMIN');
     
     const ADMIN_SESSION_FLAG = 'isAdminAuthenticated';
-    const ADMIN_PROFILE_KEY = 'MyWed360_admin_profile';
-    const ADMIN_SESSION_TOKEN_KEY = 'MyWed360_admin_session_token';
-    const ADMIN_SESSION_EXPIRES_KEY = 'MyWed360_admin_session_expires';
-    const ADMIN_SESSION_ID_KEY = 'MyWed360_admin_session_id';
+    const ADMIN_PROFILE_KEY = 'MaLoveApp_admin_profile';
+    const ADMIN_SESSION_TOKEN_KEY = 'MaLoveApp_admin_session_token';
+    const ADMIN_SESSION_EXPIRES_KEY = 'MaLoveApp_admin_session_expires';
+    const ADMIN_SESSION_ID_KEY = 'MaLoveApp_admin_session_id';
     
     console.log('Simulando función restoreAdminSession()...\n');
     
@@ -583,8 +583,8 @@ EJEMPLOS DE USO:
       console.log('\nPASO 5: Crear adminUser object');
       const adminUser = {
         uid: profile.id || 'admin-local',
-        email: profile.email || 'admin@lovenda.com',
-        displayName: profile.name || 'Administrador Lovenda',
+        email: profile.email || 'admin@maloveapp.com',
+        displayName: profile.name || 'Administrador MaLoveApp',
       };
       console.log('adminUser creado:', adminUser);
       
@@ -615,7 +615,7 @@ EJEMPLOS DE USO:
       key.includes('admin') || 
       key.includes('Admin') || 
       key.includes('isAuthenticated') ||
-      key.includes('MyWed360_admin')
+      key.includes('MaLoveApp_admin')
     );
     
     console.log(`Total de claves relacionadas con admin: ${adminKeys.length}\n`);
@@ -654,10 +654,10 @@ EJEMPLOS DE USO:
     
     const keys = [
       'isAdminAuthenticated',
-      'MyWed360_admin_profile',
-      'MyWed360_admin_session_token',
-      'MyWed360_admin_session_expires',
-      'MyWed360_admin_session_id',
+      'MaLoveApp_admin_profile',
+      'MaLoveApp_admin_session_token',
+      'MaLoveApp_admin_session_expires',
+      'MaLoveApp_admin_session_id',
     ];
     
     keys.forEach(key => {

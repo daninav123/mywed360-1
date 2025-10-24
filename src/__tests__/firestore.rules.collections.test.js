@@ -13,7 +13,7 @@ const RUN_FIRESTORE_RULES =
 const describeIf = RUN_FIRESTORE_RULES ? describe : describe.skip;
 
 let testEnv;
-const PROJECT_ID = 'mywed360-test-collections';
+const PROJECT_ID = 'maloveapp-test-collections';
 
 beforeAll(async () => {
   if (!RUN_FIRESTORE_RULES) return;

@@ -8,21 +8,21 @@ console.log('Fecha y hora: ' + new Date().toISOString());
 // Configuración de Mailgun - probaremos múltiples configuraciones
 const configs = [
   {
-    name: 'Configuración 1 - API key privada + mywed360.com',
+    name: 'Configuración 1 - API key privada + maloveapp.com',
     apiKey: 'a42e6604fb3e4b737f281cd3dbc6309a-0ce15100-24828154',
-    domain: 'mywed360.com',
+    domain: 'maloveapp.com',
     euRegion: true
   },
   {
-    name: 'Configuración 2 - API key privada + mg.mywed360.com',
+    name: 'Configuración 2 - API key privada + mg.maloveapp.com',
     apiKey: 'a42e6604fb3e4b737f281cd3dbc6309a-0ce15100-24828154',
-    domain: 'mg.mywed360.com',
+    domain: 'mg.maloveapp.com',
     euRegion: true
   },
   {
     name: 'Configuración 3 - API key privada + EU false',
     apiKey: 'a42e6604fb3e4b737f281cd3dbc6309a-0ce15100-24828154',
-    domain: 'mywed360.com',
+    domain: 'maloveapp.com',
     euRegion: false
   }
 ];

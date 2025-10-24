@@ -33,9 +33,9 @@ vi.mock('../../services/EmailService', async (importOriginal) => {
   return {
     ...actual,
     // Variables de entorno simuladas
-    BASE: 'https://api.test.mywed360.com',
+    BASE: 'https://api.test.maloveapp.com',
     MAILGUN_API_KEY: 'key-test123456789',
-    MAILGUN_DOMAIN: 'test.mywed360.com',
+    MAILGUN_DOMAIN: 'test.maloveapp.com',
     USE_MAILGUN: true,
     USE_BACKEND: false,
   };
@@ -53,7 +53,7 @@ describe('EmailService', () => {
   const mockEmail = {
     id: 'email123',
     from: 'remitente@example.com',
-    to: 'usuario@test.mywed360.com',
+    to: 'usuario@test.maloveapp.com',
     subject: 'Asunto de prueba',
     body: '<p>Contenido de prueba</p>',
     date: '2025-07-10T10:00:00Z',
@@ -81,21 +81,21 @@ describe('EmailService', () => {
   describe('initEmailService', () => {
     it('devuelve una dirección de email válida basada en el perfil', async () => {
       const email = await EmailService.initEmailService(mockProfile);
-      expect(email).toBe('maria.garcia@test.mywed360.com');
+      expect(email).toBe('maria.garcia@test.maloveapp.com');
       expect(EmailService.CURRENT_USER).toBe(mockProfile);
-      expect(EmailService.CURRENT_USER_EMAIL).toBe('maria.garcia@test.mywed360.com');
+      expect(EmailService.CURRENT_USER_EMAIL).toBe('maria.garcia@test.maloveapp.com');
     });
 
     it('usa el emailAlias si está definido', async () => {
       const profileWithAlias = { ...mockProfile, emailAlias: 'miboda' };
       const email = await EmailService.initEmailService(profileWithAlias);
-      expect(email).toBe('miboda@test.mywed360.com');
+      expect(email).toBe('miboda@test.maloveapp.com');
     });
 
     it('usa solo nombre si no hay apellido', async () => {
       const profileNoLastName = { ...mockProfile, brideLastName: '' };
       const email = await EmailService.initEmailService(profileNoLastName);
-      expect(email).toBe('maria@test.mywed360.com');
+      expect(email).toBe('maria@test.maloveapp.com');
     });
 
     it('usa userId si no hay nombre', async () => {
@@ -105,7 +105,7 @@ describe('EmailService', () => {
         brideLastName: '',
       };
       const email = await EmailService.initEmailService(profileNoName);
-      expect(email).toBe('useruser123@test.mywed360.com');
+      expect(email).toBe('useruser123@test.maloveapp.com');
     });
   });
 
@@ -117,11 +117,11 @@ describe('EmailService', () => {
 
       // Guardar emails de prueba en localStorage
       const mockEmails = [mockEmail];
-      localStorage.setItem('mywed360_mails', JSON.stringify(mockEmails));
+      localStorage.setItem('maloveapp_mails', JSON.stringify(mockEmails));
 
       const result = await EmailService.getMails('inbox');
       expect(result).toEqual(mockEmails);
-      expect(localStorage.getItem).toHaveBeenCalledWith('mywed360_mails');
+      expect(localStorage.getItem).toHaveBeenCalledWith('maloveapp_mails');
     });
 
     it('llama a la API del backend cuando está configurado', async () => {
@@ -155,7 +155,7 @@ describe('EmailService', () => {
       });
 
       // Crear datos en localStorage como fallback
-      localStorage.setItem('mywed360_mails', JSON.stringify([mockEmail]));
+      localStorage.setItem('maloveapp_mails', JSON.stringify([mockEmail]));
 
       const result = await EmailService.getMails('inbox');
 
@@ -229,7 +229,7 @@ describe('EmailService', () => {
       expect(localStorage.setItem).toHaveBeenCalled();
 
       // Verificar que el correo se guardó en localStorage
-      const saved = JSON.parse(localStorage.getItem('mywed360_mails'));
+      const saved = JSON.parse(localStorage.getItem('maloveapp_mails'));
       expect(saved).toHaveLength(1);
       expect(saved[0].subject).toBe('Asunto de prueba');
       expect(saved[0].folder).toBe('sent');
@@ -240,7 +240,7 @@ describe('EmailService', () => {
     beforeEach(() => {
       // Guardar emails de prueba en localStorage
       const mockEmails = [mockEmail];
-      localStorage.setItem('mywed360_mails', JSON.stringify(mockEmails));
+      localStorage.setItem('maloveapp_mails', JSON.stringify(mockEmails));
     });
 
     it('marca un email como leído correctamente', async () => {
@@ -251,7 +251,7 @@ describe('EmailService', () => {
       await EmailService.markAsRead('email123');
 
       // Verificar que el email fue marcado como leído
-      const saved = JSON.parse(localStorage.getItem('mywed360_mails'));
+      const saved = JSON.parse(localStorage.getItem('maloveapp_mails'));
       expect(saved[0].read).toBe(true);
     });
 
@@ -263,7 +263,7 @@ describe('EmailService', () => {
       await EmailService.deleteMail('email123');
 
       // Verificar que el email fue eliminado
-      const saved = JSON.parse(localStorage.getItem('mywed360_mails'));
+      const saved = JSON.parse(localStorage.getItem('maloveapp_mails'));
       expect(saved).toHaveLength(0);
     });
 

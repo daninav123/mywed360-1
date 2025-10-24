@@ -56,6 +56,10 @@
 - Métricas de soporte
 - MRR/ARR (subscriptions)
 - Retención (D1/D7/D30)
+- Uso de almacenamiento Firebase (total y promedio premium)
+- Descargas totales y de los ultimos 30 dias
+- Trafico web reciente frente a historico
+- Nuevos usuarios frente a nuevos usuarios premium
 - **Backend**: `/api/admin/dashboard/metrics`
 
 ### **AdminBroadcast** ✅

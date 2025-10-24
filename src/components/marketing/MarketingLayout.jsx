@@ -16,7 +16,7 @@ const activeClasses = 'text-body border-[var(--color-primary)]';
 
 const MarketingLayout = ({ children }) => {
   if (typeof window !== 'undefined') {
-    window.__LOVENDA_MARKETING_VIEW__ = true;
+    window.__MALOVEAPP_MARKETING_VIEW__ = true;
   }
 
   React.useEffect(() => {
@@ -33,7 +33,7 @@ const MarketingLayout = ({ children }) => {
 
     return () => {
       if (typeof window !== 'undefined') {
-        delete window.__LOVENDA_MARKETING_VIEW__;
+        delete window.__MALOVEAPP_MARKETING_VIEW__;
       }
     };
   }, []);

@@ -100,7 +100,7 @@ async function seedWeddings() {
   if (!snap.empty) return 'exists';
   await ensureOne('weddings', {
     couple: 'Ana & Luis',
-    owner: 'owner@lovenda.com',
+    owner: 'owner@maloveapp.com',
     eventDate: admin.firestore.Timestamp.fromDate(new Date(new Date().getFullYear(), 11, 1)),
     status: 'active',
     confirmedGuests: 80,
@@ -114,7 +114,7 @@ async function seedUsers() {
   const snap = await db.collection('users').limit(1).get();
   if (!snap.empty) return 'exists';
   const id = await ensureOne('users', {
-    email: 'owner@lovenda.com',
+    email: 'owner@maloveapp.com',
     role: 'owner',
     status: 'active',
     lastAccess: fv.serverTimestamp(),
@@ -146,7 +146,7 @@ async function seedSettings() {
       description: 'Bandera ejemplo para panel admin',
       domain: 'core',
       enabled: true,
-      lastModifiedBy: 'admin@lovenda.com',
+      lastModifiedBy: 'admin@maloveapp.com',
       lastModifiedAt: new Date().toISOString(),
     }, 'FEATURE_DEMO');
   }
@@ -186,7 +186,7 @@ async function seedAudit() {
   const snap = await db.collection('adminAuditLogs').limit(1).get();
   if (!snap.empty) return 'exists';
   await ensureOne('adminAuditLogs', {
-    actor: 'admin@lovenda.com',
+    actor: 'admin@maloveapp.com',
     action: 'FLAG_UPDATE',
     resourceType: 'flag',
     resourceId: 'FEATURE_DEMO',
@@ -202,7 +202,7 @@ async function seedReports() {
   await ensureOne('adminReports', {
     name: 'Métricas globales',
     cadence: 'Semanal',
-    recipients: ['direccion@lovenda.com'],
+    recipients: ['direccion@maloveapp.com'],
     format: 'PDF',
     status: 'enabled',
   });
@@ -225,7 +225,7 @@ async function seedSupport() {
   if (tickets.empty) {
     await ensureOne('adminTickets', {
       subject: 'Acceso planner',
-      requester: 'planner@lovenda.com',
+      requester: 'planner@maloveapp.com',
       status: 'open',
       updatedAt: new Date().toISOString(),
       priority: 'low',

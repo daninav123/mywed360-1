@@ -53,7 +53,7 @@ console.log('Iniciando prueba de Mailgun...');
 
 // Configuración directa
 const MAILGUN_API_KEY = 'a42e6604fb3e4b737f281cd3dbc6309a-0ce15100-24828154';
-const MAILGUN_DOMAIN = 'mywed360.com';
+const MAILGUN_DOMAIN = 'maloveapp.com';
 const MAILGUN_EU_REGION = true;
 
 // Contenido del informe

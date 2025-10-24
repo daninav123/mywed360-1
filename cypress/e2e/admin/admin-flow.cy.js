@@ -13,7 +13,7 @@ describe('Admin - Login', () => {
 
   it('permite iniciar sesión con credenciales válidas y MFA opcional', () => {
     cy.visit('/admin/login');
-    cy.get('[data-testid="admin-login-email"]').type('admin@lovenda.com');
+    cy.get('[data-testid="admin-login-email"]').type('admin@maloveapp.com');
     cy.get('[data-testid="admin-login-password"]').type('AdminPass123!');
     cy.get('[data-testid="admin-login-submit"]').click();
     cy.get('[data-testid="admin-mfa-input"]').type('123456');
@@ -24,7 +24,7 @@ describe('Admin - Login', () => {
 
   it('muestra error cuando las credenciales son incorrectas', () => {
     cy.visit('/admin/login');
-    cy.get('[data-testid="admin-login-email"]').type('admin@lovenda.com');
+    cy.get('[data-testid="admin-login-email"]').type('admin@maloveapp.com');
     cy.get('[data-testid="admin-login-password"]').type('bad-password');
     cy.get('[data-testid="admin-login-submit"]').click();
     cy.get('[data-testid="admin-login-error"]').should('contain', 'Email o contraseña no válidos');
@@ -32,7 +32,7 @@ describe('Admin - Login', () => {
 
   it('bloquea el acceso a usuarios sin rol admin', () => {
     cy.visit('/admin/login');
-    cy.get('[data-testid="admin-login-email"]').type('owner@lovenda.com');
+    cy.get('[data-testid="admin-login-email"]').type('owner@maloveapp.com');
     cy.get('[data-testid="admin-login-password"]').type('OwnerPass123!');
     cy.get('[data-testid="admin-login-submit"]').click();
     cy.get('[data-testid="admin-login-error"]').should('contain', 'Tu cuenta no dispone de acceso administrador');
@@ -41,7 +41,7 @@ describe('Admin - Login', () => {
   it('limita los intentos de login y muestra el mensaje de bloqueo', () => {
     cy.visit('/admin/login');
     for (let i = 0; i < 5; i += 1) {
-      cy.get('[data-testid="admin-login-email"]').clear().type('admin@lovenda.com');
+      cy.get('[data-testid="admin-login-email"]').clear().type('admin@maloveapp.com');
       cy.get('[data-testid="admin-login-password"]').clear().type(`WrongPass${i}!`);
       cy.get('[data-testid="admin-login-submit"]').click();
     }
@@ -83,6 +83,112 @@ describe('Admin - Dashboard', () => {
   });
 });
 
+describe('Admin - Dashboard metric cards', () => {
+  it('muestra las nuevas tarjetas de métricas con valores formateados', () => {
+    const overviewResponse = {
+      kpis: [],
+      services: [],
+      alerts: [],
+      newTasks: [],
+      meta: { generatedAt: '2025-10-10T12:00:00.000Z' },
+    };
+
+    const metricsResponse = {
+      series: [{ date: '2025-10-10', newUsers: 120, newWeddings: 45 }],
+      funnel: [],
+      iaCosts: [],
+      communications: [],
+      supportMetrics: null,
+      userStats: {
+        total: 1200,
+        active7d: 300,
+        active30d: 900,
+        dau: 0,
+        mau: 0,
+        stickiness: 0,
+        byRole: { owner: 600, planner: 400, assistant: 200 },
+        source: 'realtime',
+      },
+      weddingStats: {
+        total: 500,
+        active: 320,
+        withPlanner: 250,
+        withoutPlanner: 250,
+        completionRate: 64,
+        source: 'realtime',
+      },
+      conversionMetrics: {},
+      recurringRevenue: {},
+      retentionData: {},
+      storage: {
+        totalGigabytes: 256.75,
+        premiumAverageGigabytes: 12.5,
+        premiumCount: 42,
+        source: 'firestore',
+      },
+      downloads: {
+        total: 12345,
+        last30d: 321,
+        source: 'analyticsAppDownloads',
+      },
+      traffic: {
+        totalVisits: 98765,
+        newVisits: 432,
+        since: '2025-10-10T00:00:00.000Z',
+        source: 'analyticsWebVisits',
+      },
+      userGrowth: {
+        newUsers: 120,
+        newPremiumUsers: 42,
+        newPremiumShare: 0.35,
+        totalUsers: 1200,
+        since: '2025-10-10T00:00:00.000Z',
+        source: 'firestore',
+      },
+      meta: { end: '2025-10-10T18:00:00.000Z' },
+    };
+
+    cy.intercept('GET', '/api/admin/dashboard/overview', overviewResponse).as('adminOverview');
+    cy.intercept('GET', '/api/admin/dashboard/metrics', metricsResponse).as('adminMetrics');
+
+    cy.loginAsAdmin();
+    cy.visit('/admin/dashboard');
+
+    cy.wait('@adminOverview');
+    cy.wait('@adminMetrics');
+
+    cy.get('[data-testid="admin-metrics-storage-card"]').within(() => {
+      cy.contains('Fuente: Firestore');
+      cy.get('[data-testid="admin-metrics-storage-total"]').should('contain', '256,75 GB');
+      cy.get('[data-testid="admin-metrics-storage-premium-avg"]').should('contain', '12,5 GB');
+      cy.get('[data-testid="admin-metrics-storage-premium-count"]').should('contain', '42');
+    });
+
+    cy.get('[data-testid="admin-metrics-downloads-card"]').within(() => {
+      cy.contains('Fuente: analyticsAppDownloads');
+      cy.get('[data-testid="admin-metrics-downloads-total"]').should('contain', '12.345');
+      cy.get('[data-testid="admin-metrics-downloads-30d"]').should('contain', '321');
+    });
+
+    cy.get('[data-testid="admin-metrics-traffic-card"]').within(() => {
+      cy.contains('Fuente: analyticsWebVisits');
+      cy.get('[data-testid="admin-metrics-traffic-total"]').should('contain', '98.765');
+      cy.get('[data-testid="admin-metrics-traffic-new"]').should('contain', '432');
+      cy.get('[data-testid="admin-metrics-traffic-ratio"]').should('contain', '360.0%');
+      cy.get('[data-testid="admin-metrics-traffic-since"]').should('contain', '10/10/2025');
+    });
+
+    cy.get('[data-testid="admin-metrics-usergrowth-card"]').within(() => {
+      cy.contains('Fuente: Firestore');
+      cy.get('[data-testid="admin-metrics-usergrowth-new"]').should('contain', '120');
+      cy.get('[data-testid="admin-metrics-usergrowth-premium"]').should('contain', '42');
+      cy.get('[data-testid="admin-metrics-usergrowth-share"]').should('contain', '35.0%');
+      cy.get('[data-testid="admin-metrics-usergrowth-total"]').should('contain', '1.200');
+      cy.get('[data-testid="admin-metrics-usergrowth-since"]').should('contain', '10/10/2025');
+    });
+  });
+});
+
 describe('Admin - Métricas y reportes', () => {
   beforeEach(() => {
     cy.loginAsAdmin();
@@ -107,7 +213,7 @@ describe('Admin - Métricas y reportes', () => {
     cy.visit('/admin/reports');
     cy.get('[data-testid="admin-report-generate"]').click();
     cy.get('[data-testid="admin-report-template"]').select('Métricas globales');
-    cy.get('[data-testid="admin-report-recipients"]').type('direccion@lovenda.com');
+    cy.get('[data-testid="admin-report-recipients"]').type('direccion@maloveapp.com');
     cy.get('[data-testid="admin-report-submit"]').click();
   });
 });

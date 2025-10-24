@@ -188,7 +188,7 @@ function parseFlowDoc(filePath) {
 
 function generateMarkdown(modules) {
   const lines = [];
-  lines.push('# Roadmap - Lovenda/MyWed360');
+  lines.push('# Roadmap - Lovenda/MaLoveApp');
   lines.push('');
   lines.push('> Documento canonico que integra backlog, plan de sprints y estado por flujo. Actualiza esta fuente unica cuando haya cambios para evitar divergencias.');
   lines.push('>');

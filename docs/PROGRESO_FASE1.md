@@ -1,4 +1,4 @@
-# Progreso Fase 1: Estabilización - MyWed360
+# Progreso Fase 1: Estabilización - MaLoveApp
 
 **Fecha inicio:** 21 de Octubre 2025, 5:45 PM  
 **Última actualización:** 21 de Octubre 2025, 6:00 PM  

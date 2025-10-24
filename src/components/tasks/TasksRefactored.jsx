@@ -41,7 +41,7 @@ import { migrateFlatSubtasksToNested, fixParentBlockDates } from '../../services
 import { seedWeddingTasksFromTemplate } from '../../services/taskTemplateSeeder';
 
 const GANTT_UNASSIGNED = '__gantt_unassigned__';
-const GANTT_ZOOM_STORAGE_KEY = 'mywed360_gantt_zoom';
+const GANTT_ZOOM_STORAGE_KEY = 'maloveapp_gantt_zoom';
 const GANTT_ZOOM_MIN = 0.001;
 const GANTT_ZOOM_MAX = 2.4;
 const GANTT_ZOOM_STEP = 0.05;
@@ -232,9 +232,9 @@ export default function TasksRefactored() {
       const qs = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
       const q = qs ? qs.get('debug') || qs.get('ganttDebug') || qs.get('debugGantt') : '';
       const ls1 =
-        typeof localStorage !== 'undefined' ? localStorage.getItem('mywed360_gantt_debug') : null;
+        typeof localStorage !== 'undefined' ? localStorage.getItem('maloveapp_gantt_debug') : null;
       const ls2 =
-        typeof localStorage !== 'undefined' ? localStorage.getItem('mywed360_debug') : null;
+        typeof localStorage !== 'undefined' ? localStorage.getItem('maloveapp_debug') : null;
       return [q, ls1, ls2].some((v) => v && /^1|true$/i.test(String(v)));
     } catch {
       return false;

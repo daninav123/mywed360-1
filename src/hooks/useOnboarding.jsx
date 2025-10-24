@@ -12,7 +12,7 @@ export const useOnboarding = () => {
   const { weddings, activeWedding, weddingsReady } = useWedding();
 
   const marketingView =
-    typeof window !== 'undefined' && window.__LOVENDA_MARKETING_VIEW__ === true;
+    typeof window !== 'undefined' && window.__MALOVEAPP_MARKETING_VIEW__ === true;
   const ownerLike = hasRole ? hasRole('owner', 'pareja', 'admin') : false;
   const rawForceFlag =
     typeof window !== 'undefined' ? localStorage.getItem('forceOnboarding') === '1' : false;

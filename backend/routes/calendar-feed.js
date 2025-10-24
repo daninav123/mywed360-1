@@ -57,7 +57,7 @@ function icsEscape(str = '') {
 }
 
 // Construir ICS a partir de eventos [{ id, title, desc, start, end, location }]
-function buildICS({ events = [], prodId = '-//MyWed360//Calendar Feed//ES', calName = 'MyWed360' }) {
+function buildICS({ events = [], prodId = '-//MaLoveApp//Calendar Feed//ES', calName = 'MaLoveApp' }) {
   const lines = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',

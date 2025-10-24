@@ -42,7 +42,7 @@ const ImageGeneratorAI = ({
   useEffect(() => {
     (async () => {
       try {
-        const savedImages = await loadData(`mywed360_ai_images_${category}`, {
+        const savedImages = await loadData(`maloveapp_ai_images_${category}`, {
           defaultValue: [],
           collection: 'userDesigns',
         });
@@ -174,7 +174,7 @@ const ImageGeneratorAI = ({
     const updatedImages = [newImage, ...generatedImages];
     setGeneratedImages(updatedImages);
     // persistir
-    saveData(`mywed360_ai_images_${category}`, updatedImages, {
+    saveData(`maloveapp_ai_images_${category}`, updatedImages, {
       collection: 'userDesigns',
       showNotification: false,
     });

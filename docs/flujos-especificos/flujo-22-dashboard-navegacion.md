@@ -87,7 +87,7 @@
 - **Datos que consume**:
   - `getGamificationSummary({ uid, weddingId })` → devuelve puntos acumulados; se normalizan dividiendo entre `PROGRESS_COMPLETION_TARGET = 2500` para obtener porcentaje (`clampPercent`).
   - Fecha objetivo de la boda (`weddingDate`, `date`, `eventDate` o `ceremonyDate`) y punto de inicio (`planningStart`, `planningStartDate`, `projectStart`, `onboardingCompletedAt`). Si no hay fechas válidas se usa `eventDate - 365 días` como inicio.
-- **Persistencia**: el porcentaje calculado se guarda en `localStorage.mywed360_progress` como fallback cuando no hay conexión (el texto “No pudimos sincronizar el avance” usa este valor).
+- **Persistencia**: el porcentaje calculado se guarda en `localStorage.maloveapp_progress` como fallback cuando no hay conexión (el texto “No pudimos sincronizar el avance” usa este valor).
 - **Estados visuales**:
   - `success`: percent ≥ 100 o >5 puntos por encima del progreso esperado.
   - `warning`: dentro del rango ±5 del progreso esperado.

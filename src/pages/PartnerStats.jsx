@@ -350,7 +350,7 @@ const PartnerStats = () => {
 
         {/* Footer */}
         <div className="mt-8 text-center text-sm text-gray-600">
-          <p>MyWed360 - Panel de Estadísticas para Partners</p>
+          <p>MaLoveApp - Panel de Estadísticas para Partners - MaLoveApp - MaLoveApp</p>
           <p className="mt-1">Este enlace es privado, no lo compartas con terceros</p>
         </div>
       </div>

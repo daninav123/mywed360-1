@@ -37,6 +37,31 @@ const SEVERITY_COLOR = {
   low: 'default',
 };
 
+const formatGigabytes = (value) =>
+  Number.isFinite(value) ? `${value.toLocaleString('es-ES', { maximumFractionDigits: 2 })} GB` : '0 GB';
+
+const formatPercent = (value, fractionDigits = 1) =>
+  Number.isFinite(value) ? `${value.toFixed(fractionDigits)}%` : '0%';
+
+const formatInteger = (value) =>
+  Number.isFinite(value) ? value.toLocaleString('es-ES') : '0';
+
+const formatSourceLabel = (value) => {
+  if (!value) return 'sin datos';
+  const normalized = String(value).toLowerCase();
+  if (normalized === 'fallback') return 'estimado';
+  if (normalized === 'firestore') return 'Firestore';
+  if (normalized === 'realtime') return 'tiempo real';
+  return value;
+};
+
+const formatSinceDate = (value) => {
+  if (!value) return 'sin datos';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return 'sin datos';
+  return date.toLocaleDateString('es-ES');
+};
+
 const AdminDashboard = () => {
   const { currentUser } = useAuth();
   const [overview, setOverview] = useState(null);
@@ -51,6 +76,31 @@ const AdminDashboard = () => {
     iaCosts: [],
     communications: [],
     supportMetrics: null,
+    storage: {
+      totalGigabytes: 0,
+      premiumAverageGigabytes: 0,
+      premiumCount: 0,
+      source: 'fallback',
+    },
+    downloads: {
+      total: 0,
+      last30d: 0,
+      source: 'fallback',
+    },
+    traffic: {
+      totalVisits: 0,
+      newVisits: 0,
+      since: null,
+      source: 'fallback',
+    },
+    userGrowth: {
+      newUsers: 0,
+      newPremiumUsers: 0,
+      newPremiumShare: 0,
+      totalUsers: 0,
+      since: null,
+      source: 'fallback',
+    },
     meta: null,
     error: null,
   });
@@ -188,6 +238,40 @@ const AdminDashboard = () => {
   };
 
   const supportMetrics = metricsSummary?.supportMetrics;
+  const storageMetrics = metricsSummary?.storage || {
+    totalGigabytes: 0,
+    premiumAverageGigabytes: 0,
+    premiumCount: 0,
+    source: 'fallback',
+  };
+  const downloadMetrics = metricsSummary?.downloads || {
+    total: 0,
+    last30d: 0,
+    source: 'fallback',
+  };
+  const trafficMetrics = metricsSummary?.traffic || {
+    totalVisits: 0,
+    newVisits: 0,
+    since: null,
+    source: 'fallback',
+  };
+  const userGrowthMetrics = metricsSummary?.userGrowth || {
+    newUsers: 0,
+    newPremiumUsers: 0,
+    newPremiumShare: 0,
+    totalUsers: 0,
+    since: null,
+    source: 'fallback',
+  };
+  const visitsToUsersRatio =
+    userGrowthMetrics.newUsers > 0
+      ? (trafficMetrics.newVisits / userGrowthMetrics.newUsers) * 100
+      : 0;
+  const premiumSharePercent = userGrowthMetrics.newPremiumShare
+    ? userGrowthMetrics.newPremiumShare * 100
+    : userGrowthMetrics.newUsers > 0
+    ? (userGrowthMetrics.newPremiumUsers / userGrowthMetrics.newUsers) * 100
+    : 0;
 
   return (
     <div className="p-6 space-y-6">
@@ -449,6 +533,158 @@ const AdminDashboard = () => {
           </Box>
         </CardContent>
       </Card>
+
+      <Grid container spacing={3}>
+        <Grid size={{ xs: 12, md: 6, xl: 3 }}>
+          <Card className="h-full" data-testid="admin-metrics-storage-card">
+            <CardHeader title="Uso de almacenamiento" subheader={`Fuente: ${formatSourceLabel(storageMetrics.source)}`} />
+            <CardContent>
+              <Box className="grid grid-cols-2 gap-3">
+                <Box>
+                  <Typography variant="overline" display="block" color="textSecondary">
+                    Total Firebase
+                  </Typography>
+                  <Typography variant="h6" data-testid="admin-metrics-storage-total">
+                    {formatGigabytes(storageMetrics.totalGigabytes)}
+                  </Typography>
+                </Box>
+                <Box>
+                  <Typography variant="overline" display="block" color="textSecondary">
+                    Promedio premium
+                  </Typography>
+                  <Typography variant="h6" data-testid="admin-metrics-storage-premium-avg">
+                    {formatGigabytes(storageMetrics.premiumAverageGigabytes)}
+                  </Typography>
+                </Box>
+                <Box>
+                  <Typography variant="overline" display="block" color="textSecondary">
+                    Bodas premium
+                  </Typography>
+                  <Typography variant="h6" data-testid="admin-metrics-storage-premium-count">
+                    {formatInteger(storageMetrics.premiumCount)}
+                  </Typography>
+                </Box>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid size={{ xs: 12, md: 6, xl: 3 }}>
+          <Card className="h-full" data-testid="admin-metrics-downloads-card">
+            <CardHeader title="Descargas" subheader={`Fuente: ${formatSourceLabel(downloadMetrics.source)}`} />
+            <CardContent>
+              <Box className="space-y-3">
+                <Box>
+                  <Typography variant="overline" display="block" color="textSecondary">
+                    Totales acumuladas
+                  </Typography>
+                  <Typography variant="h6" data-testid="admin-metrics-downloads-total">
+                    {formatInteger(downloadMetrics.total)}
+                  </Typography>
+                </Box>
+                <Box>
+                  <Typography variant="overline" display="block" color="textSecondary">
+                    Ultimos 30 dias
+                  </Typography>
+                  <Typography variant="h6" data-testid="admin-metrics-downloads-30d">
+                    {formatInteger(downloadMetrics.last30d)}
+                  </Typography>
+                </Box>
+                <Typography variant="caption" color="textSecondary">
+                  Actualizado con eventos de descarga
+                </Typography>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid size={{ xs: 12, md: 6, xl: 3 }}>
+          <Card className="h-full" data-testid="admin-metrics-traffic-card">
+            <CardHeader title="Trafico web" subheader={`Fuente: ${formatSourceLabel(trafficMetrics.source)}`} />
+            <CardContent>
+              <Box className="space-y-3">
+                <Box>
+                  <Typography variant="overline" display="block" color="textSecondary">
+                    Visitas totales
+                  </Typography>
+                  <Typography variant="h6" data-testid="admin-metrics-traffic-total">
+                    {formatInteger(trafficMetrics.totalVisits)}
+                  </Typography>
+                </Box>
+                <Box>
+                  <Typography variant="overline" display="block" color="textSecondary">
+                    Visitas nuevas 30 dias
+                  </Typography>
+                  <Typography variant="h6" data-testid="admin-metrics-traffic-new">
+                    {formatInteger(trafficMetrics.newVisits)}
+                  </Typography>
+                </Box>
+                <Box>
+                  <Typography variant="overline" display="block" color="textSecondary">
+                    Visitas vs nuevos usuarios
+                  </Typography>
+                  <Typography variant="h6" data-testid="admin-metrics-traffic-ratio">
+                    {formatPercent(visitsToUsersRatio)}
+                  </Typography>
+                </Box>
+                <Typography variant="caption" color="textSecondary" data-testid="admin-metrics-traffic-since">
+                  Periodo desde {formatSinceDate(trafficMetrics.since)}
+                </Typography>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid size={{ xs: 12, md: 6, xl: 3 }}>
+          <Card className="h-full" data-testid="admin-metrics-usergrowth-card">
+            <CardHeader title="Crecimiento usuarios" subheader={`Fuente: ${formatSourceLabel(userGrowthMetrics.source)}`} />
+            <CardContent>
+              <Box className="grid grid-cols-2 gap-3">
+                <Box>
+                  <Typography variant="overline" display="block" color="textSecondary">
+                    Nuevos 30 dias
+                  </Typography>
+                  <Typography variant="h6" data-testid="admin-metrics-usergrowth-new">
+                    {formatInteger(userGrowthMetrics.newUsers)}
+                  </Typography>
+                </Box>
+                <Box>
+                  <Typography variant="overline" display="block" color="textSecondary">
+                    Premium 30 dias
+                  </Typography>
+                  <Typography variant="h6" data-testid="admin-metrics-usergrowth-premium">
+                    {formatInteger(userGrowthMetrics.newPremiumUsers)}
+                  </Typography>
+                </Box>
+                <Box>
+                  <Typography variant="overline" display="block" color="textSecondary">
+                    Proporcion premium
+                  </Typography>
+                  <Typography variant="h6" data-testid="admin-metrics-usergrowth-share">
+                    {formatPercent(premiumSharePercent)}
+                  </Typography>
+                </Box>
+                <Box>
+                  <Typography variant="overline" display="block" color="textSecondary">
+                    Usuarios totales
+                  </Typography>
+                  <Typography variant="h6" data-testid="admin-metrics-usergrowth-total">
+                    {formatInteger(userGrowthMetrics.totalUsers)}
+                  </Typography>
+                </Box>
+              </Box>
+              <Typography
+                variant="caption"
+                color="textSecondary"
+                className="block mt-2"
+                data-testid="admin-metrics-usergrowth-since"
+              >
+                Periodo desde {formatSinceDate(userGrowthMetrics.since)}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
 
       <Grid container spacing={3}>
         <Grid size={{ xs: 12, md: 6 }}>

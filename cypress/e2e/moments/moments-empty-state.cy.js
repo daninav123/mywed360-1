@@ -9,10 +9,10 @@ describe('Momentos - estados iniciales', () => {
   it('muestra aviso cuando no hay boda activa', () => {
     cy.window().then((win) => {
       const state = { users: { 'cypress-test': { weddings: [], activeWeddingId: '' } } };
-      win.localStorage.setItem('lovenda_local_weddings', JSON.stringify(state));
-      win.dispatchEvent(new CustomEvent('lovenda:local-weddings-updated'));
-      win.localStorage.removeItem('mywed360_active_wedding');
-      win.localStorage.removeItem('lovenda_active_wedding');
+      win.localStorage.setItem('maloveapp_local_weddings', JSON.stringify(state));
+      win.dispatchEvent(new CustomEvent('maloveapp:local-weddings-updated'));
+      win.localStorage.removeItem('maloveapp_active_wedding');
+      win.localStorage.removeItem('maloveapp_active_wedding');
     });
     cy.visit('/momentos');
     cy.closeDiagnostic();

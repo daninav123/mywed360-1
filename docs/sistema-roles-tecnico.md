@@ -1,4 +1,4 @@
-# Sistema de Roles Técnico - MyWed360
+# Sistema de Roles Técnico - MaLoveApp
 
 ## 🎯 Definición de Roles
 
@@ -518,4 +518,4 @@ const InviteAssistant = () => {
 };
 ```
 
-Este sistema de roles técnico garantiza la seguridad, escalabilidad y usabilidad del sistema MyWed360 según los diferentes tipos de usuarios y sus necesidades específicas.
+Este sistema de roles técnico garantiza la seguridad, escalabilidad y usabilidad del sistema MaLoveApp según los diferentes tipos de usuarios y sus necesidades específicas.

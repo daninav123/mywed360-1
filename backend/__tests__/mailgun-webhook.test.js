@@ -47,8 +47,8 @@ describe('Mailgun Webhook', () => {
     const payload = {
       'event-data': {
         event: 'delivered',
-        recipient: 'user@mywed360.com',
-        message: { headers: { 'message-id': '<abc@mywed360.com>' } },
+        recipient: 'user@maloveapp.com',
+        message: { headers: { 'message-id': '<abc@maloveapp.com>' } },
         timestamp: Math.floor(Date.now() / 1000)
       }
     };

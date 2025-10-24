@@ -11,7 +11,7 @@
 
 ### HTTP Overview / Errors & Latency
 - Ya incluidos: `http-overview.json` y `errors-latency.json`.
-# Monitorización MyWed360
+# Monitorización MaLoveApp
 
 Esta guía te permite desplegar Prometheus + Grafana + Alertmanager para monitorizar el backend (Express) y opcionalmente comprobar `/health` del frontend/backend con blackbox_exporter.
 

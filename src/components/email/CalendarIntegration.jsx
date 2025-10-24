@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 
 import Button from '../Button';
 import Card from '../ui/Card';
+import useTranslations from '../../hooks/useTranslations';
 
 /**
  * Componente para extraer información de eventos y fechas desde emails y crear eventos en el calendario
@@ -14,6 +15,10 @@ import Card from '../ui/Card';
  * @returns {React.ReactElement} Formulario de integración con calendario
  */
 const CalendarIntegration = ({ email, onClose, onSave }) => {
+  const { t, tVars } = useTranslations();
+  const tEmail = (key, options = {}) => t(`email.${key}`, { ns: 'email', ...options });
+  const tEmailVars = (key, variables = {}) =>
+    tVars(`email.${key}`, { ns: 'email', ...variables });
   const [eventData, setEventData] = useState({
     title: '',
     date: '',
@@ -31,7 +36,7 @@ const CalendarIntegration = ({ email, onClose, onSave }) => {
 
   useEffect(() => {
     if (!email) {
-      setError('No hay email para analizar');
+      setError(tEmail('calendarIntegration.errors.noEmail'));
       setLoading(false);
       return;
     }
@@ -121,15 +126,13 @@ const CalendarIntegration = ({ email, onClose, onSave }) => {
       }
 
       // Extraer posibles ubicaciones
-      const locationKeywords = [
-        'en',
-        'ubicado en',
-        'ubicada en',
-        'dirección',
-        'lugar',
-        'local',
-        'ubicación',
-      ];
+      const locationKeywordList = tEmail('calendarIntegration.detection.locationKeywords', {
+        returnObjects: true,
+      });
+      const locationKeywords =
+        Array.isArray(locationKeywordList) && locationKeywordList.length > 0
+          ? locationKeywordList
+          : ['at', 'located at', 'address', 'venue', 'location'];
       const locationRegex = new RegExp(
         `(${locationKeywords.join('|')})\\s+([^.,;:\\n]{5,50})`,
         'gi'
@@ -163,12 +166,34 @@ const CalendarIntegration = ({ email, onClose, onSave }) => {
       }
 
       // Verificar si el email está relacionado con un proveedor
-      const isProviderRelated =
-        email.to?.includes('proveedor') ||
-        email.from?.includes('proveedor') ||
-        bodyText.toLowerCase().includes('proveedor') ||
-        bodyText.toLowerCase().includes('servicio') ||
-        bodyText.toLowerCase().includes('contratación');
+      const providerKeywordList = tEmail('calendarIntegration.detection.providerKeywords', {
+        returnObjects: true,
+      });
+      const providerKeywords =
+        Array.isArray(providerKeywordList) && providerKeywordList.length > 0
+          ? providerKeywordList
+          : ['vendor', 'service', 'booking'];
+
+      const normalizeField = (value) => {
+        if (!value) return '';
+        if (Array.isArray(value)) {
+          return value.join(' ').toLowerCase();
+        }
+        return String(value).toLowerCase();
+      };
+
+      const toField = normalizeField(email.to);
+      const fromField = normalizeField(email.from);
+      const bodyLower = bodyText.toLowerCase();
+
+      const isProviderRelated = providerKeywords.some((keyword) => {
+        const normalized = String(keyword).toLowerCase();
+        return (
+          toField.includes(normalized) ||
+          fromField.includes(normalized) ||
+          bodyLower.includes(normalized)
+        );
+      });
 
       // Compilar toda la información extraída
       const allExtracted = [
@@ -186,14 +211,16 @@ const CalendarIntegration = ({ email, onClose, onSave }) => {
         date: dates.length > 0 ? dates[0].value : '',
         time: times.length > 0 ? times[0].value : '12:00',
         location: locations.length > 0 ? locations[0].value : '',
-        description: `Evento creado a partir del email: "${email.subject || '(Sin asunto)'}"`,
+        description: tEmailVars('calendarIntegration.defaults.description', {
+          subject: email.subject || tEmail('calendarIntegration.defaults.noSubject'),
+        }),
         attendees: [...attendees],
         providerRelated: isProviderRelated,
         providerId: email.providerId || null,
       });
     } catch (err) {
-      console.error('Error al analizar email:', err);
-      setError('No se pudo analizar correctamente el contenido del email');
+      console.error('[CalendarIntegration] Failed to analyze email:', err);
+      setError(tEmail('calendarIntegration.errors.analyzeFailed'));
     } finally {
       setLoading(false);
     }
@@ -234,12 +261,12 @@ const CalendarIntegration = ({ email, onClose, onSave }) => {
   const handleSubmit = () => {
     // Validación básica
     if (!eventData.title) {
-      setError('El título del evento es obligatorio');
+      setError(tEmail('calendarIntegration.errors.missingTitle'));
       return;
     }
 
     if (!eventData.date) {
-      setError('Debes seleccionar una fecha para el evento');
+      setError(tEmail('calendarIntegration.errors.missingDate'));
       return;
     }
 
@@ -280,6 +307,13 @@ const CalendarIntegration = ({ email, onClose, onSave }) => {
     }
   };
 
+  const chipTitles = {
+    date: tEmail('calendarIntegration.tooltips.useDate'),
+    time: tEmail('calendarIntegration.tooltips.useTime'),
+    location: tEmail('calendarIntegration.tooltips.useLocation'),
+    attendee: tEmail('calendarIntegration.tooltips.useAttendee'),
+  };
+
   return (
     <div
       className="fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center p-4"
@@ -289,7 +323,7 @@ const CalendarIntegration = ({ email, onClose, onSave }) => {
         <div className="flex items-center justify-between border-b border-gray-200 p-4">
           <h2 className="text-xl font-bold flex items-center">
             <Calendar size={24} className="mr-2 text-blue-500" />
-            Añadir evento al calendario
+            {tEmail('calendarIntegration.header')}
           </h2>
           <Button variant="ghost" size="sm" onClick={onClose}>
             <X size={20} />
@@ -305,27 +339,23 @@ const CalendarIntegration = ({ email, onClose, onSave }) => {
           )}
 
           {loading ? (
-            <div className="text-center py-8">Analizando contenido del email...</div>
+            <div className="text-center py-8">
+              {tEmail('calendarIntegration.status.analyzing')}
+            </div>
           ) : (
             <>
               {extractedInfo.length > 0 && (
                 <div className="mb-4">
-                  <h3 className="font-medium mb-2">Información detectada en el email:</h3>
+                  <h3 className="font-medium mb-2">
+                    {tEmail('calendarIntegration.status.detectedInfo')}
+                  </h3>
                   <div className="flex flex-wrap gap-2">
                     {extractedInfo.map((item, index) => (
                       <span
                         key={index}
                         className="inline-flex items-center px-2.5 py-1 rounded-md text-sm bg-blue-50 border border-blue-200 cursor-pointer hover:bg-blue-100"
                         onClick={() => applyExtracted(item)}
-                        title={`Usar ${
-                          item.type === 'date'
-                            ? 'esta fecha'
-                            : item.type === 'time'
-                              ? 'esta hora'
-                              : item.type === 'location'
-                                ? 'esta ubicación'
-                                : 'este asistente'
-                        }`}
+                        title={chipTitles[item.type] || ''}
                       >
                         {item.type === 'date' && (
                           <Calendar size={14} className="mr-1 text-blue-600" />
@@ -347,7 +377,7 @@ const CalendarIntegration = ({ email, onClose, onSave }) => {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Título del evento:
+                    {tEmail('calendarIntegration.fields.title.label')}
                   </label>
                   <input
                     type="text"
@@ -355,13 +385,15 @@ const CalendarIntegration = ({ email, onClose, onSave }) => {
                     value={eventData.title}
                     onChange={handleChange}
                     className="w-full border border-gray-300 rounded-md p-2"
-                    placeholder="Título del evento"
+                    placeholder={tEmail('calendarIntegration.fields.title.placeholder')}
                   />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Fecha:</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {tEmail('calendarIntegration.fields.date.label')}
+                    </label>
                     <input
                       type="date"
                       name="date"
@@ -371,7 +403,9 @@ const CalendarIntegration = ({ email, onClose, onSave }) => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Hora:</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {tEmail('calendarIntegration.fields.time.label')}
+                    </label>
                     <input
                       type="time"
                       name="time"
@@ -383,20 +417,22 @@ const CalendarIntegration = ({ email, onClose, onSave }) => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Ubicación:</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {tEmail('calendarIntegration.fields.location.label')}
+                  </label>
                   <input
                     type="text"
                     name="location"
                     value={eventData.location}
                     onChange={handleChange}
                     className="w-full border border-gray-300 rounded-md p-2"
-                    placeholder="Ubicación del evento"
+                    placeholder={tEmail('calendarIntegration.fields.location.placeholder')}
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Descripción:
+                    {tEmail('calendarIntegration.fields.description.label')}
                   </label>
                   <textarea
                     name="description"
@@ -404,13 +440,13 @@ const CalendarIntegration = ({ email, onClose, onSave }) => {
                     onChange={handleChange}
                     className="w-full border border-gray-300 rounded-md p-2"
                     rows="3"
-                    placeholder="Descripción del evento"
+                    placeholder={tEmail('calendarIntegration.fields.description.placeholder')}
                   ></textarea>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Asistentes:
+                    {tEmail('calendarIntegration.attendees.label')}
                   </label>
 
                   {eventData.attendees.map((attendee, index) => (
@@ -420,7 +456,7 @@ const CalendarIntegration = ({ email, onClose, onSave }) => {
                         value={attendee}
                         onChange={(e) => handleAttendeeChange(index, e.target.value)}
                         className="flex-grow border border-gray-300 rounded-md p-2"
-                        placeholder="Nombre del asistente"
+                        placeholder={tEmail('calendarIntegration.attendees.placeholder')}
                       />
                       <Button
                         variant="ghost"
@@ -434,7 +470,7 @@ const CalendarIntegration = ({ email, onClose, onSave }) => {
                   ))}
 
                   <Button variant="outline" size="sm" onClick={addAttendee} className="mt-1">
-                    Añadir asistente
+                    {tEmail('calendarIntegration.buttons.addAttendee')}
                   </Button>
                 </div>
 
@@ -453,7 +489,7 @@ const CalendarIntegration = ({ email, onClose, onSave }) => {
                     className="mr-2"
                   />
                   <label htmlFor="providerRelated" className="text-sm text-gray-700">
-                    Este evento está relacionado con un proveedor
+                    {tEmail('calendarIntegration.checkbox.providerRelated')}
                   </label>
                 </div>
               </div>
@@ -464,16 +500,16 @@ const CalendarIntegration = ({ email, onClose, onSave }) => {
         <div className="border-t border-gray-200 p-4 flex justify-end">
           <div className="flex space-x-3">
             <Button variant="outline" onClick={onClose} disabled={loading}>
-              Cancelar
+              {tEmail('calendarIntegration.buttons.cancel')}
             </Button>
-              <Button
-                onClick={handleSubmit}
-                disabled={loading}
-                className="flex items-center"
-                data-testid="calendar-save"
-              >
+            <Button
+              onClick={handleSubmit}
+              disabled={loading}
+              className="flex items-center"
+              data-testid="calendar-save"
+            >
               <Check size={18} className="mr-1" />
-              Guardar evento
+              {tEmail('calendarIntegration.buttons.save')}
             </Button>
           </div>
         </div>

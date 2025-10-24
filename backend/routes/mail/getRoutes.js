@@ -156,7 +156,7 @@ function resolveTargetUser(req, requestedUser) {
     if (!myAlias && myLogin) {
       try {
         const prefix = myLogin.split('@')[0]?.slice(0, 4);
-        if (prefix) myAlias = sanitizeEmail(`${prefix}@mywed360.com`);
+        if (prefix) myAlias = sanitizeEmail(`${prefix}@maloveapp.com`);
       } catch (_) {}
     }
 

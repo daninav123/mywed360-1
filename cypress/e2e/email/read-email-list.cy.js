@@ -1,6 +1,6 @@
 describe('Listado de correos en bandeja de entrada', () => {
   const testUser = {
-    email: 'usuario.test@lovenda.com',
+    email: 'usuario.test@maloveapp.com',
     password: 'contraseña123',
   };
 

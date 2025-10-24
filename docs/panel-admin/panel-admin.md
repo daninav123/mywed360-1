@@ -5,7 +5,7 @@ Este documento describe el panel de administración que ya está implementado en
 ## 1. Acceso y marco común
 
 ### 1.1 Autenticación (`src/pages/admin/AdminLogin.jsx`)
-- Formulario con email y contraseña (placeholders `admin@lovenda.com` / vacío). Bloquea envíos si hay intentos en curso.
+- Formulario con email y contraseña (placeholders `admin@maloveapp.com` / vacío). Bloquea envíos si hay intentos en curso.
 - MFA opcional: si `useAuth.loginAdmin` devuelve un `pendingAdminSession`, se muestra un segundo paso con contador de caducidad (6 dígitos, 60 s por defecto).
 - Gestión de bloqueo temporal (`lockedUntil`): muestra cuenta atrás y evita nuevos intentos hasta que expire.
 - Botón de ayuda abre modal con email/teléfono de soporte (`VITE_ADMIN_SUPPORT_EMAIL`, `VITE_ADMIN_SUPPORT_PHONE`).

@@ -59,15 +59,15 @@ describe('Flujo 2 - CTA multi-evento', () => {
         win.localStorage.clear();
         win.localStorage.setItem('userEmail', OWNER_EMAIL);
         win.localStorage.setItem('isLoggedIn', 'true');
-        win.localStorage.setItem('lovenda_user', JSON.stringify(mockUser));
-        win.localStorage.setItem('mywed360_user', JSON.stringify(mockUser));
-        win.localStorage.setItem('mywed360_login_email', OWNER_EMAIL);
-        win.localStorage.setItem('MyWed360_user_profile', JSON.stringify(ownerProfile));
-        win.localStorage.setItem('mywed360_active_wedding', 'w1');
-        win.localStorage.setItem('lovenda_active_wedding', 'w1');
-        win.localStorage.setItem('lovenda_stub_weddings_enabled', 'true');
-        win.localStorage.setItem('__lovenda_stub_weddings_store__', JSON.stringify(stubStore));
-        win.dispatchEvent(new CustomEvent('lovenda:stub-weddings-updated'));
+        win.localStorage.setItem('maloveapp_user', JSON.stringify(mockUser));
+        win.localStorage.setItem('maloveapp_user', JSON.stringify(mockUser));
+        win.localStorage.setItem('maloveapp_login_email', OWNER_EMAIL);
+        win.localStorage.setItem('MaLoveApp_user_profile', JSON.stringify(ownerProfile));
+        win.localStorage.setItem('maloveapp_active_wedding', 'w1');
+        win.localStorage.setItem('maloveapp_active_wedding', 'w1');
+        win.localStorage.setItem('maloveapp_stub_weddings_enabled', 'true');
+        win.localStorage.setItem('__maloveapp_stub_weddings_store__', JSON.stringify(stubStore));
+        win.dispatchEvent(new CustomEvent('maloveapp:stub-weddings-updated'));
       },
     });
 
