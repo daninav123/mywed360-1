@@ -54,12 +54,22 @@ Status: TODOS en "failed"
 
 #### **Tests y Calidad**
 ```bash
-# PASO 1: Desbloquear tests unitarios
-npm run test:unit -- src/__tests__/firestore.rules.seating.test.js
-npm run test:unit -- src/__tests__/firestore.rules.exhaustive.test.js
-npm run test:unit -- src/__tests__/firestore.rules.extended.test.js
+# PASO 1: Arreglar puerto emulador
+# PROBLEMA: firebase.json usa puerto 8288
+# scripts/test-with-emulator.js usa puerto 8080
+# SOLUCIÓN: Actualizar script a 8288 ✅ ARREGLADO
 
-# PASO 2: Ejecutar tests E2E bloqueados
+# PASO 2: Ejecutar tests con emulador
+npm run test:rules:emulator
+
+# O manual:
+# Terminal 1: npx firebase emulators:start --only firestore
+# Terminal 2: 
+#   $env:FIRESTORE_EMULATOR_HOST='localhost:8288'
+#   $env:FIRESTORE_RULES_TESTS='true'
+#   npm run test:unit -- src/__tests__/firestore.rules.seating.test.js
+
+# PASO 3: Ejecutar tests E2E bloqueados
 npm run cypress:run -- --spec "cypress/e2e/seating/*.cy.js"
 ```
 
@@ -234,8 +244,9 @@ npm run cypress:run -- --spec "cypress/e2e/seating/*.cy.js"
 ### Esta semana:
 1. ✅ **COMPLETADO HOY:** Arreglar 5 imports faltantes en Invitados.jsx
 2. ✅ **COMPLETADO HOY:** Corregir referencias i18n (services namespace)
-3. ❌ **PENDIENTE:** Arreglar 3 tests unitarios bloqueadores
-4. ❌ **PENDIENTE:** Ejecutar health check completo
+3. ✅ **COMPLETADO HOY:** Identificar problema tests unitarios (puerto emulador 8080→8288)
+4. 🔄 **EN PROGRESO:** Arreglar configuración emulador Firestore
+5. ❌ **PENDIENTE:** Ejecutar health check completo
 
 ### Próxima semana:
 1. Desbloquear 13+ tests E2E de Seating
