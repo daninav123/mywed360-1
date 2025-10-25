@@ -113,7 +113,7 @@ const EmailStats = ({
   if (error || !stats) {
     return (
       <div className="p-4 bg-red-50 text-red-700 rounded-md">
-        <p>{error || 'No hay estadísticas disponibles'}</p>
+        <p>{error || t('common.hay_estadisticas_disponibles')}</p>
         <Button variant="outline" className="mt-2" onClick={loadStats}>
           Reintentar
         </Button>
