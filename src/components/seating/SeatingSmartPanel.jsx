@@ -1,6 +1,9 @@
 import React from 'react';
+import { useTranslations } from '../../hooks/useTranslations';
 
 const clusterLabels = {
+  const { t } = useTranslations();
+
   vip: 'Invitados VIP',
   familia: 'Familia cercana',
   otros: 'Pendientes',
@@ -94,7 +97,7 @@ export default function SeatingSmartPanel({
                     item.severity
                   )}`}
                 >
-                  {item.severity === 'high' ? 'Crítico' : 'Atención'}
+                  {item.severity === 'high' ? {t('common.critico')} : {t('common.atencion')}}
                 </span>
               </header>
               <div className="mt-2 flex flex-wrap gap-2">

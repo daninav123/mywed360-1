@@ -7,11 +7,12 @@ import { useWedding } from '../../context/WeddingContext';
 import { db } from '../../firebaseConfig';
 import useSpecialMoments from '../../hooks/useSpecialMoments';
 import CeremonyTimeline from '../../components/protocolo/CeremonyTimeline';
+import { useTranslations } from '../../hooks/useTranslations';
 
 // Bloques por defecto para inicializar el Timing
 const DEFAULT_BLOCKS = [
   { id: 'ceremonia', name: 'Ceremonia' },
-  { id: 'coctel', name: 'Cóctel' },
+  { id: 'coctel', name: {t('common.coctel')} },
   { id: 'banquete', name: 'Banquete' },
   { id: 'disco', name: 'Disco' },
 ];
@@ -290,7 +291,7 @@ const Timing = () => {
                                 className="font-medium bg-transparent border-b border-dashed focus:outline-none"
                                 value={m.title || ''}
                                 onChange={(e) => updateMoment(key, m.id, { title: e.target.value })}
-                                placeholder="Título del momento"
+                                placeholder={t('common.titulo_del_momento')}
                               />
                             </div>
                             <div className="ml-6 mt-1 text-sm text-gray-600">

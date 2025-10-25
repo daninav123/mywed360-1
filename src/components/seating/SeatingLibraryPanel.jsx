@@ -18,8 +18,11 @@ import {
 } from 'lucide-react';
 import React from 'react';
 import { venueTemplates } from '../../data/venueTemplates';
+import { useTranslations } from '../../hooks/useTranslations';
 
-const Section = ({ title, icon: Icon, children }) => (
+const Section = ({
+  const { t } = useTranslations();
+ title, icon: Icon, children }) => (
   <div className="px-4 py-3 border-b">
     <div className="flex items-center gap-2 mb-2">
       {Icon && <Icon className="h-4 w-4 text-gray-600" />}
@@ -133,7 +136,7 @@ export default function SeatingLibraryPanel({
       </Section>
 
       {/* Capas / Preferencias del lienzo */}
-      <Section title="Capas y guías" icon={Layers}>
+      <Section title={t('common.capas_guias')} icon={Layers}>
         <div className="space-y-2">
           {isBanquet && (
             <button onClick={onToggleShowTables} className="flex items-center gap-2 px-2 py-1 text-xs rounded hover:bg-gray-100">
@@ -154,7 +157,7 @@ export default function SeatingLibraryPanel({
   </Section>
 
       {Array.isArray(areaSummary) && areaSummary.length > 0 && (
-        <Section title="Áreas dibujadas" icon={Shapes}>
+        <Section title={t('common.areas_dibujadas')} icon={Shapes}>
           <div className="space-y-2">
             {areaSummary.map((item) => (
               <div

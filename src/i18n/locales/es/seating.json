@@ -49,7 +49,7 @@
       "zoom": "Zoom",
       "export": "Exportar",
       "print": "Imprimir",
-      "settings": "Configuracin"
+      "settings": "Configuración"
     },
     "configureCeremony": "Configurar Ceremonia",
     "ceremony": {
@@ -63,7 +63,7 @@
       "lockVipSeats": "Bloquear asientos VIP hasta asignarlos manualmente",
       "notesPlaceholder": "Ej. Reservar para padrinos y padres",
       "totalSeats": "Total de sillas",
-      "saveConfiguration": "Guardar configuracin"
+      "saveConfiguration": "Guardar configuración"
     },
     "configureBanquet": "Configurar Banquete",
     "banquet": {
@@ -151,7 +151,7 @@
           "actions": {
             "reassign": "Reubicar {{guest}}",
             "fixPosition": "Ajustar mesa",
-            "generic": "Accin sugerida"
+            "generic": "Acción sugerida"
           }
         },
         "staff": {
@@ -160,7 +160,7 @@
           "memberFallback": "Miembro del staff",
           "assigned": "Asignado",
           "noTable": "Sin mesa",
-          "pending": "Pendiente de ubicacin",
+          "pending": "Pendiente de ubicación",
           "tableLabel": "Mesa: {{table}}"
         },
         "history": {
@@ -175,5 +175,6 @@
         }
       }
     }
-  }
+  },
+  "_note": "Translate from es/seating.json"
 }

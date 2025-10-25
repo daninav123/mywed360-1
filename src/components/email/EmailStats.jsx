@@ -18,6 +18,7 @@ import { getDailyStats } from '../../services/emailMetricsService';
 import { generateUserStats, getUserStats } from '../../services/statsService';
 import Button from '../ui/Button';
 import Card from '../ui/Card';
+import { useTranslations } from '../../hooks/useTranslations';
 
 // Registrar componentes de Chart.js
 ChartJS.register(
@@ -38,7 +39,9 @@ ChartJS.register(
  * @param {Object} props - Propiedades del componente
  * @param {string} props.userId - ID del usuario actual
  */
-const EmailStats = ({ userId }) => {
+const EmailStats = ({
+  const { t } = useTranslations();
+ userId }) => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -55,6 +58,20 @@ const EmailStats = ({ userId }) => {
     try {
       setLoading(true);
       setError(null);
+
+      if (typeof window !== 'undefined' && window.Cypress) {
+        const mockPayload = window.__EMAIL_STATS_MOCK__;
+        if (mockPayload?.stats) {
+          const mockStats = {
+            ...mockPayload.stats,
+            lastUpdated: mockPayload.stats.lastUpdated || new Date().toISOString(),
+          };
+          setStats(mockStats);
+          setDailyStats(Array.isArray(mockPayload.daily) ? mockPayload.daily : []);
+          setLoading(false);
+          return;
+        }
+      }
 
       // Intentar primero desde localStorage para rendimiento
       let userStats = getUserStats(userId);
@@ -74,7 +91,7 @@ const EmailStats = ({ userId }) => {
       setDailyStats(Array.isArray(daily) ? daily : []);
     } catch (error) {
       console.error('Error al cargar estadísticas:', error);
-      setError('No se pudieron cargar las estadísticas');
+      setError({t('common.pudieron_cargar_las_estadisticas')});
     } finally {
       setLoading(false);
     }
@@ -267,6 +284,7 @@ const EmailStats = ({ userId }) => {
       {/* Tarjetas de resumen */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-6">
         <StatCard
+          testId="email-stats-total"
           title="Correos"
           value={emailCounts.total}
           subtitle={`${emailCounts.unread} sin leer`}
@@ -275,14 +293,16 @@ const EmailStats = ({ userId }) => {
         />
 
         <StatCard
+          testId="email-stats-contacts"
           title="Contactos"
           value={contactAnalysis.totalContacts}
-          subtitle="Proveedores únicos"
+          subtitle={t('common.proveedores_unicos')}
           icon={<User />}
           color="bg-green-50 text-green-600"
         />
 
         <StatCard
+          testId="email-stats-response"
           title="Tasa de respuesta"
           value={`${Math.round(responseMetrics.responseRate * 100)}%`}
           subtitle={
@@ -295,6 +315,7 @@ const EmailStats = ({ userId }) => {
         />
 
         <StatCard
+          testId="email-stats-activity"
           title="Actividad"
           value={activityMetrics.today}
           subtitle={`${activityMetrics.thisWeek} esta semana`}
@@ -303,6 +324,7 @@ const EmailStats = ({ userId }) => {
         />
         {opens !== undefined && (
           <StatCard
+            testId="email-stats-opens"
             title="Aperturas"
             value={opens}
             subtitle="Total"
@@ -312,6 +334,7 @@ const EmailStats = ({ userId }) => {
         )}
         {clicks !== undefined && (
           <StatCard
+            testId="email-stats-clicks"
             title="Clics"
             value={clicks}
             subtitle="Total"
@@ -416,8 +439,8 @@ const EmailStats = ({ userId }) => {
 };
 
 // Componente de tarjeta de estadística
-const StatCard = ({ title, value, subtitle, icon, color }) => (
-  <Card className="p-4">
+const StatCard = ({ title, value, subtitle, icon, color, testId }) => (
+  <Card className="p-4" data-testid={testId}>
     <div className="flex items-start">
       <div className={`p-3 rounded-lg ${color}`}>{icon}</div>
       <div className="ml-3">

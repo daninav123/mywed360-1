@@ -14,6 +14,7 @@ import { formatDate } from '../../utils/formatUtils';
 import * as EmailService from '../../services/emailService';
 import EmailTemplateService from '../../services/EmailTemplateService';
 import { loadTrackingRecords } from '../../services/EmailTrackingService';
+import { useTranslations } from '../../hooks/useTranslations';
 
 /**
  * @typedef {import('../../hooks/useProveedores').Provider} Provider
@@ -34,6 +35,8 @@ import { loadTrackingRecords } from '../../services/EmailTrackingService';
  * @returns {React.ReactElement} Componente de tarjeta de proveedor
  */
 const ProveedorCard = ({
+  const { t } = useTranslations();
+
   provider,
   isSelected,
   onToggleSelect,
@@ -496,7 +499,7 @@ const ProveedorCard = ({
             {Number.isFinite(scoreValue) && (
               <span
                 className="px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 text-xs font-semibold whitespace-nowrap"
-                title="Puntuación IA consolidada"
+                title={t('common.puntuacion_consolidada')}
               >
                 Score {scoreValue}
               </span>

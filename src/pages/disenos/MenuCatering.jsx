@@ -3,38 +3,41 @@ import React, { useState } from 'react';
 import ImageGeneratorAI from '../../components/ImageGeneratorAI';
 import Card from '../../components/ui/Card';
 import { saveData, loadData } from '../../services/SyncService';
+import { useTranslations } from '../../hooks/useTranslations';
 
 // Plantillas predefinidas para menús especiales de catering
 const cateringTemplates = [
   {
-    name: 'Menú Vegetariano',
-    description: 'Diseño elegante para menús vegetarianos',
+  const { t } = useTranslations();
+
+    name: {t('common.menu_vegetariano')},
+    description: {t('common.diseno_elegante_para_menus_vegetarianos')},
     prompt:
-      'Diseña una tarjeta de menú vegetariano para boda. Utiliza un diseño elegante con elementos vegetales sutiles como hojas o hierbas. Incluye el título "Menú Vegetariano" y espacio para listar entrantes, plato principal y postre. El diseño debe ser sofisticado y a juego con la decoración general de la boda, pero claramente identificable como opción vegetariana. Usa colores que evoquen frescura y naturaleza.',
+      {t('common.disena_una_tarjeta_menu_vegetariano')},
   },
   {
-    name: 'Menú Infantil',
-    description: 'Diseño divertido pero elegante para el menú de niños',
+    name: {t('common.menu_infantil')},
+    description: {t('common.diseno_divertido_pero_elegante_para')},
     prompt:
-      'Crea un diseño de menú infantil para boda que sea divertido pero mantenga la elegancia del evento. Incluye elementos gráficos amigables para niños sin ser excesivamente infantil. El título debe ser "Menú Infantil" o similar, con espacio para listar opciones de comida para niños. Usa colores vibrantes pero armoniosos con la temática de boda. El diseño debe ser atractivo para los niños pero también visualmente agradable para los padres.',
+      {t('common.crea_diseno_menu_infantil_para')},
   },
   {
-    name: 'Menú Sin Gluten',
-    description: 'Diseño elegante para menús sin gluten',
+    name: {t('common.menu_sin_gluten')},
+    description: {t('common.diseno_elegante_para_menus_sin')},
     prompt:
-      'Diseña una tarjeta de menú sin gluten para boda. El diseño debe ser elegante y sofisticado, a la altura del evento. Incluye el título "Menú Sin Gluten" de forma visible pero discreta. Proporciona espacio para detallar los platos seguros sin gluten para entrantes, plato principal y postre. Utiliza un símbolo o icono sutil que indique que es apto para celíacos. El estilo visual debe integrarse perfectamente con el resto de la papelería de boda.',
+      {t('common.disena_una_tarjeta_menu_sin')},
   },
   {
-    name: 'Menú Sin Lácteos',
-    description: 'Diseño para menús libres de lácteos',
+    name: {t('common.menu_sin_lacteos')},
+    description: {t('common.diseno_para_menus_libres_lacteos')},
     prompt:
-      'Crea un diseño de menú sin lácteos para boda. El diseño debe ser elegante y refinado, en línea con la estética general de la boda. Incluye un título claro como "Menú Sin Lácteos" o "Menú Libre de Lácteos". Proporciona espacio para listar entrantes, plato principal y postre. Puedes incorporar algún elemento gráfico sutil que indique la ausencia de lácteos. La paleta de colores debe ser armoniosa con el resto de la decoración del evento.',
+      'Crea un diseño de menú sin lácteos para boda. El diseño debe ser elegante y refinado, en línea con la estética general de la boda. Incluye un título claro como "Menú Sin Lácteos" o {t('common.menu_libre_lacteos')}. Proporciona espacio para listar entrantes, plato principal y postre. Puedes incorporar algún elemento gráfico sutil que indique la ausencia de lácteos. La paleta de colores debe ser armoniosa con el resto de la decoración del evento.',
   },
   {
-    name: 'Menú Personalizado',
-    description: 'Diseño versátil para cualquier necesidad dietética especial',
+    name: {t('common.menu_personalizado')},
+    description: {t('common.diseno_versatil_para_cualquier_necesidad')},
     prompt:
-      'Diseña un formato de menú personalizable para necesidades dietéticas especiales en una boda. El diseño debe incluir un espacio prominente para el título donde se pueda especificar el tipo de menú especial. Proporciona secciones claras para entrantes, plato principal y postre. Incorpora elementos gráficos elegantes que sean neutros y adaptables a cualquier tipo de restricción alimentaria. El diseño debe ser sofisticado y coherente con la estética general de la boda.',
+      {t('common.disena_formato_menu_personalizable_para')},
   },
 ];
 
@@ -63,12 +66,12 @@ export default function MenuCatering() {
       const items = specialMenus[type];
       const typeLabel =
         {
-          vegetariano: 'Menú Vegetariano',
-          infantil: 'Menú Infantil',
-          sinGluten: 'Menú Sin Gluten',
-          sinLacteos: 'Menú Sin Lácteos',
-          otros: 'Menú Especial',
-        }[type] || 'Menú Especial';
+          vegetariano: {t('common.menu_vegetariano')},
+          infantil: {t('common.menu_infantil')},
+          sinGluten: {t('common.menu_sin_gluten')},
+          sinLacteos: {t('common.menu_sin_lacteos')},
+          otros: {t('common.menu_especial')},
+        }[type] || {t('common.menu_especial')};
 
       return `${typeLabel}: ${items.join(', ')}`;
     });

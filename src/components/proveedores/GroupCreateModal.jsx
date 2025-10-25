@@ -2,8 +2,13 @@ import React, { useState } from 'react';
 
 import Modal from '../Modal';
 import Button from '../ui/Button';
+import { useTranslations } from '../../hooks/useTranslations';
 
-export default function GroupCreateModal({ open, onClose, onConfirm, defaultName = '' }) {
+export default function GroupCreateModal({
+
+ open, onClose, onConfirm, defaultName = '' }) {
+  const { t } = useTranslations();
+
   const [name, setName] = useState(defaultName);
   const [notes, setNotes] = useState('');
 
@@ -19,7 +24,7 @@ export default function GroupCreateModal({ open, onClose, onConfirm, defaultName
           <label className="block text-sm font-medium mb-1">Nombre del grupo</label>
           <input
             className="w-full border rounded-md p-2"
-            placeholder="Ej. Paquete Música + Toro mecánico"
+            placeholder={t('common.paquete_musica_toro_mecanico')}
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
@@ -29,7 +34,7 @@ export default function GroupCreateModal({ open, onClose, onConfirm, defaultName
           <textarea
             className="w-full border rounded-md p-2"
             rows={3}
-            placeholder="Detalles del alcance combinado, logística, etc."
+            placeholder={t('common.detalles_del_alcance_combinado_logistica')}
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
           />

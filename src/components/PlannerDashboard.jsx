@@ -10,9 +10,12 @@ import usePlannerAlerts from '../hooks/usePlannerAlerts';
 import { fetchWall } from '../services/wallService';
 import { fetchWeddingNews } from '../services/blogService';
 import { performanceMonitor } from '../services/PerformanceMonitor';
+import { useTranslations } from '../../hooks/useTranslations';
 
 const INSPIRATION_CATEGORIES = [
-  { slug: 'decoracion', label: 'Decoración' },
+  {
+  const { t } = useTranslations();
+ slug: 'decoracion', label: {t('common.decoracion')} },
   { slug: 'ceremonia', label: 'Ceremonia' },
   { slug: 'banquete', label: 'Banquete' },
   { slug: 'flores', label: 'Flores' },

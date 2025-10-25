@@ -14,6 +14,7 @@ import useRoles from '../hooks/useRoles';
 import { changeLanguage, getCurrentLanguage } from '../i18n';
 import { loadData } from '../services/SyncService';
 import { invitePlanner, getWeddingIdForOwner } from '../services/WeddingService';
+import { useTranslations } from '../../hooks/useTranslations';
 
 function Perfil() {
   const { t } = useTranslation();
@@ -170,7 +171,7 @@ function Perfil() {
     // Validaciones rÍpidas
     try {
       if (account.email && !/^\S+@\S+\.\S+$/.test(account.email)) {
-        toast.error('Correo electrnico invÍlido');
+        toast.error({t('common.correo_electrnico_invilido')});
         return;
       }
       if (account.whatsNumber && !/^\+?[0-9]{8,15}$/.test(account.whatsNumber.trim())) {
@@ -180,7 +181,7 @@ function Perfil() {
       if (weddingInfo.weddingDate) {
         const d = new Date(weddingInfo.weddingDate);
         if (isNaN(d.getTime())) {
-          toast.error('Fecha de boda invÍlida');
+          toast.error({t('common.fecha_boda_invilida')});
           return;
         }
       }
@@ -499,8 +500,10 @@ function Perfil() {
                       <button
                         onClick={() => removeRole(c.userId || c.uid)}
                         className="text-red-500 hover:text-red-700"
+                        type="button"
+                        aria-label={t('profile.collaborators.remove', { defaultValue: 'Eliminar colaborador' })}
                       >
-                        <X size={16} />
+                        <X size={16} aria-hidden="true" />
                       </button>
                     )}
                   </td>
@@ -556,4 +559,3 @@ function Perfil() {
 }
 
 export default Perfil;
-

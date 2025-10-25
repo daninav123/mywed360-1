@@ -1,7 +1,10 @@
 import { Camera, Utensils, Music2, Flower2, Video, Sparkles, ShoppingBag } from 'lucide-react';
 import React from 'react';
+import { useTranslations } from '../../hooks/useTranslations';
 
 const serviceIcon = (service = '') => {
+  const { t } = useTranslations();
+
   const s = String(service || '').toLowerCase();
   if (s.includes('foto')) return Camera;
   if (s.includes('video')) return Video;
@@ -17,7 +20,7 @@ const statusMeta = (estado = '') => {
   if (e.includes('presup')) return { color: '#0ea5e920', border: '#0ea5e9', label: 'Presupuestos' };
   if (e.includes('negoci') || e.includes('contact')) return { color: '#f59e0b20', border: '#f59e0b', label: 'En proceso' };
   if (e.includes('rechaz')) return { color: '#ef444420', border: '#ef4444', label: 'Rechazado' };
-  return { color: 'transparent', border: '#9ca3af', label: 'Vacío' };
+  return { color: 'transparent', border: '#9ca3af', label: {t('common.vacio')} };
 };
 
 export default function ServicesBoard({ proveedores = [], onOpenSearch, onOpenNew, onOpenAI }) {

@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 
 import { useAuth } from '../hooks/useAuth';
 import { db } from '../lib/firebase';
+import { useTranslations } from '../../hooks/useTranslations';
 
 /*
   Editor interno para la página web de la boda.
@@ -11,6 +12,8 @@ import { db } from '../lib/firebase';
 */
 
 export default function WebEditor() {
+  const { t } = useTranslations();
+
   const { currentUser } = useAuth();
   const uid = currentUser?.uid || 'dev';
 
@@ -54,7 +57,7 @@ export default function WebEditor() {
     setLoading(true);
     try {
       await setDoc(doc(db, 'users', uid), { weddingInfo: info }, { merge: true });
-      alert('Información guardada');
+      alert({t('common.informacion_guardada')});
     } catch (err) {
       console.error(err);
       alert('Error al guardar');
@@ -115,7 +118,7 @@ export default function WebEditor() {
             {
               role: 'system',
               content:
-                'Eres un asistente que redacta textos románticos para webs de boda en español.',
+                {t('common.eres_asistente_que_redacta_textos')},
             },
             {
               role: 'user',
@@ -162,7 +165,7 @@ export default function WebEditor() {
             {
               role: 'system',
               content:
-                'Eres un asistente que devuelve un JSON con el programa típico de una boda en España. Ejemplo: [{"time":"12:00","title":"Ceremonia"}]',
+                {t('common.eres_asistente_que_devuelve_json')},
             },
             {
               role: 'user',
@@ -203,7 +206,7 @@ export default function WebEditor() {
       await Promise.all(
         gallery.filter((g) => g.url).map((img) => addDoc(colRef, { url: img.url }))
       );
-      alert('Galería guardada');
+      alert({t('common.galeria_guardada')});
     } catch (e) {
       console.error(e);
       alert('Error');
@@ -233,7 +236,7 @@ export default function WebEditor() {
           />
           <input
             className="border p-2 rounded sm:col-span-2"
-            placeholder="Lugar de la celebración"
+            placeholder={t('common.lugar_celebracion')}
             value={info.celebrationPlace}
             onChange={(e) => setInfo({ ...info, celebrationPlace: e.target.value })}
           />
@@ -309,7 +312,7 @@ export default function WebEditor() {
             />
             <input
               className="border p-1 rounded flex-grow"
-              placeholder="Descripción"
+              placeholder={t('common.descripcion')}
               value={s.title}
               onChange={(e) => updateSchedule(idx, 'title', e.target.value)}
             />

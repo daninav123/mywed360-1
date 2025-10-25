@@ -2,16 +2,19 @@ import React, { useEffect, useMemo } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 import Card from '../../components/ui/Card';
+import { useTranslations } from '../../hooks/useTranslations';
 
 // Pestañas iniciales para la sección Diseños
 const tabs = [
-  { path: 'invitaciones', label: 'Invitaciones' },
+  {
+  const { t } = useTranslations();
+ path: 'invitaciones', label: 'Invitaciones' },
   { path: 'logo', label: 'Logo' },
-  { path: 'menu', label: 'Menú' },
+  { path: 'menu', label: {t('common.menu')} },
   { path: 'seating-plan', label: 'Seating Plan' },
-  { path: 'menu-catering', label: 'Menú Catering' },
+  { path: 'menu-catering', label: {t('common.menu_catering')} },
   { path: 'papeles-nombres', label: 'Papeles Nombres' },
-  { path: 'mis-disenos', label: 'Mis diseños' },
+  { path: 'mis-disenos', label: {t('common.mis_disenos')} },
 ];
 
 const DiseñosLayout = React.memo(() => {

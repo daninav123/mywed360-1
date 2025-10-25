@@ -14,6 +14,7 @@ import { useEffect } from 'react';
 
 import { useWedding } from '../../context/WeddingContext';
 import { db, auth } from '../../firebaseConfig';
+import { useTranslations } from '../../hooks/useTranslations';
 
 // Listens to window 'maloveapp-tasks' events and persists tasks/meetings in Firestore
 // Supports actions: add (default), update, delete, complete (only for tasks)
@@ -118,7 +119,7 @@ export default function TaskEventBridge() {
 
           if (action === 'add') {
             const payload = {
-              title: m.title || 'Reunión',
+              title: m.title || {t('common.reunion')},
               desc: m.desc || '',
               start,
               end,

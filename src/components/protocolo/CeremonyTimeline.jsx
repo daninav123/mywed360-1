@@ -4,9 +4,12 @@ import { Plus, Trash2, ArrowUp, ArrowDown, Save } from 'lucide-react';
 import { Card } from '../ui';
 import { Button } from '../ui';
 import useCeremonyTimeline from '../../hooks/useCeremonyTimeline';
+import { useTranslations } from '../../hooks/useTranslations';
 
 const STATUS_OPTIONS = [
-  { value: 'pending', label: 'Pendiente' },
+  {
+  const { t } = useTranslations();
+ value: 'pending', label: 'Pendiente' },
   { value: 'in-progress', label: 'En curso' },
   { value: 'done', label: 'Completado' },
 ];
@@ -264,7 +267,7 @@ export default function CeremonyTimeline({ compact = false }) {
 
             {!section.items.length && (
               <div className="text-sm text-gray-500">
-                No hay hitos registrados. {!compact && 'Pulsa “Añadir hito” para empezar.'}
+                No hay hitos registrados. {!compact && {t('common.pulsa_anadir_hito_para_empezar')}}
               </div>
             )}
           </div>

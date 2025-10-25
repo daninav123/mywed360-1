@@ -335,20 +335,20 @@ function Invitados() {
         return;
       }
       const custom = window.prompt(
-        'Mensaje de difusión (se enviará una sola vez a una lista de difusión). Ten en cuenta que solo lo recibirán quienes tengan tu número guardado en contactos.',
+        {t('common.mensaje_difusion_enviara_una_sola')},
         ''
       );
       const r = await inviteSelectedWhatsAppBroadcastViaExtension(selectedIds, custom || undefined);
       if (r?.notAvailable) {
         const doFallback = window.confirm(
-          'No se detectó la extensión para difusión. ¿Quieres intentar el envío individual (una sola acción) en su lugar?'
+          {t('common.detecto_extension_para_difusion_quieres')}
         );
         if (doFallback) {
           const rb = await inviteSelectedWhatsAppViaExtension(selectedIds, custom || undefined);
           if (rb?.success && !rb?.notAvailable) {
             alert(`Envío iniciado para ${rb?.count || selectedIds.length} invitado(s).`);
           } else {
-            alert('No se pudo iniciar el envío (extensión no disponible).');
+            alert({t('common.pudo_iniciar_envio_extension_disponible')});
           }
         }
         return;
@@ -359,10 +359,10 @@ function Invitados() {
           alert(`Envío individual fallback. �0xitos: ${r?.sent || 0}, Fallos: ${r?.failed || 0}`);
         return;
       }
-      alert('No se pudo completar la difusión: ' + (r?.error || 'desconocido'));
+      alert({t('common.pudo_completar_difusion')} + (r?.error || 'desconocido'));
     } catch (e) {
       console.warn('Error en difusión (Móvil):', e);
-      alert('Error en la difusión');
+      alert({t('common.error_difusion')});
     }
   };
 
@@ -781,7 +781,7 @@ function Invitados() {
       });
       if (import.meta.env.DEV) console.log('[Invitados] handleSendSelectedApi result', res);
       if (res?.cancelled) {
-        alert('Acción cancelada');
+        alert({t('common.accion_cancelada')});
         return;
       }
       if (res?.error === 'missing-couple-signature') {
@@ -802,7 +802,7 @@ function Invitados() {
       if (res?.success) {
         alert(
           t('guests.whatsapp.bulkApiDone', {
-            defaultValue: 'Envío completado. �0xitos: {{ok}}, Fallos: {{fail}}',
+            defaultValue: {t('common.envio_completado_0xitos_fallos_fail')},
             ok: res?.ok || 0,
             fail: res?.fail || 0,
           })
@@ -811,7 +811,7 @@ function Invitados() {
       }
       alert(
         t('guests.whatsapp.apiStartFailed', {
-          defaultValue: 'No se pudo iniciar el envío por API',
+          defaultValue: {t('common.pudo_iniciar_envio_por_api')},
         })
       );
     } catch (e) {
@@ -834,7 +834,7 @@ function Invitados() {
       const custom = window.prompt(
         t('guests.whatsapp.customPrompt', {
           defaultValue:
-            'Mensaje personalizado (opcional). Si lo dejas en blanco, se usará un mensaje por defecto con enlace RSVP cuando sea posible:',
+            {t('common.mensaje_personalizado_opcional_dejas_blanco')},
         }),
         ''
       );
@@ -844,7 +844,7 @@ function Invitados() {
         if (r?.success && !r?.notAvailable) {
           alert(
             t('guests.whatsapp.webStarted', {
-              defaultValue: 'Envío iniciado en WhatsApp Web para {{count}} invitado(s).',
+              defaultValue: {t('common.envio_iniciado_whatsapp_web_para')},
               count: r?.count || selectedIds.length,
             })
           );
@@ -855,7 +855,7 @@ function Invitados() {
           const doFallback = window.confirm(
             t('guests.whatsapp.extensionMissingConfirm', {
               defaultValue:
-                'No se detectó la extensión para enviar en una sola acción. ¿Quieres abrir los chats en pestañas como alternativa?',
+                {t('common.detecto_extension_para_enviar_una')},
             })
           );
           if (doFallback) {
@@ -873,7 +873,7 @@ function Invitados() {
         // Si no es success y tampoco es notAvailable, informar del error
         alert(
           t('guests.whatsapp.oneClickFailed', {
-            defaultValue: 'No se pudo iniciar el envío en una sola acción: {{error}}',
+            defaultValue: {t('common.pudo_iniciar_envio_una_sola')},
             error: r?.error || 'desconocido',
           })
         );
@@ -894,7 +894,7 @@ function Invitados() {
       console.warn('Error envío seleccionados (Móvil):', e);
       alert(
         t('guests.whatsapp.mobileUnexpected', {
-          defaultValue: 'Error enviando a seleccionados (Móvil)',
+          defaultValue: {t('common.error_enviando_seleccionados_movil')},
         })
       );
     }
@@ -945,18 +945,18 @@ function Invitados() {
           });
       }
       if (!items.length) {
-        alert('Los seleccionados no tienen teléfonos válidos');
+        alert({t('common.los_seleccionados_tienen_telefonos_validos')});
         return;
       }
       const result = await scheduleWhats(items, whenIso);
       if (result?.success) {
         alert(`Programados ${items.length} envíos para ${whenIso}`);
       } else {
-        alert('Error programando envíos: ' + (result?.error || 'desconocido'));
+        alert({t('common.error_programando_envios')} + (result?.error || 'desconocido'));
       }
     } catch (e) {
       console.warn('Error programando envíos:', e);
-      alert('Error programando envíos');
+      alert({t('common.error_programando_envios')});
     }
   };
 
@@ -1010,7 +1010,7 @@ function Invitados() {
       setShowGuestModal(false);
     } catch (error) {
       console.error('Error importando invitados:', error);
-      alert('Ocurrió un error al importar los invitados');
+      alert({t('common.ocurrio_error_importar_los_invitados')});
     }
   };
 
@@ -1221,7 +1221,7 @@ function Invitados() {
         {!isLoading && Array.isArray(weddings) && weddings.length === 0 && (
           <div className="text-sm text-muted">
             {activeWedding
-              ? 'No se encontraron bodas asociadas a tu cuenta o no tienes permisos sobre la boda activa. Si el problema persiste, recarga la página o contacta con soporte.'
+              ? {t('common.encontraron_bodas_asociadas_cuenta_tienes')}
               : 'No se encontraron bodas asociadas a tu cuenta. Crea o selecciona una boda para gestionar invitados.'}
           </div>
         )}
@@ -1247,7 +1247,7 @@ function Invitados() {
         <Modal
           open={showGuestModal}
           onClose={handleCancelModal}
-          title={editingGuest ? 'Editar Invitado' : 'Añadir Invitado'}
+          title={editingGuest ? 'Editar Invitado' : {t('common.anadir_invitado')}}
           size="lg"
         >
           {editingGuest ? (
@@ -1574,7 +1574,7 @@ function Invitados() {
             whatsGuest
               ? t('guests.whatsapp.dm', {
                   defaultValue:
-                    '¡Hola {{name}}! Nos encantaría contar contigo en nuestra boda. ¿Puedes confirmar tu asistencia?',
+                    {t('common.hola_name_nos_encantaria_contar')},
                   name: whatsGuest?.name || '',
                 })
               : ''

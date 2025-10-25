@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { db } from '../../firebaseConfig';
 import {
   doc,
@@ -47,24 +48,6 @@ const toDate = (v, fallback) => {
 
 const MENTION_REGEX = /@([^\s@]+)/g;
 
-const formatRelativeComment = (value) => {
-  try {
-    const date = value instanceof Date ? value : new Date(value);
-    if (!(date instanceof Date) || Number.isNaN(date.getTime())) return '';
-    const diffMs = Date.now() - date.getTime();
-    const minutes = Math.round(diffMs / 60000);
-    if (minutes <= 0) return 'hace instantes';
-    if (minutes < 60) return `hace ${minutes} min`;
-    const hours = Math.round(minutes / 60);
-    if (hours < 24) return `hace ${hours} h`;
-    const days = Math.round(hours / 24);
-    if (days < 7) return `hace ${days} d`;
-    return date.toLocaleString('es-ES', { dateStyle: 'medium', timeStyle: 'short' });
-  } catch {
-    return '';
-  }
-};
-
 export default function TaskSidePanel({
   isOpen,
   onClose,
@@ -72,9 +55,12 @@ export default function TaskSidePanel({
   parent,
   subtasks = [],
 }) {
+  const { t, i18n } = useTranslation('tasks');
+  const locale = i18n.language || 'es-ES';
   const { currentUser, userProfile } = useAuth();
   const userId = currentUser?.uid || userProfile?.id || 'anon';
-  const userName = userProfile?.name || currentUser?.displayName || 'Colaborador';
+  const userName =
+    userProfile?.name || currentUser?.displayName || t('tasks.page.sidePanel.authorFallback');
 
   const [editingParentStart, setEditingParentStart] = useState(false);
   const [parentStartValue, setParentStartValue] = useState(() => fmtDateTimeLocal(toDate(parent?.start)));
@@ -88,26 +74,63 @@ export default function TaskSidePanel({
   const [commentDraft, setCommentDraft] = useState('');
   const [sendingComment, setSendingComment] = useState(false);
   const [commentError, setCommentError] = useState('');
-  const parentLabel = useMemo(() => parent?.title || parent?.name || 'tarea', [parent?.title, parent?.name]);
+  const parentLabel = useMemo(
+    () => parent?.title || parent?.name || t('tasks.page.list.defaults.parent'),
+    [parent, t]
+  );
   const parentStartDate = useMemo(() => toDate(parent?.start), [parent?.start]);
   const parentEndDate = useMemo(() => toDate(parent?.end), [parent?.end]);
 
-  const formatDisplayDate = useCallback((value) => {
-    try {
-      if (!value || !(value instanceof Date) || Number.isNaN(value.getTime())) return '';
-      return new Intl.DateTimeFormat('es-ES', { dateStyle: 'medium', timeStyle: 'short' }).format(value);
-    } catch {
-      return value?.toLocaleString?.() || '';
-    }
-  }, []);
+  const formatDisplayDate = useCallback(
+    (value) => {
+      try {
+        if (!value || !(value instanceof Date) || Number.isNaN(value.getTime())) return '';
+        return new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short' }).format(
+          value
+        );
+      } catch {
+        return value?.toLocaleString?.() || '';
+      }
+    },
+    [locale]
+  );
 
   const renderNoDateBadge = useCallback(
-    (label = 'Sin fecha programada') => (
+    (label) => (
       <span className="inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700">
-        {label}
+        {label || t('tasks.page.sidePanel.noDate')}
       </span>
     ),
-    []
+    [t]
+  );
+
+  const formatRelativeComment = useCallback(
+    (value) => {
+      try {
+        const date = value instanceof Date ? value : new Date(value);
+        if (!(date instanceof Date) || Number.isNaN(date.getTime())) return '';
+        const diffMs = Date.now() - date.getTime();
+        const minutes = Math.round(diffMs / 60000);
+        if (minutes <= 0) return t('tasks.page.sidePanel.relative.justNow');
+        if (minutes < 60) {
+          return t('tasks.page.sidePanel.relative.minutes', { value: minutes });
+        }
+        const hours = Math.round(minutes / 60);
+        if (hours < 24) {
+          return t('tasks.page.sidePanel.relative.hours', { value: hours });
+        }
+        const days = Math.round(hours / 24);
+        if (days < 7) {
+          return t('tasks.page.sidePanel.relative.days', { value: days });
+        }
+        return new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short' }).format(
+          date
+        );
+      } catch {
+        return '';
+      }
+    },
+    [locale, t]
   );
 
   useEffect(() => {
@@ -144,7 +167,7 @@ export default function TaskSidePanel({
               body: data.body || '',
               mentions: Array.isArray(data.mentions) ? data.mentions : [],
               authorId: data.authorId || '',
-              authorName: data.authorName || 'Equipo',
+              authorName: data.authorName || t('tasks.page.sidePanel.authorFallback'),
               createdAt,
             };
           });
@@ -152,7 +175,7 @@ export default function TaskSidePanel({
         } catch (error) {
           console.error('Error procesando comentarios de tarea:', error);
           setComments([]);
-          setCommentError('No se pudieron procesar los comentarios.');
+          setCommentError(t('tasks.page.sidePanel.errors.process'));
         } finally {
           setLoadingComments(false);
         }
@@ -161,11 +184,11 @@ export default function TaskSidePanel({
         console.error('Error cargando comentarios de tarea:', error);
         setComments([]);
         setLoadingComments(false);
-        setCommentError('No se pudieron cargar los comentarios.');
+        setCommentError(t('tasks.page.sidePanel.errors.load'));
       }
     );
     return () => unsubscribe();
-  }, [isOpen, weddingId, parent?.id, db]);
+  }, [isOpen, weddingId, parent?.id, t]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -311,8 +334,13 @@ export default function TaskSidePanel({
           type: uniqueMentions.length ? 'warning' : 'info',
           message:
             uniqueMentions.length > 0
-              ? `Nuevo comentario en ${parentLabel} con menciones a ${uniqueMentions.join(', ')}`
-              : `Nuevo comentario en ${parentLabel}`,
+              ? t('tasks.page.sidePanel.notifications.logWithMentions', {
+                  block: parentLabel,
+                  mentions: uniqueMentions.join(', '),
+                })
+              : t('tasks.page.sidePanel.notifications.logWithoutMentions', {
+                  block: parentLabel,
+                }),
           action: 'viewTask',
           trackingId: parent?.id || undefined,
           weddingId,
@@ -331,19 +359,21 @@ export default function TaskSidePanel({
       }
 
       notificationService.showNotification({
-        title: 'Comentario agregado',
+        title: t('tasks.page.sidePanel.notifications.toastTitle'),
         message:
           recipients.length > 0
-            ? `Notificaremos a: ${recipients.join(', ')}`
-            : 'El comentario queda registrado para el equipo',
+            ? t('tasks.page.sidePanel.notifications.toastWithRecipients', {
+                recipients: recipients.join(', '),
+              })
+            : t('tasks.page.sidePanel.notifications.toastWithoutRecipients'),
         type: 'success',
       });
     } catch (error) {
-      setCommentError('No se pudo guardar tu comentario. Intentalo de nuevo.');
+      setCommentError(t('tasks.page.sidePanel.errors.create'));
     } finally {
       setSendingComment(false);
     }
-  }, [commentDraft, weddingId, parent?.id, userId, userName, parent?.assignees, parentLabel]);
+  }, [commentDraft, weddingId, parent?.id, userId, userName, parent?.assignees, parentLabel, t]);
 
   const handleDeleteComment = useCallback(
     async (commentId) => {
@@ -352,10 +382,10 @@ export default function TaskSidePanel({
         await deleteDoc(doc(db, 'weddings', weddingId, 'tasks', parent.id, 'comments', commentId));
       } catch (error) {
         console.error('Error eliminando comentario de tarea:', error);
-        setCommentError('No se pudo eliminar el comentario.');
+        setCommentError(t('tasks.page.sidePanel.errors.delete'));
       }
     },
-    [weddingId, parent?.id]
+    [weddingId, parent?.id, t]
   );
 
   const handleCommentKeyDown = useCallback(
@@ -376,16 +406,26 @@ export default function TaskSidePanel({
       <aside className="w-full sm:w-[420px] h-full bg-white shadow-2xl border-l border-gray-200 p-4 overflow-y-auto">
         <div className="flex items-start justify-between mb-4">
           <div>
-            <h3 className="text-lg font-semibold">{parent?.title || parent?.name || 'Tarea'}</h3>
-            <p className="text-sm text-gray-500">Tarea padre " {parent?.category || 'OTROS'}</p>
+            <h3 className="text-lg font-semibold">{parentLabel}</h3>
+            <p className="text-sm text-gray-500">
+              {t('tasks.page.sidePanel.parentCategory', {
+                category: parent?.category || 'OTROS',
+              })}
+            </p>
           </div>
-          <button className="p-2 rounded hover:bg-gray-100" onClick={onClose} aria-label="Cerrar panel">
+          <button
+            className="p-2 rounded hover:bg-gray-100"
+            onClick={onClose}
+            aria-label={t('tasks.page.sidePanel.close')}
+          >
             <X size={18} />
           </button>
         </div>
 
         <div className="mb-4">
-          <div className="text-sm text-gray-600 mb-1">Inicio</div>
+          <div className="text-sm text-gray-600 mb-1">
+            {t('tasks.page.form.fields.start')}
+          </div>
           <div className="flex items-center gap-2">
             {!editingParentStart ? (
               <>
@@ -397,7 +437,7 @@ export default function TaskSidePanel({
                 <button
                   className="p-1 rounded hover:bg-gray-100"
                   onClick={() => setEditingParentStart(true)}
-                  title="Editar inicio"
+                  title={t('tasks.page.sidePanel.editStart')}
                 >
                   <Edit3 size={16} />
                 </button>
@@ -410,15 +450,27 @@ export default function TaskSidePanel({
                   value={parentStartValue}
                   onChange={(e) => setParentStartValue(e.target.value)}
                 />
-                <button className="px-2 py-1 text-sm bg-blue-600 text-white rounded" onClick={updateParentStart}>Guardar</button>
-                <button className="px-2 py-1 text-sm bg-gray-100 rounded" onClick={() => setEditingParentStart(false)}>Cancelar</button>
+                <button
+                  className="px-2 py-1 text-sm bg-blue-600 text-white rounded"
+                  onClick={updateParentStart}
+                >
+                  {t('tasks.page.form.buttons.save')}
+                </button>
+                <button
+                  className="px-2 py-1 text-sm bg-gray-100 rounded"
+                  onClick={() => setEditingParentStart(false)}
+                >
+                  {t('tasks.page.form.buttons.cancel')}
+                </button>
               </div>
             )}
           </div>
         </div>
 
         <div className="mb-4">
-          <div className="text-sm text-gray-600 mb-1">Fin</div>
+          <div className="text-sm text-gray-600 mb-1">
+            {t('tasks.page.form.fields.end')}
+          </div>
           <div className="flex items-center gap-2">
             {!editingParentEnd ? (
               <>
@@ -430,7 +482,7 @@ export default function TaskSidePanel({
                 <button
                   className="p-1 rounded hover:bg-gray-100"
                   onClick={() => setEditingParentEnd(true)}
-                  title="Editar fin"
+                  title={t('tasks.page.sidePanel.editEnd')}
                 >
                   <Edit3 size={16} />
                 </button>
@@ -443,8 +495,18 @@ export default function TaskSidePanel({
                   value={parentEndValue}
                   onChange={(e) => setParentEndValue(e.target.value)}
                 />
-                <button className="px-2 py-1 text-sm bg-blue-600 text-white rounded" onClick={updateParentEnd}>Guardar</button>
-                <button className="px-2 py-1 text-sm bg-gray-100 rounded" onClick={() => setEditingParentEnd(false)}>Cancelar</button>
+                <button
+                  className="px-2 py-1 text-sm bg-blue-600 text-white rounded"
+                  onClick={updateParentEnd}
+                >
+                  {t('tasks.page.form.buttons.save')}
+                </button>
+                <button
+                  className="px-2 py-1 text-sm bg-gray-100 rounded"
+                  onClick={() => setEditingParentEnd(false)}
+                >
+                  {t('tasks.page.form.buttons.cancel')}
+                </button>
               </div>
             )}
           </div>
@@ -452,8 +514,10 @@ export default function TaskSidePanel({
 
         <div className="mb-4">
           <div className="flex items-center justify-between mb-2">
-            <h4 className="font-medium">Subtareas</h4>
-            <div className="text-xs text-gray-500">{sortedSubs.length} items</div>
+            <h4 className="font-medium">{t('tasks.page.sidePanel.subtasks.section')}</h4>
+            <div className="text-xs text-gray-500">
+              {t('tasks.page.sidePanel.subtasks.count', { count: sortedSubs.length })}
+            </div>
           </div>
           <ul className="space-y-2">
             {sortedSubs.map((s) => (
@@ -463,22 +527,34 @@ export default function TaskSidePanel({
                     <button
                       className="p-1 rounded hover:bg-gray-100"
                       onClick={() => toggleSubDone(s)}
-                      title={s.done ? 'Marcar como pendiente' : 'Marcar como hecha'}
+                      title={
+                        s.done
+                          ? t('tasks.page.sidePanel.subtasks.markPending')
+                          : t('tasks.page.sidePanel.subtasks.markDone')
+                      }
                     >
                       {s.done ? <CheckCircle2 size={16} className="text-green-600" /> : <Circle size={16} className="text-gray-400" />}
                     </button>
                     <div>
-                      <div className="text-sm font-medium">{s.title || s.name || 'Subtarea'}</div>
+                      <div className="text-sm font-medium">
+                        {s.title || s.name || t('tasks.page.sidePanel.subtasks.default')}
+                      </div>
                       {s.desc && (
                         <div className="mt-1 text-xs text-gray-600">{s.desc}</div>
                       )}
                       {s.assignee && (
-                        <div className="mt-1 text-xs text-gray-500">Responsable: {s.assignee}</div>
+                        <div className="mt-1 text-xs text-gray-500">
+                          {t('tasks.page.sidePanel.assigned', { name: s.assignee })}
+                        </div>
                       )}
                     </div>
                   </div>
                   <div className="flex items-center gap-1 opacity-70">
-                    <button className="p-1 rounded hover:bg-gray-100" onClick={() => removeSubtask(s)} title="Eliminar subtarea">
+                    <button
+                      className="p-1 rounded hover:bg-gray-100"
+                      onClick={() => removeSubtask(s)}
+                      title={t('tasks.page.sidePanel.deleteSubtask')}
+                    >
                       <Trash2 size={15} />
                     </button>
                   </div>
@@ -486,7 +562,7 @@ export default function TaskSidePanel({
               </li>
             ))}
             {sortedSubs.length === 0 && (
-              <li className="text-sm text-gray-500">No hay subtareas.</li>
+              <li className="text-sm text-gray-500">{t('tasks.page.sidePanel.noSubtasks')}</li>
             )}
           </ul>
         </div>
@@ -494,11 +570,11 @@ export default function TaskSidePanel({
         <div className="border-t pt-3">
           <div className="flex items-center gap-2 mb-2">
             <CalendarPlus size={18} />
-            <span className="text-sm font-medium">Agregar subtarea</span>
+            <span className="text-sm font-medium">{t('tasks.page.sidePanel.addSubtask')}</span>
           </div>
           <div className="space-y-2">
             <input
-              placeholder="Titulo de la subtarea"
+              placeholder={t('tasks.page.sidePanel.subtaskPlaceholder')}
               className="w-full border rounded px-2 py-1 text-sm"
               value={newSubTitle}
               onChange={(e) => setNewSubTitle(e.target.value)}
@@ -510,14 +586,14 @@ export default function TaskSidePanel({
                 onClick={addSubtask}
                 disabled={!newSubTitle.trim()}
               >
-                Agregar
+                {t('tasks.page.sidePanel.add')}
               </button>
               <button
                 type="button"
                 className="px-3 py-1.5 bg-gray-100 text-sm rounded"
                 onClick={() => setNewSubTitle('')}
               >
-                Limpiar
+                {t('tasks.page.sidePanel.clear')}
               </button>
             </div>
           </div>
@@ -526,9 +602,11 @@ export default function TaskSidePanel({
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <MessageSquare size={18} className="text-indigo-500" />
-              <h4 className="font-medium">Comentarios</h4>
+              <h4 className="font-medium">{t('tasks.page.sidePanel.comments')}</h4>
             </div>
-            <span className="text-xs text-gray-500">{comments.length}</span>
+            <span className="text-xs text-gray-500">
+              {t('tasks.page.sidePanel.commentsCount', { count: comments.length })}
+            </span>
           </div>
 
           {commentError && (
@@ -538,10 +616,12 @@ export default function TaskSidePanel({
           )}
 
           {loadingComments ? (
-            <p className="text-sm text-gray-500 mb-3">Cargando comentarios...</p>
+            <p className="text-sm text-gray-500 mb-3">
+              {t('tasks.page.sidePanel.loadingComments')}
+            </p>
           ) : comments.length === 0 ? (
             <p className="text-sm text-gray-500 mb-3">
-              Aun no hay comentarios en este bloque. Usa @ para mencionar responsables.
+              {t('tasks.page.sidePanel.noComments')}
             </p>
           ) : (
             <ul className="space-y-3 mb-4 max-h-56 overflow-y-auto pr-1">
@@ -550,7 +630,7 @@ export default function TaskSidePanel({
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <div className="text-sm font-medium text-gray-800">
-                        {comment.authorName || 'Equipo'}
+                        {comment.authorName || t('tasks.page.sidePanel.authorFallback')}
                       </div>
                       <div className="text-xs text-gray-500">
                         {formatRelativeComment(comment.createdAt)}
@@ -560,7 +640,7 @@ export default function TaskSidePanel({
                       <button
                         onClick={() => handleDeleteComment(comment.id)}
                         className="p-1 rounded hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors"
-                        title="Eliminar comentario"
+                        title={t('tasks.page.sidePanel.deleteComment')}
                       >
                         <Trash2 size={14} />
                       </button>
@@ -578,21 +658,23 @@ export default function TaskSidePanel({
             <textarea
               className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500"
               rows={3}
-              placeholder="Escribe un comentario... Usa @ para mencionar a alguien"
+              placeholder={t('tasks.page.sidePanel.commentPlaceholder')}
               value={commentDraft}
               onChange={(e) => setCommentDraft(e.target.value)}
               onKeyDown={handleCommentKeyDown}
               disabled={sendingComment}
             />
             <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-400">Ctrl/Cmd + Enter para enviar</span>
+              <span className="text-xs text-gray-400">
+                {t('tasks.page.sidePanel.commentShortcut')}
+              </span>
               <button
                 type="button"
                 onClick={handleSubmitComment}
                 disabled={sendingComment || !commentDraft.trim()}
                 className="px-3 py-1.5 bg-indigo-600 text-white text-sm rounded disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                {sendingComment ? 'Publicando...' : 'Publicar'}
+                {sendingComment ? t('tasks.page.sidePanel.publishing') : t('tasks.page.sidePanel.publish')}
               </button>
             </div>
           </div>

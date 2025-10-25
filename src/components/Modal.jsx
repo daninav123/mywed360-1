@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 
 /**
  * Modal
@@ -48,7 +48,7 @@ export default function Modal({
             aria-label="Cerrar"
             className="p-2 rounded hover:bg-[var(--color-accent)]/20 focus:outline-none focus:ring-2 ring-primary"
           >
-            <span aria-hidden>×</span>
+            <span aria-hidden="true">×</span>
           </button>
         </div>
         <div className="overflow-y-auto px-4 py-3 flex-1">{children}</div>

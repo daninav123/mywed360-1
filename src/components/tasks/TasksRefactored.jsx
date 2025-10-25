@@ -14,7 +14,7 @@ import React, { useState, useEffect, useCallback, useRef, useMemo, useLayoutEffe
 import { useNavigate } from 'react-router-dom';
 
 // Importar componentes separados
-import { localizer, categories, eventStyleGetter, Event } from './CalendarComponents.jsx';
+import { localizer, categories, eventStyleGetter, Event, Calendar } from './CalendarComponents.jsx';
 import ErrorBoundary from './ErrorBoundary.jsx';
 import EventsCalendar from './EventsCalendar.jsx';
 import { useGanttSizing } from './hooks/useGanttSizing.js';
@@ -65,7 +65,7 @@ export default function TasksRefactored() {
   // Estados - Inicializacin segura con manejo de errores
 
   // Contexto de boda activa
-  const { activeWedding } = useWedding();
+  const { activeWedding, weddingsReady } = useWedding();
   const navigate = useNavigate();
 
   // Hooks Firestore para tasks y meetings dentro de la boda
@@ -202,6 +202,7 @@ export default function TasksRefactored() {
   });
   const [editingId, setEditingId] = useState(null);
   const [editingPath, setEditingPath] = useState(null);
+  const [savingTask, setSavingTask] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     desc: '',
@@ -628,17 +629,20 @@ export default function TasksRefactored() {
 
       return maxScore > 0 ? maxCat : 'OTROS';
     } catch (error) {
-      console.error('Error al asignar categor�­a:', error);
       return 'OTROS';
     }
   };
 
-  // Guardar una tarea en la subcolecci�³n de la boda
+  // Guardar una tarea en la subcolección de la boda
   const handleSaveTask = async () => {
+    if (savingTask) return; // Evitar doble envío
+    setSavingTask(true);
+    
     try {
-      // Validar formulario b��sico
+      // Validar formulario b��sico
       if (!formData.title.trim()) {
-        alert('Por favor ingresa un t�­tulo');
+        alert('Por favor ingresa un t�­tulo');
+        setSavingTask(false);
         return;
       }
 
@@ -647,11 +651,13 @@ export default function TasksRefactored() {
 
       if (!formData.startDate && !(isSubtask && unscheduled)) {
         alert('Por favor selecciona una fecha de inicio');
+        setSavingTask(false);
         return;
       }
 
       if (!formData.endDate && !(isSubtask && unscheduled)) {
         alert('Por favor selecciona una fecha de fin');
+        setSavingTask(false);
         return;
       }
 
@@ -666,12 +672,14 @@ export default function TasksRefactored() {
 
       // Validar fechas
       if (!(isSubtask && unscheduled) && (isNaN(startDate?.getTime?.() || NaN) || isNaN(endDate?.getTime?.() || NaN))) {
-        alert('Fechas no v��lidas');
+        alert('Fechas no v��lidas');
+        setSavingTask(false);
         return;
       }
 
       if (!(isSubtask && unscheduled) && endDate < startDate) {
         alert('La fecha de fin debe ser posterior a la de inicio');
+        setSavingTask(false);
         return;
       }
 
@@ -875,18 +883,19 @@ export default function TasksRefactored() {
         }
       } catch (_) {}
 
-      // Ajustar rango del padre si procede (modo automtico)
+      // Ajustar rango del padre si procede (modo automatico)
       try {
         if (formData.parentTaskId) {
           await computeAndUpdateParentRange(String(formData.parentTaskId));
         }
       } catch (_) {}
-
-      // Cerrar modal y limpiar
-      closeModal();
     } catch (error) {
       console.error('Error al guardar tarea:', error);
       alert('Hubo un error al guardar la tarea');
+    } finally {
+      // Cerrar modal SIEMPRE, incluso si hay errores
+      setSavingTask(false);
+      closeModal();
     }
   };
 
@@ -2545,6 +2554,18 @@ export default function TasksRefactored() {
     } catch {}
   }, [activeWedding, uniqueGanttTasks, nestedSubtasks, subtaskEvents]);
 
+  // Mostrar loading mientras se cargan las bodas
+  if (!weddingsReady) {
+    return (
+      <div className="max-w-3xl mx-auto p-6">
+        <h1 className="page-title">Gesti�n de Tareas</h1>
+        <div className="mt-6 text-center text-gray-500">
+          <div>Cargando...</div>
+        </div>
+      </div>
+    );
+  }
+
   // Renderizado condicionado tras ejecutar todos los hooks para mantener el orden estable
   if (!activeWedding) {
     return (
@@ -2803,6 +2824,7 @@ export default function TasksRefactored() {
         <div className="w-full lg:w-1/3 flex">
           <TaskList
             tasks={taskListItems}
+            maxItems={10}
             completedSet={completedIdSet}
             onToggleComplete={(id, val) => toggleCompleteById(id, val)}
             parentNameMap={parentNameMap}
@@ -2882,6 +2904,7 @@ export default function TasksRefactored() {
           closeModal={closeModal}
           setFormData={setFormData}
           parentOptions={parentTaskOptions}
+          savingTask={savingTask}
         />
       )}
       <TaskSidePanel

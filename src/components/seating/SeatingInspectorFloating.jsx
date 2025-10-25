@@ -1,8 +1,9 @@
-/**
+﻿/**
  * SeatingInspectorFloating - Panel flotante de inspección con glassmorphism
  */
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslations } from '../../hooks/useTranslations';
 import {
   X,
   Copy,
@@ -14,7 +15,9 @@ import {
   Maximize2,
 } from 'lucide-react';
 
-const ActionButton = ({ icon: Icon, label, onClick, variant = 'default' }) => {
+const ActionButton = ({
+  const { t } = useTranslations();
+ icon: Icon, label, onClick, variant = 'default' }) => {
   const variants = {
     default: 'bg-white/10 hover:bg-white/20 text-white',
     danger: 'bg-red-500/20 hover:bg-red-500/30 text-red-400',
@@ -237,7 +240,7 @@ export default function SeatingInspectorFloating({
               label="Eliminar"
               variant="danger"
               onClick={() => {
-                if (confirm('¿Eliminar esta mesa?')) {
+                if (confirm({t('common.eliminar_esta_mesa')})) {
                   onDelete?.(table.id);
                   onClose();
                 }

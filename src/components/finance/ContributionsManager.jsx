@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Users, Euro, Calendar, CheckCircle, Clock, XCircle, Edit2, Trash2 } from 'lucide-react';
 import Button from '../ui/Button';
+import { useTranslations } from '../../hooks/useTranslations';
 
 /**
  * Gestor de aportaciones familiares/amigos para la boda
  */
-const ContributionsManager = ({ weddingId, onUpdate }) => {
+const ContributionsManager = ({
+  const { t } = useTranslations();
+ weddingId, onUpdate }) => {
   const [contributions, setContributions] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingContribution, setEditingContribution] = useState(null);
@@ -66,7 +69,7 @@ const ContributionsManager = ({ weddingId, onUpdate }) => {
   };
 
   const handleDeleteContribution = (id) => {
-    if (confirm('¿Eliminar esta aportación?')) {
+    if (confirm({t('common.eliminar_esta_aportacion')})) {
       saveContributions(contributions.filter(c => c.id !== id));
     }
   };
@@ -262,7 +265,7 @@ const ContributionsManager = ({ weddingId, onUpdate }) => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              {editingContribution ? 'Editar Aportación' : 'Nueva Aportación'}
+              {editingContribution ? {t('common.editar_aportacion')} : {t('common.nueva_aportacion')}}
             </h3>
 
             <div className="space-y-4">
@@ -275,7 +278,7 @@ const ContributionsManager = ({ weddingId, onUpdate }) => {
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="w-full border border-gray-300 rounded px-3 py-2"
-                  placeholder="Ej: María García"
+                  placeholder={t('common.maria_garcia')}
                 />
               </div>
 

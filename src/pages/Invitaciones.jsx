@@ -13,8 +13,11 @@ import { post as apiPost } from '../services/apiClient';
 import { saveData, loadData } from '../services/SyncService';
 import { invitationTemplates } from '../data/invitationTemplates';
 import sanitizeHtml from '../utils/sanitizeHtml';
+import { useTranslations } from '../../hooks/useTranslations';
 
 export default function Invitaciones() {
+  const { t } = useTranslations();
+
   const { activeWedding } = useWedding();
   const { info: weddingInfo } = useActiveWeddingInfo();
   const { guests } = useGuests();
@@ -31,7 +34,7 @@ export default function Invitaciones() {
     try {
       const allowDirect =
         import.meta.env.VITE_ENABLE_DIRECT_OPENAI === 'true' || import.meta.env.DEV;
-      if (!allowDirect) throw new Error('OpenAI directo deshabilitado por configuración');
+      if (!allowDirect) throw new Error({t('common.openai_directo_deshabilitado_por_configuracion')});
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -53,10 +56,10 @@ export default function Invitaciones() {
       const data = await response.json();
       const text = data.choices?.[0]?.message?.content || '';
       setGeneratedText(text);
-      setToast({ message: 'Invitación generada', type: 'success' });
+      setToast({ message: {t('common.invitacion_generada')}, type: 'success' });
     } catch (err) {
       console.error(err);
-      setToast({ message: 'Error generando invitación', type: 'error' });
+      setToast({ message: {t('common.error_generando_invitacion')}, type: 'error' });
     } finally {
       setLoading(false);
     }
@@ -76,7 +79,7 @@ export default function Invitaciones() {
       collection: 'userInvitations',
       showNotification: false,
     });
-    setToast({ message: 'Diseño duplicado', type: 'success' });
+    setToast({ message: {t('common.diseno_duplicado')}, type: 'success' });
   };
   const [panel, setPanel] = useState('invitation'); // 'invitation' o 'envelope'
   const [filterCategory, setFilterCategory] = useState('');
@@ -240,7 +243,7 @@ export default function Invitaciones() {
           <h2 className="text-lg font-semibold">Asistente de IA</h2>
           <textarea
             rows={3}
-            placeholder="Describe cómo quieres tu invitación..."
+            placeholder={t('common.describe_como_quieres_invitacion')}
             value={aiPrompt}
             onChange={(e) => setAiPrompt(e.target.value)}
             className="w-full border rounded p-2"
@@ -251,7 +254,7 @@ export default function Invitaciones() {
             className="bg-indigo-600 text-white px-4 py-2 rounded flex items-center"
           >
             {loading ? <Spinner size={16} className="mr-2" /> : <Zap size={16} className="mr-2" />}{' '}
-            {loading ? 'Generando...' : 'Generar invitación'}
+            {loading ? 'Generando...' : {t('common.generar_invitacion')}}
           </button>
         </section>
       )}
@@ -329,7 +332,7 @@ export default function Invitaciones() {
           </div>
           <div className="border bg-surface h-[400px] flex items-center justify-center text-gray-400">
             {panel === 'invitation'
-              ? 'Canvas de invitación: arrastra componentes aquí'
+              ? {t('common.canvas_invitacion_arrastra_componentes_aqui')}
               : 'Canvas de sobre: frontal / trasero'}
           </div>
         </section>

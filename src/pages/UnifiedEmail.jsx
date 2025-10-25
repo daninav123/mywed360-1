@@ -2,7 +2,6 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 
 import ChipToggle from '../components/email/ChipToggle';
-import EmailSidebar from '../components/email/EmailSidebar';
 import { formatDate } from '../utils/formatUtils';
 import MailListComponent from '../components/email/MailList';
 import MailViewerComponent from '../components/email/MailViewer';

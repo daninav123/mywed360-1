@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { Upload, FileSpreadsheet, AlertCircle, CheckCircle, X } from 'lucide-react';
 import Button from '../ui/Button';
+import { useTranslations } from '../../hooks/useTranslations';
 
 /**
  * Componente para importar transacciones desde CSV/Excel
  * con preview y mapeo de columnas
  */
-const ImportTransactions = ({ onImportComplete, onCancel }) => {
+const ImportTransactions = ({
+  const { t } = useTranslations();
+ onImportComplete, onCancel }) => {
   const [file, setFile] = useState(null);
   const [parsing, setParsing] = useState(false);
   const [previewData, setPreviewData] = useState(null);
@@ -30,7 +33,7 @@ const ImportTransactions = ({ onImportComplete, onCancel }) => {
     ];
 
     if (!validTypes.includes(selectedFile.type) && !selectedFile.name.match(/\.(csv|xlsx|xls)$/i)) {
-      setError('Formato no válido. Por favor, sube un archivo CSV o Excel (.xlsx, .xls)');
+      setError({t('common.formato_valido_por_favor_sube')});
       return;
     }
 
@@ -48,7 +51,7 @@ const ImportTransactions = ({ onImportComplete, onCancel }) => {
       const lines = text.split('\n').filter(line => line.trim());
       
       if (lines.length === 0) {
-        throw new Error('El archivo está vacío');
+        throw new Error({t('common.archivo_esta_vacio')});
       }
 
       // Primera línea como headers
@@ -85,7 +88,7 @@ const ImportTransactions = ({ onImportComplete, onCancel }) => {
       if (!mapping.date && (lower.includes('fecha') || lower.includes('date'))) {
         mapping.date = header;
       }
-      if (!mapping.concept && (lower.includes('concepto') || lower.includes('description') || lower.includes('descripción'))) {
+      if (!mapping.concept && (lower.includes('concepto') || lower.includes('description') || lower.includes({t('common.descripcion')}))) {
         mapping.concept = header;
       }
       if (!mapping.amount && (lower.includes('monto') || lower.includes('amount') || lower.includes('importe') || lower.includes('cantidad'))) {
@@ -134,7 +137,7 @@ const ImportTransactions = ({ onImportComplete, onCancel }) => {
       }).filter(t => t.date && t.concept && t.amount); // Filtrar filas inválidas
 
       if (transactions.length === 0) {
-        throw new Error('No se encontraron transacciones válidas');
+        throw new Error({t('common.encontraron_transacciones_validas')});
       }
 
       // Llamar callback con las transacciones

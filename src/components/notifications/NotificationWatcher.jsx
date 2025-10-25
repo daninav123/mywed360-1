@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react';
 
 import { auth } from '../../firebaseConfig';
 import { useWedding } from '../../context/WeddingContext';
+import { useTranslations } from '../../hooks/useTranslations';
 import {
   showNotification,
   shouldNotify,
@@ -10,7 +11,11 @@ import {
 } from '../../services/notificationService';
 
 // Polls backend notifications and emits toast events for meeting/budget suggestions
-export default function NotificationWatcher({ intervalMs = 20000 }) {
+export default function NotificationWatcher({
+
+ intervalMs = 20000 }) {
+  const { t } = useTranslations();
+
   const { activeWedding } = useWedding();
   const seenRef = useRef(new Set());
   const uid = auth?.currentUser?.uid || null;
@@ -44,7 +49,7 @@ export default function NotificationWatcher({ intervalMs = 20000 }) {
           seenRef.current.add(n.id);
           const kind = n?.payload?.kind;
           if (kind === 'meeting_suggested') {
-            const title = n?.payload?.meeting?.title || 'Reunión detectada';
+            const title = n?.payload?.meeting?.title || {t('common.reunion_detectada')};
             const when = n?.payload?.meeting?.when || '';
             if (
               shouldNotify({
@@ -55,7 +60,7 @@ export default function NotificationWatcher({ intervalMs = 20000 }) {
               })
             ) {
               showNotification({
-                title: 'Reunión sugerida',
+                title: {t('common.reunion_sugerida')},
                 message: `${title}${when ? ' · ' + when : ''}`,
                 type: 'info',
                 duration: 9000,

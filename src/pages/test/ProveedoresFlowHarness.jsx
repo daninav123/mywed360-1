@@ -6,9 +6,12 @@ import ProveedorDetalle from '../../components/proveedores/ProveedorDetalle';
 import ProveedorFormModal from '../../components/proveedores/ProveedorFormModal';
 import ServicesBoard from '../../components/proveedores/ServicesBoard';
 import SupplierKanban from '../../components/proveedores/SupplierKanban';
+import { useTranslations } from '../../hooks/useTranslations';
 
 const SECTION_TABS = [
-  { id: 'vistos', label: 'Vistos' },
+  {
+  const { t } = useTranslations();
+ id: 'vistos', label: 'Vistos' },
   { id: 'pipeline', label: 'Pipeline' },
   { id: 'contratos', label: 'Contratos' },
 ];
@@ -35,14 +38,14 @@ const INITIAL_PROVIDERS = [
     id: 'prov-2',
     nombre: 'DJ Night',
     name: 'DJ Night',
-    servicio: 'Música',
-    service: 'Música',
+    servicio: {t('common.musica')},
+    service: {t('common.musica')},
     estado: 'Contactado',
     status: 'Contactado',
     presupuesto: 1200,
     presupuestoAsignado: 1200,
     gastado: 0,
-    proximaAccion: 'Esperar confirmación de agenda',
+    proximaAccion: {t('common.esperar_confirmacion_agenda')},
     favorito: false,
     ubicacion: 'Valencia',
     email: 'hola@djnight.es',
@@ -52,8 +55,8 @@ const INITIAL_PROVIDERS = [
     id: 'prov-3',
     nombre: 'Foto Natural',
     name: 'Foto Natural',
-    servicio: 'Fotografía',
-    service: 'Fotografía',
+    servicio: {t('common.fotografia')},
+    service: {t('common.fotografia')},
     estado: 'Presupuesto',
     status: 'Seleccionado',
     presupuesto: 1800,
@@ -73,13 +76,13 @@ const INITIAL_COMMUNICATIONS = {
       id: 'comm-201',
       tipo: 'Email',
       fecha: '2025-09-07',
-      mensaje: 'Se envió briefing inicial con playlist preferida.',
+      mensaje: {t('common.envio_briefing_inicial_con_playlist')},
     },
     {
       id: 'comm-202',
       tipo: 'Llamada',
       fecha: '2025-09-09',
-      mensaje: 'Confirmó disponibilidad para la fecha solicitada.',
+      mensaje: {t('common.confirmo_disponibilidad_para_fecha_solicitada')},
     },
   ],
   'prov-3': [
@@ -87,7 +90,7 @@ const INITIAL_COMMUNICATIONS = {
       id: 'comm-301',
       tipo: 'Email',
       fecha: '2025-09-11',
-      mensaje: 'Recibimos presupuesto detallado y ejemplos de álbum.',
+      mensaje: {t('common.recibimos_presupuesto_detallado_ejemplos_album')},
     },
   ],
 };
@@ -247,7 +250,7 @@ export default function ProveedoresFlowHarness() {
     setSearches((prev) => [...prev, query]);
     setTimeout(() => {
       setAiResult({
-        nombre: 'Floristería Prisma',
+        nombre: {t('common.floristeria_prisma')},
         servicio: 'Flores',
         descripcion: `Proveedor sugerido para "${query}"`,
         ubicacion: 'Barcelona',
@@ -311,7 +314,7 @@ export default function ProveedoresFlowHarness() {
           id: `comm-${Date.now()}`,
           tipo: 'Nota',
           fecha: new Date().toISOString(),
-          mensaje: 'Proveedor añadido desde bísqueda IA.',
+          mensaje: {t('common.proveedor_anadido_desde_bisqueda')},
         },
         ...(prev[next.id] || []),
       ],
@@ -364,7 +367,7 @@ export default function ProveedoresFlowHarness() {
         id: `comm-${Date.now()}`,
         tipo: 'Nota',
         fecha: new Date().toISOString(),
-        mensaje: 'Comunicación registrada durante la prueba',
+        mensaje: {t('common.comunicacion_registrada_durante_prueba')},
       };
       return { ...prev, [selectedProviderId]: [entry, ...current] };
     });

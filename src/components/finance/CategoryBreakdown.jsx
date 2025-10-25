@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 
 import Card from '../Card';
+import { useTranslations } from '../../hooks/useTranslations';
 
 const COLORS = [
   'var(--color-primary)',
@@ -11,7 +12,9 @@ const COLORS = [
   'var(--color-accent)',
 ];
 
-export const CategoryBreakdown = ({ transactions, type = 'expense' }) => {
+export const CategoryBreakdown = ({
+  const { t } = useTranslations();
+ transactions, type = 'expense' }) => {
   const chartRef = useRef(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
 
@@ -52,7 +55,7 @@ export const CategoryBreakdown = ({ transactions, type = 'expense' }) => {
     return (
       <Card className="p-4 h-full bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
         <h3 className="text-lg font-semibold mb-4">
-          {type === 'expense' ? 'Gastos por Categoría' : 'Ingresos por Categoría'}
+          {type === 'expense' ? {t('common.gastos_por_categoria')} : {t('common.ingresos_por_categoria')}}
         </h3>
         <p className="text-[color:var(--color-text)]/70 text-center my-8">
           No hay datos disponibles
@@ -66,7 +69,7 @@ export const CategoryBreakdown = ({ transactions, type = 'expense' }) => {
   return (
     <Card className="p-4 h-full bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
       <h3 className="text-lg font-semibold mb-4">
-        {type === 'expense' ? 'Gastos por Categoría' : 'Ingresos por Categoría'}
+        {type === 'expense' ? {t('common.gastos_por_categoria')} : {t('common.ingresos_por_categoria')}}
       </h3>
       <div ref={chartRef} className="h-64">
         <ResponsiveContainer width="100%" height="100%">

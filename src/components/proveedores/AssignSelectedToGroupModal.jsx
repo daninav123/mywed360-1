@@ -4,8 +4,13 @@ import useProveedores from '../../hooks/useProveedores';
 import useSupplierGroups from '../../hooks/useSupplierGroups';
 import Modal from '../Modal';
 import Button from '../ui/Button';
+import { useTranslations } from '../../hooks/useTranslations';
 
-export default function AssignSelectedToGroupModal({ open, onClose, providers = [] }) {
+export default function AssignSelectedToGroupModal({
+
+ open, onClose, providers = [] }) {
+  const { t } = useTranslations();
+
   const { groups, addMembers, createGroup } = useSupplierGroups();
   const { updateProvider } = useProveedores();
 
@@ -89,7 +94,7 @@ export default function AssignSelectedToGroupModal({ open, onClose, providers = 
             <label className="block text-sm text-gray-700 mb-1">Nombre del grupo</label>
             <input
               className="w-full border rounded p-2"
-              placeholder="Ej. Fotógrafos finalistas"
+              placeholder={t('common.fotografos_finalistas')}
               value={name}
               onChange={(e) => setName(e.target.value)}
             />

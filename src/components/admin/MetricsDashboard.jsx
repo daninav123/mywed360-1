@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { formatDate } from '../../utils/formatUtils';
+import Button from '../ui/Button';
 import {
   LineChart,
   Line,
@@ -19,6 +20,7 @@ import {
 import { get as apiGet } from '../../services/apiClient';
 import { performanceMonitor } from '../../services/PerformanceMonitor';
 import { getAdminFetchOptions } from '../../services/adminSession';
+import { useTranslations } from '../../hooks/useTranslations';
 
 /**
  * Dashboard para visualizar mtricas de rendimiento del sistema
@@ -581,7 +583,7 @@ function MetricsDashboard() {
                           ?colors.email
                           : entry.name.includes('Email recibidos')
                             ?colors.notification
-                            : entry.name.includes('Búsquedas')
+                            : entry.name.includes({t('common.busquedas')})
                               ?colors.search
                               : colors.eventDetection
                       }
@@ -613,7 +615,7 @@ function MetricsDashboard() {
             icon="x"
           />
           <StatCard
-            title="Búsquedas realizadas"
+            title={t('common.busquedas_realizadas')}
             value={lastPoint?.searchCount || 0}
             trend={-5}
             icon="x"
@@ -622,15 +624,19 @@ function MetricsDashboard() {
             title="Eventos detectados"
             value={lastPoint?.eventsDetected || 0}
             trend={20}
-            icon="x&"
+            icon="📅"
           />
         </div>
       </div>
 
-      {/* altima actualizacin */}
+      {/* Última actualización */}
       <div className="mt-6 text-right text-sm text-gray-500">
-        const date = new Date();
-        return `${formatDate(date, 'short')} ${date.toLocaleTimeString()}`; : 'N/A'}
+        Última actualización: {metrics?.timestamp 
+          ? (() => {
+              const date = new Date(metrics.timestamp);
+              return `${formatDate(date, 'short')} ${date.toLocaleTimeString()}`;
+            })()
+          : 'N/A'}
       </div>
     </div>
   );

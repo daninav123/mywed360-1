@@ -1,10 +1,13 @@
 import React, { useMemo } from 'react';
+import { useTranslations } from '../../hooks/useTranslations';
 
 const statusMessage = (slugStatus, checking) => {
+  const { t } = useTranslations();
+
   if (checking) return { text: 'Comprobando…', tone: 'neutral' };
   switch (slugStatus) {
     case 'invalid':
-      return { text: 'Slug inválido', tone: 'error' };
+      return { text: {t('common.slug_invalido')}, tone: 'error' };
     case 'reserved':
       return { text: 'Slug reservado', tone: 'error' };
     case 'taken':

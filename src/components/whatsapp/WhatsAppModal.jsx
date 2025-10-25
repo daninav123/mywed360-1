@@ -1,4 +1,4 @@
-import { MessageSquare, Smartphone, Send, Settings } from 'lucide-react';
+import { MessageSquare, Smartphone, Send, Settings, X } from 'lucide-react';
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
 
 import {
@@ -101,16 +101,31 @@ export default function WhatsAppModal({
 
   if (!open) return null;
 
+  const handleOverlayClick = (event) => {
+    if (event.target === event.currentTarget) {
+      onClose?.();
+    }
+  };
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+      onMouseDown={handleOverlayClick}
+      role="dialog"
+      aria-modal="true"
+    >
       <div className="bg-surface w-full max-w-2xl rounded-lg shadow-lg border border-soft">
         <div className="flex items-center justify-between px-4 py-3 border-b border-soft">
           <div className="flex items-center gap-2">
             <MessageSquare size={18} />
             <h3 className="font-semibold">Enviar por WhatsApp</h3>
           </div>
-          <button onClick={onClose} className="text-muted hover:text-body">
-            �
+          <button
+            onClick={onClose}
+            className="p-2 text-muted hover:text-body hover:bg-soft rounded-md transition-colors"
+            aria-label="Cerrar"
+          >
+            <X size={18} aria-hidden="true" />
           </button>
         </div>
 

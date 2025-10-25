@@ -29,12 +29,15 @@ import {
 import { useAuth } from '@/hooks/useAuth';
 import { useWedding } from '../context/WeddingContext';
 import { formatDate as formatDateUtil } from '../utils/formatUtils';
+import { useTranslations } from '../../hooks/useTranslations';
 
 const ALBUM_ID = 'momentos';
 
 const TABS = [
-  { id: 'overview', label: 'Resumen' },
-  { id: 'moderation', label: 'Moderación' },
+  {
+  const { t } = useTranslations();
+ id: 'overview', label: 'Resumen' },
+  { id: 'moderation', label: {t('common.moderacion')} },
   { id: 'slideshow', label: 'Slideshow' },
   { id: 'downloads', label: 'Descargas' },
 ];
@@ -157,7 +160,7 @@ export default function Momentos() {
       })
       .catch((error) => {
         console.error('Error inicializando la galería de recuerdos', error);
-        toast.error('No se pudo cargar la galería de recuerdos. Revisa tu conexión o permisos.');
+        toast.error({t('common.pudo_cargar_galeria_recuerdos_revisa')});
         setLoadingAlbum(false);
       });
 
@@ -230,7 +233,7 @@ export default function Momentos() {
       toast.success('Nuevo enlace generado');
     } catch (error) {
       console.error('createGuestToken', error);
-      toast.error(error?.message || 'No se pudo generar el enlace, reinténtalo más tarde.');
+      toast.error(error?.message || {t('common.pudo_generar_enlace_reintentalo_mas')});
     }
   };
 
@@ -253,7 +256,7 @@ export default function Momentos() {
   const handleReject = async (photo) => {
     const reason =
       typeof window !== 'undefined'
-      ? window.prompt('Motivo del rechazo', 'No cumple con la guía de la galería')
+      ? window.prompt('Motivo del rechazo', {t('common.cumple_con_guia_galeria')})
         : 'Rechazado';
     if (reason === null) return;
     try {
@@ -281,7 +284,7 @@ export default function Momentos() {
         status: 'pending',
         actorId: currentUser?.uid || null,
       });
-      toast.success('La foto volvió a pendiente');
+      toast.success({t('common.foto_volvio_pendiente')});
     } catch (error) {
       console.error('reset photo error', error);
       toast.error('No se pudo revertir el estado');
@@ -304,7 +307,7 @@ export default function Momentos() {
 
   if (!weddingsReady) {
     return (
-      <PageWrapper title="Galería de recuerdos">
+      <PageWrapper title={t('common.galeria_recuerdos')}>
         <div className="border border-gray-200 rounded-lg p-6 text-center text-gray-500">
           Cargando bodas...
         </div>
@@ -314,7 +317,7 @@ export default function Momentos() {
 
   if (!activeWedding) {
     return (
-      <PageWrapper title="Galería de recuerdos">
+      <PageWrapper title={t('common.galeria_recuerdos')}>
         <div className="border border-gray-200 rounded-lg p-6 text-center text-gray-500">
           Selecciona una boda para gestionar la galería de recuerdos.
         </div>
@@ -324,7 +327,7 @@ export default function Momentos() {
 
   if (loadingAlbum && !album) {
     return (
-      <PageWrapper title="Galería de recuerdos">
+      <PageWrapper title={t('common.galeria_recuerdos')}>
         <div className="border border-gray-200 rounded-lg p-6 text-center text-gray-500">
           Preparando tu álbum colaborativo...
         </div>
@@ -333,7 +336,7 @@ export default function Momentos() {
   }
 
   return (
-    <PageWrapper title="Galería de recuerdos">
+    <PageWrapper title={t('common.galeria_recuerdos')}>
       <PageTabs value={activeTab} onChange={setActiveTab} options={TABS} className="mb-6" />
 
       {activeTab === 'overview' && (

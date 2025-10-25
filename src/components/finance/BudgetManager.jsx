@@ -503,13 +503,13 @@ const distributeIncrease = (amounts, indices, delta) => {
           </h2>
           <p className="text-sm text-[color:var(--color-text)]/70">
             {t('finance.budget.subtitle', {
-              defaultValue: 'Organiza y controla el presupuesto por categorías',
+              defaultValue: {t('common.organiza_controla_presupuesto_por_categorias')},
             })}
           </p>
         </div>
         <div className="flex items-center gap-2">
           <Button leftIcon={<Plus size={16} />} onClick={handleAddCategory}>
-            {t('finance.budget.newCategory', { defaultValue: 'Nueva categoría' })}
+            {t('finance.budget.newCategory', { defaultValue: {t('common.nueva_categoria')} })}
           </Button>
         </div>
       </div>
@@ -525,7 +525,7 @@ const distributeIncrease = (amounts, indices, delta) => {
               onClick={handleAddCategory}
               leftIcon={<Plus size={16} />}
             >
-              {t('finance.budget.newCategory', { defaultValue: 'Nueva categoría' })}
+              {t('finance.budget.newCategory', { defaultValue: {t('common.nueva_categoria')} })}
             </Button>
           </div>
         ) : (
@@ -852,8 +852,8 @@ const distributeIncrease = (amounts, indices, delta) => {
         }}
         title={
           editingCategory
-            ? t('finance.budget.modal.editTitle', { defaultValue: 'Editar categoría' })
-            : t('finance.budget.modal.newTitle', { defaultValue: 'Nueva categoría' })
+            ? t('finance.budget.modal.editTitle', { defaultValue: {t('common.editar_categoria')} })
+            : t('finance.budget.modal.newTitle', { defaultValue: {t('common.nueva_categoria')} })
         }
       >
         <div className="space-y-4">

@@ -4,8 +4,11 @@ import Button from '../ui/Button';
 import { Card } from '../ui/Card';
 import Input from '../Input';
 import { Progress } from '../ui/Progress';
+import { useTranslations } from '../../hooks/useTranslations';
 
 const DATE_FORMATTER = new Intl.DateTimeFormat('es-ES', {
+  const { t } = useTranslations();
+
   day: '2-digit',
   month: 'short',
   year: 'numeric',
@@ -15,8 +18,8 @@ const statusOptions = [
   { id: 'all', label: 'Todas' },
   { id: 'active', label: 'Solo activas' },
   { id: 'archived', label: 'Archivadas' },
-  { id: 'upcoming30', label: 'Próximas 30 días' },
-  { id: 'upcoming90', label: 'Próximas 90 días' },
+  { id: 'upcoming30', label: {t('common.proximas_dias')} },
+  { id: 'upcoming90', label: {t('common.proximas_dias')} },
   { id: 'unsynced', label: 'Sin sincronizar CRM' },
 ];
 
@@ -111,7 +114,7 @@ export default function WeddingPortfolioTable({
           <Input
             value={filters.search || ''}
             onChange={(event) => handleFilters({ search: event.target.value })}
-            placeholder="Buscar por nombre o ubicación..."
+            placeholder={t('common.buscar_por_nombre_ubicacion')}
             data-testid="portfolio-search"
           />
           <label className="flex flex-col text-xs text-muted">
@@ -261,7 +264,7 @@ export default function WeddingPortfolioTable({
                     <td className="px-3 py-2">
                       <div className="font-medium">{wedding.name || 'Sin nombre'}</div>
                       <div className="text-xs text-muted">
-                        {wedding.location || wedding.banquetPlace || 'Ubicación pendiente'}
+                        {wedding.location || wedding.banquetPlace || {t('common.ubicacion_pendiente')}}
                       </div>
                     </td>
                     <td className="px-3 py-2 text-sm">{dateLabel}</td>

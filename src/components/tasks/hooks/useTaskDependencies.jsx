@@ -4,6 +4,7 @@
  */
 
 import { useMemo, useCallback } from 'react';
+import { useTranslations } from '../../hooks/useTranslations';
 
 /**
  * Verifica si una tarea tiene dependencias completadas
@@ -13,6 +14,8 @@ import { useMemo, useCallback } from 'react';
  * @returns {Object} Estado de dependencias { isBlocked, missingDeps, completedDeps }
  */
 export function checkTaskDependencies(task, allTasks, completedSet) {
+  const { t } = useTranslations();
+
   if (!task || !Array.isArray(task.dependsOn) || task.dependsOn.length === 0) {
     return { isBlocked: false, missingDeps: [], completedDeps: [], allDeps: [] };
   }
@@ -32,7 +35,7 @@ export function checkTaskDependencies(task, allTasks, completedSet) {
 
     const depInfo = {
       taskId: depTask.id,
-      taskTitle: dep.itemTitle || depTask.title || 'Tarea sin título',
+      taskTitle: dep.itemTitle || depTask.title || {t('common.tarea_sin_titulo')},
       blockName: dep.blockName || 'Bloque',
       isCompleted: completedSet.has(String(depTask.id))
     };
@@ -151,7 +154,7 @@ export function useTaskDependencies(tasks, completedSet) {
         if (oldStatus.isBlocked && !newStatus.isBlocked) {
           unblocked.push({
             id: task.id,
-            title: task.title || 'Sin título',
+            title: task.title || {t('common.sin_titulo')},
             task: task
           });
         }

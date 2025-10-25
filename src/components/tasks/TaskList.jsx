@@ -1,9 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useWedding } from '../../context/WeddingContext';
 import { formatDate } from '../../utils/formatUtils';
 import { categories } from './CalendarComponents.jsx';
 import { DependencyIndicator, DependencyTooltip } from './hooks/useTaskDependencies.jsx';
+import { useTranslations } from '../../hooks/useTranslations';
 
 const DEFAULT_PAGE_SIZE = 4;
 
@@ -17,6 +19,27 @@ export default function TaskList({
   dependencyStatuses = new Map(),
   containerHeight = null,
 }) {
+  const { t } = useTranslations();
+  const { t: tTasks, i18n } = useTranslation('tasks');
+  // Asegurar que locale sea un tag válido (es-ES, en-US, etc.)
+  const locale = useMemo(() => {
+    const lang = i18n.language || 'es';
+    // Si el idioma es inválido o genérico, usar es-ES por defecto
+    if (!lang || lang === 'i18n' || lang.length < 2) return 'es-ES';
+    // Si es un código de dos letras (es, en, fr), convertir a formato completo
+    if (lang.length === 2) {
+      const langMap = {
+        es: 'es-ES',
+        en: 'en-US',
+        fr: 'fr-FR',
+        de: 'de-DE',
+        it: 'it-IT',
+        pt: 'pt-PT'
+      };
+      return langMap[lang] || 'es-ES';
+    }
+    return lang;
+  }, [i18n.language]);
   const todayStart = useMemo(() => {
     const base = new Date();
     base.setHours(0, 0, 0, 0);
@@ -33,17 +56,9 @@ export default function TaskList({
 
   useEffect(() => {
     const explicit = Math.max(1, Number(maxItems) || DEFAULT_PAGE_SIZE);
-    if (!targetHeight) {
-      setPageSize(explicit);
-      return;
-    }
-    const HEADER_RESERVE = 120;
-    const FOOTER_RESERVE = 72;
-    const CARD_APPROX = 122;
-    const available = Math.max(CARD_APPROX, targetHeight - HEADER_RESERVE - FOOTER_RESERVE);
-    const computed = Math.max(1, Math.floor(available / CARD_APPROX));
-    setPageSize(Math.max(1, Math.min(explicit, computed)));
-  }, [maxItems, targetHeight]);
+    // Siempre usar el valor explícito sin limitarlo por altura
+    setPageSize(explicit);
+  }, [maxItems]);
 
   const sortedTasks = useMemo(() => {
     if (!Array.isArray(tasks)) return [];
@@ -151,7 +166,7 @@ export default function TaskList({
       style={containerStyle}
     >
       <div className="px-4 py-3 border-b border-[color:var(--color-text)]/10">
-        <h2 className="text-lg font-semibold">Tareas críticas de esta semana</h2>
+        <h2 className="text-lg font-semibold">{t('tasks.page.list.sectionTitle')}</h2>
         <div className="flex flex-wrap gap-2 mt-1 text-[10px] text-[color:var(--color-text)]/60">
           {Object.entries(categories).map(([key, cat]) => (
             <div key={key} className="flex items-center">
@@ -164,7 +179,7 @@ export default function TaskList({
 
       <div className="px-3 py-3 space-y-3 flex-1 overflow-y-auto">
         {Array.from(groupedSubtasks.entries()).map(([pid, items]) => {
-          const parentName = parentNameMap[pid] || 'Bloque';
+          const parentName = parentNameMap[pid] || t('tasks.page.list.defaults.parent');
           return (
             <div key={`group-${pid}`} className="space-y-2">
               <div className="flex items-center justify-between">
@@ -176,7 +191,7 @@ export default function TaskList({
                   className="text-xs text-indigo-600 hover:underline"
                   onClick={() => scrollToGanttParent(pid)}
                 >
-                  Ver en Gantt
+                  {t('tasks.page.list.actions.viewInGantt')}
                 </button>
               </div>
               {items.map((event) => {
@@ -208,7 +223,7 @@ export default function TaskList({
                     className={cardClasses}
                     onClick={() => onTaskClick(event)}
                     style={cardStyle}
-                    title={isBlocked ? 'Tarea bloqueada por dependencias' : undefined}
+                    title={isBlocked ? t('tasks.page.list.badges.blocked') : undefined}
                   >
                     <div className="flex items-start">
                       <div className="mr-2 flex items-center">
@@ -241,7 +256,7 @@ export default function TaskList({
                           </span>
                           {overdue && (
                             <span className="text-[10px] font-semibold text-red-700 bg-red-100 px-2 py-0.5 rounded-full">
-                              Vencida
+                              {t('tasks.page.list.badges.overdue')}
                             </span>
                           )}
                           {depStatus && <DependencyIndicator depStatus={depStatus} />}
@@ -257,7 +272,7 @@ export default function TaskList({
                         )}
                         {event.assignee && (
                           <div className="text-[11px] text-[color:var(--color-text)]/60 mt-1">
-                            Asignado a: {event.assignee}
+                            {t('tasks.page.list.labels.assigned', { name: event.assignee })}
                           </div>
                         )}
                         {depStatus && depStatus.allDeps.length > 0 && (
@@ -319,7 +334,12 @@ export default function TaskList({
                     </span>
                   )}
                   <div className="text-[11px] text-[color:var(--color-text)]/60">
-                    {event.start ? formatDate(event.start, 'custom') + ' ' + event.start.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : ''}
+                    {event.start
+                      ? `${formatDate(event.start, 'custom')} ${event.start.toLocaleTimeString(locale, {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}`
+                      : ''}
                   </div>
                   {event.desc && (
                     <div
@@ -330,11 +350,11 @@ export default function TaskList({
                       {event.desc}
                     </div>
                   )}
-                  {event.assignee && (
-                    <div className="text-[11px] text-[color:var(--color-text)]/60 mt-1">
-                      Asignado a: {event.assignee}
-                    </div>
-                  )}
+                    {event.assignee && (
+                      <div className="text-[11px] text-[color:var(--color-text)]/60 mt-1">
+                        {t('tasks.page.list.labels.assigned', { name: event.assignee })}
+                      </div>
+                    )}
                 </div>
               </div>
             </div>
@@ -342,8 +362,15 @@ export default function TaskList({
         })}
 
         {pagedTasks.length === 0 && (
-          <div className="text-center py-6 text-[color:var(--color-text)]/60 text-sm">
-            No hay próximas tareas programadas
+          <div className="text-center py-8 text-[color:var(--color-text)]/60">
+            <div className="text-sm mb-2">
+              {t('tasks.page.list.empty.upcoming')}
+            </div>
+            <div className="text-xs text-[color:var(--color-text)]/40">
+              {tasks.length > 0 
+                ? `${tasks.length} tarea(s) total(es), pero no hay próximas para mostrar` 
+                : {t('common.crea_primera_tarea_usando_boton')}}
+            </div>
           </div>
         )}
       </div>
@@ -351,7 +378,10 @@ export default function TaskList({
       {totalPages > 1 && (
         <div className="px-4 py-3 border-t border-[color:var(--color-text)]/10 flex items-center justify-between text-sm bg-[var(--color-surface)]">
           <span className="text-[color:var(--color-text)]/60">
-            Página {Math.min(page, totalPages - 1) + 1} de {totalPages}
+            {t('tasks.page.list.pagination.page', {
+              current: Math.min(page, totalPages - 1) + 1,
+              total: totalPages,
+            })}
           </span>
           <div className="flex gap-2">
             <button
@@ -360,7 +390,7 @@ export default function TaskList({
               onClick={() => setPage((prev) => Math.max(0, prev - 1))}
               disabled={page <= 0}
             >
-              Anterior
+              {t('tasks.page.list.pagination.prev')}
             </button>
             <button
               type="button"
@@ -368,7 +398,7 @@ export default function TaskList({
               onClick={() => setPage((prev) => Math.min(totalPages - 1, prev + 1))}
               disabled={page >= totalPages - 1}
             >
-              Siguiente
+              {t('tasks.page.list.pagination.next')}
             </button>
           </div>
         </div>

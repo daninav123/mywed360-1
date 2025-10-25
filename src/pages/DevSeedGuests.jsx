@@ -12,9 +12,12 @@ import {
 import React, { useEffect, useState } from 'react';
 
 import { db } from '../firebaseConfig';
+import { useTranslations } from '../../hooks/useTranslations';
 // No exigimos autenticación explícita aquí; la ruta es de desarrollo
 
 function chunkArray(arr, size) {
+  const { t } = useTranslations();
+
   const chunks = [];
   for (let i = 0; i < arr.length; i += size) chunks.push(arr.slice(i, i + size));
   return chunks;
@@ -43,7 +46,7 @@ export default function DevSeedGuests() {
           getDocs(query(collection(db, ...tablesColPath), limit(1))),
         ]);
         if (!force && (!guestsSnap.empty || !tablesSnap.empty)) {
-          setStatus('Datos existentes detectados. Añade force=true para sobrescribir.');
+          setStatus({t('common.datos_existentes_detectados_anade_forcetrue')});
           return;
         }
 

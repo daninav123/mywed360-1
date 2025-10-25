@@ -69,28 +69,28 @@ const DOWNLOAD_TEMPLATES = {
       {
         id: 'solicitud_expediente_matrimonial',
         title: 'Solicitud de expediente matrimonial',
-        desc: 'Modelo genérico para el Registro Civil',
+        desc: {t('common.modelo_generico_para_registro_civil')},
       },
       {
         id: 'declaracion_estado_civil',
-        title: 'Declaración jurada de estado civil',
-        desc: 'Soltería / divorcio / viudedad',
+        title: {t('common.declaracion_jurada_estado_civil')},
+        desc: {t('common.solteria_divorcio_viudedad')},
       },
       {
         id: 'modelo_testigos',
-        title: 'Modelo de declaración de testigos',
-        desc: 'Aportación de testigos (si el registro lo solicita)',
+        title: {t('common.modelo_declaracion_testigos')},
+        desc: {t('common.aportacion_testigos_registro_solicita')},
       },
     ],
     iglesia: [
       {
         id: 'solicitud_expediente_canonico',
-        title: 'Solicitud expediente matrimonial canónico',
-        desc: 'Modelo tipo para parroquia/diócesis',
+        title: {t('common.solicitud_expediente_matrimonial_canonico')},
+        desc: {t('common.modelo_tipo_para_parroquiadiocesis')},
       },
       {
         id: 'fe_solteria_eclesiastica',
-        title: 'Fe de soltería (modelo)',
+        title: {t('common.solteria_modelo')},
         desc: 'Para su parroquia de origen',
       },
       {
@@ -105,14 +105,14 @@ const DOWNLOAD_TEMPLATES = {
       {
         id: 'solicitud_expediente_matrimonial',
         title: 'Demande de dossier matrimonial (modèle)',
-        desc: 'Modèle générique',
+        desc: {t('common.modele_generique')},
       },
     ],
     iglesia: [
       {
         id: 'solicitud_expediente_canonico',
         title: 'Demande de dossier canonique (modèle)',
-        desc: 'Modèle générique',
+        desc: {t('common.modele_generique')},
       },
     ],
   },
@@ -140,7 +140,7 @@ function guessRelatedCeremonyId(label = '') {
   const lower = String(label).toLowerCase();
   if (lower.includes('curso')) return 'curso';
   if (lower.includes('ensayo')) return 'rehearsal';
-  if (lower.includes('proveedor') || lower.includes('música') || lower.includes('sonido')) {
+  if (lower.includes('proveedor') || lower.includes({t('common.musica')}) || lower.includes('sonido')) {
     return 'suppliers';
   }
   return DEFAULT_RELATED_ID;

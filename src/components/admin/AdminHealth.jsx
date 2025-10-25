@@ -5,8 +5,11 @@ import {
 
 import { get as apiGet } from '../../services/apiClient';
 import { getAdminFetchOptions } from '../../services/adminSession';
+import { useTranslations } from '../../hooks/useTranslations';
 
-const buildAdminApiOptions = (extra = {}) =>
+const buildAdminApiOptions = (extra = {
+  const { t } = useTranslations();
+}) =>
   getAdminFetchOptions({ auth: false, silent: true, ...extra });
 
 function UsersWithErrorsTable({ timeframe = 'day' }) {
@@ -137,7 +140,7 @@ export default function AdminHealth() {
         <div className="flex gap-2">
           {['day','week','month'].map(tf => (
             <button key={tf} onClick={() => setTimeframe(tf)} className={`px-3 py-1 rounded text-sm ${timeframe===tf? 'bg-indigo-600 text-white':'bg-gray-200'}`}>
-              {tf==='day'?'Día':tf==='week'?'Semana':'Mes'}
+              {tf==='day'?{t('common.dia')}:tf==='week'?'Semana':'Mes'}
             </button>
           ))}
         </div>

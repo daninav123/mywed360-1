@@ -10,6 +10,7 @@ import React, { useEffect, useState } from 'react';
 import { get as apiGet } from '../../../services/apiClient';
 
 import { safeRender, safeMap } from '../../../utils/promiseSafeRenderer';
+import { useTranslations } from '../../hooks/useTranslations';
 
 const IS_CYPRESS = typeof window !== 'undefined' && typeof window.Cypress !== 'undefined';
 const apiOptions = (extra = {}) => ({
@@ -220,7 +221,7 @@ const EmailList = ({
           <StatusMessage
             icon={<AlertCircle size={32} className="text-red-500" />}
             title={error}
-            description="Intenta actualizar la bandeja o revisa tu conexión."
+            description={t('common.intenta_actualizar_bandeja_revisa_conexion')}
             className="text-red-600"
             dataTestId="email-error-message"
           />

@@ -1,22 +1,30 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Sparkles, HeartHandshake, Users, CheckCircle2, Crown, Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import MarketingLayout from '../../components/marketing/MarketingLayout';
-import useTranslations from '../../hooks/useTranslations';
 import { useStripeCheckout, PRODUCT_IDS } from '../../hooks/useStripeCheckout';
 
-const formatEuro = (value, minimumFractionDigits = 0) =>
-  new Intl.NumberFormat('es-ES', {
-    style: 'currency',
-    currency: 'EUR',
-    minimumFractionDigits,
-  }).format(value);
-
 const Pricing = () => {
-  const { t } = useTranslations();
+  const { t, i18n } = useTranslation('pricing');
   const { startCheckout, isLoading, error } = useStripeCheckout();
   const [loadingPlan, setLoadingPlan] = useState(null);
+
+  const formatCurrency = useCallback(
+    (value, minimumFractionDigits = 0) => {
+      try {
+        return new Intl.NumberFormat(i18n.language || 'es', {
+          style: 'currency',
+          currency: 'EUR',
+          minimumFractionDigits,
+        }).format(value);
+      } catch {
+        return value;
+      }
+    },
+    [i18n.language]
+  );
 
   const handlePurchase = async (productId, planKey) => {
     setLoadingPlan(planKey);
@@ -99,7 +107,7 @@ const Pricing = () => {
         monthlySuffix: t('pricing.plannerPlans.pack5.monthlySuffix'),
         description: t('pricing.plannerPlans.pack5.description'),
         annualDescription: t('pricing.plannerPlans.pack5.annualDescription', {
-          amount: formatEuro(425),
+          amount: formatCurrency(425),
         }),
         features: t('pricing.plannerPlans.pack5.features', { returnObjects: true }),
       },
@@ -110,7 +118,7 @@ const Pricing = () => {
         monthlySuffix: t('pricing.plannerPlans.pack15.monthlySuffix'),
         description: t('pricing.plannerPlans.pack15.description'),
         annualDescription: t('pricing.plannerPlans.pack15.annualDescription', {
-          amount: formatEuro(1147.5),
+          amount: formatCurrency(1147.5),
         }),
         features: t('pricing.plannerPlans.pack15.features', { returnObjects: true }),
       },
@@ -121,7 +129,7 @@ const Pricing = () => {
         monthlySuffix: t('pricing.plannerPlans.teams40.monthlySuffix'),
         description: t('pricing.plannerPlans.teams40.description'),
         annualDescription: t('pricing.plannerPlans.teams40.annualDescription', {
-          amount: formatEuro(2720),
+          amount: formatCurrency(2720),
         }),
         features: t('pricing.plannerPlans.teams40.features', { returnObjects: true }),
       },
@@ -132,12 +140,12 @@ const Pricing = () => {
         monthlySuffix: t('pricing.plannerPlans.teamsUnlimited.monthlySuffix'),
         description: t('pricing.plannerPlans.teamsUnlimited.description'),
         annualDescription: t('pricing.plannerPlans.teamsUnlimited.annualDescription', {
-          amount: formatEuro(4250),
+          amount: formatCurrency(4250),
         }),
         features: t('pricing.plannerPlans.teamsUnlimited.features', { returnObjects: true }),
       },
     ],
-    [t]
+    [t, formatCurrency]
   );
 
   const plannerCta = t('pricing.plannerPlans.cta');
@@ -270,7 +278,7 @@ const Pricing = () => {
                         </>
                       ) : (
                         <>
-                          {formatEuro(plan.price)}{' '}
+                          {formatCurrency(plan.price)}{' '}
                           <span className="block text-sm font-medium text-muted">{plan.priceSuffix}</span>
                         </>
                       )}
@@ -303,7 +311,7 @@ const Pricing = () => {
                       {loadingPlan === plan.key ? (
                         <span className="flex items-center gap-2">
                           <Loader2 className="h-4 w-4 animate-spin" />
-                          Procesando...
+                          {t('pricing.actions.processing')}
                         </span>
                       ) : (
                         plan.cta
@@ -337,7 +345,7 @@ const Pricing = () => {
                     {plan.name}
                   </span>
                   <h3 className="mt-4 text-2xl font-semibold text-body">
-                    {formatEuro(plan.monthlyPrice, 2)}{' '}
+                    {formatCurrency(plan.monthlyPrice, 2)}{' '}
                     <span className="text-sm font-medium text-muted">{plan.monthlySuffix}</span>
                   </h3>
                   <p className="mt-1 text-sm text-muted">{plan.annualDescription}</p>
@@ -365,10 +373,12 @@ const Pricing = () => {
                     {loadingPlan === `${plan.key}_monthly` ? (
                       <span className="flex items-center gap-2">
                         <Loader2 className="h-4 w-4 animate-spin" />
-                        Procesando...
+                        {t('pricing.actions.processing')}
                       </span>
                     ) : (
-                      <>Plan Mensual ({formatEuro(plan.monthlyPrice, 2)}/mes)</>
+                      t('pricing.actions.monthlyButton', {
+                        amount: formatCurrency(plan.monthlyPrice, 2),
+                      })
                     )}
                   </button>
                   <button
@@ -382,10 +392,10 @@ const Pricing = () => {
                     {loadingPlan === `${plan.key}_annual` ? (
                       <span className="flex items-center gap-2">
                         <Loader2 className="h-4 w-4 animate-spin" />
-                        Procesando...
+                        {t('pricing.actions.processing')}
                       </span>
                     ) : (
-                      <>Plan Anual (Ahorra 15%)</>
+                      t('pricing.actions.annualButton')
                     )}
                   </button>
                 </div>
@@ -437,4 +447,3 @@ const Pricing = () => {
 };
 
 export default Pricing;
-

@@ -1,3 +1,4 @@
+import { useTranslations } from '../../hooks/useTranslations';
 import { toBlob } from 'html-to-image';
 import {
   ArrowLeft,
@@ -51,6 +52,8 @@ import EmailComments from '../EmailComments';
 
 // Constantes para tipos de archivos
 const IMAGE_TYPES = {
+  const { t } = useTranslations();
+
   jpg: 'image/jpeg',
   jpeg: 'image/jpeg',
   png: 'image/png',
@@ -599,7 +602,7 @@ const EmailDetail = ({
                       <span>
                         {attachment.size
                           ? `${Math.round(attachment.size / 1024)} KB`
-                          : 'Tamaño desconocido'}
+                          : {t('common.tamano_desconocido')}}
                       </span>
                       <button
                         className="text-blue-600 hover:text-blue-800 p-1"

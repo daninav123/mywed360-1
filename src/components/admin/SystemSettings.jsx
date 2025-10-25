@@ -15,6 +15,7 @@ import {
   Alert,
 } from '@mui/material';
 import React, { useState, useEffect } from 'react';
+import { useTranslations } from '../../hooks/useTranslations';
 
 /**
  * Componente de configuración del sistema para administradores
@@ -27,6 +28,8 @@ import React, { useState, useEffect } from 'react';
  * ```
  */
 function SystemSettings() {
+  const { t } = useTranslations();
+
   const [activeTab, setActiveTab] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -35,7 +38,7 @@ function SystemSettings() {
   // Estados para las diferentes configuraciones
   const [generalSettings, setGeneralSettings] = useState({
     siteName: 'MaLoveApp',
-    siteDescription: 'Plataforma de conexión con proveedores',
+    siteDescription: {t('common.plataforma_conexion_con_proveedores')},
     maxUploadSize: 10,
     allowedFileTypes: '.jpg,.png,.pdf,.docx,.xlsx',
     enableUserRegistration: true,
@@ -135,7 +138,7 @@ function SystemSettings() {
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs value={activeTab} onChange={handleTabChange} aria-label="configuración del sistema">
           <Tab label="General" />
-          <Tab label="Correo Electrónico" />
+          <Tab label={t('common.correo_electronico')} />
           <Tab label="Seguridad" />
         </Tabs>
       </Box>
@@ -158,7 +161,7 @@ function SystemSettings() {
               />
 
               <TextField
-                label="Descripción del Sitio"
+                label={t('common.descripcion_del_sitio')}
                 name="siteDescription"
                 value={generalSettings.siteDescription}
                 onChange={handleGeneralChange}
@@ -167,7 +170,7 @@ function SystemSettings() {
               />
 
               <TextField
-                label="Tamaño máximo de archivos (MB)"
+                label={t('common.tamano_maximo_archivos')}
                 name="maxUploadSize"
                 type="number"
                 value={generalSettings.maxUploadSize}
@@ -282,7 +285,7 @@ function SystemSettings() {
               />
 
               <TextField
-                label="Contraseña SMTP"
+                label={t('common.contrasena_smtp')}
                 name="smtpPassword"
                 type="password"
                 value={emailSettings.smtpPassword}
@@ -299,11 +302,11 @@ function SystemSettings() {
                 onChange={handleEmailChange}
                 fullWidth
                 variant="outlined"
-                helperText="Límite para evitar bloqueos por spam"
+                helperText={t('common.limite_para_evitar_bloqueos_por')}
               />
 
               <TextField
-                label="Tamaño máximo de adjuntos (MB)"
+                label={t('common.tamano_maximo_adjuntos')}
                 name="maxAttachmentSize"
                 type="number"
                 value={emailSettings.maxAttachmentSize}
@@ -337,29 +340,29 @@ function SystemSettings() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               <TextField
-                label="Tiempo de sesión (minutos)"
+                label={t('common.tiempo_sesion_minutos')}
                 name="sessionTimeoutMinutes"
                 type="number"
                 value={securitySettings.sessionTimeoutMinutes}
                 onChange={handleSecurityChange}
                 fullWidth
                 variant="outlined"
-                helperText="0 = sin límite"
+                helperText={t('common.sin_limite')}
               />
 
               <TextField
-                label="Máximo de intentos de login"
+                label={t('common.maximo_intentos_login')}
                 name="maxLoginAttempts"
                 type="number"
                 value={securitySettings.maxLoginAttempts}
                 onChange={handleSecurityChange}
                 fullWidth
                 variant="outlined"
-                helperText="Bloqueo temporal después de X intentos"
+                helperText={t('common.bloqueo_temporal_despues_intentos')}
               />
 
               <TextField
-                label="Tiempo de validez para reset de contraseña (horas)"
+                label={t('common.tiempo_validez_para_reset_contrasena')}
                 name="passwordResetTimeHours"
                 type="number"
                 value={securitySettings.passwordResetTimeHours}
@@ -375,7 +378,7 @@ function SystemSettings() {
                 onChange={handleSecurityChange}
                 fullWidth
                 variant="outlined"
-                helperText="Separadas por comas, vacío = permitir todas"
+                helperText={t('common.separadas_por_comas_vacio_permitir')}
               />
 
               <div className="col-span-1 md:col-span-2 flex flex-col space-y-2">
@@ -387,7 +390,7 @@ function SystemSettings() {
                       name="requireStrongPasswords"
                     />
                   }
-                  label="Requerir contraseñas seguras"
+                  label={t('common.requerir_contrasenas_seguras')}
                 />
 
                 <FormControlLabel
@@ -398,7 +401,7 @@ function SystemSettings() {
                       name="twoFactorAuthDefault"
                     />
                   }
-                  label="Autenticación de dos factores por defecto"
+                  label={t('common.autenticacion_dos_factores_por_defecto')}
                 />
               </div>
             </div>
@@ -418,7 +421,7 @@ function SystemSettings() {
           onClick={handleSaveSettings}
           disabled={isSaving}
         >
-          {isSaving ? 'Guardando...' : 'Guardar Configuración'}
+          {isSaving ? 'Guardando...' : {t('common.guardar_configuracion')}}
         </Button>
       </div>
     </div>

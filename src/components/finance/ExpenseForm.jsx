@@ -1,3 +1,4 @@
+import { useTranslations } from '../../hooks/useTranslations';
 /**
  * ExpenseForm Component
  * Formulario para crear/editar gastos
@@ -16,7 +17,9 @@ import { EXPENSE_CATEGORIES } from '../../services/financeService';
  * @param {Function} props.onCancel - Callback al cancelar
  * @param {boolean} props.loading - Estado de carga
  */
-export function ExpenseForm({ expense = null, onSave, onCancel, loading = false }) {
+export function ExpenseForm({
+  const { t } = useTranslations();
+ expense = null, onSave, onCancel, loading = false }) {
   const [formData, setFormData] = useState({
     name: expense?.name || '',
     category: expense?.category || 'other',
@@ -36,7 +39,7 @@ export function ExpenseForm({ expense = null, onSave, onCancel, loading = false 
     const newErrors = {};
     if (!formData.name.trim()) newErrors.name = 'El nombre es requerido';
     if (!formData.amount || formData.amount <= 0) newErrors.amount = 'El monto debe ser mayor a 0';
-    if (!formData.category) newErrors.category = 'Selecciona una categoría';
+    if (!formData.category) newErrors.category = {t('common.selecciona_una_categoria')};
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -198,7 +201,7 @@ export function ExpenseForm({ expense = null, onSave, onCancel, loading = false 
               onChange={(e) => handleChange('notes', e.target.value)}
               rows={3}
               className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white resize-none"
-              placeholder="Información adicional sobre este gasto..."
+              placeholder={t('common.informacion_adicional_sobre_este_gasto')}
             />
           </div>
 

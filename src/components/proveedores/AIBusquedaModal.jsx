@@ -1,4 +1,5 @@
-import { Sparkles, Search, X, RotateCw } from 'lucide-react';
+import { useTranslations } from '../../hooks/useTranslations';
+﻿import { Sparkles, Search, X, RotateCw } from 'lucide-react';
 import React, { useState } from 'react';
 
 /**
@@ -14,6 +15,8 @@ import React, { useState } from 'react';
  * @returns {React.ReactElement} Modal de búsqueda por IA
  */
 const AIBusquedaModal = ({
+  const { t } = useTranslations();
+
   visible,
   onClose,
   onBuscar,
@@ -33,8 +36,19 @@ const AIBusquedaModal = ({
 
   if (!visible) return null;
 
+  const handleOverlayClick = (event) => {
+    if (event.target === event.currentTarget) {
+      onClose?.();
+    }
+  };
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+      onMouseDown={handleOverlayClick}
+      role="dialog"
+      aria-modal="true"
+    >
       <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] flex flex-col">
         {/* Cabecera */}
         <div className="flex justify-between items-center p-5 border-b border-gray-200">
@@ -44,8 +58,13 @@ const AIBusquedaModal = ({
               Búsqueda inteligente de proveedores
             </h3>
           </div>
-          <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-100">
-            <X size={20} className="text-gray-500" />
+          <button
+            onClick={onClose}
+            className="p-1 rounded-full hover:bg-gray-100"
+            type="button"
+            aria-label="Cerrar búsqueda de proveedores"
+          >
+            <X size={20} className="text-gray-500" aria-hidden="true" />
           </button>
         </div>
 
@@ -60,7 +79,7 @@ const AIBusquedaModal = ({
                 type="text"
                 value={consulta}
                 onChange={(e) => setConsulta(e.target.value)}
-                placeholder="Ej: 'Fotógrafo de bodas en Madrid con estilo reportaje'"
+                placeholder={t('common.fotografo_bodas_madrid_con_estilo')}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
               />
               <p className="mt-1 text-xs text-gray-500">Sé específico para mejores resultados</p>

@@ -1,21 +1,52 @@
 {
+  "accion_cancelada": "Acción cancelada",
+  "acciones_creadas_manualmente_los_ultimos": "Acciones creadas manualmente en los últimos 14 días",
+  "acompanantes": "Acompañantes",
+  "actualizacion_desconocida": "Actualización desconocida",
+  "acuerdo_basico_reserva": "Acuerdo básico de reserva",
+  "acustico": "acústico",
+  "acusticoindie": "Acústico/Indie",
+  "agenda_del_dia": "Agenda del día",
+  "alerta_anadida": "Alerta añadida",
+  "alertas_curso_severidad_flujo_resolucion": "Alertas en curso, severidad y flujo de resolución.",
+  "alta_resolucion": "Alta resolución",
+  "altas_confirmadas_ultimo_mes": "Altas confirmadas en el último mes.",
+  "ambientacion": "ambientación",
+  "anade_numeros_para_reforzarla": "Añade números para reforzarla.",
+  "anade_primer_invitado_para_comenzar": "Añade tu primer invitado para comenzar",
+  "anade_termino_completa_perfil_para": "Añade un término o completa tu perfil para mejorar las búsquedas.",
+  "anade_una_cancion": "Añade una canción.",
+  "anade_una_hora_estimada": "Añade una hora estimada.",
+  "anade_url_invitacion_disenada_antes": "Añade la URL de la invitación diseñada antes de continuar.",
+  "anadir": "Añadir",
+  "anadir_comentario": "Añadir un comentario…",
+  "anadir_favoritos": "Añadir a favoritos",
+  "anadir_invitado": "Añadir Invitado",
+  "anadir_mesa": "Añadir Mesa",
+  "analisis": "📊 Análisis",
+  "analitica": "Analítica",
+  "animacion_infantil": "Ej: DJ, Animación infantil...",
+  "ano": "/año",
+  "antepone_cuando_telefono_tiene_prefijo": "Se antepone cuando el teléfono no tiene prefijo (ej. +34).",
+  "aplicacion_plantillas": "Aplicación de plantillas",
+  "aportacion_testigos_registro_solicita": "Aportación de testigos (si el registro lo solicita)",
   "app": {
     "name": "MaLove.App",
     "brandName": "Lovenda",
     "tagline": "Tu boda perfecta, organizada digitalmente",
     "loading": "Cargando...",
     "error": "Error",
-    "success": "xito",
+    "success": "Éxito",
     "cancel": "Cancelar",
     "save": "Guardar",
     "delete": "Eliminar",
     "edit": "Editar",
-    "add": "Aadir",
+    "add": "Añadir",
     "search": "Buscar",
     "filter": "Filtrar",
     "close": "Cerrar",
     "open": "Abrir",
-    "yes": "S",
+    "yes": "Sí",
     "no": "No",
     "ok": "Aceptar",
     "back": "Volver",
@@ -24,45 +55,590 @@
     "continue": "Continuar",
     "finish": "Finalizar"
   },
-  "navigation": {
-    "home": "Inicio",
-    "dashboard": "Panel",
-    "guests": "Invitados",
-    "providers": "Proveedores",
-    "finance": "Finanzas",
-    "seating": "Plan de asientos",
-    "email": "Correo electrnico",
-    "protocol": "Protocolo",
-    "designs": "Diseos",
-    "website": "Web de boda",
-    "contracts": "Contratos",
-    "tasks": "Tareas",
-    "profile": "Perfil",
-    "settings": "Configuracin",
-    "logout": "Cerrar sesin",
-    "more": "Ms",
-    "createEvent": "Crear nuevo evento",
-    "weddings": "Bodas",
-    "emailInbox": "Bandeja de entrada",
-    "darkMode": "Modo oscuro",
-    "userMenu": "Men de usuario"
+  "app_esta_lista_para_funcionar": "La app está lista para funcionar sin conexión",
+  "apply": "Aplicar",
+  "archivar_esta_boda_podras_restaurarla": "¿Archivar esta boda? Podrás restaurarla más adelante.",
+  "archivo_esta_vacio": "El archivo está vacío",
+  "areas_dibujadas": "Áreas dibujadas",
+  "asiento_huerfano": "Asiento huérfano",
+  "asignados_incluye_acompanantes_count": "Asignados (incluye acompañantes): {count}",
+  "atencion": "Atención",
+  "aumenta_longitud_caracteres_mas": "Aumenta la longitud a 12 caracteres o más.",
+  "aun_hay_contratos_firmados_con": "Aún no hay contratos firmados con este proveedor.",
+  "autenticacion_dos_factores_por_defecto": "Autenticación de dos factores por defecto",
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "forgotPassword": "Forgot your password?",
+    "resetPassword": "Reset Password",
+    "loginWithGoogle": "Login with Google",
+    "loginWithFacebook": "Login with Facebook",
+    "alreadyHaveAccount": "Already have an account?",
+    "dontHaveAccount": "Don't have an account?",
+    "createAccount": "Create Account",
+    "welcomeBack": "Welcome back!",
+    "createYourAccount": "Create your account",
+    "loginSuccess": "Login successful",
+    "logoutSuccess": "Logout successful",
+    "loginError": "Login error",
+    "registerError": "Registration error",
+    "invalidCredentials": "Invalid credentials",
+    "emailRequired": "Email is required",
+    "passwordRequired": "Password is required",
+    "passwordTooShort": "Password must be at least 6 characters",
+    "passwordsDoNotMatch": "Passwords do not match",
+    "invalidEmail": "Invalid email format"
   },
+  "authLogin": {
+    "title": "Accede a tu cuenta",
+    "subtitle": "Usa tu correo y contrasea o contina con un proveedor social.",
+    "emailLabel": "Correo electrónico",
+    "passwordLabel": "Contrasea",
+    "emailPlaceholder": "tu@email.com",
+    "passwordPlaceholder": "Tu contrasea",
+    "rememberMe": "Recurdame",
+    "forgotPassword": "Olvidaste tu contrasea?",
+    "submit": "Iniciar sesión",
+    "submitting": "Iniciando sesión...",
+    "noAccount": "No tienes cuenta?",
+    "registerLink": "Regstrate",
+    "hero": {
+      "title": "Gestiona todo desde un nico panel",
+      "description": "Accede a tus invitados, tareas, presupuestos y documentos en segundos. Sigue el progreso del evento y coordina a todo tu equipo.",
+      "features": [
+        "Sincroniza proveedores y contratos.",
+        "Automatiza correos y recordatorios personalizados.",
+        "Recibe alertas cuando algo requiera tu atencin."
+      ]
+    },
+    "validation": {
+      "missingEmail": "Introduce tu correo electrónico.",
+      "missingPassword": "Introduce tu contrasea."
+    },
+    "errors": {
+      "invalidCredentials": "Correo o contrasea invlidos.",
+      "generic": "No pudimos iniciar sesión. Intntalo de nuevo o contacta con soporte."
+    },
+    "social": {
+      "divider": "o contina con",
+      "button": "Continuar con {{provider}}",
+      "pending": "Contina el inicio de sesión en la ventana de {{provider}}."
+    }
+  },
+  "authSignup": {
+    "title": "Crea tu cuenta",
+    "subtitle": "Regstrate con tu correo o contina con tu cuenta social favorita.",
+    "emailLabel": "Correo electrónico",
+    "passwordLabel": "Contrasea",
+    "roleLabel": "Rol",
+    "emailPlaceholder": "tu@email.com",
+    "passwordPlaceholder": "Mnimo 8 caracteres",
+    "rememberMe": "Recurdame",
+    "forgotPassword": "Olvidaste tu contrasea?",
+    "submit": "Crear cuenta",
+    "submitting": "Creando cuenta...",
+    "noAccount": "No tienes cuenta?",
+    "registerLink": "Regstrate",
+    "alreadyHaveAccount": "Ya tienes cuenta?",
+    "loginLink": "Inicia sesión",
+    "hero": {
+      "title": "Bienvenida a Lovenda",
+      "description": "Centraliza tareas, invitados y proveedores en un solo lugar. Nuestra asistente te gua en cada paso para que tu boda sea perfecta.",
+      "features": [
+        "Timeline inteligente para no olvidar nada.",
+        "Automatiza correos y recordatorios para invitados.",
+        "Catlogo de proveedores con recomendaciones personalizadas."
+      ]
+    },
+    "roleOptions": {
+      "particular": "Pareja",
+      "planner": "Wedding planner",
+      "assistant": "Ayudante"
+    },
+    "validation": {
+      "missingEmail": "Introduce tu correo electrónico.",
+      "missingPassword": "Introduce tu contrasea.",
+      "shortPassword": "La contrasea debe tener al menos 8 caracteres."
+    },
+    "errors": {
+      "emailInUse": "Este correo ya est registrado.",
+      "weakPassword": "Elige una contrasea más fuerte para completar el registro.",
+      "invalidEmail": "Introduce un correo electrónico válido.",
+      "generic": "No pudimos crear tu cuenta. Intntalo de nuevo o contacta con soporte."
+    },
+    "successMessage": "Cuenta creada con Éxito. Redirigiendo a tu panel...",
+    "social": {
+      "divider": "o contina con",
+      "button": "Continuar con {{provider}}",
+      "pending": "Contina el registro en la ventana de {{provider}}."
+    }
+  },
+  "autobus": "autobús",
+  "automaticas": "automáticas",
+  "automatiza_tareas_repetitivas_manten_equipo": "Automatiza tareas repetitivas y mantén a tu equipo alineado con paneles compartidos.",
+  "automatizacion_activa": "Automatización activa",
+  "automatizacion_pausada": "Automatización pausada",
+  "basado_media_movil_los_ultimos": "Basado en la media móvil de los últimos seis meses.",
+  "basico": "Básico",
+  "beyonce": "Beyoncé",
+  "bienvenida_recepcion": "Bienvenida Recepción",
+  "bienvenidos_celebracion_nuestra_boda_gracias": "Bienvenidos a la celebración de nuestra boda. Gracias por acompañarnos en este día tan especial...",
+  "bloqueo_temporal_despues_intentos": "Bloqueo temporal después de X intentos",
+  "boda_sin_titulo": "Boda sin título",
+  "borrar_este_correo": "¿Borrar este correo?",
+  "botanico_floral": "Botánico & Floral",
+  "budgetPrediction": {
+    "header": {
+      "title": "Prediccin IA",
+      "subtitle": "Análisis inteligente de tu presupuesto"
+    },
+    "actions": {
+      "analyzing": "Analizando...",
+      "refresh": "Actualizar prediccin"
+    },
+    "metrics": {
+      "riskLabel": "Nivel de riesgo",
+      "confidence": "Confianza",
+      "spent": "Gastado",
+      "projected": "Proyectado",
+      "dailyRate": "Gasto diario",
+      "daysRemaining": "Das restantes"
+    },
+    "sections": {
+      "recommendations": "Recomendaciones",
+      "categoryAnalysis": "Análisis por categoría"
+    },
+    "emptyState": {
+      "title": "Predicciones IA disponibles prximamente",
+      "description": "Necesitas al menos 5 transacciones para generar predicciones. Actualmente tienes {{count}}."
+    },
+    "riskLabels": {
+      "critical": "Crtico",
+      "high": "Alto",
+      "medium": "Medio",
+      "low": "Bajo"
+    },
+    "recommendations": {
+      "projectedOverage": {
+        "message": "Se proyecta un exceso de {{amount}}",
+        "action": "Considera revisar gastos discrecionales"
+      },
+      "highDailyRate": {
+        "message": "Tu tasa de gasto diaria es alta",
+        "action": "Intenta espaciar más las compras grandes"
+      },
+      "onTrack": {
+        "message": "Vas muy bien con el presupuesto!",
+        "action": "Mantn este ritmo de gasto"
+      }
+    }
+  },
+  "buscar_por_codigo_url_responsable": "Buscar por código, URL o responsable",
+  "buscar_por_nombre_email_telefono": "Buscar por nombre, email o teléfono...",
+  "buscar_por_nombre_ubicacion": "Buscar por nombre o ubicación...",
+  "busqueda_global": "Búsqueda global",
+  "busquedas": "Búsquedas",
+  "busquedas_realizadas": "Búsquedas realizadas",
+  "caido": "Caído",
+  "cambiar_direccion": "Cambiar dirección",
+  "cambios_guardados_automaticamente": "Cambios guardados automáticamente",
+  "cambios_simultaneos": "Cambios simultáneos",
+  "cambios_transaccion_invalidos": "Cambios de transacción inválidos",
+  "campana": "Campaña",
+  "cancelacion_servicios": "Cancelación de servicios",
+  "cancelacion_servicios_para_boda_del": "Cancelación de servicios para boda del {{fecha_boda}}",
+  "cancion_del_primer_baile_requerida": "Canción del primer baile es requerida",
+  "canvas_invitacion_arrastra_componentes_aqui": "Canvas de invitación: arrastra componentes aquí",
+  "capacidad_calculada_automaticamente_sugerido_count": "Capacidad calculada automáticamente (sugerido {count})",
+  "capas_guias": "Capas y guías",
+  "capilla_jardin_salon": "Capilla, jardín, salón...",
+  "carmen_garcia_madre": "Carmen García (madre)",
+  "cartel_asignacion_mesas_con_diseno": "Cartel de asignación de mesas con diseño formal y refinado",
+  "cartel_decorado_con_flores_motivos": "Cartel decorado con flores, motivos románticos y colores suaves",
+  "cartel_estilo_rustico_con_elementos": "Cartel de estilo rústico con elementos naturales y madera",
+  "cartel_personalizado_con_tematica_especial": "Cartel personalizado con temática especial (viajes, naturaleza, etc)",
+  "categoria": "Categoría",
+  "categoria_existe_nombre_invalido": "Categoría ya existe o nombre inválido",
+  "categorias": "Categorías",
+  "categorias_riesgo": "Categorías en riesgo",
+  "categories": {
+    "decoration": "Decoración",
+    "cocktail": "Cctel",
+    "banquet": "Banquete",
+    "ceremony": "Ceremonia",
+    "flowers": "Flores",
+    "dress": "Vestidos",
+    "cake": "Pasteles",
+    "photography": "Fotografía"
+  },
+  "celebracion": "celebración",
+  "centrar_salon": "Centrar en salón",
+  "ceremonia_llevara_cabo_date_comenzando": "La ceremonia se llevará a cabo el {date} comenzando puntualmente a las {time} {location}. Se ruega puntualidad.",
+  "chat": {
+    "open": "Abrir chat"
+  },
+  "chatwidget_backend_respondio": "[ChatWidget] Backend IA respondió",
+  "cierre_transicion_hacia_coctel_banquete": "Cierre y transición hacia cóctel o banquete.",
+  "clasica": "clásica",
+  "clasico": "Clásico",
+  "clasico_cuadricula": "Clásico en Cuadrícula",
+  "clasico_dorado": "Clásico Dorado",
+  "clasicos_infalibles": "Clásicos infalibles",
+  "coctel": "Cóctel",
+  "coctel_bienvenida": "Cóctel de bienvenida",
+  "codigo_descuento_encontrado_token_invalido": "Código de descuento no encontrado o token inválido",
+  "codigo_moneda_eur_usd": "Código de moneda (EUR, USD...).",
+  "codigo_pais_por_defecto": "Código país por defecto",
+  "codigo_postal_valido": "El código postal no es válido",
+  "colaboracion_real": "Colaboración real",
+  "colision_con_obstaculo": "Colisión con obstáculo",
+  "combina_mayusculas_minusculas": "Combina mayúsculas y minúsculas.",
+  "combinar_dividir_lineas_servicio": "Combinar o dividir líneas de servicio",
+  "combinar_lineas": "Combinar líneas",
+  "comision_generada_periodo": "Comisión generada en el periodo.",
+  "comision_pendiente_menor_omite_aviso": "Si la comisión pendiente es menor, se omite el aviso.",
+  "common": {
+    "all": "All",
+    "none": "None",
+    "show": "Show",
+    "hide": "Hide",
+    "view": "View",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "duplicate": "Duplicate"
+  },
+  "como_organizar_ceremonia_civil_perfecta": "Ej. Cómo organizar la ceremonia civil perfecta",
+  "completa_titulo_contenido_antes_guardar": "Completa el título y el contenido antes de guardar.",
+  "completaste_tareas_dias": "Completaste 5 tareas en 7 días.",
+  "compose": {
+    "toField": "Recipient field",
+    "subjectField": "Subject field",
+    "ccField": "CC field",
+    "bccField": "BCC field",
+    "insertQuickReply": "Insert suggested reply"
+  },
+  "composicion_equilibrada_clara_legible_con": "Composición equilibrada, clara y legible, con jerarquía tipográfica.",
+  "comunicacion_registrada_durante_prueba": "Comunicación registrada durante la prueba",
+  "comunicaciones_masivas_avisos_criticos_controlados": "Comunicaciones masivas y avisos críticos controlados.",
+  "con_carino_hemos_asignado": "Con cariño, os hemos asignado",
+  "conexion_con_base_datos_emails": "Conexión con base de datos de emails OK",
+  "conexion_restablecida_correctamente": "Conexión restablecida correctamente",
+  "confeti_lanzamiento_petalos": "Confeti / lanzamiento de pétalos",
+  "configura_menos_una_categoria_antes": "Configura al menos una categoría antes de usar el consejero.",
+  "configuracion": "Configuración",
+  "confirmacion_catering": "Confirmación catering",
+  "confirmacion_cita": "Confirmación de cita",
+  "confirmacion_cita_fechacita": "Confirmación de cita - {{fecha_cita}}",
+  "confirmacion_contratacion": "Confirmación de contratación",
+  "confirmacion_contratacion_servicios_para_boda": "Confirmación de contratación de servicios para boda {{fecha_boda}}",
+  "confirmacion_detalles_finales": "Confirmación de detalles finales",
+  "confirmacion_detalles_finales_para_servicio": "Confirmación de detalles finales para {{servicio}} - Boda {{fecha_boda}}",
+  "confirmacion_floristeria": "Confirmación floristería",
+  "confirmacion_fotografovideografo": "Confirmación fotógrafo/videógrafo",
+  "confirmacion_musicadj": "Confirmación música/DJ",
+  "confirmacion_proveedores_ceremonia": "Confirmación proveedores ceremonia",
+  "confirmacion_recepcion": "Confirmación de recepción",
+  "confirmacion_recepcion_asuntooriginal": "Confirmación de recepción: {{asunto_original}}",
+  "confirmacion_reserva": "Confirmación de reserva",
+  "confirmacion_reserva_para_nuestra_boda": "Confirmación de reserva para nuestra boda - {{weddingDate}}",
+  "confirmar_menu_con_catering": "Ej: Confirmar menú con catering",
+  "confirmar_musica_entrada": "Ej. Confirmar música de entrada",
+  "confirmo_disponibilidad_para_fecha_solicitada": "Confirmó disponibilidad para la fecha solicitada.",
+  "conflicto_edicion_detectado": "Conflicto de edición detectado",
+  "considera_usar_template_automatico_reducir": "Considera usar un template automático o reducir mesas",
+  "considerar_iluminacion_adicional_zona": "Considerar iluminación adicional en la zona L",
+  "considerar_virtualizacion_para_listas_notificaciones": "Considerar virtualización para listas de notificaciones con más de 50 elementos",
+  "consulta_sobre_decoracion_floral_para": "Consulta sobre decoración floral para boda",
+  "consulta_sobre_decoracion_para_boda": "Consulta sobre decoración para boda",
+  "consulta_sobre_diseno_invitaciones": "Consulta sobre diseño de invitaciones",
+  "consulta_sobre_diseno_invitaciones_para": "Consulta sobre diseño de invitaciones para boda",
+  "consulta_sobre_musica_animacion_para": "Consulta sobre música y animación para boda",
+  "consulta_sobre_musicadj_para_boda": "Consulta sobre música/DJ para boda {{weddingDate}}",
+  "consulta_sobre_servicios_fotografia_para": "Consulta sobre servicios de fotografía para boda",
+  "contrasena_debe_tener_menos_caracteres": "La contraseña debe tener al menos 6 caracteres",
+  "contrasena_incorrecta": "Contraseña incorrecta",
+  "contrasena_muy_debil": "La contraseña es muy débil",
+  "contrasena_obligatoria": "La contraseña es obligatoria",
+  "contrasena_smtp": "Contraseña SMTP",
+  "contrato_generico_prestacion_servicios": "Contrato genérico de prestación de servicios",
+  "control_total_eventos_sin_hojas": "Control total de eventos sin hojas de cálculo.",
+  "coordina_boda_sonada_con_herramientas": "Coordina tu boda soñada con herramientas listas para tu equipo.",
+  "coordinacion": "coordinación",
+  "correo_electrnico_invilido": "Correo electrnico invÍlido",
+  "correo_electronico": "Correo Electrónico",
+  "correo_electronico_requerido": "Correo electrónico requerido",
+  "crea_cartel_seating_plan_con": "Crea un cartel de seating plan con estética rústica para una boda. Utiliza elementos como madera, flores silvestres y elementos naturales. Diseño que parezca una pizarra o tabla de madera con los nombres escritos. Incluye el título \"Encuentra tu sitio\" o similar. Estilo cálido y acogedor, con aspecto artesanal. La distribución debe permitir organizar nombres por mesas de forma clara.",
+  "crea_diseno_menu_infantil_para": "Crea un diseño de menú infantil para boda que sea divertido pero mantenga la elegancia del evento. Incluye elementos gráficos amigables para niños sin ser excesivamente infantil. El título debe ser \"Menú Infantil\" o similar, con espacio para listar opciones de comida para niños. Usa colores vibrantes pero armoniosos con la temática de boda. El diseño debe ser atractivo para los niños pero también visualmente agradable para los padres.",
+  "crea_diseno_menu_sin_lacteos": "Crea un diseño de menú sin lácteos para boda. El diseño debe ser elegante y refinado, en línea con la estética general de la boda. Incluye un título claro como \"Menú Sin Lácteos\" o \"Menú Libre de Lácteos\". Proporciona espacio para listar entrantes, plato principal y postre. Puedes incorporar algún elemento gráfico sutil que indique la ausencia de lácteos. La paleta de colores debe ser armoniosa con el resto de la decoración del evento.",
+  "crea_logo_boda_con_estetica": "Crea un logo de boda con estética vintage o retro. Utiliza tipografías clásicas con serifs pronunciados o estilo script elegante. Incorpora elementos decorativos como marcos ornamentados, cintas o víñetas. Usa una paleta de colores envejecida como sepia, borgoña o azul marino. El diseño debe evocar nostalgia y elegancia atemporal, inspirado en los años 20-50.",
+  "crea_logo_para_boda_con": "Crea un logo para boda con nombres o iniciales rodeados de elementos florales. Utiliza un estilo botánico con flores y hojas delicadas. Paleta de colores suaves como verde sage, rosa pálido y toques dorados. Diseño circular u ovalado que funcione bien como sello o emblema. Estilo romántico y natural.",
+  "crea_marcador_mesa_con_estilo": "Crea un marcador de mesa con estilo rústico y natural para boda. Utiliza texturas que simulen madera, papel kraft o materiales reciclados. Incorpora elementos decorativos como hojas, flores silvestres o ramas. Tipografía con aspecto manuscrito o artesanal. El diseño debe transmitir calidez y un ambiente campestre. Formato que permita escribir el nombre del invitado de forma destacada y legible.",
+  "crea_marcador_mesa_moderno_con": "Crea un marcador de mesa moderno con elementos geométricos para boda. Utiliza formas como hexágonos, triángulos o líneas abstractas. Tipografía sans-serif limpia y contemporánea. Paleta de colores contrastantes pero elegantes como negro, blanco, dorado o colores acentuados. El diseño debe ser actual, con estilo minimalista pero distintivo, dejando espacio prominente para el nombre del invitado.",
+  "crea_menu_boda_con_estetica": "Crea un menú de boda con estética rústica y natural. Utiliza elementos como madera, flores silvestres y hojas. Tipografía con aspecto manuscrito o caligráfico. Formato de una página con secciones para entrante, principal, postre y bebidas. Paleta de colores tierra y verdes naturales. El diseño debe transmitir calidez y un ambiente campestre elegante.",
+  "crea_menu_boda_con_tematica": "Crea un menú de boda con temática botánica y floral. Incorpora ilustraciones delicadas de flores, hojas y ramas como elementos decorativos. Usa una combinación de tipografías elegantes y caligráficas. Paleta de colores suaves como verde salvia, rosa pálido y toques dorados. Formato de una página con todas las secciones del menú organizadas armónicamente entre los elementos vegetales.",
+  "crea_otra_seccion_para_usar": "Crea otra sección para usar esta acción.",
+  "crea_primera_tarea_usando_boton": "Crea tu primera tarea usando el botón \"Nueva Tarea\"",
+  "crear_grupo_con_seleccion": "Crear grupo con selección",
+  "creo_proveedor_nuevo_con_las": "Se creó un proveedor nuevo con las líneas seleccionadas.",
+  "critica": "Crítica",
+  "critico": "Crítico",
+  "csv_contiene_filas_validas": "El CSV no contiene filas válidas",
+  "cualquier_informacion_adicional_relevante_para": "Cualquier información adicional relevante para la cita...",
+  "cuentanos_detalles_sobre_estilo_inspiracion": "Cuéntanos detalles sobre estilo, inspiración o restricciones.",
+  "cumple_con_guia_galeria": "No cumple con la guía de la galería",
+  "dates": {
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "tomorrow": "Tomorrow",
+    "thisWeek": "This week",
+    "nextWeek": "Next week",
+    "thisMonth": "This month",
+    "nextMonth": "Next month",
+    "selectDate": "Select date",
+    "dateFormat": "mm/dd/yyyy",
+    "timeFormat": "HH:mm"
+  },
+  "datos_existentes_detectados_anade_forcetrue": "Datos existentes detectados. Añade force=true para sobrescribir.",
+  "datos_transaccion_invalidos": "Datos de transacción inválidos",
+  "debe_ser_numero_valido": "Debe ser un número válido",
+  "debes_iniciar_sesion_para_reservar": "Debes iniciar sesión para reservar un nombre de usuario",
+  "debil": "Débil",
+  "declaracion_jurada_estado_civil": "Declaración jurada de estado civil",
+  "declaracion_matrimonio": "Declaración de Matrimonio",
+  "decoracion": "Decoración",
+  "decoracion_floral": "decoración floral",
+  "demasiados_intentos_intenta_mas_tarde": "Demasiados intentos. Intenta más tarde",
+  "densidad_alta_considera_espaciar_mas": "Densidad alta - Considera espaciar más las mesas",
+  "desactivaractivar_red_para_forzar_reconexion": "Desactivar/activar red para forzar reconexión",
+  "descargas_app_dias": "Descargas app (30 días)",
+  "describe_accion_tomada": "Describe la acción tomada",
+  "describe_claramente_las_rutas_llegada": "Describe claramente las rutas de llegada (avion, tren, coche) y tips logísticos relevantes.",
+  "describe_como_quieres_invitacion": "Describe cómo quieres tu invitación...",
+  "describe_como_quieres_que_sea": "Describe cómo quieres que sea tu web (estilo, colores, secciones, logística, etc.)",
+  "descripcion": "Descripción",
+  "descripcion_breve_del_proveedor": "Descripción breve del proveedor",
+  "descripcion_del_sitio": "Descripción del Sitio",
+  "descripcion_detalle_del_presupuesto": "Descripción o detalle del presupuesto",
+  "descripcion_tarea": "Descripción de la tarea",
+  "descripcionnotas": "Descripción/Notas",
+  "desplazamiento_dias": "Desplazamiento (días)",
+  "despues_boda": "Después de la Boda",
+  "detalles_adicionales_sobre_este_codigo": "Detalles adicionales sobre este código...",
+  "detalles_adicionales_sobre_transaccion": "Detalles adicionales sobre la transacción...",
+  "detalles_del_alcance_combinado_logistica": "Detalles del alcance combinado, logística, etc.",
+  "deteccion_eventos": "Detección de eventos",
+  "detectaron_filas_validas_para_importar": "No se detectaron filas válidas para importar.",
+  "detecto_extension_para_difusion_quieres": "No se detectó la extensión para difusión. ¿Quieres intentar el envío individual (una sola acción) en su lugar?",
+  "detecto_extension_para_enviar_una": "No se detectó la extensión para enviar en una sola acción. ¿Quieres abrir los chats en pestañas como alternativa?",
+  "dia": "Día",
+  "dia_del_aniversario_dia_anterior": "0 = día del aniversario, -1 = día anterior, 1 = día posterior.",
+  "dia_del_mes": "Día del mes",
+  "dia_previo_boda": "Día Previo a la Boda",
+  "diagnostico": "Diagnóstico",
+  "diagnostico_facturacion_datos_pagos_firestore": "Diagnóstico de facturación y datos de pagos en Firestore.",
+  "dias_promedio_que_tarda_owner": "Días promedio que tarda un owner en convertirse en planner.",
+  "dibujar_areas": "Dibujar áreas",
+  "dinamica": "Dinámica",
+  "direccion": "dirección: ",
+  "direccion_correo_requerida": "Dirección de correo requerida",
+  "disena_cartel_elegante_para_seating": "Diseña un cartel elegante para el seating plan (asignación de mesas) de una boda. Estilo formal con tipografía serif. Incluye el título \"Seating Plan\" o \"Distribución de Mesas\" con un diseño elegante. El cartel debe tener espacio para listar nombres de invitados organizados por mesas. Usa colores neutros con toques dorados o plateados. El diseño debe ser sofisticado y fácil de leer.",
+  "disena_cartel_seating_plan_minimalista": "Diseña un cartel de seating plan minimalista y moderno para una boda. Utiliza mucho espacio en blanco, tipografía sans-serif limpia y elementos geométricos simples. El título debe ser \"Seating Plan\" o \"Tu mesa\". Organización visual muy clara con números de mesa bien destacados. Colores monocromáticos con posibles acentos en un solo color. Diseño contemporáneo, limpio y extremadamente legible.",
+  "disena_cartel_seating_plan_romantico": "Diseña un cartel de seating plan romántico con abundantes elementos florales para una boda. Utiliza una paleta de colores suaves como rosa, lavanda y verde salvia. Incorpora ilustraciones delicadas de flores y elementos botánicos. El título puede ser \"Con cariño, os hemos asignado\" o similar. Tipografía elegante y caligráfica. El diseño debe transmitir romanticismo y delicadeza, organizado de forma clara para que los invitados encuentren fácilmente su mesa.",
+  "disena_formato_menu_personalizable_para": "Diseña un formato de menú personalizable para necesidades dietéticas especiales en una boda. El diseño debe incluir un espacio prominente para el título donde se pueda especificar el tipo de menú especial. Proporciona secciones claras para entrantes, plato principal y postre. Incorpora elementos gráficos elegantes que sean neutros y adaptables a cualquier tipo de restricción alimentaria. El diseño debe ser sofisticado y coherente con la estética general de la boda.",
+  "disena_logo_boda_ilustrado_con": "Diseña un logo de boda ilustrado con elementos personalizados. Estilo artístico que parece hecho a mano, con trazos de acuarela, tinta o dibujo. Incluye pequenos elementos simbólicos relacionados con la pareja (hobbies, lugares significativos, mascotas). Combina las ilustraciones con tipografía manuscrita o caligráfica. Colorido pero armonioso, con aspecto único y personal.",
+  "disena_logo_minimalista_moderno_para": "Diseña un logo minimalista y moderno para boda. Utiliza líneas finas, formas geométricas simples y tipografía sans-serif. Estilo limpio y contemporáneo sin adornos excesivos. Incorpora iniciales o nombres completos en un diseño equilibrado. Usa colores neutros como negro, gris o azul marino. El logo debe transmitir elegancia y simplicidad.",
+  "disena_marcador_mesa_con_motivos": "Diseña un marcador de mesa con motivos florales y románticos para una boda. Incorpora ilustraciones delicadas de flores como rosas, peonías o lavanda. Utiliza una paleta de colores suaves y pasteles. Tipografía elegante, caligráfica o manuscrita que resalte el nombre del invitado. El diseño debe ser delicado y evocador, con un aire romántico y primaveral.",
+  "disena_marcador_mesa_elegante_minimalista": "Diseña un marcador de mesa elegante y minimalista para una boda. El diseño debe incluir un espacio claro para el nombre del invitado, con tipografía serif refinada. Usa colores neutros como blanco, crema, o gris pálido con detalles en dorado o plateado. El estilo debe ser sobrio, clásico y sofisticado, adecuado para una cena formal. Formato rectangular u ovalado que pueda imprimirse y doblarse.",
+  "disena_marcador_mesa_tematico_para": "Diseña un marcador de mesa temático para boda inspirado en viajes/destinos. Incorpora sutilmente elementos como mapas, brújulas, aviones o monumentos icónicos. El diseño debe mantener la elegancia apropiada para una boda mientras incorpora estos elementos temáticos de forma creativa. Incluye un espacio claro para el nombre del invitado con tipografía legible y atractiva que complemente el tema.",
+  "disena_menu_boda_con_estetica": "Diseña un menú de boda con estética vintage y romántica. Utiliza elementos decorativos como encajes, marcos ornamentados y motivos florales delicados. Tipografía elegante con serifs o caligráfica. Paleta en tonos sepia, crema o rosa antiguo. Formato que recuerde a documentos antiguos o postales vintage. Incluye todas las secciones del menú dentro de un diseño que evoque nostalgia y romance.",
+  "disena_menu_elegante_para_una": "Diseña un menú elegante para una boda con estilo clásico y refinado. Formato vertical con tipografía serif elegante. Usa colores neutros con detalles dorados o plateados. Incluye secciones para entrante, plato principal, postre y bebidas. El diseño debe ser sobrio y sofisticado, adecuado para una cena formal de boda.",
+  "disena_menu_minimalista_moderno_para": "Diseña un menú minimalista y moderno para boda. Utiliza mucho espacio en blanco, tipografía sans-serif limpia y elementos geométricos simples. Formato elegante con distribución equilibrada. Paleta monocromática o con un acento de color. Incluye secciones para los platos principales y bebidas. El diseño debe ser contemporáneo, limpio y fácil de leer.",
+  "disena_monograma_elegante_para_una": "Diseña un monograma elegante para una boda con iniciales entrelazadas. Estilo sofisticado y clásico con tipografía serif. Usa colores dorado y blanco sobre fondo oscuro. Incluye algún elemento decorativo sutil como hojas o flores. El logo debe ser limpio y versátil para usar en invitaciones y decoración.",
+  "disena_una_invitacion_boda_lista": "Diseña una invitación de boda lista para imprimir, elegante y minimalista.",
+  "disena_una_tarjeta_menu_sin": "Diseña una tarjeta de menú sin gluten para boda. El diseño debe ser elegante y sofisticado, a la altura del evento. Incluye el título \"Menú Sin Gluten\" de forma visible pero discreta. Proporciona espacio para detallar los platos seguros sin gluten para entrantes, plato principal y postre. Utiliza un símbolo o icono sutil que indique que es apto para celíacos. El estilo visual debe integrarse perfectamente con el resto de la papelería de boda.",
+  "disena_una_tarjeta_menu_vegetariano": "Diseña una tarjeta de menú vegetariano para boda. Utiliza un diseño elegante con elementos vegetales sutiles como hojas o hierbas. Incluye el título \"Menú Vegetariano\" y espacio para listar entrantes, plato principal y postre. El diseño debe ser sofisticado y a juego con la decoración general de la boda, pero claramente identificable como opción vegetariana. Usa colores que evoquen frescura y naturaleza.",
+  "disenado_para_planners": "Diseñado para planners",
+  "diseno": "diseño",
+  "diseno_consistente": "Diseño consistente",
+  "diseno_divertido_pero_elegante_para": "Diseño divertido pero elegante para el menú de niños",
+  "diseno_duplicado": "Diseño duplicado",
+  "diseno_elegante_para_menus_sin": "Diseño elegante para menús sin gluten",
+  "diseno_elegante_para_menus_vegetarianos": "Diseño elegante para menús vegetarianos",
+  "diseno_limpio_con_tipografia_sencilla": "Diseño limpio con tipografía sencilla y organización clara",
+  "diseno_limpio_contemporaneo_con_espacios": "Diseño limpio y contemporáneo con espacios blancos y tipografía simple",
+  "diseno_menu_formal_con_estilo": "Diseño de menú formal con estilo clásico y refinado",
+  "diseno_minimalista_con_bloques_asimetricos": "Diseño minimalista con bloques asimetricos, fondo claro y acentos en morado profundo. Incluir seccion de recomendaciones de hospedaje y CTA claro hacia la información logística.",
+  "diseno_para_menus_libres_lacteos": "Diseño para menús libres de lácteos",
+  "diseno_versatil_para_cualquier_necesidad": "Diseño versátil para cualquier necesidad dietética especial",
+  "disponibilidad_para_sesion_fotos": "Disponibilidad para sesión de fotos",
+  "disposicion_asientos_para_ceremonia": "Disposición de asientos para la ceremonia",
+  "distribucion_desigual_algunas_zonas_estan": "Distribución desigual - Algunas zonas están vacías",
+  "distribucion_gastos_por_categoria": "Distribución de Gastos por Categoría",
+  "distribucion_mesas": "Distribución de Mesas",
+  "distribucion_mesas_para_banquete": "Distribución de mesas para el banquete",
+  "djmusica_consulta": "DJ/Música - Consulta",
+  "dninie_valido": "El DNI/NIE no es válido",
+  "documentacion_legal_completa": "Documentación legal completa",
+  "documentacion_testigos": "Documentación de testigos",
+  "downgrade_requiere_validacion": "Downgrade requiere validación",
+  "downloadblob_esperaba_objeto_blob_valido": "downloadBlob: se esperaba un objeto Blob válido.",
+  "duplicar_esta_seccion": "Duplicar en esta sección",
+  "duplicar_otra_seccion": "Duplicar en otra sección",
+  "duracion_peticion": "Duración petición IA:",
+  "economicas": "💰 Económicas",
+  "editar_aportacion": "Editar Aportación",
+  "editar_categoria": "Editar categoría",
+  "edith_piaf": "Édith Piaf",
+  "elegante_clasico": "Elegante & Clásico",
+  "elena_martinez_madrina": "Elena Martínez (madrina)",
+  "eliminar_esta_aportacion": "¿Eliminar esta aportación?",
+  "eliminar_esta_mesa": "¿Eliminar esta mesa?",
+  "eliminar_esta_subtarea": "¿Eliminar esta subtarea?",
+  "eliminar_este_diseno_definitivamente": "¿Eliminar este diseño definitivamente?",
+  "eliminar_este_evento": "¿Eliminar este evento?",
+  "eliminar_plantilla_seleccionada": "¿Eliminar la plantilla seleccionada?",
+  "email": {
+    "email": "Email",
+    "emails": "Emails",
+    "inbox": "Inbox",
+    "sent": "Sent",
+    "drafts": "Drafts",
+    "trash": "Trash",
+    "compose": "Compose",
+    "reply": "Reply",
+    "forward": "Forward",
+    "delete": "Delete",
+    "archive": "Archive",
+    "markAsRead": "Mark as Read",
+    "markAsUnread": "Mark as Unread",
+    "subject": "Subject",
+    "from": "From",
+    "to": "To",
+    "cc": "CC",
+    "bcc": "BCC",
+    "attachments": "Attachments",
+    "send": "Send",
+    "saveDraft": "Save Draft",
+    "emailSettings": "Email Settings",
+    "emailSignature": "Email Signature"
+  },
+  "email_esta_uso": "El email ya está en uso",
+  "email_invalido": "Email inválido",
+  "email_tiene_formato_valido": "El email no tiene formato válido",
+  "email_verificacion_enviado": "Email de verificación enviado",
+  "embudo_conversion_costes_exportes_historicos": "Embudo de conversión, costes IA y exportes históricos.",
+  "encontramos_articulos_relevantes_este_momento": "No encontramos artículos relevantes en este momento. Intenta cambiar de idioma o vuelve a intentarlo más tarde.",
+  "encontramos_coincidencias_directas_ajusta_busqueda": "No encontramos coincidencias directas. Ajusta la búsqueda o actualiza tu perfil.",
+  "encontramos_planners_publicados_aun_mostramos": "No encontramos planners publicados aún. Mostramos opciones de demostración.",
+  "encontraron_bodas_asociadas_cuenta_tienes": "No se encontraron bodas asociadas a tu cuenta o no tienes permisos sobre la boda activa. Si el problema persiste, recarga la página o contacta con soporte.",
+  "encontraron_transacciones_validas": "No se encontraron transacciones válidas",
+  "encontro_comando_ejecutable": "No se encontró comando ejecutable",
+  "encontro_ninguna_pestana_archivo": "No se encontró ninguna pestaña en el archivo.",
+  "energia": "energía",
+  "enlace_alcanzo_limite_subidas": "El enlace alcanzó su límite de subidas",
+  "enlace_esta_inactivo": "El enlace está inactivo",
+  "enlace_galeria_momentos_existe": "Enlace a la galería Momentos (si existe).",
+  "enlaces_descuento_responsables_facturacion_generada": "Enlaces de descuento, responsables y facturación generada.",
+  "entrada_salon": "Entrada al Salón",
+  "entrada_sin_titulo": "Entrada sin título",
+  "enviar_invitacion_formal_por_whatsapp": "Enviar la invitación formal por WhatsApp API",
+  "enviar_recordatorios_por_email_pendientes": "¿Enviar recordatorios por email a pendientes?",
+  "envio_briefing_inicial_con_playlist": "Se envió briefing inicial con playlist preferida.",
+  "envio_completado_0xitos_fallos_fail": "Envío completado. �0xitos: {{ok}}, Fallos: {{fail}}",
+  "envio_iniciado_whatsapp_web_para": "Envío iniciado en WhatsApp Web para {{count}} invitado(s).",
+  "eres_asistente_que_devuelve_json": "Eres un asistente que devuelve un JSON con el programa típico de una boda en España. Ejemplo: [{\"time\":\"12:00\",\"title\":\"Ceremonia\"}]",
+  "eres_asistente_que_redacta_textos": "Eres un asistente que redacta textos románticos para webs de boda en español.",
+  "error_actualizar_codigo_descuento": "Error al actualizar código de descuento",
+  "error_actualizar_proveedor_intentalo_nuevo": "Error al actualizar el proveedor. Inténtalo de nuevo.",
+  "error_cargar_informacion_usuario": "Error al cargar información de usuario",
+  "error_cargar_las_estadisticas": "Error al cargar las estadísticas",
+  "error_cerrar_sesion": "Error al cerrar sesión",
+  "error_conectar_con_servidor_aplicacion": "Error al conectar con el servidor. La aplicación funcionará en modo fuera de línea.",
+  "error_conexion_con_firestore": "Error de conexión con Firestore",
+  "error_conexion_por_favor_intenta": "Error de conexión. Por favor, intenta más tarde.",
+  "error_crear_codigo_descuento": "Error al crear código de descuento",
+  "error_crear_sesion_pago": "Error al crear sesión de pago",
+  "error_difusion": "Error en la difusión",
+  "error_enviando_seleccionados_movil": "Error enviando a seleccionados (Móvil)",
+  "error_generando_invitacion": "Error generando invitación",
+  "error_guardar_intentalo_nuevo": "Error al guardar. Inténtalo de nuevo.",
+  "error_guardar_nombre_usuario_intentalo": "Error al guardar el nombre de usuario. Inténtalo de nuevo.",
+  "error_iniciar_sesion": "Error al iniciar sesión",
+  "error_obtener_sesion": "Error al obtener sesión",
+  "error_obtener_suscripcion": "Error al obtener suscripción",
+  "error_programando_envios": "Error programando envíos: ",
+  "error_sincronizacion": "Error de sincronización",
+  "error_verificar_disponibilidad_intentalo_nuevo": "Error al verificar disponibilidad. Inténtalo de nuevo.",
+  "escribe_aqui_texto_completo_lectura": "Escribe aquí el texto completo de la lectura…",
+  "escribe_formato_markdown_ligero_usa": "Escribe en formato Markdown ligero. Usa ## títulos, **negritas**, listas con - ...",
+  "escribe_mensaje_aqui": "Escribe tu mensaje aquí...",
+  "escribe_proveedor_antes_anadirlo": "Escribe un proveedor antes de añadirlo.",
+  "escribe_respuesta_aqui": "Escribe tu respuesta aquí...",
+  "escribe_texto_que_gustaria_utilizar": "Escribe el texto que te gustaría utilizar…",
+  "escribe_una_nota_antes_anadirla": "Escribe una nota antes de añadirla.",
+  "ese_proveedor_esta_registrado": "Ese proveedor ya está registrado.",
+  "especificar_las_areas_que_requieren": "Especificar las áreas que requieren decoración",
+  "especificar_numero_aproximado_invitados": "Especificar el número aproximado de invitados",
+  "especificar_numero_aproximado_invitados_tamano": "Especificar el número aproximado de invitados o tamaño del evento",
+  "especificar_ubicacion_del_evento_mensaje": "Especificar la ubicación del evento en tu mensaje",
+  "esperar_confirmacion_agenda": "Esperar confirmación de agenda",
+  "esta_funcion_desactiva_conectar_banco": "Esta función se desactiva al conectar tu banco porque los movimientos se importan automáticamente.",
+  "esta_funcion_requiere_conexion_internet": "Esta función requiere conexión a internet",
+  "esta_funcion_requiere_plan_superior": "Esta función requiere un plan superior",
+  "esta_seguro_que_desea_eliminar": "¿Está seguro de que desea eliminar este usuario?",
+  "estado_invalido_para_gasto": "Estado inválido para gasto",
+  "estado_invalido_para_ingreso": "Estado inválido para ingreso",
+  "estados_proveedores_externos_gestion_incidencias": "Estados de proveedores externos y gestión de incidencias.",
+  "estas_editando_esta_mesa": "Estás editando esta mesa",
+  "estas_seguro_eliminar_este_gasto": "¿Estás seguro de eliminar este gasto?",
+  "estas_seguro_que_deseas_limpiar": "¿Estás seguro de que deseas limpiar toda la caché?",
+  "estatico": "estático",
+  "este_codigo_descuento_esta_desactivado": "Este código de descuento está desactivado",
+  "este_dispositivonavegador_soporta_seleccion_contactos": "Este dispositivo/navegador no soporta la selección de contactos.",
+  "este_enlace_tiene_comisiones_configuradas": "Este enlace no tiene comisiones configuradas. Usa el modal de edición para añadirlas.",
+  "este_nombre_usuario_esta_disponible": "Este nombre de usuario no está disponible",
+  "este_nombre_usuario_esta_reservado": "Este nombre de usuario está reservado",
+  "estetica": "estética",
+  "estimado_cliente_nos_complace_invitarle": "Estimado cliente, nos complace invitarle al evento que tendrá lugar el {date} a las {time} {location}. Será una ocasión especial.",
+  "esto_restablecera_las_plantillas_predefinidas": "Esto restablecerá las plantillas predefinidas. ¿Continuar?",
+  "evaluacion": "en evaluación",
+  "evento_sin_titulo": "Evento sin título",
+  "evita_repetir_mismo_caracter_varias": "Evita repetir el mismo carácter varias veces seguidas.",
+  "exploracion": "exploración",
+  "exportacion_fallida": "Exportación fallida",
+  "exportacion_para_proveedores": "Ej: Exportación para proveedores",
+  "factura_proxima_vencer": "Factura próxima a vencer",
+  "facturacion_dias": "Facturación (30 días)",
+  "fallo": "❌ FALLÓ",
+  "falta_fecha_expiracion": "Falta fecha de expiración",
+  "falta_flag_autenticacion": "Falta flag de autenticación",
+  "falta_token_sesion": "Falta token de sesión",
+  "fecha_boda_invilida": "Fecha de boda invÍlida",
+  "fecha_operacion": "Fecha operación",
+  "felicitacion_automatica_para_pareja_anfitriona": "Felicitación automática para la pareja anfitriona 12 meses después del evento.",
+  "feliz_aniversario_couplenames_gracias_por": "¡Feliz aniversario {{couple_names}}! Gracias por confiar en MaLoveApp para vuestro gran día. Aquí tenéis vuestro álbum de recuerdos: {{album_link}}",
+  "fila_invalida": "Fila inválida",
+  "filmacion": "filmación",
+  "finalistas_fotografia": "Ej. Finalistas Fotografía",
   "finance": {
     "transactions": {
       "title": "Transacciones",
-      "new": "Nueva Transaccin",
+      "new": "Nueva Transacción",
       "empty": "No hay transacciones que mostrar",
-      "createFirst": "Crear primera transaccin",
+      "createFirst": "Crear primera transacción",
       "searchPlaceholder": "Buscar por concepto...",
       "allTypes": "Todos los tipos",
       "incomes": "Ingresos",
       "expenses": "Gastos",
-      "allCategories": "Todas las categoras",
+      "allCategories": "Todas las categorías",
       "allProviders": "Todos los proveedores",
-      "allDays": "Todos los das",
-      "last30": "ltimos 30 das",
-      "last90": "ltimos 90 das",
-      "onlyUncategorized": "Solo sin categora",
+      "allDays": "Todos los días",
+      "last30": "Últimos 30 días",
+      "last90": "Últimos 90 días",
+      "onlyUncategorized": "Solo sin categoría",
       "clear": "Limpiar",
       "sort": {
         "dateDesc": "Fecha (recientes primero)",
@@ -73,7 +649,7 @@
       "headers": {
         "date": "Fecha",
         "concept": "Concepto",
-        "category": "Categora",
+        "category": "Categoría",
         "type": "Tipo",
         "status": "Estado",
         "amount": "Monto",
@@ -86,12 +662,12 @@
         "expected": "Esperado",
         "received": "Recibido"
       },
-      "saved": "Transaccin guardada",
-      "deleted": "Transaccin eliminada",
-      "deleteErrorPrefix": "Error eliminando transaccin:",
-      "saveUnexpected": "Error inesperado al guardar la transaccin",
+      "saved": "Transacción guardada",
+      "deleted": "Transacción eliminada",
+      "deleteErrorPrefix": "Error eliminando transacción:",
+      "saveUnexpected": "Error inesperado al guardar la transacción",
       "noConcept": "Sin concepto",
-      "noCategory": "Sin categora",
+      "noCategory": "Sin categoría",
       "dueOn": "Vence:",
       "attachment": "Adjunto",
       "balanceLabel": "Balance:",
@@ -102,16 +678,16 @@
       "alerts": {
         "title": "Pagos importantes",
         "overdue": "Pagos vencidos:",
-        "upcoming": "Pagos prximos (7 das):"
+        "upcoming": "Pagos prximos (7 días):"
       },
       "csv": {
         "title": "Importar CSV - Mapeo de columnas",
         "fields": {
           "date": "Fecha",
-          "description": "Descripcin",
+          "description": "Descripción",
           "amount": "Importe",
           "type": "Tipo",
-          "category": "Categora"
+          "category": "Categoría"
         },
         "none": "Ninguna",
         "preview": "Vista previa"
@@ -122,7 +698,7 @@
       "transactions": "Transacciones",
       "budget": "Presupuesto",
       "contributions": "Aportaciones",
-      "analytics": "Anlisis"
+      "analytics": "Análisis"
     },
     "connectBank": {
       "title": "Conecta tu banco para importar movimientos",
@@ -133,33 +709,33 @@
       "budget": "Alertas de Presupuesto"
     },
     "overview": {
-      "title": "Gestin financiera",
+      "title": "Gestión financiera",
       "subtitle": "Control total del presupuesto y los gastos de tu boda",
-      "lastSync": "ltima sincronizacin",
+      "lastSync": "Última sincronización",
       "synced": "Sincronizado",
-      "offline": "Sin conexin",
+      "offline": "Sin conexión",
       "totalBudget": "Presupuesto Total",
       "totalSpent": "Total Gastado",
       "ofBudget": "del presupuesto",
       "currentBalance": "Balance Actual",
       "expectedIncome": "Ingresos Esperados",
       "used": "utilizado",
-      "categoryStatus": "Estado del Presupuesto por Categoras",
+      "categoryStatus": "Estado del Presupuesto por Categorías",
       "progress": "Progreso",
       "exceededNote": "(Presupuesto excedido!)"
     },
     "form": {
-      "type": "Tipo de transaccin",
+      "type": "Tipo de transacción",
       "concept": "Concepto",
       "conceptPlaceholder": "Ej: Pago de catering, Regalo de boda...",
       "amount": "Monto (EUR)",
       "amountLabel": "Monto:",
       "date": "Fecha",
-      "category": "Categora",
-      "selectCategory": "Selecciona una categora",
-      "description": "Descripcin adicional",
-      "descriptionPlaceholder": "Detalles adicionales sobre la transaccin...",
-      "transaction": "Transaccin",
+      "category": "Categoría",
+      "selectCategory": "Selecciona una categoría",
+      "description": "Descripción adicional",
+      "descriptionPlaceholder": "Detalles adicionales sobre la transacción...",
+      "transaction": "Transacción",
       "provider": "Proveedor / Fuente",
       "attachments": {
         "title": "Comprobantes",
@@ -178,10 +754,10 @@
       },
       "errors": {
         "conceptRequired": "El concepto es obligatorio",
-        "amountPositive": "El monto debe ser un nmero positivo",
+        "amountPositive": "El monto debe ser un número positivo",
         "dateRequired": "La fecha es obligatoria",
-        "categoryRequired": "La categora es obligatoria",
-        "paidAmountPositive": "El monto abonado debe ser un nmero positivo",
+        "categoryRequired": "La categoría es obligatoria",
+        "paidAmountPositive": "El monto abonado debe ser un número positivo",
         "paidAmountExceeds": "El monto abonado no puede superar el total",
         "paidAmountRequired": "Registra cunto has pagado para marcar el estado como parcial"
       }
@@ -238,26 +814,26 @@
       }
     },
     "charts": {
-      "title": "Anlisis Financiero",
+      "title": "Análisis Financiero",
       "subtitle": "Visualizaciones y tendencias de tus finanzas de boda",
       "totalTransactions": "Total Transacciones",
-      "activeCategories": "Categoras Activas",
+      "activeCategories": "Categorías Activas",
       "budgetEfficiency": "Eficiencia Presupuesto",
       "projectedBalance": "Balance Proyectado",
-      "budgetVsSpentByCategory": "Presupuesto vs Gastado por Categora",
+      "budgetVsSpentByCategory": "Presupuesto vs Gastado por Categoría",
       "budgeted": "Presupuestado",
       "spent": "Gastado",
-      "expenseDistributionByCategory": "Distribucin de Gastos por Categora",
+      "expenseDistributionByCategory": "Distribucin de Gastos por Categoría",
       "monthlyTrend": "Tendencia Mensual de Ingresos y Gastos",
       "income": "Ingresos",
       "expenses": "Gastos",
       "balance": "Balance",
-      "budgetProgressByCategory": "Progreso del Presupuesto por Categora",
+      "budgetProgressByCategory": "Progreso del Presupuesto por Categoría",
       "used": "Usado",
       "excess": "Exceso",
       "insights": "Insights Financieros",
       "highestExpense": "Mayor Gasto",
-      "mostEfficient": "Ms Eficiente",
+      "mostEfficient": "Más Eficiente",
       "noData": "No hay datos suficientes",
       "currentTrend": "Tendencia Actual",
       "trend": {
@@ -300,18 +876,18 @@
       "useThis": "Usar esta cuenta"
     },
     "budget": {
-      "title": "Gestin de presupuesto",
-      "subtitle": "Organiza y controla el presupuesto por categoras",
-      "newCategory": "Nueva categora",
+      "title": "Gestión de presupuesto",
+      "subtitle": "Organiza y controla el presupuesto por categorías",
+      "newCategory": "Nueva categoría",
       "totalBudget": "Presupuesto total",
       "budgeted": "Presupuestado",
       "spent": "Gastado",
       "remaining": "Disponible",
       "progress": "Progreso",
-      "categoriesTitle": "Categoras de presupuesto",
-      "empty": "No hay categoras de presupuesto",
-      "createFirst": "Crear primera categora",
-      "category": "Categora",
+      "categoriesTitle": "Categorías de presupuesto",
+      "empty": "No hay categorías de presupuesto",
+      "createFirst": "Crear primera categoría",
+      "category": "Categoría",
       "overallProgress": "Progreso del presupuesto",
       "muteAlerts": "Silenciar alertas",
       "thresholds": {
@@ -319,10 +895,10 @@
         "danger": "Crtico (exceso) %"
       },
       "modal": {
-        "editTitle": "Editar categora",
-        "newTitle": "Nueva categora",
-        "name": "Nombre de la categora",
-        "namePlaceholder": "Ej.: Catering, msica, flores...",
+        "editTitle": "Editar categoría",
+        "newTitle": "Nueva categoría",
+        "name": "Nombre de la categoría",
+        "namePlaceholder": "Ej.: Catering, música, flores...",
         "amountLabel": "Presupuesto asignado ()",
         "amountPlaceholder": "0,00"
       },
@@ -332,10 +908,10 @@
       "exceeded": "Exceeded",
       "perGuestHint": "H {{value}} / guest ({{count}} events)",
       "errors": {
-        "nameRequired": "El nombre de la categora es obligatorio",
-        "amountInvalid": "El monto debe ser un nmero vlido"
+        "nameRequired": "El nombre de la categoría es obligatorio",
+        "amountInvalid": "El monto debe ser un número válido"
       },
-      "confirmDelete": "Ests seguro de eliminar la categora \"{{category}}\"?",
+      "confirmDelete": "Ests seguro de eliminar la categoría \"{{category}}\"?",
       "advisorErrors": {
         "requestFailed": "No se pudo obtener la recomendacin del consejero.",
         "refreshFailed": "No se pudo actualizar la recomendacin.",
@@ -366,48 +942,30 @@
       "expense": "Expenses"
     }
   },
-  "tasks": {
-    "high": "Alta",
-    "medium": "Media",
-    "low": "Baja",
-    "completed": "Completada",
-    "inProgress": "En progreso",
-    "notStarted": "No iniciada",
-    "overdue": "Atrasada",
-    "task": "Task",
-    "tasks": "Tasks",
-    "addTask": "Add Task",
-    "editTask": "Edit Task",
-    "deleteTask": "Delete Task",
-    "taskTitle": "Task Title",
-    "taskDescription": "Description",
-    "taskDueDate": "Due Date",
-    "taskPriority": "Priority",
-    "taskStatus": "Status",
-    "taskAssignee": "Assigned to",
-    "todoList": "To-Do List",
-    "completedTasks": "Completed Tasks",
-    "upcomingTasks": "Upcoming Tasks"
-  },
-  "profile": {
-    "synced": "Sincronizado",
-    "subscription": {
-      "type": "Tipo de suscripcin",
-      "free": "Gratis",
-      "premium": "Premium"
-    }
-  },
+  "firebase_esta_configurado_nulo": "Firebase no está configurado (db nulo)",
+  "firestore_esta_disponible_mostramos_valores": "Firestore no está disponible; mostramos valores de referencia.",
+  "floral_romantico": "Floral & Romántico",
+  "flores_del_jardin": "Flores del Jardín",
+  "floristeria": "floristería",
+  "floristeria_bella_rosa": "Floristería Bella Rosa",
+  "floristeria_prisma": "Floristería Prisma",
+  "floristeria_vintage_madrid": "Floristería vintage en Madrid",
+  "formato_del_email_valido": "El formato del email no es válido",
+  "formato_del_telefono_valido": "El formato del teléfono no es válido",
+  "formato_hora_invalido_hhmm": "Formato de hora inválido (HH:MM)",
+  "formato_hora_invalido_use_hhmm": "Formato de hora inválido (use HH:MM)",
+  "formato_valido_por_favor_sube": "Formato no válido. Por favor, sube un archivo CSV o Excel (.xlsx, .xls)",
   "forms": {
     "required": "Obligatorio",
     "optional": "Opcional",
     "pleaseSelect": "Por favor, selecciona",
-    "selectOption": "Selecciona una opcin",
+    "selectOption": "Selecciona una opción",
     "enterText": "Introduce texto",
     "chooseFile": "Seleccionar archivo",
     "uploadFile": "Subir archivo",
     "fieldRequired": "Este campo es obligatorio",
-    "invalidEmail": "Email invlido",
-    "invalidPhone": "Telfono invlido",
+    "invalidEmail": "Email inválido",
+    "invalidPhone": "Teléfono inválido",
     "invalidUrl": "URL invlida",
     "dragAndDrop": "Drag and drop files here",
     "invalidFormat": "Invalid format",
@@ -415,6 +973,272 @@
     "passwordTooShort": "Password too short",
     "passwordsDoNotMatch": "Passwords do not match"
   },
+  "foto_volvio_pendiente": "La foto volvió a pendiente",
+  "fotografia": "Fotografía",
+  "fotografia_madrid_2000": "Ej: Fotografía Madrid 2000€",
+  "fotografia_momentos": "Fotografía Momentos",
+  "fotografia_pro": "Fotografía Pro",
+  "fotografia_profesional": "fotografía profesional",
+  "fotografo": "fotógrafo",
+  "fotografo_bodas_madrid_con_estilo": "Ej: 'Fotógrafo de bodas en Madrid con estilo reportaje'",
+  "fotografo_consulta": "Fotógrafo - Consulta",
+  "fotografo_estilo_documental": "Fotógrafo estilo documental",
+  "fotografos": "fotógrafos",
+  "fotografos_favoritos": "Ej. Fotógrafos favoritos",
+  "fotografos_finalistas": "Ej. Fotógrafos finalistas",
+  "fotos_anadidas_correctamente": "Fotos añadidas correctamente.",
+  "fuera_del_perimetro": "Fuera del perímetro",
+  "galeria_acepta_nuevas_fotos_periodo": "La galería ya no acepta nuevas fotos (periodo finalizado)",
+  "galeria_guardada": "Galería guardada",
+  "galeria_recuerdos": "Galería de recuerdos",
+  "gamificationservice_autenticacion_requerida": "GamificationService: autenticación requerida",
+  "gamificationservice_pudo_obtener_token_autenticacion": "GamificationService: no se pudo obtener el token de autenticación",
+  "garcia": "García",
+  "gastos_por_categoria": "Gastos por Categoría",
+  "genera_lecturas_guiones_dinamicos_para": "Genera lecturas y guiones dinámicos para tu ceremonia.",
+  "general": "General",
+  "generar_invitacion": "Generar invitación",
+  "geometrico": "Geométrico",
+  "gestion_cuentas_roles_actividad_reciente": "Gestión de cuentas, roles y actividad reciente.",
+  "guardar_configuracion": "Guardar Configuración",
+  "guests": {
+    "guest": "Invitado",
+    "guests": "Invitados",
+    "guestList": "Lista de invitados",
+    "addGuest": "Añadir invitado",
+    "editGuest": "Editar invitado",
+    "deleteGuest": "Eliminar invitado",
+    "guestName": "Nombre del invitado",
+    "guestEmail": "Correo del invitado",
+    "guestPhone": "Teléfono del invitado",
+    "guestAddress": "Dirección del invitado",
+    "guestTable": "Mesa del invitado",
+    "guestStatus": "Estado del invitado",
+    "confirmed": "Confirmado",
+    "pending": "Pendiente",
+    "declined": "Rechazado",
+    "totalGuests": "Invitados totales",
+    "confirmedGuests": "Invitados confirmados",
+    "pendingGuests": "Invitados pendientes",
+    "importGuests": "Importar invitados",
+    "exportGuests": "Exportar invitados",
+    "sendInvitations": "Enviar invitaciones",
+    "plusOne": "Acompaante",
+    "dietaryRestrictions": "Restricciones alimentarias",
+    "specialRequests": "Peticiones especiales",
+    "saveTheDate": {
+      "message": "Hola somos {{p1}}{{p2Suffix}}, tenemos un noticin sper importante que compartir contigo. Nos casamos! Resrvate el {{date}} porque queremos contar contigo.",
+      "messageFallback": "Hola! Tenemos un noticin sper importante que compartir contigo. Nos casamos! Resrvate la fecha porque queremos contar contigo!",
+      "connector": "y",
+      "primaryFallback": "nosotros",
+      "coupleFallback": "nuestra boda"
+    },
+    "rsvp": {
+      "printPdf": "Imprimir / PDF"
+    },
+    "groups": {
+      "title": "Gestión de grupos",
+      "assignTitle": "Asignar a seleccionados",
+      "newGroup": "Nuevo grupo&",
+      "groupName": "Nombre de grupo",
+      "rename": "Renombrar grupo",
+      "origin": "Origen&",
+      "newName": "Nuevo nombre",
+      "merge": "Fusionar grupos",
+      "destination": "Destino&",
+      "existing": "Grupos existentes",
+      "none": "No hay grupos an."
+    },
+    "selectedCount": "Seleccionados: {{count}}"
+  },
+  "habilita_nueva_galeria_plantillas_web": "Habilita la nueva galería de plantillas web",
+  "has_alcanzado_maximo_items_personalizados": "Has alcanzado el máximo de 50 ítems personalizados.",
+  "has_enviado_ningun_correo": "No has enviado ningún correo",
+  "haz_clic_icono_para_cargar": "Haz clic en el icono para cargar automáticamente desde tu lista de invitados",
+  "hero_con_fondo_degradado_tipo": "Hero con fondo degradado tipo oleaje, iconos marinos y boton destacado hacia la guía logística",
+  "hero_con_foto_fondo_overlay": "Hero con foto de fondo, overlay cálido y cintillo con fecha",
+  "hero_pantalla_completa_con_nombres": "Hero de pantalla completa con nombres superpuestos, fecha, contador y boton destacando la información logística",
+  "hola_escribo_para_confirmarte_nuestra": "Hola, te escribo para confirmarte nuestra reunión el {date} a las {time} {location}. Espero que puedas asistir.",
+  "hola_name_nos_encantaria_contar": "¡Hola {{name}}! Nos encantaría contar contigo en nuestra boda. ¿Puedes confirmar tu asistencia?",
+  "hola_partnername_aqui_tienes_resumen": "Hola {{partner_name}}, aquí tienes tu resumen de {{month}}. Cierres: {{deals}}. Comisión del mes: {{total_earned}}. Pendiente por cobrar: {{pending_amount}}. ¡Gracias por seguir recomendándonos!",
+  "holannnos_gustaria_recibir_presupuesto_detallado": "Hola,\\n\\nNos gustaría recibir un presupuesto detallado para nuestro evento. Por favor, incluye condiciones, logística y extras.\\n\\nGracias.",
+  "iconica": "icónica",
+  "iglesia_santa_maria": "Iglesia de Santa María",
+  "iluminacion": "iluminación",
+  "ilustrado_artistico": "Ilustrado & Artístico",
+  "imagen_inspiracion": "Imagen de inspiración",
+  "imagen_inspiracion_tags": "Imagen de inspiración: {{tags}}",
+  "implementar_cache_para_resultados_busqueda": "Implementar caché para resultados de búsqueda global con conjuntos de datos grandes",
+  "implementar_verificacion_billing_necesario": "Implementar verificación de billing si es necesario",
+  "import_importe_invalido": "Import: importe inválido",
+  "importacion_completada": "Importación completada",
+  "importacion_disponible": "Importación no disponible",
+  "importacion_parcial": "Importación parcial",
+  "importe_senal_eur": "Importe de la señal (EUR):",
+  "impresion": "impresión",
+  "incluye_los_textos_indicados_diseno": "Incluye los textos indicados en el diseño (no placeholders).",
+  "incluye_simbolos_como_similares": "Incluye símbolos como !, %, # o similares.",
+  "indexeddb_esta_bloqueado_disponible": "IndexedDB está bloqueado o no disponible",
+  "indexeddb_esta_disponible_este_navegador": "IndexedDB no está disponible en este navegador",
+  "indica_ubicacion_del_evento": "Indica la ubicación del evento",
+  "informacion": "Información",
+  "informacion_adicional_sobre_este_gasto": "Información adicional sobre este gasto...",
+  "informacion_guardada": "Información guardada",
+  "informacion_proveedor_incompleta": "Información de proveedor incompleta",
+  "informacion_sobre_servicios_catering_para": "Información sobre servicios de catering para boda - {providerName}",
+  "informamos_que_reunion_del_date": "Te informamos que la reunión del {date} ha sido reprogramada para las {time} {location}. Disculpa las molestias.",
+  "ingresos_por_categoria": "Ingresos por Categoría",
+  "inspiracion": "Inspiración",
+  "inspiracion_tags": "inspiración: {{tags}}",
+  "inspiration": {
+    "alt": "inspiracin",
+    "altWithTags": "inspiracin: {{tags}}",
+    "aria": "Imagen de inspiracin",
+    "ariaWithTags": "Imagen de inspiracin: {{tags}}",
+    "addFav": "Añadir a favoritos",
+    "removeFav": "Quitar de favoritos"
+  },
+  "intenta_actualizar_bandeja_revisa_conexion": "Intenta actualizar la bandeja o revisa tu conexión.",
+  "intenta_ajustar_los_filtros_busqueda": "Intenta ajustar los filtros de búsqueda",
+  "intenta_distribuir_las_mesas_mas": "Intenta distribuir las mesas más uniformemente",
+  "intenta_nuevamente_mas_tarde": "Intenta nuevamente más tarde",
+  "interes_contratar_servicio_maloveapp": "Interés en contratar [Servicio] - MaLoveApp",
+  "intimo_pequeno": "Íntimo Pequeño",
+  "introduccion": "Introducción",
+  "introduce_codigo_invitacion": "Introduce el código de invitación.",
+  "introduce_una_contrasena_con_menos": "Introduce una contraseña con al menos 8 caracteres.",
+  "invitacion": "Invitación",
+  "invitacion_aceptada_correctamente": "Invitación aceptada correctamente.",
+  "invitacion_encontrada": "Invitación no encontrada",
+  "invitacion_formal": "Invitación formal",
+  "invitacion_generada": "Invitación generada",
+  "invitado_anonimo": "Invitado anónimo",
+  "invitados_informacion": "Invitados - Información",
+  "jardin": "Jardín en L",
+  "joyeria": "Joyería",
+  "joyeria_alianzas": "Joyería Alianzas",
+  "json_copiado_portapapeles_pegalo_editor": "JSON copiado al portapapeles. Pégalo en el editor JSON.",
+  "juan_perez": "Juan Pérez",
+  "las_mesas_estan_descentradas_usa": "Las mesas están descentradas. Usa \"Centrar en salón\" para equilibrar",
+  "latex_cron_fallback_fallo_durante": "Latex cron fallback falló durante 5 minutos.",
+  "leido": "No leído",
+  "limite_para_evitar_bloqueos_por": "Límite para evitar bloqueos por spam",
+  "limpiar_seleccion_esc": "Limpiar selección (Esc)",
+  "linea_tiempo_del_evento": "Línea de tiempo del evento",
+  "lineas_combinadas_correctamente": "Líneas combinadas correctamente.",
+  "lineas_formas_simples": "Líneas y formas simples",
+  "localizacion": "localización: ",
+  "logo_con_estetica_vintage_elementos": "Logo con estética vintage y elementos decorativos de época",
+  "logo_limpio_minimalista_con_lineas": "Logo limpio y minimalista con líneas finas y estética contemporánea",
+  "logo_rodeado_elementos_florales_organicos": "Logo rodeado de elementos florales y orgánicos",
+  "los_datos_personales_recogidos_seran": "Los datos personales recogidos serán tratados conforme al RGPD...",
+  "los_seleccionados_tienen_telefonos_validos": "Los seleccionados no tienen teléfonos válidos",
+  "los_videos_mas_minutos_bloquean": "Los vídeos de más de 2 minutos se bloquean cuando la galería supera el límite de almacenamiento.",
+  "lucia_marco": "Lucía & Marco",
+  "lugar_celebracion": "Lugar de la celebración",
+  "lugar_celebracion_consulta": "Lugar de celebración - Consulta",
+  "mailgun_esta_configurado_correctamente": "Mailgun no está configurado correctamente",
+  "maloveapp_centraliza_planificacion_finanzas_comunicacion": "MaLove.App centraliza planificación, finanzas y comunicación en un solo lugar.",
+  "manana_812h": "mañana (8-12h)",
+  "manten_balance_justo_entre_las": "Mantén un balance justo entre las aportaciones de ambas personas.",
+  "marcada_como_destacada_por_anfitrion": "Marcada como destacada por el anfitrión",
+  "marcador_con_lineas_limpias_formas": "Marcador con líneas limpias, formas geométricas y estilo contemporáneo",
+  "marcador_decorado_con_flores_motivos": "Marcador decorado con flores, motivos botánicos y colores suaves",
+  "marcador_mesa_elegante_con_tipografia": "Marcador de mesa elegante con tipografía refinada sobre fondo neutro",
+  "marcador_tematico_que_refleja_algun": "Marcador temático que refleja algún interés, afición o motivo especial",
+  "marcar_leido": "Marcar No leído",
+  "maria": "María",
+  "maria_garcia": "Ej: María García",
+  "maria_juan": "María & Juan",
+  "marketingAccess": {
+    "backLink": "Volver al inicio",
+    "hero": {
+      "badge": "Centro de acceso",
+      "login": {
+        "title": "Gestiona todo desde un solo lugar",
+        "description": "Accede a invitados, tareas, presupuesto y documentos al instante. Mantn a tu equipo sincronizado en cada boda.",
+        "features": [
+          "Un panel para tareas, presupuesto y seating",
+          "Invita colaboradores con permisos controlados",
+          "Actualizaciones en tiempo real desde web y mvil"
+        ]
+      },
+      "signup": {
+        "title": "Bienvenido a Lovenda",
+        "description": "Centraliza la planificación, automatiza recordatorios y deja que nuestro asistente te gue paso a paso.",
+        "features": [
+          "Onboarding guiado por nuestro asistente de planificación",
+          "Plantillas para presupuesto, invitados y proveedores",
+          "Licencias con Stripe y activacin inmediata"
+        ]
+      }
+    },
+    "toggle": {
+      "login": "Iniciar sesión",
+      "signup": "Crear cuenta"
+    },
+    "loggedIn": {
+      "title": "Sesión activa",
+      "description": "Tu cuenta de Lovenda ya est abierta. Contina con tus eventos o cierra sesión si necesitas cambiar de cuenta.",
+      "primaryCta": "Ir al panel",
+      "secondaryCta": "Cerrar sesión"
+    },
+    "loginForm": {
+      "emailLabel": "Correo electrónico",
+      "emailPlaceholder": "tu@email.com",
+      "passwordLabel": "Contrasea",
+      "passwordPlaceholder": "Tu contrasea",
+      "rememberMe": "Recordarme",
+      "forgotPassword": "Olvidaste tu contrasea?",
+      "submit": "Iniciar sesión",
+      "submitting": "Iniciando sesión&"
+    },
+    "signup": {
+      "info": "Completa el formulario para crear tu cuenta.",
+      "successMessage": "Cuenta creada con Éxito. Redirigiendo al panel&",
+      "socialPending": "Completa el flujo de alta en la ventana de {{provider}}."
+    },
+    "switch": {
+      "noAccount": "No tienes cuenta?",
+      "registerLink": "Crea una",
+      "alreadyHaveAccount": "Ya tienes cuenta?",
+      "loginLink": "Iniciar sesión"
+    },
+    "social": {
+      "redirect": "Redirigiendo a {{provider}}..."
+    },
+    "errors": {
+      "provider": "No pudimos autenticarte con {{provider}}."
+    }
+  },
+  "mas_200_personas": "Más de 200 personas",
+  "maximo": "Máximo",
+  "maximo_intentos_login": "Máximo de intentos de login",
+  "mediodia_1216h": "mediodía (12-16h)",
+  "mencion_maloveapp": "Mención de MaLoveApp",
+  "mencionar_estilo_especifico_fotografias_que": "Mencionar el estilo específico de fotografías que buscas",
+  "mencionar_fecha_ubicacion_numero_invitados": "Mencionar fecha, ubicación y número de invitados",
+  "mensaje_del_anfitrion": "Mensaje del anfitrión",
+  "mensaje_difusion_enviara_una_sola": "Mensaje de difusión (se enviará una sola vez a una lista de difusión). Ten en cuenta que solo lo recibirán quienes tengan tu número guardado en contactos.",
+  "mensaje_personalizado_opcional_dejas_blanco": "Mensaje personalizado (opcional). Si lo dejas en blanco, se usará un mensaje por defecto con enlace RSVP cuando sea posible:",
+  "mensaje_sido_enviado_proveedor_recibiras": "Tu mensaje ha sido enviado al proveedor. Recibirás una notificación cuando responda.",
+  "mensajeria_programada_whatsapp_aniversario_reglas": "Mensajería programada (WhatsApp aniversario) y reglas globales.",
+  "menu": "menú",
+  "menu_catering": "Menú Catering",
+  "menu_con_estetica_nostalgica_detalles": "Menú con estética nostálgica, detalles ornamentados y aire romántico",
+  "menu_con_estetica_rustica_elementos": "Menú con estética rústica, elementos naturales y texto manuscrito",
+  "menu_decorado_con_elementos_botanicos": "Menú decorado con elementos botánicos, flores y follaje",
+  "menu_especial": "Menú Especial",
+  "menu_infantil": "Menú Infantil",
+  "menu_libre_lacteos": "Menú Libre de Lácteos",
+  "menu_movil": "Menú móvil",
+  "menu_para_100_personas": "Menú para 100 personas",
+  "menu_personalizado": "Menú Personalizado",
+  "menu_sin_gluten": "Menú Sin Gluten",
+  "menu_sin_lacteos": "Menú Sin Lácteos",
+  "menu_vegetariano": "Menú Vegetariano",
+  "mesa_coctel_alta": "Mesa cóctel / alta",
+  "mesas_redondas_cuadricula_uniforme": "Mesas redondas en cuadrícula uniforme",
   "messages": {
     "saveSuccess": "Guardado correctamente",
     "saveError": "Error al guardar",
@@ -431,6 +1255,535 @@
     "sessionExpired": "Your session has expired",
     "pleaseLogin": "Please log in"
   },
+  "metodo": "Método",
+  "metodo_pago": "Método de pago",
+  "metricas": "Métricas",
+  "metricas_clave_salud_servicios_tareas": "Métricas clave, salud de servicios y tareas operativas.",
+  "metricas_globales": "Métricas globales",
+  "michael_buble": "Michael Bublé",
+  "migracion_automatica_desde_defaultweddingtasksjs": "Migración automática desde defaultWeddingTasks.js",
+  "minimo": "Mínimo",
+  "mis_disenos": "Mis diseños",
+  "modele_generique": "Modèle générique",
+  "modelo_declaracion_testigos": "Modelo de declaración de testigos",
+  "modelo_generico_para_registro_civil": "Modelo genérico para el Registro Civil",
+  "modelo_tipo_para_parroquiadiocesis": "Modelo tipo para parroquia/diócesis",
+  "moderacion": "Moderación",
+  "moderno_geometrico": "Moderno & Geométrico",
+  "modo_sin_conexion_los_cambios": "Modo sin conexión - Los cambios se sincronizarán cuando se recupere la conexión",
+  "momento_movido_nueva_seccion": "Momento movido a la nueva sección.",
+  "monto_debe_ser_numero_positivo": "El monto debe ser un Número positivo",
+  "monto_pagado_debe_ser_numero": "El monto pagado debe ser un Número positivo",
+  "motivo_suspension": "Motivo de la suspensión",
+  "mover_otra_seccion": "Mover a otra sección",
+  "muestra_los_proximos_eventos_fechas": "Muestra los próximos eventos y fechas importantes",
+  "musica": "Ej. Música",
+  "musica_ceremonia_confirmada": "Música de ceremonia confirmada",
+  "musica_decoracion_sonido_fotografia": "Música, decoración, sonido, fotografía.",
+  "musica_requerida_para_entradas_salidas": "Música es requerida para entradas y salidas",
+  "muy_debil": "Muy débil",
+  "mywedaisearchlog_esta_destinado_lectura_usa": "mywed.aiSearch.log() está destinado a lectura. Usa supplierDebug.log directamente si necesitas registrar eventos.",
+  "navigation": {
+    "home": "Inicio",
+    "dashboard": "Panel",
+    "guests": "Invitados",
+    "providers": "Proveedores",
+    "finance": "Finanzas",
+    "seating": "Plan de asientos",
+    "email": "Correo electrónico",
+    "protocol": "Protocolo",
+    "designs": "Diseños",
+    "website": "Web de boda",
+    "contracts": "Contratos",
+    "tasks": "Tareas",
+    "profile": "Perfil",
+    "settings": "Configuración",
+    "logout": "Cerrar sesión",
+    "more": "Más",
+    "createEvent": "Crear nuevo evento",
+    "weddings": "Bodas",
+    "emailInbox": "Bandeja de entrada",
+    "darkMode": "Modo oscuro",
+    "userMenu": "Menú de usuario"
+  },
+  "necesito_diseno_inspirado_playa_con": "Necesito un diseño inspirado en playa con ondas, flor tropical y degradados aqua. Incluir bloque para dress code y recomendaciones de hospedaje frente al mar.",
+  "negociacion": "Negociación",
+  "nombre_cancion": "Nombre de la canción",
+  "nombre_etiqueta_puede_estar_vacio": "El nombre de la etiqueta no puede estar vacío",
+  "nombre_puede_tener_mas_caracteres": "El nombre no puede tener más de 50 caracteres",
+  "nombre_servicio_estado_descripcion": "Nombre, servicio, estado, descripción...",
+  "nombre_usuario_tiene_formato_valido": "El nombre de usuario no tiene un formato válido",
+  "nota_anadida": "Nota añadida.",
+  "notas_sobre_reactivacion_opcional": "Notas sobre la reactivación (opcional)",
+  "notes": "Notas",
+  "notificacion": "Notificación",
+  "novios_fotografo": "Novios + Fotógrafo",
+  "nro_transaccion_recibo_etc": "Nro. transacción, recibo, etc.",
+  "nueva_aportacion": "Nueva Aportación",
+  "nueva_categoria": "Nueva categoría",
+  "numero_anos_cumplidos": "Número de años cumplidos (1, 2, ...).",
+  "numero_cierres_captados_periodo": "Número de cierres captados en el periodo.",
+  "numero_invitados": "Número de invitados",
+  "numero_total_cuentas_owner_evaluadas": "Número total de cuentas owner evaluadas para conversión.",
+  "obstaculos": "Obstáculos",
+  "ocupacion_mesa": "Ocupación de la mesa",
+  "ocurrio_error_importar_los_invitados": "Ocurrió un error al importar los invitados",
+  "openai_directo_deshabilitado_por_configuracion": "OpenAI directo deshabilitado por configuración",
+  "operacion_cancelada": "Operación cancelada",
+  "optimizar_algoritmos_filtrado_para_grandes": "Optimizar algoritmos de filtrado para grandes volúmenes de emails",
+  "organiza_controla_presupuesto_por_categorias": "Organiza y controla el presupuesto por categorías",
+  "organizacion_logistica": "Organización y Logística",
+  "owners_que_realizaron_conversion_planner": "Owners que realizaron la conversión a planner.",
+  "pages": {
+    "more": {
+      "title": "Más opciones",
+      "sections": {
+        "guests": {
+          "title": "Invitados",
+          "description": "Gestiona tu lista de invitados",
+          "links": {
+            "guests": "Lista de invitados",
+            "seating": "Plan de asientos"
+          }
+        },
+        "providers": {
+          "title": "Proveedores",
+          "description": "Administra tus proveedores"
+        },
+        "protocol": {
+          "title": "Protocolo",
+          "description": "Documentos y protocolo"
+        },
+        "extras": {
+          "title": "Extras",
+          "description": "Funciones adicionales"
+        }
+      }
+    },
+    "momentos": {
+      "title": "Memories gallery",
+      "tabs": {
+        "overview": "Overview",
+        "moderation": "Moderation",
+        "slideshow": "Slideshow",
+        "downloads": "Downloads"
+      },
+      "loading": {
+        "weddings": "Loading weddings...",
+        "selectWedding": "Select a wedding to manage the memories gallery.",
+        "preparing": "Preparing your collaborative album..."
+      },
+      "banners": {
+        "contributionsClosed": "The submission window closed on {{date}}. Adjust the wedding date or contact support if you need to reopen the gallery.",
+        "compressionActive": "Storage usage passed 30 GB. New photos are automatically compressed to optimise Firebase storage."
+      },
+      "toasts": {
+        "loadError": "We could not load the memories gallery. Check your connection or permissions.",
+        "tokenCreated": "Share link created",
+        "tokenError": "We could not generate the link, please try again later.",
+        "approved": "Photo approved",
+        "approveError": "We could not approve the photo",
+        "rejected": "Photo rejected",
+        "rejectError": "We could not reject the photo",
+        "reset": "Photo moved back to pending",
+        "resetError": "We could not restore the previous state",
+        "scenesSaved": "Scenes updated",
+        "scenesError": "We could not save the scenes",
+        "uploadSuccess": "Photo uploaded to the gallery"
+      },
+      "prompts": {
+        "rejectTitle": "Reason for rejection",
+        "rejectDefault": "Does not match the gallery guidelines",
+        "rejectFallback": "Rejected"
+      },
+      "slideshow": {
+        "title": "Live slideshow",
+        "description": "Connect a second screen and let the memories flow automatically.",
+        "stats": "{{count}} approved photos · {{scenes}} scenes covered"
+      },
+      "uploader": {
+        "hostFallback": "Host"
+      }
+    },
+    "momentosGuest": {
+      "badge": "Collaborative memories",
+      "greeting": "Hi, {{name}} x9",
+      "remainingUploadsSingle": "You can upload 1 more photo.",
+      "remainingUploads": "You can upload up to {{count}} more photos.",
+      "remainingUploadsUnlimited": "Upload as many photos as you like.",
+      "description": "The host will review them and share the highlights with everyone.",
+      "window": {
+        "daysLeft": "You still have {{count, plural, one {1 day} other {{count} days}} to share your best photos.",
+        "deadline": "Available until {{date}}.",
+        "compression": "New photos are optimised automatically to save storage."
+      },
+      "status": {
+        "loading": "Loading gallery...",
+        "loadingMessage": "Preparing your space to share memories⬦",
+        "errorTitle": "We could not open the memories gallery",
+        "errorAction": "If you believe this is a mistake, ask the couple for a new link.",
+        "closedTitle": "The upload window has closed",
+        "closedDescription": "The upload window has closed.",
+        "closedDescriptionWithDate": "The upload window closed on {{date}}.",
+        "closedHelp": "If you still have memories to share, let the couple know so they can reopen the link.",
+        "welcomeTitle": "Thanks for capturing memories!",
+        "welcomeDescription": "Upload your favourite photos from the event. The host will review them and showcase them in the live slideshow.",
+        "uploadTitle": "Your progress",
+        "tip": "Tip: photos are grouped by scene (ceremony, reception, party⬦) to help the host.",
+        "uploadedSummary": "You have shared {{count}} {{count, plural, one {photo} other {photos}}}. Thanks for contributing!",
+        "recentUploads": "Approved photos will appear in the live slideshow and final gallery. The host will let you know when they are ready."
+      },
+      "form": {
+        "nameLabel": "Full name",
+        "namePlaceholder": "e.g. Laura G.",
+        "emailLabel": "Contact email (optional)",
+        "emailPlaceholder": "We will let you know when your photos are featured",
+        "termsLabel": "I agree to share my photos with the couple and confirm I have permission to do so.",
+        "submit": "Start uploading photos"
+      },
+      "progress": {
+        "title": "Your progress",
+        "sceneLabel": "Scene: {{scene}} · {{size}} KB",
+        "status": "In review"
+      },
+      "toasts": {
+        "nameRequired": "Please tell us your name so we can personalise your uploads",
+        "termsRequired": "You must accept the privacy notice",
+        "windowClosed": "This gallery is no longer accepting new photos.",
+        "achievementFirst": "x& Achievement unlocked! Your first memory Sí",
+        "achievementEnthusiast": "x}0 You are a collaborative rockstar! Keep sharing memories.",
+        "achievementStar": "xRx Star memories! Your photos will shine in the slideshow.",
+        "upload": "Photo uploaded successfully"
+      },
+      "errors": {
+        "incompleteLink": "The link is incomplete. Ask the host for a new QR code.",
+        "invalidLink": "This link is no longer valid."
+      },
+      "scenes": {
+        "other": "Other"
+      },
+      "uploader": {
+        "guestFallback": "Guest"
+      }
+    }
+  },
+  "pagina_web": "Página web",
+  "pagination": "Paginacin",
+  "pagos_coleccion_raiz": "Pagos en Colección Raíz",
+  "pagos_proximos": "Pagos próximos",
+  "panel_diagnostico": "Panel de Diagnóstico",
+  "panoramica": "Panorámica",
+  "papeleria": "Papelería",
+  "paquete_musica_toro_mecanico": "Ej. Paquete Música + Toro mecánico",
+  "parametros_requeridos": "parámetros requeridos",
+  "passwordStrength": {
+    "labels": {
+      "veryWeak": "Muy dbil",
+      "weak": "Dbil",
+      "medium": "Aceptable",
+      "strong": "Buena",
+      "veryStrong": "Excelente"
+    },
+    "title": "Seguridad de la contrasea",
+    "suggestions": {
+      "start": "Introduce una contrasea con al menos 8 caracteres.",
+      "length8": "Usa al menos 8 caracteres.",
+      "length12": "Aumenta la longitud a 12 caracteres o más.",
+      "case": "Combina maysculas y minsculas.",
+      "numbers": "Aade nmeros para reforzarla.",
+      "symbols": "Incluye smbolos como !, %, # o similares.",
+      "repetition": "Evita repetir el mismo carcter varias veces seguidas.",
+      "common": "Evita palabras comunes o secuencias previsibles."
+    }
+  },
+  "pdf_multipagina": "PDF (multipágina)",
+  "pega_aqui_una_data_url": "Pega aquí una data URL o un enlace directo a la imagen",
+  "peluqueria": "peluquería",
+  "perimetro": "Perímetro",
+  "periodo_aportaciones_finalizo_contacta_con": "El periodo de aportaciones ya finalizó. Contacta con la pareja anfitriona para solicitar acceso.",
+  "periodo_para_subir_recuerdos_finalizo": "El periodo para subir recuerdos ya finalizó. Genera un nuevo QR cuando habilites la galería nuevamente.",
+  "permitir_criticas": "Permitir críticas",
+  "plan_valido": "Plan no válido",
+  "planificacion": "Planificación",
+  "plano_basico_rectangular_con_escenario": "Plano básico rectangular con escenario y pista central",
+  "plantillas_diseno": "Plantillas de diseño",
+  "plataforma_conexion_con_proveedores": "Plataforma de conexión con proveedores",
+  "politica_cookies": "Política de Cookies",
+  "politica_privacidad": "Política de Privacidad",
+  "porcentaje_owners_que_completaron_conversion": "Porcentaje de owners que completaron la conversión a planner.",
+  "porcentaje_usuarios_que_regresan_siete": "Porcentaje de usuarios que regresan siete días después de su activación.",
+  "preguntar_por_disponibilidad_albumes_impresos": "Preguntar por la disponibilidad de álbumes impresos",
+  "preguntar_por_necesidades_tecnicas_espacio": "Preguntar por necesidades técnicas y espacio necesario",
+  "preguntar_por_opciones_menu_posibilidad": "Preguntar por opciones de menú y posibilidad de cata",
+  "presentacion": "Presentación",
+  "presupuesto_gastado_por_categoria": "Presupuesto vs Gastado por Categoría",
+  "presupuestobodagarciapdf": "Presupuesto-Boda-García.pdf",
+  "pricing": {
+    "actions": {
+      "processing": "Procesando...",
+      "monthlyButton": "Plan mensual ({{amount}}/mes)",
+      "annualButton": "Plan anual (ahorra 15%)"
+    },
+    "hero": {
+      "badge": "Modelo por boda",
+      "title": "Planes claros para cada evento.",
+      "description": "Pagos nicos en euros para parejas y paquetes flexibles para planners. Cada licencia permanece activa hasta 30 días despus de la fecha del evento y puedes extenderla cuando lo necesites.",
+      "benefitsTitle": "Beneficios clave",
+      "benefits": [
+        "Licencias en modo lectura automtico tras la fecha lmite del evento.",
+        "Packs de planners con 1 mes de prueba y control de cuota disponible.",
+        "Alertas 30 / 7 / 1 días antes de expirar para mantener todo bajo control."
+      ],
+      "cta": "Crear cuenta gratuita",
+      "highlights": {
+        "payPerEvent": {
+          "title": "Pagos por evento",
+          "description": "Activa solo lo que necesitas para cada boda. Sin renovaciones automticas."
+        },
+        "collaboration": {
+          "title": "Colaboracin controlada",
+          "description": "Invita ayudantes y proveedores con permisos claros y seguimiento de acciones."
+        },
+        "syncStatus": {
+          "title": "Estado sincronizado",
+          "description": "Los webhooks de Stripe mantienen licencias y packs al día con alertas internas."
+        }
+      }
+    },
+    "sections": {
+      "couples": {
+        "label": "Parejas",
+        "title": "Planes para parejas",
+        "description": "Cada compra habilita una boda completa hasta 30 días despus del evento. Aade una extensión para seguir trabajando si necesitas más tiempo."
+      },
+      "planners": {
+        "label": "Planners",
+        "title": "Paquetes para planners",
+        "description": "Todos los packs incluyen 1 mes de prueba gratuita. Elige 12 cuotas mensuales o pago nico anual con 15 % de descuento. Las cuotas disponibles se actualizan automticamente con Stripe."
+      },
+      "needHelp": {
+        "title": "Necesitas ayuda para elegir el plan adecuado?",
+        "description": "Te ayudamos a configurar licencias, automatizaciones y reportes segn tu operación. Agenda una sesión y disea un rollout acorde a tu ritmo.",
+        "cta": "Hablar con un especialista"
+      },
+      "quickStart": {
+        "title": "Lista para usar en minutos.",
+        "description": "Crea tu cuenta, conecta Stripe y activa tus licencias de inmediato. El sistema notificar las renovaciones y podrs mantener bodas cerradas en modo lectura cuando terminen.",
+        "primaryCta": "Crear cuenta gratuita",
+        "secondaryCta": "Centro de acceso"
+      }
+    },
+    "couplePlans": {
+      "free": {
+        "name": "Free",
+        "priceLabel": "Gratis",
+        "priceSuffix": "por boda",
+        "description": "Organiza una boda ntima o prueba la plataforma sin coste.",
+        "features": [
+          "1 boda activa con hasta 80 invitados",
+          "Seating plan bsico y control de presupuesto",
+          "Directorio de proveedores y anuncios visibles",
+          "Plantillas esenciales y soporte estndar"
+        ],
+        "cta": "Crear cuenta gratuita"
+      },
+      "weddingPass": {
+        "name": "Wedding Pass",
+        "priceSuffix": "pago nico por boda",
+        "description": "Desbloquea todas las herramientas premium para tu evento sin suscripciones anuales.",
+        "features": [
+          "Invitados y proveedores ilimitados",
+          "Contacto directo con proveedores y protocolo completo",
+          "Hasta 50 diseños web y soporte prioritario",
+          "Plantillas premium para planificación avanzada"
+        ],
+        "cta": "Comprar Wedding Pass"
+      },
+      "weddingPassPlus": {
+        "name": "Wedding Pass Plus",
+        "priceSuffix": "pago nico por boda",
+        "description": "La opción más completa para bodas premium y trabajo colaborativo con ayudantes.",
+        "features": [
+          "Todo lo incluido en Wedding Pass",
+          "Elimina la marca en invitaciones, PDFs y pantallas",
+          "Biblioteca completa de diseños y galera de recuerdos",
+          "1 ayudante con acceso completo a la boda"
+        ],
+        "cta": "Elegir Wedding Pass Plus"
+      }
+    },
+    "plannerPlans": {
+      "cta": "Empezar prueba gratuita",
+      "pack5": {
+        "name": "Planner Pack 5",
+        "monthlySuffix": "/ mes (12 pagos)",
+        "description": "Hasta 5 bodas activas simultneas con herramientas profesionales.",
+        "annualDescription": "{{amount}} pago nico anual (15 % de descuento).",
+        "features": [
+          "1 mes de prueba gratuita",
+          "Prioridad en el directorio y soporte prioritario",
+          "Gestiona y reasigna licencias segn tus clientes"
+        ]
+      },
+      "pack15": {
+        "name": "Planner Pack 15",
+        "monthlySuffix": "/ mes (12 pagos)",
+        "description": "Pensado para planners en crecimiento con mltiples proyectos en paralelo.",
+        "annualDescription": "{{amount}} pago nico anual (15 % de descuento).",
+        "features": [
+          "1 mes de prueba gratuita",
+          "Analytics por cliente y visibilidad extendida",
+          "Prioridad en directorio y soporte prioritario"
+        ]
+      },
+      "teams40": {
+        "name": "Teams 40",
+        "monthlySuffix": "/ mes (12 pagos)",
+        "description": "Equipos que coordinan muchas bodas y requieren colaboracin avanzada.",
+        "annualDescription": "{{amount}} pago nico anual (15 % de descuento).",
+        "features": [
+          "1 mes de prueba gratuita",
+          "40 bodas activas al ao natural",
+          "Incluye 3 perfiles adicionales con acceso limitado",
+          "Dashboard consolidado y colaboracin avanzada"
+        ]
+      },
+      "teamsUnlimited": {
+        "name": "Teams Ilimitado",
+        "monthlySuffix": "/ mes (12 pagos)",
+        "description": "La solución definitiva con bodas y perfiles ilimitados para agencias grandes.",
+        "annualDescription": "{{amount}} pago nico anual (15 % de descuento).",
+        "features": [
+          "1 mes de prueba gratuita",
+          "White-label completo y dominio personalizado",
+          "Soporte dedicado 24/7 y formacin personalizada",
+          "Acceso API y acompaamiento experto"
+        ]
+      }
+    }
+  },
+  "problema_validacion": "Problema de validación",
+  "profile": {
+    "synced": "Sincronizado",
+    "subscription": {
+      "type": "Tipo de suscripcin",
+      "free": "Gratis",
+      "premium": "Premium"
+    }
+  },
+  "profile_invalido_role_incorrecto": "Profile inválido o role incorrecto",
+  "programacion_descarga_informes_clave_para": "Programación y descarga de informes clave para dirección.",
+  "progreso_del_presupuesto_por_categoria": "Progreso del Presupuesto por Categoría",
+  "promocion": "promoción",
+  "proveedor_anadido_desde_bisqueda": "Proveedor añadido desde bísqueda IA.",
+  "proveedor_whatsapp_api_esta_configurado": "El proveedor de WhatsApp API no está configurado. Por favor, configúralo antes de enviar.",
+  "proveedores_cancelacion": "Proveedores - Cancelación",
+  "proveedores_confirmacion": "Proveedores - Confirmación",
+  "proveedores_solicitud_informacion": "Proveedores - Solicitud de información",
+  "proveedores_unicos": "Proveedores únicos",
+  "providers": {
+    "provider": "Proveedor",
+    "providers": "Proveedores",
+    "addProvider": "Añadir proveedor",
+    "editProvider": "Editar proveedor",
+    "deleteProvider": "Eliminar proveedor",
+    "providerName": "Nombre del proveedor",
+    "providerService": "Servicio del proveedor",
+    "providerContact": "Contacto",
+    "providerEmail": "Correo del proveedor",
+    "providerPhone": "Teléfono del proveedor",
+    "providerWebsite": "Sitio web",
+    "providerAddress": "Dirección",
+    "providerBudget": "Presupuesto",
+    "providerStatus": "Estado",
+    "providerNotes": "Notas",
+    "searchProviders": "Buscar proveedores",
+    "filterByService": "Filtrar por servicio",
+    "photographer": "Fotgrafo",
+    "videographer": "Videgrafo",
+    "florist": "Florista",
+    "caterer": "Catering",
+    "dj": "DJ",
+    "band": "Banda",
+    "venue": "Lugar",
+    "decorator": "Decorador",
+    "makeup": "Maquillaje",
+    "hairdresser": "Peluquero"
+  },
+  "proximas_dias": "Próximas 30 días",
+  "proximos_pagos": "Próximos Pagos",
+  "proximos_pagos_balance_proyectado": "Próximos pagos y balance proyectado",
+  "proyeccion_anual_del_ingreso_recurrente": "Proyección anual del ingreso recurrente mensual (MRR × 12).",
+  "proyeccion_total_basada_tus_configuraciones": "Proyección total basada en tus configuraciones",
+  "prueba_notificacion": "Prueba de notificación",
+  "prueba_sonido_musica": "Prueba de sonido y música",
+  "pts_checklist_dia": "+40 pts · Checklist al día",
+  "pudieron_cargar_las_estadisticas": "No se pudieron cargar las estadísticas",
+  "pudieron_cargar_las_metricas": "No se pudieron cargar las métricas",
+  "pudieron_cargar_plantillas_para_diagnostico": "No se pudieron cargar plantillas para diagnóstico",
+  "pudieron_generar_las_estadisticas": "No se pudieron generar las estadísticas",
+  "pudieron_obtener_las_metricas_tiempo": "No se pudieron obtener las métricas en tiempo real.",
+  "pudimos_cargar_planners_recomendados_mostramos": "No pudimos cargar planners recomendados. Mostramos opciones de demostración.",
+  "pudo_actualizar_notificacion": "No se pudo actualizar la notificación",
+  "pudo_anadir_proveedor_intentalo_nuevo": "No se pudo añadir el proveedor. Inténtalo de nuevo más tarde.",
+  "pudo_buscar_canciones_intentalo_mas": "No se pudo buscar Canciones. Inténtalo más tarde.",
+  "pudo_cargar_galeria_recuerdos_revisa": "No se pudo cargar la galería de recuerdos. Revisa tu conexión o permisos.",
+  "pudo_cargar_tus_disenos": "No se pudo cargar tus diseños",
+  "pudo_completar_busqueda": "No se pudo completar la búsqueda.",
+  "pudo_completar_difusion": "No se pudo completar la difusión: ",
+  "pudo_completar_fusion": "No se pudo completar la fusión.",
+  "pudo_completar_importacion": "No se pudo completar la importación.",
+  "pudo_conectar_con_servidor_verifica": "No se pudo conectar con el servidor. Verifica que el backend esté ejecutándose en http://localhost:4004",
+  "pudo_ejecutar_automatizacion": "No se pudo ejecutar la automatización.",
+  "pudo_eliminar_notificacion": "No se pudo eliminar la notificación",
+  "pudo_eliminar_proveedor_intentalo_nuevo": "No se pudo eliminar el proveedor. Inténtalo de nuevo más tarde.",
+  "pudo_encolar_sincronizacion_crm_intenta": "No se pudo encolar la sincronización CRM. Intenta nuevamente.",
+  "pudo_enviar_email_intentalo_nuevo": "No se pudo enviar el email. Inténtalo de nuevo más tarde.",
+  "pudo_generar_enlace_reintentalo_mas": "No se pudo generar el enlace, reinténtalo más tarde.",
+  "pudo_generar_pagina_con": "No se pudo generar la página con IA",
+  "pudo_guardar_configuracion": "No se pudo guardar la configuración.",
+  "pudo_iniciar_envio_extension_disponible": "No se pudo iniciar el envío (extensión no disponible).",
+  "pudo_iniciar_envio_por_api": "No se pudo iniciar el envío por API",
+  "pudo_iniciar_envio_una_sola": "No se pudo iniciar el envío en una sola acción: {{error}}",
+  "pudo_obtener_recomendacion_del_consejero": "No se pudo obtener la recomendación del consejero.",
+  "pudo_restablecer_conexion": "No se pudo restablecer la conexión",
+  "puedes_anadir_mas_mesas_sin": "Puedes añadir más mesas sin saturar el espacio",
+  "pulsa_anadir_hito_para_empezar": "Pulsa “Añadir hito” para empezar.",
+  "puntuacion": "Puntuación",
+  "puntuacion_consolidada": "Puntuación IA consolidada",
+  "que_coincidan_con_busqueda": "que coincidan con tu búsqueda",
+  "queridoa_nombreinvitado_gracias_por_acompanarnos": "Querido/a [NOMBRE_INVITADO], gracias por acompañarnos en nuestro día especial...",
+  "queridos_familiares_amigos_nos_reunimos": "Queridos familiares y amigos, nos reunimos hoy aquí para celebrar la unión de [NOMBRE_NOVIO] y [NOMBRE_NOVIA]...",
+  "quiero_agradecer_todos_por_estar": "Quiero agradecer a todos por estar aquí hoy. [NOMBRE_NOVIA], desde que te conocí...",
+  "quiero_una_web_elegante_moderna": "Quiero una web elegante y moderna con secciones claras para historia, cronograma, galeria y detalles logísticos (transporte, hospedaje). Usa degradados suaves, botones con esquinas redondeadas y animaciones ligeras.",
+  "recargar_ignorar_cache": "Recargar (ignorar caché)",
+  "recepcion": "Recepción",
+  "rechazado_por_anfitrion": "Rechazado por anfitrión",
+  "recibimos_presupuesto_detallado_ejemplos_album": "Recibimos presupuesto detallado y ejemplos de álbum.",
+  "recibio_url_checkout": "No se recibió URL de checkout",
+  "recordatorio_reunion": "Recordatorio reunión",
+  "recordatorio_rsvp_fecha_limite_esta": "Recordatorio RSVP: la fecha límite está próxima",
+  "registrar_transaccion": "Registrar transacción",
+  "reintento_automatico": "Reintento automático",
+  "relacion_entre_usuarios_activos_diarios": "Relación entre usuarios activos diarios y mensuales para medir engagement.",
+  "relacion_entre_valor_vida_coste": "Relación entre valor de vida y coste de adquisición; idealmente ≥ 3.",
+  "requerir_contrasenas_seguras": "Requerir contraseñas seguras",
+  "requieren_direccion_origen_destino": "Se requieren dirección de origen y destino",
+  "resalta_cta_principal_hacia_informacion": "Resalta la CTA principal hacia la información logística y la opción de compartir URL.",
+  "reservar_fotografo": "Ej: Reservar fotógrafo",
+  "resetear_contrasena": "Resetear contraseña",
+  "respuesta_invalida_del_backend_whatsapp": "Respuesta inválida del backend de WhatsApp",
+  "respuesta_invalida_generar_sitio_con": "Respuesta inválida al generar el sitio con IA",
+  "restauracion": "restauración",
+  "restaurar_esta_boda_volver_marcarla": "¿Restaurar esta boda y volver a marcarla como activa?",
+  "reunion": "Reunión",
+  "reunion_detectada": "Reunión detectada",
+  "reunion_sugerida": "Reunión sugerida",
+  "rfq_fotografia": "Ej. RFQ Fotografía",
+  "rol_funcion": "Rol / función",
+  "romantica": "romántica",
+  "romantico": "romántico",
+  "romantico_floral": "Romántico & Floral",
   "rsvp": {
     "section": "RSVP",
     "simulate": "Simular recordatorios",
@@ -516,243 +1869,22 @@
       }
     }
   },
-  "auth": {
-    "login": "Login",
-    "register": "Register",
-    "email": "Email",
-    "password": "Password",
-    "confirmPassword": "Confirm Password",
-    "forgotPassword": "Forgot your password?",
-    "resetPassword": "Reset Password",
-    "loginWithGoogle": "Login with Google",
-    "loginWithFacebook": "Login with Facebook",
-    "alreadyHaveAccount": "Already have an account?",
-    "dontHaveAccount": "Don't have an account?",
-    "createAccount": "Create Account",
-    "welcomeBack": "Welcome back!",
-    "createYourAccount": "Create your account",
-    "loginSuccess": "Login successful",
-    "logoutSuccess": "Logout successful",
-    "loginError": "Login error",
-    "registerError": "Registration error",
-    "invalidCredentials": "Invalid credentials",
-    "emailRequired": "Email is required",
-    "passwordRequired": "Password is required",
-    "passwordTooShort": "Password must be at least 6 characters",
-    "passwordsDoNotMatch": "Passwords do not match",
-    "invalidEmail": "Invalid email format"
-  },
-  "authLogin": {
-    "title": "Accede a tu cuenta",
-    "subtitle": "Usa tu correo y contrasea o contina con un proveedor social.",
-    "emailLabel": "Correo electrnico",
-    "passwordLabel": "Contrasea",
-    "emailPlaceholder": "tu@email.com",
-    "passwordPlaceholder": "Tu contrasea",
-    "rememberMe": "Recurdame",
-    "forgotPassword": "Olvidaste tu contrasea?",
-    "submit": "Iniciar sesin",
-    "submitting": "Iniciando sesin...",
-    "noAccount": "No tienes cuenta?",
-    "registerLink": "Regstrate",
-    "hero": {
-      "title": "Gestiona todo desde un nico panel",
-      "description": "Accede a tus invitados, tareas, presupuestos y documentos en segundos. Sigue el progreso del evento y coordina a todo tu equipo.",
-      "features": [
-        "Sincroniza proveedores y contratos.",
-        "Automatiza correos y recordatorios personalizados.",
-        "Recibe alertas cuando algo requiera tu atencin."
-      ]
-    },
-    "validation": {
-      "missingEmail": "Introduce tu correo electrnico.",
-      "missingPassword": "Introduce tu contrasea."
-    },
-    "errors": {
-      "invalidCredentials": "Correo o contrasea invlidos.",
-      "generic": "No pudimos iniciar sesin. Intntalo de nuevo o contacta con soporte."
-    },
-    "social": {
-      "divider": "o contina con",
-      "button": "Continuar con {{provider}}",
-      "pending": "Contina el inicio de sesin en la ventana de {{provider}}."
-    }
-  },
-  "authSignup": {
-    "title": "Crea tu cuenta",
-    "subtitle": "Regstrate con tu correo o contina con tu cuenta social favorita.",
-    "emailLabel": "Correo electrnico",
-    "passwordLabel": "Contrasea",
-    "roleLabel": "Rol",
-    "emailPlaceholder": "tu@email.com",
-    "passwordPlaceholder": "Mnimo 8 caracteres",
-    "rememberMe": "Recurdame",
-    "forgotPassword": "Olvidaste tu contrasea?",
-    "submit": "Crear cuenta",
-    "submitting": "Creando cuenta...",
-    "noAccount": "No tienes cuenta?",
-    "registerLink": "Regstrate",
-    "alreadyHaveAccount": "Ya tienes cuenta?",
-    "loginLink": "Inicia sesin",
-    "hero": {
-      "title": "Bienvenida a Lovenda",
-      "description": "Centraliza tareas, invitados y proveedores en un solo lugar. Nuestra asistente te gua en cada paso para que tu boda sea perfecta.",
-      "features": [
-        "Timeline inteligente para no olvidar nada.",
-        "Automatiza correos y recordatorios para invitados.",
-        "Catlogo de proveedores con recomendaciones personalizadas."
-      ]
-    },
-    "roleOptions": {
-      "particular": "Pareja",
-      "planner": "Wedding planner",
-      "assistant": "Ayudante"
-    },
-    "validation": {
-      "missingEmail": "Introduce tu correo electrnico.",
-      "missingPassword": "Introduce tu contrasea.",
-      "shortPassword": "La contrasea debe tener al menos 8 caracteres."
-    },
-    "errors": {
-      "emailInUse": "Este correo ya est registrado.",
-      "weakPassword": "Elige una contrasea ms fuerte para completar el registro.",
-      "invalidEmail": "Introduce un correo electrnico vlido.",
-      "generic": "No pudimos crear tu cuenta. Intntalo de nuevo o contacta con soporte."
-    },
-    "successMessage": "Cuenta creada con xito. Redirigiendo a tu panel...",
-    "social": {
-      "divider": "o contina con",
-      "button": "Continuar con {{provider}}",
-      "pending": "Contina el registro en la ventana de {{provider}}."
-    }
-  },
-  "passwordStrength": {
-    "labels": {
-      "veryWeak": "Muy dbil",
-      "weak": "Dbil",
-      "medium": "Aceptable",
-      "strong": "Buena",
-      "veryStrong": "Excelente"
-    },
-    "title": "Seguridad de la contrasea",
-    "suggestions": {
-      "start": "Introduce una contrasea con al menos 8 caracteres.",
-      "length8": "Usa al menos 8 caracteres.",
-      "length12": "Aumenta la longitud a 12 caracteres o ms.",
-      "case": "Combina maysculas y minsculas.",
-      "numbers": "Aade nmeros para reforzarla.",
-      "symbols": "Incluye smbolos como !, %, # o similares.",
-      "repetition": "Evita repetir el mismo carcter varias veces seguidas.",
-      "common": "Evita palabras comunes o secuencias previsibles."
-    }
-  },
-  "wedding": {
-    "wedding": "Wedding",
-    "weddings": "Weddings",
-    "myWedding": "My Wedding",
-    "createWedding": "Create Wedding",
-    "editWedding": "Edit Wedding",
-    "weddingName": "Wedding Name",
-    "weddingDate": "Wedding Date",
-    "weddingVenue": "Wedding Venue",
-    "bride": "Bride",
-    "groom": "Groom",
-    "couple": "Couple",
-    "ceremony": "Ceremony",
-    "reception": "Reception",
-    "weddingDetails": "Wedding Details",
-    "weddingBudget": "Wedding Budget",
-    "weddingGuests": "Wedding Guests",
-    "weddingStyle": "Wedding Style",
-    "weddingTheme": "Wedding Theme",
-    "weddingColors": "Wedding Colors"
-  },
-  "guests": {
-    "guest": "Invitado",
-    "guests": "Invitados",
-    "guestList": "Lista de invitados",
-    "addGuest": "Aadir invitado",
-    "editGuest": "Editar invitado",
-    "deleteGuest": "Eliminar invitado",
-    "guestName": "Nombre del invitado",
-    "guestEmail": "Correo del invitado",
-    "guestPhone": "Telfono del invitado",
-    "guestAddress": "Direccin del invitado",
-    "guestTable": "Mesa del invitado",
-    "guestStatus": "Estado del invitado",
-    "confirmed": "Confirmado",
-    "pending": "Pendiente",
-    "declined": "Rechazado",
-    "totalGuests": "Invitados totales",
-    "confirmedGuests": "Invitados confirmados",
-    "pendingGuests": "Invitados pendientes",
-    "importGuests": "Importar invitados",
-    "exportGuests": "Exportar invitados",
-    "sendInvitations": "Enviar invitaciones",
-    "plusOne": "Acompaante",
-    "dietaryRestrictions": "Restricciones alimentarias",
-    "specialRequests": "Peticiones especiales",
-    "saveTheDate": {
-      "message": "Hola somos {{p1}}{{p2Suffix}}, tenemos un noticin sper importante que compartir contigo. Nos casamos! Resrvate el {{date}} porque queremos contar contigo.",
-      "messageFallback": "Hola! Tenemos un noticin sper importante que compartir contigo. Nos casamos! Resrvate la fecha porque queremos contar contigo!",
-      "connector": "y",
-      "primaryFallback": "nosotros",
-      "coupleFallback": "nuestra boda"
-    },
-    "rsvp": {
-      "printPdf": "Imprimir / PDF"
-    },
-    "groups": {
-      "title": "Gestin de grupos",
-      "assignTitle": "Asignar a seleccionados",
-      "newGroup": "Nuevo grupo&",
-      "groupName": "Nombre de grupo",
-      "rename": "Renombrar grupo",
-      "origin": "Origen&",
-      "newName": "Nuevo nombre",
-      "merge": "Fusionar grupos",
-      "destination": "Destino&",
-      "existing": "Grupos existentes",
-      "none": "No hay grupos an."
-    },
-    "selectedCount": "Seleccionados: {{count}}"
-  },
-  "providers": {
-    "provider": "Proveedor",
-    "providers": "Proveedores",
-    "addProvider": "Aadir proveedor",
-    "editProvider": "Editar proveedor",
-    "deleteProvider": "Eliminar proveedor",
-    "providerName": "Nombre del proveedor",
-    "providerService": "Servicio del proveedor",
-    "providerContact": "Contacto",
-    "providerEmail": "Correo del proveedor",
-    "providerPhone": "Telfono del proveedor",
-    "providerWebsite": "Sitio web",
-    "providerAddress": "Direccin",
-    "providerBudget": "Presupuesto",
-    "providerStatus": "Estado",
-    "providerNotes": "Notas",
-    "searchProviders": "Buscar proveedores",
-    "filterByService": "Filtrar por servicio",
-    "photographer": "Fotgrafo",
-    "videographer": "Videgrafo",
-    "florist": "Florista",
-    "caterer": "Catering",
-    "dj": "DJ",
-    "band": "Banda",
-    "venue": "Lugar",
-    "decorator": "Decorador",
-    "makeup": "Maquillaje",
-    "hairdresser": "Peluquero"
-  },
+  "rustico": "Rústico",
+  "rustico_kraft": "Rústico Kraft",
+  "rustico_natural": "Rústico & Natural",
+  "saldo_proyectado_dia_boda": "Saldo proyectado día de la boda",
+  "salon": "salón",
+  "salon_celebraciones_vista": "Salón Celebraciones Vista",
+  "salon_eventos": "Salón de eventos",
+  "salon_principal": "Ej: Salón Principal",
+  "salon_rectangular": "Salón rectangular",
   "seating": {
     "seatingPlan": "Plano de asientos",
     "table": "Mesa",
     "tables": "Mesas",
     "seat": "Asiento",
     "seats": "Asientos",
-    "addTable": "Aadir mesa",
+    "addTable": "Añadir mesa",
     "editTable": "Editar mesa",
     "deleteTable": "Eliminar mesa",
     "tableName": "Nombre de la mesa",
@@ -771,11 +1903,11 @@
       "syncing": "Sincronizando&",
       "synced": "Sincronizado",
       "syncError": "Error al sincronizar",
-      "offline": "Sin conexin",
+      "offline": "Sin conexión",
       "undo": "Deshacer",
-      "undoTooltip": "Deshaz el ltimo cambio",
+      "undoTooltip": "Deshaz el Último cambio",
       "redo": "Rehacer",
-      "redoTooltip": "Repite el ltimo cambio",
+      "redoTooltip": "Repite el Último cambio",
       "hideTables": "Ocultar mesas",
       "showTables": "Mostrar mesas",
       "hideRulers": "Ocultar reglas",
@@ -882,7 +2014,7 @@
     "hints": {
       "boundary": "Haz clic y arrastra para delimitar el espacio.",
       "obstacle": "Haz clic para colocar obstculos y arrastra para ajustar su tamao.",
-      "door": "Haz clic para aadir puertas o accesos.",
+      "door": "Haz clic para añadir puertas o accesos.",
       "aisle": "Arrastra para marcar pasillos entre mesas."
     },
     "export": {
@@ -897,7 +2029,7 @@
         "tools": "Herramientas (Mover vista, Mover, Permetro, Puertas, Obstculos, Pasillos)",
         "zoomFit": "Zoom acercar / alejar / Ajustar",
         "selectAll": "Seleccionar todo",
-        "escape": "Limpiar seleccin / cerrar mens",
+        "escape": "Limpiar selección / cerrar mens",
         "rotate": "Rotar -5 / +5 (Shift: 15)",
         "align": "Alinear (inicio/fin)",
         "distribute": "Distribuir (X/Y)",
@@ -907,433 +2039,6 @@
         "drawFinalizeCancel": "Finalizar / Cancelar dibujo",
         "backspaceDelete": "Deshacer punto / Eliminar mesa",
         "tabExactLength": "Longitud exacta del segmento"
-      }
-    }
-  },
-  "email": {
-    "email": "Email",
-    "emails": "Emails",
-    "inbox": "Inbox",
-    "sent": "Sent",
-    "drafts": "Drafts",
-    "trash": "Trash",
-    "compose": "Compose",
-    "reply": "Reply",
-    "forward": "Forward",
-    "delete": "Delete",
-    "archive": "Archive",
-    "markAsRead": "Mark as Read",
-    "markAsUnread": "Mark as Unread",
-    "subject": "Subject",
-    "from": "From",
-    "to": "To",
-    "cc": "CC",
-    "bcc": "BCC",
-    "attachments": "Attachments",
-    "send": "Send",
-    "saveDraft": "Save Draft",
-    "emailSettings": "Email Settings",
-    "emailSignature": "Email Signature"
-  },
-  "dates": {
-    "today": "Today",
-    "yesterday": "Yesterday",
-    "tomorrow": "Tomorrow",
-    "thisWeek": "This week",
-    "nextWeek": "Next week",
-    "thisMonth": "This month",
-    "nextMonth": "Next month",
-    "selectDate": "Select date",
-    "dateFormat": "mm/dd/yyyy",
-    "timeFormat": "HH:mm"
-  },
-  "status": {
-    "active": "Active",
-    "inactive": "Inactive",
-    "pending": "Pending",
-    "approved": "Approved",
-    "rejected": "Rejected",
-    "completed": "Completed",
-    "cancelled": "Cancelled",
-    "draft": "Draft",
-    "published": "Published"
-  },
-  "inspiration": {
-    "alt": "inspiracin",
-    "altWithTags": "inspiracin: {{tags}}",
-    "aria": "Imagen de inspiracin",
-    "ariaWithTags": "Imagen de inspiracin: {{tags}}",
-    "addFav": "Aadir a favoritos",
-    "removeFav": "Quitar de favoritos"
-  },
-  "compose": {
-    "toField": "Recipient field",
-    "subjectField": "Subject field",
-    "ccField": "CC field",
-    "bccField": "BCC field",
-    "insertQuickReply": "Insert suggested reply"
-  },
-  "common": {
-    "all": "All",
-    "none": "None",
-    "show": "Show",
-    "hide": "Hide",
-    "view": "View",
-    "cancel": "Cancel",
-    "delete": "Delete",
-    "duplicate": "Duplicate"
-  },
-  "pages": {
-    "momentos": {
-      "title": "Galera de recuerdos",
-      "tabs": {
-        "overview": "Resumen",
-        "moderation": "Moderacin",
-        "slideshow": "Slideshow",
-        "downloads": "Descargas"
-      },
-      "loading": {
-        "weddings": "Cargando bodas...",
-        "selectWedding": "Selecciona una boda para gestionar la galera de recuerdos.",
-        "preparing": "Preparando tu lbum colaborativo..."
-      },
-      "banners": {
-        "contributionsClosed": "La ventana de aportaciones cerr el {{date}}. Ajusta la fecha de la boda o solicita soporte si necesitas reabrir la galera.",
-        "compressionActive": "Hemos superado los 30GB de espacio. Las nuevas fotos se comprimen automticamente para optimizar el almacenamiento en Firebase."
-      },
-      "toasts": {
-        "loadError": "No se pudo cargar la galera de recuerdos. Revisa tu conexin o permisos.",
-        "tokenCreated": "Nuevo enlace generado",
-        "tokenError": "No se pudo generar el enlace, reintntalo ms tarde.",
-        "approved": "Foto aprobada",
-        "approveError": "No se pudo aprobar la foto",
-        "rejected": "Foto rechazada",
-        "rejectError": "No se pudo rechazar la foto",
-        "reset": "La foto volvi a pendiente",
-        "resetError": "No se pudo revertir el estado",
-        "scenesSaved": "Escenas actualizadas",
-        "scenesError": "No se pudieron guardar las escenas",
-        "uploadSuccess": "Foto subida a la galera"
-      },
-      "prompts": {
-        "rejectTitle": "Motivo del rechazo",
-        "rejectDefault": "No cumple con la gua de la galera",
-        "rejectFallback": "Rechazado"
-      },
-      "slideshow": {
-        "title": "Presentacin en vivo",
-        "description": "Conecta una pantalla secundaria y deja que los recuerdos fluyan automticamente.",
-        "stats": "{{count}} fotos aprobadas  {{scenes}} escenas cubiertas"
-      },
-      "uploader": {
-        "hostFallback": "Anfitrin"
-      }
-    },
-    "momentosGuest": {
-      "badge": "Recuerdos colaborativos",
-      "greeting": "Hola, {{name}} =K",
-      "remainingUploadsSingle": "Sube hasta 1 foto adicional.",
-      "remainingUploads": "Sube hasta {{count}} fotos adicionales.",
-      "remainingUploadsUnlimited": "Sube todas las fotos que quieras.",
-      "description": "El anfitrin revisar y las compartir con el grupo.",
-      "window": {
-        "daysLeft": "An tienes {{count, plural, one {1 da} other {{count} das}} para enviar tus mejores fotos.",
-        "deadline": "Disponible hasta {{date}}.",
-        "compression": "Las fotos nuevas se optimizan automticamente para ahorrar espacio."
-      },
-      "status": {
-        "loading": "Cargando galera...",
-        "loadingMessage": "Preparando tu espacio para compartir recuerdos&",
-        "errorTitle": "No pudimos abrir la galera de recuerdos",
-        "errorAction": "Si crees que es un error, contacta con la pareja anfitriona para solicitar un nuevo enlace.",
-        "closedTitle": "La galera est cerrada",
-        "closedDescription": "El periodo para subir fotos termin.",
-        "closedDescriptionWithDate": "El periodo para subir fotos termin el {{date}}.",
-        "closedHelp": "Si todava tienes recuerdos que compartir, avisa a la pareja anfitriona para reabrir el enlace.",
-        "welcomeTitle": "Gracias por capturar recuerdos!",
-        "welcomeDescription": "Sube tus fotos favoritas del evento. El anfitrin podr revisarlas y mostrarlas en el slideshow en vivo.",
-        "uploadTitle": "Tus progresos",
-        "tip": "Tip: las fotos se agrupan por escena (ceremonia, banquete, fiesta&) para ayudar al anfitrin.",
-        "uploadedSummary": "Has compartido {{count}} {{count, plural, one {foto} other {fotos}}}. Gracias por sumar a los recuerdos!",
-        "recentUploads": "Las fotos aprobadas aparecern en el slideshow del evento y en la galera final. El anfitrin avisar cuando estn listas."
-      },
-      "form": {
-        "nameLabel": "Nombre completo",
-        "namePlaceholder": "Ej. Laura G.",
-        "emailLabel": "Correo electrnico (opcional)",
-        "emailPlaceholder": "Te avisaremos cuando tus fotos estn destacadas",
-        "termsLabel": "Acepto compartir mis fotos con la pareja anfitriona y confirmo que tengo permiso para hacerlo.",
-        "submit": "Comenzar a subir fotos"
-      },
-      "progress": {
-        "title": "Tus progresos",
-        "sceneLabel": "Escena: {{scene}}  {{size}} KB",
-        "status": "En revisin"
-      },
-      "toasts": {
-        "nameRequired": "Indica tu nombre para personalizar tus aportaciones",
-        "termsRequired": "Debes aceptar la poltica de privacidad",
-        "windowClosed": "Esta galera ya no acepta nuevas fotos.",
-        "achievementFirst": "< Logro desbloqueado! Primer recuerdo compartido (",
-        "achievementEnthusiast": "< Eres un colaborador entusiasta! Sigue compartiendo recuerdos.",
-        "achievementStar": "< Recuerdos Estrella! Tus fotos darn vida al slideshow.",
-        "upload": "Foto enviada correctamente"
-      },
-      "errors": {
-        "incompleteLink": "El enlace est incompleto. Solicita un nuevo QR al anfitrin.",
-        "invalidLink": "Este enlace ya no es vlido."
-      },
-      "scenes": {
-        "other": "Otros"
-      },
-      "uploader": {
-        "guestFallback": "Invitado"
-      }
-    }
-  },
-  "pricing": {
-    "hero": {
-      "badge": "Modelo por boda",
-      "title": "Planes claros para cada evento.",
-      "description": "Pagos nicos en euros para parejas y paquetes flexibles para planners. Cada licencia permanece activa hasta 30 das despus de la fecha del evento y puedes extenderla cuando lo necesites.",
-      "benefitsTitle": "Beneficios clave",
-      "benefits": [
-        "Licencias en modo lectura automtico tras la fecha lmite del evento.",
-        "Packs de planners con 1 mes de prueba y control de cuota disponible.",
-        "Alertas 30 / 7 / 1 das antes de expirar para mantener todo bajo control."
-      ],
-      "cta": "Crear cuenta gratuita",
-      "highlights": {
-        "payPerEvent": {
-          "title": "Pagos por evento",
-          "description": "Activa solo lo que necesitas para cada boda. Sin renovaciones automticas."
-        },
-        "collaboration": {
-          "title": "Colaboracin controlada",
-          "description": "Invita ayudantes y proveedores con permisos claros y seguimiento de acciones."
-        },
-        "syncStatus": {
-          "title": "Estado sincronizado",
-          "description": "Los webhooks de Stripe mantienen licencias y packs al da con alertas internas."
-        }
-      }
-    },
-    "sections": {
-      "couples": {
-        "label": "Parejas",
-        "title": "Planes para parejas",
-        "description": "Cada compra habilita una boda completa hasta 30 das despus del evento. Aade una extensin para seguir trabajando si necesitas ms tiempo."
-      },
-      "planners": {
-        "label": "Planners",
-        "title": "Paquetes para planners",
-        "description": "Todos los packs incluyen 1 mes de prueba gratuita. Elige 12 cuotas mensuales o pago nico anual con 15 % de descuento. Las cuotas disponibles se actualizan automticamente con Stripe."
-      },
-      "needHelp": {
-        "title": "Necesitas ayuda para elegir el plan adecuado?",
-        "description": "Te ayudamos a configurar licencias, automatizaciones y reportes segn tu operacin. Agenda una sesin y disea un rollout acorde a tu ritmo.",
-        "cta": "Hablar con un especialista"
-      },
-      "quickStart": {
-        "title": "Lista para usar en minutos.",
-        "description": "Crea tu cuenta, conecta Stripe y activa tus licencias de inmediato. El sistema notificar las renovaciones y podrs mantener bodas cerradas en modo lectura cuando terminen.",
-        "primaryCta": "Crear cuenta gratuita",
-        "secondaryCta": "Centro de acceso"
-      }
-    },
-    "couplePlans": {
-      "free": {
-        "name": "Free",
-        "priceLabel": "Gratis",
-        "priceSuffix": "por boda",
-        "description": "Organiza una boda ntima o prueba la plataforma sin coste.",
-        "features": [
-          "1 boda activa con hasta 80 invitados",
-          "Seating plan bsico y control de presupuesto",
-          "Directorio de proveedores y anuncios visibles",
-          "Plantillas esenciales y soporte estndar"
-        ],
-        "cta": "Crear cuenta gratuita"
-      },
-      "weddingPass": {
-        "name": "Wedding Pass",
-        "priceSuffix": "pago nico por boda",
-        "description": "Desbloquea todas las herramientas premium para tu evento sin suscripciones anuales.",
-        "features": [
-          "Invitados y proveedores ilimitados",
-          "Contacto directo con proveedores y protocolo completo",
-          "Hasta 50 diseos web y soporte prioritario",
-          "Plantillas premium para planificacin avanzada"
-        ],
-        "cta": "Comprar Wedding Pass"
-      },
-      "weddingPassPlus": {
-        "name": "Wedding Pass Plus",
-        "priceSuffix": "pago nico por boda",
-        "description": "La opcin ms completa para bodas premium y trabajo colaborativo con ayudantes.",
-        "features": [
-          "Todo lo incluido en Wedding Pass",
-          "Elimina la marca en invitaciones, PDFs y pantallas",
-          "Biblioteca completa de diseos y galera de recuerdos",
-          "1 ayudante con acceso completo a la boda"
-        ],
-        "cta": "Elegir Wedding Pass Plus"
-      }
-    },
-    "plannerPlans": {
-      "cta": "Empezar prueba gratuita",
-      "pack5": {
-        "name": "Planner Pack 5",
-        "monthlySuffix": "/ mes (12 pagos)",
-        "description": "Hasta 5 bodas activas simultneas con herramientas profesionales.",
-        "annualDescription": "{{amount}} pago nico anual (15 % de descuento).",
-        "features": [
-          "1 mes de prueba gratuita",
-          "Prioridad en el directorio y soporte prioritario",
-          "Gestiona y reasigna licencias segn tus clientes"
-        ]
-      },
-      "pack15": {
-        "name": "Planner Pack 15",
-        "monthlySuffix": "/ mes (12 pagos)",
-        "description": "Pensado para planners en crecimiento con mltiples proyectos en paralelo.",
-        "annualDescription": "{{amount}} pago nico anual (15 % de descuento).",
-        "features": [
-          "1 mes de prueba gratuita",
-          "Analytics por cliente y visibilidad extendida",
-          "Prioridad en directorio y soporte prioritario"
-        ]
-      },
-      "teams40": {
-        "name": "Teams 40",
-        "monthlySuffix": "/ mes (12 pagos)",
-        "description": "Equipos que coordinan muchas bodas y requieren colaboracin avanzada.",
-        "annualDescription": "{{amount}} pago nico anual (15 % de descuento).",
-        "features": [
-          "1 mes de prueba gratuita",
-          "40 bodas activas al ao natural",
-          "Incluye 3 perfiles adicionales con acceso limitado",
-          "Dashboard consolidado y colaboracin avanzada"
-        ]
-      },
-      "teamsUnlimited": {
-        "name": "Teams Ilimitado",
-        "monthlySuffix": "/ mes (12 pagos)",
-        "description": "La solucin definitiva con bodas y perfiles ilimitados para agencias grandes.",
-        "annualDescription": "{{amount}} pago nico anual (15 % de descuento).",
-        "features": [
-          "1 mes de prueba gratuita",
-          "White-label completo y dominio personalizado",
-          "Soporte dedicado 24/7 y formacin personalizada",
-          "Acceso API y acompaamiento experto"
-        ]
-      }
-    }
-  },
-  "marketingAccess": {
-    "backLink": "Volver al inicio",
-    "hero": {
-      "badge": "Centro de acceso",
-      "login": {
-        "title": "Gestiona todo desde un solo lugar",
-        "description": "Accede a invitados, tareas, presupuesto y documentos al instante. Mantn a tu equipo sincronizado en cada boda.",
-        "features": [
-          "Un panel para tareas, presupuesto y seating",
-          "Invita colaboradores con permisos controlados",
-          "Actualizaciones en tiempo real desde web y mvil"
-        ]
-      },
-      "signup": {
-        "title": "Bienvenido a Lovenda",
-        "description": "Centraliza la planificacin, automatiza recordatorios y deja que nuestro asistente te gue paso a paso.",
-        "features": [
-          "Onboarding guiado por nuestro asistente de planificacin",
-          "Plantillas para presupuesto, invitados y proveedores",
-          "Licencias con Stripe y activacin inmediata"
-        ]
-      }
-    },
-    "toggle": {
-      "login": "Iniciar sesin",
-      "signup": "Crear cuenta"
-    },
-    "loggedIn": {
-      "title": "Sesin activa",
-      "description": "Tu cuenta de Lovenda ya est abierta. Contina con tus eventos o cierra sesin si necesitas cambiar de cuenta.",
-      "primaryCta": "Ir al panel",
-      "secondaryCta": "Cerrar sesin"
-    },
-    "loginForm": {
-      "emailLabel": "Correo electrnico",
-      "emailPlaceholder": "tu@email.com",
-      "passwordLabel": "Contrasea",
-      "passwordPlaceholder": "Tu contrasea",
-      "rememberMe": "Recordarme",
-      "forgotPassword": "Olvidaste tu contrasea?",
-      "submit": "Iniciar sesin",
-      "submitting": "Iniciando sesin&"
-    },
-    "signup": {
-      "info": "Completa el formulario para crear tu cuenta.",
-      "successMessage": "Cuenta creada con xito. Redirigiendo al panel&",
-      "socialPending": "Completa el flujo de alta en la ventana de {{provider}}."
-    },
-    "switch": {
-      "noAccount": "No tienes cuenta?",
-      "registerLink": "Crea una",
-      "alreadyHaveAccount": "Ya tienes cuenta?",
-      "loginLink": "Iniciar sesin"
-    },
-    "social": {
-      "redirect": "Redirigiendo a {{provider}}..."
-    },
-    "errors": {
-      "provider": "No pudimos autenticarte con {{provider}}."
-    }
-  },
-  "budgetPrediction": {
-    "header": {
-      "title": "Prediccin IA",
-      "subtitle": "Anlisis inteligente de tu presupuesto"
-    },
-    "actions": {
-      "analyzing": "Analizando...",
-      "refresh": "Actualizar prediccin"
-    },
-    "metrics": {
-      "riskLabel": "Nivel de riesgo",
-      "confidence": "Confianza",
-      "spent": "Gastado",
-      "projected": "Proyectado",
-      "dailyRate": "Gasto diario",
-      "daysRemaining": "Das restantes"
-    },
-    "sections": {
-      "recommendations": "Recomendaciones",
-      "categoryAnalysis": "Anlisis por categora"
-    },
-    "emptyState": {
-      "title": "Predicciones IA disponibles prximamente",
-      "description": "Necesitas al menos 5 transacciones para generar predicciones. Actualmente tienes {{count}}."
-    },
-    "riskLabels": {
-      "critical": "Crtico",
-      "high": "Alto",
-      "medium": "Medio",
-      "low": "Bajo"
-    },
-    "recommendations": {
-      "projectedOverage": {
-        "message": "Se proyecta un exceso de {{amount}}",
-        "action": "Considera revisar gastos discrecionales"
-      },
-      "highDailyRate": {
-        "message": "Tu tasa de gasto diaria es alta",
-        "action": "Intenta espaciar ms las compras grandes"
-      },
-      "onTrack": {
-        "message": "Vas muy bien con el presupuesto!",
-        "action": "Mantn este ritmo de gasto"
       }
     }
   },
@@ -1350,14 +2055,14 @@
       "pending": "Pendientes"
     },
     "tables": {
-      "moreGuests": "+{{count}} invitados ms",
+      "moreGuests": "+{{count}} invitados más",
       "empty": "Mesa vaca",
       "assignedGuests": "{{count}} invitados asignados",
       "occupancyLabel": "ocupacin"
     },
     "pending": {
       "title": "Invitados pendientes ({{count}})",
-      "moreGuests": "+{{count}} invitados ms"
+      "moreGuests": "+{{count}} invitados más"
     },
     "actions": {
       "assign": "Asignar",
@@ -1371,23 +2076,22 @@
       "noGuests": "No hay invitados asignados"
     }
   },
-  "categories": {
-    "decoration": "Decoracin",
-    "cocktail": "Cctel",
-    "banquet": "Banquete",
-    "ceremony": "Ceremonia",
-    "flowers": "Flores",
-    "dress": "Vestidos",
-    "cake": "Pasteles",
-    "photography": "Fotografa"
-  },
+  "seccion": "Sección",
+  "seguro_que_quieres_eliminar_esta": "¿Seguro que quieres eliminar esta lectura?",
+  "seguro_que_quieres_eliminar_este": "¿Seguro que quieres eliminar este elemento?",
+  "selecciona_una_categoria": "Selecciona una categoría",
+  "selecciona_una_mesa_para_habilitar": "Selecciona una mesa para habilitar la asignación rápida",
+  "selecciona_una_seccion_destino": "Selecciona una sección destino.",
+  "selecciona_una_seccion_diferente_para": "Selecciona una sección diferente para mover el momento.",
+  "separadas_por_comas_vacio_permitir": "Separadas por comas, vacío = permitir todas",
+  "ser_especifico_sobre_tus_necesidades": "Ser específico sobre tus necesidades para el evento",
   "services": {
     "catering": "Catering",
-    "photography": "Fotografa",
+    "photography": "Fotografía",
     "video": "Vdeo",
-    "music": "Msica",
-    "musicDJ": "Msica/DJ",
-    "decoration": "Decoracin",
+    "music": "Música",
+    "musicDJ": "Música/DJ",
+    "decoration": "Decoración",
     "flowers": "Flores",
     "transport": "Transporte",
     "dresses": "Vestidos",
@@ -1402,7 +2106,7 @@
     "entertainment": "Animacin",
     "weddingPlanner": "Wedding Planner",
     "ceremonyVenue": "Lugar de ceremonia",
-    "receptionVenue": "Lugar de celebracin",
+    "receptionVenue": "Lugar de celebración",
     "accommodation": "Alojamiento",
     "honeymoon": "Viaje de novios",
     "sound": "Sonido",
@@ -1411,57 +2115,164 @@
     "weddingCake": "Tarta nupcial",
     "favors": "Detalles/Regaos",
     "security": "Seguridad",
-    "dayCoordination": "Coordinacin da B",
+    "dayCoordination": "Coordinacin día B",
     "other": "Otro"
   },
+  "sesion": "sesión",
+  "sesion_expirada_timestamp_invalido": "Sesión expirada o timestamp inválido",
+  "sesion_fotos": "Sesión de Fotos",
+  "sesion_fotos_inmediata": "Sesión de fotos inmediata",
+  "sevilla_espana": "Sevilla, España",
+  "signatureservice_autenticacion_requerida": "SignatureService: autenticación requerida",
+  "signatureservice_pudo_obtener_token_autenticacion": "SignatureService: no se pudo obtener el token de autenticación",
+  "simbolica": "Simbólica",
+  "simulacion": "Simulación",
+  "sin_categoria": "Sin categoría",
+  "sin_conexion": "Sin conexión",
+  "sin_fecha_actualizacion": "Sin fecha de actualización",
+  "sin_limite": "0 = sin límite",
+  "sin_presupuestos_detectados_aun": "Sin presupuestos detectados aún",
+  "sin_restriccion_definida": "sin restricción definida",
+  "sin_titulo": "Sin título",
+  "sin_ubicacion": "Sin ubicación",
+  "sincronizar_seleccion_con_crm": "Sincronizar selección con CRM",
+  "slug_invalido": "Slug inválido",
+  "solicitud_expediente_matrimonial_canonico": "Solicitud expediente matrimonial canónico",
+  "solicitud_informacion": "Solicitud de información",
+  "solicitud_informacion_para_boda_weddingdate": "Solicitud de información para boda el {{weddingDate}} en {{weddingPlace}}",
+  "solicitud_informacion_para_servicio_boda": "Solicitud de información para {{servicio}} - Boda {{fecha_boda}}",
+  "solicitud_informacion_sobre_servicios_musicales": "Solicitud de información sobre servicios musicales para boda - {providerName}",
+  "solicitud_inicial_informacion": "Solicitud inicial de información",
+  "solicitud_reunion": "Solicitud de reunión",
+  "solicitud_reunion_temareunion": "Solicitud de reunión - {{tema_reunion}}",
+  "solo_pueden_eliminar_items_personalizados": "Solo se pueden eliminar ítems personalizados",
+  "solteria_divorcio_viudedad": "Soltería / divorcio / viudedad",
+  "solteria_modelo": "Fe de soltería (modelo)",
+  "sonido_iluminacion": "sonido e iluminación",
+  "sonido_iluminacion_elementos_especiales": "Sonido, iluminación, elementos especiales...",
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive",
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "draft": "Draft",
+    "published": "Published"
+  },
+  "subio_archivo_identico_evitamos_duplicados": "Ya se subió un archivo idéntico. Evitamos duplicados automáticamente.",
   "suppliers": {
     "configureServices": "Configurar servicios deseados",
     "suggested": "Sugeridos",
-    "addServicePlaceholder": "Aadir servicio (ej. Fotografa)",
+    "addServicePlaceholder": "Añadir servicio (ej. Fotografía)",
     "noServicesAdded": "An no has aadido servicios."
   },
+  "suscripcion_push_activada": "Suscripción push activada",
+  "suscripcion_push_desactivada": "Suscripción push desactivada",
+  "tamano_del_email": "Tamaño del Email",
+  "tamano_desconocido": "Tamaño desconocido",
+  "tamano_maximo_adjuntos": "Tamaño máximo de adjuntos (MB)",
+  "tamano_maximo_archivos": "Tamaño máximo de archivos (MB)",
+  "tarea_proxima_vencer": "Tarea próxima a vencer",
+  "tarea_sin_titulo": "Tarea sin título",
+  "tasa_rebote_supero_ultima_hora": "La tasa de rebote superó el 5% en la última hora.",
+  "tasa_respuesta_por_categoria": "Tasa de Respuesta por Categoría (%)",
+  "tasks": {
+    "high": "Alta",
+    "medium": "Media",
+    "low": "Baja",
+    "completed": "Completada",
+    "inProgress": "En progreso",
+    "notStarted": "No iniciada",
+    "overdue": "Atrasada",
+    "task": "Task",
+    "tasks": "Tasks",
+    "addTask": "Add Task",
+    "editTask": "Edit Task",
+    "deleteTask": "Delete Task",
+    "taskTitle": "Task Title",
+    "taskDescription": "Description",
+    "taskDueDate": "Due Date",
+    "taskPriority": "Priority",
+    "taskStatus": "Status",
+    "taskAssignee": "Assigned to",
+    "todoList": "To-Do List",
+    "completedTasks": "Completed Tasks",
+    "upcomingTasks": "Upcoming Tasks"
+  },
+  "tecnicas": "⚙️ Técnicas",
+  "telefono": "Teléfono",
+  "tematico_creativo": "Temático & Creativo",
+  "tematico_personalizado": "Temático & Personalizado",
+  "terminos_condiciones": "Términos y Condiciones",
+  "tiempo_asincrono": "Tiempo Asíncrono (ms)",
+  "tiempo_sesion_minutos": "Tiempo de sesión (minutos)",
+  "tiempo_sincrono": "Tiempo Síncrono (ms)",
+  "tiempo_validez_para_reset_contrasena": "Tiempo de validez para reset de contraseña (horas)",
+  "tienes_una_nueva_notificacion": "Tienes una nueva notificación",
+  "timeline_del_dia": "Timeline del Día B",
+  "tipometricavalortimestampn": "Tipo,Métrica,Valor,Timestamp\\n",
+  "titulo_del_momento": "Título del momento",
+  "titulo_obligatorio": "El título es obligatorio",
+  "titulo_requerido": "Título es requerido",
+  "titulo_tarea": "Título de la tarea",
+  "todavia_tienes_bodas_activas": "Todavía no tienes bodas activas.",
+  "todos_los_cambios_han_sincronizado": "Todos los cambios se han sincronizado con éxito",
+  "token_invalido": "Token inválido",
+  "token_sesion": "Token Sesión",
+  "transaccion": "transacción",
+  "ubicacion": "Ubicación",
+  "ubicacion_centro_eventos_bosque": "ubicación: Centro de Eventos El Bosque",
+  "ubicacion_pendiente": "Ubicación pendiente",
+  "ultima_ejecucion_aniversario": "Última ejecución (aniversario)",
+  "ultimo_tema": "Último tema",
+  "umbral_minimo_eur": "Umbral mínimo (EUR)",
+  "usa_funcion_distribuir_uniformemente_para": "Usa la función \"Distribuir uniformemente\" para espaciar mejor",
+  "usa_mesas_mas_pequenas_elimina": "Usa mesas más pequeñas o elimina algunas",
+  "usa_tipografias_serifsans_estilo_clasicocontemporaneo": "Usa tipografías serif/sans de estilo clásico/contemporáneo.",
+  "usuarios_con_actividad_registrada_los": "Usuarios con actividad registrada en los últimos siete días.",
+  "usuarios_unicos_activos_durante_los": "Usuarios únicos activos durante los últimos 30 días.",
+  "vacio": "Vacío",
+  "valeria_tomas_wedding": "Valeria & Tomás Wedding",
+  "validar_actualizacion": "Validar actualización",
   "validation": {
     "nameRequired": "El nombre es obligatorio",
     "serviceRequired": "El servicio es obligatorio",
-    "emailInvalid": "Email invlido",
+    "emailInvalid": "Email inválido",
     "linkMustStartHttp": "El enlace debe comenzar con http:// o https://",
     "titleRequired": "El ttulo es obligatorio",
-    "companionNegative": "El nmero de acompaantes no puede ser negativo",
+    "companionNegative": "El número de acompaantes no puede ser negativo",
     "selectCompanionType": "Selecciona el tipo de acompaante",
     "companionMismatch": "Establece \"Sin acompaante\" o aade alguno"
   },
-  "general": "General",
-  "notes": "Notas",
-  "apply": "Aplicar",
-  "pagination": "Paginacin",
-  "chat": {
-    "open": "Abrir chat"
+  "verificacion_cuota_requiere_implementacion_especifica": "Verificación de cuota requiere implementación específica",
+  "version_publicada_correctamente": "Versión publicada correctamente.",
+  "video": "vídeo",
+  "vintage_romantico": "Vintage & Romántico",
+  "vitebackendbaseurl_esta_configurada": "VITE_BACKEND_BASE_URL no está configurada",
+  "viteopenaiapikey_esta_configurada": "VITE_OPENAI_API_KEY no está configurada",
+  "wedding": {
+    "wedding": "Wedding",
+    "weddings": "Weddings",
+    "myWedding": "My Wedding",
+    "createWedding": "Create Wedding",
+    "editWedding": "Edit Wedding",
+    "weddingName": "Wedding Name",
+    "weddingDate": "Wedding Date",
+    "weddingVenue": "Wedding Venue",
+    "bride": "Bride",
+    "groom": "Groom",
+    "couple": "Couple",
+    "ceremony": "Ceremony",
+    "reception": "Reception",
+    "weddingDetails": "Wedding Details",
+    "weddingBudget": "Wedding Budget",
+    "weddingGuests": "Wedding Guests",
+    "weddingStyle": "Wedding Style",
+    "weddingTheme": "Wedding Theme",
+    "weddingColors": "Wedding Colors"
   },
-  "pages": {
-    "more": {
-      "title": "Más opciones",
-      "sections": {
-        "guests": {
-          "title": "Invitados",
-          "description": "Gestiona tu lista de invitados",
-          "links": {
-            "guests": "Lista de invitados",
-            "seating": "Plan de asientos"
-          }
-        },
-        "providers": {
-          "title": "Proveedores",
-          "description": "Administra tus proveedores"
-        },
-        "protocol": {
-          "title": "Protocolo",
-          "description": "Documentos y protocolo"
-        },
-        "extras": {
-          "title": "Extras",
-          "description": "Funciones adicionales"
-        }
-      }
-    }
-  }
+  "whatsapp_email_proximamente": "WhatsApp + Email (próximamente)",
+  "whatsappservice_autenticacion_requerida": "WhatsAppService: autenticación requerida"
 }

@@ -1,8 +1,11 @@
 import { useMemo } from 'react';
 
 import { validateAndNormalizeDate, normalizeAnyDate, addMonths } from '../utils/dateUtils';
+import { useTranslations } from '../../hooks/useTranslations';
 
 export function useGanttNormalizedTasks(tasksState) {
+  const { t } = useTranslations();
+
   const taskIdSet = useMemo(
     () =>
       new Set(
@@ -30,7 +33,7 @@ export function useGanttNormalizedTasks(tasksState) {
           ...task,
           start,
           end,
-          name: task.name || task.title || 'Sin título',
+          name: task.name || task.title || {t('common.sin_titulo')},
           type: task.type || 'task',
           id: task.id,
           progress: task.progress || 0,

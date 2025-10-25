@@ -1,3 +1,4 @@
+import { useTranslations } from '../../hooks/useTranslations';
 ﻿import { Settings, Copy, Trash2, Users } from 'lucide-react';
 import React, { useMemo } from 'react';
 
@@ -5,6 +6,7 @@ import TableEditor from './TableEditor';
 import { TABLE_TYPES, computeTableCapacity } from '../../utils/seatingTables';
 
 export default function SeatingInspectorPanel({
+
   selectedTable,
   tab,
   globalMaxSeats = 0,
@@ -24,6 +26,8 @@ export default function SeatingInspectorPanel({
   onAssignCeremonyGuest,
   className = '',
 }) {
+  const { t } = useTranslations();
+
   if (tab === 'ceremony') {
     const vipLabel = ceremonySettings?.vipLabel || 'VIP';
     const rows = Array.isArray(ceremonyRows) ? ceremonyRows : [];
@@ -419,7 +423,7 @@ export default function SeatingInspectorPanel({
             </button>
             <button
               onClick={() => {
-                if (window.confirm('¿Eliminar esta mesa?')) deleteTable?.(selectedTable.id);
+                if (window.confirm({t('common.eliminar_esta_mesa')})) deleteTable?.(selectedTable.id);
               }}
               className="px-3 py-2 border border-red-300 text-red-600 rounded text-sm hover:bg-red-50 transition-colors flex items-center justify-center gap-1"
               title="Eliminar mesa"

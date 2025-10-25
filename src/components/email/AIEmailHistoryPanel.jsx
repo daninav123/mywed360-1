@@ -35,6 +35,7 @@ import React, { useEffect, useState } from 'react';
 import { Pie, Bar } from 'react-chartjs-2';
 
 import AIEmailTrackingService from '../../services/AIEmailTrackingService';
+import { useTranslations } from '../../hooks/useTranslations';
 
 // Registrar componentes de Chart.js
 ChartJS.register(
@@ -52,6 +53,8 @@ ChartJS.register(
  * Componente que muestra estadísticas y el historial de correos originados desde búsquedas AI
  */
 const AIEmailHistoryPanel = () => {
+  const { t } = useTranslations();
+
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(0);
   const [activities, setActivities] = useState([]);
@@ -110,7 +113,7 @@ const AIEmailHistoryPanel = () => {
     labels: comparisonData?.categoryBreakdown?.map((cat) => cat.category) || [],
     datasets: [
       {
-        label: 'Tasa de Respuesta por Categoría (%)',
+        label: {t('common.tasa_respuesta_por_categoria')},
         data: comparisonData?.categoryBreakdown?.map((cat) => parseFloat(cat.responseRate)) || [],
         backgroundColor: [
           'rgba(75, 192, 192, 0.6)',

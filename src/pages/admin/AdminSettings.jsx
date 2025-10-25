@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
 
 import { getSettingsData, updateFeatureFlag, rotateSecret, saveTemplate } from '../../services/adminDataService';
+import { useTranslations } from '../../hooks/useTranslations';
 
 const AdminSettings = () => {
+  const { t } = useTranslations();
+
   const [loading, setLoading] = useState(true);
   const [flags, setFlags] = useState([]);
   const [secrets, setSecrets] = useState([]);
@@ -214,7 +217,7 @@ const AdminSettings = () => {
                   onClick={() => setRotateStep((s) => s + 1)}
                   className="rounded-md border border-soft px-3 py-2"
                 >
-                  {rotateStep === 0 ? 'Paso siguiente' : 'Validar actualización'}
+                  {rotateStep === 0 ? 'Paso siguiente' : {t('common.validar_actualizacion')}}
                 </button>
               )}
               <button

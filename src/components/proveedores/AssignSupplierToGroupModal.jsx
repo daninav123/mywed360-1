@@ -4,8 +4,13 @@ import useProveedores from '../../hooks/useProveedores';
 import useSupplierGroups from '../../hooks/useSupplierGroups';
 import Modal from '../Modal';
 import Button from '../ui/Button';
+import { useTranslations } from '../../hooks/useTranslations';
 
-export default function AssignSupplierToGroupModal({ open, onClose, provider }) {
+export default function AssignSupplierToGroupModal({
+
+ open, onClose, provider }) {
+  const { t } = useTranslations();
+
   const { groups, addMembers, createGroup } = useSupplierGroups();
   const { updateProvider } = useProveedores();
   const [mode, setMode] = useState('assign'); // 'assign' | 'create'
@@ -87,7 +92,7 @@ export default function AssignSupplierToGroupModal({ open, onClose, provider }) 
             <label className="block text-sm text-gray-700 mb-1">Nombre del nuevo grupo</label>
             <input
               className="w-full border rounded p-2"
-              placeholder="Ej. Fotógrafos favoritos"
+              placeholder={t('common.fotografos_favoritos')}
               value={name}
               onChange={(e) => setName(e.target.value)}
             />

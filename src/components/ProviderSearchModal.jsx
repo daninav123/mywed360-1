@@ -1,4 +1,4 @@
-import { Search, RefreshCcw, MapPin } from 'lucide-react';
+import { Search, RefreshCcw, MapPin, X } from 'lucide-react';
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 
 import Spinner from './Spinner';
@@ -125,7 +125,17 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
         className="bg-white rounded shadow-lg w-full max-w-lg max-h-[90vh] flex flex-col p-4 m-4 overflow-y-auto"
         onClick={(event) => event.stopPropagation()}
       >
-        <h3 className="text-xl font-semibold mb-4">{tEmail('providerSearch.title')}</h3>
+        <div className="flex items-start justify-between mb-4">
+          <h3 className="text-xl font-semibold">{tEmail('providerSearch.title')}</h3>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Cerrar"
+            className="p-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+          >
+            <X size={18} aria-hidden="true" />
+          </button>
+        </div>
 
         <form onSubmit={handleSearch} className="space-y-4 mb-6">
           <div className="flex flex-col md:flex-row gap-4">

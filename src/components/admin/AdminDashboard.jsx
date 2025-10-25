@@ -19,8 +19,11 @@ import { get as apiGet } from '../../services/apiClient';
 import { resolveAdminAlert } from '../../services/adminDataService';
 import { getAdminFetchOptions } from '../../services/adminSession';
 import { decodeMojibakeDeep } from '../../utils/mojibake';
+import { useTranslations } from '../../hooks/useTranslations';
 
 const KPI_CONFIG = {
+  const { t } = useTranslations();
+
   'active-weddings': { icon: <Calendar size={24} />, color: 'rgb(37, 99, 235)' },
   'revenue-30d': { icon: <Coins size={24} />, color: 'rgb(234, 88, 12)' },
   'downloads-30d': { icon: <Download size={24} />, color: 'rgb(16, 185, 129)' },
@@ -165,7 +168,7 @@ const AdminDashboard = () => {
         console.warn('[AdminDashboard] metrics load error:', error);
         if (!cancelled) {
           setMetricsSummary((prev) => ({ ...prev, error: 'No disponible' }));
-          setMetricsError('No se pudieron obtener las métricas en tiempo real.');
+          setMetricsError({t('common.pudieron_obtener_las_metricas_tiempo')});
         }
       } finally {
         if (!cancelled) setLoadingMetrics(false);
@@ -181,8 +184,8 @@ const AdminDashboard = () => {
     if (!overview?.kpis?.length) {
       return [
         { id: 'active-weddings', label: 'Bodas activas', value: '—', testId: 'admin-kpi-active-weddings' },
-        { id: 'revenue-30d', label: 'Facturación (30 días)', value: '€ 0', testId: 'admin-kpi-revenue-30d' },
-        { id: 'downloads-30d', label: 'Descargas app (30 días)', value: '—', testId: 'admin-kpi-downloads-30d' },
+        { id: 'revenue-30d', label: {t('common.facturacion_dias')}, value: '€ 0', testId: 'admin-kpi-revenue-30d' },
+        { id: 'downloads-30d', label: {t('common.descargas_app_dias')}, value: '—', testId: 'admin-kpi-downloads-30d' },
         { id: 'open-alerts', label: 'Alertas activas', value: '—', testId: 'admin-kpi-open-alerts' },
       ];
     }
@@ -373,7 +376,7 @@ const AdminDashboard = () => {
                       </Box>
                       <Chip
                         size="small"
-                        label={service.status === 'operational' ? 'Operativo' : service.status === 'down' ? 'Caído' : 'Degradado'}
+                        label={service.status === 'operational' ? 'Operativo' : service.status === 'down' ? {t('common.caido')} : 'Degradado'}
                         color={STATUS_COLOR[service.status] || 'default'}
                       />
                     </Box>
@@ -441,7 +444,7 @@ const AdminDashboard = () => {
       <Card data-testid="admin-new-tasks-card">
         <CardHeader
           title="Tareas nuevas de usuarios"
-          subheader="Acciones creadas manualmente en los últimos 14 días"
+          subheader={t('common.acciones_creadas_manualmente_los_ultimos')}
         />
         <CardContent>
           {Array.isArray(newTasks) && newTasks.length > 0 ? (

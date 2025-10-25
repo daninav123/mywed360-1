@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { db } from '../../firebaseConfig';
 import { formatDate as formatDateUtil } from '../../utils/formatUtils';
 import { Crown, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
+import { useTranslations } from '../../hooks/useTranslations';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004';
 
@@ -9,6 +11,8 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004';
  * Widget para mostrar resumen de suscripción en dashboard
  */
 const SubscriptionWidget = () => {
+  const { t } = useTranslations();
+
   const [subscription, setSubscription] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -118,7 +122,7 @@ const SubscriptionWidget = () => {
           <span className="text-lg font-bold text-gray-900">
             {formatPrice(subscription.amount, subscription.currency)}
             <span className="text-sm font-normal text-gray-600">
-              {subscription.interval === 'month' ? '/mes' : '/año'}
+              {subscription.interval === 'month' ? '/mes' : {t('common.ano')}}
             </span>
           </span>
         </div>

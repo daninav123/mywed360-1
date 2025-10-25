@@ -14,13 +14,16 @@ import React, { useEffect, useMemo, useState } from 'react';
 import * as EmailService from '../../services/EmailService';
 import Button from '../Button';
 import Card from '../ui/Card';
+import { useTranslations } from '../../hooks/useTranslations';
 
 const DEFAULT_CATEGORIES = [
-  'Proveedores - Solicitud de información',
-  'Proveedores - Confirmación',
-  'Proveedores - Cancelación',
+  {
+  const { t } = useTranslations();
+t('common.proveedores_solicitud_informacion')},
+  {t('common.proveedores_confirmacion')},
+  {t('common.proveedores_cancelacion')},
   'Proveedores - Seguimiento',
-  'Invitados - Información',
+  {t('common.invitados_informacion')},
   'Invitados - Recordatorio',
   'Seguimiento',
   'General',
@@ -121,7 +124,7 @@ const EmailTemplateManager = ({ onSelectTemplate, onClose }) => {
 
   async function handleDeleteTemplate(id) {
     if (!id) return;
-    if (!window.confirm('¿Eliminar la plantilla seleccionada?')) return;
+    if (!window.confirm({t('common.eliminar_plantilla_seleccionada')})) return;
     try {
       await EmailService.deleteEmailTemplate(id);
       setTemplates((prev) => prev.filter((tpl) => tpl.id !== id));
@@ -133,7 +136,7 @@ const EmailTemplateManager = ({ onSelectTemplate, onClose }) => {
   }
 
   async function handleResetTemplates() {
-    if (!window.confirm('Esto restablecerá las plantillas predefinidas. ¿Continuar?')) return;
+    if (!window.confirm({t('common.esto_restablecera_las_plantillas_predefinidas')})) return;
     setLoading(true);
     try {
       const restored = await EmailService.resetPredefinedTemplates();
@@ -195,7 +198,7 @@ const EmailTemplateManager = ({ onSelectTemplate, onClose }) => {
             size="sm"
             variant="ghost"
             onClick={() => loadTemplates(true)}
-            title="Recargar (ignorar caché)"
+            title={t('common.recargar_ignorar_cache')}
           >
             <RefreshCw size={16} />
           </Button>

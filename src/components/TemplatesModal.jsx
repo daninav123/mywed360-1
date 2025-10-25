@@ -1,11 +1,14 @@
 import React from 'react';
 
 import Modal from './Modal';
+import { useTranslations } from '../../hooks/useTranslations';
 
 // Plantillas dinámicas basadas en el número total de mesas (count)
 // Plantillas para mesas (banquete)
 const tableTemplates = [
   {
+  const { t } = useTranslations();
+
     id: 'circle',
     label: (n) => `Círculo de ${n} mesas`,
     generate: (count) => {
@@ -118,7 +121,7 @@ const chairTemplates = [
 
 export default function TemplatesModal({ open, onApply, onClose, count = 1, tab = 'banquet' }) {
   return (
-    <Modal open={open} title="Plantillas de diseño" onClose={onClose}>
+    <Modal open={open} title={t('common.plantillas_diseno')} onClose={onClose}>
       <div className="space-y-3">
         {(tab === 'ceremony' ? chairTemplates : tableTemplates).map((tpl) => (
           <div key={tpl.id} className="flex justify-between items-center border p-2 rounded">

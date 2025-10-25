@@ -386,7 +386,7 @@ const MasterChecklist = ({ weddingId, onUpdate }) => {
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   className="w-full border border-gray-300 rounded px-3 py-2"
-                  placeholder="Ej: Confirmar menú con catering"
+                  placeholder={t('common.confirmar_menu_con_catering')}
                 />
               </div>
 

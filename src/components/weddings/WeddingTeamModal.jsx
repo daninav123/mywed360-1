@@ -4,12 +4,15 @@ import { useWedding } from '../../context/WeddingContext';
 import { formatDate } from '../../utils/formatUtils';
 
 import Modal from '../Modal';
+import { useTranslations } from '../../hooks/useTranslations';
 
 const INVITES_STORAGE_KEY = 'maloveapp_team_invites';
 const CODES_STORAGE_KEY = 'maloveapp_team_codes';
 
 const DEFAULT_PLANNERS = [
   {
+  const { t } = useTranslations();
+
     id: 'planner-demo-1',
     name: 'Maria Lopez',
     city: 'Madrid',
@@ -39,7 +42,7 @@ const DEFAULT_PLANNERS = [
     city: 'Valencia',
     rating: 4.8,
     weddingsActive: 3,
-    tags: ['clásico', 'premium'],
+    tags: [{t('common.clasico')}, 'premium'],
     specialties: [],
     email: 'daniel.romero@demo-planners.test',
     phone: '',
@@ -141,13 +144,13 @@ export default function WeddingTeamModal({ open, onClose, weddingId, weddingName
           setPlannerCandidates(normalized);
         } else {
           setPlannerCandidates(DEFAULT_PLANNERS);
-          setPlannersError('No encontramos planners publicados aún. Mostramos opciones de demostración.');
+          setPlannersError({t('common.encontramos_planners_publicados_aun_mostramos')});
         }
       } catch (error) {
         if (!aborted) {
           console.warn('[WeddingTeamModal] planner suggestions failed', error);
           setPlannerCandidates(DEFAULT_PLANNERS);
-          setPlannersError('No pudimos cargar planners recomendados. Mostramos opciones de demostración.');
+          setPlannersError({t('common.pudimos_cargar_planners_recomendados_mostramos')});
         }
       } finally {
         if (!aborted) setPlannersLoading(false);

@@ -1,18 +1,16 @@
 import React from 'react';
 import { Link, NavLink } from 'react-router-dom';
 
-import logoApp from '../../assets/logo-app.png';
-
 const navLinks = [
   { to: '/', label: 'Inicio' },
   { to: '/app', label: 'La App' },
   { to: '/precios', label: 'Precios' },
-  { to: '/acceso', label: 'Login / Registro' },
 ];
 
 const linkBaseClasses =
   'px-3 py-2 text-sm font-medium transition-colors duration-150 text-muted hover:text-body border-b-2 border-transparent';
 const activeClasses = 'text-body border-[var(--color-primary)]';
+const MARKETING_LOGO_SRC = `${import.meta.env.BASE_URL}maloveapp-logo.png`;
 
 const MarketingLayout = ({ children }) => {
   if (typeof window !== 'undefined') {
@@ -40,11 +38,11 @@ const MarketingLayout = ({ children }) => {
 
   return (
     <div className="flex min-h-screen flex-col bg-app text-body">
-      <header className="sticky top-0 z-30 border-b border-soft bg-app/95 backdrop-blur">
+      <header className="sticky top-0 z-30 border-b border-soft bg-app shadow-sm">
         <div className="layout-container flex items-center justify-between py-4">
           <Link to="/" className="flex items-center gap-3 text-lg font-semibold text-body">
             <img
-              src="/logo-app.svg"
+              src={MARKETING_LOGO_SRC}
               alt="Logo MaLove.App"
               className="h-9 w-9 rounded-xl bg-white object-contain shadow-sm ring-1 ring-[var(--color-primary)]/20"
             />
@@ -70,7 +68,7 @@ const MarketingLayout = ({ children }) => {
               to="/login"
               className="rounded-md px-4 py-2 text-sm font-medium text-muted transition-colors hover:text-body"
             >
-              Iniciar sesion
+              Iniciar sesión
             </Link>
             <Link
               to="/signup"
@@ -100,6 +98,20 @@ const MarketingLayout = ({ children }) => {
               </NavLink>
             ))}
           </nav>
+          <div className="layout-container flex justify-center gap-3 pb-4">
+            <Link
+              to="/login"
+              className="rounded-md px-4 py-2 text-sm font-medium text-muted transition-colors hover:text-body"
+            >
+              Iniciar sesión
+            </Link>
+            <Link
+              to="/signup"
+              className="inline-flex items-center justify-center rounded-md bg-[var(--color-primary)] px-4 py-2 text-sm font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5 hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
+            >
+              Crear cuenta
+            </Link>
+          </div>
         </div>
       </header>
 

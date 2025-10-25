@@ -6,6 +6,7 @@
 
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslations } from '../../hooks/useTranslations';
 import {
   AlertTriangle,
   Info,
@@ -21,6 +22,8 @@ const ToastContext = createContext(null);
  * Hook para usar el sistema de toasts
  */
 export function useToast() {
+  const { t } = useTranslations();
+
   const context = useContext(ToastContext);
   if (!context) {
     throw new Error('useToast must be used within a ToastProvider');
@@ -255,7 +258,7 @@ export function ConflictNotification({
     conflict(
       `${user.name} también está editando ${element}`,
       {
-        title: 'Conflicto de edición detectado',
+        title: {t('common.conflicto_edicion_detectado')},
         user,
         action: onViewChanges ? {
           label: 'Ver cambios',
@@ -301,7 +304,7 @@ export const SeatingConflictToasts = {
 
   layoutConflict: (username) => ({
     type: 'conflict',
-    title: 'Cambios simultáneos',
+    title: {t('common.cambios_simultaneos')},
     message: `${username} ha modificado el layout`,
     duration: 7000,
     action: {
@@ -318,7 +321,7 @@ export const SeatingConflictToasts = {
 
   syncError: () => ({
     type: 'error',
-    title: 'Error de sincronización',
+    title: {t('common.error_sincronizacion')},
     message: 'No se pudieron sincronizar los cambios. Intentando reconectar...',
     duration: 5000
   }),

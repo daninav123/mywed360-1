@@ -28,7 +28,7 @@ const ContactsImporterFixed = ({ onImported }) => {
     if (!('contacts' in navigator) || !navigator.contacts?.select) {
       alert(
         t('guests.contacts.unsupported', {
-          defaultValue: 'Este dispositivo/navegador no soporta la selección de contactos.',
+          defaultValue: {t('common.este_dispositivonavegador_soporta_seleccion_contactos')},
         })
       );
       return;
@@ -135,7 +135,7 @@ const ContactsImporterFixed = ({ onImported }) => {
       if (!parsed.length) {
         alert(
           t('guests.contacts.csvEmpty', {
-            defaultValue: 'El CSV no contiene filas válidas',
+            defaultValue: {t('common.csv_contiene_filas_validas')},
           })
         );
         return;

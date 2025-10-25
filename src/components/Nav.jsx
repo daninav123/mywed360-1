@@ -140,7 +140,6 @@ function Nav() {
   const { userProfile, hasRole } = useAuth();
 
   // Hook de traducciones
-  const { t } = useTranslations();
 
   // Usar el nuevo sistema para el rol, con fallback b?)?) ?)"?)a?)?sico
   const role = userProfile?.role || 'owner';
@@ -151,6 +150,7 @@ function Nav() {
 
   // Prefetch for lazy routes on hover
   const prefetchForPath = React.useCallback((path) => {
+  const { t } = useTranslations();
     try {
       // Solo prefetch de rutas lazy para evitar warnings de Vite
       if (path.startsWith('/protocolo'))

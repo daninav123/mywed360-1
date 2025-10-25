@@ -3,13 +3,16 @@ import React, { useCallback, useEffect, useState } from 'react';
 
 import { useAuth } from '../../hooks/useAuth';
 import * as CommentService from '../../services/commentService';
+import { useTranslations } from '../../hooks/useTranslations';
 
 /**
  * Panel de comentarios internos para un email.
  * No se envían al proveedor. Permite colaboración entre usuarios.
  * @param {string} emailId - ID del correo al que hacen referencia los comentarios.
  */
-const EmailComments = ({ emailId }) => {
+const EmailComments = ({
+  const { t } = useTranslations();
+ emailId }) => {
   const { currentUser, userProfile } = useAuth();
   const userId = currentUser?.uid || userProfile?.id || 'anonymous';
 
@@ -107,7 +110,7 @@ const EmailComments = ({ emailId }) => {
         <textarea
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
-          placeholder="Añadir un comentario…"
+          placeholder={t('common.anadir_comentario')}
           className="flex-grow border border-gray-300 rounded-md p-2 text-sm resize-none h-20"
         />
         <button
@@ -115,7 +118,7 @@ const EmailComments = ({ emailId }) => {
           className="bg-blue-600 text-white rounded-md px-3 py-2 text-sm disabled:opacity-40"
           disabled={saving || !newComment.trim()}
         >
-          {saving ? 'Guardando…' : 'Añadir'}
+          {saving ? 'Guardando…' : {t('common.anadir')}}
         </button>
       </div>
     </div>

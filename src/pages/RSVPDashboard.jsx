@@ -6,8 +6,11 @@ import { db } from '../firebaseConfig';
 import { post as apiPost } from '../services/apiClient';
 import { evaluateTrigger } from '../services/AutomationRulesService';
 import { addNotification } from '../services/notificationService';
+import { useTranslations } from '../../hooks/useTranslations';
 
 const formatTimestamp = (value) => {
+  const { t } = useTranslations();
+
   if (!value) return '';
   try {
     if (typeof value.toDate === 'function') {
@@ -113,7 +116,7 @@ export default function RSVPDashboard() {
             // Crear notificación persistente (no altera diseño)
             await addNotification({
               type: 'info',
-              message: 'Recordatorio RSVP: la fecha límite está próxima',
+              message: {t('common.recordatorio_rsvp_fecha_limite_esta')},
               action: 'viewRSVP',
               weddingId: activeWedding,
               category: 'rsvp',
@@ -373,7 +376,7 @@ export default function RSVPDashboard() {
                   disabled={!activeWedding || sending}
                   onClick={async () => {
                     if (!activeWedding) return;
-                    const ok = window.confirm('¿Enviar recordatorios por email a pendientes?');
+                    const ok = window.confirm({t('common.enviar_recordatorios_por_email_pendientes')});
                     if (!ok) return;
                     setSending(true);
                     try {

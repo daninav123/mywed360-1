@@ -30,12 +30,15 @@ import React, { useState, useEffect } from 'react';
 
 import { db } from '../../firebaseConfig';
 import { formatDate } from '../../utils/formatUtils';
+import { useTranslations } from '../../hooks/useTranslations';
 
 /**
  * Panel de gestión de usuarios para administradores
  * Permite crear, editar, eliminar y gestionar usuarios
  */
 const UserManagement = () => {
+  const { t } = useTranslations();
+
   const { currentUser } = useAuth();
 
   // Estado para usuarios y filtros
@@ -106,7 +109,7 @@ const UserManagement = () => {
   // Eliminar usuario
   const handleDeleteUser = (userId) => {
     // Confirmar eliminación
-    if (window.confirm('¿Está seguro de que desea eliminar este usuario?')) {
+    if (window.confirm({t('common.esta_seguro_que_desea_eliminar')})) {
       setUsers(users.filter((user) => user.id !== userId));
 
       // En un entorno real, aquí se enviaría la petición a una API
@@ -285,7 +288,7 @@ const UserManagement = () => {
                         <Mail size={18} />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="Resetear contraseña">
+                    <Tooltip title={t('common.resetear_contrasena')}>
                       <IconButton
                         size="small"
                         onClick={() => alert(`Resetear contraseña de ${user.name}`)}

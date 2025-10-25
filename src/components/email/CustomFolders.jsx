@@ -1,4 +1,4 @@
-import { Folder, Plus, Edit2, Trash2, X, Check, MoreVertical, FolderPlus } from 'lucide-react';
+﻿import { Folder, Plus, Edit2, Trash2, X, Check, MoreVertical, FolderPlus } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 
 import Button from '../Button';
@@ -103,18 +103,22 @@ const CustomFolders = ({
                 autoFocus
               />
               <button
+                type="button"
                 onClick={() => handleRenameFolder(folder.id)}
                 className="p-1 text-green-600 hover:text-green-800"
                 title="Guardar"
+                aria-label="Guardar nombre de carpeta"
               >
-                <Check size={16} />
+                <Check size={16} aria-hidden="true" />
               </button>
               <button
+                type="button"
                 onClick={cancelAction}
                 className="p-1 text-red-600 hover:text-red-800"
                 title="Cancelar"
+                aria-label="Cancelar edición de carpeta"
               >
-                <X size={16} />
+                <X size={16} aria-hidden="true" />
               </button>
             </div>
           ) : (
@@ -143,8 +147,10 @@ const CustomFolders = ({
                     setShowMenuForId(showMenuForId === folder.id ? null : folder.id);
                   }}
                   className="p-1 text-gray-500 hover:text-gray-800 rounded-full hover:bg-gray-200"
+                  type="button"
+                  aria-label="Abrir opciones de carpeta"
                 >
-                  <MoreVertical size={14} />
+                  <MoreVertical size={14} aria-hidden="true" />
                 </button>
 
                 {showMenuForId === folder.id && (

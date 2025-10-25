@@ -2,9 +2,12 @@ import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useFirestoreCollection } from '../../../hooks/useFirestoreCollection';
+import { useTranslations } from '../../hooks/useTranslations';
 
 // Devuelve prioridad calculada según cercanía de la fecha
 const computePriority = (startDate) => {
+  const { t } = useTranslations();
+
   try {
     const now = new Date();
     const diffDays = Math.ceil((startDate - now) / (1000 * 60 * 60 * 24));
@@ -37,7 +40,7 @@ export const TasksWidget = ({ config }) => {
         const start = normalizeDate(m.start);
         const end = normalizeDate(m.end) || start;
         if (!start) return null;
-        const title = m.title || m.name || 'Sin título';
+        const title = m.title || m.name || {t('common.sin_titulo')};
         const completed = Boolean(m.completed);
         const priority = m.priority || computePriority(start);
         return {

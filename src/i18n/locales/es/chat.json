@@ -18,24 +18,24 @@
       "emptyPrompt": "Puedo orientarte con tareas, invitados, presupuesto o proveedores para {{subject}}. Cuntame qu necesitas.",
       "offlineMode": "El asistente remoto no responde, pero sigo disponible en modo gua. Pregntame por tareas, invitados, presupuesto o proveedores y te indicar dnde gestionarlo para {{subject}}.",
       "offlineTemporary": "El asistente IA usa modo offline temporal.",
-      "noDataExtracted": "No se detectaron datos para extraer. Puedes darme ms detalles?",
+      "noDataExtracted": "No se detectaron datos para extraer. Puedes darme más detalles?",
       "dataExtracted": "Datos extrados:",
       "changesApplied": "He aplicado los cambios.",
-      "connectionIssue": "Parece que hay problemas de conexin con el servidor. Puedo ayudarte con consultas bsicas sobre tu boda mientras se restablece la conexin. Qu deseas saber?",
-      "connectionError": "No se pudo conectar con el servidor de IA. Por favor, verifica tu conexin y vuelve a intentarlo.",
+      "connectionIssue": "Parece que hay problemas de conexión con el servidor. Puedo ayudarte con consultas bsicas sobre tu boda mientras se restablece la conexión. Qu deseas saber?",
+      "connectionError": "No se pudo conectar con el servidor de IA. Por favor, verifica tu conexión y vuelve a intentarlo.",
       "genericError": "Ha ocurrido un error: {{error}}"
     },
     "guides": {
       "suppliers": "Gestiona proveedores para {{subject}} desde la seccin Proveedores: aade fichas, marca favoritos y compara presupuestos. Quieres que te indique los pasos?",
-      "finance": "El panel de Finanzas te permite registrar gastos e ingresos y ver alertas si superas tu presupuesto de {{subject}}. Abre Finanzas y pulsa \"Aadir movimiento\".",
+      "finance": "El panel de Finanzas te permite registrar gastos e ingresos y ver alertas si superas tu presupuesto de {{subject}}. Abre Finanzas y pulsa \"Añadir movimiento\".",
       "guests": "Desde Invitados puedes importar listas, registrar confirmaciones y organizar acompaantes para {{subject}}. Tambin puedes enviar recordatorios por email.",
       "seating": "Organiza las mesas de {{subject}} desde Seating Plan: arrastra invitados, detecta huecos y exporta el plano en PDF para tus proveedores.",
-      "tasks": "El panel de Tareas te permite marcar pendientes, crear recordatorios y coordinarlos con el timeline de {{subject}}. Revisa la pestaa de tareas para mantener todo al da."
+      "tasks": "El panel de Tareas te permite marcar pendientes, crear recordatorios y coordinarlos con el timeline de {{subject}}. Revisa la pestaa de tareas para mantener todo al día."
     },
     "commands": {
-      "meetingRescheduled": "Reunin{{title}} reprogramada al {{date}} {{time}}.",
+      "meetingRescheduled": "Reunión{{title}} reprogramada al {{date}} {{time}}.",
       "taskAdded": "Tarea aadida",
-      "meetingAdded": "Reunin aadida",
+      "meetingAdded": "Reunión aadida",
       "taskUpdated": "Tarea actualizada",
       "taskDeleted": "Tarea eliminada",
       "taskCompleted": "Tarea marcada como completada",
@@ -52,34 +52,34 @@
       "suppliersNotFound": "No se encontraron proveedores",
       "suppliersSearchError": "Error buscando proveedores",
       "guestMoved": "Invitado movido a mesa {{table}}",
-      "configUpdated": "Configuracin actualizada"
+      "configUpdated": "Configuración actualizada"
     },
     "plurals": {
       "guestsAdded_one": "{{count}} invitado aadido",
       "guestsAdded_other": "{{count}} invitados aadidos",
       "tasksAdded_one": "{{count}} tarea aadida",
       "tasksAdded_other": "{{count}} tareas aadidas",
-      "meetingsAdded_one": "{{count}} reunin aadida",
+      "meetingsAdded_one": "{{count}} reunión aadida",
       "meetingsAdded_other": "{{count}} reuniones aadidas",
       "movementsAdded_one": "{{count}} movimiento aadido",
       "movementsAdded_other": "{{count}} movimientos aadidos"
     },
     "errors": {
       "timeout": "Tiempo de espera agotado",
-      "connection": "Error de conexin",
-      "communication": "Error en la comunicacin",
+      "connection": "Error de conexión",
+      "communication": "Error en la comunicación",
       "noToken": "No se pudo generar el token de autenticacin"
     },
     "defaults": {
       "task": "Tarea",
-      "meeting": "Reunin",
+      "meeting": "Reunión",
       "guest": "Invitado",
       "movement": "Movimiento",
       "supplier": "Proveedor",
       "pending": "Pendiente",
       "event": "evento",
       "wedding": "boda",
-      "yourPlanning": "tu planificacin"
+      "yourPlanning": "tu planificación"
     }
   }
 }

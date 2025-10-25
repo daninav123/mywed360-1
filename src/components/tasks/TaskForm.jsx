@@ -1,5 +1,6 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 
 import { categories } from './CalendarComponents.jsx';
 
@@ -13,7 +14,9 @@ const TaskForm = ({
   closeModal,
   setFormData,
   parentOptions = [],
+  savingTask = false,
 }) => {
+  const { t } = useTranslation('tasks');
   const modal = (
     <div
       className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-[9999]"
@@ -24,28 +27,30 @@ const TaskForm = ({
         onClick={(e) => e.stopPropagation()}
       >
         <h3 className="text-xl font-semibold">
-          {editingId ? 'Editar tarea' : 'Crear nueva tarea'}
+          {editingId
+            ? t('tasks.page.form.title.edit')
+            : t('tasks.page.form.title.create')}
         </h3>
         <div className="space-y-3">
           <input
             name="title"
             onChange={handleChange}
             value={formData.title}
-            placeholder="Título"
+            placeholder={t('tasks.page.form.fields.title')}
             className="w-full border rounded px-3 py-1"
           />
           <textarea
             name="desc"
             onChange={handleChange}
             value={formData.desc}
-            placeholder="Descripción"
+            placeholder={t('tasks.page.form.fields.description')}
             className="w-full border rounded px-3 py-1"
           />
           <input
             name="assignee"
             onChange={handleChange}
             value={formData.assignee || ''}
-            placeholder="Responsable (nombre o ID)"
+            placeholder={t('tasks.page.form.fields.assignee')}
             className="w-full border rounded px-3 py-1"
           />
           <select
@@ -62,7 +67,7 @@ const TaskForm = ({
           </select>
           <div className="flex space-x-2">
             <div className="flex-1">
-              <label className="text-xs">Inicio</label>
+              <label className="text-xs">{t('tasks.page.form.fields.start')}</label>
               <input
                 type="date"
                 name="startDate"
@@ -73,7 +78,7 @@ const TaskForm = ({
               />
             </div>
             <div className="flex-1">
-              <label className="text-xs invisible">time</label>
+              <label className="text-xs invisible">{t('tasks.page.form.fields.startTime')}</label>
               <input
                 type="time"
                 name="startTime"
@@ -86,7 +91,7 @@ const TaskForm = ({
           </div>
           <div className="flex space-x-2">
             <div className="flex-1">
-              <label className="text-xs">Fin</label>
+              <label className="text-xs">{t('tasks.page.form.fields.end')}</label>
               <input
                 type="date"
                 name="endDate"
@@ -97,7 +102,7 @@ const TaskForm = ({
               />
             </div>
             <div className="flex-1">
-              <label className="text-xs invisible">time</label>
+              <label className="text-xs invisible">{t('tasks.page.form.fields.endTime')}</label>
               <input
                 type="time"
                 name="endTime"
@@ -115,18 +120,18 @@ const TaskForm = ({
               checked={formData.long}
               onChange={(e) => setFormData({ ...formData, long: e.target.checked })}
             />
-            <span>Proceso (Gantt)</span>
+            <span>{t('tasks.page.form.fields.long')}</span>
           </label>
           {formData.long && (
             <div>
-              <label className="text-xs">Tarea padre (opcional)</label>
+              <label className="text-xs">{t('tasks.page.form.fields.parent')}</label>
               <select
                 name="parentTaskId"
                 value={formData.parentTaskId || ''}
                 onChange={handleChange}
                 className="w-full border rounded px-3 py-1"
               >
-                <option value="">— Tarea raíz (sin padre) —</option>
+                <option value="">{t('tasks.page.form.fields.rootOption')}</option>
                 {Array.isArray(parentOptions) &&
                   parentOptions.map((opt) => (
                     <option key={opt.id} value={opt.id}>
@@ -141,20 +146,22 @@ const TaskForm = ({
                     checked={!!formData.unscheduled}
                     onChange={(e) => setFormData({ ...formData, unscheduled: e.target.checked })}
                   />
-                  <span>Subtarea sin fecha (aún)</span>
+                  <span>{t('tasks.page.form.fields.unscheduled')}</span>
                 </label>
               )}
               {!formData.parentTaskId && (
                 <div className="mt-3 space-y-2 border-t pt-3">
-                  <div className="text-xs text-gray-600">Rango automático del bloque</div>
+                  <div className="text-xs text-gray-600">
+                    {t('tasks.page.form.fields.rangeHeading')}
+                  </div>
                   <div className="grid grid-cols-3 gap-2 text-sm">
                     <select
                       value={formData.rangeMode || 'auto'}
                       onChange={(e) => setFormData({ ...formData, rangeMode: e.target.value })}
                       className="border rounded px-2 py-1"
                     >
-                      <option value="auto">Auto</option>
-                      <option value="manual">Manual</option>
+                      <option value="auto">{t('tasks.page.form.fields.rangeMode.auto')}</option>
+                      <option value="manual">{t('tasks.page.form.fields.rangeMode.manual')}</option>
                     </select>
                     <select
                       value={formData.autoAdjust || 'expand_only'}
@@ -162,9 +169,15 @@ const TaskForm = ({
                       className="border rounded px-2 py-1"
                       disabled={(formData.rangeMode || 'auto') !== 'auto'}
                     >
-                      <option value="expand_only">Expandir solo</option>
-                      <option value="expand_and_shrink">Expandir y contraer</option>
-                      <option value="none">Sin ajustar</option>
+                      <option value="expand_only">
+                        {t('tasks.page.form.fields.autoAdjust.expand_only')}
+                      </option>
+                      <option value="expand_and_shrink">
+                        {t('tasks.page.form.fields.autoAdjust.expand_and_shrink')}
+                      </option>
+                      <option value="none">
+                        {t('tasks.page.form.fields.autoAdjust.none')}
+                      </option>
                     </select>
                     <input
                       type="number"
@@ -172,7 +185,7 @@ const TaskForm = ({
                       className="border rounded px-2 py-1"
                       value={Number(formData.bufferDays ?? 0)}
                       onChange={(e) => setFormData({ ...formData, bufferDays: Math.max(0, Number(e.target.value || 0)) })}
-                      placeholder="Margen (dias)"
+                      placeholder={t('tasks.page.form.fields.bufferDays')}
                       disabled={(formData.rangeMode || 'auto') !== 'auto'}
                     />
                   </div>
@@ -187,7 +200,7 @@ const TaskForm = ({
               checked={!!formData.completed}
               onChange={(e) => setFormData({ ...formData, completed: e.target.checked })}
             />
-            <span>Completada</span>
+            <span>{t('tasks.page.form.fields.completed')}</span>
           </label>
         </div>
         <div className="flex justify-end space-x-2">
@@ -201,14 +214,24 @@ const TaskForm = ({
               }}
               className="px-4 py-2 rounded bg-red-600 text-white mr-auto"
             >
-              Eliminar
+              {t('tasks.page.form.buttons.delete')}
             </button>
           )}
-          <button onClick={closeModal} className="px-4 py-2 rounded bg-gray-300">
-            Cancelar
+          <button
+            onClick={closeModal}
+            className="px-4 py-2 rounded bg-gray-300"
+            disabled={savingTask}
+          >
+            {t('tasks.page.form.buttons.cancel')}
           </button>
-          <button onClick={handleSaveTask} className="px-4 py-2 rounded bg-blue-600 text-white">
-            Guardar
+          <button 
+            onClick={handleSaveTask} 
+            className="px-4 py-2 rounded bg-blue-600 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={savingTask}
+          >
+            {savingTask
+              ? t('tasks.page.form.buttons.saving')
+              : t('tasks.page.form.buttons.save')}
           </button>
         </div>
       </div>

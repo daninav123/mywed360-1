@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { Clock, Users, MapPin, FileText, Plus, Edit2, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
 import Button from '../ui/Button';
+import { useTranslations } from '../../hooks/useTranslations';
 
 /**
  * Gestor de Protocolo de Ceremonias
  * Define orden de eventos, participantes, ubicaciones
  */
-const CeremonyProtocol = ({ weddingId, onSave }) => {
+const CeremonyProtocol = ({
+  const { t } = useTranslations();
+ weddingId, onSave }) => {
   const [protocol, setProtocol] = useState({
     ceremony: [],
     reception: [],
@@ -37,13 +40,13 @@ const CeremonyProtocol = ({ weddingId, onSave }) => {
       { title: 'Ceremonia Civil/Religiosa', duration: 30, participants: 'Novios + Oficiante' },
       { title: 'Intercambio de Votos', duration: 10, participants: 'Novios' },
       { title: 'Intercambio de Anillos', duration: 5, participants: 'Novios + Padrinos' },
-      { title: 'Declaración de Matrimonio', duration: 5, participants: 'Oficiante + Novios' },
+      { title: {t('common.declaracion_matrimonio')}, duration: 5, participants: 'Oficiante + Novios' },
       { title: 'Salida de Novios', duration: 5, participants: 'Novios' },
-      { title: 'Sesión de Fotos', duration: 45, participants: 'Novios + Fotógrafo' }
+      { title: {t('common.sesion_fotos')}, duration: 45, participants: {t('common.novios_fotografo')} }
     ],
     reception: [
-      { title: 'Cóctel de Bienvenida', duration: 60, participants: 'Todos' },
-      { title: 'Entrada al Salón', duration: 15, participants: 'Todos' },
+      { title: {t('common.coctel_bienvenida')}, duration: 60, participants: 'Todos' },
+      { title: {t('common.entrada_salon')}, duration: 15, participants: 'Todos' },
       { title: 'Entrada de Novios', duration: 5, participants: 'Novios' },
       { title: 'Primer Plato', duration: 30, participants: 'Todos' },
       { title: 'Segundo Plato', duration: 30, participants: 'Todos' },
@@ -63,7 +66,7 @@ const CeremonyProtocol = ({ weddingId, onSave }) => {
 
   const handleAddEvent = () => {
     if (!formData.title) {
-      alert('El título es obligatorio');
+      alert({t('common.titulo_obligatorio')});
       return;
     }
 
@@ -96,7 +99,7 @@ const CeremonyProtocol = ({ weddingId, onSave }) => {
   };
 
   const handleDeleteEvent = (id) => {
-    if (confirm('¿Eliminar este evento?')) {
+    if (confirm({t('common.eliminar_este_evento')})) {
       setProtocol({
         ...protocol,
         [activeTab]: protocol[activeTab].filter(e => e.id !== id)
@@ -148,7 +151,7 @@ const CeremonyProtocol = ({ weddingId, onSave }) => {
   const getSectionTitle = (section) => {
     switch (section) {
       case 'ceremony': return 'Ceremonia';
-      case 'reception': return 'Recepción';
+      case 'reception': return {t('common.recepcion')};
       case 'party': return 'Fiesta';
       default: return section;
     }
@@ -391,7 +394,7 @@ const CeremonyProtocol = ({ weddingId, onSave }) => {
                   value={formData.location}
                   onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                   className="w-full border border-gray-300 rounded px-3 py-2"
-                  placeholder="Ej: Salón Principal"
+                  placeholder={t('common.salon_principal')}
                 />
               </div>
 
@@ -440,7 +443,7 @@ const CeremonyProtocol = ({ weddingId, onSave }) => {
                 Cancelar
               </Button>
               <Button onClick={editingEvent ? handleUpdateEvent : handleAddEvent}>
-                {editingEvent ? 'Actualizar' : 'Añadir'}
+                {editingEvent ? 'Actualizar' : {t('common.anadir')}}
               </Button>
             </div>
           </div>

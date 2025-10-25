@@ -4,6 +4,7 @@
  */
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslations } from '../../hooks/useTranslations';
 import { 
   Grid, 
   Circle, 
@@ -17,10 +18,12 @@ import {
 
 const TEMPLATES = [
   {
+  const { t } = useTranslations();
+
     id: 'classic-grid',
-    name: 'Clásico en Cuadrícula',
+    name: {t('common.clasico_cuadricula')},
     icon: Grid,
-    description: 'Mesas redondas en cuadrícula uniforme',
+    description: {t('common.mesas_redondas_cuadricula_uniforme')},
     preview: '⬤ ⬤ ⬤\n⬤ ⬤ ⬤\n⬤ ⬤ ⬤',
     guestCount: [50, 150],
     tableCount: [8, 20],
@@ -74,7 +77,7 @@ const TEMPLATES = [
   },
   {
     id: 'intimate-small',
-    name: 'Íntimo Pequeño',
+    name: {t('common.intimo_pequeno')},
     icon: Circle,
     description: 'Pocas mesas grandes, ambiente cercano',
     preview: '  ⬤\n⬤   ⬤\n  ⬤',

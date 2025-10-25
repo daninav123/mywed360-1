@@ -2,6 +2,7 @@ import { Mail, Paperclip } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 import { FixedSizeList as List } from 'react-window';
 import { get as apiGet } from '../../services/apiClient';
+import { useTranslations } from '../../hooks/useTranslations';
 
 const IS_E2E = typeof window !== 'undefined' && typeof window.Cypress !== 'undefined';
 const apiOptions = (extra = {}) => ({
@@ -146,7 +147,7 @@ const EmailList = ({
           {folder === 'inbox'
             ? 'No hay correos en tu bandeja de entrada'
             : folder === 'sent'
-              ? 'No has enviado ningún correo'
+              ? {t('common.has_enviado_ningun_correo')}
               : 'No hay correos en esta carpeta'}
         </p>
       </div>

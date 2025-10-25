@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 import { useProviderEmail } from '../../hooks/useProviderEmail';
+import { useTranslations } from '../../hooks/useTranslations';
 
 /**
  * @typedef {import('../../hooks/useProveedores').Provider} Provider
@@ -20,7 +21,9 @@ import { useProviderEmail } from '../../hooks/useProviderEmail';
  * @param {Function} props.onSubmit - Función para enviar los daños de la reserva
  * @returns {React.ReactElement} Modal para agendar citas
  */
-const ReservationModal = ({ provider, onClose, onSubmit }) => {
+const ReservationModal = ({
+  const { t } = useTranslations();
+ provider, onClose, onSubmit }) => {
   // Integración con el hook de email para proveedores
   const {
     loading: emailLoading,
@@ -146,8 +149,9 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700"
             aria-label="Cerrar"
+            type="button"
           >
-            <X size={24} />
+            <X size={24} aria-hidden="true" />
           </button>
         </div>
 
@@ -218,7 +222,7 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
                   onChange={handleChange}
                   rows="3"
                   className="w-full p-2 border border-gray-300 rounded-md"
-                  placeholder="Cualquier información adicional relevante para la cita..."
+                  placeholder={t('common.cualquier_informacion_adicional_relevante_para')}
                 ></textarea>
               </div>
 
@@ -287,8 +291,10 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
               <button
                 onClick={() => setShowEmailForm(false)}
                 className="text-gray-500 hover:text-gray-700"
+                type="button"
+                aria-label="Cerrar formulario de email"
               >
-                <X size={18} />
+                <X size={18} aria-hidden="true" />
               </button>
             </div>
 

@@ -1,10 +1,13 @@
 ﻿import React, { useState } from 'react';
+import { useTranslations } from '../../hooks/useTranslations';
 
 /**
  * Test harness para probar el flujo de aprobación de presupuestos
  * Este componente simula el flujo completo sin necesidad de configurar toda la app
  */
 function BudgetApprovalHarness() {
+  const { t } = useTranslations();
+
   const [budgets, setBudgets] = useState([
     {
       id: 'budget-1',
@@ -13,14 +16,14 @@ function BudgetApprovalHarness() {
       service: 'Catering',
       amount: 5000,
       status: 'pending',
-      description: 'Menú para 100 personas',
+      description: {t('common.menu_para_100_personas')},
       createdAt: new Date().toISOString(),
     },
     {
       id: 'budget-2',
       supplierId: 'supplier-2',
-      supplierName: 'Fotografía Pro',
-      service: 'Fotografía',
+      supplierName: {t('common.fotografia_pro')},
+      service: {t('common.fotografia')},
       amount: 2500,
       status: 'pending',
       description: 'Cobertura completa del evento',

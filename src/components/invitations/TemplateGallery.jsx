@@ -1,14 +1,17 @@
 import PropTypes from 'prop-types';
 import React, { useMemo, useState } from 'react';
 import { HexColorPicker } from 'react-colorful';
+import { useTranslations } from '../../hooks/useTranslations';
 
 // Temporary static templates; in real app, fetched from API or context
 const templates = [
   {
+  const { t } = useTranslations();
+
     id: 1,
-    name: 'Clásico Dorado',
+    name: {t('common.clasico_dorado')},
     thumbnail: '/assets/templates/classic-gold-thumb.jpg',
-    style: 'Clásico',
+    style: {t('common.clasico')},
     colors: ['#d4af37', '#ffffff'],
     fontFamily: 'Times New Roman',
     orientation: 'vertical',
@@ -24,16 +27,16 @@ const templates = [
   },
   {
     id: 3,
-    name: 'Rústico Kraft',
+    name: {t('common.rustico_kraft')},
     thumbnail: '/assets/templates/rustic-kraft-thumb.jpg',
-    style: 'Rústico',
+    style: {t('common.rustico')},
     colors: ['#a78c6b', '#ffffff'],
     fontFamily: 'Georgia',
     orientation: 'horizontal',
   },
 ];
 
-const STYLES = ['Clásico', 'Moderno', 'Rústico', 'Minimalista'];
+const STYLES = [{t('common.clasico')}, 'Moderno', {t('common.rustico')}, 'Minimalista'];
 const ORIENTATIONS = ['vertical', 'horizontal'];
 
 function TemplateGallery({ onSelect }) {

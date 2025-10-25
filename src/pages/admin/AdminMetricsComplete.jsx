@@ -4,12 +4,15 @@
 import React, { useEffect, useState, useId } from 'react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
 import { getMetricsData, getHttpMetricsSummary, getProductMetrics, getTechnicalMetrics, getEconomicMetrics, getSupportData } from '../../services/adminDataService';
+import { useTranslations } from '../../hooks/useTranslations';
 
 const TABS = [
-  { id: 'resumen', label: '📊 Resumen' },
+  {
+  const { t } = useTranslations();
+ id: 'resumen', label: '📊 Resumen' },
   { id: 'producto', label: '📱 Producto' },
-  { id: 'economicas', label: '💰 Económicas' },
-  { id: 'tecnicas', label: '⚙️ Técnicas' },
+  { id: 'economicas', label: {t('common.economicas')} },
+  { id: 'tecnicas', label: {t('common.tecnicas')} },
   { id: 'soporte', label: '🎫 Soporte' },
 ];
 
@@ -130,7 +133,7 @@ const ResumenTab = ({ data }) => (
         title="DAU/MAU"
         value={`${Math.round(data.main?.userStats?.dau || 0)}/${data.main?.userStats?.mau || 0}`}
         color="purple"
-        description="Relación entre usuarios activos diarios y mensuales para medir engagement."
+        description={t('common.relacion_entre_usuarios_activos_diarios')}
       />
       <KPICard
         title="CAC:LTV"
@@ -142,7 +145,7 @@ const ResumenTab = ({ data }) => (
         title="D7 Retention"
         value={`${data.main?.retentionData?.d7 || 0}%`}
         color="pink"
-        description="Porcentaje de usuarios que regresan siete días después de su activación."
+        description={t('common.porcentaje_usuarios_que_regresan_siete')}
       />
     </div>
     <div className="rounded-lg border p-4">
@@ -164,19 +167,19 @@ const ProductoTab = ({ data }) => (
         title="Activos 7d"
         value={data.main?.userStats?.active7d || 0}
         color="green"
-        description="Usuarios con actividad registrada en los últimos siete días."
+        description={t('common.usuarios_con_actividad_registrada_los')}
       />
       <KPICard
         title="MAU"
         value={data.main?.userStats?.mau || 0}
         color="blue"
-        description="Usuarios únicos activos durante los últimos 30 días."
+        description={t('common.usuarios_unicos_activos_durante_los')}
       />
       <KPICard
         title="Nuevos (30d)"
         value={data.product?.newRegistrations?.last30days || 0}
         color="purple"
-        description="Altas confirmadas en el último mes."
+        description={t('common.altas_confirmadas_ultimo_mes')}
       />
     </div>
     {data.product?.featureAdoption && (
@@ -216,7 +219,7 @@ const EconomicasTab = ({ data }) => (
         title="ARR"
         value={`€${data.main?.recurringRevenue?.arr?.toFixed(2) || 0}`}
         color="green"
-        description="Proyección anual del ingreso recurrente mensual (MRR × 12)."
+        description={t('common.proyeccion_anual_del_ingreso_recurrente')}
       />
       <KPICard
         title="CAC"
@@ -237,7 +240,7 @@ const EconomicasTab = ({ data }) => (
         value={data.economic?.cacLtvRatio || '0:1'}
         color="purple"
         subtitle={parseFloat(data.economic?.cacLtvRatio) >= 3 ? 'Saludable' : 'Revisar'}
-        description="Relación entre valor de vida y coste de adquisición; idealmente ≥ 3."
+        description={t('common.relacion_entre_valor_vida_coste')}
       />
       <KPICard
         title="Payback Period"
@@ -250,19 +253,19 @@ const EconomicasTab = ({ data }) => (
       <div className="rounded-lg border p-4">
         <h3 className="font-semibold mb-3">Conversión Owner → Planner</h3>
         <div className="grid gap-4 md:grid-cols-4 text-center">
-          <div title="Número total de cuentas owner evaluadas para conversión.">
+          <div title={t('common.numero_total_cuentas_owner_evaluadas')}>
             <p className="text-xs text-gray-600">Total</p>
             <p className="text-xl font-bold">{data.main.conversionMetrics.totalOwners}</p>
           </div>
-          <div title="Owners que realizaron la conversión a planner.">
+          <div title={t('common.owners_que_realizaron_conversion_planner')}>
             <p className="text-xs text-gray-600">Convertidos</p>
             <p className="text-xl font-bold text-green-600">{data.main.conversionMetrics.converted}</p>
           </div>
-          <div title="Porcentaje de owners que completaron la conversión a planner.">
+          <div title={t('common.porcentaje_owners_que_completaron_conversion')}>
             <p className="text-xs text-gray-600">Tasa</p>
             <p className="text-xl font-bold text-blue-600">{data.main.conversionMetrics.conversionRate}%</p>
           </div>
-          <div title="Días promedio que tarda un owner en convertirse en planner.">
+          <div title={t('common.dias_promedio_que_tarda_owner')}>
             <p className="text-xs text-gray-600">Días</p>
             <p className="text-xl font-bold">{data.main.conversionMetrics.avgDaysToConvert?.toFixed(0) || 0}d</p>
           </div>
@@ -330,14 +333,70 @@ const TecnicasTab = ({ data }) => (
   </div>
 );
 
-const SoporteTab = ({ data }) => (
-  <div className="space-y-6">
-    <div className="rounded-lg border p-4">
-      <h3 className="font-semibold mb-3">Soporte y Satisfacción</h3>
-      <p className="text-sm text-gray-600">Datos de tickets y NPS disponibles próximamente</p>
-      <p className="text-sm text-gray-600 mt-2">Integración con sistema de soporte en desarrollo</p>
+const SoporteTab = ({ data }) => {
+  const summary = data.support?.summary;
+  const tickets = Array.isArray(data.support?.tickets) ? data.support.tickets : [];
+
+  return (
+    <div className="space-y-6">
+      {summary ? (
+        <>
+          <div className="grid gap-4 md:grid-cols-5">
+            <KPICard title="Tickets abiertos" value={summary.open ?? 0} color="red" />
+            <KPICard title="Tickets pendientes" value={summary.pending ?? 0} color="amber" />
+            <KPICard title="Tickets resueltos" value={summary.resolved ?? 0} color="green" />
+            <KPICard
+              title="SLA promedio"
+              value={summary.slaAverage || '—'}
+              color="blue"
+              subtitle={`Actualizado ${summary.updatedAt || ''}`}
+            />
+            {typeof summary.nps === 'number' && (
+              <KPICard title="NPS" value={summary.nps} color="purple" />
+            )}
+          </div>
+
+          <div className="rounded-lg border p-4">
+            <h3 className="font-semibold mb-3">Tickets recientes</h3>
+            {tickets.length > 0 ? (
+              <ul className="divide-y divide-soft">
+                {tickets.slice(0, 8).map((ticket) => (
+                  <li key={ticket.id} className="py-3 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">{ticket.subject || 'Sin asunto'}</p>
+                      <p className="text-xs text-gray-500">
+                        {ticket.requester ? `${ticket.requester} • ` : ''}
+                        {ticket.updatedAt || {t('common.actualizacion_desconocida')}}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-3 text-xs text-gray-500">
+                      {ticket.priority && (
+                        <span className="rounded-full border border-soft px-2 py-0.5 uppercase tracking-wide">
+                          {ticket.priority}
+                        </span>
+                      )}
+                      {ticket.status && (
+                        <span className="rounded-full bg-gray-100 px-2 py-0.5 uppercase tracking-wide text-gray-700">
+                          {ticket.status}
+                        </span>
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-gray-600">Sin tickets recientes en la bandeja de soporte.</p>
+            )}
+          </div>
+        </>
+      ) : (
+        <div className="rounded-lg border p-4">
+          <h3 className="font-semibold mb-3">Soporte y Satisfacción</h3>
+          <p className="text-sm text-gray-600">Aún no hay métricas de soporte disponibles.</p>
+        </div>
+      )}
     </div>
-  </div>
-);
+  );
+};
 
 export default AdminMetricsComplete;

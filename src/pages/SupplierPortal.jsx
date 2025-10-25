@@ -1,7 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { useTranslations } from '../../hooks/useTranslations';
 
 export default function SupplierPortal() {
+  const { t } = useTranslations();
+
   const { token } = useParams();
   const [state, setState] = useState({ loading: true, error: '', data: null });
   const [availability, setAvailability] = useState('unknown');
@@ -184,7 +187,7 @@ export default function SupplierPortal() {
               rows={3}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Descripción o detalle del presupuesto"
+              placeholder={t('common.descripcion_detalle_del_presupuesto')}
             />
           </div>
 

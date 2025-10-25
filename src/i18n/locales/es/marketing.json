@@ -2,16 +2,289 @@
   "marketing": {
     "landing": {
       "hero": {
-        "title": "Organiza tu boda perfecta",
-        "subtitle": "La plataforma todo-en-uno para bodas",
-        "cta": "Empieza gratis"
+        "brandLabel": "MaLove.App",
+        "logoAlt": "Logotipo de MaLove.App",
+        "badge": "Plataforma todo en uno para planear bodas",
+        "title": "Coordina tu boda soñada en menos tiempo con herramientas profesionales listas para tu equipo.",
+        "description": [
+          "MaLove.App combina planificación, finanzas, comunicación y diseño en un espacio centralizado.",
+          "Simplifica tareas diarias, involucra a proveedores y ofrece a tus invitados una experiencia memorable."
+        ],
+        "actions": {
+          "primary": "Empezar gratis",
+          "secondary": "Ver todo lo que incluye la app"
+        },
+        "highlights": [
+          {
+            "value": "360°",
+            "label": "Visión integral del evento"
+          },
+          {
+            "value": "+50",
+            "label": "Integraciones activas"
+          },
+          {
+            "value": "24/7",
+            "label": "Acceso desde cualquier dispositivo"
+          }
+        ],
+        "widget": {
+          "summaryLabel": "Resumen general",
+          "eventName": "Boda Valeria & Tomás",
+          "growth": "+18% semana",
+          "confirmedGuests": {
+            "label": "Invitados confirmados",
+            "value": "132"
+          },
+          "budget": {
+            "label": "Presupuesto ejecutado",
+            "value": "$18.4k",
+            "pendingInvoices": "4 facturas pendientes"
+          },
+          "tasks": {
+            "label": "Tareas críticas esta semana",
+            "items": [
+              {
+                "day": "21",
+                "text": "Confirmar degustación del menú y enviar feedback al catering."
+              },
+              {
+                "day": "22",
+                "text": "Generar plano de mesas para invitados VIP y compartir con protocolo."
+              }
+            ]
+          },
+          "assistant": {
+            "label": "Asistente MaLove.App",
+            "message": "\"Tu cronograma está en 82 %. Recomiendo enviar el recordatorio de alojamiento antes del lunes y confirmar proveedores restantes.\""
+          }
+        }
       },
-      "features": {
-        "title": "Todo lo que necesitas",
-        "guests": "Gestión de invitados",
-        "finance": "Control financiero",
-        "tasks": "Organización de tareas",
-        "seating": "Plan de mesas"
+      "modules": {
+        "title": "Todo lo que necesitas en un solo lugar",
+        "description": "MaLove.App simplifica la logística con módulos colaborativos listos para planners, proveedores e invitados.",
+        "items": [
+          {
+            "title": "Gestión integral de invitados",
+            "description": "Centraliza confirmaciones, mesas y preferencias en un único lugar con información siempre sincronizada."
+          },
+          {
+            "title": "Finanzas con control total",
+            "description": "Sigue presupuesto, pagos y contratos con recordatorios automáticos y reportes claros para tu equipo."
+          },
+          {
+            "title": "Diseños y comunicación",
+            "description": "Invitaciones, emails y sitio web de boda listos para compartir desde un mismo flujo de trabajo."
+          }
+        ]
+      },
+      "planner": {
+        "badge": "Diseñado para planners",
+        "title": "Control total de tu cartera de eventos sin hojas de cálculo.",
+        "description": "MaLove.App facilita la gestión de múltiples bodas con dashboards, plantillas reutilizables y reportes exportables para tu agencia. Organiza a tu equipo y mantente un paso adelante con una sola plataforma.",
+        "highlights": [
+          {
+            "key": "portfolio",
+            "title": "Portafolio multi boda",
+            "description": "Gestiona eventos simultáneos con paneles independientes. Cambia de boda en un clic sin perder el contexto."
+          },
+          {
+            "key": "kits",
+            "title": "Kits repetibles",
+            "description": "Duplica checklists, presupuestos y plantillas de comunicación para replicar tus flujos favoritos en segundos."
+          },
+          {
+            "key": "alerts",
+            "title": "Alertas proactivas",
+            "description": "Recibe avisos de tareas críticas, contratos por vencer y pagos pendientes para cada cliente."
+          }
+        ],
+        "dashboard": {
+          "title": "Vista de planners",
+          "portfolioLabel": "Portafolio actual",
+          "portfolioValue": "8 bodas activas",
+          "portfolioBadge": "2 nuevas este mes",
+          "statusLabel": "Estado de clientes",
+          "statusItems": [
+            "⬢ Ana & Diego - cronograma: 92 %",
+            "⬢ Laura & Marco - pagos: 3 facturas pendientes",
+            "⬢ Carolina & Javier - invitados: 156 confirmados"
+          ],
+          "performanceLabel": "Rendimiento mensual",
+          "performanceNote": "Tiempo promedio por boda: 38 % menos que el año pasado."
+        }
+      },
+      "benefits": {
+        "badge": "Beneficios clave",
+        "title": "Una operación cuidada de principio a fin",
+        "description": "Diseñada para planners que necesitan visibilidad y parejas que buscan tranquilidad. MaLove.App automatiza tareas repetitivas y mantiene a todos alineados.",
+        "items": {
+          "timelines": {
+            "title": "Tiempos bajo control",
+            "description": "Checklists dinámicos, recordatorios inteligentes y cronologías listas para compartir con tu equipo."
+          },
+          "collaboration": {
+            "title": "Colaboración real",
+            "description": "Roles para planners, asistentes, proveedores e invitados con vistas personalizadas."
+          },
+          "branding": {
+            "title": "Diseño consistente",
+            "description": "Sitio web de boda, invitaciones y comunicaciones con tu branding en minutos."
+          },
+          "security": {
+            "title": "Datos seguros",
+            "description": "Infraestructura cloud y permisos granulares para resguardar contratos, pagos y contactos."
+          }
+        }
+      },
+      "stories": {
+        "badge": "Historias reales",
+        "title": "MaLove.App impulsa planners y parejas alrededor del mundo",
+        "description": "Más de 12 mil bodas se gestionan en MaLove.App. Cada equipo aprovecha automatizaciones, insights y plantillas para dedicar más tiempo a la creatividad.",
+        "testimonials": [
+          {
+            "quote": "Integramos MaLove.App con nuestro proceso y ahora disponemos de dashboards compartidos con proveedores clave. El equipo llega a cada reunión preparado.",
+            "name": "Martina R.",
+            "role": "Planner boutique en Madrid"
+          },
+          {
+            "quote": "Como pareja necesitábamos claridad. Los recordatorios y la web de invitados nos permitieron responder rápido y sin correos duplicados.",
+            "name": "David y Sofía",
+            "role": "Evento 250 invitados, Bogotá"
+          }
+        ],
+        "trust": {
+          "title": "Confían en MaLove.App",
+          "brands": [
+            "Lumiere Events",
+            "Novia Atelier",
+            "Festiva Group",
+            "Urban Weddings"
+          ],
+          "note": "Más de 200 planners activos en Europa y LATAM utilizan MaLove.App para estandarizar procesos y ofrecer experiencias memorables."
+        }
+      },
+      "faq": {
+        "badge": "Preguntas frecuentes",
+        "title": "Todo lo que necesitas saber antes de empezar",
+        "items": [
+          {
+            "question": "¿Puedo probar MaLove.App gratis?",
+            "answer": "Sí. El plan Essentials es gratuito para siempre y desbloquea funciones clave (invitados, tareas, sitio web). El plan Professional tiene 14 días de prueba con integraciones avanzadas."
+          },
+          {
+            "question": "¿MaLove.App funciona para planners con múltiples eventos?",
+            "answer": "Claro. El dashboard multi evento permite alternar bodas, compartir permisos con colaboradores y automatizar actualizaciones con proveedores de cada evento."
+          },
+          {
+            "question": "¿Qué soporte recibo durante la implementación?",
+            "answer": "Ofrecemos onboarding guiado, biblioteca de plantillas y consultorías opcionales. El plan Enterprise incluye gestor dedicado y sesiones de entrenamiento para equipos."
+          }
+        ],
+        "form": {
+          "title": "Solicita una demo personalizada",
+          "description": "Cuéntanos sobre tu operación y agenda una videollamada con nuestro equipo. Recibirás recomendaciones basadas en tu flujo actual y una guía de configuración rápida.",
+          "fields": {
+            "name": {
+              "label": "Nombre completo",
+              "placeholder": "Tu nombre"
+            },
+            "email": {
+              "label": "Email de contacto",
+              "placeholder": "hola@tuagencia.com"
+            }
+          },
+          "messages": {
+            "submit": "Agendar demo",
+            "submitting": "Enviando solicitud...",
+            "success": "Gracias. Nuestro equipo se pondrá en contacto contigo en menos de 24 horas.",
+            "error": "Completa nombre y email para solicitar una demo."
+          },
+          "consent": "Al enviar aceptas recibir comunicaciones relacionadas con MaLove.App. Puedes cancelar la suscripción en cualquier momento."
+        }
+      },
+      "cta": {
+        "title": "Lista para usar en minutos.",
+        "description": "Crea tu cuenta, importa tu lista de invitados y activa automatizaciones que te acompañen desde el primer día.",
+        "primary": "Crear cuenta gratuita",
+        "secondary": "Comparar planes"
+      }
+    },
+    "appOverview": {
+      "hero": {
+        "title": "La app que reune todo tu flujo de planificacion en un solo lugar.",
+        "description": "Desde el primer checklist hasta el informe final, MaLove.App acompaña a equipos profesionales y parejas que buscan tener control total del evento.",
+        "stats": [
+          {
+            "value": "12k+",
+            "label": "bodas planificadas con MaLove.App"
+          },
+          {
+            "value": "4.8/5",
+            "label": "satisfaccion promedio de planners"
+          },
+          {
+            "value": "30%",
+            "label": "tiempo ahorrado en coordinacion logistica"
+          }
+        ],
+        "workspace": {
+          "badge": "MaLove.App Workspace",
+          "title": "Un ecosistema conectado",
+          "description": "Modulos sincronizados, roles personalizados y permisos granulares para colaborar sin perder contexto.",
+          "tags": [
+            "Dashboard",
+            "Invitados",
+            "Finanzas",
+            "Comunicacion",
+            "Diseno",
+            "Automatizaciones"
+          ]
+        }
+      },
+      "modules": {
+        "title": "Modulos clave listos para tu equipo",
+        "description": "Cada modulo esta disenado para integrarse con el resto, evitando informacion dispersa y manteniendo a todos en la misma pagina.",
+        "items": [
+          {
+            "title": "Dashboard colaborativo",
+            "description": "Tareas, hitos y recordatorios en un panel centralizado que se actualiza en tiempo real."
+          },
+          {
+            "title": "CRM de proveedores",
+            "description": "Compara propuestas, gestiona contratos y lleva seguimiento de pagos y entregables."
+          },
+          {
+            "title": "Gestion financiera",
+            "description": "Presupuestos inteligentes, control de gastos y reportes detallados por categoria."
+          },
+          {
+            "title": "Experiencia para invitados",
+            "description": "Sitio web, RSVP automatico, mesas interactivas y mensajes personalizados en un solo flujo."
+          },
+          {
+            "title": "Automatizacion de emails",
+            "description": "Flujos preconfigurados, segmentos dinamicos y metricas para medir engagement."
+          },
+          {
+            "title": "Asistente inteligente",
+            "description": "Recomendaciones con IA para crear agendas, checklist y resolver preguntas contextuales."
+          }
+        ]
+      },
+      "integrations": {
+        "title": "Integraciones y automatizaciones que trabajan por ti.",
+        "description": "Conecta MaLove.App con servicios de pago, calendarios y herramientas de comunicacion. Configura disparadores automaticos para RSVP, confirmaciones de proveedores o seguimiento de tareas.",
+        "items": [
+          "Integraciones con Google Calendar, Gmail y suites de productividad.",
+          "Automatizaciones visuales con condiciones y plantillas reutilizables.",
+          "API para desarrollos internos y conexion con sistemas externos."
+        ],
+        "cta": {
+          "title": "Acceso inmediato",
+          "description": "Todas las cuentas incluyen prueba gratuita y demo guiada con nuestro equipo de onboarding.",
+          "button": "Solicitar demo"
+        }
       }
     },
     "pricing": {

@@ -2,10 +2,13 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 
 import { useAuth } from '../../hooks/useAuth';
+import { useTranslations } from '../../hooks/useTranslations';
 
 const MFA_CODE_LENGTH = 6;
 
 const AdminLogin = () => {
+  const { t } = useTranslations();
+
   const location = useLocation();
   const navigate = useNavigate();
   const {
@@ -129,7 +132,7 @@ const AdminLogin = () => {
               `Acceso bloqueado temporalmente. Podrás reintentarlo a las ${readable}. Si necesitas ayuda, contacta con ${supportEmail}.`
           );
         } else {
-          setError(result.error || 'Email o contraseña no válidos');
+          setError(result.error || {t('auth.email_contrasena_validos')});
         }
         return;
       }
@@ -145,7 +148,7 @@ const AdminLogin = () => {
       navigate('/admin/dashboard', { replace: true });
     } catch (submitError) {
       console.error('[AdminLogin] Error durante el login admin:', submitError);
-      setError('No fue posible iniciar sesión. Inténtalo de nuevo.');
+      setError({t('auth.fue_posible_iniciar_sesion_intentalo')});
     } finally {
       setIsSubmitting(false);
     }
@@ -155,7 +158,7 @@ const AdminLogin = () => {
     event.preventDefault();
     if (isVerifyingMfa) return;
     if (!pendingAdminSession) {
-      setMfaError('No hay un desafío MFA activo. Vuelve a iniciar sesión.');
+      setMfaError({t('auth.hay_desafio_mfa_activo_vuelve')});
       return;
     }
     if (mfaCode.trim().length !== MFA_CODE_LENGTH) {
@@ -183,7 +186,7 @@ const AdminLogin = () => {
         if (result.code === 'challenge_expired') {
           setShowMfaStep(false);
         }
-        setMfaError(result.error || 'Código inválido');
+        setMfaError(result.error || {t('auth.codigo_invalido')});
         return;
       }
 
@@ -193,7 +196,7 @@ const AdminLogin = () => {
       navigate('/admin/dashboard', { replace: true });
     } catch (mfaSubmitError) {
       console.error('[AdminLogin] Error al validar MFA:', mfaSubmitError);
-      setMfaError('No fue posible validar el código. Inténtalo de nuevo.');
+      setMfaError({t('auth.fue_posible_validar_codigo_intentalo')});
     } finally {
       setIsVerifyingMfa(false);
     }
@@ -378,7 +381,7 @@ const AdminLogin = () => {
                 disabled={isVerifyingMfa || !mfaCode || mfaCode.length < MFA_CODE_LENGTH}
                 className="rounded-md bg-[color:var(--color-primary,#6366f1)] px-4 py-2 text-sm font-semibold text-white hover:bg-[color:var(--color-primary-dark,#4f46e5)] disabled:opacity-50"
               >
-                {isVerifyingMfa ? 'Verificando...' : 'Verificar código'}
+                {isVerifyingMfa ? 'Verificando...' : {t('auth.verificar_codigo')}}
               </button>
             </div>
           </form>

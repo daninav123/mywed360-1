@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { toE164, sendText, getProviderStatus } from '../../services/whatsappService';
 import Modal from '../Modal';
 import { Button } from '../ui';
+import { useTranslations } from '../../hooks/useTranslations';
 
 /**
  * SaveTheDateModal
@@ -17,6 +18,7 @@ import { Button } from '../ui';
  *  - selectedDefaultIds?: array (opcional, ids seleccionados por defecto)
  */
 export default function SaveTheDateModal({
+
   open,
   onClose,
   guests = [],
@@ -26,6 +28,8 @@ export default function SaveTheDateModal({
   coupleName = '',
   onSent,
 }) {
+  const { t } = useTranslations();
+
   const guestsWithPhone = useMemo(() => (guests || []).filter((g) => !!g.phone), [guests]);
   const [selectedIds, setSelectedIds] = useState(() => new Set());
   const [messageGlobal, setMessageGlobal] = useState(defaultMessage);
@@ -104,7 +108,7 @@ export default function SaveTheDateModal({
     }
     if (!provider.configured) {
       alert(
-        'El proveedor de WhatsApp API no está configurado. Por favor, configúralo antes de enviar.'
+        {t('common.proveedor_whatsapp_api_esta_configurado')}
       );
       return;
     }

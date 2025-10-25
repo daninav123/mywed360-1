@@ -57,7 +57,7 @@
       "today": "Hoy"
     },
     "templates": {
-      "confirmMenu": "Confirmar menú final con catering",
+      "confirmMenu": "Confirmar menúú final con catering",
       "reviewDecoration": "Revisar decoración floral",
       "confirmPlaylist": "Confirmar playlist con DJ",
       "coordinatePhotographer": "Coordinar horarios con fotógrafo",
@@ -65,9 +65,201 @@
       "confirmSeating": "Confirmar asientos para ceremonia",
       "reviewTableSetup": "Revisar montaje de mesas",
       "soundCheck": "Prueba de sonido",
-      "confirmKidsMenu": "Confirmar menú infantil",
+      "confirmKidsMenu": "Confirmar menúú infantil",
       "prepareEmergencyKit": "Preparar kit de emergencia"
     },
-    "confirmDelete": "¿Eliminar esta tarea?"
-  }
+    "confirmDelete": "¿Eliminar esta tarea?",
+    "page": {
+      "header": {
+        "title": "Gestión de Tareas",
+        "viewAll": "Ver todas las tareas",
+        "newTask": "Nueva tarea"
+      },
+      "calendarSync": {
+        "button": "Añadir a tu calendario",
+        "title": "Añadir a tu calendario",
+        "loading": "Preparando tu enlace de suscripción...",
+        "labels": {
+          "ics": "URL de suscripción (ICS)"
+        },
+        "actions": {
+          "subscribe": "Suscribirse (Apple/Outlook)",
+          "addGoogle": "Añadir a Google Calendar",
+          "copyUrl": "Copiar URL",
+          "close": "Cerrar"
+        },
+        "errors": {
+          "auth": "Debes iniciar sesión para generar tu enlace de calendario",
+          "fetch": "No se pudo obtener el enlace. Inténtalo de nuevo."
+        },
+        "footnote": "Tras suscribirte, las actualizaciones pueden tardar unos minutos según la app."
+      },
+      "list": {
+        "defaults": {
+          "parent": "Bloque"
+        },
+        "labels": {
+          "assigned": "Asignado a {{name}}"
+        },
+        "badges": {
+          "overdue": "Vencida",
+          "blocked": "Tarea bloqueada por dependencias"
+        },
+        "sectionTitle": "Tareas críticas de esta semana",
+        "filters": {
+          "categoryAll": "Todas las categorías",
+          "assigneeAll": "Todos",
+          "status": {
+            "all": "Todos",
+            "pending": "Pendientes",
+            "completed": "Completadas"
+          },
+          "clear": "Limpiar"
+        },
+        "actions": {
+          "viewInGantt": "Ver en Gantt"
+        },
+        "results": {
+          "label": "Resultados: {{count}}"
+        },
+        "pagination": {
+          "page": "Página {{current}} de {{total}}",
+          "prev": "Anterior",
+          "next": "Siguiente"
+        },
+        "empty": {
+          "upcoming": "No hay próximas tareas programadas",
+          "filters": "No hay tareas para los filtros seleccionados",
+          "columns": "Sin columnas"
+        }
+      },
+      "allTasks": {
+        "title": "Todas las tareas",
+        "orphans": "Sin padre",
+        "searchPlaceholder": "Buscar tareas...",
+        "filters": {
+          "categoryAll": "Todas las categorías",
+          "assigneeAll": "Todos",
+          "status": {
+            "all": "Todos",
+            "pending": "Pendientes",
+            "completed": "Completadas"
+          },
+          "clear": "Limpiar filtros",
+          "results": "Resultados: {{count}}"
+        },
+        "empty": {
+          "columns": "Sin columnas",
+          "filters": "No hay tareas para los filtros seleccionados"
+        },
+        "badges": {
+          "noDate": "Sin fecha programada",
+          "assigned": "Responsable: {{name}}"
+        }
+      },
+      "form": {
+        "title": {
+          "create": "Crear nueva tarea",
+          "edit": "Editar tarea"
+        },
+        "fields": {
+          "title": "Título",
+          "description": "Descripción",
+          "assignee": "Responsable (nombre o ID)",
+          "category": "Categoría",
+          "start": "Inicio",
+          "end": "Fin",
+          "startTime": "Hora de inicio",
+          "endTime": "Hora de fin",
+          "long": "Proceso (Gantt)",
+          "parent": "Tarea padre (opcional)",
+          "rootOption": "— Tarea raíz (sin padre) —",
+          "unscheduled": "Subtarea sin fecha (aún)",
+          "rangeHeading": "Rango automático del bloque",
+          "rangeMode": {
+            "auto": "Automático",
+            "manual": "Manual"
+          },
+          "autoAdjust": {
+            "expand_only": "Expandir solo",
+            "expand_and_shrink": "Expandir y contraer",
+            "none": "Sin ajustar"
+          },
+          "bufferDays": "Margen (días)",
+          "completed": "Completada"
+        },
+        "buttons": {
+          "delete": "Eliminar",
+          "cancel": "Cancelar",
+          "save": "Guardar",
+          "saving": "Guardando..."
+        }
+      },
+      "sidePanel": {
+        "close": "Cerrar panel",
+        "editStart": "Editar inicio",
+        "editEnd": "Editar fin",
+        "noDate": "Sin fecha programada",
+        "noSubtasks": "No hay subtareas.",
+        "addSubtask": "Agregar subtarea",
+        "subtaskPlaceholder": "Título de la subtarea",
+        "add": "Agregar",
+        "clear": "Limpiar",
+        "assigned": "Responsable: {{name}}",
+        "parentCategory": "Bloque padre: {{category}}",
+        "comments": "Comentarios",
+        "commentsCount": "{{count}}",
+        "loadingComments": "Cargando comentarios...",
+        "noComments": "Aún no hay comentarios en este bloque. Usa @ para mencionar responsables.",
+        "commentPlaceholder": "Escribe un comentario... Usa @ para mencionar a alguien",
+        "commentShortcut": "Ctrl/Cmd + Enter para enviar",
+        "publish": "Publicar",
+        "publishing": "Publicando...",
+        "deleteComment": "Eliminar comentario",
+        "deleteSubtask": "Eliminar subtarea",
+        "relative": {
+          "justNow": "hace instantes",
+          "minutes": "hace {{value}} min",
+          "hours": "hace {{value}} h",
+          "days": "hace {{value}} d"
+        },
+        "authorFallback": "Equipo",
+        "notifications": {
+          "logWithMentions": "Nuevo comentario en {{block}} con menciones a {{mentions}}",
+          "logWithoutMentions": "Nuevo comentario en {{block}}",
+          "toastTitle": "Comentario agregado",
+          "toastWithRecipients": "Notificaremos a: {{recipients}}",
+          "toastWithoutRecipients": "El comentario queda registrado para el equipo"
+        },
+        "errors": {
+          "process": "No se pudieron procesar los comentarios.",
+          "load": "No se pudieron cargar los comentarios.",
+          "create": "No se pudo guardar tu comentario. Inténtalo de nuevo.",
+          "delete": "No se pudo eliminar el comentario."
+        },
+        "subtasks": {
+          "section": "Subtareas",
+          "unscheduled": "Subtarea sin fecha",
+          "label": "Responsable",
+          "default": "Subtarea",
+          "markPending": "Marcar como pendiente",
+          "markDone": "Marcar como realizada",
+          "count": "{{count}} ítems"
+        },
+        "actions": {
+          "save": "Guardar",
+          "cancel": "Cancelar"
+        }
+      },
+      "calendar": {
+        "zoom": {
+          "less": "Reducir zoom del timeline",
+          "more": "Aumentar zoom del timeline",
+          "reset": "Ajustar zoom para mostrar todo el Gantt",
+          "label": "Zoom horizontal del Gantt"
+        }
+      }
+    }
+  },
+  "_note": "Translate from es/tasks.json"
 }

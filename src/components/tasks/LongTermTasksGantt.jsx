@@ -4,6 +4,7 @@ import { Flag } from 'lucide-react';
 
 import { addMonths, normalizeAnyDate } from './utils/dateUtils.js';
 import { auth } from '../../firebaseConfig';
+import { useTranslations } from '../../hooks/useTranslations';
 
 function diffMonths(a, b) {
   const y = b.getFullYear() - a.getFullYear();
@@ -33,7 +34,7 @@ const RISK_STYLES = {
     accent: '#10b981',
   },
   warning: {
-    label: 'Atención',
+    label: {t('common.atencion')},
     fill: 'rgba(245,158,11,0.18)',
     border: 'rgba(245,158,11,0.6)',
     accent: '#f59e0b',

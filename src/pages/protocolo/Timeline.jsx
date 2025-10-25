@@ -30,8 +30,11 @@ import { Button } from '../../components/ui';
 import Badge from '../../components/ui/Badge';
 import useTimeline from '../../hooks/useTimeline';
 import { formatTime } from '../../utils/dateUtils';
+import { useTranslations } from '../../hooks/useTranslations';
 
 const Timeline = () => {
+  const { t } = useTranslations();
+
   const {
     blocks,
     alerts,
@@ -107,7 +110,7 @@ const Timeline = () => {
     // Validar formato de hora
     const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
     if (!timeRegex.test(startTime) || !timeRegex.test(endTime)) {
-      toast.error('Formato de hora inválido (HH:MM)');
+      toast.error({t('common.formato_hora_invalido_hhmm')});
       return;
     }
 
@@ -122,7 +125,7 @@ const Timeline = () => {
     const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
     
     if (!timeRegex.test(value)) {
-      toast.error('Formato de hora inválido (HH:MM)');
+      toast.error({t('common.formato_hora_invalido_hhmm')});
       return;
     }
 
@@ -149,7 +152,7 @@ const Timeline = () => {
     const message = prompt('Mensaje de la alerta:');
     if (message) {
       addAlert('info', message);
-      toast.success('Alerta añadida');
+      toast.success({t('common.alerta_anadida')});
     }
   }, [addAlert]);
 
@@ -185,7 +188,7 @@ const Timeline = () => {
 
   return (
     <PageWrapper
-      title="Timeline del Día B"
+      title={t('common.timeline_del_dia')}
       subtitle="Gestiona el cronograma completo del evento"
       icon={Clock}
     >
@@ -235,7 +238,7 @@ const Timeline = () => {
             onClick={() => setLiveMode(!liveMode)}
           >
             {liveMode ? <Pause size={14} /> : <Play size={14} />}
-            Modo {liveMode ? 'live' : 'estático'}
+            Modo {liveMode ? 'live' : {t('common.estatico')}}
           </Button>
           <Button
             variant="outline"
@@ -243,7 +246,7 @@ const Timeline = () => {
             onClick={() => setAutomaticAlerts(!automaticAlerts)}
           >
             {automaticAlerts ? <Bell size={14} /> : <BellOff size={14} />}
-            Alertas {automaticAlerts ? 'automáticas' : 'manuales'}
+            Alertas {automaticAlerts ? {t('common.automaticas')} : 'manuales'}
           </Button>
           <Button
             variant="outline"
@@ -320,8 +323,10 @@ const Timeline = () => {
                         onClick={() => removeAlert(alert.id)}
                         className="text-red-600 hover:text-red-700"
                         title="Eliminar alerta"
+                        type="button"
+                        aria-label="Eliminar alerta"
                       >
-                        <X size={20} />
+                        <X size={20} aria-hidden="true" />
                       </button>
                     </div>
                   </div>

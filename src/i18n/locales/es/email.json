@@ -880,5 +880,6 @@
         "close": "Cerrar"
       }
     }
-  }
+  },
+  "_note": "Translate from es/email.json"
 }

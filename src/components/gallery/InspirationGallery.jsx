@@ -1,6 +1,7 @@
 import { Star, StarOff, X } from 'lucide-react';
 import React, { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useTranslations } from '../../hooks/useTranslations';
 
 const normalizeTag = (value = '') =>
   value
@@ -18,15 +19,15 @@ const humanize = (value = '') =>
 const TAG_LABELS = {
   favs: 'Favoritos',
   ceremonia: 'Ceremonia',
-  decoracion: 'Decoración',
-  coctel: 'Cóctel',
+  decoracion: {t('common.decoracion')},
+  coctel: {t('common.coctel')},
   banquete: 'Banquete',
   disco: 'Disco',
   flores: 'Flores',
   vestido: 'Vestidos',
   pastel: 'Pasteles',
-  fotografia: 'Fotografía',
-  inspiration: 'Inspiración',
+  fotografia: {t('common.fotografia')},
+  inspiration: {t('common.inspiracion')},
 };
 
 // Tags base (slug) se sincronizan con servicios y filtros
@@ -196,17 +197,17 @@ export default function InspirationGallery({
                 }}
                 alt={
                   img.tags && img.tags.length
-                    ? t('inspiration.altWithTags', 'inspiración: {{tags}}', {
+                    ? t('inspiration.altWithTags', {t('common.inspiracion_tags')}, {
                         tags: img.tags.join(', '),
                       })
-                    : t('inspiration.alt', 'inspiración')
+                    : t('inspiration.alt', {t('common.inspiracion')})
                 }
                 aria-label={
                   img.tags && img.tags.length
-                    ? t('inspiration.ariaWithTags', 'Imagen de inspiración: {{tags}}', {
+                    ? t('inspiration.ariaWithTags', {t('common.imagen_inspiracion_tags')}, {
                         tags: img.tags.join(', '),
                       })
-                    : t('inspiration.aria', 'Imagen de inspiración')
+                    : t('inspiration.aria', {t('common.imagen_inspiracion')})
                 }
                 className="w-full aspect-square object-cover rounded-lg"
                 loading="lazy"
@@ -222,7 +223,7 @@ export default function InspirationGallery({
                 aria-label={
                   favorites.includes(img.id)
                     ? t('inspiration.removeFav', 'Quitar de favoritos')
-                    : t('inspiration.addFav', 'Añadir a favoritos')
+                    : t('inspiration.addFav', {t('common.anadir_favoritos')})
                 }
               >
                 {favorites.includes(img.id) ? (

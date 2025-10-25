@@ -80,7 +80,7 @@ export default function VirtualizedTransactionList({ items, getPaidValue, onEdit
               <div className="text-xs text-[color:var(--color-text)]/60">
                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[color:var(--color-text)]/10 text-[color:var(--color-text)]">
                   {tx.category ||
-                    t('finance.transactions.noCategory', { defaultValue: 'Sin categoría' })}
+                    t('finance.transactions.noCategory', { defaultValue: {t('common.sin_categoria')} })}
                 </span>
               </div>
               <div>

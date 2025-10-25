@@ -5,38 +5,41 @@ import Card from '../../components/ui/Card';
 import { useWedding } from '../../context/WeddingContext';
 import useWeddingCollection from '../../hooks/useWeddingCollection';
 import { loadData } from '../../services/SyncService';
+import { useTranslations } from '../../hooks/useTranslations';
 
 // Plantillas predefinidas para carteles de seating plan
 const seatingPlanTemplates = [
   {
-    name: 'Elegante & Clásico',
-    description: 'Cartel de asignación de mesas con diseño formal y refinado',
+  const { t } = useTranslations();
+
+    name: {t('common.elegante_clasico')},
+    description: {t('common.cartel_asignacion_mesas_con_diseno')},
     prompt:
-      'Diseña un cartel elegante para el seating plan (asignación de mesas) de una boda. Estilo formal con tipografía serif. Incluye el título "Seating Plan" o "Distribución de Mesas" con un diseño elegante. El cartel debe tener espacio para listar nombres de invitados organizados por mesas. Usa colores neutros con toques dorados o plateados. El diseño debe ser sofisticado y fácil de leer.',
+      'Diseña un cartel elegante para el seating plan (asignación de mesas) de una boda. Estilo formal con tipografía serif. Incluye el título "Seating Plan" o {t('common.distribucion_mesas')} con un diseño elegante. El cartel debe tener espacio para listar nombres de invitados organizados por mesas. Usa colores neutros con toques dorados o plateados. El diseño debe ser sofisticado y fácil de leer.',
   },
   {
-    name: 'Rústico & Natural',
-    description: 'Cartel de estilo rústico con elementos naturales y madera',
+    name: {t('common.rustico_natural')},
+    description: {t('common.cartel_estilo_rustico_con_elementos')},
     prompt:
-      'Crea un cartel de seating plan con estética rústica para una boda. Utiliza elementos como madera, flores silvestres y elementos naturales. Diseño que parezca una pizarra o tabla de madera con los nombres escritos. Incluye el título "Encuentra tu sitio" o similar. Estilo cálido y acogedor, con aspecto artesanal. La distribución debe permitir organizar nombres por mesas de forma clara.',
+      {t('common.crea_cartel_seating_plan_con')},
   },
   {
     name: 'Minimalista & Moderno',
-    description: 'Diseño limpio con tipografía sencilla y organización clara',
+    description: {t('common.diseno_limpio_con_tipografia_sencilla')},
     prompt:
-      'Diseña un cartel de seating plan minimalista y moderno para una boda. Utiliza mucho espacio en blanco, tipografía sans-serif limpia y elementos geométricos simples. El título debe ser "Seating Plan" o "Tu mesa". Organización visual muy clara con números de mesa bien destacados. Colores monocromáticos con posibles acentos en un solo color. Diseño contemporáneo, limpio y extremadamente legible.',
+      {t('common.disena_cartel_seating_plan_minimalista')},
   },
   {
-    name: 'Temático & Creativo',
-    description: 'Cartel personalizado con temática especial (viajes, naturaleza, etc)',
+    name: {t('common.tematico_creativo')},
+    description: {t('common.cartel_personalizado_con_tematica_especial')},
     prompt:
-      'Crea un cartel de seating plan con diseño temático creativo. Utiliza una temática de viajes/mapas donde cada mesa representa un destino o lugar. Incluye elementos gráficos como brújulas, mapas, aviones o globos. El título puede ser "Encuentra tu destino" o similar. El diseño debe ser original y visualmente atractivo, permitiendo que los invitados identifiquen fácilmente su mesa asignada.',
+      {t('common.crea_cartel_seating_plan_con')},
   },
   {
-    name: 'Romántico & Floral',
-    description: 'Cartel decorado con flores, motivos románticos y colores suaves',
+    name: {t('common.romantico_floral')},
+    description: {t('common.cartel_decorado_con_flores_motivos')},
     prompt:
-      'Diseña un cartel de seating plan romántico con abundantes elementos florales para una boda. Utiliza una paleta de colores suaves como rosa, lavanda y verde salvia. Incorpora ilustraciones delicadas de flores y elementos botánicos. El título puede ser "Con cariño, os hemos asignado" o similar. Tipografía elegante y caligráfica. El diseño debe transmitir romanticismo y delicadeza, organizado de forma clara para que los invitados encuentren fácilmente su mesa.',
+      'Diseña un cartel de seating plan romántico con abundantes elementos florales para una boda. Utiliza una paleta de colores suaves como rosa, lavanda y verde salvia. Incorpora ilustraciones delicadas de flores y elementos botánicos. El título puede ser {t('common.con_carino_hemos_asignado')} o similar. Tipografía elegante y caligráfica. El diseño debe transmitir romanticismo y delicadeza, organizado de forma clara para que los invitados encuentren fácilmente su mesa.',
   },
 ];
 

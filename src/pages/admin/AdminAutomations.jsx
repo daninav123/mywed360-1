@@ -22,8 +22,11 @@ import {
   updatePartnerSummaryAutomation,
 } from '../../services/adminAutomationsService';
 import { performanceMonitor } from '../../services/PerformanceMonitor';
+import { useTranslations } from '../../hooks/useTranslations';
 
 const DEFAULT_ANNIVERSARY_CONFIG = {
+  const { t } = useTranslations();
+
   enabled: false,
   sendHourUtc: 9,
   sendMinuteUtc: 0,
@@ -31,7 +34,7 @@ const DEFAULT_ANNIVERSARY_CONFIG = {
   includePlanners: false,
   defaultCountryCode: '+34',
   template:
-    '¡Feliz aniversario {{couple_names}}! Gracias por confiar en MaLoveApp para vuestro gran día. Aquí tenéis vuestro álbum de recuerdos: {{album_link}}',
+    {t('common.feliz_aniversario_couplenames_gracias_por')},
 };
 
 const DEFAULT_PARTNER_CONFIG = {
@@ -45,24 +48,24 @@ const DEFAULT_PARTNER_CONFIG = {
   defaultCountryCode: '+34',
   paymentLinkBase: '',
   template:
-    'Hola {{partner_name}}, aquí tienes tu resumen de {{month}}. Cierres: {{deals}}. Comisión del mes: {{total_earned}}. Pendiente por cobrar: {{pending_amount}}. ¡Gracias por seguir recomendándonos!',
+    {t('common.hola_partnername_aqui_tienes_resumen')},
 };
 
 const ANNIVERSARY_PLACEHOLDERS = [
   { token: '{{couple_names}}', description: 'Nombres de la pareja anfitriona.' },
   { token: '{{wedding_name}}', description: 'Nombre de la boda/evento.' },
   { token: '{{wedding_date}}', description: 'Fecha original de la boda.' },
-  { token: '{{album_link}}', description: 'Enlace a la galería Momentos (si existe).' },
-  { token: '{{year}}', description: 'Número de años cumplidos (1, 2, ...).' },
+  { token: '{{album_link}}', description: {t('common.enlace_galeria_momentos_existe')} },
+  { token: '{{year}}', description: {t('common.numero_anos_cumplidos')} },
 ];
 
 const PARTNER_PLACEHOLDERS = [
   { token: '{{partner_name}}', description: 'Nombre del partner/comercial.' },
   { token: '{{month}}', description: 'Mes del resumen (ej. septiembre 2025).' },
-  { token: '{{deals}}', description: 'Número de cierres captados en el periodo.' },
-  { token: '{{total_earned}}', description: 'Comisión generada en el periodo.' },
+  { token: '{{deals}}', description: {t('common.numero_cierres_captados_periodo')} },
+  { token: '{{total_earned}}', description: {t('common.comision_generada_periodo')} },
   { token: '{{pending_amount}}', description: 'Importe pendiente de pago.' },
-  { token: '{{currency}}', description: 'Código de moneda (EUR, USD...).' },
+  { token: '{{currency}}', description: {t('common.codigo_moneda_eur_usd')} },
   { token: '{{payment_link}}', description: 'Enlace para subir factura o revisar pagos.' },
 ];
 
@@ -70,7 +73,7 @@ const HOURS = Array.from({ length: 24 }, (_, idx) => idx);
 const MINUTES = [0, 15, 30, 45];
 const CHANNEL_OPTIONS = [
   { value: 'whatsapp', label: 'WhatsApp' },
-  { value: 'whatsapp_email', label: 'WhatsApp + Email (próximamente)' },
+  { value: 'whatsapp_email', label: {t('common.whatsapp_email_proximamente')} },
 ];
 
 const formatDateTime = (value) => {
@@ -206,7 +209,7 @@ export default function AdminAutomations() {
       await updateAnniversaryAutomation({ config: anniversaryConfig });
       performanceMonitor?.logEvent?.('admin_automation_saved', { type: 'anniversary' });
     } catch (err) {
-      setError(err?.message || 'No se pudo guardar la configuración.');
+      setError(err?.message || {t('common.pudo_guardar_configuracion')});
     } finally {
       setSavingAnniversary(false);
     }
@@ -228,7 +231,7 @@ export default function AdminAutomations() {
         processed: result?.processed || 0,
       });
     } catch (err) {
-      setError(err?.message || 'No se pudo ejecutar la automatización.');
+      setError(err?.message || {t('common.pudo_ejecutar_automatizacion')});
     } finally {
       setRunningAnniversary(false);
     }
@@ -268,7 +271,7 @@ export default function AdminAutomations() {
       await updatePartnerSummaryAutomation({ config: partnerConfig });
       performanceMonitor?.logEvent?.('admin_automation_saved', { type: 'partner_summary' });
     } catch (err) {
-      setPartnerError(err?.message || 'No se pudo guardar la configuración.');
+      setPartnerError(err?.message || {t('common.pudo_guardar_configuracion')});
     } finally {
       setSavingPartner(false);
     }
@@ -324,7 +327,7 @@ export default function AdminAutomations() {
       <Card>
         <CardHeader
           title="WhatsApp primer aniversario"
-          subheader="Felicitación automática para la pareja anfitriona 12 meses después del evento."
+          subheader={t('common.felicitacion_automatica_para_pareja_anfitriona')}
         />
         <CardContent>
           <Grid container spacing={3}>
@@ -338,7 +341,7 @@ export default function AdminAutomations() {
                   inputProps={{ 'aria-label': 'Activar WhatsApp aniversario' }}
                 />
                 <Typography variant="body2" color="textSecondary">
-                  {anniversaryConfig.enabled ? 'Automatización activa' : 'Automatización pausada'}
+                  {anniversaryConfig.enabled ? {t('common.automatizacion_activa')} : {t('common.automatizacion_pausada')}}
                 </Typography>
               </Stack>
             </Grid>
@@ -378,8 +381,8 @@ export default function AdminAutomations() {
 
             <Grid item xs={12} md={4}>
               <TextField
-                label="Desplazamiento (días)"
-                helperText="0 = día del aniversario, -1 = día anterior, 1 = día posterior."
+                label={t('common.desplazamiento_dias')}
+                helperText={t('common.dia_del_aniversario_dia_anterior')}
                 fullWidth
                 type="number"
                 value={Number(anniversaryConfig.daysOffset ?? 0)}
@@ -389,8 +392,8 @@ export default function AdminAutomations() {
 
             <Grid item xs={12} md={4}>
               <TextField
-                label="Código país por defecto"
-                helperText="Se antepone cuando el teléfono no tiene prefijo (ej. +34)."
+                label={t('common.codigo_pais_por_defecto')}
+                helperText={t('common.antepone_cuando_telefono_tiene_prefijo')}
                 fullWidth
                 value={anniversaryConfig.defaultCountryCode || ''}
                 onChange={handleAnniversaryChange('defaultCountryCode')}
@@ -465,7 +468,7 @@ export default function AdminAutomations() {
 
       {anniversarySummary && (
         <Card>
-          <CardHeader title="Última ejecución (aniversario)" />
+          <CardHeader title={t('common.ultima_ejecucion_aniversario')} />
           <CardContent>
             <Typography variant="body2" gutterBottom>
               Fecha: {anniversarySummary.attempted}
@@ -476,7 +479,7 @@ export default function AdminAutomations() {
               <Typography variant="body2">Omitidas: {anniversarySummary.skipped}</Typography>
               <Typography variant="body2">Errores: {anniversarySummary.errors}</Typography>
               <Typography variant="body2">
-                Modo: {anniversarySummary.dryRun ? 'Simulación' : 'Real'}
+                Modo: {anniversarySummary.dryRun ? {t('common.simulacion')} : 'Real'}
               </Typography>
             </Stack>
             {anniversarySummary.notes.length > 0 && (
@@ -517,14 +520,14 @@ export default function AdminAutomations() {
                   inputProps={{ 'aria-label': 'Activar resumen partners' }}
                 />
                 <Typography variant="body2" color="textSecondary">
-                  {partnerConfig.enabled ? 'Automatización activa' : 'Automatización pausada'}
+                  {partnerConfig.enabled ? {t('common.automatizacion_activa')} : {t('common.automatizacion_pausada')}}
                 </Typography>
               </Stack>
             </Grid>
 
             <Grid item xs={6} md={3}>
               <TextField
-                label="Día del mes"
+                label={t('common.dia_del_mes')}
                 helperText="Se recomienda entre el 1 y el 5."
                 fullWidth
                 type="number"
@@ -584,8 +587,8 @@ export default function AdminAutomations() {
 
             <Grid item xs={12} md={4}>
               <TextField
-                label="Umbral mínimo (EUR)"
-                helperText="Si la comisión pendiente es menor, se omite el aviso."
+                label={t('common.umbral_minimo_eur')}
+                helperText={t('common.comision_pendiente_menor_omite_aviso')}
                 fullWidth
                 type="number"
                 value={Number(partnerConfig.thresholdPending ?? 0)}
@@ -609,7 +612,7 @@ export default function AdminAutomations() {
 
             <Grid item xs={12} md={4}>
               <TextField
-                label="Código país por defecto"
+                label={t('common.codigo_pais_por_defecto')}
                 fullWidth
                 value={partnerConfig.defaultCountryCode || ''}
                 onChange={handlePartnerChange('defaultCountryCode')}
@@ -693,7 +696,7 @@ export default function AdminAutomations() {
               <Typography variant="body2">Omitidas: {partnerSummary.skipped}</Typography>
               <Typography variant="body2">Errores: {partnerSummary.errors}</Typography>
               <Typography variant="body2">
-                Modo: {partnerSummary.dryRun ? 'Simulación' : 'Real'}
+                Modo: {partnerSummary.dryRun ? {t('common.simulacion')} : 'Real'}
               </Typography>
             </Stack>
             {partnerSummary.notes.length > 0 && (

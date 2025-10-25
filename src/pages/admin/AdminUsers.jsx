@@ -1,9 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { getUsersData, getUsersRoleSummary, suspendUser, reactivateUser } from '../../services/adminDataService';
+import { useTranslations } from '../../hooks/useTranslations';
 
 const ROLE_CARDS = [
-  { key: 'owner', label: 'Owners' },
+  {
+  const { t } = useTranslations();
+ key: 'owner', label: 'Owners' },
   { key: 'planner', label: 'Wedding planners' },
   { key: 'assistant', label: 'Assistants' },
 ];
@@ -90,7 +93,7 @@ const AdminUsers = () => {
       setRoleSummary(summary);
       if (result?.error) {
         const message = result.error === 'firestore_unavailable'
-          ? 'Firestore no está disponible; mostramos valores de referencia.'
+          ? {t('common.firestore_esta_disponible_mostramos_valores')}
           : 'No se pudo cargar el resumen por rol.';
         setRoleSummaryError(message);
       } else {
@@ -302,7 +305,7 @@ const AdminUsers = () => {
               Estados permitidos:{' '}
               {summaryData.filters?.allowedStatuses?.length
                 ? summaryData.filters.allowedStatuses.join(', ')
-                : 'sin restricción definida'}
+                : {t('common.sin_restriccion_definida')}}
               {summaryData.filters?.excludedEmailSuffixes?.length ? (
                 <span className="ml-2">
                   Dominios excluidos: {summaryData.filters.excludedEmailSuffixes.join(', ')}
@@ -399,7 +402,7 @@ const AdminUsers = () => {
               value={suspendReason}
               onChange={(event) => setSuspendReason(event.target.value)}
               className="w-full rounded-md border border-soft px-3 py-2 text-sm"
-              placeholder="Motivo de la suspensión"
+              placeholder={t('common.motivo_suspension')}
             />
             <div className="flex justify-end gap-3 text-sm">
               <button
@@ -446,7 +449,7 @@ const AdminUsers = () => {
               value={reactivateNotes}
               onChange={(event) => setReactivateNotes(event.target.value)}
               className="w-full rounded-md border border-soft px-3 py-2 text-sm"
-              placeholder="Notas sobre la reactivación (opcional)"
+              placeholder={t('common.notas_sobre_reactivacion_opcional')}
             />
             <div className="flex justify-end gap-3 text-sm">
               <button
