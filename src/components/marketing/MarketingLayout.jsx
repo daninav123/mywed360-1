@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, NavLink } from 'react-router-dom';
 
-import logoApp from '../../assets/logo-app.png';
+import logoApp from '../../assets/logo-mark.svg';
 
 const navLinks = [
   { to: '/', label: 'Inicio' },
