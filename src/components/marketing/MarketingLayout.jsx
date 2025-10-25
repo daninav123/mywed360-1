@@ -1,20 +1,23 @@
 import React from 'react';
 import { Link, NavLink } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import logoApp from '../../assets/logo-mark.svg';
-
-const navLinks = [
-  { to: '/', label: 'Inicio' },
-  { to: '/app', label: 'La App' },
-  { to: '/precios', label: 'Precios' },
-  { to: '/acceso', label: 'Login / Registro' },
-];
 
 const linkBaseClasses =
   'px-3 py-2 text-sm font-medium transition-colors duration-150 text-muted hover:text-body border-b-2 border-transparent';
 const activeClasses = 'text-body border-[var(--color-primary)]';
 
 const MarketingLayout = ({ children }) => {
+  const { t } = useTranslation('marketing');
+  
+  const navLinks = [
+    { to: '/', label: t('nav.home') },
+    { to: '/app', label: t('nav.app') },
+    { to: '/precios', label: t('nav.pricing') },
+    { to: '/acceso', label: t('nav.login') },
+  ];
+
   if (typeof window !== 'undefined') {
     window.__MALOVEAPP_MARKETING_VIEW__ = true;
   }
@@ -45,7 +48,7 @@ const MarketingLayout = ({ children }) => {
           <Link to="/" className="flex items-center gap-3 text-lg font-semibold text-body">
             <img
               src="/logo-app.svg"
-              alt="Logo MaLove.App"
+              alt={t('common.logoAlt')}
               className="h-9 w-9 rounded-xl bg-white object-contain shadow-sm ring-1 ring-[var(--color-primary)]/20"
             />
             <span>MaLove.App</span>
@@ -70,13 +73,13 @@ const MarketingLayout = ({ children }) => {
               to="/login"
               className="rounded-md px-4 py-2 text-sm font-medium text-muted transition-colors hover:text-body"
             >
-              Iniciar sesion
+              {t('nav.loginShort')}
             </Link>
             <Link
               to="/signup"
               className="inline-flex items-center justify-center rounded-md bg-[var(--color-primary)] px-4 py-2 text-sm font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5 hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
             >
-              Crear cuenta
+              {t('nav.signupShort')}
             </Link>
           </div>
         </div>
@@ -109,16 +112,16 @@ const MarketingLayout = ({ children }) => {
 
       <footer className="border-t border-soft bg-app/90">
         <div className="layout-container flex flex-col gap-4 py-6 text-sm text-muted md:flex-row md:items-center md:justify-between">
-          <p>&copy; {new Date().getFullYear()} MaLove.App. Todos los derechos reservados.</p>
+          <p>{t('common.copyright', { year: new Date().getFullYear() })}</p>
           <div className="flex flex-wrap gap-4">
             <Link to="/precios" className="hover:text-body">
-              Planes
+              {t('nav.plans')}
             </Link>
             <Link to="/acceso" className="hover:text-body">
-              Centro de acceso
+              {t('nav.accessCenter')}
             </Link>
-            <a href="mailto:hola@malove.app" className="hover:text-body" aria-label="Contacto MaLove.App">
-              Contacto
+            <a href="mailto:hola@malove.app" className="hover:text-body" aria-label={t('common.contactLabel')}>
+              {t('nav.contact')}
             </a>
             <a
               href="https://malove.app/legal"
@@ -126,7 +129,7 @@ const MarketingLayout = ({ children }) => {
               rel="noreferrer"
               className="hover:text-body"
             >
-              Legal
+              {t('nav.legal')}
             </a>
           </div>
         </div>

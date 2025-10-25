@@ -1,4 +1,21 @@
 {
+  "nav": {
+    "home": "Inicio",
+    "app": "La App",
+    "pricing": "Precios",
+    "login": "Login / Registro",
+    "loginShort": "Iniciar sesión",
+    "signupShort": "Crear cuenta",
+    "plans": "Planes",
+    "accessCenter": "Centro de acceso",
+    "contact": "Contacto",
+    "legal": "Legal"
+  },
+  "common": {
+    "copyright": "© {year} MaLove.App. Todos los derechos reservados.",
+    "logoAlt": "Logo MaLove.App",
+    "contactLabel": "Contacto MaLove.App"
+  },
   "marketing": {
     "landing": {
       "hero": {
