@@ -1,11 +1,14 @@
-import i18n from '../i18n';
 import { get as apiGet, post as apiPost } from './apiClient';
 import { getMailsPage } from './emailService';
 
 function parseAmountToNumber(amountStr) {
   try {
     if (!amountStr) return null;
-    const s = String(amountStr).replace(/[^0-9.,]/g, 'i18n.t('common.trim_return_null_heuristica_hay_coma'),');
+    const s = String(amountStr).replace(/[^0-9.,]/g, '').trim();
+    if (!s) return null;
+    // Heurística: si hay coma y punto, el separador de miles suele ser el primero que aparece repetido
+    // Simplificar: quitar separadores de miles y usar último separador como decimal
+    const lastComma = s.lastIndexOf(',');
     const lastDot = s.lastIndexOf('.');
     let normalized = s;
     if (lastComma > lastDot) {

@@ -5,7 +5,6 @@ import useActiveWeddingInfo from './useActiveWeddingInfo';
 import { useProviderEmail } from './useProviderEmail';
 import * as EmailService from '../services/emailService';
 import EmailTemplateService from '../services/EmailTemplateService';
-import { useTranslations } from '../../hooks/useTranslations';
 
 /**
  * Hook personalizado que integra la funcionalidad de email con la búsqueda AI de proveedores.
@@ -14,8 +13,6 @@ import { useTranslations } from '../../hooks/useTranslations';
  * @returns {Object} Métodos y propiedades para el envío de emails desde la búsqueda AI
  */
 export const useAIProviderEmail = () => {
-  const { t } = useTranslations();
-
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState(null);
   const { userEmail, sendEmailToProvider } = useProviderEmail();
@@ -120,7 +117,7 @@ export const useAIProviderEmail = () => {
   const sendEmailFromAIResult = useCallback(
     async (aiResult, searchQuery, options = {}) => {
       if (!aiResult || !aiResult.name) {
-        setError(t('common.informacion_proveedor_incompleta'));
+        setError('Información de proveedor incompleta');
         return false;
       }
 

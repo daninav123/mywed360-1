@@ -1,5 +1,3 @@
-import i18n from '../i18n';
-
 const STORE_KEY = 'maloveapp_local_weddings';
 export const LOCAL_WEDDINGS_EVENT = 'maloveapp:local-weddings-updated';
 
@@ -59,7 +57,7 @@ const createDefaultWedding = (uid) => {
   const now = new Date();
   return {
     id: weddingId,
-    name: i18n.t('common.boda_sin_titulo'),
+    name: 'Boda sin título',
     weddingDate: '',
     location: '',
     createdAt: now.toISOString(),
@@ -152,7 +150,46 @@ export const upsertLocalWedding = (uid, wedding) => {
 export const setLocalActiveWedding = (uid, weddingId) => {
   const store = readStore();
   const entry = ensureUserEntry(store, uid);
-  entry.activeWeddingId = weddingId || entry.activeWeddingId || entry.weddings[0]?.id || 'i18n.t('common.writestorestore_export_const_updatelocalfinance_uid_weddingid')' };
+  entry.activeWeddingId = weddingId || entry.activeWeddingId || entry.weddings[0]?.id || '';
+  writeStore(store);
+};
+
+export const updateLocalFinance = (uid, weddingId, patch) => {
+  if (!weddingId) return;
+  const store = readStore();
+  const entry = ensureUserEntry(store, uid);
+  const idx = entry.weddings.findIndex((item) => item.id === weddingId);
+  if (idx === -1) {
+    // Si la boda no existe todavía, creamos una copia por defecto para mantener consistencia.
+    const created = {
+      ...createDefaultWedding(uid),
+      id: weddingId,
+      financeMain: mergeFinance(undefined, patch),
+    };
+    entry.weddings.push(created);
+    if (!entry.activeWeddingId) entry.activeWeddingId = weddingId;
+  } else {
+    const current = entry.weddings[idx];
+    entry.weddings[idx] = {
+      ...current,
+      financeMain: mergeFinance(current.financeMain, patch),
+      updatedAt: new Date().toISOString(),
+    };
+  }
+  writeStore(store);
+};
+
+export const getLocalFinance = (uid, weddingId) => {
+  const store = readStore();
+  const entry = ensureUserEntry(store, uid);
+  const wedding = entry.weddings.find((item) => item.id === weddingId);
+  return wedding?.financeMain || null;
+};
+
+export const clearLocalWeddings = (uid) => {
+  const store = readStore();
+  if (uid) {
+    store.users[uid] = { weddings: [], activeWeddingId: '' };
   } else {
     store.users = {};
   }

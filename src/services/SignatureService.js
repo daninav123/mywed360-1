@@ -1,5 +1,4 @@
 // SignatureService.js - Cliente frontend para /api/signature
-import i18n from '../i18n';
 import { auth } from '../firebaseConfig';
 import { getBackendBase } from '../utils/backendBase';
 
@@ -9,7 +8,7 @@ async function getAuthToken() {
   try {
     const user = auth?.currentUser;
     if (!user?.getIdToken) {
-      throw new Error(i18n.t('common.signatureservice_autenticacion_requerida'));
+      throw new Error('SignatureService: autenticación requerida');
     }
     try {
       return await user.getIdToken(true);
@@ -18,7 +17,7 @@ async function getAuthToken() {
       return await user.getIdToken();
     }
   } catch (error) {
-    throw new Error(error?.message || i18n.t('common.signatureservice_pudo_obtener_token_autenticacion'));
+    throw new Error(error?.message || 'SignatureService: no se pudo obtener el token de autenticación');
   }
 }
 

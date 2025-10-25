@@ -1,14 +1,11 @@
 import { useState } from 'react';
 import { createCheckoutSession, PRODUCT_IDS } from '../services/stripeService';
-import { useTranslations } from '../../hooks/useTranslations';
 
 /**
  * Hook personalizado para manejar checkout de Stripe
  * @returns {Object} Estado y funciones para checkout
  */
 export function useStripeCheckout() {
-  const { t } = useTranslations();
-
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -28,7 +25,7 @@ export function useStripeCheckout() {
       if (session.url) {
         window.location.href = session.url;
       } else {
-        throw new Error(t('common.recibio_url_checkout'));
+        throw new Error('No se recibió URL de checkout');
       }
     } catch (err) {
       console.error('Error en checkout:', err);

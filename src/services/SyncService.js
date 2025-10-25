@@ -1,5 +1,4 @@
 // Servicio de sincronización para manejar la persistencia híbrida entre localStorage y Firestore
-import i18n from '../i18n';
 import { getAuth } from 'firebase/auth';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 
@@ -15,7 +14,50 @@ const syncState = {
 
 // Evento para actualizar componentes cuando cambia el estado de sincronización
 const syncEventTarget = new EventTarget();
-const SYNC_STATE_CHANGE = 'syncStateChangei18n.t('common.guarda_datos_tanto_localstorage_como_firestore')usersi18n.t('common.coleccion_firestore_doc_usersuid_mergewithexisting_true')/i18n.t('common.filterboolean_partslength_ruta_documento_valida_docref')[SyncService] docPath inválido, usando fallback:', options.docPath, e);
+const SYNC_STATE_CHANGE = 'syncStateChange';
+
+// Guarda datos tanto en localStorage como en Firestore
+export const saveData = async (key, data, userOptions = {}) => {
+  const options = {
+    firestore: true, // También guardar en Firestore?
+    collection: 'users', // Colección en Firestore (doc users/{uid})
+    mergeWithExisting: true, // Combinar con datos existentes o reemplazar
+    showNotification: true, // Mostrar notificación de éxito/error
+    docPath: undefined, // Ruta completa opcional (prioridad sobre collection/uid)
+    field: undefined, // Nombre del campo en Firestore (por defecto usa key)
+    ...userOptions,
+  };
+
+  try {
+    // 1. Siempre guardar en localStorage primero (funciona offline)
+    localStorage.setItem(key, JSON.stringify(data));
+
+    // 2. Intentar guardar en Firestore si está habilitado y hay usuario
+    if (options.firestore) {
+      const auth = getAuth();
+      const user = auth.currentUser;
+
+      if (user) {
+        syncState.isSyncing = true;
+        syncState.pendingChanges = true;
+        notifySyncStateChange();
+
+        let docRef;
+        if (options.docPath) {
+          try {
+            const parts = String(options.docPath).split('/').filter(Boolean);
+            if (parts.length % 2 === 0) {
+              // Ruta a documento válida
+              docRef = doc(db, ...parts);
+            } else if (parts.length > 2) {
+              // Intento de corrección: tratar el último segmento como nombre de campo y usar el padre como documento
+              const parentParts = parts.slice(0, -1);
+              if (parentParts.length % 2 === 0) {
+                docRef = doc(db, ...parentParts);
+              }
+            }
+          } catch (e) {
+            console.warn('[SyncService] docPath inválido, usando fallback:', options.docPath, e);
           }
         }
         if (!docRef) {
@@ -25,7 +67,32 @@ const SYNC_STATE_CHANGE = 'syncStateChangei18n.t('common.guarda_datos_tanto_loca
               // Guardar como campo dentro del documento principal de la boda
               docRef = doc(db, 'weddings', wid);
             } else {
-              docRef = doc(db, 'usersi18n.t('common.useruid_else_docref_docdb_optionscollection_useruid')Datos guardados en la nube', 'success');
+              docRef = doc(db, 'users', user.uid);
+            }
+          } else {
+            docRef = doc(db, options.collection, user.uid);
+          }
+        }
+
+        try {
+          // Comprobar si el documento ya existe
+          const docSnap = await getDoc(docRef);
+
+          const targetField = options.field || key;
+
+          if (docSnap.exists() && options.mergeWithExisting) {
+            // Actualizar el campo específico en el documento existente
+            await updateDoc(docRef, { [targetField]: data });
+          } else {
+            // Crear nuevo documento con el campo
+            await setDoc(docRef, { [targetField]: data }, { merge: options.mergeWithExisting });
+          }
+
+          syncState.pendingChanges = false;
+          syncState.lastSyncTime = new Date().toISOString();
+
+          if (options.showNotification) {
+            showNotification('Datos guardados en la nube', 'success');
           }
         } catch (error) {
           console.error('Error al guardar en Firestore:', error);
@@ -34,7 +101,17 @@ const SYNC_STATE_CHANGE = 'syncStateChangei18n.t('common.guarda_datos_tanto_loca
           if (options.showNotification) {
             showNotification(
               'Los datos se guardaron localmente, pero no se pudieron sincronizar con la nube',
-              'warningi18n.t('common.anadir_cola_sincronizacion_pendiente_addtopendingsyncqueuekey_data')Datos guardados localmente', 'info');
+              'warning'
+            );
+          }
+
+          // Añadir a la cola de sincronización pendiente
+          addToPendingSyncQueue(key, data, options);
+        }
+      } else {
+        // Usuario no autenticado, solo guardar localmente
+        if (options.showNotification) {
+          showNotification('Datos guardados localmente', 'info');
         }
         syncState.pendingChanges = true;
       }
@@ -48,7 +125,41 @@ const SYNC_STATE_CHANGE = 'syncStateChangei18n.t('common.guarda_datos_tanto_loca
     console.error('Error al guardar datos:', error);
 
     if (options.showNotification) {
-      showNotification('Error al guardar datos', 'errori18n.t('common.syncstateissyncing_false_notifysyncstatechange_return_false_carga')usersi18n.t('common.coleccion_firestore_doc_usersuid_fallbacktolocal_true')/').filter(Boolean);
+      showNotification('Error al guardar datos', 'error');
+    }
+
+    syncState.isSyncing = false;
+    notifySyncStateChange();
+    return false;
+  }
+};
+
+// Carga datos con prioridad a Firestore si está online, sino de localStorage
+export const loadData = async (key, userOptions = {}) => {
+  const options = {
+    firestore: true, // Intentar cargar de Firestore?
+    collection: 'users', // Colección en Firestore (doc users/{uid})
+    fallbackToLocal: true, // Si no se encuentra en Firestore, intentar localStorage
+    docPath: undefined, // Permite especificar una ruta de documento arbitraria
+    field: undefined, // Nombre del campo en Firestore
+    ...userOptions,
+  };
+
+  try {
+    // 1. Intentar cargar de Firestore si está habilitado y hay usuario
+    if (options.firestore && navigator.onLine) {
+      const auth = getAuth();
+      const user = auth.currentUser;
+
+      if (user) {
+        syncState.isSyncing = true;
+        notifySyncStateChange();
+
+        try {
+          let docRef;
+          if (options.docPath) {
+            try {
+              const parts = String(options.docPath).split('/').filter(Boolean);
               if (parts.length % 2 === 0) {
                 docRef = doc(db, ...parts);
               } else if (parts.length > 2) {
@@ -67,7 +178,27 @@ const SYNC_STATE_CHANGE = 'syncStateChangei18n.t('common.guarda_datos_tanto_loca
               if (wid) {
                 docRef = doc(db, 'weddings', wid);
               } else {
-                docRef = doc(db, 'usersi18n.t('common.useruid_else_docref_docdb_optionscollection_useruid')Error al cargar de Firestore, intentando localStorage:', error);
+                docRef = doc(db, 'users', user.uid);
+              }
+            } else {
+              docRef = doc(db, options.collection, user.uid);
+            }
+          }
+          const docSnap = await getDoc(docRef);
+
+          const targetField = options.field || key;
+          if (docSnap.exists() && docSnap.data()[targetField] !== undefined) {
+            // Guardar también en localStorage para acceso offline futuro
+            localStorage.setItem(key, JSON.stringify(docSnap.data()[targetField]));
+
+            syncState.isSyncing = false;
+            syncState.lastSyncTime = new Date().toISOString();
+            notifySyncStateChange();
+
+            return docSnap.data()[targetField];
+          }
+        } catch (error) {
+          console.warn('Error al cargar de Firestore, intentando localStorage:', error);
         }
       }
     }
@@ -104,7 +235,23 @@ const SYNC_STATE_CHANGE = 'syncStateChangei18n.t('common.guarda_datos_tanto_loca
 export const syncPendingData = async () => {
   if (!navigator.onLine) return false;
 
-  const pendingSyncQueue = JSON.parse(localStorage.getItem('pendingSyncQueue') || '[]i18n.t('common.pendingsyncqueuelength_return_true_syncstateissyncing_true_notifysyncstatechange')Error al sincronizar item pendiente:', error);
+  const pendingSyncQueue = JSON.parse(localStorage.getItem('pendingSyncQueue') || '[]');
+
+  if (pendingSyncQueue.length === 0) return true;
+
+  syncState.isSyncing = true;
+  notifySyncStateChange();
+
+  let success = true;
+
+  for (const item of pendingSyncQueue) {
+    try {
+      await saveData(item.key, item.data, {
+        ...item.options,
+        showNotification: false, // No mostrar notificación para cada item
+      });
+    } catch (error) {
+      console.error('Error al sincronizar item pendiente:', error);
       success = false;
     }
   }
@@ -112,7 +259,19 @@ export const syncPendingData = async () => {
   if (success) {
     localStorage.removeItem('pendingSyncQueue');
     syncState.pendingChanges = false;
-    showNotification(i18n.t('common.todos_los_cambios_han_sincronizado_con'), 'successi18n.t('common.syncstateissyncing_false_syncstatelastsynctime_new_datetoisostring_notifysyncstatechange')pendingSyncQueue') || '[]');
+    showNotification('Todos los cambios se han sincronizado con éxito', 'success');
+  }
+
+  syncState.isSyncing = false;
+  syncState.lastSyncTime = new Date().toISOString();
+  notifySyncStateChange();
+
+  return success;
+};
+
+// Añade un item a la cola de sincronización pendiente
+const addToPendingSyncQueue = (key, data, options) => {
+  const pendingSyncQueue = JSON.parse(localStorage.getItem('pendingSyncQueue') || '[]');
 
   // Evitar duplicados (reemplazar si existe)
   const index = pendingSyncQueue.findIndex((item) => item.key === key);
@@ -123,8 +282,27 @@ export const syncPendingData = async () => {
     pendingSyncQueue.push({ key, data, options });
   }
 
-  localStorage.setItem('pendingSyncQueuei18n.t('common.jsonstringifypendingsyncqueue_funcion_simple_para_mostrar_notificaciones')info') => {
-  if (typeof window.toast === 'functioni18n.t('common.windowtoasttypemessage_else_consolelogtypetouppercase_message_registra_los')onlinei18n.t('common.syncstateisonline_true_notifysyncstatechange_syncpendingdata_intentar_sincronizar')offline', () => {
+  localStorage.setItem('pendingSyncQueue', JSON.stringify(pendingSyncQueue));
+};
+
+// Función simple para mostrar notificaciones (sustituir por tu sistema de notificaciones)
+const showNotification = (message, type = 'info') => {
+  if (typeof window.toast === 'function') {
+    window.toast[type](message);
+  } else {
+    console.log(`[${type.toUpperCase()}] ${message}`);
+  }
+};
+
+// Registra los listeners de cambios de conexión
+export const setupSyncListeners = () => {
+  window.addEventListener('online', () => {
+    syncState.isOnline = true;
+    notifySyncStateChange();
+    syncPendingData(); // Intentar sincronizar automáticamente
+  });
+
+  window.addEventListener('offline', () => {
     syncState.isOnline = false;
     notifySyncStateChange();
   });

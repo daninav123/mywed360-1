@@ -1,4 +1,3 @@
-import i18n from '../i18n';
 import { apiPost } from './apiClient';
 
 const LOGIN_PATH = '/api/admin/login';
@@ -26,9 +25,42 @@ async function request(path, body = {}) {
   if (!res.ok) {
     const error = new Error(
       data?.message ||
-        i18n.t('common.pudo_completar_operacion_administrativa')
+        'No se pudo completar la operación administrativa.'
     );
-    error.code = data?.code || 'admin_request_failedi18n.t('common.datalockeduntil_errorlockeduntil_parsedatedatalockeduntil_throw_error_return')admin_request_failed') {
+    error.code = data?.code || 'admin_request_failed';
+    if (data?.lockedUntil) {
+      error.lockedUntil = parseDate(data.lockedUntil);
+    }
+    throw error;
+  }
+  return data || {};
+}
+
+export async function loginAdmin(payload) {
+  const data = await request(LOGIN_PATH, payload);
+  return {
+    ...data,
+    lockedUntil: parseDate(data.lockedUntil),
+    expiresAt: parseDate(data.expiresAt),
+    sessionExpiresAt: parseDate(data.sessionExpiresAt),
+  };
+}
+
+export async function verifyAdminMfa(payload) {
+  const data = await request(MFA_PATH, payload);
+  return {
+    ...data,
+    sessionExpiresAt: parseDate(data.sessionExpiresAt),
+  };
+}
+
+export async function logoutAdmin(sessionToken) {
+  try {
+    const payload = sessionToken ? { sessionToken } : {};
+    await request(LOGOUT_PATH, payload);
+  } catch (error) {
+    // Si el backend ya invalidó la sesión, no es crítico para el frontend.
+    if (error?.code !== 'admin_request_failed') {
       console.warn('[adminAuthClient] logout admin fallback:', error);
     }
   }

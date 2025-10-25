@@ -1,5 +1,3 @@
-import i18n from '../i18n';
-
 ﻿import { apiPost } from './apiClient';
 
 export async function requestBudgetAdvisor(payload, options = {}) {
@@ -9,7 +7,7 @@ export async function requestBudgetAdvisor(payload, options = {}) {
     try {
       details = await res.json();
     } catch (_) {}
-    const error = new Error(details?.message || details?.error || i18n.t('common.pudo_obtener_recomendacion_del_consejero'));
+    const error = new Error(details?.message || details?.error || 'No se pudo obtener la recomendación del consejero');
     error.code = details?.error || res.status;
     error.traceId = details?.traceId || null;
     error.details = details?.details || null;

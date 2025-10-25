@@ -3,7 +3,6 @@
  * Optimiza el rendimiento cachéando resultados de componentes pesados
  */
 
-import i18n from '../i18n';
 import { useMemo, useCallback, useRef, useEffect, useState } from 'react';
 
 // Caché global en memoria
@@ -86,7 +85,185 @@ const evictLRU = () => {
  */
 export const useCachedComputation = (computeFn, deps = [], options = {}) => {
   const config = { ...DEFAULT_CONFIG, ...options };
-  const componentName = options.name || 'anonymousi18n.t('common.return_usememo_const_cachekey_generatecachekeycomponentname_deps')CachedComponenti18n.t('common.return_usememo_const_cachekey_generatecachekeycomponentname_props')undefined' && (globalThis.vi || globalThis.vitest || globalThis.jest)) || (typeof process !== 'undefined' && process.env && (process.env.VITEST || process.env.NODE_ENV === 'test')) || (typeof import.meta !== 'undefined' && (import.meta.vitest || (import.meta.env && import.meta.env.MODE === 'test'))));
+  const componentName = options.name || 'anonymous';
+
+  return useMemo(() => {
+    const cacheKey = generateCacheKey(componentName, {}, deps);
+    const now = Date.now();
+
+    // Verificar si existe en caché y no ha expirado
+    if (globalCache.has(cacheKey)) {
+      const entry = globalCache.get(cacheKey);
+      if (now <= entry.expiresAt) {
+        entry.lastAccessed = now;
+        cacheStats.hits++;
+        return entry.value;
+      } else {
+        globalCache.delete(cacheKey);
+      }
+    }
+
+    // Computar nuevo valor
+    cacheStats.misses++;
+    const value = computeFn();
+
+    // Limpiar caché si es necesario
+    cleanExpiredEntries();
+    evictLRU();
+
+    // Guardar en caché
+    globalCache.set(cacheKey, {
+      value,
+      createdAt: now,
+      lastAccessed: now,
+      expiresAt: now + config.ttl,
+    });
+
+    return value;
+  }, deps);
+};
+
+/**
+ * Hook para cachear componentes completos
+ * @param {Function} renderFn - Función que renderiza el componente
+ * @param {Object} props - Props del componente
+ * @param {Array} deps - Dependencias adicionales
+ * @param {Object} options - Opciones de caché
+ * @returns {React.ReactElement} - Componente cacheado
+ */
+export const useCachedComponent = (renderFn, props = {}, deps = [], options = {}) => {
+  const config = { ...DEFAULT_CONFIG, ...options };
+  const componentName = options.name || 'CachedComponent';
+
+  return useMemo(() => {
+    const cacheKey = generateCacheKey(componentName, props, deps);
+    const now = Date.now();
+
+    // Verificar caché
+    if (globalCache.has(cacheKey)) {
+      const entry = globalCache.get(cacheKey);
+      if (now <= entry.expiresAt) {
+        entry.lastAccessed = now;
+        cacheStats.hits++;
+        return entry.value;
+      } else {
+        globalCache.delete(cacheKey);
+      }
+    }
+
+    // Renderizar nuevo componente
+    cacheStats.misses++;
+    const component = renderFn(props);
+
+    // Gestión del caché
+    cleanExpiredEntries();
+    evictLRU();
+
+    // Guardar en caché
+    globalCache.set(cacheKey, {
+      value: component,
+      createdAt: now,
+      lastAccessed: now,
+      expiresAt: now + config.ttl,
+    });
+
+    return component;
+  }, [renderFn, JSON.stringify(props), ...deps]);
+};
+
+/**
+ * Hook para invalidar caché específico
+ * @param {string} componentName - Nombre del componente
+ * @returns {Function} - Función para invalidar caché
+ */
+export const useCacheInvalidation = (componentName) => {
+  return useCallback(
+    (props = {}, deps = []) => {
+      const pattern = generateCacheKey(componentName, props, deps);
+      let invalidated = 0;
+
+      for (const key of globalCache.keys()) {
+        if (key.startsWith(`${componentName}:`)) {
+          globalCache.delete(key);
+          invalidated++;
+        }
+      }
+
+      console.log(`[ComponentCache] Invalidadas ${invalidated} entradas para ${componentName}`);
+    },
+    [componentName]
+  );
+};
+
+/**
+ * Componente HOC para cachear automáticamente
+ * @param {React.Component} WrappedComponent - Componente a cachear
+ * @param {Object} options - Opciones de caché
+ * @returns {React.Component} - Componente con caché
+ */
+export const withCache = (WrappedComponent, options = {}) => {
+  const CachedComponent = (props) => {
+    const componentName = options.name || WrappedComponent.displayName || WrappedComponent.name;
+
+    return useCachedComponent(
+      (cachedProps) => <WrappedComponent {...cachedProps} />,
+      props,
+      options.deps || [],
+      { ...options, name: componentName }
+    );
+  };
+
+  CachedComponent.displayName = `withCache(${WrappedComponent.displayName || WrappedComponent.name})`;
+  return CachedComponent;
+};
+
+/**
+ * Obtiene estadísticas del caché
+ * @returns {Object} - Estadísticas del caché
+ */
+export const getCacheStats = () => {
+  const hitRate =
+    cacheStats.hits + cacheStats.misses > 0
+      ? ((cacheStats.hits / (cacheStats.hits + cacheStats.misses)) * 100).toFixed(2)
+      : 0;
+
+  return {
+    ...cacheStats,
+    hitRate: `${hitRate}%`,
+    cacheSize: globalCache.size,
+    maxSize: DEFAULT_CONFIG.maxSize,
+  };
+};
+
+/**
+ * Limpia todo el caché
+ */
+export const clearCache = () => {
+  const size = globalCache.size;
+  globalCache.clear();
+  cacheStats.evictions += size;
+  console.log(`[ComponentCache] Limpiado caché completo (${size} entradas)`);
+};
+
+/**
+ * Hook para monitorear rendimiento del caché
+ */
+export const useCacheMonitor = () => {
+  const [stats, setStats] = useState(getCacheStats());
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setStats(getCacheStats());
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return stats;
+};
+
+// Limpiar caché expirado cada 5 minutos
+const __IS_TEST__ = ((typeof globalThis !== 'undefined' && (globalThis.vi || globalThis.vitest || globalThis.jest)) || (typeof process !== 'undefined' && process.env && (process.env.VITEST || process.env.NODE_ENV === 'test')) || (typeof import.meta !== 'undefined' && (import.meta.vitest || (import.meta.env && import.meta.env.MODE === 'test'))));
 if (!__IS_TEST__) { setInterval(cleanExpiredEntries, 5 * 60 * 1000); }
 
 export default {

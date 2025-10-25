@@ -3,21 +3,20 @@
  * Sprint 6 - S6-T002
  */
 
-import i18n from '../i18n';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 
 const LEGAL_TEMPLATES = {
   privacy: {
-    title: i18n.t('common.politica_privacidad'),
-    content: i18n.t('common.los_datos_personales_recogidos_seran_tratados')
+    title: 'Política de Privacidad',
+    content: 'Los datos personales recogidos serán tratados conforme al RGPD...'
   },
   terms: {
     title: 'Términos y Condiciones',
     content: 'Al confirmar su asistencia, acepta las condiciones del evento...'
   },
   cookies: {
-    title: i18n.t('common.politica_cookies'),
+    title: 'Política de Cookies',
     content: 'Este sitio web utiliza cookies para mejorar la experiencia...'
   }
 };

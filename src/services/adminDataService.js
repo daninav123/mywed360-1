@@ -1,4 +1,3 @@
-import i18n from '../i18n';
 import errorLogger from '../utils/errorLogger';
 import { getAdminFetchOptions, getAdminHeaders, getAdminSessionToken } from './adminSession';
 import { apiGet, apiPost, apiPut } from './apiClient';
@@ -502,7 +501,7 @@ export const createDiscountCode = async (discountData) => {
   
   if (!response.ok) {
     const error = await response.json().catch(() => ({ error: 'create_discount_failed' }));
-    throw new Error(error.error || error.message || i18n.t('common.error_crear_codigo_descuento'));
+    throw new Error(error.error || error.message || 'Error al crear código de descuento');
   }
   
   return response.json();
@@ -517,7 +516,7 @@ export const updateDiscountCode = async (id, discountData) => {
   
   if (!response.ok) {
     const error = await response.json().catch(() => ({ error: 'update_discount_failed' }));
-    throw new Error(error.error || error.message || i18n.t('common.error_actualizar_codigo_descuento'));
+    throw new Error(error.error || error.message || 'Error al actualizar código de descuento');
   }
   
   return response.json();

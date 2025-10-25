@@ -1,4 +1,3 @@
-import { useTranslations } from '../../hooks/useTranslations';
 ﻿import {
   collection,
   getDocs,
@@ -35,11 +34,9 @@ const TRACKING_STATUS_SET = new Set(
     'contactado',
     'en seguimiento',
     'seguimiento',
-    {
-  const { t } = useTranslations();
-t('common.negociacion')},
-    {t('common.negociacion')},
-    {t('common.evaluacion')},
+    'en negociación',
+    'negociación',
+    'en evaluación',
     'evaluando',
     'preconfirmado',
     'pre-confirmado',
@@ -47,7 +44,7 @@ t('common.negociacion')},
     'por-revisar',
     'analizando',
     'exploracion',
-    {t('common.exploracion')},
+    'exploración',
     'shortlist',
     'prospecto',
     'prospect',
@@ -630,7 +627,7 @@ export const useProveedores = () => {
         return newProvider;
       } catch (err) {
         console.error('Error al añadir proveedor:', err);
-        setError(t('common.pudo_anadir_proveedor_intentalo_nuevo'));
+        setError('No se pudo añadir el proveedor. Inténtalo de nuevo más tarde.');
         return null;
       }
     },
@@ -739,7 +736,7 @@ export const useProveedores = () => {
         return true;
       } catch (err) {
         console.error('Error al actualizar proveedor:', err);
-        setError(t('common.error_actualizar_proveedor_intentalo_nuevo'));
+        setError('Error al actualizar el proveedor. Inténtalo de nuevo.');
         return false;
       } finally {
         setLoading(false);
@@ -824,7 +821,7 @@ export const useProveedores = () => {
         return true;
       } catch (err) {
         console.error('Error al eliminar proveedor:', err);
-        setError(t('common.pudo_eliminar_proveedor_intentalo_nuevo'));
+        setError('No se pudo eliminar el proveedor. Inténtalo de nuevo más tarde.');
         return false;
       }
     },

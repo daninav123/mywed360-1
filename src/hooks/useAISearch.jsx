@@ -4,7 +4,6 @@ import useActiveWeddingInfo from './useActiveWeddingInfo';
 import { useAuth } from './useAuth';
 import { useFallbackReporting } from './useFallbackReporting';
 import { post as apiPost, get as apiGet } from '../services/apiClient';
-import { useTranslations } from '../../hooks/useTranslations';
 
 const slugify = (value) =>
   !value
@@ -16,8 +15,6 @@ const slugify = (value) =>
         .replace(/^-+|-+$/g, '');
 
 const guessServiceFromQuery = (query) => {
-  const { t } = useTranslations();
-
   if (!query) return 'Servicios para bodas';
   const words = query.toLowerCase().split(/[,;]+/)[0]?.trim();
   if (!words) return 'Servicios para bodas';
@@ -299,7 +296,7 @@ export const useAISearch = () => {
         // Detectar error de red (backend no disponible)
         if (backendError?.message?.includes('fetch') || backendError?.name === 'TypeError') {
           const networkError = new Error(
-            {t('common.pudo_conectar_con_servidor_verifica')}
+            'No se pudo conectar con el servidor. Verifica que el backend esté ejecutándose en http://localhost:4004'
           );
           networkError.code = 'BACKEND_OFFLINE';
           lastError = networkError;

@@ -1,11 +1,9 @@
-import i18n from '../i18n';
-
 const TEMPLATE_LIBRARY = {
   personalizada: {
     label: 'Personalizada',
     description: 'Crea una pagina web totalmente personalizada segun tus indicaciones',
     samplePrompt:
-      i18n.t('common.quiero_una_web_elegante_moderna_con'),
+      'Quiero una web elegante y moderna con secciones claras para historia, cronograma, galeria y detalles logísticos (transporte, hospedaje). Usa degradados suaves, botones con esquinas redondeadas y animaciones ligeras.',
     keywords: ['personalizada', 'moderna', 'premium'],
     tokens: {
       style: 'editorial contemporaneo con toques dorados y tipografia de lujo',
@@ -27,7 +25,7 @@ const TEMPLATE_LIBRARY = {
       fontImports: [
         'https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap',
       ],
-      hero: i18n.t('common.hero_pantalla_completa_con_nombres_superpuestos'),
+      hero: 'Hero de pantalla completa con nombres superpuestos, fecha, contador y boton destacando la información logística',
       gallery: 'Mosaico de fotos con bordes redondeados y sombra suave, captions opcionales',
       buttons: 'Botones estilo pastilla con sombra suave y efecto hover de leve escala',
       textures: 'ornamentos florales suaves y lineas finas en dorado',
@@ -69,7 +67,7 @@ const TEMPLATE_LIBRARY = {
     label: 'Moderna',
     description: 'Minimalista, limpia y contemporanea, con tipografias sans-serif',
     samplePrompt:
-      i18n.t('common.diseno_minimalista_con_bloques_asimetricos_fondo'),
+      'Diseño minimalista con bloques asimetricos, fondo claro y acentos en morado profundo. Incluir seccion de recomendaciones de hospedaje y CTA claro hacia la información logística.',
     keywords: ['moderna', 'minimal', 'geometr', 'morad', 'contempor'],
     tokens: {
       style: 'minimalista premium con bloques asimetricos y microinteracciones',
@@ -123,7 +121,7 @@ const TEMPLATE_LIBRARY = {
       fontImports: [
         'https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Merriweather:wght@400;600;700&family=Lato:wght@400;500;700&display=swap',
       ],
-      hero: i18n.t('common.hero_con_foto_fondo_overlay_calido'),
+      hero: 'Hero con foto de fondo, overlay cálido y cintillo con fecha',
       gallery: 'Grid estilo collage con marcos polaroid inclinados y cinta adhesiva simulada',
       buttons: 'Botones color tierra con borde redondeado y textura ligera',
       textures: 'elementos de acuarela, hojas y fibras naturales',
@@ -133,7 +131,7 @@ const TEMPLATE_LIBRARY = {
     label: 'Playa',
     description: 'Costera, fresca y luminosa con azules y arena',
     samplePrompt:
-      i18n.t('common.necesito_diseno_inspirado_playa_con_ondas'),
+      'Necesito un diseño inspirado en playa con ondas, flor tropical y degradados aqua. Incluir bloque para dress code y recomendaciones de hospedaje frente al mar.',
     keywords: ['playa', 'mar', 'oceano', 'turquesa', 'cost'],
     tokens: {
       style: 'coastal chic con degradados inspirados en el mar y detalles de ondas',
@@ -155,7 +153,7 @@ const TEMPLATE_LIBRARY = {
       fontImports: [
         'https://fonts.googleapis.com/css2?family=Great+Vibes&family=Quicksand:wght@400;500;600&family=Inter:wght@400;500;600&display=swap',
       ],
-      hero: i18n.t('common.hero_con_fondo_degradado_tipo_oleaje'),
+      hero: 'Hero con fondo degradado tipo oleaje, iconos marinos y boton destacado hacia la guía logística',
       gallery: 'Gallery en tarjetas con borde redondeado, efecto de vidrio esmerilado y sombras suaves',
       buttons: 'Botones en turquesa con brillo tipo agua y microanimacion hover',
       textures: 'ondas svg, burbujas y elementos nauticos discretos',
@@ -215,9 +213,9 @@ const COMMON_GUIDELINES = [
   'Incluye CSS en el <head> con variables, sin frameworks externos.',
   'Asegura experiencia responsive (mobile-first, max-width 1200px).',
   'Agrega microinteracciones suaves (hover, transiciones de 200-300ms).',
-  i18n.t('common.resalta_cta_principal_hacia_informacion_logistica'),
+  'Resalta la CTA principal hacia la información logística y la opción de compartir URL.',
   'Crea tablas limpias para los horarios de transporte y cards diferenciadas para los hoteles recomendados.',
-  i18n.t('common.describe_claramente_las_rutas_llegada_avion'),
+  'Describe claramente las rutas de llegada (avion, tren, coche) y tips logísticos relevantes.',
   'Incluye contador regresivo si hay fecha valida.',
   'Optimiza para legibilidad (contraste AA, espacios amplios, headings claros).',
 ];
@@ -298,7 +296,7 @@ export const buildSystemMessage = () =>
     'No incluyas explicaciones ni comentarios fuera del HTML.',
     'Todos los enlaces de fuentes deben ser compatibles con Google Fonts y cargarse en el <head>.',
     'Asegura accesibilidad: contraste AA, alt en imagenes, jerarquia tipografica clara.',
-    i18n.t('common.resalta_cta_principal_hacia_informacion_logistica'),
+    'Resalta la CTA principal hacia la información logística y los botones para compartir.',
   ].join(' ');
 
 export const buildDesignerPrompt = ({ templateKey = 'personalizada', weddingInfo, userPrompt }) => {

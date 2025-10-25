@@ -6,7 +6,6 @@ import { useAuth } from './useAuth';
 import EmailService from '../services/emailService';
 import { createTrackingRecord } from '../services/EmailTrackingService';
 import { addTagToEmail } from '../services/tagService';
-import { useTranslations } from '../../hooks/useTranslations';
 
 /**
  * Hook personalizado que proporciona funcionalidades para enviar y gestionar
@@ -15,8 +14,6 @@ import { useTranslations } from '../../hooks/useTranslations';
  * @returns {Object} Funciones y estados para la gestión de emails a proveedores
  */
 export const useProviderEmail = () => {
-  const { t } = useTranslations();
-
   const { user, profile } = useAuth();
   const { info: weddingDoc } = useActiveWeddingInfo();
   const [loading, setLoading] = useState(false);
@@ -84,7 +81,7 @@ export const useProviderEmail = () => {
       return { email: emailData };
     } catch (err) {
       console.error('Error al enviar email al proveedor:', err);
-      setError(t('common.pudo_enviar_email_intentalo_nuevo'));
+      setError('No se pudo enviar el email. Inténtalo de nuevo más tarde.');
       return null;
     } finally {
       setLoading(false);
@@ -105,20 +102,20 @@ export const useProviderEmail = () => {
       : 'servicios';
 
     const subjectTemplates = {
-      fotografía: t('common.consulta_sobre_servicios_fotografia_para'),
-      fotografia: t('common.consulta_sobre_servicios_fotografia_para'),
-      fotografo: t('common.consulta_sobre_servicios_fotografia_para'),
+      fotografía: 'Consulta sobre servicios de fotografía para boda',
+      fotografia: 'Consulta sobre servicios de fotografía para boda',
+      fotografo: 'Consulta sobre servicios de fotografía para boda',
       catering: 'Consulta sobre servicios de catering para boda',
-      flores: t('common.consulta_sobre_decoracion_floral_para'),
-      música: t('common.consulta_sobre_musica_animacion_para'),
-      musica: t('common.consulta_sobre_musica_animacion_para'),
+      flores: 'Consulta sobre decoración floral para boda',
+      música: 'Consulta sobre música y animación para boda',
+      musica: 'Consulta sobre música y animación para boda',
       dj: 'Consulta sobre servicio de DJ para boda',
       transporte: 'Consulta sobre servicios de transporte para boda',
       vestido: 'Consulta sobre vestido de novia',
       traje: 'Consulta sobre traje de novio',
-      decoración: t('common.consulta_sobre_decoracion_para_boda'),
-      decoracion: t('common.consulta_sobre_decoracion_para_boda'),
-      invitaciones: t('common.consulta_sobre_diseno_invitaciones'),
+      decoración: 'Consulta sobre decoración para boda',
+      decoracion: 'Consulta sobre decoración para boda',
+      invitaciones: 'Consulta sobre diseño de invitaciones',
       default: `Consulta sobre ${servicioNormalizado} para boda`,
     };
 

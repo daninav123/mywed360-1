@@ -1,15 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
 import errorLogger from '../utils/errorLogger';
-import { useTranslations } from '../../hooks/useTranslations';
 
 /**
  * Panel de Diagnóstico que se ejecuta automáticamente
  * Muestra el estado de todos los servicios y errores en tiempo real
  */
 const DiagnosticPanel = () => {
-  const { t } = useTranslations();
-
   const diagnosticsDisabled = useMemo(() => {
     if (typeof window !== 'undefined') {
       if (window.Cypress) return true;
@@ -111,7 +108,7 @@ const DiagnosticPanel = () => {
               ? 'bg-yellow-500 hover:bg-yellow-600'
               : 'bg-green-500 hover:bg-green-600'
         } text-white`}
-        title={t('common.panel_diagnostico')}
+        title="Panel de Diagnóstico"
       >
         🔍
         {stats.total > 0 && (

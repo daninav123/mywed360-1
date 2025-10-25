@@ -4,7 +4,6 @@
  * distribución por etiquetas y carpetas, etc.
  */
 
-import i18n from '../i18n';
 import { getAggregatedStats, getDailyStats } from './emailMetricsService';
 import { getMails } from './emailService';
 import { getUserFolders, getEmailsInFolder } from './folderService';
@@ -56,10 +55,37 @@ const generateUserStats = async (userId) => {
     // --- Fallback local: calcular métricas en el cliente ---
     const inboxEmails = await getMails('inbox');
     const sentEmails = await getMails('sent');
-    const trashEmails = await getMails('trashi18n.t('common.combinar_todos_los_correos_para_analisis')Error al generar estadísticas:', error);
+    const trashEmails = await getMails('trash');
+
+    // Combinar todos los correos para análisis
+    const allEmails = [...inboxEmails, ...sentEmails, ...trashEmails];
+
+    // Estructura para las estadísticas
+    const stats = {
+      lastUpdated: new Date().toISOString(),
+      emailCounts: {
+        total: allEmails.length,
+        inbox: inboxEmails.length,
+        sent: sentEmails.length,
+        trash: trashEmails.length,
+        unread: inboxEmails.filter((email) => !email.read).length,
+      },
+      activityMetrics: calculateActivityMetrics(allEmails),
+      folderDistribution: calculateFolderDistribution(userId, allEmails),
+      tagDistribution: calculateTagDistribution(userId, allEmails),
+      contactAnalysis: analyzeContacts(allEmails),
+      responseMetrics: calculateResponseMetrics(inboxEmails, sentEmails),
+    };
+
+    // Guardar estadísticas en localStorage
+    saveUserStats(userId, stats);
+
+    return stats;
+  } catch (error) {
+    console.error('Error al generar estadísticas:', error);
     return {
       error: true,
-      message: i18n.t('common.pudieron_generar_las_estadisticas'),
+      message: 'No se pudieron generar las estadísticas',
     };
   }
 };
@@ -110,9 +136,123 @@ const calculateActivityMetrics = (emails) => {
     const emailDate = new Date(email.date);
 
     // Determinar si es enviado o recibido
-    const isSent = email.from && email.from.includes('@maloveapp.comi18n.t('common.contar_por_periodo_emaildate_today_metricstoday')Ti18n.t('common.metricsdailydatestr_issent_metricsdailydatestrsent_else_metricsdailydatestrreceived_emaildate')inbox') folderDistribution.system.inbox++;
+    const isSent = email.from && email.from.includes('@maloveapp.com');
+
+    // Contar por período
+    if (emailDate >= today) {
+      metrics.today++;
+    } else if (emailDate >= yesterday) {
+      metrics.yesterday++;
+    }
+
+    if (emailDate >= oneWeekAgo) {
+      metrics.thisWeek++;
+
+      // Agregar al gráfico diario
+      const dateStr = emailDate.toISOString().split('T')[0];
+      if (metrics.daily[dateStr]) {
+        if (isSent) {
+          metrics.daily[dateStr].sent++;
+        } else {
+          metrics.daily[dateStr].received++;
+        }
+      }
+    }
+
+    if (emailDate >= oneMonthAgo) {
+      metrics.thisMonth++;
+    }
+  });
+
+  // Convertir el objeto daily a un array para facilitar el renderizado
+  metrics.dailyGraph = Object.values(metrics.daily);
+
+  return metrics;
+};
+
+/**
+ * Calcula la distribución de correos por carpeta
+ * @param {string} userId - ID del usuario
+ * @param {Array} emails - Lista de correos
+ * @returns {Object} Distribución por carpetas
+ */
+const calculateFolderDistribution = (userId, emails) => {
+  const folderDistribution = {
+    system: {
+      inbox: 0,
+      sent: 0,
+      trash: 0,
+    },
+    custom: [],
+  };
+
+  // Contar correos por carpeta del sistema
+  emails.forEach((email) => {
+    if (email.folder === 'inbox') folderDistribution.system.inbox++;
     else if (email.folder === 'sent') folderDistribution.system.sent++;
-    else if (email.folder === 'trashi18n.t('common.folderdistributionsystemtrash_obtener_carpetas_personalizadas_const_customfolders')@maloveapp.com')) {
+    else if (email.folder === 'trash') folderDistribution.system.trash++;
+  });
+
+  // Obtener carpetas personalizadas
+  const customFolders = getUserFolders(userId);
+
+  // Contar correos por carpeta personalizada
+  customFolders.forEach((folder) => {
+    const folderEmails = getEmailsInFolder(userId, folder.id);
+    folderDistribution.custom.push({
+      id: folder.id,
+      name: folder.name,
+      count: folderEmails.length,
+    });
+  });
+
+  return folderDistribution;
+};
+
+/**
+ * Calcula la distribución de correos por etiquetas
+ * @param {string} userId - ID del usuario
+ * @param {Array} emails - Lista de correos
+ * @returns {Object} Distribución por etiquetas
+ */
+const calculateTagDistribution = (userId, emails) => {
+  // Obtener todas las etiquetas disponibles
+  const allTags = getUserTags(userId);
+
+  // Inicializar contadores para cada etiqueta
+  const tagStats = allTags.map((tag) => ({
+    id: tag.id,
+    name: tag.name,
+    color: tag.color,
+    count: 0,
+  }));
+
+  // Contar correos por etiqueta
+  allTags.forEach((tag) => {
+    const taggedEmails = getEmailsByTag(userId, tag.id);
+    const tagStat = tagStats.find((ts) => ts.id === tag.id);
+    if (tagStat) {
+      tagStat.count = taggedEmails.length;
+    }
+  });
+
+  // Ordenar por cantidad (mayor a menor)
+  tagStats.sort((a, b) => b.count - a.count);
+
+  return tagStats;
+};
+
+/**
+ * Analiza la distribución de correos por contactos
+ * @param {Array} emails - Lista de correos
+ * @returns {Object} Análisis de contactos
+ */
+const analyzeContacts = (emails) => {
+  const contactMap = new Map();
+
+  emails.forEach((email) => {
+    // Procesar remitente
+    if (email.from && !email.from.includes('@maloveapp.com')) {
       const senderName = extractNameFromEmail(email.from);
       const senderContact = contactMap.get(senderName) || {
         name: senderName,
@@ -134,7 +274,50 @@ const calculateActivityMetrics = (emails) => {
     }
 
     // Procesar destinatario
-    if (email.to && !email.to.includes('@maloveapp.comi18n.t('common.const_recipientname_extractnamefromemailemailto_const_recipientcontact_contactmapgetrecipientname')Desconocido';
+    if (email.to && !email.to.includes('@maloveapp.com')) {
+      const recipientName = extractNameFromEmail(email.to);
+      const recipientContact = contactMap.get(recipientName) || {
+        name: recipientName,
+        sent: 0,
+        received: 0,
+        lastContact: null,
+      };
+
+      recipientContact.sent++;
+
+      if (
+        !recipientContact.lastContact ||
+        new Date(email.date) > new Date(recipientContact.lastContact)
+      ) {
+        recipientContact.lastContact = email.date;
+      }
+
+      contactMap.set(recipientName, recipientContact);
+    }
+  });
+
+  // Convertir a array y ordenar por número total de interacciones
+  const contacts = Array.from(contactMap.values())
+    .map((contact) => ({
+      ...contact,
+      total: contact.sent + contact.received,
+    }))
+    .sort((a, b) => b.total - a.total);
+
+  return {
+    topContacts: contacts.slice(0, 5),
+    totalContacts: contacts.length,
+    contacts: contacts,
+  };
+};
+
+/**
+ * Extrae el nombre de una dirección de correo
+ * @param {string} emailAddress - Dirección de correo (puede incluir nombre)
+ * @returns {string} Nombre extraído
+ */
+const extractNameFromEmail = (emailAddress) => {
+  if (!emailAddress) return 'Desconocido';
 
   // Si tiene formato "Nombre <email@ejemplo.com>"
   const match = emailAddress.match(/^([^<]+)\s*<([^>]+)>$/);

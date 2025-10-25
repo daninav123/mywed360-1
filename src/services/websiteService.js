@@ -1,4 +1,3 @@
-import i18n from '../i18n';
 import {
   addDoc,
   collection,
@@ -490,19 +489,19 @@ export const requestWebsiteAiHtml = async ({
     data = await response.json();
   } catch (err) {
     if (response.ok) {
-      throw new Error(i18n.t('common.respuesta_invalida_generar_sitio_con'));
+      throw new Error('Respuesta inválida al generar el sitio con IA');
     }
   }
 
   if (!response.ok) {
-    const error = new Error(data?.error || i18n.t('common.pudo_generar_pagina_con'));
+    const error = new Error(data?.error || 'No se pudo generar la página con IA');
     error.details = data;
     error.status = response.status;
     throw error;
   }
 
   if (!data || typeof data.html !== 'string') {
-    const error = new Error(i18n.t('common.respuesta_invalida_generar_sitio_con'));
+    const error = new Error('Respuesta inválida al generar el sitio con IA');
     error.details = data;
     throw error;
   }

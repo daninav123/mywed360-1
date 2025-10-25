@@ -2,14 +2,11 @@ import { doc, getDoc, setDoc, query, collection, where, getDocs } from 'firebase
 import { useState, useCallback } from 'react';
 
 import { auth, db as firestore } from '../lib/firebase';
-import { useTranslations } from '../../hooks/useTranslations';
 
 /**
  * Hook para gestionar la verificación y configuración de nombres de usuario para correo electrónico
  */
 const useEmailUsername = () => {
-  const { t } = useTranslations();
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -31,7 +28,7 @@ const useEmailUsername = () => {
       // Comprobar si cumple con el formato permitido
       const usernameRegex = /^[a-z0-9][a-z0-9._-]{2,29}$/i;
       if (!usernameRegex.test(normalizedUsername)) {
-        setError(t('common.nombre_usuario_tiene_formato_valido'));
+        setError('El nombre de usuario no tiene un formato válido');
         return false;
       }
 
@@ -50,7 +47,7 @@ const useEmailUsername = () => {
         'prueba',
       ];
       if (reservedNames.includes(normalizedUsername)) {
-        setError(t('common.este_nombre_usuario_esta_reservado'));
+        setError('Este nombre de usuario está reservado');
         return false;
       }
 
@@ -65,7 +62,7 @@ const useEmailUsername = () => {
       return querySnapshot.empty; // Disponible si la consulta no devuelve resultados
     } catch (err) {
       console.error('Error al comprobar disponibilidad del nombre:', err);
-      setError(t('common.error_verificar_disponibilidad_intentalo_nuevo'));
+      setError('Error al verificar disponibilidad. Inténtalo de nuevo.');
       return false;
     } finally {
       setLoading(false);
@@ -83,7 +80,7 @@ const useEmailUsername = () => {
 
       const currentUser = auth.currentUser;
       if (!currentUser) {
-        setError(t('common.debes_iniciar_sesion_para_reservar'));
+        setError('Debes iniciar sesión para reservar un nombre de usuario');
         return false;
       }
 
@@ -120,7 +117,7 @@ const useEmailUsername = () => {
         return true;
       } catch (err) {
         console.error('Error al reservar nombre de usuario:', err);
-        setError(t('common.error_guardar_nombre_usuario_intentalo'));
+        setError('Error al guardar el nombre de usuario. Inténtalo de nuevo.');
         return false;
       } finally {
         setLoading(false);
@@ -157,7 +154,7 @@ const useEmailUsername = () => {
       return null;
     } catch (err) {
       console.error('Error al obtener nombre de usuario:', err);
-      setError(t('common.error_cargar_informacion_usuario'));
+      setError('Error al cargar información de usuario');
       return null;
     } finally {
       setLoading(false);

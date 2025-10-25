@@ -1,17 +1,22 @@
-import i18n from '../i18n';
-
 /**
  * Stripe Service - Frontend
  * Maneja la creación de sesiones de checkout con Stripe
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004i18n.t('common.crea_una_sesion_checkout_para_producto')wedding_pass', 'planner_pack5_monthly')
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004';
+
+/**
+ * Crea una sesión de checkout para un producto
+ * @param {string} productId - ID del producto (ej: 'wedding_pass', 'planner_pack5_monthly')
  * @param {string} weddingId - ID de la boda (opcional)
  * @returns {Promise<Object>} - Objeto con sessionId y url de checkout
  */
 export async function createCheckoutSession({ productId, weddingId = null }) {
   try {
-    const token = localStorage.getItem('authTokeni18n.t('common.todo_ajustar_segun_sistema_auth_const')POST',
+    const token = localStorage.getItem('authToken'); // TODO: Ajustar según tu sistema de auth
+
+    const response = await fetch(`${API_BASE_URL}/api/stripe/create-checkout-session`, {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         ...(token && { 'Authorization': `Bearer ${token}` }),
@@ -26,7 +31,7 @@ export async function createCheckoutSession({ productId, weddingId = null }) {
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.message || i18n.t('common.error_crear_sesion_pago'));
+      throw new Error(error.message || 'Error al crear sesión de pago');
     }
 
     return await response.json();
@@ -53,7 +58,17 @@ export const PRODUCT_IDS = {
   teams40Monthly: 'teams40_monthly',
   teams40Annual: 'teams40_annual',
   teamsUnlimitedMonthly: 'teams_unlimited_monthly',
-  teamsUnlimitedAnnual: 'teams_unlimited_annuali18n.t('common.verifica_estado_una_sesion_checkout_param')authToken');
+  teamsUnlimitedAnnual: 'teams_unlimited_annual',
+};
+
+/**
+ * Verifica el estado de una sesión de checkout
+ * @param {string} sessionId - ID de la sesión
+ * @returns {Promise<Object>} - Estado de la sesión
+ */
+export async function getCheckoutSession(sessionId) {
+  try {
+    const token = localStorage.getItem('authToken');
 
     const response = await fetch(`${API_BASE_URL}/api/stripe/session/${sessionId}`, {
       method: 'GET',
@@ -64,7 +79,7 @@ export const PRODUCT_IDS = {
     });
 
     if (!response.ok) {
-      throw new Error(i18n.t('common.error_obtener_sesion'));
+      throw new Error('Error al obtener sesión');
     }
 
     return await response.json();

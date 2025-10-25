@@ -1,4 +1,3 @@
-import { useTranslations } from '../../hooks/useTranslations';
 import { doc, onSnapshot, setDoc, serverTimestamp, getDoc } from 'firebase/firestore';
 import { useState, useEffect, useCallback, useRef } from 'react';
 
@@ -16,9 +15,7 @@ const STORAGE_KEY = 'mywed360SpecialMoments';
 
 // Bloques por defecto (alineados con pginas existentes)
 const DEFAULT_BLOCKS = [
-  {
-  const { t } = useTranslations();
- id: 'ceremonia', name: 'Ceremonia' },
+  { id: 'ceremonia', name: 'Ceremonia' },
   // Nota: en Momentos Especiales histricamente se usa "coctail" mientras en Timing aparece "coctel".
   // Conservamos la clave "coctail" por compatibilidad y normalizamos en los componentes cuando sea necesario.
   { id: 'coctail', name: 'Cctel' },
@@ -27,8 +24,6 @@ const DEFAULT_BLOCKS = [
 ];
 
 export const MAX_MOMENTS_PER_BLOCK = 200;
-export const RESPONSABLES_LIMIT = 12;
-export const SUPPLIERS_LIMIT = 12;
 
 // Estructura inicial por defecto
 const withRecipientDefaults = (list = []) =>
@@ -104,7 +99,7 @@ const defaultData = {
     disco: withRecipientDefaults([
       { id: 11, order: 1, title: 'Primer Baile', song: '', time: '', duration: '', type: 'baile', location: '', responsables: [], requirements: '', suppliers: [], optional: false, state: 'pendiente', key: 'primer_baile' },
       { id: 12, order: 2, title: 'Animar pista', song: '', time: '', duration: '', type: 'otro', location: '', responsables: [], requirements: '', suppliers: [], optional: false, state: 'pendiente', key: '' },
-      { id: 13, order: 3, title: t('common.ultimo_tema'), song: '', time: '', duration: '', type: 'otro', location: '', responsables: [], requirements: '', suppliers: [], optional: false, state: 'pendiente', key: '' },
+      { id: 13, order: 3, title: 'Último tema', song: '', time: '', duration: '', type: 'otro', location: '', responsables: [], requirements: '', suppliers: [], optional: false, state: 'pendiente', key: '' },
     ]),
   },
 };
@@ -521,13 +516,13 @@ export default function useSpecialMoments() {
     
     // Campos críticos para ciertos tipos de momentos
     if (!moment.title || moment.title.trim() === '') {
-      errors.push(t('common.titulo_requerido'));
+      errors.push('Título es requerido');
     }
     
     // Validar según el tipo
     if (moment.type === 'entrada' || moment.type === 'salida') {
       if (!moment.song || moment.song.trim() === '') {
-        errors.push(t('common.musica_requerida_para_entradas_salidas'));
+        errors.push('Música es requerida para entradas y salidas');
       }
     }
     
@@ -539,7 +534,7 @@ export default function useSpecialMoments() {
     
     if (moment.type === 'baile' && moment.key === 'primer_baile') {
       if (!moment.song || moment.song.trim() === '') {
-        errors.push(t('common.cancion_del_primer_baile_requerida'));
+        errors.push('Canción del primer baile es requerida');
       }
     }
     
@@ -547,7 +542,7 @@ export default function useSpecialMoments() {
     if (moment.time && moment.duration) {
       const timePattern = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
       if (!timePattern.test(moment.time)) {
-        errors.push(t('common.formato_hora_invalido_use_hhmm'));
+        errors.push('Formato de hora inválido (use HH:MM)');
       }
     }
     

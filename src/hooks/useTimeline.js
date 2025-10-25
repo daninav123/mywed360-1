@@ -4,12 +4,9 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useWedding } from '../context/WeddingContext';
 import { db } from '../firebaseConfig';
 import useSpecialMoments from './useSpecialMoments';
-import { useTranslations } from '../../hooks/useTranslations';
 
 // Estados posibles de los bloques
 const BLOCK_STATES = {
-  const { t } = useTranslations();
-
   ON_TIME: 'on-time',
   SLIGHTLY_DELAYED: 'slightly-delayed',
   DELAYED: 'delayed',
@@ -44,7 +41,7 @@ const DEFAULT_BLOCKS = [
   },
   {
     id: 'coctel',
-    name: t('common.coctel'),
+    name: 'Cóctel',
     startTime: '12:30',
     endTime: '14:00',
     status: BLOCK_STATES.ON_TIME,

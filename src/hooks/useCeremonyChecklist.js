@@ -4,14 +4,11 @@ import { collection, getDocs, doc, onSnapshot, serverTimestamp, setDoc } from 'f
 import { useWedding } from '../context/WeddingContext';
 import { db } from '../firebaseConfig';
 import { performanceMonitor } from '../services/PerformanceMonitor';
-import { useTranslations } from '../../hooks/useTranslations';
 
 const DEFAULT_ITEMS = [
   {
-  const { t } = useTranslations();
-
     id: 'legal_documents',
-    label: t('common.documentacion_legal_completa'),
+    label: 'Documentación legal completa',
     category: 'Documentos',
     status: 'pending',
     dueDate: '',
@@ -37,11 +34,11 @@ const DEFAULT_ITEMS = [
   },
   {
     id: 'supplier_confirmation',
-    label: t('common.confirmacion_proveedores_ceremonia'),
+    label: 'Confirmación proveedores ceremonia',
     category: 'Proveedores',
     status: 'pending',
     dueDate: '',
-    notes: t('common.musica_decoracion_sonido_fotografia'),
+    notes: 'Música, decoración, sonido, fotografía.',
   },
   {
     id: 'contingency_plan',

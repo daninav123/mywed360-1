@@ -1,4 +1,3 @@
-import i18n from '../i18n';
 import { getAuth } from 'firebase/auth';
 import { doc, getDoc, setDoc, enableNetwork, disableNetwork } from 'firebase/firestore';
 
@@ -11,13 +10,74 @@ import { db } from '../firebaseConfig';
 export const diagnosticarFirestore = async () => {
   const resultado = {
     timestamp: new Date().toISOString(),
-    estadoConexion: 'desconocidoi18n.t('common.usuarioautenticado_false_permisoescritura_false_permisolectura_false')No hay usuario autenticado, requerido para operaciones en Firestorei18n.t('common.return_resultado_intentar_forzar_reconexion_red')Desactivar/activar red para forzar reconexióni18n.t('common.await_disablenetworkdb_await_new_promiseresolve_settimeoutresolve')system_status', 'online_check');
+    estadoConexion: 'desconocido',
+    usuarioAutenticado: false,
+    permisoEscritura: false,
+    permisoLectura: false,
+    errores: [],
+    solucionesIntentadas: [],
+  };
+
+  try {
+    // 1. Comprobar autenticación
+    const auth = getAuth();
+    const usuario = auth.currentUser;
+    resultado.usuarioAutenticado = !!usuario;
+
+    if (!usuario) {
+      resultado.errores.push('No hay usuario autenticado, requerido para operaciones en Firestore');
+      return resultado;
+    }
+
+    // 2. Intentar forzar reconexión a la red
+    try {
+      resultado.solucionesIntentadas.push('Desactivar/activar red para forzar reconexión');
+      await disableNetwork(db);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await enableNetwork(db);
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+    } catch (error) {
+      resultado.errores.push(`Error al reiniciar conexión: ${error.message}`);
+    }
+
+    // 3. Intentar leer un documento público
+    try {
+      const docRef = doc(db, 'system_status', 'online_check');
       await getDoc(docRef);
       resultado.permisoLectura = true;
-      resultado.estadoConexion = 'onlinei18n.t('common.catch_error_resultadoerrorespusherror_leer_documento_publico')usersi18n.t('common.usuariouid_await_setdoc_userdocref_diagnosticcheck_new')test-indexeddb');
+      resultado.estadoConexion = 'online';
+    } catch (error) {
+      resultado.errores.push(`Error al leer documento público: ${error.message}`);
+      resultado.permisoLectura = false;
+    }
+
+    // 4. Intentar escribir en un documento de usuario
+    if (resultado.permisoLectura) {
+      try {
+        const userDocRef = doc(db, 'users', usuario.uid);
+        await setDoc(
+          userDocRef,
+          {
+            diagnosticCheck: new Date().toISOString(),
+            browser: navigator.userAgent,
+          },
+          { merge: true }
+        );
+        resultado.permisoEscritura = true;
+      } catch (error) {
+        resultado.errores.push(`Error al escribir documento de usuario: ${error.message}`);
+        resultado.permisoEscritura = false;
+      }
+    }
+
+    // 5. Verificar configuración de IndexedDB
+    try {
+      if (window.indexedDB) {
+        // Probar acceso a IndexedDB
+        const testRequest = window.indexedDB.open('test-indexeddb');
 
         testRequest.onerror = function () {
-          resultado.errores.push(i18n.t('common.indexeddb_esta_bloqueado_disponible'));
+          resultado.errores.push('IndexedDB está bloqueado o no disponible');
         };
 
         testRequest.onsuccess = function () {
@@ -25,7 +85,7 @@ export const diagnosticarFirestore = async () => {
           testRequest.result.close();
         };
       } else {
-        resultado.errores.push(i18n.t('common.indexeddb_esta_disponible_este_navegador'));
+        resultado.errores.push('IndexedDB no está disponible en este navegador');
       }
     } catch (error) {
       resultado.errores.push(`Error al verificar IndexedDB: ${error.message}`);
@@ -55,12 +115,21 @@ export const repararConexionFirestore = async () => {
       await disableNetwork(db);
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
-      resultado.accionesRealizadas.push('Reactivar redi18n.t('common.await_enablenetworkdb_await_new_promiseresolve_settimeoutresolve')online') {
+      resultado.accionesRealizadas.push('Reactivar red');
+      await enableNetwork(db);
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+    } catch (error) {
+      resultado.errores.push(`Error al reiniciar conexión: ${error.message}`);
+    }
+
+    // 2. Verificar si la reparación tuvo éxito
+    const diagnostico = await diagnosticarFirestore();
+    if (diagnostico.estadoConexion === 'online') {
       resultado.exito = true;
-      resultado.accionesRealizadas.push(i18n.t('common.conexion_restablecida_correctamente'));
+      resultado.accionesRealizadas.push('Conexión restablecida correctamente');
     } else {
       resultado.exito = false;
-      resultado.errores.push(i18n.t('common.pudo_restablecer_conexion'));
+      resultado.errores.push('No se pudo restablecer la conexión');
     }
   } catch (error) {
     resultado.errores.push(`Error durante la reparación: ${error.message}`);

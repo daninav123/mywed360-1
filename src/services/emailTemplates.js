@@ -1,5 +1,3 @@
-import i18n from '../i18n';
-
 // Servicio de plantillas de correo para diferentes tipos de proveedores
 // Este servicio proporciona plantillas predefinidas para agilizar la comunicación con proveedores
 
@@ -19,8 +17,8 @@ import i18n from '../i18n';
 export const EMAIL_TEMPLATES = {
   // Solicitud de información general
   GENERAL_INFO: {
-    name: i18n.t('common.solicitud_informacion'),
-    subject: i18n.t('common.solicitud_informacion_para_boda_weddingdate_weddingplace'),
+    name: 'Solicitud de información',
+    subject: 'Solicitud de información para boda el {{weddingDate}} en {{weddingPlace}}',
     body: `Hola {{providerName}},
 
 Soy {{userName}} y estoy organizando mi boda que se celebrará el {{weddingDate}} en {{weddingPlace}}. 
@@ -40,8 +38,33 @@ Un cordial saludo,
   // Solicitud de presupuesto
   BUDGET_REQUEST: {
     name: 'Solicitud de presupuesto',
-    subject: 'Solicitud de presupuesto para boda el {{weddingDate}}i18n.t('common.body_hola_providername_soy_username_junto')Confirmación de reserva',
-    subject: i18n.t('common.confirmacion_reserva_para_nuestra_boda_weddingdate'),
+    subject: 'Solicitud de presupuesto para boda el {{weddingDate}}',
+    body: `Hola {{providerName}},
+
+Soy {{userName}} y junto con mi pareja estamos organizando nuestra boda para el {{weddingDate}} en {{weddingPlace}}.
+
+Hemos visto sus servicios y nos encantaría recibir un presupuesto detallado adaptado a nuestras necesidades.
+
+Detalles de nuestro evento:
+- Fecha: {{weddingDate}}
+- Lugar: {{weddingPlace}}
+- Número aproximado de invitados: [INDICAR NÚMERO]
+
+Estamos interesados específicamente en: [DETALLAR SERVICIOS ESPECÍFICOS]
+
+¿Sería posible concertar una llamada o videollamada para comentar más detalles?
+
+Muchas gracias,
+{{userName}}
+{{userPhone}}
+{{userEmail}}
+`,
+  },
+
+  // Confirmación de reserva
+  BOOKING_CONFIRMATION: {
+    name: 'Confirmación de reserva',
+    subject: 'Confirmación de reserva para nuestra boda - {{weddingDate}}',
     body: `Estimado/a {{providerName}},
 
 Por la presente queremos confirmar la reserva de sus servicios para nuestra boda que se celebrará el {{weddingDate}} en {{weddingPlace}}.
@@ -62,8 +85,27 @@ Saludos cordiales,
   // Seguimiento
   FOLLOW_UP: {
     name: 'Seguimiento',
-    subject: 'Seguimiento sobre consulta para boda {{weddingDate}}i18n.t('common.body_hola_providername_hace_unos_dias')Fotógrafo - Consulta',
-    subject: i18n.t('common.consulta_sobre_servicios_fotografia_para_boda'),
+    subject: 'Seguimiento sobre consulta para boda {{weddingDate}}',
+    body: `Hola {{providerName}},
+
+Hace unos días les envié una consulta sobre sus servicios para nuestra boda del {{weddingDate}} en {{weddingPlace}}.
+
+Quería hacer un seguimiento para saber si han tenido oportunidad de revisar mi solicitud y si necesitan alguna información adicional por mi parte.
+
+Seguimos muy interesados en contar con sus servicios para nuestro día especial.
+
+Gracias por su atención.
+Un saludo,
+{{userName}}
+{{userPhone}}
+{{userEmail}}
+`,
+  },
+
+  // Fotografía
+  PHOTOGRAPHY: {
+    name: 'Fotógrafo - Consulta',
+    subject: 'Consulta sobre servicios de fotografía para boda {{weddingDate}}',
     body: `Hola {{providerName}},
 
 Soy {{userName}} y estoy organizando mi boda para el {{weddingDate}} en {{weddingPlace}}.
@@ -89,8 +131,32 @@ Muchas gracias,
   // Catering
   CATERING: {
     name: 'Catering - Consulta',
-    subject: 'Consulta sobre servicios de catering para boda {{weddingDate}}i18n.t('common.body_estimado_equipo_providername_pareja_estamos')DJ/Música - Consulta',
-    subject: i18n.t('common.consulta_sobre_musicadj_para_boda_weddingdate'),
+    subject: 'Consulta sobre servicios de catering para boda {{weddingDate}}',
+    body: `Estimado equipo de {{providerName}},
+
+Mi pareja y yo estamos organizando nuestra boda para el {{weddingDate}} en {{weddingPlace}} y estamos interesados en sus servicios de catering.
+
+Nos gustaría saber:
+
+- ¿Qué menús ofrecen para bodas?
+- ¿Tienen opciones para dietas especiales (vegetarianos, veganos, alergias)?
+- ¿Incluyen servicio de camareros, menaje y mobiliario?
+- ¿Ofrecen degustación previa del menú?
+- Precio aproximado por persona
+
+Esperamos su respuesta para valorar las distintas opciones.
+
+Un cordial saludo,
+{{userName}}
+{{userPhone}}
+{{userEmail}}
+`,
+  },
+
+  // DJ/Música
+  MUSIC: {
+    name: 'DJ/Música - Consulta',
+    subject: 'Consulta sobre música/DJ para boda {{weddingDate}}',
     body: `Hola {{providerName}},
 
 Estamos organizando nuestra boda para el {{weddingDate}} en {{weddingPlace}} y estamos buscando servicios de DJ/música para amenizar el evento.
@@ -116,7 +182,7 @@ Saludos cordiales,
   // Flores
   FLOWERS: {
     name: 'Flores - Consulta',
-    subject: i18n.t('common.consulta_sobre_decoracion_floral_para_boda'),
+    subject: 'Consulta sobre decoración floral para boda {{weddingDate}}',
     body: `Estimado/a {{providerName}},
 
 Estoy organizando mi boda que se celebrará el {{weddingDate}} en {{weddingPlace}} y estoy interesado/a en sus servicios de decoración floral.
@@ -140,10 +206,60 @@ Muchas gracias,
 
   // Lugar de celebración
   VENUE: {
-    name: i18n.t('common.lugar_celebracion_consulta'),
-    subject: 'Consulta sobre disponibilidad para boda {{weddingDate}}i18n.t('common.body_estimado_equipo_providername_pareja_estamos')Vestido/Traje - Consulta',
-    subject: 'Consulta sobre cita para vestido/traje de bodai18n.t('common.body_hola_providername_estoy_organizando_boda')Invitaciones - Consulta',
-    subject: i18n.t('common.consulta_sobre_diseno_invitaciones_para_boda'),
+    name: 'Lugar de celebración - Consulta',
+    subject: 'Consulta sobre disponibilidad para boda {{weddingDate}}',
+    body: `Estimado equipo de {{providerName}},
+
+Mi pareja y yo estamos buscando un lugar para celebrar nuestra boda el {{weddingDate}}.
+
+Nos gustaría saber:
+
+- ¿Tienen disponibilidad para esa fecha?
+- ¿Qué capacidad tiene el espacio?
+- ¿Qué servicios incluye (catering propio, coordinación, decoración)?
+- ¿Cuál es el precio aproximado por persona?
+- ¿Es posible realizar tanto la ceremonia como el banquete en sus instalaciones?
+- ¿Tienen limitaciones de horario?
+- ¿Podríamos concertar una visita para conocer el espacio?
+
+Agradecemos de antemano su atención.
+
+Un cordial saludo,
+{{userName}}
+{{userPhone}}
+{{userEmail}}
+`,
+  },
+
+  // Vestido / Traje
+  DRESS_SUIT: {
+    name: 'Vestido/Traje - Consulta',
+    subject: 'Consulta sobre cita para vestido/traje de boda',
+    body: `Hola {{providerName}},
+
+Estoy organizando mi boda para el {{weddingDate}} y estoy interesado/a en sus servicios para encontrar mi vestido/traje ideal.
+
+Me gustaría saber:
+
+- ¿Es necesario pedir cita previa?
+- ¿Qué marcas o diseñadores tienen disponibles?
+- ¿Cuál es el rango de precios?
+- ¿Cuánto tiempo se necesita normalmente desde la compra hasta poder llevarlo?
+- ¿Ofrecen servicio de ajustes y modificaciones?
+
+Agradezco su atención y espero poder visitarles pronto.
+
+Un saludo,
+{{userName}}
+{{userPhone}}
+{{userEmail}}
+`,
+  },
+
+  // Invitaciones
+  INVITATIONS: {
+    name: 'Invitaciones - Consulta',
+    subject: 'Consulta sobre diseño de invitaciones para boda',
     body: `Hola {{providerName}},
 
 Estamos organizando nuestra boda que tendrá lugar el {{weddingDate}} en {{weddingPlace}} y estamos interesados en sus servicios de diseño e impresión de invitaciones.

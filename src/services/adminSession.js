@@ -1,5 +1,3 @@
-import i18n from '../i18n';
-
 const ADMIN_SESSION_TOKEN_KEY = 'MaLoveApp_admin_session_token';
 const ADMIN_SESSION_FLAG_KEY = 'isAdminAuthenticated';
 const ADMIN_REMEMBER_ME_KEY = 'MaLoveApp_admin_remember_me';
@@ -8,7 +6,21 @@ const ADMIN_PROFILE_KEY = 'MaLoveApp_admin_profile';
 const ADMIN_SESSION_ID_KEY = 'MaLoveApp_admin_session_id';
 
 export function getAdminSessionToken() {
-  if (typeof window === 'undefinedi18n.t('common.return_null_try_verificar_sesion_expirado')[adminSession] No se pudo leer el token de sesión admin:', error);
+  if (typeof window === 'undefined') return null;
+  try {
+    // Verificar si la sesión ha expirado
+    const expiry = window.localStorage.getItem(ADMIN_SESSION_EXPIRY_KEY);
+    if (expiry) {
+      const expiryTime = parseInt(expiry, 10);
+      if (Date.now() > expiryTime) {
+        // Sesión expirada
+        clearAdminSession();
+        return null;
+      }
+    }
+    return window.localStorage.getItem(ADMIN_SESSION_TOKEN_KEY) || null;
+  } catch (error) {
+    console.warn('[adminSession] No se pudo leer el token de sesión admin:', error);
     return null;
   }
 }
@@ -76,7 +88,26 @@ export function getAdminHeaders(additional = {}) {
 export function hasAdminSession() {
   if (typeof window === 'undefined') return false;
   try {
-    return window.localStorage.getItem(ADMIN_SESSION_FLAG_KEY) === 'truei18n.t('common.catch_return_false_export_function_getadminfetchoptionsinit')include';
+    return window.localStorage.getItem(ADMIN_SESSION_FLAG_KEY) === 'true';
+  } catch {
+    return false;
+  }
+}
+
+export function getAdminFetchOptions(init = {}) {
+  const base = init ? { ...init } : {};
+  if (!base.headers) {
+    base.headers = {};
+  } else {
+    base.headers = { ...base.headers };
+  }
+  
+  // Agregar headers de admin si hay sesión
+  const adminHeaders = getAdminHeaders();
+  base.headers = { ...base.headers, ...adminHeaders };
+  
+  if (!base.credentials) {
+    base.credentials = 'include';
   }
   if (base.auth === undefined) {
     base.auth = false;

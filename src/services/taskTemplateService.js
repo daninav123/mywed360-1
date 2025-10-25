@@ -1,11 +1,21 @@
-import i18n from '../i18n';
 import { collection, doc, getDoc, getDocs, query, where, orderBy, limit, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import defaultWeddingTasks from './defaultWeddingTasks';
 import errorLogger from '../utils/errorLogger';
 
 const COLLECTION_NAME = 'adminTaskTemplates';
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://maloveapp-backend.onrender.comi18n.t('common.obtiene_plantilla_tareas_actualmente_publicada_returns')GET',
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://maloveapp-backend.onrender.com';
+
+/**
+ * Obtiene la plantilla de tareas actualmente publicada
+ * @returns {Promise<Object|null>} Plantilla activa o null
+ */
+export async function getActiveTaskTemplate() {
+  try {
+    // Primero intentar desde backend (tiene caché y optimizaciones)
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/task-templates/active`, {
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -79,7 +89,7 @@ export function transformTemplateToTasks(template, weddingDate) {
     // Crear tarea padre
     const parentTask = {
       id: block.id || `block_${Date.now()}_${Math.random()}`,
-      title: block.name || block.title || i18n.t('common.sin_titulo'),
+      title: block.name || block.title || 'Sin título',
       category: block.category || 'GENERAL',
       phaseStartPct: block.startPct || 0,
       phaseEndPct: block.endPct || 100,
@@ -107,7 +117,7 @@ export function transformTemplateToTasks(template, weddingDate) {
       block.items.forEach((item) => {
         const childTask = {
           id: item.id || `task_${Date.now()}_${Math.random()}`,
-          title: item.name || item.title || i18n.t('common.sin_titulo'),
+          title: item.name || item.title || 'Sin título',
           category: item.category || block.category || 'GENERAL',
           completed: false,
           parentId: parentTask.id,
@@ -164,7 +174,7 @@ function transformLegacySeedToTasks(legacySeed, weddingDate) {
     // Crear tarea padre
     const parentTask = {
       id: parent.id || `parent_${Date.now()}_${Math.random()}`,
-      title: parent.title || i18n.t('common.sin_titulo'),
+      title: parent.title || 'Sin título',
       category: parent.category || 'GENERAL',
       phaseStartPct: parent.phaseStartPct || 0,
       phaseEndPct: parent.phaseEndPct || 100,
@@ -192,7 +202,7 @@ function transformLegacySeedToTasks(legacySeed, weddingDate) {
       parent.children.forEach((child) => {
         const childTask = {
           id: child.id || `child_${Date.now()}_${Math.random()}`,
-          title: child.title || i18n.t('common.sin_titulo'),
+          title: child.title || 'Sin título',
           category: parent.category || 'GENERAL',
           completed: false,
           parentId: parentTask.id,
@@ -253,7 +263,19 @@ export async function migrateDefaultSeedToFirebase() {
 
       // Convertir fechas: el legacy usa startOffsetDays (puede ser negativo)
       // El nuevo formato usa daysBeforeWedding (siempre positivo para "antes")
-      if (typeof parent.startOffsetDays === 'numberi18n.t('common.negativo_150_significa_150_dias_antes')both',
+      if (typeof parent.startOffsetDays === 'number') {
+        // Si es negativo (-150), significa 150 días ANTES
+        block.daysBeforeWedding = parent.startOffsetDays < 0 ? Math.abs(parent.startOffsetDays) : 0;
+        block.durationDays = parent.durationDays || 0;
+      }
+
+      if (parent.children && Array.isArray(parent.children)) {
+        block.items = parent.children.map((child) => {
+          const item = {
+            id: child.id,
+            name: child.title,
+            category: parent.category,
+            assigneeSuggestion: 'both',
             checklist: [],
           };
 
@@ -280,7 +302,7 @@ export async function migrateDefaultSeedToFirebase() {
       version: '1',
       status: 'published',
       name: 'Plantilla Base Migrada',
-      notes: i18n.t('common.migracion_automatica_desde_defaultweddingtasksjs'),
+      notes: 'Migración automática desde defaultWeddingTasks.js',
       blocks,
       totals,
       updatedAt: serverTimestamp(),

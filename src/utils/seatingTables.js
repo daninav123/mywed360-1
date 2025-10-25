@@ -1,5 +1,3 @@
-import i18n from '../i18n';
-
 // Utilities for seating plan tables: defaults, capacity calculation and sanitization
 const SEAT_SPACING_CM = 60; // average space needed per guest along perimeter
 
@@ -35,7 +33,7 @@ export const TABLE_TYPES = [
   },
   {
     id: 'cocktail',
-    label: i18n.t('common.mesa_coctel_alta'),
+    label: 'Mesa cóctel / alta',
     shape: 'circle',
     defaults: {
       diameter: 90,
@@ -84,7 +82,15 @@ export function computeTableCapacity(table = {}) {
   const diameter = Number(table.diameter) || 0;
 
   switch (type) {
-    case 'roundi18n.t('common.const_circ_mathpi_diameter_circ_return')square': {
+    case 'round': {
+      const circ = Math.PI * (diameter || 0);
+      if (!circ) return 0;
+      const raw = Math.max(0, Math.round(circ / SEAT_SPACING_CM));
+      // Ajustar a número par para parejas, mínimo 2
+      const even = raw % 2 === 0 ? raw : raw + 1;
+      return Math.max(2, even);
+    }
+    case 'square': {
       if (!width || !height) return 0;
       const perimetro = 2 * (width + height);
       const seats = Math.floor(perimetro / SEAT_SPACING_CM);

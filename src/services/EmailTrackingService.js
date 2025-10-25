@@ -1,5 +1,4 @@
 // EmailTrackingService.js - Servicio para el seguimiento de respuestas de proveedores
-import i18n from '../i18n';
 import { saveData, loadData } from './SyncService';
 import { addTagToEmail, SYSTEM_TAGS } from './tagService';
 import { auth } from '../firebaseConfig';
@@ -9,12 +8,50 @@ const TRACKING_STORAGE_KEY = 'maloveapp_email_tracking';
 // Estados posibles para seguimiento de correos
 export const TRACKING_STATUS = {
   WAITING: 'waiting', // Esperando respuesta
-  RESPONDED: 'respondedi18n.t('common.proveedor_respondio_followup')followup', // Requiere seguimiento adicional
-  COMPLETED: 'completedi18n.t('common.conversacion_completadacerrada_urgent')urgenti18n.t('common.requiere_atencion_urgente_etiquetas_disponibles_para')provideri18n.t('common.comunicacion_con_proveedor_important')important', // Correo importante
+  RESPONDED: 'responded', // Proveedor respondió
+  FOLLOWUP: 'followup', // Requiere seguimiento adicional
+  COMPLETED: 'completed', // Conversación completada/cerrada
+  URGENT: 'urgent', // Requiere atención urgente
+};
+
+// Etiquetas disponibles para correos
+export const EMAIL_TAGS = {
+  PROVIDER: 'provider', // Comunicación con proveedor
+  IMPORTANT: 'important', // Correo importante
   BUDGET: 'budget', // Relacionado con presupuesto
   CONTRACT: 'contract', // Relacionado con contrato
   QUESTION: 'question', // Consulta o pregunta
-  OFFER: 'offeri18n.t('common.oferta_promocion_appointment')appointmenti18n.t('common.cita_reunion_aigenerated')ai-generadoi18n.t('common.correo_generado_por_estructura_registro_seguimiento')function') {
+  OFFER: 'offer', // Oferta o promoción
+  APPOINTMENT: 'appointment', // Cita o reunión
+  AI_GENERATED: 'ai-generado', // Correo generado por AI
+};
+
+// Estructura de un registro de seguimiento
+// {
+//   id: string,              // ID único del seguimiento
+//   emailId: string,         // ID del correo relacionado
+//   providerId: string,      // ID del proveedor (si aplica)
+//   providerName: string,    // Nombre del proveedor
+//   providerEmail: string,   // Email del proveedor
+//   subject: string,         // Asunto del correo
+//   status: string,          // Estado del seguimiento (TRACKING_STATUS)
+//   tags: string[],          // Etiquetas aplicadas
+//   lastEmailDate: Date,     // Fecha del último correo
+//   dueDate: Date,           // Fecha límite para seguimiento (opcional)
+//   notes: string,           // Notas adicionales
+//   thread: [                // Hilo de correos relacionados
+//     { emailId, direction, date, subject, snippet }
+//   ]
+//   isAIGenerated: boolean,  // Si el correo fue generado por AI
+//   aiTrackingId: string,    // ID de seguimiento de actividad AI (si aplica)
+// }
+
+// Cargar registros de seguimiento
+export function loadTrackingRecords() {
+  try {
+    const data = loadData(TRACKING_STORAGE_KEY, { defaultValue: [] });
+    // Si loadData es asíncrono (Promise), usar localStorage como lectura síncrona
+    if (data && typeof data.then === 'function') {
       try {
         const raw = localStorage.getItem(TRACKING_STORAGE_KEY);
         const parsed = JSON.parse(raw || '[]');
@@ -71,14 +108,48 @@ export function createTrackingRecord(email, provider, options = {}) {
           direction: 'outgoing',
           date: new Date(),
           subject: email.subject,
-          snippet: email.body.substring(0, 100) + (email.body.length > 100 ? '...' : 'i18n.t('common.actualizar_registro_lista_const_updatedrecords_listmaprecord')',
+          snippet: email.body.substring(0, 100) + (email.body.length > 100 ? '...' : ''),
+        },
+      ],
+    };
+
+    // Actualizar el registro en la lista
+    const updatedRecords = list.map((record) =>
+      record.id === existingRecord.id ? updatedRecord : record
+    );
+
+    saveTrackingRecords(updatedRecords);
+    return updatedRecord;
+  } else {
+    // Crear un nuevo registro de seguimiento
+    const newRecord = {
+      id: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2),
+      emailId: email.id,
+      providerId: provider.id,
+      providerName: provider.name,
+      providerEmail: provider.email,
+      subject: email.subject,
+      status: TRACKING_STATUS.WAITING,
+      tags: [EMAIL_TAGS.PROVIDER],
+      lastEmailDate: new Date(),
+      dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // Por defecto, 7 días
+      notes: '',
       thread: [
         {
           emailId: email.id,
           direction: 'outgoing',
           date: new Date(),
           subject: email.subject,
-          snippet: email.body.substring(0, 100) + (email.body.length > 100 ? '...' : 'i18n.t('common.isaigenerated_optionsisaigenerated_false_aitrackingid_optionsaitrackingid_null')presupuesto') ||
+          snippet: email.body.substring(0, 100) + (email.body.length > 100 ? '...' : ''),
+        },
+      ],
+      isAIGenerated: options.isAIGenerated || false,
+      aiTrackingId: options.aiTrackingId || null,
+    };
+
+    // Añadir etiquetas adicionales basadas en el asunto y contenido
+    if (
+      email.subject.toLowerCase().includes('presupuesto') ||
       email.body.toLowerCase().includes('presupuesto')
     ) {
       newRecord.tags.push(EMAIL_TAGS.BUDGET);
@@ -94,8 +165,8 @@ export function createTrackingRecord(email, provider, options = {}) {
     if (
       email.subject.toLowerCase().includes('cita') ||
       email.body.toLowerCase().includes('cita') ||
-      email.subject.toLowerCase().includes(i18n.t('common.reunion')) ||
-      email.body.toLowerCase().includes(i18n.t('common.reunion'))
+      email.subject.toLowerCase().includes('reunión') ||
+      email.body.toLowerCase().includes('reunión')
     ) {
       newRecord.tags.push(EMAIL_TAGS.APPOINTMENT);
     }
@@ -158,7 +229,74 @@ export function updateTrackingStatus(recordId, status, notes = null, dueDate = u
         ...record,
         status,
         notes: notes !== null ? notes : record.notes,
-        dueDate: typeof dueDate !== 'undefinedi18n.t('common.duedate_recordduedate_return_record_savetrackingrecordsupdatedrecords_obtener')maloveapp_user_profile') || '{}');
+        dueDate: typeof dueDate !== 'undefined' ? dueDate : record.dueDate,
+      };
+    }
+    return record;
+  });
+
+  saveTrackingRecords(updatedRecords);
+}
+
+// Obtener registros que necesitan seguimiento (sin respuesta después de N días)
+export function getTrackingNeedingFollowup(days = 3) {
+  const trackingRecords = loadTrackingRecords();
+  const list = Array.isArray(trackingRecords) ? trackingRecords : [];
+  const now = new Date();
+  const cutoffDate = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+
+  return trackingRecords.filter(
+    (record) =>
+      record.status === TRACKING_STATUS.WAITING && new Date(record.lastEmailDate) < cutoffDate
+  );
+}
+
+// Añadir o eliminar etiquetas de un registro
+export function updateTrackingTags(recordId, tags) {
+  const trackingRecords = loadTrackingRecords();
+  const list = Array.isArray(trackingRecords) ? trackingRecords : [];
+
+  const updatedRecords = list.map((record) => {
+    if (record.id === recordId) {
+      return {
+        ...record,
+        tags,
+      };
+    }
+    return record;
+  });
+
+  saveTrackingRecords(updatedRecords);
+}
+
+// Eliminar un registro de seguimiento
+export function deleteTrackingRecord(recordId) {
+  const trackingRecords = loadTrackingRecords();
+  const list = Array.isArray(trackingRecords) ? trackingRecords : [];
+  const updatedRecords = trackingRecords.filter((record) => record.id !== recordId);
+  saveTrackingRecords(updatedRecords);
+}
+
+// Detectar automáticamente si un correo entrante es de un proveedor conocido
+export function detectProviderResponse(email, providers) {
+  // Si el correo entrante es de un dominio conocido de proveedor
+  const providerMatch = providers.find(
+    (p) => p.email && email.from.toLowerCase().includes(p.email.toLowerCase())
+  );
+
+  if (providerMatch) {
+    return updateTrackingWithResponse(email);
+  }
+
+  return null;
+}
+
+// Marcar un correo relacionado con un proveedor
+export function tagProviderEmail_old(emailId, providerId) {
+  try {
+    const profile = (() => {
+      try {
+        return JSON.parse(localStorage.getItem('maloveapp_user_profile') || '{}');
       } catch {
         return {};
       }

@@ -1,5 +1,3 @@
-import i18n from '../i18n';
-
 // Puente para integrar con extensión de WhatsApp Web (una sola acción)
 // La extensión debe inyectar un contentScript que escuche window.postMessage.
 // Protocolo simple:
@@ -94,7 +92,11 @@ export function sendBatchMessages(items = [], options = {}) {
         }
       };
       window.addEventListener('message', onMsg);
-      window.postMessage(payload, '*i18n.t('common.fallback_extension_responde_result_settimeout_try')message', onMsg);
+      window.postMessage(payload, '*');
+      // Fallback si la extensión no responde a RESULT
+      setTimeout(() => {
+        try {
+          window.removeEventListener('message', onMsg);
         } catch {}
         resolve({ success: true, started: items.length, noAck: true });
       }, 8000);

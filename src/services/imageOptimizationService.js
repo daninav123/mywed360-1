@@ -1,5 +1,3 @@
-import i18n from '../i18n';
-
 /**
  * Servicio para optimización de imágenes y assets
  * Incluye lazy loading, compresión y formatos modernos
@@ -11,8 +9,66 @@ const DEFAULT_CONFIG = {
   maxWidth: 1920,
   maxHeight: 1080,
   format: 'webp',
-  fallbackFormat: 'jpegi18n.t('common.lazyloadoffset_100_pixeles_antes_que_imagen')#f3f4f6i18n.t('common.comprime_una_imagen_usando_canvas_api')canvas');
-    const ctx = canvas.getContext('2di18n.t('common.const_img_new_image_imgonload_calcular')canvas');
+  fallbackFormat: 'jpeg',
+  lazyLoadOffset: 100, // píxeles antes de que la imagen entre en viewport
+  placeholderColor: '#f3f4f6',
+};
+
+/**
+ * Comprime una imagen usando Canvas API
+ * @param {File} file - Archivo de imagen
+ * @param {Object} options - Opciones de compresión
+ * @returns {Promise<Blob>} - Imagen comprimida
+ */
+export const compressImage = (file, options = {}) => {
+  return new Promise((resolve, reject) => {
+    const config = { ...DEFAULT_CONFIG, ...options };
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+
+    img.onload = () => {
+      // Calcular nuevas dimensiones manteniendo aspect ratio
+      let { width, height } = img;
+      const aspectRatio = width / height;
+
+      if (width > config.maxWidth) {
+        width = config.maxWidth;
+        height = width / aspectRatio;
+      }
+      if (height > config.maxHeight) {
+        height = config.maxHeight;
+        width = height * aspectRatio;
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+
+      // Dibujar imagen redimensionada
+      ctx.drawImage(img, 0, 0, width, height);
+
+      // Convertir a blob con compresión
+      canvas.toBlob(resolve, `image/${config.format}`, config.quality);
+    };
+
+    img.onerror = reject;
+    img.src = URL.createObjectURL(file);
+  });
+};
+
+/**
+ * Genera placeholder base64 para lazy loading
+ * @param {number} width - Ancho del placeholder
+ * @param {number} height - Alto del placeholder
+ * @param {string} color - Color de fondo
+ * @returns {string} - Data URL del placeholder
+ */
+export const generatePlaceholder = (
+  width = 400,
+  height = 300,
+  color = DEFAULT_CONFIG.placeholderColor
+) => {
+  const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
 
   canvas.width = width;
@@ -35,7 +91,16 @@ export const detectImageSupport = () => {
 
   return {
     webp: canvas.toDataURL('image/webp').startsWith('data:image/webp'),
-    avif: canvas.toDataURL('image/avif').startsWith('data:image/avifi18n.t('common.jpeg_true_png_true_componente_react')react';
+    avif: canvas.toDataURL('image/avif').startsWith('data:image/avif'),
+    jpeg: true,
+    png: true,
+  };
+};
+
+/**
+ * Componente React para imágenes optimizadas con lazy loading
+ */
+import React, { useState, useRef, useEffect } from 'react';
 
 export const OptimizedImage = ({
   src,

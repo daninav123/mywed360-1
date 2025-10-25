@@ -2,7 +2,6 @@
  * Notification Service - Sprint 7
  */
 
-import i18n from '../i18n';
 import { collection, addDoc, updateDoc, doc, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 
@@ -50,8 +49,66 @@ class NotificationService {
   }
 
   async markSent(weddingId, notificationId) {
-    const ref = doc(db, 'weddings', weddingId, 'notificationsi18n.t('common.notificationid_await_updatedocref_sent_true_sentat')22:00',
-    end: '08:00i18n.t('common.exportaciones_adicionales_para_compatibilidad_con_diferentes')Error obteniendo notificaciones:', error);
+    const ref = doc(db, 'weddings', weddingId, 'notifications', notificationId);
+    await updateDoc(ref, { sent: true, sentAt: new Date().toISOString() });
+  }
+
+  getTypes() {
+    return NOTIFICATION_TYPES;
+  }
+}
+
+// Instancia singleton del servicio
+const notificationServiceInstance = new NotificationService();
+
+// Preferencias de notificación por defecto
+export const DEFAULT_NOTIFICATION_PREFS = {
+  email: {
+    newMessage: true,
+    replies: true,
+    mentions: true,
+  },
+  tasks: {
+    assigned: true,
+    dueDate: true,
+    completed: true,
+  },
+  rsvp: {
+    newResponse: true,
+    reminders: true,
+  },
+  system: {
+    updates: true,
+    security: true,
+  },
+  quietHours: {
+    enabled: false,
+    start: '22:00',
+    end: '08:00',
+  },
+};
+
+// Exportaciones adicionales para compatibilidad con diferentes módulos
+export const addNotification = async (notification) => {
+  // Función helper para añadir notificaciones
+  // Si tiene weddingId, usa el servicio, sino solo retorna la notificación
+  if (notification.weddingId) {
+    return await notificationServiceInstance.create(notification.weddingId, notification);
+  }
+  // Para notificaciones que no requieren persistencia, solo retornar
+  return { ...notification, id: Date.now().toString() };
+};
+
+export const getNotifications = async (weddingId) => {
+  // Obtener notificaciones pendientes
+  if (!weddingId) {
+    // Si no hay weddingId, retornar array vacío
+    return [];
+  }
+  try {
+    return await notificationServiceInstance.getPending(weddingId);
+  } catch (error) {
+    console.error('Error obteniendo notificaciones:', error);
     return [];
   }
 };
@@ -111,10 +168,37 @@ export const showNotification = (notification) => {
   
   // Mostrar notificación en el navegador (si está soportado)
   if ('Notification' in window && Notification.permission === 'granted') {
-    new Notification(notification.message || i18n.t('common.notificacion'), {
+    new Notification(notification.message || 'Notificación', {
       body: notification.body || notification.message,
-      icon: '/badge-72.pngi18n.t('common.tag_notificationid_datenowtostring_tambien_podriamos_emitir')undefined') {
-    window.dispatchEvent(new CustomEvent('maloveapp:notificationi18n.t('common.detail_notification_return_notification_export_const')system';
+      icon: '/badge-72.png',
+      tag: notification.id || Date.now().toString(),
+    });
+  }
+  
+  // También podríamos emitir un evento personalizado para que otros componentes lo escuchen
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('maloveapp:notification', { detail: notification }));
+  }
+  
+  return notification;
+};
+
+export const shouldNotify = (notification) => {
+  // Lógica simple para determinar si se debe mostrar una notificación
+  // Puede ser extendida con preferencias de usuario, quiet hours, etc.
+  if (!notification) return false;
+  
+  // Verificar quiet hours
+  if (isQuietHoursActive()) return false;
+  
+  // Si el usuario tiene el contexto de auth, verificar preferencias
+  if (authContext?.preferences?.notificationsEnabled === false) {
+    return false;
+  }
+  
+  // Verificar preferencias específicas por tipo
+  const prefs = getNotificationPrefs();
+  const notifType = notification.type || 'system';
   const category = notification.category || 'updates';
   
   if (prefs[notifType]?.[category] === false) {

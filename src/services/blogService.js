@@ -1,6 +1,5 @@
 ﻿// blogService.js - noticias de bodas
 
-import i18n from '../i18n';
 import { getBackendBase } from '@/utils/backendBase.js';
 import { translateText } from './translationService.js';
 
@@ -53,7 +52,8 @@ async function fetchFromBackend({ page, pageSize, language, skipLocalCandidates 
     normalizedEnvBase,
     normalizedDerivedBase,
     'http://localhost:4004',
-    'i18n.t('common.proxy_vite_mismo_origen_como_penultimo')https://maloveapp-backend.onrender.com',
+    '', // Proxy de Vite o mismo origen como penúltimo recurso
+    'https://maloveapp-backend.onrender.com',
   ];
   let candidates = Array.from(new Set(rawCandidates.filter((v) => v !== undefined && v !== null)));
   if (skipLocalCandidates) {
@@ -62,7 +62,17 @@ async function fetchFromBackend({ page, pageSize, language, skipLocalCandidates 
       (candidate) =>
         candidate &&
         !/^https?:\/\/localhost(?::4004)?$/i.test(candidate) &&
-        candidate !== 'i18n.t('common.desarrollo_podemos_desactivar_render_con_flag')i18n.t('common.produccion_priorizamos_render_por_fiabilidad_desarrollo')https://maloveapp-backend.onrender.com';
+        candidate !== ''
+    );
+  }
+  // En desarrollo podemos desactivar Render con flag explícito, pero por defecto lo dejamos como último recurso real.
+  if (import.meta?.env?.DEV && DISABLE_RENDER_IN_DEV) {
+    candidates = candidates.filter((b) => !/^https:\/\/mywed360-backend\.onrender\.com$/i.test(b || ''));
+  }
+  // En producción priorizamos Render por fiabilidad; en desarrollo mantenemos prioridad local/env
+  if (import.meta?.env?.PROD) {
+    try {
+      const RENDER_BASE = 'https://maloveapp-backend.onrender.com';
       if (candidates.includes(RENDER_BASE)) {
         candidates = [RENDER_BASE, ...candidates.filter((b) => b !== RENDER_BASE)];
       }

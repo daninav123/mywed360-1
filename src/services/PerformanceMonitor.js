@@ -1,4 +1,3 @@
-import i18n from '../i18n';
 import { useEffect } from "react";
 
 import { post as apiPost } from './apiClient';
@@ -10,7 +9,77 @@ const originalConsoleError = console.error;
 const IS_TEST = (
   (typeof globalThis !== 'undefined' && (globalThis.vi || globalThis.vitest || globalThis.jest)) ||
   (typeof process !== 'undefined' && process.env && (process.env.VITEST || process.env.NODE_ENV === 'test')) ||
-  (typeof import.meta !== 'undefined' && (import.meta.vitest || (import.meta.env && import.meta.env.MODE === 'testi18n.t('common.servicio_monitoreo_rendimiento_para_aplicacion_maloveapp')i18n.t('common.tamano_maximo_cola_eventos_antes_enviar')monitor_init', {
+  (typeof import.meta !== 'undefined' && (import.meta.vitest || (import.meta.env && import.meta.env.MODE === 'test')))
+);
+/**
+ * Servicio de monitoreo de rendimiento para la aplicación MaLoveApp
+ *
+ * Este servicio permite monitorizar el rendimiento de diferentes componentes
+ * y funcionalidades críticas, especialmente el sistema de emails personalizados.
+ */
+
+// Configuración para el monitoreo
+const CONFIG = {
+  // Activar/desactivar el monitoreo
+  // Deshabilitado en tests para que Vitest/Jest no se queden colgados por timers pendientes
+  enabled: !IS_TEST,
+
+  // Nivel de detalle del monitoreo
+  // 0: solo errores críticos
+  // 1: errores y advertencias
+  // 2: información general
+  // 3: información detallada
+  logLevel: 2,
+
+  // Intervalo para enviar métricas al servidor (ms)
+  reportInterval: IS_TEST ? 0 : 60000, // 1 minuto (0 en tests)
+
+  // URL del endpoint para enviar métricas (ingesta)
+  // Notas:
+  // - VITE_METRICS_POST_ENDPOINT: endpoint de ingesta (ej: /api/admin/metrics)
+  // - VITE_METRICS_ENDPOINT: endpoint base para lecturas admin (dashboard)
+  reportUrl: import.meta.env.VITE_METRICS_POST_ENDPOINT || '',
+
+  // Tamaño máximo de la cola de eventos antes de enviar
+  batchSize: 20,
+
+  // Métricas a recopilar
+  metrics: {
+    emailProcessing: true,
+    searchPerformance: true,
+    notificationsRendering: true,
+    eventDetection: true,
+    uiInteractions: true,
+  },
+};
+
+// Clase para el monitoreo de rendimiento
+class PerformanceMonitor {
+  constructor(config = CONFIG) {
+    this.config = {
+      ...CONFIG,
+      ...config,
+    };
+
+    this.metrics = {
+      events: [],
+      errors: [],
+      timings: {},
+      counters: {},
+    };
+
+    this.user = null; // user context { uid, email }
+
+    this.enabled = this.config.enabled;
+    this.pendingFlush = false;
+    this.startTime = Date.now();
+
+    if (this.enabled && this.config.reportInterval) {
+      this.scheduleReporting();
+    }
+
+    // Registrar evento de inicialización
+    this.logEvent('monitor_init', {
       version: import.meta.env.VITE_APP_VERSION || 'dev',
       metrics_enabled: this.config.metrics,
       log_level: this.config.logLevel,
@@ -41,7 +110,260 @@ const IS_TEST = (
       this.reportingTimer = null;
     }
 
-    this.logEvent('monitor_state_changei18n.t('common.enabled_state_setusercontextuser_try_user_useruid')functioni18n.t('common.originalconsoleerror_error_errortype_error_enviar_inmediatamente')criticali18n.t('common.thisflushmetrics_iniciar_medicion_tiempo_para_una')slow_operationi18n.t('common.operation_metricname_duration_durationms_metadata_incrementar')POST',
+    this.logEvent('monitor_state_change', { enabled: state });
+  }
+
+  setUserContext(user) {
+    try {
+      if (user && (user.uid || user.email)) {
+        this.user = { uid: user.uid || null, email: user.email || null };
+      } else {
+        this.user = null;
+      }
+    } catch {
+      this.user = null;
+    }
+  }
+
+  /**
+   * Programar envío periódico de métricas
+   * @private
+   */
+  scheduleReporting() {
+    if (this.reportingTimer) {
+      clearTimeout(this.reportingTimer);
+    }
+
+    this.reportingTimer = setTimeout(() => {
+      this.flushMetrics();
+      this.scheduleReporting();
+    }, this.config.reportInterval);
+  }
+
+  /**
+   * Registrar un evento en el sistema de monitoreo
+   * @param {string} name - Nombre del evento
+   * @param {Object} data - Datos asociados al evento
+   */
+  logEvent(name, data = {}) {
+    if (!this.enabled || this.config.logLevel < 2) return;
+
+    const event = {
+      name,
+      timestamp: Date.now(),
+      data: {
+        ...data,
+        sessionDuration: Date.now() - this.startTime,
+      },
+    };
+
+    this.metrics.events.push(event);
+
+    // Si alcanzamos el tamaño máximo de lote, enviamos las métricas
+    if (this.metrics.events.length >= this.config.batchSize) {
+      this.flushMetrics();
+    }
+
+    if (this.config.logLevel >= 3) {
+      console.debug(`📊 Evento: ${name}`, data);
+    }
+  }
+
+  /**
+   * Registrar un error en el sistema de monitoreo
+   * @param {string} errorType - Tipo de error
+   * @param {Error|string} error - Error o mensaje de error
+   * @param {Object} context - Contexto adicional del error
+   */
+  logError(errorType, error, context = {}) {
+    if (!this.enabled || this.config.logLevel < 1) return;
+
+    const ctx = { ...(context || {}) };
+    if (this.user && !ctx.user) ctx.user = this.user;
+    const errorData = {
+      type: errorType,
+      timestamp: Date.now(),
+      message: error instanceof Error ? error.message : error,
+      stack: error instanceof Error ? error.stack : undefined,
+      context: ctx,
+    };
+
+    this.metrics.errors.push(errorData);
+
+    // Siempre registrar errores en la consola usando el original para evitar recursión
+    if (typeof originalConsoleError === 'function') {
+      originalConsoleError(`❌ Error en ${errorType}:`, error);
+    }
+
+    // Enviar inmediatamente si es un error crítico
+    if (errorType === 'critical') {
+      this.flushMetrics();
+    }
+  }
+
+  /**
+   * Iniciar medición de tiempo para una operación
+   * @param {string} operationId - Identificador único de la operación
+   * @returns {Function} Función para finalizar la medición
+   */
+  startTimer(operationId) {
+    if (!this.enabled || !this.config.metrics.uiInteractions) return () => {};
+
+    const startTime = performance.now();
+
+    return (metadata = {}) => {
+      const endTime = performance.now();
+      const duration = endTime - startTime;
+
+      this.recordTiming(operationId, duration, metadata);
+      return duration;
+    };
+  }
+
+  /**
+   * Registrar una medición de tiempo
+   * @param {string} metricName - Nombre de la métrica
+   * @param {number} durationMs - Duración en milisegundos
+   * @param {Object} metadata - Metadatos adicionales
+   */
+  recordTiming(metricName, durationMs, metadata = {}) {
+    if (!this.enabled) return;
+
+    if (!this.metrics.timings[metricName]) {
+      this.metrics.timings[metricName] = {
+        count: 0,
+        total: 0,
+        min: Number.MAX_SAFE_INTEGER,
+        max: 0,
+        samples: [],
+      };
+    }
+
+    const timing = this.metrics.timings[metricName];
+    timing.count++;
+    timing.total += durationMs;
+    timing.min = Math.min(timing.min, durationMs);
+    timing.max = Math.max(timing.max, durationMs);
+
+    // Guardar muestra con metadatos
+    timing.samples.push({
+      duration: durationMs,
+      timestamp: Date.now(),
+      metadata,
+    });
+
+    // Limitar número de muestras guardadas
+    if (timing.samples.length > 10) {
+      timing.samples.shift();
+    }
+
+    if (this.config.logLevel >= 3) {
+      console.debug(`⏱️ Tiempo ${metricName}: ${durationMs.toFixed(2)}ms`);
+    }
+
+    // Si la operación es lenta (> 1 segundo), registrar como evento
+    if (durationMs > 1000) {
+      this.logEvent('slow_operation', {
+        operation: metricName,
+        duration: durationMs,
+        ...metadata,
+      });
+    }
+  }
+
+  /**
+   * Incrementar un contador
+   * @param {string} counterName - Nombre del contador
+   * @param {number} value - Valor a incrementar (por defecto 1)
+   */
+  incrementCounter(counterName, value = 1) {
+    if (!this.enabled) return;
+
+    if (!this.metrics.counters[counterName]) {
+      this.metrics.counters[counterName] = 0;
+    }
+
+    this.metrics.counters[counterName] += value;
+  }
+
+  /**
+   * Monitorear el tiempo de ejecución de una función
+   * @param {string} operationName - Nombre de la operación
+   * @param {Function} fn - Función a monitorear
+   * @param {Object} metadata - Metadatos adicionales
+   * @returns {any} El resultado de la función
+   */
+  async measureAsync(operationName, fn, metadata = {}) {
+    if (!this.enabled) return fn();
+
+    const startTime = performance.now();
+
+    try {
+      return await fn();
+    } catch (error) {
+      this.logError(`${operationName}_error`, error, metadata);
+      throw error;
+    } finally {
+      const duration = performance.now() - startTime;
+      this.recordTiming(operationName, duration, metadata);
+    }
+  }
+
+  /**
+   * Monitorear el tiempo de ejecución de una función sincrónica
+   * @param {string} operationName - Nombre de la operación
+   * @param {Function} fn - Función a monitorear
+   * @param {Object} metadata - Metadatos adicionales
+   * @returns {any} El resultado de la función
+   */
+  measure(operationName, fn, metadata = {}) {
+    if (!this.enabled) return fn();
+
+    const startTime = performance.now();
+
+    try {
+      return fn();
+    } catch (error) {
+      this.logError(`${operationName}_error`, error, metadata);
+      throw error;
+    } finally {
+      const duration = performance.now() - startTime;
+      this.recordTiming(operationName, duration, metadata);
+    }
+  }
+
+  /**
+   * Enviar métricas recopiladas al servidor
+   * @returns {Promise<void>}
+   * @private
+   */
+  async flushMetrics() {
+    if (
+      !this.enabled ||
+      this.pendingFlush ||
+      (this.metrics.events.length === 0 &&
+        this.metrics.errors.length === 0 &&
+        Object.keys(this.metrics.timings).length === 0)
+    ) {
+      return;
+    }
+
+    this.pendingFlush = true;
+
+    // Clonar y reiniciar métricas
+    const metricsToSend = { ...this.metrics };
+    this.metrics = {
+      events: [],
+      errors: [],
+      timings: {},
+      counters: { ...this.metrics.counters },
+    };
+
+    try {
+      // Si hay URL de endpoint configurada, enviar métricas
+      if (this.config.reportUrl) {
+        const response = await fetch(this.config.reportUrl, {
+          method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             timestamp: Date.now(),
@@ -116,7 +438,58 @@ const IS_TEST = (
     }
 
     // Registrar el evento de uso de plantilla
-    this.logEvent('template_usagei18n.t('common.templateid_category_action_metadata_incrementar_contadores')template_renderingi18n.t('common.templateid_datasize_timestamp_datenow_monitorear_proceso')email_delivery_attempt', {
+    this.logEvent('template_usage', {
+      templateId,
+      category,
+      action,
+      ...metadata,
+    });
+
+    // Incrementar contadores específicos
+    this.incrementCounter(`template_${action}`);
+    this.incrementCounter(`template_category_${category}`);
+
+    return this.measureAsync(`template_${action}`, fn, {
+      templateId,
+      category,
+      ...metadata,
+    });
+  }
+
+  /**
+   * Monitorear el rendimiento de renderizado de plantillas
+   * @param {string} templateId - ID o nombre de la plantilla
+   * @param {number} dataSize - Tamaño de los datos de la plantilla (en bytes)
+   * @param {Function} fn - Función de renderizado
+   * @returns {Promise<any>} Resultado del renderizado
+   */
+  async monitorTemplateRendering(templateId, dataSize, fn) {
+    if (!this.enabled || !this.config.metrics.emailProcessing) {
+      return fn();
+    }
+
+    return this.measureAsync('template_rendering', fn, {
+      templateId,
+      dataSize,
+      timestamp: Date.now(),
+    });
+  }
+
+  /**
+   * Monitorear el proceso de entrega de email
+   * @param {string} emailId - ID del email
+   * @param {string} recipientType - Tipo de destinatario (provider, guest, etc.)
+   * @param {Function} fn - Función de entrega
+   * @param {Object} metadata - Metadatos adicionales
+   * @returns {Promise<any>} Resultado de la entrega
+   */
+  async monitorEmailDelivery(emailId, recipientType, fn, metadata = {}) {
+    if (!this.enabled || !this.config.metrics.emailProcessing) {
+      return fn();
+    }
+
+    // Registrar evento de intento de entrega
+    this.logEvent('email_delivery_attempt', {
       emailId,
       recipientType,
       ...metadata,
@@ -126,7 +499,14 @@ const IS_TEST = (
     this.incrementCounter(`email_delivery_${recipientType}`);
 
     try {
-      const result = await this.measureAsync('email_deliveryi18n.t('common.emailid_recipienttype_metadata_registrar_exito_entrega')email_delivery_success', {
+      const result = await this.measureAsync('email_delivery', fn, {
+        emailId,
+        recipientType,
+        ...metadata,
+      });
+
+      // Registrar éxito de entrega
+      this.logEvent('email_delivery_success', {
         emailId,
         recipientType,
         ...metadata,
@@ -143,7 +523,80 @@ const IS_TEST = (
       });
 
       // Incrementar contador de fallos
-      this.incrementCounter('email_delivery_failuresi18n.t('common.throw_error_monitorear_interacciones_con_emails')email_interactioni18n.t('common.emailid_interactiontype_timestamp_datenow_metadata_incrementar')email_interactions_totali18n.t('common.monitorear_busqueda_global_param_string_query')searchi18n.t('common.query_querylength_querylength_monitorear_renderizado_notificaciones')notification_renderingi18n.t('common.count_monitorear_deteccion_eventos_emails_param')event_detection', fn, {
+      this.incrementCounter('email_delivery_failures');
+
+      throw error;
+    }
+  }
+
+  /**
+   * Monitorear interacciones con emails (aperturas, clics, etc.)
+   * @param {string} emailId - ID del email
+   * @param {string} interactionType - Tipo de interacción (open, click, etc.)
+   * @param {Object} metadata - Metadatos adicionales
+   */
+  trackEmailInteraction(emailId, interactionType, metadata = {}) {
+    if (!this.enabled || !this.config.metrics.emailProcessing) {
+      return;
+    }
+
+    // Registrar evento de interacción
+    this.logEvent('email_interaction', {
+      emailId,
+      interactionType,
+      timestamp: Date.now(),
+      ...metadata,
+    });
+
+    // Incrementar contadores específicos
+    this.incrementCounter(`email_interaction_${interactionType}`);
+    this.incrementCounter('email_interactions_total');
+  }
+
+  /**
+   * Monitorear búsqueda global
+   * @param {string} query - Consulta de búsqueda
+   * @param {Function} fn - Función de búsqueda
+   * @returns {Promise<any>} Resultados de búsqueda
+   */
+  async monitorSearch(query, fn) {
+    if (!this.enabled || !this.config.metrics.searchPerformance) {
+      return fn();
+    }
+
+    return this.measureAsync('search', fn, {
+      query,
+      queryLength: query?.length || 0,
+    });
+  }
+
+  /**
+   * Monitorear renderizado de notificaciones
+   * @param {number} count - Cantidad de notificaciones
+   * @param {Function} fn - Función de renderizado
+   * @returns {any} Resultado del renderizado
+   */
+  monitorNotificationRendering(count, fn) {
+    if (!this.enabled || !this.config.metrics.notificationsRendering) {
+      return fn();
+    }
+
+    return this.measure('notification_rendering', fn, { count });
+  }
+
+  /**
+   * Monitorear detección de eventos en emails
+   * @param {string} emailId - ID del email
+   * @param {number} contentLength - Longitud del contenido
+   * @param {Function} fn - Función de detección
+   * @returns {Promise<any>} Eventos detectados
+   */
+  async monitorEventDetection(emailId, contentLength, fn) {
+    if (!this.enabled || !this.config.metrics.eventDetection) {
+      return fn();
+    }
+
+    return this.measureAsync('event_detection', fn, {
       emailId,
       contentLength,
     });

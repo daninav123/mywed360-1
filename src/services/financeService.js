@@ -4,7 +4,6 @@
  * Sprint 4 - Completar Finance
  */
 
-import i18n from '../i18n';
 import { collection, doc, getDoc, setDoc, updateDoc, addDoc, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 
@@ -14,9 +13,9 @@ import { db } from '../firebaseConfig';
 export const EXPENSE_CATEGORIES = {
   VENUE: { id: 'venue', name: 'Lugar', icon: '🏛️', color: '#3B82F6' },
   CATERING: { id: 'catering', name: 'Catering', icon: '🍽️', color: '#10B981' },
-  PHOTOGRAPHY: { id: 'photography', name: i18n.t('common.fotografia'), icon: '📸', color: '#8B5CF6' },
+  PHOTOGRAPHY: { id: 'photography', name: 'Fotografía', icon: '📸', color: '#8B5CF6' },
   MUSIC: { id: 'music', name: 'Música', icon: '🎵', color: '#F59E0B' },
-  DECORATION: { id: 'decoration', name: i18n.t('common.decoracion'), icon: '🌸', color: '#EC4899' },
+  DECORATION: { id: 'decoration', name: 'Decoración', icon: '🌸', color: '#EC4899' },
   ATTIRE: { id: 'attire', name: 'Vestuario', icon: '👗', color: '#6366F1' },
   INVITATIONS: { id: 'invitations', name: 'Invitaciones', icon: '✉️', color: '#14B8A6' },
   TRANSPORTATION: { id: 'transportation', name: 'Transporte', icon: '🚗', color: '#EF4444' },
@@ -331,7 +330,7 @@ class FinanceService {
       
       return expenses.map(expense => ({
         'Concepto': expense.name,
-        i18n.t('common.categoria'): EXPENSE_CATEGORIES[expense.category?.toUpperCase()]?.name || 'Otros',
+        'Categoría': EXPENSE_CATEGORIES[expense.category?.toUpperCase()]?.name || 'Otros',
         'Proveedor': expense.vendor || '-',
         'Monto': expense.amount,
         'Pagado': expense.totalPaid || 0,

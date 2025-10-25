@@ -3,7 +3,6 @@
 // Cuando el backend responde con error, propagamos la excepción para que
 // el frontend gestione la incidencia (sin recurrir a mocks silenciosos).
 
-import i18n from '../i18n';
 import { getBackendBase } from '../utils/backendBase';
 
 async function getAuthToken() {
@@ -75,7 +74,7 @@ export async function sendBatch({ weddingId, guestIds, messageTemplate }) {
   }
 
   if (!payload || typeof payload !== 'object') {
-    throw new Error(i18n.t('common.respuesta_invalida_del_backend_whatsapp'));
+    throw new Error('Respuesta inválida del backend de WhatsApp');
   }
 
   return payload;

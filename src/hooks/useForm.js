@@ -1,5 +1,4 @@
 import { useState, useCallback, useMemo } from 'react';
-import { useTranslations } from '../../hooks/useTranslations';
 
 /**
  * Hook personalizado para gestión avanzada de formularios
@@ -10,9 +9,7 @@ import { useTranslations } from '../../hooks/useTranslations';
  * @param {Function} onSubmit - Función a ejecutar al enviar el formulario
  * @returns {Object} Objeto con estado y funciones del formulario
  */
-const useForm = (initialValues = {
-  const { t } = useTranslations();
-}, validationRules = {}, onSubmit) => {
+const useForm = (initialValues = {}, validationRules = {}, onSubmit) => {
   // Estados del formulario
   const [values, setValues] = useState(initialValues);
   const [errors, setErrors] = useState({});
@@ -112,7 +109,7 @@ const useForm = (initialValues = {
 
       // Validación de email
       if (rules.email && value && !/\S+@\S+\.\S+/.test(value)) {
-        return rules.emailMessage || {t('common.formato_del_email_valido')};
+        return rules.emailMessage || 'El formato del email no es válido';
       }
 
       // Validación de URL
@@ -122,7 +119,7 @@ const useForm = (initialValues = {
 
       // Validación de número
       if (rules.number && value && isNaN(Number(value))) {
-        return rules.numberMessage || {t('common.debe_ser_numero_valido')};
+        return rules.numberMessage || 'Debe ser un número válido';
       }
 
       // Validación personalizada

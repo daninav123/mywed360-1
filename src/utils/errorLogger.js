@@ -1,5 +1,3 @@
-import i18n from '../i18n';
-
 /**
  * Sistema de Logging y Diagnóstico de Errores Centralizado
  * Captura todos los errores del frontend y backend para diagnóstico
@@ -15,7 +13,21 @@ class ErrorLogger {
       mailgun: { status: 'unknown', details: null },
       environment: { status: 'unknown', details: null },
       auth: { status: 'unknown', details: null },
-      wedding: { status: 'unknowni18n.t('common.details_null_thisisinitialized_false_thisopenaithrottleuntil_thisisloggingerror')error', (event) => {
+      wedding: { status: 'unknown', details: null },
+    };
+    this.isInitialized = false;
+    this.openAIThrottleUntil = 0;
+    this.isLoggingError = false; // Prevenir recursión
+    this.setupGlobalErrorHandlers();
+    this.startDiagnostics();
+  }
+
+  /**
+   * Configura los manejadores globales de errores
+   */
+  setupGlobalErrorHandlers() {
+    // Capturar errores JavaScript no manejados
+    window.addEventListener('error', (event) => {
       this.logError('JavaScript Error', {
         message: event.message,
         filename: event.filename,
@@ -36,7 +48,19 @@ class ErrorLogger {
     // Interceptar console.error para capturar errores manuales
     this.originalConsoleError = console.error;
     console.error = (...args) => {
-      this.logError('Console Errori18n.t('common.args_llamar_implementacion_original_para_perder')object') ? args[1] : null;
+      this.logError('Console Error', { args });
+      // Llamar a la implementación original para no perder mensajes
+      this.originalConsoleError.apply(console, args);
+    };
+
+        // Interceptar fetch para capturar errores de red
+    const originalFetch = window.fetch;
+    window.fetch = async (...args) => {
+      let suppressLogging = false;
+      try {
+        // Detectar bandera para silenciar logging desde los callers (cabeceras o query param)
+        try {
+          const init = (args && typeof args[1] === 'object') ? args[1] : null;
           const headers = init?.headers;
           if (headers) {
             if (headers.get && typeof headers.get === 'function') {
@@ -77,7 +101,48 @@ class ErrorLogger {
       } catch (error) {
         if (!suppressLogging) {
           this.logError('Network Error', {
-            url: typeof args[0] === 'string' ? args[0] : (args[0]?.url || String(args[0] || 'i18n.t('common.error_errormessage_stack_errorstack_throw_error')Details:', details);
+            url: typeof args[0] === 'string' ? args[0] : (args[0]?.url || String(args[0] || '')),
+            error: error.message,
+            stack: error.stack,
+          });
+        }
+        throw error;
+      }
+    };
+  }
+
+  /**
+   * Registra un error en el sistema
+   */
+  logError(type, details) {
+    // Prevenir recursión infinita
+    if (this.isLoggingError) {
+      return;
+    }
+
+    this.isLoggingError = true;
+
+    try {
+      const errorEntry = {
+        id: Date.now() + Math.random(),
+        timestamp: new Date().toISOString(),
+        type,
+        details,
+        userAgent: navigator.userAgent,
+        url: window.location.href,
+      };
+
+      this.errors.push(errorEntry);
+
+      // Mantener solo los últimos 100 errores para evitar memory leaks
+      if (this.errors.length > 100) {
+        this.errors = this.errors.slice(-100);
+      }
+
+      // Log en consola con formato mejorado evitando recursión
+      if (this.originalConsoleError) {
+        this.originalConsoleError.call(console, `🚨 ${type} - ${new Date().toLocaleTimeString()}`);
+        this.originalConsoleError.call(console, 'Details:', details);
         this.originalConsoleError.call(console, 'Full Error Entry:', errorEntry);
       } else {
         console.group(`🚨 ${type} - ${new Date().toLocaleTimeString()}`);
@@ -124,13 +189,45 @@ class ErrorLogger {
           this.diagnostics.openai.status = 'error';
           this.diagnostics.openai.details = details;
         } else if (urlStr.includes('mailgun')) {
-          this.diagnostics.mailgun.status = 'errori18n.t('common.thisdiagnosticsmailgundetails_details_catch_actualiza_informacion_autenticacion')success', details: info };
+          this.diagnostics.mailgun.status = 'error';
+          this.diagnostics.mailgun.details = details;
+        }
+      } catch {}
+    }
+  }
+
+  /**
+   * Actualiza la información de autenticación (usuario actual)
+   * @param {Object|null} info Información de usuario (uid, email, perfil, etc.)
+   */
+  setAuthInfo(info) {
+    if (info) {
+      this.diagnostics.auth = { status: 'success', details: info };
     } else {
-      this.diagnostics.auth = { status: 'error', details: { message: 'Sin usuario autenticadoi18n.t('common.actualiza_informacion_boda_activa_param_objectnull')success', details: info };
+      this.diagnostics.auth = { status: 'error', details: { message: 'Sin usuario autenticado' } };
+    }
+  }
+
+  /**
+   * Actualiza la información de la boda activa
+   * @param {Object|null} info Información sobre la boda y lista de bodas
+   */
+  setWeddingInfo(info) {
+    if (info && info.activeWedding) {
+      this.diagnostics.wedding = { status: 'success', details: info };
     } else {
       this.diagnostics.wedding = {
         status: 'warning',
-        details: info || { message: 'Sin boda activai18n.t('common.inicia_diagnosticos_automaticos_del_sistema_async')🔍 Iniciando diagnósticos del sistema...');
+        details: info || { message: 'Sin boda activa' },
+      };
+    }
+  }
+
+  /**
+   * Inicia diagnósticos automáticos del sistema
+   */
+  async startDiagnostics() {
+    console.log('🔍 Iniciando diagnósticos del sistema...');
 
     await Promise.all([
       this.checkEnvironmentVariables(),
@@ -181,7 +278,19 @@ class ErrorLogger {
       };
     } catch (error) {
       this.diagnostics.environment = {
-        status: 'errori18n.t('common.details_error_errormessage_verifica_conexion_con')firebase/firestore');
+        status: 'error',
+        details: { error: error.message },
+      };
+    }
+  }
+
+  /**
+   * Verifica la conexión con Firebase
+   */
+  async checkFirebaseConnection() {
+    try {
+      // Importar dinámicamente para evitar errores de inicialización
+      const { getFirestore, doc, getDoc } = await import('firebase/firestore');
       const { getAuth } = await import('firebase/auth');
 
       const db = getFirestore();
@@ -200,7 +309,14 @@ class ErrorLogger {
               projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
               authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
               currentUser: auth.currentUser.uid,
-              connection: 'OK - Authenticated accessi18n.t('common.return_catch_readerror_falla_lectura_pero')success',
+              connection: 'OK - Authenticated access',
+            },
+          };
+          return;
+        } catch (readError) {
+          // Si falla lectura, pero tenemos auth, considerar éxito parcial
+          this.diagnostics.firebase = {
+            status: 'success',
             details: {
               projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
               authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
@@ -227,7 +343,20 @@ class ErrorLogger {
         status: 'error',
         details: {
           error: error.message || String(error),
-          code: error.code || 'unknowni18n.t('common.verifica_conexion_con_backend_async_checkbackendconnection')VITE_BACKEND_BASE_URL no está configurada');
+          code: error.code || 'unknown',
+        },
+      };
+    }
+  }
+
+  /**
+   * Verifica la conexión con el backend
+   */
+  async checkBackendConnection() {
+    try {
+      const backendUrl = import.meta.env.VITE_BACKEND_BASE_URL;
+      if (!backendUrl) {
+        throw new Error('VITE_BACKEND_BASE_URL no está configurada');
       }
 
       const response = await fetch(`${backendUrl}/health`, {
@@ -240,7 +369,35 @@ class ErrorLogger {
       if (response.ok) {
         const data = await response.json();
         this.diagnostics.backend = {
-          status: 'successi18n.t('common.details_url_backendurl_response_data_status')errori18n.t('common.details_error_errormessage_url_importmetaenvvitebackendbaseurl_verifica')warning',
+          status: 'success',
+          details: {
+            url: backendUrl,
+            response: data,
+            status: response.status,
+          },
+        };
+      } else {
+        throw new Error(`Backend respondió con status ${response.status}`);
+      }
+    } catch (error) {
+      this.diagnostics.backend = {
+        status: 'error',
+        details: {
+          error: error.message,
+          url: import.meta.env.VITE_BACKEND_BASE_URL,
+        },
+      };
+    }
+  }
+
+  /**
+   * Verifica la conexión con OpenAI
+  */
+  async checkOpenAIConnection() {
+    try {
+      if (this.openAIThrottleUntil && Date.now() < this.openAIThrottleUntil) {
+        this.diagnostics.openai = {
+          status: 'warning',
           details: {
             reason: 'throttled',
             nextRetryInMs: this.openAIThrottleUntil - Date.now(),
@@ -260,7 +417,7 @@ class ErrorLogger {
       }
       const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
       if (!apiKey) {
-        throw new Error(i18n.t('common.viteopenaiapikey_esta_configurada'));
+        throw new Error('VITE_OPENAI_API_KEY no está configurada');
       }
 
       // Test simple de la API de OpenAI
@@ -290,13 +447,55 @@ class ErrorLogger {
       if (response.status === 401 || response.status === 403) {
         this.openAIThrottleUntil = Date.now() + 10 * 60 * 1000;
         this.diagnostics.openai = {
-          status: 'warningi18n.t('common.details_error_openai_api_respondio_con')string' &&
+          status: 'warning',
+          details: {
+            error: `OpenAI API respondió con status ${response.status}`,
+            status: response.status,
+            retryAt: new Date(this.openAIThrottleUntil).toISOString(),
+          },
+        };
+        return;
+      } else {
+        throw new Error(`OpenAI API respondió con status ${response.status}`);
+      }
+    } catch (error) {
+      if (
+        !this.openAIThrottleUntil &&
+        typeof error?.message === 'string' &&
         /status (401|403)/.test(error.message)
       ) {
         this.openAIThrottleUntil = Date.now() + 10 * 60 * 1000;
       }
       this.diagnostics.openai = {
-        status: 'errori18n.t('common.details_error_errormessage_hasapikey_importmetaenvviteopenaiapikey_thisopenaithrottleuntil')Variables de Mailgun no configuradasi18n.t('common.verificar_traves_del_backend_esta_disponible')GET',
+        status: 'error',
+        details: {
+          error: error.message,
+          hasApiKey: !!import.meta.env.VITE_OPENAI_API_KEY,
+          ...(this.openAIThrottleUntil
+            ? { retryAt: new Date(this.openAIThrottleUntil).toISOString() }
+            : {}),
+        },
+      };
+    }
+  }
+
+  /**
+   * Verifica la configuración de Mailgun
+   */
+  async checkMailgunConnection() {
+    try {
+      const apiKey = import.meta.env.VITE_MAILGUN_API_KEY;
+      const domain = import.meta.env.VITE_MAILGUN_DOMAIN;
+
+      if (!apiKey || !domain) {
+        throw new Error('Variables de Mailgun no configuradas');
+      }
+
+      // Verificar a través del backend si está disponible
+      const backendUrl = import.meta.env.VITE_BACKEND_BASE_URL;
+      if (backendUrl) {
+        const response = await fetch(`${backendUrl}/api/mailgun/test`, {
+          method: 'GET',
           headers: {
             'Content-Type': 'application/json',
           },
@@ -305,7 +504,16 @@ class ErrorLogger {
         if (response.ok) {
           const data = await response.json();
           this.diagnostics.mailgun = {
-            status: 'successi18n.t('common.details_data_else_throw_new_errormailgun')warning',
+            status: 'success',
+            details: data,
+          };
+        } else {
+          throw new Error(`Mailgun test falló con status ${response.status}`);
+        }
+      } else {
+        // Si no hay backend, solo verificar que las variables estén configuradas
+        this.diagnostics.mailgun = {
+          status: 'warning',
           details: {
             message: 'Variables configuradas pero backend no disponible para test',
             domain,
@@ -315,7 +523,24 @@ class ErrorLogger {
       }
     } catch (error) {
       this.diagnostics.mailgun = {
-        status: 'errori18n.t('common.details_error_errormessage_hasapikey_importmetaenvvitemailgunapikey_hasdomain')—— (console.clear() omitido en DEV) ——');
+        status: 'error',
+        details: {
+          error: error.message,
+          hasApiKey: !!import.meta.env.VITE_MAILGUN_API_KEY,
+          hasDomain: !!import.meta.env.VITE_MAILGUN_DOMAIN,
+        },
+      };
+    }
+  }
+
+  /**
+   * Imprime un reporte completo de diagnósticos en la consola
+   */
+  printDiagnosticsReport() {
+    if (!import.meta.env.DEV) {
+      console.clear();
+    } else {
+      console.log('—— (console.clear() omitido en DEV) ——');
     }
     console.log('🔍 REPORTE DE DIAGNÓSTICOS MALOVEAPP');
     console.log('=====================================');

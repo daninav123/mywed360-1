@@ -1,12 +1,20 @@
-import i18n from '../i18n';
-
 /*
   Registro de comandos de consola para diagnóstico y utilidades.
   Se carga automáticamente desde src/main.jsx.
 */
 
 // Aseguramos que no se ejecute en entornos donde window no está disponible (SSR tests)
-if (typeof window !== 'undefinedi18n.t('common.espacio_global_para_evitar_colisiones_windowmywed')../services/diagnosticService.js');
+if (typeof window !== 'undefined') {
+  // Espacio global para evitar colisiones
+  window.mywed = window.mywed || {};
+
+  /**
+   * Ejecuta todas las comprobaciones de diagnóstico disponibles.
+   * Ejemplo de uso en consola: mywed.checkAll()
+   */
+  window.mywed.checkAll = async () => {
+    try {
+      const diagService = await import('../services/diagnosticService.js');
       const report = await diagService.default.runFullDiagnostics?.();
       console.info('✅ Diagnóstico completo ejecutado', report);
       return report;
@@ -32,12 +40,91 @@ if (typeof window !== 'undefinedi18n.t('common.espacio_global_para_evitar_colisi
   };
 
   console.info(
-    '✅  Comandos de consola MaLoveApp registrados: mywed.checkAll(), mywed.clearDiagnostics()i18n.t('common.comandos_consola_para_diagnostico_debugging_proporciona')./errorLogger';
+    '✅  Comandos de consola MaLoveApp registrados: mywed.checkAll(), mywed.clearDiagnostics()'
+  );
+}
+
+/**
+ * Comandos de Consola para Diagnóstico y Debugging
+ * Proporciona comandos fáciles de usar desde la consola del navegador
+ */
+
+import errorLogger from './errorLogger';
 // Carga perezosa para evitar doble import (estático + dinámico)
 let __diagnosticSvc = null;
 async function getDiagnosticService() {
   if (__diagnosticSvc) return __diagnosticSvc;
-  const mod = await import('../services/diagnosticServicei18n.t('common.diagnosticsvc_moddefault_mod_return_diagnosticsvc_class')✅ Ejecutando diagnóstico completo...');
+  const mod = await import('../services/diagnosticService');
+  __diagnosticSvc = mod.default || mod;
+  return __diagnosticSvc;
+}
+
+class ConsoleCommands {
+  constructor() {
+    this.setupCommands();
+  }
+
+  setupCommands() {
+    // Hacer comandos disponibles globalmente
+    window.mywed = {
+      // Diagnósticos rápidos
+      checkAll: () => this.checkAll(),
+      checkEmails: () => this.checkEmails(),
+      checkAI: () => this.checkAI(),
+      checkFirebase: () => this.checkFirebase(),
+      
+      // Diagnóstico específico de sesión admin
+      checkAdminSession: () => this.checkAdminSession(),
+      testAdminRestore: () => this.testAdminRestore(),
+      showAdminStorage: () => this.showAdminStorage(),
+      clearAdminSession: () => this.clearAdminSession(),
+
+      // Gestión de errores
+      errors: () => this.showErrors(),
+      clearErrors: () => this.clearErrors(),
+      copyErrors: () => this.copyErrors(),
+
+      // Información del sistema
+      info: () => this.showSystemInfo(),
+      env: () => this.showEnvironment(),
+
+      // Utilidades
+      help: () => this.showHelp(),
+      reload: () => this.reloadApp(),
+
+      // Acceso directo a servicios
+      logger: errorLogger,
+      diagnostic: undefined,
+    };
+
+    // Cargar servicio en background y exponerlo cuando esté listo
+    getDiagnosticService().then((svc) => {
+      try {
+        window.mywed.diagnostic = svc;
+      } catch {}
+    });
+
+    // Mostrar mensaje de bienvenida
+    this.showWelcomeMessage();
+  }
+
+  showWelcomeMessage() {
+    console.log(`
+✅ MaLoveApp - Sistema de Diagnóstico Activado
+===
+
+Comandos disponibles:
+→ mywed.help()        - Mostrar ayuda completa
+→ mywed.checkAll()    - Diagnóstico completo
+→ mywed.errors()      - Ver errores recientes
+→ mywed.info()        - Información del sistema
+
+💡 Tip: Usa mywed.help() para ver todos los comandos
+    `);
+  }
+
+  async checkAll() {
+    console.log('✅ Ejecutando diagnóstico completo...');
 
     try {
       const diagnosticService = await getDiagnosticService();
@@ -317,7 +404,9 @@ EJEMPLOS DE USO:
     
     console.table({
       'Flag Autenticado': { existe: !!keys.isAdminAuthenticated, valor: keys.isAdminAuthenticated },
-      'Perfil Admini18n.t('common.existe_keysadminprofile_tamano_keysadminprofilelength')Token Sesióni18n.t('common.existe_keyssessiontoken_tamano_keyssessiontokenlength')Expira En': { existe: !!keys.sessionExpires, valor: keys.sessionExpires },
+      'Perfil Admin': { existe: !!keys.adminProfile, tamaño: keys.adminProfile?.length || 0 },
+      'Token Sesión': { existe: !!keys.sessionToken, tamaño: keys.sessionToken?.length || 0 },
+      'Expira En': { existe: !!keys.sessionExpires, valor: keys.sessionExpires },
       'Session ID': { existe: !!keys.sessionId, valor: keys.sessionId },
     });
     
@@ -395,12 +484,12 @@ EJEMPLOS DE USO:
       parseInt(keys.sessionExpires, 10) > Date.now();
     
     const issues = [];
-    if (!hasFlag) issues.push(i18n.t('common.falta_flag_autenticacion'));
+    if (!hasFlag) issues.push('Falta flag de autenticación');
     if (!hasProfile) issues.push('Falta perfil admin');
-    if (!hasToken) issues.push(i18n.t('common.falta_token_sesion'));
-    if (!hasExpires) issues.push(i18n.t('common.falta_fecha_expiracion'));
-    if (!profileValid) issues.push(i18n.t('common.profile_invalido_role_incorrecto'));
-    if (!sessionValid) issues.push(i18n.t('common.sesion_expirada_timestamp_invalido'));
+    if (!hasToken) issues.push('Falta token de sesión');
+    if (!hasExpires) issues.push('Falta fecha de expiración');
+    if (!profileValid) issues.push('Profile inválido o role incorrecto');
+    if (!sessionValid) issues.push('Sesión expirada o timestamp inválido');
     
     if (issues.length === 0) {
       console.log('✅ TODO CORRECTO - La sesión debería restaurarse');

@@ -11,7 +11,6 @@
 //   createdAt: Timestamp
 // }
 
-import i18n from '../i18n';
 import {
   doc,
   setDoc,
@@ -32,7 +31,11 @@ import { performanceMonitor } from './PerformanceMonitor';
 import { seedWeddingTasksFromTemplate } from './taskTemplateSeeder';
 import { syncWeddingWithCRM } from './crmSyncService';
 
-const DEFAULT_EVENT_TYPE = 'bodai18n.t('common.determina_limite_bodas_permitidas_por_tier')').toLowerCase();
+const DEFAULT_EVENT_TYPE = 'boda';
+
+// Determina el límite de bodas permitidas por tier de planner
+function plannerLimitForTier(tier) {
+  const t = String(tier || '').toLowerCase();
   if (!t) return 5;
   if (t.includes('unlimit') || t.includes('ilimit')) return Number.POSITIVE_INFINITY;
   if (t.includes('teams')) return 40; // Teams Wedding Planner
@@ -91,7 +94,10 @@ const buildEventProfileSummary = (eventType, eventProfile, preferences) => ({
  * @returns {Promise<string>} weddingId creado
  */
 export async function createWedding(uid, extraData = {}) {
-  if (!uid) throw new Error('uid requeridoi18n.t('common.validacion_limites_creador_planner_try_const')users', uid));
+  if (!uid) throw new Error('uid requerido');
+  // Validación de límites si el creador es planner
+  try {
+    const userSnap = await getDoc(doc(db, 'users', uid));
     if (userSnap.exists()) {
       const u = userSnap.data() || {};
       const role = String(u.role || '').toLowerCase();
@@ -105,7 +111,11 @@ export async function createWedding(uid, extraData = {}) {
       }
     }
   } catch (e) {
-    if (String(e?.message || '') === 'planner_limit_exceededi18n.t('common.throw_falla_validacion_continuamos_bloquear_creacion')weddings', weddingId);
+    if (String(e?.message || '') === 'planner_limit_exceeded') throw e;
+    // Si falla la validación, continuamos (no bloquear creación para owners)
+  }
+  const weddingId = uuidv4();
+  const ref = doc(db, 'weddings', weddingId);
   const eventType = normalizeEventType(extraData?.eventType);
   const eventProfile = sanitizeEventProfile(extraData?.eventProfile, eventType);
   const preferences = sanitizePreferences(extraData?.preferences);
@@ -114,14 +124,35 @@ export async function createWedding(uid, extraData = {}) {
     plannerIds: [],
     subscription: { tier: 'free', renewedAt: Timestamp.now() },
     createdAt: Timestamp.now(),
-    creatorRole: (typeof extraData?.creatorRole === 'string' ? extraData.creatorRole : 'owneri18n.t('common.extradata_eventtype_eventprofile_preferences_await_setdocref')weddings', weddingId, 'finance', 'main');
+    creatorRole: (typeof extraData?.creatorRole === 'string' ? extraData.creatorRole : 'owner'),
+    ...extraData,
+    eventType,
+    eventProfile,
+    preferences,
+  };
+  await setDoc(ref, base);
+  // Inicializar subcolección de finanzas
+  try {
+    const financeRef = doc(db, 'weddings', weddingId, 'finance', 'main');
     await setDoc(financeRef, { movements: [], createdAt: Timestamp.now() }, { merge: true });
   } catch (e) {
     console.warn('No se pudo inicializar finance/main para', weddingId, e);
   }
   // Guardar enlace rápido en el perfil del usuario (crea si no existe)
   await setDoc(
-    doc(db, 'usersi18n.t('common.uid_weddingid_activeweddingid_weddingid_hasactivewedding_true')users', uid, 'weddings', weddingId);
+    doc(db, 'users', uid),
+    {
+      weddingId,
+      activeWeddingId: weddingId,
+      hasActiveWedding: true,
+      lastWeddingCreatedAt: Timestamp.now(),
+    },
+    { merge: true }
+  );
+
+  // Registrar la boda en la subcolección users/{uid}/weddings para que WeddingContext la cargue
+  try {
+    const subRef = doc(db, 'users', uid, 'weddings', weddingId);
     const eventProfileSummary = buildEventProfileSummary(eventType, eventProfile, preferences);
     await setDoc(
       subRef,
@@ -306,29 +337,74 @@ export async function migrateFlatSubtasksToNested(weddingId) {
       } catch (_) {
         // Si no se puede borrar, al menos marcar como migrada
         await setDoc(
-          doc(db, 'weddings', weddingId, 'tasksi18n.t('common.snapid_migratedtonested_true_merge_true_catch')partneri18n.t('common.crea_una_invitacion_para_wedding_planner')planner');
+          doc(db, 'weddings', weddingId, 'tasks', snap.id),
+          { migratedToNested: true },
+          { merge: true }
+        );
+      }
+    } catch (_) {}
+  }
+  return { moved };
+}
+
+/**
+ * Crea una invitación para otro novio/a.
+ * @param {string} weddingId
+ * @param {string} email
+ * @returns {Promise<string>} invitationCode
+ */
+export async function invitePartner(weddingId, email) {
+  return createInvitation(weddingId, email, 'partner');
+}
+
+/**
+ * Crea una invitación para un wedding planner.
+ * @param {string} weddingId
+ * @param {string} email
+ * @returns {Promise<string>} invitationCode
+ */
+export async function invitePlanner(weddingId, email) {
+  return createInvitation(weddingId, email, 'planner');
 }
 
 async function createInvitation(weddingId, email, role) {
-  if (!weddingId || !email) throw new Error(i18n.t('common.parametros_requeridos'));
+  if (!weddingId || !email) throw new Error('parámetros requeridos');
   const code = uuidv4();
   const invRef = doc(db, 'weddings', weddingId, 'weddingInvitations', code);
   await setDoc(invRef, {
     code,
     weddingId,
     email: email.toLowerCase(),
-    role, // 'partner' | 'planneri18n.t('common.createdat_timestampnow_return_code_acepta_una')parámetros requeridosi18n.t('common.buscar_codigo_cualquier_boda_usando_collectiongroup')weddingInvitations'),
+    role, // 'partner' | 'planner'
+    createdAt: Timestamp.now(),
+  });
+  return code;
+}
+
+/**
+ * Acepta una invitación (partner o planner) y agrega el uid al array correspondiente.
+ * @param {string} code - invitation code
+ * @param {string} uid  - usuario que acepta
+ */
+export async function acceptInvitation(code, uid) {
+  if (!code || !uid) throw new Error('parámetros requeridos');
+  // Buscar código en cualquier boda usando collectionGroup
+  const q = query(
+    collectionGroup(db, 'weddingInvitations'),
     where(documentId(), '==', code)
   );
   const res = await getDocs(q);
-  if (res.empty) throw new Error(i18n.t('common.invitacion_encontrada'));
+  if (res.empty) throw new Error('Invitación no encontrada');
   const snap = res.docs[0];
   const { weddingId, role } = snap.data();
   const invRef = snap.ref;
   const wedRef = doc(db, 'weddings', weddingId);
   if (role === 'partner') {
     await updateDoc(wedRef, { ownerIds: arrayUnion(uid) });
-  } else if (role === 'planneri18n.t('common.validacion_limites_por_tier_del_planner')users', uid));
+  } else if (role === 'planner') {
+    // Validación de límites por tier del planner antes de añadirlo
+    try {
+      const userSnap = await getDoc(doc(db, 'users', uid));
       const u = userSnap.exists() ? (userSnap.data() || {}) : {};
       const tier = u?.subscription?.tier || 'wedding_planner_1';
       const limit = plannerLimitForTier(tier);
@@ -355,7 +431,13 @@ async function createInvitation(weddingId, email, role) {
   }
   // Guardar weddingId en perfil de usuario si es partner
   if (role === 'partner') {
-    await setDoc(doc(db, 'usersi18n.t('common.uid_weddingid_merge_true_vincular_subcoleccion')users', uid, 'weddings', weddingId),
+    await setDoc(doc(db, 'users', uid), { weddingId }, { merge: true });
+    // Vincular en subcolección del usuario
+    try {
+      const wedSnap = await getDoc(wedRef);
+      const wdata = wedSnap.exists() ? wedSnap.data() : {};
+      await setDoc(
+        doc(db, 'users', uid, 'weddings', weddingId),
         {
           id: weddingId,
           name: wdata.name || 'Boda',
@@ -407,8 +489,11 @@ export async function getWeddingsForPlanner(plannerUid) {
 }
 
 export async function addPlannerToWedding(weddingId, plannerUid) {
-  if (!weddingId || !plannerUid) throw new Error(i18n.t('common.parametros_requeridos'));
-  const wedRef = doc(db, 'weddingsi18n.t('common.weddingid_validacion_limites_por_tier_del')users', plannerUid));
+  if (!weddingId || !plannerUid) throw new Error('parámetros requeridos');
+  const wedRef = doc(db, 'weddings', weddingId);
+  // Validación de límites por tier del planner
+  try {
+    const userSnap = await getDoc(doc(db, 'users', plannerUid));
     const u = userSnap.exists() ? (userSnap.data() || {}) : {};
     const tier = u?.subscription?.tier || 'wedding_planner_1';
     const limit = plannerLimitForTier(tier);
@@ -429,7 +514,52 @@ export async function addPlannerToWedding(weddingId, plannerUid) {
 
   await updateDoc(wedRef, { plannerIds: arrayUnion(plannerUid) });
   // Guardar referencia de bodas que gestiona el planner
-  try { await updateDoc(doc(db, 'usersi18n.t('common.planneruid_plannerweddingids_arrayunionweddingid_catch_return_true')weddings', weddingId));
+  try { await updateDoc(doc(db, 'users', plannerUid), { plannerWeddingIds: arrayUnion(weddingId) }); } catch {}
+  return true;
+}
+
+/**
+ * Ajusta las fechas de las tareas padre (bloques) según porcentajes fijos
+ * en el intervalo [weddingDate - 12 meses, weddingDate].
+ * No crea ni elimina tareas; solo actualiza start/end si existen.
+ */
+export async function fixParentBlockDates(weddingId, ganttStart = null, ganttEnd = null) {
+  if (!weddingId) return { updated: 0 };
+  // Utilidades de fechas basadas en días completos para evitar desfases DST
+  const toLocalMidday = (d) => {
+    try {
+      const x = d instanceof Date ? d : new Date(d);
+      return new Date(x.getFullYear(), x.getMonth(), x.getDate(), 12, 0, 0, 0);
+    } catch {
+      return null;
+    }
+  };
+  const diffDays = (a, b) => {
+    const am = toLocalMidday(a);
+    const bm = toLocalMidday(b);
+    if (!am || !bm) return 0;
+    const MS = 24 * 60 * 60 * 1000;
+    return Math.round((bm.getTime() - am.getTime()) / MS);
+  };
+  const addDays = (base, days) => {
+    const bm = toLocalMidday(base);
+    if (!bm) return null;
+    const out = new Date(bm);
+    out.setDate(out.getDate() + days);
+    return out;
+  };
+
+  // Determinar intervalo base: preferir proyecto (Gantt) si llega desde UI; si no, usar [weddingDate-12m, weddingDate]
+  let startBase = null;
+  let endBase = null;
+  if (ganttStart instanceof Date && !isNaN(ganttStart)) startBase = ganttStart;
+  if (ganttEnd instanceof Date && !isNaN(ganttEnd)) endBase = ganttEnd;
+
+  if (!startBase || !endBase) {
+    // Fallback: obtener weddingDate y asumir 12 meses antes
+    let wDate = null;
+    try {
+      const snap = await getDoc(doc(db, 'weddings', weddingId));
       if (snap.exists()) {
         const data = snap.data() || {};
         const raw = data?.weddingDate || data?.weddingdate || data?.date || null;
@@ -462,11 +592,11 @@ export async function addPlannerToWedding(weddingId, plannerUid) {
     { name: 'Proveedores Clave', p0: 0.1, p1: 0.8 },
     { name: 'Vestuario y Moda', p0: 0.15, p1: 0.9 },
     { name: 'Estilo y Detalles', p0: 0.2, p1: 0.95 },
-    { name: i18n.t('common.organizacion_logistica'), p0: 0.3, p1: 1.0 },
+    { name: 'Organización y Logística', p0: 0.3, p1: 1.0 },
     { name: 'Celebraciones y Emociones', p0: 0.4, p1: 0.95 },
     { name: 'Belleza y Cuidado', p0: 0.6, p1: 0.95 },
     { name: 'Anillos y Luna de Miel', p0: 0.7, p1: 1.0 },
-    { name: i18n.t('common.despues_boda'), p0: 1.0, p1: 1.05 },
+    { name: 'Después de la Boda', p0: 1.0, p1: 1.05 },
   ];
 
   const byName = new Map(blocks.map((b) => [b.name.toLowerCase(), b]));

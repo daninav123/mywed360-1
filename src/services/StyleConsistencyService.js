@@ -1,5 +1,3 @@
-import i18n from '../i18n';
-
 /**
  * StyleConsistencyService
  * ------------------------
@@ -96,7 +94,14 @@ export function detectStyleConflicts(preferences = [], weights = {}, options = {
       conflicts.push({
         id: pref.id,
         type: 'requires_review',
-        message: `El contraste "${pref.idea}i18n.t('common.esta_marcado_para_revision_manual_weightscontrastweight')style_balance',
+        message: `El contraste "${pref.idea}" está marcado para revisión manual.`,
+      });
+    }
+  }
+
+  if (weights.contrastWeight > limit) {
+    conflicts.push({
+      id: 'style_balance',
       type: 'limit_exceeded',
       message: `El peso de contrastes (${weights.contrastWeight}) supera el límite permitido (${limit}).`,
     });

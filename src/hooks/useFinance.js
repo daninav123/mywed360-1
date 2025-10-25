@@ -11,7 +11,6 @@ import { uploadEmailAttachments } from '../services/storageUploadService';
 import { saveData } from '../services/SyncService';
 import { requestBudgetAdvisor as fetchBudgetAdvisor } from '../services/budgetAdvisorService';
 import { getLocalFinance, updateLocalFinance } from '../services/localWeddingStore';
-import { useTranslations } from '../../hooks/useTranslations';
 import {
   normalizeBudgetCategoryKey,
   normalizeBudgetCategoryName,
@@ -19,8 +18,6 @@ import {
 } from '../utils/budgetCategories';
 
 const resolveLocalUid = () => {
-  const { t } = useTranslations();
-
   if (typeof window === 'undefined') return null;
   try {
     const raw = window.localStorage.getItem('MaLoveApp_user_profile');
@@ -34,31 +31,31 @@ const resolveLocalUid = () => {
 
 // Reglas simples de autocategorización por palabras clave/proveedor
 const AUTO_CATEGORY_RULES = [
-  { cat: 'Catering', keywords: ['catering', 'restaurante', 'banquete', 'comida', t('common.menu')] },
-  { cat: t('common.musica'), keywords: ['dj', 'banda', t('common.musica'), 'musica', 'orquesta', 'sonido'] },
+  { cat: 'Catering', keywords: ['catering', 'restaurante', 'banquete', 'comida', 'menú'] },
+  { cat: 'Música', keywords: ['dj', 'banda', 'música', 'musica', 'orquesta', 'sonido'] },
   {
     cat: 'Flores',
-    keywords: ['flor', 'flores', t('common.floristeria'), 'floristeria', 'ramo', 'decor floral'],
+    keywords: ['flor', 'flores', 'floristería', 'floristeria', 'ramo', 'decor floral'],
   },
-  { cat: 'Fotografia', keywords: ['foto', t('common.fotografo'), 'fotografo', t('common.fotografia'), 'fotografia'] },
+  { cat: 'Fotografia', keywords: ['foto', 'fotógrafo', 'fotografo', 'fotografía', 'fotografia'] },
   { cat: 'Vestimenta', keywords: ['vestido', 'traje', 'moda', 'sastre', 'zapatos'] },
   {
     cat: 'Decoracion',
-    keywords: [t('common.decoracion'), 'decoracion', t('common.iluminacion'), 'iluminacion', 'alquiler', 'carpa'],
+    keywords: ['decoración', 'decoracion', 'iluminación', 'iluminacion', 'alquiler', 'carpa'],
   },
   {
     cat: 'Transporte',
-    keywords: ['taxi', 'uber', 'cabify', 'bus', t('common.autobus'), 'autobus', 'transporte', 'coche'],
+    keywords: ['taxi', 'uber', 'cabify', 'bus', 'autobús', 'autobus', 'transporte', 'coche'],
   },
   { cat: 'Alojamiento', keywords: ['hotel', 'hostal', 'alojamiento'] },
   {
     cat: 'Invitaciones',
     keywords: [
-      {t('common.invitacion')},
+      'invitación',
       'invitacion',
-      {t('common.papeleria')},
+      'papelería',
       'papeleria',
-      {t('common.impresion')},
+      'impresión',
       'impresion',
       'save the date',
     ],
@@ -1020,7 +1017,7 @@ export default function useFinance() {
   const addBudgetCategory = useCallback(
     (name, amount = 0) => {
       if (!name || budget.categories.find((c) => c.name === name)) {
-        return { success: false, error: t('common.categoria_existe_nombre_invalido') };
+        return { success: false, error: 'Categoría ya existe o nombre inválido' };
       }
       const parsedAmount = parseMoneyValue(amount, 0);
       const nextCategories = [...budget.categories, { name, amount: parsedAmount }];
@@ -1206,7 +1203,7 @@ export default function useFinance() {
     }
     const categories = Array.isArray(budget.categories) ? budget.categories : [];
     if (!categories.length) {
-      throw new Error(t('common.configura_menos_una_categoria_antes'));
+      throw new Error('Configura al menos una categoría antes de usar el consejero.');
     }
 
     const currency =
@@ -1295,7 +1292,7 @@ export default function useFinance() {
     } catch (err) {
       console.error('[useFinance] advisor request failed', err);
       const message =
-        err?.message || {t('common.pudo_obtener_recomendacion_del_consejero')};
+        err?.message || 'No se pudo obtener la recomendación del consejero.';
       setAdvisorError(message);
       throw err;
     } finally {
@@ -1541,7 +1538,7 @@ export default function useFinance() {
         // Validar y normalizar con Zod
         const parsed = transactionSchema.safeParse(payload);
         if (!parsed.success) {
-          throw new Error(parsed.error?.errors?.[0]?.message || {t('common.datos_transaccion_invalidos')});
+          throw new Error(parsed.error?.errors?.[0]?.message || 'Datos de transacción inválidos');
         }
         payload = parsed.data;
 
@@ -1704,7 +1701,7 @@ export default function useFinance() {
         // Validar update parcial
         const parsed = transactionUpdateSchema.safeParse(payload);
         if (!parsed.success) {
-          throw new Error(parsed.error?.errors?.[0]?.message || {t('common.cambios_transaccion_invalidos')});
+          throw new Error(parsed.error?.errors?.[0]?.message || 'Cambios de transacción inválidos');
         }
         payload = parsed.data;
 
@@ -1814,7 +1811,7 @@ export default function useFinance() {
           const type = rawType === 'income' || rawType.startsWith('ing') ? 'income' : 'expense';
           const amount = Math.abs(Number(entry.amount) || 0);
           if (!Number.isFinite(amount) || amount <= 0) {
-            throw new Error(t('common.import_importe_invalido'));
+            throw new Error('Import: importe inválido');
           }
           let status = String(entry.status || '').toLowerCase();
           if (type === 'expense') {
@@ -1873,7 +1870,7 @@ export default function useFinance() {
           }
           const validation = transactionSchema.safeParse(payload);
           if (!validation.success) {
-            throw new Error(validation.error?.errors?.[0]?.message || {t('common.fila_invalida')});
+            throw new Error(validation.error?.errors?.[0]?.message || 'Fila inválida');
           }
           const saved = await _addTransaction(validation.data);
           successes.push(saved);
@@ -1923,7 +1920,7 @@ export default function useFinance() {
         Importe: Number(tx.amount) || 0,
         Pagado: tx.paidAmount != null ? Number(tx.paidAmount) : '',
         'Fecha venc.': tx.dueDate || '',
-        {t('common.metodo_pago')}: tx.paymentMethod || '',
+        'Método de pago': tx.paymentMethod || '',
         Fuente: tx.source || tx.meta?.source || '',
       }));
       XLSX.utils.book_append_sheet(
@@ -1942,7 +1939,7 @@ export default function useFinance() {
       XLSX.utils.book_append_sheet(
         workbook,
         XLSX.utils.json_to_sheet(categoryRows.length ? categoryRows : [{}], { skipHeader: categoryRows.length === 0 }),
-        {t('common.categorias')}
+        'Categorías'
       );
 
       const monthlyRows = monthlySeries.months.map((month, idx) => ({
@@ -1965,27 +1962,27 @@ export default function useFinance() {
           ['Burn rate (mes)', predictiveInsights.burnRate],
           ['Meses hasta agotar presupuesto', predictiveInsights.monthsToZero ?? 'N/A'],
           ['Fecha estimada de agotamiento', predictiveInsights.projectedZeroDate || 'N/A'],
-          [t('common.saldo_proyectado_dia_boda'), predictiveInsights.forecastSurplus || 0],
+          ['Saldo proyectado día de la boda', predictiveInsights.forecastSurplus || 0],
           ['Ahorro mensual recomendado', predictiveInsights.recommendedMonthlySaving || 0],
           ['Tendencia neta', predictiveInsights.netTrend?.direction || 'flat'],
           ['Cambio neto acumulado', predictiveInsights.netTrend?.change || 0],
         ];
         if (predictiveInsights.categoriesAtRisk?.length) {
-          insightsRows.push([], [t('common.categorias_riesgo')]);
+          insightsRows.push([], ['Categorías en riesgo']);
           insightsRows.push(['Nombre', '% uso', 'Restante']);
           predictiveInsights.categoriesAtRisk.forEach((cat) => {
             insightsRows.push([cat.name, cat.percentage, cat.remaining]);
           });
         }
         if (predictiveInsights.upcomingPayments?.length) {
-          insightsRows.push([], [t('common.pagos_proximos')]);
+          insightsRows.push([], ['Pagos próximos']);
           insightsRows.push(['Concepto', 'Fecha', 'Importe', 'Proveedor']);
           predictiveInsights.upcomingPayments.forEach((pay) => {
             insightsRows.push([pay.concept, pay.dueDate, pay.outstanding, pay.provider]);
           });
         }
         const insightsSheet = XLSX.utils.aoa_to_sheet(insightsRows);
-        XLSX.utils.book_append_sheet(workbook, insightsSheet, t('common.analitica'));
+        XLSX.utils.book_append_sheet(workbook, insightsSheet, 'Analítica');
       }
 
       const buffer = XLSX.write(workbook, { type: 'array', bookType: 'xlsx' });

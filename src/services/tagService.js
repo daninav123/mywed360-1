@@ -2,7 +2,6 @@
  * Servicio para gestionar etiquetas (tags) de correo
  * Permite crear, eliminar, asignar y filtrar etiquetas para correos
  */
-import i18n from '../i18n';
 import { get as apiGet, put as apiPut } from './apiClient';
 import { USE_BACKEND } from './emailService';
 import { v4 as uuidv4 } from 'uuid';
@@ -22,12 +21,49 @@ export const SYSTEM_TAGS = [
   { id: 'important', name: 'Importante', color: '#e53e3e' }, // Rojo
   { id: 'work', name: 'Trabajo', color: '#3182ce' }, // Azul
   { id: 'personal', name: 'Personal', color: '#38a169' }, // Verde
-  { id: 'invitation', name: i18n.t('common.invitacion'), color: '#805ad5' }, // Morado
+  { id: 'invitation', name: 'Invitación', color: '#805ad5' }, // Morado
   { id: 'provider', name: 'Proveedor', color: '#dd6b20' }, // Naranja
 ];
 
 function fireAndForget(promise) {
-  if (promise && typeof promise.then === 'function' && typeof promise.catch === 'functioni18n.t('common.promisecatch_obtener_todas_las_etiquetas_disponibles')Error al obtener etiquetas:', error);
+  if (promise && typeof promise.then === 'function' && typeof promise.catch === 'function') {
+    promise.catch(() => {});
+  }
+}
+
+/**
+ * Obtener todas las etiquetas disponibles para un usuario
+ * Incluye tanto etiquetas del sistema como personalizadas
+ * @param {string} userId - ID del usuario
+ * @returns {Array} - Array de objetos de etiqueta
+ */
+export const getUserTags = (userId) => {
+  try {
+    fireAndForget(refreshTagsFromCloud(userId));
+  } catch {}
+  const storageKey = `${TAGS_STORAGE_KEY}_${userId}`;
+  try {
+    const storage = _getStorage();
+
+    // Llamada explícita para que el spy de los tests registre la lectura
+    const raw = storage.getItem(storageKey);
+
+    // Parsear resultado (si existe)
+    let customTags = [];
+    if (raw) {
+      try {
+        customTags = JSON.parse(raw);
+      } catch {
+        customTags = [];
+      }
+    }
+
+    // Actualizar caché
+    runtimeCustomTags[userId] = customTags;
+
+    return [...SYSTEM_TAGS, ...customTags];
+  } catch (error) {
+    console.error('Error al obtener etiquetas:', error);
     return [...SYSTEM_TAGS];
   }
 };
@@ -71,7 +107,7 @@ export const createTag = (userId, tagName, color = '#64748b') => {
     // Si existe duplicado, generar nombre con sufijo incremental " (n)"
     let finalName = tagName.trim();
     if (!finalName) {
-      throw new Error(i18n.t('common.nombre_etiqueta_puede_estar_vacio'));
+      throw new Error('El nombre de la etiqueta no puede estar vacío');
     }
     const baseLower = finalName.toLowerCase();
     let counter = 0;
@@ -121,7 +157,29 @@ export const deleteTag = (userId, tagId) => {
     // Si es etiqueta del sistema, no se puede eliminar -> false
     const isSystemTag = SYSTEM_TAGS.some((tag) => tag.id === tagId);
     if (isSystemTag) {
-      throw new Error('No se pueden eliminar etiquetas del sistemai18n.t('common.const_tags_getcustomtagsuserid_comprobar_etiqueta_existe')Error al eliminar etiqueta:', error);
+      throw new Error('No se pueden eliminar etiquetas del sistema');
+    }
+
+    const tags = getCustomTags(userId);
+
+    // Comprobar si la etiqueta existe realmente
+    const exists = tags.some((tag) => tag.id === tagId);
+    if (!exists) {
+      return false; // Nada que eliminar
+    }
+
+    // Filtrar la etiqueta a eliminar
+    const updatedTags = tags.filter((tag) => tag.id !== tagId);
+
+    // Guardar etiquetas actualizadas
+    saveUserTags(userId, updatedTags);
+
+    // También eliminar asignaciones de esta etiqueta a correos
+    removeTagFromAllEmails(userId, tagId);
+
+    return true;
+  } catch (error) {
+    console.error('Error al eliminar etiqueta:', error);
     throw error;
   }
 };
@@ -257,7 +315,30 @@ export const addTagToEmail = (userId, emailId, tagId) => {
     }
 
     if (!tagExists) {
-      throw new Error('La etiqueta especificada no existei18n.t('common.obtener_mapeo_actual_const_mapping_getemailtagsmappinguserid')Error al asignar etiqueta a correo:', error);
+      throw new Error('La etiqueta especificada no existe');
+    }
+
+    // Obtener mapeo actual
+    const mapping = getEmailTagsMapping(userId);
+
+    // Inicializar array de etiquetas para este correo si no existe
+    if (!mapping[emailId]) {
+      mapping[emailId] = [];
+    }
+
+    // Verificar si la etiqueta ya está asignada
+    if (!mapping[emailId].includes(tagId)) {
+      mapping[emailId].push(tagId);
+      // Guardar mapeo actualizado
+      saveEmailTagsMapping(userId, mapping);
+      // Espejo en backend (best‑effort)
+      try {
+        updateMailTagsBackend(emailId, { add: [tagId] });
+      } catch {}
+    }
+    return true;
+  } catch (error) {
+    console.error('Error al asignar etiqueta a correo:', error);
     throw error;
   }
 };
