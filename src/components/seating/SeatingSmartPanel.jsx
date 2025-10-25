@@ -97,7 +97,7 @@ export default function SeatingSmartPanel({
                     item.severity
                   )}`}
                 >
-                  {item.severity === 'high' ? {t('common.critico')} : {t('common.atencion')}}
+                  {item.severity === 'high' ? {t('common.critico')} : t('common.atencion')}
                 </span>
               </header>
               <div className="mt-2 flex flex-wrap gap-2">

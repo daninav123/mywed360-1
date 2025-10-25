@@ -124,7 +124,7 @@ const EmailTemplateManager = ({ onSelectTemplate, onClose }) => {
 
   async function handleDeleteTemplate(id) {
     if (!id) return;
-    if (!window.confirm({t('common.eliminar_plantilla_seleccionada')})) return;
+    if (!window.confirm(t('common.eliminar_plantilla_seleccionada'))) return;
     try {
       await EmailService.deleteEmailTemplate(id);
       setTemplates((prev) => prev.filter((tpl) => tpl.id !== id));
@@ -136,7 +136,7 @@ const EmailTemplateManager = ({ onSelectTemplate, onClose }) => {
   }
 
   async function handleResetTemplates() {
-    if (!window.confirm({t('common.esto_restablecera_las_plantillas_predefinidas')})) return;
+    if (!window.confirm(t('common.esto_restablecera_las_plantillas_predefinidas'))) return;
     setLoading(true);
     try {
       const restored = await EmailService.resetPredefinedTemplates();

@@ -6,7 +6,7 @@ import { useTranslations } from '../../hooks/useTranslations';
 const severityLabels = {
   const { t } = useTranslations();
 
-  critical: {t('common.critica')},
+  critical: t('common.critica'),
   high: 'Alta',
   medium: 'Media',
   low: 'Baja',

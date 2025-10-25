@@ -46,7 +46,7 @@ const defaultMailsTest = [
   },
   {
     id: 'email-2',
-    subject: {t('common.recordatorio_reunion')},
+    subject: t('common.recordatorio_reunion'),
     from: 'team@empresa.com',
     to: 'usuario@maloveapp.com',
     date: '2025-07-09T08:15:00Z',

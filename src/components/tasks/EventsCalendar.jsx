@@ -190,7 +190,7 @@ export default function EventsCalendar({
                 today: 'Hoy',
                 month: 'Mes',
                 week: 'Semana',
-                day: {t('common.dia')},
+                day: t('common.dia'),
               }}
             />
           </div>

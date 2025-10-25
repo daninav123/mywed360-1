@@ -13,12 +13,12 @@ const FIELD_DEFS = [
   { key: 'type', label: 'Tipo (Ingreso/Gasto)', required: false, examples: ['Tipo', 'Type'] },
   { key: 'status', label: 'Estado', required: false, examples: ['Estado', 'Status'] },
   { key: 'paidAmount', label: 'Importe pagado', required: false, examples: ['Pagado', 'Paid'] },
-  { key: 'category', label: {t('common.categoria')}, required: false, examples: [{t('common.categoria')}, 'Category'] },
+  { key: 'category', label: t('common.categoria'), required: false, examples: [t('common.categoria'), 'Category'] },
   { key: 'provider', label: 'Proveedor', required: false, examples: ['Proveedor', 'Vendor'] },
   { key: 'dueDate', label: 'Fecha vencimiento', required: false, examples: ['Vencimiento', 'Due Date'] },
-  { key: 'date', label: {t('common.fecha_operacion')}, required: false, examples: ['Fecha', 'Date'] },
-  { key: 'paymentMethod', label: {t('common.metodo_pago')}, required: false, examples: [{t('common.metodo')}, 'Payment Method'] },
-  { key: 'description', label: {t('common.descripcionnotas')}, required: false, examples: ['Notas', 'Notes', 'Memo', {t('common.descripcion')}] },
+  { key: 'date', label: t('common.fecha_operacion'), required: false, examples: ['Fecha', 'Date'] },
+  { key: 'paymentMethod', label: t('common.metodo_pago'), required: false, examples: [t('common.metodo'), 'Payment Method'] },
+  { key: 'description', label: t('common.descripcionnotas'), required: false, examples: ['Notas', 'Notes', 'Memo', t('common.descripcion')] },
 ];
 
 const SUGGESTIONS = {
@@ -166,7 +166,7 @@ export default function TransactionImportModal({
         dateNF: 'yyyy-mm-dd',
       });
       const sheetName = workbook.SheetNames[0];
-      if (!sheetName) throw new Error({t('common.encontro_ninguna_pestana_archivo')});
+      if (!sheetName) throw new Error(t('common.encontro_ninguna_pestana_archivo'));
       const worksheet = workbook.Sheets[sheetName];
       const raw = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
       if (!Array.isArray(raw) || raw.length < 2) {
@@ -288,7 +288,7 @@ export default function TransactionImportModal({
         .filter(Boolean);
 
       if (!normalized.length) {
-        setError({t('common.detectaron_filas_validas_para_importar')});
+        setError(t('common.detectaron_filas_validas_para_importar'));
         return;
       }
 

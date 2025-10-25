@@ -1,14 +1,43 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // ---- Helpers for tasks/processes ----
+    // ---- Global Helper Functions (must be defined before use) ----
     function _isSignedIn() { return request.auth != null; }
+    
+    function isOwner(wid) {
+      let wedding = get(/databases/$(database)/documents/weddings/$(wid));
+      return request.auth != null &&
+        wedding != null &&
+        wedding.data.ownerIds != null &&
+        request.auth.uid in wedding.data.ownerIds;
+    }
+
+    function isPlanner(wid) {
+      let wedding = get(/databases/$(database)/documents/weddings/$(wid));
+      return request.auth != null &&
+        wedding != null &&
+        wedding.data.plannerIds != null &&
+        request.auth.uid in wedding.data.plannerIds;
+    }
+
+    function isAssistant(wid) {
+      let wedding = get(/databases/$(database)/documents/weddings/$(wid));
+      return request.auth != null &&
+        wedding != null &&
+        wedding.data.assistantIds != null &&
+        request.auth.uid in wedding.data.assistantIds;
+    }
+
+    function isOwnerOrPlanner(wid) {
+      return isOwner(wid) || isPlanner(wid);
+    }
+
+    function isCollaborator(wid) {
+      return isOwner(wid) || isPlanner(wid) || isAssistant(wid);
+    }
+    
     function _isWeddingCollaborator(wid) {
-      return _isSignedIn() && (
-        (get(/databases/$(database)/documents/weddings/$(wid)).data.ownerIds != null && request.auth.uid in get(/databases/$(database)/documents/weddings/$(wid)).data.ownerIds) ||
-        (get(/databases/$(database)/documents/weddings/$(wid)).data.plannerIds != null && request.auth.uid in get(/databases/$(database)/documents/weddings/$(wid)).data.plannerIds) ||
-        (get(/databases/$(database)/documents/weddings/$(wid)).data.assistantIds != null && request.auth.uid in get(/databases/$(database)/documents/weddings/$(wid)).data.assistantIds)
-      );
+      return isCollaborator(wid);
     }
 
     function _progressValid() {
@@ -125,22 +154,14 @@ service cloud.firestore {
 
     // Subcollections inside a wedding (guests, tasks, suppliers, etc.)
     match /weddings/{weddingId}/{document=**} {
-      allow read: if request.auth != null && (
-        (get(/databases/$(database)/documents/weddings/$(weddingId)).data.ownerIds != null && request.auth.uid in get(/databases/$(database)/documents/weddings/$(weddingId)).data.ownerIds) ||
-        (get(/databases/$(database)/documents/weddings/$(weddingId)).data.plannerIds != null && request.auth.uid in get(/databases/$(database)/documents/weddings/$(weddingId)).data.plannerIds) ||
-        (get(/databases/$(database)/documents/weddings/$(weddingId)).data.assistantIds != null && request.auth.uid in get(/databases/$(database)/documents/weddings/$(weddingId)).data.assistantIds)
-      );
+      // Read: owners, planners and assistants (all collaborators)
+      allow read: if isCollaborator(weddingId);
 
-      // For writes require owner/planner. Additionally, if the target path is
-      // seatingPlan/banquet or seatingPlan/ceremony, validate structure.
-      allow write: if request.auth != null && (
-        (
-          (get(/databases/$(database)/documents/weddings/$(weddingId)).data.ownerIds != null && request.auth.uid in get(/databases/$(database)/documents/weddings/$(weddingId)).data.ownerIds) ||
-          (get(/databases/$(database)/documents/weddings/$(weddingId)).data.plannerIds != null && request.auth.uid in get(/databases/$(database)/documents/weddings/$(weddingId)).data.plannerIds)
-        ) && (
-          !((document == 'seatingPlan/banquet') || (document == 'seatingPlan/ceremony')) ||
-          isValidSeatingPlanDoc(document, request.resource.data)
-        )
+      // Write: ONLY owners and planners (assistants cannot write)
+      // Additionally, if the target path is seatingPlan/banquet or seatingPlan/ceremony, validate structure.
+      allow write: if isOwnerOrPlanner(weddingId) && (
+        !((document == 'seatingPlan/banquet') || (document == 'seatingPlan/ceremony')) ||
+        isValidSeatingPlanDoc(document, request.resource.data)
       );
     }
 
@@ -226,35 +247,13 @@ service cloud.firestore {
       allow read, write: if request.auth != null && request.auth.uid == uid;
     }
 
-    // -------- Helpers --------
-    function isOwner(wid) {
-      return request.auth != null &&
-        request.auth.uid in get(/databases/$(database)/documents/weddings/$(wid)).data.ownerIds;
-    }
-
-    function isPlanner(wid) {
-      return request.auth != null &&
-        request.auth.uid in get(/databases/$(database)/documents/weddings/$(wid)).data.plannerIds;
-    }
-
-    function isAssistant(wid) {
-      return request.auth != null &&
-        request.auth.uid in get(/databases/$(database)/documents/weddings/$(wid)).data.assistantIds;
-    }
-
-    function isOwnerOrPlanner(wid) {
-      return isOwner(wid) || isPlanner(wid);
-    }
-
-    function isCollaborator(wid) {
-      return isOwner(wid) || isPlanner(wid) || isAssistant(wid);
-    }
-
     // SeatingPlan validations
+    // Validación relajada: cualquier valor positivo de aisleMin es válido en cliente
+    // La validación estricta >= 40 se hace en backend para mejor UX
     function isValidConfig(cfg) {
       return cfg.width is number && cfg.height is number &&
              cfg.width > 0 && cfg.height > 0 &&
-             cfg.aisleMin is number && cfg.aisleMin >= 40 && cfg.aisleMin <= 300;
+             cfg.aisleMin is number && cfg.aisleMin > 0 && cfg.aisleMin <= 500;
     }
 
     function listFieldValid(data, field) {

@@ -123,7 +123,7 @@ const MetricsDashboard = () => {
       setMetrics(combinedMetrics);
     } catch (err) {
       console.error('Error al cargar métricas:', err);
-      setError({t('common.pudieron_cargar_las_metricas')});
+      setError(t('common.pudieron_cargar_las_metricas'));
     } finally {
       setLoading(false);
     }

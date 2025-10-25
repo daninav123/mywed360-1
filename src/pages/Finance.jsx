@@ -212,7 +212,7 @@ function Finance() {
               id: 'contributions',
               label: t('finance.tabs.contributions', { defaultValue: 'Aportaciones' }),
             },
-            { id: 'analytics', label: t('finance.tabs.analytics', { defaultValue: {t('common.analisis')} }) },
+            { id: 'analytics', label: t('finance.tabs.analytics', { defaultValue: t('common.analisis') }) },
           ]}
           className="w-full"
         />

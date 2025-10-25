@@ -19,7 +19,7 @@
    - `HomePage` consulta `useAuth` para personalizar saludo (nombre boda + usuario) y resolver el rol.
 2. **Hero principal**  
    - Encabezado muestra mensaje "Bienvenidos" junto al nombre de la boda.
-   - Muestra el logotipo cargado desde `logo-app.png` (assets públicos).
+   - Muestra el logotipo cargado desde `maloveapp-logo.png` (assets públicos).
 3. **Progreso**  
    - Card `Progress` consulta `GamificationService.getSummary` (puntos totales de la boda) y traduce el resultado a un porcentaje 0-100 (`maloveapp_progress`) que se guarda como snapshot en `localStorage`.
    - La barra se colorea según el desfase respecto al plan temporal de la boda (adelantado -> verde, en ritmo -> ámbar, por detrás -> rojo) y muestra el porcentaje esperado para la fecha actual.

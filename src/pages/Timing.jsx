@@ -22,7 +22,7 @@ export default function Timing() {
   const { t } = useTranslations();
 
   const { moments, addMoment, updateMoment, removeMoment, reorderMoment, moveMoment  = useSpecialMoments();
-  const labels = { ceremonia: 'Ceremonia', coctail: {t('common.coctel')}, banquete: 'Banquete', disco: 'Disco' ;
+  const labels = { ceremonia: 'Ceremonia', coctail: t('common.coctel'), banquete: 'Banquete', disco: 'Disco' ;
 
   const handleAdd = key => {
     const nextOrder = (moments[key]?.length || 0) + 1;

@@ -1,4 +1,4 @@
-// @vitest-environment node
+﻿// @vitest-environment node
 import {
   assertFails,
   assertSucceeds,
@@ -21,7 +21,7 @@ beforeAll(async () => {
   testEnv = await initializeTestEnvironment({ projectId: PROJECT_ID, firestore: { rules } });
 
   await testEnv.withSecurityRulesDisabled(async (ctx) => {
-    const adminDb = getFirestore(ctx.app);
+    const adminDb = ctx.firestore();
 
     await setDoc(doc(adminDb, 'weddings', 'wX'), {
       ownerIds: ['ownerX'],
@@ -77,25 +77,25 @@ D.each(COLLECTIONS)('%s subcollection permissions', (col) => {
   const newId = col + 'New';
 
   test('Owner can WRITE', async () => {
-    const db = getFirestore(ctx('ownerX').app);
+    const db = ctx('ownerX').firestore();
     const ref = doc(db, 'weddings', 'wX', col, newId);
     await assertSucceeds(setDoc(ref, { field: 'ok' }));
   });
 
   test('Planner can WRITE', async () => {
-    const db = getFirestore(ctx('plannerX').app);
+    const db = ctx('plannerX').firestore();
     const ref = doc(db, 'weddings', 'wX', col, newId + '2');
     await assertSucceeds(setDoc(ref, { field: 'ok' }));
   });
 
   test('Assistant CANNOT WRITE', async () => {
-    const db = getFirestore(ctx('assistantX').app);
+    const db = ctx('assistantX').firestore();
     const ref = doc(db, 'weddings', 'wX', col, newId + '3');
     await assertFails(setDoc(ref, { field: 'nope' }));
   });
 
   test('Unauthenticated cannot READ', async () => {
-    const db = getFirestore(ctx(null).app);
+    const db = ctx(null).firestore();
     const ref = doc(db, 'weddings', 'wX', col, 'doc1');
     await assertFails(getDoc(ref));
   });
@@ -103,13 +103,13 @@ D.each(COLLECTIONS)('%s subcollection permissions', (col) => {
 
 D('weddingInfo doc permissions', () => {
   test('Owner can UPDATE weddingInfo', async () => {
-    const db = getFirestore(ctx('ownerX').app);
+    const db = ctx('ownerX').firestore();
     const ref = doc(db, 'weddings', 'wX', 'weddingInfo');
     await assertSucceeds(setDoc(ref, { banquetPlace: 'Nuevo' }, { merge: true }));
   });
 
   test('Assistant cannot UPDATE weddingInfo', async () => {
-    const db = getFirestore(ctx('assistantX').app);
+    const db = ctx('assistantX').firestore();
     const ref = doc(db, 'weddings', 'wX', 'weddingInfo');
     await assertFails(setDoc(ref, { banquetPlace: 'Hack' }, { merge: true }));
   });
@@ -117,46 +117,47 @@ D('weddingInfo doc permissions', () => {
 
 D('users profile rules', () => {
   test('User can UPDATE own profile', async () => {
-    const db = getFirestore(ctx('plannerX').app);
+    const db = ctx('plannerX').firestore();
     await assertSucceeds(setDoc(doc(db, 'users', 'plannerX'), { bio: 'hello' }, { merge: true }));
   });
 
   test('User cannot UPDATE others profile', async () => {
-    const db = getFirestore(ctx('plannerX').app);
+    const db = ctx('plannerX').firestore();
     await assertFails(setDoc(doc(db, 'users', 'ownerX'), { bio: 'hack' }, { merge: true }));
   });
 
   test('Unauthenticated cannot WRITE profile', async () => {
-    const db = getFirestore(ctx(null).app);
+    const db = ctx(null).firestore();
     await assertFails(setDoc(doc(db, 'users', 'anon'), { name: 'Anon' }));
   });
 });
 
 D('wedding delete permissions', () => {
   test('Only owner or planner can DELETE wedding', async () => {
-    const dbOwner = getFirestore(ctx('ownerX').app);
+    const dbOwner = ctx('ownerX').firestore();
     await assertSucceeds(deleteDoc(doc(dbOwner, 'weddings', 'wX')));
 
     // recreate for next test
     await testEnv.withSecurityRulesDisabled(async (adminCtx) => {
-      await setDoc(doc(getFirestore(adminCtx.app), 'weddings', 'wX'), {
+      await setDoc(doc(adminCtx.firestore(), 'weddings', 'wX'), {
         ownerIds: ['ownerX'],
         plannerIds: ['plannerX'],
       });
     });
 
-    const dbPlanner = getFirestore(ctx('plannerX').app);
+    const dbPlanner = ctx('plannerX').firestore();
     await assertSucceeds(deleteDoc(doc(dbPlanner, 'weddings', 'wX')));
   });
 
   test('Assistant cannot DELETE wedding', async () => {
     await testEnv.withSecurityRulesDisabled(async (adminCtx) => {
-      await setDoc(doc(getFirestore(adminCtx.app), 'weddings', 'wX'), {
+      await setDoc(doc(adminCtx.firestore(), 'weddings', 'wX'), {
         ownerIds: ['ownerX'],
         assistantIds: ['assistantX'],
       });
     });
-    const db = getFirestore(ctx('assistantX').app);
+    const db = ctx('assistantX').firestore();
     await assertFails(deleteDoc(doc(db, 'weddings', 'wX')));
   });
 });
+

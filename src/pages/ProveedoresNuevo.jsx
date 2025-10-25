@@ -336,7 +336,7 @@ const Proveedores = () => {
       const enrichedQuery = [...baseTokens, ...profileSearchTokens].join(' ').trim();
 
       if (!trimmed && !enrichedQuery) {
-        if (!silent) toast.warn({t('common.anade_termino_completa_perfil_para')});
+        if (!silent) toast.warn(t('common.anade_termino_completa_perfil_para'));
         return;
       }
 
@@ -356,11 +356,11 @@ const Proveedores = () => {
         });
         const safeResults = Array.isArray(results) ? results : [];
         if (!safeResults.length && !silent) {
-          toast.info({t('common.encontramos_coincidencias_directas_ajusta_busqueda')});
+          toast.info(t('common.encontramos_coincidencias_directas_ajusta_busqueda'));
         }
       } catch (err) {
         console.warn('[Proveedores] searchProviders failed', err);
-        if (!silent) toast.error({t('common.pudo_completar_busqueda')});
+        if (!silent) toast.error(t('common.pudo_completar_busqueda'));
       }
     },
     [profileSearchTokens, registerSearchQuery, runAISearch, setSearchTerm]
@@ -501,7 +501,7 @@ const Proveedores = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                aria-label="Plegar exploración"
+                aria-label={t('common.aria_plegar_exploracion')}
                 onClick={() => setSearchPanelCollapsed(true)}
                 className="h-8 w-8 justify-center"
               >

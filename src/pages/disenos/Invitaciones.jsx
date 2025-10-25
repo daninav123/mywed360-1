@@ -90,13 +90,13 @@ export default function Invitaciones() {
       prompt: `${autoPrompt}`,
     },
     {
-      name: {t('common.clasico')},
+      name: t('common.clasico'),
       description: 'Serif, adornos muy sutiles',
       prompt: `${autoPrompt} Estilo clásico, serif sobria, marcos finos.`,
     },
     {
-      name: {t('common.geometrico')},
-      description: {t('common.lineas_formas_simples')},
+      name: t('common.geometrico'),
+      description: t('common.lineas_formas_simples'),
       prompt: `${autoPrompt} Estilo geométrico con líneas finas y simetría.`,
     },
     {

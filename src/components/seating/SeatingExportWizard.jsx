@@ -188,7 +188,7 @@ const MiniPreview = ({
 };
 
 const formatOptions = [
-  { id: 'pdf', label: {t('common.pdf_multipagina')} },
+  { id: 'pdf', label: t('common.pdf_multipagina') },
   { id: 'svg', label: 'SVG editable' },
   { id: 'csv', label: 'CSV (resumen invitados)' },
 ];

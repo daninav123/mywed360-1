@@ -165,7 +165,7 @@ const ReportGenerator = ({
 
     // Hoja 2: Transacciones
     const transactionsData = [
-      ['Fecha', 'Concepto', 'Proveedor', 'Tipo', 'Monto', {t('common.categoria')}],
+      ['Fecha', 'Concepto', 'Proveedor', 'Tipo', 'Monto', t('common.categoria')],
       ...data.map(t => [
         formatDate(t.date, 'short'),
         t.concept || t.description || '-',

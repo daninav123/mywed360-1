@@ -232,7 +232,7 @@ export default function ContributionSettings({
               <div>
                 <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1">
                   {t('finance.contributions.gifts.guestCount', {
-                    defaultValue: {t('common.numero_invitados')},
+                    defaultValue: t('common.numero_invitados'),
                   })}
                 </label>
                 <div className="flex space-x-2">
@@ -311,7 +311,7 @@ export default function ContributionSettings({
                 </h3>
                 <p className="text-sm text-[color:var(--color-text)]/70">
                   {t('finance.contributions.summary.subtitle', {
-                    defaultValue: {t('common.proyeccion_total_basada_tus_configuraciones')},
+                    defaultValue: t('common.proyeccion_total_basada_tus_configuraciones'),
                   })}
                 </p>
               </div>

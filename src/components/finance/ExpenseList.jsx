@@ -275,7 +275,7 @@ export function ExpenseList({
                       </button>
                       <button
                         onClick={() => {
-                          if (confirm({t('common.estas_seguro_eliminar_este_gasto')})) {
+                          if (confirm(t('common.estas_seguro_eliminar_este_gasto'))) {
                             onDelete?.(expense.id);
                           }
                         }}

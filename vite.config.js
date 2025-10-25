@@ -25,7 +25,7 @@ export default defineConfig(({ mode }) => {
             srcDir: 'src/pwa',
             filename: 'serviceWorker.js',
             registerType: 'autoUpdate',
-            includeAssets: ['logo-app.png', 'icon-192.png', 'icon-512.png', 'badge-72.png'],
+            includeAssets: ['maloveapp-logo.png', 'icon-192.png', 'icon-512.png', 'badge-72.png'],
             manifest: false
           })]
         : [])
@@ -96,4 +96,3 @@ export default defineConfig(({ mode }) => {
     }
   };
 });
-

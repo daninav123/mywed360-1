@@ -36,7 +36,7 @@ const FALLBACK_LANDING_COPY = {
     brandLabel: 'MaLove.App',
     logoAlt: 'Logotipo de MaLove.App',
     badge: 'Plataforma integral para bodas',
-    title: {t('common.coordina_boda_sonada_con_herramientas')},
+    title: t('common.coordina_boda_sonada_con_herramientas'),
     description: [
       {t('common.maloveapp_centraliza_planificacion_finanzas_comunicacion')},
     ],
@@ -46,8 +46,8 @@ const FALLBACK_LANDING_COPY = {
   },
   modules: { items: [] },
   planner: {
-    badge: {t('common.disenado_para_planners')},
-    title: {t('common.control_total_eventos_sin_hojas')},
+    badge: t('common.disenado_para_planners'),
+    title: t('common.control_total_eventos_sin_hojas'),
     description:
       {t('common.automatiza_tareas_repetitivas_manten_equipo')},
     highlights: [],
@@ -56,8 +56,8 @@ const FALLBACK_LANDING_COPY = {
   benefits: {
     items: {
       timelines: { title: 'Tiempos bajo control', description: '' },
-      collaboration: { title: {t('common.colaboracion_real')}, description: '' },
-      branding: { title: {t('common.diseno_consistente')}, description: '' },
+      collaboration: { title: t('common.colaboracion_real'), description: '' },
+      branding: { title: t('common.diseno_consistente'), description: '' },
       security: { title: 'Datos seguros', description: '' },
     },
   },

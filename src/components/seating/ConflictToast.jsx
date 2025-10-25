@@ -258,7 +258,7 @@ export function ConflictNotification({
     conflict(
       `${user.name} también está editando ${element}`,
       {
-        title: {t('common.conflicto_edicion_detectado')},
+        title: t('common.conflicto_edicion_detectado'),
         user,
         action: onViewChanges ? {
           label: 'Ver cambios',
@@ -304,7 +304,7 @@ export const SeatingConflictToasts = {
 
   layoutConflict: (username) => ({
     type: 'conflict',
-    title: {t('common.cambios_simultaneos')},
+    title: t('common.cambios_simultaneos'),
     message: `${username} ha modificado el layout`,
     duration: 7000,
     action: {
@@ -321,7 +321,7 @@ export const SeatingConflictToasts = {
 
   syncError: () => ({
     type: 'error',
-    title: {t('common.error_sincronizacion')},
+    title: t('common.error_sincronizacion'),
     message: 'No se pudieron sincronizar los cambios. Intentando reconectar...',
     duration: 5000
   }),

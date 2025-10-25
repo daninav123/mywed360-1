@@ -148,7 +148,7 @@ const AdminLogin = () => {
       navigate('/admin/dashboard', { replace: true });
     } catch (submitError) {
       console.error('[AdminLogin] Error durante el login admin:', submitError);
-      setError({t('auth.fue_posible_iniciar_sesion_intentalo')});
+      setError(t('auth.fue_posible_iniciar_sesion_intentalo'));
     } finally {
       setIsSubmitting(false);
     }
@@ -158,7 +158,7 @@ const AdminLogin = () => {
     event.preventDefault();
     if (isVerifyingMfa) return;
     if (!pendingAdminSession) {
-      setMfaError({t('auth.hay_desafio_mfa_activo_vuelve')});
+      setMfaError(t('auth.hay_desafio_mfa_activo_vuelve'));
       return;
     }
     if (mfaCode.trim().length !== MFA_CODE_LENGTH) {
@@ -196,7 +196,7 @@ const AdminLogin = () => {
       navigate('/admin/dashboard', { replace: true });
     } catch (mfaSubmitError) {
       console.error('[AdminLogin] Error al validar MFA:', mfaSubmitError);
-      setMfaError({t('auth.fue_posible_validar_codigo_intentalo')});
+      setMfaError(t('auth.fue_posible_validar_codigo_intentalo'));
     } finally {
       setIsVerifyingMfa(false);
     }
@@ -381,7 +381,7 @@ const AdminLogin = () => {
                 disabled={isVerifyingMfa || !mfaCode || mfaCode.length < MFA_CODE_LENGTH}
                 className="rounded-md bg-[color:var(--color-primary,#6366f1)] px-4 py-2 text-sm font-semibold text-white hover:bg-[color:var(--color-primary-dark,#4f46e5)] disabled:opacity-50"
               >
-                {isVerifyingMfa ? 'Verificando...' : {t('auth.verificar_codigo')}}
+                {isVerifyingMfa ? 'Verificando...' : t('auth.verificar_codigo')}
               </button>
             </div>
           </form>

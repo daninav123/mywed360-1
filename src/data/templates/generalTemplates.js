@@ -1,9 +1,12 @@
+import { useTranslations } from '../../hooks/useTranslations';
 /**
  * Plantillas de email generales para diversas situaciones
  */
 
 const generalTemplates = [
   {
+  const { t } = useTranslations();
+
     id: 'template_general_consulta_1',
     name: 'Consulta general',
     category: 'General',
@@ -91,9 +94,9 @@ Saludos,
   },
   {
     id: 'template_general_confirmacion_1',
-    name: 'Confirmación de recepción',
+    name: t('common.confirmacion_recepcion'),
     category: 'General',
-    subject: 'Confirmación de recepción: {{asunto_original}}',
+    subject: t('common.confirmacion_recepcion_asuntooriginal'),
     body: `
 Estimado/a {{nombre_destinatario}},
 
@@ -120,9 +123,9 @@ Saludos cordiales,
   },
   {
     id: 'template_general_reunion_1',
-    name: 'Solicitud de reunión',
+    name: t('common.solicitud_reunion'),
     category: 'General',
-    subject: 'Solicitud de reunión - {{tema_reunion}}',
+    subject: t('common.solicitud_reunion_temareunion'),
     body: `
 Hola {{nombre_destinatario}},
 

@@ -33,7 +33,7 @@ const ImportTransactions = ({
     ];
 
     if (!validTypes.includes(selectedFile.type) && !selectedFile.name.match(/\.(csv|xlsx|xls)$/i)) {
-      setError({t('common.formato_valido_por_favor_sube')});
+      setError(t('common.formato_valido_por_favor_sube'));
       return;
     }
 
@@ -51,7 +51,7 @@ const ImportTransactions = ({
       const lines = text.split('\n').filter(line => line.trim());
       
       if (lines.length === 0) {
-        throw new Error({t('common.archivo_esta_vacio')});
+        throw new Error(t('common.archivo_esta_vacio'));
       }
 
       // Primera línea como headers
@@ -88,7 +88,7 @@ const ImportTransactions = ({
       if (!mapping.date && (lower.includes('fecha') || lower.includes('date'))) {
         mapping.date = header;
       }
-      if (!mapping.concept && (lower.includes('concepto') || lower.includes('description') || lower.includes({t('common.descripcion')}))) {
+      if (!mapping.concept && (lower.includes('concepto') || lower.includes('description') || lower.includes(t('common.descripcion')))) {
         mapping.concept = header;
       }
       if (!mapping.amount && (lower.includes('monto') || lower.includes('amount') || lower.includes('importe') || lower.includes('cantidad'))) {
@@ -137,7 +137,7 @@ const ImportTransactions = ({
       }).filter(t => t.date && t.concept && t.amount); // Filtrar filas inválidas
 
       if (transactions.length === 0) {
-        throw new Error({t('common.encontraron_transacciones_validas')});
+        throw new Error(t('common.encontraron_transacciones_validas'));
       }
 
       // Llamar callback con las transacciones

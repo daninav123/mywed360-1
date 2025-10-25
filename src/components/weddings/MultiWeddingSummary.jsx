@@ -191,7 +191,7 @@ export default function MultiWeddingSummary({
           onClick={onSyncAll}
           disabled={syncing || filteredStats.count === 0}
         >
-          {syncing ? 'Sincronizando...' : {t('common.sincronizar_seleccion_con_crm')}}
+          {syncing ? 'Sincronizando...' : t('common.sincronizar_seleccion_con_crm')}
         </Button>
         <Button
           size="sm"

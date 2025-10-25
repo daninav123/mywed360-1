@@ -59,7 +59,7 @@ export default function TaskNotificationWatcher({ intervalMs = 5 * 60 * 1000 }) 
           const key = `${kind}:${doc.id}:${end.toISOString().slice(0,10)}`;
           if (seen[key]) continue;
 
-          const title = isOverdue ? 'Tarea vencida' : {t('common.tarea_proxima_vencer')};
+          const title = isOverdue ? 'Tarea vencida' : t('common.tarea_proxima_vencer');
           const name = t.title || t.name || 'Tarea';
           const endStr = end.toLocaleString('es-ES');
           const message = isOverdue ? `${name} venció (${endStr})` : `${name} vence antes de 24h (${endStr})`;

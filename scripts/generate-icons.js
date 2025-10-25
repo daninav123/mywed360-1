@@ -1,5 +1,5 @@
 /*
- Generates PWA icons from public/logo-app.png into standard sizes.
+ Generates PWA icons from public/maloveapp-logo.png into standard sizes.
  Requires `sharp` (already in dev dependencies).
 */
 const fs = require('fs');
@@ -11,11 +11,11 @@ async function ensureDir(p) {
 }
 
 async function generate() {
-  const src = path.resolve('public', 'logo-app.png');
+  const src = path.resolve('public', 'maloveapp-logo.png');
   const outDir = path.resolve('public');
 
   if (!fs.existsSync(src)) {
-    console.error('Source logo not found at public/logo-app.png');
+    console.error('Source logo not found at public/maloveapp-logo.png');
     process.exit(1);
   }
 
@@ -41,4 +41,3 @@ generate().catch((e) => {
   console.error(e);
   process.exit(1);
 });
-

@@ -7,7 +7,7 @@ const statusMessage = (slugStatus, checking) => {
   if (checking) return { text: 'Comprobando…', tone: 'neutral' };
   switch (slugStatus) {
     case 'invalid':
-      return { text: {t('common.slug_invalido')}, tone: 'error' };
+      return { text: t('common.slug_invalido'), tone: 'error' };
     case 'reserved':
       return { text: 'Slug reservado', tone: 'error' };
     case 'taken':

@@ -116,7 +116,7 @@ export default function RSVPDashboard() {
             // Crear notificación persistente (no altera diseño)
             await addNotification({
               type: 'info',
-              message: {t('common.recordatorio_rsvp_fecha_limite_esta')},
+              message: t('common.recordatorio_rsvp_fecha_limite_esta'),
               action: 'viewRSVP',
               weddingId: activeWedding,
               category: 'rsvp',
@@ -376,7 +376,7 @@ export default function RSVPDashboard() {
                   disabled={!activeWedding || sending}
                   onClick={async () => {
                     if (!activeWedding) return;
-                    const ok = window.confirm({t('common.enviar_recordatorios_por_email_pendientes')});
+                    const ok = window.confirm(t('common.enviar_recordatorios_por_email_pendientes'));
                     if (!ok) return;
                     setSending(true);
                     try {

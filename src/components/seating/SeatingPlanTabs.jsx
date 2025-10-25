@@ -25,14 +25,14 @@ const SeatingPlanTabs = ({
       label: 'Ceremonia',
       icon: Church,
       count: ceremonyCount,
-      description: {t('common.disposicion_asientos_para_ceremonia')},
+      description: t('common.disposicion_asientos_para_ceremonia'),
     },
     {
       id: 'banquet',
       label: 'Banquete',
       icon: Utensils,
       count: banquetCount,
-      description: {t('common.distribucion_mesas_para_banquete')},
+      description: t('common.distribucion_mesas_para_banquete'),
     },
   ];
 

@@ -10,9 +10,9 @@
 - Ofrecer inspiraci�n musical asistida por IA y plantillas para duplicar/reordenar momentos.
 
 ## 2. Triggers y rutas
-- Navegaci�n: `M�s � Protocolo � Momentos especiales`; es la pesta�a principal dentro de Protocolo.
-- Acceso r�pido desde tareas que contengan momentos especiales, votos, lecturas (ver `TasksRefactored.jsx`).
-- Notificaciones internas pueden enlazar al flujo cuando faltan canciones en bloques cr�ticos.
+- Navegacion: `Mas → Protocolo → Momentos especiales`; se trata de una ruta dedicada dentro del modulo Protocolo (sin pestañas compartidas).
+- Acceso rapido desde tareas que contengan "momentos especiales", "votos", "lecturas" (ver `TasksRefactored.jsx`).
+- Notificaciones internas pueden enlazar al flujo cuando faltan canciones en bloques criticos.
 
 ## 3. Estado actual
 

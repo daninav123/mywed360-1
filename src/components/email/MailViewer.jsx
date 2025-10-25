@@ -137,7 +137,7 @@ export default function MailViewer({
     onMarkRead && onMarkRead(mail);
   };
   const handleDelete = () => {
-    if (onDelete && window.confirm({t('common.borrar_este_correo')})) {
+    if (onDelete && window.confirm(t('common.borrar_este_correo'))) {
       onDelete(mail);
     }
   };

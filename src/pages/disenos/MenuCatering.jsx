@@ -10,32 +10,32 @@ const cateringTemplates = [
   {
   const { t } = useTranslations();
 
-    name: {t('common.menu_vegetariano')},
-    description: {t('common.diseno_elegante_para_menus_vegetarianos')},
+    name: t('common.menu_vegetariano'),
+    description: t('common.diseno_elegante_para_menus_vegetarianos'),
     prompt:
       {t('common.disena_una_tarjeta_menu_vegetariano')},
   },
   {
-    name: {t('common.menu_infantil')},
-    description: {t('common.diseno_divertido_pero_elegante_para')},
+    name: t('common.menu_infantil'),
+    description: t('common.diseno_divertido_pero_elegante_para'),
     prompt:
       {t('common.crea_diseno_menu_infantil_para')},
   },
   {
-    name: {t('common.menu_sin_gluten')},
-    description: {t('common.diseno_elegante_para_menus_sin')},
+    name: t('common.menu_sin_gluten'),
+    description: t('common.diseno_elegante_para_menus_sin'),
     prompt:
       {t('common.disena_una_tarjeta_menu_sin')},
   },
   {
-    name: {t('common.menu_sin_lacteos')},
-    description: {t('common.diseno_para_menus_libres_lacteos')},
+    name: t('common.menu_sin_lacteos'),
+    description: t('common.diseno_para_menus_libres_lacteos'),
     prompt:
       'Crea un diseño de menú sin lácteos para boda. El diseño debe ser elegante y refinado, en línea con la estética general de la boda. Incluye un título claro como "Menú Sin Lácteos" o {t('common.menu_libre_lacteos')}. Proporciona espacio para listar entrantes, plato principal y postre. Puedes incorporar algún elemento gráfico sutil que indique la ausencia de lácteos. La paleta de colores debe ser armoniosa con el resto de la decoración del evento.',
   },
   {
-    name: {t('common.menu_personalizado')},
-    description: {t('common.diseno_versatil_para_cualquier_necesidad')},
+    name: t('common.menu_personalizado'),
+    description: t('common.diseno_versatil_para_cualquier_necesidad'),
     prompt:
       {t('common.disena_formato_menu_personalizable_para')},
   },
@@ -66,11 +66,11 @@ export default function MenuCatering() {
       const items = specialMenus[type];
       const typeLabel =
         {
-          vegetariano: {t('common.menu_vegetariano')},
-          infantil: {t('common.menu_infantil')},
-          sinGluten: {t('common.menu_sin_gluten')},
-          sinLacteos: {t('common.menu_sin_lacteos')},
-          otros: {t('common.menu_especial')},
+          vegetariano: t('common.menu_vegetariano'),
+          infantil: t('common.menu_infantil'),
+          sinGluten: t('common.menu_sin_gluten'),
+          sinLacteos: t('common.menu_sin_lacteos'),
+          otros: t('common.menu_especial'),
         }[type] || {t('common.menu_especial')};
 
       return `${typeLabel}: ${items.join(', ')}`;

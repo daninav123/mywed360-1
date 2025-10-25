@@ -104,14 +104,14 @@ export default function SeatingToolbarFloating({
     {
       id: 'add',
       icon: Plus,
-      label: {t('common.anadir_mesa')},
+      label: t('common.anadir_mesa'),
       shortcut: 'A',
       onClick: onAddTable,
     },
     {
       id: 'draw',
       icon: Pencil,
-      label: {t('common.dibujar_areas')},
+      label: t('common.dibujar_areas'),
       shortcut: 'D',
       onClick: onOpenDrawMode,
     },
@@ -158,7 +158,7 @@ export default function SeatingToolbarFloating({
     {
       id: 'settings',
       icon: Settings,
-      label: {t('common.configuracion')},
+      label: t('common.configuracion'),
       shortcut: ',',
       onClick: onOpenSettings,
     },

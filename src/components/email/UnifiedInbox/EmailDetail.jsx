@@ -433,7 +433,7 @@ const EmailDetail = ({
               <button
                 onClick={() => setShowDropdown(!showDropdown)}
                 className="rounded-full p-1.5 text-muted transition hover:bg-gray-100"
-                aria-label="Más acciones"
+                aria-label={t('common.aria_mas_acciones')}
               >
                 <MoreHorizontal size={20} />
               </button>
@@ -602,7 +602,7 @@ const EmailDetail = ({
                       <span>
                         {attachment.size
                           ? `${Math.round(attachment.size / 1024)} KB`
-                          : {t('common.tamano_desconocido')}}
+                          : t('common.tamano_desconocido')}
                       </span>
                       <button
                         className="text-blue-600 hover:text-blue-800 p-1"

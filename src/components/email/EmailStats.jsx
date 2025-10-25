@@ -91,7 +91,7 @@ const EmailStats = ({
       setDailyStats(Array.isArray(daily) ? daily : []);
     } catch (error) {
       console.error('Error al cargar estadísticas:', error);
-      setError({t('common.pudieron_cargar_las_estadisticas')});
+      setError(t('common.pudieron_cargar_las_estadisticas'));
     } finally {
       setLoading(false);
     }

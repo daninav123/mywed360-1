@@ -1,3 +1,4 @@
+import { useTranslations } from '../../hooks/useTranslations';
 import React, { forwardRef, memo, useRef, useMemo, useState } from 'react';
 
 import ChairItem from '../../components/ChairItem';
@@ -14,6 +15,8 @@ import SelectionMarquee from '../../components/seating/SelectionMarquee';
  */
 const SeatingCanvas = forwardRef(function SeatingCanvas(
   {
+  const { t } = useTranslations();
+
     tab,
     areas,
     tables,
@@ -255,12 +258,12 @@ const SeatingCanvas = forwardRef(function SeatingCanvas(
               // 1) Fuera de perímetro (si existe)
               if (boundaryPoly && !boxInsidePoly(selfBox, boundaryPoly)) {
                 danger = true;
-                dangerReason = 'Fuera del perímetro';
+                dangerReason = {t('common.fuera_del_perimetro')};
               }
               // 2) Colisión con obstáculo/puerta
               if (!danger && obstaclesRects.some((o) => rectsOverlap(padded, o))) {
                 danger = true;
-                dangerReason = 'Colisión con obstáculo';
+                dangerReason = {t('common.colision_con_obstaculo')};
               }
               // 3) Demasiado cerca de otra mesa (pasillo mínimo)
               if (!danger) {

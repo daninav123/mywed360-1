@@ -61,7 +61,7 @@ const rows = [
   {
     group: 'finance',
     entries: [
-      { key: 'invoiceDue', label: {t('common.factura_proxima_vencer')} },
+      { key: 'invoiceDue', label: t('common.factura_proxima_vencer') },
       { key: 'paymentReceived', label: 'Pago recibido' },
     ],
   },
@@ -92,7 +92,7 @@ const NotificationSettings = () => {
     const evt = { type: 'ai', subtype: 'task_suggested', priority: 'high', channel: 'toast' };
     if (!shouldNotify(evt, prefs)) return;
     showNotification({
-      title: {t('common.prueba_notificacion')},
+      title: t('common.prueba_notificacion'),
       message: 'Este es un aviso de prueba respetando tus ajustes.',
       type: 'info',
       duration: 4000,

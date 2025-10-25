@@ -273,7 +273,7 @@ const AdminTaskTemplates = () => {
       
       const { items } = await loadTemplates({ forceRefresh: true, silent: true });
       selectTemplate(form.id, items);
-      setMessage({t('common.version_publicada_correctamente')});
+      setMessage(t('common.version_publicada_correctamente'));
     } catch (publishError) {
       // Manejar errores de validación de dependencias
       if (publishError?.response?.data?.error === 'cannot_publish_invalid_dependencies') {
@@ -394,7 +394,7 @@ const AdminTaskTemplates = () => {
   };
 
   const handleDeleteItem = (blockIndex, itemIndex) => {
-    if (!confirm({t('common.eliminar_esta_subtarea')})) return;
+    if (!confirm(t('common.eliminar_esta_subtarea'))) return;
     
     try {
       const blocks = JSON.parse(form.blocksJson);
@@ -810,7 +810,7 @@ const AdminTaskTemplates = () => {
             }}
             className="rounded-md bg-purple-600 px-4 py-2 text-sm font-semibold text-white hover:bg-purple-700"
           >
-            {showUserTasks ? '← Volver' : {t('common.analisis')}}
+            {showUserTasks ? '← Volver' : t('common.analisis')}
           </button>
         </div>
       </header>
@@ -910,7 +910,7 @@ const AdminTaskTemplates = () => {
                                 ? `{ "title": "${task.title}", "startPct": 0, "endPct": 0.05 }`
                                 : `{\n  "name": "${task.title}",\n  "startPct": 0,\n  "endPct": 0.2,\n  "admin": { "category": "${task.categories[0] || 'OTROS'}" },\n  "items": []\n}`;
                               navigator.clipboard.writeText(textToCopy);
-                              alert({t('common.json_copiado_portapapeles_pegalo_editor')});
+                              alert(t('common.json_copiado_portapapeles_pegalo_editor'));
                             }}
                             className="text-blue-600 hover:text-blue-800 font-medium text-xs"
                           >
@@ -1027,7 +1027,7 @@ const AdminTaskTemplates = () => {
                     v{tpl.version || '—'} · {formatCount(totals.blocks)} bloques · {formatCount(totals.subtasks)} subtareas
                   </div>
                   <div className="text-xs text-[var(--color-text-soft,#6b7280)]">
-                    {tpl.updatedAt ? `Actualizado ${tpl.updatedAt}` : {t('common.sin_fecha_actualizacion')}}
+                    {tpl.updatedAt ? `Actualizado ${tpl.updatedAt}` : t('common.sin_fecha_actualizacion')}
                   </div>
                 </button>
               );

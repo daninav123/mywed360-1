@@ -546,7 +546,7 @@
         "suffix": "@maloveapp.com",
         "helper": "Solo letras minusculas, numeros y puntos. Minimo 3 caracteres.",
         "validationError": "El alias debe tener al menos 3 caracteres y solo puede contener letras, numeros y puntos.",
-        "success": "Tu direccion de correo ha sido actualizada con exito.",
+        "success": "Tu direccion de correo ha sido actualizada con eÉxito.",
         "button": {
           "default": "Actualizar direccion",
           "loading": "Actualizando..."

@@ -28,7 +28,7 @@ const ContactsImporterFixed = ({ onImported }) => {
     if (!('contacts' in navigator) || !navigator.contacts?.select) {
       alert(
         t('guests.contacts.unsupported', {
-          defaultValue: {t('common.este_dispositivonavegador_soporta_seleccion_contactos')},
+          defaultValue: t('common.este_dispositivonavegador_soporta_seleccion_contactos'),
         })
       );
       return;
@@ -135,7 +135,7 @@ const ContactsImporterFixed = ({ onImported }) => {
       if (!parsed.length) {
         alert(
           t('guests.contacts.csvEmpty', {
-            defaultValue: {t('common.csv_contiene_filas_validas')},
+            defaultValue: t('common.csv_contiene_filas_validas'),
           })
         );
         return;

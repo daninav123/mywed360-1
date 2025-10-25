@@ -27,7 +27,7 @@
 
 ## Roadmap / pendientes
 - Tipos adicionales (simbólica, destino) y más países.  
-- Desplegar variaciones completas por país: para cada combinación `tipo de ceremonia × país` se definen bloques (preparación, obtención, legalización), responsables, plazos sugeridos y alertas contextuales (ej. apostillas). El layout reordena pestañas y copy según la jurisdicción seleccionada.
+- Desplegar variaciones completas por país: para cada combinación `tipo de ceremonia × país` se definen bloques (preparación, obtención, legalización), responsables, plazos sugeridos y alertas contextuales (ej. apostillas). La disposición se ajusta por jurisdicción sin depender de pestañas compartidas.
 - Selector de país con memoria multiusuario: el país asignado automáticamente se almacena en `weddings/{id}/ceremony/legal.countryOrigin`, mientras que los overrides manuales se registran por usuario para evitar conflictos (`legalSettings/{uid}` con `preferredCountry` y timestamp).
 - Sincronización multiusuario (guardar progreso en Firestore) y notas por requisito.  
 - Instrumentación (`ceremony_document_guide_opened`) y automatismos en checklist (marcar estado).

@@ -215,7 +215,7 @@ const GuestList = React.memo(
             <p className="text-muted">
               {searchTerm || statusFilter || tableFilter
                 ?{t('common.intenta_ajustar_los_filtros_busqueda')}
-                : {t('common.anade_primer_invitado_para_comenzar')}}
+                : t('common.anade_primer_invitado_para_comenzar')}
             </p>
           </div>
         ) : (

@@ -17,7 +17,7 @@
 ## 3. Estado actual
 
 ### Implementado hoy
-- Dos pesta�as operativas: "Lecturas" y "Ramos y Sorpresas".  
+- Secciones dedicadas para "Lecturas" y "Ramos y Sorpresas", disponibles como rutas independientes dentro de Protocolo.  
 - Editor de lecturas con duraci�n estimada autom�tica, vista previa modal y control de estado (`draft`/`final`).  
 - Persistencia compartida en Firestore con `updatedAt`, `updatedBy` y registro de eventos (`ceremony_text_created`, `ceremony_text_finalized`).  
 - Lista de sorpresas con alta, cambio de estado y eliminaci�n sincronizados en tiempo real.  

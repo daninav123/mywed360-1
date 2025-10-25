@@ -1838,10 +1838,17 @@ router.get('/metrics', async (_req, res) => {
     if (!weddingsTotal) {
       try { weddingsTotal = await countDocuments(collections.weddingsGroup); } catch { weddingsTotal = 0; }
     }
-    let weddingsActive = await countDocuments(collections.weddings, [{ field: 'status', op: '==', value: 'active' }]);
+    let weddingsActive = await countDocuments(collections.weddings, [{ field: 'active', op: '==', value: true }]);
     if (!weddingsActive) {
-      try { weddingsActive = await countDocuments(collections.weddingsGroup, [{ field: 'status', op: '==', value: 'active' }]); } catch { weddingsActive = 0; }
+      try { weddingsActive = await countDocuments(collections.weddingsGroup, [{ field: 'active', op: '==', value: true }]); } catch { weddingsActive = 0; }
     }
+    if (!weddingsActive) {
+      try { weddingsActive = await countDocuments(collections.weddings, [{ field: 'status', op: '==', value: 'active' }]); } catch {}
+    }
+    if (!weddingsActive) {
+      try { weddingsActive = await countDocuments(collections.weddingsGroup, [{ field: 'status', op: '==', value: 'active' }]); } catch {}
+    }
+    weddingsActive = Number.isFinite(weddingsActive) ? weddingsActive : 0;
     
     const withPlanner = await countDocuments(collections.weddings, [{ field: 'plannerIds', op: '!=', value: [] }]).catch(() => 0);
     const withoutPlanner = await countDocuments(collections.weddings, [{ field: 'plannerIds', op: '==', value: [] }]).catch(() => 0);

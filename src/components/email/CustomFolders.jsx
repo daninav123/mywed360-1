@@ -116,7 +116,7 @@ const CustomFolders = ({
                 onClick={cancelAction}
                 className="p-1 text-red-600 hover:text-red-800"
                 title="Cancelar"
-                aria-label="Cancelar edición de carpeta"
+                aria-label={t('common.aria_cancelar_edicion_de_carpeta')}
               >
                 <X size={16} aria-hidden="true" />
               </button>

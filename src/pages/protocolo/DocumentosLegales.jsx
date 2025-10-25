@@ -69,28 +69,28 @@ const DOWNLOAD_TEMPLATES = {
       {
         id: 'solicitud_expediente_matrimonial',
         title: 'Solicitud de expediente matrimonial',
-        desc: {t('common.modelo_generico_para_registro_civil')},
+        desc: t('common.modelo_generico_para_registro_civil'),
       },
       {
         id: 'declaracion_estado_civil',
-        title: {t('common.declaracion_jurada_estado_civil')},
-        desc: {t('common.solteria_divorcio_viudedad')},
+        title: t('common.declaracion_jurada_estado_civil'),
+        desc: t('common.solteria_divorcio_viudedad'),
       },
       {
         id: 'modelo_testigos',
-        title: {t('common.modelo_declaracion_testigos')},
-        desc: {t('common.aportacion_testigos_registro_solicita')},
+        title: t('common.modelo_declaracion_testigos'),
+        desc: t('common.aportacion_testigos_registro_solicita'),
       },
     ],
     iglesia: [
       {
         id: 'solicitud_expediente_canonico',
-        title: {t('common.solicitud_expediente_matrimonial_canonico')},
-        desc: {t('common.modelo_tipo_para_parroquiadiocesis')},
+        title: t('common.solicitud_expediente_matrimonial_canonico'),
+        desc: t('common.modelo_tipo_para_parroquiadiocesis'),
       },
       {
         id: 'fe_solteria_eclesiastica',
-        title: {t('common.solteria_modelo')},
+        title: t('common.solteria_modelo'),
         desc: 'Para su parroquia de origen',
       },
       {
@@ -105,14 +105,14 @@ const DOWNLOAD_TEMPLATES = {
       {
         id: 'solicitud_expediente_matrimonial',
         title: 'Demande de dossier matrimonial (modèle)',
-        desc: {t('common.modele_generique')},
+        desc: t('common.modele_generique'),
       },
     ],
     iglesia: [
       {
         id: 'solicitud_expediente_canonico',
         title: 'Demande de dossier canonique (modèle)',
-        desc: {t('common.modele_generique')},
+        desc: t('common.modele_generique'),
       },
     ],
   },
@@ -140,7 +140,7 @@ function guessRelatedCeremonyId(label = '') {
   const lower = String(label).toLowerCase();
   if (lower.includes('curso')) return 'curso';
   if (lower.includes('ensayo')) return 'rehearsal';
-  if (lower.includes('proveedor') || lower.includes({t('common.musica')}) || lower.includes('sonido')) {
+  if (lower.includes('proveedor') || lower.includes(t('common.musica')) || lower.includes('sonido')) {
     return 'suppliers';
   }
   return DEFAULT_RELATED_ID;

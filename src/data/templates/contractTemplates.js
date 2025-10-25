@@ -1,9 +1,12 @@
+import { useTranslations } from '../../hooks/useTranslations';
 // Plantillas simples para contratos de proveedores
 
 const contractTemplates = [
   {
+  const { t } = useTranslations();
+
     id: 'contrato_generico_servicios',
-    name: 'Contrato genérico de prestación de servicios',
+    name: t('common.contrato_generico_prestacion_servicios'),
     ext: 'txt',
     mime: 'text/plain',
     body: `CONTRATO DE PRESTACIÓN DE SERVICIOS
@@ -31,7 +34,7 @@ PROVEEDOR: ________________________
   },
   {
     id: 'acuerdo_basico_reserva',
-    name: 'Acuerdo básico de reserva',
+    name: t('common.acuerdo_basico_reserva'),
     ext: 'txt',
     mime: 'text/plain',
     body: `ACUERDO BÁSICO DE RESERVA DE SERVICIOS

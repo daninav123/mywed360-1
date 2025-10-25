@@ -1,4 +1,4 @@
-import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+﻿import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { Users, X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -171,7 +171,7 @@ function Perfil() {
     // Validaciones rÍpidas
     try {
       if (account.email && !/^\S+@\S+\.\S+$/.test(account.email)) {
-        toast.error({t('common.correo_electrnico_invilido')});
+        toast.error(t('common.correo_electrnico_invilido'));
         return;
       }
       if (account.whatsNumber && !/^\+?[0-9]{8,15}$/.test(account.whatsNumber.trim())) {
@@ -181,7 +181,7 @@ function Perfil() {
       if (weddingInfo.weddingDate) {
         const d = new Date(weddingInfo.weddingDate);
         if (isNaN(d.getTime())) {
-          toast.error({t('common.fecha_boda_invilida')});
+          toast.error(t('common.fecha_boda_invilida'));
           return;
         }
       }
@@ -559,3 +559,4 @@ function Perfil() {
 }
 
 export default Perfil;
+

@@ -15,7 +15,7 @@
 ## 2. Trigger y rutas
 - Redirección automática tras registro/verificación cuando `activeWeddingId` es falsy.
 - Acceso manual a `/create-wedding-ai` para owners (roles `owner`/`pareja`). Planners y asistentes reciben bloqueo con CTA a inicio.
-- CTA «Crear nuevo evento» disponible en la cabecera para owners con eventos existentes (multi-evento).
+- CTA «Crear nuevo evento» en la cabecera y en el menú contextual fueron retirados; no debe existir este botón en la navegación superior para ningún rol. Los accesos multi-evento quedan limitados a flujos dedicados (wizard, onboarding, enlaces profundos aprobados).
 
 ## 3. Paso a paso UX (wizard multi-evento)
 1. **Paso 1 · Datos base**
@@ -91,7 +91,7 @@
 
 ## Cobertura E2E implementada
 - `cypress/e2e/onboarding/create-event-flow.cy.js`: recorre ambos pasos del wizard multi-evento, valida persistencia de datos entre pasos y el copy condicional según tipo de evento.
-- `cypress/e2e/onboarding/create-event-cta.cy.js`: valida el CTA «Crear nuevo evento» para owners con eventos activos y la navegación directa al asistente.
+- `cypress/e2e/onboarding/create-event-cta.cy.js`: asegura que el CTA «Crear nuevo evento» no aparece ni en la cabecera ni en el menú contextual.
 
 ## 10. Checklist de despliegue
 - Reglas Firestore: permitir escritura de `eventType`, `eventProfile`, `eventProfileSummary` y nuevos campos en `_seed_meta`.
@@ -110,7 +110,7 @@
 - ✅ 2025-10-13: Asistencia IA contextual con prompts por tipo de evento y fallback offline en ChatWidget.
 - ✅ 2025-10-08: Wizard multi-evento, servicios y pantallas asociados actualizados para `eventType/eventProfile`.
 - ✅ 2025-10-08: Catálogo de estilos centralizado y copy adaptable (`Boda`/`Evento`).
-- ✅ 2025-10-13: CTA «Crear nuevo evento» en header y selector multi-evento habilitado para owners.
+- 🚫 2025-10-13: CTA «Crear nuevo evento» retirado del header y del menú contextual; ambos deben permanecer sin botón y mantenerse el selector multi-evento habilitado para owners.
 
 ## 12. Resumen de implementación · 2025-10-08
 - Wizard dividido en dos pasos con guardas de rol, selector `eventType` y perfil ampliado (`eventProfile`).

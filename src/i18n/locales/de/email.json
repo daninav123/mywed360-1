@@ -2,7 +2,49 @@
   "email": {
     "title": "Correo electrónico",
     "inbox": "Bandeja de entrada",
-    "compose": "Redactar",
+    "compose": {
+      "0": "R",
+      "1": "e",
+      "2": "d",
+      "3": "a",
+      "4": "c",
+      "5": "t",
+      "6": "a",
+      "7": "r",
+      "header": {
+        "title": "New email"
+      },
+      "fields": {
+        "to": {
+          "placeholder": "To:",
+          "aria": "Recipient field"
+        },
+        "subject": {
+          "placeholder": "Subject:",
+          "aria": "Subject field"
+        },
+        "cc": {
+          "placeholder": "CC:",
+          "aria": "CC field"
+        },
+        "bcc": {
+          "placeholder": "BCC:",
+          "aria": "BCC field"
+        }
+      },
+      "toggle": {
+        "showCcBcc": "Add CC/BCC",
+        "hideCcBcc": "Hide CC/BCC"
+      },
+      "quickReplies": {
+        "options": [
+          "Thank you for your response. I look forward to the next steps.",
+          "Could you please send us a detailed quote?",
+          "We confirm our availability on the suggested date. Thank you."
+        ],
+        "ariaLabel": "Insert suggested reply {{index}}"
+      }
+    },
     "sent": "Enviados",
     "drafts": "Borradores",
     "trash": "Papelera",
@@ -512,7 +554,7 @@
         "suffix": "@maloveapp.com",
         "helper": "Solo letras minusculas, numeros y puntos. Minimo 3 caracteres.",
         "validationError": "El alias debe tener al menos 3 caracteres y solo puede contener letras, numeros y puntos.",
-        "success": "Tu direccion de correo ha sido actualizada con exito.",
+        "success": "Tu direccion de correo ha sido actualizada con eÉxito.",
         "button": {
           "default": "Actualizar direccion",
           "loading": "Actualizando..."

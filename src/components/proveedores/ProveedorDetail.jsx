@@ -188,7 +188,7 @@ const ProveedorDetail = ({
     const contractsSigned = providerStatus?.contracts?.byStatus?.signed ?? 0;
     const contractsTotal = providerStatus?.contracts?.total ?? 0;
     if (contractsTotal > 0 && contractsSigned === 0) {
-      alerts.push({t('common.aun_hay_contratos_firmados_con')});
+      alerts.push(t('common.aun_hay_contratos_firmados_con'));
     }
     if ((financialSummary.pending || 0) > 0) {
       alerts.push('Existen pagos pendientes por registrar o confirmar.');
@@ -225,7 +225,7 @@ const ProveedorDetail = ({
     let amount = 100;
     try {
       if (typeof window !== 'undefined') {
-        const input = window.prompt({t('common.importe_senal_eur')}, '100');
+        const input = window.prompt(t('common.importe_senal_eur'), '100');
         if (input != null && input !== '') amount = Math.max(1, parseFloat(input));
       }
     } catch {}
@@ -1062,9 +1062,9 @@ const ProveedorDetail = ({
           setMergeOpen(false);
           if (!result) return;
           if (result.type === 'merge') {
-            setToast({ type: 'success', message: {t('common.lineas_combinadas_correctamente')} });
+            setToast({ type: 'success', message: t('common.lineas_combinadas_correctamente') });
           } else if (result.type === 'split') {
-            setToast({ type: 'success', message: {t('common.creo_proveedor_nuevo_con_las')} });
+            setToast({ type: 'success', message: t('common.creo_proveedor_nuevo_con_las') });
           }
         }}
       />

@@ -73,14 +73,14 @@ const WeddingAccountLink = () => {
 
   const handleAcceptInvite = async () => {
     if (!inviteCode) {
-      setError({t('common.introduce_codigo_invitacion')});
+      setError(t('common.introduce_codigo_invitacion'));
       return;
     }
     try {
       setLoading(true);
       setError('');
       await acceptInvitation(inviteCode);
-      setSuccess({t('common.invitacion_aceptada_correctamente')});
+      setSuccess(t('common.invitacion_aceptada_correctamente'));
       setInviteCode('');
     } catch (err) {
       setError(err.message);

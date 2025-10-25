@@ -11,8 +11,8 @@ const TABS = [
   const { t } = useTranslations();
  id: 'resumen', label: '📊 Resumen' },
   { id: 'producto', label: '📱 Producto' },
-  { id: 'economicas', label: {t('common.economicas')} },
-  { id: 'tecnicas', label: {t('common.tecnicas')} },
+  { id: 'economicas', label: t('common.economicas') },
+  { id: 'tecnicas', label: t('common.tecnicas') },
   { id: 'soporte', label: '🎫 Soporte' },
 ];
 

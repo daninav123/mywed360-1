@@ -46,7 +46,7 @@ export default function Checklist() {
 
   const blocks = [
     {
-      name: {t('common.dia_previo_boda')},
+      name: t('common.dia_previo_boda'),
       tasks: [
         {
           id: 1,

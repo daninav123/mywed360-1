@@ -461,7 +461,7 @@ const AyudaCeremonia = () => {
                             className="text-red-600 hover:text-red-800"
                             onClick={() => {
                               if (
-                                window.confirm({t('common.seguro_que_quieres_eliminar_este')})
+                                window.confirm(t('common.seguro_que_quieres_eliminar_este'))
                               ) {
                                 removeSurprise(item.id);
                               }

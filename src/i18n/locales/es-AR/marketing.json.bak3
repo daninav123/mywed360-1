@@ -1,0 +1,26 @@
+{
+  "marketing": {
+    "landing": {
+      "hero": {
+        "title": "Organiza tu boda perfecta",
+        "subtitle": "La plataforma todo-en-uno para bodas",
+        "cta": "Empieza gratis"
+      },
+      "features": {
+        "title": "Todo lo que necesitas",
+        "guests": "Gestión de invitados",
+        "finance": "Control financiero",
+        "tasks": "Organización de tareas",
+        "seating": "Plan de mesas"
+      }
+    },
+    "pricing": {
+      "title": "Precios simples y transparentes",
+      "free": "Gratis",
+      "pro": "Profesional",
+      "enterprise": "Empresa",
+      "cta": "Empezar ahora"
+    }
+  },
+  "_note": "Translate from es/marketing.json"
+}

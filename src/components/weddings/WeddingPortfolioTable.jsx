@@ -18,8 +18,8 @@ const statusOptions = [
   { id: 'all', label: 'Todas' },
   { id: 'active', label: 'Solo activas' },
   { id: 'archived', label: 'Archivadas' },
-  { id: 'upcoming30', label: {t('common.proximas_dias')} },
-  { id: 'upcoming90', label: {t('common.proximas_dias')} },
+  { id: 'upcoming30', label: t('common.proximas_dias') },
+  { id: 'upcoming90', label: t('common.proximas_dias') },
   { id: 'unsynced', label: 'Sin sincronizar CRM' },
 ];
 

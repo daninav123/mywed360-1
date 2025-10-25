@@ -168,7 +168,7 @@ const AdminDashboard = () => {
         console.warn('[AdminDashboard] metrics load error:', error);
         if (!cancelled) {
           setMetricsSummary((prev) => ({ ...prev, error: 'No disponible' }));
-          setMetricsError({t('common.pudieron_obtener_las_metricas_tiempo')});
+          setMetricsError(t('common.pudieron_obtener_las_metricas_tiempo'));
         }
       } finally {
         if (!cancelled) setLoadingMetrics(false);
@@ -184,8 +184,8 @@ const AdminDashboard = () => {
     if (!overview?.kpis?.length) {
       return [
         { id: 'active-weddings', label: 'Bodas activas', value: '—', testId: 'admin-kpi-active-weddings' },
-        { id: 'revenue-30d', label: {t('common.facturacion_dias')}, value: '€ 0', testId: 'admin-kpi-revenue-30d' },
-        { id: 'downloads-30d', label: {t('common.descargas_app_dias')}, value: '—', testId: 'admin-kpi-downloads-30d' },
+        { id: 'revenue-30d', label: t('common.facturacion_dias'), value: '€ 0', testId: 'admin-kpi-revenue-30d' },
+        { id: 'downloads-30d', label: t('common.descargas_app_dias'), value: '—', testId: 'admin-kpi-downloads-30d' },
         { id: 'open-alerts', label: 'Alertas activas', value: '—', testId: 'admin-kpi-open-alerts' },
       ];
     }

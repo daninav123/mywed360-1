@@ -319,7 +319,7 @@ const MomentosEspeciales = () => {
       }
     } catch (err) {
       console.error('Error buscando Canciones', err);
-      setErrorSearch({t('common.pudo_buscar_canciones_intentalo_mas')});
+      setErrorSearch(t('common.pudo_buscar_canciones_intentalo_mas'));
       setResults([]);
     } finally {
       setLoadingSearch(false);
@@ -426,7 +426,7 @@ const MomentosEspeciales = () => {
       const draftRaw = supplierDrafts[moment.id] || '';
       const draft = draftRaw.trim();
       if (!draft) {
-        toast.info({t('common.escribe_proveedor_antes_anadirlo')});
+        toast.info(t('common.escribe_proveedor_antes_anadirlo'));
         return;
       }
       const current = Array.isArray(moment.suppliers) ? [...moment.suppliers] : [];
@@ -435,7 +435,7 @@ const MomentosEspeciales = () => {
         return;
       }
       if (current.some((supplier) => supplier.toLowerCase() === draft.toLowerCase())) {
-        toast.info({t('common.ese_proveedor_esta_registrado')});
+        toast.info(t('common.ese_proveedor_esta_registrado'));
         return;
       }
       current.push(draft);
@@ -462,7 +462,7 @@ const MomentosEspeciales = () => {
   const computeMomentWarnings = useCallback((moment) => {
     const warnings = [];
     const timeValue = typeof moment?.time === 'string' ? moment.time.trim() : '';
-    if (!timeValue) warnings.push({t('common.anade_una_hora_estimada')});
+    if (!timeValue) warnings.push(t('common.anade_una_hora_estimada'));
     const responsablesList = Array.isArray(moment?.responsables)
       ? moment.responsables.filter((resp) => {
           if (!resp) return false;
@@ -479,7 +479,7 @@ const MomentosEspeciales = () => {
       warnings.push('Asigna destinatario o rol.');
     }
     if (['entrada', 'baile'].includes(moment?.type) && !(moment?.song && String(moment.song).trim())) {
-      warnings.push({t('common.anade_una_cancion')});
+      warnings.push(t('common.anade_una_cancion'));
     }
     return warnings;
   }, []);
@@ -505,7 +505,7 @@ const MomentosEspeciales = () => {
     (moment, mode) => {
       const targetBlockId = actionPanelSelection[moment.id];
       if (!targetBlockId) {
-        toast.info({t('common.selecciona_una_seccion_destino')});
+        toast.info(t('common.selecciona_una_seccion_destino'));
         return;
       }
       if (mode === 'duplicate') {
@@ -520,7 +520,7 @@ const MomentosEspeciales = () => {
       }
       if (mode === 'move') {
         if (targetBlockId === activeTab) {
-          toast.info({t('common.selecciona_una_seccion_diferente_para')});
+          toast.info(t('common.selecciona_una_seccion_diferente_para'));
           return;
         }
         if ((moments[targetBlockId]?.length || 0) >= maxMomentsPerBlock) {
@@ -529,7 +529,7 @@ const MomentosEspeciales = () => {
         }
         duplicateMoment(activeTab, moment.id, targetBlockId);
         removeMoment(activeTab, moment.id);
-        toast.success({t('common.momento_movido_nueva_seccion')});
+        toast.success(t('common.momento_movido_nueva_seccion'));
         setActiveTab(targetBlockId);
         closeActionPanel();
       }
@@ -552,7 +552,7 @@ const MomentosEspeciales = () => {
         (block) => (block.id || block.key) !== activeTab
       );
       if (!otherBlocks.length) {
-        toast.info({t('common.crea_otra_seccion_para_usar')});
+        toast.info(t('common.crea_otra_seccion_para_usar'));
         return;
       }
       const fallback = actionPanelSelection[momentId] || otherBlocks[0].id || otherBlocks[0].key;
@@ -1419,7 +1419,7 @@ const MomentosEspeciales = () => {
                       onClick={async () => { await Playback.stop(); setPlayerOpen(false); }}
                       className="p-1 text-gray-500 hover:text-gray-700"
                       title="Detener"
-                      aria-label="Detener reproducción"
+                      aria-label={t('common.aria_detener_reproduccion')}
                     >
                       <X size={16} aria-hidden="true" />
                     </button>
@@ -1732,7 +1732,7 @@ const MomentosEspeciales = () => {
                       stopAudio();
                     }}
                     className="float-right text-gray-500 hover:text-gray-700"
-                    aria-label="Cerrar resultados de búsqueda"
+                    aria-label={t('common.aria_cerrar_resultados_de_busqueda')}
                   >
                     <X size={16} aria-hidden="true" />
                   </button>

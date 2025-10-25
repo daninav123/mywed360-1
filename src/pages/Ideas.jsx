@@ -197,7 +197,7 @@ export default function Ideas() {
   const handleAddNote = () => {
     const trimmed = noteText.trim();
     if (!trimmed) {
-      toast.info({t('common.escribe_una_nota_antes_anadirla')});
+      toast.info(t('common.escribe_una_nota_antes_anadirla'));
       return;
     }
     const now = new Date().toISOString();
@@ -210,7 +210,7 @@ export default function Ideas() {
     };
     setNotes((prev) => [...prev, nextNote]);
     setNoteText('');
-    toast.success({t('common.nota_anadida')});
+    toast.success(t('common.nota_anadida'));
   };
 
   const handleDeleteNote = (id) => {
@@ -284,7 +284,7 @@ export default function Ideas() {
       }));
       setPhotos((prev) => [...prev, ...mapped]);
       toast.update(uploadingToast, {
-        render: {t('common.fotos_anadidas_correctamente')},
+        render: t('common.fotos_anadidas_correctamente'),
         type: 'success',
         isLoading: false,
         autoClose: 2000,
@@ -595,7 +595,7 @@ function IdeasBlogSection() {
     const title = draft.title.trim();
     const content = draft.content.trim();
     if (!title || !content) {
-      toast.info({t('common.completa_titulo_contenido_antes_guardar')});
+      toast.info(t('common.completa_titulo_contenido_antes_guardar'));
       return;
     }
     const now = new Date().toISOString();
@@ -621,7 +621,7 @@ function IdeasBlogSection() {
     const title = draft.title.trim();
     const content = draft.content.trim();
     if (!title || !content) {
-      toast.info({t('common.completa_titulo_contenido_antes_guardar')});
+      toast.info(t('common.completa_titulo_contenido_antes_guardar'));
       return;
     }
     setPosts((prev) =>
@@ -753,7 +753,7 @@ function IdeasBlogSection() {
             </div>
             <div className="flex justify-between items-center gap-3 flex-wrap">
               <span className="text-xs text-gray-500">
-                {isSaving ? 'Guardando…' : {t('common.cambios_guardados_automaticamente')}}
+                {isSaving ? 'Guardando…' : t('common.cambios_guardados_automaticamente')}
               </span>
               <div className="flex gap-2">
                 {selectedPostId && (

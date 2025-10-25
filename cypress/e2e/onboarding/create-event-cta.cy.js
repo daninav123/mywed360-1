@@ -1,6 +1,6 @@
 /// <reference types="Cypress" />
 
-// Cobertura adicional Flujo 2: CTA multi-evento en header
+// Cobertura adicional Flujo 2: CTA multi-evento (sin botones en header ni menú)
 const OWNER_UID = 'owner-multi-cta';
 const OWNER_EMAIL = 'owner.multi@lovenda.test';
 const MULTI_EVENT_WEDDINGS = [
@@ -36,7 +36,7 @@ describe('Flujo 2 - CTA multi-evento', () => {
     Cypress.env('STUB_FIRESTORE', true);
   });
 
-  it('muestra el CTA y navega al asistente de creación', () => {
+  it('no muestra CTA en header ni en el menú contextual', () => {
     const stubStore = buildStubStore(OWNER_UID, MULTI_EVENT_WEDDINGS, 'w1');
 
     cy.visit('/home', {
@@ -80,16 +80,14 @@ describe('Flujo 2 - CTA multi-evento', () => {
       expect(weddings, 'eventos disponibles en la cuenta multi-evento').to.have.length.greaterThan(1);
     });
 
-    cy.contains('button', 'Crear nuevo evento', { timeout: 10000 })
-      .should('be.visible')
+    cy.contains('button', 'Crear nuevo evento', { timeout: 10000 }).should('not.exist');
+
+    cy.get('[data-user-menu] > div')
+      .first()
       .click();
 
-    cy.location('pathname', { timeout: 10000 }).should('include', '/crear-evento');
-    cy.contains('Paso 1 de 2', { timeout: 10000 }).should('be.visible');
-
-    cy.window().should((win) => {
-      const state = win.history?.state || {};
-      expect(state?.usr?.source).to.eq('multi_event_cta');
-    });
+    cy.get('[data-user-menu]')
+      .contains('button', 'Crear nuevo evento', { timeout: 1000 })
+      .should('not.exist');
   });
 });

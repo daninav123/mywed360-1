@@ -583,7 +583,7 @@ function MetricsDashboard() {
                           ?colors.email
                           : entry.name.includes('Email recibidos')
                             ?colors.notification
-                            : entry.name.includes({t('common.busquedas')})
+                            : entry.name.includes(t('common.busquedas'))
                               ?colors.search
                               : colors.eventDetection
                       }

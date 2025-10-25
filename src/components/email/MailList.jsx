@@ -221,7 +221,7 @@ export default function MailList({
               {/* Acciones rápidas al hover */}
               <div className="absolute right-2 top-2 hidden gap-1 sm:flex sm:opacity-0 sm:transition-opacity sm:duration-150 sm:group-hover:opacity-100">
                 <button
-                  title={mail.read ? {t('common.marcar_leido')} : {t('common.marcar_leido')}}
+                  title={mail.read ? {t('common.marcar_leido')} : t('common.marcar_leido')}
                   onClick={(e) => {
                     e.stopPropagation();
                     onToggleRead(mail);
@@ -252,7 +252,7 @@ export default function MailList({
                       onToggleRead(mail);
                     }}
                   >
-                    {mail.read ? {t('common.marcar_leido')} : {t('common.marcar_leido')}}
+                    {mail.read ? {t('common.marcar_leido')} : t('common.marcar_leido')}
                   </button>
                   {folders.length > 0 && (
                     <div className="border-top">

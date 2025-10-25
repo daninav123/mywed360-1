@@ -11,7 +11,7 @@ import React from 'react';
 export default function PageTabs({ value, onChange, options = [], className = '' }) {
   const activeClassExtra = (typeof window !== 'undefined' && window.Cypress) ? ' /bg-blue-50/' : '';
   return (
-    <nav className={`tabs-nav ${className}`} aria-label="Pestañas de página">
+    <nav className={`tabs-nav ${className}`} aria-label={t('common.aria_pestanas_de_pagina')}>
       {options.map((opt) => (
         <button
           key={opt.id}

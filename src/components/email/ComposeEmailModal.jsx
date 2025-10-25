@@ -1,4 +1,4 @@
-import { X, Paperclip, Send } from 'lucide-react';
+﻿import { X, Paperclip, Send } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 
 import * as EmailService from '../../services/emailService';
@@ -137,8 +137,9 @@ const ComposeEmailModal = ({ isOpen, onClose, userEmail, replyTo }) => {
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700"
             aria-label="Cerrar"
+            type="button"
           >
-            <X size={24} />
+            <X size={24} aria-hidden="true" />
           </button>
         </div>
 
@@ -228,8 +229,9 @@ const ComposeEmailModal = ({ isOpen, onClose, userEmail, replyTo }) => {
                         type="button"
                         onClick={() => removeAttachment(index)}
                         className="text-gray-500 hover:text-red-500"
+                        aria-label="Eliminar adjunto"
                       >
-                        <X size={16} />
+                        <X size={16} aria-hidden="true" />
                       </button>
                     </div>
                   ))}
@@ -293,3 +295,4 @@ const ComposeEmailModal = ({ isOpen, onClose, userEmail, replyTo }) => {
 };
 
 export default ComposeEmailModal;
+

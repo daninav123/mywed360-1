@@ -112,7 +112,7 @@ const ProveedorDetalle = ({
             onClick={() => {
               try { onNuevaComunicacion?.(); } catch {}
               // Mostrar mensaje esperado por el test E2E
-              setFlashMensaje({t('common.comunicacion_registrada_durante_prueba')});
+              setFlashMensaje(t('common.comunicacion_registrada_durante_prueba'));
               // Ocultar el mensaje tras unos segundos
               try { setTimeout(() => setFlashMensaje(''), 2500); } catch {}
             }}

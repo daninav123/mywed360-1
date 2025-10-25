@@ -113,7 +113,7 @@ const AIEmailHistoryPanel = () => {
     labels: comparisonData?.categoryBreakdown?.map((cat) => cat.category) || [],
     datasets: [
       {
-        label: {t('common.tasa_respuesta_por_categoria')},
+        label: t('common.tasa_respuesta_por_categoria'),
         data: comparisonData?.categoryBreakdown?.map((cat) => parseFloat(cat.responseRate)) || [],
         backgroundColor: [
           'rgba(75, 192, 192, 0.6)',

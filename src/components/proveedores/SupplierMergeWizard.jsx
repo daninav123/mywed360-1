@@ -392,7 +392,7 @@ export default function SupplierMergeWizard({ open, onClose, provider, onComplet
             </Button>
             {state.mode === 'merge' ? (
               <Button onClick={handleConfirmMerge} disabled={!canMerge || submitting}>
-                {submitting ? 'Aplicando…' : {t('common.combinar_lineas')}}
+                {submitting ? 'Aplicando…' : t('common.combinar_lineas')}
               </Button>
             ) : (
               <Button onClick={handleConfirmSplit} disabled={!canSplit || submitting}>

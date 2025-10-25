@@ -62,7 +62,7 @@ const AIBusquedaModal = ({
             onClick={onClose}
             className="p-1 rounded-full hover:bg-gray-100"
             type="button"
-            aria-label="Cerrar búsqueda de proveedores"
+            aria-label={t('common.aria_cerrar_busqueda_de_proveedores')}
           >
             <X size={20} className="text-gray-500" aria-hidden="true" />
           </button>

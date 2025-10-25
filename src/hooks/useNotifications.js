@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useTranslations } from '../../hooks/useTranslations';
 
 /**
  * Hook personalizado para gestionar el sistema de notificaciones
@@ -13,6 +14,8 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
  * @returns {Object} Estado y funciones para gestionar notificaciones
  */
 export default function useNotifications({
+  const { t } = useTranslations();
+
   fetchNotifications,
   markAsRead,
   deleteNotification,
@@ -127,7 +130,7 @@ export default function useNotifications({
         return true;
       } catch (err) {
         console.error('Error al marcar notificación como leída:', err);
-        setError('No se pudo actualizar la notificación');
+        setError(t('common.pudo_actualizar_notificacion'));
         return false;
       }
     },
@@ -164,7 +167,7 @@ export default function useNotifications({
         return true;
       } catch (err) {
         console.error('Error al eliminar notificación:', err);
-        setError('No se pudo eliminar la notificación');
+        setError(t('common.pudo_eliminar_notificacion'));
         return false;
       }
     },

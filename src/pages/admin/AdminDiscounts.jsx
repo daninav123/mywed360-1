@@ -502,7 +502,7 @@ const summarizeCommissionRules = (rules) => {
   if (!rules || !Array.isArray(rules.periods) || rules.periods.length === 0) {
     return {
       label: 'Sin reglas',
-      description: {t('common.este_enlace_tiene_comisiones_configuradas')},
+      description: t('common.este_enlace_tiene_comisiones_configuradas'),
       hasRules: false,
     };
   }
@@ -553,7 +553,7 @@ const TYPE_LABELS = {
   planner: 'Planner',
   influencer: 'Influencer',
   partner: 'Partner',
-  campaign: {t('common.campana')},
+  campaign: t('common.campana'),
 };
 
 const AdminDiscounts = () => {

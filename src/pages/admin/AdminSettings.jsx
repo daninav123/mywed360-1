@@ -217,7 +217,7 @@ const AdminSettings = () => {
                   onClick={() => setRotateStep((s) => s + 1)}
                   className="rounded-md border border-soft px-3 py-2"
                 >
-                  {rotateStep === 0 ? 'Paso siguiente' : {t('common.validar_actualizacion')}}
+                  {rotateStep === 0 ? 'Paso siguiente' : t('common.validar_actualizacion')}
                 </button>
               )}
               <button

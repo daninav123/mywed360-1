@@ -12,32 +12,32 @@ const seatingPlanTemplates = [
   {
   const { t } = useTranslations();
 
-    name: {t('common.elegante_clasico')},
-    description: {t('common.cartel_asignacion_mesas_con_diseno')},
+    name: t('common.elegante_clasico'),
+    description: t('common.cartel_asignacion_mesas_con_diseno'),
     prompt:
       'Diseña un cartel elegante para el seating plan (asignación de mesas) de una boda. Estilo formal con tipografía serif. Incluye el título "Seating Plan" o {t('common.distribucion_mesas')} con un diseño elegante. El cartel debe tener espacio para listar nombres de invitados organizados por mesas. Usa colores neutros con toques dorados o plateados. El diseño debe ser sofisticado y fácil de leer.',
   },
   {
-    name: {t('common.rustico_natural')},
-    description: {t('common.cartel_estilo_rustico_con_elementos')},
+    name: t('common.rustico_natural'),
+    description: t('common.cartel_estilo_rustico_con_elementos'),
     prompt:
       {t('common.crea_cartel_seating_plan_con')},
   },
   {
     name: 'Minimalista & Moderno',
-    description: {t('common.diseno_limpio_con_tipografia_sencilla')},
+    description: t('common.diseno_limpio_con_tipografia_sencilla'),
     prompt:
       {t('common.disena_cartel_seating_plan_minimalista')},
   },
   {
-    name: {t('common.tematico_creativo')},
-    description: {t('common.cartel_personalizado_con_tematica_especial')},
+    name: t('common.tematico_creativo'),
+    description: t('common.cartel_personalizado_con_tematica_especial'),
     prompt:
       {t('common.crea_cartel_seating_plan_con')},
   },
   {
-    name: {t('common.romantico_floral')},
-    description: {t('common.cartel_decorado_con_flores_motivos')},
+    name: t('common.romantico_floral'),
+    description: t('common.cartel_decorado_con_flores_motivos'),
     prompt:
       'Diseña un cartel de seating plan romántico con abundantes elementos florales para una boda. Utiliza una paleta de colores suaves como rosa, lavanda y verde salvia. Incorpora ilustraciones delicadas de flores y elementos botánicos. El título puede ser {t('common.con_carino_hemos_asignado')} o similar. Tipografía elegante y caligráfica. El diseño debe transmitir romanticismo y delicadeza, organizado de forma clara para que los invitados encuentren fácilmente su mesa.',
   },

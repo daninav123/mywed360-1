@@ -17,9 +17,9 @@ const CEREMONY_MOMENTS = [
 ];
 
 const GENERIC_MOMENTS = [
-  { name: 'Bienvenida', items: [{t('common.introduccion')}, {t('common.mensaje_del_anfitrion')}, {t('common.agenda_del_dia')}] },
-  { name: 'Actividad principal', items: [{t('common.presentacion')}, {t('common.dinamica')}, 'Reconocimientos'] },
-  { name: {t('common.celebracion')}, items: ['Brindis', 'Entretenimiento', 'Cierre del evento'] },
+  { name: 'Bienvenida', items: [t('common.introduccion'), t('common.mensaje_del_anfitrion'), t('common.agenda_del_dia')] },
+  { name: 'Actividad principal', items: [t('common.presentacion'), t('common.dinamica'), 'Reconocimientos'] },
+  { name: t('common.celebracion'), items: ['Brindis', 'Entretenimiento', 'Cierre del evento'] },
 ];
 
 export default function AyudaCeremonia() {

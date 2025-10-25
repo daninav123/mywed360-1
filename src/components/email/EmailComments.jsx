@@ -118,7 +118,7 @@ const EmailComments = ({
           className="bg-blue-600 text-white rounded-md px-3 py-2 text-sm disabled:opacity-40"
           disabled={saving || !newComment.trim()}
         >
-          {saving ? 'Guardando…' : {t('common.anadir')}}
+          {saving ? 'Guardando…' : t('common.anadir')}
         </button>
       </div>
     </div>

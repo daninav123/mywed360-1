@@ -97,7 +97,7 @@ export default function FormalInvitationModal({
       return;
     }
     if (!assetUrl) {
-      alert({t('common.anade_url_invitacion_disenada_antes')});
+      alert(t('common.anade_url_invitacion_disenada_antes'));
       return;
     }
     setSending(true);

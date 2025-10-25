@@ -5,17 +5,17 @@
     "tagline": "Tu boda perfecta, organizada digitalmente",
     "loading": "Cargando...",
     "error": "Error",
-    "success": "xito",
+    "success": "ÉÉxito",
     "cancel": "Cancelar",
     "save": "Guardar",
     "delete": "Eliminar",
     "edit": "Editar",
-    "add": "Aadir",
+    "add": "Añadir",
     "search": "Buscar",
     "filter": "Filtrar",
     "close": "Cerrar",
     "open": "Abrir",
-    "yes": "S",
+    "yes": "Sí",
     "no": "No",
     "ok": "Aceptar",
     "back": "Volver",
@@ -31,38 +31,38 @@
     "providers": "Proveedores",
     "finance": "Finanzas",
     "seating": "Plan de asientos",
-    "email": "Correo electrnico",
+    "email": "Correo electrónico",
     "protocol": "Protocolo",
-    "designs": "Diseos",
+    "designs": "Diseños",
     "website": "Web de boda",
     "contracts": "Contratos",
     "tasks": "Tareas",
     "profile": "Perfil",
-    "settings": "Configuracin",
-    "logout": "Cerrar sesin",
-    "more": "Ms",
+    "settings": "Configuración",
+    "logout": "Cerrar sesión",
+    "more": "Más",
     "createEvent": "Crear nuevo evento",
     "weddings": "Bodas",
     "emailInbox": "Bandeja de entrada",
     "darkMode": "Modo oscuro",
-    "userMenu": "Men de usuario"
+    "userMenu": "Menú de usuario"
   },
   "finance": {
     "transactions": {
       "title": "Transacciones",
-      "new": "Nueva Transaccin",
+      "new": "Nueva Transacción",
       "empty": "No hay transacciones que mostrar",
-      "createFirst": "Crear primera transaccin",
+      "createFirst": "Crear primera transacción",
       "searchPlaceholder": "Buscar por concepto...",
       "allTypes": "Todos los tipos",
       "incomes": "Ingresos",
       "expenses": "Gastos",
-      "allCategories": "Todas las categoras",
+      "allCategories": "Todas las categorías",
       "allProviders": "Todos los proveedores",
-      "allDays": "Todos los das",
-      "last30": "ltimos 30 das",
-      "last90": "ltimos 90 das",
-      "onlyUncategorized": "Solo sin categora",
+      "allDays": "Todos los días",
+      "last30": "Últimos 30 días",
+      "last90": "Últimos 90 días",
+      "onlyUncategorized": "Solo sin categoría",
       "clear": "Limpiar",
       "sort": {
         "dateDesc": "Fecha (recientes primero)",
@@ -73,7 +73,7 @@
       "headers": {
         "date": "Fecha",
         "concept": "Concepto",
-        "category": "Categora",
+        "category": "Categoría",
         "type": "Tipo",
         "status": "Estado",
         "amount": "Monto",
@@ -86,12 +86,12 @@
         "expected": "Esperado",
         "received": "Recibido"
       },
-      "saved": "Transaccin guardada",
-      "deleted": "Transaccin eliminada",
-      "deleteErrorPrefix": "Error eliminando transaccin:",
-      "saveUnexpected": "Error inesperado al guardar la transaccin",
+      "saved": "Transacción guardada",
+      "deleted": "Transacción eliminada",
+      "deleteErrorPrefix": "Error eliminando transacción:",
+      "saveUnexpected": "Error inesperado al guardar la transacción",
       "noConcept": "Sin concepto",
-      "noCategory": "Sin categora",
+      "noCategory": "Sin categoría",
       "dueOn": "Vence:",
       "attachment": "Adjunto",
       "balanceLabel": "Balance:",
@@ -102,16 +102,16 @@
       "alerts": {
         "title": "Pagos importantes",
         "overdue": "Pagos vencidos:",
-        "upcoming": "Pagos prximos (7 das):"
+        "upcoming": "Pagos próximos (7 días):"
       },
       "csv": {
         "title": "Importar CSV - Mapeo de columnas",
         "fields": {
           "date": "Fecha",
-          "description": "Descripcin",
+          "description": "Descripción",
           "amount": "Importe",
           "type": "Tipo",
-          "category": "Categora"
+          "category": "Categoría"
         },
         "none": "Ninguna",
         "preview": "Vista previa"
@@ -122,7 +122,7 @@
       "transactions": "Transacciones",
       "budget": "Presupuesto",
       "contributions": "Aportaciones",
-      "analytics": "Anlisis"
+      "analytics": "Análisis"
     },
     "connectBank": {
       "title": "Conecta tu banco para importar movimientos",
@@ -133,33 +133,33 @@
       "budget": "Alertas de Presupuesto"
     },
     "overview": {
-      "title": "Gestin financiera",
+      "title": "Gestión financiera",
       "subtitle": "Control total del presupuesto y los gastos de tu boda",
-      "lastSync": "ltima sincronizacin",
+      "lastSync": "Última sincronización",
       "synced": "Sincronizado",
-      "offline": "Sin conexin",
+      "offline": "Sin conexión",
       "totalBudget": "Presupuesto Total",
       "totalSpent": "Total Gastado",
       "ofBudget": "del presupuesto",
       "currentBalance": "Balance Actual",
       "expectedIncome": "Ingresos Esperados",
       "used": "utilizado",
-      "categoryStatus": "Estado del Presupuesto por Categoras",
+      "categoryStatus": "Estado del Presupuesto por Categorías",
       "progress": "Progreso",
       "exceededNote": "(Presupuesto excedido!)"
     },
     "form": {
-      "type": "Tipo de transaccin",
+      "type": "Tipo de transacción",
       "concept": "Concepto",
       "conceptPlaceholder": "Ej: Pago de catering, Regalo de boda...",
       "amount": "Monto (EUR)",
       "amountLabel": "Monto:",
       "date": "Fecha",
-      "category": "Categora",
-      "selectCategory": "Selecciona una categora",
-      "description": "Descripcin adicional",
-      "descriptionPlaceholder": "Detalles adicionales sobre la transaccin...",
-      "transaction": "Transaccin",
+      "category": "Categoría",
+      "selectCategory": "Selecciona una categoría",
+      "description": "Descripción adicional",
+      "descriptionPlaceholder": "Detalles adicionales sobre la transacción...",
+      "transaction": "Transacción",
       "provider": "Proveedor / Fuente",
       "attachments": {
         "title": "Comprobantes",
@@ -178,10 +178,10 @@
       },
       "errors": {
         "conceptRequired": "El concepto es obligatorio",
-        "amountPositive": "El monto debe ser un nmero positivo",
+        "amountPositive": "El monto debe ser un número positivo",
         "dateRequired": "La fecha es obligatoria",
-        "categoryRequired": "La categora es obligatoria",
-        "paidAmountPositive": "El monto abonado debe ser un nmero positivo",
+        "categoryRequired": "La categoría es obligatoria",
+        "paidAmountPositive": "El monto abonado debe ser un número positivo",
         "paidAmountExceeds": "El monto abonado no puede superar el total",
         "paidAmountRequired": "Registra cunto has pagado para marcar el estado como parcial"
       }
@@ -238,26 +238,26 @@
       }
     },
     "charts": {
-      "title": "Anlisis Financiero",
+      "title": "Análisis Financiero",
       "subtitle": "Visualizaciones y tendencias de tus finanzas de boda",
       "totalTransactions": "Total Transacciones",
-      "activeCategories": "Categoras Activas",
+      "activeCategories": "Categorías Activas",
       "budgetEfficiency": "Eficiencia Presupuesto",
       "projectedBalance": "Balance Proyectado",
-      "budgetVsSpentByCategory": "Presupuesto vs Gastado por Categora",
+      "budgetVsSpentByCategory": "Presupuesto vs Gastado por Categoría",
       "budgeted": "Presupuestado",
       "spent": "Gastado",
-      "expenseDistributionByCategory": "Distribucin de Gastos por Categora",
+      "expenseDistributionByCategory": "Distribucin de Gastos por Categoría",
       "monthlyTrend": "Tendencia Mensual de Ingresos y Gastos",
       "income": "Ingresos",
       "expenses": "Gastos",
       "balance": "Balance",
-      "budgetProgressByCategory": "Progreso del Presupuesto por Categora",
+      "budgetProgressByCategory": "Progreso del Presupuesto por Categoría",
       "used": "Usado",
       "excess": "Exceso",
       "insights": "Insights Financieros",
       "highestExpense": "Mayor Gasto",
-      "mostEfficient": "Ms Eficiente",
+      "mostEfficient": "Más Eficiente",
       "noData": "No hay datos suficientes",
       "currentTrend": "Tendencia Actual",
       "trend": {
@@ -300,18 +300,18 @@
       "useThis": "Usar esta cuenta"
     },
     "budget": {
-      "title": "Gestin de presupuesto",
-      "subtitle": "Organiza y controla el presupuesto por categoras",
-      "newCategory": "Nueva categora",
+      "title": "Gestión de presupuesto",
+      "subtitle": "Organiza y controla el presupuesto por categorías",
+      "newCategory": "Nueva categoría",
       "totalBudget": "Presupuesto total",
       "budgeted": "Presupuestado",
       "spent": "Gastado",
       "remaining": "Disponible",
       "progress": "Progreso",
-      "categoriesTitle": "Categoras de presupuesto",
-      "empty": "No hay categoras de presupuesto",
-      "createFirst": "Crear primera categora",
-      "category": "Categora",
+      "categoriesTitle": "Categorías de presupuesto",
+      "empty": "No hay categorías de presupuesto",
+      "createFirst": "Crear primera categoría",
+      "category": "Categoría",
       "overallProgress": "Progreso del presupuesto",
       "muteAlerts": "Silenciar alertas",
       "thresholds": {
@@ -319,10 +319,10 @@
         "danger": "Crtico (exceso) %"
       },
       "modal": {
-        "editTitle": "Editar categora",
-        "newTitle": "Nueva categora",
-        "name": "Nombre de la categora",
-        "namePlaceholder": "Ej.: Catering, msica, flores...",
+        "editTitle": "Editar categoría",
+        "newTitle": "Nueva categoría",
+        "name": "Nombre de la categoría",
+        "namePlaceholder": "Ej.: Catering, música, flores...",
         "amountLabel": "Presupuesto asignado ()",
         "amountPlaceholder": "0,00"
       },
@@ -332,10 +332,10 @@
       "exceeded": "Exceeded",
       "perGuestHint": "H {{value}} / guest ({{count}} events)",
       "errors": {
-        "nameRequired": "El nombre de la categora es obligatorio",
-        "amountInvalid": "El monto debe ser un nmero vlido"
+        "nameRequired": "El nombre de la categoría es obligatorio",
+        "amountInvalid": "El monto debe ser un número válido"
       },
-      "confirmDelete": "Ests seguro de eliminar la categora \"{{category}}\"?",
+      "confirmDelete": "Ests seguro de eliminar la categoría \"{{category}}\"?",
       "advisorErrors": {
         "requestFailed": "No se pudo obtener la recomendacin del consejero.",
         "refreshFailed": "No se pudo actualizar la recomendacin.",
@@ -401,13 +401,13 @@
     "required": "Obligatorio",
     "optional": "Opcional",
     "pleaseSelect": "Por favor, selecciona",
-    "selectOption": "Selecciona una opcin",
+    "selectOption": "Selecciona una opción",
     "enterText": "Introduce texto",
     "chooseFile": "Seleccionar archivo",
     "uploadFile": "Subir archivo",
     "fieldRequired": "Este campo es obligatorio",
-    "invalidEmail": "Email invlido",
-    "invalidPhone": "Telfono invlido",
+    "invalidEmail": "Email inválido",
+    "invalidPhone": "Teléfono inválido",
     "invalidUrl": "URL invlida",
     "dragAndDrop": "Drag and drop files here",
     "invalidFormat": "Invalid format",
@@ -545,14 +545,14 @@
   "authLogin": {
     "title": "Accede a tu cuenta",
     "subtitle": "Usa tu correo y contrasea o contina con un proveedor social.",
-    "emailLabel": "Correo electrnico",
+    "emailLabel": "Correo electrónico",
     "passwordLabel": "Contrasea",
     "emailPlaceholder": "tu@email.com",
     "passwordPlaceholder": "Tu contrasea",
     "rememberMe": "Recurdame",
     "forgotPassword": "Olvidaste tu contrasea?",
-    "submit": "Iniciar sesin",
-    "submitting": "Iniciando sesin...",
+    "submit": "Iniciar sesión",
+    "submitting": "Iniciando sesión...",
     "noAccount": "No tienes cuenta?",
     "registerLink": "Regstrate",
     "hero": {
@@ -565,23 +565,23 @@
       ]
     },
     "validation": {
-      "missingEmail": "Introduce tu correo electrnico.",
+      "missingEmail": "Introduce tu correo electrónico.",
       "missingPassword": "Introduce tu contrasea."
     },
     "errors": {
       "invalidCredentials": "Correo o contrasea invlidos.",
-      "generic": "No pudimos iniciar sesin. Intntalo de nuevo o contacta con soporte."
+      "generic": "No pudimos iniciar sesión. Intntalo de nuevo o contacta con soporte."
     },
     "social": {
       "divider": "o contina con",
       "button": "Continuar con {{provider}}",
-      "pending": "Contina el inicio de sesin en la ventana de {{provider}}."
+      "pending": "Contina el inicio de sesión en la ventana de {{provider}}."
     }
   },
   "authSignup": {
     "title": "Crea tu cuenta",
     "subtitle": "Regstrate con tu correo o contina con tu cuenta social favorita.",
-    "emailLabel": "Correo electrnico",
+    "emailLabel": "Correo electrónico",
     "passwordLabel": "Contrasea",
     "roleLabel": "Rol",
     "emailPlaceholder": "tu@email.com",
@@ -593,7 +593,7 @@
     "noAccount": "No tienes cuenta?",
     "registerLink": "Regstrate",
     "alreadyHaveAccount": "Ya tienes cuenta?",
-    "loginLink": "Inicia sesin",
+    "loginLink": "Inicia sesión",
     "hero": {
       "title": "Bienvenida a Lovenda",
       "description": "Centraliza tareas, invitados y proveedores en un solo lugar. Nuestra asistente te gua en cada paso para que tu boda sea perfecta.",
@@ -609,17 +609,17 @@
       "assistant": "Ayudante"
     },
     "validation": {
-      "missingEmail": "Introduce tu correo electrnico.",
+      "missingEmail": "Introduce tu correo electrónico.",
       "missingPassword": "Introduce tu contrasea.",
       "shortPassword": "La contrasea debe tener al menos 8 caracteres."
     },
     "errors": {
       "emailInUse": "Este correo ya est registrado.",
-      "weakPassword": "Elige una contrasea ms fuerte para completar el registro.",
-      "invalidEmail": "Introduce un correo electrnico vlido.",
+      "weakPassword": "Elige una contrasea más fuerte para completar el registro.",
+      "invalidEmail": "Introduce un correo electrónico válido.",
       "generic": "No pudimos crear tu cuenta. Intntalo de nuevo o contacta con soporte."
     },
-    "successMessage": "Cuenta creada con xito. Redirigiendo a tu panel...",
+    "successMessage": "Cuenta creada con ÉÉxito. Redirigiendo a tu panel...",
     "social": {
       "divider": "o contina con",
       "button": "Continuar con {{provider}}",
@@ -638,7 +638,7 @@
     "suggestions": {
       "start": "Introduce una contrasea con al menos 8 caracteres.",
       "length8": "Usa al menos 8 caracteres.",
-      "length12": "Aumenta la longitud a 12 caracteres o ms.",
+      "length12": "Aumenta la longitud a 12 caracteres o más.",
       "case": "Combina maysculas y minsculas.",
       "numbers": "Aade nmeros para reforzarla.",
       "symbols": "Incluye smbolos como !, %, # o similares.",
@@ -671,13 +671,13 @@
     "guest": "Invitado",
     "guests": "Invitados",
     "guestList": "Lista de invitados",
-    "addGuest": "Aadir invitado",
+    "addGuest": "Añadir invitado",
     "editGuest": "Editar invitado",
     "deleteGuest": "Eliminar invitado",
     "guestName": "Nombre del invitado",
     "guestEmail": "Correo del invitado",
-    "guestPhone": "Telfono del invitado",
-    "guestAddress": "Direccin del invitado",
+    "guestPhone": "Teléfono del invitado",
+    "guestAddress": "Dirección del invitado",
     "guestTable": "Mesa del invitado",
     "guestStatus": "Estado del invitado",
     "confirmed": "Confirmado",
@@ -703,7 +703,7 @@
       "printPdf": "Imprimir / PDF"
     },
     "groups": {
-      "title": "Gestin de grupos",
+      "title": "Gestión de grupos",
       "assignTitle": "Asignar a seleccionados",
       "newGroup": "Nuevo grupo&",
       "groupName": "Nombre de grupo",
@@ -720,16 +720,16 @@
   "providers": {
     "provider": "Proveedor",
     "providers": "Proveedores",
-    "addProvider": "Aadir proveedor",
+    "addProvider": "Añadir proveedor",
     "editProvider": "Editar proveedor",
     "deleteProvider": "Eliminar proveedor",
     "providerName": "Nombre del proveedor",
     "providerService": "Servicio del proveedor",
     "providerContact": "Contacto",
     "providerEmail": "Correo del proveedor",
-    "providerPhone": "Telfono del proveedor",
+    "providerPhone": "Teléfono del proveedor",
     "providerWebsite": "Sitio web",
-    "providerAddress": "Direccin",
+    "providerAddress": "Dirección",
     "providerBudget": "Presupuesto",
     "providerStatus": "Estado",
     "providerNotes": "Notas",
@@ -752,7 +752,7 @@
     "tables": "Mesas",
     "seat": "Asiento",
     "seats": "Asientos",
-    "addTable": "Aadir mesa",
+    "addTable": "Añadir mesa",
     "editTable": "Editar mesa",
     "deleteTable": "Eliminar mesa",
     "tableName": "Nombre de la mesa",
@@ -771,11 +771,11 @@
       "syncing": "Sincronizando&",
       "synced": "Sincronizado",
       "syncError": "Error al sincronizar",
-      "offline": "Sin conexin",
+      "offline": "Sin conexión",
       "undo": "Deshacer",
-      "undoTooltip": "Deshaz el ltimo cambio",
+      "undoTooltip": "Deshaz el Último cambio",
       "redo": "Rehacer",
-      "redoTooltip": "Repite el ltimo cambio",
+      "redoTooltip": "Repite el Último cambio",
       "hideTables": "Ocultar mesas",
       "showTables": "Mostrar mesas",
       "hideRulers": "Ocultar reglas",
@@ -882,7 +882,7 @@
     "hints": {
       "boundary": "Haz clic y arrastra para delimitar el espacio.",
       "obstacle": "Haz clic para colocar obstculos y arrastra para ajustar su tamao.",
-      "door": "Haz clic para aadir puertas o accesos.",
+      "door": "Haz clic para añadir puertas o accesos.",
       "aisle": "Arrastra para marcar pasillos entre mesas."
     },
     "export": {
@@ -897,7 +897,7 @@
         "tools": "Herramientas (Mover vista, Mover, Permetro, Puertas, Obstculos, Pasillos)",
         "zoomFit": "Zoom acercar / alejar / Ajustar",
         "selectAll": "Seleccionar todo",
-        "escape": "Limpiar seleccin / cerrar mens",
+        "escape": "Limpiar selección / cerrar mens",
         "rotate": "Rotar -5 / +5 (Shift: 15)",
         "align": "Alinear (inicio/fin)",
         "distribute": "Distribuir (X/Y)",
@@ -963,7 +963,7 @@
     "altWithTags": "inspiracin: {{tags}}",
     "aria": "Imagen de inspiracin",
     "ariaWithTags": "Imagen de inspiracin: {{tags}}",
-    "addFav": "Aadir a favoritos",
+    "addFav": "Añadir a favoritos",
     "removeFav": "Quitar de favoritos"
   },
   "compose": {
@@ -1002,9 +1002,9 @@
         "compressionActive": "Hemos superado los 30GB de espacio. Las nuevas fotos se comprimen automticamente para optimizar el almacenamiento en Firebase."
       },
       "toasts": {
-        "loadError": "No se pudo cargar la galera de recuerdos. Revisa tu conexin o permisos.",
+        "loadError": "No se pudo cargar la galera de recuerdos. Revisa tu conexión o permisos.",
         "tokenCreated": "Nuevo enlace generado",
-        "tokenError": "No se pudo generar el enlace, reintntalo ms tarde.",
+        "tokenError": "No se pudo generar el enlace, reintntalo más tarde.",
         "approved": "Foto aprobada",
         "approveError": "No se pudo aprobar la foto",
         "rejected": "Foto rechazada",
@@ -1037,7 +1037,7 @@
       "remainingUploadsUnlimited": "Sube todas las fotos que quieras.",
       "description": "El anfitrin revisar y las compartir con el grupo.",
       "window": {
-        "daysLeft": "An tienes {{count, plural, one {1 da} other {{count} das}} para enviar tus mejores fotos.",
+        "daysLeft": "An tienes {{count, plural, one {1 día} other {{count} días}} para enviar tus mejores fotos.",
         "deadline": "Disponible hasta {{date}}.",
         "compression": "Las fotos nuevas se optimizan automticamente para ahorrar espacio."
       },
@@ -1060,7 +1060,7 @@
       "form": {
         "nameLabel": "Nombre completo",
         "namePlaceholder": "Ej. Laura G.",
-        "emailLabel": "Correo electrnico (opcional)",
+        "emailLabel": "Correo electrónico (opcional)",
         "emailPlaceholder": "Te avisaremos cuando tus fotos estn destacadas",
         "termsLabel": "Acepto compartir mis fotos con la pareja anfitriona y confirmo que tengo permiso para hacerlo.",
         "submit": "Comenzar a subir fotos"
@@ -1068,7 +1068,7 @@
       "progress": {
         "title": "Tus progresos",
         "sceneLabel": "Escena: {{scene}}  {{size}} KB",
-        "status": "En revisin"
+        "status": "En revisión"
       },
       "toasts": {
         "nameRequired": "Indica tu nombre para personalizar tus aportaciones",
@@ -1081,7 +1081,7 @@
       },
       "errors": {
         "incompleteLink": "El enlace est incompleto. Solicita un nuevo QR al anfitrin.",
-        "invalidLink": "Este enlace ya no es vlido."
+        "invalidLink": "Este enlace ya no es válido."
       },
       "scenes": {
         "other": "Otros"
@@ -1095,12 +1095,12 @@
     "hero": {
       "badge": "Modelo por boda",
       "title": "Planes claros para cada evento.",
-      "description": "Pagos nicos en euros para parejas y paquetes flexibles para planners. Cada licencia permanece activa hasta 30 das despus de la fecha del evento y puedes extenderla cuando lo necesites.",
+      "description": "Pagos nicos en euros para parejas y paquetes flexibles para planners. Cada licencia permanece activa hasta 30 días despus de la fecha del evento y puedes extenderla cuando lo necesites.",
       "benefitsTitle": "Beneficios clave",
       "benefits": [
         "Licencias en modo lectura automtico tras la fecha lmite del evento.",
         "Packs de planners con 1 mes de prueba y control de cuota disponible.",
-        "Alertas 30 / 7 / 1 das antes de expirar para mantener todo bajo control."
+        "Alertas 30 / 7 / 1 días antes de expirar para mantener todo bajo control."
       ],
       "cta": "Crear cuenta gratuita",
       "highlights": {
@@ -1114,7 +1114,7 @@
         },
         "syncStatus": {
           "title": "Estado sincronizado",
-          "description": "Los webhooks de Stripe mantienen licencias y packs al da con alertas internas."
+          "description": "Los webhooks de Stripe mantienen licencias y packs al día con alertas internas."
         }
       }
     },
@@ -1122,7 +1122,7 @@
       "couples": {
         "label": "Parejas",
         "title": "Planes para parejas",
-        "description": "Cada compra habilita una boda completa hasta 30 das despus del evento. Aade una extensin para seguir trabajando si necesitas ms tiempo."
+        "description": "Cada compra habilita una boda completa hasta 30 días despus del evento. Aade una extensión para seguir trabajando si necesitas más tiempo."
       },
       "planners": {
         "label": "Planners",
@@ -1131,7 +1131,7 @@
       },
       "needHelp": {
         "title": "Necesitas ayuda para elegir el plan adecuado?",
-        "description": "Te ayudamos a configurar licencias, automatizaciones y reportes segn tu operacin. Agenda una sesin y disea un rollout acorde a tu ritmo.",
+        "description": "Te ayudamos a configurar licencias, automatizaciones y reportes segn tu operación. Agenda una sesión y disea un rollout acorde a tu ritmo.",
         "cta": "Hablar con un especialista"
       },
       "quickStart": {
@@ -1162,19 +1162,19 @@
         "features": [
           "Invitados y proveedores ilimitados",
           "Contacto directo con proveedores y protocolo completo",
-          "Hasta 50 diseos web y soporte prioritario",
-          "Plantillas premium para planificacin avanzada"
+          "Hasta 50 diseños web y soporte prioritario",
+          "Plantillas premium para planificación avanzada"
         ],
         "cta": "Comprar Wedding Pass"
       },
       "weddingPassPlus": {
         "name": "Wedding Pass Plus",
         "priceSuffix": "pago nico por boda",
-        "description": "La opcin ms completa para bodas premium y trabajo colaborativo con ayudantes.",
+        "description": "La opción más completa para bodas premium y trabajo colaborativo con ayudantes.",
         "features": [
           "Todo lo incluido en Wedding Pass",
           "Elimina la marca en invitaciones, PDFs y pantallas",
-          "Biblioteca completa de diseos y galera de recuerdos",
+          "Biblioteca completa de diseños y galera de recuerdos",
           "1 ayudante con acceso completo a la boda"
         ],
         "cta": "Elegir Wedding Pass Plus"
@@ -1219,7 +1219,7 @@
       "teamsUnlimited": {
         "name": "Teams Ilimitado",
         "monthlySuffix": "/ mes (12 pagos)",
-        "description": "La solucin definitiva con bodas y perfiles ilimitados para agencias grandes.",
+        "description": "La solución definitiva con bodas y perfiles ilimitados para agencias grandes.",
         "annualDescription": "{{amount}} pago nico anual (15 % de descuento).",
         "features": [
           "1 mes de prueba gratuita",
@@ -1228,6 +1228,11 @@
           "Acceso API y acompaamiento experto"
         ]
       }
+    },
+    "actions": {
+      "processing": "Processing...",
+      "monthlyButton": "Monthly plan ({{amount}}/month)",
+      "annualButton": "Annual plan (save 15%)"
     }
   },
   "marketingAccess": {
@@ -1245,44 +1250,44 @@
       },
       "signup": {
         "title": "Bienvenido a Lovenda",
-        "description": "Centraliza la planificacin, automatiza recordatorios y deja que nuestro asistente te gue paso a paso.",
+        "description": "Centraliza la planificación, automatiza recordatorios y deja que nuestro asistente te gue paso a paso.",
         "features": [
-          "Onboarding guiado por nuestro asistente de planificacin",
+          "Onboarding guiado por nuestro asistente de planificación",
           "Plantillas para presupuesto, invitados y proveedores",
           "Licencias con Stripe y activacin inmediata"
         ]
       }
     },
     "toggle": {
-      "login": "Iniciar sesin",
+      "login": "Iniciar sesión",
       "signup": "Crear cuenta"
     },
     "loggedIn": {
-      "title": "Sesin activa",
-      "description": "Tu cuenta de Lovenda ya est abierta. Contina con tus eventos o cierra sesin si necesitas cambiar de cuenta.",
+      "title": "Sesión activa",
+      "description": "Tu cuenta de Lovenda ya est abierta. Contina con tus eventos o cierra sesión si necesitas cambiar de cuenta.",
       "primaryCta": "Ir al panel",
-      "secondaryCta": "Cerrar sesin"
+      "secondaryCta": "Cerrar sesión"
     },
     "loginForm": {
-      "emailLabel": "Correo electrnico",
+      "emailLabel": "Correo electrónico",
       "emailPlaceholder": "tu@email.com",
       "passwordLabel": "Contrasea",
       "passwordPlaceholder": "Tu contrasea",
       "rememberMe": "Recordarme",
       "forgotPassword": "Olvidaste tu contrasea?",
-      "submit": "Iniciar sesin",
-      "submitting": "Iniciando sesin&"
+      "submit": "Iniciar sesión",
+      "submitting": "Iniciando sesión&"
     },
     "signup": {
       "info": "Completa el formulario para crear tu cuenta.",
-      "successMessage": "Cuenta creada con xito. Redirigiendo al panel&",
+      "successMessage": "Cuenta creada con ÉÉxito. Redirigiendo al panel&",
       "socialPending": "Completa el flujo de alta en la ventana de {{provider}}."
     },
     "switch": {
       "noAccount": "No tienes cuenta?",
       "registerLink": "Crea una",
       "alreadyHaveAccount": "Ya tienes cuenta?",
-      "loginLink": "Iniciar sesin"
+      "loginLink": "Iniciar sesión"
     },
     "social": {
       "redirect": "Redirigiendo a {{provider}}..."
@@ -1294,7 +1299,7 @@
   "budgetPrediction": {
     "header": {
       "title": "Prediccin IA",
-      "subtitle": "Anlisis inteligente de tu presupuesto"
+      "subtitle": "Análisis inteligente de tu presupuesto"
     },
     "actions": {
       "analyzing": "Analizando...",
@@ -1310,7 +1315,7 @@
     },
     "sections": {
       "recommendations": "Recomendaciones",
-      "categoryAnalysis": "Anlisis por categora"
+      "categoryAnalysis": "Análisis por categoría"
     },
     "emptyState": {
       "title": "Predicciones IA disponibles prximamente",
@@ -1329,7 +1334,7 @@
       },
       "highDailyRate": {
         "message": "Tu tasa de gasto diaria es alta",
-        "action": "Intenta espaciar ms las compras grandes"
+        "action": "Intenta espaciar más las compras grandes"
       },
       "onTrack": {
         "message": "Vas muy bien con el presupuesto!",
@@ -1350,14 +1355,14 @@
       "pending": "Pendientes"
     },
     "tables": {
-      "moreGuests": "+{{count}} invitados ms",
+      "moreGuests": "+{{count}} invitados más",
       "empty": "Mesa vaca",
       "assignedGuests": "{{count}} invitados asignados",
       "occupancyLabel": "ocupacin"
     },
     "pending": {
       "title": "Invitados pendientes ({{count}})",
-      "moreGuests": "+{{count}} invitados ms"
+      "moreGuests": "+{{count}} invitados más"
     },
     "actions": {
       "assign": "Asignar",
@@ -1372,22 +1377,22 @@
     }
   },
   "categories": {
-    "decoration": "Decoracin",
+    "decoration": "Decoración",
     "cocktail": "Cctel",
     "banquet": "Banquete",
     "ceremony": "Ceremonia",
     "flowers": "Flores",
     "dress": "Vestidos",
     "cake": "Pasteles",
-    "photography": "Fotografa"
+    "photography": "Fotografía"
   },
   "services": {
     "catering": "Catering",
-    "photography": "Fotografa",
+    "photography": "Fotografía",
     "video": "Vdeo",
-    "music": "Msica",
-    "musicDJ": "Msica/DJ",
-    "decoration": "Decoracin",
+    "music": "Música",
+    "musicDJ": "Música/DJ",
+    "decoration": "Decoración",
     "flowers": "Flores",
     "transport": "Transporte",
     "dresses": "Vestidos",
@@ -1402,7 +1407,7 @@
     "entertainment": "Animacin",
     "weddingPlanner": "Wedding Planner",
     "ceremonyVenue": "Lugar de ceremonia",
-    "receptionVenue": "Lugar de celebracin",
+    "receptionVenue": "Lugar de celebración",
     "accommodation": "Alojamiento",
     "honeymoon": "Viaje de novios",
     "sound": "Sonido",
@@ -1411,22 +1416,22 @@
     "weddingCake": "Tarta nupcial",
     "favors": "Detalles/Regaos",
     "security": "Seguridad",
-    "dayCoordination": "Coordinacin da B",
+    "dayCoordination": "Coordinacin día B",
     "other": "Otro"
   },
   "suppliers": {
     "configureServices": "Configurar servicios deseados",
     "suggested": "Sugeridos",
-    "addServicePlaceholder": "Aadir servicio (ej. Fotografa)",
+    "addServicePlaceholder": "Añadir servicio (ej. Fotografía)",
     "noServicesAdded": "An no has aadido servicios."
   },
   "validation": {
     "nameRequired": "El nombre es obligatorio",
     "serviceRequired": "El servicio es obligatorio",
-    "emailInvalid": "Email invlido",
+    "emailInvalid": "Email inválido",
     "linkMustStartHttp": "El enlace debe comenzar con http:// o https://",
     "titleRequired": "El ttulo es obligatorio",
-    "companionNegative": "El nmero de acompaantes no puede ser negativo",
+    "companionNegative": "El número de acompaantes no puede ser negativo",
     "selectCompanionType": "Selecciona el tipo de acompaante",
     "companionMismatch": "Establece \"Sin acompaante\" o aade alguno"
   },

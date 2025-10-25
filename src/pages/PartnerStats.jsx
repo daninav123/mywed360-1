@@ -28,11 +28,11 @@ const PartnerStats = () => {
 
         if (!response.ok) {
           if (response.status === 404) {
-            setError({t('common.codigo_descuento_encontrado_token_invalido')});
+            setError(t('common.codigo_descuento_encontrado_token_invalido'));
           } else if (response.status === 403) {
-            setError({t('common.este_codigo_descuento_esta_desactivado')});
+            setError(t('common.este_codigo_descuento_esta_desactivado'));
           } else {
-            setError({t('common.error_cargar_las_estadisticas')});
+            setError(t('common.error_cargar_las_estadisticas'));
           }
           setLoading(false);
           return;
@@ -43,7 +43,7 @@ const PartnerStats = () => {
         setError('');
       } catch (err) {
         console.error('[PartnerStats] Error:', err);
-        setError({t('common.error_conexion_por_favor_intenta')});
+        setError(t('common.error_conexion_por_favor_intenta'));
       } finally {
         setLoading(false);
       }

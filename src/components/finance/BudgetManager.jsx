@@ -503,13 +503,13 @@ const distributeIncrease = (amounts, indices, delta) => {
           </h2>
           <p className="text-sm text-[color:var(--color-text)]/70">
             {t('finance.budget.subtitle', {
-              defaultValue: {t('common.organiza_controla_presupuesto_por_categorias')},
+              defaultValue: t('common.organiza_controla_presupuesto_por_categorias'),
             })}
           </p>
         </div>
         <div className="flex items-center gap-2">
           <Button leftIcon={<Plus size={16} />} onClick={handleAddCategory}>
-            {t('finance.budget.newCategory', { defaultValue: {t('common.nueva_categoria')} })}
+            {t('finance.budget.newCategory', { defaultValue: t('common.nueva_categoria') })}
           </Button>
         </div>
       </div>
@@ -525,7 +525,7 @@ const distributeIncrease = (amounts, indices, delta) => {
               onClick={handleAddCategory}
               leftIcon={<Plus size={16} />}
             >
-              {t('finance.budget.newCategory', { defaultValue: {t('common.nueva_categoria')} })}
+              {t('finance.budget.newCategory', { defaultValue: t('common.nueva_categoria') })}
             </Button>
           </div>
         ) : (
@@ -663,14 +663,14 @@ const distributeIncrease = (amounts, indices, delta) => {
 
                   <div className="flex items-center gap-1 text-[10px] text-[color:var(--color-text)]/70">
                     <button
-                      aria-label="Editar categoría"
+                      aria-label={t('common.aria_editar_categoria')}
                       onClick={() => handleEditCategory(category, index)}
                       className="text-[var(--color-primary)] hover:brightness-110 p-1"
                     >
                       <Edit3 size={14} />
                     </button>
                     <button
-                      aria-label="Eliminar categoría"
+                      aria-label={t('common.aria_eliminar_categoria')}
                       onClick={() => handleDeleteCategory(index, category.name)}
                       className="text-[color:var(--color-danger)] hover:brightness-110 p-1"
                     >
@@ -852,8 +852,8 @@ const distributeIncrease = (amounts, indices, delta) => {
         }}
         title={
           editingCategory
-            ? t('finance.budget.modal.editTitle', { defaultValue: {t('common.editar_categoria')} })
-            : t('finance.budget.modal.newTitle', { defaultValue: {t('common.nueva_categoria')} })
+            ? t('finance.budget.modal.editTitle', { defaultValue: t('common.editar_categoria') })
+            : t('finance.budget.modal.newTitle', { defaultValue: t('common.nueva_categoria') })
         }
       >
         <div className="space-y-4">

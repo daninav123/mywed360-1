@@ -38,7 +38,7 @@ const CachePerformancePanel = () => {
     const cacheStats = templateCache.getCacheStats();
     if (cacheStats.categoryHits) {
       const categoryList = Object.keys(cacheStats.categoryHits);
-      setCategories(categoryList.length ? categoryList : [{t('common.sin_categoria')}]);
+      setCategories(categoryList.length ? categoryList : [t('common.sin_categoria')]);
       setSelectedCategory(categoryList[0] || {t('common.sin_categoria')});
     }
   }, []);
@@ -104,7 +104,7 @@ const CachePerformancePanel = () => {
 
   // Limpiar toda la caché
   const handleClearCache = useCallback(() => {
-    if (window.confirm({t('common.estas_seguro_que_deseas_limpiar')})) {
+    if (window.confirm(t('common.estas_seguro_que_deseas_limpiar'))) {
       templateCache.clearAll();
       loadCacheReport();
 

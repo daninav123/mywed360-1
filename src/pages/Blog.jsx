@@ -313,7 +313,7 @@ function Blog() {
       ) : null}
 
       {loading ? (
-        <div className="flex justify-center mt-8" role="status" aria-label="Cargando artículos">
+        <div className="flex justify-center mt-8" role="status" aria-label={t('common.aria_cargando_articulos')}>
           <Spinner />
         </div>
       ) : null}

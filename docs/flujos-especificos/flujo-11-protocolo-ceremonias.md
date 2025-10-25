@@ -14,7 +14,7 @@ El flujo 11 funciona como paraguas de todo lo relacionado con la ceremonia y los
 
 ## Arquitectura compartida
 
-- **Navegación:** `Más → Protocolo`. El layout `src/pages/protocolo/ProtocoloLayout.jsx` expone pestañas para cada subflujo, más accesos independientes como “Documentos”.  
+- **Navegación:** `Mas → Protocolo`. El layout `src/pages/protocolo/ProtocoloLayout.jsx` redirige a las rutas hijas (`/protocolo/momentos-especiales`, `/protocolo/timing`, etc.); cada subflujo se presenta como página independiente sin pestañas embebidas.  
 - **Persistencia (Firestore):**
   - `weddings/{id}/specialMoments/main`: bloques y momentos (subflujo 11A).  
   - `weddings/{id}/timing`: timeline maestro (11B).  
@@ -40,7 +40,7 @@ El flujo 11 funciona como paraguas de todo lo relacionado con la ceremonia y los
 
 
 ## Cobertura E2E implementada
-- `cypress/e2e/protocolo/ceremony-tabs-flow.cy.js`: verifica la navegación general del módulo de protocolo, conmutando entre los subflujos 11A–11E y confirmando que cada vista se renderiza con una boda simulada.
+- `cypress/e2e/protocolo/ceremony-tabs-flow.cy.js`: pendiente de actualizar; la navegación entre subflujos se realiza ahora mediante rutas directas sin pestañas compartidas.
 
 ## Roadmap / pendientes
 

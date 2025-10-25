@@ -55,7 +55,7 @@ export const CategoryBreakdown = ({
     return (
       <Card className="p-4 h-full bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
         <h3 className="text-lg font-semibold mb-4">
-          {type === 'expense' ? {t('common.gastos_por_categoria')} : {t('common.ingresos_por_categoria')}}
+          {type === 'expense' ? {t('common.gastos_por_categoria')} : t('common.ingresos_por_categoria')}
         </h3>
         <p className="text-[color:var(--color-text)]/70 text-center my-8">
           No hay datos disponibles
@@ -69,7 +69,7 @@ export const CategoryBreakdown = ({
   return (
     <Card className="p-4 h-full bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
       <h3 className="text-lg font-semibold mb-4">
-        {type === 'expense' ? {t('common.gastos_por_categoria')} : {t('common.ingresos_por_categoria')}}
+        {type === 'expense' ? {t('common.gastos_por_categoria')} : t('common.ingresos_por_categoria')}
       </h3>
       <div ref={chartRef} className="h-64">
         <ResponsiveContainer width="100%" height="100%">

@@ -10,11 +10,11 @@ const tabs = [
   const { t } = useTranslations();
  path: 'invitaciones', label: 'Invitaciones' },
   { path: 'logo', label: 'Logo' },
-  { path: 'menu', label: {t('common.menu')} },
+  { path: 'menu', label: t('common.menu') },
   { path: 'seating-plan', label: 'Seating Plan' },
-  { path: 'menu-catering', label: {t('common.menu_catering')} },
+  { path: 'menu-catering', label: t('common.menu_catering') },
   { path: 'papeles-nombres', label: 'Papeles Nombres' },
-  { path: 'mis-disenos', label: {t('common.mis_disenos')} },
+  { path: 'mis-disenos', label: t('common.mis_disenos') },
 ];
 
 const DiseñosLayout = React.memo(() => {
@@ -46,7 +46,7 @@ const DiseñosLayout = React.memo(() => {
 
       <nav
         role="tablist"
-        aria-label="Secciones de Diseño"
+        aria-label={t('common.aria_secciones_de_diseno')}
         className="flex overflow-x-auto space-x-2 pb-2"
       >
         {navTabs.map((tab) => (
@@ -71,7 +71,7 @@ const DiseñosLayout = React.memo(() => {
       <Card
         className="overflow-hidden focus:outline-none focus-visible:ring-2 ring-primary"
         role="region"
-        aria-label="Contenido de Diseños"
+        aria-label={t('common.aria_contenido_de_disenos')}
       >
         <div className="p-6">
           <Outlet />

@@ -15,7 +15,7 @@
     "filter": "Filtra",
     "close": "Tanca",
     "open": "Obre",
-    "yes": "S",
+    "yes": "Sí",
     "no": "No",
     "ok": "D'acord",
     "back": "Enrere",
@@ -40,12 +40,12 @@
     "profile": "Perfil",
     "settings": "Configuraci",
     "logout": "Tanca sessi",
-    "more": "Ms",
+    "more": "Más",
     "createEvent": "Crea un nou esdeveniment",
     "weddings": "Casaments",
     "emailInbox": "Safata d'entrada",
     "darkMode": "Mode fosc",
-    "userMenu": "Men d'usuari"
+    "userMenu": "Menú d'usuari"
   },
   "auth": {
     "login": "Login",
@@ -228,7 +228,10 @@
     "specialRequests": "Special Requests",
     "saveTheDate": {
       "message": "Hi, we are {{p1}}{{p2Suffix}} and we have amazing news to share. We're getting married! Please save {{date}} because we really want you with us.",
-      "messageFallback": "Hi! We have exciting news to share. We're getting married! Save the date because we want you there!"
+      "messageFallback": "Hi! We have exciting news to share. We're getting married! Save the date because we want you there!",
+      "connector": "and",
+      "primaryFallback": "us",
+      "coupleFallback": "our wedding"
     },
     "groups": {
       "title": "Group management",
@@ -371,7 +374,21 @@
       "modal": {
         "editTitle": "Edit category",
         "newTitle": "New category",
-        "name": "Category name"
+        "name": "Category name",
+        "namePlaceholder": "e.g. Catering, Music, Flowers&",
+        "amountLabel": "Assigned budget ()",
+        "amountPlaceholder": "0.00"
+      },
+      "errors": {
+        "nameRequired": "Category name is required",
+        "amountInvalid": "Amount must be a valid number"
+      },
+      "confirmDelete": "Are you sure you want to delete the \"{{category}}\" category?",
+      "advisorErrors": {
+        "requestFailed": "Unable to fetch advisor recommendation.",
+        "refreshFailed": "Unable to refresh advisor recommendation.",
+        "applyFailed": "Unable to apply the recommended scenario.",
+        "applyFailedWithReason": "Unable to apply the scenario ({{reason}})."
       }
     },
     "benchmarks": {
@@ -1057,7 +1074,7 @@
         "nameRequired": "Please tell us your name so we can personalise your uploads",
         "termsRequired": "You must accept the privacy notice",
         "windowClosed": "This gallery is no longer accepting new photos.",
-        "achievementFirst": "x& Achievement unlocked! Your first memory S",
+        "achievementFirst": "x& Achievement unlocked! Your first memory Sí",
         "achievementEnthusiast": "x}0 You are a collaborative rockstar! Keep sharing memories.",
         "achievementStar": "xRx Star memories! Your photos will shine in the slideshow.",
         "upload": "Photo uploaded successfully"
@@ -1073,5 +1090,353 @@
         "guestFallback": "Guest"
       }
     }
-  }
+  },
+  "pricing": {
+    "hero": {
+      "badge": "Per-event model",
+      "title": "Clear plans for every celebration.",
+      "description": "One-time payments in euros for couples and flexible packages for planners. Each license stays active for 30 days after the event and you can extend it whenever you need more time.",
+      "benefitsTitle": "Key benefits",
+      "benefits": [
+        "Licenses switch to read-only automatically once the event date passes.",
+        "Planner packs include a free month and quota tracking.",
+        "Alerts 30 / 7 / 1 days before expiration keep everything under control."
+      ],
+      "cta": "Create free account",
+      "highlights": {
+        "payPerEvent": {
+          "title": "Pay per event",
+          "description": "Activate only what you need for each wedding. No automatic renewals."
+        },
+        "collaboration": {
+          "title": "Controlled collaboration",
+          "description": "Invite helpers and suppliers with clear permissions and action tracking."
+        },
+        "syncStatus": {
+          "title": "Synced status",
+          "description": "Stripe webhooks keep licenses and packs up to date with internal alerts."
+        }
+      }
+    },
+    "sections": {
+      "couples": {
+        "label": "Couples",
+        "title": "Plans for couples",
+        "description": "Each purchase enables a full wedding until 30 days after the event. Add an extension if you need more time."
+      },
+      "planners": {
+        "label": "Planners",
+        "title": "Packages for planners",
+        "description": "Every pack includes a 1-month free trial. Choose 12 monthly payments or a single annual payment with a 15% discount. Stripe keeps the available seats updated automatically."
+      },
+      "needHelp": {
+        "title": "Need help choosing the right plan?",
+        "description": "We help you configure licenses, automations, and reports based on your workflow. Schedule a session and design a rollout that matches your pace.",
+        "cta": "Talk to a specialist"
+      },
+      "quickStart": {
+        "title": "Ready to use in minutes.",
+        "description": "Create your account, connect Stripe, and activate your licenses immediately. The system will notify renewals and you can keep closed weddings in read-only mode when they finish.",
+        "primaryCta": "Create free account",
+        "secondaryCta": "Access hub"
+      }
+    },
+    "couplePlans": {
+      "free": {
+        "name": "Free",
+        "priceLabel": "Free",
+        "priceSuffix": "per wedding",
+        "description": "Plan an intimate wedding or test the platform at no cost.",
+        "features": [
+          "1 active wedding with up to 80 guests",
+          "Basic seating plan and budget tracking",
+          "Supplier directory and visible listings",
+          "Essential templates and standard support"
+        ],
+        "cta": "Create free account"
+      },
+      "weddingPass": {
+        "name": "Wedding Pass",
+        "priceSuffix": "one-time payment per wedding",
+        "description": "Unlock every premium tool for your event without annual subscriptions.",
+        "features": [
+          "Unlimited guests and suppliers",
+          "Direct contact with suppliers and full protocol tools",
+          "Up to 50 website designs and priority support",
+          "Premium planning templates"
+        ],
+        "cta": "Buy Wedding Pass"
+      },
+      "weddingPassPlus": {
+        "name": "Wedding Pass Plus",
+        "priceSuffix": "one-time payment per wedding",
+        "description": "The most complete option for premium weddings and collaborative work with helpers.",
+        "features": [
+          "Everything included in Wedding Pass",
+          "Remove branding from invitations, PDFs, and screens",
+          "Full design library and memories gallery",
+          "1 helper with full access to the wedding"
+        ],
+        "cta": "Choose Wedding Pass Plus"
+      }
+    },
+    "plannerPlans": {
+      "cta": "Start free trial",
+      "pack5": {
+        "name": "Planner Pack 5",
+        "monthlySuffix": "/ month (12 payments)",
+        "description": "Up to 5 active weddings simultaneously with professional tools.",
+        "annualDescription": "{{amount}} one-time annual payment (15% discount).",
+        "features": [
+          "1-month free trial",
+          "Priority in the directory and priority support",
+          "Assign and reassign licenses as needed"
+        ]
+      },
+      "pack15": {
+        "name": "Planner Pack 15",
+        "monthlySuffix": "/ month (12 payments)",
+        "description": "Designed for growing planners managing multiple projects in parallel.",
+        "annualDescription": "{{amount}} one-time annual payment (15% discount).",
+        "features": [
+          "1-month free trial",
+          "Client analytics and extended visibility",
+          "Priority in the directory and priority support"
+        ]
+      },
+      "teams40": {
+        "name": "Teams 40",
+        "monthlySuffix": "/ month (12 payments)",
+        "description": "Teams coordinating many weddings and requiring advanced collaboration.",
+        "annualDescription": "{{amount}} one-time annual payment (15% discount).",
+        "features": [
+          "1-month free trial",
+          "40 active weddings per calendar year",
+          "Includes 3 additional profiles with limited access",
+          "Consolidated dashboard and advanced collaboration"
+        ]
+      },
+      "teamsUnlimited": {
+        "name": "Teams Unlimited",
+        "monthlySuffix": "/ month (12 payments)",
+        "description": "The definitive solution with unlimited weddings and profiles for large agencies.",
+        "annualDescription": "{{amount}} one-time annual payment (15% discount).",
+        "features": [
+          "1-month free trial",
+          "Full white-label and custom domain",
+          "24/7 dedicated support and tailored training",
+          "API access and expert onboarding"
+        ]
+      }
+    },
+    "actions": {
+      "processing": "Processing...",
+      "monthlyButton": "Monthly plan ({{amount}}/month)",
+      "annualButton": "Annual plan (save 15%)"
+    }
+  },
+  "marketingAccess": {
+    "backLink": "Back to home",
+    "hero": {
+      "badge": "MaLoveApp Access",
+      "login": {
+        "title": "Manage everything from one place",
+        "description": "Access your guests, tasks, budgets, and documents in seconds. Keep your team in sync across every event.",
+        "features": [
+          "One dashboard for tasks, budget, and seating",
+          "Invite collaborators with controlled permissions",
+          "Real-time updates across desktop and mobile"
+        ]
+      },
+      "signup": {
+        "title": "Welcome to MaLoveApp",
+        "description": "Centralise planning, automate reminders, and let our assistant guide you every step of the way.",
+        "features": [
+          "Onboarding guided by our planning assistant",
+          "Templates for budgets, guests, and suppliers",
+          "Stripe-powered licensing with instant activation"
+        ]
+      }
+    },
+    "toggle": {
+      "login": "Sign in",
+      "signup": "Create account"
+    },
+    "loggedIn": {
+      "title": "Active session",
+      "description": "Your MaLoveApp account is already open. Continue with your events or sign out if you need to switch accounts.",
+      "primaryCta": "Go to dashboard",
+      "secondaryCta": "Sign out"
+    },
+    "loginForm": {
+      "emailLabel": "Email",
+      "emailPlaceholder": "your@email.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Your password",
+      "rememberMe": "Remember me",
+      "forgotPassword": "Forgot password?",
+      "submit": "Sign in",
+      "submitting": "Signing in&"
+    },
+    "signup": {
+      "info": "Complete the form to create your account.",
+      "successMessage": "Account created successfully. Redirecting to your dashboard&",
+      "socialPending": "Complete the sign-up flow in the {{provider}} window."
+    },
+    "switch": {
+      "noAccount": "Do not have an account?",
+      "registerLink": "Create one",
+      "alreadyHaveAccount": "Already have an account?",
+      "loginLink": "Sign in"
+    },
+    "social": {
+      "redirect": "Redirecting to {{provider}}..."
+    },
+    "errors": {
+      "provider": "We could not authenticate with {{provider}}."
+    }
+  },
+  "budgetPrediction": {
+    "header": {
+      "title": "AI budget prediction",
+      "subtitle": "Intelligent analysis of your budget"
+    },
+    "actions": {
+      "analyzing": "Analyzing...",
+      "refresh": "Update prediction"
+    },
+    "metrics": {
+      "riskLabel": "Risk level",
+      "confidence": "Confidence",
+      "spent": "Spent",
+      "projected": "Projected",
+      "dailyRate": "Daily spend",
+      "daysRemaining": "Days remaining"
+    },
+    "sections": {
+      "recommendations": "Recommendations",
+      "categoryAnalysis": "Category analysis"
+    },
+    "emptyState": {
+      "title": "AI predictions available soon",
+      "description": "You need at least 5 transactions to generate predictions. You currently have {{count}}."
+    },
+    "riskLabels": {
+      "critical": "Critical",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "recommendations": {
+      "projectedOverage": {
+        "message": "Projected overage of {{amount}}",
+        "action": "Consider reviewing discretionary expenses"
+      },
+      "highDailyRate": {
+        "message": "Your daily spending rate is high",
+        "action": "Try spacing large purchases further apart"
+      },
+      "onTrack": {
+        "message": "You're on track with the budget!",
+        "action": "Keep this spending pace"
+      }
+    }
+  },
+  "seatingMobile": {
+    "header": {
+      "title": "Seating plan"
+    },
+    "search": {
+      "placeholder": "Search tables or guests..."
+    },
+    "stats": {
+      "tables": "Tables",
+      "guests": "Guests",
+      "pending": "Unassigned"
+    },
+    "tables": {
+      "moreGuests": "+{{count}} more guests",
+      "empty": "Empty table",
+      "assignedGuests": "{{count}} guests assigned",
+      "occupancyLabel": "occupancy"
+    },
+    "pending": {
+      "title": "Pending guests ({{count}})",
+      "moreGuests": "+{{count}} more guests"
+    },
+    "actions": {
+      "assign": "Assign",
+      "remove": "Remove",
+      "close": "Close"
+    },
+    "tableDetail": {
+      "capacity": "Capacity",
+      "occupancy": "Occupancy",
+      "guestsHeading": "Guests",
+      "noGuests": "No guests assigned"
+    }
+  },
+  "categories": {
+    "decoration": "Decoration",
+    "cocktail": "Cocktail",
+    "banquet": "Banquet",
+    "ceremony": "Ceremony",
+    "flowers": "Flowers",
+    "dress": "Dresses",
+    "cake": "Cakes",
+    "photography": "Photography"
+  },
+  "services": {
+    "catering": "Catering",
+    "photography": "Fotografía",
+    "video": "Vdeo",
+    "music": "Música",
+    "musicDJ": "Música/DJ",
+    "decoration": "Decoración",
+    "flowers": "Flores",
+    "transport": "Transporte",
+    "dresses": "Vestidos",
+    "suits": "Trajes",
+    "pastry": "Pastelera",
+    "invitations": "Invitaciones",
+    "furnitureRental": "Alquiler de mobiliario",
+    "lighting": "Iluminacin",
+    "makeup": "Maquillaje",
+    "hairdressing": "Peluquera",
+    "jewelry": "Joyera",
+    "entertainment": "Animacin",
+    "weddingPlanner": "Wedding Planner",
+    "ceremonyVenue": "Lugar de ceremonia",
+    "receptionVenue": "Lugar de celebración",
+    "accommodation": "Alojamiento",
+    "honeymoon": "Viaje de novios",
+    "sound": "Sonido",
+    "photoBooth": "Fotomatn",
+    "officiant": "Oficiante",
+    "weddingCake": "Tarta nupcial",
+    "favors": "Detalles/Regaos",
+    "security": "Seguridad",
+    "dayCoordination": "Coordinacin día B",
+    "other": "Otro"
+  },
+  "suppliers": {
+    "configureServices": "Configurar servicios deseados",
+    "suggested": "Sugeridos",
+    "addServicePlaceholder": "Añadir servicio (ej. Fotografía)",
+    "noServicesAdded": "An no has aadido servicios."
+  },
+  "validation": {
+    "nameRequired": "El nombre es obligatorio",
+    "serviceRequired": "El servicio es obligatorio",
+    "emailInvalid": "Email inválido",
+    "linkMustStartHttp": "El enlace debe comenzar con http:// o https://",
+    "titleRequired": "El ttulo es obligatorio",
+    "companionNegative": "El número de acompaantes no puede ser negativo",
+    "selectCompanionType": "Selecciona el tipo de acompaante",
+    "companionMismatch": "Establece \"Sin acompaante\" o aade alguno"
+  },
+  "general": "General",
+  "notes": "Notas",
+  "apply": "Aplicar",
+  "pagination": "Paginacin"
 }

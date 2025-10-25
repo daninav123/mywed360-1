@@ -1,4 +1,4 @@
-import {
+﻿import {
   Users,
   Split,
   Eye,
@@ -167,6 +167,7 @@ export default function ProveedorGroupCard({
                       await removeMember(group.id, m.id);
                     }
                   }}
+                  aria-label="Quitar proveedor del grupo"
                 >
                   <X size={14} />
                 </Button>
@@ -180,7 +181,7 @@ export default function ProveedorGroupCard({
           ? 'Leyendo presupuestos…'
           : totalRange
             ? `Rango de presupuestos detectado: ${totalRange}`
-            : {t('common.sin_presupuestos_detectados_aun')}}
+            : t('common.sin_presupuestos_detectados_aun')}
         {conflicts.overlap && (
           <div className="mt-2 text-sm text-red-700 flex items-center gap-1">
             <AlertCircle size={14} /> Posibles solapes en fechas (

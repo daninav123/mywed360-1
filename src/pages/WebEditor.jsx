@@ -57,7 +57,7 @@ export default function WebEditor() {
     setLoading(true);
     try {
       await setDoc(doc(db, 'users', uid), { weddingInfo: info }, { merge: true });
-      alert({t('common.informacion_guardada')});
+      alert(t('common.informacion_guardada'));
     } catch (err) {
       console.error(err);
       alert('Error al guardar');
@@ -206,7 +206,7 @@ export default function WebEditor() {
       await Promise.all(
         gallery.filter((g) => g.url).map((img) => addDoc(colRef, { url: img.url }))
       );
-      alert({t('common.galeria_guardada')});
+      alert(t('common.galeria_guardada'));
     } catch (e) {
       console.error(e);
       alert('Error');

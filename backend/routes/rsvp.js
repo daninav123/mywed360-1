@@ -384,9 +384,52 @@ function devRoutesAllowed(req) {
   }
 }
 
-router.post('/dev/create', (req, res) => {
-  logger.warn('rsvp-dev-create disabled: requiere flujo RSVP real');
-  return sendError(req, res, 'dev-endpoint-removed', 'El endpoint /api/rsvp/dev/create ha sido retirado. Usa la creaci�n de invitados real.', 410);
+router.post('/dev/create', async (req, res) => {
+  if (!devRoutesAllowed(req)) {
+    return sendError(req, res, 'forbidden', 'Endpoint solo disponible en desarrollo', 403);
+  }
+
+  try {
+    const { weddingId, name, phone, email } = req.body || {};
+    if (!weddingId || !name) {
+      return sendValidationError(req, res, [{ message: 'weddingId and name required' }]);
+    }
+
+    // Crear invitado en Firestore
+    const guestId = uuidv4();
+    const token = uuidv4();
+    const guestRef = db.collection('weddings').doc(String(weddingId)).collection('guests').doc(guestId);
+    
+    await guestRef.set({
+      name: String(name),
+      phone: phone || '',
+      email: email || '',
+      status: 'pending',
+      companions: 0,
+      companion: 0,
+      allergens: '',
+      token,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    // Crear índice de token
+    await db.collection('rsvpTokens').doc(token).set({
+      weddingId: String(weddingId),
+      guestId,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    const baseUrl = process.env.FRONTEND_BASE_URL || 'http://localhost:5173';
+    const link = `${baseUrl.replace(/\/$/, '')}/rsvp/${token}`;
+    
+    logger.info(`Dev guest created: ${guestId} for wedding ${weddingId}`);
+    return sendSuccess(req, res, { token, link, guestId, weddingId: String(weddingId) });
+  } catch (err) {
+    logger.error('rsvp-dev-create', err);
+    return sendInternalError(req, res, err);
+  }
 });
 
 

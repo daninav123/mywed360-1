@@ -1,4 +1,4 @@
-/* eslint-disable no-unused-vars */
+﻿/* eslint-disable no-unused-vars */
 // @vitest-environment node
 import {
   assertFails,
@@ -22,7 +22,7 @@ beforeAll(async () => {
 
   // Seed base data
   await testEnv.withSecurityRulesDisabled(async (ctx) => {
-    const db = getFirestore(ctx.app);
+    const db = ctx.firestore();
 
     // Wedding with single owner only (no plannerIds/assistantIds yet)
     await setDoc(doc(db, 'weddings', 'w2'), {
@@ -62,27 +62,27 @@ const weddingDoc = (db, id) => doc(db, 'weddings', id);
 
 D('Wedding document permissions', () => {
   test('Owner can CREATE new wedding', async () => {
-    const db = getFirestore(ctx('newOwner').app);
+    const db = ctx('newOwner').firestore();
     await assertSucceeds(setDoc(weddingDoc(db, 'wNew'), { ownerIds: ['newOwner'], name: 'New W' }));
   });
 
   test('Planner cannot CREATE new top-level wedding', async () => {
-    const db = getFirestore(ctx('somePlanner').app);
+    const db = ctx('somePlanner').firestore();
     await assertFails(setDoc(weddingDoc(db, 'plannerCreate'), { ownerIds: ['somePlanner'] }));
   });
 
   test('Owner can ADD planner to plannerIds', async () => {
-    const db = getFirestore(ctx('owner2').app);
+    const db = ctx('owner2').firestore();
     await assertSucceeds(
       setDoc(weddingDoc(db, 'w2'), { plannerIds: ['planner2'] }, { merge: true })
     );
   });
 
   test('Planner can add THEMSELVES to plannerIds (invitation accepted)', async () => {
-    const db = getFirestore(ctx('plannerSelf').app);
+    const db = ctx('plannerSelf').firestore();
     // First seed doc without their uid
     await testEnv.withSecurityRulesDisabled(async (admin) => {
-      await setDoc(weddingDoc(getFirestore(admin.app), 'selfAdd'), {
+      await setDoc(weddingDoc(admin.firestore(), 'selfAdd'), {
         ownerIds: ['ownerX'],
         plannerIds: [],
       });
@@ -93,9 +93,9 @@ D('Wedding document permissions', () => {
   });
 
   test('Planner cannot modify other fields while adding themselves', async () => {
-    const db = getFirestore(ctx('plannerBad').app);
+    const db = ctx('plannerBad').firestore();
     await testEnv.withSecurityRulesDisabled(async (admin) => {
-      await setDoc(weddingDoc(getFirestore(admin.app), 'selfAddBad'), {
+      await setDoc(weddingDoc(admin.firestore(), 'selfAddBad'), {
         ownerIds: ['ownerY'],
         plannerIds: [],
       });
@@ -110,17 +110,17 @@ D('Wedding document permissions', () => {
   });
 
   test('Assistant cannot WRITE wedding doc', async () => {
-    const db = getFirestore(ctx('assistant3').app);
+    const db = ctx('assistant3').firestore();
     await assertFails(setDoc(weddingDoc(db, 'w3'), { title: 'try' }, { merge: true }));
   });
 
   test('Owner can DELETE wedding', async () => {
-    const db = getFirestore(ctx('owner3').app);
+    const db = ctx('owner3').firestore();
     await assertSucceeds(deleteDoc(weddingDoc(db, 'w3')));
   });
 
   test('External user cannot READ wedding with missing plannerIds array', async () => {
-    const db = getFirestore(ctx('rand').app);
+    const db = ctx('rand').firestore();
     await assertFails(getDoc(weddingDoc(db, 'w2')));
   });
 });
@@ -129,19 +129,19 @@ D('Wedding document permissions', () => {
 
 D('Wedding subcollection permissions', () => {
   test('Owner can CREATE task', async () => {
-    const db = getFirestore(ctx('owner2').app);
+    const db = ctx('owner2').firestore();
     const taskRef = doc(db, 'weddings', 'w2', 'tasks', 'task1');
     await assertSucceeds(setDoc(taskRef, { name: 't' }));
   });
 
   test('Planner added later can WRITE tasks', async () => {
-    const db = getFirestore(ctx('planner2').app);
+    const db = ctx('planner2').firestore();
     const taskRef = doc(db, 'weddings', 'w2', 'tasks', 'task2');
     await assertSucceeds(setDoc(taskRef, { name: 'plan' }));
   });
 
   test('Assistant cannot WRITE tasks', async () => {
-    const db = getFirestore(ctx('assistant3').app);
+    const db = ctx('assistant3').firestore();
     const taskRef = doc(db, 'weddings', 'w3', 'tasks', 'tBad');
     await assertFails(setDoc(taskRef, { name: 'bad' }));
   });
@@ -151,7 +151,7 @@ D('Wedding subcollection permissions', () => {
 
 D('weddingInvitations rules (as subcollection)', () => {
   test('Any owner/planner can CREATE invitation under their wedding', async () => {
-    const db = getFirestore(ctx('owner2').app);
+    const db = ctx('owner2').firestore();
     await assertSucceeds(
       setDoc(doc(db, 'weddings', 'w2', 'weddingInvitations', 'invZ'), {
         weddingId: 'w2',
@@ -161,9 +161,10 @@ D('weddingInvitations rules (as subcollection)', () => {
   });
 
   test('Unauthenticated cannot CREATE invitation', async () => {
-    const db = getFirestore(ctx(null).app);
+    const db = ctx(null).firestore();
     await assertFails(
       setDoc(doc(db, 'weddings', 'w2', 'weddingInvitations', 'invNo'), { weddingId: 'w2' })
     );
   });
 });
+

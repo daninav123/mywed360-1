@@ -24,32 +24,32 @@ const initialState = () => {
 // Plantillas predefinidas para menús de boda
 const menuTemplates = [
   {
-    name: {t('common.elegante_clasico')},
-    description: {t('common.diseno_menu_formal_con_estilo')},
+    name: t('common.elegante_clasico'),
+    description: t('common.diseno_menu_formal_con_estilo'),
     prompt:
       {t('common.disena_menu_elegante_para_una')},
   },
   {
-    name: {t('common.rustico_natural')},
-    description: {t('common.menu_con_estetica_rustica_elementos')},
+    name: t('common.rustico_natural'),
+    description: t('common.menu_con_estetica_rustica_elementos'),
     prompt:
       {t('common.crea_menu_boda_con_estetica')},
   },
   {
     name: 'Minimalista & Moderno',
-    description: {t('common.diseno_limpio_contemporaneo_con_espacios')},
+    description: t('common.diseno_limpio_contemporaneo_con_espacios'),
     prompt:
       {t('common.disena_menu_minimalista_moderno_para')},
   },
   {
-    name: {t('common.botanico_floral')},
-    description: {t('common.menu_decorado_con_elementos_botanicos')},
+    name: t('common.botanico_floral'),
+    description: t('common.menu_decorado_con_elementos_botanicos'),
     prompt:
       {t('common.crea_menu_boda_con_tematica')},
   },
   {
-    name: {t('common.vintage_romantico')},
-    description: {t('common.menu_con_estetica_nostalgica_detalles')},
+    name: t('common.vintage_romantico'),
+    description: t('common.menu_con_estetica_nostalgica_detalles'),
     prompt:
       {t('common.disena_menu_boda_con_estetica')},
   },

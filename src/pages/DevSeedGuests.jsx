@@ -46,7 +46,7 @@ export default function DevSeedGuests() {
           getDocs(query(collection(db, ...tablesColPath), limit(1))),
         ]);
         if (!force && (!guestsSnap.empty || !tablesSnap.empty)) {
-          setStatus({t('common.datos_existentes_detectados_anade_forcetrue')});
+          setStatus(t('common.datos_existentes_detectados_anade_forcetrue'));
           return;
         }
 

@@ -60,7 +60,7 @@ export default function NotificationWatcher({
               })
             ) {
               showNotification({
-                title: {t('common.reunion_sugerida')},
+                title: t('common.reunion_sugerida'),
                 message: `${title}${when ? ' · ' + when : ''}`,
                 type: 'info',
                 duration: 9000,

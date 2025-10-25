@@ -21,7 +21,40 @@ const resources = Object.entries(localeModules).reduce((acc, [path, module]) => 
   return acc;
 }, {});
 
+const DEBUG_LANGUAGE_CODE = 'i18n';
+
+resources[DEBUG_LANGUAGE_CODE] ??= {};
+
+const missingKeyLog = [];
+const registerMissingKey = (languages, namespace, key, res) => {
+  const normalizedLanguages = Array.isArray(languages) ? languages : [languages].filter(Boolean);
+  const entry = {
+    languages: normalizedLanguages.length ? normalizedLanguages : ['unknown'],
+    namespace,
+    key,
+    resource: res,
+    timestamp: Date.now(),
+  };
+  const exists = missingKeyLog.some(
+    (item) =>
+      item.key === entry.key &&
+      item.namespace === entry.namespace &&
+      item.languages.some((lng) => entry.languages.includes(lng))
+  );
+  if (!exists) {
+    missingKeyLog.push(entry);
+  }
+  if (typeof window !== 'undefined') {
+    window.__I18N_MISSING_KEYS__ = missingKeyLog;
+  }
+};
+
 const LANGUAGE_METADATA = {
+  [DEBUG_LANGUAGE_CODE]: {
+    name: 'i18n (sin traducciones)',
+    flag: 'DBG',
+    order: 999,
+  },
   ar: { name: 'Arabic', flag: 'AR', dir: 'rtl', order: 20 },
   bg: { name: 'Bulgarian', flag: 'BG', order: 20 },
   ca: { name: 'Catalan', flag: 'CA', order: 20 },
@@ -62,6 +95,12 @@ const FALLBACK_LANGUAGES = [FALLBACK_LANGUAGE, 'en'];
 
 const buildAvailableLanguages = () =>
   Object.keys(resources)
+    .filter((code) => {
+      if (code === DEBUG_LANGUAGE_CODE) {
+        return true;
+      }
+      return Object.keys(resources[code] || {}).length > 0;
+    })
     .map((code) => {
       const meta = LANGUAGE_METADATA[code] ?? {
         name: code,
@@ -132,13 +171,20 @@ const applyDocumentAttributes = (lng) => {
 };
 
 i18n.on('languageChanged', applyDocumentAttributes);
+i18n.on('missingKey', registerMissingKey);
 
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
     resources,
-    fallbackLng: FALLBACK_LANGUAGES,
+    fallbackLng: (code) => {
+      const candidates = Array.isArray(code) ? code : [code];
+      if (candidates.includes(DEBUG_LANGUAGE_CODE)) {
+        return [];
+      }
+      return FALLBACK_LANGUAGES;
+    },
     supportedLngs: AVAILABLE_LANGUAGES.map((lang) => lang.code),
     lng: resolveInitialLanguage(),
     detection: {
@@ -167,16 +213,32 @@ export const changeLanguage = (lng) => {
 };
 
 export const getCurrentLanguage = () => i18n.language || FALLBACK_LANGUAGE;
+const getIntlLanguage = () => {
+  const current = getCurrentLanguage();
+  return current === DEBUG_LANGUAGE_CODE ? FALLBACK_LANGUAGE : current;
+};
 export const getAvailableLanguages = () =>
   AVAILABLE_LANGUAGES.map((lang) => ({ ...lang }));
 
 export const formatDate = (date, options = {}) =>
-  new Intl.DateTimeFormat(getCurrentLanguage(), options).format(new Date(date));
+  new Intl.DateTimeFormat(getIntlLanguage(), options).format(new Date(date));
 export const formatCurrency = (amount, currency = 'EUR') =>
-  new Intl.NumberFormat(getCurrentLanguage(), { style: 'currency', currency }).format(
+  new Intl.NumberFormat(getIntlLanguage(), { style: 'currency', currency }).format(
     amount
   );
 export const formatNumber = (number) =>
-  new Intl.NumberFormat(getCurrentLanguage()).format(number);
+  new Intl.NumberFormat(getIntlLanguage()).format(number);
+
+export const getMissingTranslationLog = () => missingKeyLog.slice();
+
+if (typeof window !== 'undefined') {
+  window.__I18N_INSTANCE__ = i18n;
+  window.__I18N_RESET_MISSING__ = () => {
+    missingKeyLog.length = 0;
+    window.__I18N_MISSING_KEYS__ = missingKeyLog;
+    return missingKeyLog;
+  };
+  window.__I18N_GET_MISSING__ = () => missingKeyLog.slice();
+}
 
 export default i18n;

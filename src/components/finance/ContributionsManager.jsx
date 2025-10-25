@@ -69,7 +69,7 @@ const ContributionsManager = ({
   };
 
   const handleDeleteContribution = (id) => {
-    if (confirm({t('common.eliminar_esta_aportacion')})) {
+    if (confirm(t('common.eliminar_esta_aportacion'))) {
       saveContributions(contributions.filter(c => c.id !== id));
     }
   };
@@ -265,7 +265,7 @@ const ContributionsManager = ({
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              {editingContribution ? {t('common.editar_aportacion')} : {t('common.nueva_aportacion')}}
+              {editingContribution ? {t('common.editar_aportacion')} : t('common.nueva_aportacion')}
             </h3>
 
             <div className="space-y-4">

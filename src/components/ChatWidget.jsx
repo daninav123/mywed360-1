@@ -757,7 +757,7 @@ export default function ChatWidget() {
       );
 
       clearTimeout(timeoutId);
-      chatDebug({t('common.duracion_peticion')}, (performance.now() - fetchStart).toFixed(0), 'ms');
+      chatDebug(t('common.duracion_peticion'), (performance.now() - fetchStart).toFixed(0), 'ms');
 
       let data;
       if (response.ok) {

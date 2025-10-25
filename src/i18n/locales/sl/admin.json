@@ -1,0 +1,26 @@
+{
+  "admin": {
+    "title": "Administración",
+    "dashboard": "Panel de control",
+    "users": {
+      "title": "Gestión de usuarios",
+      "newUser": "Nuevo usuario",
+      "editUser": "Editar usuario",
+      "deleteUser": "Eliminar usuario",
+      "roles": {
+        "admin": "Administrador",
+        "owner": "Propietario",
+        "planner": "Wedding Planner",
+        "assistant": "Asistente"
+      }
+    },
+    "settings": "Configuración",
+    "analytics": "Analíticas",
+    "logs": "Registros",
+    "messages": {
+      "updated": "Configuración actualizada",
+      "error": "Error en la operación"
+    }
+  },
+  "_note": "Translate from es/admin.json"
+}

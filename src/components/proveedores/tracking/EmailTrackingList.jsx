@@ -11,7 +11,7 @@ const FILTERS = [
  key: 'todos', label: 'Todos' },
   { key: 'enviado', label: 'Enviado' },
   { key: 'entregado', label: 'Entregado' },
-  { key: 'leido', label: {t('common.leido')} },
+  { key: 'leido', label: t('common.leido') },
   { key: 'responded', label: 'Respondido' },
   { key: 'error', label: 'Error' },
   { key: 'pendiente', label: 'Pendiente' },
@@ -54,7 +54,7 @@ const EmailTrackingList = ({ trackingItems = [], onViewDetails, onFilter, curren
           color: 'text-purple-600',
           bg: 'bg-purple-100',
           icon: <Eye size={16} />,
-          label: {t('common.leido')},
+          label: t('common.leido'),
         };
       case 'responded':
       case 'completed':

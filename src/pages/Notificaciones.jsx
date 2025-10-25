@@ -81,7 +81,7 @@ export default function Notificaciones() {
             onClick={async () => {
               try {
                 await pushSubscribe();
-                alert({t('common.suscripcion_push_activada')});
+                alert(t('common.suscripcion_push_activada'));
               } catch (e) {
                 alert('No se pudo activar push');
               }
@@ -94,7 +94,7 @@ export default function Notificaciones() {
             onClick={async () => {
               try {
                 await pushUnsubscribe();
-                alert({t('common.suscripcion_push_desactivada')});
+                alert(t('common.suscripcion_push_desactivada'));
               } catch (e) {
                 alert('No se pudo desactivar');
               }

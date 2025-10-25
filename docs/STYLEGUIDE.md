@@ -37,7 +37,8 @@ Esta guía define convenciones para código, UI y estructura, alineadas con las 
 - Colores: usar paleta `blue` existente + neutrales (`slate/gray`) y estados: `success (#16a34a)`, `warning (#f59e0b)`, `danger (#dc2626)`, `info (#0ea5e9)`.
 - Radios: `rounded-md` (controles), `rounded-lg` (cards/modals), `rounded-full` (pills/avatars).
 - Sombras: `shadow-sm` (controles), `shadow` (cards), `shadow-lg` (modals/overlays).
-- Menú usuario: el botón (esquina superior derecha) muestra `logo-app.png` como avatar por defecto; mantiene `aria-label`/`title` con `app.brandName`. No se ancla el logo en la esquina superior izquierda.
+- Menú usuario: el botón (esquina superior derecha) muestra `maloveapp-logo.png` como avatar por defecto; mantiene `aria-label`/`title` con `app.brandName`. No se ancla el logo en la esquina superior izquierda.
+- Header marketing (páginas públicas): barra superior opaca (`bg-app` sin sufijos de transparencia ni `backdrop-blur`) con CTAs únicos `Iniciar sesión`/`Crear cuenta` y logotipo `maloveapp-logo.png`; no debe existir enlace duplicado «Login / Registro» en la navegación.
 - Layout responsivo:
   - Variables CSS (`src/index.css`): `--layout-max-width: 1120px`, `--layout-wide-width: 1280px`, `--layout-padding: clamp(16px, 4vw, 32px)`.
   - Contenedor estándar: aplica `.layout-container` para vistas de aplicación; mantiene padding fluido en móviles y un `max-width` legible en desktop.

@@ -4,6 +4,7 @@
  */
 
 import { precacheAndRoute } from 'workbox-precaching';
+import { useTranslations } from '../../hooks/useTranslations';
 // Inyección de precache (vite-plugin-pwa injectManifest)
 // self.__WB_MANIFEST será reemplazado en build con la lista de assets
 precacheAndRoute(self.__WB_MANIFEST || []);
@@ -28,7 +29,7 @@ const STATIC_ASSETS = [
   '/icon-192.png',
   '/icon-512.png',
   '/badge-72.png',
-  '/logo-app.png',
+  '/maloveapp-logo.png',
 ];
 
 // Rutas de API que se pueden cachear
@@ -38,6 +39,8 @@ const CACHEABLE_API_ROUTES = ['/api/mail', '/api/tasks', '/api/finance', '/api/p
  * Instalar Service Worker y cachear recursos estáticos
  */
 self.addEventListener('install', (event) => {
+  const { t } = useTranslations();
+
   console.log('[SW] Instalando Service Worker...');
   console.log(`[SW] Cache base version ${CACHE_NAME}`);
 
@@ -137,7 +140,7 @@ self.addEventListener('push', (event) => {
     }
     const title = data.title || 'MaLoveApp';
     const options = {
-      body: data.body || 'Tienes una nueva notificación',
+      body: data.body || {t('common.tienes_una_nueva_notificacion')},
       icon: '/icon-192.png',
       badge: '/badge-72.png',
       data: { url: data.url || '/' },
@@ -348,8 +351,8 @@ async function getOfflineFallback(request) {
   if (isAPIRequest(url)) {
     return new Response(
       JSON.stringify({
-        error: 'Sin conexión',
-        message: 'Esta función requiere conexión a internet',
+        error: t('common.sin_conexion'),
+        message: t('common.esta_funcion_requiere_conexion_internet'),
         offline: true,
       }),
       {
@@ -505,4 +508,3 @@ self.addEventListener('notificationclick', (event) => {
 });
 
 console.log('[SW] Service Worker cargado correctamente');
-

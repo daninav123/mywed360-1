@@ -33,7 +33,7 @@ export default function MisDiseños() {
         setItems(arr);
       } catch (e) {
         console.error(e);
-        setError({t('common.pudo_cargar_tus_disenos')});
+        setError(t('common.pudo_cargar_tus_disenos'));
       } finally {
         setLoading(false);
       }
@@ -42,7 +42,7 @@ export default function MisDiseños() {
   }, [activeWedding]);
 
   const handleDelete = async (it) => {
-    if (!confirm({t('common.eliminar_este_diseno_definitivamente')})) return;
+    if (!confirm(t('common.eliminar_este_diseno_definitivamente'))) return;
     try {
       await firebaseReady;
       const { doc, deleteDoc } = await fsImport();

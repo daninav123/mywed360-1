@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+﻿import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import {
   Clock,
@@ -110,7 +110,7 @@ const Timeline = () => {
     // Validar formato de hora
     const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
     if (!timeRegex.test(startTime) || !timeRegex.test(endTime)) {
-      toast.error({t('common.formato_hora_invalido_hhmm')});
+      toast.error(t('common.formato_hora_invalido_hhmm'));
       return;
     }
 
@@ -125,7 +125,7 @@ const Timeline = () => {
     const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
     
     if (!timeRegex.test(value)) {
-      toast.error({t('common.formato_hora_invalido_hhmm')});
+      toast.error(t('common.formato_hora_invalido_hhmm'));
       return;
     }
 
@@ -152,7 +152,7 @@ const Timeline = () => {
     const message = prompt('Mensaje de la alerta:');
     if (message) {
       addAlert('info', message);
-      toast.success({t('common.alerta_anadida')});
+      toast.success(t('common.alerta_anadida'));
     }
   }, [addAlert]);
 
@@ -238,7 +238,7 @@ const Timeline = () => {
             onClick={() => setLiveMode(!liveMode)}
           >
             {liveMode ? <Pause size={14} /> : <Play size={14} />}
-            Modo {liveMode ? 'live' : {t('common.estatico')}}
+            Modo {liveMode ? 'live' : t('common.estatico')}
           </Button>
           <Button
             variant="outline"
@@ -582,3 +582,4 @@ const Timeline = () => {
 };
 
 export default Timeline;
+

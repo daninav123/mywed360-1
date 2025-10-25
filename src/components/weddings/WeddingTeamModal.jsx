@@ -42,7 +42,7 @@ const DEFAULT_PLANNERS = [
     city: 'Valencia',
     rating: 4.8,
     weddingsActive: 3,
-    tags: [{t('common.clasico')}, 'premium'],
+    tags: [t('common.clasico'), 'premium'],
     specialties: [],
     email: 'daniel.romero@demo-planners.test',
     phone: '',
@@ -144,13 +144,13 @@ export default function WeddingTeamModal({ open, onClose, weddingId, weddingName
           setPlannerCandidates(normalized);
         } else {
           setPlannerCandidates(DEFAULT_PLANNERS);
-          setPlannersError({t('common.encontramos_planners_publicados_aun_mostramos')});
+          setPlannersError(t('common.encontramos_planners_publicados_aun_mostramos'));
         }
       } catch (error) {
         if (!aborted) {
           console.warn('[WeddingTeamModal] planner suggestions failed', error);
           setPlannerCandidates(DEFAULT_PLANNERS);
-          setPlannersError({t('common.pudimos_cargar_planners_recomendados_mostramos')});
+          setPlannersError(t('common.pudimos_cargar_planners_recomendados_mostramos'));
         }
       } finally {
         if (!aborted) setPlannersLoading(false);

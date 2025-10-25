@@ -20,7 +20,7 @@ const statusMeta = (estado = '') => {
   if (e.includes('presup')) return { color: '#0ea5e920', border: '#0ea5e9', label: 'Presupuestos' };
   if (e.includes('negoci') || e.includes('contact')) return { color: '#f59e0b20', border: '#f59e0b', label: 'En proceso' };
   if (e.includes('rechaz')) return { color: '#ef444420', border: '#ef4444', label: 'Rechazado' };
-  return { color: 'transparent', border: '#9ca3af', label: {t('common.vacio')} };
+  return { color: 'transparent', border: '#9ca3af', label: t('common.vacio') };
 };
 
 export default function ServicesBoard({ proveedores = [], onOpenSearch, onOpenNew, onOpenAI }) {

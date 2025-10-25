@@ -165,7 +165,7 @@ export default function TransactionManager({
           if (!onImportTransactions) {
             toast.error(
               t('finance.transactions.importUnsupported', {
-                defaultValue: {t('common.importacion_disponible')},
+                defaultValue: t('common.importacion_disponible'),
               })
             );
             return { success: false, error: 'Import unsupported' };
@@ -176,12 +176,12 @@ export default function TransactionManager({
             if (result?.success) {
               toast.success(
                 t('finance.transactions.importSuccess', {
-                  defaultValue: {t('common.importacion_completada')},
+                  defaultValue: t('common.importacion_completada'),
                 }) +
                   (result?.imported
                     ? ` (${result.imported} ${
                         result.imported === 1
-                          ? t('finance.transactions.item', { defaultValue: {t('common.transaccion')} })
+                          ? t('finance.transactions.item', { defaultValue: t('common.transaccion') })
                           : t('finance.transactions.items', { defaultValue: 'transacciones' })
                       })`
                     : '')
@@ -189,7 +189,7 @@ export default function TransactionManager({
             } else if (result?.errors?.length) {
               toast.warning(
                 `${t('finance.transactions.importPartial', {
-                  defaultValue: {t('common.importacion_parcial')},
+                  defaultValue: t('common.importacion_parcial'),
                 })}: ${result.errors.length} ${t('finance.transactions.rowsFailed', {
                   defaultValue: 'filas con errores',
                 })}`

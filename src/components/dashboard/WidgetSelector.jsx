@@ -9,7 +9,7 @@ const WIDGET_OPTIONS = [
 
     type: WidgetTypes.CALENDAR,
     title: 'Calendario',
-    description: {t('common.muestra_los_proximos_eventos_fechas')},
+    description: t('common.muestra_los_proximos_eventos_fechas'),
     icon: '📅',
   },
   {
@@ -33,7 +33,7 @@ const WIDGET_OPTIONS = [
   {
     type: WidgetTypes.TIMELINE,
     title: 'Cronograma',
-    description: {t('common.linea_tiempo_del_evento')},
+    description: t('common.linea_tiempo_del_evento'),
     icon: '⏱️',
   },
 ];

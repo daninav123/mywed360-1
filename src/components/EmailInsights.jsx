@@ -134,7 +134,7 @@ export default function EmailInsights({
         folder = folder || 'Proveedores';
       }
       if (/invitaci[óo]n|rsvp|confirmaci[óo]n/.test(text)) {
-        tags.push({t('common.invitacion')});
+        tags.push(t('common.invitacion'));
         folder = folder || 'RSVP';
       }
       return { tags: Array.from(new Set(tags)), folder };
@@ -286,7 +286,7 @@ export default function EmailInsights({
               const defaultTitle =
                 (tasks && tasks[0]?.title) ||
                 (email?.subject ? `Tarea: ${email.subject}` : 'Tarea de email');
-              const title = prompt({t('common.titulo_tarea')}, defaultTitle);
+              const title = prompt(t('common.titulo_tarea'), defaultTitle);
               if (!title) return;
               const task = { title, due: tasks && tasks[0]?.due ? tasks[0].due : null };
               window.dispatchEvent(new CustomEvent('maloveapp-tasks', { detail: { task } }));
@@ -311,7 +311,7 @@ export default function EmailInsights({
               }
               const endIso = new Date(new Date(startIso).getTime() + 60 * 60 * 1000).toISOString();
               const meeting = {
-                title: email?.subject ? `Reunión: ${email.subject}` : {t('common.reunion')},
+                title: email?.subject ? `Reunión: ${email.subject}` : t('common.reunion'),
                 start: startIso,
                 end: endIso,
               };

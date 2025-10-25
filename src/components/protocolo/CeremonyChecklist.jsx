@@ -66,7 +66,7 @@ export default function CeremonyChecklist({ compact = false }) {
     if (!label) return;
     const customCount = (draft || []).filter((item) => !defaultIds.has(item.id)).length;
     if (customCount >= 50) {
-      setLimitWarning({t('common.has_alcanzado_maximo_items_personalizados')});
+      setLimitWarning(t('common.has_alcanzado_maximo_items_personalizados'));
       return;
     }
     setDraft((prev) => [

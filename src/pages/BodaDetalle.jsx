@@ -63,10 +63,10 @@ export default function BodaDetalle() {
   const { data: suppliers } = useWeddingCollection('suppliers', id, []);
 
   const DESIGN_ITEMS = [
-    { key: 'web', label: {t('common.pagina_web')} },
+    { key: 'web', label: t('common.pagina_web') },
     { key: 'invitacion', label: 'Invitaciones' },
     { key: 'seating', label: 'Seating plan' },
-    { key: 'menu', label: {t('common.menu')} },
+    { key: 'menu', label: t('common.menu') },
     { key: 'logo', label: 'Logo' },
   ];
 

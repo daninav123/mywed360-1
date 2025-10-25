@@ -369,7 +369,7 @@ export default function TaskList({
             <div className="text-xs text-[color:var(--color-text)]/40">
               {tasks.length > 0 
                 ? `${tasks.length} tarea(s) total(es), pero no hay próximas para mostrar` 
-                : {t('common.crea_primera_tarea_usando_boton')}}
+                : t('common.crea_primera_tarea_usando_boton')}
             </div>
           </div>
         )}

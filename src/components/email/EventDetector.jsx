@@ -258,7 +258,7 @@ function EventDetector({ emailContent, emailSubject, onEventDetected }) {
                 <button
                   onClick={() => onEventDetected(event)}
                   className="px-3 py-1 bg-indigo-500 hover:bg-indigo-600 text-white text-xs rounded-md transition"
-                  aria-label="Añadir al calendario"
+                  aria-label={t('common.aria_anadir_al_calendario')}
                 >
                   Añadir al calendario
                 </button>

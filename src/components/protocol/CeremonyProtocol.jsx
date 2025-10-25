@@ -40,13 +40,13 @@ const CeremonyProtocol = ({
       { title: 'Ceremonia Civil/Religiosa', duration: 30, participants: 'Novios + Oficiante' },
       { title: 'Intercambio de Votos', duration: 10, participants: 'Novios' },
       { title: 'Intercambio de Anillos', duration: 5, participants: 'Novios + Padrinos' },
-      { title: {t('common.declaracion_matrimonio')}, duration: 5, participants: 'Oficiante + Novios' },
+      { title: t('common.declaracion_matrimonio'), duration: 5, participants: 'Oficiante + Novios' },
       { title: 'Salida de Novios', duration: 5, participants: 'Novios' },
-      { title: {t('common.sesion_fotos')}, duration: 45, participants: {t('common.novios_fotografo')} }
+      { title: t('common.sesion_fotos'), duration: 45, participants: t('common.novios_fotografo') }
     ],
     reception: [
-      { title: {t('common.coctel_bienvenida')}, duration: 60, participants: 'Todos' },
-      { title: {t('common.entrada_salon')}, duration: 15, participants: 'Todos' },
+      { title: t('common.coctel_bienvenida'), duration: 60, participants: 'Todos' },
+      { title: t('common.entrada_salon'), duration: 15, participants: 'Todos' },
       { title: 'Entrada de Novios', duration: 5, participants: 'Novios' },
       { title: 'Primer Plato', duration: 30, participants: 'Todos' },
       { title: 'Segundo Plato', duration: 30, participants: 'Todos' },
@@ -66,7 +66,7 @@ const CeremonyProtocol = ({
 
   const handleAddEvent = () => {
     if (!formData.title) {
-      alert({t('common.titulo_obligatorio')});
+      alert(t('common.titulo_obligatorio'));
       return;
     }
 
@@ -99,7 +99,7 @@ const CeremonyProtocol = ({
   };
 
   const handleDeleteEvent = (id) => {
-    if (confirm({t('common.eliminar_este_evento')})) {
+    if (confirm(t('common.eliminar_este_evento'))) {
       setProtocol({
         ...protocol,
         [activeTab]: protocol[activeTab].filter(e => e.id !== id)
@@ -443,7 +443,7 @@ const CeremonyProtocol = ({
                 Cancelar
               </Button>
               <Button onClick={editingEvent ? handleUpdateEvent : handleAddEvent}>
-                {editingEvent ? 'Actualizar' : {t('common.anadir')}}
+                {editingEvent ? 'Actualizar' : t('common.anadir')}
               </Button>
             </div>
           </div>

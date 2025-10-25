@@ -122,7 +122,7 @@ const SubscriptionWidget = () => {
           <span className="text-lg font-bold text-gray-900">
             {formatPrice(subscription.amount, subscription.currency)}
             <span className="text-sm font-normal text-gray-600">
-              {subscription.interval === 'month' ? '/mes' : {t('common.ano')}}
+              {subscription.interval === 'month' ? '/mes' : t('common.ano')}
             </span>
           </span>
         </div>

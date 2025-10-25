@@ -1,5 +1,8 @@
+import { useTranslations } from '../../hooks/useTranslations';
 ﻿export const adminKpis = [
   {
+  const { t } = useTranslations();
+
     id: 'active-weddings',
     label: 'Bodas activas',
     value: 142,
@@ -8,14 +11,14 @@
   },
   {
     id: 'revenue-30d',
-    label: 'Facturación (30 días)',
+    label: t('common.facturacion_dias'),
     value: '€ 12.340',
     trend: 5.6,
     testId: 'admin-kpi-revenue-30d',
   },
   {
     id: 'downloads-30d',
-    label: 'Descargas app (30 días)',
+    label: t('common.descargas_app_dias'),
     value: 980,
     trend: 8.4,
     testId: 'admin-kpi-downloads-30d',
@@ -69,14 +72,14 @@ export const adminAlerts = [
     id: 'alert-1',
     severity: 'critical',
     module: 'Infraestructura',
-    message: 'Latex cron fallback falló durante 5 minutos.',
+    message: t('common.latex_cron_fallback_fallo_durante'),
     timestamp: 'Hace 4 minutos',
   },
   {
     id: 'alert-2',
     severity: 'high',
     module: 'Emails',
-    message: 'La tasa de rebote superó el 5% en la última hora.',
+    message: t('common.tasa_rebote_supero_ultima_hora'),
     timestamp: 'Hace 12 minutos',
   },
 ];
@@ -89,7 +92,7 @@ export const adminTasks = [
 export const adminPortfolio = [
   {
     id: 'wed-001',
-    couple: 'Lucía & Marco',
+    couple: t('common.lucia_marco'),
     owner: 'lucia@maloveapp.com',
     eventDate: '2025-11-12',
     status: 'active',
@@ -137,7 +140,7 @@ export const adminIncidents = [
     startedAt: '2025-10-01 10:12',
     duration: '8 min',
     impact: 'Emails en cola',
-    action: 'Reintento automático',
+    action: t('common.reintento_automatico'),
     resolvedBy: 'Ops',
   },
 ];
@@ -146,7 +149,7 @@ export const featureFlags = [
   {
     id: 'flag-1',
     name: 'webbuilder.newTemplates',
-    description: 'Habilita la nueva galería de plantillas web',
+    description: t('common.habilita_nueva_galeria_plantillas_web'),
     domain: 'web',
     enabled: true,
     lastModifiedBy: 'admin@maloveapp.com',
@@ -225,7 +228,7 @@ export const auditLogs = [
 export const reportsScheduled = [
   {
     id: 'report-1',
-    name: 'Métricas globales',
+    name: t('common.metricas_globales'),
     cadence: 'Semanal',
     recipients: ['direccion@maloveapp.com'],
     format: 'PDF',

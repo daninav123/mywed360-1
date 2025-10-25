@@ -38,7 +38,7 @@ function SystemSettings() {
   // Estados para las diferentes configuraciones
   const [generalSettings, setGeneralSettings] = useState({
     siteName: 'MaLoveApp',
-    siteDescription: {t('common.plataforma_conexion_con_proveedores')},
+    siteDescription: t('common.plataforma_conexion_con_proveedores'),
     maxUploadSize: 10,
     allowedFileTypes: '.jpg,.png,.pdf,.docx,.xlsx',
     enableUserRegistration: true,
@@ -136,7 +136,7 @@ function SystemSettings() {
       )}
 
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs value={activeTab} onChange={handleTabChange} aria-label="configuración del sistema">
+        <Tabs value={activeTab} onChange={handleTabChange} aria-label={t('common.aria_configuracion_del_sistema')}>
           <Tab label="General" />
           <Tab label={t('common.correo_electronico')} />
           <Tab label="Seguridad" />
@@ -421,7 +421,7 @@ function SystemSettings() {
           onClick={handleSaveSettings}
           disabled={isSaving}
         >
-          {isSaving ? 'Guardando...' : {t('common.guardar_configuracion')}}
+          {isSaving ? 'Guardando...' : t('common.guardar_configuracion')}
         </Button>
       </div>
     </div>

@@ -200,7 +200,7 @@ const EmailList = ({
             {!email.read && (
               <span
                 className="w-2 h-2 bg-blue-500 rounded-full mr-2"
-                aria-label="No leído"
+                aria-label={t('common.aria_no_leido')}
                 role="status"
               ></span>
             )}

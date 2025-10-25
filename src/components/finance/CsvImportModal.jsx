@@ -23,7 +23,7 @@ export default function CsvImportModal({
     { key: 'date', label: t('finance.transactions.csv.date', { defaultValue: 'Fecha' }) },
     {
       key: 'desc',
-      label: t('finance.transactions.csv.description', { defaultValue: {t('common.descripcion')} }),
+      label: t('finance.transactions.csv.description', { defaultValue: t('common.descripcion') }),
     },
     {
       key: 'type',
@@ -31,7 +31,7 @@ export default function CsvImportModal({
     },
     {
       key: 'category',
-      label: t('finance.transactions.csv.category', { defaultValue: {t('common.categoria')} }),
+      label: t('finance.transactions.csv.category', { defaultValue: t('common.categoria') }),
     },
     { key: 'amount', label: t('finance.transactions.csv.amount', { defaultValue: 'Monto' }) },
   ];
@@ -86,13 +86,13 @@ export default function CsvImportModal({
                     {t('finance.transactions.csv.date', { defaultValue: 'Fecha' })}
                   </th>
                   <th className="px-2 py-1 text-left">
-                    {t('finance.transactions.csv.description', { defaultValue: {t('common.descripcion')} })}
+                    {t('finance.transactions.csv.description', { defaultValue: t('common.descripcion') })}
                   </th>
                   <th className="px-2 py-1 text-left">
                     {t('finance.transactions.csv.type', { defaultValue: 'Tipo' })}
                   </th>
                   <th className="px-2 py-1 text-left">
-                    {t('finance.transactions.csv.category', { defaultValue: {t('common.categoria')} })}
+                    {t('finance.transactions.csv.category', { defaultValue: t('common.categoria') })}
                   </th>
                   <th className="px-2 py-1 text-right">
                     {t('finance.transactions.csv.amount', { defaultValue: 'Monto' })}

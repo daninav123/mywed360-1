@@ -28,8 +28,8 @@ const MODULE_LABELS = {
   finance: 'Finanzas',
   providers: 'Proveedores',
   communications: 'Comunicaciones',
-  settings: {t('common.configuracion')},
-  analytics: {t('common.analitica')},
+  settings: t('common.configuracion'),
+  analytics: t('common.analitica'),
 };
 
 export default function WeddingModulePermissionsCard({

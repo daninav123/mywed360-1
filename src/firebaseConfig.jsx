@@ -2,6 +2,7 @@ import { getAnalytics, isSupported } from 'firebase/analytics';
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getDatabase, ref, onValue } from 'firebase/database';
+import { useTranslations } from '../../hooks/useTranslations';
 import {
   initializeFirestore,
   getFirestore,
@@ -16,6 +17,8 @@ import {
 
 // Configuraci�n de Firebase desde variables de entorno (sin secretos hard-coded)
 const rawFirebaseConfig = {
+  const { t } = useTranslations();
+
   apiKey: import.meta?.env?.VITE_FIREBASE_API_KEY || "",
   authDomain: import.meta?.env?.VITE_FIREBASE_AUTH_DOMAIN || "",
   projectId: import.meta?.env?.VITE_FIREBASE_PROJECT_ID || "",
@@ -215,7 +218,7 @@ const inicializarFirebase = async () => {
     if (!ok) {
       if (typeof window !== 'undefined' && window.mostrarErrorUsuario) {
         window.mostrarErrorUsuario(
-          'Modo sin conexión - Los cambios se sincronizarán cuando se recupere la conexión',
+          {t('common.modo_sin_conexion_los_cambios')},
           10000
         );
       }
@@ -239,7 +242,7 @@ const inicializarFirebase = async () => {
     console.error('Error al inicializar Firebase:', error);
     if (typeof window !== 'undefined' && window.mostrarErrorUsuario) {
       window.mostrarErrorUsuario(
-        'Error al conectar con el servidor. La aplicación funcionará en modo fuera de línea.',
+        {t('common.error_conectar_con_servidor_aplicacion')},
         0
       );
     }

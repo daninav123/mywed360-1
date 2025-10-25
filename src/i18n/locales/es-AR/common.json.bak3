@@ -1,0 +1,1437 @@
+{
+  "app": {
+    "name": "MaLove.App",
+    "brandName": "Lovenda",
+    "tagline": "Tu boda perfecta, organizada digitalmente",
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "add": "Añadir",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "close": "Cerrar",
+    "open": "Abrir",
+    "yes": "Sí",
+    "no": "No",
+    "ok": "Aceptar",
+    "back": "Volver",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "continue": "Continuar",
+    "finish": "Finalizar"
+  },
+  "navigation": {
+    "home": "Inicio",
+    "dashboard": "Panel",
+    "guests": "Invitados",
+    "providers": "Proveedores",
+    "finance": "Finanzas",
+    "seating": "Plan de asientos",
+    "email": "Correo electrónico",
+    "protocol": "Protocolo",
+    "designs": "Diseños",
+    "website": "Web de boda",
+    "contracts": "Contratos",
+    "tasks": "Tareas",
+    "profile": "Perfil",
+    "settings": "Configuración",
+    "logout": "Cerrar sesión",
+    "more": "Más",
+    "createEvent": "Crear nuevo evento",
+    "weddings": "Bodas",
+    "emailInbox": "Bandeja de entrada",
+    "darkMode": "Modo oscuro",
+    "userMenu": "Menú de usuario"
+  },
+  "finance": {
+    "transactions": {
+      "title": "Transacciones",
+      "new": "Nueva Transacción",
+      "empty": "No hay transacciones que mostrar",
+      "createFirst": "Crear primera transacción",
+      "searchPlaceholder": "Buscar por concepto...",
+      "allTypes": "Todos los tipos",
+      "incomes": "Ingresos",
+      "expenses": "Gastos",
+      "allCategories": "Todas las categorías",
+      "allProviders": "Todos los proveedores",
+      "allDays": "Todos los días",
+      "last30": "Últimos 30 días",
+      "last90": "Últimos 90 días",
+      "onlyUncategorized": "Solo sin categoría",
+      "clear": "Limpiar",
+      "sort": {
+        "dateDesc": "Fecha (recientes primero)",
+        "dateAsc": "Fecha (antiguos primero)",
+        "amountDesc": "Importe (mayor primero)",
+        "amountAsc": "Importe (menor primero)"
+      },
+      "headers": {
+        "date": "Fecha",
+        "concept": "Concepto",
+        "category": "Categoría",
+        "type": "Tipo",
+        "status": "Estado",
+        "amount": "Monto",
+        "actions": "Acciones"
+      },
+      "status": {
+        "pending": "Pendiente",
+        "partial": "Pago parcial",
+        "paid": "Pagado",
+        "expected": "Esperado",
+        "received": "Recibido"
+      },
+      "saved": "Transacción guardada",
+      "deleted": "Transacción eliminada",
+      "deleteErrorPrefix": "Error eliminando transacción:",
+      "saveUnexpected": "Error inesperado al guardar la transacción",
+      "noConcept": "Sin concepto",
+      "noCategory": "Sin categoría",
+      "dueOn": "Vence:",
+      "attachment": "Adjunto",
+      "balanceLabel": "Balance:",
+      "pendingAmount": "Pendiente:",
+      "overdueAmount": "Vencido:",
+      "outstandingExpense": "Pendiente:",
+      "outstandingIncome": "Por recibir:",
+      "alerts": {
+        "title": "Pagos importantes",
+        "overdue": "Pagos vencidos:",
+        "upcoming": "Pagos prximos (7 días):"
+      },
+      "csv": {
+        "title": "Importar CSV - Mapeo de columnas",
+        "fields": {
+          "date": "Fecha",
+          "description": "Descripción",
+          "amount": "Importe",
+          "type": "Tipo",
+          "category": "Categoría"
+        },
+        "none": "Ninguna",
+        "preview": "Vista previa"
+      }
+    },
+    "tabs": {
+      "overview": "Resumen",
+      "transactions": "Transacciones",
+      "budget": "Presupuesto",
+      "contributions": "Aportaciones",
+      "analytics": "Anlisis"
+    },
+    "connectBank": {
+      "title": "Conecta tu banco para importar movimientos",
+      "desc": "Acelera el registro de gastos e ingresos conectando tu cuenta bancaria.",
+      "button": "Conectar banco"
+    },
+    "alerts": {
+      "budget": "Alertas de Presupuesto"
+    },
+    "overview": {
+      "title": "Gestin financiera",
+      "subtitle": "Control total del presupuesto y los gastos de tu boda",
+      "lastSync": "Última sincronizacin",
+      "synced": "Sincronizado",
+      "offline": "Sin conexin",
+      "totalBudget": "Presupuesto Total",
+      "totalSpent": "Total Gastado",
+      "ofBudget": "del presupuesto",
+      "currentBalance": "Balance Actual",
+      "expectedIncome": "Ingresos Esperados",
+      "used": "utilizado",
+      "categoryStatus": "Estado del Presupuesto por Categorías",
+      "progress": "Progreso",
+      "exceededNote": "(Presupuesto excedido!)"
+    },
+    "form": {
+      "type": "Tipo de transacción",
+      "concept": "Concepto",
+      "conceptPlaceholder": "Ej: Pago de catering, Regalo de boda...",
+      "amount": "Monto (EUR)",
+      "amountLabel": "Monto:",
+      "date": "Fecha",
+      "category": "Categoría",
+      "selectCategory": "Selecciona una categoría",
+      "description": "Descripción adicional",
+      "descriptionPlaceholder": "Detalles adicionales sobre la transacción...",
+      "transaction": "Transacción",
+      "provider": "Proveedor / Fuente",
+      "attachments": {
+        "title": "Comprobantes",
+        "help": "Adjunta facturas, contratos o recibos para tenerlos a mano.",
+        "add": "Adjuntar comprobante",
+        "remove": "Quitar",
+        "count": "Total adjuntos:",
+        "attachment": "Adjunto"
+      },
+      "status": {
+        "expected": "Esperado",
+        "received": "Recibido",
+        "pending": "Pendiente",
+        "partial": "Pago parcial",
+        "paid": "Pagado"
+      },
+      "errors": {
+        "conceptRequired": "El concepto es obligatorio",
+        "amountPositive": "El monto debe ser un número positivo",
+        "dateRequired": "La fecha es obligatoria",
+        "categoryRequired": "La categoría es obligatoria",
+        "paidAmountPositive": "El monto abonado debe ser un número positivo",
+        "paidAmountExceeds": "El monto abonado no puede superar el total",
+        "paidAmountRequired": "Registra cunto has pagado para marcar el estado como parcial"
+      }
+    },
+    "contributions": {
+      "title": "Contributions Setup",
+      "subtitle": "Configure contributions and estimate expected income",
+      "updateGuests": "Update Guests",
+      "initial": {
+        "title": "Initial Contributions",
+        "personA": "Person A (EUR)",
+        "personB": "Person B (EUR)",
+        "total": "Initial total:"
+      },
+      "monthly": {
+        "title": "Monthly Contributions",
+        "personA": "Person A (EUR/month)",
+        "personB": "Person B (EUR/month)",
+        "total": "Monthly total:"
+      },
+      "extras": {
+        "title": "Extra Contributions",
+        "totalLabel": "Extras total (family, other income) (EUR)",
+        "help": "Include family gifts, parents' contributions, etc."
+      },
+      "gifts": {
+        "title": "Gift Estimation",
+        "giftPerGuest": "Estimated gift per guest (EUR)",
+        "guestCount": "Number of guests",
+        "loadHint": "Click the icon to auto-load from your guest list",
+        "total": "Estimated gifts total:"
+      },
+      "unsaved": "You have unsaved changes",
+      "saveChanges": "Save Changes",
+      "summary": {
+        "title": "Expected Income Summary",
+        "subtitle": "Total projection based on your settings",
+        "initial": "Initial contributions",
+        "monthly": "Monthly contributions",
+        "extras": "Extra contributions",
+        "gifts": "Estimated gifts",
+        "total": "Expected Total"
+      },
+      "tips": {
+        "title": "Financial Tips",
+        "emergencyTitle": "Emergency fund:",
+        "emergencyText": "Consider reserving 10-15% of the total budget for unexpected expenses.",
+        "giftsTitle": "Conservative gifts:",
+        "giftsText": "It's better to underestimate wedding gifts than overestimate them.",
+        "reviewTitle": "Regular review:",
+        "reviewText": "Review and update these projections monthly.",
+        "balanceTitle": "Balanced contributions:",
+        "balanceText": "Keep a fair balance between both people's contributions."
+      }
+    },
+    "charts": {
+      "title": "Anlisis Financiero",
+      "subtitle": "Visualizaciones y tendencias de tus finanzas de boda",
+      "totalTransactions": "Total Transacciones",
+      "activeCategories": "Categorías Activas",
+      "budgetEfficiency": "Eficiencia Presupuesto",
+      "projectedBalance": "Balance Proyectado",
+      "budgetVsSpentByCategory": "Presupuesto vs Gastado por Categoría",
+      "budgeted": "Presupuestado",
+      "spent": "Gastado",
+      "expenseDistributionByCategory": "Distribucin de Gastos por Categoría",
+      "monthlyTrend": "Tendencia Mensual de Ingresos y Gastos",
+      "income": "Ingresos",
+      "expenses": "Gastos",
+      "balance": "Balance",
+      "budgetProgressByCategory": "Progreso del Presupuesto por Categoría",
+      "used": "Usado",
+      "excess": "Exceso",
+      "insights": "Insights Financieros",
+      "highestExpense": "Mayor Gasto",
+      "mostEfficient": "Más Eficiente",
+      "noData": "No hay datos suficientes",
+      "currentTrend": "Tendencia Actual",
+      "trend": {
+        "positive": "Positiva",
+        "negative": "Negativa"
+      },
+      "balanceLabel": "Balance:"
+    },
+    "bank": {
+      "title": "Vincular cuenta bancaria",
+      "country": "Pas",
+      "countries": {
+        "es": "Espaa",
+        "fr": "Francia",
+        "de": "Alemania",
+        "it": "Italia",
+        "pt": "Portugal"
+      },
+      "bankLabel": "Banco",
+      "selectBank": "Selecciona un banco",
+      "selectBankPlaceholder": "Selecciona un banco...",
+      "loadBanks": "Cargar bancos",
+      "connect": "Conectar",
+      "errorLoad": "No se pudieron cargar bancos. Es posible que el backend no tenga habilitada la integracin Nordigen o la ruta /api/bank an no est desplegada.",
+      "errorStart": "No se pudo iniciar la vinculacin",
+      "noRequisition": "No hay requisicin iniciada",
+      "errorCheck": "No se pudo consultar el estado",
+      "selectWedding": "Selecciona una boda activa",
+      "linked": "Cuenta vinculada",
+      "errorSave": "No se pudo guardar la cuenta",
+      "requirements": {
+        "title": "Requisitos backend:",
+        "env": "Definir NORDIGEN_SECRET_ID, NORDIGEN_SECRET_KEY y NORDIGEN_BASE_URL",
+        "route": "Backend con ruta /api/bank desplegada"
+      },
+      "alternative": "Alternativa temporal: importa movimientos manualmente desde Finanzas -> Transacciones -> \"Importar Banco\".",
+      "requisition": "Requisition:",
+      "checkStatus": "Comprobar estado",
+      "availableAccounts": "Cuentas disponibles",
+      "useThis": "Usar esta cuenta"
+    },
+    "budget": {
+      "title": "Gestin de presupuesto",
+      "subtitle": "Organiza y controla el presupuesto por categorías",
+      "newCategory": "Nueva categoría",
+      "totalBudget": "Presupuesto total",
+      "budgeted": "Presupuestado",
+      "spent": "Gastado",
+      "remaining": "Disponible",
+      "progress": "Progreso",
+      "categoriesTitle": "Categorías de presupuesto",
+      "empty": "No hay categorías de presupuesto",
+      "createFirst": "Crear primera categoría",
+      "category": "Categoría",
+      "overallProgress": "Progreso del presupuesto",
+      "muteAlerts": "Silenciar alertas",
+      "thresholds": {
+        "warn": "Aviso (en riesgo) %",
+        "danger": "Crtico (exceso) %"
+      },
+      "modal": {
+        "editTitle": "Editar categoría",
+        "newTitle": "Nueva categoría",
+        "name": "Nombre de la categoría",
+        "namePlaceholder": "Ej.: Catering, música, flores...",
+        "amountLabel": "Presupuesto asignado ()",
+        "amountPlaceholder": "0,00"
+      },
+      "advisor": "Advisor",
+      "advisorShort": "AI",
+      "muteShort": "Mute",
+      "exceeded": "Exceeded",
+      "perGuestHint": "H {{value}} / guest ({{count}} events)",
+      "errors": {
+        "nameRequired": "El nombre de la categoría es obligatorio",
+        "amountInvalid": "El monto debe ser un número válido"
+      },
+      "confirmDelete": "Ests seguro de eliminar la categoría \"{{category}}\"?",
+      "advisorErrors": {
+        "requestFailed": "No se pudo obtener la recomendacin del consejero.",
+        "refreshFailed": "No se pudo actualizar la recomendacin.",
+        "applyFailed": "No se pudo aplicar el escenario recomendado.",
+        "applyFailedWithReason": "No se pudo aplicar el escenario ({{reason}})."
+      }
+    },
+    "benchmarks": {
+      "title": "Budget suggestions based on similar weddings",
+      "subtitle": "Based on {{count}} confirmed budgets. Average estimate: {{average}}  Confidence: {{confidence}}.",
+      "loading": "Calculating budget suggestions&",
+      "applyMedian": "Apply median (p50)",
+      "applyP75": "Apply percentile 75",
+      "saveSnapshot": "Save budget"
+    },
+    "cashflow": {
+      "title": "Cashflow timeline",
+      "subtitle": "Upcoming payments and projected balance",
+      "remaining": "Budget remaining",
+      "burnRate": "Monthly burn rate",
+      "monthsToZero": "{{months}} months until depletion",
+      "upcoming": "Upcoming payments (45 days)",
+      "noUpcoming": "No pending payments in the next weeks.",
+      "netTimeline": "Net monthly flow (6 months)",
+      "legend": "Income - Expense",
+      "noHistory": "We need more history to estimate the trend.",
+      "income": "Income",
+      "expense": "Expenses"
+    }
+  },
+  "tasks": {
+    "high": "Alta",
+    "medium": "Media",
+    "low": "Baja",
+    "completed": "Completada",
+    "inProgress": "En progreso",
+    "notStarted": "No iniciada",
+    "overdue": "Atrasada",
+    "task": "Task",
+    "tasks": "Tasks",
+    "addTask": "Add Task",
+    "editTask": "Edit Task",
+    "deleteTask": "Delete Task",
+    "taskTitle": "Task Title",
+    "taskDescription": "Description",
+    "taskDueDate": "Due Date",
+    "taskPriority": "Priority",
+    "taskStatus": "Status",
+    "taskAssignee": "Assigned to",
+    "todoList": "To-Do List",
+    "completedTasks": "Completed Tasks",
+    "upcomingTasks": "Upcoming Tasks"
+  },
+  "profile": {
+    "synced": "Sincronizado",
+    "subscription": {
+      "type": "Tipo de suscripcin",
+      "free": "Gratis",
+      "premium": "Premium"
+    }
+  },
+  "forms": {
+    "required": "Obligatorio",
+    "optional": "Opcional",
+    "pleaseSelect": "Por favor, selecciona",
+    "selectOption": "Selecciona una opción",
+    "enterText": "Introduce texto",
+    "chooseFile": "Seleccionar archivo",
+    "uploadFile": "Subir archivo",
+    "fieldRequired": "Este campo es obligatorio",
+    "invalidEmail": "Email inválido",
+    "invalidPhone": "Teléfono inválido",
+    "invalidUrl": "URL invlida",
+    "dragAndDrop": "Drag and drop files here",
+    "invalidFormat": "Invalid format",
+    "fileTooLarge": "File too large",
+    "passwordTooShort": "Password too short",
+    "passwordsDoNotMatch": "Passwords do not match"
+  },
+  "messages": {
+    "saveSuccess": "Guardado correctamente",
+    "saveError": "Error al guardar",
+    "deleteSuccess": "Eliminado correctamente",
+    "deleteError": "Error al eliminar",
+    "updateSuccess": "Actualizado correctamente",
+    "updateError": "Error al actualizar",
+    "loadError": "Error al cargar datos",
+    "networkError": "Error de red",
+    "confirmDelete": "Seguro que deseas eliminar?",
+    "unsavedChanges": "Tienes cambios sin guardar",
+    "permissionDenied": "Permission denied",
+    "notFound": "Not found",
+    "sessionExpired": "Your session has expired",
+    "pleaseLogin": "Please log in"
+  },
+  "rsvp": {
+    "section": "RSVP",
+    "simulate": "Simular recordatorios",
+    "send": "Enviar recordatorios",
+    "overview": {
+      "title": "Financial Management",
+      "subtitle": "Full control of your wedding budget and expenses",
+      "lastSync": "Last sync",
+      "synced": "Synced",
+      "offline": "Offline",
+      "totalBudget": "Total Budget",
+      "totalSpent": "Total Spent",
+      "ofBudget": "of budget",
+      "currentBalance": "Current Balance",
+      "expectedIncome": "Expected Income",
+      "used": "used",
+      "categoryStatus": "Budget Status by Categories",
+      "progress": "Progress"
+    },
+    "budget": {
+      "title": "Budget Management",
+      "subtitle": "Organize and control your budget by categories",
+      "newCategory": "New category",
+      "totalBudget": "Total Budget",
+      "budgeted": "Budgeted",
+      "spent": "Spent",
+      "remaining": "Remaining",
+      "categoriesTitle": "Budget Categories",
+      "empty": "No budget categories",
+      "createFirst": "Create first category",
+      "category": "Category",
+      "exceeded": "Exceeded",
+      "progress": "Progress",
+      "overallProgress": "Budget progress",
+      "muteAlerts": "Mute alerts",
+      "thresholds": {
+        "title": "Alert thresholds (global)",
+        "warn": "Warning (at risk) %",
+        "danger": "Critical (excess) %"
+      },
+      "modal": {
+        "editTitle": "Edit category",
+        "newTitle": "New category",
+        "name": "Category name"
+      },
+      "perGuestHint": "H {{value}} / guest ({{count}} events)"
+    },
+    "transactions": {
+      "title": "Transactions",
+      "connectBank": "Connect Bank (Open Banking)",
+      "importCSV": "Import CSV",
+      "exportCSV": "Export CSV",
+      "new": "New Transaction",
+      "searchPlaceholder": "Search by concept...",
+      "allTypes": "All types",
+      "incomes": "Incomes",
+      "expenses": "Expenses",
+      "allCategories": "All categories",
+      "allDays": "All days",
+      "last30": "Last 30 days",
+      "last90": "Last 90 days",
+      "onlyUncategorized": "Only uncategorized",
+      "clear": "Clear",
+      "empty": "No transactions to show",
+      "createFirst": "Create first transaction",
+      "noConcept": "No concept",
+      "noCategory": "No category",
+      "income": "Income",
+      "expense": "Expense",
+      "headers": {
+        "date": "Date",
+        "concept": "Concept",
+        "category": "Category",
+        "type": "Type",
+        "amount": "Amount",
+        "actions": "Actions"
+      },
+      "sort": {
+        "dateDesc": "Date (newest first)",
+        "dateAsc": "Date (oldest first)",
+        "amountDesc": "Amount (highest first)",
+        "amountAsc": "Amount (lowest first)"
+      }
+    }
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "forgotPassword": "Forgot your password?",
+    "resetPassword": "Reset Password",
+    "loginWithGoogle": "Login with Google",
+    "loginWithFacebook": "Login with Facebook",
+    "alreadyHaveAccount": "Already have an account?",
+    "dontHaveAccount": "Don't have an account?",
+    "createAccount": "Create Account",
+    "welcomeBack": "Welcome back!",
+    "createYourAccount": "Create your account",
+    "loginSuccess": "Login successful",
+    "logoutSuccess": "Logout successful",
+    "loginError": "Login error",
+    "registerError": "Registration error",
+    "invalidCredentials": "Invalid credentials",
+    "emailRequired": "Email is required",
+    "passwordRequired": "Password is required",
+    "passwordTooShort": "Password must be at least 6 characters",
+    "passwordsDoNotMatch": "Passwords do not match",
+    "invalidEmail": "Invalid email format"
+  },
+  "authLogin": {
+    "title": "Accede a tu cuenta",
+    "subtitle": "Usa tu correo y contrasea o contina con un proveedor social.",
+    "emailLabel": "Correo electrónico",
+    "passwordLabel": "Contrasea",
+    "emailPlaceholder": "tu@email.com",
+    "passwordPlaceholder": "Tu contrasea",
+    "rememberMe": "Recurdame",
+    "forgotPassword": "Olvidaste tu contrasea?",
+    "submit": "Iniciar sesión",
+    "submitting": "Iniciando sesión...",
+    "noAccount": "No tienes cuenta?",
+    "registerLink": "Regstrate",
+    "hero": {
+      "title": "Gestiona todo desde un nico panel",
+      "description": "Accede a tus invitados, tareas, presupuestos y documentos en segundos. Sigue el progreso del evento y coordina a todo tu equipo.",
+      "features": [
+        "Sincroniza proveedores y contratos.",
+        "Automatiza correos y recordatorios personalizados.",
+        "Recibe alertas cuando algo requiera tu atencin."
+      ]
+    },
+    "validation": {
+      "missingEmail": "Introduce tu correo electrónico.",
+      "missingPassword": "Introduce tu contrasea."
+    },
+    "errors": {
+      "invalidCredentials": "Correo o contrasea invlidos.",
+      "generic": "No pudimos iniciar sesión. Intntalo de nuevo o contacta con soporte."
+    },
+    "social": {
+      "divider": "o contina con",
+      "button": "Continuar con {{provider}}",
+      "pending": "Contina el inicio de sesión en la ventana de {{provider}}."
+    }
+  },
+  "authSignup": {
+    "title": "Crea tu cuenta",
+    "subtitle": "Regstrate con tu correo o contina con tu cuenta social favorita.",
+    "emailLabel": "Correo electrónico",
+    "passwordLabel": "Contrasea",
+    "roleLabel": "Rol",
+    "emailPlaceholder": "tu@email.com",
+    "passwordPlaceholder": "Mnimo 8 caracteres",
+    "rememberMe": "Recurdame",
+    "forgotPassword": "Olvidaste tu contrasea?",
+    "submit": "Crear cuenta",
+    "submitting": "Creando cuenta...",
+    "noAccount": "No tienes cuenta?",
+    "registerLink": "Regstrate",
+    "alreadyHaveAccount": "Ya tienes cuenta?",
+    "loginLink": "Inicia sesión",
+    "hero": {
+      "title": "Bienvenida a Lovenda",
+      "description": "Centraliza tareas, invitados y proveedores en un solo lugar. Nuestra asistente te gua en cada paso para que tu boda sea perfecta.",
+      "features": [
+        "Timeline inteligente para no olvidar nada.",
+        "Automatiza correos y recordatorios para invitados.",
+        "Catlogo de proveedores con recomendaciones personalizadas."
+      ]
+    },
+    "roleOptions": {
+      "particular": "Pareja",
+      "planner": "Wedding planner",
+      "assistant": "Ayudante"
+    },
+    "validation": {
+      "missingEmail": "Introduce tu correo electrónico.",
+      "missingPassword": "Introduce tu contrasea.",
+      "shortPassword": "La contrasea debe tener al menos 8 caracteres."
+    },
+    "errors": {
+      "emailInUse": "Este correo ya est registrado.",
+      "weakPassword": "Elige una contrasea más fuerte para completar el registro.",
+      "invalidEmail": "Introduce un correo electrónico válido.",
+      "generic": "No pudimos crear tu cuenta. Intntalo de nuevo o contacta con soporte."
+    },
+    "successMessage": "Cuenta creada con Éxito. Redirigiendo a tu panel...",
+    "social": {
+      "divider": "o contina con",
+      "button": "Continuar con {{provider}}",
+      "pending": "Contina el registro en la ventana de {{provider}}."
+    }
+  },
+  "passwordStrength": {
+    "labels": {
+      "veryWeak": "Muy dbil",
+      "weak": "Dbil",
+      "medium": "Aceptable",
+      "strong": "Buena",
+      "veryStrong": "Excelente"
+    },
+    "title": "Seguridad de la contrasea",
+    "suggestions": {
+      "start": "Introduce una contrasea con al menos 8 caracteres.",
+      "length8": "Usa al menos 8 caracteres.",
+      "length12": "Aumenta la longitud a 12 caracteres o más.",
+      "case": "Combina maysculas y minsculas.",
+      "numbers": "Aade nmeros para reforzarla.",
+      "symbols": "Incluye smbolos como !, %, # o similares.",
+      "repetition": "Evita repetir el mismo carcter varias veces seguidas.",
+      "common": "Evita palabras comunes o secuencias previsibles."
+    }
+  },
+  "wedding": {
+    "wedding": "Wedding",
+    "weddings": "Weddings",
+    "myWedding": "My Wedding",
+    "createWedding": "Create Wedding",
+    "editWedding": "Edit Wedding",
+    "weddingName": "Wedding Name",
+    "weddingDate": "Wedding Date",
+    "weddingVenue": "Wedding Venue",
+    "bride": "Bride",
+    "groom": "Groom",
+    "couple": "Couple",
+    "ceremony": "Ceremony",
+    "reception": "Reception",
+    "weddingDetails": "Wedding Details",
+    "weddingBudget": "Wedding Budget",
+    "weddingGuests": "Wedding Guests",
+    "weddingStyle": "Wedding Style",
+    "weddingTheme": "Wedding Theme",
+    "weddingColors": "Wedding Colors"
+  },
+  "guests": {
+    "guest": "Invitado",
+    "guests": "Invitados",
+    "guestList": "Lista de invitados",
+    "addGuest": "Añadir invitado",
+    "editGuest": "Editar invitado",
+    "deleteGuest": "Eliminar invitado",
+    "guestName": "Nombre del invitado",
+    "guestEmail": "Correo del invitado",
+    "guestPhone": "Teléfono del invitado",
+    "guestAddress": "Dirección del invitado",
+    "guestTable": "Mesa del invitado",
+    "guestStatus": "Estado del invitado",
+    "confirmed": "Confirmado",
+    "pending": "Pendiente",
+    "declined": "Rechazado",
+    "totalGuests": "Invitados totales",
+    "confirmedGuests": "Invitados confirmados",
+    "pendingGuests": "Invitados pendientes",
+    "importGuests": "Importar invitados",
+    "exportGuests": "Exportar invitados",
+    "sendInvitations": "Enviar invitaciones",
+    "plusOne": "Acompaante",
+    "dietaryRestrictions": "Restricciones alimentarias",
+    "specialRequests": "Peticiones especiales",
+    "saveTheDate": {
+      "message": "Hola somos {{p1}}{{p2Suffix}}, tenemos un noticin sper importante que compartir contigo. Nos casamos! Resrvate el {{date}} porque queremos contar contigo.",
+      "messageFallback": "Hola! Tenemos un noticin sper importante que compartir contigo. Nos casamos! Resrvate la fecha porque queremos contar contigo!",
+      "connector": "y",
+      "primaryFallback": "nosotros",
+      "coupleFallback": "nuestra boda"
+    },
+    "rsvp": {
+      "printPdf": "Imprimir / PDF"
+    },
+    "groups": {
+      "title": "Gestin de grupos",
+      "assignTitle": "Asignar a seleccionados",
+      "newGroup": "Nuevo grupo&",
+      "groupName": "Nombre de grupo",
+      "rename": "Renombrar grupo",
+      "origin": "Origen&",
+      "newName": "Nuevo nombre",
+      "merge": "Fusionar grupos",
+      "destination": "Destino&",
+      "existing": "Grupos existentes",
+      "none": "No hay grupos an."
+    },
+    "selectedCount": "Seleccionados: {{count}}"
+  },
+  "providers": {
+    "provider": "Proveedor",
+    "providers": "Proveedores",
+    "addProvider": "Añadir proveedor",
+    "editProvider": "Editar proveedor",
+    "deleteProvider": "Eliminar proveedor",
+    "providerName": "Nombre del proveedor",
+    "providerService": "Servicio del proveedor",
+    "providerContact": "Contacto",
+    "providerEmail": "Correo del proveedor",
+    "providerPhone": "Teléfono del proveedor",
+    "providerWebsite": "Sitio web",
+    "providerAddress": "Dirección",
+    "providerBudget": "Presupuesto",
+    "providerStatus": "Estado",
+    "providerNotes": "Notas",
+    "searchProviders": "Buscar proveedores",
+    "filterByService": "Filtrar por servicio",
+    "photographer": "Fotgrafo",
+    "videographer": "Videgrafo",
+    "florist": "Florista",
+    "caterer": "Catering",
+    "dj": "DJ",
+    "band": "Banda",
+    "venue": "Lugar",
+    "decorator": "Decorador",
+    "makeup": "Maquillaje",
+    "hairdresser": "Peluquero"
+  },
+  "seating": {
+    "seatingPlan": "Plano de asientos",
+    "table": "Mesa",
+    "tables": "Mesas",
+    "seat": "Asiento",
+    "seats": "Asientos",
+    "addTable": "Añadir mesa",
+    "editTable": "Editar mesa",
+    "deleteTable": "Eliminar mesa",
+    "tableName": "Nombre de la mesa",
+    "tableCapacity": "Capacidad de la mesa",
+    "assignGuest": "Asignar invitado",
+    "unassignGuest": "Desasignar invitado",
+    "autoAssign": "Asignacin automtica",
+    "ceremonyLayout": "Plano de ceremonia",
+    "receptionLayout": "Plano de recepcin",
+    "viewLayout": "Ver plano",
+    "editLayout": "Editar plano",
+    "saveLayout": "Guardar plano",
+    "resetLayout": "Reiniciar plano",
+    "toolbar": {
+      "hotkeys": "Atajos",
+      "syncing": "Sincronizando&",
+      "synced": "Sincronizado",
+      "syncError": "Error al sincronizar",
+      "offline": "Sin conexin",
+      "undo": "Deshacer",
+      "undoTooltip": "Deshaz el Último cambio",
+      "redo": "Rehacer",
+      "redoTooltip": "Repite el Último cambio",
+      "hideTables": "Ocultar mesas",
+      "showTables": "Mostrar mesas",
+      "hideRulers": "Ocultar reglas",
+      "showRulers": "Mostrar reglas",
+      "rulers": "Reglas",
+      "snapEnabled": "Ajuste activo",
+      "enableSnap": "Activar ajuste",
+      "disableSnap": "Desactivar ajuste",
+      "snap": "Ajuste",
+      "hideSeatNumbers": "Ocultar nmeros",
+      "showSeatNumbers": "Mostrar nmeros",
+      "seatNumbers": "Nmeros de asiento",
+      "disableValidations": "Desactivar validaciones",
+      "enableValidations": "Activar validaciones",
+      "validations": "Validaciones",
+      "spaceConfig": "Configurar espacio",
+      "space": "Espacio",
+      "ceremonyConfig": "Configurar ceremonia",
+      "ceremony": "Ceremonia",
+      "banquetConfig": "Configurar banquete",
+      "banquet": "Banquete",
+      "clearBanquet": "Limpiar banquete",
+      "clear": "Limpiar",
+      "templates": "Plantillas",
+      "export": "Exportar",
+      "capacityTooltip": "Capacidad asignada / disponible",
+      "capacityShort": "Capacidad",
+      "autoAssign": "Asignacin automtica",
+      "autoAssignShort": "Auto",
+      "backgroundConfig": "Configurar fondo",
+      "background": "Fondo",
+      "alignMenu": "Alinear",
+      "align": "Alinear",
+      "alignLeft": "Alinear a la izquierda",
+      "alignCenterX": "Alinear al centro",
+      "alignRight": "Alinear a la derecha",
+      "alignTop": "Alinear arriba",
+      "alignCenterY": "Alinear vertical",
+      "alignBottom": "Alinear abajo",
+      "distribute": "Distribuir",
+      "distributeHorizontal": "Distribuir horizontal",
+      "distributeVertical": "Distribuir vertical"
+    },
+    "snapshots": {
+      "title": "Versiones guardadas",
+      "button": "Versiones",
+      "manage": "Gestionar versiones",
+      "nameLabel": "Nombre",
+      "namePlaceholder": "p. ej. Plano base",
+      "saveCurrent": "Guardar vista actual",
+      "empty": "Sin versiones guardadas",
+      "load": "Cargar",
+      "delete": "Eliminar",
+      "nameRequired": "Introduce un nombre"
+    },
+    "sidebar": {
+      "tools": "Herramientas",
+      "pending": "Pendientes ({{count}})",
+      "hideGuests": "Ocultar invitados",
+      "showGuests": "Mostrar invitados",
+      "searchGuests": "Buscar invitados...",
+      "noResults": "Sin coincidencias",
+      "allAssigned": "Todos los invitados asignados",
+      "conflictsTitle": "Conflictos",
+      "conflictPerimeter": "Permetro",
+      "conflictObstacle": "Obstculos",
+      "conflictAisles": "Pasillos",
+      "conflictOverbooking": "Sobrecupo",
+      "noConflicts": "Sin conflictos",
+      "focusTable": "Centrar en el plano",
+      "fix": "Resolver",
+      "noSuggestions": "Sin sugerencias",
+      "assignGuestButton": "Asignar",
+      "weightsTitle": "Preferencias",
+      "weightFit": "Encajar",
+      "weightSide": "Lado preferido",
+      "weightTogether": "Sentar juntos",
+      "weightAvoid": "Evitar",
+      "tableDefault": "Mesa {{id}}",
+      "configureTable": "Configurar mesa",
+      "type": "Tipo",
+      "seats": "Asientos",
+      "shape": "Forma",
+      "dimensions": "Dimensiones",
+      "widthCm": "Ancho (cm)",
+      "lengthCm": "Largo (cm)",
+      "assignedGuests": "Invitados asignados ({{count}})",
+      "removeGuest": "Quitar invitado",
+      "noAssigned": "Sin invitados asignados",
+      "usePanelToAssign": "Usa este panel para asignar invitados.",
+      "guests": "Invitados",
+      "duplicateTable": "Duplicar mesa",
+      "deleteTable": "Eliminar mesa"
+    },
+    "tools": {
+      "pan": "Mover vista",
+      "moveTables": "Mover mesas",
+      "boundary": "Permetro",
+      "doors": "Puertas",
+      "obstacles": "Obstculos",
+      "aisles": "Pasillos",
+      "erase": "Borrar"
+    },
+    "hints": {
+      "boundary": "Haz clic y arrastra para delimitar el espacio.",
+      "obstacle": "Haz clic para colocar obstculos y arrastra para ajustar su tamao.",
+      "door": "Haz clic para añadir puertas o accesos.",
+      "aisle": "Arrastra para marcar pasillos entre mesas."
+    },
+    "export": {
+      "pdf": "PDF",
+      "png": "PNG",
+      "csv": "CSV"
+    },
+    "hotkeys": {
+      "title": "Atajos de teclado",
+      "items": {
+        "undoRedo": "Deshacer / Rehacer",
+        "tools": "Herramientas (Mover vista, Mover, Permetro, Puertas, Obstculos, Pasillos)",
+        "zoomFit": "Zoom acercar / alejar / Ajustar",
+        "selectAll": "Seleccionar todo",
+        "escape": "Limpiar selección / cerrar mens",
+        "rotate": "Rotar -5 / +5 (Shift: 15)",
+        "align": "Alinear (inicio/fin)",
+        "distribute": "Distribuir (X/Y)",
+        "tabs": "Cambiar pestaa (Ceremonia/Banquete)",
+        "toggles": "Reglas / Nmeros / Validaciones",
+        "panels": "Plantillas / Configurar espacio",
+        "drawFinalizeCancel": "Finalizar / Cancelar dibujo",
+        "backspaceDelete": "Deshacer punto / Eliminar mesa",
+        "tabExactLength": "Longitud exacta del segmento"
+      }
+    }
+  },
+  "email": {
+    "email": "Email",
+    "emails": "Emails",
+    "inbox": "Inbox",
+    "sent": "Sent",
+    "drafts": "Drafts",
+    "trash": "Trash",
+    "compose": "Compose",
+    "reply": "Reply",
+    "forward": "Forward",
+    "delete": "Delete",
+    "archive": "Archive",
+    "markAsRead": "Mark as Read",
+    "markAsUnread": "Mark as Unread",
+    "subject": "Subject",
+    "from": "From",
+    "to": "To",
+    "cc": "CC",
+    "bcc": "BCC",
+    "attachments": "Attachments",
+    "send": "Send",
+    "saveDraft": "Save Draft",
+    "emailSettings": "Email Settings",
+    "emailSignature": "Email Signature"
+  },
+  "dates": {
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "tomorrow": "Tomorrow",
+    "thisWeek": "This week",
+    "nextWeek": "Next week",
+    "thisMonth": "This month",
+    "nextMonth": "Next month",
+    "selectDate": "Select date",
+    "dateFormat": "mm/dd/yyyy",
+    "timeFormat": "HH:mm"
+  },
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive",
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "draft": "Draft",
+    "published": "Published"
+  },
+  "inspiration": {
+    "alt": "inspiracin",
+    "altWithTags": "inspiracin: {{tags}}",
+    "aria": "Imagen de inspiracin",
+    "ariaWithTags": "Imagen de inspiracin: {{tags}}",
+    "addFav": "Añadir a favoritos",
+    "removeFav": "Quitar de favoritos"
+  },
+  "compose": {
+    "toField": "Recipient field",
+    "subjectField": "Subject field",
+    "ccField": "CC field",
+    "bccField": "BCC field",
+    "insertQuickReply": "Insert suggested reply"
+  },
+  "common": {
+    "all": "All",
+    "none": "None",
+    "show": "Show",
+    "hide": "Hide",
+    "view": "View",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "duplicate": "Duplicate"
+  },
+  "pages": {
+    "momentos": {
+      "title": "Galera de recuerdos",
+      "tabs": {
+        "overview": "Resumen",
+        "moderation": "Moderacin",
+        "slideshow": "Slideshow",
+        "downloads": "Descargas"
+      },
+      "loading": {
+        "weddings": "Cargando bodas...",
+        "selectWedding": "Selecciona una boda para gestionar la galera de recuerdos.",
+        "preparing": "Preparando tu lbum colaborativo..."
+      },
+      "banners": {
+        "contributionsClosed": "La ventana de aportaciones cerr el {{date}}. Ajusta la fecha de la boda o solicita soporte si necesitas reabrir la galera.",
+        "compressionActive": "Hemos superado los 30GB de espacio. Las nuevas fotos se comprimen automticamente para optimizar el almacenamiento en Firebase."
+      },
+      "toasts": {
+        "loadError": "No se pudo cargar la galera de recuerdos. Revisa tu conexin o permisos.",
+        "tokenCreated": "Nuevo enlace generado",
+        "tokenError": "No se pudo generar el enlace, reintntalo más tarde.",
+        "approved": "Foto aprobada",
+        "approveError": "No se pudo aprobar la foto",
+        "rejected": "Foto rechazada",
+        "rejectError": "No se pudo rechazar la foto",
+        "reset": "La foto volvi a pendiente",
+        "resetError": "No se pudo revertir el estado",
+        "scenesSaved": "Escenas actualizadas",
+        "scenesError": "No se pudieron guardar las escenas",
+        "uploadSuccess": "Foto subida a la galera"
+      },
+      "prompts": {
+        "rejectTitle": "Motivo del rechazo",
+        "rejectDefault": "No cumple con la gua de la galera",
+        "rejectFallback": "Rechazado"
+      },
+      "slideshow": {
+        "title": "Presentacin en vivo",
+        "description": "Conecta una pantalla secundaria y deja que los recuerdos fluyan automticamente.",
+        "stats": "{{count}} fotos aprobadas  {{scenes}} escenas cubiertas"
+      },
+      "uploader": {
+        "hostFallback": "Anfitrin"
+      }
+    },
+    "momentosGuest": {
+      "badge": "Recuerdos colaborativos",
+      "greeting": "Hola, {{name}} =K",
+      "remainingUploadsSingle": "Sube hasta 1 foto adicional.",
+      "remainingUploads": "Sube hasta {{count}} fotos adicionales.",
+      "remainingUploadsUnlimited": "Sube todas las fotos que quieras.",
+      "description": "El anfitrin revisar y las compartir con el grupo.",
+      "window": {
+        "daysLeft": "An tienes {{count, plural, one {1 día} other {{count} días}} para enviar tus mejores fotos.",
+        "deadline": "Disponible hasta {{date}}.",
+        "compression": "Las fotos nuevas se optimizan automticamente para ahorrar espacio."
+      },
+      "status": {
+        "loading": "Cargando galera...",
+        "loadingMessage": "Preparando tu espacio para compartir recuerdos&",
+        "errorTitle": "No pudimos abrir la galera de recuerdos",
+        "errorAction": "Si crees que es un error, contacta con la pareja anfitriona para solicitar un nuevo enlace.",
+        "closedTitle": "La galera est cerrada",
+        "closedDescription": "El periodo para subir fotos termin.",
+        "closedDescriptionWithDate": "El periodo para subir fotos termin el {{date}}.",
+        "closedHelp": "Si todava tienes recuerdos que compartir, avisa a la pareja anfitriona para reabrir el enlace.",
+        "welcomeTitle": "Gracias por capturar recuerdos!",
+        "welcomeDescription": "Sube tus fotos favoritas del evento. El anfitrin podr revisarlas y mostrarlas en el slideshow en vivo.",
+        "uploadTitle": "Tus progresos",
+        "tip": "Tip: las fotos se agrupan por escena (ceremonia, banquete, fiesta&) para ayudar al anfitrin.",
+        "uploadedSummary": "Has compartido {{count}} {{count, plural, one {foto} other {fotos}}}. Gracias por sumar a los recuerdos!",
+        "recentUploads": "Las fotos aprobadas aparecern en el slideshow del evento y en la galera final. El anfitrin avisar cuando estn listas."
+      },
+      "form": {
+        "nameLabel": "Nombre completo",
+        "namePlaceholder": "Ej. Laura G.",
+        "emailLabel": "Correo electrónico (opcional)",
+        "emailPlaceholder": "Te avisaremos cuando tus fotos estn destacadas",
+        "termsLabel": "Acepto compartir mis fotos con la pareja anfitriona y confirmo que tengo permiso para hacerlo.",
+        "submit": "Comenzar a subir fotos"
+      },
+      "progress": {
+        "title": "Tus progresos",
+        "sceneLabel": "Escena: {{scene}}  {{size}} KB",
+        "status": "En revisión"
+      },
+      "toasts": {
+        "nameRequired": "Indica tu nombre para personalizar tus aportaciones",
+        "termsRequired": "Debes aceptar la poltica de privacidad",
+        "windowClosed": "Esta galera ya no acepta nuevas fotos.",
+        "achievementFirst": "< Logro desbloqueado! Primer recuerdo compartido (",
+        "achievementEnthusiast": "< Eres un colaborador entusiasta! Sigue compartiendo recuerdos.",
+        "achievementStar": "< Recuerdos Estrella! Tus fotos darn vida al slideshow.",
+        "upload": "Foto enviada correctamente"
+      },
+      "errors": {
+        "incompleteLink": "El enlace est incompleto. Solicita un nuevo QR al anfitrin.",
+        "invalidLink": "Este enlace ya no es válido."
+      },
+      "scenes": {
+        "other": "Otros"
+      },
+      "uploader": {
+        "guestFallback": "Invitado"
+      }
+    }
+  },
+  "pricing": {
+    "hero": {
+      "badge": "Modelo por boda",
+      "title": "Planes claros para cada evento.",
+      "description": "Pagos nicos en euros para parejas y paquetes flexibles para planners. Cada licencia permanece activa hasta 30 días despus de la fecha del evento y puedes extenderla cuando lo necesites.",
+      "benefitsTitle": "Beneficios clave",
+      "benefits": [
+        "Licencias en modo lectura automtico tras la fecha lmite del evento.",
+        "Packs de planners con 1 mes de prueba y control de cuota disponible.",
+        "Alertas 30 / 7 / 1 días antes de expirar para mantener todo bajo control."
+      ],
+      "cta": "Crear cuenta gratuita",
+      "highlights": {
+        "payPerEvent": {
+          "title": "Pagos por evento",
+          "description": "Activa solo lo que necesitas para cada boda. Sin renovaciones automticas."
+        },
+        "collaboration": {
+          "title": "Colaboracin controlada",
+          "description": "Invita ayudantes y proveedores con permisos claros y seguimiento de acciones."
+        },
+        "syncStatus": {
+          "title": "Estado sincronizado",
+          "description": "Los webhooks de Stripe mantienen licencias y packs al día con alertas internas."
+        }
+      }
+    },
+    "sections": {
+      "couples": {
+        "label": "Parejas",
+        "title": "Planes para parejas",
+        "description": "Cada compra habilita una boda completa hasta 30 días despus del evento. Aade una extensión para seguir trabajando si necesitas más tiempo."
+      },
+      "planners": {
+        "label": "Planners",
+        "title": "Paquetes para planners",
+        "description": "Todos los packs incluyen 1 mes de prueba gratuita. Elige 12 cuotas mensuales o pago nico anual con 15 % de descuento. Las cuotas disponibles se actualizan automticamente con Stripe."
+      },
+      "needHelp": {
+        "title": "Necesitas ayuda para elegir el plan adecuado?",
+        "description": "Te ayudamos a configurar licencias, automatizaciones y reportes segn tu operación. Agenda una sesión y disea un rollout acorde a tu ritmo.",
+        "cta": "Hablar con un especialista"
+      },
+      "quickStart": {
+        "title": "Lista para usar en minutos.",
+        "description": "Crea tu cuenta, conecta Stripe y activa tus licencias de inmediato. El sistema notificar las renovaciones y podrs mantener bodas cerradas en modo lectura cuando terminen.",
+        "primaryCta": "Crear cuenta gratuita",
+        "secondaryCta": "Centro de acceso"
+      }
+    },
+    "couplePlans": {
+      "free": {
+        "name": "Free",
+        "priceLabel": "Gratis",
+        "priceSuffix": "por boda",
+        "description": "Organiza una boda ntima o prueba la plataforma sin coste.",
+        "features": [
+          "1 boda activa con hasta 80 invitados",
+          "Seating plan bsico y control de presupuesto",
+          "Directorio de proveedores y anuncios visibles",
+          "Plantillas esenciales y soporte estndar"
+        ],
+        "cta": "Crear cuenta gratuita"
+      },
+      "weddingPass": {
+        "name": "Wedding Pass",
+        "priceSuffix": "pago nico por boda",
+        "description": "Desbloquea todas las herramientas premium para tu evento sin suscripciones anuales.",
+        "features": [
+          "Invitados y proveedores ilimitados",
+          "Contacto directo con proveedores y protocolo completo",
+          "Hasta 50 diseños web y soporte prioritario",
+          "Plantillas premium para planificación avanzada"
+        ],
+        "cta": "Comprar Wedding Pass"
+      },
+      "weddingPassPlus": {
+        "name": "Wedding Pass Plus",
+        "priceSuffix": "pago nico por boda",
+        "description": "La opción más completa para bodas premium y trabajo colaborativo con ayudantes.",
+        "features": [
+          "Todo lo incluido en Wedding Pass",
+          "Elimina la marca en invitaciones, PDFs y pantallas",
+          "Biblioteca completa de diseños y galera de recuerdos",
+          "1 ayudante con acceso completo a la boda"
+        ],
+        "cta": "Elegir Wedding Pass Plus"
+      }
+    },
+    "plannerPlans": {
+      "cta": "Empezar prueba gratuita",
+      "pack5": {
+        "name": "Planner Pack 5",
+        "monthlySuffix": "/ mes (12 pagos)",
+        "description": "Hasta 5 bodas activas simultneas con herramientas profesionales.",
+        "annualDescription": "{{amount}} pago nico anual (15 % de descuento).",
+        "features": [
+          "1 mes de prueba gratuita",
+          "Prioridad en el directorio y soporte prioritario",
+          "Gestiona y reasigna licencias segn tus clientes"
+        ]
+      },
+      "pack15": {
+        "name": "Planner Pack 15",
+        "monthlySuffix": "/ mes (12 pagos)",
+        "description": "Pensado para planners en crecimiento con mltiples proyectos en paralelo.",
+        "annualDescription": "{{amount}} pago nico anual (15 % de descuento).",
+        "features": [
+          "1 mes de prueba gratuita",
+          "Analytics por cliente y visibilidad extendida",
+          "Prioridad en directorio y soporte prioritario"
+        ]
+      },
+      "teams40": {
+        "name": "Teams 40",
+        "monthlySuffix": "/ mes (12 pagos)",
+        "description": "Equipos que coordinan muchas bodas y requieren colaboracin avanzada.",
+        "annualDescription": "{{amount}} pago nico anual (15 % de descuento).",
+        "features": [
+          "1 mes de prueba gratuita",
+          "40 bodas activas al ao natural",
+          "Incluye 3 perfiles adicionales con acceso limitado",
+          "Dashboard consolidado y colaboracin avanzada"
+        ]
+      },
+      "teamsUnlimited": {
+        "name": "Teams Ilimitado",
+        "monthlySuffix": "/ mes (12 pagos)",
+        "description": "La solución definitiva con bodas y perfiles ilimitados para agencias grandes.",
+        "annualDescription": "{{amount}} pago nico anual (15 % de descuento).",
+        "features": [
+          "1 mes de prueba gratuita",
+          "White-label completo y dominio personalizado",
+          "Soporte dedicado 24/7 y formacin personalizada",
+          "Acceso API y acompaamiento experto"
+        ]
+      }
+    }
+  },
+  "marketingAccess": {
+    "backLink": "Volver al inicio",
+    "hero": {
+      "badge": "Centro de acceso",
+      "login": {
+        "title": "Gestiona todo desde un solo lugar",
+        "description": "Accede a invitados, tareas, presupuesto y documentos al instante. Mantn a tu equipo sincronizado en cada boda.",
+        "features": [
+          "Un panel para tareas, presupuesto y seating",
+          "Invita colaboradores con permisos controlados",
+          "Actualizaciones en tiempo real desde web y mvil"
+        ]
+      },
+      "signup": {
+        "title": "Bienvenido a Lovenda",
+        "description": "Centraliza la planificación, automatiza recordatorios y deja que nuestro asistente te gue paso a paso.",
+        "features": [
+          "Onboarding guiado por nuestro asistente de planificación",
+          "Plantillas para presupuesto, invitados y proveedores",
+          "Licencias con Stripe y activacin inmediata"
+        ]
+      }
+    },
+    "toggle": {
+      "login": "Iniciar sesión",
+      "signup": "Crear cuenta"
+    },
+    "loggedIn": {
+      "title": "Sesión activa",
+      "description": "Tu cuenta de Lovenda ya est abierta. Contina con tus eventos o cierra sesión si necesitas cambiar de cuenta.",
+      "primaryCta": "Ir al panel",
+      "secondaryCta": "Cerrar sesión"
+    },
+    "loginForm": {
+      "emailLabel": "Correo electrónico",
+      "emailPlaceholder": "tu@email.com",
+      "passwordLabel": "Contrasea",
+      "passwordPlaceholder": "Tu contrasea",
+      "rememberMe": "Recordarme",
+      "forgotPassword": "Olvidaste tu contrasea?",
+      "submit": "Iniciar sesión",
+      "submitting": "Iniciando sesión&"
+    },
+    "signup": {
+      "info": "Completa el formulario para crear tu cuenta.",
+      "successMessage": "Cuenta creada con Éxito. Redirigiendo al panel&",
+      "socialPending": "Completa el flujo de alta en la ventana de {{provider}}."
+    },
+    "switch": {
+      "noAccount": "No tienes cuenta?",
+      "registerLink": "Crea una",
+      "alreadyHaveAccount": "Ya tienes cuenta?",
+      "loginLink": "Iniciar sesión"
+    },
+    "social": {
+      "redirect": "Redirigiendo a {{provider}}..."
+    },
+    "errors": {
+      "provider": "No pudimos autenticarte con {{provider}}."
+    }
+  },
+  "budgetPrediction": {
+    "header": {
+      "title": "Prediccin IA",
+      "subtitle": "Anlisis inteligente de tu presupuesto"
+    },
+    "actions": {
+      "analyzing": "Analizando...",
+      "refresh": "Actualizar prediccin"
+    },
+    "metrics": {
+      "riskLabel": "Nivel de riesgo",
+      "confidence": "Confianza",
+      "spent": "Gastado",
+      "projected": "Proyectado",
+      "dailyRate": "Gasto diario",
+      "daysRemaining": "Das restantes"
+    },
+    "sections": {
+      "recommendations": "Recomendaciones",
+      "categoryAnalysis": "Anlisis por categoría"
+    },
+    "emptyState": {
+      "title": "Predicciones IA disponibles prximamente",
+      "description": "Necesitas al menos 5 transacciones para generar predicciones. Actualmente tienes {{count}}."
+    },
+    "riskLabels": {
+      "critical": "Crtico",
+      "high": "Alto",
+      "medium": "Medio",
+      "low": "Bajo"
+    },
+    "recommendations": {
+      "projectedOverage": {
+        "message": "Se proyecta un exceso de {{amount}}",
+        "action": "Considera revisar gastos discrecionales"
+      },
+      "highDailyRate": {
+        "message": "Tu tasa de gasto diaria es alta",
+        "action": "Intenta espaciar más las compras grandes"
+      },
+      "onTrack": {
+        "message": "Vas muy bien con el presupuesto!",
+        "action": "Mantn este ritmo de gasto"
+      }
+    }
+  },
+  "seatingMobile": {
+    "header": {
+      "title": "Seating plan"
+    },
+    "search": {
+      "placeholder": "Buscar mesas o invitados..."
+    },
+    "stats": {
+      "tables": "Mesas",
+      "guests": "Invitados",
+      "pending": "Pendientes"
+    },
+    "tables": {
+      "moreGuests": "+{{count}} invitados más",
+      "empty": "Mesa vaca",
+      "assignedGuests": "{{count}} invitados asignados",
+      "occupancyLabel": "ocupacin"
+    },
+    "pending": {
+      "title": "Invitados pendientes ({{count}})",
+      "moreGuests": "+{{count}} invitados más"
+    },
+    "actions": {
+      "assign": "Asignar",
+      "remove": "Quitar",
+      "close": "Cerrar"
+    },
+    "tableDetail": {
+      "capacity": "Capacidad",
+      "occupancy": "Ocupacin",
+      "guestsHeading": "Invitados",
+      "noGuests": "No hay invitados asignados"
+    }
+  },
+  "categories": {
+    "decoration": "Decoración",
+    "cocktail": "Cctel",
+    "banquet": "Banquete",
+    "ceremony": "Ceremonia",
+    "flowers": "Flores",
+    "dress": "Vestidos",
+    "cake": "Pasteles",
+    "photography": "Fotografía"
+  },
+  "services": {
+    "catering": "Catering",
+    "photography": "Fotografía",
+    "video": "Vdeo",
+    "music": "Música",
+    "musicDJ": "Música/DJ",
+    "decoration": "Decoración",
+    "flowers": "Flores",
+    "transport": "Transporte",
+    "dresses": "Vestidos",
+    "suits": "Trajes",
+    "pastry": "Pastelera",
+    "invitations": "Invitaciones",
+    "furnitureRental": "Alquiler de mobiliario",
+    "lighting": "Iluminacin",
+    "makeup": "Maquillaje",
+    "hairdressing": "Peluquera",
+    "jewelry": "Joyera",
+    "entertainment": "Animacin",
+    "weddingPlanner": "Wedding Planner",
+    "ceremonyVenue": "Lugar de ceremonia",
+    "receptionVenue": "Lugar de celebración",
+    "accommodation": "Alojamiento",
+    "honeymoon": "Viaje de novios",
+    "sound": "Sonido",
+    "photoBooth": "Fotomatn",
+    "officiant": "Oficiante",
+    "weddingCake": "Tarta nupcial",
+    "favors": "Detalles/Regaos",
+    "security": "Seguridad",
+    "dayCoordination": "Coordinacin día B",
+    "other": "Otro"
+  },
+  "suppliers": {
+    "configureServices": "Configurar servicios deseados",
+    "suggested": "Sugeridos",
+    "addServicePlaceholder": "Añadir servicio (ej. Fotografía)",
+    "noServicesAdded": "An no has aadido servicios."
+  },
+  "validation": {
+    "nameRequired": "El nombre es obligatorio",
+    "serviceRequired": "El servicio es obligatorio",
+    "emailInvalid": "Email inválido",
+    "linkMustStartHttp": "El enlace debe comenzar con http:// o https://",
+    "titleRequired": "El ttulo es obligatorio",
+    "companionNegative": "El número de acompaantes no puede ser negativo",
+    "selectCompanionType": "Selecciona el tipo de acompaante",
+    "companionMismatch": "Establece \"Sin acompaante\" o aade alguno"
+  },
+  "general": "General",
+  "notes": "Notas",
+  "apply": "Aplicar",
+  "pagination": "Paginacin"
+}

@@ -3,9 +3,12 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 
 import { useWedding } from '../context/WeddingContext';
 import { db } from '../firebaseConfig';
+import { useTranslations } from '../../hooks/useTranslations';
 
 // Categorías de ítems del checklist
 const CATEGORIES = {
+  const { t } = useTranslations();
+
   DOCUMENTATION: 'documentation',
   PROVIDERS: 'providers',
   CEREMONY: 'ceremony',
@@ -53,7 +56,7 @@ const DEFAULT_ITEMS = [
   },
   {
     id: 'doc-witnesses',
-    label: 'Documentación de testigos',
+    label: t('common.documentacion_testigos'),
     category: CATEGORIES.DOCUMENTATION,
     status: ITEM_STATUS.PENDING,
     dueDate: null,
@@ -65,7 +68,7 @@ const DEFAULT_ITEMS = [
   // Proveedores
   {
     id: 'prov-catering',
-    label: 'Confirmación catering',
+    label: t('common.confirmacion_catering'),
     category: CATEGORIES.PROVIDERS,
     status: ITEM_STATUS.PENDING,
     dueDate: null,
@@ -75,7 +78,7 @@ const DEFAULT_ITEMS = [
   },
   {
     id: 'prov-music',
-    label: 'Confirmación música/DJ',
+    label: t('common.confirmacion_musicadj'),
     category: CATEGORIES.PROVIDERS,
     status: ITEM_STATUS.PENDING,
     dueDate: null,
@@ -85,7 +88,7 @@ const DEFAULT_ITEMS = [
   },
   {
     id: 'prov-photo',
-    label: 'Confirmación fotógrafo/videógrafo',
+    label: t('common.confirmacion_fotografovideografo'),
     category: CATEGORIES.PROVIDERS,
     status: ITEM_STATUS.PENDING,
     dueDate: null,
@@ -95,7 +98,7 @@ const DEFAULT_ITEMS = [
   },
   {
     id: 'prov-flowers',
-    label: 'Confirmación floristería',
+    label: t('common.confirmacion_floristeria'),
     category: CATEGORIES.PROVIDERS,
     status: ITEM_STATUS.PENDING,
     dueDate: null,
@@ -127,7 +130,7 @@ const DEFAULT_ITEMS = [
   },
   {
     id: 'cer-music',
-    label: 'Música de ceremonia confirmada',
+    label: t('common.musica_ceremonia_confirmada'),
     category: CATEGORIES.CEREMONY,
     status: ITEM_STATUS.PENDING,
     dueDate: null,
@@ -346,7 +349,7 @@ export default function useChecklist() {
     // Solo permitir eliminar ítems personalizados
     const item = items.find(i => i.id === itemId);
     if (!item?.custom) {
-      throw new Error('Solo se pueden eliminar ítems personalizados');
+      throw new Error(t('common.solo_pueden_eliminar_items_personalizados'));
     }
 
     setItems((prev) => prev.filter((item) => item.id !== itemId));

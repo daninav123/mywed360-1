@@ -348,7 +348,7 @@ function Invitados() {
           if (rb?.success && !rb?.notAvailable) {
             alert(`Envío iniciado para ${rb?.count || selectedIds.length} invitado(s).`);
           } else {
-            alert({t('common.pudo_iniciar_envio_extension_disponible')});
+            alert(t('common.pudo_iniciar_envio_extension_disponible'));
           }
         }
         return;
@@ -359,10 +359,10 @@ function Invitados() {
           alert(`Envío individual fallback. �0xitos: ${r?.sent || 0}, Fallos: ${r?.failed || 0}`);
         return;
       }
-      alert({t('common.pudo_completar_difusion')} + (r?.error || 'desconocido'));
+      alert(t('common.pudo_completar_difusion') + (r?.error || 'desconocido'));
     } catch (e) {
       console.warn('Error en difusión (Móvil):', e);
-      alert({t('common.error_difusion')});
+      alert(t('common.error_difusion'));
     }
   };
 
@@ -781,7 +781,7 @@ function Invitados() {
       });
       if (import.meta.env.DEV) console.log('[Invitados] handleSendSelectedApi result', res);
       if (res?.cancelled) {
-        alert({t('common.accion_cancelada')});
+        alert(t('common.accion_cancelada'));
         return;
       }
       if (res?.error === 'missing-couple-signature') {
@@ -802,7 +802,7 @@ function Invitados() {
       if (res?.success) {
         alert(
           t('guests.whatsapp.bulkApiDone', {
-            defaultValue: {t('common.envio_completado_0xitos_fallos_fail')},
+            defaultValue: t('common.envio_completado_0xitos_fallos_fail'),
             ok: res?.ok || 0,
             fail: res?.fail || 0,
           })
@@ -811,7 +811,7 @@ function Invitados() {
       }
       alert(
         t('guests.whatsapp.apiStartFailed', {
-          defaultValue: {t('common.pudo_iniciar_envio_por_api')},
+          defaultValue: t('common.pudo_iniciar_envio_por_api'),
         })
       );
     } catch (e) {
@@ -844,7 +844,7 @@ function Invitados() {
         if (r?.success && !r?.notAvailable) {
           alert(
             t('guests.whatsapp.webStarted', {
-              defaultValue: {t('common.envio_iniciado_whatsapp_web_para')},
+              defaultValue: t('common.envio_iniciado_whatsapp_web_para'),
               count: r?.count || selectedIds.length,
             })
           );
@@ -873,7 +873,7 @@ function Invitados() {
         // Si no es success y tampoco es notAvailable, informar del error
         alert(
           t('guests.whatsapp.oneClickFailed', {
-            defaultValue: {t('common.pudo_iniciar_envio_una_sola')},
+            defaultValue: t('common.pudo_iniciar_envio_una_sola'),
             error: r?.error || 'desconocido',
           })
         );
@@ -894,7 +894,7 @@ function Invitados() {
       console.warn('Error envío seleccionados (Móvil):', e);
       alert(
         t('guests.whatsapp.mobileUnexpected', {
-          defaultValue: {t('common.error_enviando_seleccionados_movil')},
+          defaultValue: t('common.error_enviando_seleccionados_movil'),
         })
       );
     }
@@ -945,18 +945,18 @@ function Invitados() {
           });
       }
       if (!items.length) {
-        alert({t('common.los_seleccionados_tienen_telefonos_validos')});
+        alert(t('common.los_seleccionados_tienen_telefonos_validos'));
         return;
       }
       const result = await scheduleWhats(items, whenIso);
       if (result?.success) {
         alert(`Programados ${items.length} envíos para ${whenIso}`);
       } else {
-        alert({t('common.error_programando_envios')} + (result?.error || 'desconocido'));
+        alert(t('common.error_programando_envios') + (result?.error || 'desconocido'));
       }
     } catch (e) {
       console.warn('Error programando envíos:', e);
-      alert({t('common.error_programando_envios')});
+      alert(t('common.error_programando_envios'));
     }
   };
 
@@ -1010,7 +1010,7 @@ function Invitados() {
       setShowGuestModal(false);
     } catch (error) {
       console.error('Error importando invitados:', error);
-      alert({t('common.ocurrio_error_importar_los_invitados')});
+      alert(t('common.ocurrio_error_importar_los_invitados'));
     }
   };
 
@@ -1247,7 +1247,7 @@ function Invitados() {
         <Modal
           open={showGuestModal}
           onClose={handleCancelModal}
-          title={editingGuest ? 'Editar Invitado' : {t('common.anadir_invitado')}}
+          title={editingGuest ? 'Editar Invitado' : t('common.anadir_invitado')}
           size="lg"
         >
           {editingGuest ? (

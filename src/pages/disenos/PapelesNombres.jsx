@@ -13,31 +13,31 @@ const nameCardsTemplates = [
   const { t } = useTranslations();
 
     name: 'Elegante & Minimalista',
-    description: {t('common.marcador_mesa_elegante_con_tipografia')},
+    description: t('common.marcador_mesa_elegante_con_tipografia'),
     prompt:
       {t('common.disena_marcador_mesa_elegante_minimalista')},
   },
   {
-    name: {t('common.rustico_natural')},
+    name: t('common.rustico_natural'),
     description: 'Marcador de mesa con elementos naturales, madera y estilo campestre',
     prompt:
       {t('common.crea_marcador_mesa_con_estilo')},
   },
   {
-    name: {t('common.floral_romantico')},
-    description: {t('common.marcador_decorado_con_flores_motivos')},
+    name: t('common.floral_romantico'),
+    description: t('common.marcador_decorado_con_flores_motivos'),
     prompt:
       {t('common.disena_marcador_mesa_con_motivos')},
   },
   {
-    name: {t('common.moderno_geometrico')},
-    description: {t('common.marcador_con_lineas_limpias_formas')},
+    name: t('common.moderno_geometrico'),
+    description: t('common.marcador_con_lineas_limpias_formas'),
     prompt:
       {t('common.crea_marcador_mesa_moderno_con')},
   },
   {
-    name: {t('common.tematico_personalizado')},
-    description: {t('common.marcador_tematico_que_refleja_algun')},
+    name: t('common.tematico_personalizado'),
+    description: t('common.marcador_tematico_que_refleja_algun'),
     prompt:
       {t('common.disena_marcador_mesa_tematico_para')},
   },

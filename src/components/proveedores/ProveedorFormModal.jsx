@@ -160,7 +160,7 @@ const ProveedorFormModal = ({
       console.error('Error al guardar proveedor:', error);
       setErrores({
         ...errores,
-        general: {t('common.error_guardar_intentalo_nuevo')},
+        general: t('common.error_guardar_intentalo_nuevo'),
       });
     } finally {
       setEnviando(false);

@@ -225,7 +225,7 @@ export default function CompareSelectedModal({
             <div className="md:text-right">
               <div className="text-xs text-gray-500 mb-1">Incluirá {filteredRows.length} de {rows.length}</div>
               <Button onClick={createGroupFromSelection} disabled={!canCreate}>
-                {creating ? 'Creando…' : {t('common.crear_grupo_con_seleccion')}}
+                {creating ? 'Creando…' : t('common.crear_grupo_con_seleccion')}
               </Button>
             </div>
           </div>

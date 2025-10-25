@@ -21,24 +21,24 @@ const logoTemplates = [
   },
   {
     name: 'Emblema Floral',
-    description: {t('common.logo_rodeado_elementos_florales_organicos')},
+    description: t('common.logo_rodeado_elementos_florales_organicos'),
     prompt:
       {t('common.crea_logo_para_boda_con')},
   },
   {
     name: 'Minimalista Moderno',
-    description: {t('common.logo_limpio_minimalista_con_lineas')},
+    description: t('common.logo_limpio_minimalista_con_lineas'),
     prompt:
       {t('common.disena_logo_minimalista_moderno_para')},
   },
   {
     name: 'Vintage & Retro',
-    description: {t('common.logo_con_estetica_vintage_elementos')},
+    description: t('common.logo_con_estetica_vintage_elementos'),
     prompt:
       {t('common.crea_logo_boda_con_estetica')},
   },
   {
-    name: {t('common.ilustrado_artistico')},
+    name: t('common.ilustrado_artistico'),
     description: 'Logo personalizado con ilustraciones hechas a mano y elementos creativos',
     prompt:
       {t('common.disena_logo_boda_ilustrado_con')},

@@ -15,7 +15,7 @@ import { useTranslations } from '../../hooks/useTranslations';
 const INSPIRATION_CATEGORIES = [
   {
   const { t } = useTranslations();
- slug: 'decoracion', label: {t('common.decoracion')} },
+ slug: 'decoracion', label: t('common.decoracion') },
   { slug: 'ceremonia', label: 'Ceremonia' },
   { slug: 'banquete', label: 'Banquete' },
   { slug: 'flores', label: 'Flores' },
@@ -293,7 +293,7 @@ export default function PlannerDashboard() {
                     key={`inspiration-skeleton-${idx}`}
                     className="w-full h-32 bg-gray-200 rounded-lg animate-pulse"
                     role="status"
-                    aria-label="Cargando inspiración"
+                    aria-label={t('common.aria_cargando_inspiracion')}
                   />
                 ))
               : inspiration.items.map((item) => (
@@ -349,7 +349,7 @@ export default function PlannerDashboard() {
                     key={`blog-skeleton-${idx}`}
                     className="bg-white rounded shadow p-3 animate-pulse"
                     role="status"
-                    aria-label="Cargando publicación"
+                    aria-label={t('common.aria_cargando_publicacion')}
                   />
                 ))
               : blogPosts.items.map((post) => (

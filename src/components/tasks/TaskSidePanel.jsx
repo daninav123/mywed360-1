@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+﻿import React, { useMemo, useState } from 'react';
 import { useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { db } from '../../firebaseConfig';
@@ -417,8 +417,9 @@ export default function TaskSidePanel({
             className="p-2 rounded hover:bg-gray-100"
             onClick={onClose}
             aria-label={t('tasks.page.sidePanel.close')}
+            type="button"
           >
-            <X size={18} />
+            <X size={18} aria-hidden="true" />
           </button>
         </div>
 
@@ -683,3 +684,5 @@ export default function TaskSidePanel({
     </div>
   );
 }
+
+

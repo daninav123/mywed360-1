@@ -15,7 +15,7 @@
     "filter": "Filtra",
     "close": "Chiudi",
     "open": "Apri",
-    "yes": "S",
+    "yes": "Sí",
     "no": "No",
     "ok": "OK",
     "back": "Indietro",
@@ -45,7 +45,7 @@
     "weddings": "Matrimoni",
     "emailInbox": "Posta in arrivo",
     "darkMode": "Modalit scura",
-    "userMenu": "Men utente"
+    "userMenu": "Menú utente"
   },
   "auth": {
     "login": "Login",
@@ -375,15 +375,15 @@
         "editTitle": "Edit category",
         "newTitle": "New category",
         "name": "Category name",
-        "namePlaceholder": "Ej.: Catering, msica, flores...",
+        "namePlaceholder": "Ej.: Catering, música, flores...",
         "amountLabel": "Presupuesto asignado ()",
         "amountPlaceholder": "0,00"
       },
       "errors": {
-        "nameRequired": "El nombre de la categora es obligatorio",
-        "amountInvalid": "El monto debe ser un nmero vlido"
+        "nameRequired": "El nombre de la categoría es obligatorio",
+        "amountInvalid": "El monto debe ser un número válido"
       },
-      "confirmDelete": "Ests seguro de eliminar la categora \"{{category}}\"?",
+      "confirmDelete": "Ests seguro de eliminar la categoría \"{{category}}\"?",
       "advisorErrors": {
         "requestFailed": "No se pudo obtener la recomendacin del consejero.",
         "refreshFailed": "No se pudo actualizar la recomendacin.",
@@ -1074,7 +1074,7 @@
         "nameRequired": "Please tell us your name so we can personalise your uploads",
         "termsRequired": "You must accept the privacy notice",
         "windowClosed": "This gallery is no longer accepting new photos.",
-        "achievementFirst": "x& Achievement unlocked! Your first memory S",
+        "achievementFirst": "x& Achievement unlocked! Your first memory Sí",
         "achievementEnthusiast": "x}0 You are a collaborative rockstar! Keep sharing memories.",
         "achievementStar": "xRx Star memories! Your photos will shine in the slideshow.",
         "upload": "Photo uploaded successfully"
@@ -1095,12 +1095,12 @@
     "hero": {
       "badge": "Modelo por boda",
       "title": "Planes claros para cada evento.",
-      "description": "Pagos nicos en euros para parejas y paquetes flexibles para planners. Cada licencia permanece activa hasta 30 das despus de la fecha del evento y puedes extenderla cuando lo necesites.",
+      "description": "Pagos nicos en euros para parejas y paquetes flexibles para planners. Cada licencia permanece activa hasta 30 días despus de la fecha del evento y puedes extenderla cuando lo necesites.",
       "benefitsTitle": "Beneficios clave",
       "benefits": [
         "Licencias en modo lectura automtico tras la fecha lmite del evento.",
         "Packs de planners con 1 mes de prueba y control de cuota disponible.",
-        "Alertas 30 / 7 / 1 das antes de expirar para mantener todo bajo control."
+        "Alertas 30 / 7 / 1 días antes de expirar para mantener todo bajo control."
       ],
       "cta": "Crear cuenta gratuita",
       "highlights": {
@@ -1114,7 +1114,7 @@
         },
         "syncStatus": {
           "title": "Estado sincronizado",
-          "description": "Los webhooks de Stripe mantienen licencias y packs al da con alertas internas."
+          "description": "Los webhooks de Stripe mantienen licencias y packs al día con alertas internas."
         }
       }
     },
@@ -1122,7 +1122,7 @@
       "couples": {
         "label": "Parejas",
         "title": "Planes para parejas",
-        "description": "Cada compra habilita una boda completa hasta 30 das despus del evento. Aade una extensin para seguir trabajando si necesitas ms tiempo."
+        "description": "Cada compra habilita una boda completa hasta 30 días despus del evento. Aade una extensión para seguir trabajando si necesitas más tiempo."
       },
       "planners": {
         "label": "Planners",
@@ -1131,7 +1131,7 @@
       },
       "needHelp": {
         "title": "Necesitas ayuda para elegir el plan adecuado?",
-        "description": "Te ayudamos a configurar licencias, automatizaciones y reportes segn tu operacin. Agenda una sesin y disea un rollout acorde a tu ritmo.",
+        "description": "Te ayudamos a configurar licencias, automatizaciones y reportes segn tu operación. Agenda una sesión y disea un rollout acorde a tu ritmo.",
         "cta": "Hablar con un especialista"
       },
       "quickStart": {
@@ -1162,19 +1162,19 @@
         "features": [
           "Invitados y proveedores ilimitados",
           "Contacto directo con proveedores y protocolo completo",
-          "Hasta 50 diseos web y soporte prioritario",
-          "Plantillas premium para planificacin avanzada"
+          "Hasta 50 diseños web y soporte prioritario",
+          "Plantillas premium para planificación avanzada"
         ],
         "cta": "Comprar Wedding Pass"
       },
       "weddingPassPlus": {
         "name": "Wedding Pass Plus",
         "priceSuffix": "pago nico por boda",
-        "description": "La opcin ms completa para bodas premium y trabajo colaborativo con ayudantes.",
+        "description": "La opción más completa para bodas premium y trabajo colaborativo con ayudantes.",
         "features": [
           "Todo lo incluido en Wedding Pass",
           "Elimina la marca en invitaciones, PDFs y pantallas",
-          "Biblioteca completa de diseos y galera de recuerdos",
+          "Biblioteca completa de diseños y galera de recuerdos",
           "1 ayudante con acceso completo a la boda"
         ],
         "cta": "Elegir Wedding Pass Plus"
@@ -1219,7 +1219,7 @@
       "teamsUnlimited": {
         "name": "Teams Ilimitado",
         "monthlySuffix": "/ mes (12 pagos)",
-        "description": "La solucin definitiva con bodas y perfiles ilimitados para agencias grandes.",
+        "description": "La solución definitiva con bodas y perfiles ilimitados para agencias grandes.",
         "annualDescription": "{{amount}} pago nico anual (15 % de descuento).",
         "features": [
           "1 mes de prueba gratuita",
@@ -1228,6 +1228,11 @@
           "Acceso API y acompaamiento experto"
         ]
       }
+    },
+    "actions": {
+      "processing": "Processing...",
+      "monthlyButton": "Monthly plan ({{amount}}/month)",
+      "annualButton": "Annual plan (save 15%)"
     }
   },
   "marketingAccess": {
@@ -1245,44 +1250,44 @@
       },
       "signup": {
         "title": "Bienvenido a Lovenda",
-        "description": "Centraliza la planificacin, automatiza recordatorios y deja que nuestro asistente te gue paso a paso.",
+        "description": "Centraliza la planificación, automatiza recordatorios y deja que nuestro asistente te gue paso a paso.",
         "features": [
-          "Onboarding guiado por nuestro asistente de planificacin",
+          "Onboarding guiado por nuestro asistente de planificación",
           "Plantillas para presupuesto, invitados y proveedores",
           "Licencias con Stripe y activacin inmediata"
         ]
       }
     },
     "toggle": {
-      "login": "Iniciar sesin",
+      "login": "Iniciar sesión",
       "signup": "Crear cuenta"
     },
     "loggedIn": {
-      "title": "Sesin activa",
-      "description": "Tu cuenta de Lovenda ya est abierta. Contina con tus eventos o cierra sesin si necesitas cambiar de cuenta.",
+      "title": "Sesión activa",
+      "description": "Tu cuenta de Lovenda ya est abierta. Contina con tus eventos o cierra sesión si necesitas cambiar de cuenta.",
       "primaryCta": "Ir al panel",
-      "secondaryCta": "Cerrar sesin"
+      "secondaryCta": "Cerrar sesión"
     },
     "loginForm": {
-      "emailLabel": "Correo electrnico",
+      "emailLabel": "Correo electrónico",
       "emailPlaceholder": "tu@email.com",
       "passwordLabel": "Contrasea",
       "passwordPlaceholder": "Tu contrasea",
       "rememberMe": "Recordarme",
       "forgotPassword": "Olvidaste tu contrasea?",
-      "submit": "Iniciar sesin",
-      "submitting": "Iniciando sesin&"
+      "submit": "Iniciar sesión",
+      "submitting": "Iniciando sesión&"
     },
     "signup": {
       "info": "Completa el formulario para crear tu cuenta.",
-      "successMessage": "Cuenta creada con xito. Redirigiendo al panel&",
+      "successMessage": "Cuenta creada con ÉÉxito. Redirigiendo al panel&",
       "socialPending": "Completa el flujo de alta en la ventana de {{provider}}."
     },
     "switch": {
       "noAccount": "No tienes cuenta?",
       "registerLink": "Crea una",
       "alreadyHaveAccount": "Ya tienes cuenta?",
-      "loginLink": "Iniciar sesin"
+      "loginLink": "Iniciar sesión"
     },
     "social": {
       "redirect": "Redirigiendo a {{provider}}..."
@@ -1294,7 +1299,7 @@
   "budgetPrediction": {
     "header": {
       "title": "Prediccin IA",
-      "subtitle": "Anlisis inteligente de tu presupuesto"
+      "subtitle": "Análisis inteligente de tu presupuesto"
     },
     "actions": {
       "analyzing": "Analizando...",
@@ -1310,7 +1315,7 @@
     },
     "sections": {
       "recommendations": "Recomendaciones",
-      "categoryAnalysis": "Anlisis por categora"
+      "categoryAnalysis": "Análisis por categoría"
     },
     "emptyState": {
       "title": "Predicciones IA disponibles prximamente",
@@ -1329,7 +1334,7 @@
       },
       "highDailyRate": {
         "message": "Tu tasa de gasto diaria es alta",
-        "action": "Intenta espaciar ms las compras grandes"
+        "action": "Intenta espaciar más las compras grandes"
       },
       "onTrack": {
         "message": "Vas muy bien con el presupuesto!",
@@ -1350,14 +1355,14 @@
       "pending": "Pendientes"
     },
     "tables": {
-      "moreGuests": "+{{count}} invitados ms",
+      "moreGuests": "+{{count}} invitados más",
       "empty": "Mesa vaca",
       "assignedGuests": "{{count}} invitados asignados",
       "occupancyLabel": "ocupacin"
     },
     "pending": {
       "title": "Invitados pendientes ({{count}})",
-      "moreGuests": "+{{count}} invitados ms"
+      "moreGuests": "+{{count}} invitados más"
     },
     "actions": {
       "assign": "Asignar",
@@ -1372,22 +1377,22 @@
     }
   },
   "categories": {
-    "decoration": "Decoracin",
+    "decoration": "Decoración",
     "cocktail": "Cctel",
     "banquet": "Banquete",
     "ceremony": "Ceremonia",
     "flowers": "Flores",
     "dress": "Vestidos",
     "cake": "Pasteles",
-    "photography": "Fotografa"
+    "photography": "Fotografía"
   },
   "services": {
     "catering": "Catering",
-    "photography": "Fotografa",
+    "photography": "Fotografía",
     "video": "Vdeo",
-    "music": "Msica",
-    "musicDJ": "Msica/DJ",
-    "decoration": "Decoracin",
+    "music": "Música",
+    "musicDJ": "Música/DJ",
+    "decoration": "Decoración",
     "flowers": "Flores",
     "transport": "Transporte",
     "dresses": "Vestidos",
@@ -1402,7 +1407,7 @@
     "entertainment": "Animacin",
     "weddingPlanner": "Wedding Planner",
     "ceremonyVenue": "Lugar de ceremonia",
-    "receptionVenue": "Lugar de celebracin",
+    "receptionVenue": "Lugar de celebración",
     "accommodation": "Alojamiento",
     "honeymoon": "Viaje de novios",
     "sound": "Sonido",
@@ -1411,22 +1416,22 @@
     "weddingCake": "Tarta nupcial",
     "favors": "Detalles/Regaos",
     "security": "Seguridad",
-    "dayCoordination": "Coordinacin da B",
+    "dayCoordination": "Coordinacin día B",
     "other": "Otro"
   },
   "suppliers": {
     "configureServices": "Configurar servicios deseados",
     "suggested": "Sugeridos",
-    "addServicePlaceholder": "Aadir servicio (ej. Fotografa)",
+    "addServicePlaceholder": "Añadir servicio (ej. Fotografía)",
     "noServicesAdded": "An no has aadido servicios."
   },
   "validation": {
     "nameRequired": "El nombre es obligatorio",
     "serviceRequired": "El servicio es obligatorio",
-    "emailInvalid": "Email invlido",
+    "emailInvalid": "Email inválido",
     "linkMustStartHttp": "El enlace debe comenzar con http:// o https://",
     "titleRequired": "El ttulo es obligatorio",
-    "companionNegative": "El nmero de acompaantes no puede ser negativo",
+    "companionNegative": "El número de acompaantes no puede ser negativo",
     "selectCompanionType": "Selecciona el tipo de acompaante",
     "companionMismatch": "Establece \"Sin acompaante\" o aade alguno"
   },

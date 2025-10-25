@@ -38,10 +38,10 @@ function Toolbar({
       >
         <FaRedo />
       </button>
-      <button className="p-2 bg-gray-200 rounded" aria-label="Añadir texto" onClick={onAddText}>
+      <button className="p-2 bg-gray-200 rounded" aria-label={t('common.aria_anadir_texto')} onClick={onAddText}>
         <FaPlus />
       </button>
-      <button className="p-2 bg-gray-200 rounded" aria-label="Añadir imagen" onClick={onAddImage}>
+      <button className="p-2 bg-gray-200 rounded" aria-label={t('common.aria_anadir_imagen')} onClick={onAddImage}>
         <FaImage />
       </button>
       <span className="mx-2 border-r h-4" />

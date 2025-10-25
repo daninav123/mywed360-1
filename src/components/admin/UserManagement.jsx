@@ -109,7 +109,7 @@ const UserManagement = () => {
   // Eliminar usuario
   const handleDeleteUser = (userId) => {
     // Confirmar eliminación
-    if (window.confirm({t('common.esta_seguro_que_desea_eliminar')})) {
+    if (window.confirm(t('common.esta_seguro_que_desea_eliminar'))) {
       setUsers(users.filter((user) => user.id !== userId));
 
       // En un entorno real, aquí se enviaría la petición a una API

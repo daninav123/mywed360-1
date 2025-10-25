@@ -1,13 +1,16 @@
+import { useTranslations } from '../../hooks/useTranslations';
 /**
  * Plantillas de email predefinidas para comunicación con proveedores
  */
 
 const proveedorTemplates = [
   {
+  const { t } = useTranslations();
+
     id: 'template_proveedor_solicitud_info_1',
-    name: 'Solicitud inicial de información',
-    category: 'Proveedores - Solicitud de información',
-    subject: 'Solicitud de información para {{servicio}} - Boda {{fecha_boda}}',
+    name: t('common.solicitud_inicial_informacion'),
+    category: t('common.proveedores_solicitud_informacion'),
+    subject: t('common.solicitud_informacion_para_servicio_boda'),
     body: `
 Estimado/a {{nombre_proveedor}},
 
@@ -44,7 +47,7 @@ Saludos cordiales,
   {
     id: 'template_proveedor_solicitud_info_2',
     name: 'Solicitud detallada de presupuesto',
-    category: 'Proveedores - Solicitud de información',
+    category: t('common.proveedores_solicitud_informacion'),
     subject: 'Solicitud de presupuesto detallado para {{servicio}}',
     body: `
 Estimado/a {{nombre_proveedor}},
@@ -84,9 +87,9 @@ Atentamente,
   },
   {
     id: 'template_proveedor_confirmacion_1',
-    name: 'Confirmación de contratación',
-    category: 'Proveedores - Confirmación',
-    subject: 'Confirmación de contratación de servicios para boda {{fecha_boda}}',
+    name: t('common.confirmacion_contratacion'),
+    category: t('common.proveedores_confirmacion'),
+    subject: t('common.confirmacion_contratacion_servicios_para_boda'),
     body: `
 Estimado/a {{nombre_proveedor}},
 
@@ -114,9 +117,9 @@ Un cordial saludo,
   },
   {
     id: 'template_proveedor_confirmacion_2',
-    name: 'Confirmación de detalles finales',
-    category: 'Proveedores - Confirmación',
-    subject: 'Confirmación de detalles finales para {{servicio}} - Boda {{fecha_boda}}',
+    name: t('common.confirmacion_detalles_finales'),
+    category: t('common.proveedores_confirmacion'),
+    subject: t('common.confirmacion_detalles_finales_para_servicio'),
     body: `
 Estimado/a {{nombre_proveedor}},
 
@@ -154,9 +157,9 @@ Saludos cordiales,
   },
   {
     id: 'template_proveedor_cancelacion_1',
-    name: 'Cancelación de servicios',
-    category: 'Proveedores - Cancelación',
-    subject: 'Cancelación de servicios para boda del {{fecha_boda}}',
+    name: t('common.cancelacion_servicios'),
+    category: t('common.proveedores_cancelacion'),
+    subject: t('common.cancelacion_servicios_para_boda_del'),
     body: `
 Estimado/a {{nombre_proveedor}},
 

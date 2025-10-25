@@ -129,7 +129,7 @@ const EmailDetail = ({
       className="h-full flex flex-col"
       onKeyDown={handleKeyDown}
       role="region"
-      aria-label="Detalle del correo electrónico"
+      aria-label={t('common.aria_detalle_del_correo_electronico')}
     >
       {/* Cabecera - Adaptativa para móvil */}
       <header className="mb-3 sm:mb-4 pb-2 border-b border-gray-200" role="header">
@@ -218,12 +218,12 @@ const EmailDetail = ({
                 <p
                   className="text-xs text-gray-700 break-all"
                   id="sender-email"
-                  aria-label="Dirección de correo del remitente"
+                  aria-label={t('common.aria_direccion_de_correo_del_remitente')}
                 >
                   {getSenderEmail(email.from)}
                 </p>
               </div>
-              <p className="text-xs text-gray-700 mt-1 sm:mt-0" aria-label="Fecha de envío">
+              <p className="text-xs text-gray-700 mt-1 sm:mt-0" aria-label={t('common.aria_fecha_de_envio')}>
                 {formatFullDate(email.date)}
               </p>
             </div>
@@ -349,7 +349,7 @@ const EmailDetail = ({
                     {attachment.filename || `adjunto-${index + 1}`}
                   </p>
                   {attachment.size && (
-                    <p className="text-xs text-gray-700" aria-label="Tamaño del archivo">
+                    <p className="text-xs text-gray-700" aria-label={t('common.aria_tamano_del_archivo')}>
                       {Math.round(attachment.size / 1024)} KB
                     </p>
                   )}
@@ -385,7 +385,7 @@ const EmailDetail = ({
         }}
         title="Mover correo a carpeta"
         description={`Seleccione una carpeta para mover "${email.subject || '(Sin asunto)'}":`}
-        aria-label="Selección de carpetas"
+        aria-label={t('common.aria_seleccion_de_carpetas')}
       />
     </div>
   );

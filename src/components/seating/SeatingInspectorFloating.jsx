@@ -63,8 +63,10 @@ const GuestItem = ({ guest, onRemove }) => (
       onClick={onRemove}
       className="opacity-0 group-hover:opacity-100 transition-opacity
                  text-red-400 hover:text-red-300"
+      type="button"
+      aria-label="Eliminar invitado de la mesa"
     >
-      <Trash2 size={14} />
+      <Trash2 size={14} aria-hidden="true" />
     </button>
   </motion.div>
 );
@@ -116,8 +118,10 @@ export default function SeatingInspectorFloating({
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-white transition-colors"
+            type="button"
+            aria-label="Cerrar inspector"
           >
-            <X size={20} />
+            <X size={20} aria-hidden="true" />
           </button>
         </div>
 
@@ -240,7 +244,7 @@ export default function SeatingInspectorFloating({
               label="Eliminar"
               variant="danger"
               onClick={() => {
-                if (confirm({t('common.eliminar_esta_mesa')})) {
+                if (confirm(t('common.eliminar_esta_mesa'))) {
                   onDelete?.(table.id);
                   onClose();
                 }

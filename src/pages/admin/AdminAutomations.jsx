@@ -55,17 +55,17 @@ const ANNIVERSARY_PLACEHOLDERS = [
   { token: '{{couple_names}}', description: 'Nombres de la pareja anfitriona.' },
   { token: '{{wedding_name}}', description: 'Nombre de la boda/evento.' },
   { token: '{{wedding_date}}', description: 'Fecha original de la boda.' },
-  { token: '{{album_link}}', description: {t('common.enlace_galeria_momentos_existe')} },
-  { token: '{{year}}', description: {t('common.numero_anos_cumplidos')} },
+  { token: '{{album_link}}', description: t('common.enlace_galeria_momentos_existe') },
+  { token: '{{year}}', description: t('common.numero_anos_cumplidos') },
 ];
 
 const PARTNER_PLACEHOLDERS = [
   { token: '{{partner_name}}', description: 'Nombre del partner/comercial.' },
   { token: '{{month}}', description: 'Mes del resumen (ej. septiembre 2025).' },
-  { token: '{{deals}}', description: {t('common.numero_cierres_captados_periodo')} },
-  { token: '{{total_earned}}', description: {t('common.comision_generada_periodo')} },
+  { token: '{{deals}}', description: t('common.numero_cierres_captados_periodo') },
+  { token: '{{total_earned}}', description: t('common.comision_generada_periodo') },
   { token: '{{pending_amount}}', description: 'Importe pendiente de pago.' },
-  { token: '{{currency}}', description: {t('common.codigo_moneda_eur_usd')} },
+  { token: '{{currency}}', description: t('common.codigo_moneda_eur_usd') },
   { token: '{{payment_link}}', description: 'Enlace para subir factura o revisar pagos.' },
 ];
 
@@ -73,7 +73,7 @@ const HOURS = Array.from({ length: 24 }, (_, idx) => idx);
 const MINUTES = [0, 15, 30, 45];
 const CHANNEL_OPTIONS = [
   { value: 'whatsapp', label: 'WhatsApp' },
-  { value: 'whatsapp_email', label: {t('common.whatsapp_email_proximamente')} },
+  { value: 'whatsapp_email', label: t('common.whatsapp_email_proximamente') },
 ];
 
 const formatDateTime = (value) => {
@@ -341,7 +341,7 @@ export default function AdminAutomations() {
                   inputProps={{ 'aria-label': 'Activar WhatsApp aniversario' }}
                 />
                 <Typography variant="body2" color="textSecondary">
-                  {anniversaryConfig.enabled ? {t('common.automatizacion_activa')} : {t('common.automatizacion_pausada')}}
+                  {anniversaryConfig.enabled ? {t('common.automatizacion_activa')} : t('common.automatizacion_pausada')}
                 </Typography>
               </Stack>
             </Grid>
@@ -520,7 +520,7 @@ export default function AdminAutomations() {
                   inputProps={{ 'aria-label': 'Activar resumen partners' }}
                 />
                 <Typography variant="body2" color="textSecondary">
-                  {partnerConfig.enabled ? {t('common.automatizacion_activa')} : {t('common.automatizacion_pausada')}}
+                  {partnerConfig.enabled ? {t('common.automatizacion_activa')} : t('common.automatizacion_pausada')}
                 </Typography>
               </Stack>
             </Grid>

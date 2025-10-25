@@ -2,10 +2,13 @@
 // Requiere que <ToastContainer /> esté montado en la app
 import React from 'react';
 import { toast } from 'react-toastify';
+import { useTranslations } from '../../hooks/useTranslations';
 
 let refreshToastId = null;
 
 function showUpdateToast(updateFn) {
+  const { t } = useTranslations();
+
   // Evitar toasts duplicados
   if (refreshToastId) return;
   refreshToastId = toast.info(
@@ -29,7 +32,7 @@ function showUpdateToast(updateFn) {
 }
 
 function showOfflineReady() {
-  toast.success('La app está lista para funcionar sin conexión');
+  toast.success(t('common.app_esta_lista_para_funcionar'));
 }
 
 if (typeof window !== 'undefined') {

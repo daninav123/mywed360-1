@@ -1,5 +1,8 @@
+import { useTranslations } from '../../hooks/useTranslations';
 const ADMIN_NAVIGATION = [
   {
+  const { t } = useTranslations();
+
     id: 'panel',
     title: 'Panel',
     items: [
@@ -7,7 +10,7 @@ const ADMIN_NAVIGATION = [
         id: 'dashboard',
         label: 'Resumen',
         path: '/admin/dashboard',
-        description: 'Métricas clave, salud de servicios y tareas operativas.',
+        description: t('common.metricas_clave_salud_servicios_tareas'),
       },
     ],
   },
@@ -25,43 +28,43 @@ const ADMIN_NAVIGATION = [
         id: 'users',
         label: 'Usuarios',
         path: '/admin/users',
-        description: 'Gestión de cuentas, roles y actividad reciente.',
+        description: t('common.gestion_cuentas_roles_actividad_reciente'),
       },
       {
         id: 'broadcast',
         label: 'Broadcast',
         path: '/admin/broadcast',
-        description: 'Comunicaciones masivas y avisos críticos controlados.',
+        description: t('common.comunicaciones_masivas_avisos_criticos_controlados'),
       },
       {
         id: 'automations',
         label: 'Automatizaciones',
         path: '/admin/automations',
-        description: 'Mensajería programada (WhatsApp aniversario) y reglas globales.',
+        description: t('common.mensajeria_programada_whatsapp_aniversario_reglas'),
       },
       {
         id: 'commerce',
         label: 'Comerciales',
         path: '/admin/commerce',
-        description: 'Enlaces de descuento, responsables y facturación generada.',
+        description: t('common.enlaces_descuento_responsables_facturacion_generada'),
       },
     ],
   },
   {
     id: 'analytics',
-    title: 'Analítica',
+    title: t('common.analitica'),
     items: [
       {
         id: 'metrics',
-        label: 'Métricas',
+        label: t('common.metricas'),
         path: '/admin/metrics',
-        description: 'Embudo de conversión, costes IA y exportes históricos.',
+        description: t('common.embudo_conversion_costes_exportes_historicos'),
       },
       {
         id: 'reports',
         label: 'Reportes',
         path: '/admin/reports',
-        description: 'Programación y descarga de informes clave para dirección.',
+        description: t('common.programacion_descarga_informes_clave_para'),
       },
     ],
   },
@@ -73,19 +76,19 @@ const ADMIN_NAVIGATION = [
         id: 'integrations',
         label: 'Integraciones',
         path: '/admin/integrations',
-        description: 'Estados de proveedores externos y gestión de incidencias.',
+        description: t('common.estados_proveedores_externos_gestion_incidencias'),
       },
       {
         id: 'alerts',
         label: 'Alertas',
         path: '/admin/alerts',
-        description: 'Alertas en curso, severidad y flujo de resolución.',
+        description: t('common.alertas_curso_severidad_flujo_resolucion'),
       },
     ],
   },
   {
     id: 'settings',
-    title: 'Configuración',
+    title: t('common.configuracion'),
     items: [
       {
         id: 'settings-global',
@@ -115,7 +118,7 @@ const ADMIN_NAVIGATION = [
         id: 'debug-payments',
         label: 'Debug Pagos',
         path: '/admin/debug/payments',
-        description: 'Diagnóstico de facturación y datos de pagos en Firestore.',
+        description: t('common.diagnostico_facturacion_datos_pagos_firestore'),
       },
     ],
   },

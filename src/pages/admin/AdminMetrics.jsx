@@ -9,8 +9,8 @@ const TABS = [
   const { t } = useTranslations();
  id: 'resumen', label: '📊 Resumen', icon: '📊' },
   { id: 'producto', label: '📱 Producto', icon: '📱' },
-  { id: 'economicas', label: {t('common.economicas')}, icon: '💰' },
-  { id: 'tecnicas', label: {t('common.tecnicas')}, icon: '⚙️' },
+  { id: 'economicas', label: t('common.economicas'), icon: '💰' },
+  { id: 'tecnicas', label: t('common.tecnicas'), icon: '⚙️' },
   { id: 'soporte', label: '🎫 Soporte', icon: '🎫' },
 ];
 

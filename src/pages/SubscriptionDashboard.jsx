@@ -43,7 +43,7 @@ const SubscriptionDashboard = () => {
       });
 
       if (!response.ok) {
-        throw new Error({t('common.error_obtener_suscripcion')});
+        throw new Error(t('common.error_obtener_suscripcion'));
       }
 
       const data = await response.json();
@@ -227,7 +227,7 @@ const SubscriptionDashboard = () => {
                 <p className="mt-2 text-2xl font-bold text-gray-900">
                   {formatPrice(subscription.amount, subscription.currency)}
                   <span className="text-base font-normal text-gray-600">
-                    {subscription.interval === 'month' ? '/mes' : {t('common.ano')}}
+                    {subscription.interval === 'month' ? '/mes' : t('common.ano')}
                   </span>
                 </p>
               </div>

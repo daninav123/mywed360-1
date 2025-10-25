@@ -79,13 +79,28 @@ const readSafeJson = (key) => {
 export function WeddingProvider({ children }) {
   const { currentUser, userProfile } = useAuth();
   
-  // Detectar si estamos en modo test y cargar datos mock
-  const isTestMode = typeof window !== 'undefined' && (window.Cypress || window.__MALOVEAPP_TEST_MODE__);
+  // Detectar si estamos en modo test y cargar datos mock (memoizado para evitar loops)
+  const isTestMode = useMemo(() => 
+    typeof window !== 'undefined' && (window.Cypress || window.__MALOVEAPP_TEST_MODE__ || import.meta.env.VITE_TEST_MODE === 'true'),
+    []
+  );
   
-  // Cargar bodas mock de localStorage si estamos en tests
-  const loadTestWeddings = () => {
+  // Cargar bodas mock de localStorage o window.__MOCK_WEDDING__ si estamos en tests (memoizado)
+  const testData = useMemo(() => {
     if (!isTestMode) return { weddings: [], activeWedding: '' };
     try {
+      // Primero verificar si hay mock directo en window (Cypress)
+      if (typeof window !== 'undefined' && window.__MOCK_WEDDING__) {
+        const mockWedding = window.__MOCK_WEDDING__;
+        const weddings = Array.isArray(mockWedding.weddings) ? mockWedding.weddings : [];
+        const activeWedding = mockWedding.activeWedding?.id || (weddings.length > 0 ? weddings[0].id : '');
+        if (import.meta.env.DEV) {
+          console.log('[WeddingContext] Usando mock de window.__MOCK_WEDDING__', { weddings, activeWedding });
+        }
+        return { weddings, activeWedding };
+      }
+      
+      // Fallback a localStorage
       const storedWeddings = window.localStorage.getItem('MaLoveApp_weddings');
       const storedActive = window.localStorage.getItem('MaLoveApp_active_wedding');
       const weddings = storedWeddings ? JSON.parse(storedWeddings) : [];
@@ -98,17 +113,15 @@ export function WeddingProvider({ children }) {
       console.warn('Error loading test weddings:', e);
       return { weddings: [], activeWedding: '' };
     }
-  };
-  
-  const testData = loadTestWeddings();
+  }, [isTestMode]);
   
   // Estado inicial - usar datos de test si están disponibles
-  const [weddings, setWeddings] = useState(testData.weddings);
-  const [weddingsReady, setWeddingsReady] = useState(isTestMode);
-  const [activeWedding, setActiveWeddingState] = useState(testData.activeWedding);
+  const [weddings, setWeddings] = useState([]);
+  const [weddingsReady, setWeddingsReady] = useState(false);
+  const [activeWedding, setActiveWeddingState] = useState('');
   const [localMirror, setLocalMirror] = useState({
-    weddings: testData.weddings,
-    activeWeddingId: testData.activeWedding,
+    weddings: [],
+    activeWeddingId: '',
     uid: '',
   });
   const [usingFirestore, setUsingFirestore] = useState(false);
@@ -142,8 +155,26 @@ export function WeddingProvider({ children }) {
     [storageKeyForUser]
   );
 
+  // En modo test, aplicar datos mock inicialmente (solo una vez)
+  useEffect(() => {
+    if (isTestMode && testData.weddings.length > 0) {
+      setWeddings(testData.weddings);
+      setActiveWeddingState(testData.activeWedding);
+      setWeddingsReady(true);
+      setLocalMirror({
+        weddings: testData.weddings,
+        activeWeddingId: testData.activeWedding,
+        uid: 'cypress-test',
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Solo ejecutar una vez al montar
+
   // Inicializar activeWedding cuando cambie el usuario
   useEffect(() => {
+    // En modo test, los mocks ya están configurados
+    if (isTestMode) return;
+    
     const uid = currentUser?.uid || getLocalProfileUid();
     if (!uid) {
       setActiveWeddingState('');
@@ -153,10 +184,13 @@ export function WeddingProvider({ children }) {
     if (stored) {
       setActiveWeddingState(stored);
     }
-  }, [currentUser, getLocalProfileUid, resolveActiveWeddingFromStorage]);
+  }, [currentUser, getLocalProfileUid, resolveActiveWeddingFromStorage, isTestMode]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
+    // En modo test con mock directo, no leer de localStorage
+    if (isTestMode && window.__MOCK_WEDDING__) return;
+    
     let cancelled = false;
 
     const uid = currentUser?.uid || getLocalProfileUid() || 'anonymous';
@@ -179,11 +213,14 @@ export function WeddingProvider({ children }) {
       cancelled = true;
       window.removeEventListener(LOCAL_WEDDINGS_EVENT, handleUpdate);
     };
-  }, [currentUser, getLocalProfileUid]);
+  }, [currentUser, getLocalProfileUid, isTestMode]);
 
   useEffect(() => {
     if (!localMirror.uid) return;
     if (usingFirestore) return;
+    // En modo test con mock directo, no actualizar desde localStorage
+    if (isTestMode && typeof window !== 'undefined' && window.__MOCK_WEDDING__) return;
+    
     setWeddings(localMirror.weddings);
     setWeddingsReady(true);
     const nextActive =
@@ -194,7 +231,7 @@ export function WeddingProvider({ children }) {
     } else {
       setActiveWeddingState('');
     }
-  }, [localMirror, usingFirestore]);
+  }, [localMirror, usingFirestore, isTestMode]);
 
   // Suscribirse a Firestore usando subcolección users/{uid}/weddings
   useEffect(() => {

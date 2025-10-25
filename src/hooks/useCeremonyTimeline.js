@@ -4,9 +4,12 @@ import { doc, onSnapshot, serverTimestamp, setDoc } from 'firebase/firestore';
 import { useWedding } from '../context/WeddingContext';
 import { db } from '../firebaseConfig';
 import { performanceMonitor } from '../services/PerformanceMonitor';
+import { useTranslations } from '../../hooks/useTranslations';
 
 const DEFAULT_SECTIONS = [
   {
+  const { t } = useTranslations();
+
     id: 'preCeremony',
     title: 'Pre-ceremonia',
     description: 'Preparativos, traslados y llegada de participantes clave.',
@@ -21,7 +24,7 @@ const DEFAULT_SECTIONS = [
       },
       {
         id: 'sound-check',
-        title: 'Prueba de sonido y música',
+        title: t('common.prueba_sonido_musica'),
         time: '',
         responsible: '',
         status: 'pending',
@@ -71,7 +74,7 @@ const DEFAULT_SECTIONS = [
   {
     id: 'postCeremony',
     title: 'Post-ceremonia',
-    description: 'Cierre y transición hacia cóctel o banquete.',
+    description: t('common.cierre_transicion_hacia_coctel_banquete'),
     items: [
       {
         id: 'recessional',
@@ -83,7 +86,7 @@ const DEFAULT_SECTIONS = [
       },
       {
         id: 'photo-session',
-        title: 'Sesión de fotos inmediata',
+        title: t('common.sesion_fotos_inmediata'),
         time: '',
         responsible: '',
         status: 'pending',
@@ -91,7 +94,7 @@ const DEFAULT_SECTIONS = [
       },
       {
         id: 'confetti',
-        title: 'Confeti / lanzamiento de pétalos',
+        title: t('common.confeti_lanzamiento_petalos'),
         time: '',
         responsible: '',
         status: 'pending',
@@ -204,7 +207,7 @@ function mergeSections(candidate) {
     const items = Array.isArray(section.items) ? section.items : [];
     return {
       id: section.id || template.id,
-      title: section.title || template.title || 'Sección',
+      title: section.title || template.title || {t('common.seccion')},
       description: section.description || template.description || '',
       items: items.map((item) => ({
         id: item.id || crypto.randomUUID?.() || `${Date.now()}-${Math.random()}`,

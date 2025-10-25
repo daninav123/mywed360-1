@@ -19,15 +19,15 @@ const humanize = (value = '') =>
 const TAG_LABELS = {
   favs: 'Favoritos',
   ceremonia: 'Ceremonia',
-  decoracion: {t('common.decoracion')},
-  coctel: {t('common.coctel')},
+  decoracion: t('common.decoracion'),
+  coctel: t('common.coctel'),
   banquete: 'Banquete',
   disco: 'Disco',
   flores: 'Flores',
   vestido: 'Vestidos',
   pastel: 'Pasteles',
-  fotografia: {t('common.fotografia')},
-  inspiration: {t('common.inspiracion')},
+  fotografia: t('common.fotografia'),
+  inspiration: t('common.inspiracion'),
 };
 
 // Tags base (slug) se sincronizan con servicios y filtros
@@ -197,17 +197,17 @@ export default function InspirationGallery({
                 }}
                 alt={
                   img.tags && img.tags.length
-                    ? t('inspiration.altWithTags', {t('common.inspiracion_tags')}, {
+                    ? t('inspiration.altWithTags', t('common.inspiracion_tags'), {
                         tags: img.tags.join(', '),
                       })
-                    : t('inspiration.alt', {t('common.inspiracion')})
+                    : t('inspiration.alt', t('common.inspiracion'))
                 }
                 aria-label={
                   img.tags && img.tags.length
-                    ? t('inspiration.ariaWithTags', {t('common.imagen_inspiracion_tags')}, {
+                    ? t('inspiration.ariaWithTags', t('common.imagen_inspiracion_tags'), {
                         tags: img.tags.join(', '),
                       })
-                    : t('inspiration.aria', {t('common.imagen_inspiracion')})
+                    : t('inspiration.aria', t('common.imagen_inspiracion'))
                 }
                 className="w-full aspect-square object-cover rounded-lg"
                 loading="lazy"
@@ -223,7 +223,7 @@ export default function InspirationGallery({
                 aria-label={
                   favorites.includes(img.id)
                     ? t('inspiration.removeFav', 'Quitar de favoritos')
-                    : t('inspiration.addFav', {t('common.anadir_favoritos')})
+                    : t('inspiration.addFav', t('common.anadir_favoritos'))
                 }
               >
                 {favorites.includes(img.id) ? (

@@ -9,9 +9,9 @@ const templates = [
   const { t } = useTranslations();
 
     id: 1,
-    name: {t('common.clasico_dorado')},
+    name: t('common.clasico_dorado'),
     thumbnail: '/assets/templates/classic-gold-thumb.jpg',
-    style: {t('common.clasico')},
+    style: t('common.clasico'),
     colors: ['#d4af37', '#ffffff'],
     fontFamily: 'Times New Roman',
     orientation: 'vertical',
@@ -27,16 +27,16 @@ const templates = [
   },
   {
     id: 3,
-    name: {t('common.rustico_kraft')},
+    name: t('common.rustico_kraft'),
     thumbnail: '/assets/templates/rustic-kraft-thumb.jpg',
-    style: {t('common.rustico')},
+    style: t('common.rustico'),
     colors: ['#a78c6b', '#ffffff'],
     fontFamily: 'Georgia',
     orientation: 'horizontal',
   },
 ];
 
-const STYLES = [{t('common.clasico')}, 'Moderno', {t('common.rustico')}, 'Minimalista'];
+const STYLES = [t('common.clasico'), 'Moderno', t('common.rustico'), 'Minimalista'];
 const ORIENTATIONS = ['vertical', 'horizontal'];
 
 function TemplateGallery({ onSelect }) {

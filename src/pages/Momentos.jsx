@@ -37,7 +37,7 @@ const TABS = [
   {
   const { t } = useTranslations();
  id: 'overview', label: 'Resumen' },
-  { id: 'moderation', label: {t('common.moderacion')} },
+  { id: 'moderation', label: t('common.moderacion') },
   { id: 'slideshow', label: 'Slideshow' },
   { id: 'downloads', label: 'Descargas' },
 ];
@@ -160,7 +160,7 @@ export default function Momentos() {
       })
       .catch((error) => {
         console.error('Error inicializando la galería de recuerdos', error);
-        toast.error({t('common.pudo_cargar_galeria_recuerdos_revisa')});
+        toast.error(t('common.pudo_cargar_galeria_recuerdos_revisa'));
         setLoadingAlbum(false);
       });
 
@@ -256,7 +256,7 @@ export default function Momentos() {
   const handleReject = async (photo) => {
     const reason =
       typeof window !== 'undefined'
-      ? window.prompt('Motivo del rechazo', {t('common.cumple_con_guia_galeria')})
+      ? window.prompt('Motivo del rechazo', t('common.cumple_con_guia_galeria'))
         : 'Rechazado';
     if (reason === null) return;
     try {
@@ -284,7 +284,7 @@ export default function Momentos() {
         status: 'pending',
         actorId: currentUser?.uid || null,
       });
-      toast.success({t('common.foto_volvio_pendiente')});
+      toast.success(t('common.foto_volvio_pendiente'));
     } catch (error) {
       console.error('reset photo error', error);
       toast.error('No se pudo revertir el estado');

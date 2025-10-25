@@ -8,7 +8,7 @@ const statusInfo = {
 
   operational: { label: 'Operativo', className: 'text-green-600' },
   degraded: { label: 'Degradado', className: 'text-amber-600' },
-  down: { label: {t('common.caido')}, className: 'text-red-600' },
+  down: { label: t('common.caido'), className: 'text-red-600' },
 };
 
 const AdminIntegrations = () => {

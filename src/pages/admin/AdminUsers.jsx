@@ -305,7 +305,7 @@ const AdminUsers = () => {
               Estados permitidos:{' '}
               {summaryData.filters?.allowedStatuses?.length
                 ? summaryData.filters.allowedStatuses.join(', ')
-                : {t('common.sin_restriccion_definida')}}
+                : t('common.sin_restriccion_definida')}
               {summaryData.filters?.excludedEmailSuffixes?.length ? (
                 <span className="ml-2">
                   Dominios excluidos: {summaryData.filters.excludedEmailSuffixes.join(', ')}

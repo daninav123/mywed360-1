@@ -12,7 +12,7 @@ import { useTranslations } from '../../hooks/useTranslations';
 // Bloques por defecto para inicializar el Timing
 const DEFAULT_BLOCKS = [
   { id: 'ceremonia', name: 'Ceremonia' },
-  { id: 'coctel', name: {t('common.coctel')} },
+  { id: 'coctel', name: t('common.coctel') },
   { id: 'banquete', name: 'Banquete' },
   { id: 'disco', name: 'Disco' },
 ];

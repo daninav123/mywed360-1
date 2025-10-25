@@ -34,6 +34,7 @@ import { apiPost } from '../services/apiClient';
 import errorLogger from '../utils/errorLogger';
 import { getBackendBase } from '../utils/backendBase';
 import { mapAuthError } from '../utils/authErrorMapper';
+import { useTranslations } from '../../hooks/useTranslations';
 
 // Crear contexto de autenticación
 const AuthContext = createContext(null);
@@ -41,6 +42,8 @@ const AuthContext = createContext(null);
 let __authWarnedOutside = false;
 
 const getEnv = (key, fallback) => {
+  const { t } = useTranslations();
+
   try {
     if (typeof import.meta !== 'undefined' && import.meta.env && key in import.meta.env) {
       return import.meta.env[key] ?? fallback;
@@ -132,12 +135,12 @@ const SOCIAL_PROVIDER_READABLE = {
 
 const SOCIAL_AUTH_ERROR_MESSAGES = {
   'auth/account-exists-with-different-credential':
-    'Ya existe una cuenta con este correo asociada a otro proveedor. Inicia sesión con el proveedor original y vincúlalo desde tu perfil.',
-  'auth/popup-blocked': 'El navegador bloqueó la ventana emergente. Permite las ventanas emergentes e inténtalo de nuevo.',
-  'auth/popup-closed-by-user': 'La ventana de autenticación se cerró antes de completar el proceso.',
-  'auth/cancelled-popup-request': 'Se canceló un intento previo de inicio de sesión. Vuelve a intentarlo.',
+    {t('auth.existe_una_cuenta_con_este')},
+  'auth/popup-blocked': t('auth.navegador_bloqueo_ventana_emergente_permite'),
+  'auth/popup-closed-by-user': t('auth.ventana_autenticacion_cerro_antes_completar'),
+  'auth/cancelled-popup-request': t('auth.cancelo_intento_previo_inicio_sesion'),
   'auth/unauthorized-domain':
-    'Este dominio no está autorizado en la consola de Firebase. Contacta con soporte técnico.',
+    {t('auth.este_dominio_esta_autorizado_consola')},
 };
 
 const getReadableProvider = (providerId = '') =>
@@ -145,7 +148,7 @@ const getReadableProvider = (providerId = '') =>
 
 const getReadableAuthMethod = (providerId = '') => {
   if (!providerId) return 'otro proveedor';
-  if (providerId === 'password') return 'correo y contraseña';
+  if (providerId === 'password') return {t('auth.correo_contrasena')};
   const key = providerId.replace('.com', '');
   return getReadableProvider(key) || providerId;
 };
@@ -962,7 +965,7 @@ export const AuthProvider = ({ children }) => {
     async (email, password, rememberMe = false) => {
       try {
         if (!email || !password) {
-          throw new Error('Email y contraseña son requeridos');
+          throw new Error(t('auth.email_contrasena_son_requeridos'));
         }
 
         const trimmedEmail = String(email).trim().toLowerCase();
@@ -971,7 +974,7 @@ export const AuthProvider = ({ children }) => {
         if (!normalizedEmail || !normalizedEmail.includes('@')) {
           return {
             success: false,
-            error: 'Formato de email no válido',
+            error: t('auth.formato_email_valido'),
             code: 'invalid_email',
           };
         }
@@ -991,7 +994,7 @@ export const AuthProvider = ({ children }) => {
         
         if (!loginResponse.ok) {
           const errorData = await loginResponse.json().catch(() => ({}));
-          throw new Error(errorData.message || 'Error al iniciar sesión como administrador');
+          throw new Error(errorData.message || {t('auth.error_iniciar_sesion_como_administrador')});
         }
 
         const response = await loginResponse.json();
@@ -1014,7 +1017,7 @@ export const AuthProvider = ({ children }) => {
         }
 
         if (!response.profile && !response.adminUser) {
-          throw new Error('La respuesta no incluye información de administrador');
+          throw new Error(t('auth.respuesta_incluye_informacion_administrador'));
         }
 
         const profile = response.profile || {
@@ -1051,7 +1054,7 @@ export const AuthProvider = ({ children }) => {
         console.error('Error al iniciar sesión admin:', error);
         return {
           success: false,
-          error: error?.message || 'No se pudo iniciar sesión.',
+          error: error?.message || {t('auth.pudo_iniciar_sesion')},
           code: error?.code,
           lockedUntil:
             error?.lockedUntil instanceof Date
@@ -1066,21 +1069,21 @@ export const AuthProvider = ({ children }) => {
   const completeAdminMfa = useCallback(
     async (code, rememberMe) => {
       if (!pendingAdminSession) {
-        return { success: false, error: 'No hay un desafío MFA activo.' };
+        return { success: false, error: t('auth.hay_desafio_mfa_activo') };
       }
 
       if (pendingAdminSession.expiresAt && Date.now() > pendingAdminSession.expiresAt) {
         setPendingAdminSession(null);
         return {
           success: false,
-          error: 'El código ha expirado. Vuelve a iniciar sesión.',
+          error: t('auth.codigo_expirado_vuelve_iniciar_sesion'),
           code: 'challenge_expired',
         };
       }
 
       const normalizedCode = String(code || '').trim();
       if (!normalizedCode) {
-        return { success: false, error: 'Introduce el código de verificación.' };
+        return { success: false, error: t('auth.introduce_codigo_verificacion') };
       }
 
       // Usar rememberMe pasado o el guardado en pendingAdminSession
@@ -1125,7 +1128,7 @@ export const AuthProvider = ({ children }) => {
         console.error('Error completando MFA admin:', error);
         return {
           success: false,
-          error: error?.message || 'Código inválido.',
+          error: error?.message || {t('auth.codigo_invalido')},
           code: error?.code,
           lockedUntil:
             error?.lockedUntil instanceof Date

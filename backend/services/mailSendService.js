@@ -191,7 +191,10 @@ export async function sendMailAndPersist({
     }
   }
 
-  if (!recordOnly && mailgun) {
+  // Modo test: mockear envío de emails para tests E2E
+  const testMode = String(process.env.MAILGUN_TEST_MODE || '').toLowerCase() === 'true';
+  
+  if (!recordOnly && mailgun && !testMode) {
     try {
       let result = await mailgun.messages().send(mailData);
       let rawId = (result && (result.id || result.messageId)) || null;
@@ -218,6 +221,10 @@ export async function sendMailAndPersist({
         throw altError;
       }
     }
+  } else if (!recordOnly && testMode) {
+    // Modo test: generar messageId falso pero válido
+    messageId = `<test-${Date.now()}-${Math.random().toString(36).substr(2, 9)}@malove.app>`;
+    console.log('[mailSendService] TEST MODE: Email no enviado realmente, messageId mockeado:', messageId);
   }
 
   const docPayload = {

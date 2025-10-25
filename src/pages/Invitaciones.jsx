@@ -34,7 +34,7 @@ export default function Invitaciones() {
     try {
       const allowDirect =
         import.meta.env.VITE_ENABLE_DIRECT_OPENAI === 'true' || import.meta.env.DEV;
-      if (!allowDirect) throw new Error({t('common.openai_directo_deshabilitado_por_configuracion')});
+      if (!allowDirect) throw new Error(t('common.openai_directo_deshabilitado_por_configuracion'));
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -56,10 +56,10 @@ export default function Invitaciones() {
       const data = await response.json();
       const text = data.choices?.[0]?.message?.content || '';
       setGeneratedText(text);
-      setToast({ message: {t('common.invitacion_generada')}, type: 'success' });
+      setToast({ message: t('common.invitacion_generada'), type: 'success' });
     } catch (err) {
       console.error(err);
-      setToast({ message: {t('common.error_generando_invitacion')}, type: 'error' });
+      setToast({ message: t('common.error_generando_invitacion'), type: 'error' });
     } finally {
       setLoading(false);
     }
@@ -79,7 +79,7 @@ export default function Invitaciones() {
       collection: 'userInvitations',
       showNotification: false,
     });
-    setToast({ message: {t('common.diseno_duplicado')}, type: 'success' });
+    setToast({ message: t('common.diseno_duplicado'), type: 'success' });
   };
   const [panel, setPanel] = useState('invitation'); // 'invitation' o 'envelope'
   const [filterCategory, setFilterCategory] = useState('');
@@ -254,7 +254,7 @@ export default function Invitaciones() {
             className="bg-indigo-600 text-white px-4 py-2 rounded flex items-center"
           >
             {loading ? <Spinner size={16} className="mr-2" /> : <Zap size={16} className="mr-2" />}{' '}
-            {loading ? 'Generando...' : {t('common.generar_invitacion')}}
+            {loading ? 'Generando...' : t('common.generar_invitacion')}
           </button>
         </section>
       )}

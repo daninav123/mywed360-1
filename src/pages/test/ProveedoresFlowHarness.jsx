@@ -38,14 +38,14 @@ const INITIAL_PROVIDERS = [
     id: 'prov-2',
     nombre: 'DJ Night',
     name: 'DJ Night',
-    servicio: {t('common.musica')},
-    service: {t('common.musica')},
+    servicio: t('common.musica'),
+    service: t('common.musica'),
     estado: 'Contactado',
     status: 'Contactado',
     presupuesto: 1200,
     presupuestoAsignado: 1200,
     gastado: 0,
-    proximaAccion: {t('common.esperar_confirmacion_agenda')},
+    proximaAccion: t('common.esperar_confirmacion_agenda'),
     favorito: false,
     ubicacion: 'Valencia',
     email: 'hola@djnight.es',
@@ -55,8 +55,8 @@ const INITIAL_PROVIDERS = [
     id: 'prov-3',
     nombre: 'Foto Natural',
     name: 'Foto Natural',
-    servicio: {t('common.fotografia')},
-    service: {t('common.fotografia')},
+    servicio: t('common.fotografia'),
+    service: t('common.fotografia'),
     estado: 'Presupuesto',
     status: 'Seleccionado',
     presupuesto: 1800,
@@ -76,13 +76,13 @@ const INITIAL_COMMUNICATIONS = {
       id: 'comm-201',
       tipo: 'Email',
       fecha: '2025-09-07',
-      mensaje: {t('common.envio_briefing_inicial_con_playlist')},
+      mensaje: t('common.envio_briefing_inicial_con_playlist'),
     },
     {
       id: 'comm-202',
       tipo: 'Llamada',
       fecha: '2025-09-09',
-      mensaje: {t('common.confirmo_disponibilidad_para_fecha_solicitada')},
+      mensaje: t('common.confirmo_disponibilidad_para_fecha_solicitada'),
     },
   ],
   'prov-3': [
@@ -90,7 +90,7 @@ const INITIAL_COMMUNICATIONS = {
       id: 'comm-301',
       tipo: 'Email',
       fecha: '2025-09-11',
-      mensaje: {t('common.recibimos_presupuesto_detallado_ejemplos_album')},
+      mensaje: t('common.recibimos_presupuesto_detallado_ejemplos_album'),
     },
   ],
 };
@@ -250,7 +250,7 @@ export default function ProveedoresFlowHarness() {
     setSearches((prev) => [...prev, query]);
     setTimeout(() => {
       setAiResult({
-        nombre: {t('common.floristeria_prisma')},
+        nombre: t('common.floristeria_prisma'),
         servicio: 'Flores',
         descripcion: `Proveedor sugerido para "${query}"`,
         ubicacion: 'Barcelona',
@@ -314,7 +314,7 @@ export default function ProveedoresFlowHarness() {
           id: `comm-${Date.now()}`,
           tipo: 'Nota',
           fecha: new Date().toISOString(),
-          mensaje: {t('common.proveedor_anadido_desde_bisqueda')},
+          mensaje: t('common.proveedor_anadido_desde_bisqueda'),
         },
         ...(prev[next.id] || []),
       ],
@@ -367,7 +367,7 @@ export default function ProveedoresFlowHarness() {
         id: `comm-${Date.now()}`,
         tipo: 'Nota',
         fecha: new Date().toISOString(),
-        mensaje: {t('common.comunicacion_registrada_durante_prueba')},
+        mensaje: t('common.comunicacion_registrada_durante_prueba'),
       };
       return { ...prev, [selectedProviderId]: [entry, ...current] };
     });
