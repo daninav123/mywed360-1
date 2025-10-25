@@ -3,13 +3,10 @@ import React, { useEffect, useMemo, useState } from 'react';
 import ImageGeneratorAI from '../../components/ImageGeneratorAI';
 import { useWedding } from '../../context/WeddingContext';
 import { db, firebaseReady } from '../../firebaseConfig';
-import { useTranslations } from '../../hooks/useTranslations';
 
 const fsImport = () => import('firebase/firestore');
 
 function formatDateLong(d) {
-  const { t } = useTranslations();
-
   try {
     const dt = new Date(d);
     if (!dt || isNaN(dt.getTime())) return '';
@@ -68,17 +65,17 @@ export default function Invitaciones() {
     const time = (profile.schedule || '').trim();
     const place = (profile.celebrationPlace || '').trim();
     const parts = [
-      {t('common.disena_una_invitacion_boda_lista')},
+      'Diseña una invitación de boda lista para imprimir, elegante y minimalista.',
       names ? `Nombres: ${names}.` : '',
       [date, time].filter(Boolean).length
         ? `Fecha y hora: ${[date, time].filter(Boolean).join(' a las ')}.`
         : '',
       place ? `Lugar: ${place}.` : '',
-      {t('common.usa_tipografias_serifsans_estilo_clasicocontemporaneo')},
+      'Usa tipografías serif/sans de estilo clásico/contemporáneo.',
       'Sin sombras, sin efectos de luz, sin brillos, sin texturas de fondo.',
       'Fondo limpio blanco, alto contraste en negro o gris muy oscuro.',
-      {t('common.composicion_equilibrada_clara_legible_con')},
-      {t('common.incluye_los_textos_indicados_diseno')},
+      'Composición equilibrada, clara y legible, con jerarquía tipográfica.',
+      'Incluye los textos indicados en el diseño (no placeholders).',
     ].filter(Boolean);
     return parts.join(' ');
   }, [profile]);
@@ -90,13 +87,13 @@ export default function Invitaciones() {
       prompt: `${autoPrompt}`,
     },
     {
-      name: t('common.clasico'),
+      name: 'Clásico',
       description: 'Serif, adornos muy sutiles',
       prompt: `${autoPrompt} Estilo clásico, serif sobria, marcos finos.`,
     },
     {
-      name: t('common.geometrico'),
-      description: t('common.lineas_formas_simples'),
+      name: 'Geométrico',
+      description: 'Líneas y formas simples',
       prompt: `${autoPrompt} Estilo geométrico con líneas finas y simetría.`,
     },
     {

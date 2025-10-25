@@ -3,14 +3,11 @@ import { toast } from 'react-toastify';
 
 import { uploadMomentPhoto } from '@/services/momentosService';
 import SceneSelector from './SceneSelector';
-import { useTranslations } from '../../hooks/useTranslations';
 
 const makeQueueId = () =>
   (typeof crypto !== 'undefined' && crypto.randomUUID
     ? crypto.randomUUID()
-    : `upload_${
-  const { t } = useTranslations();
-Date.now()}_${Math.random().toString(36).slice(2, 8)}`);
+    : `upload_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`);
 
 const readableSize = (bytes = 0) => {
   if (!bytes) return '0 KB';
@@ -189,10 +186,10 @@ export default function UploadWidget({
         } catch (error) {
           let message = error?.message;
           if (message === 'duplicate_photo') {
-            message = {t('common.subio_archivo_identico_evitamos_duplicados')};
+            message = 'Ya se subió un archivo idéntico. Evitamos duplicados automáticamente.';
           } else if (message === 'video_exceeds_limit') {
             message =
-              {t('common.los_videos_mas_minutos_bloquean')};
+              'Los vídeos de más de 2 minutos se bloquean cuando la galería supera el límite de almacenamiento.';
           } else if (!message || message === 'undefined') {
             message =
               error?.code === 'storage/canceled'

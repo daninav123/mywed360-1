@@ -70,7 +70,7 @@ const SeatingPlanSidebar = ({
 
   // Herramientas de dibujo específicas para banquete
   const drawingTools = [
-    { id: 'pan', label: t('seating.tools.pan', { defaultValue: t('common.panoramica') }), icon: Hand },
+    { id: 'pan', label: t('seating.tools.pan', { defaultValue: 'Panorámica' }), icon: Hand },
     {
       id: 'move',
       label: t('seating.tools.moveTables', { defaultValue: 'Mover mesas' }),
@@ -78,13 +78,13 @@ const SeatingPlanSidebar = ({
     },
     {
       id: 'boundary',
-      label: t('seating.tools.boundary', { defaultValue: t('common.perimetro') }),
+      label: t('seating.tools.boundary', { defaultValue: 'Perímetro' }),
       icon: Square,
     },
     { id: 'door', label: t('seating.tools.doors', { defaultValue: 'Puertas' }), icon: DoorOpen },
     {
       id: 'obstacle',
-      label: t('seating.tools.obstacles', { defaultValue: t('common.obstaculos') }),
+      label: t('seating.tools.obstacles', { defaultValue: 'Obstáculos' }),
       icon: Hexagon,
     },
     { id: 'aisle', label: t('seating.tools.aisles', { defaultValue: 'Pasillos' }), icon: Minus },
@@ -339,12 +339,12 @@ const SeatingPlanSidebar = ({
                   return (
                     <>
                       {badge(
-                        t('seating.sidebar.conflictPerimeter', { defaultValue: t('common.perimetro') }),
+                        t('seating.sidebar.conflictPerimeter', { defaultValue: 'Perímetro' }),
                         'perimeter',
                         '#ef4444'
                       )}
                       {badge(
-                        t('seating.sidebar.conflictObstacle', { defaultValue: t('common.obstaculos') }),
+                        t('seating.sidebar.conflictObstacle', { defaultValue: 'Obstáculos' }),
                         'obstacle',
                         '#dc2626'
                       )}
@@ -621,14 +621,14 @@ const SeatingPlanSidebar = ({
                   </div>
                   <div className="text-xs text-gray-500">
                     {t('seating.sidebar.assignedCount', {
-                      defaultValue: t('common.asignados_incluye_acompanantes_count'),
+                      defaultValue: 'Asignados (incluye acompañantes): {count}',
                       count: assignedGuestsWithCompanions,
                     })}
                   </div>
                   <div className="text-xs text-gray-500">
                     {selectedTable.autoCapacity !== false
                       ? t('seating.sidebar.autoCapacity', {
-                          defaultValue: t('common.capacidad_calculada_automaticamente_sugerido_count'),
+                          defaultValue: 'Capacidad calculada automáticamente (sugerido {count})',
                           count: recommendedCapacity || 0,
                         })
                       : t('seating.sidebar.manualCapacity', {
@@ -730,7 +730,7 @@ const SeatingPlanSidebar = ({
                 </button>
                 <button
                   onClick={() => {
-                    if (window.confirm(t('common.eliminar_esta_mesa'))) deleteTable?.(selectedTable.id);
+                    if (window.confirm('¿Eliminar esta mesa?')) deleteTable?.(selectedTable.id);
                   }}
                   className="px-3 py-2 border border-red-300 text-red-600 rounded text-sm hover:bg-red-50 transition-colors flex items-center justify-center gap-1"
                   title={t('seating.sidebar.deleteTable')}

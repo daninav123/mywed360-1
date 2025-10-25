@@ -1,11 +1,8 @@
 import React from 'react';
 import { useWedding } from '../../context/WeddingContext';
 import { formatDate } from '../../utils/formatUtils';
-import { Calendar } from './CalendarComponents.jsx';
-import { useTranslations } from '../../hooks/useTranslations';
 
 export default function EventsCalendar({
-
   currentView,
   setCurrentView,
   calendarDate,
@@ -23,8 +20,6 @@ export default function EventsCalendar({
   eventStyleGetter,
   EventComponent,
 }) {
-  const { t } = useTranslations();
-
   return (
     <div className="flex-1 flex flex-col h-full bg-[var(--color-surface)] rounded-xl shadow-md p-6 overflow-x-auto border border-[color:var(--color-text)]/10">
       <h2 className="text-xl font-semibold mb-4">Calendario de Eventos</h2>
@@ -101,7 +96,7 @@ export default function EventsCalendar({
                 {safeEvents && safeEvents.length > 0 ? (
                   sortedEvents.map((event) => {
                     const eventId = event.id || '';
-                    const eventTitle = event.title || event.name || {t('common.evento_sin_titulo')};
+                    const eventTitle = event.title || event.name || 'Evento sin título';
                     const eventStart = event.start instanceof Date ? event.start : new Date();
                     const formattedDate = formatDate(eventStart, 'custom');
                     return (
@@ -190,7 +185,7 @@ export default function EventsCalendar({
                 today: 'Hoy',
                 month: 'Mes',
                 week: 'Semana',
-                day: t('common.dia'),
+                day: 'Día',
               }}
             />
           </div>

@@ -1,4 +1,4 @@
-﻿import {
+import {
   Users,
   Split,
   Eye,
@@ -18,22 +18,18 @@ import useGroupBudgets from '../../hooks/useGroupBudgets';
 import useSupplierGroups from '../../hooks/useSupplierGroups';
 import Button from '../ui/Button';
 import Card from '../ui/Card';
-import { useTranslations } from '../../hooks/useTranslations';
 
 /**
  * Tarjeta que representa un grupo manual de proveedores unificados
  * @param {{ group: { id:string, name:string, memberIds:string[], notes?:string }, providers: any[], onDissolve:Function }} props
  */
 export default function ProveedorGroupCard({
-
   group,
   providers = [],
   onDissolve,
   onViewMember,
   highlighted = false,
 }) {
-  const { t } = useTranslations();
-
   const [openSug, setOpenSug] = useState(false);
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(group.name || '');
@@ -167,7 +163,6 @@ export default function ProveedorGroupCard({
                       await removeMember(group.id, m.id);
                     }
                   }}
-                  aria-label="Quitar proveedor del grupo"
                 >
                   <X size={14} />
                 </Button>
@@ -181,7 +176,7 @@ export default function ProveedorGroupCard({
           ? 'Leyendo presupuestos…'
           : totalRange
             ? `Rango de presupuestos detectado: ${totalRange}`
-            : t('common.sin_presupuestos_detectados_aun')}
+            : 'Sin presupuestos detectados aún'}
         {conflicts.overlap && (
           <div className="mt-2 text-sm text-red-700 flex items-center gap-1">
             <AlertCircle size={14} /> Posibles solapes en fechas (

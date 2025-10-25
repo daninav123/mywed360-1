@@ -5,7 +5,7 @@ import { Camera, Sparkles, ChevronRight, UploadCloud, X } from 'lucide-react';
 
 import UploadWidget from '@/components/momentos/UploadWidget';
 import { db } from '../firebaseConfig';
-import { formatDate as formatDateUtil } from '../utils/formatUtils';
+import { formatDate } from '../utils/formatUtils';
 import {
   getAlbumScenes,
   getGalleryUploadState,
@@ -25,7 +25,7 @@ const formatDate = (value) => {
       ? value.toDate()
       : new Date(value);
   if (Number.isNaN(date.getTime())) return '';
-  return formatDateUtil(date, 'medium');
+  return formatDate(date, 'medium');
 };
 
 export default function MomentosPublic() {

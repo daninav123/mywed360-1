@@ -6,12 +6,9 @@ import useSupplierGroups from '../../hooks/useSupplierGroups';
 import Modal from '../Modal';
 import Button from '../ui/Button';
 import Alert from '../ui/Alert';
-import { useTranslations } from '../../hooks/useTranslations';
 
 
 function toCSV(rows, includeEstPrice = false) {
-  const { t } = useTranslations();
-
   const esc = (s) => '"' + String(s ?? '').replace(/"/g, '""') + '"';
   const headers = [
     'Nombre',
@@ -19,11 +16,11 @@ function toCSV(rows, includeEstPrice = false) {
     'Estado',
     'Precio',
     'Rating',
-    {t('common.ubicacion')},
+    'Ubicación',
     'Email',
-    {t('common.telefono')},
+    'Teléfono',
     ...(includeEstPrice ? ['Precio (num)'] : []),
-    {t('common.puntuacion')},
+    'Puntuación',
   ];
   const csv = [headers.join(',')]
     .concat(
@@ -204,7 +201,7 @@ export default function CompareSelectedModal({
               <label className="block text-xs text-gray-500 mb-1">Nombre de grupo</label>
               <input
                 className="w-full border rounded p-2"
-                placeholder={t('common.finalistas_fotografia')}
+                placeholder="Ej. Finalistas Fotografía"
                 value={groupName}
                 onChange={(e) => setGroupName(e.target.value)}
               />
@@ -225,7 +222,7 @@ export default function CompareSelectedModal({
             <div className="md:text-right">
               <div className="text-xs text-gray-500 mb-1">Incluirá {filteredRows.length} de {rows.length}</div>
               <Button onClick={createGroupFromSelection} disabled={!canCreate}>
-                {creating ? 'Creando…' : t('common.crear_grupo_con_seleccion')}
+                {creating ? 'Creando…' : 'Crear grupo con selección'}
               </Button>
             </div>
           </div>
@@ -256,7 +253,7 @@ export default function CompareSelectedModal({
               type="button"
               onClick={() => setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))}
               className="px-2 py-1 border rounded border-gray-300 text-gray-700"
-              title={t('common.cambiar_direccion')}
+              title="Cambiar dirección"
             >
               {sortDir === 'asc' ? 'Asc' : 'Desc'}
             </button>

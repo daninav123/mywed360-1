@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import PageWrapper from '../components/PageWrapper';
 import NotificationSettings from '../components/settings/NotificationSettings';
 import Button from '../components/ui/Button';
-import { useTranslations } from '../../hooks/useTranslations';
 import {
   getNotifications,
   markNotificationRead,
@@ -17,8 +16,6 @@ import {
 } from '../services/PushService';
 
 const typeColors = {
-  const { t } = useTranslations();
-
   success:
     'bg-[var(--color-success)]/10 border-[color:var(--color-success)]/40 text-[color:var(--color-success)]',
   error:
@@ -81,7 +78,7 @@ export default function Notificaciones() {
             onClick={async () => {
               try {
                 await pushSubscribe();
-                alert(t('common.suscripcion_push_activada'));
+                alert('Suscripción push activada');
               } catch (e) {
                 alert('No se pudo activar push');
               }
@@ -94,7 +91,7 @@ export default function Notificaciones() {
             onClick={async () => {
               try {
                 await pushUnsubscribe();
-                alert(t('common.suscripcion_push_desactivada'));
+                alert('Suscripción push desactivada');
               } catch (e) {
                 alert('No se pudo desactivar');
               }

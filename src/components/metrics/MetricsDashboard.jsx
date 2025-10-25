@@ -29,16 +29,13 @@ import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { performanceMonitor } from '../../services/PerformanceMonitor';
 import Button from '../ui/Button';
 import Card from '../ui/Card';
-import { useTranslations } from '../../hooks/useTranslations';
 
 // Colores para los gráficos
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d', '#ffc658'];
 
 /**
  * Componente para visualizar métricas del sistema de emails y plantillas
- * @returns {
-  const { t } = useTranslations();
-React.ReactElement} Dashboard de métricas
+ * @returns {React.ReactElement} Dashboard de métricas
  */
 const MetricsDashboard = () => {
   // Estados para almacenar las métricas
@@ -123,7 +120,7 @@ const MetricsDashboard = () => {
       setMetrics(combinedMetrics);
     } catch (err) {
       console.error('Error al cargar métricas:', err);
-      setError(t('common.pudieron_cargar_las_metricas'));
+      setError('No se pudieron cargar las métricas');
     } finally {
       setLoading(false);
     }
@@ -142,7 +139,7 @@ const MetricsDashboard = () => {
     metrics.events
       .filter((event) => event.name === 'template_usage')
       .forEach((event) => {
-        const category = event.data.category || {t('common.sin_categoria')};
+        const category = event.data.category || 'Sin categoría';
         if (!categoryCounters[category]) {
           categoryCounters[category] = 0;
         }
@@ -201,7 +198,7 @@ const MetricsDashboard = () => {
     let csvContent = 'data:text/csv;charset=utf-8,';
 
     // Encabezados
-    csvContent += {t('common.tipometricavalortimestampn')};
+    csvContent += 'Tipo,Métrica,Valor,Timestamp\n';
 
     // Contadores
     Object.entries(metrics.counters).forEach(([key, value]) => {
@@ -385,8 +382,8 @@ const MetricsDashboard = () => {
                 <Tooltip />
                 <Legend />
                 <Line type="monotone" dataKey="avg" name="Promedio" stroke="#8884d8" />
-                <Line type="monotone" dataKey="min" name={t('common.minimo')} stroke="#82ca9d" />
-                <Line type="monotone" dataKey="max" name={t('common.maximo')} stroke="#ff7300" />
+                <Line type="monotone" dataKey="min" name="Mínimo" stroke="#82ca9d" />
+                <Line type="monotone" dataKey="max" name="Máximo" stroke="#ff7300" />
               </LineChart>
             </ResponsiveContainer>
           </div>

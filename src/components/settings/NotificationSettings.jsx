@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useTranslations } from '../../hooks/useTranslations';
 
 import {
   getNotificationPrefs,
@@ -10,9 +9,7 @@ import {
   showNotification,
 } from '../../services/notificationService';
 
-function Toggle({
-  const { t } = useTranslations();
- label, checked, onChange, disabled = false }) {
+function Toggle({ label, checked, onChange, disabled = false }) {
   return (
     <label className="flex items-center gap-2 select-none">
       <input
@@ -61,7 +58,7 @@ const rows = [
   {
     group: 'finance',
     entries: [
-      { key: 'invoiceDue', label: t('common.factura_proxima_vencer') },
+      { key: 'invoiceDue', label: 'Factura próxima a vencer' },
       { key: 'paymentReceived', label: 'Pago recibido' },
     ],
   },
@@ -92,7 +89,7 @@ const NotificationSettings = () => {
     const evt = { type: 'ai', subtype: 'task_suggested', priority: 'high', channel: 'toast' };
     if (!shouldNotify(evt, prefs)) return;
     showNotification({
-      title: t('common.prueba_notificacion'),
+      title: 'Prueba de notificación',
       message: 'Este es un aviso de prueba respetando tus ajustes.',
       type: 'info',
       duration: 4000,
@@ -189,7 +186,7 @@ const NotificationSettings = () => {
             />
           </label>
           <Toggle
-            label={t('common.permitir_criticas')}
+            label="Permitir críticas"
             checked={!!(prefs.quietHours && prefs.quietHours.allowCritical)}
             onChange={(v) =>
               updatePrefs({

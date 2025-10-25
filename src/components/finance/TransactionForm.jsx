@@ -106,7 +106,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
 
     if (!formData.amount || Number.isNaN(amountValue) || amountValue <= 0) {
       newErrors.amount = t('finance.form.errors.amountPositive', {
-        defaultValue: t('common.monto_debe_ser_numero_positivo'),
+        defaultValue: 'El monto debe ser un Número positivo',
       });
     }
 
@@ -124,7 +124,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
 
     if (formData.paidAmount !== '' && (Number.isNaN(paidValue) || paidValue < 0)) {
       newErrors.paidAmount = t('finance.form.errors.paidAmountPositive', {
-        defaultValue: t('common.monto_pagado_debe_ser_numero'),
+        defaultValue: 'El monto pagado debe ser un Número positivo',
       });
     } else if (!Number.isNaN(amountValue) && paidValue > amountValue) {
       newErrors.paidAmount = t('finance.form.errors.paidAmountExceeds', {
@@ -256,7 +256,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
 
   // Obtener categorias segn el tipo
   const availableCategories = categories[formData.type] || [];
-  const categoryLabel = t('finance.form.category', { defaultValue: t('common.categoria') });
+  const categoryLabel = t('finance.form.category', { defaultValue: 'Categoría' });
   const paymentMethods = [
     'Transferencia',
     'Tarjeta',
@@ -660,7 +660,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
           value={formData.description}
           onChange={(e) => handleChange('description', e.target.value)}
           placeholder={t('finance.form.descriptionPlaceholder', {
-            defaultValue: t('common.detalles_adicionales_sobre_transaccion'),
+            defaultValue: 'Detalles adicionales sobre la transacción...',
           })}
           rows={3}
           className="w-full px-3 py-2 border border-[color:var(--color-text)]/20 rounded-md focus:ring-2 focus:ring-[color:var(--color-primary)] focus:border-transparent bg-[var(--color-surface)] text-[color:var(--color-text)]"

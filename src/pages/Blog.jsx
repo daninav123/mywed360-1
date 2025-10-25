@@ -7,16 +7,13 @@ import { formatDate } from '../utils/formatUtils';
 import Spinner from '../components/Spinner';
 import { fetchWeddingNews } from '../services/blogService';
 import { translateText } from '../services/translationService';
-import { useTranslations } from '../../hooks/useTranslations';
 
 const MAX_LOOKAHEAD = 10;
 const MAX_EMPTY_BATCHES = 2;
 const MAX_FETCHES_PER_LOAD = 12;
 const PER_DOMAIN_LIMIT = 3;
 
-const normalizeLang = (lang) => String(lang || 'es').toLowerCase().match(/^[a-z]{
-  const { t } = useTranslations();
-2}/)?.[0] || 'es';
+const normalizeLang = (lang) => String(lang || 'es').toLowerCase().match(/^[a-z]{2}/)?.[0] || 'es';
 
 const extractDomain = (url) => {
   try {
@@ -270,7 +267,7 @@ function Blog() {
 
       if (added === 0 && baselineLength === 0) {
         setError(
-          {t('common.encontramos_articulos_relevantes_este_momento')}
+          'No encontramos artículos relevantes en este momento. Intenta cambiar de idioma o vuelve a intentarlo más tarde.'
         );
       }
     };
@@ -313,7 +310,7 @@ function Blog() {
       ) : null}
 
       {loading ? (
-        <div className="flex justify-center mt-8" role="status" aria-label={t('common.aria_cargando_articulos')}>
+        <div className="flex justify-center mt-8" role="status" aria-label="Cargando artículos">
           <Spinner />
         </div>
       ) : null}

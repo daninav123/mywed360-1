@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
 import format from 'date-fns/format';
 import parse from 'date-fns/parse';
@@ -11,12 +11,9 @@ import '../../styles/calendarOverrides.css';
 
 // Importar locale de español
 import es from 'date-fns/locale/es';
-import { useTranslations } from '../../hooks/useTranslations';
 
 // Configuración del localizador para el calendario
 const locales = {
-  const { t } = useTranslations();
-
   es: es,
 };
 
@@ -33,10 +30,10 @@ export const categories = {
   LUGAR: { name: 'Lugar', color: '#ef4444', bgColor: '#fee2e2', borderColor: '#fca5a5' },
   INVITADOS: { name: 'Invitados', color: '#f97316', bgColor: '#ffedd5', borderColor: '#fdba74' },
   COMIDA: { name: 'Catering', color: '#eab308', bgColor: '#fef9c3', borderColor: '#fde047' },
-  DECORACION: { name: t('common.decoracion'), color: '#22c55e', bgColor: '#dcfce7', borderColor: '#86efac' },
-  PAPELERIA: { name: t('common.papeleria'), color: '#06b6d4', bgColor: '#cffafe', borderColor: '#67e8f9' },
-  MUSICA: { name: t('common.musica'), color: '#6366f1', bgColor: '#e0e7ff', borderColor: '#a5b4fc' },
-  FOTOGRAFO: { name: t('common.fotografia'), color: '#8b5cf6', bgColor: '#ede9fe', borderColor: '#c4b5fd' },
+  DECORACION: { name: 'Decoración', color: '#22c55e', bgColor: '#dcfce7', borderColor: '#86efac' },
+  PAPELERIA: { name: 'Papelería', color: '#06b6d4', bgColor: '#cffafe', borderColor: '#67e8f9' },
+  MUSICA: { name: 'Música', color: '#6366f1', bgColor: '#e0e7ff', borderColor: '#a5b4fc' },
+  FOTOGRAFO: { name: 'Fotografía', color: '#8b5cf6', bgColor: '#ede9fe', borderColor: '#c4b5fd' },
   VESTUARIO: { name: 'Vestuario', color: '#d946ef', bgColor: '#fae8ff', borderColor: '#e879f9' },
   OTROS: { name: 'Otros', color: '#6b7280', bgColor: '#f3f4f6', borderColor: '#d1d5db' },
 };
@@ -76,11 +73,8 @@ export const Event = ({ event }) => {
           textShadow: '0 1px 1px rgba(0,0,0,0.2)', // Mejora legibilidad del texto blanco
         }}
       >
-        {event.title || event.name || {t('common.sin_titulo')}}
+        {event.title || event.name || 'Sin título'}
       </div>
     </div>
   );
 };
-
-// Exportar el componente Calendar para que otros módulos puedan usarlo
-export { Calendar };

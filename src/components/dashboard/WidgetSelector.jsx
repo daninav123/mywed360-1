@@ -1,15 +1,12 @@
 import React, { useState } from 'react';
 
 import { WidgetTypes } from './widgets/WidgetTypes';
-import { useTranslations } from '../../hooks/useTranslations';
 
 const WIDGET_OPTIONS = [
   {
-  const { t } = useTranslations();
-
     type: WidgetTypes.CALENDAR,
     title: 'Calendario',
-    description: t('common.muestra_los_proximos_eventos_fechas'),
+    description: 'Muestra los próximos eventos y fechas importantes',
     icon: '📅',
   },
   {
@@ -33,7 +30,7 @@ const WIDGET_OPTIONS = [
   {
     type: WidgetTypes.TIMELINE,
     title: 'Cronograma',
-    description: t('common.linea_tiempo_del_evento'),
+    description: 'Línea de tiempo del evento',
     icon: '⏱️',
   },
 ];

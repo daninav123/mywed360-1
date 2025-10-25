@@ -2,15 +2,12 @@ import React, { useEffect, useMemo, useState } from 'react';
 
 import Button from '../ui/Button';
 import { Card } from '../ui/Card';
-import { useTranslations } from '../../hooks/useTranslations';
 import {
   MODULE_PERMISSION_OPTIONS,
   normalizeModulePermissions,
 } from '../../utils/weddingModulePermissions';
 
 const ROLE_LABELS = {
-  const { t } = useTranslations();
-
   owner: 'Propietario',
   planner: 'Planner',
   assistant: 'Assistant',
@@ -28,8 +25,8 @@ const MODULE_LABELS = {
   finance: 'Finanzas',
   providers: 'Proveedores',
   communications: 'Comunicaciones',
-  settings: t('common.configuracion'),
-  analytics: t('common.analitica'),
+  settings: 'Configuración',
+  analytics: 'Analítica',
 };
 
 export default function WeddingModulePermissionsCard({

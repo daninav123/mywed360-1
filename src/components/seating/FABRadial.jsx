@@ -6,7 +6,6 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useTranslations } from '../../hooks/useTranslations';
 import {
   Plus,
   Save,
@@ -21,10 +20,8 @@ import {
 } from 'lucide-react';
 
 const BUTTON_ACTIONS = [
-  {
-  const { t } = useTranslations();
- id: 'add-table', icon: Grid, label: t('common.anadir_mesa'), angle: 0, color: 'bg-blue-500' },
-  { id: 'add-guest', icon: Users, label: t('common.anadir_invitado'), angle: 45, color: 'bg-green-500' },
+  { id: 'add-table', icon: Grid, label: 'Añadir Mesa', angle: 0, color: 'bg-blue-500' },
+  { id: 'add-guest', icon: Users, label: 'Añadir Invitado', angle: 45, color: 'bg-green-500' },
   { id: 'save', icon: Save, label: 'Guardar', angle: 90, color: 'bg-purple-500' },
   { id: 'export', icon: Download, label: 'Exportar', angle: 135, color: 'bg-orange-500' },
   { id: 'undo', icon: Undo, label: 'Deshacer', angle: 180, color: 'bg-gray-500' },

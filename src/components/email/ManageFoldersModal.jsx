@@ -1,4 +1,3 @@
-import { X } from 'lucide-react';
 import React, { useState } from 'react';
 
 import Button from '../Button';
@@ -30,19 +29,12 @@ const ManageFoldersModal = ({ isOpen, onClose, folders = [], onDeleteFolder }) =
     }
   };
 
-  const handleOverlayClick = (event) => {
-    if (event.target === event.currentTarget) {
-      onClose?.();
-    }
-  };
-
   return (
     <div
       className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50 p-4"
       role="dialog"
       aria-modal="true"
       data-testid="folders-manager-modal"
-      onMouseDown={handleOverlayClick}
     >
       <div className="bg-white rounded-lg shadow-lg w-full max-w-md">
         {/* Cabecera */}
@@ -54,7 +46,7 @@ const ManageFoldersModal = ({ isOpen, onClose, folders = [], onDeleteFolder }) =
             data-testid="close-modal-button"
             onClick={onClose}
           >
-            <X size={18} aria-hidden="true" />
+            ✕
           </button>
         </div>
 

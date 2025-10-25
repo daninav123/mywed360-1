@@ -1,12 +1,7 @@
 import { X, Search } from 'lucide-react';
 import React, { useState } from 'react';
-import { useTranslations } from '../../hooks/useTranslations';
 
-export default function ProviderSearchDrawer({
-
- open, onClose, onBuscar, onGuardar, resultado, cargando }) {
-  const { t } = useTranslations();
-
+export default function ProviderSearchDrawer({ open, onClose, onBuscar, onGuardar, resultado, cargando }) {
   const [query, setQuery] = useState('');
 
   if (!open) return null;
@@ -34,7 +29,7 @@ export default function ProviderSearchDrawer({
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder={t('common.fotografia_madrid_2000')}
+              placeholder="Ej: Fotografía Madrid 2000€"
               className="w-full pl-8 pr-3 py-2 border rounded text-sm"
             />
           </div>

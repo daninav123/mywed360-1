@@ -5,13 +5,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Plus } from 'lucide-react';
-import { useTranslations } from '../../hooks/useTranslations';
 
-export default function QuickAddTableButton({
-
- onAdd, position = 'bottom-right' }) {
-  const { t } = useTranslations();
-
+export default function QuickAddTableButton({ onAdd, position = 'bottom-right' }) {
   const positions = {
     'bottom-right': 'bottom-20 right-6',
     'bottom-left': 'bottom-20 left-20',
@@ -33,7 +28,7 @@ export default function QuickAddTableButton({
         flex items-center justify-center
         transition-all duration-200
       `}
-      title={t('common.anadir_mesa')}
+      title="Añadir mesa (A)"
     >
       <Plus size={28} strokeWidth={2.5} />
       

@@ -38,7 +38,7 @@ const ProveedorFiltro = ({
     <div className="mb-6">
       {/* Pestañas de filtro */}
       <div className="border-b border-gray-200 mb-4">
-        <nav className="-mb-px flex space-x-6" aria-label={t('common.aria_pestanas')}>
+        <nav className="-mb-px flex space-x-6" aria-label="Pestañas">
           {filtros.map((filtro) => (
             <button
               key={filtro.id}

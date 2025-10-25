@@ -3,11 +3,8 @@ import { useParams } from 'react-router-dom';
 import { TrendingUp, Users, CreditCard, Calendar, ExternalLink, DollarSign, Link2, Copy } from 'lucide-react';
 import { db } from '../firebaseConfig';
 import { formatDate as formatDateUtil } from '../utils/formatUtils';
-import { useTranslations } from '../../hooks/useTranslations';
 
 const PartnerStats = () => {
-  const { t } = useTranslations();
-
   const { token } = useParams();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -28,11 +25,11 @@ const PartnerStats = () => {
 
         if (!response.ok) {
           if (response.status === 404) {
-            setError(t('common.codigo_descuento_encontrado_token_invalido'));
+            setError('Código de descuento no encontrado o token inválido');
           } else if (response.status === 403) {
-            setError(t('common.este_codigo_descuento_esta_desactivado'));
+            setError('Este código de descuento está desactivado');
           } else {
-            setError(t('common.error_cargar_las_estadisticas'));
+            setError('Error al cargar las estadísticas');
           }
           setLoading(false);
           return;
@@ -43,7 +40,7 @@ const PartnerStats = () => {
         setError('');
       } catch (err) {
         console.error('[PartnerStats] Error:', err);
-        setError(t('common.error_conexion_por_favor_intenta'));
+        setError('Error de conexión. Por favor, intenta más tarde.');
       } finally {
         setLoading(false);
       }

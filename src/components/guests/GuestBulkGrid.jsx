@@ -8,8 +8,8 @@ import { Input } from '../ui';
 const DEFAULT_COLUMNS = [
   { key: 'name', label: 'Nombre *', required: true },
   { key: 'email', label: 'Email *', required: true },
-  { key: 'phone', label: t('common.telefono') },
-  { key: 'companions', label: t('common.acompanantes'), type: 'number', min: 0, max: 10 },
+  { key: 'phone', label: 'Teléfono' },
+  { key: 'companions', label: 'Acompañantes', type: 'number', min: 0, max: 10 },
   { key: 'table', label: 'Mesa' },
 ];
 

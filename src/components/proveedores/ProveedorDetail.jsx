@@ -23,7 +23,6 @@ import Toast from '../Toast';
 import Button from '../ui/Button';
 import Card from '../ui/Card';
 import { fetchProviderStatus } from '../../services/providerStatusService';
-import { useTranslations } from '../../hooks/useTranslations';
 
 /**
  * @typedef {import('../../hooks/useProveedores').Provider} Provider
@@ -31,9 +30,7 @@ import { useTranslations } from '../../hooks/useTranslations';
 
 const TABS = ['info', 'communications', 'contracts', 'insights'];
 
-const ProveedorDetail = ({
-  const { t } = useTranslations();
- provider, onClose, onEdit, activeTab, setActiveTab, onOpenGroups }) => {
+const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, onOpenGroups }) => {
   const [rating, setRating] = useState(provider.ratingCount > 0 ? provider.rating / provider.ratingCount : 0);
   const [ratingDirty, setRatingDirty] = useState(false);
   const [savingRating, setSavingRating] = useState(false);
@@ -188,7 +185,7 @@ const ProveedorDetail = ({
     const contractsSigned = providerStatus?.contracts?.byStatus?.signed ?? 0;
     const contractsTotal = providerStatus?.contracts?.total ?? 0;
     if (contractsTotal > 0 && contractsSigned === 0) {
-      alerts.push(t('common.aun_hay_contratos_firmados_con'));
+      alerts.push('Aún no hay contratos firmados con este proveedor.');
     }
     if ((financialSummary.pending || 0) > 0) {
       alerts.push('Existen pagos pendientes por registrar o confirmar.');
@@ -225,7 +222,7 @@ const ProveedorDetail = ({
     let amount = 100;
     try {
       if (typeof window !== 'undefined') {
-        const input = window.prompt(t('common.importe_senal_eur'), '100');
+        const input = window.prompt('Importe de la señal (EUR):', '100');
         if (input != null && input !== '') amount = Math.max(1, parseFloat(input));
       }
     } catch {}
@@ -1062,9 +1059,9 @@ const ProveedorDetail = ({
           setMergeOpen(false);
           if (!result) return;
           if (result.type === 'merge') {
-            setToast({ type: 'success', message: t('common.lineas_combinadas_correctamente') });
+            setToast({ type: 'success', message: 'Líneas combinadas correctamente.' });
           } else if (result.type === 'split') {
-            setToast({ type: 'success', message: t('common.creo_proveedor_nuevo_con_las') });
+            setToast({ type: 'success', message: 'Se creó un proveedor nuevo con las líneas seleccionadas.' });
           }
         }}
       />

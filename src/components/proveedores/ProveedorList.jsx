@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { FixedSizeList as List } from 'react-window';
 
 import ProveedorCard from './ProveedorCard';
-import { useTranslations } from '../../hooks/useTranslations';
 
 /**
  * @typedef {import('../../hooks/useProveedores').Provider} Provider
@@ -14,8 +13,6 @@ import { useTranslations } from '../../hooks/useTranslations';
  * Activa virtualizacion cuando la lista es muy grande para mejorar rendimiento.
  */
 const ProveedorList = ({
-  const { t } = useTranslations();
-
   providers,
   handleViewDetail,
   tab,
@@ -131,7 +128,7 @@ const ProveedorList = ({
               type="text"
               value={searchTerm || ''}
               onChange={(e) => setSearchTerm?.(e.target.value)}
-              placeholder={t('common.nombre_servicio_estado_descripcion')}
+              placeholder="Nombre, servicio, estado, descripción..."
               className="w-full border rounded p-2"
             />
           </div>

@@ -24,19 +24,13 @@ import { Card } from '../../components/ui';
 import { Button } from '../../components/ui';
 import Badge from '../../components/ui/Badge';
 import { MUSIC_INSPIRATION } from '../../data/musicInspiration';
-import useSpecialMoments, {
-  RESPONSABLES_LIMIT,
-  SUPPLIERS_LIMIT,
-} from '../../hooks/useSpecialMoments';
+import useSpecialMoments from '../../hooks/useSpecialMoments';
 import useGuests from '../../hooks/useGuests';
 import { post as apiPost } from '../../services/apiClient';
 import * as Playback from '../../services/PlaybackService';
-import { useTranslations } from '../../hooks/useTranslations';
 
 const MOMENT_TYPE_OPTIONS = [
-  {
-  const { t } = useTranslations();
- value: 'entrada', label: 'Entrada' },
+  { value: 'entrada', label: 'Entrada' },
   { value: 'lectura', label: 'Lectura' },
   { value: 'votos', label: 'Votos' },
   { value: 'anillos', label: 'Intercambio de anillos' },
@@ -68,6 +62,9 @@ const STATE_BADGE_TYPE = {
   confirmado: 'success',
   ensayo: 'info',
 };
+
+const RESPONSABLES_LIMIT = 12;
+const SUPPLIERS_LIMIT = 12;
 
 // Tabs pasan a ser dinmicas desde el hook (blocks)
 
@@ -319,7 +316,7 @@ const MomentosEspeciales = () => {
       }
     } catch (err) {
       console.error('Error buscando Canciones', err);
-      setErrorSearch(t('common.pudo_buscar_canciones_intentalo_mas'));
+      setErrorSearch('No se pudo buscar Canciones. Inténtalo más tarde.');
       setResults([]);
     } finally {
       setLoadingSearch(false);
@@ -426,7 +423,7 @@ const MomentosEspeciales = () => {
       const draftRaw = supplierDrafts[moment.id] || '';
       const draft = draftRaw.trim();
       if (!draft) {
-        toast.info(t('common.escribe_proveedor_antes_anadirlo'));
+        toast.info('Escribe un proveedor antes de añadirlo.');
         return;
       }
       const current = Array.isArray(moment.suppliers) ? [...moment.suppliers] : [];
@@ -435,7 +432,7 @@ const MomentosEspeciales = () => {
         return;
       }
       if (current.some((supplier) => supplier.toLowerCase() === draft.toLowerCase())) {
-        toast.info(t('common.ese_proveedor_esta_registrado'));
+        toast.info('Ese proveedor ya está registrado.');
         return;
       }
       current.push(draft);
@@ -462,7 +459,7 @@ const MomentosEspeciales = () => {
   const computeMomentWarnings = useCallback((moment) => {
     const warnings = [];
     const timeValue = typeof moment?.time === 'string' ? moment.time.trim() : '';
-    if (!timeValue) warnings.push(t('common.anade_una_hora_estimada'));
+    if (!timeValue) warnings.push('Añade una hora estimada.');
     const responsablesList = Array.isArray(moment?.responsables)
       ? moment.responsables.filter((resp) => {
           if (!resp) return false;
@@ -479,7 +476,7 @@ const MomentosEspeciales = () => {
       warnings.push('Asigna destinatario o rol.');
     }
     if (['entrada', 'baile'].includes(moment?.type) && !(moment?.song && String(moment.song).trim())) {
-      warnings.push(t('common.anade_una_cancion'));
+      warnings.push('Añade una canción.');
     }
     return warnings;
   }, []);
@@ -505,7 +502,7 @@ const MomentosEspeciales = () => {
     (moment, mode) => {
       const targetBlockId = actionPanelSelection[moment.id];
       if (!targetBlockId) {
-        toast.info(t('common.selecciona_una_seccion_destino'));
+        toast.info('Selecciona una sección destino.');
         return;
       }
       if (mode === 'duplicate') {
@@ -520,7 +517,7 @@ const MomentosEspeciales = () => {
       }
       if (mode === 'move') {
         if (targetBlockId === activeTab) {
-          toast.info(t('common.selecciona_una_seccion_diferente_para'));
+          toast.info('Selecciona una sección diferente para mover el momento.');
           return;
         }
         if ((moments[targetBlockId]?.length || 0) >= maxMomentsPerBlock) {
@@ -529,7 +526,7 @@ const MomentosEspeciales = () => {
         }
         duplicateMoment(activeTab, moment.id, targetBlockId);
         removeMoment(activeTab, moment.id);
-        toast.success(t('common.momento_movido_nueva_seccion'));
+        toast.success('Momento movido a la nueva sección.');
         setActiveTab(targetBlockId);
         closeActionPanel();
       }
@@ -552,7 +549,7 @@ const MomentosEspeciales = () => {
         (block) => (block.id || block.key) !== activeTab
       );
       if (!otherBlocks.length) {
-        toast.info(t('common.crea_otra_seccion_para_usar'));
+        toast.info('Crea otra sección para usar esta acción.');
         return;
       }
       const fallback = actionPanelSelection[momentId] || otherBlocks[0].id || otherBlocks[0].key;
@@ -629,7 +626,7 @@ const MomentosEspeciales = () => {
                       title: e.target.value,
                     })
                   }
-                  placeholder={t('common.titulo_del_momento')}
+                  placeholder="Título del momento"
                 />
                 <Badge type={stateBadgeType} className="uppercase tracking-wide">
                   {moment.state ? moment.state : 'sin estado'}
@@ -681,7 +678,7 @@ const MomentosEspeciales = () => {
                         location: e.target.value,
                       })
                     }
-                    placeholder={t('common.capilla_jardin_salon')}
+                    placeholder="Capilla, jardín, salón..."
                   />
                 </div>
                 <div>
@@ -734,7 +731,7 @@ const MomentosEspeciales = () => {
                         song: e.target.value,
                       })
                     }
-                    placeholder={t('common.nombre_cancion')}
+                    placeholder="Nombre de la canción"
                   />
                   {(() => {
                     const embed = getSpotifyEmbedUrl(moment.song);
@@ -801,21 +798,21 @@ const MomentosEspeciales = () => {
               <button
                 onClick={() => handleDuplicateSameBlock(moment)}
                 className="text-gray-400 hover:text-blue-500 p-1"
-                title={t('common.duplicar_esta_seccion')}
+                title="Duplicar en esta sección"
               >
                 <Edit2 size={16} />
               </button>
               <button
                 onClick={() => openActionPanel(moment.id, 'duplicate')}
                 className="text-gray-400 hover:text-blue-500 p-1 text-[11px]"
-                title={t('common.duplicar_otra_seccion')}
+                title="Duplicar en otra sección"
               >
                 Dup →
               </button>
               <button
                 onClick={() => openActionPanel(moment.id, 'move')}
                 className="text-gray-400 hover:text-blue-600 p-1 text-[11px]"
-                title={t('common.mover_otra_seccion')}
+                title="Mover a otra sección"
               >
                 Mov →
               </button>
@@ -1032,7 +1029,7 @@ const MomentosEspeciales = () => {
                           <input
                             type="text"
                             className="border rounded px-2 py-1 text-sm"
-                            placeholder={t('common.rol_funcion')}
+                            placeholder="Rol / función"
                             value={responsable.role || ''}
                             onChange={(e) =>
                               handleResponsibleChange(activeTab, moment, responsableIdx, {
@@ -1092,7 +1089,7 @@ const MomentosEspeciales = () => {
                         requirements: e.target.value,
                       })
                     }
-                    placeholder={t('common.sonido_iluminacion_elementos_especiales')}
+                    placeholder="Sonido, iluminación, elementos especiales..."
                   />
                 </div>
                 <div>
@@ -1112,9 +1109,8 @@ const MomentosEspeciales = () => {
                             type="button"
                             className="text-gray-400 hover:text-red-500"
                             onClick={() => handleRemoveSupplier(activeTab, moment, supplierIdx)}
-                            aria-label="Quitar proveedor"
                           >
-                            <X size={12} aria-hidden="true" />
+                            <X size={12} />
                           </button>
                         </span>
                       ))}
@@ -1411,7 +1407,6 @@ const MomentosEspeciales = () => {
                       }}
                       className="p-1 text-gray-700 hover:text-blue-600"
                       title={playerState.paused ? 'Reproducir' : 'Pausar'}
-                      aria-label={playerState.paused ? 'Reproducir audio' : 'Pausar audio'}
                     >
                       {playerState.paused ? <Play size={16} /> : <Pause size={16} />}
                     </button>
@@ -1419,9 +1414,8 @@ const MomentosEspeciales = () => {
                       onClick={async () => { await Playback.stop(); setPlayerOpen(false); }}
                       className="p-1 text-gray-500 hover:text-gray-700"
                       title="Detener"
-                      aria-label={t('common.aria_detener_reproduccion')}
                     >
-                      <X size={16} aria-hidden="true" />
+                      <X size={16} />
                     </button>
                   </div>
                   {/* Barra de progreso */}
@@ -1607,9 +1601,8 @@ const MomentosEspeciales = () => {
                   <button
                     onClick={() => setAiSongs([])}
                     className="float-right text-gray-500 hover:text-gray-700"
-                    aria-label="Cerrar recomendaciones de IA"
                   >
-                    <X size={16} aria-hidden="true" />
+                    <X size={16} />
                   </button>
                 </div>
                 <ul className="divide-y">
@@ -1724,18 +1717,17 @@ const MomentosEspeciales = () => {
           {/* Resultados búsqueda */}
           {results.length > 0 && (
             <div className="border rounded-md overflow-hidden">
-                <div className="bg-gray-50 p-2 border-b text-sm font-medium">
-                  Resultados
-                  <button
-                    onClick={() => {
-                      setResults([]);
-                      stopAudio();
-                    }}
-                    className="float-right text-gray-500 hover:text-gray-700"
-                    aria-label={t('common.aria_cerrar_resultados_de_busqueda')}
-                  >
-                    <X size={16} aria-hidden="true" />
-                  </button>
+              <div className="bg-gray-50 p-2 border-b text-sm font-medium">
+                Resultados
+                <button
+                  onClick={() => {
+                    setResults([]);
+                    stopAudio();
+                  }}
+                  className="float-right text-gray-500 hover:text-gray-700"
+                >
+                  <X size={16} />
+                </button>
               </div>
               <ul className="divide-y">
                 {results.map((song) => (

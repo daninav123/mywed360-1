@@ -9,15 +9,12 @@ import {
   testCategoryPreloading,
 } from '../../utils/CacheDiagnostics';
 import { Card, Button, Progress, Tabs, TabsContent, TabsList, TabsTrigger } from '../ui';
-import { useTranslations } from '../../hooks/useTranslations';
 
 /**
  * Panel para visualizar y analizar el rendimiento de la caché de plantillas
  * Disponible solo para administradores del sistema
  */
 const CachePerformancePanel = () => {
-  const { t } = useTranslations();
-
   // Estados
   const [cacheReport, setCacheReport] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -38,8 +35,8 @@ const CachePerformancePanel = () => {
     const cacheStats = templateCache.getCacheStats();
     if (cacheStats.categoryHits) {
       const categoryList = Object.keys(cacheStats.categoryHits);
-      setCategories(categoryList.length ? categoryList : [t('common.sin_categoria')]);
-      setSelectedCategory(categoryList[0] || {t('common.sin_categoria')});
+      setCategories(categoryList.length ? categoryList : ['Sin categoría']);
+      setSelectedCategory(categoryList[0] || 'Sin categoría');
     }
   }, []);
 
@@ -104,7 +101,7 @@ const CachePerformancePanel = () => {
 
   // Limpiar toda la caché
   const handleClearCache = useCallback(() => {
-    if (window.confirm(t('common.estas_seguro_que_deseas_limpiar'))) {
+    if (window.confirm('¿Estás seguro de que deseas limpiar toda la caché?')) {
       templateCache.clearAll();
       loadCacheReport();
 

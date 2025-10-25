@@ -198,7 +198,7 @@ export default function ChatWidget() {
           out.commands.push({
             entity: 'meeting',
             action: 'update',
-            payload: { title: title || {t('common.reunion')}, start: start.toISOString(), end: end.toISOString() },
+            payload: { title: title || 'Reunión', start: start.toISOString(), end: end.toISOString() },
           });
           out.reply = `Reunión${title ? ` "${title}"` : ''} reprogramada al ${start.toLocaleDateString('es-ES')} ${start.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}.`;
           return out;
@@ -757,7 +757,7 @@ export default function ChatWidget() {
       );
 
       clearTimeout(timeoutId);
-      chatDebug(t('common.duracion_peticion'), (performance.now() - fetchStart).toFixed(0), 'ms');
+      chatDebug('Duración petición IA:', (performance.now() - fetchStart).toFixed(0), 'ms');
 
       let data;
       if (response.ok) {
@@ -775,7 +775,7 @@ export default function ChatWidget() {
           details: backendFallback?.details || backendFallback?.message || null,
         };
         console.warn(
-          {t('common.chatwidget_backend_respondio')},
+          '[ChatWidget] Backend IA respondió',
           response.status,
           response.statusText,
           data.error || '(sin detalle)'
@@ -859,8 +859,8 @@ export default function ChatWidget() {
           const endDate = endIso ? new Date(endIso) : startDate;
           return {
             id: `ai-${nextId++}`,
-            title: r.title || r.name || {t('common.reunion')},
-            name: r.title || r.name || {t('common.reunion')},
+            title: r.title || r.name || 'Reunión',
+            name: r.title || r.name || 'Reunión',
             desc: r.desc || r.description || '',
             start: startDate,
             end: endDate,

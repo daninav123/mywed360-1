@@ -87,7 +87,7 @@ const FinanceCashflowTimeline = ({ monthlySeries, predictiveInsights, stats, bud
           </h2>
           <p className="text-xs text-muted">
             {t('finance.cashflow.subtitle', {
-              defaultValue: t('common.proximos_pagos_balance_proyectado'),
+              defaultValue: 'Próximos pagos y balance proyectado',
             })}
           </p>
         </div>

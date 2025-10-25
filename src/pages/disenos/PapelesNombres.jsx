@@ -5,41 +5,38 @@ import Card from '../../components/ui/Card';
 import { useWedding } from '../../context/WeddingContext';
 import useWeddingCollection from '../../hooks/useWeddingCollection';
 import { loadData } from '../../services/SyncService';
-import { useTranslations } from '../../hooks/useTranslations';
 
 // Plantillas predefinidas para marcadores de mesa y papelitos con nombres
 const nameCardsTemplates = [
   {
-  const { t } = useTranslations();
-
     name: 'Elegante & Minimalista',
-    description: t('common.marcador_mesa_elegante_con_tipografia'),
+    description: 'Marcador de mesa elegante con tipografía refinada sobre fondo neutro',
     prompt:
-      {t('common.disena_marcador_mesa_elegante_minimalista')},
+      'Diseña un marcador de mesa elegante y minimalista para una boda. El diseño debe incluir un espacio claro para el nombre del invitado, con tipografía serif refinada. Usa colores neutros como blanco, crema, o gris pálido con detalles en dorado o plateado. El estilo debe ser sobrio, clásico y sofisticado, adecuado para una cena formal. Formato rectangular u ovalado que pueda imprimirse y doblarse.',
   },
   {
-    name: t('common.rustico_natural'),
+    name: 'Rústico & Natural',
     description: 'Marcador de mesa con elementos naturales, madera y estilo campestre',
     prompt:
-      {t('common.crea_marcador_mesa_con_estilo')},
+      'Crea un marcador de mesa con estilo rústico y natural para boda. Utiliza texturas que simulen madera, papel kraft o materiales reciclados. Incorpora elementos decorativos como hojas, flores silvestres o ramas. Tipografía con aspecto manuscrito o artesanal. El diseño debe transmitir calidez y un ambiente campestre. Formato que permita escribir el nombre del invitado de forma destacada y legible.',
   },
   {
-    name: t('common.floral_romantico'),
-    description: t('common.marcador_decorado_con_flores_motivos'),
+    name: 'Floral & Romántico',
+    description: 'Marcador decorado con flores, motivos botánicos y colores suaves',
     prompt:
-      {t('common.disena_marcador_mesa_con_motivos')},
+      'Diseña un marcador de mesa con motivos florales y románticos para una boda. Incorpora ilustraciones delicadas de flores como rosas, peonías o lavanda. Utiliza una paleta de colores suaves y pasteles. Tipografía elegante, caligráfica o manuscrita que resalte el nombre del invitado. El diseño debe ser delicado y evocador, con un aire romántico y primaveral.',
   },
   {
-    name: t('common.moderno_geometrico'),
-    description: t('common.marcador_con_lineas_limpias_formas'),
+    name: 'Moderno & Geométrico',
+    description: 'Marcador con líneas limpias, formas geométricas y estilo contemporáneo',
     prompt:
-      {t('common.crea_marcador_mesa_moderno_con')},
+      'Crea un marcador de mesa moderno con elementos geométricos para boda. Utiliza formas como hexágonos, triángulos o líneas abstractas. Tipografía sans-serif limpia y contemporánea. Paleta de colores contrastantes pero elegantes como negro, blanco, dorado o colores acentuados. El diseño debe ser actual, con estilo minimalista pero distintivo, dejando espacio prominente para el nombre del invitado.',
   },
   {
-    name: t('common.tematico_personalizado'),
-    description: t('common.marcador_tematico_que_refleja_algun'),
+    name: 'Temático & Personalizado',
+    description: 'Marcador temático que refleja algún interés, afición o motivo especial',
     prompt:
-      {t('common.disena_marcador_mesa_tematico_para')},
+      'Diseña un marcador de mesa temático para boda inspirado en viajes/destinos. Incorpora sutilmente elementos como mapas, brújulas, aviones o monumentos icónicos. El diseño debe mantener la elegancia apropiada para una boda mientras incorpora estos elementos temáticos de forma creativa. Incluye un espacio claro para el nombre del invitado con tipografía legible y atractiva que complemente el tema.',
   },
 ];
 

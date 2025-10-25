@@ -1,12 +1,9 @@
 import React, { useEffect, useState } from 'react';
 
 import { getAlertsData, resolveAdminAlert } from '../../services/adminDataService';
-import { useTranslations } from '../../hooks/useTranslations';
 
 const severityLabels = {
-  const { t } = useTranslations();
-
-  critical: t('common.critica'),
+  critical: 'Crítica',
   high: 'Alta',
   medium: 'Media',
   low: 'Baja',
@@ -191,7 +188,7 @@ const AdminAlerts = () => {
               rows={4}
               value={resolveNotes}
               onChange={(e) => setResolveNotes(e.target.value)}
-              placeholder={t('common.describe_accion_tomada')}
+              placeholder="Describe la acción tomada"
             />
             <div className="flex justify-end gap-3 text-sm">
               <button type="button" onClick={() => setShowResolve(false)} className="px-3 py-2 text-[var(--color-text-soft,#6b7280)]">

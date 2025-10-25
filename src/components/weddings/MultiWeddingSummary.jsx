@@ -3,11 +3,8 @@ import React, { useMemo } from 'react';
 import Button from '../ui/Button';
 import { Card } from '../ui/Card';
 import { Progress } from '../ui/Progress';
-import { useTranslations } from '../../hooks/useTranslations';
 
 const DATE_FORMATTER = new Intl.DateTimeFormat('es-ES', {
-  const { t } = useTranslations();
-
   day: '2-digit',
   month: 'short',
   year: 'numeric',
@@ -191,7 +188,7 @@ export default function MultiWeddingSummary({
           onClick={onSyncAll}
           disabled={syncing || filteredStats.count === 0}
         >
-          {syncing ? 'Sincronizando...' : t('common.sincronizar_seleccion_con_crm')}
+          {syncing ? 'Sincronizando...' : 'Sincronizar selección con CRM'}
         </Button>
         <Button
           size="sm"
@@ -233,7 +230,7 @@ export default function MultiWeddingSummary({
                       {item.name}
                     </p>
                     <p className="text-xs text-[color:var(--color-text)]/60">
-                      {item.location || {t('common.ubicacion_pendiente')}}
+                      {item.location || 'Ubicación pendiente'}
                     </p>
                   </div>
                   <div className="text-right">

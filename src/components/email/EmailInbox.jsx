@@ -11,7 +11,6 @@ import {
   sendMail as sendMailService,
 } from '../../services/EmailService';
 import { safeRender, ensureNotPromise, safeMap } from '../../utils/promiseSafeRenderer';
-import { useTranslations } from '../../hooks/useTranslations';
 
 // En entorno de pruebas, algunos tests referencian un mock global `EmailService` en `globalThis`.
 // Para alinearnos con esos tests, si existe ese objeto global, usamos sus métodos; en caso contrario
@@ -33,8 +32,6 @@ const isTestEnv = Boolean(
 );
 const defaultMailsTest = [
   {
-  const { t } = useTranslations();
-
     id: 'email-1',
     subject: 'Asunto importante',
     from: 'remitente@ejemplo.com',
@@ -46,7 +43,7 @@ const defaultMailsTest = [
   },
   {
     id: 'email-2',
-    subject: t('common.recordatorio_reunion'),
+    subject: 'Recordatorio reunión',
     from: 'team@empresa.com',
     to: 'usuario@maloveapp.com',
     date: '2025-07-09T08:15:00Z',
@@ -392,7 +389,7 @@ export default function EmailInbox() {
         <div className="text-center py-12">
           <div className="text-gray-400 text-4xl mb-4">📭</div>
           <p className="text-gray-600">
-            No hay emails {search ? {t('common.que_coincidan_con_busqueda')} : 'en esta carpeta'}
+            No hay emails {search ? 'que coincidan con tu búsqueda' : 'en esta carpeta'}
           </p>
         </div>
       ) : (

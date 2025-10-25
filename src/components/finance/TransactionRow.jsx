@@ -117,14 +117,14 @@ export default function TransactionRow({
       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
         <div className="flex justify-end space-x-2">
           <button
-            aria-label={t('common.aria_editar_transaccion')}
+            aria-label="Editar transacción"
             className="inline-flex items-center gap-1 rounded-md border border-[color:var(--color-text)]/20 px-2 py-1 text-[color:var(--color-text)] hover:bg-[var(--color-accent)]/10"
             onClick={() => onEdit && onEdit(tx)}
           >
             <span className="sr-only">Editar</span>
           </button>
           <button
-            aria-label={t('common.aria_borrar_transaccion')}
+            aria-label="Borrar transacción"
             className="inline-flex items-center gap-1 rounded-md border border-[color:var(--color-text)]/20 px-2 py-1 text-[color:var(--color-danger)] hover:bg-[var(--color-danger)]/10"
             onClick={() => onDelete && onDelete(tx)}
           >

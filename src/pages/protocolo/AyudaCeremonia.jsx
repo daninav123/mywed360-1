@@ -4,11 +4,8 @@ import PageWrapper from '../../components/PageWrapper';
 import { Card } from '../../components/ui';
 import { Button } from '../../components/ui';
 import useCeremonyTexts from '../../hooks/useCeremonyTexts';
-import { useTranslations } from '../../hooks/useTranslations';
 
 const INITIAL_READING = {
-  const { t } = useTranslations();
-
   id: null,
   title: '',
   content: '',
@@ -225,7 +222,7 @@ const AyudaCeremonia = () => {
                                 e.stopPropagation();
                                 if (
                                   window.confirm(
-                                    {t('common.seguro_que_quieres_eliminar_esta')},
+                                    '¿Seguro que quieres eliminar esta lectura?',
                                   )
                                 ) {
                                   removeReading(reading.id);
@@ -294,7 +291,7 @@ const AyudaCeremonia = () => {
                   value={readingForm.content}
                   onChange={(e) => handleReadingContentChange(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 font-serif"
-                  placeholder={t('common.escribe_aqui_texto_completo_lectura')}
+                  placeholder="Escribe aquí el texto completo de la lectura…"
                   required
                   disabled={!canEdit}
                 />
@@ -461,7 +458,7 @@ const AyudaCeremonia = () => {
                             className="text-red-600 hover:text-red-800"
                             onClick={() => {
                               if (
-                                window.confirm(t('common.seguro_que_quieres_eliminar_este'))
+                                window.confirm('¿Seguro que quieres eliminar este elemento?')
                               ) {
                                 removeSurprise(item.id);
                               }

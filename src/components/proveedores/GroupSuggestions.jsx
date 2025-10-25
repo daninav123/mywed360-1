@@ -2,7 +2,6 @@ import React, { useMemo } from 'react';
 
 import Modal from '../Modal';
 import Button from '../ui/Button';
-import { useTranslations } from '../../hooks/useTranslations';
 
 const STOPWORDS = new Set([
   'y',
@@ -28,9 +27,7 @@ const STOPWORDS = new Set([
   'paquete',
   'oferta',
   'promocion',
-  {
-  const { t } = useTranslations();
-t('common.promocion')},
+  'promoción',
   'servicio',
   'servicios',
   'precio',

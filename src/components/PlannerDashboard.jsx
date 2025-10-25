@@ -10,12 +10,9 @@ import usePlannerAlerts from '../hooks/usePlannerAlerts';
 import { fetchWall } from '../services/wallService';
 import { fetchWeddingNews } from '../services/blogService';
 import { performanceMonitor } from '../services/PerformanceMonitor';
-import { useTranslations } from '../../hooks/useTranslations';
 
 const INSPIRATION_CATEGORIES = [
-  {
-  const { t } = useTranslations();
- slug: 'decoracion', label: t('common.decoracion') },
+  { slug: 'decoracion', label: 'Decoración' },
   { slug: 'ceremonia', label: 'Ceremonia' },
   { slug: 'banquete', label: 'Banquete' },
   { slug: 'flores', label: 'Flores' },
@@ -293,7 +290,7 @@ export default function PlannerDashboard() {
                     key={`inspiration-skeleton-${idx}`}
                     className="w-full h-32 bg-gray-200 rounded-lg animate-pulse"
                     role="status"
-                    aria-label={t('common.aria_cargando_inspiracion')}
+                    aria-label="Cargando inspiración"
                   />
                 ))
               : inspiration.items.map((item) => (
@@ -349,7 +346,7 @@ export default function PlannerDashboard() {
                     key={`blog-skeleton-${idx}`}
                     className="bg-white rounded shadow p-3 animate-pulse"
                     role="status"
-                    aria-label={t('common.aria_cargando_publicacion')}
+                    aria-label="Cargando publicación"
                   />
                 ))
               : blogPosts.items.map((post) => (

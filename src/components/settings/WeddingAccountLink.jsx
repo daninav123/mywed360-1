@@ -9,14 +9,11 @@ import {
   acceptInvitation,
 } from '../../services/WeddingService';
 import Button from '../Button';
-import { useTranslations } from '../../hooks/useTranslations';
 
 /**
  * Componente para vincular cuentas de boda y gestionar invitaciones.
  */
 const WeddingAccountLink = () => {
-  const { t } = useTranslations();
-
   const { currentUser, userProfile, reloadUserProfile } = useAuth();
   const [weddingId, setWeddingId] = useState('');
 
@@ -73,14 +70,14 @@ const WeddingAccountLink = () => {
 
   const handleAcceptInvite = async () => {
     if (!inviteCode) {
-      setError(t('common.introduce_codigo_invitacion'));
+      setError('Introduce el código de invitación.');
       return;
     }
     try {
       setLoading(true);
       setError('');
       await acceptInvitation(inviteCode);
-      setSuccess(t('common.invitacion_aceptada_correctamente'));
+      setSuccess('Invitación aceptada correctamente.');
       setInviteCode('');
     } catch (err) {
       setError(err.message);

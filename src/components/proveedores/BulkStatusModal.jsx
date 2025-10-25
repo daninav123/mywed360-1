@@ -2,16 +2,13 @@ import React, { useState } from 'react';
 
 import Modal from '../Modal';
 import Button from '../ui/Button';
-import { useTranslations } from '../../hooks/useTranslations';
 
 const STATUSES = [
   'Nuevo',
   'Contactado',
   'RFQ enviado',
   'Oferta recibida',
-  {
-  const { t } = useTranslations();
-t('common.negociacion')},
+  'Negociación',
   'Seleccionado',
   'Confirmado',
   'Rechazado',

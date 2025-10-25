@@ -2,15 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell } from 'recharts';
 
 import { getMetricsData, getHttpMetricsSummary, getProductMetrics, getTechnicalMetrics, getEconomicMetrics } from '../../services/adminDataService';
-import { useTranslations } from '../../hooks/useTranslations';
 
 const TABS = [
-  {
-  const { t } = useTranslations();
- id: 'resumen', label: '📊 Resumen', icon: '📊' },
+  { id: 'resumen', label: '📊 Resumen', icon: '📊' },
   { id: 'producto', label: '📱 Producto', icon: '📱' },
-  { id: 'economicas', label: t('common.economicas'), icon: '💰' },
-  { id: 'tecnicas', label: t('common.tecnicas'), icon: '⚙️' },
+  { id: 'economicas', label: '💰 Económicas', icon: '💰' },
+  { id: 'tecnicas', label: '⚙️ Técnicas', icon: '⚙️' },
   { id: 'soporte', label: '🎫 Soporte', icon: '🎫' },
 ];
 

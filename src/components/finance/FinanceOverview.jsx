@@ -228,7 +228,7 @@ export default function FinanceOverview({
               </h3>
               <p className="text-sm text-[color:var(--color-text)]/60">
                 {t('finance.overview.predictiveSubtitle', {
-                  defaultValue: t('common.basado_media_movil_los_ultimos'),
+                  defaultValue: 'Basado en la media móvil de los últimos seis meses.',
                 })}
               </p>
             </div>
@@ -284,7 +284,7 @@ export default function FinanceOverview({
             <div className="p-4 rounded-lg bg-[var(--color-success)]/10 border border-[color:var(--color-success)]/30">
               <p className="text-xs text-[color:var(--color-success)]/80 uppercase tracking-wide">
                 {t('finance.overview.forecastSurplus', {
-                  defaultValue: t('common.saldo_proyectado_dia_boda'),
+                  defaultValue: 'Saldo proyectado día de la boda',
                 })}
               </p>
               <p className="text-lg font-semibold text-[color:var(--color-success)]">
@@ -308,7 +308,7 @@ export default function FinanceOverview({
               <div>
                 <h4 className="text-sm font-semibold text-[color:var(--color-text)] mb-2">
                   {t('finance.overview.categoriesAtRisk', {
-                    defaultValue: t('common.categorias_riesgo'),
+                    defaultValue: 'Categorías en riesgo',
                   })}
                 </h4>
                 <div className="flex flex-wrap gap-2">
@@ -328,7 +328,7 @@ export default function FinanceOverview({
               <div>
                 <h4 className="text-sm font-semibold text-[color:var(--color-text)] mb-2">
                   {t('finance.overview.upcomingPayments', {
-                    defaultValue: t('common.pagos_proximos'),
+                    defaultValue: 'Pagos próximos',
                   })}
                 </h4>
                 <ul className="space-y-2 text-xs text-[color:var(--color-text)]/80">

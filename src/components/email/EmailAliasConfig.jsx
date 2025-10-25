@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Mail, Check, AlertCircle, X } from 'lucide-react';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
@@ -216,9 +216,8 @@ const EmailAliasConfig = ({ user, onClose, onSuccess }) => {
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
           type="button"
-          aria-label={tAlias('header.close', 'Cerrar configuración de alias')}
         >
-          <X size={20} aria-hidden="true" />
+          <X size={20} />
         </button>
 
         {/* Header */}

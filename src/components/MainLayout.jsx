@@ -1,4 +1,4 @@
-import { User, Mail, Moon, LogOut } from 'lucide-react';
+import { User, Mail, Moon, LogOut, Plus } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
@@ -23,6 +23,8 @@ import OnboardingModeSelector from './Onboarding/OnboardingModeSelector.jsx';
 import OnboardingTutorial from './Onboarding/OnboardingTutorial';
 import RoleBadge from './RoleBadge';
 import { useOnboarding } from '../hooks/useOnboarding';
+import Button from './ui/Button';
+import { performanceMonitor } from '../services/PerformanceMonitor';
 
 export default function MainLayout() {
   const { t } = useTranslation();
@@ -54,6 +56,25 @@ export default function MainLayout() {
     location.pathname.startsWith('/crear-evento') ||
     location.pathname.startsWith('/create-wedding-ai') ||
     location.pathname.startsWith('/crear-evento-asistente');
+  const canShowCreateEventCta =
+    ownerLike &&
+    weddingsReady &&
+    Array.isArray(weddings) &&
+    weddings.length > 0 &&
+    !isCreateEventRoute;
+
+  const handleCreateEventClick = React.useCallback(() => {
+    try {
+      performanceMonitor.logEvent('event_creation_cta_click', {
+        uid: currentUser?.uid || null,
+        activeWeddingId: activeWedding || null,
+        weddings_count: Array.isArray(weddings) ? weddings.length : 0,
+        route: location.pathname,
+      });
+    } catch {}
+    navigate('/crear-evento', { state: { source: 'multi_event_cta' } });
+  }, [activeWedding, currentUser?.uid, location.pathname, navigate, weddings]);
+
   // Prefetch helpers for lazy routes (email)
   const prefetchEmail = React.useCallback(() => {
     prefetchModule('UnifiedEmail', () => import('../pages/UnifiedEmail'));
@@ -129,6 +150,16 @@ export default function MainLayout() {
   return (
     <div className="relative min-h-screen flex flex-col bg-[var(--color-bg)] text-[color:var(--color-text)] font-sans">
       <div className="absolute top-4 right-4 z-50 flex items-center space-x-4">
+        {canShowCreateEventCta && (
+          <Button
+            size="sm"
+            onClick={handleCreateEventClick}
+            startIcon={<Plus className="w-4 h-4" />}
+            className="hidden sm:inline-flex"
+          >
+            {t('navigation.createEvent', { defaultValue: 'Crear nuevo evento' })}
+          </Button>
+        )}
         {/* Watchers de notificaciones (sin icono visible aquí) */}
         <NotificationWatcher intervalMs={3000} />
         <TaskNotificationWatcher intervalMs={5 * 60 * 1000} />
@@ -150,7 +181,7 @@ export default function MainLayout() {
             }}
           >
             <img
-              src={`${import.meta.env.BASE_URL}maloveapp-logo.png`}
+              src={`${import.meta.env.BASE_URL}logo-app.png`}
               alt={brandLabel}
               className="h-11 w-11 rounded-full object-contain"
               loading="lazy"
@@ -170,6 +201,20 @@ export default function MainLayout() {
                 <User className="w-4 h-4 mr-2" />{' '}
                 {t('navigation.profile', { defaultValue: 'Perfil' })}
               </Link>
+
+              {canShowCreateEventCta && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpenMenu(false);
+                    handleCreateEventClick();
+                  }}
+                  className="flex w-full items-center px-3 py-2 text-sm hover:bg-[var(--color-accent)]/20 rounded-md transition-colors"
+                >
+                  <Plus className="w-4 h-4 mr-2" />{' '}
+                  {t('navigation.createEvent', { defaultValue: 'Crear nuevo evento' })}
+                </button>
+              )}
 
               {false && (
                 <Link

@@ -1,11 +1,8 @@
 import { useMemo } from 'react';
 
 import { validateAndNormalizeDate } from '../utils/dateUtils';
-import { useTranslations } from '../../hooks/useTranslations';
 
 export function useSafeEvents(meetingsState) {
-  const { t } = useTranslations();
-
   const safeEvents = useMemo(() => {
     const allEvents = Array.isArray(meetingsState) ? meetingsState : [];
     return allEvents
@@ -19,7 +16,7 @@ export function useSafeEvents(meetingsState) {
           ...event,
           start,
           end,
-          title: event.title || event.name || {t('common.sin_titulo')},
+          title: event.title || event.name || 'Sin título',
         };
       })
       .filter(Boolean);
@@ -37,7 +34,7 @@ export function useSafeEvents(meetingsState) {
         const start = validateAndNormalizeDate(event.start);
         const end = validateAndNormalizeDate(event.end);
         if (!start || !end) return null;
-        return { ...event, start, end, title: event.title || event.name || {t('common.sin_titulo')} };
+        return { ...event, start, end, title: event.title || event.name || 'Sin título' };
       })
       .filter(Boolean);
 

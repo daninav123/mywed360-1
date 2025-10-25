@@ -1,4 +1,3 @@
-import { useTranslations } from '../../hooks/useTranslations';
 /**
  * PaymentModal Component
  * Modal para registrar pagos
@@ -16,9 +15,7 @@ import { X, DollarSign, Save, Calendar } from 'lucide-react';
  * @param {Function} props.onClose - Callback al cerrar
  * @param {boolean} props.loading - Estado de carga
  */
-export function PaymentModal({
-  const { t } = useTranslations();
- expense, onSave, onClose, loading = false }) {
+export function PaymentModal({ expense, onSave, onClose, loading = false }) {
   const [formData, setFormData] = useState({
     amount: '',
     method: 'transfer',
@@ -69,19 +66,8 @@ export function PaymentModal({
     handleChange('amount', remainingAmount.toString());
   };
 
-  const handleOverlayClick = (event) => {
-    if (event.target === event.currentTarget) {
-      onClose?.();
-    }
-  };
-
   return (
-    <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-      onMouseDown={handleOverlayClick}
-      role="dialog"
-      aria-modal="true"
-    >
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full">
         {/* Header */}
         <div className="border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex items-center justify-between">
@@ -189,7 +175,7 @@ export function PaymentModal({
               value={formData.reference}
               onChange={(e) => handleChange('reference', e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-              placeholder={t('common.nro_transaccion_recibo_etc')}
+              placeholder="Nro. transacción, recibo, etc."
             />
           </div>
 

@@ -2,11 +2,8 @@ import { AlertCircle, Clock, CheckCircle, AlertTriangle } from 'lucide-react';
 import React from 'react';
 
 import Card from '../Card';
-import { useTranslations } from '../../hooks/useTranslations';
 
-export const VendorPayments = ({
-  const { t } = useTranslations();
- transactions }) => {
+export const VendorPayments = ({ transactions }) => {
   const now = new Date();
   const oneWeekFromNow = new Date();
   oneWeekFromNow.setDate(now.getDate() + 7);
@@ -101,7 +98,7 @@ export const VendorPayments = ({
           color={{ bg: 'bg-[var(--color-danger)]/10', text: 'text-[color:var(--color-danger)]' }}
         />
         <PaymentStatusCard
-          title={t('common.proximos_pagos')}
+          title="Próximos Pagos"
           items={paymentStatus.upcoming}
           total={totals.upcoming}
           icon={<Clock className="w-4 h-4" />}

@@ -1,21 +1,16 @@
 import React from 'react';
 
 import { db } from '../../firebaseConfig';
-import { formatDate as formatDateUtil } from '../../utils/formatUtils';
+import { formatDate } from '../../utils/formatUtils';
 import Card from '../ui/Card';
-import Button from '../ui/Button';
-import { useTranslations } from '../../hooks/useTranslations';
 
 export default function ShortlistBoard({
-
   groups = [],
   onPromote,
   onReview,
   onRemove,
   onApplySearch,
 }) {
-  const { t } = useTranslations();
-
   if (!Array.isArray(groups) || groups.length === 0) {
     return (
       <Card className="border border-dashed border-[color:var(--color-text)]/15 bg-white/70 text-sm text-[color:var(--color-text)]/70">
@@ -58,7 +53,7 @@ export default function ShortlistBoard({
                       {item.name || 'Proveedor sugerido'}
                     </p>
                     <p className="text-xs text-[color:var(--color-text)]/55">
-                      {item.location || {t('common.sin_ubicacion')}} · Guardado: {formatDate(item.createdAt, 'short')}
+                      {item.location || 'Sin ubicación'} · Guardado: {formatDate(item.createdAt)}
                     </p>
                   </div>
                   {item.match != null && (
@@ -119,7 +114,7 @@ const formatDate = (value) => {
             ? value
             : new Date(value);
     if (Number.isNaN(date.getTime())) return '—';
-    return formatDateUtil(date, 'short');
+    return formatDate(date, 'custom');
   } catch {
     return '—';
   }

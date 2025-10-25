@@ -1,4 +1,3 @@
-import { useTranslations } from '../../hooks/useTranslations';
 import React, { useRef, useMemo, useCallback } from 'react';
 import { useDrop } from 'react-dnd';
 
@@ -6,8 +5,6 @@ import { ItemTypes } from './GuestItem';
 import { inferTableType } from '../utils/seatingTables';
 
 const TABLE_TYPE_COLORS = {
-  const { t } = useTranslations();
-
   round: '#fef3c7',
   square: '#e0f2fe',
   imperial: '#fee2e2',
@@ -365,7 +362,7 @@ function TableItem({
         if (isLockedByOther || eventsDisabled) return;
         onOpenConfig(table);
       }}
-      title={danger ? dangerReason || {t('common.problema_validacion')} : undefined}
+      title={danger ? dangerReason || 'Problema de validación' : undefined}
     >
       <button
         onClick={(e) => {
@@ -413,7 +410,7 @@ function TableItem({
       {danger && (
         <div
           className="absolute top-0 left-0 m-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-red-600 text-white"
-          title={dangerReason || {t('common.problema_validacion')}}
+          title={dangerReason || 'Problema de validación'}
         >
           !
         </div>
@@ -432,7 +429,7 @@ function TableItem({
         <div
           className="absolute top-0 left-0 m-1 px-1 py-0.5 rounded text-[10px] font-semibold text-white flex items-center gap-1"
           style={{ backgroundColor: lockedColor || '#2563eb', opacity: 0.85, zIndex: 30 }}
-          title={t('common.estas_editando_esta_mesa')}
+          title="Estás editando esta mesa"
         >
           <span aria-hidden="true">🔒</span>
           <span>Tú</span>
@@ -450,7 +447,7 @@ function TableItem({
             color: '#fff',
             opacity: 0.9,
           }}
-          title={t('common.ocupacion_mesa')}
+          title="Ocupación de la mesa"
         >
           {guestCount}/{parseInt(table.seats, 10) || globalMaxSeats || '—'}
         </div>

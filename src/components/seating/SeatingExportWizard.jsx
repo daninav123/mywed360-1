@@ -1,14 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
-import { useTranslations } from '../../hooks/useTranslations';
 
 const DEFAULT_STORAGE_KEY = 'seating.export.presets';
 const MAX_PREVIEW_WIDTH = 220;
 const MAX_PREVIEW_HEIGHT = 160;
 
-const MiniPreview = ({
-  const { t } = useTranslations();
- snapshot, selectedTabs, selectedFormats, selectedContents }) => {
+const MiniPreview = ({ snapshot, selectedTabs, selectedFormats, selectedContents }) => {
   const effectiveSnapshot = snapshot || {};
   const tables = Array.isArray(effectiveSnapshot.tables) ? effectiveSnapshot.tables : [];
   const hallSize = effectiveSnapshot.hallSize || { width: 1800, height: 1200 };
@@ -188,7 +185,7 @@ const MiniPreview = ({
 };
 
 const formatOptions = [
-  { id: 'pdf', label: t('common.pdf_multipagina') },
+  { id: 'pdf', label: 'PDF (multipágina)' },
   { id: 'svg', label: 'SVG editable' },
   { id: 'csv', label: 'CSV (resumen invitados)' },
 ];
@@ -643,7 +640,7 @@ export default function SeatingExportWizard({
             type="text"
             value={config.presetName}
             onChange={(e) => handleConfigChange({ presetName: e.target.value })}
-            placeholder={t('common.exportacion_para_proveedores')}
+            placeholder="Ej: Exportación para proveedores"
             className="w-full border px-2 py-1 rounded text-sm"
           />
           <p className="text-[11px] text-gray-500 mt-1">

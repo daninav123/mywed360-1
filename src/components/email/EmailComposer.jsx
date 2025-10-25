@@ -1,4 +1,4 @@
-﻿import { X, Paperclip, AlertCircle, CheckCircle, ChevronDown } from 'lucide-react';
+import { X, Paperclip, AlertCircle, CheckCircle, ChevronDown } from 'lucide-react';
 import React, { useState, useEffect, useRef } from 'react';
 
 import { useAuth } from '../../hooks/useAuth';
@@ -622,4 +622,3 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
 };
 
 export default EmailComposer;
-

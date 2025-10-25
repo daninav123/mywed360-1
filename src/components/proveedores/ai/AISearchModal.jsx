@@ -1,5 +1,4 @@
-import { useTranslations } from '../../hooks/useTranslations';
-﻿import { Search, X, Sparkles } from 'lucide-react';
+import { Search, X, Sparkles } from 'lucide-react';
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 
 import AIResultList from './AIResultList.jsx';
@@ -30,10 +29,10 @@ export default function AISearchModal({
 
   useEffect(() => {
     setSuggestions([
-      {t('common.fotografo_estilo_documental')},
+      'Fotógrafo estilo documental',
       'Catering para 120 invitados',
       'DJ disponible en agosto',
-      {t('common.floristeria_vintage_madrid')},
+      'Floristería vintage en Madrid',
       'Lugar al aire libre cerca de Barcelona',
     ]);
     return () => {
@@ -83,13 +82,8 @@ export default function AISearchModal({
             <Sparkles size={20} className="mr-2 text-blue-500" />
             Búsqueda inteligente
           </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700"
-            aria-label="Cerrar"
-            type="button"
-          >
-            <X size={24} aria-hidden="true" />
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-700" aria-label="Cerrar">
+            <X size={24} />
           </button>
         </div>
 

@@ -79,7 +79,7 @@ const buildExpenseDistribution = (transactions, t) => {
     .filter((tx) => tx.type === 'expense')
     .forEach((tx) => {
       const category =
-        tx.category || t('finance.transactions.noCategory', { defaultValue: t('common.sin_categoria') });
+        tx.category || t('finance.transactions.noCategory', { defaultValue: 'Sin categoría' });
       distribution[category] = toFinite(distribution[category]) + toFinite(tx.amount);
     });
   return Object.entries(distribution)
@@ -190,7 +190,7 @@ export default function FinanceCharts({ transactions = [], budgetUsage = [], sta
         <Card className="p-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
           <h3 className="text-lg font-medium text-[color:var(--color-text)] mb-4">
             {t('finance.charts.budgetVsSpentByCategory', {
-              defaultValue: t('common.presupuesto_gastado_por_categoria'),
+              defaultValue: 'Presupuesto vs Gastado por Categoría',
             })}
           </h3>
           <div className="h-80">
@@ -228,7 +228,7 @@ export default function FinanceCharts({ transactions = [], budgetUsage = [], sta
         <Card className="p-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
           <h3 className="text-lg font-medium text-[color:var(--color-text)] mb-4">
             {t('finance.charts.expenseDistributionByCategory', {
-              defaultValue: t('common.distribucion_gastos_por_categoria'),
+              defaultValue: 'Distribución de Gastos por Categoría',
             })}
           </h3>
           <div className="h-80">
@@ -309,7 +309,7 @@ export default function FinanceCharts({ transactions = [], budgetUsage = [], sta
         <Card className="p-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
           <h3 className="text-lg font-medium text-[color:var(--color-text)] mb-4">
             {t('finance.charts.budgetProgressByCategory', {
-              defaultValue: t('common.progreso_del_presupuesto_por_categoria'),
+              defaultValue: 'Progreso del Presupuesto por Categoría',
             })}
           </h3>
           <div className="h-80">

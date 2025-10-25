@@ -1,5 +1,4 @@
-import { useTranslations } from '../../hooks/useTranslations';
-﻿import { X, Calendar } from 'lucide-react';
+import { X, Calendar } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 
 /**
@@ -12,9 +11,7 @@ import React, { useState, useEffect } from 'react';
  * @param {Object} props.proveedorEditar - Proveedor a editar (null si es nuevo)
  * @returns {React.ReactElement} Modal de formulario de proveedor
  */
-const ProveedorFormModal = ({
-  const { t } = useTranslations();
- visible, onClose, onGuardar, proveedorEditar = null, forceGuardar = false }) => {
+const ProveedorFormModal = ({ visible, onClose, onGuardar, proveedorEditar = null, forceGuardar = false }) => {
   // Estado para los campos del formulario
   const [formData, setFormData] = useState({
     nombre: '',
@@ -112,7 +109,7 @@ const ProveedorFormModal = ({
 
     // Email válido si se proporciona
     if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
-      nuevosErrores.email = {t('common.email_tiene_formato_valido')};
+      nuevosErrores.email = 'El email no tiene formato válido';
     }
 
     // Web con formato válido si se proporciona
@@ -160,7 +157,7 @@ const ProveedorFormModal = ({
       console.error('Error al guardar proveedor:', error);
       setErrores({
         ...errores,
-        general: t('common.error_guardar_intentalo_nuevo'),
+        general: 'Error al guardar. Inténtalo de nuevo.',
       });
     } finally {
       setEnviando(false);
@@ -169,19 +166,10 @@ const ProveedorFormModal = ({
 
   if (!visible) return null;
 
-  const handleOverlayClick = (event) => {
-    if (event.target === event.currentTarget) {
-      onClose?.();
-    }
-  };
-
   return (
     <div
       className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
       data-cy="modal-proveedor-overlay"
-      onMouseDown={handleOverlayClick}
-      role="dialog"
-      aria-modal="true"
     >
       <div
         className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col"
@@ -192,13 +180,8 @@ const ProveedorFormModal = ({
           <h3 className="font-semibold text-lg text-gray-800">
             {isEditing ? 'Editar proveedor' : 'Nuevo proveedor'}
           </h3>
-          <button
-            onClick={onClose}
-            className="p-1 rounded-full hover:bg-gray-100"
-            type="button"
-            aria-label="Cerrar formulario de proveedor"
-          >
-            <X size={20} className="text-gray-500" aria-hidden="true" />
+          <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-100">
+            <X size={20} className="text-gray-500" />
           </button>
         </div>
 

@@ -1,10 +1,16 @@
 import React, { useRef, useState, useEffect, useCallback, useMemo } from 'react';
+const normalizeLang = (l) =>
+  String(l || 'es')
+    .toLowerCase()
+    .match(/^[a-z]{2}/)?.[0] || 'es';
 import { useTranslation } from 'react-i18next';
+import useTranslations from '../hooks/useTranslations';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 // import anterior eliminado: useUserContext
 import { getBackendBase } from '@/utils/backendBase.js';
+
 import ExternalImage from './ExternalImage';
 import Input from './Input';
 import Nav from './Nav';
@@ -31,22 +37,16 @@ import { fetchWeddingNews } from '../services/blogService';
 import { fetchWall } from '../services/wallService';
 import { getSummary as getGamificationSummary } from '../services/GamificationService';
 
-// Normalizar idioma a formato de 2 letras
-const normalizeLang = (l) =>
-  String(l || 'es')
-    .toLowerCase()
-    .match(/^[a-z]{2}/)?.[0] || 'es';
-
-// Las categorías se traducen con el namespace common
-const getInspirationCategories = (translate) => [
-  { slug: 'decoracion', label: translate('categories.decoration') },
-  { slug: 'coctel', label: translate('categories.cocktail') },
-  { slug: 'banquete', label: translate('categories.banquet') },
-  { slug: 'ceremonia', label: translate('categories.ceremony') },
-  { slug: 'flores', label: translate('categories.flowers') },
-  { slug: 'vestido', label: translate('categories.dress') },
-  { slug: 'pastel', label: translate('categories.cake') },
-  { slug: 'fotografia', label: translate('categories.photography') },
+// Las categorías se traducirán usando el hook useTranslations
+const getInspirationCategories = (t) => [
+  { slug: 'decoracion', label: t('common.categories.decoration') },
+  { slug: 'coctel', label: t('common.categories.cocktail') },
+  { slug: 'banquete', label: t('common.categories.banquet') },
+  { slug: 'ceremonia', label: t('common.categories.ceremony') },
+  { slug: 'flores', label: t('common.categories.flowers') },
+  { slug: 'vestido', label: t('common.categories.dress') },
+  { slug: 'pastel', label: t('common.categories.cake') },
+  { slug: 'fotografia', label: t('common.categories.photography') },
 ];
 
 const PROGRESS_STORAGE_KEY = 'maloveapp_progress';
@@ -161,23 +161,8 @@ const computeExpectedProgress = (weddingData) => {
 };
 
 export default function HomePage() {
-  const { t: tHome, i18n } = useTranslation('home');
-  const { t: tCommon } = useTranslation('common');
-  const INSPIRATION_CATEGORIES = useMemo(
-    () => getInspirationCategories(tCommon),
-    [tCommon]
-  );
-  const formatNumber = useCallback(
-    (value) => {
-      if (!Number.isFinite(value)) return value;
-      try {
-        return new Intl.NumberFormat(i18n.language).format(value);
-      } catch {
-        return value;
-      }
-    },
-    [i18n.language]
-  );
+  const { t } = useTranslations();
+  const INSPIRATION_CATEGORIES = useMemo(() => getInspirationCategories(t), [t]);
   
   // Todo se maneja con modales locales
   const [noteText, setNoteText] = useState('');
@@ -269,18 +254,18 @@ export default function HomePage() {
   }, [expectedProgress, progressDiff, progressPercent]);
 
   const progressStatusText = useMemo(() => {
-    if (progressPercent >= 100) return tHome('progress.status.complete');
+    if (progressPercent >= 100) return '¡Progreso completo!';
     if (expectedProgress == null) {
       return '';
     }
     if (progressDiff !== null && progressDiff > PROGRESS_DIFF_TOLERANCE) {
-      return tHome('progress.status.ahead');
+      return 'Vas adelantado al plan previsto';
     }
     if (progressDiff !== null && progressDiff < -PROGRESS_DIFF_TOLERANCE) {
-      return tHome('progress.status.behind');
+      return 'Vas por detrás del plan. Revisa tus tareas clave.';
     }
-    return tHome('progress.status.onTrack');
-  }, [expectedProgress, progressDiff, progressPercent, tHome]);
+    return 'Todo en marcha según el calendario';
+  }, [expectedProgress, progressDiff, progressPercent]);
 
   const resolvedWeddingName = useMemo(() => {
     if (!activeWeddingData) return '';
@@ -343,14 +328,14 @@ export default function HomePage() {
       filtered.push(name.trim());
     });
 
-    if (filtered.length > 1) return filtered.join(tHome('weddingName.connector'));
+    if (filtered.length > 1) return filtered.join(' y ');
     if (filtered.length === 1) return filtered[0];
 
     const fallbackString = stringCandidates
       .map((value) => (typeof value === 'string' ? value.trim() : ''))
       .find((value) => value.length > 0);
     return fallbackString || '';
-  }, [activeWeddingData, displayName, tHome]);
+  }, [activeWeddingData, displayName]);
   const legacyWeddingName =
     typeof window !== 'undefined'
       ? localStorage.getItem('maloveapp_active_wedding_name') || ''
@@ -365,6 +350,7 @@ export default function HomePage() {
   const [newsPosts, setNewsPosts] = useState([]);
   const [newsError, setNewsError] = useState(null);
   const [categoryImages, setCategoryImages] = useState([]);
+  const { i18n } = useTranslation();
   const lang = normalizeLang(i18n.language);
   const backendBase = getBackendBase();
 
@@ -474,32 +460,29 @@ export default function HomePage() {
         setNewsError(null);
       } else {
         setNewsPosts([]);
-        setNewsError(tHome('news.error'));
+        setNewsError(
+          'No se pudieron encontrar cuatro noticias con imagen en tu idioma en este momento. Inténtalo más tarde.'
+        );
       }
     };
     loadNews();
   }, [lang]);
 
   const handleRedoTutorial = useCallback(async () => {
-    if (
-      !confirm(
-        tHome('header.redo.confirm')
-      )
-    ) {
+    if (!confirm('Esto eliminar datos locales y crear una nueva boda de prueba. Continuar?'))
       return;
-    }
     try {
       // 1. Limpiar almacenamiento y marcar flag para mostrar tutorial
       localStorage.clear();
       localStorage.setItem('forceOnboarding', '1');
 
-      toast.success(tHome('header.redo.success'));
+      toast.success('Tutorial reiniciado: recargando...');
       setTimeout(() => window.location.reload(), 800);
     } catch (err) {
       console.error(err);
-      toast.error(tHome('header.redo.error'));
+      toast.error('No se pudo reiniciar el tutorial');
     }
-  }, [tHome]);
+  }, []);
   const scrollAmount = 300;
 
   const scrollPrev = useCallback(() => {
@@ -552,96 +535,50 @@ export default function HomePage() {
   const financeSpent = Number(financeStats?.totalSpent || 0);
   const budgetTotal = Number(financeStats?.totalBudget || 0);
 
-  const statsNovios = useMemo(() => {
-    const confirmedGuests = formatNumber(guestsMetrics.confirmedCount);
-    const providersValue = `${formatNumber(providersMetrics.providersAssigned)} / ${formatNumber(providersMetrics.providersTotalNeeded)}`;
-    const tasksValue = `${formatNumber(tasksMetrics.tasksCompleted)} / ${formatNumber(tasksMetrics.tasksTotal)}`;
-    const spentFormatted = formatNumber(financeSpent);
-    const totalFormatted = budgetTotal ? formatNumber(budgetTotal) : null;
-
-    return [
-      { label: tHome('stats.confirmedGuests'), value: confirmedGuests, icon: Users },
+  const statsNovios = useMemo(
+    () => [
+      { label: 'Invitados confirmados', value: guestsMetrics.confirmedCount, icon: Users },
       {
-        label: tHome('stats.budgetSpent'),
-        value: totalFormatted
-          ? tHome('stats.budgetValueWithTotal', { spent: spentFormatted, total: totalFormatted })
-          : tHome('stats.budgetValue', { spent: spentFormatted }),
+        label: 'Presupuesto gastado',
+        value:
+          `${financeSpent.toLocaleString()}` +
+          (budgetTotal ? ` / ${budgetTotal.toLocaleString()}` : ''),
         icon: DollarSign,
       },
       {
-        label: tHome('stats.providers'),
-        value: providersValue,
+        label: 'Proveedores contratados',
+        value: `${providersMetrics.providersAssigned} / ${providersMetrics.providersTotalNeeded}`,
         icon: User,
       },
       {
-        label: tHome('stats.tasksCompleted'),
-        value: tasksValue,
+        label: 'Tareas completadas',
+        value: `${tasksMetrics.tasksCompleted} / ${tasksMetrics.tasksTotal}`,
         icon: Calendar,
       },
-    ];
-  }, [
-    budgetTotal,
-    financeSpent,
-    formatNumber,
-    guestsMetrics.confirmedCount,
-    providersMetrics.providersAssigned,
-    providersMetrics.providersTotalNeeded,
-    tHome,
-    tasksMetrics.tasksCompleted,
-    tasksMetrics.tasksTotal,
-  ]);
+    ],
+    [guestsMetrics, financeSpent, providersMetrics, tasksMetrics, budgetTotal]
+  );
 
-  const statsPlanner = useMemo(() => {
-    const spentFormatted = formatNumber(financeSpent);
-    const totalFormatted = budgetTotal ? formatNumber(budgetTotal) : null;
-
-    return [
-      { label: tHome('stats.tasksAssigned'), value: formatNumber(tasksMetrics.tasksTotal), icon: Calendar },
-      { label: tHome('stats.providersAssigned'), value: formatNumber(providersMetrics.providersAssigned), icon: User },
-      { label: tHome('stats.confirmedGuests'), value: formatNumber(guestsMetrics.confirmedCount), icon: Users },
+  const statsPlanner = useMemo(
+    () => [
+      { label: 'Tareas asignadas', value: `${tasksMetrics.tasksTotal}`, icon: Calendar },
+      { label: 'Proveedores asignados', value: providersMetrics.providersAssigned, icon: User },
+      { label: 'Invitados confirmados', value: guestsMetrics.confirmedCount, icon: Users },
       {
-        label: tHome('stats.budgetSpent'),
-        value: totalFormatted
-          ? tHome('stats.budgetValueWithTotal', { spent: spentFormatted, total: totalFormatted })
-          : tHome('stats.budgetValue', { spent: spentFormatted }),
+        label: 'Presupuesto gastado',
+        value:
+          `${financeSpent.toLocaleString()}` +
+          (budgetTotal ? ` / ${budgetTotal.toLocaleString()}` : ''),
         icon: DollarSign,
       },
-    ];
-  }, [
-    budgetTotal,
-    financeSpent,
-    formatNumber,
-    guestsMetrics.confirmedCount,
-    providersMetrics.providersAssigned,
-    tHome,
-    tasksMetrics.tasksTotal,
-  ]);
+    ],
+    [guestsMetrics, financeSpent, providersMetrics, tasksMetrics, budgetTotal]
+  );
 
   const statsCommon = useMemo(
     () => (role === 'particular' ? statsNovios : statsPlanner),
     [role, statsNovios, statsPlanner]
   );
-
-  const quickActions = useMemo(
-    () => [
-      { key: 'proveedor', label: tHome('quickActions.provider'), icon: User },
-      { key: 'invitado', label: tHome('quickActions.guest'), icon: Users },
-      { key: 'movimiento', label: tHome('quickActions.movement'), icon: DollarSign },
-      { key: 'nota', label: tHome('quickActions.note'), icon: Plus },
-    ],
-    [tHome]
-  );
-
-  const progressCompletionLabel = useMemo(
-    () => tHome('progress.completion', { value: progressPercent }),
-    [progressPercent, tHome]
-  );
-  const expectedProgressLabel = useMemo(
-    () =>
-      expectedProgress != null ? tHome('progress.expected', { value: expectedProgress }) : '',
-    [expectedProgress, tHome]
-  );
-  const weddingDisplayName = weddingName || tHome('header.titleFallback');
 
   const handleQuickAddProvider = useCallback(
     (provider) => {
@@ -649,7 +586,7 @@ export default function HomePage() {
         const existing = JSON.parse(localStorage.getItem('lovendaProviders') || '[]');
         const normalized = {
           id: provider.id || Date.now(),
-          name: provider.title || provider.name || tHome('providers.fallbackName'),
+          name: provider.title || provider.name || 'Proveedor sin nombre',
           service: provider.service || '',
           location: provider.location || '',
           priceRange: provider.priceRange || provider.price || '',
@@ -660,13 +597,13 @@ export default function HomePage() {
         const updated = [normalized, ...existing].slice(0, 25);
         localStorage.setItem('lovendaProviders', JSON.stringify(updated));
         window.dispatchEvent(new Event('maloveapp-providers'));
-        toast.success(tHome('providers.addSuccess'));
+        toast.success('Proveedor añadido al panel rápido');
       } catch (error) {
         console.warn('[HomePage] No se pudo guardar el proveedor seleccionado', error);
-        toast.error(tHome('providers.addError'));
+        toast.error('No se pudo guardar el proveedor seleccionado');
       }
     },
-    [tHome]
+    []
   );
 
   if (isPlanner) {
@@ -681,7 +618,7 @@ export default function HomePage() {
           onClick={handleRedoTutorial}
           className="fixed top-4 right-4 bg-red-600 text-white px-4 py-2 rounded-full shadow-lg z-[100]"
         >
-          {tHome('header.redo.button')}
+          Rehacer tutorial
         </button>
       )}
       <div className="relative flex flex-col h-full bg-[var(--color-bg)] pb-16">
@@ -691,13 +628,15 @@ export default function HomePage() {
         {/* Header */}
         <header className="relative z-10 p-6 flex justify-between items-center flex-wrap gap-4">
           <div className="space-y-1">
-            <h1 className="page-title">{tHome('header.title', { name: weddingDisplayName })}</h1>
-            <p className="text-4xl font-bold text-[color:var(--color-text)]">{tHome('header.subtitle')}</p>
+            <h1 className="page-title">Bienvenidos, {weddingName}</h1>
+            <p className="text-4xl font-bold text-[color:var(--color-text)]">
+              Cada detalle hace tu boda inolvidable
+            </p>
           </div>
           <div className="flex items-center">
             <img
-              src={`${import.meta.env.BASE_URL}maloveapp-logo.png`}
-              alt={tHome('header.logoAlt')}
+              src={`${import.meta.env.BASE_URL}logo-app.png`}
+              alt="Logo de la boda"
               className="w-32 h-32 object-contain"
             />
           </div>
@@ -707,7 +646,7 @@ export default function HomePage() {
         <section className="z-10 w-full p-6">
           <Card className="bg-[var(--color-surface)]/70 backdrop-blur-md p-4 w-full flex flex-col gap-4">
             <div>
-              <p className="text-sm text-[color:var(--color-text)]/70 mb-2">{tHome('progress.tasksLabel')}</p>
+              <p className="text-sm text-[color:var(--color-text)]/70 mb-2">Progreso de tareas</p>
               <Progress
                 className="h-4 rounded-full w-full"
                 value={progressPercent}
@@ -719,17 +658,19 @@ export default function HomePage() {
                 className="mt-2 text-sm font-medium text-[color:var(--color-text)]"
                 data-testid="home-progress-label"
               >
-                {progressCompletionLabel}
+                {progressPercent}% completado
               </p>
               <p className="text-xs text-[color:var(--color-text)]/60" data-testid="home-progress-status">
                 {progressStatusText}
-                {expectedProgressLabel}
+                {expectedProgress != null ? ` · Esperado: ${expectedProgress}%` : ''}
               </p>
               {progressLoading && (
-                <p className="text-xs text-[color:var(--color-text)]/40">{tHome('progress.loading')}</p>
+                <p className="text-xs text-[color:var(--color-text)]/40">Actualizando progreso...</p>
               )}
               {progressError && !progressLoading && (
-                <p className="text-xs text-[color:var(--color-danger)]">{tHome('progress.error')}</p>
+                <p className="text-xs text-[color:var(--color-danger)]">
+                  No pudimos sincronizar el avance. Se muestra el último valor guardado.
+                </p>
               )}
             </div>
           </Card>
@@ -737,7 +678,12 @@ export default function HomePage() {
 
         {/* Quick Actions */}
         <section className="z-10 p-6 grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
-          {quickActions.map((action, idx) => {
+          {[
+            { key: 'proveedor', label: 'Buscar proveedor', icon: User },
+            { key: 'invitado', label: 'Añadir invitado', icon: Users },
+            { key: 'movimiento', label: 'Añadir movimiento', icon: DollarSign },
+            { key: 'nota', label: 'Nueva nota', icon: Plus },
+          ].map((action, idx) => {
             const Icon = action.icon;
             return (
               <Card
@@ -782,7 +728,7 @@ export default function HomePage() {
           <div className="flex justify-between items-center mb-4">
             <Link to="/inspiracion">
               <button className="text-xl font-bold text-[var(--color-text)] hover:text-[var(--color-primary)]">
-                {tHome('gallery.title')}
+                Inspiración para tu boda
               </button>
             </Link>
             <div className="flex space-x-2">
@@ -828,7 +774,7 @@ export default function HomePage() {
           <div className="flex justify-between items-center mb-4">
             <Link to="/blog">
               <button className="text-xl font-bold text-[var(--color-text)] hover:text-[var(--color-primary)]">
-                {tHome('blog.title')}
+                Blog
               </button>
             </Link>
           </div>
@@ -859,7 +805,7 @@ export default function HomePage() {
                       {post.description}
                     </p>
                     <div className="pt-2 text-xs text-[var(--color-text)]/60 border-t border-[var(--color-text)]/10">
-                      {tHome('blog.source')}{' '}
+                      Fuente:{' '}
                       {post.source ||
                         (post.url || '').replace(/^https?:\/\/(www\.)?/, '').split('/')[0]}
                     </div>
@@ -889,28 +835,28 @@ export default function HomePage() {
       {activeModal === 'invitado' && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-[var(--color-surface)] p-6 rounded-lg w-96 max-w-full">
-            <h2 className="text-xl font-bold mb-4">{tHome('modals.guest.title')}</h2>
+            <h2 className="text-xl font-bold mb-4">Añadir Invitado</h2>
             <div className="space-y-4">
               <Input
-                label={tHome('modals.guest.name')}
+                label="Nombre"
                 value={guest.name}
                 onChange={(e) => setGuest({ ...guest, name: e.target.value })}
               />
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1">{tHome('modals.guest.side')}</label>
+                  <label className="block text-sm font-medium mb-1">Parte de</label>
                   <select
                     className="w-full p-2 border border-gray-300 rounded"
                     value={guest.side}
                     onChange={(e) => setGuest({ ...guest, side: e.target.value })}
                   >
-                    <option value="novia">{tHome('modals.guest.sideBride')}</option>
-                    <option value="novio">{tHome('modals.guest.sideGroom')}</option>
-                    <option value="ambos">{tHome('modals.guest.sideBoth')}</option>
+                    <option value="novia">Novia</option>
+                    <option value="novio">Novio</option>
+                    <option value="ambos">Ambos</option>
                   </select>
                 </div>
                 <Input
-                  label={tHome('modals.guest.contact')}
+                  label="Contacto"
                   value={guest.contact}
                   onChange={(e) => setGuest({ ...guest, contact: e.target.value })}
                 />
@@ -921,19 +867,19 @@ export default function HomePage() {
                 onClick={() => setActiveModal(null)}
                 className="px-4 py-2 text-[var(--color-text)] border border-[var(--color-text)]/20 rounded"
               >
-                {tHome('modals.shared.cancel')}
+                Cancelar
               </button>
               <button
                 onClick={() => handleNavigateFromModal('/invitados')}
                 className="px-4 py-2 text-[var(--color-primary)] border border-[var(--color-primary)]/40 rounded bg-[var(--color-primary)]/10"
               >
-                {tHome('modals.shared.goToGuests')}
+                Ir a invitados
               </button>
               <button
                 onClick={async () => {
                   const trimmedName = guest.name.trim();
                   if (!trimmedName) {
-                    toast.error(tHome('modals.guest.missingName'));
+                    toast.error('Añade un nombre para el invitado.');
                     return;
                   }
 
@@ -951,10 +897,10 @@ export default function HomePage() {
                     } else if (/^\+?\d[\d\s()-]{3,}$/.test(contact)) {
                       payload.phone = contact;
                     } else {
-                      notes.push(tHome('modals.guest.contactNote', { value: contact }));
+                      notes.push(`Contacto: ${contact}`);
                     }
                   }
-                  notes.push(tHome('modals.guest.note'));
+                  notes.push('Añadido desde la pantalla principal');
                   payload.notes = notes.join(' · ');
 
                   try {
@@ -988,18 +934,18 @@ export default function HomePage() {
 
                       setGuest({ name: '', side: 'novia', contact: '' });
                       setActiveModal(null);
-                      toast.success(tHome('modals.guest.success'));
+                      toast.success('Invitado añadido');
                     } else {
-                      toast.error(result?.error || tHome('modals.guest.error'));
+                      toast.error(result?.error || 'No se pudo añadir el invitado');
                     }
                   } catch (err) {
                     console.error('[Home] addGuest quick action failed', err);
-                    toast.error(tHome('modals.guest.unknownError'));
+                    toast.error('Ocurrió un error al añadir el invitado.');
                   }
                 }}
                 className="px-4 py-2 bg-[var(--color-primary)] text-white rounded"
               >
-                {tHome('modals.shared.save')}
+                Guardar
               </button>
             </div>
           </div>
@@ -1009,15 +955,15 @@ export default function HomePage() {
       {activeModal === 'movimiento' && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-[var(--color-surface)] p-6 rounded-lg w-96 max-w-full">
-            <h2 className="text-xl font-bold mb-4">{tHome('modals.movement.title')}</h2>
+            <h2 className="text-xl font-bold mb-4">Nuevo Movimiento</h2>
             <div className="space-y-4">
               <Input
-                label={tHome('modals.movement.concept')}
+                label="Concepto"
                 value={newMovement.concept}
                 onChange={(e) => setNewMovement({ ...newMovement, concept: e.target.value })}
               />
               <Input
-                label={tHome('modals.movement.amount')}
+                label="Cantidad ()"
                 type="number"
                 value={newMovement.amount}
                 onChange={(e) =>
@@ -1025,20 +971,20 @@ export default function HomePage() {
                 }
               />
               <Input
-                label={tHome('modals.movement.date')}
+                label="Fecha"
                 type="date"
                 value={newMovement.date}
                 onChange={(e) => setNewMovement({ ...newMovement, date: e.target.value })}
               />
               <div>
-                <label className="block text-sm font-medium mb-1">{tHome('modals.movement.type')}</label>
+                <label className="block text-sm font-medium mb-1">Tipo</label>
                 <select
                   className="w-full p-2 border border-gray-300 rounded"
                   value={newMovement.type}
                   onChange={(e) => setNewMovement({ ...newMovement, type: e.target.value })}
                 >
-                  <option value="expense">{tHome('modals.movement.expense')}</option>
-                  <option value="income">{tHome('modals.movement.income')}</option>
+                  <option value="expense">Gasto</option>
+                  <option value="income">Ingreso</option>
                 </select>
               </div>
             </div>
@@ -1047,13 +993,13 @@ export default function HomePage() {
                 onClick={() => setActiveModal(null)}
                 className="px-4 py-2 text-[var(--color-text)] border border-[var(--color-text)]/20 rounded"
               >
-                {tHome('modals.shared.cancel')}
+                Cancelar
               </button>
               <button
                 onClick={() => handleNavigateFromModal('/finance')}
                 className="px-4 py-2 text-[var(--color-primary)] border border-[var(--color-primary)]/40 rounded bg-[var(--color-primary)]/10"
               >
-                {tHome('modals.shared.goToFinance')}
+                Ir a finanzas
               </button>
               <button
                 onClick={() => {
@@ -1062,11 +1008,11 @@ export default function HomePage() {
                   localStorage.setItem('quickMovements', JSON.stringify(movs));
                   setNewMovement({ concept: '', amount: 0, date: '', type: 'expense' });
                   setActiveModal(null);
-                  toast.success(tHome('modals.movement.success'));
+                  toast.success('Movimiento guardado');
                 }}
                 className="px-4 py-2 bg-[var(--color-primary)] text-white rounded"
               >
-                {tHome('modals.shared.save')}
+                Guardar
               </button>
             </div>
           </div>
@@ -1076,11 +1022,11 @@ export default function HomePage() {
       {activeModal === 'nota' && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-[var(--color-surface)] p-6 rounded-lg w-96 max-w-full">
-            <h2 className="text-xl font-bold mb-4">{tHome('modals.note.title')}</h2>
+            <h2 className="text-xl font-bold mb-4">Nueva Nota</h2>
             <div className="space-y-4">
               <textarea
                 className="w-full p-3 border border-gray-300 rounded h-32"
-                placeholder={tHome('modals.note.placeholder')}
+                placeholder="Escribe tu nota aqu..."
                 value={noteText}
                 onChange={(e) => setNoteText(e.target.value)}
               ></textarea>
@@ -1090,13 +1036,13 @@ export default function HomePage() {
                 onClick={() => setActiveModal(null)}
                 className="px-4 py-2 text-[var(--color-text)] border border-[var(--color-text)]/20 rounded"
               >
-                {tHome('modals.shared.cancel')}
+                Cancelar
               </button>
               <button
                 onClick={() => handleNavigateFromModal('/ideas')}
                 className="px-4 py-2 text-[var(--color-primary)] border border-[var(--color-primary)]/40 rounded bg-[var(--color-primary)]/10"
               >
-                {tHome('modals.shared.goToIdeas')}
+                Ir a ideas
               </button>
               <button
                 onClick={() => {
@@ -1105,11 +1051,11 @@ export default function HomePage() {
                   localStorage.setItem('lovendaNotes', JSON.stringify(notes));
                   setNoteText('');
                   setActiveModal(null);
-                  toast.success(tHome('modals.note.success'));
+                  toast.success('Nota guardada');
                 }}
                 className="px-4 py-2 bg-[var(--color-primary)] text-white rounded"
               >
-                {tHome('modals.shared.save')}
+                Guardar
               </button>
             </div>
           </div>

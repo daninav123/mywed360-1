@@ -1,20 +1,17 @@
 import React from 'react';
-import { useTranslations } from '../../hooks/useTranslations';
 
 const TIMELINE_EVENTS = [
   {
-  const { t } = useTranslations();
-
     id: 1,
     title: 'Ceremonia',
     time: '17:00 - 18:00',
-    location: t('common.iglesia_santa_maria'),
+    location: 'Iglesia de Santa María',
     completed: true,
     current: false,
   },
   {
     id: 2,
-    title: t('common.coctel_bienvenida'),
+    title: 'Cóctel de bienvenida',
     time: '18:30 - 20:00',
     location: 'Jardines del Palacio',
     completed: true,
@@ -24,7 +21,7 @@ const TIMELINE_EVENTS = [
     id: 3,
     title: 'Cena de gala',
     time: '20:30 - 23:00',
-    location: t('common.salon_eventos'),
+    location: 'Salón de eventos',
     completed: false,
     current: true,
   },

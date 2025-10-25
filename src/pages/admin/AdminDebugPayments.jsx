@@ -16,11 +16,8 @@ import { db } from '../../firebaseConfig';
 import { formatDate } from '../../utils/formatUtils';
 import { get as apiGet } from '../../services/apiClient';
 import { getAdminFetchOptions } from '../../services/adminSession';
-import { useTranslations } from '../../hooks/useTranslations';
 
 const AdminDebugPayments = () => {
-  const { t } = useTranslations();
-
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
@@ -80,7 +77,7 @@ const AdminDebugPayments = () => {
           {/* Recomendaciones */}
           <Card>
             <CardHeader
-              title={t('common.diagnostico')}
+              title="Diagnóstico"
               avatar={<Database size={24} />}
             />
             <CardContent>
@@ -150,7 +147,7 @@ const AdminDebugPayments = () => {
           {data.rootCollection?.count > 0 && (
             <Card>
               <CardHeader
-                title={t('common.pagos_coleccion_raiz')}
+                title="Pagos en Colección Raíz"
                 subheader={`${data.rootCollection.count} documentos encontrados`}
                 avatar={<DollarSign size={24} />}
               />

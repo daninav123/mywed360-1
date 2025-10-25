@@ -1,4 +1,3 @@
-import { useTranslations } from '../../hooks/useTranslations';
 ﻿import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import React, { useState, useEffect } from 'react';
 
@@ -12,36 +11,34 @@ import { saveData, loadData } from '../../services/SyncService';
 // Plantillas predefinidas para logos de boda
 const logoTemplates = [
   {
-  const { t } = useTranslations();
-
     name: 'Monograma Elegante',
     description: 'Logo con las iniciales de los novios en estilo elegante y sofisticado',
     prompt:
-      {t('common.disena_monograma_elegante_para_una')},
+      'Diseña un monograma elegante para una boda con iniciales entrelazadas. Estilo sofisticado y clásico con tipografía serif. Usa colores dorado y blanco sobre fondo oscuro. Incluye algún elemento decorativo sutil como hojas o flores. El logo debe ser limpio y versátil para usar en invitaciones y decoración.',
   },
   {
     name: 'Emblema Floral',
-    description: t('common.logo_rodeado_elementos_florales_organicos'),
+    description: 'Logo rodeado de elementos florales y orgánicos',
     prompt:
-      {t('common.crea_logo_para_boda_con')},
+      'Crea un logo para boda con nombres o iniciales rodeados de elementos florales. Utiliza un estilo botánico con flores y hojas delicadas. Paleta de colores suaves como verde sage, rosa pálido y toques dorados. Diseño circular u ovalado que funcione bien como sello o emblema. Estilo romántico y natural.',
   },
   {
     name: 'Minimalista Moderno',
-    description: t('common.logo_limpio_minimalista_con_lineas'),
+    description: 'Logo limpio y minimalista con líneas finas y estética contemporánea',
     prompt:
-      {t('common.disena_logo_minimalista_moderno_para')},
+      'Diseña un logo minimalista y moderno para boda. Utiliza líneas finas, formas geométricas simples y tipografía sans-serif. Estilo limpio y contemporáneo sin adornos excesivos. Incorpora iniciales o nombres completos en un diseño equilibrado. Usa colores neutros como negro, gris o azul marino. El logo debe transmitir elegancia y simplicidad.',
   },
   {
     name: 'Vintage & Retro',
-    description: t('common.logo_con_estetica_vintage_elementos'),
+    description: 'Logo con estética vintage y elementos decorativos de época',
     prompt:
-      {t('common.crea_logo_boda_con_estetica')},
+      'Crea un logo de boda con estética vintage o retro. Utiliza tipografías clásicas con serifs pronunciados o estilo script elegante. Incorpora elementos decorativos como marcos ornamentados, cintas o víñetas. Usa una paleta de colores envejecida como sepia, borgoña o azul marino. El diseño debe evocar nostalgia y elegancia atemporal, inspirado en los años 20-50.',
   },
   {
-    name: t('common.ilustrado_artistico'),
+    name: 'Ilustrado & Artístico',
     description: 'Logo personalizado con ilustraciones hechas a mano y elementos creativos',
     prompt:
-      {t('common.disena_logo_boda_ilustrado_con')},
+      'Diseña un logo de boda ilustrado con elementos personalizados. Estilo artístico que parece hecho a mano, con trazos de acuarela, tinta o dibujo. Incluye pequenos elementos simbólicos relacionados con la pareja (hobbies, lugares significativos, mascotas). Combina las ilustraciones con tipografía manuscrita o caligráfica. Colorido pero armonioso, con aspecto único y personal.',
   },
 ];
 

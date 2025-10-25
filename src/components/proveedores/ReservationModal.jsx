@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 import { useProviderEmail } from '../../hooks/useProviderEmail';
-import { useTranslations } from '../../hooks/useTranslations';
 
 /**
  * @typedef {import('../../hooks/useProveedores').Provider} Provider
@@ -21,9 +20,7 @@ import { useTranslations } from '../../hooks/useTranslations';
  * @param {Function} props.onSubmit - Función para enviar los daños de la reserva
  * @returns {React.ReactElement} Modal para agendar citas
  */
-const ReservationModal = ({
-  const { t } = useTranslations();
- provider, onClose, onSubmit }) => {
+const ReservationModal = ({ provider, onClose, onSubmit }) => {
   // Integración con el hook de email para proveedores
   const {
     loading: emailLoading,
@@ -149,9 +146,8 @@ const ReservationModal = ({
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700"
             aria-label="Cerrar"
-            type="button"
           >
-            <X size={24} aria-hidden="true" />
+            <X size={24} />
           </button>
         </div>
 
@@ -222,7 +218,7 @@ const ReservationModal = ({
                   onChange={handleChange}
                   rows="3"
                   className="w-full p-2 border border-gray-300 rounded-md"
-                  placeholder={t('common.cualquier_informacion_adicional_relevante_para')}
+                  placeholder="Cualquier información adicional relevante para la cita..."
                 ></textarea>
               </div>
 
@@ -291,10 +287,8 @@ const ReservationModal = ({
               <button
                 onClick={() => setShowEmailForm(false)}
                 className="text-gray-500 hover:text-gray-700"
-                type="button"
-                aria-label="Cerrar formulario de email"
               >
-                <X size={18} aria-hidden="true" />
+                <X size={18} />
               </button>
             </div>
 

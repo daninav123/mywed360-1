@@ -3,12 +3,9 @@ import React, { useEffect, useMemo, useState } from 'react';
 import Modal from '../Modal';
 import Button from '../ui/Button';
 import useProveedores from '../../hooks/useProveedores';
-import { useTranslations } from '../../hooks/useTranslations';
 
 const STATUS_OPTIONS = [
-  {
-  const { t } = useTranslations();
- value: 'Pendiente', label: 'Pendiente' },
+  { value: 'Pendiente', label: 'Pendiente' },
   { value: 'Contactado', label: 'Contactado' },
   { value: 'Presupuesto', label: 'Presupuesto' },
   { value: 'Seleccionado', label: 'Seleccionado' },
@@ -111,7 +108,7 @@ export default function SupplierMergeWizard({ open, onClose, provider, onComplet
       if (typeof onCompleted === 'function') onCompleted({ type: 'merge', primaryId: state.mergePrimaryId });
       onClose?.();
     } catch (e) {
-      setError(e?.message || {t('common.pudo_completar_fusion')});
+      setError(e?.message || 'No se pudo completar la fusión.');
       setSubmitting(false);
     }
   };
@@ -293,7 +290,7 @@ export default function SupplierMergeWizard({ open, onClose, provider, onComplet
     <Modal
       open={open}
       onClose={submitting ? undefined : onClose}
-      title={t('common.combinar_dividir_lineas_servicio')}
+      title="Combinar o dividir líneas de servicio"
       size="large"
     >
       <div className="space-y-6">
@@ -392,7 +389,7 @@ export default function SupplierMergeWizard({ open, onClose, provider, onComplet
             </Button>
             {state.mode === 'merge' ? (
               <Button onClick={handleConfirmMerge} disabled={!canMerge || submitting}>
-                {submitting ? 'Aplicando…' : t('common.combinar_lineas')}
+                {submitting ? 'Aplicando…' : 'Combinar líneas'}
               </Button>
             ) : (
               <Button onClick={handleConfirmSplit} disabled={!canSplit || submitting}>

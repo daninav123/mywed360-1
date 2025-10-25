@@ -120,19 +120,8 @@ const ProviderEmailModal = ({ open, onClose, provider, onSent }) => {
 
   if (!open) return null;
 
-  const handleOverlayClick = (event) => {
-    if (event.target === event.currentTarget) {
-      onClose?.();
-    }
-  };
-
   return (
-    <div
-      className="fixed inset-0 bg-black bg-opacity-50 z-50 flex itemás-center justify-center p-4"
-      onMouseDown={handleOverlayClick}
-      role="dialog"
-      aria-modal="true"
-    >
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex itemás-center justify-center p-4">
       <Card className="w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
         <div className="flex itemás-center justify-between border-b p-4">
           <h2 className="text-xl font-semibold">Contactar proveedor</h2>
@@ -140,9 +129,8 @@ const ProviderEmailModal = ({ open, onClose, provider, onSent }) => {
             onClick={onClose}
             aria-label="Cerrar"
             className="text-gray-500 hover:text-gray-700"
-            type="button"
           >
-            <X size={20} aria-hidden="true" />
+            <X size={20} />
           </button>
         </div>
         <div className="p-4 overflow-y-auto flex-1">

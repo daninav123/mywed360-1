@@ -1,4 +1,3 @@
-import { X } from 'lucide-react';
 import React from 'react';
 
 import Button from '../Button';
@@ -13,19 +12,12 @@ import Button from '../Button';
 const EmptyTrashModal = ({ isOpen, onConfirm, onClose }) => {
   if (!isOpen) return null;
 
-  const handleOverlayClick = (event) => {
-    if (event.target === event.currentTarget) {
-      onClose?.();
-    }
-  };
-
   return (
     <div
       className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50 p-4"
       role="dialog"
       aria-modal="true"
       data-testid="empty-trash-modal"
-      onMouseDown={handleOverlayClick}
     >
       <div className="bg-white rounded-lg shadow-lg w-full max-w-sm">
         <div className="flex items-center justify-between px-4 py-2 border-b">
@@ -36,7 +28,7 @@ const EmptyTrashModal = ({ isOpen, onConfirm, onClose }) => {
             data-testid="close-modal-button"
             onClick={onClose}
           >
-            <X size={18} aria-hidden="true" />
+            ✕
           </button>
         </div>
         <div className="p-4 space-y-4">

@@ -4,11 +4,8 @@ import React, { useState, useEffect } from 'react';
 import PageWrapper from '../components/PageWrapper';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
-import { useTranslations } from '../../hooks/useTranslations';
 
 export default function Checklist() {
-  const { t } = useTranslations();
-
   const [view, setView] = useState('list');
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
@@ -46,7 +43,7 @@ export default function Checklist() {
 
   const blocks = [
     {
-      name: t('common.dia_previo_boda'),
+      name: 'Día Previo a la Boda',
       tasks: [
         {
           id: 1,
@@ -242,7 +239,7 @@ export default function Checklist() {
                     type="text"
                     value={newTask.title}
                     onChange={(e) => setNewTask((p) => ({ ...p, title: e.target.value }))}
-                    placeholder={t('common.descripcion_tarea')}
+                    placeholder="Descripción de la tarea"
                     className="w-full border rounded px-2 py-1 border-[color:var(--color-text)]/20 bg-[var(--color-surface)] text-[color:var(--color-text)]"
                     required
                   />

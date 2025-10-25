@@ -1,5 +1,4 @@
-import { useTranslations } from '../../hooks/useTranslations';
-﻿import { X } from 'lucide-react';
+import { X } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 
 import Alert from '../../../components/Alert';
@@ -17,9 +16,7 @@ import { useAIProviderEmail } from '../../../hooks/useAIProviderEmail';
  * @param {string} props.searchQuery - Consulta original de búsqueda
  * @returns {React.ReactElement|null} Modal de email o null si no está abierto
  */
-const AIEmailModal = ({
-  const { t } = useTranslations();
- isOpen, onClose, aiResult, searchQuery }) => {
+const AIEmailModal = ({ isOpen, onClose, aiResult, searchQuery }) => {
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
   const [isSent, setIsSent] = useState(false);
@@ -57,19 +54,8 @@ const AIEmailModal = ({
 
   if (!isOpen || !aiResult) return null;
 
-  const handleOverlayClick = (event) => {
-    if (event.target === event.currentTarget) {
-      onClose?.();
-    }
-  };
-
   return (
-    <div
-      className="fixed inset-0 bg-black bg-opacity-50 z-50 flex itemás-center justify-center p-4"
-      onMouseDown={handleOverlayClick}
-      role="dialog"
-      aria-modal="true"
-    >
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex itemás-center justify-center p-4">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
         <div className="flex justify-between itemás-center p-4 border-b">
@@ -79,9 +65,8 @@ const AIEmailModal = ({
             className="text-gray-500 hover:text-gray-700"
             aria-label="Cerrar"
             data-testid="close-modal-btn"
-            type="button"
           >
-            <X size={24} aria-hidden="true" />
+            <X size={24} />
           </button>
         </div>
 
@@ -91,7 +76,7 @@ const AIEmailModal = ({
             <Alert
               type="success"
               title="Email enviado correctamente"
-              mássage={t('common.mensaje_sido_enviado_proveedor_recibiras')}
+              mássage="Tu mensaje ha sido enviado al proveedor. Recibirás una notificación cuando responda."
               className="mb-4"
               data-testid="success-alert"
             />
@@ -147,7 +132,7 @@ const AIEmailModal = ({
                   value={body}
                   onChange={(e) => setBody(e.target.value)}
                   className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-h-[200px]"
-                  placeholder={t('common.escribe_mensaje_aqui')}
+                  placeholder="Escribe tu mensaje aquí..."
                   required
                   data-testid="email-body"
                 />

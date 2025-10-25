@@ -5,13 +5,8 @@ import { useAuth } from '../hooks/useAuth';
 import { get as apiGet, post as apiPost } from '../services/apiClient';
 import { getUserFolders, createFolder, assignEmailToFolder } from '../services/folderService';
 import { getUserTags, createTag, addTagToEmail } from '../services/tagService';
-import { useTranslations } from '../../hooks/useTranslations';
 
-export default function EmailInsights({
-
- mailId, userId, email }) {
-  const { t } = useTranslations();
-
+export default function EmailInsights({ mailId, userId, email }) {
   const { user: authUser } = (typeof useAuth === 'function' ? useAuth() : {}) || {};
   const navigate = typeof useNavigate === 'function' ? useNavigate() : null;
   const [insights, setInsights] = useState(null);
@@ -71,7 +66,7 @@ export default function EmailInsights({
         const start = email?.date || new Date(Date.now() + 60 * 60 * 1000).toISOString();
         const startDate = new Date(start);
         const end = new Date(startDate.getTime() + 60 * 60 * 1000).toISOString();
-        out.meetings.push({ title: email?.subject || {t('common.reunion')}, start, end });
+        out.meetings.push({ title: email?.subject || 'Reunión', start, end });
       }
       if (/presupuesto|budget|importe|precio|quote/.test(text)) {
         out.budgets.push({ client: email?.from || 'Contacto', amount: '—', currency: 'EUR' });
@@ -134,7 +129,7 @@ export default function EmailInsights({
         folder = folder || 'Proveedores';
       }
       if (/invitaci[óo]n|rsvp|confirmaci[óo]n/.test(text)) {
-        tags.push(t('common.invitacion'));
+        tags.push('Invitación');
         folder = folder || 'RSVP';
       }
       return { tags: Array.from(new Set(tags)), folder };
@@ -197,7 +192,7 @@ export default function EmailInsights({
           if (isNaN(startDate.getTime())) return;
           const endDate = new Date(startDate.getTime() + 60 * 60 * 1000);
           const meeting = {
-            title: m.title || {t('common.reunion')},
+            title: m.title || 'Reunión',
             start: startDate.toISOString(),
             end: endDate.toISOString(),
           };
@@ -286,7 +281,7 @@ export default function EmailInsights({
               const defaultTitle =
                 (tasks && tasks[0]?.title) ||
                 (email?.subject ? `Tarea: ${email.subject}` : 'Tarea de email');
-              const title = prompt(t('common.titulo_tarea'), defaultTitle);
+              const title = prompt('Título de la tarea', defaultTitle);
               if (!title) return;
               const task = { title, due: tasks && tasks[0]?.due ? tasks[0].due : null };
               window.dispatchEvent(new CustomEvent('maloveapp-tasks', { detail: { task } }));
@@ -311,7 +306,7 @@ export default function EmailInsights({
               }
               const endIso = new Date(new Date(startIso).getTime() + 60 * 60 * 1000).toISOString();
               const meeting = {
-                title: email?.subject ? `Reunión: ${email.subject}` : t('common.reunion'),
+                title: email?.subject ? `Reunión: ${email.subject}` : 'Reunión',
                 start: startIso,
                 end: endIso,
               };

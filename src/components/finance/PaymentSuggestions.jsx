@@ -4,15 +4,13 @@ import { Button, Card } from '../ui';
 import TransactionForm from './TransactionForm';
 import { getPaymentSuggestions } from '../../services/EmailInsightsService';
 import Modal from '../Modal';
-import { useTranslations } from '../../hooks/useTranslations';
 
 export default function PaymentSuggestions({
-
   onCreateTransaction,
   isLoading,
   providers = [],
   enabled = true,
-  disabledMessage = {t('common.esta_funcion_desactiva_conectar_banco')},
+  disabledMessage = 'Esta función se desactiva al conectar tu banco porque los movimientos se importan automáticamente.',
 }) {
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState('');
@@ -169,7 +167,7 @@ export default function PaymentSuggestions({
         </div>
       )}
 
-      <Modal open={open} onClose={() => setOpen(false)} title={t('common.registrar_transaccion')}>
+      <Modal open={open} onClose={() => setOpen(false)} title="Registrar transacción">
         <TransactionForm
           transaction={prefill}
           isLoading={isLoading}

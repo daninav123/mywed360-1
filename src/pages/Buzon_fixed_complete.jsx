@@ -36,11 +36,8 @@ import {
 } from '../services/EmailTrackingService';
 
 import { getTemplateOptions, applyTemplate } from '../services/emailTemplates';
-import { useTranslations } from '../../hooks/useTranslations';
 
 export default function Buzon() {
-  const { t } = useTranslations();
-
   const [folder, setFolder] = useState('inbox');
   const [search, setSearch] = useState('');
   const [mails, setMails] = useState([]);
@@ -198,7 +195,7 @@ export default function Buzon() {
       }
     } catch (e) {
       console.error('Error al enviar correo:', e);
-      alert(`Error al enviar correo: ${e.message || {t('common.intenta_nuevamente_mas_tarde')}}`);
+      alert(`Error al enviar correo: ${e.message || 'Intenta nuevamente más tarde'}`);
     }
   };
 

@@ -6,7 +6,6 @@ import { useAuth } from '../hooks/useAuth';
 import { createWedding } from '../services/WeddingService';
 import { useWedding } from '../context/WeddingContext';
 import { performanceMonitor } from '../services/PerformanceMonitor';
-import { useTranslations } from '../../hooks/useTranslations';
 import {
   EVENT_STYLE_OPTIONS,
   GUEST_COUNT_OPTIONS,
@@ -22,8 +21,6 @@ import {
 } from '../config/eventStyles';
 
 export default function CreateWeddingAI() {
-  const { t } = useTranslations();
-
   const { currentUser, userProfile, hasRole, isLoading } = useAuth();
   const navigate = useNavigate();
   const { weddings, weddingsReady } = useWedding();
@@ -97,7 +94,7 @@ export default function CreateWeddingAI() {
   const validateStepOne = () => {
     const nextErrors = {};
     if (!form.weddingDate) nextErrors.weddingDate = 'Selecciona la fecha del evento';
-    if (!form.location.trim()) nextErrors.location = {t('common.indica_ubicacion_del_evento')};
+    if (!form.location.trim()) nextErrors.location = 'Indica la ubicación del evento';
     setFieldErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
   };
@@ -256,7 +253,7 @@ export default function CreateWeddingAI() {
                   value={form.coupleName}
                   onChange={handleChange}
                   className="w-full border rounded px-3 py-2"
-                  placeholder={t('common.maria_juan')}
+                  placeholder="María & Juan"
                 />
               </div>
 
@@ -287,7 +284,7 @@ export default function CreateWeddingAI() {
                     value={form.location}
                     onChange={handleChange}
                     className="w-full border rounded px-3 py-2"
-                    placeholder={t('common.sevilla_espana')}
+                    placeholder="Sevilla, España"
                   />
                   {fieldErrors.location && (
                     <p className="mt-1 text-xs text-red-600">{fieldErrors.location}</p>
@@ -436,7 +433,7 @@ export default function CreateWeddingAI() {
                   value={form.notes}
                   onChange={handleChange}
                   className="w-full border rounded px-3 py-2 h-28"
-                  placeholder={t('common.cuentanos_detalles_sobre_estilo_inspiracion')}
+                  placeholder="Cuéntanos detalles sobre estilo, inspiración o restricciones."
                 />
               </div>
             </section>

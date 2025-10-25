@@ -1,7 +1,6 @@
 import React from 'react';
 import { Plus, Trash2  from 'lucide-react';
 import useSpecialMoments from '../hooks/useSpecialMoments';
-import { useTranslations } from '../../hooks/useTranslations';
 
 // Página Timing vinculada en directo con Momentos Especiales
 
@@ -19,10 +18,8 @@ import { useTranslations } from '../../hooks/useTranslations';
 
 
 export default function Timing() {
-  const { t } = useTranslations();
-
   const { moments, addMoment, updateMoment, removeMoment, reorderMoment, moveMoment  = useSpecialMoments();
-  const labels = { ceremonia: 'Ceremonia', coctail: t('common.coctel'), banquete: 'Banquete', disco: 'Disco' ;
+  const labels = { ceremonia: 'Ceremonia', coctail: 'Cóctel', banquete: 'Banquete', disco: 'Disco' ;
 
   const handleAdd = key => {
     const nextOrder = (moments[key]?.length || 0) + 1;

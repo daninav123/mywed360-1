@@ -1,4 +1,4 @@
-﻿import { X, Plus } from 'lucide-react';
+import { X, Plus } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 
 import { useAuth } from '../../hooks/useAuth';
@@ -134,9 +134,8 @@ const EmailTagsManager = ({ emailId, onTagsChange }) => {
               onClick={() => handleRemoveTag(safeRender(tag?.id, ''))}
               className="ml-1 rounded-full hover:bg-opacity-20 hover:bg-gray-600 remove-tag-button"
               data-testid="remove-tag-button"
-              aria-label="Eliminar etiqueta"
             >
-              <X size={12} aria-hidden="true" />
+              <X size={12} />
             </button>
           </div>
         ))}

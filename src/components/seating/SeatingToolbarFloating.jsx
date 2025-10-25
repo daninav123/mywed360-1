@@ -4,7 +4,6 @@
  */
 import React from 'react';
 import { motion } from 'framer-motion';
-import { useTranslations } from '../../hooks/useTranslations';
 import {
   Move,
   Plus,
@@ -16,9 +15,7 @@ import {
   Layers,
 } from 'lucide-react';
 
-const ToolbarButton = ({
-  const { t } = useTranslations();
- 
+const ToolbarButton = ({ 
   icon: Icon, 
   label, 
   onClick, 
@@ -104,14 +101,14 @@ export default function SeatingToolbarFloating({
     {
       id: 'add',
       icon: Plus,
-      label: t('common.anadir_mesa'),
+      label: 'Añadir mesa',
       shortcut: 'A',
       onClick: onAddTable,
     },
     {
       id: 'draw',
       icon: Pencil,
-      label: t('common.dibujar_areas'),
+      label: 'Dibujar áreas',
       shortcut: 'D',
       onClick: onOpenDrawMode,
     },
@@ -158,7 +155,7 @@ export default function SeatingToolbarFloating({
     {
       id: 'settings',
       icon: Settings,
-      label: t('common.configuracion'),
+      label: 'Configuración',
       shortcut: ',',
       onClick: onOpenSettings,
     },

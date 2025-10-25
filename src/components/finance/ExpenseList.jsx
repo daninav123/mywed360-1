@@ -1,4 +1,3 @@
-import { useTranslations } from '../../hooks/useTranslations';
 /**
  * ExpenseList Component  
  * Lista y gestión de gastos
@@ -17,9 +16,7 @@ import { EXPENSE_CATEGORIES, PAYMENT_STATUS } from '../../services/financeServic
  * @param {Function} props.onDelete - Callback al eliminar
  * @param {Function} props.onPayment - Callback al registrar pago
  */
-export function ExpenseList({
-  const { t } = useTranslations();
- expenses = [], onEdit, onDelete, onPayment }) {
+export function ExpenseList({ expenses = [], onEdit, onDelete, onPayment }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
@@ -175,7 +172,7 @@ export function ExpenseList({
           </h3>
           <p className="text-gray-600 dark:text-gray-400">
             {searchTerm || filterCategory !== 'all' || filterStatus !== 'all'
-              ? {t('common.intenta_ajustar_los_filtros_busqueda')}
+              ? 'Intenta ajustar los filtros de búsqueda'
               : 'Comienza agregando tu primer gasto'}
           </p>
         </div>
@@ -275,7 +272,7 @@ export function ExpenseList({
                       </button>
                       <button
                         onClick={() => {
-                          if (confirm(t('common.estas_seguro_eliminar_este_gasto'))) {
+                          if (confirm('¿Estás seguro de eliminar este gasto?')) {
                             onDelete?.(expense.id);
                           }
                         }}

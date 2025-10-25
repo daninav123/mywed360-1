@@ -10,10 +10,9 @@ import useRFQTemplates from '../../hooks/useRFQTemplates';
 import { post as apiPost } from '../../services/apiClient';
 import Modal from '../Modal';
 import Button from '../ui/Button';
-import { useTranslations } from '../../hooks/useTranslations';
 
 const DEFAULT_RFP_BODY =
-  {t('common.holannnos_gustaria_recibir_presupuesto_detallado')};
+  'Hola,\n\nNos gustaría recibir un presupuesto detallado para nuestro evento. Por favor, incluye condiciones, logística y extras.\n\nGracias.';
 const REMINDER_OPTIONS = [3, 7, 14];
 
 export default function RFQModal({
@@ -268,7 +267,7 @@ export default function RFQModal({
               className="border rounded p-2 w-full"
               value={tplName}
               onChange={(e) => setTplName(e.target.value)}
-              placeholder={t('common.rfq_fotografia')}
+              placeholder="Ej. RFQ Fotografía"
             />
           </div>
           <div>
@@ -277,7 +276,7 @@ export default function RFQModal({
               className="border rounded p-2 w-full"
               value={tplService}
               onChange={(e) => setTplService(e.target.value)}
-              placeholder={t('common.musica')}
+              placeholder="Ej. Música"
             />
           </div>
           <div className="md:col-span-3 flex gap-2 justify-end">

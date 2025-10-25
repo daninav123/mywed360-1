@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { db } from '../../firebaseConfig';
 import { formatDate as formatDateUtil } from '../../utils/formatUtils';
 import { Crown, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
-import { useTranslations } from '../../hooks/useTranslations';
-import { Card } from '../ui';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004';
 
@@ -11,8 +9,6 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004';
  * Widget para mostrar resumen de suscripción en dashboard
  */
 const SubscriptionWidget = () => {
-  const { t } = useTranslations();
-
   const [subscription, setSubscription] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -55,104 +51,106 @@ const SubscriptionWidget = () => {
     return formatDateUtil(date, 'custom');
   };
 
-  const primaryActionClasses =
-    'inline-flex items-center gap-2 rounded-md bg-[var(--color-primary)] px-4 py-2 text-sm font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5 hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2';
-  const linkButtonClasses =
-    'mt-4 inline-flex w-full items-center justify-center rounded-md border border-[color:var(--color-text)]/15 bg-[var(--color-surface)] px-4 py-2 text-sm font-semibold text-[color:var(--color-text)] transition-colors hover:bg-[var(--color-accent)]/15 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2';
-
   if (loading) {
     return (
-      <Card className="flex min-h-[140px] items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-[color:var(--color-text)]/50" />
-      </Card>
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="flex items-center justify-center">
+          <Loader2 className="h-6 w-6 text-gray-400 animate-spin" />
+        </div>
+      </div>
     );
   }
 
   if (!subscription) {
     return (
-      <Card className="space-y-4 border-dashed border-[var(--color-primary)]/40 bg-[var(--color-accent)]/10">
-        <div className="flex flex-col gap-3">
-          <div className="flex items-center gap-2 text-[var(--color-primary)]">
-            <Crown className="h-5 w-5" />
-            <h3 className="text-lg font-semibold text-[color:var(--color-text)]">
-              Activa tu cuenta Premium
-            </h3>
+      <div className="bg-gradient-to-br from-purple-600 to-blue-600 rounded-xl shadow-lg p-6 text-white">
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-2">
+              <Crown className="h-5 w-5" />
+              <h3 className="font-semibold">Activa tu cuenta Premium</h3>
+            </div>
+            <p className="text-sm text-purple-100 mb-4">
+              Desbloquea funcionalidades exclusivas y lleva tu planificación al siguiente nivel
+            </p>
+            <Link
+              to="/pricing"
+              className="inline-flex items-center gap-2 bg-white text-purple-600 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-purple-50 transition-colors"
+            >
+              Ver Planes
+              <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
-          <p className="text-sm text-[color:var(--color-text)]/70">
-            Desbloquea funcionalidades exclusivas y lleva tu planificación al siguiente nivel.
-          </p>
-          <Link to="/pricing" className={primaryActionClasses}>
-            Ver planes
-            <ArrowRight className="h-4 w-4" />
-          </Link>
         </div>
-      </Card>
+      </div>
     );
   }
 
   const isActive = subscription.status === 'active' || subscription.status === 'trialing';
-  const cardStateClasses = subscription.cancelAtPeriodEnd
-    ? 'bg-[var(--color-warning)]/10 border-[var(--color-warning)]/30'
-    : '';
-  const statusBadgeClasses = isActive
-    ? 'bg-[var(--color-success)]/15 text-[var(--color-success)]'
-    : 'bg-[var(--color-warning)]/15 text-[var(--color-warning)]';
-  const crownTone = isActive ? 'text-[var(--color-primary)]' : 'text-[var(--color-warning)]';
 
   return (
-    <Card className={`space-y-4 ${cardStateClasses}`}>
-      <div className="flex items-start justify-between">
+    <div className={`rounded-xl shadow-sm border p-6 ${
+      isActive 
+        ? 'bg-white border-gray-200' 
+        : 'bg-yellow-50 border-yellow-200'
+    }`}>
+      <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-2">
-          <Crown className={`h-5 w-5 ${crownTone}`} />
-          <h3 className="text-lg font-semibold text-[color:var(--color-text)]">
+          <Crown className={`h-5 w-5 ${isActive ? 'text-purple-600' : 'text-yellow-600'}`} />
+          <h3 className="font-semibold text-gray-900">
             {subscription.productName || 'Plan Premium'}
           </h3>
         </div>
-        <span className={`text-xs px-2 py-1 rounded-full font-semibold ${statusBadgeClasses}`}>
-          {subscription.status === 'trialing'
-            ? 'En prueba'
-            : subscription.status === 'active'
-              ? 'Activa'
-              : subscription.status}
+        <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
+          isActive 
+            ? 'bg-green-100 text-green-800' 
+            : 'bg-yellow-100 text-yellow-800'
+        }`}>
+          {subscription.status === 'trialing' ? 'En prueba' : 
+           subscription.status === 'active' ? 'Activa' : 
+           subscription.status}
         </span>
       </div>
 
-      <div className="space-y-3 text-sm text-[color:var(--color-text)]/70">
+      <div className="space-y-3">
         <div className="flex justify-between items-baseline">
-          <span>Precio:</span>
-          <span className="text-lg font-semibold text-[color:var(--color-text)]">
+          <span className="text-sm text-gray-600">Precio:</span>
+          <span className="text-lg font-bold text-gray-900">
             {formatPrice(subscription.amount, subscription.currency)}
-            <span className="ml-1 text-sm font-normal text-[color:var(--color-text)]/70">
-              {subscription.interval === 'month' ? '/mes' : t('common.ano')}
+            <span className="text-sm font-normal text-gray-600">
+              {subscription.interval === 'month' ? '/mes' : '/año'}
             </span>
           </span>
         </div>
 
         {subscription.currentPeriodEnd && (
           <div className="flex justify-between items-baseline">
-            <span>
+            <span className="text-sm text-gray-600">
               {subscription.cancelAtPeriodEnd ? 'Finaliza:' : 'Renueva:'}
             </span>
-            <span className="text-sm font-semibold text-[color:var(--color-text)]">
+            <span className="text-sm font-semibold text-gray-900">
               {formatDate(subscription.currentPeriodEnd)}
             </span>
           </div>
         )}
 
         {subscription.cancelAtPeriodEnd && (
-          <div className="mt-2 flex items-start gap-2 rounded-lg border border-[var(--color-warning)]/30 bg-[var(--color-warning)]/15 p-3">
-            <AlertCircle className="h-4 w-4 flex-shrink-0 text-[var(--color-warning)]" />
-            <p className="text-xs text-[color:var(--color-text)]/80">
+          <div className="flex items-start gap-2 bg-yellow-50 rounded-lg p-3 mt-2">
+            <AlertCircle className="h-4 w-4 text-yellow-600 flex-shrink-0 mt-0.5" />
+            <p className="text-xs text-yellow-800">
               Tu suscripción finalizará el {formatDate(subscription.currentPeriodEnd)}
             </p>
           </div>
         )}
       </div>
 
-      <Link to="/subscription" className={linkButtonClasses}>
+      <Link
+        to="/subscription"
+        className="mt-4 block w-full text-center bg-gray-100 hover:bg-gray-200 text-gray-900 px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
+      >
         Gestionar Suscripción
       </Link>
-    </Card>
+    </div>
   );
 };
 

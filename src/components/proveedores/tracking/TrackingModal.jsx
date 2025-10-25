@@ -1,4 +1,4 @@
-﻿import { X, Mail, Clock, CheckCircle, Eye, XCircle, ExternalLink, Calendar } from 'lucide-react';
+import { X, Mail, Clock, CheckCircle, Eye, XCircle, ExternalLink, Calendar } from 'lucide-react';
 import React from 'react';
 
 import Button from '../../../components/ui/Button';
@@ -150,9 +150,8 @@ const TrackingModal = ({ isOpen, onClose, trackingItem }) => {
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700"
             aria-label="Cerrar"
-            type="button"
           >
-            <X size={24} aria-hidden="true" />
+            <X size={24} />
           </button>
         </div>
 

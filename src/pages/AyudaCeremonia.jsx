@@ -5,21 +5,18 @@ import PageWrapper from '../components/PageWrapper';
 import { useAuth } from '../hooks/useAuth';
 import useActiveWeddingInfo from '../hooks/useActiveWeddingInfo';
 import { EVENT_TYPE_LABELS } from '../config/eventStyles';
-import { useTranslations } from '../../hooks/useTranslations';
 
 const CEREMONY_MOMENTS = [
-  {
-  const { t } = useTranslations();
- name: 'Ceremonia', items: ['Entrada', 'Lectura de votos', 'Intercambio de anillos'] },
+  { name: 'Ceremonia', items: ['Entrada', 'Lectura de votos', 'Intercambio de anillos'] },
   { name: 'Cocktail', items: ['Aperitivos', 'Brindis'] },
   { name: 'Banquete', items: ['Primer plato', 'Segundo plato', 'Postre'] },
   { name: 'Fiesta', items: ['Primer baile', 'DJ set', 'Cierre'] },
 ];
 
 const GENERIC_MOMENTS = [
-  { name: 'Bienvenida', items: [t('common.introduccion'), t('common.mensaje_del_anfitrion'), t('common.agenda_del_dia')] },
-  { name: 'Actividad principal', items: [t('common.presentacion'), t('common.dinamica'), 'Reconocimientos'] },
-  { name: t('common.celebracion'), items: ['Brindis', 'Entretenimiento', 'Cierre del evento'] },
+  { name: 'Bienvenida', items: ['Introducción', 'Mensaje del anfitrión', 'Agenda del día'] },
+  { name: 'Actividad principal', items: ['Presentación', 'Dinámica', 'Reconocimientos'] },
+  { name: 'Celebración', items: ['Brindis', 'Entretenimiento', 'Cierre del evento'] },
 ];
 
 export default function AyudaCeremonia() {
@@ -94,7 +91,7 @@ export default function AyudaCeremonia() {
     <PageWrapper title={pageTitle}>
       <p className="text-sm text-muted mb-4">
         {isBoda
-          ? {t('common.genera_lecturas_guiones_dinamicos_para')}
+          ? 'Genera lecturas y guiones dinámicos para tu ceremonia.'
           : `Configura el guion del ${eventLabel.toLowerCase()} y comparte fragmentos con tu equipo.`}
       </p>
 
@@ -122,7 +119,7 @@ export default function AyudaCeremonia() {
           value={text}
           onChange={(e) => setText(e.target.value)}
           className="w-full h-32 border rounded p-2 text-sm"
-          placeholder={t('common.escribe_texto_que_gustaria_utilizar')}
+          placeholder="Escribe el texto que te gustaría utilizar…"
         />
       </div>
 

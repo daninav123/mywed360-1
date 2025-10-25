@@ -16,7 +16,6 @@ import { safeExecute } from '../../utils/promiseSafeRenderer';
 import sanitizeHtml from '../../utils/sanitizeHtml';
 import Button from '../Button';
 import Card from '../ui/Card';
-import { useTranslations } from '../../hooks/useTranslations';
 
 /**
  * Componente para visualizar el contenido completo de un email
@@ -31,9 +30,7 @@ import { useTranslations } from '../../hooks/useTranslations';
  * @param {Function} props.onToggleImportant - Función para marcar/desmarcar como importante
  * @returns {React.ReactElement} Visor detallado del email
  */
-const EmailViewer = ({
-  const { t } = useTranslations();
- email, onBack, onDelete, onReply, onForward, onToggleImportant }) => {
+const EmailViewer = ({ email, onBack, onDelete, onReply, onForward, onToggleImportant }) => {
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [replyText, setReplyText] = useState('');
   const isImportant = email?.folder === 'important';
@@ -222,7 +219,7 @@ const EmailViewer = ({
             onChange={(e) => setReplyText(e.target.value)}
             className="w-full border border-gray-300 rounded-md p-2 mb-2"
             rows="4"
-            placeholder={t('common.escribe_respuesta_aqui')}
+            placeholder="Escribe tu respuesta aquí..."
           ></textarea>
 
           <div className="flex justify-end space-x-2">

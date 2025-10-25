@@ -2,11 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import Avatar from './Avatar';
 import { getEmailTagsDetails } from '../../services/tagService';
-import { useTranslations } from '../../hooks/useTranslations';
 
 const formatDateShort = (d) => {
-  const { t } = useTranslations();
-
   if (!d) return '';
   const dt = new Date(d);
   if (Number.isNaN(dt.getTime())) return '';
@@ -221,14 +218,14 @@ export default function MailList({
               {/* Acciones rápidas al hover */}
               <div className="absolute right-2 top-2 hidden gap-1 sm:flex sm:opacity-0 sm:transition-opacity sm:duration-150 sm:group-hover:opacity-100">
                 <button
-                  title={mail.read ? {t('common.marcar_leido')} : t('common.marcar_leido')}
+                  title={mail.read ? 'Marcar No leído' : 'Marcar leído'}
                   onClick={(e) => {
                     e.stopPropagation();
                     onToggleRead(mail);
                   }}
                   className="rounded border bg-white px-2 py-1 text-[11px] text-gray-700 hover:bg-gray-50"
                 >
-                  {mail.read ? {t('common.leido')} : 'Leer'}
+                  {mail.read ? 'No leído' : 'Leer'}
                 </button>
                 <button
                   title="Eliminar"
@@ -252,7 +249,7 @@ export default function MailList({
                       onToggleRead(mail);
                     }}
                   >
-                    {mail.read ? {t('common.marcar_leido')} : t('common.marcar_leido')}
+                    {mail.read ? 'Marcar No leído' : 'Marcar leído'}
                   </button>
                   {folders.length > 0 && (
                     <div className="border-top">

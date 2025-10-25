@@ -1,4 +1,3 @@
-import { useTranslations } from '../../hooks/useTranslations';
 /**
  * SyncPanel Component
  * Panel de sincronización RSVP-Seating
@@ -9,9 +8,7 @@ import React, { useState, useEffect } from 'react';
 import { RefreshCw, AlertCircle, CheckCircle, XCircle, Users, Clock } from 'lucide-react';
 import { useRSVPSeatingSync } from '../../services/rsvpSeatingSync';
 
-export function SyncPanel({
-  const { t } = useTranslations();
- weddingId }) {
+export function SyncPanel({ weddingId }) {
   const { syncing, conflicts, lastSync, syncAll, detectConflicts, resolveConflict } = useRSVPSeatingSync(weddingId);
   const [syncResults, setSyncResults] = useState(null);
   const [showConflicts, setShowConflicts] = useState(false);
@@ -142,7 +139,7 @@ export function SyncPanel({
                         </span>
                         <span className="text-sm font-medium text-gray-900 dark:text-white">
                           {conflict.type === 'missing_seating' ? 'Guest sin asiento' :
-                           conflict.type === 'orphan_seating' ? {t('common.asiento_huerfano')} :
+                           conflict.type === 'orphan_seating' ? 'Asiento huérfano' :
                            'Asiento no confirmado'}
                         </span>
                       </div>

@@ -35,7 +35,7 @@ const InvitationCanvas = React.forwardRef(function InvitationCanvas(
           transform: `scale(${scale})`,
         }}
         role="region"
-        aria-label={t('common.aria_lienzo_de_invitacion')}
+        aria-label="Lienzo de invitación"
       >
         {/* Bleed area */}
         <div

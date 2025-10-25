@@ -14,13 +14,10 @@ import {
   Settings
 } from 'lucide-react';
 import { createCustomerPortalSession } from '../services/stripeService';
-import { useTranslations } from '../../hooks/useTranslations';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004';
 
 const SubscriptionDashboard = () => {
-  const { t } = useTranslations();
-
   const [subscription, setSubscription] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -43,7 +40,7 @@ const SubscriptionDashboard = () => {
       });
 
       if (!response.ok) {
-        throw new Error(t('common.error_obtener_suscripcion'));
+        throw new Error('Error al obtener suscripción');
       }
 
       const data = await response.json();
@@ -227,7 +224,7 @@ const SubscriptionDashboard = () => {
                 <p className="mt-2 text-2xl font-bold text-gray-900">
                   {formatPrice(subscription.amount, subscription.currency)}
                   <span className="text-base font-normal text-gray-600">
-                    {subscription.interval === 'month' ? '/mes' : t('common.ano')}
+                    {subscription.interval === 'month' ? '/mes' : '/año'}
                   </span>
                 </p>
               </div>

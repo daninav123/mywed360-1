@@ -104,7 +104,7 @@ const GuestFilters = React.memo(
               />
               <Input
                 type="text"
-                placeholder={t('common.buscar_por_nombre_email_telefono')}
+                placeholder="Buscar por nombre, email o teléfono..."
                 value={searchTerm}
                 onChange={handleSearchChange}
                 className="pl-10"
@@ -161,7 +161,7 @@ const GuestFilters = React.memo(
               onClick={handleBulkInviteApi}
               disabled={isLoading || guestCount === 0}
               className="flex items-center"
-              title={t('common.enviar_invitacion_formal_por_whatsapp')}
+              title="Enviar la invitación formal por WhatsApp API"
             >
               <MessageSquare size={16} className="mr-2" />
               Invitaciones masivas (API)

@@ -7,7 +7,6 @@ import {
   X,
 } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
-import { useTranslations } from '../../hooks/useTranslations';
 
 const badgeToneClasses = {
   emerald: 'bg-emerald-100 text-emerald-700',
@@ -191,7 +190,7 @@ export default function SeatingGuestDrawer({
               }`}
               title={
                 assignDisabled
-                  ? {t('common.selecciona_una_mesa_para_habilitar')}
+                  ? 'Selecciona una mesa para habilitar la asignación rápida'
                   : 'Asignar a la mesa seleccionada'
               }
             >

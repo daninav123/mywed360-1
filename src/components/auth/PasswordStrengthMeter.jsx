@@ -4,7 +4,7 @@ import { evaluatePasswordStrength } from '../../utils/validationUtils';
 import useTranslations from '../../hooks/useTranslations';
 
 const LABEL_KEYS = {
-  {t('common.muy_debil')}: 'passwordStrength.labels.veryWeak',
+  'Muy débil': 'passwordStrength.labels.veryWeak',
   Débil: 'passwordStrength.labels.weak',
   Aceptable: 'passwordStrength.labels.medium',
   Buena: 'passwordStrength.labels.strong',
@@ -12,13 +12,13 @@ const LABEL_KEYS = {
 };
 
 const SUGGESTION_KEYS = {
-  {t('common.introduce_una_contrasena_con_menos')}: 'passwordStrength.suggestions.start',
+  'Introduce una contraseña con al menos 8 caracteres.': 'passwordStrength.suggestions.start',
   'Usa al menos 8 caracteres.': 'passwordStrength.suggestions.length8',
-  {t('common.aumenta_longitud_caracteres_mas')}: 'passwordStrength.suggestions.length12',
-  {t('common.combina_mayusculas_minusculas')}: 'passwordStrength.suggestions.case',
-  {t('common.anade_numeros_para_reforzarla')}: 'passwordStrength.suggestions.numbers',
-  {t('common.incluye_simbolos_como_similares')}: 'passwordStrength.suggestions.symbols',
-  {t('common.evita_repetir_mismo_caracter_varias')}:
+  'Aumenta la longitud a 12 caracteres o más.': 'passwordStrength.suggestions.length12',
+  'Combina mayúsculas y minúsculas.': 'passwordStrength.suggestions.case',
+  'Añade números para reforzarla.': 'passwordStrength.suggestions.numbers',
+  'Incluye símbolos como !, %, # o similares.': 'passwordStrength.suggestions.symbols',
+  'Evita repetir el mismo carácter varias veces seguidas.':
     'passwordStrength.suggestions.repetition',
   'Evita palabras comunes o secuencias previsibles.': 'passwordStrength.suggestions.common',
 };

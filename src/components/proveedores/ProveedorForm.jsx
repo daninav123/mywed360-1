@@ -233,7 +233,7 @@ const ProveedorForm = ({ onSubmit, onCancel, initialData }) => {
                 onChange={handleChange}
                 rows={3}
                 className="w-full p-2 border border-gray-300 rounded-md"
-                placeholder={t('common.descripcion_breve_del_proveedor')}
+                placeholder="Descripción breve del proveedor"
               />
             </div>
 

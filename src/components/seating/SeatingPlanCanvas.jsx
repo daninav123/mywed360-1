@@ -1,4 +1,3 @@
-import { useTranslations } from '../../hooks/useTranslations';
 /**
  * Componente Canvas especializado para el plan de asientos
  * Maneja la visualización y interacción con mesas y sillas
@@ -645,7 +644,7 @@ const SeatingPlanCanvas = ({
             <button
               type="button"
               className="px-2 py-0.5 rounded border hover:bg-gray-50"
-              title={t('common.limpiar_seleccion_esc')}
+              title="Limpiar selección (Esc)"
               onClick={() => {
                 try { typeof onSelectTable === 'function' && onSelectTable(null, false); } catch {}
               }}

@@ -19,13 +19,10 @@ import useAISearch from '../hooks/useAISearch';
 import useProveedores from '../hooks/useProveedores';
 import useSupplierShortlist from '../hooks/useSupplierShortlist';
 import { loadData, saveData } from '../services/SyncService';
-import { useTranslations } from '../../hooks/useTranslations';
 
 const CONFIRMED_KEYWORDS = ['confirm', 'contrat', 'reserva', 'firm'];
 
 const normalizeServiceKey = (value) => {
-  const { t } = useTranslations();
-
   if (!value) return 'otros';
   return String(value).trim().toLowerCase();
 };
@@ -336,7 +333,7 @@ const Proveedores = () => {
       const enrichedQuery = [...baseTokens, ...profileSearchTokens].join(' ').trim();
 
       if (!trimmed && !enrichedQuery) {
-        if (!silent) toast.warn(t('common.anade_termino_completa_perfil_para'));
+        if (!silent) toast.warn('Añade un término o completa tu perfil para mejorar las búsquedas.');
         return;
       }
 
@@ -356,11 +353,11 @@ const Proveedores = () => {
         });
         const safeResults = Array.isArray(results) ? results : [];
         if (!safeResults.length && !silent) {
-          toast.info(t('common.encontramos_coincidencias_directas_ajusta_busqueda'));
+          toast.info('No encontramos coincidencias directas. Ajusta la búsqueda o actualiza tu perfil.');
         }
       } catch (err) {
         console.warn('[Proveedores] searchProviders failed', err);
-        if (!silent) toast.error(t('common.pudo_completar_busqueda'));
+        if (!silent) toast.error('No se pudo completar la búsqueda.');
       }
     },
     [profileSearchTokens, registerSearchQuery, runAISearch, setSearchTerm]
@@ -501,7 +498,7 @@ const Proveedores = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                aria-label={t('common.aria_plegar_exploracion')}
+                aria-label="Plegar exploración"
                 onClick={() => setSearchPanelCollapsed(true)}
                 className="h-8 w-8 justify-center"
               >
@@ -576,7 +573,7 @@ const Proveedores = () => {
                   </Card>
                 ) : aiError ? (
                   <Card className="border border-danger bg-danger-soft text-sm text-danger">
-                    {aiError?.message || {t('common.pudo_completar_busqueda')}}
+                    {aiError?.message || 'No se pudo completar la búsqueda.'}
                   </Card>
                 ) : aiResults.length === 0 ? (
                   <Card className="border border-dashed border-soft bg-surface/80 text-sm text-muted">

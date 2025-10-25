@@ -11,10 +11,8 @@ import {
 import sanitizeHtml from '../../utils/sanitizeHtml';
 import EmailInsights from '../EmailInsights';
 import Button from '../ui/Button';
-import { useTranslations } from '../../hooks/useTranslations';
 
 export default function MailViewer({
-
   mail,
   onMarkRead,
   onDelete,
@@ -137,7 +135,7 @@ export default function MailViewer({
     onMarkRead && onMarkRead(mail);
   };
   const handleDelete = () => {
-    if (onDelete && window.confirm(t('common.borrar_este_correo'))) {
+    if (onDelete && window.confirm('¿Borrar este correo?')) {
       onDelete(mail);
     }
   };

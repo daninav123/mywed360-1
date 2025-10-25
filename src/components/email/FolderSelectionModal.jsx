@@ -114,7 +114,7 @@ const FolderSelectionModal = ({
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 p-1 rounded-full"
-            aria-label={t('common.aria_cerrar_dialogo')}
+            aria-label="Cerrar diálogo"
           >
             <X size={20} />
           </button>
@@ -202,7 +202,7 @@ const FolderSelectionModal = ({
 
         {/* Acciones */}
         <footer className="p-4 border-t flex justify-end space-x-2">
-          <Button variant="ghost" onClick={onClose} aria-label={t('common.aria_cancelar_seleccion_y_cerrar')}>
+          <Button variant="ghost" onClick={onClose} aria-label="Cancelar selección y cerrar">
             Cancelar
           </Button>
         </footer>

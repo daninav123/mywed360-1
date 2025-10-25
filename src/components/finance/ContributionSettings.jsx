@@ -232,7 +232,7 @@ export default function ContributionSettings({
               <div>
                 <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1">
                   {t('finance.contributions.gifts.guestCount', {
-                    defaultValue: t('common.numero_invitados'),
+                    defaultValue: 'Número de invitados',
                   })}
                 </label>
                 <div className="flex space-x-2">
@@ -256,7 +256,7 @@ export default function ContributionSettings({
                 <p className="mt-1 text-xs text-[color:var(--color-text)]/60">
                   {t('finance.contributions.gifts.loadHint', {
                     defaultValue:
-                      {t('common.haz_clic_icono_para_cargar')},
+                      'Haz clic en el icono para cargar automáticamente desde tu lista de invitados',
                   })}
                 </p>
               </div>
@@ -311,7 +311,7 @@ export default function ContributionSettings({
                 </h3>
                 <p className="text-sm text-[color:var(--color-text)]/70">
                   {t('finance.contributions.summary.subtitle', {
-                    defaultValue: t('common.proyeccion_total_basada_tus_configuraciones'),
+                    defaultValue: 'Proyección total basada en tus configuraciones',
                   })}
                 </p>
               </div>
@@ -423,7 +423,7 @@ export default function ContributionSettings({
                   </strong>{' '}
                   {t('finance.contributions.tips.balanceText', {
                     defaultValue:
-                      {t('common.manten_balance_justo_entre_las')},
+                      'Mantén un balance justo entre las aportaciones de ambas personas.',
                   })}
                 </p>
               </div>

@@ -1,10 +1,7 @@
-import { useTranslations } from '../../hooks/useTranslations';
-﻿import { X, Plus } from 'lucide-react';
+import { X, Plus } from 'lucide-react';
 import React, { useState } from 'react';
 
-const ProviderConfigModal = ({
-  const { t } = useTranslations();
- defaultServices, currentServices, onSave, onCancel }) => {
+const ProviderConfigModal = ({ defaultServices, currentServices, onSave, onCancel }) => {
   const [selectedServices, setSelectedServices] = useState(currentServices || []);
   const [customService, setCustomService] = useState('');
 
@@ -57,7 +54,7 @@ const ProviderConfigModal = ({
             type="text"
             value={customService}
             onChange={(e) => setCustomService(e.target.value)}
-            placeholder={t('common.animacion_infantil')}
+            placeholder="Ej: DJ, Animación infantil..."
             className="flex-1 border rounded px-3 py-2"
             onKeyPress={(e) => e.key === 'Enter' && addCustomService()}
           />
@@ -84,10 +81,8 @@ const ProviderConfigModal = ({
                 <button
                   onClick={() => removeService(service)}
                   className="hover:bg-blue-200 rounded-full p-1"
-                  type="button"
-                  aria-label={`Quitar servicio ${service}`}
                 >
-                  <X size={12} aria-hidden="true" />
+                  <X size={12} />
                 </button>
               </span>
             ))}

@@ -3,14 +3,11 @@ import { Link, useNavigate } from 'react-router-dom';
 
 import { useWedding } from '../../context/WeddingContext';
 import { db, firebaseReady } from '../../firebaseConfig';
-import { useTranslations } from '../../hooks/useTranslations';
 
 const fsImport = () => import('firebase/firestore');
 const stImport = () => import('firebase/storage');
 
 export default function MisDiseños() {
-  const { t } = useTranslations();
-
   const { activeWedding } = useWedding();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -33,7 +30,7 @@ export default function MisDiseños() {
         setItems(arr);
       } catch (e) {
         console.error(e);
-        setError(t('common.pudo_cargar_tus_disenos'));
+        setError('No se pudo cargar tus diseños');
       } finally {
         setLoading(false);
       }
@@ -42,7 +39,7 @@ export default function MisDiseños() {
   }, [activeWedding]);
 
   const handleDelete = async (it) => {
-    if (!confirm(t('common.eliminar_este_diseno_definitivamente'))) return;
+    if (!confirm('¿Eliminar este diseño definitivamente?')) return;
     try {
       await firebaseReady;
       const { doc, deleteDoc } = await fsImport();
@@ -79,14 +76,14 @@ export default function MisDiseños() {
           {items.map((it) => (
             <div key={it.id} className="border rounded overflow-hidden bg-white">
               <div className="p-2 bg-gray-50 text-xs text-gray-600 flex items-center justify-between">
-                <span>{it.type || {t('common.diseno')}}</span>
+                <span>{it.type || 'diseño'}</span>
                 <span>{it.category || 'general'}</span>
               </div>
               <div className="aspect-square w-full overflow-hidden flex items-center justify-center bg-white">
                 {it.url ? (
                   <img
                     src={it.url}
-                    alt={it.category || {t('common.diseno')}}
+                    alt={it.category || 'diseño'}
                     className="max-w-full max-h-full object-contain"
                   />
                 ) : (

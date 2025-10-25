@@ -214,8 +214,8 @@ const GuestList = React.memo(
             <h3 className="text-lg font-medium text-body mb-2">No se encontraron invitados</h3>
             <p className="text-muted">
               {searchTerm || statusFilter || tableFilter
-                ?{t('common.intenta_ajustar_los_filtros_busqueda')}
-                : t('common.anade_primer_invitado_para_comenzar')}
+                ?'Intenta ajustar los filtros de búsqueda'
+                : 'Añade tu primer invitado para comenzar'}
             </p>
           </div>
         ) : (

@@ -5,11 +5,8 @@ import BanquetConfigModal from '../BanquetConfigModal';
 import CeremonyConfigModal from '../CeremonyConfigModal';
 import Modal from '../Modal';
 import VenueTemplateSelector from './VenueTemplateSelector';
-import { useTranslations } from '../../hooks/useTranslations';
 
-const clampNumber = (value, fallback, {
-  const { t } = useTranslations();
- min, max }) => {
+const clampNumber = (value, fallback, { min, max }) => {
   const parsed = Number(value);
   if (!Number.isFinite(parsed)) return fallback;
   let result = parsed;
@@ -122,7 +119,7 @@ const BackgroundModal = ({
             onChange={(e) =>
               setDraft((prev) => ({ ...prev, dataUrl: e.target.value.trim() }))
             }
-            placeholder={t('common.pega_aqui_una_data_url')}
+            placeholder="Pega aquí una data URL o un enlace directo a la imagen"
             className="w-full min-h-[90px] text-xs border rounded px-2 py-1"
           />
           {draft.dataUrl && (

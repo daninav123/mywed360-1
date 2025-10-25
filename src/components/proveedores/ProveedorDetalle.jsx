@@ -11,7 +11,6 @@ import {
 import React, { useState } from 'react';
 import { useWedding } from '../../context/WeddingContext';
 import { formatDate } from '../../utils/formatUtils';
-import { useTranslations } from '../../hooks/useTranslations';
 
 /**
  * Componente para mostrar el detalle completo de un proveedor con pestañas
@@ -26,8 +25,6 @@ import { useTranslations } from '../../hooks/useTranslations';
  * @returns {React.ReactElement} Vista detalle del proveedor
  */
 const ProveedorDetalle = ({
-  const { t } = useTranslations();
-
   proveedor,
   comunicaciones = [],
   onCerrar,
@@ -112,7 +109,7 @@ const ProveedorDetalle = ({
             onClick={() => {
               try { onNuevaComunicacion?.(); } catch {}
               // Mostrar mensaje esperado por el test E2E
-              setFlashMensaje(t('common.comunicacion_registrada_durante_prueba'));
+              setFlashMensaje('Comunicación registrada durante la prueba');
               // Ocultar el mensaje tras unos segundos
               try { setTimeout(() => setFlashMensaje(''), 2500); } catch {}
             }}

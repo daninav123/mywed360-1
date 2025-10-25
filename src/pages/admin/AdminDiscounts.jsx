@@ -2,13 +2,10 @@ import React, { useEffect, useMemo, useState } from 'react';
 
 import { getDiscountLinks, createDiscountCode, updateDiscountCode, generatePartnerToken } from '../../services/adminDataService';
 import { ExternalLink, Link as LinkIcon } from 'lucide-react';
-import { useTranslations } from '../../hooks/useTranslations';
 
 const makeId = () => Math.random().toString(36).slice(2, 10);
 
 const createEmptyTier = () => ({
-  const { t } = useTranslations();
-
   id: makeId(),
   label: '',
   minRevenue: '0',
@@ -502,7 +499,7 @@ const summarizeCommissionRules = (rules) => {
   if (!rules || !Array.isArray(rules.periods) || rules.periods.length === 0) {
     return {
       label: 'Sin reglas',
-      description: t('common.este_enlace_tiene_comisiones_configuradas'),
+      description: 'Este enlace no tiene comisiones configuradas. Usa el modal de edición para añadirlas.',
       hasRules: false,
     };
   }
@@ -553,7 +550,7 @@ const TYPE_LABELS = {
   planner: 'Planner',
   influencer: 'Influencer',
   partner: 'Partner',
-  campaign: t('common.campana'),
+  campaign: 'Campaña',
 };
 
 const AdminDiscounts = () => {
@@ -861,7 +858,7 @@ const AdminDiscounts = () => {
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder={t('common.buscar_por_codigo_url_responsable')}
+            placeholder="Buscar por código, URL o responsable"
             className="rounded-md border border-soft px-3 py-2 text-sm"
           />
           <select
@@ -1361,7 +1358,7 @@ const AdminDiscounts = () => {
                 <textarea
                   value={formData.notes}
                   onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
-                  placeholder={t('common.detalles_adicionales_sobre_este_codigo')}
+                  placeholder="Detalles adicionales sobre este código..."
                   rows="2"
                   className="w-full rounded-md border border-soft px-3 py-2 text-sm"
                 />

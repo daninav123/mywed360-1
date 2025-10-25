@@ -3,13 +3,10 @@
 import Modal from '../Modal';
 import { Button } from '../ui';
 import { Input } from '../ui';
-import { useTranslations } from '../../hooks/useTranslations';
 
 const ensureSet = (ids = []) => new Set(Array.isArray(ids) ? ids : []);
 
 const requiresCoupleSignature = (text = '', coupleName = '') => {
-  const { t } = useTranslations();
-
   if (!coupleName) return true;
   const normalized = coupleName.trim().toLowerCase();
   if (!normalized) return true;
@@ -97,7 +94,7 @@ export default function FormalInvitationModal({
       return;
     }
     if (!assetUrl) {
-      alert(t('common.anade_url_invitacion_disenada_antes'));
+      alert('Añade la URL de la invitación diseñada antes de continuar.');
       return;
     }
     setSending(true);
@@ -118,7 +115,7 @@ export default function FormalInvitationModal({
   if (!open) return null;
 
   return (
-    <Modal open={open} onClose={onClose} title={t('common.invitacion_formal')} size="lg">
+    <Modal open={open} onClose={onClose} title="Invitación formal" size="lg">
       <div className="space-y-4">
         <div className="text-sm text-gray-600">
           Personaliza el mensaje, adjunta la invitación final y decide cómo enviarla. El mensaje debe

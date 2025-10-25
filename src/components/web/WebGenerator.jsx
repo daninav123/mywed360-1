@@ -1,9 +1,6 @@
 import React from 'react';
-import { useTranslations } from '../../hooks/useTranslations';
 
 const WebGenerator = ({
-  const { t } = useTranslations();
-
   prompt,
   onPromptChange,
   onGenerate,
@@ -38,7 +35,7 @@ const WebGenerator = ({
 
     <textarea
       className="w-full h-40 border rounded-lg p-4"
-      placeholder={t('common.describe_como_quieres_que_sea')}
+      placeholder="Describe cómo quieres que sea tu web (estilo, colores, secciones, logística, etc.)"
       value={prompt}
       onChange={(event) => onPromptChange?.(event.target.value)}
     />

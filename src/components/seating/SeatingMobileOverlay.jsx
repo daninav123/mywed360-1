@@ -1,9 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import { useTranslations } from '../../hooks/useTranslations';
 
-const FabButton = ({
-  const { t } = useTranslations();
- icon, label, onClick }) => (
+const FabButton = ({ icon, label, onClick }) => (
   <button
     type="button"
     onClick={onClick}
@@ -149,7 +146,7 @@ export default function SeatingMobileOverlay({
           </div>
         )}
         <FabButton
-          label={t('common.menu_movil')}
+          label="Menú móvil"
           onClick={() => setFabOpen((prev) => !prev)}
           icon={<span className="text-lg">{fabOpen ? '×' : '⋮'}</span>}
         />

@@ -5,11 +5,8 @@
 
 import { Church, Utensils, Users, Grid } from 'lucide-react';
 import React from 'react';
-import { useTranslations } from '../../hooks/useTranslations';
 
 const SeatingPlanTabs = ({
-  const { t } = useTranslations();
-
   activeTab,
   onTabChange,
   ceremonyCount = 0,
@@ -25,14 +22,14 @@ const SeatingPlanTabs = ({
       label: 'Ceremonia',
       icon: Church,
       count: ceremonyCount,
-      description: t('common.disposicion_asientos_para_ceremonia'),
+      description: 'Disposición de asientos para la ceremonia',
     },
     {
       id: 'banquet',
       label: 'Banquete',
       icon: Utensils,
       count: banquetCount,
-      description: t('common.distribucion_mesas_para_banquete'),
+      description: 'Distribución de mesas para el banquete',
     },
   ];
 

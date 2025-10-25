@@ -13,11 +13,8 @@ import { useWedding } from '../context/WeddingContext';
 import { uploadEmailAttachments as uploadFilesToStorage } from '../services/storageUploadService';
 import { saveData, loadData } from '../services/SyncService';
 import { formatDate } from '../utils/formatUtils';
-import { useTranslations } from '../../hooks/useTranslations';
 
 const generateNoteId = () => {
-  const { t } = useTranslations();
-
   if (typeof crypto !== 'undefined' && crypto.randomUUID) {
     return crypto.randomUUID();
   }
@@ -49,7 +46,7 @@ const normalizePosts = (items = []) =>
     .filter((item) => item && typeof item === 'object')
     .map((item) => ({
       id: item.id || generatePostId(),
-      title: item.title || {t('common.entrada_sin_titulo')},
+      title: item.title || 'Entrada sin título',
       content: item.content || '',
       createdAt: item.createdAt || new Date().toISOString(),
       updatedAt: item.updatedAt || item.createdAt || new Date().toISOString(),
@@ -197,7 +194,7 @@ export default function Ideas() {
   const handleAddNote = () => {
     const trimmed = noteText.trim();
     if (!trimmed) {
-      toast.info(t('common.escribe_una_nota_antes_anadirla'));
+      toast.info('Escribe una nota antes de añadirla.');
       return;
     }
     const now = new Date().toISOString();
@@ -210,7 +207,7 @@ export default function Ideas() {
     };
     setNotes((prev) => [...prev, nextNote]);
     setNoteText('');
-    toast.success(t('common.nota_anadida'));
+    toast.success('Nota añadida.');
   };
 
   const handleDeleteNote = (id) => {
@@ -284,7 +281,7 @@ export default function Ideas() {
       }));
       setPhotos((prev) => [...prev, ...mapped]);
       toast.update(uploadingToast, {
-        render: t('common.fotos_anadidas_correctamente'),
+        render: 'Fotos añadidas correctamente.',
         type: 'success',
         isLoading: false,
         autoClose: 2000,
@@ -595,7 +592,7 @@ function IdeasBlogSection() {
     const title = draft.title.trim();
     const content = draft.content.trim();
     if (!title || !content) {
-      toast.info(t('common.completa_titulo_contenido_antes_guardar'));
+      toast.info('Completa el título y el contenido antes de guardar.');
       return;
     }
     const now = new Date().toISOString();
@@ -621,7 +618,7 @@ function IdeasBlogSection() {
     const title = draft.title.trim();
     const content = draft.content.trim();
     if (!title || !content) {
-      toast.info(t('common.completa_titulo_contenido_antes_guardar'));
+      toast.info('Completa el título y el contenido antes de guardar.');
       return;
     }
     setPosts((prev) =>
@@ -732,7 +729,7 @@ function IdeasBlogSection() {
                     title: event.target.value,
                   }))
                 }
-                placeholder={t('common.como_organizar_ceremonia_civil_perfecta')}
+                placeholder="Ej. Cómo organizar la ceremonia civil perfecta"
                 className="border rounded px-3 py-2 text-sm"
               />
             </div>
@@ -748,12 +745,12 @@ function IdeasBlogSection() {
                 }
                 rows={12}
                 className="border rounded px-3 py-2 text-sm font-mono"
-                placeholder={t('common.escribe_formato_markdown_ligero_usa')}
+                placeholder="Escribe en formato Markdown ligero. Usa ## títulos, **negritas**, listas con - ..."
               />
             </div>
             <div className="flex justify-between items-center gap-3 flex-wrap">
               <span className="text-xs text-gray-500">
-                {isSaving ? 'Guardando…' : t('common.cambios_guardados_automaticamente')}
+                {isSaving ? 'Guardando…' : 'Cambios guardados automáticamente'}
               </span>
               <div className="flex gap-2">
                 {selectedPostId && (

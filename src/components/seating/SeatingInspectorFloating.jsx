@@ -1,9 +1,8 @@
-﻿/**
+/**
  * SeatingInspectorFloating - Panel flotante de inspección con glassmorphism
  */
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useTranslations } from '../../hooks/useTranslations';
 import {
   X,
   Copy,
@@ -15,9 +14,7 @@ import {
   Maximize2,
 } from 'lucide-react';
 
-const ActionButton = ({
-  const { t } = useTranslations();
- icon: Icon, label, onClick, variant = 'default' }) => {
+const ActionButton = ({ icon: Icon, label, onClick, variant = 'default' }) => {
   const variants = {
     default: 'bg-white/10 hover:bg-white/20 text-white',
     danger: 'bg-red-500/20 hover:bg-red-500/30 text-red-400',
@@ -63,10 +60,8 @@ const GuestItem = ({ guest, onRemove }) => (
       onClick={onRemove}
       className="opacity-0 group-hover:opacity-100 transition-opacity
                  text-red-400 hover:text-red-300"
-      type="button"
-      aria-label="Eliminar invitado de la mesa"
     >
-      <Trash2 size={14} aria-hidden="true" />
+      <Trash2 size={14} />
     </button>
   </motion.div>
 );
@@ -118,10 +113,8 @@ export default function SeatingInspectorFloating({
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-white transition-colors"
-            type="button"
-            aria-label="Cerrar inspector"
           >
-            <X size={20} aria-hidden="true" />
+            <X size={20} />
           </button>
         </div>
 
@@ -244,7 +237,7 @@ export default function SeatingInspectorFloating({
               label="Eliminar"
               variant="danger"
               onClick={() => {
-                if (confirm(t('common.eliminar_esta_mesa'))) {
+                if (confirm('¿Eliminar esta mesa?')) {
                   onDelete?.(table.id);
                   onClose();
                 }

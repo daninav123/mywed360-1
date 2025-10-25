@@ -14,7 +14,6 @@ import useWeddingCollection from '../hooks/useWeddingCollection';
 import { useWedding } from '../context/WeddingContext';
 import { performanceMonitor } from '../services/PerformanceMonitor';
 import { updateWeddingModulePermissions } from '../services/WeddingService';
-import { useTranslations } from '../../hooks/useTranslations';
 import {
   EVENT_TYPE_LABELS,
   EVENT_STYLE_OPTIONS,
@@ -26,8 +25,6 @@ import {
 
 const toLabelMap = (options) =>
   options.reduce((map, option) => {
-  const { t } = useTranslations();
-
     map[option.value] = option.label;
     return map;
   }, {});
@@ -63,10 +60,10 @@ export default function BodaDetalle() {
   const { data: suppliers } = useWeddingCollection('suppliers', id, []);
 
   const DESIGN_ITEMS = [
-    { key: 'web', label: t('common.pagina_web') },
+    { key: 'web', label: 'Página web' },
     { key: 'invitacion', label: 'Invitaciones' },
     { key: 'seating', label: 'Seating plan' },
-    { key: 'menu', label: t('common.menu') },
+    { key: 'menu', label: 'Menú' },
     { key: 'logo', label: 'Logo' },
   ];
 

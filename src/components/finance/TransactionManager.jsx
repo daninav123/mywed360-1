@@ -117,7 +117,7 @@ export default function TransactionManager({
                       })
                     );
                   } else {
-                    throw new Error(result?.error || {t('common.exportacion_fallida')});
+                    throw new Error(result?.error || 'Exportación fallida');
                   }
                 } catch (err) {
                   toast.error(
@@ -165,7 +165,7 @@ export default function TransactionManager({
           if (!onImportTransactions) {
             toast.error(
               t('finance.transactions.importUnsupported', {
-                defaultValue: t('common.importacion_disponible'),
+                defaultValue: 'Importación no disponible',
               })
             );
             return { success: false, error: 'Import unsupported' };
@@ -176,12 +176,12 @@ export default function TransactionManager({
             if (result?.success) {
               toast.success(
                 t('finance.transactions.importSuccess', {
-                  defaultValue: t('common.importacion_completada'),
+                  defaultValue: 'Importación completada',
                 }) +
                   (result?.imported
                     ? ` (${result.imported} ${
                         result.imported === 1
-                          ? t('finance.transactions.item', { defaultValue: t('common.transaccion') })
+                          ? t('finance.transactions.item', { defaultValue: 'transacción' })
                           : t('finance.transactions.items', { defaultValue: 'transacciones' })
                       })`
                     : '')
@@ -189,7 +189,7 @@ export default function TransactionManager({
             } else if (result?.errors?.length) {
               toast.warning(
                 `${t('finance.transactions.importPartial', {
-                  defaultValue: t('common.importacion_parcial'),
+                  defaultValue: 'Importación parcial',
                 })}: ${result.errors.length} ${t('finance.transactions.rowsFailed', {
                   defaultValue: 'filas con errores',
                 })}`

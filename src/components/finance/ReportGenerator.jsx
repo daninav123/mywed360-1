@@ -2,14 +2,11 @@ import React, { useState } from 'react';
 import { Download, FileText, FileSpreadsheet, Loader2, Calendar, Filter } from 'lucide-react';
 import Button from '../ui/Button';
 import { formatDate } from '../../utils/formatUtils';
-import { useTranslations } from '../../hooks/useTranslations';
 
 /**
  * Generador de reportes financieros en PDF y Excel
  */
-const ReportGenerator = ({
-  const { t } = useTranslations();
- transactions = [], weddingInfo = {} }) => {
+const ReportGenerator = ({ transactions = [], weddingInfo = {} }) => {
   const [generating, setGenerating] = useState(false);
   const [reportType, setReportType] = useState('summary'); // summary, detailed, supplier
   const [format, setFormat] = useState('pdf'); // pdf, excel
@@ -165,7 +162,7 @@ const ReportGenerator = ({
 
     // Hoja 2: Transacciones
     const transactionsData = [
-      ['Fecha', 'Concepto', 'Proveedor', 'Tipo', 'Monto', t('common.categoria')],
+      ['Fecha', 'Concepto', 'Proveedor', 'Tipo', 'Monto', 'Categoría'],
       ...data.map(t => [
         formatDate(t.date, 'short'),
         t.concept || t.description || '-',

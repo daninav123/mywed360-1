@@ -2,19 +2,16 @@ import React, { useEffect, useMemo } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 import Card from '../../components/ui/Card';
-import { useTranslations } from '../../hooks/useTranslations';
 
 // Pestañas iniciales para la sección Diseños
 const tabs = [
-  {
-  const { t } = useTranslations();
- path: 'invitaciones', label: 'Invitaciones' },
+  { path: 'invitaciones', label: 'Invitaciones' },
   { path: 'logo', label: 'Logo' },
-  { path: 'menu', label: t('common.menu') },
+  { path: 'menu', label: 'Menú' },
   { path: 'seating-plan', label: 'Seating Plan' },
-  { path: 'menu-catering', label: t('common.menu_catering') },
+  { path: 'menu-catering', label: 'Menú Catering' },
   { path: 'papeles-nombres', label: 'Papeles Nombres' },
-  { path: 'mis-disenos', label: t('common.mis_disenos') },
+  { path: 'mis-disenos', label: 'Mis diseños' },
 ];
 
 const DiseñosLayout = React.memo(() => {
@@ -46,7 +43,7 @@ const DiseñosLayout = React.memo(() => {
 
       <nav
         role="tablist"
-        aria-label={t('common.aria_secciones_de_diseno')}
+        aria-label="Secciones de Diseño"
         className="flex overflow-x-auto space-x-2 pb-2"
       >
         {navTabs.map((tab) => (
@@ -71,7 +68,7 @@ const DiseñosLayout = React.memo(() => {
       <Card
         className="overflow-hidden focus:outline-none focus-visible:ring-2 ring-primary"
         role="region"
-        aria-label={t('common.aria_contenido_de_disenos')}
+        aria-label="Contenido de Diseños"
       >
         <div className="p-6">
           <Outlet />

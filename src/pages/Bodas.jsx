@@ -24,12 +24,9 @@ import { useAuth } from '../hooks/useAuth';
 import { performanceMonitor } from '../services/PerformanceMonitor';
 import { createWedding } from '../services/WeddingService';
 import { bulkSyncWeddings, syncWeddingWithCRM } from '../services/crmSyncService';
-import { useTranslations } from '../../hooks/useTranslations';
 
 const STATUS_TAB_OPTIONS = [
-  {
-  const { t } = useTranslations();
- id: 'active', label: 'Bodas activas' },
+  { id: 'active', label: 'Bodas activas' },
   { id: 'archived', label: 'Bodas archivadas' },
   { id: 'portfolio', label: 'Resumen multi boda' },
 ];
@@ -194,7 +191,7 @@ export default function Bodas() {
         });
       } catch (error) {
         console.error('[Bodas] sync CRM error', error);
-        alert(t('common.pudo_encolar_sincronizacion_crm_intenta'));
+        alert('No se pudo encolar la sincronización CRM. Intenta nuevamente.');
       } finally {
         markSyncing(weddingId, false);
       }
@@ -353,8 +350,8 @@ export default function Bodas() {
   const handleToggleActive = async (wedding) => {
     const nextActive = wedding.active === false;
     const confirmMessage = nextActive
-      ? {t('common.restaurar_esta_boda_volver_marcarla')}
-      : t('common.archivar_esta_boda_podras_restaurarla');
+      ? '¿Restaurar esta boda y volver a marcarla como activa?'
+      : '¿Archivar esta boda? Podrás restaurarla más adelante.';
     if (!window.confirm(confirmMessage)) return;
     try {
       const wedRef = doc(db, 'weddings', wedding.id);
@@ -451,7 +448,7 @@ export default function Bodas() {
         <p className="text-sm text-muted">
           {viewMode === 'archived'
             ? 'No hay bodas archivadas en este momento.'
-            : t('common.todavia_tienes_bodas_activas')}
+            : 'Todavía no tienes bodas activas.'}
         </p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -472,7 +469,7 @@ export default function Bodas() {
                       {(wedding.weddingDateValue && formatDate(wedding.weddingDateValue, 'short')) ||
                         wedding.weddingDate ||
                         'Fecha pendiente'}{' '}
-                      · {wedding.location || {t('common.ubicacion_pendiente')}}
+                      · {wedding.location || 'Ubicación pendiente'}
                     </p>
                   </div>
                   <span

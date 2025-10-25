@@ -1,4 +1,3 @@
-import { X } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 
 import { useWedding } from '../../context/WeddingContext';
@@ -118,19 +117,8 @@ export default function SupplierOnboardingModal({
   const selectedCount = selectedLabels.length;
   const summaryLabels = normalizeLabels(selectedCount ? selectedLabels : DEFAULT_SELECTION);
 
-  const handleOverlayClick = (event) => {
-    if (event.target === event.currentTarget) {
-      onClose?.();
-    }
-  };
-
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4"
-      onMouseDown={handleOverlayClick}
-      role="dialog"
-      aria-modal="true"
-    >
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
       <Card className="w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
         <div className="border-b px-6 py-4 flex items-center justify-between">
           <div>
@@ -139,10 +127,10 @@ export default function SupplierOnboardingModal({
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+            className="text-gray-500 hover:text-gray-700"
             aria-label="Cerrar"
           >
-            <X size={20} aria-hidden="true" />
+            ?
           </button>
         </div>
 

@@ -1,4 +1,3 @@
-import { useTranslations } from '../../hooks/useTranslations';
 ﻿import { Plus, Trash2 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 
@@ -6,9 +5,7 @@ import ImageGeneratorAI from '../../components/ImageGeneratorAI';
 import Card from '../../components/ui/Card';
 import { saveData, loadData } from '../../services/SyncService';
 
-const defaultMenu = {
-  const { t } = useTranslations();
- entradas: [], principales: [], postres: [], bebidas: [] };
+const defaultMenu = { entradas: [], principales: [], postres: [], bebidas: [] };
 const initialState = () => {
   try {
     return loadData('menuDesigner', {
@@ -24,34 +21,34 @@ const initialState = () => {
 // Plantillas predefinidas para menús de boda
 const menuTemplates = [
   {
-    name: t('common.elegante_clasico'),
-    description: t('common.diseno_menu_formal_con_estilo'),
+    name: 'Elegante & Clásico',
+    description: 'Diseño de menú formal con estilo clásico y refinado',
     prompt:
-      {t('common.disena_menu_elegante_para_una')},
+      'Diseña un menú elegante para una boda con estilo clásico y refinado. Formato vertical con tipografía serif elegante. Usa colores neutros con detalles dorados o plateados. Incluye secciones para entrante, plato principal, postre y bebidas. El diseño debe ser sobrio y sofisticado, adecuado para una cena formal de boda.',
   },
   {
-    name: t('common.rustico_natural'),
-    description: t('common.menu_con_estetica_rustica_elementos'),
+    name: 'Rústico & Natural',
+    description: 'Menú con estética rústica, elementos naturales y texto manuscrito',
     prompt:
-      {t('common.crea_menu_boda_con_estetica')},
+      'Crea un menú de boda con estética rústica y natural. Utiliza elementos como madera, flores silvestres y hojas. Tipografía con aspecto manuscrito o caligráfico. Formato de una página con secciones para entrante, principal, postre y bebidas. Paleta de colores tierra y verdes naturales. El diseño debe transmitir calidez y un ambiente campestre elegante.',
   },
   {
     name: 'Minimalista & Moderno',
-    description: t('common.diseno_limpio_contemporaneo_con_espacios'),
+    description: 'Diseño limpio y contemporáneo con espacios blancos y tipografía simple',
     prompt:
-      {t('common.disena_menu_minimalista_moderno_para')},
+      'Diseña un menú minimalista y moderno para boda. Utiliza mucho espacio en blanco, tipografía sans-serif limpia y elementos geométricos simples. Formato elegante con distribución equilibrada. Paleta monocromática o con un acento de color. Incluye secciones para los platos principales y bebidas. El diseño debe ser contemporáneo, limpio y fácil de leer.',
   },
   {
-    name: t('common.botanico_floral'),
-    description: t('common.menu_decorado_con_elementos_botanicos'),
+    name: 'Botánico & Floral',
+    description: 'Menú decorado con elementos botánicos, flores y follaje',
     prompt:
-      {t('common.crea_menu_boda_con_tematica')},
+      'Crea un menú de boda con temática botánica y floral. Incorpora ilustraciones delicadas de flores, hojas y ramas como elementos decorativos. Usa una combinación de tipografías elegantes y caligráficas. Paleta de colores suaves como verde salvia, rosa pálido y toques dorados. Formato de una página con todas las secciones del menú organizadas armónicamente entre los elementos vegetales.',
   },
   {
-    name: t('common.vintage_romantico'),
-    description: t('common.menu_con_estetica_nostalgica_detalles'),
+    name: 'Vintage & Romántico',
+    description: 'Menú con estética nostálgica, detalles ornamentados y aire romántico',
     prompt:
-      {t('common.disena_menu_boda_con_estetica')},
+      'Diseña un menú de boda con estética vintage y romántica. Utiliza elementos decorativos como encajes, marcos ornamentados y motivos florales delicados. Tipografía elegante con serifs o caligráfica. Paleta en tonos sepia, crema o rosa antiguo. Formato que recuerde a documentos antiguos o postales vintage. Incluye todas las secciones del menú dentro de un diseño que evoque nostalgia y romance.',
   },
 ];
 

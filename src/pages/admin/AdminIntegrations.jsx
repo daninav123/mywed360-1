@@ -1,14 +1,11 @@
 import React, { useEffect, useState } from 'react';
 
 import { getIntegrationsData, retryIntegration } from '../../services/adminDataService';
-import { useTranslations } from '../../hooks/useTranslations';
 
 const statusInfo = {
-  const { t } = useTranslations();
-
   operational: { label: 'Operativo', className: 'text-green-600' },
   degraded: { label: 'Degradado', className: 'text-amber-600' },
-  down: { label: t('common.caido'), className: 'text-red-600' },
+  down: { label: 'Caído', className: 'text-red-600' },
 };
 
 const AdminIntegrations = () => {

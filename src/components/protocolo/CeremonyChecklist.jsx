@@ -4,11 +4,8 @@ import { Plus, Save, FileText, CheckCircle2 } from 'lucide-react';
 import { Card } from '../ui';
 import { Button } from '../ui';
 import useCeremonyChecklist from '../../hooks/useCeremonyChecklist';
-import { useTranslations } from '../../hooks/useTranslations';
 
 const STATUS_COLORS = {
-  const { t } = useTranslations();
-
   pending: 'bg-amber-100 text-amber-800',
   'in-progress': 'bg-blue-100 text-blue-800',
   done: 'bg-emerald-100 text-emerald-800',
@@ -66,7 +63,7 @@ export default function CeremonyChecklist({ compact = false }) {
     if (!label) return;
     const customCount = (draft || []).filter((item) => !defaultIds.has(item.id)).length;
     if (customCount >= 50) {
-      setLimitWarning(t('common.has_alcanzado_maximo_items_personalizados'));
+      setLimitWarning('Has alcanzado el máximo de 50 ítems personalizados.');
       return;
     }
     setDraft((prev) => [
@@ -138,7 +135,7 @@ export default function CeremonyChecklist({ compact = false }) {
               <label className="text-sm text-gray-600 mb-1">Nuevo ítem</label>
               <input
                 className="border rounded px-3 py-2"
-                placeholder={t('common.confirmar_musica_entrada')}
+                placeholder="Ej. Confirmar música de entrada"
                 value={newItem.label}
                 onChange={(e) => setNewItem((prev) => ({ ...prev, label: e.target.value }))}
               />
