@@ -1,5 +1,3 @@
-import i18n from '../i18n';
-
 /**
  * Cliente API centralizado para manejar el nuevo formato de respuestas
  * Según convenciones definidas en docs/API_CONVENTIONS.md
@@ -15,7 +13,49 @@ import i18n from '../i18n';
 export class ApiError extends Error {
   constructor(message, code, requestId, statusCode) {
     super(message);
-    this.name = 'ApiErrori18n.t('common.thiscode_code_thisrequestid_requestid_thisstatuscode_statuscode')Content-Type': 'application/jsoni18n.t('common.optionsheaders_intentar_parsear_json_let_result')parse_errori18n.t('common.null_responsestatus_verificar_respuesta_sigue_formato')booleani18n.t('common.formato_estandar_nuevo_resultsuccess_const_errorcode')unknown_error';
+    this.name = 'ApiError';
+    this.code = code;
+    this.requestId = requestId;
+    this.statusCode = statusCode;
+  }
+}
+
+/**
+ * Realiza una petición HTTP y maneja el formato de respuesta estándar
+ * @param {string} url - URL del endpoint
+ * @param {object} options - Opciones de fetch
+ * @returns {Promise<any>} - Datos de la respuesta
+ * @throws {ApiError} - Error con información detallada
+ */
+export async function apiRequest(url, options = {}) {
+  try {
+    const response = await fetch(url, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+    });
+
+    // Intentar parsear JSON
+    let result;
+    try {
+      result = await response.json();
+    } catch (parseError) {
+      // Si no se puede parsear, crear un error genérico
+      throw new ApiError(
+        `Error parsing response: ${parseError.message}`,
+        'parse_error',
+        null,
+        response.status
+      );
+    }
+
+    // Verificar si la respuesta sigue el formato estándar
+    if (result && typeof result.success === 'boolean') {
+      // Formato estándar nuevo
+      if (!result.success) {
+        const errorCode = result.error?.code || 'unknown_error';
         const errorMessage = result.error?.message || 'An error occurred';
         const requestId = result.requestId || null;
         throw new ApiError(errorMessage, errorCode, requestId, response.status);
@@ -43,12 +83,99 @@ export class ApiError extends Error {
     // Error de red u otro error
     throw new ApiError(
       error.message || 'Network error',
-      'network_errori18n.t('common.null_realiza_una_peticion_get_param')GETi18n.t('common.realiza_una_peticion_post_param_string')POSTi18n.t('common.body_jsonstringifydata_realiza_una_peticion_put')PUTi18n.t('common.body_jsonstringifydata_realiza_una_peticion_delete')DELETEi18n.t('common.maneja_errores_api_forma_centralizada_param')[API Error]', message, details);
+      'network_error',
+      null,
+      0
+    );
+  }
+}
+
+/**
+ * Realiza una petición GET
+ * @param {string} url - URL del endpoint
+ * @param {object} options - Opciones adicionales
+ * @returns {Promise<any>}
+ */
+export async function apiGet(url, options = {}) {
+  return apiRequest(url, {
+    ...options,
+    method: 'GET',
+  });
+}
+
+/**
+ * Realiza una petición POST
+ * @param {string} url - URL del endpoint
+ * @param {object} data - Datos a enviar
+ * @param {object} options - Opciones adicionales
+ * @returns {Promise<any>}
+ */
+export async function apiPost(url, data, options = {}) {
+  return apiRequest(url, {
+    ...options,
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
+/**
+ * Realiza una petición PUT
+ * @param {string} url - URL del endpoint
+ * @param {object} data - Datos a enviar
+ * @param {object} options - Opciones adicionales
+ * @returns {Promise<any>}
+ */
+export async function apiPut(url, data, options = {}) {
+  return apiRequest(url, {
+    ...options,
+    method: 'PUT',
+    body: JSON.stringify(data),
+  });
+}
+
+/**
+ * Realiza una petición DELETE
+ * @param {string} url - URL del endpoint
+ * @param {object} options - Opciones adicionales
+ * @returns {Promise<any>}
+ */
+export async function apiDelete(url, options = {}) {
+  return apiRequest(url, {
+    ...options,
+    method: 'DELETE',
+  });
+}
+
+/**
+ * Maneja errores de API de forma centralizada
+ * @param {Error} error - Error capturado
+ * @param {Function} showNotification - Función para mostrar notificaciones (opcional)
+ */
+export function handleApiError(error, showNotification = null) {
+  if (error instanceof ApiError) {
+    const message = error.message;
+    const details = {
+      code: error.code,
+      requestId: error.requestId,
+      statusCode: error.statusCode,
+    };
+
+    console.error('[API Error]', message, details);
 
     if (showNotification) {
       showNotification({
         type: 'error',
-        title: 'Errori18n.t('common.message_message_details_errorrequestid_request_errorrequestid')[Unexpected Error]', error);
+        title: 'Error',
+        message: message,
+        details: error.requestId ? `Request ID: ${error.requestId}` : undefined,
+      });
+    }
+
+    return details;
+  }
+
+  // Error genérico
+  console.error('[Unexpected Error]', error);
   if (showNotification) {
     showNotification({
       type: 'error',
