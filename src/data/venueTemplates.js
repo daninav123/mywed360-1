@@ -1,11 +1,8 @@
-import { useTranslations } from '../../hooks/useTranslations';
 ﻿export const venueTemplates = [
   {
-  const { t } = useTranslations();
-
     id: 'rect_hall',
-    name: t('common.salon_rectangular'),
-    description: t('common.plano_basico_rectangular_con_escenario'),
+    name: 'Salón rectangular',
+    description: 'Plano básico rectangular con escenario y pista central',
     hallSize: { width: 1800, height: 1200 },
     pointsOfInterest: [
       { id: 'stage', label: 'Escenario', x: 900, y: 120, type: 'stage' },
@@ -21,7 +18,7 @@ import { useTranslations } from '../../hooks/useTranslations';
   },
   {
     id: 'garden_l',
-    name: t('common.jardin'),
+    name: 'Jardín en L',
     description: 'Zona exterior con formato L, altar y barra lateral',
     hallSize: { width: 2000, height: 1500 },
     pointsOfInterest: [
@@ -33,7 +30,7 @@ import { useTranslations } from '../../hooks/useTranslations';
     ],
     overlays: {
       distance: { aisleMin: 120 },
-      notes: [t('common.considerar_iluminacion_adicional_zona'), 'Respetar rutas accesibles cerca del altar'],
+      notes: ['Considerar iluminación adicional en la zona L', 'Respetar rutas accesibles cerca del altar'],
     },
   },
   {

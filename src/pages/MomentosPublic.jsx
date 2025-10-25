@@ -16,7 +16,7 @@ import { firebaseReady } from '@/firebaseConfig';
 
 const ALBUM_ID = 'momentos';
 
-const formatDate = (value) => {
+const formatDateLocal = (value) => {
   if (!value) return '';
   const date =
     value instanceof Date
@@ -247,7 +247,7 @@ export default function MomentosPublic() {
         {uploadState?.closesAt && uploadState.isWindowOpen && remainingDays !== null && (
           <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-blue-500/10 border border-blue-400/40 px-4 py-2 text-xs font-medium text-blue-200">
             <Sparkles size={14} />
-            Disponible hasta {formatDate(uploadState.closesAt)} � {remainingDays === 0 ? '�ltimo d�a' : `${remainingDays} d�as restantes`}
+            Disponible hasta {formatDateLocal(uploadState.closesAt)} · {remainingDays === 0 ? 'Último día' : `${remainingDays} días restantes`}
           </div>
         )}
         {uploadsClosed && (

@@ -1,16 +1,13 @@
-import { useTranslations } from '../../hooks/useTranslations';
 export const EVENT_TYPE_OPTIONS = [
-  {
-  const { t } = useTranslations();
- value: 'boda', label: 'Boda' },
+  { value: 'boda', label: 'Boda' },
   { value: 'evento', label: 'Otro evento' },
 ];
 
 export const EVENT_STYLE_OPTIONS = [
-  { value: 'clasico', label: t('common.clasico') },
+  { value: 'clasico', label: 'Clásico' },
   { value: 'boho', label: 'Boho' },
   { value: 'moderno', label: 'Moderno' },
-  { value: 'rustico', label: t('common.rustico') },
+  { value: 'rustico', label: 'Rústico' },
   { value: 'glam', label: 'Glam' },
   { value: 'minimal', label: 'Minimalista' },
 ];
@@ -19,7 +16,7 @@ export const GUEST_COUNT_OPTIONS = [
   { value: 'menos-50', label: 'Hasta 50 personas' },
   { value: '50-100', label: 'Entre 50 y 100 personas' },
   { value: '100-200', label: 'Entre 100 y 200 personas' },
-  { value: '200-plus', label: t('common.mas_200_personas') },
+  { value: '200-plus', label: 'Más de 200 personas' },
 ];
 
 export const FORMALITY_OPTIONS = [
@@ -32,7 +29,7 @@ export const FORMALITY_OPTIONS = [
 export const CEREMONY_TYPE_OPTIONS = [
   { value: 'civil', label: 'Civil' },
   { value: 'religiosa', label: 'Religiosa' },
-  { value: 'simbolica', label: t('common.simbolica') },
+  { value: 'simbolica', label: 'Simbólica' },
   { value: 'otro', label: 'Otra / Personalizada' },
 ];
 

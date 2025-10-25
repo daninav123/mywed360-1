@@ -1,12 +1,9 @@
 import { z } from 'zod';
-import { useTranslations } from '../../hooks/useTranslations';
 
 const statusEnum = z.enum(['pending', 'paid', 'expected', 'received', 'overdue', 'canceled']);
 
 // Base object schema used to derive strict and partial variants
 const transactionBaseSchema = z.object({
-  const { t } = useTranslations();
-
   type: z.enum(['expense', 'income']).default('expense'),
   amount: z.coerce.number().finite().nonnegative(),
   status: statusEnum.optional(),
@@ -48,10 +45,10 @@ const withBusinessRules = (schema) =>
     if (obj.status) {
       const s = obj.status;
       if (obj.type === 'expense' && !['pending', 'paid', 'overdue', 'canceled'].includes(s)) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('common.estado_invalido_para_gasto'), path: ['status'] });
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Estado inválido para gasto', path: ['status'] });
       }
       if (obj.type === 'income' && !['expected', 'received'].includes(s)) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('common.estado_invalido_para_ingreso'), path: ['status'] });
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Estado inválido para ingreso', path: ['status'] });
       }
     }
     // paidAmount no puede exceder amount

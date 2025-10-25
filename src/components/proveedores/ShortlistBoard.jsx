@@ -53,7 +53,7 @@ export default function ShortlistBoard({
                       {item.name || 'Proveedor sugerido'}
                     </p>
                     <p className="text-xs text-[color:var(--color-text)]/55">
-                      {item.location || 'Sin ubicación'} · Guardado: {formatDate(item.createdAt)}
+                      {item.location || 'Sin ubicación'} · Guardado: {formatDateLocal(item.createdAt)}
                     </p>
                   </div>
                   {item.match != null && (
@@ -102,7 +102,7 @@ export default function ShortlistBoard({
   );
 }
 
-const formatDate = (value) => {
+const formatDateLocal = (value) => {
   if (!value) return '—';
   try {
     const date =

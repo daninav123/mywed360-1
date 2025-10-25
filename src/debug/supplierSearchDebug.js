@@ -1,9 +1,6 @@
-import { useTranslations } from '../../hooks/useTranslations';
 const MAX_EVENTS = 200;
 
 const createState = () => ({
-  const { t } = useTranslations();
-
   events: [],
   listeners: new Set(),
   verbose: false,
@@ -162,7 +159,7 @@ export const supplierDebug = {
       lastResults: api.lastResults,
       log: (type, payload) => {
         console.warn(
-          {t('common.mywedaisearchlog_esta_destinado_lectura_usa')}
+          'mywed.aiSearch.log() está destinado a lectura. Usa supplierDebug.log directamente si necesitas registrar eventos.'
         );
         return emitEvent(type, payload);
       },

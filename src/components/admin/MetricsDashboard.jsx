@@ -627,10 +627,12 @@ function MetricsDashboard() {
         </div>
       </div>
 
-      {/* altima actualizacin */}
+      {/* Última actualización */}
       <div className="mt-6 text-right text-sm text-gray-500">
-        const date = new Date();
-        return `${formatDate(date, 'short')} ${date.toLocaleTimeString()}`; : 'N/A'}
+        Última actualización: {(() => {
+          const date = new Date();
+          return `${formatDate(date, 'short')} ${date.toLocaleTimeString()}`;
+        })()}
       </div>
     </div>
   );
