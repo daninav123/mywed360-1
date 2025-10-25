@@ -1,3 +1,5 @@
+import i18n from '../i18n';
+
 /**
  * PlanLimitsService - Servicio para gestión de límites por plan de suscripción
  * 
@@ -15,40 +17,13 @@ export const OWNER_PLANS = {
   ANNUAL: 'annual',
   PREMIUM: 'premium',
   PLUS: 'plus',
-  PREMIUM_PLUS: 'premium_plus'
-};
-
-// Definición de planes para wedding planners
-export const PLANNER_PLANS = {
-  EXPLORATORY: 'planner_exploratory',
+  PREMIUM_PLUS: 'premium_plusi18n.t('common.definicion_planes_para_wedding_planners_export')planner_exploratory',
   STUDIO: 'planner_studio', // Wedding Planner 1
   STUDIO_PLUS: 'planner_studio_plus',
   AGENCY: 'planner_agency', // Wedding Planner 2
   AGENCY_PLUS: 'planner_agency_plus',
   TEAMS: 'planner_teams',
-  TEAMS_UNLIMITED: 'planner_teams_unlimited'
-};
-
-// Definición de planes para asistentes
-export const ASSISTANT_PLANS = {
-  ASSISTANT: 'assistant'
-};
-
-// Todos los planes disponibles
-export const ALL_PLANS = {
-  ...OWNER_PLANS,
-  ...PLANNER_PLANS,
-  ...ASSISTANT_PLANS
-};
-
-/**
- * Configuración de límites por plan
- * Basado en docs/flujos-especificos/flujo-25-suscripciones.md y docs/planes-suscripcion.md
- */
-const PLAN_LIMITS = {
-  // ===== PLANES PARA PAREJAS (OWNERS) =====
-  [OWNER_PLANS.FREE]: {
-    displayName: 'Gratis',
+  TEAMS_UNLIMITED: 'planner_teams_unlimitedi18n.t('common.definicion_planes_para_asistentes_export_const')assistanti18n.t('common.todos_los_planes_disponibles_export_const')Gratis',
     price: 0,
     currency: 'EUR',
     billingPeriod: null,
@@ -119,24 +94,7 @@ const PLAN_LIMITS = {
     displayName: 'Anual',
     price: 35,
     currency: 'EUR',
-    billingPeriod: 'yearly',
-    limits: {
-      activeWeddings: 1,
-      maxGuests: -1, // Ilimitado
-      maxEvents: 3, // Ceremonia, cóctel, banquete
-      maxAssistants: 0,
-      maxPlanners: 1,
-      seatingAdvanced: false,
-      aiTimeline: false,
-      legalDocuments: false,
-      emailAutomations: false,
-      webDesigns: 50,
-      whiteLabel: false,
-      exportsPDF: false,
-      exportsExcel: false,
-      concierge: false,
-      integrations: false,
-      supportLevel: 'priority',
+    billingPeriod: 'yearlyi18n.t('common.limits_activeweddings_maxguests_ilimitado_maxevents_ceremonia')priority',
       supportSLA: '4h',
       branding: 'maloveapp'
     },
@@ -150,27 +108,8 @@ const PLAN_LIMITS = {
   },
 
   [OWNER_PLANS.PREMIUM]: {
-    displayName: 'Premium',
-    price: 35, // Pago único por boda según docs/flujo-25
-    currency: 'EUR',
-    billingPeriod: 'per_wedding',
-    limits: {
-      activeWeddings: 1,
-      maxGuests: -1, // Ilimitado
-      maxEvents: 3, // Ceremonia, cóctel, banquete
-      maxAssistants: 3,
-      maxPlanners: 1,
-      seatingAdvanced: true,
-      aiTimeline: true,
-      legalDocuments: true,
-      emailAutomations: true,
-      webDesigns: 20,
-      whiteLabel: false,
-      exportsPDF: true,
-      exportsExcel: true,
-      concierge: false,
-      integrations: false,
-      supportLevel: 'priority',
+    displayName: 'Premiumi18n.t('common.price_pago_unico_por_boda_segun')EUR',
+    billingPeriod: 'per_weddingi18n.t('common.limits_activeweddings_maxguests_ilimitado_maxevents_ceremonia')priority',
       supportSLA: '4h',
       branding: 'maloveapp'
     },
@@ -228,9 +167,7 @@ const PLAN_LIMITS = {
   },
 
   [OWNER_PLANS.PREMIUM_PLUS]: {
-    displayName: 'Premium Plus',
-    price: 55, // Pago único por boda según docs/flujo-25
-    currency: 'EUR',
+    displayName: 'Premium Plusi18n.t('common.price_pago_unico_por_boda_segun')EUR',
     billingPeriod: 'per_wedding',
     limits: {
       activeWeddings: 1,
@@ -508,143 +445,7 @@ const PLAN_LIMITS = {
       maxAssistants: 0,
       maxPlanners: 0,
       inheritFromOwner: true, // Hereda nivel del owner
-      supportLevel: 'community',
-      supportSLA: null
-    },
-    features: {
-      editGuests: true,
-      editTasks: true,
-      editTimeline: true,
-      editSeating: true,
-      viewBudget: false, // Sin permisos de facturación
-      sendInvitations: false // Sin re-invitaciones
-    }
-  }
-};
-
-/**
- * Servicio para gestión de límites de planes
- */
-class PlanLimitsService {
-  /**
-   * Obtiene la configuración de un plan
-   * @param {string} planId - ID del plan
-   * @returns {Object|null} Configuración del plan o null si no existe
-   */
-  getPlanConfig(planId) {
-    return PLAN_LIMITS[planId] || null;
-  }
-
-  /**
-   * Obtiene los límites de un plan
-   * @param {string} planId - ID del plan
-   * @returns {Object} Límites del plan
-   */
-  getPlanLimits(planId) {
-    const config = this.getPlanConfig(planId);
-    return config ? config.limits : {};
-  }
-
-  /**
-   * Obtiene las características de un plan
-   * @param {string} planId - ID del plan
-   * @returns {Object} Características del plan
-   */
-  getPlanFeatures(planId) {
-    const config = this.getPlanConfig(planId);
-    return config ? config.features : {};
-  }
-
-  /**
-   * Verifica si un plan tiene una característica específica
-   * @param {string} planId - ID del plan
-   * @param {string} feature - Nombre de la característica
-   * @returns {boolean} true si tiene la característica
-   */
-  hasFeature(planId, feature) {
-    const features = this.getPlanFeatures(planId);
-    return features[feature] === true;
-  }
-
-  /**
-   * Verifica si se ha alcanzado el límite de invitados
-   * @param {string} planId - ID del plan
-   * @param {number} currentGuests - Número actual de invitados
-   * @returns {Object} { exceeded: boolean, limit: number, current: number }
-   */
-  checkGuestLimit(planId, currentGuests) {
-    const limits = this.getPlanLimits(planId);
-    const maxGuests = limits.maxGuests;
-    
-    if (maxGuests === -1) {
-      return { exceeded: false, limit: -1, current: currentGuests, message: 'Invitados ilimitados' };
-    }
-    
-    const exceeded = currentGuests > maxGuests;
-    return {
-      exceeded,
-      limit: maxGuests,
-      current: currentGuests,
-      message: exceeded 
-        ? `Has alcanzado el límite de ${maxGuests} invitados` 
-        : `${currentGuests} de ${maxGuests} invitados`
-    };
-  }
-
-  /**
-   * Verifica si se ha alcanzado el límite de eventos
-   * @param {string} planId - ID del plan
-   * @param {number} currentEvents - Número actual de eventos
-   * @returns {Object} { exceeded: boolean, limit: number, current: number }
-   */
-  checkEventLimit(planId, currentEvents) {
-    const limits = this.getPlanLimits(planId);
-    const maxEvents = limits.maxEvents;
-    
-    if (maxEvents === -1) {
-      return { exceeded: false, limit: -1, current: currentEvents, message: 'Eventos ilimitados' };
-    }
-    
-    const exceeded = currentEvents > maxEvents;
-    return {
-      exceeded,
-      limit: maxEvents,
-      current: currentEvents,
-      message: exceeded 
-        ? `Has alcanzado el límite de ${maxEvents} eventos` 
-        : `${currentEvents} de ${maxEvents} eventos`
-    };
-  }
-
-  /**
-   * Verifica si se ha alcanzado el límite de asistentes
-   * @param {string} planId - ID del plan
-   * @param {number} currentAssistants - Número actual de asistentes
-   * @returns {Object} { exceeded: boolean, limit: number, current: number }
-   */
-  checkAssistantLimit(planId, currentAssistants) {
-    const limits = this.getPlanLimits(planId);
-    const maxAssistants = limits.maxAssistants;
-    
-    if (maxAssistants === -1) {
-      return { exceeded: false, limit: -1, current: currentAssistants, message: 'Asistentes ilimitados' };
-    }
-    
-    const exceeded = currentAssistants > maxAssistants;
-    return {
-      exceeded,
-      limit: maxAssistants,
-      current: currentAssistants,
-      message: exceeded 
-        ? `Has alcanzado el límite de ${maxAssistants} asistentes` 
-        : `${currentAssistants} de ${maxAssistants} asistentes`
-    };
-  }
-
-  /**
-   * Verifica si se puede realizar una acción según el plan
-   * @param {string} planId - ID del plan
-   * @param {string} action - Acción a verificar (e.g., 'exportPDF', 'useAI', 'whiteLabel')
+      supportLevel: 'communityi18n.t('common.supportsla_null_features_editguests_true_edittasks')Invitados ilimitadosi18n.t('common.const_exceeded_currentguests_maxguests_return_exceeded')Eventos ilimitadosi18n.t('common.const_exceeded_currentevents_maxevents_return_exceeded')Asistentes ilimitadosi18n.t('common.const_exceeded_currentassistants_maxassistants_return_exceeded')exportPDF', 'useAI', 'whiteLabel')
    * @returns {Object} { allowed: boolean, reason: string }
    */
   canPerformAction(planId, action) {
@@ -667,13 +468,7 @@ class PlanLimitsService {
     
     return {
       allowed,
-      reason: allowed ? 'Permitido en tu plan' : `Esta función requiere un plan superior`
-    };
-  }
-
-  /**
-   * Obtiene el plan por defecto para un rol
-   * @param {string} role - Rol del usuario ('owner', 'planner', 'assistant')
+      reason: allowed ? 'Permitido en tu plani18n.t('common.esta_funcion_requiere_plan_superior_obtiene')owner', 'planner', 'assistant')
    * @returns {string} ID del plan por defecto
    */
   getDefaultPlanForRole(role) {
@@ -727,7 +522,7 @@ class PlanLimitsService {
         isUpgrade: false,
         isDowngrade: false,
         allowed: false,
-        reason: 'Plan no válido'
+        reason: i18n.t('common.plan_valido')
       };
     }
 
@@ -738,7 +533,7 @@ class PlanLimitsService {
       isUpgrade,
       isDowngrade,
       allowed: true, // La lógica de negocio determina si se permite
-      reason: isUpgrade ? 'Upgrade disponible' : isDowngrade ? 'Downgrade requiere validación' : 'Cambio lateral'
+      reason: isUpgrade ? 'Upgrade disponible' : isDowngrade ? i18n.t('common.downgrade_requiere_validacion') : 'Cambio lateral'
     };
   }
 }

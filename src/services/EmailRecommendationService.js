@@ -2,63 +2,14 @@
  * Servicio para generar recomendaciones inteligentes basadas en métricas
  * de efectividad de correos electrónicos
  */
+import i18n from '../i18n';
 import AIEmailTrackingService from './AIEmailTrackingService';
 import { EMAIL_TAGS } from './EmailTrackingService';
 
 class EmailRecommendationService {
   constructor() {
     this.trackingService = new AIEmailTrackingService();
-    this.storageKeyRecommendations = 'emailRecommendations';
-  }
-
-  /**
-   * Genera recomendaciones personalizadas basadas en métricas históricas
-   * @param {string} category - Categoría de proveedor (opcional)
-   * @param {string} searchQuery - Consulta de búsqueda (opcional)
-   * @returns {Object} Objeto con recomendaciones
-   */
-  generateRecommendations(category = null, searchQuery = null) {
-    try {
-      // Obtener datos históricos
-      const activities = this.trackingService.getActivities();
-      const metrics = this.trackingService.getMetrics();
-      const comparison = this.trackingService.getComparisonData();
-
-      // Objeto base de recomendaciones
-      const recommendations = {
-        bestTimeToSend: this._calculateBestTimeToSend(activities),
-        subjectLineRecommendations: this._generateSubjectRecommendations(activities),
-        templateRecommendations: this._generateTemplateRecommendations(activities, category),
-        customizationImpact: this._calculateCustomizationImpact(activities),
-        responseTimeExpectations: this._calculateResponseTimeExpectations(activities, category),
-        confidenceScore: 0,
-      };
-
-      // Aplicar contexto de categoría si está disponible
-      if (category) {
-        recommendations.categorySpecific = this._generateCategorySpecificRecommendations(
-          category,
-          activities
-        );
-      }
-
-      // Aplicar contexto de búsqueda si está disponible
-      if (searchQuery) {
-        recommendations.querySpecific = this._generateQuerySpecificRecommendations(
-          searchQuery,
-          activities
-        );
-      }
-
-      // Calcular puntuación de confianza basada en la cantidad de datos disponibles
-      recommendations.confidenceScore = this._calculateConfidenceScore(activities, category);
-
-      // Guardar recomendaciones en localStorage para referencia
-      this._saveRecommendations(recommendations, category, searchQuery);
-
-      return recommendations;
-    } catch (error) {
-      console.error('Error generando recomendaciones:', error);
+    this.storageKeyRecommendations = 'emailRecommendationsi18n.t('common.genera_recomendaciones_personalizadas_basadas_metricas_historicas')Error generando recomendaciones:', error);
       return this._getDefaultRecommendations();
     }
   }
@@ -114,60 +65,18 @@ class EmailRecommendationService {
     // Mappear nombres amigables
     const timeSlotNames = {
       morning: 'mañana (8-12h)',
-      afternoon: 'mediodía (12-16h)',
+      afternoon: i18n.t('common.mediodia_1216h'),
       evening: 'tarde (16-20h)',
-      night: 'noche (20-8h)',
-    };
-
-    // Preparar recomendación
-    return {
-      bestTimeSlot,
-      bestTimeSlotName: timeSlotNames[bestTimeSlot],
-      bestRate: timeSlots[bestTimeSlot].rate.toFixed(1),
-      timeSlots,
-      hasSufficientData: this._hasSufficientTimeData(timeSlots),
-    };
-  }
-
-  /**
-   * Determina si hay suficientes datos para hacer recomendaciones de tiempo confiables
-   * @private
-   * @param {Object} timeSlots - Datos por franja horaria
-   * @returns {boolean} True si hay suficientes datos
-   */
-  _hasSufficientTimeData(timeSlots) {
-    // Verificar si al menos 2 franjas tienen 5+ envíos
-    let slotsWithSufficientData = 0;
-
-    Object.values(timeSlots).forEach((slot) => {
-      if (slot.sent >= 5) slotsWithSufficientData++;
-    });
-
-    return slotsWithSufficientData >= 2;
-  }
-
-  /**
-   * Genera recomendaciones para líneas de asunto efectivas
-   * @private
-   * @param {Array} activities - Actividades históricas
-   * @returns {Object} Objeto con recomendaciones de asunto
-   */
-  _generateSubjectRecommendations(activities) {
-    // Para una implementación real, esto requeriría analizar los asuntos de correos exitosos
-    // Aquí incluiremos recomendaciones genéricas basadas en mejores prácticas
-
-    return {
-      recommendedPatterns: [
-        'Consulta sobre [Servicio] para evento el [Fecha]',
+      night: 'noche (20-8h)i18n.t('common.preparar_recomendacion_return_besttimeslot_besttimeslotname_timeslotnamesbesttimeslot')Consulta sobre [Servicio] para evento el [Fecha]',
         'Disponibilidad y presupuesto para [Evento]',
-        'Interés en contratar [Servicio] - MaLoveApp',
+        i18n.t('common.interes_contratar_servicio_maloveapp'),
       ],
-      avoidPatterns: ['Consulta', 'Información', 'Hola'],
+      avoidPatterns: ['Consulta', i18n.t('common.informacion'), 'Hola'],
       optimalLength: {
         min: 30,
         max: 60,
       },
-      includeElements: ['Fecha del evento', 'Tipo de servicio', 'Mención de MaLoveApp'],
+      includeElements: ['Fecha del evento', 'Tipo de servicio', i18n.t('common.mencion_maloveapp')],
     };
   }
 
@@ -214,211 +123,19 @@ class EmailRecommendationService {
     });
 
     // Encontrar mejor plantilla general
-    let bestTemplate = 'general';
-    let bestRate = 0;
-
-    Object.keys(templateStats).forEach((cat) => {
-      // Solo considerar plantillas con suficientes datos
-      if (templateStats[cat].total >= 5 && templateStats[cat].responseRate > bestRate) {
-        bestRate = templateStats[cat].responseRate;
-        bestTemplate = cat;
-      }
-    });
-
-    // Si se especificó una categoría, filtrar para esa categoría
-    let categorySpecificTemplate = null;
-    if (category && templateStats[category] && templateStats[category].total > 0) {
-      categorySpecificTemplate = {
-        category,
-        responseRate: templateStats[category].responseRate.toFixed(1),
-        hasSufficientData: templateStats[category].total >= 5,
-      };
-    }
-
-    return {
-      bestOverallTemplate: bestTemplate,
-      bestOverallResponseRate: bestRate.toFixed(1),
-      templateStats,
-      categorySpecificTemplate,
-      hasSufficientData: this._hasSufficientTemplateData(templateStats),
-    };
-  }
-
-  /**
-   * Determina si hay suficientes datos para hacer recomendaciones de plantillas confiables
-   * @private
-   * @param {Object} templateStats - Estadísticas por plantilla
-   * @returns {boolean} True si hay suficientes datos
-   */
-  _hasSufficientTemplateData(templateStats) {
-    // Verificar si al menos 2 plantillas tienen 5+ envíos
-    let templatesWithSufficientData = 0;
-
-    Object.values(templateStats).forEach((stats) => {
-      if (stats.total >= 5) templatesWithSufficientData++;
-    });
-
-    return templatesWithSufficientData >= 2;
-  }
-
-  /**
-   * Calcula el impacto de personalizar mensajes en la tasa de respuesta
-   * @private
-   * @param {Array} activities - Actividades históricas
-   * @returns {Object} Objeto con análisis de impacto
-   */
-  _calculateCustomizationImpact(activities) {
-    const customized = {
-      total: 0,
-      responded: 0,
-      rate: 0,
-    };
-
-    const nonCustomized = {
-      total: 0,
-      responded: 0,
-      rate: 0,
-    };
-
-    // Analizar actividades
-    activities.forEach((activity) => {
-      const target = activity.wasCustomized ? customized : nonCustomized;
-
-      target.total++;
-      if (activity.responseReceived) {
-        target.responded++;
-      }
-    });
-
-    // Calcular tasas
-    customized.rate = customized.total > 0 ? (customized.responded / customized.total) * 100 : 0;
-    nonCustomized.rate =
-      nonCustomized.total > 0 ? (nonCustomized.responded / nonCustomized.total) * 100 : 0;
-
-    // Calcular impacto
-    const impact = customized.rate - nonCustomized.rate;
-
-    return {
-      customized: {
-        ...customized,
-        rate: customized.rate.toFixed(1),
-      },
-      nonCustomized: {
-        ...nonCustomized,
-        rate: nonCustomized.rate.toFixed(1),
-      },
-      impact: impact.toFixed(1),
-      recommendCustomization: impact > 5, // Recomendar si hay al menos 5% de mejora
-      hasSufficientData: customized.total >= 5 && nonCustomized.total >= 5,
-    };
-  }
-
-  /**
-   * Calcula tiempos esperados de respuesta basados en datos históricos
-   * @private
-   * @param {Array} activities - Actividades históricas
-   * @param {string} category - Categoría de proveedor
-   * @returns {Object} Objeto con expectativas de tiempo de respuesta
-   */
-  _calculateResponseTimeExpectations(activities, category) {
-    // Filtrar solo actividades con respuesta
-    const respondedActivities = activities.filter((a) => a.responseReceived && a.responseTime);
-
-    // Si no hay suficientes datos, retornar expectativas por defecto
-    if (respondedActivities.length < 5) {
-      return {
-        averageTime: '24-48',
-        hasSufficientData: false,
-      };
-    }
-
-    // Calcular tiempo promedio general
-    const avgTime =
-      respondedActivities.reduce((sum, act) => sum + act.responseTime, 0) /
-      respondedActivities.length;
-
-    // Si se especificó categoría, calcular tiempo para esa categoría
-    let categoryAvgTime = null;
-    if (category) {
-      const categoryActivities = respondedActivities.filter((a) => a.templateCategory === category);
-
-      if (categoryActivities.length >= 3) {
-        categoryAvgTime =
-          categoryActivities.reduce((sum, act) => sum + act.responseTime, 0) /
-          categoryActivities.length;
-      }
-    }
-
-    return {
-      averageTime: avgTime.toFixed(1),
-      medianTime: this._calculateMedianTime(respondedActivities),
-      categoryAverageTime: categoryAvgTime ? categoryAvgTime.toFixed(1) : null,
-      fastestResponse: Math.min(...respondedActivities.map((a) => a.responseTime)).toFixed(1),
-      slowestResponse: Math.max(...respondedActivities.map((a) => a.responseTime)).toFixed(1),
-      hasSufficientData: true,
-    };
-  }
-
-  /**
-   * Calcula la mediana del tiempo de respuesta
-   * @private
-   * @param {Array} activities - Actividades con respuesta
-   * @returns {string} Mediana formateada
-   */
-  _calculateMedianTime(activities) {
-    const times = activities.map((a) => a.responseTime).sort((a, b) => a - b);
-    const mid = Math.floor(times.length / 2);
-
-    const median = times.length % 2 === 0 ? (times[mid - 1] + times[mid]) / 2 : times[mid];
-
-    return median.toFixed(1);
-  }
-
-  /**
-   * Genera recomendaciones específicas para una categoría
-   * @private
-   * @param {string} category - Categoría de proveedor
-   * @param {Array} activities - Actividades históricas
-   * @returns {Object} Objeto con recomendaciones específicas
-   */
-  _generateCategorySpecificRecommendations(category, activities) {
-    // Filtrar actividades para la categoría específica
-    const categoryActivities = activities.filter((a) => a.templateCategory === category);
-
-    if (categoryActivities.length < 3) {
-      return {
-        hasSufficientData: false,
-        recommendations: [],
-      };
-    }
-
-    // En una implementación real, aquí se aplicaría análisis específico por categoría
-    // Proveer algunas recomendaciones basadas en la categoría
-
-    const categoryRecommendations = {
-      hasSufficientData: true,
-      responseRate: (
-        (categoryActivities.filter((a) => a.responseReceived).length / categoryActivities.length) *
-        100
-      ).toFixed(1),
-      recommendations: [],
-    };
-
-    // Generar recomendaciones específicas según la categoría
-    switch (category.toLowerCase()) {
-      case 'fotografía':
+    let bestTemplate = 'generali18n.t('common.let_bestrate_objectkeystemplatestatsforeachcat_solo_considerar_plantillas')24-48i18n.t('common.hassufficientdata_false_calcular_tiempo_promedio_general')fotografía':
         categoryRecommendations.recommendations = [
-          'Mencionar el estilo específico de fotografías que buscas',
-          'Preguntar por la disponibilidad de álbumes impresos',
+          i18n.t('common.mencionar_estilo_especifico_fotografias_que_buscas'),
+          i18n.t('common.preguntar_por_disponibilidad_albumes_impresos'),
           'Consultar sobre el tiempo de entrega de las fotos editadas',
         ];
         break;
 
       case 'catering':
         categoryRecommendations.recommendations = [
-          'Especificar el número aproximado de invitados',
+          i18n.t('common.especificar_numero_aproximado_invitados'),
           'Mencionar restricciones alimentarias o preferencias',
-          'Preguntar por opciones de menú y posibilidad de cata',
+          i18n.t('common.preguntar_por_opciones_menu_posibilidad_cata'),
         ];
         break;
 
@@ -426,53 +143,23 @@ class EmailRecommendationService {
         categoryRecommendations.recommendations = [
           'Especificar el estilo musical preferido',
           'Consultar sobre el repertorio y posibilidad de peticiones',
-          'Preguntar por necesidades técnicas y espacio necesario',
+          i18n.t('common.preguntar_por_necesidades_tecnicas_espacio_necesario'),
         ];
         break;
 
       case 'flores':
         categoryRecommendations.recommendations = [
           'Mencionar la paleta de colores del evento',
-          'Especificar las áreas que requieren decoración',
+          i18n.t('common.especificar_las_areas_que_requieren_decoracion'),
           'Consultar sobre flores de temporada disponibles',
         ];
         break;
 
       default:
         categoryRecommendations.recommendations = [
-          'Ser específico sobre tus necesidades para el evento',
-          'Mencionar fecha, ubicación y número de invitados',
-          'Consultar disponibilidad antes de entrar en detalles',
-        ];
-    }
-
-    return categoryRecommendations;
-  }
-
-  /**
-   * Genera recomendaciones específicas basadas en la consulta de búsqueda
-   * @private
-   * @param {string} searchQuery - Consulta de búsqueda
-   * @param {Array} activities - Actividades históricas
-   * @returns {Object} Objeto con recomendaciones basadas en la búsqueda
-   */
-  _generateQuerySpecificRecommendations(searchQuery, activities) {
-    // Análisis básico de la consulta
-    const query = searchQuery.toLowerCase();
-    const recommendations = [];
-
-    // Detectar elementos clave en la consulta
-    const hasLocation = /madrid|barcelona|valencia|sevilla|málaga|ciudad|zona|cerca/i.test(query);
-    const hasDate =
-      /202\d|enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre/i.test(
-        query
-      );
-    const hasBudget = /presupuesto|euros|precio|coste|económico/i.test(query);
-    const hasSize = /grande|pequeño|íntimo|invitados|personas|gente|tamaño/i.test(query);
-
-    // Generar recomendaciones contextuales
-    if (!hasLocation) {
-      recommendations.push('Especificar la ubicación del evento en tu mensaje');
+          i18n.t('common.ser_especifico_sobre_tus_necesidades_para'),
+          i18n.t('common.mencionar_fecha_ubicacion_numero_invitados'),
+          'Consultar disponibilidad antes de entrar en detallesi18n.t('common.return_categoryrecommendations_genera_recomendaciones_especificas_basadas')Especificar la ubicación del evento en tu mensaje');
     }
 
     if (!hasDate) {
@@ -484,7 +171,7 @@ class EmailRecommendationService {
     }
 
     if (!hasSize) {
-      recommendations.push('Especificar el número aproximado de invitados o tamaño del evento');
+      recommendations.push(i18n.t('common.especificar_numero_aproximado_invitados_tamano_del'));
     }
 
     return {
@@ -553,27 +240,7 @@ class EmailRecommendationService {
   _saveRecommendations(recommendations, category, searchQuery) {
     try {
       const savedRecommendations = JSON.parse(
-        localStorage.getItem(this.storageKeyRecommendations) || '[]'
-      );
-
-      // Limitar a las últimas 10 recomendaciones
-      if (savedRecommendations.length >= 10) {
-        savedRecommendations.pop();
-      }
-
-      // Añadir nueva recomendación
-      savedRecommendations.unshift({
-        id: `rec_${Date.now()}`,
-        timestamp: new Date().toISOString(),
-        category,
-        searchQuery,
-        recommendations,
-        applied: false,
-      });
-
-      localStorage.setItem(this.storageKeyRecommendations, JSON.stringify(savedRecommendations));
-    } catch (error) {
-      console.error('Error guardando recomendaciones:', error);
+        localStorage.getItem(this.storageKeyRecommendations) || '[]i18n.t('common.limitar_las_ultimas_recomendaciones_savedrecommendationslength_savedrecommendationspop')Error guardando recomendaciones:', error);
     }
   }
 
@@ -593,7 +260,7 @@ class EmailRecommendationService {
         recommendedPatterns: [
           'Consulta sobre [Servicio] para evento el [Fecha]',
           'Disponibilidad y presupuesto para [Evento]',
-          'Interés en contratar [Servicio] - MaLoveApp',
+          i18n.t('common.interes_contratar_servicio_maloveapp'),
         ],
         optimalLength: {
           min: 30,

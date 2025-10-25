@@ -2,6 +2,7 @@
  * Servicio especializado para el seguimiento y análisis de efectividad de correos
  * generados mediante búsqueda AI de proveedores.
  */
+import i18n from '../i18n';
 import { EMAIL_TAGS } from './EmailTrackingService';
 
 class AIEmailTrackingService {
@@ -10,27 +11,7 @@ class AIEmailTrackingService {
    */
   constructor() {
     this.storageKeyActivities = 'aiEmailActivities';
-    this.storageKeyMetrics = 'aiEmailMetrics';
-  }
-
-  /**
-   * Registra una actividad de email AI con información detallada
-   * @param {Object} aiResult - Resultado de búsqueda AI utilizado
-   * @param {string} searchQuery - Consulta original del usuario
-   * @param {Object} options - Opciones adicionales
-   * @returns {string} - ID único del registro de actividad
-   */
-  registerActivity(aiResult, searchQuery, options = {}) {
-    try {
-      const activityId = `ai_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
-
-      const activity = {
-        id: activityId,
-        aiResultId: aiResult?.id,
-        providerName: aiResult?.name,
-        providerCategory: aiResult?.service,
-        searchQuery,
-        templateCategory: options.templateCategory || aiResult?.service || 'general',
+    this.storageKeyMetrics = 'aiEmailMetricsi18n.t('common.registra_una_actividad_email_con_informacion')general',
         wasCustomized: options.wasCustomized || false,
         timestamp: new Date().toISOString(),
         status: 'sent',
@@ -72,21 +53,7 @@ class AIEmailTrackingService {
       // Actualizar la actividad con datos de respuesta
       activities[index] = {
         ...activities[index],
-        status: 'responded',
-        responseReceived: true,
-        responseTime,
-        responseDate: now.toISOString(),
-        effectivenessScore: responseData.score || null,
-      };
-
-      localStorage.setItem(this.storageKeyActivities, JSON.stringify(activities));
-
-      // Actualizar métricas generales
-      this.updateOverallMetrics();
-
-      return true;
-    } catch (error) {
-      console.error('Error actualizando actividad AI con respuesta:', error);
+        status: 'respondedi18n.t('common.responsereceived_true_responsetime_responsedate_nowtoisostring_effectivenessscore')Error actualizando actividad AI con respuesta:', error);
       return false;
     }
   }
@@ -150,62 +117,7 @@ class AIEmailTrackingService {
       // Calcular métricas por categoría
       const categoriesMap = {};
       activities.forEach((act) => {
-        const cat = act.templateCategory || 'general';
-
-        if (!categoriesMap[cat]) {
-          categoriesMap[cat] = {
-            total: 0,
-            responded: 0,
-            customized: 0,
-            totalResponseTime: 0,
-            averageResponseTime: 0,
-          };
-        }
-
-        categoriesMap[cat].total++;
-
-        if (act.wasCustomized) {
-          categoriesMap[cat].customized++;
-        }
-
-        if (act.responseReceived) {
-          categoriesMap[cat].responded++;
-
-          if (act.responseTime) {
-            categoriesMap[cat].totalResponseTime += act.responseTime;
-          }
-        }
-      });
-
-      // Calcular promedios
-      Object.keys(categoriesMap).forEach((cat) => {
-        const stats = categoriesMap[cat];
-        stats.averageResponseTime =
-          stats.responded > 0 ? stats.totalResponseTime / stats.responded : 0;
-      });
-
-      // Calcular métricas generales
-      const metrics = {
-        timestamp: new Date().toISOString(),
-        totalEmails: activities.length,
-        totalResponses: responded.length,
-        responseRate: activities.length > 0 ? (responded.length / activities.length) * 100 : 0,
-        customizedRate: activities.length > 0 ? (customized.length / activities.length) * 100 : 0,
-        customizedResponseRate:
-          customized.length > 0 ? (customizedWithResponse.length / customized.length) * 100 : 0,
-        averageResponseTime:
-          responded.length > 0
-            ? responded.reduce((sum, act) => sum + (act.responseTime || 0), 0) / responded.length
-            : 0,
-        categoryStats: categoriesMap,
-      };
-
-      // Guardar métricas
-      localStorage.setItem(this.storageKeyMetrics, JSON.stringify(metrics));
-
-      return metrics;
-    } catch (error) {
-      console.error('Error actualizando métricas:', error);
+        const cat = act.templateCategory || 'generali18n.t('common.categoriesmapcat_categoriesmapcat_total_responded_customized_totalresponsetime')Error actualizando métricas:', error);
       return null;
     }
   }
@@ -240,61 +152,7 @@ class AIEmailTrackingService {
 
       // Obtener datos de correos no-AI desde localStorage (simulado)
       // En producción, esta información vendría de la base de datos
-      const emailData = JSON.parse(localStorage.getItem('emailTrackings') || '[]');
-      const nonAiEmails = emailData.filter((e) => !e.isAIGenerated);
-      const nonAiResponses = nonAiEmails.filter((e) => e.hasResponse);
-
-      // Calcular métricas para correos no-AI
-      const nonAiResponseRate =
-        nonAiEmails.length > 0 ? (nonAiResponses.length / nonAiEmails.length) * 100 : 0;
-
-      // Calcular tiempo de respuesta promedio para no-AI (si hay datos disponibles)
-      let nonAiAvgResponseTime = 0;
-      if (nonAiResponses.length > 0) {
-        let totalTime = 0;
-        let countWithTime = 0;
-
-        nonAiResponses.forEach((email) => {
-          if (email.sentDate && email.responseDate) {
-            const sentDate = new Date(email.sentDate);
-            const responseDate = new Date(email.responseDate);
-            const responseTime = (responseDate - sentDate) / (1000 * 60 * 60); // horas
-            totalTime += responseTime;
-            countWithTime++;
-          }
-        });
-
-        nonAiAvgResponseTime = countWithTime > 0 ? totalTime / countWithTime : 0;
-      }
-
-      // Preparar datos de comparación
-      return {
-        ai: {
-          total: aiMetrics.totalEmails || 0,
-          responded: aiMetrics.totalResponses || 0,
-          responseRate: aiMetrics.responseRate.toFixed(2),
-          avgResponseTime: aiMetrics.averageResponseTime.toFixed(1),
-        },
-        nonAi: {
-          total: nonAiEmails.length,
-          responded: nonAiResponses.length,
-          responseRate: nonAiResponseRate.toFixed(2),
-          avgResponseTime: nonAiAvgResponseTime.toFixed(1),
-        },
-        difference: {
-          responseRate: (aiMetrics.responseRate - nonAiResponseRate).toFixed(2),
-          avgResponseTime: (nonAiAvgResponseTime - aiMetrics.averageResponseTime).toFixed(1),
-        },
-        categoryBreakdown: Object.keys(aiMetrics.categoryStats || {}).map((cat) => ({
-          category: cat,
-          total: aiMetrics.categoryStats[cat].total,
-          responseRate:
-            aiMetrics.categoryStats[cat].total > 0
-              ? (
-                  (aiMetrics.categoryStats[cat].responded / aiMetrics.categoryStats[cat].total) *
-                  100
-                ).toFixed(2)
-              : '0.00',
+      const emailData = JSON.parse(localStorage.getItem('emailTrackings') || '[]i18n.t('common.const_nonaiemails_emaildatafiltere_eisaigenerated_const_nonairesponses')0.00',
           avgResponseTime: aiMetrics.categoryStats[cat].averageResponseTime.toFixed(1),
         })),
       };

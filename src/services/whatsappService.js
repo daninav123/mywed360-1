@@ -1,3 +1,5 @@
+import i18n from '../i18n';
+
 // Servicio de WhatsApp – integra envío por API (backend) y utilidades de deeplink
 
 let authContext = null;
@@ -53,7 +55,7 @@ async function getAuthToken() {
     }
   }
 
-  throw new Error('WhatsAppService: autenticación requerida');
+  throw new Error(i18n.t('common.whatsappservice_autenticacion_requerida'));
 }
 
 export function toE164(phone) {

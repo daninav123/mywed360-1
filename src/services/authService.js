@@ -3,6 +3,7 @@
  * Maneja automáticamente la renovación de tokens y sesiones expiradas
  */
 
+import i18n from '../i18n';
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
@@ -35,23 +36,7 @@ const AUTH_CONFIG = {
     USER: 'maloveapp_user_session',
     PREFERENCES: 'maloveapp_user_preferences',
     LAST_ACTIVITY: 'maloveapp_last_activity',
-    LOGIN_EMAIL: 'maloveapp_login_email',
-  },
-};
-
-// Estado global del servicio
-let tokenRefreshTimer = null;
-let sessionCheckTimer = null;
-let authStateListeners = [];
-let currentUserData = null;
-
-/**
- * Clase para manejar errores de autenticación
- */
-class AuthError extends Error {
-  constructor(code, message, originalError = null) {
-    super(message);
-    this.name = 'AuthError';
+    LOGIN_EMAIL: 'maloveapp_login_emaili18n.t('common.estado_global_del_servicio_let_tokenrefreshtimer')AuthError';
     this.code = code;
     this.originalError = originalError;
   }
@@ -89,18 +74,7 @@ const createOrUpdateUserProfile = async (user, additionalData = {}) => {
     const profileData = {
       uid: user.uid,
       email: user.email,
-      displayName: user.displayName || user.email?.split('@')[0] || 'Usuario',
-      photoURL: user.photoURL || null,
-      emailVerified: user.emailVerified,
-      lastLogin: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-      ...additionalData,
-    };
-
-    // Si es un usuario nuevo, añadir datos de creación
-    if (!existingProfile) {
-      profileData.createdAt = serverTimestamp();
-      profileData.role = additionalData.role || 'particular';
+      displayName: user.displayName || user.email?.split('@')[0] || 'Usuarioi18n.t('common.photourl_userphotourl_null_emailverified_useremailverified_lastlogin')particular';
       profileData.preferences = {
         theme: 'light',
         language: 'es',
@@ -185,21 +159,7 @@ const refreshAuthToken = async (forceRefresh = false) => {
     };
   } catch (error) {
     console.error('[AuthService] Error refrescando token:', error);
-    throw new AuthError('token-refresh-failed', 'Error al refrescar el token', error);
-  }
-};
-
-/**
- * Programa el refresh automático del token
- */
-const scheduleTokenRefresh = () => {
-  if (tokenRefreshTimer) {
-    clearTimeout(tokenRefreshTimer);
-  }
-
-  tokenRefreshTimer = setTimeout(() => {
-    refreshAuthToken(true).catch((error) => {
-      console.error('[AuthService] Error en refresh automático:', error);
+    throw new AuthError('token-refresh-failed', 'Error al refrescar el tokeni18n.t('common.error_programa_refresh_automatico_del_token')[AuthService] Error en refresh automático:', error);
       // Si falla el refresh, cerrar sesión
       signOut(auth);
     });
@@ -211,21 +171,7 @@ const scheduleTokenRefresh = () => {
  */
 const startSessionMonitoring = () => {
   // Monitorear actividad del usuario
-  const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
-  const throttledUpdateActivity = throttle(updateUserActivity, 30000); // Máximo cada 30 segundos
-
-  events.forEach((event) => {
-    document.addEventListener(event, throttledUpdateActivity, true);
-  });
-
-  // Verificar sesión periódicamente
-  if (sessionCheckTimer) {
-    clearInterval(sessionCheckTimer);
-  }
-
-  sessionCheckTimer = setInterval(() => {
-    if (isSessionExpired()) {
-      console.log('[AuthService] Sesión expirada por inactividad');
+  const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'clicki18n.t('common.const_throttledupdateactivity_throttleupdateuseractivity_30000_maximo_cada')[AuthService] Sesión expirada por inactividad');
       signOut(auth);
     }
   }, AUTH_CONFIG.SESSION_CHECK_INTERVAL);
@@ -302,22 +248,22 @@ export const login = async (email, password, rememberMe = true) => {
   } catch (error) {
     console.error('[AuthService] Error en login:', error);
 
-    let errorMessage = 'Error al iniciar sesión';
+    let errorMessage = i18n.t('common.error_iniciar_sesion');
     switch (error.code) {
       case 'auth/user-not-found':
         errorMessage = 'Usuario no encontrado';
         break;
       case 'auth/wrong-password':
-        errorMessage = 'Contraseña incorrecta';
+        errorMessage = i18n.t('common.contrasena_incorrecta');
         break;
       case 'auth/invalid-email':
-        errorMessage = 'Email inválido';
+        errorMessage = i18n.t('common.email_invalido');
         break;
       case 'auth/user-disabled':
         errorMessage = 'Usuario deshabilitado';
         break;
       case 'auth/too-many-requests':
-        errorMessage = 'Demasiados intentos. Intenta más tarde';
+        errorMessage = i18n.t('common.demasiados_intentos_intenta_mas_tarde');
         break;
     }
 
@@ -356,13 +302,13 @@ export const register = async (email, password, additionalData = {}) => {
     let errorMessage = 'Error al crear la cuenta';
     switch (error.code) {
       case 'auth/email-already-in-use':
-        errorMessage = 'El email ya está en uso';
+        errorMessage = i18n.t('common.email_esta_uso');
         break;
       case 'auth/invalid-email':
-        errorMessage = 'Email inválido';
+        errorMessage = i18n.t('common.email_invalido');
         break;
       case 'auth/weak-password':
-        errorMessage = 'La contraseña es muy débil';
+        errorMessage = i18n.t('common.contrasena_muy_debil');
         break;
     }
 
@@ -391,7 +337,7 @@ export const logout = async () => {
     console.log('[AuthService] Logout exitoso');
   } catch (error) {
     console.error('[AuthService] Error en logout:', error);
-    throw new AuthError('logout-failed', 'Error al cerrar sesión', error);
+    throw new AuthError('logout-failed', i18n.t('common.error_cerrar_sesion'), error);
   }
 };
 
@@ -478,19 +424,7 @@ export const reauthenticate = async (password) => {
     console.log('[AuthService] Reautenticación exitosa');
   } catch (error) {
     console.error('[AuthService] Error en reautenticación:', error);
-    throw new AuthError('reauthentication-failed', 'Error al reautenticar', error);
-  }
-};
-
-/**
- * Enviar email de restablecimiento de contraseña
- * @param {string} email - Email del usuario
- * @returns {Promise<void>}
- */
-export const sendPasswordReset = async (email) => {
-  try {
-    await sendPasswordResetEmail(auth, email);
-    console.log('[AuthService] Email de restablecimiento enviado');
+    throw new AuthError('reauthentication-failed', 'Error al reautenticari18n.t('common.error_enviar_email_restablecimiento_contrasena_param')[AuthService] Email de restablecimiento enviado');
   } catch (error) {
     console.error('[AuthService] Error enviando email de restablecimiento:', error);
     throw new AuthError(
@@ -535,12 +469,7 @@ export const updateUserProfile = async (updates) => {
     return currentUserData;
   } catch (error) {
     console.error('[AuthService] Error actualizando perfil:', error);
-    throw new AuthError('profile-update-failed', 'Error al actualizar el perfil', error);
-  }
-};
-
-// Inicializar el servicio cuando se carga el módulo
-if (typeof window !== 'undefined') {
+    throw new AuthError('profile-update-failed', 'Error al actualizar el perfili18n.t('common.error_inicializar_servicio_cuando_carga_modulo')undefined') {
   // Restaurar actividad si existe
   const lastActivity = localStorage.getItem(AUTH_CONFIG.STORAGE_KEYS.LAST_ACTIVITY);
   if (!lastActivity) {

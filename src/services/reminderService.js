@@ -18,6 +18,7 @@
  * Nota: Para entornos con backend, se recomienda mover esta lógica al servidor.
  */
 
+import i18n from '../i18n';
 import { getMails, sendMail } from './emailService';
 
 const DEFAULT_DAYS = 3; // días de espera por defecto
@@ -77,24 +78,7 @@ async function runReminderJob(days) {
       const replied = inboxMails.some(
         (m) =>
           m.inReplyTo === mail.id ||
-          ((m.subject || '').startsWith('Re:') && (m.subject || '').includes(mail.subject))
-      );
-      if (replied) continue;
-
-      // Enviar recordatorio
-      await sendMail({
-        to: mail.to,
-        subject: `Re: ${mail.subject}`,
-        body: `Hola,\n\nSólo para asegurarme de que recibiste mi mensaje anterior. Quedo atento(a) a tu respuesta.\n\n---\nMensaje original:\n${mail.body}`,
-      });
-
-      // Marcar como enviado el recordatorio
-      mail.reminderSent = true;
-      // Persistir
-      const allSent = sentMails.map((m) => (m.id === mail.id ? mail : m));
-      // emailService expone saveLocal? no, usamos localStorage directo
-      try {
-        const stored = JSON.parse(localStorage.getItem('maloveapp_mails') || '[]');
+          ((m.subject || '').startsWith('Re:') && (m.subject || 'i18n.t('common.includesmailsubject_replied_continue_enviar_recordatorio_await')maloveapp_mails') || '[]');
         const updated = stored.map((m) => (m.id === mail.id ? mail : m));
         localStorage.setItem('maloveapp_mails', JSON.stringify(updated));
       } catch (e) {

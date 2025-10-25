@@ -1,15 +1,11 @@
+import i18n from '../i18n';
 import { post } from './apiClient';
 
 export async function checkoutProviderDeposit({
   providerId,
   providerName,
   amount = 100,
-  currency = 'EUR',
-  weddingId = null,
-}) {
-  const desc = `Señal proveedor: ${providerName || providerId}`;
-  const res = await post(
-    '/api/payments/checkout',
+  currency = 'EURi18n.t('common.weddingid_null_const_desc_senal_proveedor')/api/payments/checkout',
     {
       amount,
       currency,

@@ -5,48 +5,14 @@
  * @module utils/EmailCache
  */
 
+import i18n from '../i18n';
 import { _getStorage } from './storage.js';
 
 class EmailCache {
   constructor() {
     this.memoryCache = {};
     this.initialized = false;
-    this.storageKey = 'maloveapp_unified_inbox_cache';
-    this.maxCacheAge = 15 * 60 * 1000; // 15 minutos por defecto
-    this.folderMaxItems = {
-      inbox: 100, // máx 100 emails en caché para la bandeja de entrada
-      sent: 50, // máx 50 emails enviados
-      important: 30, // máx 30 emails importantes
-      trash: 20, // máx 20 emails en papelera
-    };
-
-    // Métricas internas
-    this.metrics = {
-      hits: 0,
-      misses: 0,
-      sets: 0,
-      invalidations: 0,
-      lastFullInvalidation: null,
-    };
-  }
-
-  /**
-   * Inicializa la caché cargando datos del almacenamiento local
-   */
-  init() {
-    if (this.initialized) return;
-
-    try {
-      const savedCache = _getStorage().getItem(this.storageKey);
-
-      if (savedCache) {
-        const parsed = JSON.parse(savedCache);
-        this.memoryCache = parsed.cache || {};
-        this.metrics = parsed.metrics || this.metrics;
-      }
-
-      this.initialized = true;
-      console.log('EmailCache: Inicializado con éxito');
+    this.storageKey = 'maloveapp_unified_inbox_cachei18n.t('common.thismaxcacheage_1000_minutos_por_defecto_thisfoldermaxitems')EmailCache: Inicializado con éxito');
 
       // Programar limpieza periódica de caché
       setInterval(() => this.cleanExpiredItems(), 5 * 60 * 1000); // Cada 5 minutos

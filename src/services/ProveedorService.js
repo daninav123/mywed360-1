@@ -1,3 +1,5 @@
+import i18n from '../i18n';
+
 /**
  * Servicio para la gestión de proveedores
  * Proporciona funciones para buscar, filtrar y manipular datos de proveedores
@@ -8,30 +10,30 @@
 const SAMPLE_PROVIDERS = [
   {
     id: 1,
-    name: 'Floristería Bella Rosa',
-    category: 'Decoración',
+    name: i18n.t('common.floristeria_bella_rosa'),
+    category: i18n.t('common.decoracion'),
     location: 'Madrid',
     rating: 4.8,
   },
   { id: 2, name: 'Catering Delicias', category: 'Catering', location: 'Barcelona', rating: 4.5 },
-  { id: 3, name: 'Fotografía Momentos', category: 'Fotografía', location: 'Valencia', rating: 4.7 },
+  { id: 3, name: i18n.t('common.fotografia_momentos'), category: i18n.t('common.fotografia'), location: 'Valencia', rating: 4.7 },
   { id: 4, name: 'DJ Events', category: 'Música', location: 'Sevilla', rating: 4.3 },
   {
     id: 5,
     name: 'Wedding Planners S.L.',
-    category: 'Planificación',
+    category: i18n.t('common.planificacion'),
     location: 'Madrid',
     rating: 4.9,
   },
   { id: 6, name: 'Vestidos Novias Elegance', category: 'Moda', location: 'Barcelona', rating: 4.6 },
   {
     id: 7,
-    name: 'Salón Celebraciones Vista',
+    name: i18n.t('common.salon_celebraciones_vista'),
     category: 'Locales',
     location: 'Valencia',
     rating: 4.2,
   },
-  { id: 8, name: 'Joyería Alianzas', category: 'Joyería', location: 'Madrid', rating: 4.4 },
+  { id: 8, name: i18n.t('common.joyeria_alianzas'), category: i18n.t('common.joyeria'), location: 'Madrid', rating: 4.4 },
 ];
 
 /**

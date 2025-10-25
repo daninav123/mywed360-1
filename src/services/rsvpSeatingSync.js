@@ -4,6 +4,7 @@
  * Sprint 5 - Sincronizar RSVP-Seating, S5-T001
  */
 
+import i18n from '../i18n';
 import { collection, doc, getDoc, getDocs, setDoc, updateDoc, writeBatch, query, where, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 
@@ -31,24 +32,9 @@ class RSVPSeatingSync {
       const guestDoc = await getDoc(guestRef);
 
       if (!guestDoc.exists()) {
-        return { success: false, error: 'Guest not found' };
-      }
-
-      const guest = guestDoc.data();
-
-      // Si no confirmó asistencia, remover de seating
-      if (guest.status !== 'confirmed') {
+        return { success: false, error: 'Guest not foundi18n.t('common.const_guest_guestdocdata_confirmo_asistencia_remover')confirmed') {
         await this.removeGuestFromSeating(weddingId, guestId);
-        return { success: true, action: 'removed', reason: 'not_confirmed' };
-      }
-
-      // Si confirmó, verificar que tenga asiento
-      const hasSeating = await this.checkGuestHasSeating(weddingId, guestId);
-
-      if (!hasSeating) {
-        // Marcar como pendiente de asignar
-        await this.markGuestNeedsSeating(weddingId, guestId);
-        return { success: true, action: 'marked_pending', needsSeating: true };
+        return { success: true, action: 'removed', reason: 'not_confirmedi18n.t('common.confirmo_verificar_que_tenga_asiento_const')marked_pending', needsSeating: true };
       }
 
       // Actualizar datos del asiento con info del guest
@@ -190,19 +176,7 @@ class RSVPSeatingSync {
         
         if (result.success) {
           if (result.action === 'synced') results.synced++;
-          else if (result.action === 'removed') results.removed++;
-          else if (result.needsSeating) results.needsSeating++;
-        } else {
-          results.errors++;
-        }
-      }
-
-      // Guardar resultado de sincronización
-      await this.saveSyncReport(weddingId, results);
-
-      return results;
-    } catch (error) {
-      console.error('Error syncing all guests:', error);
+          else if (result.action === 'removedi18n.t('common.resultsremoved_else_resultneedsseating_resultsneedsseating_else_resultserrors')Error syncing all guests:', error);
       throw error;
     }
   }

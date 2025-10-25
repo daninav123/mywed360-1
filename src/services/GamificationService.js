@@ -1,4 +1,5 @@
 // GamificationService.js - cliente frontend para /api/gamification
+import i18n from '../i18n';
 import { auth } from '../firebaseConfig';
 import { getBackendBase } from '../utils/backendBase';
 
@@ -37,12 +38,12 @@ const FALLBACK_SAMPLE = {
       id: 'tasks_weekly',
       name: 'Semana productiva',
       unlockedAt: '2025-09-10',
-      description: 'Completaste 5 tareas en 7 días.',
+      description: i18n.t('common.completaste_tareas_dias'),
     },
   ],
   lastEvent: {
     type: 'complete_task',
-    label: '+40 pts · Checklist al día',
+    label: i18n.t('common.pts_checklist_dia'),
     createdAt: '2025-09-20T08:00:00.000Z',
   },
   history: [
@@ -85,14 +86,14 @@ const shouldUseSampleData = () => {
 async function getAuthToken() {
   const user = auth?.currentUser;
   if (!user?.getIdToken) {
-    throw new Error('GamificationService: autenticación requerida');
+    throw new Error(i18n.t('common.gamificationservice_autenticacion_requerida'));
   }
   try {
     return await user.getIdToken(true);
   } catch (error) {
     console.warn('[GamificationService] No se pudo refrescar el token, usando caché:', error);
     return await user.getIdToken().catch(() => {
-      throw new Error('GamificationService: no se pudo obtener el token de autenticación');
+      throw new Error(i18n.t('common.gamificationservice_pudo_obtener_token_autenticacion'));
     });
   }
 }

@@ -1,3 +1,5 @@
+import i18n from '../i18n';
+
 /**
  * Servicio para gestionar plantillas de correo electrónico para diferentes tipos de proveedores
  * y contextos de búsqueda AI.
@@ -19,7 +21,7 @@ class EmailTemplateService {
     // Plantillas base por categoría de proveedor
     this.templates = {
       fotografía: {
-        subject: 'Consulta sobre servicios de fotografía para boda - {providerName}',
+        subject: i18n.t('common.consulta_sobre_servicios_fotografia_para_boda'),
         body: `
 Hola {providerName},
 
@@ -40,7 +42,7 @@ Gracias de antemano,
         `,
       },
       catering: {
-        subject: 'Información sobre servicios de catering para boda - {providerName}',
+        subject: i18n.t('common.informacion_sobre_servicios_catering_para_boda'),
         body: `
 Hola {providerName},
 
@@ -61,7 +63,7 @@ Muchas gracias,
         `,
       },
       florista: {
-        subject: 'Consulta sobre decoración floral para boda - {providerName}',
+        subject: i18n.t('common.consulta_sobre_decoracion_floral_para_boda'),
         body: `
 Hola {providerName},
 
@@ -82,7 +84,7 @@ Atentamente,
         `,
       },
       música: {
-        subject: 'Solicitud de información sobre servicios musicales para boda - {providerName}',
+        subject: i18n.t('common.solicitud_informacion_sobre_servicios_musicales_para'),
         body: `
 Hola {providerName},
 
@@ -103,69 +105,9 @@ Saludos cordiales,
         `,
       },
       local: {
-        subject: 'Consulta sobre disponibilidad de espacio para boda - {providerName}',
-        body: `
-Hola {providerName},
-
-Estamos en proceso de elegir el lugar para nuestra boda y su espacio nos ha llamado la atención. {aiInsight}
-
-Nos gustaría saber:
-- Disponibilidad para la fecha {date}
-- Capacidad y características del espacio
-- Servicios incluidos y opcionales (catering, decoración, etc.)
-- Costes y condiciones de reserva
-
-Estamos buscando un lugar que: {searchQuery}
-
-¿Sería posible concertar una visita para conocer el espacio en persona?
-
-Gracias de antemano,
-{userName}
-        `,
-      },
-      general: {
-        subject: 'Consulta sobre servicios para boda - {providerName}',
-        body: `
-Hola {providerName},
-
-Estoy organizando mi boda y me interesa conocer más sobre los servicios que ofrece. {aiInsight}
-
-Me gustaría obtener información sobre:
-- Detalle de los servicios que proporciona
-- Disponibilidad para la fecha {date}
-- Precios y opciones disponibles
-- Proceso de reserva y contratación
-
-Estoy buscando específicamente: {searchQuery}
-
-¿Podría proporcionarme más información? También estoy disponible para resolver cualquier duda por teléfono si lo prefiere.
-
-Muchas gracias,
-{userName}
-        `,
-      },
-    };
-  }
-
-  /**
-   * Obtiene una plantilla para una categoría específica de proveedor
-   * @param {string} category - Categoría del proveedor (fotografía, catering, etc.)
-   * @returns {Object} Objeto con subject y body para la plantilla
-   */
-  getTemplateByCategory(category) {
-    // Normalizar categoría (minúsculas, sin acentos)
-    const normalizedCategory = category
-      ? category
-          .toLowerCase()
-          .normalize('NFD')
+        subject: 'Consulta sobre disponibilidad de espacio para boda - {providerName}i18n.t('common.body_hola_providername_estamos_proceso_elegir')Consulta sobre servicios para boda - {providerName}i18n.t('common.body_hola_providername_estoy_organizando_boda')NFD')
           .replace(/[\u0300-\u036f]/g, '')
-      : '';
-
-    // Buscar plantilla específica o devolver la general
-    if (normalizedCategory.includes('foto') || normalizedCategory.includes('fotogra')) {
-      return this.templates.fotografía;
-    } else if (
-      normalizedCategory.includes('catering') ||
+      : 'i18n.t('common.buscar_plantilla_especifica_devolver_general_normalizedcategoryincludes')foto') || normalizedCategory.includes('fotograi18n.t('common.return_thistemplatesfotografia_else_normalizedcategoryincludes')catering') ||
       normalizedCategory.includes('comida') ||
       normalizedCategory.includes('gastronomia')
     ) {
@@ -179,75 +121,11 @@ Muchas gracias,
     } else if (
       normalizedCategory.includes('music') ||
       normalizedCategory.includes('dj') ||
-      normalizedCategory.includes('banda')
-    ) {
-      return this.templates.música;
-    } else if (
-      normalizedCategory.includes('local') ||
+      normalizedCategory.includes('bandai18n.t('common.return_thistemplatesmusica_else_normalizedcategoryincludes')local') ||
       normalizedCategory.includes('finca') ||
       normalizedCategory.includes('salon') ||
-      normalizedCategory.includes('espacio')
-    ) {
-      return this.templates.local;
-    }
-
-    // Plantilla genérica por defecto
-    return this.templates.general;
-  }
-
-  /**
-   * Genera un asunto personalizado según la plantilla y datos proporcionados
-   * @param {string} category - Categoría del proveedor
-   * @param {Object} data - Datos para rellenar la plantilla
-   * @returns {string} Asunto personalizado
-   */
-  generateSubjectFromTemplate(category, data) {
-    const template = this.getTemplateByCategory(category);
-
-    return this.replaceTemplateVariables(template.subject, data);
-  }
-
-  /**
-   * Genera un cuerpo de correo personalizado según la plantilla y datos proporcionados
-   * @param {string} category - Categoría del proveedor
-   * @param {Object} data - Datos para rellenar la plantilla
-   * @returns {string} Cuerpo del correo personalizado
-   */
-  generateBodyFromTemplate(category, data) {
-    const template = this.getTemplateByCategory(category);
-
-    return this.replaceTemplateVariables(template.body, data);
-  }
-
-  /**
-   * Reemplaza las variables en una plantilla con los datos proporcionados
-   * @param {string} template - Plantilla con variables entre llaves
-   * @param {Object} data - Objeto con los valores para reemplazar
-   * @returns {string} Plantilla con las variables reemplazadas
-   * @private
-   */
-  replaceTemplateVariables(template, data) {
-    let result = template;
-
-    // Reemplazar todas las variables en la plantilla
-    Object.keys(data).forEach((key) => {
-      const regex = new RegExp(`{${key}}`, 'g');
-      result = result.replace(regex, data[key] || '');
-    });
-
-    return result;
-  }
-
-  /**
-   * Registra y analiza el uso de plantillas para mejorar recomendaciones futuras
-   * @param {string} category - Categoría utilizada
-   * @param {Object} aiResult - Resultado de búsqueda AI utilizado
-   * @param {boolean} wasCustomized - Si el usuario personalizó la plantilla
-   */
-  logTemplateUsage(category, aiResult, wasCustomized) {
-    // Aquí se implementaría la lógica para registrar el uso de plantillas
-    // y mejorar las recomendaciones futuras
-    console.log('Template usage logged:', {
+      normalizedCategory.includes('espacioi18n.t('common.return_thistemplateslocal_plantilla_generica_por_defecto')g');
+      result = result.replace(regex, data[key] || 'i18n.t('common.return_result_registra_analiza_uso_plantillas')Template usage logged:', {
       category,
       aiResultId: aiResult?.id,
       wasCustomized,

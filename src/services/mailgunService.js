@@ -1,3 +1,5 @@
+import i18n from '../i18n';
+
 /* eslint-disable no-unreachable */
 /**
  * Servicio de integración con Mailgun para correos MaLove.App (actualizado)
@@ -13,40 +15,7 @@
 const DOMAIN = import.meta.env.VITE_MAILGUN_DOMAIN || 'malove.app';
 const FUNCTIONS_URL =
   import.meta.env.VITE_FIREBASE_FUNCTIONS_URL ||
-  'https://us-central1-maloveapp.cloudfunctions.net';
-
-/**
- * Verifica si Mailgun está configurado correctamente
- * @returns {boolean} - true si hay un dominio configurado y acceso a funciones
- */
-export function isMailgunConfigured() {
-  return !!DOMAIN && !!FUNCTIONS_URL;
-}
-
-/**
- * Envía un correo electrónico usando Mailgun a través de Cloud Functions
- *
- * @param {Object} options - Opciones para el correo
- * @param {string} options.from - Dirección de correo del remitente
- * @param {string} options.to - Dirección(es) de correo de destinatario(s)
- * @param {string} options.subject - Asunto del correo
- * @param {string} options.text - Contenido en texto plano
- * @param {string} options.html - Contenido en HTML
- * @param {string} [options.cc] - Dirección(es) en copia
- * @param {string} [options.bcc] - Dirección(es) en copia oculta
- * @param {string} [options.replyTo] - Dirección de respuesta
- * @param {Array} [options.attachments] - Archivos adjuntos
- * @returns {Promise<Object>} - Respuesta de la Cloud Function
- */
-export async function sendEmail(options) {
-  if (!isMailgunConfigured()) {
-    throw new Error('Mailgun no está configurado correctamente');
-  }
-
-  const { from, to, subject, text, html, cc, bcc, replyTo, attachments = [] } = options;
-
-  // Validaciones básicas
-  if (!from) throw new Error('Remitente (from) requerido');
+  'https://us-central1-maloveapp.cloudfunctions.neti18n.t('common.verifica_mailgun_esta_configurado_correctamente_returns')Mailgun no está configurado correctamentei18n.t('common.const_from_subject_text_html_bcc')Remitente (from) requerido');
   if (!to) throw new Error('Destinatario (to) requerido');
   if (!subject) throw new Error('Asunto (subject) requerido');
   if (!text && !html) throw new Error('Contenido (text o html) requerido');
@@ -56,34 +25,7 @@ export async function sendEmail(options) {
     const response = await fetch(`${FUNCTIONS_URL}/sendEmail`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from,
-        to,
-        subject,
-        text,
-        html,
-        cc,
-        bcc,
-        replyTo,
-        // No se pueden enviar archivos binarios directamente, se necesita un enfoque diferente para adjuntos
-        // En producción, deberías subir los archivos a Cloud Storage y pasar las URLs
-        attachments: attachments
-          ? attachments.map((a) => ({ name: a.name || a.filename, url: a.url }))
-          : [],
-      }),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Error al enviar correo: ${response.status} - ${errorText}`);
-    }
-
-    const data = await response.json();
-    return {
-      success: true,
-      messageId: data.id || 'unknown',
+        'Content-Type': 'application/jsoni18n.t('common.body_jsonstringify_from_subject_text_html')unknown',
       response: data,
     };
   } catch (error) {
@@ -99,11 +41,11 @@ export async function sendEmail(options) {
  */
 export async function validateEmail(email) {
   if (!isMailgunConfigured()) {
-    throw new Error('Mailgun no está configurado correctamente');
+    throw new Error(i18n.t('common.mailgun_esta_configurado_correctamente'));
   }
 
   if (!email) {
-    throw new Error('Correo electrónico requerido');
+    throw new Error(i18n.t('common.correo_electronico_requerido'));
   }
 
   try {
@@ -131,7 +73,7 @@ export async function validateEmail(email) {
  */
 export async function checkUsernameAvailability(username) {
   if (!isMailgunConfigured()) {
-    throw new Error('Mailgun no está configurado correctamente');
+    throw new Error(i18n.t('common.mailgun_esta_configurado_correctamente'));
   }
 
   if (!username) {
@@ -143,20 +85,7 @@ export async function checkUsernameAvailability(username) {
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9.]/g, '.');
-
-  // El correo a verificar
-  const email = `${normalizedUsername}@${DOMAIN}`;
-
-  try {
-    // Usamos el endpoint de validación para verificar a través de Cloud Functions
-    const validationResult = await validateEmail(email);
-
-    // Si mailgun dice que es válido, podemos asumirlo como disponible
-    // En producción, se debería verificar contra una base de datos de usuarios existentes
-    return validationResult.is_valid && !validationResult.is_disposable_address;
-  } catch (error) {
-    console.error('Error al verificar disponibilidad de nombre de usuario:', error);
+    .replace(/[^a-z0-9.]/g, '.i18n.t('common.correo_verificar_const_email_normalizedusernamedomain_try')Error al verificar disponibilidad de nombre de usuario:', error);
     // En caso de error, asumimos que no está disponible por precaución
     return false;
   }
@@ -169,26 +98,11 @@ export async function checkUsernameAvailability(username) {
 
   // Para simulación, consideramos nombres cortos como no disponibles
   if (username.length <= 4) {
-    return { available: false, reason: 'Este nombre de usuario no está disponible' };
-  }
-
-  // Por defecto, indicamos que está disponible
-  return { available: true };
-}
-
-/**
- * Crea una ruta de reenvío de correo en Mailgun
- * @param {string} address - Dirección de correo completa (ejemplo@maloveapp.com)
- * @param {string} forwardTo - Dirección a la que reenviar (usuario@gmail.com)
- * @returns {Promise<Object>} - Respuesta de la API
- */
-export async function createForwardingRoute(address, forwardTo) {
-  if (!isMailgunConfigured()) {
-    throw new Error('Mailgun no está configurado correctamente');
+    return { available: false, reason: 'Este nombre de usuario no está disponiblei18n.t('common.por_defecto_indicamos_que_esta_disponible')Mailgun no está configurado correctamente');
   }
 
   if (!address || !forwardTo) {
-    throw new Error('Se requieren dirección de origen y destino');
+    throw new Error(i18n.t('common.requieren_direccion_origen_destino'));
   }
 
   try {
@@ -208,11 +122,11 @@ export async function createForwardingRoute(address, forwardTo) {
  */
 export async function getMailEvents(emailAddress, eventType = 'delivered', limit = 50) {
   if (!isMailgunConfigured()) {
-    throw new Error('Mailgun no está configurado correctamente');
+    throw new Error(i18n.t('common.mailgun_esta_configurado_correctamente'));
   }
 
   if (!emailAddress) {
-    throw new Error('Dirección de correo requerida');
+    throw new Error(i18n.t('common.direccion_correo_requerida'));
   }
 
   try {
@@ -273,15 +187,7 @@ export async function sendAliasVerificationEmail(alias) {
   }
 
   if (!alias) {
-    throw new Error('Alias requerido');
-  }
-
-  try {
-    // En producción, esto debería llamar a un endpoint del backend
-    // que envíe un email de verificación
-    return {
-      success: true,
-      message: 'Email de verificación enviado',
+    throw new Error('Alias requeridoi18n.t('common.try_produccion_esto_deberia_llamar_endpoint')Email de verificación enviado',
       alias: alias,
     };
   } catch (error) {

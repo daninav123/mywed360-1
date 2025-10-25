@@ -1,3 +1,4 @@
+import i18n from '../i18n';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 
 import { db } from '../firebaseConfig';
@@ -5,7 +6,7 @@ import { formatDate } from '../utils/formatUtils';
 import { post as apiPost } from './apiClient';
 
 const DEFAULT_BODY =
-  'Hola,\n\nNos gustaría recibir un presupuesto detallado para nuestro evento. Por favor, incluye condiciones, logística y extras.\n\nGracias.';
+  i18n.t('common.holannnos_gustaria_recibir_presupuesto_detallado_para');
 
 const interpolate = (text, variables = {}) =>
   Object.entries(variables).reduce((acc, [key, value]) => acc.split(key).join(value || ''), String(text || ''));
@@ -97,25 +98,7 @@ const buildProviderVariables = (provider = {}) => ({
     provider.assignedBudget ??
     provider.presupuestoAsignado ??
     provider.budgetTarget ??
-    '',
-});
-
-/**
- * Envía un email de solicitud de presupuesto a todos los proveedores indicados y registra la actividad.
- * Devuelve un resumen con enviados y errores.
- *
- * @param {Object} options
- * @param {string} options.weddingId
- * @param {Array<{id:string,name:string,email:string,service?:string}>} options.providers
- * @param {string} [options.subject]
- * @param {string} [options.body]
- * @param {Object} [options.weddingInfo]
- * @returns {Promise<{sent:number,errors:Array,fail:number}>}
- */
-export async function sendBulkRfqAutomation({
-  weddingId,
-  providers = [],
-  subject = 'Solicitud de presupuesto',
+    'i18n.t('common.envia_email_solicitud_presupuesto_todos_los')Solicitud de presupuesto',
   body = DEFAULT_BODY,
   weddingInfo = {},
 } = {}) {

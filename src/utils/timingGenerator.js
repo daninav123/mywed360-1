@@ -1,3 +1,5 @@
+import i18n from '../i18n';
+
 // Utilidad para generar el Timing (bloques del día de la boda)
 // a partir de respuestas del tutorial inicial.
 
@@ -53,32 +55,11 @@ export function generateTimingFromAnswers(answers) {
   let currentStart = ceremonyTime || '17:00';
 
   if (hasCeremony) {
-    const ceremonyDur = ceremonyType === 'religiosa' ? 45 : 30; // heurística sencilla
-    const ceremonyEnd = addMinutes(currentStart, ceremonyDur);
-    blocks.push({
-      id: 'ceremonia',
+    const ceremonyDur = ceremonyType === 'religiosai18n.t('common.heuristica_sencilla_const_ceremonyend_addminutescurrentstart_ceremonydur')ceremonia',
       name: 'Ceremonia',
       startTime: currentStart,
       endTime: ceremonyEnd,
-      status: 'on-time',
-      moments: [],
-    });
-    currentStart = addMinutes(ceremonyEnd, bufferMinutes);
-  }
-
-  if (hasCocktail) {
-    // Añadir traslado si ceremonia y cóctel están en ubicaciones diferentes
-    if (
-      hasCeremony &&
-      differentLocations &&
-      Number.isFinite(transferMinutes) &&
-      transferMinutes > 0
-    ) {
-      currentStart = addMinutes(currentStart, transferMinutes);
-    }
-    const end = addMinutes(currentStart, Number.isFinite(cocktailDuration) ? cocktailDuration : 90);
-    blocks.push({
-      id: 'coctel',
+      status: 'on-timei18n.t('common.moments_currentstart_addminutesceremonyend_bufferminutes_hascocktail_anadir')coctel',
       name: 'Cóctel',
       startTime: currentStart,
       endTime: end,
@@ -108,20 +89,7 @@ export function generateTimingFromAnswers(answers) {
       name: 'Disco',
       startTime: currentStart,
       endTime: end,
-      status: 'on-time',
-      moments: [],
-    });
-    currentStart = end;
-  }
-
-  const timeline = blocks.map((b) => ({ label: b.name, time: b.startTime }));
-
-  // Datos iniciales para Momentos Especiales según bloques incluidos (localStorage)
-  const specialMomentsInit = {
-    ...(hasCeremony
-      ? {
-          ceremonia: [
-            { id: Date.now() + 1, order: 1, title: 'Entrada Novio', song: '' },
+      status: 'on-timei18n.t('common.moments_currentstart_end_const_timeline_blocksmapb')Entrada Novio', song: '' },
             { id: Date.now() + 2, order: 2, title: 'Entrada Novia', song: '' },
             {
               id: Date.now() + 3,

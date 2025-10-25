@@ -4,6 +4,7 @@
  * Sprint 2 - Completar Seating Plan
  */
 
+import i18n from '../i18n';
 import { collection, addDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
 
@@ -72,71 +73,7 @@ export const SEATING_EVENTS = {
   
   // Performance
   PERFORMANCE_SLOW_RENDER: 'seating_performance_slow_render',
-  PERFORMANCE_LAG_DETECTED: 'seating_performance_lag',
-};
-
-/**
- * SeatingAnalytics Class
- */
-class SeatingAnalytics {
-  constructor() {
-    this.sessionId = this.generateSessionId();
-    this.sessionStartTime = Date.now();
-    this.eventQueue = [];
-    this.flushInterval = null;
-    this.isEnabled = true;
-  }
-
-  /**
-   * Genera un ID único de sesión
-   */
-  generateSessionId() {
-    return `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  }
-
-  /**
-   * Habilita o deshabilita analytics
-   */
-  setEnabled(enabled) {
-    this.isEnabled = enabled;
-  }
-
-  /**
-   * Registra un evento
-   */
-  async trackEvent(eventName, properties = {}, userId = null, weddingId = null) {
-    if (!this.isEnabled) return;
-
-    try {
-      const event = {
-        eventName,
-        properties: {
-          ...properties,
-          sessionId: this.sessionId,
-          sessionDuration: Date.now() - this.sessionStartTime,
-          userAgent: navigator.userAgent,
-          screenResolution: `${window.screen.width}x${window.screen.height}`,
-          viewport: `${window.innerWidth}x${window.innerHeight}`,
-          platform: navigator.platform,
-          language: navigator.language,
-        },
-        userId,
-        weddingId,
-        timestamp: serverTimestamp(),
-        date: new Date().toISOString(),
-      };
-
-      // Añadir a cola
-      this.eventQueue.push(event);
-
-      // Flush si la cola es grande
-      if (this.eventQueue.length >= 10) {
-        await this.flush();
-      }
-
-      return event;
-    } catch (error) {
-      console.error('Error tracking event:', error);
+  PERFORMANCE_LAG_DETECTED: 'seating_performance_lagi18n.t('common.seatinganalytics_class_class_seatinganalytics_constructor_thissessionid')Error tracking event:', error);
       return null;
     }
   }
@@ -230,50 +167,7 @@ class SeatingAnalytics {
         eventsRef,
         where('weddingId', '==', weddingId),
         where('date', '>=', startDate.toISOString()),
-        where('date', '<=', endDate.toISOString())
-      );
-
-      const snapshot = await getDocs(q);
-      const events = snapshot.docs.map(doc => doc.data());
-
-      // Calcular estadísticas
-      const stats = {
-        totalEvents: events.length,
-        uniqueSessions: new Set(events.map(e => e.properties.sessionId)).size,
-        eventsByType: {},
-        averageDuration: 0,
-        peakHours: {},
-      };
-
-      // Contar por tipo
-      events.forEach(event => {
-        stats.eventsByType[event.eventName] = 
-          (stats.eventsByType[event.eventName] || 0) + 1;
-        
-        // Hora pico
-        const hour = new Date(event.date).getHours();
-        stats.peakHours[hour] = (stats.peakHours[hour] || 0) + 1;
-      });
-
-      // Calcular duración promedio de sesión
-      const sessions = {};
-      events.forEach(event => {
-        const sessionId = event.properties.sessionId;
-        if (!sessions[sessionId]) {
-          sessions[sessionId] = [];
-        }
-        sessions[sessionId].push(event.properties.sessionDuration || 0);
-      });
-
-      const totalDuration = Object.values(sessions).reduce((sum, durations) => {
-        return sum + Math.max(...durations);
-      }, 0);
-      
-      stats.averageDuration = totalDuration / stats.uniqueSessions;
-
-      return stats;
-    } catch (error) {
-      console.error('Error getting event stats:', error);
+        where('date', '<=i18n.t('common.enddatetoisostring_const_snapshot_await_getdocsq_const')Error getting event stats:', error);
       return null;
     }
   }
@@ -330,28 +224,7 @@ class SeatingAnalytics {
       action === 'open' ? SEATING_EVENTS.GUEST_SIDEBAR_OPENED :
       action === 'close' ? SEATING_EVENTS.GUEST_SIDEBAR_CLOSED :
       tab === 'alerts' ? SEATING_EVENTS.GUEST_SIDEBAR_ALERTS_VIEWED :
-      tab === 'recommendations' ? SEATING_EVENTS.GUEST_SIDEBAR_RECOMMENDATIONS_VIEWED :
-      SEATING_EVENTS.GUEST_SIDEBAR_STAFF_VIEWED;
-
-    return this.trackEvent(eventName, { action, tab }, userId, weddingId);
-  }
-
-  trackPerformance(userId, weddingId, metric, value) {
-    return this.trackEvent(SEATING_EVENTS.PERFORMANCE_SLOW_RENDER, {
-      metric,
-      value,
-    }, userId, weddingId);
-  }
-}
-
-// Instancia singleton
-const seatingAnalytics = new SeatingAnalytics();
-
-// Auto-flush cada 30 segundos
-seatingAnalytics.startAutoFlush(30000);
-
-// Flush al cerrar la página
-if (typeof window !== 'undefined') {
+      tab === 'recommendationsi18n.t('common.seatingeventsguestsidebarrecommendationsviewed_seatingeventsguestsidebarstaffviewed_return_thistrackeventeventname_action_tab')undefined') {
   window.addEventListener('beforeunload', () => {
     seatingAnalytics.flush();
   });

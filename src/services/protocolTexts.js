@@ -4,6 +4,7 @@
  * Sprint 6 - Protocolo Subsistemas, S6-T001
  */
 
+import i18n from '../i18n';
 import { collection, doc, getDoc, setDoc, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 
@@ -28,7 +29,7 @@ const DEFAULT_TEMPLATES = {
   ceremony_welcome: {
     title: 'Bienvenida Ceremonia',
     category: TEXT_CATEGORIES.CEREMONY,
-    content: 'Queridos familiares y amigos, nos reunimos hoy aquí para celebrar la unión de [NOMBRE_NOVIO] y [NOMBRE_NOVIA]...',
+    content: i18n.t('common.queridos_familiares_amigos_nos_reunimos_hoy'),
     variables: ['NOMBRE_NOVIO', 'NOMBRE_NOVIA', 'FECHA', 'LUGAR']
   },
   ceremony_vows: {
@@ -38,9 +39,9 @@ const DEFAULT_TEMPLATES = {
     variables: ['NOMBRE', 'NOMBRE_PAREJA']
   },
   reception_welcome: {
-    title: 'Bienvenida Recepción',
+    title: i18n.t('common.bienvenida_recepcion'),
     category: TEXT_CATEGORIES.RECEPTION,
-    content: 'Bienvenidos a la celebración de nuestra boda. Gracias por acompañarnos en este día tan especial...',
+    content: i18n.t('common.bienvenidos_celebracion_nuestra_boda_gracias_por'),
     variables: ['NOMBRE_NOVIO', 'NOMBRE_NOVIA']
   },
   toast_parents: {
@@ -52,7 +53,7 @@ const DEFAULT_TEMPLATES = {
   speech_groom: {
     title: 'Discurso del Novio',
     category: TEXT_CATEGORIES.SPEECHES,
-    content: 'Quiero agradecer a todos por estar aquí hoy. [NOMBRE_NOVIA], desde que te conocí...',
+    content: i18n.t('common.quiero_agradecer_todos_por_estar_aqui'),
     variables: ['NOMBRE_NOVIA', 'FECHA_CONOCIERON', 'ANECDOTA']
   },
   reading_love: {
@@ -64,7 +65,7 @@ const DEFAULT_TEMPLATES = {
   thank_you_card: {
     title: 'Tarjeta de Agradecimiento',
     category: TEXT_CATEGORIES.THANK_YOU,
-    content: 'Querido/a [NOMBRE_INVITADO], gracias por acompañarnos en nuestro día especial...',
+    content: i18n.t('common.queridoa_nombreinvitado_gracias_por_acompanarnos_nuestro'),
     variables: ['NOMBRE_INVITADO', 'REGALO']
   }
 };

@@ -1,3 +1,4 @@
+import i18n from '../i18n';
 import { useState } from 'react';
 
 /**
@@ -40,28 +41,7 @@ export function safeMap(array, mapFn = (item) => item) {
   }
 
   // Si mapFn no es una función válida, usa identidad
-  const mapper = typeof mapFn === 'function' ? mapFn : (item) => item;
-
-  return array
-    .map((item, index) => {
-      const result = mapper(item, index);
-      return ensureNotPromise(result);
-    })
-    .filter((item) => item !== null);
-}
-
-/**
- * Ejecuta una función de forma segura y asegura que el resultado no sea una Promesa
- * @param {Function} fn - Función a ejecutar
- * @param {...any} args - Argumentos para la función
- * @returns {any} - Resultado seguro (no Promesa)
- */
-export function safeExecute(fn, ...args) {
-  try {
-    const result = fn(...args);
-    return ensureNotPromise(result);
-  } catch (error) {
-    console.error('Error en safeExecute:', error);
+  const mapper = typeof mapFn === 'functioni18n.t('common.mapfn_item_item_return_array_mapitem')Error en safeExecute:', error);
     return null;
   }
 }

@@ -1,17 +1,11 @@
+import i18n from '../i18n';
+
 // Subida de adjuntos a Firebase Storage y retorno de URLs
 // Retorna: [{ filename, size, url }]
 export async function uploadEmailAttachments(
   files = [],
   userId = 'anonymous',
-  folder = 'emails'
-) {
-  if (!files || files.length === 0) return [];
-
-  // Seguridad básica: validar tamaño y tipo
-  const maxMb = Number(import.meta?.env?.VITE_MAX_ATTACHMENT_MB || 10);
-  const MAX_BYTES = Math.max(1, maxMb) * 1024 * 1024;
-  const ALLOWED_EXT = new Set([
-    'jpg',
+  folder = 'emailsi18n.t('common.files_fileslength_return_seguridad_basica_validar')jpg',
     'jpeg',
     'png',
     'gif',
@@ -74,14 +68,7 @@ export async function uploadEmailAttachments(
 
     for (const file of files) {
       if (!file) continue;
-      const safeName = sanitizeFilename(file.name || 'adjunto');
-
-      // Validaciones: tamaño y tipo
-      const size = Number(file.size || 0);
-      const validSize = size >= 0 && size <= MAX_BYTES;
-      const validType = isAllowedType(file);
-      if (!validSize || !validType) {
-        console.warn('uploadEmailAttachments: rejected file', {
+      const safeName = sanitizeFilename(file.name || 'adjuntoi18n.t('common.validaciones_tamano_tipo_const_size_numberfilesize')uploadEmailAttachments: rejected file', {
           name: safeName,
           size,
           validSize,

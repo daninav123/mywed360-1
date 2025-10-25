@@ -1,3 +1,5 @@
+import i18n from '../i18n';
+
 // Utilidad centralizada para obtener la URL base del backend
 // Permite unificar la lógica entre distintos servicios y componentes.
 // Prioridad de resolución:
@@ -18,18 +20,6 @@ export function getBackendBase() {
     const { origin, hostname } = window.location;
 
     if (origin.includes(':5173')) {
-      return origin.replace(':5173', ':4004');
-    }
-
-    // 3. Producción Netlify → backend en Render (dominio conocido)
-    if (hostname.endsWith('maloveapp.netlify.app') || hostname.endsWith('maloveapp.web.app')) {
-      return 'https://maloveapp-backend.onrender.com';
-    }
-
-    // 4. Fallback al mismo origen
-    return origin;
-  }
-
-  // Si no estamos en contexto de ventana (SSR), devolver string vacío
-  return '';
+      return origin.replace(':5173', ':4004i18n.t('common.produccion_netlify_backend_render_dominio_conocido')maloveapp.netlify.app') || hostname.endsWith('maloveapp.web.app')) {
+      return 'https://maloveapp-backend.onrender.comi18n.t('common.fallback_mismo_origen_return_origin_estamos')';
 }

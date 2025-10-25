@@ -4,6 +4,7 @@
  * Proporciona funciones específicas para diagnosticar problemas comunes
  */
 
+import i18n from '../i18n';
 import { getBackendBase } from '../utils/backendBase';
 
 class DiagnosticService {
@@ -81,16 +82,7 @@ class DiagnosticService {
       if (!apiKey || !domain) {
         return {
           status: 'error',
-          message: 'Variables de Mailgun no configuradas',
-          details: { hasApiKey: !!apiKey, hasDomain: !!domain },
-        };
-      }
-
-      // Test a través del backend - intentar múltiples rutas
-      if (this.backendUrl) {
-        // Intentar primero la ruta principal
-        let response = await fetch(`${this.backendUrl}/api/mailgun/test`, {
-          method: 'GET',
+          message: 'Variables de Mailgun no configuradasi18n.t('common.details_hasapikey_apikey_hasdomain_domain_test')GET',
         });
 
         // Si falla, intentar ruta de test simple
@@ -110,15 +102,7 @@ class DiagnosticService {
         } else {
           const error = await response.text();
           return {
-            status: 'error',
-            message: `Mailgun test falló con status ${response.status}`,
-            details: { error, domain, hasApiKey: !!apiKey, hasDomain: !!domain },
-          };
-        }
-      }
-
-      return {
-        status: 'warning',
+            status: 'errori18n.t('common.message_mailgun_test_fallo_con_status')warning',
         message: 'Variables configuradas pero backend no disponible',
         details: { domain, sendingDomain },
       };
@@ -189,7 +173,7 @@ class DiagnosticService {
 
       return {
         status: 'success',
-        message: 'Conexión con base de datos de emails OK',
+        message: i18n.t('common.conexion_con_base_datos_emails'),
         details: {
           documentsFound: snapshot.size,
           collectionPath: 'emails',
@@ -235,18 +219,7 @@ class DiagnosticService {
     } catch (error) {
       return {
         status: 'error',
-        message: 'Error al probar webhook',
-        details: { error: error.message },
-      };
-    }
-  }
-
-  /**
-   * Test de configuración de OpenAI
-   */
-  async testOpenAIConfig() {
-    try {
-      const allowDirect = import.meta.env.VITE_ENABLE_DIRECT_OPENAI === 'true';
+        message: 'Error al probar webhooki18n.t('common.details_error_errormessage_test_configuracion_openai')true';
       if (!allowDirect) {
         return {
           status: 'warning',
@@ -259,12 +232,7 @@ class DiagnosticService {
       if (!apiKey) {
         return {
           status: 'error',
-          message: 'API Key de OpenAI no configurada',
-        };
-      }
-
-      // Test básico de la API
-      const response = await fetch('https://api.openai.com/v1/models', {
+          message: 'API Key de OpenAI no configuradai18n.t('common.test_basico_api_const_response_await')https://api.openai.com/v1/models', {
         headers: {
           Authorization: `Bearer ${apiKey}`,
           'Content-Type': 'application/json',
@@ -324,39 +292,14 @@ class DiagnosticService {
     } catch (error) {
       return {
         status: 'error',
-        message: 'Error al probar rutas de IA',
-        details: { error: error.message },
-      };
-    }
-  }
-
-  /**
-   * Verificar cuota de API de OpenAI
-   */
-  async checkAPIQuota() {
-    try {
-      // Esta información normalmente requiere una llamada específica a la API de billing
-      // Por ahora, haremos un test simple
-      return {
-        status: 'info',
-        message: 'Verificación de cuota requiere implementación específica',
-        details: { note: 'Implementar verificación de billing si es necesario' },
+        message: 'Error al probar rutas de IAi18n.t('common.details_error_errormessage_verificar_cuota_api')info',
+        message: i18n.t('common.verificacion_cuota_requiere_implementacion_especifica'),
+        details: { note: i18n.t('common.implementar_verificacion_billing_necesario') },
       };
     } catch (error) {
       return {
         status: 'error',
-        message: 'Error al verificar cuota',
-        details: { error: error.message },
-      };
-    }
-  }
-
-  /**
-   * Test de autenticación de Firebase
-   */
-  async testFirebaseAuth() {
-    try {
-      const { getAuth } = await import('firebase/auth');
+        message: 'Error al verificar cuotai18n.t('common.details_error_errormessage_test_autenticacion_firebase')firebase/auth');
       const auth = getAuth();
 
       return {
@@ -370,18 +313,7 @@ class DiagnosticService {
     } catch (error) {
       return {
         status: 'error',
-        message: 'Error en Firebase Auth',
-        details: { error: error.message, code: error.code },
-      };
-    }
-  }
-
-  /**
-   * Test de conexión a Firestore
-   */
-  async testFirestoreConnection() {
-    try {
-      const { getFirestore, doc, getDoc } = await import('firebase/firestore');
+        message: 'Error en Firebase Authi18n.t('common.details_error_errormessage_code_errorcode_test')firebase/firestore');
       const db = getFirestore();
 
       // Intentar leer un documento de prueba
@@ -398,7 +330,7 @@ class DiagnosticService {
     } catch (error) {
       return {
         status: 'error',
-        message: 'Error de conexión con Firestore',
+        message: i18n.t('common.error_conexion_con_firestore'),
         details: { error: error.message, code: error.code },
       };
     }
@@ -461,17 +393,7 @@ class DiagnosticService {
     } catch (error) {
       return {
         status: 'error',
-        message: 'Error al probar reglas de Firestore',
-        details: { error: error.message },
-      };
-    }
-  }
-
-  /**
-   * Ejecuta un diagnóstico completo del sistema
-   */
-  async runFullDiagnostic() {
-    console.log('🔍 Iniciando diagnóstico completo del sistema...');
+        message: 'Error al probar reglas de Firestorei18n.t('common.details_error_errormessage_ejecuta_diagnostico_completo')🔍 Iniciando diagnóstico completo del sistema...');
 
     const results = {
       timestamp: new Date().toISOString(),

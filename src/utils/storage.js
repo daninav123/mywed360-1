@@ -1,3 +1,5 @@
+import i18n from '../i18n';
+
 // Utilidades genéricas para acceso a localStorage con manejo de JSON y fallback
 // Se centraliza la lógica para evitar duplicación en los servicios.
 
@@ -23,42 +25,7 @@ export const _getStorage = () => {
   if (typeof global !== 'undefined' && global.localStorage) {
     return global.localStorage;
   }
-  if (typeof window !== 'undefined' && window.localStorage) {
-    return window.localStorage;
-  }
-  return {
-    getItem: () => null,
-    setItem: () => {},
-    removeItem: () => {},
-  };
-};
-
-// Nota: No almacenamos la referencia; en entornos de test `localStorage` puede definirse *después* de importar el módulo.
-// Por ello, siempre llamaremos _getStorage() dinámicamente dentro de cada función para asegurar que usamos la versión correcta.
-
-export const loadJson = (key, defaultValue = null) => {
-  try {
-    const store =
-      typeof window !== 'undefined' && window.localStorage ? window.localStorage : _getStorage();
-    const raw = store.getItem(key);
-    if (!raw) return defaultValue;
-    return JSON.parse(raw);
-  } catch (error) {
-    console.error(`storage.loadJson error for key ${key}:`, error);
-    return defaultValue;
-  }
-};
-
-/**
- * Guarda un valor JSON en localStorage.
- * @param {string} key - Clave.
- * @param {*} value - Valor a serializar.
- * @returns {boolean} Éxito de la operación.
- */
-export const saveJson = (key, value) => {
-  try {
-    const store =
-      typeof window !== 'undefined' && window.localStorage ? window.localStorage : _getStorage();
+  if (typeof window !== 'undefinedi18n.t('common.windowlocalstorage_return_windowlocalstorage_return_getitem_null')undefinedi18n.t('common.windowlocalstorage_windowlocalstorage_getstorage_const_raw_storegetitemkey')undefined' && window.localStorage ? window.localStorage : _getStorage();
     store.setItem(key, JSON.stringify(value));
     return true;
   } catch (error) {

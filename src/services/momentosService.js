@@ -1,3 +1,4 @@
+import i18n from '../i18n';
 import {
   collection,
   deleteDoc,
@@ -186,7 +187,7 @@ const optimizeImageFile = async (
 const ensureFirebase = async () => {
   await firebaseReady;
   if (!db) {
-    throw new Error('Firebase no está configurado (db nulo)');
+    throw new Error(i18n.t('common.firebase_esta_configurado_nulo'));
   }
   return db;
 };
@@ -367,7 +368,7 @@ const nowPlusHours = (hours) => {
 };
 
 const buildAlbumDefaults = (overridesSettings = {}) => ({
-  name: 'Galería de recuerdos',
+  name: i18n.t('common.galeria_recuerdos'),
   slug: 'momentos-principal',
   status: 'active',
   eventDate: null,
@@ -486,14 +487,14 @@ const calculateHighlightScore = (photo, album) => {
 
   if (photo?.labels?.includes('featured')) {
     score += 0.15;
-    reasons.push('Marcada como destacada por el anfitrión');
+    reasons.push(i18n.t('common.marcada_como_destacada_por_anfitrion'));
   }
 
   if (photo?.width && photo?.height) {
     const megapixels = (photo.width * photo.height) / 1_000_000;
     if (megapixels >= 8) {
       score += 0.05;
-      reasons.push('Alta resolución');
+      reasons.push(i18n.t('common.alta_resolucion'));
     }
   }
 
@@ -672,7 +673,7 @@ export const uploadMomentPhoto = async ({
       }).catch(() => {});
     }
     throw new Error(
-      'El periodo de aportaciones ya finalizó. Contacta con la pareja anfitriona para solicitar acceso.'
+      i18n.t('common.periodo_aportaciones_finalizo_contacta_con_pareja')
     );
   }
 
@@ -765,7 +766,7 @@ export const uploadMomentPhoto = async ({
       try {
         uploadTask.cancel();
       } catch {}
-      reject(new DOMException('Operación cancelada', 'AbortError'));
+      reject(new DOMException(i18n.t('common.operacion_cancelada'), 'AbortError'));
     };
     if (signal) {
       if (signal.aborted) {
@@ -928,7 +929,7 @@ export const uploadMomentPhoto = async ({
                 guestRef,
                 {
                   displayName:
-                    metadata?.guestDisplayName || metadata?.guestName || 'Invitado anónimo',
+                    metadata?.guestDisplayName || metadata?.guestName || i18n.t('common.invitado_anonimo'),
                   totalUploads: nextTotal,
                   lastUploadAt: serverTimestamp(),
                   badges: Array.from(badges),
@@ -1023,7 +1024,7 @@ export const updatePhotoStatus = async ({
     if (nextStatus === 'rejected') {
       countersUpdate['counters.rejectedPhotos'] = increment(1);
       updates.rejection = {
-        reason: reason || 'Rechazado por anfitrión',
+        reason: reason || i18n.t('common.rechazado_por_anfitrion'),
         rejectedBy: actorId || null,
         rejectedAt: serverTimestamp(),
       };
@@ -1110,7 +1111,7 @@ export const createGuestToken = async (
   const { closesAt } = resolveUploadWindow(albumData);
   const nowDate = new Date();
   if (closesAt && nowDate > closesAt) {
-    throw new Error('El periodo para subir recuerdos ya finalizó. Genera un nuevo QR cuando habilites la galería nuevamente.');
+    throw new Error(i18n.t('common.periodo_para_subir_recuerdos_finalizo_genera'));
   }
 
   const tokensRef = collection(db, 'weddings', weddingId, 'albums', albumId, 'tokens');
@@ -1158,7 +1159,7 @@ export const validateGuestToken = async (
   { albumId = DEFAULT_ALBUM_ID } = {}
 ) => {
   if (!weddingId || !tokenValue) {
-    throw new Error('Token inválido');
+    throw new Error(i18n.t('common.token_invalido'));
   }
   await ensureFirebase();
   const tokensRef = collection(db, 'weddings', weddingId, 'albums', albumId, 'tokens');
@@ -1170,14 +1171,14 @@ export const validateGuestToken = async (
   const docSnap = snap.docs[0];
   const data = docSnap.data();
   if (data.status && data.status !== 'active') {
-    throw new Error('El enlace está inactivo');
+    throw new Error(i18n.t('common.enlace_esta_inactivo'));
   }
   const now = Timestamp.now();
   if (data.expiresAt?.toMillis && data.expiresAt.toMillis() < now.toMillis()) {
     throw new Error('El enlace ha caducado');
   }
   if (data.maxUsages && data.usedCount >= data.maxUsages) {
-    throw new Error('El enlace alcanzó su límite de subidas');
+    throw new Error(i18n.t('common.enlace_alcanzo_limite_subidas'));
   }
 
   const albumRef = doc(db, 'weddings', weddingId, 'albums', albumId);
@@ -1186,7 +1187,7 @@ export const validateGuestToken = async (
   const { closesAt } = resolveUploadWindow(albumData);
   const nowDate = new Date();
   if (closesAt && nowDate > closesAt) {
-    throw new Error('La galería ya no acepta nuevas fotos (periodo finalizado)');
+    throw new Error(i18n.t('common.galeria_acepta_nuevas_fotos_periodo_finalizado'));
   }
 
   return { id: docSnap.id, ...data };
