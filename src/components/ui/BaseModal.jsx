@@ -1,5 +1,6 @@
 import { X } from 'lucide-react';
 import React, { useEffect, useCallback } from 'react';
+import useTranslations from '../../hooks/useTranslations';
 
 /**
  * Componente Modal base avanzado y reutilizable
@@ -32,6 +33,7 @@ const BaseModal = ({
   footer,
   scrollable = true,
 }) => {
+  const { t } = useTranslations();
   // Manejar cierre con tecla Escape
   const handleKeyDown = useCallback(
     (event) => {
@@ -118,7 +120,7 @@ const BaseModal = ({
               <button
                 onClick={onClose}
                 className="p-1 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
-                aria-label="Cerrar modal"
+                aria-label={t('app.close')}
               >
                 <X size={20} />
               </button>

@@ -1,4 +1,5 @@
 import React from 'react';
+import useTranslations from '../../hooks/useTranslations';
 
 /**
  * Componente FormField reutilizable para formularios
@@ -42,6 +43,7 @@ const FormField = ({
   helpText,
   ...rest
 }) => {
+  const { t } = useTranslations();
   // Clases base para inputs
   const baseInputClasses = `
     w-full px-3 py-2 border rounded-md shadow-sm transition-colors
@@ -85,7 +87,7 @@ const FormField = ({
             className={baseInputClasses}
             {...rest}
           >
-            <option value="">{placeholder || 'Seleccionar...'}</option>
+            <option value="">{placeholder || t('forms.pleaseSelect')}</option>
             {options.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}

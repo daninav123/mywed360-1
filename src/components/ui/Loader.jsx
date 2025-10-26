@@ -1,4 +1,5 @@
 import React from 'react';
+import useTranslations from '../../hooks/useTranslations';
 
 /**
  * Componente de carga animado
@@ -11,6 +12,7 @@ import React from 'react';
  * @returns {JSX.Element} - Componente de carga
  */
 export const Loader = ({ className = '', size = 'md', color = 'primary' }) => {
+  const { t } = useTranslations();
   const sizeClasses = {
     sm: 'w-4 h-4',
     md: 'w-8 h-8',
@@ -38,8 +40,8 @@ export const Loader = ({ className = '', size = 'md', color = 'primary' }) => {
   `;
 
   return (
-    <div className={classes.trim().replace(/\s+/g, ' ')} role="status" aria-label="Cargando">
-      <span className="sr-only">Cargando...</span>
+    <div className={classes.trim().replace(/\s+/g, ' ')} role="status" aria-label={t('app.loading')}>
+      <span className="sr-only">{t('app.loading')}</span>
     </div>
   );
 };
