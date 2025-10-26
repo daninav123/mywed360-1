@@ -1,4 +1,5 @@
 import React from 'react';
+import useTranslations from '../../hooks/useTranslations';
 
 /**
  * Componente Spinner para mostrar estados de carga
@@ -6,6 +7,7 @@ import React from 'react';
  * @param {string} className - Clases adicionales
  */
 const Spinner = ({ size = 'md', className = '' }) => {
+  const { t } = useTranslations();
   const sizeClasses = {
     sm: 'w-4 h-4',
     md: 'w-6 h-6',
@@ -18,7 +20,7 @@ const Spinner = ({ size = 'md', className = '' }) => {
   return (
     <div role="status" className="inline-block">
       <div className={classes}></div>
-      <span className="sr-only">Cargando...</span>
+      <span className="sr-only">{t('app.loading')}</span>
     </div>
   );
 };
