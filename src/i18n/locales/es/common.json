@@ -129,63 +129,63 @@
   },
   "authLogin": {
     "title": "Accede a tu cuenta",
-    "subtitle": "Usa tu correo y contrasea o contina con un proveedor social.",
+    "subtitle": "Usa tu correo y contraseña o continúa con un proveedor social.",
     "emailLabel": "Correo electrónico",
-    "passwordLabel": "Contrasea",
+    "passwordLabel": "Contraseña",
     "emailPlaceholder": "tu@email.com",
-    "passwordPlaceholder": "Tu contrasea",
-    "rememberMe": "Recurdame",
-    "forgotPassword": "Olvidaste tu contrasea?",
+    "passwordPlaceholder": "Tu contraseña",
+    "rememberMe": "Recuérdame",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
     "submit": "Iniciar sesión",
     "submitting": "Iniciando sesión...",
-    "noAccount": "No tienes cuenta?",
-    "registerLink": "Regstrate",
+    "noAccount": "¿No tienes cuenta?",
+    "registerLink": "Regístrate",
     "hero": {
-      "title": "Gestiona todo desde un nico panel",
+      "title": "Gestiona todo desde un único panel",
       "description": "Accede a tus invitados, tareas, presupuestos y documentos en segundos. Sigue el progreso del evento y coordina a todo tu equipo.",
       "features": [
         "Sincroniza proveedores y contratos.",
         "Automatiza correos y recordatorios personalizados.",
-        "Recibe alertas cuando algo requiera tu atencin."
+        "Recibe alertas cuando algo requiera tu atención."
       ]
     },
     "validation": {
       "missingEmail": "Introduce tu correo electrónico.",
-      "missingPassword": "Introduce tu contrasea."
+      "missingPassword": "Introduce tu contraseña."
     },
     "errors": {
-      "invalidCredentials": "Correo o contrasea invlidos.",
-      "generic": "No pudimos iniciar sesión. Intntalo de nuevo o contacta con soporte."
+      "invalidCredentials": "Correo o contraseña inválidos.",
+      "generic": "No pudimos iniciar sesión. Inténtalo de nuevo o contacta con soporte."
     },
     "social": {
-      "divider": "o contina con",
+      "divider": "o continúa con",
       "button": "Continuar con {{provider}}",
-      "pending": "Contina el inicio de sesión en la ventana de {{provider}}."
+      "pending": "Continúa el inicio de sesión en la ventana de {{provider}}."
     }
   },
   "authSignup": {
     "title": "Crea tu cuenta",
-    "subtitle": "Regstrate con tu correo o contina con tu cuenta social favorita.",
+    "subtitle": "Regístrate con tu correo o continúa con tu cuenta social favorita.",
     "emailLabel": "Correo electrónico",
-    "passwordLabel": "Contrasea",
+    "passwordLabel": "Contraseña",
     "roleLabel": "Rol",
     "emailPlaceholder": "tu@email.com",
-    "passwordPlaceholder": "Mnimo 8 caracteres",
-    "rememberMe": "Recurdame",
-    "forgotPassword": "Olvidaste tu contrasea?",
+    "passwordPlaceholder": "Mínimo 8 caracteres",
+    "rememberMe": "Recuérdame",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
     "submit": "Crear cuenta",
     "submitting": "Creando cuenta...",
-    "noAccount": "No tienes cuenta?",
-    "registerLink": "Regstrate",
-    "alreadyHaveAccount": "Ya tienes cuenta?",
+    "noAccount": "¿No tienes cuenta?",
+    "registerLink": "Regístrate",
+    "alreadyHaveAccount": "¿Ya tienes cuenta?",
     "loginLink": "Inicia sesión",
     "hero": {
       "title": "Bienvenida a Lovenda",
-      "description": "Centraliza tareas, invitados y proveedores en un solo lugar. Nuestra asistente te gua en cada paso para que tu boda sea perfecta.",
+      "description": "Centraliza tareas, invitados y proveedores en un solo lugar. Nuestra asistente te guía en cada paso para que tu boda sea perfecta.",
       "features": [
         "Timeline inteligente para no olvidar nada.",
         "Automatiza correos y recordatorios para invitados.",
-        "Catlogo de proveedores con recomendaciones personalizadas."
+        "Catálogo de proveedores con recomendaciones personalizadas."
       ]
     },
     "roleOptions": {
@@ -195,18 +195,18 @@
     },
     "validation": {
       "missingEmail": "Introduce tu correo electrónico.",
-      "missingPassword": "Introduce tu contrasea.",
-      "shortPassword": "La contrasea debe tener al menos 8 caracteres."
+      "missingPassword": "Introduce tu contraseña.",
+      "shortPassword": "La contraseña debe tener al menos 8 caracteres."
     },
     "errors": {
-      "emailInUse": "Este correo ya est registrado.",
-      "weakPassword": "Elige una contrasea más fuerte para completar el registro.",
+      "emailInUse": "Este correo ya está registrado.",
+      "weakPassword": "Elige una contraseña más fuerte para completar el registro.",
       "invalidEmail": "Introduce un correo electrónico válido.",
-      "generic": "No pudimos crear tu cuenta. Intntalo de nuevo o contacta con soporte."
+      "generic": "No pudimos crear tu cuenta. Inténtalo de nuevo o contacta con soporte."
     },
-    "successMessage": "Cuenta creada con Éxito. Redirigiendo a tu panel...",
+    "successMessage": "Cuenta creada con éxito. Redirigiendo a tu panel...",
     "social": {
-      "divider": "o contina con",
+      "divider": "o continúa con",
       "button": "Continuar con {{provider}}",
       "pending": "Contina el registro en la ventana de {{provider}}."
     }
