@@ -7,7 +7,12 @@ import LanguageSelector from './ui/LanguageSelector';
 import useTranslations from '../hooks/useTranslations';
 import { prefetchModule } from '../utils/prefetch';
 
-// Devuelve los ?)?) ?)"?)a?)?tems de navegaci?)?) ?)"?)a?)?n seg?)?) ?)"?)a?)?n rol
+/**
+ * Devuelve los items de navegación según el rol del usuario
+ * @param {string} role - Rol del usuario (pareja, planner, ayudante)
+ * @param {function} t - Función de traducción
+ * @returns {Array} Array de items de navegación con path y label
+ */
 function getNavItems(role, t) {
   const roleMap = {
     pareja: 'owner',
@@ -47,102 +52,11 @@ function getNavItems(role, t) {
       ];
   }
 }
-/*
-  // Normalizar nombres de roles provenientes de Firestore
-  const roleMap = {
-    'pareja': 'owner',
-    'wedding-planner': 'planner',
-    'planner': 'planner',
-    'ayudante': 'assistant'
-  };
-  const normalizedRole = roleMap[role] || role;
 
-  if (normalizedRole === 'owner') {
-    return [
-      { path: '/home', label: 'Inicio' },
-      { path: '/tasks', label: 'Tareas' },
-      { path: '/finance', label: 'Finanzas' },
-        { path: '/more', label: t('navigation.more') },
-    ];
-  }
-
-  if (normalizedRole === 'planner') {
-    return [
-      { path: '/home', label: 'Inicio' },
-      { path: '/tasks', label: 'Tareas' },
-      { path: '/protocolo', label: t('navigation.protocol') },
-        { path: '/more', label: t('navigation.more') },
-    ];
-  }
-
-  if (normalizedRole === 'assistant') {
-    return [
-      { path: '/tasks', label: 'Tareas' },
-      { path: '/protocolo', label: t('navigation.protocol') },
-        { path: '/more', label: t('navigation.more') },
-    ];
-  }
-
-  // Fallback (rol no reconocido)
-  return [
-    { path: '/home', label: 'Inicio' },
-    { path: '/tasks', label: 'Tareas' },
-        { path: '/more', label: t('navigation.more') },
-  ];
-  // Normalizar nombres de roles provenientes de Firestore
-  const roleMap = {
-    'pareja': 'owner',
-    'wedding-planner': 'planner',
-    'planner': 'planner',
-    'ayudante': 'assistant'
-  };
-  const normalizedRole = roleMap[role] || role;
-  const common = [
-    { path: '/home', label: 'Inicio' },
-    { path: '/tasks', label: 'Tareas' },
-    { path: '/protocolo', label: t('navigation.protocol') },
-        { path: '/more', label: t('navigation.more') },
-  ];
-
-  if (normalizedRole === 'owner') {
-    return [
-      { path: '/home', label: 'Inicio' },
-      { path: '/tasks', label: 'Tareas' },
-      { path: '/finance', label: 'Finanzas' },
-        { path: '/more', label: t('navigation.more') },
-    ];
-  }
-  if (normalizedRole === 'planner') {
-    // Planner no ve finanzas, pero puede tener otras secciones espec?)?) ?)"?)a?)?ficas
-    return [
-      { path: '/home', label: 'Inicio' },
-      { path: '/tasks', label: 'Tareas' },
-      { path: '/protocolo', label: t('navigation.protocol') },
-        { path: '/more', label: t('navigation.more') },
-    ];
-  }
-  if (normalizedRole === 'assistant') {
-    // Asistente: solo tareas y protocolo (m?)?) ?)"?)a?)?s se mantiene)
-    return [
-      { path: '/tasks', label: 'Tareas' },
-      { path: '/protocolo', label: t('navigation.protocol') },
-        { path: '/more', label: t('navigation.more') },
-    ];
-
-  }
-  // Fallback
-  return common;
-}
-
-*/
 function Nav() {
-  // Nuevo sistema unificado
-  const { userProfile, hasRole } = useAuth();
-
-  // Hook de traducciones
+  const { userProfile } = useAuth();
   const { t } = useTranslations();
 
-  // Usar el nuevo sistema para el rol, con fallback b?)?) ?)"?)a?)?sico
   const role = userProfile?.role || 'owner';
   const navItems = React.useMemo(() => getNavItems(role, t), [role, t]);
 
@@ -152,7 +66,6 @@ function Nav() {
   // Prefetch for lazy routes on hover
   const prefetchForPath = React.useCallback((path) => {
     try {
-      // Solo prefetch de rutas lazy para evitar warnings de Vite
       if (path.startsWith('/protocolo'))
         prefetchModule('ProtocoloLayout', () => import('../pages/protocolo/ProtocoloLayout'));
     } catch {}
@@ -160,7 +73,7 @@ function Nav() {
 
   return (
     <nav className="fixed bottom-0 w-full bg-[var(--color-primary)] text-[color:var(--color-text)] shadow-md flex justify-between items-center p-3 z-30">
-      {/* Navegaci?)?) ?)"?)a?)?n principal */}
+      {/* Navegación principal */}
       <div className="flex justify-around flex-1">
         {navItems.map(({ path, label }, idx) => {
           const isActive = location.pathname.startsWith(path);
