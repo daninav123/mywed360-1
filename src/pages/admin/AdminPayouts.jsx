@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { RefreshCcw } from 'lucide-react';
 
-import { getCommercePayoutPreview } from '../../services/adminDataService';
+import { commitCommercePayouts, getCommercePayoutPreview } from '../../services/adminDataService';
 
 const formatCurrency = (value, currency = 'EUR') => {
   try {
@@ -43,9 +43,17 @@ const AdminPayouts = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [data, setData] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [commitMessage, setCommitMessage] = useState('');
+  const [commitError, setCommitError] = useState('');
 
-  const loadPreview = async (targetPeriod = period) => {
+  const loadPreview = async (targetPeriod = period, options = {}) => {
     if (!targetPeriod) return;
+    const resetCommit = options?.resetCommit !== false;
+    if (resetCommit) {
+      setCommitMessage('');
+      setCommitError('');
+    }
     setLoading(true);
     setError('');
     try {
@@ -63,6 +71,25 @@ const AdminPayouts = () => {
     loadPreview(period);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const handleCommit = async () => {
+    if (!period || saving) return;
+    setCommitMessage('');
+    setCommitError('');
+    try {
+      setSaving(true);
+      const response = await commitCommercePayouts(period);
+      const versionLabel = response?.version ? ` (versión ${response.version})` : '';
+      const periodLabel = response?.period?.label || data?.period?.label || period;
+      setCommitMessage(`Liquidación guardada${versionLabel} para ${periodLabel}.`);
+      await loadPreview(period, { resetCommit: false });
+    } catch (err) {
+      console.error('[AdminPayouts] Failed to commit payouts:', err);
+      setCommitError(err?.message || 'No se pudo guardar la liquidación.');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const totals = data?.totals ?? [];
   const payouts = data?.payouts ?? [];
@@ -125,12 +152,32 @@ const AdminPayouts = () => {
             <RefreshCcw size={16} />
             {loading ? 'Actualizando...' : 'Regenerar'}
           </button>
+          <button
+            type="button"
+            className="inline-flex items-center justify-center gap-2 rounded-md border border-indigo-600 px-4 py-2 text-sm font-medium text-indigo-600 shadow-sm transition hover:bg-indigo-50 disabled:cursor-not-allowed disabled:opacity-50"
+            onClick={handleCommit}
+            disabled={loading || saving || !data}
+          >
+            {saving ? 'Guardando...' : 'Guardar liquidación'}
+          </button>
         </form>
       </div>
 
       {error && (
         <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {error}
+        </div>
+      )}
+
+      {commitMessage && (
+        <div className="rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+          {commitMessage}
+        </div>
+      )}
+
+      {commitError && (
+        <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {commitError}
         </div>
       )}
 

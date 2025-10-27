@@ -2942,6 +2942,379 @@ router.get('/discounts', async (_req, res) => {
 
 const COMMERCE_PAYOUT_STATUSES = ['paid', 'succeeded', 'completed'];
 
+class CommercePayoutsError extends Error {
+  constructor(code, message, status = 400, details = null) {
+    super(message);
+    this.name = 'CommercePayoutsError';
+    this.code = code;
+    this.status = status;
+    this.details = details;
+  }
+}
+
+async function buildCommercePayoutPreview({ periodInput, limit = 500 } = {}) {
+  let period;
+  try {
+    period = resolveCommercePeriod(periodInput);
+  } catch (periodError) {
+    throw new CommercePayoutsError('invalid_period', periodError.message || 'Periodo inválido.', 400);
+  }
+
+  const { payload } = await fetchDiscountsDataset({ limit });
+  const { items, managers, commercials } = payload;
+
+  const managerRulesMap = new Map();
+  managers.forEach((manager) => {
+    if (manager.id) managerRulesMap.set(manager.id, manager);
+    const key = contactKey(manager);
+    if (key) managerRulesMap.set(key.toLowerCase(), manager);
+  });
+
+  const commercialDirectory = new Map();
+  commercials.forEach((commercial) => {
+    const keys = [
+      commercial.id,
+      commercial.email ? commercial.email.toLowerCase() : null,
+      commercial.phone ? commercial.phone.replace(/\s+/g, '') : null,
+      commercial.name ? commercial.name.toLowerCase() : null,
+    ].filter(Boolean);
+    keys.forEach((key) => commercialDirectory.set(key, commercial));
+  });
+
+  const startTs = admin.firestore.Timestamp.fromDate(period.start);
+  const endTs = admin.firestore.Timestamp.fromDate(period.end);
+
+  let paymentsSnapshot = null;
+  let needsIndex = false;
+  try {
+    paymentsSnapshot = await db
+      .collection('payments')
+      .where('status', 'in', COMMERCE_PAYOUT_STATUSES)
+      .where('createdAt', '>=', startTs)
+      .where('createdAt', '<', endTs)
+      .get();
+  } catch (error) {
+    if (error.code === 9 || error.code === 'failed-precondition') {
+      needsIndex = true;
+    } else {
+      throw error;
+    }
+  }
+
+  if (!paymentsSnapshot) {
+    try {
+      paymentsSnapshot = await db
+        .collection('payments')
+        .where('createdAt', '>=', startTs)
+        .where('createdAt', '<', endTs)
+        .get();
+    } catch (fallbackError) {
+      console.warn('[admin-dashboard] payouts preview fallback query failed:', fallbackError?.message);
+      paymentsSnapshot = { empty: true, docs: [] };
+      needsIndex = true;
+    }
+  }
+
+  const paymentsByCode = new Map();
+  const unmatchedPayments = [];
+  const paymentDocs = paymentsSnapshot?.docs || [];
+
+  paymentDocs.forEach((docSnap) => {
+    const raw = docSnap.data() || {};
+    const code = (raw.discountCode || raw.coupon || raw.code || '').toString().trim().toUpperCase();
+    const amountRaw = raw.amount ?? raw.total ?? raw.value ?? 0;
+    let amount = Number(amountRaw);
+    if (!Number.isFinite(amount)) amount = 0;
+    if (!amount || amount <= 0) return;
+
+    const currency = (raw.currency || raw.currencyCode || raw.currencySymbol || 'EUR').toString().toUpperCase();
+    const createdAt = toDate(raw.createdAt) || toDate(raw.paidAt) || toDate(raw.completedAt) || new Date();
+    if (createdAt < period.start || createdAt >= period.end) return;
+
+    const paymentRecord = {
+      id: docSnap.id,
+      amount,
+      currency,
+      createdAt,
+      raw,
+    };
+
+    if (!code) {
+      unmatchedPayments.push(paymentRecord);
+      return;
+    }
+
+    if (!paymentsByCode.has(code)) paymentsByCode.set(code, []);
+    paymentsByCode.get(code).push(paymentRecord);
+  });
+
+  const payoutsMap = new Map();
+  const currencyTotals = new Map();
+  const managerPaymentMap = new Map();
+
+  const warnings = {
+    missingCommissionRules: [],
+    missingAssignedContacts: [],
+    currencyMismatch: [],
+    discountsWithoutPayments: [],
+    managersMissingRules: [],
+    needsIndex,
+    unmatchedPayments: unmatchedPayments.length,
+  };
+
+  const discountPreviews = [];
+
+  items.forEach((discount) => {
+    const codeKey = (discount.code || discount.id || '').toString().trim().toUpperCase();
+    const payments = paymentsByCode.get(codeKey) || [];
+    const revenue = payments.reduce((sum, payment) => sum + (payment.amount || 0), 0);
+    const currency = (discount.currency || payments[0]?.currency || 'EUR').toUpperCase();
+
+    const observedCurrencies = Array.from(new Set(payments.map((payment) => payment.currency)));
+    if (observedCurrencies.length && observedCurrencies.some((value) => value !== currency)) {
+      warnings.currencyMismatch.push({
+        discountId: discount.id,
+        code: discount.code,
+        observed: observedCurrencies,
+        expected: currency,
+      });
+    }
+
+    const assignedContact = normalizePayoutContact(discount.assignedTo, determineDiscountRole(discount, discount.assignedTo));
+    if (!assignedContact || !assignedContact.email) {
+      warnings.missingAssignedContacts.push({
+        discountId: discount.id,
+        code: discount.code,
+      });
+    }
+
+    const commission = calculateCommission(payments, discount.commissionRules, {
+      currency,
+      startDate: period.start,
+      fallbackPercentage: 0.05,
+      revenue,
+    });
+
+    if (!discount.commissionRules || commission.hasRules === false) {
+      warnings.missingCommissionRules.push({
+        discountId: discount.id,
+        code: discount.code,
+        revenue,
+      });
+    }
+
+    const role = determineDiscountRole(discount, assignedContact);
+    if (assignedContact) {
+      const beneficiaryKey = createBeneficiaryKey(assignedContact, role, currency, discount.code || discount.id);
+      if (!payoutsMap.has(beneficiaryKey)) {
+        const normalized = normalizePayoutContact(assignedContact, role);
+        payoutsMap.set(beneficiaryKey, {
+          beneficiary: normalized,
+          currency,
+          totals: { revenue: 0, commission: 0, payments: 0 },
+          paymentsEvaluated: 0,
+          discounts: [],
+        });
+      }
+      const entry = payoutsMap.get(beneficiaryKey);
+      entry.totals.revenue += revenue;
+      entry.totals.commission += Number(commission.amount || 0);
+      entry.totals.payments += payments.length;
+      entry.paymentsEvaluated += commission.paymentsEvaluated || 0;
+      entry.discounts.push({
+        id: discount.id,
+        code: discount.code,
+        revenue,
+        commission: Number(commission.amount || 0),
+        payments: payments.length,
+        hasRules: commission.hasRules !== false,
+        breakdown: commission.breakdown || [],
+      });
+      addCurrencyTotal(currencyTotals, currency, revenue, commission.amount, beneficiaryKey);
+    } else {
+      addCurrencyTotal(currencyTotals, currency, revenue, commission.amount, null);
+    }
+
+    let managerContact = discount.salesManager;
+    if (!managerContact && assignedContact) {
+      const key = contactKey(assignedContact);
+      if (key && commercialDirectory.has(key)) {
+        managerContact = commercialDirectory.get(key).manager;
+      }
+    }
+
+    if (managerContact && payments.length) {
+      const managerKey = contactKey(managerContact) || managerContact.id || managerContact.email;
+      if (managerKey) {
+        const mapKey = `${managerKey.toLowerCase()}|${currency}`;
+        if (!managerPaymentMap.has(mapKey)) {
+          managerPaymentMap.set(mapKey, {
+            manager: managerContact,
+            currency,
+            payments: [],
+            revenue: 0,
+          });
+        }
+        const managerEntry = managerPaymentMap.get(mapKey);
+        managerEntry.payments.push(...payments);
+        managerEntry.revenue += revenue;
+      }
+    }
+
+    if (!payments.length) {
+      warnings.discountsWithoutPayments.push({ id: discount.id, code: discount.code });
+    }
+
+    discountPreviews.push({
+      id: discount.id,
+      code: discount.code,
+      currency,
+      revenue,
+      commission: Number(commission.amount || 0),
+      payments: payments.length,
+      hasRules: commission.hasRules !== false,
+    });
+  });
+
+  const payouts = Array.from(payoutsMap.values())
+    .map((entry) => ({
+      ...entry,
+      totals: {
+        revenue: Number(entry.totals.revenue.toFixed(2)),
+        commission: Number(entry.totals.commission.toFixed(2)),
+        payments: entry.totals.payments,
+      },
+      paymentsEvaluated: entry.paymentsEvaluated,
+      discounts: entry.discounts.map((discount) => ({
+        ...discount,
+        revenue: Number(discount.revenue.toFixed(2)),
+        commission: Number(discount.commission.toFixed(2)),
+      })),
+    }))
+    .sort((a, b) => b.totals.commission - a.totals.commission);
+
+  const handledMissingManagers = new Set();
+  const managerSummaries = [];
+  managerPaymentMap.forEach((entry, key) => {
+    const managerContact = entry.manager;
+    const contactKeyValue = contactKey(managerContact) || managerContact.id || key.split('|')[0];
+    const canonical =
+      managerRulesMap.get(managerContact.id) ||
+      managerRulesMap.get((contactKey(managerContact) || '').toLowerCase()) ||
+      managerRulesMap.get((contactKeyValue || '').toLowerCase()) ||
+      managerContact;
+    const rules = canonical?.commissionRules || null;
+    const commission = rules
+      ? calculateCommission(entry.payments, rules, { currency: entry.currency, startDate: period.start })
+      : { amount: 0, currency: entry.currency, breakdown: [], paymentsEvaluated: 0, hasRules: false, unassignedRevenue: entry.revenue };
+    if (!rules) {
+      const missingKey = canonical?.id || contactKeyValue || key;
+      if (missingKey && !handledMissingManagers.has(missingKey)) {
+        warnings.managersMissingRules.push({
+          id: missingKey,
+          name: canonical?.name || managerContact.name || managerContact.email || 'Manager',
+        });
+        handledMissingManagers.add(missingKey);
+      }
+    }
+    managerSummaries.push({
+      manager: {
+        id: canonical?.id || managerContact.id || contactKeyValue || null,
+        name: canonical?.name || managerContact.name || managerContact.email || 'Manager sin nombre',
+        email: canonical?.email || managerContact.email || null,
+        phone: canonical?.phone || managerContact.phone || null,
+      },
+      currency: entry.currency,
+      totals: {
+        revenue: Number(entry.revenue.toFixed(2)),
+        commission: Number((commission.amount || 0).toFixed(2)),
+        payments: entry.payments.length,
+      },
+      hasRules: commission.hasRules !== false,
+      paymentsEvaluated: commission.paymentsEvaluated || 0,
+      breakdown: commission.breakdown || [],
+    });
+  });
+  managerSummaries.sort((a, b) => b.totals.commission - a.totals.commission);
+
+  const totalsByCurrency = Array.from(currencyTotals.values()).map((entry) => ({
+    currency: entry.currency,
+    revenue: Number(entry.revenue.toFixed(2)),
+    commission: Number(entry.commission.toFixed(2)),
+    beneficiaries: entry.beneficiaryKeys.size,
+  }));
+
+  return {
+    generatedAt: new Date().toISOString(),
+    period: {
+      id: period.id,
+      label: period.label,
+      start: period.start.toISOString(),
+      end: new Date(period.end.getTime() - 1).toISOString(),
+    },
+    totals: totalsByCurrency,
+    payouts,
+    managers: managerSummaries,
+    discounts: discountPreviews,
+    warnings,
+    stats: {
+      discountCount: items.length,
+      paymentSample: paymentDocs.length,
+    },
+  };
+}
+
+function normalizeDocIdSegment(value) {
+  if (!value) return '';
+  try {
+    return String(value)
+      .normalize('NFKD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-zA-Z0-9]/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '')
+      .toLowerCase();
+  } catch {
+    return String(value || '')
+      .replace(/[^a-zA-Z0-9]/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '')
+      .toLowerCase();
+  }
+}
+
+function buildPayoutDocId(entry) {
+  const role = (entry?.beneficiary?.role || 'commercial').toLowerCase();
+  const currency = (entry?.currency || 'EUR').toUpperCase();
+  const rawIdentifier =
+    entry?.beneficiary?.id ||
+    entry?.beneficiary?.email ||
+    entry?.beneficiary?.phone ||
+    entry?.beneficiary?.name ||
+    entry?.discounts?.[0]?.code ||
+    'beneficiario';
+  const normalized = normalizeDocIdSegment(rawIdentifier) || 'beneficiario';
+  let hash = '';
+  try {
+    const key = createBeneficiaryKey(
+      entry?.beneficiary || null,
+      entry?.beneficiary?.role || role,
+      currency,
+      entry?.discounts?.[0]?.code || rawIdentifier || 'unknown',
+    );
+    hash = Buffer.from(String(key || 'unknown'))
+      .toString('base64')
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/g, '')
+      .slice(0, 8);
+  } catch {
+    hash = Math.random().toString(36).slice(2, 10);
+  }
+  const composed = `${role}-${currency}-${normalized}-${hash}`.replace(/-+/g, '-');
+  return composed.length > 120 ? composed.slice(0, 120) : composed;
+}
+
 function resolveCommercePeriod(input) {
   const now = new Date();
   let year = now.getFullYear();
@@ -3028,322 +3401,158 @@ router.post('/commerce/payouts/preview', async (req, res) => {
   console.log('[DEBUG] POST /commerce/payouts/preview called');
   try {
     const periodInput = req.body?.period ?? req.query?.period ?? null;
-
-    let period;
-    try {
-      period = resolveCommercePeriod(periodInput);
-    } catch (periodError) {
-      return res.status(400).json({
-        error: 'invalid_period',
-        message: periodError.message,
-      });
-    }
-
-    const { payload } = await fetchDiscountsDataset({ limit: 500 });
-    const { items, managers, commercials } = payload;
-
-    const managerRulesMap = new Map();
-    managers.forEach((manager) => {
-      if (manager.id) managerRulesMap.set(manager.id, manager);
-      const key = contactKey(manager);
-      if (key) managerRulesMap.set(key.toLowerCase(), manager);
-    });
-
-    const commercialDirectory = new Map();
-    commercials.forEach((commercial) => {
-      const keys = [
-        commercial.id,
-        commercial.email ? commercial.email.toLowerCase() : null,
-        commercial.phone ? commercial.phone.replace(/\s+/g, '') : null,
-        commercial.name ? commercial.name.toLowerCase() : null,
-      ].filter(Boolean);
-      keys.forEach((key) => commercialDirectory.set(key, commercial));
-    });
-
-    const startTs = admin.firestore.Timestamp.fromDate(period.start);
-    const endTs = admin.firestore.Timestamp.fromDate(period.end);
-
-    let paymentsSnapshot = null;
-    let needsIndex = false;
-    try {
-      paymentsSnapshot = await db
-        .collection('payments')
-        .where('status', 'in', COMMERCE_PAYOUT_STATUSES)
-        .where('createdAt', '>=', startTs)
-        .where('createdAt', '<', endTs)
-        .get();
-    } catch (error) {
-      if (error.code === 9 || error.code === 'failed-precondition') {
-        needsIndex = true;
-      } else {
-        throw error;
-      }
-    }
-
-    if (!paymentsSnapshot) {
-      try {
-        paymentsSnapshot = await db
-          .collection('payments')
-          .where('createdAt', '>=', startTs)
-          .where('createdAt', '<', endTs)
-          .get();
-      } catch (fallbackError) {
-        console.warn('[admin-dashboard] payouts preview fallback query failed:', fallbackError?.message);
-        paymentsSnapshot = { empty: true, docs: [] };
-        needsIndex = true;
-      }
-    }
-
-    const paymentsByCode = new Map();
-    const unmatchedPayments = [];
-    const paymentDocs = paymentsSnapshot?.docs || [];
-
-    paymentDocs.forEach((docSnap) => {
-      const raw = docSnap.data() || {};
-      const code = (raw.discountCode || raw.coupon || raw.code || '').toString().trim().toUpperCase();
-      const amountRaw = raw.amount ?? raw.total ?? raw.value ?? 0;
-      let amount = Number(amountRaw);
-      if (!Number.isFinite(amount)) amount = 0;
-      if (!amount || amount <= 0) return;
-
-      const currency = (raw.currency || raw.currencyCode || raw.currencySymbol || 'EUR').toString().toUpperCase();
-      const createdAt = toDate(raw.createdAt) || toDate(raw.paidAt) || toDate(raw.completedAt) || new Date();
-      if (createdAt < period.start || createdAt >= period.end) return;
-
-      const paymentRecord = {
-        id: docSnap.id,
-        amount,
-        currency,
-        createdAt,
-        raw,
-      };
-
-      if (!code) {
-        unmatchedPayments.push(paymentRecord);
-        return;
-      }
-
-      if (!paymentsByCode.has(code)) paymentsByCode.set(code, []);
-      paymentsByCode.get(code).push(paymentRecord);
-    });
-
-    const payoutsMap = new Map();
-    const currencyTotals = new Map();
-    const managerPaymentMap = new Map();
-
-    const warnings = {
-      missingCommissionRules: [],
-      missingAssignedContacts: [],
-      currencyMismatch: [],
-      discountsWithoutPayments: [],
-      managersMissingRules: [],
-      needsIndex,
-      unmatchedPayments: unmatchedPayments.length,
-    };
-
-    const discountPreviews = [];
-
-    items.forEach((discount) => {
-      const codeKey = (discount.code || discount.id || '').toString().trim().toUpperCase();
-      const payments = paymentsByCode.get(codeKey) || [];
-      const revenue = payments.reduce((sum, payment) => sum + (payment.amount || 0), 0);
-      const currency = (discount.currency || payments[0]?.currency || 'EUR').toUpperCase();
-
-      const observedCurrencies = Array.from(new Set(payments.map((payment) => payment.currency)));
-      if (observedCurrencies.length && observedCurrencies.some((value) => value !== currency)) {
-        warnings.currencyMismatch.push({
-          id: discount.id,
-          code: discount.code,
-          expected: currency,
-          observed: observedCurrencies,
-        });
-      }
-
-      const commissionRules = discount.commissionRules;
-      if (!commissionRules || !commissionRules.periods?.length) {
-        warnings.missingCommissionRules.push({ id: discount.id, code: discount.code });
-      }
-
-      const commission = commissionRules
-        ? calculateCommission(payments, commissionRules, { currency, startDate: period.start })
-        : { amount: 0, currency, breakdown: [], paymentsEvaluated: 0, hasRules: false, unassignedRevenue: revenue };
-
-      const assignedContact = discount.assignedTo;
-      const role = determineDiscountRole(discount, assignedContact);
-
-      if (!assignedContact) {
-        warnings.missingAssignedContacts.push({ id: discount.id, code: discount.code });
-      }
-
-      if (assignedContact) {
-        const beneficiaryKey = createBeneficiaryKey(assignedContact, role, currency, discount.code || discount.id);
-        if (!payoutsMap.has(beneficiaryKey)) {
-          const normalized = normalizePayoutContact(assignedContact, role);
-          payoutsMap.set(beneficiaryKey, {
-            beneficiary: normalized,
-            currency,
-            totals: { revenue: 0, commission: 0, payments: 0 },
-            paymentsEvaluated: 0,
-            discounts: [],
-          });
-        }
-        const entry = payoutsMap.get(beneficiaryKey);
-        entry.totals.revenue += revenue;
-        entry.totals.commission += Number(commission.amount || 0);
-        entry.totals.payments += payments.length;
-        entry.paymentsEvaluated += commission.paymentsEvaluated || 0;
-        entry.discounts.push({
-          id: discount.id,
-          code: discount.code,
-          revenue,
-          commission: Number(commission.amount || 0),
-          payments: payments.length,
-          hasRules: commission.hasRules !== false,
-          breakdown: commission.breakdown || [],
-        });
-        addCurrencyTotal(currencyTotals, currency, revenue, commission.amount, beneficiaryKey);
-      } else {
-        addCurrencyTotal(currencyTotals, currency, revenue, commission.amount, null);
-      }
-
-      let managerContact = discount.salesManager;
-      if (!managerContact && assignedContact) {
-        const key = contactKey(assignedContact);
-        if (key && commercialDirectory.has(key)) {
-          managerContact = commercialDirectory.get(key).manager;
-        }
-      }
-
-      if (managerContact && payments.length) {
-        const managerKey = contactKey(managerContact) || managerContact.id || managerContact.email;
-        if (managerKey) {
-          const mapKey = `${managerKey.toLowerCase()}|${currency}`;
-          if (!managerPaymentMap.has(mapKey)) {
-            managerPaymentMap.set(mapKey, {
-              manager: managerContact,
-              currency,
-              payments: [],
-              revenue: 0,
-            });
-          }
-          const managerEntry = managerPaymentMap.get(mapKey);
-          managerEntry.payments.push(...payments);
-          managerEntry.revenue += revenue;
-        }
-      }
-
-      if (!payments.length) {
-        warnings.discountsWithoutPayments.push({ id: discount.id, code: discount.code });
-      }
-
-      discountPreviews.push({
-        id: discount.id,
-        code: discount.code,
-        currency,
-        revenue,
-        commission: Number(commission.amount || 0),
-        payments: payments.length,
-        hasRules: commission.hasRules !== false,
-      });
-    });
-
-    const payouts = Array.from(payoutsMap.values())
-      .map((entry) => ({
-        ...entry,
-        totals: {
-          revenue: Number(entry.totals.revenue.toFixed(2)),
-          commission: Number(entry.totals.commission.toFixed(2)),
-          payments: entry.totals.payments,
-        },
-        paymentsEvaluated: entry.paymentsEvaluated,
-        discounts: entry.discounts.map((discount) => ({
-          ...discount,
-          revenue: Number(discount.revenue.toFixed(2)),
-          commission: Number(discount.commission.toFixed(2)),
-        })),
-      }))
-      .sort((a, b) => b.totals.commission - a.totals.commission);
-
-    const handledMissingManagers = new Set();
-    const managerSummaries = [];
-    managerPaymentMap.forEach((entry, key) => {
-      const managerContact = entry.manager;
-      const contactKeyValue = contactKey(managerContact) || managerContact.id || key.split('|')[0];
-      const canonical =
-        managerRulesMap.get(managerContact.id) ||
-        managerRulesMap.get((contactKey(managerContact) || '').toLowerCase()) ||
-        managerRulesMap.get((contactKeyValue || '').toLowerCase()) ||
-        managerContact;
-      const rules = canonical?.commissionRules || null;
-      const commission = rules
-        ? calculateCommission(entry.payments, rules, { currency: entry.currency, startDate: period.start })
-        : { amount: 0, currency: entry.currency, breakdown: [], paymentsEvaluated: 0, hasRules: false, unassignedRevenue: entry.revenue };
-      if (!rules) {
-        const missingKey = canonical?.id || contactKeyValue || key;
-        if (missingKey && !handledMissingManagers.has(missingKey)) {
-          warnings.managersMissingRules.push({
-            id: missingKey,
-            name: canonical?.name || managerContact.name || managerContact.email || 'Manager',
-          });
-          handledMissingManagers.add(missingKey);
-        }
-      }
-      managerSummaries.push({
-        manager: {
-          id: canonical?.id || managerContact.id || contactKeyValue || null,
-          name: canonical?.name || managerContact.name || managerContact.email || 'Manager sin nombre',
-          email: canonical?.email || managerContact.email || null,
-          phone: canonical?.phone || managerContact.phone || null,
-        },
-        currency: entry.currency,
-        totals: {
-          revenue: Number(entry.revenue.toFixed(2)),
-          commission: Number((commission.amount || 0).toFixed(2)),
-          payments: entry.payments.length,
-        },
-        hasRules: commission.hasRules !== false,
-        paymentsEvaluated: commission.paymentsEvaluated || 0,
-        breakdown: commission.breakdown || [],
-      });
-    });
-    managerSummaries.sort((a, b) => b.totals.commission - a.totals.commission);
-
-    const totalsByCurrency = Array.from(currencyTotals.values()).map((entry) => ({
-      currency: entry.currency,
-      revenue: Number(entry.revenue.toFixed(2)),
-      commission: Number(entry.commission.toFixed(2)),
-      beneficiaries: entry.beneficiaryKeys.size,
-    }));
-
-    return res.json({
-      generatedAt: new Date().toISOString(),
-      period: {
-        id: period.id,
-        label: period.label,
-        start: period.start.toISOString(),
-        end: new Date(period.end.getTime() - 1).toISOString(),
-      },
-      totals: totalsByCurrency,
-      payouts,
-      managers: managerSummaries,
-      discounts: discountPreviews,
-      warnings,
-      stats: {
-        discountCount: items.length,
-        paymentSample: paymentDocs.length,
-      },
-    });
+    const preview = await buildCommercePayoutPreview({ periodInput, limit: 500 });
+    return res.json(preview);
   } catch (error) {
+    if (error instanceof CommercePayoutsError) {
+      const status = error.status || 400;
+      const response = {
+        error: error.code || 'commerce_payout_error',
+        message: error.message || 'No se pudo generar la previsión de pagos comerciales.',
+      };
+      if (error.details) response.details = error.details;
+      return res.status(status).json(response);
+    }
     console.error('[admin-dashboard] commerce payouts preview error:', error);
     logger.error('[admin-dashboard] commerce payouts preview error', error);
     return res.status(500).json({
       error: 'commerce_payout_preview_failed',
-      message: error?.message || 'No se pudo generar la previsi�n de pagos comerciales.',
+      message: error?.message || 'No se pudo generar la previsión de pagos comerciales.',
     });
   }
 });
+router.post('/commerce/payouts/commit', async (req, res) => {
+  console.log('[DEBUG] POST /commerce/payouts/commit called');
+  try {
+    const periodInput = req.body?.period ?? req.query?.period ?? null;
+    const sourceRaw = typeof req.body?.source === 'string' ? req.body.source.trim() : '';
+    const notesRaw = typeof req.body?.notes === 'string' ? req.body.notes.trim() : '';
+    const source = sourceRaw || 'manual';
 
+    const preview = await buildCommercePayoutPreview({ periodInput, limit: 500 });
+    if (!preview?.period?.id) {
+      throw new CommercePayoutsError('invalid_period', 'No se pudo determinar el periodo de liquidación.', 400);
+    }
 
+    const actor = getActor(req);
+    const periodId = preview.period.id;
+    const periodRef = db.collection('commercePayouts').doc(periodId);
+    const payouts = Array.isArray(preview.payouts) ? preview.payouts : [];
+    const stats = preview.stats || {};
+    const warnings = preview.warnings || {};
+
+    let version = 1;
+    await db.runTransaction(async (transaction) => {
+      const summarySnap = await transaction.get(periodRef);
+      const existingSummary = summarySnap.exists ? summarySnap.data() : null;
+      version = Number(existingSummary?.version || 0) + 1;
+
+      const summaryPayload = {
+        period: preview.period,
+        totals: preview.totals,
+        managers: preview.managers,
+        stats,
+        warnings,
+        generatedAt: preview.generatedAt,
+        committedAt: serverTs(),
+        committedBy: actor,
+        source,
+        version,
+        payoutsCount: payouts.length,
+        updatedAt: serverTs(),
+        lastCommit: {
+          by: actor,
+          at: preview.generatedAt,
+          source,
+        },
+      };
+      if (notesRaw) {
+        summaryPayload.notes = notesRaw;
+      }
+      transaction.set(periodRef, summaryPayload, { merge: true });
+
+      const payoutCollection = periodRef.collection('payouts');
+      for (const entry of payouts) {
+        const docId = buildPayoutDocId(entry);
+        const docRef = payoutCollection.doc(docId);
+        const snap = await transaction.get(docRef);
+        const existingData = snap.exists ? snap.data() : null;
+        const status =
+          existingData?.status && existingData.status !== 'calculated'
+            ? existingData.status
+            : 'calculated';
+
+        const docPayload = {
+          periodId,
+          period: preview.period,
+          beneficiaryKey: createBeneficiaryKey(
+            entry.beneficiary,
+            entry?.beneficiary?.role || 'commercial',
+            entry.currency,
+            entry.discounts?.[0]?.code || entry.beneficiary?.id || null,
+          ),
+          beneficiary: entry.beneficiary,
+          currency: entry.currency,
+          totals: entry.totals,
+          paymentsEvaluated: entry.paymentsEvaluated || 0,
+          discounts: entry.discounts,
+          status,
+          adjustments: Array.isArray(existingData?.adjustments) ? existingData.adjustments : [],
+          notes: Array.isArray(existingData?.notes) ? existingData.notes : [],
+          lastCalculation: {
+            at: preview.generatedAt,
+            by: actor,
+            source,
+            version,
+          },
+          updatedAt: serverTs(),
+        };
+        if (!snap.exists) {
+          docPayload.createdAt = serverTs();
+        }
+        transaction.set(docRef, docPayload, { merge: true });
+      }
+    });
+
+    await writeAdminAudit(req, 'commerce_payouts_commit', {
+      resourceType: 'commercePayouts',
+      resourceId: preview.period.id,
+      payload: {
+        period: preview.period,
+        payouts: payouts.length,
+        source,
+        version,
+      },
+    });
+
+    return res.json({
+      ok: true,
+      period: preview.period,
+      totals: preview.totals,
+      payouts: payouts.length,
+      managers: Array.isArray(preview.managers) ? preview.managers.length : 0,
+      version,
+      warnings,
+      stats,
+    });
+  } catch (error) {
+    if (error instanceof CommercePayoutsError) {
+      const status = error.status || 400;
+      const response = {
+        error: error.code || 'commerce_payout_error',
+        message: error.message || 'No se pudo guardar la liquidación de pagos.',
+      };
+      if (error.details) response.details = error.details;
+      return res.status(status).json(response);
+    }
+    console.error('[admin-dashboard] commerce payouts commit error:', error);
+    logger.error('[admin-dashboard] commerce payouts commit error', error);
+    return res.status(500).json({
+      error: 'commerce_payout_commit_failed',
+      message: error?.message || 'No se pudo guardar la liquidación de pagos.',
+    });
+  }
+});
 router.post('/discounts', async (req, res) => {
   console.log('�x� [DEBUG] POST /discounts endpoint called');
     try {
@@ -4249,3 +4458,5 @@ export {
 };
 
 export default router;
+
+

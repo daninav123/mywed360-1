@@ -832,6 +832,16 @@ export const getCommercePayoutPreview = async (period) => {
   return postJson(`${ADMIN_BASE_PATH}/commerce/payouts/preview`, payload);
 };
 
+export const commitCommercePayouts = async (period, options = {}) => {
+  const payload = {};
+  if (period) payload.period = period;
+  if (options && typeof options === 'object') {
+    if (options.source) payload.source = options.source;
+    if (options.notes) payload.notes = options.notes;
+  }
+  return postJson(`${ADMIN_BASE_PATH}/commerce/payouts/commit`, payload);
+};
+
 // --- Mutations ---
 
 async function postJson(path, body) {

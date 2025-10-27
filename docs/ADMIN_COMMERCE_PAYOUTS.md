@@ -18,6 +18,16 @@
 
 ---
 
+## Estado actual
+
+- ✅ Endpoint `/api/admin/dashboard/commerce/payouts/preview` disponible y conectado a `AdminPayouts.jsx`.
+- ✅ Endpoint `/api/admin/dashboard/commerce/payouts/commit` que persiste la liquidación mensual en `commercePayouts/{periodId}` con versión, advertencias y auditoría.
+- ✅ UI básica en `/admin/finance/payouts` con acción “Guardar liquidación” que dispara el commit manual.
+- ⏳ Persistencia de estados granulares por beneficiario (notified, invoice_received, paid).
+- ⏳ Flujo de notificaciones, ingestión de facturas y pagos automáticos (iteraciones posteriores).
+
+---
+
 ## 2. Modelo de datos propuesto
 
 ### 2.1. Colección `commercePayouts`
@@ -169,4 +179,3 @@ commercePayouts (collection)
 5. Investigar API Revolut para pagos programáticos y definir wrapper.
 
 Una vez completado el paso 1, podremos validar con datos reales y ajustar reglas antes de automatizar el resto del flujo.
-

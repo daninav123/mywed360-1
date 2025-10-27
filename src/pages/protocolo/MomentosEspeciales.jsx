@@ -174,26 +174,7 @@ const MomentosEspeciales = () => {
   const [aiTempo, setAiTempo] = useState('');
   const [aiEra, setAiEra] = useState('');
   const [aiGenre, setAiGenre] = useState('');
-  const [profilePrefs, setProfilePrefs] = useState({ languages: ['es'], genres: [], decades: [] });
 
-  // Cargar preferencias guardadas en Perfil desde localStorage si existen
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem('maloveapp_music_prefs');
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        setProfilePrefs({
-          languages: Array.isArray(parsed?.languages) ? parsed.languages : ['es'],
-          genres: Array.isArray(parsed?.genres) ? parsed.genres : [],
-          decades: Array.isArray(parsed?.decades) ? parsed.decades : [],
-        });
-        // Prefijar idiomsi viene vaco
-        if (!aiLanguage && parsed?.languages?.length) {
-          setAiLanguage(parsed.languages[0]);
-        }
-      }
-    } catch {}
-  }, []);
   // Asegura que la pestaa activa exista entre los bloques dinmicos
   useEffect(() => {
     try {
@@ -1180,13 +1161,6 @@ const MomentosEspeciales = () => {
       if (aiTempo) prefs.push(`tempo ${aiTempo}`);
       if (aiEra) prefs.push(`dcada ${aiEra}`);
       if (aiGenre) prefs.push(`gnero ${aiGenre}`);
-      if (!aiGenre && profilePrefs.genres?.length)
-        prefs.push(`gneros: ${profilePrefs.genres.join(', ')}`);
-      if (!aiEra && profilePrefs.decades?.length)
-        prefs.push(`dcadas: ${profilePrefs.decades.join(', ')}`);
-      // Idiomas adicionales como pista
-      const extraLangs = (profilePrefs.languages || []).filter((l) => l !== aiLanguage);
-      if (extraLangs.length) prefs.push(`tambin considerar Idiomas: ${extraLangs.join(', ')}`);
       const fullPrompt = prefs.length ? `${prompt}. Preferencias: ${prefs.join(', ')}` : prompt;
       const res = await apiPost(
         '/api/ai-songs/recommend',
@@ -2157,9 +2131,6 @@ const MomentosEspeciales = () => {
 };
 
 export default MomentosEspeciales;
-
-
-
 
 
 
