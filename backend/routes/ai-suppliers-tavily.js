@@ -676,18 +676,12 @@ router.post('/', async (req, res) => {
       const urlLower = url.toLowerCase();
       
       // Descartar URLs a PÁGINAS DE LISTADO (múltiples proveedores)
+      // Solo patrones MUY ESPECÍFICOS de listados
       const invalidPatterns = [
         '/buscar', '/search', '/resultados', '/results',
         '/busqueda', '/encuentra', '/directorio', '/listado',
-        '/categoria', '/category', '/servicios-de-',
         '?q=', '?search=', '?query=', '?buscar=',
-        '/proveedores-de-', '/fotografos-bodas/', '/djs-bodas/',
-        '/catering-bodas/', '/floristerias-bodas/', '/musicos-bodas/',
-        '/tag/', '/tags/', '/archivo/', '/archive/',
-        '/fotografia/', '/video/', '/catering/', '/flores/', '/musica/', // Categorías genéricas
-        '/empresas/', '/profesionales/', '/negocios/',
-        'bodas.net/fotografos', 'bodas.net/video', 'bodas.net/catering', // URLs de categorías de bodas.net
-        'bodas.net/musica', 'bodas.net/flores', 'bodas.net/dj'
+        '/tag/', '/tags/'
       ];
       
       const isInvalid = invalidPatterns.some(pattern => urlLower.includes(pattern));
@@ -702,27 +696,26 @@ router.post('/', async (req, res) => {
         const pathSegments = urlObj.pathname.split('/').filter(s => s.length > 0);
         
         // Si tiene muy pocos segmentos, probablemente es una página genérica
-        if (pathSegments.length < 2) {
-          console.log(`❌ [FILTRO-URL] URL demasiado genérica (sin perfil específico): ${url}`);
+        if (pathSegments.length < 1) {
+          console.log(`❌ [FILTRO-URL] URL vacía o inválida: ${url}`);
           return false;
         }
         
-        // Para bodas.net: ACEPTAR solo si tiene ID numérico (perfil específico)
-        // ✅ bodas.net/fotografia/nombre--e123456 → ACEPTAR (tiene ID)
-        // ❌ bodas.net/fotografia → DESCARTAR (categoría genérica, muestra listado)
+        // Para bodas.net: PREFERIR URLs con ID pero no descartar si no lo tienen
+        // Esto permite que pasen más resultados inicialmente
         if (urlLower.includes('bodas.net')) {
-          const hasNumericId = /\/\d{5,}/.test(urlObj.pathname); // IDs de bodas.net suelen ser largos
+          const hasNumericId = /[-_]e\d{5,}|\/\d{6,}/.test(urlObj.pathname);
           if (!hasNumericId) {
-            console.log(`❌ [FILTRO-URL] bodas.net sin ID de proveedor (página de listado): ${url}`);
-            return false;
+            console.log(`⚠️ [FILTRO-URL] bodas.net sin ID claro (se mantiene): ${url}`);
+            // NO descartamos - puede ser válido
           }
         }
         
-        // Verificar que el último segmento sea específico (no una categoría genérica)
+        // Solo descartar si el último segmento es EXACTAMENTE una categoría y no hay más info
         const lastSegment = pathSegments[pathSegments.length - 1];
-        const genericLastSegments = ['fotografia', 'video', 'catering', 'flores', 'musica', 'dj', 'eventos', 'bodas'];
-        if (genericLastSegments.includes(lastSegment.toLowerCase())) {
-          console.log(`❌ [FILTRO-URL] Categoría genérica (muestra listado, no perfil): ${url}`);
+        const exactCategoryMatches = ['fotografia', 'video', 'catering', 'flores', 'musica', 'dj'];
+        if (exactCategoryMatches.includes(lastSegment.toLowerCase()) && pathSegments.length === 1) {
+          console.log(`❌ [FILTRO-URL] Solo categoría sin proveedor: ${url}`);
           return false;
         }
         
@@ -742,26 +735,20 @@ router.post('/', async (req, res) => {
       }
       
       // Validar título (detectar páginas de listado por el título)
-      // ❌ DESCARTAR títulos como: "Encuentra fotógrafos", "Mejores proveedores", "Directorio de..."
-      // ✅ ACEPTAR títulos como: "Delia Fotógrafos", "Juan López Fotografía"
+      // Solo descartar títulos MUY OBVIOS de listado
       const titleLower = (result.title || '').toLowerCase();
-      const invalidTitlePatterns = [
-        'encuentra', 'busca', 'directorio', 'listado',
-        'todos los', 'mejores', 'top', 'los mejores',
-        'buscar', 'resultado',
-        'profesionales de', 'servicios de',
-        'fotógrafos en', 'djs en', 'catering en', 'floristerías en',
-        'compara', 'opiniones', 'valoraciones'
+      const obviousListingPatterns = [
+        'encuentra los mejores', 'todos los proveedores',
+        'directorio de', 'listado de',
+        'compara precios', 'buscar proveedores'
       ];
       
-      // 🆕 RELAJADO: Requiere 2+ palabras genéricas para descartar (no solo 1)
-      // Esto permite "Juan López Fotografía" (1 palabra genérica + nombre propio)
-      const genericCount = invalidTitlePatterns.filter(pattern => 
+      const isObviousListing = obviousListingPatterns.some(pattern => 
         titleLower.includes(pattern)
-      ).length;
+      );
       
-      if (genericCount >= 2) {
-        console.log(`🗑️ [${idx}] Título de listado (${genericCount} palabras genéricas): ${result.title}`);
+      if (isObviousListing) {
+        console.log(`🗑️ [${idx}] Título obvio de listado: ${result.title}`);
         return false;
       }
       
@@ -784,50 +771,33 @@ router.post('/', async (req, res) => {
         return false;
       }
       
-      // Validar contenido (debe mencionar un proveedor específico)
-      // ❌ DESCARTAR contenido como: "Compara precios", "Todos los proveedores en Madrid"
-      // ✅ ACEPTAR contenido como: "Nuestros servicios", "Sobre nosotros", "Contacta con nosotros"
+      // Validar contenido - solo descartar si es OBVIAMENTE un listado
       const contentLower = (result.content || '').toLowerCase();
       
-      // El contenido debe tener longitud mínima (relajado de 30 a 20 palabras)
-      if (!result.content || contentLower.split(' ').length < 20) {
-        console.log(`⚠️ [${idx}] Contenido muy corto: ${result.title}`);
-        return false;
+      // El contenido debe existir y tener longitud mínima (muy relajado)
+      if (!result.content || contentLower.split(' ').length < 10) {
+        console.log(`⚠️ [${idx}] Contenido muy corto (se mantiene): ${result.title}`);
+        // NO descartamos - Tavily a veces tiene poco contenido
       }
       
-      // El contenido NO debe tener palabras de listado múltiple
-      const multipleProviderIndicators = [
-        'compara precios', 'compara presupuestos',
-        'consulta disponibilidad de', 'encuentra el mejor',
-        'todos los proveedores', 'más de', 'empresas de',
-        'opciones de', 'selección de', 'variedad de'
+      // Solo descartar si tiene indicadores MUY CLAROS de listado múltiple
+      const obviousMultipleProviderIndicators = [
+        'compara precios de',
+        'todos los proveedores de',
+        'encuentra el mejor proveedor',
+        'listado de proveedores'
       ];
       
-      const hasMultipleIndicators = multipleProviderIndicators.some(indicator => 
+      const hasObviousMultipleIndicators = obviousMultipleProviderIndicators.some(indicator => 
         contentLower.includes(indicator)
       );
       
-      if (hasMultipleIndicators) {
-        console.log(`🗑️ [${idx}] Contenido de listado múltiple: ${result.title}`);
+      if (hasObviousMultipleIndicators) {
+        console.log(`🗑️ [${idx}] Contenido obvio de listado múltiple: ${result.title}`);
         return false;
       }
       
-      // El contenido DEBE tener indicadores de proveedor único
-      const singleProviderIndicators = [
-        'nuestro', 'nuestra', 'nos dedicamos', 'somos',
-        'mi experiencia', 'nuestros servicios', 'contacta con nosotros',
-        'sobre nosotros', 'sobre mí', 'mi trabajo', 'portfolio'
-      ];
-      
-      const hasSingleProviderIndicator = singleProviderIndicators.some(indicator => 
-        contentLower.includes(indicator)
-      );
-      
-      // Si no tiene indicadores de proveedor único Y el título no es muy específico, avisar pero NO descartar
-      if (!hasSingleProviderIndicator && titleLower.length < 15) {
-        console.log(`⚠️ [${idx}] Sin indicadores claros (se mantiene): ${result.title}`);
-        // No descartamos - puede ser un proveedor válido con poco contenido
-      }
+      // NO requerir indicadores de proveedor único - pueden no estar presentes
       
       return true;
     });
