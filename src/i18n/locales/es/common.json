@@ -2547,6 +2547,72 @@
       "confirmAssign": "Asignar",
       "confirmCreate": "Crear y asignar"
     },
+    "compareModal": {
+      "title": "Comparar ({{count}})",
+      "hiddenGroupPrefix": "Grupo \"",
+      "csvFilename": "comparativa_proveedores.csv",
+      "csv": {
+        "name": "Nombre",
+        "service": "Servicio",
+        "status": "Estado",
+        "price": "Precio",
+        "rating": "Rating",
+        "location": "Ubicación",
+        "email": "Email",
+        "phone": "Teléfono",
+        "estimatedPrice": "Precio (num)",
+        "score": "Puntuación"
+      },
+      "filter": {
+        "groupLabel": "Nombre del grupo",
+        "groupPlaceholder": "Ej. Fotógrafos finalistas",
+        "scoreLabel": "Puntuación IA mínima (opcional)",
+        "scorePlaceholder": "Ej. 70",
+        "includeCount": "Incluirá {{included}} de {{total}}",
+        "create": "Crear grupo con selección",
+        "creating": "Creando…"
+      },
+      "sort": {
+        "label": "Ordenar por:",
+        "score": "Puntuación IA",
+        "name": "Nombre",
+        "price": "Precio estimado",
+        "toggleTitle": "Cambiar dirección",
+        "asc": "Asc",
+        "desc": "Desc",
+        "showEstimated": "Mostrar precio (num)"
+      },
+      "table": {
+        "name": "Nombre",
+        "service": "Servicio",
+        "status": "Estado",
+        "price": "Precio",
+        "rating": "Rating",
+        "location": "Ubicación",
+        "email": "Email",
+        "phone": "Teléfono",
+        "estimatedPrice": "Precio (num)",
+        "score": "Puntuación",
+        "actions": "Acciones",
+        "remove": "Quitar"
+      },
+      "buttons": {
+        "close": "Cerrar",
+        "exportCsv": "Exportar CSV"
+      },
+      "recommendation": {
+        "summary": "Recomendación IA: {{name}} · Puntuación {{score}}",
+        "fallbackName": "Proveedor recomendado",
+        "breakdown": "Base {{base}} · Inteligencia {{intelligence}} · Presupuesto {{budget}} · Requisitos {{requirements}}",
+        "rfqSummary": "Solicitudes enviadas: {{sent}} · Errores: {{fail}}",
+        "badge": "Recomendación IA"
+      },
+      "toasts": {
+        "createSuccess": "Grupo \"{{name}}\" creado con {{count}} proveedores",
+        "createError": "No se pudo crear el grupo",
+        "genericError": "Error creando grupo"
+      }
+    },
     "bulkStatusModal": {
       "title": "Cambiar estado",
       "label": "Nuevo estado",

@@ -79,12 +79,33 @@ router.post('/', async (req, res) => {
     '';
   const budgetPrompt = inferredBudget ? `El presupuesto es ${inferredBudget}.` : 'No hay un presupuesto especificado.';
 
-  const prompt = `Actua como un asistente de planificacion de bodas que busca proveedores reales.
-Necesito encontrar proveedores de "${servicioSeleccionado || 'servicios para bodas'}" que ofrezcan: "${query}".
-${locationPrompt}
+  const prompt = `Busca en internet proveedores reales de ${servicioSeleccionado || 'servicios para bodas'} para la siguiente consulta:
+
+CONSULTA: "${query}"
+UBICACIÓN: ${formattedLocation}
 ${budgetPrompt}
-Devuelve UNICAMENTE un array JSON con 5 opciones de proveedores reales, con el formato exacto por cada proveedor: \n{
-  \"title\": \"Nombre del proveedor\",\n  \"link\": \"URL de su web oficial o perfil en plataforma de bodas\",\n  \"snippet\": \"Breve descripcion del servicio que ofrecen\",\n  \"service\": \"${servicioSeleccionado || 'Servicios para bodas'}\",\n  \"location\": \"Ubicacion del proveedor (ciudad o provincia)\",\n  \"priceRange\": \"Rango de precios aproximado\"\n}\nAsegurate de: 1) incluir enlaces reales y operativos, preferiblemente web oficial o bodas.net; 2) priorizar proveedores en ${formattedLocation}; 3) que sean relevantes para "${query}"; 4) devolver SOLO el array JSON, sin texto adicional.`;
+
+REQUISITOS:
+1. Busca SOLO proveedores reales con presencia web verificable
+2. Prioriza proveedores en ${formattedLocation} o que den servicio en esa zona
+3. Incluye web oficial, perfil en bodas.net, bodas.com.mx, instagram profesional, o similar
+4. Verifica que sean proveedores activos (no cerrados)
+5. Busca diversidad: diferentes estilos y rangos de precio
+
+DEVUELVE un array JSON con exactamente 6 proveedores encontrados. Formato por proveedor:
+{
+  "title": "Nombre comercial del proveedor",
+  "link": "URL verificada (web oficial o perfil profesional)",
+  "snippet": "Descripción breve del servicio (50-100 palabras)",
+  "service": "${servicioSeleccionado || 'Servicios para bodas'}",
+  "location": "Ciudad/Provincia donde opera",
+  "priceRange": "Rango de precio estimado (ej: 1200-2500 EUR)",
+  "phone": "Teléfono si está disponible",
+  "email": "Email si está disponible",
+  "tags": ["etiqueta1", "etiqueta2", "etiqueta3"]
+}
+
+IMPORTANTE: Devuelve SOLO el array JSON, sin texto adicional antes o después.`;
 
   try {
     logger.info('[ai-suppliers] solicitando resultados a OpenAI', {
@@ -94,19 +115,43 @@ Devuelve UNICAMENTE un array JSON con 5 opciones de proveedores reales, con el f
       apiKeyPrefix: (openAIConfig.apiKey || '').slice(0, 8),
     });
     const completion = await openai.chat.completions.create({
-      model: process.env.OPENAI_MODEL || 'gpt-3.5-turbo',
-      temperature: 0,
+      model: process.env.OPENAI_MODEL || 'gpt-4-turbo-preview',
+      temperature: 0.3,
+      response_format: { type: 'json_object' },
       messages: [
-        { role: 'system', content: 'Eres un asistente experto en planificacion de bodas.' },
-        { role: 'user', content: prompt },
+        { 
+          role: 'system', 
+          content: `Eres un buscador experto de proveedores de bodas con acceso a internet.
+Buscas información actualizada y verificada.
+Siempre devuelves resultados en formato JSON válido.
+Solo incluyes proveedores que existen realmente y tienen presencia web verificable.` 
+        },
+        { 
+          role: 'user', 
+          content: `${prompt}\n\nDevuelve el resultado en formato JSON con la estructura: {"providers": [array de proveedores]}` 
+        },
       ],
     });
 
     const content = completion.choices?.[0]?.message?.content || '';
     let results = [];
+    
     try {
-      results = JSON.parse(content);
-    } catch {
+      const parsed = JSON.parse(content);
+      // El response_format json_object devuelve {providers: [...]}
+      if (parsed.providers && Array.isArray(parsed.providers)) {
+        results = parsed.providers;
+      } else if (Array.isArray(parsed)) {
+        results = parsed;
+      } else {
+        logger.warn('[ai-suppliers] formato JSON inesperado', { parsed });
+      }
+    } catch (parseError) {
+      logger.error('[ai-suppliers] Error parseando respuesta', { 
+        error: parseError.message,
+        content: content.substring(0, 500) 
+      });
+      
       // Intentar extraer substring que parezca un array JSON
       const match = content.match(/\[.*\]/s);
       if (match) {
@@ -119,8 +164,21 @@ Devuelve UNICAMENTE un array JSON con 5 opciones de proveedores reales, con el f
     }
 
     if (!Array.isArray(results) || results.length === 0) {
-      return res.status(502).json({ error: 'openai_invalid_response', raw: content });
+      logger.error('[ai-suppliers] Sin resultados válidos', { 
+        hasContent: !!content,
+        contentPreview: content.substring(0, 200)
+      });
+      return res.status(502).json({ 
+        error: 'openai_invalid_response', 
+        message: 'La IA no devolvió proveedores válidos. Intenta reformular la búsqueda.',
+        raw: content.substring(0, 500)
+      });
     }
+
+    logger.info('[ai-suppliers] Resultados obtenidos exitosamente', { 
+      count: results.length,
+      firstProvider: results[0]?.title || 'N/A'
+    });
 
     res.json(results);
   } catch (err) {

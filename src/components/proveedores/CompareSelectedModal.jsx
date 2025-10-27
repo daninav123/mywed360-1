@@ -243,10 +243,10 @@ export default function CompareSelectedModal({
         <div className="border rounded p-3 bg-white">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
             <div>
-              <label className="block text-xs text-gray-500 mb-1">Nombre de grupo</label>
+              <label className="block text-sm font-medium mb-1">{t('common.suppliers.compareModal.filter.groupLabel')}</label>
               <input
                 className="w-full border rounded p-2"
-                placeholder="Ej. Finalistas Fotografía"
+                placeholder={t('common.suppliers.compareModal.filter.groupPlaceholder')}
                 value={groupName}
                 onChange={(e) => setGroupName(e.target.value)}
               />
@@ -339,7 +339,7 @@ export default function CompareSelectedModal({
                       <div className="flex items-center gap-2">
                         {isRecommended && (
                           <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-emerald-600 text-white">
-                            Recomendación IA
+                            {t('common.suppliers.compareModal.recommendation.badge')}
                           </span>
                         )}
                         <span>{r.name}</span>
