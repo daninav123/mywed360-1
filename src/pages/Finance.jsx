@@ -240,73 +240,18 @@ function Finance() {
 
         {/* Contenido: Transacciones */}
         {activeTab === 'transactions' && (
-          <div className="space-y-6">
-            <PaymentSuggestions
-              onCreateTransaction={createTransaction}
-              isLoading={isLoading}
-              providers={supplierProviders}
-              enabled={!hasBankAccount}
-              disabledMessage="Con la cuenta bancaria vinculada importamos los movimientos directamente, por lo que las sugerencias del correo quedan desactivadas."
-            />
-            {/* Vista rápida: transacciones registradas desde emails */}
-            <div className="p-3 border rounded bg-white/60">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-sm font-medium">Transacciones registradas desde emails</h3>
-                <span className="text-xs text-gray-600">{(transactions || []).filter(tx => /Desde email:/i.test(tx?.description || '') || (tx?.meta && tx.meta.source === 'email')).length}</span>
-              </div>
-              <div className="max-h-40 overflow-auto text-sm">
-                {(transactions || [])
-                  .filter((tx) => /Desde email:/i.test(tx?.description || '') || (tx?.meta && tx.meta.source === 'email'))
-                  .slice(0, 8)
-                  .map((tx, i) => (
-                    <div key={tx.id || i} className="flex items-center justify-between py-1 border-b last:border-0">
-                      <div className="truncate">
-                        <div className="font-medium truncate" title={tx.concept || ''}>{tx.concept || '(Sin concepto)'}</div>
-                        <div className="text-[color:var(--color-text)]/70">{(tx.date || '').slice(0,10)} · {tx.type === 'income' ? 'Ingreso' : 'Gasto'} · {tx.provider || ''}</div>
-                      </div>
-                      <div className="whitespace-nowrap">{Number(tx.amount || tx.paidAmount || 0).toFixed(2)}</div>
-                    </div>
-                  ))}
-              </div>
-            </div>
-            {!hasBankAccount && (
-              <div className="p-4 border rounded-md border-[color:var(--color-primary)]/30 bg-[var(--color-primary)]/10">
-                <div className="flex items-center justify-between gap-3 flex-wrap">
-                  <div>
-                    <p className="font-medium text-[var(--color-primary)]">
-                      {t('finance.connectBank.title', {
-                        defaultValue: 'Conecta tu banco para importar movimientos',
-                      })}
-                    </p>
-                    <p className="text-sm text-[color:var(--color-text)]/70">
-                      {t('finance.connectBank.desc', {
-                        defaultValue:
-                          'Acelera el registro de gastos e ingresos conectando tu cuenta bancaria.',
-                      })}
-                    </p>
-                  </div>
-                  <a
-                    href="/finance/bank-connect"
-                    className="inline-flex items-center px-3 py-2 rounded-md bg-[var(--color-primary)] text-white hover:brightness-110"
-                  >
-                    {t('finance.connectBank.button', { defaultValue: 'Conectar banco' })}
-                  </a>
-                </div>
-              </div>
-            )}
-            <TransactionManager
-              transactions={transactions}
-              onCreateTransaction={createTransaction}
-              onUpdateTransaction={updateTransaction}
-              onDeleteTransaction={deleteTransaction}
-              onImportBank={importBankTransactions}
-              onImportTransactions={importTransactionsBulk}
-              onExportReport={exportFinanceReport}
-              isLoading={isLoading}
-              initialTransaction={prefillTx}
-              onInitialOpened={() => setPrefillTx(null)}
-            />
-          </div>
+          <TransactionManager
+            transactions={transactions}
+            onCreateTransaction={createTransaction}
+            onUpdateTransaction={updateTransaction}
+            onDeleteTransaction={deleteTransaction}
+            onImportBank={importBankTransactions}
+            onImportTransactions={importTransactionsBulk}
+            onExportReport={exportFinanceReport}
+            isLoading={isLoading}
+            initialTransaction={prefillTx}
+            onInitialOpened={() => setPrefillTx(null)}
+          />
         )}
 
         {/* Contenido: Presupuesto */}
