@@ -2546,6 +2546,23 @@
       "cancel": "Cancelar",
       "confirmAssign": "Asignar",
       "confirmCreate": "Crear y asignar"
+    },
+    "bulkStatusModal": {
+      "title": "Cambiar estado",
+      "label": "Nuevo estado",
+      "cancel": "Cancelar",
+      "apply": "Aplicar",
+      "applying": "Aplicando...",
+      "options": {
+        "new": "Nuevo",
+        "contacted": "Contactado",
+        "rfqSent": "RFQ enviado",
+        "offerReceived": "Oferta recibida",
+        "negotiation": "Negociación",
+        "selected": "Seleccionado",
+        "confirmed": "Confirmado",
+        "rejected": "Rechazado"
+      }
     }
   },
   "supportsla_null_features_editguests_true_edittasks": ",\n      supportSLA: null\n    },\n    features: {\n      editGuests: true,\n      editTasks: true,\n      editTimeline: true,\n      editSeating: true,\n      viewBudget: false, // Sin permisos de facturación\n      sendInvitations: false // Sin re-invitaciones\n    }\n  }\n};\n\n/**\n * Servicio para gestión de límites de planes\n */\nclass PlanLimitsService {\n  /**\n   * Obtiene la configuración de un plan\n   * @param {string} planId - ID del plan\n   * @returns {Object|null} Configuración del plan o null si no existe\n   */\n  getPlanConfig(planId) {\n    return PLAN_LIMITS[planId] || null;\n  }\n\n  /**\n   * Obtiene los límites de un plan\n   * @param {string} planId - ID del plan\n   * @returns {Object} Límites del plan\n   */\n  getPlanLimits(planId) {\n    const config = this.getPlanConfig(planId);\n    return config ? config.limits : {};\n  }\n\n  /**\n   * Obtiene las características de un plan\n   * @param {string} planId - ID del plan\n   * @returns {Object} Características del plan\n   */\n  getPlanFeatures(planId) {\n    const config = this.getPlanConfig(planId);\n    return config ? config.features : {};\n  }\n\n  /**\n   * Verifica si un plan tiene una característica específica\n   * @param {string} planId - ID del plan\n   * @param {string} feature - Nombre de la característica\n   * @returns {boolean} true si tiene la característica\n   */\n  hasFeature(planId, feature) {\n    const features = this.getPlanFeatures(planId);\n    return features[feature] === true;\n  }\n\n  /**\n   * Verifica si se ha alcanzado el límite de invitados\n   * @param {string} planId - ID del plan\n   * @param {number} currentGuests - Número actual de invitados\n   * @returns {Object} { exceeded: boolean, limit: number, current: number }\n   */\n  checkGuestLimit(planId, currentGuests) {\n    const limits = this.getPlanLimits(planId);\n    const maxGuests = limits.maxGuests;\n    \n    if (maxGuests === -1) {\n      return { exceeded: false, limit: -1, current: currentGuests, message: ",

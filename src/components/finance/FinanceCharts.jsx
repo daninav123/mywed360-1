@@ -1,4 +1,4 @@
-﻿import React, { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import {
   BarChart,
   Bar,
@@ -14,6 +14,7 @@ import {
   Pie,
   Cell,
 } from 'recharts';
+import { TrendingUp, DollarSign, PieChart as PieChartIcon, Target, Lightbulb, AlertCircle } from 'lucide-react';
 
 import useTranslations from '../../hooks/useTranslations';
 import { formatCurrency } from '../../utils/formatUtils';
@@ -144,55 +145,79 @@ export default function FinanceCharts({ transactions = [], budgetUsage = [], sta
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-xl font-semibold text-[color:var(--color-text)]">
-          {t('finance.charts.title', { defaultValue: 'Análisis Financiero' })}
-        </h2>
-        <p className="text-sm text-[color:var(--color-text)]/70">
-          {t('finance.charts.subtitle', {
-            defaultValue: 'Visualizaciones y tendencias de tus finanzas de boda',
-          })}
-        </p>
-      </div>
-
+      {/* Stats Cards Premium */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="p-4 text-center bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
-          <p className="text-sm text-[color:var(--color-text)]/70">
-            {t('finance.charts.totalTransactions', { defaultValue: 'Total Transacciones' })}
-          </p>
-          <p className="text-2xl font-bold text-[color:var(--color-text)]">{totalTransactions}</p>
+        <Card className="p-4 bg-gradient-to-br from-[var(--color-primary)]/10 to-transparent border-[var(--color-primary)]/30">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-primary)] mb-1">
+                {t('finance.charts.totalTransactions', { defaultValue: 'Transacciones' })}
+              </p>
+              <p className="text-2xl font-black text-body">{totalTransactions}</p>
+            </div>
+            <DollarSign className="w-8 h-8 text-[color:var(--color-primary)]/40" />
+          </div>
         </Card>
-        <Card className="p-4 text-center bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
-          <p className="text-sm text-[color:var(--color-text)]/70">
-            {t('finance.charts.activeCategories', { defaultValue: 'Categorías Activas' })}
-          </p>
-          <p className="text-2xl font-bold text-[color:var(--color-primary)]">{activeCategories}</p>
+
+        <Card className="p-4 bg-gradient-to-br from-[var(--color-success)]/10 to-transparent border-[var(--color-success)]/30">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-success)] mb-1">
+                {t('finance.charts.activeCategories', { defaultValue: 'Categorías' })}
+              </p>
+              <p className="text-2xl font-black text-[color:var(--color-success)]">{activeCategories}</p>
+            </div>
+            <PieChartIcon className="w-8 h-8 text-[color:var(--color-success)]/40" />
+          </div>
         </Card>
-        <Card className="p-4 text-center bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
-          <p className="text-sm text-[color:var(--color-text)]/70">
-            {t('finance.charts.budgetEfficiency', { defaultValue: 'Eficiencia Presupuesto' })}
-          </p>
-          <p className="text-2xl font-bold text-[color:var(--color-success)]">{efficiency}%</p>
+
+        <Card className="p-4 bg-gradient-to-br from-[var(--color-warning)]/10 to-transparent border-[var(--color-warning)]/30">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-warning)] mb-1">
+                {t('finance.charts.budgetEfficiency', { defaultValue: 'Eficiencia' })}
+              </p>
+              <p className="text-2xl font-black text-[color:var(--color-warning)]">{efficiency}%</p>
+            </div>
+            <Target className="w-8 h-8 text-[color:var(--color-warning)]/40" />
+          </div>
         </Card>
-        <Card className="p-4 text-center bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
-          <p className="text-sm text-[color:var(--color-text)]/70">
-            {t('finance.charts.projectedBalance', { defaultValue: 'Balance Proyectado' })}
-          </p>
-          <p
-            className={`text-2xl font-bold ${safeStats.currentBalance >= 0 ? 'text-[color:var(--color-success)]' : 'text-[color:var(--color-danger)]'}`}
-          >
-            {formatCurrency(safeStats.currentBalance)}
-          </p>
+
+        <Card className={`p-4 bg-gradient-to-br ${safeStats.currentBalance >= 0 ? 'from-[var(--color-success)]' : 'from-[var(--color-danger)]'}/10 to-transparent ${safeStats.currentBalance >= 0 ? 'border-[var(--color-success)]' : 'border-[var(--color-danger)]'}/30`}>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className={`text-xs font-bold uppercase tracking-wider ${safeStats.currentBalance >= 0 ? 'text-[color:var(--color-success)]' : 'text-[color:var(--color-danger)]'} mb-1`}>
+                {t('finance.charts.projectedBalance', { defaultValue: 'Balance' })}
+              </p>
+              <p className={`text-2xl font-black ${safeStats.currentBalance >= 0 ? 'text-[color:var(--color-success)]' : 'text-[color:var(--color-danger)]'}`}>
+                {formatCurrency(safeStats.currentBalance)}
+              </p>
+            </div>
+            <TrendingUp className={`w-8 h-8 ${safeStats.currentBalance >= 0 ? 'text-[color:var(--color-success)]' : 'text-[color:var(--color-danger)]'}/40`} />
+          </div>
         </Card>
       </div>
 
+      {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="p-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
-          <h3 className="text-lg font-medium text-[color:var(--color-text)] mb-4">
-            {t('finance.charts.budgetVsSpentByCategory', {
-              defaultValue: 'Presupuesto vs Gastado por Categoría',
-            })}
-          </h3>
+        <Card className="p-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft shadow-lg hover:shadow-xl transition-shadow duration-300">
+          <div className="flex items-start justify-between mb-4">
+            <div>
+              <h3 className="text-lg font-semibold text-[color:var(--color-text)] mb-1">
+                {t('finance.charts.budgetVsSpentByCategory', {
+                  defaultValue: 'Presupuesto vs Gastado',
+                })}
+              </h3>
+              <p className="text-xs text-[color:var(--color-text)]/60">
+                {t('finance.charts.budgetVsSpentDesc', {
+                  defaultValue: 'Compara lo asignado vs lo gastado por categoría',
+                })}
+              </p>
+            </div>
+            <div className="p-2 rounded-lg bg-[var(--color-primary)]/10">
+              <PieChartIcon className="w-5 h-5 text-[color:var(--color-primary)]" />
+            </div>
+          </div>
           <div className="h-80">
             {hasFiniteForKeys(categoryData, ['presupuestado', 'gastado']) ? (
               <ResponsiveContainer width="100%" height="100%">
@@ -225,12 +250,24 @@ export default function FinanceCharts({ transactions = [], budgetUsage = [], sta
           </div>
         </Card>
 
-        <Card className="p-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
-          <h3 className="text-lg font-medium text-[color:var(--color-text)] mb-4">
-            {t('finance.charts.expenseDistributionByCategory', {
-              defaultValue: 'Distribución de Gastos por Categoría',
-            })}
-          </h3>
+        <Card className="p-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft shadow-lg hover:shadow-xl transition-shadow duration-300">
+          <div className="flex items-start justify-between mb-4">
+            <div>
+              <h3 className="text-lg font-semibold text-[color:var(--color-text)] mb-1">
+                {t('finance.charts.expenseDistributionByCategory', {
+                  defaultValue: 'Distribución de Gastos',
+                })}
+              </h3>
+              <p className="text-xs text-[color:var(--color-text)]/60">
+                {t('finance.charts.expenseDistributionDesc', {
+                  defaultValue: 'Proporción de cada categoría en el total de gastos',
+                })}
+              </p>
+            </div>
+            <div className="p-2 rounded-lg bg-[var(--color-danger)]/10">
+              <PieChartIcon className="w-5 h-5 text-[color:var(--color-danger)]" />
+            </div>
+          </div>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -256,12 +293,24 @@ export default function FinanceCharts({ transactions = [], budgetUsage = [], sta
           </div>
         </Card>
 
-        <Card className="p-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
-          <h3 className="text-lg font-medium text-[color:var(--color-text)] mb-4">
-            {t('finance.charts.monthlyTrend', {
-              defaultValue: 'Tendencia Mensual de Ingresos y Gastos',
-            })}
-          </h3>
+        <Card className="p-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft shadow-lg hover:shadow-xl transition-shadow duration-300">
+          <div className="flex items-start justify-between mb-4">
+            <div>
+              <h3 className="text-lg font-semibold text-[color:var(--color-text)] mb-1">
+                {t('finance.charts.monthlyTrend', {
+                  defaultValue: 'Tendencia Mensual',
+                })}
+              </h3>
+              <p className="text-xs text-[color:var(--color-text)]/60">
+                {t('finance.charts.monthlyTrendDesc', {
+                  defaultValue: 'Evolución de ingresos, gastos y balance mes a mes',
+                })}
+              </p>
+            </div>
+            <div className="p-2 rounded-lg bg-[var(--color-success)]/10">
+              <TrendingUp className="w-5 h-5 text-[color:var(--color-success)]" />
+            </div>
+          </div>
           <div className="h-80">
             {hasFiniteForKeys(monthlyTrend, ['ingresos', 'gastos', 'balance']) ? (
               <ResponsiveContainer width="100%" height="100%">
@@ -306,12 +355,24 @@ export default function FinanceCharts({ transactions = [], budgetUsage = [], sta
           </div>
         </Card>
 
-        <Card className="p-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
-          <h3 className="text-lg font-medium text-[color:var(--color-text)] mb-4">
-            {t('finance.charts.budgetProgressByCategory', {
-              defaultValue: 'Progreso del Presupuesto por Categoría',
-            })}
-          </h3>
+        <Card className="p-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft shadow-lg hover:shadow-xl transition-shadow duration-300">
+          <div className="flex items-start justify-between mb-4">
+            <div>
+              <h3 className="text-lg font-semibold text-[color:var(--color-text)] mb-1">
+                {t('finance.charts.budgetProgressByCategory', {
+                  defaultValue: 'Progreso del Presupuesto',
+                })}
+              </h3>
+              <p className="text-xs text-[color:var(--color-text)]/60">
+                {t('finance.charts.budgetProgressDesc', {
+                  defaultValue: 'Porcentaje de uso y exceso por categoría',
+                })}
+              </p>
+            </div>
+            <div className="p-2 rounded-lg bg-[var(--color-warning)]/10">
+              <Target className="w-5 h-5 text-[color:var(--color-warning)]" />
+            </div>
+          </div>
           <div className="h-80">
             {hasFiniteForKeys(budgetProgress, ['porcentaje', 'exceso']) ? (
               <ResponsiveContainer width="100%" height="100%">
@@ -353,43 +414,62 @@ export default function FinanceCharts({ transactions = [], budgetUsage = [], sta
         </Card>
       </div>
 
-      <Card className="p-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
-        <h3 className="text-lg font-medium text-[color:var(--color-text)] mb-4">
-          {t('finance.charts.insights', { defaultValue: 'Insights Financieros' })}
-        </h3>
+      {/* Insights Premium */}
+      <Card className="p-6 bg-gradient-to-br from-[var(--color-primary)]/5 to-transparent backdrop-blur-md border-soft shadow-lg">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="p-3 rounded-xl bg-[var(--color-primary)]/15">
+            <Lightbulb className="w-6 h-6 text-[color:var(--color-primary)]" />
+          </div>
+          <div>
+            <h3 className="text-xl font-bold text-[color:var(--color-text)]">
+              {t('finance.charts.insights', { defaultValue: 'Insights Financieros' })}
+            </h3>
+            <p className="text-sm text-[color:var(--color-text)]/60">
+              {t('finance.charts.insightsDesc', { defaultValue: 'Análisis automático de tus finanzas' })}
+            </p>
+          </div>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {expenseDistribution.length > 0 && (
-            <div className="p-4 rounded-lg bg-[var(--color-danger)]/10">
-              <h4 className="font-medium text-[color:var(--color-danger)] mb-2">
-                {t('finance.charts.highestExpense', { defaultValue: 'Mayor Gasto' })}
-              </h4>
-              <p className="text-sm text-[color:var(--color-danger)]/90">
-                <span className="font-medium">{expenseDistribution[0].name}</span>
-                <br />
-                {formatCurrency(expenseDistribution[0].value)}
+            <div className="p-5 rounded-xl bg-gradient-to-br from-[var(--color-danger)]/10 to-transparent border-2 border-[var(--color-danger)]/20 hover:border-[var(--color-danger)]/40 transition-colors duration-300">
+              <div className="flex items-center gap-2 mb-3">
+                <AlertCircle className="w-5 h-5 text-[color:var(--color-danger)]" />
+                <h4 className="font-bold text-[color:var(--color-danger)]">
+                  {t('finance.charts.highestExpense', { defaultValue: 'Mayor Gasto' })}
+                </h4>
+              </div>
+              <p className="text-sm text-[color:var(--color-text)]/80">
+                <span className="font-semibold text-lg block mb-1">{expenseDistribution[0].name}</span>
+                <span className="text-xl font-black text-[color:var(--color-danger)]">
+                  {formatCurrency(expenseDistribution[0].value)}
+                </span>
               </p>
             </div>
           )}
 
           {safeBudget.length > 0 && (
-            <div className="p-4 rounded-lg bg-[var(--color-success)]/10">
-              <h4 className="font-medium text-[color:var(--color-success)] mb-2">
-                {t('finance.charts.mostEfficient', { defaultValue: 'Más Eficiente' })}
-              </h4>
-              <p className="text-sm text-[color:var(--color-success)]/90">
+            <div className="p-5 rounded-xl bg-gradient-to-br from-[var(--color-success)]/10 to-transparent border-2 border-[var(--color-success)]/20 hover:border-[var(--color-success)]/40 transition-colors duration-300">
+              <div className="flex items-center gap-2 mb-3">
+                <Target className="w-5 h-5 text-[color:var(--color-success)]" />
+                <h4 className="font-bold text-[color:var(--color-success)]">
+                  {t('finance.charts.mostEfficient', { defaultValue: 'Más Eficiente' })}
+                </h4>
+              </div>
+              <p className="text-sm text-[color:var(--color-text)]/80">
                 {(() => {
                   const mostEfficient = safeBudget
                     .filter((cat) => toFinite(cat.amount) > 0)
                     .sort((a, b) => toFinite(a.percentage) - toFinite(b.percentage))[0];
                   return mostEfficient ? (
                     <>
-                      <span className="font-medium">{mostEfficient.name}</span>
-                      <br />
-                      {toFinite(mostEfficient.percentage).toFixed(1)}%{' '}
-                      {t('finance.overview.used', { defaultValue: 'utilizado' })}
+                      <span className="font-semibold text-lg block mb-1">{mostEfficient.name}</span>
+                      <span className="text-xl font-black text-[color:var(--color-success)]">
+                        {toFinite(mostEfficient.percentage).toFixed(1)}%{' '}
+                        {t('finance.overview.used', { defaultValue: 'usado' })}
+                      </span>
                     </>
                   ) : (
-                    t('finance.charts.noData', { defaultValue: 'No hay datos suficientes' })
+                    t('finance.charts.noData', { defaultValue: 'No hay datos' })
                   );
                 })()}
               </p>
@@ -397,23 +477,27 @@ export default function FinanceCharts({ transactions = [], budgetUsage = [], sta
           )}
 
           {monthlyTrend.length > 0 && (
-            <div className="p-4 rounded-lg bg-[var(--color-primary)]/10">
-              <h4 className="font-medium text-[color:var(--color-primary)] mb-2">
-                {t('finance.charts.bestMonth', { defaultValue: 'Mejor mes' })}
-              </h4>
-              <p className="text-sm text-[color:var(--color-primary)]/90">
+            <div className="p-5 rounded-xl bg-gradient-to-br from-[var(--color-primary)]/10 to-transparent border-2 border-[var(--color-primary)]/20 hover:border-[var(--color-primary)]/40 transition-colors duration-300">
+              <div className="flex items-center gap-2 mb-3">
+                <TrendingUp className="w-5 h-5 text-[color:var(--color-primary)]" />
+                <h4 className="font-bold text-[color:var(--color-primary)]">
+                  {t('finance.charts.bestMonth', { defaultValue: 'Mejor Mes' })}
+                </h4>
+              </div>
+              <p className="text-sm text-[color:var(--color-text)]/80">
                 {(() => {
                   const best = [...monthlyTrend].sort(
                     (a, b) => toFinite(b.balance) - toFinite(a.balance)
                   )[0];
                   return best ? (
                     <>
-                      <span className="font-medium">{best.month}</span>
-                      <br />
-                      {formatCurrency(toFinite(best.balance))}
+                      <span className="font-semibold text-lg block mb-1">{best.month}</span>
+                      <span className="text-xl font-black text-[color:var(--color-primary)]">
+                        {formatCurrency(toFinite(best.balance))}
+                      </span>
                     </>
                   ) : (
-                    t('finance.charts.noData', { defaultValue: 'No hay datos suficientes' })
+                    t('finance.charts.noData', { defaultValue: 'No hay datos' })
                   );
                 })()}
               </p>
