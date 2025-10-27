@@ -426,7 +426,17 @@
     "view": "View",
     "cancel": "Cancel",
     "delete": "Delete",
-    "duplicate": "Duplicate"
+    "duplicate": "Duplicate",
+    "categories": {
+      "decoration": "Decoración",
+      "cocktail": "Cóctel",
+      "banquet": "Banquete",
+      "ceremony": "Ceremonia",
+      "flowers": "Flores",
+      "dress": "Vestidos",
+      "cake": "Pasteles",
+      "photography": "Fotografía"
+    }
   },
   "como_organizar_ceremonia_civil_perfecta": "Ej. Cómo organizar la ceremonia civil perfecta",
   "completa_titulo_contenido_antes_guardar": "Completa el título y el contenido antes de guardar.",
