@@ -56,7 +56,7 @@ export default function VirtualizedTransactionList({ items, getPaidValue, onEdit
             <div
               style={style}
               key={tx.id}
-              className="grid grid-cols-7 gap-2 px-6 items-center border-b border-[color:var(--color-text)]/10 hover:bg-[var(--color-accent)]/10"
+              className="grid grid-cols-8 gap-2 px-6 items-center border-b border-[color:var(--color-text)]/10 hover:bg-[var(--color-primary)]/5 transition-colors duration-150"
             >
               <div className="text-sm text-[color:var(--color-text)]">{formatDate(tx.date)}</div>
               <div className="col-span-2 text-sm text-[color:var(--color-text)]">
@@ -117,18 +117,18 @@ export default function VirtualizedTransactionList({ items, getPaidValue, onEdit
                 )}
               </div>
               <div className="text-right">
-                <div className="inline-flex gap-2">
+                <div className="inline-flex gap-1.5 justify-end">
                   <button
                     aria-label={t('app.edit', { defaultValue: 'Editar' })}
                     onClick={() => onEdit?.(tx)}
-                    className="text-[var(--color-primary)] hover:brightness-110"
+                    className="p-2 rounded-md text-[var(--color-primary)] hover:bg-[var(--color-primary)]/10 transition-colors duration-150"
                   >
                     <Edit3 size={16} />
                   </button>
                   <button
                     aria-label={t('app.delete', { defaultValue: 'Eliminar' })}
                     onClick={() => onDelete?.(tx)}
-                    className="text-[color:var(--color-danger)] hover:brightness-110"
+                    className="p-2 rounded-md text-[color:var(--color-danger)] hover:bg-[var(--color-danger)]/10 transition-colors duration-150"
                   >
                     <Trash2 size={16} />
                   </button>

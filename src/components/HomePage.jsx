@@ -768,7 +768,7 @@ export default function HomePage() {
     t,
   ]);
 
-const statsPlanner = useMemo(() => {
+  const statsPlanner = useMemo(() => {
     const tasksAssigned = format.number(tasksMetrics.tasksTotal || 0);
     const tasksCompletedFormatted = format.number(tasksMetrics.tasksCompleted || 0);
     const plannerTasksValue =
@@ -982,7 +982,7 @@ const statsPlanner = useMemo(() => {
           <div className="flex justify-between items-center mb-4">
             <Link to="/blog">
               <button className="text-xl font-bold text-[var(--color-text)] hover:text-[var(--color-primary)]">
-                Blog
+                {t('home.blog.title')}
               </button>
             </Link>
           </div>
@@ -1013,7 +1013,7 @@ const statsPlanner = useMemo(() => {
                       {post.description}
                     </p>
                     <div className="pt-2 text-xs text-[var(--color-text)]/60 border-t border-[var(--color-text)]/10">
-                      Fuente:{' '}
+                      {t('home.blog.source')}{' '}
                       {post.source ||
                         (post.url || '').replace(/^https?:\/\/(www\.)?/, '').split('/')[0]}
                     </div>
@@ -1201,12 +1201,14 @@ const statsPlanner = useMemo(() => {
                 onClick={() => setActiveModal(null)}
                 className="px-4 py-2 text-[var(--color-text)] border border-[var(--color-text)]/20 rounded"
               >
-                Cancelar
+                {t('home.modals.shared.cancel')}
               </button>
               <button
                 onClick={() => handleNavigateFromModal('/finance')}
                 className="px-4 py-2 text-[var(--color-primary)] border border-[var(--color-primary)]/40 rounded bg-[var(--color-primary)]/10"
-              {t('home.modals.shared.goToFinance')}/button>
+              >
+                {t('home.modals.shared.goToFinance')}
+              </button>
               <button
                 onClick={() => {
                   const movs = JSON.parse(localStorage.getItem('quickMovements') || '[]');
@@ -1218,7 +1220,7 @@ const statsPlanner = useMemo(() => {
                 }}
                 className="px-4 py-2 bg-[var(--color-primary)] text-white rounded"
               >
-                Guardar
+                {t('home.modals.shared.save')}
               </button>
             </div>
           </div>
