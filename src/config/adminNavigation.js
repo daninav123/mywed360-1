@@ -108,6 +108,18 @@ const ADMIN_NAVIGATION = [
     ],
   },
   {
+    id: 'finance',
+    title: 'Finanzas',
+    items: [
+      {
+        id: 'revolut',
+        label: 'Revolut',
+        path: '/admin/finance/revolut',
+        description: 'Saldo, movimientos y webhooks de la cuenta Revolut del proyecto.',
+      },
+    ],
+  },
+  {
     id: 'development',
     title: 'Desarrollo',
     items: [

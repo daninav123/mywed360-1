@@ -35,6 +35,7 @@ import { getSummary as getGamificationSummary } from '../services/GamificationSe
 import { isConfirmedStatus } from '../utils/supplierStatus';
 import useFinance from '../hooks/useFinance';
 import useWeddingTasksHierarchy from '../hooks/useWeddingTasksHierarchy';
+import { useFirestoreCollection } from '../hooks/useFirestoreCollection';
 
 const normalizeLang = (l) =>
   String(l || 'es')
@@ -62,6 +63,87 @@ const dedupeServiceList = (entries) => {
   }
   return unique;
 };
+
+const safeParseLocalStorage = (key, fallback) => {
+  if (typeof window === 'undefined') return fallback;
+  try {
+    const raw = window.localStorage.getItem(key);
+    if (!raw) return fallback;
+    return JSON.parse(raw);
+  } catch {
+    return fallback;
+  }
+};
+
+const readGuestsFromLocalStorage = (weddingId) => {
+  const namespaced = weddingId
+    ? safeParseLocalStorage(`maloveapp_${weddingId}_guests`, [])
+    : [];
+  if (Array.isArray(namespaced) && namespaced.length) return namespaced;
+  const legacy = safeParseLocalStorage('mywed360Guests', []);
+  return Array.isArray(legacy) ? legacy : [];
+};
+
+const confirmedAttendanceTokens = [
+  'confirmado',
+  'confirmada',
+  'confirmed',
+  'attending',
+  'asiste',
+  'asistira',
+  'sí',
+  'si',
+  'yes',
+];
+
+const isConfirmedAttendance = (value) => {
+  if (value === true) return true;
+  const normalized = String(value || '').trim().toLowerCase();
+  if (!normalized) return false;
+  if (confirmedAttendanceTokens.includes(normalized)) return true;
+  return ['confirm', 'assist', 'attend', 'yes'].some((token) => normalized.includes(token));
+};
+
+const isGuestConfirmed = (guest) => {
+  if (!guest) return false;
+  if (typeof guest.confirmed === 'boolean') return guest.confirmed;
+  if (typeof guest.isConfirmed === 'boolean') return guest.isConfirmed;
+  if (guest.status === true) return true;
+  const statusCandidates = [
+    guest.response,
+    guest.status,
+    guest.rsvpStatus,
+    guest.rsvp,
+    guest.attendance,
+    guest.estado,
+  ];
+  return statusCandidates.some((value) => isConfirmedAttendance(value));
+};
+
+const readTasksCompletedFromLocalStorage = (weddingId) => {
+  const namespacedKey = weddingId ? `maloveapp_${weddingId}_tasksCompleted` : '';
+  const namespaced = namespacedKey
+    ? safeParseLocalStorage(namespacedKey, [])
+    : [];
+  let collection = [];
+  if (Array.isArray(namespaced) && namespaced.length) {
+    collection = namespaced;
+  }
+  if (!collection.length) {
+    const legacy = safeParseLocalStorage('tasksCompleted', {});
+    if (Array.isArray(legacy)) {
+      collection = legacy;
+    } else if (legacy && typeof legacy === 'object') {
+      collection = Object.entries(legacy).map(([id, entry]) => ({
+        id,
+        ...(entry || {}),
+        taskId: entry?.taskId || id,
+      }));
+    }
+  }
+  return Array.isArray(collection) ? collection : [];
+};
+
 
 // Las categorÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¾ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­as se traducirÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¾ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡n usando el hook useTranslations
 const getInspirationCategories = (t) => [
@@ -553,53 +635,105 @@ export default function HomePage() {
     galleryRef.current?.scrollBy({ left: scrollAmount, behavior: 'smooth' });
   }, []);
 
-  // --- Mtricas dinmicas (memoizadas para performance) ---
-  const guestsMetrics = useMemo(() => {
-    try {
-      const guestsArr = JSON.parse(localStorage.getItem('mywed360Guests') || '[]');
-      const isConfirmedAttendance = (value) => {
-        const normalized = String(value || '').trim().toLowerCase();
-        if (!normalized) return false;
-        if (
-          [
-            'confirmado',
-            'confirmada',
-            'confirmed',
-            'attending',
-            'asiste',
-            'asistira',
-            'sÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­',
-            'si',
-            'yes'
-          ].includes(normalized)
-        ) {
-          return true;
-        }
-        return ['confirm', 'assist', 'attend', 'yes'].some((token) => normalized.includes(token));
-      };
+  const { data: guestsCollection = [] } = useFirestoreCollection('guests', []);
+  const { data: tasksCompletedDocs = [] } = useFirestoreCollection('tasksCompleted', []);
 
-      const confirmedCount = guestsArr.reduce((acc, guest) => {
-        const statusValue =
-          guest?.response ||
-          guest?.status ||
-          guest?.rsvpStatus ||
-          guest?.rsvp ||
-          guest?.attendance ||
-          guest?.estado ||
-          '';
-        return acc + (isConfirmedAttendance(statusValue) ? 1 : 0);
-      }, 0);
+  const [localGuestsVersion, setLocalGuestsVersion] = useState(0);
+  const [localTasksVersion, setLocalTasksVersion] = useState(0);
 
-      return { guestsArr, confirmedCount, totalGuests: guestsArr.length };
-    } catch {
-      return { guestsArr: [], confirmedCount: 0, totalGuests: 0 };
-    }
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+    const increment = () => setLocalGuestsVersion((value) => value + 1);
+    window.addEventListener('maloveapp-guests', increment);
+    window.addEventListener('maloveapp-guests-updated', increment);
+    return () => {
+      window.removeEventListener('maloveapp-guests', increment);
+      window.removeEventListener('maloveapp-guests-updated', increment);
+    };
   }, []);
 
+  useEffect(() => {
+    if (typeof window === 'undefined' || !activeWedding) return undefined;
+    const eventName = `mywed360-${activeWedding}-guests`;
+    const handler = () => setLocalGuestsVersion((value) => value + 1);
+    window.addEventListener(eventName, handler);
+    return () => {
+      window.removeEventListener(eventName, handler);
+    };
+  }, [activeWedding]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+    const increment = () => setLocalTasksVersion((value) => value + 1);
+    window.addEventListener('maloveapp-tasks', increment);
+    return () => {
+      window.removeEventListener('maloveapp-tasks', increment);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !activeWedding) return undefined;
+    const eventName = `mywed360-${activeWedding}-tasksCompleted`;
+    const handler = () => setLocalTasksVersion((value) => value + 1);
+    window.addEventListener(eventName, handler);
+    return () => {
+      window.removeEventListener(eventName, handler);
+    };
+  }, [activeWedding]);
+
+  // --- Métricas dinámicas (memoizadas para performance) ---
+  const guestsMetrics = useMemo(() => {
+    const firestoreGuests = Array.isArray(guestsCollection) ? guestsCollection : [];
+    const sourceGuests =
+      firestoreGuests.length > 0
+        ? firestoreGuests
+        : readGuestsFromLocalStorage(activeWedding);
+    const confirmedCount = sourceGuests.reduce(
+      (acc, guest) => acc + (isGuestConfirmed(guest) ? 1 : 0),
+      0
+    );
+    return {
+      confirmedCount,
+      totalGuests: sourceGuests.length,
+    };
+  }, [guestsCollection, localGuestsVersion, activeWedding]);
+
   const guestStatValue = useMemo(() => {
-    const { confirmedCount, totalGuests } = guestsMetrics;
-    return totalGuests > 0 ? `${confirmedCount} / ${totalGuests}` : `${confirmedCount}`;
-  }, [guestsMetrics]);
+    const confirmedText = format.number(guestsMetrics.confirmedCount || 0);
+    const totalGuests = guestsMetrics.totalGuests || 0;
+    return totalGuests > 0
+      ? `${confirmedText} / ${format.number(totalGuests)}`
+      : confirmedText;
+  }, [guestsMetrics, format]);
+
+  const completedTaskIds = useMemo(() => {
+    const set = new Set();
+    const addEntry = (entry) => {
+      if (!entry) return;
+      const candidates = [
+        entry.id,
+        entry.taskId,
+        entry.taskID,
+        entry.subtaskId,
+        entry.subTaskId,
+      ];
+      candidates.forEach((value) => {
+        if (value !== undefined && value !== null && value !== '') {
+          set.add(String(value));
+        }
+      });
+      if (Array.isArray(entry.ids)) {
+        entry.ids.forEach((value) => {
+          if (value !== undefined && value !== null && value !== '') {
+            set.add(String(value));
+          }
+        });
+      }
+    };
+    (Array.isArray(tasksCompletedDocs) ? tasksCompletedDocs : []).forEach(addEntry);
+    readTasksCompletedFromLocalStorage(activeWedding).forEach(addEntry);
+    return set;
+  }, [tasksCompletedDocs, activeWedding, localTasksVersion]);
 
   const tasksMetrics = useMemo(() => {
     const parents = Array.isArray(taskParents) ? taskParents : [];
@@ -610,7 +744,7 @@ export default function HomePage() {
     let tasksTotal = 0;
     let tasksCompleted = 0;
 
-    const isTaskDone = (status) => {
+    const isStatusDone = (status) => {
       const normalized = String(status || '').trim().toLowerCase();
       if (!normalized) return false;
       if (
@@ -629,19 +763,29 @@ export default function HomePage() {
       return normalized.startsWith('complet');
     };
 
+    const isTaskCompleted = (task) => {
+      if (!task) return false;
+      if (typeof task.completed === 'boolean') return task.completed;
+      if (typeof task.isDone === 'boolean') return task.isDone;
+      if (typeof task.done === 'boolean') return task.done;
+      const taskId = task?.id != null ? String(task.id) : null;
+      if (taskId && completedTaskIds.has(taskId)) return true;
+      return isStatusDone(task.status || task.estado || task.state);
+    };
+
     parents.forEach((task) => {
       tasksTotal += 1;
-      if (isTaskDone(task.status || task.estado)) tasksCompleted += 1;
+      if (isTaskCompleted(task)) tasksCompleted += 1;
 
       const subtasks = Array.isArray(childrenMap[task.id]) ? childrenMap[task.id] : [];
       subtasks.forEach((subtask) => {
         tasksTotal += 1;
-        if (isTaskDone(subtask.status || subtask.estado)) tasksCompleted += 1;
+        if (isTaskCompleted(subtask)) tasksCompleted += 1;
       });
     });
 
     return { tasksTotal, tasksCompleted };
-  }, [taskParents, taskChildrenByParent]);
+  }, [taskParents, taskChildrenByParent, completedTaskIds]);
 
   const [providersMetrics, setProvidersMetrics] = useState({
     providersAssigned: 0,

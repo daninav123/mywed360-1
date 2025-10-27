@@ -10,6 +10,7 @@ import useProviderEmail from '../../hooks/useProviderEmail.jsx';
 import useSupplierBudgets from '../../hooks/useSupplierBudgets';
 import { useAuth } from '../../hooks/useAuth';
 import { useWedding } from '../../context/WeddingContext';
+import useTranslations from '../../hooks/useTranslations';
 import { formatDate } from '../../utils/formatUtils';
 import * as EmailService from '../../services/emailService';
 import EmailTemplateService from '../../services/EmailTemplateService';
@@ -51,6 +52,7 @@ const ProveedorCard = ({
   disableInlineDetail = false,
 }) => {
   const { userProfile } = useAuth();
+  const { t } = useTranslations();
   const {
     sendEmailToProvider,
     generateDefaultSubject,
@@ -141,10 +143,10 @@ const ProveedorCard = ({
   }, [provider?.portalLastSubmitAt, provider?.portalToken]);
 
   const portalStatusLabel = useMemo(() => {
-    if (portalStatus === 'responded') return 'Portal respondido';
-    if (portalStatus === 'pending') return 'Portal pendiente';
+    if (portalStatus === 'responded') return t('common.suppliers.card.portal.responded');
+    if (portalStatus === 'pending') return t('common.suppliers.card.portal.pending');
     return null;
-  }, [portalStatus]);
+  }, [portalStatus, t]);
 
   const refreshTracking = useCallback(() => {
     try {
@@ -320,17 +322,18 @@ const ProveedorCard = ({
       if (baseBodyHtml) {
         const signature =
           userProfile?.preferences?.emailSignature ||
-          'Enviado automaticamente desde MaLoveApp';
+          t('common.suppliers.card.autoEmail.signature');
         body = `${baseBodyHtml}${appended}${closing}<p style="color:#888; font-size:12px;">${signature}</p>`;
       } else {
         const fallback = generateDefaultEmailBody(provider) || '';
         body = insertBeforeSignature(fallback, `${appended}${closing}`);
       }
 
+      const target = provider?.name || provider?.service || baseSubject;
       const subject =
         action === 'quote'
-          ? `Solicitud de presupuesto - ${provider?.name || provider?.service || baseSubject}`
-          : `Solicitud de reunion - ${provider?.name || provider?.service || baseSubject}`;
+          ? t('common.suppliers.card.autoEmail.subjectQuote', { target })
+          : t('common.suppliers.card.autoEmail.subjectMeeting', { target });
 
       return { subject, body };
     },
@@ -343,6 +346,7 @@ const ProveedorCard = ({
       generateDefaultEmailBody,
       formatTemplateToHtml,
       insertBeforeSignature,
+      t,
     ]
   );
 
@@ -351,7 +355,7 @@ const ProveedorCard = ({
       if (!provider?.email) {
         setAutoMessage({
           type: 'error',
-          text: 'Agrega un email de contacto al proveedor para enviar solicitudes automaticas.',
+          text: t('common.suppliers.card.autoEmail.missingEmail'),
         });
         return;
       }
@@ -369,8 +373,8 @@ const ProveedorCard = ({
             type: 'success',
             text:
               action === 'quote'
-                ? 'Solicitud de presupuesto enviada automaticamente.'
-                : 'Solicitud de cita enviada automaticamente.',
+                ? t('common.suppliers.card.autoEmail.successQuote')
+                : t('common.suppliers.card.autoEmail.successMeeting'),
           });
           refreshTracking();
           if (emailsOpen) {
@@ -382,13 +386,13 @@ const ProveedorCard = ({
             type: 'error',
             text:
               providerEmailError ||
-              'No se pudo enviar el correo automatico. Intentalo nuevamente.',
+              t('common.suppliers.card.autoEmail.sendErrorRetry'),
           });
         }
       } catch (err) {
         setAutoMessage({
           type: 'error',
-          text: err?.message || 'No se pudo enviar el correo automatico.',
+          text: err?.message || t('common.suppliers.card.autoEmail.sendError'),
         });
       } finally {
         setSendingAction(null);
@@ -403,6 +407,7 @@ const ProveedorCard = ({
       refreshTracking,
       emailsOpen,
       fetchProviderEmails,
+      t,
     ]
   );
   // Función para mástrar estrellas de calificación
@@ -457,7 +462,11 @@ const ProveedorCard = ({
             onToggleFavorite?.(provider.id);
           }}
           className="absolute top-2 left-2 text-yellow-400 hover:scale-110 transition-transform"
-          title={provider.favorite ? 'Quitar de favoritos' : 'Marcar como favorito'}
+          title={
+            provider.favorite
+              ? t('common.suppliers.card.favorite.remove')
+              : t('common.suppliers.card.favorite.add')
+          }
         >
           <Star
             size={18}
@@ -468,7 +477,7 @@ const ProveedorCard = ({
         {hasPending ? (
           <span
             className={`absolute top-3 right-10 h-2.5 w-2.5 rounded-full shadow-inner ${pendingIndicatorClass}`}
-            title="Pendiente de revisar"
+            title={t('common.suppliers.card.pendingTooltip')}
           ></span>
         ) : null}
 
@@ -496,9 +505,9 @@ const ProveedorCard = ({
             {Number.isFinite(scoreValue) && (
               <span
                 className="px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 text-xs font-semibold whitespace-nowrap"
-                title="Puntuación IA consolidada"
+                title={t('common.suppliers.card.scoreTooltip')}
               >
-                Score {scoreValue}
+                {t('common.suppliers.card.scoreLabel', { value: scoreValue })}
               </span>
             )}
           </div>
@@ -507,20 +516,26 @@ const ProveedorCard = ({
             <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-600">
               {matchValue != null && (
                 <span>
-                  Match IA:{' '}
-                  <span className="font-semibold text-gray-800">{matchValue}%</span>
+                  {t('common.suppliers.card.metrics.matchLabel')}{' '}
+                  <span className="font-semibold text-gray-800">
+                    {t('common.suppliers.card.metrics.percent', { value: matchValue })}
+                  </span>
                 </span>
               )}
               {experiencePercent != null && (
                 <span>
-                  Experiencia:{' '}
-                  <span className="font-semibold text-gray-800">{experiencePercent}%</span>
+                  {t('common.suppliers.card.metrics.experienceLabel')}{' '}
+                  <span className="font-semibold text-gray-800">
+                    {t('common.suppliers.card.metrics.percent', { value: experiencePercent })}
+                  </span>
                 </span>
               )}
               {responsePercent != null && (
                 <span>
-                  Agilidad:{' '}
-                  <span className="font-semibold text-gray-800">{responsePercent}%</span>
+                  {t('common.suppliers.card.metrics.responseLabel')}{' '}
+                  <span className="font-semibold text-gray-800">
+                    {t('common.suppliers.card.metrics.percent', { value: responsePercent })}
+                  </span>
                 </span>
               )}
             </div>
@@ -550,7 +565,7 @@ const ProveedorCard = ({
             {provider.groupName && (
               <span
                 className="text-xs px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 inline-flex itemás-center gap-1"
-                title={`Grupo: ${provider.groupName}`}
+                title={t('common.suppliers.card.groupTooltip', { name: provider.groupName })}
               >
                 <Users size={12} /> {provider.groupName}
               </span>
@@ -559,25 +574,37 @@ const ProveedorCard = ({
               <span
                 className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 inline-flex itemás-center gap-1"
                 title={budgetInfo.accepted
-                  ? `Presupuesto aceptado: ${budgetInfo.accepted?.amount ?? '-'} ${budgetInfo.accepted?.currency || ''}`
+                  ? t('common.suppliers.card.budget.acceptedTooltip', {
+                      amount: budgetInfo.accepted?.amount ?? '-',
+                      currency: budgetInfo.accepted?.currency || '',
+                    })
                   : budgetInfo.latest
-                    ? `Último presupuesto: ${budgetInfo.latest?.amount ?? '-'} ${budgetInfo.latest?.currency || ''}`
-                    : 'Presupuesto'}
+                  ? t('common.suppliers.card.budget.latestTooltip', {
+                      amount: budgetInfo.latest?.amount ?? '-',
+                      currency: budgetInfo.latest?.currency || '',
+                    })
+                  : t('common.suppliers.card.budget.genericTooltip')}
               >
                 {budgetInfo.accepted
-                  ? 'Presupuesto aceptado'
+                  ? t('common.suppliers.card.budget.accepted')
                   : budgetInfo.pendingCount > 0
-                    ? `Presupuesto pendiente (${budgetInfo.pendingCount})`
-                    : 'Presupuesto recibido'}
+                  ? t('common.suppliers.card.budget.pending', { count: budgetInfo.pendingCount })
+                  : t('common.suppliers.card.budget.received')}
               </span>
             )}
           </div>
 
           {provider.contact && (
-            <p className="text-sm text-gray-600 mb-1">Contacto: {provider.contact}</p>
+            <p className="text-sm text-gray-600 mb-1">
+              {t('common.suppliers.card.contactLabel', { value: provider.contact })}
+            </p>
           )}
 
-          {provider.phone && <p className="text-sm text-gray-600 mb-1">Tel: {provider.phone}</p>}
+          {provider.phone && (
+            <p className="text-sm text-gray-600 mb-1">
+              {t('common.suppliers.card.phoneLabel', { value: provider.phone })}
+            </p>
+          )}
 
           {provider.email && (
             <p className="text-sm text-gray-600 mb-1 truncate">{provider.email}</p>
@@ -596,12 +623,14 @@ const ProveedorCard = ({
           )}
 
           {provider.priceRange && (
-            <p className="text-sm font-medium mt-1">Precio: {provider.priceRange}</p>
+            <p className="text-sm font-medium mt-1">
+              {t('common.suppliers.card.priceLabel', { value: provider.priceRange })}
+            </p>
           )}
 
           {provider.depositStatus === 'paid' && (
             <span className="inline-flex itemás-center mt-2 text-xs font-medium bg-green-100 text-green-700 px-2 py-0.5 rounded">
-              Señal pagada
+              {t('common.suppliers.card.depositPaid')}
             </span>
           )}
 
@@ -616,7 +645,9 @@ const ProveedorCard = ({
           {provider.date && (
             <div className="flex itemás-center mt-2 mb-2">
               <Calendar size={14} className="mr-1 text-gray-400" />
-              <span className="text-sm text-gray-600">{provider.date}</span>
+              <span className="text-sm text-gray-600">
+                {t('common.suppliers.card.dateLabel', { value: provider.date })}
+              </span>
             </div>
           )}
 
@@ -643,7 +674,7 @@ const ProveedorCard = ({
             size="sm"
             className="flex-1"
           >
-            <Eye size={16} className="mr-1" /> Ver
+            <Eye size={16} className="mr-1" /> {t('common.suppliers.card.actions.view')}
           </Button>
 
           <Button
@@ -653,7 +684,9 @@ const ProveedorCard = ({
             className="flex-1 min-w-[180px]"
             disabled={sendingEmail || !!sendingAction}
           >
-            {sendingEmail && sendingAction === 'quote' ? 'Enviando...' : 'Solicitar presupuesto'}
+            {sendingEmail && sendingAction === 'quote'
+              ? t('common.suppliers.card.autoEmail.sending')
+              : t('common.suppliers.card.actions.requestQuote')}
           </Button>
           <Button
             onClick={() => handleAutoEmail('meeting')}
@@ -662,7 +695,9 @@ const ProveedorCard = ({
             className="flex-1 min-w-[170px]"
             disabled={sendingEmail || !!sendingAction}
           >
-            {sendingEmail && sendingAction === 'meeting' ? 'Enviando...' : 'Pedir cita'}
+            {sendingEmail && sendingAction === 'meeting'
+              ? t('common.suppliers.card.autoEmail.sending')
+              : t('common.suppliers.card.actions.requestMeeting')}
           </Button>
 
           {/* Contratos se gestionan en la plataforma del proveedor */}
@@ -674,7 +709,7 @@ const ProveedorCard = ({
               size="sm"
               className="flex-1"
             >
-              <Edit2 size={16} className="mr-1" /> Editar
+              <Edit2 size={16} className="mr-1" /> {t('common.suppliers.card.actions.edit')}
             </Button>
           )}
 
@@ -688,7 +723,7 @@ const ProveedorCard = ({
               size="sm"
               className="flex-1"
             >
-              Ver presupuesto
+              {t('common.suppliers.card.actions.viewBudget')}
             </Button>
           )}
 
@@ -699,7 +734,7 @@ const ProveedorCard = ({
               size="sm"
               className="flex-1"
             >
-              Asignar a grupo
+              {t('common.suppliers.card.actions.assignGroup')}
             </Button>
           )}
 
@@ -710,7 +745,7 @@ const ProveedorCard = ({
               size="sm"
               className="flex-1 text-red-600 border-red-200 hover:bg-red-50"
             >
-              <Trash2 size={16} className="mr-1" /> Eliminar
+              <Trash2 size={16} className="mr-1" /> {t('common.suppliers.card.actions.delete')}
             </Button>
           )}
 
@@ -721,7 +756,7 @@ const ProveedorCard = ({
               size="sm"
               className="flex-1"
             >
-              <Calendar size={16} className="mr-1" /> Reservar
+              <Calendar size={16} className="mr-1" /> {t('common.suppliers.card.actions.reserve')}
             </Button>
           )}
         </div>
@@ -736,16 +771,24 @@ const ProveedorCard = ({
 
         {tracking && (
           <div className="w-full text-xs text-gray-600 mt-1 flex itemás-center gap-2 flex-wrap">
-            <span>Seguimiento: {tracking.status || '-'}</span>
-            <span>Último: {lastAgo || '-'}</span>
-            <span>Hilo: {(tracking.thread || []).length}</span>
+            <span>
+              {t('common.suppliers.card.tracking.status', { status: tracking.status || '-' })}
+            </span>
+            <span>
+              {t('common.suppliers.card.tracking.last', { value: lastAgo || '-' })}
+            </span>
+            <span>
+              {t('common.suppliers.card.tracking.thread', {
+                count: (tracking.thread || []).length,
+              })}
+            </span>
             <a
               href="/email/inbox"
               className="ml-auto text-blue-600 hover:underline"
               onClick={(e) => e.stopPropagation()}
-              title="Abrir bandeja de entrada"
+              title={t('common.suppliers.card.tracking.openInboxTitle')}
             >
-              Ver correo
+              {t('common.suppliers.card.tracking.openInbox')}
             </a>
             {typeof onShowTracking === 'function' && (
               <button
@@ -758,7 +801,11 @@ const ProveedorCard = ({
                       id: tracking.id || provider.id,
                       providerId: provider.id,
                       providerName: provider.name,
-                      subject: tracking.subject || `Mensaje para ${provider.name}`,
+                      subject:
+                        tracking.subject ||
+                        t('common.suppliers.card.tracking.defaultSubject', {
+                          name: provider.name,
+                        }),
                       status: tracking.status || 'pendiente',
                       sentAt: tracking.lastEmailDate || new Date().toISOString(),
                       lastUpdated: tracking.lastEmailDate || new Date().toISOString(),
@@ -769,9 +816,9 @@ const ProveedorCard = ({
                     onShowTracking(null);
                   }
                 }}
-                title="Ver detalles de seguimiento"
+                title={t('common.suppliers.card.tracking.detailsTitle')}
               >
-                Detalles
+                {t('common.suppliers.card.tracking.details')}
               </button>
             )}
           </div>
@@ -791,21 +838,29 @@ const ProveedorCard = ({
               setEmails(list);
             }
           }}
-          title="Ver correos relacionados"
+          title={t('common.suppliers.card.emails.toggleTitle')}
         >
-          {emailsOpen ? 'Ocultar correos' : `Correos relacionados (${emails.length || 0})`}
+          {emailsOpen
+            ? t('common.suppliers.card.emails.hide')
+            : t('common.suppliers.card.emails.show', { count: emails.length || 0 })}
         </button>
         {emailsOpen && (
           <div className="mt-1 border rounded p-2 bg-white/50 max-h-40 overflow-auto text-xs">
             {emailsLoading ? (
-              <div className="text-gray-500">Cargando correos...</div>
+              <div className="text-gray-500">
+                {t('common.suppliers.card.emails.loading')}
+              </div>
             ) : emails.length === 0 ? (
-              <div className="text-gray-500">Sin correos relacionados</div>
+              <div className="text-gray-500">
+                {t('common.suppliers.card.emails.empty')}
+              </div>
             ) : (
               <ul className="space-y-1">
                 {emails.map((m) => (
                   <li key={m.id} className="flex items-center justify-between gap-2">
-                    <span className="truncate" title={m.subject}>{m.subject || '(Sin asunto)'}</span>
+                    <span className="truncate" title={m.subject}>
+                      {m.subject || t('common.suppliers.card.emails.noSubject')}
+                    </span>
                     <span className="text-gray-500 whitespace-nowrap">{formatDate(m.date, 'short')}</span>
                   </li>
                 ))}
@@ -817,7 +872,7 @@ const ProveedorCard = ({
                 className="text-blue-600 hover:underline"
                 onClick={(e) => e.stopPropagation()}
               >
-                Abrir en buzón
+                {t('common.suppliers.card.emails.openInbox')}
               </a>
             </div>
           </div>

@@ -1,7 +1,8 @@
 import { Search, X, Sparkles } from 'lucide-react';
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 
 import AIResultList from './AIResultList.jsx';
+import useTranslations from '../../../hooks/useTranslations';
 import Button from '../../../components/ui/Button';
 
 // Modal de búsqueda inteligente con filtros mínimos (sólo Servicio)
@@ -18,27 +19,27 @@ export default function AISearchModal({
   setServiceFilter,
   providers = [],
 }) {
+  const { t } = useTranslations();
   const [query, setQuery] = useState('');
-  const [suggestions, setSuggestions] = useState([]);
   const [searchTimeout, setSearchTimeout] = useState(null);
 
   const uniqueServices = useMemo(
     () => [...new Set((providers || []).map((p) => p.service))].filter(Boolean),
     [providers]
   );
-
-  useEffect(() => {
-    setSuggestions([
-      'Fotógrafo estilo documental',
-      'Catering para 120 invitados',
-      'DJ disponible en agosto',
-      'Floristería vintage en Madrid',
-      'Lugar al aire libre cerca de Barcelona',
-    ]);
-    return () => {
+  const suggestions = useMemo(
+    () =>
+      t('common.suppliers.aiSearchModal.suggestions', {
+        returnObjects: true,
+      }) || [],
+    [t]
+  );
+  useEffect(
+    () => () => {
       if (searchTimeout) clearTimeout(searchTimeout);
-    };
-  }, []);
+    },
+    [searchTimeout]
+  );
 
   const handleSubmit = useCallback(
     (e) => {
@@ -80,9 +81,13 @@ export default function AISearchModal({
         <div className="flex justify-between items-center p-4 border-b">
           <h2 className="text-xl font-semibold flex items-center">
             <Sparkles size={20} className="mr-2 text-blue-500" />
-            Búsqueda inteligente
+            {t('common.suppliers.aiSearchModal.title')}
           </h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700" aria-label="Cerrar">
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700"
+            aria-label={t('common.suppliers.aiSearchModal.closeAria')}
+          >
             <X size={24} />
           </button>
         </div>
@@ -95,7 +100,7 @@ export default function AISearchModal({
                 type="text"
                 value={query}
                 onChange={handleQueryChange}
-                placeholder="Describe lo que buscas..."
+                placeholder={t('common.suppliers.aiSearchModal.inputPlaceholder')}
                 className="w-full p-3 pl-10 pr-24 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500"
                 autoFocus
                 data-testid="ai-search-input"
@@ -108,22 +113,30 @@ export default function AISearchModal({
                 disabled={isLoading || !query.trim()}
                 data-testid="ai-search-button"
               >
-                {isLoading ? 'Buscando...' : 'Buscar'}
+                {isLoading
+                  ? t('common.suppliers.aiSearchModal.searching')
+                  : t('common.suppliers.aiSearchModal.search')}
               </Button>
             </div>
-            <p className="mt-2 text-sm text-gray-500">Ejemplo: &quot;Fotógrafo estilo natural en Sevilla&quot;</p>
+            <p className="mt-2 text-sm text-gray-500">
+              {t('common.suppliers.aiSearchModal.example')}
+            </p>
           </form>
 
           {/* Filtros */}
           <div className="grid grid-cols-1 md:grid-cols-1 gap-3">
             <div>
-              <label className="block text-xs text-gray-500 mb-1">Servicio</label>
+              <label className="block text-xs text-gray-500 mb-1">
+                {t('common.suppliers.aiSearchModal.filters.service')}
+              </label>
               <select
                 className="w-full p-2 border rounded"
                 value={serviceFilter}
                 onChange={(e) => setServiceFilter?.(e.target.value)}
               >
-                <option value="">Todos</option>
+                <option value="">
+                  {t('common.suppliers.aiSearchModal.filters.all')}
+                </option>
                 {uniqueServices.map((s) => (
                   <option key={s} value={s}>
                     {s}
@@ -139,7 +152,9 @@ export default function AISearchModal({
           {/* Panel lateral */}
           <div className="w-64 p-4 border-r overflow-y-auto">
             <div>
-              <h3 className="text-sm font-semibold text-gray-700 mb-2">Sugerencias</h3>
+              <h3 className="text-sm font-semibold text-gray-700 mb-2">
+                {t('common.suppliers.aiSearchModal.suggestionsTitle')}
+              </h3>
               <ul className="space-y-1">
                 {suggestions.map((s, i) => (
                   <li key={i}>
@@ -163,9 +178,11 @@ export default function AISearchModal({
 
         {/* Footer */}
         <div className="border-t p-4 bg-gray-50 flex justify-between items-center">
-          <div className="text-sm text-gray-500">Powered by IA</div>
+          <div className="text-sm text-gray-500">
+            {t('common.suppliers.aiSearchModal.footer.powered')}
+          </div>
           <Button variant="outline" onClick={onClose}>
-            Cerrar
+            {t('common.suppliers.aiSearchModal.footer.close')}
           </Button>
         </div>
       </div>

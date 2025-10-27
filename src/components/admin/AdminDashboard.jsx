@@ -19,6 +19,7 @@ import { get as apiGet } from '../../services/apiClient';
 import { resolveAdminAlert } from '../../services/adminDataService';
 import { getAdminFetchOptions } from '../../services/adminSession';
 import { decodeMojibakeDeep } from '../../utils/mojibake';
+import { useAuth } from '../../hooks/useAuth';
 
 const KPI_CONFIG = {
   'active-weddings': { icon: <Calendar size={24} />, color: 'rgb(37, 99, 235)' },

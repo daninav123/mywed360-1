@@ -1,8 +1,9 @@
-import { collection, getDocs, query, where, Timestamp } from 'firebase/firestore';
+import { collection, getDocs } from 'firebase/firestore';
 import { useEffect } from 'react';
 
 import { useWedding } from '../../context/WeddingContext';
 import { auth, db } from '../../firebaseConfig';
+import useTranslations from '../../hooks/useTranslations';
 import { addNotification, showNotification, shouldNotify } from '../../services/notificationService';
 
 // Observa tareas de la boda activa (consulta puntual + polling simple) y emite notificaciones
@@ -10,6 +11,7 @@ import { addNotification, showNotification, shouldNotify } from '../../services/
 export default function TaskNotificationWatcher({ intervalMs = 5 * 60 * 1000 }) {
   const { activeWedding } = useWedding();
   const firebaseUid = auth?.currentUser?.uid || null;
+  const { t, format } = useTranslations();
 
   useEffect(() => {
     let timer = null;
@@ -18,9 +20,17 @@ export default function TaskNotificationWatcher({ intervalMs = 5 * 60 * 1000 }) 
 
     const seenKey = 'maloveapp_tasks_notif_seen';
     const loadSeen = () => {
-      try { return JSON.parse(localStorage.getItem(seenKey) || '{}'); } catch { return {}; }
+      try {
+        return JSON.parse(localStorage.getItem(seenKey) || '{}');
+      } catch {
+        return {};
+      }
     };
-    const saveSeen = (obj) => { try { localStorage.setItem(seenKey, JSON.stringify(obj)); } catch {} };
+    const saveSeen = (obj) => {
+      try {
+        localStorage.setItem(seenKey, JSON.stringify(obj));
+      } catch {}
+    };
 
     const scan = async () => {
       if (running) return;
@@ -32,44 +42,61 @@ export default function TaskNotificationWatcher({ intervalMs = 5 * 60 * 1000 }) 
 
         const colRef = collection(db, 'weddings', activeWedding, 'tasks');
         const snap = await getDocs(colRef);
-        if (snap.empty) { running = false; return; }
+        if (snap.empty) {
+          running = false;
+          return;
+        }
 
         let emitted = 0;
         const maxEmits = 5;
 
         for (const doc of snap.docs) {
-          const t = doc.data() || {};
-          // Normalizar fechas (Timestamp/Date/string)
-          const endRaw = t.end || t.due || t.until;
+          const taskData = doc.data() || {};
+          const endRaw = taskData.end || taskData.due || taskData.until;
           let end = null;
           try {
             if (endRaw instanceof Date) end = endRaw;
             else if (endRaw && typeof endRaw.toDate === 'function') end = endRaw.toDate();
             else if (typeof endRaw === 'number' || typeof endRaw === 'string') end = new Date(endRaw);
           } catch {}
-          if (!(end instanceof Date) || isNaN(end.getTime())) continue;
+          if (!(end instanceof Date) || Number.isNaN(end.getTime())) continue;
 
           const msDiff = end.getTime() - now.getTime();
-          const isOverdue = msDiff < 0 && end.getTime() > now.getTime() - soonMs; // vencida en últimas 24h
-          const isDueSoon = msDiff >= 0 && msDiff <= soonMs; // vence en próximas 24h
+          const isOverdue = msDiff < 0 && end.getTime() > now.getTime() - soonMs;
+          const isDueSoon = msDiff >= 0 && msDiff <= soonMs;
           if (!isOverdue && !isDueSoon) continue;
 
           const kind = isOverdue ? 'overdue' : 'reminder24h';
-          const key = `${kind}:${doc.id}:${end.toISOString().slice(0,10)}`;
+          const key = `${kind}:${doc.id}:${end.toISOString().slice(0, 10)}`;
           if (seen[key]) continue;
 
-          const title = isOverdue ? 'Tarea vencida' : 'Tarea próxima a vencer';
-          const name = t.title || t.name || 'Tarea';
-          const endStr = end.toLocaleString('es-ES');
-          const message = isOverdue ? `${name} venció (${endStr})` : `${name} vence antes de 24h (${endStr})`;
+          const title = isOverdue
+            ? t('tasks.page.notifications.overdueTitle')
+            : t('tasks.page.notifications.upcomingTitle');
+          const name =
+            taskData.title ||
+            taskData.name ||
+            t('tasks.page.common.fallbacks.task', { defaultValue: 'Tarea' });
+          const endStr = format.datetime(end);
+          const message = isOverdue
+            ? t('tasks.page.notifications.overdueMessage', { name, date: endStr })
+            : t('tasks.page.notifications.upcomingMessage', { name, date: endStr });
 
-          // Respeta preferencias (canal toast)
-          const allowToast = shouldNotify({ type: 'tasks', subtype: kind, priority: isOverdue ? 'high' : 'normal', channel: 'toast' });
+          const allowToast = shouldNotify({
+            type: 'tasks',
+            subtype: kind,
+            priority: isOverdue ? 'high' : 'normal',
+            channel: 'toast',
+          });
           if (allowToast) {
-            showNotification({ title, message, type: isOverdue ? 'warning' : 'info', duration: 6000 });
+            showNotification({
+              title,
+              message,
+              type: isOverdue ? 'warning' : 'info',
+              duration: 6000,
+            });
           }
 
-          // Registrar en bandeja (persistente)
           addNotification({
             type: isOverdue ? 'warning' : 'info',
             message,
@@ -95,11 +122,12 @@ export default function TaskNotificationWatcher({ intervalMs = 5 * 60 * 1000 }) 
       running = false;
     };
 
-    // Disparo inicial y polling sencillo
     scan();
     timer = setInterval(scan, Math.max(60_000, intervalMs));
-    return () => { if (timer) clearInterval(timer); };
-  }, [db, activeWedding, intervalMs, firebaseUid]);
+    return () => {
+      if (timer) clearInterval(timer);
+    };
+  }, [db, activeWedding, intervalMs, firebaseUid, t, format]);
 
   return null;
 }

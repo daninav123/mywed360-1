@@ -52,6 +52,8 @@ import aiAssignRouter from './routes/ai-assign.js';
 import aiImageRouter from './routes/ai-image.js';
 import aiSuppliersRouter from './routes/ai-suppliers.js';
 import aiSuppliersWebRouter from './routes/ai-suppliers-web.js';
+import aiSuppliersRealRouter from './routes/ai-suppliers-real-search.js';
+import aiSuppliersTavilyRouter from './routes/ai-suppliers-tavily.js';
 import aiBudgetRouter from './routes/ai-budget.js';
 import aiSongsRouter from './routes/ai-songs.js';
 import aiWebsiteRouter from './routes/ai-website.js';
@@ -221,6 +223,8 @@ if (RATE_LIMIT_AI_MAX > 0) {
   app.use('/api/ai-image', aiLimiter);
   app.use('/api/ai-suppliers', aiLimiter);
   app.use('/api/ai-suppliers-web', aiLimiter);
+  app.use('/api/ai-suppliers-real', aiLimiter);
+  app.use('/api/ai-suppliers-tavily', aiLimiter);
   app.use('/api/ai/budget-estimate', aiLimiter);
   app.use('/api/ai-website', aiLimiter);
 }
@@ -527,6 +531,8 @@ app.use('/api/roles', requireAuth, rolesRouter);
 app.use('/api/ai-image', authMiddleware(), aiImageRouter);
 app.use('/api/ai-suppliers', authMiddleware(), aiSuppliersRouter);
 app.use('/api/ai-suppliers-web', authMiddleware(), aiSuppliersWebRouter);
+app.use('/api/ai-suppliers-real', authMiddleware(), aiSuppliersRealRouter);
+app.use('/api/ai-suppliers-tavily', authMiddleware(), aiSuppliersTavilyRouter);
 app.use('/api/ai/budget-estimate', authMiddleware(), aiBudgetRouter);
 app.use('/api/ai', authMiddleware(), aiRouter);
 app.use('/api/ai-assign', requireAuth, aiAssignRouter);

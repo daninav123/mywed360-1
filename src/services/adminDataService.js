@@ -102,7 +102,86 @@ const DEFAULT_DISCOUNTS = {
     totalUses: 0,
     totalRevenue: 0,
     currency: 'EUR',
+    totalManagers: 0,
   },
+};
+
+const DEFAULT_REVOLUT_LIMIT = {
+  limit: 0,
+  used: 0,
+  currency: 'EUR',
+};
+
+export const DEFAULT_REVOLUT_ACCOUNT = {
+  connected: false,
+  businessName: '',
+  businessId: null,
+  lastSync: null,
+  lastSyncStatus: 'never',
+  lastSyncError: null,
+  balance: {
+    available: 0,
+    pending: 0,
+    currency: 'EUR',
+  },
+  limits: {
+    daily: { ...DEFAULT_REVOLUT_LIMIT },
+    monthly: { ...DEFAULT_REVOLUT_LIMIT },
+  },
+  webhookStatus: 'unknown',
+  webhookUrl: null,
+  autoSyncEnabled: false,
+  pendingApprovals: [],
+  requiresAction: false,
+};
+
+const DEFAULT_SALES_CONTACT = {
+  name: '',
+  email: '',
+  phone: '',
+};
+
+const normalizeSalesContact = (contact) => {
+  if (!contact || typeof contact !== 'object') {
+    return { ...DEFAULT_SALES_CONTACT };
+  }
+
+  return {
+    name: typeof contact.name === 'string' ? contact.name : '',
+    email: typeof contact.email === 'string' ? contact.email : '',
+    phone: typeof contact.phone === 'string' ? contact.phone : '',
+  };
+};
+
+const normalizeDiscountLinkItem = (item = {}) => {
+  if (!item || typeof item !== 'object') return item || {};
+
+  const assignedTo = normalizeSalesContact(item.assignedTo);
+  const salesManager = normalizeSalesContact(item.salesManager);
+
+  return {
+    ...item,
+    assignedTo,
+    salesManager,
+  };
+};
+
+const computeUniqueManagers = (items = []) => {
+  const identifiers = new Set();
+
+  for (const link of items) {
+    if (!link || typeof link !== 'object') continue;
+    const manager = normalizeSalesContact(link.salesManager);
+    const key =
+      (manager.email && manager.email.toLowerCase()) ||
+      (manager.name && manager.name.toLowerCase()) ||
+      null;
+    if (key) {
+      identifiers.add(key);
+    }
+  }
+
+  return identifiers.size;
 };
 
 const ROLE_LABEL_DEFAULTS = {
@@ -222,6 +301,87 @@ const normalizeUserGrowthMetrics = (metrics) => {
       typeof metrics.source === 'string' && metrics.source
         ? metrics.source
         : 'fallback',
+  };
+};
+
+const normalizeCurrencyCode = (code, fallback = 'EUR') => {
+  if (typeof code === 'string' && code.trim().length === 3) {
+    return code.trim().toUpperCase();
+  }
+  return fallback;
+};
+
+const normalizeRevolutLimit = (limit = {}, fallbackCurrency = 'EUR') => ({
+  limit: normalizeMetricNumber(limit.limit),
+  used: normalizeMetricNumber(limit.used),
+  currency: normalizeCurrencyCode(limit.currency, fallbackCurrency),
+});
+
+const normalizeRevolutAccount = (raw = {}) => {
+  const balanceCurrency = normalizeCurrencyCode(raw?.balance?.currency, 'EUR');
+  return {
+    connected: !!raw.connected,
+    businessName: typeof raw.businessName === 'string' ? raw.businessName : '',
+    businessId: typeof raw.businessId === 'string' ? raw.businessId : null,
+    lastSync: typeof raw.lastSync === 'string' ? raw.lastSync : null,
+    lastSyncStatus:
+      typeof raw.lastSyncStatus === 'string' && raw.lastSyncStatus
+        ? raw.lastSyncStatus
+        : 'never',
+    lastSyncError: typeof raw.lastSyncError === 'string' ? raw.lastSyncError : null,
+    balance: {
+      available: normalizeMetricNumber(raw?.balance?.available),
+      pending: normalizeMetricNumber(raw?.balance?.pending),
+      currency: balanceCurrency,
+    },
+    limits: {
+      daily: normalizeRevolutLimit(raw?.limits?.daily, balanceCurrency),
+      monthly: normalizeRevolutLimit(raw?.limits?.monthly, balanceCurrency),
+    },
+    webhookStatus:
+      typeof raw.webhookStatus === 'string' && raw.webhookStatus
+        ? raw.webhookStatus
+        : 'unknown',
+    webhookUrl: typeof raw.webhookUrl === 'string' ? raw.webhookUrl : null,
+    autoSyncEnabled: !!raw.autoSyncEnabled,
+    pendingApprovals: toArray(raw.pendingApprovals),
+    requiresAction: !!raw.requiresAction,
+  };
+};
+
+const normalizeRevolutStatement = (raw = {}) => ({
+  id: typeof raw.id === 'string' ? raw.id : raw.period || raw.createdAt || null,
+  period: typeof raw.period === 'string' ? raw.period : null,
+  status:
+    typeof raw.status === 'string' && raw.status
+      ? raw.status
+      : 'available',
+  createdAt: typeof raw.createdAt === 'string' ? raw.createdAt : null,
+  downloadUrl: typeof raw.downloadUrl === 'string' ? raw.downloadUrl : null,
+});
+
+const normalizeRevolutTransfer = (raw = {}) => {
+  const counterparty =
+    typeof raw.counterparty === 'string'
+      ? raw.counterparty
+      : typeof raw?.counterparty?.name === 'string'
+        ? raw.counterparty.name
+        : '—';
+  return {
+    id: typeof raw.id === 'string' ? raw.id : raw.reference || raw.publicId || null,
+    createdAt: typeof raw.createdAt === 'string' ? raw.createdAt : null,
+    amount: normalizeMetricNumber(raw.amount),
+    currency: normalizeCurrencyCode(raw.currency, 'EUR'),
+    counterparty,
+    reference: typeof raw.reference === 'string' ? raw.reference : null,
+    status:
+      typeof raw.status === 'string' && raw.status
+        ? raw.status
+        : 'pending',
+    direction:
+      typeof raw.direction === 'string' && raw.direction
+        ? raw.direction
+        : 'out',
   };
 };
 
@@ -487,9 +647,72 @@ export const getSupportData = async () => {
   };
 };
 
+export const getRevolutAccountOverview = async () => {
+  const data = await fetchAdminEndpoint(`${ADMIN_BASE_PATH}/finance/revolut`);
+  if (!data) {
+    return {
+      account: { ...DEFAULT_REVOLUT_ACCOUNT },
+      statements: [],
+      transfers: [],
+      meta: { source: 'fallback' },
+    };
+  }
+  return {
+    account: normalizeRevolutAccount(data.account),
+    statements: toArray(data.statements).map(normalizeRevolutStatement),
+    transfers: toArray(data.transfers).map(normalizeRevolutTransfer),
+    meta: toObject(data.meta) || { source: 'api' },
+  };
+};
+
+export const triggerRevolutSync = async () => {
+  const data = await postJson(`${ADMIN_BASE_PATH}/finance/revolut/sync`, {});
+  return {
+    account: normalizeRevolutAccount(data?.account),
+    statements: toArray(data?.statements).map(normalizeRevolutStatement),
+    transfers: toArray(data?.transfers).map(normalizeRevolutTransfer),
+    meta: toObject(data?.meta) || null,
+  };
+};
+
+export const refreshRevolutWebhooks = async () => {
+  const data = await postJson(`${ADMIN_BASE_PATH}/finance/revolut/webhooks/refresh`, {});
+  return normalizeRevolutAccount(data?.account);
+};
+
+export const disconnectRevolutAccount = async () => {
+  const data = await postJson(`${ADMIN_BASE_PATH}/finance/revolut/disconnect`, {});
+  return !!data?.success;
+};
+
+export const requestRevolutConnectLink = async () => {
+  const data = await postJson(`${ADMIN_BASE_PATH}/finance/revolut/connect`, {});
+  return typeof data?.url === 'string' && data.url ? data.url : null;
+};
+
 export const getDiscountLinks = async () => {
   const data = await fetchAdminEndpoint(`${ADMIN_BASE_PATH}/discounts`);
-  return data || { items: [], summary: { total: 0, active: 0, expired: 0, totalUses: 0, totalRevenue: 0 } };
+  if (!data) {
+    return { ...DEFAULT_DISCOUNTS };
+  }
+
+  const items = toArray(data.items).map(normalizeDiscountLinkItem);
+  const summary = {
+    ...DEFAULT_DISCOUNTS.summary,
+    ...(toObject(data.summary) || {}),
+  };
+  const managers = toArray(data.managers).map(normalizeSalesContact);
+  const inferredManagers = computeUniqueManagers(items);
+
+  if (!Number.isFinite(summary.totalManagers) || summary.totalManagers <= 0) {
+    summary.totalManagers = managers.length > 0 ? managers.length : inferredManagers;
+  }
+
+  return {
+    items,
+    summary,
+    managers,
+  };
 };
 
 export const createDiscountCode = async (discountData) => {

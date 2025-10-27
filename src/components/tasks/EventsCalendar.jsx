@@ -1,5 +1,7 @@
 import React from 'react';
 import { Calendar } from 'react-big-calendar';
+
+import useTranslations from '../../hooks/useTranslations';
 import { formatDate } from '../../utils/formatUtils';
 
 export default function EventsCalendar({
@@ -20,9 +22,27 @@ export default function EventsCalendar({
   eventStyleGetter,
   EventComponent,
 }) {
+  const { t } = useTranslations();
+
+  const goToPrevious = () => {
+    const newDate = new Date(calendarDate);
+    if (currentView === 'month') newDate.setMonth(newDate.getMonth() - 1);
+    else if (currentView === 'week') newDate.setDate(newDate.getDate() - 7);
+    else newDate.setDate(newDate.getDate() - 1);
+    setCalendarDate(newDate);
+  };
+
+  const goToNext = () => {
+    const newDate = new Date(calendarDate);
+    if (currentView === 'month') newDate.setMonth(newDate.getMonth() + 1);
+    else if (currentView === 'week') newDate.setDate(newDate.getDate() + 7);
+    else newDate.setDate(newDate.getDate() + 1);
+    setCalendarDate(newDate);
+  };
+
   return (
     <div className="flex-1 flex flex-col h-full bg-[var(--color-surface)] rounded-xl shadow-md p-6 overflow-x-auto border border-[color:var(--color-text)]/10">
-      <h2 className="text-xl font-semibold mb-4">Calendario de Eventos</h2>
+      <h2 className="text-xl font-semibold mb-4">{t('tasks.page.calendar.title')}</h2>
 
       <div className="flex justify-between items-center mb-4">
         <div className="space-x-2">
@@ -30,51 +50,33 @@ export default function EventsCalendar({
             className={`px-3 py-1 rounded ${currentView === 'month' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
             onClick={() => setCurrentView('month')}
           >
-            Mes
+            {t('tasks.calendar.month')}
           </button>
           <button
             className={`px-3 py-1 rounded ${currentView === 'week' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
             onClick={() => setCurrentView('week')}
           >
-            Semana
+            {t('tasks.calendar.week')}
           </button>
           <button
             className={`px-3 py-1 rounded ${currentView === 'day' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
             onClick={() => setCurrentView('day')}
           >
-            Día
+            {t('tasks.calendar.day')}
           </button>
         </div>
         <div className="flex items-center space-x-2">
-          <button
-            className="px-2 py-1 rounded bg-gray-200 hover:bg-gray-300"
-            onClick={() => {
-              const newDate = new Date(calendarDate);
-              if (currentView === 'month') newDate.setMonth(newDate.getMonth() - 1);
-              else if (currentView === 'week') newDate.setDate(newDate.getDate() - 7);
-              else newDate.setDate(newDate.getDate() - 1);
-              setCalendarDate(newDate);
-            }}
-          >
-            &#8592; Anterior
+          <button className="px-2 py-1 rounded bg-gray-200 hover:bg-gray-300" onClick={goToPrevious}>
+            &#8592; {t('tasks.page.list.pagination.prev')}
           </button>
           <button
             className="px-3 py-1 rounded bg-blue-100 hover:bg-blue-200"
             onClick={() => setCalendarDate(new Date())}
           >
-            Hoy
+            {t('tasks.calendar.today')}
           </button>
-          <button
-            className="px-2 py-1 rounded bg-gray-200 hover:bg-gray-300"
-            onClick={() => {
-              const newDate = new Date(calendarDate);
-              if (currentView === 'month') newDate.setMonth(newDate.getMonth() + 1);
-              else if (currentView === 'week') newDate.setDate(newDate.getDate() + 7);
-              else newDate.setDate(newDate.getDate() + 1);
-              setCalendarDate(newDate);
-            }}
-          >
-            Siguiente &#8594;
+          <button className="px-2 py-1 rounded bg-gray-200 hover:bg-gray-300" onClick={goToNext}>
+            {t('tasks.page.list.pagination.next')} &#8594;
           </button>
         </div>
       </div>
@@ -85,18 +87,18 @@ export default function EventsCalendar({
             <div>
               <div className="text-center mb-6">
                 <h3 className="text-lg font-medium text-gray-800 mb-2">
-                  Error al cargar el calendario
+                  {t('tasks.page.calendar.errors.title')}
                 </h3>
                 <p className="text-gray-600">
-                  Hubo un problema al cargar el calendario. Puedes gestionar tus eventos a través de
-                  la lista inferior.
+                  {t('tasks.page.calendar.errors.description')}
                 </p>
               </div>
               <div className="space-y-4 max-h-[300px] overflow-y-auto p-2">
                 {safeEvents && safeEvents.length > 0 ? (
                   sortedEvents.map((event) => {
                     const eventId = event.id || '';
-                    const eventTitle = event.title || event.name || 'Evento sin título';
+                    const eventTitle =
+                      event.title || event.name || t('tasks.page.calendar.fallback.eventUntitled');
                     const eventStart = event.start instanceof Date ? event.start : new Date();
                     const formattedDate = formatDate(eventStart, 'custom');
                     return (
@@ -119,7 +121,7 @@ export default function EventsCalendar({
                           />
                         </div>
                         <div className="flex-1">
-                          <div className={`font-medium`}>{eventTitle}</div>
+                          <div className="font-medium">{eventTitle}</div>
                           <div className="text-xs text-gray-500">{formattedDate}</div>
                         </div>
                         <div
@@ -132,7 +134,9 @@ export default function EventsCalendar({
                     );
                   })
                 ) : (
-                  <div className="text-center text-gray-500">No hay tareas disponibles</div>
+                  <div className="text-center text-gray-500">
+                    {t('tasks.page.calendar.empty')}
+                  </div>
                 )}
               </div>
             </div>
@@ -180,12 +184,12 @@ export default function EventsCalendar({
               culture="es"
               onDoubleClickEvent={(event) => onEventEdit(event)}
               messages={{
-                next: 'Siguiente',
-                previous: 'Anterior',
-                today: 'Hoy',
-                month: 'Mes',
-                week: 'Semana',
-                day: 'Día',
+                next: t('tasks.page.list.pagination.next'),
+                previous: t('tasks.page.list.pagination.prev'),
+                today: t('tasks.calendar.today'),
+                month: t('tasks.calendar.month'),
+                week: t('tasks.calendar.week'),
+                day: t('tasks.calendar.day'),
               }}
             />
           </div>

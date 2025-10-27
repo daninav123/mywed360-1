@@ -3,6 +3,7 @@ import React from 'react';
 
 import Button from '../../../components/ui/Button';
 import Card from '../../../components/ui/Card';
+import useTranslations from '../../../hooks/useTranslations';
 
 /**
  * @typedef {import('../../../hooks/useAISearch').AISearchResult} AISearchResult
@@ -63,15 +64,20 @@ const getServiceImage = (service) => {
  * @returns {React.ReactElement} Componente de lista de resulta�os de b�squeda con IA
  */
 const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFallback }) => {
+  const { t } = useTranslations();
   if (isLoading) {
     return (
       <div data-testid="ai-results-list">
-        <div className="flex flex-col itemás-center justify-center py-12">
+        <div className="flex flex-col items-center justify-center py-12">
           <div className="animate-spin mb-4">
             <Loader2 size={40} className="text-blue-500" />
           </div>
-          <p className="text-lg font-medium text-gray-700">Buscando proveedores...</p>
-          <p className="text-sm text-gray-500 mt-2">Analizando tu consulta: "{query}"</p>
+          <p className="text-lg font-medium text-gray-700">
+            {t('common.suppliers.aiResultList.loading.title')}
+          </p>
+          <p className="text-sm text-gray-500 mt-2">
+            {t('common.suppliers.aiResultList.loading.subtitle', { query })}
+          </p>
         </div>
       </div>
     );
@@ -79,14 +85,16 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
   if (error) {
     return (
       <div data-testid="ai-results-list">
-        <div className="flex flex-col itemás-center justify-center py-12">
+        <div className="flex flex-col items-center justify-center py-12">
           <div className="p-3 rounded-full bg-red-100 mb-4">
             <X size={24} className="text-red-500" />
           </div>
-          <p className="text-lg font-medium text-gray-700">Error al buscar</p>
+          <p className="text-lg font-medium text-gray-700">
+            {t('common.suppliers.aiResultList.error.title')}
+          </p>
           <p className="text-sm text-gray-500 mt-2 text-center max-w-md">{error}</p>
-          <Button className="mt-4" size="sm" variant="outline">
-            Intentar de nuevo
+          <Button className="mt-4" size="sm" variant="outline" type="button">
+            {t('common.suppliers.aiResultList.error.retry')}
           </Button>
         </div>
       </div>
@@ -97,14 +105,15 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
   if (!query) {
     return (
       <div data-testid="ai-results-list">
-        <div className="flex flex-col itemás-center justify-center py-12">
+        <div className="flex flex-col items-center justify-center py-12">
           <div className="p-3 rounded-full bg-blue-100 mb-4">
             <Search size={24} className="text-blue-500" />
           </div>
-          <p className="text-lg font-medium text-gray-700">Busca proveedores con IA</p>
+          <p className="text-lg font-medium text-gray-700">
+            {t('common.suppliers.aiResultList.emptyQuery.title')}
+          </p>
           <p className="text-sm text-gray-500 mt-2 text-center max-w-md">
-            Describe lo que buscas en lenguaje natural y la IA encontrar� los proveedores m�s
-            adecuados
+            {t('common.suppliers.aiResultList.emptyQuery.description')}
           </p>
         </div>
       </div>
@@ -178,9 +187,11 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
           <div className="p-3 rounded-full bg-yellow-100 mb-4">
             <Search size={24} className="text-yellow-600" />
           </div>
-          <p className="text-lg font-medium text-gray-700">No se encontraron resultados</p>
+          <p className="text-lg font-medium text-gray-700">
+            {t('common.suppliers.aiResultList.noResults.title')}
+          </p>
           <p className="text-sm text-gray-500 mt-2 text-center max-w-md">
-            No hay proveedores que coincidan con tu búsqueda "{query}". Intenta con otros términos o verifica que el backend esté ejecutándose correctamente.
+            {t('common.suppliers.aiResultList.noResults.description', { query })}
           </p>
         </div>
       </div>
@@ -193,15 +204,16 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
         <div className="w-full flex items-start gap-2 p-3 border border-amber-200 bg-amber-50 text-amber-800 rounded">
           <AlertTriangle size={18} className="mt-0.5" />
           <div className="text-sm">
-            Mostrando resultados de demostración por indisponibilidad del servidor.
+            {t('common.suppliers.aiResultList.fallbackNotice')}
           </div>
         </div>
       )}
       {/* Resumen de la búsqueda */}
       <div className="mb-4">
         <p className="text-sm text-gray-500">
-          Se encontraron <span className="font-medium">{displayResults.length}</span> proveedores
-          para tu búsqueda:
+          {t('common.suppliers.aiResultList.summary.prefix')}
+          <span className="font-medium">{displayResults.length}</span>
+          {t('common.suppliers.aiResultList.summary.suffix')}
         </p>
         <p className="text-lg font-medium">"{query}"</p>
       </div>
@@ -211,7 +223,7 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
         <Card key={result.id} className="relative overflow-hidden">
           {/* Indicador de porcentaje de coincidencia */}
           <div className="absolute top-2 right-2 bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-full">
-            {result.match}% match
+            {t('common.suppliers.aiResultList.matchBadge', { value: result.match })}
           </div>
 
           <div className="flex flex-col md:flex-row gap-4">
@@ -236,7 +248,7 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
 
             {/* Contenido principal */}
             <div className="flex-1">
-              <div className="flex flex-wrap justify-between item�s-start mb-2">
+              <div className="flex flex-wrap justify-between items-start mb-2">
                 <div>
                   <h3 className="text-lg font-semibold">{result.name}</h3>
                   <p className="text-sm text-gray-600">{result.service}</p>
@@ -250,7 +262,10 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
 
               {result.location && (
                 <p className="text-sm text-gray-600 mb-2">
-                  <span className="font-medium">Ubicaci�n:</span> {result.location}
+                  <span className="font-medium">
+                    {t('common.suppliers.aiResultList.locationLabel')}
+                  </span>{' '}
+                  {result.location}
                 </p>
               )}
 
@@ -259,7 +274,9 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
               {/* An�lisis de IA */}
               {result.aiSummary && (
                 <div className="bg-blue-50 p-3 rounded-md mb-3">
-                  <p className="text-xs font-semibold text-blue-600 mb-1">An�lisis de IA</p>
+                  <p className="text-xs font-semibold text-blue-600 mb-1">
+                    {t('common.suppliers.aiResultList.aiAnalysis')}
+                  </p>
                   <p className="text-sm text-gray-700">{result.aiSummary}</p>
                 </div>
               )}
@@ -267,10 +284,12 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
               {/* Acciones */}
               <div className="flex flex-wrap gap-2 mt-2">
                 <Button onClick={() => onSelect(result, 'view')} variant="outline" size="sm">
-                  <ArrowRight size={16} className="mr-1" /> Ver detalles
+                  <ArrowRight size={16} className="mr-1" />
+                  {t('common.suppliers.aiResultList.buttons.view')}
                 </Button>
                 <Button onClick={() => onSelect(result, 'add')} size="sm">
-                  <Plus size={16} className="mr-1" /> A�adir
+                  <Plus size={16} className="mr-1" />
+                  {t('common.suppliers.aiResultList.buttons.add')}
                 </Button>
                 <Button
                   onClick={() => onSelect(result, 'email')}
@@ -279,7 +298,8 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
                   className="border-blue-600 text-blue-600 hover:bg-blue-50"
                   data-testid="email-provider-btn"
                 >
-                  <Mail size={16} className="mr-1" /> Enviar email
+                  <Mail size={16} className="mr-1" />
+                  {t('common.suppliers.aiResultList.buttons.email')}
                 </Button>
                 <Button
                   onClick={() => onSelect(result, 'select')}
@@ -287,7 +307,8 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
                   size="sm"
                   className="border-green-600 text-green-600 hover:bg-green-50"
                 >
-                  <Check size={16} className="mr-1" /> Seleccionar
+                  <Check size={16} className="mr-1" />
+                  {t('common.suppliers.aiResultList.buttons.select')}
                 </Button>
               </div>
             </div>
@@ -307,4 +328,3 @@ export default React.memo(AIResultList, (prevProps, nextProps) => {
     prevProps.onSelect === nextProps.onSelect
   );
 });
-

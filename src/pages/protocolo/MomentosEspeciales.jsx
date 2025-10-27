@@ -24,7 +24,10 @@ import { Card } from '../../components/ui';
 import { Button } from '../../components/ui';
 import Badge from '../../components/ui/Badge';
 import { MUSIC_INSPIRATION } from '../../data/musicInspiration';
-import useSpecialMoments from '../../hooks/useSpecialMoments';
+import useSpecialMoments, {
+  RESPONSABLES_LIMIT,
+  SUPPLIERS_LIMIT
+} from '../../hooks/useSpecialMoments';
 import useGuests from '../../hooks/useGuests';
 import { post as apiPost } from '../../services/apiClient';
 import * as Playback from '../../services/PlaybackService';
@@ -62,9 +65,6 @@ const STATE_BADGE_TYPE = {
   confirmado: 'success',
   ensayo: 'info',
 };
-
-const RESPONSABLES_LIMIT = 12;
-const SUPPLIERS_LIMIT = 12;
 
 // Tabs pasan a ser dinmicas desde el hook (blocks)
 
@@ -2157,7 +2157,6 @@ const MomentosEspeciales = () => {
 };
 
 export default MomentosEspeciales;
-
 
 
 

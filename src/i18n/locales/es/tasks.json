@@ -131,6 +131,13 @@
           "upcoming": "No hay próximas tareas programadas",
           "filters": "No hay tareas para los filtros seleccionados",
           "columns": "Sin columnas"
+        },
+        "dependencies": {
+          "blocked_one": "Bloqueada ({{count}} pendiente)",
+          "blocked_other": "Bloqueada ({{count}} pendientes)",
+          "resolved": "Dependencias OK ({{count}})",
+          "pendingTitle": "Tareas pendientes para desbloquear:",
+          "completedTitle": "Tareas completadas:"
         }
       },
       "allTasks": {
@@ -155,6 +162,9 @@
         "badges": {
           "noDate": "Sin fecha programada",
           "assigned": "Responsable: {{name}}"
+        },
+        "defaults": {
+          "task": "Tarea"
         }
       },
       "form": {
@@ -257,7 +267,32 @@
           "more": "Aumentar zoom del timeline",
           "reset": "Ajustar zoom para mostrar todo el Gantt",
           "label": "Zoom horizontal del Gantt"
+        },
+        "title": "Calendario de Eventos",
+        "errors": {
+          "title": "Error al cargar el calendario",
+          "description": "Hubo un problema al cargar el calendario. Puedes gestionar tus eventos a trav�s de la lista inferior."
+        },
+        "empty": "No hay tareas disponibles",
+        "fallback": {
+          "eventUntitled": "Evento sin t�tulo"
         }
+      },
+      "common": {
+        "errors": {
+          "generic": "Algo sali� mal."
+        },
+        "fallbacks": {
+          "task": "Tarea",
+          "untitled": "Sin t�tulo",
+          "untitledTask": "Tarea sin t�tulo"
+        }
+      },
+      "notifications": {
+        "overdueTitle": "Tarea vencida",
+        "upcomingTitle": "Tarea pr�xima a vencer",
+        "overdueMessage": "{{name}} venci� ({{date}})",
+        "upcomingMessage": "{{name}} vence antes de 24h ({{date}})"
       }
     }
   },

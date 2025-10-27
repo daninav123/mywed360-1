@@ -485,11 +485,126 @@ const CommissionRulesEditor = ({ value, onChange, disabled }) => {
   );
 };
 
+const EMPTY_CONTACT = {
+  name: '',
+  email: '',
+  phone: '',
+};
+
+const normalizeContact = (contact) => {
+  if (!contact || typeof contact !== 'object') return { ...EMPTY_CONTACT };
+  return {
+    name: typeof contact.name === 'string' ? contact.name : '',
+    email: typeof contact.email === 'string' ? contact.email : '',
+    phone: typeof contact.phone === 'string' ? contact.phone : '',
+  };
+};
+
+const hasContactInfo = (contact) => {
+  if (!contact || typeof contact !== 'object') return false;
+  return Boolean(contact.name || contact.email || contact.phone);
+};
+
+const toNullableString = (value) =>
+  typeof value === 'string' && value.trim() ? value.trim() : null;
+
+const getContactKey = (contact) => {
+  const normalized = normalizeContact(contact);
+  const phoneKey = normalized.phone ? normalized.phone.replace(/\s+/g, '') : '';
+  return (
+    (normalized.email && normalized.email.toLowerCase()) ||
+    (normalized.name && normalized.name.toLowerCase()) ||
+    phoneKey ||
+    null
+  );
+};
+
+const normalizeDiscountEntry = (entry) => {
+  if (!entry || typeof entry !== 'object') return entry || {};
+  return {
+    ...entry,
+    assignedTo: normalizeContact(entry.assignedTo),
+    salesManager: normalizeContact(entry.salesManager),
+  };
+};
+
+const buildManagerOverview = (items = []) => {
+  const managers = new Map();
+
+  items.forEach((rawItem) => {
+    if (!rawItem || typeof rawItem !== 'object') return;
+    const item = normalizeDiscountEntry(rawItem);
+    const manager = item.salesManager;
+    if (!hasContactInfo(manager)) return;
+
+    const managerKey = getContactKey(manager);
+    if (!managerKey) return;
+
+    if (!managers.has(managerKey)) {
+      managers.set(managerKey, {
+        manager,
+        totalLinks: 0,
+        totalRevenue: 0,
+        totalUses: 0,
+        commercialsMap: new Map(),
+      });
+    }
+
+    const managerEntry = managers.get(managerKey);
+    managerEntry.totalLinks += 1;
+    managerEntry.totalRevenue += Number(item.revenue) || 0;
+    managerEntry.totalUses += Number(item.uses) || 0;
+
+    const commercialContact = normalizeContact(item.assignedTo);
+    const commercialKey =
+      getContactKey(commercialContact) ||
+      (item.id ? String(item.id) : item.code || `link-${managerEntry.totalLinks}`);
+
+    if (!managerEntry.commercialsMap.has(commercialKey)) {
+      managerEntry.commercialsMap.set(commercialKey, {
+        contact: commercialContact,
+        totalRevenue: 0,
+        totalUses: 0,
+        links: [],
+      });
+    }
+
+    const commercialEntry = managerEntry.commercialsMap.get(commercialKey);
+    commercialEntry.totalRevenue += Number(item.revenue) || 0;
+    commercialEntry.totalUses += Number(item.uses) || 0;
+    commercialEntry.links.push({
+      id: item.id,
+      code: item.code,
+      revenue: Number(item.revenue) || 0,
+      uses: Number(item.uses) || 0,
+    });
+  });
+
+  return Array.from(managers.values()).map((entry, index) => ({
+    id: getContactKey(entry.manager) || `manager-${index}`,
+    manager: entry.manager,
+    totalLinks: entry.totalLinks,
+    totalRevenue: entry.totalRevenue,
+    totalUses: entry.totalUses,
+    commercials: Array.from(entry.commercialsMap.values()).map((commercial, idx) => ({
+      id:
+        getContactKey(commercial.contact) ||
+        commercial.links[0]?.id ||
+        `commercial-${idx}`,
+      contact: commercial.contact,
+      totalRevenue: commercial.totalRevenue,
+      totalUses: commercial.totalUses,
+      links: commercial.links,
+    })),
+  }));
+};
+
 const DEFAULT_SUMMARY = {
   totalLinks: 0,
   totalUses: 0,
   totalRevenue: 0,
   currency: 'EUR',
+  totalManagers: 0,
 };
 
 const formatCurrency = (value = 0, currency = 'EUR') =>
@@ -575,6 +690,7 @@ const AdminDiscounts = () => {
     validFrom: '',
     validUntil: '',
     assignedTo: { name: '', email: '' },
+    salesManager: { name: '', email: '', phone: '' },
     notes: '',
     status: 'activo',
     commissionRules: defaultCommissionState(),
@@ -589,8 +705,36 @@ const AdminDiscounts = () => {
       try {
         const data = await getDiscountLinks();
         if (!cancelled) {
-          setLinks(Array.isArray(data.items) ? data.items : []);
-          setSummary(data.summary || DEFAULT_SUMMARY);
+          const managerDirectory = new Map();
+          if (Array.isArray(data?.managers)) {
+            data.managers
+              .map(normalizeContact)
+              .forEach((manager) => {
+                const key = getContactKey(manager);
+                if (key) managerDirectory.set(key, manager);
+              });
+          }
+
+          const rawItems = Array.isArray(data?.items) ? data.items : [];
+          const normalizedItems = rawItems.map((item) => {
+            const normalized = normalizeDiscountEntry(item);
+            const key = getContactKey(normalized.salesManager);
+            if (key && managerDirectory.has(key)) {
+              const reference = managerDirectory.get(key);
+              normalized.salesManager = normalizeContact({
+                name: normalized.salesManager.name || reference.name,
+                email: normalized.salesManager.email || reference.email,
+                phone: normalized.salesManager.phone || reference.phone,
+              });
+            }
+            return normalized;
+          });
+
+          setLinks(normalizedItems);
+          const incomingSummary = data?.summary
+            ? { ...DEFAULT_SUMMARY, ...data.summary }
+            : DEFAULT_SUMMARY;
+          setSummary(incomingSummary);
           setError('');
         }
       } catch (err) {
@@ -614,13 +758,26 @@ const AdminDiscounts = () => {
     return links.filter((link) => {
       const matchesStatus = statusFilter === 'all' || (link.status || '').toLowerCase() === statusFilter;
       const matchesQuery = query
-        ? [link.code, link.url, link.assignedTo?.name]
+        ? [link.code, link.url, link.assignedTo?.name, link.assignedTo?.email, link.salesManager?.name, link.salesManager?.email]
             .filter(Boolean)
             .some((value) => String(value).toLowerCase().includes(query.toLowerCase()))
         : true;
       return matchesStatus && matchesQuery;
     });
   }, [links, statusFilter, query]);
+
+  const managerOverview = useMemo(() => buildManagerOverview(links), [links]);
+
+  useEffect(() => {
+    setSummary((prev) => {
+      if (!prev) return prev;
+      const nextTotal = managerOverview.length;
+      if (prev.totalManagers === nextTotal) {
+        return prev;
+      }
+      return { ...prev, totalManagers: nextTotal };
+    });
+  }, [managerOverview]);
 
   const commissionSummary = useMemo(() => {
     const currency = summary?.commission?.currency || summary?.currency || 'EUR';
@@ -706,6 +863,20 @@ const AdminDiscounts = () => {
 
     setCreating(true);
     try {
+      const assignedPayload =
+        formData.assignedTo.name || formData.assignedTo.email
+          ? {
+              name: toNullableString(formData.assignedTo.name),
+              email: toNullableString(formData.assignedTo.email),
+            }
+          : null;
+      const managerPayload = hasContactInfo(formData.salesManager)
+        ? {
+            name: toNullableString(formData.salesManager.name),
+            email: toNullableString(formData.salesManager.email),
+            phone: toNullableString(formData.salesManager.phone),
+          }
+        : null;
       const discountData = {
         code: formData.code.trim(),
         url: formData.url.trim() || undefined,
@@ -714,10 +885,8 @@ const AdminDiscounts = () => {
         discountPercentage: parseFloat(formData.discountPercentage) || 0,
         validFrom: formData.validFrom ? new Date(formData.validFrom).toISOString() : null,
         validUntil: formData.validUntil ? new Date(formData.validUntil).toISOString() : null,
-        assignedTo: formData.assignedTo.name || formData.assignedTo.email ? {
-          name: formData.assignedTo.name || null,
-          email: formData.assignedTo.email || null
-        } : null,
+        assignedTo: assignedPayload,
+        salesManager: managerPayload,
         notes: formData.notes.trim() || undefined,
         commissionRules: commissionPayload,
       };
@@ -728,7 +897,15 @@ const AdminDiscounts = () => {
 
       const newDiscount = await createDiscountCode(discountData);
 
-      setLinks(prev => [newDiscount, ...prev]);
+      const normalizedDiscount = normalizeDiscountEntry(newDiscount);
+      if (managerPayload && !hasContactInfo(normalizedDiscount.salesManager)) {
+        normalizedDiscount.salesManager = normalizeContact(managerPayload);
+      }
+      if (assignedPayload && !hasContactInfo(normalizedDiscount.assignedTo)) {
+        normalizedDiscount.assignedTo = normalizeContact(assignedPayload);
+      }
+
+      setLinks((prev) => [normalizedDiscount, ...prev]);
       setSummary(prev => ({
         ...prev,
         totalLinks: prev.totalLinks + 1
@@ -763,6 +940,20 @@ const AdminDiscounts = () => {
     setUpdating(true);
 
     try {
+      const assignedPayload =
+        formData.assignedTo.name || formData.assignedTo.email
+          ? {
+              name: toNullableString(formData.assignedTo.name),
+              email: toNullableString(formData.assignedTo.email),
+            }
+          : null;
+      const managerPayload = hasContactInfo(formData.salesManager)
+        ? {
+            name: toNullableString(formData.salesManager.name),
+            email: toNullableString(formData.salesManager.email),
+            phone: toNullableString(formData.salesManager.phone),
+          }
+        : null;
       const discountData = {
         url: formData.url.trim() || undefined,
         type: formData.type,
@@ -770,10 +961,8 @@ const AdminDiscounts = () => {
         discountPercentage: parseFloat(formData.discountPercentage) || 0,
         validFrom: formData.validFrom ? new Date(formData.validFrom).toISOString() : null,
         validUntil: formData.validUntil ? new Date(formData.validUntil).toISOString() : null,
-        assignedTo: formData.assignedTo.name || formData.assignedTo.email ? {
-          name: formData.assignedTo.name || null,
-          email: formData.assignedTo.email || null
-        } : null,
+        assignedTo: assignedPayload,
+        salesManager: managerPayload,
         notes: formData.notes.trim() || undefined,
         status: formData.status,
         commissionRules: commissionPayload,
@@ -784,9 +973,16 @@ const AdminDiscounts = () => {
       }
 
       const updatedDiscount = await updateDiscountCode(editingDiscount.id, discountData);
+      const normalizedDiscount = normalizeDiscountEntry(updatedDiscount);
+      if (managerPayload && !hasContactInfo(normalizedDiscount.salesManager)) {
+        normalizedDiscount.salesManager = normalizeContact(managerPayload);
+      }
+      if (assignedPayload && !hasContactInfo(normalizedDiscount.assignedTo)) {
+        normalizedDiscount.assignedTo = normalizeContact(assignedPayload);
+      }
 
       setLinks(prev => prev.map(link =>
-        link.id === editingDiscount.id ? updatedDiscount : link
+        link.id === editingDiscount.id ? normalizedDiscount : link
       ));
 
       resetForm();
@@ -804,23 +1000,29 @@ const AdminDiscounts = () => {
   const openEditModal = (discount) => {
     setFormError('');
     setEditError('');
-    setEditingDiscount(discount);
+    const normalized = normalizeDiscountEntry(discount);
+    setEditingDiscount(normalized);
     setFormData({
-      code: discount.code,
-      url: discount.url || '',
-      type: discount.type || 'campaign',
-      maxUses: discount.maxUses || '',
-      isPermanent: !discount.maxUses,
-      discountPercentage: discount.discountPercentage || '',
-      validFrom: discount.validFrom ? new Date(discount.validFrom).toISOString().split('T')[0] : '',
-      validUntil: discount.validUntil ? new Date(discount.validUntil).toISOString().split('T')[0] : '',
+      code: normalized.code,
+      url: normalized.url || '',
+      type: normalized.type || 'campaign',
+      maxUses: normalized.maxUses || '',
+      isPermanent: !normalized.maxUses,
+      discountPercentage: normalized.discountPercentage || '',
+      validFrom: normalized.validFrom ? new Date(normalized.validFrom).toISOString().split('T')[0] : '',
+      validUntil: normalized.validUntil ? new Date(normalized.validUntil).toISOString().split('T')[0] : '',
       assignedTo: {
-        name: discount.assignedTo?.name || '',
-        email: discount.assignedTo?.email || ''
+        name: normalized.assignedTo?.name || '',
+        email: normalized.assignedTo?.email || ''
       },
-      notes: discount.notes || '',
-      status: discount.status || 'activo',
-      commissionRules: hydrateCommissionForm(discount.commissionRules),
+      salesManager: {
+        name: normalized.salesManager?.name || '',
+        email: normalized.salesManager?.email || '',
+        phone: normalized.salesManager?.phone || '',
+      },
+      notes: normalized.notes || '',
+      status: normalized.status || 'activo',
+      commissionRules: hydrateCommissionForm(normalized.commissionRules),
     });
     setShowEditModal(true);
   };
@@ -836,6 +1038,7 @@ const AdminDiscounts = () => {
       validFrom: '',
       validUntil: '',
       assignedTo: { name: '', email: '' },
+      salesManager: { name: '', email: '', phone: '' },
       notes: '',
       status: 'activo',
       commissionRules: defaultCommissionState(),
@@ -858,7 +1061,7 @@ const AdminDiscounts = () => {
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Buscar por código, URL o responsable"
+            placeholder="Buscar por código, URL, comercial o jefe"
             className="rounded-md border border-soft px-3 py-2 text-sm"
           />
           <select
@@ -892,7 +1095,7 @@ const AdminDiscounts = () => {
         <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-6 text-sm text-red-600">{error}</div>
       ) : (
         <>
-          <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
             <article className="rounded-xl border border-soft bg-surface px-4 py-5 shadow-sm">
               <p className="text-xs uppercase text-[var(--color-text-soft,#6b7280)]">Enlaces totales</p>
               <p className="mt-2 text-2xl font-semibold">{summary.totalLinks}</p>
@@ -925,6 +1128,93 @@ const AdminDiscounts = () => {
                 </div>
               </div>
             </article>
+            <article className="rounded-xl border border-soft bg-surface px-4 py-5 shadow-sm">
+              <p className="text-xs uppercase text-[var(--color-text-soft,#6b7280)]">Jefes comerciales</p>
+              <p className="mt-2 text-2xl font-semibold">{summary.totalManagers ?? 0}</p>
+              <p className="mt-1 text-xs text-[var(--color-text-soft,#6b7280)]">
+                Con al menos un enlace activo asignado.
+              </p>
+            </article>
+          </section>
+
+          <section className="rounded-xl border border-soft bg-surface shadow-sm">
+            <header className="border-b border-soft px-4 py-3">
+              <h2 className="text-sm font-semibold">Jefes de comerciales</h2>
+              <p className="text-xs text-[var(--color-text-soft,#6b7280)]">
+                Visibilidad de quién coordina a cada comercial y sus indicadores principales.
+              </p>
+            </header>
+            {managerOverview.length ? (
+              <div className="divide-y divide-soft">
+                {managerOverview.map((entry) => (
+                  <article key={entry.id} className="px-4 py-4 space-y-3">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                      <div>
+                        <p className="text-sm font-semibold">
+                          {entry.manager.name || entry.manager.email || 'Jefe sin nombre'}
+                        </p>
+                        <div className="text-xs text-[var(--color-text-soft,#6b7280)] space-x-2">
+                          {entry.manager.email && <span>{entry.manager.email}</span>}
+                          {entry.manager.phone && <span>{entry.manager.phone}</span>}
+                        </div>
+                      </div>
+                      <div className="text-xs text-[var(--color-text-soft,#6b7280)] space-y-1 text-right">
+                        <div>
+                          <span className="font-semibold text-[var(--color-text,#111827)]">{entry.totalLinks}</span> enlaces
+                        </div>
+                        <div>
+                          <span className="font-semibold text-[var(--color-text,#111827)]">
+                            {formatCurrency(entry.totalRevenue, summary.currency)}
+                          </span>{' '}
+                          facturación
+                        </div>
+                        <div>
+                          <span className="font-semibold text-[var(--color-text,#111827)]">{entry.totalUses}</span> usos
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-xs uppercase text-[var(--color-text-soft,#6b7280)]">
+                        Comerciales a cargo ({entry.commercials.length})
+                      </p>
+                      <div className="mt-2 space-y-2">
+                        {entry.commercials.map((commercial) => (
+                          <div
+                            key={commercial.id}
+                            className="rounded-lg border border-soft bg-[var(--color-bg-soft,#f3f4f6)] px-3 py-2"
+                          >
+                            <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                              <div className="text-sm font-medium">
+                                {commercial.contact.name || commercial.contact.email || 'Comercial sin asignar'}
+                              </div>
+                              <div className="text-xs text-[var(--color-text-soft,#6b7280)] sm:text-right">
+                                {formatCurrency(commercial.totalRevenue, summary.currency)} · {commercial.totalUses} usos
+                              </div>
+                            </div>
+                            <div className="mt-2 flex flex-wrap gap-2">
+                              {commercial.links.map((link) => (
+                                <span
+                                  key={link.id || link.code}
+                                  className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-xs font-medium text-[var(--color-text-soft,#6b7280)] shadow-sm"
+                                >
+                                  <span className="font-semibold text-[var(--color-text,#111827)]">{link.code}</span>
+                                  <span>{link.uses} usos</span>
+                                  <span>{formatCurrency(link.revenue, summary.currency)}</span>
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            ) : (
+              <p className="px-4 py-6 text-sm text-[var(--color-text-soft,#6b7280)]">
+                Aún no hay jefes de comerciales asignados a los enlaces. Puedes agregarlos al crear o editar un enlace.
+              </p>
+            )}
           </section>
 
           <section className="rounded-xl border border-soft bg-surface shadow-sm">
@@ -938,6 +1228,8 @@ const AdminDiscounts = () => {
                     <th className="px-4 py-3 text-left">Código</th>
                     <th className="px-4 py-3 text-left">Tipo</th>
                     <th className="px-4 py-3 text-left">% Desc.</th>
+                    <th className="px-4 py-3 text-left">Comercial</th>
+                    <th className="px-4 py-3 text-left">Jefe</th>
                     <th className="px-4 py-3 text-left">Usos</th>
                     <th className="px-4 py-3 text-left">Ingresos</th>
                     <th className="px-4 py-3 text-left">Comision</th>
@@ -956,6 +1248,37 @@ const AdminDiscounts = () => {
                         </td>
                         <td className="px-4 py-3 text-right font-semibold text-blue-600">
                           {link.discountPercentage ? `${link.discountPercentage}%` : '-'}
+                        </td>
+                        <td className="px-4 py-3">
+                          {hasContactInfo(link.assignedTo) ? (
+                            <div className="space-y-1">
+                              <p className="text-sm font-medium">
+                                {link.assignedTo.name || link.assignedTo.email}
+                              </p>
+                              {link.assignedTo.name && link.assignedTo.email && (
+                                <p className="text-xs text-[var(--color-text-soft,#6b7280)]">
+                                  {link.assignedTo.email}
+                                </p>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="text-xs text-[var(--color-text-soft,#6b7280)]">No asignado</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3">
+                          {hasContactInfo(link.salesManager) ? (
+                            <div className="space-y-1">
+                              <p className="text-sm font-medium">
+                                {link.salesManager.name || link.salesManager.email || '—'}
+                              </p>
+                              <div className="text-xs text-[var(--color-text-soft,#6b7280)] space-x-2">
+                                {link.salesManager.email && <span>{link.salesManager.email}</span>}
+                                {link.salesManager.phone && <span>{link.salesManager.phone}</span>}
+                              </div>
+                            </div>
+                          ) : (
+                            <span className="text-xs text-[var(--color-text-soft,#6b7280)]">Sin jefe</span>
+                          )}
                         </td>
                         <td className="px-4 py-3 text-right">{link.uses || 0}</td>
                         <td className="px-4 py-3 text-right font-medium text-green-600">
@@ -1013,7 +1336,7 @@ const AdminDiscounts = () => {
                   })}
                   {filtered.length === 0 && (
                     <tr>
-                      <td className="px-4 py-6 text-center text-sm text-[var(--color-text-soft,#6b7280)]" colSpan={9}>
+                      <td className="px-4 py-6 text-center text-sm text-[var(--color-text-soft,#6b7280)]" colSpan={11}>
                         No se encontraron enlaces con los filtros aplicados.
                       </td>
                     </tr>
@@ -1159,6 +1482,102 @@ const AdminDiscounts = () => {
                     className="rounded-md border border-soft px-3 py-2 text-sm"
                   />
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">Jefe de comerciales (opcional)</label>
+                <div className="grid gap-2 sm:grid-cols-3">
+                  <input
+                    type="text"
+                    value={formData.salesManager.name}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        salesManager: { ...prev.salesManager, name: e.target.value },
+                      }))
+                    }
+                    placeholder="Nombre"
+                    className="rounded-md border border-soft px-3 py-2 text-sm"
+                    disabled={updating}
+                  />
+                  <input
+                    type="email"
+                    value={formData.salesManager.email}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        salesManager: { ...prev.salesManager, email: e.target.value },
+                      }))
+                    }
+                    placeholder="Email"
+                    className="rounded-md border border-soft px-3 py-2 text-sm"
+                    disabled={updating}
+                  />
+                  <input
+                    type="tel"
+                    value={formData.salesManager.phone}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        salesManager: { ...prev.salesManager, phone: e.target.value },
+                      }))
+                    }
+                    placeholder="Teléfono"
+                    className="rounded-md border border-soft px-3 py-2 text-sm"
+                    disabled={updating}
+                  />
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Define quién guía a este comercial y centraliza el seguimiento con su contacto directo.
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">Jefe de comerciales (opcional)</label>
+                <div className="grid gap-2 sm:grid-cols-3">
+                  <input
+                    type="text"
+                    value={formData.salesManager.name}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        salesManager: { ...prev.salesManager, name: e.target.value },
+                      }))
+                    }
+                    placeholder="Nombre"
+                    className="rounded-md border border-soft px-3 py-2 text-sm"
+                    disabled={creating}
+                  />
+                  <input
+                    type="email"
+                    value={formData.salesManager.email}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        salesManager: { ...prev.salesManager, email: e.target.value },
+                      }))
+                    }
+                    placeholder="Email"
+                    className="rounded-md border border-soft px-3 py-2 text-sm"
+                    disabled={creating}
+                  />
+                  <input
+                    type="tel"
+                    value={formData.salesManager.phone}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        salesManager: { ...prev.salesManager, phone: e.target.value },
+                      }))
+                    }
+                    placeholder="Teléfono"
+                    className="rounded-md border border-soft px-3 py-2 text-sm"
+                    disabled={creating}
+                  />
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Se usará como punto de contacto para seguimiento y coaching del comercial.
+                </p>
               </div>
 
               <div>
@@ -1404,9 +1823,3 @@ const AdminDiscounts = () => {
 };
 
 export default AdminDiscounts;
-
-
-
-
-
-

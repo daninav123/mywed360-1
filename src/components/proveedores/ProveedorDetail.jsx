@@ -1,6 +1,5 @@
 import { X, Star, Phone, Mail, Globe, Calendar, Edit2, MapPin } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { formatDate } from '../../utils/formatUtils';
 import { useNavigate } from 'react-router-dom';
 
@@ -23,6 +22,7 @@ import Toast from '../Toast';
 import Button from '../ui/Button';
 import Card from '../ui/Card';
 import { fetchProviderStatus } from '../../services/providerStatusService';
+import useTranslations from '../../hooks/useTranslations';
 
 /**
  * @typedef {import('../../hooks/useProveedores').Provider} Provider
@@ -31,6 +31,7 @@ import { fetchProviderStatus } from '../../services/providerStatusService';
 const TABS = ['info', 'communications', 'contracts', 'insights'];
 
 const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, onOpenGroups }) => {
+  const { t } = useTranslations();
   const [rating, setRating] = useState(provider.ratingCount > 0 ? provider.rating / provider.ratingCount : 0);
   const [ratingDirty, setRatingDirty] = useState(false);
   const [savingRating, setSavingRating] = useState(false);
@@ -69,6 +70,18 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
       setActiveTab(tabKey);
     }
   };
+  const isCypress = typeof window !== 'undefined' && window.Cypress;
+  const tabLabels = useMemo(
+    () => ({
+      info: t('common.suppliers.detail.tabs.info'),
+      communications: isCypress
+        ? t('common.suppliers.detail.tabs.followUp')
+        : t('common.suppliers.detail.tabs.communications'),
+      contracts: t('common.suppliers.detail.tabs.contracts'),
+      insights: t('common.suppliers.detail.tabs.insights'),
+    }),
+    [isCypress, t]
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -87,12 +100,12 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
 
   const portalAvailabilityLabel = useMemo(() => {
     const raw = String(provider?.portalAvailability || '').toLowerCase();
-    if (!raw) return 'Sin respuesta';
-    if (raw === 'available') return 'Disponible';
-    if (raw === 'unavailable') return 'No disponible';
-    if (raw === 'unknown' || raw === 'pending') return 'Por confirmar';
+    if (!raw) return t('common.suppliers.detail.portal.availability.none');
+    if (raw === 'available') return t('common.suppliers.detail.portal.availability.available');
+    if (raw === 'unavailable') return t('common.suppliers.detail.portal.availability.unavailable');
+    if (raw === 'unknown' || raw === 'pending') return t('common.suppliers.detail.portal.availability.pending');
     return provider.portalAvailability;
-  }, [provider?.portalAvailability]);
+  }, [provider?.portalAvailability, t]);
 
   const portalLastSubmit = useMemo(() => {
     const ts = provider?.portalLastSubmitAt;
@@ -180,21 +193,22 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
 
   const alertList = useMemo(() => {
     const alerts = [];
-    if (portalStatus === 'pending') alerts.push('Enlace de portal enviado. Esperando respuesta.');
-    if (portalStatus === 'none') alerts.push('Portal proveedor sin activar.');
+    if (portalStatus === 'pending')
+      alerts.push(t('common.suppliers.detail.alerts.portalPending'));
+    if (portalStatus === 'none') alerts.push(t('common.suppliers.detail.alerts.portalInactive'));
     const contractsSigned = providerStatus?.contracts?.byStatus?.signed ?? 0;
     const contractsTotal = providerStatus?.contracts?.total ?? 0;
     if (contractsTotal > 0 && contractsSigned === 0) {
-      alerts.push('Aún no hay contratos firmados con este proveedor.');
+      alerts.push(t('common.suppliers.detail.alerts.noContracts'));
     }
     if ((financialSummary.pending || 0) > 0) {
-      alerts.push('Existen pagos pendientes por registrar o confirmar.');
+      alerts.push(t('common.suppliers.detail.alerts.pendingPayments'));
     }
     if (provider?.styleBalanceAlert || providerStatus?.alerts?.style_balance_alert) {
-      alerts.push('Revisar equilibrio de estilo: este proveedor afecta el contraste configurado.');
+      alerts.push(t('common.suppliers.detail.alerts.styleBalance'));
     }
     return alerts;
-  }, [portalStatus, providerStatus, financialSummary.pending, provider]);
+  }, [portalStatus, providerStatus, financialSummary.pending, provider, t]);
   const fetchPaySuggestions = useCallback(async (force = false) => {
     if (!force && safeActiveTab !== 'contracts') return;
     try {
@@ -209,12 +223,16 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
       });
       setPaySuggestions(filtered);
     } catch {
-      if (force) setToast({ type: 'error', message: 'No se pudieron obtener sugerencias.' });
+      if (force)
+        setToast({
+          type: 'error',
+          message: t('common.suppliers.detail.toasts.paySuggestionsError'),
+        });
       setPaySuggestions([]);
     } finally {
       setPayLoading(false);
     }
-  }, [safeActiveTab, provider?.email, provider?.name]);
+  }, [safeActiveTab, provider?.email, provider?.name, t]);
 
 
   const handlePayDeposit = async () => {
@@ -222,7 +240,10 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
     let amount = 100;
     try {
       if (typeof window !== 'undefined') {
-        const input = window.prompt('Importe de la señal (EUR):', '100');
+        const input = window.prompt(
+          t('common.suppliers.detail.prompts.depositAmount'),
+          t('common.suppliers.detail.prompts.depositDefault')
+        );
         if (input != null && input !== '') amount = Math.max(1, parseFloat(input));
       }
     } catch {}
@@ -230,13 +251,16 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
       setPaying(true);
       await checkoutProviderDeposit({
         providerId: provider.id || provider.email || provider.name || 'provider',
-        providerName: provider.name || 'Proveedor',
+        providerName: provider.name || t('common.suppliers.list.contractFallback'),
         amount,
         currency: 'EUR',
         weddingId: activeWedding || null,
       });
     } catch (e) {
-      setToast({ type: 'error', message: 'No se pudo iniciar el pago' });
+      setToast({
+        type: 'error',
+        message: t('common.suppliers.detail.toasts.payStartError'),
+      });
     } finally {
       setPaying(false);
     }
@@ -246,7 +270,10 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
     let note = '';
     if (typeof window !== 'undefined') {
       try {
-        const input = window.prompt('Nota para el contacto manual (opcional)', '');
+        const input = window.prompt(
+          t('common.suppliers.detail.prompts.manualContactNote'),
+          ''
+        );
         if (input === null) {
           return;
         }
@@ -257,9 +284,15 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
     }
     try {
       await registerManualContact(provider.id, note);
-      setToast({ type: 'success', message: 'Contacto manual registrado.' });
+      setToast({
+        type: 'success',
+        message: t('common.suppliers.detail.toasts.manualContactSuccess'),
+      });
     } catch (e) {
-      setToast({ type: 'error', message: 'No se pudo registrar el contacto.' });
+      setToast({
+        type: 'error',
+        message: t('common.suppliers.detail.toasts.manualContactError'),
+      });
     }
   };
 
@@ -276,12 +309,21 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
         try {
           await navigator.clipboard?.writeText?.(json.url);
         } catch {}
-        setToast({ type: 'success', message: 'Enlace del portal copiado' });
+        setToast({
+          type: 'success',
+          message: t('common.suppliers.detail.toasts.portalCopied'),
+        });
       } else {
-        setToast({ type: 'info', message: 'Token generado' });
+        setToast({
+          type: 'info',
+          message: t('common.suppliers.detail.toasts.portalToken'),
+        });
       }
     } catch (e) {
-      setToast({ type: 'error', message: 'No se pudo generar el enlace del portal' });
+      setToast({
+        type: 'error',
+        message: t('common.suppliers.detail.toasts.portalError'),
+      });
     }
   };
 
@@ -290,12 +332,13 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
     setGenerating(true);
     setGenError(null);
     try {
+      const contractName = provider?.name || t('common.suppliers.list.contractFallback');
       const payload = {
         weddingId: activeWedding,
         payload: {
           type: 'provider_contract',
           subtype: 'basic',
-          title: `Contrato Proveedor - ${provider?.name || 'Proveedor'}`,
+          title: t('common.suppliers.list.contractTitle', { name: contractName }),
           data: {
             supplierId: provider?.id,
             supplierName: provider?.name,
@@ -320,14 +363,15 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
         }
       }
     } catch (e) {
-      setGenError('No se pudo generar el contrato');
+      setGenError(t('common.suppliers.detail.documents.error'));
     } finally {
       setGenerating(false);
     }
   };
 
   const handleOpenLegalDocs = () => {
-    const title = `Contrato Proveedor - ${provider?.name || 'Proveedor'}`;
+    const contractName = provider?.name || t('common.suppliers.list.contractFallback');
+    const title = t('common.suppliers.list.contractTitle', { name: contractName });
     navigate('/protocolo/documentos', {
       state: {
         prefill: {
@@ -376,9 +420,15 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
       };
       await updateProvider(provider.id, newData);
       setRatingDirty(false);
-      setToast({ type: 'success', message: 'Valoracion guardada' });
+      setToast({
+        type: 'success',
+        message: t('common.suppliers.detail.toasts.ratingSaved'),
+      });
     } catch (e) {
-      setToast({ type: 'error', message: 'No se pudo guardar la valoracion' });
+      setToast({
+        type: 'error',
+        message: t('common.suppliers.detail.toasts.ratingError'),
+      });
     } finally {
       setSavingRating(false);
     }
@@ -491,29 +541,45 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
         <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
           <div className="flex justify-between items-center p-4 border-b">
             <h2 className="text-xl font-semibold">{provider.name}</h2>
-            <button onClick={onClose} className="text-gray-500 hover:text-gray-700" aria-label="Cerrar">
+            <button
+              onClick={onClose}
+              className="text-gray-500 hover:text-gray-700"
+              aria-label={t('common.suppliers.detail.closeAria')}
+            >
               <X size={24} />
             </button>
           </div>
 
           <div className="flex border-b overflow-x-auto">
             <button
-              className={`py-3 px-4 ${safeActiveTab === 'info' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+              className={`py-3 px-4 ${
+                safeActiveTab === 'info'
+                  ? 'border-b-2 border-blue-500 text-blue-600'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
               onClick={() => handleTabChange('info')}
             >
-              Información
+              {tabLabels.info}
             </button>
             <button
-              className={`py-3 px-4 ${safeActiveTab === 'communications' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+              className={`py-3 px-4 ${
+                safeActiveTab === 'communications'
+                  ? 'border-b-2 border-blue-500 text-blue-600'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
               onClick={() => handleTabChange('communications')}
             >
-              {typeof window !== 'undefined' && window.Cypress ? 'Seguimiento' : 'Comunicaciones'}
+              {tabLabels.communications}
             </button>
             <button
-              className={`py-3 px-4 ${safeActiveTab === 'contracts' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+              className={`py-3 px-4 ${
+                safeActiveTab === 'contracts'
+                  ? 'border-b-2 border-blue-500 text-blue-600'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
               onClick={() => handleTabChange('contracts')}
             >
-              Contratos y pagos
+              {tabLabels.contracts}
               {safeActiveTab !== 'contracts' && paySuggestions?.length ? (
                 <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">
                   {paySuggestions.length}
@@ -521,10 +587,14 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
               ) : null}
             </button>
             <button
-              className={`py-3 px-4 ${safeActiveTab === 'insights' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+              className={`py-3 px-4 ${
+                safeActiveTab === 'insights'
+                  ? 'border-b-2 border-blue-500 text-blue-600'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
               onClick={() => handleTabChange('insights')}
             >
-              Insights
+              {tabLabels.insights}
             </button>
           </div>
 
@@ -539,7 +609,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                       </span>
                       {provider.depositStatus === 'paid' && (
                         <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700">
-                          Señal pagada
+                          {t('common.suppliers.card.depositPaid')}
                         </span>
                       )}
                       <span className="ml-2 text-gray-500">{provider.service}</span>
@@ -550,38 +620,52 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                             if (onOpenGroups) {
                               onOpenGroups(provider.groupId);
                             } else {
-                              setToast({ type: 'info', message: `Grupo: ${provider.groupName}` });
+                              setToast({
+                                type: 'info',
+                                message: t('common.suppliers.detail.groupToast', {
+                                  name: provider.groupName,
+                                }),
+                              });
                             }
                           }}
                           className="text-xs px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 hover:bg-indigo-200 transition"
-                          title={`Ir al grupo: ${provider.groupName}`}
+                          title={t('common.suppliers.detail.groupButtonTitle', {
+                            name: provider.groupName,
+                          })}
                         >
-                          Grupo: {provider.groupName}
+                          {t('common.suppliers.detail.groupButton', { name: provider.groupName })}
                         </button>
                       )}
                       {!provider.groupId && (
                         <Button size="xs" variant="outline" onClick={() => setAssignOpen(true)}>
-                          Asignar a grupo
+                          {t('common.suppliers.card.actions.assignGroup')}
                         </Button>
                       )}
                     </div>
                     {onEdit && (
                       <Button onClick={() => onEdit(provider)} variant="outline" size="sm">
-                        <Edit2 size={16} className="mr-1" /> Editar
+                        <Edit2 size={16} className="mr-1" /> {t('common.suppliers.card.actions.edit')}
                       </Button>
                     )}
-                    <span className="ml-2 text-xs text-gray-500">Pagos/contratos en plataforma del proveedor</span>
+                    <span className="ml-2 text-xs text-gray-500">
+                      {t('common.suppliers.detail.contracts.externalNote')}
+                    </span>
                     {provider.groupId && (
                       <Button
                         onClick={async () => {
                           if (removing) return;
-                          const ok = window.confirm('Quitar este proveedor del grupo?');
+                          const ok = window.confirm(
+                            t('common.suppliers.detail.groupRemoveConfirm')
+                          );
                           if (!ok) return;
                           try {
                             setRemoving(true);
                             await removeMember(provider.groupId, provider.id);
                             setGroupCleared(true);
-                            setToast({ type: 'success', message: 'Proveedor quitado del grupo' });
+                            setToast({
+                              type: 'success',
+                              message: t('common.suppliers.detail.groupRemoveSuccess'),
+                            });
                           } finally {
                             setRemoving(false);
                           }
@@ -591,7 +675,9 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                         className="ml-2 text-red-600 border-red-200 hover:bg-red-50"
                         disabled={removing}
                       >
-                        {removing ? 'Quitando...' : 'Quitar del grupo'}
+                        {removing
+                          ? t('common.suppliers.detail.groupRemoving')
+                          : t('common.suppliers.detail.groupRemove')}
                       </Button>
                     )}
                   </div>
@@ -611,7 +697,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                           <span className="text-blue-600 font-medium">{provider.contact.charAt(0)}</span>
                         </div>
                         <div>
-                          <p className="font-medium">Contacto</p>
+                          <p className="font-medium">{t('common.suppliers.detail.info.contact')}</p>
                           <p className="text-sm text-gray-600">{provider.contact}</p>
                         </div>
                       </div>
@@ -623,7 +709,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                           <Phone size={16} className="text-green-600" />
                         </div>
                         <div>
-                          <p className="font-medium">Teléfono</p>
+                          <p className="font-medium">{t('common.suppliers.detail.info.phone')}</p>
                           <p className="text-sm text-gray-600">{provider.phone}</p>
                         </div>
                       </div>
@@ -635,7 +721,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                           <Mail size={16} className="text-red-600" />
                         </div>
                         <div className="overflow-hidden">
-                          <p className="font-medium">Email</p>
+                          <p className="font-medium">{t('common.suppliers.detail.info.email')}</p>
                           <a href={`mailto:${provider.email}`} className="text-sm text-blue-600 hover:underline truncate block">
                             {provider.email}
                           </a>
@@ -649,7 +735,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                           <Globe size={16} className="text-purple-600" />
                         </div>
                         <div className="overflow-hidden">
-                          <p className="font-medium">Sitio web</p>
+                          <p className="font-medium">{t('common.suppliers.detail.info.website')}</p>
                           <a
                             href={provider.link}
                             target="_blank"
@@ -668,7 +754,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                           <Calendar size={16} className="text-amber-600" />
                         </div>
                         <div>
-                          <p className="font-medium">Fecha</p>
+                          <p className="font-medium">{t('common.suppliers.detail.info.date')}</p>
                           <p className="text-sm text-gray-600">{formatDate(provider.date)}</p>
                         </div>
                       </div>
@@ -680,7 +766,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                           <MapPin size={16} className="text-teal-600" />
                         </div>
                         <div>
-                          <p className="font-medium">Ubicación</p>
+                          <p className="font-medium">{t('common.suppliers.detail.info.location')}</p>
                           <p className="text-sm text-gray-600">{provider.location || provider.address}</p>
                         </div>
                       </div>
@@ -688,7 +774,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
 
                     {provider.priceRange && (
                       <div className="mt-3 p-3 bg-gray-50 rounded-md">
-                        <p className="font-medium">Rango de precios</p>
+                        <p className="font-medium">{t('common.suppliers.detail.info.priceRange')}</p>
                         <p className="text-lg font-semibold text-gray-800">{provider.priceRange}</p>
                       </div>
                     )}
@@ -696,26 +782,34 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
 
                   <div className="mt-4">
                     <Button size="sm" variant="outline" onClick={handleManualContact}>
-                      Registrar contacto manual
+                      {t('common.suppliers.detail.info.registerManual')}
                     </Button>
                   </div>
 
                   <div className="mt-6">
-                    <p className="font-medium mb-1">Calificacion</p>
+                    <p className="font-medium mb-1">{t('common.suppliers.detail.info.ratingTitle')}</p>
                     <div className="flex items-center space-x-4">
                       {renderRatingStars(rating, true)}
                       <span className="text-sm text-gray-500">
-                        {rating.toFixed(1)} de 5 ({provider.ratingCount || 0} valoraciones)
+                        {t('common.suppliers.detail.info.ratingSummary', {
+                          value: rating.toFixed(1),
+                          total: 5,
+                          count: provider.ratingCount || 0,
+                        })}
                       </span>
                       <Button size="sm" variant="outline" disabled={savingRating || !ratingDirty} onClick={saveRating}>
-                        {savingRating ? 'Guardando...' : 'Guardar valoracion'}
+                        {savingRating
+                          ? t('common.suppliers.detail.info.ratingSaving')
+                          : t('common.suppliers.detail.info.ratingSave')}
                       </Button>
                     </div>
                   </div>
 
                   <div className="mt-6">
                     <div className="flex items-center justify-between mb-2">
-                      <h3 className="text-lg font-medium">Líneas de servicio</h3>
+                      <h3 className="text-lg font-medium">
+                        {t('common.suppliers.detail.serviceLines.title')}
+                      </h3>
                       <div className="flex items-center gap-2">
                         <Button
                           size="sm"
@@ -723,7 +817,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                           onClick={() => setMergeOpen(true)}
                           disabled={!Array.isArray(provider.serviceLines) || provider.serviceLines.length === 0}
                         >
-                          Gestionar líneas
+                          {t('common.suppliers.detail.serviceLines.manage')}
                         </Button>
                       </div>
                     </div>
@@ -732,17 +826,25 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                         <table className="min-w-full text-sm bg-white">
                           <thead className="bg-gray-50 text-gray-600 uppercase text-xs tracking-wide">
                             <tr>
-                              <th className="px-3 py-2 text-left font-medium">Servicio</th>
-                              <th className="px-3 py-2 text-left font-medium">Estado</th>
-                              <th className="px-3 py-2 text-left font-medium">Presupuesto</th>
-                              <th className="px-3 py-2 text-left font-medium">Notas</th>
+                              <th className="px-3 py-2 text-left font-medium">
+                                {t('common.suppliers.detail.serviceLines.headers.service')}
+                              </th>
+                              <th className="px-3 py-2 text-left font-medium">
+                                {t('common.suppliers.detail.serviceLines.headers.status')}
+                              </th>
+                              <th className="px-3 py-2 text-left font-medium">
+                                {t('common.suppliers.detail.serviceLines.headers.budget')}
+                              </th>
+                              <th className="px-3 py-2 text-left font-medium">
+                                {t('common.suppliers.detail.serviceLines.headers.notes')}
+                              </th>
                             </tr>
                           </thead>
                           <tbody>
                             {provider.serviceLines.map((line) => (
                               <tr key={line.id} className="border-t border-gray-100">
                                 <td className="px-3 py-2 font-medium text-gray-800">
-                                  {line.name || 'Sin nombre'}
+                                  {line.name || t('common.suppliers.detail.serviceLines.unnamed')}
                                 </td>
                                 <td className="px-3 py-2">{line.status || '—'}</td>
                                 <td className="px-3 py-2">
@@ -756,80 +858,163 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                       </div>
                     ) : (
                       <p className="text-sm text-gray-500">
-                        Aún no se han definido líneas de servicio para este proveedor.
+                        {t('common.suppliers.detail.serviceLines.empty')}
                       </p>
                     )}
                   </div>
                 </Card>
 
                 <Card>
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-lg font-medium">Estado del proveedor</h3>
-                    {statusLoading && <span className="text-xs text-gray-500">Cargando…</span>}
-                  </div>
-                  {!providerStatus ? (
-                    <p className="text-sm text-gray-600">Sin datos agregados todavía.</p>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                      <div className="p-3 rounded bg-gray-50">
-                        <p className="font-semibold mb-1">Contratos</p>
-                        <p>Total: {providerStatus.contracts?.total ?? 0}</p>
-                        <div className="mt-1 text-gray-700">
-                          <p>Firmados: {providerStatus.contracts?.byStatus?.signed ?? 0}</p>
-                          <p>Enviados: {providerStatus.contracts?.byStatus?.sent ?? 0}</p>
-                          <p>Borradores: {providerStatus.contracts?.byStatus?.draft ?? 0}</p>
-                          <p>Cancelados: {providerStatus.contracts?.byStatus?.cancelled ?? 0}</p>
-                        </div>
-                        <p className="mt-1">Importe firmado: {providerStatus.contracts?.amountSigned ?? 0}</p>
-                        {providerStatus.contracts?.lastUpdate && (
-                          <p className="text-xs text-gray-500 mt-1">Última actualización: {new Date(providerStatus.contracts.lastUpdate).toLocaleString()}</p>
-                        )}
-                      </div>
-                      <div className="p-3 rounded bg-gray-50">
-                        <p className="font-semibold mb-1">Pagos</p>
-                        <p>Total: {providerStatus.payments?.total ?? 0}</p>
-                        <div className="mt-1 text-gray-700">
-                          <p>Pagados: {providerStatus.payments?.byStatus?.paid ?? 0}</p>
-                          <p>Pendientes/Autorizados: {(providerStatus.payments?.byStatus?.pending ?? 0) + (providerStatus.payments?.byStatus?.authorized ?? 0)}</p>
-                          <p>Fallidos: {providerStatus.payments?.byStatus?.failed ?? 0}</p>
-                          <p>Reembolsados: {providerStatus.payments?.byStatus?.refunded ?? 0}</p>
-                        </div>
-                        <p className="mt-1">Importes: pagado {providerStatus.payments?.amount?.paid ?? 0}, pendiente {providerStatus.payments?.amount?.pending ?? 0}</p>
-                        {providerStatus.payments?.lastUpdate && (
-                          <p className="text-xs text-gray-500 mt-1">Última actualización: {new Date(providerStatus.payments.lastUpdate).toLocaleString()}</p>
-                        )}
-                      </div>
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="text-lg font-medium">
+                        {t('common.suppliers.detail.status.title')}
+                      </h3>
+                      {statusLoading && (
+                        <span className="text-xs text-gray-500">
+                          {t('common.suppliers.detail.status.loading')}
+                        </span>
+                      )}
                     </div>
-                  )}
+                    {!providerStatus ? (
+                      <p className="text-sm text-gray-600">
+                        {t('common.suppliers.detail.status.empty')}
+                      </p>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div className="p-3 rounded bg-gray-50">
+                          <p className="font-semibold mb-1">
+                            {t('common.suppliers.detail.status.contracts.title')}
+                          </p>
+                          <p>
+                            {t('common.suppliers.detail.status.contracts.total', {
+                              count: providerStatus.contracts?.total ?? 0,
+                            })}
+                          </p>
+                          <div className="mt-1 text-gray-700">
+                            <p>
+                              {t('common.suppliers.detail.status.contracts.signed', {
+                                count: providerStatus.contracts?.byStatus?.signed ?? 0,
+                              })}
+                            </p>
+                            <p>
+                              {t('common.suppliers.detail.status.contracts.sent', {
+                                count: providerStatus.contracts?.byStatus?.sent ?? 0,
+                              })}
+                            </p>
+                            <p>
+                              {t('common.suppliers.detail.status.contracts.draft', {
+                                count: providerStatus.contracts?.byStatus?.draft ?? 0,
+                              })}
+                            </p>
+                            <p>
+                              {t('common.suppliers.detail.status.contracts.cancelled', {
+                                count: providerStatus.contracts?.byStatus?.cancelled ?? 0,
+                              })}
+                            </p>
+                          </div>
+                          <p className="mt-1">
+                            {t('common.suppliers.detail.status.contracts.amountSigned', {
+                              amount: providerStatus.contracts?.amountSigned ?? 0,
+                            })}
+                          </p>
+                          {providerStatus.contracts?.lastUpdate && (
+                            <p className="text-xs text-gray-500 mt-1">
+                              {t('common.suppliers.detail.status.lastUpdate', {
+                                value: new Date(
+                                  providerStatus.contracts.lastUpdate
+                                ).toLocaleString(),
+                              })}
+                            </p>
+                          )}
+                        </div>
+                        <div className="p-3 rounded bg-gray-50">
+                          <p className="font-semibold mb-1">
+                            {t('common.suppliers.detail.status.payments.title')}
+                          </p>
+                          <p>
+                            {t('common.suppliers.detail.status.payments.total', {
+                              count: providerStatus.payments?.total ?? 0,
+                            })}
+                          </p>
+                          <div className="mt-1 text-gray-700">
+                            <p>
+                              {t('common.suppliers.detail.status.payments.paid', {
+                                count: providerStatus.payments?.byStatus?.paid ?? 0,
+                              })}
+                            </p>
+                            <p>
+                              {t('common.suppliers.detail.status.payments.pending', {
+                                count:
+                                  (providerStatus.payments?.byStatus?.pending ?? 0) +
+                                  (providerStatus.payments?.byStatus?.authorized ?? 0),
+                              })}
+                            </p>
+                            <p>
+                              {t('common.suppliers.detail.status.payments.failed', {
+                                count: providerStatus.payments?.byStatus?.failed ?? 0,
+                              })}
+                            </p>
+                            <p>
+                              {t('common.suppliers.detail.status.payments.refunded', {
+                                count: providerStatus.payments?.byStatus?.refunded ?? 0,
+                              })}
+                            </p>
+                          </div>
+                          <p className="mt-1">
+                            {t('common.suppliers.detail.status.payments.amount', {
+                              paid: providerStatus.payments?.amount?.paid ?? 0,
+                              pending: providerStatus.payments?.amount?.pending ?? 0,
+                            })}
+                          </p>
+                          {providerStatus.payments?.lastUpdate && (
+                            <p className="text-xs text-gray-500 mt-1">
+                              {t('common.suppliers.detail.status.lastUpdate', {
+                                value: new Date(
+                                  providerStatus.payments.lastUpdate
+                                ).toLocaleString(),
+                              })}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    )}
                 </Card>
 
                 <Card>
                   <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
-                        <h3 className="text-lg font-medium">Portal proveedor</h3>
+                        <h3 className="text-lg font-medium">
+                          {t('common.suppliers.detail.portal.title')}
+                        </h3>
                         <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${portalStatusColor}`}>
                           {portalStatus === 'responded'
-                            ? 'Respondido'
+                            ? t('common.suppliers.detail.portal.status.responded')
                             : portalStatus === 'pending'
-                              ? 'Pendiente'
-                              : 'Sin enlace'}
+                            ? t('common.suppliers.detail.portal.status.pending')
+                            : t('common.suppliers.detail.portal.status.none')}
                         </span>
                       </div>
                       <div className="text-sm text-gray-600 space-y-1">
                         <div className="flex items-center gap-2">
-                          <span className="font-semibold">Disponibilidad:</span>
+                          <span className="font-semibold">
+                            {t('common.suppliers.detail.portal.labels.availability')}
+                          </span>
                           <span className="text-gray-800">{portalAvailabilityLabel}</span>
                         </div>
                         {portalLastSubmitText && (
                           <div className="flex items-center gap-2">
-                            <span className="font-semibold">Última respuesta:</span>
+                            <span className="font-semibold">
+                              {t('common.suppliers.detail.portal.labels.lastResponse')}
+                            </span>
                             <span>{portalLastSubmitText}</span>
                           </div>
                         )}
                         {portalLastMessage && (
                           <div>
-                            <span className="font-semibold">Último mensaje:</span>
+                            <span className="font-semibold">
+                              {t('common.suppliers.detail.portal.labels.lastMessage')}
+                            </span>
                             <p className="mt-1 p-2 border border-gray-200 bg-white rounded text-sm text-gray-700 line-clamp-3">
                               {portalLastMessage}
                             </p>
@@ -837,12 +1022,12 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                         )}
                         {portalStatus === 'pending' && (
                           <p className="text-xs text-amber-600">
-                            Invitación enviada: a la espera de respuesta del proveedor.
+                            {t('common.suppliers.detail.portal.pendingHint')}
                           </p>
                         )}
                         {portalStatus === 'none' && (
                           <p className="text-xs text-gray-500">
-                            Genera un enlace para que el proveedor pueda responder desde su portal privado.
+                            {t('common.suppliers.detail.portal.noneHint')}
                           </p>
                         )}
                       </div>
@@ -853,10 +1038,12 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                         onClick={handleCopyPortalLink}
                         disabled={!activeWedding || !provider?.id}
                       >
-                        Copiar enlace del portal
+                        {t('common.suppliers.detail.portal.copyLink')}
                       </Button>
                       {portalLastSubmitText && (
-                        <span className="text-xs text-emerald-600">Respuesta registrada.</span>
+                        <span className="text-xs text-emerald-600">
+                          {t('common.suppliers.detail.portal.responseRegistered')}
+                        </span>
                       )}
                     </div>
                   </div>
@@ -867,15 +1054,19 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                 <Card>
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="text-lg font-medium">Documentos</h3>
+                      <h3 className="text-lg font-medium">
+                        {t('common.suppliers.detail.documents.title')}
+                      </h3>
                       {genError && <p className="text-sm text-red-600 mt-1">{genError}</p>}
                     </div>
                     <div className="flex gap-2">
                       <Button onClick={handleOpenLegalDocs} variant="outline">
-                        Crear contrato en Documentos
+                        {t('common.suppliers.detail.documents.open')}
                       </Button>
                       <Button onClick={handleGenerateContract} disabled={!activeWedding || generating}>
-                        {generating ? 'Generando...' : 'Generar ahora'}
+                        {generating
+                          ? t('common.suppliers.detail.documents.generating')
+                          : t('common.suppliers.detail.documents.generate')}
                       </Button>
                     </div>
                   </div>
@@ -883,32 +1074,48 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
 
                 <Card>
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-lg font-medium">RFQ envianos</h3>
+                    <h3 className="text-lg font-medium">
+                      {t('common.suppliers.detail.rfq.title')}
+                    </h3>
                     <div className="flex gap-2">
                       <Button
                         variant="outline"
                         onClick={() => {
-                          setRfqDefaults({ subject: `Solicitud de presupuesto - ${provider?.service || ''}`.trim(), body: '' });
+                          setRfqDefaults({
+                            subject: t('common.suppliers.detail.rfq.defaultSubject', {
+                              service: provider?.service || '',
+                            }).trim(),
+                            body: '',
+                          });
                           setRfqOpen(true);
                         }}
                       >
-                        Enviar nuevo
+                        {t('common.suppliers.detail.rfq.new')}
                       </Button>
                     </div>
                   </div>
                   {rfqLoading ? (
-                    <p className="text-sm text-gray-500">Cargando...</p>
+                    <p className="text-sm text-gray-500">
+                      {t('common.suppliers.detail.rfq.loading')}
+                    </p>
                   ) : rfqHistory.length === 0 ? (
-                    <p className="text-sm text-gray-500">Sin RFQs previos.</p>
+                    <p className="text-sm text-gray-500">
+                      {t('common.suppliers.detail.rfq.empty')}
+                    </p>
                   ) : (
                     <ul className="divide-y">
                       {rfqHistory.map((r) => (
                         <li key={r.id} className="py-2 flex items-center justify-between">
                           <div>
                             <p className="font-medium truncate max-w-[28rem]" title={r.subject}>
-                              {r.subject || 'Sin asunto'}
+                              {r.subject || t('common.suppliers.detail.rfq.noSubject')}
                             </p>
-                            <p className="text-xs text-gray-600">{r.email || provider?.email} – {formatDateTime(r.sentAt)}</p>
+                            <p className="text-xs text-gray-600">
+                              {t('common.suppliers.detail.rfq.sentAt', {
+                                email: r.email || provider?.email,
+                                date: formatDateTime(r.sentAt),
+                              })}
+                            </p>
                           </div>
                           <Button
                             size="sm"
@@ -918,7 +1125,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                               setRfqOpen(true);
                             }}
                           >
-                            Reenviar
+                            {t('common.suppliers.detail.rfq.resend')}
                           </Button>
                         </li>
                       ))}
@@ -927,37 +1134,57 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                 </Card>
                 <Card>
                   <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-lg font-medium">Sugerencias de pago (emails)</h3>
+                    <h3 className="text-lg font-medium">
+                      {t('common.suppliers.detail.paySuggestions.title')}
+                    </h3>
                     <Button size="sm" variant="outline" onClick={() => {
                       // Forzar recarga
                       const ev = new Event('reloadPaySuggestions');
                       try { window.dispatchEvent(ev); } catch {}
                     }} disabled={payLoading}>
-                      {payLoading ? 'Cargando…' : 'Actualizar'}
+                      {payLoading
+                        ? t('common.suppliers.detail.paySuggestions.refreshing')
+                        : t('common.suppliers.detail.paySuggestions.refresh')}
                     </Button>
                   </div>
                   {payLoading ? (
-                    <div className="text-sm text-gray-600">Cargando…</div>
+                    <div className="text-sm text-gray-600">
+                      {t('common.suppliers.detail.paySuggestions.loading')}
+                    </div>
                   ) : paySuggestions.length === 0 ? (
-                    <div className="text-sm text-gray-600">Sin sugerencias</div>
+                    <div className="text-sm text-gray-600">
+                      {t('common.suppliers.detail.paySuggestions.empty')}
+                    </div>
                   ) : (
                     <ul className="space-y-2">
                       {paySuggestions.slice(0, 4).map((s, idx) => (
                         <li key={idx} className="p-2 border rounded flex items-center justify-between text-sm">
                           <div className="min-w-0">
-                            <div className="font-medium truncate" title={s.subject}>{s.subject || '(Sin asunto)'}</div>
-                            <div className="text-gray-600">{s.rawAmount || s.amount} {s.currency || ''} · {formatDate(s.date, 'short')}</div>
+                            <div className="font-medium truncate" title={s.subject}>
+                              {s.subject || t('common.suppliers.detail.paySuggestions.noSubject')}
+                            </div>
+                            <div className="text-gray-600">
+                              {t('common.suppliers.detail.paySuggestions.amountDate', {
+                                amount: s.rawAmount || s.amount,
+                                currency: s.currency || '',
+                                date: formatDate(s.date, 'short'),
+                              })}
+                            </div>
                           </div>
                           <Button size="sm" onClick={() => {
                             const isIncome = (s.direction || 'outgoing') === 'incoming';
                             const amt = typeof s.amount === 'number' && !Number.isNaN(s.amount) ? String(s.amount) : '';
                             const prefill = {
-                              concept: `Pago proveedor - ${provider?.name || ''}`.trim(),
+                              concept: t('common.suppliers.detail.paySuggestions.prefillConcept', {
+                                name: provider?.name || '',
+                              }).trim(),
                               amount: amt,
                               date: (s.date || '').slice(0, 10),
                               type: isIncome ? 'income' : 'expense',
                               category: '',
-                              description: `Desde email: ${s.subject}`,
+                              description: t('common.suppliers.detail.paySuggestions.prefillDescription', {
+                                subject: s.subject,
+                              }),
                               provider: provider?.name || '',
                               status: isIncome ? 'received' : 'paid',
                               paidAmount: amt,
@@ -969,7 +1196,9 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                                 window.location.assign('/finance#nuevo');
                               }
                             } catch {}
-                          }}>Registrar en Finanzas</Button>
+                          }}>
+                            {t('common.suppliers.detail.paySuggestions.register')}
+                          </Button>
                         </li>
                       ))}
                     </ul>
@@ -981,8 +1210,12 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
             {safeActiveTab === 'communications' && (
               <div className="space-y-4">
                 <Card>
-                  <h3 className="text-lg font-medium mb-3">Comunicaciones</h3>
-                  <p className="text-gray-500">Historial de comunicaciones con este proveedor.</p>
+                  <h3 className="text-lg font-medium mb-3">
+                    {t('common.suppliers.detail.communications.title')}
+                  </h3>
+                  <p className="text-gray-500">
+                    {t('common.suppliers.detail.communications.subtitle')}
+                  </p>
                 </Card>
               </div>
             )}
@@ -991,9 +1224,13 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
               <div className="space-y-4">
                 <Card>
                   <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-lg font-medium">Seguimiento</h3>
+                    <h3 className="text-lg font-medium">
+                      {t('common.suppliers.detail.contractsTab.title')}
+                    </h3>
                     <Button size="sm" variant="outline" onClick={refreshMailEvents} disabled={loadingEvents}>
-                      {loadingEvents ? 'Actualizando…' : 'Actualizar eventos'}
+                      {loadingEvents
+                        ? t('common.suppliers.detail.contractsTab.refreshing')
+                        : t('common.suppliers.detail.contractsTab.refresh')}
                     </Button>
                   </div>
                   <EmailTrackingList
@@ -1008,7 +1245,9 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
           </div>
 
           <div className="border-t p-4 bg-gray-50 flex justify-end space-x-3">
-            <Button variant="outline" onClick={onClose}>Cerrar</Button>
+            <Button variant="outline" onClick={onClose}>
+              {t('common.suppliers.detail.close')}
+            </Button>
           </div>
         </div>
       </div>
@@ -1022,15 +1261,27 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
       )}
 
       {preview.open && (
-        <Modal open={preview.open} onClose={() => setPreview({ open: false, url: '', type: '' })} title="Vista previa">
+        <Modal
+          open={preview.open}
+          onClose={() => setPreview({ open: false, url: '', type: '' })}
+          title={t('common.suppliers.detail.preview.title')}
+        >
           <div className="min-h-[60vh]">
             {preview.type === 'image' ? (
-              <img src={preview.url} alt="preview" className="max-h-[70vh] mx-auto" />
+              <img
+                src={preview.url}
+                alt={t('common.suppliers.detail.preview.imageAlt')}
+                className="max-h-[70vh] mx-auto"
+              />
             ) : preview.type === 'pdf' ? (
-              <iframe src={preview.url} className="w-full h-[70vh]" title="PDF" />
+              <iframe
+                src={preview.url}
+                className="w-full h-[70vh]"
+                title={t('common.suppliers.detail.preview.pdfTitle')}
+              />
             ) : (
               <a href={preview.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
-                Abrir en nueva pestaña
+                {t('common.suppliers.detail.preview.openExternal')}
               </a>
             )}
           </div>
@@ -1059,9 +1310,15 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
           setMergeOpen(false);
           if (!result) return;
           if (result.type === 'merge') {
-            setToast({ type: 'success', message: 'Líneas combinadas correctamente.' });
+            setToast({
+              type: 'success',
+              message: t('common.suppliers.detail.toasts.mergeSuccess'),
+            });
           } else if (result.type === 'split') {
-            setToast({ type: 'success', message: 'Se creó un proveedor nuevo con las líneas seleccionadas.' });
+            setToast({
+              type: 'success',
+              message: t('common.suppliers.detail.toasts.splitSuccess'),
+            });
           }
         }}
       />
@@ -1076,4 +1333,3 @@ export default React.memo(ProveedorDetail, (prevProps, nextProps) => {
     JSON.stringify(prevProps.provider) === JSON.stringify(nextProps.provider)
   );
 });
-

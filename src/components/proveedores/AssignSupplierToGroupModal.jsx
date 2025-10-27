@@ -2,12 +2,14 @@ import React, { useMemo, useState } from 'react';
 
 import useProveedores from '../../hooks/useProveedores';
 import useSupplierGroups from '../../hooks/useSupplierGroups';
+import useTranslations from '../../hooks/useTranslations';
 import Modal from '../Modal';
 import Button from '../ui/Button';
 
 export default function AssignSupplierToGroupModal({ open, onClose, provider }) {
   const { groups, addMembers, createGroup } = useSupplierGroups();
   const { updateProvider } = useProveedores();
+  const { t } = useTranslations();
   const [mode, setMode] = useState('assign'); // 'assign' | 'create'
   const [groupId, setGroupId] = useState('');
   const [name, setName] = useState('');
@@ -47,36 +49,45 @@ export default function AssignSupplierToGroupModal({ open, onClose, provider }) 
 
   if (!open) return null;
   return (
-    <Modal open={open} onClose={() => onClose?.()} title="Asignar a grupo">
+    <Modal
+      open={open}
+      onClose={() => onClose?.()}
+      title={t('common.suppliers.assignModal.title', { count: provider ? 1 : 0 })}
+    >
       <div className="space-y-4">
         <div className="flex items-center gap-4">
           <label className="text-sm inline-flex items-center gap-2">
             <input type="radio" checked={mode === 'assign'} onChange={() => setMode('assign')} />
-            Asignar a existente
+            {t('common.suppliers.assignModal.modeAssign')}
           </label>
           <label className="text-sm inline-flex items-center gap-2">
             <input type="radio" checked={mode === 'create'} onChange={() => setMode('create')} />
-            Crear nuevo grupo
+            {t('common.suppliers.assignModal.modeCreate')}
           </label>
         </div>
 
         {mode === 'assign' ? (
           (!groups || groups.length === 0) ? (
             <p className="text-sm text-gray-600">
-              No hay grupos creados todavía. Puedes crear uno nuevo.
+              {t('common.suppliers.assignModal.emptyGroups')}
             </p>
           ) : (
             <div>
-              <label className="block text-sm text-gray-700 mb-1">Selecciona un grupo existente</label>
+              <label className="block text-sm text-gray-700 mb-1">
+                {t('common.suppliers.assignModal.groupLabel')}
+              </label>
               <select
                 className="w-full border rounded p-2"
                 value={groupId}
                 onChange={(e) => setGroupId(e.target.value)}
               >
-                <option value="">Seleccionar…</option>
+                <option value="">{t('common.suppliers.assignModal.groupPlaceholder')}</option>
                 {groups.map((g) => (
                   <option key={g.id} value={g.id}>
-                    {g.name || g.id} ({(g.memberIds || []).length} miembros)
+                    {g.name || g.id}{' '}
+                    {t('common.suppliers.assignModal.membersCount', {
+                      count: (g.memberIds || []).length,
+                    })}
                   </option>
                 ))}
               </select>
@@ -84,18 +95,26 @@ export default function AssignSupplierToGroupModal({ open, onClose, provider }) 
           )
         ) : (
           <div>
-            <label className="block text-sm text-gray-700 mb-1">Nombre del nuevo grupo</label>
+            <label className="block text-sm text-gray-700 mb-1">
+              {t('common.suppliers.assignModal.newGroupLabel')}
+            </label>
             <input
               className="w-full border rounded p-2"
-              placeholder="Ej. Fotógrafos favoritos"
+              placeholder={t('common.suppliers.assignModal.newGroupPlaceholder')}
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
           </div>
         )}
         <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={() => onClose?.()}>Cancelar</Button>
-          <Button onClick={confirm} disabled={!canAssign}>{mode === 'assign' ? 'Asignar' : 'Crear y asignar'}</Button>
+          <Button variant="outline" onClick={() => onClose?.()}>
+            {t('common.suppliers.assignModal.cancel')}
+          </Button>
+          <Button onClick={confirm} disabled={!canAssign}>
+            {mode === 'assign'
+              ? t('common.suppliers.assignModal.confirmAssign')
+              : t('common.suppliers.assignModal.confirmCreate')}
+          </Button>
         </div>
       </div>
     </Modal>

@@ -13,6 +13,9 @@ import { performanceMonitor } from '../services/PerformanceMonitor';
 */
 const STORAGE_KEY = 'mywed360SpecialMoments';
 
+export const RESPONSABLES_LIMIT = 12;
+export const SUPPLIERS_LIMIT = 12;
+
 // Bloques por defecto (alineados con pginas existentes)
 const DEFAULT_BLOCKS = [
   { id: 'ceremonia', name: 'Ceremonia' },

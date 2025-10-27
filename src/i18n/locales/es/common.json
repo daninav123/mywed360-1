@@ -1,4 +1,4 @@
-{
+﻿{
   "accion_cancelada": "Acción cancelada",
   "acciones_creadas_manualmente_los_ultimos": "Acciones creadas manualmente en los últimos 14 días",
   "acompanantes": "Acompañantes",
@@ -2613,6 +2613,65 @@
         "genericError": "Error creando grupo"
       }
     },
+    "rfqModal": {
+      "defaults": {
+        "subject": "Solicitud de información para {servicio}",
+        "body": "Hola {proveedor_nombre},\\n\\nSomos {novios} y estamos organizando nuestra boda el {fecha_evento} en {lugar}. Nos encantaría conocer vuestra disponibilidad y tarifas para {servicio}.\\n\\nDetalles clave:\\n• Invitados: {invitados}\\n• Presupuesto aproximado: {presupuesto}\\n• Wedding planner: {organizador}\\n\\n¿Podríais enviarnos una propuesta inicial o concertar una llamada?\\n\\nGracias y quedamos atentos a vuestra respuesta.\\n\\n{organizador}",
+        "unknownDate": "Fecha por confirmar"
+      },
+      "title": "Enviar RFQ ({{count}})",
+      "missingEmails": "{{count, plural, one=1 proveedor no tiene email. Añádelo para incluirlo en la solicitud., other={{count}} proveedores no tienen email. Añádelos para incluirlos en la solicitud.}}",
+      "templates": {
+        "label": "Plantillas guardadas",
+        "placeholder": "Selecciona una plantilla",
+        "nameLabel": "Nombre de la plantilla",
+        "namePlaceholder": "Ej. Seguimiento fotógrafos",
+        "serviceLabel": "Servicio por defecto",
+        "servicePlaceholder": "Ej. Fotografía",
+        "save": "Guardar plantilla",
+        "delete": "Eliminar plantilla",
+        "defaultName": "Plantilla sin título"
+      },
+      "subjectLabel": "Asunto del correo",
+      "messageLabel": "Mensaje",
+      "variablesLabel": "Variables disponibles",
+      "variablesInsert": "Insertar variable",
+      "reminders": {
+        "title": "Recordatorios automáticos",
+        "clear": "Borrar recordatorios",
+        "none": "Sin recordatorios activos",
+        "add": "Añadir recordatorio en {{day}} días",
+        "summary": "Se enviarán recordatorios en {{days}} días",
+        "disabled": "Los recordatorios están desactivados"
+      },
+      "attachments": {
+        "title": "Adjuntos",
+        "namePlaceholder": "Nombre para mostrar",
+        "urlPlaceholder": "URL (https://...)",
+        "remove": "Eliminar",
+        "add": "Añadir adjunto",
+        "upload": "Subir desde el dispositivo",
+        "uploading": "Subiendo..."
+      },
+      "errors": {
+        "upload": "No se pudo subir el adjunto: {{message}}"
+      },
+      "preview": {
+        "title": "Vista previa",
+        "subject": "Asunto:"
+      },
+      "result": {
+        "success": "Se enviaron {{count}} solicitudes correctamente.",
+        "reminders": "Recordatorios programados: {{days}}",
+        "failure": "{{count}} envíos fallidos.",
+        "failureSummary": "{{sentCount}} proveedores recibieron la solicitud. Recordatorios programados: {{reminders}}."
+      },
+      "buttons": {
+        "close": "Cerrar",
+        "send": "Enviar RFQ",
+        "sending": "Enviando..."
+      }
+    },
     "groupSuggestions": {
       "title": "Sugerencias basadas en presupuestos",
       "overlaps": {
@@ -2660,6 +2719,68 @@
       "cancel": "Cancelar",
       "confirm": "Crear grupo"
     },
+    "mergeWizard": {
+      "title": "Combinar o dividir líneas de servicio",
+      "description": "Selecciona las líneas de servicio afectadas y elige si quieres combinarlas en una sola ficha o moverlas a un proveedor nuevo. Los cambios se registran inmediatamente en Firestore.",
+      "statusOptions": {
+        "pending": "Pendiente",
+        "contacted": "Contactado",
+        "quote": "Presupuesto",
+        "selected": "Seleccionado",
+        "confirmed": "Confirmado",
+        "rejected": "Rechazado"
+      },
+      "lists": {
+        "heading": "Líneas del proveedor",
+        "selected": "Seleccionadas: {{selected}}/{{total}}",
+        "empty": "Este proveedor no tiene líneas registradas.",
+        "unnamed": "Sin nombre",
+        "meta": "Estado: {{status}} · Presupuesto: {{budget}}",
+        "budgetValue": "€ {{amount}}",
+        "budgetUnknown": "—"
+      },
+      "actionPanel": {
+        "title": "Acción",
+        "merge": "Combinar en una sola línea",
+        "split": "Mover a un proveedor nuevo"
+      },
+      "merge": {
+        "primaryLabel": "Línea principal",
+        "primaryPlaceholder": "Selecciona una línea",
+        "primaryOption": "{{name}} · {{status}}",
+        "nameLabel": "Nombre combinado",
+        "namePlaceholder": "Ej. Catering + Barra libre",
+        "statusLabel": "Estado",
+        "statusKeep": "Mantener existente",
+        "budgetLabel": "Presupuesto combinado",
+        "budgetPlaceholder": "Ej. 2500",
+        "notesLabel": "Notas",
+        "notesPlaceholder": "Notas adicionales"
+      },
+      "split": {
+        "nameLabel": "Nombre del nuevo proveedor",
+        "namePlaceholder": "Ej. Catering Exclusivo",
+        "serviceLabel": "Servicio principal",
+        "servicePlaceholder": "Ej. Catering",
+        "statusLabel": "Estado inicial",
+        "copyContact": "Copiar datos de contacto del proveedor original"
+      },
+      "errors": {
+        "createProvider": "No se pudo crear el nuevo proveedor.",
+        "merge": "No se pudo completar la fusión.",
+        "split": "No se pudo dividir el proveedor."
+      },
+      "warnings": {
+        "irreversible": "Cambios irreversibles. Considera exportar el proveedor antes de realizar ajustes permanentes."
+      },
+      "buttons": {
+        "cancel": "Cancelar",
+        "merge": "Combinar líneas",
+        "mergeSubmitting": "Aplicando…",
+        "split": "Crear proveedor nuevo",
+        "splitSubmitting": "Creando…"
+      }
+    },
     "providerEmailModal": {
       "title": "Contactar proveedor",
       "closeAria": "Cerrar",
@@ -2704,6 +2825,394 @@
       },
       "closeButton": "Cerrar",
       "saveButton": "Guardar proveedor"
+    },
+    "aiSearchModal": {
+      "title": "Búsqueda inteligente",
+      "closeAria": "Cerrar",
+      "inputPlaceholder": "Describe lo que buscas...",
+      "search": "Buscar",
+      "searching": "Buscando...",
+      "example": "Ejemplo: \"Fotógrafo estilo natural en Sevilla\"",
+      "filters": {
+        "service": "Servicio",
+        "all": "Todos"
+      },
+      "suggestionsTitle": "Sugerencias",
+      "suggestions": [
+        "Fotógrafo estilo documental",
+        "Catering para 120 invitados",
+        "DJ disponible en agosto",
+        "Floristería vintage en Madrid",
+        "Lugar al aire libre cerca de Barcelona"
+      ],
+      "footer": {
+        "powered": "Impulsado por IA",
+        "close": "Cerrar"
+      }
+    },
+    "aiResultList": {
+      "loading": {
+        "title": "Buscando proveedores...",
+        "subtitle": "Analizando tu consulta: \"{{query}}\""
+      },
+      "error": {
+        "title": "Error al buscar",
+        "retry": "Intentar de nuevo"
+      },
+      "emptyQuery": {
+        "title": "Busca proveedores con IA",
+        "description": "Describe lo que buscas en lenguaje natural y la IA encontrará los proveedores más adecuados."
+      },
+      "noResults": {
+        "title": "No se encontraron resultados",
+        "description": "No hay proveedores que coincidan con tu búsqueda \"{{query}}\". Intenta con otros términos o verifica que el backend esté ejecutándose correctamente."
+      },
+      "fallbackNotice": "Mostrando resultados de demostración por indisponibilidad del servidor.",
+      "summary": {
+        "prefix": "Se encontraron ",
+        "suffix": " proveedores para tu búsqueda:"
+      },
+      "matchBadge": "{{value}}% coincidencia",
+      "locationLabel": "Ubicación:",
+      "aiAnalysis": "Análisis de IA",
+      "buttons": {
+        "view": "Ver detalles",
+        "add": "Añadir",
+        "email": "Enviar email",
+        "select": "Seleccionar"
+      }
+    },
+    "aiEmailModal": {
+      "title": "Contactar a {{name}}",
+      "closeAria": "Cerrar",
+      "success": {
+        "title": "Email enviado correctamente",
+        "message": "Tu mensaje ha sido enviado al proveedor. Recibirás una notificación cuando responda."
+      },
+      "error": {
+        "title": "Error al enviar el email"
+      },
+      "from": "Enviando desde:",
+      "to": "Para:",
+      "subject": {
+        "label": "Asunto",
+        "placeholder": "Asunto del correo"
+      },
+      "body": {
+        "label": "Mensaje",
+        "placeholder": "Escribe tu mensaje aquí..."
+      },
+      "aiSummary": "¿Por qué este proveedor?",
+      "buttons": {
+        "cancel": "Cancelar",
+        "send": "Enviar email",
+        "sending": "Enviando..."
+      }
+    },
+    "list": {
+      "contractTitle": "Contrato proveedor - {{name}}",
+      "contractFallback": "Proveedor",
+      "tabs": {
+        "contracted": "Contratados",
+        "searching": "Buscados",
+        "favorites": "Favoritos",
+        "aria": "Filtros de proveedores"
+      },
+      "filters": {
+        "searchLabel": "Buscar",
+        "searchPlaceholder": "Nombre, servicio, estado, descripción...",
+        "serviceLabel": "Servicio",
+        "statusLabel": "Estado",
+        "allOption": "Todos",
+        "dateFrom": "Desde",
+        "dateTo": "Hasta",
+        "ratingLabel": "Rating mínimo",
+        "clear": "Limpiar filtros",
+        "statusOptions": {
+          "pending": "Pendiente",
+          "contacted": "Contactado",
+          "selected": "Seleccionado",
+          "confirmed": "Confirmado",
+          "rejected": "Rechazado"
+        }
+      },
+      "selection": {
+        "count": "{{count}} seleccionados",
+        "compare": "Comparar",
+        "sendRfq": "Enviar RFQ",
+        "group": "Agrupar",
+        "changeStatus": "Cambiar estado",
+        "duplicates": "Revisar duplicados",
+        "clear": "Limpiar"
+      },
+      "empty": "No hay proveedores en esta pestaña.",
+      "loadingVirtualized": "Preparando lista..."
+    },
+    "card": {
+      "scoreTooltip": "Puntuación IA consolidada",
+      "scoreLabel": "Score {{value}}",
+      "metrics": {
+        "matchLabel": "Match IA:",
+        "experienceLabel": "Experiencia:",
+        "responseLabel": "Agilidad:",
+        "percent": "{{value}}%"
+      },
+      "portal": {
+        "responded": "Portal respondido",
+        "pending": "Portal pendiente"
+      },
+      "groupTooltip": "Grupo: {{name}}",
+      "budget": {
+        "acceptedTooltip": "Presupuesto aceptado: {{amount}} {{currency}}",
+        "latestTooltip": "Último presupuesto: {{amount}} {{currency}}",
+        "genericTooltip": "Presupuesto",
+        "accepted": "Presupuesto aceptado",
+        "pending": "Presupuesto pendiente ({{count}})",
+        "received": "Presupuesto recibido"
+      },
+      "contactLabel": "Contacto: {{value}}",
+      "phoneLabel": "Tel: {{value}}",
+      "priceLabel": "Precio: {{value}}",
+      "depositPaid": "Señal pagada",
+      "dateLabel": "{{value}}",
+      "actions": {
+        "view": "Ver",
+        "edit": "Editar",
+        "viewBudget": "Ver presupuesto",
+        "assignGroup": "Asignar a grupo",
+        "delete": "Eliminar",
+        "reserve": "Reservar",
+        "requestQuote": "Solicitar presupuesto",
+        "requestMeeting": "Pedir cita"
+      },
+      "autoEmail": {
+        "signature": "Enviado automáticamente desde MaLove.App",
+        "subjectQuote": "Solicitud de presupuesto - {{target}}",
+        "subjectMeeting": "Solicitud de reunión - {{target}}",
+        "missingEmail": "Agrega un email de contacto al proveedor para enviar solicitudes automáticas.",
+        "successQuote": "Solicitud de presupuesto enviada automáticamente.",
+        "successMeeting": "Solicitud de cita enviada automáticamente.",
+        "sendErrorRetry": "No se pudo enviar el correo automático. Inténtalo nuevamente.",
+        "sendError": "No se pudo enviar el correo automático.",
+        "sending": "Enviando..."
+      },
+      "tracking": {
+        "status": "Seguimiento: {{status}}",
+        "last": "Último: {{value}}",
+        "thread": "Hilo: {{count}}",
+        "openInboxTitle": "Abrir bandeja de entrada",
+        "openInbox": "Ver correo",
+        "detailsTitle": "Ver detalles de seguimiento",
+        "details": "Detalles",
+        "defaultSubject": "Mensaje para {{name}}"
+      },
+      "emails": {
+        "toggleTitle": "Ver correos relacionados",
+        "hide": "Ocultar correos",
+        "show": "Correos relacionados ({{count}})",
+        "loading": "Cargando correos...",
+        "empty": "Sin correos relacionados",
+        "noSubject": "(Sin asunto)",
+        "openInbox": "Abrir en buzón"
+      },
+      "favorite": {
+        "add": "Marcar como favorito",
+        "remove": "Quitar de favoritos"
+      },
+      "pendingTooltip": "Pendiente de revisar"
+    },
+    "budgets": {
+      "loading": "Cargando presupuestos…",
+      "error": "Error: {{message}}",
+      "empty": "Sin presupuestos.",
+      "title": "Presupuestos",
+      "defaultDescription": "Presupuesto",
+      "portalTag": "Portal",
+      "portalPendingReview": "Pendiente de revisión interna.",
+      "status": {
+        "pending": "Pendiente",
+        "accepted": "Aceptado",
+        "rejected": "Rechazado",
+        "submitted": "Enviado",
+        "unknown": "desconocido"
+      },
+      "buttons": {
+        "accept": "Aceptar",
+        "reject": "Rechazar",
+        "registerFinance": "Registrar en Finanzas"
+      },
+      "prefillConcept": "Presupuesto aceptado - {{name}}",
+      "prefillDescription": "Desde presupuesto: {{description}}"
+    },
+    "detail": {
+      "closeAria": "Cerrar",
+      "close": "Cerrar",
+      "tabs": {
+        "info": "Información",
+        "communications": "Comunicaciones",
+        "followUp": "Seguimiento",
+        "contracts": "Contratos y pagos",
+        "insights": "Insights"
+      },
+      "preview": {
+        "title": "Vista previa",
+        "imageAlt": "Vista previa",
+        "pdfTitle": "PDF",
+        "openExternal": "Abrir en nueva pestaña"
+      },
+      "portal": {
+        "title": "Portal proveedor",
+        "status": {
+          "responded": "Respondido",
+          "pending": "Pendiente",
+          "none": "Sin enlace"
+        },
+        "availability": {
+          "none": "Sin respuesta",
+          "available": "Disponible",
+          "unavailable": "No disponible",
+          "pending": "Por confirmar"
+        },
+        "labels": {
+          "availability": "Disponibilidad:",
+          "lastResponse": "Última respuesta:",
+          "lastMessage": "Último mensaje:"
+        },
+        "pendingHint": "Invitación enviada: a la espera de respuesta del proveedor.",
+        "noneHint": "Genera un enlace para que el proveedor pueda responder desde su portal privado.",
+        "copyLink": "Copiar enlace del portal",
+        "responseRegistered": "Respuesta registrada."
+      },
+      "groupToast": "Grupo: {{name}}",
+      "groupButtonTitle": "Ir al grupo: {{name}}",
+      "groupButton": "Grupo: {{name}}",
+      "contracts": {
+        "externalNote": "Pagos/contratos en plataforma del proveedor"
+      },
+      "groupRemoveConfirm": "¿Quitar este proveedor del grupo?",
+      "groupRemoveSuccess": "Proveedor quitado del grupo",
+      "groupRemoving": "Quitando...",
+      "groupRemove": "Quitar del grupo",
+      "documents": {
+        "title": "Documentos",
+        "open": "Crear contrato en Documentos",
+        "generate": "Generar ahora",
+        "generating": "Generando…",
+        "error": "No se pudo generar el contrato"
+      },
+      "rfq": {
+        "title": "RFQs enviados",
+        "defaultSubject": "Solicitud de presupuesto - {{service}}",
+        "new": "Enviar nuevo",
+        "loading": "Cargando...",
+        "empty": "Sin RFQs previos.",
+        "noSubject": "Sin asunto",
+        "sentAt": "{{email}} – {{date}}",
+        "resend": "Reenviar",
+        "open": "Abrir"
+      },
+      "paySuggestions": {
+        "title": "Sugerencias de pago (emails)",
+        "loading": "Cargando…",
+        "refresh": "Actualizar",
+        "refreshing": "Actualizando…",
+        "empty": "Sin sugerencias",
+        "noSubject": "(Sin asunto)",
+        "amountDate": "{{amount}} {{currency}} · {{date}}",
+        "register": "Registrar en Finanzas",
+        "prefillConcept": "Pago proveedor - {{name}}",
+        "prefillDescription": "Desde email: {{subject}}"
+      },
+      "contractsTab": {
+        "title": "Seguimiento",
+        "refresh": "Actualizar eventos",
+        "refreshing": "Actualizando…"
+      },
+      "communications": {
+        "title": "Comunicaciones",
+        "subtitle": "Historial de comunicaciones con este proveedor."
+      },
+      "preview": {
+        "title": "Vista previa",
+        "imageAlt": "Vista previa",
+        "pdfTitle": "PDF",
+        "openExternal": "Abrir en nueva pestaña"
+      },
+      "toasts": {
+        "paySuggestionsError": "No se pudieron obtener sugerencias.",
+        "payStartError": "No se pudo iniciar el pago.",
+        "manualContactSuccess": "Contacto manual registrado.",
+        "manualContactError": "No se pudo registrar el contacto.",
+        "portalCopied": "Enlace del portal copiado.",
+        "portalToken": "Token generado.",
+        "portalError": "No se pudo generar el enlace del portal.",
+        "ratingSaved": "Calificación guardada.",
+        "ratingError": "No se pudo guardar la calificación.",
+        "mergeSuccess": "Líneas combinadas correctamente.",
+        "splitSuccess": "Se creó un proveedor nuevo con las líneas seleccionadas."
+      },
+      "prompts": {
+        "depositAmount": "Importe de la señal (EUR):",
+        "depositDefault": "100",
+        "manualContactNote": "Nota para el contacto manual (opcional)"
+      },
+      "alerts": {
+        "portalPending": "Enlace de portal enviado. Esperando respuesta.",
+        "portalInactive": "Portal proveedor sin activar.",
+        "noContracts": "Aún no hay contratos firmados con este proveedor.",
+        "pendingPayments": "Existen pagos pendientes por registrar o confirmar.",
+        "styleBalance": "Revisar equilibrio de estilo: este proveedor afecta el contraste configurado."
+      },
+      "info": {
+        "contact": "Contacto",
+        "phone": "Teléfono",
+        "email": "Email",
+        "website": "Sitio web",
+        "date": "Fecha",
+        "location": "Ubicación",
+        "priceRange": "Rango de precios",
+        "registerManual": "Registrar contacto manual",
+        "ratingTitle": "Calificación",
+        "ratingSummary": "{{value}} de {{total}} ({{count}} valoraciones)",
+        "ratingSaving": "Guardando...",
+        "ratingSave": "Guardar calificación"
+      },
+      "serviceLines": {
+        "title": "Líneas de servicio",
+        "manage": "Gestionar líneas",
+        "headers": {
+          "service": "Servicio",
+          "status": "Estado",
+          "budget": "Presupuesto",
+          "notes": "Notas"
+        },
+        "unnamed": "Sin nombre",
+        "empty": "Aún no se han definido líneas de servicio para este proveedor."
+      },
+      "status": {
+        "title": "Estado del proveedor",
+        "loading": "Cargando…",
+        "empty": "Sin datos agregados todavía.",
+        "contracts": {
+          "title": "Contratos",
+          "total": "Total: {{count}}",
+          "signed": "Firmados: {{count}}",
+          "sent": "Enviados: {{count}}",
+          "draft": "Borradores: {{count}}",
+          "cancelled": "Cancelados: {{count}}",
+          "amountSigned": "Importe firmado: {{amount}}"
+        },
+        "payments": {
+          "title": "Pagos",
+          "total": "Total: {{count}}",
+          "paid": "Pagados: {{count}}",
+          "pending": "Pendientes/Autorizados: {{count}}",
+          "failed": "Fallidos: {{count}}",
+          "refunded": "Reembolsados: {{count}}",
+          "amount": "Importes: pagado {{paid}}, pendiente {{pending}}"
+        },
+        "lastUpdate": "Última actualización: {{value}}"
+      }
     },
     "analyticsPanel": {
       "title": "Analítica IA de proveedores",

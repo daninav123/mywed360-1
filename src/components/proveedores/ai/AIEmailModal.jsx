@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 
 import Alert from '../../../components/Alert';
 import Button from '../../../components/ui/Button';
+import useTranslations from '../../../hooks/useTranslations';
 import { useAIProviderEmail } from '../../../hooks/useAIProviderEmail';
 
 /**
@@ -20,6 +21,7 @@ const AIEmailModal = ({ isOpen, onClose, aiResult, searchQuery }) => {
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
   const [isSent, setIsSent] = useState(false);
+  const { t } = useTranslations();
 
   const {
     userEmail,
@@ -55,15 +57,17 @@ const AIEmailModal = ({ isOpen, onClose, aiResult, searchQuery }) => {
   if (!isOpen || !aiResult) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex itemás-center justify-center p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex justify-between itemás-center p-4 border-b">
-          <h2 className="text-xl font-semibold">Contactar a {aiResult.name}</h2>
+        <div className="flex justify-between items-center p-4 border-b">
+          <h2 className="text-xl font-semibold">
+            {t('common.suppliers.aiEmailModal.title', { name: aiResult.name })}
+          </h2>
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700"
-            aria-label="Cerrar"
+            aria-label={t('common.suppliers.aiEmailModal.closeAria')}
             data-testid="close-modal-btn"
           >
             <X size={24} />
@@ -73,33 +77,34 @@ const AIEmailModal = ({ isOpen, onClose, aiResult, searchQuery }) => {
         {/* Cuerpo del modal */}
         <div className="p-4 overflow-y-auto flex-1">
           {isSent && (
-            <Alert
-              type="success"
-              title="Email enviado correctamente"
-              mássage="Tu mensaje ha sido enviado al proveedor. Recibirás una notificación cuando responda."
-              className="mb-4"
-              data-testid="success-alert"
-            />
+            <Alert type="success" className="mb-4" data-testid="success-alert">
+              <p className="font-semibold">
+                {t('common.suppliers.aiEmailModal.success.title')}
+              </p>
+              <p className="text-sm mt-1">
+                {t('common.suppliers.aiEmailModal.success.message')}
+              </p>
+            </Alert>
           )}
 
           {error && (
-            <Alert
-              type="error"
-              title="Error al enviar el email"
-              mássage={error}
-              className="mb-4"
-              data-testid="error-alert"
-            />
+            <Alert type="error" className="mb-4" data-testid="error-alert">
+              <p className="font-semibold">
+                {t('common.suppliers.aiEmailModal.error.title')}
+              </p>
+              <p className="text-sm mt-1">{error}</p>
+            </Alert>
           )}
 
           <form onSubmit={handleSendEmail} data-testid="email-form">
             <div className="space-y-4">
               <div>
                 <p className="text-sm text-gray-600 mb-1">
-                  Enviando desde: <span className="font-medium">{userEmail}</span>
+                  {t('common.suppliers.aiEmailModal.from')}{' '}
+                  <span className="font-medium">{userEmail}</span>
                 </p>
                 <p className="text-sm text-gray-600 mb-3">
-                  Para:{' '}
+                  {t('common.suppliers.aiEmailModal.to')}{' '}
                   <span className="font-medium">
                     {aiResult.email ||
                       `${aiResult.name.toLowerCase().replace(/\s+/g, '.')}@proveedor.com`}
@@ -109,7 +114,7 @@ const AIEmailModal = ({ isOpen, onClose, aiResult, searchQuery }) => {
 
               <div>
                 <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1">
-                  Asunto
+                  {t('common.suppliers.aiEmailModal.subject.label')}
                 </label>
                 <input
                   id="subject"
@@ -117,7 +122,7 @@ const AIEmailModal = ({ isOpen, onClose, aiResult, searchQuery }) => {
                   value={subject}
                   onChange={(e) => setSubject(e.target.value)}
                   className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Asunto del correo"
+                  placeholder={t('common.suppliers.aiEmailModal.subject.placeholder')}
                   required
                   data-testid="email-subject"
                 />
@@ -125,14 +130,14 @@ const AIEmailModal = ({ isOpen, onClose, aiResult, searchQuery }) => {
 
               <div>
                 <label htmlFor="body" className="block text-sm font-medium text-gray-700 mb-1">
-                  Mensaje
+                  {t('common.suppliers.aiEmailModal.body.label')}
                 </label>
                 <textarea
                   id="body"
                   value={body}
                   onChange={(e) => setBody(e.target.value)}
                   className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-h-[200px]"
-                  placeholder="Escribe tu mensaje aquí..."
+                  placeholder={t('common.suppliers.aiEmailModal.body.placeholder')}
                   required
                   data-testid="email-body"
                 />
@@ -142,7 +147,7 @@ const AIEmailModal = ({ isOpen, onClose, aiResult, searchQuery }) => {
               {aiResult.aiSummary && (
                 <div className="bg-blue-50 p-3 rounded-md">
                   <p className="text-xs font-semibold text-blue-600 mb-1">
-                    ¿Por qué este proveedor?
+                    {t('common.suppliers.aiEmailModal.aiSummary')}
                   </p>
                   <p className="text-sm text-gray-700">{aiResult.aiSummary}</p>
                 </div>
@@ -157,10 +162,12 @@ const AIEmailModal = ({ isOpen, onClose, aiResult, searchQuery }) => {
                 className="mr-2"
                 disabled={isSending}
               >
-                Cancelar
+                {t('common.suppliers.aiEmailModal.buttons.cancel')}
               </Button>
               <Button type="submit" disabled={isSending || isSent} data-testid="send-email-btn">
-                {isSending ? 'Enviando...' : 'Enviar email'}
+                {isSending
+                  ? t('common.suppliers.aiEmailModal.buttons.sending')
+                  : t('common.suppliers.aiEmailModal.buttons.send')}
               </Button>
             </div>
           </form>

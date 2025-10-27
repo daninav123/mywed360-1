@@ -95,30 +95,30 @@
         "footnote": "After subscribing, updates may take a few minutes depending on the app."
       },
       "list": {
-      "defaults": {
-        "parent": "Block"
-      },
-      "labels": {
-        "assigned": "Assigned to {{name}}"
-      },
-      "badges": {
-        "overdue": "Overdue",
-        "blocked": "Task blocked by dependencies"
-      },
-      "sectionTitle": "Critical tasks for this week",
-      "filters": {
-        "categoryAll": "All categories",
-        "assigneeAll": "All",
+        "defaults": {
+          "parent": "Block"
+        },
+        "labels": {
+          "assigned": "Assigned to {{name}}"
+        },
+        "badges": {
+          "overdue": "Overdue",
+          "blocked": "Task blocked by dependencies"
+        },
+        "sectionTitle": "Critical tasks for this week",
+        "filters": {
+          "categoryAll": "All categories",
+          "assigneeAll": "All",
           "status": {
             "all": "All",
             "pending": "Pending",
             "completed": "Completed"
           },
-        "clear": "Clear"
-      },
-      "actions": {
-        "viewInGantt": "View in Gantt"
-      },
+          "clear": "Clear"
+        },
+        "actions": {
+          "viewInGantt": "View in Gantt"
+        },
         "results": {
           "label": "Results: {{count}}"
         },
@@ -131,13 +131,20 @@
           "upcoming": "No upcoming tasks scheduled",
           "filters": "No tasks match the selected filters",
           "columns": "No columns"
+        },
+        "dependencies": {
+          "blocked_one": "Blocked ({{count}} pending)",
+          "blocked_other": "Blocked ({{count}} pending)",
+          "resolved": "Dependencies cleared ({{count}})",
+          "pendingTitle": "Tasks pending to unblock:",
+          "completedTitle": "Completed tasks:"
         }
       },
       "allTasks": {
-      "title": "All tasks",
-      "orphans": "Without parent",
-      "searchPlaceholder": "Search tasks...",
-      "filters": {
+        "title": "All tasks",
+        "orphans": "Without parent",
+        "searchPlaceholder": "Search tasks...",
+        "filters": {
           "categoryAll": "All categories",
           "assigneeAll": "All",
           "status": {
@@ -155,6 +162,9 @@
         "badges": {
           "noDate": "No scheduled date",
           "assigned": "Assigned to {{name}}"
+        },
+        "defaults": {
+          "task": "Task"
         }
       },
       "form": {
@@ -257,7 +267,32 @@
           "more": "Zoom in timeline",
           "reset": "Fit the entire Gantt timeline",
           "label": "Gantt horizontal zoom"
+        },
+        "title": "Events Calendar",
+        "errors": {
+          "title": "Calendar failed to load",
+          "description": "We had trouble loading the calendar. Manage your events from the list below."
+        },
+        "empty": "No tasks available",
+        "fallback": {
+          "eventUntitled": "Untitled event"
         }
+      },
+      "common": {
+        "errors": {
+          "generic": "Something went wrong."
+        },
+        "fallbacks": {
+          "task": "Task",
+          "untitled": "Untitled",
+          "untitledTask": "Untitled task"
+        }
+      },
+      "notifications": {
+        "overdueTitle": "Task overdue",
+        "upcomingTitle": "Task due soon",
+        "overdueMessage": "{{name}} was due ({{date}})",
+        "upcomingMessage": "{{name}} is due within 24h ({{date}})"
       }
     }
   },

@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import { withTranslation } from 'react-i18next';
 
 // Componente ErrorBoundary para manejar errores en componentes hijos
 class ErrorBoundary extends Component {
@@ -35,22 +36,41 @@ class ErrorBoundary extends Component {
   }
 
   render() {
-    if (this.state.hasError) {
-      const { error } = this.state;
-      if (this.props.fallback) return this.props.fallback;
+    const { hasError, error } = this.state;
+    const { fallback, t, children } = this.props;
+
+    if (hasError) {
+      if (fallback) return fallback;
       return (
-        <div style={{ padding: 16, border: '1px solid #fecaca', borderRadius: 8, background: '#fef2f2', color: '#7f1d1d' }}>
-          <div style={{ fontWeight: 600, marginBottom: 8 }}>Algo salió mal.</div>
+        <div
+          style={{
+            padding: 16,
+            border: '1px solid #fecaca',
+            borderRadius: 8,
+            background: '#fef2f2',
+            color: '#7f1d1d',
+          }}
+        >
+          <div style={{ fontWeight: 600, marginBottom: 8 }}>
+            {t('tasks.page.common.errors.generic', { defaultValue: 'Algo salió mal.' })}
+          </div>
           {error?.message && (
-            <div style={{ fontFamily: 'monospace', fontSize: 12, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+            <div
+              style={{
+                fontFamily: 'monospace',
+                fontSize: 12,
+                whiteSpace: 'pre-wrap',
+                wordBreak: 'break-word',
+              }}
+            >
               {error.message}
             </div>
           )}
         </div>
       );
     }
-    return this.props.children;
+    return children;
   }
 }
 
-export default ErrorBoundary;
+export default withTranslation('tasks')(ErrorBoundary);

@@ -5,14 +5,17 @@
 
 import { useMemo, useCallback } from 'react';
 
+import useTranslations from '../../../hooks/useTranslations';
+
 /**
  * Verifica si una tarea tiene dependencias completadas
  * @param {Object} task - Tarea a verificar
  * @param {Array} allTasks - Todas las tareas disponibles
  * @param {Set} completedSet - Set de IDs de tareas completadas
+ * @param {Object} labels - Textos de fallback
  * @returns {Object} Estado de dependencias { isBlocked, missingDeps, completedDeps }
  */
-export function checkTaskDependencies(task, allTasks, completedSet) {
+export function checkTaskDependencies(task, allTasks, completedSet, labels = {}) {
   if (!task || !Array.isArray(task.dependsOn) || task.dependsOn.length === 0) {
     return { isBlocked: false, missingDeps: [], completedDeps: [], allDeps: [] };
   }
@@ -22,19 +25,18 @@ export function checkTaskDependencies(task, allTasks, completedSet) {
   const completedDeps = [];
 
   for (const dep of task.dependsOn) {
-    // Encontrar la tarea dependencia
     const depTask = findTaskByIndices(allTasks, dep.blockIndex, dep.itemIndex);
-    
+
     if (!depTask) {
-      // Dependencia no encontrada (posiblemente eliminada)
       continue;
     }
 
     const depInfo = {
       taskId: depTask.id,
-      taskTitle: dep.itemTitle || depTask.title || 'Tarea sin título',
-      blockName: dep.blockName || 'Bloque',
-      isCompleted: completedSet.has(String(depTask.id))
+      taskTitle:
+        dep.itemTitle || depTask.title || labels.fallbackTaskTitle || 'Tarea sin título',
+      blockName: dep.blockName || labels.defaultBlock || 'Bloque',
+      isCompleted: completedSet.has(String(depTask.id)),
     };
 
     allDeps.push(depInfo);
@@ -50,39 +52,34 @@ export function checkTaskDependencies(task, allTasks, completedSet) {
     isBlocked: missingDeps.length > 0,
     missingDeps,
     completedDeps,
-    allDeps
+    allDeps,
   };
 }
 
-/**
- * Encuentra una tarea por sus índices de bloque e ítem
- * @param {Array} tasks - Array de tareas
- * @param {number} blockIndex - Índice del bloque padre
- * @param {number} itemIndex - Índice del ítem dentro del bloque
- * @returns {Object|null} Tarea encontrada o null
- */
 function findTaskByIndices(tasks, blockIndex, itemIndex) {
   if (!Array.isArray(tasks)) return null;
-
-  // Las tareas vienen aplanadas, necesitamos reconstruir la estructura
-  // o usar metadata adicional si existe
   for (const task of tasks) {
     if (task.__blockIndex === blockIndex && task.__itemIndex === itemIndex) {
       return task;
     }
   }
-
   return null;
 }
 
-/**
- * Hook principal para gestión de dependencias
- * @param {Array} tasks - Array de todas las tareas
- * @param {Set} completedSet - Set de IDs de tareas completadas
- * @returns {Object} Utilidades para manejar dependencias
- */
 export function useTaskDependencies(tasks, completedSet) {
-  // Memoizar el mapa de tareas bloqueadas
+  const { t } = useTranslations();
+
+  const labels = useMemo(
+    () => ({
+      fallbackTaskTitle: t('tasks.page.common.fallbacks.untitledTask', {
+        defaultValue: 'Tarea sin título',
+      }),
+      defaultBlock: t('tasks.page.list.defaults.parent'),
+      unblockedTitle: t('tasks.page.common.fallbacks.untitled', { defaultValue: 'Sin título' }),
+    }),
+    [t]
+  );
+
   const blockedTasksMap = useMemo(() => {
     const map = new Map();
 
@@ -91,17 +88,16 @@ export function useTaskDependencies(tasks, completedSet) {
     for (const task of tasks) {
       if (!task || !task.id) continue;
 
-      const depStatus = checkTaskDependencies(task, tasks, completedSet);
-      
+      const depStatus = checkTaskDependencies(task, tasks, completedSet, labels);
+
       if (depStatus.isBlocked || depStatus.allDeps.length > 0) {
         map.set(String(task.id), depStatus);
       }
     }
 
     return map;
-  }, [tasks, completedSet]);
+  }, [tasks, completedSet, labels]);
 
-  // Verificar si una tarea está bloqueada
   const isTaskBlocked = useCallback(
     (taskId) => {
       const status = blockedTasksMap.get(String(taskId));
@@ -110,20 +106,18 @@ export function useTaskDependencies(tasks, completedSet) {
     [blockedTasksMap]
   );
 
-  // Obtener estado de dependencias de una tarea
   const getTaskDependencyStatus = useCallback(
     (taskId) => {
       return blockedTasksMap.get(String(taskId)) || {
         isBlocked: false,
         missingDeps: [],
         completedDeps: [],
-        allDeps: []
+        allDeps: [],
       };
     },
     [blockedTasksMap]
   );
 
-  // Obtener todas las tareas desbloqueadas después de completar una tarea
   const getUnblockedTasks = useCallback(
     (justCompletedTaskId) => {
       const unblocked = [];
@@ -131,51 +125,44 @@ export function useTaskDependencies(tasks, completedSet) {
       for (const task of tasks) {
         if (!task || !task.id || !Array.isArray(task.dependsOn)) continue;
 
-        // Verificar si esta tarea dependía de la recién completada
-        const dependedOnCompleted = task.dependsOn.some(dep => {
+        const dependedOnCompleted = task.dependsOn.some((dep) => {
           const depTask = findTaskByIndices(tasks, dep.blockIndex, dep.itemIndex);
           return depTask && String(depTask.id) === String(justCompletedTaskId);
         });
 
         if (!dependedOnCompleted) continue;
 
-        // Verificar si ahora está desbloqueada
-        // Crear un nuevo Set incluyendo la tarea recién completada
         const newCompletedSet = new Set(completedSet);
         newCompletedSet.add(String(justCompletedTaskId));
 
-        const newStatus = checkTaskDependencies(task, tasks, newCompletedSet);
-        const oldStatus = checkTaskDependencies(task, tasks, completedSet);
+        const newStatus = checkTaskDependencies(task, tasks, newCompletedSet, labels);
+        const oldStatus = checkTaskDependencies(task, tasks, completedSet, labels);
 
-        // Si antes estaba bloqueada y ahora no
         if (oldStatus.isBlocked && !newStatus.isBlocked) {
           unblocked.push({
             id: task.id,
-            title: task.title || 'Sin título',
-            task: task
+            title: task.title || labels.unblockedTitle || labels.fallbackTaskTitle,
+            task: task,
           });
         }
       }
 
       return unblocked;
     },
-    [tasks, completedSet]
+    [tasks, completedSet, labels]
   );
 
   return {
     isTaskBlocked,
     getTaskDependencyStatus,
     getUnblockedTasks,
-    blockedTasksMap
+    blockedTasksMap,
   };
 }
 
-/**
- * Componente de indicador visual de dependencias
- * @param {Object} depStatus - Estado de dependencias { isBlocked, missingDeps, completedDeps }
- * @returns {JSX.Element|null}
- */
 export function DependencyIndicator({ depStatus }) {
+  const { t } = useTranslations();
+
   if (!depStatus || depStatus.allDeps.length === 0) {
     return null;
   }
@@ -185,7 +172,9 @@ export function DependencyIndicator({ depStatus }) {
       <div className="flex items-center gap-1 text-xs text-red-600 bg-red-50 px-2 py-1 rounded">
         <span>🔒</span>
         <span className="font-medium">
-          Bloqueada ({depStatus.missingDeps.length} pendiente{depStatus.missingDeps.length !== 1 ? 's' : ''})
+          {t('tasks.page.list.dependencies.blocked', {
+            count: depStatus.missingDeps.length,
+          })}
         </span>
       </div>
     );
@@ -195,18 +184,17 @@ export function DependencyIndicator({ depStatus }) {
     <div className="flex items-center gap-1 text-xs text-green-600 bg-green-50 px-2 py-1 rounded">
       <span>✅</span>
       <span className="font-medium">
-        Dependencias OK ({depStatus.completedDeps.length})
+        {t('tasks.page.list.dependencies.resolved', {
+          count: depStatus.completedDeps.length,
+        })}
       </span>
     </div>
   );
 }
 
-/**
- * Tooltip con detalle de dependencias
- * @param {Object} depStatus - Estado de dependencias
- * @returns {JSX.Element|null}
- */
 export function DependencyTooltip({ depStatus }) {
+  const { t } = useTranslations();
+
   if (!depStatus || depStatus.allDeps.length === 0) {
     return null;
   }
@@ -216,7 +204,7 @@ export function DependencyTooltip({ depStatus }) {
       {depStatus.missingDeps.length > 0 && (
         <div>
           <div className="font-semibold text-red-700 mb-1">
-            Tareas pendientes para desbloquear:
+            {t('tasks.page.list.dependencies.pendingTitle')}
           </div>
           <ul className="space-y-1">
             {depStatus.missingDeps.map((dep, idx) => (
@@ -232,7 +220,7 @@ export function DependencyTooltip({ depStatus }) {
       {depStatus.completedDeps.length > 0 && (
         <div>
           <div className="font-semibold text-green-700 mb-1">
-            Tareas completadas:
+            {t('tasks.page.list.dependencies.completedTitle')}
           </div>
           <ul className="space-y-1">
             {depStatus.completedDeps.map((dep, idx) => (

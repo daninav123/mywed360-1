@@ -271,6 +271,23 @@ const ENABLE_BACKEND_AI =
         .trim()
         .match(/^(1|true|on|enabled)$/i);
 
+// Variable para elegir tipo de búsqueda:
+// 'tavily' = Tavily Search API (RECOMENDADO - mejor para IA)
+// 'google' = Google Custom Search API
+// 'false' = Solo GPT (datos generados/ficticios)
+// TEMPORAL: Hardcodeado mientras se soluciona problema de carga de .env
+const SEARCH_PROVIDER = 'tavily'; // String(import.meta?.env?.VITE_SEARCH_PROVIDER || 'false').toLowerCase();
+
+// DEBUG: Sistema completo de diagnóstico de variables de entorno
+console.group('🔍 [DEBUG] Diagnóstico de Variables de Entorno');
+console.log('📋 Todas las variables import.meta.env:', import.meta?.env);
+console.log('🎯 VITE_SEARCH_PROVIDER:', import.meta?.env?.VITE_SEARCH_PROVIDER);
+console.log('🎯 VITE_ENABLE_AI_SUPPLIERS:', import.meta?.env?.VITE_ENABLE_AI_SUPPLIERS);
+console.log('🎯 VITE_BACKEND_BASE_URL:', import.meta?.env?.VITE_BACKEND_BASE_URL);
+console.log('✅ SEARCH_PROVIDER procesado:', SEARCH_PROVIDER);
+console.log('✅ ENABLE_BACKEND_AI procesado:', ENABLE_BACKEND_AI);
+console.groupEnd();
+
 export const useAISearch = () => {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -314,14 +331,28 @@ export const useAISearch = () => {
 
       try {
         if (ENABLE_BACKEND_AI) {
+          // Elegir endpoint según configuración
+          let endpoint = '/api/ai-suppliers'; // Por defecto: solo GPT (datos generados)
+          
+          if (SEARCH_PROVIDER === 'tavily') {
+            endpoint = '/api/ai-suppliers-tavily'; // Tavily Search (RECOMENDADO)
+          } else if (SEARCH_PROVIDER === 'google') {
+            endpoint = '/api/ai-suppliers-real'; // Google Custom Search
+          }
+          
+          console.log('[useAISearch] 🚀 Usando endpoint:', endpoint);
+          console.log('[useAISearch] 📊 Proveedor:', SEARCH_PROVIDER);
+          
           const res = await apiPost(
-            '/api/ai-suppliers',
+            endpoint,
             { query, service: inferredService, budget, profile, location },
             baseFetchOptions
           );
           if (res?.ok) {
             const data = await res.json().catch(() => null);
             console.log('[useAISearch] ✅ Respuesta exitosa de ai-suppliers:', data);
+            console.log('[useAISearch] 🖼️ Primera imagen:', data?.[0]?.image);
+            console.log('[useAISearch] 📦 Primer resultado completo:', data?.[0]);
             const arr = Array.isArray(data) ? data : [];
             if (arr.length) {
               const normalized = arr
