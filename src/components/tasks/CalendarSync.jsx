@@ -3,10 +3,12 @@ import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import { useWedding } from '../../context/WeddingContext';
+import useTranslations from '../../hooks/useTranslations';
 import { get as apiGet } from '../../services/apiClient';
 
 // Calendario: Suscripción iCal/ICS sin OAuth ni API de Google
 const CalendarSync = () => {
+  const { t } = useTranslations();
   const [feed, setFeed] = useState(null);
   const [loadingFeed, setLoadingFeed] = useState(false);
   const [error, setError] = useState(null);
@@ -20,16 +22,19 @@ const CalendarSync = () => {
       const qs = activeWedding ? `?weddingId=${encodeURIComponent(activeWedding)}` : '';
       const res = await apiGet(`/api/calendar/token${qs}`, { auth: true });
       if (!res.ok) {
-        if (res.status === 401)
-          throw new Error('Debes iniciar sesión para generar tu enlace de calendario');
+        if (res.status === 401) throw new Error(t('tasks.page.calendarSync.errors.auth'));
         const txt = await res.text().catch(() => '');
-        throw new Error(`No se pudo obtener el enlace (${res.status}). ${txt || ''}`.trim());
+        throw new Error(
+          txt
+            ? `${t('tasks.page.calendarSync.errors.fetch')} (${res.status}). ${txt}`.trim()
+            : `${t('tasks.page.calendarSync.errors.fetch')} (${res.status})`
+        );
       }
       const data = await res.json();
       if (data?.ok) setFeed(data);
     } catch (e) {
       console.error('calendar token error', e);
-      setError(e?.message || 'No se pudo obtener el enlace. Inténtalo de nuevo.');
+      setError(e?.message || t('tasks.page.calendarSync.errors.fetch'));
       setFeed(null);
     } finally {
       setLoadingFeed(false);
@@ -52,10 +57,10 @@ const CalendarSync = () => {
         className="relative bg-white rounded-lg w-full max-w-md p-6 shadow-lg"
         onClick={(e) => e.stopPropagation()}
       >
-        <h3 className="text-lg font-semibold mb-3">Añadir a tu Calendario</h3>
+        <h3 className="text-lg font-semibold mb-3">{t('tasks.page.calendarSync.title')}</h3>
         {error && <div className="text-sm text-red-600 mb-2">{error}</div>}
         {loadingFeed && !feed ? (
-          <div className="text-sm text-gray-600">Preparando tu enlace de suscripción...</div>
+          <div className="text-sm text-gray-600">{t('tasks.page.calendarSync.loading')}</div>
         ) : (
           <div className="space-y-3">
             <a
@@ -63,7 +68,7 @@ const CalendarSync = () => {
               href={webcalUrl}
               onClick={() => setOpen(false)}
             >
-              Suscribirse (Apple/Outlook)
+              {t('tasks.page.calendarSync.actions.subscribe')}
             </a>
             <a
               className="block w-full text-center px-4 py-2 rounded bg-green-600 text-white"
@@ -72,28 +77,26 @@ const CalendarSync = () => {
               rel="noreferrer"
               onClick={() => setOpen(false)}
             >
-              Añadir a Google Calendar
+              {t('tasks.page.calendarSync.actions.addGoogle')}
             </a>
             {feed?.feedUrl && (
               <div className="text-xs text-gray-700 border rounded p-2 break-all">
-                <div className="font-medium mb-1">URL de suscripción (ICS)</div>
+                <div className="font-medium mb-1">{t('tasks.page.calendarSync.labels.ics')}</div>
                 <div className="mb-2">{feed.feedUrl}</div>
                 <button
                   className="px-3 py-1 rounded border text-xs"
                   onClick={() => navigator.clipboard.writeText(feed.feedUrl)}
                 >
-                  Copiar URL
+                  {t('tasks.page.calendarSync.actions.copyUrl')}
                 </button>
               </div>
             )}
-            <div className="text-xs text-gray-500">
-              Tras suscribirte, las actualizaciones pueden tardar unos minutos según la app.
-            </div>
+            <div className="text-xs text-gray-500">{t('tasks.page.calendarSync.footnote')}</div>
           </div>
         )}
         <div className="mt-4 text-right">
           <button className="px-3 py-1 rounded bg-gray-200" onClick={() => setOpen(false)}>
-            Cerrar
+            {t('tasks.page.calendarSync.actions.close')}
           </button>
         </div>
       </div>
@@ -110,7 +113,7 @@ const CalendarSync = () => {
         }}
         disabled={loadingFeed}
       >
-        <Calendar size={18} className="mr-2 text-blue-600" /> Añadir a tu Calendario
+        <Calendar size={18} className="mr-2 text-blue-600" /> {t('tasks.page.calendarSync.button')}
       </button>
       {open &&
         (typeof document !== 'undefined' ? createPortal(<Modal />, document.body) : <Modal />)}

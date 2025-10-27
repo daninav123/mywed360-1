@@ -1,5 +1,6 @@
 import React, { useMemo, useCallback, useState } from 'react';
 
+import useTranslations from '../../hooks/useTranslations';
 import { categories } from './CalendarComponents.jsx';
 import BaseModal from '../ui/BaseModal.jsx';
 
@@ -11,18 +12,29 @@ import BaseModal from '../ui/BaseModal.jsx';
 export default function AllTasksModal({
   isOpen,
   onClose,
-  parents = [], // array de tareas padre (type === 'task')
-  subtasks = [], // array de subtareas normalizadas { id, title, start: Date, end: Date, parentId, __kind: 'subtask' }
-  completedSet, // Set de ids completados
-  onToggleComplete, // (id, checked) => void
-  onTaskClick, // (task) => void
+  parents = [],
+  subtasks = [],
+  completedSet,
+  onToggleComplete,
+  onTaskClick,
 }) {
-  // Filtros
+  const { t } = useTranslations();
+
   const [query, setQuery] = useState('');
   const [filterCategory, setFilterCategory] = useState('ALL');
   const [filterAssignee, setFilterAssignee] = useState('ALL');
   const [filterStatus, setFilterStatus] = useState('ALL'); // ALL | PENDING | COMPLETED
-  // Padres ordenados por fecha de inicio
+
+  const fallbackTaskLabel = useCallback(
+    () => t('tasks.page.allTasks.defaults.task', { defaultValue: 'Tarea' }),
+    [t]
+  );
+
+  const getCategoryName = useCallback(
+    (key) => t(`tasks.categories.${key}`, { defaultValue: categories[key]?.name || key }),
+    [t]
+  );
+
   const sortedParents = useMemo(() => {
     try {
       const arr = Array.isArray(parents) ? parents : [];
@@ -30,7 +42,7 @@ export default function AllTasksModal({
         .filter((p) => String(p?.type || 'task') === 'task' && !p.isDisabled)
         .map((p) => ({
           id: String(p.id),
-          name: p.name || p.title || 'Tarea',
+          name: p.name || p.title || fallbackTaskLabel(),
           start: p.start instanceof Date ? p.start : p.start ? new Date(p.start) : null,
         }))
         .sort((a, b) => {
@@ -41,7 +53,7 @@ export default function AllTasksModal({
     } catch (_) {
       return [];
     }
-  }, [parents]);
+  }, [parents, fallbackTaskLabel]);
 
   // Agrupar subtareas por parentId y ordenarlas dentro del grupo
   const grouped = useMemo(() => {
@@ -74,12 +86,15 @@ export default function AllTasksModal({
   // Opciones de filtros
   const categoryOptions = useMemo(() => {
     try {
-      const opts = Object.entries(categories || {}).map(([key, cat]) => ({ id: key, name: cat?.name || key }));
-      return [{ id: 'ALL', name: 'Todas las categorías' }, ...opts];
+      const opts = Object.entries(categories || {}).map(([key]) => ({
+        id: key,
+        name: getCategoryName(key),
+      }));
+      return [{ id: 'ALL', name: t('tasks.page.allTasks.filters.categoryAll') }, ...opts];
     } catch {
-      return [{ id: 'ALL', name: 'Todas las categorías' }];
+      return [{ id: 'ALL', name: t('tasks.page.allTasks.filters.categoryAll') }];
     }
-  }, []);
+  }, [getCategoryName, t]);
 
   const assigneeOptions = useMemo(() => {
     try {
@@ -90,11 +105,11 @@ export default function AllTasksModal({
         if (a) set.add(a);
       }
       const arr = Array.from(set).sort((a, b) => a.localeCompare(b));
-      return [{ id: 'ALL', name: 'Todos' }, ...arr.map((a) => ({ id: a, name: a }))];
+      return [{ id: 'ALL', name: t('tasks.page.allTasks.filters.assigneeAll') }, ...arr.map((a) => ({ id: a, name: a }))];
     } catch {
-      return [{ id: 'ALL', name: 'Todos' }];
+      return [{ id: 'ALL', name: t('tasks.page.allTasks.filters.assigneeAll') }];
     }
-  }, [subtasks]);
+  }, [subtasks, t]);
 
   const passesFilters = useCallback(
     (st) => {
@@ -139,7 +154,8 @@ export default function AllTasksModal({
 
   const renderSubtaskCell = useCallback(
     (st) => {
-      const cat = categories[st.category] || categories.OTROS;
+      const catKey = st.category || 'OTROS';
+      const cat = categories[catKey] || categories.OTROS;
       const isCompleted = completedSet ? completedSet.has(String(st.id)) : false;
       const showNoDate = !st.start && !st.end;
       return (
@@ -163,7 +179,7 @@ export default function AllTasksModal({
           />
           <div className="flex-1 min-w-0">
             <div className={`flex items-center gap-2 ${isCompleted ? 'line-through text-gray-500' : ''}`}>
-              <div className="font-medium truncate">{st.title || st.name || 'Tarea'}</div>
+              <div className="font-medium truncate">{st.title || st.name || fallbackTaskLabel()}</div>
               <span
                 className="text-[10px] px-2 py-0.5 rounded-full border"
                 style={{
@@ -172,15 +188,19 @@ export default function AllTasksModal({
                   borderColor: cat.borderColor,
                 }}
               >
-                {cat.name}
+                {getCategoryName(catKey)}
               </span>
               {showNoDate && (
                 <span className="text-[10px] px-2 py-0.5 rounded-full border border-dashed text-orange-700 bg-orange-50">
-                  Sin fecha
+                  {t('tasks.page.allTasks.badges.noDate')}
                 </span>
               )}
             </div>
-            {st.assignee && <div className="text-xs text-gray-500">Asignado a: {st.assignee}</div>}
+            {st.assignee && (
+              <div className="text-xs text-gray-500">
+                {t('tasks.page.allTasks.badges.assigned', { name: st.assignee })}
+              </div>
+            )}
             {st.desc && (
               <div className="text-xs text-gray-500 mt-1 line-clamp-2">{st.desc}</div>
             )}
@@ -188,7 +208,7 @@ export default function AllTasksModal({
         </div>
       );
     },
-    [completedSet, onToggleComplete, onTaskClick]
+    [completedSet, onToggleComplete, onTaskClick, fallbackTaskLabel, getCategoryName, t]
   );
 
   // Preparar columnas: una por tarea padre; si hay subtareas sin padre, añadir columna "Sin padre"
@@ -200,17 +220,17 @@ export default function AllTasksModal({
     }
     const orphanItems = (grouped.orphans || []).filter(passesFilters);
     if (orphanItems.length > 0) {
-      cols.push({ id: '__orphans__', name: 'Sin padre', items: orphanItems });
+      cols.push({ id: '__orphans__', name: t('tasks.page.allTasks.orphans'), items: orphanItems });
     }
     return cols;
-  }, [sortedParents, grouped, passesFilters]);
+  }, [sortedParents, grouped, passesFilters, t]);
 
   const maxRows = useMemo(() => {
     return columns.reduce((acc, c) => Math.max(acc, Array.isArray(c.items) ? c.items.length : 0), 0);
   }, [columns]);
 
   return (
-    <BaseModal isOpen={isOpen} onClose={onClose} title="Todas las tareas" size="xl" scrollable>
+    <BaseModal isOpen={isOpen} onClose={onClose} title={t('tasks.page.allTasks.title')} size="xl" scrollable>
       {/* Controles de filtro */}
       <div className="mb-4 grid grid-cols-1 md:grid-cols-4 gap-3">
         <div>
@@ -218,7 +238,7 @@ export default function AllTasksModal({
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Buscar tareas..."
+            placeholder={t('tasks.page.allTasks.searchPlaceholder')}
             className="w-full border rounded px-3 py-2 text-sm"
           />
         </div>
@@ -250,22 +270,22 @@ export default function AllTasksModal({
             onChange={(e) => setFilterStatus(e.target.value)}
             className="flex-1 border rounded px-3 py-2 text-sm bg-white"
           >
-            <option value="ALL">Todos</option>
-            <option value="PENDING">Pendientes</option>
-            <option value="COMPLETED">Completadas</option>
+            <option value="ALL">{t('tasks.page.allTasks.filters.status.all')}</option>
+            <option value="PENDING">{t('tasks.page.allTasks.filters.status.pending')}</option>
+            <option value="COMPLETED">{t('tasks.page.allTasks.filters.status.completed')}</option>
           </select>
           <button
             type="button"
             className="px-3 py-2 text-sm border rounded hover:bg-gray-50"
             onClick={() => { setQuery(''); setFilterCategory('ALL'); setFilterAssignee('ALL'); setFilterStatus('ALL'); }}
-            title="Limpiar filtros"
+            title={t('tasks.page.allTasks.filters.clear')}
           >
-            Limpiar
+            {t('tasks.page.allTasks.filters.clear')}
           </button>
         </div>
       </div>
 
-      <div className="mb-2 text-sm text-gray-600">Resultados: {totalFiltered}</div>
+      <div className="mb-2 text-sm text-gray-600">{t('tasks.page.allTasks.filters.results', { count: totalFiltered })}</div>
 
       {/* Tabla: primera fila padres, siguientes filas subtareas alineadas por columna */}
       <div className="overflow-x-auto">
@@ -282,7 +302,7 @@ export default function AllTasksModal({
                 </div>
               ))
             ) : (
-              <div className="text-sm text-gray-500">Sin columnas</div>
+              <div className="text-sm text-gray-500">{t('tasks.page.allTasks.empty.columns')}</div>
             )}
           </div>
 
@@ -309,7 +329,7 @@ export default function AllTasksModal({
               </div>
             ))
           ) : (
-            <div className="text-center text-gray-500 py-6">No hay tareas para los filtros seleccionados</div>
+            <div className="text-center text-gray-500 py-6">{t('tasks.page.allTasks.empty.filters')}</div>
           )}
         </div>
       </div>

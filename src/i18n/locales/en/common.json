@@ -2670,6 +2670,46 @@
       "closeButton": "Close",
       "saveButton": "Save supplier"
     },
+    "analyticsPanel": {
+      "title": "AI supplier analytics",
+      "description": "Consolidated tracking of scores, coverage, and AI-assisted pipeline maturity.",
+      "openReport": "View detailed report",
+      "cards": {
+        "average": {
+          "title": "Average AI score",
+          "targetHint": "Target ≥ 75 to reach the shortlist."
+        },
+        "portal": {
+          "title": "Portal responses",
+          "responses": "Responses received",
+          "coverage": "Portal coverage",
+          "pending": "Pending: {{count}}"
+        },
+        "services": {
+          "title": "Service coverage",
+          "empty": "Not enough data.",
+          "row": "{{confirmed}}/{{total}} · Score {{score}}"
+        }
+      },
+      "distribution": {
+        "title": "Score distribution",
+        "bucket": "{{count}} · {{percent}}%",
+        "empty": "Not enough data yet to display the distribution."
+      },
+      "top": {
+        "title": "Top suppliers",
+        "columns": {
+          "provider": "Supplier",
+          "service": "Service",
+          "score": "Score"
+        },
+        "empty": "No highlighted suppliers yet."
+      },
+      "coverage": {
+        "title": "Detailed coverage",
+        "suppliers": "Suppliers"
+      }
+    },
     "bulkStatusModal": {
       "title": "Change status",
       "label": "New status",

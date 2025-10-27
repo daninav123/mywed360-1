@@ -157,35 +157,56 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
     },
   ];
 
-  // Usar da�os reales si est�n disponibles, o los da�os de dem�straci�n
-  const displayResults = results.length > 0 ? results : (usedFallback ? demoResults : []);
+  // SIEMPRE usar datos reales, nunca demo automáticamente
+  const displayResults = results.length > 0 ? results : [];
 
-  // DEBUG: Ver qu� resultados llegan
+  // DEBUG: Ver qué resultados llegan
   if (displayResults.length > 0) {
-    console.log('[AIResultList] Resultados a mostrar:', displayResults);
-    console.log('[AIResultList] Primer resultado - image:', displayResults[0]?.image, 'service:', displayResults[0]?.service);
+    console.log('[AIResultList] ✅ Mostrando', displayResults.length, 'resultados reales');
+    console.log('[AIResultList] Primer resultado:', {
+      name: displayResults[0]?.name,
+      service: displayResults[0]?.service,
+      hasImage: !!displayResults[0]?.image
+    });
+  }
+  
+  // Si no hay resultados reales y query existe, mostrar mensaje
+  if (query && displayResults.length === 0 && !isLoading && !error) {
+    return (
+      <div data-testid="ai-results-list">
+        <div className="flex flex-col items-center justify-center py-12">
+          <div className="p-3 rounded-full bg-yellow-100 mb-4">
+            <Search size={24} className="text-yellow-600" />
+          </div>
+          <p className="text-lg font-medium text-gray-700">No se encontraron resultados</p>
+          <p className="text-sm text-gray-500 mt-2 text-center max-w-md">
+            No hay proveedores que coincidan con tu búsqueda "{query}". Intenta con otros términos o verifica que el backend esté ejecutándose correctamente.
+          </p>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="space-y-6" data-testid="ai-results-list">
       {usedFallback && query && (
-        <div className="w-full flex item�s-start gap-2 p-3 border border-amber-200 bg-amber-50 text-amber-800 rounded">
+        <div className="w-full flex items-start gap-2 p-3 border border-amber-200 bg-amber-50 text-amber-800 rounded">
           <AlertTriangle size={18} className="mt-0.5" />
           <div className="text-sm">
-            Mostrando resulta�os locales (demo) por indisponibilidad del servidor.
+            Mostrando resultados de demostración por indisponibilidad del servidor.
           </div>
         </div>
       )}
-      {/* Resumen de la b�squeda */}
+      {/* Resumen de la búsqueda */}
       <div className="mb-4">
         <p className="text-sm text-gray-500">
           Se encontraron <span className="font-medium">{displayResults.length}</span> proveedores
-          para tu b�squeda:
+          para tu búsqueda:
         </p>
         <p className="text-lg font-medium">"{query}"</p>
       </div>
 
-      {/* Lista de resulta�os */}
+      {/* Lista de resultados */}
       {displayResults.map((result) => (
         <Card key={result.id} className="relative overflow-hidden">
           {/* Indicador de porcentaje de coincidencia */}
@@ -198,18 +219,16 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
             <div className="w-full md:w-32 h-32 flex-shrink-0 overflow-hidden rounded-md bg-gray-100">
               <img 
                 src={(() => {
-                  // Usar imagen del resultado si existe y no es vac�a, sino usar placeholder seg�n servicio
+                  // Usar imagen del resultado si existe y no es vacía, sino usar placeholder según servicio
                   const imgSrc = (result.image && result.image.trim()) 
                     ? result.image 
                     : getServiceImage(result.service);
-                  console.log('[AIResultList] Cargando imagen para', result.name, '- URL:', imgSrc, '- Service:', result.service);
                   return imgSrc;
                 })()} 
                 alt={result.name} 
                 className="w-full h-full object-cover"
                 loading="lazy"
                 onError={(e) => {
-                  console.error('[AIResultList] Error cargando imagen para', result.name, '- intentando default');
                   e.currentTarget.src = SERVICE_IMAGES.default;
                 }}
               />

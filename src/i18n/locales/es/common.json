@@ -2705,6 +2705,46 @@
       "closeButton": "Cerrar",
       "saveButton": "Guardar proveedor"
     },
+    "analyticsPanel": {
+      "title": "Analítica IA de proveedores",
+      "description": "Seguimiento consolidado de puntuaciones, cobertura y madurez del pipeline asistido por IA.",
+      "openReport": "Ver reporte detallado",
+      "cards": {
+        "average": {
+          "title": "Score promedio IA",
+          "targetHint": "Objetivo ≥ 75 para pasar a shortlist."
+        },
+        "portal": {
+          "title": "Respuestas portal",
+          "responses": "Respuestas recibidas",
+          "coverage": "Cobertura portal",
+          "pending": "Pendientes: {{count}}"
+        },
+        "services": {
+          "title": "Cobertura por servicio",
+          "empty": "Sin datos suficientes.",
+          "row": "{{confirmed}}/{{total}} · Score {{score}}"
+        }
+      },
+      "distribution": {
+        "title": "Distribución de puntuaciones",
+        "bucket": "{{count}} · {{percent}}%",
+        "empty": "Aún no hay datos suficientes para mostrar la distribución."
+      },
+      "top": {
+        "title": "Top proveedores",
+        "columns": {
+          "provider": "Proveedor",
+          "service": "Servicio",
+          "score": "Score"
+        },
+        "empty": "Sin proveedores destacados aún."
+      },
+      "coverage": {
+        "title": "Cobertura detallada",
+        "suppliers": "Proveedores"
+      }
+    },
     "bulkStatusModal": {
       "title": "Cambiar estado",
       "label": "Nuevo estado",

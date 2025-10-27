@@ -321,6 +321,7 @@ export const useAISearch = () => {
           );
           if (res?.ok) {
             const data = await res.json().catch(() => null);
+            console.log('[useAISearch] ✅ Respuesta exitosa de ai-suppliers:', data);
             const arr = Array.isArray(data) ? data : [];
             if (arr.length) {
               const normalized = arr
@@ -333,6 +334,11 @@ export const useAISearch = () => {
                       service: item.service || inferredService,
                       priceRange: item.priceRange || item.price,
                       snippet: item.snippet,
+                      image: item.image || '',
+                      link: item.link || item.url || '',
+                      email: item.email || '',
+                      phone: item.phone || '',
+                      tags: item.tags || [],
                     },
                     index,
                     query,
@@ -340,15 +346,18 @@ export const useAISearch = () => {
                   )
                 );
               if (normalized.length) {
+                console.log('[useAISearch] ✅ Proveedores normalizados:', normalized.length);
                 const refined = refineResults(normalized, { service: inferredService, location });
                 setResults(refined);
                 setLoading(false);
                 return refined;
               }
+            } else {
+              console.warn('[useAISearch] ⚠️ Backend respondió OK pero sin resultados');
             }
           } else {
             const payload = await res.json().catch(() => null);
-            console.debug('[useAISearch] ai-suppliers backend respondió error', {
+            console.error('[useAISearch] ❌ ai-suppliers backend respondió error', {
               status: res?.status,
               payload,
             });
@@ -495,9 +504,35 @@ export const useAISearch = () => {
           lastError = providerErr instanceof Error ? providerErr : new Error(String(providerErr || 'Error'));
         }
       }
-      // Si es error de backend offline, usar fallback automáticamente
-      if (lastError?.code === 'BACKEND_OFFLINE' || (allowFallback && lastError?.code !== 'NO_LOCAL_RESULTS')) {
-        console.info('[useAISearch] Usando resultados de demostración (backend no disponible o fallback activado)');
+      // Si hay error de backend offline, mostrar mensaje claro
+      if (lastError?.code === 'BACKEND_OFFLINE') {
+        const backendError = new Error(
+          'El servidor backend no está disponible. Asegúrate de que el backend esté corriendo en http://localhost:4004'
+        );
+        backendError.code = 'BACKEND_OFFLINE';
+        setResults([]);
+        setUsedFallback(false);
+        setError(backendError);
+        setLoading(false);
+        return [];
+      }
+
+      // Si es error de OpenAI, mostrar mensaje específico
+      if (lastError?.code === 'OPENAI_API_KEY missing' || lastError?.message?.includes('OPENAI_API_KEY')) {
+        const openaiError = new Error(
+          'La búsqueda IA requiere configurar OPENAI_API_KEY en el backend. Por favor, añade tu API key de OpenAI en el archivo .env del backend.'
+        );
+        openaiError.code = 'OPENAI_NOT_CONFIGURED';
+        setResults([]);
+        setUsedFallback(false);
+        setError(openaiError);
+        setLoading(false);
+        return [];
+      }
+
+      // Solo usar fallback si se solicita explícitamente
+      if (allowFallback) {
+        console.info('[useAISearch] Usando resultados de demostración (fallback solicitado explícitamente)');
         const demoResults = generateDemoResults(query);
         const refined = refineResults(demoResults, { service: inferredService, location, isDemoMode: true });
         setResults(refined);
@@ -506,13 +541,12 @@ export const useAISearch = () => {
         return refined;
       }
 
+      // Si llegamos aquí, no hay resultados reales
       setResults([]);
       setUsedFallback(false);
-      const finalError =
-        lastError ||
-        new Error(
-          'No se encontraron resultados para esta busqueda. Configura los servicios de IA o un motor de respaldo para continuar.'
-        );
+      const finalError = lastError || new Error(
+        'No se encontraron proveedores para tu búsqueda. Intenta con otros términos o configura el servicio de búsqueda IA.'
+      );
       setError(finalError);
       setLoading(false);
       return [];
