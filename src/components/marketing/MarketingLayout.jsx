@@ -9,14 +9,25 @@ const linkBaseClasses =
 const activeClasses = 'text-body border-[var(--color-primary)]';
 
 const MarketingLayout = ({ children }) => {
-  const { t } = useTranslation('marketing');
-  
-  const navLinks = [
-    { to: '/', label: t('nav.home') },
-    { to: '/app', label: t('nav.app') },
-    { to: '/precios', label: t('nav.pricing') },
-    { to: '/acceso', label: t('nav.login') },
-  ];
+  const { t, i18n } = useTranslation('marketing');
+
+  const safeT = React.useCallback(
+    (key, fallback, options = {}) =>
+      i18n.exists(key, { ns: 'marketing' }) ? t(key, options) : fallback,
+    [i18n, t]
+  );
+
+  const navLinks = React.useMemo(
+    () => [
+      { to: '/', label: safeT('nav.home', 'Inicio') },
+      { to: '/app', label: safeT('nav.app', 'La App') },
+      { to: '/precios', label: safeT('nav.pricing', 'Precios') },
+      { to: '/acceso', label: safeT('nav.login', 'Login / Registro') },
+    ],
+    [safeT]
+  );
+
+  const currentYear = new Date().getFullYear();
 
   if (typeof window !== 'undefined') {
     window.__MALOVEAPP_MARKETING_VIEW__ = true;
@@ -47,8 +58,8 @@ const MarketingLayout = ({ children }) => {
         <div className="layout-container flex items-center justify-between py-4">
           <Link to="/" className="flex items-center gap-3 text-lg font-semibold text-body">
             <img
-              src="/logo-app.svg"
-              alt={t('common.logoAlt')}
+              src={logoApp}
+              alt={safeT('common.logoAlt', 'Logo MaLove.App')}
               className="h-9 w-9 rounded-xl bg-white object-contain shadow-sm ring-1 ring-[var(--color-primary)]/20"
             />
             <span>MaLove.App</span>
@@ -73,13 +84,13 @@ const MarketingLayout = ({ children }) => {
               to="/login"
               className="rounded-md px-4 py-2 text-sm font-medium text-muted transition-colors hover:text-body"
             >
-              {t('nav.loginShort')}
+              {safeT('nav.loginShort', 'Iniciar sesion')}
             </Link>
             <Link
               to="/signup"
               className="inline-flex items-center justify-center rounded-md bg-[var(--color-primary)] px-4 py-2 text-sm font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5 hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
             >
-              {t('nav.signupShort')}
+              {safeT('nav.signupShort', 'Crear cuenta')}
             </Link>
           </div>
         </div>
@@ -112,16 +123,26 @@ const MarketingLayout = ({ children }) => {
 
       <footer className="border-t border-soft bg-app/90">
         <div className="layout-container flex flex-col gap-4 py-6 text-sm text-muted md:flex-row md:items-center md:justify-between">
-          <p>{t('common.copyright', { year: new Date().getFullYear() })}</p>
+          <p>
+            {safeT(
+              'common.copyright',
+              `Copyright ${currentYear} MaLove.App. Todos los derechos reservados.`,
+              { year: currentYear }
+            )}
+          </p>
           <div className="flex flex-wrap gap-4">
             <Link to="/precios" className="hover:text-body">
-              {t('nav.plans')}
+              {safeT('nav.plans', 'Planes')}
             </Link>
             <Link to="/acceso" className="hover:text-body">
-              {t('nav.accessCenter')}
+              {safeT('nav.accessCenter', 'Centro de acceso')}
             </Link>
-            <a href="mailto:hola@malove.app" className="hover:text-body" aria-label={t('common.contactLabel')}>
-              {t('nav.contact')}
+            <a
+              href="mailto:hola@malove.app"
+              className="hover:text-body"
+              aria-label={safeT('common.contactLabel', 'Contacto MaLove.App')}
+            >
+              {safeT('nav.contact', 'Contacto')}
             </a>
             <a
               href="https://malove.app/legal"
@@ -129,7 +150,7 @@ const MarketingLayout = ({ children }) => {
               rel="noreferrer"
               className="hover:text-body"
             >
-              {t('nav.legal')}
+              {safeT('nav.legal', 'Legal')}
             </a>
           </div>
         </div>

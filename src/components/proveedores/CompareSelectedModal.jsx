@@ -8,6 +8,22 @@ import Modal from '../Modal';
 import Button from '../ui/Button';
 import Alert from '../ui/Alert';
 
+function computePriceValue(p) {
+  const txt = String(p?.priceRange || '')
+    .replace(/€/g, '')
+    .replace(/eur/gi, '')
+    .replace(/por\s+persona/gi, '')
+    .trim();
+  if (!txt) return 0;
+  const nums = (txt.match(/[0-9]+[.,]?[0-9]*/g) || []).map((raw) => {
+    const s = raw.replace(/\./g, '').replace(/,/g, '.');
+    const n = parseFloat(s);
+    return Number.isFinite(n) ? n : 0;
+  });
+  if (nums.length === 0) return 0;
+  if (nums.length === 1) return nums[0];
+  return (nums[0] + nums[1]) / 2;
+}
 
 function toCSV(rows, includeEstPrice = false, labels) {
   const esc = (s) => '"' + String(s ?? '').replace(/"/g, '""') + '"';
@@ -105,23 +121,6 @@ export default function CompareSelectedModal({
     if (!Number.isNaN(a)) return a;
     if (!Number.isNaN(b)) return b;
     return 0;
-  };
-
-  const computePriceValue = (p) => {
-    const txt = String(p?.priceRange || '')
-      .replace(/€/g, '')
-      .replace(/eur/gi, '')
-      .replace(/por\s+persona/gi, '')
-      .trim();
-    if (!txt) return 0;
-    const nums = (txt.match(/[0-9]+[.,]?[0-9]*/g) || []).map((raw) => {
-      const s = raw.replace(/\./g, '').replace(/,/g, '.');
-      const n = parseFloat(s);
-      return Number.isFinite(n) ? n : 0;
-    });
-    if (nums.length === 0) return 0;
-    if (nums.length === 1) return nums[0];
-    return (nums[0] + nums[1]) / 2;
   };
 
   const filteredRows = useMemo(() => {
@@ -265,7 +264,12 @@ export default function CompareSelectedModal({
               />
             </div>
             <div className="md:text-right">
-              <div className="text-xs text-gray-500 mb-1">{t('common.suppliers.compareModal.filter.includeCount', {'included': filteredRows.length, 'total': rows.length})}</div>
+              <div className="text-xs text-gray-500 mb-1">
+                {t('common.suppliers.compareModal.filter.includeCount', {
+                  included: filteredRows.length,
+                  total: rows.length,
+                })}
+              </div>
               <Button onClick={createGroupFromSelection} disabled={!canCreate}>
                 {creating ? t('common.suppliers.compareModal.filter.creating') : t('common.suppliers.compareModal.filter.create')}
               </Button>

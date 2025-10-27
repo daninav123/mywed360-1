@@ -2613,6 +2613,25 @@
         "genericError": "Error creando grupo"
       }
     },
+    "groupSuggestions": {
+      "title": "Sugerencias basadas en presupuestos",
+      "overlaps": {
+        "heading": "Posibles unificaciones por solapamiento",
+        "empty": "No se detectan términos comunes entre presupuestos.",
+        "item": "Aparece en: {{suppliers}}"
+      },
+      "splits": {
+        "heading": "Posibles separaciones por partidas múltiples",
+        "empty": "No se detectan presupuestos con varias subpartidas claras.",
+        "item": "{{supplier}}: {{parts}}"
+      },
+      "outliers": {
+        "heading": "Presupuestos atípicos por importe",
+        "empty": "Sin atípicos; importes dentro de la media del grupo.",
+        "item": "{{supplier}}: {{amount}} (media aprox. {{mean}})"
+      },
+      "close": "Cerrar"
+    },
     "bulkStatusModal": {
       "title": "Cambiar estado",
       "label": "Nuevo estado",

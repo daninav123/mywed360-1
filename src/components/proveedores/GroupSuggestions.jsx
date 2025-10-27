@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 
 import Modal from '../Modal';
 import Button from '../ui/Button';
+import useTranslations from '../../hooks/useTranslations';
 
 const STOPWORDS = new Set([
   'y',
@@ -115,6 +116,7 @@ export default function GroupSuggestions({
   providers = [],
   budgetsBySupplier = {},
 }) {
+  const { t } = useTranslations();
   const providerById = useMemo(
     () => Object.fromEntries(providers.map((p) => [p.id, p])),
     [providers]
@@ -124,24 +126,36 @@ export default function GroupSuggestions({
   const outliers = useMemo(() => detectOutliers(budgetsBySupplier), [budgetsBySupplier]);
 
   return (
-    <Modal open={open} onClose={onClose} title="Sugerencias basadas en presupuestos">
+    <Modal
+      open={open}
+      onClose={onClose}
+      title={t('common.suppliers.groupSuggestions.title')}
+    >
       <div className="space-y-5">
         <div>
-          <h4 className="font-semibold mb-2">Posibles unificaciones por solapamiento</h4>
+          <h4 className="font-semibold mb-2">
+            {t('common.suppliers.groupSuggestions.overlaps.heading')}
+          </h4>
           {overlaps.length === 0 ? (
             <p className="text-sm text-gray-600">
-              No se detectan términos comunes entre presupuestos.
+              {t('common.suppliers.groupSuggestions.overlaps.empty')}
             </p>
           ) : (
             <ul className="list-disc ml-5 space-y-1">
               {overlaps.slice(0, 8).map(([word, occ]) => {
-                const sNames = Array.from(
-                  new Set(occ.map((x) => providerById[x.supplierId]?.name).filter(Boolean))
-                );
+                const suppliersLabel = Array.from(
+                  new Set(
+                    occ
+                      .map((x) => providerById[x.supplierId]?.name || x.supplierId)
+                      .filter(Boolean)
+                  )
+                ).join(', ');
                 return (
                   <li key={word} className="text-sm">
-                    <mark className="px-1 py-0.5 bg-yellow-200 rounded">{word}</mark> aparece en:{' '}
-                    {sNames.join(', ')}
+                    <mark className="px-1 py-0.5 bg-yellow-200 rounded">{word}</mark>{' '}
+                    {t('common.suppliers.groupSuggestions.overlaps.item', {
+                      suppliers: suppliersLabel,
+                    })}
                   </li>
                 );
               })}
@@ -150,43 +164,62 @@ export default function GroupSuggestions({
         </div>
 
         <div>
-          <h4 className="font-semibold mb-2">Posibles separaciones por partidas múltiples</h4>
+          <h4 className="font-semibold mb-2">
+            {t('common.suppliers.groupSuggestions.splits.heading')}
+          </h4>
           {splits.length === 0 ? (
             <p className="text-sm text-gray-600">
-              No se detectan presupuestos con varias subpartidas claras.
+              {t('common.suppliers.groupSuggestions.splits.empty')}
             </p>
           ) : (
             <ul className="list-disc ml-5 space-y-1">
-              {splits.slice(0, 8).map((sug, idx) => (
-                <li key={idx} className="text-sm">
-                  {providerById[sug.supplierId]?.name || sug.supplierId}: {sug.parts.join(' + ')}
-                </li>
-              ))}
+              {splits.slice(0, 8).map((sug, idx) => {
+                const supplierName = providerById[sug.supplierId]?.name || sug.supplierId;
+                const partsLabel = sug.parts.join(' + ');
+                return (
+                  <li key={idx} className="text-sm">
+                    {t('common.suppliers.groupSuggestions.splits.item', {
+                      supplier: supplierName,
+                      parts: partsLabel,
+                    })}
+                  </li>
+                );
+              })}
             </ul>
           )}
         </div>
 
         <div>
-          <h4 className="font-semibold mb-2">Presupuestos atípicos por importe</h4>
+          <h4 className="font-semibold mb-2">
+            {t('common.suppliers.groupSuggestions.outliers.heading')}
+          </h4>
           {outliers.length === 0 ? (
             <p className="text-sm text-gray-600">
-              Sin atípicos; importes dentro de la media del grupo.
+              {t('common.suppliers.groupSuggestions.outliers.empty')}
             </p>
           ) : (
             <ul className="list-disc ml-5 space-y-1">
-              {outliers.slice(0, 8).map((o, idx) => (
-                <li key={idx} className="text-sm">
-                  {providerById[o.supplierId]?.name || o.supplierId}: {o.amount} € (media â‰ˆ{' '}
-                  {Math.round(o.mean)} €)
-                </li>
-              ))}
+              {outliers.slice(0, 8).map((o, idx) => {
+                const supplierName = providerById[o.supplierId]?.name || o.supplierId;
+                const amountLabel = `${o.amount} €`;
+                const meanLabel = `${Math.round(o.mean)} €`;
+                return (
+                  <li key={idx} className="text-sm">
+                    {t('common.suppliers.groupSuggestions.outliers.item', {
+                      supplier: supplierName,
+                      amount: amountLabel,
+                      mean: meanLabel,
+                    })}
+                  </li>
+                );
+              })}
             </ul>
           )}
         </div>
 
         <div className="flex justify-end">
           <Button variant="outline" onClick={onClose}>
-            Cerrar
+            {t('common.suppliers.groupSuggestions.close')}
           </Button>
         </div>
       </div>

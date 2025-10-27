@@ -2512,6 +2512,91 @@
       "confirmAssign": "Assign",
       "confirmCreate": "Create and assign"
     },
+    "compareModal": {
+      "title": "Compare ({{count}})",
+      "hiddenGroupPrefix": "Group \"",
+      "csvFilename": "supplier_comparison.csv",
+      "csv": {
+        "name": "Name",
+        "service": "Service",
+        "status": "Status",
+        "price": "Price",
+        "rating": "Rating",
+        "location": "Location",
+        "email": "Email",
+        "phone": "Phone",
+        "estimatedPrice": "Price (num)",
+        "score": "Score"
+      },
+      "filter": {
+        "groupLabel": "Group name",
+        "groupPlaceholder": "E.g. Finalist photographers",
+        "scoreLabel": "AI score minimum (optional)",
+        "scorePlaceholder": "E.g. 70",
+        "includeCount": "Will include {{included}} of {{total}}",
+        "create": "Create group with selection",
+        "creating": "Creating…"
+      },
+      "sort": {
+        "label": "Sort by:",
+        "score": "AI score",
+        "name": "Name",
+        "price": "Estimated price",
+        "toggleTitle": "Toggle direction",
+        "asc": "Asc",
+        "desc": "Desc",
+        "showEstimated": "Show price (num)"
+      },
+      "table": {
+        "name": "Name",
+        "service": "Service",
+        "status": "Status",
+        "price": "Price",
+        "rating": "Rating",
+        "location": "Location",
+        "email": "Email",
+        "phone": "Phone",
+        "estimatedPrice": "Price (num)",
+        "score": "Score",
+        "actions": "Actions",
+        "remove": "Remove"
+      },
+      "buttons": {
+        "close": "Close",
+        "exportCsv": "Export CSV"
+      },
+      "recommendation": {
+        "summary": "AI recommendation: {{name}} · Score {{score}}",
+        "fallbackName": "Recommended supplier",
+        "breakdown": "Base {{base}} · Intelligence {{intelligence}} · Budget {{budget}} · Requirements {{requirements}}",
+        "rfqSummary": "RFQs sent: {{sent}} · Errors: {{fail}}",
+        "badge": "AI recommendation"
+      },
+      "toasts": {
+        "createSuccess": "Group \"{{name}}\" created with {{count}} suppliers",
+        "createError": "Could not create the group",
+        "genericError": "Error while creating the group"
+      }
+    },
+    "groupSuggestions": {
+      "title": "Budget-based suggestions",
+      "overlaps": {
+        "heading": "Potential merges by overlapping terms",
+        "empty": "No shared terms detected across budgets.",
+        "item": "Appears in: {{suppliers}}"
+      },
+      "splits": {
+        "heading": "Potential splits by multiple line items",
+        "empty": "No budgets found with clear sub-items.",
+        "item": "{{supplier}}: {{parts}}"
+      },
+      "outliers": {
+        "heading": "Budget outliers by amount",
+        "empty": "No outliers; amounts sit near the group average.",
+        "item": "{{supplier}}: {{amount}} (avg approx. {{mean}})"
+      },
+      "close": "Close"
+    },
     "bulkStatusModal": {
       "title": "Change status",
       "label": "New status",

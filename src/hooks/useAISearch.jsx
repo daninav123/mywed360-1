@@ -314,51 +314,6 @@ export const useAISearch = () => {
 
       try {
         if (ENABLE_BACKEND_AI) {
-          // Intentar primero con búsqueda web real (Tavily)
-          try {
-            const resWeb = await apiPost(
-              '/api/ai-suppliers-web',
-              { query, service: inferredService, budget, profile, location },
-              baseFetchOptions
-            );
-            
-            if (resWeb?.ok) {
-              const data = await resWeb.json().catch(() => null);
-              const arr = Array.isArray(data) ? data : [];
-              if (arr.length) {
-                console.info('[useAISearch] Resultados de búsqueda web real obtenidos', { count: arr.length });
-                const normalized = arr
-                  .filter((item) => item && (item.title || item.name))
-                  .map((item, index) =>
-                    normalizeResult(
-                      {
-                        ...item,
-                        name: item.name || item.title,
-                        service: item.service || inferredService,
-                        priceRange: item.priceRange || item.price,
-                        snippet: item.snippet,
-                      },
-                      index,
-                      query,
-                      'web-search'
-                    )
-                  );
-                if (normalized.length) {
-                  const refined = refineResults(normalized, { service: inferredService, location });
-                  setResults(refined);
-                  setLoading(false);
-                  return refined;
-                }
-              }
-            }
-          } catch (webSearchError) {
-            // Si falla búsqueda web (Tavily no configurado), continuar con GPT-4
-            console.info('[useAISearch] Búsqueda web no disponible, usando GPT-4', { 
-              error: webSearchError.message 
-            });
-          }
-
-          // Fallback: búsqueda con GPT-4 (conocimiento hasta 2023)
           const res = await apiPost(
             '/api/ai-suppliers',
             { query, service: inferredService, budget, profile, location },
@@ -368,7 +323,6 @@ export const useAISearch = () => {
             const data = await res.json().catch(() => null);
             const arr = Array.isArray(data) ? data : [];
             if (arr.length) {
-              console.info('[useAISearch] Resultados de GPT-4 obtenidos', { count: arr.length });
               const normalized = arr
                 .filter((item) => item && (item.title || item.name))
                 .map((item, index) =>

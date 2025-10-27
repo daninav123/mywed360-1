@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import MarketingLayout from '../../components/marketing/MarketingLayout';
+import logoApp from '../../assets/logo-mark.svg';
 import {
   CalendarCheck,
   Palette,
@@ -38,6 +39,36 @@ const pickArray = (primary, fallback) => {
     return candidate;
   }
   return ensureArray(fallback);
+};
+
+const normalizeFallbacks = (fallbackLng) => {
+  if (!fallbackLng) {
+    return [];
+  }
+  if (typeof fallbackLng === 'string') {
+    return [fallbackLng];
+  }
+  if (Array.isArray(fallbackLng)) {
+    return fallbackLng;
+  }
+  if (typeof fallbackLng === 'object') {
+    return Object.values(fallbackLng)
+      .flat()
+      .filter(Boolean);
+  }
+  return [];
+};
+
+const uniqueLanguages = (list) => {
+  const seen = new Set();
+  const ordered = [];
+  list.forEach((lng) => {
+    if (lng && !seen.has(lng)) {
+      seen.add(lng);
+      ordered.push(lng);
+    }
+  });
+  return ordered;
 };
 
 const DEFAULT_LANDING_COPY = {
@@ -275,77 +306,132 @@ const PLANNER_HIGHLIGHT_ICON_MAP = {
 };
 
 const Landing = () => {
-  const { t } = useTranslations();
+  const { i18n } = useTranslations();
   const [demoName, setDemoName] = useState('');
   const [demoEmail, setDemoEmail] = useState('');
   const [demoMessage, setDemoMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const hero = useMemo(
-    () => ensureObject(t('marketing.landing.hero', { returnObjects: true })),
-    [t]
-  );
-  const heroDescriptions = ensureArray(hero.description);
-  const heroHighlights = ensureArray(hero.highlights);
-  const heroActions = ensureObject(hero.actions);
-  const heroPrimaryActionLabel = heroActions.primary || 'Empezar gratis';
-  const heroSecondaryActionLabel = heroActions.secondary || 'Ver todo lo que incluye la app';
-  const heroWidget = ensureObject(hero.widget);
-  const heroWidgetConfirmedGuests = ensureObject(heroWidget.confirmedGuests);
-  const heroWidgetBudget = ensureObject(heroWidget.budget);
-  const heroWidgetTasks = ensureObject(heroWidget.tasks);
-  const heroWidgetTasksItems = ensureArray(heroWidgetTasks.items);
-  const heroWidgetAssistant = ensureObject(heroWidget.assistant);
+  const landingRaw = useMemo(
+    () =>
+      ensureObject(
+        (() => {
+          const activeLanguages = Array.isArray(i18n.languages)
+            ? i18n.languages
+            : [i18n.language, i18n.resolvedLanguage].filter(Boolean);
+          const fallbackLanguages = normalizeFallbacks(i18n.options?.fallbackLng);
+          const searchOrder = uniqueLanguages([
+            ...activeLanguages,
+            ...fallbackLanguages,
+            'es',
+            'en',
+          ]);
 
-  const modules = useMemo(
-    () => ensureObject(t('marketing.landing.modules', { returnObjects: true })),
-    [t]
-  );
-  const modulesItems = ensureArray(modules.items);
+          for (const language of searchOrder) {
+            const resource = i18n.getResource(language, 'marketing', 'landing');
+            if (resource) {
+              return resource;
+            }
+          }
 
-  const planner = useMemo(
-    () => ensureObject(t('marketing.landing.planner', { returnObjects: true })),
-    [t]
+          return {};
+        })()
+      ),
+    [i18n.language, i18n.options?.fallbackLng, i18n.resolvedLanguage]
   );
-  const plannerHighlights = ensureArray(planner.highlights).map((item) => {
-    const Icon = PLANNER_HIGHLIGHT_ICON_MAP[item.key] ?? Sparkles;
-    return { ...item, Icon };
+
+  const hero = mergeObjects(DEFAULT_LANDING_COPY.hero, landingRaw.hero);
+  const heroDescriptions = pickArray(hero.description, DEFAULT_LANDING_COPY.hero.description);
+  const heroHighlights = pickArray(hero.highlights, DEFAULT_LANDING_COPY.hero.highlights);
+  const heroActions = mergeObjects(DEFAULT_LANDING_COPY.hero.actions, hero.actions);
+  const heroPrimaryActionLabel = heroActions.primary;
+  const heroSecondaryActionLabel = heroActions.secondary;
+  const heroWidget = mergeObjects(DEFAULT_LANDING_COPY.hero.widget, hero.widget);
+  const heroWidgetConfirmedGuests = mergeObjects(
+    DEFAULT_LANDING_COPY.hero.widget.confirmedGuests,
+    heroWidget.confirmedGuests
+  );
+  const heroWidgetBudget = mergeObjects(
+    DEFAULT_LANDING_COPY.hero.widget.budget,
+    heroWidget.budget
+  );
+  const heroWidgetTasks = mergeObjects(
+    DEFAULT_LANDING_COPY.hero.widget.tasks,
+    heroWidget.tasks
+  );
+  const heroWidgetTasksItems = pickArray(
+    heroWidgetTasks.items,
+    DEFAULT_LANDING_COPY.hero.widget.tasks.items
+  );
+  const heroWidgetAssistant = mergeObjects(
+    DEFAULT_LANDING_COPY.hero.widget.assistant,
+    heroWidget.assistant
+  );
+
+  const modules = mergeObjects(DEFAULT_LANDING_COPY.modules, landingRaw.modules);
+  const modulesItems = pickArray(modules.items, DEFAULT_LANDING_COPY.modules.items);
+
+  const planner = mergeObjects(DEFAULT_LANDING_COPY.planner, landingRaw.planner);
+  const plannerHighlightsSource = pickArray(
+    planner.highlights,
+    DEFAULT_LANDING_COPY.planner.highlights
+  );
+  const plannerHighlights = plannerHighlightsSource.map((item) => {
+    const base =
+      DEFAULT_LANDING_COPY.planner.highlights.find((highlight) => highlight.key === item.key) ||
+      {};
+    const merged = mergeObjects(base, item);
+    const Icon = PLANNER_HIGHLIGHT_ICON_MAP[merged.key] ?? Sparkles;
+    return { ...merged, Icon };
   });
-  const plannerDashboard = ensureObject(planner.dashboard);
-  const plannerStatusItems = ensureArray(plannerDashboard.statusItems);
-
-  const benefits = useMemo(
-    () => ensureObject(t('marketing.landing.benefits', { returnObjects: true })),
-    [t]
+  const plannerDashboard = mergeObjects(
+    DEFAULT_LANDING_COPY.planner.dashboard,
+    planner.dashboard
   );
-  const benefitItems = Object.entries(ensureObject(benefits.items)).map(([key, item]) => {
-    const Icon = BENEFIT_ICON_MAP[key] ?? Sparkles;
-    return { key, Icon, ...item };
-  });
-
-  const stories = useMemo(
-    () => ensureObject(t('marketing.landing.stories', { returnObjects: true })),
-    [t]
+  const plannerStatusItems = pickArray(
+    plannerDashboard.statusItems,
+    DEFAULT_LANDING_COPY.planner.dashboard.statusItems
   );
-  const testimonials = ensureArray(stories.testimonials);
-  const trust = ensureObject(stories.trust);
-  const trustBrands = ensureArray(trust.brands);
 
-  const faq = useMemo(
-    () => ensureObject(t('marketing.landing.faq', { returnObjects: true })),
-    [t]
+  const benefits = mergeObjects(DEFAULT_LANDING_COPY.benefits, landingRaw.benefits);
+  const benefitKeys = Array.from(
+    new Set([
+      ...Object.keys(DEFAULT_LANDING_COPY.benefits.items),
+      ...Object.keys(ensureObject(benefits.items)),
+    ])
   );
-  const faqItems = ensureArray(faq.items);
-  const faqForm = ensureObject(faq.form);
-  const faqFormFields = ensureObject(faqForm.fields);
-  const faqFormMessages = ensureObject(faqForm.messages);
-  const faqSubmitLabel = faqFormMessages.submit || 'Agendar demo';
-  const faqSubmittingLabel = faqFormMessages.submitting || 'Enviando solicitud...';
+  const benefitItems = benefitKeys
+    .map((key) => {
+      const base = DEFAULT_LANDING_COPY.benefits.items[key] || {};
+      const merged = mergeObjects(base, ensureObject(benefits.items?.[key]));
+      const Icon = BENEFIT_ICON_MAP[key] ?? Sparkles;
+      return merged.title ? { key, Icon, ...merged } : null;
+    })
+    .filter(Boolean);
 
-  const cta = useMemo(
-    () => ensureObject(t('marketing.landing.cta', { returnObjects: true })),
-    [t]
+  const stories = mergeObjects(DEFAULT_LANDING_COPY.stories, landingRaw.stories);
+  const testimonials = pickArray(
+    stories.testimonials,
+    DEFAULT_LANDING_COPY.stories.testimonials
   );
+  const trust = mergeObjects(DEFAULT_LANDING_COPY.stories.trust, stories.trust);
+  const trustBrands = pickArray(trust.brands, DEFAULT_LANDING_COPY.stories.trust.brands);
+
+  const faq = mergeObjects(DEFAULT_LANDING_COPY.faq, landingRaw.faq);
+  const faqItems = pickArray(faq.items, DEFAULT_LANDING_COPY.faq.items);
+  const faqForm = mergeObjects(DEFAULT_LANDING_COPY.faq.form, faq.form);
+  const faqFormFields = {
+    name: mergeObjects(DEFAULT_LANDING_COPY.faq.form.fields.name, faqForm.fields?.name),
+    email: mergeObjects(DEFAULT_LANDING_COPY.faq.form.fields.email, faqForm.fields?.email),
+  };
+  const faqFormMessages = mergeObjects(
+    DEFAULT_LANDING_COPY.faq.form.messages,
+    faqForm.messages
+  );
+  const faqSubmitLabel = faqFormMessages.submit;
+  const faqSubmittingLabel = faqFormMessages.submitting;
+
+  const cta = mergeObjects(DEFAULT_LANDING_COPY.cta, landingRaw.cta);
 
   const handleDemoSubmit = (event) => {
     event.preventDefault();
@@ -372,7 +458,7 @@ const Landing = () => {
         <div>
           <div className="flex items-center gap-3">
             <img
-              src="/logo-app.svg"
+              src={logoApp}
               alt={hero.logoAlt || hero.brandLabel || 'MaLove.App'}
               className="h-12 w-12 rounded-2xl bg-white object-contain shadow-sm ring-1 ring-[var(--color-primary)]/25"
             />
@@ -717,27 +803,27 @@ const Landing = () => {
           <form className="mt-6 space-y-4" onSubmit={handleDemoSubmit}>
             <div>
               <label htmlFor="demo-name" className="text-sm font-medium text-body">
-                {ensureObject(faqFormFields.name).label || 'Nombre completo'}
+                {faqFormFields.name.label || 'Nombre completo'}
               </label>
               <input
                 id="demo-name"
                 type="text"
                 value={demoName}
                 onChange={(event) => setDemoName(event.target.value)}
-                placeholder={ensureObject(faqFormFields.name).placeholder || 'Tu nombre'}
+                placeholder={faqFormFields.name.placeholder || 'Tu nombre'}
                 className="mt-1 w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
               />
             </div>
             <div>
               <label htmlFor="demo-email" className="text-sm font-medium text-body">
-                {ensureObject(faqFormFields.email).label || 'Email de contacto'}
+                {faqFormFields.email.label || 'Email de contacto'}
               </label>
               <input
                 id="demo-email"
                 type="email"
                 value={demoEmail}
                 onChange={(event) => setDemoEmail(event.target.value)}
-                placeholder={ensureObject(faqFormFields.email).placeholder || 'hola@tuagencia.com'}
+                placeholder={faqFormFields.email.placeholder || 'hola@tuagencia.com'}
                 className="mt-1 w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
               />
             </div>
