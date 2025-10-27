@@ -347,7 +347,41 @@ const validResults = results.filter(result => {
 });
 ```
 
-### **4. Limpieza de Nombres**
+### **4. 🆕 Deduplicación por Email y URL**
+
+```javascript
+const seenEmails = new Set();
+const seenUrls = new Set();
+
+const uniqueResults = validResults.filter(result => {
+  // Si tiene email, verificar que no esté duplicado
+  if (result.email && result.email.trim() !== '') {
+    const emailLower = result.email.toLowerCase().trim();
+    if (seenEmails.has(emailLower)) {
+      console.log(`🗑️ [DEDUP] Duplicado por email: ${result.title}`);
+      return false;
+    }
+    seenEmails.add(emailLower);
+  }
+  
+  // También verificar URLs duplicadas
+  const baseDomain = `${url.hostname}${url.pathname}`;
+  if (seenUrls.has(baseDomain)) {
+    console.log(`🗑️ [DEDUP] Duplicado por URL: ${result.title}`);
+    return false;
+  }
+  seenUrls.add(baseDomain);
+  
+  return true;
+});
+```
+
+**¿Por qué es necesario?**
+- ⚠️ **Problema**: Tavily puede devolver el mismo proveedor en múltiples URLs
+- ⚠️ **Ejemplo**: `bodas.net/fotografia/delia--e123` y `www.deliafotografos.com` → mismo email
+- ✅ **Solución**: Solo mostrar el proveedor una vez (el primer resultado encontrado)
+
+### **5. Limpieza de Nombres**
 
 ```javascript
 // Antes:
@@ -357,7 +391,7 @@ const validResults = results.filter(result => {
 "Delia Fotógrafos"
 ```
 
-### **5. Extracción de Ubicación**
+### **6. Extracción de Ubicación**
 
 ```javascript
 // Busca ciudades españolas en el contenido:
@@ -365,9 +399,9 @@ const cities = ['Madrid', 'Barcelona', 'Valencia', 'Sevilla', ...];
 const location = extractLocation(content, cities);
 ```
 
-### **6. Top 8 Resultados**
+### **7. Top 8 Resultados**
 
-Solo devuelve los **8 mejores proveedores únicos** con mayor score.
+Solo devuelve los **8 mejores proveedores únicos** con mayor score (después de deduplicar).
 
 ---
 

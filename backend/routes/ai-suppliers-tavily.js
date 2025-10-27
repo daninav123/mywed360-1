@@ -845,11 +845,58 @@ router.post('/', async (req, res) => {
       console.warn(`⚠️ [FILTRO] Solo ${validResults.length} resultados válidos. Considera refinar la búsqueda.`);
     }
 
-    // 3. Limitar a los mejores 8 resultados para calidad
-    const topResults = validResults.slice(0, 8);
-    console.log(`🎯 [FILTRO] Devolviendo los mejores ${topResults.length} proveedores\n`);
+    // 3. DEDUPLICAR por email de contacto
+    // ⚠️ CRÍTICO: Evitar mostrar el mismo proveedor múltiples veces
+    // Si dos resultados tienen el mismo email, solo mantener el primero
+    const seenEmails = new Set();
+    const seenUrls = new Set();
+    
+    const uniqueResults = validResults.filter((result, idx) => {
+      // Si tiene email, verificar que no esté duplicado
+      if (result.email && result.email.trim() !== '') {
+        const emailLower = result.email.toLowerCase().trim();
+        if (seenEmails.has(emailLower)) {
+          console.log(`🗑️ [DEDUP] Duplicado por email: ${result.title} (${result.email})`);
+          return false;
+        }
+        seenEmails.add(emailLower);
+      }
+      
+      // También verificar URLs duplicadas (mismo dominio base)
+      try {
+        const urlObj = new URL(result.url);
+        const baseDomain = `${urlObj.hostname}${urlObj.pathname}`;
+        const normalizedDomain = baseDomain.toLowerCase().replace(/\/$/, '');
+        
+        if (seenUrls.has(normalizedDomain)) {
+          console.log(`🗑️ [DEDUP] Duplicado por URL: ${result.title}`);
+          return false;
+        }
+        seenUrls.add(normalizedDomain);
+      } catch (e) {
+        // Si falla el parseo de URL, mantener el resultado
+      }
+      
+      return true;
+    });
+    
+    console.log(`\n🔄 [DEDUP] ${validResults.length} → ${uniqueResults.length} resultados únicos`);
+    console.log(`   Emails duplicados eliminados: ${validResults.length - uniqueResults.length}`);
+    
+    if (uniqueResults.length === 0) {
+      console.warn('⚠️ [DEDUP] No hay resultados únicos después de deduplicar');
+      logger.warn('[ai-suppliers-tavily] Todos los resultados son duplicados', {
+        originalCount: validResults.length,
+        query
+      });
+      return res.json([]);
+    }
 
-    // 4. Convertir resultados válidos a formato de proveedor (SIN OpenAI)
+    // 4. Limitar a los mejores 8 resultados para calidad
+    const topResults = uniqueResults.slice(0, 8);
+    console.log(`🎯 [FILTRO] Devolviendo los mejores ${topResults.length} proveedores únicos\n`);
+
+    // 5. Convertir resultados válidos a formato de proveedor (SIN OpenAI)
     const providers = topResults.map((result, index) => {
       // === EXTRACCIÓN DEL NOMBRE REAL DEL PROVEEDOR ===
       let providerName = result.title;

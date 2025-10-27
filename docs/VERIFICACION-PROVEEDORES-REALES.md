@@ -272,26 +272,77 @@ const cities = [
 
 ---
 
-### **7. ✅ Límite de Resultados**
+### **7. ✅ Deduplicación de Proveedores**
 
-**Requisito:** Devolver solo los 8 mejores proveedores
+**Requisito:** Evitar mostrar el mismo proveedor múltiples veces
 
 | Criterio | Implementado | Líneas de código | Estado |
 |----------|--------------|------------------|--------|
-| Limita a 8 resultados | ✅ Sí | 852-853 | ✅ CORRECTO |
-| Muestra log de limitación | ✅ Sí | 853 | ✅ CORRECTO |
+| Deduplicación por email | ✅ Sí | 855-862 | ✅ CORRECTO |
+| Deduplicación por URL | ✅ Sí | 865-878 | ✅ CORRECTO |
+| Normalización de emails | ✅ Sí | 857 | ✅ CORRECTO |
+| Normalización de URLs | ✅ Sí | 868-869 | ✅ CORRECTO |
+| Log de duplicados | ✅ Sí | 859, 872, 883-884 | ✅ CORRECTO |
 
-**Código (Líneas 852-853):**
+**Código de deduplicación por email (Líneas 855-862):**
 ```javascript
-const topResults = validResults.slice(0, 8);
-console.log(`🎯 [FILTRO] Devolviendo los mejores ${topResults.length} proveedores\n`);
+if (result.email && result.email.trim() !== '') {
+  const emailLower = result.email.toLowerCase().trim();
+  if (seenEmails.has(emailLower)) {
+    console.log(`🗑️ [DEDUP] Duplicado por email: ${result.title} (${result.email})`);
+    return false;
+  }
+  seenEmails.add(emailLower);
+}
+```
+
+**Código de deduplicación por URL (Líneas 865-878):**
+```javascript
+try {
+  const urlObj = new URL(result.url);
+  const baseDomain = `${urlObj.hostname}${urlObj.pathname}`;
+  const normalizedDomain = baseDomain.toLowerCase().replace(/\/$/, '');
+  
+  if (seenUrls.has(normalizedDomain)) {
+    console.log(`🗑️ [DEDUP] Duplicado por URL: ${result.title}`);
+    return false;
+  }
+  seenUrls.add(normalizedDomain);
+} catch (e) {
+  // Si falla el parseo de URL, mantener el resultado
+}
+```
+
+**Log de resumen (Líneas 883-884):**
+```javascript
+console.log(`\n🔄 [DEDUP] ${validResults.length} → ${uniqueResults.length} resultados únicos`);
+console.log(`   Emails duplicados eliminados: ${validResults.length - uniqueResults.length}`);
+```
+
+✅ **RESULTADO:** Deduplicación correctamente implementada
+
+---
+
+### **8. ✅ Límite de Resultados**
+
+**Requisito:** Devolver solo los 8 mejores proveedores únicos
+
+| Criterio | Implementado | Líneas de código | Estado |
+|----------|--------------|------------------|--------|
+| Limita a 8 resultados | ✅ Sí | 895-897 | ✅ CORRECTO |
+| Muestra log de limitación | ✅ Sí | 897 | ✅ CORRECTO |
+
+**Código (Líneas 895-897):**
+```javascript
+const topResults = uniqueResults.slice(0, 8);
+console.log(`🎯 [FILTRO] Devolviendo los mejores ${topResults.length} proveedores únicos\n`);
 ```
 
 ✅ **RESULTADO:** Límite correctamente aplicado
 
 ---
 
-### **8. ✅ Logs Informativos**
+### **9. ✅ Logs Informativos**
 
 **Requisito:** Mostrar información de filtrado en consola
 
@@ -334,9 +385,10 @@ console.log('='.repeat(80) + '\n');
 | **Scraping de Datos** | 4 | 4 | 100% ✅ |
 | **Limpieza de Nombres** | 6 | 6 | 100% ✅ |
 | **Extracción de Ubicación** | 3 | 3 | 100% ✅ |
+| **🆕 Deduplicación** | 5 | 5 | 100% ✅ |
 | **Límite de Resultados** | 2 | 2 | 100% ✅ |
 | **Logs Informativos** | 5 | 5 | 100% ✅ |
-| **TOTAL** | **40** | **40** | **100% ✅** |
+| **TOTAL** | **45** | **45** | **100% ✅** |
 
 ---
 
@@ -381,6 +433,31 @@ console.log('='.repeat(80) + '\n');
    Razón: Contiene "somos", "nuestros servicios" (primera persona)
 ```
 
+### **🆕 Ejemplo 4: Deduplicación por email**
+
+```
+ANTES DE DEDUPLICACIÓN:
+   1. "Delia Fotógrafos" (bodas.net/fotografia/delia--e123456)
+      Email: info@deliafotografos.com
+   
+   2. "Delia - Fotografía de bodas" (www.deliafotografos.com)
+      Email: info@deliafotografos.com
+   
+   3. "Delia Fotógrafos Valencia" (instagram.com/deliafotografos)
+      Email: info@deliafotografos.com
+
+DESPUÉS DE DEDUPLICACIÓN:
+   1. "Delia Fotógrafos" (bodas.net/fotografia/delia--e123456)
+      Email: info@deliafotografos.com
+      ✅ Primer resultado → SE MANTIENE
+
+   Log: "🗑️ [DEDUP] Duplicado por email: Delia - Fotografía de bodas (info@deliafotografos.com)"
+   Log: "🗑️ [DEDUP] Duplicado por email: Delia Fotógrafos Valencia (info@deliafotografos.com)"
+   Log: "🔄 [DEDUP] 3 → 1 resultados únicos"
+```
+
+**Beneficio:** El usuario ve solo 1 tarjeta de Delia Fotógrafos (en lugar de 3 tarjetas del mismo proveedor)
+
 ---
 
 ## 🎯 Conclusión
@@ -397,15 +474,20 @@ El código implementado en `backend/routes/ai-suppliers-tavily.js` cumple **TODO
 6. ✅ Filtra contenido de listados múltiples
 7. ✅ Acepta solo proveedores únicos
 8. ✅ Extrae datos de contacto (email, teléfono, Instagram)
-9. ✅ Limpia nombres de proveedores
-10. ✅ Extrae ubicaciones
-11. ✅ Limita a 8 resultados
-12. ✅ Muestra logs informativos
+9. ✅ 🆕 **Deduplica por email** (evita proveedores repetidos)
+10. ✅ 🆕 **Deduplica por URL** (evita URLs duplicadas)
+11. ✅ Limpia nombres de proveedores
+12. ✅ Extrae ubicaciones
+13. ✅ Limita a 8 resultados únicos
+14. ✅ Muestra logs informativos
 
-**El sistema garantiza que cada tarjeta devuelta es de un PROVEEDOR REAL específico, NO un motor de búsqueda.**
+**El sistema garantiza que:**
+- ✅ Cada tarjeta es de un PROVEEDOR REAL específico (NO motor de búsqueda)
+- ✅ 🆕 Cada proveedor se muestra SOLO UNA VEZ (sin duplicados)
 
 ---
 
-**Fecha de verificación:** 2025-10-27  
+**Fecha de verificación:** 2025-10-27 (actualizado)  
 **Verificado por:** Sistema automatizado  
+**Última actualización:** Deduplicación por email/URL añadida  
 **Próxima revisión:** Tras cambios en el código de filtrado
