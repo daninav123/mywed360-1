@@ -96,6 +96,15 @@ export default function TasksRefactored() {
   // Subtareas anidadas (nuevo modelo): weddings/{id}/tasks|task/{parentId}/subtasks/*
   const { data: nestedSubtasks = [] } = useWeddingCollectionGroup('subtasks', activeWedding);
 
+  // Memorizar IDs de tareas padre para evitar re-ejecutar el useEffect en cada render
+  const parentTaskIds = useMemo(() => {
+    return (Array.isArray(tasksState) ? tasksState : [])
+      .filter((t) => String(t?.type || 'task') === 'task' && t?.id)
+      .map((t) => String(t.id))
+      .sort()
+      .join(',');
+  }, [tasksState]);
+
   // Fallback listener: if collectionGroup('subtasks') returns nothing
   // (e.g., due to rules in some environments), subscribe each parent's
   // subtasks subcollection and merge results locally.
@@ -114,9 +123,7 @@ export default function TasksRefactored() {
       try { nestedFallbackUnsubsRef.current.forEach((u) => u && u()); } catch {}
       nestedFallbackUnsubsRef.current = [];
 
-      const parents = (Array.isArray(tasksState) ? tasksState : [])
-        .filter((t) => String(t?.type || 'task') === 'task' && t?.id)
-        .map((t) => String(t.id));
+      const parents = parentTaskIds.split(',').filter(Boolean);
       if (parents.length === 0) { setNestedSubtasksFallback([]); return; }
 
       const acc = new Map();
@@ -163,25 +170,39 @@ export default function TasksRefactored() {
         nestedFallbackUnsubsRef.current = [];
       };
     } catch (_) {}
-  }, [activeWedding, db, tasksState, nestedSubtasks]);
+  }, [activeWedding, db, parentTaskIds, nestedSubtasks]);
 
   // Fallback para estructura con coleccin singular 'task':
   // Escucha weddings/{id}/task/*/subtasks/* si el collectionGroup no devuelve nada
   
 
   // Migracin suave de subtareas planas -> anidadas (una vez por boda)
+  const migrationAttemptedRef = useRef(new Set());
   useEffect(() => {
     (async () => {
       try {
         if (!activeWedding) return;
+        
+        // Prevenir múltiples migraciones para la misma boda
+        if (migrationAttemptedRef.current.has(activeWedding)) return;
+        
         const flatCount = Array.isArray(tasksState)
           ? tasksState.filter((t) => String(t?.type || '') === 'subtask').length
           : 0;
         const nestedCount = Array.isArray(nestedSubtasks) ? nestedSubtasks.length : 0;
+        
         if (flatCount > 0 && nestedCount < flatCount) {
+          // Marcar como intentado antes de ejecutar
+          migrationAttemptedRef.current.add(activeWedding);
           await migrateFlatSubtasksToNested(activeWedding);
         }
-      } catch (_) {}
+      } catch (error) {
+        console.warn('[Tasks] migration failed', error);
+        // Si falla, permitir reintentar
+        if (activeWedding) {
+          migrationAttemptedRef.current.delete(activeWedding);
+        }
+      }
     })();
   }, [activeWedding, tasksState, nestedSubtasks]);
 
@@ -2082,12 +2103,22 @@ export default function TasksRefactored() {
   }, [activeWedding, db, projectEnd]);
 
   // Seed autom�tico de Bloques A-I (padres + subtareas) si no hay tareas
+  // Usar ref para ejecutar solo una vez por boda
+  const seedAttemptedRef = useRef(new Set());
   useEffect(() => {
     (async () => {
       try {
         if (!activeWedding || !db) return;
+        
+        // Prevenir múltiples intentos para la misma boda
+        if (seedAttemptedRef.current.has(activeWedding)) return;
+        
         const hasAny = Array.isArray(tasksState) && tasksState.length > 0;
         if (hasAny) return;
+        
+        // Marcar como intentado antes de ejecutar
+        seedAttemptedRef.current.add(activeWedding);
+        
         await seedWeddingTasksFromTemplate({
           db,
           weddingId: activeWedding,
@@ -2096,6 +2127,10 @@ export default function TasksRefactored() {
         });
       } catch (error) {
         console.warn('[Tasks] automatic seed failed', error);
+        // Si falla, permitir reintentar en el próximo mount
+        if (activeWedding) {
+          seedAttemptedRef.current.delete(activeWedding);
+        }
       }
     })();
   }, [activeWedding, db, projectEnd, tasksState]);
