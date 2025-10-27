@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { db } from '../../firebaseConfig';
+import { Link } from 'react-router-dom';
 import { formatDate as formatDateUtil } from '../../utils/formatUtils';
 import { Crown, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
 

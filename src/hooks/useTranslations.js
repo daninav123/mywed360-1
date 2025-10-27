@@ -2,15 +2,38 @@ import { useTranslation } from 'react-i18next';
 
 import { getCurrentLanguage, formatDate, formatCurrency, formatNumber } from '../i18n';
 
+const SUPPORTED_NAMESPACES = [
+  'common',
+  'finance',
+  'tasks',
+  'seating',
+  'email',
+  'admin',
+  'marketing',
+  'chat',
+  'home',
+];
+
+const PREFIXED_NAMESPACES = SUPPORTED_NAMESPACES.filter((ns) => ns !== 'common');
+
 // Hook de traducciones y formateos localizados
 const useTranslations = () => {
-  const { t, i18n } = useTranslation(['common', 'finance']);
+  const { t, i18n } = useTranslation(SUPPORTED_NAMESPACES);
 
-  // Normalize key/namespace: if key starts with "finance." use finance ns and drop prefix
+  // Normalize key/namespace: if key starts with a known namespace prefix drop it and set ns
   const normalizeNs = (key, opts = {}) => {
-    if (typeof key === 'string' && key.startsWith('finance.')) {
-      return { key: key.slice('finance.'.length), opts: { ...opts, ns: 'finance' } };
+    if (typeof key !== 'string') {
+      return { key, opts };
     }
+
+    const matchedNamespace = PREFIXED_NAMESPACES.find((ns) => key.startsWith(`${ns}.`));
+    if (matchedNamespace) {
+      return {
+        key: key.slice(matchedNamespace.length + 1),
+        opts: { ...opts, ns: matchedNamespace },
+      };
+    }
+
     return { key, opts };
   };
 
@@ -132,4 +155,3 @@ const useTranslations = () => {
 };
 
 export default useTranslations;
-

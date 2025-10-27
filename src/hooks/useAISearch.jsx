@@ -82,6 +82,78 @@ const normalizeResult = (item, index, query, source) => {
   };
 };
 
+const extractFromArray = (arr, selector) => {
+  if (!Array.isArray(arr) || arr.length === 0) return '';
+  for (const entry of arr) {
+    const value = selector(entry);
+    if (value) return value;
+  }
+  return '';
+};
+
+const normalizeProviderRecord = (item, index, query, inferredService) => {
+  if (!item) return null;
+  const tagsSet = new Set();
+  if (Array.isArray(item.tags)) {
+    item.tags.filter(Boolean).forEach((tag) => tagsSet.add(tag));
+  }
+  if (Array.isArray(item.services)) {
+    item.services
+      .map((s) => s?.name)
+      .filter(Boolean)
+      .forEach((name) => tagsSet.add(name));
+  }
+
+  const snippetParts = [];
+  if (item.description) snippetParts.push(item.description);
+  if (item.notes) snippetParts.push(item.notes);
+  if (Array.isArray(item.services)) {
+    item.services
+      .map((s) => s?.description)
+      .filter(Boolean)
+      .forEach((desc) => snippetParts.push(desc));
+  }
+  const snippet = snippetParts.join(' ').trim();
+
+  const imageCandidate =
+    item.image ||
+    item.imageUrl ||
+    item.coverImage ||
+    item.coverImageUrl ||
+    extractFromArray(item.images, (img) => (typeof img === 'string' ? img : img?.url));
+
+  const priceCandidate =
+    item.priceRange ||
+    item.price ||
+    item.averagePrice ||
+    extractFromArray(item.services, (svc) => svc?.priceRange || svc?.price);
+
+  const linkCandidate =
+    item.website ||
+    item.url ||
+    item.profileUrl ||
+    extractFromArray(item.links, (link) => (typeof link === 'string' ? link : link?.url));
+
+  return normalizeResult(
+    {
+      name: item.name,
+      service: item.category || inferredService,
+      location: item.location || item.city || item.address || '',
+      priceRange: priceCandidate,
+      snippet: snippet || item.summary || '',
+      link: linkCandidate,
+      image: imageCandidate || '',
+      email: item.email || item.contactEmail || '',
+      phone: item.phone || item.contactPhone || '',
+      tags: Array.from(tagsSet),
+      keywords: Array.from(tagsSet),
+    },
+    index,
+    query,
+    'database'
+  );
+};
+
 const mapBackendErrorMessage = (payload, status, fallbackMessage) => {
   const code = payload?.error || payload?.code;
   const detail = payload?.details || payload?.message || '';
@@ -230,6 +302,7 @@ export const useAISearch = () => {
         profile.budget || profile.estimatedBudget || profile.totalBudget || profile.presupuesto || '';
       const inferredService = (opts && opts.service) || guessServiceFromQuery(query);
       const allowFallback = opts?.allowFallback === true;
+      const enrichedQuery = [query, inferredService, location, budget].filter(Boolean).join(' ').trim();
 
       let lastError = null;
 
@@ -367,8 +440,63 @@ export const useAISearch = () => {
         }
       }
 
-      // Si es error de backend offline, usar fallback automáticamente
-      if (lastError?.code === 'BACKEND_OFFLINE' || allowFallback) {
+      // Intento 3: consultar la base interna de proveedores
+      try {
+        const providerQueries = Array.from(
+          new Set(
+            [query, `${inferredService} ${location}`.trim(), inferredService, location]
+              .map((term) => String(term || '').trim())
+              .filter(Boolean)
+          )
+        );
+
+        for (const term of providerQueries) {
+          const resProviders = await apiGet(`/api/providers/search?q=${encodeURIComponent(term)}`, {
+            ...baseFetchOptions,
+          });
+          if (!resProviders) continue;
+
+          if (resProviders.ok) {
+            const payload = await resProviders.json().catch(() => null);
+            const items = Array.isArray(payload?.items) ? payload.items : [];
+            if (items.length) {
+              const normalized = items
+                .map((item, index) => normalizeProviderRecord(item, index, query, inferredService))
+                .filter(Boolean);
+              if (normalized.length) {
+                const refined = refineResults(normalized, { service: inferredService, location });
+                setResults(refined);
+                setLoading(false);
+                return refined;
+              }
+            }
+          } else {
+            const payload = await resProviders.json().catch(() => null);
+            const providerError = new Error(
+              mapBackendErrorMessage(
+                payload,
+                resProviders.status,
+                `El buscador interno respondio ${resProviders.status}`
+              )
+            );
+            if (payload?.error) providerError.code = payload.error;
+            if (!lastError) lastError = providerError;
+          }
+        }
+
+        if (!lastError) {
+          const noResultsError = new Error('No se encontraron proveedores en la base de datos interna.');
+          noResultsError.code = 'NO_LOCAL_RESULTS';
+          lastError = noResultsError;
+        }
+      } catch (providerErr) {
+        console.warn('Fallo consultando providers/search', providerErr);
+        if (!lastError) {
+          lastError = providerErr instanceof Error ? providerErr : new Error(String(providerErr || 'Error'));
+        }
+      }
+// Si es error de backend offline, usar fallback automáticamente
+      if (lastError?.code === 'BACKEND_OFFLINE' || (allowFallback && lastError?.code !== 'NO_LOCAL_RESULTS')) {
         console.info('[useAISearch] Usando resultados de demostración (backend no disponible o fallback activado)');
         const demoResults = generateDemoResults(query);
         const refined = refineResults(demoResults, { service: inferredService, location, isDemoMode: true });
@@ -464,3 +592,6 @@ function includesWord(haystack, needle) {
   const nw = n.split(/[\s,/-]+/);
   return hw.some((w) => nw.includes(w));
 }
+
+
+

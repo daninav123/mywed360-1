@@ -9,6 +9,13 @@ const toneToVar = {
   danger: 'var(--color-danger)',
 };
 
+const toneToGradient = {
+  primary: 'from-[#5ebbff]/20 via-[#5ebbff]/5 to-transparent',
+  success: 'from-[#22c55e]/20 via-[#22c55e]/5 to-transparent',
+  warning: 'from-[#f59e0b]/20 via-[#f59e0b]/5 to-transparent',
+  danger: 'from-[#ef4444]/20 via-[#ef4444]/5 to-transparent',
+};
+
 export default function StatCard({
   title,
   value,
@@ -31,15 +38,16 @@ export default function StatCard({
   sparklineData,
 }) {
   const color = toneToVar[tone] || toneToVar.primary;
+  const gradient = toneToGradient[tone] || toneToGradient.primary;
   const clickable = typeof onClick === 'function';
 
-  const padding = compact ? 'p-4 md:p-5' : 'p-5 md:p-6';
+  const padding = compact ? 'p-5 md:p-6' : 'p-6 md:p-7';
 
   const renderSparkline = () => {
     const data = Array.isArray(sparklineData) ? sparklineData : null;
     if (!data || data.length < 2) return null;
-    const w = 84;
-    const h = 28;
+    const w = 100;
+    const h = 32;
     const min = Math.min(...data);
     const max = Math.max(...data);
     const range = max - min || 1;
@@ -51,19 +59,33 @@ export default function StatCard({
         return `${x},${y}`;
       })
       .join(' ');
+    
+    // Crear área para el gradiente
+    const areaPoints = `${points} ${w},${h} 0,${h}`;
+    
     return (
       <svg
         width={w}
         height={h}
-        className="absolute right-3 bottom-3 opacity-70"
+        className="absolute right-4 bottom-4 opacity-60 group-hover:opacity-80 transition-opacity duration-300"
         aria-hidden="true"
         focusable="false"
       >
+        <defs>
+          <linearGradient id={`gradient-${tone}`} x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="currentColor" stopOpacity="0.3" />
+            <stop offset="100%" stopColor="currentColor" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        <polygon
+          points={areaPoints}
+          fill={`url(#gradient-${tone})`}
+        />
         <polyline
           points={points}
           fill="none"
           stroke="currentColor"
-          strokeWidth="2"
+          strokeWidth="2.5"
           strokeLinejoin="round"
           strokeLinecap="round"
         />
@@ -80,42 +102,61 @@ export default function StatCard({
           ? 'var(--color-danger)'
           : 'var(--color-text)';
     const arrow = deltaTrend === 'up' ? '▲' : deltaTrend === 'down' ? '▼' : '•';
+    const bgColor = deltaTrend === 'up' 
+      ? 'color-mix(in srgb, var(--color-success) 15%, transparent)'
+      : deltaTrend === 'down'
+        ? 'color-mix(in srgb, var(--color-danger) 15%, transparent)'
+        : 'color-mix(in srgb, var(--color-text) 10%, transparent)';
+    
     return (
       <div
-        className="mt-2 inline-flex items-center gap-1 text-xs font-medium"
-        style={{ color: trendColor }}
+        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold shadow-sm"
+        style={{ color: trendColor, backgroundColor: bgColor }}
       >
-        <span aria-hidden>{arrow}</span>
+        <span aria-hidden className="text-sm">{arrow}</span>
         <span>{Math.abs(deltaValue).toFixed(1)}%</span>
-        {deltaLabel && <span className="text-[color:var(--color-text)]/60">{deltaLabel}</span>}
+        {deltaLabel && <span className="text-[color:var(--color-text)]/60 font-normal ml-1">{deltaLabel}</span>}
       </div>
     );
   };
 
   return (
     <Card
-      className={`${padding} relative overflow-hidden bg-[var(--color-surface)]/80 backdrop-blur-md border-soft ${clickable ? 'cursor-pointer transition hover:shadow-lg hover:-translate-y-0.5 focus-within:ring-2 focus-within:ring-[color:var(--color-primary)]/40' : 'transition'} ${className}`}
+      className={`${padding} group relative overflow-hidden bg-gradient-to-br ${gradient} backdrop-blur-xl border-soft shadow-lg ${clickable ? 'cursor-pointer transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 hover:scale-[1.02] focus-within:ring-2 focus-within:ring-[color:var(--color-primary)]/50' : 'transition-all duration-300'} ${className}`}
       onClick={onClick}
       role={role}
       tabIndex={tabIndex}
       title={tooltip}
     >
-      <div className="absolute inset-x-0 top-0 h-1" style={{ backgroundColor: color }} />
-      <div className="flex items-start justify-between gap-3">
-        <div>
+      {/* Gradiente superior con efecto shimmer */}
+      <div 
+        className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r opacity-90 group-hover:opacity-100 transition-opacity duration-300" 
+        style={{ 
+          backgroundImage: `linear-gradient(90deg, ${color}, color-mix(in srgb, ${color} 70%, white))` 
+        }} 
+      />
+      
+      {/* Efecto de luz de fondo */}
+      <div 
+        className="absolute -top-24 -right-24 w-48 h-48 rounded-full blur-3xl opacity-20 group-hover:opacity-30 transition-opacity duration-500"
+        style={{ backgroundColor: color }}
+      />
+      
+      <div className="flex items-start justify-between gap-4 relative z-10">
+        <div className="flex-1">
           {title && (
-            <p className="text-sm font-medium text-[color:var(--color-text)]/70">{title}</p>
+            <p className="text-sm font-semibold text-muted uppercase tracking-wide mb-2">{title}</p>
           )}
-          <div className="mt-1">
+          <div className="space-y-2">
             {loading ? (
-              <div className="h-7 md:h-8 w-28 bg-[color:var(--color-text)]/10 rounded animate-pulse" />
+              <div className="h-9 md:h-10 w-32 bg-[color:var(--color-text)]/10 rounded-lg animate-pulse" />
             ) : (
-              <div className="text-2xl md:text-3xl font-bold text-[color:var(--color-text)]">
+              <div className="text-3xl md:text-4xl font-bold text-body tracking-tight">
                 {value}
               </div>
             )}
             {subtitle && !loading && (
-              <p className="text-xs md:text-sm text-[color:var(--color-text)]/60 mt-1">
+              <p className="text-xs md:text-sm text-muted font-medium">
                 {subtitle}
               </p>
             )}
@@ -123,13 +164,18 @@ export default function StatCard({
           </div>
         </div>
         {icon && (
-          <div className="p-2 md:p-3 rounded-full" style={{ backgroundColor: `${color}1A` }}>
-            {/* 1A ~ 10% opacity */}
-            <div style={{ color }}>{icon}</div>
+          <div 
+            className="relative p-3 md:p-4 rounded-2xl shadow-lg group-hover:scale-110 transition-transform duration-300"
+            style={{ 
+              backgroundColor: `color-mix(in srgb, ${color} 15%, var(--color-surface))`,
+              boxShadow: `0 4px 14px color-mix(in srgb, ${color} 25%, transparent)`
+            }}
+          >
+            <div className="w-6 h-6 md:w-7 md:h-7" style={{ color }}>{icon}</div>
           </div>
         )}
       </div>
-      <div style={{ color }}>{renderSparkline()}</div>
+      <div style={{ color }} className="relative z-10">{renderSparkline()}</div>
     </Card>
   );
 }

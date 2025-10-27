@@ -228,12 +228,14 @@ function Finance() {
               transactions={transactions}
               projection={projection}
               predictiveInsights={predictiveInsights}
+              onNavigate={navigateToTransactions}
             />
             <FinanceCashflowTimeline
               monthlySeries={monthlySeries}
               predictiveInsights={predictiveInsights}
               stats={stats}
               budget={budget}
+              projection={projection}
             />
           </div>
         )}

@@ -62,7 +62,7 @@ const dedupeServiceList = (entries) => {
   return unique;
 };
 
-// Las categorÃƒÆ’Ã‚Â­as se traducirÃƒÆ’Ã‚Â¡n usando el hook useTranslations
+// Las categorÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­as se traducirÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡n usando el hook useTranslations
 const getInspirationCategories = (t) => [
   { slug: 'decoracion', label: t('common.categories.decoration') },
   { slug: 'coctel', label: t('common.categories.cocktail') },
@@ -75,9 +75,9 @@ const getInspirationCategories = (t) => [
 ];
 
 const PROGRESS_STORAGE_KEY = 'maloveapp_progress';
-// 2500 coincide con el lÃƒÆ’Ã‚Â­mite superior del nivel 6 (Experto Wedding) en backend/services/gamificationService.js.
+// 2500 coincide con el lÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­mite superior del nivel 6 (Experto Wedding) en backend/services/gamificationService.js.
 const PROGRESS_COMPLETION_TARGET = 2500;
-// Diferencia mÃƒÆ’Ã‚Â­nima (en puntos porcentuales) para considerar que se va adelantado o retrasado.
+// Diferencia mÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­nima (en puntos porcentuales) para considerar que se va adelantado o retrasado.
 const PROGRESS_DIFF_TOLERANCE = 5;
 const YEAR_IN_MS = 365 * 24 * 60 * 60 * 1000;
 
@@ -103,7 +103,7 @@ const writeStoredProgress = (value) => {
   try {
     window.localStorage.setItem(PROGRESS_STORAGE_KEY, String(clampPercent(value)));
   } catch {
-    // Ignorar errores de almacenamiento (modo incÃƒÆ’Ã‚Â³gnito, etc.)
+    // Ignorar errores de almacenamiento (modo incÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³gnito, etc.)
   }
 };
 
@@ -246,7 +246,7 @@ export default function HomePage() {
         }
       } catch (error) {
         if (!cancelled) {
-          console.warn('[HomePage] No se pudo obtener el resumen de gamificaciÃƒÆ’Ã‚Â³n.', error);
+          console.warn('[HomePage] No se pudo obtener el resumen de gamificaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n.', error);
           setProgressError(error);
         }
       } finally {
@@ -279,18 +279,18 @@ export default function HomePage() {
   }, [expectedProgress, progressDiff, progressPercent]);
 
   const progressStatusText = useMemo(() => {
-    if (progressPercent >= 100) return 'Ãƒâ€šÃ‚Â¡Progreso completo!';
+    if (progressPercent >= 100) return t('home.progress.status.complete');
     if (expectedProgress == null) {
       return '';
     }
     if (progressDiff !== null && progressDiff > PROGRESS_DIFF_TOLERANCE) {
-      return 'Vas adelantado al plan previsto';
+      return t('home.progress.status.ahead');
     }
     if (progressDiff !== null && progressDiff < -PROGRESS_DIFF_TOLERANCE) {
-      return 'Vas por detrÃƒÆ’Ã‚Â¡s del plan. Revisa tus tareas clave.';
+      return t('home.progress.status.behind');
     }
-    return 'Todo en marcha segÃƒÆ’Ã‚Âºn el calendario';
-  }, [expectedProgress, progressDiff, progressPercent]);
+    return t('home.progress.status.onTrack');
+  }, [expectedProgress, progressDiff, progressPercent, t]);
 
   const resolvedWeddingName = useMemo(() => {
     if (!activeWeddingData) return '';
@@ -400,7 +400,12 @@ export default function HomePage() {
     return false;
   }, []);
 
-  // Cargar primera imagen de cada categorÃƒÆ’Ã‚Â­a destacada
+  const guestStatValue = useMemo(() => {
+    const { confirmedCount, totalGuests } = guestsMetrics;
+    return totalGuests > 0 ? `${confirmedCount} / ${totalGuests}` : `${confirmedCount}`;
+  }, [guestsMetrics]);
+
+  // Cargar primera imagen de cada categorÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a destacada
   useEffect(() => {
     Promise.all(INSPIRATION_CATEGORIES.map(({ slug }) => fetchWall(1, slug)))
       .then((results) => {
@@ -419,7 +424,7 @@ export default function HomePage() {
         setCategoryImages(imgs);
       })
       .catch((error) => {
-        console.error('[HomePage] No se pudo precargar la galerÃƒÆ’Ã‚Â­a de inspiraciÃƒÆ’Ã‚Â³n:', error);
+        console.error('[HomePage] No se pudo precargar la galerÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a de inspiraciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n:', error);
       });
   }, []);
 
@@ -485,29 +490,26 @@ export default function HomePage() {
         setNewsError(null);
       } else {
         setNewsPosts([]);
-        setNewsError(
-          'No se pudieron encontrar cuatro noticias con imagen en tu idioma en este momento. IntÃƒÆ’Ã‚Â©ntalo mÃƒÆ’Ã‚Â¡s tarde.'
-        );
+        setNewsError(t('home.news.error'));
       }
     };
     loadNews();
-  }, [lang]);
+  }, [lang, t]);
 
   const handleRedoTutorial = useCallback(async () => {
-    if (!confirm('Esto eliminar datos locales y crear una nueva boda de prueba. Continuar?'))
-      return;
+    if (!confirm(t('home.header.redo.confirm'))) return;
     try {
       // 1. Limpiar almacenamiento y marcar flag para mostrar tutorial
       localStorage.clear();
       localStorage.setItem('forceOnboarding', '1');
 
-      toast.success('Tutorial reiniciado: recargando...');
+      toast.success(t('home.header.redo.success'));
       setTimeout(() => window.location.reload(), 800);
     } catch (err) {
       console.error(err);
-      toast.error('No se pudo reiniciar el tutorial');
+      toast.error(t('home.header.redo.error'));
     }
-  }, []);
+  }, [t]);
   const scrollAmount = 300;
 
   const scrollPrev = useCallback(() => {
@@ -522,9 +524,39 @@ export default function HomePage() {
   const guestsMetrics = useMemo(() => {
     try {
       const guestsArr = JSON.parse(localStorage.getItem('mywed360Guests') || '[]');
-      const confirmedCount = guestsArr.filter(
-        (g) => (g.response || g.status || '').toLowerCase() === 'confirmado'
-      ).length;
+      const isConfirmedAttendance = (value) => {
+        const normalized = String(value || '').trim().toLowerCase();
+        if (!normalized) return false;
+        if (
+          [
+            'confirmado',
+            'confirmada',
+            'confirmed',
+            'attending',
+            'asiste',
+            'asistira',
+            'sÃƒÆ’Ã‚Â­',
+            'si',
+            'yes'
+          ].includes(normalized)
+        ) {
+          return true;
+        }
+        return ['confirm', 'assist', 'attend', 'yes'].some((token) => normalized.includes(token));
+      };
+
+      const confirmedCount = guestsArr.reduce((acc, guest) => {
+        const statusValue =
+          guest?.response ||
+          guest?.status ||
+          guest?.rsvpStatus ||
+          guest?.rsvp ||
+          guest?.attendance ||
+          guest?.estado ||
+          '';
+        return acc + (isConfirmedAttendance(statusValue) ? 1 : 0);
+      }, 0);
+
       return { guestsArr, confirmedCount, totalGuests: guestsArr.length };
     } catch {
       return { guestsArr: [], confirmedCount: 0, totalGuests: 0 };
@@ -548,6 +580,7 @@ export default function HomePage() {
   const [providersMetrics, setProvidersMetrics] = useState({
     providersAssigned: 0,
     providersTotalNeeded: 0,
+    providersFallbackNeeded: 0,
   });
 
   useEffect(() => {
@@ -556,7 +589,11 @@ export default function HomePage() {
     }
 
     if (!activeWedding) {
-      setProvidersMetrics({ providersAssigned: 0, providersTotalNeeded: 0 });
+      setProvidersMetrics({
+        providersAssigned: 0,
+        providersTotalNeeded: 0,
+        providersFallbackNeeded: 0,
+      });
       return undefined;
     }
 
@@ -596,12 +633,29 @@ export default function HomePage() {
       suppliersRef,
       (snap) => {
         let confirmed = 0;
+        const serviceNames = new Set();
         snap.forEach((docSnap) => {
-          if (isConfirmedStatus(docSnap.data()?.status)) confirmed += 1;
+          const data = docSnap.data() || {};
+          if (isConfirmedStatus(data.status) || isConfirmedStatus(data.estado)) confirmed += 1;
+
+          const serviceCandidate =
+            typeof data.service === 'string'
+              ? data.service
+              : typeof data.category === 'string'
+                ? data.category
+                : typeof data.servicio === 'string'
+                  ? data.servicio
+                  : '';
+          const normalizedService =
+            typeof serviceCandidate === 'string' ? serviceCandidate.trim() : '';
+          if (normalizedService) {
+            serviceNames.add(normalizedService.toLowerCase());
+          }
         });
         setProvidersMetrics((prev) => ({
           ...prev,
           providersAssigned: confirmed,
+          providersFallbackNeeded: serviceNames.size,
         }));
       },
       (error) => {
@@ -619,9 +673,14 @@ export default function HomePage() {
   const financeSpent = Number(financeStats?.totalSpent || 0);
   const budgetTotal = Number(financeStats?.totalBudget || 0);
 
-  const statsNovios = useMemo(
-    () => [
-      { label: 'Invitados confirmados', value: guestsMetrics.confirmedCount, icon: Users },
+  const statsNovios = useMemo(() => {
+    const neededProviders =
+      providersMetrics.providersTotalNeeded > 0
+        ? providersMetrics.providersTotalNeeded
+        : providersMetrics.providersFallbackNeeded;
+
+    return [
+      { label: 'Invitados confirmados', value: guestStatValue, icon: Users },
       {
         label: 'Presupuesto gastado',
         value:
@@ -632,8 +691,8 @@ export default function HomePage() {
       {
         label: 'Proveedores contratados',
         value:
-          providersMetrics.providersTotalNeeded > 0
-            ? `${providersMetrics.providersAssigned} / ${providersMetrics.providersTotalNeeded}`
+          neededProviders > 0
+            ? `${providersMetrics.providersAssigned} / ${neededProviders}`
             : `${providersMetrics.providersAssigned}`,
         icon: User,
       },
@@ -642,15 +701,14 @@ export default function HomePage() {
         value: `${tasksMetrics.tasksCompleted} / ${tasksMetrics.tasksTotal}`,
         icon: Calendar,
       },
-    ],
-    [guestsMetrics, financeSpent, providersMetrics, tasksMetrics, budgetTotal]
-  );
+    ];
+  }, [guestStatValue, financeSpent, providersMetrics, tasksMetrics, budgetTotal]);
 
   const statsPlanner = useMemo(
     () => [
       { label: 'Tareas asignadas', value: `${tasksMetrics.tasksTotal}`, icon: Calendar },
       { label: 'Proveedores asignados', value: providersMetrics.providersAssigned, icon: User },
-      { label: 'Invitados confirmados', value: guestsMetrics.confirmedCount, icon: Users },
+      { label: 'Invitados confirmados', value: guestStatValue, icon: Users },
       {
         label: 'Presupuesto gastado',
         value:
@@ -659,7 +717,7 @@ export default function HomePage() {
         icon: DollarSign,
       },
     ],
-    [guestsMetrics, financeSpent, providersMetrics, tasksMetrics, budgetTotal]
+    [guestStatValue, financeSpent, providersMetrics, tasksMetrics, budgetTotal]
   );
 
   const statsCommon = useMemo(
@@ -673,7 +731,7 @@ export default function HomePage() {
         const existing = JSON.parse(localStorage.getItem('lovendaProviders') || '[]');
         const normalized = {
           id: provider.id || Date.now(),
-          name: provider.title || provider.name || 'Proveedor sin nombre',
+          name: provider.title || provider.name || t('home.providers.fallbackName'),
           service: provider.service || '',
           location: provider.location || '',
           priceRange: provider.priceRange || provider.price || '',
@@ -684,13 +742,13 @@ export default function HomePage() {
         const updated = [normalized, ...existing].slice(0, 25);
         localStorage.setItem('lovendaProviders', JSON.stringify(updated));
         window.dispatchEvent(new Event('maloveapp-providers'));
-        toast.success('Proveedor aÃƒÆ’Ã‚Â±adido al panel rÃƒÆ’Ã‚Â¡pido');
+        toast.success(t('home.providers.addSuccess'));
       } catch (error) {
         console.warn('[HomePage] No se pudo guardar el proveedor seleccionado', error);
-        toast.error('No se pudo guardar el proveedor seleccionado');
+        toast.error(t('home.providers.addError'));
       }
     },
-    []
+    [t]
   );
 
   if (isPlanner) {
@@ -749,14 +807,14 @@ export default function HomePage() {
               </p>
               <p className="text-xs text-[color:var(--color-text)]/60" data-testid="home-progress-status">
                 {progressStatusText}
-                {expectedProgress != null ? ` Ãƒâ€šÃ‚Â· Esperado: ${expectedProgress}%` : ''}
+                {expectedProgress != null ? ` ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· Esperado: ${expectedProgress}%` : ''}
               </p>
               {progressLoading && (
                 <p className="text-xs text-[color:var(--color-text)]/40">Actualizando progreso...</p>
               )}
               {progressError && !progressLoading && (
                 <p className="text-xs text-[color:var(--color-danger)]">
-                  No pudimos sincronizar el avance. Se muestra el ÃƒÆ’Ã‚Âºltimo valor guardado.
+                  No pudimos sincronizar el avance. Se muestra el ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºltimo valor guardado.
                 </p>
               )}
             </div>
@@ -767,8 +825,8 @@ export default function HomePage() {
         <section className="z-10 p-6 grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
           {[
             { key: 'proveedor', label: 'Buscar proveedor', icon: User },
-            { key: 'invitado', label: 'AÃƒÆ’Ã‚Â±adir invitado', icon: Users },
-            { key: 'movimiento', label: 'AÃƒÆ’Ã‚Â±adir movimiento', icon: DollarSign },
+            { key: 'invitado', label: 'AÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±adir invitado', icon: Users },
+            { key: 'movimiento', label: 'AÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±adir movimiento', icon: DollarSign },
             { key: 'nota', label: 'Nueva nota', icon: Plus },
           ].map((action, idx) => {
             const Icon = action.icon;
@@ -815,7 +873,7 @@ export default function HomePage() {
           <div className="flex justify-between items-center mb-4">
             <Link to="/inspiracion">
               <button className="text-xl font-bold text-[var(--color-text)] hover:text-[var(--color-primary)]">
-                InspiraciÃƒÆ’Ã‚Â³n para tu boda
+                InspiraciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n para tu boda
               </button>
             </Link>
             <div className="flex space-x-2">
@@ -922,7 +980,7 @@ export default function HomePage() {
       {activeModal === 'invitado' && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-[var(--color-surface)] p-6 rounded-lg w-96 max-w-full">
-            <h2 className="text-xl font-bold mb-4">AÃƒÆ’Ã‚Â±adir Invitado</h2>
+            <h2 className="text-xl font-bold mb-4">AÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±adir Invitado</h2>
             <div className="space-y-4">
               <Input
                 label="Nombre"
@@ -966,7 +1024,7 @@ export default function HomePage() {
                 onClick={async () => {
                   const trimmedName = guest.name.trim();
                   if (!trimmedName) {
-                    toast.error('AÃƒÆ’Ã‚Â±ade un nombre para el invitado.');
+                    toast.error('AÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±ade un nombre para el invitado.');
                     return;
                   }
 
@@ -987,8 +1045,8 @@ export default function HomePage() {
                       notes.push(`Contacto: ${contact}`);
                     }
                   }
-                  notes.push('AÃƒÆ’Ã‚Â±adido desde la pantalla principal');
-                  payload.notes = notes.join(' Ãƒâ€šÃ‚Â· ');
+                  notes.push('AÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±adido desde la pantalla principal');
+                  payload.notes = notes.join(' ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· ');
 
                   try {
                     const result = await addGuestRecord(payload);
@@ -1021,13 +1079,13 @@ export default function HomePage() {
 
                       setGuest({ name: '', side: 'novia', contact: '' });
                       setActiveModal(null);
-                      toast.success('Invitado aÃƒÆ’Ã‚Â±adido');
+                      toast.success('Invitado aÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±adido');
                     } else {
-                      toast.error(result?.error || 'No se pudo aÃƒÆ’Ã‚Â±adir el invitado');
+                      toast.error(result?.error || 'No se pudo aÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±adir el invitado');
                     }
                   } catch (err) {
                     console.error('[Home] addGuest quick action failed', err);
-                    toast.error('OcurriÃƒÆ’Ã‚Â³ un error al aÃƒÆ’Ã‚Â±adir el invitado.');
+                    toast.error('OcurriÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³ un error al aÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±adir el invitado.');
                   }
                 }}
                 className="px-4 py-2 bg-[var(--color-primary)] text-white rounded"
