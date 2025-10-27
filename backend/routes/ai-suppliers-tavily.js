@@ -1033,16 +1033,31 @@ router.post('/', async (req, res) => {
     
     const seenPhones = new Set(); // 🆕 Añadir deduplicación por teléfono
     
-    const uniqueResults = validResults.filter((result, idx) => {
-      // 1. DEDUPLICACIÓN POR EMAIL (más confiable)
-      if (result.email && result.email.trim() !== '') {
-        const emailLower = result.email.toLowerCase().trim();
-        if (seenEmails.has(emailLower)) {
-          console.log(`🗑️ [DEDUP-EMAIL] ${result.title} (${result.email})`);
-          return false;
-        }
-        seenEmails.add(emailLower);
+    // 🆕 FILTRO 1: REQUERIR EMAIL de contacto (eliminar proveedores sin email)
+    const resultsWithEmail = validResults.filter((result) => {
+      if (!result.email || result.email.trim() === '') {
+        console.log(`❌ [SIN-EMAIL] Descartado: ${result.title} (sin email de contacto)`);
+        return false;
       }
+      return true;
+    });
+    
+    console.log(`\n📧 [FILTRO-EMAIL] ${resultsWithEmail.length}/${validResults.length} proveedores tienen email`);
+    console.log(`   Descartados: ${validResults.length - resultsWithEmail.length} sin email\n`);
+    
+    if (resultsWithEmail.length === 0) {
+      console.warn('⚠️ Ningún proveedor tiene email de contacto');
+      return res.json([]);
+    }
+    
+    const uniqueResults = resultsWithEmail.filter((result, idx) => {
+      // 1. DEDUPLICACIÓN POR EMAIL (más confiable)
+      const emailLower = result.email.toLowerCase().trim();
+      if (seenEmails.has(emailLower)) {
+        console.log(`🗑️ [DEDUP-EMAIL] ${result.title} (${result.email})`);
+        return false;
+      }
+      seenEmails.add(emailLower);
       
       // 2. 🆕 DEDUPLICACIÓN POR TELÉFONO
       if (result.phone && result.phone.trim() !== '') {
@@ -1085,8 +1100,8 @@ router.post('/', async (req, res) => {
       return true;
     });
     
-    console.log(`\n🔄 [DEDUP] ${validResults.length} → ${uniqueResults.length} resultados únicos`);
-    console.log(`   Emails duplicados eliminados: ${validResults.length - uniqueResults.length}`);
+    console.log(`\n🔄 [DEDUP] ${resultsWithEmail.length} → ${uniqueResults.length} resultados únicos`);
+    console.log(`   Duplicados eliminados: ${resultsWithEmail.length - uniqueResults.length}`);
     
     if (uniqueResults.length === 0) {
       console.warn('⚠️ [DEDUP] No hay resultados únicos después de deduplicar');
