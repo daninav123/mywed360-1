@@ -39,6 +39,7 @@ import { useWeddingCollectionGroup } from '../../hooks/useWeddingCollectionGroup
 import { useUserCollection } from '../../hooks/useUserCollection';
 import { migrateFlatSubtasksToNested, fixParentBlockDates } from '../../services/WeddingService';
 import { seedWeddingTasksFromTemplate } from '../../services/taskTemplateSeeder';
+import useTranslations from '../../hooks/useTranslations';
 
 const GANTT_UNASSIGNED = '__gantt_unassigned__';
 const GANTT_ZOOM_STORAGE_KEY = 'maloveapp_gantt_zoom';
@@ -67,6 +68,17 @@ export default function TasksRefactored() {
   // Contexto de boda activa
   const { activeWedding } = useWedding();
   const navigate = useNavigate();
+  const { t } = useTranslations();
+
+  const fallbackTaskLabel = useMemo(() => t('tasks.page.common.fallbacks.task'), [t]);
+  const fallbackUntitledTask = useMemo(
+    () => t('tasks.page.common.fallbacks.untitledTask'),
+    [t]
+  );
+  const fallbackSubtaskLabel = useMemo(
+    () => t('tasks.page.sidePanel.subtasks.default'),
+    [t]
+  );
 
   // Hooks Firestore para tasks y meetings dentro de la boda
   const {
@@ -336,14 +348,14 @@ export default function TasksRefactored() {
   if (false && !activeWedding) {
     return (
       <div className="max-w-3xl mx-auto p-6">
-        <h1 className="page-title">Gesti�n de Tareas</h1>
+        <h1 className="page-title">{t('tasks.page.header.title')}</h1>
         <div className="mt-6 bg-yellow-50 border border-yellow-200 text-yellow-900 rounded p-4">
-          <div className="font-semibold mb-1">Selecciona o crea una boda para ver tareas</div>
-          <div className="text-sm">No hay boda activa en este momento. Ve a la secci)n "Bodas" para seleccionar una existente o crear una nueva.</div>
+          <div className="font-semibold mb-1">{t('tasks.page.common.noWeddingTitle')}</div>
+          <div className="text-sm">{t('tasks.page.common.noWeddingDescription')}</div>
         </div>
       </div>
     );
-}
+  }
 
 
   // Etiqueta de mes para el calendario (EJ: "septiembre 2025")
@@ -659,7 +671,7 @@ export default function TasksRefactored() {
     try {
       // Validar formulario b��sico
       if (!formData.title.trim()) {
-        alert('Por favor ingresa un t�­tulo');
+        alert(t('tasks.page.form.validation.titleRequired'));
         return;
       }
 
@@ -667,12 +679,12 @@ export default function TasksRefactored() {
       const unscheduled = Boolean(formData.unscheduled);
 
       if (!formData.startDate && !(isSubtask && unscheduled)) {
-        alert('Por favor selecciona una fecha de inicio');
+        alert(t('tasks.page.form.validation.startRequired'));
         return;
       }
 
       if (!formData.endDate && !(isSubtask && unscheduled)) {
-        alert('Por favor selecciona una fecha de fin');
+        alert(t('tasks.page.form.validation.endRequired'));
         return;
       }
 
@@ -686,13 +698,16 @@ export default function TasksRefactored() {
       const endDate = endDateStr ? new Date(`${endDateStr}T${endTimeStr}`) : null;
 
       // Validar fechas
-      if (!(isSubtask && unscheduled) && (isNaN(startDate?.getTime?.() || NaN) || isNaN(endDate?.getTime?.() || NaN))) {
-        alert('Fechas no v��lidas');
+      if (
+        !(isSubtask && unscheduled) &&
+        (isNaN(startDate?.getTime?.() || NaN) || isNaN(endDate?.getTime?.() || NaN))
+      ) {
+        alert(t('tasks.page.form.validation.invalidDates'));
         return;
       }
 
       if (!(isSubtask && unscheduled) && endDate < startDate) {
-        alert('La fecha de fin debe ser posterior a la de inicio');
+        alert(t('tasks.page.form.validation.endAfterStart'));
         return;
       }
 
@@ -905,9 +920,9 @@ export default function TasksRefactored() {
 
       // Cerrar modal y limpiar
       closeModal();
-    } catch (error) {
-      console.error('Error al guardar tarea:', error);
-      alert('Hubo un error al guardar la tarea');
+      } catch (error) {
+        console.error('Error al guardar tarea:', error);
+        alert(t('tasks.page.form.errors.saveFailed'));
     }
   };
 
@@ -1273,8 +1288,8 @@ export default function TasksRefactored() {
             if (!s || !e || e < s) return null;
             return {
               id: String(x.id || `${x.title}-${s.getTime()}-${e.getTime()}`),
-              name: x.name || x.title || 'Tarea',
-              title: x.title || x.name || 'Tarea',
+              name: x.name || x.title || fallbackTaskLabel,
+              title: x.title || x.name || fallbackUntitledTask,
               start: s,
               end: e,
               type: 'task',
@@ -1472,7 +1487,7 @@ export default function TasksRefactored() {
         .map((t) => {
           const base = {
             id: String(t.id),
-            title: t.name || t.title || 'Subtarea',
+            title: t.name || t.title || fallbackSubtaskLabel,
             desc: t.desc || '',
             category: t.category || 'OTROS',
             start: t.start instanceof Date ? t.start : new Date(t.start),
@@ -1516,7 +1531,7 @@ export default function TasksRefactored() {
         })();
         const base = {
           id: String(s.id),
-          title: s.name || s.title || 'Subtarea',
+          title: s.name || s.title || fallbackSubtaskLabel,
           desc: s.desc || '',
           category: s.category || 'OTROS',
           start,
@@ -1538,7 +1553,7 @@ export default function TasksRefactored() {
           const e = t?.end?.toDate ? t.end.toDate() : (t?.end ? new Date(t.end) : (s || null));
           const base = {
             id: String(t.id),
-            title: t.name || t.title || 'Subtarea',
+            title: t.name || t.title || fallbackSubtaskLabel,
             desc: t.desc || '',
             category: t.category || 'OTROS',
             start: s || null,
@@ -1621,7 +1636,7 @@ export default function TasksRefactored() {
     try {
       return (Array.isArray(uniqueGanttTasks) ? uniqueGanttTasks : [])
         .filter((t) => String(t.type || 'task') === 'task' && !t.isDisabled)
-        .map((t) => ({ id: String(t.id), name: t.name || t.title || 'Tarea' }));
+        .map((t) => ({ id: String(t.id), name: t.name || t.title || fallbackTaskLabel }));
     } catch {
       return [];
     }
@@ -1725,7 +1740,12 @@ export default function TasksRefactored() {
     try {
       const parentsReal = (Array.isArray(uniqueGanttTasks) ? uniqueGanttTasks : [])
         .filter((t) => String(t.type || 'task') === 'task' && !t.isDisabled)
-        .map((t) => ({ id: String(t.id), name: t.name || t.title || 'Tarea', start: t.start instanceof Date ? t.start : new Date(t.start), type: 'task' }));
+        .map((t) => ({
+          id: String(t.id),
+          name: t.name || t.title || fallbackTaskLabel,
+          start: t.start instanceof Date ? t.start : new Date(t.start),
+          type: 'task',
+        }));
 
       const byId = new Map();
       parentsReal.forEach((p) => byId.set(p.id, p));
@@ -1736,7 +1756,7 @@ export default function TasksRefactored() {
           if (String(t?.type || 'task') !== 'task') continue;
           const id = String(t.id || '');
           if (!id) continue;
-          nameById.set(id, t.name || t.title || 'Tarea');
+          nameById.set(id, t.name || t.title || fallbackTaskLabel);
         }
       } catch {}
 
@@ -1745,7 +1765,13 @@ export default function TasksRefactored() {
       for (const st of subs) {
         const pid = String(st.parentId || '');
         if (!pid) continue;
-        const cur = grouped.get(pid) || { id: pid, name: (nameById.get(pid) || 'Tarea'), start: st.start instanceof Date ? st.start : new Date(st.start), type: 'task' };
+        const cur =
+          grouped.get(pid) || {
+            id: pid,
+            name: nameById.get(pid) || fallbackTaskLabel,
+            start: st.start instanceof Date ? st.start : new Date(st.start),
+            type: 'task',
+          };
         const stStart = st.start instanceof Date ? st.start : new Date(st.start);
         if (!cur.start || (stStart && stStart < cur.start)) cur.start = stStart;
         grouped.set(pid, cur);
@@ -1772,7 +1798,7 @@ export default function TasksRefactored() {
         if (String(t?.type || 'task') !== 'task') continue;
         const id = String(t.id || '');
         if (!id) continue;
-        out[id] = t.name || t.title || 'Tarea';
+        out[id] = t.name || t.title || fallbackTaskLabel;
       }
       return out;
     } catch {
@@ -1891,19 +1917,19 @@ export default function TasksRefactored() {
         let reason = '';
         if (end && end.getTime() < todayStart.getTime() && completionPct < 90) {
           level = 'critical';
-          reason = 'Bloque atrasado y sin finalizar';
+          reason = t('tasks.page.notifications.blocks.delayed');
         } else if (overdue > 0 && overdue >= Math.max(2, Math.ceil(total * 0.3))) {
           level = 'critical';
-          reason = `${overdue} subtareas vencidas`;
+          reason = t('tasks.page.notifications.blocks.overdueSubtasks', { count: overdue });
         } else if (overdue > 0) {
           level = 'warning';
-          reason = `${overdue} subtareas vencidas`;
+          reason = t('tasks.page.notifications.blocks.overdueSubtasks', { count: overdue });
         } else if (timeRatio > 0.3 && completionPct + 15 < expectedProgress) {
           level = 'warning';
-          reason = 'Progreso por debajo del ritmo esperado';
+          reason = t('tasks.page.notifications.blocks.progressBehind');
         } else if (completionPct >= 100) {
           level = 'ok';
-          reason = 'Bloque completado';
+          reason = t('tasks.page.notifications.blocks.completed');
         }
 
         map.set(pid, {
@@ -1958,9 +1984,14 @@ export default function TasksRefactored() {
     }
     const ordered = Array.from(names).sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
     const opts = ordered.map((value) => ({ value, label: value }));
-    if (includeUnassigned) opts.push({ value: GANTT_UNASSIGNED, label: 'Sin responsable' });
+    if (includeUnassigned) {
+      opts.push({
+        value: GANTT_UNASSIGNED,
+        label: t('tasks.page.gantt.filters.assigneeUnassigned'),
+      });
+    }
     return opts;
-  }, [ganttDisplayTasks, extractAssignees]);
+  }, [ganttDisplayTasks, extractAssignees, t]);
 
   const filteredGanttTasks = useMemo(() => {
     const tasks = Array.isArray(ganttDisplayTasks) ? ganttDisplayTasks : [];
@@ -2163,7 +2194,7 @@ export default function TasksRefactored() {
         if (nextCompleted && isTaskBlocked(id)) {
           const depStatus = getTaskDependencyStatus(id);
           const missingNames = depStatus.missingDeps.map(d => d.taskTitle).join(', ');
-          alert(`= No puedes completar esta tarea a�n.\n\nDebes completar primero: ${missingNames}`);
+          alert(t('tasks.page.dependencies.blocked', { tasks: missingNames }));
           return;
         }
         
@@ -2584,10 +2615,10 @@ export default function TasksRefactored() {
   if (!activeWedding) {
     return (
       <div className="max-w-3xl mx-auto p-6">
-        <h1 className="page-title">Gesti�n de Tareas</h1>
+        <h1 className="page-title">{t('tasks.page.header.title')}</h1>
         <div className="mt-6 bg-yellow-50 border border-yellow-200 text-yellow-900 rounded p-4">
-          <div className="font-semibold mb-1">Selecciona o crea una boda para ver tareas</div>
-          <div className="text-sm">No hay boda activa en este momento. Ve a la secci)n \"Bodas\" para seleccionar una existente o crear una nueva.</div>
+          <div className="font-semibold mb-1">{t('tasks.page.common.noWeddingTitle')}</div>
+          <div className="text-sm">{t('tasks.page.common.noWeddingDescription')}</div>
         </div>
       </div>
     );
@@ -2608,7 +2639,7 @@ export default function TasksRefactored() {
       
       <div className="mt-6 mb-8" ref={ganttContainerRef}>
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-          <h2 className="text-xl font-semibold">Planificaci�n a Largo Plazo</h2>
+          <h2 className="text-xl font-semibold">{t('tasks.page.gantt.title')}</h2>
           <div className="flex flex-wrap items-center gap-3 text-sm text-gray-600">
             <label className="inline-flex items-center gap-2 cursor-pointer select-none">
               <input
@@ -2617,17 +2648,19 @@ export default function TasksRefactored() {
                 checked={showGanttSubtasks}
                 onChange={(e) => setShowGanttSubtasks(e.target.checked)}
               />
-              Mostrar subtareas
+              {t('tasks.page.gantt.controls.showSubtasks')}
             </label>
             <select
               className="border border-gray-200 rounded px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
               value={ganttCategoryFilter}
               onChange={(e) => setGanttCategoryFilter(e.target.value)}
             >
-              <option value="ALL">Todas las categor�as</option>
+              <option value="ALL">{t('tasks.page.gantt.filters.categoryAll')}</option>
               {ganttCategoryOptions.map((cat) => {
                 const pretty = cat ? cat.charAt(0) + cat.slice(1).toLowerCase() : '';
-                const label = pretty ? pretty.charAt(0).toUpperCase() + pretty.slice(1) : 'Sin categor�a';
+                const label = pretty
+                  ? pretty.charAt(0).toUpperCase() + pretty.slice(1)
+                  : t('tasks.page.gantt.filters.categoryNone');
                 return (
                   <option key={cat} value={cat}>
                     {label}
@@ -2640,7 +2673,7 @@ export default function TasksRefactored() {
               value={ganttAssigneeFilter}
               onChange={(e) => setGanttAssigneeFilter(e.target.value)}
             >
-              <option value="ALL">Todos los responsables</option>
+              <option value="ALL">{t('tasks.page.gantt.filters.assigneeAll')}</option>
               {ganttAssigneeOptions.map((opt) => (
                 <option key={opt.value} value={opt.value}>
                   {opt.label}
@@ -2652,19 +2685,21 @@ export default function TasksRefactored() {
               value={ganttRiskFilter}
               onChange={(e) => setGanttRiskFilter(e.target.value)}
             >
-              <option value="ALL">Todos los estados</option>
-              <option value="critical">Solo riesgo</option>
-              <option value="warning">Solo atenci�n</option>
-              <option value="ok">Solo en curso</option>
+              <option value="ALL">{t('tasks.page.gantt.filters.statusAll')}</option>
+              <option value="critical">{t('tasks.page.gantt.filters.statusCritical')}</option>
+              <option value="warning">{t('tasks.page.gantt.filters.statusWarning')}</option>
+              <option value="ok">{t('tasks.page.gantt.filters.statusOk')}</option>
             </select>
             <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
-              <span className="font-medium text-gray-500">Zoom</span>
+              <span className="font-medium text-gray-500">
+                {t('tasks.page.gantt.controls.zoomLabel')}
+              </span>
               <button
                 type="button"
                 className="h-8 w-8 flex items-center justify-center border border-gray-300 rounded text-gray-600 hover:bg-gray-100 transition disabled:opacity-40 disabled:hover:bg-transparent"
                 onClick={handleZoomOut}
                 disabled={isZoomMin}
-                aria-label="Reducir zoom del timeline"
+                aria-label={t('tasks.page.calendar.zoom.less')}
               >
                 -
               </button>
@@ -2676,14 +2711,14 @@ export default function TasksRefactored() {
                 value={ganttZoom}
                 onChange={(e) => handleZoomSlider(e.target.value)}
                 className="w-24 accent-indigo-500"
-                aria-label="Zoom horizontal del Gantt"
+                aria-label={t('tasks.page.calendar.zoom.label')}
               />
               <button
                 type="button"
                 className="h-8 w-8 flex items-center justify-center border border-gray-300 rounded text-gray-600 hover:bg-gray-100 transition disabled:opacity-40 disabled:hover:bg-transparent"
                 onClick={handleZoomIn}
                 disabled={isZoomMax}
-                aria-label="Aumentar zoom del timeline"
+                aria-label={t('tasks.page.calendar.zoom.more')}
               >
                 +
               </button>
@@ -2692,9 +2727,9 @@ export default function TasksRefactored() {
                 className="h-8 px-3 flex items-center justify-center border border-gray-300 rounded text-gray-600 hover:bg-gray-100 transition disabled:opacity-40 disabled:hover:bg-transparent"
                 onClick={handleFitToScreen}
                 disabled={fitZoomValue === null || isFitApplied}
-                aria-label="Ajustar zoom para mostrar todo el Gantt"
+                aria-label={t('tasks.page.calendar.zoom.reset')}
               >
-                Ajustar
+                {t('tasks.page.gantt.controls.fit')}
               </button>
               <span className="w-12 text-right tabular-nums text-gray-500">{zoomPercent}%</span>
             </div>
@@ -2708,18 +2743,18 @@ export default function TasksRefactored() {
                   setGanttRiskFilter('ALL');
                 }}
               >
-                Limpiar filtros
+                {t('tasks.page.gantt.controls.clearFilters')}
               </button>
             )}
           </div>
         </div>
         {showEmptyGanttState ? (
           <div className="bg-[var(--color-surface)] rounded-xl shadow-md border border-gray-100 px-6 py-10 text-center text-sm text-gray-500">
-            No hay tareas que coincidan con los filtros seleccionados.
+            {t('tasks.page.list.empty.filters')}
           </div>
         ) : noTasksScheduled ? (
           <div className="bg-[var(--color-surface)] rounded-xl shadow-md border border-gray-100 px-6 py-10 text-center text-sm text-gray-500">
-            A�n no hay bloques planificados en el timeline. Importa una plantilla o crea una tarea padre desde la checklist para empezar.
+            {t('tasks.page.gantt.empty.noScheduled')}
           </div>
         ) : (
           <LongTermTasksGantt

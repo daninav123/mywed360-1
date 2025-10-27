@@ -2989,6 +2989,100 @@
         "close": "Cerrar"
       }
     },
+    "aiSearch": {
+      "services": {
+        "generic": "Servicios para bodas",
+        "photo": "Fotografía",
+        "video": "Vídeo",
+        "catering": "Catering",
+        "music": "Música",
+        "flowers": "Flores"
+      },
+      "defaults": {
+        "suggestedName": "Proveedor sugerido {{index}}"
+      },
+      "aiSummary": {
+        "matchesPreferences": "Coincide con tus preferencias clave.",
+        "priceRange": "Rango de precio estimado: {{price}}.",
+        "location": "Ubicado en {{location}}.",
+        "locationAvailable": "Disponible en la zona de {{location}}."
+      },
+      "errors": {
+        "openaiFailed": "La búsqueda de proveedores con IA no está disponible. Configura OPENAI_API_KEY en el backend o habilita un motor alternativo.",
+        "openaiInvalidResponse": "El servicio de IA devolvió un formato inválido. Inténtalo de nuevo más tarde o revisa los logs del backend.",
+        "openaiRequestFailed": "No se pudo contactar con OpenAI. Verifica tus credenciales y la conectividad.",
+        "serpUnavailable": "El motor de respaldo (SerpAPI) no está configurado. Proporciona SERPAPI_API_KEY para habilitarlo.",
+        "rateLimited": "Se superó el límite de peticiones permitidas. Inténtalo de nuevo en unos minutos.",
+        "http": "Error {{status}}",
+        "generic": "No se pudo completar la búsqueda de proveedores.",
+        "aiResponse": "La búsqueda IA respondió {{status}}",
+        "externalResponse": "El buscador externo respondió {{status}}",
+        "internalResponse": "El buscador interno respondió {{status}}",
+        "unknownStatus": "desconocido",
+        "offline": "No se pudo conectar con el servidor. Verifica que el backend esté ejecutándose en http://localhost:4004.",
+        "backendUnavailable": "El servidor backend no está disponible. Asegúrate de que esté corriendo en http://localhost:4004.",
+        "openaiNotConfigured": "La búsqueda IA requiere configurar OPENAI_API_KEY en el backend. Añade tu API key de OpenAI en el archivo .env del backend.",
+        "noLocalResults": "No se encontraron proveedores en la base de datos interna.",
+        "noResults": "No se encontraron proveedores para tu búsqueda. Intenta con otros términos o configura el servicio de búsqueda IA."
+      },
+      "demoResults": [
+        {
+          "id": "1",
+          "name": "Fotografía Naturaleza Viva",
+          "service": "Fotografía",
+          "snippet": "Estudio especializado en fotografía de bodas con estilo natural y documental. Capturamos los momentos más emotivos y espontáneos.",
+          "image": "https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=500&q=60",
+          "location": "Madrid",
+          "price": "1.200 € - 2.500 €",
+          "tags": ["natural", "documental", "exterior", "luz natural"],
+          "keywords": ["fotógrafo", "natural", "documental", "boda"]
+        },
+        {
+          "id": "2",
+          "name": "Lente Azul Fotografía",
+          "service": "Fotografía",
+          "snippet": "Más de 10 años de experiencia en bodas en playa y espacios naturales. Paquetes personalizados para cada pareja.",
+          "image": "https://images.unsplash.com/photo-1508435234994-67cfd7690508?auto=format&fit=crop&w=500&q=60",
+          "location": "Barcelona",
+          "price": "1.500 € - 3.000 €",
+          "tags": ["playa", "exterior", "naturaleza"],
+          "keywords": ["fotógrafo", "boda", "playa", "experiencia"]
+        },
+        {
+          "id": "3",
+          "name": "Catering Delicious Moments",
+          "service": "Catering",
+          "snippet": "Catering con opciones vegetarianas, veganas y para alergias. Especialistas en eventos de 50 a 200 personas.",
+          "image": "https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&w=500&q=60",
+          "location": "Madrid",
+          "price": "70 € - 120 € por persona",
+          "tags": ["vegetariano", "vegano", "buffet"],
+          "keywords": ["catering", "buffet", "evento"]
+        },
+        {
+          "id": "4",
+          "name": "DJ Sounds & Lights",
+          "service": "Música",
+          "snippet": "DJ con equipo profesional de sonido e iluminación. Amplia experiencia en bodas y eventos corporativos.",
+          "image": "https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?auto=format&fit=crop&w=500&q=60",
+          "location": "Valencia",
+          "price": "800 € - 1.500 €",
+          "tags": ["dj", "música", "iluminación"],
+          "keywords": ["dj", "música", "evento"]
+        },
+        {
+          "id": "5",
+          "name": "Flores del Jardín",
+          "service": "Flores",
+          "snippet": "Floristería artesanal especializada en decoración vintage y boho. Trabajamos con producto local de temporada.",
+          "image": "https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&w=500&q=60",
+          "location": "Sevilla",
+          "price": "500 € - 1.500 €",
+          "tags": ["flores", "decoración", "boho"],
+          "keywords": ["flores", "decoración", "boda"]
+        }
+      ]
+    },
     "aiResultList": {
       "loading": {
         "title": "Buscando proveedores...",
@@ -3019,6 +3113,12 @@
         "add": "Añadir",
         "email": "Enviar email",
         "select": "Seleccionar"
+      },
+      "links": {
+        "emailTitle": "Enviar correo",
+        "phoneTitle": "Llamar",
+        "instagramTitle": "Abrir Instagram",
+        "instagramLabel": "Instagram"
       }
     },
     "aiEmailModal": {
@@ -3046,6 +3146,164 @@
         "cancel": "Cancelar",
         "send": "Enviar email",
         "sending": "Enviando..."
+      }
+    },
+    "reservationModal": {
+      "title": "Reservar cita con {{name}}",
+      "actions": {
+        "closeAria": "Cerrar modal",
+        "cancel": "Cancelar",
+        "confirm": "Confirmar reserva"
+      },
+      "form": {
+        "dateLabel": "Fecha *",
+        "timeLabel": "Hora *",
+        "contactMethodLabel": "Método de contacto preferido",
+        "contactMethods": {
+          "email": "Email",
+          "phone": "Teléfono",
+          "inPerson": "Presencial",
+          "videoCall": "Videollamada"
+        },
+        "notesLabel": "Notas o preguntas para el proveedor",
+        "notesPlaceholder": "Información adicional relevante para la cita..."
+      },
+      "providerInfo": {
+        "title": "Información de contacto",
+        "contact": "Contacto:",
+        "phone": "Teléfono:",
+        "email": "Email:",
+        "location": "Ubicación:"
+      },
+      "emailSection": {
+        "title": "Contacto por email",
+        "description": "Envía un email directo para consultar disponibilidad o pedir más información antes de confirmar la reserva.",
+        "button": "Redactar email al proveedor"
+      },
+      "emailForm": {
+        "title": "Enviar email al proveedor",
+        "closeAria": "Cerrar redactor de email",
+        "subjectLabel": "Asunto",
+        "bodyLabel": "Mensaje",
+        "send": "Enviar email",
+        "sending": "Enviando..."
+      },
+      "emailSuccess": {
+        "title": "Email enviado",
+        "description": "Tu mensaje se envió a {{name}} desde {{email}}. Te avisaremos cuando responda."
+      },
+      "errors": {
+        "emailRequired": "El asunto y el cuerpo del email son obligatorios.",
+        "dateRequired": "La fecha es obligatoria.",
+        "timeRequired": "La hora es obligatoria."
+      }
+    },
+    "formModal": {
+      "title": {
+        "create": "Nuevo proveedor",
+        "edit": "Editar proveedor"
+      },
+      "actions": {
+        "closeAria": "Cerrar modal",
+        "cancel": "Cancelar",
+        "save": "Guardar",
+        "update": "Actualizar",
+        "saving": "Guardando..."
+      },
+      "sections": {
+        "basic": "Información básica",
+        "contact": "Datos de contacto",
+        "additional": "Información adicional"
+      },
+      "fields": {
+        "name": {
+          "label": "Nombre *",
+          "placeholder": "Nombre del proveedor"
+        },
+        "service": {
+          "label": "Servicio *",
+          "placeholder": "Tipo de servicio"
+        },
+        "budget": {
+          "label": "Presupuesto",
+          "prefix": "€",
+          "placeholder": "0"
+        },
+        "status": {
+          "label": "Estado"
+        },
+        "contact": {
+          "label": "Persona de contacto",
+          "placeholder": "Nombre de contacto"
+        },
+        "phone": {
+          "label": "Teléfono",
+          "placeholder": "+34 XXX XXX XXX"
+        },
+        "email": {
+          "label": "Email",
+          "placeholder": "email@ejemplo.com"
+        },
+        "web": {
+          "label": "Sitio web",
+          "placeholder": "https://ejemplo.com"
+        },
+        "location": {
+          "label": "Ubicación",
+          "placeholder": "Ciudad, provincia"
+        },
+        "appointment": {
+          "label": "Fecha de cita"
+        },
+        "notes": {
+          "label": "Notas",
+          "placeholder": "Notas adicionales sobre el proveedor"
+        },
+        "image": {
+          "label": "URL de imagen",
+          "placeholder": "https://ejemplo.com/imagen.jpg",
+          "help": "Introduce una URL para la imagen del proveedor (opcional)"
+        }
+      },
+      "status": {
+        "options": {
+          "new": "Nuevo",
+          "contacted": "Contactado",
+          "pending": "Pendiente",
+          "hired": "Contratado",
+          "discarded": "Descartado"
+        }
+      },
+      "errors": {
+        "general": "No se pudo guardar el proveedor. Inténtalo de nuevo.",
+        "nameRequired": "El nombre es obligatorio.",
+        "serviceRequired": "El servicio es obligatorio.",
+        "emailInvalid": "El email no tiene un formato válido.",
+        "webInvalid": "La web debe empezar con http:// o https://"
+      }
+    },
+    "confirmedCard": {
+      "nameFallback": "Proveedor",
+      "serviceFallback": "Servicio sin definir",
+      "statusBadge": "Confirmado",
+      "nextPayment": {
+        "label": "Próximo pago",
+        "none": "Sin fecha programada"
+      },
+      "summary": {
+        "assigned": "Asignado",
+        "paid": "Pagado",
+        "pending": "Pendiente"
+      },
+      "groupLabel": "Grupo: {{name}}",
+      "actions": {
+        "view": "Ver ficha",
+        "registerPayment": "Registrar pago",
+        "viewContract": "Ver contrato",
+        "portal": "Portal proveedor"
+      },
+      "shared": {
+        "notAvailable": "—"
       }
     },
     "list": {
@@ -3357,6 +3615,9 @@
           "amount": "Importes: pagado {{paid}}, pendiente {{pending}}"
         },
         "lastUpdate": "Última actualización: {{value}}"
+      },
+      "placeholders": {
+        "notAvailable": "—"
       }
     },
     "analyticsPanel": {

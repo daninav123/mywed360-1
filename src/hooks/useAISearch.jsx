@@ -4,6 +4,7 @@ import useActiveWeddingInfo from './useActiveWeddingInfo';
 import { useAuth } from './useAuth';
 import { useFallbackReporting } from './useFallbackReporting';
 import { post as apiPost, get as apiGet } from '../services/apiClient';
+import useTranslations from './useTranslations';
 
 const slugify = (value) =>
   !value
@@ -14,15 +15,16 @@ const slugify = (value) =>
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/^-+|-+$/g, '');
 
-const guessServiceFromQuery = (query) => {
-  if (!query) return 'Servicios para bodas';
+const guessServiceFromQuery = (query, t) => {
+  const fallback = t('common.suppliers.aiSearch.services.generic');
+  if (!query) return fallback;
   const words = query.toLowerCase().split(/[,;]+/)[0]?.trim();
-  if (!words) return 'Servicios para bodas';
-  if (words.includes('foto')) return 'Fotografia';
-  if (words.includes('video')) return 'Video';
-  if (words.includes('catering')) return 'Catering';
-  if (words.includes('dj') || words.includes('musica')) return 'Musica';
-  if (words.includes('flor')) return 'Flores';
+  if (!words) return fallback;
+  if (words.includes('foto')) return t('common.suppliers.aiSearch.services.photo');
+  if (words.includes('video')) return t('common.suppliers.aiSearch.services.video');
+  if (words.includes('catering')) return t('common.suppliers.aiSearch.services.catering');
+  if (words.includes('dj') || words.includes('musica')) return t('common.suppliers.aiSearch.services.music');
+  if (words.includes('flor')) return t('common.suppliers.aiSearch.services.flowers');
   return query.trim();
 };
 
@@ -33,26 +35,34 @@ const ensureMatchScore = (match, index) => {
   return Math.max(60, 95 - index * 5);
 };
 
-const generateAISummary = (item, query) => {
+const generateAISummary = (item, query, t) => {
   const highlights = [];
   const queryWords = query.toLowerCase().split(' ');
   if (item.tags?.some((tag) => queryWords.includes(tag.toLowerCase()))) {
-    highlights.push('Coincide con tus preferencias clave.');
+    highlights.push(t('common.suppliers.aiSearch.aiSummary.matchesPreferences'));
   }
-  if (item.price) highlights.push(`Rango de precio estimado: ${item.price}.`);
-  if (item.location) highlights.push(`Ubicado en ${item.location}.`);
+  if (item.price) {
+    highlights.push(t('common.suppliers.aiSearch.aiSummary.priceRange', { price: item.price }));
+  }
+  if (item.location) {
+    highlights.push(t('common.suppliers.aiSearch.aiSummary.location', { location: item.location }));
+  }
   return highlights.join(' ');
 };
 
-const normalizeResult = (item, index, query) => {
-  const name = (item?.name || item?.title || `Proveedor sugerido ${index + 1}`).trim();
-  const service = (item?.service || item?.category || guessServiceFromQuery(query)).trim();
+const normalizeResult = (item, index, query, t) => {
+  const name = (
+    item?.name ||
+    item?.title ||
+    t('common.suppliers.aiSearch.defaults.suggestedName', { index: index + 1 })
+  ).trim();
+  const service = (item?.service || item?.category || guessServiceFromQuery(query, t)).trim();
   const location = item?.location || item?.city || '';
   const priceRange = item?.priceRange || item?.price || '';
   const snippet = item?.snippet || item?.description || '';
   const link = item?.link || item?.url || item?.website || '';
   const match = ensureMatchScore(item?.match, index);
-  const aiSummary = item?.aiSummary || generateAISummary(item, query);
+  const aiSummary = item?.aiSummary || generateAISummary(item, query, t);
   const image = item?.image || '';
   const email = item?.email || '';
   const phone = item?.phone || '';
@@ -90,7 +100,7 @@ const extractFromArray = (arr, selector) => {
   return '';
 };
 
-const normalizeProviderRecord = (item, index, query, inferredService) => {
+const normalizeProviderRecord = (item, index, query, inferredService, t) => {
   if (!item) return null;
   const tagsSet = new Set();
   if (Array.isArray(item.tags)) {
@@ -148,109 +158,54 @@ const normalizeProviderRecord = (item, index, query, inferredService) => {
       keywords: Array.from(tagsSet),
     },
     index,
-    query
+    query,
+    t
   );
 };
 
-const mapBackendErrorMessage = (payload, status, fallbackMessage) => {
+const mapBackendErrorMessage = (payload, status, fallbackMessage, t) => {
   const code = payload?.error || payload?.code;
   const detail = payload?.details || payload?.message || '';
+  const statusLabel =
+    status !== undefined && status !== null
+      ? status
+      : t('common.suppliers.aiSearch.errors.unknownStatus');
   switch (code) {
     case 'openai_failed':
-      return (
-        'La busqueda de proveedores por IA no esta disponible. Configura OPENAI_API_KEY en el backend o habilita un motor alternativo.'
-      );
+      return t('common.suppliers.aiSearch.errors.openaiFailed');
     case 'openai_invalid_response':
-      return 'El servicio de IA devolvio un formato invalido. Intenta de nuevo mas tarde o revisa los logs del backend.';
+      return t('common.suppliers.aiSearch.errors.openaiInvalidResponse');
     case 'openai_request_failed':
-      return 'No se pudo contactar con OpenAI. Verifica tus credenciales y la conectividad.';
+      return t('common.suppliers.aiSearch.errors.openaiRequestFailed');
     case 'serp_unavailable':
-      return 'El motor de respaldo (SerpAPI) no esta configurado. Proporciona SERPAPI_API_KEY para habilitarlo.';
+      return t('common.suppliers.aiSearch.errors.serpUnavailable');
     case 'rate_limited':
-      return 'Se supero el limite de peticiones permitidas. Intentalo de nuevo en unos minutos.';
+      return t('common.suppliers.aiSearch.errors.rateLimited');
     default:
       if (detail) return detail;
       if (fallbackMessage) return fallbackMessage;
-      if (status) return `Error ${status}`;
-      return 'No se pudo completar la busqueda.';
+      if (status) return t('common.suppliers.aiSearch.errors.http', { status: statusLabel });
+      return t('common.suppliers.aiSearch.errors.generic');
   }
 };
 
-const generateDemoResults = (query) => {
-  const demoDatabase = [
-    {
-      id: '1',
-      name: 'Fotografia Naturaleza Viva',
-      service: 'Fotografia',
-      snippet:
-        'Estudio especializado en fotografia de bodas con estilo natural y documental. Capturamos los momentos mas emotivos y espontaneos.',
-      image: 'https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=500&q=60',
-      location: 'Madrid',
-      price: '1200 EUR - 2500 EUR',
-      tags: ['natural', 'documental', 'exterior', 'luz natural'],
-      keywords: ['fotografo', 'natural', 'documental', 'boda'],
-    },
-    {
-      id: '2',
-      name: 'Lente Azul Fotografia',
-      service: 'Fotografia',
-      snippet:
-        'Mas de 10 anos de experiencia en bodas en playa y espacios naturales. Paquetes personalizados para cada pareja.',
-      image: 'https://images.unsplash.com/photo-1508435234994-67cfd7690508?auto=format&fit=crop&w=500&q=60',
-      location: 'Barcelona',
-      price: '1500 EUR - 3000 EUR',
-      tags: ['playa', 'exterior', 'naturaleza'],
-      keywords: ['fotografo', 'boda', 'playa', 'experiencia'],
-    },
-    {
-      id: '3',
-      name: 'Catering Delicious Moments',
-      service: 'Catering',
-      snippet:
-        'Catering con opciones vegetarianas, veganas y alergias. Especialistas en eventos de 50 a 200 personas.',
-      image: 'https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&w=500&q=60',
-      location: 'Madrid',
-      price: '70 EUR - 120 EUR por persona',
-      tags: ['vegetariano', 'vegano', 'buffet'],
-      keywords: ['catering', 'buffet', 'evento'],
-    },
-    {
-      id: '4',
-      name: 'DJ Sounds & Lights',
-      service: 'Musica',
-      snippet:
-        'DJ con equipo profesional de sonido e iluminacion. Amplia experiencia en bodas y eventos corporativos.',
-      image: 'https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?auto=format&fit=crop&w=500&q=60',
-      location: 'Valencia',
-      price: '800 EUR - 1500 EUR',
-      tags: ['dj', 'musica', 'iluminacion'],
-      keywords: ['dj', 'musica', 'evento'],
-    },
-    {
-      id: '5',
-      name: 'Flores del Jardin',
-      service: 'Flores',
-      snippet:
-        'Floristeria artesanal especializada en decoracion vintage y boho. Trabajamos con producto local de temporada.',
-      image: 'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&w=500&q=60',
-      location: 'Sevilla',
-      price: '500 EUR - 1500 EUR',
-      tags: ['flores', 'decoracion', 'boho'],
-      keywords: ['flores', 'decoracion', 'boda'],
-    },
-  ];
+const generateDemoResults = (query, t) => {
+  const demoDatabase =
+    t('common.suppliers.aiSearch.demoResults', {
+      returnObjects: true,
+    }) || [];
 
   return demoDatabase.map((item, index) =>
     normalizeResult(
       {
         ...item,
-        priceRange: item.price,
+        priceRange: item.price ?? item.priceRange,
         match: ensureMatchScore(item.match, index),
-        aiSummary: generateAISummary(item, query),
-      },
+        aiSummary: item.aiSummary || generateAISummary(item, query, t),
+        },
       index,
       query,
-      'ai-demo'
+      t
     )
   );
 };
@@ -295,6 +250,7 @@ export const useAISearch = () => {
   const { user } = useAuth();
   const { info: weddingDoc } = useActiveWeddingInfo();
   const { reportFallback } = useFallbackReporting();
+  const { t } = useTranslations();
 
   const searchProviders = useCallback(
     async (query, opts = {}) => {
@@ -315,7 +271,7 @@ export const useAISearch = () => {
         '';
       const budget =
         profile.budget || profile.estimatedBudget || profile.totalBudget || profile.presupuesto || '';
-      const inferredService = (opts && opts.service) || guessServiceFromQuery(query);
+      const inferredService = (opts && opts.service) || guessServiceFromQuery(query, t);
       const allowFallback = opts?.allowFallback === true;
       const enrichedQuery = [query, inferredService, location, budget].filter(Boolean).join(' ').trim();
 
@@ -357,25 +313,26 @@ export const useAISearch = () => {
                 .filter((item) => item && (item.title || item.name))
                 .map((item, index) =>
                   normalizeResult(
-                  {
-                    ...item,
-                    name: item.name || item.title,
-                    service: item.service || inferredService,
-                    priceRange: item.priceRange || item.price,
-                    snippet: item.snippet,
-                    image: item.image || '',
-                    link: item.link || item.url || '',
-                    email: item.email || '',
-                    phone: item.phone || '',
-                    tags: item.tags || [],
-                  },
-                  index,
-                  query
-                )
+                    {
+                      ...item,
+                      name: item.name || item.title,
+                      service: item.service || inferredService,
+                      priceRange: item.priceRange || item.price,
+                      snippet: item.snippet,
+                      image: item.image || '',
+                      link: item.link || item.url || '',
+                      email: item.email || '',
+                      phone: item.phone || '',
+                      tags: item.tags || [],
+                    },
+                    index,
+                    query,
+                    t
+                  )
                 );
               if (normalized.length) {
                 console.log('[useAISearch] ✅ Proveedores normalizados:', normalized.length);
-                const refined = refineResults(normalized, { service: inferredService, location });
+                const refined = refineResults(normalized, { service: inferredService, location, t });
                 setResults(refined);
                 setLoading(false);
                 return refined;
@@ -392,7 +349,10 @@ export const useAISearch = () => {
             const message = mapBackendErrorMessage(
               payload,
               res?.status,
-              `La busqueda IA respondio ${res?.status || 'desconocido'}`
+              t('common.suppliers.aiSearch.errors.aiResponse', {
+                status: res?.status ?? t('common.suppliers.aiSearch.errors.unknownStatus'),
+              }),
+              t
             );
             const err = new Error(message);
             if (payload?.error) err.code = payload.error;
@@ -406,7 +366,7 @@ export const useAISearch = () => {
         // Detectar error de red (backend no disponible)
         if (backendError?.message?.includes('fetch') || backendError?.name === 'TypeError') {
           const networkError = new Error(
-            'No se pudo conectar con el servidor. Verifica que el backend esté ejecutándose en http://localhost:4004'
+            t('common.suppliers.aiSearch.errors.offline')
           );
           networkError.code = 'BACKEND_OFFLINE';
           lastError = networkError;
@@ -450,10 +410,10 @@ export const useAISearch = () => {
                 },
                 index,
                 query,
-                'web-search'
+                t
               )
             );
-            const refined = refineResults(normalized, { service: inferredService, location });
+            const refined = refineResults(normalized, { service: inferredService, location, t });
             setResults(refined);
             setLoading(false);
             return refined;
@@ -463,7 +423,10 @@ export const useAISearch = () => {
           const message = mapBackendErrorMessage(
             payload,
             res2.status,
-            `El buscador externo respondio ${res2.status}`
+            t('common.suppliers.aiSearch.errors.externalResponse', {
+              status: res2.status ?? t('common.suppliers.aiSearch.errors.unknownStatus'),
+            }),
+            t
           );
           const err = new Error(message);
           if (payload?.error) err.code = payload.error;
@@ -498,10 +461,10 @@ export const useAISearch = () => {
             const items = Array.isArray(payload?.items) ? payload.items : [];
             if (items.length) {
               const normalized = items
-                .map((item, index) => normalizeProviderRecord(item, index, query, inferredService))
+                .map((item, index) => normalizeProviderRecord(item, index, query, inferredService, t))
                 .filter(Boolean);
               if (normalized.length) {
-                const refined = refineResults(normalized, { service: inferredService, location });
+                const refined = refineResults(normalized, { service: inferredService, location, t });
                 setResults(refined);
                 setLoading(false);
                 return refined;
@@ -513,8 +476,11 @@ export const useAISearch = () => {
               mapBackendErrorMessage(
                 payload,
                 resProviders.status,
-                `El buscador interno respondio ${resProviders.status}`
-              )
+                t('common.suppliers.aiSearch.errors.internalResponse', {
+                  status: resProviders.status ?? t('common.suppliers.aiSearch.errors.unknownStatus'),
+                }),
+                t
+              ),
             );
             if (payload?.error) providerError.code = payload.error;
             if (!lastError) lastError = providerError;
@@ -522,7 +488,7 @@ export const useAISearch = () => {
         }
 
         if (!lastError) {
-          const noResultsError = new Error('No se encontraron proveedores en la base de datos interna.');
+          const noResultsError = new Error(t('common.suppliers.aiSearch.errors.noLocalResults'));
           noResultsError.code = 'NO_LOCAL_RESULTS';
           lastError = noResultsError;
         }
@@ -535,7 +501,7 @@ export const useAISearch = () => {
       // Si hay error de backend offline, mostrar mensaje claro
       if (lastError?.code === 'BACKEND_OFFLINE') {
         const backendError = new Error(
-          'El servidor backend no está disponible. Asegúrate de que el backend esté corriendo en http://localhost:4004'
+          t('common.suppliers.aiSearch.errors.backendUnavailable')
         );
         backendError.code = 'BACKEND_OFFLINE';
         setResults([]);
@@ -548,7 +514,7 @@ export const useAISearch = () => {
       // Si es error de OpenAI, mostrar mensaje específico
       if (lastError?.code === 'OPENAI_API_KEY missing' || lastError?.message?.includes('OPENAI_API_KEY')) {
         const openaiError = new Error(
-          'La búsqueda IA requiere configurar OPENAI_API_KEY en el backend. Por favor, añade tu API key de OpenAI en el archivo .env del backend.'
+          t('common.suppliers.aiSearch.errors.openaiNotConfigured')
         );
         openaiError.code = 'OPENAI_NOT_CONFIGURED';
         setResults([]);
@@ -561,8 +527,13 @@ export const useAISearch = () => {
       // Solo usar fallback si se solicita explícitamente
       if (allowFallback) {
         console.info('[useAISearch] Usando resultados de demostración (fallback solicitado explícitamente)');
-        const demoResults = generateDemoResults(query);
-        const refined = refineResults(demoResults, { service: inferredService, location, isDemoMode: true });
+        const demoResults = generateDemoResults(query, t);
+        const refined = refineResults(demoResults, {
+          service: inferredService,
+          location,
+          isDemoMode: true,
+          t,
+        });
         setResults(refined);
         setUsedFallback(true);
         setLoading(false);
@@ -573,7 +544,7 @@ export const useAISearch = () => {
       setResults([]);
       setUsedFallback(false);
       const finalError = lastError || new Error(
-        'No se encontraron proveedores para tu búsqueda. Intenta con otros términos o configura el servicio de búsqueda IA.'
+        t('common.suppliers.aiSearch.errors.noResults')
       );
       setError(finalError);
       setLoading(false);
@@ -598,6 +569,7 @@ function refineResults(list, ctx) {
   const serviceRef = String(ctx?.service || '').toLowerCase();
   const locRef = String(ctx?.location || '').toLowerCase();
   const isDemoMode = ctx?.isDemoMode === true;
+  const translate = ctx?.t;
   if (!Array.isArray(list) || (!serviceRef && !locRef)) return list || [];
 
   let byService = serviceRef
@@ -627,7 +599,10 @@ function refineResults(list, ctx) {
     let aiSummary = src.aiSummary || '';
     if (locRef && locMatch && !/zona|\bubicaci[óo]n|\bdisponible/i.test(aiSummary)) {
       const humanLoc = ctx.location || '';
-      aiSummary = (aiSummary ? aiSummary + ' ' : '') + `Disponible en la zona de ${humanLoc}.`;
+      const locationLine = translate
+        ? translate('common.suppliers.aiSearch.aiSummary.locationAvailable', { location: humanLoc })
+        : `Disponible en la zona de ${humanLoc}.`;
+      aiSummary = (aiSummary ? aiSummary + ' ' : '') + locationLine;
     }
     return { ...src, match, aiSummary };
   });

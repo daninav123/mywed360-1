@@ -272,35 +272,35 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
               {/* Email, Teléfono e Instagram */}
               <div className="flex flex-wrap gap-3 mb-2">
                 {result.email && (
-                  <a 
+                  <a
                     href={`mailto:${result.email}`}
                     className="flex items-center text-sm text-blue-600 hover:text-blue-800 hover:underline"
-                    title="Enviar email"
+                    title={t('common.suppliers.aiResultList.links.emailTitle')}
                   >
                     <Mail size={14} className="mr-1" />
                     {result.email}
                   </a>
                 )}
                 {result.phone && (
-                  <a 
+                  <a
                     href={`tel:${result.phone}`}
                     className="flex items-center text-sm text-green-600 hover:text-green-800 hover:underline"
-                    title="Llamar"
+                    title={t('common.suppliers.aiResultList.links.phoneTitle')}
                   >
                     <Phone size={14} className="mr-1" />
                     {result.phone}
                   </a>
                 )}
                 {result.instagram && (
-                  <a 
+                  <a
                     href={result.instagram}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center text-sm text-pink-600 hover:text-pink-800 hover:underline"
-                    title="Ver Instagram"
+                    title={t('common.suppliers.aiResultList.links.instagramTitle')}
                   >
                     <Instagram size={14} className="mr-1" />
-                    Instagram
+                    {t('common.suppliers.aiResultList.links.instagramLabel')}
                   </a>
                 )}
               </div>

@@ -826,6 +826,12 @@ export const createSalesCommercial = async (commercialData) => {
   return normalizeCommercial(data);
 };
 
+export const getCommercePayoutPreview = async (period) => {
+  const payload = {};
+  if (period) payload.period = period;
+  return postJson(`${ADMIN_BASE_PATH}/commerce/payouts/preview`, payload);
+};
+
 // --- Mutations ---
 
 async function postJson(path, body) {

@@ -142,6 +142,25 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
     provider?.name || provider?.nombre || t('common.suppliers.detail.info.nameFallback');
   const displayService =
     provider?.service || provider?.servicio || t('common.suppliers.detail.info.serviceFallback');
+  const notAvailable = t('common.suppliers.detail.placeholders.notAvailable');
+
+  const normalizeStatusKey = useCallback((status) => {
+    const value = String(status || '').trim().toLowerCase();
+    if (!value || value === 'por_definir' || value === 'por definir' || value === 'none') return 'none';
+    if (value === 'pendiente' || value === 'pending') return 'pending';
+    if (value === 'contactado' || value === 'contacted') return 'contacted';
+    if (value === 'presupuesto' || value === 'quote' || value === 'budget') return 'quote';
+    if (value === 'seleccionado' || value === 'selected') return 'selected';
+    if (value === 'confirmado' || value === 'confirmed') return 'confirmed';
+    if (value === 'rechazado' || value === 'rejected') return 'rejected';
+    return null;
+  }, []);
+
+  const displayStatusLabel = useMemo(() => {
+    const key = normalizeStatusKey(provider?.status);
+    if (key) return t(`common.suppliers.detail.statusLabels.${key}`);
+    return provider?.status || notAvailable;
+  }, [normalizeStatusKey, provider?.status, t, notAvailable]);
 
   const financialSummary = useMemo(() => {
     const payments = providerStatus?.payments?.amount || {};
@@ -444,40 +463,56 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
     }
   };
 
-  const formatDate = (dateStr) => {
-    if (!dateStr) return '';
-    try {
-      const date = new Date(dateStr);
-      return formatDate(date, 'medium');
-    } catch (e) {
-      return dateStr;
-    }
-  };
+  const formatDateValue = useCallback(
+    (dateStr) => {
+      if (!dateStr) return '';
+      try {
+        const date = typeof dateStr?.toDate === 'function' ? dateStr.toDate() : new Date(dateStr);
+        if (Number.isNaN(date.getTime())) return '';
+        return format.date(date);
+      } catch (e) {
+        return '';
+      }
+    },
+    [format]
+  );
 
-  const formatDateTime = (ts) => {
-    if (!ts) return '';
-    try {
-      const d = typeof ts?.toDate === 'function' ? ts.toDate() : new Date(ts);
-      return d.toLocaleString('es-ES', { dateStyle: 'medium', timeStyle: 'short' });
-    } catch (_) {
-      return '';
-    }
-  };
+  const formatDateTimeValue = useCallback(
+    (ts) => {
+      if (!ts) return '';
+      try {
+        const d = typeof ts?.toDate === 'function' ? ts.toDate() : new Date(ts);
+        if (Number.isNaN(d.getTime())) return '';
+        return format.datetime(d);
+      } catch (_) {
+        return '';
+      }
+    },
+    [format]
+  );
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'Confirmado':
-        return 'bg-green-100 text-green-800';
-      case 'Contactado':
-        return 'bg-blue-100 text-blue-800';
-      case 'Seleccionado':
-        return 'bg-purple-100 text-purple-800';
-      case 'Rechazado':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
+  const getStatusColor = useCallback(
+    (status) => {
+      const key = normalizeStatusKey(status);
+      switch (key) {
+        case 'confirmed':
+          return 'bg-green-100 text-green-800';
+        case 'contacted':
+          return 'bg-blue-100 text-blue-800';
+        case 'selected':
+          return 'bg-purple-100 text-purple-800';
+        case 'quote':
+          return 'bg-indigo-100 text-indigo-700';
+        case 'rejected':
+          return 'bg-red-100 text-red-800';
+        case 'pending':
+          return 'bg-amber-100 text-amber-700';
+        default:
+          return 'bg-gray-100 text-gray-800';
+      }
+    },
+    [normalizeStatusKey]
+  );
 
   const trackingItemsLocal = useMemo(() => {
     try {
@@ -765,7 +800,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                         </div>
                         <div>
                           <p className="font-medium">{t('common.suppliers.detail.info.date')}</p>
-                          <p className="text-sm text-gray-600">{formatDate(provider.date)}</p>
+                      <p className="text-sm text-gray-600">{formatDateValue(provider.date)}</p>
                         </div>
                       </div>
                     )}
@@ -856,11 +891,11 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                                 <td className="px-3 py-2 font-medium text-gray-800">
                                   {line.name || t('common.suppliers.detail.serviceLines.unnamed')}
                                 </td>
-                                <td className="px-3 py-2">{line.status || '—'}</td>
+                                <td className="px-3 py-2">{line.status || notAvailable}</td>
                                 <td className="px-3 py-2">
-                                  {line.budget != null ? `€ ${line.budget}` : '—'}
+                                  {line.budget != null ? `€ ${line.budget}` : notAvailable}
                                 </td>
-                                <td className="px-3 py-2 text-gray-500">{line.notes || '—'}</td>
+                                <td className="px-3 py-2 text-gray-500">{line.notes || notAvailable}</td>
                               </tr>
                             ))}
                           </tbody>
@@ -1093,7 +1128,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                         onClick={() => {
                           setRfqDefaults({
                             subject: t('common.suppliers.detail.rfq.defaultSubject', {
-                              service: provider?.service || '',
+                              service: displayService,
                             }).trim(),
                             body: '',
                           });
@@ -1123,7 +1158,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                             <p className="text-xs text-gray-600">
                               {t('common.suppliers.detail.rfq.sentAt', {
                                 email: r.email || provider?.email,
-                                date: formatDateTime(r.sentAt),
+                                date: formatDateTimeValue(r.sentAt),
                               })}
                             </p>
                           </div>

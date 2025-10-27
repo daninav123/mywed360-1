@@ -100,6 +100,12 @@ const ADMIN_NAVIGATION = [
     title: 'Finanzas',
     items: [
       {
+        id: 'payouts',
+        label: 'Pagos comerciales',
+        path: '/admin/finance/payouts',
+        description: 'Liquidaciones de comisiones y pagos automaticos programados.',
+      },
+      {
         id: 'revolut',
         label: 'Revolut',
         path: '/admin/finance/revolut',

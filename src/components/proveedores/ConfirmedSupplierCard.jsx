@@ -11,19 +11,7 @@ import React from 'react';
 
 import Button from '../ui/Button';
 import Card from '../ui/Card';
-
-const formatCurrency = (value, currency = 'EUR') => {
-  if (!Number.isFinite(Number(value))) return '—';
-  try {
-    return new Intl.NumberFormat('es-ES', {
-      style: 'currency',
-      currency,
-      maximumFractionDigits: 0,
-    }).format(Number(value));
-  } catch {
-    return `${value} ${currency}`;
-  }
-};
+import useTranslations from '../../hooks/useTranslations';
 
 export default function ConfirmedSupplierCard({
   provider,
@@ -34,10 +22,34 @@ export default function ConfirmedSupplierCard({
   onOpenContract,
   onOpenPortal,
 }) {
+  const { t, format } = useTranslations();
   const totalAssigned =
     Number(provider?.assignedBudget ?? provider?.presupuestoAsignado ?? provider?.priceRange) || 0;
   const totalSpent = Number(provider?.spent ?? provider?.gastado) || 0;
   const pending = Math.max(totalAssigned - totalSpent, 0);
+  const currency = provider?.currency || 'EUR';
+  const notAvailable = t('common.suppliers.confirmedCard.shared.notAvailable');
+
+  const displayAmount = (value) =>
+    value ? format.currency(Number(value), currency) : notAvailable;
+
+  const formatDateValue = (value) => {
+    if (!value) return notAvailable;
+    try {
+      const date =
+        typeof value?.toDate === 'function'
+          ? value.toDate()
+          : value instanceof Date
+            ? value
+            : new Date(value);
+      if (Number.isNaN(date.getTime())) return value;
+      return typeof format.dateShort === 'function'
+        ? format.dateShort(date)
+        : format.date(date, { month: 'short' });
+    } catch {
+      return value;
+    }
+  };
 
   return (
     <Card
@@ -57,21 +69,26 @@ export default function ConfirmedSupplierCard({
       <header className="pl-10 pr-3 pt-2 flex items-start justify-between gap-3">
         <div className="space-y-1 text-emerald-900">
           <h3 className="text-lg font-semibold line-clamp-1">
-            {provider?.name || provider?.nombre || 'Proveedor'}
+            {provider?.name ||
+              provider?.nombre ||
+              t('common.suppliers.confirmedCard.nameFallback')}
           </h3>
           <div className="flex flex-wrap items-center gap-2 text-xs">
             <span className="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 font-medium text-emerald-700">
-              Confirmado
+              {t('common.suppliers.confirmedCard.statusBadge')}
             </span>
             <span className="inline-flex items-center rounded-full bg-white/80 px-2 py-0.5 font-medium text-emerald-600">
-              {provider?.service || provider?.servicio || 'Servicio sin definir'}
+              {provider?.service ||
+                provider?.servicio ||
+                t('common.suppliers.confirmedCard.serviceFallback')}
             </span>
           </div>
         </div>
         <div className="text-right text-sm text-emerald-900/80">
-          <p className="font-medium">Próximo pago</p>
+          <p className="font-medium">{t('common.suppliers.confirmedCard.nextPayment.label')}</p>
           <p className="font-semibold">
-            {provider?.nextPaymentDate || provider?.paymentDate || 'Sin fecha'}
+            {formatDateValue(provider?.nextPaymentDate || provider?.paymentDate) ||
+              t('common.suppliers.confirmedCard.nextPayment.none')}
           </p>
         </div>
       </header>
@@ -79,22 +96,22 @@ export default function ConfirmedSupplierCard({
       <section className="mt-4 rounded-lg border border-emerald-200/70 bg-white/70 px-4 py-3 text-sm text-emerald-900/80">
         <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
           <div>
-            <p className="text-xs uppercase tracking-wide text-emerald-700/60">Asignado</p>
-            <p className="text-lg font-semibold text-emerald-900">
-              {totalAssigned ? formatCurrency(totalAssigned, provider?.currency || 'EUR') : '—'}
+            <p className="text-xs uppercase tracking-wide text-emerald-700/60">
+              {t('common.suppliers.confirmedCard.summary.assigned')}
             </p>
+            <p className="text-lg font-semibold text-emerald-900">{displayAmount(totalAssigned)}</p>
           </div>
           <div>
-            <p className="text-xs uppercase tracking-wide text-emerald-700/60">Pagado</p>
-            <p className="text-lg font-semibold text-emerald-900">
-              {totalSpent ? formatCurrency(totalSpent, provider?.currency || 'EUR') : '—'}
+            <p className="text-xs uppercase tracking-wide text-emerald-700/60">
+              {t('common.suppliers.confirmedCard.summary.paid')}
             </p>
+            <p className="text-lg font-semibold text-emerald-900">{displayAmount(totalSpent)}</p>
           </div>
           <div>
-            <p className="text-xs uppercase tracking-wide text-emerald-700/60">Pendiente</p>
-            <p className="text-lg font-semibold text-emerald-900">
-              {pending ? formatCurrency(pending, provider?.currency || 'EUR') : '—'}
+            <p className="text-xs uppercase tracking-wide text-emerald-700/60">
+              {t('common.suppliers.confirmedCard.summary.pending')}
             </p>
+            <p className="text-lg font-semibold text-emerald-900">{displayAmount(pending)}</p>
           </div>
         </div>
       </section>
@@ -124,7 +141,8 @@ export default function ConfirmedSupplierCard({
         </div>
         {provider?.groupName && (
           <div className="inline-flex items-center gap-2 rounded-md bg-emerald-100 px-3 py-1 text-xs text-emerald-800">
-            <ClipboardList size={12} /> Grupo: {provider.groupName}
+            <ClipboardList size={12} />{' '}
+            {t('common.suppliers.confirmedCard.groupLabel', { name: provider.groupName })}
           </div>
         )}
       </section>
@@ -139,7 +157,8 @@ export default function ConfirmedSupplierCard({
             onDetail?.();
           }}
         >
-          <CheckCircle2 size={14} className="mr-1" /> Ver ficha
+          <CheckCircle2 size={14} className="mr-1" />{' '}
+          {t('common.suppliers.confirmedCard.actions.view')}
         </Button>
         <Button
           size="sm"
@@ -149,7 +168,8 @@ export default function ConfirmedSupplierCard({
             onRegisterPayment?.();
           }}
         >
-          <Wallet size={14} className="mr-1" /> Registrar pago
+          <Wallet size={14} className="mr-1" />{' '}
+          {t('common.suppliers.confirmedCard.actions.registerPayment')}
         </Button>
         <Button
           variant="outline"
@@ -160,7 +180,8 @@ export default function ConfirmedSupplierCard({
             onOpenContract?.();
           }}
         >
-          <ClipboardList size={14} className="mr-1" /> Ver contrato
+          <ClipboardList size={14} className="mr-1" />{' '}
+          {t('common.suppliers.confirmedCard.actions.viewContract')}
         </Button>
         <Button
           variant="ghost"
@@ -171,7 +192,8 @@ export default function ConfirmedSupplierCard({
             onOpenPortal?.();
           }}
         >
-          <ExternalLink size={14} className="mr-1" /> Portal proveedor
+          <ExternalLink size={14} className="mr-1" />{' '}
+          {t('common.suppliers.confirmedCard.actions.portal')}
         </Button>
       </footer>
     </Card>

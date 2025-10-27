@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { db } from '../db.js';
 import logger from '../logger.js';
 import { createMailgunClients } from './mail/clients.js';
-import { normalizeCommissionRules } from '../utils/commission.js';
+import { normalizeCommissionRules, calculateCommission } from '../utils/commission.js';
 
 const toSafeNumber = (value, fallback = 0) => {
   const num = Number(value);
@@ -2744,340 +2744,112 @@ router.get('/users/role-summary', async (_req, res) => {
 });
 
 // --- Discounts ---
-router.get('/discounts', async (_req, res) => {
-  console.log('�x� [DEBUG] GET /discounts endpoint called');
-  try {
-    const [docs, managerDocs, commercialDocs] = await Promise.all([
-      getCollectionDocs('discountLinks', { orderBy: 'createdAt', limit: 500 }),
-      getCollectionDocs('salesManagers', { orderBy: 'createdAt', limit: 500 }),
-      getCollectionDocs('salesCommercials', { orderBy: 'createdAt', limit: 500 }),
-    ]);
+async function fetchDiscountsDataset({ limit = 500 } = {}) {
+  const [docs, managerDocs, commercialDocs] = await Promise.all([
+    getCollectionDocs('discountLinks', { orderBy: 'createdAt', limit }),
+    getCollectionDocs('salesManagers', { orderBy: 'createdAt', limit }),
+    getCollectionDocs('salesCommercials', { orderBy: 'createdAt', limit }),
+  ]);
 
-    console.log(`  - Found ${docs.length} discount links`);
+  const toIso = (value) => {
+    const date = toDate(value);
+    return date ? date.toISOString() : null;
+  };
 
-    const toIso = (value) => {
-      const date = toDate(value);
-      return date ? date.toISOString() : null;
+  const managers = managerDocs.map((doc) => {
+    const data = doc.data() || {};
+    const base = hydrateSalesManager({ id: doc.id, ...data }) || { id: doc.id };
+    const commissionRules = normalizeCommissionRules(
+      data.commissionRules || null,
+      { defaultCurrency: data.currency || 'EUR' },
+    );
+    return {
+      id: base.id || doc.id,
+      name: base.name || '',
+      email: base.email || '',
+      phone: base.phone || '',
+      notes: base.notes || '',
+      status: base.status || 'active',
+      createdAt: toIso(data.createdAt),
+      updatedAt: toIso(data.updatedAt),
+      commissionRules,
     };
-
-    const managers = managerDocs.map((doc) => {
-      const data = doc.data() || {};
-      const base = hydrateSalesManager({ id: doc.id, ...data }) || { id: doc.id };
-      return {
-        id: base.id || doc.id,
-        name: base.name || '',
-        email: base.email || '',
-        phone: base.phone || '',
-        notes: base.notes || '',
-        status: base.status || 'active',
-        createdAt: toIso(data.createdAt),
-        updatedAt: toIso(data.updatedAt),
-      };
-    });
-
-    const managerDirectory = new Map();
-    managers.forEach((manager) => {
-      const keys = [
-        manager.id,
-        manager.email ? manager.email.toLowerCase() : null,
-        manager.name ? manager.name.toLowerCase() : null,
-        manager.phone ? manager.phone.replace(/\s+/g, '') : null,
-      ].filter(Boolean);
-      keys.forEach((key) => managerDirectory.set(key, manager));
-    });
-
-    const commercials = commercialDocs.map((doc) => {
-      const data = doc.data() || {};
-      const base = sanitizeContactInput({ id: doc.id, ...data }) || { id: doc.id };
-      const managerId = data.managerId || base.managerId || null;
-      const managerSnapshot = data.manager ? sanitizeContactInput(data.manager) : null;
-      const resolvedManager = hydrateSalesManager(
-        managerSnapshot || { id: managerId || null },
-        managerDirectory,
-      );
-
-      return {
-        id: base.id || doc.id,
-        name: base.name || '',
-        email: base.email || '',
-        phone: base.phone || '',
-        notes: base.notes || '',
-        status: data.status || 'active',
-        managerId: resolvedManager?.id || managerId || null,
-        manager: resolvedManager || null,
-        assignedLinks: Array.isArray(data.assignedLinks) ? data.assignedLinks : [],
-        createdAt: toIso(data.createdAt),
-        updatedAt: toIso(data.updatedAt),
-      };
-    });
-
-    const managerIdentifiers = new Set();
-    managers.forEach((manager) => {
-      const key = contactKey(manager);
-    if (key) managerIdentifiers.add(key);
   });
 
-    commercials.forEach((commercial) => {
-      if (commercial.manager) {
-        const key = contactKey(commercial.manager);
-        if (key) managerIdentifiers.add(key);
-      }
-    });
+  const managerDirectory = new Map();
+  managers.forEach((manager) => {
+    const keys = [
+      manager.id,
+      manager.email ? manager.email.toLowerCase() : null,
+      manager.name ? manager.name.toLowerCase() : null,
+      manager.phone ? manager.phone.replace(/\s+/g, '') : null,
+    ].filter(Boolean);
+    keys.forEach((key) => managerDirectory.set(key, manager));
+  });
 
-    const items = docs.map((doc) => {
-      const data = doc.data() || {};
-
-      const commissionRules = normalizeCommissionRules(
-        data.commissionRules || null,
-        { defaultCurrency: data.currency || 'EUR' },
-      );
-
-      const commissionEstimate = commissionRules
-        ? estimateCommissionFromRules(commissionRules, Number(data.revenue || 0))
-        : 0;
-
-      const assignedTo = sanitizeContactInput(data.assignedTo) || null;
-      const salesManager = hydrateSalesManager(data.salesManager, managerDirectory);
-
-      if (salesManager) {
-        const key = contactKey(salesManager);
-        if (key) managerIdentifiers.add(key);
-      }
-
-      const createdAtDate = toDate(data.createdAt);
-      const updatedAtDate = toDate(data.updatedAt);
-
-      return {
-        id: doc.id,
-        code: data.code || doc.id,
-        url: data.url || null,
-        type: data.type || 'campaign',
-        uses: Number(data.uses ?? data.usesCount ?? 0),
-        maxUses: data.maxUses ?? null,
-        revenue: Number(data.revenue || 0),
-        currency: data.currency || 'EUR',
-        status: data.status || 'active',
-        discountPercentage: Number.isFinite(Number(data.discountPercentage))
-          ? Number(data.discountPercentage)
-          : 0,
-        validFrom: toIso(data.validFrom),
-        validUntil: toIso(data.validUntil),
-        assignedTo,
-        salesManager,
-        notes: data.notes || null,
-        commissionRules,
-        commissionEstimate,
-        createdAt: createdAtDate ? formatDateOnly(createdAtDate) : null,
-        updatedAt: updatedAtDate ? formatDateOnly(updatedAtDate) : null,
-      };
-    });
-
-    const summary = items.reduce(
-      (acc, it) => {
-        acc.totalLinks += 1;
-        acc.totalUses += it.uses;
-        acc.totalRevenue += it.revenue;
-        if (it.commissionRules && it.commissionRules.periods?.length) {
-          acc.commission.total += toSafeNumber(it.commissionEstimate);
-          acc.commission.configured += 1;
-        } else {
-          acc.commission.missing += 1;
-        }
-        return acc;
-      },
-      {
-        totalLinks: 0,
-        totalUses: 0,
-        totalRevenue: 0,
-        currency: 'EUR',
-        commission: {
-          total: 0,
-          configured: 0,
-          missing: 0,
-        },
-      },
+  const commercials = commercialDocs.map((doc) => {
+    const data = doc.data() || {};
+    const base = sanitizeContactInput({ id: doc.id, ...data }) || { id: doc.id };
+    const managerId = data.managerId || base.managerId || null;
+    const managerSnapshot = data.manager ? sanitizeContactInput(data.manager) : null;
+    const resolvedManager = hydrateSalesManager(
+      managerSnapshot || { id: managerId || null },
+      managerDirectory,
     );
 
-    summary.currency = items[0]?.currency || summary.currency || 'EUR';
-    summary.commission.currency = summary.currency;
-    summary.commission.average = summary.commission.configured
-      ? summary.commission.total / Math.max(summary.commission.configured, 1)
-      : 0;
-    summary.commission.total = Number(summary.commission.total.toFixed(2));
-    summary.commission.average = Number(summary.commission.average.toFixed(2));
-    summary.totalManagers = managerIdentifiers.size;
-
-    console.log(`  �S& Returning ${items.length} discount links`);
-    console.log('  - Total revenue:', summary.totalRevenue);
-    console.log('  - Total managers detected:', summary.totalManagers);
-
-    return res.json({ items, summary, managers, commercials });
-  } catch (error) {
-    console.error('  �R Discounts error:', error.message);
-    logger.error('[admin-dashboard] discounts error', error);
-    return res.status(500).json({ error: 'admin_dashboard_discounts_failed', message: error.message });
-  }
-});
-
-// Actualizar codigo de descuento existente
-router.put('/discounts/:id', async (req, res) => {
-  console.log('?? [DEBUG] PUT /discounts/:id endpoint called');
-  try {
-    const { id } = req.params;
-    if (!id) return res.status(400).json({ error: 'discount_id_required' });
-
-    const {
-      url,
-      type,
-      maxUses,
-      assignedTo,
-      salesManager,
-      notes,
-      status,
-      discountPercentage,
-      validFrom,
-      validUntil,
-      currency: bodyCurrency,
-      commissionRules: rawCommissionRules,
-    } = req.body || {};
-
-    const discountRef = collections.discountLinks().doc(id);
-    const discountDoc = await discountRef.get();
-
-    if (!discountDoc.exists) {
-      return res.status(404).json({ error: 'discount_not_found' });
-    }
-
-    const currentData = discountDoc.data() || {};
-    const updateData = {};
-
-    if (url !== undefined) updateData.url = String(url || '').trim();
-    if (type !== undefined) updateData.type = String(type || 'campaign').trim();
-    if (status !== undefined) updateData.status = String(status).trim();
-    if (notes !== undefined) updateData.notes = String(notes || '').trim() || null;
-
-    if (discountPercentage !== undefined) {
-      const parsedDiscount = Number(discountPercentage);
-      updateData.discountPercentage = Number.isFinite(parsedDiscount) ? parsedDiscount : 0;
-    }
-
-    if (validFrom !== undefined) {
-      if (!validFrom) {
-        updateData.validFrom = null;
-      } else {
-        const fromDate = new Date(validFrom);
-        updateData.validFrom = Number.isNaN(fromDate.getTime()) ? null : fromDate;
-      }
-    }
-
-    if (validUntil !== undefined) {
-      if (!validUntil) {
-        updateData.validUntil = null;
-      } else {
-        const untilDate = new Date(validUntil);
-        updateData.validUntil = Number.isNaN(untilDate.getTime()) ? null : untilDate;
-      }
-    }
-
-    let cleanCurrency = null;
-    if (bodyCurrency !== undefined) {
-      cleanCurrency = typeof bodyCurrency === 'string' && bodyCurrency.trim()
-        ? bodyCurrency.trim().toUpperCase()
-        : null;
-      if (cleanCurrency) {
-        updateData.currency = cleanCurrency;
-      }
-    }
-
-    if (maxUses !== undefined) {
-      const isPermanent = maxUses === null || maxUses === undefined || maxUses === 0;
-      updateData.maxUses = isPermanent ? null : Math.max(1, Number(maxUses) || 1);
-    }
-
-    if (assignedTo !== undefined) {
-      const sanitizedAssigned = sanitizeContactInput(assignedTo);
-      updateData.assignedTo = sanitizedAssigned
-        ? {
-            id: sanitizedAssigned.id || null,
-            name: sanitizedAssigned.name || null,
-            email: sanitizedAssigned.email || null,
-            phone: sanitizedAssigned.phone || null,
-            notes: sanitizedAssigned.notes || null,
-          }
-        : null;
-    }
-
-    if (salesManager !== undefined) {
-      const sanitizedManager = sanitizeContactInput(salesManager);
-      updateData.salesManager = sanitizedManager
-        ? {
-            id: sanitizedManager.id || null,
-            name: sanitizedManager.name || null,
-            email: sanitizedManager.email || null,
-            phone: sanitizedManager.phone || null,
-            notes: sanitizedManager.notes || null,
-            status: sanitizedManager.status || 'active',
-          }
-        : null;
-    }
-
-    if (rawCommissionRules !== undefined) {
-      if (rawCommissionRules === null) {
-        updateData.commissionRules = null;
-      } else {
-        const normalizedCommission = normalizeCommissionRules(
-          rawCommissionRules,
-          { defaultCurrency: cleanCurrency || currentData.currency || 'EUR' },
-        );
-        if (!normalizedCommission) {
-          return res.status(400).json({ error: 'invalid_commission_rules' });
-        }
-        updateData.commissionRules = normalizedCommission;
-        if (normalizedCommission.currency
-          && normalizedCommission.currency !== (updateData.currency || currentData.currency || 'EUR')) {
-          updateData.currency = normalizedCommission.currency;
-        }
-      }
-    }
-
-    updateData.updatedAt = admin.firestore.FieldValue.serverTimestamp();
-    updateData.updatedBy = 'admin';
-
-    await discountRef.update(updateData);
-
-    const updated = await discountRef.get();
-    const data = updated.data() || {};
-
-    const toDateSafe = (value) => {
-      if (!value) return null;
-      if (value.toDate && typeof value.toDate === 'function') {
-        try {
-          return value.toDate();
-        } catch {
-          return null;
-        }
-      }
-      if (value instanceof Date) return value;
-      if (typeof value === 'string' || typeof value === 'number') {
-        const parsed = new Date(value);
-        return Number.isNaN(parsed.getTime()) ? null : parsed;
-      }
-      return null;
+    return {
+      id: base.id || doc.id,
+      name: base.name || '',
+      email: base.email || '',
+      phone: base.phone || '',
+      notes: base.notes || '',
+      status: data.status || 'active',
+      managerId: resolvedManager?.id || managerId || null,
+      manager: resolvedManager || null,
+      assignedLinks: Array.isArray(data.assignedLinks) ? data.assignedLinks : [],
+      createdAt: toIso(data.createdAt),
+      updatedAt: toIso(data.updatedAt),
     };
+  });
+
+  const managerIdentifiers = new Set();
+  managers.forEach((manager) => {
+    const key = contactKey(manager);
+    if (key) managerIdentifiers.add(key);
+  });
+  commercials.forEach((commercial) => {
+    if (commercial.manager) {
+      const key = contactKey(commercial.manager);
+      if (key) managerIdentifiers.add(key);
+    }
+  });
+
+  const items = docs.map((doc) => {
+    const data = doc.data() || {};
 
     const commissionRules = normalizeCommissionRules(
       data.commissionRules || null,
       { defaultCurrency: data.currency || 'EUR' },
     );
 
-    console.log(`  OK. Updated discount code: ${data.code}`);
+    const commissionEstimate = commissionRules
+      ? estimateCommissionFromRules(commissionRules, Number(data.revenue || 0))
+      : 0;
 
-    const sanitizedAssignedTo = sanitizeContactInput(data.assignedTo);
-    const sanitizedSalesManager = sanitizeContactInput(data.salesManager);
+    const assignedTo = sanitizeContactInput(data.assignedTo) || null;
+    const salesManager = hydrateSalesManager(data.salesManager, managerDirectory);
 
-    return res.json({
-      id: updated.id,
-      code: data.code || updated.id,
+    if (salesManager) {
+      const key = contactKey(salesManager);
+      if (key) managerIdentifiers.add(key);
+    }
+
+    const createdAtDate = toDate(data.createdAt);
+    const updatedAtDate = toDate(data.updatedAt);
+
+    return {
+      id: doc.id,
+      code: data.code || doc.id,
       url: data.url || null,
       type: data.type || 'campaign',
       uses: Number(data.uses ?? data.usesCount ?? 0),
@@ -3088,23 +2860,490 @@ router.put('/discounts/:id', async (req, res) => {
       discountPercentage: Number.isFinite(Number(data.discountPercentage))
         ? Number(data.discountPercentage)
         : 0,
-      validFrom: toDateSafe(data.validFrom)?.toISOString() || null,
-      validUntil: toDateSafe(data.validUntil)?.toISOString() || null,
-      assignedTo: sanitizedAssignedTo,
-      salesManager: sanitizedSalesManager,
+      validFrom: toIso(data.validFrom),
+      validUntil: toIso(data.validUntil),
+      assignedTo,
+      salesManager,
       notes: data.notes || null,
       commissionRules,
-      partnerToken: data.partnerToken || null,
-      createdAt: toDateSafe(data.createdAt)?.toISOString() || null,
-      updatedAt: new Date().toISOString(),
-    });
+      commissionEstimate,
+      createdAt: createdAtDate ? formatDateOnly(createdAtDate) : null,
+      updatedAt: updatedAtDate ? formatDateOnly(updatedAtDate) : null,
+    };
+  });
+
+  const summary = items.reduce(
+    (acc, it) => {
+      acc.totalLinks += 1;
+      acc.totalUses += it.uses;
+      acc.totalRevenue += it.revenue;
+      if (it.commissionRules && it.commissionRules.periods?.length) {
+        acc.commission.total += toSafeNumber(it.commissionEstimate);
+        acc.commission.configured += 1;
+      } else {
+        acc.commission.missing += 1;
+      }
+      return acc;
+    },
+    {
+      totalLinks: 0,
+      totalUses: 0,
+      totalRevenue: 0,
+      currency: 'EUR',
+      commission: {
+        total: 0,
+        configured: 0,
+        missing: 0,
+        currency: 'EUR',
+        average: 0,
+      },
+    },
+  );
+
+  summary.totalManagers = managerIdentifiers.size;
+
+  if (items.length) {
+    summary.currency = items[0]?.currency || summary.currency || 'EUR';
+    summary.commission.currency = summary.currency;
+    summary.commission.average = summary.commission.configured
+      ? summary.commission.total / Math.max(summary.commission.configured, 1)
+      : 0;
+    summary.commission.total = Number(summary.commission.total.toFixed(2));
+    summary.commission.average = Number(summary.commission.average.toFixed(2));
+  }
+
+  return {
+    payload: {
+      items,
+      summary,
+      managers,
+      commercials,
+    },
+    helpers: {
+      managerDirectory,
+    },
+  };
+}
+
+router.get('/discounts', async (_req, res) => {
+  console.log('[DEBUG] GET /discounts endpoint called');
+  try {
+    const { payload } = await fetchDiscountsDataset({ limit: 500 });
+    return res.json(payload);
   } catch (error) {
-    console.error('  ERROR Update discount error:', error.message);
-    logger.error('[admin-dashboard] update discount error', error);
-    return res.status(500).json({ error: 'admin_dashboard_update_discount_failed', message: error.message });
+    console.error('[admin-dashboard] Failed to fetch discount links:', error);
+    logger.error('[admin-dashboard] discounts fetch failed', error);
+    return res.status(500).json({
+      error: 'discounts_fetch_failed',
+      message: error?.message || 'No se pudieron cargar los c�digos de descuento.',
+    });
   }
 });
-// Crear nuevo código de descuento
+
+const COMMERCE_PAYOUT_STATUSES = ['paid', 'succeeded', 'completed'];
+
+function resolveCommercePeriod(input) {
+  const now = new Date();
+  let year = now.getFullYear();
+  let month = now.getMonth();
+
+  if (typeof input === 'string' && input.trim()) {
+    const match = input.trim().match(/^(\d{4})-(\d{1,2})$/);
+    if (!match) {
+      throw new Error('Formato de periodo inv�lido. Usa YYYY-MM.');
+    }
+    year = Number(match[1]);
+    month = Number(match[2]) - 1;
+  } else if (input && typeof input === 'object') {
+    if (Number.isInteger(input.year) && Number.isInteger(input.month)) {
+      year = Number(input.year);
+      month = Number(input.month) - (input.month > 0 ? 1 : 0);
+    }
+  }
+
+  if (!Number.isFinite(year) || !Number.isFinite(month)) {
+    throw new Error('Periodo inv�lido.');
+  }
+
+  const start = new Date(year, month, 1, 0, 0, 0, 0);
+  const end = new Date(year, month + 1, 1, 0, 0, 0, 0);
+  const label = start.toLocaleString('es-ES', { month: 'long', year: 'numeric' });
+
+  return {
+    id: `${year}-${String(month + 1).padStart(2, '0')}`,
+    label,
+    start,
+    end,
+  };
+}
+
+function determineDiscountRole(discount, contact) {
+  if (contact && typeof contact === 'object' && contact.role) {
+    return String(contact.role).toLowerCase();
+  }
+  const type = (discount?.type || '').toLowerCase();
+  if (type.includes('influencer')) return 'influencer';
+  if (type.includes('manager')) return 'manager';
+  if (type.includes('affiliate')) return 'affiliate';
+  return 'commercial';
+}
+
+function createBeneficiaryKey(contact, role, currency, fallback) {
+  const key =
+    contactKey(contact) ||
+    (contact && contact.id) ||
+    (contact && contact.email) ||
+    fallback ||
+    'unknown';
+  return [role || 'commercial', (currency || 'EUR').toUpperCase(), key.toString().toLowerCase()].join('|');
+}
+
+function addCurrencyTotal(map, currency, revenue, commission, beneficiaryKey) {
+  const key = (currency || 'EUR').toUpperCase();
+  if (!map.has(key)) {
+    map.set(key, { currency: key, revenue: 0, commission: 0, beneficiaryKeys: new Set() });
+  }
+  const entry = map.get(key);
+  entry.revenue += Number(revenue || 0);
+  entry.commission += Number(commission || 0);
+  if (beneficiaryKey) {
+    entry.beneficiaryKeys.add(beneficiaryKey);
+  }
+}
+
+function normalizePayoutContact(contact, roleFallback = 'commercial') {
+  if (!contact || typeof contact !== 'object') {
+    return { id: null, name: 'Sin asignar', email: null, role: roleFallback };
+  }
+  return {
+    id: contact.id || null,
+    name: contact.name || contact.email || 'Sin asignar',
+    email: contact.email || null,
+    phone: contact.phone || null,
+    role: contact.role || roleFallback,
+  };
+}
+
+router.post('/commerce/payouts/preview', async (req, res) => {
+  console.log('[DEBUG] POST /commerce/payouts/preview called');
+  try {
+    const periodInput = req.body?.period ?? req.query?.period ?? null;
+
+    let period;
+    try {
+      period = resolveCommercePeriod(periodInput);
+    } catch (periodError) {
+      return res.status(400).json({
+        error: 'invalid_period',
+        message: periodError.message,
+      });
+    }
+
+    const { payload } = await fetchDiscountsDataset({ limit: 500 });
+    const { items, managers, commercials } = payload;
+
+    const managerRulesMap = new Map();
+    managers.forEach((manager) => {
+      if (manager.id) managerRulesMap.set(manager.id, manager);
+      const key = contactKey(manager);
+      if (key) managerRulesMap.set(key.toLowerCase(), manager);
+    });
+
+    const commercialDirectory = new Map();
+    commercials.forEach((commercial) => {
+      const keys = [
+        commercial.id,
+        commercial.email ? commercial.email.toLowerCase() : null,
+        commercial.phone ? commercial.phone.replace(/\s+/g, '') : null,
+        commercial.name ? commercial.name.toLowerCase() : null,
+      ].filter(Boolean);
+      keys.forEach((key) => commercialDirectory.set(key, commercial));
+    });
+
+    const startTs = admin.firestore.Timestamp.fromDate(period.start);
+    const endTs = admin.firestore.Timestamp.fromDate(period.end);
+
+    let paymentsSnapshot = null;
+    let needsIndex = false;
+    try {
+      paymentsSnapshot = await db
+        .collection('payments')
+        .where('status', 'in', COMMERCE_PAYOUT_STATUSES)
+        .where('createdAt', '>=', startTs)
+        .where('createdAt', '<', endTs)
+        .get();
+    } catch (error) {
+      if (error.code === 9 || error.code === 'failed-precondition') {
+        needsIndex = true;
+      } else {
+        throw error;
+      }
+    }
+
+    if (!paymentsSnapshot) {
+      try {
+        paymentsSnapshot = await db
+          .collection('payments')
+          .where('createdAt', '>=', startTs)
+          .where('createdAt', '<', endTs)
+          .get();
+      } catch (fallbackError) {
+        console.warn('[admin-dashboard] payouts preview fallback query failed:', fallbackError?.message);
+        paymentsSnapshot = { empty: true, docs: [] };
+        needsIndex = true;
+      }
+    }
+
+    const paymentsByCode = new Map();
+    const unmatchedPayments = [];
+    const paymentDocs = paymentsSnapshot?.docs || [];
+
+    paymentDocs.forEach((docSnap) => {
+      const raw = docSnap.data() || {};
+      const code = (raw.discountCode || raw.coupon || raw.code || '').toString().trim().toUpperCase();
+      const amountRaw = raw.amount ?? raw.total ?? raw.value ?? 0;
+      let amount = Number(amountRaw);
+      if (!Number.isFinite(amount)) amount = 0;
+      if (!amount || amount <= 0) return;
+
+      const currency = (raw.currency || raw.currencyCode || raw.currencySymbol || 'EUR').toString().toUpperCase();
+      const createdAt = toDate(raw.createdAt) || toDate(raw.paidAt) || toDate(raw.completedAt) || new Date();
+      if (createdAt < period.start || createdAt >= period.end) return;
+
+      const paymentRecord = {
+        id: docSnap.id,
+        amount,
+        currency,
+        createdAt,
+        raw,
+      };
+
+      if (!code) {
+        unmatchedPayments.push(paymentRecord);
+        return;
+      }
+
+      if (!paymentsByCode.has(code)) paymentsByCode.set(code, []);
+      paymentsByCode.get(code).push(paymentRecord);
+    });
+
+    const payoutsMap = new Map();
+    const currencyTotals = new Map();
+    const managerPaymentMap = new Map();
+
+    const warnings = {
+      missingCommissionRules: [],
+      missingAssignedContacts: [],
+      currencyMismatch: [],
+      discountsWithoutPayments: [],
+      managersMissingRules: [],
+      needsIndex,
+      unmatchedPayments: unmatchedPayments.length,
+    };
+
+    const discountPreviews = [];
+
+    items.forEach((discount) => {
+      const codeKey = (discount.code || discount.id || '').toString().trim().toUpperCase();
+      const payments = paymentsByCode.get(codeKey) || [];
+      const revenue = payments.reduce((sum, payment) => sum + (payment.amount || 0), 0);
+      const currency = (discount.currency || payments[0]?.currency || 'EUR').toUpperCase();
+
+      const observedCurrencies = Array.from(new Set(payments.map((payment) => payment.currency)));
+      if (observedCurrencies.length && observedCurrencies.some((value) => value !== currency)) {
+        warnings.currencyMismatch.push({
+          id: discount.id,
+          code: discount.code,
+          expected: currency,
+          observed: observedCurrencies,
+        });
+      }
+
+      const commissionRules = discount.commissionRules;
+      if (!commissionRules || !commissionRules.periods?.length) {
+        warnings.missingCommissionRules.push({ id: discount.id, code: discount.code });
+      }
+
+      const commission = commissionRules
+        ? calculateCommission(payments, commissionRules, { currency, startDate: period.start })
+        : { amount: 0, currency, breakdown: [], paymentsEvaluated: 0, hasRules: false, unassignedRevenue: revenue };
+
+      const assignedContact = discount.assignedTo;
+      const role = determineDiscountRole(discount, assignedContact);
+
+      if (!assignedContact) {
+        warnings.missingAssignedContacts.push({ id: discount.id, code: discount.code });
+      }
+
+      if (assignedContact) {
+        const beneficiaryKey = createBeneficiaryKey(assignedContact, role, currency, discount.code || discount.id);
+        if (!payoutsMap.has(beneficiaryKey)) {
+          const normalized = normalizePayoutContact(assignedContact, role);
+          payoutsMap.set(beneficiaryKey, {
+            beneficiary: normalized,
+            currency,
+            totals: { revenue: 0, commission: 0, payments: 0 },
+            paymentsEvaluated: 0,
+            discounts: [],
+          });
+        }
+        const entry = payoutsMap.get(beneficiaryKey);
+        entry.totals.revenue += revenue;
+        entry.totals.commission += Number(commission.amount || 0);
+        entry.totals.payments += payments.length;
+        entry.paymentsEvaluated += commission.paymentsEvaluated || 0;
+        entry.discounts.push({
+          id: discount.id,
+          code: discount.code,
+          revenue,
+          commission: Number(commission.amount || 0),
+          payments: payments.length,
+          hasRules: commission.hasRules !== false,
+          breakdown: commission.breakdown || [],
+        });
+        addCurrencyTotal(currencyTotals, currency, revenue, commission.amount, beneficiaryKey);
+      } else {
+        addCurrencyTotal(currencyTotals, currency, revenue, commission.amount, null);
+      }
+
+      let managerContact = discount.salesManager;
+      if (!managerContact && assignedContact) {
+        const key = contactKey(assignedContact);
+        if (key && commercialDirectory.has(key)) {
+          managerContact = commercialDirectory.get(key).manager;
+        }
+      }
+
+      if (managerContact && payments.length) {
+        const managerKey = contactKey(managerContact) || managerContact.id || managerContact.email;
+        if (managerKey) {
+          const mapKey = `${managerKey.toLowerCase()}|${currency}`;
+          if (!managerPaymentMap.has(mapKey)) {
+            managerPaymentMap.set(mapKey, {
+              manager: managerContact,
+              currency,
+              payments: [],
+              revenue: 0,
+            });
+          }
+          const managerEntry = managerPaymentMap.get(mapKey);
+          managerEntry.payments.push(...payments);
+          managerEntry.revenue += revenue;
+        }
+      }
+
+      if (!payments.length) {
+        warnings.discountsWithoutPayments.push({ id: discount.id, code: discount.code });
+      }
+
+      discountPreviews.push({
+        id: discount.id,
+        code: discount.code,
+        currency,
+        revenue,
+        commission: Number(commission.amount || 0),
+        payments: payments.length,
+        hasRules: commission.hasRules !== false,
+      });
+    });
+
+    const payouts = Array.from(payoutsMap.values())
+      .map((entry) => ({
+        ...entry,
+        totals: {
+          revenue: Number(entry.totals.revenue.toFixed(2)),
+          commission: Number(entry.totals.commission.toFixed(2)),
+          payments: entry.totals.payments,
+        },
+        paymentsEvaluated: entry.paymentsEvaluated,
+        discounts: entry.discounts.map((discount) => ({
+          ...discount,
+          revenue: Number(discount.revenue.toFixed(2)),
+          commission: Number(discount.commission.toFixed(2)),
+        })),
+      }))
+      .sort((a, b) => b.totals.commission - a.totals.commission);
+
+    const handledMissingManagers = new Set();
+    const managerSummaries = [];
+    managerPaymentMap.forEach((entry, key) => {
+      const managerContact = entry.manager;
+      const contactKeyValue = contactKey(managerContact) || managerContact.id || key.split('|')[0];
+      const canonical =
+        managerRulesMap.get(managerContact.id) ||
+        managerRulesMap.get((contactKey(managerContact) || '').toLowerCase()) ||
+        managerRulesMap.get((contactKeyValue || '').toLowerCase()) ||
+        managerContact;
+      const rules = canonical?.commissionRules || null;
+      const commission = rules
+        ? calculateCommission(entry.payments, rules, { currency: entry.currency, startDate: period.start })
+        : { amount: 0, currency: entry.currency, breakdown: [], paymentsEvaluated: 0, hasRules: false, unassignedRevenue: entry.revenue };
+      if (!rules) {
+        const missingKey = canonical?.id || contactKeyValue || key;
+        if (missingKey && !handledMissingManagers.has(missingKey)) {
+          warnings.managersMissingRules.push({
+            id: missingKey,
+            name: canonical?.name || managerContact.name || managerContact.email || 'Manager',
+          });
+          handledMissingManagers.add(missingKey);
+        }
+      }
+      managerSummaries.push({
+        manager: {
+          id: canonical?.id || managerContact.id || contactKeyValue || null,
+          name: canonical?.name || managerContact.name || managerContact.email || 'Manager sin nombre',
+          email: canonical?.email || managerContact.email || null,
+          phone: canonical?.phone || managerContact.phone || null,
+        },
+        currency: entry.currency,
+        totals: {
+          revenue: Number(entry.revenue.toFixed(2)),
+          commission: Number((commission.amount || 0).toFixed(2)),
+          payments: entry.payments.length,
+        },
+        hasRules: commission.hasRules !== false,
+        paymentsEvaluated: commission.paymentsEvaluated || 0,
+        breakdown: commission.breakdown || [],
+      });
+    });
+    managerSummaries.sort((a, b) => b.totals.commission - a.totals.commission);
+
+    const totalsByCurrency = Array.from(currencyTotals.values()).map((entry) => ({
+      currency: entry.currency,
+      revenue: Number(entry.revenue.toFixed(2)),
+      commission: Number(entry.commission.toFixed(2)),
+      beneficiaries: entry.beneficiaryKeys.size,
+    }));
+
+    return res.json({
+      generatedAt: new Date().toISOString(),
+      period: {
+        id: period.id,
+        label: period.label,
+        start: period.start.toISOString(),
+        end: new Date(period.end.getTime() - 1).toISOString(),
+      },
+      totals: totalsByCurrency,
+      payouts,
+      managers: managerSummaries,
+      discounts: discountPreviews,
+      warnings,
+      stats: {
+        discountCount: items.length,
+        paymentSample: paymentDocs.length,
+      },
+    });
+  } catch (error) {
+    console.error('[admin-dashboard] commerce payouts preview error:', error);
+    logger.error('[admin-dashboard] commerce payouts preview error', error);
+    return res.status(500).json({
+      error: 'commerce_payout_preview_failed',
+      message: error?.message || 'No se pudo generar la previsi�n de pagos comerciales.',
+    });
+  }
+});
+
+
 router.post('/discounts', async (req, res) => {
   console.log('�x� [DEBUG] POST /discounts endpoint called');
     try {

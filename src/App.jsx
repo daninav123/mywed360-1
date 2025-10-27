@@ -50,6 +50,7 @@ import AdminSupport from './pages/admin/AdminSupport.jsx';
 import AdminTaskTemplates from './pages/admin/AdminTaskTemplates.jsx';
 import AdminDebugPayments from './pages/admin/AdminDebugPayments.jsx';
 import AdminRevolut from './pages/admin/AdminRevolut.jsx';
+import AdminPayouts from './pages/admin/AdminPayouts.jsx';
 import PartnerStats from './pages/PartnerStats.jsx';
 import WebEditor from './pages/WebEditor';
 import WeddingSite from './pages/WeddingSite';
@@ -276,6 +277,7 @@ function App() {
                   <Route path="support" element={<AdminSupport />} />
                   <Route path="task-templates" element={<AdminTaskTemplates />} />
                   <Route path="debug/payments" element={<AdminDebugPayments />} />
+                  <Route path="finance/payouts" element={<AdminPayouts />} />
                   <Route path="finance/revolut" element={<AdminRevolut />} />
                 </Route>
               </Route>

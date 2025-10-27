@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
+import useTranslations from '../../hooks/useTranslations';
 import { useProviderEmail } from '../../hooks/useProviderEmail';
 
 /**
@@ -21,6 +22,7 @@ import { useProviderEmail } from '../../hooks/useProviderEmail';
  * @returns {React.ReactElement} Modal para agendar citas
  */
 const ReservationModal = ({ provider, onClose, onSubmit }) => {
+  const { t } = useTranslations();
   // Integración con el hook de email para proveedores
   const {
     loading: emailLoading,
@@ -88,7 +90,7 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
     if (!emailData.subject || !emailData.body) {
       setErrors((prev) => ({
         ...prev,
-        email: 'El asunto y el cuerpo del email son obligatorios',
+        email: t('common.suppliers.reservationModal.errors.emailRequired'),
       }));
       return;
     }
@@ -106,11 +108,11 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
     const newErrors = {};
 
     if (!formData.date) {
-      newErrors.date = 'La fecha es obligatoria';
+      newErrors.date = t('common.suppliers.reservationModal.errors.dateRequired');
     }
 
     if (!formData.time) {
-      newErrors.time = 'La hora es obligatoria';
+      newErrors.time = t('common.suppliers.reservationModal.errors.timeRequired');
     }
 
     setErrors(newErrors);
@@ -132,7 +134,7 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 z-50 flex itemás-center justify-center p-4"
+      className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
       onClick={onClose}
     >
       <div
@@ -140,12 +142,14 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex justify-between itemás-center p-4 border-b">
-          <h2 className="text-xl font-semibold">Reservar cita con {provider.name}</h2>
+        <div className="flex justify-between items-center p-4 border-b">
+          <h2 className="text-xl font-semibold">
+            {t('common.suppliers.reservationModal.title', { name: provider.name })}
+          </h2>
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700"
-            aria-label="Cerrar"
+            aria-label={t('common.suppliers.reservationModal.actions.closeAria')}
           >
             <X size={24} />
           </button>
@@ -157,7 +161,7 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
             <Card>
               <div className="mb-4">
                 <label htmlFor="date" className="block mb-1 text-sm font-medium">
-                  Fecha *
+                  {t('common.suppliers.reservationModal.form.dateLabel')}
                 </label>
                 <input
                   type="date"
@@ -174,7 +178,7 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
 
               <div className="mb-4">
                 <label htmlFor="time" className="block mb-1 text-sm font-medium">
-                  Hora *
+                  {t('common.suppliers.reservationModal.form.timeLabel')}
                 </label>
                 <input
                   type="time"
@@ -191,7 +195,7 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
 
               <div className="mb-4">
                 <label htmlFor="contactMethod" className="block mb-1 text-sm font-medium">
-                  Método de contacto preferido
+                  {t('common.suppliers.reservationModal.form.contactMethodLabel')}
                 </label>
                 <select
                   id="contactMethod"
@@ -200,16 +204,24 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
                   onChange={handleChange}
                   className="w-full p-2 border border-gray-300 rounded-md"
                 >
-                  <option value="email">Email</option>
-                  <option value="phone">Teléfono</option>
-                  <option value="presencial">Presencial</option>
-                  <option value="videollamada">Videollamada</option>
+                  <option value="email">
+                    {t('common.suppliers.reservationModal.form.contactMethods.email')}
+                  </option>
+                  <option value="phone">
+                    {t('common.suppliers.reservationModal.form.contactMethods.phone')}
+                  </option>
+                  <option value="presencial">
+                    {t('common.suppliers.reservationModal.form.contactMethods.inPerson')}
+                  </option>
+                  <option value="videollamada">
+                    {t('common.suppliers.reservationModal.form.contactMethods.videoCall')}
+                  </option>
                 </select>
               </div>
 
               <div className="mb-4">
                 <label htmlFor="notes" className="block mb-1 text-sm font-medium">
-                  Notas o preguntas para el proveedor
+                  {t('common.suppliers.reservationModal.form.notesLabel')}
                 </label>
                 <textarea
                   id="notes"
@@ -218,34 +230,46 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
                   onChange={handleChange}
                   rows="3"
                   className="w-full p-2 border border-gray-300 rounded-md"
-                  placeholder="Cualquier información adicional relevante para la cita..."
+                  placeholder={t('common.suppliers.reservationModal.form.notesPlaceholder')}
                 ></textarea>
               </div>
 
               {/* Información de contacto del proveedor */}
               <div className="mt-6 p-4 bg-blue-50 rounded-md">
-                <h3 className="font-medium mb-2 flex itemás-center">
+                <h3 className="font-medium mb-2 flex items-center">
                   <Calendar size={16} className="mr-1 text-blue-600" />
-                  Información de contacto
+                  {t('common.suppliers.reservationModal.providerInfo.title')}
                 </h3>
                 {provider.contact && (
                   <p className="text-sm text-gray-700 mb-1">
-                    <span className="font-medium">Contacto:</span> {provider.contact}
+                    <span className="font-medium">
+                      {t('common.suppliers.reservationModal.providerInfo.contact')}
+                    </span>{' '}
+                    {provider.contact}
                   </p>
                 )}
                 {provider.phone && (
                   <p className="text-sm text-gray-700 mb-1">
-                    <span className="font-medium">Teléfono:</span> {provider.phone}
+                    <span className="font-medium">
+                      {t('common.suppliers.reservationModal.providerInfo.phone')}
+                    </span>{' '}
+                    {provider.phone}
                   </p>
                 )}
                 {provider.email && (
                   <p className="text-sm text-gray-700 mb-1">
-                    <span className="font-medium">Email:</span> {provider.email}
+                    <span className="font-medium">
+                      {t('common.suppliers.reservationModal.providerInfo.email')}
+                    </span>{' '}
+                    {provider.email}
                   </p>
                 )}
                 {provider.location && (
                   <p className="text-sm text-gray-700">
-                    <span className="font-medium">Ubicación:</span> {provider.location}
+                    <span className="font-medium">
+                      {t('common.suppliers.reservationModal.providerInfo.location')}
+                    </span>{' '}
+                    {provider.location}
                   </p>
                 )}
               </div>
@@ -256,22 +280,23 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
         {/* Sección de email */}
         {!showEmailForm && !emailSent && (
           <div className="p-4 border-t bg-gray-50">
-            <div className="flex itemás-center mb-2">
+            <div className="flex items-center mb-2">
               <Mail size={18} className="mr-2 text-blue-600" />
-              <h3 className="font-medium">Contacto por email</h3>
+              <h3 className="font-medium">
+                {t('common.suppliers.reservationModal.emailSection.title')}
+              </h3>
             </div>
             <p className="text-sm text-gray-600 mb-3">
-              Puedes enviar un email directamente al proveedor para consultar disponibilidad o
-              solicitar más información antes de confirmar la reserva.
+              {t('common.suppliers.reservationModal.emailSection.description')}
             </p>
             <Button
               type="button"
               variant="outline"
               onClick={initializeEmailData}
-              className="w-full flex itemás-center justify-center"
+              className="w-full flex items-center justify-center"
             >
               <Mail size={16} className="mr-2" />
-              Redactar email al proveedor
+              {t('common.suppliers.reservationModal.emailSection.button')}
             </Button>
           </div>
         )}
@@ -279,14 +304,15 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
         {/* Formulario de email */}
         {showEmailForm && (
           <div className="p-4 border-t bg-gray-50">
-            <div className="flex justify-between itemás-center mb-3">
-              <h3 className="font-medium flex itemás-center">
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="font-medium flex items-center">
                 <Mail size={18} className="mr-2 text-blue-600" />
-                Enviar email al proveedor
+                {t('common.suppliers.reservationModal.emailForm.title')}
               </h3>
               <button
                 onClick={() => setShowEmailForm(false)}
                 className="text-gray-500 hover:text-gray-700"
+                aria-label={t('common.suppliers.reservationModal.emailForm.closeAria')}
               >
                 <X size={18} />
               </button>
@@ -295,7 +321,7 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
             <div className="space-y-3 mb-4">
               <div>
                 <label htmlFor="subject" className="block mb-1 text-sm font-medium">
-                  Asunto
+                  {t('common.suppliers.reservationModal.emailForm.subjectLabel')}
                 </label>
                 <input
                   type="text"
@@ -309,7 +335,7 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
 
               <div>
                 <label htmlFor="body" className="block mb-1 text-sm font-medium">
-                  Mensaje
+                  {t('common.suppliers.reservationModal.emailForm.bodyLabel')}
                 </label>
                 <textarea
                   id="body"
@@ -324,15 +350,20 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
               {emailError && (
                 <div className="text-red-500 text-sm p-2 bg-red-50 rounded">{emailError}</div>
               )}
+              {errors.email && (
+                <div className="text-red-500 text-sm p-2 bg-red-50 rounded">{errors.email}</div>
+              )}
             </div>
 
             <Button
               type="button"
               onClick={handleSendEmail}
               disabled={emailLoading}
-              className="w-full flex itemás-center justify-center"
+              className="w-full flex items-center justify-center"
             >
-              {emailLoading ? 'Enviando...' : 'Enviar email'}
+              {emailLoading
+                ? t('common.suppliers.reservationModal.emailForm.sending')
+                : t('common.suppliers.reservationModal.emailForm.send')}
             </Button>
           </div>
         )}
@@ -340,13 +371,17 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
         {/* Confirmación de email enviado */}
         {emailSent && (
           <div className="p-4 border-t bg-green-50">
-            <div className="flex itemás-center text-green-700 mb-2">
+            <div className="flex items-center text-green-700 mb-2">
               <CheckCircle size={18} className="mr-2" />
-              <span className="font-medium">Email enviado correctamente</span>
+              <span className="font-medium">
+                {t('common.suppliers.reservationModal.emailSuccess.title')}
+              </span>
             </div>
             <p className="text-sm text-gray-700">
-              Tu mensaje ha sido enviado a {provider.name} desde tu dirección personalizada{' '}
-              {userEmail}. Recibirás una notificación cuando responda.
+              {t('common.suppliers.reservationModal.emailSuccess.description', {
+                name: provider.name,
+                email: userEmail,
+              })}
             </p>
           </div>
         )}
@@ -354,10 +389,10 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
         {/* Botones de acción */}
         <div className="p-4 border-t flex justify-between">
           <Button type="button" variant="outline" onClick={onClose}>
-            Cancelar
+            {t('common.suppliers.reservationModal.actions.cancel')}
           </Button>
           <Button type="button" onClick={handleSubmit} disabled={emailLoading}>
-            Confirmar reserva
+            {t('common.suppliers.reservationModal.actions.confirm')}
           </Button>
         </div>
       </div>

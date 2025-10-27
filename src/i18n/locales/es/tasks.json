@@ -203,7 +203,20 @@
           "cancel": "Cancelar",
           "save": "Guardar",
           "saving": "Guardando..."
+        },
+        "validation": {
+          "titleRequired": "Por favor ingresa un título.",
+          "startRequired": "Por favor selecciona una fecha de inicio.",
+          "endRequired": "Por favor selecciona una fecha de fin.",
+          "invalidDates": "Las fechas proporcionadas no son válidas.",
+          "endAfterStart": "La fecha de fin debe ser posterior a la de inicio."
+        },
+        "errors": {
+          "saveFailed": "Hubo un error al guardar la tarea."
         }
+      },
+      "dependencies": {
+        "blocked": "No puedes completar esta tarea aún.\n\nDebes completar primero: {{tasks}}"
       },
       "sidePanel": {
         "close": "Cerrar panel",
@@ -278,7 +291,31 @@
           "eventUntitled": "Evento sin t�tulo"
         }
       },
+      "gantt": {
+        "title": "Planificaci\u00f3n a Largo Plazo",
+        "controls": {
+          "showSubtasks": "Mostrar subtareas",
+          "zoomLabel": "Zoom",
+          "fit": "Ajustar",
+          "clearFilters": "Limpiar filtros"
+        },
+        "filters": {
+          "categoryAll": "Todas las categor\u00edas",
+          "categoryNone": "Sin categor\u00eda",
+          "assigneeAll": "Todos los responsables",
+          "assigneeUnassigned": "Sin responsable",
+          "statusAll": "Todos los estados",
+          "statusCritical": "Solo riesgo",
+          "statusWarning": "Solo atenci\u00f3n",
+          "statusOk": "Solo en curso"
+        },
+        "empty": {
+          "noScheduled": "A\u00fan no hay bloques planificados en el timeline. Importa una plantilla o crea una tarea padre desde la checklist para empezar."
+        }
+      },
       "common": {
+        "noWeddingTitle": "Selecciona o crea una boda para ver tareas",
+        "noWeddingDescription": "No hay una boda activa en este momento. Dirígete a la sección \"Bodas\" para elegir una existente o crear una nueva.",
         "errors": {
           "generic": "Algo sali� mal."
         },
@@ -292,7 +329,13 @@
         "overdueTitle": "Tarea vencida",
         "upcomingTitle": "Tarea pr�xima a vencer",
         "overdueMessage": "{{name}} venci� ({{date}})",
-        "upcomingMessage": "{{name}} vence antes de 24h ({{date}})"
+        "upcomingMessage": "{{name}} vence antes de 24h ({{date}})",
+        "blocks": {
+          "delayed": "Bloque atrasado y sin finalizar",
+          "overdueSubtasks": "{{count}} subtareas vencidas",
+          "progressBehind": "Progreso por debajo del ritmo esperado",
+          "completed": "Bloque completado"
+        }
       }
     }
   },

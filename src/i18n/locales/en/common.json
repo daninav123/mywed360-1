@@ -1704,6 +1704,100 @@
         "close": "Close"
       }
     },
+    "aiSearch": {
+      "services": {
+        "generic": "Wedding services",
+        "photo": "Photography",
+        "video": "Video",
+        "catering": "Catering",
+        "music": "Music",
+        "flowers": "Flowers"
+      },
+      "defaults": {
+        "suggestedName": "Suggested provider {{index}}"
+      },
+      "aiSummary": {
+        "matchesPreferences": "Matches your key preferences.",
+        "priceRange": "Estimated price range: {{price}}.",
+        "location": "Located in {{location}}.",
+        "locationAvailable": "Available near {{location}}."
+      },
+      "errors": {
+        "openaiFailed": "AI supplier search is not available. Configure OPENAI_API_KEY in the backend or enable an alternative engine.",
+        "openaiInvalidResponse": "The AI service returned an invalid format. Try again later or check the backend logs.",
+        "openaiRequestFailed": "Could not contact OpenAI. Check your credentials and connectivity.",
+        "serpUnavailable": "The fallback engine (SerpAPI) is not configured. Provide SERPAPI_API_KEY to enable it.",
+        "rateLimited": "Rate limit exceeded. Try again in a few minutes.",
+        "http": "Error {{status}}",
+        "generic": "Unable to complete the supplier search.",
+        "aiResponse": "AI search responded {{status}}",
+        "externalResponse": "The external search responded {{status}}",
+        "internalResponse": "The internal search responded {{status}}",
+        "unknownStatus": "unknown",
+        "offline": "Could not connect to the server. Make sure the backend is running at http://localhost:4004.",
+        "backendUnavailable": "The backend server is unavailable. Ensure it is running at http://localhost:4004.",
+        "openaiNotConfigured": "AI search requires OPENAI_API_KEY to be set in the backend. Add your OpenAI API key to the backend .env file.",
+        "noLocalResults": "No suppliers were found in the internal database.",
+        "noResults": "No suppliers matched your search. Try different terms or configure the AI search service."
+      },
+      "demoResults": [
+        {
+          "id": "1",
+          "name": "Naturaleza Viva Photography",
+          "service": "Photography",
+          "snippet": "Studio specialized in wedding photography with a natural, documentary style. We capture your most emotional and spontaneous moments.",
+          "image": "https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=500&q=60",
+          "location": "Madrid",
+          "price": "€1,200 - €2,500",
+          "tags": ["natural", "documentary", "outdoor", "sunlight"],
+          "keywords": ["photographer", "natural", "documentary", "wedding"]
+        },
+        {
+          "id": "2",
+          "name": "Lente Azul Photography",
+          "service": "Photography",
+          "snippet": "More than 10 years of experience in beach weddings and natural spaces. Personalized packages for every couple.",
+          "image": "https://images.unsplash.com/photo-1508435234994-67cfd7690508?auto=format&fit=crop&w=500&q=60",
+          "location": "Barcelona",
+          "price": "€1,500 - €3,000",
+          "tags": ["beach", "outdoor", "nature"],
+          "keywords": ["photographer", "wedding", "beach", "experience"]
+        },
+        {
+          "id": "3",
+          "name": "Delicious Moments Catering",
+          "service": "Catering",
+          "snippet": "Catering with vegetarian, vegan and allergy-friendly options. Specialists in events from 50 to 200 guests.",
+          "image": "https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&w=500&q=60",
+          "location": "Madrid",
+          "price": "€70 - €120 per guest",
+          "tags": ["vegetarian", "vegan", "buffet"],
+          "keywords": ["catering", "buffet", "event"]
+        },
+        {
+          "id": "4",
+          "name": "DJ Sounds & Lights",
+          "service": "Music",
+          "snippet": "DJ with professional sound and lighting equipment. Extensive experience in weddings and corporate events.",
+          "image": "https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?auto=format&fit=crop&w=500&q=60",
+          "location": "Valencia",
+          "price": "€800 - €1,500",
+          "tags": ["dj", "music", "lighting"],
+          "keywords": ["dj", "music", "event"]
+        },
+        {
+          "id": "5",
+          "name": "Flores del Jardín",
+          "service": "Flowers",
+          "snippet": "Artisan florist specialized in vintage and boho decoration. We work with local, seasonal product.",
+          "image": "https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&w=500&q=60",
+          "location": "Seville",
+          "price": "€500 - €1,500",
+          "tags": ["flowers", "decoration", "boho"],
+          "keywords": ["flowers", "decoration", "wedding"]
+        }
+      ]
+    },
     "aiResultList": {
       "loading": {
         "title": "Searching suppliers...",
@@ -1734,6 +1828,12 @@
         "add": "Add",
         "email": "Send email",
         "select": "Select"
+      },
+      "links": {
+        "emailTitle": "Send email",
+        "phoneTitle": "Call",
+        "instagramTitle": "Open Instagram",
+        "instagramLabel": "Instagram"
       }
     },
     "aiEmailModal": {
@@ -1763,10 +1863,171 @@
         "sending": "Sending..."
       }
     },
+    "reservationModal": {
+      "title": "Schedule meeting with {{name}}",
+      "actions": {
+        "closeAria": "Close modal",
+        "cancel": "Cancel",
+        "confirm": "Confirm booking"
+      },
+      "form": {
+        "dateLabel": "Date *",
+        "timeLabel": "Time *",
+        "contactMethodLabel": "Preferred contact method",
+        "contactMethods": {
+          "email": "Email",
+          "phone": "Phone",
+          "inPerson": "In person",
+          "videoCall": "Video call"
+        },
+        "notesLabel": "Notes or questions for the supplier",
+        "notesPlaceholder": "Any additional information relevant to the meeting..."
+      },
+      "providerInfo": {
+        "title": "Contact information",
+        "contact": "Contact:",
+        "phone": "Phone:",
+        "email": "Email:",
+        "location": "Location:"
+      },
+      "emailSection": {
+        "title": "Contact by email",
+        "description": "Send a direct email to check availability or request more information before confirming the booking.",
+        "button": "Compose email to the supplier"
+      },
+      "emailForm": {
+        "title": "Send email to the supplier",
+        "closeAria": "Close email composer",
+        "subjectLabel": "Subject",
+        "bodyLabel": "Message",
+        "send": "Send email",
+        "sending": "Sending..."
+      },
+      "emailSuccess": {
+        "title": "Email sent",
+        "description": "Your message was sent to {{name}} from {{email}}. We'll notify you when they reply."
+      },
+      "errors": {
+        "emailRequired": "Subject and message are required.",
+        "dateRequired": "The date is required.",
+        "timeRequired": "The time is required."
+      }
+    },
+    "formModal": {
+      "title": {
+        "create": "New supplier",
+        "edit": "Edit supplier"
+      },
+      "actions": {
+        "closeAria": "Close modal",
+        "cancel": "Cancel",
+        "save": "Save",
+        "update": "Update",
+        "saving": "Saving..."
+      },
+      "sections": {
+        "basic": "Basic information",
+        "contact": "Contact details",
+        "additional": "Additional information"
+      },
+      "fields": {
+        "name": {
+          "label": "Name *",
+          "placeholder": "Supplier name"
+        },
+        "service": {
+          "label": "Service *",
+          "placeholder": "Type of service"
+        },
+        "budget": {
+          "label": "Budget",
+          "prefix": "€",
+          "placeholder": "0"
+        },
+        "status": {
+          "label": "Status"
+        },
+        "contact": {
+          "label": "Contact person",
+          "placeholder": "Contact name"
+        },
+        "phone": {
+          "label": "Phone",
+          "placeholder": "+34 XXX XXX XXX"
+        },
+        "email": {
+          "label": "Email",
+          "placeholder": "email@example.com"
+        },
+        "web": {
+          "label": "Website",
+          "placeholder": "https://example.com"
+        },
+        "location": {
+          "label": "Location",
+          "placeholder": "City, province"
+        },
+        "appointment": {
+          "label": "Meeting date"
+        },
+        "notes": {
+          "label": "Notes",
+          "placeholder": "Additional notes about the supplier"
+        },
+        "image": {
+          "label": "Image URL",
+          "placeholder": "https://example.com/image.jpg",
+          "help": "Enter an image URL for the supplier (optional)"
+        }
+      },
+      "status": {
+        "options": {
+          "new": "New",
+          "contacted": "Contacted",
+          "pending": "Pending",
+          "hired": "Booked",
+          "discarded": "Discarded"
+        }
+      },
+      "errors": {
+        "general": "We couldn't save the supplier. Please try again.",
+        "nameRequired": "Name is required.",
+        "serviceRequired": "Service is required.",
+        "emailInvalid": "Email format is invalid.",
+        "webInvalid": "Website must start with http:// or https://"
+      }
+    },
+    "confirmedCard": {
+      "nameFallback": "Supplier",
+      "serviceFallback": "Service not set",
+      "statusBadge": "Confirmed",
+      "nextPayment": {
+        "label": "Next payment",
+        "none": "No scheduled date"
+      },
+      "summary": {
+        "assigned": "Assigned",
+        "paid": "Paid",
+        "pending": "Pending"
+      },
+      "groupLabel": "Group: {{name}}",
+      "actions": {
+        "view": "View record",
+        "registerPayment": "Record payment",
+        "viewContract": "View contract",
+        "portal": "Supplier portal"
+      },
+      "shared": {
+        "notAvailable": "—"
+      }
+    },
     "detail": {
       "info": {
         "nameFallback": "Unnamed supplier",
         "serviceFallback": "Service not set"
+      },
+      "placeholders": {
+        "notAvailable": "—"
       }
     }
   },

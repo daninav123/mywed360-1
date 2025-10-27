@@ -1,6 +1,8 @@
 import { X, Calendar } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 
+import useTranslations from '../../hooks/useTranslations';
+
 /**
  * Modal para añadir o editar proveedores
  *
@@ -11,7 +13,14 @@ import React, { useState, useEffect } from 'react';
  * @param {Object} props.proveedorEditar - Proveedor a editar (null si es nuevo)
  * @returns {React.ReactElement} Modal de formulario de proveedor
  */
-const ProveedorFormModal = ({ visible, onClose, onGuardar, proveedorEditar = null, forceGuardar = false }) => {
+const ProveedorFormModal = ({
+  visible,
+  onClose,
+  onGuardar,
+  proveedorEditar = null,
+  forceGuardar = false,
+}) => {
+  const { t } = useTranslations();
   // Estado para los campos del formulario
   const [formData, setFormData] = useState({
     nombre: '',
@@ -100,21 +109,21 @@ const ProveedorFormModal = ({ visible, onClose, onGuardar, proveedorEditar = nul
     const nuevosErrores = {};
 
     if (!formData.nombre.trim()) {
-      nuevosErrores.nombre = 'El nombre es obligatorio';
+      nuevosErrores.nombre = t('common.suppliers.formModal.errors.nameRequired');
     }
 
     if (!formData.servicio.trim()) {
-      nuevosErrores.servicio = 'El servicio es obligatorio';
+      nuevosErrores.servicio = t('common.suppliers.formModal.errors.serviceRequired');
     }
 
     // Email válido si se proporciona
     if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
-      nuevosErrores.email = 'El email no tiene formato válido';
+      nuevosErrores.email = t('common.suppliers.formModal.errors.emailInvalid');
     }
 
     // Web con formato válido si se proporciona
     if (formData.web && !formData.web.startsWith('http')) {
-      nuevosErrores.web = 'La web debe empezar con http:// o https://';
+      nuevosErrores.web = t('common.suppliers.formModal.errors.webInvalid');
     }
 
     setErrores(nuevosErrores);
@@ -157,7 +166,7 @@ const ProveedorFormModal = ({ visible, onClose, onGuardar, proveedorEditar = nul
       console.error('Error al guardar proveedor:', error);
       setErrores({
         ...errores,
-        general: 'Error al guardar. Inténtalo de nuevo.',
+        general: t('common.suppliers.formModal.errors.general'),
       });
     } finally {
       setEnviando(false);
@@ -165,6 +174,14 @@ const ProveedorFormModal = ({ visible, onClose, onGuardar, proveedorEditar = nul
   };
 
   if (!visible) return null;
+
+  const statusOptions = [
+    { value: 'Nuevo', label: t('common.suppliers.formModal.status.options.new') },
+    { value: 'Contactado', label: t('common.suppliers.formModal.status.options.contacted') },
+    { value: 'Pendiente', label: t('common.suppliers.formModal.status.options.pending') },
+    { value: 'Contratado', label: t('common.suppliers.formModal.status.options.hired') },
+    { value: 'Descartado', label: t('common.suppliers.formModal.status.options.discarded') },
+  ];
 
   return (
     <div
@@ -178,9 +195,15 @@ const ProveedorFormModal = ({ visible, onClose, onGuardar, proveedorEditar = nul
         {/* Cabecera */}
         <div className="flex justify-between items-center p-5 border-b border-gray-200">
           <h3 className="font-semibold text-lg text-gray-800">
-            {isEditing ? 'Editar proveedor' : 'Nuevo proveedor'}
+            {isEditing
+              ? t('common.suppliers.formModal.title.edit')
+              : t('common.suppliers.formModal.title.create')}
           </h3>
-          <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-100">
+          <button
+            onClick={onClose}
+            className="p-1 rounded-full hover:bg-gray-100"
+            aria-label={t('common.suppliers.formModal.actions.closeAria')}
+          >
             <X size={20} className="text-gray-500" />
           </button>
         </div>
@@ -195,13 +218,15 @@ const ProveedorFormModal = ({ visible, onClose, onGuardar, proveedorEditar = nul
 
             {/* Datos básicos */}
             <div className="space-y-4">
-              <h4 className="font-medium text-gray-700">Información básica</h4>
+              <h4 className="font-medium text-gray-700">
+                {t('common.suppliers.formModal.sections.basic')}
+              </h4>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Nombre */}
                 <div>
                   <label htmlFor="nombre" className="block text-sm font-medium text-gray-700 mb-1">
-                    Nombre *
+                    {t('common.suppliers.formModal.fields.name.label')}
                   </label>
                   <input
                     type="text"
@@ -212,7 +237,7 @@ const ProveedorFormModal = ({ visible, onClose, onGuardar, proveedorEditar = nul
                     className={`w-full px-3 py-2 border ${
                       errores.nombre ? 'border-red-300' : 'border-gray-300'
                     } rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500`}
-                    placeholder="Nombre del proveedor"
+                    placeholder={t('common.suppliers.formModal.fields.name.placeholder')}
                   />
                   {errores.nombre && <p className="mt-1 text-sm text-red-600">{errores.nombre}</p>}
                 </div>
@@ -223,7 +248,7 @@ const ProveedorFormModal = ({ visible, onClose, onGuardar, proveedorEditar = nul
                     htmlFor="servicio"
                     className="block text-sm font-medium text-gray-700 mb-1"
                   >
-                    Servicio *
+                    {t('common.suppliers.formModal.fields.service.label')}
                   </label>
                   <input
                     type="text"
@@ -234,7 +259,7 @@ const ProveedorFormModal = ({ visible, onClose, onGuardar, proveedorEditar = nul
                     className={`w-full px-3 py-2 border ${
                       errores.servicio ? 'border-red-300' : 'border-gray-300'
                     } rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500`}
-                    placeholder="Tipo de servicio"
+                    placeholder={t('common.suppliers.formModal.fields.service.placeholder')}
                   />
                   {errores.servicio && (
                     <p className="mt-1 text-sm text-red-600">{errores.servicio}</p>
@@ -249,11 +274,11 @@ const ProveedorFormModal = ({ visible, onClose, onGuardar, proveedorEditar = nul
                     htmlFor="presupuesto"
                     className="block text-sm font-medium text-gray-700 mb-1"
                   >
-                    Presupuesto
+                    {t('common.suppliers.formModal.fields.budget.label')}
                   </label>
                   <div className="relative">
                     <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
-                      €
+                      {t('common.suppliers.formModal.fields.budget.prefix')}
                     </span>
                     <input
                       type="text"
@@ -262,7 +287,7 @@ const ProveedorFormModal = ({ visible, onClose, onGuardar, proveedorEditar = nul
                       value={formData.presupuesto}
                       onChange={handleChange}
                       className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="0"
+                      placeholder={t('common.suppliers.formModal.fields.budget.placeholder')}
                     />
                   </div>
                 </div>
@@ -270,7 +295,7 @@ const ProveedorFormModal = ({ visible, onClose, onGuardar, proveedorEditar = nul
                 {/* Estado */}
                 <div>
                   <label htmlFor="estado" className="block text-sm font-medium text-gray-700 mb-1">
-                    Estado
+                    {t('common.suppliers.formModal.fields.status.label')}
                   </label>
                   <select
                     id="estado"
@@ -279,11 +304,11 @@ const ProveedorFormModal = ({ visible, onClose, onGuardar, proveedorEditar = nul
                     onChange={handleChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                   >
-                    <option value="Nuevo">Nuevo</option>
-                    <option value="Contactado">Contactado</option>
-                    <option value="Pendiente">Pendiente</option>
-                    <option value="Contratado">Contratado</option>
-                    <option value="Descartado">Descartado</option>
+                    {statusOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
@@ -291,7 +316,9 @@ const ProveedorFormModal = ({ visible, onClose, onGuardar, proveedorEditar = nul
 
             {/* Datos de contacto */}
             <div className="pt-2 space-y-4">
-              <h4 className="font-medium text-gray-700">Datos de contacto</h4>
+              <h4 className="font-medium text-gray-700">
+                {t('common.suppliers.formModal.sections.contact')}
+              </h4>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Contacto */}
@@ -300,7 +327,7 @@ const ProveedorFormModal = ({ visible, onClose, onGuardar, proveedorEditar = nul
                     htmlFor="contacto"
                     className="block text-sm font-medium text-gray-700 mb-1"
                   >
-                    Persona de contacto
+                    {t('common.suppliers.formModal.fields.contact.label')}
                   </label>
                   <input
                     type="text"
@@ -309,7 +336,7 @@ const ProveedorFormModal = ({ visible, onClose, onGuardar, proveedorEditar = nul
                     value={formData.contacto}
                     onChange={handleChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Nombre de contacto"
+                    placeholder={t('common.suppliers.formModal.fields.contact.placeholder')}
                   />
                 </div>
 
@@ -319,7 +346,7 @@ const ProveedorFormModal = ({ visible, onClose, onGuardar, proveedorEditar = nul
                     htmlFor="telefono"
                     className="block text-sm font-medium text-gray-700 mb-1"
                   >
-                    Teléfono
+                    {t('common.suppliers.formModal.fields.phone.label')}
                   </label>
                   <input
                     type="text"
@@ -328,7 +355,7 @@ const ProveedorFormModal = ({ visible, onClose, onGuardar, proveedorEditar = nul
                     value={formData.telefono}
                     onChange={handleChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="+34 XXX XXX XXX"
+                    placeholder={t('common.suppliers.formModal.fields.phone.placeholder')}
                   />
                 </div>
               </div>
@@ -337,7 +364,7 @@ const ProveedorFormModal = ({ visible, onClose, onGuardar, proveedorEditar = nul
                 {/* Email */}
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                    Email
+                    {t('common.suppliers.formModal.fields.email.label')}
                   </label>
                   <input
                     type="email"
@@ -348,7 +375,7 @@ const ProveedorFormModal = ({ visible, onClose, onGuardar, proveedorEditar = nul
                     className={`w-full px-3 py-2 border ${
                       errores.email ? 'border-red-300' : 'border-gray-300'
                     } rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500`}
-                    placeholder="email@ejemplo.com"
+                    placeholder={t('common.suppliers.formModal.fields.email.placeholder')}
                   />
                   {errores.email && <p className="mt-1 text-sm text-red-600">{errores.email}</p>}
                 </div>
@@ -356,7 +383,7 @@ const ProveedorFormModal = ({ visible, onClose, onGuardar, proveedorEditar = nul
                 {/* Web */}
                 <div>
                   <label htmlFor="web" className="block text-sm font-medium text-gray-700 mb-1">
-                    Sitio web
+                    {t('common.suppliers.formModal.fields.web.label')}
                   </label>
                   <input
                     type="text"
@@ -367,7 +394,7 @@ const ProveedorFormModal = ({ visible, onClose, onGuardar, proveedorEditar = nul
                     className={`w-full px-3 py-2 border ${
                       errores.web ? 'border-red-300' : 'border-gray-300'
                     } rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500`}
-                    placeholder="https://ejemplo.com"
+                    placeholder={t('common.suppliers.formModal.fields.web.placeholder')}
                   />
                   {errores.web && <p className="mt-1 text-sm text-red-600">{errores.web}</p>}
                 </div>
@@ -376,7 +403,7 @@ const ProveedorFormModal = ({ visible, onClose, onGuardar, proveedorEditar = nul
               {/* Ubicación */}
               <div>
                 <label htmlFor="ubicacion" className="block text-sm font-medium text-gray-700 mb-1">
-                  Ubicación
+                  {t('common.suppliers.formModal.fields.location.label')}
                 </label>
                 <input
                   type="text"
@@ -385,14 +412,14 @@ const ProveedorFormModal = ({ visible, onClose, onGuardar, proveedorEditar = nul
                   value={formData.ubicacion}
                   onChange={handleChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Ciudad, provincia"
+                  placeholder={t('common.suppliers.formModal.fields.location.placeholder')}
                 />
               </div>
 
               {/* Cita */}
               <div>
                 <label htmlFor="fechaCita" className="block text-sm font-medium text-gray-700 mb-1">
-                  Fecha de cita
+                  {t('common.suppliers.formModal.fields.appointment.label')}
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -412,12 +439,14 @@ const ProveedorFormModal = ({ visible, onClose, onGuardar, proveedorEditar = nul
 
             {/* Información adicional */}
             <div className="pt-2 space-y-4">
-              <h4 className="font-medium text-gray-700">Información adicional</h4>
+              <h4 className="font-medium text-gray-700">
+                {t('common.suppliers.formModal.sections.additional')}
+              </h4>
 
               {/* Notas */}
               <div>
                 <label htmlFor="notas" className="block text-sm font-medium text-gray-700 mb-1">
-                  Notas
+                  {t('common.suppliers.formModal.fields.notes.label')}
                 </label>
                 <textarea
                   id="notas"
@@ -426,14 +455,14 @@ const ProveedorFormModal = ({ visible, onClose, onGuardar, proveedorEditar = nul
                   onChange={handleChange}
                   rows={3}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Notas adicionales sobre el proveedor"
+                  placeholder={t('common.suppliers.formModal.fields.notes.placeholder')}
                 />
               </div>
 
               {/* URL de imagen */}
               <div>
                 <label htmlFor="imagen" className="block text-sm font-medium text-gray-700 mb-1">
-                  URL de imagen
+                  {t('common.suppliers.formModal.fields.image.label')}
                 </label>
                 <input
                   type="text"
@@ -442,10 +471,10 @@ const ProveedorFormModal = ({ visible, onClose, onGuardar, proveedorEditar = nul
                   value={formData.imagen}
                   onChange={handleChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="https://ejemplo.com/imagen.jpg"
+                  placeholder={t('common.suppliers.formModal.fields.image.placeholder')}
                 />
                 <p className="mt-1 text-xs text-gray-500">
-                  Introduce una URL para la imagen del proveedor (opcional)
+                  {t('common.suppliers.formModal.fields.image.help')}
                 </p>
               </div>
             </div>
@@ -458,15 +487,19 @@ const ProveedorFormModal = ({ visible, onClose, onGuardar, proveedorEditar = nul
               onClick={onClose}
               className="px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
-              Cancelar
+              {t('common.suppliers.formModal.actions.cancel')}
             </button>
             <button
               type="submit"
               disabled={enviando}
               className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md shadow-sm text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
             >
-              {enviando ? 'Guardando...' : (isCypress || forceGuardar || !isEditing) ? 'Guardar' : 'Actualizar'}
-              <span className="sr-only">Guardar</span>
+              {enviando
+                ? t('common.suppliers.formModal.actions.saving')
+                : isCypress || forceGuardar || !isEditing
+                ? t('common.suppliers.formModal.actions.save')
+                : t('common.suppliers.formModal.actions.update')}
+              <span className="sr-only">{t('common.suppliers.formModal.actions.save')}</span>
             </button>
           </div>
         </form>
