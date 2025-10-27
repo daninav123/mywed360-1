@@ -3,6 +3,7 @@ import React, { useMemo } from 'react';
 
 import Card from '../ui/Card';
 import Button from '../ui/Button';
+import useTranslations from '../../hooks/useTranslations';
 
 const EMPTY_ANALYTICS = {
   averageScore: 0,
@@ -14,8 +15,13 @@ const EMPTY_ANALYTICS = {
 
 const MIN_BAR_WIDTH = 6;
 
-export default function SupplierAnalyticsPanel({ analytics = EMPTY_ANALYTICS, loading = false, onOpenReport }) {
+export default function SupplierAnalyticsPanel({
+  analytics = EMPTY_ANALYTICS,
+  loading = false,
+  onOpenReport,
+}) {
   const summary = analytics || EMPTY_ANALYTICS;
+  const { t } = useTranslations();
   const totalSuppliers = useMemo(() => {
     if (!Array.isArray(summary.scoreDistribution)) {
       return summary.serviceStats?.reduce?.((acc, item) => acc + (item?.total || 0), 0) || 0;
@@ -37,15 +43,15 @@ export default function SupplierAnalyticsPanel({ analytics = EMPTY_ANALYTICS, lo
         <div>
           <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
             <TrendingUp size={18} className="text-indigo-600" />
-            Analítica IA de proveedores
+            {t('common.suppliers.analyticsPanel.title')}
           </h2>
           <p className="text-sm text-gray-600">
-            Seguimiento consolidado de puntuaciones, cobertura y madurez del pipeline asistido por IA.
+            {t('common.suppliers.analyticsPanel.description')}
           </p>
         </div>
         {typeof onOpenReport === 'function' && (
           <Button variant="outline" size="sm" onClick={onOpenReport}>
-            Ver reporte detallado
+            {t('common.suppliers.analyticsPanel.openReport')}
           </Button>
         )}
       </div>
@@ -54,48 +60,62 @@ export default function SupplierAnalyticsPanel({ analytics = EMPTY_ANALYTICS, lo
         <div className="rounded border border-slate-200 bg-slate-50 px-4 py-3">
           <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
             <Award size={16} className="text-indigo-500" />
-            Score promedio IA
+            {t('common.suppliers.analyticsPanel.cards.average.title')}
           </div>
           <div className="mt-2 text-3xl font-bold text-slate-900">
             {loading ? '—' : `${summary.averageScore || 0}`}
           </div>
-          <p className="mt-1 text-xs text-slate-500">Objetivo ≥ 75 para pasar a shortlist.</p>
+          <p className="mt-1 text-xs text-slate-500">
+            {t('common.suppliers.analyticsPanel.cards.average.targetHint')}
+          </p>
         </div>
         <div className="rounded border border-slate-200 bg-white px-4 py-3">
           <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
             <Activity size={16} className="text-emerald-500" />
-            Respuestas portal
+            {t('common.suppliers.analyticsPanel.cards.portal.title')}
           </div>
           <div className="mt-2 flex items-end gap-4 text-slate-900">
             <div>
               <div className="text-2xl font-bold">{portalStats.responded || 0}</div>
-              <p className="text-xs text-slate-500">Respuestas recibidas</p>
+              <p className="text-xs text-slate-500">
+                {t('common.suppliers.analyticsPanel.cards.portal.responses')}
+              </p>
             </div>
             <div>
               <div className="text-sm font-semibold text-emerald-600">
                 {(portalStats.enabled || 0) ? Math.round(((portalStats.responded || 0) / (portalStats.enabled || 1)) * 100) : 0}%
               </div>
-              <p className="text-xs text-slate-500">Cobertura portal</p>
+              <p className="text-xs text-slate-500">
+                {t('common.suppliers.analyticsPanel.cards.portal.coverage')}
+              </p>
             </div>
           </div>
           <p className="mt-1 text-xs text-slate-500">
-            Pendientes: {Math.max(0, (portalStats.enabled || 0) - (portalStats.responded || 0))}
+            {t('common.suppliers.analyticsPanel.cards.portal.pending', {
+              count: Math.max(0, (portalStats.enabled || 0) - (portalStats.responded || 0)),
+            })}
           </p>
         </div>
         <div className="rounded border border-slate-200 bg-white px-4 py-3">
           <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
             <BarChart2 size={16} className="text-sky-500" />
-            Cobertura por servicio
+            {t('common.suppliers.analyticsPanel.cards.services.title')}
           </div>
           <div className="mt-2 space-y-1">
             {serviceLeaders.length === 0 && (
-              <p className="text-xs text-slate-500">Sin datos suficientes.</p>
+              <p className="text-xs text-slate-500">
+                {t('common.suppliers.analyticsPanel.cards.services.empty')}
+              </p>
             )}
             {serviceLeaders.map((service) => (
               <div key={service.service} className="flex items-center justify-between text-xs text-slate-600">
                 <span className="font-medium text-slate-700">{service.service}</span>
                 <span className="text-slate-500">
-                  {service.confirmed}/{service.total} · Score {service.averageScore}
+                  {t('common.suppliers.analyticsPanel.cards.services.row', {
+                    confirmed: service.confirmed,
+                    total: service.total,
+                    score: service.averageScore,
+                  })}
                 </span>
               </div>
             ))}

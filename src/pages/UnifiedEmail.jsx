@@ -44,6 +44,7 @@ import {
   removeTagFromEmail,
 } from '../services/tagService';
 import sanitizeHtml from '../utils/sanitizeHtml';
+import { ensureContractFromEmail } from '../services/contractEmailService';
 
 /**
  * P)gina principal de Buz)n (correo interno @maloveapp.com)
@@ -171,6 +172,28 @@ const UnifiedEmail = () => {
       console.warn('UnifiedEmail: error detectando respuesta de proveedor', e);
     }
   }, [emails, providers]);
+
+  useEffect(() => {
+    if (!activeWedding || !Array.isArray(emails) || emails.length === 0) return;
+    let cancelled = false;
+
+    const processContracts = async () => {
+      for (const email of emails) {
+        if (cancelled) break;
+        try {
+          await ensureContractFromEmail(email, activeWedding);
+        } catch (error) {
+          console.warn('UnifiedEmail: error al guardar contrato desde correo', error);
+        }
+      }
+    };
+
+    processContracts();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [emails, activeWedding]);
   // Obtener email del usuario
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
@@ -628,4 +651,3 @@ const formatDateShort = (d) => {
 };
 
 // Avatar y ChipToggle se han extra)do a componentes reutilizables
-

@@ -2691,6 +2691,20 @@
         "sending": "Enviando..."
       }
     },
+    "providerSearchDrawer": {
+      "title": "Búsqueda IA de proveedores",
+      "closeTooltip": "Cerrar",
+      "queryPlaceholder": "Ej: Fotografía Madrid 2000€",
+      "searchButton": "Buscar",
+      "loading": "Buscando…",
+      "emptyPrompt": "Introduce una consulta y pulsa Buscar.",
+      "result": {
+        "meta": "{{service}} • {{location}}",
+        "web": "Web"
+      },
+      "closeButton": "Cerrar",
+      "saveButton": "Guardar proveedor"
+    },
     "bulkStatusModal": {
       "title": "Cambiar estado",
       "label": "Nuevo estado",

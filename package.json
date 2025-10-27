@@ -81,6 +81,7 @@
     "metrics:cleanup": "node scripts/cleanupProjectMetricsEvents.js --days=30",
     "cleanup:bak": "node scripts/cleanup-bak-files.js",
     "cleanup:bak:dry": "node scripts/cleanup-bak-files.js --dry-run",
+    "security:xss": "node scripts/check-xss-vulnerabilities.js",
     "mobile:start": "npm --prefix mobile run start",
     "mobile:start:clean": "npm --prefix mobile run start:clean",
     "mobile:android": "npm --prefix mobile run android",

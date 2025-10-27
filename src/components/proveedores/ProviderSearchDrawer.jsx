@@ -1,8 +1,18 @@
 import { X, Search } from 'lucide-react';
 import React, { useState } from 'react';
 
-export default function ProviderSearchDrawer({ open, onClose, onBuscar, onGuardar, resultado, cargando }) {
+import useTranslations from '../../hooks/useTranslations';
+
+export default function ProviderSearchDrawer({
+  open,
+  onClose,
+  onBuscar,
+  onGuardar,
+  resultado,
+  cargando,
+}) {
   const [query, setQuery] = useState('');
+  const { t } = useTranslations();
 
   if (!open) return null;
 
@@ -11,8 +21,15 @@ export default function ProviderSearchDrawer({ open, onClose, onBuscar, onGuarda
       <div className="absolute inset-0 bg-black/30" onClick={onClose} />
       <div className="absolute right-0 top-0 bottom-0 w-[420px] bg-white border-l shadow-xl flex flex-col">
         <div className="flex items-center justify-between p-3 border-b">
-          <div className="font-medium">Búsqueda IA de proveedores</div>
-          <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded" title="Cerrar">
+          <div className="font-medium">
+            {t('common.suppliers.providerSearchDrawer.title')}
+          </div>
+          <button
+            onClick={onClose}
+            className="p-1 hover:bg-gray-100 rounded"
+            title={t('common.suppliers.providerSearchDrawer.closeTooltip')}
+            aria-label={t('common.suppliers.providerSearchDrawer.closeTooltip')}
+          >
             <X className="h-4 w-4" />
           </button>
         </div>
@@ -29,23 +46,52 @@ export default function ProviderSearchDrawer({ open, onClose, onBuscar, onGuarda
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Ej: Fotografía Madrid 2000€"
+              placeholder={t('common.suppliers.providerSearchDrawer.queryPlaceholder')}
               className="w-full pl-8 pr-3 py-2 border rounded text-sm"
             />
           </div>
-          <button type="submit" className="px-3 py-2 text-sm border rounded hover:bg-gray-50">Buscar</button>
+          <button
+            type="submit"
+            className="px-3 py-2 text-sm border rounded hover:bg-gray-50"
+          >
+            {t('common.suppliers.providerSearchDrawer.searchButton')}
+          </button>
         </form>
 
         <div className="p-3 flex-1 overflow-y-auto">
-          {cargando && <div className="text-sm text-gray-500">Buscando…</div>}
-          {!cargando && !resultado && <div className="text-sm text-gray-500">Introduce una consulta y pulsa Buscar.</div>}
+          {cargando && (
+            <div className="text-sm text-gray-500">
+              {t('common.suppliers.providerSearchDrawer.loading')}
+            </div>
+          )}
+          {!cargando && !resultado && (
+            <div className="text-sm text-gray-500">
+              {t('common.suppliers.providerSearchDrawer.emptyPrompt')}
+            </div>
+          )}
           {!cargando && resultado && (
             <div className="space-y-2">
               <div className="text-lg font-semibold">{resultado.nombre}</div>
-              <div className="text-sm text-gray-600">{resultado.servicio} • {resultado.ubicacion}</div>
-              {resultado.descripcion && <p className="text-sm text-gray-700">{resultado.descripcion}</p>}
+              <div className="text-sm text-gray-600">
+                {t('common.suppliers.providerSearchDrawer.result.meta', {
+                  service: resultado.servicio,
+                  location: resultado.ubicacion,
+                })}
+              </div>
+              {resultado.descripcion && (
+                <p className="text-sm text-gray-700">{resultado.descripcion}</p>
+              )}
               <div className="mt-2 flex flex-wrap gap-2 text-xs">
-                {resultado.web && <a className="px-2 py-1 border rounded hover:bg-gray-50" href={resultado.web} target="_blank" rel="noreferrer">Web</a>}
+                {resultado.web && (
+                  <a
+                    className="px-2 py-1 border rounded hover:bg-gray-50"
+                    href={resultado.web}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {t('common.suppliers.providerSearchDrawer.result.web')}
+                  </a>
+                )}
                 {resultado.email && <span className="px-2 py-1 border rounded">{resultado.email}</span>}
                 {resultado.telefono && <span className="px-2 py-1 border rounded">{resultado.telefono}</span>}
               </div>
@@ -54,13 +100,18 @@ export default function ProviderSearchDrawer({ open, onClose, onBuscar, onGuarda
         </div>
 
         <div className="p-3 border-t flex items-center justify-end gap-2">
-          <button className="px-3 py-2 text-sm border rounded hover:bg-gray-50" onClick={onClose}>Cerrar</button>
+          <button
+            className="px-3 py-2 text-sm border rounded hover:bg-gray-50"
+            onClick={onClose}
+          >
+            {t('common.suppliers.providerSearchDrawer.closeButton')}
+          </button>
           <button
             className="px-3 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
             disabled={!resultado}
             onClick={() => typeof onGuardar === 'function' && onGuardar(resultado)}
           >
-            Guardar proveedor
+            {t('common.suppliers.providerSearchDrawer.saveButton')}
           </button>
         </div>
       </div>

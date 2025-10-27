@@ -2656,6 +2656,20 @@
         "sending": "Sending..."
       }
     },
+    "providerSearchDrawer": {
+      "title": "AI supplier search",
+      "closeTooltip": "Close",
+      "queryPlaceholder": "e.g. Photography Madrid 2000€",
+      "searchButton": "Search",
+      "loading": "Searching…",
+      "emptyPrompt": "Enter a query and press Search.",
+      "result": {
+        "meta": "{{service}} • {{location}}",
+        "web": "Website"
+      },
+      "closeButton": "Close",
+      "saveButton": "Save supplier"
+    },
     "bulkStatusModal": {
       "title": "Change status",
       "label": "New status",
