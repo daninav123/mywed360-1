@@ -352,7 +352,7 @@ async function scrapeProviderData(providerUrl) {
 async function enrichQueryWithGPT(query, location, budget, service) {
   // Si no hay OpenAI, devolver query básica
   if (!openai) {
-    return location ? `${query} en ${location}` : query;
+    return location ? `${query} ${location}` : query;
   }
 
   try {
@@ -364,10 +364,14 @@ UBICACIÓN: ${location || 'no especificada'}
 PRESUPUESTO: ${budget || 'no especificado'}
 
 INSTRUCCIONES:
-1. Mantén la esencia de la búsqueda original
-2. Añade la ubicación si es relevante
-3. Añade palabras clave que ayuden a encontrar proveedores (contacto, email, teléfono)
-4. NO añadas palabras que busquen listados ("mejores", "encuentra", "compara")
+1. Si parece un NOMBRE ESPECÍFICO de proveedor → busca SOLO ese nombre + España
+2. Si es una búsqueda genérica → añade ubicación y palabras clave (contacto, web, teléfono)
+3. NO añadas palabras que busquen listados ("mejores", "top", "encuentra")
+4. Máximo 6-8 palabras
+
+EJEMPLOS:
+- "alfonso calza" → "alfonso calza bodas españa"
+- "fotógrafo bodas" → "fotógrafo bodas valencia contacto"
 
 Devuelve SOLO la query optimizada, sin explicaciones.`;
 
@@ -385,7 +389,7 @@ Devuelve SOLO la query optimizada, sin explicaciones.`;
     return enriched;
   } catch (error) {
     console.warn(`⚠️ [GPT] Error enriqueciendo query, usando original:`, error.message);
-    return location ? `${query} en ${location}` : query;
+    return location ? `${query} ${location}` : query;
   }
 }
 
@@ -431,14 +435,6 @@ async function searchTavily(query, location = 'España', budget = '', service = 
           'facebook.com/marketplace',
           'idealista.com',
           'fotocasa.es',
-        ],
-        // 🆕 PRIORIZAR dominios especializados en bodas
-        include_domains: [
-          'bodas.net',
-          'bodas.com.mx',
-          'matrimonio.com.co',
-          'zankyou.es',
-          'casar.com',
         ],
       }),
     });
@@ -809,13 +805,27 @@ router.post('/', async (req, res) => {
 
     // 1. BUSCAR con Tavily (búsqueda web real con query enriquecida por GPT)
     console.log(`\n🔍 [TAVILY] Buscando: "${query}" en ${formattedLocation}\n`);
-    const tavilyResults = await searchTavily(query, formattedLocation, budget, service);
+    let tavilyResults = await searchTavily(query, formattedLocation, budget, service);
     
     logger.info('[ai-suppliers-tavily] Resultados de Tavily obtenidos', {
       count: tavilyResults.length
     });
 
+    // 🔄 FALLBACK: Si hay muy pocos resultados, buscar más ampliamente
+    if (tavilyResults.length < 3) {
+      console.log(`⚠️ [FALLBACK] Solo ${tavilyResults.length} resultados. Buscando en toda España...`);
+      const fallbackResults = await searchTavily(query, 'España', budget, service);
+      
+      // Combinar resultados sin duplicados
+      const existingUrls = new Set(tavilyResults.map(r => r.url));
+      const newResults = fallbackResults.filter(r => !existingUrls.has(r.url));
+      
+      tavilyResults = [...tavilyResults, ...newResults];
+      console.log(`✅ [FALLBACK] Total resultados combinados: ${tavilyResults.length}`);
+    }
+
     if (tavilyResults.length === 0) {
+      console.warn('❌ No se encontraron resultados ni con búsqueda fallback');
       return res.json([]);
     }
 
