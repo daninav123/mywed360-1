@@ -261,7 +261,7 @@ async function searchTavily(query, location = 'España') {
         include_answer: false,
         include_raw_content: true, // Incluir contenido completo para mejor filtrado
         include_images: true, // ✅ ACTIVAR IMÁGENES
-        max_results: 20, // Más resultados porque muchos serán filtrados
+        max_results: 50, // 🆕 Aumentado a 50 para obtener más proveedores válidos
         // Excluir sitios genéricos y de listados
         exclude_domains: [
           'wikipedia.org',
@@ -733,21 +733,20 @@ router.post('/', async (req, res) => {
       const invalidTitlePatterns = [
         'encuentra', 'busca', 'directorio', 'listado',
         'todos los', 'mejores', 'top', 'los mejores',
-        'buscar', 'resultado', 'empresa',
+        'buscar', 'resultado',
         'profesionales de', 'servicios de',
-        'bodas en', 'para bodas', 'de bodas',
         'fotógrafos en', 'djs en', 'catering en', 'floristerías en',
-        'proveedores', 'empresas', 'negocios',
-        'compara', 'opiniones', 'valoraciones', 'reseñas'
+        'compara', 'opiniones', 'valoraciones'
       ];
       
-      // Si el título contiene MÚLTIPLES palabras genéricas, es un listado
+      // 🆕 RELAJADO: Requiere 2+ palabras genéricas para descartar (no solo 1)
+      // Esto permite "Juan López Fotografía" (1 palabra genérica + nombre propio)
       const genericCount = invalidTitlePatterns.filter(pattern => 
         titleLower.includes(pattern)
       ).length;
       
-      if (genericCount >= 1) {
-        console.log(`🗑️ [${idx}] Título de listado: ${result.title}`);
+      if (genericCount >= 2) {
+        console.log(`🗑️ [${idx}] Título de listado (${genericCount} palabras genéricas): ${result.title}`);
         return false;
       }
       
@@ -775,8 +774,8 @@ router.post('/', async (req, res) => {
       // ✅ ACEPTAR contenido como: "Nuestros servicios", "Sobre nosotros", "Contacta con nosotros"
       const contentLower = (result.content || '').toLowerCase();
       
-      // El contenido debe tener longitud mínima
-      if (!result.content || contentLower.split(' ').length < 30) {
+      // El contenido debe tener longitud mínima (relajado de 30 a 20 palabras)
+      if (!result.content || contentLower.split(' ').length < 20) {
         console.log(`⚠️ [${idx}] Contenido muy corto: ${result.title}`);
         return false;
       }
@@ -809,10 +808,10 @@ router.post('/', async (req, res) => {
         contentLower.includes(indicator)
       );
       
-      // Si no tiene indicadores de proveedor único Y el título no es muy específico, descartar
+      // Si no tiene indicadores de proveedor único Y el título no es muy específico, avisar pero NO descartar
       if (!hasSingleProviderIndicator && titleLower.length < 15) {
-        console.log(`⚠️ [${idx}] Sin indicadores de proveedor único: ${result.title}`);
-        // No descartamos automáticamente, pero es sospechoso
+        console.log(`⚠️ [${idx}] Sin indicadores claros (se mantiene): ${result.title}`);
+        // No descartamos - puede ser un proveedor válido con poco contenido
       }
       
       return true;
@@ -919,8 +918,8 @@ router.post('/', async (req, res) => {
       return res.json([]);
     }
 
-    // 4. Limitar a los mejores 8 resultados para calidad
-    const topResults = uniqueResults.slice(0, 8);
+    // 4. Limitar a los mejores 12 resultados para dar más opciones
+    const topResults = uniqueResults.slice(0, 12);
     console.log(`🎯 [FILTRO] Devolviendo los mejores ${topResults.length} proveedores únicos\n`);
 
     // 5. Convertir resultados válidos a formato de proveedor (SIN OpenAI)
