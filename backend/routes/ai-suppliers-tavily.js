@@ -246,16 +246,59 @@ async function scrapeProviderData(providerUrl) {
   }
 }
 
-async function searchTavily(query, location = 'España') {
+// 🆕 Enriquecer búsqueda con GPT
+async function enrichQueryWithGPT(query, location, budget, service) {
+  // Si no hay OpenAI, devolver query básica
+  if (!openai) {
+    return location ? `${query} en ${location}` : query;
+  }
+
+  try {
+    const prompt = `Analiza esta búsqueda de proveedor de bodas y crea una query optimizada para encontrar proveedores reales:
+
+BÚSQUEDA: "${query}"
+SERVICIO: ${service || 'no especificado'}
+UBICACIÓN: ${location || 'no especificada'}
+PRESUPUESTO: ${budget || 'no especificado'}
+
+INSTRUCCIONES:
+1. Mantén la esencia de la búsqueda original
+2. Añade la ubicación si es relevante
+3. Añade palabras clave que ayuden a encontrar proveedores (contacto, email, teléfono)
+4. NO añadas palabras que busquen listados ("mejores", "encuentra", "compara")
+
+Devuelve SOLO la query optimizada, sin explicaciones.`;
+
+    const completion = await openai.chat.completions.create({
+      model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
+      temperature: 0.3,
+      messages: [
+        { role: 'system', content: 'Eres un experto en búsquedas web de proveedores de bodas. Creas queries optimizadas.' },
+        { role: 'user', content: prompt }
+      ],
+    });
+
+    const enriched = completion.choices?.[0]?.message?.content?.trim() || query;
+    console.log(`✨ [GPT] Query enriquecida: "${query}" → "${enriched}"`);
+    return enriched;
+  } catch (error) {
+    console.warn(`⚠️ [GPT] Error enriqueciendo query, usando original:`, error.message);
+    return location ? `${query} en ${location}` : query;
+  }
+}
+
+async function searchTavily(query, location = 'España', budget = '', service = '') {
   const apiKey = process.env.TAVILY_API_KEY;
 
   if (!apiKey) {
     throw new Error('TAVILY_API_KEY no está configurado');
   }
 
-  // Query ultra-específica para encontrar SOLO perfiles individuales de proveedores
-  // Usamos operadores de búsqueda para excluir listados
-  const searchQuery = `"${query}" ${location} contacto portfolio sobre -directorio -buscar -listado -resultados -encuentra -empresas -proveedores site:bodas.net OR site:*.com OR site:*.es`;
+  // 🆕 PASO 1: Enriquecer query con GPT
+  const enrichedQuery = await enrichQueryWithGPT(query, location, budget, service);
+  
+  // Query optimizada para Tavily: buscar proveedores específicos
+  const searchQuery = `${enrichedQuery} contacto -"buscar" -"encuentra" -"directorio" -"listado"`;
 
   try {
     const response = await fetch('https://api.tavily.com/search', {
@@ -662,8 +705,9 @@ router.post('/', async (req, res) => {
       location: formattedLocation
     });
 
-    // 1. Búsqueda web real con Tavily (YA INCLUYE email, phone, imagen)
-    const tavilyResults = await searchTavily(query, formattedLocation);
+    // 1. BUSCAR con Tavily (búsqueda web real con query enriquecida por GPT)
+    console.log(`\n🔍 [TAVILY] Buscando: "${query}" en ${formattedLocation}\n`);
+    const tavilyResults = await searchTavily(query, formattedLocation, budget, service);
     
     logger.info('[ai-suppliers-tavily] Resultados de Tavily obtenidos', {
       count: tavilyResults.length
@@ -874,6 +918,8 @@ router.post('/', async (req, res) => {
         .trim();
     };
     
+    const seenPhones = new Set(); // 🆕 Añadir deduplicación por teléfono
+    
     const uniqueResults = validResults.filter((result, idx) => {
       // 1. DEDUPLICACIÓN POR EMAIL (más confiable)
       if (result.email && result.email.trim() !== '') {
@@ -885,7 +931,20 @@ router.post('/', async (req, res) => {
         seenEmails.add(emailLower);
       }
       
-      // 2. DEDUPLICACIÓN POR URL
+      // 2. 🆕 DEDUPLICACIÓN POR TELÉFONO
+      if (result.phone && result.phone.trim() !== '') {
+        // Normalizar teléfono: solo dígitos
+        const phoneNormalized = result.phone.replace(/\D/g, '');
+        if (phoneNormalized.length >= 9) { // Mínimo 9 dígitos para ser válido
+          if (seenPhones.has(phoneNormalized)) {
+            console.log(`🗑️ [DEDUP-PHONE] ${result.title} (${result.phone})`);
+            return false;
+          }
+          seenPhones.add(phoneNormalized);
+        }
+      }
+      
+      // 3. DEDUPLICACIÓN POR URL (menos prioritaria)
       try {
         const urlObj = new URL(result.url);
         const baseDomain = `${urlObj.hostname}${urlObj.pathname}`;
@@ -900,11 +959,8 @@ router.post('/', async (req, res) => {
         // Si falla el parseo de URL, continuar con otras verificaciones
       }
       
-      // 3. 🆕 DEDUPLICACIÓN POR SIMILITUD DE NOMBRE
-      // Si dos títulos son muy similares (después de normalizar), considerarlos duplicados
+      // 4. DEDUPLICACIÓN POR SIMILITUD DE NOMBRE (última línea de defensa)
       const normalizedTitle = normalizeTitleForComparison(result.title);
-      
-      // Si el título normalizado está vacío o es muy corto, usar el original
       const titleForComparison = normalizedTitle.length >= 3 ? normalizedTitle : result.title.toLowerCase().trim();
       
       if (seenTitles.has(titleForComparison)) {
