@@ -246,6 +246,27 @@
     "saveSuccess": "Preferencias guardadas correctamente.",
     "saveError": "Error al guardar preferencias. Vuelve a intentarlo."
   },
+  "notifications": {
+    "title": "Notificaciones",
+    "filters": {
+      "all": "Todas",
+      "unread": "Sin leer"
+    },
+    "push": {
+      "enable": "Activar Push",
+      "disable": "Desactivar Push",
+      "test": "Probar Push",
+      "enableSuccess": "Suscripción push activada",
+      "enableError": "No se pudo activar push",
+      "disableSuccess": "Suscripción push desactivada",
+      "disableError": "No se pudo desactivar",
+      "testSuccess": "Test enviado",
+      "testError": "Fallo en test"
+    },
+    "empty": "No hay notificaciones.",
+    "markRead": "Marcar leída",
+    "delete": "Borrar"
+  },
   "autobus": "autobús",
   "automaticas": "automáticas",
   "automatiza_tareas_repetitivas_manten_equipo": "Automatiza tareas repetitivas y mantén a tu equipo alineado con paneles compartidos.",

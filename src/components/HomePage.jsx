@@ -62,7 +62,7 @@ const dedupeServiceList = (entries) => {
   return unique;
 };
 
-// Las categorías se traducirán usando el hook useTranslations
+// Las categorÃƒÆ’Ã‚Â­as se traducirÃƒÆ’Ã‚Â¡n usando el hook useTranslations
 const getInspirationCategories = (t) => [
   { slug: 'decoracion', label: t('common.categories.decoration') },
   { slug: 'coctel', label: t('common.categories.cocktail') },
@@ -75,9 +75,9 @@ const getInspirationCategories = (t) => [
 ];
 
 const PROGRESS_STORAGE_KEY = 'maloveapp_progress';
-// 2500 coincide con el límite superior del nivel 6 (Experto Wedding) en backend/services/gamificationService.js.
+// 2500 coincide con el lÃƒÆ’Ã‚Â­mite superior del nivel 6 (Experto Wedding) en backend/services/gamificationService.js.
 const PROGRESS_COMPLETION_TARGET = 2500;
-// Diferencia mínima (en puntos porcentuales) para considerar que se va adelantado o retrasado.
+// Diferencia mÃƒÆ’Ã‚Â­nima (en puntos porcentuales) para considerar que se va adelantado o retrasado.
 const PROGRESS_DIFF_TOLERANCE = 5;
 const YEAR_IN_MS = 365 * 24 * 60 * 60 * 1000;
 
@@ -103,7 +103,7 @@ const writeStoredProgress = (value) => {
   try {
     window.localStorage.setItem(PROGRESS_STORAGE_KEY, String(clampPercent(value)));
   } catch {
-    // Ignorar errores de almacenamiento (modo incógnito, etc.)
+    // Ignorar errores de almacenamiento (modo incÃƒÆ’Ã‚Â³gnito, etc.)
   }
 };
 
@@ -246,7 +246,7 @@ export default function HomePage() {
         }
       } catch (error) {
         if (!cancelled) {
-          console.warn('[HomePage] No se pudo obtener el resumen de gamificación.', error);
+          console.warn('[HomePage] No se pudo obtener el resumen de gamificaciÃƒÆ’Ã‚Â³n.', error);
           setProgressError(error);
         }
       } finally {
@@ -279,7 +279,7 @@ export default function HomePage() {
   }, [expectedProgress, progressDiff, progressPercent]);
 
   const progressStatusText = useMemo(() => {
-    if (progressPercent >= 100) return '¡Progreso completo!';
+    if (progressPercent >= 100) return 'Ãƒâ€šÃ‚Â¡Progreso completo!';
     if (expectedProgress == null) {
       return '';
     }
@@ -287,9 +287,9 @@ export default function HomePage() {
       return 'Vas adelantado al plan previsto';
     }
     if (progressDiff !== null && progressDiff < -PROGRESS_DIFF_TOLERANCE) {
-      return 'Vas por detrás del plan. Revisa tus tareas clave.';
+      return 'Vas por detrÃƒÆ’Ã‚Â¡s del plan. Revisa tus tareas clave.';
     }
-    return 'Todo en marcha según el calendario';
+    return 'Todo en marcha segÃƒÆ’Ã‚Âºn el calendario';
   }, [expectedProgress, progressDiff, progressPercent]);
 
   const resolvedWeddingName = useMemo(() => {
@@ -400,7 +400,7 @@ export default function HomePage() {
     return false;
   }, []);
 
-  // Cargar primera imagen de cada categoría destacada
+  // Cargar primera imagen de cada categorÃƒÆ’Ã‚Â­a destacada
   useEffect(() => {
     Promise.all(INSPIRATION_CATEGORIES.map(({ slug }) => fetchWall(1, slug)))
       .then((results) => {
@@ -419,7 +419,7 @@ export default function HomePage() {
         setCategoryImages(imgs);
       })
       .catch((error) => {
-        console.error('[HomePage] No se pudo precargar la galería de inspiración:', error);
+        console.error('[HomePage] No se pudo precargar la galerÃƒÆ’Ã‚Â­a de inspiraciÃƒÆ’Ã‚Â³n:', error);
       });
   }, []);
 
@@ -486,7 +486,7 @@ export default function HomePage() {
       } else {
         setNewsPosts([]);
         setNewsError(
-          'No se pudieron encontrar cuatro noticias con imagen en tu idioma en este momento. Inténtalo más tarde.'
+          'No se pudieron encontrar cuatro noticias con imagen en tu idioma en este momento. IntÃƒÆ’Ã‚Â©ntalo mÃƒÆ’Ã‚Â¡s tarde.'
         );
       }
     };
@@ -545,16 +545,75 @@ export default function HomePage() {
     }
   }, []);
 
-  const providersMetrics = useMemo(() => {
-    try {
-      const providersArr = JSON.parse(localStorage.getItem('lovendaProviders') || '[]');
-      const providersTotalNeeded = 8; // puede venir de ajustes
-      const providersAssigned = providersArr.length;
-      return { providersAssigned, providersTotalNeeded };
-    } catch {
-      return { providersAssigned: 0, providersTotalNeeded: 8 };
+  const [providersMetrics, setProvidersMetrics] = useState({
+    providersAssigned: 0,
+    providersTotalNeeded: 0,
+  });
+
+  useEffect(() => {
+    if (!db) {
+      return undefined;
     }
-  }, []);
+
+    if (!activeWedding) {
+      setProvidersMetrics({ providersAssigned: 0, providersTotalNeeded: 0 });
+      return undefined;
+    }
+
+    let unsubscribeSuppliers;
+    let unsubscribeWedding;
+
+    const weddingRef = doc(db, 'weddings', activeWedding);
+    unsubscribeWedding = onSnapshot(
+      weddingRef,
+      (snap) => {
+        if (!snap.exists()) {
+          setProvidersMetrics((prev) => ({ ...prev, providersTotalNeeded: 0 }));
+          return;
+        }
+        const data = snap.data() || {};
+        const rawList =
+          (Array.isArray(data?.wantedServices) && data.wantedServices.length
+            ? data.wantedServices
+            : Array.isArray(data?.neededServices) && data.neededServices.length
+              ? data.neededServices
+              : Array.isArray(data?.requiredServices) && data.requiredServices.length
+                ? data.requiredServices
+                : []);
+        const deduped = dedupeServiceList(rawList);
+        setProvidersMetrics((prev) => ({
+          ...prev,
+          providersTotalNeeded: deduped.length,
+        }));
+      },
+      (error) => {
+        console.warn('[HomePage] No se pudo cargar wantedServices:', error);
+      }
+    );
+
+    const suppliersRef = collection(db, 'weddings', activeWedding, 'suppliers');
+    unsubscribeSuppliers = onSnapshot(
+      suppliersRef,
+      (snap) => {
+        let confirmed = 0;
+        snap.forEach((docSnap) => {
+          if (isConfirmedStatus(docSnap.data()?.status)) confirmed += 1;
+        });
+        setProvidersMetrics((prev) => ({
+          ...prev,
+          providersAssigned: confirmed,
+        }));
+      },
+      (error) => {
+        console.warn('[HomePage] No se pudieron cargar proveedores:', error);
+      }
+    );
+
+    return () => {
+      if (typeof unsubscribeWedding === 'function') unsubscribeWedding();
+      if (typeof unsubscribeSuppliers === 'function') unsubscribeSuppliers();
+    };
+  }, [activeWedding]);
 
   const { stats: financeStats } = useFinance();
   const financeSpent = Number(financeStats?.totalSpent || 0);
@@ -572,7 +631,10 @@ export default function HomePage() {
       },
       {
         label: 'Proveedores contratados',
-        value: `${providersMetrics.providersAssigned} / ${providersMetrics.providersTotalNeeded}`,
+        value:
+          providersMetrics.providersTotalNeeded > 0
+            ? `${providersMetrics.providersAssigned} / ${providersMetrics.providersTotalNeeded}`
+            : `${providersMetrics.providersAssigned}`,
         icon: User,
       },
       {
@@ -622,7 +684,7 @@ export default function HomePage() {
         const updated = [normalized, ...existing].slice(0, 25);
         localStorage.setItem('lovendaProviders', JSON.stringify(updated));
         window.dispatchEvent(new Event('maloveapp-providers'));
-        toast.success('Proveedor añadido al panel rápido');
+        toast.success('Proveedor aÃƒÆ’Ã‚Â±adido al panel rÃƒÆ’Ã‚Â¡pido');
       } catch (error) {
         console.warn('[HomePage] No se pudo guardar el proveedor seleccionado', error);
         toast.error('No se pudo guardar el proveedor seleccionado');
@@ -687,14 +749,14 @@ export default function HomePage() {
               </p>
               <p className="text-xs text-[color:var(--color-text)]/60" data-testid="home-progress-status">
                 {progressStatusText}
-                {expectedProgress != null ? ` · Esperado: ${expectedProgress}%` : ''}
+                {expectedProgress != null ? ` Ãƒâ€šÃ‚Â· Esperado: ${expectedProgress}%` : ''}
               </p>
               {progressLoading && (
                 <p className="text-xs text-[color:var(--color-text)]/40">Actualizando progreso...</p>
               )}
               {progressError && !progressLoading && (
                 <p className="text-xs text-[color:var(--color-danger)]">
-                  No pudimos sincronizar el avance. Se muestra el último valor guardado.
+                  No pudimos sincronizar el avance. Se muestra el ÃƒÆ’Ã‚Âºltimo valor guardado.
                 </p>
               )}
             </div>
@@ -705,8 +767,8 @@ export default function HomePage() {
         <section className="z-10 p-6 grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
           {[
             { key: 'proveedor', label: 'Buscar proveedor', icon: User },
-            { key: 'invitado', label: 'Añadir invitado', icon: Users },
-            { key: 'movimiento', label: 'Añadir movimiento', icon: DollarSign },
+            { key: 'invitado', label: 'AÃƒÆ’Ã‚Â±adir invitado', icon: Users },
+            { key: 'movimiento', label: 'AÃƒÆ’Ã‚Â±adir movimiento', icon: DollarSign },
             { key: 'nota', label: 'Nueva nota', icon: Plus },
           ].map((action, idx) => {
             const Icon = action.icon;
@@ -753,7 +815,7 @@ export default function HomePage() {
           <div className="flex justify-between items-center mb-4">
             <Link to="/inspiracion">
               <button className="text-xl font-bold text-[var(--color-text)] hover:text-[var(--color-primary)]">
-                Inspiración para tu boda
+                InspiraciÃƒÆ’Ã‚Â³n para tu boda
               </button>
             </Link>
             <div className="flex space-x-2">
@@ -860,7 +922,7 @@ export default function HomePage() {
       {activeModal === 'invitado' && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-[var(--color-surface)] p-6 rounded-lg w-96 max-w-full">
-            <h2 className="text-xl font-bold mb-4">Añadir Invitado</h2>
+            <h2 className="text-xl font-bold mb-4">AÃƒÆ’Ã‚Â±adir Invitado</h2>
             <div className="space-y-4">
               <Input
                 label="Nombre"
@@ -904,7 +966,7 @@ export default function HomePage() {
                 onClick={async () => {
                   const trimmedName = guest.name.trim();
                   if (!trimmedName) {
-                    toast.error('Añade un nombre para el invitado.');
+                    toast.error('AÃƒÆ’Ã‚Â±ade un nombre para el invitado.');
                     return;
                   }
 
@@ -925,8 +987,8 @@ export default function HomePage() {
                       notes.push(`Contacto: ${contact}`);
                     }
                   }
-                  notes.push('Añadido desde la pantalla principal');
-                  payload.notes = notes.join(' · ');
+                  notes.push('AÃƒÆ’Ã‚Â±adido desde la pantalla principal');
+                  payload.notes = notes.join(' Ãƒâ€šÃ‚Â· ');
 
                   try {
                     const result = await addGuestRecord(payload);
@@ -959,13 +1021,13 @@ export default function HomePage() {
 
                       setGuest({ name: '', side: 'novia', contact: '' });
                       setActiveModal(null);
-                      toast.success('Invitado añadido');
+                      toast.success('Invitado aÃƒÆ’Ã‚Â±adido');
                     } else {
-                      toast.error(result?.error || 'No se pudo añadir el invitado');
+                      toast.error(result?.error || 'No se pudo aÃƒÆ’Ã‚Â±adir el invitado');
                     }
                   } catch (err) {
                     console.error('[Home] addGuest quick action failed', err);
-                    toast.error('Ocurrió un error al añadir el invitado.');
+                    toast.error('OcurriÃƒÆ’Ã‚Â³ un error al aÃƒÆ’Ã‚Â±adir el invitado.');
                   }
                 }}
                 className="px-4 py-2 bg-[var(--color-primary)] text-white rounded"

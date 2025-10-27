@@ -198,6 +198,27 @@
     "saveSuccess": "Preferences saved successfully.",
     "saveError": "Error saving preferences. Please try again."
   },
+  "notifications": {
+    "title": "Notifications",
+    "filters": {
+      "all": "All",
+      "unread": "Unread"
+    },
+    "push": {
+      "enable": "Enable Push",
+      "disable": "Disable Push",
+      "test": "Test Push",
+      "enableSuccess": "Push subscription enabled",
+      "enableError": "Could not enable push",
+      "disableSuccess": "Push subscription disabled",
+      "disableError": "Could not disable",
+      "testSuccess": "Test sent",
+      "testError": "Test failed"
+    },
+    "empty": "No notifications.",
+    "markRead": "Mark as read",
+    "delete": "Delete"
+  },
   "authSignup": {
     "title": "Create your account",
     "subtitle": "Register with your email or continue with your favourite social account.",

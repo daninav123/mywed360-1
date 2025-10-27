@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import PageWrapper from '../components/PageWrapper';
 import NotificationSettings from '../components/settings/NotificationSettings';
 import Button from '../components/ui/Button';
+import useTranslations from '../hooks/useTranslations';
 import {
   getNotifications,
   markNotificationRead,
@@ -26,6 +27,7 @@ const typeColors = {
 };
 
 export default function Notificaciones() {
+  const { t } = useTranslations();
   const [filter, setFilter] = useState('all');
   const [items, setItems] = useState([]);
   const [pushEnabled, setPushEnabled] = useState(false);
@@ -53,7 +55,7 @@ export default function Notificaciones() {
   const filtered = items.filter((n) => (filter === 'unread' ? !n.read : true));
 
   return (
-    <PageWrapper title="Notificaciones" className="max-w-4xl mx-auto">
+    <PageWrapper title={t('notifications.title')} className="max-w-4xl mx-auto">
       {/* Ajustes de notificaciones */}
       <NotificationSettings />
 
@@ -62,13 +64,13 @@ export default function Notificaciones() {
           onClick={() => setFilter('all')}
           className={`px-3 py-1 rounded ${filter === 'all' ? 'bg-[var(--color-primary)] text-white' : 'bg-[color:var(--color-text)]/10'}`}
         >
-          Todas
+          {t('notifications.filters.all')}
         </button>
         <button
           onClick={() => setFilter('unread')}
           className={`px-3 py-1 rounded ${filter === 'unread' ? 'bg-[var(--color-primary)] text-white' : 'bg-[color:var(--color-text)]/10'}`}
         >
-          Sin leer
+          {t('notifications.filters.unread')}
         </button>
       </div>
 
@@ -78,36 +80,36 @@ export default function Notificaciones() {
             onClick={async () => {
               try {
                 await pushSubscribe();
-                alert('Suscripción push activada');
+                alert(t('notifications.push.enableSuccess'));
               } catch (e) {
-                alert('No se pudo activar push');
+                alert(t('notifications.push.enableError'));
               }
             }}
             className="px-3 py-1 rounded bg-green-600 text-white"
           >
-            Activar Push
+            {t('notifications.push.enable')}
           </button>
           <button
             onClick={async () => {
               try {
                 await pushUnsubscribe();
-                alert('Suscripción push desactivada');
+                alert(t('notifications.push.disableSuccess'));
               } catch (e) {
-                alert('No se pudo desactivar');
+                alert(t('notifications.push.disableError'));
               }
             }}
             className="px-3 py-1 rounded bg-gray-200"
           >
-            Desactivar Push
+            {t('notifications.push.disable')}
           </button>
           <button
             onClick={async () => {
               const ok = await pushTest();
-              alert(ok ? 'Test enviado' : 'Fallo en test');
+              alert(ok ? t('notifications.push.testSuccess') : t('notifications.push.testError'));
             }}
             className="px-3 py-1 rounded bg-blue-600 text-white"
           >
-            Probar Push
+            {t('notifications.push.test')}
           </button>
         </div>
       )}
@@ -116,7 +118,7 @@ export default function Notificaciones() {
 
       <div className="bg-[var(--color-surface)] border border-soft rounded divide-y divide-[color:var(--color-text)]/10">
         {filtered.length === 0 && (
-          <p className="p-4 text-[color:var(--color-text)]/60">No hay notificaciones.</p>
+          <p className="p-4 text-[color:var(--color-text)]/60">{t('notifications.empty')}</p>
         )}
         {filtered.map((n) => (
           <div
@@ -138,7 +140,7 @@ export default function Notificaciones() {
                     await refresh();
                   }}
                 >
-                  Marcar leída
+                  {t('notifications.markRead')}
                 </Button>
               )}
               <Button
@@ -149,7 +151,7 @@ export default function Notificaciones() {
                   await refresh();
                 }}
               >
-                Borrar
+                {t('notifications.delete')}
               </Button>
             </div>
           </div>
