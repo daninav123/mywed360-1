@@ -110,6 +110,56 @@ function cleanSnippet(content) {
   return cleaned.trim();
 }
 
+/**
+ * Resume el snippet usando GPT para crear una descripción concisa y profesional
+ */
+async function summarizeSnippetWithGPT(snippet, providerName, service) {
+  if (!openai || !snippet || snippet.length < 20) {
+    return snippet; // Devolver original si no hay OpenAI o snippet muy corto
+  }
+  
+  try {
+    const prompt = `Eres un experto en crear descripciones profesionales de proveedores de bodas.
+
+TAREA: Resume esta descripción en 1-2 frases concisas y atractivas (máximo 150 caracteres).
+
+PROVEEDOR: ${providerName}
+SERVICIO: ${service}
+DESCRIPCIÓN ORIGINAL:
+${snippet}
+
+REQUISITOS:
+- Destaca el estilo o especialidad del proveedor
+- Usa un tono profesional pero cercano
+- Máximo 150 caracteres
+- NO uses emojis
+- NO menciones la ubicación (ya se muestra aparte)
+
+RESPUESTA (solo la descripción resumida):`;
+
+    const completion = await openai.chat.completions.create({
+      model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
+      temperature: 0.3,
+      max_tokens: 100,
+      messages: [
+        { role: 'system', content: 'Eres un experto en crear descripciones concisas y profesionales.' },
+        { role: 'user', content: prompt }
+      ],
+    });
+
+    const summarized = completion.choices[0]?.message?.content?.trim();
+    
+    if (summarized && summarized.length > 10 && summarized.length < 200) {
+      return summarized;
+    }
+    
+    return snippet; // Fallback al original
+  } catch (error) {
+    console.warn(`⚠️ [GPT-SUMMARY] Error resumiendo snippet: ${error.message}`);
+    return snippet; // Fallback al original
+  }
+}
+
 // Función auxiliar para extraer imágenes del contenido de Tavily
 function extractImageFromContent(result) {
   // Buscar URLs de imágenes en el contenido o raw_content
@@ -1144,21 +1194,39 @@ router.post('/', async (req, res) => {
       };
     });
 
+    // 🤖 RESUMIR SNIPPETS CON GPT (en paralelo)
+    console.log('✨ [GPT] Resumiendo descripciones de proveedores...');
+    const providersWithSummaries = await Promise.all(
+      providers.map(async (provider) => {
+        const summarizedSnippet = await summarizeSnippetWithGPT(
+          provider.snippet,
+          provider.title,
+          provider.service
+        );
+        return {
+          ...provider,
+          snippet: summarizedSnippet
+        };
+      })
+    );
+    console.log('✅ [GPT] Descripciones resumidas correctamente');
+
     // Log reducido (solo si DEBUG_AI=true)
     if (process.env.DEBUG_AI === 'true') {
-      console.log('✅ [TAVILY] Proveedores directos (sin OpenAI):');
-      providers.slice(0, 3).forEach((p, idx) => {
+      console.log('✅ [TAVILY] Proveedores con descripciones resumidas:');
+      providersWithSummaries.slice(0, 3).forEach((p, idx) => {
         console.log(`  [${idx}] Nombre limpio: "${p.title}"`);
         console.log(`       Original: "${p._originalTitle}"`);
         console.log(`       Ubicación: ${p.location || 'sin ubicación'}`);
+        console.log(`       Snippet: "${p.snippet}"`);
       });
     }
 
     // 3. OPCIONAL: Si useRanking=true, rankear con OpenAI según características de la boda
-    let finalProviders = providers;
+    let finalProviders = providersWithSummaries;
     if (useRanking && hasOpenAI) {
       console.log('🤖 [RANKING] Usando OpenAI para ordenar por relevancia...');
-      finalProviders = await rankProviders(providers, profile, budget);
+      finalProviders = await rankProviders(providersWithSummaries, profile, budget);
       console.log('✅ [RANKING] Proveedores reordenados por OpenAI');
     } else {
       console.log('ℹ️ [RANKING] Usando orden de Tavily (sin ranking de OpenAI)');
