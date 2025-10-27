@@ -1,6 +1,8 @@
 import { Sparkles, Search, X, RotateCw } from 'lucide-react';
 import React, { useState } from 'react';
 
+import useTranslations from '../../hooks/useTranslations';
+
 /**
  * Modal para buscar proveedores mediante IA
  *
@@ -22,6 +24,7 @@ const AIBusquedaModal = ({
   cargando = false,
 }) => {
   const [consulta, setConsulta] = useState('');
+  const { t } = useTranslations();
 
   // Manejar envío del formulario
   const handleSubmit = (e) => {
@@ -41,7 +44,7 @@ const AIBusquedaModal = ({
           <div className="flex items-center">
             <Sparkles className="text-purple-500 mr-2" size={20} />
             <h3 className="font-semibold text-lg text-gray-800">
-              Búsqueda inteligente de proveedores
+              {t('common.aiSearchModal.title')}
             </h3>
           </div>
           <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-100">
@@ -51,19 +54,17 @@ const AIBusquedaModal = ({
 
         {/* Formulario de búsqueda */}
         <div className="p-5 border-b border-gray-200">
-          <p className="text-gray-600 mb-3">
-            Describe qué tipo de proveedor estás buscando y la IA encontrará opciones para ti.
-          </p>
+          <p className="text-gray-600 mb-3">{t('common.aiSearchModal.description')}</p>
           <form onSubmit={handleSubmit} className="flex items-start gap-2">
             <div className="flex-1">
               <input
                 type="text"
                 value={consulta}
                 onChange={(e) => setConsulta(e.target.value)}
-                placeholder="Ej: 'Fotógrafo de bodas en Madrid con estilo reportaje'"
+                placeholder={t('common.aiSearchModal.placeholder')}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
               />
-              <p className="mt-1 text-xs text-gray-500">Sé específico para mejores resultados</p>
+              <p className="mt-1 text-xs text-gray-500">{t('common.aiSearchModal.hint')}</p>
             </div>
             <button
               type="submit"
@@ -75,7 +76,7 @@ const AIBusquedaModal = ({
               ) : (
                 <Search className="mr-2" size={16} />
               )}
-              Buscar
+              {t('common.aiSearchModal.submit')}
             </button>
           </form>
         </div>
@@ -85,7 +86,7 @@ const AIBusquedaModal = ({
           {cargando ? (
             <div className="text-center py-10">
               <RotateCw className="animate-spin h-10 w-10 text-purple-500 mx-auto mb-4" />
-              <p className="text-gray-600">Buscando proveedores...</p>
+              <p className="text-gray-600">{t('common.aiSearchModal.loading')}</p>
             </div>
           ) : resultado ? (
             <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
@@ -101,7 +102,7 @@ const AIBusquedaModal = ({
 
                 {resultado.web && (
                   <div>
-                    <span className="text-gray-500 text-sm">Web:</span>
+                    <span className="text-gray-500 text-sm">{t('common.aiSearchModal.webLabel')}</span>
                     <a
                       href={resultado.web}
                       target="_blank"
@@ -115,14 +116,18 @@ const AIBusquedaModal = ({
 
                 {resultado.ubicacion && (
                   <div>
-                    <span className="text-gray-500 text-sm">Ubicación:</span>
+                    <span className="text-gray-500 text-sm">
+                      {t('common.aiSearchModal.locationLabel')}
+                    </span>
                     <span className="ml-2">{resultado.ubicacion}</span>
                   </div>
                 )}
 
                 {resultado.contacto && (
                   <div>
-                    <span className="text-gray-500 text-sm">Contacto:</span>
+                    <span className="text-gray-500 text-sm">
+                      {t('common.aiSearchModal.contactLabel')}
+                    </span>
                     <span className="ml-2">{resultado.contacto}</span>
                   </div>
                 )}
@@ -133,26 +138,25 @@ const AIBusquedaModal = ({
                   onClick={() => onGuardar(resultado)}
                   className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 shadow-sm"
                 >
-                  Guardar proveedor
+                  {t('common.aiSearchModal.saveButton')}
                 </button>
               </div>
             </div>
           ) : consulta && !cargando ? (
             <div className="text-center py-10">
-              <p className="text-gray-600">No se encontraron resultados para tu búsqueda.</p>
+              <p className="text-gray-600">{t('common.aiSearchModal.noResultsTitle')}</p>
               <p className="text-sm text-gray-500 mt-1">
-                Intenta con términos diferentes o más específicos.
+                {t('common.aiSearchModal.noResultsHint')}
               </p>
             </div>
           ) : (
             <div className="text-center py-10">
               <Sparkles className="h-12 w-12 text-purple-300 mx-auto mb-3" />
               <h4 className="text-lg font-medium text-gray-700 mb-2">
-                Busca con inteligencia artificial
+                {t('common.aiSearchModal.emptyTitle')}
               </h4>
               <p className="text-gray-500 max-w-md mx-auto">
-                Describe el tipo de proveedor que necesitas y la IA encontrará opciones perfectas
-                para tu boda.
+                {t('common.aiSearchModal.emptyDescription')}
               </p>
             </div>
           )}
@@ -161,8 +165,7 @@ const AIBusquedaModal = ({
         {/* Pie del modal */}
         <div className="p-4 border-t border-gray-200 bg-gray-50">
           <p className="text-xs text-gray-500 text-center">
-            La información proporcionada es orientativa. Recomendamos verificar siempre los datos de
-            contacto antes de contratar.
+            {t('common.aiSearchModal.footerNotice')}
           </p>
         </div>
       </div>

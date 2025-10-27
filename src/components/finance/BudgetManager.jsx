@@ -8,6 +8,10 @@ import {
   Loader2,
   Info,
   CheckCircle,
+  Wallet,
+  TrendingUp,
+  TrendingDown,
+  PieChart,
 } from 'lucide-react';
 import React, { useState, useEffect, useRef } from 'react';
 
@@ -16,6 +20,7 @@ import { formatCurrency } from '../../utils/formatUtils';
 import { normalizeBudgetCategoryKey } from '../../utils/budgetCategories';
 import Modal from '../Modal';
 import { Card, Button } from '../ui';
+import BudgetCategoryCard from './BudgetCategoryCard';
 
 export default function BudgetManager({
   budget,
@@ -494,196 +499,141 @@ const distributeIncrease = (amounts, indices, delta) => {
       ? statsTotalSpent
       : (budgetUsage || []).reduce((sum, cat) => sum + (Number(cat.spent) || 0), 0);
 
+  // Calcular % total usado
+  const totalUsagePercent = totalBudgetValue > 0 ? (totalSpent / totalBudgetValue) * 100 : 0;
+  const budgetRemaining = totalBudgetValue - totalSpent;
+
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center flex-wrap gap-3">
-        <div>
-          <h2 className="text-xl font-semibold text-[color:var(--color-text)]">
-            {t('finance.budget.title', { defaultValue: 'Gestión de presupuesto' })}
-          </h2>
-          <p className="text-sm text-[color:var(--color-text)]/70">
-            {t('finance.budget.subtitle', {
-              defaultValue: 'Organiza y controla el presupuesto por categorías',
-            })}
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
+      {/* Stats Cards Premium */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card className="p-4 bg-gradient-to-br from-[var(--color-primary)]/10 to-transparent border-[var(--color-primary)]/30">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-primary)] mb-1">
+                {t('finance.budget.totalBudget', { defaultValue: 'Presupuesto Total' })}
+              </p>
+              <p className="text-2xl font-black text-body">{formatCurrency(totalBudgetValue)}</p>
+            </div>
+            <Wallet className="w-8 h-8 text-[color:var(--color-primary)]/40" />
+          </div>
+        </Card>
+
+        <Card className="p-4 bg-gradient-to-br from-[var(--color-danger)]/10 to-transparent border-[var(--color-danger)]/30">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-danger)] mb-1">
+                {t('finance.budget.totalSpent', { defaultValue: 'Total Gastado' })}
+              </p>
+              <p className="text-2xl font-black text-[color:var(--color-danger)]">
+                {formatCurrency(totalSpent)}
+              </p>
+            </div>
+            <TrendingDown className="w-8 h-8 text-[color:var(--color-danger)]/40" />
+          </div>
+        </Card>
+
+        <Card className="p-4 bg-gradient-to-br from-[var(--color-success)]/10 to-transparent border-[var(--color-success)]/30">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-success)] mb-1">
+                {t('finance.budget.remaining', { defaultValue: 'Restante' })}
+              </p>
+              <p className="text-2xl font-black text-[color:var(--color-success)]">
+                {formatCurrency(budgetRemaining)}
+              </p>
+            </div>
+            <TrendingUp className="w-8 h-8 text-[color:var(--color-success)]/40" />
+          </div>
+        </Card>
+
+        <Card className="p-4 bg-gradient-to-br from-[var(--color-warning)]/10 to-transparent border-[var(--color-warning)]/30">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-warning)] mb-1">
+                {t('finance.budget.usage', { defaultValue: 'Uso' })}
+              </p>
+              <p className="text-2xl font-black text-[color:var(--color-warning)]">
+                {totalUsagePercent.toFixed(1)}%
+              </p>
+            </div>
+            <PieChart className="w-8 h-8 text-[color:var(--color-warning)]/40" />
+          </div>
+        </Card>
+      </div>
+
+      {/* Actions Bar */}
+      <Card className="p-4 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
+        <div className="flex justify-between items-center flex-wrap gap-3">
+          <div>
+            <h2 className="text-xl font-semibold text-[color:var(--color-text)]">
+              {t('finance.budget.title', { defaultValue: 'Categorías de Presupuesto' })}
+            </h2>
+            <p className="text-sm text-[color:var(--color-text)]/70">
+              {categories.length} {t('finance.budget.categories', { defaultValue: 'categorías' })}
+            </p>
+          </div>
           <Button leftIcon={<Plus size={16} />} onClick={handleAddCategory}>
             {t('finance.budget.newCategory', { defaultValue: 'Nueva categoría' })}
           </Button>
         </div>
-      </div>
-
-      <Card className="overflow-hidden bg-[var(--color-surface)]/80 backdrop-blur-md border-soft p-4">
-        {categories.length === 0 ? (
-          <div className="p-8 text-center">
-            <p className="text-[color:var(--color-text)]/60">
-              {t('finance.budget.empty', { defaultValue: 'No hay categorías de presupuesto' })}
-            </p>
-            <Button
-              className="mt-4"
-              onClick={handleAddCategory}
-              leftIcon={<Plus size={16} />}
-            >
-              {t('finance.budget.newCategory', { defaultValue: 'Nueva categoría' })}
-            </Button>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            <div className="space-y-2">
-            {(budgetUsage || categories.map((cat) => ({ ...cat, spent: 0, percentage: 0 }))).map((category, index) => {
-              const rawCategory = categories[index];
-              const assignedAmountRaw = Number(
-                rawCategory?.amount ?? category.amount ?? 0
-              );
-              const assignedAmount = Number.isFinite(assignedAmountRaw) ? assignedAmountRaw : 0;
-              const assignedCents = Math.max(0, Math.round(assignedAmount * 100));
-              const spentAmount = Number(category.spent) || 0;
-              const percentageValue = Number(category.percentage);
-              const usageBase = Number.isFinite(percentageValue)
-                ? percentageValue
-                : assignedAmount > 0
-                  ? (spentAmount / assignedAmount) * 100
-                  : spentAmount > 0
-                    ? 999
-                    : 0;
-              const usagePercent = Math.min(Math.max(usageBase, 0), 999);
-              const progressPercent = Math.min(usagePercent, 100);
-              const barColor =
-                usagePercent >= (thresholds.danger || 90)
-                  ? 'bg-[var(--color-danger)]'
-                  : usagePercent >= (thresholds.warn || 75)
-                    ? 'bg-[var(--color-warning)]'
-                    : 'bg-[var(--color-success)]';
-              const sliderMin = Math.max(
-                0,
-                Math.round((Number(budgetUsage[index]?.spent) || 0) * 100)
-              );
-              const dynamicSliderBaseline = hasGlobalBudget
-                ? totalBudgetCents
-                : Math.max(categoriesTotalCents, assignedCents * 2, sliderMin + 10000);
-              const sliderMax = Math.max(dynamicSliderBaseline, assignedCents, sliderMin + 10000);
-              const categoryKey = normalizeBudgetCategoryKey(category.name);
-              const benchmarkCategory = benchmarkState.categories?.[categoryKey];
-              const perGuestStats = benchmarkCategory?.perGuest;
-              const showPerGuest =
-                categoryKey === 'catering' &&
-                perGuestStats &&
-                Number(perGuestStats?.count || 0) >= 10 &&
-                Number(perGuestStats?.avg || 0) > 0;
-              const perGuestHint = showPerGuest
-                ? t('finance.budget.perGuestHint', {
-                    value: formatCurrency(perGuestStats.avg),
-                    count: perGuestStats.count,
-                  })
-                : null;
-              const sliderStep =
-                sliderMax >= 5000 ? 5000 : Math.max(1, Math.round(sliderMax / 100));
-              const sliderValue = Math.min(sliderMax, Math.max(sliderMin, assignedCents));
-              const sliderDisabled = !onReallocateCategories;
-              const sourceTag =
-                typeof category.source === 'string' && category.source.toLowerCase() === 'advisor';
-
-              return (
-                <div
-                  key={category.name || index}
-                  className="flex flex-wrap items-center gap-2 rounded-lg border border-[color:var(--color-text)]/10 bg-white/85 px-3 py-2 text-[11px] shadow-sm"
-                >
-                  <div className="flex items-center gap-1 min-w-[150px]">
-                    <span className="text-sm font-semibold text-[color:var(--color-text)]">
-                      {category.name}
-                    </span>
-                    {perGuestHint && (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-700">
-                        {perGuestHint}
-                      </span>
-                    )}
-                    {sourceTag && (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-primary)]/10 px-2 py-0.5 text-[10px] font-semibold text-[var(--color-primary)]">
-                        <Sparkles size={10} />
-                        {t('finance.budget.advisor', { defaultValue: 'Consejero' })}
-                      </span>
-                    )}
-                    {usagePercent >= 100 && (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-danger)]/10 px-2 py-0.5 text-[10px] font-semibold text-[var(--color-danger)]">
-                        <AlertTriangle size={10} />
-                        {t('finance.budget.exceeded', { defaultValue: 'Excedido' })}
-                      </span>
-                    )}
-                  </div>
-
-                  <div className={`flex items-center gap-1.5 ${sliderDisabled ? 'opacity-60' : ''}`}>
-                    <input
-                      type="number"
-                      min={(sliderMin / 100).toFixed(2)}
-                      step="0.01"
-                      defaultValue={assignedAmount.toFixed(2)}
-                      onBlur={(event) => {
-                        const raw = parseFloat(String(event.target.value).replace(',', '.'));
-                        if (Number.isNaN(raw)) {
-                          event.target.value = (sliderValue / 100).toFixed(2);
-                          return;
-                        }
-                        const cents = Math.round(raw * 100);
-                        const clamped = Math.max(sliderMin, Math.min(sliderMax, cents));
-                        handleAllocationChange(index, clamped);
-                        event.target.value = (clamped / 100).toFixed(2);
-                      }}
-                      onKeyDown={(event) => {
-                        if (event.key === 'Enter') {
-                          event.preventDefault();
-                          event.currentTarget.blur();
-                        }
-                      }}
-                      disabled={sliderDisabled}
-                      key={`${category.name || index}-${sliderValue}`}
-                      className="w-20 rounded-md border border-[color:var(--color-text)]/20 px-2 py-1 text-xs shadow-sm"
-                    />
-                  </div>
-
-                  <div className={`flex flex-1 min-w-[180px] flex-col ${sliderDisabled ? 'opacity-60' : ''}`}>
-                    <input
-                      type="range"
-                      min={sliderMin}
-                      max={sliderMax}
-                      step={sliderStep}
-                      value={sliderValue}
-                      onChange={(e) => handleAllocationChange(index, Number(e.target.value))}
-                      disabled={sliderDisabled}
-                      className="w-full accent-[var(--color-primary)]"
-                      aria-label={`Reasignar presupuesto para ${category.name}`}
-                    />
-                    <div className="mt-1 h-[4px] w-full rounded-full bg-[color:var(--color-text)]/10">
-                      <div
-                        className={`${barColor} h-full rounded-full transition-all duration-300`}
-                        style={{ width: `${progressPercent}%` }}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-1 text-[10px] text-[color:var(--color-text)]/70">
-                    <button
-                      aria-label="Editar categoría"
-                      onClick={() => handleEditCategory(category, index)}
-                      className="text-[var(--color-primary)] hover:brightness-110 p-1"
-                    >
-                      <Edit3 size={14} />
-                    </button>
-                    <button
-                      aria-label="Eliminar categoría"
-                      onClick={() => handleDeleteCategory(index, category.name)}
-                      className="text-[color:var(--color-danger)] hover:brightness-110 p-1"
-                    >
-                      <Trash2 size={14} />
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-            </div>
-          </div>
-        )}
       </Card>
+
+      {/* Categories Grid */}
+      {categories.length === 0 ? (
+        <Card className="p-12 text-center bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--color-text)]/5 mb-4">
+            <PieChart className="w-8 h-8 text-[color:var(--color-text)]/40" />
+          </div>
+          <p className="text-lg font-medium text-[color:var(--color-text)]/80 mb-2">
+            {t('finance.budget.empty', { defaultValue: 'No hay categorías de presupuesto' })}
+          </p>
+          <p className="text-sm text-[color:var(--color-text)]/60 mb-6">
+            {t('finance.budget.emptyHint', { defaultValue: 'Crea categorías para organizar tu presupuesto de boda' })}
+          </p>
+          <Button
+            onClick={handleAddCategory}
+            leftIcon={<Plus size={16} />}
+          >
+            {t('finance.budget.newCategory', { defaultValue: 'Nueva categoría' })}
+          </Button>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {(budgetUsage || categories.map((cat) => ({ ...cat, spent: 0, percentage: 0 }))).map((category, index) => {
+            const rawCategory = categories[index];
+            const assignedAmountRaw = Number(
+              rawCategory?.amount ?? category.amount ?? 0
+            );
+            const assignedAmount = Number.isFinite(assignedAmountRaw) ? assignedAmountRaw : 0;
+            const spentAmount = Number(category.spent) || 0;
+            const percentageValue = Number(category.percentage);
+            const usageBase = Number.isFinite(percentageValue)
+              ? percentageValue
+              : assignedAmount > 0
+                ? (spentAmount / assignedAmount) * 100
+                : spentAmount > 0
+                  ? 999
+                  : 0;
+            const usagePercent = Math.min(Math.max(usageBase, 0), 999);
+
+            return (
+              <BudgetCategoryCard
+                key={category.name || index}
+                category={category}
+                index={index}
+                assignedAmount={assignedAmount}
+                spentAmount={spentAmount}
+                usagePercent={usagePercent}
+                thresholds={thresholds}
+                onEdit={handleEditCategory}
+                onDelete={handleDeleteCategory}
+                t={t}
+              />
+            );
+          })}
+        </div>
+      )}
 
       <Modal
         open={showAdvisorModal}

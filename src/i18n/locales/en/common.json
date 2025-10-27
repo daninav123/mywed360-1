@@ -432,7 +432,24 @@
       "optionAuthor": "Author",
       "optionKeyword": "Keyword",
       "placeholder": "Search...",
-      "submit": "Search"
+    "submit": "Search"
+    },
+    "aiSearchModal": {
+      "title": "AI supplier search",
+      "description": "Describe the supplier you need and the AI will suggest options for you.",
+      "placeholder": "E.g. “Wedding photographer in Madrid with documentary style”",
+      "hint": "Be as specific as possible for better results.",
+      "submit": "Search",
+      "loading": "Searching suppliers...",
+      "webLabel": "Website:",
+      "locationLabel": "Location:",
+      "contactLabel": "Contact:",
+      "saveButton": "Save supplier",
+      "noResultsTitle": "We couldn't find results for your search.",
+      "noResultsHint": "Try different keywords or be more specific.",
+      "emptyTitle": "Search with artificial intelligence",
+      "emptyDescription": "Describe the kind of supplier you need and the AI will find great matches for your wedding.",
+      "footerNotice": "Information is for guidance only. Always verify contact details before hiring."
     }
   },
   "como_organizar_ceremonia_civil_perfecta": "ej. cómo organizar la ceremony civil perfecta",

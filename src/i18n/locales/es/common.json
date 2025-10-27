@@ -442,7 +442,24 @@
       "optionAuthor": "Autor",
       "optionKeyword": "Palabra clave",
       "placeholder": "Buscar...",
-      "submit": "Buscar"
+    "submit": "Buscar"
+    },
+    "aiSearchModal": {
+      "title": "Búsqueda inteligente de proveedores",
+      "description": "Describe qué tipo de proveedor necesitas y la IA encontrará opciones para ti.",
+      "placeholder": "Ej: \"Fotógrafo de bodas en Madrid con estilo reportaje\"",
+      "hint": "Sé específico para obtener mejores resultados.",
+      "submit": "Buscar",
+      "loading": "Buscando proveedores...",
+      "webLabel": "Web:",
+      "locationLabel": "Ubicación:",
+      "contactLabel": "Contacto:",
+      "saveButton": "Guardar proveedor",
+      "noResultsTitle": "No se encontraron resultados para tu búsqueda.",
+      "noResultsHint": "Prueba con términos diferentes o más específicos.",
+      "emptyTitle": "Busca con inteligencia artificial",
+      "emptyDescription": "Describe el tipo de proveedor que necesitas y la IA encontrará opciones perfectas para tu boda.",
+      "footerNotice": "La información proporcionada es orientativa. Verifica los datos de contacto antes de contratar."
     }
   },
   "como_organizar_ceremonia_civil_perfecta": "Ej. Cómo organizar la ceremonia civil perfecta",
@@ -2513,6 +2530,23 @@
     "suggested": "Sugeridos",
     "addServicePlaceholder": "Añadir servicio (ej. Fotografía)",
     "noServicesAdded": "An no has aadido servicios."
+    ,
+    "assignModal": {
+      "title": "Agrupar ({{count}})",
+      "selectedWithNames": "Seleccionados: {{names}}",
+      "selectedNone": "Seleccionados: ninguno",
+      "modeAssign": "Asignar a grupo existente",
+      "modeCreate": "Crear grupo nuevo",
+      "emptyGroups": "No hay grupos aún. Puedes crear uno nuevo.",
+      "groupLabel": "Grupo",
+      "groupPlaceholder": "Seleccionar...",
+      "membersCount": "({{count}} miembros)",
+      "newGroupLabel": "Nombre del grupo",
+      "newGroupPlaceholder": "Ej. Fotógrafos finalistas",
+      "cancel": "Cancelar",
+      "confirmAssign": "Asignar",
+      "confirmCreate": "Crear y asignar"
+    }
   },
   "supportsla_null_features_editguests_true_edittasks": ",\n      supportSLA: null\n    },\n    features: {\n      editGuests: true,\n      editTasks: true,\n      editTimeline: true,\n      editSeating: true,\n      viewBudget: false, // Sin permisos de facturación\n      sendInvitations: false // Sin re-invitaciones\n    }\n  }\n};\n\n/**\n * Servicio para gestión de límites de planes\n */\nclass PlanLimitsService {\n  /**\n   * Obtiene la configuración de un plan\n   * @param {string} planId - ID del plan\n   * @returns {Object|null} Configuración del plan o null si no existe\n   */\n  getPlanConfig(planId) {\n    return PLAN_LIMITS[planId] || null;\n  }\n\n  /**\n   * Obtiene los límites de un plan\n   * @param {string} planId - ID del plan\n   * @returns {Object} Límites del plan\n   */\n  getPlanLimits(planId) {\n    const config = this.getPlanConfig(planId);\n    return config ? config.limits : {};\n  }\n\n  /**\n   * Obtiene las características de un plan\n   * @param {string} planId - ID del plan\n   * @returns {Object} Características del plan\n   */\n  getPlanFeatures(planId) {\n    const config = this.getPlanConfig(planId);\n    return config ? config.features : {};\n  }\n\n  /**\n   * Verifica si un plan tiene una característica específica\n   * @param {string} planId - ID del plan\n   * @param {string} feature - Nombre de la característica\n   * @returns {boolean} true si tiene la característica\n   */\n  hasFeature(planId, feature) {\n    const features = this.getPlanFeatures(planId);\n    return features[feature] === true;\n  }\n\n  /**\n   * Verifica si se ha alcanzado el límite de invitados\n   * @param {string} planId - ID del plan\n   * @param {number} currentGuests - Número actual de invitados\n   * @returns {Object} { exceeded: boolean, limit: number, current: number }\n   */\n  checkGuestLimit(planId, currentGuests) {\n    const limits = this.getPlanLimits(planId);\n    const maxGuests = limits.maxGuests;\n    \n    if (maxGuests === -1) {\n      return { exceeded: false, limit: -1, current: currentGuests, message: ",
   "suscripcion_push_activada": "Suscripción push activada",
