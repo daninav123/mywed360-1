@@ -2660,6 +2660,37 @@
       "cancel": "Cancelar",
       "confirm": "Crear grupo"
     },
+    "providerEmailModal": {
+      "title": "Contactar proveedor",
+      "closeAria": "Cerrar",
+      "fields": {
+        "fromLabel": "De:",
+        "toLabel": "Para:",
+        "unknownEmail": "...",
+        "missingEmail": "Añade un email al proveedor",
+        "subjectLabel": "Asunto",
+        "subjectPlaceholder": "Asunto",
+        "messageLabel": "Mensaje",
+        "messagePlaceholder": "Escribe tu mensaje..."
+      },
+      "templates": {
+        "label": "Plantillas:",
+        "defaultOption": "Seleccionar",
+        "fallback": "Plantilla {{index}}"
+      },
+      "preview": {
+        "title": "Vista previa",
+        "toggle": "Mostrar",
+        "subjectPrefix": "Asunto:",
+        "emptySubject": "(Sin asunto)"
+      },
+      "buttons": {
+        "restore": "Restaurar",
+        "cancel": "Cancelar",
+        "send": "Enviar",
+        "sending": "Enviando..."
+      }
+    },
     "bulkStatusModal": {
       "title": "Cambiar estado",
       "label": "Nuevo estado",

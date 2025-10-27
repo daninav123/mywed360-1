@@ -2625,6 +2625,37 @@
       "cancel": "Cancel",
       "confirm": "Create group"
     },
+    "providerEmailModal": {
+      "title": "Contact supplier",
+      "closeAria": "Close",
+      "fields": {
+        "fromLabel": "From:",
+        "toLabel": "To:",
+        "unknownEmail": "...",
+        "missingEmail": "Add an email to the supplier",
+        "subjectLabel": "Subject",
+        "subjectPlaceholder": "Subject",
+        "messageLabel": "Message",
+        "messagePlaceholder": "Write your message..."
+      },
+      "templates": {
+        "label": "Templates:",
+        "defaultOption": "Select",
+        "fallback": "Template {{index}}"
+      },
+      "preview": {
+        "title": "Preview",
+        "toggle": "Show",
+        "subjectPrefix": "Subject:",
+        "emptySubject": "(No subject)"
+      },
+      "buttons": {
+        "restore": "Restore",
+        "cancel": "Cancel",
+        "send": "Send",
+        "sending": "Sending..."
+      }
+    },
     "bulkStatusModal": {
       "title": "Change status",
       "label": "New status",

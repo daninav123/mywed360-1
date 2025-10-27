@@ -5,9 +5,11 @@ import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 import useActiveWeddingInfo from '../../hooks/useActiveWeddingInfo';
 import { useAuth } from '../../hooks/useAuth';
+import useTranslations from '../../hooks/useTranslations';
+import * as EmailService from '../../services/EmailService';
 import { formatDate } from '../../utils/formatUtils';
 import { useProviderEmail } from '../../hooks/useProviderEmail';
-import * as EmailService from '../../services/EmailService';
+import sanitizeHtml from '../../utils/sanitizeHtml';
 
 const ProviderEmailModal = ({ open, onClose, provider, onSent }) => {
   const {
@@ -25,6 +27,7 @@ const ProviderEmailModal = ({ open, onClose, provider, onSent }) => {
   const [templates, setTemplates] = useState([]);
   const [selectedTemplateIndex, setSelectedTemplateIndex] = useState('');
   const [showPreview, setShowPreview] = useState(true);
+  const { t } = useTranslations();
   const validEmail = useMemo(() => /.+@.+\..+/.test(provider?.email || ''), [provider]);
 
   useEffect(() => {
@@ -124,10 +127,12 @@ const ProviderEmailModal = ({ open, onClose, provider, onSent }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex itemás-center justify-center p-4">
       <Card className="w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
         <div className="flex itemás-center justify-between border-b p-4">
-          <h2 className="text-xl font-semibold">Contactar proveedor</h2>
+          <h2 className="text-xl font-semibold">
+            {t('common.suppliers.providerEmailModal.title')}
+          </h2>
           <button
             onClick={onClose}
-            aria-label="Cerrar"
+            aria-label={t('common.suppliers.providerEmailModal.closeAria')}
             className="text-gray-500 hover:text-gray-700"
           >
             <X size={20} />
@@ -143,28 +148,41 @@ const ProviderEmailModal = ({ open, onClose, provider, onSent }) => {
 
           <div className="mb-2">
             <p className="text-sm text-gray-600">
-              De: <span className="font-medium">{userEmail || '...'}</span>
+              {t('common.suppliers.providerEmailModal.fields.fromLabel')}{' '}
+              <span className="font-medium">
+                {userEmail || t('common.suppliers.providerEmailModal.fields.unknownEmail')}
+              </span>
             </p>
             <p className="text-sm text-gray-600">
-              Para: <span className="font-medium">{provider?.email || '—'}</span>{' '}
+              {t('common.suppliers.providerEmailModal.fields.toLabel')}{' '}
+              <span className="font-medium">{provider?.email || '—'}</span>{' '}
               {!validEmail && (
-                <span className="text-xs text-red-600 ml-2">Añade un email al proveedor</span>
+                <span className="text-xs text-red-600 ml-2">
+                  {t('common.suppliers.providerEmailModal.fields.missingEmail')}
+                </span>
               )}
             </p>
           </div>
 
           {templates.length > 0 && (
             <div className="mb-3">
-              <label className="text-sm text-gray-700 mr-2">Plantillas:</label>
+              <label className="text-sm text-gray-700 mr-2">
+                {t('common.suppliers.providerEmailModal.templates.label')}
+              </label>
               <select
                 value={selectedTemplateIndex}
                 onChange={(e) => applyTemplate(e.target.value)}
                 className="text-sm border border-gray-300 rounded-md py-1 px-2"
               >
-                <option value="">Seleccionar</option>
+                <option value="">
+                  {t('common.suppliers.providerEmailModal.templates.defaultOption')}
+                </option>
                 {templates.map((t, i) => (
                   <option key={i} value={i}>
-                    {t.name || `Plantilla ${i + 1}`}
+                    {t.name ||
+                      t('common.suppliers.providerEmailModal.templates.fallback', {
+                        index: i + 1,
+                      })}
                   </option>
                 ))}
               </select>
@@ -172,40 +190,49 @@ const ProviderEmailModal = ({ open, onClose, provider, onSent }) => {
           )}
 
           <div className="mb-3">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Asunto</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {t('common.suppliers.providerEmailModal.fields.subjectLabel')}
+            </label>
             <input
               type="text"
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
               className="w-full p-2 border border-gray-300 rounded-md"
-              placeholder="Asunto"
+              placeholder={t('common.suppliers.providerEmailModal.fields.subjectPlaceholder')}
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Mensaje</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {t('common.suppliers.providerEmailModal.fields.messageLabel')}
+            </label>
             <textarea
               value={body}
               onChange={(e) => setBody(e.target.value)}
               className="w-full p-2 border border-gray-300 rounded-md min-h-[180px]"
-              placeholder="Escribe tu mensaje..."
+              placeholder={t('common.suppliers.providerEmailModal.fields.messagePlaceholder')}
             />
           </div>
           <div className="mt-4">
             <div className="flex itemás-center justify-between mb-2">
-              <h3 className="text-sm font-medium text-gray-700">Vista previa</h3>
+              <h3 className="text-sm font-medium text-gray-700">
+                {t('common.suppliers.providerEmailModal.preview.title')}
+              </h3>
               <label className="text-xs text-gray-600 flex itemás-center gap-2">
                 <input
                   type="checkbox"
                   checked={showPreview}
                   onChange={(e) => setShowPreview(e.target.checked)}
-                />{' '}
-                Mostrar
+                />
+                {t('common.suppliers.providerEmailModal.preview.toggle')}
               </label>
             </div>
             {showPreview && (
               <Card className="p-3 border border-gray-200 bg-white">
                 <div className="text-sm text-gray-800 mb-2">
-                  <span className="font-semibold">Asunto:</span> {subject || '(Sin asunto)'}
+                  <span className="font-semibold">
+                    {t('common.suppliers.providerEmailModal.preview.subjectPrefix')}
+                  </span>{' '}
+                  {subject || t('common.suppliers.providerEmailModal.preview.emptySubject')}
                 </div>
                 <div
                   className="prose prose-sm max-w-none"
@@ -217,13 +244,15 @@ const ProviderEmailModal = ({ open, onClose, provider, onSent }) => {
         </div>
         <div className="border-t p-4 flex justify-end gap-2 bg-gray-50">
           <Button variant="outline" onClick={resetDefaults} disabled={loading || !provider}>
-            Restaurar
+            {t('common.suppliers.providerEmailModal.buttons.restore')}
           </Button>
           <Button variant="outline" onClick={onClose} disabled={loading}>
-            Cancelar
+            {t('common.suppliers.providerEmailModal.buttons.cancel')}
           </Button>
           <Button onClick={handleSend} disabled={loading || !validEmail}>
-            {loading ? 'Enviando...' : 'Enviar'}
+            {loading
+              ? t('common.suppliers.providerEmailModal.buttons.sending')
+              : t('common.suppliers.providerEmailModal.buttons.send')}
           </Button>
         </div>
       </Card>
@@ -232,4 +261,3 @@ const ProviderEmailModal = ({ open, onClose, provider, onSent }) => {
 };
 
 export default ProviderEmailModal;
-import sanitizeHtml from '../../utils/sanitizeHtml';
