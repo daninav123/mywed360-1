@@ -80,6 +80,13 @@ allowFallback: true,
 3. ✅ **Mejor experiencia de usuario** - Siempre hay algo que ver
 4. ✅ **Degradación elegante** - Si el backend falla, usa demo
 
+### Actualización 23/oct
+
+- El hook `useAISearch` realiza ahora un tercer intento antes de recurrir a los proveedores demo: consulta `GET /api/providers/search` y normaliza los registros de Firestore.
+- Si existen proveedores dados de alta en la base interna, se muestran con fotos, etiquetas y contacto reales.
+- El modo demo únicamente se activa cuando el backend IA está caído o no devuelve resultados **y** la base interna tampoco tiene coincidencias.
+- Resultado: el usuario deja de ver proveedores mock cuando ya tenemos datos reales cargados.
+
 ---
 
 ## 🎯 Configuración Opcional del Backend

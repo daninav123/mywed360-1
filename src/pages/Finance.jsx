@@ -225,8 +225,6 @@ function Finance() {
               budgetUsage={budgetUsage}
               thresholds={settings?.alertThresholds}
               isLoading={isLoading}
-              transactions={transactions}
-              projection={projection}
               predictiveInsights={predictiveInsights}
               onNavigate={navigateToTransactions}
             />

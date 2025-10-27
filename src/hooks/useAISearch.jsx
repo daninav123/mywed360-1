@@ -495,7 +495,7 @@ export const useAISearch = () => {
           lastError = providerErr instanceof Error ? providerErr : new Error(String(providerErr || 'Error'));
         }
       }
-// Si es error de backend offline, usar fallback automáticamente
+      // Si es error de backend offline, usar fallback automáticamente
       if (lastError?.code === 'BACKEND_OFFLINE' || (allowFallback && lastError?.code !== 'NO_LOCAL_RESULTS')) {
         console.info('[useAISearch] Usando resultados de demostración (backend no disponible o fallback activado)');
         const demoResults = generateDemoResults(query);
@@ -592,6 +592,3 @@ function includesWord(haystack, needle) {
   const nw = n.split(/[\s,/-]+/);
   return hw.some((w) => nw.includes(w));
 }
-
-
-

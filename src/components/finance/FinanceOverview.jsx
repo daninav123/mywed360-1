@@ -11,30 +11,12 @@ const toFinite = (value) => {
   return Number.isFinite(num) ? num : 0;
 };
 
-const formatMonths = (months) => {
-  if (!months || months === Infinity) return '∞';
-  if (months < 0) return '0';
-  return Math.round(months).toString();
-};
-
-const handleAccessibleClick = (event, callback) => {
-  if (!callback) return;
-  if (event.type === 'click') {
-    callback();
-  } else if (event.type === 'keydown' && (event.key === 'Enter' || event.key === ' ')) {
-    event.preventDefault();
-    callback();
-  }
-};
-
 export default function FinanceOverview({
   stats,
   budgetUsage = [],
   thresholds = { warn: 75, danger: 90 },
   onNavigate,
   isLoading = false,
-  transactions = [],
-  projection = null,
   predictiveInsights = null,
 }) {
   const { t } = useTranslations();
@@ -57,20 +39,12 @@ export default function FinanceOverview({
     return <CheckCircle size={16} />;
   };
 
-  const fallbackTotal = safeBudget.reduce((sum, category) => sum + toFinite(category.amount), 0);
-  const expectedIncome = toFinite(stats?.expectedIncome);
-  const totalBudget = toFinite(stats?.totalBudget);
-  const totalSpent = toFinite(stats?.totalSpent);
-  const effectiveTotal =
-    expectedIncome > 0 ? expectedIncome : totalBudget > 0 ? totalBudget : fallbackTotal;
-  const budgetPercent = effectiveTotal > 0 ? (totalSpent / effectiveTotal) * 100 : 0;
-
   const safeStats = {
-    totalBudget,
-    totalSpent,
+    totalBudget: toFinite(stats?.totalBudget),
+    totalSpent: toFinite(stats?.totalSpent),
     totalIncome: toFinite(stats?.totalIncome),
     currentBalance: toFinite(stats?.currentBalance),
-    expectedIncome,
+    expectedIncome: toFinite(stats?.expectedIncome),
     budgetUsagePercentage: toFinite(stats?.budgetUsagePercentage),
   };
 
@@ -79,66 +53,6 @@ export default function FinanceOverview({
       onNavigate({ tab: 'transactions', filters });
     }
   };
-
-  const clickableCardProps = (filters) => ({
-    role: 'button',
-    tabIndex: 0,
-    className:
-      'p-6 cursor-pointer transition hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]/40',
-    onClick: () => handleNavigate(filters),
-    onKeyDown: (event) => handleAccessibleClick(event, () => handleNavigate(filters)),
-  });
-
-  const alertCategories = safeBudget.filter(
-    (cat) => !cat.muted && toFinite(cat.percentage) >= warnThreshold
-  );
-
-  // Build monthly series for sparklines and deltas (last 12 months)
-  const monthly = React.useMemo(() => {
-    const arr = Array.isArray(transactions) ? transactions : [];
-    const months = [];
-    const mapInc = new Map();
-    const mapExp = new Map();
-    const now = new Date();
-    // prepare last 12 keys
-    for (let i = 11; i >= 0; i--) {
-      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-      months.push(key);
-      mapInc.set(key, 0);
-      mapExp.set(key, 0);
-    }
-    for (const tx of arr) {
-      if (!tx?.date) continue;
-      const d = new Date(tx.date);
-      if (Number.isNaN(d.getTime())) continue;
-      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-      if (!mapInc.has(key)) continue; // outside 12m window
-      const amount = Number(tx.amount) || 0;
-      if (tx.type === 'income') mapInc.set(key, mapInc.get(key) + Math.max(0, amount));
-      else if (tx.type === 'expense') mapExp.set(key, mapExp.get(key) + Math.max(0, amount));
-    }
-    const income = months.map((k) => mapInc.get(k) || 0);
-    const expense = months.map((k) => mapExp.get(k) || 0);
-    const balance = income.map((v, i) => v - expense[i]);
-    const computeDelta = (series) => {
-      if (!series || series.length < 2) return { value: 0, trend: 'neutral' };
-      const last = series[series.length - 1];
-      const prev = series[series.length - 2];
-      if (prev === 0) return { value: last === 0 ? 0 : 100, trend: last > 0 ? 'up' : 'neutral' };
-      const pct = ((last - prev) / Math.abs(prev)) * 100;
-      return { value: Math.abs(pct), trend: last > prev ? 'up' : last < prev ? 'down' : 'neutral' };
-    };
-    return {
-      months,
-      income,
-      expense,
-      balance,
-      deltaIncome: computeDelta(income),
-      deltaExpense: computeDelta(expense),
-      deltaBalance: computeDelta(balance),
-    };
-  }, [transactions]);
 
   return (
     <div className="space-y-6">

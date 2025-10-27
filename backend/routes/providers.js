@@ -88,6 +88,18 @@ router.post('/', express.json(), validate(createBody), async (req, res) => {
   }
 });
 
+// GET /api/providers/search
+const searchQuery = z.object({ q: z.string().min(1) });
+router.get('/search', validate(searchQuery, 'query'), async (req, res) => {
+  try {
+    const { q } = req.query || {};
+    const items = await listProviders({ q: String(q), limit: 50 });
+    res.json({ items });
+  } catch (e) {
+    res.status(500).json({ success: false, error: e?.message || 'internal' });
+  }
+});
+
 // GET /api/providers/:id
 const idParams = z.object({ id: z.string().min(1) });
 router.get('/:id', validate(idParams, 'params'), async (req, res) => {
@@ -152,18 +164,6 @@ router.delete('/:id', validate(idParams, 'params'), async (req, res) => {
     const id = req.params.id;
     await admin.firestore().collection('providers').doc(id).delete();
     res.status(204).send();
-  } catch (e) {
-    res.status(500).json({ success: false, error: e?.message || 'internal' });
-  }
-});
-
-// GET /api/providers/search
-const searchQuery = z.object({ q: z.string().min(1) });
-router.get('/search', validate(searchQuery, 'query'), async (req, res) => {
-  try {
-    const { q } = req.query || {};
-    const items = await listProviders({ q: String(q), limit: 50 });
-    res.json({ items });
   } catch (e) {
     res.status(500).json({ success: false, error: e?.message || 'internal' });
   }

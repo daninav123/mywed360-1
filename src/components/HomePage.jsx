@@ -186,7 +186,7 @@ const computeExpectedProgress = (weddingData) => {
 };
 
 export default function HomePage() {
-  const { t } = useTranslations();
+  const { t, format } = useTranslations();
   const INSPIRATION_CATEGORIES = useMemo(() => getInspirationCategories(t), [t]);
   
   // Todo se maneja con modales locales
@@ -367,6 +367,35 @@ export default function HomePage() {
       : '';
   const weddingName = resolvedWeddingName || legacyWeddingName || displayName;
   const logoUrl = userProfile?.logoUrl || '';
+  const displayWeddingName = weddingName || t('home.header.titleFallback');
+  const headerTitle = t('home.header.title', { name: displayWeddingName });
+  const headerSubtitle = t('home.header.subtitle');
+  const headerLogoAlt = t('home.header.logoAlt');
+  const progressTasksLabel = t('home.progress.tasksLabel');
+  const progressLoadingLabel = t('home.progress.loading');
+  const progressErrorLabel = t('home.progress.error');
+  const progressCompletionLabel = t('home.progress.completion', { value: progressPercent });
+  const expectedProgressLabel =
+    expectedProgress != null ? t('home.progress.expected', { value: expectedProgress }) : '';
+  const budgetDisplay = useMemo(() => {
+    const spent = format.currency(financeSpent || 0);
+    if (budgetTotal) {
+      return t('home.stats.budgetValueWithTotal', {
+        spent,
+        total: format.currency(budgetTotal),
+      });
+    }
+    return t('home.stats.budgetValue', { spent });
+  }, [financeSpent, budgetTotal, format, t]);
+  const quickActions = useMemo(
+    () => [
+      { key: 'proveedor', label: t('home.quickActions.provider'), icon: User },
+      { key: 'invitado', label: t('home.quickActions.guest'), icon: Users },
+      { key: 'movimiento', label: t('home.quickActions.movement'), icon: DollarSign },
+      { key: 'nota', label: t('home.quickActions.note'), icon: Plus },
+    ],
+    [t]
+  );
 
   // Datos derivados ya calculados ms arriba
   const email = currentUser?.email || '';
@@ -399,11 +428,6 @@ export default function HomePage() {
     } catch {}
     return false;
   }, []);
-
-  const guestStatValue = useMemo(() => {
-    const { confirmedCount, totalGuests } = guestsMetrics;
-    return totalGuests > 0 ? `${confirmedCount} / ${totalGuests}` : `${confirmedCount}`;
-  }, [guestsMetrics]);
 
   // Cargar primera imagen de cada categorÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a destacada
   useEffect(() => {
@@ -563,6 +587,11 @@ export default function HomePage() {
     }
   }, []);
 
+  const guestStatValue = useMemo(() => {
+    const { confirmedCount, totalGuests } = guestsMetrics;
+    return totalGuests > 0 ? `${confirmedCount} / ${totalGuests}` : `${confirmedCount}`;
+  }, [guestsMetrics]);
+
   const tasksMetrics = useMemo(() => {
     try {
       const tasksCompletedMap = JSON.parse(localStorage.getItem('tasksCompleted') || '{}');
@@ -679,30 +708,44 @@ export default function HomePage() {
         ? providersMetrics.providersTotalNeeded
         : providersMetrics.providersFallbackNeeded;
 
+    const budgetValue = (() => {
+      const spent = format.currency(financeSpent || 0);
+      if (budgetTotal) {
+        return t('home.stats.budgetValueWithTotal', {
+          spent,
+          total: format.currency(budgetTotal),
+        });
+      }
+      return t('home.stats.budgetValue', { spent });
+    })();
+
+    const providersAssigned = format.number(providersMetrics.providersAssigned || 0);
+    const providersValue =
+      neededProviders > 0
+        ? `${providersAssigned} / ${format.number(neededProviders)}`
+        : providersAssigned;
+
+    const tasksCompleted = format.number(tasksMetrics.tasksCompleted || 0);
+    const tasksValue =
+      tasksMetrics.tasksTotal > 0
+        ? `${tasksCompleted} / ${format.number(tasksMetrics.tasksTotal)}`
+        : tasksCompleted;
+
     return [
-      { label: 'Invitados confirmados', value: guestStatValue, icon: Users },
-      {
-        label: 'Presupuesto gastado',
-        value:
-          `${financeSpent.toLocaleString()}` +
-          (budgetTotal ? ` / ${budgetTotal.toLocaleString()}` : ''),
-        icon: DollarSign,
-      },
-      {
-        label: 'Proveedores contratados',
-        value:
-          neededProviders > 0
-            ? `${providersMetrics.providersAssigned} / ${neededProviders}`
-            : `${providersMetrics.providersAssigned}`,
-        icon: User,
-      },
-      {
-        label: 'Tareas completadas',
-        value: `${tasksMetrics.tasksCompleted} / ${tasksMetrics.tasksTotal}`,
-        icon: Calendar,
-      },
+      { label: t('home.stats.confirmedGuests'), value: guestStatValue, icon: Users },
+      { label: t('home.stats.budgetSpent'), value: budgetValue, icon: DollarSign },
+      { label: t('home.stats.providers'), value: providersValue, icon: User },
+      { label: t('home.stats.tasksCompleted'), value: tasksValue, icon: Calendar },
     ];
-  }, [guestStatValue, financeSpent, providersMetrics, tasksMetrics, budgetTotal]);
+  }, [
+    guestStatValue,
+    financeSpent,
+    budgetTotal,
+    providersMetrics,
+    tasksMetrics,
+    format,
+    t,
+  ]);
 
   const statsPlanner = useMemo(
     () => [
@@ -763,7 +806,7 @@ export default function HomePage() {
           onClick={handleRedoTutorial}
           className="fixed top-4 right-4 bg-red-600 text-white px-4 py-2 rounded-full shadow-lg z-[100]"
         >
-          Rehacer tutorial
+          {t('home.header.redo.button')}
         </button>
       )}
       <div className="relative flex flex-col h-full bg-[var(--color-bg)] pb-16">
@@ -773,15 +816,13 @@ export default function HomePage() {
         {/* Header */}
         <header className="relative z-10 p-6 flex justify-between items-center flex-wrap gap-4">
           <div className="space-y-1">
-            <h1 className="page-title">Bienvenidos, {weddingName}</h1>
-            <p className="text-4xl font-bold text-[color:var(--color-text)]">
-              Cada detalle hace tu boda inolvidable
-            </p>
+            <h1 className="page-title">{headerTitle}</h1>
+            <p className="text-4xl font-bold text-[color:var(--color-text)]">{headerSubtitle}</p>
           </div>
           <div className="flex items-center">
             <img
               src={`${import.meta.env.BASE_URL}logo-app.png`}
-              alt="Logo de la boda"
+              alt={headerLogoAlt}
               className="w-32 h-32 object-contain"
             />
           </div>
@@ -791,7 +832,7 @@ export default function HomePage() {
         <section className="z-10 w-full p-6">
           <Card className="bg-[var(--color-surface)]/70 backdrop-blur-md p-4 w-full flex flex-col gap-4">
             <div>
-              <p className="text-sm text-[color:var(--color-text)]/70 mb-2">Progreso de tareas</p>
+              <p className="text-sm text-[color:var(--color-text)]/70 mb-2">{progressTasksLabel}</p>
               <Progress
                 className="h-4 rounded-full w-full"
                 value={progressPercent}
@@ -803,19 +844,17 @@ export default function HomePage() {
                 className="mt-2 text-sm font-medium text-[color:var(--color-text)]"
                 data-testid="home-progress-label"
               >
-                {progressPercent}% completado
+                {progressCompletionLabel}
               </p>
               <p className="text-xs text-[color:var(--color-text)]/60" data-testid="home-progress-status">
                 {progressStatusText}
-                {expectedProgress != null ? ` ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· Esperado: ${expectedProgress}%` : ''}
+                {expectedProgressLabel}
               </p>
               {progressLoading && (
-                <p className="text-xs text-[color:var(--color-text)]/40">Actualizando progreso...</p>
+                <p className="text-xs text-[color:var(--color-text)]/40">{progressLoadingLabel}</p>
               )}
               {progressError && !progressLoading && (
-                <p className="text-xs text-[color:var(--color-danger)]">
-                  No pudimos sincronizar el avance. Se muestra el ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºltimo valor guardado.
-                </p>
+                <p className="text-xs text-[color:var(--color-danger)]">{progressErrorLabel}</p>
               )}
             </div>
           </Card>
@@ -823,12 +862,7 @@ export default function HomePage() {
 
         {/* Quick Actions */}
         <section className="z-10 p-6 grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
-          {[
-            { key: 'proveedor', label: 'Buscar proveedor', icon: User },
-            { key: 'invitado', label: 'AÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±adir invitado', icon: Users },
-            { key: 'movimiento', label: 'AÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±adir movimiento', icon: DollarSign },
-            { key: 'nota', label: 'Nueva nota', icon: Plus },
-          ].map((action, idx) => {
+          {quickActions.map((action, idx) => {
             const Icon = action.icon;
             return (
               <Card
