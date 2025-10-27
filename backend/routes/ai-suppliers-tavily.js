@@ -58,6 +58,58 @@ const ensureOpenAIClient = () => {
 };
 
 // Búsqueda usando Tavily API (optimizada para IA)
+// Funciones auxiliares para limpiar y extraer información
+
+/**
+ * Limpia el snippet eliminando markdown, metadata y URLs
+ */
+function cleanSnippet(content) {
+  if (!content) return '';
+  
+  let cleaned = content;
+  
+  // 1. Eliminar links en formato Markdown: [texto](url) → texto
+  cleaned = cleaned.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
+  
+  // 2. Eliminar metadata técnica: [!!Image...], [Ir al contenido...], etc.
+  cleaned = cleaned.replace(/\[!!?[^\]]*\]/g, '');
+  
+  // 3. Eliminar URLs sueltas (http/https)
+  cleaned = cleaned.replace(/https?:\/\/[^\s)]+/g, '');
+  
+  // 4. Eliminar asteriscos al inicio de línea o múltiples
+  cleaned = cleaned.replace(/^\s*\*+\s*/gm, '');
+  cleaned = cleaned.replace(/\s+\*\s+/g, ' ');
+  
+  // 5. Eliminar paréntesis vacíos o con solo URLs
+  cleaned = cleaned.replace(/\([^)]*http[^)]*\)/g, '');
+  cleaned = cleaned.replace(/\(\s*\)/g, '');
+  
+  // 6. Eliminar corchetes vacíos
+  cleaned = cleaned.replace(/\[\s*\]/g, '');
+  
+  // 7. Limpiar espacios múltiples y saltos de línea
+  cleaned = cleaned.replace(/\s+/g, ' ');
+  
+  // 8. Limpiar caracteres especiales al inicio/final
+  cleaned = cleaned.replace(/^[\s.,;:!¡?¿-]+/, '');
+  cleaned = cleaned.replace(/[\s.,;:!¡?¿-]+$/, '');
+  
+  // 9. Tomar las primeras frases completas (máximo 200 caracteres)
+  cleaned = cleaned.trim();
+  if (cleaned.length > 200) {
+    // Buscar el último punto antes de 200 caracteres
+    const lastDot = cleaned.substring(0, 200).lastIndexOf('.');
+    if (lastDot > 100) {
+      cleaned = cleaned.substring(0, lastDot + 1);
+    } else {
+      cleaned = cleaned.substring(0, 200);
+    }
+  }
+  
+  return cleaned.trim();
+}
+
 // Función auxiliar para extraer imágenes del contenido de Tavily
 function extractImageFromContent(result) {
   // Buscar URLs de imágenes en el contenido o raw_content
@@ -1079,7 +1131,7 @@ router.post('/', async (req, res) => {
         title: providerName,
         link: result.url,
         image: result.image || '',
-        snippet: result.content.substring(0, 200) + '...', // Contenido literal de Tavily
+        snippet: cleanSnippet(result.content), // ✨ Snippet limpio (sin Markdown, URLs, metadata)
         service: servicioSeleccionado,
         location: extractedLocation, // Extraído del contenido, no de la búsqueda
         email: result.email || '',
