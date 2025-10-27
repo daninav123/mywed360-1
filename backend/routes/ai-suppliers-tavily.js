@@ -271,7 +271,7 @@ async function searchTavily(query, location = 'España') {
         include_raw_content: true, // Incluir contenido completo para mejor filtrado
         include_images: true, // ✅ ACTIVAR IMÁGENES
         max_results: 50, // 🆕 Aumentado a 50 para obtener más proveedores válidos
-        // Excluir sitios genéricos y de listados
+        // Excluir sitios que NO son proveedores de bodas
         exclude_domains: [
           'wikipedia.org',
           'youtube.com',
@@ -281,8 +281,19 @@ async function searchTavily(query, location = 'España') {
           'aliexpress.com',
           'milanuncios.com',
           'wallapop.com',
-          'google.com',
-          'bing.com'
+          'vibbo.com',
+          'segundamano.es',
+          'facebook.com/marketplace',
+          'idealista.com',
+          'fotocasa.es',
+        ],
+        // 🆕 PRIORIZAR dominios especializados en bodas
+        include_domains: [
+          'bodas.net',
+          'bodas.com.mx',
+          'matrimonio.com.co',
+          'zankyou.es',
+          'casar.com',
         ],
       }),
     });
@@ -675,8 +686,21 @@ router.post('/', async (req, res) => {
       
       const urlLower = url.toLowerCase();
       
-      // Descartar URLs a PÁGINAS DE LISTADO (múltiples proveedores)
-      // Solo patrones MUY ESPECÍFICOS de listados
+      // 1. DESCARTAR dominios que NO son proveedores de bodas
+      const excludedDomains = [
+        'wikipedia.org', 'youtube.com', 'amazon', 'pinterest',
+        'ebay', 'aliexpress', 'milanuncios', 'wallapop',
+        'vibbo', 'segundamano', 'marketplace', 'idealista',
+        'fotocasa', 'twitter.com', 'linkedin.com'
+      ];
+      
+      const hasExcludedDomain = excludedDomains.some(domain => urlLower.includes(domain));
+      if (hasExcludedDomain) {
+        console.log(`❌ [FILTRO-DOMINIO] Dominio no relevante para bodas: ${url}`);
+        return false;
+      }
+      
+      // 2. Descartar URLs a PÁGINAS DE LISTADO (múltiples proveedores)
       const invalidPatterns = [
         '/buscar', '/search', '/resultados', '/results',
         '/busqueda', '/encuentra', '/directorio', '/listado',
