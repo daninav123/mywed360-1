@@ -41,9 +41,14 @@ export default defineConfig(({ mode }) => {
         host: 'localhost',
         port: 5173,
         clientPort: 5173,
+        // Reducir sensibilidad del HMR
+        overlay: false, // Desactiva overlay de errores que puede causar recargas
       },
       // Ignorar archivos que no necesitan recargar el frontend
       watch: {
+        // Reducir agresividad del watcher
+        usePolling: false,
+        interval: 1000, // Check cada 1 segundo en lugar de inmediatamente
         ignored: [
           '**/node_modules/**',
           '**/backend/**',
@@ -54,6 +59,9 @@ export default defineConfig(({ mode }) => {
           '**/*.log',
           '**/scripts/**',
           '**/cypress/**',
+          '**/.env*',
+          '**/package-lock.json',
+          '**/*.md',
         ],
       },
       // Proxy para API backend

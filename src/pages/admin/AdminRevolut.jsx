@@ -21,11 +21,12 @@ import {
   requestRevolutConnectLink,
   triggerRevolutSync,
 } from '../../services/adminDataService';
+import useTranslations from '../../hooks/useTranslations';
 
-const formatCurrency = (value, currency = 'EUR') => {
+const formatCurrency = (value, currency = 'EUR', locale = 'es-ES') => {
   const amount = Number.isFinite(value) ? value : 0;
   try {
-    return new Intl.NumberFormat('es-ES', {
+    return new Intl.NumberFormat(locale || 'es-ES', {
       style: 'currency',
       currency,
       minimumFractionDigits: 2,
@@ -36,11 +37,11 @@ const formatCurrency = (value, currency = 'EUR') => {
   }
 };
 
-const formatAbsoluteDate = (isoString) => {
+const formatAbsoluteDate = (isoString, locale = 'es-ES') => {
   if (!isoString) return '—';
   try {
     const date = parseISO(isoString);
-    return new Intl.DateTimeFormat('es-ES', {
+    return new Intl.DateTimeFormat(locale || 'es-ES', {
       dateStyle: 'medium',
       timeStyle: 'short',
     }).format(date);
@@ -49,12 +50,15 @@ const formatAbsoluteDate = (isoString) => {
   }
 };
 
-const formatRelativeDate = (isoString) => {
-  if (!isoString) return 'Nunca';
+const formatRelativeDate = (isoString, locale = es, fallback = 'Nunca') => {
+  if (!isoString) return fallback;
   try {
-    return formatDistanceToNow(parseISO(isoString), { addSuffix: true, locale: es });
+    return formatDistanceToNow(parseISO(isoString), {
+      addSuffix: true,
+      locale: locale || es,
+    });
   } catch {
-    return isoString;
+    return isoString || fallback;
   }
 };
 

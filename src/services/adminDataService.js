@@ -136,9 +136,12 @@ export const DEFAULT_REVOLUT_ACCOUNT = {
 };
 
 const DEFAULT_SALES_CONTACT = {
+  id: null,
   name: '',
   email: '',
   phone: '',
+  notes: '',
+  status: 'active',
 };
 
 const normalizeSalesContact = (contact) => {
@@ -146,10 +149,44 @@ const normalizeSalesContact = (contact) => {
     return { ...DEFAULT_SALES_CONTACT };
   }
 
+  const rawId = contact.id ?? contact.contactId ?? contact.uid ?? null;
+  let id = null;
+  if (typeof rawId === 'string' && rawId.trim()) {
+    id = rawId.trim();
+  } else if (Number.isFinite(rawId)) {
+    id = String(rawId);
+  }
+
   return {
+    id,
     name: typeof contact.name === 'string' ? contact.name : '',
     email: typeof contact.email === 'string' ? contact.email : '',
     phone: typeof contact.phone === 'string' ? contact.phone : '',
+    notes: typeof contact.notes === 'string' ? contact.notes : '',
+    status: typeof contact.status === 'string' ? contact.status : 'active',
+  };
+};
+
+const normalizeCommercial = (commercial = {}) => {
+  const contact = normalizeSalesContact(commercial);
+  const managerId = commercial.managerId ?? commercial.salesManagerId ?? commercial.manager?.id ?? null;
+  let resolvedManagerId = null;
+  if (typeof managerId === 'string' && managerId.trim()) {
+    resolvedManagerId = managerId.trim();
+  } else if (Number.isFinite(managerId)) {
+    resolvedManagerId = String(managerId);
+  }
+
+  return {
+    id: contact.id,
+    name: contact.name,
+    email: contact.email,
+    phone: contact.phone,
+    notes: contact.notes,
+    status: contact.status,
+    managerId: resolvedManagerId,
+    manager: commercial.manager ? normalizeSalesContact(commercial.manager) : null,
+    assignedLinks: Array.isArray(commercial.assignedLinks) ? commercial.assignedLinks : [],
   };
 };
 
@@ -702,6 +739,7 @@ export const getDiscountLinks = async () => {
     ...(toObject(data.summary) || {}),
   };
   const managers = toArray(data.managers).map(normalizeSalesContact);
+  const commercials = toArray(data.commercials).map(normalizeCommercial);
   const inferredManagers = computeUniqueManagers(items);
 
   if (!Number.isFinite(summary.totalManagers) || summary.totalManagers <= 0) {
@@ -712,6 +750,7 @@ export const getDiscountLinks = async () => {
     items,
     summary,
     managers,
+    commercials,
   };
 };
 
@@ -758,6 +797,33 @@ export const generatePartnerToken = async (discountId) => {
   }
   
   return response.json();
+};
+
+export const createSalesManager = async (managerData) => {
+  const payload = {
+    name: managerData?.name || '',
+    email: managerData?.email || '',
+    phone: managerData?.phone || '',
+    notes: managerData?.notes || '',
+  };
+  const data = await postJson(`${ADMIN_BASE_PATH}/commerce/sales-managers`, payload);
+  if (!data) return null;
+  if (data.manager) return normalizeSalesContact(data.manager);
+  return normalizeSalesContact(data);
+};
+
+export const createSalesCommercial = async (commercialData) => {
+  const payload = {
+    name: commercialData?.name || '',
+    email: commercialData?.email || '',
+    phone: commercialData?.phone || '',
+    notes: commercialData?.notes || '',
+    managerId: commercialData?.managerId || null,
+  };
+  const data = await postJson(`${ADMIN_BASE_PATH}/commerce/commercials`, payload);
+  if (!data) return null;
+  if (data.commercial) return normalizeCommercial(data.commercial);
+  return normalizeCommercial(data);
 };
 
 // --- Mutations ---

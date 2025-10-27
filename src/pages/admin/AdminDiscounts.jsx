@@ -1,7 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
-import { getDiscountLinks, createDiscountCode, updateDiscountCode, generatePartnerToken } from '../../services/adminDataService';
-import { ExternalLink, Link as LinkIcon } from 'lucide-react';
+import {
+  getDiscountLinks,
+  createDiscountCode,
+  updateDiscountCode,
+  generatePartnerToken,
+  createSalesCommercial,
+  createSalesManager,
+} from '../../services/adminDataService';
+import { ExternalLink, Plus } from 'lucide-react';
 
 const makeId = () => Math.random().toString(36).slice(2, 10);
 
@@ -486,17 +493,31 @@ const CommissionRulesEditor = ({ value, onChange, disabled }) => {
 };
 
 const EMPTY_CONTACT = {
+  id: null,
   name: '',
   email: '',
   phone: '',
+  notes: '',
+  status: 'active',
 };
 
 const normalizeContact = (contact) => {
   if (!contact || typeof contact !== 'object') return { ...EMPTY_CONTACT };
+  const rawId = contact.id ?? contact.contactId ?? contact.uid ?? null;
+  let id = null;
+  if (typeof rawId === 'string' && rawId.trim()) {
+    id = rawId.trim();
+  } else if (Number.isFinite(rawId)) {
+    id = String(rawId);
+  }
+
   return {
+    id,
     name: typeof contact.name === 'string' ? contact.name : '',
     email: typeof contact.email === 'string' ? contact.email : '',
     phone: typeof contact.phone === 'string' ? contact.phone : '',
+    notes: typeof contact.notes === 'string' ? contact.notes : '',
+    status: typeof contact.status === 'string' ? contact.status : 'active',
   };
 };
 
@@ -508,10 +529,13 @@ const hasContactInfo = (contact) => {
 const toNullableString = (value) =>
   typeof value === 'string' && value.trim() ? value.trim() : null;
 
+const safeTrim = (value) => (typeof value === 'string' ? value.trim() : '');
+
 const getContactKey = (contact) => {
   const normalized = normalizeContact(contact);
   const phoneKey = normalized.phone ? normalized.phone.replace(/\s+/g, '') : '';
   return (
+    (normalized.id && normalized.id.toString()) ||
     (normalized.email && normalized.email.toLowerCase()) ||
     (normalized.name && normalized.name.toLowerCase()) ||
     phoneKey ||
@@ -528,35 +552,48 @@ const normalizeDiscountEntry = (entry) => {
   };
 };
 
-const buildManagerOverview = (items = []) => {
+const buildManagerOverview = (items = [], managerCatalog = []) => {
   const managers = new Map();
 
-  items.forEach((rawItem) => {
-    if (!rawItem || typeof rawItem !== 'object') return;
-    const item = normalizeDiscountEntry(rawItem);
-    const manager = item.salesManager;
-    if (!hasContactInfo(manager)) return;
-
-    const managerKey = getContactKey(manager);
-    if (!managerKey) return;
-
+  const ensureManagerEntry = (sourceManager, fallbackIndex = 0) => {
+    const normalizedManager = normalizeContact(sourceManager);
+    const managerKey =
+      normalizedManager.id ||
+      getContactKey(normalizedManager) ||
+      `manager-${fallbackIndex}`;
     if (!managers.has(managerKey)) {
       managers.set(managerKey, {
-        manager,
+        manager: normalizedManager,
         totalLinks: 0,
         totalRevenue: 0,
         totalUses: 0,
         commercialsMap: new Map(),
       });
     }
+    return { key: managerKey, entry: managers.get(managerKey) };
+  };
 
-    const managerEntry = managers.get(managerKey);
+  managerCatalog.forEach((manager, index) => {
+    ensureManagerEntry(manager, index);
+  });
+
+  items.forEach((rawItem, linkIndex) => {
+    if (!rawItem || typeof rawItem !== 'object') return;
+    const item = normalizeDiscountEntry(rawItem);
+    if (!hasContactInfo(item.salesManager)) return;
+
+    const { entry: managerEntry, key: managerKey } = ensureManagerEntry(
+      item.salesManager,
+      linkIndex,
+    );
+
     managerEntry.totalLinks += 1;
     managerEntry.totalRevenue += Number(item.revenue) || 0;
     managerEntry.totalUses += Number(item.uses) || 0;
 
     const commercialContact = normalizeContact(item.assignedTo);
     const commercialKey =
+      commercialContact.id ||
       getContactKey(commercialContact) ||
       (item.id ? String(item.id) : item.code || `link-${managerEntry.totalLinks}`);
 
@@ -577,17 +614,19 @@ const buildManagerOverview = (items = []) => {
       code: item.code,
       revenue: Number(item.revenue) || 0,
       uses: Number(item.uses) || 0,
+      managerKey,
     });
   });
 
-  return Array.from(managers.values()).map((entry, index) => ({
-    id: getContactKey(entry.manager) || `manager-${index}`,
+  return Array.from(managers.entries()).map(([key, entry]) => ({
+    id: entry.manager.id || getContactKey(entry.manager) || key,
     manager: entry.manager,
     totalLinks: entry.totalLinks,
     totalRevenue: entry.totalRevenue,
     totalUses: entry.totalUses,
     commercials: Array.from(entry.commercialsMap.values()).map((commercial, idx) => ({
       id:
+        commercial.contact.id ||
         getContactKey(commercial.contact) ||
         commercial.links[0]?.id ||
         `commercial-${idx}`,
@@ -680,6 +719,27 @@ const AdminDiscounts = () => {
   const [editingDiscount, setEditingDiscount] = useState(null);
   const [creating, setCreating] = useState(false);
   const [updating, setUpdating] = useState(false);
+  const [managerCatalog, setManagerCatalog] = useState([]);
+  const [commercialCatalog, setCommercialCatalog] = useState([]);
+  const [showCreateManagerModal, setShowCreateManagerModal] = useState(false);
+  const [showCreateCommercialModal, setShowCreateCommercialModal] = useState(false);
+  const [creatingManager, setCreatingManager] = useState(false);
+  const [creatingCommercial, setCreatingCommercial] = useState(false);
+  const [createManagerError, setCreateManagerError] = useState('');
+  const [createCommercialError, setCreateCommercialError] = useState('');
+  const [newManagerData, setNewManagerData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    notes: '',
+  });
+  const [newCommercialData, setNewCommercialData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    notes: '',
+    managerId: '',
+  });
   const [formData, setFormData] = useState({
     code: '',
     url: '',
@@ -705,23 +765,36 @@ const AdminDiscounts = () => {
       try {
         const data = await getDiscountLinks();
         if (!cancelled) {
+          const managersFromApi = Array.isArray(data?.managers)
+            ? data.managers.map(normalizeContact)
+            : [];
+          setManagerCatalog(managersFromApi);
+
           const managerDirectory = new Map();
-          if (Array.isArray(data?.managers)) {
-            data.managers
-              .map(normalizeContact)
-              .forEach((manager) => {
-                const key = getContactKey(manager);
-                if (key) managerDirectory.set(key, manager);
-              });
-          }
+          managersFromApi.forEach((manager) => {
+            const key = getContactKey(manager);
+            if (key) managerDirectory.set(key, manager);
+            if (manager.id) managerDirectory.set(manager.id, manager);
+          });
+
+          const commercialsFromApi = Array.isArray(data?.commercials)
+            ? data.commercials.map((commercial) => ({
+                ...commercial,
+                manager: commercial.manager ? normalizeContact(commercial.manager) : null,
+                assignedLinks: Array.isArray(commercial.assignedLinks) ? commercial.assignedLinks : [],
+              }))
+            : [];
 
           const rawItems = Array.isArray(data?.items) ? data.items : [];
           const normalizedItems = rawItems.map((item) => {
             const normalized = normalizeDiscountEntry(item);
-            const key = getContactKey(normalized.salesManager);
-            if (key && managerDirectory.has(key)) {
-              const reference = managerDirectory.get(key);
+            const candidateKey =
+              normalized.salesManager?.id ||
+              getContactKey(normalized.salesManager);
+            if (candidateKey && managerDirectory.has(candidateKey)) {
+              const reference = managerDirectory.get(candidateKey);
               normalized.salesManager = normalizeContact({
+                ...reference,
                 name: normalized.salesManager.name || reference.name,
                 email: normalized.salesManager.email || reference.email,
                 phone: normalized.salesManager.phone || reference.phone,
@@ -730,6 +803,71 @@ const AdminDiscounts = () => {
             return normalized;
           });
 
+          const commercialAggregator = new Map();
+          normalizedItems.forEach((item) => {
+            const contact = normalizeContact(item.assignedTo);
+            if (!hasContactInfo(contact)) return;
+            const commercialKey =
+              contact.id ||
+              getContactKey(contact) ||
+              (item.id ? String(item.id) : item.code || `link-${commercialAggregator.size}`);
+            if (!commercialKey) return;
+
+            if (!commercialAggregator.has(commercialKey)) {
+              commercialAggregator.set(commercialKey, {
+                id: contact.id,
+                name: contact.name,
+                email: contact.email,
+                phone: contact.phone,
+                notes: contact.notes,
+                status: contact.status,
+                assignedLinks: [],
+                managerId:
+                  item.salesManager?.id || getContactKey(item.salesManager) || null,
+                manager: item.salesManager ? normalizeContact(item.salesManager) : null,
+              });
+            }
+
+            const entry = commercialAggregator.get(commercialKey);
+            if (item.code) entry.assignedLinks.push(item.code);
+            if (!entry.manager && item.salesManager) {
+              entry.manager = normalizeContact(item.salesManager);
+            }
+            if (!entry.managerId && item.salesManager) {
+              entry.managerId =
+                item.salesManager.id || getContactKey(item.salesManager) || null;
+            }
+          });
+
+          const combinedCommercials = [...commercialsFromApi];
+          const existingCommercialIndex = new Map();
+          combinedCommercials.forEach((commercial, index) => {
+            const key = commercial.id || getContactKey(commercial);
+            if (key) existingCommercialIndex.set(key, index);
+          });
+
+          commercialAggregator.forEach((commercial, key) => {
+            if (existingCommercialIndex.has(key)) {
+              const index = existingCommercialIndex.get(key);
+              const previous = combinedCommercials[index];
+              combinedCommercials[index] = {
+                ...previous,
+                ...commercial,
+                assignedLinks: Array.from(
+                  new Set([
+                    ...(previous.assignedLinks || []),
+                    ...(commercial.assignedLinks || []),
+                  ]),
+                ),
+                manager: previous.manager || commercial.manager,
+                managerId: previous.managerId || commercial.managerId,
+              };
+            } else {
+              combinedCommercials.push(commercial);
+            }
+          });
+
+          setCommercialCatalog(combinedCommercials);
           setLinks(normalizedItems);
           const incomingSummary = data?.summary
             ? { ...DEFAULT_SUMMARY, ...data.summary }
@@ -766,7 +904,21 @@ const AdminDiscounts = () => {
     });
   }, [links, statusFilter, query]);
 
-  const managerOverview = useMemo(() => buildManagerOverview(links), [links]);
+  const managerOverview = useMemo(
+    () => buildManagerOverview(links, managerCatalog),
+    [links, managerCatalog],
+  );
+
+  const managerLookup = useMemo(() => {
+    const map = new Map();
+    managerCatalog.forEach((manager) => {
+      const key = manager.id || getContactKey(manager);
+      if (key) {
+        map.set(key, manager);
+      }
+    });
+    return map;
+  }, [managerCatalog]);
 
   useEffect(() => {
     setSummary((prev) => {
@@ -844,6 +996,138 @@ const AdminDiscounts = () => {
     } catch (err) {
       console.error('[AdminDiscounts] generate partner link failed:', err);
       alert(err.message || 'Error al generar enlace');
+    }
+  };
+
+  const resetManagerForm = () => {
+    setNewManagerData({
+      name: '',
+      email: '',
+      phone: '',
+      notes: '',
+    });
+    setCreateManagerError('');
+  };
+
+  const resetCommercialForm = () => {
+    setNewCommercialData({
+      name: '',
+      email: '',
+      phone: '',
+      notes: '',
+      managerId: '',
+    });
+    setCreateCommercialError('');
+  };
+
+  const handleCreateManager = async (event) => {
+    event.preventDefault();
+    if (creatingManager) return;
+
+    const nameValue = safeTrim(newManagerData.name);
+    const emailValue = safeTrim(newManagerData.email);
+    const phoneValue = safeTrim(newManagerData.phone);
+    const notesValue = safeTrim(newManagerData.notes);
+
+    if (!nameValue && !emailValue) {
+      setCreateManagerError('Introduce al menos un nombre o correo.');
+      return;
+    }
+
+    setCreateManagerError('');
+    setCreatingManager(true);
+    try {
+      const payload = {
+        name: nameValue,
+        email: emailValue,
+        phone: phoneValue,
+        notes: notesValue,
+      };
+      const created = await createSalesManager(payload);
+      if (created) {
+        setManagerCatalog((prev) => {
+          const seen = new Set();
+          const next = [created, ...prev];
+          return next.filter((manager) => {
+            const key = manager.id || getContactKey(manager);
+            if (!key) return true;
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+          });
+        });
+        alert('Jefe de comerciales creado correctamente.');
+      } else {
+        alert('No se recibió confirmación del nuevo jefe. Revisa el backend.');
+      }
+      setShowCreateManagerModal(false);
+      resetManagerForm();
+    } catch (err) {
+      console.error('[AdminDiscounts] create manager failed:', err);
+      setCreateManagerError(err.message || 'Error al crear el jefe comercial.');
+    } finally {
+      setCreatingManager(false);
+    }
+  };
+
+  const handleCreateCommercial = async (event) => {
+    event.preventDefault();
+    if (creatingCommercial) return;
+
+    const nameValue = safeTrim(newCommercialData.name);
+    const emailValue = safeTrim(newCommercialData.email);
+    const phoneValue = safeTrim(newCommercialData.phone);
+    const notesValue = safeTrim(newCommercialData.notes);
+
+    if (!nameValue && !emailValue) {
+      setCreateCommercialError('Introduce al menos un nombre o correo.');
+      return;
+    }
+
+    setCreateCommercialError('');
+    setCreatingCommercial(true);
+    try {
+      const payload = {
+        name: nameValue,
+        email: emailValue,
+        phone: phoneValue,
+        notes: notesValue,
+        managerId: newCommercialData.managerId || null,
+      };
+      const created = await createSalesCommercial(payload);
+      if (created) {
+        setCommercialCatalog((prev) => {
+          const existingIds = new Set(prev.map((item) => item.id || getContactKey(item)));
+          const createdKey = created.id || getContactKey(created);
+          if (createdKey && existingIds.has(createdKey)) {
+            return prev;
+          }
+          return [created, ...prev];
+        });
+        if (created.manager) {
+          setManagerCatalog((prev) => {
+            const seen = new Set();
+            const next = [created.manager, ...prev];
+            return next.filter((manager) => {
+              const key = manager.id || getContactKey(manager);
+              if (!key) return true;
+              if (seen.has(key)) return false;
+              seen.add(key);
+              return true;
+            });
+          });
+        }
+        alert('Comercial creado correctamente.');
+      } else {
+        alert('No se recibió confirmación del nuevo comercial. Revisa el backend.');
+      }
+      setShowCreateCommercialModal(false);
+      resetCommercialForm();
+    } catch (err) {
+      console.error('[AdminDiscounts] create commercial failed:', err);
+      setCreateCommercialError(err.message || 'Error al crear el comercial.');
+    } finally {
+      setCreatingCommercial(false);
     }
   };
 
@@ -1056,34 +1340,61 @@ const AdminDiscounts = () => {
             Seguimiento de enlaces de descuento, asignaciones y facturación asociada.
           </p>
         </div>
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-          <input
-            type="search"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Buscar por código, URL, comercial o jefe"
-            className="rounded-md border border-soft px-3 py-2 text-sm"
-          />
-          <select
-            value={statusFilter}
-            onChange={(event) => setStatusFilter(event.target.value)}
-            className="rounded-md border border-soft px-3 py-2 text-sm"
-          >
-            <option value="all">Todos los estados</option>
-            <option value="activo">Activos</option>
-            <option value="agotado">Agotados</option>
-            <option value="caducado">Caducados</option>
-          </select>
-          <button
-            type="button"
-            onClick={() => {
-              resetForm();
-              setShowCreateModal(true);
-            }}
-            className="rounded-md bg-[color:var(--color-primary,#6366f1)] px-4 py-2 text-sm font-semibold text-white hover:bg-[color:var(--color-primary-dark,#4f46e5)]"
-          >
-            + Crear código
-          </button>
+        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <input
+              type="search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Buscar por código, URL, comercial o jefe"
+              className="rounded-md border border-soft px-3 py-2 text-sm"
+            />
+            <select
+              value={statusFilter}
+              onChange={(event) => setStatusFilter(event.target.value)}
+              className="rounded-md border border-soft px-3 py-2 text-sm"
+            >
+              <option value="all">Todos los estados</option>
+              <option value="activo">Activos</option>
+              <option value="agotado">Agotados</option>
+              <option value="caducado">Caducados</option>
+            </select>
+          </div>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <button
+              type="button"
+              onClick={() => {
+                resetCommercialForm();
+                setShowCreateCommercialModal(true);
+              }}
+              className="inline-flex items-center justify-center gap-2 rounded-md border border-soft px-3 py-2 text-sm font-medium text-[color:var(--color-primary,#6366f1)] hover:bg-[var(--color-bg-soft,#f3f4f6)]"
+            >
+              <Plus className="h-4 w-4" />
+              Crear comercial
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                resetManagerForm();
+                setShowCreateManagerModal(true);
+              }}
+              className="inline-flex items-center justify-center gap-2 rounded-md border border-soft px-3 py-2 text-sm font-medium text-[color:var(--color-primary,#6366f1)] hover:bg-[var(--color-bg-soft,#f3f4f6)]"
+            >
+              <Plus className="h-4 w-4" />
+              Crear jefe
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                resetForm();
+                setShowCreateModal(true);
+              }}
+              className="inline-flex items-center justify-center gap-2 rounded-md bg-[color:var(--color-primary,#6366f1)] px-4 py-2 text-sm font-semibold text-white hover:bg-[color:var(--color-primary-dark,#4f46e5)]"
+            >
+              <Plus className="h-4 w-4" />
+              Crear código
+            </button>
+          </div>
         </div>
       </header>
 
@@ -1218,6 +1529,72 @@ const AdminDiscounts = () => {
           </section>
 
           <section className="rounded-xl border border-soft bg-surface shadow-sm">
+            <header className="flex flex-col gap-1 border-b border-soft px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 className="text-sm font-semibold">Catálogo de comerciales</h2>
+                <p className="text-xs text-[var(--color-text-soft,#6b7280)]">
+                  Registro de contactos disponibles para asignar a nuevos enlaces.
+                </p>
+              </div>
+              <span className="text-xs text-[var(--color-text-soft,#6b7280)]">
+                Total: {commercialCatalog.length}
+              </span>
+            </header>
+            {commercialCatalog.length ? (
+              <div className="divide-y divide-soft">
+                {commercialCatalog.map((commercial) => {
+                  const manager =
+                    commercial.manager ||
+                    (commercial.managerId
+                      ? managerLookup.get(commercial.managerId)
+                      : null);
+                  return (
+                    <article key={commercial.id || getContactKey(commercial)} className="px-4 py-3">
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                        <div>
+                          <p className="text-sm font-semibold">
+                            {commercial.name || commercial.email || 'Comercial sin nombre'}
+                          </p>
+                          <div className="text-xs text-[var(--color-text-soft,#6b7280)] space-x-2">
+                            {commercial.email && <span>{commercial.email}</span>}
+                            {commercial.phone && <span>{commercial.phone}</span>}
+                          </div>
+                          {commercial.notes && (
+                            <p className="mt-1 text-xs text-[var(--color-text-soft,#6b7280)]">
+                              {commercial.notes}
+                            </p>
+                          )}
+                        </div>
+                        <div className="text-xs text-[var(--color-text-soft,#6b7280)] sm:text-right">
+                          {manager ? (
+                            <>
+                              <span className="font-semibold text-[var(--color-text,#111827)]">
+                                {manager.name || manager.email || 'Jefe sin nombre'}
+                              </span>
+                              {manager.email && <span> · {manager.email}</span>}
+                            </>
+                          ) : (
+                            <span>Sin jefe asignado</span>
+                          )}
+                        </div>
+                      </div>
+                      {Array.isArray(commercial.assignedLinks) && commercial.assignedLinks.length > 0 && (
+                        <div className="mt-2 text-xs text-[var(--color-text-soft,#6b7280)]">
+                          Enlaces asignados: {commercial.assignedLinks.join(', ')}
+                        </div>
+                      )}
+                    </article>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="px-4 py-6 text-sm text-[var(--color-text-soft,#6b7280)]">
+                Todavía no hay comerciales registrados manualmente. Usa el botón “Crear comercial” para añadirlos al catálogo.
+              </p>
+            )}
+          </section>
+
+          <section className="rounded-xl border border-soft bg-surface shadow-sm">
             <header className="border-b border-soft px-4 py-3">
               <h2 className="text-sm font-semibold">Enlaces de descuento</h2>
             </header>
@@ -1346,6 +1723,182 @@ const AdminDiscounts = () => {
             </div>
           </section>
         </>
+      )}
+
+      {showCreateCommercialModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-8">
+          <div className="w-full max-w-lg rounded-xl bg-surface p-6 shadow-xl">
+            <header className="mb-4">
+              <h2 className="text-lg font-semibold">Crear comercial</h2>
+              <p className="text-sm text-[var(--color-text-soft,#6b7280)]">
+                Registra un nuevo comercial para poder asignarlo a enlaces de descuento.
+              </p>
+            </header>
+            <form className="space-y-4" onSubmit={handleCreateCommercial}>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Nombre</label>
+                  <input
+                    type="text"
+                    value={newCommercialData.name}
+                    onChange={(e) => setNewCommercialData((prev) => ({ ...prev, name: e.target.value }))}
+                    className="w-full rounded-md border border-soft px-3 py-2 text-sm"
+                    disabled={creatingCommercial}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Email</label>
+                  <input
+                    type="email"
+                    value={newCommercialData.email}
+                    onChange={(e) => setNewCommercialData((prev) => ({ ...prev, email: e.target.value }))}
+                    className="w-full rounded-md border border-soft px-3 py-2 text-sm"
+                    disabled={creatingCommercial}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Teléfono</label>
+                  <input
+                    type="tel"
+                    value={newCommercialData.phone}
+                    onChange={(e) => setNewCommercialData((prev) => ({ ...prev, phone: e.target.value }))}
+                    className="w-full rounded-md border border-soft px-3 py-2 text-sm"
+                    disabled={creatingCommercial}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Jefe asignado</label>
+                  <select
+                    value={newCommercialData.managerId}
+                    onChange={(e) => setNewCommercialData((prev) => ({ ...prev, managerId: e.target.value }))}
+                    className="w-full rounded-md border border-soft px-3 py-2 text-sm"
+                    disabled={creatingCommercial}
+                  >
+                    <option value="">Sin jefe</option>
+                    {managerCatalog.map((manager) => (
+                      <option key={manager.id || getContactKey(manager)} value={manager.id || getContactKey(manager)}>
+                        {manager.name || manager.email || 'Jefe sin nombre'}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Notas</label>
+                <textarea
+                  value={newCommercialData.notes}
+                  onChange={(e) => setNewCommercialData((prev) => ({ ...prev, notes: e.target.value }))}
+                  rows={3}
+                  className="w-full rounded-md border border-soft px-3 py-2 text-sm"
+                  disabled={creatingCommercial}
+                />
+              </div>
+              {createCommercialError && (
+                <p className="text-sm text-red-600">{createCommercialError}</p>
+              )}
+              <div className="flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowCreateCommercialModal(false);
+                    resetCommercialForm();
+                  }}
+                  className="rounded-md border border-soft px-4 py-2 text-sm hover:bg-[var(--color-bg-soft,#f3f4f6)]"
+                  disabled={creatingCommercial}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="rounded-md bg-[color:var(--color-primary,#6366f1)] px-4 py-2 text-sm font-semibold text-white hover:bg-[color:var(--color-primary-dark,#4f46e5)] disabled:opacity-50"
+                  disabled={creatingCommercial}
+                >
+                  {creatingCommercial ? 'Guardando...' : 'Crear comercial'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {showCreateManagerModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-8">
+          <div className="w-full max-w-lg rounded-xl bg-surface p-6 shadow-xl">
+            <header className="mb-4">
+              <h2 className="text-lg font-semibold">Crear jefe de comerciales</h2>
+              <p className="text-sm text-[var(--color-text-soft,#6b7280)]">
+                Añade un nuevo responsable para coordinar comerciales y dar seguimiento.
+              </p>
+            </header>
+            <form className="space-y-4" onSubmit={handleCreateManager}>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Nombre</label>
+                  <input
+                    type="text"
+                    value={newManagerData.name}
+                    onChange={(e) => setNewManagerData((prev) => ({ ...prev, name: e.target.value }))}
+                    className="w-full rounded-md border border-soft px-3 py-2 text-sm"
+                    disabled={creatingManager}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Email</label>
+                  <input
+                    type="email"
+                    value={newManagerData.email}
+                    onChange={(e) => setNewManagerData((prev) => ({ ...prev, email: e.target.value }))}
+                    className="w-full rounded-md border border-soft px-3 py-2 text-sm"
+                    disabled={creatingManager}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Teléfono</label>
+                  <input
+                    type="tel"
+                    value={newManagerData.phone}
+                    onChange={(e) => setNewManagerData((prev) => ({ ...prev, phone: e.target.value }))}
+                    className="w-full rounded-md border border-soft px-3 py-2 text-sm"
+                    disabled={creatingManager}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Notas</label>
+                  <input
+                    type="text"
+                    value={newManagerData.notes}
+                    onChange={(e) => setNewManagerData((prev) => ({ ...prev, notes: e.target.value }))}
+                    className="w-full rounded-md border border-soft px-3 py-2 text-sm"
+                    disabled={creatingManager}
+                  />
+                </div>
+              </div>
+              {createManagerError && (
+                <p className="text-sm text-red-600">{createManagerError}</p>
+              )}
+              <div className="flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowCreateManagerModal(false);
+                    resetManagerForm();
+                  }}
+                  className="rounded-md border border-soft px-4 py-2 text-sm hover:bg-[var(--color-bg-soft,#f3f4f6)]"
+                  disabled={creatingManager}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="rounded-md bg-[color:var(--color-primary,#6366f1)] px-4 py-2 text-sm font-semibold text-white hover:bg-[color:var(--color-primary-dark,#4f46e5)] disabled:opacity-50"
+                  disabled={creatingManager}
+                >
+                  {creatingManager ? 'Guardando...' : 'Crear jefe'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
 
       {/* Modal crear c�digo */}

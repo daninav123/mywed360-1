@@ -1,4 +1,4 @@
-import { Check, Plus, ArrowRight, Loader2, Mail, Search, X, AlertTriangle } from 'lucide-react';
+import { Check, Plus, ArrowRight, Loader2, Mail, Phone, Instagram, Search, X, AlertTriangle } from 'lucide-react';
 import React from 'react';
 
 import Button from '../../../components/ui/Button';
@@ -268,6 +268,42 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
                   {result.location}
                 </p>
               )}
+
+              {/* Email, Teléfono e Instagram */}
+              <div className="flex flex-wrap gap-3 mb-2">
+                {result.email && (
+                  <a 
+                    href={`mailto:${result.email}`}
+                    className="flex items-center text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                    title="Enviar email"
+                  >
+                    <Mail size={14} className="mr-1" />
+                    {result.email}
+                  </a>
+                )}
+                {result.phone && (
+                  <a 
+                    href={`tel:${result.phone}`}
+                    className="flex items-center text-sm text-green-600 hover:text-green-800 hover:underline"
+                    title="Llamar"
+                  >
+                    <Phone size={14} className="mr-1" />
+                    {result.phone}
+                  </a>
+                )}
+                {result.instagram && (
+                  <a 
+                    href={result.instagram}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center text-sm text-pink-600 hover:text-pink-800 hover:underline"
+                    title="Ver Instagram"
+                  >
+                    <Instagram size={14} className="mr-1" />
+                    Instagram
+                  </a>
+                )}
+              </div>
 
               <p className="text-sm text-gray-700 mb-3">{result.snippet}</p>
 

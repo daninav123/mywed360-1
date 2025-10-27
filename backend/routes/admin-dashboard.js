@@ -61,6 +61,79 @@ const estimateCommissionFromRules = (rules, revenueValue) => {
   return revenue * percentage + fixedAmount;
 };
 
+const safeTrim = (value) => (typeof value === 'string' ? value.trim() : '');
+
+const sanitizeContactInput = (input) => {
+  if (!input || typeof input !== 'object') return null;
+
+  const idRaw = input.id ?? input.contactId ?? input.uid ?? null;
+  let id = null;
+  if (typeof idRaw === 'string' && idRaw.trim()) {
+    id = idRaw.trim();
+  } else if (Number.isFinite(idRaw)) {
+    id = String(idRaw);
+  }
+
+  const name = safeTrim(input.name || '');
+  const email = safeTrim(input.email || '');
+  const phone = safeTrim(input.phone || '');
+  const notes = safeTrim(input.notes || '');
+  const status = safeTrim(input.status || '');
+
+  if (!id && !name && !email && !phone && !notes) {
+    return null;
+  }
+
+  return {
+    id: id || null,
+    name: name || null,
+    email: email || null,
+    phone: phone || null,
+    notes: notes || null,
+    status: status || 'active',
+  };
+};
+
+const contactKey = (contact) => {
+  if (!contact || typeof contact !== 'object') return null;
+  if (contact.id) return String(contact.id);
+  if (contact.email) return contact.email.toLowerCase();
+  if (contact.name) return contact.name.toLowerCase();
+  if (contact.phone) return contact.phone.replace(/\s+/g, '');
+  return null;
+};
+
+const hydrateSalesManager = (raw, directory = null) => {
+  const sanitized = sanitizeContactInput(raw);
+  if (!sanitized) return null;
+  if (directory && directory instanceof Map) {
+    const candidates = [
+      sanitized.id,
+      sanitized.email ? sanitized.email.toLowerCase() : null,
+      sanitized.name ? sanitized.name.toLowerCase() : null,
+      sanitized.phone ? sanitized.phone.replace(/\s+/g, '') : null,
+    ].filter(Boolean);
+    for (const key of candidates) {
+      if (directory.has(key)) {
+        return directory.get(key);
+      }
+    }
+  }
+  return {
+    id: sanitized.id || null,
+    name: sanitized.name || '',
+    email: sanitized.email || '',
+    phone: sanitized.phone || '',
+    notes: sanitized.notes || '',
+    status: sanitized.status || 'active',
+  };
+};
+
+const toIsoString = (value) => {
+  const date = toDate(value);
+  return date ? date.toISOString() : null;
+};
+
 const router = express.Router();
 
 const MAX_LIMIT = 200;
@@ -97,6 +170,8 @@ const collections = {
   taskTemplates: () => db.collection('adminTaskTemplates'),
   // Descuentos/códigos promocionales
   discountLinks: () => db.collection('discountLinks'),
+  salesManagers: () => db.collection('salesManagers'),
+  salesCommercials: () => db.collection('salesCommercials'),
 };
 
 const LIVE_STATUS_TTL_MS = 3 * 60 * 1000;
@@ -2672,30 +2747,86 @@ router.get('/users/role-summary', async (_req, res) => {
 router.get('/discounts', async (_req, res) => {
   console.log('�x� [DEBUG] GET /discounts endpoint called');
   try {
-    const docs = await getCollectionDocs('discountLinks', { orderBy: 'createdAt', limit: 500 });
+    const [docs, managerDocs, commercialDocs] = await Promise.all([
+      getCollectionDocs('discountLinks', { orderBy: 'createdAt', limit: 500 }),
+      getCollectionDocs('salesManagers', { orderBy: 'createdAt', limit: 500 }),
+      getCollectionDocs('salesCommercials', { orderBy: 'createdAt', limit: 500 }),
+    ]);
+
     console.log(`  - Found ${docs.length} discount links`);
-    const items = docs.map((d) => {
-      const data = d.data() || {};
-      
-      // Función helper para convertir timestamps de forma segura
-      const safeToDate = (value) => {
-        if (!value) return null;
-        if (value.toDate && typeof value.toDate === 'function') {
-          try {
-            return value.toDate();
-          } catch (e) {
-            console.warn('Error converting timestamp:', e);
-            return null;
-          }
-        }
-        if (value instanceof Date) return value;
-        if (typeof value === 'string' || typeof value === 'number') {
-          const d = new Date(value);
-          return isNaN(d.getTime()) ? null : d;
-        }
-        return null;
+
+    const toIso = (value) => {
+      const date = toDate(value);
+      return date ? date.toISOString() : null;
+    };
+
+    const managers = managerDocs.map((doc) => {
+      const data = doc.data() || {};
+      const base = hydrateSalesManager({ id: doc.id, ...data }) || { id: doc.id };
+      return {
+        id: base.id || doc.id,
+        name: base.name || '',
+        email: base.email || '',
+        phone: base.phone || '',
+        notes: base.notes || '',
+        status: base.status || 'active',
+        createdAt: toIso(data.createdAt),
+        updatedAt: toIso(data.updatedAt),
       };
-      
+    });
+
+    const managerDirectory = new Map();
+    managers.forEach((manager) => {
+      const keys = [
+        manager.id,
+        manager.email ? manager.email.toLowerCase() : null,
+        manager.name ? manager.name.toLowerCase() : null,
+        manager.phone ? manager.phone.replace(/\s+/g, '') : null,
+      ].filter(Boolean);
+      keys.forEach((key) => managerDirectory.set(key, manager));
+    });
+
+    const commercials = commercialDocs.map((doc) => {
+      const data = doc.data() || {};
+      const base = sanitizeContactInput({ id: doc.id, ...data }) || { id: doc.id };
+      const managerId = data.managerId || base.managerId || null;
+      const managerSnapshot = data.manager ? sanitizeContactInput(data.manager) : null;
+      const resolvedManager = hydrateSalesManager(
+        managerSnapshot || { id: managerId || null },
+        managerDirectory,
+      );
+
+      return {
+        id: base.id || doc.id,
+        name: base.name || '',
+        email: base.email || '',
+        phone: base.phone || '',
+        notes: base.notes || '',
+        status: data.status || 'active',
+        managerId: resolvedManager?.id || managerId || null,
+        manager: resolvedManager || null,
+        assignedLinks: Array.isArray(data.assignedLinks) ? data.assignedLinks : [],
+        createdAt: toIso(data.createdAt),
+        updatedAt: toIso(data.updatedAt),
+      };
+    });
+
+    const managerIdentifiers = new Set();
+    managers.forEach((manager) => {
+      const key = contactKey(manager);
+    if (key) managerIdentifiers.add(key);
+  });
+
+    commercials.forEach((commercial) => {
+      if (commercial.manager) {
+        const key = contactKey(commercial.manager);
+        if (key) managerIdentifiers.add(key);
+      }
+    });
+
+    const items = docs.map((doc) => {
+      const data = doc.data() || {};
+
       const commissionRules = normalizeCommissionRules(
         data.commissionRules || null,
         { defaultCurrency: data.currency || 'EUR' },
@@ -2705,17 +2836,23 @@ router.get('/discounts', async (_req, res) => {
         ? estimateCommissionFromRules(commissionRules, Number(data.revenue || 0))
         : 0;
 
-      const createdAt = safeToDate(data.createdAt);
-      const updatedAt = safeToDate(data.updatedAt);
-      const validFrom = safeToDate(data.validFrom);
-      const validUntil = safeToDate(data.validUntil);
+      const assignedTo = sanitizeContactInput(data.assignedTo) || null;
+      const salesManager = hydrateSalesManager(data.salesManager, managerDirectory);
+
+      if (salesManager) {
+        const key = contactKey(salesManager);
+        if (key) managerIdentifiers.add(key);
+      }
+
+      const createdAtDate = toDate(data.createdAt);
+      const updatedAtDate = toDate(data.updatedAt);
 
       return {
-        id: d.id,
-        code: data.code || d.id,
+        id: doc.id,
+        code: data.code || doc.id,
         url: data.url || null,
         type: data.type || 'campaign',
-        uses: Number(data.uses || 0),
+        uses: Number(data.uses ?? data.usesCount ?? 0),
         maxUses: data.maxUses ?? null,
         revenue: Number(data.revenue || 0),
         currency: data.currency || 'EUR',
@@ -2723,16 +2860,18 @@ router.get('/discounts', async (_req, res) => {
         discountPercentage: Number.isFinite(Number(data.discountPercentage))
           ? Number(data.discountPercentage)
           : 0,
-        validFrom: validFrom ? validFrom.toISOString() : null,
-        validUntil: validUntil ? validUntil.toISOString() : null,
-        assignedTo: data.assignedTo || null,
+        validFrom: toIso(data.validFrom),
+        validUntil: toIso(data.validUntil),
+        assignedTo,
+        salesManager,
         notes: data.notes || null,
         commissionRules,
         commissionEstimate,
-        createdAt: createdAt ? formatDateOnly(createdAt) : null,
-        updatedAt: updatedAt ? formatDateOnly(updatedAt) : null,
+        createdAt: createdAtDate ? formatDateOnly(createdAtDate) : null,
+        updatedAt: updatedAtDate ? formatDateOnly(updatedAtDate) : null,
       };
     });
+
     const summary = items.reduce(
       (acc, it) => {
         acc.totalLinks += 1;
@@ -2758,6 +2897,7 @@ router.get('/discounts', async (_req, res) => {
         },
       },
     );
+
     summary.currency = items[0]?.currency || summary.currency || 'EUR';
     summary.commission.currency = summary.currency;
     summary.commission.average = summary.commission.configured
@@ -2765,10 +2905,13 @@ router.get('/discounts', async (_req, res) => {
       : 0;
     summary.commission.total = Number(summary.commission.total.toFixed(2));
     summary.commission.average = Number(summary.commission.average.toFixed(2));
+    summary.totalManagers = managerIdentifiers.size;
+
     console.log(`  �S& Returning ${items.length} discount links`);
     console.log('  - Total revenue:', summary.totalRevenue);
-    
-    return res.json({ items, summary });
+    console.log('  - Total managers detected:', summary.totalManagers);
+
+    return res.json({ items, summary, managers, commercials });
   } catch (error) {
     console.error('  �R Discounts error:', error.message);
     logger.error('[admin-dashboard] discounts error', error);
@@ -2788,6 +2931,7 @@ router.put('/discounts/:id', async (req, res) => {
       type,
       maxUses,
       assignedTo,
+      salesManager,
       notes,
       status,
       discountPercentage,
@@ -2851,11 +2995,30 @@ router.put('/discounts/:id', async (req, res) => {
     }
 
     if (assignedTo !== undefined) {
-      updateData.assignedTo = assignedTo ? {
-        id: assignedTo.id || null,
-        name: assignedTo.name || null,
-        email: assignedTo.email || null,
-      } : null;
+      const sanitizedAssigned = sanitizeContactInput(assignedTo);
+      updateData.assignedTo = sanitizedAssigned
+        ? {
+            id: sanitizedAssigned.id || null,
+            name: sanitizedAssigned.name || null,
+            email: sanitizedAssigned.email || null,
+            phone: sanitizedAssigned.phone || null,
+            notes: sanitizedAssigned.notes || null,
+          }
+        : null;
+    }
+
+    if (salesManager !== undefined) {
+      const sanitizedManager = sanitizeContactInput(salesManager);
+      updateData.salesManager = sanitizedManager
+        ? {
+            id: sanitizedManager.id || null,
+            name: sanitizedManager.name || null,
+            email: sanitizedManager.email || null,
+            phone: sanitizedManager.phone || null,
+            notes: sanitizedManager.notes || null,
+            status: sanitizedManager.status || 'active',
+          }
+        : null;
     }
 
     if (rawCommissionRules !== undefined) {
@@ -2909,12 +3072,15 @@ router.put('/discounts/:id', async (req, res) => {
 
     console.log(`  OK. Updated discount code: ${data.code}`);
 
+    const sanitizedAssignedTo = sanitizeContactInput(data.assignedTo);
+    const sanitizedSalesManager = sanitizeContactInput(data.salesManager);
+
     return res.json({
       id: updated.id,
       code: data.code || updated.id,
       url: data.url || null,
       type: data.type || 'campaign',
-      uses: Number(data.uses || 0),
+      uses: Number(data.uses ?? data.usesCount ?? 0),
       maxUses: data.maxUses ?? null,
       revenue: Number(data.revenue || 0),
       currency: data.currency || 'EUR',
@@ -2924,7 +3090,8 @@ router.put('/discounts/:id', async (req, res) => {
         : 0,
       validFrom: toDateSafe(data.validFrom)?.toISOString() || null,
       validUntil: toDateSafe(data.validUntil)?.toISOString() || null,
-      assignedTo: data.assignedTo || null,
+      assignedTo: sanitizedAssignedTo,
+      salesManager: sanitizedSalesManager,
       notes: data.notes || null,
       commissionRules,
       partnerToken: data.partnerToken || null,
@@ -2947,6 +3114,7 @@ router.post('/discounts', async (req, res) => {
         type,
         maxUses,
         assignedTo,
+        salesManager,
         notes,
         discountPercentage,
         validFrom,
@@ -2985,12 +3153,16 @@ router.post('/discounts', async (req, res) => {
     if (!existing.empty) {
       return res.status(409).json({ error: 'code_already_exists' });
     }
-    
+
+    const sanitizedAssignedTo = sanitizeContactInput(assignedTo);
+    const sanitizedSalesManager = sanitizeContactInput(salesManager);
+
     const newDiscount = {
       code: cleanCode,
       url: cleanUrl || `https://maloveapp.com/registro?ref=${cleanCode}`,
         type: cleanType,
         maxUses: maxUsesValue,
+        uses: 0,
         usesCount: 0,
         status: 'activo',
         discountPercentage: cleanDiscountPercentage,
@@ -2998,11 +3170,25 @@ router.post('/discounts', async (req, res) => {
         validUntil: cleanValidUntil,
         revenue: 0,
         currency: cleanCurrency,
-        assignedTo: assignedTo ? {
-          id: assignedTo.id || null,
-          name: assignedTo.name || null,
-          email: assignedTo.email || null,
-        } : null,
+        assignedTo: sanitizedAssignedTo
+          ? {
+              id: sanitizedAssignedTo.id || null,
+              name: sanitizedAssignedTo.name || null,
+              email: sanitizedAssignedTo.email || null,
+              phone: sanitizedAssignedTo.phone || null,
+              notes: sanitizedAssignedTo.notes || null,
+            }
+          : null,
+        salesManager: sanitizedSalesManager
+          ? {
+              id: sanitizedSalesManager.id || null,
+              name: sanitizedSalesManager.name || null,
+              email: sanitizedSalesManager.email || null,
+              phone: sanitizedSalesManager.phone || null,
+              notes: sanitizedSalesManager.notes || null,
+              status: sanitizedSalesManager.status || 'active',
+            }
+          : null,
         notes: String(notes || '').trim() || null,
         commissionRules: normalizedCommissionRules || null,
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
@@ -3011,19 +3197,187 @@ router.post('/discounts', async (req, res) => {
       };
     
     const docRef = await collections.discountLinks().add(newDiscount);
+    const createdSnap = await docRef.get();
+    const createdData = createdSnap.data() || {};
+
+    const createdCommission = normalizeCommissionRules(
+      createdData.commissionRules || null,
+      { defaultCurrency: createdData.currency || 'EUR' },
+    );
+
+    const responseAssignedTo = sanitizeContactInput(createdData.assignedTo);
+    const responseSalesManager = sanitizeContactInput(createdData.salesManager);
+    const createdUses = Number(createdData.uses ?? createdData.usesCount ?? 0);
+    const createdRevenue = Number(createdData.revenue || 0);
     
     console.log(`  �S& Created discount code: ${cleanCode} (${isPermanent ? 'permanent' : `max ${maxUsesValue} uses`})`);
     
     return res.status(201).json({
-      id: docRef.id,
-      ...newDiscount,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      id: createdSnap.id,
+      code: createdData.code || createdSnap.id,
+      url: createdData.url || null,
+      type: createdData.type || 'campaign',
+      uses: createdUses,
+      maxUses: createdData.maxUses ?? null,
+      revenue: createdRevenue,
+      currency: createdData.currency || 'EUR',
+      status: createdData.status || 'active',
+      discountPercentage: Number.isFinite(Number(createdData.discountPercentage))
+        ? Number(createdData.discountPercentage)
+        : 0,
+      validFrom: toIsoString(createdData.validFrom),
+      validUntil: toIsoString(createdData.validUntil),
+      assignedTo: responseAssignedTo,
+      salesManager: responseSalesManager,
+      notes: createdData.notes || null,
+      commissionRules: createdCommission,
+      commissionEstimate: createdCommission
+        ? estimateCommissionFromRules(createdCommission, createdRevenue)
+        : 0,
+      createdAt: toIsoString(createdData.createdAt),
+      updatedAt: toIsoString(createdData.updatedAt),
     });
   } catch (error) {
     console.error('  �R Create discount error:', error.message);
     logger.error('[admin-dashboard] create discount error', error);
     return res.status(500).json({ error: 'admin_dashboard_create_discount_failed', message: error.message });
+  }
+});
+
+router.post('/commerce/sales-managers', async (req, res) => {
+  console.log('[DEBUG] POST /commerce/sales-managers called');
+  try {
+    const { name, email, phone, notes } = req.body || {};
+
+    const cleanName = safeTrim(name || '');
+    const cleanEmail = safeTrim(email || '');
+    const cleanPhone = safeTrim(phone || '');
+    const cleanNotes = safeTrim(notes || '');
+
+    if (!cleanName && !cleanEmail) {
+      return res.status(400).json({ error: 'manager_name_or_email_required' });
+    }
+
+    const managerData = {
+      name: cleanName || null,
+      email: cleanEmail || null,
+      phone: cleanPhone || null,
+      notes: cleanNotes || null,
+      status: 'active',
+      createdAt: serverTs(),
+      updatedAt: serverTs(),
+      createdBy: getActor(req),
+    };
+
+    const docRef = collections.salesManagers().doc();
+    await docRef.set(managerData);
+    const snapshot = await docRef.get();
+    const data = snapshot.data() || {};
+
+    const response = {
+      id: snapshot.id,
+      name: data.name || '',
+      email: data.email || '',
+      phone: data.phone || '',
+      notes: data.notes || '',
+      status: data.status || 'active',
+      createdAt: toIsoString(data.createdAt),
+      updatedAt: toIsoString(data.updatedAt),
+    };
+
+    await writeAdminAudit(req, 'ADMIN_SALES_MANAGER_CREATE', {
+      resourceType: 'sales_manager',
+      resourceId: snapshot.id,
+      payload: { name: response.name, email: response.email },
+    });
+
+    return res.status(201).json(response);
+  } catch (error) {
+    console.error('[ERROR] create sales manager failed:', error.message);
+    logger.error('[admin-dashboard] create sales manager failed', error);
+    return res.status(500).json({ error: 'sales_manager_create_failed', message: error.message });
+  }
+});
+
+router.post('/commerce/commercials', async (req, res) => {
+  console.log('[DEBUG] POST /commerce/commercials called');
+  try {
+    const { name, email, phone, notes, managerId } = req.body || {};
+
+    const cleanName = safeTrim(name || '');
+    const cleanEmail = safeTrim(email || '');
+    const cleanPhone = safeTrim(phone || '');
+    const cleanNotes = safeTrim(notes || '');
+    const cleanManagerId = safeTrim(managerId || '');
+
+    if (!cleanName && !cleanEmail) {
+      return res.status(400).json({ error: 'commercial_name_or_email_required' });
+    }
+
+    let manager = null;
+    if (cleanManagerId) {
+      try {
+        const managerDoc = await collections.salesManagers().doc(cleanManagerId).get();
+        if (managerDoc.exists) {
+          manager = sanitizeContactInput({ id: managerDoc.id, ...(managerDoc.data() || {}) });
+        }
+      } catch (fetchError) {
+        console.warn('[admin-dashboard] Failed to resolve manager for commercial:', fetchError.message);
+      }
+    }
+
+    const commercialData = {
+      name: cleanName || null,
+      email: cleanEmail || null,
+      phone: cleanPhone || null,
+      notes: cleanNotes || null,
+      status: 'active',
+      managerId: manager?.id || (cleanManagerId || null),
+      manager: manager || null,
+      assignedLinks: [],
+      createdAt: serverTs(),
+      updatedAt: serverTs(),
+      createdBy: getActor(req),
+    };
+
+    const docRef = collections.salesCommercials().doc();
+    await docRef.set(commercialData);
+    const snapshot = await docRef.get();
+    const data = snapshot.data() || {};
+
+    const responseManager = data.manager
+      ? sanitizeContactInput({ id: data.manager.id || data.managerId || null, ...data.manager })
+      : manager || null;
+
+    const response = {
+      id: snapshot.id,
+      name: data.name || '',
+      email: data.email || '',
+      phone: data.phone || '',
+      notes: data.notes || '',
+      status: data.status || 'active',
+      managerId: data.managerId || responseManager?.id || null,
+      manager: responseManager,
+      assignedLinks: Array.isArray(data.assignedLinks) ? data.assignedLinks : [],
+      createdAt: toIsoString(data.createdAt),
+      updatedAt: toIsoString(data.updatedAt),
+    };
+
+    await writeAdminAudit(req, 'ADMIN_SALES_COMMERCIAL_CREATE', {
+      resourceType: 'sales_commercial',
+      resourceId: snapshot.id,
+      payload: {
+        name: response.name,
+        email: response.email,
+        managerId: response.managerId,
+      },
+    });
+
+    return res.status(201).json(response);
+  } catch (error) {
+    console.error('[ERROR] create sales commercial failed:', error.message);
+    logger.error('[admin-dashboard] create sales commercial failed', error);
+    return res.status(500).json({ error: 'sales_commercial_create_failed', message: error.message });
   }
 });
 

@@ -30,7 +30,10 @@ Este documento resume los cambios recientes aplicados al panel de administració
   - Sección “Jefes de comerciales” con datos agregados por manager, listando los comerciales a su cargo y su desempeño (usos, facturación, enlaces).
   - Tabla de enlaces incluye columnas “Comercial” y “Jefe” para facilitar filtros y auditorías.
   - El buscador contempla nombre/email tanto de comerciales como de jefes.
-- **Requisitos de backend:** el endpoint `/api/admin/dashboard/discounts` debería incluir `salesManager` por elemento y, opcionalmente, un array `managers` para enriquecer la libreta de contactos que usa el front.
+- **Alta rápida de contactos:**
+  - Botones “Crear comercial” y “Crear jefe” abren modales ligeros para registrar nuevos contactos sin salir del panel.
+  - Tras guardar, se actualizan el catálogo y los contadores; los nuevos managers aparecen con métricas en cero hasta que se les asigne un enlace.
+- **Requisitos de backend:** el endpoint `/api/admin/dashboard/discounts` debería incluir `salesManager` por elemento y, opcionalmente, un array `managers` para enriquecer la libreta de contactos que usa el front. Además, se esperan los nuevos endpoints `POST /api/admin/dashboard/commerce/sales-managers` y `POST /api/admin/dashboard/commerce/commercials` para persistir los formularios de alta.
 
 ## Próximos pasos sugeridos
 

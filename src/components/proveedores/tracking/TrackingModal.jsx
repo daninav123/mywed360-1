@@ -1,8 +1,67 @@
-import { X, Mail, Clock, CheckCircle, Eye, XCircle, ExternalLink, Calendar } from 'lucide-react';
+import { X, Mail, Clock, CheckCircle, Eye, XCircle, Calendar } from 'lucide-react';
 import React from 'react';
 
 import Button from '../../../components/ui/Button';
 import Card from '../../../components/ui/Card';
+import useTranslations from '../../../hooks/useTranslations';
+
+const RAW_STATUS_TO_KEY = {
+  enviado: 'sent',
+  sent: 'sent',
+  entregado: 'delivered',
+  delivered: 'delivered',
+  leido: 'read',
+  leído: 'read',
+  read: 'read',
+  responded: 'responded',
+  completed: 'responded',
+  error: 'error',
+  failed: 'error',
+  pendiente: 'pending',
+  waiting: 'pending',
+  waiting_response: 'pending',
+  followup: 'pending',
+};
+
+const STATUS_STYLES = {
+  sent: { color: 'text-blue-600', bgColor: 'bg-blue-100', iconColor: 'text-blue-600', Icon: Mail },
+  delivered: {
+    color: 'text-green-600',
+    bgColor: 'bg-green-100',
+    iconColor: 'text-green-600',
+    Icon: CheckCircle,
+  },
+  read: {
+    color: 'text-purple-600',
+    bgColor: 'bg-purple-100',
+    iconColor: 'text-purple-600',
+    Icon: Eye,
+  },
+  responded: {
+    color: 'text-emerald-600',
+    bgColor: 'bg-emerald-100',
+    iconColor: 'text-emerald-600',
+    Icon: CheckCircle,
+  },
+  error: {
+    color: 'text-red-600',
+    bgColor: 'bg-red-100',
+    iconColor: 'text-red-600',
+    Icon: XCircle,
+  },
+  pending: {
+    color: 'text-amber-600',
+    bgColor: 'bg-amber-100',
+    iconColor: 'text-amber-600',
+    Icon: Clock,
+  },
+  unknown: {
+    color: 'text-gray-600',
+    bgColor: 'bg-gray-100',
+    iconColor: 'text-gray-600',
+    Icon: Clock,
+  },
+};
 
 /**
  * @typedef {import('./EmailTrackingList').EmailTrackingItem} EmailTrackingItem
@@ -20,83 +79,55 @@ import Card from '../../../components/ui/Card';
  * @returns {React.ReactElement|null} Modal de detalles de seguimiento o null si no está abierto
  */
 const TrackingModal = ({ isOpen, onClose, trackingItem }) => {
+  const { t, format } = useTranslations();
   if (!isOpen || !trackingItem) return null;
 
   // Función para obtener el color y texto según el estado del email
   const getStatusInfo = (status) => {
-    switch (status) {
-      case 'enviado':
-        return {
-          color: 'text-blue-600',
-          bgColor: 'bg-blue-100',
-          icon: <Mail size={20} className="text-blue-600" />,
-          text: 'Enviado',
-        };
-      case 'entregado':
-        return {
-          color: 'text-green-600',
-          bgColor: 'bg-green-100',
-          icon: <CheckCircle size={20} className="text-green-600" />,
-          text: 'Entregado',
-        };
-      case 'leido':
-        return {
-          color: 'text-purple-600',
-          bgColor: 'bg-purple-100',
-          icon: <Eye size={20} className="text-purple-600" />,
-          text: 'Leído',
-        };
-      case 'error':
-        return {
-          color: 'text-red-600',
-          bgColor: 'bg-red-100',
-          icon: <XCircle size={20} className="text-red-600" />,
-          text: 'Error',
-        };
-      case 'pendiente':
-        return {
-          color: 'text-amber-600',
-          bgColor: 'bg-amber-100',
-          icon: <Clock size={20} className="text-amber-600" />,
-          text: 'Pendiente',
-        };
-      default:
-        return {
-          color: 'text-gray-600',
-          bgColor: 'bg-gray-100',
-          icon: <Clock size={20} className="text-gray-600" />,
-          text: 'Desconocido',
-        };
-    }
+    const key =
+      RAW_STATUS_TO_KEY[String(status || '').toLowerCase()] || 'unknown';
+    const { color, bgColor, iconColor, Icon } =
+      STATUS_STYLES[key] || STATUS_STYLES.unknown;
+    return {
+      color,
+      bgColor,
+      icon: <Icon size={20} className={iconColor} />,
+      text: t(`common.suppliers.tracking.status.${key}`),
+    };
   };
 
   // Formatear fecha y hora
   const formatDateTime = (dateStr) => {
     if (!dateStr) return '';
     try {
-      const date = new Date(dateStr);
-      return date.toLocaleString('es-ES', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-      });
+      const date =
+        typeof dateStr?.toDate === 'function'
+          ? dateStr.toDate()
+          : dateStr instanceof Date
+            ? dateStr
+            : new Date(dateStr);
+      if (Number.isNaN(date.getTime())) return '';
+      return format.datetime(date);
     } catch (e) {
-      return dateStr;
+      return '';
     }
   };
 
   // Datos de ejemplo para la visualización
   const statusInfo = getStatusInfo(trackingItem.status);
+  const notAvailable = t('common.suppliers.tracking.shared.notAvailable');
+  const fallbackRecipient =
+    trackingItem.recipientEmail ||
+    t('common.suppliers.tracking.modal.placeholders.recipient');
 
   // Historial de actividad de ejemplo
   const activities = [
     {
       type: 'send',
       date: trackingItem.sentAt,
-      detail: `Email enviado a ${trackingItem.recipientEmail || 'destinatario'}`,
+      detail: t('common.suppliers.tracking.modal.activities.send', {
+        email: fallbackRecipient,
+      }),
     },
   ];
 
@@ -107,7 +138,7 @@ const TrackingModal = ({ isOpen, onClose, trackingItem }) => {
       date:
         trackingItem.deliveredAt ||
         new Date(new Date(trackingItem.sentAt).getTime() + 60000).toISOString(),
-      detail: 'Email entregado al servidor de destino',
+      detail: t('common.suppliers.tracking.modal.activities.deliver'),
     });
   }
 
@@ -122,7 +153,12 @@ const TrackingModal = ({ isOpen, onClose, trackingItem }) => {
             ? trackingItem.firstOpenedAt ||
               new Date(new Date(trackingItem.sentAt).getTime() + 300000).toISOString()
             : new Date(new Date(trackingItem.sentAt).getTime() + 300000 * (i + 1)).toISOString(),
-        detail: `Email abierto ${i === 0 ? 'por primera vez' : `(apertura #${i + 1})`}`,
+        detail:
+          i === 0
+            ? t('common.suppliers.tracking.modal.activities.openFirst')
+            : t('common.suppliers.tracking.modal.activities.openNth', {
+                index: i + 1,
+              }),
       });
     }
   }
@@ -133,7 +169,9 @@ const TrackingModal = ({ isOpen, onClose, trackingItem }) => {
       date:
         trackingItem.errorAt ||
         new Date(new Date(trackingItem.sentAt).getTime() + 120000).toISOString(),
-      detail: trackingItem.errorMessage || 'Error en la entrega del email',
+      detail:
+        trackingItem.errorMessage ||
+        t('common.suppliers.tracking.modal.activities.errorDefault'),
     });
   }
 
@@ -145,11 +183,13 @@ const TrackingModal = ({ isOpen, onClose, trackingItem }) => {
       <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
         <div className="flex justify-between items-center p-4 border-b">
-          <h2 className="text-xl font-semibold">Seguimiento de Email</h2>
+          <h2 className="text-xl font-semibold">
+            {t('common.suppliers.tracking.modal.title')}
+          </h2>
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700"
-            aria-label="Cerrar"
+            aria-label={t('common.suppliers.tracking.modal.closeAria')}
           >
             <X size={24} />
           </button>
@@ -160,7 +200,9 @@ const TrackingModal = ({ isOpen, onClose, trackingItem }) => {
           {/* Información del email */}
           <Card className="mb-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium">Información del email</h3>
+              <h3 className="text-lg font-medium">
+                {t('common.suppliers.tracking.modal.emailInfo.title')}
+              </h3>
               <span
                 className={`flex items-center gap-1 px-3 py-1 rounded-full ${statusInfo.bgColor} ${statusInfo.color}`}
               >
@@ -171,49 +213,93 @@ const TrackingModal = ({ isOpen, onClose, trackingItem }) => {
 
             <div className="space-y-3">
               <div>
-                <p className="text-sm text-gray-500">Asunto</p>
-                <p className="font-medium">{trackingItem.subject}</p>
+                <p className="text-sm text-gray-500">
+                  {t('common.suppliers.tracking.modal.emailInfo.fields.subject')}
+                </p>
+                <p className="font-medium">
+                  {trackingItem.subject ||
+                    t('common.suppliers.tracking.modal.placeholders.subject')}
+                </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-gray-500">Proveedor</p>
-                  <p className="font-medium">{trackingItem.providerName}</p>
-                </div>
-
-                <div>
-                  <p className="text-sm text-gray-500">Destinatario</p>
-                  <p className="font-medium">{trackingItem.recipientEmail || 'No disponible'}</p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-gray-500">Enviado</p>
-                  <p className="font-medium">{formatDateTime(trackingItem.sentAt)}</p>
-                </div>
-
-                <div>
-                  <p className="text-sm text-gray-500">Última actualización</p>
+                  <p className="text-sm text-gray-500">
+                    {t('common.suppliers.tracking.modal.emailInfo.fields.provider')}
+                  </p>
                   <p className="font-medium">
-                    {formatDateTime(trackingItem.lastUpdated || trackingItem.sentAt)}
+                    {trackingItem.providerName ||
+                      t('common.suppliers.tracking.list.placeholders.provider')}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-gray-500">
+                    {t('common.suppliers.tracking.modal.emailInfo.fields.recipient')}
+                  </p>
+                  <p className="font-medium">
+                    {trackingItem.recipientEmail ||
+                      t('common.suppliers.tracking.modal.placeholders.recipientEmail')}
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-gray-500">
+                    {t('common.suppliers.tracking.modal.emailInfo.fields.sent')}
+                  </p>
+                  <p className="font-medium">
+                    {formatDateTime(trackingItem.sentAt) || notAvailable}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-gray-500">
+                    {t('common.suppliers.tracking.modal.emailInfo.fields.updated')}
+                  </p>
+                  <p className="font-medium">
+                    {formatDateTime(trackingItem.lastUpdated || trackingItem.sentAt) ||
+                      notAvailable}
                   </p>
                 </div>
               </div>
 
               {trackingItem.openCount > 0 && (
                 <div>
-                  <p className="text-sm text-gray-500">Aperturas</p>
+                  <p className="text-sm text-gray-500">
+                    {t('common.suppliers.tracking.modal.emailInfo.fields.opens')}
+                  </p>
                   <p className="font-medium text-green-600">
-                    {trackingItem.openCount} {trackingItem.openCount === 1 ? 'vez' : 'veces'}
+                    {t('common.suppliers.tracking.modal.emailInfo.openCount', {
+                      count: trackingItem.openCount,
+                    })}
                   </p>
                 </div>
               )}
 
+              {trackingItem.providerWebsite && (
+                <a
+                  href={trackingItem.providerWebsite}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-blue-600 hover:underline inline-flex items-center gap-1"
+                >
+                  {t('common.suppliers.tracking.modal.emailInfo.websiteLink', {
+                    url: trackingItem.providerWebsite,
+                  })}
+                </a>
+              )}
+
               {trackingItem.errorMessage && (
                 <div className="bg-red-50 p-3 rounded-md border border-red-200 text-red-700">
-                  <p className="font-medium mb-1">Error</p>
-                  <p className="text-sm">{trackingItem.errorMessage}</p>
+                  <p className="font-medium mb-1">
+                    {t('common.suppliers.tracking.modal.error.title')}
+                  </p>
+                  <p className="text-sm">
+                    {trackingItem.errorMessage ||
+                      t('common.suppliers.tracking.modal.error.default')}
+                  </p>
                 </div>
               )}
             </div>
@@ -221,7 +307,9 @@ const TrackingModal = ({ isOpen, onClose, trackingItem }) => {
 
           {/* Historial de actividad */}
           <div className="mb-6">
-            <h3 className="text-lg font-medium mb-4">Historial de actividad</h3>
+            <h3 className="text-lg font-medium mb-4">
+              {t('common.suppliers.tracking.modal.activity.title')}
+            </h3>
 
             <div className="relative">
               {/* Línea de tiempo vertical */}
@@ -267,7 +355,7 @@ const TrackingModal = ({ isOpen, onClose, trackingItem }) => {
                       <div className="ml-4 flex-1">
                         <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
                           <p className="text-sm text-gray-500 mb-1">
-                            {formatDateTime(activity.date)}
+                            {formatDateTime(activity.date) || notAvailable}
                           </p>
                           <p className="font-medium">{activity.detail}</p>
                         </div>
@@ -281,29 +369,34 @@ const TrackingModal = ({ isOpen, onClose, trackingItem }) => {
 
           {/* Contenido del email (ejemplo) */}
           <Card>
-            <h3 className="text-lg font-medium mb-4">Contenido del email</h3>
+            <h3 className="text-lg font-medium mb-4">
+              {t('common.suppliers.tracking.modal.content.title')}
+            </h3>
             <div className="bg-gray-50 p-4 rounded-md border border-gray-200">
               <div className="mb-4">
                 <p>
-                  <strong>De:</strong> Tu Correo de MaLoveApp
+                  <strong>{t('common.suppliers.tracking.modal.content.fromLabel')}</strong>{' '}
+                  {t('common.suppliers.tracking.modal.content.fromValue')}
                 </p>
                 <p>
-                  <strong>Para:</strong> {trackingItem.recipientEmail || 'proveedor@ejemplo.com'}
+                  <strong>{t('common.suppliers.tracking.modal.content.toLabel')}</strong>{' '}
+                  {trackingItem.recipientEmail ||
+                    t('common.suppliers.tracking.modal.content.placeholderRecipientEmail')}
                 </p>
                 <p>
-                  <strong>Asunto:</strong> {trackingItem.subject}
+                  <strong>{t('common.suppliers.tracking.modal.content.subjectLabel')}</strong>{' '}
+                  {trackingItem.subject ||
+                    t('common.suppliers.tracking.modal.placeholders.subject')}
                 </p>
               </div>
               <div className="border-t border-gray-200 pt-4">
-                <p>Estimado proveedor,</p>
+                <p>{t('common.suppliers.tracking.modal.content.body.greeting')}</p>
                 <br />
-                <p>Este es un ejemplo del contenido del email que se envió al proveedor.</p>
-                <p>
-                  En una implementación real, aquí se mostraría el contenido real del email enviado.
-                </p>
+                <p>{t('common.suppliers.tracking.modal.content.body.intro')}</p>
+                <p>{t('common.suppliers.tracking.modal.content.body.note')}</p>
                 <br />
-                <p>Saludos cordiales,</p>
-                <p>Tu Nombre</p>
+                <p>{t('common.suppliers.tracking.modal.content.body.farewell')}</p>
+                <p>{t('common.suppliers.tracking.modal.content.body.signature')}</p>
               </div>
             </div>
           </Card>
@@ -313,19 +406,21 @@ const TrackingModal = ({ isOpen, onClose, trackingItem }) => {
         <div className="border-t p-4 bg-gray-50 flex justify-between">
           <div>
             <Button variant="outline" size="sm" className="flex items-center">
-              <Calendar size={16} className="mr-1" /> Programar seguimiento
+              <Calendar size={16} className="mr-1" />{' '}
+              {t('common.suppliers.tracking.modal.buttons.schedule')}
             </Button>
           </div>
           <div className="flex space-x-3">
             <Button variant="outline" onClick={onClose}>
-              Cerrar
+              {t('common.suppliers.tracking.modal.buttons.close')}
             </Button>
             <Button
               variant="outline"
               className="flex items-center"
               onClick={() => window.open(`mailto:${trackingItem.recipientEmail || ''}`)}
             >
-              <Mail size={16} className="mr-1" /> Responder
+              <Mail size={16} className="mr-1" />{' '}
+              {t('common.suppliers.tracking.modal.buttons.reply')}
             </Button>
           </div>
         </div>
@@ -335,5 +430,3 @@ const TrackingModal = ({ isOpen, onClose, trackingItem }) => {
 };
 
 export default TrackingModal;
-
-

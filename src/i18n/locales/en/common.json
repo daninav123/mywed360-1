@@ -1,4 +1,4 @@
-﻿{
+{
   "app": {
     "name": "MaLove.App",
     "brandName": "MaLoveApp",
@@ -1540,6 +1540,146 @@
         "splitSubmitting": "Creating…"
       }
     },
+    "tracking": {
+      "shared": {
+        "notAvailable": "—"
+      },
+      "status": {
+        "sent": "Sent",
+        "delivered": "Delivered",
+        "read": "Read",
+        "responded": "Responded",
+        "error": "Error",
+        "pending": "Pending",
+        "unknown": "Unknown"
+      },
+      "list": {
+        "filters": {
+          "all": "All",
+          "sent": "Sent",
+          "delivered": "Delivered",
+          "read": "Read",
+          "responded": "Responded",
+          "error": "Error",
+          "pending": "Pending"
+        },
+        "empty": "No tracking records match the selected filter.",
+        "placeholders": {
+          "provider": "Supplier",
+          "subject": "(No subject)"
+        },
+        "sentAt": "Sent: {{value}}",
+        "updatedAt": "Updated: {{value}}",
+        "openCount": "{{count, plural, one=Opened {{count}} time, other=Opened {{count}} times}}",
+        "details": "View details"
+      },
+      "modal": {
+        "title": "Email tracking",
+        "closeAria": "Close",
+        "placeholders": {
+          "recipient": "recipient",
+          "recipientEmail": "supplier@example.com",
+          "subject": "(No subject)"
+        },
+        "emailInfo": {
+          "title": "Email information",
+          "fields": {
+            "subject": "Subject",
+            "provider": "Supplier",
+            "recipient": "Recipient",
+            "sent": "Sent",
+            "updated": "Last updated",
+            "opens": "Opens"
+          },
+          "openCount": "{{count, plural, one=Opened {{count}} time, other=Opened {{count}} times}}",
+          "websiteLink": "View website: {{url}}"
+        },
+        "activities": {
+          "send": "Email sent to {{email}}",
+          "deliver": "Email delivered to the destination server",
+          "openFirst": "Email opened for the first time",
+          "openNth": "Open #{{index}}",
+          "errorDefault": "Email delivery error"
+        },
+        "activity": {
+          "title": "Activity history"
+        },
+        "error": {
+          "title": "Error",
+          "default": "Email delivery error"
+        },
+        "content": {
+          "title": "Email content",
+          "fromLabel": "From:",
+          "fromValue": "Your MaLoveApp email",
+          "toLabel": "To:",
+          "subjectLabel": "Subject:",
+          "placeholderRecipientEmail": "supplier@example.com",
+          "body": {
+            "greeting": "Hello supplier,",
+            "intro": "This is a sample of the email content that was sent to the supplier.",
+            "note": "In a real implementation, the actual email body would appear here.",
+            "farewell": "Best regards,",
+            "signature": "Your name"
+          }
+        },
+        "buttons": {
+          "schedule": "Schedule follow-up",
+          "close": "Close",
+          "reply": "Reply"
+        }
+      },
+      "card": {
+        "pendingTooltip": "Follow-up pending",
+        "statusFallback": "To define",
+        "nameFallback": "Supplier without name",
+        "serviceFallback": "Service not set",
+        "estimatedBudget": "Estimated budget",
+        "labels": {
+          "lastContact": "Last contact",
+          "nextStep": "Next step",
+          "owner": "Owner",
+          "nextPayment": "Next payment"
+        },
+        "buttons": {
+          "view": "View record",
+          "promote": "Promote to confirmed",
+          "schedule": "Log next action",
+          "archive": "Discard"
+        }
+      },
+      "pendingTodos": {
+        "tasks": "Pending tasks",
+        "followUps": "Follow-ups needed",
+        "assigned": "Assigned to-dos"
+      }
+    },
+    "kanban": {
+      "columns": {
+        "por_definir": "To classify",
+        "vistos": "Viewed",
+        "contactado": "Contacted",
+        "presupuesto": "Quote",
+        "contratado": "Contracted",
+        "rechazado": "Rejected"
+      },
+      "badges": {
+        "group": "Group: {{name}}",
+        "nextAction": "Next action: {{value}}"
+      },
+      "actions": {
+        "reset": "Reset",
+        "budget": "Quote",
+        "hire": "Mark as contracted",
+        "reject": "Mark as rejected"
+      },
+      "placeholders": {
+        "name": "Supplier",
+        "service": "Service",
+        "empty": "Drag suppliers here",
+        "notAvailable": "—"
+      }
+    },
     "aiSearchModal": {
       "title": "Smart search",
       "closeAria": "Close",
@@ -1621,6 +1761,12 @@
         "cancel": "Cancel",
         "send": "Send email",
         "sending": "Sending..."
+      }
+    },
+    "detail": {
+      "info": {
+        "nameFallback": "Unnamed supplier",
+        "serviceFallback": "Service not set"
       }
     }
   },

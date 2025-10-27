@@ -1,5 +1,7 @@
 import React, { useMemo } from 'react';
 
+import useTranslations from '../../hooks/useTranslations';
+
 function statusToColumn(status = '') {
   const value = String(status || '').toLowerCase();
   if (value.includes('vist')) return 'vistos';
@@ -10,19 +12,21 @@ function statusToColumn(status = '') {
   return 'por_definir';
 }
 
-const columns = [
-  { key: 'por_definir', label: 'Por definir' },
-  { key: 'vistos', label: 'Vistos' },
-  { key: 'contactado', label: 'Contactados' },
-  { key: 'presupuesto', label: 'Presupuesto' },
-  { key: 'contratado', label: 'Contratado' },
-  { key: 'rechazado', label: 'Rechazado' },
-];
+const COLUMN_KEYS = ['por_definir', 'vistos', 'contactado', 'presupuesto', 'contratado', 'rechazado'];
 
 export default function SupplierKanban({ proveedores = [], onMove, onClick, showNextAction = false, ...rest }) {
+  const { t } = useTranslations();
+  const columns = useMemo(
+    () =>
+      COLUMN_KEYS.map((key) => ({
+        key,
+        label: t(`common.suppliers.kanban.columns.${key}`),
+      })),
+    [t]
+  );
   const grouped = useMemo(() => {
-    const map = columns.reduce((acc, col) => {
-      acc[col.key] = [];
+    const map = COLUMN_KEYS.reduce((acc, key) => {
+      acc[key] = [];
       return acc;
     }, {});
     (proveedores || []).forEach((prov) => {
@@ -76,10 +80,10 @@ export default function SupplierKanban({ proveedores = [], onMove, onClick, show
                 <header className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
                     <h4 className="text-sm font-semibold text-gray-800 truncate">
-                      {prov.name || prov.nombre || 'Proveedor'}
+                      {prov.name || prov.nombre || t('common.suppliers.kanban.placeholders.name')}
                     </h4>
                     <p className="text-xs text-gray-500 truncate">
-                      {prov.service || prov.servicio || 'Servicio'}
+                      {prov.service || prov.servicio || t('common.suppliers.kanban.placeholders.service')}
                     </p>
                   </div>
                   {prov.intelligentScore?.score != null && (
@@ -94,7 +98,7 @@ export default function SupplierKanban({ proveedores = [], onMove, onClick, show
                   )}
                   {prov.groupName && (
                     <span className="px-2 py-0.5 rounded border border-amber-200 bg-amber-50 text-amber-700">
-                      Grupo: {prov.groupName}
+                      {t('common.suppliers.kanban.badges.group', { name: prov.groupName })}
                     </span>
                   )}
                   {prov.origin && (
@@ -104,7 +108,7 @@ export default function SupplierKanban({ proveedores = [], onMove, onClick, show
                   )}
                   {showNextAction && prov?.proximaAccion && (
                     <span className="px-2 py-0.5 rounded border border-blue-200 bg-blue-50 text-blue-700">
-                      Próxima acción: {prov.proximaAccion}
+                      {t('common.suppliers.kanban.badges.nextAction', { value: prov.proximaAccion })}
                     </span>
                   )}
                 </div>
@@ -116,8 +120,10 @@ export default function SupplierKanban({ proveedores = [], onMove, onClick, show
                       e.stopPropagation();
                       onMove?.(prov, 'vacio');
                     }}
+                    title={t('common.suppliers.kanban.actions.reset')}
+                    aria-label={t('common.suppliers.kanban.actions.reset')}
                   >
-                    Reset
+                    {t('common.suppliers.kanban.actions.reset')}
                   </button>
                   <button
                     type="button"
@@ -126,8 +132,10 @@ export default function SupplierKanban({ proveedores = [], onMove, onClick, show
                       e.stopPropagation();
                       onMove?.(prov, 'presupuestos');
                     }}
+                    title={t('common.suppliers.kanban.actions.budget')}
+                    aria-label={t('common.suppliers.kanban.actions.budget')}
                   >
-                    Presupuesto
+                    {t('common.suppliers.kanban.actions.budget')}
                   </button>
                   <button
                     type="button"
@@ -136,6 +144,8 @@ export default function SupplierKanban({ proveedores = [], onMove, onClick, show
                       e.stopPropagation();
                       onMove?.(prov, 'contratado');
                     }}
+                    title={t('common.suppliers.kanban.actions.hire')}
+                    aria-label={t('common.suppliers.kanban.actions.hire')}
                   >
                     ✓
                   </button>
@@ -146,6 +156,8 @@ export default function SupplierKanban({ proveedores = [], onMove, onClick, show
                       e.stopPropagation();
                       onMove?.(prov, 'rechazado');
                     }}
+                    title={t('common.suppliers.kanban.actions.reject')}
+                    aria-label={t('common.suppliers.kanban.actions.reject')}
                   >
                     ✕
                   </button>
@@ -154,7 +166,7 @@ export default function SupplierKanban({ proveedores = [], onMove, onClick, show
             ))}
             {(grouped[col.key] || []).length === 0 && (
               <div className="text-xs text-gray-400 italic text-center py-6 border border-dashed border-gray-200 rounded">
-                Arrastra proveedores aquí
+                {t('common.suppliers.kanban.placeholders.empty')}
               </div>
             )}
           </div>

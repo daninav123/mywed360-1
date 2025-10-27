@@ -17,7 +17,7 @@ const ADMIN_NAVIGATION = [
     items: [
       {
         id: 'portfolio',
-        label: 'Portfolio',
+        label: 'Bodas',
         path: '/admin/portfolio',
         description: 'Estado de bodas activas, owners y seguimiento operativo.',
       },
@@ -26,18 +26,6 @@ const ADMIN_NAVIGATION = [
         label: 'Usuarios',
         path: '/admin/users',
         description: 'Gestión de cuentas, roles y actividad reciente.',
-      },
-      {
-        id: 'broadcast',
-        label: 'Broadcast',
-        path: '/admin/broadcast',
-        description: 'Comunicaciones masivas y avisos críticos controlados.',
-      },
-      {
-        id: 'automations',
-        label: 'Automatizaciones',
-        path: '/admin/automations',
-        description: 'Mensajería programada (WhatsApp aniversario) y reglas globales.',
       },
       {
         id: 'commerce',
@@ -70,16 +58,16 @@ const ADMIN_NAVIGATION = [
     title: 'Infraestructura',
     items: [
       {
-        id: 'integrations',
-        label: 'Integraciones',
-        path: '/admin/integrations',
-        description: 'Estados de proveedores externos y gestión de incidencias.',
-      },
-      {
         id: 'alerts',
         label: 'Alertas',
         path: '/admin/alerts',
         description: 'Alertas en curso, severidad y flujo de resolución.',
+      },
+      {
+        id: 'broadcast',
+        label: 'Broadcast',
+        path: '/admin/broadcast',
+        description: 'Comunicaciones masivas y avisos críticos controlados.',
       },
     ],
   },
@@ -88,16 +76,16 @@ const ADMIN_NAVIGATION = [
     title: 'Configuración',
     items: [
       {
-        id: 'settings-global',
-        label: 'Global',
-        path: '/admin/settings',
-        description: 'Feature flags, secretos y plantillas globales.',
-      },
-      {
         id: 'task-templates',
         label: 'Plantillas tareas',
         path: '/admin/task-templates',
         description: 'Seed maestro de tareas padre/subtareas y versionado del checklist.',
+      },
+      {
+        id: 'automations',
+        label: 'Automatizaciones',
+        path: '/admin/automations',
+        description: 'Mensajería programada (WhatsApp aniversario) y reglas globales.',
       },
       {
         id: 'support',

@@ -31,7 +31,7 @@ import useTranslations from '../../hooks/useTranslations';
 const TABS = ['info', 'communications', 'contracts', 'insights'];
 
 const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, onOpenGroups }) => {
-  const { t } = useTranslations();
+  const { t, format } = useTranslations();
   const [rating, setRating] = useState(provider.ratingCount > 0 ? provider.rating / provider.ratingCount : 0);
   const [ratingDirty, setRatingDirty] = useState(false);
   const [savingRating, setSavingRating] = useState(false);
@@ -131,16 +131,17 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
     return 'bg-gray-100 text-gray-600';
   }, [portalStatus]);
 
-  const portalLastSubmitText = portalLastSubmit ? portalLastSubmit.toLocaleString() : null;
+  const portalLastSubmitText = portalLastSubmit ? format.datetime(portalLastSubmit) : null;
 
+  const portalStatusLabel = useMemo(
+    () => t(`common.suppliers.detail.portal.status.${portalStatus}`),
+    [portalStatus, t]
+  );
   const portalLastMessage = provider?.portalLastMessage || '';
-
-  const portalStatusLabel =
-    portalStatus === 'responded'
-      ? 'Respondido'
-      : portalStatus === 'pending'
-        ? 'Pendiente'
-        : 'Sin enlace';
+  const displayName =
+    provider?.name || provider?.nombre || t('common.suppliers.detail.info.nameFallback');
+  const displayService =
+    provider?.service || provider?.servicio || t('common.suppliers.detail.info.serviceFallback');
 
   const financialSummary = useMemo(() => {
     const payments = providerStatus?.payments?.amount || {};
@@ -180,16 +181,25 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
   const pendingTodos = useMemo(() => {
     const list = [];
     if (providerStatus?.tasks?.pending) {
-      list.push({ label: 'Tareas pendientes', value: providerStatus.tasks.pending });
+      list.push({
+        label: t('common.suppliers.detail.pendingTodos.tasks'),
+        value: providerStatus.tasks.pending,
+      });
     }
     if (providerStatus?.actions?.needFollowUp) {
-      list.push({ label: 'Seguimientos necesarios', value: providerStatus.actions.needFollowUp });
+      list.push({
+        label: t('common.suppliers.detail.pendingTodos.followUps'),
+        value: providerStatus.actions.needFollowUp,
+      });
     }
     if (Array.isArray(provider?.pendingTasks) && provider.pendingTasks.length > 0) {
-      list.push({ label: 'To-dos asignados', value: provider.pendingTasks.length });
+      list.push({
+        label: t('common.suppliers.detail.pendingTodos.assigned'),
+        value: provider.pendingTasks.length,
+      });
     }
     return list;
-  }, [providerStatus, provider]);
+  }, [providerStatus, provider, t]);
 
   const alertList = useMemo(() => {
     const alerts = [];
@@ -540,7 +550,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
       <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
           <div className="flex justify-between items-center p-4 border-b">
-            <h2 className="text-xl font-semibold">{provider.name}</h2>
+            <h2 className="text-xl font-semibold">{displayName}</h2>
             <button
               onClick={onClose}
               className="text-gray-500 hover:text-gray-700"
@@ -612,7 +622,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                           {t('common.suppliers.card.depositPaid')}
                         </span>
                       )}
-                      <span className="ml-2 text-gray-500">{provider.service}</span>
+                      <span className="ml-2 text-gray-500">{displayService}</span>
                       {!!provider.groupName && !groupCleared && (
                         <button
                           type="button"
@@ -684,7 +694,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
 
                   {provider.image && (
                     <div className="w-full h-64 overflow-hidden rounded-lg mb-4">
-                      <img src={provider.image} alt={provider.name} className="w-full h-full object-cover" />
+                      <img src={provider.image} alt={displayName} className="w-full h-full object-cover" />
                     </div>
                   )}
 

@@ -3,16 +3,56 @@ import React, { useMemo } from 'react';
 
 import Button from '../../../components/ui/Button';
 import Card from '../../../components/ui/Card';
+import useTranslations from '../../../hooks/useTranslations';
 
-const FILTERS = [
-  { key: 'todos', label: 'Todos' },
-  { key: 'enviado', label: 'Enviado' },
-  { key: 'entregado', label: 'Entregado' },
-  { key: 'leido', label: 'Leído' },
-  { key: 'responded', label: 'Respondido' },
-  { key: 'error', label: 'Error' },
-  { key: 'pendiente', label: 'Pendiente' },
+const FILTER_KEYS = [
+  'todos',
+  'enviado',
+  'entregado',
+  'leido',
+  'responded',
+  'error',
+  'pendiente',
 ];
+
+const FILTER_TO_TRANSLATION_KEY = {
+  todos: 'all',
+  enviado: 'sent',
+  entregado: 'delivered',
+  leido: 'read',
+  responded: 'responded',
+  error: 'error',
+  pendiente: 'pending',
+};
+
+const RAW_STATUS_TO_KEY = {
+  enviado: 'sent',
+  sent: 'sent',
+  entregado: 'delivered',
+  delivered: 'delivered',
+  leido: 'read',
+  leído: 'read',
+  read: 'read',
+  responded: 'responded',
+  completed: 'responded',
+  error: 'error',
+  urgent: 'error',
+  failed: 'error',
+  pendiente: 'pending',
+  waiting: 'pending',
+  waiting_response: 'pending',
+  followup: 'pending',
+};
+
+const STATUS_STYLES = {
+  sent: { color: 'text-blue-600', bg: 'bg-blue-100', Icon: Mail },
+  delivered: { color: 'text-green-600', bg: 'bg-green-100', Icon: CheckCircle },
+  read: { color: 'text-purple-600', bg: 'bg-purple-100', Icon: Eye },
+  responded: { color: 'text-emerald-600', bg: 'bg-emerald-100', Icon: CheckCircle },
+  error: { color: 'text-red-600', bg: 'bg-red-100', Icon: XCircle },
+  pending: { color: 'text-amber-600', bg: 'bg-amber-100', Icon: Clock },
+  unknown: { color: 'text-gray-600', bg: 'bg-gray-100', Icon: AlertCircle },
+};
 
 /**
  * @typedef {Object} EmailTrackingItem
@@ -30,63 +70,19 @@ const FILTERS = [
  */
 
 const EmailTrackingList = ({ trackingItems = [], onViewDetails, onFilter, currentFilter }) => {
+  const { t, format } = useTranslations();
+  const notAvailable = t('common.suppliers.tracking.shared.notAvailable');
+
   const getStatusInfo = (status) => {
-    switch (status) {
-      case 'enviado':
-        return {
-          color: 'text-blue-600',
-          bg: 'bg-blue-100',
-          icon: <Mail size={16} />,
-          label: 'Enviado',
-        };
-      case 'entregado':
-        return {
-          color: 'text-green-600',
-          bg: 'bg-green-100',
-          icon: <CheckCircle size={16} />,
-          label: 'Entregado',
-        };
-      case 'leido':
-        return {
-          color: 'text-purple-600',
-          bg: 'bg-purple-100',
-          icon: <Eye size={16} />,
-          label: 'Leído',
-        };
-      case 'responded':
-      case 'completed':
-        return {
-          color: 'text-emerald-600',
-          bg: 'bg-emerald-100',
-          icon: <CheckCircle size={16} />,
-          label: 'Respondido',
-        };
-      case 'error':
-      case 'urgent':
-        return {
-          color: 'text-red-600',
-          bg: 'bg-red-100',
-          icon: <XCircle size={16} />,
-          label: 'Error',
-        };
-      case 'pendiente':
-      case 'waiting':
-      case 'waiting_response':
-      case 'followup':
-        return {
-          color: 'text-amber-600',
-          bg: 'bg-amber-100',
-          icon: <Clock size={16} />,
-          label: 'Pendiente',
-        };
-      default:
-        return {
-          color: 'text-gray-600',
-          bg: 'bg-gray-100',
-          icon: <AlertCircle size={16} />,
-          label: 'Desconocido',
-        };
-    }
+    const key =
+      RAW_STATUS_TO_KEY[String(status || '').toLowerCase()] || 'unknown';
+    const { color, bg, Icon } = STATUS_STYLES[key] || STATUS_STYLES.unknown;
+    return {
+      color,
+      bg,
+      icon: <Icon size={16} />,
+      label: t(`common.suppliers.tracking.status.${key}`),
+    };
   };
 
   const list = useMemo(() => (Array.isArray(trackingItems) ? trackingItems : []), [trackingItems]);
@@ -106,13 +102,7 @@ const EmailTrackingList = ({ trackingItems = [], onViewDetails, onFilter, curren
             ? value
             : new Date(value);
       if (Number.isNaN(date.getTime())) return '';
-      return date.toLocaleString('es-ES', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      });
+      return format.datetime(date);
     } catch {
       return '';
     }
@@ -121,22 +111,24 @@ const EmailTrackingList = ({ trackingItems = [], onViewDetails, onFilter, curren
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap gap-2 mb-4">
-        {FILTERS.map((filter) => (
+        {FILTER_KEYS.map((key) => (
           <Button
-            key={filter.key}
+            key={key}
             size="sm"
-            variant={filter.key === currentFilter ? 'default' : 'outline'}
-            className={filter.key === currentFilter ? 'capitalize' : 'capitalize text-gray-600'}
-            onClick={() => onFilter(filter.key)}
+            variant={key === currentFilter ? 'default' : 'outline'}
+            className={key === currentFilter ? 'capitalize' : 'capitalize text-gray-600'}
+            onClick={() => onFilter(key)}
           >
-            {filter.label}
+            {t(
+              `common.suppliers.tracking.list.filters.${FILTER_TO_TRANSLATION_KEY[key] || 'all'}`
+            )}
           </Button>
         ))}
       </div>
 
       {filteredItems.length === 0 ? (
         <div className="text-center py-8 text-gray-500">
-          No hay registros de seguimiento que coincidan con el filtro seleccionado.
+          {t('common.suppliers.tracking.list.empty')}
         </div>
       ) : (
         <div className="space-y-3">
@@ -150,38 +142,50 @@ const EmailTrackingList = ({ trackingItems = [], onViewDetails, onFilter, curren
               <Card key={item.id} className="hover:shadow-md transition-shadow">
                 <div className="flex items-center justify-between">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-1">
-                      <h3 className="font-medium text-gray-900 truncate">
-                        {item.providerName || 'Proveedor'}
-                      </h3>
-                      <span
-                        className={`text-xs ${statusInfo.color} ${statusInfo.bg} flex items-center gap-1 px-2 py-1 rounded-full`}
-                      >
-                        {statusInfo.icon} {statusInfo.label}
-                      </span>
-                    </div>
+                  <div className="flex items-center justify-between mb-1">
+                    <h3 className="font-medium text-gray-900 truncate">
+                      {item.providerName ||
+                        t('common.suppliers.tracking.list.placeholders.provider')}
+                    </h3>
+                    <span
+                      className={`text-xs ${statusInfo.color} ${statusInfo.bg} flex items-center gap-1 px-2 py-1 rounded-full`}
+                    >
+                      {statusInfo.icon} {statusInfo.label}
+                    </span>
+                  </div>
 
                     <p className="text-sm font-medium text-gray-700 mb-1 truncate">
-                      {item.subject || '(Sin asunto)'}
+                  {item.subject ||
+                    t('common.suppliers.tracking.list.placeholders.subject')}
                     </p>
 
                     <div className="flex flex-wrap items-center gap-x-4 text-xs text-gray-500">
-                      <span>Enviado: {formatDateTime(sentAt)}</span>
+                      <span>
+                        {t('common.suppliers.tracking.list.sentAt', {
+                          value: formatDateTime(sentAt) || notAvailable,
+                        })}
+                      </span>
                       {updatedAt && updatedAt !== sentAt && (
-                        <span>Actualizado: {formatDateTime(updatedAt)}</span>
+                        <span>
+                          {t('common.suppliers.tracking.list.updatedAt', {
+                            value: formatDateTime(updatedAt) || notAvailable,
+                          })}
+                        </span>
                       )}
                       {emailLabel && <span>{emailLabel}</span>}
                       {item.openCount > 0 && (
                         <span className="text-green-600 flex items-center">
-                          <Eye size={12} className="mr-1" /> Abierto {item.openCount}{' '}
-                          {item.openCount === 1 ? 'vez' : 'veces'}
+                          <Eye size={12} className="mr-1" />
+                          {t('common.suppliers.tracking.list.openCount', {
+                            count: item.openCount,
+                          })}
                         </span>
                       )}
                     </div>
                   </div>
 
                   <Button size="sm" variant="ghost" onClick={() => onViewDetails(item)}>
-                    Detalles
+                    {t('common.suppliers.tracking.list.details')}
                   </Button>
                 </div>
               </Card>

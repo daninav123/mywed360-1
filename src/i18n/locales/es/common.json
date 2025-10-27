@@ -1,4 +1,4 @@
-﻿{
+{
   "accion_cancelada": "Acción cancelada",
   "acciones_creadas_manualmente_los_ultimos": "Acciones creadas manualmente en los últimos 14 días",
   "acompanantes": "Acompañantes",
@@ -442,7 +442,7 @@
       "optionAuthor": "Autor",
       "optionKeyword": "Palabra clave",
       "placeholder": "Buscar...",
-    "submit": "Buscar"
+      "submit": "Buscar"
     },
     "aiSearchModal": {
       "title": "Búsqueda inteligente de proveedores",
@@ -2529,8 +2529,7 @@
     "configureServices": "Configurar servicios deseados",
     "suggested": "Sugeridos",
     "addServicePlaceholder": "Añadir servicio (ej. Fotografía)",
-    "noServicesAdded": "An no has aadido servicios."
-    ,
+    "noServicesAdded": "An no has aadido servicios.",
     "assignModal": {
       "title": "Agrupar ({{count}})",
       "selectedWithNames": "Seleccionados: {{names}}",
@@ -2781,6 +2780,146 @@
         "splitSubmitting": "Creando…"
       }
     },
+    "tracking": {
+      "shared": {
+        "notAvailable": "—"
+      },
+      "status": {
+        "sent": "Enviado",
+        "delivered": "Entregado",
+        "read": "Leído",
+        "responded": "Respondido",
+        "error": "Error",
+        "pending": "Pendiente",
+        "unknown": "Desconocido"
+      },
+      "list": {
+        "filters": {
+          "all": "Todos",
+          "sent": "Enviado",
+          "delivered": "Entregado",
+          "read": "Leído",
+          "responded": "Respondido",
+          "error": "Error",
+          "pending": "Pendiente"
+        },
+        "empty": "No hay registros de seguimiento que coincidan con el filtro seleccionado.",
+        "placeholders": {
+          "provider": "Proveedor",
+          "subject": "(Sin asunto)"
+        },
+        "sentAt": "Enviado: {{value}}",
+        "updatedAt": "Actualizado: {{value}}",
+        "openCount": "{{count, plural, one=Abierto {{count}} vez, other=Abierto {{count}} veces}}",
+        "details": "Detalles"
+      },
+      "modal": {
+        "title": "Seguimiento de email",
+        "closeAria": "Cerrar",
+        "placeholders": {
+          "recipient": "destinatario",
+          "recipientEmail": "proveedor@ejemplo.com",
+          "subject": "(Sin asunto)"
+        },
+        "emailInfo": {
+          "title": "Información del email",
+          "fields": {
+            "subject": "Asunto",
+            "provider": "Proveedor",
+            "recipient": "Destinatario",
+            "sent": "Enviado",
+            "updated": "Última actualización",
+            "opens": "Aperturas"
+          },
+          "openCount": "{{count, plural, one=Abierto {{count}} vez, other=Abierto {{count}} veces}}",
+          "websiteLink": "Ver sitio: {{url}}"
+        },
+        "activities": {
+          "send": "Email enviado a {{email}}",
+          "deliver": "Email entregado al servidor de destino",
+          "openFirst": "Email abierto por primera vez",
+          "openNth": "Apertura #{{index}}",
+          "errorDefault": "Error en la entrega del email"
+        },
+        "activity": {
+          "title": "Historial de actividad"
+        },
+        "error": {
+          "title": "Error",
+          "default": "Error en la entrega del email"
+        },
+        "content": {
+          "title": "Contenido del email",
+          "fromLabel": "De:",
+          "fromValue": "Tu correo de MaLoveApp",
+          "toLabel": "Para:",
+          "subjectLabel": "Asunto:",
+          "placeholderRecipientEmail": "proveedor@ejemplo.com",
+          "body": {
+            "greeting": "Estimado proveedor,",
+            "intro": "Este es un ejemplo del contenido del email que se envió al proveedor.",
+            "note": "En una implementación real, aquí se mostraría el contenido real del email enviado.",
+            "farewell": "Saludos cordiales,",
+            "signature": "Tu nombre"
+          }
+        },
+        "buttons": {
+          "schedule": "Programar seguimiento",
+          "close": "Cerrar",
+          "reply": "Responder"
+        }
+      },
+      "card": {
+        "pendingTooltip": "Pendiente de seguimiento",
+        "statusFallback": "Por definir",
+        "nameFallback": "Proveedor sin nombre",
+        "serviceFallback": "Servicio sin definir",
+        "estimatedBudget": "Presupuesto estimado",
+        "labels": {
+          "lastContact": "Último contacto",
+          "nextStep": "Próximo paso",
+          "owner": "Responsable",
+          "nextPayment": "Próximo pago"
+        },
+        "buttons": {
+          "view": "Ver ficha",
+          "promote": "Promover a confirmado",
+          "schedule": "Registrar próxima acción",
+          "archive": "Descartar"
+        }
+      },
+      "pendingTodos": {
+        "tasks": "Tareas pendientes",
+        "followUps": "Seguimientos necesarios",
+        "assigned": "To-dos asignados"
+      }
+    },
+    "kanban": {
+      "columns": {
+        "por_definir": "Por definir",
+        "vistos": "Vistos",
+        "contactado": "Contactados",
+        "presupuesto": "Presupuesto",
+        "contratado": "Contratado",
+        "rechazado": "Rechazado"
+      },
+      "badges": {
+        "group": "Grupo: {{name}}",
+        "nextAction": "Próxima acción: {{value}}"
+      },
+      "actions": {
+        "reset": "Reset",
+        "budget": "Presupuesto",
+        "hire": "Marcar como contratado",
+        "reject": "Marcar como rechazado"
+      },
+      "placeholders": {
+        "name": "Proveedor",
+        "service": "Servicio",
+        "empty": "Arrastra proveedores aquí",
+        "notAvailable": "—"
+      }
+    },
     "providerEmailModal": {
       "title": "Contactar proveedor",
       "closeAria": "Cerrar",
@@ -3004,7 +3143,12 @@
         "openInbox": "Ver correo",
         "detailsTitle": "Ver detalles de seguimiento",
         "details": "Detalles",
-        "defaultSubject": "Mensaje para {{name}}"
+        "defaultSubject": "Mensaje para {{name}}",
+        "pendingTodos": {
+          "tasks": "Tareas pendientes",
+          "followUps": "Seguimientos necesarios",
+          "assigned": "To-dos asignados"
+        }
       },
       "emails": {
         "toggleTitle": "Ver correos relacionados",
@@ -3132,12 +3276,6 @@
         "title": "Comunicaciones",
         "subtitle": "Historial de comunicaciones con este proveedor."
       },
-      "preview": {
-        "title": "Vista previa",
-        "imageAlt": "Vista previa",
-        "pdfTitle": "PDF",
-        "openExternal": "Abrir en nueva pestaña"
-      },
       "toasts": {
         "paySuggestionsError": "No se pudieron obtener sugerencias.",
         "payStartError": "No se pudo iniciar el pago.",
@@ -3163,6 +3301,11 @@
         "pendingPayments": "Existen pagos pendientes por registrar o confirmar.",
         "styleBalance": "Revisar equilibrio de estilo: este proveedor afecta el contraste configurado."
       },
+      "pendingTodos": {
+        "tasks": "Tareas pendientes",
+        "followUps": "Seguimientos necesarios",
+        "assigned": "To-dos asignados"
+      },
       "info": {
         "contact": "Contacto",
         "phone": "Teléfono",
@@ -3171,6 +3314,8 @@
         "date": "Fecha",
         "location": "Ubicación",
         "priceRange": "Rango de precios",
+        "nameFallback": "Proveedor sin nombre",
+        "serviceFallback": "Servicio sin definir",
         "registerManual": "Registrar contacto manual",
         "ratingTitle": "Calificación",
         "ratingSummary": "{{value}} de {{total}} ({{count}} valoraciones)",

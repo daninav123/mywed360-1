@@ -44,7 +44,7 @@ const generateAISummary = (item, query) => {
   return highlights.join(' ');
 };
 
-const normalizeResult = (item, index, query, source) => {
+const normalizeResult = (item, index, query) => {
   const name = (item?.name || item?.title || `Proveedor sugerido ${index + 1}`).trim();
   const service = (item?.service || item?.category || guessServiceFromQuery(query)).trim();
   const location = item?.location || item?.city || '';
@@ -52,7 +52,7 @@ const normalizeResult = (item, index, query, source) => {
   const snippet = item?.snippet || item?.description || '';
   const link = item?.link || item?.url || item?.website || '';
   const match = ensureMatchScore(item?.match, index);
-  const aiSummary = item?.aiSummary || '';
+  const aiSummary = item?.aiSummary || generateAISummary(item, query);
   const image = item?.image || '';
   const email = item?.email || '';
   const phone = item?.phone || '';
@@ -77,7 +77,6 @@ const normalizeResult = (item, index, query, source) => {
     link,
     email,
     phone,
-    source,
     raw: item,
   };
 };
@@ -149,8 +148,7 @@ const normalizeProviderRecord = (item, index, query, inferredService) => {
       keywords: Array.from(tagsSet),
     },
     index,
-    query,
-    'database'
+    query
   );
 };
 
@@ -359,22 +357,21 @@ export const useAISearch = () => {
                 .filter((item) => item && (item.title || item.name))
                 .map((item, index) =>
                   normalizeResult(
-                    {
-                      ...item,
-                      name: item.name || item.title,
-                      service: item.service || inferredService,
-                      priceRange: item.priceRange || item.price,
-                      snippet: item.snippet,
-                      image: item.image || '',
-                      link: item.link || item.url || '',
-                      email: item.email || '',
-                      phone: item.phone || '',
-                      tags: item.tags || [],
-                    },
-                    index,
-                    query,
-                    'ai-backend'
-                  )
+                  {
+                    ...item,
+                    name: item.name || item.title,
+                    service: item.service || inferredService,
+                    priceRange: item.priceRange || item.price,
+                    snippet: item.snippet,
+                    image: item.image || '',
+                    link: item.link || item.url || '',
+                    email: item.email || '',
+                    phone: item.phone || '',
+                    tags: item.tags || [],
+                  },
+                  index,
+                  query
+                )
                 );
               if (normalized.length) {
                 console.log('[useAISearch] ✅ Proveedores normalizados:', normalized.length);

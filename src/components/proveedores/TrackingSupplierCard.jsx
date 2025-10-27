@@ -14,8 +14,9 @@ import React from 'react';
 
 import Button from '../ui/Button';
 import Card from '../ui/Card';
+import useTranslations from '../../hooks/useTranslations';
 
-const formatField = (value, placeholder = '—') => {
+const formatField = (value, placeholder) => {
   if (!value) return placeholder;
   return value;
 };
@@ -30,10 +31,18 @@ export default function TrackingSupplierCard({
   onDetail,
   onArchive,
 }) {
+  const { t } = useTranslations();
+  const notAvailable = t('common.suppliers.tracking.shared.notAvailable');
   const statusBadge =
     provider?.status && typeof provider.status === 'string'
       ? provider.status.trim()
-      : 'Por definir';
+      : '';
+  const displayStatus = statusBadge || t('common.suppliers.tracking.card.statusFallback');
+  const name = provider?.name || provider?.nombre || t('common.suppliers.tracking.card.nameFallback');
+  const service =
+    provider?.service ||
+    provider?.servicio ||
+    t('common.suppliers.tracking.card.serviceFallback');
 
   return (
     <Card
@@ -52,21 +61,21 @@ export default function TrackingSupplierCard({
       {hasPending && (
         <span
           className="absolute top-3 right-3 h-2.5 w-2.5 rounded-full bg-red-500 shadow-inner shadow-red-200"
-          title="Pendiente de seguimiento"
+          title={t('common.suppliers.tracking.card.pendingTooltip')}
         />
       )}
 
       <header className="pl-10 pr-3 pt-2 flex items-start justify-between gap-2">
         <div className="space-y-1">
           <h3 className="text-lg font-semibold text-[color:var(--color-text)] line-clamp-1">
-            {provider?.name || provider?.nombre || 'Proveedor sin nombre'}
+            {name}
           </h3>
           <div className="flex flex-wrap items-center gap-2">
             <span className="inline-flex items-center rounded-full bg-[var(--color-primary)]/10 px-2 py-0.5 text-xs font-medium text-[var(--color-primary)]">
-              {provider?.service || provider?.servicio || 'Servicio sin definir'}
+              {service}
             </span>
             <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
-              {statusBadge}
+              {displayStatus}
             </span>
             {Number.isFinite(provider?.intelligentScore?.score) && (
               <span className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-600">
@@ -77,7 +86,9 @@ export default function TrackingSupplierCard({
         </div>
         {provider?.priceRange && (
           <div className="text-right text-sm text-[color:var(--color-text)]/70">
-            <p className="font-medium">Presupuesto estimado</p>
+            <p className="font-medium">
+              {t('common.suppliers.tracking.card.estimatedBudget')}
+            </p>
             <p className="font-semibold text-[color:var(--color-text)]">{provider.priceRange}</p>
           </div>
         )}
@@ -88,37 +99,37 @@ export default function TrackingSupplierCard({
           <div className="flex items-center gap-2">
             <Clock size={14} className="text-[var(--color-primary)]" />
             <span className="text-xs uppercase tracking-wide text-[color:var(--color-text)]/50">
-              Último contacto
+              {t('common.suppliers.tracking.card.labels.lastContact')}
             </span>
             <span className="font-medium text-[color:var(--color-text)]">
-              {formatField(provider?.lastContact || provider?.contactedAt)}
+              {formatField(provider?.lastContact || provider?.contactedAt, notAvailable)}
             </span>
           </div>
           <div className="flex items-center gap-2">
             <ArrowUpRight size={14} className="text-[var(--color-primary)]" />
             <span className="text-xs uppercase tracking-wide text-[color:var(--color-text)]/50">
-              Próximo paso
+              {t('common.suppliers.tracking.card.labels.nextStep')}
             </span>
             <span className="font-medium text-[color:var(--color-text)]">
-              {formatField(provider?.nextAction)}
+              {formatField(provider?.nextAction, notAvailable)}
             </span>
           </div>
           <div className="flex items-center gap-2">
             <User size={14} className="text-[var(--color-primary)]" />
             <span className="text-xs uppercase tracking-wide text-[color:var(--color-text)]/50">
-              Responsable
+              {t('common.suppliers.tracking.card.labels.owner')}
             </span>
             <span className="font-medium text-[color:var(--color-text)]">
-              {formatField(provider?.owner || provider?.responsable)}
+              {formatField(provider?.owner || provider?.responsable, notAvailable)}
             </span>
           </div>
           <div className="flex items-center gap-2">
             <Calendar size={14} className="text-[var(--color-primary)]" />
             <span className="text-xs uppercase tracking-wide text-[color:var(--color-text)]/50">
-              Próximo pago
+              {t('common.suppliers.tracking.card.labels.nextPayment')}
             </span>
             <span className="font-medium text-[color:var(--color-text)]">
-              {formatField(provider?.nextPaymentDate || provider?.paymentDate)}
+              {formatField(provider?.nextPaymentDate || provider?.paymentDate, notAvailable)}
             </span>
           </div>
         </div>
@@ -152,7 +163,7 @@ export default function TrackingSupplierCard({
             onDetail?.();
           }}
         >
-          <EyeIcon size={14} className="mr-1" /> Ver ficha
+          <EyeIcon size={14} className="mr-1" /> {t('common.suppliers.tracking.card.buttons.view')}
         </Button>
         <Button
           size="sm"
@@ -162,7 +173,7 @@ export default function TrackingSupplierCard({
             onPromote?.();
           }}
         >
-          <CheckCircle2 size={14} className="mr-1" /> Promover a confirmado
+          <CheckCircle2 size={14} className="mr-1" /> {t('common.suppliers.tracking.card.buttons.promote')}
         </Button>
         <Button
           variant="outline"
@@ -173,7 +184,7 @@ export default function TrackingSupplierCard({
             onSchedule?.();
           }}
         >
-          <Calendar size={14} className="mr-1" /> Registrar próxima acción
+          <Calendar size={14} className="mr-1" /> {t('common.suppliers.tracking.card.buttons.schedule')}
         </Button>
         <Button
           variant="ghost"
@@ -184,7 +195,7 @@ export default function TrackingSupplierCard({
             onArchive?.();
           }}
         >
-          <Trash2 size={14} className="mr-1" /> Descartar
+          <Trash2 size={14} className="mr-1" /> {t('common.suppliers.tracking.card.buttons.archive')}
         </Button>
       </footer>
     </Card>
