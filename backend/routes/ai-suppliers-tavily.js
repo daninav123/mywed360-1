@@ -769,13 +769,14 @@ router.post('/', async (req, res) => {
           return false;
         }
         
-        // Para bodas.net: PREFERIR URLs con ID pero no descartar si no lo tienen
-        // Esto permite que pasen más resultados inicialmente
+        // Para bodas.net: REQUERIR ID numérico (perfil específico)
+        // ✅ bodas.net/fotografia/nombre--e123456 → ACEPTAR (tiene --e12345)
+        // ❌ bodas.net/bodas/proveedores/fotografos/valencia → DESCARTAR (sin ID)
         if (urlLower.includes('bodas.net')) {
-          const hasNumericId = /[-_]e\d{5,}|\/\d{6,}/.test(urlObj.pathname);
+          const hasNumericId = /--e\d{5,}/.test(urlObj.pathname);
           if (!hasNumericId) {
-            console.log(`⚠️ [FILTRO-URL] bodas.net sin ID claro (se mantiene): ${url}`);
-            // NO descartamos - puede ser válido
+            console.log(`❌ [FILTRO-URL] bodas.net sin ID de proveedor (página de listado): ${url}`);
+            return false;
           }
         }
         
