@@ -7,12 +7,234 @@
 
 ## 🎯 Objetivo
 
-Búsqueda **web real** de proveedores de bodas usando **Tavily Search API** + **scraping automático** para obtener:
+Búsqueda **inteligente** de proveedores de bodas usando **GPT + Tavily Search API** + **scraping automático**:
 
-- ✅ **Tarjetas de PROVEEDORES REALES**: Perfiles de empresas/profesionales específicos
-- ✅ **Datos de contacto reales**: Email, Teléfono, Instagram del proveedor
-- ✅ **Información completa**: Nombre, Ubicación, Imagen, Link
-- ❌ **NO se aceptan**: Motores de búsqueda, directorios, listados de múltiples proveedores
+- 🧠 **GPT enriquece la búsqueda**: Analiza qué datos son relevantes (ubicación, presupuesto, estilo)
+- 🌐 **Tavily busca en internet REAL**: bodas.net, sitios propios, Instagram profesional
+- 🗑️ **Filtra páginas de listado**: Solo perfiles específicos, NO buscadores de bodas.net
+- 🔄 **Deduplica por contacto**: Email > Teléfono > URL > Nombre (un proveedor = una tarjeta)
+- 📇 **Tarjeta completa**: Nombre, descripción, imagen, email, teléfono, web, Instagram
+
+**Resultado final:**
+- ✅ **Proveedores REALES únicos** con datos de contacto verificados
+- ❌ **NO listados**, NO directorios, NO duplicados
+
+---
+
+## 🔄 **Flujo Completo del Sistema**
+
+### **PASO 1: 🧠 GPT Enriquece la Búsqueda**
+
+**Entrada:**
+```javascript
+query: "fotógrafo"
+location: "Valencia"
+budget: "2000€"
+service: "fotografía"
+```
+
+**Proceso:**
+```javascript
+// GPT analiza y decide qué datos añadir a la búsqueda
+async function enrichQueryWithGPT(query, location, budget, service) {
+  // Prompt: "Analiza esta búsqueda y crea query optimizada..."
+  // GPT decide: ubicación es crítica, presupuesto puede omitirse
+}
+```
+
+**Salida:**
+```javascript
+enrichedQuery: "fotógrafo de bodas Valencia contacto email teléfono"
+```
+
+**¿Por qué GPT?**
+- ✅ Decide automáticamente qué datos son relevantes
+- ✅ No sobrecarga la búsqueda con info innecesaria
+- ✅ Optimiza para encontrar proveedores con datos de contacto
+
+---
+
+### **PASO 2: 🌐 Tavily Busca en Internet Real**
+
+**Query enviada a Tavily:**
+```javascript
+searchQuery: "fotógrafo de bodas Valencia contacto -buscar -encuentra -directorio"
+```
+
+**Tavily busca en:**
+- ✅ bodas.net (motor especializado en bodas España)
+- ✅ bodas.com.mx, matrimonio.com.co (otros países)
+- ✅ zankyou.es, casar.com (directorios especializados)
+- ✅ Sitios web propios (.com, .es)
+- ✅ Instagram profesional
+
+**Excluye automáticamente:**
+- ❌ wikipedia.org
+- ❌ wallapop.com, milanuncios.com
+- ❌ amazon, ebay, pinterest
+- ❌ youtube.com
+
+**Resultados Tavily (50 URLs):**
+```javascript
+[
+  { url: "bodas.net/fotografia/delia--e123456", title: "Delia Fotógrafos", ... },
+  { url: "bodas.net/fotografia", title: "Fotógrafos Valencia", ... },  // ← Listado
+  { url: "juanlopezfoto.com", title: "Juan López Fotografía", ... },
+  { url: "bodas.net/fotografia/juan--e789012", title: "Juan López", ... },  // ← Duplicado
+  { url: "instagram.com/deliafotografos", title: "Delia Fotógrafos IG", ... },  // ← Duplicado
+  { url: "wikipedia.org/...", title: "Fotografía", ... }  // ← No relevante
+]
+```
+
+---
+
+### **PASO 3: 🗑️ Filtrar Páginas de Listado**
+
+**Filtros aplicados:**
+
+**A. Dominio no relevante:**
+```javascript
+❌ wikipedia.org → DESCARTADO
+❌ wallapop.com → DESCARTADO
+✅ bodas.net → PASA (puede tener perfiles)
+✅ juanlopezfoto.com → PASA
+```
+
+**B. Patrón de listado en URL:**
+```javascript
+❌ bodas.net/fotografia → DESCARTADO (categoría sin ID)
+❌ bodas.net/buscar?q=foto → DESCARTADO (buscador)
+✅ bodas.net/fotografia/delia--e123456 → PASA (tiene ID)
+✅ juanlopezfoto.com → PASA
+```
+
+**C. Título de listado:**
+```javascript
+❌ "Encuentra los mejores fotógrafos" → DESCARTADO
+❌ "Directorio de proveedores" → DESCARTADO
+✅ "Delia Fotógrafos" → PASA
+✅ "Juan López Fotografía" → PASA
+```
+
+**D. Contenido de listado:**
+```javascript
+❌ "Compara precios de todos los fotógrafos..." → DESCARTADO
+✅ "Somos un equipo de fotógrafos profesionales..." → PASA
+```
+
+**Resultados después del filtrado (20 proveedores):**
+```javascript
+[
+  { url: "bodas.net/fotografia/delia--e123456", ... },
+  { url: "juanlopezfoto.com", ... },
+  { url: "bodas.net/fotografia/juan--e789012", ... },
+  { url: "instagram.com/deliafotografos", ... }
+]
+```
+
+---
+
+### **PASO 4: 🔄 Deduplicación por Contacto**
+
+**Prioridad de deduplicación:** Email > Teléfono > URL > Nombre
+
+**Ejemplo:**
+
+```javascript
+ANTES (4 resultados):
+1. "Delia Fotógrafos" (bodas.net)
+   email: info@deliafotografos.com
+   phone: +34 612 345 678
+
+2. "Delia Photography" (deliafotografos.com)
+   email: info@deliafotografos.com  ← MISMO EMAIL
+   phone: +34 612 345 678
+
+3. "Delia Studio" (instagram.com/deliafotografos)
+   email: contacto@deliafotografos.com
+   phone: +34 612 345 678  ← MISMO TELÉFONO
+
+4. "Juan López Fotografía" (juanlopezfoto.com)
+   email: juan@lopez.com
+   phone: +34 666 777 888
+
+DEDUPLICACIÓN:
+→ #1: ✅ SE MANTIENE (primer email)
+→ #2: ❌ DESCARTADO (email duplicado)
+→ #3: ❌ DESCARTADO (teléfono duplicado)
+→ #4: ✅ SE MANTIENE (email y teléfono únicos)
+
+DESPUÉS (2 resultados únicos):
+1. "Delia Fotógrafos" (bodas.net)
+2. "Juan López Fotografía" (juanlopezfoto.com)
+```
+
+**Logs:**
+```
+🗑️ [DEDUP-EMAIL] Delia Photography (info@deliafotografos.com)
+🗑️ [DEDUP-PHONE] Delia Studio (+34 612 345 678)
+🔄 [DEDUP] 4 → 2 resultados únicos
+```
+
+**Beneficio:** **Un proveedor = una tarjeta**, aunque tenga múltiples URLs
+
+---
+
+### **PASO 5: 📇 Tarjeta Completa del Proveedor**
+
+**Scraping automático de cada URL:**
+```javascript
+// Para cada proveedor único, scraping de:
+- Email (regex en contenido HTML)
+- Teléfono (regex +34, 6XX, 9XX)
+- Instagram (buscar links a instagram.com)
+- Imagen (og:image, twitter:image, primera imagen grande)
+```
+
+**Formato final de cada tarjeta:**
+```json
+{
+  "name": "Delia Fotógrafos",
+  "snippet": "Especialistas en fotografía de bodas en Valencia. Estilo natural y reportaje documental.",
+  "image": "https://bodas.net/img/delia-portfolio.jpg",
+  "email": "info@deliafotografos.com",
+  "phone": "+34 612 345 678",
+  "link": "https://bodas.net/fotografia/delia-fotografos--e123456",
+  "instagram": "https://instagram.com/deliafotografos",
+  "location": "Valencia",
+  "service": "Fotografía",
+  "score": 0.95
+}
+```
+
+**Todos los campos que el usuario necesita:**
+- ✅ Nombre limpio
+- ✅ Descripción breve
+- ✅ Imagen del trabajo
+- ✅ Email de contacto
+- ✅ Teléfono
+- ✅ Enlace al perfil completo
+- ✅ Instagram profesional
+
+---
+
+### **Resumen del Flujo:**
+
+```
+USUARIO → "fotógrafo"
+    ↓
+GPT → "fotógrafo de bodas Valencia contacto"
+    ↓
+TAVILY → 50 URLs de internet
+    ↓
+FILTRO → 20 perfiles específicos (sin listados)
+    ↓
+DEDUPLICACIÓN → 12 proveedores únicos
+    ↓
+SCRAPING → Datos completos
+    ↓
+USUARIO ← 12 tarjetas con email/teléfono/Instagram
+```
 
 ---
 
