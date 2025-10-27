@@ -1,5 +1,5 @@
 import React from 'react';
-import { useWedding } from '../../context/WeddingContext';
+import { Calendar } from 'react-big-calendar';
 import { formatDate } from '../../utils/formatUtils';
 
 export default function EventsCalendar({

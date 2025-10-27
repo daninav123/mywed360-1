@@ -1,14 +1,9 @@
 import React, { useRef, useState, useEffect, useCallback, useMemo } from 'react';
-const normalizeLang = (l) =>
-  String(l || 'es')
-    .toLowerCase()
-    .match(/^[a-z]{2}/)?.[0] || 'es';
+import { collection, doc, onSnapshot } from 'firebase/firestore';
 import { useTranslation } from 'react-i18next';
-import useTranslations from '../hooks/useTranslations';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
-// import anterior eliminado: useUserContext
 import { getBackendBase } from '@/utils/backendBase.js';
 
 import ExternalImage from './ExternalImage';
@@ -16,7 +11,6 @@ import Input from './Input';
 import Nav from './Nav';
 import PlannerDashboard from './PlannerDashboard';
 import ProviderSearchModal from './ProviderSearchModal';
-import { useAuth } from '../hooks/useAuth'; // Nuevo sistema
 import { Card } from './ui/Card';
 import { Progress } from './ui/Progress';
 
@@ -31,11 +25,42 @@ import {
   Phone,
 } from 'lucide-react';
 
+import { db } from '../firebaseConfig';
+import { useAuth } from '../hooks/useAuth'; // Nuevo sistema
+import useTranslations from '../hooks/useTranslations';
 import useFinance from '../hooks/useFinance';
 import { useWedding } from '../context/WeddingContext';
 import { fetchWeddingNews } from '../services/blogService';
 import { fetchWall } from '../services/wallService';
 import { getSummary as getGamificationSummary } from '../services/GamificationService';
+import { isConfirmedStatus } from '../utils/supplierStatus';
+
+const normalizeLang = (l) =>
+  String(l || 'es')
+    .toLowerCase()
+    .match(/^[a-z]{2}/)?.[0] || 'es';
+
+const dedupeServiceList = (entries) => {
+  if (!Array.isArray(entries)) return [];
+  const unique = [];
+  const seen = new Set();
+  for (const entry of entries) {
+    let value = '';
+    if (typeof entry === 'string') {
+      value = entry.trim();
+    } else if (entry && typeof entry === 'object') {
+      if (typeof entry.name === 'string') value = entry.name.trim();
+      else if (typeof entry.label === 'string') value = entry.label.trim();
+      else if (typeof entry.value === 'string') value = entry.value.trim();
+    }
+    if (!value) continue;
+    const key = value.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    unique.push(value);
+  }
+  return unique;
+};
 
 // Las categorías se traducirán usando el hook useTranslations
 const getInspirationCategories = (t) => [
@@ -1064,4 +1089,3 @@ export default function HomePage() {
     </React.Fragment>
   );
 }
-

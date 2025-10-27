@@ -175,6 +175,29 @@
     "success": "We've sent you an email with instructions to reset your password.",
     "error": "Could not send the reset email."
   },
+  "notificationPreferences": {
+    "title": "Notification Preferences",
+    "loading": "Loading preferences...",
+    "loadError": "Could not load preferences. Please try again later.",
+    "channels": {
+      "title": "Active Channels",
+      "description": "Choose the channels you want to use to receive important notifications.",
+      "email": "Email",
+      "inapp": "In-app notifications",
+      "push": "Push (optional)"
+    },
+    "quietHours": {
+      "title": "Quiet Hours (optional)",
+      "description": "Set a time range when we won't send notifications. Leave empty to receive alerts at any time.",
+      "from": "to",
+      "startPlaceholder": "10:00 PM",
+      "endPlaceholder": "7:00 AM"
+    },
+    "save": "Save changes",
+    "saving": "Saving...",
+    "saveSuccess": "Preferences saved successfully.",
+    "saveError": "Error saving preferences. Please try again."
+  },
   "authSignup": {
     "title": "Create your account",
     "subtitle": "Register with your email or continue with your favourite social account.",

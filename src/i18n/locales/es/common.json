@@ -223,6 +223,29 @@
     "success": "Te enviamos un correo con instrucciones para restablecer tu contraseña.",
     "error": "No se pudo enviar el correo de restablecimiento."
   },
+  "notificationPreferences": {
+    "title": "Preferencias de notificación",
+    "loading": "Cargando preferencias...",
+    "loadError": "No se pudieron cargar las preferencias. Intenta de nuevo más tarde.",
+    "channels": {
+      "title": "Canales activos",
+      "description": "Escoge los canales que quieres utilizar para recibir avisos importantes.",
+      "email": "Email",
+      "inapp": "Notificaciones en la app",
+      "push": "Push (opcional)"
+    },
+    "quietHours": {
+      "title": "Horario de silencio (opcional)",
+      "description": "Define una franja en la que no enviaremos avisos. Déjalo vacío para recibir alertas en cualquier momento.",
+      "from": "a",
+      "startPlaceholder": "22:00",
+      "endPlaceholder": "07:00"
+    },
+    "save": "Guardar cambios",
+    "saving": "Guardando...",
+    "saveSuccess": "Preferencias guardadas correctamente.",
+    "saveError": "Error al guardar preferencias. Vuelve a intentarlo."
+  },
   "autobus": "autobús",
   "automaticas": "automáticas",
   "automatiza_tareas_repetitivas_manten_equipo": "Automatiza tareas repetitivas y mantén a tu equipo alineado con paneles compartidos.",

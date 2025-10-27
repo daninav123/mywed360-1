@@ -19,6 +19,12 @@ import { useWedding } from '../context/WeddingContext';
 import { loadData, saveData } from '../services/SyncService';
 import { recordSupplierInsight } from '../services/supplierInsightsService';
 import computeSupplierScore from '../utils/supplierScore';
+import {
+  normalizeStatus,
+  isConfirmedStatus,
+  isDiscardedStatus,
+  isTrackingStatus,
+} from '../utils/supplierStatus';
 
 const SERVICE_LINES_COLLECTION = "serviceLines";
 const MEETINGS_COLLECTION = "supplierMeetings";
@@ -28,99 +34,6 @@ const TAB_TRACKING = 'seguimiento';
 const TAB_CONFIRMED = 'confirmados';
 const TAB_FAVORITES = 'favoritos';
 
-const TRACKING_STATUS_SET = new Set(
-  [
-    'pendiente',
-    'contactado',
-    'en seguimiento',
-    'seguimiento',
-    'en negociación',
-    'negociación',
-    'en evaluación',
-    'evaluando',
-    'preconfirmado',
-    'pre-confirmado',
-    'por revisar',
-    'por-revisar',
-    'analizando',
-    'exploracion',
-    'exploración',
-    'shortlist',
-    'prospecto',
-    'prospect',
-    'por contactar',
-    'por-contactar',
-    'a revisar',
-  ].map((value) => value.toLowerCase())
-);
-
-const CONFIRMED_STATUS_SET = new Set(
-  [
-    'confirmado',
-    'confirmada',
-    'seleccionado',
-    'seleccionada',
-    'contratado',
-    'contratada',
-    'firmado',
-    'en firma',
-    'en-firma',
-    'firmando',
-    'reservado',
-    'reserva',
-    'cerrado',
-    'ganado',
-    'closed won',
-    'confirming',
-  ].map((value) => value.toLowerCase())
-);
-
-const normalizeStatus = (status) => {
-  if (!status) return '';
-  return String(status).trim().toLowerCase();
-};
-
-const isConfirmedStatus = (status) => {
-  const normalized = normalizeStatus(status);
-  if (!normalized) return false;
-  if (CONFIRMED_STATUS_SET.has(normalized)) return true;
-  return (
-    normalized.includes('confirm') ||
-    normalized.includes('firma') ||
-    normalized.includes('contrat') ||
-    normalized.includes('cerrad') ||
-    normalized.includes('ganad') ||
-    normalized.includes('reserva')
-  );
-};
-
-const isDiscardedStatus = (status) => {
-  const normalized = normalizeStatus(status);
-  if (!normalized) return false;
-  return (
-    normalized.includes('rechaz') ||
-    normalized.includes('descart') ||
-    normalized.includes('cancel') ||
-    normalized.includes('perdid') ||
-    normalized.includes('lost')
-  );
-};
-
-const isTrackingStatus = (status) => {
-  const normalized = normalizeStatus(status);
-  if (!normalized) return true;
-  if (isConfirmedStatus(normalized)) return false;
-  if (isDiscardedStatus(normalized)) return false;
-  if (TRACKING_STATUS_SET.has(normalized)) return true;
-  return (
-    normalized.includes('pend') ||
-    normalized.includes('seguim') ||
-    normalized.includes('negoci') ||
-    normalized.includes('evalu') ||
-    normalized.includes('prospect') ||
-    normalized.includes('shortlist')
-  );
-};
 
 /**
  * @typedef {Object} Provider
@@ -990,6 +903,4 @@ export const useProveedores = () => {
 };
 
 export default useProveedores;
-
-
 
