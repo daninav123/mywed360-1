@@ -11,6 +11,19 @@ const toFinite = (value) => {
   return Number.isFinite(num) ? num : 0;
 };
 
+const formatMonths = (months) => {
+  if (months == null || !Number.isFinite(months)) return 'N/A';
+  if (months === Infinity) return '∞';
+  return months.toFixed(1);
+};
+
+const handleAccessibleClick = (event, action) => {
+  if (event.key === 'Enter' || event.key === ' ') {
+    event.preventDefault();
+    action();
+  }
+};
+
 export default function FinanceOverview({
   stats,
   budgetUsage = [],
@@ -214,7 +227,7 @@ export default function FinanceOverview({
       <Card className="p-6 md:p-7 bg-gradient-to-br from-[var(--color-surface)] to-[var(--color-surface)]/95 backdrop-blur-xl border-soft shadow-lg">
         <h3 className="text-xl md:text-2xl font-bold text-body tracking-tight mb-5">
           {t('finance.overview.categoryStatus', {
-            defaultValue: 'Estado del Presupuesto por Categor€)as',
+            defaultValue: 'Estado del Presupuesto por Categorías',
           })}
         </h3>
         <div className="space-y-4">

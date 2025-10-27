@@ -436,6 +436,13 @@
       "dress": "Vestidos",
       "cake": "Pasteles",
       "photography": "Fotografía"
+    },
+    "searchBar": {
+      "optionHashtag": "Hashtag",
+      "optionAuthor": "Autor",
+      "optionKeyword": "Palabra clave",
+      "placeholder": "Buscar...",
+      "submit": "Buscar"
     }
   },
   "como_organizar_ceremonia_civil_perfecta": "Ej. Cómo organizar la ceremonia civil perfecta",

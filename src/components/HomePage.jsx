@@ -386,7 +386,7 @@ export default function HomePage() {
   const financeSpent = Number(financeStats?.totalSpent || 0);
   const budgetTotal = Number(financeStats?.totalBudget || 0);
   
-  const budgetDisplay = useMemo(() => {
+  const budgetValueDisplay = useMemo(() => {
     const spent = format.currency(financeSpent || 0);
     if (budgetTotal) {
       return t('home.stats.budgetValueWithTotal', {
@@ -741,17 +741,6 @@ export default function HomePage() {
         ? providersMetrics.providersTotalNeeded
         : providersMetrics.providersFallbackNeeded;
 
-    const budgetValue = (() => {
-      const spent = format.currency(financeSpent || 0);
-      if (budgetTotal) {
-        return t('home.stats.budgetValueWithTotal', {
-          spent,
-          total: format.currency(budgetTotal),
-        });
-      }
-      return t('home.stats.budgetValue', { spent });
-    })();
-
     const providersAssigned = format.number(providersMetrics.providersAssigned || 0);
     const providersValue =
       neededProviders > 0
@@ -766,35 +755,42 @@ export default function HomePage() {
 
     return [
       { label: t('home.stats.confirmedGuests'), value: guestStatValue, icon: Users },
-      { label: t('home.stats.budgetSpent'), value: budgetValue, icon: DollarSign },
+      { label: t('home.stats.budgetSpent'), value: budgetValueDisplay, icon: DollarSign },
       { label: t('home.stats.providers'), value: providersValue, icon: User },
       { label: t('home.stats.tasksCompleted'), value: tasksValue, icon: Calendar },
     ];
   }, [
     guestStatValue,
-    financeSpent,
-    budgetTotal,
+    budgetValueDisplay,
     providersMetrics,
     tasksMetrics,
     format,
     t,
   ]);
 
-  const statsPlanner = useMemo(
-    () => [
-      { label: 'Tareas asignadas', value: `${tasksMetrics.tasksTotal}`, icon: Calendar },
-      { label: 'Proveedores asignados', value: providersMetrics.providersAssigned, icon: User },
-      { label: 'Invitados confirmados', value: guestStatValue, icon: Users },
+const statsPlanner = useMemo(() => {
+    const tasksAssigned = format.number(tasksMetrics.tasksTotal || 0);
+    const tasksCompletedFormatted = format.number(tasksMetrics.tasksCompleted || 0);
+    const plannerTasksValue =
+      tasksMetrics.tasksTotal > 0
+        ? `${tasksCompletedFormatted} / ${tasksAssigned}`
+        : tasksAssigned;
+
+    return [
+      { label: t('home.stats.tasksAssigned'), value: plannerTasksValue, icon: Calendar },
       {
-        label: 'Presupuesto gastado',
-        value:
-          `${financeSpent.toLocaleString()}` +
-          (budgetTotal ? ` / ${budgetTotal.toLocaleString()}` : ''),
+        label: t('home.stats.providersAssigned'),
+        value: format.number(providersMetrics.providersAssigned || 0),
+        icon: User,
+      },
+      { label: t('home.stats.confirmedGuests'), value: guestStatValue, icon: Users },
+      {
+        label: t('home.stats.budgetSpent'),
+        value: budgetValueDisplay,
         icon: DollarSign,
       },
-    ],
-    [guestStatValue, financeSpent, providersMetrics, tasksMetrics, budgetTotal]
-  );
+    ];
+  }, [budgetValueDisplay, guestStatValue, providersMetrics, tasksMetrics, format, t]);
 
   const statsCommon = useMemo(
     () => (role === 'particular' ? statsNovios : statsPlanner),
@@ -1113,7 +1109,7 @@ export default function HomePage() {
                     }
                   }
                   notes.push(t('home.modals.guest.note'));
-                  payload.notes = notes.join(' Ã‚Â· ');
+                  payload.notes = notes.join(' | ');
 
                   try {
                     const result = await addGuestRecord(payload);

@@ -1,5 +1,5 @@
-import React from 'react';
-import { TrendingUp, TrendingDown, AlertTriangle } from 'lucide-react';
+import React, { useMemo } from 'react';
+import { TrendingUp, TrendingDown, AlertTriangle, Calendar, Clock, DollarSign } from 'lucide-react';
 import { Card } from '../ui';
 import { formatCurrency } from '../../utils/formatUtils';
 import useTranslations from '../../hooks/useTranslations';
@@ -14,25 +14,79 @@ export default function FinanceHeroSection({
   budgetUsage = [], 
   thresholds = { warn: 75, danger: 90 },
   isLoading = false,
-  onNavigate 
+  onNavigate,
+  transactions = [],
+  predictiveInsights = null
 }) {
   const { t } = useTranslations();
   
+  // Métricas básicas
   const currentBalance = toFinite(stats?.currentBalance);
-  const totalBudget = toFinite(stats?.totalBudget);
-  const totalSpent = toFinite(stats?.totalSpent);
+  const totalIncome = toFinite(stats?.totalIncome);
   const expectedIncome = toFinite(stats?.expectedIncome);
+  const totalSpent = toFinite(stats?.totalSpent);
+  const overdueExpenses = toFinite(stats?.overdueExpenses);
+  const pendingExpenses = toFinite(stats?.pendingExpenses);
   
-  const effectiveTotal = expectedIncome > 0 ? expectedIncome : totalBudget;
-  const budgetPercent = effectiveTotal > 0 ? (totalSpent / effectiveTotal) * 100 : 0;
+  // Disponible AHORA (ingresos confirmados - gastado)
+  const availableNow = totalIncome - totalSpent;
   
-  const isHealthy = currentBalance >= 0;
-  const isAtRisk = budgetPercent >= thresholds.danger;
-  const isWarning = budgetPercent >= thresholds.warn && !isAtRisk;
+  // Análisis de pagos críticos
+  const paymentAnalysis = useMemo(() => {
+    if (!Array.isArray(transactions)) return { overdue: [], upcoming7d: [], upcoming30d: [] };
+    
+    const now = new Date();
+    const in7Days = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+    const in30Days = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+    
+    const overdue = [];
+    const upcoming7d = [];
+    const upcoming30d = [];
+    
+    transactions.forEach(tx => {
+      if (tx.type !== 'expense' || tx.status === 'paid') return;
+      if (!tx.dueDate) return;
+      
+      const dueDate = new Date(tx.dueDate);
+      if (isNaN(dueDate.getTime())) return;
+      
+      const amount = toFinite(tx.amount);
+      const paid = toFinite(tx.paidAmount);
+      const outstanding = Math.max(0, amount - paid);
+      
+      if (outstanding <= 0) return;
+      
+      if (dueDate < now) {
+        overdue.push({ ...tx, outstanding });
+      } else if (dueDate <= in7Days) {
+        upcoming7d.push({ ...tx, outstanding });
+      } else if (dueDate <= in30Days) {
+        upcoming30d.push({ ...tx, outstanding });
+      }
+    });
+    
+    return { overdue, upcoming7d, upcoming30d };
+  }, [transactions]);
   
-  const alertCategories = budgetUsage.filter(
-    (cat) => !cat.muted && toFinite(cat.percentage) >= thresholds.warn
-  ).slice(0, 3); // Solo top 3
+  // Runway (días hasta quedarse sin fondos)
+  const runway = useMemo(() => {
+    const monthsToZero = predictiveInsights?.monthsToZero;
+    if (monthsToZero == null || monthsToZero === Infinity) return null;
+    return Math.round(monthsToZero * 30); // Convertir meses a días
+  }, [predictiveInsights]);
+  
+  // Estado de categorías
+  const categoryStatus = useMemo(() => {
+    const ok = budgetUsage.filter(cat => !cat.muted && toFinite(cat.percentage) < thresholds.warn).length;
+    const warning = budgetUsage.filter(cat => !cat.muted && toFinite(cat.percentage) >= thresholds.warn && toFinite(cat.percentage) < thresholds.danger).length;
+    const critical = budgetUsage.filter(cat => !cat.muted && toFinite(cat.percentage) >= thresholds.danger).length;
+    return { ok, warning, critical };
+  }, [budgetUsage, thresholds]);
+  
+  // Determinar estado de salud general
+  const isHealthy = availableNow >= 0 && paymentAnalysis.overdue.length === 0;
+  const isAtRisk = availableNow < 0 || paymentAnalysis.overdue.length > 0 || categoryStatus.critical > 0;
+  const isWarning = !isHealthy && !isAtRisk;
 
   const getHealthColor = () => {
     if (isAtRisk) return 'danger';
@@ -48,9 +102,9 @@ export default function FinanceHeroSection({
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
-      {/* HERO CARD - Balance Actual */}
-      <Card className="lg:col-span-2 relative overflow-hidden bg-gradient-to-br from-[var(--color-surface)] to-[var(--color-surface)]/95 backdrop-blur-xl border-2 shadow-2xl p-6 md:p-8">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+      {/* HERO CARD - Disponible Ahora */}
+      <Card className="relative overflow-hidden bg-gradient-to-br from-[var(--color-surface)] to-[var(--color-surface)]/95 backdrop-blur-xl border-2 shadow-2xl p-6 md:p-8">
         {/* Fondo decorativo dinámico */}
         <div 
           className="absolute -top-32 -right-32 w-96 h-96 rounded-full blur-3xl opacity-20 transition-all duration-500"
@@ -61,22 +115,30 @@ export default function FinanceHeroSection({
           style={{ backgroundColor: colorMap[healthColor] }}
         />
 
-        <div className="relative z-10 space-y-4">
-          {/* Header */}
+        <div className="relative z-10 space-y-6">
+          {/* Header - Disponible Ahora */}
           <div className="flex items-start justify-between">
-            <div>
-              <p className="text-sm font-bold uppercase tracking-wider text-muted mb-1">
-                {t('finance.overview.currentBalance', { defaultValue: 'Balance Actual' })}
-              </p>
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-2">
+                <DollarSign className="w-5 h-5 text-muted" />
+                <p className="text-sm font-bold uppercase tracking-wider text-muted">
+                  {t('finance.hero.availableNow', { defaultValue: 'Disponible Ahora' })}
+                </p>
+              </div>
               {isLoading ? (
                 <div className="h-16 md:h-20 w-64 bg-[color:var(--color-text)]/10 rounded-xl animate-pulse" />
               ) : (
-                <h1 
-                  className="text-5xl md:text-7xl font-black tracking-tight transition-colors duration-300"
-                  style={{ color: colorMap[healthColor] }}
-                >
-                  {formatCurrency(currentBalance)}
-                </h1>
+                <>
+                  <h1 
+                    className="text-4xl md:text-6xl font-black tracking-tight transition-colors duration-300"
+                    style={{ color: colorMap[healthColor] }}
+                  >
+                    {formatCurrency(availableNow)}
+                  </h1>
+                  <p className="text-sm text-muted mt-2">
+                    {t('finance.hero.ofConfirmed', { defaultValue: 'De' })} {formatCurrency(totalIncome + expectedIncome)} {t('finance.hero.confirmed', { defaultValue: 'confirmados' })}
+                  </p>
+                </>
               )}
             </div>
             <div 
@@ -94,104 +156,143 @@ export default function FinanceHeroSection({
             </div>
           </div>
 
-          {/* Status Bar */}
+          {/* Runway y Próximos Pagos */}
           {!isLoading && (
-            <div className="flex items-center gap-3 flex-wrap">
-              <div 
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm shadow-lg"
-                style={{ 
-                  backgroundColor: `color-mix(in srgb, ${colorMap[healthColor]} 20%, transparent)`,
-                  color: colorMap[healthColor]
-                }}
-              >
-                <span className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: colorMap[healthColor] }} />
-                {isAtRisk 
-                  ? t('finance.hero.statusCritical', { defaultValue: 'Crítico' })
-                  : isWarning 
-                    ? t('finance.hero.statusWarning', { defaultValue: 'Atención' })
-                    : t('finance.hero.statusHealthy', { defaultValue: 'Saludable' })
-                }
+            <div className="grid grid-cols-2 gap-4">
+              {/* Runway */}
+              <div className="bg-[var(--color-text)]/5 rounded-xl p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Clock className="w-4 h-4 text-muted" />
+                  <p className="text-xs font-bold uppercase tracking-wider text-muted">
+                    {t('finance.hero.runway', { defaultValue: 'Runway' })}
+                  </p>
+                </div>
+                {runway ? (
+                  <>
+                    <p className="text-2xl font-black text-body">{runway}d</p>
+                    <p className="text-xs text-muted mt-1">
+                      {t('finance.hero.runwayDesc', { defaultValue: 'Hasta quedarte sin fondos' })}
+                    </p>
+                  </>
+                ) : (
+                  <p className="text-sm text-muted">
+                    {t('finance.hero.runwayUnknown', { defaultValue: 'Estable' })}
+                  </p>
+                )}
               </div>
-              <div className="text-sm text-muted font-semibold">
-                {budgetPercent.toFixed(1)}% {t('finance.overview.ofBudget', { defaultValue: 'del presupuesto' })}
+              
+              {/* Próximos Pagos 7d */}
+              <div className="bg-[var(--color-text)]/5 rounded-xl p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Calendar className="w-4 h-4 text-muted" />
+                  <p className="text-xs font-bold uppercase tracking-wider text-muted">
+                    {t('finance.hero.next7d', { defaultValue: 'Próximos 7d' })}
+                  </p>
+                </div>
+                {paymentAnalysis.upcoming7d.length > 0 ? (
+                  <>
+                    <p className="text-2xl font-black text-[color:var(--color-warning)]">
+                      {formatCurrency(paymentAnalysis.upcoming7d.reduce((sum, p) => sum + p.outstanding, 0))}
+                    </p>
+                    <p className="text-xs text-muted mt-1">
+                      {paymentAnalysis.upcoming7d.length} {t('finance.hero.payments', { defaultValue: 'pagos' })}
+                    </p>
+                  </>
+                ) : (
+                  <p className="text-sm text-muted">
+                    {t('finance.hero.noPayments', { defaultValue: 'Sin pagos' })}
+                  </p>
+                )}
               </div>
             </div>
           )}
 
-          {/* Alertas Críticas Integradas */}
-          {!isLoading && alertCategories.length > 0 && (
+          {/* Urgente: Pagos Vencidos */}
+          {!isLoading && paymentAnalysis.overdue.length > 0 && (
             <div className="pt-4 border-t border-soft">
               <div className="flex items-center gap-2 mb-3">
-                <AlertTriangle className="w-4 h-4 text-[color:var(--color-warning)]" />
-                <h4 className="text-sm font-bold text-body">
-                  {t('finance.hero.criticalAlerts', { defaultValue: 'Alertas Críticas' })}
+                <AlertTriangle className="w-4 h-4 text-[color:var(--color-danger)]" />
+                <h4 className="text-sm font-bold text-[color:var(--color-danger)]">
+                  {t('finance.hero.overdue', { defaultValue: '⚠️ Pagos Vencidos' })}
                 </h4>
               </div>
-              <div className="flex flex-wrap gap-2">
-                {alertCategories.map((cat, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => onNavigate?.({ categoryFilter: cat.name, typeFilter: 'expense' })}
-                    className="group px-3 py-1.5 rounded-lg bg-[var(--color-warning)]/10 border border-[color:var(--color-warning)]/30 hover:bg-[var(--color-warning)]/20 transition-all duration-200"
-                  >
-                    <span className="text-xs font-semibold text-[color:var(--color-warning)]">
-                      {cat.name}
-                    </span>
-                    <span className="text-xs text-muted ml-1">
-                      {toFinite(cat.percentage).toFixed(0)}%
-                    </span>
-                  </button>
-                ))}
+              <div className="bg-[var(--color-danger)]/10 border border-[color:var(--color-danger)]/30 rounded-lg p-3">
+                <p className="text-lg font-black text-[color:var(--color-danger)]">
+                  {paymentAnalysis.overdue.length} {t('finance.hero.payments', { defaultValue: 'pagos' })}: {formatCurrency(overdueExpenses)}
+                </p>
+                <button
+                  onClick={() => onNavigate?.({ statusFilter: 'overdue' })}
+                  className="text-xs text-[color:var(--color-danger)] hover:underline mt-1"
+                >
+                  {t('finance.hero.viewDetails', { defaultValue: 'Ver detalles →' })}
+                </button>
               </div>
             </div>
           )}
         </div>
       </Card>
 
-      {/* Quick Stats Sidebar */}
+      {/* Estado de Categorías */}
       <Card className="bg-gradient-to-br from-[var(--color-surface)] to-[var(--color-surface)]/90 backdrop-blur-xl border-soft shadow-xl p-6">
         <div className="space-y-5">
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-muted mb-2">
-              {t('finance.overview.totalBudget', { defaultValue: 'Presupuesto' })}
+            <p className="text-sm font-bold uppercase tracking-wider text-muted mb-4">
+              {t('finance.hero.budgetStatus', { defaultValue: 'Estado del Presupuesto' })}
             </p>
-            {isLoading ? (
-              <div className="h-8 w-32 bg-[color:var(--color-text)]/10 rounded animate-pulse" />
-            ) : (
-              <p className="text-2xl md:text-3xl font-bold text-[color:var(--color-primary)]">
-                {formatCurrency(effectiveTotal)}
-              </p>
-            )}
           </div>
+
+          {/* Categorías OK */}
+          <div className="flex items-center justify-between p-3 rounded-lg bg-[var(--color-success)]/10">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider text-muted mb-1">
+                {t('finance.hero.categoriesOk', { defaultValue: '✅ Categorías OK' })}
+              </p>
+              <p className="text-3xl font-black text-[color:var(--color-success)]">
+                {categoryStatus.ok}
+              </p>
+            </div>
+          </div>
+
+          {/* Categorías en Alerta */}
+          {categoryStatus.warning > 0 && (
+            <div className="flex items-center justify-between p-3 rounded-lg bg-[var(--color-warning)]/10">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider text-muted mb-1">
+                  {t('finance.hero.categoriesWarning', { defaultValue: '⚠️ En alerta (>75%)' })}
+                </p>
+                <p className="text-3xl font-black text-[color:var(--color-warning)]">
+                  {categoryStatus.warning}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Categorías Críticas */}
+          {categoryStatus.critical > 0 && (
+            <div className="flex items-center justify-between p-3 rounded-lg bg-[var(--color-danger)]/10">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider text-muted mb-1">
+                  {t('finance.hero.categoriesCritical', { defaultValue: '🔴 Críticas (>90%)' })}
+                </p>
+                <p className="text-3xl font-black text-[color:var(--color-danger)]">
+                  {categoryStatus.critical}
+                </p>
+              </div>
+            </div>
+          )}
 
           <div className="h-px bg-soft" />
 
-          <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-muted mb-2">
-              {t('finance.overview.totalSpent', { defaultValue: 'Gastado' })}
-            </p>
-            {isLoading ? (
-              <div className="h-8 w-32 bg-[color:var(--color-text)]/10 rounded animate-pulse" />
-            ) : (
-              <p className="text-2xl md:text-3xl font-bold text-[color:var(--color-danger)]">
-                {formatCurrency(totalSpent)}
-              </p>
-            )}
-          </div>
-
-          <div className="h-px bg-soft" />
-
-          <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-muted mb-2">
-              {t('finance.overview.expectedIncome', { defaultValue: 'Ingresos' })}
-            </p>
-            {isLoading ? (
-              <div className="h-8 w-32 bg-[color:var(--color-text)]/10 rounded animate-pulse" />
-            ) : (
-              <p className="text-2xl md:text-3xl font-bold text-[color:var(--color-success)]">
-                {formatCurrency(expectedIncome)}
-              </p>
-            )}
+          {/* Resumen Financiero */}
+          <div className="space-y-3 text-sm">
+            <div className="flex justify-between">
+              <span className="text-muted">{t('finance.hero.spent', { defaultValue: 'Gastado' })}</span>
+              <span className="font-bold text-body">{formatCurrency(totalSpent)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted">{t('finance.hero.pending', { defaultValue: 'Pendiente' })}</span>
+              <span className="font-bold text-[color:var(--color-warning)]">{formatCurrency(pendingExpenses)}</span>
+            </div>
           </div>
         </div>
       </Card>

@@ -426,7 +426,14 @@
     "view": "View",
     "cancel": "Cancel",
     "delete": "Delete",
-    "duplicate": "Duplicate"
+    "duplicate": "Duplicate",
+    "searchBar": {
+      "optionHashtag": "Hashtag",
+      "optionAuthor": "Author",
+      "optionKeyword": "Keyword",
+      "placeholder": "Search...",
+      "submit": "Search"
+    }
   },
   "como_organizar_ceremonia_civil_perfecta": "ej. cómo organizar la ceremony civil perfecta",
   "completa_titulo_contenido_antes_guardar": "completa el title y el contenido before de guardar.",
