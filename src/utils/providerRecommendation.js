@@ -1,4 +1,4 @@
-import { computeSupplierScore } from './supplierScore';
+import { computeSupplierScore } from './supplierScore.js';
 
 const parsePrice = (raw) => {
   if (raw == null) return null;

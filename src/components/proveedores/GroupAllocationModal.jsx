@@ -4,6 +4,7 @@ import useGroupAllocations from '../../hooks/useGroupAllocations';
 import useSupplierGroups from '../../hooks/useSupplierGroups';
 import Modal from '../Modal';
 import Button from '../ui/Button';
+import useTranslations from '../../hooks/useTranslations';
 
 export default function GroupAllocationModal({ open, onClose, group, providers = [] }) {
   const { items, addAllocation, updateAllocation, removeAllocation } = useGroupAllocations(
@@ -11,11 +12,12 @@ export default function GroupAllocationModal({ open, onClose, group, providers =
   );
   const { updateGroup } = useSupplierGroups();
   const [editingBudget, setEditingBudget] = useState(false);
+  const { t } = useTranslations();
   const total = useMemo(() => items.reduce((s, i) => s + (Number(i.amount) || 0), 0), [items]);
 
   const handleAdd = async () => {
     await addAllocation({
-      part: 'Nueva partida',
+      part: t('common.suppliers.groupAllocationModal.table.newPartLabel'),
       supplierId: providers[0]?.id || '',
       amount: 0,
       notes: '',
@@ -26,24 +28,34 @@ export default function GroupAllocationModal({ open, onClose, group, providers =
   const exceeded = targetBudget > 0 && total > targetBudget;
 
   return (
-    <Modal open={open} onClose={onClose} title="Dividir alcance del grupo">
+    <Modal
+      open={open}
+      onClose={onClose}
+      title={t('common.suppliers.groupAllocationModal.title')}
+    >
       <div className="space-y-4">
         <div
           className={`p-3 rounded border ${exceeded ? 'border-red-300 bg-red-50 text-red-700' : 'border-gray-200'}`}
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm">Total asignado</p>
+              <p className="text-sm">{t('common.suppliers.groupAllocationModal.summary.totalLabel')}</p>
               <p className="text-xl font-semibold">{total.toFixed(2)} €</p>
             </div>
             <div className="text-right">
-              <p className="text-sm">Presupuesto objetivo</p>
+              <p className="text-sm">
+                {t('common.suppliers.groupAllocationModal.summary.targetLabel')}
+              </p>
               {!editingBudget ? (
                 <button
                   className="text-lg font-semibold underline"
                   onClick={() => setEditingBudget(true)}
                 >
-                  {targetBudget > 0 ? `${targetBudget.toFixed(2)} €` : '—'}
+                  {targetBudget > 0
+                    ? t('common.suppliers.groupAllocationModal.summary.targetValue', {
+                        amount: targetBudget.toFixed(2),
+                      })
+                    : t('common.suppliers.groupAllocationModal.summary.noTarget')}
                 </button>
               ) : (
                 <div className="flex items-center gap-2">
@@ -66,14 +78,18 @@ export default function GroupAllocationModal({ open, onClose, group, providers =
                       setEditingBudget(false);
                     }}
                   >
-                    Guardar
+                    {t('common.suppliers.groupAllocationModal.summary.save')}
                   </Button>
                 </div>
               )}
             </div>
           </div>
           {exceeded && (
-            <p className="text-sm mt-2">Sobrepresupuesto: {(total - targetBudget).toFixed(2)} €</p>
+            <p className="text-sm mt-2">
+              {t('common.suppliers.groupAllocationModal.summary.overBudget', {
+                amount: (total - targetBudget).toFixed(2),
+              })}
+            </p>
           )}
         </div>
 
@@ -106,7 +122,7 @@ export default function GroupAllocationModal({ open, onClose, group, providers =
               <input
                 className="col-span-3 border rounded p-1"
                 value={it.notes || ''}
-                placeholder="Notas"
+                placeholder={t('common.suppliers.groupAllocationModal.table.notesPlaceholder')}
                 onChange={(e) => updateAllocation(it.id, { notes: e.target.value })}
               />
               <div className="col-span-1 text-right">
@@ -116,18 +132,20 @@ export default function GroupAllocationModal({ open, onClose, group, providers =
                   className="text-red-600 border-red-200"
                   onClick={() => removeAllocation(it.id)}
                 >
-                  Eliminar
+                  {t('common.suppliers.groupAllocationModal.table.remove')}
                 </Button>
               </div>
             </div>
           ))}
           {items.length === 0 && (
-            <p className="text-sm text-gray-600">Sin partidas. Crea la primera.</p>
+            <p className="text-sm text-gray-600">
+              {t('common.suppliers.groupAllocationModal.empty')}
+            </p>
           )}
         </div>
         <div className="flex justify-between">
           <Button variant="outline" onClick={handleAdd}>
-            Añadir partida
+            {t('common.suppliers.groupAllocationModal.add')}
           </Button>
           <Button onClick={onClose}>Cerrar</Button>
         </div>
