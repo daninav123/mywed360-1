@@ -1025,16 +1025,49 @@ router.post('/', async (req, res) => {
         .trim()
         .replace(/\s+/g, ' ')
         // Eliminar palabras genéricas que no ayudan a diferenciar
-        .replace(/\b(fotografía|fotógrafo|videografía|videógrafo|catering|floristería|dj|música|bodas?|de|para|en|y|el|la|los|las)\b/gi, '')
-        .replace(/[^\w\s]/g, '') // Eliminar puntuación
+        .replace(/\b(fotografía|fotógrafo|fotograf|videografía|videógrafo|videograf|catering|floristería|florist|dj|música|music|bodas?|wedding|de|para|en|y|el|la|los|las|alta|sociedad|estilo|único|creativo)\b/gi, '')
+        .replace(/[^\w\sáéíóúñ]/gi, '') // Eliminar puntuación pero mantener acentos
         .replace(/\s+/g, '') // Eliminar todos los espacios
         .trim();
     };
     
     const seenPhones = new Set(); // 🆕 Añadir deduplicación por teléfono
     
-    // 🆕 FILTRO 1: REQUERIR EMAIL de contacto (eliminar proveedores sin email)
-    const resultsWithEmail = validResults.filter((result) => {
+    // 🆕 FILTRO 1: Eliminar resultados irrelevantes (marketplaces, compraventa, etc.)
+    const relevantKeywords = ['fotógrafo', 'fotografía', 'videógrafo', 'videografía', 'boda', 'wedding', 'catering', 'florist', 'dj', 'música'];
+    const irrelevantKeywords = ['wallapop', 'milanuncios', 'vibbo', 'marketplace', 'comprar', 'vender', 'segunda mano', 'usado', 'forocoches', 'okdiario', 'amazon', 'ebay', 'aliexpress'];
+    
+    const relevantResults = validResults.filter((result) => {
+      const titleLower = (result.title || '').toLowerCase();
+      const contentLower = (result.content || '').substring(0, 200).toLowerCase();
+      const combined = `${titleLower} ${contentLower}`;
+      
+      // ❌ DESCARTAR si contiene palabras irrelevantes
+      const hasIrrelevantKeyword = irrelevantKeywords.some(keyword => 
+        titleLower.includes(keyword) || contentLower.includes(keyword)
+      );
+      
+      if (hasIrrelevantKeyword) {
+        console.log(`❌ [IRRELEVANTE] Descartado: ${result.title} (marketplace/compraventa)`);
+        return false;
+      }
+      
+      // ✅ ACEPTAR si menciona keywords relevantes
+      const hasRelevantKeyword = relevantKeywords.some(keyword => combined.includes(keyword));
+      
+      if (!hasRelevantKeyword) {
+        console.log(`❌ [NO-RELEVANTE] Descartado: ${result.title} (no menciona bodas/fotografía)`);
+        return false;
+      }
+      
+      return true;
+    });
+    
+    console.log(`\n🎯 [FILTRO-RELEVANCIA] ${relevantResults.length}/${validResults.length} resultados relevantes`);
+    console.log(`   Descartados: ${validResults.length - relevantResults.length} irrelevantes\n`);
+    
+    // 🆕 FILTRO 2: REQUERIR EMAIL de contacto (eliminar proveedores sin email)
+    const resultsWithEmail = relevantResults.filter((result) => {
       if (!result.email || result.email.trim() === '') {
         console.log(`❌ [SIN-EMAIL] Descartado: ${result.title} (sin email de contacto)`);
         return false;
