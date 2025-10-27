@@ -160,8 +160,20 @@
     "social": {
       "divider": "or continue with",
       "button": "Continue with {{provider}}",
-      "pending": "Continue the sign-in flow in the {{provider}} window."
+      "pending": "Complete the sign-in flow in the {{provider}} window."
     }
+  },
+  "authResetPassword": {
+    "title": "Reset Password",
+    "description": "Enter your email and we'll send you a link to set a new password.",
+    "emailPlaceholder": "you@email.com",
+    "submit": "Send link",
+    "submitting": "Sending...",
+    "validation": {
+      "missingEmail": "Please enter your email address."
+    },
+    "success": "We've sent you an email with instructions to reset your password.",
+    "error": "Could not send the reset email."
   },
   "authSignup": {
     "title": "Create your account",

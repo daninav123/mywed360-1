@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
 import { useAuth } from '../hooks/useAuth';
+import useTranslations from '../hooks/useTranslations';
 import { performanceMonitor } from '../services/PerformanceMonitor';
 
 const STATUS_ID = 'reset-status-message';
@@ -10,6 +11,7 @@ const ERROR_ID = 'reset-error-message';
 export default function ResetPassword() {
   const location = useLocation();
   const { sendPasswordReset } = useAuth();
+  const { t } = useTranslations();
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState('');
   const [error, setError] = useState('');
@@ -32,7 +34,7 @@ export default function ResetPassword() {
 
     const trimmedEmail = email.trim();
     if (!trimmedEmail) {
-      const message = 'Introduce tu correo electronico.';
+      const message = t('authResetPassword.validation.missingEmail');
       setError(message);
       emailInputRef.current?.focus();
       performanceMonitor?.logEvent?.('password_reset_failed', {
@@ -49,14 +51,14 @@ export default function ResetPassword() {
 
     try {
       await sendPasswordReset(trimmedEmail);
-      const message = 'Te enviamos un correo con instrucciones para restablecer tu contrasena.';
+      const message = t('authResetPassword.success');
       setStatus(message);
       setTimeout(() => submitButtonRef.current?.focus(), 0);
       performanceMonitor?.logEvent?.('password_reset_completed', {
         source: resetSource,
       });
     } catch (err) {
-      const mappedMessage = err?.message || 'No se pudo enviar el correo de restablecimiento.';
+      const mappedMessage = err?.message || t('authResetPassword.error');
       setError(mappedMessage);
       performanceMonitor?.logEvent?.('password_reset_failed', {
         source: resetSource,
@@ -75,13 +77,13 @@ export default function ResetPassword() {
         className="w-full max-w-md space-y-5 rounded-2xl border border-[color:var(--color-border)] bg-[var(--color-surface)] px-6 py-8 shadow-sm"
         noValidate
       >
-        <h2 className="text-2xl font-semibold text-[color:var(--color-text)]">Restablecer contrasena</h2>
+        <h2 className="text-2xl font-semibold text-[color:var(--color-text)]">{t('authResetPassword.title')}</h2>
         <p className="text-sm text-[color:var(--color-muted)]">
-          Introduce tu correo y te enviaremos un enlace para definir una nueva contrasena.
+          {t('authResetPassword.description')}
         </p>
         <input
           type="email"
-          placeholder="tu@email.com"
+          placeholder={t('authResetPassword.emailPlaceholder')}
           value={email}
           onChange={(event) => setEmail(event.target.value)}
           ref={emailInputRef}
@@ -107,7 +109,7 @@ export default function ResetPassword() {
           className="bg-[var(--color-primary)] text-[color:var(--color-surface)] px-4 py-2 rounded w-full hover:bg-[var(--color-accent)] transition-colors disabled:opacity-70"
           data-testid="reset-submit"
         >
-          {isSubmitting ? 'Enviando...' : 'Enviar enlace'}
+          {isSubmitting ? t('authResetPassword.submitting') : t('authResetPassword.submit')}
         </button>
       </form>
     </div>

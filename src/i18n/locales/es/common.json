@@ -211,6 +211,18 @@
       "pending": "Contina el registro en la ventana de {{provider}}."
     }
   },
+  "authResetPassword": {
+    "title": "Restablecer contraseña",
+    "description": "Introduce tu correo y te enviaremos un enlace para definir una nueva contraseña.",
+    "emailPlaceholder": "tu@email.com",
+    "submit": "Enviar enlace",
+    "submitting": "Enviando...",
+    "validation": {
+      "missingEmail": "Introduce tu correo electrónico."
+    },
+    "success": "Te enviamos un correo con instrucciones para restablecer tu contraseña.",
+    "error": "No se pudo enviar el correo de restablecimiento."
+  },
   "autobus": "autobús",
   "automaticas": "automáticas",
   "automatiza_tareas_repetitivas_manten_equipo": "Automatiza tareas repetitivas y mantén a tu equipo alineado con paneles compartidos.",
