@@ -1,4 +1,4 @@
-import { Plus, ChevronUp } from 'lucide-react';
+import { Plus, ChevronUp, Search, Users, CheckCircle, Clock, Sparkles, TrendingUp, Building2 } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -477,80 +477,157 @@ const Proveedores = () => {
     </div>
   );
 
+  // Stats calculations
+  const confirmedCount = useMemo(() => {
+    return serviceCards.filter(card => card.confirmed).length;
+  }, [serviceCards]);
+
+  const pendingCount = useMemo(() => {
+    return serviceCards.filter(card => !card.confirmed).length;
+  }, [serviceCards]);
+
+  const totalProviders = useMemo(() => {
+    return (providers || []).length;
+  }, [providers]);
+
+  const shortlistTotal = useMemo(() => {
+    return (shortlist || []).length;
+  }, [shortlist]);
+
   return (
     <>
-      <PageWrapper title="Gestión de proveedores" actions={headerActions} className="layout-container space-y-8">
+      <PageWrapper title="Gestión de proveedores" actions={headerActions} className="layout-container space-y-6">
         {error && (
           <Card className="border border-danger bg-danger-soft text-danger">
             {error}
           </Card>
         )}
 
-        {!searchPanelCollapsed ? (
-          <Card className="space-y-6 border-dashed border-soft">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div className="space-y-1">
-                <h2 className="text-xl font-semibold text-body">Exploración y shortlist</h2>
-                <p className="text-sm text-muted">
-                  Explora proveedores, guarda ideas y revisa tus candidatos pendientes desde este panel.
+        {/* Stats Cards Premium */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Card className="p-4 bg-gradient-to-br from-[var(--color-primary)]/10 to-transparent border-[var(--color-primary)]/30">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-primary)] mb-1">
+                  Total Proveedores
                 </p>
+                <p className="text-2xl font-black text-body">{totalProviders}</p>
+              </div>
+              <Building2 className="w-8 h-8 text-[color:var(--color-primary)]/40" />
+            </div>
+          </Card>
+
+          <Card className="p-4 bg-gradient-to-br from-[var(--color-success)]/10 to-transparent border-[var(--color-success)]/30">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-success)] mb-1">
+                  Confirmados
+                </p>
+                <p className="text-2xl font-black text-[color:var(--color-success)]">{confirmedCount}</p>
+              </div>
+              <CheckCircle className="w-8 h-8 text-[color:var(--color-success)]/40" />
+            </div>
+          </Card>
+
+          <Card className="p-4 bg-gradient-to-br from-[var(--color-warning)]/10 to-transparent border-[var(--color-warning)]/30">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-warning)] mb-1">
+                  Pendientes
+                </p>
+                <p className="text-2xl font-black text-[color:var(--color-warning)]">{pendingCount}</p>
+              </div>
+              <Clock className="w-8 h-8 text-[color:var(--color-warning)]/40" />
+            </div>
+          </Card>
+
+          <Card className="p-4 bg-gradient-to-br from-[var(--color-accent)]/10 to-transparent border-[var(--color-accent)]/30">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-accent)] mb-1">
+                  Shortlist
+                </p>
+                <p className="text-2xl font-black text-[color:var(--color-accent)]">{shortlistTotal}</p>
+              </div>
+              <Sparkles className="w-8 h-8 text-[color:var(--color-accent)]/40" />
+            </div>
+          </Card>
+        </div>
+
+        {!searchPanelCollapsed ? (
+          <Card className="p-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft shadow-lg">
+            <div className="flex flex-wrap items-start justify-between gap-3 mb-6">
+              <div className="flex items-center gap-3">
+                <div className="p-3 rounded-xl bg-[var(--color-primary)]/15">
+                  <Search className="w-6 h-6 text-[color:var(--color-primary)]" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-body">Exploración y shortlist</h2>
+                  <p className="text-sm text-muted">
+                    Explora proveedores, guarda ideas y revisa tus candidatos pendientes
+                  </p>
+                </div>
               </div>
               <Button
                 variant="ghost"
                 size="sm"
                 aria-label="Plegar exploración"
                 onClick={() => setSearchPanelCollapsed(true)}
-                className="h-8 w-8 justify-center"
+                className="h-8 w-8 justify-center hover:bg-[var(--color-primary)]/10"
               >
                 <ChevronUp className="h-4 w-4" />
               </Button>
             </div>
 
-            <form onSubmit={handleSearchSubmit} className="space-y-3">
-              <div className="flex flex-wrap items-center gap-3">
-                <div className="relative flex-1 min-w-[220px]">
-                  <Input
-                    type="search"
-                    value={searchInput}
-                    onChange={(event) => setSearchInput(event.target.value)}
-                    placeholder="Buscar por proveedor, servicio o nota"
-                  />
-                </div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <Button type="submit" size="sm">
-                    Buscar
-                  </Button>
-                  {searchInput && (
-                    <Button type="button" variant="outline" size="sm" onClick={handleClearSearch}>
-                      Limpiar
+            <div className="space-y-6">
+
+              <form onSubmit={handleSearchSubmit} className="space-y-3">
+                <div className="flex flex-wrap items-center gap-3">
+                  <div className="relative flex-1 min-w-[220px]">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted" />
+                    <Input
+                      type="search"
+                      value={searchInput}
+                      onChange={(event) => setSearchInput(event.target.value)}
+                      placeholder="Buscar por proveedor, servicio o nota"
+                      className="pl-10"
+                    />
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Button type="submit" size="sm" leftIcon={<Search size={16} />}>
+                      Buscar
                     </Button>
-                  )}
+                    {searchInput && (
+                      <Button type="button" variant="outline" size="sm" onClick={handleClearSearch}>
+                        Limpiar
+                      </Button>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </form>
+              </form>
 
-            {searchHistory.length > 0 && (
-              <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
-                <span className="font-medium text-body">Búsquedas recientes:</span>
-                {searchHistory.map((query) => (
-                  <button
-                    key={query}
-                    type="button"
-                    onClick={() => {
-                      setSearchInput(query);
-                      setSearchTerm(query);
-                    }}
-                    className="px-2 py-1 rounded-full border border-soft bg-surface hover:border-primary hover:text-primary"
-                  >
-                    {query}
-                  </button>
-                ))}
-              </div>
-            )}
+              {searchHistory.length > 0 && (
+                <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
+                  <span className="font-medium text-body">Búsquedas recientes:</span>
+                  {searchHistory.map((query) => (
+                    <button
+                      key={query}
+                      type="button"
+                      onClick={() => {
+                        setSearchInput(query);
+                        setSearchTerm(query);
+                      }}
+                      className="px-3 py-1.5 rounded-full border border-soft bg-surface hover:border-primary hover:text-primary hover:bg-[var(--color-primary)]/5 transition-all duration-200"
+                    >
+                      {query}
+                    </button>
+                  ))}
+                </div>
+              )}
 
-            <ShortlistList items={shortlist} loading={shortlistLoading} error={shortlistError} />
+              <ShortlistList items={shortlist} loading={shortlistLoading} error={shortlistError} />
 
-            {(aiLoading || searchCompleted) && (
+              {(aiLoading || searchCompleted) && (
               <section className="space-y-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="space-y-1">
@@ -666,7 +743,8 @@ const Proveedores = () => {
                   </>
                 )}
               </section>
-            )}
+              )}
+            </div>
           </Card>
         ) : (
           <div className="flex justify-center">
@@ -683,40 +761,65 @@ const Proveedores = () => {
         )}
 
         <section className="space-y-5">
-          <div className="space-y-1">
-            <h2 className="text-2xl font-semibold text-body">Servicios</h2>
-            <p className="text-sm text-muted">
-              Revisa qué servicios ya tienen proveedor confirmado y cuáles siguen pendientes. Las tarjetas semitransparentes indican que aún debes seleccionar opción.
-            </p>
-          </div>
+          <Card className="p-4 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-[var(--color-primary)]/10">
+                <Users className="w-5 h-5 text-[color:var(--color-primary)]" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-body">Servicios por Categoría</h2>
+                <p className="text-sm text-muted">
+                  {serviceCards.length} servicio{serviceCards.length === 1 ? '' : 's'} · {confirmedCount} confirmado{confirmedCount === 1 ? '' : 's'} · {pendingCount} pendiente{pendingCount === 1 ? '' : 's'}
+                </p>
+              </div>
+            </div>
+          </Card>
 
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {serviceCards.map((card) => {
               const isPending = !card.confirmed;
+              const borderColor = isPending ? 'border-[var(--color-warning)]/40' : 'border-[var(--color-success)]/40';
+              const gradientFrom = isPending ? 'from-[var(--color-warning)]/10' : 'from-[var(--color-success)]/10';
+              
               return (
                 <Card
                   key={card.key}
-                  className={`border ${isPending ? 'border-dashed border-soft bg-surface/80 cursor-pointer hover:border-primary/60' : 'border-soft bg-surface'} transition`}
+                  className={`relative overflow-hidden border-2 ${borderColor} bg-gradient-to-br ${gradientFrom} to-transparent backdrop-blur-sm transition-all duration-300 ${isPending ? 'cursor-pointer hover:shadow-lg hover:scale-[1.02] hover:border-[var(--color-warning)]/60' : 'shadow-md'}`}
                   onClick={() => {
                     if (isPending) handleOpenServiceModal(card);
                   }}
                 >
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between gap-2">
-                      <h3 className="text-lg font-semibold text-body">{card.label}</h3>
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${isPending ? 'bg-warning-soft text-warning border border-warning/40' : 'bg-success-soft text-success border border-success/40'}`}>
+                  <div className="space-y-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1">
+                        <h3 className="text-lg font-bold text-body mb-1">{card.label}</h3>
+                        {isPending && card.shortlist.length > 0 && (
+                          <p className="text-xs text-muted flex items-center gap-1">
+                            <Sparkles size={12} />
+                            {card.shortlist.length} opción{card.shortlist.length === 1 ? '' : 'es'} guardada{card.shortlist.length === 1 ? '' : 's'}
+                          </p>
+                        )}
+                      </div>
+                      <span className={`inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full ${isPending ? 'bg-[var(--color-warning)]/15 text-[color:var(--color-warning)]' : 'bg-[var(--color-success)]/15 text-[color:var(--color-success)]'}`}>
+                        {isPending ? <Clock size={12} /> : <CheckCircle size={12} />}
                         {isPending ? 'Pendiente' : 'Confirmado'}
                       </span>
                     </div>
+                    
                     {card.confirmed ? (
-                      <div className="text-sm text-body/85 space-y-1">
-                        <p className="font-medium">{card.confirmed.name}</p>
+                      <div className="p-3 rounded-lg bg-[var(--color-success)]/10 border border-[var(--color-success)]/20">
+                        <p className="font-semibold text-body mb-1">{card.confirmed.name}</p>
                         <p className="text-xs text-muted">{card.confirmed.status || 'Confirmado'}</p>
                       </div>
                     ) : (
-                      <div className="text-sm text-muted space-y-1">
-                        <p>{card.shortlist.length ? `${card.shortlist.length} opción${card.shortlist.length === 1 ? '' : 'es'} guardadas` : 'Sin shortlist aún'}</p>
-                        <p>Haz clic para revisar las opciones disponibles.</p>
+                      <div className="text-sm text-muted">
+                        <p className="mb-2">
+                          {card.shortlist.length ? 'Revisa las opciones guardadas' : 'Sin opciones guardadas aún'}
+                        </p>
+                        <div className="flex items-center gap-1 text-xs text-[color:var(--color-primary)]">
+                          <TrendingUp size={12} />
+                          <span>Clic para explorar</span>
+                        </div>
                       </div>
                     )}
                   </div>

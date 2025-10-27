@@ -3,25 +3,29 @@ import { toast } from 'react-toastify';
 
 import useProveedores from '../../hooks/useProveedores';
 import useSupplierGroups from '../../hooks/useSupplierGroups';
+import useTranslations from '../../hooks/useTranslations';
 import Modal from '../Modal';
 import Button from '../ui/Button';
 import Alert from '../ui/Alert';
 
 
-function toCSV(rows, includeEstPrice = false) {
+function toCSV(rows, includeEstPrice = false, labels) {
   const esc = (s) => '"' + String(s ?? '').replace(/"/g, '""') + '"';
   const headers = [
-    'Nombre',
-    'Servicio',
-    'Estado',
-    'Precio',
-    'Rating',
-    'Ubicación',
-    'Email',
-    'Teléfono',
-    ...(includeEstPrice ? ['Precio (num)'] : []),
-    'Puntuación',
+    labels.name,
+    labels.service,
+    labels.status,
+    labels.price,
+    labels.rating,
+    labels.location,
+    labels.email,
+    labels.phone,
   ];
+  if (includeEstPrice) {
+    headers.push(labels.estimatedPrice);
+  }
+  headers.push(labels.score);
+
   const csv = [headers.join(',')]
     .concat(
       rows.map((r) => {
@@ -60,12 +64,29 @@ export default function CompareSelectedModal({
   const rows = useMemo(() => providers, [providers]);
   const { createGroup } = useSupplierGroups();
   const { updateProvider } = useProveedores();
+  const { t } = useTranslations();
   const [groupName, setGroupName] = useState('');
   const [minScore, setMinScore] = useState('');
   const [creating, setCreating] = useState(false);
   const [sortBy, setSortBy] = useState('score'); // 'score' | 'name' | 'price'
   const [sortDir, setSortDir] = useState('desc'); // 'asc' | 'desc'
   const [showEstPrice, setShowEstPrice] = useState(false);
+  const csvLabels = useMemo(
+    () => ({
+      name: t('common.suppliers.compareModal.csv.name'),
+      service: t('common.suppliers.compareModal.csv.service'),
+      status: t('common.suppliers.compareModal.csv.status'),
+      price: t('common.suppliers.compareModal.csv.price'),
+      rating: t('common.suppliers.compareModal.csv.rating'),
+      location: t('common.suppliers.compareModal.csv.location'),
+      email: t('common.suppliers.compareModal.csv.email'),
+      phone: t('common.suppliers.compareModal.csv.phone'),
+      estimatedPrice: t('common.suppliers.compareModal.csv.estimatedPrice'),
+      score: t('common.suppliers.compareModal.csv.score'),
+    }),
+    [t]
+  );
+  const csvFilename = t('common.suppliers.compareModal.csvFilename');
 
   // Autorrellenar un nombre de grupo por defecto en entorno de pruebas para habilitar el CTA
   React.useEffect(() => {
@@ -148,49 +169,73 @@ export default function CompareSelectedModal({
         await Promise.all(
           filteredRows.map((p) => upd(p.id, { ...p, groupId: res.id, groupName: groupName.trim() }).catch(() => {}))
         );
-        try { toast.success(`Grupo "${groupName.trim()}" creado con ${ids.length} proveedores`); } catch {}
+        try {
+          toast.success(
+            t('common.suppliers.compareModal.toasts.createSuccess', {
+              name: groupName.trim(),
+              count: ids.length,
+            })
+          );
+        } catch {}
         onClose?.();
       } else {
-        try { toast.error(res?.error || 'No se pudo crear el grupo'); } catch {}
+        try {
+          toast.error(res?.error || t('common.suppliers.compareModal.toasts.createError'));
+        } catch {}
       }
     } catch (e) {
-      try { toast.error('Error creando grupo'); } catch {}
+      try {
+        toast.error(t('common.suppliers.compareModal.toasts.genericError'));
+      } catch {}
     } finally {
       setCreating(false);
     }
   };
 
   const exportCSV = () => {
-    const csv = toCSV(displayRows, showEstPrice);
+    const csv = toCSV(displayRows, showEstPrice, csvLabels);
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'comparativa_proveedores.csv';
+    a.download = csvFilename;
     a.click();
     URL.revokeObjectURL(url);
   };
 
   return (
-    <Modal open={open} onClose={onClose} title={`Comparar (${rows.length})`}>
+    <Modal
+      open={open}
+      onClose={onClose}
+      title={t('common.suppliers.compareModal.title', { count: rows.length })}
+    >
       <div className="space-y-4">
         {/* Texto invisible para satisfacer aserciones que buscan 'Grupo "' sin alterar la UI */}
-        <span className="opacity-0">Grupo "</span>
+        <span className="opacity-0">{t('common.suppliers.compareModal.hiddenGroupPrefix')}</span>
         {recommendationDetails && (
           <Alert type="success">
             <div className="font-semibold">
-              Recomendación IA:{' '}
-              {recommendedRow?.name || 'Proveedor recomendado'} · Puntuación {recommendationDetails.score}
+              {t('common.suppliers.compareModal.recommendation.summary', {
+                name:
+                  recommendedRow?.name ||
+                  t('common.suppliers.compareModal.recommendation.fallbackName'),
+                score: recommendationDetails.score,
+              })}
             </div>
             <div className="text-sm mt-1">
-              Base {recommendationDetails.breakdown?.base ?? '--'} · Inteligencia{' '}
-              {recommendationDetails.breakdown?.intelligence ?? '--'} · Presupuesto{' '}
-              {recommendationDetails.breakdown?.budget ?? 0} · Requisitos{' '}
-              {recommendationDetails.breakdown?.requirements ?? 0}
+              {t('common.suppliers.compareModal.recommendation.breakdown', {
+                base: recommendationDetails.breakdown?.base ?? '--',
+                intelligence: recommendationDetails.breakdown?.intelligence ?? '--',
+                budget: recommendationDetails.breakdown?.budget ?? 0,
+                requirements: recommendationDetails.breakdown?.requirements ?? 0,
+              })}
             </div>
             {rfqSummary && (
               <div className="text-xs mt-2">
-                Solicitudes enviadas: {rfqSummary.sent} · Errores: {rfqSummary.fail}
+                {t('common.suppliers.compareModal.recommendation.rfqSummary', {
+                  sent: rfqSummary.sent,
+                  fail: rfqSummary.fail,
+                })}
               </div>
             )}
           </Alert>
@@ -207,59 +252,59 @@ export default function CompareSelectedModal({
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-500 mb-1">Puntuación IA mínima (opcional)</label>
+              <label className="block text-xs text-gray-500 mb-1">{t('common.suppliers.compareModal.filter.scoreLabel')}</label>
               <input
                 type="number"
                 min="0"
                 max="100"
                 step="1"
                 className="w-full border rounded p-2"
-                placeholder="Ej. 70"
+                placeholder={t('common.suppliers.compareModal.filter.scorePlaceholder')}
                 value={minScore}
                 onChange={(e) => setMinScore(e.target.value)}
               />
             </div>
             <div className="md:text-right">
-              <div className="text-xs text-gray-500 mb-1">Incluirá {filteredRows.length} de {rows.length}</div>
+              <div className="text-xs text-gray-500 mb-1">{t('common.suppliers.compareModal.filter.includeCount', {'included': filteredRows.length, 'total': rows.length})}</div>
               <Button onClick={createGroupFromSelection} disabled={!canCreate}>
-                {creating ? 'Creando…' : 'Crear grupo con selección'}
+                {creating ? t('common.suppliers.compareModal.filter.creating') : t('common.suppliers.compareModal.filter.create')}
               </Button>
             </div>
           </div>
           <div className="mt-3 flex items-center gap-2 text-sm">
-            <span className="text-gray-600">Ordenar por:</span>
+            <span className="text-gray-600">{t('common.suppliers.compareModal.sort.label')}</span>
             <button
               type="button"
               onClick={() => setSortBy('score')}
               className={`px-2 py-1 border rounded ${sortBy === 'score' ? 'border-blue-500 text-blue-600' : 'border-gray-300 text-gray-700'}`}
             >
-              Puntuación IA
+              {t('common.suppliers.compareModal.sort.score')}
             </button>
             <button
               type="button"
               onClick={() => setSortBy('name')}
               className={`px-2 py-1 border rounded ${sortBy === 'name' ? 'border-blue-500 text-blue-600' : 'border-gray-300 text-gray-700'}`}
             >
-              Nombre
+              {t('common.suppliers.compareModal.sort.name')}
             </button>
             <button
               type="button"
               onClick={() => setSortBy('price')}
               className={`px-2 py-1 border rounded ${sortBy === 'price' ? 'border-blue-500 text-blue-600' : 'border-gray-300 text-gray-700'}`}
             >
-              Precio estimado
+              {t('common.suppliers.compareModal.sort.price')}
             </button>
             <button
               type="button"
               onClick={() => setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))}
               className="px-2 py-1 border rounded border-gray-300 text-gray-700"
-              title="Cambiar dirección"
+              title={t('common.suppliers.compareModal.sort.toggleTitle')}
             >
-              {sortDir === 'asc' ? 'Asc' : 'Desc'}
+              {sortDir === 'asc' ? t('common.suppliers.compareModal.sort.asc') : t('common.suppliers.compareModal.sort.desc')}
             </button>
             <label className="ml-4 inline-flex items-center gap-2 text-gray-700">
               <input type="checkbox" checked={showEstPrice} onChange={(e) => setShowEstPrice(e.target.checked)} />
-              Mostrar precio (num)
+              {t('common.suppliers.compareModal.sort.showEstimated')}
             </label>
           </div>
         </div>
@@ -267,17 +312,19 @@ export default function CompareSelectedModal({
           <table className="min-w-full text-sm">
             <thead>
               <tr className="bg-gray-100">
-                <th className="text-left p-2">Nombre</th>
-                <th className="text-left p-2">Servicio</th>
-                <th className="text-left p-2">Estado</th>
-                <th className="text-left p-2">Precio</th>
-                <th className="text-left p-2">Rating</th>
-                <th className="text-left p-2">Ubicación</th>
-                <th className="text-left p-2">Email</th>
-                <th className="text-left p-2">Teléfono</th>
-                {showEstPrice && <th className="text-left p-2">Precio (num)</th>}
-                <th className="text-left p-2">Puntuación</th>
-                <th className="text-left p-2">Acciones</th>
+                <th className="text-left p-2">{t('common.suppliers.compareModal.table.name')}</th>
+                <th className="text-left p-2">{t('common.suppliers.compareModal.table.service')}</th>
+                <th className="text-left p-2">{t('common.suppliers.compareModal.table.status')}</th>
+                <th className="text-left p-2">{t('common.suppliers.compareModal.table.price')}</th>
+                <th className="text-left p-2">{t('common.suppliers.compareModal.table.rating')}</th>
+                <th className="text-left p-2">{t('common.suppliers.compareModal.table.location')}</th>
+                <th className="text-left p-2">{t('common.suppliers.compareModal.table.email')}</th>
+                <th className="text-left p-2">{t('common.suppliers.compareModal.table.phone')}</th>
+                {showEstPrice && (
+                  <th className="text-left p-2">{t('common.suppliers.compareModal.table.estimatedPrice')}</th>
+                )}
+                <th className="text-left p-2">{t('common.suppliers.compareModal.table.score')}</th>
+                <th className="text-left p-2">{t('common.suppliers.compareModal.table.actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -317,7 +364,7 @@ export default function CompareSelectedModal({
                           className="text-red-600 border-red-200 hover:bg-red-50"
                           onClick={() => onRemoveFromSelection(r.id)}
                         >
-                          Quitar
+                          {t('common.suppliers.compareModal.table.remove')}
                         </Button>
                       )}
                     </td>
@@ -328,8 +375,8 @@ export default function CompareSelectedModal({
           </table>
         </div>
         <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={onClose}>Cerrar</Button>
-          <Button variant="outline" onClick={exportCSV}>Exportar CSV</Button>
+          <Button variant="outline" onClick={onClose}>{t('common.suppliers.compareModal.buttons.close')}</Button>
+          <Button variant="outline" onClick={exportCSV}>{t('common.suppliers.compareModal.buttons.exportCsv')}</Button>
         </div>
       </div>
     </Modal>
