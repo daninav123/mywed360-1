@@ -2632,6 +2632,34 @@
       },
       "close": "Cerrar"
     },
+    "groupAllocationModal": {
+      "title": "Dividir alcance del grupo",
+      "summary": {
+        "totalLabel": "Total asignado",
+        "targetLabel": "Presupuesto objetivo",
+        "targetValue": "{{amount}} €",
+        "noTarget": "—",
+        "save": "Guardar",
+        "overBudget": "Sobrepresupuesto: {{amount}} €"
+      },
+      "table": {
+        "newPartLabel": "Nueva partida",
+        "notesPlaceholder": "Notas",
+        "remove": "Eliminar"
+      },
+      "empty": "Sin partidas. Crea la primera.",
+      "add": "Añadir partida",
+      "close": "Cerrar"
+    },
+    "groupCreateModal": {
+      "title": "Unificar proveedores",
+      "nameLabel": "Nombre del grupo",
+      "namePlaceholder": "Ej. Paquete Música + Toro mecánico",
+      "notesLabel": "Notas (opcional)",
+      "notesPlaceholder": "Detalles del alcance combinado, logística, etc.",
+      "cancel": "Cancelar",
+      "confirm": "Crear grupo"
+    },
     "bulkStatusModal": {
       "title": "Cambiar estado",
       "label": "Nuevo estado",

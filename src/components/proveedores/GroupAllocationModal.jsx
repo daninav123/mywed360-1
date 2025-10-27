@@ -147,7 +147,9 @@ export default function GroupAllocationModal({ open, onClose, group, providers =
           <Button variant="outline" onClick={handleAdd}>
             {t('common.suppliers.groupAllocationModal.add')}
           </Button>
-          <Button onClick={onClose}>Cerrar</Button>
+          <Button onClick={onClose}>
+            {t('common.suppliers.groupAllocationModal.close')}
+          </Button>
         </div>
       </div>
     </Modal>

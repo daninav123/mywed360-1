@@ -2597,6 +2597,34 @@
       },
       "close": "Close"
     },
+    "groupAllocationModal": {
+      "title": "Split group scope",
+      "summary": {
+        "totalLabel": "Allocated total",
+        "targetLabel": "Target budget",
+        "targetValue": "{{amount}} €",
+        "noTarget": "—",
+        "save": "Save",
+        "overBudget": "Over budget: {{amount}} €"
+      },
+      "table": {
+        "newPartLabel": "New item",
+        "notesPlaceholder": "Notes",
+        "remove": "Remove"
+      },
+      "empty": "No items yet. Create the first one.",
+      "add": "Add item",
+      "close": "Close"
+    },
+    "groupCreateModal": {
+      "title": "Merge suppliers",
+      "nameLabel": "Group name",
+      "namePlaceholder": "E.g. Music package + Mechanical bull",
+      "notesLabel": "Notes (optional)",
+      "notesPlaceholder": "Combined scope details, logistics, etc.",
+      "cancel": "Cancel",
+      "confirm": "Create group"
+    },
     "bulkStatusModal": {
       "title": "Change status",
       "label": "New status",

@@ -22,7 +22,6 @@ const MarketingLayout = ({ children }) => {
       { to: '/', label: safeT('nav.home', 'Inicio') },
       { to: '/app', label: safeT('nav.app', 'La App') },
       { to: '/precios', label: safeT('nav.pricing', 'Precios') },
-      { to: '/acceso', label: safeT('nav.login', 'Login / Registro') },
     ],
     [safeT]
   );
@@ -54,7 +53,7 @@ const MarketingLayout = ({ children }) => {
 
   return (
     <div className="flex min-h-screen flex-col bg-app text-body">
-      <header className="sticky top-0 z-30 border-b border-soft bg-app/95 backdrop-blur">
+      <header className="sticky top-0 z-30 border-b border-soft bg-app shadow-sm">
         <div className="layout-container flex items-center justify-between py-4">
           <Link to="/" className="flex items-center gap-3 text-lg font-semibold text-body">
             <img
@@ -114,6 +113,20 @@ const MarketingLayout = ({ children }) => {
               </NavLink>
             ))}
           </nav>
+          <div className="layout-container flex flex-col gap-2 px-4 pb-4">
+            <Link
+              to="/login"
+              className="w-full rounded-md border border-[color:var(--color-text)]/20 px-4 py-2 text-center text-sm font-medium text-[color:var(--color-text)] transition-colors hover:bg-[var(--color-accent)]/20"
+            >
+              {safeT('nav.loginShort', 'Iniciar sesión')}
+            </Link>
+            <Link
+              to="/signup"
+              className="w-full rounded-md bg-[var(--color-primary)] px-4 py-2 text-center text-sm font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5 hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
+            >
+              {safeT('nav.signupShort', 'Crear cuenta')}
+            </Link>
+          </div>
         </div>
       </header>
 
