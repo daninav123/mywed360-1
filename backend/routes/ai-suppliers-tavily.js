@@ -2,6 +2,19 @@
 // Búsqueda REAL de proveedores usando Tavily Search API + OpenAI
 // POST /api/ai-suppliers-tavily
 // Body: { query, service, budget, profile, location }
+//
+// ⚠️ CRÍTICO: Este endpoint devuelve SOLO tarjetas de PROVEEDORES REALES individuales.
+// NO devuelve motores de búsqueda, directorios ni listados de múltiples proveedores.
+// 
+// ✅ CORRECTO: bodas.net/fotografia/delia-fotografos--e123456 (perfil específico con ID)
+// ❌ INCORRECTO: bodas.net/fotografos (listado de todos los fotógrafos)
+// ❌ INCORRECTO: bodas.net/buscar?q=fotografo (motor de búsqueda)
+// 
+// Cada tarjeta debe tener:
+// - Nombre propio del proveedor (NO "Encuentra", "Mejores", etc.)
+// - URL específica con ID único o dominio propio
+// - Email, teléfono, Instagram del proveedor individual
+// - Descripción en primera persona ("Somos", "Ofrecemos", NO "Compara", "Encuentra")
 
 import express from 'express';
 import OpenAI from 'openai';
@@ -641,7 +654,9 @@ router.post('/', async (req, res) => {
     }
 
     // 2. FILTRAR resultados que no sean proveedores específicos
-    // Eliminar páginas de búsqueda, categorías, directorios, etc.
+    // ⚠️ OBJETIVO: Solo aceptar TARJETAS DE PROVEEDORES REALES
+    // ❌ DESCARTAR: Motores de búsqueda, directorios, listados, comparadores
+    // ✅ ACEPTAR: Perfiles individuales de empresas/profesionales
     const isValidProviderUrl = (url) => {
       if (!url) return false;
       
@@ -712,6 +727,8 @@ router.post('/', async (req, res) => {
       }
       
       // Validar título (detectar páginas de listado por el título)
+      // ❌ DESCARTAR títulos como: "Encuentra fotógrafos", "Mejores proveedores", "Directorio de..."
+      // ✅ ACEPTAR títulos como: "Delia Fotógrafos", "Juan López Fotografía"
       const titleLower = (result.title || '').toLowerCase();
       const invalidTitlePatterns = [
         'encuentra', 'busca', 'directorio', 'listado',
@@ -754,6 +771,8 @@ router.post('/', async (req, res) => {
       }
       
       // Validar contenido (debe mencionar un proveedor específico)
+      // ❌ DESCARTAR contenido como: "Compara precios", "Todos los proveedores en Madrid"
+      // ✅ ACEPTAR contenido como: "Nuestros servicios", "Sobre nosotros", "Contacta con nosotros"
       const contentLower = (result.content || '').toLowerCase();
       
       // El contenido debe tener longitud mínima

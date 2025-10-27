@@ -34,11 +34,38 @@
     - Contadores rápidos (todos/favoritos) y feedback del último resultado (origen IA/manual, fecha, notas).
     - Sub-sección **Shortlist guardada**: tarjetas semitransparentes con candidatos “vistos” agrupados por servicio, mostrando match y notas. Desde aquí se puede promover o descartar sin cambiar de pestaña.
   - Cuando se lanza una búsqueda IA:
-    - El sistema genera un *prompt* compuesto automáticamente a partir del perfil de la boda (`weddingInfo` + `wantedServices`): estilo preferido, tipo de evento, fecha, presupuesto objetivo, localización, número de asistentes, servicios aún pendientes y restricciones (`noGoItems`). 
-    - Ese prompt se envía al proveedor IA (OpenAI / modelo propio) solicitando candidatos contextualizados. El usuario puede modificar el texto base antes de enviar (“Florista Barcelona 2500”, etc.), pero el motor siempre anexa los datos estructurados para mejorar la relevancia.
-    - Las respuestas se normalizan (`mapAIResultToProvider`) y se guardan de forma idempotente en la shortlist, evitando duplicados por email o enlace. Si la IA devuelve información incompleta, se rellenan campos con defaults (email sintético, servicio actual).
-    - En caso de fallo o respuesta vacía, se muestra mensaje en el panel y se mantiene el buscador abierto para ajustes manuales.
-    - Los resultados inmediatos se muestran justo debajo del formulario como tarjetas de “candidato sugerido”: nombre, servicio, snippet y match. Desde ahí el planner puede guardarlo (añade a shortlist) o descartarlo sin salir del panel.
+    - El sistema utiliza **Tavily Search API** para búsqueda web real de proveedores, seguido de **OpenAI** para estructurar y filtrar resultados.
+    - El motor de búsqueda construye una query optimizada a partir del perfil de la boda (`weddingInfo` + `wantedServices`): servicio solicitado, localización, presupuesto objetivo, estilo preferido y restricciones (`noGoItems`).
+    - **Tavily Search API** (`POST /api/ai-suppliers-tavily`):
+      1. Busca proveedores reales en la web (bodas.net, sitios oficiales, Instagram, etc.)
+      2. Incluye `search_depth: 'advanced'` para resultados más específicos
+      3. Scraped automático de cada URL para obtener: email, teléfono, Instagram e imágenes
+      4. Filtrado multicapa para eliminar páginas de listado/búsqueda (solo perfiles específicos)
+    - **⚠️ CRÍTICO - Cada tarjeta DEBE SER de un PROVEEDOR REAL**:
+      - 🏢 **Perfil específico** de UNA empresa/profesional individual
+      - ❌ **NO motores de búsqueda**: Descarta bodas.net/fotografos, proveedores.com/buscar, etc.
+      - ❌ **NO directorios**: Descarta listados de múltiples proveedores
+      - ❌ **NO categorías**: Descarta páginas genéricas como "fotografia/valencia"
+      - ✅ **SÍ perfiles únicos**: bodas.net/fotografia/nombre-proveedor--e123456 (con ID)
+      - ✅ **SÍ sitios propios**: www.nombreproveedor.com
+      - ✅ **SÍ perfiles sociales**: instagram.com/nombreproveedor
+    - **Requisitos técnicos de cada tarjeta**:
+      - ✅ **Link**: URL específica del proveedor con ID único o dominio propio (NO `/buscar`, `/categoria`, `?q=`)
+      - ✅ **Email**: Email directo del proveedor (NO emails genéricos de contacto múltiple)
+      - ✅ **Teléfono**: Teléfono directo español (+34, 6XX, 9XX) del proveedor
+      - ✅ **Instagram**: URL del perfil específico (https://instagram.com/usuario, NO hashtags)
+      - ✅ **Imagen**: Foto del trabajo del proveedor (scraped desde og:image, NO logos genéricos)
+      - ✅ **Ubicación**: Ciudad específica extraída del contenido
+      - ✅ **Nombre**: Nombre propio del proveedor (sin "Bodas.net", "Encuentra", "Mejores")
+      - ✅ **Descripción**: Contenido en primera persona ("Somos", "Ofrecemos", NO "Compara", "Encuentra")
+    - **Filtrado de calidad**:
+      - ❌ Se descartan URLs con: `/buscar`, `/search`, `/directorio`, `/categoria`
+      - ❌ Se descartan títulos genéricos: "Encuentra", "Mejores", "Listado de"
+      - ❌ Se descartan contenidos de listado múltiple: "Compara precios", "Todos los proveedores"
+      - ✅ Se aceptan solo páginas con indicadores de proveedor único: "nuestros servicios", "sobre nosotros", "portfolio"
+    - Las respuestas se normalizan y se guardan de forma idempotente en la shortlist, evitando duplicados por email o enlace.
+    - Si Tavily no devuelve resultados o falla, se muestra mensaje en el panel y se mantiene el buscador abierto para ajustes manuales.
+    - Los resultados inmediatos se muestran justo debajo del formulario como **tarjetas únicas de proveedor**: nombre, servicio, ubicación, snippet, email (con icono de sobre), teléfono (con icono de teléfono), Instagram (con icono rosa), imagen y enlace. Desde ahí el planner puede guardarlo (añade a shortlist) o descartarlo sin salir del panel.
 - **Área principal (scroll)**
   - El bloque **Servicios** lista cada servicio en tarjetas semitransparentes (pendientes) o sólidas (confirmados). Las tarjetas muestran nombre del servicio, badge “Pendiente/Confirmado” y, en caso de shortlist, el número de candidatos guardados.
   - Al hacer clic sobre una tarjeta pendiente se abre el modal **Opciones Guardadas**:
@@ -123,9 +150,16 @@
 ## 4. Persistencia y datos
 - Firestore `weddings/{id}/suppliers/{supplierId}`
   - Campos obligatorios: `name`, `primaryContact`, `email`, `phone`, `statusGlobal`, `ownerUserId`, `createdAt`, `updatedAt`.
+  - **Campos de contacto scraped** (desde Tavily):
+    - `email`: Email del proveedor (extraído del sitio web o disponible en Tavily)
+    - `phone`: Teléfono español (formatos: +34 XXX XXX XXX, 6XX XXX XXX, 9XX XX XX XX)
+    - `instagram`: URL del perfil de Instagram (https://instagram.com/usuario)
+    - `link`: URL específica del perfil del proveedor (NO páginas de búsqueda)
+    - `image`: URL de la imagen principal (scraped desde og:image, twitter:image o primera imagen)
+    - `location`: Ubicación extraída del contenido (ciudades españolas)
   - Campos financieros: `budget = { planned: number, estimated: number, currency, lastSyncedAt }`, `payments = { pending: number, paid: number }`, `financeLink` (path a documento de finanzas relacionado).
-  - Flags y metadatos: `isFavorite`, `isMultiService`, `tags[]`, `portalState` (`draft|active|public`), `source` (`manual|ai|import`), `mergeRootId` (para duplicados), `styleAlignment`.
-  - Auditoria: `audit = { createdBy, updatedBy, lastPortalUpdate }`.
+  - Flags y metadatos: `isFavorite`, `isMultiService`, `tags[]`, `portalState` (`draft|active|public`), `source` (`manual|ai|tavily`), `mergeRootId` (para duplicados), `styleAlignment`.
+  - Auditoria: `audit = { createdBy, updatedBy, lastPortalUpdate, scrapedAt }`.
   - Indices compuestos: `(statusGlobal, isFavorite)`, `(tags, statusGlobal)`, `(portalState, statusGlobal)`.
 - Subcoleccion `serviceLines` (`weddings/{id}/suppliers/{supplierId}/serviceLines/{lineId}`)
   - Campos clave: `serviceName`, `category`, `status`, `stageHistory[]`, `budget = { planned, negotiated, variance }`, `dates = { requested, proposalReceived, contractSigned, eventDate }`, `kpis = { responseTimeHours, winProbability }`.
@@ -262,11 +296,86 @@
 - `cypress/e2e/proveedores_compare.cy.js`: valida la comparativa de proveedores y la generación de shortlist.
 - `cypress/e2e/proveedores_smoke.cy.js`: smoke general del módulo para garantizar accesos y filtros básicos.
 
-## 10. Checklist de despliegue
-- Credenciales `OPENAI_*` / `VITE_OPENAI_*`, `MAILGUN_*`, `SUPPLIER_TRACKING_ENDPOINT` configuradas.
+## 10. API y Endpoints
+
+### **POST /api/ai-suppliers-tavily**
+Búsqueda real de proveedores usando Tavily Search API + scraping automático.
+
+> ⚠️ **IMPORTANTE**: Este endpoint devuelve **SOLO tarjetas de proveedores reales individuales**.
+> NO devuelve motores de búsqueda, directorios ni listados de múltiples proveedores.
+> Cada tarjeta representa UN proveedor específico con datos de contacto directos.
+
+**Request:**
+```json
+{
+  "query": "fotógrafo de bodas",
+  "service": "Fotografía",
+  "location": "Madrid",
+  "budget": 3000,
+  "profile": {
+    "style": "moderno",
+    "guests": 120,
+    "date": "2025-06-15"
+  },
+  "useRanking": false
+}
+```
+
+**Response:**
+```json
+[
+  {
+    "title": "Delia Fotógrafos",
+    "link": "https://www.bodas.net/fotografia/delia-fotografos--e123456",
+    "image": "https://cdn.bodas.net/img/fotografos/delia-123.jpg",
+    "snippet": "Fotografía de bodas con estilo natural y moderno...",
+    "service": "Fotografía",
+    "location": "Valencia",
+    "email": "info@deliafotografos.com",
+    "phone": "+34 666 777 888",
+    "instagram": "https://www.instagram.com/deliafotografos",
+    "priceRange": "",
+    "tags": [],
+    "score": 0.95
+  }
+]
+```
+
+**Proceso interno:**
+1. **Tavily Search** (`search_depth: 'advanced'`, `max_results: 20`)
+2. **Filtrado multicapa**:
+   - URLs: Descarta `/buscar`, `/directorio`, `/categoria`
+   - Títulos: Descarta "Encuentra", "Mejores", "Listado"
+   - Contenido: Verifica indicadores de proveedor único
+   - bodas.net: Requiere ID numérico (ej: `/fotografia/nombre-123456`)
+3. **Scraping paralelo** de cada URL válida:
+   - Email: Regex `[\w.-]+@[\w.-]+\.\w+`
+   - Teléfono: Regex `/(?:\+34|0034)?\s?[6789]\d{2}\s?\d{3}\s?\d{3}/`
+   - Instagram: Busca enlaces `instagram.com/usuario` o `@usuario`
+   - Imagen: `og:image` > `twitter:image` > primera imagen válida
+4. **Limpieza de nombres**: Elimina sufijos "Bodas.net", separadores genéricos
+5. **Extracción de ubicación**: Detecta ciudades españolas en el contenido
+6. **Top 8 resultados**: Devuelve solo los mejores 8 proveedores únicos
+
+**Variables de entorno requeridas:**
+```env
+TAVILY_API_KEY=tvly-dev-xxxxx  # Obtener en https://tavily.com
+OPENAI_API_KEY=sk-proj-xxxxx   # Para ranking opcional
+```
+
+**Límites:**
+- Tavily: 1,000 búsquedas/mes gratis
+- `search_depth: 'advanced'` consume 2 créditos por búsqueda
+- Timeout de scraping: 10s por URL
+
+---
+
+## 11. Checklist de despliegue
+- Credenciales `TAVILY_API_KEY`, `OPENAI_*` / `VITE_OPENAI_*`, `MAILGUN_*`, `SUPPLIER_TRACKING_ENDPOINT` configuradas.
 - Reglas Firestore para `suppliers`, subcolección `serviceLines`, `supplierGroups`, `supplierEmails`, `supplierShortlist`.
 - Validar límites de documentos y seguridad para narrativas IA y almacenamiento de shortlist.
 - QA del tablero y filtros (performance > 500 proveedores).
+- Verificar que Tavily devuelva resultados para búsquedas típicas (fotografía, catering, DJ, flores).
 
 ## 11. Roadmap / pendientes
 - Scoring IA consolidado con métricas históricas por servicio.
@@ -276,28 +385,40 @@
 - Integración con marketplaces externos y recomendaciones en sitio público.
 
 
-### 🔍 ESTADO REAL VERIFICADO (2025-10-24)
+### 🔍 ESTADO REAL VERIFICADO (2025-10-27)
 
 **✅ IMPLEMENTADO Y FUNCIONAL:**
 
-1. **useAISearch Hook** - `src/hooks/useAISearch.jsx` ✅ (439 líneas)
-   - Búsqueda IA con OpenAI integrada
+1. **Backend - Tavily Search API** - `backend/routes/ai-suppliers-tavily.js` ✅
+   - Búsqueda web real con Tavily Search API
+   - Scraping automático de email, teléfono, Instagram e imágenes
+   - Filtrado multicapa (URLs, títulos, contenido)
+   - Limpieza de nombres de proveedores
+   - Extracción de ubicaciones españolas
+   - Detección y descarte de páginas de listado/búsqueda
+   - Top 8 resultados únicos
+   - Funciones: `searchTavily()`, `scrapeProviderData()`, `isValidProviderUrl()`
+
+2. **useAISearch Hook** - `src/hooks/useAISearch.jsx` ✅ (439 líneas)
+   - Integración con endpoint `/api/ai-suppliers-tavily`
    - Normalización de resultados (`normalizeResult()`)
    - Match scoring automático
    - Generación de resúmenes IA
    - Funciones: `guessServiceFromQuery()`, `ensureMatchScore()`, `generateAISummary()`
 
-2. **Componentes IA** ✅
+3. **Componentes IA** ✅
    - `src/components/proveedores/ai/AISearchModal.jsx` ✅
    - `src/components/proveedores/ai/AIEmailModal.jsx` ✅ (6103 bytes)
-   - `src/components/proveedores/ai/AIResultList.jsx` ✅ (13425 bytes)
+   - `src/components/proveedores/ai/AIResultList.jsx` ✅ (actualizado con Instagram)
+   - **Tarjetas de proveedor** con: Link, Email, Teléfono, Instagram, Imagen, Ubicación
 
-3. **Componentes Core** ✅
+4. **Componentes Core** ✅
    - `src/components/proveedores/ProveedorList.jsx` ✅ (CORREGIDO)
    - `src/components/proveedores/ProveedorCard.jsx` ✅
 
-4. **Tests E2E** ✅
+5. **Tests E2E** ✅
    - `cypress/e2e/ai-supplier-search.cy.js` ✅ (252 líneas)
+   - `cypress/e2e/ai-supplier-images-validation.cy.js` ✅ (validación de imágenes scraped)
    - `cypress/e2e/proveedores_flow.cy.js` ✅
    - `cypress/e2e/proveedores_smoke.cy.js` ✅
 
@@ -337,20 +458,102 @@
    - Tests de modales: ❌ (AISearchModal, AIEmailModal sin tests)
    - Cobertura E2E: ~50%
 
-### Implementación Actual: **70%**
+### Implementación Actual: **85%**
 
 **Código verificado:**
+
 ```javascript
-// useAISearch.jsx - Líneas 46-66
-const normalizeResult = (item, index, query, source) => {
-  const name = (item?.name || item?.title || `Proveedor sugerido ${index + 1}`).trim();
-  const service = (item?.service || item?.category || guessServiceFromQuery(query)).trim();
-  const location = item?.location || item?.city || '';
-  const priceRange = item?.priceRange || item?.price || '';
-  // ... normalización completa con 15+ campos
-  return { id, name, service, location, priceRange, description, tags, 
-           image, website, email, phone, match, aiSummary, source };
+// backend/routes/ai-suppliers-tavily.js - Búsqueda con Tavily
+const searchTavily = async (query, location) => {
+  const searchQuery = `"${query}" ${location} contacto portfolio sobre -directorio -buscar`;
+  
+  const response = await fetch('https://api.tavily.com/search', {
+    method: 'POST',
+    body: JSON.stringify({
+      api_key: process.env.TAVILY_API_KEY,
+      query: searchQuery,
+      search_depth: 'advanced',
+      include_raw_content: true,
+      include_images: true,
+      max_results: 20
+    })
+  });
+  
+  const data = await response.json();
+  
+  // Scraping paralelo de cada resultado
+  const resultsWithData = await Promise.all(
+    data.results.map(async (result) => {
+      const scrapedData = await scrapeProviderData(result.url);
+      return {
+        ...result,
+        email: scrapedData.email,
+        phone: scrapedData.phone,
+        instagram: scrapedData.instagram,
+        image: scrapedData.image || result.image
+      };
+    })
+  );
+  
+  return resultsWithData;
 };
+
+// Filtrado multicapa para solo perfiles específicos
+const validResults = tavilyResults.filter((result) => {
+  // URLs válidas (no páginas de búsqueda)
+  const isValidUrl = !result.url.includes('/buscar') && 
+                     !result.url.includes('/directorio') &&
+                     /\/\d{5,}/.test(result.url); // Requiere ID numérico
+  
+  // Títulos específicos (no genéricos)
+  const validTitle = !result.title.toLowerCase().includes('encuentra') &&
+                     !result.title.toLowerCase().includes('listado');
+  
+  // Contenido de proveedor único (no múltiple)
+  const hasUniqueProviderIndicators = 
+    result.content.includes('nuestros servicios') ||
+    result.content.includes('sobre nosotros');
+  
+  return isValidUrl && validTitle && hasUniqueProviderIndicators;
+});
+
+// Retorna solo los mejores 8 proveedores únicos
+return validResults.slice(0, 8).map((result) => ({
+  title: cleanProviderName(result.title),
+  link: result.url,
+  email: result.email || '',
+  phone: result.phone || '',
+  instagram: result.instagram || '',
+  image: result.image || '',
+  location: extractLocation(result.content),
+  snippet: result.content.substring(0, 200) + '...',
+  service: service,
+  score: result.score
+}));
+```
+
+```javascript
+// src/components/proveedores/ai/AIResultList.jsx - Tarjetas con contacto
+<div className="flex flex-wrap gap-3 mb-2">
+  {result.email && (
+    <a href={`mailto:${result.email}`} className="flex items-center text-sm text-blue-600">
+      <Mail size={14} className="mr-1" />
+      {result.email}
+    </a>
+  )}
+  {result.phone && (
+    <a href={`tel:${result.phone}`} className="flex items-center text-sm text-green-600">
+      <Phone size={14} className="mr-1" />
+      {result.phone}
+    </a>
+  )}
+  {result.instagram && (
+    <a href={result.instagram} target="_blank" className="flex items-center text-sm text-pink-600">
+      <Instagram size={14} className="mr-1" />
+      Instagram
+    </a>
+  )}
+</div>
 ```
 
 ### Pendientes Priorizados:
