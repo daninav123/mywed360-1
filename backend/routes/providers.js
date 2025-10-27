@@ -4,6 +4,27 @@ import { z, validate } from '../utils/validation.js';
 
 const router = express.Router();
 
+const normalizeText = (value) =>
+  String(value || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+
+const buildMatcher = (rawTerm) => {
+  const baseTerm = normalizeText(rawTerm);
+  const tokens = baseTerm.split(/\s+/).filter(Boolean);
+  if (!baseTerm && tokens.length === 0) {
+    return () => true;
+  }
+  return (value) => {
+    const normalized = normalizeText(value);
+    if (!normalized) return false;
+    if (baseTerm && normalized.includes(baseTerm)) return true;
+    if (!tokens.length) return false;
+    return tokens.some((token) => normalized.includes(token));
+  };
+};
+
 async function listProviders({ category, status, q, limit = 20 }) {
   let query = admin.firestore().collection('providers');
   if (category) query = query.where('category', '==', category);
@@ -13,18 +34,17 @@ async function listProviders({ category, status, q, limit = 20 }) {
   const snap = await query.get();
   let items = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
   if (q) {
-    const term = String(q).toLowerCase();
+    const matches = buildMatcher(q);
     items = items.filter((it) => {
-      const name = String(it.name || '').toLowerCase();
-      const location = String(it.location || '').toLowerCase();
-      const inServices = Array.isArray(it.services)
-        ? it.services.some((s) =>
-            String(s?.name || '')
-              .toLowerCase()
-              .includes(term)
-          )
+      const nameMatch = matches(it.name);
+      const locationMatch = matches(it.location);
+      const categoryMatch = matches(it.category);
+      const tagMatch = Array.isArray(it.tags) ? it.tags.some((tag) => matches(tag)) : false;
+      const keywordMatch = Array.isArray(it.keywords) ? it.keywords.some((tag) => matches(tag)) : false;
+      const servicesMatch = Array.isArray(it.services)
+        ? it.services.some((svc) => matches(svc?.name) || matches(svc?.description))
         : false;
-      return name.includes(term) || location.includes(term) || inServices;
+      return nameMatch || locationMatch || categoryMatch || tagMatch || keywordMatch || servicesMatch;
     });
   }
   return items;
