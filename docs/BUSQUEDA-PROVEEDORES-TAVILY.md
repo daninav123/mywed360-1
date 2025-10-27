@@ -16,62 +16,102 @@ Búsqueda **web real** de proveedores de bodas usando **Tavily Search API** + **
 
 ---
 
-## ⚠️ **CRÍTICO: Tarjeta de Proveedor Real vs Motor de Búsqueda**
+## ⚠️ **CRÍTICO: Perfil de Proveedor Específico vs Página de Listado**
 
-### **✅ TARJETA DE PROVEEDOR REAL (CORRECTO)**
+### **✅ PERFIL ESPECÍFICO DE PROVEEDOR (CORRECTO)**
 
-Una tarjeta de proveedor **DEBE SER**:
+**El enlace de la tarjeta DEBE llevar a:**
 
-- 🏢 **Perfil específico de UNA empresa/profesional**
-- 📧 **Datos de contacto directos** del proveedor
-- 🌐 **Sitio web propio** o perfil único en un directorio
-- 📸 **Fotos del trabajo** del proveedor
-- 📝 **Descripción del proveedor** en primera persona ("Somos", "Ofrecemos")
+- 🎯 **Perfil/página de UN SOLO proveedor específico**
+- 📄 **Contenido sobre ESE proveedor**: sus servicios, portfolio, sobre nosotros
+- 📧 **Datos de contacto del proveedor**: email, teléfono, redes sociales
+- 📸 **Fotos del trabajo de ESE proveedor**
+- ❌ **NO debe mostrar múltiples proveedores** en la misma página
 
-**Ejemplos correctos:**
+**✅ SE ACEPTAN URLs de directorios/plataformas SI llevan a un perfil específico:**
+
 ```
-✅ "Delia Fotógrafos - Valencia"
+✅ CORRECTO: bodas.net con perfil específico
    URL: https://www.bodas.net/fotografia/delia-fotografos--e123456
-   → Perfil específico con ID único
-   
-✅ "Juan López Fotografía"
+   → Lleva al PERFIL de "Delia Fotógrafos" (UN proveedor)
+   → bodas.net actúa como plataforma, pero muestra 1 proveedor
+
+✅ CORRECTO: Sitio web propio
    URL: https://www.juanlopezfoto.com
-   → Sitio web propio del fotógrafo
+   → Sitio web del fotógrafo Juan López (UN proveedor)
    
-✅ "Estudio Fotográfico Valencia"
+✅ CORRECTO: Perfil en Instagram
    URL: https://www.instagram.com/estudiofotovalencia
-   → Perfil específico en Instagram
+   → Perfil específico del Estudio Fotográfico Valencia (UN proveedor)
+
+✅ CORRECTO: Perfil en otro directorio
+   URL: https://www.proveedoresbodas.com/perfil/catering-martinez-12345
+   → Lleva al PERFIL de "Catering Martínez" (UN proveedor)
 ```
 
 ---
 
-### **❌ MOTOR DE BÚSQUEDA / LISTADO (INCORRECTO)**
+### **❌ PÁGINA DE LISTADO MÚLTIPLE (INCORRECTO)**
 
-Una tarjeta **NO DEBE SER**:
+**El enlace de la tarjeta NO DEBE llevar a:**
 
-- 🚫 **Página de búsqueda** de proveedores
-- 🚫 **Directorio** con múltiples proveedores
-- 🚫 **Categoría** genérica de servicios
-- 🚫 **Listado** de opciones
-- 🚫 **Comparador** de precios/proveedores
+- 🚫 **Página que muestra VARIOS proveedores** (listado, directorio, resultados)
+- 🚫 **Buscador** que requiere otra búsqueda
+- 🚫 **Categoría genérica** sin proveedor específico
+- 🚫 **Comparador** de múltiples opciones
 
-**Ejemplos incorrectos que SE DESCARTAN:**
+**❌ SE DESCARTAN URLs que llevan a listados múltiples:**
+
 ```
-❌ "Encuentra fotógrafos en Madrid"
-   URL: https://www.bodas.net/fotografos?ciudad=madrid
-   → Motor de búsqueda, NO proveedor específico
-   
-❌ "Mejores fotógrafos para bodas"
+❌ INCORRECTO: bodas.net sin perfil específico
    URL: https://www.bodas.net/fotografia
-   → Categoría genérica, NO perfil único
+   → Muestra LISTADO de todos los fotógrafos (MÚLTIPLES proveedores)
    
-❌ "Directorio de DJ en Valencia"
+❌ INCORRECTO: Buscador con resultados
+   URL: https://www.bodas.net/fotografos?ciudad=madrid
+   → Página de BÚSQUEDA con múltiples resultados
+   
+❌ INCORRECTO: Directorio sin perfil
    URL: https://www.proveedores.com/dj/valencia
-   → Listado múltiple, NO proveedor individual
+   → Listado de todos los DJs en Valencia (MÚLTIPLES proveedores)
    
-❌ "Compara precios de catering"
+❌ INCORRECTO: Comparador
    URL: https://www.bodas.net/catering/compara
-   → Comparador, NO proveedor directo
+   → Página para comparar múltiples proveedores
+```
+
+---
+
+## 🎯 **Regla de Oro:**
+
+**"Si hago clic en el enlace de la tarjeta, ¿me lleva DIRECTAMENTE al perfil/página de ESE proveedor específico?"**
+
+- ✅ **SÍ** → Tarjeta válida (aunque sea en bodas.net u otro directorio)
+- ❌ **NO** (me muestra varios proveedores para elegir) → Tarjeta inválida
+
+**Ejemplo práctico:**
+
+```
+Tarjeta: "Delia Fotógrafos - Valencia"
+Link: bodas.net/fotografia/delia-fotografos--e123456
+
+Al hacer clic:
+✅ ¿Me lleva a la página de Delia Fotógrafos? → SÍ
+✅ ¿Veo su portfolio, precios, contacto? → SÍ  
+✅ ¿O veo una lista de 20 fotógrafos? → NO
+
+→ TARJETA VÁLIDA ✅
+```
+
+```
+Tarjeta: "Fotógrafos en Madrid"
+Link: bodas.net/fotografia?ciudad=madrid
+
+Al hacer clic:
+❌ ¿Me lleva a la página de un fotógrafo? → NO
+❌ ¿Veo una lista de múltiples fotógrafos? → SÍ
+
+→ TARJETA INVÁLIDA ❌
 ```
 
 ---

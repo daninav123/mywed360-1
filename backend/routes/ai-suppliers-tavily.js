@@ -3,18 +3,27 @@
 // POST /api/ai-suppliers-tavily
 // Body: { query, service, budget, profile, location }
 //
-// ⚠️ CRÍTICO: Este endpoint devuelve SOLO tarjetas de PROVEEDORES REALES individuales.
-// NO devuelve motores de búsqueda, directorios ni listados de múltiples proveedores.
+// ⚠️ CRÍTICO: El enlace de cada tarjeta DEBE llevar a UN proveedor específico.
+// ❌ NO se aceptan enlaces a PÁGINAS DE LISTADO de múltiples proveedores.
+// ✅ SÍ se aceptan directorios (bodas.net, etc.) SI llevan a UN perfil específico.
 // 
-// ✅ CORRECTO: bodas.net/fotografia/delia-fotografos--e123456 (perfil específico con ID)
-// ❌ INCORRECTO: bodas.net/fotografos (listado de todos los fotógrafos)
-// ❌ INCORRECTO: bodas.net/buscar?q=fotografo (motor de búsqueda)
+// REGLA DE ORO: "¿El enlace me lleva DIRECTAMENTE al perfil de ESE proveedor?"
+// 
+// ✅ CORRECTO: bodas.net/fotografia/delia-fotografos--e123456 
+//    → Lleva al PERFIL de "Delia Fotógrafos" (UN proveedor)
+//    → bodas.net OK si muestra 1 proveedor, NO si muestra listado
+// 
+// ❌ INCORRECTO: bodas.net/fotografia
+//    → Muestra LISTADO de todos los fotógrafos (MÚLTIPLES proveedores)
+// 
+// ❌ INCORRECTO: bodas.net/buscar?q=fotografo
+//    → Página de BÚSQUEDA con múltiples resultados
 // 
 // Cada tarjeta debe tener:
-// - Nombre propio del proveedor (NO "Encuentra", "Mejores", etc.)
-// - URL específica con ID único o dominio propio
-// - Email, teléfono, Instagram del proveedor individual
-// - Descripción en primera persona ("Somos", "Ofrecemos", NO "Compara", "Encuentra")
+// - Nombre propio del proveedor específico
+// - URL que lleva a SU perfil/página (no a un listado)
+// - Email, teléfono, Instagram del proveedor
+// - Descripción sobre ESE proveedor ("Somos", "Nuestros servicios")
 
 import express from 'express';
 import OpenAI from 'openai';
@@ -653,16 +662,20 @@ router.post('/', async (req, res) => {
       return res.json([]);
     }
 
-    // 2. FILTRAR resultados que no sean proveedores específicos
-    // ⚠️ OBJETIVO: Solo aceptar TARJETAS DE PROVEEDORES REALES
-    // ❌ DESCARTAR: Motores de búsqueda, directorios, listados, comparadores
-    // ✅ ACEPTAR: Perfiles individuales de empresas/profesionales
+    // 2. FILTRAR URLs que llevan a PÁGINAS DE LISTADO (no a perfiles específicos)
+    // ⚠️ OBJETIVO: Solo aceptar enlaces que lleven a UN proveedor específico
+    // ❌ DESCARTAR: URLs a páginas de búsqueda, directorios, listados múltiples
+    // ✅ ACEPTAR: URLs a perfiles individuales (propios o en directorios como bodas.net)
+    //
+    // REGLA: ¿El enlace me lleva DIRECTAMENTE al perfil de ESE proveedor?
+    // - SÍ (bodas.net/fotografia/nombre--e123) → ACEPTAR ✅
+    // - NO (bodas.net/fotografia) → DESCARTAR ❌
     const isValidProviderUrl = (url) => {
       if (!url) return false;
       
       const urlLower = url.toLowerCase();
       
-      // Descartar URLs de búsqueda o listados
+      // Descartar URLs a PÁGINAS DE LISTADO (múltiples proveedores)
       const invalidPatterns = [
         '/buscar', '/search', '/resultados', '/results',
         '/busqueda', '/encuentra', '/directorio', '/listado',
@@ -679,7 +692,7 @@ router.post('/', async (req, res) => {
       
       const isInvalid = invalidPatterns.some(pattern => urlLower.includes(pattern));
       if (isInvalid) {
-        console.log(`❌ [FILTRO] Descartando URL de listado/búsqueda: ${url}`);
+        console.log(`❌ [FILTRO-URL] Página de listado múltiple descartada: ${url}`);
         return false;
       }
       
@@ -690,24 +703,26 @@ router.post('/', async (req, res) => {
         
         // Si tiene muy pocos segmentos, probablemente es una página genérica
         if (pathSegments.length < 2) {
-          console.log(`⚠️ [FILTRO] URL demasiado genérica: ${url}`);
+          console.log(`❌ [FILTRO-URL] URL demasiado genérica (sin perfil específico): ${url}`);
           return false;
         }
         
-        // Para bodas.net, verificar que tenga un ID numérico (URLs de proveedores específicos)
+        // Para bodas.net: ACEPTAR solo si tiene ID numérico (perfil específico)
+        // ✅ bodas.net/fotografia/nombre--e123456 → ACEPTAR (tiene ID)
+        // ❌ bodas.net/fotografia → DESCARTAR (categoría genérica, muestra listado)
         if (urlLower.includes('bodas.net')) {
           const hasNumericId = /\/\d{5,}/.test(urlObj.pathname); // IDs de bodas.net suelen ser largos
           if (!hasNumericId) {
-            console.log(`❌ [FILTRO] bodas.net sin ID específico: ${url}`);
+            console.log(`❌ [FILTRO-URL] bodas.net sin ID de proveedor (página de listado): ${url}`);
             return false;
           }
         }
         
-        // Verificar que el último segmento sea específico (no una categoría)
+        // Verificar que el último segmento sea específico (no una categoría genérica)
         const lastSegment = pathSegments[pathSegments.length - 1];
         const genericLastSegments = ['fotografia', 'video', 'catering', 'flores', 'musica', 'dj', 'eventos', 'bodas'];
         if (genericLastSegments.includes(lastSegment.toLowerCase())) {
-          console.log(`❌ [FILTRO] Último segmento es categoría: ${url}`);
+          console.log(`❌ [FILTRO-URL] Categoría genérica (muestra listado, no perfil): ${url}`);
           return false;
         }
         
@@ -818,10 +833,11 @@ router.post('/', async (req, res) => {
     });
     
     console.log('\n' + '='.repeat(80));
-    console.log(`✅ [FILTRO] ${validResults.length}/${tavilyResults.length} resultados son proveedores específicos`);
+    console.log(`✅ [FILTRO] ${validResults.length}/${tavilyResults.length} URLs llevan a perfiles específicos`);
+    console.log(`   Descartados: ${tavilyResults.length - validResults.length} URLs a páginas de listado`);
     
     if (validResults.length > 0) {
-      console.log('\n📋 Proveedores válidos encontrados:');
+      console.log('\n📋 Proveedores con perfil específico encontrados:');
       validResults.slice(0, 5).forEach((r, i) => {
         console.log(`  ${i + 1}. ${r.title}`);
         console.log(`     URL: ${r.url}`);
