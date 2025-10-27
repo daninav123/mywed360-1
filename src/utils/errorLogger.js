@@ -26,32 +26,41 @@ class ErrorLogger {
    * Configura los manejadores globales de errores
    */
   setupGlobalErrorHandlers() {
-    // Capturar errores JavaScript no manejados
-    window.addEventListener('error', (event) => {
-      this.logError('JavaScript Error', {
-        message: event.message,
-        filename: event.filename,
-        lineno: event.lineno,
-        colno: event.colno,
-        error: event.error?.stack || event.error,
+    // EN DESARROLLO: Solo interceptar fetch, NO console.error ni window.error
+    // Esto previene bucles infinitos con PerformanceMonitor y setupDebug
+    const isDevelopment = import.meta.env.DEV;
+    
+    if (!isDevelopment) {
+      // Solo en producción: Capturar errores JavaScript no manejados
+      window.addEventListener('error', (event) => {
+        this.logError('JavaScript Error', {
+          message: event.message,
+          filename: event.filename,
+          lineno: event.lineno,
+          colno: event.colno,
+          error: event.error?.stack || event.error,
+        });
       });
-    });
 
-    // Capturar promesas rechazadas no manejadas
-    window.addEventListener('unhandledrejection', (event) => {
-      this.logError('Unhandled Promise Rejection', {
-        reason: event.reason,
-        stack: event.reason?.stack || 'No stack trace available',
+      // Solo en producción: Capturar promesas rechazadas no manejadas
+      window.addEventListener('unhandledrejection', (event) => {
+        this.logError('Unhandled Promise Rejection', {
+          reason: event.reason,
+          stack: event.reason?.stack || 'No stack trace available',
+        });
       });
-    });
 
-    // Interceptar console.error para capturar errores manuales
-    this.originalConsoleError = console.error;
-    console.error = (...args) => {
-      this.logError('Console Error', { args });
-      // Llamar a la implementación original para no perder mensajes
-      this.originalConsoleError.apply(console, args);
-    };
+      // Solo en producción: Interceptar console.error
+      this.originalConsoleError = console.error;
+      console.error = (...args) => {
+        this.logError('Console Error', { args });
+        // Llamar a la implementación original para no perder mensajes
+        this.originalConsoleError.apply(console, args);
+      };
+    } else {
+      // En desarrollo: Solo guardar referencia al console.error original
+      this.originalConsoleError = console.error;
+    }
 
         // Interceptar fetch para capturar errores de red
     const originalFetch = window.fetch;
@@ -227,6 +236,19 @@ class ErrorLogger {
    * Inicia diagnósticos automáticos del sistema
    */
   async startDiagnostics() {
+    // En desarrollo, solo mostrar mensaje simple
+    if (import.meta.env.DEV) {
+      console.log('🔍 [ErrorLogger] Modo desarrollo - Diagnósticos simplificados');
+      
+      // Solo verificar variables de entorno en desarrollo
+      await this.checkEnvironmentVariables();
+      this.isInitialized = true;
+      
+      console.log('💡 ErrorLogger listo (modo dev - sin interceptación de console.error)');
+      return;
+    }
+    
+    // En producción, ejecutar todos los diagnósticos
     console.log('🔍 Iniciando diagnósticos del sistema...');
 
     await Promise.all([

@@ -37,57 +37,64 @@ function triggerViteHardReload() {
 if (typeof window !== 'undefined') {
   let isHandlingError = false;
 
-  window.addEventListener(
-    'error',
-    (event) => {
+  // DESHABILITADO EN DESARROLLO: Causa bucles infinitos con errorLogger
+  // Solo registrar en producción
+  if (import.meta.env.PROD) {
+    window.addEventListener(
+      'error',
+      (event) => {
+        // Prevenir recursión
+        if (isHandlingError) return;
+        isHandlingError = true;
+
+        try {
+          const errorMsg = event.error || event.message || 'Unknown error';
+          performanceMonitor.logError('window_error', errorMsg, {
+            filename: event.filename,
+            lineno: event.lineno,
+            colno: event.colno,
+          });
+        } catch (e) {
+          // NO usar console.error para evitar recursión
+          if (typeof console.warn === 'function') {
+            console.warn('[setupDebug] Error al registrar window_error', e);
+          }
+        } finally {
+          isHandlingError = false;
+        }
+
+        if (isViteOutdatedOptimizeError(event)) {
+          triggerViteHardReload();
+        }
+      },
+      true,
+    );
+  }
+
+  // Maneja rechazos de promesas no capturados
+  // DESHABILITADO EN DESARROLLO: Causa bucles infinitos con errorLogger
+  if (import.meta.env.PROD) {
+    let isHandlingRejection = false;
+    
+    window.addEventListener('unhandledrejection', (event) => {
       // Prevenir recursión
-      if (isHandlingError) return;
-      isHandlingError = true;
+      if (isHandlingRejection) return;
+      isHandlingRejection = true;
 
       try {
-        const errorMsg = event.error || event.message || 'Unknown error';
-        performanceMonitor.logError('window_error', errorMsg, {
-          filename: event.filename,
-          lineno: event.lineno,
-          colno: event.colno,
-        });
+        performanceMonitor.logError('unhandled_promise_rejection', event.reason);
       } catch (e) {
         // NO usar console.error para evitar recursión
         if (typeof console.warn === 'function') {
-          console.warn('[setupDebug] Error al registrar window_error', e);
+          console.warn('[setupDebug] Error al registrar unhandledrejection', e);
         }
       } finally {
-        isHandlingError = false;
+        isHandlingRejection = false;
       }
 
       if (isViteOutdatedOptimizeError(event)) {
         triggerViteHardReload();
       }
-    },
-    true,
-  );
-
-  // Maneja rechazos de promesas no capturados
-  let isHandlingRejection = false;
-  
-  window.addEventListener('unhandledrejection', (event) => {
-    // Prevenir recursión
-    if (isHandlingRejection) return;
-    isHandlingRejection = true;
-
-    try {
-      performanceMonitor.logError('unhandled_promise_rejection', event.reason);
-    } catch (e) {
-      // NO usar console.error para evitar recursión
-      if (typeof console.warn === 'function') {
-        console.warn('[setupDebug] Error al registrar unhandledrejection', e);
-      }
-    } finally {
-      isHandlingRejection = false;
-    }
-
-    if (isViteOutdatedOptimizeError(event)) {
-      triggerViteHardReload();
-    }
-  });
+    });
+  }
 }
