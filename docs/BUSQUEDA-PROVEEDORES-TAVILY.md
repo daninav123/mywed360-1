@@ -347,39 +347,63 @@ const validResults = results.filter(result => {
 });
 ```
 
-### **4. 🆕 Deduplicación por Email y URL**
+### **4. 🆕 Deduplicación Triple: Email, URL y Nombre**
 
 ```javascript
 const seenEmails = new Set();
 const seenUrls = new Set();
+const seenTitles = new Set();
+
+// Normalizar títulos para detectar similitudes
+const normalizeTitleForComparison = (title) => {
+  return title
+    .toLowerCase()
+    .trim()
+    // Eliminar palabras genéricas
+    .replace(/\b(fotografía|fotógrafo|bodas|de|para|en)\b/gi, '')
+    .replace(/[^\w\s]/g, '') // Sin puntuación
+    .replace(/\s+/g, ''); // Sin espacios
+};
 
 const uniqueResults = validResults.filter(result => {
-  // Si tiene email, verificar que no esté duplicado
+  // 1. DEDUPLICACIÓN POR EMAIL
   if (result.email && result.email.trim() !== '') {
     const emailLower = result.email.toLowerCase().trim();
     if (seenEmails.has(emailLower)) {
-      console.log(`🗑️ [DEDUP] Duplicado por email: ${result.title}`);
+      console.log(`🗑️ [DEDUP-EMAIL] ${result.title}`);
       return false;
     }
     seenEmails.add(emailLower);
   }
   
-  // También verificar URLs duplicadas
+  // 2. DEDUPLICACIÓN POR URL
   const baseDomain = `${url.hostname}${url.pathname}`;
   if (seenUrls.has(baseDomain)) {
-    console.log(`🗑️ [DEDUP] Duplicado por URL: ${result.title}`);
+    console.log(`🗑️ [DEDUP-URL] ${result.title}`);
     return false;
   }
   seenUrls.add(baseDomain);
+  
+  // 3. 🆕 DEDUPLICACIÓN POR SIMILITUD DE NOMBRE
+  const normalizedTitle = normalizeTitleForComparison(result.title);
+  if (seenTitles.has(normalizedTitle)) {
+    console.log(`🗑️ [DEDUP-TITLE] ${result.title} (similar a existente)`);
+    return false;
+  }
+  seenTitles.add(normalizedTitle);
   
   return true;
 });
 ```
 
 **¿Por qué es necesario?**
-- ⚠️ **Problema**: Tavily puede devolver el mismo proveedor en múltiples URLs
-- ⚠️ **Ejemplo**: `bodas.net/fotografia/delia--e123` y `www.deliafotografos.com` → mismo email
-- ✅ **Solución**: Solo mostrar el proveedor una vez (el primer resultado encontrado)
+- ⚠️ **Problema 1**: Tavily devuelve el mismo proveedor en múltiples URLs
+- ⚠️ **Problema 2**: Scraping puede fallar y no obtener email → no se detecta duplicado
+- ⚠️ **Problema 3**: Mismo proveedor con títulos ligeramente diferentes
+  - Ejemplo 1: `bodas.net/fotografia/delia--e123` y `www.deliafotografos.com` → mismo email
+  - Ejemplo 2: "Fotografía Bodas" y "Fotografía Bodas" → mismo título
+  - Ejemplo 3: "Juan López Fotografía" y "Juan López Fotógrafo Bodas" → mismo nombre normalizado
+- ✅ **Solución**: Triple deduplicación → Email > URL > Nombre similar
 
 ### **5. Limpieza de Nombres**
 

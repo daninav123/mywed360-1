@@ -845,37 +845,64 @@ router.post('/', async (req, res) => {
       console.warn(`⚠️ [FILTRO] Solo ${validResults.length} resultados válidos. Considera refinar la búsqueda.`);
     }
 
-    // 3. DEDUPLICAR por email de contacto
+    // 3. DEDUPLICAR por email, URL y similitud de nombres
     // ⚠️ CRÍTICO: Evitar mostrar el mismo proveedor múltiples veces
     // Si dos resultados tienen el mismo email, solo mantener el primero
     const seenEmails = new Set();
     const seenUrls = new Set();
+    const seenTitles = new Set();
+    
+    // Función para normalizar títulos (eliminar palabras genéricas y comparar)
+    const normalizeTitleForComparison = (title) => {
+      return title
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, ' ')
+        // Eliminar palabras genéricas que no ayudan a diferenciar
+        .replace(/\b(fotografía|fotógrafo|videografía|videógrafo|catering|floristería|dj|música|bodas?|de|para|en|y|el|la|los|las)\b/gi, '')
+        .replace(/[^\w\s]/g, '') // Eliminar puntuación
+        .replace(/\s+/g, '') // Eliminar todos los espacios
+        .trim();
+    };
     
     const uniqueResults = validResults.filter((result, idx) => {
-      // Si tiene email, verificar que no esté duplicado
+      // 1. DEDUPLICACIÓN POR EMAIL (más confiable)
       if (result.email && result.email.trim() !== '') {
         const emailLower = result.email.toLowerCase().trim();
         if (seenEmails.has(emailLower)) {
-          console.log(`🗑️ [DEDUP] Duplicado por email: ${result.title} (${result.email})`);
+          console.log(`🗑️ [DEDUP-EMAIL] ${result.title} (${result.email})`);
           return false;
         }
         seenEmails.add(emailLower);
       }
       
-      // También verificar URLs duplicadas (mismo dominio base)
+      // 2. DEDUPLICACIÓN POR URL
       try {
         const urlObj = new URL(result.url);
         const baseDomain = `${urlObj.hostname}${urlObj.pathname}`;
         const normalizedDomain = baseDomain.toLowerCase().replace(/\/$/, '');
         
         if (seenUrls.has(normalizedDomain)) {
-          console.log(`🗑️ [DEDUP] Duplicado por URL: ${result.title}`);
+          console.log(`🗑️ [DEDUP-URL] ${result.title}`);
           return false;
         }
         seenUrls.add(normalizedDomain);
       } catch (e) {
-        // Si falla el parseo de URL, mantener el resultado
+        // Si falla el parseo de URL, continuar con otras verificaciones
       }
+      
+      // 3. 🆕 DEDUPLICACIÓN POR SIMILITUD DE NOMBRE
+      // Si dos títulos son muy similares (después de normalizar), considerarlos duplicados
+      const normalizedTitle = normalizeTitleForComparison(result.title);
+      
+      // Si el título normalizado está vacío o es muy corto, usar el original
+      const titleForComparison = normalizedTitle.length >= 3 ? normalizedTitle : result.title.toLowerCase().trim();
+      
+      if (seenTitles.has(titleForComparison)) {
+        console.log(`🗑️ [DEDUP-TITLE] ${result.title} (similar a uno existente)`);
+        return false;
+      }
+      seenTitles.add(titleForComparison);
       
       return true;
     });

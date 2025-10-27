@@ -278,25 +278,42 @@ const cities = [
 
 | Criterio | Implementado | Líneas de código | Estado |
 |----------|--------------|------------------|--------|
-| Deduplicación por email | ✅ Sí | 855-862 | ✅ CORRECTO |
-| Deduplicación por URL | ✅ Sí | 865-878 | ✅ CORRECTO |
-| Normalización de emails | ✅ Sí | 857 | ✅ CORRECTO |
-| Normalización de URLs | ✅ Sí | 868-869 | ✅ CORRECTO |
-| Log de duplicados | ✅ Sí | 859, 872, 883-884 | ✅ CORRECTO |
+| Deduplicación por email | ✅ Sí | 869-877 | ✅ CORRECTO |
+| Deduplicación por URL | ✅ Sí | 879-892 | ✅ CORRECTO |
+| 🆕 Deduplicación por nombre | ✅ Sí | 894-906 | ✅ CORRECTO |
+| Normalización de emails | ✅ Sí | 871 | ✅ CORRECTO |
+| Normalización de URLs | ✅ Sí | 882-883 | ✅ CORRECTO |
+| 🆕 Normalización de títulos | ✅ Sí | 856-866 | ✅ CORRECTO |
+| Log de duplicados | ✅ Sí | 873, 886, 902, 910-911 | ✅ CORRECTO |
 
-**Código de deduplicación por email (Líneas 855-862):**
+**Normalización de títulos (Líneas 856-866):**
+```javascript
+const normalizeTitleForComparison = (title) => {
+  return title
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, ' ')
+    // Eliminar palabras genéricas que no ayudan a diferenciar
+    .replace(/\b(fotografía|fotógrafo|videografía|videógrafo|catering|floristería|dj|música|bodas?|de|para|en|y|el|la|los|las)\b/gi, '')
+    .replace(/[^\w\s]/g, '') // Eliminar puntuación
+    .replace(/\s+/g, '') // Eliminar todos los espacios
+    .trim();
+};
+```
+
+**Código de deduplicación por email (Líneas 869-877):**
 ```javascript
 if (result.email && result.email.trim() !== '') {
   const emailLower = result.email.toLowerCase().trim();
   if (seenEmails.has(emailLower)) {
-    console.log(`🗑️ [DEDUP] Duplicado por email: ${result.title} (${result.email})`);
+    console.log(`🗑️ [DEDUP-EMAIL] ${result.title} (${result.email})`);
     return false;
   }
   seenEmails.add(emailLower);
 }
 ```
 
-**Código de deduplicación por URL (Líneas 865-878):**
+**Código de deduplicación por URL (Líneas 879-892):**
 ```javascript
 try {
   const urlObj = new URL(result.url);
@@ -304,16 +321,30 @@ try {
   const normalizedDomain = baseDomain.toLowerCase().replace(/\/$/, '');
   
   if (seenUrls.has(normalizedDomain)) {
-    console.log(`🗑️ [DEDUP] Duplicado por URL: ${result.title}`);
+    console.log(`🗑️ [DEDUP-URL] ${result.title}`);
     return false;
   }
   seenUrls.add(normalizedDomain);
 } catch (e) {
-  // Si falla el parseo de URL, mantener el resultado
+  // Si falla el parseo de URL, continuar con otras verificaciones
 }
 ```
 
-**Log de resumen (Líneas 883-884):**
+**🆕 Código de deduplicación por nombre (Líneas 894-906):**
+```javascript
+const normalizedTitle = normalizeTitleForComparison(result.title);
+
+// Si el título normalizado está vacío o es muy corto, usar el original
+const titleForComparison = normalizedTitle.length >= 3 ? normalizedTitle : result.title.toLowerCase().trim();
+
+if (seenTitles.has(titleForComparison)) {
+  console.log(`🗑️ [DEDUP-TITLE] ${result.title} (similar a uno existente)`);
+  return false;
+}
+seenTitles.add(titleForComparison);
+```
+
+**Log de resumen (Líneas 910-911):**
 ```javascript
 console.log(`\n🔄 [DEDUP] ${validResults.length} → ${uniqueResults.length} resultados únicos`);
 console.log(`   Emails duplicados eliminados: ${validResults.length - uniqueResults.length}`);
@@ -385,10 +416,10 @@ console.log('='.repeat(80) + '\n');
 | **Scraping de Datos** | 4 | 4 | 100% ✅ |
 | **Limpieza de Nombres** | 6 | 6 | 100% ✅ |
 | **Extracción de Ubicación** | 3 | 3 | 100% ✅ |
-| **🆕 Deduplicación** | 5 | 5 | 100% ✅ |
+| **🆕 Deduplicación** | 7 | 7 | 100% ✅ |
 | **Límite de Resultados** | 2 | 2 | 100% ✅ |
 | **Logs Informativos** | 5 | 5 | 100% ✅ |
-| **TOTAL** | **45** | **45** | **100% ✅** |
+| **TOTAL** | **47** | **47** | **100% ✅** |
 
 ---
 
@@ -433,30 +464,66 @@ console.log('='.repeat(80) + '\n');
    Razón: Contiene "somos", "nuestros servicios" (primera persona)
 ```
 
-### **🆕 Ejemplo 4: Deduplicación por email**
+### **🆕 Ejemplo 4: Deduplicación triple (Email + URL + Nombre)**
 
+**Caso A: Deduplicación por email**
 ```
-ANTES DE DEDUPLICACIÓN:
+ANTES:
    1. "Delia Fotógrafos" (bodas.net/fotografia/delia--e123456)
       Email: info@deliafotografos.com
    
    2. "Delia - Fotografía de bodas" (www.deliafotografos.com)
       Email: info@deliafotografos.com
+
+DESPUÉS:
+   1. "Delia Fotógrafos" → ✅ SE MANTIENE
    
-   3. "Delia Fotógrafos Valencia" (instagram.com/deliafotografos)
-      Email: info@deliafotografos.com
-
-DESPUÉS DE DEDUPLICACIÓN:
-   1. "Delia Fotógrafos" (bodas.net/fotografia/delia--e123456)
-      Email: info@deliafotografos.com
-      ✅ Primer resultado → SE MANTIENE
-
-   Log: "🗑️ [DEDUP] Duplicado por email: Delia - Fotografía de bodas (info@deliafotografos.com)"
-   Log: "🗑️ [DEDUP] Duplicado por email: Delia Fotógrafos Valencia (info@deliafotografos.com)"
-   Log: "🔄 [DEDUP] 3 → 1 resultados únicos"
+   Log: "🗑️ [DEDUP-EMAIL] Delia - Fotografía de bodas (info@deliafotografos.com)"
 ```
 
-**Beneficio:** El usuario ve solo 1 tarjeta de Delia Fotógrafos (en lugar de 3 tarjetas del mismo proveedor)
+**Caso B: Deduplicación por nombre similar (sin email)**
+```
+ANTES:
+   1. "Fotografía Bodas" (bodas.net/fotografia/alfonso--e123456)
+      Email: (vacío - scraping falló)
+      Normalizado: "" (todas las palabras son genéricas)
+   
+   2. "Fotografía Bodas" (bodas.net/video/alfonso--e789123)
+      Email: (vacío - scraping falló)
+      Normalizado: "" (todas las palabras son genéricas)
+
+DESPUÉS:
+   1. "Fotografía Bodas" → ✅ SE MANTIENE
+   
+   Log: "🗑️ [DEDUP-TITLE] Fotografía Bodas (similar a uno existente)"
+   Log: "🔄 [DEDUP] 2 → 1 resultados únicos"
+```
+
+**Caso C: Deduplicación por nombre con variaciones**
+```
+ANTES:
+   1. "Juan López Fotografía"
+      Normalizado: "juanlopez" (sin palabras genéricas)
+   
+   2. "Juan López Fotógrafo de Bodas Valencia"
+      Normalizado: "juanlopezvalencia"
+      → DIFERENTE, se mantiene
+
+   3. "Juan López Fotografía"
+      Normalizado: "juanlopez"
+      → IGUAL al #1, se descarta
+
+DESPUÉS:
+   1. "Juan López Fotografía" → ✅ SE MANTIENE
+   2. "Juan López Fotógrafo de Bodas Valencia" → ✅ SE MANTIENE
+   
+   Log: "🗑️ [DEDUP-TITLE] Juan López Fotografía (similar a uno existente)"
+```
+
+**Beneficio:** 
+- ✅ Con email: Deduplica aunque cambien los títulos
+- ✅ Sin email: Deduplica por similitud de nombre
+- ✅ Evita mostrar el mismo proveedor 2-3 veces
 
 ---
 
@@ -474,20 +541,21 @@ El código implementado en `backend/routes/ai-suppliers-tavily.js` cumple **TODO
 6. ✅ Filtra contenido de listados múltiples
 7. ✅ Acepta solo proveedores únicos
 8. ✅ Extrae datos de contacto (email, teléfono, Instagram)
-9. ✅ 🆕 **Deduplica por email** (evita proveedores repetidos)
+9. ✅ 🆕 **Deduplica por email** (evita proveedores repetidos con mismo email)
 10. ✅ 🆕 **Deduplica por URL** (evita URLs duplicadas)
-11. ✅ Limpia nombres de proveedores
-12. ✅ Extrae ubicaciones
-13. ✅ Limita a 8 resultados únicos
-14. ✅ Muestra logs informativos
+11. ✅ 🆕 **Deduplica por nombre** (evita nombres similares aunque fallen email/URL)
+12. ✅ Limpia nombres de proveedores
+13. ✅ Extrae ubicaciones
+14. ✅ Limita a 8 resultados únicos
+15. ✅ Muestra logs informativos
 
 **El sistema garantiza que:**
 - ✅ Cada tarjeta es de un PROVEEDOR REAL específico (NO motor de búsqueda)
-- ✅ 🆕 Cada proveedor se muestra SOLO UNA VEZ (sin duplicados)
+- ✅ 🆕 Cada proveedor se muestra SOLO UNA VEZ (deduplicación triple: email > URL > nombre)
 
 ---
 
 **Fecha de verificación:** 2025-10-27 (actualizado)  
 **Verificado por:** Sistema automatizado  
-**Última actualización:** Deduplicación por email/URL añadida  
+**Última actualización:** Deduplicación triple (email/URL/nombre) añadida  
 **Próxima revisión:** Tras cambios en el código de filtrado
