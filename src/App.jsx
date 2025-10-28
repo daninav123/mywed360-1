@@ -9,7 +9,7 @@ import EmailNotification from './components/EmailNotification';
 import MainLayout from './components/MainLayout';
 import Loader from './components/ui/Loader';
 import { WeddingProvider } from './context/WeddingContext';
-import { FavoritesProvider } from './contexts/FavoritesContext';
+// import { FavoritesProvider } from './contexts/FavoritesContext'; // TEMPORALMENTE DESHABILITADO - CAUSA ERRORES
 import { UserPreferencesProvider } from './contexts/UserContext';
 import { useAuth, AuthProvider } from './hooks/useAuth';
 import AcceptInvitation from './pages/AcceptInvitation';
@@ -245,14 +245,53 @@ function App() {
     <AuthProvider>
       <UserProvider>
         <WeddingProvider>
-          <FavoritesProvider>
-            <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-              <ToastContainer position="top-right" autoClose={4000} hideProgressBar newestOnTop />
-              <React.Suspense
-                fallback={
-                  <div className="flex items-center justify-center min-h-screen">
-                    <Loader className="w-10 h-10" />
-                    <span className="ml-3 text-lg">Cargando...</span>
+          <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <ToastContainer position="top-right" autoClose={4000} hideProgressBar newestOnTop />
+            <React.Suspense
+              fallback={
+                <div className="flex items-center justify-center min-h-screen">
+                  <Loader className="w-10 h-10" />
+                  <span className="ml-3 text-lg">Cargando...</span>
+                </div>
+              }
+            >
+              <Routes>
+                <Route path="/" element={<RootLandingRoute />} />
+                <Route path="/app" element={<MarketingAppOverview />} />
+                <Route path="/producto" element={<Navigate to="/app" replace />} />
+                <Route path="/precios" element={<MarketingPricing />} />
+                <Route path="/pricing" element={<Navigate to="/precios" replace />} />
+                <Route path="/acceso" element={<MarketingAccess />} />
+                <Route path="/payment/success" element={<PaymentSuccess />} />
+                <Route path="/payment/cancel" element={<PaymentCancel />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/registro" element={<Navigate to="/signup" replace />} />
+                <Route path="/verify-email" element={<VerifyEmail />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
+                <Route path="/partner/:token" element={<PartnerStats />} />
+                <Route path="/admin/login" element={<AdminLogin />} />
+                <Route element={<RequireAdmin />}>
+                  <Route path="/admin" element={<AdminLayout />}>
+                    <Route index element={<Navigate to="dashboard" replace />} />
+                    <Route path="dashboard" element={<AdminDashboard />} />
+                    <Route path="metrics" element={<AdminMetrics />} />
+                    <Route path="portfolio" element={<AdminPortfolio />} />
+                    <Route path="users" element={<AdminUsers />} />
+                    <Route path="suppliers" element={<AdminSuppliers />} />
+                    <Route path="blog" element={<AdminBlog />} />
+                    <Route path="integrations" element={<AdminIntegrations />} />
+                    <Route path="settings" element={<AdminSettings />} />
+                    <Route path="alerts" element={<AdminAlerts />} />
+                    <Route path="broadcast" element={<AdminBroadcast />} />
+                    <Route path="automations" element={<AdminAutomations />} />
+                    <Route path="commerce" element={<AdminDiscounts />} />
+                    <Route path="reports" element={<AdminReports />} />
+                    <Route path="support" element={<AdminSupport />} />
+                    <Route path="task-templates" element={<AdminTaskTemplates />} />
+                    <Route path="debug/payments" element={<AdminDebugPayments />} />
+                    <Route path="finance/payouts" element={<AdminPayouts />} />
+                    <Route path="finance/revolut" element={<AdminRevolut />} />
                   </div>
                 }
               >
@@ -454,12 +493,12 @@ function App() {
                 </Routes>
                 {/* Sistema de diagnóstico global */}
               </React.Suspense>
-              <DiagnosticPanel />
-            </BrowserRouter>
-          </FavoritesProvider>
-        </WeddingProvider>
-      </UserProvider>
-    </AuthProvider>
+          <DiagnosticPanel />
+        </BrowserRouter>
+          {/* </FavoritesProvider> */}
+      </WeddingProvider>
+    </UserProvider>
+  </AuthProvider>
   );
 }
 

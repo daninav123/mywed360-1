@@ -15,15 +15,15 @@ import {
 import { toast } from 'react-toastify';
 
 import useTranslations from '../../hooks/useTranslations';
-import { useFavorites } from '../../contexts/FavoritesContext';
+// import { useFavorites } from '../../contexts/FavoritesContext'; // TEMPORALMENTE DESHABILITADO
 
 export default function SupplierCard({ supplier, onContact, onViewDetails, onMarkAsConfirmed }) {
   const { t } = useTranslations();
-  const { isFavorite, toggleFavorite } = useFavorites();
+  // const { isFavorite, toggleFavorite } = useFavorites(); // TEMPORALMENTE DESHABILITADO
   const [showContactMenu, setShowContactMenu] = useState(false);
   const [isFavoriting, setIsFavoriting] = useState(false);
 
-  const isFav = isFavorite(supplier.id);
+  const isFav = false; // isFavorite(supplier.id); // TEMPORALMENTE DESHABILITADO
 
   const isRegistered = supplier.priority === 'registered';
   const isCached = supplier.priority === 'cached';
@@ -85,24 +85,26 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
     setShowContactMenu(false);
   };
 
-  // Manejar favoritos
+  // Manejar favoritos - TEMPORALMENTE DESHABILITADO
   const handleToggleFavorite = async (e) => {
-    e.stopPropagation(); // Evitar propagación al card
-
-    setIsFavoriting(true);
-    try {
-      await toggleFavorite(supplier);
-
-      if (isFav) {
-        toast.success('❤️ Eliminado de favoritos');
-      } else {
-        toast.success('❤️ Añadido a favoritos');
-      }
-    } catch (error) {
-      toast.error(error.message || 'Error al guardar favorito');
-    } finally {
-      setIsFavoriting(false);
-    }
+    e.stopPropagation();
+    toast.info('Funcionalidad de favoritos temporalmente deshabilitada');
+    return;
+    
+    // setIsFavoriting(true);
+    // try {
+    //   await toggleFavorite(supplier);
+    //   
+    //   if (isFav) {
+    //     toast.success('❤️ Eliminado de favoritos');
+    //   } else {
+    //     toast.success('❤️ Añadido a favoritos');
+    //   }
+    // } catch (error) {
+    //   toast.error(error.message || 'Error al guardar favorito');
+    // } finally {
+    //   setIsFavoriting(false);
+    // }
   };
 
   return (
