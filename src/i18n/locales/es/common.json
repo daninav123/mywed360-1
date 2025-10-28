@@ -390,9 +390,6 @@
   "celebracion": "celebración",
   "centrar_salon": "Centrar en salón",
   "ceremonia_llevara_cabo_date_comenzando": "La ceremonia se llevará a cabo el {date} comenzando puntualmente a las {time} {location}. Se ruega puntualidad.",
-  "chat": {
-    "open": "Abrir chat"
-  },
   "chatwidget_backend_respondio": "[ChatWidget] Backend IA respondió",
   "cierre_transicion_hacia_coctel_banquete": "Cierre y transición hacia cóctel o banquete.",
   "cita_reunion_aigenerated": ", // Cita o reunión\n  AI_GENERATED: ",
@@ -4752,6 +4749,249 @@
     "reminderSendError": "Error enviando recordatorios",
     "linkCopied": "Enlace RSVP copiado",
     "linkCopyError": "No se pudo generar/copiar el enlace"
+  },
+  "weddings": {
+    "syncCrmError": "No se pudo encolar la sincronización CRM. Intenta nuevamente.",
+    "bulkSyncError": "No se pudieron encolar las bodas seleccionadas. Intenta nuevamente.",
+    "createError": "No se pudo crear la boda. Revisa permisos.",
+    "updateStatusError": "No se pudo actualizar el estado de la boda. Intenta nuevamente."
+  },
+  "finance": {
+    "budget": {
+      "errors": {
+        "nameRequired": "El nombre de la categoría es obligatorio",
+        "amountInvalid": "El importe debe ser un número válido"
+      },
+      "advisorErrors": {
+        "requestFailed": "No se pudo obtener la recomendación del asesor",
+        "refreshFailed": "No se pudo actualizar la recomendación del asesor",
+        "applyFailed": "No se pudo aplicar el escenario recomendado"
+      }
+    }
+  },
+  "guests": {
+    "email": {
+      "sent": "Email enviado a {{email}}",
+      "sentSuccess": "Email enviado correctamente",
+      "sendError": "Error enviando email: {{error}}",
+      "sendFailed": "No se pudo enviar el email"
+    }
+  },
+  "whatsapp": {
+    "selectGuests": "Selecciona al menos un invitado",
+    "coupleNameRequired": "El mensaje debe incluir el nombre de la pareja o la variable {coupleName}",
+    "assetUrlRequired": "Añade la URL de la invitación diseñada antes de continuar",
+    "providerNotConfigured": "El proveedor de WhatsApp API no está configurado. Por favor, configúralo antes de enviar.",
+    "coupleNameMissing": "El mensaje debe incluir el nombre de la pareja para cada invitado seleccionado",
+    "sendComplete": "Envío completado. Éxitos: {{ok}}, Fallos: {{fail}}"
+  },
+  "design": {
+    "svg": {
+      "noContent": "No hay SVG para guardar",
+      "saved": "SVG guardado en la boda",
+      "saveError": "No se pudo guardar el SVG"
+    },
+    "palette": {
+      "saved": "Paleta guardada",
+      "saveError": "No se pudo guardar la paleta"
+    }
+  },
+  "email": {
+    "requiredFields": "Por favor completa los campos requeridos",
+    "sentSuccess": "Correo enviado exitosamente",
+    "sendError": "Error al enviar correo: {{message}}"
+  },
+  "admin": {
+    "clipboard": {
+      "copied": "Copiado al portapapeles",
+      "copyError": "Error al copiar"
+    },
+    "partner": {
+      "linkGenerated": "Enlace generado y copiado:\n{{url}}",
+      "linkError": "Error al generar enlace",
+      "managerCreated": "Jefe de comerciales creado correctamente",
+      "managerConfirmError": "No se recibió confirmación del nuevo jefe. Revisa el backend.",
+      "commercialCreated": "Comercial creado correctamente",
+      "commercialConfirmError": "No se recibió confirmación del nuevo comercial. Revisa el backend."
+    },
+    "users": {
+      "exportSuccess": "Datos de usuarios exportados correctamente",
+      "sendEmail": "Enviar email a {{email}}",
+      "resetPassword": "Resetear contraseña de {{name}}",
+      "suspendError": "Error al suspender el usuario: {{message}}",
+      "reactivateError": "Error al reactivar el usuario: {{message}}"
+    },
+    "portfolio": {
+      "exported": "✅ Portfolio exportado: {{total}} bodas",
+      "exportError": "Error al exportar portfolio: {{message}}"
+    },
+    "support": {
+      "responseSuccess": "Respuesta enviada exitosamente",
+      "responseError": "Error al enviar la respuesta: {{message}}"
+    },
+    "alerts": {
+      "resolveError": "No se pudo marcar la alerta como resuelta."
+    }
+  },
+  "supplier": {
+    "profile": {
+      "updateSuccess": "Perfil actualizado correctamente"
+    }
+  },
+  "finance": {
+    "contributions": {
+      "nameAmountRequired": "Nombre y monto son obligatorios"
+    },
+    "reports": {
+      "generateError": "Error al generar el reporte. Por favor, intenta nuevamente.",
+      "exported": "Informe exportado en formato {{format}}"
+    }
+  },
+  "protocol": {
+    "ceremony": {
+      "titleRequired": "El título es obligatorio"
+    }
+  },
+  "invitations": {
+    "wizardComplete": "Wizard completado",
+    "noGuests": "No hay invitados para enviar invitaciones"
+  },
+  "clipboard": {
+    "linkCopied": "Enlace copiado al portapapeles",
+    "jsonCopied": "JSON copiado al portapapeles. Pégalo en el editor JSON.",
+    "debugCopied": "Debug copiado al portapapeles",
+    "emailConfigSuccess": "Email configurado correctamente: {{email}}\n\nRecarga la página para que los cambios surtan efecto."
+  },
+  "validation": {
+    "titleRequired": "El título es obligatorio"
+  },
+  "exportError": "No se pudo exportar a PDF",
+  "deleteError": "No se pudo eliminar",
+  "chat": {
+    "open": "Abrir chat",
+    "noteMarked": "Nota marcada como importante",
+    "messages": {
+      "user": "Usuario",
+      "assistant": "Asistente",
+      "emptyPrompt": "¿En qué puedo ayudarte con {{subject}}?",
+      "greeting": "¡Hola! Estoy aquí para ayudarte con {{subject}}"
+    },
+    "defaults": {
+      "event": "evento",
+      "wedding": "boda",
+      "yourPlanning": "tu planificación",
+      "task": "tarea",
+      "meeting": "reunión"
+    },
+    "commands": {
+      "taskAdded": "Tarea añadida",
+      "meetingAdded": "Reunión añadida",
+      "taskUpdated": "Tarea actualizada",
+      "taskDeleted": "Tarea eliminada",
+      "taskCompleted": "Tarea completada"
+    }
+  },
+  "common": {
+    "suppliers": {
+      "overview": {
+        "defaults": {
+          "serviceGroup": "Otros servicios",
+          "otherService": "Otro servicio",
+          "country": "España"
+        },
+        "actions": {
+          "manageServices": "Gestionar servicios",
+          "newSupplier": "Nuevo proveedor",
+          "clear": "Limpiar"
+        },
+        "services": {
+          "count": "{{count}} servicios",
+          "confirmedCount": "{{count}} confirmados",
+          "pendingCount": "{{count}} pendientes",
+          "title": "Servicios contratados",
+          "shortlistCount": "{{count}} en lista",
+          "emptyShortlist": "No hay proveedores en la lista",
+          "exploreHint": "Explora proveedores para añadir a tu lista"
+        },
+        "title": "Gestión de proveedores",
+        "metrics": {
+          "totalProviders": "Proveedores totales",
+          "confirmed": "Confirmados",
+          "pending": "Pendientes",
+          "shortlist": "Lista de interés"
+        },
+        "exploration": {
+          "title": "Explorar proveedores",
+          "subtitle": "Busca y descubre proveedores para tu evento",
+          "collapseAria": "Contraer sección de exploración",
+          "searchPlaceholder": "Buscar proveedores...",
+          "recentSearches": "Búsquedas recientes"
+        },
+        "status": {
+          "pending": "Pendiente",
+          "confirmed": "Confirmado"
+        },
+        "shortlist": {
+          "loading": "Cargando lista...",
+          "error": "Error al cargar la lista",
+          "empty": "No tienes proveedores guardados",
+          "savedAt": "Guardado {{value}}",
+          "match": "{{value}}% compatibilidad"
+        },
+        "modals": {
+          "board": {
+            "title": "Tablero de servicios",
+            "description": "Gestiona todos tus servicios contratados"
+          },
+          "options": {
+            "title": "Opciones para {{label}}",
+            "confirmedTitle": "Confirmados",
+            "contactTitle": "Contactados / En negociación",
+            "contactEmpty": "No hay proveedores contactados aún",
+            "shortlistTitle": "Lista de interés",
+            "shortlistEmpty": "No hay proveedores en la lista"
+          }
+        },
+        "results": {
+          "title": "Resultados de búsqueda",
+          "query": "Consulta: {{value}}",
+          "loading": "Buscando proveedores…",
+          "empty": "No encontramos resultados con los filtros actuales.",
+          "breakdown": "📊 Encontrados: {{registered}} verificados · {{cached}} en caché · {{internet}} de internet"
+        },
+        "pagination": {
+          "label": "Página {{current}} de {{total}}"
+        },
+        "drawer": {
+          "title": "Detalles del proveedor",
+          "titleWithName": "Detalles del proveedor · {{name}}",
+          "imageAlt": "Imagen de {{name}}",
+          "serviceUnknown": "Servicio desconocido",
+          "location": "Ubicación: {{value}}",
+          "priceRange": "Precio estimado: {{value}}",
+          "email": "Correo: {{value}}",
+          "phone": "Teléfono: {{value}}",
+          "openLink": "Abrir enlace",
+          "empty": "Selecciona un proveedor para ver detalles",
+          "fallbackName": "proveedor"
+        },
+        "toasts": {
+          "missingQuery": "Por favor, introduce un término de búsqueda",
+          "noResults": "No se encontraron resultados",
+          "success": "Encontrados {{count}} proveedores ({{registered}} registrados, {{cached}} guardados, {{internet}} de internet)",
+          "error": "Error en la búsqueda. Intenta de nuevo.",
+          "wantedServicesSaved": "Servicios guardados correctamente",
+          "wantedServicesError": "Error al guardar los servicios",
+          "providerSaved": "Proveedor guardado correctamente",
+          "providerError": "Error al guardar el proveedor"
+        }
+      },
+      "configureServices": "Configurar servicios",
+      "labels": {
+        "provider": "Proveedor",
+        "service": "Servicio"
+      }
+    }
   },
   "verifica_conexion_con_backend_async_checkbackendconnection": ",\n        },\n      };\n    }\n  }\n\n  /**\n   * Verifica la conexión con el backend\n   */\n  async checkBackendConnection() {\n    try {\n      const backendUrl = import.meta.env.VITE_BACKEND_BASE_URL;\n      if (!backendUrl) {\n        throw new Error(",
   "verifica_estado_una_sesion_checkout_param": ",\n};\n\n/**\n * Verifica el estado de una sesión de checkout\n * @param {string} sessionId - ID de la sesión\n * @returns {Promise<Object>} - Estado de la sesión\n */\nexport async function getCheckoutSession(sessionId) {\n  try {\n    const token = localStorage.getItem(",
