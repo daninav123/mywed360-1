@@ -2,8 +2,8 @@
 // 🔄 FASE 2: BÚSQUEDA HÍBRIDA (Registrados + Internet)
 // 
 // Busca primero en proveedores REGISTRADOS (Firestore)
-// Si hay < 10, complementa con INTERNET (Tavily)
-// Resultado: [VERIFICADOS] primero + [Internet] después
+// Si NO hay resultados (0), busca en INTERNET (Tavily)
+// Resultado: [VERIFICADOS] primero + [Internet] solo si no hay nada en BD
 
 import express from 'express';
 import admin from 'firebase-admin';
@@ -24,7 +24,8 @@ async function searchTavilySimple(query, location, service) {
     return [];
   }
 
-  const searchQuery = `${query} ${location} ${service} contacto -"buscar" -"encuentra"`;
+  // Query mejorada para fotógrafos de bodas específicos
+  const searchQuery = `${service} bodas ${location} ${query || ''} profesional contacto -"buscar" -"encuentra" -"listado" -"directorio"`;
 
   try {
     const response = await fetch('https://api.tavily.com/search', {
@@ -154,12 +155,12 @@ router.post('/search', async (req, res) => {
     console.log(`   - Registrados: ${registeredResults.filter(r => r.registered).length}`);
     console.log(`   - En caché: ${registeredResults.filter(r => !r.registered).length}`);
     
-    // ===== 2. SI HAY POCOS, BUSCAR EN INTERNET (TAVILY) =====
+    // ===== 2. SI NO HAY RESULTADOS, BUSCAR EN INTERNET (TAVILY) =====
     let internetResults = [];
     let usedTavily = false;
     
-    if (registeredResults.length < 10) {
-      console.log(`\n🌐 [TAVILY] Menos de 10 resultados en BD. Buscando en internet...`);
+    if (registeredResults.length === 0) {
+      console.log(`\n🌐 [TAVILY] No hay resultados en BD. Buscando en internet...`);
       
       try {
         const tavilyResults = await searchTavilySimple(
@@ -245,7 +246,7 @@ router.post('/search', async (req, res) => {
         // Continuar con solo resultados de Firestore
       }
     } else {
-      console.log(`\n✅ [FIRESTORE] Suficientes resultados en BD (${registeredResults.length}). No se busca en internet.`);
+      console.log(`\n✅ [FIRESTORE] ${registeredResults.length} resultados en BD. No es necesario buscar en internet.`);
     }
     
     // ===== 3. MEZCLAR RESULTADOS: REGISTRADOS PRIMERO =====
