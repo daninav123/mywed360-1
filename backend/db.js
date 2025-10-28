@@ -25,7 +25,9 @@ for (const candidate of envCandidates) {
 // Deshabilitar el uso del emulador salvo que se indique explícitamente
 // Esto evita errores de conexión (ECONNREFUSED) cuando el emulador no está arrancado.
 if (process.env.FIRESTORE_EMULATOR_HOST && process.env.USE_FIRESTORE_EMULATOR !== 'true') {
-  console.warn('⚠️  FIRESTORE_EMULATOR_HOST está definido pero USE_FIRESTORE_EMULATOR no es "true". Usando Firestore real.');
+  console.warn(
+    '⚠️  FIRESTORE_EMULATOR_HOST está definido pero USE_FIRESTORE_EMULATOR no es "true". Usando Firestore real.'
+  );
   delete process.env.FIRESTORE_EMULATOR_HOST;
 }
 
@@ -48,13 +50,14 @@ if (RAW_SERVICE_ACCOUNT) {
     ) {
       clean = clean.slice(1, -1);
     }
-    const jsonStr = clean.startsWith('{')
-      ? clean
-      : Buffer.from(clean, 'base64').toString('utf8');
+    const jsonStr = clean.startsWith('{') ? clean : Buffer.from(clean, 'base64').toString('utf8');
     parsedServiceAccount = JSON.parse(jsonStr);
     console.log('✅ Credencial de servicio cargada desde variable de entorno');
   } catch (e) {
-    console.error('❌ No se pudo parsear FIREBASE_SERVICE_ACCOUNT_JSON. Se intentará método alternativo:', e.message);
+    console.error(
+      '❌ No se pudo parsear FIREBASE_SERVICE_ACCOUNT_JSON. Se intentará método alternativo:',
+      e.message
+    );
   }
 }
 
@@ -62,12 +65,14 @@ if (!admin.apps.length) {
   console.log('🔍 [db.js] Initializing Firebase Admin...');
   console.log('  - parsedServiceAccount exists:', !!parsedServiceAccount);
   console.log('  - GOOGLE_APPLICATION_CREDENTIALS:', process.env.GOOGLE_APPLICATION_CREDENTIALS);
-  
+
   // Build init options dynamically to avoid passing invalid credential
   const initOptions = {
-    projectId: process.env.VITE_FIREBASE_PROJECT_ID || (parsedServiceAccount && parsedServiceAccount.project_id),
+    projectId:
+      process.env.VITE_FIREBASE_PROJECT_ID ||
+      (parsedServiceAccount && parsedServiceAccount.project_id),
   };
-  
+
   console.log('  - Project ID:', initOptions.projectId);
 
   if (parsedServiceAccount) {
@@ -78,11 +83,13 @@ if (!admin.apps.length) {
     const credPath = path.isAbsolute(process.env.GOOGLE_APPLICATION_CREDENTIALS)
       ? process.env.GOOGLE_APPLICATION_CREDENTIALS
       : path.resolve(__dirname, process.env.GOOGLE_APPLICATION_CREDENTIALS);
-    
+
     if (fs.existsSync(credPath)) {
       const json = JSON.parse(fs.readFileSync(credPath, 'utf8'));
       initOptions.credential = admin.credential.cert(json);
-      console.log(`✅ Credencial de servicio cargada desde GOOGLE_APPLICATION_CREDENTIALS: ${credPath}`);
+      console.log(
+        `✅ Credencial de servicio cargada desde GOOGLE_APPLICATION_CREDENTIALS: ${credPath}`
+      );
     } else {
       console.warn(`⚠️  GOOGLE_APPLICATION_CREDENTIALS apunta a archivo no existente: ${credPath}`);
     }
@@ -96,13 +103,13 @@ if (!admin.apps.length) {
         path.resolve(__dirname, '..', 'serviceAccount.json'),
         path.resolve(__dirname, '..', 'serviceAccountKey.json'),
       ];
-      
+
       console.log('  - Searching for service account file in candidates...');
       candidates.forEach((c, i) => {
         const exists = fs.existsSync(c);
         console.log(`    ${i + 1}. ${exists ? '✓' : '✗'} ${c}`);
       });
-      
+
       const svcPath = candidates.find((p) => fs.existsSync(p));
       if (svcPath) {
         const json = JSON.parse(fs.readFileSync(svcPath, 'utf8'));
@@ -125,8 +132,11 @@ if (!admin.apps.length) {
   if (process.env.FIRESTORE_EMULATOR_HOST) {
     console.log(`⚙️  Using Firestore emulator at ${process.env.FIRESTORE_EMULATOR_HOST}`);
   } else if (!process.env.GOOGLE_APPLICATION_CREDENTIALS) {
-    console.warn('⚠️  GOOGLE_APPLICATION_CREDENTIALS not set. Firestore access will fail unless the emulator is running or Application Default Credentials are configured.');
+    console.warn(
+      '⚠️  GOOGLE_APPLICATION_CREDENTIALS not set. Firestore access will fail unless the emulator is running or Application Default Credentials are configured.'
+    );
   }
 }
 
 export const db = getFirestore();
+export { admin };
