@@ -524,6 +524,42 @@
       "labels": {
         "provider": "Proveedor",
         "service": "Servicio"
+      },
+      "card": {
+        "hybrid": {
+          "defaults": {
+            "name": "Proveedor sin nombre",
+            "service": "Servicio no especificado"
+          },
+          "location": "{{city}}",
+          "badges": {
+            "registered": "Verificado ✓",
+            "cached": "En caché",
+            "internet": "De internet"
+          },
+          "contact": {
+            "primary": "Contactar",
+            "whatsapp": "WhatsApp",
+            "email": "Email",
+            "phone": "Teléfono",
+            "whatsappMessage": "Hola {{name}}, estoy interesado/a en {{service}} para mi boda. Encontré tu perfil en {{brand}}.",
+            "emailSubject": "Consulta sobre {{service}} - {{brand}}",
+            "emailBody": "Hola {{name}},\n\nEstoy organizando mi boda y me gustaría conocer más sobre tus servicios.\n\nSaludos desde {{brand}}",
+            "whatsappTitle": "Contactar por WhatsApp",
+            "emailTitle": "Enviar email"
+          },
+          "actions": {
+            "viewProfile": "Ver perfil",
+            "markConfirmed": "Marcar como confirmado",
+            "viewWebsite": "Ver sitio web"
+          },
+          "imageAlt": "Imagen de {{name}}",
+          "reviews": "({{count}} reseñas)",
+          "source": {
+            "label": "Fuente: {{source}}",
+            "internet": "Internet"
+          }
+        }
       }
     }
   },
