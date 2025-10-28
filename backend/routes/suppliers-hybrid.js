@@ -121,6 +121,8 @@ router.post('/search', async (req, res) => {
     const db = admin.firestore();
 
     let registeredResults = [];
+    let trueRegistered = [];
+    let cachedResults = [];
     let internetResults = [];
     let usedTavily = false;
 
@@ -247,8 +249,8 @@ router.post('/search', async (req, res) => {
       }
 
       // Separar proveedores registrados de caché
-      const trueRegistered = registeredResults.filter((r) => r.registered === true);
-      const cachedResults = registeredResults.filter((r) => r.registered !== true);
+      trueRegistered = registeredResults.filter((r) => r.registered === true);
+      cachedResults = registeredResults.filter((r) => r.registered !== true);
 
       console.log(
         `✅ [FIRESTORE] ${registeredResults.length} proveedores encontrados en base de datos`
@@ -262,7 +264,7 @@ router.post('/search', async (req, res) => {
     // ===== 2. BUSCAR EN INTERNET =====
     // (Saltar si modo es 'database')
     const MIN_RESULTS = 5;
-    const trueRegistered = registeredResults.filter((r) => r.registered === true);
+    // trueRegistered ya está calculado arriba o inicializado vacío
     const shouldSearchInternet =
       searchMode === 'internet' || (searchMode === 'auto' && trueRegistered.length < MIN_RESULTS);
 
