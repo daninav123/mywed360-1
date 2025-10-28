@@ -58,7 +58,9 @@ export function FavoritesProvider({ children }) {
       const token = await getAuthToken();
 
       if (!token) {
-        console.warn('[FavoritesContext] No se pudo obtener token de autenticación');
+        console.warn(
+          '[FavoritesContext] No se pudo obtener token de autenticación, favoritos no disponibles'
+        );
         setFavorites([]);
         setLoading(false);
         return;
@@ -76,9 +78,15 @@ export function FavoritesProvider({ children }) {
 
       setFavorites(response.data.favorites || []);
     } catch (err) {
-      console.error('[FavoritesContext] Error cargando favoritos:', err);
-      setError(err.message);
-      setFavorites([]);
+      // Silenciosamente fallar si es un error de autenticación
+      if (err.response?.status === 401 || err.response?.status === 500) {
+        console.warn('[FavoritesContext] Favoritos no disponibles (error auth)');
+        setFavorites([]);
+      } else {
+        console.error('[FavoritesContext] Error cargando favoritos:', err);
+        setError(err.message);
+        setFavorites([]);
+      }
     } finally {
       setLoading(false);
     }
