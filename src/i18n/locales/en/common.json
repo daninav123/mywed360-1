@@ -32,7 +32,7 @@
     "finance": "Finance",
     "seating": "Seating Plan",
     "email": "Email",
-    
+
     "designs": "Designs",
     "website": "Wedding Website",
     "contracts": "Contracts",
@@ -2514,7 +2514,7 @@
           "view": "View record",
           "promote": "Promote to confirmed",
           "schedule": "Log next action",
-        "archive": "Discard"
+          "archive": "Discard"
         },
         "metrics": {
           "matchLabel": "AI match:",
@@ -3059,6 +3059,16 @@
         "wantedServicesError": "Could not save desired services.",
         "providerSaved": "Provider saved.",
         "providerError": "Could not save provider."
+      },
+      "searchMode": {
+        "label": "Search in:",
+        "auto": "🔍 Auto (Hybrid)",
+        "database": "💾 Database only",
+        "internet": "🌐 Internet only",
+        "indicator": "🎯 Search mode: {{mode}}"
+      },
+      "breakdown": {
+        "title": "Found {{total}} suppliers ({{registered}} registered, {{cached}} cached, {{internet}} from the web)"
       },
       "actions": {
         "manageServices": "Manage services",

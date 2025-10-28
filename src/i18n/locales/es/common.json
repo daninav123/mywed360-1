@@ -3001,6 +3001,16 @@
         "providerSaved": "Proveedor guardado.",
         "providerError": "No se pudo guardar el proveedor."
       },
+      "searchMode": {
+        "label": "Buscar en:",
+        "auto": "🔍 Auto (Híbrido)",
+        "database": "💾 Solo Base de Datos",
+        "internet": "🌐 Solo Internet",
+        "indicator": "🎯 Modo de búsqueda: {{mode}}"
+      },
+      "breakdown": {
+        "title": "Encontrados {{total}} proveedores ({{registered}} registrados, {{cached}} en caché, {{internet}} de internet)"
+      },
       "actions": {
         "manageServices": "Gestionar servicios",
         "newSupplier": "Nuevo proveedor",

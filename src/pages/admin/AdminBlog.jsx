@@ -8,6 +8,8 @@ import {
   publishAdminBlogPost,
   scheduleAdminBlogPost,
   updateAdminBlogPost,
+  listAdminBlogPlan,
+  triggerAdminBlogPlanGeneration,
 } from '../../services/adminBlogService';
 
 const STATUS_LABELS = {
@@ -23,6 +25,20 @@ const STATUS_BADGE = {
   scheduled: 'bg-sky-100 text-sky-700',
   published: 'bg-emerald-100 text-emerald-700',
   archived: 'bg-slate-100 text-slate-600',
+  failed: 'bg-rose-100 text-rose-700',
+};
+
+const PLAN_STATUS_LABELS = {
+  planned: 'Pendiente',
+  generating: 'Generando',
+  scheduled: 'Programado',
+  failed: 'Fallido',
+};
+
+const PLAN_STATUS_BADGE = {
+  planned: 'bg-gray-100 text-gray-700',
+  generating: 'bg-amber-100 text-amber-700',
+  scheduled: 'bg-emerald-100 text-emerald-700',
   failed: 'bg-rose-100 text-rose-700',
 };
 
@@ -78,6 +94,9 @@ const AdminBlog = () => {
   const [generateForm, setGenerateForm] = useState(defaultGenerateForm);
   const [scheduledPosts, setScheduledPosts] = useState([]);
   const [loadingScheduled, setLoadingScheduled] = useState(false);
+  const [planEntries, setPlanEntries] = useState([]);
+  const [loadingPlan, setLoadingPlan] = useState(false);
+  const [triggeringPlan, setTriggeringPlan] = useState(false);
 
   const selectedPost = useMemo(
     () => posts.find((post) => post.id === selectedId) || null,
@@ -100,6 +119,21 @@ const AdminBlog = () => {
     }
   }, []);
 
+  const loadPlan = useCallback(async () => {
+    setLoadingPlan(true);
+    try {
+      const { entries } = await listAdminBlogPlan({
+        limit: 90,
+      });
+      setPlanEntries(entries || []);
+    } catch (error) {
+      console.error('[AdminBlog] loadPlan failed', error);
+      toast.error('No se pudo cargar el plan editorial.');
+    } finally {
+      setLoadingPlan(false);
+    }
+  }, []);
+
   const loadPosts = async (status = listStatusFilter) => {
     setLoadingList(true);
     try {
@@ -116,9 +150,30 @@ const AdminBlog = () => {
     }
   };
 
+  const handleTriggerAutomation = async () => {
+    setTriggeringPlan(true);
+    try {
+      const { result } = await triggerAdminBlogPlanGeneration();
+      if (result?.processed) {
+        toast.success('Se generó un artículo del plan editorial.');
+      } else if (result?.reason === 'no-plan-entry') {
+        toast.info('No hay entradas pendientes en el plan para generar.');
+      } else {
+        toast.success('Se ejecutó la automatización del plan editorial.');
+      }
+      await Promise.all([loadPlan(), loadScheduled(), loadPosts(listStatusFilter)]);
+    } catch (error) {
+      console.error('[AdminBlog] trigger automation failed', error);
+      toast.error('No se pudo ejecutar la automatización del plan.');
+    } finally {
+      setTriggeringPlan(false);
+    }
+  };
+
   useEffect(() => {
     loadPosts('all');
     loadScheduled();
+    loadPlan();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -427,6 +482,95 @@ const AdminBlog = () => {
         )}
       </section>
 
+      <section className="rounded-lg border border-soft bg-white p-5 shadow-sm space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-semibold">Plan editorial</h2>
+            <p className="text-sm text-gray-600">
+              Próximas entradas generadas automáticamente. Revisa estado y fecha prevista.
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={loadPlan}
+              className="px-3 py-2 text-sm border rounded-md border-soft hover:bg-gray-50"
+            >
+              {loadingPlan ? 'Actualizando...' : 'Actualizar'}
+            </button>
+            <button
+              type="button"
+              onClick={handleTriggerAutomation}
+              disabled={triggeringPlan}
+              className="inline-flex items-center rounded-md px-3 py-2 text-sm font-medium text-white bg-[color:var(--color-primary,#6366f1)] hover:bg-[color:var(--color-primary-dark,#4f46e5)] disabled:opacity-60"
+            >
+              {triggeringPlan ? 'Generando...' : 'Generar siguiente artículo ahora'}
+            </button>
+          </div>
+        </div>
+        {loadingPlan ? (
+          <p className="text-sm text-gray-500">Cargando plan editorial...</p>
+        ) : planEntries.length === 0 ? (
+          <p className="text-sm text-gray-500">Aún no hay días planificados.</p>
+        ) : (
+          <div className="overflow-x-auto rounded-lg border border-soft">
+            <table className="min-w-full text-sm">
+              <thead className="bg-gray-50 text-xs uppercase text-gray-500">
+                <tr>
+                  <th className="px-3 py-2 text-left">Fecha</th>
+                  <th className="px-3 py-2 text-left">Estado</th>
+                  <th className="px-3 py-2 text-left">Tema</th>
+                  <th className="px-3 py-2 text-left">Post</th>
+                </tr>
+              </thead>
+              <tbody>
+                {planEntries.map((entry) => {
+                  const status = entry.status || 'planned';
+                  const badgeClass = PLAN_STATUS_BADGE[status] || 'bg-gray-100 text-gray-700';
+                  const statusLabel = PLAN_STATUS_LABELS[status] || status;
+                  return (
+                    <tr key={entry.planDate} className="border-b last:border-b-0">
+                      <td className="px-3 py-3 text-sm text-gray-800">
+                        {formatDate(entry.date || entry.planDate)}
+                      </td>
+                      <td className="px-3 py-3">
+                        <span
+                          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${badgeClass}`}
+                        >
+                          {statusLabel}
+                        </span>
+                        {entry.error ? (
+                          <p className="mt-1 text-xs text-rose-600">{entry.error}</p>
+                        ) : null}
+                      </td>
+                      <td className="px-3 py-3 text-sm text-gray-700">
+                        <p className="font-medium text-gray-900">{entry.topic}</p>
+                        {entry.angle ? (
+                          <p className="text-xs text-gray-500">{entry.angle}</p>
+                        ) : null}
+                      </td>
+                      <td className="px-3 py-3 text-xs text-gray-600">
+                        {entry.postId ? (
+                          <button
+                            type="button"
+                            className="text-indigo-600 hover:underline"
+                            onClick={() => setSelectedId(entry.postId)}
+                          >
+                            Ver post
+                          </button>
+                        ) : (
+                          <span>—</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+
       <section className="grid gap-6 lg:grid-cols-5">
         <div className="space-y-4 lg:col-span-2">
           <div className="flex items-center justify-between">
@@ -506,6 +650,12 @@ const AdminBlog = () => {
             {selectedPost ? (
               <span className="text-xs text-gray-500">
                 ID: <code>{selectedPost.id}</code>
+                {selectedPost.coverImage?.storagePath ? (
+                  <span className="ml-2 text-gray-400">
+                    <span className="hidden sm:inline">· Storage: </span>
+                    <code>{selectedPost.coverImage?.storagePath}</code>
+                  </span>
+                ) : null}
               </span>
             ) : null}
           </div>
@@ -553,6 +703,63 @@ const AdminBlog = () => {
                   }
                 />
               </div>
+
+              {selectedPost?.research?.summary ? (
+                <div className="rounded-md border border-dashed border-soft bg-indigo-50/40 p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <h3 className="text-xs font-semibold uppercase text-indigo-600">
+                        Investigación IA
+                      </h3>
+                      <p className="mt-1 text-sm text-gray-700 leading-relaxed">
+                        {selectedPost.research.summary}
+                      </p>
+                    </div>
+                    <span className="text-xs text-gray-500">
+                      {selectedPost.research.provider || 'sin proveedor'}
+                    </span>
+                  </div>
+                  {Array.isArray(selectedPost.research.references) &&
+                  selectedPost.research.references.length ? (
+                    <ul className="mt-3 space-y-1 text-xs text-gray-600 list-disc list-inside">
+                      {selectedPost.research.references.slice(0, 6).map((ref) => (
+                        <li key={ref.url || ref.title}>
+                          <span className="font-medium text-gray-700">{ref.title}</span>
+                          {ref.url ? (
+                            <a
+                              href={ref.url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="ml-2 text-indigo-600 hover:underline"
+                            >
+                              abrir
+                            </a>
+                          ) : null}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </div>
+              ) : null}
+
+              {selectedPost?.coverImage ? (
+                <div className="rounded-md border border-soft bg-gray-50 px-3 py-2 text-xs text-gray-600">
+                  Imagen de portada:{' '}
+                  <span className="font-semibold text-gray-800">
+                    {selectedPost.coverImage.status || 'pendiente'}
+                  </span>
+                  {selectedPost.coverImage.url ? (
+                    <a
+                      href={selectedPost.coverImage.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="ml-2 text-indigo-600 hover:underline"
+                    >
+                      Ver imagen
+                    </a>
+                  ) : null}
+                </div>
+              ) : null}
 
               <div className="grid gap-4 md:grid-cols-2">
                 <div>

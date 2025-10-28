@@ -1,4 +1,6 @@
 import { randomUUID } from 'crypto';
+import admin from 'firebase-admin';
+import axios from 'axios';
 import { z } from 'zod';
 
 let openaiClient = null;
@@ -385,7 +387,10 @@ export async function generateCoverImageFromPrompt(prompt, options = {}) {
   }
 
   const size = options.size || '1024x1024';
-  const quality = options.quality || 'hd';
+  let quality = options.quality || 'high';
+  if (quality === 'hd') {
+    quality = 'high';
+  }
 
   try {
     await ensureOpenAI();
@@ -404,11 +409,84 @@ export async function generateCoverImageFromPrompt(prompt, options = {}) {
       throw new Error('cover-image-empty-response');
     }
 
+    let storageInfo = null;
+    const bucketName =
+      process.env.BLOG_COVER_STORAGE_BUCKET ||
+      process.env.FIREBASE_STORAGE_BUCKET ||
+      process.env.VITE_FIREBASE_STORAGE_BUCKET ||
+      null;
+
+    if (bucketName) {
+      try {
+        const download = await axios.get(imageUrl, { responseType: 'arraybuffer' });
+        const buffer = Buffer.from(download.data);
+        const contentType = download.headers?.['content-type'] || 'image/png';
+        const extension = (() => {
+          const ct = contentType.toLowerCase();
+          if (ct.includes('jpeg') || ct.includes('jpg')) return 'jpg';
+          if (ct.includes('png')) return 'png';
+          if (ct.includes('webp')) return 'webp';
+          return 'png';
+        })();
+
+        const storagePath = `blog/covers/${new Date().toISOString().slice(0, 10)}/${createLocalId()}.${extension}`;
+        const bucket = admin.storage().bucket(bucketName);
+        const file = bucket.file(storagePath);
+
+        await file.save(buffer, {
+          contentType,
+          metadata: {
+            cacheControl: 'public,max-age=31536000,immutable',
+          },
+        });
+
+        let publicUrl = `https://storage.googleapis.com/${bucketName}/${storagePath}`;
+        let signedUrlExpiresAt = null;
+        let madePublic = false;
+        try {
+          await file.makePublic();
+          madePublic = true;
+        } catch (publishError) {
+          // Bucket may have uniform access. Fallback to signed URL.
+          const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24 * 365); // 1 año
+          const [signedUrl] = await file.getSignedUrl({
+            action: 'read',
+            expires: expiresAt,
+          });
+          publicUrl = signedUrl;
+          signedUrlExpiresAt = expiresAt.toISOString();
+        }
+
+        storageInfo = {
+          bucket: bucketName,
+          storagePath,
+          contentType,
+          publicUrl,
+          madePublic,
+          signedUrlExpiresAt,
+          originalUrl: imageUrl,
+        };
+      } catch (uploadError) {
+        console.error('[blogAiService] cover upload failed:', uploadError?.message || uploadError);
+        storageInfo = {
+          bucket: bucketName,
+          error: uploadError?.message || 'upload-failed',
+          originalUrl: imageUrl,
+        };
+      }
+    }
+
     return {
       status: 'ready',
-      url: imageUrl,
+      url: storageInfo?.publicUrl || imageUrl,
       provider: 'openai',
       model: DEFAULT_IMAGE_MODEL,
+      storagePath: storageInfo?.storagePath || null,
+      bucket: storageInfo?.bucket || null,
+      signedUrlExpiresAt: storageInfo?.signedUrlExpiresAt || null,
+      originalUrl: imageUrl,
+      upload: storageInfo || null,
+      error: storageInfo?.error || null,
       raw: {
         id: response.id,
         created: response.created,

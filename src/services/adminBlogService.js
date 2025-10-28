@@ -80,3 +80,25 @@ export async function archiveAdminBlogPost(id) {
   return handleResponse(response);
 }
 
+export async function listAdminBlogPlan(params = {}) {
+  const url = new URL(`${BASE_URL}/plan`, window.location.origin);
+  if (params.limit) url.searchParams.set('limit', String(params.limit));
+  if (params.status) url.searchParams.set('status', params.status);
+  if (params.startDate) url.searchParams.set('startDate', params.startDate);
+  const response = await fetch(url.toString().replace(window.location.origin, ''), {
+    ...getAdminFetchOptions(),
+    method: 'GET',
+  });
+  return handleResponse(response);
+}
+
+export async function triggerAdminBlogPlanGeneration(payload = {}) {
+  const response = await fetch(`${BASE_URL}/plan/generate`, {
+    ...getAdminFetchOptions({
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }),
+  });
+  return handleResponse(response);
+}

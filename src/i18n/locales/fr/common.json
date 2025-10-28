@@ -1960,6 +1960,16 @@
         "providerSaved": "Fournisseur enregistré.",
         "providerError": "Impossible d'enregistrer le fournisseur."
       },
+      "searchMode": {
+        "label": "Recherche dans :",
+        "auto": "🔍 Auto (Hybride)",
+        "database": "💾 Base de données uniquement",
+        "internet": "🌐 Internet uniquement",
+        "indicator": "🎯 Mode de recherche : {{mode}}"
+      },
+      "breakdown": {
+        "title": "Trouvés {{total}} fournisseurs ({{registered}} enregistrés, {{cached}} en cache, {{internet}} depuis le web)"
+      },
       "actions": {
         "manageServices": "Gérer les services",
         "newSupplier": "Nouveau fournisseur",
@@ -2464,18 +2474,8 @@
           "image": "https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=500&q=60",
           "location": "Madrid",
           "price": "€1,200 - €2,500",
-          "tags": [
-            "natural",
-            "documentary",
-            "outdoor",
-            "sunlight"
-          ],
-          "keywords": [
-            "photographer",
-            "natural",
-            "documentary",
-            "wedding"
-          ]
+          "tags": ["natural", "documentary", "outdoor", "sunlight"],
+          "keywords": ["photographer", "natural", "documentary", "wedding"]
         },
         {
           "id": "2",
@@ -2485,17 +2485,8 @@
           "image": "https://images.unsplash.com/photo-1508435234994-67cfd7690508?auto=format&fit=crop&w=500&q=60",
           "location": "Barcelona",
           "price": "€1,500 - €3,000",
-          "tags": [
-            "beach",
-            "outdoor",
-            "nature"
-          ],
-          "keywords": [
-            "photographer",
-            "wedding",
-            "beach",
-            "experience"
-          ]
+          "tags": ["beach", "outdoor", "nature"],
+          "keywords": ["photographer", "wedding", "beach", "experience"]
         },
         {
           "id": "3",
@@ -2505,16 +2496,8 @@
           "image": "https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&w=500&q=60",
           "location": "Madrid",
           "price": "€70 - €120 per guest",
-          "tags": [
-            "vegetarian",
-            "vegan",
-            "buffet"
-          ],
-          "keywords": [
-            "catering",
-            "buffet",
-            "event"
-          ]
+          "tags": ["vegetarian", "vegan", "buffet"],
+          "keywords": ["catering", "buffet", "event"]
         },
         {
           "id": "4",
@@ -2524,16 +2507,8 @@
           "image": "https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?auto=format&fit=crop&w=500&q=60",
           "location": "Valencia",
           "price": "€800 - €1,500",
-          "tags": [
-            "dj",
-            "music",
-            "lighting"
-          ],
-          "keywords": [
-            "dj",
-            "music",
-            "event"
-          ]
+          "tags": ["dj", "music", "lighting"],
+          "keywords": ["dj", "music", "event"]
         },
         {
           "id": "5",
@@ -2543,16 +2518,8 @@
           "image": "https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&w=500&q=60",
           "location": "Seville",
           "price": "€500 - €1,500",
-          "tags": [
-            "flowers",
-            "decoration",
-            "boho"
-          ],
-          "keywords": [
-            "flowers",
-            "decoration",
-            "wedding"
-          ]
+          "tags": ["flowers", "decoration", "boho"],
+          "keywords": ["flowers", "decoration", "wedding"]
         }
       ]
     },

@@ -136,6 +136,7 @@ import { startMetricAggregatorWorker } from './workers/metricAggregatorWorker.js
 import { startMomentosCleanupWorker } from './workers/momentosCleanupWorker.js';
 import { startMomentosModerationWorker } from './workers/momentosModerationWorker.js';
 import { startBlogAutomationWorker } from './workers/blogAutomationWorker.js';
+import { cleanupExpiredFavorites } from './tasks/cleanupExpiredFavorites.js';
 
 const {
   PORT,
