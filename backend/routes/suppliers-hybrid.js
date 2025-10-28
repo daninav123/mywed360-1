@@ -6,7 +6,10 @@
 // Priorización: [BD PROPIA] → [BODAS.NET] → [OTROS INTERNET]
 
 import express from 'express';
-import admin from 'firebase-admin';
+import OpenAI from 'openai';
+import { db } from '../db.js';
+import axios from 'axios';
+import crypto from 'crypto';
 import logger from '../logger.js';
 import searchAnalyticsService from '../services/searchAnalyticsService.js';
 
@@ -16,17 +19,28 @@ const router = express.Router();
 // (Necesitaremos refactorizar esto)
 import fetch from 'node-fetch';
 
-const NEUTRAL_LOCATIONS = new Set([
-  'espana',
-  'españa',
-  'spain',
-  'all',
-  'todos',
-  'todas',
-  'any',
-  'cualquier',
-  'global',
-]);
+const NEUTRAL_LOCATIONS = new Set(['españa', 'spain', 'nacional', 'todo españa', 'toda españa']);
+
+/**
+ * Genera un ID único y determinístico para un proveedor basado en su email
+ * Si el mismo proveedor aparece en múltiples búsquedas, tendrá el mismo ID
+ */
+function generateSupplierId(email, name) {
+  if (!email || typeof email !== 'string') {
+    // Fallback: generar ID basado en nombre + timestamp (menos ideal)
+    const base = (name || 'unknown') + Date.now();
+    return 'inet_' + crypto.createHash('md5').update(base).digest('hex').substring(0, 16);
+  }
+
+  // Email normalizado (lowercase, sin espacios)
+  const normalized = email.toLowerCase().trim();
+
+  // Hash MD5 del email (determinístico)
+  const hash = crypto.createHash('md5').update(normalized).digest('hex');
+
+  // Tomar primeros 16 caracteres + prefijo
+  return 'inet_' + hash.substring(0, 16);
+}
 
 const normalizeText = (value = '') =>
   String(value)
@@ -765,8 +779,12 @@ router.post('/search', async (req, res) => {
             `   Descripción: ${cleanedDescription ? '✅ ' + cleanedDescription.substring(0, 50) + '...' : '❌ Vacía'}`
           );
 
+          // Generar ID único y determinístico
+          const supplierId = generateSupplierId(extractedEmail, cleanName);
+
           return {
             // Convertir formato Tavily a formato supplier
+            id: supplierId, // ✅ NUEVO: ID único basado en email
             name: cleanName,
             slug: null, // No tiene slug aún
             category: service,
