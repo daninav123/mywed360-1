@@ -2520,6 +2520,40 @@
         "favorite": {
           "add": "Mark as favorite",
           "remove": "Remove from favorites"
+        },
+        "hybrid": {
+          "defaults": {
+            "name": "Supplier",
+            "service": "weddings"
+          },
+          "location": "📍 {{city}}",
+          "imageAlt": "Image of {{name}}",
+          "badges": {
+            "registered": "Verified ✓",
+            "cached": "Cached",
+            "internet": "From the web"
+          },
+          "reviews": "({{count, plural, one={{count}} review, other={{count}} reviews}})",
+          "contact": {
+            "primary": "Contact",
+            "whatsapp": "WhatsApp",
+            "email": "Email",
+            "phone": "Call",
+            "whatsappTitle": "Contact via WhatsApp",
+            "emailTitle": "Send email",
+            "whatsappMessage": "Hi {{name}}, I found your {{service}} service on {{brand}} and I'd love to get more information.",
+            "emailSubject": "Enquiry from {{brand}} - {{service}}",
+            "emailBody": "Hi {{name}},\\n\\nI found your service on {{brand}} and would love to receive more information.\\n\\nThanks!"
+          },
+          "actions": {
+            "viewProfile": "View profile",
+            "markConfirmed": "Book supplier",
+            "viewWebsite": "Visit website"
+          },
+          "source": {
+            "label": "Source: {{source}}",
+            "internet": "Internet"
+          }
         }
       },
       "pendingTodos": {
@@ -3197,6 +3231,29 @@
       "defaultMessage": {
         "generic": "Hello! We'd love to invite you to our wedding. Can you confirm your attendance?",
         "named": "Hello {{name}}! We'd love to have you at our wedding. Can you confirm your attendance?"
+      }
+    },
+    "inviteTemplate": {
+      "title": "Edit message (WhatsApp API)",
+      "labels": {
+        "template": "Template (supports {guestName})"
+      },
+      "placeholder": "Hi {guestName}! We are {coupleName} and we'd love to celebrate with you...",
+      "variables": {
+        "title": "Available variables:"
+      },
+      "tokens": {
+        "guestName": "{guestName}",
+        "coupleName": "{coupleName}"
+      },
+      "examples": {
+        "guestName": "María"
+      },
+      "previewTitle": "Preview",
+      "confirmAddCouple": "The message does not include {coupleName}. It will be added automatically to identify the couple.",
+      "appendCouple": "We are {coupleName}",
+      "toast": {
+        "saveError": "We couldn't save the template."
       }
     }
   },

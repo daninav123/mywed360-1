@@ -1,7 +1,7 @@
 // pages/suppliers/SupplierRegister.jsx
 // Registro de nuevos proveedores
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import useTranslations from '../../hooks/useTranslations';
@@ -10,6 +10,7 @@ import { auth } from '../../firebaseConfig';
 
 export default function SupplierRegister() {
   const navigate = useNavigate();
+  const { t } = useTranslations();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   
@@ -25,20 +26,23 @@ export default function SupplierRegister() {
     description: ''
   });
   
-  const categories = [
-    { value: 'fotografia', label: 'Fotografía' },
-    { value: 'video', label: 'Vídeo' },
-    { value: 'catering', label: 'Catering' },
-    { value: 'flores', label: 'Flores y Decoración' },
-    { value: 'musica', label: 'Música / DJ' },
-    { value: 'peluqueria', label: 'Peluquería y Maquillaje' },
-    { value: 'invitaciones', label: 'Invitaciones' },
-    { value: 'vestidos', label: 'Vestidos y Trajes' },
-    { value: 'joyeria', label: 'Joyería' },
-    { value: 'transporte', label: 'Transporte' },
-    { value: 'alojamiento', label: 'Alojamiento' },
-    { value: 'otros', label: 'Otros Servicios' }
-  ];
+  const categories = useMemo(
+    () => [
+      { value: 'fotografia', label: t('common.suppliers.register.categories.photography') },
+      { value: 'video', label: t('common.suppliers.register.categories.video') },
+      { value: 'catering', label: t('common.suppliers.register.categories.catering') },
+      { value: 'flores', label: t('common.suppliers.register.categories.flowers') },
+      { value: 'musica', label: t('common.suppliers.register.categories.music') },
+      { value: 'peluqueria', label: t('common.suppliers.register.categories.beauty') },
+      { value: 'invitaciones', label: t('common.suppliers.register.categories.stationery') },
+      { value: 'vestidos', label: t('common.suppliers.register.categories.attire') },
+      { value: 'joyeria', label: t('common.suppliers.register.categories.jewelry') },
+      { value: 'transporte', label: t('common.suppliers.register.categories.transport') },
+      { value: 'alojamiento', label: t('common.suppliers.register.categories.accommodation') },
+      { value: 'otros', label: t('common.suppliers.register.categories.other') }
+    ],
+    [t]
+  );
   
   const handleChange = (e) => {
     setFormData({
@@ -54,12 +58,12 @@ export default function SupplierRegister() {
     
     // Validaciones
     if (formData.password !== formData.confirmPassword) {
-      setError('Las contraseñas no coinciden');
+      setError(t('common.suppliers.register.errors.passwordMismatch'));
       return;
     }
     
     if (formData.password.length < 6) {
-      setError('La contraseña debe tener al menos 6 caracteres');
+      setError(t('common.suppliers.register.errors.passwordLength'));
       return;
     }
     
@@ -87,7 +91,7 @@ export default function SupplierRegister() {
       const data = await response.json();
       
       if (!data.success) {
-        throw new Error(data.error || 'Error en el registro');
+        throw new Error(data.error || t('common.suppliers.register.errors.server'));
       }
       
       // Login automático con custom token
@@ -105,7 +109,7 @@ export default function SupplierRegister() {
       
     } catch (err) {
       console.error('Error en registro:', err);
-      setError(err.message || 'Error al registrar. Inténtalo de nuevo.');
+      setError(err.message || t('common.suppliers.register.errors.generic'));
     } finally {
       setLoading(false);
     }
@@ -117,10 +121,10 @@ export default function SupplierRegister() {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">
-            Registra tu Negocio
+            {t('common.suppliers.register.title')}
           </h1>
           <p className="mt-2 text-gray-600">
-            Únete a la plataforma y destaca entre miles de parejas buscando proveedores
+            {t('common.suppliers.register.subtitle')}
           </p>
         </div>
         
@@ -131,7 +135,7 @@ export default function SupplierRegister() {
             {/* Email */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Email *
+                {t('common.suppliers.register.form.email.label')}
               </label>
               <input
                 type="email"
@@ -140,7 +144,7 @@ export default function SupplierRegister() {
                 value={formData.email}
                 onChange={handleChange}
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="tu@email.com"
+                placeholder={t('common.suppliers.register.form.email.placeholder')}
               />
             </div>
             
@@ -148,7 +152,7 @@ export default function SupplierRegister() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Contraseña *
+                  {t('common.suppliers.register.form.password.label')}
                 </label>
                 <input
                   type="password"
@@ -157,13 +161,13 @@ export default function SupplierRegister() {
                   value={formData.password}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Mínimo 6 caracteres"
+                  placeholder={t('common.suppliers.register.form.password.placeholder')}
                 />
               </div>
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Confirmar Contraseña *
+                  {t('common.suppliers.register.form.confirmPassword.label')}
                 </label>
                 <input
                   type="password"
@@ -172,6 +176,7 @@ export default function SupplierRegister() {
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder={t('common.suppliers.register.form.confirmPassword.placeholder')}
                 />
               </div>
             </div>
@@ -179,7 +184,7 @@ export default function SupplierRegister() {
             {/* Nombre del negocio */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Nombre del Negocio *
+                {t('common.suppliers.register.form.name.label')}
               </label>
               <input
                 type="text"
@@ -188,7 +193,7 @@ export default function SupplierRegister() {
                 value={formData.name}
                 onChange={handleChange}
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Ej: Fotografía María López"
+                placeholder={t('common.suppliers.register.form.name.placeholder')}
               />
             </div>
             

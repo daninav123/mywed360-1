@@ -3400,6 +3400,40 @@
         "favorite": {
           "add": "Marcar como favorito",
           "remove": "Quitar de favoritos"
+        },
+        "hybrid": {
+          "defaults": {
+            "name": "Proveedor",
+            "service": "bodas"
+          },
+          "location": "📍 {{city}}",
+          "imageAlt": "Imagen de {{name}}",
+          "badges": {
+            "registered": "Verificado ✓",
+            "cached": "En caché",
+            "internet": "De internet"
+          },
+          "reviews": "({{count, plural, one={{count}} reseña, other={{count}} reseñas}})",
+          "contact": {
+            "primary": "Contactar",
+            "whatsapp": "WhatsApp",
+            "email": "Email",
+            "phone": "Llamar",
+            "whatsappTitle": "Contactar por WhatsApp",
+            "emailTitle": "Enviar email",
+            "whatsappMessage": "Hola {{name}}, encontré tu servicio de {{service}} en {{brand}} y me gustaría más información.",
+            "emailSubject": "Consulta desde {{brand}} - {{service}}",
+            "emailBody": "Hola {{name}},\\n\\nEncontré tu servicio en {{brand}} y me gustaría recibir más información.\\n\\n¡Gracias!"
+          },
+          "actions": {
+            "viewProfile": "Ver perfil",
+            "markConfirmed": "Contratar",
+            "viewWebsite": "Ver web"
+          },
+          "source": {
+            "label": "Fuente: {{source}}",
+            "internet": "Internet"
+          }
         }
       },
       "pendingTodos": {
@@ -4553,6 +4587,29 @@
       "defaultMessage": {
         "generic": "¡Hola! Queremos invitarte a nuestra boda. ¿Puedes confirmar tu asistencia?",
         "named": "¡Hola {{name}}! Nos encantaría contar contigo en nuestra boda. ¿Puedes confirmar tu asistencia?"
+      }
+    },
+    "inviteTemplate": {
+      "title": "Editar mensaje (WhatsApp API)",
+      "labels": {
+        "template": "Plantilla (soporta {guestName})"
+      },
+      "placeholder": "¡Hola {guestName}! Somos {coupleName} y nos encantaría celebrar contigo...",
+      "variables": {
+        "title": "Variables disponibles:"
+      },
+      "tokens": {
+        "guestName": "{guestName}",
+        "coupleName": "{coupleName}"
+      },
+      "examples": {
+        "guestName": "María"
+      },
+      "previewTitle": "Previsualización",
+      "confirmAddCouple": "El mensaje no incluye {coupleName}. Se añadirá automáticamente para identificar a la pareja.",
+      "appendCouple": "Somos {coupleName}",
+      "toast": {
+        "saveError": "No se pudo guardar la plantilla."
       }
     }
   },

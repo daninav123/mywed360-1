@@ -31,6 +31,8 @@ import RSVPConfirm from './pages/RSVPConfirm';
 import RSVPDashboard from './pages/RSVPDashboard';
 import SupplierPortal from './pages/SupplierPortal';
 import SupplierRegistration from './pages/SupplierRegistration';
+import SupplierLogin from './pages/suppliers/SupplierLogin';
+import SupplierSetPassword from './pages/suppliers/SupplierSetPassword';
 import SupplierRegister from './pages/suppliers/SupplierRegister';
 import SupplierDashboard from './pages/suppliers/SupplierDashboard';
 import Tasks from './pages/Tasks';
@@ -294,6 +296,8 @@ function App() {
               
               {/* Portal de proveedores */}
               <Route path="supplier/registro" element={<SupplierRegistration />} />
+              <Route path="supplier/login" element={<SupplierLogin />} />
+              <Route path="supplier/setup-password" element={<SupplierSetPassword />} />
               <Route path="supplier/register" element={<SupplierRegister />} />
               <Route path="supplier/dashboard/:id" element={<SupplierDashboard />} />
               <Route path="supplier/:token" element={<SupplierPortal />} />

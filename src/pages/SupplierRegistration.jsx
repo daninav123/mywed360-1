@@ -15,6 +15,7 @@ export default function SupplierRegistration() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [successData, setSuccessData] = useState(null);
   const [errors, setErrors] = useState({});
   
   const [formData, setFormData] = useState({
@@ -162,6 +163,7 @@ export default function SupplierRegistration() {
       }
       
       setSuccess(true);
+      setSuccessData(data);
       window.scrollTo({ top: 0, behavior: 'smooth' });
       
     } catch (error) {
@@ -183,18 +185,49 @@ export default function SupplierRegistration() {
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 text-left">
             <h3 className="font-semibold mb-2">Próximos pasos:</h3>
             <ol className="list-decimal list-inside space-y-1 text-sm">
-              <li>Revisa tu email y verifica tu cuenta</li>
-              <li>Completa tu perfil con más información</li>
-              <li>Sube fotos de tu portfolio</li>
-              <li>Activa tu cuenta para aparecer en búsquedas</li>
+              {successData?.nextSteps?.map((step, index) => (
+                <li key={index}>{step}</li>
+              )) || (
+                <>
+                  <li>Verifica tu email y establece tu contraseña</li>
+                  <li>Inicia sesión en tu dashboard</li>
+                  <li>Completa tu perfil</li>
+                  <li>Sube fotos de tu portfolio</li>
+                  <li>Activa tu cuenta</li>
+                </>
+              )}
             </ol>
           </div>
-          <button
-            onClick={() => navigate('/')}
-            className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-          >
-            Volver al inicio
-          </button>
+          
+          {/* Solo mostrar en desarrollo para testing */}
+          {successData?.setupPasswordUrl && import.meta.env.DEV && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6 text-left">
+              <p className="text-sm font-semibold text-yellow-800 mb-2">
+                🔧 MODO DESARROLLO - Link de prueba:
+              </p>
+              <a 
+                href={successData.setupPasswordUrl}
+                className="text-sm text-blue-600 hover:underline break-all"
+              >
+                {successData.setupPasswordUrl}
+              </a>
+            </div>
+          )}
+          
+          <div className="flex gap-3 justify-center">
+            <button
+              onClick={() => navigate('/supplier/login')}
+              className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+            >
+              Ir al Login
+            </button>
+            <button
+              onClick={() => navigate('/')}
+              className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50"
+            >
+              Volver al inicio
+            </button>
+          </div>
         </div>
       </div>
     );

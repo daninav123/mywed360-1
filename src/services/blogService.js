@@ -1,6 +1,7 @@
 ﻿// blogService.js - noticias de bodas
 
 import { getBackendBase } from '@/utils/backendBase.js';
+import { getFallbackWeddingNews } from '@/data/blogFallbackPosts.js';
 import { translateText } from './translationService.js';
 
 // Evita spam de peticiones al backend si está caído/no iniciado (reservado para uso futuro)
@@ -580,6 +581,7 @@ const scoreMatches = (text, patterns) =>
 export async function fetchWeddingNews(page = 1, pageSize = 10, language = 'es') {
   const lang = normalizeLang(language);
   const skipLocal = !_backendAvailable();
+  const fallbackBatch = getFallbackWeddingNews(page, pageSize, lang);
   const rssData = await fetchFromBackend({
     page,
     pageSize,
@@ -593,6 +595,10 @@ export async function fetchWeddingNews(page = 1, pageSize = 10, language = 'es')
       _backoffBackend(2 * 60_000);
     }
     if (!API_KEY) {
+      if (fallbackBatch.length) {
+        console.info('[blogService] usando fallback wedding-news', { page, lang, size: fallbackBatch.length });
+        return fallbackBatch;
+      }
       return [];
     }
   }
@@ -602,17 +608,29 @@ export async function fetchWeddingNews(page = 1, pageSize = 10, language = 'es')
   }
 
   if (!API_KEY) {
+    if (fallbackBatch.length) {
+      console.info('[blogService] usando fallback wedding-news', { page, lang, size: fallbackBatch.length });
+      return fallbackBatch;
+    }
     return [];
   }
 
   try {
     const news = await fetchFromNewsApi(page, pageSize, lang);
     if (!news.length) {
+      if (fallbackBatch.length) {
+        console.info('[blogService] usando fallback wedding-news', { page, lang, size: fallbackBatch.length });
+        return fallbackBatch;
+      }
       return [];
     }
     return maybeTranslatePosts(news.map((entry) => normalizeBlogPost(entry, lang)), lang);
   } catch (error) {
     console.warn('[blogService] NewsAPI fallback failed', error);
+    if (fallbackBatch.length) {
+      console.info('[blogService] usando fallback wedding-news', { page, lang, size: fallbackBatch.length });
+      return fallbackBatch;
+    }
     return [];
   }
 }
@@ -624,6 +642,10 @@ async function maybeTranslatePosts(posts, lang) {
 
   const translated = [];
   for (const post of posts) {
+    if (post?.__fallback) {
+      translated.push({ ...post });
+      continue;
+    }
     const copy = { ...post };
     try {
       copy.title = await translateText(copy.title, lang, '');
@@ -637,5 +659,3 @@ async function maybeTranslatePosts(posts, lang) {
 }
 
 // Fin de archivo
-
-

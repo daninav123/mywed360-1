@@ -3053,6 +3053,29 @@
         "generic": "Bonjour ! Nous aimerions t'inviter à notre mariage. Peux-tu confirmer ta présence ?",
         "named": "Bonjour {{name}} ! Nous serions ravis de t'avoir à notre mariage. Peux-tu confirmer ta présence ?"
       }
+    },
+    "inviteTemplate": {
+      "title": "Modifier le message (WhatsApp API)",
+      "labels": {
+        "template": "Modèle (compatible avec {guestName})"
+      },
+      "placeholder": "Bonjour {guestName} ! Nous sommes {coupleName} et nous serions ravis de célébrer avec toi...",
+      "variables": {
+        "title": "Variables disponibles :"
+      },
+      "tokens": {
+        "guestName": "{guestName}",
+        "coupleName": "{coupleName}"
+      },
+      "examples": {
+        "guestName": "María"
+      },
+      "previewTitle": "Aperçu",
+      "confirmAddCouple": "Le message n'inclut pas {coupleName}. Il sera ajouté automatiquement pour identifier le couple.",
+      "appendCouple": "Nous sommes {coupleName}",
+      "toast": {
+        "saveError": "Impossible d'enregistrer le modèle."
+      }
     }
   },
   "design": {
