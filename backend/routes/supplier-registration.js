@@ -315,6 +315,7 @@ router.get('/categories', async (req, res) => {
     { value: 'invitaciones', label: 'Invitaciones' },
     { value: 'maquillaje', label: 'Maquillaje y Peluquería' },
     { value: 'transporte', label: 'Transporte' },
+    { value: 'coches', label: 'Coches de Boda' },
     { value: 'animacion', label: 'Animación' },
     { value: 'wedding-planner', label: 'Wedding Planner' },
     { value: 'otro', label: 'Otro' },
