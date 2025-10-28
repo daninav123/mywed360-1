@@ -136,17 +136,23 @@ router.post('/search', async (req, res) => {
       // Filtraremos por nombre en memoria
       let firestoreQuery = db.collection('suppliers').limit(100); // Traer más documentos para buscar por nombre
 
-      // Filtro por ubicación si se especifica
-      const locationValue = typeof location === 'string' ? location.trim() : location;
-      const shouldFilterByLocation = (() => {
-        if (!locationValue) return false;
-        const normalized = normalizeText(locationValue);
-        return normalized.length > 0 && !NEUTRAL_LOCATIONS.has(normalized);
-      })();
+      // DESHABILITADO TEMPORALMENTE: Filtro de ubicación causa 0 resultados
+      // El filtro location.city es muy estricto y elimina todos los proveedores
+      // TODO: Buscar en ubicación DESPUÉS de obtener todos los documentos
 
-      if (shouldFilterByLocation) {
-        firestoreQuery = firestoreQuery.where('location.city', '==', locationValue);
-      }
+      console.log(`⚠️ [UBICACION] Filtro de ubicación DESHABILITADO temporalmente`);
+      console.log(`   Location solicitada: "${location}"`);
+
+      // const locationValue = typeof location === 'string' ? location.trim() : location;
+      // const shouldFilterByLocation = (() => {
+      //   if (!locationValue) return false;
+      //   const normalized = normalizeText(locationValue);
+      //   return normalized.length > 0 && !NEUTRAL_LOCATIONS.has(normalized);
+      // })();
+
+      // if (shouldFilterByLocation) {
+      //   firestoreQuery = firestoreQuery.where('location.city', '==', locationValue);
+      // }
 
       const snapshot = await firestoreQuery.get();
 
