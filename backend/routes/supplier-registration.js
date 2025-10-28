@@ -153,6 +153,12 @@ router.post('/register', express.json({ limit: '2mb' }), async (req, res) => {
         documentsVerified: false,
       },
       
+      // Authentication
+      auth: {
+        passwordHash: null, // Se establece después de verificar email
+        passwordSetAt: null,
+      },
+      
       // Metadata
       createdAt: FieldValue.serverTimestamp(),
       updatedAt: FieldValue.serverTimestamp(),
@@ -170,8 +176,12 @@ router.post('/register', express.json({ limit: '2mb' }), async (req, res) => {
     
     await supplierRef.set(supplierData);
     
-    // TODO: Enviar email de verificación
-    // await sendVerificationEmail(data.email, verificationToken);
+    // Generar enlace para establecer contraseña
+    const baseUrl = process.env.PUBLIC_APP_BASE_URL || 'http://localhost:5173';
+    const setupPasswordUrl = `${baseUrl}/supplier/setup-password?email=${encodeURIComponent(data.email)}&token=${verificationToken}`;
+    
+    // TODO: Enviar email de verificación con el enlace
+    // await sendVerificationEmail(data.email, verificationToken, setupPasswordUrl);
     
     logger.info('Nuevo proveedor registrado', {
       supplierId,
@@ -184,9 +194,11 @@ router.post('/register', express.json({ limit: '2mb' }), async (req, res) => {
       success: true,
       supplierId,
       slug,
-      message: 'Registro exitoso. Revisa tu email para verificar tu cuenta.',
+      setupPasswordUrl, // Para testing, en producción solo se envía por email
+      message: 'Registro exitoso. Revisa tu email para verificar tu cuenta y establecer tu contraseña.',
       nextSteps: [
-        'Verifica tu email',
+        'Verifica tu email y establece tu contraseña',
+        'Inicia sesión en tu dashboard',
         'Completa tu perfil',
         'Sube fotos de tu portfolio',
         'Activa tu cuenta'

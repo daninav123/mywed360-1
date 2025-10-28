@@ -80,6 +80,7 @@ import imageProxyRouter from './routes/image-proxy.js';
 import weddingNewsRouter from './routes/wedding-news.js';
 import supplierPortalRouter from './routes/supplier-portal.js';
 import supplierRegistrationRouter from './routes/supplier-registration.js';
+import supplierDashboardRouter from './routes/supplier-dashboard.js';
 import supplierBudgetRouter from './routes/supplier-budget.js';
 import publicWeddingRouter from './routes/public-wedding.js';
 import rsvpRouter from './routes/rsvp.js';
@@ -573,6 +574,8 @@ app.use('/api/crm', crmRouter);
 app.use('/api/supplier-portal', supplierPortalRouter);
 // Supplier registration (public, no auth required)
 app.use('/api/supplier-registration', supplierRegistrationRouter);
+// Supplier dashboard (protected, JWT auth)
+app.use('/api/supplier-dashboard', supplierDashboardRouter);
 
 // Nuevos módulos transversales
 app.use('/api/automation', automationRouter);
