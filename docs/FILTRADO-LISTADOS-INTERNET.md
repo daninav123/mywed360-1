@@ -1,8 +1,52 @@
 # 🚫 FILTRADO DE LISTADOS Y DIRECTORIOS EN BÚSQUEDA INTERNET
 
 **Fecha:** 2025-10-28  
+**Última actualización:** 2025-10-28 18:08  
 **Problema:** Resultados mostraban listados genéricos en vez de proveedores específicos  
-**Solución:** Triple capa de filtrado agresivo
+**Solución:** Triple capa de filtrado + Excepción especial para Bodas.net
+
+---
+
+## ⭐ EXCEPCIÓN IMPORTANTE: BODAS.NET
+
+**Bodas.net es el MAYOR portal de bodas en España** y contiene perfiles individuales de miles de proveedores reales.
+
+### ✅ **PERMITIDO - Perfiles individuales:**
+
+```
+URL: https://bodas.net/musicos/angeli-musica--e123456
+Estructura: /[categoria]/[slug-proveedor]--[id]
+Resultado: ACEPTADO ✅
+```
+
+**Por qué SÍ:**
+
+- ✅ Tiene slug único del proveedor (`angeli-musica`)
+- ✅ Tiene ID único (`e123456`)
+- ✅ Es un perfil específico, NO un listado
+- ✅ Tiene contacto directo del proveedor
+- ✅ Es la página oficial del proveedor en bodas.net
+
+### ❌ **BLOQUEADO - Listados genéricos:**
+
+```
+URL: https://bodas.net/musicos/valencia
+Estructura: /[categoria]/[ciudad]
+Resultado: RECHAZADO ❌
+```
+
+**Por qué NO:**
+
+- ❌ Solo tiene categoría y ciudad
+- ❌ NO tiene slug único
+- ❌ Es un listado de múltiples proveedores
+- ❌ NO es un proveedor específico
+
+**Regex de detección:**
+
+```javascript
+const hasProfileSlug = /bodas\.net\/[^\/]+\/[^\/]+--[a-z0-9]+/i.test(url);
+```
 
 ---
 
@@ -51,7 +95,36 @@ Instagram: https://instagram.com/angelimusica
 
 ---
 
-## 🛡️ TRIPLE CAPA DE FILTRADO
+## 🛡️ SISTEMA DE FILTRADO INTELIGENTE
+
+### **Capa 0: Excepción especial para Bodas.net** ⭐ **NUEVO**
+
+**PRIMERO** se evalúa si es de Bodas.net:
+
+```javascript
+const isBodasNet = url && url.includes('bodas.net');
+if (isBodasNet) {
+  const hasProfileSlug = /bodas\.net\/[^\/]+\/[^\/]+--[a-z0-9]+/i.test(url);
+
+  if (hasProfileSlug) {
+    // Perfil individual → ACEPTAR sin más filtros
+    return true;
+  } else {
+    // Listado genérico → RECHAZAR inmediatamente
+    return false;
+  }
+}
+// Si NO es bodas.net, continuar con filtros normales...
+```
+
+**Ventaja:**
+
+- ✅ Bodas.net perfiles individuales **siempre se muestran**
+- ✅ Bodas.net listados **siempre se bloquean**
+- ✅ No se aplican filtros agresivos a perfiles de bodas.net
+- ✅ Mayor portal de bodas incluido correctamente
+
+---
 
 ### **Capa 1: Exclusión de dominios (48 dominios)**
 
@@ -247,14 +320,17 @@ const listPatterns = [
 🔍 [TAVILY] Query construida: "musica valencia bodas profesional OR empresa OR estudio -\"buscar\" -\"listado\"..."
 📊 [TAVILY] Respuesta: 15 resultados brutos
 
+   ✅ Bodas.net perfil individual aceptado: Angeli Música | Música para bodas Valencia
+   ❌ Bodas.net listado rechazado: Músicos Valencia - Encuentra tu grupo
    ❌ Filtrado por baja calidad/listado: Los 10 mejores MÚSICOS para boda en Valencia
    ❌ Filtrado por patrón de listado: Top 5 grupos de música para eventos Valencia
    ❌ Filtrado por baja calidad/listado: Directorio de músicos Valencia
+   ✅ Bodas.net perfil individual aceptado: DJ Paco Events - Música profesional
    ❌ Filtrado por baja calidad/listado: Comparar precios música bodas Valencia
    ❌ Filtrado por patrón de listado: Ranking de los mejores grupos musicales
 
    ✅ Tras filtrado de calidad: 8 resultados
-   📊 Resultados priorizados: 1 bodas.net, 4 alto score, 3 otros
+   📊 Resultados priorizados: 2 bodas.net, 3 alto score, 3 otros
 🔄 [TAVILY] 8 proveedores nuevos (no duplicados)
 ```
 
@@ -353,18 +429,20 @@ Ratio esperado:
 
 ## 📊 MÉTRICAS DE ÉXITO
 
-| Métrica                     | Antes | Después | Mejora |
-| --------------------------- | ----- | ------- | ------ |
-| **Dominios excluidos**      | 20    | 48      | +140%  |
-| **Indicadores de texto**    | 8     | 22      | +175%  |
-| **Patrones regex**          | 0     | 7       | ∞      |
-| **Proveedores específicos** | 50%   | 95-100% | +90%   |
-| **Listados colados**        | 50%   | 0-5%    | -90%   |
-| **Calidad de resultados**   | Media | Alta    | ⬆️     |
+| Métrica                     | Antes | Después | Mejora   |
+| --------------------------- | ----- | ------- | -------- |
+| **Capas de filtrado**       | 3     | 4       | +33%     |
+| **Dominios excluidos**      | 20    | 48      | +140%    |
+| **Indicadores de texto**    | 8     | 22      | +175%    |
+| **Patrones regex**          | 0     | 7       | NUEVO    |
+| **Bodas.net incluido**      | NO    | SI      | NUEVO    |
+| **Proveedores específicos** | 50%   | 95-100% | +90%     |
+| **Listados colados**        | 50%   | 0-5%    | -90%     |
+| **Calidad de resultados**   | Media | Alta    | Mejorada |
 
 ---
 
-## 🚀 PRÓXIMAS MEJORAS SUGERIDAS
+## PRÓXIMAS MEJORAS SUGERIDAS
 
 1. **Machine Learning para detección:**
    - Entrenar modelo con clicks/conversions
