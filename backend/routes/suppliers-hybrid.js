@@ -810,16 +810,50 @@ router.post('/search', async (req, res) => {
           );
         }
 
-        // ⭐ FILTRAR 2: Eliminar duplicados por email o teléfono
+        // ⭐ FILTRAR 2: Eliminar duplicados inteligente
+        // Estrategia: dominio email + ubicación + similitud nombre
         const seenEmails = new Set();
         const seenPhones = new Set();
+        const seenDomains = new Map(); // Map<dominio, {name, location}>
         const beforeDedup = internetResults.length;
+
+        // Función para extraer dominio de email
+        const extractDomain = (email) => {
+          if (!email) return null;
+          const match = email.match(/@([a-z0-9.-]+\.[a-z]{2,})$/i);
+          return match ? match[1].toLowerCase() : null;
+        };
+
+        // Función para extraer dominio de URL
+        const extractUrlDomain = (url) => {
+          if (!url) return null;
+          try {
+            const urlObj = new URL(url);
+            return urlObj.hostname.toLowerCase().replace(/^www\./, '');
+          } catch {
+            return null;
+          }
+        };
+
+        // Función de similitud de texto (simple)
+        const similarity = (str1, str2) => {
+          const s1 = str1.toLowerCase().trim();
+          const s2 = str2.toLowerCase().trim();
+          if (s1 === s2) return 1;
+          if (s1.includes(s2) || s2.includes(s1)) return 0.8;
+          const longer = s1.length > s2.length ? s1 : s2;
+          const shorter = s1.length > s2.length ? s2 : s1;
+          if (longer.includes(shorter)) return 0.7;
+          return 0;
+        };
 
         internetResults = internetResults.filter((supplier) => {
           const email = supplier.contact?.email?.toLowerCase().trim();
-          const phone = supplier.contact?.phone?.replace(/\s/g, ''); // Sin espacios
+          const phone = supplier.contact?.phone?.replace(/\s/g, '');
+          const name = supplier.name || '';
+          const loc = (supplier.location?.city || '').toLowerCase();
 
-          // Verificar si ya vimos este email o teléfono
+          // 1. Verificar duplicado exacto por email/teléfono (como antes)
           const isDuplicateEmail = email && seenEmails.has(email);
           const isDuplicatePhone = phone && seenPhones.has(phone);
 
@@ -827,6 +861,32 @@ router.post('/search', async (req, res) => {
             const reason = isDuplicateEmail ? 'email duplicado' : 'teléfono duplicado';
             console.log(`   🔄 Descartado (${reason}): ${supplier.name}`);
             return false;
+          }
+
+          // 2. Verificar duplicado por dominio + ubicación + nombre similar
+          const emailDomain = extractDomain(email);
+          const urlDomain = extractUrlDomain(supplier.contact?.website);
+          const domain = emailDomain || urlDomain;
+
+          if (domain && loc) {
+            const key = `${domain}::${loc}`; // Clave: dominio + ubicación
+            const seen = seenDomains.get(key);
+
+            if (seen) {
+              // Ya vimos este dominio en esta ubicación
+              const nameSimilarity = similarity(name, seen.name);
+
+              if (nameSimilarity >= 0.7) {
+                // Mismo dominio + misma ubicación + nombre similar = DUPLICADO
+                console.log(
+                  `   🔄 Descartado (dominio ${domain} duplicado + nombre similar): ${supplier.name}`
+                );
+                return false;
+              }
+            } else {
+              // Primera vez que vemos este dominio en esta ubicación
+              seenDomains.set(key, { name, location: loc });
+            }
           }
 
           // Registrar email y teléfono como vistos
