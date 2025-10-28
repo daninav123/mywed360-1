@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { useAuth } from './AuthContext';
-import { useWedding } from './WeddingContext';
+import { useAuth } from '../hooks/useAuth';
+import { useWedding } from '../context/WeddingContext';
 import axios from 'axios';
 
 const FavoritesContext = createContext();
