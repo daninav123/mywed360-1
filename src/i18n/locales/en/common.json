@@ -2085,6 +2085,89 @@
       "provider": "Supplier",
       "service": "Service"
     },
+    "register": {
+      "title": "Register your business",
+      "subtitle": "Join the platform and stand out to thousands of couples searching for suppliers",
+      "form": {
+        "email": {
+          "label": "Email *",
+          "placeholder": "you@email.com"
+        },
+        "password": {
+          "label": "Password *",
+          "placeholder": "Minimum 6 characters"
+        },
+        "confirmPassword": {
+          "label": "Confirm password *",
+          "placeholder": "Repeat your password"
+        },
+        "name": {
+          "label": "Business name *",
+          "placeholder": "e.g. Maria Lopez Photography"
+        },
+        "category": {
+          "label": "Category *"
+        },
+        "location": {
+          "label": "City *",
+          "placeholder": "e.g. Valencia"
+        },
+        "phone": {
+          "label": "Phone",
+          "placeholder": "612 345 678"
+        },
+        "website": {
+          "label": "Website",
+          "placeholder": "https://yourwebsite.com"
+        },
+        "description": {
+          "label": "Describe your service",
+          "placeholder": "Tell us about your service, experience, style..."
+        }
+      },
+      "categories": {
+        "photography": "Photography",
+        "video": "Video",
+        "catering": "Catering",
+        "flowers": "Flowers & decor",
+        "music": "Music / DJ",
+        "beauty": "Hair & makeup",
+        "stationery": "Invitations",
+        "attire": "Dresses & suits",
+        "jewelry": "Jewelry",
+        "transport": "Transport",
+        "accommodation": "Accommodation",
+        "other": "Other services"
+      },
+      "errors": {
+        "passwordMismatch": "Passwords do not match",
+        "passwordLength": "Password must be at least 6 characters",
+        "server": "Registration error",
+        "generic": "We couldn't complete the registration. Please try again."
+      },
+      "buttons": {
+        "submit": "Register business",
+        "submitting": "Registering..."
+      },
+      "login": {
+        "question": "Already have an account?",
+        "link": "Sign in"
+      },
+      "benefits": {
+        "title": "Benefits of registering",
+        "items": [
+          "Appear first in searches with the \"Verified\" badge",
+          "Manage your profile: photos, pricing, services",
+          "Receive direct enquiries from interested couples",
+          "Analytics dashboard for views, clicks, conversions",
+          "Stand out compared to non-registered suppliers"
+        ]
+      },
+      "toasts": {
+        "registerSuccess": "Supplier registered successfully.",
+        "claimedSuccess": "Profile claimed and activated successfully."
+      }
+    },
     "overview": {
       "title": "Supplier management",
       "metrics": {

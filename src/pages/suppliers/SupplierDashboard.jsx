@@ -1,107 +1,103 @@
 // pages/suppliers/SupplierDashboard.jsx
-// Dashboard del proveedor
+// Dashboard COMPLETO del proveedor con solicitudes de presupuesto
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { auth } from '../../firebaseConfig';
-import { BarChart3, Eye, MousePointer, Mail, Edit, Save, X } from 'lucide-react';
+import { 
+  LayoutDashboard, 
+  Mail, 
+  BarChart3, 
+  User, 
+  Settings, 
+  LogOut,
+  Eye,
+  MousePointer,
+  FileText,
+  Clock,
+  CheckCircle,
+  AlertCircle,
+  MessageSquare
+} from 'lucide-react';
 
 export default function SupplierDashboard() {
   const { id } = useParams();
   const navigate = useNavigate();
   
+  const [activeTab, setActiveTab] = useState('inicio'); // inicio, solicitudes, perfil
   const [supplier, setSupplier] = useState(null);
+  const [requests, setRequests] = useState([]);
+  const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [editing, setEditing] = useState(false);
-  const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   
-  const [formData, setFormData] = useState({});
-  
   useEffect(() => {
-    fetchSupplier();
-  }, [id]);
+    // Verificar autenticación
+    const token = localStorage.getItem('supplier_token');
+    const supplierId = localStorage.getItem('supplier_id');
+    
+    if (!token || !supplierId) {
+      navigate('/supplier/login');
+      return;
+    }
+    
+    if (id !== supplierId) {
+      navigate(`/supplier/dashboard/${supplierId}`);
+      return;
+    }
+    
+    fetchDashboardData();
+  }, [id, navigate]);
   
-  const fetchSupplier = async () => {
+  const fetchDashboardData = async () => {
+    setLoading(true);
     try {
-      const user = auth.currentUser;
-      if (!user) {
-        navigate('/supplier/login');
-        return;
-      }
+      const token = localStorage.getItem('supplier_token');
+      const headers = { 'Authorization': `Bearer ${token}` };
       
-      const token = await user.getIdToken();
+      // Fetch en paralelo
+      const [profileRes, requestsRes, analyticsRes] = await Promise.all([
+        fetch('/api/supplier-dashboard/profile', { headers }),
+        fetch('/api/supplier-dashboard/requests?limit=10', { headers }),
+        fetch('/api/supplier-dashboard/analytics?period=30d', { headers }),
+      ]);
       
-      const response = await fetch(`/api/suppliers/profile/${id}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
+      if (!profileRes.ok || !requestsRes.ok || !analyticsRes.ok) {
+        if (profileRes.status === 401 || requestsRes.status === 401 || analyticsRes.status === 401) {
+          localStorage.removeItem('supplier_token');
+          localStorage.removeItem('supplier_id');
+          navigate('/supplier/login');
+          return;
         }
-      });
-      
-      const data = await response.json();
-      
-      if (!data.success) {
-        throw new Error(data.error);
+        throw new Error('Error cargando datos');
       }
       
-      setSupplier(data.supplier);
-      setFormData({
-        name: data.supplier.name || '',
-        description: data.supplier.business?.description || '',
-        phone: data.supplier.contact?.phone || '',
-        website: data.supplier.contact?.website || '',
-        instagram: data.supplier.contact?.instagram || '',
-        priceRange: data.supplier.business?.priceRange || '',
-      });
+      const [profileData, requestsData, analyticsData] = await Promise.all([
+        profileRes.json(),
+        requestsRes.json(),
+        analyticsRes.json(),
+      ]);
+      
+      setSupplier(profileData.profile);
+      setRequests(requestsData.requests || []);
+      setAnalytics(analyticsData.metrics || {});
       
     } catch (err) {
-      console.error('Error fetching supplier:', err);
+      console.error('Error:', err);
       setError(err.message);
     } finally {
       setLoading(false);
     }
   };
   
-  const handleSave = async () => {
-    setSaving(true);
-    setError('');
-    
-    try {
-      const user = auth.currentUser;
-      const token = await user.getIdToken();
-      
-      const response = await fetch(`/api/suppliers/profile/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          name: formData.name,
-          'business.description': formData.description,
-          'business.priceRange': formData.priceRange,
-          'contact.phone': formData.phone,
-          'contact.website': formData.website,
-          'contact.instagram': formData.instagram,
-        })
-      });
-      
-      const data = await response.json();
-      
-      if (!data.success) {
-        throw new Error(data.error);
-      }
-      
-      alert('Perfil actualizado correctamente');
-      setEditing(false);
-      fetchSupplier();
-      
-    } catch (err) {
-      console.error('Error saving:', err);
-      setError(err.message);
-    } finally {
-      setSaving(false);
-    }
+  const handleLogout = () => {
+    localStorage.removeItem('supplier_token');
+    localStorage.removeItem('supplier_id');
+    localStorage.removeItem('supplier_data');
+    navigate('/supplier/login');
+  };
+  
+  const handleViewRequest = (requestId) => {
+    navigate(`/supplier/dashboard/${id}/request/${requestId}`);
   };
   
   if (loading) {

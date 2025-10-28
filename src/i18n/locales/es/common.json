@@ -2835,6 +2835,89 @@
       "provider": "Proveedor",
       "service": "Servicio"
     },
+    "register": {
+      "title": "Registra tu negocio",
+      "subtitle": "Únete a la plataforma y destaca entre miles de parejas buscando proveedores",
+      "form": {
+        "email": {
+          "label": "Correo electrónico *",
+          "placeholder": "tu@email.com"
+        },
+        "password": {
+          "label": "Contraseña *",
+          "placeholder": "Mínimo 6 caracteres"
+        },
+        "confirmPassword": {
+          "label": "Confirmar contraseña *",
+          "placeholder": "Repite tu contraseña"
+        },
+        "name": {
+          "label": "Nombre del negocio *",
+          "placeholder": "Ej: Fotografía María López"
+        },
+        "category": {
+          "label": "Categoría *"
+        },
+        "location": {
+          "label": "Ciudad *",
+          "placeholder": "Ej: Valencia"
+        },
+        "phone": {
+          "label": "Teléfono",
+          "placeholder": "612 345 678"
+        },
+        "website": {
+          "label": "Sitio web",
+          "placeholder": "https://tuweb.com"
+        },
+        "description": {
+          "label": "Descripción de tu servicio",
+          "placeholder": "Cuéntanos sobre tu servicio, experiencia, estilo..."
+        }
+      },
+      "categories": {
+        "photography": "Fotografía",
+        "video": "Vídeo",
+        "catering": "Catering",
+        "flowers": "Flores y decoración",
+        "music": "Música / DJ",
+        "beauty": "Peluquería y maquillaje",
+        "stationery": "Invitaciones",
+        "attire": "Vestidos y trajes",
+        "jewelry": "Joyería",
+        "transport": "Transporte",
+        "accommodation": "Alojamiento",
+        "other": "Otros servicios"
+      },
+      "errors": {
+        "passwordMismatch": "Las contraseñas no coinciden",
+        "passwordLength": "La contraseña debe tener al menos 6 caracteres",
+        "server": "Error en el registro",
+        "generic": "No se pudo completar el registro. Inténtalo nuevamente."
+      },
+      "buttons": {
+        "submit": "Registrar negocio",
+        "submitting": "Registrando..."
+      },
+      "login": {
+        "question": "¿Ya tienes cuenta?",
+        "link": "Inicia sesión"
+      },
+      "benefits": {
+        "title": "Beneficios de registrarte",
+        "items": [
+          "Aparece primero en las búsquedas con badge \"Verificado\"",
+          "Gestiona tu perfil: fotos, precios y servicios",
+          "Recibe contactos directos de parejas interesadas",
+          "Panel de estadísticas: vistas, clics y conversiones",
+          "Destaca frente a proveedores no registrados"
+        ]
+      },
+      "toasts": {
+        "registerSuccess": "Proveedor registrado correctamente.",
+        "claimedSuccess": "Perfil reclamado y activado con éxito."
+      }
+    },
     "overview": {
       "title": "Gestión de proveedores",
       "metrics": {

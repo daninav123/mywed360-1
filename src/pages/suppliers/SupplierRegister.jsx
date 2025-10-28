@@ -1,8 +1,8 @@
 // pages/suppliers/SupplierRegister.jsx
 // Registro de nuevos proveedores
 
-import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import React, { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import useTranslations from '../../hooks/useTranslations';
 import { signInWithCustomToken } from 'firebase/auth';
@@ -98,11 +98,11 @@ export default function SupplierRegister() {
       await signInWithCustomToken(auth, data.customToken);
       
       // Mostrar mensaje
-      if (data.isClaimedProfile) {
-        toast.success(t('supplier.register.claimedSuccess'));
-      } else {
-        toast.success(t('supplier.register.registerSuccess'));
-      }
+      toast.success(
+        data.isClaimedProfile
+          ? t('common.suppliers.register.toasts.claimedSuccess')
+          : t('common.suppliers.register.toasts.registerSuccess')
+      );
       
       // Redirigir al dashboard
       navigate(`/supplier/dashboard/${data.supplierId}`);
@@ -201,7 +201,7 @@ export default function SupplierRegister() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Categoría *
+                  {t('common.suppliers.register.form.category.label')}
                 </label>
                 <select
                   name="category"
@@ -220,7 +220,7 @@ export default function SupplierRegister() {
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Ciudad *
+                  {t('common.suppliers.register.form.location.label')}
                 </label>
                 <input
                   type="text"
@@ -229,7 +229,7 @@ export default function SupplierRegister() {
                   value={formData.location}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Ej: Valencia"
+                  placeholder={t('common.suppliers.register.form.location.placeholder')}
                 />
               </div>
             </div>
@@ -238,7 +238,7 @@ export default function SupplierRegister() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Teléfono
+                  {t('common.suppliers.register.form.phone.label')}
                 </label>
                 <input
                   type="tel"
@@ -246,13 +246,13 @@ export default function SupplierRegister() {
                   value={formData.phone}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="612 345 678"
+                  placeholder={t('common.suppliers.register.form.phone.placeholder')}
                 />
               </div>
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Sitio Web
+                  {t('common.suppliers.register.form.website.label')}
                 </label>
                 <input
                   type="url"
@@ -260,7 +260,7 @@ export default function SupplierRegister() {
                   value={formData.website}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="https://tuweb.com"
+                  placeholder={t('common.suppliers.register.form.website.placeholder')}
                 />
               </div>
             </div>
@@ -268,7 +268,7 @@ export default function SupplierRegister() {
             {/* Descripción */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Descripción de tu servicio
+                {t('common.suppliers.register.form.description.label')}
               </label>
               <textarea
                 name="description"
@@ -276,7 +276,7 @@ export default function SupplierRegister() {
                 onChange={handleChange}
                 rows={4}
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Cuéntanos sobre tu servicio, experiencia, estilo..."
+                placeholder={t('common.suppliers.register.form.description.placeholder')}
               />
             </div>
             
@@ -293,18 +293,20 @@ export default function SupplierRegister() {
               disabled={loading}
               className="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium transition-colors"
             >
-              {loading ? 'Registrando...' : 'Registrar Negocio'}
+              {loading
+                ? t('common.suppliers.register.buttons.submitting')
+                : t('common.suppliers.register.buttons.submit')}
             </button>
             
             {/* Login link */}
             <div className="text-center text-sm text-gray-600">
-              ¿Ya tienes cuenta?{' '}
+              {t('common.suppliers.register.login.question')}{' '}
               <button
                 type="button"
                 onClick={() => navigate('/supplier/login')}
                 className="text-blue-600 hover:underline font-medium"
               >
-                Inicia sesión
+                {t('common.suppliers.register.login.link')}
               </button>
             </div>
           </form>
@@ -313,29 +315,15 @@ export default function SupplierRegister() {
         {/* Beneficios */}
         <div className="mt-8 bg-white shadow-md rounded-lg p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            Beneficios de registrarte
+            {t('common.suppliers.register.benefits.title')}
           </h2>
           <ul className="space-y-2 text-gray-600">
-            <li className="flex items-start">
-              <span className="text-green-500 mr-2">✓</span>
-              <span>Aparece primero en las búsquedas con badge "Verificado"</span>
-            </li>
-            <li className="flex items-start">
-              <span className="text-green-500 mr-2">✓</span>
-              <span>Gestiona tu perfil: fotos, precios, servicios</span>
-            </li>
-            <li className="flex items-start">
-              <span className="text-green-500 mr-2">✓</span>
-              <span>Recibe contactos directos de parejas interesadas</span>
-            </li>
-            <li className="flex items-start">
-              <span className="text-green-500 mr-2">✓</span>
-              <span>Panel de estadísticas: vistas, clics, conversiones</span>
-            </li>
-            <li className="flex items-start">
-              <span className="text-green-500 mr-2">✓</span>
-              <span>Destaca frente a proveedores no registrados</span>
-            </li>
+            {t('common.suppliers.register.benefits.items', { returnObjects: true }).map((item, index) => (
+              <li key={index} className="flex items-start">
+                <span className="text-green-500 mr-2">✓</span>
+                <span>{item}</span>
+              </li>
+            ))}
           </ul>
         </div>
       </div>
