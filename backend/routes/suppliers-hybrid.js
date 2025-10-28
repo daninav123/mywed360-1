@@ -789,7 +789,7 @@ router.post('/search', async (req, res) => {
           };
         });
 
-        // ⭐ FILTRAR: Descartar proveedores sin email NI teléfono
+        // ⭐ FILTRAR 1: Descartar proveedores sin email NI teléfono
         const beforeFilter = internetResults.length;
         internetResults = internetResults.filter((supplier) => {
           const hasEmail = supplier.contact?.email && supplier.contact.email.length > 0;
@@ -810,10 +810,39 @@ router.post('/search', async (req, res) => {
           );
         }
 
+        // ⭐ FILTRAR 2: Eliminar duplicados por email o teléfono
+        const seenEmails = new Set();
+        const seenPhones = new Set();
+        const beforeDedup = internetResults.length;
+
+        internetResults = internetResults.filter((supplier) => {
+          const email = supplier.contact?.email?.toLowerCase().trim();
+          const phone = supplier.contact?.phone?.replace(/\s/g, ''); // Sin espacios
+
+          // Verificar si ya vimos este email o teléfono
+          const isDuplicateEmail = email && seenEmails.has(email);
+          const isDuplicatePhone = phone && seenPhones.has(phone);
+
+          if (isDuplicateEmail || isDuplicatePhone) {
+            const reason = isDuplicateEmail ? 'email duplicado' : 'teléfono duplicado';
+            console.log(`   🔄 Descartado (${reason}): ${supplier.name}`);
+            return false;
+          }
+
+          // Registrar email y teléfono como vistos
+          if (email) seenEmails.add(email);
+          if (phone) seenPhones.add(phone);
+
+          return true;
+        });
+
+        const duplicates = beforeDedup - internetResults.length;
+        if (duplicates > 0) {
+          console.log(`\n🔄 [DEDUP] ${duplicates} proveedores duplicados eliminados`);
+        }
+
         usedTavily = true;
-        console.log(
-          `🔄 [TAVILY] ${internetResults.length} proveedores útiles (con datos de contacto)`
-        );
+        console.log(`🔄 [TAVILY] ${internetResults.length} proveedores únicos y útiles`);
       } catch (error) {
         console.error('❌ [TAVILY] Error en búsqueda:', error.message);
         // Continuar con solo resultados de Firestore
