@@ -542,6 +542,8 @@
             "whatsapp": "WhatsApp",
             "email": "Email",
             "phone": "Teléfono",
+            "noEmail": "Email no disponible",
+            "noPhone": "Teléfono no disponible",
             "whatsappMessage": "Hola {{name}}, estoy interesado/a en {{service}} para mi boda. Encontré tu perfil en {{brand}}.",
             "emailSubject": "Consulta sobre {{service}} - {{brand}}",
             "emailBody": "Hola {{name}},\n\nEstoy organizando mi boda y me gustaría conocer más sobre tus servicios.\n\nSaludos desde {{brand}}",

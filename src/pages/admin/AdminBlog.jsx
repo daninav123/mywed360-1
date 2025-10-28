@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 
 import {
@@ -76,11 +76,29 @@ const AdminBlog = () => {
   const [publishing, setPublishing] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [generateForm, setGenerateForm] = useState(defaultGenerateForm);
+  const [scheduledPosts, setScheduledPosts] = useState([]);
+  const [loadingScheduled, setLoadingScheduled] = useState(false);
 
   const selectedPost = useMemo(
     () => posts.find((post) => post.id === selectedId) || null,
-    [posts, selectedId],
+    [posts, selectedId]
   );
+
+  const loadScheduled = useCallback(async () => {
+    setLoadingScheduled(true);
+    try {
+      const { posts: scheduled } = await listAdminBlogPosts({
+        status: 'scheduled',
+        limit: 50,
+      });
+      setScheduledPosts(scheduled || []);
+    } catch (error) {
+      console.error('[AdminBlog] loadScheduled failed', error);
+      toast.error('No se pudieron cargar las noticias programadas.');
+    } finally {
+      setLoadingScheduled(false);
+    }
+  }, []);
 
   const loadPosts = async (status = listStatusFilter) => {
     setLoadingList(true);
@@ -100,6 +118,8 @@ const AdminBlog = () => {
 
   useEffect(() => {
     loadPosts('all');
+    loadScheduled();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -114,9 +134,7 @@ const AdminBlog = () => {
       markdown: selectedPost.content?.markdown || '',
       tagsInput: (selectedPost.tags || []).join(', '),
       status: selectedPost.status || 'draft',
-      scheduledAt: selectedPost.scheduledAt
-        ? selectedPost.scheduledAt.slice(0, 16)
-        : '',
+      scheduledAt: selectedPost.scheduledAt ? selectedPost.scheduledAt.slice(0, 16) : '',
     });
   }, [selectedPost]);
 
@@ -142,6 +160,7 @@ const AdminBlog = () => {
       setSelectedId(post.id);
       setListStatusFilter('all');
       setGenerateForm(defaultGenerateForm);
+      loadScheduled();
     } catch (error) {
       console.error('[AdminBlog] generate failed', error);
       toast.error('No se pudo generar el artículo. Revisa el log de servidor.');
@@ -151,9 +170,7 @@ const AdminBlog = () => {
   };
 
   const updatePostInState = (updatedPost) => {
-    setPosts((prev) =>
-      prev.map((post) => (post.id === updatedPost.id ? updatedPost : post)),
-    );
+    setPosts((prev) => prev.map((post) => (post.id === updatedPost.id ? updatedPost : post)));
   };
 
   const handleSave = async () => {
@@ -186,6 +203,7 @@ const AdminBlog = () => {
       const { post } = await updateAdminBlogPost(editor.id, payload);
       updatePostInState(post);
       toast.success('Cambios guardados.');
+      loadScheduled();
     } catch (error) {
       console.error('[AdminBlog] save failed', error);
       toast.error('No se pudieron guardar los cambios.');
@@ -201,6 +219,7 @@ const AdminBlog = () => {
       const { post } = await publishAdminBlogPost(editor.id);
       updatePostInState(post);
       toast.success('Artículo publicado.');
+      loadScheduled();
     } catch (error) {
       console.error('[AdminBlog] publish failed', error);
       toast.error('No se pudo publicar el artículo.');
@@ -223,6 +242,7 @@ const AdminBlog = () => {
       const { post } = await scheduleAdminBlogPost(editor.id, isoDate.toISOString());
       updatePostInState(post);
       toast.success('Artículo programado.');
+      loadScheduled();
     } catch (error) {
       console.error('[AdminBlog] schedule failed', error);
       toast.error('No se pudo programar el artículo.');
@@ -235,6 +255,7 @@ const AdminBlog = () => {
       const { post } = await archiveAdminBlogPost(editor.id);
       updatePostInState(post);
       toast.info('Artículo archivado.');
+      loadScheduled();
     } catch (error) {
       console.error('[AdminBlog] archive failed', error);
       toast.error('No se pudo archivar el artículo.');
@@ -307,9 +328,7 @@ const AdminBlog = () => {
             </select>
           </div>
           <div>
-            <label className="text-xs font-semibold text-gray-600 uppercase block mb-1">
-              Tono
-            </label>
+            <label className="text-xs font-semibold text-gray-600 uppercase block mb-1">Tono</label>
             <input
               type="text"
               value={generateForm.tone}
@@ -356,6 +375,56 @@ const AdminBlog = () => {
             </button>
           </div>
         </form>
+      </section>
+
+      <section className="rounded-lg border border-soft bg-white p-5 shadow-sm space-y-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-semibold">Noticias programadas</h2>
+            <p className="text-sm text-gray-600">Artículos con publicación pendiente.</p>
+          </div>
+          <button
+            type="button"
+            onClick={loadScheduled}
+            className="px-3 py-2 text-sm border rounded-md border-soft hover:bg-gray-50"
+          >
+            {loadingScheduled ? 'Actualizando...' : 'Actualizar'}
+          </button>
+        </div>
+        {loadingScheduled ? (
+          <p className="text-sm text-gray-500">Cargando noticias programadas...</p>
+        ) : scheduledPosts.length === 0 ? (
+          <p className="text-sm text-gray-500">No hay publicaciones programadas actualmente.</p>
+        ) : (
+          <ul className="space-y-2">
+            {scheduledPosts
+              .slice()
+              .sort((a, b) => {
+                const dateA = new Date(a.scheduledAt).getTime();
+                const dateB = new Date(b.scheduledAt).getTime();
+                return dateA - dateB;
+              })
+              .map((post) => (
+                <li
+                  key={post.id}
+                  className="flex items-start justify-between gap-3 rounded-md border border-soft bg-gray-50 px-4 py-3 hover:bg-gray-100 transition cursor-pointer"
+                  onClick={() => setSelectedId(post.id)}
+                >
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900">{post.title}</p>
+                    <p className="text-xs text-gray-500">
+                      {post.scheduledAt
+                        ? `Programado para ${formatDate(post.scheduledAt)}`
+                        : 'Sin fecha programada'}
+                    </p>
+                  </div>
+                  <span className="inline-flex items-center rounded-full bg-sky-100 px-2 py-0.5 text-xs font-semibold text-sky-700">
+                    {(post.language || 'es').toUpperCase()}
+                  </span>
+                </li>
+              ))}
+          </ul>
+        )}
       </section>
 
       <section className="grid gap-6 lg:grid-cols-5">
@@ -451,7 +520,9 @@ const AdminBlog = () => {
                   type="text"
                   className="w-full rounded-md border border-soft px-3 py-2 text-sm"
                   value={editor.title}
-                  onChange={(event) => setEditor((prev) => ({ ...prev, title: event.target.value }))}
+                  onChange={(event) =>
+                    setEditor((prev) => ({ ...prev, title: event.target.value }))
+                  }
                 />
               </div>
 

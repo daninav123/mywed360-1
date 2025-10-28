@@ -2,34 +2,39 @@
 // Tarjeta de proveedor con diferenciación visual (Registrado vs Internet)
 
 import React, { useState } from 'react';
-import { CheckCircle, Globe, Mail, Phone, Instagram, ExternalLink, MessageCircle } from 'lucide-react';
+import {
+  CheckCircle,
+  Globe,
+  Mail,
+  Phone,
+  Instagram,
+  ExternalLink,
+  MessageCircle,
+} from 'lucide-react';
 
 import useTranslations from '../../hooks/useTranslations';
 
 export default function SupplierCard({ supplier, onContact, onViewDetails, onMarkAsConfirmed }) {
   const { t } = useTranslations();
   const [showContactMenu, setShowContactMenu] = useState(false);
-  
+
   const isRegistered = supplier.priority === 'registered';
   const isCached = supplier.priority === 'cached';
   const isInternet = supplier.priority === 'internet';
-  
+
   // Colores según tipo
-  const borderColor = isRegistered 
-    ? 'border-green-500' 
-    : isCached 
-    ? 'border-blue-400'
-    : 'border-gray-300';
-  
-  const bgColor = isRegistered 
-    ? 'bg-green-50' 
+  const borderColor = isRegistered
+    ? 'border-green-500'
     : isCached
-    ? 'bg-blue-50'
-    : 'bg-white';
-  
+      ? 'border-blue-400'
+      : 'border-gray-300';
+
+  const bgColor = isRegistered ? 'bg-green-50' : isCached ? 'bg-blue-50' : 'bg-white';
+
   const brandName = t('app.brandName');
   const fallbackName = supplier.name || t('common.suppliers.card.hybrid.defaults.name');
-  const fallbackService = supplier.category || supplier.service || t('common.suppliers.card.hybrid.defaults.service');
+  const fallbackService =
+    supplier.category || supplier.service || t('common.suppliers.card.hybrid.defaults.service');
   const locationLabel = supplier.location?.city
     ? t('common.suppliers.card.hybrid.location', { city: supplier.location.city })
     : null;
@@ -47,7 +52,7 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
     onContact?.({ method: 'whatsapp', supplier });
     setShowContactMenu(false);
   };
-  
+
   const handleContactEmail = () => {
     if (!supplier.contact?.email) return;
     const subject = t('common.suppliers.card.hybrid.contact.emailSubject', {
@@ -58,36 +63,37 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
       name: fallbackName,
       brand: brandName,
     });
-    window.open(`mailto:${supplier.contact?.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`, '_blank');
+    window.open(
+      `mailto:${supplier.contact?.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
+      '_blank'
+    );
     onContact?.({ method: 'email', supplier });
     setShowContactMenu(false);
   };
-  
+
   const handleContactPhone = () => {
     if (!supplier.contact?.phone) return;
     window.open(`tel:${supplier.contact?.phone}`, '_blank');
     onContact?.({ method: 'phone', supplier });
     setShowContactMenu(false);
   };
-  
+
   return (
-    <div className={`
+    <div
+      className={`
       border-2 rounded-lg p-4 transition-all hover:shadow-lg
       ${borderColor} ${bgColor}
-    `}>
+    `}
+    >
       {/* Header con nombre y badge */}
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1">
           <h3 className="font-semibold text-lg text-gray-900">
             {supplier.name || t('common.suppliers.card.hybrid.defaults.name')}
           </h3>
-          {locationLabel && (
-            <p className="text-sm text-gray-600">
-              {locationLabel}
-            </p>
-          )}
+          {locationLabel && <p className="text-sm text-gray-600">{locationLabel}</p>}
         </div>
-        
+
         {/* Badge según tipo */}
         <div className="ml-2">
           {isRegistered && (
@@ -109,59 +115,73 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
           )}
         </div>
       </div>
-      
+
       {/* Imagen */}
       {supplier.media?.logo && (
         <div className="mb-3">
-          <img 
-            src={supplier.media.logo} 
+          <img
+            src={supplier.media.logo}
             alt={t('common.suppliers.card.hybrid.imageAlt', {
               name: supplier.name || t('common.suppliers.card.hybrid.defaults.name'),
             })}
             className="w-full h-48 object-cover rounded-md"
-            onError={(e) => { e.target.style.display = 'none'; }}
+            onError={(e) => {
+              e.target.style.display = 'none';
+            }}
           />
         </div>
       )}
-      
+
       {/* Descripción */}
       {supplier.business?.description && (
-        <p className="text-sm text-gray-700 mb-3 line-clamp-3">
-          {supplier.business.description}
-        </p>
+        <p className="text-sm text-gray-700 mb-3 line-clamp-3">{supplier.business.description}</p>
       )}
-      
+
       {/* Info de contacto (solo si está disponible) */}
       <div className="space-y-1 mb-3 text-sm">
-        {supplier.contact?.email && (
+        {supplier.contact?.email ? (
           <div className="flex items-center gap-2 text-gray-600">
-            <Mail size={14} />
+            <Mail size={14} className="text-blue-600" />
             <span className="truncate">{supplier.contact.email}</span>
           </div>
+        ) : (
+          isInternet && (
+            <div className="flex items-center gap-2 text-gray-400 italic">
+              <Mail size={14} />
+              <span className="text-xs">{t('common.suppliers.card.hybrid.contact.noEmail')}</span>
+            </div>
+          )
         )}
-        {supplier.contact?.phone && (
+        {supplier.contact?.phone ? (
           <div className="flex items-center gap-2 text-gray-600">
-            <Phone size={14} />
+            <Phone size={14} className="text-green-600" />
             <span>{supplier.contact.phone}</span>
           </div>
+        ) : (
+          isInternet && (
+            <div className="flex items-center gap-2 text-gray-400 italic">
+              <Phone size={14} />
+              <span className="text-xs">{t('common.suppliers.card.hybrid.contact.noPhone')}</span>
+            </div>
+          )
         )}
         {supplier.contact?.instagram && (
           <div className="flex items-center gap-2 text-gray-600">
-            <Instagram size={14} />
-            <span className="truncate">{supplier.contact.instagram}</span>
+            <Instagram size={14} className="text-pink-600" />
+            <span className="truncate text-xs">
+              {supplier.contact.instagram.replace('https://instagram.com/', '@')}
+            </span>
           </div>
         )}
       </div>
-      
+
       {/* Precio (si disponible) */}
       {supplier.business?.priceRange && (
         <div className="mb-3">
-          <span className="text-sm font-medium text-gray-700">
-            {supplier.business.priceRange}
-          </span>
+          <span className="text-sm font-medium text-gray-700">{supplier.business.priceRange}</span>
         </div>
       )}
-      
+
       {/* Rating (si disponible) */}
       {supplier.metrics?.rating > 0 && (
         <div className="flex items-center gap-1 mb-3 text-sm">
@@ -174,7 +194,7 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
           )}
         </div>
       )}
-      
+
       {/* Acciones */}
       <div className="space-y-2 mt-4">
         {isRegistered || isCached ? (
@@ -188,7 +208,7 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
                 <MessageCircle size={16} />
                 {t('common.suppliers.card.hybrid.contact.primary')}
               </button>
-              
+
               {/* Menú de opciones de contacto */}
               {showContactMenu && (
                 <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-10 overflow-hidden">
@@ -222,7 +242,7 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
                 </div>
               )}
             </div>
-            
+
             {/* Botones secundarios */}
             <div className="flex gap-2">
               {onViewDetails && (
@@ -259,7 +279,7 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
                   {t('common.suppliers.card.hybrid.actions.viewWebsite')}
                 </a>
               ) : null}
-              
+
               {supplier.contact?.phone && (
                 <button
                   onClick={handleContactWhatsApp}
@@ -269,7 +289,7 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
                   <MessageCircle size={16} />
                 </button>
               )}
-              
+
               {supplier.contact?.email && (
                 <button
                   onClick={handleContactEmail}
@@ -283,13 +303,15 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
           </>
         )}
       </div>
-      
+
       {/* Fuente (solo para proveedores de internet) */}
       {isInternet && supplier.source && (
         <div className="mt-2 pt-2 border-t border-gray-200">
           <p className="text-xs text-gray-500">
             {t('common.suppliers.card.hybrid.source.label', {
-              source: supplier.sources?.[0]?.platform || t('common.suppliers.card.hybrid.source.internet'),
+              source:
+                supplier.sources?.[0]?.platform ||
+                t('common.suppliers.card.hybrid.source.internet'),
             })}
           </p>
         </div>

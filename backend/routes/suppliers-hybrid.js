@@ -35,6 +35,125 @@ const normalizeText = (value = '') =>
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '');
 
+// ⭐ NUEVA: Función para extraer email del contenido
+const extractEmail = (text = '') => {
+  if (!text) return null;
+
+  // Patrones de email
+  const emailPattern = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g;
+  const matches = text.match(emailPattern);
+
+  if (!matches || matches.length === 0) return null;
+
+  // Filtrar emails no deseados (genéricos, spam)
+  const unwantedEmails = [
+    'info@example.com',
+    'noreply@',
+    'no-reply@',
+    'postmaster@',
+    'webmaster@',
+    'admin@example',
+    'test@',
+    'privacy@',
+    'legal@',
+    'soporte@bodas.net',
+    'contacto@bodas.net',
+  ];
+
+  for (const email of matches) {
+    const lowerEmail = email.toLowerCase();
+    const isUnwanted = unwantedEmails.some((unwanted) => lowerEmail.includes(unwanted));
+
+    if (!isUnwanted) {
+      return email;
+    }
+  }
+
+  return null;
+};
+
+// ⭐ NUEVA: Función para extraer teléfono del contenido
+const extractPhone = (text = '') => {
+  if (!text) return null;
+
+  // Patrones de teléfono español (más flexibles)
+  const phonePatterns = [
+    // Móviles españoles: 6XX XXX XXX, 7XX XXX XXX
+    /\b([67]\d{2}[\s\-]?\d{3}[\s\-]?\d{3})\b/g,
+    // Fijos españoles: 9XX XXX XXX
+    /\b(9\d{2}[\s\-]?\d{3}[\s\-]?\d{3})\b/g,
+    // Con prefijo +34
+    /\+34[\s\-]?([67]\d{2}[\s\-]?\d{3}[\s\-]?\d{3})\b/g,
+    /\+34[\s\-]?(9\d{2}[\s\-]?\d{3}[\s\-]?\d{3})\b/g,
+    // Con código de área entre paréntesis
+    /\((\d{3})\)[\s\-]?(\d{3})[\s\-]?(\d{3})/g,
+  ];
+
+  for (const pattern of phonePatterns) {
+    const matches = text.match(pattern);
+    if (matches && matches.length > 0) {
+      // Limpiar y formatear
+      let phone = matches[0].replace(/[\s\-\(\)]/g, '');
+
+      // Si empieza con +34, quitar el prefijo
+      if (phone.startsWith('+34')) {
+        phone = phone.substring(3);
+      }
+
+      // Verificar que tiene 9 dígitos
+      if (phone.length === 9) {
+        // Formatear: XXX XXX XXX
+        return `${phone.substring(0, 3)} ${phone.substring(3, 6)} ${phone.substring(6, 9)}`;
+      }
+    }
+  }
+
+  return null;
+};
+
+// ⭐ NUEVA: Función para limpiar y mejorar descripción
+const cleanDescription = (text = '', maxLength = 250) => {
+  if (!text) return '';
+
+  let cleaned = text
+    // Eliminar HTML tags
+    .replace(/<[^>]*>/g, ' ')
+    // Eliminar múltiples espacios
+    .replace(/\s+/g, ' ')
+    // Eliminar caracteres especiales problemáticos
+    .replace(/[^\w\sáéíóúñÁÉÍÓÚÑüÜ.,;:()\-¿?¡!€$%&]/g, '')
+    // Trim
+    .trim();
+
+  // Eliminar patrones de SEO/spam
+  const spamPatterns = [
+    /consulta (precio|presupuesto)/gi,
+    /contacta con nosotros/gi,
+    /solicita información/gi,
+    /ver más/gi,
+    /leer más/gi,
+    /cookies/gi,
+    /política de privacidad/gi,
+  ];
+
+  spamPatterns.forEach((pattern) => {
+    cleaned = cleaned.replace(pattern, '');
+  });
+
+  // Truncar si es muy largo
+  if (cleaned.length > maxLength) {
+    cleaned = cleaned.substring(0, maxLength);
+    // Buscar el último espacio para no cortar palabras
+    const lastSpace = cleaned.lastIndexOf(' ');
+    if (lastSpace > maxLength - 50) {
+      cleaned = cleaned.substring(0, lastSpace);
+    }
+    cleaned = cleaned.trim() + '...';
+  }
+
+  return cleaned;
+};
+
 // Función auxiliar: Buscar en Tavily (MEJORADA)
 async function searchTavilySimple(query, location, service) {
   const apiKey = process.env.TAVILY_API_KEY;
@@ -88,7 +207,7 @@ async function searchTavilySimple(query, location, service) {
         query: searchQuery,
         search_depth: 'advanced',
         include_answer: false,
-        include_raw_content: false,
+        include_raw_content: true, // ⭐ ACTIVADO: Para extraer email/teléfono del HTML
         include_images: true,
         max_results: 15, // ✅ Reducido de 20 a 15 (más eficiente)
         exclude_domains: [
@@ -576,14 +695,48 @@ router.post('/search', async (req, res) => {
           const isBodas = url.includes('bodas.net');
           const score = r.score || 0.5;
 
-          // ✅ Extraer redes sociales del contenido
+          // ⭐ MEJORADO: Extraer datos del contenido
           const content = r.content || '';
-          const instagramMatch = content.match(/instagram\.com\/([a-zA-Z0-9._]+)/);
-          const facebookMatch = content.match(/facebook\.com\/([a-zA-Z0-9._]+)/);
+          const rawContent = r.raw_content || content;
+
+          // Combinar título + contenido para extracción
+          const fullText = `${r.title || ''} ${content} ${rawContent}`.toLowerCase();
+
+          // ✅ Extraer email (prioridad: campo directo > contenido)
+          const extractedEmail = r.email || extractEmail(fullText);
+
+          // ✅ Extraer teléfono (prioridad: campo directo > contenido)
+          const extractedPhone = r.phone || extractPhone(fullText);
+
+          // ✅ Limpiar y mejorar descripción
+          const cleanedDescription = cleanDescription(content, 250);
+
+          // ✅ Extraer redes sociales del contenido
+          const instagramMatch = fullText.match(/instagram\.com\/([a-zA-Z0-9._]+)/);
+          const facebookMatch = fullText.match(/facebook\.com\/([a-zA-Z0-9._]+)/);
+
+          // ⭐ NUEVO: Extraer nombre limpio del título (eliminar SEO)
+          let cleanName = r.title || 'Proveedor';
+          // Eliminar patrones de SEO comunes
+          cleanName = cleanName
+            .replace(/\s*[-|]\s*(bodas\.net|zankyou|the knot|matrimonio\.com).*$/i, '')
+            .replace(/\s*\|\s*.*$/i, '')
+            .replace(
+              /^(mejores?\s+)?(\d+\s+)?(fotógrafos?|catering|dj|floristería|vestidos?)(\s+de\s+bodas?)?\s+en\s+/i,
+              ''
+            )
+            .trim();
+
+          console.log(`📧 [EXTRACCIÓN] ${cleanName}:`);
+          console.log(`   Email: ${extractedEmail || '❌ No encontrado'}`);
+          console.log(`   Teléfono: ${extractedPhone || '❌ No encontrado'}`);
+          console.log(
+            `   Descripción: ${cleanedDescription ? '✅ ' + cleanedDescription.substring(0, 50) + '...' : '❌ Vacía'}`
+          );
 
           return {
             // Convertir formato Tavily a formato supplier
-            name: r.title,
+            name: cleanName,
             slug: null, // No tiene slug aún
             category: service,
             location: {
@@ -592,16 +745,16 @@ router.post('/search', async (req, res) => {
               country: 'España',
             },
             contact: {
-              email: r.email || '',
+              email: extractedEmail || '',
               website: r.url,
-              phone: r.phone || '',
+              phone: extractedPhone || '',
               instagram: instagramMatch
                 ? `https://instagram.com/${instagramMatch[1]}`
                 : r.instagram || '',
               facebook: facebookMatch ? `https://facebook.com/${facebookMatch[1]}` : '',
             },
             business: {
-              description: r.content?.substring(0, 250) || '', // ✅ Aumentado de 200 a 250
+              description: cleanedDescription,
               priceRange: '',
               services: [service], // ✅ Añadido el servicio
             },
