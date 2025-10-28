@@ -92,7 +92,11 @@ async function searchTavilySimple(query, location, service) {
         include_images: true,
         max_results: 15, // ✅ Reducido de 20 a 15 (más eficiente)
         exclude_domains: [
-          // Marketplaces
+          // ⭐ CAMBIO: Solo excluimos marketplaces genéricos y portales NO relacionados con bodas
+          // Los portales de bodas (bodas.net, zankyou, etc.) se permiten y se filtran por CONTENIDO
+          // Esto permite que CUALQUIER portal nuevo de bodas funcione automáticamente
+
+          // Marketplaces genéricos (NO bodas)
           'wikipedia.org',
           'youtube.com',
           'amazon',
@@ -101,38 +105,18 @@ async function searchTavilySimple(query, location, service) {
           'aliexpress',
           'milanuncios',
           'wallapop',
-          // Directorios de bodas
-          'weddyplace.com',
-          'eventosybodas.com',
-          'tulistadebodas.com',
-          'zankyou.es',
-          'matrimonio.com',
-          'casamientos.com.ar',
-          'bodasyweddings.com',
-          'eventopedia.es',
-          'guianovias.com',
-          // NUEVO: Más directorios y agregadores de bodas
-          'bodamas.es',
-          'bodasdecuento.com',
-          'enlaceboda.com',
-          'noviatica.com',
-          'bodasenvalencia.com',
-          'directoriodebodas.com',
-          'guiadebodas.es',
-          'bodasnet.es',
-          'celebracionesperfectas.com',
-          'tusbodasdecuento.com',
-          // Portales genéricos
+
+          // Portales de clasificados genéricos (NO bodas)
           'milanuncios.com',
           'segundamano.es',
           'olx.es',
           'vibbo.com',
           'tablondeanuncios.com',
-          // NUEVO: Portales de recomendaciones/rankings
+
+          // Portales de reseñas genéricos (NO bodas)
           'tripadvisor',
           'yelp',
           'foursquare',
-          'facebook.com/pages', // Páginas de FB que listan proveedores
           'mejores10.com',
           'top10.com',
           'rankia.com',
@@ -420,27 +404,9 @@ router.post('/search', async (req, res) => {
           if (email && registeredEmails.has(email)) return false;
           if (url && registeredUrls.has(url)) return false;
 
-          // ⭐ EXCEPCIÓN ESPECIAL: Bodas.net - Detectar si es perfil individual o listado
-          const isBodasNet = url && url.includes('bodas.net');
-          if (isBodasNet) {
-            // Perfiles individuales de bodas.net tienen un slug único con ID
-            // Ejemplo BUENO: bodas.net/musicos/angeli-musica--e123456
-            // Ejemplo MALO:  bodas.net/musicos/valencia (listado)
-
-            const hasProfileSlug = /bodas\.net\/[^\/]+\/[^\/]+--[a-z0-9]+/i.test(url);
-
-            if (hasProfileSlug) {
-              // Es un perfil individual de bodas.net → ACEPTAR siempre
-              console.log(`   ✅ Bodas.net perfil individual aceptado: ${r.title}`);
-              return true;
-            } else {
-              // Es un listado de bodas.net → RECHAZAR
-              console.log(`   ❌ Bodas.net listado rechazado: ${r.title}`);
-              return false;
-            }
-          }
-
           // ✅ Filtrar resultados de baja calidad y LISTADOS/DIRECTORIOS
+          // ⭐ IMPORTANTE: NO hacemos excepciones por dominio
+          // Los filtros de contenido funcionan para TODOS los portales (bodas.net, zankyou, etc.)
           const lowQualityIndicators = [
             // Opiniones y comparativas
             'opiniones de',
