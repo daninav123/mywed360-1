@@ -28,6 +28,7 @@
 import express from 'express';
 import OpenAI from 'openai';
 import logger from '../logger.js';
+import admin from 'firebase-admin';
 
 const router = express.Router();
 
@@ -753,6 +754,144 @@ Devuelve máximo 8 proveedores con información VERIFICABLE en el contenido.`;
   }
 }
 
+// 🆕 FASE 1: CACHE SILENCIOSO EN FIRESTORE
+// Guarda proveedores en background sin bloquear la respuesta al usuario
+async function saveToFirestoreBackground(providers, service, location) {
+  // NO usar await en la llamada externa - dejar que se ejecute en paralelo
+  Promise.all(providers.map(async (provider) => {
+    try {
+      const db = admin.firestore();
+      
+      // Crear slug único: nombre-ciudad
+      const slug = createSlugFromProvider(provider.title, location);
+      
+      // Verificar si ya existe
+      const docRef = db.collection('suppliers').doc(slug);
+      const doc = await docRef.get();
+      
+      if (!doc.exists) {
+        // Crear nuevo proveedor en cache
+        await docRef.set({
+          // Datos básicos
+          name: provider.title,
+          slug: slug,
+          
+          // Categoría
+          category: service,
+          tags: provider.tags || [],
+          
+          // Ubicación
+          location: {
+            city: provider.location || location || 'España',
+            province: provider.location || '',
+            country: 'España'
+          },
+          
+          // Contacto
+          contact: {
+            email: provider.email || '',
+            emailVerified: false,
+            phone: provider.phone || '',
+            phoneVerified: false,
+            website: provider.link || '',
+            instagram: provider.instagram || ''
+          },
+          
+          // Business
+          business: {
+            description: provider.snippet || '',
+            priceRange: provider.priceRange || '',
+            services: []
+          },
+          
+          // 🆕 CAMPOS HÍBRIDOS - Fase 1
+          registered: false,              // No registrado, solo cache
+          source: 'tavily',               // Origen: Tavily
+          status: 'discovered',           // Estado: descubierto
+          
+          // Fuentes
+          sources: [
+            {
+              platform: 'tavily',
+              url: provider.link,
+              lastChecked: admin.firestore.FieldValue.serverTimestamp(),
+              status: 'active'
+            }
+          ],
+          
+          // Media
+          media: {
+            logo: provider.image || '',
+            cover: '',
+            portfolio: []
+          },
+          
+          // Métricas iniciales
+          metrics: {
+            matchScore: Math.round((provider.score || 0.5) * 100),
+            views: 0,
+            clicks: 0,
+            conversions: 0,
+            rating: 0,
+            reviewCount: 0
+          },
+          
+          // Timestamps
+          lastSeen: admin.firestore.FieldValue.serverTimestamp(),
+          createdAt: admin.firestore.FieldValue.serverTimestamp(),
+          lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
+          createdBy: 'tavily-cache',
+          
+          // Claim (futuro)
+          claimed: false,
+          claimedBy: null,
+          claimedAt: null
+        });
+        
+        console.log(`💾 [CACHE] ${provider.title} → Firestore`);
+        
+      } else {
+        // Ya existe, actualizar lastSeen
+        await docRef.update({
+          lastSeen: admin.firestore.FieldValue.serverTimestamp(),
+          lastUpdated: admin.firestore.FieldValue.serverTimestamp()
+        });
+        
+        console.log(`🔄 [CACHE] ${provider.title} actualizado (lastSeen)`);
+      }
+      
+    } catch (error) {
+      // No propagar error, es tarea background
+      console.error(`❌ [CACHE] Error guardando ${provider?.title}:`, error.message);
+    }
+  })).catch(error => {
+    console.error('❌ [CACHE] Error en background save:', error);
+  });
+}
+
+// Función auxiliar para crear slug desde proveedor
+function createSlugFromProvider(name, city) {
+  const namePart = (name || 'proveedor')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // Eliminar acentos
+    .replace(/[^\w\s-]/g, '')         // Solo letras, números, espacios, guiones
+    .replace(/\s+/g, '-')             // Espacios → guiones
+    .replace(/-+/g, '-')              // Múltiples guiones → uno
+    .trim()
+    .substring(0, 50);                // Limitar longitud
+  
+  const cityPart = (city || 'espana')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^\w\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .substring(0, 20);
+  
+  return `${namePart}-${cityPart}`;
+}
+
 ensureOpenAIClient();
 
 router.post('/', async (req, res) => {
@@ -1292,6 +1431,10 @@ router.post('/', async (req, res) => {
 
     // Limpiar campos de debug antes de enviar al frontend
     const cleanProviders = finalProviders.map(({ _originalTitle, ...provider }) => provider);
+
+    // 🆕 FASE 1: GUARDAR EN FIRESTORE (background, no bloquear respuesta)
+    console.log('\n💾 [CACHE] Guardando proveedores en Firestore (background)...');
+    saveToFirestoreBackground(cleanProviders, servicioSeleccionado, formattedLocation);
 
     logger.info('[ai-suppliers-tavily] Proveedores devueltos', {
       count: cleanProviders.length,
