@@ -28,6 +28,12 @@ const ADMIN_NAVIGATION = [
         description: 'Gestión de cuentas, roles y actividad reciente.',
       },
       {
+        id: 'suppliers',
+        label: 'Proveedores',
+        path: '/admin/suppliers',
+        description: 'Catálogo y verificaciones de proveedores (próximamente).',
+      },
+      {
         id: 'commerce',
         label: 'Comerciales',
         path: '/admin/commerce',

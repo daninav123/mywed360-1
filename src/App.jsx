@@ -47,6 +47,7 @@ import AdminAutomations from './pages/admin/AdminAutomations.jsx';
 import AdminDiscounts from './pages/admin/AdminDiscounts.jsx';
 import AdminReports from './pages/admin/AdminReports.jsx';
 import AdminSupport from './pages/admin/AdminSupport.jsx';
+import AdminSuppliers from './pages/admin/AdminSuppliers.jsx';
 import AdminTaskTemplates from './pages/admin/AdminTaskTemplates.jsx';
 import AdminDebugPayments from './pages/admin/AdminDebugPayments.jsx';
 import AdminRevolut from './pages/admin/AdminRevolut.jsx';
@@ -267,6 +268,7 @@ function App() {
                   <Route path="metrics" element={<AdminMetrics />} />
                   <Route path="portfolio" element={<AdminPortfolio />} />
                   <Route path="users" element={<AdminUsers />} />
+                  <Route path="suppliers" element={<AdminSuppliers />} />
                   <Route path="integrations" element={<AdminIntegrations />} />
                   <Route path="settings" element={<AdminSettings />} />
                   <Route path="alerts" element={<AdminAlerts />} />

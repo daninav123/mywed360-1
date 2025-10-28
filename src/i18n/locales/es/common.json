@@ -2765,6 +2765,203 @@
         "createAnotherSection": "Crea otra sección para usar esta acción.",
         "songApplied": "Canción añadida al último momento."
       }
+    },
+    "checklist": {
+      "title": "Checklist de última hora",
+      "description": "Resumen rápido de lo imprescindible a última hora.",
+      "manualDefaults": {
+        "specialGifts": "Regalos para momentos especiales preparados"
+      },
+      "buttons": {
+        "addCheckpoint": "Añadir checkpoint",
+        "view": "Ver"
+      },
+      "statuses": {
+        "pending": "pendiente",
+        "in-progress": "en progreso",
+        "done": "completado"
+      },
+      "categories": {
+        "documentation": "Documentación",
+        "providers": "Proveedores",
+        "ceremony": "Ceremonia",
+        "contingency": "Contingencia",
+        "personal": "Personal",
+        "technical": "Técnico"
+      },
+      "badges": {
+        "critical": "Crítico",
+        "custom": "Personalizado",
+        "documents": "Documentos"
+      },
+      "labels": {
+        "due": "Vence:",
+        "overdue": "¡Vencido!",
+        "notesPlaceholder": "Añadir notas...",
+        "documents": "Documentos:",
+        "manualTitle": "Checkpoints manuales"
+      },
+      "manual": {
+        "empty": "Añade checkpoints con el botón «{{button}}».",
+        "toggleDone": "Marcar listo",
+        "togglePending": "Marcar pendiente",
+        "removeTooltip": "Eliminar"
+      },
+      "providersCard": {
+        "title": "Proveedores",
+        "confirmed": "Confirmados:",
+        "pending": "Pendientes: {{count}}",
+        "link": "Ver"
+      },
+      "momentsCard": {
+        "title": "Momentos (música)",
+        "assigned": "Canciones asignadas:",
+        "missing": "Faltan por asignar: {{count}}",
+        "empty": "Sin momentos configurados"
+      },
+      "toasts": {
+        "statusUpdated": "\"{{label}}\" marcado como {{status}}",
+        "missingName": "Ingresa un nombre para el ítem",
+        "customAdded": "Ítem \"{{label}}\" añadido",
+        "customRemoved": "Ítem eliminado",
+        "exported": "Checklist exportado",
+        "imported": "{{count}} ítems personalizados importados",
+        "importError": "Error al importar el archivo",
+        "importFormat": "Formato de archivo inválido"
+      },
+      "prompts": {
+        "deleteCustom": "¿Eliminar \"{{label}}\"?"
+      },
+      "import": {
+        "warn": "No se pudo importar {{label}}"
+      },
+      "addModal": {
+        "title": "Añadir checkpoint",
+        "nameLabel": "Nombre del checkpoint",
+        "namePlaceholder": "Ej: Regalos preparados para los momentos especiales",
+        "notesLabel": "Notas (opcional)",
+        "notesPlaceholder": "Detalles o recordatorios"
+      },
+      "tooltips": {
+        "markCritical": "Marcar como crítico",
+        "edit": "Editar",
+        "save": "Guardar",
+        "delete": "Eliminar"
+      }
+    }
+  },
+  "public": {
+    "payment": {
+      "success": {
+        "loadingMessage": "Verificando tu pago...",
+        "errorTitle": "Error al verificar el pago",
+        "errorDescription": "No pudimos verificar tu sesión de pago. Por favor, contacta con soporte.",
+        "buttons": {
+          "backPricing": "Volver a planes",
+          "contactSupport": "Contactar soporte",
+          "goDashboard": "Ir al panel"
+        },
+        "title": "Pago completado con éxito",
+        "description": "Tu suscripción ha sido activada correctamente.",
+        "detailsHeading": "Detalles de la compra:",
+        "statusLabel": "Estado:",
+        "status": {
+          "complete": "Completado"
+        },
+        "totalLabel": "Total:",
+        "redirectNotice": "Serás redirigido automáticamente en 5 segundos...",
+        "emailNotice": "Recibirás un email de confirmación con los detalles de tu compra."
+      },
+      "cancel": {
+        "title": "Pago cancelado",
+        "description": "Has cancelado el proceso de pago. No se ha realizado ningún cargo.",
+        "supportCard": {
+          "title": "¿Tuviste algún problema?",
+          "description": "Si encontraste algún error o tienes dudas sobre los planes, nuestro equipo está aquí para ayudarte."
+        },
+        "buttons": {
+          "backPricing": "Volver a planes",
+          "contactSupport": "Contactar soporte",
+          "backHome": "Volver al inicio"
+        },
+        "faq": {
+          "title": "¿Tienes dudas?",
+          "link": "Ver preguntas frecuentes"
+        },
+        "support": {
+          "title": "Soporte",
+          "emailLink": "Enviar email"
+        }
+      }
+    },
+    "invitation": {
+      "accept": {
+        "processing": "Procesando invitación...",
+        "success": "¡Invitación aceptada! Redirigiendo...",
+        "error": "No se pudo aceptar la invitación: {{message}}"
+      }
+    },
+    "rsvp": {
+      "loading": "Cargando...",
+      "notFound": "Invitado no encontrado",
+      "title": "Confirmación de asistencia",
+      "greeting": "Hola {{name}}, por favor confírmanos si podrás asistir.",
+      "question": "¿Asistirás?",
+      "statusOptions": {
+        "accepted": "Sí",
+        "rejected": "No"
+      },
+      "companionsLabel": "Número de acompañantes",
+      "allergensLabel": "Alergias o restricciones alimentarias",
+      "messagePlaceholder": "Mensaje",
+      "submit": "Enviar respuesta",
+      "thanksTitle": "¡Gracias, {{name}}!",
+      "thanksDescription": "Hemos registrado tu respuesta. Nos vemos pronto.",
+      "toasts": {
+        "fetchError": "Ha ocurrido un error al cargar la invitación.",
+        "submitSuccess": "¡Respuesta registrada!",
+        "submitError": "Ha ocurrido un error al enviar la respuesta."
+      },
+      "errors": {
+        "fetchNotFound": "Invitado no encontrado",
+        "submit": "Error enviando respuesta"
+      }
+    },
+    "supplierPortal": {
+      "loading": "Cargando...",
+      "error": "Enlace no válido o expirado",
+      "errorWithReason": "Enlace no válido o expirado ({{reason}})",
+      "title": "Portal del proveedor",
+      "thanksTitle": "¡Gracias!",
+      "thanksDescription": "Hemos recibido su respuesta. Nos pondremos en contacto en breve.",
+      "labels": {
+        "wedding": "Boda",
+        "supplier": "Proveedor",
+        "availability": "Disponibilidad",
+        "message": "Mensaje",
+        "budget": "Presupuesto (opcional)",
+        "amount": "Importe",
+        "links": "Enlace a archivos (Drive, Dropbox)",
+        "description": "Descripción o detalle del presupuesto"
+      },
+      "availability": {
+        "available": "Disponible",
+        "unavailable": "No disponible",
+        "unknown": "Por confirmar"
+      },
+      "placeholders": {
+        "message": "Comentarios, dudas o condiciones",
+        "amount": "Importe",
+        "links": "Enlace a archivos (Drive, Dropbox)",
+        "description": "Descripción o detalle del presupuesto"
+      },
+      "buttons": {
+        "submit": "Enviar",
+        "submitting": "Enviando..."
+      },
+      "alerts": {
+        "submitError": "No se pudo enviar: {{message}}"
+      }
     }
   },
   "suppliers": {

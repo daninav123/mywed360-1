@@ -2,10 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
+import useTranslations from '../hooks/useTranslations';
 import { get as apiGet, put as apiPut } from '../services/apiClient';
 
 function RSVPConfirm() {
   const { token } = useParams();
+  const { t } = useTranslations();
   const [guest, setGuest] = useState(null);
   const [status, setStatus] = useState('accepted');
   const [companions, setCompanions] = useState(0);
@@ -17,20 +19,20 @@ function RSVPConfirm() {
     const fetchGuest = async () => {
       try {
         const res = await apiGet(`/api/rsvp/by-token/${token}`);
-        if (!res.ok) throw new Error('Invitado no encontrado');
+        if (!res.ok) throw new Error(t('common.public.rsvp.errors.fetchNotFound'));
         const data = await res.json();
         setGuest(data);
         setStatus(data.status === 'rejected' ? 'rejected' : 'accepted');
         setCompanions(data.companions || 0);
         setAllergens(data.allergens || '');
       } catch (err) {
-        toast.error(err.message || 'Ha ocurrido un error');
+        toast.error(err?.message || t('common.public.rsvp.toasts.fetchError'));
       } finally {
         setLoading(false);
       }
     };
     fetchGuest();
-  }, [token]);
+  }, [token, t]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -40,33 +42,37 @@ function RSVPConfirm() {
         companions: Number(companions),
         allergens,
       });
-      if (!res.ok) throw new Error('Error enviando respuesta');
-      toast.success('�Respuesta registrada!');
+      if (!res.ok) throw new Error(t('common.public.rsvp.errors.submit'));
+      toast.success(t('common.public.rsvp.toasts.submitSuccess'));
       setSubmitted(true);
     } catch (err) {
-      toast.error(err.message || 'Ha ocurrido un error');
+      toast.error(err?.message || t('common.public.rsvp.toasts.submitError'));
     }
   };
 
-  if (loading) return <div className="p-6 text-center">Cargando&</div>;
-  if (!guest) return <div className="p-6 text-center">Invitado no encontrado</div>;
+  if (loading) return <div className="p-6 text-center">{t('common.public.rsvp.loading')}</div>;
+  if (!guest) return <div className="p-6 text-center">{t('common.public.rsvp.notFound')}</div>;
 
   if (submitted) {
     return (
       <div className="p-6 text-center max-w-md mx-auto">
-        <h1 className="text-2xl font-bold mb-4">�Gracias, {guest.name}!</h1>
-        <p>Hemos registrado tu respuesta. Nos vemos pronto.</p>
+        <h1 className="text-2xl font-bold mb-4">
+          {t('common.public.rsvp.thanksTitle', { name: guest.name })}
+        </h1>
+        <p>{t('common.public.rsvp.thanksDescription')}</p>
       </div>
     );
   }
 
   return (
     <div className="p-6 max-w-md mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Confirmaci�n de asistencia</h1>
-      <p className="mb-4">Hola {guest.name}, por favor conf�rmanos si podr�s asistir.</p>
+      <h1 className="text-2xl font-bold mb-6">{t('common.public.rsvp.title')}</h1>
+      <p className="mb-4">
+        {t('common.public.rsvp.greeting', { name: guest.name })}
+      </p>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="font-medium mr-4">�Asistir�s?</label>
+          <label className="font-medium mr-4">{t('common.public.rsvp.question')}</label>
           <label className="mr-4">
             <input
               type="radio"
@@ -74,7 +80,7 @@ function RSVPConfirm() {
               checked={status === 'accepted'}
               onChange={() => setStatus('accepted')}
             />{' '}
-            S�
+            {t('common.public.rsvp.statusOptions.accepted')}
           </label>
           <label>
             <input
@@ -83,11 +89,13 @@ function RSVPConfirm() {
               checked={status === 'rejected'}
               onChange={() => setStatus('rejected')}
             />{' '}
-            No
+            {t('common.public.rsvp.statusOptions.rejected')}
           </label>
         </div>
         <div>
-          <label className="font-medium block mb-1">N�mero de acompa�antes</label>
+          <label className="font-medium block mb-1">
+            {t('common.public.rsvp.companionsLabel')}
+          </label>
           <input
             type="number"
             min="0"
@@ -97,19 +105,22 @@ function RSVPConfirm() {
           />
         </div>
         <div>
-          <label className="font-medium block mb-1">Alergias o restricciones alimentarias</label>
+          <label className="font-medium block mb-1">
+            {t('common.public.rsvp.allergensLabel')}
+          </label>
           <textarea
             value={allergens}
             onChange={(e) => setAllergens(e.target.value)}
             className="border rounded px-2 py-1 w-full"
             rows={3}
+            placeholder={t('common.public.rsvp.messagePlaceholder')}
           />
         </div>
         <button
           type="submit"
           className="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded"
         >
-          Enviar respuesta
+          {t('common.public.rsvp.submit')}
         </button>
       </form>
     </div>

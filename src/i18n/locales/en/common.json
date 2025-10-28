@@ -349,6 +349,203 @@
         "createAnotherSection": "Create another section to use this action.",
         "songApplied": "Song applied to the last moment."
       }
+    },
+    "checklist": {
+      "title": "Last-minute checklist",
+      "description": "Quick summary of the must-do items right before the event.",
+      "manualDefaults": {
+        "specialGifts": "Gifts prepared for the special moments"
+      },
+      "buttons": {
+        "addCheckpoint": "Add checkpoint",
+        "view": "View"
+      },
+      "statuses": {
+        "pending": "pending",
+        "in-progress": "in progress",
+        "done": "completed"
+      },
+      "categories": {
+        "documentation": "Documentation",
+        "providers": "Suppliers",
+        "ceremony": "Ceremony",
+        "contingency": "Contingency",
+        "personal": "Personal",
+        "technical": "Technical"
+      },
+      "badges": {
+        "critical": "Critical",
+        "custom": "Custom",
+        "documents": "Documents"
+      },
+      "labels": {
+        "due": "Due:",
+        "overdue": "Overdue!",
+        "notesPlaceholder": "Add notes...",
+        "documents": "Documents:",
+        "manualTitle": "Manual checkpoints"
+      },
+      "manual": {
+        "empty": "Add checkpoints with the \"{{button}}\" button.",
+        "toggleDone": "Mark done",
+        "togglePending": "Mark pending",
+        "removeTooltip": "Delete"
+      },
+      "providersCard": {
+        "title": "Suppliers",
+        "confirmed": "Confirmed:",
+        "pending": "Pending: {{count}}",
+        "link": "View"
+      },
+      "momentsCard": {
+        "title": "Moments (music)",
+        "assigned": "Songs assigned:",
+        "missing": "Missing assignments: {{count}}",
+        "empty": "No moments configured"
+      },
+      "toasts": {
+        "statusUpdated": "\"{{label}}\" marked as {{status}}",
+        "missingName": "Enter a name for the item",
+        "customAdded": "Item \"{{label}}\" added",
+        "customRemoved": "Item removed",
+        "exported": "Checklist exported",
+        "imported": "{{count}} custom items imported",
+        "importError": "We couldn't import the file",
+        "importFormat": "Invalid file format"
+      },
+      "prompts": {
+        "deleteCustom": "Delete \"{{label}}\"?"
+      },
+      "import": {
+        "warn": "Could not import {{label}}"
+      },
+      "addModal": {
+        "title": "Add checkpoint",
+        "nameLabel": "Checkpoint name",
+        "namePlaceholder": "E.g. Gifts prepared for the special moments",
+        "notesLabel": "Notes (optional)",
+        "notesPlaceholder": "Details or reminders"
+      },
+      "tooltips": {
+        "markCritical": "Mark as critical",
+        "edit": "Edit",
+        "save": "Save",
+        "delete": "Delete"
+      }
+    }
+  },
+  "public": {
+    "payment": {
+      "success": {
+        "loadingMessage": "Verifying your payment...",
+        "errorTitle": "Payment verification failed",
+        "errorDescription": "We couldn't verify your payment session. Please contact support.",
+        "buttons": {
+          "backPricing": "Back to plans",
+          "contactSupport": "Contact support",
+          "goDashboard": "Go to dashboard"
+        },
+        "title": "Payment completed successfully",
+        "description": "Your subscription has been activated.",
+        "detailsHeading": "Purchase details:",
+        "statusLabel": "Status:",
+        "status": {
+          "complete": "Completed"
+        },
+        "totalLabel": "Total:",
+        "redirectNotice": "You will be redirected automatically in 5 seconds...",
+        "emailNotice": "You'll receive a confirmation email with your purchase details."
+      },
+      "cancel": {
+        "title": "Payment cancelled",
+        "description": "You cancelled the payment process. No charge was made.",
+        "supportCard": {
+          "title": "Did you have any issues?",
+          "description": "If you experienced an error or have questions about our plans, our team is ready to help."
+        },
+        "buttons": {
+          "backPricing": "Back to plans",
+          "contactSupport": "Contact support",
+          "backHome": "Return to home"
+        },
+        "faq": {
+          "title": "Need help?",
+          "link": "View FAQs"
+        },
+        "support": {
+          "title": "Support",
+          "emailLink": "Send email"
+        }
+      }
+    },
+    "invitation": {
+      "accept": {
+        "processing": "Processing invitation...",
+        "success": "Invitation accepted! Redirecting...",
+        "error": "We couldn't accept the invitation: {{message}}"
+      }
+    },
+    "rsvp": {
+      "loading": "Loading...",
+      "notFound": "Guest not found",
+      "title": "RSVP confirmation",
+      "greeting": "Hi {{name}}, please let us know if you will attend.",
+      "question": "Will you attend?",
+      "statusOptions": {
+        "accepted": "Yes",
+        "rejected": "No"
+      },
+      "companionsLabel": "Number of companions",
+      "allergensLabel": "Allergies or dietary restrictions",
+      "messagePlaceholder": "Message",
+      "submit": "Submit response",
+      "thanksTitle": "Thank you, {{name}}!",
+      "thanksDescription": "We have recorded your response. See you soon.",
+      "toasts": {
+        "fetchError": "We could not load your invitation.",
+        "submitSuccess": "Response saved!",
+        "submitError": "Something went wrong while sending your response."
+      },
+      "errors": {
+        "fetchNotFound": "Guest not found",
+        "submit": "Error submitting response"
+      }
+    },
+    "supplierPortal": {
+      "loading": "Loading...",
+      "error": "Link is invalid or has expired",
+      "errorWithReason": "Link is invalid or has expired ({{reason}})",
+      "title": "Supplier portal",
+      "thanksTitle": "Thank you!",
+      "thanksDescription": "We have received your response. We will get in touch shortly.",
+      "labels": {
+        "wedding": "Wedding",
+        "supplier": "Supplier",
+        "availability": "Availability",
+        "message": "Message",
+        "budget": "Budget (optional)",
+        "amount": "Amount",
+        "links": "File link (Drive, Dropbox)",
+        "description": "Budget description or details"
+      },
+      "availability": {
+        "available": "Available",
+        "unavailable": "Not available",
+        "unknown": "To be confirmed"
+      },
+      "placeholders": {
+        "message": "Comments, questions, or conditions",
+        "amount": "Amount",
+        "links": "File link (Drive, Dropbox)",
+        "description": "Budget description or details"
+      },
+      "buttons": {
+        "submit": "Send",
+        "submitting": "Sending..."
+      },
+      "alerts": {
+        "submitError": "We could not submit the response: {{message}}"
+      }
     }
   },
   "authSignup": {
