@@ -21,13 +21,16 @@ router.get('/', async (req, res) => {
     const searchKey = weddingId || userId;
     const searchField = weddingId ? 'weddingId' : 'userId';
 
-    const snapshot = await db
-      .collection('favorites')
-      .where(searchField, '==', searchKey)
-      .orderBy('addedAt', 'desc')
-      .get();
+    const snapshot = await db.collection('favorites').where(searchField, '==', searchKey).get();
 
-    const favorites = snapshot.docs.map((doc) => ({
+    // Ordenar en JavaScript en vez de Firestore (evita necesidad de índice)
+    const docs = snapshot.docs.sort((a, b) => {
+      const aDate = new Date(a.data().addedAt || 0);
+      const bDate = new Date(b.data().addedAt || 0);
+      return bDate - aDate; // desc
+    });
+
+    const favorites = docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
