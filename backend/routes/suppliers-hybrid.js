@@ -177,16 +177,21 @@ router.post('/search', async (req, res) => {
       }
     }
     
-    console.log(`✅ [FIRESTORE] ${registeredResults.length} proveedores encontrados en base de datos`);
-    console.log(`   - Registrados: ${registeredResults.filter(r => r.registered === true).length}`);
-    console.log(`   - En caché: ${registeredResults.filter(r => r.registered !== true).length}`);
+    // Separar proveedores registrados de caché
+    const trueRegistered = registeredResults.filter(r => r.registered === true);
+    const cachedResults = registeredResults.filter(r => r.registered !== true);
     
-    // ===== 2. SI NO HAY RESULTADOS, BUSCAR EN INTERNET (TAVILY) =====
+    console.log(`✅ [FIRESTORE] ${registeredResults.length} proveedores encontrados en base de datos`);
+    console.log(`   - Registrados reales: ${trueRegistered.length}`);
+    console.log(`   - En caché: ${cachedResults.length}`);
+    
+    // ===== 2. SI NO HAY RESULTADOS REGISTRADOS REALES, BUSCAR EN INTERNET (TAVILY) =====
     let internetResults = [];
     let usedTavily = false;
     
-    if (registeredResults.length === 0) {
-      console.log(`\n🌐 [TAVILY] No hay resultados en BD. Buscando en internet...`);
+    // Solo buscar en internet si NO hay proveedores registrados reales
+    if (trueRegistered.length === 0) {
+      console.log(`\n🌐 [TAVILY] No hay proveedores registrados. Buscando en internet...`);
       
       try {
         const tavilyResults = await searchTavilySimple(
@@ -285,26 +290,36 @@ router.post('/search', async (req, res) => {
         // Continuar con solo resultados de Firestore
       }
     } else {
-      console.log(`\n✅ [FIRESTORE] ${registeredResults.length} resultados en BD. No es necesario buscar en internet.`);
+      console.log(`\n✅ [FIRESTORE] ${trueRegistered.length} proveedores registrados encontrados. Ignorando caché e internet.`);
     }
     
-    // ===== 3. MEZCLAR RESULTADOS: REGISTRADOS PRIMERO =====
-    const allResults = [
-      ...registeredResults,  // 🟢 PRIMERO: Registrados y cache
-      ...internetResults     // 🔵 DESPUÉS: De internet
-    ];
+    // ===== 3. MEZCLAR RESULTADOS: SI HAY REGISTRADOS REALES, SOLO ESOS =====
+    let allResults;
+    
+    if (trueRegistered.length > 0) {
+      // Si hay proveedores registrados reales, SOLO mostrar esos (ignorar caché e internet)
+      allResults = [...trueRegistered];
+      console.log(`📊 [RESULTADO FINAL] Mostrando solo proveedores registrados: ${trueRegistered.length}`);
+    } else {
+      // Si NO hay registrados, mostrar caché + internet
+      allResults = [
+        ...cachedResults,  // 🟡 Proveedores en caché
+        ...internetResults // 🔵 De internet
+      ];
+      console.log(`📊 [RESULTADO FINAL] Sin registrados. Mostrando caché (${cachedResults.length}) + internet (${internetResults.length})`);
+    }
     
     console.log(`\n📊 [RESULTADO] Total: ${allResults.length} proveedores`);
-    console.log(`   🟢 Registrados: ${registeredResults.filter(r => r.registered).length}`);
-    console.log(`   🔵 En caché: ${registeredResults.filter(r => !r.registered).length}`);
-    console.log(`   🌐 Internet: ${internetResults.length}`);
-    console.log(`   📡 Fuente: ${usedTavily ? 'Firestore + Tavily' : 'Solo Firestore'}\n`);
+    console.log(`   🟢 Registrados reales: ${trueRegistered.length}`);
+    console.log(`   🟡 En caché: ${trueRegistered.length > 0 ? 0 : cachedResults.length} (ocultos si hay registrados)`);
+    console.log(`   🌐 Internet: ${trueRegistered.length > 0 ? 0 : internetResults.length} (ocultos si hay registrados)`);
+    console.log(`   📡 Fuente: ${trueRegistered.length > 0 ? 'Solo registrados' : (usedTavily ? 'Caché + Internet' : 'Solo caché')}\n`);
     
-    // ===== 4. ACTUALIZAR MÉTRICAS DE VISTAS (solo para los de Firestore) =====
-    if (registeredResults.length > 0) {
+    // ===== 4. ACTUALIZAR MÉTRICAS DE VISTAS (solo para registrados reales) =====
+    if (trueRegistered.length > 0) {
       const batch = db.batch();
       
-      registeredResults.forEach(supplier => {
+      trueRegistered.forEach(supplier => {
         if (supplier.id) { // Solo si tiene ID (está en Firestore)
           const docRef = db.collection('suppliers').doc(supplier.id);
           batch.update(docRef, {
@@ -315,7 +330,7 @@ router.post('/search', async (req, res) => {
       });
       
       await batch.commit();
-      console.log(`📊 [METRICS] Views incrementadas para ${registeredResults.length} proveedores`);
+      console.log(`📊 [METRICS] Views incrementadas para ${trueRegistered.length} proveedores registrados`);
     }
     
     // ===== 5. RESPONDER =====
@@ -323,9 +338,9 @@ router.post('/search', async (req, res) => {
       success: true,
       count: allResults.length,
       breakdown: {
-        registered: registeredResults.filter(r => r.registered).length,
-        cached: registeredResults.filter(r => !r.registered).length,
-        internet: internetResults.length
+        registered: trueRegistered.length,
+        cached: trueRegistered.length > 0 ? 0 : cachedResults.length, // 0 si hay registrados
+        internet: trueRegistered.length > 0 ? 0 : internetResults.length // 0 si hay registrados
       },
       source: usedTavily ? 'firestore+tavily' : 'firestore',
       suppliers: allResults
