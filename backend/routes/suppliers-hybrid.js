@@ -853,6 +853,14 @@ router.post('/search', async (req, res) => {
           const name = supplier.name || '';
           const loc = (supplier.location?.city || '').toLowerCase();
 
+          // Extraer usuario de Instagram (sin URL)
+          const instagram = supplier.contact?.instagram || '';
+          const instagramUser = instagram
+            .replace(/https?:\/\/(www\.)?instagram\.com\//i, '')
+            .replace(/@/g, '')
+            .toLowerCase()
+            .trim();
+
           // 1. Verificar duplicado exacto por email/teléfono (como antes)
           const isDuplicateEmail = email && seenEmails.has(email);
           const isDuplicatePhone = phone && seenPhones.has(phone);
@@ -863,7 +871,7 @@ router.post('/search', async (req, res) => {
             return false;
           }
 
-          // 2. Verificar duplicado por dominio + ubicación + nombre similar
+          // 2. Verificar duplicado por dominio + ubicación
           const emailDomain = extractDomain(email);
           const urlDomain = extractUrlDomain(supplier.contact?.website);
           const domain = emailDomain || urlDomain;
@@ -876,16 +884,19 @@ router.post('/search', async (req, res) => {
               // Ya vimos este dominio en esta ubicación
               const nameSimilarity = similarity(name, seen.name);
 
-              if (nameSimilarity >= 0.7) {
-                // Mismo dominio + misma ubicación + nombre similar = DUPLICADO
-                console.log(
-                  `   🔄 Descartado (dominio ${domain} duplicado + nombre similar): ${supplier.name}`
-                );
+              // ⭐ MEJORADO: También verificar Instagram
+              const sameInstagram =
+                instagramUser && seen.instagram && instagramUser === seen.instagram;
+
+              if (nameSimilarity >= 0.7 || sameInstagram) {
+                // Mismo dominio + ubicación + (nombre similar O mismo Instagram) = DUPLICADO
+                const reason = sameInstagram ? 'Instagram duplicado' : 'nombre similar';
+                console.log(`   🔄 Descartado (dominio ${domain} + ${reason}): ${supplier.name}`);
                 return false;
               }
             } else {
               // Primera vez que vemos este dominio en esta ubicación
-              seenDomains.set(key, { name, location: loc });
+              seenDomains.set(key, { name, location: loc, instagram: instagramUser });
             }
           }
 
