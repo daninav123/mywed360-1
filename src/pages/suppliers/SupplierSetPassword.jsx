@@ -87,20 +87,20 @@ export default function SupplierSetPassword() {
   
   if (success) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-green-50 flex items-center justify-center p-4">
+      <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: 'var(--color-bg)' }}>
         <div className="max-w-md w-full text-center">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-100 text-green-600 mb-6">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-6" style={{ backgroundColor: 'rgba(34, 197, 94, 0.1)', color: 'var(--color-success)' }}>
             <CheckCircle size={48} />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">
+          <h1 className="text-3xl font-bold mb-4" style={{ color: 'var(--color-text)' }}>
             ¡Contraseña Establecida!
           </h1>
-          <p className="text-gray-600 mb-8">
+          <p className="mb-8" style={{ color: 'var(--color-muted)' }}>
             Tu contraseña ha sido configurada correctamente.
             Redirigiendo al login...
           </p>
           <div className="animate-pulse">
-            <div className="w-16 h-1 bg-green-600 mx-auto rounded-full"></div>
+            <div className="w-16 h-1 mx-auto rounded-full" style={{ backgroundColor: 'var(--color-success)' }}></div>
           </div>
         </div>
       </div>
@@ -108,23 +108,23 @@ export default function SupplierSetPassword() {
   }
   
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: 'var(--color-bg)' }}>
       <div className="max-w-md w-full">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-indigo-600 text-white mb-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full text-white mb-4" style={{ backgroundColor: 'var(--color-primary)' }}>
             <Lock size={32} />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--color-text)' }}>
             Establece tu Contraseña
           </h1>
-          <p className="text-gray-600">
+          <p style={{ color: 'var(--color-muted)' }}>
             Crea una contraseña segura para tu cuenta de proveedor
           </p>
         </div>
         
         {/* Card */}
-        <div className="bg-white rounded-xl shadow-lg p-8">
+        <div className="rounded-xl shadow-lg p-8" style={{ backgroundColor: 'var(--color-surface)' }}>
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email (readonly) */}
             <div>
@@ -135,7 +135,8 @@ export default function SupplierSetPassword() {
                 type="email"
                 value={email}
                 readOnly
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 cursor-not-allowed"
+                className="w-full px-4 py-3 border rounded-lg cursor-not-allowed"
+                style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-muted)' }}
               />
             </div>
             
@@ -153,7 +154,7 @@ export default function SupplierSetPassword() {
                 required
                 minLength={8}
               />
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-xs" style={{ color: 'var(--color-muted)' }}>
                 Al menos 8 caracteres
               </p>
             </div>
@@ -175,7 +176,7 @@ export default function SupplierSetPassword() {
             
             {/* Error */}
             {error && (
-              <div className="flex items-center gap-2 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm">
+              <div className="flex items-center gap-2 p-4 border rounded-lg text-sm" style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', borderColor: 'var(--color-danger)', color: 'var(--color-danger)' }}>
                 <AlertCircle size={20} />
                 <p>{error}</p>
               </div>
@@ -185,7 +186,8 @@ export default function SupplierSetPassword() {
             <button
               type="submit"
               disabled={loading || !email || !token}
-              className="w-full py-3 px-4 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3 px-4 text-white font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ backgroundColor: 'var(--color-primary)' }}
             >
               {loading ? 'Estableciendo...' : 'Establecer Contraseña'}
             </button>
@@ -195,7 +197,8 @@ export default function SupplierSetPassword() {
           <div className="mt-6 text-center">
             <button
               onClick={() => navigate('/supplier/login')}
-              className="text-sm text-indigo-600 hover:underline"
+              className="text-sm hover:underline"
+              style={{ color: 'var(--color-primary)' }}
             >
               ¿Ya tienes contraseña? Inicia sesión
             </button>

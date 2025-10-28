@@ -319,14 +319,14 @@
   "categorias": "catégories",
   "categorias_riesgo": "catégories en riesgo",
   "categories": {
-    "decoration": "Decoración",
-    "cocktail": "Cctel",
-    "banquet": "Banquete",
-    "ceremony": "Ceremonia",
-    "flowers": "Flores",
-    "dress": "Vestidos",
-    "cake": "Pasteles",
-    "photography": "Fotografía"
+    "decoration": "Décoration",
+    "cocktail": "Cocktail",
+    "banquet": "Banquet",
+    "ceremony": "Cérémonie",
+    "flowers": "Fleurs",
+    "dress": "Robes",
+    "cake": "Gâteaux",
+    "photography": "Photographie"
   },
   "categoriesmapcat_categoriesmapcat_total_responded_customized_totalresponsetime": ";\n\n        if (!categoriesMap[cat]) {\n          categoriesMap[cat] = {\n            total: 0,\n            responded: 0,\n            customized: 0,\n            totalResponseTime: 0,\n            averageResponseTime: 0,\n          };\n        }\n\n        categoriesMap[cat].total++;\n\n        if (act.wasCustomized) {\n          categoriesMap[cat].customized++;\n        }\n\n        if (act.responseReceived) {\n          categoriesMap[cat].responded++;\n\n          if (act.responseTime) {\n            categoriesMap[cat].totalResponseTime += act.responseTime;\n          }\n        }\n      });\n\n      // Calcular promedios\n      Object.keys(categoriesMap).forEach((cat) => {\n        const stats = categoriesMap[cat];\n        stats.averageResponseTime =\n          stats.responded > 0 ? stats.totalResponseTime / stats.responded : 0;\n      });\n\n      // Calcular métricas generales\n      const metrics = {\n        timestamp: new Date().toISOString(),\n        totalEmails: activities.length,\n        totalResponses: responded.length,\n        responseRate: activities.length > 0 ? (responded.length / activities.length) * 100 : 0,\n        customizedRate: activities.length > 0 ? (customized.length / activities.length) * 100 : 0,\n        customizedResponseRate:\n          customized.length > 0 ? (customizedWithResponse.length / customized.length) * 100 : 0,\n        averageResponseTime:\n          responded.length > 0\n            ? responded.reduce((sum, act) => sum + (act.responseTime || 0), 0) / responded.length\n            : 0,\n        categoryStats: categoriesMap,\n      };\n\n      // Guardar métricas\n      localStorage.setItem(this.storageKeyMetrics, JSON.stringify(metrics));\n\n      return metrics;\n    } catch (error) {\n      console.error(",
   "categorycountcategory_categorycountcategory_categorycountcategory_datacount_ordenar_categorias": ";\n      if (!categoryCount[category]) {\n        categoryCount[category] = 0;\n      }\n      categoryCount[category] += data.count;\n    });\n\n    // Ordenar categorías por uso\n    return Object.entries(categoryCount)\n      .sort((a, b) => b[1] - a[1])\n      .map(([category, _]) => category);\n  } catch (error) {\n    console.error(",

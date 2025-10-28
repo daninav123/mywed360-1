@@ -56,38 +56,39 @@ export default function SupplierLogin() {
   };
   
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: 'var(--color-bg)' }}>
       <div className="max-w-md w-full">
         {/* Logo y título */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-indigo-600 text-white mb-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4" style={{ backgroundColor: 'var(--color-primary)', color: 'white' }}>
             <LogIn size={32} />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--color-text)' }}>
             Dashboard de Proveedores
           </h1>
-          <p className="text-gray-600">
+          <p style={{ color: 'var(--color-muted)' }}>
             Inicia sesión para gestionar tus solicitudes de presupuesto
           </p>
         </div>
         
         {/* Card de login */}
-        <div className="bg-white rounded-xl shadow-lg p-8">
+        <div className="rounded-xl shadow-lg p-8" style={{ backgroundColor: 'var(--color-surface)' }}>
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text)' }}>
                 Email
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail size={20} className="text-gray-400" />
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none" style={{ color: 'var(--color-muted)' }}>
+                  <Mail size={20} />
                 </div>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:border-transparent"
+                  style={{ borderColor: 'var(--color-border)', '--tw-ring-color': 'var(--color-primary)' }}
                   placeholder="tu@email.com"
                   required
                 />
@@ -96,12 +97,12 @@ export default function SupplierLogin() {
             
             {/* Contraseña */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text)' }}>
                 Contraseña
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock size={20} className="text-gray-400" />
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none" style={{ color: 'var(--color-muted)' }}>
+                  <Lock size={20} />
                 </div>
                 <input
                   type="password"
@@ -116,7 +117,7 @@ export default function SupplierLogin() {
             
             {/* Error */}
             {error && (
-              <div className="flex items-center gap-2 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm">
+              <div className="flex items-center gap-2 p-4 border rounded-lg text-sm" style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', borderColor: 'var(--color-danger)', color: 'var(--color-danger)' }}>
                 <AlertCircle size={20} />
                 <p>{error}</p>
               </div>
@@ -126,7 +127,8 @@ export default function SupplierLogin() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 px-4 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3 px-4 text-white font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ backgroundColor: 'var(--color-primary)' }}
             >
               {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
             </button>
@@ -136,18 +138,20 @@ export default function SupplierLogin() {
           <div className="mt-6 text-center space-y-3">
             <button
               onClick={() => navigate('/supplier/forgot-password')}
-              className="text-sm text-indigo-600 hover:underline"
+              className="text-sm hover:underline"
+              style={{ color: 'var(--color-primary)' }}
             >
               ¿Olvidaste tu contraseña?
             </button>
             
-            <div className="pt-4 border-t border-gray-200">
-              <p className="text-sm text-gray-600 mb-2">
+            <div className="pt-4 border-t" style={{ borderColor: 'var(--color-border)' }}>
+              <p className="text-sm mb-2" style={{ color: 'var(--color-muted)' }}>
                 ¿No tienes cuenta?
               </p>
               <button
                 onClick={() => navigate('/supplier/registro')}
-                className="text-indigo-600 hover:underline font-medium"
+                className="hover:underline font-medium"
+                style={{ color: 'var(--color-primary)' }}
               >
                 Regístrate como proveedor
               </button>
@@ -156,7 +160,7 @@ export default function SupplierLogin() {
         </div>
         
         {/* Footer */}
-        <div className="mt-8 text-center text-sm text-gray-600">
+        <div className="mt-8 text-center text-sm" style={{ color: 'var(--color-muted)' }}>
           <p>© 2025 MyWed360. Todos los derechos reservados.</p>
         </div>
       </div>
