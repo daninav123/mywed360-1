@@ -789,8 +789,31 @@ router.post('/search', async (req, res) => {
           };
         });
 
+        // ⭐ FILTRAR: Descartar proveedores sin email NI teléfono
+        const beforeFilter = internetResults.length;
+        internetResults = internetResults.filter((supplier) => {
+          const hasEmail = supplier.contact?.email && supplier.contact.email.length > 0;
+          const hasPhone = supplier.contact?.phone && supplier.contact.phone.length > 0;
+          const hasContact = hasEmail || hasPhone;
+
+          if (!hasContact) {
+            console.log(`   ❌ Descartado (sin contacto): ${supplier.name}`);
+          }
+
+          return hasContact;
+        });
+
+        const filtered = beforeFilter - internetResults.length;
+        if (filtered > 0) {
+          console.log(
+            `\n🔍 [FILTRO] ${filtered} proveedores descartados por falta de email/teléfono`
+          );
+        }
+
         usedTavily = true;
-        console.log(`🔄 [TAVILY] ${internetResults.length} proveedores nuevos (no duplicados)`);
+        console.log(
+          `🔄 [TAVILY] ${internetResults.length} proveedores útiles (con datos de contacto)`
+        );
       } catch (error) {
         console.error('❌ [TAVILY] Error en búsqueda:', error.message);
         // Continuar con solo resultados de Firestore
