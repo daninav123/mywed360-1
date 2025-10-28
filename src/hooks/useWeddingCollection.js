@@ -288,40 +288,86 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
         console.log(
           `[useWeddingCollection] Iniciando listener para weddings/${weddingId}/${subName}`
         );
+      // ⭐ OPTIMIZADO: Debounce para reducir actualizaciones excesivas
+      let debounceTimer = null;
+      
       unsub = onSnapshot(
         q,
         (snap) => {
-          // Asegurar que el id del documento prevalezca sobre cualquier campo id dentro de los datos
-          let arr = snap.docs.map((d) => ({ ...d.data(), id: d.id }));
-          // Ordenar en cliente si se solicitó y no se aplicó en servidor
-          const ob2 = options?.orderBy;
-          if (ob2 && ob2.field) {
-            const dirMul = ob2.direction === 'desc' ? -1 : 1;
-            const f = ob2.field;
+          // Limpiar timer anterior
+          if (debounceTimer) clearTimeout(debounceTimer);
+          
+          // ⭐ Debounce de 100ms para evitar actualizaciones rápidas
+          debounceTimer = setTimeout(() => {
             try {
-              arr = arr.slice().sort((a, b) => {
-                const av = a?.[f];
-                const bv = b?.[f];
-                if (av == null && bv == null) return 0;
-                if (av == null) return -1 * dirMul;
-                if (bv == null) return 1 * dirMul;
-                if (typeof av === 'number' && typeof bv === 'number') return (av - bv) * dirMul;
-                const as = String(av);
-                const bs = String(bv);
-                return as.localeCompare(bs) * dirMul;
-              });
-            } catch {}
-          }
-          lastLocalWriteRef.current = Date.now();
-          lsSet(weddingId, subName, arr);
-          setData(arr);
-          setLoading(false);
+              // Asegurar que el id del documento prevalezca sobre cualquier campo id dentro de los datos
+              let arr = snap.docs.map((d) => ({ ...d.data(), id: d.id }));
+              // Ordenar en cliente si se solicitó y no se aplicó en servidor
+              const ob2 = options?.orderBy;
+              if (ob2 && ob2.field) {
+                const dirMul = ob2.direction === 'desc' ? -1 : 1;
+                const f = ob2.field;
+                try {
+                  arr = arr.slice().sort((a, b) => {
+                    const av = a?.[f];
+                    const bv = b?.[f];
+                    if (av == null && bv == null) return 0;
+                    if (av == null) return -1 * dirMul;
+                    if (bv == null) return 1 * dirMul;
+                    if (typeof av === 'number' && typeof bv === 'number') return (av - bv) * dirMul;
+                    const as = String(av);
+                    const bs = String(bv);
+                    return as.localeCompare(bs) * dirMul;
+                  });
+                } catch {}
+              }
+              lastLocalWriteRef.current = Date.now();
+              lsSet(weddingId, subName, arr);
+              setData(arr);
+              setLoading(false);
+            } catch (snapError) {
+              console.error('[useWeddingCollection] Error procesando snapshot:', snapError);
+              setLoading(false);
+            }
+          }, 100);
         },
         (err) => {
-          // Silenciar errores de permisos si estamos usando admin local
+          // ⭐ MEJORADO: Manejo robusto de errores de conexión
           const isPermissionDenied = err.code === 'permission-denied';
+          const isUnavailable = err.code === 'unavailable';
+          const isFailedPrecondition = err.code === 'failed-precondition';
+          
+          // ✅ Error de conexión/red (no crítico)
+          if (isUnavailable) {
+            console.warn(`⚠️ [useWeddingCollection] Firestore temporalmente no disponible para ${subName}`);
+            // Usar caché mientras se recupera
+            const cached = lsGet(weddingId, subName, fallback);
+            setData(cached);
+            setLoading(false);
+            
+            // Reintentar después de 5 segundos
+            setTimeout(() => {
+              console.log(`🔄 Reintentando conexión para ${subName}...`);
+              if (typeof unsub === 'function') {
+                try {
+                  unsub();
+                } catch {}
+              }
+              listen();
+            }, 5000);
+            return;
+          }
+          
+          // ✅ Error de índices (no crítico, usar caché)
+          if (isFailedPrecondition) {
+            console.warn(`⚠️ [useWeddingCollection] Índice faltante para ${subName}, usando caché`);
+            setData(lsGet(weddingId, subName, fallback));
+            setLoading(false);
+            return;
+          }
+          
+          // ✅ Error de permisos (intentar auto-fix)
           if (isPermissionDenied) {
-            // Intentar auto-fix de permisos
             (async () => {
               try {
                 const resp = await apiPost(
@@ -355,11 +401,13 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
             return;
           }
           
+          // ✅ Otros errores (usar caché)
           if (import.meta.env.DEV)
             console.debug('[useWeddingCollection] usando caché local por error en snapshot', {
               sub: subName,
               wedding: weddingId,
               code: err?.code,
+              message: err?.message,
             });
           setData(lsGet(weddingId, subName, fallback));
           setLoading(false);

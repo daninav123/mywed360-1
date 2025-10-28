@@ -42,6 +42,18 @@ const ADMIN_NAVIGATION = [
     ],
   },
   {
+    id: 'content',
+    title: 'Contenido',
+    items: [
+      {
+        id: 'blog',
+        label: 'Blog',
+        path: '/admin/blog',
+        description: 'Gestión editorial y publicaciones generadas por IA.',
+      },
+    ],
+  },
+  {
     id: 'analytics',
     title: 'Analítica',
     items: [

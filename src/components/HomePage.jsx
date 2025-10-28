@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect, useCallback, useMemo } from 'react';
 import { collection, doc, onSnapshot } from 'firebase/firestore';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 import { getBackendBase } from '@/utils/backendBase.js';
@@ -29,7 +29,7 @@ import { db } from '../firebaseConfig';
 import { useAuth } from '../hooks/useAuth'; // Nuevo sistema
 import useTranslations from '../hooks/useTranslations';
 import { useWedding } from '../context/WeddingContext';
-import { fetchWeddingNews } from '../services/blogService';
+import { fetchBlogPosts } from '../services/blogContentService';
 import { fetchWall } from '../services/wallService';
 import { getSummary as getGamificationSummary } from '../services/GamificationService';
 import { isConfirmedStatus } from '../utils/supplierStatus';
@@ -271,6 +271,7 @@ const computeExpectedProgress = (weddingData) => {
 export default function HomePage() {
   const { t, format } = useTranslations();
   const INSPIRATION_CATEGORIES = useMemo(() => getInspirationCategories(t), [t]);
+  const navigate = useNavigate();
   
   // Todo se maneja con modales locales
   const [noteText, setNoteText] = useState('');
@@ -509,17 +510,6 @@ export default function HomePage() {
     }
   }, [resolvedWeddingName]);
 
-  // Visual mode toggle similar a Blog
-  const visualMode = useMemo(() => {
-    try {
-      const usp = new URLSearchParams(window.location.search);
-      if (usp.has('visual')) return usp.get('visual') !== '0';
-      if (typeof localStorage !== 'undefined' && localStorage.getItem('newsVisual') === '1') return true;
-      if (import.meta?.env?.VITE_NEWS_VISUAL === '1') return true;
-    } catch {}
-    return false;
-  }, []);
-
   // Cargar primera imagen de cada categorÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¾ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a destacada
   useEffect(() => {
     Promise.all(INSPIRATION_CATEGORIES.map(({ slug }) => fetchWall(1, slug)))
@@ -543,72 +533,30 @@ export default function HomePage() {
       });
   }, []);
 
-  // Cargar ltimas noticias (mx 3 por dominio y 4 con imagen)
+  // Cargar últimas noticias desde el nuevo blog
   useEffect(() => {
-    const loadNews = async () => {
-      setNewsError(null);
-      const desired = 4;
-      let page = 1;
-      const results = [];
-      const domainCounts = {};
-      const PER_DOMAIN_LIMIT = 1;
-      let consecutiveErrors = 0;
-
-      const hasHttpImage = (p) => typeof p?.image === 'string' && /^https?:\/\//i.test(p.image);
-      const isLikelyCover = (url, feedSource) => {
-        try {
-          const u = new URL(url);
-          const host = u.hostname.replace(/^www\./, '').toLowerCase();
-          const path = (u.pathname || '').toLowerCase();
-          if (/\.svg(\?|$)/i.test(url)) return false;
-          const blockHosts = new Set(['gstatic.com', 'ssl.gstatic.com', 'googleusercontent.com']);
-          if (host === 'news.google.com' || blockHosts.has(host)) return false;
-          const patterns = ['logo', 'favicon', 'sprite', 'placeholder', 'default', 'brand', 'apple-touch-icon', 'android-chrome'];
-          if (patterns.some((p) => path.includes(p))) return false;
-          return true;
-        } catch { return true; }
-      };
-      while (results.length < desired && page <= 20) {
-        try {
-          const batch = await fetchWeddingNews(page, 10, lang);
-          consecutiveErrors = 0;
-          for (const post of batch) {
-            if (!post?.url || !hasHttpImage(post)) continue;
-            if (visualMode && !isLikelyCover(post.image, post.feedSource)) continue;
-            const dom = (() => {
-              try {
-                return new URL(post.url).hostname.replace(/^www\./, '');
-              } catch {
-                return 'unk';
-              }
-            })();
-            if ((domainCounts[dom] || 0) >= PER_DOMAIN_LIMIT) continue;
-            if (results.some((x) => x.url === post.url)) continue;
-            domainCounts[dom] = (domainCounts[dom] || 0) + 1;
-            results.push(post);
-            if (results.length >= desired) break;
-          }
-        } catch (err) {
-          console.error(err);
-          consecutiveErrors++;
-          if (consecutiveErrors >= 3 && results.length) break;
-        } finally {
-          page++;
-        }
-      }
-
-      // Sin fallback a EN: respetar idioma del usuario
-
-      // Sin placeholders: solo mantener items con imagen real (ya filtrado arriba)
-      if (results.length >= desired) {
-        setNewsPosts(results.slice(0, desired));
-        setNewsError(null);
-      } else {
+    let cancelled = false;
+    async function loadNews() {
+      try {
+        const { posts: latestPosts } = await fetchBlogPosts({ language: lang, limit: 4 });
+        if (cancelled) return;
+        const cleanPosts = (latestPosts || []).map((post) => ({
+          ...post,
+          coverUrl: post.coverImage?.url || null,
+        }));
+        setNewsPosts(cleanPosts);
+        setNewsError(cleanPosts.length ? null : t('home.news.error'));
+      } catch (error) {
+        if (cancelled) return;
+        console.error('[HomePage] blog posts failed', error);
         setNewsPosts([]);
         setNewsError(t('home.news.error'));
       }
-    };
+    }
     loadNews();
+    return () => {
+      cancelled = true;
+    };
   }, [lang, t]);
 
   const handleRedoTutorial = useCallback(async () => {
@@ -1132,38 +1080,42 @@ export default function HomePage() {
           </div>
           {newsPosts.length > 0 && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {newsPosts.map((post) => (
-                <Card
-                  key={post.id}
-                  onClick={() => window.open(post.url, '_blank')}
-                  className="cursor-pointer p-0 overflow-hidden bg-[var(--color-surface)]/80 backdrop-blur-md hover:shadow-lg transition"
-                >
-                  {post.image && (
-                    <ExternalImage
-                      src={post.image}
-                      alt={post.title}
-                      className="w-full h-40 object-cover"
-                      requireCover={true}
-                      minWidth={visualMode ? 900 : 600}
-                      minHeight={visualMode ? 500 : 300}
-                      extraBlockHosts={post.feedSource === 'google-news' ? ['news.google.com','gstatic.com','ssl.gstatic.com','googleusercontent.com'] : []}
-                    />
-                  )}
-                  <div className="p-4 space-y-1">
-                    <h3 className="font-semibold text-[color:var(--color-text)] line-clamp-2">
-                      {post.title}
-                    </h3>
-                    <p className="text-sm text-[var(--color-text)]/70 line-clamp-2">
-                      {post.description}
-                    </p>
-                    <div className="pt-2 text-xs text-[var(--color-text)]/60 border-t border-[var(--color-text)]/10">
-                      {t('home.blog.source')}{' '}
-                      {post.source ||
-                        (post.url || '').replace(/^https?:\/\/(www\.)?/, '').split('/')[0]}
+              {newsPosts.map((post) => {
+                const published = post.publishedAt ? new Date(post.publishedAt) : null;
+                const publishedLabel = published
+                  ? published.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })
+                  : 'Lovenda';
+                return (
+                  <Card
+                    key={post.id}
+                    onClick={() => navigate(post.slug ? `/blog/${post.slug}` : '/blog')}
+                    className="cursor-pointer p-0 overflow-hidden bg-[var(--color-surface)]/80 backdrop-blur-md hover:shadow-lg transition"
+                  >
+                    {post.coverUrl && (
+                      <ExternalImage
+                        src={post.coverUrl}
+                        alt={post.title}
+                        className="w-full h-40 object-cover"
+                        requireCover={true}
+                        minWidth={640}
+                        minHeight={360}
+                      />
+                    )}
+                    <div className="p-4 space-y-1">
+                      <h3 className="font-semibold text-[color:var(--color-text)] line-clamp-2">
+                        {post.title}
+                      </h3>
+                      <p className="text-sm text-[var(--color-text)]/70 line-clamp-2">
+                        {post.excerpt || ''}
+                      </p>
+                      <div className="pt-2 text-xs text-[var(--color-text)]/60 border-t border-[var(--color-text)]/10 flex items-center justify-between">
+                        <span>{t('home.blog.source')} Lovenda</span>
+                        <span>{publishedLabel}</span>
+                      </div>
                     </div>
-                  </div>
-                </Card>
-              ))}
+                  </Card>
+                );
+              })}
             </div>
           )}
           {newsError ? (

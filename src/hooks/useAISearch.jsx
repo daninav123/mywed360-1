@@ -240,14 +240,15 @@ const ENABLE_BACKEND_AI =
 const SEARCH_PROVIDER = 'tavily'; // String(import.meta?.env?.VITE_SEARCH_PROVIDER || 'false').toLowerCase();
 
 // DEBUG: Sistema completo de diagnóstico de variables de entorno
-console.group('🔍 [DEBUG] Diagnóstico de Variables de Entorno');
-console.log('📋 Todas las variables import.meta.env:', import.meta?.env);
-console.log('🎯 VITE_SEARCH_PROVIDER:', import.meta?.env?.VITE_SEARCH_PROVIDER);
-console.log('🎯 VITE_ENABLE_AI_SUPPLIERS:', import.meta?.env?.VITE_ENABLE_AI_SUPPLIERS);
-console.log('🎯 VITE_BACKEND_BASE_URL:', import.meta?.env?.VITE_BACKEND_BASE_URL);
-console.log('✅ SEARCH_PROVIDER procesado:', SEARCH_PROVIDER);
-console.log('✅ ENABLE_BACKEND_AI procesado:', ENABLE_BACKEND_AI);
-console.groupEnd();
+  // ⭐ OPTIMIZADO: Solo mostrar en DEV y cuando hay errores
+  if (import.meta.env.DEV && (!import.meta.env?.VITE_SEARCH_PROVIDER || !import.meta.env?.VITE_BACKEND_BASE_URL)) {
+    console.log('🔍 [DEBUG] Diagnóstico de Variables de Entorno');
+    console.log('🎯 VITE_SEARCH_PROVIDER:', import.meta.env?.VITE_SEARCH_PROVIDER);
+    console.log('🎯 VITE_ENABLE_AI_SUPPLIERS:', import.meta.env?.VITE_ENABLE_AI_SUPPLIERS);
+    console.log('🎯 VITE_BACKEND_BASE_URL:', import.meta.env?.VITE_BACKEND_BASE_URL);
+    console.log('✅ SEARCH_PROVIDER procesado:', SEARCH_PROVIDER);
+    console.log('✅ ENABLE_BACKEND_AI procesado:', ENABLE_BACKEND_AI);
+  }
 
 export const useAISearch = () => {
   const [results, setResults] = useState([]);

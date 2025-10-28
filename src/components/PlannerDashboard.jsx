@@ -8,7 +8,7 @@ import { useWedding } from '../context/WeddingContext';
 import { useFirestoreCollection } from '../hooks/useFirestoreCollection';
 import usePlannerAlerts from '../hooks/usePlannerAlerts';
 import { fetchWall } from '../services/wallService';
-import { fetchWeddingNews } from '../services/blogService';
+import { fetchBlogPosts } from '../services/blogContentService';
 import { performanceMonitor } from '../services/PerformanceMonitor';
 
 const INSPIRATION_CATEGORIES = [
@@ -158,10 +158,11 @@ export default function PlannerDashboard() {
     setBlogPosts((prev) => ({ ...prev, loading: true, error: null }));
     (async () => {
       try {
-        const posts = await fetchWeddingNews(1, 10, localeLang);
+        const response = await fetchBlogPosts({ language: localeLang, limit: MAX_BLOG_POSTS });
+        const posts = response?.posts || [];
         if (!cancelled) {
           setBlogPosts({
-            items: Array.isArray(posts) ? posts.slice(0, MAX_BLOG_POSTS) : [],
+            items: posts,
             loading: false,
             error: null,
           });
@@ -191,15 +192,18 @@ export default function PlannerDashboard() {
     } catch {}
   }, [activeWedding]);
 
-  const handleBlogClick = useCallback((post) => {
-    try {
-      performanceMonitor.logEvent('planner_blog_clicked', {
-        url: post?.url,
-        source: post?.source || null,
-        activeWeddingId: activeWedding || null,
-      });
-    } catch {}
-  }, [activeWedding]);
+  const handleBlogClick = useCallback(
+    (post) => {
+      try {
+        performanceMonitor.logEvent('planner_blog_clicked', {
+          slug: post?.slug || null,
+          language: post?.language || localeLang,
+          activeWeddingId: activeWedding || null,
+        });
+      } catch {}
+    },
+    [activeWedding, localeLang],
+  );
 
   const handleEmptyStateCta = useCallback(() => {
     try {
@@ -349,22 +353,25 @@ export default function PlannerDashboard() {
                     aria-label="Cargando publicación"
                   />
                 ))
-              : blogPosts.items.map((post) => (
-                  <li key={post.id || post.url} className="bg-white rounded shadow p-3 hover:bg-gray-50">
-                    <a
-                      href={post.url || '#'}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={() => handleBlogClick(post)}
-                      className="block"
-                    >
-                      <p className="text-base font-semibold text-gray-800">{post.title}</p>
-                      {post.source ? (
-                        <span className="text-xs text-gray-500">Fuente: {post.source}</span>
-                      ) : null}
-                    </a>
-                  </li>
-                ))}
+              : blogPosts.items.map((post) => {
+                  const published = post.publishedAt ? new Date(post.publishedAt) : null;
+                  const subtitle = published
+                    ? published.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })
+                    : post.language?.toUpperCase();
+                  return (
+                    <li key={post.id || post.slug} className="bg-white rounded shadow p-3 hover:bg-gray-50">
+                      <Link
+                        to={post.slug ? `/blog/${post.slug}` : '/blog'}
+                        onClick={() => handleBlogClick(post)}
+                        className="block space-y-1"
+                      >
+                        <p className="text-base font-semibold text-gray-800">{post.title}</p>
+                        <p className="text-sm text-gray-600 line-clamp-2">{post.excerpt}</p>
+                        <span className="text-xs text-gray-500">{subtitle || 'Lovenda'}</span>
+                      </Link>
+                    </li>
+                  );
+                })}
           </ul>
         )}
       </section>

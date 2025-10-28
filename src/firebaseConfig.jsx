@@ -116,24 +116,69 @@ const probarConexionFirestore = async () => {
   }
 };
 
-// Listener de estado de conexión (opcional)
+// ⭐ MEJORADO: Listener de estado de conexión para Firestore y Realtime DB
+let isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
+let reconnectAttempts = 0;
+const MAX_RECONNECT_ATTEMPTS = 3;
+
 const configurarListenerConexion = () => {
   if (typeof window === 'undefined') return;
-  if (import.meta.env.VITE_ENABLE_REALTIME_DB !== 'true') return;
-  try {
-    const dbRealtime = getDatabase();
-    const estadoConexion = ref(dbRealtime, '.info/connected');
-    onValue(estadoConexion, (snapshot) => {
-      if (snapshot.val() === true) {
-        if (window.mostrarErrorUsuario) {
-          window.mostrarErrorUsuario(`Conectado a internet`, 3000);
+  
+  // ✅ Listener para Firestore (browser online/offline)
+  const handleConnectionChange = async (online) => {
+    isOnline = online;
+    
+    if (online) {
+      console.log('🟢 Conexión de red restaurada');
+      reconnectAttempts = 0;
+      
+      // Intentar habilitar red de Firestore
+      if (db) {
+        try {
+          const { enableNetwork } = await import('firebase/firestore');
+          await enableNetwork(db);
+          console.log('✅ Firestore reconectado exitosamente');
+          
+          if (window.mostrarErrorUsuario) {
+            window.mostrarErrorUsuario('Conectado a internet', 3000);
+          }
+        } catch (error) {
+          console.warn('⚠️ Error reconectando Firestore:', error.message);
         }
-      } else {
-        // desconectado
       }
-    });
-  } catch (error) {
-    console.warn('No se pudo configurar el listener de conexión:', error);
+    } else {
+      console.log('🔴 Conexión de red perdida - modo offline');
+      reconnectAttempts++;
+      
+      if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+        console.log(`🔄 Reintento ${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS}`);
+      }
+    }
+  };
+  
+  window.addEventListener('online', () => handleConnectionChange(true));
+  window.addEventListener('offline', () => handleConnectionChange(false));
+  
+  // Estado inicial
+  if (!navigator.onLine) {
+    console.log('⚠️ Iniciando en modo offline');
+  }
+  
+  // ✅ Listener para Realtime Database (si está habilitado)
+  if (import.meta.env.VITE_ENABLE_REALTIME_DB === 'true') {
+    try {
+      const dbRealtime = getDatabase();
+      const estadoConexion = ref(dbRealtime, '.info/connected');
+      onValue(estadoConexion, (snapshot) => {
+        if (snapshot.val() === true) {
+          console.log('✅ Realtime Database conectado');
+        } else {
+          console.log('⚠️ Realtime Database desconectado');
+        }
+      });
+    } catch (error) {
+      console.warn('No se pudo configurar el listener de Realtime Database:', error);
+    }
   }
 };
 
@@ -171,31 +216,6 @@ const inicializarFirebase = async () => {
           }),
         });
       } catch (firestoreError) {
-        try {
-          db = initializeFirestore(app, {
-            experimentalForceLongPolling: true,
-            ignoreUndefinedProperties: true,
-            localCache: persistentLocalCache(),
-          });
-        } catch (_e2) {
-          if (firestoreError?.message?.includes('has already been called')) {
-            db = getFirestore(app);
-            console.warn('��️ Firestore ya estaba inicializado, usando instancia existente');
-          } else {
-            try {
-              db = initializeFirestore(app, {
-                experimentalForceLongPolling: true,
-                ignoreUndefinedProperties: true,
-                localCache: memoryLocalCache(),
-              });
-            } catch (_e3) {
-              console.error('�R Error al inicializar Firestore:', firestoreError);
-              throw new Error(`Error al inicializar Firestore: ${firestoreError.message}`);
-            }
-          }
-        }
-      }
-    }
 
     try {
       db && db;
@@ -257,5 +277,5 @@ const firebaseReady = FIREBASE_CONFIGURED
 
 const getFirebaseAuth = () => auth;
 
-export { auth, db, analytics, firebaseReady, getFirebaseAuth };
+export { auth, db, analytics, firebaseReady, getFirebaseAuth, isOnline };
 

@@ -56,6 +56,7 @@ import AdminReports from './pages/admin/AdminReports.jsx';
 import AdminSupport from './pages/admin/AdminSupport.jsx';
 import AdminSuppliers from './pages/admin/AdminSuppliers.jsx';
 import AdminTaskTemplates from './pages/admin/AdminTaskTemplates.jsx';
+import AdminBlog from './pages/admin/AdminBlog.jsx';
 import AdminDebugPayments from './pages/admin/AdminDebugPayments.jsx';
 import AdminRevolut from './pages/admin/AdminRevolut.jsx';
 import AdminPayouts from './pages/admin/AdminPayouts.jsx';
@@ -111,6 +112,7 @@ const MisDisenos = React.lazy(() => import('./pages/disenos/MisDisenos'));
 const Ideas = React.lazy(() => import('./pages/Ideas'));
 const Inspiration = React.lazy(() => import('./pages/Inspiration'));
 const Blog = React.lazy(() => import('./pages/Blog'));
+const BlogPost = React.lazy(() => import('./pages/BlogPost.jsx'));
 import ProveedoresCompareTest from './pages/test/ProveedoresCompareTest.jsx';
 import ProveedoresSmoke from './pages/test/ProveedoresSmoke.jsx';
 import ProveedoresFlowHarness from './pages/test/ProveedoresFlowHarness.jsx';
@@ -276,6 +278,7 @@ function App() {
                   <Route path="portfolio" element={<AdminPortfolio />} />
                   <Route path="users" element={<AdminUsers />} />
                   <Route path="suppliers" element={<AdminSuppliers />} />
+                  <Route path="blog" element={<AdminBlog />} />
                   <Route path="integrations" element={<AdminIntegrations />} />
                   <Route path="settings" element={<AdminSettings />} />
                   <Route path="alerts" element={<AdminAlerts />} />
@@ -374,6 +377,7 @@ function App() {
                   <Route path="ideas" element={<Ideas />} />
                   <Route path="inspiracion" element={<Inspiration />} />
                   <Route path="blog" element={<Blog />} />
+                  <Route path="blog/:slug" element={<BlogPost />} />
                   <Route path="momentos" element={<Momentos />} />
                   <Route path="more" element={<More />} />
                   <Route path="crear-evento" element={<CreateWeddingAI />} />

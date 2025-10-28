@@ -129,6 +129,8 @@ import ipAllowlist from './middleware/ipAllowlist.js';
 import adminAuthRouter from './routes/admin-auth.js';
 import adminSuppliersRouter from './routes/admin-suppliers.js';
 import adminAuditRouter from './routes/admin-audit.js';
+import adminBlogRouter from './routes/admin-blog.js';
+import blogRouter from './routes/blog.js';
 import { startEmailSchedulerWorker } from './workers/emailSchedulerWorker.js';
 import { startMetricAggregatorWorker } from './workers/metricAggregatorWorker.js';
 import { startMomentosCleanupWorker } from './workers/momentosCleanupWorker.js';
@@ -719,6 +721,7 @@ app.use('/api/calendar', calendarFeedRouter);
 app.use('/api/spotify', spotifyRouter);
 app.use('/api/web-vitals', (await import('./routes/web-vitals.js')).default);
 app.use('/api/weddings', (await import('./routes/wedding-metrics.js')).default);
+app.use('/api/blog', blogRouter);
 // Rutas de autenticación de administración (login/MFA/logout)
 app.use('/api/admin', adminAuthRouter);
 app.use(
@@ -727,6 +730,7 @@ app.use(
   requireAdmin,
   adminSuppliersRouter
 );
+app.use('/api/admin/blog', ipAllowlist(ADMIN_IP_ALLOWLIST), requireAdmin, adminBlogRouter);
 app.use('/api/admin/audit', ipAllowlist(ADMIN_IP_ALLOWLIST), requireAdmin, adminAuditRouter);
 // Admin metrics dashboard API (solo admin) en ruta separada para no bloquear /api/metrics/* públicos
 // Rutas de métricas y dashboard de admin

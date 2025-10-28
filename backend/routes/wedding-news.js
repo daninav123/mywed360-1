@@ -13,14 +13,33 @@ const router = express.Router();
 // Cache en memoria: 6 horas
 // Guardamos listas completas por idioma para poder paginar sin refetch
 const cache = new LRU({ max: 4, ttl: 1000 * 60 * 60 * 6 });
-const parser = new Parser({
-  requestOptions: {
-    headers: {
-      // Algunos hosts bloquean user-agents desconocidos
-      'User-Agent': 'MaLoveAppBot/1.0 (+https://maloveapp.com)'
-    },
-  },
-});
+const parser = new Parser();
+const RSS_REQUEST_TIMEOUT = 10_000;
+const RSS_REQUEST_HEADERS = {
+  // Algunos hosts bloquean user-agents desconocidos
+  'User-Agent':
+    'MaLoveAppBot/1.0 (+https://maloveapp.com) Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36',
+  Accept: 'application/rss+xml, application/xml;q=0.9, text/xml;q=0.8, */*;q=0.7',
+  'Accept-Language': 'es-ES,es;q=0.9,en;q=0.8',
+};
+
+async function fetchRssFeed(url) {
+  try {
+    const { data } = await axios.get(url, {
+      timeout: RSS_REQUEST_TIMEOUT,
+      responseType: 'text',
+      maxRedirects: 5,
+      headers: RSS_REQUEST_HEADERS,
+      // Axios ya descomprime por defecto, pero explicitamos para versiones antiguas
+      decompress: true,
+    });
+    const feed = await parser.parseString(String(data || ''));
+    return mapItems(feed, url);
+  } catch (err) {
+    console.warn('RSS fetch failed', url, err?.message || err);
+    return [];
+  }
+}
 
 // Feeds RSS categorizados por idioma
 const RSS_FEEDS = {
@@ -178,15 +197,7 @@ router.get('/', async (req, res) => {
     if (!allPosts) {
       const sources = RSS_FEEDS[lang] || RSS_FEEDS['en'];
 
-      const promises = sources.map(async (url) => {
-        try {
-          const feed = await parser.parseURL(url);
-          return mapItems(feed, url);
-        } catch (err) {
-          console.warn('RSS fetch failed', url, err?.message || err);
-          return [];
-        }
-      });
+      const promises = sources.map((url) => fetchRssFeed(url));
 
       const lists = await Promise.all(promises);
       let results = ([]).concat(...lists);
@@ -206,9 +217,7 @@ router.get('/', async (req, res) => {
       // No mezclar idiomas: solo rellenar con 'en' si el idioma solicitado es 'en'
       if (distinct.size < MIN_SOURCES && lang === 'en' && RSS_FEEDS['en']) {
         try {
-          const extraPromises = RSS_FEEDS['en'].map(async (url) => {
-            try { const feed = await parser.parseURL(url); return mapItems(feed, url); } catch { return []; }
-          });
+          const extraPromises = RSS_FEEDS['en'].map((url) => fetchRssFeed(url));
           const extraLists = await Promise.all(extraPromises);
           let extra = ([]).concat(...extraLists);
           const seen2 = new Set(results.map(r => r.id || r.url));
@@ -293,18 +302,10 @@ router.get('/', async (req, res) => {
     const withImages = [];
     const blockedHosts = new Set(['news.google.com', 'gstatic.com', 'ssl.gstatic.com', 'googleusercontent.com']);
     const badPatterns = ['logo', 'favicon', 'sprite', 'placeholder', 'default', 'brand', 'apple-touch-icon', 'android-chrome'];
-    const canonicalRe = /<link[^>]+rel=['"]canonical['"][^>]+href=['"]([^'\"]+)['"][^>]*>/i;
-    const ogUrlRe = /<meta\s+property=['"]og:url['"]\s+content=['"]([^'\"]+)['"][^>]*>/i;
-    const reqCfg = {
-      timeout: 8000,
-      responseType: 'text',
-      maxRedirects: 5,
-      headers: {
-        'User-Agent': 'MaLoveAppBot/1.0 (+https://maloveapp.com) Mozilla/5.0',
-        Referer: 'https://news.google.com/',
-        'Accept-Language': 'es-ES,es;q=0.9,en;q=0.8',
-      },
-    };
+    const FALLBACK_POST_IMAGE =
+      'https://images.unsplash.com/photo-1520854221050-0f4caff449fb?auto=format&fit=crop&w=1200&q=80';
+    const MAX_OG_IMAGE_ATTEMPTS = 6;
+    let ogAttempts = 0;
     for (const item of pageItems) {
       let img = item.image;
       let finalUrl = item.url;
@@ -321,7 +322,8 @@ router.get('/', async (req, res) => {
         } catch {}
         return false;
       };
-      if (finalUrl && shouldTryResolve()) {
+      if (finalUrl && shouldTryResolve() && ogAttempts < MAX_OG_IMAGE_ATTEMPTS) {
+        ogAttempts += 1;
         try {
           const found = await resolveOgImage(finalUrl);
           if (isHttp(found)) img = found;
@@ -330,7 +332,7 @@ router.get('/', async (req, res) => {
       // Asegurar absoluta si es relativa
       try { if (img && !/^https?:\/\//i.test(img)) img = new URL(img, finalUrl).toString(); } catch {}
       if (!isHttp(img || item.image)) {
-        continue;
+        img = FALLBACK_POST_IMAGE;
       }
       // Recalcular fuente desde la URL final
       const finalHost = (() => {
