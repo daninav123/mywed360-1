@@ -29,6 +29,8 @@ import PublicWedding from './pages/PublicWedding';
 import RSVPConfirm from './pages/RSVPConfirm';
 import RSVPDashboard from './pages/RSVPDashboard';
 import SupplierPortal from './pages/SupplierPortal';
+import SupplierRegister from './pages/suppliers/SupplierRegister';
+import SupplierDashboard from './pages/suppliers/SupplierDashboard';
 import Tasks from './pages/Tasks';
 import VerifyEmail from './pages/VerifyEmail.jsx';
 import Login from './pages/Login.jsx';
@@ -287,6 +289,10 @@ function App() {
               {/* Rutas públicas */}
               <Route path="w/:uid" element={<WeddingSite />} />
               <Route path="p/:slug" element={<PublicWedding />} />
+              
+              {/* Portal de proveedores */}
+              <Route path="supplier/register" element={<SupplierRegister />} />
+              <Route path="supplier/dashboard/:id" element={<SupplierDashboard />} />
               <Route path="supplier/:token" element={<SupplierPortal />} />
               <Route path="invitation/:code" element={<AcceptInvitation />} />
               <Route path="rsvp/:token" element={<RSVPConfirm />} />
