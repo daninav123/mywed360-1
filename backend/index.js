@@ -129,7 +129,6 @@ import ipAllowlist from './middleware/ipAllowlist.js';
 import adminAuthRouter from './routes/admin-auth.js';
 import adminSuppliersRouter from './routes/admin-suppliers.js';
 import adminAuditRouter from './routes/admin-audit.js';
-import adminBlogRouter from './routes/admin-blog.js';
 import blogRouter from './routes/blog.js';
 import { startEmailSchedulerWorker } from './workers/emailSchedulerWorker.js';
 import { startMetricAggregatorWorker } from './workers/metricAggregatorWorker.js';
@@ -730,7 +729,7 @@ app.use(
   requireAdmin,
   adminSuppliersRouter
 );
-app.use('/api/admin/blog', ipAllowlist(ADMIN_IP_ALLOWLIST), requireAdmin, adminBlogRouter);
+// app.use('/api/admin/blog', ipAllowlist(ADMIN_IP_ALLOWLIST), requireAdmin, adminBlogRouter); // Eliminado temporalmente
 app.use('/api/admin/audit', ipAllowlist(ADMIN_IP_ALLOWLIST), requireAdmin, adminAuditRouter);
 // Admin metrics dashboard API (solo admin) en ruta separada para no bloquear /api/metrics/* públicos
 // Rutas de métricas y dashboard de admin
@@ -906,12 +905,10 @@ app.use((err, req, res, _next) => {
     );
     res.status(status).json({ success: false, error: { code, message }, requestId });
   } catch (e) {
-    res
-      .status(500)
-      .json({
-        success: false,
-        error: { code: 'internal_error', message: 'Internal server error' },
-      });
+    res.status(500).json({
+      success: false,
+      error: { code: 'internal_error', message: 'Internal server error' },
+    });
   }
 });
 
