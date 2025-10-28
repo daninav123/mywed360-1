@@ -827,16 +827,20 @@ const Proveedores = () => {
                   {/* Selector de modo de búsqueda (DEBUG) */}
                   <div className="flex items-center gap-2">
                     <label className="text-xs font-medium text-muted whitespace-nowrap">
-                      Buscar en:
+                      {t('common.suppliers.overview.searchMode.label')}
                     </label>
                     <select
                       value={searchMode}
                       onChange={(e) => setSearchMode(e.target.value)}
                       className="px-3 py-1.5 text-sm border border-border rounded-md bg-surface text-body focus:outline-none focus:ring-2 focus:ring-primary"
                     >
-                      <option value="auto">🔄 Auto (Híbrido)</option>
-                      <option value="database">💾 Solo Base de Datos</option>
-                      <option value="internet">🌐 Solo Internet</option>
+                      <option value="auto">{t('common.suppliers.overview.searchMode.auto')}</option>
+                      <option value="database">
+                        {t('common.suppliers.overview.searchMode.database')}
+                      </option>
+                      <option value="internet">
+                        {t('common.suppliers.overview.searchMode.internet')}
+                      </option>
                     </select>
                   </div>
 
@@ -931,24 +935,28 @@ const Proveedores = () => {
                                     : 'bg-green-50 border-green-200 text-green-900'
                               }`}
                             >
-                              🎯 Modo de búsqueda:{' '}
-                              {searchMode === 'database'
-                                ? '💾 Solo Base de Datos'
-                                : searchMode === 'internet'
-                                  ? '🌐 Solo Internet'
-                                  : '🔄 Híbrido (Auto)'}
+                              {t('common.suppliers.overview.searchMode.indicator', {
+                                mode:
+                                  searchMode === 'database'
+                                    ? t('common.suppliers.overview.searchMode.database')
+                                    : searchMode === 'internet'
+                                      ? t('common.suppliers.overview.searchMode.internet')
+                                      : t('common.suppliers.overview.searchMode.auto'),
+                              })}
                             </div>
 
                             {/* Breakdown de resultados */}
                             <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
                               <p className="text-sm text-blue-900 font-medium">
-                                Encontrados{' '}
-                                {searchBreakdown.registered +
-                                  searchBreakdown.cached +
-                                  searchBreakdown.internet}{' '}
-                                proveedores ({searchBreakdown.registered} registrados,{' '}
-                                {searchBreakdown.cached} guardados, {searchBreakdown.internet} de
-                                internet)
+                                {t('common.suppliers.overview.breakdown.title', {
+                                  total:
+                                    searchBreakdown.registered +
+                                    searchBreakdown.cached +
+                                    searchBreakdown.internet,
+                                  registered: searchBreakdown.registered,
+                                  cached: searchBreakdown.cached,
+                                  internet: searchBreakdown.internet,
+                                })}
                               </p>
                             </div>
                           </div>

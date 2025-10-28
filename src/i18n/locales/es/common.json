@@ -508,6 +508,16 @@
           "wantedServicesError": "Error al guardar los servicios",
           "providerSaved": "Proveedor guardado correctamente",
           "providerError": "Error al guardar el proveedor"
+        },
+        "searchMode": {
+          "label": "Buscar en:",
+          "auto": "🔄 Auto (Híbrido)",
+          "database": "💾 Solo Base de Datos",
+          "internet": "🌐 Solo Internet",
+          "indicator": "🎯 Modo de búsqueda: {{mode}}"
+        },
+        "breakdown": {
+          "title": "Encontrados {{total}} proveedores ({{registered}} registrados, {{cached}} guardados, {{internet}} de internet)"
         }
       },
       "configureServices": "Configurar servicios",
@@ -3665,18 +3675,8 @@
           "image": "https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=500&q=60",
           "location": "Madrid",
           "price": "1.200 € - 2.500 €",
-          "tags": [
-            "natural",
-            "documental",
-            "exterior",
-            "luz natural"
-          ],
-          "keywords": [
-            "fotógrafo",
-            "natural",
-            "documental",
-            "boda"
-          ]
+          "tags": ["natural", "documental", "exterior", "luz natural"],
+          "keywords": ["fotógrafo", "natural", "documental", "boda"]
         },
         {
           "id": "2",
@@ -3686,17 +3686,8 @@
           "image": "https://images.unsplash.com/photo-1508435234994-67cfd7690508?auto=format&fit=crop&w=500&q=60",
           "location": "Barcelona",
           "price": "1.500 € - 3.000 €",
-          "tags": [
-            "playa",
-            "exterior",
-            "naturaleza"
-          ],
-          "keywords": [
-            "fotógrafo",
-            "boda",
-            "playa",
-            "experiencia"
-          ]
+          "tags": ["playa", "exterior", "naturaleza"],
+          "keywords": ["fotógrafo", "boda", "playa", "experiencia"]
         },
         {
           "id": "3",
@@ -3706,16 +3697,8 @@
           "image": "https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&w=500&q=60",
           "location": "Madrid",
           "price": "70 € - 120 € por persona",
-          "tags": [
-            "vegetariano",
-            "vegano",
-            "buffet"
-          ],
-          "keywords": [
-            "catering",
-            "buffet",
-            "evento"
-          ]
+          "tags": ["vegetariano", "vegano", "buffet"],
+          "keywords": ["catering", "buffet", "evento"]
         },
         {
           "id": "4",
@@ -3725,16 +3708,8 @@
           "image": "https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?auto=format&fit=crop&w=500&q=60",
           "location": "Valencia",
           "price": "800 € - 1.500 €",
-          "tags": [
-            "dj",
-            "música",
-            "iluminación"
-          ],
-          "keywords": [
-            "dj",
-            "música",
-            "evento"
-          ]
+          "tags": ["dj", "música", "iluminación"],
+          "keywords": ["dj", "música", "evento"]
         },
         {
           "id": "5",
@@ -3744,16 +3719,8 @@
           "image": "https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&w=500&q=60",
           "location": "Sevilla",
           "price": "500 € - 1.500 €",
-          "tags": [
-            "flores",
-            "decoración",
-            "boho"
-          ],
-          "keywords": [
-            "flores",
-            "decoración",
-            "boda"
-          ]
+          "tags": ["flores", "decoración", "boho"],
+          "keywords": ["flores", "decoración", "boda"]
         }
       ]
     },
