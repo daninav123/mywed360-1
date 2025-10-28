@@ -1,49 +1,77 @@
-# ✅ Búsqueda Ajustada - Solo Internet si BD vacía
+# ✅ Búsqueda Inteligente - Lógica de 5 Proveedores
 
-**Fecha:** 2025-01-28  
-**Cambio:** Buscar en internet SOLO si NO hay resultados en BD
+**Fecha:** 2025-10-28  
+**Estado:** ✅ Implementado  
+**Cambio:** Sistema inteligente que busca en internet según cantidad de proveedores registrados
 
 ---
 
-## 🔧 **Cambio realizado:**
+## 🔧 **EVOLUCIÓN DEL SISTEMA:**
 
-### **ANTES:**
+### **VERSIÓN 1:**
 ```javascript
 if (registeredResults.length < 10) {
   // Buscar en internet si hay menos de 10
 }
 ```
 
-### **AHORA:**
+### **VERSIÓN 2:**
 ```javascript
 if (registeredResults.length === 0) {
   // Buscar en internet SOLO si NO hay ningún resultado
 }
 ```
 
+### **VERSIÓN 3 (ACTUAL):**
+```javascript
+const MIN_RESULTS = 5;
+
+if (trueRegistered.length < MIN_RESULTS) {
+  // Buscar en internet si hay menos de 5 REGISTRADOS REALES
+  // Distingue entre registered=true y registered=false
+}
+```
+
 ---
 
-## 📊 **Nuevo flujo:**
+## 📊 **Flujo actual (con búsqueda por NOMBRE):**
 
 ```
-Usuario busca "fotógrafo bodas Valencia"
+Usuario busca "ReSona valencia"
          ↓
-  1. Buscar en FIRESTORE
-     - Filtrar por service="fotografia"
-     - Filtrar por location="Valencia"
-     - Aplicar filtros de presupuesto, rating, etc.
+  1. Buscar en FIRESTORE POR NOMBRE
+     - NO filtrar por category (campo ignorado)
+     - Buscar coincidencias en: name, description, tags
+     - Traer hasta 100 documentos
          ↓
-  2. ¿Cuántos resultados?
+  2. Filtrar en MEMORIA
+     - searchTerm = "resona" (lowercase)
+     - Match: supplierName.includes(searchTerm)
+     - Match: supplierDesc.includes(searchTerm)
+     - Match: supplierTags.includes(searchTerm)
+         ↓
+  3. Separar REGISTRADOS de CACHÉ
+     - registered === true  → trueRegistered[]
+     - registered === false → cachedResults[]
+         ↓
+  4. ¿Cuántos registrados REALES?
      
-     > 0 resultados → DEVOLVER SOLO BD ✅
+     ≥ 5 registrados → SOLO MOSTRAR REGISTRADOS ✅
+                       NO buscar en Tavily
      
-     = 0 resultados → BUSCAR EN TAVILY 🌐
+     1-4 registrados → REGISTRADOS + TAVILY 🌐
+                       Complementar con internet
+     
+     = 0 registrados → CACHÉ + TAVILY 🌐
+                       Mostrar todo disponible
          ↓
-  3. Si buscó en Tavily:
-     - Filtrar duplicados
+  5. Si buscó en Tavily:
+     - Filtrar duplicados (por email/URL)
+     - Separar bodas.net de otros
      - Combinar resultados
          ↓
-  4. Devolver al usuario
+  6. Devolver al usuario
+     Orden: [Registrados] → [Internet]
 ```
 
 ---

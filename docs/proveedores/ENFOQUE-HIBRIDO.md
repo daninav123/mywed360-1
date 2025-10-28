@@ -1,19 +1,21 @@
-# 🔄 Enfoque Híbrido - Transición Progresiva
+# 🔄 Enfoque Híbrido - Sistema Inteligente de Búsqueda
 
-**Actualización:** 2025-01-28  
-**Estrategia:** Inicio con internet → Transición gradual → Plataforma propia
+**Actualización:** 2025-10-28  
+**Estado:** ✅ Implementado  
+**Estrategia:** Búsqueda flexible por nombre + Lógica de 5 proveedores
 
 ---
 
 ## 🎯 VISIÓN GENERAL
 
-En lugar de crear una base de datos completa desde cero, empezamos buscando en **todo internet** y progresivamente priorizamos proveedores **registrados en nuestra plataforma**.
+Sistema híbrido que combina **base de datos propia (Firestore)** con **búsqueda en internet (Tavily)** de forma inteligente, priorizando proveedores registrados y optimizando costes.
 
 ### **¿Por qué híbrido?**
-- ✅ **Lanzamiento inmediato** - No esperar a tener proveedores registrados
-- ✅ **Catálogo completo** - Mostrar TODOS los proveedores disponibles
-- ✅ **Incentivo natural** - Proveedores quieren destacar → se registran
-- ✅ **Transición suave** - Sin cambios bruscos para usuarios
+- ✅ **Lanzamiento inmediato** - Funciona desde día 1 aunque no tengas proveedores
+- ✅ **Catálogo completo** - Muestra proveedores reales y de internet
+- ✅ **Incentivo natural** - Proveedores registrados aparecen primero
+- ✅ **Optimización de costes** - Reduce llamadas a Tavily automáticamente
+- ✅ **Búsqueda flexible** - Por nombre, no categorías rígidas
 
 ---
 
@@ -61,66 +63,59 @@ En lugar de crear una base de datos completa desde cero, empezamos buscando en *
 
 ---
 
-## 🔄 FLUJO DE BÚSQUEDA POR FASE
+## 🔄 FLUJO DE BÚSQUEDA ACTUAL (IMPLEMENTADO)
 
-### **FASE 1: Solo Internet (Ahora)**
-
-```javascript
-Usuario busca "fotógrafo Valencia"
-         ↓
-    Tavily API
-         ↓
-  Resultados de internet
-  (bodas.net, Instagram, webs)
-         ↓
-  Guardar en Firestore (background, silencioso)
-         ↓
-  Mostrar al usuario
-```
-
-**Ventaja:** Lanzamiento inmediato, catálogo completo desde día 1.
-
----
-
-### **FASE 2: Híbrido con Priorización**
+### **Sistema Inteligente con Lógica de 5 Proveedores**
 
 ```javascript
-Usuario busca "fotógrafo Valencia"
+Usuario busca "ReSona valencia"
          ↓
-    1️⃣ Buscar en Firestore
-       ¿Hay proveedores registrados?
+    1️⃣ BUSCAR EN FIRESTORE POR NOMBRE
+       - NO filtra por category
+       - Busca en: name, description, tags
+       - Trae hasta 100 resultados
          ↓
-       SÍ → Mostrar primero (con badge ✓)
+    2️⃣ FILTRAR EN MEMORIA
+       searchTerm = "resona"
+       Match: name, description o tags
          ↓
-    2️⃣ Buscar en Tavily
-       Completar con proveedores de internet
+    3️⃣ SEPARAR REGISTRADOS DE CACHÉ
+       registered = true  → trueRegistered[]
+       registered = false → cachedResults[]
          ↓
-    3️⃣ Mezclar resultados
-       [VERIFICADOS] + [Internet]
+    4️⃣ DECIDIR SEGÚN CANTIDAD
+       
+       ┌─────────────────────────────────────┐
+       │ ≥5 registrados?                     │
+       ├─────────────────────────────────────┤
+       │ SÍ → Solo mostrar registrados       │
+       │      NO buscar en Tavily            │
+       └─────────────────────────────────────┘
+                    ↓
+       ┌─────────────────────────────────────┐
+       │ 1-4 registrados?                    │
+       ├─────────────────────────────────────┤
+       │ SÍ → Mostrar registrados            │
+       │      + Buscar en Tavily (complemento)│
+       └─────────────────────────────────────┘
+                    ↓
+       ┌─────────────────────────────────────┐
+       │ 0 registrados?                      │
+       ├─────────────────────────────────────┤
+       │ SÍ → Mostrar caché                  │
+       │      + Buscar en Tavily             │
+       └─────────────────────────────────────┘
          ↓
-  Mostrar al usuario
+    5️⃣ DEVOLVER AL USUARIO
+       [Registrados] primero
+       [Internet] después
 ```
 
-**Ventaja:** Proveedores registrados destacan, incentivo para registrarse.
-
----
-
-### **FASE 3-4: Prioridad a Plataforma**
-
-```javascript
-Usuario busca "fotógrafo Valencia"
-         ↓
-    Buscar en Firestore
-         ↓
-    ¿Hay > 10 registrados?
-         ↓
-       SÍ → Solo mostrar registrados
-       NO → Completar con Tavily
-         ↓
-  Mostrar al usuario
-```
-
-**Ventaja:** Reduce costes de Tavily, plataforma autosuficiente.
+**Ventajas:**
+- ✅ Búsqueda flexible por nombre
+- ✅ Optimización automática de costes
+- ✅ Siempre muestra resultados relevantes
+- ✅ Prioriza proveedores registrados
 
 ---
 
