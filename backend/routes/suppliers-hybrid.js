@@ -150,13 +150,21 @@ router.post('/search', async (req, res) => {
 
       const snapshot = await firestoreQuery.get();
 
+      console.log(`📊 [FIRESTORE] ${snapshot.size} documentos encontrados en colección suppliers`);
+
       let registeredResults = snapshot.docs
         .map((doc) => {
           const data = doc.data();
 
-          // DEBUG: Log para ver el valor de registered
+          // DEBUG: Log completo del proveedor
+          console.log(`\n[DEBUG] Proveedor ID: ${doc.id}`);
+          console.log(`   name: "${data.name}"`);
+          console.log(`   registered: ${data.registered} (${typeof data.registered})`);
+          console.log(`   status: "${data.status}"`);
+          console.log(`   category: "${data.category || data.profile?.category}"`);
+          console.log(`   tags: [${(data.tags || []).join(', ')}]`);
           console.log(
-            `[DEBUG] Proveedor: ${data.name}, registered: ${data.registered}, type: ${typeof data.registered}`
+            `   description: "${(data.business?.description || '').substring(0, 50)}..."`
           );
 
           return {
@@ -191,25 +199,52 @@ router.post('/search', async (req, res) => {
           }
 
           const tokens = [...new Set(searchTokens.filter(Boolean))];
-          if (tokens.length === 0) return true;
+
+          console.log(`\n🔍 [FILTER] Evaluando: ${supplier.name}`);
+          console.log(`   Tokens búsqueda: [${tokens.join(', ')}]`);
+          console.log(`   Name: "${supplierName}"`);
+          console.log(`   Tags: "${supplierTags}"`);
+          console.log(`   Desc: "${supplierDesc.substring(0, 50)}..."`);
+
+          if (tokens.length === 0) {
+            console.log(`   ✅ SIN TOKENS - Incluido`);
+            return true;
+          }
 
           const haystacks = [supplierName, supplierDesc, supplierTags];
           const normalizedHaystacks = haystacks.map(normalizeText);
 
-          return tokens.some((term) => {
+          const matches = tokens.some((term) => {
             const token = term.toLowerCase();
             const normalizedToken = normalizeText(token);
 
-            return (
+            const found =
               haystacks.some((h) => h.includes(token)) ||
-              normalizedHaystacks.some((h) => h.includes(normalizedToken))
-            );
+              normalizedHaystacks.some((h) => h.includes(normalizedToken));
+
+            if (found) {
+              console.log(`   ✅ MATCH con token "${term}"`);
+            }
+
+            return found;
           });
+
+          if (!matches) {
+            console.log(`   ❌ NO MATCH - Filtrado`);
+          }
+
+          return matches;
         })
         // Filtrar por status en memoria (evita índice compuesto)
         .filter((supplier) => {
           const status = supplier.status || 'active';
-          return status === 'active' || status === 'discovered';
+          const isValid = status === 'active' || status === 'discovered';
+
+          if (!isValid) {
+            console.log(`❌ [STATUS] ${supplier.name} filtrado por status: "${status}"`);
+          }
+
+          return isValid;
         })
         // Ordenar por matchScore en memoria (evita índice compuesto)
         .sort((a, b) => {
