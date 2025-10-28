@@ -1,0 +1,385 @@
+# 📊 DIAGRAMA: ESTRUCTURA FIRESTORE PROPUESTA
+
+**Visual rápida de la organización propuesta**
+
+---
+
+## 🎯 VISTA GENERAL
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                      FIRESTORE                               │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│  👤 USUARIOS                  💒 BODAS (Core Business)       │
+│  ├─ users/                    ├─ weddings/                  │
+│  │   └─ {uid}/                │   └─ {weddingId}/          │
+│  │       ├─ profile           │       ├─ info               │
+│  │       ├─ preferences       │       ├─ team               │
+│  │       └─ notifications     │       ├─ guests/            │
+│  │                             │       ├─ tasks/             │
+│  📧 EMAIL GLOBAL              │       ├─ suppliers/         │
+│  ├─ emailTemplates/           │       ├─ finance/           │
+│  ├─ emailQueue/               │       ├─ emails/            │
+│  └─ emailEvents/              │       ├─ automation/        │
+│                                │       ├─ metrics/           │
+│  🎯 CATÁLOGO PROVEEDORES      │       └─ settings/          │
+│  └─ suppliers/                │                             │
+│      └─ {supplierId}/         │  💰 PAGOS                   │
+│          ├─ profile            │  ├─ payments/              │
+│          ├─ portfolio          │  ├─ subscriptions/         │
+│          ├─ reviews            │  ├─ invoices/              │
+│          └─ analytics/         │  └─ refunds/               │
+│                                │                             │
+│  🔗 PARTNERS                  📊 ANALÍTICA                  │
+│  ├─ partners/                  ├─ analytics/               │
+│  └─ discounts/                 └─ feedback/                │
+│                                                              │
+│  🤖 AUTOMATIZACIÓN            ⚙️ SISTEMA                    │
+│  ├─ automationJobs/            ├─ config/                  │
+│  └─ automationLogs/            └─ audit/                   │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 💒 DETALLE: COLECCIÓN `weddings/`
+
+```
+weddings/{weddingId}/
+│
+├─ 📄 info/                     # Información básica
+│   ├─ date                     # Fecha de la boda
+│   ├─ location                 # Ubicación
+│   ├─ style                    # Estilo
+│   └─ budget                   # Presupuesto total
+│
+├─ 👥 team/                     # Equipo
+│   ├─ owners: [uid1, uid2]     # Novios
+│   ├─ planners: [uid3]         # Wedding planners
+│   └─ assistants: [uid4]       # Asistentes
+│
+├─ 👥 guests/                   # Invitados
+│   └─ {guestId}/
+│       ├─ name
+│       ├─ email
+│       ├─ phone
+│       ├─ rsvpStatus
+│       ├─ companions
+│       ├─ dietaryRestrictions
+│       ├─ table
+│       │
+│       ├─ responses/           # Respuestas RSVP
+│       │   └─ {responseId}/
+│       │
+│       └─ notes/               # Notas sobre el invitado
+│           └─ {noteId}/
+│
+├─ ✅ tasks/                    # Tareas
+│   └─ {taskId}/
+│       ├─ title
+│       ├─ description
+│       ├─ dueDate
+│       ├─ status
+│       ├─ assignedTo
+│       └─ category
+│
+├─ 🎯 suppliers/                # Proveedores CONTRATADOS
+│   └─ {supplierId}/
+│       ├─ name
+│       ├─ service
+│       ├─ status              # confirmed, pending, contacted
+│       ├─ contactDate
+│       │
+│       ├─ contracts/          # Contratos firmados
+│       │   └─ {contractId}/
+│       │
+│       ├─ budgets/            # Presupuestos recibidos
+│       │   └─ {budgetId}/
+│       │
+│       └─ payments/           # Pagos realizados
+│           └─ {paymentId}/
+│
+├─ 💰 finance/                  # Finanzas
+│   └─ {transactionId}/
+│       ├─ type                # income / expense
+│       ├─ amount
+│       ├─ category
+│       ├─ supplier
+│       ├─ date
+│       ├─ paymentMethod
+│       └─ receipt
+│
+├─ 📧 emails/                   # Emails de la boda
+│   └─ {emailId}/
+│       ├─ from
+│       ├─ to
+│       ├─ subject
+│       ├─ body
+│       ├─ folder             # inbox, sent, trash
+│       ├─ read
+│       ├─ tags
+│       │
+│       └─ attachments/       # Adjuntos
+│           └─ {attachmentId}/
+│
+├─ 🤖 automation/               # Automatización
+│   ├─ rules/                  # Reglas configuradas
+│   │   └─ {ruleId}/
+│   │       ├─ name
+│   │       ├─ trigger
+│   │       ├─ conditions
+│   │       ├─ actions
+│   │       └─ active
+│   │
+│   └─ history/                # Historial de ejecuciones
+│       └─ {executionId}/
+│           ├─ ruleId
+│           ├─ executedAt
+│           ├─ success
+│           └─ logs
+│
+├─ 📊 metrics/                  # Métricas de la boda
+│   └─ daily/
+│       └─ {YYYY-MM-DD}/
+│           ├─ emailsSent
+│           ├─ tasksCompleted
+│           ├─ budgetSpent
+│           ├─ guestsConfirmed
+│           └─ suppliersContacted
+│
+└─ ⚙️ settings/                 # Configuración
+    ├─ email/                  # Config de email
+    │   ├─ autoReplies
+    │   ├─ signatures
+    │   └─ templates
+    │
+    ├─ notifications/          # Config notificaciones
+    │   ├─ channels
+    │   └─ preferences
+    │
+    └─ integrations/           # Integraciones externas
+        ├─ calendar
+        ├─ accounting
+        └─ crm
+```
+
+---
+
+## 🎯 DETALLE: CATÁLOGO `suppliers/`
+
+```
+suppliers/{supplierId}/
+│
+├─ 📄 profile/                  # Perfil público
+│   ├─ name
+│   ├─ slug
+│   ├─ category
+│   ├─ description
+│   ├─ location
+│   │   ├─ city
+│   │   ├─ province
+│   │   └─ country
+│   │
+│   ├─ contact
+│   │   ├─ email
+│   │   ├─ phone
+│   │   ├─ website
+│   │   └─ instagram
+│   │
+│   ├─ business
+│   │   ├─ priceRange
+│   │   ├─ minBudget
+│   │   ├─ maxBudget
+│   │   ├─ services: []
+│   │   └─ availability
+│   │
+│   ├─ registered             # true/false
+│   ├─ status                 # active, discovered, pending
+│   └─ source                 # registration, tavily, bodas-net
+│
+├─ 📸 portfolio/                # Portfolio de trabajos
+│   └─ {imageId}/
+│       ├─ url
+│       ├─ title
+│       ├─ category
+│       └─ order
+│
+├─ ⭐ reviews/                  # Reseñas
+│   └─ {reviewId}/
+│       ├─ weddingId
+│       ├─ userId
+│       ├─ rating
+│       ├─ comment
+│       ├─ date
+│       └─ verified
+│
+├─ 💵 pricing/                  # Precios y paquetes
+│   └─ {packageId}/
+│       ├─ name
+│       ├─ price
+│       ├─ description
+│       └─ includes: []
+│
+└─ 📊 analytics/                # Analítica del proveedor
+    ├─ views/                  # Vistas del perfil
+    │   └─ {viewId}/
+    │
+    ├─ clicks/                 # Clicks en contacto
+    │   └─ {clickId}/
+    │
+    └─ contacts/               # Contactos recibidos
+        └─ {contactId}/
+```
+
+---
+
+## 🔄 COMPARACIÓN: ANTES vs DESPUÉS
+
+### **EMAILS**
+
+#### **ANTES (Duplicado):**
+```
+mails/{emailId}                   # ❌ Emails globales
+users/{uid}/mails/{emailId}       # ❌ Emails de usuario
+weddings/{wid}/emailHistory/      # ❌ Historial separado
+```
+
+#### **DESPUÉS (Unificado):**
+```
+weddings/{wid}/emails/{emailId}/  # ✅ Un solo lugar
+  └─ attachments/
+```
+
+---
+
+### **PROVEEDORES**
+
+#### **ANTES (Mezclado):**
+```
+suppliers/{id}                    # ❌ Catálogo + Contratados mezclados
+supplier_events/{id}              # ❌ Eventos separados
+```
+
+#### **DESPUÉS (Separado):**
+```
+suppliers/{id}/                   # ✅ Solo CATÁLOGO
+  └─ analytics/                   # ✅ Analítica integrada
+
+weddings/{wid}/suppliers/{id}/    # ✅ CONTRATADOS por boda
+  ├─ contracts/
+  ├─ budgets/
+  └─ payments/
+```
+
+---
+
+### **MÉTRICAS**
+
+#### **ANTES (Fragmentado):**
+```
+projectMetrics_events/{id}        # ❌ Eventos sin procesar
+projectMetrics/{wid}/modules/     # ❌ Estructura compleja
+  └─ {module}/
+      └─ daily/{date}/
+```
+
+#### **DESPUÉS (Simple):**
+```
+weddings/{wid}/metrics/daily/{date}/  # ✅ Directo y simple
+  ├─ emailsSent
+  ├─ tasksCompleted
+  └─ budgetSpent
+```
+
+---
+
+## 🎯 BENEFICIOS VISUALES
+
+### **ANTES:**
+```
+users/
+├─ {uid}/
+│   ├─ weddings/          ┐
+│   └─ mails/             │  DUPLICACIÓN
+weddings/                 │
+├─ {wid}/                 ┘
+mails/                    ┘
+└─ {emailId}/
+```
+
+### **DESPUÉS:**
+```
+users/
+└─ {uid}/
+    └─ profile            ✅ Solo perfil
+
+weddings/
+└─ {wid}/
+    ├─ emails/           ✅ Todo en un lugar
+    ├─ guests/           ✅ Jerarquía clara
+    ├─ suppliers/        ✅ Fácil de entender
+    └─ ...
+```
+
+---
+
+## 🔐 SEGURIDAD SIMPLIFICADA
+
+### **ANTES (Complejo):**
+```javascript
+// Reglas para múltiples ubicaciones
+match /users/{uid}/weddings/{wid} { ... }
+match /weddings/{wid} { ... }
+match /users/{uid}/mails/{mid} { ... }
+match /weddings/{wid}/emailHistory/{mid} { ... }
+```
+
+### **DESPUÉS (Simple):**
+```javascript
+// Una sola regla para toda la boda
+match /weddings/{weddingId}/{document=**} {
+  allow read, write: if isWeddingTeamMember(weddingId);
+}
+
+// Proveedores pueden ver su analítica
+match /suppliers/{supplierId}/analytics/{document=**} {
+  allow read: if isSupplierOwner(supplierId);
+}
+```
+
+---
+
+## 📈 QUERIES MÁS EFICIENTES
+
+### **ANTES:**
+```javascript
+// Buscar todos los emails de una boda
+const userMails = await db.collection('users').doc(uid).collection('mails').get();
+const globalMails = await db.collection('mails').where('weddingId', '==', wid).get();
+const history = await db.collection('weddings').doc(wid).collection('emailHistory').get();
+// ❌ 3 queries + merge manual
+```
+
+### **DESPUÉS:**
+```javascript
+// Una sola query
+const emails = await db.collection('weddings').doc(wid).collection('emails').get();
+// ✅ 1 query, simple y rápido
+```
+
+---
+
+## 🎯 CONCLUSIÓN
+
+La nueva estructura es:
+- ✅ **Más simple** - Menos duplicación
+- ✅ **Más clara** - Jerarquía lógica
+- ✅ **Más segura** - Reglas más fáciles
+- ✅ **Más rápida** - Menos queries
+- ✅ **Más escalable** - Preparada para crecer
+
+---
+
+**Ver propuesta completa:** `PROPUESTA-ORGANIZACION-FIRESTORE.md`
