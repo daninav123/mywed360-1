@@ -1,6 +1,7 @@
 import { User, Phone, Mail, Edit2, Trash2, MessageCircle } from 'lucide-react';
-import React, { useMemo, useCallback } from 'react';
-
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Plus, Search, Filter, Download, Mail } from 'lucide-react';
+import { toast } from 'react-toastify';
 import useTranslations from '../../hooks/useTranslations';
 import { Button } from '../ui';
 
@@ -131,15 +132,15 @@ const GuestList = React.memo(
           const result = await onInviteEmail(guest);
           if (result?.success) {
             if (guest?.email) {
-              alert(`Email enviado a ${guest.email}`);
+              toast.success(t('guests.email.sent', { email: guest.email }));
             } else {
-              alert('Email enviado correctamente.');
+              toast.success(t('guests.email.sentSuccess'));
             }
           } else if (result?.error) {
-            alert(`Error enviando email: ${result.error}`);
+            toast.error(t('guests.email.sendError', { error: result.error }));
           }
         } catch (error) {
-          alert('No se pudo enviar el email.');
+          toast.error(t('guests.email.sendFailed'));
         }
       },
       [onInviteEmail]
@@ -203,7 +204,7 @@ const GuestList = React.memo(
           </div>
           <div className="bg-white p-4 rounded-lg shadow-sm border">
             <div className="text-2xl font-bold text-purple-600">{stats.totalAttendees}</div>
-            <div className="text-sm text-muted">Total asistentes</div>
+            <div className="text-sm text-muted">{t('guests.stats.totalAttendees')}</div>
           </div>
         </div>
 
@@ -211,11 +212,11 @@ const GuestList = React.memo(
         {filteredGuests.length === 0 ?(
           <div className="text-center py-12 bg-gray-50 rounded-lg">
             <User size={48} className="mx-auto text-muted mb-4" />
-            <h3 className="text-lg font-medium text-body mb-2">No se encontraron invitados</h3>
+            <h3 className="text-lg font-medium text-body mb-2">{t('guests.empty.title')}</h3>
             <p className="text-muted">
               {searchTerm || statusFilter || tableFilter
-                ?'Intenta ajustar los filtros de búsqueda'
-                : 'Añade tu primer invitado para comenzar'}
+                ? t('guests.empty.searchHint')
+                : t('guests.empty.defaultHint')}
             </p>
           </div>
         ) : (
@@ -229,7 +230,7 @@ const GuestList = React.memo(
                       <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
                         <input
                           type="checkbox"
-                          aria-label="Seleccionar todos"
+                          aria-label={t('guests.actions.selectAll')}
                           checked={allVisibleSelected}
                           onChange={(e) => {
                             if (onToggleSelectAll) {

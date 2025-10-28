@@ -1,5 +1,7 @@
-import { onAuthStateChanged } from 'firebase/auth';
-import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Mail, Send, Trash2, Archive, Star, Clock, CheckCircle } from 'lucide-react';
+import { toast } from 'react-toastify';
+import useTranslations from '../hooks/useTranslations';
 
 import ChipToggle from '../components/email/ChipToggle';
 import { formatDate } from '../utils/formatUtils';
@@ -260,7 +262,7 @@ const UnifiedEmail = () => {
       setSelected((prev) => (prev ? { ...prev, read: true } : prev));
     } catch (err) {
       console.error('Error marcando le)do:', err);
-      alert('No se pudo marcar como le)do');
+      toast.error(t('email.markReadError'));
     }
   };
 
@@ -271,7 +273,7 @@ const UnifiedEmail = () => {
       setSelected(null);
     } catch (err) {
       console.error('Error eliminando correo:', err);
-      alert('No se pudo eliminar el correo');
+      toast.error(t('email.deleteError'));
     }
   };
   async function handleToggleRead(mail) {

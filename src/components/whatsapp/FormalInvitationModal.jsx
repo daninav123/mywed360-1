@@ -1,6 +1,6 @@
-﻿import React, { useEffect, useMemo, useState } from 'react';
-
-import Modal from '../Modal';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Send, Users, FileText } from 'lucide-react';
+import { toast } from 'react-toastify';
 import { Button } from '../ui';
 import { Input } from '../ui';
 
@@ -69,7 +69,7 @@ export default function FormalInvitationModal({
       return;
     }
     if (!requiresCoupleSignature(message, coupleName)) {
-      alert('El mensaje debe incluir el nombre de la pareja o la variable {coupleName}.');
+      toast.error(t('whatsapp.coupleNameRequired'));
       return;
     }
     setSending(true);
@@ -90,11 +90,11 @@ export default function FormalInvitationModal({
 
   const handleDelivery = async (channel) => {
     if (!selectedCount) {
-      alert('Selecciona al menos un invitado');
+      toast.error(t('whatsapp.selectGuests'));
       return;
     }
     if (!assetUrl) {
-      alert('Añade la URL de la invitación diseñada antes de continuar.');
+      toast.error(t('whatsapp.assetUrlRequired'));
       return;
     }
     setSending(true);

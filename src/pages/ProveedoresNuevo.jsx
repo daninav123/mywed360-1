@@ -374,6 +374,38 @@ const Proveedores = () => {
     );
   }, [currentLanguage, normalizedWanted, providersSource, shortlist, t]);
 
+  const resolvedLocation = useMemo(() => {
+    const profile = (weddingProfile && (weddingProfile.weddingInfo || weddingProfile)) || {};
+    const candidates = [
+      profile.location,
+      profile.city,
+      profile.celebrationPlace,
+      profile.ceremonyLocation,
+      profile.receptionVenue,
+      profile.destinationCity,
+      profile.country
+    ];
+
+    for (const candidate of candidates) {
+      if (!candidate) continue;
+      if (typeof candidate === 'string') {
+        const trimmedValue = candidate.trim();
+        if (trimmedValue) return trimmedValue;
+      }
+      if (typeof candidate === 'object') {
+        const city =
+          typeof candidate.city === 'string' ? candidate.city.trim() : '';
+        if (city) return city;
+
+        const name =
+          typeof candidate.name === 'string' ? candidate.name.trim() : '';
+        if (name) return name;
+      }
+    }
+
+    return t('common.suppliers.overview.defaults.country');
+  }, [t, weddingProfile]);
+
   const performSearch = useCallback(
     async (rawQuery, { saveHistory = false, silent = false } = {}) => {
       const trimmed = (rawQuery || '').trim();
@@ -403,9 +435,7 @@ const Proveedores = () => {
         // Usar nuevo sistema híbrido (BD propia → bodas.net → internet)
         const result = await searchSuppliersHybrid(
           trimmed, // service/category
-          weddingProfile?.location ||
-            weddingProfile?.city ||
-            t('common.suppliers.overview.defaults.country'),
+          resolvedLocation,
           enrichedQuery || '', // query adicional
           weddingProfile?.budget, // budget
           {} // filters
@@ -439,7 +469,7 @@ const Proveedores = () => {
         setAiLoading(false);
       }
     },
-    [profileSearchTokens, registerSearchQuery, setSearchTerm, weddingProfile]
+    [profileSearchTokens, registerSearchQuery, resolvedLocation, setSearchTerm, weddingProfile]
   );
 
   const totalSearchPages = useMemo(() => {

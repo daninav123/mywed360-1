@@ -8,12 +8,15 @@ import {
   Loader2,
   Info,
   CheckCircle,
+  Check,
+  X,
   Wallet,
   TrendingUp,
   TrendingDown,
   PieChart,
 } from 'lucide-react';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { toast } from 'react-toastify';
 
 import useTranslations from '../../hooks/useTranslations';
 import { formatCurrency } from '../../utils/formatUtils';
@@ -391,19 +394,11 @@ const distributeIncrease = (amounts, indices, delta) => {
   const handleSaveCategory = () => {
     const amount = Number(newCategory.amount);
     if (!newCategory.name.trim()) {
-      alert(
-        t('finance.budget.errors.nameRequired', {
-          defaultValue: 'Category name is required',
-        })
-      );
+      toast.error(t('finance.budget.errors.nameRequired'));
       return;
     }
     if (isNaN(amount) || amount < 0) {
-      alert(
-        t('finance.budget.errors.amountInvalid', {
-          defaultValue: 'Amount must be a valid number',
-        })
-      );
+      toast.error(t('finance.budget.errors.amountInvalid'));
       return;
     }
     if (editingCategory) {
@@ -411,7 +406,7 @@ const distributeIncrease = (amounts, indices, delta) => {
     } else {
       const result = onAddCategory(newCategory.name.trim(), amount);
       if (!result.success) {
-        alert(result.error);
+        toast.error(result.error);
         return;
       }
     }
@@ -438,7 +433,7 @@ const distributeIncrease = (amounts, indices, delta) => {
       await onRequestAdvisor();
     } catch (err) {
       console.error('[BudgetManager] advisor request failed', err);
-      alert(err?.message || t('finance.budget.advisorErrors.requestFailed', { defaultValue: 'Unable to fetch advisor recommendation.' }));
+      toast.error(err?.message || t('finance.budget.advisorErrors.requestFailed'));
     } finally {
       setLocalAdvisorLoading(false);
     }
@@ -458,7 +453,7 @@ const distributeIncrease = (amounts, indices, delta) => {
         await onRefreshAdvisor();
       } catch (err) {
         console.error('[BudgetManager] advisor refresh failed', err);
-        alert(err?.message || t('finance.budget.advisorErrors.refreshFailed', { defaultValue: 'Unable to refresh advisor recommendation.' }));
+        toast.error(err?.message || t('finance.budget.advisorErrors.refreshFailed'));
       } finally {
         setLocalAdvisorLoading(false);
       }
@@ -480,13 +475,13 @@ const distributeIncrease = (amounts, indices, delta) => {
           : t('finance.budget.advisorErrors.applyFailed', {
               defaultValue: 'Unable to apply the recommended scenario.',
             });
-        alert(message);
+        toast.error(message);
       } else {
         setShowAdvisorModal(false);
       }
     } catch (err) {
       console.error('[BudgetManager] apply advisor scenario failed', err);
-      alert(err?.message || t('finance.budget.advisorErrors.applyFailed', { defaultValue: 'Unable to apply the recommended scenario.' }));
+      toast.error(err?.message || t('finance.budget.advisorErrors.applyFailed'));
     }
   };
 

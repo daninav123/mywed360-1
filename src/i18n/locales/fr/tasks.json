@@ -131,6 +131,13 @@
           "upcoming": "No upcoming tasks scheduled",
           "filters": "No tasks match the selected filters",
           "columns": "No columns"
+        },
+        "dependencies": {
+          "blocked_one": "Blocked ({{count}} pending)",
+          "blocked_other": "Blocked ({{count}} pending)",
+          "resolved": "Dependencies cleared ({{count}})",
+          "pendingTitle": "Tasks pending to unblock:",
+          "completedTitle": "Completed tasks:"
         }
       },
       "allTasks": {
@@ -155,6 +162,9 @@
         "badges": {
           "noDate": "No scheduled date",
           "assigned": "Assigned to {{name}}"
+        },
+        "defaults": {
+          "task": "Task"
         }
       },
       "form": {
@@ -193,6 +203,16 @@
           "cancel": "Cancel",
           "save": "Save",
           "saving": "Saving..."
+        },
+        "validation": {
+          "titleRequired": "Please enter a title.",
+          "startRequired": "Please select a start date.",
+          "endRequired": "Please select an end date.",
+          "invalidDates": "The provided dates are not valid.",
+          "endAfterStart": "The end date must be later than the start date."
+        },
+        "errors": {
+          "saveFailed": "We couldn't save the task."
         }
       },
       "sidePanel": {
@@ -257,6 +277,64 @@
           "more": "Zoom in timeline",
           "reset": "Fit the entire Gantt timeline",
           "label": "Gantt horizontal zoom"
+        },
+        "title": "Events Calendar",
+        "errors": {
+          "title": "Calendar failed to load",
+          "description": "We had trouble loading the calendar. Manage your events from the list below."
+        },
+        "empty": "No tasks available",
+        "fallback": {
+          "eventUntitled": "Untitled event"
+        }
+      },
+      "dependencies": {
+        "blocked": "You can't complete this task yet.\n\nComplete these tasks first: {{tasks}}"
+      },
+      "gantt": {
+        "title": "Long-Term Planning",
+        "controls": {
+          "showSubtasks": "Show subtasks",
+          "zoomLabel": "Zoom",
+          "fit": "Fit",
+          "clearFilters": "Clear filters"
+        },
+        "filters": {
+          "categoryAll": "All categories",
+          "categoryNone": "No category",
+          "assigneeAll": "All assignees",
+          "assigneeUnassigned": "Unassigned",
+          "statusAll": "All statuses",
+          "statusCritical": "Critical only",
+          "statusWarning": "Attention only",
+          "statusOk": "In progress only"
+        },
+        "empty": {
+          "noScheduled": "No timeline blocks yet. Import a template or create a parent task from the checklist to get started."
+        }
+      },
+      "common": {
+        "noWeddingTitle": "Select or create a wedding to manage tasks",
+        "noWeddingDescription": "There is no active wedding at the moment. Head to the “Weddings” section to choose an existing one or create a new wedding.",
+        "errors": {
+          "generic": "Something went wrong."
+        },
+        "fallbacks": {
+          "task": "Task",
+          "untitled": "Untitled",
+          "untitledTask": "Untitled task"
+        }
+      },
+      "notifications": {
+        "overdueTitle": "Task overdue",
+        "upcomingTitle": "Task due soon",
+        "overdueMessage": "{{name}} was due ({{date}})",
+        "upcomingMessage": "{{name}} is due within 24h ({{date}})",
+        "blocks": {
+          "delayed": "Block overdue and unfinished",
+          "overdueSubtasks": "{{count}} overdue subtasks",
+          "progressBehind": "Progress is behind the expected pace",
+          "completed": "Block completed"
         }
       }
     }

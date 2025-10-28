@@ -1,8 +1,10 @@
 // pages/suppliers/SupplierRegister.jsx
 // Registro de nuevos proveedores
 
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import useTranslations from '../../hooks/useTranslations';
 import { signInWithCustomToken } from 'firebase/auth';
 import { auth } from '../../firebaseConfig';
 
@@ -93,9 +95,9 @@ export default function SupplierRegister() {
       
       // Mostrar mensaje
       if (data.isClaimedProfile) {
-        alert('¡Perfil reclamado exitosamente! Ahora puedes gestionar tu información.');
+        toast.success(t('supplier.register.claimedSuccess'));
       } else {
-        alert('¡Registro exitoso! Bienvenido a la plataforma.');
+        toast.success(t('supplier.register.registerSuccess'));
       }
       
       // Redirigir al dashboard

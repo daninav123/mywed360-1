@@ -134,7 +134,7 @@ const AdminUsers = () => {
       setSelectedUser(null);
     } catch (error) {
       console.error('[AdminUsers] Failed to suspend user', error);
-      alert('Error al suspender el usuario: ' + error.message);
+      toast.error(t('admin.users.suspendError', { message: error.message }));
     } finally {
       setIsSuspending(false);
     }
@@ -161,7 +161,7 @@ const AdminUsers = () => {
       setSelectedUser(null);
     } catch (error) {
       console.error('[AdminUsers] Failed to reactivate user', error);
-      alert('Error al reactivar el usuario: ' + error.message);
+      toast.error(t('admin.users.reactivateError', { message: error.message }));
     } finally {
       setIsReactivating(false);
     }

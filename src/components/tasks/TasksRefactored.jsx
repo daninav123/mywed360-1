@@ -10,7 +10,8 @@ import {
   updateDoc,
 } from 'firebase/firestore';
 // View mode string kept for internal sizing logic (no external lib)
-import React, { useState, useEffect, useCallback, useRef, useMemo, useLayoutEffect } from 'react';
+import React, { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
+import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 
 // Importar componentes separados
@@ -671,7 +672,7 @@ export default function TasksRefactored() {
     try {
       // Validar formulario b��sico
       if (!formData.title.trim()) {
-        alert(t('tasks.page.form.validation.titleRequired'));
+        toast.error(t('tasks.page.form.validation.titleRequired'));
         return;
       }
 
@@ -679,12 +680,12 @@ export default function TasksRefactored() {
       const unscheduled = Boolean(formData.unscheduled);
 
       if (!formData.startDate && !(isSubtask && unscheduled)) {
-        alert(t('tasks.page.form.validation.startRequired'));
+        toast.error(t('tasks.page.form.validation.startRequired'));
         return;
       }
 
       if (!formData.endDate && !(isSubtask && unscheduled)) {
-        alert(t('tasks.page.form.validation.endRequired'));
+        toast.error(t('tasks.page.form.validation.endRequired'));
         return;
       }
 
@@ -702,12 +703,12 @@ export default function TasksRefactored() {
         !(isSubtask && unscheduled) &&
         (isNaN(startDate?.getTime?.() || NaN) || isNaN(endDate?.getTime?.() || NaN))
       ) {
-        alert(t('tasks.page.form.validation.invalidDates'));
+        toast.error(t('tasks.page.form.validation.invalidDates'));
         return;
       }
 
       if (!(isSubtask && unscheduled) && endDate < startDate) {
-        alert(t('tasks.page.form.validation.endAfterStart'));
+        toast.error(t('tasks.page.form.validation.endAfterStart'));
         return;
       }
 
@@ -922,7 +923,7 @@ export default function TasksRefactored() {
       closeModal();
       } catch (error) {
         console.error('Error al guardar tarea:', error);
-        alert(t('tasks.page.form.errors.saveFailed'));
+        toast.error(t('tasks.page.form.errors.saveFailed'));
     }
   };
 
@@ -2194,7 +2195,7 @@ export default function TasksRefactored() {
         if (nextCompleted && isTaskBlocked(id)) {
           const depStatus = getTaskDependencyStatus(id);
           const missingNames = depStatus.missingDeps.map(d => d.taskTitle).join(', ');
-          alert(t('tasks.page.dependencies.blocked', { tasks: missingNames }));
+          toast.warning(t('tasks.page.dependencies.blocked', { tasks: missingNames }));
           return;
         }
         

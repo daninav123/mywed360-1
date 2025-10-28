@@ -1,5 +1,6 @@
-import React, { useEffect, useMemo, useState } from 'react';
-
+import React, { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
+import { Button } from '../ui';
 import {
   getInviteTemplate,
   setInviteTemplate,
@@ -43,7 +44,7 @@ function InviteTemplateModal({ open, onClose, onSaved, coupleName = 'Ana y Luis'
       } catch {}
       onSaved?.(next);
     } else {
-      alert('No se pudo guardar la plantilla');
+      toast.error(t('messages.saveError'));
     }
   };
 

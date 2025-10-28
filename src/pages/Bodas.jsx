@@ -6,8 +6,11 @@ import {
   setDoc,
   updateDoc,
 } from 'firebase/firestore';
-import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+
+import useTranslations from '../hooks/useTranslations';
 import { formatDate } from '../utils/formatUtils';
 
 import MultiWeddingSummary from '../components/weddings/MultiWeddingSummary.jsx';
@@ -88,7 +91,9 @@ const defaultFilters = {
 };
 
 export default function Bodas() {
-  const { currentUser, userProfile } = useAuth();
+  const { currentUser } = useAuth();
+  const { t } = useTranslations();
+  const { userProfile } = useAuth();
   const {
     weddings,
     weddingsReady,
@@ -191,7 +196,7 @@ export default function Bodas() {
         });
       } catch (error) {
         console.error('[Bodas] sync CRM error', error);
-        alert('No se pudo encolar la sincronización CRM. Intenta nuevamente.');
+        toast.error(t('weddings.syncCrmError'));
       } finally {
         markSyncing(weddingId, false);
       }
@@ -312,7 +317,7 @@ export default function Bodas() {
       await bulkSyncWeddings(ids, { source: 'multi-wedding-dashboard' });
     } catch (error) {
       console.error('[Bodas] bulk CRM sync error', error);
-      alert('No se pudieron encolar las bodas seleccionadas. Intenta nuevamente.');
+      toast.error(t('weddings.bulkSyncError'));
     } finally {
       setBulkSyncing(false);
     }
@@ -343,7 +348,7 @@ export default function Bodas() {
       navigate(`/bodas/${weddingId}`);
     } catch (err) {
       console.error('Error creando nueva boda:', err);
-      alert('No se pudo crear la boda. Revisa permisos.');
+      toast.error(t('weddings.createError'));
     }
   };
 
@@ -380,7 +385,7 @@ export default function Bodas() {
       }
     } catch (err) {
       console.error('No se pudo actualizar el estado de la boda', err);
-      alert('No se pudo actualizar el estado de la boda. Intenta nuevamente.');
+      toast.error(t('weddings.updateStatusError'));
     }
   };
 

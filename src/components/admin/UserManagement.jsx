@@ -26,8 +26,8 @@ import {
   InputLabel,
 } from '@mui/material';
 import { Search, Edit, Delete, Mail, Key, Shield, Download } from 'lucide-react';
-import React, { useState, useEffect } from 'react';
-
+import React, { useState, useMemo } from 'react';
+import { toast } from 'react-toastify';
 import { db } from '../../firebaseConfig';
 import { formatDate } from '../../utils/formatUtils';
 
@@ -118,7 +118,7 @@ const UserManagement = () => {
   const handleExportUsers = () => {
     // En un entorno real, aquí se generaría un CSV o Excel
     console.log('Exportando datos de usuarios:', filteredUsers);
-    alert('Datos de usuarios exportados correctamente');
+    toast.success(t('admin.users.exportSuccess'));
   };
 
   // Renderizar chip de estado del usuario
@@ -280,7 +280,7 @@ const UserManagement = () => {
                     <Tooltip title="Enviar email">
                       <IconButton
                         size="small"
-                        onClick={() => alert(`Enviar email a ${user.email}`)}
+                        onClick={() => toast.info(t('admin.users.sendEmail', { email: user.email }))}
                       >
                         <Mail size={18} />
                       </IconButton>
@@ -288,7 +288,7 @@ const UserManagement = () => {
                     <Tooltip title="Resetear contraseña">
                       <IconButton
                         size="small"
-                        onClick={() => alert(`Resetear contraseña de ${user.name}`)}
+                        onClick={() => toast.info(t('admin.users.resetPassword', { name: user.name }))}
                       >
                         <Key size={18} />
                       </IconButton>

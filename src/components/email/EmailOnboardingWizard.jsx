@@ -4,8 +4,9 @@
  * Sprint 3 - Unificar Email
  */
 
-import React, { useMemo, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { Check, AlertCircle, Loader, ArrowRight, ArrowLeft } from 'lucide-react';
+import { toast } from 'react-toastify';
 import {
   AlertCircle,
   ArrowLeft,
@@ -80,7 +81,7 @@ export function EmailOnboardingWizard({ onComplete, onSkip, initialConfig = {} }
   const handleNext = async () => {
     if (step.id === 'domain') {
       if (!config.domain || !config.fromEmail || !config.fromName) {
-        alert(tEmail('onboarding.errors.missingDomainFields'));
+        toast.error(tEmail('onboarding.errors.missingDomainFields'));
         return;
       }
     }
@@ -88,13 +89,13 @@ export function EmailOnboardingWizard({ onComplete, onSkip, initialConfig = {} }
     if (step.id === 'validation') {
       await validateDNS();
       if (validation.dkim !== 'valid' || validation.spf !== 'valid') {
-        alert(tEmail('onboarding.errors.dnsIncomplete'));
+        toast.error(tEmail('onboarding.errors.dnsIncomplete'));
         return;
       }
     }
 
     if (step.id === 'test' && !testSent) {
-      alert(tEmail('onboarding.errors.testNotSent'));
+      toast.warning(tEmail('onboarding.errors.testNotSent'));
       return;
     }
 
@@ -141,7 +142,7 @@ export function EmailOnboardingWizard({ onComplete, onSkip, initialConfig = {} }
 
   const sendTestEmail = async () => {
     if (!testEmail) {
-      alert(tEmail('onboarding.errors.missingTestRecipient'));
+      toast.error(tEmail('onboarding.errors.missingTestRecipient'));
       return;
     }
 
@@ -149,7 +150,7 @@ export function EmailOnboardingWizard({ onComplete, onSkip, initialConfig = {} }
       await new Promise((resolve) => setTimeout(resolve, 1500));
       setTestSent(true);
     } catch (error) {
-      alert(tEmail('onboarding.errors.testSendFailed'));
+      toast.error(tEmail('onboarding.errors.testSendFailed'));
     }
   };
 

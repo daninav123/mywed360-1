@@ -1,7 +1,8 @@
 import { UploadCloud, Check, X } from 'lucide-react';
 import PropTypes from 'prop-types';
 import React, { useRef, useState } from 'react';
-
+import { Users, Upload, FileText } from 'lucide-react';
+import { toast } from 'react-toastify';
 import useTranslations from '../../hooks/useTranslations';
 import { Button, Input } from '../ui';
 
@@ -26,10 +27,10 @@ const ContactsImporterFixed = ({ onImported }) => {
 
   const pickContacts = async () => {
     if (!('contacts' in navigator) || !navigator.contacts?.select) {
-      alert(
+      toast.error(
         t('guests.contacts.unsupported', {
-          defaultValue: 'Este dispositivo/navegador no soporta la selección de contactos.',
-        })
+          defaultValue: 'Este dispositivo no es compatible con el selector de contactos.',
+        }),
       );
       return;
     }
@@ -63,11 +64,7 @@ const ContactsImporterFixed = ({ onImported }) => {
       setStep('review');
     } catch (err) {
       console.error(err);
-      alert(
-        t('guests.contacts.errorAccess', {
-          defaultValue: 'Error al acceder a los contactos.',
-        })
-      );
+      toast.error(t('guests.contacts.errorAccess', { defaultValue: 'No se pudo acceder a los contactos.' }));
     }
   };
 
@@ -133,10 +130,10 @@ const ContactsImporterFixed = ({ onImported }) => {
       const text = await file.text();
       const parsed = parseCSV(text);
       if (!parsed.length) {
-        alert(
+        toast.error(
           t('guests.contacts.csvEmpty', {
-            defaultValue: 'El CSV no contiene filas válidas',
-          })
+            defaultValue: 'El archivo CSV está vacío o es inválido.',
+          }),
         );
         return;
       }
@@ -144,7 +141,7 @@ const ContactsImporterFixed = ({ onImported }) => {
       const now = Date.now();
       const imported = parsed.map((r, i) => ({
         id: `csv-${now}-${i}`,
-        name: r.name || 'Sin nombre',
+        name: r.name || t('guests.contacts.noName', { defaultValue: 'Sin nombre' }),
         email: r.email || '',
         phone: r.phone || '',
         address: r.address || '',
@@ -163,10 +160,10 @@ const ContactsImporterFixed = ({ onImported }) => {
       setStep('review');
     } catch (err) {
       console.error('Error leyendo CSV:', err);
-      alert(
+      toast.error(
         t('guests.contacts.csvReadError', {
-          defaultValue: 'No se pudo leer el archivo CSV',
-        })
+          defaultValue: 'No se pudo leer el archivo CSV.',
+        }),
       );
     } finally {
       e.target.value = '';

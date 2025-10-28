@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
-
+import React, { useCallback, useEffect, useState } from 'react';
+import { Bell } from 'lucide-react';
+import { toast } from 'react-toastify';
 import PageWrapper from '../components/PageWrapper';
 import NotificationSettings from '../components/settings/NotificationSettings';
 import Button from '../components/ui/Button';
@@ -80,9 +81,9 @@ export default function Notificaciones() {
             onClick={async () => {
               try {
                 await pushSubscribe();
-                alert(t('notifications.push.enableSuccess'));
+                toast.success(t('notifications.push.enableSuccess'));
               } catch (e) {
-                alert(t('notifications.push.enableError'));
+                toast.error(t('notifications.push.enableError'));
               }
             }}
             className="px-3 py-1 rounded bg-green-600 text-white"
@@ -93,9 +94,9 @@ export default function Notificaciones() {
             onClick={async () => {
               try {
                 await pushUnsubscribe();
-                alert(t('notifications.push.disableSuccess'));
+                toast.success(t('notifications.push.disableSuccess'));
               } catch (e) {
-                alert(t('notifications.push.disableError'));
+                toast.error(t('notifications.push.disableError'));
               }
             }}
             className="px-3 py-1 rounded bg-gray-200"
@@ -105,7 +106,7 @@ export default function Notificaciones() {
           <button
             onClick={async () => {
               const ok = await pushTest();
-              alert(ok ? t('notifications.push.testSuccess') : t('notifications.push.testError'));
+              ok ? toast.success(t('notifications.push.testSuccess')) : toast.error(t('notifications.push.testError'));
             }}
             className="px-3 py-1 rounded bg-blue-600 text-white"
           >

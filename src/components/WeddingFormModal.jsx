@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-
+import { toast } from 'react-toastify';
+import useTranslations from '../hooks/useTranslations';
 import Modal from './Modal';
 
 /**
@@ -24,7 +25,7 @@ export default function WeddingFormModal({ open, onClose, onSave }) {
     e.preventDefault();
     // validaciones básicas
     if (!values.name.trim()) {
-      alert('El nombre es obligatorio');
+      toast.error(t('wedding.form.nameRequired'));
       return;
     }
     setSaving(true);
@@ -33,7 +34,7 @@ export default function WeddingFormModal({ open, onClose, onSave }) {
       onClose();
     } catch (err) {
       console.error(err);
-      alert('Error guardando la boda');
+      toast.error(t('wedding.form.saveError'));
     } finally {
       setSaving(false);
     }

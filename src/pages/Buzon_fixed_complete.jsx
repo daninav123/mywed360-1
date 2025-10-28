@@ -1,5 +1,8 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Card, Input, Button } from '../components/ui';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Send, Trash2, Archive, Mail } from 'lucide-react';
+import { toast } from 'react-toastify';
+
+import useTranslations from '../hooks/useTranslations';
 import {
   ChevronDownIcon,
   ChevronUpIcon,
@@ -173,7 +176,7 @@ export default function Buzon() {
 
   const handleSendEmail = async () => {
     if (!form.to || !form.subject) {
-      alert('Por favor completa los campos requeridos');
+      toast.error(t('email.requiredFields'));
       return;
     }
 
@@ -185,7 +188,7 @@ export default function Buzon() {
         attachments: form.attachments,
       });
 
-      alert('Correo enviado exitosamente');
+      toast.success(t('email.sentSuccess'));
       setComposeOpen(false);
       setForm({ to: '', subject: '', body: '', attachments: [] });
 
@@ -195,7 +198,7 @@ export default function Buzon() {
       }
     } catch (e) {
       console.error('Error al enviar correo:', e);
-      alert(`Error al enviar correo: ${e.message || 'Intenta nuevamente más tarde'}`);
+      toast.error(t('email.sendError', { message: e.message || 'Intenta nuevamente más tarde' }));
     }
   };
 

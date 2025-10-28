@@ -1,5 +1,7 @@
-import React, { useCallback, useEffect, useState } from 'react';
-
+import React, { useState, useEffect } from 'react';
+import { Download, Eye, Calendar, Users } from 'lucide-react';
+import { toast } from 'react-toastify';
+import useTranslations from '../../hooks/useTranslations';
 import { getPortfolioData, exportPortfolioPDF } from '../../services/adminDataService';
 
 const statusLabels = {
@@ -67,10 +69,10 @@ const AdminPortfolio = () => {
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
       
-      alert(`✅ Portfolio exportado: ${result.total} bodas`);
+      toast.success(t('admin.portfolio.exported', { total: result.total }));
     } catch (error) {
       console.error('[AdminPortfolio] Export error:', error);
-      alert('Error al exportar portfolio: ' + error.message);
+      toast.error(t('admin.portfolio.exportError', { message: error.message }));
     } finally {
       setExporting(false);
     }

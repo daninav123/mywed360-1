@@ -68,11 +68,11 @@ export default function WeddingSite() {
     e.preventDefault();
     try {
       await addDoc(collection(db, 'users', uid, 'rsvp'), { ...rsvp, createdAt: serverTimestamp() });
-      window.alert(t('common.public.weddingSite.alerts.success'));
+      toast.success(t('wedding.site.rsvpSuccess'));
       setRsvp({ name: '', guests: 1, response: 'yes', message: '' });
     } catch (err) {
       console.error(err);
-      window.alert(t('common.public.weddingSite.alerts.error'));
+      toast.error(t('wedding.site.rsvpError'));
     }
   };
 

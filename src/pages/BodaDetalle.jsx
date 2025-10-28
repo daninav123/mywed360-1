@@ -1,7 +1,9 @@
 import { doc, onSnapshot, updateDoc, serverTimestamp, deleteField } from 'firebase/firestore';
 import { ArrowLeft, CheckCircle, Circle } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import useTranslations from '../hooks/useTranslations';
 import { formatDate } from '../utils/formatUtils';
 
 import PageWrapper from '../components/PageWrapper';
@@ -160,7 +162,7 @@ export default function BodaDetalle() {
       performanceMonitor?.logEvent?.('wedding_permissions_updated', { weddingId: id });
     } catch (error) {
       console.error('[BodaDetalle] No se pudieron actualizar los permisos', error);
-      alert('No se pudieron actualizar los permisos. Intenta nuevamente.');
+      toast.error(t('wedding.permissions.updateError'));
     } finally {
       setSavingPermissions(false);
     }
@@ -189,7 +191,7 @@ export default function BodaDetalle() {
       setWedding((prev) => (prev ? { ...prev, active: nextActive } : prev));
     } catch (error) {
       console.error('[BodaDetalle] No se pudo actualizar el estado de la boda', error);
-      alert('No se pudo actualizar el estado. Intenta nuevamente.');
+      toast.error(t('wedding.status.updateError'));
     } finally {
       setUpdatingState(false);
     }

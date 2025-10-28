@@ -197,7 +197,9 @@ router.post('/search', async (req, res) => {
       // Limitar resultados después de ordenar
       .slice(0, 20);
     
-    // Filtro por presupuesto
+
+
+      // Filtro por presupuesto
     if (budget) {
       registeredResults = registeredResults.filter(supplier => {
         const minBudget = supplier.business?.minBudget || 0;

@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from 'react';
-
+import React, { useState, useEffect } from 'react';
+import { MessageSquare, Clock, CheckCircle, AlertCircle } from 'lucide-react';
+import { toast } from 'react-toastify';
+import useTranslations from '../../hooks/useTranslations';
 import { getSupportData, respondToTicket } from '../../services/adminDataService';
 
 const initialSummary = {
@@ -46,10 +48,10 @@ const AdminSupport = () => {
       setResponseMessage('');
       setNewStatus('');
       
-      alert('Respuesta enviada exitosamente');
+      toast.success(t('admin.support.responseSuccess'));
     } catch (error) {
       console.error('[AdminSupport] Error sending response:', error);
-      alert('Error al enviar la respuesta: ' + error.message);
+      toast.error(t('admin.support.responseError', { message: error.message }));
     } finally {
       setResponding(false);
     }

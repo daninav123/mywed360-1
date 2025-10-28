@@ -12,7 +12,7 @@ import {
   createSalesCommercial,
   createSalesManager,
 } from '../../services/adminDataService';
-import { ExternalLink, Plus } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 
 const makeId = () => Math.random().toString(36).slice(2, 10);
 

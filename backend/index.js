@@ -79,6 +79,7 @@ import instagramWallRouter from './routes/instagram-wall.js';
 import imageProxyRouter from './routes/image-proxy.js';
 import weddingNewsRouter from './routes/wedding-news.js';
 import supplierPortalRouter from './routes/supplier-portal.js';
+import supplierRegistrationRouter from './routes/supplier-registration.js';
 import supplierBudgetRouter from './routes/supplier-budget.js';
 import publicWeddingRouter from './routes/public-wedding.js';
 import rsvpRouter from './routes/rsvp.js';
@@ -570,6 +571,8 @@ app.use('/api/weddings', requireAuth, weddingsRouter);
 app.use('/api/crm', crmRouter);
 // Supplier portal (public entry by token, handled inside router)
 app.use('/api/supplier-portal', supplierPortalRouter);
+// Supplier registration (public, no auth required)
+app.use('/api/supplier-registration', supplierRegistrationRouter);
 
 // Nuevos módulos transversales
 app.use('/api/automation', automationRouter);

@@ -416,47 +416,105 @@
   "comision_generada_periodo": "Comisión generada en el periodo.",
   "comision_pendiente_menor_omite_aviso": "Si la comisión pendiente es menor, se omite el aviso.",
   "common": {
-    "all": "All",
-    "none": "None",
-    "show": "Show",
-    "hide": "Hide",
-    "view": "View",
-    "cancel": "Cancel",
-    "delete": "Delete",
-    "duplicate": "Duplicate",
-    "categories": {
-      "decoration": "Decoración",
-      "cocktail": "Cóctel",
-      "banquet": "Banquete",
-      "ceremony": "Ceremonia",
-      "flowers": "Flores",
-      "dress": "Vestidos",
-      "cake": "Pasteles",
-      "photography": "Fotografía"
-    },
-    "searchBar": {
-      "optionHashtag": "Hashtag",
-      "optionAuthor": "Autor",
-      "optionKeyword": "Palabra clave",
-      "placeholder": "Buscar...",
-      "submit": "Buscar"
-    },
-    "aiSearchModal": {
-      "title": "Búsqueda inteligente de proveedores",
-      "description": "Describe qué tipo de proveedor necesitas y la IA encontrará opciones para ti.",
-      "placeholder": "Ej: \"Fotógrafo de bodas en Madrid con estilo reportaje\"",
-      "hint": "Sé específico para obtener mejores resultados.",
-      "submit": "Buscar",
-      "loading": "Buscando proveedores...",
-      "webLabel": "Web:",
-      "locationLabel": "Ubicación:",
-      "contactLabel": "Contacto:",
-      "saveButton": "Guardar proveedor",
-      "noResultsTitle": "No se encontraron resultados para tu búsqueda.",
-      "noResultsHint": "Prueba con términos diferentes o más específicos.",
-      "emptyTitle": "Busca con inteligencia artificial",
-      "emptyDescription": "Describe el tipo de proveedor que necesitas y la IA encontrará opciones perfectas para tu boda.",
-      "footerNotice": "La información proporcionada es orientativa. Verifica los datos de contacto antes de contratar."
+    "suppliers": {
+      "overview": {
+        "defaults": {
+          "serviceGroup": "Otros servicios",
+          "otherService": "Otro servicio",
+          "country": "España"
+        },
+        "actions": {
+          "manageServices": "Gestionar servicios",
+          "newSupplier": "Nuevo proveedor",
+          "clear": "Limpiar"
+        },
+        "services": {
+          "count": "{{count}} servicios",
+          "confirmedCount": "{{count}} confirmados",
+          "pendingCount": "{{count}} pendientes",
+          "title": "Servicios contratados",
+          "shortlistCount": "{{count}} en lista",
+          "emptyShortlist": "No hay proveedores en la lista",
+          "exploreHint": "Explora proveedores para añadir a tu lista"
+        },
+        "title": "Gestión de proveedores",
+        "metrics": {
+          "totalProviders": "Proveedores totales",
+          "confirmed": "Confirmados",
+          "pending": "Pendientes",
+          "shortlist": "Lista de interés"
+        },
+        "exploration": {
+          "title": "Explorar proveedores",
+          "subtitle": "Busca y descubre proveedores para tu evento",
+          "collapseAria": "Contraer sección de exploración",
+          "searchPlaceholder": "Buscar proveedores...",
+          "recentSearches": "Búsquedas recientes"
+        },
+        "status": {
+          "pending": "Pendiente",
+          "confirmed": "Confirmado"
+        },
+        "shortlist": {
+          "loading": "Cargando lista...",
+          "error": "Error al cargar la lista",
+          "empty": "No tienes proveedores guardados",
+          "savedAt": "Guardado {{value}}",
+          "match": "{{value}}% compatibilidad"
+        },
+        "modals": {
+          "board": {
+            "title": "Tablero de servicios",
+            "description": "Gestiona todos tus servicios contratados"
+          },
+          "options": {
+            "title": "Opciones para {{label}}",
+            "confirmedTitle": "Confirmados",
+            "contactTitle": "Contactados / En negociación",
+            "contactEmpty": "No hay proveedores contactados aún",
+            "shortlistTitle": "Lista de interés",
+            "shortlistEmpty": "No hay proveedores en la lista"
+          }
+        },
+        "results": {
+          "title": "Resultados de búsqueda",
+          "query": "Consulta: {{value}}",
+          "loading": "Buscando proveedores…",
+          "empty": "No encontramos resultados con los filtros actuales.",
+          "breakdown": "📊 Encontrados: {{registered}} verificados · {{cached}} en caché · {{internet}} de internet"
+        },
+        "pagination": {
+          "label": "Página {{current}} de {{total}}"
+        },
+        "drawer": {
+          "title": "Detalles del proveedor",
+          "titleWithName": "Detalles del proveedor · {{name}}",
+          "imageAlt": "Imagen de {{name}}",
+          "serviceUnknown": "Servicio desconocido",
+          "location": "Ubicación: {{value}}",
+          "priceRange": "Precio estimado: {{value}}",
+          "email": "Correo: {{value}}",
+          "phone": "Teléfono: {{value}}",
+          "openLink": "Abrir enlace",
+          "empty": "Selecciona un proveedor para ver detalles",
+          "fallbackName": "proveedor"
+        },
+        "toasts": {
+          "missingQuery": "Por favor, introduce un término de búsqueda",
+          "noResults": "No se encontraron resultados",
+          "success": "Encontrados {{count}} proveedores ({{registered}} registrados, {{cached}} guardados, {{internet}} de internet)",
+          "error": "Error en la búsqueda. Intenta de nuevo.",
+          "wantedServicesSaved": "Servicios guardados correctamente",
+          "wantedServicesError": "Error al guardar los servicios",
+          "providerSaved": "Proveedor guardado correctamente",
+          "providerError": "Error al guardar el proveedor"
+        }
+      },
+      "configureServices": "Configurar servicios",
+      "labels": {
+        "provider": "Proveedor",
+        "service": "Servicio"
+      }
     }
   },
   "como_organizar_ceremonia_civil_perfecta": "Ej. Cómo organizar la ceremonia civil perfecta",
@@ -721,29 +779,11 @@
   "eliminar_eventos_onclick_onload_etc_trim": ") // Eliminar eventos onclick, onload, etc.\n    .trim();\n};\n\n/**\n * Normaliza un string para comparaciones (sin acentos, minúsculas)\n * @param {string} str - String a normalizar\n * @returns {string} String normalizado\n */\nexport const normalizeString = (str) => {\n  if (!str || typeof str !== ",
   "eliminar_plantilla_seleccionada": "¿Eliminar la plantilla seleccionada?",
   "email": {
-    "email": "Email",
-    "emails": "Emails",
-    "inbox": "Inbox",
-    "sent": "Sent",
-    "drafts": "Drafts",
-    "trash": "Trash",
-    "compose": "Compose",
-    "reply": "Reply",
-    "forward": "Forward",
-    "delete": "Delete",
-    "archive": "Archive",
-    "markAsRead": "Mark as Read",
-    "markAsUnread": "Mark as Unread",
-    "subject": "Subject",
-    "from": "From",
-    "to": "To",
-    "cc": "CC",
-    "bcc": "BCC",
-    "attachments": "Attachments",
-    "send": "Send",
-    "saveDraft": "Save Draft",
-    "emailSettings": "Email Settings",
-    "emailSignature": "Email Signature"
+    "requiredFields": "Por favor completa los campos requeridos",
+    "sentSuccess": "Correo enviado exitosamente",
+    "sendError": "Error al enviar correo: {{message}}",
+    "markReadError": "Could not mark as read",
+    "deleteError": "Could not delete email"
   },
   "email_esta_uso": "El email ya está en uso",
   "email_invalido": "Email inválido",
@@ -868,322 +908,50 @@
   "filterboolean_partslength_ruta_documento_valida_docref": ").filter(Boolean);\n            if (parts.length % 2 === 0) {\n              // Ruta a documento válida\n              docRef = doc(db, ...parts);\n            } else if (parts.length > 2) {\n              // Intento de corrección: tratar el último segmento como nombre de campo y usar el padre como documento\n              const parentParts = parts.slice(0, -1);\n              if (parentParts.length % 2 === 0) {\n                docRef = doc(db, ...parentParts);\n              }\n            }\n          } catch (e) {\n            console.warn(",
   "finalistas_fotografia": "Ej. Finalistas Fotografía",
   "finance": {
-    "transactions": {
-      "title": "Transacciones",
-      "new": "Nueva Transacción",
-      "empty": "No hay transacciones que mostrar",
-      "createFirst": "Crear primera transacción",
-      "searchPlaceholder": "Buscar por concepto...",
-      "allTypes": "Todos los tipos",
-      "incomes": "Ingresos",
-      "expenses": "Gastos",
-      "allCategories": "Todas las categorías",
-      "allProviders": "Todos los proveedores",
-      "allDays": "Todos los días",
-      "last30": "Últimos 30 días",
-      "last90": "Últimos 90 días",
-      "onlyUncategorized": "Solo sin categoría",
-      "clear": "Limpiar",
-      "sort": {
-        "dateDesc": "Fecha (recientes primero)",
-        "dateAsc": "Fecha (antiguos primero)",
-        "amountDesc": "Importe (mayor primero)",
-        "amountAsc": "Importe (menor primero)"
-      },
-      "headers": {
-        "date": "Fecha",
-        "concept": "Concepto",
-        "category": "Categoría",
-        "type": "Tipo",
-        "status": "Estado",
-        "amount": "Monto",
-        "actions": "Acciones"
-      },
-      "status": {
-        "pending": "Pendiente",
-        "partial": "Pago parcial",
-        "paid": "Pagado",
-        "expected": "Esperado",
-        "received": "Recibido"
-      },
-      "saved": "Transacción guardada",
-      "deleted": "Transacción eliminada",
-      "deleteErrorPrefix": "Error eliminando transacción:",
-      "saveUnexpected": "Error inesperado al guardar la transacción",
-      "noConcept": "Sin concepto",
-      "noCategory": "Sin categoría",
-      "dueOn": "Vence:",
-      "attachment": "Adjunto",
-      "balanceLabel": "Balance:",
-      "pendingAmount": "Pendiente:",
-      "overdueAmount": "Vencido:",
-      "outstandingExpense": "Pendiente:",
-      "outstandingIncome": "Por recibir:",
-      "alerts": {
-        "title": "Pagos importantes",
-        "overdue": "Pagos vencidos:",
-        "upcoming": "Pagos prximos (7 días):"
-      },
-      "csv": {
-        "title": "Importar CSV - Mapeo de columnas",
-        "fields": {
-          "date": "Fecha",
-          "description": "Descripción",
-          "amount": "Importe",
-          "type": "Tipo",
-          "category": "Categoría"
-        },
-        "none": "Ninguna",
-        "preview": "Vista previa"
-      }
-    },
-    "tabs": {
-      "overview": "Resumen",
-      "transactions": "Transacciones",
-      "budget": "Presupuesto",
-      "contributions": "Aportaciones",
-      "analytics": "Análisis"
-    },
-    "connectBank": {
-      "title": "Conecta tu banco para importar movimientos",
-      "desc": "Acelera el registro de gastos e ingresos conectando tu cuenta bancaria.",
-      "button": "Conectar banco"
-    },
-    "alerts": {
-      "budget": "Alertas de Presupuesto"
-    },
-    "overview": {
-      "title": "Gestión financiera",
-      "subtitle": "Control total del presupuesto y los gastos de tu boda",
-      "lastSync": "Última sincronización",
-      "synced": "Sincronizado",
-      "offline": "Sin conexión",
-      "totalBudget": "Presupuesto Total",
-      "totalSpent": "Total Gastado",
-      "ofBudget": "del presupuesto",
-      "currentBalance": "Balance Actual",
-      "expectedIncome": "Ingresos Esperados",
-      "used": "utilizado",
-      "categoryStatus": "Estado del Presupuesto por Categorías",
-      "progress": "Progreso",
-      "exceededNote": "(Presupuesto excedido!)"
-    },
-    "form": {
-      "type": "Tipo de transacción",
-      "concept": "Concepto",
-      "conceptPlaceholder": "Ej: Pago de catering, Regalo de boda...",
-      "amount": "Monto (EUR)",
-      "amountLabel": "Monto:",
-      "date": "Fecha",
-      "category": "Categoría",
-      "selectCategory": "Selecciona una categoría",
-      "description": "Descripción adicional",
-      "descriptionPlaceholder": "Detalles adicionales sobre la transacción...",
-      "transaction": "Transacción",
-      "provider": "Proveedor / Fuente",
-      "attachments": {
-        "title": "Comprobantes",
-        "help": "Adjunta facturas, contratos o recibos para tenerlos a mano.",
-        "add": "Adjuntar comprobante",
-        "remove": "Quitar",
-        "count": "Total adjuntos:",
-        "attachment": "Adjunto"
-      },
-      "status": {
-        "expected": "Esperado",
-        "received": "Recibido",
-        "pending": "Pendiente",
-        "partial": "Pago parcial",
-        "paid": "Pagado"
-      },
-      "errors": {
-        "conceptRequired": "El concepto es obligatorio",
-        "amountPositive": "El monto debe ser un número positivo",
-        "dateRequired": "La fecha es obligatoria",
-        "categoryRequired": "La categoría es obligatoria",
-        "paidAmountPositive": "El monto abonado debe ser un número positivo",
-        "paidAmountExceeds": "El monto abonado no puede superar el total",
-        "paidAmountRequired": "Registra cunto has pagado para marcar el estado como parcial"
-      }
-    },
     "contributions": {
-      "title": "Contributions Setup",
-      "subtitle": "Configure contributions and estimate expected income",
-      "updateGuests": "Update Guests",
-      "initial": {
-        "title": "Initial Contributions",
-        "personA": "Person A (EUR)",
-        "personB": "Person B (EUR)",
-        "total": "Initial total:"
-      },
-      "monthly": {
-        "title": "Monthly Contributions",
-        "personA": "Person A (EUR/month)",
-        "personB": "Person B (EUR/month)",
-        "total": "Monthly total:"
-      },
-      "extras": {
-        "title": "Extra Contributions",
-        "totalLabel": "Extras total (family, other income) (EUR)",
-        "help": "Include family gifts, parents' contributions, etc."
-      },
-      "gifts": {
-        "title": "Gift Estimation",
-        "giftPerGuest": "Estimated gift per guest (EUR)",
-        "guestCount": "Number of guests",
-        "loadHint": "Click the icon to auto-load from your guest list",
-        "total": "Estimated gifts total:"
-      },
-      "unsaved": "You have unsaved changes",
-      "saveChanges": "Save Changes",
-      "summary": {
-        "title": "Expected Income Summary",
-        "subtitle": "Total projection based on your settings",
-        "initial": "Initial contributions",
-        "monthly": "Monthly contributions",
-        "extras": "Extra contributions",
-        "gifts": "Estimated gifts",
-        "total": "Expected Total"
-      },
-      "tips": {
-        "title": "Financial Tips",
-        "emergencyTitle": "Emergency fund:",
-        "emergencyText": "Consider reserving 10-15% of the total budget for unexpected expenses.",
-        "giftsTitle": "Conservative gifts:",
-        "giftsText": "It's better to underestimate wedding gifts than overestimate them.",
-        "reviewTitle": "Regular review:",
-        "reviewText": "Review and update these projections monthly.",
-        "balanceTitle": "Balanced contributions:",
-        "balanceText": "Keep a fair balance between both people's contributions."
-      }
+      "nameAmountRequired": "Nombre y monto son obligatorios"
     },
-    "charts": {
-      "title": "Análisis Financiero",
-      "subtitle": "Visualizaciones y tendencias de tus finanzas de boda",
-      "totalTransactions": "Total Transacciones",
-      "activeCategories": "Categorías Activas",
-      "budgetEfficiency": "Eficiencia Presupuesto",
-      "projectedBalance": "Balance Proyectado",
-      "budgetVsSpentByCategory": "Presupuesto vs Gastado por Categoría",
-      "budgeted": "Presupuestado",
-      "spent": "Gastado",
-      "expenseDistributionByCategory": "Distribucin de Gastos por Categoría",
-      "monthlyTrend": "Tendencia Mensual de Ingresos y Gastos",
-      "income": "Ingresos",
-      "expenses": "Gastos",
-      "balance": "Balance",
-      "budgetProgressByCategory": "Progreso del Presupuesto por Categoría",
-      "used": "Usado",
-      "excess": "Exceso",
-      "insights": "Insights Financieros",
-      "highestExpense": "Mayor Gasto",
-      "mostEfficient": "Más Eficiente",
-      "noData": "No hay datos suficientes",
-      "currentTrend": "Tendencia Actual",
-      "trend": {
-        "positive": "Positiva",
-        "negative": "Negativa"
-      },
-      "balanceLabel": "Balance:"
-    },
-    "bank": {
-      "title": "Vincular cuenta bancaria",
-      "country": "Pas",
-      "countries": {
-        "es": "Espaa",
-        "fr": "Francia",
-        "de": "Alemania",
-        "it": "Italia",
-        "pt": "Portugal"
-      },
-      "bankLabel": "Banco",
-      "selectBank": "Selecciona un banco",
-      "selectBankPlaceholder": "Selecciona un banco...",
-      "loadBanks": "Cargar bancos",
-      "connect": "Conectar",
-      "errorLoad": "No se pudieron cargar bancos. Es posible que el backend no tenga habilitada la integracin Nordigen o la ruta /api/bank an no est desplegada.",
-      "errorStart": "No se pudo iniciar la vinculacin",
-      "noRequisition": "No hay requisicin iniciada",
-      "errorCheck": "No se pudo consultar el estado",
-      "selectWedding": "Selecciona una boda activa",
-      "linked": "Cuenta vinculada",
-      "errorSave": "No se pudo guardar la cuenta",
-      "requirements": {
-        "title": "Requisitos backend:",
-        "env": "Definir NORDIGEN_SECRET_ID, NORDIGEN_SECRET_KEY y NORDIGEN_BASE_URL",
-        "route": "Backend con ruta /api/bank desplegada"
-      },
-      "alternative": "Alternativa temporal: importa movimientos manualmente desde Finanzas -> Transacciones -> \"Importar Banco\".",
-      "requisition": "Requisition:",
-      "checkStatus": "Comprobar estado",
-      "availableAccounts": "Cuentas disponibles",
-      "useThis": "Usar esta cuenta"
+    "reports": {
+      "generateError": "Error al generar el reporte. Por favor, intenta nuevamente.",
+      "exported": "Informe exportado en formato {{format}}"
     },
     "budget": {
-      "title": "Gestión de presupuesto",
-      "subtitle": "Organiza y controla el presupuesto por categorías",
-      "newCategory": "Nueva categoría",
-      "totalBudget": "Presupuesto total",
-      "budgeted": "Presupuestado",
-      "spent": "Gastado",
-      "remaining": "Disponible",
-      "progress": "Progreso",
-      "categoriesTitle": "Categorías de presupuesto",
-      "empty": "No hay categorías de presupuesto",
-      "createFirst": "Crear primera categoría",
-      "category": "Categoría",
-      "overallProgress": "Progreso del presupuesto",
-      "muteAlerts": "Silenciar alertas",
-      "thresholds": {
-        "warn": "Aviso (en riesgo) %",
-        "danger": "Crtico (exceso) %"
-      },
-      "modal": {
-        "editTitle": "Editar categoría",
-        "newTitle": "Nueva categoría",
-        "name": "Nombre de la categoría",
-        "namePlaceholder": "Ej.: Catering, música, flores...",
-        "amountLabel": "Presupuesto asignado ()",
-        "amountPlaceholder": "0,00"
-      },
-      "advisor": "Advisor",
-      "advisorShort": "AI",
-      "muteShort": "Mute",
-      "exceeded": "Exceeded",
-      "perGuestHint": "H {{value}} / guest ({{count}} events)",
       "errors": {
-        "nameRequired": "El nombre de la categoría es obligatorio",
-        "amountInvalid": "El monto debe ser un número válido"
+        "nameRequired": "Category name is required",
+        "amountInvalid": "Amount must be a valid number"
       },
-      "confirmDelete": "Ests seguro de eliminar la categoría \"{{category}}\"?",
       "advisorErrors": {
-        "requestFailed": "No se pudo obtener la recomendacin del consejero.",
-        "refreshFailed": "No se pudo actualizar la recomendacin.",
-        "applyFailed": "No se pudo aplicar el escenario recomendado.",
-        "applyFailedWithReason": "No se pudo aplicar el escenario ({{reason}})."
-      }
+        "requestFailed": "Unable to fetch advisor recommendation",
+        "refreshFailed": "Unable to refresh advisor recommendation",
+        "applyFailed": "Unable to apply the recommended scenario"
+      },
+      "advisor": "Asesor",
+      "advisorShort": "IA",
+      "muteShort": "Silenciar",
+      "exceeded": "Excedido",
+      "perGuestHint": "≈ {{value}} / invitado ({{count}} eventos)"
     },
     "benchmarks": {
-      "title": "Budget suggestions based on similar weddings",
-      "subtitle": "Based on {{count}} confirmed budgets. Average estimate: {{average}}  Confidence: {{confidence}}.",
-      "loading": "Calculating budget suggestions&",
-      "applyMedian": "Apply median (p50)",
-      "applyP75": "Apply percentile 75",
-      "saveSnapshot": "Save budget"
+      "title": "Sugerencias de presupuesto basadas en bodas similares",
+      "subtitle": "Basado en {{count}} presupuestos confirmados. Estimación promedio: {{average}} · Confianza: {{confidence}}.",
+      "loading": "Calculando sugerencias de presupuesto…",
+      "applyMedian": "Aplicar mediana (p50)",
+      "applyP75": "Aplicar percentil 75",
+      "saveSnapshot": "Guardar presupuesto"
     },
     "cashflow": {
-      "title": "Cashflow timeline",
-      "subtitle": "Upcoming payments and projected balance",
-      "remaining": "Budget remaining",
-      "burnRate": "Monthly burn rate",
-      "monthsToZero": "{{months}} months until depletion",
-      "upcoming": "Upcoming payments (45 days)",
-      "noUpcoming": "No pending payments in the next weeks.",
-      "netTimeline": "Net monthly flow (6 months)",
-      "legend": "Income - Expense",
-      "noHistory": "We need more history to estimate the trend.",
-      "income": "Income",
-      "expense": "Expenses"
+      "title": "Cronograma de caja",
+      "subtitle": "Pagos próximos y balance proyectado",
+      "remaining": "Presupuesto restante",
+      "burnRate": "Burn rate mensual",
+      "monthsToZero": "{{months}} meses hasta agotarlo",
+      "upcoming": "Pagos próximos (45 días)",
+      "noUpcoming": "Sin pagos pendientes en las próximas semanas.",
+      "netTimeline": "Flujo neto mensual (6 meses)",
+      "legend": "Ingresos - Gastos",
+      "noHistory": "Necesitamos más historial para calcular la tendencia.",
+      "income": "Ingresos",
+      "expense": "Gastos"
     }
   },
   "firebase_esta_configurado_nulo": "Firebase no está configurado (db nulo)",
@@ -1254,54 +1022,51 @@
   "guardar_configuracion": "Guardar Configuración",
   "guardar_referencia_para_resolucion_lazy_buildheaders": ") {\n      // Guardar referencia para resolución lazy en buildHeaders mediante auth=true\n      opts.auth = opts.auth !== undefined ? opts.auth : true;\n    }\n    if (user.uid) headers[",
   "guests": {
-    "guest": "Invitado",
-    "guests": "Invitados",
-    "guestList": "Lista de invitados",
-    "addGuest": "Añadir invitado",
-    "editGuest": "Editar invitado",
-    "deleteGuest": "Eliminar invitado",
-    "guestName": "Nombre del invitado",
-    "guestEmail": "Correo del invitado",
-    "guestPhone": "Teléfono del invitado",
-    "guestAddress": "Dirección del invitado",
-    "guestTable": "Mesa del invitado",
-    "guestStatus": "Estado del invitado",
-    "confirmed": "Confirmado",
-    "pending": "Pendiente",
-    "declined": "Rechazado",
-    "totalGuests": "Invitados totales",
-    "confirmedGuests": "Invitados confirmados",
-    "pendingGuests": "Invitados pendientes",
-    "importGuests": "Importar invitados",
-    "exportGuests": "Exportar invitados",
-    "sendInvitations": "Enviar invitaciones",
-    "plusOne": "Acompaante",
-    "dietaryRestrictions": "Restricciones alimentarias",
-    "specialRequests": "Peticiones especiales",
-    "saveTheDate": {
-      "message": "Hola somos {{p1}}{{p2Suffix}}, tenemos un noticin sper importante que compartir contigo. Nos casamos! Resrvate el {{date}} porque queremos contar contigo.",
-      "messageFallback": "Hola! Tenemos un noticin sper importante que compartir contigo. Nos casamos! Resrvate la fecha porque queremos contar contigo!",
-      "connector": "y",
-      "primaryFallback": "nosotros",
-      "coupleFallback": "nuestra boda"
+    "email": {
+      "sent": "Email enviado a {{email}}",
+      "sentSuccess": "Email enviado correctamente",
+      "sendError": "Error enviando email: {{error}}",
+      "sendFailed": "No se pudo enviar el email"
     },
-    "rsvp": {
-      "printPdf": "Imprimir / PDF"
+    "stats": {
+      "totalAttendees": "Total asistentes"
     },
-    "groups": {
-      "title": "Gestión de grupos",
-      "assignTitle": "Asignar a seleccionados",
-      "newGroup": "Nuevo grupo&",
-      "groupName": "Nombre de grupo",
-      "rename": "Renombrar grupo",
-      "origin": "Origen&",
-      "newName": "Nuevo nombre",
-      "merge": "Fusionar grupos",
-      "destination": "Destino&",
-      "existing": "Grupos existentes",
-      "none": "No hay grupos an."
+    "empty": {
+      "title": "No se encontraron invitados",
+      "searchHint": "Intenta ajustar los filtros de búsqueda",
+      "defaultHint": "Añade tu primer invitado para comenzar"
     },
-    "selectedCount": "Seleccionados: {{count}}"
+    "actions": {
+      "selectAll": "Seleccionar todos"
+    },
+    "status": {
+      "pending": "Pendiente",
+      "confirmed": "Confirmado",
+      "declined": "Rechazado"
+    },
+    "fields": {
+      "name": "Nombre",
+      "email": "Correo",
+      "phone": "Teléfono",
+      "table": "Mesa",
+      "tableOptional": "Mesa (opcional)"
+    },
+    "examples": {
+      "table": "Ej. 5"
+    },
+    "contacts": {
+      "unsupported": "Este dispositivo no es compatible con el selector de contactos.",
+      "noName": "Sin nombre",
+      "importedFromPicker": "Importado desde contactos",
+      "errorAccess": "No se pudo acceder a los contactos. Revisa los permisos.",
+      "csvEmpty": "El archivo CSV está vacío o es inválido.",
+      "importedFromCsv": "Importado desde CSV",
+      "csvReadError": "No se pudo leer el archivo CSV.",
+      "importCount": "Importar {{count}}",
+      "selectContacts": "Seleccionar contactos",
+      "importCsv": "Importar CSV",
+      "supportedColumns": "Columnas soportadas: name, email, phone, table, companion, dietaryRestrictions, notes, companionGroupId"
+    }
   },
   "habilita_nueva_galeria_plantillas_web": "Habilita la nueva galería de plantillas web",
   "has_alcanzado_maximo_items_personalizados": "Has alcanzado el máximo de 50 ítems personalizados.",
@@ -1561,7 +1326,6 @@
     "finance": "Finanzas",
     "seating": "Plan de asientos",
     "email": "Correo electrónico",
-    
     "designs": "Diseños",
     "website": "Web de boda",
     "contracts": "Contratos",
@@ -1634,7 +1398,11 @@
         },
         "providers": {
           "title": "Proveedores",
-          "description": "Administra tus proveedores"
+          "description": "Administra tus proveedores",
+          "links": {
+            "providers": "Providers",
+            "contracts": "Contracts"
+          }
         },
         "protocol": {
           "title": "Protocolo",
@@ -2119,88 +1887,14 @@
   "romantico": "romántico",
   "romantico_floral": "Romántico & Floral",
   "rsvp": {
-    "section": "RSVP",
-    "simulate": "Simular recordatorios",
-    "send": "Enviar recordatorios",
-    "overview": {
-      "title": "Financial Management",
-      "subtitle": "Full control of your wedding budget and expenses",
-      "lastSync": "Last sync",
-      "synced": "Synced",
-      "offline": "Offline",
-      "totalBudget": "Total Budget",
-      "totalSpent": "Total Spent",
-      "ofBudget": "of budget",
-      "currentBalance": "Current Balance",
-      "expectedIncome": "Expected Income",
-      "used": "used",
-      "categoryStatus": "Budget Status by Categories",
-      "progress": "Progress"
-    },
+    "reminderSimulation": "Simulación: candidatos={{attempted}}, enviados={{sent}}, omitidos={{skipped}}",
+    "reminderSent": "Envío: candidatos={{attempted}}, enviados={{sent}}, omitidos={{skipped}}",
+    "reminderSimulationError": "Error simulando recordatorios",
+    "reminderSendError": "Error enviando recordatorios",
+    "linkCopied": "Enlace RSVP copiado",
+    "linkCopyError": "No se pudo generar/copiar el enlace",
     "budget": {
-      "title": "Budget Management",
-      "subtitle": "Organize and control your budget by categories",
-      "newCategory": "New category",
-      "totalBudget": "Total Budget",
-      "budgeted": "Budgeted",
-      "spent": "Spent",
-      "remaining": "Remaining",
-      "categoriesTitle": "Budget Categories",
-      "empty": "No budget categories",
-      "createFirst": "Create first category",
-      "category": "Category",
-      "exceeded": "Exceeded",
-      "progress": "Progress",
-      "overallProgress": "Budget progress",
-      "muteAlerts": "Mute alerts",
-      "thresholds": {
-        "title": "Alert thresholds (global)",
-        "warn": "Warning (at risk) %",
-        "danger": "Critical (excess) %"
-      },
-      "modal": {
-        "editTitle": "Edit category",
-        "newTitle": "New category",
-        "name": "Category name"
-      },
-      "perGuestHint": "H {{value}} / guest ({{count}} events)"
-    },
-    "transactions": {
-      "title": "Transactions",
-      "connectBank": "Connect Bank (Open Banking)",
-      "importCSV": "Import CSV",
-      "exportCSV": "Export CSV",
-      "new": "New Transaction",
-      "searchPlaceholder": "Search by concept...",
-      "allTypes": "All types",
-      "incomes": "Incomes",
-      "expenses": "Expenses",
-      "allCategories": "All categories",
-      "allDays": "All days",
-      "last30": "Last 30 days",
-      "last90": "Last 90 days",
-      "onlyUncategorized": "Only uncategorized",
-      "clear": "Clear",
-      "empty": "No transactions to show",
-      "createFirst": "Create first transaction",
-      "noConcept": "No concept",
-      "noCategory": "No category",
-      "income": "Income",
-      "expense": "Expense",
-      "headers": {
-        "date": "Date",
-        "concept": "Concept",
-        "category": "Category",
-        "type": "Type",
-        "amount": "Amount",
-        "actions": "Actions"
-      },
-      "sort": {
-        "dateDesc": "Date (newest first)",
-        "dateAsc": "Date (oldest first)",
-        "amountDesc": "Amount (highest first)",
-        "amountAsc": "Amount (lowest first)"
-      }
+      "perGuestHint": "≈ {{value}} / invitado ({{count}} eventos)"
     }
   },
   "rustico": "Rústico",
@@ -2507,327 +2201,330 @@
   },
   "subio_archivo_identico_evitamos_duplicados": "Ya se subió un archivo idéntico. Evitamos duplicados automáticamente.",
   "protocol": {
+    "ceremony": {
+      "titleRequired": "El título es obligatorio"
+    },
     "specialMoments": {
-      "title": "Momentos especiales",
-      "description": "Planifica cada instante clave con la música y el momento adecuados.",
+      "title": "Special Moments",
+      "description": "Plan each key moment with the right music and timing.",
       "buttons": {
-        "addSection": "Añadir sección",
-        "addMoment": "Añadir momento",
+        "addSection": "Add section",
+        "addMoment": "Add moment",
         "duplicateShort": "Dup →",
-        "moveShort": "Mov →",
-        "use": "Usar",
-        "searchWithAI": "Buscar con IA",
-        "confirm": "Confirmar",
-        "clear": "Limpiar",
-        "remove": "Quitar"
+        "moveShort": "Move →",
+        "use": "Use",
+        "searchWithAI": "Search with AI",
+        "confirm": "Confirm",
+        "clear": "Clear",
+        "remove": "Remove"
       },
       "tooltips": {
-        "addSection": "Añadir sección personalizada",
-        "deleteMoment": "Eliminar",
-        "duplicateHere": "Duplicar en esta sección",
-        "duplicateElse": "Duplicar en otra sección",
-        "moveElse": "Mover a otra sección",
-        "moveUp": "Mover arriba",
-        "moveDown": "Mover abajo",
-        "play": "Reproducir",
-        "pause": "Pausar",
-        "stop": "Detener",
-        "blockHeader": "Doble clic para renombrar sección (clic derecho para más opciones)"
+        "addSection": "Add custom section",
+        "deleteMoment": "Delete",
+        "duplicateHere": "Duplicate in this section",
+        "duplicateElse": "Duplicate in another section",
+        "moveElse": "Move to another section",
+        "moveUp": "Move up",
+        "moveDown": "Move down",
+        "play": "Play",
+        "pause": "Pause",
+        "stop": "Stop",
+        "blockHeader": "Double-click to rename section (right-click for more options)"
       },
       "toggles": {
-        "showAdvanced": "Mostrar detalles avanzados",
-        "hideAdvanced": "Ocultar detalles avanzados",
-        "hideRecipient": "Ocultar destinatario",
-        "showPlayer": "Reproductor",
-        "hidePlayer": "Ocultar"
+        "showAdvanced": "Show advanced details",
+        "hideAdvanced": "Hide advanced details",
+        "hideRecipient": "Hide recipient",
+        "showPlayer": "Player",
+        "hidePlayer": "Hide"
       },
       "labels": {
-        "dragHandle": "Arrastrar para reordenar",
-        "stateNone": "Sin estado",
-        "optionalBadge": "Opcional",
-        "optionalToggle": "Es opcional",
-        "type": "Tipo",
-        "location": "Ubicación",
-        "state": "Estado",
-        "song": "Canción",
-        "time": "Hora",
-        "duration": "Duración",
-        "language": "Idioma",
+        "dragHandle": "Drag to reorder",
+        "stateNone": "No status",
+        "optionalBadge": "Optional",
+        "optionalToggle": "Optional",
+        "type": "Type",
+        "location": "Location",
+        "state": "Status",
+        "song": "Song",
+        "time": "Time",
+        "duration": "Duration",
+        "language": "Language",
         "tempo": "Tempo",
-        "era": "Década",
-        "genre": "Género",
-        "volume": "Volumen",
-        "recipientHint": "Selecciona a quién va dirigido este momento (opcional)",
-        "recipientDefault": "Destinatario",
-        "recipientRoleFallback": "Rol asignado",
-        "recipientSummary": "Destinatario: {{label}}",
-        "responsibles": "Responsables",
-        "requirements": "Requisitos técnicos / notas",
-        "relatedSuppliers": "Proveedores relacionados",
-        "actionDuplicate": "Duplicar en:",
-        "actionMove": "Mover a:",
-        "playerNowPlaying": "Reproduciendo vista previa",
-        "musicInspiration": "Inspiración musical",
-        "aiTitle": "Encuentra la canción perfecta (IA)",
-        "viewOn": "Ver en:"
+        "era": "Decade",
+        "genre": "Genre",
+        "volume": "Volume",
+        "recipientHint": "Choose who this moment is for (optional)",
+        "recipientDefault": "Recipient",
+        "recipientRoleFallback": "Assigned role",
+        "recipientSummary": "Recipient: {{label}}",
+        "responsibles": "Responsible people",
+        "requirements": "Technical requirements / notes",
+        "relatedSuppliers": "Related suppliers",
+        "actionDuplicate": "Duplicate to:",
+        "actionMove": "Move to:",
+        "playerNowPlaying": "Playing preview",
+        "musicInspiration": "Music inspiration",
+        "aiTitle": "Find the perfect song (AI)",
+        "viewOn": "View on:"
       },
       "placeholders": {
-        "momentTitle": "Título del momento",
-        "location": "Capilla, jardín, salón...",
-        "song": "Nombre de la canción",
+        "momentTitle": "Moment title",
+        "location": "Chapel, garden, ballroom...",
+        "song": "Song name",
         "time": "hh:mm",
-        "duration": "ej. 10 min",
-        "recipientManual": "Nombre o rol del destinatario",
-        "requirements": "Sonido, iluminación, elementos especiales...",
-        "supplier": "Nombre o referencia",
-        "searchSong": "Buscar canción por nombre...",
-        "aiPrompt": "Describe el momento: \"primer baile, balada en español\"",
-        "role": "Rol / función",
-        "name": "Nombre",
-        "contact": "Contacto (tel/email)"
+        "duration": "e.g. 10 min",
+        "recipientManual": "Recipient name or role",
+        "requirements": "Sound, lighting, special elements...",
+        "supplier": "Name or reference",
+        "searchSong": "Search song by name...",
+        "aiPrompt": "Describe the moment: \"first dance, spanish ballad\"",
+        "role": "Role / function",
+        "name": "Name",
+        "contact": "Contact (phone/email)"
       },
       "options": {
         "recipient": {
-          "none": "Sin destinatario",
-          "custom": "Especificar manualmente",
-          "rolePrefix": "Rol: {{role}}",
-          "table": "· Mesa {{table}}"
+          "none": "No recipient",
+          "custom": "Specify manually",
+          "rolePrefix": "Role: {{role}}",
+          "table": "· Table {{table}}"
         },
         "languages": {
-          "es": "Español",
-          "en": "Inglés"
+          "es": "Spanish",
+          "en": "English"
         },
         "tempo": {
-          "any": "Cualquiera",
-          "slow": "Lento",
-          "medium": "Medio",
-          "fast": "Rápido"
+          "any": "Any",
+          "slow": "Slow",
+          "medium": "Medium",
+          "fast": "Fast"
         },
         "era": {
-          "any": "Cualquiera",
+          "any": "Any",
           "80s": "80s",
           "90s": "90s",
           "2000s": "2000s",
           "2010s": "2010s",
-          "current": "Actual"
+          "current": "Current"
         },
         "genre": {
-          "any": "Cualquiera",
+          "any": "Any",
           "pop": "Pop",
           "rock": "Rock",
           "jazz": "Jazz",
-          "latin": "Latino",
-          "classical": "Clásica",
+          "latin": "Latin",
+          "classical": "Classical",
           "indie": "Indie",
           "rnb": "R&B"
         }
       },
       "helperTexts": {
-        "recipientDetails": "Mesa: {{table}} · Dieta: {{diet}}",
-        "responsiblesEmpty": "Añade quién se encargará de este momento.",
-        "suppliersEmpty": "Registra proveedores relevantes para este momento.",
-        "spotifyEmbed": "Pegaste un enlace de Spotify. Se muestra una vista previa.",
-        "sectionTip": "Consejo: doble clic sobre el nombre de la sección para renombrar. Clic derecho para eliminar o mover la sección. Usa \"Dup →\" para duplicar un momento en otra sección y \"Mov →\" para moverlo.",
-        "noOtherSections": "No hay otras secciones disponibles."
+        "recipientDetails": "Table: {{table}} · Diet: {{diet}}",
+        "responsiblesEmpty": "Add who is in charge of this moment.",
+        "suppliersEmpty": "Record suppliers relevant to this moment.",
+        "spotifyEmbed": "You pasted a Spotify link. A preview is shown.",
+        "sectionTip": "Tip: double-click the section name to rename it. Right-click to delete or move the section. Use \"Dup →\" to duplicate a moment into another section and \"Move →\" to move it.",
+        "noOtherSections": "No other sections available."
       },
       "menu": {
-        "duplicateHere": "Duplicar en esta sección",
-        "duplicateElse": "Duplicar en otra sección",
-        "move": "Mover a otra sección",
-        "delete": "Eliminar momento"
+        "duplicateHere": "Duplicate in this section",
+        "duplicateElse": "Duplicate in another section",
+        "move": "Move to another section",
+        "delete": "Delete moment"
       },
       "player": {
-        "show": "Reproductor",
-        "hide": "Ocultar",
-        "play": "Reproducir",
-        "pause": "Pausar",
-        "stop": "Detener",
-        "volume": "Volumen"
+        "show": "Player",
+        "hide": "Hide",
+        "play": "Play",
+        "pause": "Pause",
+        "stop": "Stop",
+        "volume": "Volume"
       },
       "ai": {
-        "loading": "Buscando recomendaciones...",
-        "error": "No se pudo obtener recomendaciones. Prueba de nuevo.",
-        "resultsTitle": "Recomendaciones de IA",
-        "preferencesPrefix": "Preferencias",
+        "loading": "Fetching recommendations...",
+        "error": "Could not fetch recommendations. Try again.",
+        "resultsTitle": "AI recommendations",
+        "preferencesPrefix": "Preferences",
         "preferences": {
           "language": {
-            "es": "idioma español",
-            "en": "idioma inglés"
+            "es": "spanish language",
+            "en": "english language"
           },
           "tempo": {
-            "slow": "tempo lento",
-            "medium": "tempo medio",
-            "fast": "tempo rápido"
+            "slow": "slow tempo",
+            "medium": "medium tempo",
+            "fast": "fast tempo"
           },
           "era": {
-            "80s": "década 80",
-            "90s": "década 90",
-            "2000s": "década 2000",
-            "2010s": "década 2010",
-            "current": "década actual"
+            "80s": "1980s decade",
+            "90s": "1990s decade",
+            "2000s": "2000s decade",
+            "2010s": "2010s decade",
+            "current": "current decade"
           },
           "genre": {
-            "pop": "género pop",
-            "rock": "género rock",
-            "jazz": "género jazz",
-            "latin": "género latino",
-            "classical": "género clásico",
-            "indie": "género indie",
-            "rnb": "género R&B"
+            "pop": "pop genre",
+            "rock": "rock genre",
+            "jazz": "jazz genre",
+            "latin": "latin genre",
+            "classical": "classical genre",
+            "indie": "indie genre",
+            "rnb": "R&B genre"
           }
         }
       },
       "search": {
-        "loading": "Buscando...",
-        "error": "No se pudo buscar canciones. Inténtalo más tarde.",
-        "resultsTitle": "Resultados"
+        "loading": "Searching...",
+        "error": "Could not search songs. Try again later.",
+        "resultsTitle": "Results"
       },
       "aria": {
-        "reorderHandle": "Arrastrar para reordenar"
+        "reorderHandle": "Drag to reorder"
       },
       "defaults": {
-        "newMoment": "Nuevo momento {{count}}",
-        "momentTitle": "Nuevo momento"
+        "newMoment": "New moment {{count}}",
+        "momentTitle": "New moment"
       },
       "empty": {
-        "title": "No hay momentos en esta sección.",
-        "subtitle": "Haz clic en \"Añadir momento\" para crear uno nuevo."
+        "title": "There are no moments in this section.",
+        "subtitle": "Click \"Add moment\" to create one."
       },
       "prompts": {
-        "newSection": "Nombre de la nueva sección (ej. Ensayo, Brunch...)",
-        "blockAction": "Acción: eliminar | mover-izquierda | mover-derecha",
-        "deleteSection": "Eliminar sección \"{{name}}\"?",
-        "renameSection": "Nuevo nombre de la sección:",
-        "duplicateIn": "Duplicar en (escribe tal cual):\n{{list}}",
-        "moveTo": "Mover a (escribe tal cual):\n{{list}}"
+        "newSection": "Name for the new section (e.g., Rehearsal, Brunch...)",
+        "blockAction": "Action: delete | move-left | move-right",
+        "deleteSection": "Remove section \"{{name}}\"?",
+        "renameSection": "New name for the section:",
+        "duplicateIn": "Duplicate to (type exactly):\n{{list}}",
+        "moveTo": "Move to (type exactly):\n{{list}}"
       },
       "momentTypes": {
-        "entrada": "Entrada",
-        "lectura": "Lectura",
-        "votos": "Votos",
-        "anillos": "Intercambio de anillos",
-        "baile": "Baile",
-        "discurso": "Discurso",
-        "corte_pastel": "Corte de pastel",
-        "salida": "Salida",
-        "otro": "Otro"
+        "entrada": "Entrance",
+        "lectura": "Reading",
+        "votos": "Vows",
+        "anillos": "Ring exchange",
+        "baile": "Dance",
+        "discurso": "Speech",
+        "corte_pastel": "Cake cutting",
+        "salida": "Exit",
+        "otro": "Other"
       },
       "states": {
-        "pendiente": "Pendiente",
-        "confirmado": "Confirmado",
-        "ensayo": "Ensayo"
+        "pendiente": "Pending",
+        "confirmado": "Confirmed",
+        "ensayo": "Rehearsal"
       },
       "recipientRoles": {
-        "novia": "Novia",
-        "novio": "Novio",
+        "novia": "Bride",
+        "novio": "Groom",
         "planner": "Planner",
-        "oficiante": "Oficiante / Maestro de ceremonias",
-        "familia": "Familiar cercano",
-        "amigo": "Amigo/a",
-        "proveedor": "Proveedor"
+        "oficiante": "Officiant / Master of ceremonies",
+        "familia": "Close family",
+        "amigo": "Friend",
+        "proveedor": "Supplier"
       },
       "warnings": {
-        "missingTime": "Añade una hora estimada.",
-        "missingResponsible": "Define al menos un responsable.",
-        "missingRecipient": "Asigna destinatario o rol.",
-        "missingSong": "Añade una canción."
+        "missingTime": "Add an estimated time.",
+        "missingResponsible": "Assign at least one responsible person.",
+        "missingRecipient": "Assign a recipient or role.",
+        "missingSong": "Add a song."
       },
       "toasts": {
-        "validationReminder": "Hay campos requeridos sin completar. Revisa las alertas en cada momento.",
-        "maxMomentsInSection": "Has alcanzado el máximo de {{count}} momentos en esta sección.",
-        "responsibleLimit": "Máximo {{count}} responsables por momento.",
-        "supplierDraftRequired": "Escribe un proveedor antes de añadirlo.",
-        "supplierLimit": "Máximo {{count}} proveedores por momento.",
-        "supplierAlreadyExists": "Ese proveedor ya está registrado.",
-        "selectTargetSection": "Selecciona una sección destino.",
-        "momentDuplicated": "Momento duplicado correctamente.",
-        "selectDifferentSection": "Selecciona una sección diferente para mover el momento.",
-        "momentMoved": "Momento movido a la nueva sección.",
-        "createAnotherSection": "Crea otra sección para usar esta acción.",
-        "songApplied": "Canción añadida al último momento."
+        "validationReminder": "Some required fields are missing. Check the alerts in each moment.",
+        "maxMomentsInSection": "You've reached the maximum of {{count}} moments in this section.",
+        "responsibleLimit": "Maximum {{count}} responsibles per moment.",
+        "supplierDraftRequired": "Enter a supplier before adding it.",
+        "supplierLimit": "Maximum {{count}} suppliers per moment.",
+        "supplierAlreadyExists": "That supplier is already registered.",
+        "selectTargetSection": "Select a destination section.",
+        "momentDuplicated": "Moment duplicated successfully.",
+        "selectDifferentSection": "Choose a different section to move the moment.",
+        "momentMoved": "Moment moved to the new section.",
+        "createAnotherSection": "Create another section to use this action.",
+        "songApplied": "Song applied to the last moment."
       }
     },
     "checklist": {
-      "title": "Checklist de última hora",
-      "description": "Resumen rápido de lo imprescindible a última hora.",
+      "title": "Last-minute checklist",
+      "description": "Quick summary of the must-do items right before the event.",
       "manualDefaults": {
-        "specialGifts": "Regalos para momentos especiales preparados"
+        "specialGifts": "Gifts prepared for the special moments"
       },
       "buttons": {
-        "addCheckpoint": "Añadir checkpoint",
-        "view": "Ver"
+        "addCheckpoint": "Add checkpoint",
+        "view": "View"
       },
       "statuses": {
-        "pending": "pendiente",
-        "in-progress": "en progreso",
-        "done": "completado"
+        "pending": "pending",
+        "in-progress": "in progress",
+        "done": "completed"
       },
       "categories": {
-        "documentation": "Documentación",
-        "providers": "Proveedores",
-        "ceremony": "Ceremonia",
-        "contingency": "Contingencia",
+        "documentation": "Documentation",
+        "providers": "Suppliers",
+        "ceremony": "Ceremony",
+        "contingency": "Contingency",
         "personal": "Personal",
-        "technical": "Técnico"
+        "technical": "Technical"
       },
       "badges": {
-        "critical": "Crítico",
-        "custom": "Personalizado",
-        "documents": "Documentos"
+        "critical": "Critical",
+        "custom": "Custom",
+        "documents": "Documents"
       },
       "labels": {
-        "due": "Vence:",
-        "overdue": "¡Vencido!",
-        "notesPlaceholder": "Añadir notas...",
-        "documents": "Documentos:",
-        "manualTitle": "Checkpoints manuales"
+        "due": "Due:",
+        "overdue": "Overdue!",
+        "notesPlaceholder": "Add notes...",
+        "documents": "Documents:",
+        "manualTitle": "Manual checkpoints"
       },
       "manual": {
-        "empty": "Añade checkpoints con el botón «{{button}}».",
-        "toggleDone": "Marcar listo",
-        "togglePending": "Marcar pendiente",
-        "removeTooltip": "Eliminar"
+        "empty": "Add checkpoints with the \"{{button}}\" button.",
+        "toggleDone": "Mark done",
+        "togglePending": "Mark pending",
+        "removeTooltip": "Delete"
       },
       "providersCard": {
-        "title": "Proveedores",
-        "confirmed": "Confirmados:",
-        "pending": "Pendientes: {{count}}",
-        "link": "Ver"
+        "title": "Suppliers",
+        "confirmed": "Confirmed:",
+        "pending": "Pending: {{count}}",
+        "link": "View"
       },
       "momentsCard": {
-        "title": "Momentos (música)",
-        "assigned": "Canciones asignadas:",
-        "missing": "Faltan por asignar: {{count}}",
-        "empty": "Sin momentos configurados"
+        "title": "Moments (music)",
+        "assigned": "Songs assigned:",
+        "missing": "Missing assignments: {{count}}",
+        "empty": "No moments configured"
       },
       "toasts": {
-        "statusUpdated": "\"{{label}}\" marcado como {{status}}",
-        "missingName": "Ingresa un nombre para el ítem",
-        "customAdded": "Ítem \"{{label}}\" añadido",
-        "customRemoved": "Ítem eliminado",
-        "exported": "Checklist exportado",
-        "imported": "{{count}} ítems personalizados importados",
-        "importError": "Error al importar el archivo",
-        "importFormat": "Formato de archivo inválido"
+        "statusUpdated": "\"{{label}}\" marked as {{status}}",
+        "missingName": "Enter a name for the item",
+        "customAdded": "Item \"{{label}}\" added",
+        "customRemoved": "Item removed",
+        "exported": "Checklist exported",
+        "imported": "{{count}} custom items imported",
+        "importError": "We couldn't import the file",
+        "importFormat": "Invalid file format"
       },
       "prompts": {
-        "deleteCustom": "¿Eliminar \"{{label}}\"?"
+        "deleteCustom": "Delete \"{{label}}\"?"
       },
       "import": {
-        "warn": "No se pudo importar {{label}}"
+        "warn": "Could not import {{label}}"
       },
       "addModal": {
-        "title": "Añadir checkpoint",
-        "nameLabel": "Nombre del checkpoint",
-        "namePlaceholder": "Ej: Regalos preparados para los momentos especiales",
-        "notesLabel": "Notas (opcional)",
-        "notesPlaceholder": "Detalles o recordatorios"
+        "title": "Add checkpoint",
+        "nameLabel": "Checkpoint name",
+        "namePlaceholder": "E.g. Gifts prepared for the special moments",
+        "notesLabel": "Notes (optional)",
+        "notesPlaceholder": "Details or reminders"
       },
       "tooltips": {
-        "markCritical": "Marcar como crítico",
-        "edit": "Editar",
-        "save": "Guardar",
-        "delete": "Eliminar"
+        "markCritical": "Mark as critical",
+        "edit": "Edit",
+        "save": "Save",
+        "delete": "Delete"
       }
     }
   },
@@ -3044,11 +2741,11 @@
           "compressionNotice": "Las fotos nuevas se optimizan automáticamente para ahorrar espacio.",
           "progressTitle": "Tus progresos",
           "progressDescription": "Has compartido {{count}} {{count, plural, one {foto} other {fotos}}}. ¡Gracias por sumar a los recuerdos!",
-            "uploadsEmpty": "Las fotos aprobadas aparecerán en el slideshow del evento y en la galería final. El anfitrión avisará cuando estén listas.",
-            "uploadStatus": "Escena: {{scene}} · {{size}} KB",
-            "uploadReview": "En revisión",
-            "recentUploadsTitle": "Tus últimos envíos",
-            "guestFallback": "Invitado"
+          "uploadsEmpty": "Las fotos aprobadas aparecerán en el slideshow del evento y en la galería final. El anfitrión avisará cuando estén listas.",
+          "uploadStatus": "Escena: {{scene}} · {{size}} KB",
+          "uploadReview": "En revisión",
+          "recentUploadsTitle": "Tus últimos envíos",
+          "guestFallback": "Invitado"
         },
         "toasts": {
           "firstUpload": "¡Logro desbloqueado! Primer recuerdo compartido ✨",
@@ -3057,76 +2754,76 @@
           "default": "Foto enviada correctamente"
         }
       },
-        "public": {
-          "loading": "Preparando la galería...",
-          "error": "Este enlace ya no es válido. Pide uno nuevo a la pareja anfitriona.",
-          "errorTitle": "No pudimos abrir la galería",
-          "errorDescription": "Este enlace ya no es válido o ha sido revocado. Contacta con la pareja anfitriona para solicitar uno nuevo.",
-          "errors": {
-            "incompleteLink": "El enlace está incompleto. Solicita un nuevo QR al anfitrión.",
-            "invalidLink": "Este enlace ya no es válido."
+      "public": {
+        "loading": "Preparando la galería...",
+        "error": "Este enlace ya no es válido. Pide uno nuevo a la pareja anfitriona.",
+        "errorTitle": "No pudimos abrir la galería",
+        "errorDescription": "Este enlace ya no es válido o ha sido revocado. Contacta con la pareja anfitriona para solicitar uno nuevo.",
+        "errors": {
+          "incompleteLink": "El enlace está incompleto. Solicita un nuevo QR al anfitrión.",
+          "invalidLink": "Este enlace ya no es válido."
+        },
+        "hero": {
+          "badge": "Galería de recuerdos",
+          "titleFallback": "Comparte tus mejores momentos",
+          "description": "Elige un momento para tus recuerdos y súbelos directamente desde tu móvil.",
+          "deadline": "Disponible hasta {{date}} · {{remaining}}",
+          "remaining": {
+            "lastDay": "Último día",
+            "days": "{{count}} días restantes"
           },
-          "hero": {
-            "badge": "Galería de recuerdos",
-            "titleFallback": "Comparte tus mejores momentos",
-            "description": "Elige un momento para tus recuerdos y súbelos directamente desde tu móvil.",
-            "deadline": "Disponible hasta {{date}} · {{remaining}}",
-            "remaining": {
-              "lastDay": "Último día",
-              "days": "{{count}} días restantes"
-            },
-            "closed": "La subida de archivos ha finalizado para esta galería."
-          },
-          "form": {
-            "title": "Comparte tus recuerdos",
-            "description": "Carga tus fotos, añade un mensaje y aparecerán en la galería de todos los invitados.",
-            "nameLabel": "Tu nombre",
-            "namePlaceholder": "Ej. Laura G.",
-            "emailLabel": "Correo electrónico (opcional)",
-            "emailPlaceholder": "Te avisaremos cuando destaquen tus recuerdos",
-            "sceneLabel": "Escena o momento",
-            "termsLabel": "Acepto compartir mis fotos con la pareja anfitriona.",
-            "termsDescription": "Confirmo que tengo permiso para compartir estas imágenes y acepto que la pareja anfitriona las utilice en la galería.",
-            "start": "Comenzar",
-            "startUpload": "Empezar a subir recuerdos",
-            "tip": "¡Consejo! Elige la escena correcta para ayudar a la pareja a organizar las fotos."
-          },
-          "list": {
-            "title": "Momentos destacados",
-            "count": "{{count}} momentos disponibles",
-            "cardDescription": "Sube instantáneamente tus fotos o videos de este momento.",
-            "empty": "Los anfitriones aún no han configurado momentos específicos. Vuelve más tarde para compartir tus recuerdos."
-          },
-          "recent": {
-            "title": "Últimas aportaciones",
-            "item": "{{scene}} · {{size}} KB"
-          },
-          "status": {
-            "cleanup": "La galería permanecerá disponible aproximadamente {{duration}} antes de archivarse automáticamente.",
-            "cleanupToday": "un día más",
-            "cleanupDays": "{{count}} días más"
-          },
-          "overlay": {
-            "selected": "Momento seleccionado",
-            "close": "Cerrar",
-            "start": "Empezar a subir recuerdos",
-            "remainingUploads": "Puedes subir {{count, plural, one {1 archivo adicional} other {{count} archivos adicionales}} con este enlace."
-          },
-          "uploadStates": {
-            "title": "Recuerdos compartidos",
-            "description": "Gracias por colaborar. Tus fotos se revisarán antes de mostrarse al resto de invitados.",
-            "recentUploads": "Últimas fotos enviadas",
-            "statusReview": "En revisión",
-            "dropzoneTitle": "Arrastra y suelta tus fotos aquí",
-            "dropzoneSubtitle": "Hasta 20 archivos, formato JPG o PNG"
-          },
-          "toasts": {
-            "uploadsClosed": "Esta galería ya no acepta nuevas fotos.",
-            "missingName": "Indica tu nombre para personalizar tus aportaciones.",
-            "missingTerms": "Debes aceptar la política de privacidad.",
-            "success": "¡Gracias! Tu archivo se ha enviado correctamente."
-          }
+          "closed": "La subida de archivos ha finalizado para esta galería."
+        },
+        "form": {
+          "title": "Comparte tus recuerdos",
+          "description": "Carga tus fotos, añade un mensaje y aparecerán en la galería de todos los invitados.",
+          "nameLabel": "Tu nombre",
+          "namePlaceholder": "Ej. Laura G.",
+          "emailLabel": "Correo electrónico (opcional)",
+          "emailPlaceholder": "Te avisaremos cuando destaquen tus recuerdos",
+          "sceneLabel": "Escena o momento",
+          "termsLabel": "Acepto compartir mis fotos con la pareja anfitriona.",
+          "termsDescription": "Confirmo que tengo permiso para compartir estas imágenes y acepto que la pareja anfitriona las utilice en la galería.",
+          "start": "Comenzar",
+          "startUpload": "Empezar a subir recuerdos",
+          "tip": "¡Consejo! Elige la escena correcta para ayudar a la pareja a organizar las fotos."
+        },
+        "list": {
+          "title": "Momentos destacados",
+          "count": "{{count}} momentos disponibles",
+          "cardDescription": "Sube instantáneamente tus fotos o videos de este momento.",
+          "empty": "Los anfitriones aún no han configurado momentos específicos. Vuelve más tarde para compartir tus recuerdos."
+        },
+        "recent": {
+          "title": "Últimas aportaciones",
+          "item": "{{scene}} · {{size}} KB"
+        },
+        "status": {
+          "cleanup": "La galería permanecerá disponible aproximadamente {{duration}} antes de archivarse automáticamente.",
+          "cleanupToday": "un día más",
+          "cleanupDays": "{{count}} días más"
+        },
+        "overlay": {
+          "selected": "Momento seleccionado",
+          "close": "Cerrar",
+          "start": "Empezar a subir recuerdos",
+          "remainingUploads": "Puedes subir {{count, plural, one {1 archivo adicional} other {{count} archivos adicionales}} con este enlace."
+        },
+        "uploadStates": {
+          "title": "Recuerdos compartidos",
+          "description": "Gracias por colaborar. Tus fotos se revisarán antes de mostrarse al resto de invitados.",
+          "recentUploads": "Últimas fotos enviadas",
+          "statusReview": "En revisión",
+          "dropzoneTitle": "Arrastra y suelta tus fotos aquí",
+          "dropzoneSubtitle": "Hasta 20 archivos, formato JPG o PNG"
+        },
+        "toasts": {
+          "uploadsClosed": "Esta galería ya no acepta nuevas fotos.",
+          "missingName": "Indica tu nombre para personalizar tus aportaciones.",
+          "missingTerms": "Debes aceptar la política de privacidad.",
+          "success": "¡Gracias! Tu archivo se ha enviado correctamente."
         }
+      }
     }
   },
   "suppliers": {
@@ -3614,7 +3311,7 @@
           "view": "Ver ficha",
           "promote": "Promover a confirmado",
           "schedule": "Registrar próxima acción",
-        "archive": "Descartar"
+          "archive": "Descartar"
         },
         "metrics": {
           "matchLabel": "Match IA:",
@@ -3851,8 +3548,18 @@
           "image": "https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=500&q=60",
           "location": "Madrid",
           "price": "1.200 € - 2.500 €",
-          "tags": ["natural", "documental", "exterior", "luz natural"],
-          "keywords": ["fotógrafo", "natural", "documental", "boda"]
+          "tags": [
+            "natural",
+            "documental",
+            "exterior",
+            "luz natural"
+          ],
+          "keywords": [
+            "fotógrafo",
+            "natural",
+            "documental",
+            "boda"
+          ]
         },
         {
           "id": "2",
@@ -3862,8 +3569,17 @@
           "image": "https://images.unsplash.com/photo-1508435234994-67cfd7690508?auto=format&fit=crop&w=500&q=60",
           "location": "Barcelona",
           "price": "1.500 € - 3.000 €",
-          "tags": ["playa", "exterior", "naturaleza"],
-          "keywords": ["fotógrafo", "boda", "playa", "experiencia"]
+          "tags": [
+            "playa",
+            "exterior",
+            "naturaleza"
+          ],
+          "keywords": [
+            "fotógrafo",
+            "boda",
+            "playa",
+            "experiencia"
+          ]
         },
         {
           "id": "3",
@@ -3873,8 +3589,16 @@
           "image": "https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&w=500&q=60",
           "location": "Madrid",
           "price": "70 € - 120 € por persona",
-          "tags": ["vegetariano", "vegano", "buffet"],
-          "keywords": ["catering", "buffet", "evento"]
+          "tags": [
+            "vegetariano",
+            "vegano",
+            "buffet"
+          ],
+          "keywords": [
+            "catering",
+            "buffet",
+            "evento"
+          ]
         },
         {
           "id": "4",
@@ -3884,8 +3608,16 @@
           "image": "https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?auto=format&fit=crop&w=500&q=60",
           "location": "Valencia",
           "price": "800 € - 1.500 €",
-          "tags": ["dj", "música", "iluminación"],
-          "keywords": ["dj", "música", "evento"]
+          "tags": [
+            "dj",
+            "música",
+            "iluminación"
+          ],
+          "keywords": [
+            "dj",
+            "música",
+            "evento"
+          ]
         },
         {
           "id": "5",
@@ -3895,8 +3627,16 @@
           "image": "https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&w=500&q=60",
           "location": "Sevilla",
           "price": "500 € - 1.500 €",
-          "tags": ["flores", "decoración", "boho"],
-          "keywords": ["flores", "decoración", "boda"]
+          "tags": [
+            "flores",
+            "decoración",
+            "boho"
+          ],
+          "keywords": [
+            "flores",
+            "decoración",
+            "boda"
+          ]
         }
       ]
     },
@@ -4635,44 +4375,40 @@
   "validaciones_tamano_tipo_const_size_numberfilesize": ");\n\n      // Validaciones: tamaño y tipo\n      const size = Number(file.size || 0);\n      const validSize = size >= 0 && size <= MAX_BYTES;\n      const validType = isAllowedType(file);\n      if (!validSize || !validType) {\n        console.warn(",
   "validar_actualizacion": "Validar actualización",
   "validation": {
-    "nameRequired": "El nombre es obligatorio",
-    "serviceRequired": "El servicio es obligatorio",
-    "emailInvalid": "Email inválido",
-    "linkMustStartHttp": "El enlace debe comenzar con http:// o https://",
     "titleRequired": "El título es obligatorio",
-    "companionNegative": "El número de acompañantes no puede ser negativo",
-    "selectCompanionType": "Selecciona el tipo de acompañante",
-    "companionMismatch": "Establece \"Sin acompañante\" o añade alguno",
-    "fieldRequired": "Este campo es obligatorio",
-    "emailRequired": "El email es obligatorio",
-    "emailFormat": "El formato del email no es válido",
-    "phoneFormat": "El formato del teléfono no es válido",
-    "urlFormat": "La URL debe empezar con http:// o https://",
-    "passwordRequired": "La contraseña es obligatoria",
-    "passwordMinLength": "La contraseña debe tener al menos {{count}} caracteres",
-    "nameMinLength": "El nombre debe tener al menos {{count}} caracteres",
-    "nameMaxLength": "El nombre no puede tener más de {{count}} caracteres",
-    "postalCodeInvalid": "El código postal no es válido",
-    "dniInvalid": "El DNI/NIE no es válido",
-    "dniRequired": "El DNI/NIE es obligatorio",
-    "dniFormat": "El formato del DNI/NIE no es válido",
-    "passwordMatch": "Las contraseñas no coinciden",
-    "passwordStrength": "La contraseña debe tener al menos una letra mayúscula, una letra minúscula y un número",
+    "nameRequired": "Name is required",
+    "serviceRequired": "Service is required",
+    "emailInvalid": "Invalid email",
+    "linkMustStartHttp": "Link must start with http:// or https://",
+    "companionNegative": "Number of companions cannot be negative",
+    "selectCompanionType": "Select companion type",
+    "companionMismatch": "Set \"No companion\" or add one",
+    "fieldRequired": "This field is required",
+    "emailRequired": "Email is required",
+    "emailFormat": "Email format is invalid",
+    "phoneFormat": "Phone format is invalid",
+    "urlFormat": "URL must start with http:// or https://",
+    "passwordRequired": "Password is required",
+    "passwordMinLength": "Password must be at least {{count}} characters",
+    "nameMinLength": "Name must be at least {{count}} characters",
+    "nameMaxLength": "Name cannot exceed {{count}} characters",
+    "postalCodeInvalid": "Postal code is invalid",
+    "dniInvalid": "DNI/NIE is invalid",
     "password": {
-      "veryWeak": "Muy débil",
-      "weak": "Débil",
-      "acceptable": "Aceptable",
-      "good": "Buena",
-      "excellent": "Excelente",
+      "veryWeak": "Very weak",
+      "weak": "Weak",
+      "acceptable": "Acceptable",
+      "good": "Good",
+      "excellent": "Excellent",
       "suggestions": {
-        "minLength": "Introduce una contraseña con al menos {{count}} caracteres.",
-        "useMinChars": "Usa al menos {{count}} caracteres.",
-        "increase12": "Aumenta la longitud a 12 caracteres o más.",
-        "mixCase": "Combina mayúsculas y minúsculas.",
-        "addNumbers": "Añade números para reforzarla.",
-        "addSymbols": "Incluye símbolos como !, %, # o similares.",
-        "avoidRepetition": "Evita repetir el mismo carácter varias veces seguidas.",
-        "avoidCommon": "Evita palabras comunes o secuencias previsibles."
+        "minLength": "Enter a password with at least {{count}} characters.",
+        "useMinChars": "Use at least {{count}} characters.",
+        "increase12": "Increase length to 12 characters or more.",
+        "mixCase": "Combine uppercase and lowercase.",
+        "addNumbers": "Add numbers to strengthen it.",
+        "addSymbols": "Include symbols like !, %, # or similar.",
+        "avoidRepetition": "Avoid repeating the same character multiple times in a row.",
+        "avoidCommon": "Avoid common words or predictable sequences."
       }
     }
   },
@@ -4740,79 +4476,6 @@
       "managerConfirmError": "No se recibió confirmación del nuevo jefe. Revisa el backend.",
       "commercialCreated": "Comercial creado correctamente",
       "commercialConfirmError": "No se recibió confirmación del nuevo comercial. Revisa el backend."
-    }
-  },
-  "rsvp": {
-    "reminderSimulation": "Simulación: candidatos={{attempted}}, enviados={{sent}}, omitidos={{skipped}}",
-    "reminderSent": "Envío: candidatos={{attempted}}, enviados={{sent}}, omitidos={{skipped}}",
-    "reminderSimulationError": "Error simulando recordatorios",
-    "reminderSendError": "Error enviando recordatorios",
-    "linkCopied": "Enlace RSVP copiado",
-    "linkCopyError": "No se pudo generar/copiar el enlace"
-  },
-  "weddings": {
-    "syncCrmError": "No se pudo encolar la sincronización CRM. Intenta nuevamente.",
-    "bulkSyncError": "No se pudieron encolar las bodas seleccionadas. Intenta nuevamente.",
-    "createError": "No se pudo crear la boda. Revisa permisos.",
-    "updateStatusError": "No se pudo actualizar el estado de la boda. Intenta nuevamente."
-  },
-  "finance": {
-    "budget": {
-      "errors": {
-        "nameRequired": "El nombre de la categoría es obligatorio",
-        "amountInvalid": "El importe debe ser un número válido"
-      },
-      "advisorErrors": {
-        "requestFailed": "No se pudo obtener la recomendación del asesor",
-        "refreshFailed": "No se pudo actualizar la recomendación del asesor",
-        "applyFailed": "No se pudo aplicar el escenario recomendado"
-      }
-    }
-  },
-  "guests": {
-    "email": {
-      "sent": "Email enviado a {{email}}",
-      "sentSuccess": "Email enviado correctamente",
-      "sendError": "Error enviando email: {{error}}",
-      "sendFailed": "No se pudo enviar el email"
-    }
-  },
-  "whatsapp": {
-    "selectGuests": "Selecciona al menos un invitado",
-    "coupleNameRequired": "El mensaje debe incluir el nombre de la pareja o la variable {coupleName}",
-    "assetUrlRequired": "Añade la URL de la invitación diseñada antes de continuar",
-    "providerNotConfigured": "El proveedor de WhatsApp API no está configurado. Por favor, configúralo antes de enviar.",
-    "coupleNameMissing": "El mensaje debe incluir el nombre de la pareja para cada invitado seleccionado",
-    "sendComplete": "Envío completado. Éxitos: {{ok}}, Fallos: {{fail}}"
-  },
-  "design": {
-    "svg": {
-      "noContent": "No hay SVG para guardar",
-      "saved": "SVG guardado en la boda",
-      "saveError": "No se pudo guardar el SVG"
-    },
-    "palette": {
-      "saved": "Paleta guardada",
-      "saveError": "No se pudo guardar la paleta"
-    }
-  },
-  "email": {
-    "requiredFields": "Por favor completa los campos requeridos",
-    "sentSuccess": "Correo enviado exitosamente",
-    "sendError": "Error al enviar correo: {{message}}"
-  },
-  "admin": {
-    "clipboard": {
-      "copied": "Copiado al portapapeles",
-      "copyError": "Error al copiar"
-    },
-    "partner": {
-      "linkGenerated": "Enlace generado y copiado:\n{{url}}",
-      "linkError": "Error al generar enlace",
-      "managerCreated": "Jefe de comerciales creado correctamente",
-      "managerConfirmError": "No se recibió confirmación del nuevo jefe. Revisa el backend.",
-      "commercialCreated": "Comercial creado correctamente",
-      "commercialConfirmError": "No se recibió confirmación del nuevo comercial. Revisa el backend."
     },
     "users": {
       "exportSuccess": "Datos de usuarios exportados correctamente",
@@ -4833,23 +4496,84 @@
       "resolveError": "No se pudo marcar la alerta como resuelta."
     }
   },
+  "weddings": {
+    "syncCrmError": "No se pudo encolar la sincronización CRM. Intenta nuevamente.",
+    "bulkSyncError": "No se pudieron encolar las bodas seleccionadas. Intenta nuevamente.",
+    "createError": "No se pudo crear la boda. Revisa permisos.",
+    "updateStatusError": "No se pudo actualizar el estado de la boda. Intenta nuevamente."
+  },
+  "whatsapp": {
+    "selectGuests": "Selecciona al menos un invitado",
+    "coupleNameRequired": "El mensaje debe incluir el nombre de la pareja o la variable {coupleName}",
+    "assetUrlRequired": "Añade la URL de la invitación diseñada antes de continuar",
+    "providerNotConfigured": "El proveedor de WhatsApp API no está configurado. Por favor, configúralo antes de enviar.",
+    "coupleNameMissing": "El mensaje debe incluir el nombre de la pareja para cada invitado seleccionado",
+    "sendComplete": "Envío completado. Éxitos: {{ok}}, Fallos: {{fail}}",
+    "modal": {
+      "title": "Enviar por WhatsApp",
+      "tabs": {
+        "personal": "Móvil personal",
+        "api": "Número de la app (API)"
+      },
+      "personal": {
+        "description": "Se abrirá WhatsApp en tu dispositivo con el mensaje preparado. Podrás confirmar el envío manualmente.",
+        "businessToggle": "Abrir en WhatsApp Business"
+      },
+      "api": {
+        "providerStatusLine": "Estado del proveedor: {{status}}",
+        "status": {
+          "checking": "Comprobando…",
+          "configured": "Configurado",
+          "notConfigured": "No configurado"
+        },
+        "providerName": "Proveedor: {{provider}}",
+        "healthLabel": "Health: {{status}}",
+        "healthStatus": {
+          "ok": "OK",
+          "degraded": "Degradado"
+        },
+        "healthFallback": "(fallback: {{value}})",
+        "viewMetrics": "Ver métricas",
+        "metrics": {
+          "loading": "Cargando métricas…",
+          "total": "Total: {{value}}",
+          "delivery": "Entrega: {{percentage}}%",
+          "read": "Lectura: {{percentage}}%"
+        },
+        "noteUnconfigured": "Nota: el proveedor API no está listo. Puedes usar la pestaña «Móvil personal» (deeplink) como alternativa."
+      },
+      "labels": {
+        "message": "Mensaje"
+      },
+      "actions": {
+        "sendSingle": "Enviar a este invitado",
+        "sendBulkPending": "Masivo: pendientes",
+        "sendBulkPendingTitle": "Enviar a invitados pendientes (API)"
+      },
+      "defaultMessage": {
+        "generic": "¡Hola! Queremos invitarte a nuestra boda. ¿Puedes confirmar tu asistencia?",
+        "named": "¡Hola {{name}}! Nos encantaría contar contigo en nuestra boda. ¿Puedes confirmar tu asistencia?"
+      }
+    }
+  },
+  "design": {
+    "svg": {
+      "noContent": "No hay SVG para guardar",
+      "saved": "SVG guardado en la boda",
+      "saveError": "No se pudo guardar el SVG"
+    },
+    "palette": {
+      "saved": "Paleta guardada",
+      "saveError": "No se pudo guardar la paleta"
+    }
+  },
   "supplier": {
     "profile": {
       "updateSuccess": "Perfil actualizado correctamente"
-    }
-  },
-  "finance": {
-    "contributions": {
-      "nameAmountRequired": "Nombre y monto son obligatorios"
     },
-    "reports": {
-      "generateError": "Error al generar el reporte. Por favor, intenta nuevamente.",
-      "exported": "Informe exportado en formato {{format}}"
-    }
-  },
-  "protocol": {
-    "ceremony": {
-      "titleRequired": "El título es obligatorio"
+    "register": {
+      "claimedSuccess": "Profile claimed successfully! You can now manage your information.",
+      "registerSuccess": "Registration successful! Welcome to the platform."
     }
   },
   "invitations": {
@@ -4861,9 +4585,6 @@
     "jsonCopied": "JSON copiado al portapapeles. Pégalo en el editor JSON.",
     "debugCopied": "Debug copiado al portapapeles",
     "emailConfigSuccess": "Email configurado correctamente: {{email}}\n\nRecarga la página para que los cambios surtan efecto."
-  },
-  "validation": {
-    "titleRequired": "El título es obligatorio"
   },
   "exportError": "No se pudo exportar a PDF",
   "deleteError": "No se pudo eliminar",
@@ -4889,108 +4610,6 @@
       "taskUpdated": "Tarea actualizada",
       "taskDeleted": "Tarea eliminada",
       "taskCompleted": "Tarea completada"
-    }
-  },
-  "common": {
-    "suppliers": {
-      "overview": {
-        "defaults": {
-          "serviceGroup": "Otros servicios",
-          "otherService": "Otro servicio",
-          "country": "España"
-        },
-        "actions": {
-          "manageServices": "Gestionar servicios",
-          "newSupplier": "Nuevo proveedor",
-          "clear": "Limpiar"
-        },
-        "services": {
-          "count": "{{count}} servicios",
-          "confirmedCount": "{{count}} confirmados",
-          "pendingCount": "{{count}} pendientes",
-          "title": "Servicios contratados",
-          "shortlistCount": "{{count}} en lista",
-          "emptyShortlist": "No hay proveedores en la lista",
-          "exploreHint": "Explora proveedores para añadir a tu lista"
-        },
-        "title": "Gestión de proveedores",
-        "metrics": {
-          "totalProviders": "Proveedores totales",
-          "confirmed": "Confirmados",
-          "pending": "Pendientes",
-          "shortlist": "Lista de interés"
-        },
-        "exploration": {
-          "title": "Explorar proveedores",
-          "subtitle": "Busca y descubre proveedores para tu evento",
-          "collapseAria": "Contraer sección de exploración",
-          "searchPlaceholder": "Buscar proveedores...",
-          "recentSearches": "Búsquedas recientes"
-        },
-        "status": {
-          "pending": "Pendiente",
-          "confirmed": "Confirmado"
-        },
-        "shortlist": {
-          "loading": "Cargando lista...",
-          "error": "Error al cargar la lista",
-          "empty": "No tienes proveedores guardados",
-          "savedAt": "Guardado {{value}}",
-          "match": "{{value}}% compatibilidad"
-        },
-        "modals": {
-          "board": {
-            "title": "Tablero de servicios",
-            "description": "Gestiona todos tus servicios contratados"
-          },
-          "options": {
-            "title": "Opciones para {{label}}",
-            "confirmedTitle": "Confirmados",
-            "contactTitle": "Contactados / En negociación",
-            "contactEmpty": "No hay proveedores contactados aún",
-            "shortlistTitle": "Lista de interés",
-            "shortlistEmpty": "No hay proveedores en la lista"
-          }
-        },
-        "results": {
-          "title": "Resultados de búsqueda",
-          "query": "Consulta: {{value}}",
-          "loading": "Buscando proveedores…",
-          "empty": "No encontramos resultados con los filtros actuales.",
-          "breakdown": "📊 Encontrados: {{registered}} verificados · {{cached}} en caché · {{internet}} de internet"
-        },
-        "pagination": {
-          "label": "Página {{current}} de {{total}}"
-        },
-        "drawer": {
-          "title": "Detalles del proveedor",
-          "titleWithName": "Detalles del proveedor · {{name}}",
-          "imageAlt": "Imagen de {{name}}",
-          "serviceUnknown": "Servicio desconocido",
-          "location": "Ubicación: {{value}}",
-          "priceRange": "Precio estimado: {{value}}",
-          "email": "Correo: {{value}}",
-          "phone": "Teléfono: {{value}}",
-          "openLink": "Abrir enlace",
-          "empty": "Selecciona un proveedor para ver detalles",
-          "fallbackName": "proveedor"
-        },
-        "toasts": {
-          "missingQuery": "Por favor, introduce un término de búsqueda",
-          "noResults": "No se encontraron resultados",
-          "success": "Encontrados {{count}} proveedores ({{registered}} registrados, {{cached}} guardados, {{internet}} de internet)",
-          "error": "Error en la búsqueda. Intenta de nuevo.",
-          "wantedServicesSaved": "Servicios guardados correctamente",
-          "wantedServicesError": "Error al guardar los servicios",
-          "providerSaved": "Proveedor guardado correctamente",
-          "providerError": "Error al guardar el proveedor"
-        }
-      },
-      "configureServices": "Configurar servicios",
-      "labels": {
-        "provider": "Proveedor",
-        "service": "Servicio"
-      }
     }
   },
   "verifica_conexion_con_backend_async_checkbackendconnection": ",\n        },\n      };\n    }\n  }\n\n  /**\n   * Verifica la conexión con el backend\n   */\n  async checkBackendConnection() {\n    try {\n      const backendUrl = import.meta.env.VITE_BACKEND_BASE_URL;\n      if (!backendUrl) {\n        throw new Error(",
@@ -5023,7 +4642,24 @@
     "weddingGuests": "Wedding Guests",
     "weddingStyle": "Wedding Style",
     "weddingTheme": "Wedding Theme",
-    "weddingColors": "Wedding Colors"
+    "weddingColors": "Wedding Colors",
+    "permissions": {
+      "updateError": "Could not update permissions. Please try again."
+    },
+    "status": {
+      "updateError": "Could not update status. Please try again."
+    },
+    "form": {
+      "nameRequired": "Name is required",
+      "saveError": "Error saving wedding"
+    },
+    "site": {
+      "rsvpSuccess": "Thank you for confirming your attendance",
+      "rsvpError": "Error sending your response. Please try again."
+    },
+    "share": {
+      "linkCopied": "Link copied"
+    }
   },
   "weddingid_null_const_desc_senal_proveedor": ",\n  weddingId = null,\n}) {\n  const desc = `Señal proveedor: ${providerName || providerId}`;\n  const res = await post(\n    ",
   "weddingid_validacion_limites_por_tier_del": ", weddingId);\n  // Validación de límites por tier del planner\n  try {\n    const userSnap = await getDoc(doc(db, ",
@@ -5034,9 +4670,8 @@
   "windowlocalstorage_windowlocalstorage_getstorage_const_raw_storegetitemkey": " && window.localStorage ? window.localStorage : _getStorage();\n    const raw = store.getItem(key);\n    if (!raw) return defaultValue;\n    return JSON.parse(raw);\n  } catch (error) {\n    console.error(`storage.loadJson error for key ${key}:`, error);\n    return defaultValue;\n  }\n};\n\n/**\n * Guarda un valor JSON en localStorage.\n * @param {string} key - Clave.\n * @param {*} value - Valor a serializar.\n * @returns {boolean} Éxito de la operación.\n */\nexport const saveJson = (key, value) => {\n  try {\n    const store =\n      typeof window !== ",
   "windowtoasttypemessage_else_consolelogtypetouppercase_message_registra_los": ") {\n    window.toast[type](message);\n  } else {\n    console.log(`[${type.toUpperCase()}] ${message}`);\n  }\n};\n\n// Registra los listeners de cambios de conexión\nexport const setupSyncListeners = () => {\n  window.addEventListener(",
   "withcacheavg_resultswithcacheavgtime_withoutcacheavg_resultswithoutcacheavgtime_improvementpercent_resultsimprovementpercent": ", {\n    withCacheAvg: results.withCache.avgTime,\n    withoutCacheAvg: results.withoutCache.avgTime,\n    improvementPercent: results.improvement.percent,\n    timesSaved: results.improvement.timesSaved,\n    templatesCount: templatesForTest.length,\n    iterations,\n  });\n\n  return results;\n}\n\n/**\n * Genera un informe detallado del estado actual de la caché\n * @returns {Object} Estadísticas detalladas de la caché\n */\nexport function generateCacheReport() {\n  // Obtener estadísticas del servicio de caché\n  const stats = templateCache.getCacheStats();\n\n  // Obtener entradas actuales\n  const memoryEntries = templateCache.getMemoryCacheEntries();\n  const localStorageSize = templateCache.getStorageCacheSize();\n\n  // Calcular tiempos promedio\n  const avgHitTime =\n    stats.hitTimes.length > 0\n      ? stats.hitTimes.reduce((sum, time) => sum + time, 0) / stats.hitTimes.length\n      : 0;\n\n  const avgMissTime =\n    stats.missTimes.length > 0\n      ? stats.missTimes.reduce((sum, time) => sum + time, 0) / stats.missTimes.length\n      : 0;\n\n  // Calcular efectividad\n  const hitRatio =\n    stats.hits + stats.misses > 0 ? (stats.hits / (stats.hits + stats.misses)) * 100 : 0;\n\n  // Preparar detalles de uso por categoría\n  const categoryUsage = {};\n  if (stats.categoryHits) {\n    Object.keys(stats.categoryHits).forEach((category) => {\n      categoryUsage[category] = {\n        hits: stats.categoryHits[category] || 0,\n        misses: stats.categoryMisses?.[category] || 0,\n        total: (stats.categoryHits[category] || 0) + (stats.categoryMisses?.[category] || 0),\n      };\n    });\n  }\n\n  return {\n    timestamp: Date.now(),\n    stats: {\n      hits: stats.hits,\n      misses: stats.misses,\n      total: stats.hits + stats.misses,\n      hitRatio: hitRatio.toFixed(2),\n      avgHitTime: avgHitTime.toFixed(2),\n      avgMissTime: avgMissTime.toFixed(2),\n      avgTimeSaved: avgMissTime - avgHitTime > 0 ? (avgMissTime - avgHitTime).toFixed(2) : 0,\n    },\n    memory: {\n      entryCount: memoryEntries.length,\n      byCategory: memoryEntries.reduce((acc, entry) => {\n        const cat = entry.category || ",
-  "writestorestore_export_const_updatelocalfinance_uid_weddingid": ";\n  writeStore(store);\n};\n\nexport const updateLocalFinance = (uid, weddingId, patch) => {\n  if (!weddingId) return;\n  const store = readStore();\n  const entry = ensureUserEntry(store, uid);\n  const idx = entry.weddings.findIndex((item) => item.id === weddingId);\n  if (idx === -1) {\n    // Si la boda no existe todavía, creamos una copia por defecto para mantener consistencia.\n    const created = {\n      ...createDefaultWedding(uid),\n      id: weddingId,\n      financeMain: mergeFinance(undefined, patch),\n    };\n    entry.weddings.push(created);\n    if (!entry.activeWeddingId) entry.activeWeddingId = weddingId;\n  } else {\n    const current = entry.weddings[idx];\n    entry.weddings[idx] = {\n      ...current,\n      financeMain: mergeFinance(current.financeMain, patch),\n      updatedAt: new Date().toISOString(),\n    };\n  }\n  writeStore(store);\n};\n\nexport const getLocalFinance = (uid, weddingId) => {\n  const store = readStore();\n  const entry = ensureUserEntry(store, uid);\n  const wedding = entry.weddings.find((item) => item.id === weddingId);\n  return wedding?.financeMain || null;\n};\n\nexport const clearLocalWeddings = (uid) => {\n  const store = readStore();\n  if (uid) {\n    store.users[uid] = { weddings: [], activeWeddingId: ",
+  "writestorestore_export_const_updatelocalfinance_uid_weddingid": ";\n  writeStore(store);\n};\n\nexport const updateLocalFinance = (uid, weddingId, patch) => {\n  if (!weddingId) return;\n  const store = readStore();\n  const entry = ensureUserEntry(store, uid);\n  const idx = entry.weddings.findIndex((item) => item.id === weddingId);\n  if (idx === -1) {\n    // Si la boda no existe todavía, creamos una copia por defecto para mantener consistencia.\n    const created = {\n      ...createDefaultWedding(uid),\n      id: weddingId,\n      financeMain: mergeFinance(undefined, patch),\n    };\n    entry.weddings.push(created);\n    if (!entry.activeWeddingId) entry.activeWeddingId = weddingId;\n  } else {\n    const current = entry.weddings[idx];\n    entry.weddings[idx] = {\n      ...current,\n      financeMain: mergeFinance(current.financeMain, patch),\n      updatedAt: new Date().toISOString(),\n    };\n  }\n  writeStore(store);\n};\n\nexport const getLocalFinance = (uid, weddingId) => {\n  const store = readStore();\n  const entry = ensureUserEntry(store, uid);\n  const wedding = entry.weddings.find((item) => item.id === weddingId);\n  return wedding?.financeMain || null;\n};\n\nexport const clearLocalWeddings = (uid) => {\n  const store = readStore();\n  if (uid) {\n    store.users[uid] = { weddings: [], activeWeddingId: ",
   "actions": {
     "close": "Cerrar"
   }
 }
-

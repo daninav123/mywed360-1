@@ -1,6 +1,9 @@
-﻿import { doc, onSnapshot, collection, query, where, orderBy, limit } from 'firebase/firestore';
-import React, { useEffect, useState } from 'react';
+import { doc, onSnapshot, collection, query, where, orderBy, limit } from 'firebase/firestore';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
+import useTranslations from '../hooks/useTranslations';
 import { useWedding } from '../context/WeddingContext';
 import { db } from '../firebaseConfig';
 import { post as apiPost } from '../services/apiClient';
@@ -25,6 +28,8 @@ const percentageOf = (count, total) => {
 };
 
 export default function RSVPDashboard() {
+  const { token } = useParams();
+  const { t } = useTranslations();
   const { activeWedding } = useWedding();
   const [stats, setStats] = useState(null);
   const [pendingGuests, setPendingGuests] = useState([]);
@@ -356,11 +361,15 @@ export default function RSVPDashboard() {
                         { auth: true }
                       );
                       const json = await res.json().catch(() => ({}));
-                      alert(
-                        `Simulación: candidatos=${json.attempted || 0}, enviados=${json.sent || 0}, omitidos=${json.skipped || 0}`
+                      toast.info(
+                        t('rsvp.reminderSimulation', {
+                          attempted: json.attempted || 0,
+                          sent: json.sent || 0,
+                          skipped: json.skipped || 0
+                        })
                       );
                     } catch (e) {
-                      alert('Error simulando recordatorios');
+                      toast.error(t('rsvp.reminderSimulationError'));
                     } finally {
                       setSending(false);
                     }
@@ -383,11 +392,15 @@ export default function RSVPDashboard() {
                         { auth: true }
                       );
                       const json = await res.json().catch(() => ({}));
-                      alert(
-                        `Envío: candidatos=${json.attempted || 0}, enviados=${json.sent || 0}, omitidos=${json.skipped || 0}`
+                      toast.success(
+                        t('rsvp.reminderSent', {
+                          attempted: json.attempted || 0,
+                          sent: json.sent || 0,
+                          skipped: json.skipped || 0
+                        })
                       );
                     } catch (e) {
-                      alert('Error enviando recordatorios');
+                      toast.error(t('rsvp.reminderSendError'));
                     } finally {
                       setSending(false);
                     }
@@ -432,10 +445,10 @@ export default function RSVPDashboard() {
                                 const link =
                                   json.link || `${window.location.origin}/rsvp/${json.token}`;
                                 await navigator.clipboard.writeText(link);
-                                alert('Enlace RSVP copiado');
+                                toast.success(t('rsvp.linkCopied'));
                               } catch (e) {
                                 console.error(e);
-                                alert('No se pudo generar/copiar el enlace');
+                                toast.error(t('rsvp.linkCopyError'));
                               }
                             }}
                           >

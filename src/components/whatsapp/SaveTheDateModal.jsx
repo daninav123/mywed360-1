@@ -1,5 +1,6 @@
-import React, { useEffect, useMemo, useState, useCallback } from 'react';
-
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Send, Calendar, Users } from 'lucide-react';
+import { toast } from 'react-toastify';
 import { toE164, sendText, getProviderStatus } from '../../services/whatsappService';
 import Modal from '../Modal';
 import { Button } from '../ui';
@@ -99,13 +100,11 @@ export default function SaveTheDateModal({
 
   const handleSend = useCallback(async () => {
     if (!selectedCount) {
-      alert('Selecciona al menos un invitado');
+      toast.error(t('whatsapp.selectGuests'));
       return;
     }
     if (!provider.configured) {
-      alert(
-        'El proveedor de WhatsApp API no está configurado. Por favor, configúralo antes de enviar.'
-      );
+      toast.error(t('whatsapp.providerNotConfigured'));
       return;
     }
     const normalizedCouple = (coupleName || '').toLowerCase().trim();
@@ -115,7 +114,7 @@ export default function SaveTheDateModal({
         return !msg.includes(normalizedCouple);
       });
       if (missing) {
-        alert('El mensaje debe incluir el nombre de la pareja para cada invitado seleccionado.');
+        toast.error(t('whatsapp.coupleNameMissing'));
         return;
       }
     }
@@ -165,7 +164,7 @@ export default function SaveTheDateModal({
         }
       }
       setStats({ ok, fail });
-      alert(`Envío completado. Éxitos: ${ok}, Fallos: ${fail}`);
+      toast.success(t('whatsapp.sendComplete', { ok, fail }));
       onSent?.({ ok: okIds, fail: failIds });
       onClose?.();
     } finally {

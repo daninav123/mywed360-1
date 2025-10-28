@@ -8,6 +8,28 @@ import { auth } from '../firebaseConfig';
  * Primero busca en BD (registrados + cache), luego complementa con Tavily
  */
 export async function searchSuppliersHybrid(service, location, query = '', budget = null, filters = {}) {
+  const normalizeInput = (value, fallback = '') => {
+    if (typeof value === 'string') {
+      const trimmed = value.trim();
+      return trimmed || fallback;
+    }
+
+    if (value && typeof value === 'object') {
+      const candidates = [value.city, value.name, value.label, value.value];
+      for (const candidate of candidates) {
+        if (typeof candidate === 'string') {
+          const trimmed = candidate.trim();
+          if (trimmed) return trimmed;
+        }
+      }
+    }
+
+    if (value == null) return fallback;
+
+    const coerced = String(value).trim();
+    return coerced || fallback;
+  };
+
   try {
     // Obtener token de Firebase Auth
     const user = auth.currentUser;
@@ -21,17 +43,19 @@ export async function searchSuppliersHybrid(service, location, query = '', budge
       headers['Authorization'] = `Bearer ${token}`;
     }
     
+    const payload = {
+      service: normalizeInput(service),
+      location: normalizeInput(location),
+      query: typeof query === 'string' ? query.trim() : '',
+      budget,
+      filters: filters && typeof filters === 'object' ? filters : {}
+    };
+    
     const response = await fetch('/api/suppliers/search', {
       method: 'POST',
       headers,
       credentials: 'include',
-      body: JSON.stringify({
-        service,
-        location,
-        query,
-        budget,
-        filters
-      })
+      body: JSON.stringify(payload)
     });
 
     if (!response.ok) {

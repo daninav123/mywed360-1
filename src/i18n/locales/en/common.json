@@ -843,6 +843,45 @@
     "importGuests": "Import Guests",
     "exportGuests": "Export Guests",
     "sendInvitations": "Send Invitations",
+    "stats": {
+      "totalAttendees": "Total attendees"
+    },
+    "empty": {
+      "title": "No guests found",
+      "searchHint": "Try adjusting the filters",
+      "defaultHint": "Add your first guest to get started"
+    },
+    "actions": {
+      "selectAll": "Select all"
+    },
+    "status": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "declined": "Declined"
+    },
+    "fields": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "table": "Table",
+      "tableOptional": "Table (optional)"
+    },
+    "examples": {
+      "table": "e.g. 5"
+    },
+    "contacts": {
+      "unsupported": "This device does not support the contact picker.",
+      "noName": "Unnamed contact",
+      "importedFromPicker": "Imported from contacts",
+      "errorAccess": "We couldn't access your contacts. Please check permissions.",
+      "csvEmpty": "The CSV file is empty or invalid.",
+      "importedFromCsv": "Imported from CSV",
+      "csvReadError": "We couldn't read the CSV file.",
+      "importCount": "Import {{count}}",
+      "selectContacts": "Select contacts",
+      "importCsv": "Import CSV",
+      "supportedColumns": "Supported columns: name, email, phone, table, companion, dietaryRestrictions, notes, companionGroupId"
+    },
     "rsvp": {
       "printPdf": "Print / PDF"
     },
@@ -3079,6 +3118,278 @@
     "reminderSendError": "Error sending reminders",
     "linkCopied": "RSVP link copied",
     "linkCopyError": "Could not generate/copy link"
+  },
+  "weddings": {
+    "syncCrmError": "Could not queue CRM sync. Please try again.",
+    "bulkSyncError": "Could not queue selected weddings. Please try again.",
+    "createError": "Could not create wedding. Check permissions.",
+    "updateStatusError": "Could not update wedding status. Please try again."
+  },
+  "finance": {
+    "budget": {
+      "errors": {
+        "nameRequired": "Category name is required",
+        "amountInvalid": "Amount must be a valid number"
+      },
+      "advisorErrors": {
+        "requestFailed": "Unable to fetch advisor recommendation",
+        "refreshFailed": "Unable to refresh advisor recommendation",
+        "applyFailed": "Unable to apply the recommended scenario"
+      }
+    }
+  },
+  "guests": {
+    "email": {
+      "sent": "Email sent to {{email}}",
+      "sentSuccess": "Email sent successfully",
+      "sendError": "Error sending email: {{error}}",
+      "sendFailed": "Could not send email"
+    }
+  },
+  "whatsapp": {
+    "selectGuests": "Select at least one guest",
+    "coupleNameRequired": "The message must include the couple name or the {coupleName} variable",
+    "assetUrlRequired": "Add the designed invitation URL before continuing",
+    "providerNotConfigured": "WhatsApp API provider is not configured. Please configure it before sending.",
+    "coupleNameMissing": "The message must include the couple name for each selected guest",
+    "sendComplete": "Send completed. Success: {{ok}}, Failed: {{fail}}",
+    "modal": {
+      "title": "Send via WhatsApp",
+      "tabs": {
+        "personal": "Personal phone",
+        "api": "App number (API)"
+      },
+      "personal": {
+        "description": "WhatsApp will open on your device with the prepared message. Confirm the send manually.",
+        "businessToggle": "Open in WhatsApp Business"
+      },
+      "api": {
+        "providerStatusLine": "Provider status: {{status}}",
+        "status": {
+          "checking": "Checking…",
+          "configured": "Configured",
+          "notConfigured": "Not configured"
+        },
+        "providerName": "Provider: {{provider}}",
+        "healthLabel": "Health: {{status}}",
+        "healthStatus": {
+          "ok": "OK",
+          "degraded": "Degraded"
+        },
+        "healthFallback": "(fallback: {{value}})",
+        "viewMetrics": "View metrics",
+        "metrics": {
+          "loading": "Loading metrics…",
+          "total": "Total: {{value}}",
+          "delivery": "Delivery: {{percentage}}%",
+          "read": "Read: {{percentage}}%"
+        },
+        "noteUnconfigured": "Note: The API provider is not ready. You can use the \"Personal phone\" tab (deeplink) as an alternative."
+      },
+      "labels": {
+        "message": "Message"
+      },
+      "actions": {
+        "sendSingle": "Send to this guest",
+        "sendBulkPending": "Bulk: pending guests",
+        "sendBulkPendingTitle": "Send to pending guests through the API"
+      },
+      "defaultMessage": {
+        "generic": "Hello! We'd love to invite you to our wedding. Can you confirm your attendance?",
+        "named": "Hello {{name}}! We'd love to have you at our wedding. Can you confirm your attendance?"
+      }
+    }
+  },
+  "design": {
+    "svg": {
+      "noContent": "No SVG to save",
+      "saved": "SVG saved to wedding",
+      "saveError": "Could not save SVG"
+    },
+    "palette": {
+      "saved": "Palette saved",
+      "saveError": "Could not save palette"
+    }
+  },
+  "email": {
+    "requiredFields": "Please complete required fields",
+    "sentSuccess": "Email sent successfully",
+    "sendError": "Error sending email: {{message}}",
+    "markReadError": "Could not mark as read",
+    "deleteError": "Could not delete email"
+  },
+  "wedding": {
+    "permissions": {
+      "updateError": "Could not update permissions. Please try again."
+    },
+    "status": {
+      "updateError": "Could not update status. Please try again."
+    },
+    "form": {
+      "nameRequired": "Name is required",
+      "saveError": "Error saving wedding"
+    },
+    "site": {
+      "rsvpSuccess": "Thank you for confirming your attendance",
+      "rsvpError": "Error sending your response. Please try again."
+    },
+    "share": {
+      "linkCopied": "Link copied"
+    }
+  },
+  "supplier": {
+    "register": {
+      "claimedSuccess": "Profile claimed successfully! You can now manage your information.",
+      "registerSuccess": "Registration successful! Welcome to the platform."
+    }
+  },
+  "admin": {
+    "clipboard": {
+      "copied": "Copied to clipboard",
+      "copyError": "Error copying"
+    },
+    "partner": {
+      "linkGenerated": "Link generated and copied:\n{{url}}",
+      "linkError": "Error generating link",
+      "managerCreated": "Sales manager created successfully",
+      "managerConfirmError": "No confirmation received for new manager. Check backend.",
+      "commercialCreated": "Sales representative created successfully",
+      "commercialConfirmError": "No confirmation received for new representative. Check backend."
+    },
+    "users": {
+      "exportSuccess": "User data exported successfully",
+      "sendEmail": "Send email to {{email}}",
+      "resetPassword": "Reset password for {{name}}",
+      "suspendError": "Error suspending user: {{message}}",
+      "reactivateError": "Error reactivating user: {{message}}"
+    },
+    "portfolio": {
+      "exported": "✅ Portfolio exported: {{total}} weddings",
+      "exportError": "Error exporting portfolio: {{message}}"
+    },
+    "support": {
+      "responseSuccess": "Response sent successfully",
+      "responseError": "Error sending response: {{message}}"
+    }
+  },
+  "chat": {
+    "open": "Open chat",
+    "noteMarked": "Note marked as important",
+    "messages": {
+      "user": "User",
+      "assistant": "Assistant",
+      "emptyPrompt": "How can I help you with {{subject}}?",
+      "greeting": "Hello! I'm here to help you with {{subject}}"
+    },
+    "defaults": {
+      "event": "event",
+      "wedding": "wedding",
+      "yourPlanning": "your planning",
+      "task": "task",
+      "meeting": "meeting"
+    },
+    "commands": {
+      "taskAdded": "Task added",
+      "meetingAdded": "Meeting added",
+      "taskUpdated": "Task updated",
+      "taskDeleted": "Task deleted",
+      "taskCompleted": "Task completed"
+    }
+  },
+  "pages": {
+    "more": {
+      "sections": {
+        "providers": {
+          "links": {
+            "providers": "Providers",
+            "contracts": "Contracts"
+          }
+        }
+      }
+    }
+  },
+  "common": {
+    "suppliers": {
+      "overview": {
+        "defaults": {
+          "serviceGroup": "Other services",
+          "otherService": "Other service",
+          "country": "Spain"
+        },
+        "actions": {
+          "manageServices": "Manage services",
+          "newSupplier": "New supplier",
+          "clear": "Clear"
+        },
+        "services": {
+          "count": "{{count}} services",
+          "confirmedCount": "{{count}} confirmed",
+          "pendingCount": "{{count}} pending",
+          "title": "Hired services",
+          "shortlistCount": "{{count}} in list",
+          "emptyShortlist": "No suppliers in the list",
+          "exploreHint": "Explore suppliers to add to your list"
+        },
+        "title": "Supplier management",
+        "metrics": {
+          "totalProviders": "Total suppliers",
+          "confirmed": "Confirmed",
+          "pending": "Pending",
+          "shortlist": "Shortlist"
+        },
+        "exploration": {
+          "title": "Explore suppliers",
+          "subtitle": "Search and discover suppliers for your event",
+          "collapseAria": "Collapse exploration section",
+          "searchPlaceholder": "Search suppliers...",
+          "recentSearches": "Recent searches"
+        },
+        "status": {
+          "pending": "Pending",
+          "confirmed": "Confirmed"
+        },
+        "shortlist": {
+          "loading": "Loading list...",
+          "error": "Error loading list",
+          "empty": "You have no saved suppliers",
+          "savedAt": "Saved {{value}}",
+          "match": "{{value}}% match"
+        },
+        "modals": {
+          "board": {
+            "title": "Services board",
+            "description": "Manage all your hired services"
+          },
+          "options": {
+            "title": "Options for {{label}}",
+            "confirmedTitle": "Confirmed",
+            "contactTitle": "Contacted / In negotiation",
+            "contactEmpty": "No suppliers contacted yet",
+            "shortlistTitle": "Shortlist",
+            "shortlistEmpty": "No suppliers in the list"
+          }
+        },
+        "drawer": {
+          "title": "Supplier details",
+          "empty": "Select a supplier to view details"
+        },
+        "toasts": {
+          "missingQuery": "Please enter a search term",
+          "noResults": "No results found",
+          "success": "Found {{count}} suppliers ({{registered}} registered, {{cached}} cached)",
+          "error": "Search error. Try again.",
+          "wantedServicesSaved": "Services saved successfully",
+          "wantedServicesError": "Error saving services",
+          "providerSaved": "Supplier saved successfully",
+          "providerError": "Error saving supplier"
+        }
+      },
+      "configureServices": "Configure services",
+      "labels": {
+        "provider": "Provider",
+        "service": "Service"
+      }
+    }
   },
   "general": "General",
   "notes": "Notas",

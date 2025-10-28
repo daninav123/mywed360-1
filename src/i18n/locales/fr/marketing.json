@@ -304,5 +304,22 @@
       }
     }
   },
-  "_note": "Translate from es/marketing.json"
+  "_note": "Translate from es/marketing.json",
+  "nav": {
+    "home": "Home",
+    "app": "The App",
+    "pricing": "Pricing",
+    "login": "Login / Sign up",
+    "loginShort": "Log in",
+    "signupShort": "Sign up",
+    "plans": "Plans",
+    "accessCenter": "Access Center",
+    "contact": "Contact",
+    "legal": "Legal"
+  },
+  "common": {
+    "copyright": "© {year} MaLove.App. All rights reserved.",
+    "logoAlt": "MaLove.App Logo",
+    "contactLabel": "Contact MaLove.App"
+  }
 }

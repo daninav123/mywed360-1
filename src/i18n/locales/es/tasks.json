@@ -292,7 +292,7 @@
         }
       },
       "gantt": {
-        "title": "Planificaci\u00f3n a Largo Plazo",
+        "title": "Planificación a Largo Plazo",
         "controls": {
           "showSubtasks": "Mostrar subtareas",
           "zoomLabel": "Zoom",
@@ -300,17 +300,17 @@
           "clearFilters": "Limpiar filtros"
         },
         "filters": {
-          "categoryAll": "Todas las categor\u00edas",
-          "categoryNone": "Sin categor\u00eda",
+          "categoryAll": "Todas las categorías",
+          "categoryNone": "Sin categoría",
           "assigneeAll": "Todos los responsables",
           "assigneeUnassigned": "Sin responsable",
           "statusAll": "Todos los estados",
           "statusCritical": "Solo riesgo",
-          "statusWarning": "Solo atenci\u00f3n",
+          "statusWarning": "Solo atención",
           "statusOk": "Solo en curso"
         },
         "empty": {
-          "noScheduled": "A\u00fan no hay bloques planificados en el timeline. Importa una plantilla o crea una tarea padre desde la checklist para empezar."
+          "noScheduled": "Aún no hay bloques planificados en el timeline. Importa una plantilla o crea una tarea padre desde la checklist para empezar."
         }
       },
       "common": {

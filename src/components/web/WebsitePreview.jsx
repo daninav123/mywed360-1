@@ -1,4 +1,7 @@
 import React, { useMemo } from 'react';
+import { ExternalLink, Copy } from 'lucide-react';
+import { toast } from 'react-toastify';
+import useTranslations from '../../hooks/useTranslations';
 
 const statusMessage = (slugStatus, checking) => {
   if (checking) return { text: 'Comprobando…', tone: 'neutral' };
@@ -98,9 +101,9 @@ const WebsitePreview = ({
     if (!shareUrl) return;
     try {
       await navigator.clipboard.writeText(shareUrl);
-      alert('Enlace copiado');
+      toast.success(t('wedding.share.linkCopied'));
     } catch {
-      alert(shareUrl);
+      toast.info(shareUrl);
     }
   };
 

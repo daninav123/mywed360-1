@@ -1,4 +1,8 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Save, Download, Palette } from 'lucide-react';
+import { toast } from 'react-toastify';
+
+import useTranslations from '../../hooks/useTranslations';
 import { useSearchParams, Link } from 'react-router-dom';
 
 import VectorEditor from '../../components/VectorEditor';
@@ -255,7 +259,7 @@ export default function VectorEditorPage() {
                 onClick={async () => {
                   try {
                     const content = editorRef.current?.getSvg?.();
-                    if (!content) return alert('No hay SVG para guardar');
+                    if (!content) return toast.error(t('design.svg.noContent'));
                     await firebaseReady;
                     const { collection, doc, setDoc, serverTimestamp } = await fsImport();
                     const { getStorage, ref: sRef, uploadBytes, getDownloadURL } = await stImport();
@@ -275,10 +279,10 @@ export default function VectorEditorPage() {
                       createdAt: serverTimestamp(),
                       createdBy: currentUser?.uid || 'unknown',
                     });
-                    alert('SVG guardado en la boda');
+                    toast.success(t('design.svg.saved'));
                   } catch (e) {
                     console.error('Guardar SVG error', e);
-                    alert('No se pudo guardar el SVG');
+                    toast.error(t('design.svg.saveError'));
                   }
                 }}
                 className="px-3 py-2 rounded bg-emerald-600 text-white hover:bg-emerald-700"
@@ -303,10 +307,10 @@ export default function VectorEditorPage() {
                   const { doc, setDoc, serverTimestamp } = await fsImport();
                   const ref = doc(db, 'weddings', activeWedding, 'branding', 'main');
                   await setDoc(ref, { palette, updatedAt: serverTimestamp() }, { merge: true });
-                  alert('Paleta guardada');
+                  toast.success(t('design.palette.saved'));
                 } catch (e) {
                   console.error(e);
-                  alert('No se pudo guardar la paleta');
+                  toast.error(t('design.palette.saveError'));
                 }
               }}
             >

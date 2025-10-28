@@ -335,7 +335,28 @@
   "centrar_salon": "centrar en lieu",
   "ceremonia_llevara_cabo_date_comenzando": "la cérémonie se llevará a cabo el {date} comenzando puntualmente a las {time} {location}. se ruega puntualidad.",
   "chat": {
-    "open": "Abrir chat"
+    "open": "Ouvrir le chat",
+    "noteMarked": "Note marquée comme importante",
+    "messages": {
+      "user": "Utilisateur",
+      "assistant": "Assistant",
+      "emptyPrompt": "Comment puis-je vous aider avec {{subject}} ?",
+      "greeting": "Bonjour ! Je suis là pour vous aider avec {{subject}}"
+    },
+    "defaults": {
+      "event": "événement",
+      "wedding": "mariage",
+      "yourPlanning": "votre planification",
+      "task": "tâche",
+      "meeting": "réunion"
+    },
+    "commands": {
+      "taskAdded": "Tâche ajoutée",
+      "meetingAdded": "Réunion ajoutée",
+      "taskUpdated": "Tâche mise à jour",
+      "taskDeleted": "Tâche supprimée",
+      "taskCompleted": "Tâche terminée"
+    }
   },
   "chatwidget_backend_respondio": "[chatwidget] backend ia respondió",
   "cierre_transicion_hacia_coctel_banquete": "cierre y transición hacia cóctel o banquete.",
@@ -362,25 +383,15 @@
   "combinar_todos_los_correos_para_analisis": ");\n\n    // Combinar todos los correos para análisis\n    const allEmails = [...inboxEmails, ...sentEmails, ...trashEmails];\n\n    // Estructura para las estadísticas\n    const stats = {\n      lastUpdated: new Date().toISOString(),\n      emailCounts: {\n        total: allEmails.length,\n        inbox: inboxEmails.length,\n        sent: sentEmails.length,\n        trash: trashEmails.length,\n        unread: inboxEmails.filter((email) => !email.read).length,\n      },\n      activityMetrics: calculateActivityMetrics(allEmails),\n      folderDistribution: calculateFolderDistribution(userId, allEmails),\n      tagDistribution: calculateTagDistribution(userId, allEmails),\n      contactAnalysis: analyzeContacts(allEmails),\n      responseMetrics: calculateResponseMetrics(inboxEmails, sentEmails),\n    };\n\n    // Guardar estadísticas en localStorage\n    saveUserStats(userId, stats);\n\n    return stats;\n  } catch (error) {\n    console.error(",
   "comision_generada_periodo": "comisión generada en el periodo.",
   "comision_pendiente_menor_omite_aviso": "oui la comisión en attente es menor, se omite el aviso.",
-  "common": {
-    "all": "All",
-    "none": "None",
-    "show": "Show",
-    "hide": "Hide",
-    "view": "View",
-    "cancel": "Cancel",
-    "delete": "Delete",
-    "duplicate": "Duplicate"
-  },
   "como_organizar_ceremonia_civil_perfecta": "ej. cómo organizar la cérémonie civil perfecta",
   "completa_titulo_contenido_antes_guardar": "completa el título y el contenido antes de guardar.",
   "completaste_tareas_dias": "Completaste 5 tareas en 7 días.",
   "compose": {
-    "toField": "Recipient field",
-    "subjectField": "Subject field",
-    "ccField": "CC field",
-    "bccField": "BCC field",
-    "insertQuickReply": "Insert suggested reply"
+    "toField": "Champ destinataire",
+    "subjectField": "Champ objet",
+    "ccField": "Champ CC",
+    "bccField": "Champ CCI",
+    "insertQuickReply": "Insérer une réponse suggérée"
   },
   "composicion_equilibrada_clara_legible_con": "composición equilibrada, clara y legible, con jerarquía tipográfica.",
   "comprime_una_imagen_usando_canvas_api": ",\n};\n\n/**\n * Comprime una imagen usando Canvas API\n * @param {File} file - Archivo de imagen\n * @param {Object} options - Opciones de compresión\n * @returns {Promise<Blob>} - Imagen comprimida\n */\nexport const compressImage = (file, options = {}) => {\n  return new Promise((resolve, reject) => {\n    const config = { ...DEFAULT_CONFIG, ...options };\n    const canvas = document.createElement(",
@@ -634,29 +645,11 @@
   "eliminar_eventos_onclick_onload_etc_trim": ") // Eliminar eventos onclick, onload, etc.\n    .trim();\n};\n\n/**\n * Normaliza un string para comparaciones (sin acentos, minúsculas)\n * @param {string} str - String a normalizar\n * @returns {string} String normalizado\n */\nexport const normalizeString = (str) => {\n  if (!str || typeof str !== ",
   "eliminar_plantilla_seleccionada": "¿eliminar la plantilla seleccionada?",
   "email": {
-    "email": "Email",
-    "emails": "Emails",
-    "inbox": "Inbox",
-    "sent": "Sent",
-    "drafts": "Drafts",
-    "trash": "Trash",
-    "compose": "Compose",
-    "reply": "Reply",
-    "forward": "Forward",
-    "delete": "Delete",
-    "archive": "Archive",
-    "markAsRead": "Mark as Read",
-    "markAsUnread": "Mark as Unread",
-    "subject": "Subject",
-    "from": "From",
-    "to": "To",
-    "cc": "CC",
-    "bcc": "BCC",
-    "attachments": "Attachments",
-    "send": "Send",
-    "saveDraft": "Save Draft",
-    "emailSettings": "Email Settings",
-    "emailSignature": "Email Signature"
+    "requiredFields": "Veuillez remplir les champs requis",
+    "sentSuccess": "Email envoyé avec succès",
+    "sendError": "Erreur lors de l'envoi de l'email : {{message}}",
+    "markReadError": "Impossible de marquer comme lu",
+    "deleteError": "Impossible de supprimer l'email"
   },
   "email_esta_uso": "L'email est déjà utilisé",
   "email_invalido": "Email invalide",
@@ -781,321 +774,15 @@
   "filterboolean_partslength_ruta_documento_valida_docref": ").filter(Boolean);\n            if (parts.length % 2 === 0) {\n              // Ruta a documento válida\n              docRef = doc(db, ...parts);\n            } else if (parts.length > 2) {\n              // Intento de corrección: tratar el último segmento como nombre de campo y usar el padre como documento\n              const parentParts = parts.slice(0, -1);\n              if (parentParts.length % 2 === 0) {\n                docRef = doc(db, ...parentParts);\n              }\n            }\n          } catch (e) {\n            console.warn(",
   "finalistas_fotografia": "ej. finalistas photographie",
   "finance": {
-    "tabs": {
-      "overview": "Overview",
-      "transactions": "Transactions",
-      "budget": "Budget",
-      "contributions": "Contributions",
-      "analytics": "Analytics"
-    },
-    "connectBank": {
-      "title": "Connect your bank to import transactions",
-      "desc": "Speed up recording income and expenses by linking your bank account.",
-      "button": "Connect bank"
-    },
-    "alerts": {
-      "budget": "Budget Alerts"
-    },
-    "overview": {
-      "title": "Financial Management",
-      "subtitle": "Full control of your wedding budget and expenses",
-      "lastSync": "Last sync",
-      "synced": "Synced",
-      "offline": "Offline",
-      "totalBudget": "Total Budget",
-      "totalSpent": "Total Spent",
-      "ofBudget": "of budget",
-      "currentBalance": "Current Balance",
-      "expectedIncome": "Expected Income",
-      "used": "used",
-      "categoryStatus": "Budget Status by Categories",
-      "progress": "Progress",
-      "exceededNote": "(Budget exceeded!)"
-    },
-    "form": {
-      "type": "Transaction type",
-      "concept": "Concept",
-      "conceptPlaceholder": "e.g., Catering payment, Wedding gift...",
-      "amount": "Amount",
-      "amountLabel": "Amount:",
-      "date": "Date",
-      "category": "Category",
-      "selectCategory": "Select a category",
-      "description": "Additional description",
-      "descriptionPlaceholder": "Additional details about the transaction...",
-      "transaction": "Transaction",
-      "provider": "Provider / Source",
-      "attachments": {
-        "title": "Attachments",
-        "help": "Attach invoices, contracts, or receipts to keep them handy.",
-        "add": "Attach document",
-        "remove": "Remove",
-        "count": "Total attachments:",
-        "attachment": "Attachment"
-      },
-      "status": {
-        "expected": "Expected",
-        "received": "Received",
-        "pending": "Pending",
-        "partial": "Partial payment",
-        "paid": "Paid"
-      },
-      "errors": {
-        "conceptRequired": "Concept is required",
-        "amountPositive": "Amount must be a positive number",
-        "dateRequired": "Date is required",
-        "categoryRequired": "Category is required",
-        "paidAmountPositive": "Paid amount must be a positive number",
-        "paidAmountExceeds": "Paid amount cannot exceed the total",
-        "paidAmountRequired": "Register how much you paid to mark the status as partial"
-      }
-    },
     "budget": {
-      "title": "Budget management",
-      "subtitle": "Organize and control the budget by categories",
-      "newCategory": "New category",
-      "totalBudget": "Total Budget",
-      "budgeted": "Budgeted",
-      "spent": "Spent",
-      "remaining": "Remaining",
-      "progress": "Progress",
-      "categoriesTitle": "Budget categories",
-      "empty": "No budget categories yet",
-      "createFirst": "Create first category",
-      "category": "Category",
-      "overallProgress": "Budget progress",
-      "advisor": "Advisor",
-      "advisorShort": "AI",
-      "muteShort": "Mute",
-      "exceeded": "Exceeded",
-      "perGuestHint": "H {{value}} / guest ({{count}} events)",
-      "muteAlerts": "Mute alerts",
-      "thresholds": {
-        "warn": "Warning (at risk) %",
-        "danger": "Critical (excess) %"
-      },
-      "modal": {
-        "editTitle": "Edit category",
-        "newTitle": "New category",
-        "name": "Category name",
-        "namePlaceholder": "Ej.: Catering, música, flores...",
-        "amountLabel": "Presupuesto asignado ()",
-        "amountPlaceholder": "0,00"
-      },
       "errors": {
-        "nameRequired": "El nombre de la categoría es obligatorio",
-        "amountInvalid": "El monto debe ser un número válido"
+        "nameRequired": "Le nom de la catégorie est obligatoire",
+        "amountInvalid": "Le montant doit être un nombre valide"
       },
-      "confirmDelete": "Ests seguro de eliminar la categoría \"{{category}}\"?",
       "advisorErrors": {
-        "requestFailed": "No se pudo obtener la recomendacin del consejero.",
-        "refreshFailed": "No se pudo actualizar la recomendacin.",
-        "applyFailed": "No se pudo aplicar el escenario recomendado.",
-        "applyFailedWithReason": "No se pudo aplicar el escenario ({{reason}})."
-      }
-    },
-    "benchmarks": {
-      "title": "Budget suggestions based on similar weddings",
-      "subtitle": "Based on {{count}} confirmed budgets. Average estimate: {{average}} · Confidence: {{confidence}}.",
-      "loading": "Calculating budget suggestions&",
-      "applyMedian": "Apply median (p50)",
-      "applyP75": "Apply percentile 75",
-      "saveSnapshot": "Save budget"
-    },
-    "cashflow": {
-      "title": "Cashflow timeline",
-      "subtitle": "Upcoming payments and projected balance",
-      "remaining": "Budget remaining",
-      "burnRate": "Monthly burn rate",
-      "monthsToZero": "{{months}} months until depletion",
-      "upcoming": "Upcoming payments (45 days)",
-      "noUpcoming": "No pending payments in the next weeks.",
-      "netTimeline": "Net monthly flow (6 months)",
-      "legend": "Income - Expense",
-      "noHistory": "We need more history to estimate the trend.",
-      "income": "Income",
-      "expense": "Expenses"
-    },
-    "contributions": {
-      "title": "Contributions Setup",
-      "subtitle": "Configure contributions and estimate expected income",
-      "updateGuests": "Update Guests",
-      "initial": {
-        "title": "Initial Contributions",
-        "personA": "Person A (EUR)",
-        "personB": "Person B (EUR)",
-        "total": "Initial total:"
-      },
-      "monthly": {
-        "title": "Monthly Contributions",
-        "personA": "Person A (EUR/month)",
-        "personB": "Person B (EUR/month)",
-        "total": "Monthly total:"
-      },
-      "extras": {
-        "title": "Extra Contributions",
-        "totalLabel": "Extras total (family, other income) (EUR)",
-        "help": "Include family gifts, parents' contributions, etc."
-      },
-      "gifts": {
-        "title": "Gift Estimation",
-        "giftPerGuest": "Estimated gift per guest (EUR)",
-        "guestCount": "Number of guests",
-        "loadHint": "Click the icon to auto-load from your guest list",
-        "total": "Estimated gifts total:"
-      },
-      "unsaved": "You have unsaved changes",
-      "saveChanges": "Save Changes",
-      "summary": {
-        "title": "Expected Income Summary",
-        "subtitle": "Total projection based on your settings",
-        "initial": "Initial contributions",
-        "monthly": "Monthly contributions",
-        "extras": "Extra contributions",
-        "gifts": "Estimated gifts",
-        "total": "Expected Total"
-      },
-      "tips": {
-        "title": "Financial Tips",
-        "emergencyTitle": "Emergency fund:",
-        "emergencyText": "Consider reserving 10-15% of the total budget for unexpected expenses.",
-        "giftsTitle": "Conservative gifts:",
-        "giftsText": "It's better to underestimate wedding gifts than overestimate them.",
-        "reviewTitle": "Regular review:",
-        "reviewText": "Review and update these projections monthly.",
-        "balanceTitle": "Balanced contributions:",
-        "balanceText": "Keep a fair balance between both people's contributions."
-      }
-    },
-    "charts": {
-      "title": "Financial Analysis",
-      "subtitle": "Visualizations and trends of your wedding finances",
-      "totalTransactions": "Total Transactions",
-      "activeCategories": "Active Categories",
-      "budgetEfficiency": "Budget Efficiency",
-      "projectedBalance": "Projected Balance",
-      "budgetVsSpentByCategory": "Budget vs Spent by Category",
-      "budgeted": "Budgeted",
-      "spent": "Spent",
-      "expenseDistributionByCategory": "Expense Distribution by Category",
-      "monthlyTrend": "Monthly Trend of Income and Expenses",
-      "income": "Income",
-      "expenses": "Expenses",
-      "balance": "Balance",
-      "budgetProgressByCategory": "Budget Progress by Category",
-      "used": "Used",
-      "excess": "Excess",
-      "insights": "Financial Insights",
-      "highestExpense": "Highest Expense",
-      "mostEfficient": "Most Efficient",
-      "noData": "Not enough data",
-      "currentTrend": "Current Trend",
-      "trend": {
-        "positive": "Positive",
-        "negative": "Negative"
-      },
-      "balanceLabel": "Balance:"
-    },
-    "bank": {
-      "title": "Link bank account",
-      "country": "Country",
-      "countries": {
-        "es": "Spain",
-        "fr": "France",
-        "de": "Germany",
-        "it": "Italy",
-        "pt": "Portugal"
-      },
-      "bankLabel": "Bank",
-      "selectBank": "Select a bank",
-      "selectBankPlaceholder": "Select a bank",
-      "loadBanks": "Load banks",
-      "connect": "Connect",
-      "errorLoad": "Could not load banks. Backend may not have Nordigen integration enabled or /api/bank not deployed.",
-      "errorStart": "Could not start linking",
-      "noRequisition": "No requisition started",
-      "errorCheck": "Could not check status",
-      "selectWedding": "Select an active wedding",
-      "linked": "Account linked",
-      "errorSave": "Could not save account",
-      "requirements": {
-        "title": "Backend requirements:",
-        "env": "Define NORDIGEN_SECRET_ID, NORDIGEN_SECRET_KEY and NORDIGEN_BASE_URL",
-        "route": "Backend with /api/bank route deployed"
-      },
-      "alternative": "Temporary alternative: import transactions manually from Finance > Transactions > \"Import Bank\".",
-      "requisition": "Requisition:",
-      "checkStatus": "Check status",
-      "availableAccounts": "Available accounts",
-      "useThis": "Use this account"
-    },
-    "transactions": {
-      "title": "Transactions",
-      "new": "New Transaction",
-      "empty": "No transactions to show",
-      "createFirst": "Create first transaction",
-      "searchPlaceholder": "Search by concept...",
-      "allTypes": "All types",
-      "incomes": "Incomes",
-      "expenses": "Expenses",
-      "allCategories": "All categories",
-      "allProviders": "All providers",
-      "allDays": "All days",
-      "last30": "Last 30 days",
-      "last90": "Last 90 days",
-      "onlyUncategorized": "Only uncategorized",
-      "clear": "Clear",
-      "headers": {
-        "date": "Date",
-        "concept": "Concept",
-        "category": "Category",
-        "type": "Type",
-        "amount": "Amount",
-        "status": "Status",
-        "actions": "Actions"
-      },
-      "sort": {
-        "dateDesc": "Date (newest first)",
-        "dateAsc": "Date (oldest first)",
-        "amountDesc": "Amount (highest first)",
-        "amountAsc": "Amount (lowest first)"
-      },
-      "status": {
-        "pending": "Pending",
-        "partial": "Partial payment",
-        "paid": "Paid",
-        "expected": "Expected",
-        "received": "Received"
-      },
-      "saved": "Transaction saved",
-      "deleted": "Transaction deleted",
-      "deleteErrorPrefix": "Error deleting transaction:",
-      "saveUnexpected": "Unexpected error saving the transaction",
-      "noConcept": "No concept",
-      "noCategory": "No category",
-      "dueOn": "Due:",
-      "attachment": "Attachment",
-      "balanceLabel": "Balance:",
-      "pendingAmount": "Pending:",
-      "overdueAmount": "Overdue:",
-      "outstandingExpense": "Pending:",
-      "outstandingIncome": "To receive:",
-      "alerts": {
-        "title": "Important payments",
-        "overdue": "Overdue payments:",
-        "upcoming": "Upcoming payments (7 days):"
-      },
-      "csv": {
-        "title": "Import CSV - Column mapping",
-        "fields": {
-          "date": "Date",
-          "description": "Description",
-          "amount": "Amount",
-          "type": "Type",
-          "category": "Category"
-        },
-        "none": "None",
-        "preview": "Preview"
+        "requestFailed": "Impossible d'obtenir la recommandation du conseiller",
+        "refreshFailed": "Impossible d'actualiser la recommandation du conseiller",
+        "applyFailed": "Impossible d'appliquer le scénario recommandé"
       }
     }
   },
@@ -1167,54 +854,51 @@
   "guardar_configuracion": "enregistrer paramètres",
   "guardar_referencia_para_resolucion_lazy_buildheaders": ") {\n      // Guardar referencia para resolución lazy en buildHeaders mediante auth=true\n      opts.auth = opts.auth !== undefined ? opts.auth : true;\n    }\n    if (user.uid) headers[",
   "guests": {
-    "guest": "Guest",
-    "guests": "Guests",
-    "guestList": "Guest List",
-    "addGuest": "Add Guest",
-    "editGuest": "Edit Guest",
-    "deleteGuest": "Delete Guest",
-    "guestName": "Guest Name",
-    "guestEmail": "Guest Email",
-    "guestPhone": "Guest Phone",
-    "guestAddress": "Guest Address",
-    "guestTable": "Guest Table",
-    "guestStatus": "Guest Status",
-    "confirmed": "Confirmed",
-    "pending": "Pending",
-    "declined": "Declined",
-    "totalGuests": "Total Guests",
-    "confirmedGuests": "Confirmed Guests",
-    "pendingGuests": "Pending Guests",
-    "importGuests": "Import Guests",
-    "exportGuests": "Export Guests",
-    "sendInvitations": "Send Invitations",
-    "rsvp": {
-      "printPdf": "Print / PDF"
+    "email": {
+      "sent": "Email envoyé à {{email}}",
+      "sentSuccess": "Email envoyé avec succès",
+      "sendError": "Erreur lors de l'envoi de l'email : {{error}}",
+      "sendFailed": "Impossible d'envoyer l'email"
     },
-    "plusOne": "Plus One",
-    "dietaryRestrictions": "Dietary Restrictions",
-    "specialRequests": "Special Requests",
-    "saveTheDate": {
-      "message": "Hi, we are {{p1}}{{p2Suffix}} and we have amazing news to share. We're getting married! Please save {{date}} because we really want you with us.",
-      "messageFallback": "Hi! We have exciting news to share. We're getting married! Save the date because we want you there!",
-      "connector": "y",
-      "primaryFallback": "nosotros",
-      "coupleFallback": "nuestra boda"
+    "stats": {
+      "totalAttendees": "Total des participants"
     },
-    "groups": {
-      "title": "Group management",
-      "assignTitle": "Assign to selected",
-      "newGroup": "New group⬦",
-      "groupName": "Group name",
-      "rename": "Rename group",
-      "origin": "Origin⬦",
-      "newName": "New name",
-      "merge": "Merge groups",
-      "destination": "Destination⬦",
-      "existing": "Existing groups",
-      "none": "No groups yet."
+    "empty": {
+      "title": "Aucun invité trouvé",
+      "searchHint": "Essayez d'ajuster les filtres de recherche",
+      "defaultHint": "Ajoutez votre premier invité pour commencer"
     },
-    "selectedCount": "Selected: {{count}}"
+    "actions": {
+      "selectAll": "Tout sélectionner"
+    },
+    "status": {
+      "pending": "En attente",
+      "confirmed": "Confirmé",
+      "declined": "Refusé"
+    },
+    "fields": {
+      "name": "Nom",
+      "email": "Email",
+      "phone": "Téléphone",
+      "table": "Table",
+      "tableOptional": "Table (optionnel)"
+    },
+    "examples": {
+      "table": "Ex. 5"
+    },
+    "contacts": {
+      "unsupported": "Cet appareil ne prend pas en charge le sélecteur de contacts.",
+      "noName": "Sans nom",
+      "importedFromPicker": "Importé depuis les contacts",
+      "errorAccess": "Impossible d'accéder aux contacts. Vérifiez les autorisations.",
+      "csvEmpty": "Le fichier CSV est vide ou invalide.",
+      "importedFromCsv": "Importé depuis un CSV",
+      "csvReadError": "Lecture du fichier CSV impossible.",
+      "importCount": "Importer {{count}}",
+      "selectContacts": "Sélectionner des contacts",
+      "importCsv": "Importer un CSV",
+      "supportedColumns": "Colonnes prises en charge : name, email, phone, table, companion, dietaryRestrictions, notes, companionGroupId"
+    }
   },
   "habilita_nueva_galeria_plantillas_web": "habilita la nueva galería de plantillas web",
   "has_alcanzado_maximo_items_personalizados": "has alcanzado el máximo de 50 ítems personalizados.",
@@ -1434,20 +1118,15 @@
   "message_muchas_mesas_estan_demasiado_juntas": ",\n      message: `Muchas mesas están demasiado juntas (${tooClose} conflictos)`,\n      severity: ",
   "message_tooclose_mesas_estan_muy_cerca": ",\n      message: `${tooClose} mesas están muy cerca. Sepáralas al menos ${MIN_SPACING}cm`,\n      priority: ",
   "messages": {
-    "saveSuccess": "Saved successfully",
-    "saveError": "Error saving",
-    "deleteSuccess": "Deleted successfully",
-    "deleteError": "Error deleting",
-    "updateSuccess": "Updated successfully",
-    "updateError": "Error updating",
-    "loadError": "Error loading data",
-    "networkError": "Network error",
-    "permissionDenied": "Permission denied",
-    "notFound": "Not found",
-    "confirmDelete": "Are you sure you want to delete?",
-    "unsavedChanges": "You have unsaved changes",
-    "sessionExpired": "Your session has expired",
-    "pleaseLogin": "Please log in"
+    "saveSuccess": "Enregistré avec succès",
+    "saveError": "Erreur lors de l'enregistrement",
+    "deleteSuccess": "Supprimé avec succès",
+    "updateSuccess": "Mis à jour avec succès",
+    "logisticsUpdated": "Logistique mise à jour avec succès",
+    "publishSuccess": "Page publiée !",
+    "publishSuccessWithUrl": "Page publiée ! URL publique : {{url}}",
+    "savedNoActiveWedding": "Page enregistrée. Aucun mariage actif à publier publiquement.",
+    "generateWebFirst": "Générez d'abord le site web"
   },
   "metodo": "método",
   "metodo_pago": "método de pago",
@@ -1550,110 +1229,14 @@
   "originalconsoleerror_error_errortype_error_enviar_inmediatamente": ") {\n      originalConsoleError(`❌ Error en ${errorType}:`, error);\n    }\n\n    // Enviar inmediatamente si es un error crítico\n    if (errorType === ",
   "owners_que_realizaron_conversion_planner": "owners que realizaron la conversión a planner.",
   "pages": {
-    "momentos": {
-      "title": "Memories gallery",
-      "tabs": {
-        "overview": "Overview",
-        "moderation": "Moderation",
-        "slideshow": "Slideshow",
-        "downloads": "Downloads"
-      },
-      "loading": {
-        "weddings": "Loading weddings...",
-        "selectWedding": "Select a wedding to manage the memories gallery.",
-        "preparing": "Preparing your collaborative album..."
-      },
-      "banners": {
-        "contributionsClosed": "The submission window closed on {{date}}. Adjust the wedding date or contact support if you need to reopen the gallery.",
-        "compressionActive": "Storage usage passed 30 GB. New photos are automatically compressed to optimise Firebase storage."
-      },
-      "toasts": {
-        "loadError": "We could not load the memories gallery. Check your connection or permissions.",
-        "tokenCreated": "Share link created",
-        "tokenError": "We could not generate the link, please try again later.",
-        "approved": "Photo approved",
-        "approveError": "We could not approve the photo",
-        "rejected": "Photo rejected",
-        "rejectError": "We could not reject the photo",
-        "reset": "Photo moved back to pending",
-        "resetError": "We could not restore the previous state",
-        "scenesSaved": "Scenes updated",
-        "scenesError": "We could not save the scenes",
-        "uploadSuccess": "Photo uploaded to the gallery"
-      },
-      "prompts": {
-        "rejectTitle": "Reason for rejection",
-        "rejectDefault": "Does not match the gallery guidelines",
-        "rejectFallback": "Rejected"
-      },
-      "slideshow": {
-        "title": "Live slideshow",
-        "description": "Connect a second screen and let the memories flow automatically.",
-        "stats": "{{count}} approved photos · {{scenes}} scenes covered"
-      },
-      "uploader": {
-        "hostFallback": "Host"
-      }
-    },
-    "momentosGuest": {
-      "badge": "Collaborative memories",
-      "greeting": "Hi, {{name}} x9",
-      "remainingUploadsSingle": "You can upload 1 more photo.",
-      "remainingUploads": "You can upload up to {{count}} more photos.",
-      "remainingUploadsUnlimited": "Upload as many photos as you like.",
-      "description": "The host will review them and share the highlights with everyone.",
-      "window": {
-        "daysLeft": "You still have {{count, plural, one {1 day} other {{count} days}} to share your best photos.",
-        "deadline": "Available until {{date}}.",
-        "compression": "New photos are optimised automatically to save storage."
-      },
-      "status": {
-        "loading": "Loading gallery...",
-        "loadingMessage": "Preparing your space to share memories⬦",
-        "errorTitle": "We could not open the memories gallery",
-        "errorAction": "If you believe this is a mistake, ask the couple for a new link.",
-        "closedTitle": "The upload window has closed",
-        "closedDescription": "The upload window has closed.",
-        "closedDescriptionWithDate": "The upload window closed on {{date}}.",
-        "closedHelp": "If you still have memories to share, let the couple know so they can reopen the link.",
-        "welcomeTitle": "Thanks for capturing memories!",
-        "welcomeDescription": "Upload your favourite photos from the event. The host will review them and showcase them in the live slideshow.",
-        "uploadTitle": "Your progress",
-        "tip": "Tip: photos are grouped by scene (ceremony, reception, party⬦) to help the host.",
-        "uploadedSummary": "You have shared {{count}} {{count, plural, one {photo} other {photos}}}. Thanks for contributing!",
-        "recentUploads": "Approved photos will appear in the live slideshow and final gallery. The host will let you know when they are ready."
-      },
-      "form": {
-        "nameLabel": "Full name",
-        "namePlaceholder": "e.g. Laura G.",
-        "emailLabel": "Contact email (optional)",
-        "emailPlaceholder": "We will let you know when your photos are featured",
-        "termsLabel": "I agree to share my photos with the couple and confirm I have permission to do so.",
-        "submit": "Start uploading photos"
-      },
-      "progress": {
-        "title": "Your progress",
-        "sceneLabel": "Scene: {{scene}} · {{size}} KB",
-        "status": "In review"
-      },
-      "toasts": {
-        "nameRequired": "Please tell us your name so we can personalise your uploads",
-        "termsRequired": "You must accept the privacy notice",
-        "windowClosed": "This gallery is no longer accepting new photos.",
-        "achievementFirst": "x& Achievement unlocked! Your first memory Sí",
-        "achievementEnthusiast": "x}0 You are a collaborative rockstar! Keep sharing memories.",
-        "achievementStar": "xRx Star memories! Your photos will shine in the slideshow.",
-        "upload": "Photo uploaded successfully"
-      },
-      "errors": {
-        "incompleteLink": "The link is incomplete. Ask the host for a new QR code.",
-        "invalidLink": "This link is no longer valid."
-      },
-      "scenes": {
-        "other": "Other"
-      },
-      "uploader": {
-        "guestFallback": "Guest"
+    "more": {
+      "sections": {
+        "providers": {
+          "links": {
+            "providers": "Fournisseurs",
+            "contracts": "Contrats"
+          }
+        }
       }
     }
   },
@@ -2023,89 +1606,12 @@
   "romantico": "romántico",
   "romantico_floral": "romántico & floral",
   "rsvp": {
-    "section": "RSVP",
-    "simulate": "Simulate reminders",
-    "send": "Send reminders",
-    "overview": {
-      "title": "Financial Management",
-      "subtitle": "Full control of your wedding budget and expenses",
-      "lastSync": "Last sync",
-      "synced": "Synced",
-      "offline": "Offline",
-      "totalBudget": "Total Budget",
-      "totalSpent": "Total Spent",
-      "ofBudget": "of budget",
-      "currentBalance": "Current Balance",
-      "expectedIncome": "Expected Income",
-      "used": "used",
-      "categoryStatus": "Budget Status by Categories",
-      "progress": "Progress"
-    },
-    "budget": {
-      "title": "Budget Management",
-      "subtitle": "Organize and control your budget by categories",
-      "newCategory": "New category",
-      "totalBudget": "Total Budget",
-      "budgeted": "Budgeted",
-      "spent": "Spent",
-      "remaining": "Remaining",
-      "categoriesTitle": "Budget Categories",
-      "empty": "No budget categories",
-      "createFirst": "Create first category",
-      "category": "Category",
-      "exceeded": "Exceeded",
-      "perGuestHint": "H {{value}} / guest ({{count}} events)",
-      "progress": "Progress",
-      "overallProgress": "Budget progress",
-      "muteAlerts": "Mute alerts",
-      "thresholds": {
-        "title": "Alert thresholds (global)",
-        "warn": "Warning (at risk) %",
-        "danger": "Critical (excess) %"
-      },
-      "modal": {
-        "editTitle": "Edit category",
-        "newTitle": "New category",
-        "name": "Category name"
-      }
-    },
-    "transactions": {
-      "title": "Transactions",
-      "connectBank": "Connect Bank (Nordigen)",
-      "importCSV": "Import CSV",
-      "exportCSV": "Export CSV",
-      "new": "New Transaction",
-      "searchPlaceholder": "Search by concept...",
-      "allTypes": "All types",
-      "incomes": "Incomes",
-      "expenses": "Expenses",
-      "allCategories": "All categories",
-      "allDays": "All days",
-      "last30": "Last 30 days",
-      "last90": "Last 90 days",
-      "onlyUncategorized": "Only uncategorized",
-      "clear": "Clear",
-      "empty": "No transactions to show",
-      "createFirst": "Create first transaction",
-      "noConcept": "No concept",
-      "noCategory": "No category",
-      "income": "Income",
-      "expense": "Expense",
-      "headers": {
-        "date": "Date",
-        "concept": "Concept",
-        "category": "Category",
-        "type": "Type",
-        "amount": "Amount",
-        "actions": "Actions"
-      },
-      "sort": {
-        "dateDesc": "Date (newest first)",
-        "dateAsc": "Date (oldest first)",
-        "amountDesc": "Amount (highest first)",
-        "amountAsc": "Amount (lowest first)"
-      }
-    }
+    "reminderSimulation": "Simulation : candidats={{attempted}}, envoyés={{sent}}, ignorés={{skipped}}",
+    "reminderSent": "Envoi : candidats={{attempted}}, envoyés={{sent}}, ignorés={{skipped}}",
+    "reminderSimulationError": "Erreur lors de la simulation des rappels",
+    "reminderSendError": "Erreur lors de l'envoi des rappels",
+    "linkCopied": "Lien RSVP copié",
+    "linkCopyError": "Impossible de générer/copier le lien"
   },
   "rustico": "rústico",
   "rustico_kraft": "rústico kraft",
@@ -2411,120 +1917,6 @@
   },
   "subio_archivo_identico_evitamos_duplicados": "ya se subió un fichier idéntico. evitamos duplicados automáticamente.",
   "suppliers": {
-    "configureServices": "Configurar servicios deseados",
-    "suggested": "Sugeridos",
-    "addServicePlaceholder": "Añadir servicio (ej. Fotografía)",
-    "noServicesAdded": "An no has aadido servicios."
-  },
-  "supportsla_null_features_editguests_true_edittasks": ",\n      supportSLA: null\n    },\n    features: {\n      editGuests: true,\n      editTasks: true,\n      editTimeline: true,\n      editSeating: true,\n      viewBudget: false, // Sin permisos de facturación\n      sendInvitations: false // Sin re-invitaciones\n    }\n  }\n};\n\n/**\n * Servicio para gestión de límites de planes\n */\nclass PlanLimitsService {\n  /**\n   * Obtiene la configuración de un plan\n   * @param {string} planId - ID del plan\n   * @returns {Object|null} Configuración del plan o null si no existe\n   */\n  getPlanConfig(planId) {\n    return PLAN_LIMITS[planId] || null;\n  }\n\n  /**\n   * Obtiene los límites de un plan\n   * @param {string} planId - ID del plan\n   * @returns {Object} Límites del plan\n   */\n  getPlanLimits(planId) {\n    const config = this.getPlanConfig(planId);\n    return config ? config.limits : {};\n  }\n\n  /**\n   * Obtiene las características de un plan\n   * @param {string} planId - ID del plan\n   * @returns {Object} Características del plan\n   */\n  getPlanFeatures(planId) {\n    const config = this.getPlanConfig(planId);\n    return config ? config.features : {};\n  }\n\n  /**\n   * Verifica si un plan tiene una característica específica\n   * @param {string} planId - ID del plan\n   * @param {string} feature - Nombre de la característica\n   * @returns {boolean} true si tiene la característica\n   */\n  hasFeature(planId, feature) {\n    const features = this.getPlanFeatures(planId);\n    return features[feature] === true;\n  }\n\n  /**\n   * Verifica si se ha alcanzado el límite de invitados\n   * @param {string} planId - ID del plan\n   * @param {number} currentGuests - Número actual de invitados\n   * @returns {Object} { exceeded: boolean, limit: number, current: number }\n   */\n  checkGuestLimit(planId, currentGuests) {\n    const limits = this.getPlanLimits(planId);\n    const maxGuests = limits.maxGuests;\n    \n    if (maxGuests === -1) {\n      return { exceeded: false, limit: -1, current: currentGuests, message: ",
-  "suscripcion_push_activada": "suscripción push activada",
-  "suscripcion_push_desactivada": "suscripción push desactivada",
-  "syncstateisonline_true_notifysyncstatechange_syncpendingdata_intentar_sincronizar": ", () => {\n    syncState.isOnline = true;\n    notifySyncStateChange();\n    syncPendingData(); // Intentar sincronizar automáticamente\n  });\n\n  window.addEventListener(",
-  "syncstateissyncing_false_notifysyncstatechange_return_false_carga": ");\n    }\n\n    syncState.isSyncing = false;\n    notifySyncStateChange();\n    return false;\n  }\n};\n\n// Carga datos con prioridad a Firestore si está online, sino de localStorage\nexport const loadData = async (key, userOptions = {}) => {\n  const options = {\n    firestore: true, // Intentar cargar de Firestore?\n    collection: ",
-  "syncstateissyncing_false_syncstatelastsynctime_new_datetoisostring_notifysyncstatechange": ");\n  }\n\n  syncState.isSyncing = false;\n  syncState.lastSyncTime = new Date().toISOString();\n  notifySyncStateChange();\n\n  return success;\n};\n\n// Añade un item a la cola de sincronización pendiente\nconst addToPendingSyncQueue = (key, data, options) => {\n  const pendingSyncQueue = JSON.parse(localStorage.getItem(",
-  "tag_notificationid_datenowtostring_tambien_podriamos_emitir": ",\n      tag: notification.id || Date.now().toString(),\n    });\n  }\n  \n  // También podríamos emitir un evento personalizado para que otros componentes lo escuchen\n  if (typeof window !== ",
-  "tamano_del_email": "tamaño del email",
-  "tamano_desconocido": "tamaño desconocido",
-  "tamano_maximo_adjuntos": "tamaño máximo de adjuntos (mb)",
-  "tamano_maximo_archivos": "tamaño máximo de archivos (mb)",
-  "tamano_maximo_cola_eventos_antes_enviar": ",\n\n  // Tamaño máximo de la cola de eventos antes de enviar\n  batchSize: 20,\n\n  // Métricas a recopilar\n  metrics: {\n    emailProcessing: true,\n    searchPerformance: true,\n    notificationsRendering: true,\n    eventDetection: true,\n    uiInteractions: true,\n  },\n};\n\n// Clase para el monitoreo de rendimiento\nclass PerformanceMonitor {\n  constructor(config = CONFIG) {\n    this.config = {\n      ...CONFIG,\n      ...config,\n    };\n\n    this.metrics = {\n      events: [],\n      errors: [],\n      timings: {},\n      counters: {},\n    };\n\n    this.user = null; // user context { uid, email }\n\n    this.enabled = this.config.enabled;\n    this.pendingFlush = false;\n    this.startTime = Date.now();\n\n    if (this.enabled && this.config.reportInterval) {\n      this.scheduleReporting();\n    }\n\n    // Registrar evento de inicialización\n    this.logEvent(",
-  "tarea_proxima_vencer": "tâche próxima a vencer",
-  "tarea_sin_titulo": "tâche sin título",
-  "tasa_rebote_supero_ultima_hora": "la tasa de rebote superó el 5% en la última hora.",
-  "tasa_respuesta_por_categoria": "tasa de respuesta por catégorie (%)",
-  "tasks": {
-    "task": "Task",
-    "tasks": "Tasks",
-    "addTask": "Add Task",
-    "editTask": "Edit Task",
-    "deleteTask": "Delete Task",
-    "taskTitle": "Task Title",
-    "taskDescription": "Description",
-    "taskDueDate": "Due Date",
-    "taskPriority": "Priority",
-    "taskStatus": "Status",
-    "taskAssignee": "Assigned to",
-    "completed": "Completed",
-    "inProgress": "In progress",
-    "notStarted": "Not started",
-    "overdue": "Overdue",
-    "high": "High",
-    "medium": "Medium",
-    "low": "Low",
-    "todoList": "To-Do List",
-    "completedTasks": "Completed Tasks",
-    "upcomingTasks": "Upcoming Tasks"
-  },
-  "tecnicas": "⚙️ técnicas",
-  "telefono": "téléphone",
-  "tematico_creativo": "temático & creativo",
-  "tematico_personalizado": "temático & personalizado",
-  "templateid_cacheditem_const_data_timestamp_version": ", templateId));\n\n    if (cachedItem) {\n      const { data, timestamp, version } = JSON.parse(cachedItem);\n\n      // Verificar versión y expiración\n      if (version === CACHE_VERSION && !isCacheExpired(timestamp)) {\n        // Actualizar caché en memoria\n        memoryCache.byId[templateId] = data;\n\n        cacheStats.hits++;\n\n        return {\n          template: data,\n          fromCache: true,\n          source: ",
-  "templateid_category_action_metadata_incrementar_contadores": ", {\n      templateId,\n      category,\n      action,\n      ...metadata,\n    });\n\n    // Incrementar contadores específicos\n    this.incrementCounter(`template_${action}`);\n    this.incrementCounter(`template_category_${category}`);\n\n    return this.measureAsync(`template_${action}`, fn, {\n      templateId,\n      category,\n      ...metadata,\n    });\n  }\n\n  /**\n   * Monitorear el rendimiento de renderizado de plantillas\n   * @param {string} templateId - ID o nombre de la plantilla\n   * @param {number} dataSize - Tamaño de los datos de la plantilla (en bytes)\n   * @param {Function} fn - Función de renderizado\n   * @returns {Promise<any>} Resultado del renderizado\n   */\n  async monitorTemplateRendering(templateId, dataSize, fn) {\n    if (!this.enabled || !this.config.metrics.emailProcessing) {\n      return fn();\n    }\n\n    return this.measureAsync(",
-  "templateid_category_templatecategory_elimina_una_plantilla": ", {\n    id: template.id,\n    category: template.category,\n  });\n};\n\n/**\n * Elimina una plantilla de la caché\n * @param {string} templateId - ID de la plantilla a eliminar\n */\nexport const invalidateTemplate = (templateId) => {\n  // Eliminar de la caché en memoria\n  if (memoryCache.byId[templateId]) {\n    const template = memoryCache.byId[templateId];\n    const category = template.category || ",
-  "templateid_datasize_timestamp_datenow_monitorear_proceso": ", fn, {\n      templateId,\n      dataSize,\n      timestamp: Date.now(),\n    });\n  }\n\n  /**\n   * Monitorear el proceso de entrega de email\n   * @param {string} emailId - ID del email\n   * @param {string} recipientType - Tipo de destinatario (provider, guest, etc.)\n   * @param {Function} fn - Función de entrega\n   * @param {Object} metadata - Metadatos adicionales\n   * @returns {Promise<any>} Resultado de la entrega\n   */\n  async monitorEmailDelivery(emailId, recipientType, fn, metadata = {}) {\n    if (!this.enabled || !this.config.metrics.emailProcessing) {\n      return fn();\n    }\n\n    // Registrar evento de intento de entrega\n    this.logEvent(",
-  "templateid_timestamp_datenow_invalida_completamente_cache": ", {\n    id: templateId,\n    timestamp: Date.now(),\n  });\n};\n\n/**\n * Invalida completamente la caché de plantillas\n */\nexport const invalidateAllTemplates = () => {\n  // Reiniciar caché en memoria\n  memoryCache.allTemplates = null;\n  memoryCache.byId = {};\n  memoryCache.byCategory = {};\n  memoryCache.lastFetched = 0;\n\n  // Limpiar localStorage\n  try {\n    for (let i = 0; i < localStorage.length; i++) {\n      const key = localStorage.key(i);\n      if (key.startsWith(CACHE_PREFIX)) {\n        localStorage.removeItem(key);\n      }\n    }\n  } catch (error) {\n    console.error(",
-  "templatescount_templatesfortestlength_iterations_prueba_sin_cache": ", {\n    templatesCount: templatesForTest.length,\n    iterations,\n  });\n\n  // 1. Prueba sin caché (limpiar caché primero)\n  templateCache.clearAll();\n  const noCacheStart = performance.now();\n\n  for (let i = 0; i < iterations; i++) {\n    for (const templateId of templatesForTest) {\n      const startTime = performance.now();\n      await EmailService.getEmailTemplateById(templateId, true); // Forzar ignorar caché\n      const endTime = performance.now();\n\n      results.withoutCache.times.push(endTime - startTime);\n      results.details.push({\n        iteration: i,\n        templateId,\n        withCache: false,\n        time: endTime - startTime,\n      });\n    }\n  }\n\n  const noCacheEnd = performance.now();\n  results.withoutCache.totalTime = noCacheEnd - noCacheStart;\n  results.withoutCache.avgTime =\n    results.withoutCache.totalTime / (templatesForTest.length * iterations);\n\n  // 2. Prueba con caché (precalentar la caché primero)\n  for (const templateId of templatesForTest) {\n    const template = await EmailService.getEmailTemplateById(templateId);\n    templateCache.cacheTemplate(template);\n  }\n\n  const withCacheStart = performance.now();\n\n  for (let i = 0; i < iterations; i++) {\n    for (const templateId of templatesForTest) {\n      const startTime = performance.now();\n      await EmailService.getEmailTemplateById(templateId);\n      const endTime = performance.now();\n\n      results.withCache.times.push(endTime - startTime);\n      results.details.push({\n        iteration: i,\n        templateId,\n        withCache: true,\n        time: endTime - startTime,\n      });\n    }\n  }\n\n  const withCacheEnd = performance.now();\n  results.withCache.totalTime = withCacheEnd - withCacheStart;\n  results.withCache.avgTime = results.withCache.totalTime / (templatesForTest.length * iterations);\n\n  // Calcular mejora y ahorro de tiempo\n  if (results.withoutCache.totalTime > 0) {\n    results.improvement.percent = Math.round(\n      (1 - results.withCache.totalTime / results.withoutCache.totalTime) * 100\n    );\n    results.improvement.timesSaved = results.withoutCache.totalTime - results.withCache.totalTime;\n  }\n\n  // Registrar resultados en monitor de rendimiento\n  performanceMonitor.logEvent(",
-  "terminos_condiciones": "términos y condiciones",
-  "test_basico_api_const_response_await": ",\n        };\n      }\n\n      // Test básico de la API\n      const response = await fetch(",
-  "thiscode_code_thisrequestid_requestid_thisstatuscode_statuscode": ";\r\n    this.code = code;\r\n    this.requestId = requestId;\r\n    this.statusCode = statusCode;\r\n  }\r\n}\r\n\r\n/**\r\n * Realiza una petición HTTP y maneja el formato de respuesta estándar\r\n * @param {string} url - URL del endpoint\r\n * @param {object} options - Opciones de fetch\r\n * @returns {Promise<any>} - Datos de la respuesta\r\n * @throws {ApiError} - Error con información detallada\r\n */\r\nexport async function apiRequest(url, options = {}) {\r\n  try {\r\n    const response = await fetch(url, {\r\n      ...options,\r\n      headers: {\r\n        ",
-  "thisdiagnosticsmailgundetails_details_catch_actualiza_informacion_autenticacion": ";\n          this.diagnostics.mailgun.details = details;\n        }\n      } catch {}\n    }\n  }\n\n  /**\n   * Actualiza la información de autenticación (usuario actual)\n   * @param {Object|null} info Información de usuario (uid, email, perfil, etc.)\n   */\n  setAuthInfo(info) {\n    if (info) {\n      this.diagnostics.auth = { status: ",
-  "thisflushmetrics_iniciar_medicion_tiempo_para_una": ") {\n      this.flushMetrics();\n    }\n  }\n\n  /**\n   * Iniciar medición de tiempo para una operación\n   * @param {string} operationId - Identificador único de la operación\n   * @returns {Function} Función para finalizar la medición\n   */\n  startTimer(operationId) {\n    if (!this.enabled || !this.config.metrics.uiInteractions) return () => {};\n\n    const startTime = performance.now();\n\n    return (metadata = {}) => {\n      const endTime = performance.now();\n      const duration = endTime - startTime;\n\n      this.recordTiming(operationId, duration, metadata);\n      return duration;\n    };\n  }\n\n  /**\n   * Registrar una medición de tiempo\n   * @param {string} metricName - Nombre de la métrica\n   * @param {number} durationMs - Duración en milisegundos\n   * @param {Object} metadata - Metadatos adicionales\n   */\n  recordTiming(metricName, durationMs, metadata = {}) {\n    if (!this.enabled) return;\n\n    if (!this.metrics.timings[metricName]) {\n      this.metrics.timings[metricName] = {\n        count: 0,\n        total: 0,\n        min: Number.MAX_SAFE_INTEGER,\n        max: 0,\n        samples: [],\n      };\n    }\n\n    const timing = this.metrics.timings[metricName];\n    timing.count++;\n    timing.total += durationMs;\n    timing.min = Math.min(timing.min, durationMs);\n    timing.max = Math.max(timing.max, durationMs);\n\n    // Guardar muestra con metadatos\n    timing.samples.push({\n      duration: durationMs,\n      timestamp: Date.now(),\n      metadata,\n    });\n\n    // Limitar número de muestras guardadas\n    if (timing.samples.length > 10) {\n      timing.samples.shift();\n    }\n\n    if (this.config.logLevel >= 3) {\n      console.debug(`⏱️ Tiempo ${metricName}: ${durationMs.toFixed(2)}ms`);\n    }\n\n    // Si la operación es lenta (> 1 segundo), registrar como evento\n    if (durationMs > 1000) {\n      this.logEvent(",
-  "thismaxcacheage_1000_minutos_por_defecto_thisfoldermaxitems": ";\n    this.maxCacheAge = 15 * 60 * 1000; // 15 minutos por defecto\n    this.folderMaxItems = {\n      inbox: 100, // máx 100 emails en caché para la bandeja de entrada\n      sent: 50, // máx 50 emails enviados\n      important: 30, // máx 30 emails importantes\n      trash: 20, // máx 20 emails en papelera\n    };\n\n    // Métricas internas\n    this.metrics = {\n      hits: 0,\n      misses: 0,\n      sets: 0,\n      invalidations: 0,\n      lastFullInvalidation: null,\n    };\n  }\n\n  /**\n   * Inicializa la caché cargando datos del almacenamiento local\n   */\n  init() {\n    if (this.initialized) return;\n\n    try {\n      const savedCache = _getStorage().getItem(this.storageKey);\n\n      if (savedCache) {\n        const parsed = JSON.parse(savedCache);\n        this.memoryCache = parsed.cache || {};\n        this.metrics = parsed.metrics || this.metrics;\n      }\n\n      this.initialized = true;\n      console.log(",
-  "throw_error_monitorear_interacciones_con_emails": ");\n\n      throw error;\n    }\n  }\n\n  /**\n   * Monitorear interacciones con emails (aperturas, clics, etc.)\n   * @param {string} emailId - ID del email\n   * @param {string} interactionType - Tipo de interacción (open, click, etc.)\n   * @param {Object} metadata - Metadatos adicionales\n   */\n  trackEmailInteraction(emailId, interactionType, metadata = {}) {\n    if (!this.enabled || !this.config.metrics.emailProcessing) {\n      return;\n    }\n\n    // Registrar evento de interacción\n    this.logEvent(",
-  "throw_falla_validacion_continuamos_bloquear_creacion": ") throw e;\n    // Si falla la validación, continuamos (no bloquear creación para owners)\n  }\n  const weddingId = uuidv4();\n  const ref = doc(db, ",
-  "tiempo_asincrono": "tiempo asíncrono (ms)",
-  "tiempo_sesion_minutos": "tiempo de sesión (minutos)",
-  "tiempo_sincrono": "tiempo síncrono (ms)",
-  "tiempo_validez_para_reset_contrasena": "tiempo de validez para reset de mot de passe (horas)",
-  "tienes_una_nueva_notificacion": "tienes una nueva notification",
-  "timeline_del_dia": "timeline del jour b",
-  "timestamp_datenow_obtiene_todas_las_plantillas": ", {\n    timestamp: Date.now(),\n  });\n};\n\n/**\n * Obtiene todas las plantillas de la caché\n * @param {boolean} bypassCache - Si es true, indica que se debe ignorar la caché\n * @returns {Object} - Objeto con las plantillas y el estado de la caché\n */\nexport const getCachedTemplates = (bypassCache = false) => {\n  // Si se debe ignorar la caché, devolver null\n  if (bypassCache) {\n    cacheStats.misses++;\n    return { templates: null, fromCache: false };\n  }\n\n  // Verificar caché en memoria primero (más rápida)\n  if (memoryCache.allTemplates && !isCacheExpired(memoryCache.lastFetched)) {\n    cacheStats.hits++;\n\n    return {\n      templates: memoryCache.allTemplates,\n      fromCache: true,\n      source: ",
-  "tipometricavalortimestampn": "tipo,métrica,valor,timestamp\\n",
-  "titulo_del_momento": "título del momento",
-  "titulo_obligatorio": "el título es obligatoire",
-  "titulo_requerido": "título es requis",
-  "titulo_tarea": "título de la tâche",
-  "todavia_tienes_bodas_activas": "todavía non tienes mariages activas.",
-  "todo_ajustar_segun_sistema_auth_const": "); // TODO: Ajustar según tu sistema de auth\n\n    const response = await fetch(`${API_BASE_URL}/api/stripe/create-checkout-session`, {\n      method: ",
-  "todos_los_cambios_han_sincronizado": "tous los cambios se han synchronisé con succès",
-  "todos_los_cambios_han_sincronizado_con": "Todos los cambios se han sincronizado con éxito",
-  "todos_los_planes_disponibles_export_const": "\n};\n\n// Todos los planes disponibles\nexport const ALL_PLANS = {\n  ...OWNER_PLANS,\n  ...PLANNER_PLANS,\n  ...ASSISTANT_PLANS\n};\n\n/**\n * Configuración de límites por plan\n * Basado en docs/flujos-especificos/flujo-25-suscripciones.md y docs/planes-suscripcion.md\n */\nconst PLAN_LIMITS = {\n  // ===== PLANES PARA PAREJAS (OWNERS) =====\n  [OWNER_PLANS.FREE]: {\n    displayName: ",
-  "token_invalido": "Token inválido",
-  "token_sesion": "token sesión",
-  "tostring_const_inferred_guesstagstxt_inferredlength_objtags": ").toString();\n      const inferred = guessTags(txt);\n      if (inferred.length) obj.tags = inferred;\n    }\n\n    return obj;\n  };\n\n  // Circuit breaker mejorado: evitar spam de requests fallidos\n  const lastFailureKey = `wallService_lastFailure_${page}_${query}`;\n  const lastRequestKey = `wallService_lastRequest_${page}_${query}`;\n  const lastFailure = localStorage.getItem(lastFailureKey);\n  const lastRequest = localStorage.getItem(lastRequestKey);\n  const now = Date.now();\n\n  // Si estamos en desarrollo, no aplicamos circuit-breaker; siempre reintentamos.\n  if (!import.meta.env.PROD) {\n    localStorage.removeItem(lastFailureKey);\n  } else {\n    // Si falló hace menos de 30 minutos, usar datos demo directamente\n    if (lastFailure && now - parseInt(lastFailure) < 30 * 60 * 1000) {\n      console.log(",
-  "touppercase_validar_formato_dni_digitos_letra": ").toUpperCase();\n\n  // Validar formato DNI (8 dígitos + letra)\n  const dniRegex = /^\\d{8}[A-Z]$/;\n  if (dniRegex.test(cleanDNI)) {\n    const letters = ",
-  "transaccion": "transaction",
-  "trim_guiones_trunca_texto_una_longitud": "); // Trim guiones\n};\n\n/**\n * Trunca un texto a una longitud específica\n */\nexport const truncateText = (text, maxLength, suffix = ",
-  "trim_return_null_heuristica_hay_coma": ").trim();\n    if (!s) return null;\n    // Heurística: si hay coma y punto, el separador de miles suele ser el primero que aparece repetido\n    // Simplificar: quitar separadores de miles y usar último separador como decimal\n    const lastComma = s.lastIndexOf(",
-  "try_produccion_esto_deberia_llamar_endpoint": ");\n  }\n\n  try {\n    // En producción, esto debería llamar a un endpoint del backend\n    // que envíe un email de verificación\n    return {\n      success: true,\n      message: ",
-  "ubicacion": "ubicación",
-  "ubicacion_centro_eventos_bosque": "ubicación: centro de eventos el bosque",
-  "ubicacion_pendiente": "ubicación en attente",
-  "uid_weddingid_activeweddingid_weddingid_hasactivewedding_true": ", uid),\n    {\n      weddingId,\n      activeWeddingId: weddingId,\n      hasActiveWedding: true,\n      lastWeddingCreatedAt: Timestamp.now(),\n    },\n    { merge: true }\n  );\n\n  // Registrar la boda en la subcolección users/{uid}/weddings para que WeddingContext la cargue\n  try {\n    const subRef = doc(db, ",
-  "uid_weddingid_merge_true_vincular_subcoleccion": ", uid), { weddingId }, { merge: true });\n    // Vincular en subcolección del usuario\n    try {\n      const wedSnap = await getDoc(wedRef);\n      const wdata = wedSnap.exists() ? wedSnap.data() : {};\n      await setDoc(\n        doc(db, ",
-  "ultima_ejecucion_aniversario": "última ejecución (aniversario)",
-  "ultimo_tema": "dernier tema",
-  "umbral_minimo_eur": "umbral mínimo (eur)",
-  "undefined_hasremappedbody_remappedbody_null_undefined_jsonstringifyremappedbody": "\n      ? undefined\n      : hasRemappedBody\n        ? remapped.body == null\n          ? undefined\n          : JSON.stringify(remapped.body)\n        : undefined;\n  const headers = await buildHeaders(opts);\n  const fetchOptions = {\n    method: finalMethod,\n    headers,\n  };\n  if (finalBody !== undefined) {\n    fetchOptions.body = finalBody;\n  }\n  if (opts.credentials) {\n    fetchOptions.credentials = opts.credentials;\n  }\n  const res = await fetch(u2, fetchOptions);\n  return res;\n}\n\n/**\n * Construye las opciones de cabecera para peticiones autenticadas.\n * Acepta objetos de usuario (Firebase, contexto propio o mocks de tests) y mergea opciones extra.\n *\n * - Si el usuario expone un token sin prefijo, se agrega como `Bearer`.\n * - Si no hay token explícito, fuerza auth=true para que buildHeaders obtenga el token actual.\n * - Permite aportar cabeceras adicionales mediante `extra.headers`.\n *\n * @param {Object|string|null} user Usuario actual o token directo.\n * @param {Object} extra Opciones adicionales (por ejemplo { silent: true }).\n * @returns {Object} Opciones compatibles con apiClient (auth, headers, silent, ...).\n */\nexport function buildAuthHeaders(user, extra = {}) {\n  const opts = { ...(extra || {}) };\n  const headers = { ...(opts.headers || {}) };\n\n  let token = null;\n  if (typeof user === ",
-  "usa_funcion": "Usa la función ",
-  "usa_funcion_distribuir_uniformemente_para": "usa la función \"distribuir uniformemente\" para espaciar mejor",
-  "usa_mesas_mas_pequenas_elimina": "usa tables plus pequeñas o elimina algunas",
-  "usa_mesas_mas_pequenas_elimina_algunas": "Usa mesas más pequeñas o elimina algunas",
-  "usa_tipografias_serifsans_estilo_clasicocontemporaneo": "usa tipografías serif/sans de estilo clásico/contemporáneo.",
-  "usage_bycategory_categoryusage_las_plantillas_mas": ",\n    },\n    usage: {\n      byCategory: categoryUsage,\n      // Las 5 plantillas más usadas\n      topTemplates: templateCache.getTopTemplates(5),\n    },\n    config: templateCache.getConfiguration(),\n  };\n}\n\n/**\n * Realiza una prueba de precarga de plantillas por categoría\n * @param {string} category - Categoría a probar\n * @returns {Object} Resultados de la prueba de precarga\n */\nexport async function testCategoryPreloading(category) {\n  const startTime = performance.now();\n\n  // Limpiar caché específicamente para esta categoría\n  templateCache.clearCategory(category);\n\n  // Iniciar precarga\n  const preloadResult = await templateCache.preloadTemplatesByCategory(category);\n\n  const endTime = performance.now();\n  const duration = endTime - startTime;\n\n  return {\n    category,\n    templatesLoaded: preloadResult.length,\n    duration: duration.toFixed(2) + ",
-  "useruid_else_docref_docdb_optionscollection_useruid": ", user.uid);\n            }\n          } else {\n            docRef = doc(db, options.collection, user.uid);\n          }\n        }\n\n        try {\n          // Comprobar si el documento ya existe\n          const docSnap = await getDoc(docRef);\n\n          const targetField = options.field || key;\n\n          if (docSnap.exists() && options.mergeWithExisting) {\n            // Actualizar el campo específico en el documento existente\n            await updateDoc(docRef, { [targetField]: data });\n          } else {\n            // Crear nuevo documento con el campo\n            await setDoc(docRef, { [targetField]: data }, { merge: options.mergeWithExisting });\n          }\n\n          syncState.pendingChanges = false;\n          syncState.lastSyncTime = new Date().toISOString();\n\n          if (options.showNotification) {\n            showNotification(",
-  "usuarioautenticado_false_permisoescritura_false_permisolectura_false": ",\n    usuarioAutenticado: false,\n    permisoEscritura: false,\n    permisoLectura: false,\n    errores: [],\n    solucionesIntentadas: [],\n  };\n\n  try {\n    // 1. Comprobar autenticación\n    const auth = getAuth();\n    const usuario = auth.currentUser;\n    resultado.usuarioAutenticado = !!usuario;\n\n    if (!usuario) {\n      resultado.errores.push(",
-  "usuarios_con_actividad_registrada_los": "usuarios con actividad registrada en los últimos siete días.",
-  "usuarios_unicos_activos_durante_los": "usuarios únicos activos durante los últimos 30 días.",
-  "usuariouid_await_setdoc_userdocref_diagnosticcheck_new": ", usuario.uid);\n        await setDoc(\n          userDocRef,\n          {\n            diagnosticCheck: new Date().toISOString(),\n            browser: navigator.userAgent,\n          },\n          { merge: true }\n        );\n        resultado.permisoEscritura = true;\n      } catch (error) {\n        resultado.errores.push(`Error al escribir documento de usuario: ${error.message}`);\n        resultado.permisoEscritura = false;\n      }\n    }\n\n    // 5. Verificar configuración de IndexedDB\n    try {\n      if (window.indexedDB) {\n        // Probar acceso a IndexedDB\n        const testRequest = window.indexedDB.open(",
-  "vacio": "vacío",
-  "valeria_tomas_wedding": "valeria & tomás wedding",
-  "validacion_limites_creador_planner_try_const": ");\n  // Validación de límites si el creador es planner\n  try {\n    const userSnap = await getDoc(doc(db, ",
-  "validacion_limites_por_tier_del_planner": ") {\n    // Validación de límites por tier del planner antes de añadirlo\n    try {\n      const userSnap = await getDoc(doc(db, ",
-  "validaciones_tamano_tipo_const_size_numberfilesize": ");\n\n      // Validaciones: tamaño y tipo\n      const size = Number(file.size || 0);\n      const validSize = size >= 0 && size <= MAX_BYTES;\n      const validType = isAllowedType(file);\n      if (!validSize || !validType) {\n        console.warn(",
-  "validar_actualizacion": "validar actualización",
-  "suppliers": {
     "configureServices": "Configurer les services souhaités",
     "suggested": "Suggérés",
     "addServicePlaceholder": "Ajouter un service (ex. Photographie)",
@@ -2637,8 +2029,874 @@
           "description": "Consultez l'état de chaque service et ajoutez des options directement depuis ce panneau."
         }
       }
+    },
+    "rfqModal": {
+      "defaults": {
+        "subject": "Demande de proposition : {servicio}",
+        "body": "Bonjour {proveedor_nombre},\\n\\nNous sommes {novios} et nous organisons notre mariage le {fecha_evento} à {lugar}. Nous aimerions connaître vos disponibilités et tarifs pour {servicio}.\\n\\nDétails de l'événement :\\n• Invités : {invitados}\\n• Budget approximatif : {presupuesto}\\n• Planner : {organizador}\\n\\nPourriez-vous nous envoyer une première proposition ou planifier un appel rapide ?\\n\\nMerci beaucoup !\\n\\n{organizador}",
+        "unknownDate": "Date à confirmer"
+      },
+      "title": "Envoyer la demande ({{count}})",
+      "missingEmails": "{{count, plural, one=Un fournisseur n'a pas d'email. Ajoutez-le pour l'inclure dans la demande., other={{count}} fournisseurs n'ont pas d'email. Ajoutez-les pour les inclure dans la demande.}}",
+      "templates": {
+        "label": "Modèles enregistrés",
+        "placeholder": "Sélectionner un modèle",
+        "nameLabel": "Nom du modèle",
+        "namePlaceholder": "ex. Relance photographe",
+        "serviceLabel": "Service par défaut",
+        "servicePlaceholder": "ex. Photographie",
+        "save": "Enregistrer le modèle",
+        "delete": "Supprimer le modèle",
+        "defaultName": "Modèle sans titre"
+      },
+      "subjectLabel": "Objet de l'email",
+      "messageLabel": "Message",
+      "variablesLabel": "Variables disponibles",
+      "variablesInsert": "Insérer la variable",
+      "reminders": {
+        "title": "Rappels automatiques",
+        "clear": "Effacer les rappels",
+        "none": "Aucun rappel programmé",
+        "add": "Ajouter un rappel dans {{day}} jours",
+        "summary": "Rappels programmés pour {{days}} jours",
+        "disabled": "Les rappels automatiques sont désactivés"
+      },
+      "attachments": {
+        "title": "Pièces jointes",
+        "namePlaceholder": "Nom à afficher",
+        "urlPlaceholder": "URL (https://...)",
+        "remove": "Supprimer",
+        "add": "Ajouter une pièce jointe",
+        "upload": "Télécharger depuis l'appareil",
+        "uploading": "Téléchargement..."
+      },
+      "errors": {
+        "upload": "Échec du téléchargement de la pièce jointe : {{message}}"
+      },
+      "preview": {
+        "title": "Aperçu",
+        "subject": "Objet :"
+      },
+      "result": {
+        "success": "{{count}} demandes envoyées avec succès.",
+        "reminders": "Rappels programmés : {{days}}",
+        "failure": "{{count}} emails n'ont pas pu être envoyés.",
+        "failureSummary": "{{sentCount}} fournisseurs ont reçu la demande. Rappels programmés : {{reminders}}."
+      },
+      "buttons": {
+        "close": "Fermer",
+        "send": "Envoyer la demande",
+        "sending": "Envoi..."
+      }
+    },
+    "mergeWizard": {
+      "title": "Fusionner ou scinder des prestations",
+      "description": "Sélectionnez les prestations concernées et choisissez de les fusionner en une seule fiche ou de les déplacer vers un nouveau fournisseur. Les changements sont appliqués immédiatement dans Firestore.",
+      "statusOptions": {
+        "pending": "En attente",
+        "contacted": "Contacté",
+        "quote": "Devis",
+        "selected": "Sélectionné",
+        "confirmed": "Confirmé",
+        "rejected": "Rejeté"
+      },
+      "lists": {
+        "heading": "Prestations du fournisseur",
+        "selected": "Sélectionnées : {{selected}}/{{total}}",
+        "empty": "Ce fournisseur n'a pas encore de prestations.",
+        "unnamed": "Sans titre",
+        "meta": "Statut : {{status}} · Budget : {{budget}}",
+        "budgetValue": "€ {{amount}}",
+        "budgetUnknown": "—"
+      },
+      "actionPanel": {
+        "title": "Action",
+        "merge": "Fusionner en une seule prestation",
+        "split": "Déplacer vers un nouveau fournisseur"
+      },
+      "merge": {
+        "primaryLabel": "Prestation principale",
+        "primaryPlaceholder": "Sélectionner une prestation",
+        "primaryOption": "{{name}} · {{status}}",
+        "nameLabel": "Nom fusionné",
+        "namePlaceholder": "ex. Traiteur + Open bar",
+        "statusLabel": "Statut",
+        "statusKeep": "Conserver le statut actuel",
+        "budgetLabel": "Budget fusionné",
+        "budgetPlaceholder": "ex. 2500",
+        "notesLabel": "Notes",
+        "notesPlaceholder": "Notes supplémentaires"
+      },
+      "split": {
+        "nameLabel": "Nom du nouveau fournisseur",
+        "namePlaceholder": "ex. Traiteur Exclusif",
+        "serviceLabel": "Service principal",
+        "servicePlaceholder": "ex. Traiteur",
+        "statusLabel": "Statut initial",
+        "copyContact": "Copier les coordonnées du fournisseur d'origine"
+      },
+      "errors": {
+        "createProvider": "Impossible de créer le nouveau fournisseur.",
+        "merge": "Impossible de fusionner les prestations sélectionnées.",
+        "split": "Impossible de scinder le fournisseur."
+      },
+      "warnings": {
+        "irreversible": "Cette action est irréversible. Pensez à exporter le fournisseur avant d'appliquer des changements définitifs."
+      },
+      "buttons": {
+        "cancel": "Annuler",
+        "merge": "Fusionner les prestations",
+        "mergeSubmitting": "Application…",
+        "split": "Créer le nouveau fournisseur",
+        "splitSubmitting": "Création…"
+      }
+    },
+    "tracking": {
+      "shared": {
+        "notAvailable": "—"
+      },
+      "status": {
+        "sent": "Envoyé",
+        "delivered": "Distribué",
+        "read": "Lu",
+        "responded": "Répondu",
+        "error": "Erreur",
+        "pending": "En attente",
+        "unknown": "Inconnu"
+      },
+      "list": {
+        "filters": {
+          "all": "Tous",
+          "sent": "Envoyés",
+          "delivered": "Distribués",
+          "read": "Lus",
+          "responded": "Répondus",
+          "error": "Erreurs",
+          "pending": "En attente"
+        },
+        "empty": "Aucun suivi ne correspond au filtre sélectionné.",
+        "placeholders": {
+          "provider": "Fournisseur",
+          "subject": "(Sans objet)"
+        },
+        "sentAt": "Envoyé : {{value}}",
+        "updatedAt": "Mis à jour : {{value}}",
+        "openCount": "{{count, plural, one=Ouvert {{count}} fois, other=Ouvert {{count}} fois}}",
+        "details": "Voir les détails"
+      },
+      "modal": {
+        "title": "Suivi des emails",
+        "closeAria": "Fermer",
+        "placeholders": {
+          "recipient": "destinataire",
+          "recipientEmail": "fournisseur@example.com",
+          "subject": "(Sans objet)"
+        },
+        "emailInfo": {
+          "title": "Informations sur l'email",
+          "fields": {
+            "subject": "Objet",
+            "provider": "Fournisseur",
+            "recipient": "Destinataire",
+            "sent": "Envoyé",
+            "updated": "Dernière mise à jour",
+            "opens": "Ouvertures"
+          },
+          "openCount": "{{count, plural, one=Ouvert {{count}} fois, other=Ouvert {{count}} fois}}",
+          "websiteLink": "Voir le site : {{url}}"
+        },
+        "activities": {
+          "send": "Email envoyé à {{email}}",
+          "deliver": "Email distribué au serveur de destination",
+          "openFirst": "Email ouvert pour la première fois",
+          "openNth": "Ouverture n°{{index}}",
+          "errorDefault": "Erreur de distribution de l'email"
+        },
+        "activity": {
+          "title": "Historique des activités"
+        },
+        "error": {
+          "title": "Erreur",
+          "default": "Erreur lors de la distribution"
+        },
+        "content": {
+          "title": "Contenu de l'email",
+          "fromLabel": "De :",
+          "fromValue": "Votre email MaLoveApp",
+          "toLabel": "À :",
+          "subjectLabel": "Objet :",
+          "placeholderRecipientEmail": "fournisseur@example.com",
+          "body": {
+            "greeting": "Bonjour,",
+            "intro": "Voici un exemple du contenu envoyé au fournisseur.",
+            "note": "Dans la version finale, le contenu réel apparaîtra ici.",
+            "farewell": "Bien cordialement,",
+            "signature": "Votre nom"
+          }
+        },
+        "buttons": {
+          "schedule": "Planifier un suivi",
+          "close": "Fermer",
+          "reply": "Répondre"
+        }
+      },
+      "card": {
+        "pendingTooltip": "Suivi en attente",
+        "statusFallback": "À définir",
+        "nameFallback": "Fournisseur sans nom",
+        "serviceFallback": "Service non défini",
+        "estimatedBudget": "Budget estimé",
+        "shared": {
+          "notAvailable": "—"
+        },
+        "statusLabels": {
+          "new": "Nouveau",
+          "contacted": "Contacté",
+          "selected": "Sélectionné",
+          "confirmed": "Confirmé",
+          "rejected": "Rejeté",
+          "discarded": "Abandonné",
+          "pending": "En attente",
+          "unknown": "Statut non défini"
+        },
+        "rating": {
+          "count": "({{count}})"
+        },
+        "labels": {
+          "lastContact": "Dernier contact",
+          "nextStep": "Étape suivante",
+          "owner": "Responsable",
+          "nextPayment": "Prochain paiement"
+        },
+        "buttons": {
+          "view": "Voir la fiche",
+          "promote": "Marquer comme confirmé",
+          "schedule": "Enregistrer l'action suivante",
+          "archive": "Archiver"
+        },
+        "metrics": {
+          "matchLabel": "Correspondance IA :",
+          "experienceLabel": "Expérience :",
+          "responseLabel": "Réactivité :",
+          "percent": "{{value}}%"
+        },
+        "portal": {
+          "responded": "Portail : réponse reçue",
+          "pending": "Portail : en attente"
+        },
+        "groupTooltip": "Groupe : {{name}}",
+        "budget": {
+          "acceptedTooltip": "Budget accepté : {{amount}}",
+          "latestTooltip": "Dernier budget : {{amount}}",
+          "genericTooltip": "Budget",
+          "accepted": "Budget accepté",
+          "pending": "Budget en attente ({{count}})",
+          "received": "Budget reçu"
+        },
+        "contactLabel": "Contact : {{value}}",
+        "phoneLabel": "Téléphone : {{value}}",
+        "priceLabel": "Prix : {{value}}",
+        "depositPaid": "Acompte versé",
+        "dateLabel": "{{value}}",
+        "actions": {
+          "view": "Voir",
+          "edit": "Modifier",
+          "viewBudget": "Voir le budget",
+          "assignGroup": "Attribuer à un groupe",
+          "delete": "Supprimer",
+          "reserve": "Planifier",
+          "requestQuote": "Demander un devis",
+          "requestMeeting": "Demander un rendez-vous"
+        },
+        "autoEmail": {
+          "signature": "Envoyé automatiquement depuis MaLove.App",
+          "subjectQuote": "Demande de devis - {{target}}",
+          "subjectMeeting": "Demande de rendez-vous - {{target}}",
+          "missingEmail": "Ajoutez un email de contact pour envoyer des demandes automatiques.",
+          "successQuote": "Demande de devis envoyée automatiquement.",
+          "successMeeting": "Demande de rendez-vous envoyée automatiquement.",
+          "sendErrorRetry": "Impossible d'envoyer l'email automatique. Veuillez réessayer.",
+          "sendError": "Impossible d'envoyer l'email automatique.",
+          "sending": "Envoi...",
+          "userFallback": "Planner",
+          "guestsFallback": "100",
+          "appendedQuote": "Nous souhaiterions recevoir un devis détaillé avec vos tarifs, conditions et disponibilités pour notre date.",
+          "appendedMeeting": "Serait-il possible de planifier un rendez-vous (en personne ou en visio) pour revoir le service et confirmer votre disponibilité ? Indiquez-nous vos créneaux idéaux.",
+          "closing": "Dans l'attente de votre réponse.",
+          "searchQuery": {
+            "quote": "Demande de devis prestataire mariage",
+            "meeting": "Planifier un rendez-vous avec un prestataire mariage"
+          }
+        },
+        "tracking": {
+          "status": "Suivi : {{status}}",
+          "last": "Dernier : {{value}}",
+          "thread": "Conversation : {{count}}",
+          "openInboxTitle": "Ouvrir la boîte mail",
+          "openInbox": "Voir l'email",
+          "detailsTitle": "Voir le détail du suivi",
+          "details": "Détails",
+          "defaultSubject": "Message pour {{name}}",
+          "pendingTodos": {
+            "tasks": "Tâches en attente",
+            "followUps": "Relances nécessaires",
+            "assigned": "Actions assignées"
+          },
+          "lastAgo": {
+            "justNow": "À l'instant",
+            "minutes": "{count, plural, one=Il y a {{count}} min, other=Il y a {{count}} min}",
+            "hours": "{count, plural, one=Il y a {{count}} h, other=Il y a {{count}} h}",
+            "days": "{count, plural, one=Il y a {{count}} jour, other=Il y a {{count}} jours}"
+          }
+        },
+        "emails": {
+          "toggleTitle": "Voir les emails associés",
+          "hide": "Masquer les emails",
+          "show": "Emails liés ({{count}})",
+          "loading": "Chargement des emails...",
+          "empty": "Aucun email associé",
+          "noSubject": "(Sans objet)",
+          "openInbox": "Ouvrir dans la boîte mail"
+        },
+        "favorite": {
+          "add": "Ajouter aux favoris",
+          "remove": "Retirer des favoris"
+        }
+      },
+      "pendingTodos": {
+        "tasks": "Tâches en attente",
+        "followUps": "Relances nécessaires",
+        "assigned": "Actions assignées"
+      }
+    },
+    "kanban": {
+      "columns": {
+        "por_definir": "À classer",
+        "vistos": "Consultés",
+        "contactado": "Contactés",
+        "presupuesto": "Devis",
+        "contratado": "Contratés",
+        "rechazado": "Rejetés"
+      },
+      "badges": {
+        "group": "Groupe : {{name}}",
+        "nextAction": "Prochaine action : {{value}}"
+      },
+      "actions": {
+        "reset": "Réinitialiser",
+        "budget": "Marquer en devis",
+        "hire": "Marquer comme confirmé",
+        "reject": "Marquer comme rejeté"
+      },
+      "placeholders": {
+        "name": "Fournisseur",
+        "service": "Service",
+        "empty": "Glissez les fournisseurs ici",
+        "notAvailable": "—"
+      }
+    },
+    "aiSearchModal": {
+      "title": "Recherche intelligente",
+      "closeAria": "Fermer",
+      "inputPlaceholder": "Décrivez ce que vous recherchez...",
+      "search": "Rechercher",
+      "searching": "Recherche en cours...",
+      "example": "Exemple : « Photographe de mariage style documentaire à Séville »",
+      "filters": {
+        "service": "Service",
+        "all": "Tous"
+      },
+      "suggestionsTitle": "Suggestions",
+      "suggestions": [
+        "Photographe style documentaire",
+        "Traiteur pour 120 invités",
+        "DJ disponible en août",
+        "Fleuriste vintage à Madrid",
+        "Lieu en plein air près de Barcelone"
+      ],
+      "footer": {
+        "powered": "Propulsé par l'IA",
+        "close": "Fermer"
+      }
+    },
+    "aiSearch": {
+      "services": {
+        "generic": "Services de mariage",
+        "photo": "Photographie",
+        "video": "Vidéo",
+        "catering": "Traiteur",
+        "music": "Musique",
+        "flowers": "Fleurs"
+      },
+      "defaults": {
+        "suggestedName": "Fournisseur suggéré {{index}}"
+      },
+      "aiSummary": {
+        "matchesPreferences": "Correspond à vos préférences clés.",
+        "priceRange": "Fourchette de prix estimée : {{price}}.",
+        "location": "Situé à {{location}}.",
+        "locationAvailable": "Disponible près de {{location}}."
+      },
+      "errors": {
+        "openaiFailed": "La recherche IA n'est pas disponible. Configurez OPENAI_API_KEY dans le backend ou activez un moteur alternatif.",
+        "openaiInvalidResponse": "Le service IA a renvoyé un format invalide. Réessayez plus tard ou consultez les logs du backend.",
+        "openaiRequestFailed": "Impossible de contacter OpenAI. Vérifiez vos identifiants et la connexion.",
+        "serpUnavailable": "Le moteur de secours (SerpAPI) n'est pas configuré. Fournissez SERPAPI_API_KEY pour l'activer.",
+        "rateLimited": "Limite de requêtes dépassée. Réessayez dans quelques minutes.",
+        "http": "Erreur {{status}}",
+        "generic": "Impossible de terminer la recherche de fournisseurs.",
+        "aiResponse": "Réponse de la recherche IA : {{status}}",
+        "externalResponse": "Réponse du moteur externe : {{status}}",
+        "internalResponse": "Réponse du moteur interne : {{status}}",
+        "unknownStatus": "inconnu",
+        "offline": "Connexion au serveur impossible. Vérifiez que le backend est actif sur http://localhost:4004.",
+        "backendUnavailable": "Le serveur backend est indisponible. Assurez-vous qu'il tourne sur http://localhost:4004.",
+        "openaiNotConfigured": "La recherche IA nécessite la variable OPENAI_API_KEY dans le backend. Ajoutez votre clé API OpenAI au fichier .env.",
+        "noLocalResults": "Aucun fournisseur trouvé dans la base interne.",
+        "noResults": "Aucun fournisseur ne correspond à votre recherche. Essayez d'autres termes ou activez la recherche IA."
+      },
+      "demoResults": [
+        {
+          "id": "1",
+          "name": "Naturaleza Viva Photography",
+          "service": "Photographie",
+          "snippet": "Studio spécialisé dans la photographie de mariage au style naturel et documentaire. Nous capturons vos moments les plus émouvants et spontanés.",
+          "image": "https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=500&q=60",
+          "location": "Madrid",
+          "price": "€1,200 - €2,500",
+          "tags": [
+            "natural",
+            "documentary",
+            "outdoor",
+            "sunlight"
+          ],
+          "keywords": [
+            "photographer",
+            "natural",
+            "documentary",
+            "wedding"
+          ]
+        },
+        {
+          "id": "2",
+          "name": "Lente Azul Photography",
+          "service": "Photographie",
+          "snippet": "Plus de 10 ans d'expérience dans les mariages en bord de mer et les espaces naturels. Forfaits personnalisés pour chaque couple.",
+          "image": "https://images.unsplash.com/photo-1508435234994-67cfd7690508?auto=format&fit=crop&w=500&q=60",
+          "location": "Barcelona",
+          "price": "€1,500 - €3,000",
+          "tags": [
+            "beach",
+            "outdoor",
+            "nature"
+          ],
+          "keywords": [
+            "photographer",
+            "wedding",
+            "beach",
+            "experience"
+          ]
+        },
+        {
+          "id": "3",
+          "name": "Delicious Moments Catering",
+          "service": "Traiteur",
+          "snippet": "Traiteur proposant des options végétariennes, véganes et adaptées aux allergies. Spécialiste des événements de 50 à 200 invités.",
+          "image": "https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&w=500&q=60",
+          "location": "Madrid",
+          "price": "€70 - €120 per guest",
+          "tags": [
+            "vegetarian",
+            "vegan",
+            "buffet"
+          ],
+          "keywords": [
+            "catering",
+            "buffet",
+            "event"
+          ]
+        },
+        {
+          "id": "4",
+          "name": "DJ Sounds & Lights",
+          "service": "Musique",
+          "snippet": "DJ avec sonorisation et éclairage professionnels. Grande expérience des mariages et événements d'entreprise.",
+          "image": "https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?auto=format&fit=crop&w=500&q=60",
+          "location": "Valencia",
+          "price": "€800 - €1,500",
+          "tags": [
+            "dj",
+            "music",
+            "lighting"
+          ],
+          "keywords": [
+            "dj",
+            "music",
+            "event"
+          ]
+        },
+        {
+          "id": "5",
+          "name": "Flores del Jardín",
+          "service": "Flowers",
+          "snippet": "Artisan florist specialized in vintage and boho decoration. We work with local, seasonal product.",
+          "image": "https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&w=500&q=60",
+          "location": "Seville",
+          "price": "€500 - €1,500",
+          "tags": [
+            "flowers",
+            "decoration",
+            "boho"
+          ],
+          "keywords": [
+            "flowers",
+            "decoration",
+            "wedding"
+          ]
+        }
+      ]
+    },
+    "aiResultList": {
+      "loading": {
+        "title": "Searching suppliers...",
+        "subtitle": "Analyzing your query: \"{{query}}\""
+      },
+      "error": {
+        "title": "Search error",
+        "retry": "Try again"
+      },
+      "emptyQuery": {
+        "title": "Search suppliers with AI",
+        "description": "Describe what you need in natural language and AI will find the best suppliers."
+      },
+      "noResults": {
+        "title": "No results found",
+        "description": "No suppliers match your search \"{{query}}\". Try different terms or check that the backend is running correctly."
+      },
+      "fallbackNotice": "Showing demo results because the server is unavailable.",
+      "summary": {
+        "prefix": "Found ",
+        "suffix": " suppliers for your search:"
+      },
+      "matchBadge": "{{value}}% match",
+      "locationLabel": "Location:",
+      "aiAnalysis": "AI analysis",
+      "buttons": {
+        "view": "View details",
+        "add": "Add",
+        "email": "Send email",
+        "select": "Select"
+      },
+      "links": {
+        "emailTitle": "Send email",
+        "phoneTitle": "Call",
+        "instagramTitle": "Open Instagram",
+        "instagramLabel": "Instagram"
+      }
+    },
+    "aiEmailModal": {
+      "title": "Contact {{name}}",
+      "closeAria": "Close",
+      "success": {
+        "title": "Email sent successfully",
+        "message": "Your message was sent to the supplier. You'll receive a notification when they reply."
+      },
+      "error": {
+        "title": "Error sending the email"
+      },
+      "from": "Sending from:",
+      "to": "To:",
+      "subject": {
+        "label": "Subject",
+        "placeholder": "Email subject"
+      },
+      "body": {
+        "label": "Message",
+        "placeholder": "Write your message here..."
+      },
+      "aiSummary": "Why this supplier?",
+      "buttons": {
+        "cancel": "Cancel",
+        "send": "Send email",
+        "sending": "Sending..."
+      }
+    },
+    "reservationModal": {
+      "title": "Schedule meeting with {{name}}",
+      "actions": {
+        "closeAria": "Close modal",
+        "cancel": "Cancel",
+        "confirm": "Confirm booking"
+      },
+      "form": {
+        "dateLabel": "Date *",
+        "timeLabel": "Time *",
+        "contactMethodLabel": "Preferred contact method",
+        "contactMethods": {
+          "email": "Email",
+          "phone": "Phone",
+          "inPerson": "In person",
+          "videoCall": "Video call"
+        },
+        "notesLabel": "Notes or questions for the supplier",
+        "notesPlaceholder": "Any additional information relevant to the meeting..."
+      },
+      "providerInfo": {
+        "title": "Contact information",
+        "contact": "Contact:",
+        "phone": "Phone:",
+        "email": "Email:",
+        "location": "Location:"
+      },
+      "emailSection": {
+        "title": "Contact by email",
+        "description": "Send a direct email to check availability or request more information before confirming the booking.",
+        "button": "Compose email to the supplier"
+      },
+      "emailForm": {
+        "title": "Send email to the supplier",
+        "closeAria": "Close email composer",
+        "subjectLabel": "Subject",
+        "bodyLabel": "Message",
+        "send": "Send email",
+        "sending": "Sending..."
+      },
+      "emailSuccess": {
+        "title": "Email sent",
+        "description": "Your message was sent to {{name}} from {{email}}. We'll notify you when they reply."
+      },
+      "errors": {
+        "emailRequired": "Subject and message are required.",
+        "dateRequired": "The date is required.",
+        "timeRequired": "The time is required."
+      }
+    },
+    "formModal": {
+      "title": {
+        "create": "New supplier",
+        "edit": "Edit supplier"
+      },
+      "actions": {
+        "closeAria": "Close modal",
+        "cancel": "Cancel",
+        "save": "Save",
+        "update": "Update",
+        "saving": "Saving..."
+      },
+      "sections": {
+        "basic": "Basic information",
+        "contact": "Contact details",
+        "additional": "Additional information"
+      },
+      "fields": {
+        "name": {
+          "label": "Name *",
+          "placeholder": "Supplier name"
+        },
+        "service": {
+          "label": "Service *",
+          "placeholder": "Type of service"
+        },
+        "budget": {
+          "label": "Budget",
+          "prefix": "€",
+          "placeholder": "0"
+        },
+        "status": {
+          "label": "Status"
+        },
+        "contact": {
+          "label": "Contact person",
+          "placeholder": "Contact name"
+        },
+        "phone": {
+          "label": "Phone",
+          "placeholder": "+34 XXX XXX XXX"
+        },
+        "email": {
+          "label": "Email",
+          "placeholder": "email@example.com"
+        },
+        "web": {
+          "label": "Website",
+          "placeholder": "https://example.com"
+        },
+        "location": {
+          "label": "Location",
+          "placeholder": "City, province"
+        },
+        "appointment": {
+          "label": "Meeting date"
+        },
+        "notes": {
+          "label": "Notes",
+          "placeholder": "Additional notes about the supplier"
+        },
+        "image": {
+          "label": "Image URL",
+          "placeholder": "https://example.com/image.jpg",
+          "help": "Enter an image URL for the supplier (optional)"
+        }
+      },
+      "status": {
+        "options": {
+          "new": "New",
+          "contacted": "Contacted",
+          "pending": "Pending",
+          "hired": "Booked",
+          "discarded": "Discarded"
+        }
+      },
+      "errors": {
+        "general": "We couldn't save the supplier. Please try again.",
+        "nameRequired": "Name is required.",
+        "serviceRequired": "Service is required.",
+        "emailInvalid": "Email format is invalid.",
+        "webInvalid": "Website must start with http:// or https://"
+      }
+    },
+    "confirmedCard": {
+      "nameFallback": "Supplier",
+      "serviceFallback": "Service not set",
+      "statusBadge": "Confirmed",
+      "nextPayment": {
+        "label": "Next payment",
+        "none": "No scheduled date"
+      },
+      "summary": {
+        "assigned": "Assigned",
+        "paid": "Paid",
+        "pending": "Pending"
+      },
+      "groupLabel": "Group: {{name}}",
+      "actions": {
+        "view": "View record",
+        "registerPayment": "Record payment",
+        "viewContract": "View contract",
+        "portal": "Supplier portal"
+      },
+      "shared": {
+        "notAvailable": "—"
+      }
+    },
+    "detail": {
+      "info": {
+        "nameFallback": "Unnamed supplier",
+        "serviceFallback": "Service not set"
+      },
+      "placeholders": {
+        "notAvailable": "—"
+      }
     }
   },
+  "supportsla_null_features_editguests_true_edittasks": ",\n      supportSLA: null\n    },\n    features: {\n      editGuests: true,\n      editTasks: true,\n      editTimeline: true,\n      editSeating: true,\n      viewBudget: false, // Sin permisos de facturación\n      sendInvitations: false // Sin re-invitaciones\n    }\n  }\n};\n\n/**\n * Servicio para gestión de límites de planes\n */\nclass PlanLimitsService {\n  /**\n   * Obtiene la configuración de un plan\n   * @param {string} planId - ID del plan\n   * @returns {Object|null} Configuración del plan o null si no existe\n   */\n  getPlanConfig(planId) {\n    return PLAN_LIMITS[planId] || null;\n  }\n\n  /**\n   * Obtiene los límites de un plan\n   * @param {string} planId - ID del plan\n   * @returns {Object} Límites del plan\n   */\n  getPlanLimits(planId) {\n    const config = this.getPlanConfig(planId);\n    return config ? config.limits : {};\n  }\n\n  /**\n   * Obtiene las características de un plan\n   * @param {string} planId - ID del plan\n   * @returns {Object} Características del plan\n   */\n  getPlanFeatures(planId) {\n    const config = this.getPlanConfig(planId);\n    return config ? config.features : {};\n  }\n\n  /**\n   * Verifica si un plan tiene una característica específica\n   * @param {string} planId - ID del plan\n   * @param {string} feature - Nombre de la característica\n   * @returns {boolean} true si tiene la característica\n   */\n  hasFeature(planId, feature) {\n    const features = this.getPlanFeatures(planId);\n    return features[feature] === true;\n  }\n\n  /**\n   * Verifica si se ha alcanzado el límite de invitados\n   * @param {string} planId - ID del plan\n   * @param {number} currentGuests - Número actual de invitados\n   * @returns {Object} { exceeded: boolean, limit: number, current: number }\n   */\n  checkGuestLimit(planId, currentGuests) {\n    const limits = this.getPlanLimits(planId);\n    const maxGuests = limits.maxGuests;\n    \n    if (maxGuests === -1) {\n      return { exceeded: false, limit: -1, current: currentGuests, message: ",
+  "suscripcion_push_activada": "suscripción push activada",
+  "suscripcion_push_desactivada": "suscripción push desactivada",
+  "syncstateisonline_true_notifysyncstatechange_syncpendingdata_intentar_sincronizar": ", () => {\n    syncState.isOnline = true;\n    notifySyncStateChange();\n    syncPendingData(); // Intentar sincronizar automáticamente\n  });\n\n  window.addEventListener(",
+  "syncstateissyncing_false_notifysyncstatechange_return_false_carga": ");\n    }\n\n    syncState.isSyncing = false;\n    notifySyncStateChange();\n    return false;\n  }\n};\n\n// Carga datos con prioridad a Firestore si está online, sino de localStorage\nexport const loadData = async (key, userOptions = {}) => {\n  const options = {\n    firestore: true, // Intentar cargar de Firestore?\n    collection: ",
+  "syncstateissyncing_false_syncstatelastsynctime_new_datetoisostring_notifysyncstatechange": ");\n  }\n\n  syncState.isSyncing = false;\n  syncState.lastSyncTime = new Date().toISOString();\n  notifySyncStateChange();\n\n  return success;\n};\n\n// Añade un item a la cola de sincronización pendiente\nconst addToPendingSyncQueue = (key, data, options) => {\n  const pendingSyncQueue = JSON.parse(localStorage.getItem(",
+  "tag_notificationid_datenowtostring_tambien_podriamos_emitir": ",\n      tag: notification.id || Date.now().toString(),\n    });\n  }\n  \n  // También podríamos emitir un evento personalizado para que otros componentes lo escuchen\n  if (typeof window !== ",
+  "tamano_del_email": "tamaño del email",
+  "tamano_desconocido": "tamaño desconocido",
+  "tamano_maximo_adjuntos": "tamaño máximo de adjuntos (mb)",
+  "tamano_maximo_archivos": "tamaño máximo de archivos (mb)",
+  "tamano_maximo_cola_eventos_antes_enviar": ",\n\n  // Tamaño máximo de la cola de eventos antes de enviar\n  batchSize: 20,\n\n  // Métricas a recopilar\n  metrics: {\n    emailProcessing: true,\n    searchPerformance: true,\n    notificationsRendering: true,\n    eventDetection: true,\n    uiInteractions: true,\n  },\n};\n\n// Clase para el monitoreo de rendimiento\nclass PerformanceMonitor {\n  constructor(config = CONFIG) {\n    this.config = {\n      ...CONFIG,\n      ...config,\n    };\n\n    this.metrics = {\n      events: [],\n      errors: [],\n      timings: {},\n      counters: {},\n    };\n\n    this.user = null; // user context { uid, email }\n\n    this.enabled = this.config.enabled;\n    this.pendingFlush = false;\n    this.startTime = Date.now();\n\n    if (this.enabled && this.config.reportInterval) {\n      this.scheduleReporting();\n    }\n\n    // Registrar evento de inicialización\n    this.logEvent(",
+  "tarea_proxima_vencer": "tâche próxima a vencer",
+  "tarea_sin_titulo": "tâche sin título",
+  "tasa_rebote_supero_ultima_hora": "la tasa de rebote superó el 5% en la última hora.",
+  "tasa_respuesta_por_categoria": "tasa de respuesta por catégorie (%)",
+  "tasks": {
+    "task": "Task",
+    "tasks": "Tasks",
+    "addTask": "Add Task",
+    "editTask": "Edit Task",
+    "deleteTask": "Delete Task",
+    "taskTitle": "Task Title",
+    "taskDescription": "Description",
+    "taskDueDate": "Due Date",
+    "taskPriority": "Priority",
+    "taskStatus": "Status",
+    "taskAssignee": "Assigned to",
+    "completed": "Completed",
+    "inProgress": "In progress",
+    "notStarted": "Not started",
+    "overdue": "Overdue",
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low",
+    "todoList": "To-Do List",
+    "completedTasks": "Completed Tasks",
+    "upcomingTasks": "Upcoming Tasks"
+  },
+  "tecnicas": "⚙️ técnicas",
+  "telefono": "téléphone",
+  "tematico_creativo": "temático & creativo",
+  "tematico_personalizado": "temático & personalizado",
+  "templateid_cacheditem_const_data_timestamp_version": ", templateId));\n\n    if (cachedItem) {\n      const { data, timestamp, version } = JSON.parse(cachedItem);\n\n      // Verificar versión y expiración\n      if (version === CACHE_VERSION && !isCacheExpired(timestamp)) {\n        // Actualizar caché en memoria\n        memoryCache.byId[templateId] = data;\n\n        cacheStats.hits++;\n\n        return {\n          template: data,\n          fromCache: true,\n          source: ",
+  "templateid_category_action_metadata_incrementar_contadores": ", {\n      templateId,\n      category,\n      action,\n      ...metadata,\n    });\n\n    // Incrementar contadores específicos\n    this.incrementCounter(`template_${action}`);\n    this.incrementCounter(`template_category_${category}`);\n\n    return this.measureAsync(`template_${action}`, fn, {\n      templateId,\n      category,\n      ...metadata,\n    });\n  }\n\n  /**\n   * Monitorear el rendimiento de renderizado de plantillas\n   * @param {string} templateId - ID o nombre de la plantilla\n   * @param {number} dataSize - Tamaño de los datos de la plantilla (en bytes)\n   * @param {Function} fn - Función de renderizado\n   * @returns {Promise<any>} Resultado del renderizado\n   */\n  async monitorTemplateRendering(templateId, dataSize, fn) {\n    if (!this.enabled || !this.config.metrics.emailProcessing) {\n      return fn();\n    }\n\n    return this.measureAsync(",
+  "templateid_category_templatecategory_elimina_una_plantilla": ", {\n    id: template.id,\n    category: template.category,\n  });\n};\n\n/**\n * Elimina una plantilla de la caché\n * @param {string} templateId - ID de la plantilla a eliminar\n */\nexport const invalidateTemplate = (templateId) => {\n  // Eliminar de la caché en memoria\n  if (memoryCache.byId[templateId]) {\n    const template = memoryCache.byId[templateId];\n    const category = template.category || ",
+  "templateid_datasize_timestamp_datenow_monitorear_proceso": ", fn, {\n      templateId,\n      dataSize,\n      timestamp: Date.now(),\n    });\n  }\n\n  /**\n   * Monitorear el proceso de entrega de email\n   * @param {string} emailId - ID del email\n   * @param {string} recipientType - Tipo de destinatario (provider, guest, etc.)\n   * @param {Function} fn - Función de entrega\n   * @param {Object} metadata - Metadatos adicionales\n   * @returns {Promise<any>} Resultado de la entrega\n   */\n  async monitorEmailDelivery(emailId, recipientType, fn, metadata = {}) {\n    if (!this.enabled || !this.config.metrics.emailProcessing) {\n      return fn();\n    }\n\n    // Registrar evento de intento de entrega\n    this.logEvent(",
+  "templateid_timestamp_datenow_invalida_completamente_cache": ", {\n    id: templateId,\n    timestamp: Date.now(),\n  });\n};\n\n/**\n * Invalida completamente la caché de plantillas\n */\nexport const invalidateAllTemplates = () => {\n  // Reiniciar caché en memoria\n  memoryCache.allTemplates = null;\n  memoryCache.byId = {};\n  memoryCache.byCategory = {};\n  memoryCache.lastFetched = 0;\n\n  // Limpiar localStorage\n  try {\n    for (let i = 0; i < localStorage.length; i++) {\n      const key = localStorage.key(i);\n      if (key.startsWith(CACHE_PREFIX)) {\n        localStorage.removeItem(key);\n      }\n    }\n  } catch (error) {\n    console.error(",
+  "templatescount_templatesfortestlength_iterations_prueba_sin_cache": ", {\n    templatesCount: templatesForTest.length,\n    iterations,\n  });\n\n  // 1. Prueba sin caché (limpiar caché primero)\n  templateCache.clearAll();\n  const noCacheStart = performance.now();\n\n  for (let i = 0; i < iterations; i++) {\n    for (const templateId of templatesForTest) {\n      const startTime = performance.now();\n      await EmailService.getEmailTemplateById(templateId, true); // Forzar ignorar caché\n      const endTime = performance.now();\n\n      results.withoutCache.times.push(endTime - startTime);\n      results.details.push({\n        iteration: i,\n        templateId,\n        withCache: false,\n        time: endTime - startTime,\n      });\n    }\n  }\n\n  const noCacheEnd = performance.now();\n  results.withoutCache.totalTime = noCacheEnd - noCacheStart;\n  results.withoutCache.avgTime =\n    results.withoutCache.totalTime / (templatesForTest.length * iterations);\n\n  // 2. Prueba con caché (precalentar la caché primero)\n  for (const templateId of templatesForTest) {\n    const template = await EmailService.getEmailTemplateById(templateId);\n    templateCache.cacheTemplate(template);\n  }\n\n  const withCacheStart = performance.now();\n\n  for (let i = 0; i < iterations; i++) {\n    for (const templateId of templatesForTest) {\n      const startTime = performance.now();\n      await EmailService.getEmailTemplateById(templateId);\n      const endTime = performance.now();\n\n      results.withCache.times.push(endTime - startTime);\n      results.details.push({\n        iteration: i,\n        templateId,\n        withCache: true,\n        time: endTime - startTime,\n      });\n    }\n  }\n\n  const withCacheEnd = performance.now();\n  results.withCache.totalTime = withCacheEnd - withCacheStart;\n  results.withCache.avgTime = results.withCache.totalTime / (templatesForTest.length * iterations);\n\n  // Calcular mejora y ahorro de tiempo\n  if (results.withoutCache.totalTime > 0) {\n    results.improvement.percent = Math.round(\n      (1 - results.withCache.totalTime / results.withoutCache.totalTime) * 100\n    );\n    results.improvement.timesSaved = results.withoutCache.totalTime - results.withCache.totalTime;\n  }\n\n  // Registrar resultados en monitor de rendimiento\n  performanceMonitor.logEvent(",
+  "terminos_condiciones": "términos y condiciones",
+  "test_basico_api_const_response_await": ",\n        };\n      }\n\n      // Test básico de la API\n      const response = await fetch(",
+  "thiscode_code_thisrequestid_requestid_thisstatuscode_statuscode": ";\r\n    this.code = code;\r\n    this.requestId = requestId;\r\n    this.statusCode = statusCode;\r\n  }\r\n}\r\n\r\n/**\r\n * Realiza una petición HTTP y maneja el formato de respuesta estándar\r\n * @param {string} url - URL del endpoint\r\n * @param {object} options - Opciones de fetch\r\n * @returns {Promise<any>} - Datos de la respuesta\r\n * @throws {ApiError} - Error con información detallada\r\n */\r\nexport async function apiRequest(url, options = {}) {\r\n  try {\r\n    const response = await fetch(url, {\r\n      ...options,\r\n      headers: {\r\n        ",
+  "thisdiagnosticsmailgundetails_details_catch_actualiza_informacion_autenticacion": ";\n          this.diagnostics.mailgun.details = details;\n        }\n      } catch {}\n    }\n  }\n\n  /**\n   * Actualiza la información de autenticación (usuario actual)\n   * @param {Object|null} info Información de usuario (uid, email, perfil, etc.)\n   */\n  setAuthInfo(info) {\n    if (info) {\n      this.diagnostics.auth = { status: ",
+  "thisflushmetrics_iniciar_medicion_tiempo_para_una": ") {\n      this.flushMetrics();\n    }\n  }\n\n  /**\n   * Iniciar medición de tiempo para una operación\n   * @param {string} operationId - Identificador único de la operación\n   * @returns {Function} Función para finalizar la medición\n   */\n  startTimer(operationId) {\n    if (!this.enabled || !this.config.metrics.uiInteractions) return () => {};\n\n    const startTime = performance.now();\n\n    return (metadata = {}) => {\n      const endTime = performance.now();\n      const duration = endTime - startTime;\n\n      this.recordTiming(operationId, duration, metadata);\n      return duration;\n    };\n  }\n\n  /**\n   * Registrar una medición de tiempo\n   * @param {string} metricName - Nombre de la métrica\n   * @param {number} durationMs - Duración en milisegundos\n   * @param {Object} metadata - Metadatos adicionales\n   */\n  recordTiming(metricName, durationMs, metadata = {}) {\n    if (!this.enabled) return;\n\n    if (!this.metrics.timings[metricName]) {\n      this.metrics.timings[metricName] = {\n        count: 0,\n        total: 0,\n        min: Number.MAX_SAFE_INTEGER,\n        max: 0,\n        samples: [],\n      };\n    }\n\n    const timing = this.metrics.timings[metricName];\n    timing.count++;\n    timing.total += durationMs;\n    timing.min = Math.min(timing.min, durationMs);\n    timing.max = Math.max(timing.max, durationMs);\n\n    // Guardar muestra con metadatos\n    timing.samples.push({\n      duration: durationMs,\n      timestamp: Date.now(),\n      metadata,\n    });\n\n    // Limitar número de muestras guardadas\n    if (timing.samples.length > 10) {\n      timing.samples.shift();\n    }\n\n    if (this.config.logLevel >= 3) {\n      console.debug(`⏱️ Tiempo ${metricName}: ${durationMs.toFixed(2)}ms`);\n    }\n\n    // Si la operación es lenta (> 1 segundo), registrar como evento\n    if (durationMs > 1000) {\n      this.logEvent(",
+  "thismaxcacheage_1000_minutos_por_defecto_thisfoldermaxitems": ";\n    this.maxCacheAge = 15 * 60 * 1000; // 15 minutos por defecto\n    this.folderMaxItems = {\n      inbox: 100, // máx 100 emails en caché para la bandeja de entrada\n      sent: 50, // máx 50 emails enviados\n      important: 30, // máx 30 emails importantes\n      trash: 20, // máx 20 emails en papelera\n    };\n\n    // Métricas internas\n    this.metrics = {\n      hits: 0,\n      misses: 0,\n      sets: 0,\n      invalidations: 0,\n      lastFullInvalidation: null,\n    };\n  }\n\n  /**\n   * Inicializa la caché cargando datos del almacenamiento local\n   */\n  init() {\n    if (this.initialized) return;\n\n    try {\n      const savedCache = _getStorage().getItem(this.storageKey);\n\n      if (savedCache) {\n        const parsed = JSON.parse(savedCache);\n        this.memoryCache = parsed.cache || {};\n        this.metrics = parsed.metrics || this.metrics;\n      }\n\n      this.initialized = true;\n      console.log(",
+  "throw_error_monitorear_interacciones_con_emails": ");\n\n      throw error;\n    }\n  }\n\n  /**\n   * Monitorear interacciones con emails (aperturas, clics, etc.)\n   * @param {string} emailId - ID del email\n   * @param {string} interactionType - Tipo de interacción (open, click, etc.)\n   * @param {Object} metadata - Metadatos adicionales\n   */\n  trackEmailInteraction(emailId, interactionType, metadata = {}) {\n    if (!this.enabled || !this.config.metrics.emailProcessing) {\n      return;\n    }\n\n    // Registrar evento de interacción\n    this.logEvent(",
+  "throw_falla_validacion_continuamos_bloquear_creacion": ") throw e;\n    // Si falla la validación, continuamos (no bloquear creación para owners)\n  }\n  const weddingId = uuidv4();\n  const ref = doc(db, ",
+  "tiempo_asincrono": "tiempo asíncrono (ms)",
+  "tiempo_sesion_minutos": "tiempo de sesión (minutos)",
+  "tiempo_sincrono": "tiempo síncrono (ms)",
+  "tiempo_validez_para_reset_contrasena": "tiempo de validez para reset de mot de passe (horas)",
+  "tienes_una_nueva_notificacion": "tienes una nueva notification",
+  "timeline_del_dia": "timeline del jour b",
+  "timestamp_datenow_obtiene_todas_las_plantillas": ", {\n    timestamp: Date.now(),\n  });\n};\n\n/**\n * Obtiene todas las plantillas de la caché\n * @param {boolean} bypassCache - Si es true, indica que se debe ignorar la caché\n * @returns {Object} - Objeto con las plantillas y el estado de la caché\n */\nexport const getCachedTemplates = (bypassCache = false) => {\n  // Si se debe ignorar la caché, devolver null\n  if (bypassCache) {\n    cacheStats.misses++;\n    return { templates: null, fromCache: false };\n  }\n\n  // Verificar caché en memoria primero (más rápida)\n  if (memoryCache.allTemplates && !isCacheExpired(memoryCache.lastFetched)) {\n    cacheStats.hits++;\n\n    return {\n      templates: memoryCache.allTemplates,\n      fromCache: true,\n      source: ",
+  "tipometricavalortimestampn": "tipo,métrica,valor,timestamp\\n",
+  "titulo_del_momento": "título del momento",
+  "titulo_obligatorio": "el título es obligatoire",
+  "titulo_requerido": "título es requis",
+  "titulo_tarea": "título de la tâche",
+  "todavia_tienes_bodas_activas": "todavía non tienes mariages activas.",
+  "todo_ajustar_segun_sistema_auth_const": "); // TODO: Ajustar según tu sistema de auth\n\n    const response = await fetch(`${API_BASE_URL}/api/stripe/create-checkout-session`, {\n      method: ",
+  "todos_los_cambios_han_sincronizado": "tous los cambios se han synchronisé con succès",
+  "todos_los_cambios_han_sincronizado_con": "Todos los cambios se han sincronizado con éxito",
+  "todos_los_planes_disponibles_export_const": "\n};\n\n// Todos los planes disponibles\nexport const ALL_PLANS = {\n  ...OWNER_PLANS,\n  ...PLANNER_PLANS,\n  ...ASSISTANT_PLANS\n};\n\n/**\n * Configuración de límites por plan\n * Basado en docs/flujos-especificos/flujo-25-suscripciones.md y docs/planes-suscripcion.md\n */\nconst PLAN_LIMITS = {\n  // ===== PLANES PARA PAREJAS (OWNERS) =====\n  [OWNER_PLANS.FREE]: {\n    displayName: ",
+  "token_invalido": "Token inválido",
+  "token_sesion": "token sesión",
+  "tostring_const_inferred_guesstagstxt_inferredlength_objtags": ").toString();\n      const inferred = guessTags(txt);\n      if (inferred.length) obj.tags = inferred;\n    }\n\n    return obj;\n  };\n\n  // Circuit breaker mejorado: evitar spam de requests fallidos\n  const lastFailureKey = `wallService_lastFailure_${page}_${query}`;\n  const lastRequestKey = `wallService_lastRequest_${page}_${query}`;\n  const lastFailure = localStorage.getItem(lastFailureKey);\n  const lastRequest = localStorage.getItem(lastRequestKey);\n  const now = Date.now();\n\n  // Si estamos en desarrollo, no aplicamos circuit-breaker; siempre reintentamos.\n  if (!import.meta.env.PROD) {\n    localStorage.removeItem(lastFailureKey);\n  } else {\n    // Si falló hace menos de 30 minutos, usar datos demo directamente\n    if (lastFailure && now - parseInt(lastFailure) < 30 * 60 * 1000) {\n      console.log(",
+  "touppercase_validar_formato_dni_digitos_letra": ").toUpperCase();\n\n  // Validar formato DNI (8 dígitos + letra)\n  const dniRegex = /^\\d{8}[A-Z]$/;\n  if (dniRegex.test(cleanDNI)) {\n    const letters = ",
+  "transaccion": "transaction",
+  "trim_guiones_trunca_texto_una_longitud": "); // Trim guiones\n};\n\n/**\n * Trunca un texto a una longitud específica\n */\nexport const truncateText = (text, maxLength, suffix = ",
+  "trim_return_null_heuristica_hay_coma": ").trim();\n    if (!s) return null;\n    // Heurística: si hay coma y punto, el separador de miles suele ser el primero que aparece repetido\n    // Simplificar: quitar separadores de miles y usar último separador como decimal\n    const lastComma = s.lastIndexOf(",
+  "try_produccion_esto_deberia_llamar_endpoint": ");\n  }\n\n  try {\n    // En producción, esto debería llamar a un endpoint del backend\n    // que envíe un email de verificación\n    return {\n      success: true,\n      message: ",
+  "ubicacion": "ubicación",
+  "ubicacion_centro_eventos_bosque": "ubicación: centro de eventos el bosque",
+  "ubicacion_pendiente": "ubicación en attente",
+  "uid_weddingid_activeweddingid_weddingid_hasactivewedding_true": ", uid),\n    {\n      weddingId,\n      activeWeddingId: weddingId,\n      hasActiveWedding: true,\n      lastWeddingCreatedAt: Timestamp.now(),\n    },\n    { merge: true }\n  );\n\n  // Registrar la boda en la subcolección users/{uid}/weddings para que WeddingContext la cargue\n  try {\n    const subRef = doc(db, ",
+  "uid_weddingid_merge_true_vincular_subcoleccion": ", uid), { weddingId }, { merge: true });\n    // Vincular en subcolección del usuario\n    try {\n      const wedSnap = await getDoc(wedRef);\n      const wdata = wedSnap.exists() ? wedSnap.data() : {};\n      await setDoc(\n        doc(db, ",
+  "ultima_ejecucion_aniversario": "última ejecución (aniversario)",
+  "ultimo_tema": "dernier tema",
+  "umbral_minimo_eur": "umbral mínimo (eur)",
+  "undefined_hasremappedbody_remappedbody_null_undefined_jsonstringifyremappedbody": "\n      ? undefined\n      : hasRemappedBody\n        ? remapped.body == null\n          ? undefined\n          : JSON.stringify(remapped.body)\n        : undefined;\n  const headers = await buildHeaders(opts);\n  const fetchOptions = {\n    method: finalMethod,\n    headers,\n  };\n  if (finalBody !== undefined) {\n    fetchOptions.body = finalBody;\n  }\n  if (opts.credentials) {\n    fetchOptions.credentials = opts.credentials;\n  }\n  const res = await fetch(u2, fetchOptions);\n  return res;\n}\n\n/**\n * Construye las opciones de cabecera para peticiones autenticadas.\n * Acepta objetos de usuario (Firebase, contexto propio o mocks de tests) y mergea opciones extra.\n *\n * - Si el usuario expone un token sin prefijo, se agrega como `Bearer`.\n * - Si no hay token explícito, fuerza auth=true para que buildHeaders obtenga el token actual.\n * - Permite aportar cabeceras adicionales mediante `extra.headers`.\n *\n * @param {Object|string|null} user Usuario actual o token directo.\n * @param {Object} extra Opciones adicionales (por ejemplo { silent: true }).\n * @returns {Object} Opciones compatibles con apiClient (auth, headers, silent, ...).\n */\nexport function buildAuthHeaders(user, extra = {}) {\n  const opts = { ...(extra || {}) };\n  const headers = { ...(opts.headers || {}) };\n\n  let token = null;\n  if (typeof user === ",
+  "usa_funcion": "Usa la función ",
+  "usa_funcion_distribuir_uniformemente_para": "usa la función \"distribuir uniformemente\" para espaciar mejor",
+  "usa_mesas_mas_pequenas_elimina": "usa tables plus pequeñas o elimina algunas",
+  "usa_mesas_mas_pequenas_elimina_algunas": "Usa mesas más pequeñas o elimina algunas",
+  "usa_tipografias_serifsans_estilo_clasicocontemporaneo": "usa tipografías serif/sans de estilo clásico/contemporáneo.",
+  "usage_bycategory_categoryusage_las_plantillas_mas": ",\n    },\n    usage: {\n      byCategory: categoryUsage,\n      // Las 5 plantillas más usadas\n      topTemplates: templateCache.getTopTemplates(5),\n    },\n    config: templateCache.getConfiguration(),\n  };\n}\n\n/**\n * Realiza una prueba de precarga de plantillas por categoría\n * @param {string} category - Categoría a probar\n * @returns {Object} Resultados de la prueba de precarga\n */\nexport async function testCategoryPreloading(category) {\n  const startTime = performance.now();\n\n  // Limpiar caché específicamente para esta categoría\n  templateCache.clearCategory(category);\n\n  // Iniciar precarga\n  const preloadResult = await templateCache.preloadTemplatesByCategory(category);\n\n  const endTime = performance.now();\n  const duration = endTime - startTime;\n\n  return {\n    category,\n    templatesLoaded: preloadResult.length,\n    duration: duration.toFixed(2) + ",
+  "useruid_else_docref_docdb_optionscollection_useruid": ", user.uid);\n            }\n          } else {\n            docRef = doc(db, options.collection, user.uid);\n          }\n        }\n\n        try {\n          // Comprobar si el documento ya existe\n          const docSnap = await getDoc(docRef);\n\n          const targetField = options.field || key;\n\n          if (docSnap.exists() && options.mergeWithExisting) {\n            // Actualizar el campo específico en el documento existente\n            await updateDoc(docRef, { [targetField]: data });\n          } else {\n            // Crear nuevo documento con el campo\n            await setDoc(docRef, { [targetField]: data }, { merge: options.mergeWithExisting });\n          }\n\n          syncState.pendingChanges = false;\n          syncState.lastSyncTime = new Date().toISOString();\n\n          if (options.showNotification) {\n            showNotification(",
+  "usuarioautenticado_false_permisoescritura_false_permisolectura_false": ",\n    usuarioAutenticado: false,\n    permisoEscritura: false,\n    permisoLectura: false,\n    errores: [],\n    solucionesIntentadas: [],\n  };\n\n  try {\n    // 1. Comprobar autenticación\n    const auth = getAuth();\n    const usuario = auth.currentUser;\n    resultado.usuarioAutenticado = !!usuario;\n\n    if (!usuario) {\n      resultado.errores.push(",
+  "usuarios_con_actividad_registrada_los": "usuarios con actividad registrada en los últimos siete días.",
+  "usuarios_unicos_activos_durante_los": "usuarios únicos activos durante los últimos 30 días.",
+  "usuariouid_await_setdoc_userdocref_diagnosticcheck_new": ", usuario.uid);\n        await setDoc(\n          userDocRef,\n          {\n            diagnosticCheck: new Date().toISOString(),\n            browser: navigator.userAgent,\n          },\n          { merge: true }\n        );\n        resultado.permisoEscritura = true;\n      } catch (error) {\n        resultado.errores.push(`Error al escribir documento de usuario: ${error.message}`);\n        resultado.permisoEscritura = false;\n      }\n    }\n\n    // 5. Verificar configuración de IndexedDB\n    try {\n      if (window.indexedDB) {\n        // Probar acceso a IndexedDB\n        const testRequest = window.indexedDB.open(",
+  "vacio": "vacío",
+  "valeria_tomas_wedding": "valeria & tomás wedding",
+  "validacion_limites_creador_planner_try_const": ");\n  // Validación de límites si el creador es planner\n  try {\n    const userSnap = await getDoc(doc(db, ",
+  "validacion_limites_por_tier_del_planner": ") {\n    // Validación de límites por tier del planner antes de añadirlo\n    try {\n      const userSnap = await getDoc(doc(db, ",
+  "validaciones_tamano_tipo_const_size_numberfilesize": ");\n\n      // Validaciones: tamaño y tipo\n      const size = Number(file.size || 0);\n      const validSize = size >= 0 && size <= MAX_BYTES;\n      const validType = isAllowedType(file);\n      if (!validSize || !validType) {\n        console.warn(",
+  "validar_actualizacion": "validar actualización",
   "validation": {
     "nameRequired": "Le nom est obligatoire",
     "serviceRequired": "Le service est obligatoire",
@@ -2694,17 +2952,6 @@
     "activateUrlError": "Impossible d'activer l'URL publique pour le moment. Veuillez réessayer plus tard.",
     "saveLogisticsError": "Impossible d'enregistrer la logistique. Veuillez réessayer."
   },
-  "messages": {
-    "saveSuccess": "Enregistré avec succès",
-    "saveError": "Erreur lors de l'enregistrement",
-    "deleteSuccess": "Supprimé avec succès",
-    "updateSuccess": "Mis à jour avec succès",
-    "logisticsUpdated": "Logistique mise à jour avec succès",
-    "publishSuccess": "Page publiée !",
-    "publishSuccessWithUrl": "Page publiée ! URL publique : {{url}}",
-    "savedNoActiveWedding": "Page enregistrée. Aucun mariage actif à publier publiquement.",
-    "generateWebFirst": "Générez d'abord le site web"
-  },
   "website": {
     "generate": "Générer le site",
     "publish": "Publier",
@@ -2731,15 +2978,137 @@
       "managerConfirmError": "Aucune confirmation reçue pour le nouveau chef. Vérifiez le backend.",
       "commercialCreated": "Commercial créé avec succès",
       "commercialConfirmError": "Aucune confirmation reçue pour le nouveau commercial. Vérifiez le backend."
+    },
+    "users": {
+      "exportSuccess": "Données utilisateur exportées avec succès",
+      "sendEmail": "Envoyer un email à {{email}}",
+      "resetPassword": "Réinitialiser le mot de passe de {{name}}",
+      "suspendError": "Erreur lors de la suspension de l'utilisateur : {{message}}",
+      "reactivateError": "Erreur lors de la réactivation de l'utilisateur : {{message}}"
+    },
+    "portfolio": {
+      "exported": "✅ Portfolio exporté : {{total}} mariages",
+      "exportError": "Erreur lors de l'exportation du portfolio : {{message}}"
+    },
+    "support": {
+      "responseSuccess": "Réponse envoyée avec succès",
+      "responseError": "Erreur lors de l'envoi de la réponse : {{message}}"
     }
   },
-  "rsvp": {
-    "reminderSimulation": "Simulation : candidats={{attempted}}, envoyés={{sent}}, ignorés={{skipped}}",
-    "reminderSent": "Envoi : candidats={{attempted}}, envoyés={{sent}}, ignorés={{skipped}}",
-    "reminderSimulationError": "Erreur lors de la simulation des rappels",
-    "reminderSendError": "Erreur lors de l'envoi des rappels",
-    "linkCopied": "Lien RSVP copié",
-    "linkCopyError": "Impossible de générer/copier le lien"
+  "weddings": {
+    "syncCrmError": "Impossible de mettre en file d'attente la synchronisation CRM. Veuillez réessayer.",
+    "bulkSyncError": "Impossible de mettre en file d'attente les mariages sélectionnés. Veuillez réessayer.",
+    "createError": "Impossible de créer le mariage. Vérifiez les permissions.",
+    "updateStatusError": "Impossible de mettre à jour le statut du mariage. Veuillez réessayer."
+  },
+  "whatsapp": {
+    "selectGuests": "Sélectionnez au moins un invité",
+    "coupleNameRequired": "Le message doit inclure le nom du couple ou la variable {coupleName}",
+    "assetUrlRequired": "Ajoutez l'URL de l'invitation conçue avant de continuer",
+    "providerNotConfigured": "Le fournisseur d'API WhatsApp n'est pas configuré. Veuillez le configurer avant d'envoyer.",
+    "coupleNameMissing": "Le message doit inclure le nom du couple pour chaque invité sélectionné",
+    "sendComplete": "Envoi terminé. Succès : {{ok}}, Échecs : {{fail}}",
+    "modal": {
+      "title": "Envoyer par WhatsApp",
+      "tabs": {
+        "personal": "Téléphone personnel",
+        "api": "Numéro de l'application (API)"
+      },
+      "personal": {
+        "description": "WhatsApp s'ouvrira sur votre appareil avec le message préparé. Confirmez l'envoi manuellement.",
+        "businessToggle": "Ouvrir dans WhatsApp Business"
+      },
+      "api": {
+        "providerStatusLine": "Statut du fournisseur : {{status}}",
+        "status": {
+          "checking": "Vérification…",
+          "configured": "Configuré",
+          "notConfigured": "Non configuré"
+        },
+        "providerName": "Fournisseur : {{provider}}",
+        "healthLabel": "Health: {{status}}",
+        "healthStatus": {
+          "ok": "OK",
+          "degraded": "Dégradé"
+        },
+        "healthFallback": "(fallback : {{value}})",
+        "viewMetrics": "Afficher les métriques",
+        "metrics": {
+          "loading": "Chargement des métriques…",
+          "total": "Total : {{value}}",
+          "delivery": "Livraison : {{percentage}}%",
+          "read": "Lecture : {{percentage}}%"
+        },
+        "noteUnconfigured": "Remarque : le fournisseur API n'est pas prêt. Vous pouvez utiliser l'onglet « Téléphone personnel » (deeplink) comme alternative."
+      },
+      "labels": {
+        "message": "Message"
+      },
+      "actions": {
+        "sendSingle": "Envoyer à cet invité",
+        "sendBulkPending": "Envoi massif : invités en attente",
+        "sendBulkPendingTitle": "Envoyer aux invités en attente via l'API"
+      },
+      "defaultMessage": {
+        "generic": "Bonjour ! Nous aimerions t'inviter à notre mariage. Peux-tu confirmer ta présence ?",
+        "named": "Bonjour {{name}} ! Nous serions ravis de t'avoir à notre mariage. Peux-tu confirmer ta présence ?"
+      }
+    }
+  },
+  "design": {
+    "svg": {
+      "noContent": "Aucun SVG à enregistrer",
+      "saved": "SVG enregistré dans le mariage",
+      "saveError": "Impossible d'enregistrer le SVG"
+    },
+    "palette": {
+      "saved": "Palette enregistrée",
+      "saveError": "Impossible d'enregistrer la palette"
+    }
+  },
+  "wedding": {
+    "wedding": "Mariage",
+    "weddings": "Mariages",
+    "myWedding": "Mon mariage",
+    "createWedding": "Créer un mariage",
+    "editWedding": "Modifier le mariage",
+    "weddingName": "Nom du mariage",
+    "weddingDate": "Date du mariage",
+    "weddingVenue": "Lieu du mariage",
+    "bride": "Mariée",
+    "groom": "Marié",
+    "couple": "Couple",
+    "ceremony": "Cérémonie",
+    "reception": "Réception",
+    "weddingDetails": "Détails du mariage",
+    "weddingBudget": "Budget du mariage",
+    "weddingGuests": "Invités",
+    "weddingStyle": "Style du mariage",
+    "weddingTheme": "Thème du mariage",
+    "weddingColors": "Couleurs du mariage",
+    "permissions": {
+      "updateError": "Impossible de mettre à jour les permissions. Veuillez réessayer."
+    },
+    "status": {
+      "updateError": "Impossible de mettre à jour le statut. Veuillez réessayer."
+    },
+    "form": {
+      "nameRequired": "Le nom est obligatoire",
+      "saveError": "Erreur lors de l'enregistrement du mariage"
+    },
+    "site": {
+      "rsvpSuccess": "Merci d'avoir confirmé votre présence",
+      "rsvpError": "Erreur lors de l'envoi de votre réponse. Veuillez réessayer."
+    },
+    "share": {
+      "linkCopied": "Lien copié"
+    }
+  },
+  "supplier": {
+    "register": {
+      "claimedSuccess": "Profil revendiqué avec succès ! Vous pouvez maintenant gérer vos informations.",
+      "registerSuccess": "Inscription réussie ! Bienvenue sur la plateforme."
+    }
   },
   "verifica_conexion_con_backend_async_checkbackendconnection": ",\n        },\n      };\n    }\n  }\n\n  /**\n   * Verifica la conexión con el backend\n   */\n  async checkBackendConnection() {\n    try {\n      const backendUrl = import.meta.env.VITE_BACKEND_BASE_URL;\n      if (!backendUrl) {\n        throw new Error(",
   "verifica_estado_una_sesion_checkout_param": ",\n};\n\n/**\n * Verifica el estado de una sesión de checkout\n * @param {string} sessionId - ID de la sesión\n * @returns {Promise<Object>} - Estado de la sesión\n */\nexport async function getCheckoutSession(sessionId) {\n  try {\n    const token = localStorage.getItem(",
@@ -2752,27 +3121,6 @@
   "vintage_romantico": "vintage & romántico",
   "vitebackendbaseurl_esta_configurada": "vite_backend_base_url non está configurada",
   "viteopenaiapikey_esta_configurada": "VITE_OPENAI_API_KEY no está configurada",
-  "wedding": {
-    "wedding": "Wedding",
-    "weddings": "Weddings",
-    "myWedding": "My Wedding",
-    "createWedding": "Create Wedding",
-    "editWedding": "Edit Wedding",
-    "weddingName": "Wedding Name",
-    "weddingDate": "Wedding Date",
-    "weddingVenue": "Wedding Venue",
-    "bride": "Bride",
-    "groom": "Groom",
-    "couple": "Couple",
-    "ceremony": "Ceremony",
-    "reception": "Reception",
-    "weddingDetails": "Wedding Details",
-    "weddingBudget": "Wedding Budget",
-    "weddingGuests": "Wedding Guests",
-    "weddingStyle": "Wedding Style",
-    "weddingTheme": "Wedding Theme",
-    "weddingColors": "Wedding Colors"
-  },
   "weddingid_null_const_desc_senal_proveedor": ",\n  weddingId = null,\n}) {\n  const desc = `Señal proveedor: ${providerName || providerId}`;\n  const res = await post(\n    ",
   "weddingid_validacion_limites_por_tier_del": ", weddingId);\n  // Validación de límites por tier del planner\n  try {\n    const userSnap = await getDoc(doc(db, ",
   "whatsapp_email_proximamente": "whatsapp + email (próximamente)",
@@ -2782,5 +3130,631 @@
   "windowlocalstorage_windowlocalstorage_getstorage_const_raw_storegetitemkey": " && window.localStorage ? window.localStorage : _getStorage();\n    const raw = store.getItem(key);\n    if (!raw) return defaultValue;\n    return JSON.parse(raw);\n  } catch (error) {\n    console.error(`storage.loadJson error for key ${key}:`, error);\n    return defaultValue;\n  }\n};\n\n/**\n * Guarda un valor JSON en localStorage.\n * @param {string} key - Clave.\n * @param {*} value - Valor a serializar.\n * @returns {boolean} Éxito de la operación.\n */\nexport const saveJson = (key, value) => {\n  try {\n    const store =\n      typeof window !== ",
   "windowtoasttypemessage_else_consolelogtypetouppercase_message_registra_los": ") {\n    window.toast[type](message);\n  } else {\n    console.log(`[${type.toUpperCase()}] ${message}`);\n  }\n};\n\n// Registra los listeners de cambios de conexión\nexport const setupSyncListeners = () => {\n  window.addEventListener(",
   "withcacheavg_resultswithcacheavgtime_withoutcacheavg_resultswithoutcacheavgtime_improvementpercent_resultsimprovementpercent": ", {\n    withCacheAvg: results.withCache.avgTime,\n    withoutCacheAvg: results.withoutCache.avgTime,\n    improvementPercent: results.improvement.percent,\n    timesSaved: results.improvement.timesSaved,\n    templatesCount: templatesForTest.length,\n    iterations,\n  });\n\n  return results;\n}\n\n/**\n * Genera un informe detallado del estado actual de la caché\n * @returns {Object} Estadísticas detalladas de la caché\n */\nexport function generateCacheReport() {\n  // Obtener estadísticas del servicio de caché\n  const stats = templateCache.getCacheStats();\n\n  // Obtener entradas actuales\n  const memoryEntries = templateCache.getMemoryCacheEntries();\n  const localStorageSize = templateCache.getStorageCacheSize();\n\n  // Calcular tiempos promedio\n  const avgHitTime =\n    stats.hitTimes.length > 0\n      ? stats.hitTimes.reduce((sum, time) => sum + time, 0) / stats.hitTimes.length\n      : 0;\n\n  const avgMissTime =\n    stats.missTimes.length > 0\n      ? stats.missTimes.reduce((sum, time) => sum + time, 0) / stats.missTimes.length\n      : 0;\n\n  // Calcular efectividad\n  const hitRatio =\n    stats.hits + stats.misses > 0 ? (stats.hits / (stats.hits + stats.misses)) * 100 : 0;\n\n  // Preparar detalles de uso por categoría\n  const categoryUsage = {};\n  if (stats.categoryHits) {\n    Object.keys(stats.categoryHits).forEach((category) => {\n      categoryUsage[category] = {\n        hits: stats.categoryHits[category] || 0,\n        misses: stats.categoryMisses?.[category] || 0,\n        total: (stats.categoryHits[category] || 0) + (stats.categoryMisses?.[category] || 0),\n      };\n    });\n  }\n\n  return {\n    timestamp: Date.now(),\n    stats: {\n      hits: stats.hits,\n      misses: stats.misses,\n      total: stats.hits + stats.misses,\n      hitRatio: hitRatio.toFixed(2),\n      avgHitTime: avgHitTime.toFixed(2),\n      avgMissTime: avgMissTime.toFixed(2),\n      avgTimeSaved: avgMissTime - avgHitTime > 0 ? (avgMissTime - avgHitTime).toFixed(2) : 0,\n    },\n    memory: {\n      entryCount: memoryEntries.length,\n      byCategory: memoryEntries.reduce((acc, entry) => {\n        const cat = entry.category || ",
-  "writestorestore_export_const_updatelocalfinance_uid_weddingid": ";\n  writeStore(store);\n};\n\nexport const updateLocalFinance = (uid, weddingId, patch) => {\n  if (!weddingId) return;\n  const store = readStore();\n  const entry = ensureUserEntry(store, uid);\n  const idx = entry.weddings.findIndex((item) => item.id === weddingId);\n  if (idx === -1) {\n    // Si la boda no existe todavía, creamos una copia por defecto para mantener consistencia.\n    const created = {\n      ...createDefaultWedding(uid),\n      id: weddingId,\n      financeMain: mergeFinance(undefined, patch),\n    };\n    entry.weddings.push(created);\n    if (!entry.activeWeddingId) entry.activeWeddingId = weddingId;\n  } else {\n    const current = entry.weddings[idx];\n    entry.weddings[idx] = {\n      ...current,\n      financeMain: mergeFinance(current.financeMain, patch),\n      updatedAt: new Date().toISOString(),\n    };\n  }\n  writeStore(store);\n};\n\nexport const getLocalFinance = (uid, weddingId) => {\n  const store = readStore();\n  const entry = ensureUserEntry(store, uid);\n  const wedding = entry.weddings.find((item) => item.id === weddingId);\n  return wedding?.financeMain || null;\n};\n\nexport const clearLocalWeddings = (uid) => {\n  const store = readStore();\n  if (uid) {\n    store.users[uid] = { weddings: [], activeWeddingId: "
+  "writestorestore_export_const_updatelocalfinance_uid_weddingid": ";\n  writeStore(store);\n};\n\nexport const updateLocalFinance = (uid, weddingId, patch) => {\n  if (!weddingId) return;\n  const store = readStore();\n  const entry = ensureUserEntry(store, uid);\n  const idx = entry.weddings.findIndex((item) => item.id === weddingId);\n  if (idx === -1) {\n    // Si la boda no existe todavía, creamos una copia por defecto para mantener consistencia.\n    const created = {\n      ...createDefaultWedding(uid),\n      id: weddingId,\n      financeMain: mergeFinance(undefined, patch),\n    };\n    entry.weddings.push(created);\n    if (!entry.activeWeddingId) entry.activeWeddingId = weddingId;\n  } else {\n    const current = entry.weddings[idx];\n    entry.weddings[idx] = {\n      ...current,\n      financeMain: mergeFinance(current.financeMain, patch),\n      updatedAt: new Date().toISOString(),\n    };\n  }\n  writeStore(store);\n};\n\nexport const getLocalFinance = (uid, weddingId) => {\n  const store = readStore();\n  const entry = ensureUserEntry(store, uid);\n  const wedding = entry.weddings.find((item) => item.id === weddingId);\n  return wedding?.financeMain || null;\n};\n\nexport const clearLocalWeddings = (uid) => {\n  const store = readStore();\n  if (uid) {\n    store.users[uid] = { weddings: [], activeWeddingId: ",
+  "protocol": {
+    "specialMoments": {
+      "title": "Special Moments",
+      "description": "Plan each key moment with the right music and timing.",
+      "buttons": {
+        "addSection": "Add section",
+        "addMoment": "Add moment",
+        "duplicateShort": "Dup →",
+        "moveShort": "Move →",
+        "use": "Use",
+        "searchWithAI": "Search with AI",
+        "confirm": "Confirm",
+        "clear": "Clear",
+        "remove": "Remove"
+      },
+      "tooltips": {
+        "addSection": "Add custom section",
+        "deleteMoment": "Delete",
+        "duplicateHere": "Duplicate in this section",
+        "duplicateElse": "Duplicate in another section",
+        "moveElse": "Move to another section",
+        "moveUp": "Move up",
+        "moveDown": "Move down",
+        "play": "Play",
+        "pause": "Pause",
+        "stop": "Stop",
+        "blockHeader": "Double-click to rename section (right-click for more options)"
+      },
+      "toggles": {
+        "showAdvanced": "Show advanced details",
+        "hideAdvanced": "Hide advanced details",
+        "hideRecipient": "Hide recipient",
+        "showPlayer": "Player",
+        "hidePlayer": "Hide"
+      },
+      "labels": {
+        "dragHandle": "Drag to reorder",
+        "stateNone": "No status",
+        "optionalBadge": "Optional",
+        "optionalToggle": "Optional",
+        "type": "Type",
+        "location": "Location",
+        "state": "Status",
+        "song": "Song",
+        "time": "Time",
+        "duration": "Duration",
+        "language": "Language",
+        "tempo": "Tempo",
+        "era": "Decade",
+        "genre": "Genre",
+        "volume": "Volume",
+        "recipientHint": "Choose who this moment is for (optional)",
+        "recipientDefault": "Recipient",
+        "recipientRoleFallback": "Assigned role",
+        "recipientSummary": "Recipient: {{label}}",
+        "responsibles": "Responsible people",
+        "requirements": "Technical requirements / notes",
+        "relatedSuppliers": "Related suppliers",
+        "actionDuplicate": "Duplicate to:",
+        "actionMove": "Move to:",
+        "playerNowPlaying": "Playing preview",
+        "musicInspiration": "Music inspiration",
+        "aiTitle": "Find the perfect song (AI)",
+        "viewOn": "View on:"
+      },
+      "placeholders": {
+        "momentTitle": "Moment title",
+        "location": "Chapel, garden, ballroom...",
+        "song": "Song name",
+        "time": "hh:mm",
+        "duration": "e.g. 10 min",
+        "recipientManual": "Recipient name or role",
+        "requirements": "Sound, lighting, special elements...",
+        "supplier": "Name or reference",
+        "searchSong": "Search song by name...",
+        "aiPrompt": "Describe the moment: \"first dance, spanish ballad\"",
+        "role": "Role / function",
+        "name": "Name",
+        "contact": "Contact (phone/email)"
+      },
+      "options": {
+        "recipient": {
+          "none": "No recipient",
+          "custom": "Specify manually",
+          "rolePrefix": "Role: {{role}}",
+          "table": "· Table {{table}}"
+        },
+        "languages": {
+          "es": "Spanish",
+          "en": "English"
+        },
+        "tempo": {
+          "any": "Any",
+          "slow": "Slow",
+          "medium": "Medium",
+          "fast": "Fast"
+        },
+        "era": {
+          "any": "Any",
+          "80s": "80s",
+          "90s": "90s",
+          "2000s": "2000s",
+          "2010s": "2010s",
+          "current": "Current"
+        },
+        "genre": {
+          "any": "Any",
+          "pop": "Pop",
+          "rock": "Rock",
+          "jazz": "Jazz",
+          "latin": "Latin",
+          "classical": "Classical",
+          "indie": "Indie",
+          "rnb": "R&B"
+        }
+      },
+      "helperTexts": {
+        "recipientDetails": "Table: {{table}} · Diet: {{diet}}",
+        "responsiblesEmpty": "Add who is in charge of this moment.",
+        "suppliersEmpty": "Record suppliers relevant to this moment.",
+        "spotifyEmbed": "You pasted a Spotify link. A preview is shown.",
+        "sectionTip": "Tip: double-click the section name to rename it. Right-click to delete or move the section. Use \"Dup →\" to duplicate a moment into another section and \"Move →\" to move it.",
+        "noOtherSections": "No other sections available."
+      },
+      "menu": {
+        "duplicateHere": "Duplicate in this section",
+        "duplicateElse": "Duplicate in another section",
+        "move": "Move to another section",
+        "delete": "Delete moment"
+      },
+      "player": {
+        "show": "Player",
+        "hide": "Hide",
+        "play": "Play",
+        "pause": "Pause",
+        "stop": "Stop",
+        "volume": "Volume"
+      },
+      "ai": {
+        "loading": "Fetching recommendations...",
+        "error": "Could not fetch recommendations. Try again.",
+        "resultsTitle": "AI recommendations",
+        "preferencesPrefix": "Preferences",
+        "preferences": {
+          "language": {
+            "es": "spanish language",
+            "en": "english language"
+          },
+          "tempo": {
+            "slow": "slow tempo",
+            "medium": "medium tempo",
+            "fast": "fast tempo"
+          },
+          "era": {
+            "80s": "1980s decade",
+            "90s": "1990s decade",
+            "2000s": "2000s decade",
+            "2010s": "2010s decade",
+            "current": "current decade"
+          },
+          "genre": {
+            "pop": "pop genre",
+            "rock": "rock genre",
+            "jazz": "jazz genre",
+            "latin": "latin genre",
+            "classical": "classical genre",
+            "indie": "indie genre",
+            "rnb": "R&B genre"
+          }
+        }
+      },
+      "search": {
+        "loading": "Searching...",
+        "error": "Could not search songs. Try again later.",
+        "resultsTitle": "Results"
+      },
+      "aria": {
+        "reorderHandle": "Drag to reorder"
+      },
+      "defaults": {
+        "newMoment": "New moment {{count}}",
+        "momentTitle": "New moment"
+      },
+      "empty": {
+        "title": "There are no moments in this section.",
+        "subtitle": "Click \"Add moment\" to create one."
+      },
+      "prompts": {
+        "newSection": "Name for the new section (e.g., Rehearsal, Brunch...)",
+        "blockAction": "Action: delete | move-left | move-right",
+        "deleteSection": "Remove section \"{{name}}\"?",
+        "renameSection": "New name for the section:",
+        "duplicateIn": "Duplicate to (type exactly):\n{{list}}",
+        "moveTo": "Move to (type exactly):\n{{list}}"
+      },
+      "momentTypes": {
+        "entrada": "Entrance",
+        "lectura": "Reading",
+        "votos": "Vows",
+        "anillos": "Ring exchange",
+        "baile": "Dance",
+        "discurso": "Speech",
+        "corte_pastel": "Cake cutting",
+        "salida": "Exit",
+        "otro": "Other"
+      },
+      "states": {
+        "pendiente": "Pending",
+        "confirmado": "Confirmed",
+        "ensayo": "Rehearsal"
+      },
+      "recipientRoles": {
+        "novia": "Bride",
+        "novio": "Groom",
+        "planner": "Planner",
+        "oficiante": "Officiant / Master of ceremonies",
+        "familia": "Close family",
+        "amigo": "Friend",
+        "proveedor": "Supplier"
+      },
+      "warnings": {
+        "missingTime": "Add an estimated time.",
+        "missingResponsible": "Assign at least one responsible person.",
+        "missingRecipient": "Assign a recipient or role.",
+        "missingSong": "Add a song."
+      },
+      "toasts": {
+        "validationReminder": "Some required fields are missing. Check the alerts in each moment.",
+        "maxMomentsInSection": "You've reached the maximum of {{count}} moments in this section.",
+        "responsibleLimit": "Maximum {{count}} responsibles per moment.",
+        "supplierDraftRequired": "Enter a supplier before adding it.",
+        "supplierLimit": "Maximum {{count}} suppliers per moment.",
+        "supplierAlreadyExists": "That supplier is already registered.",
+        "selectTargetSection": "Select a destination section.",
+        "momentDuplicated": "Moment duplicated successfully.",
+        "selectDifferentSection": "Choose a different section to move the moment.",
+        "momentMoved": "Moment moved to the new section.",
+        "createAnotherSection": "Create another section to use this action.",
+        "songApplied": "Song applied to the last moment."
+      }
+    },
+    "checklist": {
+      "title": "Last-minute checklist",
+      "description": "Quick summary of the must-do items right before the event.",
+      "manualDefaults": {
+        "specialGifts": "Gifts prepared for the special moments"
+      },
+      "buttons": {
+        "addCheckpoint": "Add checkpoint",
+        "view": "View"
+      },
+      "statuses": {
+        "pending": "pending",
+        "in-progress": "in progress",
+        "done": "completed"
+      },
+      "categories": {
+        "documentation": "Documentation",
+        "providers": "Suppliers",
+        "ceremony": "Ceremony",
+        "contingency": "Contingency",
+        "personal": "Personal",
+        "technical": "Technical"
+      },
+      "badges": {
+        "critical": "Critical",
+        "custom": "Custom",
+        "documents": "Documents"
+      },
+      "labels": {
+        "due": "Due:",
+        "overdue": "Overdue!",
+        "notesPlaceholder": "Add notes...",
+        "documents": "Documents:",
+        "manualTitle": "Manual checkpoints"
+      },
+      "manual": {
+        "empty": "Add checkpoints with the \"{{button}}\" button.",
+        "toggleDone": "Mark done",
+        "togglePending": "Mark pending",
+        "removeTooltip": "Delete"
+      },
+      "providersCard": {
+        "title": "Suppliers",
+        "confirmed": "Confirmed:",
+        "pending": "Pending: {{count}}",
+        "link": "View"
+      },
+      "momentsCard": {
+        "title": "Moments (music)",
+        "assigned": "Songs assigned:",
+        "missing": "Missing assignments: {{count}}",
+        "empty": "No moments configured"
+      },
+      "toasts": {
+        "statusUpdated": "\"{{label}}\" marked as {{status}}",
+        "missingName": "Enter a name for the item",
+        "customAdded": "Item \"{{label}}\" added",
+        "customRemoved": "Item removed",
+        "exported": "Checklist exported",
+        "imported": "{{count}} custom items imported",
+        "importError": "We couldn't import the file",
+        "importFormat": "Invalid file format"
+      },
+      "prompts": {
+        "deleteCustom": "Delete \"{{label}}\"?"
+      },
+      "import": {
+        "warn": "Could not import {{label}}"
+      },
+      "addModal": {
+        "title": "Add checkpoint",
+        "nameLabel": "Checkpoint name",
+        "namePlaceholder": "E.g. Gifts prepared for the special moments",
+        "notesLabel": "Notes (optional)",
+        "notesPlaceholder": "Details or reminders"
+      },
+      "tooltips": {
+        "markCritical": "Mark as critical",
+        "edit": "Edit",
+        "save": "Save",
+        "delete": "Delete"
+      }
+    }
+  },
+  "public": {
+    "payment": {
+      "success": {
+        "loadingMessage": "Verifying your payment...",
+        "errorTitle": "Payment verification failed",
+        "errorDescription": "We couldn't verify your payment session. Please contact support.",
+        "buttons": {
+          "backPricing": "Back to plans",
+          "contactSupport": "Contact support",
+          "goDashboard": "Go to dashboard"
+        },
+        "title": "Payment completed successfully",
+        "description": "Your subscription has been activated.",
+        "detailsHeading": "Purchase details:",
+        "statusLabel": "Status:",
+        "status": {
+          "complete": "Completed"
+        },
+        "totalLabel": "Total:",
+        "redirectNotice": "You will be redirected automatically in 5 seconds...",
+        "emailNotice": "You'll receive a confirmation email with your purchase details."
+      },
+      "cancel": {
+        "title": "Payment cancelled",
+        "description": "You cancelled the payment process. No charge was made.",
+        "supportCard": {
+          "title": "Did you have any issues?",
+          "description": "If you experienced an error or have questions about our plans, our team is ready to help."
+        },
+        "buttons": {
+          "backPricing": "Back to plans",
+          "contactSupport": "Contact support",
+          "backHome": "Return to home"
+        },
+        "faq": {
+          "title": "Need help?",
+          "link": "View FAQs"
+        },
+        "support": {
+          "title": "Support",
+          "emailLink": "Send email"
+        }
+      }
+    },
+    "invitation": {
+      "accept": {
+        "processing": "Processing invitation...",
+        "success": "Invitation accepted! Redirecting...",
+        "error": "We couldn't accept the invitation: {{message}}"
+      }
+    },
+    "rsvp": {
+      "loading": "Loading...",
+      "notFound": "Guest not found",
+      "title": "RSVP confirmation",
+      "greeting": "Hi {{name}}, please let us know if you will attend.",
+      "question": "Will you attend?",
+      "statusOptions": {
+        "accepted": "Yes",
+        "rejected": "No"
+      },
+      "companionsLabel": "Number of companions",
+      "allergensLabel": "Allergies or dietary restrictions",
+      "messagePlaceholder": "Message",
+      "submit": "Submit response",
+      "thanksTitle": "Thank you, {{name}}!",
+      "thanksDescription": "We have recorded your response. See you soon.",
+      "toasts": {
+        "fetchError": "We could not load your invitation.",
+        "submitSuccess": "Response saved!",
+        "submitError": "Something went wrong while sending your response."
+      },
+      "errors": {
+        "fetchNotFound": "Guest not found",
+        "submit": "Error submitting response"
+      }
+    },
+    "supplierPortal": {
+      "loading": "Chargement...",
+      "error": "Le lien est invalide ou a expiré",
+      "errorWithReason": "Le lien est invalide ou a expiré ({{reason}})",
+      "title": "Portail fournisseur",
+      "thanksTitle": "Merci !",
+      "thanksDescription": "Nous avons bien reçu votre réponse. Nous vous contacterons prochainement.",
+      "labels": {
+        "wedding": "Mariage",
+        "supplier": "Fournisseur",
+        "availability": "Disponibilité",
+        "message": "Message",
+        "budget": "Budget (optionnel)",
+        "amount": "Montant",
+        "links": "Lien de fichier (Drive, Dropbox)",
+        "description": "Description ou détails du budget"
+      },
+      "availability": {
+        "available": "Disponible",
+        "unavailable": "Non disponible",
+        "unknown": "À confirmer"
+      },
+      "placeholders": {
+        "message": "Commentaires, questions ou conditions",
+        "amount": "Montant",
+        "links": "Lien vers un fichier (Drive, Dropbox)",
+        "description": "Description du budget ou précisions"
+      },
+      "buttons": {
+        "submit": "Envoyer",
+        "submitting": "Envoi..."
+      },
+      "alerts": {
+        "submitError": "Impossible d'envoyer la réponse : {{message}}"
+      }
+    },
+    "weddingSite": {
+      "loading": "Chargement...",
+      "alerts": {
+        "success": "Merci pour votre réponse !",
+        "error": "Le formulaire n'a pas pu être envoyé."
+      },
+      "defaults": {
+        "title": "Notre mariage",
+        "storyTitle": "Notre histoire",
+        "timelineTitle": "Programme",
+        "galleryTitle": "Galerie",
+        "rsvpTitle": "RSVP",
+        "giftsTitle": "Liste de cadeaux",
+        "giftsDescription": "Merci pour votre cadeau, à envoyer sur le compte suivant :",
+        "mapTitle": "Comment s'y rendre"
+      },
+      "countdown": {
+        "days": "{{value}}d",
+        "hours": "{{value}}h",
+        "minutes": "{{value}}m",
+        "seconds": "{{value}}s"
+      },
+      "rsvp": {
+        "placeholders": {
+          "name": "Votre nom",
+          "guests": "Nombre d'invités",
+          "message": "Message"
+        },
+        "options": {
+          "yes": "Je serai présent(e)",
+          "no": "Je ne pourrai pas venir"
+        },
+        "button": "Envoyer"
+      }
+    },
+    "publicWedding": {
+      "loading": "Chargement...",
+      "error": "Indisponible ({{reason}})",
+      "defaults": {
+        "title": "Notre mariage",
+        "storyTitle": "Notre histoire",
+        "timelineTitle": "Programme",
+        "galleryTitle": "Galerie",
+        "iframeTitle": "Site du mariage"
+      }
+    },
+    "moments": {
+      "guest": {
+        "loading": "Preparing your space to share memories...",
+        "errorTitle": "We could not open the memories gallery",
+        "errorDescription": "{{message}}",
+        "errorHint": "If you believe this is a mistake, ask the couple for a new link.",
+        "errors": {
+          "incompleteLink": "The link is incomplete. Ask the couple for a new QR code.",
+          "invalidLink": "This link is no longer valid."
+        },
+        "closedTitle": "The gallery is closed",
+        "closedDescription": "The upload window closed{{date}}.",
+        "closedHint": "If you still have memories to share, let the couple know so they can reopen the link.",
+        "form": {
+          "badge": "Collaborative memories",
+          "title": "Thanks for capturing memories!",
+          "description": "Upload your favourite photos from the event. The host will review them and showcase them in the live slideshow.",
+          "deadline": "The gallery accepts new photos until {{date}}.",
+          "remainingDays": {
+            "one": "You have 1 day left to share memories.",
+            "other": "You have {{count}} days left to share memories."
+          },
+          "compressionNotice": "Photos are automatically optimised to save space.",
+          "nameLabel": "Your name",
+          "namePlaceholder": "E.g. Laura G.",
+          "emailLabel": "Email (optional)",
+          "emailPlaceholder": "We'll let you know when your photos are featured",
+          "termsLabel": "I consent to sharing my photos with the couple and confirm I have permission to do so.",
+          "submit": "Start uploading photos",
+          "tip": "Tip: photos are grouped by scene (ceremony, reception, party…) to help the host.",
+          "errors": {
+            "missingName": "Add your name so we can personalise your contributions.",
+            "missingTerms": "You must accept the privacy policy.",
+            "uploadsClosed": "This gallery is no longer accepting new photos."
+          }
+        },
+        "scenes": {
+          "other": "Other"
+        },
+        "uploadStates": {
+          "badge": "Collaborative memories",
+          "greeting": "Hi, {{name}} ✨",
+          "remainingUploads": "Upload up to {{count}} additional photos.",
+          "remainingUploadsOne": "Upload 1 additional photo.",
+          "remainingUploadsUnlimited": "Upload as many photos as you like.",
+          "reviewHint": "The host will review them and share them with the group.",
+          "remainingDays": {
+            "one": "You still have 1 day to send your best photos.",
+            "other": "You still have {{count}} days to send your best photos."
+          },
+          "deadline": "Available until {{date}}.",
+          "compressionNotice": "New photos are automatically optimised to save space.",
+          "progressTitle": "Your progress",
+          "progressDescription": "You've shared {{count}} {{count, plural, one {photo} other {photos}}}. Thank you for contributing to the memories!",
+          "uploadStatus": "Scene: {{scene}} · {{size}} KB",
+          "uploadReview": "Under review",
+          "recentUploadsTitle": "Your latest uploads",
+          "uploadsEmpty": "Approved photos will appear in the event slideshow and the final gallery. The host will let you know when they're ready.",
+          "guestFallback": "Guest"
+        },
+        "toasts": {
+          "firstUpload": "✨ Achievement unlocked! First memory shared!",
+          "thirdUpload": "🎉 You're a collaborative superstar! Keep sharing memories.",
+          "fifthUpload": "🌟 Star memories! Your photos will shine in the slideshow.",
+          "default": "Photo uploaded successfully"
+        }
+      },
+      "public": {
+        "loading": "Preparing the gallery...",
+        "error": "This link is no longer valid. Ask the couple for a new one.",
+        "errorTitle": "We couldn't open the gallery",
+        "errorDescription": "This link is no longer valid or has been revoked. Ask the couple for a new one.",
+        "errors": {
+          "incompleteLink": "The link is incomplete. Ask the couple for a new QR code.",
+          "invalidLink": "This link is no longer valid."
+        },
+        "hero": {
+          "badge": "Memories gallery",
+          "titleFallback": "Share your best moments",
+          "description": "Pick a moment for your memories and upload them straight from your phone.",
+          "deadline": "Available until {{date}} · {{remaining}}",
+          "remaining": {
+            "lastDay": "Final day",
+            "days": "{{count}} days remaining"
+          },
+          "closed": "Uploads have finished for this gallery."
+        },
+        "form": {
+          "title": "Share your memories",
+          "description": "Upload your favourite photos with a message and they'll appear in the shared gallery.",
+          "nameLabel": "Your name",
+          "namePlaceholder": "E.g. Laura G.",
+          "emailLabel": "Email (optional)",
+          "emailPlaceholder": "We'll let you know when your memories stand out",
+          "sceneLabel": "Scene or moment",
+          "termsLabel": "I consent to sharing my photos with the couple.",
+          "termsDescription": "I confirm I have permission to share these images and allow the couple to use them in the gallery.",
+          "start": "Get started",
+          "startUpload": "Start uploading memories",
+          "tip": "Pro tip! Pick the matching scene to help the couple organise their photos."
+        },
+        "list": {
+          "title": "Featured moments",
+          "count": "{{count}} moments available",
+          "cardDescription": "Upload your photos or videos for this moment instantly.",
+          "empty": "The hosts haven't configured specific moments yet. Come back later to share your memories."
+        },
+        "recent": {
+          "title": "Latest contributions",
+          "item": "{{scene}} · {{size}} KB"
+        },
+        "status": {
+          "cleanup": "The gallery will remain available for approximately {{duration}} before it is archived automatically.",
+          "cleanupToday": "one more day",
+          "cleanupDays": "{{count}} more days"
+        },
+        "overlay": {
+          "selected": "Selected moment",
+          "close": "Close",
+          "start": "Start uploading memories",
+          "remainingUploads": "You can upload {{count, plural, one {1 additional file} other {{count} additional files}} with this link."
+        },
+        "uploadStates": {
+          "title": "Shared memories",
+          "description": "Thanks for collaborating. Your photos will be reviewed before everyone can see them.",
+          "recentUploads": "Latest uploads",
+          "statusReview": "Under review",
+          "dropzoneTitle": "Drag & drop your photos here",
+          "dropzoneSubtitle": "Up to 20 files, JPG or PNG"
+        },
+        "toasts": {
+          "uploadsClosed": "This gallery is no longer accepting new photos.",
+          "missingName": "Add your name so we can personalise your contributions.",
+          "missingTerms": "You must accept the privacy policy.",
+          "success": "Thanks! Your file was uploaded successfully."
+        }
+      }
+    }
+  },
+  "actions": {
+    "close": "Close"
+  }
 }
