@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { formatDate } from '../utils/formatUtils';
+import useTranslations from '../hooks/useTranslations';
 
 import ProveedorForm from '../components/proveedores/ProveedorForm';
 import ServicesBoard from '../components/proveedores/ServicesBoard';
@@ -56,11 +57,11 @@ const SEARCH_PAGE_SIZE = 6;
 const DEFAULT_PROVIDER_IMAGE =
   'https://images.unsplash.com/photo-1530023367847-a683933f4177?auto=format&fit=crop&w=800&q=60';
 
-const ShortlistList = ({ items, loading, error }) => {
+const ShortlistList = ({ items, loading, error, t }) => {
   if (loading) {
     return (
       <Card className="border border-soft bg-surface">
-        <p className="text-sm text-muted">Cargando shortlist…</p>
+        <p className="text-sm text-muted">{t('common.suppliers.overview.shortlist.loading')}</p>
       </Card>
     );
   }
@@ -68,7 +69,7 @@ const ShortlistList = ({ items, loading, error }) => {
   if (error) {
     return (
       <Card className="border border-danger bg-danger-soft">
-        <p className="text-sm text-danger">No se pudo cargar la shortlist.</p>
+        <p className="text-sm text-danger">{t('common.suppliers.overview.shortlist.error')}</p>
       </Card>
     );
   }
@@ -77,7 +78,7 @@ const ShortlistList = ({ items, loading, error }) => {
     return (
       <Card className="border border-dashed border-soft bg-surface/80">
         <p className="text-sm text-muted">
-          Guarda candidatos desde tus búsquedas o registros manuales para construir la shortlist inicial.
+          {t('common.suppliers.overview.shortlist.empty')}
         </p>
       </Card>
     );
@@ -89,15 +90,22 @@ const ShortlistList = ({ items, loading, error }) => {
         <Card key={item.id} className="border border-soft bg-surface">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="space-y-1">
-              <p className="text-sm font-semibold text-body">{item.name || 'Proveedor'}</p>
+              <p className="text-sm font-semibold text-body">
+                {item.name || t('common.suppliers.labels.provider')}
+              </p>
               <p className="text-xs text-muted">
-                {item.service || 'Servicio'} · Guardado {formatShortDate(item.createdAt)}
+                {item.service || t('common.suppliers.labels.service')} ·{' '}
+                {t('common.suppliers.overview.shortlist.savedAt', {
+                  value: formatShortDate(item.createdAt),
+                })}
               </p>
               {item.notes && <p className="text-sm text-body/75">{item.notes}</p>}
             </div>
             {item.match != null && (
               <span className="rounded-full bg-primary-soft px-2 py-0.5 text-xs font-semibold text-primary">
-                Match {Math.round(item.match)}
+                {t('common.suppliers.overview.shortlist.match', {
+                  value: Math.round(item.match),
+                })}
               </span>
             )}
           </div>
@@ -107,22 +115,35 @@ const ShortlistList = ({ items, loading, error }) => {
   );
 };
 
-const ServiceOptionsModal = ({ open, card, onClose }) => {
+const ServiceOptionsModal = ({ open, card, onClose, t }) => {
   if (!open || !card) return null;
 
   const pendingCandidates = (card.providers || []).filter((prov) => !isConfirmedStatus(prov.status));
   const confirmed = card.confirmed ? [card.confirmed] : [];
 
   return (
-    <Modal open={open} onClose={onClose} title={`Opciones guardadas · ${card.label}`} size="lg">
+    <Modal
+      open={open}
+      onClose={onClose}
+      title={t('common.suppliers.overview.modals.options.title', { label: card.label })}
+      size="lg"
+    >
       <div className="space-y-6">
         {confirmed.length > 0 && (
           <section className="space-y-2">
-            <h3 className="text-sm font-semibold text-body">Proveedor confirmado</h3>
+            <h3 className="text-sm font-semibold text-body">
+              {t('common.suppliers.overview.modals.options.confirmedTitle')}
+            </h3>
             {confirmed.map((prov) => (
               <Card key={prov.id} className="border border-soft bg-surface">
                 <p className="text-sm font-medium text-body">{prov.name}</p>
-                <p className="text-xs text-muted">{prov.status || 'Pendiente'} · {prov.service || card.label}</p>
+                <p className="text-xs text-muted">
+                  {(prov.status && prov.status !== '')
+                    ? prov.status
+                    : t('common.suppliers.overview.status.pending')}
+                  {' '}
+                  · {prov.service || card.label}
+                </p>
                 {prov.notes && <p className="mt-2 text-sm text-body/75">{prov.notes}</p>}
               </Card>
             ))}
@@ -130,42 +151,62 @@ const ServiceOptionsModal = ({ open, card, onClose }) => {
         )}
 
         <section className="space-y-2">
-          <h3 className="text-sm font-semibold text-body">Proveedores contactados</h3>
+          <h3 className="text-sm font-semibold text-body">
+            {t('common.suppliers.overview.modals.options.contactTitle')}
+          </h3>
           {pendingCandidates.length ? (
             pendingCandidates.map((prov) => (
               <Card key={prov.id} className="border border-soft bg-surface">
                 <p className="text-sm font-medium text-body">{prov.name}</p>
-                <p className="text-xs text-muted">{prov.status || 'Pendiente'} · {prov.service || card.label}</p>
+                <p className="text-xs text-muted">
+                  {(prov.status && prov.status !== '')
+                    ? prov.status
+                    : t('common.suppliers.overview.status.pending')}
+                  {' '}
+                  · {prov.service || card.label}
+                </p>
                 {prov.notes && <p className="mt-2 text-sm text-body/75">{prov.notes}</p>}
               </Card>
             ))
           ) : (
             <Card className="border border-dashed border-soft bg-surface/80">
-              <p className="text-sm text-muted">Sin candidatos registrados dentro de los proveedores actuales.</p>
+              <p className="text-sm text-muted">
+                {t('common.suppliers.overview.modals.options.contactEmpty')}
+              </p>
             </Card>
           )}
         </section>
 
         <section className="space-y-2">
-          <h3 className="text-sm font-semibold text-body">Shortlist</h3>
+          <h3 className="text-sm font-semibold text-body">
+            {t('common.suppliers.overview.modals.options.shortlistTitle')}
+          </h3>
           {card.shortlist && card.shortlist.length ? (
             card.shortlist.map((item) => (
               <Card key={item.id} className="border border-soft bg-surface">
-                <p className="text-sm font-medium text-body">{item.name || 'Proveedor'}</p>
-                <p className="text-xs text-muted">Guardado {formatShortDate(item.createdAt)}</p>
+                <p className="text-sm font-medium text-body">
+                  {item.name || t('common.suppliers.labels.provider')}
+                </p>
+                <p className="text-xs text-muted">
+                  {t('common.suppliers.overview.shortlist.savedAt', {
+                    value: formatShortDate(item.createdAt),
+                  })}
+                </p>
                 {item.notes && <p className="mt-2 text-sm text-body/75">{item.notes}</p>}
               </Card>
             ))
           ) : (
             <Card className="border border-dashed border-soft bg-surface/80">
-              <p className="text-sm text-muted">Todavía no has guardado propuestas para este servicio.</p>
+              <p className="text-sm text-muted">
+                {t('common.suppliers.overview.modals.options.shortlistEmpty')}
+              </p>
             </Card>
           )}
         </section>
 
         <div className="flex justify-end">
           <Button variant="outline" onClick={onClose}>
-            Cerrar
+            {t('common.actions.close')}
           </Button>
         </div>
       </div>
@@ -174,8 +215,8 @@ const ServiceOptionsModal = ({ open, card, onClose }) => {
 };
 
 const Proveedores = () => {
-  const { providers, filteredProviders, loading, error, searchTerm, setSearchTerm, loadProviders, addProvider } =
-    useProveedores();
+  const { t } = useTranslations();
+  const { providers, filteredProviders, loading, error, searchTerm, setSearchTerm, loadProviders, addProvider } = useProveedores();
   const { shortlist, loading: shortlistLoading, error: shortlistError } = useSupplierShortlist();
   const { activeWedding } = useWedding();
   const { info: weddingProfile } = useActiveWeddingInfo();
@@ -338,7 +379,9 @@ const Proveedores = () => {
       const enrichedQuery = [...baseTokens, ...profileSearchTokens].join(' ').trim();
 
       if (!trimmed && !enrichedQuery) {
-        if (!silent) toast.warn('Añade un término o completa tu perfil para mejorar las búsquedas.');
+        if (!silent) {
+          toast.warn(t('common.suppliers.overview.toasts.missingQuery'));
+        }
         return;
       }
 
@@ -358,7 +401,9 @@ const Proveedores = () => {
         // Usar nuevo sistema híbrido (BD propia → bodas.net → internet)
         const result = await searchSuppliersHybrid(
           trimmed, // service/category
-          weddingProfile?.location || weddingProfile?.city || 'España', // location
+          weddingProfile?.location ||
+            weddingProfile?.city ||
+            t('common.suppliers.overview.defaults.country'),
           enrichedQuery || '', // query adicional
           weddingProfile?.budget, // budget
           {} // filters
@@ -371,14 +416,23 @@ const Proveedores = () => {
         setSearchBreakdown(result.breakdown);
         
         if (result.count === 0 && !silent) {
-          toast.info('No encontramos coincidencias. Intenta con otros términos de búsqueda.');
+          toast.info(t('common.suppliers.overview.toasts.noResults'));
         } else if (result.count > 0) {
-          toast.success(`✅ ${result.count} proveedores encontrados (${result.breakdown?.registered || 0} verificados, ${result.breakdown?.cached || 0} en caché, ${result.breakdown?.internet || 0} de internet)`);
+          toast.success(
+            t('common.suppliers.overview.toasts.success', {
+              count: result.count,
+              registered: result.breakdown?.registered || 0,
+              cached: result.breakdown?.cached || 0,
+              internet: result.breakdown?.internet || 0,
+            })
+          );
         }
       } catch (err) {
         console.error('[Proveedores] Hybrid search failed', err);
         setAiError(err);
-        if (!silent) toast.error('No se pudo completar la búsqueda.');
+        if (!silent) {
+          toast.error(t('common.suppliers.overview.toasts.error'));
+        }
       } finally {
         setAiLoading(false);
       }
@@ -519,7 +573,11 @@ const Proveedores = () => {
 
   return (
     <>
-      <PageWrapper title="Gestión de proveedores" actions={headerActions} className="layout-container space-y-6">
+      <PageWrapper
+        title={t('common.suppliers.overview.title')}
+        actions={headerActions}
+        className="layout-container space-y-6"
+      >
         {error && (
           <Card className="border border-danger bg-danger-soft text-danger">
             {error}
@@ -544,7 +602,7 @@ const Proveedores = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-success)] mb-1">
-                  Confirmados
+                  {t('common.suppliers.overview.metrics.confirmed')}
                 </p>
                 <p className="text-2xl font-black text-[color:var(--color-success)]">{confirmedCount}</p>
               </div>
@@ -556,7 +614,7 @@ const Proveedores = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-warning)] mb-1">
-                  Pendientes
+                  {t('common.suppliers.overview.metrics.pending')}
                 </p>
                 <p className="text-2xl font-black text-[color:var(--color-warning)]">{pendingCount}</p>
               </div>
@@ -568,7 +626,7 @@ const Proveedores = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-accent)] mb-1">
-                  Shortlist
+                  {t('common.suppliers.overview.metrics.shortlist')}
                 </p>
                 <p className="text-2xl font-black text-[color:var(--color-accent)]">{shortlistTotal}</p>
               </div>
@@ -648,7 +706,12 @@ const Proveedores = () => {
                 </div>
               )}
 
-              <ShortlistList items={shortlist} loading={shortlistLoading} error={shortlistError} />
+              <ShortlistList
+                items={shortlist}
+                loading={shortlistLoading}
+                error={shortlistError}
+                t={t}
+              />
 
               {(aiLoading || searchCompleted) && (
               <section className="space-y-3">
@@ -818,7 +881,12 @@ const Proveedores = () => {
         </section>
       </PageWrapper>
 
-      <ServiceOptionsModal open={serviceModal.open} card={serviceModal.card} onClose={handleCloseServiceModal} />
+      <ServiceOptionsModal
+        open={serviceModal.open}
+        card={serviceModal.card}
+        onClose={handleCloseServiceModal}
+        t={t}
+      />
 
       {showNewProviderForm && (
         <Modal open={showNewProviderForm} onClose={() => setShowNewProviderForm(false)} title="Nuevo proveedor" size="lg">

@@ -546,6 +546,190 @@
       "alerts": {
         "submitError": "We could not submit the response: {{message}}"
       }
+    },
+    "weddingSite": {
+      "loading": "Loading...",
+      "alerts": {
+        "success": "Thank you for your response!",
+        "error": "We couldn't submit the form."
+      },
+      "defaults": {
+        "title": "Our wedding",
+        "storyTitle": "Our story",
+        "timelineTitle": "Schedule",
+        "galleryTitle": "Gallery",
+        "rsvpTitle": "RSVP",
+        "giftsTitle": "Gift registry",
+        "giftsDescription": "We appreciate your gift sent to the following account:",
+        "mapTitle": "How to get there"
+      },
+      "countdown": {
+        "days": "{{value}}d",
+        "hours": "{{value}}h",
+        "minutes": "{{value}}m",
+        "seconds": "{{value}}s"
+      },
+      "rsvp": {
+        "placeholders": {
+          "name": "Your name",
+          "guests": "Number of guests",
+          "message": "Message"
+        },
+        "options": {
+          "yes": "I will attend",
+          "no": "I won't attend"
+        },
+        "button": "Send"
+      }
+    },
+    "publicWedding": {
+      "loading": "Loading...",
+      "error": "Unavailable ({{reason}})",
+      "defaults": {
+        "title": "Our wedding",
+        "storyTitle": "Our story",
+        "timelineTitle": "Schedule",
+        "galleryTitle": "Gallery",
+        "iframeTitle": "Wedding Site"
+      }
+    },
+    "moments": {
+      "guest": {
+        "loading": "Preparing your space to share memories...",
+        "errorTitle": "We could not open the memories gallery",
+        "errorDescription": "{{message}}",
+        "errorHint": "If you believe this is a mistake, ask the couple for a new link.",
+        "errors": {
+          "incompleteLink": "The link is incomplete. Ask the couple for a new QR code.",
+          "invalidLink": "This link is no longer valid."
+        },
+        "closedTitle": "The gallery is closed",
+        "closedDescription": "The upload window closed{{date}}.",
+        "closedHint": "If you still have memories to share, let the couple know so they can reopen the link.",
+        "form": {
+          "badge": "Collaborative memories",
+          "title": "Thanks for capturing memories!",
+          "description": "Upload your favourite photos from the event. The host will review them and showcase them in the live slideshow.",
+          "deadline": "The gallery accepts new photos until {{date}}.",
+          "remainingDays": {
+            "one": "You have 1 day left to share memories.",
+            "other": "You have {{count}} days left to share memories."
+          },
+          "compressionNotice": "Photos are automatically optimised to save space.",
+          "nameLabel": "Your name",
+          "namePlaceholder": "E.g. Laura G.",
+          "emailLabel": "Email (optional)",
+          "emailPlaceholder": "We'll let you know when your photos are featured",
+          "termsLabel": "I consent to sharing my photos with the couple and confirm I have permission to do so.",
+          "submit": "Start uploading photos",
+          "tip": "Tip: photos are grouped by scene (ceremony, reception, party…) to help the host.",
+          "errors": {
+            "missingName": "Add your name so we can personalise your contributions.",
+            "missingTerms": "You must accept the privacy policy.",
+            "uploadsClosed": "This gallery is no longer accepting new photos."
+          }
+        },
+        "scenes": {
+          "other": "Other"
+        },
+        "uploadStates": {
+          "badge": "Collaborative memories",
+          "greeting": "Hi, {{name}} ✨",
+          "remainingUploads": "Upload up to {{count}} additional photos.",
+          "remainingUploadsOne": "Upload 1 additional photo.",
+          "remainingUploadsUnlimited": "Upload as many photos as you like.",
+          "reviewHint": "The host will review them and share them with the group.",
+          "remainingDays": {
+            "one": "You still have 1 day to send your best photos.",
+            "other": "You still have {{count}} days to send your best photos."
+          },
+          "deadline": "Available until {{date}}.",
+          "compressionNotice": "New photos are automatically optimised to save space.",
+          "progressTitle": "Your progress",
+          "progressDescription": "You've shared {{count}} {{count, plural, one {photo} other {photos}}}. Thank you for contributing to the memories!",
+          "uploadStatus": "Scene: {{scene}} · {{size}} KB",
+          "uploadReview": "Under review",
+          "recentUploadsTitle": "Your latest uploads",
+          "uploadsEmpty": "Approved photos will appear in the event slideshow and the final gallery. The host will let you know when they're ready.",
+          "guestFallback": "Guest"
+        },
+        "toasts": {
+          "firstUpload": "✨ Achievement unlocked! First memory shared!",
+          "thirdUpload": "🎉 You're a collaborative superstar! Keep sharing memories.",
+          "fifthUpload": "🌟 Star memories! Your photos will shine in the slideshow.",
+          "default": "Photo uploaded successfully"
+        }
+      },
+      "public": {
+        "loading": "Preparing the gallery...",
+        "error": "This link is no longer valid. Ask the couple for a new one.",
+        "errorTitle": "We couldn't open the gallery",
+        "errorDescription": "This link is no longer valid or has been revoked. Ask the couple for a new one.",
+        "errors": {
+          "incompleteLink": "The link is incomplete. Ask the couple for a new QR code.",
+          "invalidLink": "This link is no longer valid."
+        },
+        "hero": {
+          "badge": "Memories gallery",
+          "titleFallback": "Share your best moments",
+          "description": "Pick a moment for your memories and upload them straight from your phone.",
+          "deadline": "Available until {{date}} · {{remaining}}",
+          "remaining": {
+            "lastDay": "Final day",
+            "days": "{{count}} days remaining"
+          },
+          "closed": "Uploads have finished for this gallery."
+        },
+        "form": {
+          "title": "Share your memories",
+          "description": "Upload your favourite photos with a message and they'll appear in the shared gallery.",
+          "nameLabel": "Your name",
+          "namePlaceholder": "E.g. Laura G.",
+          "emailLabel": "Email (optional)",
+          "emailPlaceholder": "We'll let you know when your memories stand out",
+          "sceneLabel": "Scene or moment",
+          "termsLabel": "I consent to sharing my photos with the couple.",
+          "termsDescription": "I confirm I have permission to share these images and allow the couple to use them in the gallery.",
+          "start": "Get started",
+          "startUpload": "Start uploading memories",
+          "tip": "Pro tip! Pick the matching scene to help the couple organise their photos."
+        },
+        "list": {
+          "title": "Featured moments",
+          "count": "{{count}} moments available",
+          "cardDescription": "Upload your photos or videos for this moment instantly.",
+          "empty": "The hosts haven't configured specific moments yet. Come back later to share your memories."
+        },
+        "recent": {
+          "title": "Latest contributions",
+          "item": "{{scene}} · {{size}} KB"
+        },
+        "status": {
+          "cleanup": "The gallery will remain available for approximately {{duration}} before it is archived automatically.",
+          "cleanupToday": "one more day",
+          "cleanupDays": "{{count}} more days"
+        },
+        "overlay": {
+          "selected": "Selected moment",
+          "close": "Close",
+          "start": "Start uploading memories",
+          "remainingUploads": "You can upload {{count, plural, one {1 additional file} other {{count} additional files}} with this link."
+        },
+        "uploadStates": {
+          "title": "Shared memories",
+          "description": "Thanks for collaborating. Your photos will be reviewed before everyone can see them.",
+          "recentUploads": "Latest uploads",
+          "statusReview": "Under review",
+          "dropzoneTitle": "Drag & drop your photos here",
+          "dropzoneSubtitle": "Up to 20 files, JPG or PNG"
+        },
+        "toasts": {
+          "uploadsClosed": "This gallery is no longer accepting new photos.",
+          "missingName": "Add your name so we can personalise your contributions.",
+          "missingTerms": "You must accept the privacy policy.",
+          "success": "Thanks! Your file was uploaded successfully."
+        }
+      }
     }
   },
   "authSignup": {
@@ -2572,7 +2756,36 @@
       "placeholders": {
         "notAvailable": "—"
       }
+    },
+    "labels": {
+      "provider": "Provider",
+      "service": "Service"
+    },
+    "overview": {
+      "shortlist": {
+        "loading": "Loading shortlist...",
+        "error": "Could not load the shortlist.",
+        "empty": "Save candidates from your searches or manual registrations to build the initial shortlist.",
+        "savedAt": "Saved {{value}}",
+        "match": "Match {{value}}"
+      },
+      "status": {
+        "pending": "Pending"
+      },
+      "modals": {
+        "options": {
+          "title": "Saved options · {{label}}",
+          "confirmedTitle": "Confirmed provider",
+          "contactTitle": "Contacted providers",
+          "contactEmpty": "No candidates registered among current providers.",
+          "shortlistTitle": "Shortlist",
+          "shortlistEmpty": "You haven't saved proposals for this service yet."
+        }
+      }
     }
+  },
+  "actions": {
+    "close": "Close"
   },
   "validation": {
     "nameRequired": "El nombre es obligatorio",
