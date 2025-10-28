@@ -102,10 +102,10 @@ export default function SupplierDashboard() {
   
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--color-bg)' }}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Cargando...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto" style={{ borderColor: 'var(--color-primary)' }}></div>
+          <p className="mt-4" style={{ color: 'var(--color-muted)' }}>Cargando...</p>
         </div>
       </div>
     );
@@ -113,13 +113,14 @@ export default function SupplierDashboard() {
   
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="bg-white p-8 rounded-lg shadow-md max-w-md">
-          <h2 className="text-xl font-bold text-red-600 mb-4">Error</h2>
-          <p className="text-gray-600">{error}</p>
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--color-bg)' }}>
+        <div className="p-8 rounded-lg shadow-md max-w-md" style={{ backgroundColor: 'var(--color-surface)' }}>
+          <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--color-danger)' }}>Error</h2>
+          <p style={{ color: 'var(--color-muted)' }}>{error}</p>
           <button
             onClick={() => navigate('/supplier/login')}
-            className="mt-4 w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700"
+            className="mt-4 w-full text-white py-2 rounded-md"
+            style={{ backgroundColor: 'var(--color-primary)' }}
           >
             Ir a Login
           </button>
@@ -129,21 +130,21 @@ export default function SupplierDashboard() {
   }
   
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen py-8" style={{ backgroundColor: 'var(--color-bg)' }}>
+      <div className="layout-container max-w-6xl">
         
         {/* Header */}
-        <div className="bg-white shadow-md rounded-lg p-6 mb-6">
+        <div className="shadow-md rounded-lg p-6 mb-6" style={{ backgroundColor: 'var(--color-surface)' }}>
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">
+              <h1 className="text-2xl font-bold" style={{ color: 'var(--color-text)' }}>
                 {supplier.name}
               </h1>
-              <p className="text-gray-600 mt-1">
+              <p className="mt-1" style={{ color: 'var(--color-muted)' }}>
                 {supplier.category} • {supplier.location?.city}
               </p>
               {supplier.registered && (
-                <span className="inline-block mt-2 px-3 py-1 bg-green-100 text-green-800 text-sm font-medium rounded-full">
+                <span className="inline-block mt-2 px-3 py-1 text-sm font-medium rounded-full" style={{ backgroundColor: 'rgba(34, 197, 94, 0.1)', color: 'var(--color-success)' }}>
                   ✓ Verificado
                 </span>
               )}
@@ -153,7 +154,8 @@ export default function SupplierDashboard() {
               {!editing ? (
                 <button
                   onClick={() => setEditing(true)}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  className="flex items-center gap-2 px-4 py-2 text-white rounded-md"
+                  style={{ backgroundColor: 'var(--color-primary)' }}
                 >
                   <Edit size={18} />
                   Editar Perfil
@@ -163,14 +165,16 @@ export default function SupplierDashboard() {
                   <button
                     onClick={handleSave}
                     disabled={saving}
-                    className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-gray-400"
+                    className="flex items-center gap-2 px-4 py-2 text-white rounded-md disabled:opacity-50"
+                    style={{ backgroundColor: 'var(--color-success)' }}
                   >
                     <Save size={18} />
                     {saving ? 'Guardando...' : 'Guardar'}
                   </button>
                   <button
                     onClick={() => setEditing(false)}
-                    className="flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
+                    className="flex items-center gap-2 px-4 py-2 border rounded-md"
+                    style={{ borderColor: 'var(--color-border)', color: 'var(--color-text)' }}
                   >
                     <X size={18} />
                     Cancelar
