@@ -35,7 +35,7 @@ const normalizeText = (value = '') =>
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '');
 
-// Función auxiliar: Buscar en Tavily (copiada temporalmente)
+// Función auxiliar: Buscar en Tavily (MEJORADA)
 async function searchTavilySimple(query, location, service) {
   const apiKey = process.env.TAVILY_API_KEY;
 
@@ -44,8 +44,40 @@ async function searchTavilySimple(query, location, service) {
     return [];
   }
 
-  // Query mejorada para fotógrafos de bodas específicos
-  const searchQuery = `${service} bodas ${location} ${query || ''} profesional contacto -"buscar" -"encuentra" -"listado" -"directorio"`;
+  // ✅ MEJORADA: Query más específica y efectiva
+  const queryTerms = [];
+
+  // 1. Servicio principal
+  if (service) queryTerms.push(service);
+
+  // 2. Términos de búsqueda del usuario
+  if (query && query.trim()) {
+    queryTerms.push(query.trim());
+  }
+
+  // 3. Contexto de bodas
+  queryTerms.push('bodas');
+
+  // 4. Ubicación
+  if (location) queryTerms.push(location);
+
+  // 5. Términos de calidad para mejorar resultados
+  queryTerms.push('profesional OR empresa OR estudio');
+
+  // 6. Excluir directorios y listados genéricos
+  const excludeTerms = [
+    '-"buscar"',
+    '-"encuentra"',
+    '-"listado"',
+    '-"directorio"',
+    '-"comparar"',
+    '-"precios desde"',
+    '-"opiniones de"',
+  ];
+
+  const searchQuery = `${queryTerms.join(' ')} ${excludeTerms.join(' ')}`;
+
+  console.log(`🔍 [TAVILY] Query construida: "${searchQuery}"`);
 
   try {
     const response = await fetch('https://api.tavily.com/search', {
@@ -58,8 +90,9 @@ async function searchTavilySimple(query, location, service) {
         include_answer: false,
         include_raw_content: false,
         include_images: true,
-        max_results: 20,
+        max_results: 15, // ✅ Reducido de 20 a 15 (más eficiente)
         exclude_domains: [
+          // Marketplaces
           'wikipedia.org',
           'youtube.com',
           'amazon',
@@ -68,6 +101,22 @@ async function searchTavilySimple(query, location, service) {
           'aliexpress',
           'milanuncios',
           'wallapop',
+          // ✅ NUEVOS: Directorios y agregadores
+          'weddyplace.com',
+          'eventosybodas.com',
+          'tulistadebodas.com',
+          'zankyou.es',
+          'matrimonio.com',
+          'casamientos.com.ar',
+          'bodasyweddings.com',
+          'eventopedia.es',
+          'guianovias.com',
+          // ✅ NUEVOS: Portales genéricos
+          'milanuncios.com',
+          'segundamano.es',
+          'olx.es',
+          'vibbo.com',
+          'tablondeanuncios.com',
         ],
       }),
     });
@@ -78,6 +127,9 @@ async function searchTavilySimple(query, location, service) {
     }
 
     const data = await response.json();
+
+    console.log(`📊 [TAVILY] Respuesta: ${data.results?.length || 0} resultados brutos`);
+
     return data.results || [];
   } catch (error) {
     console.error('❌ Error en búsqueda Tavily:', error.message);
@@ -338,74 +390,155 @@ router.post('/search', async (req, res) => {
           registeredResults.map((r) => r.contact?.website?.toLowerCase()).filter((u) => u)
         );
 
-        // Separar resultados de bodas.net vs otros
-        const bodasNetResults = [];
-        const otherResults = [];
-
-        tavilyResults.forEach((r) => {
+        // ✅ MEJORADO: Filtrar resultados de baja calidad
+        const qualityResults = tavilyResults.filter((r) => {
           const email = r.email?.toLowerCase();
           const url = r.url?.toLowerCase();
+          const title = r.title?.toLowerCase() || '';
+          const content = r.content?.toLowerCase() || '';
 
           // Excluir si ya está en Firestore
-          if (email && registeredEmails.has(email)) return;
-          if (url && registeredUrls.has(url)) return;
+          if (email && registeredEmails.has(email)) return false;
+          if (url && registeredUrls.has(url)) return false;
 
-          // Separar bodas.net de otros
+          // ✅ Filtrar resultados de baja calidad
+          const lowQualityIndicators = [
+            'opiniones de',
+            'precios desde',
+            'comparar precios',
+            'encuentra los mejores',
+            'directorio de',
+            'listado de',
+            'guía de proveedores',
+            'selección de',
+          ];
+
+          const hasLowQualityIndicator = lowQualityIndicators.some(
+            (indicator) => title.includes(indicator) || content.includes(indicator)
+          );
+
+          if (hasLowQualityIndicator) {
+            console.log(`   ❌ Filtrado por baja calidad: ${r.title}`);
+            return false;
+          }
+
+          // ✅ Debe tener al menos título y URL
+          if (!r.title || !r.url) return false;
+
+          // ✅ Score mínimo de calidad (Tavily score 0-1)
+          if ((r.score || 0) < 0.3) {
+            console.log(`   ❌ Filtrado por score bajo (${r.score}): ${r.title}`);
+            return false;
+          }
+
+          return true;
+        });
+
+        console.log(`   ✅ Tras filtrado de calidad: ${qualityResults.length} resultados`);
+
+        // ✅ MEJORADO: Separar y priorizar por fuente y score
+        const bodasNetResults = [];
+        const highScoreResults = [];
+        const otherResults = [];
+
+        qualityResults.forEach((r) => {
+          const url = r.url?.toLowerCase();
+          const score = r.score || 0;
+
+          // 1ª Prioridad: Bodas.net
           if (url && url.includes('bodas.net')) {
             bodasNetResults.push(r);
-          } else {
+          }
+          // 2ª Prioridad: Score alto (>0.7)
+          else if (score > 0.7) {
+            highScoreResults.push(r);
+          }
+          // 3ª Prioridad: Resto
+          else {
             otherResults.push(r);
           }
         });
 
-        // PRIORIZAR: Bodas.net primero, luego otros
-        const prioritizedResults = [...bodasNetResults, ...otherResults].slice(0, 8);
+        // ✅ Ordenar cada grupo por score
+        const sortByScore = (a, b) => (b.score || 0) - (a.score || 0);
+        bodasNetResults.sort(sortByScore);
+        highScoreResults.sort(sortByScore);
+        otherResults.sort(sortByScore);
+
+        // ✅ PRIORIZAR: Bodas.net → Alto score → Resto
+        const prioritizedResults = [...bodasNetResults, ...highScoreResults, ...otherResults].slice(
+          0,
+          10
+        ); // ✅ Aumentado de 8 a 10
 
         console.log(
-          `   📊 Resultados internet: ${bodasNetResults.length} de bodas.net, ${otherResults.length} otros`
+          `   📊 Resultados priorizados: ${bodasNetResults.length} bodas.net, ${highScoreResults.length} alto score, ${otherResults.length} otros`
         );
 
-        internetResults = prioritizedResults.map((r) => ({
-          // Convertir formato Tavily a formato supplier
-          name: r.title,
-          slug: null, // No tiene slug aún
-          category: service,
-          location: {
-            city: location,
-            province: '',
-            country: 'España',
-          },
-          contact: {
-            email: r.email || '',
-            website: r.url,
-            phone: r.phone || '',
-            instagram: r.instagram || '',
-          },
-          business: {
-            description: r.content?.substring(0, 200) || '',
-            priceRange: '',
-            services: [],
-          },
-          media: {
-            logo: r.image || '',
-            cover: '',
-            portfolio: [],
-          },
-          metrics: {
-            matchScore: Math.round((r.score || 0.5) * 100),
-            views: 0,
-            clicks: 0,
-            conversions: 0,
-            rating: 0,
-            reviewCount: 0,
-          },
-          registered: false,
-          source: r.url?.includes('bodas.net') ? 'bodas-net' : 'tavily-realtime',
-          status: 'discovered',
-          priority: 'internet',
-          badge: r.url?.includes('bodas.net') ? 'Bodas.net 💒' : 'De internet 🌐',
-          badgeType: r.url?.includes('bodas.net') ? 'info' : 'default',
-        }));
+        // ✅ MEJORADO: Convertir y extraer más información
+        internetResults = prioritizedResults.map((r) => {
+          const url = r.url?.toLowerCase() || '';
+          const isBodas = url.includes('bodas.net');
+          const score = r.score || 0.5;
+
+          // ✅ Extraer redes sociales del contenido
+          const content = r.content || '';
+          const instagramMatch = content.match(/instagram\.com\/([a-zA-Z0-9._]+)/);
+          const facebookMatch = content.match(/facebook\.com\/([a-zA-Z0-9._]+)/);
+
+          return {
+            // Convertir formato Tavily a formato supplier
+            name: r.title,
+            slug: null, // No tiene slug aún
+            category: service,
+            location: {
+              city: location,
+              province: '',
+              country: 'España',
+            },
+            contact: {
+              email: r.email || '',
+              website: r.url,
+              phone: r.phone || '',
+              instagram: instagramMatch
+                ? `https://instagram.com/${instagramMatch[1]}`
+                : r.instagram || '',
+              facebook: facebookMatch ? `https://facebook.com/${facebookMatch[1]}` : '',
+            },
+            business: {
+              description: r.content?.substring(0, 250) || '', // ✅ Aumentado de 200 a 250
+              priceRange: '',
+              services: [service], // ✅ Añadido el servicio
+            },
+            media: {
+              logo: r.image || '',
+              cover: '',
+              portfolio: [],
+            },
+            metrics: {
+              matchScore: Math.round(score * 100), // ✅ Usar score real
+              views: 0,
+              clicks: 0,
+              conversions: 0,
+              rating: 0,
+              reviewCount: 0,
+              tavilyScore: score, // ✅ NUEVO: Guardar score original
+            },
+            registered: false,
+            source: isBodas ? 'bodas-net' : 'tavily-realtime',
+            status: 'discovered',
+            priority: isBodas ? 'high' : score > 0.7 ? 'medium' : 'low', // ✅ NUEVO: Prioridad dinámica
+            badge: isBodas ? 'Bodas.net 💒' : score > 0.7 ? 'Alta calidad ⭐' : 'De internet 🌐',
+            badgeType: isBodas ? 'info' : score > 0.7 ? 'success' : 'default',
+            // ✅ NUEVO: Metadata de búsqueda
+            searchMetadata: {
+              query: query || service,
+              location: location,
+              discoveredAt: new Date().toISOString(),
+              tavilyUrl: r.url,
+            },
+          };
+        });
 
         usedTavily = true;
         console.log(`🔄 [TAVILY] ${internetResults.length} proveedores nuevos (no duplicados)`);
@@ -470,6 +603,59 @@ router.post('/search', async (req, res) => {
       sourceMsg = 'Caché + Internet';
     }
     console.log(`   📡 Fuente: ${sourceMsg}\n`);
+
+    // ===== 3.5. GUARDAR RESULTADOS DE INTERNET EN FIRESTORE =====
+    // ✅ NUEVO: Guardar proveedores descubiertos en Firestore para futuras búsquedas
+    if (internetResults.length > 0) {
+      console.log(
+        `\n💾 [SAVE] Guardando ${internetResults.length} proveedores de internet en Firestore...`
+      );
+
+      const batch = db.batch();
+      let savedCount = 0;
+
+      for (const supplier of internetResults) {
+        try {
+          // Generar ID único basado en URL
+          const urlHash = Buffer.from(supplier.contact.website)
+            .toString('base64')
+            .replace(/[^a-zA-Z0-9]/g, '')
+            .substring(0, 20);
+          const supplierId = `discovered_${urlHash}_${Date.now()}`;
+
+          const docRef = db.collection('suppliers').doc(supplierId);
+
+          // Preparar datos para guardar
+          const supplierData = {
+            ...supplier,
+            id: supplierId,
+            status: 'discovered', // Estado especial
+            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
+            discoverySource: 'tavily',
+            autoDiscovered: true,
+          };
+
+          batch.set(docRef, supplierData, { merge: true });
+          savedCount++;
+
+          // Batch tiene límite de 500 operaciones
+          if (savedCount % 500 === 0) {
+            await batch.commit();
+            console.log(`   ✅ Guardados ${savedCount}/${internetResults.length}...`);
+          }
+        } catch (error) {
+          console.error(`   ❌ Error guardando ${supplier.name}:`, error.message);
+        }
+      }
+
+      // Commit final
+      if (savedCount % 500 !== 0) {
+        await batch.commit();
+      }
+
+      console.log(`✅ [SAVE] ${savedCount} proveedores guardados en Firestore como 'discovered'`);
+    }
 
     // ===== 4. ACTUALIZAR MÉTRICAS DE VISTAS (solo para registrados reales) =====
     if (trueRegistered.length > 0) {
