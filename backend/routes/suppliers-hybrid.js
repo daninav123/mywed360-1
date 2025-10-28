@@ -819,25 +819,21 @@ router.post('/search', async (req, res) => {
           };
         });
 
-        // ⭐ FILTRAR 1: Descartar proveedores sin email NI teléfono
+        // ⭐ FILTRAR 1: Descartar proveedores sin email (OBLIGATORIO)
         const beforeFilter = internetResults.length;
         internetResults = internetResults.filter((supplier) => {
           const hasEmail = supplier.contact?.email && supplier.contact.email.length > 0;
-          const hasPhone = supplier.contact?.phone && supplier.contact.phone.length > 0;
-          const hasContact = hasEmail || hasPhone;
 
-          if (!hasContact) {
-            console.log(`   ❌ Descartado (sin contacto): ${supplier.name}`);
+          if (!hasEmail) {
+            console.log(`   ❌ Descartado (sin email): ${supplier.name}`);
           }
 
-          return hasContact;
+          return hasEmail;
         });
 
         const filtered = beforeFilter - internetResults.length;
         if (filtered > 0) {
-          console.log(
-            `\n🔍 [FILTRO] ${filtered} proveedores descartados por falta de email/teléfono`
-          );
+          console.log(`\n🔍 [FILTRO] ${filtered} proveedores descartados por falta de email`);
         }
 
         // ⭐ FILTRAR 2: Eliminar duplicados inteligente
