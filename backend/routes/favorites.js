@@ -6,7 +6,8 @@ const router = express.Router();
 
 /**
  * GET /api/favorites
- * Obtener todos los proveedores favoritos del usuario/boda actual
+ * Obtener todos los proveedores favoritos de la boda actual
+ * REQUIERE: x-wedding-id header
  */
 router.get('/', async (req, res) => {
   try {
@@ -17,25 +18,36 @@ router.get('/', async (req, res) => {
       return res.status(401).json({ error: 'unauthorized' });
     }
 
-    // Buscar por weddingId si existe, sino por userId
-    const searchKey = weddingId || userId;
-    const searchField = weddingId ? 'weddingId' : 'userId';
+    if (!weddingId) {
+      return res.status(400).json({
+        error: 'wedding-required',
+        message: 'Se requiere una boda activa para gestionar favoritos',
+      });
+    }
 
-    const snapshot = await db.collection('favorites').where(searchField, '==', searchKey).get();
+    // Ruta: weddings/{weddingId}/favorites
+    const snapshot = await db.collection('weddings').doc(weddingId).collection('favorites').get();
 
-    // Ordenar en JavaScript en vez de Firestore (evita necesidad de índice)
-    const docs = snapshot.docs.sort((a, b) => {
-      const aDate = new Date(a.data().addedAt || 0);
-      const bDate = new Date(b.data().addedAt || 0);
-      return bDate - aDate; // desc
-    });
+    // Filtrar expirados y ordenar
+    const now = new Date();
+    const docs = snapshot.docs
+      .filter((doc) => {
+        const expiresAt = doc.data().expiresAt;
+        if (!expiresAt) return true; // Compatibilidad con favoritos antiguos
+        return new Date(expiresAt) > now;
+      })
+      .sort((a, b) => {
+        const aDate = new Date(a.data().addedAt || 0);
+        const bDate = new Date(b.data().addedAt || 0);
+        return bDate - aDate; // desc
+      });
 
     const favorites = docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
 
-    logger.info(`[favorites] Usuario ${userId} tiene ${favorites.length} favoritos`);
+    logger.info(`[favorites] Boda ${weddingId} tiene ${favorites.length} favoritos activos`);
 
     res.json({ favorites, count: favorites.length });
   } catch (error) {
@@ -46,7 +58,8 @@ router.get('/', async (req, res) => {
 
 /**
  * POST /api/favorites
- * Añadir proveedor a favoritos
+ * Añadir proveedor a favoritos (TEMPORAL: 30 días)
+ * REQUIERE: x-wedding-id header
  *
  * Body: { supplier: {...}, notes: "opcional" }
  */
@@ -60,17 +73,21 @@ router.post('/', async (req, res) => {
       return res.status(401).json({ error: 'unauthorized' });
     }
 
+    if (!weddingId) {
+      return res.status(400).json({
+        error: 'wedding-required',
+        message: 'Se requiere una boda activa para gestionar favoritos',
+      });
+    }
+
     if (!supplier || !supplier.id) {
       return res.status(400).json({ error: 'invalid-supplier' });
     }
 
-    const searchKey = weddingId || userId;
-    const searchField = weddingId ? 'weddingId' : 'userId';
+    const favoritesRef = db.collection('weddings').doc(weddingId).collection('favorites');
 
     // Verificar si ya existe en favoritos
-    const existingSnapshot = await db
-      .collection('favorites')
-      .where(searchField, '==', searchKey)
+    const existingSnapshot = await favoritesRef
       .where('supplierId', '==', supplier.id)
       .limit(1)
       .get();
@@ -82,10 +99,14 @@ router.post('/', async (req, res) => {
       });
     }
 
+    // Calcular fecha de expiración (30 días)
+    const now = new Date();
+    const expiresAt = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000); // +30 días
+
     // Crear documento de favorito
     const favoriteData = {
       userId,
-      weddingId: weddingId || null,
+      weddingId,
       supplierId: supplier.id,
       supplier: {
         id: supplier.id,
@@ -99,15 +120,18 @@ router.post('/', async (req, res) => {
         source: supplier.source,
       },
       notes: notes || '',
-      addedAt: new Date().toISOString(),
+      addedAt: now.toISOString(),
+      expiresAt: expiresAt.toISOString(), // ⭐ TTL de 30 días
     };
 
-    const docRef = await db.collection('favorites').add(favoriteData);
+    const docRef = await favoritesRef.add(favoriteData);
 
-    logger.info(`[favorites] Usuario ${userId} añadió proveedor ${supplier.id} a favoritos`);
+    logger.info(
+      `[favorites] Boda ${weddingId} añadió proveedor ${supplier.id} (expira: ${expiresAt.toISOString()})`
+    );
 
     res.status(201).json({
-      message: 'Proveedor añadido a favoritos',
+      message: 'Proveedor añadido a favoritos (válido 30 días)',
       favorite: { id: docRef.id, ...favoriteData },
     });
   } catch (error) {
@@ -119,6 +143,7 @@ router.post('/', async (req, res) => {
 /**
  * DELETE /api/favorites/:supplierId
  * Eliminar proveedor de favoritos
+ * REQUIERE: x-wedding-id header
  */
 router.delete('/:supplierId', async (req, res) => {
   try {
@@ -130,16 +155,17 @@ router.delete('/:supplierId', async (req, res) => {
       return res.status(401).json({ error: 'unauthorized' });
     }
 
-    const searchKey = weddingId || userId;
-    const searchField = weddingId ? 'weddingId' : 'userId';
+    if (!weddingId) {
+      return res.status(400).json({
+        error: 'wedding-required',
+        message: 'Se requiere una boda activa para gestionar favoritos',
+      });
+    }
+
+    const favoritesRef = db.collection('weddings').doc(weddingId).collection('favorites');
 
     // Buscar el favorito
-    const snapshot = await db
-      .collection('favorites')
-      .where(searchField, '==', searchKey)
-      .where('supplierId', '==', supplierId)
-      .limit(1)
-      .get();
+    const snapshot = await favoritesRef.where('supplierId', '==', supplierId).limit(1).get();
 
     if (snapshot.empty) {
       return res.status(404).json({
@@ -150,9 +176,9 @@ router.delete('/:supplierId', async (req, res) => {
 
     // Eliminar
     const docId = snapshot.docs[0].id;
-    await db.collection('favorites').doc(docId).delete();
+    await favoritesRef.doc(docId).delete();
 
-    logger.info(`[favorites] Usuario ${userId} eliminó proveedor ${supplierId} de favoritos`);
+    logger.info(`[favorites] Boda ${weddingId} eliminó proveedor ${supplierId} de favoritos`);
 
     res.json({ message: 'Proveedor eliminado de favoritos' });
   } catch (error) {
@@ -164,6 +190,7 @@ router.delete('/:supplierId', async (req, res) => {
 /**
  * GET /api/favorites/check/:supplierId
  * Verificar si un proveedor está en favoritos
+ * REQUIERE: x-wedding-id header
  */
 router.get('/check/:supplierId', async (req, res) => {
   try {
@@ -175,15 +202,25 @@ router.get('/check/:supplierId', async (req, res) => {
       return res.status(401).json({ error: 'unauthorized' });
     }
 
-    const searchKey = weddingId || userId;
-    const searchField = weddingId ? 'weddingId' : 'userId';
+    if (!weddingId) {
+      return res.json({ isFavorite: false }); // Sin boda = sin favoritos
+    }
 
-    const snapshot = await db
-      .collection('favorites')
-      .where(searchField, '==', searchKey)
-      .where('supplierId', '==', supplierId)
-      .limit(1)
-      .get();
+    const favoritesRef = db.collection('weddings').doc(weddingId).collection('favorites');
+
+    const snapshot = await favoritesRef.where('supplierId', '==', supplierId).limit(1).get();
+
+    // Verificar si está expirado
+    if (!snapshot.empty) {
+      const doc = snapshot.docs[0];
+      const expiresAt = doc.data().expiresAt;
+      if (expiresAt && new Date(expiresAt) < new Date()) {
+        // Eliminar favorito expirado
+        await favoritesRef.doc(doc.id).delete();
+        logger.info(`[favorites] Favorito expirado eliminado: ${supplierId}`);
+        return res.json({ isFavorite: false });
+      }
+    }
 
     res.json({ isFavorite: !snapshot.empty });
   } catch (error) {
