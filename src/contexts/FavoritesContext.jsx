@@ -51,6 +51,14 @@ export function FavoritesProvider({ children }) {
       return;
     }
 
+    // Esperar a que se cargue la boda activa
+    if (!activeWedding?.id) {
+      console.warn('[FavoritesContext] No hay boda activa, esperando...');
+      setFavorites([]);
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
@@ -68,11 +76,8 @@ export function FavoritesProvider({ children }) {
 
       const headers = {
         Authorization: `Bearer ${token}`,
+        'x-wedding-id': activeWedding.id, // Siempre incluir (ya verificamos que existe)
       };
-
-      if (activeWedding?.id) {
-        headers['x-wedding-id'] = activeWedding.id;
-      }
 
       const response = await axios.get(`${API_URL}/api/favorites`, { headers });
 
@@ -103,6 +108,10 @@ export function FavoritesProvider({ children }) {
       throw new Error('Debes iniciar sesión para guardar favoritos');
     }
 
+    if (!activeWedding?.id) {
+      throw new Error('Debes tener una boda activa para guardar favoritos');
+    }
+
     try {
       const token = await getAuthToken();
 
@@ -112,11 +121,8 @@ export function FavoritesProvider({ children }) {
 
       const headers = {
         Authorization: `Bearer ${token}`,
+        'x-wedding-id': activeWedding.id, // Siempre incluir (ya verificamos que existe)
       };
-
-      if (activeWedding?.id) {
-        headers['x-wedding-id'] = activeWedding.id;
-      }
 
       const response = await axios.post(
         `${API_URL}/api/favorites`,
@@ -145,6 +151,10 @@ export function FavoritesProvider({ children }) {
       throw new Error('Debes iniciar sesión');
     }
 
+    if (!activeWedding?.id) {
+      throw new Error('Debes tener una boda activa');
+    }
+
     try {
       const token = await getAuthToken();
 
@@ -154,11 +164,8 @@ export function FavoritesProvider({ children }) {
 
       const headers = {
         Authorization: `Bearer ${token}`,
+        'x-wedding-id': activeWedding.id, // Siempre incluir (ya verificamos que existe)
       };
-
-      if (activeWedding?.id) {
-        headers['x-wedding-id'] = activeWedding.id;
-      }
 
       await axios.delete(`${API_URL}/api/favorites/${supplierId}`, { headers });
 
