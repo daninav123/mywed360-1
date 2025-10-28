@@ -94,9 +94,22 @@ export default function SupplierPortal() {
   if (state.error) {
     const message =
       state.error && state.error !== 'error'
-        ? t('common.public.supplierPortal.errorWithReason', { reason: state.error })
-        : t('common.public.supplierPortal.error');
-    return <div className="p-6 text-center text-red-700">{message}</div>;
+        ? `Error: ${state.error}`
+        : 'Ha ocurrido un error. Por favor, intenta de nuevo.';
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+        <div className="max-w-lg w-full bg-white border border-red-200 rounded-xl p-6 text-center">
+          <div className="text-red-600 text-xl mb-2">⚠️</div>
+          <p className="text-red-700">{message}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          >
+            Reintentar
+          </button>
+        </div>
+      </div>
+    );
   }
 
   if (sent) {
