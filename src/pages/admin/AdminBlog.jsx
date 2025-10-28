@@ -323,8 +323,8 @@ const AdminBlog = () => {
   }, [posts, listStatusFilter]);
 
   return (
-    <div className="px-6 py-6 space-y-8">
-      <section className="rounded-lg border border-soft bg-white p-6 shadow-sm">
+    <div className="layout-container-wide space-y-8 pb-16 pt-6">
+      <section className="rounded-xl border border-soft bg-surface p-6 shadow-sm">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h1 className="text-xl font-semibold">Blog Lovenda · Generación IA</h1>
