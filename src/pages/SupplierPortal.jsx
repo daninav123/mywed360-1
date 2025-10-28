@@ -92,21 +92,64 @@ export default function SupplierPortal() {
       </div>
     );
   if (state.error) {
-    const message =
-      state.error && state.error !== 'error'
-        ? `Error: ${state.error}`
-        : 'Ha ocurrido un error. Por favor, intenta de nuevo.';
+    let message = 'Ha ocurrido un error. Por favor, intenta de nuevo.';
+    let isTokenError = false;
+    
+    if (state.error === 'invalid_token' || state.error === 'not_found') {
+      isTokenError = true;
+      message = 'Este enlace no es válido o ha expirado.';
+    } else if (state.error === 'http-404') {
+      isTokenError = true;
+      message = 'Este enlace no existe. Verifica que la URL esté completa.';
+    } else if (state.error && state.error !== 'error') {
+      message = `Error: ${state.error}`;
+    }
+    
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
-        <div className="max-w-lg w-full bg-white border border-red-200 rounded-xl p-6 text-center">
-          <div className="text-red-600 text-xl mb-2">⚠️</div>
-          <p className="text-red-700">{message}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-          >
-            Reintentar
-          </button>
+        <div className="max-w-lg w-full bg-white border border-red-200 rounded-xl p-6">
+          <div className="text-center mb-4">
+            <div className="text-red-600 text-4xl mb-2">⚠️</div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+              {isTokenError ? 'Enlace no válido' : 'Error'}
+            </h2>
+            <p className="text-red-700">{message}</p>
+          </div>
+          
+          {isTokenError && (
+            <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-4 text-sm text-left">
+              <p className="font-medium text-blue-900 mb-2">Posibles causas:</p>
+              <ul className="list-disc list-inside space-y-1 text-blue-800">
+                <li>El enlace ha expirado</li>
+                <li>El enlace ya fue utilizado</li>
+                <li>La URL está incompleta (falta copiar toda la dirección)</li>
+                <li>La pareja canceló la solicitud</li>
+              </ul>
+            </div>
+          )}
+          
+          <div className="flex gap-2">
+            <button
+              onClick={() => window.location.reload()}
+              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            >
+              Reintentar
+            </button>
+            {isTokenError && (
+              <button
+                onClick={() => window.history.back()}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
+              >
+                Volver
+              </button>
+            )}
+          </div>
+          
+          <div className="mt-4 pt-4 border-t border-gray-200 text-center text-sm text-gray-600">
+            <p>
+              Si crees que esto es un error, contacta con la pareja que te envió este enlace.
+            </p>
+          </div>
         </div>
       </div>
     );
