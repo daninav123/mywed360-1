@@ -1580,7 +1580,7 @@
     "finance": "Finanzas",
     "seating": "Plan de asientos",
     "email": "Correo electrónico",
-    "protocol": "Protocolo",
+    
     "designs": "Diseños",
     "website": "Web de boda",
     "contracts": "Contratos",
@@ -2525,6 +2525,248 @@
     "published": "Published"
   },
   "subio_archivo_identico_evitamos_duplicados": "Ya se subió un archivo idéntico. Evitamos duplicados automáticamente.",
+  "protocol": {
+    "specialMoments": {
+      "title": "Momentos especiales",
+      "description": "Planifica cada instante clave con la música y el momento adecuados.",
+      "buttons": {
+        "addSection": "Añadir sección",
+        "addMoment": "Añadir momento",
+        "duplicateShort": "Dup →",
+        "moveShort": "Mov →",
+        "use": "Usar",
+        "searchWithAI": "Buscar con IA",
+        "confirm": "Confirmar",
+        "clear": "Limpiar",
+        "remove": "Quitar"
+      },
+      "tooltips": {
+        "addSection": "Añadir sección personalizada",
+        "deleteMoment": "Eliminar",
+        "duplicateHere": "Duplicar en esta sección",
+        "duplicateElse": "Duplicar en otra sección",
+        "moveElse": "Mover a otra sección",
+        "moveUp": "Mover arriba",
+        "moveDown": "Mover abajo",
+        "play": "Reproducir",
+        "pause": "Pausar",
+        "stop": "Detener",
+        "blockHeader": "Doble clic para renombrar sección (clic derecho para más opciones)"
+      },
+      "toggles": {
+        "showAdvanced": "Mostrar detalles avanzados",
+        "hideAdvanced": "Ocultar detalles avanzados",
+        "hideRecipient": "Ocultar destinatario",
+        "showPlayer": "Reproductor",
+        "hidePlayer": "Ocultar"
+      },
+      "labels": {
+        "dragHandle": "Arrastrar para reordenar",
+        "stateNone": "Sin estado",
+        "optionalBadge": "Opcional",
+        "optionalToggle": "Es opcional",
+        "type": "Tipo",
+        "location": "Ubicación",
+        "state": "Estado",
+        "song": "Canción",
+        "time": "Hora",
+        "duration": "Duración",
+        "language": "Idioma",
+        "tempo": "Tempo",
+        "era": "Década",
+        "genre": "Género",
+        "volume": "Volumen",
+        "recipientHint": "Selecciona a quién va dirigido este momento (opcional)",
+        "recipientDefault": "Destinatario",
+        "recipientRoleFallback": "Rol asignado",
+        "recipientSummary": "Destinatario: {{label}}",
+        "responsibles": "Responsables",
+        "requirements": "Requisitos técnicos / notas",
+        "relatedSuppliers": "Proveedores relacionados",
+        "actionDuplicate": "Duplicar en:",
+        "actionMove": "Mover a:",
+        "playerNowPlaying": "Reproduciendo vista previa",
+        "musicInspiration": "Inspiración musical",
+        "aiTitle": "Encuentra la canción perfecta (IA)",
+        "viewOn": "Ver en:"
+      },
+      "placeholders": {
+        "momentTitle": "Título del momento",
+        "location": "Capilla, jardín, salón...",
+        "song": "Nombre de la canción",
+        "time": "hh:mm",
+        "duration": "ej. 10 min",
+        "recipientManual": "Nombre o rol del destinatario",
+        "requirements": "Sonido, iluminación, elementos especiales...",
+        "supplier": "Nombre o referencia",
+        "searchSong": "Buscar canción por nombre...",
+        "aiPrompt": "Describe el momento: \"primer baile, balada en español\"",
+        "role": "Rol / función",
+        "name": "Nombre",
+        "contact": "Contacto (tel/email)"
+      },
+      "options": {
+        "recipient": {
+          "none": "Sin destinatario",
+          "custom": "Especificar manualmente",
+          "rolePrefix": "Rol: {{role}}",
+          "table": "· Mesa {{table}}"
+        },
+        "languages": {
+          "es": "Español",
+          "en": "Inglés"
+        },
+        "tempo": {
+          "any": "Cualquiera",
+          "slow": "Lento",
+          "medium": "Medio",
+          "fast": "Rápido"
+        },
+        "era": {
+          "any": "Cualquiera",
+          "80s": "80s",
+          "90s": "90s",
+          "2000s": "2000s",
+          "2010s": "2010s",
+          "current": "Actual"
+        },
+        "genre": {
+          "any": "Cualquiera",
+          "pop": "Pop",
+          "rock": "Rock",
+          "jazz": "Jazz",
+          "latin": "Latino",
+          "classical": "Clásica",
+          "indie": "Indie",
+          "rnb": "R&B"
+        }
+      },
+      "helperTexts": {
+        "recipientDetails": "Mesa: {{table}} · Dieta: {{diet}}",
+        "responsiblesEmpty": "Añade quién se encargará de este momento.",
+        "suppliersEmpty": "Registra proveedores relevantes para este momento.",
+        "spotifyEmbed": "Pegaste un enlace de Spotify. Se muestra una vista previa.",
+        "sectionTip": "Consejo: doble clic sobre el nombre de la sección para renombrar. Clic derecho para eliminar o mover la sección. Usa \"Dup →\" para duplicar un momento en otra sección y \"Mov →\" para moverlo.",
+        "noOtherSections": "No hay otras secciones disponibles."
+      },
+      "menu": {
+        "duplicateHere": "Duplicar en esta sección",
+        "duplicateElse": "Duplicar en otra sección",
+        "move": "Mover a otra sección",
+        "delete": "Eliminar momento"
+      },
+      "player": {
+        "show": "Reproductor",
+        "hide": "Ocultar",
+        "play": "Reproducir",
+        "pause": "Pausar",
+        "stop": "Detener",
+        "volume": "Volumen"
+      },
+      "ai": {
+        "loading": "Buscando recomendaciones...",
+        "error": "No se pudo obtener recomendaciones. Prueba de nuevo.",
+        "resultsTitle": "Recomendaciones de IA",
+        "preferencesPrefix": "Preferencias",
+        "preferences": {
+          "language": {
+            "es": "idioma español",
+            "en": "idioma inglés"
+          },
+          "tempo": {
+            "slow": "tempo lento",
+            "medium": "tempo medio",
+            "fast": "tempo rápido"
+          },
+          "era": {
+            "80s": "década 80",
+            "90s": "década 90",
+            "2000s": "década 2000",
+            "2010s": "década 2010",
+            "current": "década actual"
+          },
+          "genre": {
+            "pop": "género pop",
+            "rock": "género rock",
+            "jazz": "género jazz",
+            "latin": "género latino",
+            "classical": "género clásico",
+            "indie": "género indie",
+            "rnb": "género R&B"
+          }
+        }
+      },
+      "search": {
+        "loading": "Buscando...",
+        "error": "No se pudo buscar canciones. Inténtalo más tarde.",
+        "resultsTitle": "Resultados"
+      },
+      "aria": {
+        "reorderHandle": "Arrastrar para reordenar"
+      },
+      "defaults": {
+        "newMoment": "Nuevo momento {{count}}",
+        "momentTitle": "Nuevo momento"
+      },
+      "empty": {
+        "title": "No hay momentos en esta sección.",
+        "subtitle": "Haz clic en \"Añadir momento\" para crear uno nuevo."
+      },
+      "prompts": {
+        "newSection": "Nombre de la nueva sección (ej. Ensayo, Brunch...)",
+        "blockAction": "Acción: eliminar | mover-izquierda | mover-derecha",
+        "deleteSection": "Eliminar sección \"{{name}}\"?",
+        "renameSection": "Nuevo nombre de la sección:",
+        "duplicateIn": "Duplicar en (escribe tal cual):\n{{list}}",
+        "moveTo": "Mover a (escribe tal cual):\n{{list}}"
+      },
+      "momentTypes": {
+        "entrada": "Entrada",
+        "lectura": "Lectura",
+        "votos": "Votos",
+        "anillos": "Intercambio de anillos",
+        "baile": "Baile",
+        "discurso": "Discurso",
+        "corte_pastel": "Corte de pastel",
+        "salida": "Salida",
+        "otro": "Otro"
+      },
+      "states": {
+        "pendiente": "Pendiente",
+        "confirmado": "Confirmado",
+        "ensayo": "Ensayo"
+      },
+      "recipientRoles": {
+        "novia": "Novia",
+        "novio": "Novio",
+        "planner": "Planner",
+        "oficiante": "Oficiante / Maestro de ceremonias",
+        "familia": "Familiar cercano",
+        "amigo": "Amigo/a",
+        "proveedor": "Proveedor"
+      },
+      "warnings": {
+        "missingTime": "Añade una hora estimada.",
+        "missingResponsible": "Define al menos un responsable.",
+        "missingRecipient": "Asigna destinatario o rol.",
+        "missingSong": "Añade una canción."
+      },
+      "toasts": {
+        "validationReminder": "Hay campos requeridos sin completar. Revisa las alertas en cada momento.",
+        "maxMomentsInSection": "Has alcanzado el máximo de {{count}} momentos en esta sección.",
+        "responsibleLimit": "Máximo {{count}} responsables por momento.",
+        "supplierDraftRequired": "Escribe un proveedor antes de añadirlo.",
+        "supplierLimit": "Máximo {{count}} proveedores por momento.",
+        "supplierAlreadyExists": "Ese proveedor ya está registrado.",
+        "selectTargetSection": "Selecciona una sección destino.",
+        "momentDuplicated": "Momento duplicado correctamente.",
+        "selectDifferentSection": "Selecciona una sección diferente para mover el momento.",
+        "momentMoved": "Momento movido a la nueva sección.",
+        "createAnotherSection": "Crea otra sección para usar esta acción.",
+        "songApplied": "Canción añadida al último momento."
+      }
+    }
+  },
   "suppliers": {
     "configureServices": "Configurar servicios deseados",
     "suggested": "Sugeridos",
@@ -2875,6 +3117,22 @@
         "nameFallback": "Proveedor sin nombre",
         "serviceFallback": "Servicio sin definir",
         "estimatedBudget": "Presupuesto estimado",
+        "shared": {
+          "notAvailable": "—"
+        },
+        "statusLabels": {
+          "new": "Nuevo",
+          "contacted": "Contactado",
+          "selected": "Seleccionado",
+          "confirmed": "Confirmado",
+          "rejected": "Rechazado",
+          "discarded": "Descartado",
+          "pending": "Pendiente",
+          "unknown": "Estado sin definir"
+        },
+        "rating": {
+          "count": "({{count}})"
+        },
         "labels": {
           "lastContact": "Último contacto",
           "nextStep": "Próximo paso",
@@ -2885,7 +3143,95 @@
           "view": "Ver ficha",
           "promote": "Promover a confirmado",
           "schedule": "Registrar próxima acción",
-          "archive": "Descartar"
+        "archive": "Descartar"
+        },
+        "metrics": {
+          "matchLabel": "Match IA:",
+          "experienceLabel": "Experiencia:",
+          "responseLabel": "Agilidad:",
+          "percent": "{{value}}%"
+        },
+        "portal": {
+          "responded": "Portal respondido",
+          "pending": "Portal pendiente"
+        },
+        "groupTooltip": "Grupo: {{name}}",
+        "budget": {
+          "acceptedTooltip": "Presupuesto aceptado: {{amount}}",
+          "latestTooltip": "Último presupuesto: {{amount}}",
+          "genericTooltip": "Presupuesto",
+          "accepted": "Presupuesto aceptado",
+          "pending": "Presupuesto pendiente ({{count}})",
+          "received": "Presupuesto recibido"
+        },
+        "contactLabel": "Contacto: {{value}}",
+        "phoneLabel": "Tel: {{value}}",
+        "priceLabel": "Precio: {{value}}",
+        "depositPaid": "Señal pagada",
+        "dateLabel": "{{value}}",
+        "actions": {
+          "view": "Ver",
+          "edit": "Editar",
+          "viewBudget": "Ver presupuesto",
+          "assignGroup": "Asignar a grupo",
+          "delete": "Eliminar",
+          "reserve": "Reservar",
+          "requestQuote": "Solicitar presupuesto",
+          "requestMeeting": "Pedir cita"
+        },
+        "autoEmail": {
+          "signature": "Enviado automáticamente desde MaLove.App",
+          "subjectQuote": "Solicitud de presupuesto - {{target}}",
+          "subjectMeeting": "Solicitud de reunión - {{target}}",
+          "missingEmail": "Agrega un email de contacto al proveedor para enviar solicitudes automáticas.",
+          "successQuote": "Solicitud de presupuesto enviada automáticamente.",
+          "successMeeting": "Solicitud de cita enviada automáticamente.",
+          "sendErrorRetry": "No se pudo enviar el correo automático. Inténtalo nuevamente.",
+          "sendError": "No se pudo enviar el correo automático.",
+          "sending": "Enviando...",
+          "userFallback": "Organizador",
+          "guestsFallback": "100",
+          "appendedQuote": "Nos gustaría recibir un presupuesto detallado con tarifas, condiciones y disponibilidad para nuestra fecha.",
+          "appendedMeeting": "¿Podemos coordinar una reunión (presencial o videollamada) para revisar el servicio y confirmar disponibilidad? Indícanos los horarios que mejor te encajen.",
+          "closing": "Quedamos atentos a tu respuesta.",
+          "searchQuery": {
+            "quote": "Solicitud de presupuesto para proveedor de bodas",
+            "meeting": "Agendar reunión con proveedor de bodas"
+          }
+        },
+        "tracking": {
+          "status": "Seguimiento: {{status}}",
+          "last": "Último: {{value}}",
+          "thread": "Hilo: {{count}}",
+          "openInboxTitle": "Abrir bandeja de entrada",
+          "openInbox": "Ver correo",
+          "detailsTitle": "Ver detalles de seguimiento",
+          "details": "Detalles",
+          "defaultSubject": "Mensaje para {{name}}",
+          "pendingTodos": {
+            "tasks": "Tareas pendientes",
+            "followUps": "Seguimientos necesarios",
+            "assigned": "To-dos asignados"
+          },
+          "lastAgo": {
+            "justNow": "Justo ahora",
+            "minutes": "{count, plural, one=hace 1 min, other=hace {{count}} min}",
+            "hours": "{count, plural, one=hace 1 h, other=hace {{count}} h}",
+            "days": "{count, plural, one=hace 1 día, other=hace {{count}} días}"
+          }
+        },
+        "emails": {
+          "toggleTitle": "Ver correos relacionados",
+          "hide": "Ocultar correos",
+          "show": "Correos relacionados ({{count}})",
+          "loading": "Cargando correos...",
+          "empty": "Sin correos relacionados",
+          "noSubject": "(Sin asunto)",
+          "openInbox": "Abrir en buzón"
+        },
+        "favorite": {
+          "add": "Marcar como favorito",
+          "remove": "Quitar de favoritos"
         }
       },
       "pendingTodos": {
@@ -3346,6 +3692,22 @@
       "loadingVirtualized": "Preparando lista..."
     },
     "card": {
+      "shared": {
+        "notAvailable": "—"
+      },
+      "statusLabels": {
+        "new": "Nuevo",
+        "contacted": "Contactado",
+        "selected": "Seleccionado",
+        "confirmed": "Confirmado",
+        "rejected": "Rechazado",
+        "discarded": "Descartado",
+        "pending": "Pendiente",
+        "unknown": "Estado sin definir"
+      },
+      "rating": {
+        "count": "({{count}})"
+      },
       "scoreTooltip": "Puntuación IA consolidada",
       "scoreLabel": "Score {{value}}",
       "metrics": {
@@ -3360,8 +3722,8 @@
       },
       "groupTooltip": "Grupo: {{name}}",
       "budget": {
-        "acceptedTooltip": "Presupuesto aceptado: {{amount}} {{currency}}",
-        "latestTooltip": "Último presupuesto: {{amount}} {{currency}}",
+        "acceptedTooltip": "Presupuesto aceptado: {{amount}}",
+        "latestTooltip": "Último presupuesto: {{amount}}",
         "genericTooltip": "Presupuesto",
         "accepted": "Presupuesto aceptado",
         "pending": "Presupuesto pendiente ({{count}})",
@@ -3391,7 +3753,16 @@
         "successMeeting": "Solicitud de cita enviada automáticamente.",
         "sendErrorRetry": "No se pudo enviar el correo automático. Inténtalo nuevamente.",
         "sendError": "No se pudo enviar el correo automático.",
-        "sending": "Enviando..."
+        "sending": "Enviando...",
+        "userFallback": "Organizador",
+        "guestsFallback": "100",
+        "appendedQuote": "Nos gustaría recibir un presupuesto detallado con tarifas, condiciones y disponibilidad para nuestra fecha.",
+        "appendedMeeting": "¿Podemos coordinar una reunión (presencial o videollamada) para revisar el servicio y confirmar disponibilidad? Indícanos los horarios que mejor te encajen.",
+        "closing": "Quedamos atentos a tu respuesta.",
+        "searchQuery": {
+          "quote": "Solicitud de presupuesto para proveedor de bodas",
+          "meeting": "Agendar reunión con proveedor de bodas"
+        }
       },
       "tracking": {
         "status": "Seguimiento: {{status}}",
@@ -3402,6 +3773,12 @@
         "detailsTitle": "Ver detalles de seguimiento",
         "details": "Detalles",
         "defaultSubject": "Mensaje para {{name}}",
+        "lastAgo": {
+          "justNow": "Justo ahora",
+          "minutes": "{count, plural, one=hace 1 min, other=hace {{count}} min}",
+          "hours": "{count, plural, one=hace 1 h, other=hace {{count}} h}",
+          "days": "{count, plural, one=hace 1 día, other=hace {{count}} días}"
+        },
         "pendingTodos": {
           "tasks": "Tareas pendientes",
           "followUps": "Seguimientos necesarios",

@@ -35,6 +35,12 @@ Este documento resume los cambios recientes aplicados al panel de administració
   - Tras guardar, se actualizan el catálogo y los contadores; los nuevos managers aparecen con métricas en cero hasta que se les asigne un enlace.
 - **Requisitos de backend:** el endpoint `/api/admin/dashboard/discounts` debería incluir `salesManager` por elemento y, opcionalmente, un array `managers` para enriquecer la libreta de contactos que usa el front. Además, se esperan los nuevos endpoints `POST /api/admin/dashboard/commerce/sales-managers` y `POST /api/admin/dashboard/commerce/commercials` para persistir los formularios de alta.
 
+## Sección de métricas
+
+- **Resumen más rico:** tarjetas adicionales para bodas finalizadas/completadas, media de tareas resueltas y consumo de Momentos, junto con gráfico de descargas mensuales y muestra de progreso por boda.
+- **Producto:** nuevas métricas de adquisición (totales y de pago), gráfico de altas mensuales y ranking de planners por número de bodas.
+- **Backend ampliado:** `/api/admin/dashboard/metrics` ahora devuelve `downloads.byMonth`, `userAcquisition`, `plannerStats`, `weddingProgress`, `tasksCompletion` y `momentosUsage`.
+
 ## Próximos pasos sugeridos
 
 1. Confirmar con backend que las respuestas/mutaciones devuelvan los campos nuevos (`salesManager`, `managers`, payload Revolut).

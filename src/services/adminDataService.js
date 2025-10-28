@@ -29,6 +29,7 @@ const DEFAULT_DOWNLOAD_METRICS = {
   total: 0,
   last30d: 0,
   source: 'fallback',
+  byMonth: [],
 };
 
 const DEFAULT_TRAFFIC_METRICS = {
@@ -45,6 +46,36 @@ const DEFAULT_USER_GROWTH_METRICS = {
   totalUsers: 0,
   since: null,
   source: 'fallback',
+};
+
+const DEFAULT_PLANNER_STATS = {
+  totalPlanners: 0,
+  top: [],
+};
+
+const DEFAULT_WEDDING_PROGRESS = {
+  finished: 0,
+  completed: 0,
+  completionRate: 0,
+};
+
+const DEFAULT_TASKS_COMPLETION = {
+  averageCompletionPercent: 0,
+  sample: [],
+};
+
+const DEFAULT_MOMENTOS_USAGE = {
+  totalBytes: 0,
+  totalGigabytes: 0,
+  averageGigabytes: 0,
+  weddingsWithMoments: 0,
+};
+
+const DEFAULT_USER_ACQUISITION = {
+  total: 0,
+  byMonth: [],
+  paidTotal: 0,
+  paidByMonth: [],
 };
 
 const DEFAULT_METRICS = {
@@ -77,6 +108,11 @@ const DEFAULT_METRICS = {
   downloads: { ...DEFAULT_DOWNLOAD_METRICS },
   traffic: { ...DEFAULT_TRAFFIC_METRICS },
   userGrowth: { ...DEFAULT_USER_GROWTH_METRICS },
+  plannerStats: { ...DEFAULT_PLANNER_STATS },
+  weddingProgress: { ...DEFAULT_WEDDING_PROGRESS },
+  tasksCompletion: { ...DEFAULT_TASKS_COMPLETION },
+  momentosUsage: { ...DEFAULT_MOMENTOS_USAGE },
+  userAcquisition: { ...DEFAULT_USER_ACQUISITION },
 };
 
 const DEFAULT_INTEGRATIONS = {
@@ -310,6 +346,12 @@ const normalizeDownloadMetrics = (metrics) => {
       typeof metrics.source === 'string' && metrics.source
         ? metrics.source
         : 'fallback',
+    byMonth: Array.isArray(metrics.byMonth)
+      ? metrics.byMonth.map((entry) => ({
+          month: String(entry?.month || ''),
+          value: normalizeMetricNumber(entry?.value),
+        }))
+      : [],
   };
 };
 
@@ -589,6 +631,60 @@ export const getMetricsData = async () => {
     downloads: normalizeDownloadMetrics(data.downloads),
     traffic: normalizeTrafficMetrics(data.traffic),
     userGrowth: normalizeUserGrowthMetrics(data.userGrowth),
+    plannerStats:
+      data.plannerStats && typeof data.plannerStats === 'object'
+        ? {
+            totalPlanners: normalizeMetricNumber(data.plannerStats.totalPlanners),
+            top: Array.isArray(data.plannerStats.top) ? data.plannerStats.top : [],
+          }
+        : { ...DEFAULT_PLANNER_STATS },
+    weddingProgress:
+      data.weddingProgress && typeof data.weddingProgress === 'object'
+        ? {
+            finished: normalizeMetricNumber(data.weddingProgress.finished),
+            completed: normalizeMetricNumber(data.weddingProgress.completed),
+            completionRate: Number.isFinite(data.weddingProgress.completionRate)
+              ? data.weddingProgress.completionRate
+              : 0,
+          }
+        : { ...DEFAULT_WEDDING_PROGRESS },
+    tasksCompletion:
+      data.tasksCompletion && typeof data.tasksCompletion === 'object'
+        ? {
+            averageCompletionPercent: Number.isFinite(data.tasksCompletion.averageCompletionPercent)
+              ? data.tasksCompletion.averageCompletionPercent
+              : 0,
+            sample: Array.isArray(data.tasksCompletion.sample) ? data.tasksCompletion.sample : [],
+          }
+        : { ...DEFAULT_TASKS_COMPLETION },
+    momentosUsage:
+      data.momentosUsage && typeof data.momentosUsage === 'object'
+        ? {
+            totalBytes: normalizeMetricNumber(data.momentosUsage.totalBytes),
+            totalGigabytes: Number(data.momentosUsage.totalGigabytes || 0),
+            averageGigabytes: Number(data.momentosUsage.averageGigabytes || 0),
+            weddingsWithMoments: normalizeMetricNumber(data.momentosUsage.weddingsWithMoments),
+          }
+        : { ...DEFAULT_MOMENTOS_USAGE },
+    userAcquisition:
+      data.userAcquisition && typeof data.userAcquisition === 'object'
+        ? {
+            total: normalizeMetricNumber(data.userAcquisition.total),
+            byMonth: Array.isArray(data.userAcquisition.byMonth)
+              ? data.userAcquisition.byMonth.map((entry) => ({
+                  month: String(entry?.month || ''),
+                  value: normalizeMetricNumber(entry?.value),
+                }))
+              : [],
+            paidTotal: normalizeMetricNumber(data.userAcquisition.paidTotal),
+            paidByMonth: Array.isArray(data.userAcquisition.paidByMonth)
+              ? data.userAcquisition.paidByMonth.map((entry) => ({
+                  month: String(entry?.month || ''),
+                  value: normalizeMetricNumber(entry?.value),
+                }))
+              : [],
+          }
+        : { ...DEFAULT_USER_ACQUISITION },
   };
 };
 

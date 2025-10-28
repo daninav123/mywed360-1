@@ -9,12 +9,38 @@ import Alert from '../../components/ui/Alert';
 import useProviderEmail from '../../hooks/useProviderEmail.jsx';
 import useSupplierBudgets from '../../hooks/useSupplierBudgets';
 import { useAuth } from '../../hooks/useAuth';
-import { useWedding } from '../../context/WeddingContext';
 import useTranslations from '../../hooks/useTranslations';
-import { formatDate } from '../../utils/formatUtils';
 import * as EmailService from '../../services/emailService';
 import EmailTemplateService from '../../services/EmailTemplateService';
 import { loadTrackingRecords } from '../../services/EmailTrackingService';
+
+const STATUS_KEY_MAP = {
+  confirmado: 'confirmed',
+  confirmed: 'confirmed',
+  contactado: 'contacted',
+  contacted: 'contacted',
+  seleccionado: 'selected',
+  selected: 'selected',
+  rechazado: 'rejected',
+  rejected: 'rejected',
+  descartado: 'discarded',
+  discarded: 'discarded',
+  pendiente: 'pending',
+  pending: 'pending',
+  nuevo: 'new',
+  new: 'new',
+};
+
+const STATUS_COLOR_CLASSES = {
+  confirmed: 'bg-green-100 text-green-800',
+  contacted: 'bg-blue-100 text-blue-800',
+  selected: 'bg-purple-100 text-purple-800',
+  rejected: 'bg-red-100 text-red-800',
+  discarded: 'bg-red-100 text-red-800',
+  pending: 'bg-amber-100 text-amber-800',
+  new: 'bg-gray-100 text-gray-800',
+  unknown: 'bg-gray-100 text-gray-800',
+};
 
 /**
  * @typedef {import('../../hooks/useProveedores').Provider} Provider
@@ -52,7 +78,7 @@ const ProveedorCard = ({
   disableInlineDetail = false,
 }) => {
   const { userProfile } = useAuth();
-  const { t } = useTranslations();
+  const { t, format } = useTranslations();
   const {
     sendEmailToProvider,
     generateDefaultSubject,
@@ -72,6 +98,8 @@ const ProveedorCard = ({
   const templateService = useMemo(() => new EmailTemplateService(), []);
   const { budgets = [] } = useSupplierBudgets(provider?.id);
   const budgetsToUse = Array.isArray(budgetsOverride) ? budgetsOverride : budgets;
+  const currency = provider?.currency || 'EUR';
+  const notAvailable = t('common.suppliers.card.shared.notAvailable');
   const cardAppearanceClasses = useMemo(() => {
     switch (appearance) {
       case 'tracking':
@@ -85,6 +113,17 @@ const ProveedorCard = ({
   const pendingIndicatorClass = appearance === 'confirmed'
     ? 'bg-amber-500 shadow-amber-200'
     : 'bg-red-500 shadow-red-200';
+  const formatBudgetAmount = useCallback(
+    (budget) => {
+      if (!budget) return notAvailable;
+      const amountNumber = Number(budget.amount);
+      if (Number.isFinite(amountNumber)) {
+        return format.currency(amountNumber, budget.currency || currency);
+      }
+      return budget.amount || notAvailable;
+    },
+    [currency, format, notAvailable]
+  );
   const budgetInfo = useMemo(() => {
     try {
       const list = Array.isArray(budgetsToUse) ? budgetsToUse : [];
@@ -135,6 +174,20 @@ const ProveedorCard = ({
       return null;
     }
   }, [breakdown.responseScore]);
+  const statusMeta = useMemo(() => {
+    const raw = String(provider?.status || '').trim();
+    const normalized =
+      STATUS_KEY_MAP[raw.toLowerCase()] ||
+      (raw ? 'unknown' : 'unknown');
+    const label =
+      normalized === 'unknown'
+        ? raw || t('common.suppliers.card.statusLabels.unknown')
+        : t(`common.suppliers.card.statusLabels.${normalized}`);
+    return {
+      label,
+      colorClass: STATUS_COLOR_CLASSES[normalized] || STATUS_COLOR_CLASSES.unknown,
+    };
+  }, [provider?.status, t]);
 
   const portalStatus = useMemo(() => {
     if (provider?.portalLastSubmitAt) return 'responded';
@@ -190,31 +243,65 @@ const ProveedorCard = ({
   const lastAgo = useMemo(() => {
     try {
       const d = tracking?.lastEmailDate ? new Date(tracking.lastEmailDate) : null;
-      if (!d || isNaN(d.getTime())) return null;
+      if (!d || Number.isNaN(d.getTime())) return null;
       const diffMs = Date.now() - d.getTime();
       const sec = Math.floor(diffMs / 1000);
       const min = Math.floor(sec / 60);
       const hrs = Math.floor(min / 60);
       const days = Math.floor(hrs / 24);
-      if (days > 0) return `hace ${days} día${days !== 1 ? 's' : ''}`;
-      if (hrs > 0) return `hace ${hrs} h`;
-      if (min > 0) return `hace ${min} min`;
-      return 'justo ahora';
+      if (days > 0) {
+        return t('common.suppliers.card.tracking.lastAgo.days', { count: days });
+      }
+      if (hrs > 0) {
+        return t('common.suppliers.card.tracking.lastAgo.hours', { count: hrs });
+      }
+      if (min > 0) {
+        return t('common.suppliers.card.tracking.lastAgo.minutes', { count: min });
+      }
+      return t('common.suppliers.card.tracking.lastAgo.justNow');
     } catch {
       return null;
     }
-  }, [tracking?.lastEmailDate]);
+  }, [t, tracking?.lastEmailDate]);
 
-  const formatWeddingDate = useCallback((value) => {
-    if (!value) return '';
-    try {
-      const date = typeof value?.toDate === 'function' ? value.toDate() : new Date(value);
-      if (Number.isNaN(date.getTime())) return '';
-      return formatDate(date, 'medium');
-    } catch {
-      return '';
-    }
-  }, []);
+  const formatWeddingDate = useCallback(
+    (value) => {
+      if (!value) return '';
+      try {
+        const date =
+          typeof value?.toDate === 'function'
+            ? value.toDate()
+            : value instanceof Date
+              ? value
+              : new Date(value);
+        if (Number.isNaN(date.getTime())) return '';
+        return format.date(date);
+      } catch {
+        return '';
+      }
+    },
+    [format]
+  );
+  const formatEmailDate = useCallback(
+    (value) => {
+      if (!value) return '';
+      try {
+        const date =
+          typeof value?.toDate === 'function'
+            ? value.toDate()
+            : value instanceof Date
+              ? value
+              : new Date(value);
+        if (Number.isNaN(date.getTime())) return '';
+        return typeof format.dateShort === 'function'
+          ? format.dateShort(date)
+          : format.date(date, { month: 'short', day: 'numeric' });
+      } catch {
+        return '';
+      }
+    },
+    [format]
+  );
 
   const handleCardClick = useCallback(() => {
     onViewDetail?.(provider);
@@ -277,12 +364,22 @@ const ProveedorCard = ({
             userProfile?.guestCount ||
             userProfile?.guests ||
             ''
-        ) || '100';
+        ) || t('common.suppliers.card.autoEmail.guestsFallback');
       const displayName =
         userProfile?.name ||
         [userProfile?.brideFirstName, userProfile?.brideLastName].filter(Boolean).join(' ') ||
         userProfile?.displayName ||
-        (userProfile?.email ? userProfile.email.split('@')[0] : 'Usuario');
+        (userProfile?.email
+          ? userProfile.email.split('@')[0]
+          : t('common.suppliers.card.autoEmail.userFallback'));
+      const numericBudget = Number(provider?.presupuesto);
+      const priceValue = Number.isFinite(numericBudget)
+        ? format.currency(numericBudget, currency)
+        : provider?.budgetRange || provider?.pricing || provider?.price || '';
+      const searchQuery =
+        action === 'quote'
+          ? t('common.suppliers.card.autoEmail.searchQuery.quote')
+          : t('common.suppliers.card.autoEmail.searchQuery.meeting');
 
       const templateData = {
         providerName: provider?.name || '',
@@ -295,15 +392,9 @@ const ProveedorCard = ({
           userProfile?.weddingLocation ||
           userProfile?.city ||
           '',
-        price:
-          provider?.presupuesto != null
-            ? `${provider.presupuesto} €`
-            : provider?.budgetRange || provider?.pricing || provider?.price || '',
+        price: priceValue,
         aiInsight: provider?.aiSummary || provider?.notes || '',
-        searchQuery:
-          action === 'quote'
-            ? 'Solicitud de presupuesto para boda'
-            : 'Agendar reunion con proveedor de boda',
+        searchQuery,
       };
 
       const category = provider?.service || 'general';
@@ -312,11 +403,12 @@ const ProveedorCard = ({
       const baseSubject =
         (aiSubject && aiSubject.trim()) || generateDefaultSubject(provider) || '';
       const baseBodyHtml = formatTemplateToHtml(aiBody);
-      const appended =
+      const appendedText =
         action === 'quote'
-          ? '<p>Nos gustaria recibir un presupuesto detallado con tarifas, condiciones y disponibilidad para nuestra fecha.</p>'
-          : '<p>Podemos coordinar una reunion (presencial o videollamada) para revisar el servicio y confirmar disponibilidad? Indicanos los horarios que mejor te encajen.</p>';
-      const closing = '<p>Quedamos atentos a tu respuesta.</p>';
+          ? t('common.suppliers.card.autoEmail.appendedQuote')
+          : t('common.suppliers.card.autoEmail.appendedMeeting');
+      const appended = `<p>${appendedText}</p>`;
+      const closing = `<p>${t('common.suppliers.card.autoEmail.closing')}</p>`;
 
       let body = '';
       if (baseBodyHtml) {
@@ -341,11 +433,13 @@ const ProveedorCard = ({
       formatWeddingDate,
       userProfile,
       provider,
+      currency,
       templateService,
       generateDefaultSubject,
       generateDefaultEmailBody,
       formatTemplateToHtml,
       insertBeforeSignature,
+      format,
       t,
     ]
   );
@@ -426,27 +520,15 @@ const ProveedorCard = ({
     }
 
     return (
-      <div className="flex itemás-center">
+      <div className="flex items-center">
         {stars}
-        {count > 0 && <span className="ml-1 text-xs text-gray-500">({count})</span>}
+        {count > 0 && (
+          <span className="ml-1 text-xs text-gray-500">
+            {t('common.suppliers.card.rating.count', { count })}
+          </span>
+        )}
       </div>
     );
-  };
-
-  // Color según estado del proveedor
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'Confirmado':
-        return 'bg-green-100 text-green-800';
-      case 'Contactado':
-        return 'bg-blue-100 text-blue-800';
-      case 'Seleccionado':
-        return 'bg-purple-100 text-purple-800';
-      case 'Rechazado':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
   };
 
   return (
@@ -501,7 +583,11 @@ const ProveedorCard = ({
         {/* Información principal */}
         <div className="p-4">
           <div className="flex items-start justify-between gap-2">
-            <h3 className="text-lg font-semibold line-clamp-1">{provider.name}</h3>
+            <h3 className="text-lg font-semibold line-clamp-1">
+              {provider?.name ||
+                provider?.nombre ||
+                t('common.suppliers.card.nameFallback')}
+            </h3>
             {Number.isFinite(scoreValue) && (
               <span
                 className="px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 text-xs font-semibold whitespace-nowrap"
@@ -557,14 +643,18 @@ const ProveedorCard = ({
             </div>
           )}
 
-          <div className="mt-1 mb-3 flex itemás-center space-x-2">
-            <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(provider.status)}`}>
-              {provider.status}
+          <div className="mt-1 mb-3 flex items-center space-x-2">
+            <span className={`text-xs px-2 py-1 rounded-full ${statusMeta.colorClass}`}>
+              {statusMeta.label}
             </span>
-            <span className="text-sm font-medium text-gray-500">{provider.service}</span>
+            <span className="text-sm font-medium text-gray-500">
+              {provider?.service ||
+                provider?.servicio ||
+                t('common.suppliers.card.serviceFallback')}
+            </span>
             {provider.groupName && (
               <span
-                className="text-xs px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 inline-flex itemás-center gap-1"
+                className="text-xs px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 inline-flex items-center gap-1"
                 title={t('common.suppliers.card.groupTooltip', { name: provider.groupName })}
               >
                 <Users size={12} /> {provider.groupName}
@@ -572,18 +662,18 @@ const ProveedorCard = ({
             )}
             {budgetInfo && (
               <span
-                className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 inline-flex itemás-center gap-1"
-                title={budgetInfo.accepted
-                  ? t('common.suppliers.card.budget.acceptedTooltip', {
-                      amount: budgetInfo.accepted?.amount ?? '-',
-                      currency: budgetInfo.accepted?.currency || '',
-                    })
-                  : budgetInfo.latest
-                  ? t('common.suppliers.card.budget.latestTooltip', {
-                      amount: budgetInfo.latest?.amount ?? '-',
-                      currency: budgetInfo.latest?.currency || '',
-                    })
-                  : t('common.suppliers.card.budget.genericTooltip')}
+                className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 inline-flex items-center gap-1"
+                title={
+                  budgetInfo.accepted
+                    ? t('common.suppliers.card.budget.acceptedTooltip', {
+                        amount: formatBudgetAmount(budgetInfo.accepted),
+                      })
+                    : budgetInfo.latest
+                    ? t('common.suppliers.card.budget.latestTooltip', {
+                        amount: formatBudgetAmount(budgetInfo.latest),
+                      })
+                    : t('common.suppliers.card.budget.genericTooltip')
+                }
               >
                 {budgetInfo.accepted
                   ? t('common.suppliers.card.budget.accepted')
@@ -629,13 +719,13 @@ const ProveedorCard = ({
           )}
 
           {provider.depositStatus === 'paid' && (
-            <span className="inline-flex itemás-center mt-2 text-xs font-medium bg-green-100 text-green-700 px-2 py-0.5 rounded">
+            <span className="inline-flex items-center mt-2 text-xs font-medium bg-green-100 text-green-700 px-2 py-0.5 rounded">
               {t('common.suppliers.card.depositPaid')}
             </span>
           )}
 
           {(provider.location || provider.address) && (
-            <div className="flex itemás-center mt-1 text-sm text-gray-600">
+            <div className="flex items-center mt-1 text-sm text-gray-600">
               <MapPin size={14} className="mr-1 text-gray-400" />
               <span className="truncate">{provider.location || provider.address}</span>
             </div>
@@ -643,7 +733,7 @@ const ProveedorCard = ({
 
           {/* Fecha */}
           {provider.date && (
-            <div className="flex itemás-center mt-2 mb-2">
+            <div className="flex items-center mt-2 mb-2">
               <Calendar size={14} className="mr-1 text-gray-400" />
               <span className="text-sm text-gray-600">
                 {t('common.suppliers.card.dateLabel', { value: provider.date })}
@@ -662,7 +752,7 @@ const ProveedorCard = ({
 
         {/* Acciones */}
         <div
-          className="border-t border-gray-100 p-3 bg-gray-50 rounded-b-lg flex flex-wrap itemás-center gap-2"
+          className="border-t border-gray-100 p-3 bg-gray-50 rounded-b-lg flex flex-wrap items-center gap-2"
           onClick={(e) => e.stopPropagation()}
         >
           <Button
@@ -770,7 +860,7 @@ const ProveedorCard = ({
         )}
 
         {tracking && (
-          <div className="w-full text-xs text-gray-600 mt-1 flex itemás-center gap-2 flex-wrap">
+          <div className="w-full text-xs text-gray-600 mt-1 flex items-center gap-2 flex-wrap">
             <span>
               {t('common.suppliers.card.tracking.status', { status: tracking.status || '-' })}
             </span>
@@ -861,7 +951,9 @@ const ProveedorCard = ({
                     <span className="truncate" title={m.subject}>
                       {m.subject || t('common.suppliers.card.emails.noSubject')}
                     </span>
-                    <span className="text-gray-500 whitespace-nowrap">{formatDate(m.date, 'short')}</span>
+                    <span className="text-gray-500 whitespace-nowrap">
+                      {formatEmailDate(m.date) || notAvailable}
+                    </span>
                   </li>
                 ))}
               </ul>

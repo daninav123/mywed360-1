@@ -103,6 +103,33 @@ const contactKey = (contact) => {
   return null;
 };
 
+function formatMonthKey(date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+}
+
+function buildMonthlyBuckets(months = 12) {
+  const buckets = [];
+  const index = new Map();
+  const now = new Date();
+  for (let i = months - 1; i >= 0; i -= 1) {
+    const base = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const key = formatMonthKey(base);
+    const bucket = { month: key, value: 0 };
+    buckets.push(bucket);
+    index.set(key, bucket);
+  }
+  return { buckets, index };
+}
+
+function recordMonthlyValue(index, dateValue, amount = 1) {
+  const date = toDate(dateValue);
+  if (!date) return false;
+  const key = formatMonthKey(date);
+  if (!index.has(key)) return false;
+  index.get(key).value += amount;
+  return true;
+}
+
 const hydrateSalesManager = (raw, directory = null) => {
   const sanitized = sanitizeContactInput(raw);
   if (!sanitized) return null;
@@ -1286,6 +1313,217 @@ function isPremiumUserDoc(data) {
   return isPremiumPlan(plan);
 }
 
+async function aggregateDownloadsByMonth(months = 12) {
+  const { buckets, index } = buildMonthlyBuckets(months);
+  const visited = new Set();
+  const dateFields = ['createdAt', 'installedAt', 'timestamp', 'eventAt', 'registeredAt', 'updatedAt'];
+  const candidates = [
+    { key: 'appDownloads', fields: dateFields },
+    { key: 'appDownloadEvents', fields: dateFields },
+    { key: 'mobileDownloads', fields: dateFields },
+    { key: 'analyticsAppDownloads', fields: dateFields },
+  ];
+
+  for (const candidate of candidates) {
+    const factory = collections[candidate.key];
+    if (typeof factory !== 'function') continue;
+    try {
+      const docs = await fetchDocuments(() => factory(), [], 5000);
+      docs.forEach((doc) => {
+        const data = doc.data() || {};
+        let matchDate = null;
+
+        for (const field of candidate.fields) {
+          if (data[field]) {
+            matchDate = toDate(data[field]);
+            if (matchDate) break;
+          }
+        }
+
+        if (!matchDate && data.device?.installedAt) {
+          matchDate = toDate(data.device.installedAt);
+        }
+        if (!matchDate && data.metadata?.createdAt) {
+          matchDate = toDate(data.metadata.createdAt);
+        }
+        if (!matchDate) return;
+
+        const key = formatMonthKey(matchDate);
+        const uniqueKey = `${candidate.key}:${doc.id}`;
+        if (visited.has(uniqueKey)) return;
+        visited.add(uniqueKey);
+        if (index.has(key)) {
+          index.get(key).value += 1;
+        }
+      });
+    } catch (error) {
+      logger.warn('[admin-dashboard] downloads by month aggregation failed', {
+        collection: candidate.key,
+        message: error?.message,
+      });
+    }
+  }
+
+  const total = buckets.reduce((sum, bucket) => sum + bucket.value, 0);
+  return { total, byMonth: buckets };
+}
+
+async function aggregateUserAcquisitionStats(months = 12) {
+  const { buckets, index } = buildMonthlyBuckets(months);
+  const { buckets: paidBuckets, index: paidIndex } = buildMonthlyBuckets(months);
+  let totalUsers = 0;
+  let paidUsers = 0;
+
+  try {
+    const docs = await fetchDocuments(collections.users, [], 5000);
+    totalUsers = docs.length;
+    docs.forEach((doc) => {
+      const data = doc.data() || {};
+      const createdAt = toDate(data.createdAt);
+      if (createdAt) {
+        recordMonthlyValue(index, createdAt, 1);
+      }
+      if (isPremiumUserDoc(data)) {
+        paidUsers += 1;
+        if (createdAt) {
+          recordMonthlyValue(paidIndex, createdAt, 1);
+        }
+      }
+    });
+  } catch (error) {
+    logger.warn('[admin-dashboard] user acquisition aggregation failed', { message: error?.message });
+  }
+
+  return {
+    total: totalUsers,
+    byMonth: buckets,
+    paidTotal: paidUsers,
+    paidByMonth: paidBuckets,
+  };
+}
+
+async function aggregateWeddingInsights(limit = 10) {
+  const plannerCounts = new Map();
+  let finishedCount = 0;
+  let completedCount = 0;
+  let tasksCompletionTotal = 0;
+  const tasksCompletionSamples = [];
+  let tasksCompletionCount = 0;
+  let momentosUsageBytes = 0;
+  let momentosUsageCount = 0;
+
+  try {
+    const docs = await fetchDocuments(collections.weddings, [], 5000);
+    const now = new Date();
+
+    docs.forEach((doc) => {
+      const data = doc.data() || {};
+      const plannerIds = Array.isArray(data.plannerIds) && data.plannerIds.length
+        ? data.plannerIds
+        : ['sin_asignar'];
+      plannerIds.forEach((plannerId) => {
+        const key = String(plannerId || 'sin_asignar');
+        plannerCounts.set(key, (plannerCounts.get(key) || 0) + 1);
+      });
+
+      const status = String(data.status || '').toLowerCase();
+      const active = data.active;
+      const eventDate = toDate(data.eventDate || data.weddingDate);
+      const isFinished =
+        status === 'archived' ||
+        status === 'finished' ||
+        status === 'completed' ||
+        active === false ||
+        (eventDate && eventDate < now && status !== 'draft');
+      if (isFinished) finishedCount += 1;
+
+      const summary = data.summary || {};
+      const tasksCompleted = Number(summary.tasksCompleted ?? data.tasksCompleted ?? 0);
+      const tasksPending = Number(summary.tasksPending ?? data.tasksPending ?? 0);
+      const tasksTotal = Number(summary.tasksTotal ?? data.tasksTotal ?? 0) || tasksCompleted + tasksPending;
+      if (tasksTotal > 0) {
+        const ratio = Math.min(100, Math.max(0, (tasksCompleted / tasksTotal) * 100));
+        tasksCompletionTotal += ratio;
+        tasksCompletionCount += 1;
+        if (tasksCompletionSamples.length < 10) {
+          tasksCompletionSamples.push({
+            weddingId: doc.id,
+            name: data.name || data.slug || doc.id,
+            completionPercent: Number(ratio.toFixed(1)),
+            tasksCompleted,
+            tasksTotal,
+          });
+        }
+      }
+
+      const completionThreshold = tasksTotal > 0 ? tasksCompleted / tasksTotal : 0;
+      const isCompleted =
+        isFinished &&
+        (status === 'completed' ||
+          tasksPending === 0 ||
+          completionThreshold >= 0.9 ||
+          Number(data.progress || 0) >= 95 ||
+          summary.status === 'completed');
+      if (isCompleted) completedCount += 1;
+
+      const momentosActive = Boolean(
+        data.momentosEnabled ||
+          data.features?.momentos?.active ||
+          data.products?.momentos?.active ||
+          data.subscription?.addons?.includes?.('momentos')
+      );
+      if (momentosActive) {
+        const usageBytes =
+          Number(
+            data.storageUsage?.momentosBytes ??
+              data.storage?.momentosBytes ??
+              data.storage?.momentos?.bytes ??
+              data.storageUsage?.bytes ??
+              0,
+          ) || 0;
+        if (usageBytes > 0) {
+          momentosUsageBytes += usageBytes;
+        }
+        momentosUsageCount += 1;
+      }
+    });
+  } catch (error) {
+    logger.warn('[admin-dashboard] wedding insights aggregation failed', { message: error?.message });
+  }
+
+  const plannerEntries = Array.from(plannerCounts.entries())
+    .map(([plannerId, count]) => ({ plannerId, count }))
+    .sort((a, b) => b.count - a.count);
+  const totalPlanners = plannerEntries.length;
+  const averageTasksCompletion =
+    tasksCompletionCount > 0 ? Number((tasksCompletionTotal / tasksCompletionCount).toFixed(1)) : 0;
+  const completionRate =
+    finishedCount > 0 ? Number(((completedCount / finishedCount) * 100).toFixed(1)) : 0;
+
+  return {
+    plannerStats: {
+      totalPlanners,
+      top: plannerEntries.slice(0, limit),
+    },
+    weddingProgress: {
+      finished: finishedCount,
+      completed: completedCount,
+      completionRate,
+    },
+    tasksCompletion: {
+      averageCompletionPercent: averageTasksCompletion,
+      sample: tasksCompletionSamples,
+    },
+    momentosUsage: {
+      totalBytes: momentosUsageBytes,
+      totalGigabytes: momentosUsageBytes / BYTES_IN_GB,
+      averageGigabytes:
+        momentosUsageCount > 0 ? (momentosUsageBytes / momentosUsageCount) / BYTES_IN_GB : 0,
+      weddingsWithMoments: momentosUsageCount,
+    },
+  };
+}
+
 async function aggregateWebVisitStats(days = 30) {
   const sinceDate = new Date(Date.now() - days * DAY_MS);
   const sinceTimestamp = admin.firestore.Timestamp.fromDate(sinceDate);
@@ -1885,7 +2123,10 @@ router.get('/metrics', async (_req, res) => {
       totalDownloads,
       trafficMetrics,
       userGrowthMetrics,
-      downloadsLast30d
+      downloadsLast30d,
+      downloadsByMonth,
+      userAcquisition,
+      weddingInsights,
     ] = await Promise.all([
       calculateConversionMetrics(),
       calculateRecurringRevenue(),
@@ -1895,6 +2136,9 @@ router.get('/metrics', async (_req, res) => {
       aggregateWebVisitStats(30),
       aggregateUserGrowthMetrics(30),
       countDownloadsLast30d(),
+      aggregateDownloadsByMonth(12),
+      aggregateUserAcquisitionStats(12),
+      aggregateWeddingInsights(10),
     ]);
     
     // userStats / weddingStats en tiempo real (best-effort)
@@ -1978,7 +2222,96 @@ router.get('/metrics', async (_req, res) => {
       completionRate: weddingsTotal > 0 ? ((weddingsActive / weddingsTotal) * 100).toFixed(1) : 0,
       source: 'realtime',
     };
-    
+    const downloadsByMonthResult =
+      downloadsByMonth && typeof downloadsByMonth === 'object' ? downloadsByMonth : null;
+    const downloadsTotal =
+      Number.isFinite(totalDownloads) && totalDownloads > 0
+        ? totalDownloads
+        : normalizeNumber(downloadsByMonthResult?.total) ?? 0;
+    const downloadsPayload = {
+      total: Number.isFinite(downloadsTotal) ? downloadsTotal : 0,
+      last30d: Number.isFinite(downloadsLast30d) ? downloadsLast30d : 0,
+      byMonth: Array.isArray(downloadsByMonthResult?.byMonth)
+        ? downloadsByMonthResult.byMonth.map((entry) => ({
+            month: String(entry?.month || ''),
+            value: normalizeNumber(entry?.value) ?? 0,
+          }))
+        : [],
+      source: 'aggregated',
+    };
+    const weddingInsightsResult =
+      weddingInsights && typeof weddingInsights === 'object' ? weddingInsights : {};
+    const plannerStats =
+      weddingInsightsResult.plannerStats && typeof weddingInsightsResult.plannerStats === 'object'
+        ? {
+            totalPlanners: normalizeNumber(weddingInsightsResult.plannerStats.totalPlanners) ?? 0,
+            top: Array.isArray(weddingInsightsResult.plannerStats.top)
+              ? weddingInsightsResult.plannerStats.top.map((item) => ({
+                  plannerId: String(item?.plannerId || ''),
+                  count: normalizeNumber(item?.count) ?? 0,
+                }))
+              : [],
+          }
+        : { totalPlanners: 0, top: [] };
+    const weddingProgress =
+      weddingInsightsResult.weddingProgress &&
+      typeof weddingInsightsResult.weddingProgress === 'object'
+        ? {
+            finished: normalizeNumber(weddingInsightsResult.weddingProgress.finished) ?? 0,
+            completed: normalizeNumber(weddingInsightsResult.weddingProgress.completed) ?? 0,
+            completionRate:
+              normalizeNumber(weddingInsightsResult.weddingProgress.completionRate) ?? 0,
+          }
+        : { finished: 0, completed: 0, completionRate: 0 };
+    const tasksCompletion =
+      weddingInsightsResult.tasksCompletion &&
+      typeof weddingInsightsResult.tasksCompletion === 'object'
+        ? {
+            averageCompletionPercent:
+              normalizeNumber(weddingInsightsResult.tasksCompletion.averageCompletionPercent) ?? 0,
+            sample: Array.isArray(weddingInsightsResult.tasksCompletion.sample)
+              ? weddingInsightsResult.tasksCompletion.sample.map((item) => ({
+                  weddingId: String(item?.weddingId || ''),
+                  name: String(item?.name || ''),
+                  completionPercent: normalizeNumber(item?.completionPercent) ?? 0,
+                  tasksCompleted: normalizeNumber(item?.tasksCompleted) ?? 0,
+                  tasksTotal: normalizeNumber(item?.tasksTotal) ?? 0,
+                }))
+              : [],
+          }
+        : { averageCompletionPercent: 0, sample: [] };
+    const momentosUsage =
+      weddingInsightsResult.momentosUsage &&
+      typeof weddingInsightsResult.momentosUsage === 'object'
+        ? {
+            totalBytes: normalizeNumber(weddingInsightsResult.momentosUsage.totalBytes) ?? 0,
+            totalGigabytes: normalizeNumber(weddingInsightsResult.momentosUsage.totalGigabytes) ?? 0,
+            averageGigabytes:
+              normalizeNumber(weddingInsightsResult.momentosUsage.averageGigabytes) ?? 0,
+            weddingsWithMoments:
+              normalizeNumber(weddingInsightsResult.momentosUsage.weddingsWithMoments) ?? 0,
+          }
+        : { totalBytes: 0, totalGigabytes: 0, averageGigabytes: 0, weddingsWithMoments: 0 };
+    const userAcquisitionResult =
+      userAcquisition && typeof userAcquisition === 'object'
+        ? {
+            total: normalizeNumber(userAcquisition.total) ?? 0,
+            byMonth: Array.isArray(userAcquisition.byMonth)
+              ? userAcquisition.byMonth.map((entry) => ({
+                  month: String(entry?.month || ''),
+                  value: normalizeNumber(entry?.value) ?? 0,
+                }))
+              : [],
+            paidTotal: normalizeNumber(userAcquisition.paidTotal) ?? 0,
+            paidByMonth: Array.isArray(userAcquisition.paidByMonth)
+              ? userAcquisition.paidByMonth.map((entry) => ({
+                  month: String(entry?.month || ''),
+                  value: normalizeNumber(entry?.value) ?? 0,
+                }))
+              : [],
+          }
+        : { total: 0, byMonth: [], paidTotal: 0, paidByMonth: [] };
+
     res.json({ 
       series, 
       funnel, 
@@ -1991,12 +2324,14 @@ router.get('/metrics', async (_req, res) => {
       recurringRevenue, 
       retentionData,
       storage: storageMetrics,
-      downloads: {
-        total: totalDownloads,
-        last30d: downloadsLast30d,
-      },
+      downloads: downloadsPayload,
       traffic: trafficMetrics,
       userGrowth: userGrowthMetrics,
+      plannerStats,
+      weddingProgress,
+      tasksCompletion,
+      momentosUsage,
+      userAcquisition: userAcquisitionResult,
     });
   } catch (error) {
     logger.error('[admin-dashboard] metrics error', error);

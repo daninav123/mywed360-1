@@ -1,13 +1,9 @@
-import {
+﻿import {
   Music,
-  Edit2,
   Play,
   Plus,
-  Trash2,
   Search as SearchIcon,
   X,
-  ChevronUp,
-  ChevronDown,
   Sparkles,
   Pause,
   AlertTriangle,
@@ -29,35 +25,33 @@ import useSpecialMoments, {
   SUPPLIERS_LIMIT
 } from '../../hooks/useSpecialMoments';
 import useGuests from '../../hooks/useGuests';
+import useTranslations from '../../hooks/useTranslations';
 import { post as apiPost } from '../../services/apiClient';
 import * as Playback from '../../services/PlaybackService';
+import MomentActions from './components/MomentActions';
 
-const MOMENT_TYPE_OPTIONS = [
-  { value: 'entrada', label: 'Entrada' },
-  { value: 'lectura', label: 'Lectura' },
-  { value: 'votos', label: 'Votos' },
-  { value: 'anillos', label: 'Intercambio de anillos' },
-  { value: 'baile', label: 'Baile' },
-  { value: 'discurso', label: 'Discurso' },
-  { value: 'corte_pastel', label: 'Corte de pastel' },
-  { value: 'salida', label: 'Salida' },
-  { value: 'otro', label: 'Otro' },
+const MOMENT_TYPE_VALUES = [
+  'entrada',
+  'lectura',
+  'votos',
+  'anillos',
+  'baile',
+  'discurso',
+  'corte_pastel',
+  'salida',
+  'otro',
 ];
 
-const MOMENT_STATE_OPTIONS = [
-  { value: 'pendiente', label: 'Pendiente' },
-  { value: 'confirmado', label: 'Confirmado' },
-  { value: 'ensayo', label: 'Ensayo' },
-];
+const MOMENT_STATE_VALUES = ['pendiente', 'confirmado', 'ensayo'];
 
-const RECIPIENT_ROLE_OPTIONS = [
-  { value: 'novia', label: 'Novia' },
-  { value: 'novio', label: 'Novio' },
-  { value: 'planner', label: 'Planner' },
-  { value: 'oficiante', label: 'Oficiante / Maestro de ceremonias' },
-  { value: 'familia', label: 'Familiar cercano' },
-  { value: 'amigo', label: 'Amigo/a' },
-  { value: 'proveedor', label: 'Proveedor' },
+const RECIPIENT_ROLE_VALUES = [
+  'novia',
+  'novio',
+  'planner',
+  'oficiante',
+  'familia',
+  'amigo',
+  'proveedor',
 ];
 
 const STATE_BADGE_TYPE = {
@@ -69,6 +63,7 @@ const STATE_BADGE_TYPE = {
 // Tabs pasan a ser dinmicas desde el hook (blocks)
 
 const MomentosEspeciales = () => {
+  const { t } = useTranslations();
   const {
     blocks,
     moments,
@@ -89,6 +84,30 @@ const MomentosEspeciales = () => {
   } = useSpecialMoments();
 
   const { guests } = useGuests();
+  const momentTypeOptions = useMemo(
+    () =>
+      MOMENT_TYPE_VALUES.map((value) => ({
+        value,
+        label: t(`common.protocol.specialMoments.momentTypes.${value}`),
+      })),
+    [t]
+  );
+  const momentStateOptions = useMemo(
+    () =>
+      MOMENT_STATE_VALUES.map((value) => ({
+        value,
+        label: t(`common.protocol.specialMoments.states.${value}`),
+      })),
+    [t]
+  );
+  const recipientRoleOptions = useMemo(
+    () =>
+      RECIPIENT_ROLE_VALUES.map((value) => ({
+        value,
+        label: t(`common.protocol.specialMoments.recipientRoles.${value}`),
+      })),
+    [t]
+  );
   const [recipientPanelsOpen, setRecipientPanelsOpen] = useState({});
   const { options: recipientOptions, map: guestOptionMap } = useMemo(() => {
     const list = Array.isArray(guests) ? guests : [];
@@ -107,8 +126,8 @@ const MomentosEspeciales = () => {
     return { options, map };
   }, [guests]);
   const recipientRoleMap = useMemo(
-    () => new Map(RECIPIENT_ROLE_OPTIONS.map((role) => [role.value, role.label])),
-    []
+    () => new Map(recipientRoleOptions.map((role) => [role.value, role.label])),
+    [recipientRoleOptions]
   );
   const [advancedOpen, setAdvancedOpen] = useState({});
   const [actionPanel, setActionPanel] = useState({ momentId: null, mode: null });
@@ -152,7 +171,7 @@ const MomentosEspeciales = () => {
     
     // Solo mostrar alerta una vez si hay errores críticos
     if (criticalErrors.length > 0 && localStorage.getItem('momentosValidationShown') !== 'true') {
-      toast.warning('Hay campos requeridos sin completar. Revisa las alertas en cada momento.');
+      toast.warning(t('common.protocol.specialMoments.toasts.validationReminder'));
       localStorage.setItem('momentosValidationShown', 'true');
     }
   }, [blocks, moments, showValidationAlerts, getMomentValidationErrors]);
@@ -287,7 +306,7 @@ const MomentosEspeciales = () => {
       }
     } catch (err) {
       console.error('Error buscando Canciones', err);
-      setErrorSearch('No se pudo buscar Canciones. Inténtalo más tarde.');
+      setErrorSearch(t('common.protocol.specialMoments.search.error'));
       setResults([]);
     } finally {
       setLoadingSearch(false);
@@ -297,7 +316,11 @@ const MomentosEspeciales = () => {
   const handleDuplicateSameBlock = useCallback(
     (moment) => {
       if ((moments[activeTab]?.length || 0) >= maxMomentsPerBlock) {
-        toast.warning(`Has alcanzado el máximo de ${maxMomentsPerBlock} momentos en esta sección.`);
+        toast.warning(
+          t('common.protocol.specialMoments.toasts.maxMomentsInSection', {
+            count: maxMomentsPerBlock,
+          })
+        );
         return;
       }
       duplicateMoment(activeTab, moment.id, activeTab);
@@ -344,7 +367,11 @@ const MomentosEspeciales = () => {
             }))
           : [];
       if (current.length >= RESPONSABLES_LIMIT) {
-        toast.warning(`Máximo ${RESPONSABLES_LIMIT} responsables por momento.`);
+        toast.warning(
+          t('common.protocol.specialMoments.toasts.responsibleLimit', {
+            count: RESPONSABLES_LIMIT,
+          })
+        );
         return;
       }
       const next = [
@@ -394,16 +421,20 @@ const MomentosEspeciales = () => {
       const draftRaw = supplierDrafts[moment.id] || '';
       const draft = draftRaw.trim();
       if (!draft) {
-        toast.info('Escribe un proveedor antes de añadirlo.');
+        toast.info(t('common.protocol.specialMoments.toasts.supplierDraftRequired'));
         return;
       }
       const current = Array.isArray(moment.suppliers) ? [...moment.suppliers] : [];
       if (current.length >= SUPPLIERS_LIMIT) {
-        toast.warning(`Máximo ${SUPPLIERS_LIMIT} proveedores por momento.`);
+        toast.warning(
+          t('common.protocol.specialMoments.toasts.supplierLimit', {
+            count: SUPPLIERS_LIMIT,
+          })
+        );
         return;
       }
       if (current.some((supplier) => supplier.toLowerCase() === draft.toLowerCase())) {
-        toast.info('Ese proveedor ya está registrado.');
+        toast.info(t('common.protocol.specialMoments.toasts.supplierAlreadyExists'));
         return;
       }
       current.push(draft);
@@ -430,7 +461,7 @@ const MomentosEspeciales = () => {
   const computeMomentWarnings = useCallback((moment) => {
     const warnings = [];
     const timeValue = typeof moment?.time === 'string' ? moment.time.trim() : '';
-    if (!timeValue) warnings.push('Añade una hora estimada.');
+    if (!timeValue) warnings.push(t('common.protocol.specialMoments.warnings.missingTime'));
     const responsablesList = Array.isArray(moment?.responsables)
       ? moment.responsables.filter((resp) => {
           if (!resp) return false;
@@ -441,16 +472,18 @@ const MomentosEspeciales = () => {
           );
         })
       : [];
-    if (!responsablesList.length) warnings.push('Define al menos un responsable.');
+    if (!responsablesList.length) {
+      warnings.push(t('common.protocol.specialMoments.warnings.missingResponsible'));
+    }
     const needsRecipient = ['lectura', 'discurso', 'votos'].includes(moment?.type);
     if (needsRecipient && !(moment?.recipientId || moment?.recipientName || moment?.recipientRole)) {
-      warnings.push('Asigna destinatario o rol.');
+      warnings.push(t('common.protocol.specialMoments.warnings.missingRecipient'));
     }
     if (['entrada', 'baile'].includes(moment?.type) && !(moment?.song && String(moment.song).trim())) {
-      warnings.push('Añade una canción.');
+      warnings.push(t('common.protocol.specialMoments.warnings.missingSong'));
     }
     return warnings;
-  }, []);
+  }, [t]);
 
   const blockIssuesCount = useMemo(
     () => orderedMoments.filter((moment) => computeMomentWarnings(moment).length > 0).length,
@@ -473,31 +506,39 @@ const MomentosEspeciales = () => {
     (moment, mode) => {
       const targetBlockId = actionPanelSelection[moment.id];
       if (!targetBlockId) {
-        toast.info('Selecciona una sección destino.');
+        toast.info(t('common.protocol.specialMoments.toasts.selectTargetSection'));
         return;
       }
       if (mode === 'duplicate') {
         if ((moments[targetBlockId]?.length || 0) >= maxMomentsPerBlock) {
-          toast.warning(`La sección seleccionada ya tiene ${maxMomentsPerBlock} momentos.`);
+        toast.warning(
+          t('common.protocol.specialMoments.toasts.maxMomentsInSection', {
+            count: maxMomentsPerBlock,
+          })
+        );
           return;
         }
         duplicateMoment(activeTab, moment.id, targetBlockId);
-        toast.success('Momento duplicado correctamente.');
+        toast.success(t('common.protocol.specialMoments.toasts.momentDuplicated'));
         closeActionPanel();
         return;
       }
       if (mode === 'move') {
         if (targetBlockId === activeTab) {
-          toast.info('Selecciona una sección diferente para mover el momento.');
+        toast.info(t('common.protocol.specialMoments.toasts.selectDifferentSection'));
           return;
         }
         if ((moments[targetBlockId]?.length || 0) >= maxMomentsPerBlock) {
-          toast.warning(`La sección seleccionada ya tiene ${maxMomentsPerBlock} momentos.`);
+        toast.warning(
+          t('common.protocol.specialMoments.toasts.maxMomentsInSection', {
+            count: maxMomentsPerBlock,
+          })
+        );
           return;
         }
         duplicateMoment(activeTab, moment.id, targetBlockId);
         removeMoment(activeTab, moment.id);
-        toast.success('Momento movido a la nueva sección.');
+        toast.success(t('common.protocol.specialMoments.toasts.momentMoved'));
         setActiveTab(targetBlockId);
         closeActionPanel();
       }
@@ -520,7 +561,7 @@ const MomentosEspeciales = () => {
         (block) => (block.id || block.key) !== activeTab
       );
       if (!otherBlocks.length) {
-        toast.info('Crea otra sección para usar esta acción.');
+        toast.info(t('common.protocol.specialMoments.toasts.createAnotherSection'));
         return;
       }
       const fallback = actionPanelSelection[momentId] || otherBlocks[0].id || otherBlocks[0].key;
@@ -546,6 +587,12 @@ const MomentosEspeciales = () => {
     const actionMode = actionPanel.momentId === moment.id ? actionPanel.mode : null;
     const otherBlocks = (blocks || []).filter((block) => (block.id || block.key) !== activeTab);
     const stateBadgeType = STATE_BADGE_TYPE[moment.state] || 'default';
+    const stateOption = moment.state
+      ? momentStateOptions.find((option) => option.value === moment.state)
+      : null;
+    const stateLabel = stateOption
+      ? stateOption.label
+      : t('common.protocol.specialMoments.labels.stateNone');
     const recipientMode = moment.recipientRole
       ? 'role'
       : moment.recipientId
@@ -565,8 +612,11 @@ const MomentosEspeciales = () => {
       recipientMode === 'guest' && selectedValue ? guestOptionMap.get(selectedValue) : null;
     const buttonLabel =
       recipientMode === 'role'
-        ? recipientRoleMap.get(moment.recipientRole) || 'Rol asignado'
-        : selectedGuest?.name || moment.recipientName || 'Destinatario';
+        ? recipientRoleMap.get(moment.recipientRole) ||
+          t('common.protocol.specialMoments.labels.recipientRoleFallback')
+        : selectedGuest?.name ||
+          moment.recipientName ||
+          t('common.protocol.specialMoments.labels.recipientDefault');
 
     return (
       <div
@@ -583,7 +633,7 @@ const MomentosEspeciales = () => {
                 <div
                   {...draggableProvided.dragHandleProps}
                   className="text-gray-400 cursor-grab active:cursor-grabbing"
-                  aria-label="Arrastrar para reordenar"
+                  aria-label={t('common.protocol.specialMoments.aria.reorderHandle')}
                 >
                   <GripVertical size={16} />
                 </div>
@@ -597,12 +647,16 @@ const MomentosEspeciales = () => {
                       title: e.target.value,
                     })
                   }
-                  placeholder="Título del momento"
+                  placeholder={t('common.protocol.specialMoments.placeholders.momentTitle')}
                 />
                 <Badge type={stateBadgeType} className="uppercase tracking-wide">
-                  {moment.state ? moment.state : 'sin estado'}
+                  {stateLabel}
                 </Badge>
-                {moment.optional && <Badge type="info">Opcional</Badge>}
+                {moment.optional && (
+                  <Badge type="info">
+                    {t('common.protocol.specialMoments.labels.optionalBadge')}
+                  </Badge>
+                )}
                 <Badge type="primary">#{idx + 1}</Badge>
               </div>
 
@@ -619,7 +673,9 @@ const MomentosEspeciales = () => {
 
               <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                 <div>
-                  <div className="text-xs text-gray-500 mb-1">Tipo</div>
+                  <div className="text-xs text-gray-500 mb-1">
+                    {t('common.protocol.specialMoments.labels.type')}
+                  </div>
                   <select
                     className="w-full border rounded px-2 py-1 text-sm"
                     value={moment.type || 'otro'}
@@ -630,7 +686,7 @@ const MomentosEspeciales = () => {
                       })
                     }
                   >
-                    {MOMENT_TYPE_OPTIONS.map((option) => (
+                    {momentTypeOptions.map((option) => (
                       <option key={option.value} value={option.value}>
                         {option.label}
                       </option>
@@ -638,7 +694,9 @@ const MomentosEspeciales = () => {
                   </select>
                 </div>
                 <div>
-                  <div className="text-xs text-gray-500 mb-1">Ubicación</div>
+                  <div className="text-xs text-gray-500 mb-1">
+                    {t('common.protocol.specialMoments.labels.location')}
+                  </div>
                   <input
                     type="text"
                     className="w-full border rounded px-2 py-1 text-sm"
@@ -649,11 +707,13 @@ const MomentosEspeciales = () => {
                         location: e.target.value,
                       })
                     }
-                    placeholder="Capilla, jardín, salón..."
+                    placeholder={t('common.protocol.specialMoments.placeholders.location')}
                   />
                 </div>
                 <div>
-                  <div className="text-xs text-gray-500 mb-1">Estado</div>
+                  <div className="text-xs text-gray-500 mb-1">
+                    {t('common.protocol.specialMoments.labels.state')}
+                  </div>
                   <select
                     className="w-full border rounded px-2 py-1 text-sm"
                     value={moment.state || 'pendiente'}
@@ -664,7 +724,7 @@ const MomentosEspeciales = () => {
                       })
                     }
                   >
-                    {MOMENT_STATE_OPTIONS.map((option) => (
+                    {momentStateOptions.map((option) => (
                       <option key={option.value} value={option.value}>
                         {option.label}
                       </option>
@@ -683,14 +743,16 @@ const MomentosEspeciales = () => {
                       })
                     }
                   />
-                  <label htmlFor={`optional-${moment.id}`}>Es opcional</label>
+                  <label htmlFor={`optional-${moment.id}`}>
+                    {t('common.protocol.specialMoments.labels.optionalToggle')}
+                  </label>
                 </div>
               </div>
 
               <div className="mt-3 grid gap-3 md:grid-cols-[minmax(0,2fr),minmax(0,1fr),minmax(0,1fr)]">
                 <div className="min-w-[200px]">
                   <div className="text-xs text-gray-500 mb-1 flex items-center gap-1">
-                    <Music size={12} /> Canción
+                    <Music size={12} /> {t('common.protocol.specialMoments.labels.song')}
                   </div>
                   <input
                     type="text"
@@ -702,7 +764,7 @@ const MomentosEspeciales = () => {
                         song: e.target.value,
                       })
                     }
-                    placeholder="Nombre de la canción"
+                    placeholder={t('common.protocol.specialMoments.placeholders.song')}
                   />
                   {(() => {
                     const embed = getSpotifyEmbedUrl(moment.song);
@@ -719,14 +781,16 @@ const MomentosEspeciales = () => {
                           loading="lazy"
                         />
                         <div className="text-[11px] text-gray-500 mt-1">
-                          Pegaste un enlace de Spotify. Se muestra una vista previa.
+                          {t('common.protocol.specialMoments.helperTexts.spotifyEmbed')}
                         </div>
                       </div>
                     );
                   })()}
                 </div>
                 <div>
-                  <div className="text-xs text-gray-500 mb-1">Hora</div>
+                  <div className="text-xs text-gray-500 mb-1">
+                    {t('common.protocol.specialMoments.labels.time')}
+                  </div>
                   <input
                     type="text"
                     className="w-full border rounded px-2 py-1 text-sm"
@@ -737,11 +801,13 @@ const MomentosEspeciales = () => {
                         time: e.target.value,
                       })
                     }
-                    placeholder="hh:mm"
+                    placeholder={t('common.protocol.specialMoments.placeholders.time')}
                   />
                 </div>
                 <div>
-                  <div className="text-xs text-gray-500 mb-1">Duración</div>
+                  <div className="text-xs text-gray-500 mb-1">
+                    {t('common.protocol.specialMoments.labels.duration')}
+                  </div>
                   <input
                     type="text"
                     className="w-full border rounded px-2 py-1 text-sm"
@@ -752,60 +818,22 @@ const MomentosEspeciales = () => {
                         duration: e.target.value,
                       })
                     }
-                    placeholder="ej. 10 min"
+                    placeholder={t('common.protocol.specialMoments.placeholders.duration')}
                   />
                 </div>
               </div>
             </div>
 
-            <div className="flex flex-col gap-1 lg:min-w-[44px]">
-              <button
-                onClick={() => removeMoment(activeTab, moment.id)}
-                className="text-gray-400 hover:text-red-500 p-1"
-                title="Eliminar"
-              >
-                <Trash2 size={16} />
-              </button>
-              <button
-                onClick={() => handleDuplicateSameBlock(moment)}
-                className="text-gray-400 hover:text-blue-500 p-1"
-                title="Duplicar en esta sección"
-              >
-                <Edit2 size={16} />
-              </button>
-              <button
-                onClick={() => openActionPanel(moment.id, 'duplicate')}
-                className="text-gray-400 hover:text-blue-500 p-1 text-[11px]"
-                title="Duplicar en otra sección"
-              >
-                Dup →
-              </button>
-              <button
-                onClick={() => openActionPanel(moment.id, 'move')}
-                className="text-gray-400 hover:text-blue-600 p-1 text-[11px]"
-                title="Mover a otra sección"
-              >
-                Mov →
-              </button>
-              {idx > 0 && (
-                <button
-                  onClick={() => reorderMoment(activeTab, moment.id, 'up')}
-                  className="text-gray-400 hover:text-blue-600 p-1"
-                  title="Mover arriba"
-                >
-                  <ChevronUp size={16} />
-                </button>
-              )}
-              {idx < orderedMoments.length - 1 && (
-                <button
-                  onClick={() => reorderMoment(activeTab, moment.id, 'down')}
-                  className="text-gray-400 hover:text-blue-600 p-1"
-                  title="Mover abajo"
-                >
-                  <ChevronDown size={16} />
-                </button>
-              )}
-            </div>
+            <MomentActions
+              canMoveUp={idx > 0}
+              canMoveDown={idx < orderedMoments.length - 1}
+              onMoveUp={() => reorderMoment(activeTab, moment.id, 'up')}
+              onMoveDown={() => reorderMoment(activeTab, moment.id, 'down')}
+              onDuplicateHere={() => handleDuplicateSameBlock(moment)}
+              onDuplicateElse={() => openActionPanel(moment.id, 'duplicate')}
+              onMoveElse={() => openActionPanel(moment.id, 'move')}
+              onDelete={() => removeMoment(activeTab, moment.id)}
+            />
           </div>
 
           {(() => {
@@ -822,12 +850,16 @@ const MomentosEspeciales = () => {
                   }
                   className="text-xs text-blue-600 hover:underline"
                 >
-                  {isOpen ? 'Ocultar destinatario' : `Destinatario: ${buttonLabel}`}
+                  {isOpen
+                    ? t('common.protocol.specialMoments.toggles.hideRecipient')
+                    : t('common.protocol.specialMoments.labels.recipientSummary', {
+                        label: buttonLabel,
+                      })}
                 </button>
                 {isOpen && (
                   <div className="mt-2 space-y-2 rounded border border-gray-200 bg-gray-50 p-3">
                     <div className="text-xs text-gray-500">
-                      Selecciona a quién va dirigido este momento (opcional)
+                      {t('common.protocol.specialMoments.labels.recipientHint')}
                     </div>
                     <select
                       className="w-full border rounded px-2 py-1 text-sm"
@@ -867,17 +899,27 @@ const MomentosEspeciales = () => {
                         }
                       }}
                     >
-                      <option value="">Sin destinatario</option>
-                      <option value="__custom">Especificar manualmente</option>
-                      {RECIPIENT_ROLE_OPTIONS.map((role) => (
+                      <option value="">
+                        {t('common.protocol.specialMoments.options.recipient.none')}
+                      </option>
+                      <option value="__custom">
+                        {t('common.protocol.specialMoments.options.recipient.custom')}
+                      </option>
+                      {recipientRoleOptions.map((role) => (
                         <option key={role.value} value={`__role__${role.value}`}>
-                          Rol: {role.label}
+                          {t('common.protocol.specialMoments.options.recipient.rolePrefix', {
+                            role: role.label,
+                          })}
                         </option>
                       ))}
                       {recipientOptions.map((option) => (
                         <option key={option.value} value={option.value}>
                           {option.label}{' '}
-                          {option.raw?.table ? `· Mesa ${option.raw.table}` : ''}
+                          {option.raw?.table
+                            ? t('common.protocol.specialMoments.options.recipient.table', {
+                                table: option.raw.table,
+                              })
+                            : ''}
                         </option>
                       ))}
                     </select>
@@ -885,7 +927,9 @@ const MomentosEspeciales = () => {
                       <input
                         type="text"
                         className="w-full border rounded px-2 py-1 text-sm"
-                        placeholder="Nombre o rol del destinatario"
+                        placeholder={t(
+                          'common.protocol.specialMoments.placeholders.recipientManual'
+                        )}
                         value={moment.recipientName || ''}
                         onChange={(e) =>
                           updateMoment(activeTab, moment.id, {
@@ -899,8 +943,10 @@ const MomentosEspeciales = () => {
                     )}
                     {selectedGuest && (
                       <div className="text-xs text-gray-500">
-                        Mesa: {selectedGuest.table || selectedGuest.tableId || '—'} · Dieta:{' '}
-                        {selectedGuest.dietaryRestrictions || '—'}
+                        {t('common.protocol.specialMoments.helperTexts.recipientDetails', {
+                          table: selectedGuest.table || selectedGuest.tableId || '—',
+                          diet: selectedGuest.dietaryRestrictions || '—',
+                        })}
                       </div>
                     )}
                     <div className="flex items-center gap-2">
@@ -916,7 +962,7 @@ const MomentosEspeciales = () => {
                           })
                         }
                       >
-                        Limpiar
+                        {t('common.protocol.specialMoments.buttons.clear')}
                       </button>
                     </div>
                   </div>
@@ -928,7 +974,9 @@ const MomentosEspeciales = () => {
           {actionMode && (
             <div className="rounded border border-gray-200 bg-gray-50 p-3 text-xs text-gray-600">
               <div className="font-semibold mb-2">
-                {actionMode === 'duplicate' ? 'Duplicar en:' : 'Mover a:'}
+                {actionMode === 'duplicate'
+                  ? t('common.protocol.specialMoments.labels.actionDuplicate')
+                  : t('common.protocol.specialMoments.labels.actionMove')}
               </div>
               {otherBlocks.length ? (
                 <>
@@ -949,7 +997,7 @@ const MomentosEspeciales = () => {
                       onClick={() => handleConfirmAction(moment, actionMode)}
                       className="text-xs"
                     >
-                      Confirmar
+                      {t('common.protocol.specialMoments.buttons.confirm')}
                     </Button>
                     <Button
                       size="xs"
@@ -957,12 +1005,12 @@ const MomentosEspeciales = () => {
                       onClick={closeActionPanel}
                       className="text-xs"
                     >
-                      Cancelar
+                      {t('common.app.cancel')}
                     </Button>
                   </div>
                 </>
               ) : (
-                <p>No hay otras secciones disponibles.</p>
+                <p>{t('common.protocol.specialMoments.helperTexts.noOtherSections')}</p>
               )}
             </div>
           )}
@@ -973,13 +1021,15 @@ const MomentosEspeciales = () => {
               className="text-xs text-blue-600 hover:underline"
               onClick={() => toggleAdvancedSection(moment.id)}
             >
-              {isAdvanced ? 'Ocultar detalles avanzados' : 'Mostrar detalles avanzados'}
+              {isAdvanced
+                ? t('common.protocol.specialMoments.toggles.hideAdvanced')
+                : t('common.protocol.specialMoments.toggles.showAdvanced')}
             </button>
             {isAdvanced && (
               <div className="mt-2 space-y-3 rounded border border-gray-200 bg-gray-50 p-3">
                 <div>
                   <div className="flex items-center justify-between text-xs font-semibold text-gray-600">
-                    Responsables
+                    {t('common.protocol.specialMoments.labels.responsibles')}
                     <Button
                       variant="ghost"
                       size="xs"
@@ -987,7 +1037,7 @@ const MomentosEspeciales = () => {
                       disabled={responsablesList.length >= RESPONSABLES_LIMIT}
                     >
                       <UserPlus size={14} className="mr-1" />
-                      Añadir
+                      {t('common.app.add')}
                     </Button>
                   </div>
                   {responsablesList.length ? (
@@ -1000,7 +1050,7 @@ const MomentosEspeciales = () => {
                           <input
                             type="text"
                             className="border rounded px-2 py-1 text-sm"
-                            placeholder="Rol / función"
+                            placeholder={t('common.protocol.specialMoments.placeholders.role')}
                             value={responsable.role || ''}
                             onChange={(e) =>
                               handleResponsibleChange(activeTab, moment, responsableIdx, {
@@ -1011,7 +1061,7 @@ const MomentosEspeciales = () => {
                           <input
                             type="text"
                             className="border rounded px-2 py-1 text-sm"
-                            placeholder="Nombre"
+                            placeholder={t('common.protocol.specialMoments.placeholders.name')}
                             value={responsable.name || ''}
                             onChange={(e) =>
                               handleResponsibleChange(activeTab, moment, responsableIdx, {
@@ -1022,7 +1072,7 @@ const MomentosEspeciales = () => {
                           <input
                             type="text"
                             className="border rounded px-2 py-1 text-sm"
-                            placeholder="Contacto (tel/email)"
+                            placeholder={t('common.protocol.specialMoments.placeholders.contact')}
                             value={responsable.contact || ''}
                             onChange={(e) =>
                               handleResponsibleChange(activeTab, moment, responsableIdx, {
@@ -1035,20 +1085,20 @@ const MomentosEspeciales = () => {
                             className="text-xs text-red-500 hover:underline"
                             onClick={() => handleRemoveResponsible(activeTab, moment, responsableIdx)}
                           >
-                            Quitar
+                            {t('common.protocol.specialMoments.buttons.remove')}
                           </button>
                         </div>
                       ))}
                     </div>
                   ) : (
                     <p className="mt-2 text-xs text-gray-500">
-                      Añade quién se encargará de este momento.
+                      {t('common.protocol.specialMoments.helperTexts.responsiblesEmpty')}
                     </p>
                   )}
                 </div>
                 <div>
                   <div className="text-xs font-semibold text-gray-600 mb-1">
-                    Requisitos técnicos / notas
+                    {t('common.protocol.specialMoments.labels.requirements')}
                   </div>
                   <textarea
                     rows={3}
@@ -1060,12 +1110,12 @@ const MomentosEspeciales = () => {
                         requirements: e.target.value,
                       })
                     }
-                    placeholder="Sonido, iluminación, elementos especiales..."
+                    placeholder={t('common.protocol.specialMoments.placeholders.requirements')}
                   />
                 </div>
                 <div>
                   <div className="text-xs font-semibold text-gray-600 mb-1">
-                    Proveedores relacionados
+                    {t('common.protocol.specialMoments.labels.relatedSuppliers')}
                   </div>
                   {suppliersList.length ? (
                     <div className="flex flex-wrap gap-2">
@@ -1088,14 +1138,14 @@ const MomentosEspeciales = () => {
                     </div>
                   ) : (
                     <p className="text-xs text-gray-500">
-                      Registra proveedores relevantes para este momento.
+                      {t('common.protocol.specialMoments.helperTexts.suppliersEmpty')}
                     </p>
                   )}
                   <div className="mt-2 flex gap-2">
                     <input
                       type="text"
                       className="flex-1 border rounded px-2 py-1 text-sm"
-                      placeholder="Nombre o referencia"
+                      placeholder={t('common.protocol.specialMoments.placeholders.supplier')}
                       value={supplierDraft}
                       onChange={(e) => handleSupplierInputChange(moment.id, e.target.value)}
                     />
@@ -1105,7 +1155,7 @@ const MomentosEspeciales = () => {
                       onClick={() => handleAddSupplier(activeTab, moment)}
                       disabled={!supplierDraft.trim()}
                     >
-                      Añadir
+                      {t('common.app.add')}
                     </Button>
                   </div>
                 </div>
@@ -1121,13 +1171,17 @@ const MomentosEspeciales = () => {
   const handleAddMoment = () => {
     const currentCount = moments[activeTab]?.length || 0;
     if (currentCount >= maxMomentsPerBlock) {
-      toast.warning(`Has alcanzado el máximo de ${maxMomentsPerBlock} momentos en esta sección.`);
+      toast.warning(
+        t('common.protocol.specialMoments.toasts.maxMomentsInSection', {
+          count: maxMomentsPerBlock,
+        })
+      );
       return;
     }
     const nextOrder = currentCount + 1;
     addMoment(activeTab, {
       order: nextOrder,
-      title: `Nuevo momento ${nextOrder}`,
+      title: t('common.protocol.specialMoments.defaults.newMoment', { count: nextOrder }),
       song: '',
       time: '',
     });
@@ -1144,14 +1198,37 @@ const MomentosEspeciales = () => {
     setAiError(null);
     try {
       const prefs = [];
-      // Idioma explcito del selector
-      if (aiLanguage === 'es') prefs.push('idioma espaol');
-      else if (aiLanguage === 'en') prefs.push('idioma ingls');
-      // Si no hay gnero/decada en UI, usa preferencias del perfil
-      if (aiTempo) prefs.push(`tempo ${aiTempo}`);
-      if (aiEra) prefs.push(`dcada ${aiEra}`);
-      if (aiGenre) prefs.push(`gnero ${aiGenre}`);
-      const fullPrompt = prefs.length ? `${prompt}. Preferencias: ${prefs.join(', ')}` : prompt;
+      if (aiLanguage) {
+        prefs.push(
+          t(`common.protocol.specialMoments.ai.preferences.language.${aiLanguage}`, {
+            defaultValue: aiLanguage,
+          })
+        );
+      }
+      if (aiTempo) {
+        prefs.push(
+          t(`common.protocol.specialMoments.ai.preferences.tempo.${aiTempo}`, {
+            defaultValue: aiTempo,
+          })
+        );
+      }
+      if (aiEra) {
+        prefs.push(
+          t(`common.protocol.specialMoments.ai.preferences.era.${aiEra}`, {
+            defaultValue: aiEra,
+          })
+        );
+      }
+      if (aiGenre) {
+        prefs.push(
+          t(`common.protocol.specialMoments.ai.preferences.genre.${aiGenre}`, {
+            defaultValue: aiGenre,
+          })
+        );
+      }
+      const fullPrompt = prefs.length
+        ? `${prompt}. ${t('common.protocol.specialMoments.ai.preferencesPrefix')}: ${prefs.join(', ')}`
+        : prompt;
       const res = await apiPost(
         '/api/ai-songs/recommend',
         { prompt: fullPrompt, context: activeTab, language: aiLanguage },
@@ -1162,7 +1239,7 @@ const MomentosEspeciales = () => {
       const items = Array.isArray(data?.songs) ? data.songs : [];
       const mapped = items.map((s, i) => ({
         id: `${Date.now()}-${i}`,
-        title: s.title || s.name || 'Cancin',
+        title: s.title || s.name || t('common.protocol.specialMoments.labels.song'),
         artist: s.artist || s.author || '',
         reason: s.reason || s.why || '',
         mood: s.mood || '',
@@ -1202,7 +1279,7 @@ const MomentosEspeciales = () => {
       setAiSongs(enriched);
     } catch (e) {
       console.error('AI songs error', e);
-      setAiError('No se pudo obtener recomendaciones. Prueba de nuevo.');
+      setAiError(t('common.protocol.specialMoments.ai.error'));
       setAiSongs([]);
     } finally {
       setAiLoading(false);
@@ -1210,108 +1287,10 @@ const MomentosEspeciales = () => {
   };
 
   return (
-    <PageWrapper title="Momentos Especiales">
+    <PageWrapper title={t('common.protocol.specialMoments.title')}>
       <div className="space-y-6">
-        {/* Se elimin la tarjeta de conexin con Spotify */}
-        {/* Preferencias msi$1les (movidas desde Perfil) */}
-        <Card className="space-y-4 p-5">
-          <h3 className="text-md font-medium flex items-center gap-2">
-            <Music size={16} /> Preferencias msi$1les
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <div className="text-sm font-medium mb-1">Idiomas</div>
-              <div className="flex flex-wrap gap-2">
-                {['es', 'en', 'it', 'fr', 'pt'].map((lang) => (
-                  <label
-                    key={lang}
-                    className={`text-xs border rounded px-2 py-1 cursor-pointer ${profilePrefs.languages.includes(lang) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white'}`}
-                  >
-                    <input
-                      type="checkbox"
-                      className="hidden"
-                      checked={profilePrefs.languages.includes(lang)}
-                      onChange={(e) => {
-                        setProfilePrefs((prev) => {
-                          const set = new Set(prev.languages);
-                          e.target.checked ? set.add(lang) : set.delete(lang);
-                          return { ...prev, languages: Array.from(set) };
-                        });
-                      }}
-                    />
-                    {lang.toUpperCase()}
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <div className="text-sm font-medium mb-1">Gneros</div>
-              <div className="flex flex-wrap gap-2">
-                {[
-                  'pop',
-                  'rock',
-                  'jazz',
-                  'latino',
-                  'cl\\u00E1sica',
-                  'indie',
-                  'r&b',
-                  'electr\\u00F3nica',
-                ].map((genre) => (
-                  <label
-                    key={genre}
-                    className={`text-xs border rounded px-2 py-1 cursor-pointer ${profilePrefs.genres.includes(genre) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white'}`}
-                  >
-                    <input
-                      type="checkbox"
-                      className="hidden"
-                      checked={profilePrefs.genres.includes(genre)}
-                      onChange={(e) => {
-                        setProfilePrefs((prev) => {
-                          const set = new Set(prev.genres);
-                          e.target.checked ? set.add(genre) : set.delete(genre);
-                          return { ...prev, genres: Array.from(set) };
-                        });
-                      }}
-                    />
-                    {genre}
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <div className="text-sm font-medium mb-1">Dcadas</div>
-              <div className="flex flex-wrap gap-2">
-                {['70s', '80s', '90s', '2000s', '2010s', 'actual'].map((dec) => (
-                  <label
-                    key={dec}
-                    className={`text-xs border rounded px-2 py-1 cursor-pointer ${profilePrefs.decades.includes(dec) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white'}`}
-                  >
-                    <input
-                      type="checkbox"
-                      className="hidden"
-                      checked={profilePrefs.decades.includes(dec)}
-                      onChange={(e) => {
-                        setProfilePrefs((prev) => {
-                          const set = new Set(prev.decades);
-                          e.target.checked ? set.add(dec) : set.delete(dec);
-                          return { ...prev, decades: Array.from(set) };
-                        });
-                      }}
-                    />
-                    {dec}
-                  </label>
-                ))}
-              </div>
-            </div>
-          </div>
-          <div className="text-right">
-            <Button onClick={saveProfilePrefs}>Guardar preferencias</Button>
-          </div>
-        </Card>
         <p className="text-gray-600">
-          Planifica cada instante clave con la msi$1 y el momento adecuados.
+          {t('common.protocol.specialMoments.description')}
         </p>
 
         {/* Tabs (dinmicas desde blocks) */}
@@ -1336,13 +1315,13 @@ const MomentosEspeciales = () => {
           <button
             className="ml-auto text-xs border rounded px-2 py-1 hover:bg-gray-50"
             onClick={() => {
-              const name = prompt('Nombre de la nueva seccin (ej. Ensayo, Brunch...)');
+              const name = prompt(t('common.protocol.specialMoments.prompts.newSection'));
               if (!name) return;
               try { addBlock(name); } catch {}
             }}
-            title="Aadir seccin personalizada"
+            title={t('common.protocol.specialMoments.tooltips.addSection')}
           >
-            Aadir seccin
+            {t('common.protocol.specialMoments.buttons.addSection')}
           </button>
         </div>
 
@@ -1353,13 +1332,15 @@ const MomentosEspeciales = () => {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <div className="text-sm text-gray-600 truncate mr-2">
-                  Reproduciendo vista previa
+                  {t('common.protocol.specialMoments.labels.playerNowPlaying')}
                 </div>
                 <button
                   className="text-xs border rounded px-2 py-1 hover:bg-gray-50"
                   onClick={() => setPlayerOpen((v) => !v)}
                 >
-                  {playerOpen ? 'Ocultar' : 'Reproductor'}
+                  {playerOpen
+                    ? t('common.protocol.specialMoments.toggles.hidePlayer')
+                    : t('common.protocol.specialMoments.toggles.showPlayer')}
                 </button>
               </div>
               {playerOpen && (
@@ -1370,14 +1351,18 @@ const MomentosEspeciales = () => {
                         if (playerState.paused) await Playback.resume(); else await Playback.pause();
                       }}
                       className="p-1 text-gray-700 hover:text-blue-600"
-                      title={playerState.paused ? 'Reproducir' : 'Pausar'}
+                      title={
+                        playerState.paused
+                          ? t('common.protocol.specialMoments.player.play')
+                          : t('common.protocol.specialMoments.player.pause')
+                      }
                     >
                       {playerState.paused ? <Play size={16} /> : <Pause size={16} />}
                     </button>
                     <button
                       onClick={async () => { await Playback.stop(); setPlayerOpen(false); }}
                       className="p-1 text-gray-500 hover:text-gray-700"
-                      title="Detener"
+                      title={t('common.protocol.specialMoments.player.stop')}
                     >
                       <X size={16} />
                     </button>
@@ -1404,7 +1389,9 @@ const MomentosEspeciales = () => {
                   </div>
                   {/* Volumen */}
                   <div className="space-y-1">
-                    <div className="text-xs text-gray-600">Volumen</div>
+                    <div className="text-xs text-gray-600">
+                      {t('common.protocol.specialMoments.player.volume')}
+                    </div>
                     <input
                       type="range"
                       min={0}
@@ -1419,43 +1406,56 @@ const MomentosEspeciales = () => {
               )}
             </div>
           ) : null}
-          {/* Inspiracin */}
-          <div className="space-y-2">
+          {/* Inspiración Musical - Todas las sugerencias visibles */}
+          <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <Sparkles size={16} className="text-yellow-600" />
-              <h3 className="font-medium">Inspiracin</h3>
+              <Sparkles size={18} className="text-yellow-500" />
+              <h3 className="font-semibold text-lg">
+                {t('common.protocol.specialMoments.labels.musicInspiration')}
+              </h3>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-4">
               {Object.entries(MUSIC_INSPIRATION[activeTab] || {}).map(([cat, songs]) => (
-                <div key={cat} className="border rounded-md">
-                  <button
-                    className="w-full text-left px-3 py-2 bg-gray-50 hover:bg-gray-100 flex items-center justify-between"
-                    onClick={() => setOpenCategory((prev) => (prev === cat ? null : cat))}
-                  >
-                    <span className="font-medium text-sm">{cat}</span>
-                    <span className="text-xs text-gray-500">
-                      {openCategory === cat ? 'Ocultar' : 'Ver sugerencias'}
-                    </span>
-                  </button>
-                  {openCategory === cat && (
-                    <ul className="divide-y">
+                <div 
+                  key={cat} 
+                  className="rounded-xl border border-soft bg-gradient-to-br from-[var(--color-surface)] to-[var(--color-surface)]/80 overflow-hidden shadow-md hover:shadow-lg transition-all duration-300"
+                >
+                  <div className="bg-gradient-to-r from-yellow-500/10 to-amber-500/10 px-4 py-3 border-b border-soft">
+                    <h4 className="font-semibold text-base flex items-center gap-2">
+                      <Music size={16} className="text-yellow-600" />
+                      {cat}
+                    </h4>
+                  </div>
+                  <div className="p-3">
+                    <div className="grid gap-2">
                       {songs.map((s, idx) => (
-                        <li
+                        <div
                           key={`${cat}-${idx}`}
-                          className="p-2 flex items-center justify-between gap-2"
+                          className="group flex items-center justify-between gap-3 p-3 rounded-lg bg-white/50 hover:bg-yellow-50/50 border border-transparent hover:border-yellow-200 transition-all duration-200"
                         >
-                          <div className="min-w-0">
-                            <div className="truncate text-sm font-medium">
-                              {s.title} <span className="text-gray-500">- {s.artist}</span>
+                          <div className="min-w-0 flex-1">
+                            <div className="font-medium text-sm text-gray-900 truncate">
+                              {s.title}
+                            </div>
+                            <div className="text-xs text-gray-600 truncate">
+                              {s.artist}
                             </div>
                             {s.tags?.length ? (
-                              <div className="text-xs text-gray-500 truncate">
-                                {s.tags.join(' · ')}
+                              <div className="flex flex-wrap gap-1 mt-1">
+                                {s.tags.map((tag, tagIdx) => (
+                                  <span
+                                    key={tagIdx}
+                                    className="inline-block px-2 py-0.5 text-[10px] rounded-full bg-yellow-100 text-yellow-700"
+                                  >
+                                    {tag}
+                                  </span>
+                                ))}
                               </div>
                             ) : null}
                           </div>
                           <Button
-                            className="text-xs py-1 px-2"
+                            size="sm"
+                            className="flex-shrink-0 bg-yellow-500 hover:bg-yellow-600 text-white shadow-sm"
                             onClick={() => {
                               if (!moments[activeTab]?.length) {
                                 addMoment(activeTab, {
@@ -1472,96 +1472,161 @@ const MomentosEspeciales = () => {
                                     song: `${s.title} - ${s.artist}`,
                                   });
                               }
-                            }}
-                          >
-                            Usar
-                          </Button>
-                        </li>
+                          toast.success(
+                            t('common.protocol.specialMoments.toasts.songApplied')
+                          );
+                        }}
+                      >
+                        {t('common.protocol.specialMoments.buttons.use')}
+                      </Button>
+                    </div>
                       ))}
-                    </ul>
-                  )}
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* IA */}
-          <div className="space-y-2">
+          {/* Búsqueda con IA */}
+          <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <Sparkles size={16} className="text-purple-600" />
-              <h3 className="font-medium">Encuentra la Cancin perfecta (IA)</h3>
+              <Sparkles size={18} className="text-purple-600" />
+              <h3 className="font-semibold text-lg">
+                {t('common.protocol.specialMoments.labels.aiTitle')}
+              </h3>
             </div>
-            <div className="flex flex-wrap items-center gap-2 text-sm">
-              <label className="text-gray-600">Idioma</label>
-              <select
-                className="border rounded px-2 py-1"
-                value={aiLanguage}
-                onChange={(e) => setAiLanguage(e.target.value)}
-              >
-                <option value="es">Espaol</option>
-                <option value="en">Ingls</option>
-              </select>
-              <label className="text-gray-600">Tempo</label>
-              <select
-                className="border rounded px-2 py-1"
-                value={aiTempo}
-                onChange={(e) => setAiTempo(e.target.value)}
-              >
-                <option value="">Cualquiera</option>
-                <option value="lento">Lento</option>
-                <option value="medio">Medio</option>
-                <option value="rpido">Rpido</option>
-              </select>
-              <label className="text-gray-600">Dcada</label>
-              <select
-                className="border rounded px-2 py-1"
-                value={aiEra}
-                onChange={(e) => setAiEra(e.target.value)}
-              >
-                <option value="">Cualquiera</option>
-                <option value="80s">80s</option>
-                <option value="90s">90s</option>
-                <option value="2000s">2000s</option>
-                <option value="2010s">2010s</option>
-                <option value="actual">Actual</option>
-              </select>
-              <label className="text-gray-600">Gnero</label>
-              <select
-                className="border rounded px-2 py-1"
-                value={aiGenre}
-                onChange={(e) => setAiGenre(e.target.value)}
-              >
-                <option value="">Cualquiera</option>
-                <option value="pop">Pop</option>
-                <option value="rock">Rock</option>
-                <option value="jazz">Jazz</option>
-                <option value="latino">Latino</option>
-                <option value="clsica">Clsica</option>
-                <option value="indie">Indie</option>
-                <option value="r&b">R&B</option>
-              </select>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+              <div>
+                <label className="text-xs text-gray-600 block mb-1">
+                  {t('common.protocol.specialMoments.labels.language')}
+                </label>
+                <select
+                  className="w-full border rounded px-2 py-1 text-sm"
+                  value={aiLanguage}
+                  onChange={(e) => setAiLanguage(e.target.value)}
+                >
+                  <option value="es">
+                    {t('common.protocol.specialMoments.options.languages.es')}
+                  </option>
+                  <option value="en">
+                    {t('common.protocol.specialMoments.options.languages.en')}
+                  </option>
+                </select>
+              </div>
+              <div>
+                <label className="text-xs text-gray-600 block mb-1">
+                  {t('common.protocol.specialMoments.labels.tempo')}
+                </label>
+                <select
+                  className="w-full border rounded px-2 py-1 text-sm"
+                  value={aiTempo}
+                  onChange={(e) => setAiTempo(e.target.value)}
+                >
+                  <option value="">
+                    {t('common.protocol.specialMoments.options.tempo.any')}
+                  </option>
+                  <option value="slow">
+                    {t('common.protocol.specialMoments.options.tempo.slow')}
+                  </option>
+                  <option value="medium">
+                    {t('common.protocol.specialMoments.options.tempo.medium')}
+                  </option>
+                  <option value="fast">
+                    {t('common.protocol.specialMoments.options.tempo.fast')}
+                  </option>
+                </select>
+              </div>
+              <div>
+                <label className="text-xs text-gray-600 block mb-1">
+                  {t('common.protocol.specialMoments.labels.era')}
+                </label>
+                <select
+                  className="w-full border rounded px-2 py-1 text-sm"
+                  value={aiEra}
+                  onChange={(e) => setAiEra(e.target.value)}
+                >
+                  <option value="">
+                    {t('common.protocol.specialMoments.options.era.any')}
+                  </option>
+                  <option value="80s">
+                    {t('common.protocol.specialMoments.options.era.80s')}
+                  </option>
+                  <option value="90s">
+                    {t('common.protocol.specialMoments.options.era.90s')}
+                  </option>
+                  <option value="2000s">
+                    {t('common.protocol.specialMoments.options.era.2000s')}
+                  </option>
+                  <option value="2010s">
+                    {t('common.protocol.specialMoments.options.era.2010s')}
+                  </option>
+                  <option value="current">
+                    {t('common.protocol.specialMoments.options.era.current')}
+                  </option>
+                </select>
+              </div>
+              <div>
+                <label className="text-xs text-gray-600 block mb-1">
+                  {t('common.protocol.specialMoments.labels.genre')}
+                </label>
+                <select
+                  className="w-full border rounded px-2 py-1 text-sm"
+                  value={aiGenre}
+                  onChange={(e) => setAiGenre(e.target.value)}
+                >
+                  <option value="">
+                    {t('common.protocol.specialMoments.options.genre.any')}
+                  </option>
+                  <option value="pop">
+                    {t('common.protocol.specialMoments.options.genre.pop')}
+                  </option>
+                  <option value="rock">
+                    {t('common.protocol.specialMoments.options.genre.rock')}
+                  </option>
+                  <option value="jazz">
+                    {t('common.protocol.specialMoments.options.genre.jazz')}
+                  </option>
+                  <option value="latin">
+                    {t('common.protocol.specialMoments.options.genre.latin')}
+                  </option>
+                  <option value="classical">
+                    {t('common.protocol.specialMoments.options.genre.classical')}
+                  </option>
+                  <option value="indie">
+                    {t('common.protocol.specialMoments.options.genre.indie')}
+                  </option>
+                  <option value="rnb">
+                    {t('common.protocol.specialMoments.options.genre.rnb')}
+                  </option>
+                </select>
+              </div>
             </div>
             <div className="flex gap-2 items-start">
               <textarea
                 rows={2}
                 value={aiPrompt}
                 onChange={(e) => setAiPrompt(e.target.value)}
-                placeholder="Describe el momento: 'primer baile, balada en espaol'"
+                placeholder={t('common.protocol.specialMoments.placeholders.aiPrompt')}
                 className="flex-1 border rounded px-3 py-2"
               />
               <button
                 onClick={handleAISearch}
                 className="bg-purple-600 text-white px-3 py-2 rounded flex items-center gap-1"
               >
-                <Sparkles size={16} /> Buscar con IA
+                <Sparkles size={16} /> {t('common.protocol.specialMoments.buttons.searchWithAI')}
               </button>
             </div>
-            {aiLoading && <p className="text-sm text-gray-500">Buscando recomendaciones...</p>}
+            {aiLoading && (
+              <p className="text-sm text-gray-500">
+                {t('common.protocol.specialMoments.ai.loading')}
+              </p>
+            )}
             {aiError && <p className="text-sm text-red-600">{aiError}</p>}
             {aiSongs.length > 0 && (
               <div className="border rounded-md overflow-hidden">
                 <div className="bg-gray-50 p-2 border-b text-sm font-medium">
-                  Recomendaciones de IA
+                  {t('common.protocol.specialMoments.ai.resultsTitle')}
                   <button
                     onClick={() => setAiSongs([])}
                     className="float-right text-gray-500 hover:text-gray-700"
@@ -1588,7 +1653,7 @@ const MomentosEspeciales = () => {
                             <div className="text-xs text-gray-600 line-clamp-2">{s.reason}</div>
                           )}
                           <div className="text-xs text-gray-500 truncate mt-1">
-                            Ver en:
+                            {t('common.protocol.specialMoments.labels.viewOn')}{' '}
                             <a
                               className="ml-1 hover:underline"
                               href={`https://www.youtube.com/results?search_query=${encodeURIComponent(`${s.title} ${s.artist || ''}`)}`}
@@ -1619,7 +1684,11 @@ const MomentosEspeciales = () => {
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
                           <button
-                            title={playingId === s.id ? 'Pausar' : 'Reproducir'}
+                            title={
+                              playingId === s.id
+                                ? t('common.protocol.specialMoments.player.pause')
+                                : t('common.protocol.specialMoments.player.play')
+                            }
                             onClick={() => togglePreview(s)}
                             className="text-gray-500 hover:text-purple-600 p-1"
                           >
@@ -1631,8 +1700,8 @@ const MomentosEspeciales = () => {
                               if (!moments[activeTab]?.length) {
                                 addMoment(activeTab, {
                                   order: 1,
-                                  title: 'Nuevo momento',
-                                  song: `${s.title}${s.artist ? ' - ' + s.artist : ''}`,
+                                  title: t('common.protocol.specialMoments.defaults.momentTitle'),
+                                  song: `${s.title}${s.artist ? ` - ${s.artist}` : ''}`,
                                   time: '',
                                 });
                               } else {
@@ -1640,12 +1709,12 @@ const MomentosEspeciales = () => {
                                 if (last)
                                   updateMoment(activeTab, last.id, {
                                     ...last,
-                                    song: `${s.title}${s.artist ? ' - ' + s.artist : ''}`,
+                                    song: `${s.title}${s.artist ? ` - ${s.artist}` : ''}`,
                                   });
                               }
                             }}
                           >
-                            Usar
+                            {t('common.protocol.specialMoments.buttons.use')}
                           </Button>
                         </div>
                       </div>
@@ -1662,7 +1731,7 @@ const MomentosEspeciales = () => {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Buscar Cancin por nombre..."
+              placeholder={t('common.protocol.specialMoments.placeholders.searchSong')}
               className="flex-1 border rounded px-3 py-2"
               onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
             />
@@ -1670,19 +1739,23 @@ const MomentosEspeciales = () => {
               onClick={handleSearch}
               className="bg-blue-600 text-white px-3 py-2 rounded flex items-center gap-1"
             >
-              <SearchIcon size={16} /> Buscar
+              <SearchIcon size={16} /> {t('common.app.search')}
             </button>
           </div>
 
           {/* Estado búsqueda */}
-          {loadingSearch && <p className="text-sm text-gray-500">Buscando...</p>}
+          {loadingSearch && (
+            <p className="text-sm text-gray-500">
+              {t('common.protocol.specialMoments.search.loading')}
+            </p>
+          )}
           {errorSearch && <p className="text-sm text-red-600">{errorSearch}</p>}
 
           {/* Resultados búsqueda */}
           {results.length > 0 && (
             <div className="border rounded-md overflow-hidden">
               <div className="bg-gray-50 p-2 border-b text-sm font-medium">
-                Resultados
+                {t('common.protocol.specialMoments.search.resultsTitle')}
                 <button
                   onClick={() => {
                     setResults([]);
@@ -1743,7 +1816,11 @@ const MomentosEspeciales = () => {
                       </div>
 
                       <button
-                        title={playingId === song.id ? 'Pausar' : 'Reproducir'}
+                        title={
+                          playingId === song.id
+                            ? t('common.protocol.specialMoments.player.pause')
+                            : t('common.protocol.specialMoments.player.play')
+                        }
                         onClick={() => togglePreview(song)}
                         className="text-gray-500 hover:text-blue-600 p-1"
                       >
@@ -1756,7 +1833,7 @@ const MomentosEspeciales = () => {
                           if (!moments[activeTab]?.length) {
                             addMoment(activeTab, {
                               order: 1,
-                              title: 'Nuevo momento',
+                              title: t('common.protocol.specialMoments.defaults.momentTitle'),
                               song: `${song.title} - ${song.artist}`,
                               time: '',
                             });
@@ -1773,7 +1850,7 @@ const MomentosEspeciales = () => {
                           stopAudio();
                         }}
                       >
-                        Usar
+                        {t('common.protocol.specialMoments.buttons.use')}
                       </button>
                     </div>
                   </li>
@@ -1791,7 +1868,10 @@ const MomentosEspeciales = () => {
                   try {
                     const current = (blocks || []).find((b) => (b.id || b.key) === activeTab);
                     if (!current) return;
-                    const newName = prompt('Nuevo nombre de la seccin:', current.name || '');
+                    const newName = prompt(
+                      t('common.protocol.specialMoments.prompts.renameSection'),
+                      current.name || ''
+                    );
                     if (!newName) return;
                     renameBlock(current.id || current.key, newName);
                   } catch {}
@@ -1802,11 +1882,18 @@ const MomentosEspeciales = () => {
                     if (!Array.isArray(blocks) || !blocks.length) return;
                     const idx = blocks.findIndex((b) => (b.id || b.key) === activeTab);
                     if (idx === -1) return;
-                    const action = prompt('Accin: eliminar | mover-izquierda | mover-derecha');
+                    const action = prompt(t('common.protocol.specialMoments.prompts.blockAction'));
                     if (!action) return;
                     const lower = action.trim().toLowerCase();
                     if (lower.startsWith('elimi')) {
-                      if (!confirm(`Eliminar seccin "${blocks[idx].name}"?`)) return;
+                      if (
+                        !confirm(
+                          t('common.protocol.specialMoments.prompts.deleteSection', {
+                            name: blocks[idx].name,
+                          })
+                        )
+                      )
+                        return;
                       const nextIdx = idx > 0 ? idx - 1 : (blocks.length > 1 ? 1 : -1);
                       removeBlock(blocks[idx].id || blocks[idx].key);
                       if (nextIdx !== -1 && blocks[nextIdx]) setActiveTab(blocks[nextIdx].id || blocks[nextIdx].key);
@@ -1819,20 +1906,20 @@ const MomentosEspeciales = () => {
                     }
                   } catch {}
                 }}
-                title="Doble clic para renombrar seccin (clic derecho para ms opciones)"
+                title={t('common.protocol.specialMoments.tooltips.blockHeader')}
               >
-                {blocks?.find((b) => (b.id || b.key) === activeTab)?.name || 'Momentos'}
+                {blocks?.find((b) => (b.id || b.key) === activeTab)?.name || t('common.protocol.specialMoments.title')}
               </h3>
               <Button
                 onClick={handleAddMoment}
                 className="py-1 px-3 text-sm flex items-center gap-1"
               >
-                <Plus size={14} /> Aadir momento
+                <Plus size={14} /> {t('common.protocol.specialMoments.buttons.addMoment')}
               </Button>
             </div>
 
             <p className="text-xs text-gray-500">
-              Consejo: doble clic sobre el nombre de la seccin para renombrar. Clic derecho para eliminar o mover la seccin. Usa “Dup →” para duplicar un momento en otra seccin y “Mov →” para moverlo.
+              {t('common.protocol.specialMoments.helperTexts.sectionTip')}
             </p>
 
             <div className="space-y-3">
@@ -1853,13 +1940,13 @@ const MomentosEspeciales = () => {
                                 title: e.target.value,
                               })
                             }
-                            placeholder="Ttulo del momento"
+                            placeholder={t('common.protocol.specialMoments.placeholders.momentTitle')}
                           />
 
                           <div className="mt-2 flex flex-wrap gap-2">
                             <div className="flex-1 min-w-[200px]">
                               <div className="text-xs text-gray-500 mb-1 flex items-center gap-1">
-                                <Music size={12} /> Cancin
+                                <Music size={12} /> {t('common.protocol.specialMoments.labels.song')}
                               </div>
                               <input
                                 type="text"
@@ -1871,7 +1958,7 @@ const MomentosEspeciales = () => {
                                     song: e.target.value,
                                   })
                                 }
-                                placeholder="Nombre de la Cancin"
+                                placeholder={t('common.protocol.specialMoments.placeholders.song')}
                               />
                               {/* Si pega un enlace de Spotify vlido, mstrams el reproductor embebido */}
                               {(() => {
@@ -1889,8 +1976,7 @@ const MomentosEspeciales = () => {
                                       loading="lazy"
                                     />
                                     <div className="text-[11px] text-gray-500 mt-1">
-                                      Pegaste un enlace de Spotify. Se mstra un reproductor de
-                                      vista previa.
+                                      {t('common.protocol.specialMoments.helperTexts.spotifyEmbed')}
                                     </div>
                                   </div>
                                 );
@@ -1898,7 +1984,9 @@ const MomentosEspeciales = () => {
                             </div>
 
                             <div className="w-24">
-                              <div className="text-xs text-gray-500 mb-1">Hora</div>
+                              <div className="text-xs text-gray-500 mb-1">
+                                {t('common.protocol.specialMoments.labels.time')}
+                              </div>
                               <input
                                 type="text"
                                 className="w-full border rounded px-2 py-1 text-sm"
@@ -1909,12 +1997,14 @@ const MomentosEspeciales = () => {
                                     time: e.target.value,
                                   })
                                 }
-                                placeholder="hh:mm"
+                                placeholder={t('common.protocol.specialMoments.placeholders.time')}
                               />
                             </div>
 
                             <div className="w-28">
-                              <div className="text-xs text-gray-500 mb-1">Duracin</div>
+                              <div className="text-xs text-gray-500 mb-1">
+                                {t('common.protocol.specialMoments.labels.duration')}
+                              </div>
                               <input
                                 type="text"
                                 className="w-full border rounded px-2 py-1 text-sm"
@@ -1925,16 +2015,38 @@ const MomentosEspeciales = () => {
                                     duration: e.target.value,
                                   })
                                 }
-                                placeholder="ej. 10 min"
+                                placeholder={t('common.protocol.specialMoments.placeholders.duration')}
                               />
                             </div>
                           </div>
                         </div>
                         {(() => {
-                          const recipientMode = moment.recipientId ? 'guest' : moment.recipientName ? 'custom' : 'none';
-                          const selectedValue = recipientMode === 'guest' ? String(moment.recipientId) : recipientMode === 'custom' ? '__custom' : '';
-                          const selectedGuest = selectedValue && selectedValue !== '__custom' ? guestOptionMap.get(selectedValue) : null;
-                          const buttonLabel = selectedGuest?.name || moment.recipientName || 'Destinatario';
+                          const recipientMode = moment.recipientRole
+                            ? 'role'
+                            : moment.recipientId
+                            ? 'guest'
+                            : moment.recipientName
+                            ? 'custom'
+                            : 'none';
+                          const selectedValue =
+                            recipientMode === 'guest'
+                              ? String(moment.recipientId)
+                              : recipientMode === 'custom'
+                              ? '__custom'
+                              : recipientMode === 'role'
+                              ? `__role__${moment.recipientRole}`
+                              : '';
+                          const selectedGuest =
+                            recipientMode === 'guest' && selectedValue && selectedValue !== '__custom'
+                              ? guestOptionMap.get(selectedValue)
+                              : null;
+                          const buttonLabel =
+                            recipientMode === 'role'
+                              ? recipientRoleMap.get(moment.recipientRole) ||
+                                t('common.protocol.specialMoments.labels.recipientRoleFallback')
+                              : selectedGuest?.name ||
+                                moment.recipientName ||
+                                t('common.protocol.specialMoments.labels.recipientDefault');
                           return (
                             <div className="mt-3">
                               <button
@@ -1948,44 +2060,75 @@ const MomentosEspeciales = () => {
                                 className="text-xs text-blue-600 hover:underline"
                               >
                                 {recipientPanelsOpen[moment.id]
-                                  ? 'Ocultar destinatario'
-                                  : `Destinatario: ${buttonLabel}`}
+                                  ? t('common.protocol.specialMoments.toggles.hideRecipient')
+                                  : t('common.protocol.specialMoments.labels.recipientSummary', {
+                                      label: buttonLabel,
+                                    })}
                               </button>
                               {recipientPanelsOpen[moment.id] && (
                                 <div className="mt-2 space-y-2 rounded border border-gray-200 bg-gray-50 p-3">
-                                  <div className="text-xs text-gray-500">Selecciona a quién va dirigido este momento (opcional)</div>
+                                  <div className="text-xs text-gray-500">
+                                    {t('common.protocol.specialMoments.labels.recipientHint')}
+                                  </div>
                                   <select
                                     className="w-full border rounded px-2 py-1 text-sm"
                                     value={selectedValue}
                                     onChange={(e) => {
                                       const value = e.target.value;
-                                      if (!value || value === '') {
+                                      if (!value) {
                                         updateMoment(activeTab, moment.id, {
                                           ...moment,
                                           recipientId: '',
                                           recipientName: '',
+                                          recipientRole: '',
                                         });
                                       } else if (value === '__custom') {
                                         updateMoment(activeTab, moment.id, {
                                           ...moment,
                                           recipientId: '',
+                                          recipientRole: '',
                                           recipientName: moment.recipientName || '',
+                                        });
+                                      } else if (value.startsWith('__role__')) {
+                                        const roleValue = value.replace('__role__', '');
+                                        updateMoment(activeTab, moment.id, {
+                                          ...moment,
+                                          recipientRole: roleValue,
+                                          recipientId: '',
+                                          recipientName: '',
                                         });
                                       } else {
                                         const guest = guestOptionMap.get(value);
                                         updateMoment(activeTab, moment.id, {
                                           ...moment,
                                           recipientId: value,
+                                          recipientRole: '',
                                           recipientName: guest?.name || guest?.email || '',
                                         });
                                       }
                                     }}
                                   >
-                                    <option value="">Sin destinatario</option>
-                                    <option value="__custom">Especificar manualmente</option>
+                                    <option value="">
+                                      {t('common.protocol.specialMoments.options.recipient.none')}
+                                    </option>
+                                    <option value="__custom">
+                                      {t('common.protocol.specialMoments.options.recipient.custom')}
+                                    </option>
+                                    {recipientRoleOptions.map((role) => (
+                                      <option key={role.value} value={`__role__${role.value}`}>
+                                        {t('common.protocol.specialMoments.options.recipient.rolePrefix', {
+                                          role: role.label,
+                                        })}
+                                      </option>
+                                    ))}
                                     {recipientOptions.map((option) => (
                                       <option key={option.value} value={option.value}>
-                                        {option.label} {option.raw?.table ? `· Mesa ${option.raw.table}` : ''}
+                                        {option.label}{' '}
+                                        {option.raw?.table
+                                          ? t('common.protocol.specialMoments.options.recipient.table', {
+                                              table: option.raw.table,
+                                            })
+                                          : ''}
                                       </option>
                                     ))}
                                   </select>
@@ -1993,12 +2136,15 @@ const MomentosEspeciales = () => {
                                     <input
                                       type="text"
                                       className="w-full border rounded px-2 py-1 text-sm"
-                                      placeholder="Nombre o rol del destinatario"
+                                      placeholder={t(
+                                        'common.protocol.specialMoments.placeholders.recipientManual'
+                                      )}
                                       value={moment.recipientName || ''}
                                       onChange={(e) =>
                                         updateMoment(activeTab, moment.id, {
                                           ...moment,
                                           recipientId: '',
+                                          recipientRole: '',
                                           recipientName: e.target.value,
                                         })
                                       }
@@ -2006,7 +2152,10 @@ const MomentosEspeciales = () => {
                                   )}
                                   {selectedGuest && (
                                     <div className="text-xs text-gray-500">
-                                      Mesa: {selectedGuest.table || selectedGuest.tableId || '—'} · Dieta: {selectedGuest.dietaryRestrictions || '—'}
+                                      {t('common.protocol.specialMoments.helperTexts.recipientDetails', {
+                                        table: selectedGuest.table || selectedGuest.tableId || '—',
+                                        diet: selectedGuest.dietaryRestrictions || '—',
+                                      })}
                                     </div>
                                   )}
                                   <div className="flex items-center gap-2">
@@ -2017,11 +2166,12 @@ const MomentosEspeciales = () => {
                                         updateMoment(activeTab, moment.id, {
                                           ...moment,
                                           recipientId: '',
+                                          recipientRole: '',
                                           recipientName: '',
                                         })
                                       }
                                     >
-                                      Limpiar
+                                      {t('common.protocol.specialMoments.buttons.clear')}
                                     </button>
                                   </div>
                                 </div>
@@ -2031,85 +2181,25 @@ const MomentosEspeciales = () => {
                         })()}
 
 
-                        <div className="flex flex-col gap-1">
-                          <button
-                            onClick={() => removeMoment(activeTab, moment.id)}
-                            className="text-gray-400 hover:text-red-500 p-1"
-                            title="Eliminar"
-                          >
-                            <Trash2 size={16} />
-                          </button>
-
-                          <button
-                            onClick={() => duplicateMoment(activeTab, moment.id, activeTab)}
-                            className="text-gray-400 hover:text-blue-500 p-1"
-                            title="Duplicar"
-                          >
-                            <Edit2 size={16} />
-                          </button>
-
-                          <button
-                            onClick={() => {
-                              try {
-                                const names = (blocks || []).map((b) => `${b.name}:::${b.id}`);
-                                const choice = prompt(`Duplicar en (escribe tal cual):\n${names.map(n => '- ' + n.split(':::')[0]).join('\n')}`);
-                                if (!choice) return;
-                                const found = (blocks || []).find((b) => b.name === choice || `${b.name}:::${b.id}` === choice);
-                                if (!found) return;
-                                duplicateMoment(activeTab, moment.id, found.id);
-                              } catch {}
-                            }}
-                            className="text-gray-400 hover:text-blue-500 p-1"
-                            title="Duplicar en otra seccin"
-                          >
-                            <span className="text-[11px]">Dup ?</span>
-                          </button>
-
-                          <button
-                            onClick={() => {
-                              try {
-                                const names = (blocks || []).map((b) => `${b.name}:::${b.id}`);
-                                const choice = prompt(`Mover a (escribe tal cual):\n${names.map(n => '- ' + n.split(':::')[0]).join('\n')}`);
-                                if (!choice) return;
-                                const found = (blocks || []).find((b) => b.name === choice || `${b.name}:::${b.id}` === choice);
-                                if (!found) return;
-                                duplicateMoment(activeTab, moment.id, found.id);
-                                removeMoment(activeTab, moment.id);
-                              } catch {}
-                            }}
-                            className="text-gray-400 hover:text-blue-600 p-1"
-                            title="Mover a otra seccin"
-                          >
-                            <span className="text-[11px]">Mov ?</span>
-                          </button>
-
-                          {idx > 0 && (
-                            <button
-                              onClick={() => reorderMoment(activeTab, moment.id, 'up')}
-                              className="text-gray-400 hover:text-blue-600 p-1"
-                              title="Mover arriba"
-                            >
-                              <ChevronUp size={16} />
-                            </button>
-                          )}
-
-                          {idx < moments[activeTab].length - 1 && (
-                            <button
-                              onClick={() => reorderMoment(activeTab, moment.id, 'down')}
-                              className="text-gray-400 hover:text-blue-600 p-1"
-                              title="Mover abajo"
-                            >
-                              <ChevronDown size={16} />
-                            </button>
-                          )}
-                        </div>
+                        <MomentActions
+                          canMoveUp={idx > 0}
+                          canMoveDown={idx < (moments?.[activeTab]?.length || 0) - 1}
+                          onMoveUp={() => reorderMoment(activeTab, moment.id, 'up')}
+                          onMoveDown={() => reorderMoment(activeTab, moment.id, 'down')}
+                          onDuplicateHere={() => handleDuplicateSameBlock(moment)}
+                          onDuplicateElse={() => openActionPanel(moment.id, 'duplicate')}
+                          onMoveElse={() => openActionPanel(moment.id, 'move')}
+                          onDelete={() => removeMoment(activeTab, moment.id)}
+                        />
                       </div>
                     </div>
                   ))
               ) : (
                 <div className="text-center py-6 text-gray-500">
-                  <p>No hay momentos en esta seccin.</p>
-                  <p className="text-sm mt-1">Haz clic en "Aadir momento" para crear uno nuevo.</p>
+                  <p>{t('common.protocol.specialMoments.empty.title')}</p>
+                  <p className="text-sm mt-1">
+                    {t('common.protocol.specialMoments.empty.subtitle')}
+                  </p>
                 </div>
               )}
             </div>
@@ -2121,30 +2211,3 @@ const MomentosEspeciales = () => {
 };
 
 export default MomentosEspeciales;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

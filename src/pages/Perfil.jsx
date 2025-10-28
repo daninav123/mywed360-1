@@ -126,18 +126,77 @@ function Perfil() {
   const handleBillingChange = (e) =>
     setBilling((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
+  const accountFields = [
+    { name: 'name', labelKey: 'profile.account.name', defaultValue: 'Nombre' },
+    { name: 'linkedAccount', labelKey: 'profile.account.linkedAccount', defaultValue: 'Cuenta vinculada' },
+    { name: 'planner', labelKey: 'profile.account.planner', defaultValue: 'Wedding planner vinculada' },
+    { name: 'helpers', labelKey: 'profile.account.helpers', defaultValue: 'Ayudantes vinculados' },
+    { name: 'email', labelKey: 'profile.account.email', defaultValue: 'Correo electrónico', type: 'email' },
+    {
+      name: 'whatsNumber',
+      labelKey: 'profile.account.whatsapp',
+      defaultValue: 'Número WhatsApp personal',
+      placeholderKey: 'profile.account.whatsappPlaceholder',
+      placeholderDefault: '+34xxxxxxxxx',
+    },
+    {
+      name: 'password',
+      labelKey: 'profile.account.password',
+      defaultValue: 'Reestablecer contraseña',
+      type: 'password',
+    },
+  ];
+
+  const weddingFields = [
+    { name: 'coupleName', labelKey: 'profile.wedding.coupleName', defaultValue: 'Nombre de la pareja' },
+    { name: 'celebrationPlace', labelKey: 'profile.wedding.celebrationPlace', defaultValue: 'Lugar de la celebración' },
+    { name: 'celebrationAddress', labelKey: 'profile.wedding.celebrationAddress', defaultValue: 'Dirección de la celebración' },
+    { name: 'banquetPlace', labelKey: 'profile.wedding.banquetPlace', defaultValue: 'Lugar del banquete' },
+    { name: 'receptionAddress', labelKey: 'profile.wedding.receptionAddress', defaultValue: 'Dirección del banquete' },
+    { name: 'schedule', labelKey: 'profile.wedding.schedule', defaultValue: 'Horario (ceremonia/recepción)' },
+    { name: 'weddingDate', labelKey: 'profile.wedding.date', defaultValue: 'Fecha de la boda', type: 'date' },
+    { name: 'rsvpDeadline', labelKey: 'profile.wedding.rsvp', defaultValue: 'Fecha límite RSVP', type: 'date' },
+    { name: 'giftAccount', labelKey: 'profile.wedding.giftAccount', defaultValue: 'Cuenta de regalos' },
+    { name: 'transportation', labelKey: 'profile.wedding.transportation', defaultValue: 'Transporte / alojamiento' },
+    { name: 'weddingStyle', labelKey: 'profile.wedding.style', defaultValue: 'Estilo de la boda' },
+    {
+      name: 'colorScheme',
+      labelKey: 'profile.wedding.colorScheme',
+      defaultValue: 'Paleta de colores (web)',
+      placeholderKey: 'profile.wedding.colorSchemePlaceholder',
+      placeholderDefault: 'Blanco y dorado',
+    },
+    {
+      name: 'numGuests',
+      labelKey: 'profile.wedding.numGuests',
+      defaultValue: 'Número de invitados',
+      type: 'number',
+      readOnly: true,
+    },
+  ];
+
+  const billingFields = [
+    { name: 'fullName', labelKey: 'profile.billing.fullName', defaultValue: 'Nombre completo' },
+    { name: 'address', labelKey: 'profile.billing.address', defaultValue: 'Dirección' },
+    { name: 'zip', labelKey: 'profile.billing.zip', defaultValue: 'CP' },
+    { name: 'city', labelKey: 'profile.billing.city', defaultValue: 'Localidad' },
+    { name: 'state', labelKey: 'profile.billing.state', defaultValue: 'Provincia' },
+    { name: 'country', labelKey: 'profile.billing.country', defaultValue: 'País' },
+    { name: 'dni', labelKey: 'profile.billing.dni', defaultValue: 'DNI' },
+  ];
+
   const handleCreateInvite = async () => {
     if (!plannerEmail) return;
     let wid = weddingId;
     const effectiveUid = fallbackUid;
     if (!wid && !effectiveUid) {
-      toast.error('Tu sesi\u00F3n a\u00FAn no est\u00E1 lista. Int\u00E9ntalo de nuevo.');
+      toast.error(t('profile.errors.sessionNotReady', { defaultValue: 'Tu sesión aún no está lista. Inténtalo de nuevo.' }));
       return;
     }
     if (!wid) {
       wid = await getWeddingIdForOwner(effectiveUid);
       if (!wid) {
-        toast.error('No se encontr\u00F3 tu boda.');
+        toast.error(t('profile.errors.weddingNotFound', { defaultValue: 'No se encontró tu boda.' }));
         return;
       }
     }
@@ -148,14 +207,14 @@ function Perfil() {
       setInviteLink(link);
       try {
         await navigator.clipboard.writeText(link);
-        toast.success('Enlace copiado');
+        toast.success(t('profile.collaborators.linkCopied', { defaultValue: 'Enlace copiado' }));
       } catch {
-        toast.success('Enlace generado');
+        toast.success(t('profile.collaborators.linkCreated', { defaultValue: 'Enlace generado' }));
       }
       setPlannerEmail('');
     } catch (err) {
       console.error(err);
-      toast.error('Error creando invitaci\u00F3n');
+      toast.error(t('profile.errors.creatingInvite', { defaultValue: 'Error creando invitación' }));
     } finally {
       setInviteLoading(false);
     }
@@ -164,23 +223,23 @@ function Perfil() {
   const saveProfile = async () => {
     const uid = fallbackUid;
     if (!uid) {
-      toast.error('No se pudo determinar tu usuario');
+      toast.error(t('profile.errors.userNotFound', { defaultValue: 'No se pudo determinar tu usuario' }));
       return;
     }
     // Validaciones rÍpidas
     try {
       if (account.email && !/^\S+@\S+\.\S+$/.test(account.email)) {
-        toast.error('Correo electrnico invÍlido');
+        toast.error(t('profile.errors.invalidEmail', { defaultValue: 'Correo electrónico inválido' }));
         return;
       }
       if (account.whatsNumber && !/^\+?[0-9]{8,15}$/.test(account.whatsNumber.trim())) {
-        toast.error('WhatsApp debe tener formato internacional, e.g. +349XXXXXXXX');
+        toast.error(t('profile.errors.invalidWhatsapp', { defaultValue: 'WhatsApp debe tener formato internacional, ej. +349XXXXXXXX' }));
         return;
       }
       if (weddingInfo.weddingDate) {
         const d = new Date(weddingInfo.weddingDate);
         if (isNaN(d.getTime())) {
-          toast.error('Fecha de boda invÍlida');
+          toast.error(t('profile.errors.invalidWeddingDate', { defaultValue: 'Fecha de boda inválida' }));
           return;
         }
       }
@@ -195,13 +254,13 @@ function Perfil() {
         await updateDoc(doc(db, 'weddings', weddingId), {
           weddingInfo: { ...weddingInfo, importantInfo },
         });
-      toast.success('Perfil guardado');
+      toast.success(t('profile.success.saved', { defaultValue: 'Perfil guardado' }));
       try {
         setLastSavedAt(new Date());
       } catch {}
     } catch (e) {
       console.error(e);
-      toast.error('Error al guardar el perfil');
+      toast.error(t('profile.errors.savingProfile', { defaultValue: 'Error al guardar el perfil' }));
     }
   };
 
@@ -259,7 +318,7 @@ function Perfil() {
         }
       } catch (e) {
         console.error('Error cargando perfil', e);
-        toast.error('Error al cargar el perfil');
+        toast.error(t('profile.errors.loadingProfile', { defaultValue: 'Error al cargar el perfil' }));
       }
     };
     // Preferencias musicales ahora se gestionan desde Momentos Especiales
@@ -274,15 +333,15 @@ function Perfil() {
         </div>
         {lastSavedAt && (
           <div className="text-sm text-muted">
-            {t('profile.lastSaved', { defaultValue: '�ltimo guardado:' })}{' '}
+            {t('profile.lastSaved', { defaultValue: 'Último guardado:' })}{' '}
             {new Date(lastSavedAt).toLocaleString()}
           </div>
         )}
       </div>
-      {/* Suscripci�n Real con Stripe */}
+      {/* Suscripción Real con Stripe */}
       <div className="space-y-4">
         <h2 className="text-lg font-medium">
-          {t('profile.subscription.type', { defaultValue: 'Tipo de suscripci�n' })}
+          {t('profile.subscription.type', { defaultValue: 'Tipo de suscripción' })}
         </h2>
         <SubscriptionWidget />
       </div>
@@ -291,46 +350,21 @@ function Perfil() {
       <Card className="space-y-4">
         <h2 className="text-lg font-medium">{t('profile.account.title', { defaultValue: 'Información de la cuenta' })}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Input label="Nombre" name="name" value={account.name} onChange={handleAccountChange} />
-          <Input
-            label="Cuenta vinculada"
-            name="linkedAccount"
-            value={account.linkedAccount}
-            onChange={handleAccountChange}
-          />
-          <Input
-            label="Wedding planner vinculada"
-            name="planner"
-            value={account.planner}
-            onChange={handleAccountChange}
-          />
-          <Input
-            label="Ayudantes vinculados"
-            name="helpers"
-            value={account.helpers}
-            onChange={handleAccountChange}
-          />
-          <Input
-            label={'Correo electr\u00F3nico'}
-            name="email"
-            type="email"
-            value={account.email}
-            onChange={handleAccountChange}
-          />
-          <Input
-            label={'N\u00FAmero WhatsApp personal'}
-            name="whatsNumber"
-            placeholder="+34xxxxxxxxx"
-            value={account.whatsNumber}
-            onChange={handleAccountChange}
-          />
-          <Input
-            label={'Reestablecer contrase\u00F1a'}
-            name="password"
-            type="password"
-            value={account.password}
-            onChange={handleAccountChange}
-          />
+          {accountFields.map((field) => (
+            <Input
+              key={field.name}
+              label={t(field.labelKey, { defaultValue: field.defaultValue })}
+              name={field.name}
+              type={field.type}
+              placeholder={
+                field.placeholderKey
+                  ? t(field.placeholderKey, { defaultValue: field.placeholderDefault })
+                  : field.placeholder
+              }
+              value={account[field.name] ?? ''}
+              onChange={handleAccountChange}
+            />
+          ))}
         </div>
         <div className="text-right">
           <Button onClick={saveProfile}>{t('app.save', { defaultValue: 'Guardar' })}</Button>
@@ -340,88 +374,22 @@ function Perfil() {
       <Card className="space-y-4">
         <h2 className="text-lg font-medium">{t('profile.wedding.title', { defaultValue: 'Información de la boda' })}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Input
-            label="Nombre de la pareja"
-            name="coupleName"
-            value={weddingInfo.coupleName}
-            onChange={handleWeddingChange}
-          />
-          <Input
-            label={'Lugar de la celebraci\u00F3n'}
-            name="celebrationPlace"
-            value={weddingInfo.celebrationPlace}
-            onChange={handleWeddingChange}
-          />
-          <Input
-            label={'Direcci\u00F3n de la celebraci\u00F3n'}
-            name="celebrationAddress"
-            value={weddingInfo.celebrationAddress}
-            onChange={handleWeddingChange}
-          />
-          <Input
-            label="Lugar del banquete"
-            name="banquetPlace"
-            value={weddingInfo.banquetPlace}
-            onChange={handleWeddingChange}
-          />
-          <Input
-            label={'Direcci\u00F3n del banquete'}
-            name="receptionAddress"
-            value={weddingInfo.receptionAddress}
-            onChange={handleWeddingChange}
-          />
-          <Input
-            label={'Horario (ceremonia/recepci\u00F3n)'}
-            name="schedule"
-            value={weddingInfo.schedule}
-            onChange={handleWeddingChange}
-          />
-          <Input
-            label="Fecha de la boda"
-            name="weddingDate"
-            type="date"
-            value={weddingInfo.weddingDate}
-            onChange={handleWeddingChange}
-          />
-          <Input
-            label={'Fecha l\u00EDmite RSVP'}
-            name="rsvpDeadline"
-            type="date"
-            value={weddingInfo.rsvpDeadline}
-            onChange={handleWeddingChange}
-          />
-          <Input
-            label="Cuenta de regalos"
-            name="giftAccount"
-            value={weddingInfo.giftAccount}
-            onChange={handleWeddingChange}
-          />
-          <Input
-            label={'Transporte / alojamiento'}
-            name="transportation"
-            value={weddingInfo.transportation}
-            onChange={handleWeddingChange}
-          />
-          <Input
-            label={'Estilo de la boda'}
-            name="weddingStyle"
-            value={weddingInfo.weddingStyle}
-            onChange={handleWeddingChange}
-          />
-          <Input
-            label={'Paleta de colores (web)'}
-            name="colorScheme"
-            placeholder="Blanco y dorado"
-            value={weddingInfo.colorScheme}
-            onChange={handleWeddingChange}
-          />
-          <Input
-            label={'N\u00FAmero de invitados'}
-            name="numGuests"
-            type="number"
-            value={weddingInfo.numGuests}
-            readOnly
-          />
+          {weddingFields.map((field) => (
+            <Input
+              key={field.name}
+              label={t(field.labelKey, { defaultValue: field.defaultValue })}
+              name={field.name}
+              type={field.type}
+              placeholder={
+                field.placeholderKey
+                  ? t(field.placeholderKey, { defaultValue: field.placeholderDefault })
+                  : field.placeholder
+              }
+              value={weddingInfo[field.name] ?? ''}
+              readOnly={field.readOnly}
+              onChange={field.readOnly ? undefined : handleWeddingChange}
+            />
+          ))}
         </div>
         <div className="text-right">
           <Button onClick={saveProfile}>{t('app.save', { defaultValue: 'Guardar' })}</Button>
@@ -432,9 +400,9 @@ function Perfil() {
         <h2 className="text-lg font-medium">{t('profile.wedding.important', { defaultValue: 'Información importante de la boda' })}</h2>
         <textarea
           className="w-full min-h-[150px] border rounded-md p-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder={
-            'Datos o detalles clave (alergias, proveedores cr\u00EDticos, horarios especiales, etc.)'
-          }
+          placeholder={t('profile.wedding.notesPlaceholder', {
+            defaultValue: 'Datos o detalles clave (alergias, proveedores críticos, horarios especiales, etc.)',
+          })}
           value={importantInfo}
           onChange={(e) => setImportantInfo(e.target.value)}
         />
@@ -446,7 +414,7 @@ function Perfil() {
       <Card className="space-y-4">
         <h2 className="text-lg font-medium flex items-center">
           <Users className="w-5 h-5 mr-2" />
-          Colaboradores
+          {t('profile.collaborators.title', { defaultValue: 'Colaboradores' })}
         </h2>
         <div className="flex flex-col sm:flex-row items-center gap-2 mb-4">
           <Input
@@ -489,9 +457,15 @@ function Perfil() {
                       disabled={c.role === 'owner'}
                       className="border rounded px-2 py-1 text-sm"
                     >
-                      <option value="owner">Pareja</option>
-                      <option value="planner">Wedding Planner</option>
-                      <option value="helper">Ayudante</option>
+                      <option value="owner">
+                        {t('profile.collaborators.roleOwner', { defaultValue: 'Pareja' })}
+                      </option>
+                      <option value="planner">
+                        {t('profile.collaborators.rolePlanner', { defaultValue: 'Wedding Planner' })}
+                      </option>
+                      <option value="helper">
+                        {t('profile.collaborators.roleHelper', { defaultValue: 'Ayudante' })}
+                      </option>
                     </select>
                   </td>
                   <td className="p-2 text-center">
@@ -512,40 +486,17 @@ function Perfil() {
       </Card>
 
       <Card className="space-y-4">
-        <h2 className="text-lg font-medium">{t('profile.billing.title', { defaultValue: 'Datos de facturacin' })}</h2>
+        <h2 className="text-lg font-medium">{t('profile.billing.title', { defaultValue: 'Datos de facturación' })}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Input
-            label="Nombre completo"
-            name="fullName"
-            value={billing.fullName}
-            onChange={handleBillingChange}
-          />
-          <Input
-            label={'Direcci\u00F3n'}
-            name="address"
-            value={billing.address}
-            onChange={handleBillingChange}
-          />
-          <Input label="CP" name="zip" value={billing.zip} onChange={handleBillingChange} />
-          <Input
-            label="Localidad"
-            name="city"
-            value={billing.city}
-            onChange={handleBillingChange}
-          />
-          <Input
-            label="Provincia"
-            name="state"
-            value={billing.state}
-            onChange={handleBillingChange}
-          />
-          <Input
-            label={'Pa\u00EDs'}
-            name="country"
-            value={billing.country}
-            onChange={handleBillingChange}
-          />
-          <Input label="DNI" name="dni" value={billing.dni} onChange={handleBillingChange} />
+          {billingFields.map((field) => (
+            <Input
+              key={field.name}
+              label={t(field.labelKey, { defaultValue: field.defaultValue })}
+              name={field.name}
+              value={billing[field.name] ?? ''}
+              onChange={handleBillingChange}
+            />
+          ))}
         </div>
         <div className="text-right">
           <Button onClick={saveProfile}>{t('app.save', { defaultValue: 'Guardar' })}</Button>
@@ -556,4 +507,3 @@ function Perfil() {
 }
 
 export default Perfil;
-
