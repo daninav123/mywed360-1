@@ -24,6 +24,7 @@ import Invitaciones from './pages/Invitaciones';
 import More from './pages/More';
 import Perfil from './pages/Perfil';
 import GestionProveedores from './pages/GestionProveedores.jsx';
+import WeddingServices from './pages/WeddingServices.jsx';
 import ResetPassword from './pages/ResetPassword.jsx';
 import PublicWedding from './pages/PublicWedding';
 import RSVPConfirm from './pages/RSVPConfirm';
@@ -323,6 +324,8 @@ function App() {
                   <Route path="rsvp/dashboard" element={<RSVPDashboard />} />
                   <Route path="proveedores" element={<GestionProveedores />} />
                   <Route path="proveedores/contratos" element={<Contratos />} />
+                  <Route path="servicios" element={<WeddingServices />} />
+                  <Route path="wedding-services" element={<Navigate to="/servicios" replace />} />
                   <Route path="subscription" element={<SubscriptionDashboard />} />
 
                   {/* Protocolo */}
