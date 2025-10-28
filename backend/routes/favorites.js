@@ -25,8 +25,14 @@ router.get('/', async (req, res) => {
       });
     }
 
-    // Ruta: weddings/{weddingId}/favorites
-    const snapshot = await db.collection('weddings').doc(weddingId).collection('favorites').get();
+    // Ruta: weddings/{weddingId}/suppliers/favorites
+    const snapshot = await db
+      .collection('weddings')
+      .doc(weddingId)
+      .collection('suppliers')
+      .doc('favorites')
+      .collection('items')
+      .get();
 
     // Filtrar expirados y ordenar
     const now = new Date();
@@ -84,7 +90,12 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ error: 'invalid-supplier' });
     }
 
-    const favoritesRef = db.collection('weddings').doc(weddingId).collection('favorites');
+    const favoritesRef = db
+      .collection('weddings')
+      .doc(weddingId)
+      .collection('suppliers')
+      .doc('favorites')
+      .collection('items');
 
     // Verificar si ya existe en favoritos
     const existingSnapshot = await favoritesRef
@@ -162,7 +173,12 @@ router.delete('/:supplierId', async (req, res) => {
       });
     }
 
-    const favoritesRef = db.collection('weddings').doc(weddingId).collection('favorites');
+    const favoritesRef = db
+      .collection('weddings')
+      .doc(weddingId)
+      .collection('suppliers')
+      .doc('favorites')
+      .collection('items');
 
     // Buscar el favorito
     const snapshot = await favoritesRef.where('supplierId', '==', supplierId).limit(1).get();
@@ -206,7 +222,12 @@ router.get('/check/:supplierId', async (req, res) => {
       return res.json({ isFavorite: false }); // Sin boda = sin favoritos
     }
 
-    const favoritesRef = db.collection('weddings').doc(weddingId).collection('favorites');
+    const favoritesRef = db
+      .collection('weddings')
+      .doc(weddingId)
+      .collection('suppliers')
+      .doc('favorites')
+      .collection('items');
 
     const snapshot = await favoritesRef.where('supplierId', '==', supplierId).limit(1).get();
 

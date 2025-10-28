@@ -39,7 +39,9 @@ export async function cleanupExpiredFavorites() {
         const favoritesSnapshot = await db
           .collection('weddings')
           .doc(weddingId)
-          .collection('favorites')
+          .collection('suppliers')
+          .doc('favorites')
+          .collection('items')
           .get();
 
         // Filtrar expirados
