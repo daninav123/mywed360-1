@@ -14,7 +14,8 @@ const _backoffBackend = (ms = 60_000) => {
 const _candidateBackoff = new Map();
 const DEFAULT_CANDIDATE_BACKOFF = 10 * 60_000;
 
-const candidateKey = (base) => (base === undefined || base === null || base === '' ? '__proxy__' : String(base));
+const candidateKey = (base) =>
+  base === undefined || base === null || base === '' ? '__proxy__' : String(base);
 const candidateAvailable = (base) => Date.now() > (_candidateBackoff.get(candidateKey(base)) || 0);
 const backoffCandidate = (base, ms = DEFAULT_CANDIDATE_BACKOFF) => {
   _candidateBackoff.set(candidateKey(base), Date.now() + ms);
@@ -27,9 +28,26 @@ const clearCandidateBackoff = (base) => {
 // Si se quiere forzar NewsAPI, definir VITE_NEWSAPI_KEY en build.
 const API_KEY = import.meta.env.VITE_NEWSAPI_KEY || '';
 const ENV = typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env : {};
-const DISABLE_RENDER_IN_DEV = ['1', 'true', 'yes', 'on'].includes(
-  String(ENV.VITE_BLOG_DISABLE_RENDER_DEV || '').trim().toLowerCase()
-);
+const isTruthyFlag = (value) =>
+  ['1', 'true', 'yes', 'on'].includes(
+    String(value || '')
+      .trim()
+      .toLowerCase()
+  );
+const RENDER_BACKENDS = [
+  'https://maloveapp-backend.onrender.com',
+  'https://mywed360-backend.onrender.com',
+];
+const ENABLE_RENDER_IN_DEV = (() => {
+  if (isTruthyFlag(ENV?.VITE_BLOG_DISABLE_RENDER_DEV)) return false;
+  if (isTruthyFlag(ENV?.VITE_BLOG_ENABLE_RENDER_DEV)) return true;
+  return false;
+})();
+const isRenderCandidate = (base) => {
+  if (!base) return false;
+  const normalized = String(base).replace(/\/$/, '');
+  return RENDER_BACKENDS.includes(normalized) || /onrender\.com$/i.test(normalized);
+};
 
 function normalizeLang(lang) {
   if (!lang) return 'es';
@@ -49,33 +67,32 @@ async function fetchFromBackend({ page, pageSize, language, skipLocalCandidates 
   // a la ruta relativa '/api/wedding-news' gestionada por el proxy de Vite.
   const normalizedEnvBase = envBase ? envBase.replace(/\/$/, '') : undefined;
   const normalizedDerivedBase = derivedBase ? derivedBase.replace(/\/$/, '') : undefined;
+  const remoteCandidates = import.meta?.env?.PROD || ENABLE_RENDER_IN_DEV ? RENDER_BACKENDS : [];
   const rawCandidates = [
     normalizedEnvBase,
     normalizedDerivedBase,
     'http://localhost:4004',
     '', // Proxy de Vite o mismo origen como penúltimo recurso
-    'https://maloveapp-backend.onrender.com',
+    ...remoteCandidates,
   ];
   let candidates = Array.from(new Set(rawCandidates.filter((v) => v !== undefined && v !== null)));
   if (skipLocalCandidates) {
     console.info('[blogService] Local backend in backoff, saltando candidatos locales');
     candidates = candidates.filter(
       (candidate) =>
-        candidate &&
-        !/^https?:\/\/localhost(?::4004)?$/i.test(candidate) &&
-        candidate !== ''
+        candidate && !/^https?:\/\/localhost(?::4004)?$/i.test(candidate) && candidate !== ''
     );
   }
-  // En desarrollo podemos desactivar Render con flag explícito, pero por defecto lo dejamos como último recurso real.
-  if (import.meta?.env?.DEV && DISABLE_RENDER_IN_DEV) {
-    candidates = candidates.filter((b) => !/^https:\/\/mywed360-backend\.onrender\.com$/i.test(b || ''));
+  // En desarrollo priorizamos el backend local; solo alcanzamos Render si se habilita explícitamente.
+  if (import.meta?.env?.DEV && !ENABLE_RENDER_IN_DEV) {
+    candidates = candidates.filter((candidate) => !isRenderCandidate(candidate));
   }
   // En producción priorizamos Render por fiabilidad; en desarrollo mantenemos prioridad local/env
   if (import.meta?.env?.PROD) {
     try {
-      const RENDER_BASE = 'https://maloveapp-backend.onrender.com';
-      if (candidates.includes(RENDER_BASE)) {
-        candidates = [RENDER_BASE, ...candidates.filter((b) => b !== RENDER_BASE)];
+      const normalizedRender = RENDER_BACKENDS[0];
+      if (normalizedRender && candidates.includes(normalizedRender)) {
+        candidates = [normalizedRender, ...candidates.filter((b) => b !== normalizedRender)];
       }
     } catch {}
   }
@@ -117,9 +134,15 @@ async function fetchFromBackend({ page, pageSize, language, skipLocalCandidates 
       sawError = true;
       backoffCandidate(base);
     } catch (error) {
-      console.warn('[blogService] error al consultar wedding-news', { base, message: error?.message });
+      console.warn('[blogService] error al consultar wedding-news', {
+        base,
+        message: error?.message,
+      });
       sawError = true;
-      backoffCandidate(base, error?.code === 'ECONNABORTED' ? 2 * 60_000 : DEFAULT_CANDIDATE_BACKOFF);
+      backoffCandidate(
+        base,
+        error?.code === 'ECONNABORTED' ? 2 * 60_000 : DEFAULT_CANDIDATE_BACKOFF
+      );
     }
   }
   // Si hubo errores en candidatos, devolver null para diferenciar de "vacío"
@@ -341,7 +364,8 @@ function normalizeBlogPost(raw) {
     return fallback.published;
   })();
 
-  const title = cleanPlainText(entry.title || entry.name || entry.headline || fallback.title) || fallback.title;
+  const title =
+    cleanPlainText(entry.title || entry.name || entry.headline || fallback.title) || fallback.title;
   const description = cleanPlainText(
     entry.description ||
       entry.summary ||
@@ -596,7 +620,11 @@ export async function fetchWeddingNews(page = 1, pageSize = 10, language = 'es')
     }
     if (!API_KEY) {
       if (fallbackBatch.length) {
-        console.info('[blogService] usando fallback wedding-news', { page, lang, size: fallbackBatch.length });
+        console.info('[blogService] usando fallback wedding-news', {
+          page,
+          lang,
+          size: fallbackBatch.length,
+        });
         return fallbackBatch;
       }
       return [];
@@ -604,12 +632,19 @@ export async function fetchWeddingNews(page = 1, pageSize = 10, language = 'es')
   }
 
   if (Array.isArray(rssData) && rssData.length > 0) {
-    return maybeTranslatePosts(rssData.map((post) => normalizeBlogPost(post, lang)), lang);
+    return maybeTranslatePosts(
+      rssData.map((post) => normalizeBlogPost(post, lang)),
+      lang
+    );
   }
 
   if (!API_KEY) {
     if (fallbackBatch.length) {
-      console.info('[blogService] usando fallback wedding-news', { page, lang, size: fallbackBatch.length });
+      console.info('[blogService] usando fallback wedding-news', {
+        page,
+        lang,
+        size: fallbackBatch.length,
+      });
       return fallbackBatch;
     }
     return [];
@@ -619,16 +654,27 @@ export async function fetchWeddingNews(page = 1, pageSize = 10, language = 'es')
     const news = await fetchFromNewsApi(page, pageSize, lang);
     if (!news.length) {
       if (fallbackBatch.length) {
-        console.info('[blogService] usando fallback wedding-news', { page, lang, size: fallbackBatch.length });
+        console.info('[blogService] usando fallback wedding-news', {
+          page,
+          lang,
+          size: fallbackBatch.length,
+        });
         return fallbackBatch;
       }
       return [];
     }
-    return maybeTranslatePosts(news.map((entry) => normalizeBlogPost(entry, lang)), lang);
+    return maybeTranslatePosts(
+      news.map((entry) => normalizeBlogPost(entry, lang)),
+      lang
+    );
   } catch (error) {
     console.warn('[blogService] NewsAPI fallback failed', error);
     if (fallbackBatch.length) {
-      console.info('[blogService] usando fallback wedding-news', { page, lang, size: fallbackBatch.length });
+      console.info('[blogService] usando fallback wedding-news', {
+        page,
+        lang,
+        size: fallbackBatch.length,
+      });
       return fallbackBatch;
     }
     return [];

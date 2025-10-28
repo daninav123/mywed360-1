@@ -1,4 +1,14 @@
-import { Plus, ChevronUp, Search, Users, CheckCircle, Clock, Sparkles, TrendingUp, Building2 } from 'lucide-react';
+import {
+  Plus,
+  ChevronUp,
+  Search,
+  Users,
+  CheckCircle,
+  Clock,
+  Sparkles,
+  TrendingUp,
+  Building2,
+} from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -77,9 +87,7 @@ const ShortlistList = ({ items, loading, error, t }) => {
   if (!items || items.length === 0) {
     return (
       <Card className="border border-dashed border-soft bg-surface/80">
-        <p className="text-sm text-muted">
-          {t('common.suppliers.overview.shortlist.empty')}
-        </p>
+        <p className="text-sm text-muted">{t('common.suppliers.overview.shortlist.empty')}</p>
       </Card>
     );
   }
@@ -118,7 +126,9 @@ const ShortlistList = ({ items, loading, error, t }) => {
 const ServiceOptionsModal = ({ open, card, onClose, t }) => {
   if (!open || !card) return null;
 
-  const pendingCandidates = (card.providers || []).filter((prov) => !isConfirmedStatus(prov.status));
+  const pendingCandidates = (card.providers || []).filter(
+    (prov) => !isConfirmedStatus(prov.status)
+  );
   const confirmed = card.confirmed ? [card.confirmed] : [];
 
   return (
@@ -138,10 +148,9 @@ const ServiceOptionsModal = ({ open, card, onClose, t }) => {
               <Card key={prov.id} className="border border-soft bg-surface">
                 <p className="text-sm font-medium text-body">{prov.name}</p>
                 <p className="text-xs text-muted">
-                  {(prov.status && prov.status !== '')
+                  {prov.status && prov.status !== ''
                     ? prov.status
-                    : t('common.suppliers.overview.status.pending')}
-                  {' '}
+                    : t('common.suppliers.overview.status.pending')}{' '}
                   · {prov.service || card.label}
                 </p>
                 {prov.notes && <p className="mt-2 text-sm text-body/75">{prov.notes}</p>}
@@ -159,10 +168,9 @@ const ServiceOptionsModal = ({ open, card, onClose, t }) => {
               <Card key={prov.id} className="border border-soft bg-surface">
                 <p className="text-sm font-medium text-body">{prov.name}</p>
                 <p className="text-xs text-muted">
-                  {(prov.status && prov.status !== '')
+                  {prov.status && prov.status !== ''
                     ? prov.status
-                    : t('common.suppliers.overview.status.pending')}
-                  {' '}
+                    : t('common.suppliers.overview.status.pending')}{' '}
                   · {prov.service || card.label}
                 </p>
                 {prov.notes && <p className="mt-2 text-sm text-body/75">{prov.notes}</p>}
@@ -216,8 +224,23 @@ const ServiceOptionsModal = ({ open, card, onClose, t }) => {
 
 const Proveedores = () => {
   const { t, currentLanguage } = useTranslations();
-  const { providers, filteredProviders, loading, error, searchTerm, setSearchTerm, loadProviders, addProvider, updateProvider } = useProveedores();
-  const { shortlist, loading: shortlistLoading, error: shortlistError, addEntry: addToShortlist } = useSupplierShortlist();
+  const {
+    providers,
+    filteredProviders,
+    loading,
+    error,
+    searchTerm,
+    setSearchTerm,
+    loadProviders,
+    addProvider,
+    updateProvider,
+  } = useProveedores();
+  const {
+    shortlist,
+    loading: shortlistLoading,
+    error: shortlistError,
+    addEntry: addToShortlist,
+  } = useSupplierShortlist();
   const { activeWedding } = useWedding();
   const { info: weddingProfile } = useActiveWeddingInfo();
   // Sistema de búsqueda híbrido (prioriza BD propia)
@@ -225,7 +248,8 @@ const Proveedores = () => {
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState(null);
   const [searchBreakdown, setSearchBreakdown] = useState(null);
-  
+  const [searchMode, setSearchMode] = useState('auto'); // 'auto', 'database', 'internet'
+
   const clearAISearch = () => {
     setAiResults([]);
     setAiError(null);
@@ -314,7 +338,10 @@ const Proveedores = () => {
       const trimmed = query.trim();
       if (!trimmed) return;
       setSearchHistory((prev) => {
-        const next = [trimmed, ...prev.filter((item) => item.toLowerCase() !== trimmed.toLowerCase())].slice(0, 6);
+        const next = [
+          trimmed,
+          ...prev.filter((item) => item.toLowerCase() !== trimmed.toLowerCase()),
+        ].slice(0, 6);
         try {
           if (searchHistoryKey) localStorage.setItem(searchHistoryKey, JSON.stringify(next));
         } catch {}
@@ -383,7 +410,7 @@ const Proveedores = () => {
       profile.ceremonyLocation,
       profile.receptionVenue,
       profile.destinationCity,
-      profile.country
+      profile.country,
     ];
 
     for (const candidate of candidates) {
@@ -393,12 +420,10 @@ const Proveedores = () => {
         if (trimmedValue) return trimmedValue;
       }
       if (typeof candidate === 'object') {
-        const city =
-          typeof candidate.city === 'string' ? candidate.city.trim() : '';
+        const city = typeof candidate.city === 'string' ? candidate.city.trim() : '';
         if (city) return city;
 
-        const name =
-          typeof candidate.name === 'string' ? candidate.name.trim() : '';
+        const name = typeof candidate.name === 'string' ? candidate.name.trim() : '';
         if (name) return name;
       }
     }
@@ -431,22 +456,22 @@ const Proveedores = () => {
       try {
         setAiLoading(true);
         setAiError(null);
-        
+
         // Usar nuevo sistema híbrido (BD propia → bodas.net → internet)
         const result = await searchSuppliersHybrid(
           trimmed, // service/category
           resolvedLocation,
           enrichedQuery || '', // query adicional
           weddingProfile?.budget, // budget
-          {} // filters
+          { searchMode } // filters - incluir modo de búsqueda
         );
-        
+
         console.log('🔍 [Hybrid Search] Resultados:', result);
         console.log('📊 Breakdown:', result.breakdown);
-        
+
         setAiResults(result.suppliers || []);
         setSearchBreakdown(result.breakdown);
-        
+
         if (result.count === 0 && !silent) {
           toast.info(t('common.suppliers.overview.toasts.noResults'));
         } else if (result.count > 0) {
@@ -469,7 +494,14 @@ const Proveedores = () => {
         setAiLoading(false);
       }
     },
-    [profileSearchTokens, registerSearchQuery, resolvedLocation, setSearchTerm, weddingProfile]
+    [
+      profileSearchTokens,
+      registerSearchQuery,
+      resolvedLocation,
+      setSearchTerm,
+      weddingProfile,
+      searchMode,
+    ]
   );
 
   const totalSearchPages = useMemo(() => {
@@ -538,76 +570,77 @@ const Proveedores = () => {
   }, []);
 
   // 🆕 Marcar proveedor como contratado
-  const handleMarkAsConfirmed = useCallback(async (supplier) => {
-    if (!supplier) return;
-    
-    try {
-      // Verificar si el proveedor ya existe en nuestra base de datos
-      const existingProvider = providers.find(p => 
-        p.email === supplier.contact?.email || 
-        p.name === supplier.name
-      );
-      
-      if (existingProvider) {
-        // Actualizar proveedor existente
-        await updateProvider(existingProvider.id, {
-          status: 'Confirmado',
-          confirmedAt: new Date(),
-        });
-        
-        toast.success(`✅ ${supplier.name} marcado como contratado`);
-      } else {
-        // Crear nuevo proveedor en la base de datos
-        const newProviderData = {
-          name: supplier.name,
-          service: supplier.category || supplier.service || 'otros',
-          contact: supplier.contact?.name || supplier.name,
-          email: supplier.contact?.email || '',
-          phone: supplier.contact?.phone || '',
-          status: 'Confirmado',
-          date: new Date().toISOString(),
-          rating: supplier.metrics?.rating || 0,
-          ratingCount: supplier.metrics?.reviewCount || 0,
-          snippet: supplier.business?.description || '',
-          link: supplier.contact?.website || '',
-          image: supplier.media?.logo || '',
-          isFavorite: false,
-          confirmedAt: new Date(),
-          source: 'search', // Indica que viene de búsqueda
-          originalData: {
-            supplierId: supplier.id || supplier.slug,
-            registered: supplier.registered || false,
-            priority: supplier.priority
-          }
-        };
-        
-        await addProvider(newProviderData);
-        toast.success(`✅ ${supplier.name} agregado y marcado como contratado`);
-      }
-      
-      // Trackear la acción
-      await trackSupplierAction(supplier.id || supplier.slug, 'confirm');
-      
-      // Agregar al shortlist si no está
+  const handleMarkAsConfirmed = useCallback(
+    async (supplier) => {
+      if (!supplier) return;
+
       try {
-        await addToShortlist({
-          supplierId: supplier.id || supplier.slug,
-          supplierName: supplier.name,
-          service: supplier.category || supplier.service || 'otros',
-          notes: `Contratado el ${new Date().toLocaleDateString()}`,
-        });
-      } catch (err) {
-        console.log('[Shortlist] Ya existe o error:', err);
+        // Verificar si el proveedor ya existe en nuestra base de datos
+        const existingProvider = providers.find(
+          (p) => p.email === supplier.contact?.email || p.name === supplier.name
+        );
+
+        if (existingProvider) {
+          // Actualizar proveedor existente
+          await updateProvider(existingProvider.id, {
+            status: 'Confirmado',
+            confirmedAt: new Date(),
+          });
+
+          toast.success(`✅ ${supplier.name} marcado como contratado`);
+        } else {
+          // Crear nuevo proveedor en la base de datos
+          const newProviderData = {
+            name: supplier.name,
+            service: supplier.category || supplier.service || 'otros',
+            contact: supplier.contact?.name || supplier.name,
+            email: supplier.contact?.email || '',
+            phone: supplier.contact?.phone || '',
+            status: 'Confirmado',
+            date: new Date().toISOString(),
+            rating: supplier.metrics?.rating || 0,
+            ratingCount: supplier.metrics?.reviewCount || 0,
+            snippet: supplier.business?.description || '',
+            link: supplier.contact?.website || '',
+            image: supplier.media?.logo || '',
+            isFavorite: false,
+            confirmedAt: new Date(),
+            source: 'search', // Indica que viene de búsqueda
+            originalData: {
+              supplierId: supplier.id || supplier.slug,
+              registered: supplier.registered || false,
+              priority: supplier.priority,
+            },
+          };
+
+          await addProvider(newProviderData);
+          toast.success(`✅ ${supplier.name} agregado y marcado como contratado`);
+        }
+
+        // Trackear la acción
+        await trackSupplierAction(supplier.id || supplier.slug, 'confirm');
+
+        // Agregar al shortlist si no está
+        try {
+          await addToShortlist({
+            supplierId: supplier.id || supplier.slug,
+            supplierName: supplier.name,
+            service: supplier.category || supplier.service || 'otros',
+            notes: `Contratado el ${new Date().toLocaleDateString()}`,
+          });
+        } catch (err) {
+          console.log('[Shortlist] Ya existe o error:', err);
+        }
+
+        // Recargar proveedores
+        loadProviders();
+      } catch (error) {
+        console.error('[MarkAsConfirmed] Error:', error);
+        toast.error(`Error al marcar ${supplier.name} como contratado`);
       }
-      
-      // Recargar proveedores
-      loadProviders();
-      
-    } catch (error) {
-      console.error('[MarkAsConfirmed] Error:', error);
-      toast.error(`Error al marcar ${supplier.name} como contratado`);
-    }
-  }, [providers, updateProvider, addProvider, addToShortlist, loadProviders]);
+    },
+    [providers, updateProvider, addProvider, addToShortlist, loadProviders]
+  );
 
   const handleSaveWantedServices = useCallback(
     async (list) => {
@@ -660,11 +693,11 @@ const Proveedores = () => {
 
   // Stats calculations
   const confirmedCount = useMemo(() => {
-    return serviceCards.filter(card => card.confirmed).length;
+    return serviceCards.filter((card) => card.confirmed).length;
   }, [serviceCards]);
 
   const pendingCount = useMemo(() => {
-    return serviceCards.filter(card => !card.confirmed).length;
+    return serviceCards.filter((card) => !card.confirmed).length;
   }, [serviceCards]);
 
   const totalProviders = useMemo(() => {
@@ -691,11 +724,7 @@ const Proveedores = () => {
         actions={headerActions}
         className="layout-container space-y-6"
       >
-        {error && (
-          <Card className="border border-danger bg-danger-soft text-danger">
-            {error}
-          </Card>
-        )}
+        {error && <Card className="border border-danger bg-danger-soft text-danger">{error}</Card>}
 
         {/* Stats Cards Premium */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -717,7 +746,9 @@ const Proveedores = () => {
                 <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-success)] mb-1">
                   {t('common.suppliers.overview.metrics.confirmed')}
                 </p>
-                <p className="text-2xl font-black text-[color:var(--color-success)]">{confirmedCount}</p>
+                <p className="text-2xl font-black text-[color:var(--color-success)]">
+                  {confirmedCount}
+                </p>
               </div>
               <CheckCircle className="w-8 h-8 text-[color:var(--color-success)]/40" />
             </div>
@@ -729,7 +760,9 @@ const Proveedores = () => {
                 <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-warning)] mb-1">
                   {t('common.suppliers.overview.metrics.pending')}
                 </p>
-                <p className="text-2xl font-black text-[color:var(--color-warning)]">{pendingCount}</p>
+                <p className="text-2xl font-black text-[color:var(--color-warning)]">
+                  {pendingCount}
+                </p>
               </div>
               <Clock className="w-8 h-8 text-[color:var(--color-warning)]/40" />
             </div>
@@ -741,7 +774,9 @@ const Proveedores = () => {
                 <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-accent)] mb-1">
                   {t('common.suppliers.overview.metrics.shortlist')}
                 </p>
-                <p className="text-2xl font-black text-[color:var(--color-accent)]">{shortlistTotal}</p>
+                <p className="text-2xl font-black text-[color:var(--color-accent)]">
+                  {shortlistTotal}
+                </p>
               </div>
               <Sparkles className="w-8 h-8 text-[color:var(--color-accent)]/40" />
             </div>
@@ -776,7 +811,6 @@ const Proveedores = () => {
             </div>
 
             <div className="space-y-6">
-
               <form onSubmit={handleSearchSubmit} className="space-y-3">
                 <div className="flex flex-wrap items-center gap-3">
                   <div className="relative flex-1 min-w-[220px]">
@@ -789,6 +823,23 @@ const Proveedores = () => {
                       className="pl-10"
                     />
                   </div>
+
+                  {/* Selector de modo de búsqueda (DEBUG) */}
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs font-medium text-muted whitespace-nowrap">
+                      Buscar en:
+                    </label>
+                    <select
+                      value={searchMode}
+                      onChange={(e) => setSearchMode(e.target.value)}
+                      className="px-3 py-1.5 text-sm border border-border rounded-md bg-surface text-body focus:outline-none focus:ring-2 focus:ring-primary"
+                    >
+                      <option value="auto">🔄 Auto (Híbrido)</option>
+                      <option value="database">💾 Solo Base de Datos</option>
+                      <option value="internet">🌐 Solo Internet</option>
+                    </select>
+                  </div>
+
                   <div className="flex flex-wrap items-center gap-2">
                     <Button type="submit" size="sm" leftIcon={<Search size={16} />}>
                       {t('app.search')}
@@ -831,103 +882,130 @@ const Proveedores = () => {
               />
 
               {(aiLoading || searchCompleted) && (
-              <section className="space-y-3">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div className="space-y-1">
-                    <h3 className="text-lg font-semibold text-body">
-                      {t('common.suppliers.overview.results.title')}
-                    </h3>
-                    {searchResultsQuery && (
-                      <p className="text-xs text-muted">
-                        {t('common.suppliers.overview.results.query', {
-                          value: searchResultsQuery,
-                        })}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Mensaje de fallback eliminado - ya no se usa */}
-
-                {aiLoading ? (
-                  <Card className="border border-soft bg-surface text-sm text-muted">
-                    {t('common.suppliers.overview.results.loading')}
-                  </Card>
-                ) : aiError ? (
-                  <Card className="border border-danger bg-danger-soft text-sm text-danger">
-                    {aiError?.message || t('common.suppliers.overview.toasts.error')}
-                  </Card>
-                ) : aiResults.length === 0 ? (
-                  <Card className="border border-dashed border-soft bg-surface/80 text-sm text-muted">
-                    {t('common.suppliers.overview.results.empty')}
-                  </Card>
-                ) : (
-                  <>
-                    {/* Mostrar breakdown de resultados */}
-                    {searchBreakdown && searchBreakdown.registered + searchBreakdown.cached + searchBreakdown.internet > 0 && (
-                      <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                        <p className="text-sm text-blue-900 font-medium">
-                          {t('common.suppliers.overview.results.breakdown', {
-                            registered: searchBreakdown.registered,
-                            cached: searchBreakdown.cached,
-                            internet: searchBreakdown.internet,
+                <section className="space-y-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="space-y-1">
+                      <h3 className="text-lg font-semibold text-body">
+                        {t('common.suppliers.overview.results.title')}
+                      </h3>
+                      {searchResultsQuery && (
+                        <p className="text-xs text-muted">
+                          {t('common.suppliers.overview.results.query', {
+                            value: searchResultsQuery,
                           })}
                         </p>
-                      </div>
-                    )}
-                    
-                    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                      {paginatedResults.map((supplier) => (
-                        <SupplierCard
-                          key={supplier.id || supplier.slug || Math.random()}
-                          supplier={supplier}
-                          onContact={(contactInfo) => {
-                            // contactInfo puede ser { method, supplier } o simplemente supplier
-                            const sup = contactInfo.supplier || contactInfo;
-                            trackSupplierAction(sup.id || sup.slug, 'contact', {
-                              method: contactInfo.method || 'unknown'
-                            });
-                          }}
-                          onViewDetails={(s) => {
-                            trackSupplierAction(s.id || s.slug, 'click');
-                            handleSelectSearchResult(s);
-                          }}
-                          onMarkAsConfirmed={handleMarkAsConfirmed}
-                        />
-                      ))}
+                      )}
                     </div>
+                  </div>
 
-                    {totalSearchPages > 1 && (
-                      <div className="flex items-center justify-between gap-3 pt-2">
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant="outline"
-                          onClick={handlePrevSearchPage}
-                          disabled={searchResultsPage === 1}
-                        >
-                          {t('app.previous')}
-                        </Button>
-                        <span className="text-xs text-muted">
-                          {t('common.suppliers.overview.pagination.label', {
-                            current: searchResultsPage,
-                            total: totalSearchPages,
-                          })}
-                        </span>
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant="outline"
-                          onClick={handleNextSearchPage}
-                          disabled={searchResultsPage === totalSearchPages}
-                        >
-                          {t('app.next')}
-                        </Button>
+                  {/* Mensaje de fallback eliminado - ya no se usa */}
+
+                  {aiLoading ? (
+                    <Card className="border border-soft bg-surface text-sm text-muted">
+                      {t('common.suppliers.overview.results.loading')}
+                    </Card>
+                  ) : aiError ? (
+                    <Card className="border border-danger bg-danger-soft text-sm text-danger">
+                      {aiError?.message || t('common.suppliers.overview.toasts.error')}
+                    </Card>
+                  ) : aiResults.length === 0 ? (
+                    <Card className="border border-dashed border-soft bg-surface/80 text-sm text-muted">
+                      {t('common.suppliers.overview.results.empty')}
+                    </Card>
+                  ) : (
+                    <>
+                      {/* Mostrar breakdown de resultados + modo de búsqueda */}
+                      {searchBreakdown &&
+                        searchBreakdown.registered +
+                          searchBreakdown.cached +
+                          searchBreakdown.internet >
+                          0 && (
+                          <div className="mb-4 space-y-2">
+                            {/* Indicador de modo de búsqueda activo */}
+                            <div
+                              className={`p-2 border rounded-lg text-xs font-medium ${
+                                searchMode === 'database'
+                                  ? 'bg-purple-50 border-purple-200 text-purple-900'
+                                  : searchMode === 'internet'
+                                    ? 'bg-orange-50 border-orange-200 text-orange-900'
+                                    : 'bg-green-50 border-green-200 text-green-900'
+                              }`}
+                            >
+                              🎯 Modo de búsqueda:{' '}
+                              {searchMode === 'database'
+                                ? '💾 Solo Base de Datos'
+                                : searchMode === 'internet'
+                                  ? '🌐 Solo Internet'
+                                  : '🔄 Híbrido (Auto)'}
+                            </div>
+
+                            {/* Breakdown de resultados */}
+                            <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                              <p className="text-sm text-blue-900 font-medium">
+                                Encontrados{' '}
+                                {searchBreakdown.registered +
+                                  searchBreakdown.cached +
+                                  searchBreakdown.internet}{' '}
+                                proveedores ({searchBreakdown.registered} registrados,{' '}
+                                {searchBreakdown.cached} guardados, {searchBreakdown.internet} de
+                                internet)
+                              </p>
+                            </div>
+                          </div>
+                        )}
+
+                      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                        {paginatedResults.map((supplier) => (
+                          <SupplierCard
+                            key={supplier.id || supplier.slug || Math.random()}
+                            supplier={supplier}
+                            onContact={(contactInfo) => {
+                              // contactInfo puede ser { method, supplier } o simplemente supplier
+                              const sup = contactInfo.supplier || contactInfo;
+                              trackSupplierAction(sup.id || sup.slug, 'contact', {
+                                method: contactInfo.method || 'unknown',
+                              });
+                            }}
+                            onViewDetails={(s) => {
+                              trackSupplierAction(s.id || s.slug, 'click');
+                              handleSelectSearchResult(s);
+                            }}
+                            onMarkAsConfirmed={handleMarkAsConfirmed}
+                          />
+                        ))}
                       </div>
-                    )}
-                  </>
-                )}
-              </section>
+
+                      {totalSearchPages > 1 && (
+                        <div className="flex items-center justify-between gap-3 pt-2">
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            onClick={handlePrevSearchPage}
+                            disabled={searchResultsPage === 1}
+                          >
+                            {t('app.previous')}
+                          </Button>
+                          <span className="text-xs text-muted">
+                            {t('common.suppliers.overview.pagination.label', {
+                              current: searchResultsPage,
+                              total: totalSearchPages,
+                            })}
+                          </span>
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            onClick={handleNextSearchPage}
+                            disabled={searchResultsPage === totalSearchPages}
+                          >
+                            {t('app.next')}
+                          </Button>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </section>
               )}
             </div>
           </Card>
@@ -956,7 +1034,8 @@ const Proveedores = () => {
                   {t('common.suppliers.overview.services.title')}
                 </h2>
                 <p className="text-sm text-muted">
-                  {servicesSummary.services} · {servicesSummary.confirmed} · {servicesSummary.pending}
+                  {servicesSummary.services} · {servicesSummary.confirmed} ·{' '}
+                  {servicesSummary.pending}
                 </p>
               </div>
             </div>
@@ -965,8 +1044,12 @@ const Proveedores = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {serviceCards.map((card) => {
               const isPending = !card.confirmed;
-              const borderColor = isPending ? 'border-[var(--color-warning)]/40' : 'border-[var(--color-success)]/40';
-              const gradientFrom = isPending ? 'from-[var(--color-warning)]/10' : 'from-[var(--color-success)]/10';
+              const borderColor = isPending
+                ? 'border-[var(--color-warning)]/40'
+                : 'border-[var(--color-success)]/40';
+              const gradientFrom = isPending
+                ? 'from-[var(--color-warning)]/10'
+                : 'from-[var(--color-success)]/10';
               const shortlistLabel = t('common.suppliers.overview.services.shortlistCount', {
                 count: card.shortlist.length,
               });
@@ -975,7 +1058,7 @@ const Proveedores = () => {
                 : t('common.suppliers.overview.status.confirmed');
               const confirmedStatusLabel =
                 card.confirmed?.status || t('common.suppliers.overview.status.confirmed');
-              
+
               return (
                 <Card
                   key={card.key}
@@ -995,12 +1078,14 @@ const Proveedores = () => {
                           </p>
                         )}
                       </div>
-                      <span className={`inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full ${isPending ? 'bg-[var(--color-warning)]/15 text-[color:var(--color-warning)]' : 'bg-[var(--color-success)]/15 text-[color:var(--color-success)]'}`}>
+                      <span
+                        className={`inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full ${isPending ? 'bg-[var(--color-warning)]/15 text-[color:var(--color-warning)]' : 'bg-[var(--color-success)]/15 text-[color:var(--color-success)]'}`}
+                      >
                         {isPending ? <Clock size={12} /> : <CheckCircle size={12} />}
                         {statusLabel}
                       </span>
                     </div>
-                    
+
                     {card.confirmed ? (
                       <div className="p-3 rounded-lg bg-[var(--color-success)]/10 border border-[var(--color-success)]/20">
                         <p className="font-semibold text-body mb-1">{card.confirmed.name}</p>
@@ -1119,8 +1204,7 @@ const Proveedores = () => {
                 src={searchDrawerResult.image || DEFAULT_PROVIDER_IMAGE}
                 alt={t('common.suppliers.overview.drawer.imageAlt', {
                   name:
-                    searchDrawerResult.name ||
-                    t('common.suppliers.overview.drawer.fallbackName'),
+                    searchDrawerResult.name || t('common.suppliers.overview.drawer.fallbackName'),
                 })}
                 className="h-full w-full object-cover"
                 onError={(event) => {
@@ -1131,8 +1215,7 @@ const Proveedores = () => {
 
             <div className="space-y-2">
               <p className="text-sm text-muted">
-                {searchDrawerResult.service ||
-                  t('common.suppliers.overview.drawer.serviceUnknown')}
+                {searchDrawerResult.service || t('common.suppliers.overview.drawer.serviceUnknown')}
               </p>
               {searchDrawerResult.location && (
                 <p className="text-sm text-muted">

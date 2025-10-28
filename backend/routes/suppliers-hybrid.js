@@ -1,6 +1,6 @@
 // routes/suppliers-hybrid.js
 // 🔄 FASE 2: BÚSQUEDA HÍBRIDA (Registrados + Internet)
-// 
+//
 // Busca primero en proveedores REGISTRADOS (Firestore)
 // Si NO hay resultados (0), busca en INTERNET (Tavily)
 // Priorización: [BD PROPIA] → [BODAS.NET] → [OTROS INTERNET]
@@ -25,7 +25,7 @@ const NEUTRAL_LOCATIONS = new Set([
   'todas',
   'any',
   'cualquier',
-  'global'
+  'global',
 ]);
 
 const normalizeText = (value = '') =>
@@ -38,7 +38,7 @@ const normalizeText = (value = '') =>
 // Función auxiliar: Buscar en Tavily (copiada temporalmente)
 async function searchTavilySimple(query, location, service) {
   const apiKey = process.env.TAVILY_API_KEY;
-  
+
   if (!apiKey) {
     console.warn('⚠️ TAVILY_API_KEY no configurada, saltando búsqueda en internet');
     return [];
@@ -60,9 +60,15 @@ async function searchTavilySimple(query, location, service) {
         include_images: true,
         max_results: 20,
         exclude_domains: [
-          'wikipedia.org', 'youtube.com', 'amazon', 'pinterest',
-          'ebay', 'aliexpress', 'milanuncios', 'wallapop'
-        ]
+          'wikipedia.org',
+          'youtube.com',
+          'amazon',
+          'pinterest',
+          'ebay',
+          'aliexpress',
+          'milanuncios',
+          'wallapop',
+        ],
       }),
     });
 
@@ -83,201 +89,214 @@ async function searchTavilySimple(query, location, service) {
 router.post('/search', async (req, res) => {
   try {
     const { service, location, query, budget, filters, user_id, wedding_id } = req.body;
-    
+
+    // Extraer modo de búsqueda (auto, database, internet)
+    const searchMode = filters?.searchMode || 'auto';
+
     // Validaciones
     if (!service || !location) {
-      return res.status(400).json({ 
-        success: false, 
-        error: 'service y location son requeridos' 
+      return res.status(400).json({
+        success: false,
+        error: 'service y location son requeridos',
       });
     }
-    
+
     console.log(`\n🔍 [HYBRID-SEARCH] ${service} en ${location}`);
     console.log(`   Query: "${query || 'sin query específica'}"`);
-    console.log(`   Budget: ${budget || 'no especificado'}\n`);
-    
+    console.log(`   Budget: ${budget || 'no especificado'}`);
+    console.log(`   🎯 MODO: ${searchMode.toUpperCase()}\n`);
+
     // 🧠 CAPTURAR BÚSQUEDA PARA ANÁLISIS (async, no bloquea)
-    searchAnalyticsService.captureSearch({
-      query,
-      service,
-      location,
-      filters: { budget, ...filters },
-      user_id,
-      wedding_id
-    }).catch(err => console.error('[ANALYTICS] Error:', err));
-    
+    searchAnalyticsService
+      .captureSearch({
+        query,
+        service,
+        location,
+        filters: { budget, ...filters },
+        user_id,
+        wedding_id,
+      })
+      .catch((err) => console.error('[ANALYTICS] Error:', err));
+
     const db = admin.firestore();
-    
-    // ===== 1. BUSCAR PROVEEDORES REGISTRADOS EN FIRESTORE =====
-    console.log('📊 [FIRESTORE] Buscando proveedores por nombre...');
-    console.log(`   Servicio: "${service}" | Query: "${query || '—'}"`);
-    
-    // Traer todos los proveedores (sin filtro de categoría)
-    // Filtraremos por nombre en memoria
-    let firestoreQuery = db.collection('suppliers')
-      .limit(100); // Traer más documentos para buscar por nombre
-    
-    // Filtro por ubicación si se especifica
-    const locationValue = typeof location === 'string' ? location.trim() : location;
-    const shouldFilterByLocation = (() => {
-      if (!locationValue) return false;
-      const normalized = normalizeText(locationValue);
-      return normalized.length > 0 && !NEUTRAL_LOCATIONS.has(normalized);
-    })();
 
-    if (shouldFilterByLocation) {
-      firestoreQuery = firestoreQuery.where('location.city', '==', locationValue);
-    }
-    
-    const snapshot = await firestoreQuery.get();
-    
-    let registeredResults = snapshot.docs
-      .map(doc => {
-        const data = doc.data();
-        
-        // DEBUG: Log para ver el valor de registered
-        console.log(`[DEBUG] Proveedor: ${data.name}, registered: ${data.registered}, type: ${typeof data.registered}`);
-        
-        return {
-          id: doc.id,
-          ...data,
-          priority: data.registered === true ? 'registered' : 'cached',
-          badge: data.registered === true ? 'Verificado ✓' : 'En caché',
-          badgeType: data.registered === true ? 'success' : 'info'
-        };
-      })
-      // Filtrar por nombre/término de búsqueda
-      .filter(supplier => {
-        const supplierName = (supplier.name || '').toLowerCase();
-        const supplierDesc = (supplier.business?.description || '').toLowerCase();
-        const supplierTags = (supplier.tags || []).join(' ').toLowerCase();
-
-        const searchTokens = [];
-
-        if (service) {
-          searchTokens.push(String(service).toLowerCase().trim());
-        }
-
-        if (query && query.trim()) {
-          const normalizedQuery = String(query).toLowerCase().trim();
-          searchTokens.push(normalizedQuery);
-          searchTokens.push(
-            ...normalizedQuery
-              .split(/\s+/)
-              .map(token => token.trim())
-              .filter(Boolean)
-          );
-        }
-
-        const tokens = [...new Set(searchTokens.filter(Boolean))];
-        if (tokens.length === 0) return true;
-
-        const haystacks = [supplierName, supplierDesc, supplierTags];
-        const normalizedHaystacks = haystacks.map(normalizeText);
-
-        return tokens.some(term => {
-          const token = term.toLowerCase();
-          const normalizedToken = normalizeText(token);
-
-          return haystacks.some(h => h.includes(token)) ||
-                 normalizedHaystacks.some(h => h.includes(normalizedToken));
-        });
-      })
-      // Filtrar por status en memoria (evita índice compuesto)
-      .filter(supplier => {
-        const status = supplier.status || 'active';
-        return status === 'active' || status === 'discovered';
-      })
-      // Ordenar por matchScore en memoria (evita índice compuesto)
-      .sort((a, b) => {
-        const scoreA = a.metrics?.matchScore || 0;
-        const scoreB = b.metrics?.matchScore || 0;
-        return scoreB - scoreA; // Descendente
-      })
-      // Limitar resultados después de ordenar
-      .slice(0, 20);
-    
-
-
-      // Filtro por presupuesto
-    if (budget) {
-      registeredResults = registeredResults.filter(supplier => {
-        const minBudget = supplier.business?.minBudget || 0;
-        const maxBudget = supplier.business?.maxBudget || Infinity;
-        return minBudget <= budget && maxBudget >= budget;
-      });
-    }
-    
-    // Filtros adicionales
-    if (filters) {
-      if (filters.priceRange) {
-        registeredResults = registeredResults.filter(s => 
-          s.business?.priceRange === filters.priceRange
-        );
-      }
-      if (filters.rating) {
-        registeredResults = registeredResults.filter(s => 
-          (s.metrics?.rating || 0) >= filters.rating
-        );
-      }
-      if (filters.availability) {
-        registeredResults = registeredResults.filter(s => 
-          s.business?.availability === filters.availability
-        );
-      }
-    }
-    
-    // Separar proveedores registrados de caché
-    const trueRegistered = registeredResults.filter(r => r.registered === true);
-    const cachedResults = registeredResults.filter(r => r.registered !== true);
-    
-    console.log(`✅ [FIRESTORE] ${registeredResults.length} proveedores encontrados en base de datos`);
-    console.log(`   - Registrados reales: ${trueRegistered.length}`);
-    console.log(`   - En caché: ${cachedResults.length}`);
-    
-    // ===== 2. BUSCAR EN INTERNET SI HAY MENOS DE 5 PROVEEDORES REGISTRADOS =====
+    let registeredResults = [];
     let internetResults = [];
     let usedTavily = false;
-    
-    // Buscar en internet si hay menos de 5 proveedores registrados
+
+    // ===== 1. BUSCAR PROVEEDORES REGISTRADOS EN FIRESTORE =====
+    // (Saltar si modo es 'internet')
+    if (searchMode !== 'internet') {
+      console.log('📊 [FIRESTORE] Buscando proveedores por nombre...');
+      console.log(`   Servicio: "${service}" | Query: "${query || '—'}"`);
+
+      // Traer todos los proveedores (sin filtro de categoría)
+      // Filtraremos por nombre en memoria
+      let firestoreQuery = db.collection('suppliers').limit(100); // Traer más documentos para buscar por nombre
+
+      // Filtro por ubicación si se especifica
+      const locationValue = typeof location === 'string' ? location.trim() : location;
+      const shouldFilterByLocation = (() => {
+        if (!locationValue) return false;
+        const normalized = normalizeText(locationValue);
+        return normalized.length > 0 && !NEUTRAL_LOCATIONS.has(normalized);
+      })();
+
+      if (shouldFilterByLocation) {
+        firestoreQuery = firestoreQuery.where('location.city', '==', locationValue);
+      }
+
+      const snapshot = await firestoreQuery.get();
+
+      let registeredResults = snapshot.docs
+        .map((doc) => {
+          const data = doc.data();
+
+          // DEBUG: Log para ver el valor de registered
+          console.log(
+            `[DEBUG] Proveedor: ${data.name}, registered: ${data.registered}, type: ${typeof data.registered}`
+          );
+
+          return {
+            id: doc.id,
+            ...data,
+            priority: data.registered === true ? 'registered' : 'cached',
+            badge: data.registered === true ? 'Verificado ✓' : 'En caché',
+            badgeType: data.registered === true ? 'success' : 'info',
+          };
+        })
+        // Filtrar por nombre/término de búsqueda
+        .filter((supplier) => {
+          const supplierName = (supplier.name || '').toLowerCase();
+          const supplierDesc = (supplier.business?.description || '').toLowerCase();
+          const supplierTags = (supplier.tags || []).join(' ').toLowerCase();
+
+          const searchTokens = [];
+
+          if (service) {
+            searchTokens.push(String(service).toLowerCase().trim());
+          }
+
+          if (query && query.trim()) {
+            const normalizedQuery = String(query).toLowerCase().trim();
+            searchTokens.push(normalizedQuery);
+            searchTokens.push(
+              ...normalizedQuery
+                .split(/\s+/)
+                .map((token) => token.trim())
+                .filter(Boolean)
+            );
+          }
+
+          const tokens = [...new Set(searchTokens.filter(Boolean))];
+          if (tokens.length === 0) return true;
+
+          const haystacks = [supplierName, supplierDesc, supplierTags];
+          const normalizedHaystacks = haystacks.map(normalizeText);
+
+          return tokens.some((term) => {
+            const token = term.toLowerCase();
+            const normalizedToken = normalizeText(token);
+
+            return (
+              haystacks.some((h) => h.includes(token)) ||
+              normalizedHaystacks.some((h) => h.includes(normalizedToken))
+            );
+          });
+        })
+        // Filtrar por status en memoria (evita índice compuesto)
+        .filter((supplier) => {
+          const status = supplier.status || 'active';
+          return status === 'active' || status === 'discovered';
+        })
+        // Ordenar por matchScore en memoria (evita índice compuesto)
+        .sort((a, b) => {
+          const scoreA = a.metrics?.matchScore || 0;
+          const scoreB = b.metrics?.matchScore || 0;
+          return scoreB - scoreA; // Descendente
+        })
+        // Limitar resultados después de ordenar
+        .slice(0, 20);
+
+      // Filtro por presupuesto
+      if (budget) {
+        registeredResults = registeredResults.filter((supplier) => {
+          const minBudget = supplier.business?.minBudget || 0;
+          const maxBudget = supplier.business?.maxBudget || Infinity;
+          return minBudget <= budget && maxBudget >= budget;
+        });
+      }
+
+      // Filtros adicionales
+      if (filters) {
+        if (filters.priceRange) {
+          registeredResults = registeredResults.filter(
+            (s) => s.business?.priceRange === filters.priceRange
+          );
+        }
+        if (filters.rating) {
+          registeredResults = registeredResults.filter(
+            (s) => (s.metrics?.rating || 0) >= filters.rating
+          );
+        }
+        if (filters.availability) {
+          registeredResults = registeredResults.filter(
+            (s) => s.business?.availability === filters.availability
+          );
+        }
+      }
+
+      // Separar proveedores registrados de caché
+      const trueRegistered = registeredResults.filter((r) => r.registered === true);
+      const cachedResults = registeredResults.filter((r) => r.registered !== true);
+
+      console.log(
+        `✅ [FIRESTORE] ${registeredResults.length} proveedores encontrados en base de datos`
+      );
+      console.log(`   - Registrados reales: ${trueRegistered.length}`);
+      console.log(`   - En caché: ${cachedResults.length}`);
+    } else {
+      console.log('⏭️ [FIRESTORE] Saltando búsqueda en base de datos (modo: internet)');
+    }
+
+    // ===== 2. BUSCAR EN INTERNET =====
+    // (Saltar si modo es 'database')
     const MIN_RESULTS = 5;
-    if (trueRegistered.length < MIN_RESULTS) {
-      console.log(`\n🌐 [TAVILY] Solo ${trueRegistered.length} proveedores registrados (mínimo: ${MIN_RESULTS}). Buscando en internet...`);
-      
+    const trueRegistered = registeredResults.filter((r) => r.registered === true);
+    const shouldSearchInternet =
+      searchMode === 'internet' || (searchMode === 'auto' && trueRegistered.length < MIN_RESULTS);
+
+    if (searchMode !== 'database' && shouldSearchInternet) {
+      console.log(
+        `\n🌐 [TAVILY] Solo ${trueRegistered.length} proveedores registrados (mínimo: ${MIN_RESULTS}). Buscando en internet...`
+      );
+
       try {
-        const tavilyResults = await searchTavilySimple(
-          query || service, 
-          location, 
-          service
-        );
-        
+        const tavilyResults = await searchTavilySimple(query || service, location, service);
+
         console.log(`✅ [TAVILY] ${tavilyResults.length} proveedores encontrados en internet`);
-        
+
         // Filtrar duplicados (que ya estén en Firestore)
         const registeredEmails = new Set(
-          registeredResults
-            .map(r => r.contact?.email?.toLowerCase())
-            .filter(e => e)
+          registeredResults.map((r) => r.contact?.email?.toLowerCase()).filter((e) => e)
         );
-        
+
         const registeredUrls = new Set(
-          registeredResults
-            .map(r => r.contact?.website?.toLowerCase())
-            .filter(u => u)
+          registeredResults.map((r) => r.contact?.website?.toLowerCase()).filter((u) => u)
         );
-        
+
         // Separar resultados de bodas.net vs otros
         const bodasNetResults = [];
         const otherResults = [];
-        
-        tavilyResults.forEach(r => {
+
+        tavilyResults.forEach((r) => {
           const email = r.email?.toLowerCase();
           const url = r.url?.toLowerCase();
-          
+
           // Excluir si ya está en Firestore
           if (email && registeredEmails.has(email)) return;
           if (url && registeredUrls.has(url)) return;
-          
+
           // Separar bodas.net de otros
           if (url && url.includes('bodas.net')) {
             bodasNetResults.push(r);
@@ -285,93 +304,110 @@ router.post('/search', async (req, res) => {
             otherResults.push(r);
           }
         });
-        
+
         // PRIORIZAR: Bodas.net primero, luego otros
         const prioritizedResults = [...bodasNetResults, ...otherResults].slice(0, 8);
-        
-        console.log(`   📊 Resultados internet: ${bodasNetResults.length} de bodas.net, ${otherResults.length} otros`);
-        
-        internetResults = prioritizedResults.map(r => ({
-            // Convertir formato Tavily a formato supplier
-            name: r.title,
-            slug: null, // No tiene slug aún
-            category: service,
-            location: {
-              city: location,
-              province: '',
-              country: 'España'
-            },
-            contact: {
-              email: r.email || '',
-              website: r.url,
-              phone: r.phone || '',
-              instagram: r.instagram || ''
-            },
-            business: {
-              description: r.content?.substring(0, 200) || '',
-              priceRange: '',
-              services: []
-            },
-            media: {
-              logo: r.image || '',
-              cover: '',
-              portfolio: []
-            },
-            metrics: {
-              matchScore: Math.round((r.score || 0.5) * 100),
-              views: 0,
-              clicks: 0,
-              conversions: 0,
-              rating: 0,
-              reviewCount: 0
-            },
-            registered: false,
-            source: r.url?.includes('bodas.net') ? 'bodas-net' : 'tavily-realtime',
-            status: 'discovered',
-            priority: 'internet',
-            badge: r.url?.includes('bodas.net') ? 'Bodas.net 💒' : 'De internet 🌐',
-            badgeType: r.url?.includes('bodas.net') ? 'info' : 'default'
-          }));
-        
+
+        console.log(
+          `   📊 Resultados internet: ${bodasNetResults.length} de bodas.net, ${otherResults.length} otros`
+        );
+
+        internetResults = prioritizedResults.map((r) => ({
+          // Convertir formato Tavily a formato supplier
+          name: r.title,
+          slug: null, // No tiene slug aún
+          category: service,
+          location: {
+            city: location,
+            province: '',
+            country: 'España',
+          },
+          contact: {
+            email: r.email || '',
+            website: r.url,
+            phone: r.phone || '',
+            instagram: r.instagram || '',
+          },
+          business: {
+            description: r.content?.substring(0, 200) || '',
+            priceRange: '',
+            services: [],
+          },
+          media: {
+            logo: r.image || '',
+            cover: '',
+            portfolio: [],
+          },
+          metrics: {
+            matchScore: Math.round((r.score || 0.5) * 100),
+            views: 0,
+            clicks: 0,
+            conversions: 0,
+            rating: 0,
+            reviewCount: 0,
+          },
+          registered: false,
+          source: r.url?.includes('bodas.net') ? 'bodas-net' : 'tavily-realtime',
+          status: 'discovered',
+          priority: 'internet',
+          badge: r.url?.includes('bodas.net') ? 'Bodas.net 💒' : 'De internet 🌐',
+          badgeType: r.url?.includes('bodas.net') ? 'info' : 'default',
+        }));
+
         usedTavily = true;
         console.log(`🔄 [TAVILY] ${internetResults.length} proveedores nuevos (no duplicados)`);
-        
       } catch (error) {
         console.error('❌ [TAVILY] Error en búsqueda:', error.message);
         // Continuar con solo resultados de Firestore
       }
     } else {
-      console.log(`\n✅ [FIRESTORE] ${trueRegistered.length} proveedores registrados (≥${MIN_RESULTS}). No es necesario buscar en internet.`);
+      if (searchMode === 'database') {
+        console.log(`\n⏭️ [TAVILY] Saltando búsqueda en internet (modo: database)`);
+      } else {
+        console.log(
+          `\n✅ [FIRESTORE] ${trueRegistered.length} proveedores registrados (≥${MIN_RESULTS}). No es necesario buscar en internet.`
+        );
+      }
     }
-    
+
     // ===== 3. MEZCLAR RESULTADOS: LÓGICA INTELIGENTE =====
     let allResults;
-    
+
     if (trueRegistered.length >= MIN_RESULTS) {
       // Si hay 5+ proveedores registrados, SOLO mostrar esos
       allResults = [...trueRegistered];
-      console.log(`📊 [RESULTADO FINAL] ≥${MIN_RESULTS} registrados. Mostrando solo registrados: ${trueRegistered.length}`);
+      console.log(
+        `📊 [RESULTADO FINAL] ≥${MIN_RESULTS} registrados. Mostrando solo registrados: ${trueRegistered.length}`
+      );
     } else if (trueRegistered.length > 0) {
       // Si hay 1-4 registrados, complementar con internet
       allResults = [
-        ...trueRegistered,  // 🟢 Registrados primero
-        ...internetResults  // 🌐 Internet para complementar
+        ...trueRegistered, // 🟢 Registrados primero
+        ...internetResults, // 🌐 Internet para complementar
       ];
-      console.log(`📊 [RESULTADO FINAL] <${MIN_RESULTS} registrados. Mostrando registrados (${trueRegistered.length}) + internet (${internetResults.length})`);
+      console.log(
+        `📊 [RESULTADO FINAL] <${MIN_RESULTS} registrados. Mostrando registrados (${trueRegistered.length}) + internet (${internetResults.length})`
+      );
     } else {
       // Si NO hay registrados, mostrar caché + internet
       allResults = [
-        ...cachedResults,  // 🟡 Proveedores en caché
-        ...internetResults // 🔵 De internet
+        ...cachedResults, // 🟡 Proveedores en caché
+        ...internetResults, // 🔵 De internet
       ];
-      console.log(`📊 [RESULTADO FINAL] Sin registrados. Mostrando caché (${cachedResults.length}) + internet (${internetResults.length})`);
+      console.log(
+        `📊 [RESULTADO FINAL] Sin registrados. Mostrando caché (${cachedResults.length}) + internet (${internetResults.length})`
+      );
     }
-    
+
     console.log(`\n📊 [RESULTADO] Total: ${allResults.length} proveedores`);
     console.log(`   🟢 Registrados reales: ${trueRegistered.length}`);
-    console.log(`   🟡 En caché: ${trueRegistered.length >= MIN_RESULTS ? 0 : (trueRegistered.length > 0 ? 0 : cachedResults.length)}`);
-    console.log(`   🌐 Internet: ${trueRegistered.length >= MIN_RESULTS ? 0 : internetResults.length}`);
-    
+    console.log(
+      `   🟡 En caché: ${trueRegistered.length >= MIN_RESULTS ? 0 : trueRegistered.length > 0 ? 0 : cachedResults.length}`
+    );
+    console.log(
+      `   🌐 Internet: ${trueRegistered.length >= MIN_RESULTS ? 0 : internetResults.length}`
+    );
+
     let sourceMsg = 'Solo caché';
     if (trueRegistered.length >= MIN_RESULTS) {
       sourceMsg = `Solo registrados (≥${MIN_RESULTS})`;
@@ -381,51 +417,61 @@ router.post('/search', async (req, res) => {
       sourceMsg = 'Caché + Internet';
     }
     console.log(`   📡 Fuente: ${sourceMsg}\n`);
-    
+
     // ===== 4. ACTUALIZAR MÉTRICAS DE VISTAS (solo para registrados reales) =====
     if (trueRegistered.length > 0) {
       const batch = db.batch();
-      
-      trueRegistered.forEach(supplier => {
-        if (supplier.id) { // Solo si tiene ID (está en Firestore)
+
+      trueRegistered.forEach((supplier) => {
+        if (supplier.id) {
+          // Solo si tiene ID (está en Firestore)
           const docRef = db.collection('suppliers').doc(supplier.id);
           batch.update(docRef, {
             'metrics.views': admin.firestore.FieldValue.increment(1),
-            lastUpdated: admin.firestore.FieldValue.serverTimestamp()
+            lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
           });
         }
       });
-      
+
       await batch.commit();
-      console.log(`📊 [METRICS] Views incrementadas para ${trueRegistered.length} proveedores registrados`);
+      console.log(
+        `📊 [METRICS] Views incrementadas para ${trueRegistered.length} proveedores registrados`
+      );
     }
-    
+
     // ===== 5. RESPONDER =====
+    const cachedCount =
+      trueRegistered.length >= MIN_RESULTS
+        ? 0
+        : trueRegistered.length > 0
+          ? 0
+          : registeredResults.filter((r) => r.registered !== true).length;
+
     res.json({
       success: true,
       count: allResults.length,
       breakdown: {
         registered: trueRegistered.length,
-        cached: trueRegistered.length >= MIN_RESULTS ? 0 : (trueRegistered.length > 0 ? 0 : cachedResults.length),
-        internet: trueRegistered.length >= MIN_RESULTS ? 0 : internetResults.length
+        cached: cachedCount,
+        internet: internetResults.length,
       },
+      searchMode: searchMode, // Modo de búsqueda usado
       source: usedTavily ? 'firestore+tavily' : 'firestore',
       minResults: MIN_RESULTS,
       showingInternetComplement: trueRegistered.length > 0 && trueRegistered.length < MIN_RESULTS,
-      suppliers: allResults
+      suppliers: allResults,
     });
-    
   } catch (error) {
     console.error('❌ [HYBRID-SEARCH] Error:', error);
-    logger.error('[suppliers-hybrid] Error en búsqueda híbrida', { 
+    logger.error('[suppliers-hybrid] Error en búsqueda híbrida', {
       message: error.message,
-      stack: error.stack
+      stack: error.stack,
     });
-    
-    res.status(500).json({ 
-      success: false, 
+
+    res.status(500).json({
+      success: false,
       error: error.message,
-      details: 'Error en búsqueda híbrida de proveedores'
+      details: 'Error en búsqueda híbrida de proveedores',
     });
   }
 });
@@ -435,33 +481,33 @@ router.post('/:id/track', async (req, res) => {
   try {
     const { id } = req.params;
     const { action, userId, weddingId } = req.body;
-    
+
     // Validar action
     const validActions = ['view', 'click', 'contact'];
     if (!validActions.includes(action)) {
-      return res.status(400).json({ 
-        success: false, 
-        error: 'action debe ser view, click o contact' 
+      return res.status(400).json({
+        success: false,
+        error: 'action debe ser view, click o contact',
       });
     }
-    
+
     const db = admin.firestore();
     const docRef = db.collection('suppliers').doc(id);
-    
+
     // Verificar que existe
     const doc = await docRef.get();
     if (!doc.exists) {
-      return res.status(404).json({ 
-        success: false, 
-        error: 'Proveedor no encontrado' 
+      return res.status(404).json({
+        success: false,
+        error: 'Proveedor no encontrado',
       });
     }
-    
+
     // Actualizar métrica correspondiente
     const updateData = {
-      lastUpdated: admin.firestore.FieldValue.serverTimestamp()
+      lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
     };
-    
+
     if (action === 'click') {
       updateData['metrics.clicks'] = admin.firestore.FieldValue.increment(1);
     } else if (action === 'contact') {
@@ -469,11 +515,12 @@ router.post('/:id/track', async (req, res) => {
       updateData['metrics.lastContactDate'] = admin.firestore.FieldValue.serverTimestamp();
     }
     // 'view' ya se registra en la búsqueda
-    
+
     await docRef.update(updateData);
-    
+
     // Registrar evento detallado en nueva ubicación
-    await db.collection('suppliers')
+    await db
+      .collection('suppliers')
       .doc(id)
       .collection('analytics')
       .doc('events')
@@ -483,18 +530,17 @@ router.post('/:id/track', async (req, res) => {
         action,
         userId: userId || 'anonymous',
         weddingId: weddingId || null,
-      timestamp: admin.firestore.FieldValue.serverTimestamp()
-    });
-    
+        timestamp: admin.firestore.FieldValue.serverTimestamp(),
+      });
+
     console.log(`📊 [METRIC] ${action} registrado para ${id}`);
-    
+
     res.json({ success: true });
-    
   } catch (error) {
     console.error('❌ Error tracking metric:', error);
-    res.status(500).json({ 
-      success: false, 
-      error: error.message 
+    res.status(500).json({
+      success: false,
+      error: error.message,
     });
   }
 });
@@ -503,22 +549,21 @@ router.post('/:id/track', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     const db = admin.firestore();
     const doc = await db.collection('suppliers').doc(id).get();
-    
+
     if (!doc.exists) {
-      return res.status(404).json({ 
-        success: false, 
-        error: 'Proveedor no encontrado' 
+      return res.status(404).json({
+        success: false,
+        error: 'Proveedor no encontrado',
       });
     }
-    
+
     res.json({
       success: true,
-      supplier: { id: doc.id, ...doc.data() }
+      supplier: { id: doc.id, ...doc.data() },
     });
-    
   } catch (error) {
     console.error('Error getting supplier:', error);
     res.status(500).json({ success: false, error: error.message });
