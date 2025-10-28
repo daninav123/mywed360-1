@@ -132,7 +132,11 @@ firestore/
 │           ├─ profile/           # Perfil del usuario
 │           ├─ preferences/       # Preferencias
 │           ├─ notifications/     # Notificaciones
-│           └─ sessions/          # Sesiones activas
+│           ├─ sessions/          # Sesiones activas
+│           │
+│           └─ emails/            # 📧 EMAILS DEL USUARIO
+│               └─ {emailId}/
+│                   └─ attachments/
 │
 ├─ 💒 BODAS (CORE)
 │   └─ weddings/
@@ -157,9 +161,9 @@ firestore/
 │           ├─ finance/           # 💰 FINANZAS
 │           │   └─ {transactionId}/
 │           │
-│           ├─ emails/            # 📧 EMAILS DE LA BODA
-│           │   └─ {emailId}/
-│           │       └─ attachments/
+│           ├─ emailSettings/     # ⚙️ Configuración de email para esta boda
+│           │   ├─ signatures
+│           │   └─ templates
 │           │
 │           ├─ automation/        # 🤖 AUTOMATIZACIÓN
 │           │   ├─ rules/         # Reglas
@@ -186,61 +190,57 @@ firestore/
 │               ├─ clicks/        # Clicks
 │               └─ contacts/      # Contactos
 │
-├─ 💰 PAGOS Y SUSCRIPCIONES
-│   ├─ payments/
-│   │   └─ {paymentId}/
-│   │
-│   ├─ subscriptions/
-│   │   └─ {subscriptionId}/
-│   │       └─ history/           # Historial de cambios
-│   │
-│   ├─ invoices/
-│   │   └─ {invoiceId}/
-│   │
-│   └─ refunds/
-│       └─ {refundId}/
-│
-├─ 🔗 PARTNERS Y AFILIADOS
-│   ├─ partners/
-│   │   └─ {partnerId}/
-│   │       ├─ stats/             # Estadísticas
-│   │       └─ payouts/           # Pagos realizados
-│   │
-│   └─ discounts/
-│       └─ {discountId}/
-│           └─ usage/             # Usos del descuento
-│
-├─ 📧 EMAIL GLOBAL
-│   ├─ emailTemplates/
-│   │   └─ {templateId}/
-│   │
-│   ├─ emailQueue/                # Cola de envío
-│   │   └─ {queueId}/
-│   │
-│   └─ emailEvents/               # Eventos globales (bounces, etc.)
-│       └─ {eventId}/
-│
-├─ 🤖 AUTOMATIZACIÓN GLOBAL
-│   ├─ automationJobs/
-│   │   └─ {jobId}/
-│   │
-│   └─ automationLogs/
-│       └─ {logId}/
-│
-├─ 📊 ANALÍTICA GLOBAL
-│   ├─ analytics/
-│   │   ├─ searches/              # Búsquedas
-│   │   ├─ userActivity/          # Actividad de usuarios
-│   │   └─ performance/           # Performance del sistema
-│   │
-│   └─ feedback/
-│       └─ {feedbackId}/
-│
-└─ ⚙️ SISTEMA
-    ├─ config/                    # Configuración global
+└─ ⚙️ SISTEMA (Todo lo administrativo y global)
+    │
+    ├─ 💰 payments/               # Pagos
+    │   └─ {paymentId}/
+    │
+    ├─ 💳 subscriptions/          # Suscripciones
+    │   └─ {subscriptionId}/
+    │       └─ history/
+    │
+    ├─ 📄 invoices/               # Facturas
+    │   └─ {invoiceId}/
+    │
+    ├─ 💸 refunds/                # Devoluciones
+    │   └─ {refundId}/
+    │
+    ├─ 🔗 partners/               # Partners y afiliados
+    │   └─ {partnerId}/
+    │       ├─ stats/
+    │       └─ payouts/
+    │
+    ├─ 🎟️ discounts/              # Descuentos
+    │   └─ {discountId}/
+    │       └─ usage/
+    │
+    ├─ 📧 emailTemplates/         # Plantillas globales de email
+    │   └─ {templateId}/
+    │
+    ├─ 📤 emailQueue/             # Cola de envío
+    │   └─ {queueId}/
+    │
+    ├─ 📨 emailEvents/            # Eventos de email (bounces, etc.)
+    │   └─ {eventId}/
+    │
+    ├─ 🤖 automationJobs/         # Jobs de automatización
+    │   └─ {jobId}/
+    │
+    ├─ 📝 automationLogs/         # Logs de automatización
+    │   └─ {logId}/
+    │
+    ├─ 📊 analytics/              # Analítica del sistema
+    │   ├─ searches/
+    │   ├─ userActivity/
+    │   └─ performance/
+    │
+    ├─ 💬 feedback/               # Feedback de usuarios
+    │   └─ {feedbackId}/
+    │
+    ├─ ⚙️ config/                 # Configuración global
     │   └─ {key}/
     │
-    └─ audit/                     # Auditoría de cambios
+    └─ 🔍 audit/                  # Auditoría de cambios
         └─ {auditId}/
 ```
 
@@ -279,9 +279,11 @@ users/{uid}/mails/{id}            →  Emails de usuario
 weddings/{wid}/emailHistory/      →  Historial separado
 
 // DESPUÉS
-weddings/{wid}/emails/{id}/       →  Todos los emails de la boda
-emailTemplates/{id}/              →  Plantillas globales
-emailQueue/{id}/                  →  Cola de envío
+users/{uid}/emails/{id}/          →  Emails DEL USUARIO (no por boda)
+  └─ attachments/
+weddings/{wid}/emailSettings/     →  Solo configuración de email
+system/emailTemplates/{id}/       →  Plantillas globales
+system/emailQueue/{id}/           →  Cola de envío
 ```
 
 ### **AUTOMATIZACIÓN**
@@ -319,9 +321,19 @@ analytics/userActivity/           →  Analítica global del sistema
 ### **2. SEGURIDAD**
 ✅ Reglas de seguridad más simples:
 ```javascript
-// Ejemplo: Solo el equipo de la boda puede ver sus datos
+// Usuario solo ve sus emails
+match /users/{uid}/emails/{emailId} {
+  allow read, write: if request.auth.uid == uid;
+}
+
+// Solo el equipo de la boda puede ver sus datos
 match /weddings/{weddingId}/{document=**} {
   allow read, write: if isWeddingTeamMember(weddingId);
+}
+
+// Solo admins acceden a sistema
+match /system/{document=**} {
+  allow read, write: if isAdmin();
 }
 ```
 

@@ -7,7 +7,7 @@
 ## 🎯 VISTA GENERAL
 
 ```
-┌─────────────────────────────────────────────────────────────┐
+┌└─────────────────────────────────────────────────────────────┐
 │                      FIRESTORE                               │
 ├─────────────────────────────────────────────────────────────┤
 │                                                              │
@@ -16,28 +16,33 @@
 │  │   └─ {uid}/                │   └─ {weddingId}/          │
 │  │       ├─ profile           │       ├─ info               │
 │  │       ├─ preferences       │       ├─ team               │
-│  │       └─ notifications     │       ├─ guests/            │
-│  │                             │       ├─ tasks/             │
-│  📧 EMAIL GLOBAL              │       ├─ suppliers/         │
-│  ├─ emailTemplates/           │       ├─ finance/           │
-│  ├─ emailQueue/               │       ├─ emails/            │
-│  └─ emailEvents/              │       ├─ automation/        │
-│                                │       ├─ metrics/           │
-│  🎯 CATÁLOGO PROVEEDORES      │       └─ settings/          │
-│  └─ suppliers/                │                             │
-│      └─ {supplierId}/         │  💰 PAGOS                   │
-│          ├─ profile            │  ├─ payments/              │
-│          ├─ portfolio          │  ├─ subscriptions/         │
-│          ├─ reviews            │  ├─ invoices/              │
-│          └─ analytics/         │  └─ refunds/               │
-│                                │                             │
-│  🔗 PARTNERS                  📊 ANALÍTICA                  │
-│  ├─ partners/                  ├─ analytics/               │
-│  └─ discounts/                 └─ feedback/                │
-│                                                              │
-│  🤖 AUTOMATIZACIÓN            ⚙️ SISTEMA                    │
-│  ├─ automationJobs/            ├─ config/                  │
-│  └─ automationLogs/            └─ audit/                   │
+│  │       ├─ notifications     │       ├─ guests/            │
+│  │       └─ emails/           │       ├─ tasks/             │
+│  │                             │       ├─ suppliers/         │
+│  🎯 CATÁLOGO PROVEEDORES      │       ├─ finance/           │
+│  ├─ suppliers/                │       ├─ emailSettings/     │
+│  │   └─ {supplierId}/         │       ├─ automation/        │
+│  │       ├─ profile            │       ├─ metrics/           │
+│  │       ├─ portfolio          │       └─ settings/          │
+│  │       ├─ reviews            │                             │
+│  │       └─ analytics/         │                             │
+│  │                             │                             │
+│  ⚙️ SISTEMA (Admin/Global)                                  │
+│  ├─ payments/                                                │
+│  ├─ subscriptions/                                           │
+│  ├─ invoices/                                                │
+│  ├─ refunds/                                                 │
+│  ├─ partners/                                                │
+│  ├─ discounts/                                               │
+│  ├─ emailTemplates/                                          │
+│  ├─ emailQueue/                                              │
+│  ├─ emailEvents/                                             │
+│  ├─ automationJobs/                                          │
+│  ├─ automationLogs/                                          │
+│  ├─ analytics/                                               │
+│  ├─ feedback/                                                │
+│  ├─ config/                                                  │
+│  └─ audit/                                                   │
 │                                                              │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -111,18 +116,12 @@ weddings/{weddingId}/
 │       ├─ paymentMethod
 │       └─ receipt
 │
-├─ 📧 emails/                   # Emails de la boda
-│   └─ {emailId}/
-│       ├─ from
-│       ├─ to
-│       ├─ subject
-│       ├─ body
-│       ├─ folder             # inbox, sent, trash
-│       ├─ read
-│       ├─ tags
-│       │
-│       └─ attachments/       # Adjuntos
-│           └─ {attachmentId}/
+├─ ⚙️ emailSettings/           # Configuración de email (no emails en sí)
+│   ├─ signatures/            # Firmas personalizadas
+│   │   └─ {signatureId}/
+│   │
+│   └─ templates/             # Templates específicos de la boda
+│       └─ {templateId}/
 │
 ├─ 🤖 automation/               # Automatización
 │   ├─ rules/                  # Reglas configuradas
@@ -246,10 +245,14 @@ users/{uid}/mails/{emailId}       # ❌ Emails de usuario
 weddings/{wid}/emailHistory/      # ❌ Historial separado
 ```
 
-#### **DESPUÉS (Unificado):**
+#### **DESPUÉS (Correcto - Por usuario):**
 ```
-weddings/{wid}/emails/{emailId}/  # ✅ Un solo lugar
+users/{uid}/emails/{emailId}/     # ✅ Emails del USUARIO
   └─ attachments/
+
+weddings/{wid}/emailSettings/     # ✅ Solo config de email
+  ├─ signatures/
+  └─ templates/
 ```
 
 ---
@@ -307,20 +310,29 @@ weddings/                 │
 ├─ {wid}/                 ┘
 mails/                    ┘
 └─ {emailId}/
+
+payments/, partners/, analytics/ → ❌ Mezclado en raíz
 ```
 
 ### **DESPUÉS:**
 ```
 users/
 └─ {uid}/
-    └─ profile            ✅ Solo perfil
+    ├─ profile            ✅ Solo perfil
+    └─ emails/            ✅ Emails del usuario
 
 weddings/
 └─ {wid}/
-    ├─ emails/           ✅ Todo en un lugar
-    ├─ guests/           ✅ Jerarquía clara
-    ├─ suppliers/        ✅ Fácil de entender
-    └─ ...
+    ├─ guests/            ✅ Jerarquía clara
+    ├─ suppliers/         ✅ Fácil de entender
+    └─ emailSettings/     ✅ Solo config
+
+system/                    ✅ Todo admin junto
+├─ payments/
+├─ partners/
+├─ analytics/
+├─ emailQueue/
+└─ ...
 ```
 
 ---
@@ -355,18 +367,21 @@ match /suppliers/{supplierId}/analytics/{document=**} {
 
 ### **ANTES:**
 ```javascript
-// Buscar todos los emails de una boda
+// Buscar todos los emails del usuario
 const userMails = await db.collection('users').doc(uid).collection('mails').get();
-const globalMails = await db.collection('mails').where('weddingId', '==', wid).get();
-const history = await db.collection('weddings').doc(wid).collection('emailHistory').get();
-// ❌ 3 queries + merge manual
+const globalMails = await db.collection('mails').where('userId', '==', uid).get();
+// ❌ 2 queries + merge manual
 ```
 
 ### **DESPUÉS:**
 ```javascript
-// Una sola query
-const emails = await db.collection('weddings').doc(wid).collection('emails').get();
+// Una sola query - emails del usuario
+const emails = await db.collection('users').doc(uid).collection('emails').get();
 // ✅ 1 query, simple y rápido
+
+// Obtener config de email de una boda
+const emailConfig = await db.collection('weddings').doc(wid).collection('emailSettings').get();
+// ✅ Config separada de emails
 ```
 
 ---
