@@ -4,7 +4,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { signInWithCustomToken } from 'firebase/auth';
-import { auth } from '../../config/firebase';
+import { auth } from '../../firebaseConfig';
 
 export default function SupplierRegister() {
   const navigate = useNavigate();

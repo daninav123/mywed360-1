@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { auth } from '../../config/firebase';
+import { auth } from '../../firebaseConfig';
 import { BarChart3, Eye, MousePointer, Mail, Edit, Save, X } from 'lucide-react';
 
 export default function SupplierDashboard() {
