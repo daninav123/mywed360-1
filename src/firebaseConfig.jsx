@@ -16,12 +16,12 @@ import {
 
 // Configuraci�n de Firebase desde variables de entorno (sin secretos hard-coded)
 const rawFirebaseConfig = {
-  apiKey: import.meta?.env?.VITE_FIREBASE_API_KEY || "",
-  authDomain: import.meta?.env?.VITE_FIREBASE_AUTH_DOMAIN || "",
-  projectId: import.meta?.env?.VITE_FIREBASE_PROJECT_ID || "",
-  storageBucket: import.meta?.env?.VITE_FIREBASE_STORAGE_BUCKET || "",
-  messagingSenderId: import.meta?.env?.VITE_FIREBASE_MESSAGING_SENDER_ID || "",
-  appId: import.meta?.env?.VITE_FIREBASE_APP_ID || "",
+  apiKey: import.meta?.env?.VITE_FIREBASE_API_KEY || '',
+  authDomain: import.meta?.env?.VITE_FIREBASE_AUTH_DOMAIN || '',
+  projectId: import.meta?.env?.VITE_FIREBASE_PROJECT_ID || '',
+  storageBucket: import.meta?.env?.VITE_FIREBASE_STORAGE_BUCKET || '',
+  messagingSenderId: import.meta?.env?.VITE_FIREBASE_MESSAGING_SENDER_ID || '',
+  appId: import.meta?.env?.VITE_FIREBASE_APP_ID || '',
   measurementId: import.meta?.env?.VITE_FIREBASE_MEASUREMENT_ID || undefined,
 };
 const inferredAuthDomain =
@@ -52,7 +52,9 @@ const firebaseConfig = {
 };
 
 const FIREBASE_CONFIGURED =
-  Boolean(firebaseConfig.apiKey) && Boolean(firebaseConfig.projectId) && Boolean(firebaseConfig.authDomain);
+  Boolean(firebaseConfig.apiKey) &&
+  Boolean(firebaseConfig.projectId) &&
+  Boolean(firebaseConfig.authDomain);
 
 if (typeof window !== 'undefined') {
   const missing = Object.entries(firebaseConfig)
@@ -70,8 +72,8 @@ let app =
   FIREBASE_CONFIGURED && getApps().length
     ? getApp()
     : FIREBASE_CONFIGURED
-    ? initializeApp(firebaseConfig)
-    : null;
+      ? initializeApp(firebaseConfig)
+      : null;
 let db =
   FIREBASE_CONFIGURED && app
     ? (() => {
@@ -123,22 +125,22 @@ const MAX_RECONNECT_ATTEMPTS = 3;
 
 const configurarListenerConexion = () => {
   if (typeof window === 'undefined') return;
-  
+
   // ✅ Listener para Firestore (browser online/offline)
   const handleConnectionChange = async (online) => {
     isOnline = online;
-    
+
     if (online) {
       console.log('🟢 Conexión de red restaurada');
       reconnectAttempts = 0;
-      
+
       // Intentar habilitar red de Firestore
       if (db) {
         try {
           const { enableNetwork } = await import('firebase/firestore');
           await enableNetwork(db);
           console.log('✅ Firestore reconectado exitosamente');
-          
+
           if (window.mostrarErrorUsuario) {
             window.mostrarErrorUsuario('Conectado a internet', 3000);
           }
@@ -149,21 +151,21 @@ const configurarListenerConexion = () => {
     } else {
       console.log('🔴 Conexión de red perdida - modo offline');
       reconnectAttempts++;
-      
+
       if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
         console.log(`🔄 Reintento ${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS}`);
       }
     }
   };
-  
+
   window.addEventListener('online', () => handleConnectionChange(true));
   window.addEventListener('offline', () => handleConnectionChange(false));
-  
+
   // Estado inicial
   if (!navigator.onLine) {
     console.log('⚠️ Iniciando en modo offline');
   }
-  
+
   // ✅ Listener para Realtime Database (si está habilitado)
   if (import.meta.env.VITE_ENABLE_REALTIME_DB === 'true') {
     try {
@@ -216,6 +218,26 @@ const inicializarFirebase = async () => {
           }),
         });
       } catch (firestoreError) {
+        try {
+          db = initializeFirestore(app, {
+            experimentalForceLongPolling: true,
+            ignoreUndefinedProperties: true,
+            localCache: persistentLocalCache(),
+          });
+        } catch (_e2) {
+          try {
+            db = initializeFirestore(app, {
+              experimentalForceLongPolling: true,
+              ignoreUndefinedProperties: true,
+              localCache: memoryLocalCache(),
+            });
+          } catch (finalError) {
+            console.error('❌ Error crítico inicializando Firestore:', finalError);
+            db = getFirestore(app);
+          }
+        }
+      }
+    }
 
     try {
       db && db;
@@ -278,4 +300,3 @@ const firebaseReady = FIREBASE_CONFIGURED
 const getFirebaseAuth = () => auth;
 
 export { auth, db, analytics, firebaseReady, getFirebaseAuth, isOnline };
-
