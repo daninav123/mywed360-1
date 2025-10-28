@@ -10,13 +10,20 @@ import {
   Instagram,
   ExternalLink,
   MessageCircle,
+  Heart,
 } from 'lucide-react';
+import { toast } from 'react-toastify';
 
 import useTranslations from '../../hooks/useTranslations';
+import { useFavorites } from '../../contexts/FavoritesContext';
 
 export default function SupplierCard({ supplier, onContact, onViewDetails, onMarkAsConfirmed }) {
   const { t } = useTranslations();
+  const { isFavorite, toggleFavorite } = useFavorites();
   const [showContactMenu, setShowContactMenu] = useState(false);
+  const [isFavoriting, setIsFavoriting] = useState(false);
+
+  const isFav = isFavorite(supplier.id);
 
   const isRegistered = supplier.priority === 'registered';
   const isCached = supplier.priority === 'cached';
@@ -78,6 +85,26 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
     setShowContactMenu(false);
   };
 
+  // Manejar favoritos
+  const handleToggleFavorite = async (e) => {
+    e.stopPropagation(); // Evitar propagación al card
+
+    setIsFavoriting(true);
+    try {
+      await toggleFavorite(supplier);
+
+      if (isFav) {
+        toast.success('❤️ Eliminado de favoritos');
+      } else {
+        toast.success('❤️ Añadido a favoritos');
+      }
+    } catch (error) {
+      toast.error(error.message || 'Error al guardar favorito');
+    } finally {
+      setIsFavoriting(false);
+    }
+  };
+
   return (
     <div
       className={`
@@ -85,7 +112,7 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
       ${borderColor} ${bgColor}
     `}
     >
-      {/* Header con nombre y badge */}
+      {/* Header con nombre, favorito y badge */}
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1">
           <h3 className="font-semibold text-lg text-gray-900">
@@ -93,6 +120,24 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
           </h3>
           {locationLabel && <p className="text-sm text-gray-600">{locationLabel}</p>}
         </div>
+
+        {/* Botón de favorito */}
+        <button
+          onClick={handleToggleFavorite}
+          disabled={isFavoriting}
+          className={`
+            p-2 rounded-full transition-all hover:scale-110 mr-2
+            ${isFav ? 'text-red-500 hover:bg-red-50' : 'text-gray-400 hover:bg-gray-100'}
+            ${isFavoriting ? 'opacity-50 cursor-not-allowed' : ''}
+          `}
+          title={isFav ? 'Eliminar de favoritos' : 'Añadir a favoritos'}
+        >
+          <Heart
+            size={20}
+            fill={isFav ? 'currentColor' : 'none'}
+            className={isFavoriting ? 'animate-pulse' : ''}
+          />
+        </button>
 
         {/* Badge según tipo */}
         <div className="ml-2">

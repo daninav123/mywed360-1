@@ -119,6 +119,7 @@ import emailTagsRouter from './routes/email-tags.js';
 import emailAliasRouter from './routes/email-alias.js';
 import crmRouter from './routes/crm.js';
 import providersRouter from './routes/providers.js';
+import favoritesRouter from './routes/favorites.js';
 import projectMetricsRouter from './routes/project-metrics.js';
 import weddingsRouter from './routes/weddings.js';
 import usersRouter from './routes/users.js';
@@ -134,6 +135,7 @@ import { startEmailSchedulerWorker } from './workers/emailSchedulerWorker.js';
 import { startMetricAggregatorWorker } from './workers/metricAggregatorWorker.js';
 import { startMomentosCleanupWorker } from './workers/momentosCleanupWorker.js';
 import { startMomentosModerationWorker } from './workers/momentosModerationWorker.js';
+import { startBlogAutomationWorker } from './workers/blogAutomationWorker.js';
 
 const {
   PORT,
@@ -627,6 +629,7 @@ app.use('/api/ai-suppliers-real', authMiddleware(), aiSuppliersRealRouter);
 app.use('/api/ai-suppliers-tavily', authMiddleware(), aiSuppliersTavilyRouter);
 app.use('/api/suppliers', suppliersHybridRouter); // Búsqueda pública, sin auth
 app.use('/api/suppliers', suppliersRegisterRouter); // No requiere auth para registro
+app.use('/api/favorites', authMiddleware(), favoritesRouter); // Favoritos requiere auth
 app.use('/api/ai/budget-estimate', authMiddleware(), aiBudgetRouter);
 app.use('/api/ai', authMiddleware(), aiRouter);
 app.use('/api/ai-assign', requireAuth, aiAssignRouter);
@@ -729,7 +732,13 @@ app.use(
   requireAdmin,
   adminSuppliersRouter
 );
-// app.use('/api/admin/blog', ipAllowlist(ADMIN_IP_ALLOWLIST), requireAdmin, adminBlogRouter); // Eliminado temporalmente
+try {
+  const adminBlogRouter = (await import('./routes/admin-blog.js')).default;
+  app.use('/api/admin/blog', ipAllowlist(ADMIN_IP_ALLOWLIST), requireAdmin, adminBlogRouter);
+  console.log('[backend] Admin blog routes mounted on /api/admin/blog');
+} catch (error) {
+  console.error('[backend] Failed to load admin blog routes:', error.message);
+}
 app.use('/api/admin/audit', ipAllowlist(ADMIN_IP_ALLOWLIST), requireAdmin, adminAuditRouter);
 // Admin metrics dashboard API (solo admin) en ruta separada para no bloquear /api/metrics/* públicos
 // Rutas de métricas y dashboard de admin
@@ -926,6 +935,7 @@ if (process.env.NODE_ENV !== 'test') {
   startMetricAggregatorWorker();
   startMomentosCleanupWorker();
   startMomentosModerationWorker();
+  startBlogAutomationWorker();
 }
 
 if (process.env.NODE_ENV !== 'test') {
