@@ -68,7 +68,7 @@ router.post('/webhook', express.raw({ type: 'application/json', limit: WEBHOOK_M
       const contractId = obj.metadata?.contractId || null;
       const amountTotal = obj.amount_total || null;
       const currency = (obj.currency || 'eur').toUpperCase();
-      try { await db.collection('payments').add({ kind: 'checkout_session', sessionId: obj.id || null, contractId, providerId, weddingId, amount: typeof amountTotal === 'number' ? amountTotal / 100 : null, currency, status: 'paid', createdAt: tsNow, updatedAt: tsNow }); } catch {}
+      try { await db.collection('_system').doc('config').collection('payments').add({ kind: 'checkout_session', sessionId: obj.id || null, contractId, providerId, weddingId, amount: typeof amountTotal === 'number' ? amountTotal / 100 : null, currency, status: 'paid', createdAt: tsNow, updatedAt: tsNow }); } catch {}
       if (contractId) { try { await db.collection('contracts').doc(contractId).set({ paymentStatus: 'paid', amountPaid: typeof amountTotal === 'number' ? amountTotal / 100 : null, currency, lastPaymentAt: tsNow, updatedAt: tsNow }, { merge: true }); } catch {} }
       if (providerId) {
         try { await db.collection('providerPayments').doc(providerId).set({ lastPaymentAt: tsNow, amount_total: amountTotal, currency }, { merge: true }); } catch {}
@@ -78,13 +78,13 @@ router.post('/webhook', express.raw({ type: 'application/json', limit: WEBHOOK_M
 
     if (event.type === 'payment_intent.succeeded') {
       const contractId = obj.metadata?.contractId || null;
-      try { await db.collection('payments').doc(obj.id || 'pi_unknown').set({ kind: 'payment_intent', status: 'succeeded', amount: typeof obj.amount === 'number' ? obj.amount / 100 : null, currency: (obj.currency || 'eur').toUpperCase(), contractId, updatedAt: tsNow }, { merge: true }); } catch {}
+      try { await db.collection('_system').doc('config').collection('payments').doc(obj.id || 'pi_unknown').set({ kind: 'payment_intent', status: 'succeeded', amount: typeof obj.amount === 'number' ? obj.amount / 100 : null, currency: (obj.currency || 'eur').toUpperCase(), contractId, updatedAt: tsNow }, { merge: true }); } catch {}
       if (contractId) { try { await db.collection('contracts').doc(contractId).set({ paymentStatus: 'paid', lastPaymentAt: tsNow, updatedAt: tsNow }, { merge: true }); } catch {} }
     }
 
     if (event.type === 'payment_intent.payment_failed') {
       const contractId = obj.metadata?.contractId || null;
-      try { await db.collection('payments').doc(obj.id || 'pi_unknown').set({ kind: 'payment_intent', status: 'failed', error: obj.last_payment_error || null, updatedAt: tsNow, contractId }, { merge: true }); } catch {}
+      try { await db.collection('_system').doc('config').collection('payments').doc(obj.id || 'pi_unknown').set({ kind: 'payment_intent', status: 'failed', error: obj.last_payment_error || null, updatedAt: tsNow, contractId }, { merge: true }); } catch {}
       if (contractId) { try { await db.collection('contracts').doc(contractId).set({ paymentStatus: 'failed', updatedAt: tsNow }, { merge: true }); } catch {} }
     }
 

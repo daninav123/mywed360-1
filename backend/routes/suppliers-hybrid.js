@@ -16,6 +16,25 @@ const router = express.Router();
 // (Necesitaremos refactorizar esto)
 import fetch from 'node-fetch';
 
+const NEUTRAL_LOCATIONS = new Set([
+  'espana',
+  'españa',
+  'spain',
+  'all',
+  'todos',
+  'todas',
+  'any',
+  'cualquier',
+  'global'
+]);
+
+const normalizeText = (value = '') =>
+  String(value)
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+
 // Función auxiliar: Buscar en Tavily (copiada temporalmente)
 async function searchTavilySimple(query, location, service) {
   const apiKey = process.env.TAVILY_API_KEY;
@@ -91,7 +110,7 @@ router.post('/search', async (req, res) => {
     
     // ===== 1. BUSCAR PROVEEDORES REGISTRADOS EN FIRESTORE =====
     console.log('📊 [FIRESTORE] Buscando proveedores por nombre...');
-    console.log(`   Término de búsqueda: "${service}"`);
+    console.log(`   Servicio: "${service}" | Query: "${query || '—'}"`);
     
     // Traer todos los proveedores (sin filtro de categoría)
     // Filtraremos por nombre en memoria
@@ -99,8 +118,15 @@ router.post('/search', async (req, res) => {
       .limit(100); // Traer más documentos para buscar por nombre
     
     // Filtro por ubicación si se especifica
-    if (location && location !== 'España') {
-      firestoreQuery = firestoreQuery.where('location.city', '==', location);
+    const locationValue = typeof location === 'string' ? location.trim() : location;
+    const shouldFilterByLocation = (() => {
+      if (!locationValue) return false;
+      const normalized = normalizeText(locationValue);
+      return normalized.length > 0 && !NEUTRAL_LOCATIONS.has(normalized);
+    })();
+
+    if (shouldFilterByLocation) {
+      firestoreQuery = firestoreQuery.where('location.city', '==', locationValue);
     }
     
     const snapshot = await firestoreQuery.get();
@@ -122,15 +148,40 @@ router.post('/search', async (req, res) => {
       })
       // Filtrar por nombre/término de búsqueda
       .filter(supplier => {
-        const searchTerm = (service || '').toLowerCase();
         const supplierName = (supplier.name || '').toLowerCase();
         const supplierDesc = (supplier.business?.description || '').toLowerCase();
         const supplierTags = (supplier.tags || []).join(' ').toLowerCase();
-        
-        // Buscar coincidencia en nombre, descripción o tags
-        return supplierName.includes(searchTerm) || 
-               supplierDesc.includes(searchTerm) ||
-               supplierTags.includes(searchTerm);
+
+        const searchTokens = [];
+
+        if (service) {
+          searchTokens.push(String(service).toLowerCase().trim());
+        }
+
+        if (query && query.trim()) {
+          const normalizedQuery = String(query).toLowerCase().trim();
+          searchTokens.push(normalizedQuery);
+          searchTokens.push(
+            ...normalizedQuery
+              .split(/\s+/)
+              .map(token => token.trim())
+              .filter(Boolean)
+          );
+        }
+
+        const tokens = [...new Set(searchTokens.filter(Boolean))];
+        if (tokens.length === 0) return true;
+
+        const haystacks = [supplierName, supplierDesc, supplierTags];
+        const normalizedHaystacks = haystacks.map(normalizeText);
+
+        return tokens.some(term => {
+          const token = term.toLowerCase();
+          const normalizedToken = normalizeText(token);
+
+          return haystacks.some(h => h.includes(token)) ||
+                 normalizedHaystacks.some(h => h.includes(normalizedToken));
+        });
       })
       // Filtrar por status en memoria (evita índice compuesto)
       .filter(supplier => {
@@ -145,20 +196,6 @@ router.post('/search', async (req, res) => {
       })
       // Limitar resultados después de ordenar
       .slice(0, 20);
-    
-    // Filtro adicional por keywords si hay query específica
-    if (query && query.trim()) {
-      const keywords = query.toLowerCase().split(' ');
-      registeredResults = registeredResults.filter(supplier => {
-        const searchText = [
-          supplier.name,
-          supplier.business?.description || '',
-          ...(supplier.tags || [])
-        ].join(' ').toLowerCase();
-        
-        return keywords.some(keyword => searchText.includes(keyword));
-      });
-    }
     
     // Filtro por presupuesto
     if (budget) {
@@ -433,12 +470,17 @@ router.post('/:id/track', async (req, res) => {
     
     await docRef.update(updateData);
     
-    // Registrar evento detallado (opcional)
-    await db.collection('supplier_events').add({
-      supplierId: id,
-      action,
-      userId: userId || 'anonymous',
-      weddingId: weddingId || null,
+    // Registrar evento detallado en nueva ubicación
+    await db.collection('suppliers')
+      .doc(id)
+      .collection('analytics')
+      .doc('events')
+      .collection('log')
+      .add({
+        supplierId: id,
+        action,
+        userId: userId || 'anonymous',
+        weddingId: weddingId || null,
       timestamp: admin.firestore.FieldValue.serverTimestamp()
     });
     

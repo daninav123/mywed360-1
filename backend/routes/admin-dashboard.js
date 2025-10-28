@@ -176,15 +176,15 @@ const collections = {
   users: () => db.collection('users'),
   incidents: () => db.collection('adminIncidents'),
   featureFlags: () => db.collection('featureFlags'),
-  secrets: () => db.collection('adminSecrets'),
-  templates: () => db.collection('adminTemplates'),
-  broadcasts: () => db.collection('adminBroadcasts'),
-  auditLogs: () => db.collection('adminAuditLogs'),
-  reports: () => db.collection('adminReports'),
-  supportSummary: () => db.collection('adminSupportSummary'),
-  supportTickets: () => db.collection('adminTickets'),
+  secrets: () => db.collection('_system').doc('config').collection('secrets'),
+  templates: () => db.collection('_system').doc('config').collection('templates'),
+  broadcasts: () => db.collection('_system').doc('config').collection('broadcasts'),
+  auditLogs: () => db.collection('_system').doc('config').collection('auditLogs'),
+  reports: () => db.collection('_system').doc('config').collection('reports'),
+  supportSummary: () => db.collection('_system').doc('config').collection('supportSummary'),
+  supportTickets: () => db.collection('_system').doc('config').collection('supportTickets'),
   // Datos operativos reales
-  payments: () => db.collection('payments'),
+  payments: () => db.collection('_system').doc('config').collection('payments'),
   appDownloads: () => db.collection('appDownloads'),
   appDownloadEvents: () => db.collection('appDownloadEvents'),
   mobileDownloads: () => db.collection('mobileDownloads'),
@@ -195,8 +195,8 @@ const collections = {
   tasksGroup: () => db.collectionGroup('tasks'),
   // Plantillas de tareas administrativas
   taskTemplates: () => db.collection('adminTaskTemplates'),
-  // Descuentos/códigos promocionales
-  discountLinks: () => db.collection('discountLinks'),
+  // Descuentos/códigos promocionales (nueva ubicación en _system)
+  discountLinks: () => db.collection('_system').doc('config').collection('discounts'),
   salesManagers: () => db.collection('salesManagers'),
   salesCommercials: () => db.collection('salesCommercials'),
 };
@@ -3323,7 +3323,7 @@ async function buildCommercePayoutPreview({ periodInput, limit = 500 } = {}) {
   let needsIndex = false;
   try {
     paymentsSnapshot = await db
-      .collection('payments')
+      .collection('_system').doc('config').collection('payments')
       .where('status', 'in', COMMERCE_PAYOUT_STATUSES)
       .where('createdAt', '>=', startTs)
       .where('createdAt', '<', endTs)
@@ -3339,7 +3339,7 @@ async function buildCommercePayoutPreview({ periodInput, limit = 500 } = {}) {
   if (!paymentsSnapshot) {
     try {
       paymentsSnapshot = await db
-        .collection('payments')
+        .collection('_system').doc('config').collection('payments')
         .where('createdAt', '>=', startTs)
         .where('createdAt', '<', endTs)
         .get();
@@ -4741,7 +4741,7 @@ router.get('/debug/payments', async (req, res) => {
     
     // Intentar sin filtros primero
     console.log('[DEBUG] Consultando payments sin filtros...');
-    const paymentsSnap = await db.collection('payments').limit(limit).get();
+    const paymentsSnap = await db.collection('_system').doc('config').collection('payments').limit(limit).get();
     
     const payments = paymentsSnap.docs.map(doc => ({
       id: doc.id,

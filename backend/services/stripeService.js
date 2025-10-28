@@ -139,7 +139,7 @@ export async function handleCheckoutCompleted(session) {
       },
     };
     
-    await db.collection('payments').add(paymentData);
+    await db.collection('_system').doc('config').collection('payments').add(paymentData);
     
     // Actualizar suscripción del usuario
     if (product?.type === 'subscription') {

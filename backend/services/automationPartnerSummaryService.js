@@ -9,8 +9,8 @@ const FieldValue = admin.firestore.FieldValue;
 
 const CONFIG_REF = firestore.collection('admin').doc('automation_partner_summary');
 const PAYOUTS_COLLECTION = firestore.collection('partnerPayouts');
-const DISCOUNTS_COLLECTION = firestore.collection('discountLinks');
-const PAYMENTS_COLLECTION = firestore.collection('payments');
+const DISCOUNTS_COLLECTION = firestore.collection('_system').doc('config').collection('discounts');
+const PAYMENTS_COLLECTION = firestore.collection('_system').doc('config').collection('payments');
 
 const DEFAULT_CONFIG = {
   enabled: false,

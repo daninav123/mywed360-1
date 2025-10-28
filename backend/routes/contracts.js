@@ -98,7 +98,7 @@ export default router;
 router.get('/:id/payments', async (req, res) => {
   try {
     const id = req.params.id;
-    const snap = await admin.firestore().collection('payments').where('contractId', '==', id).limit(200).get();
+    const snap = await admin.firestore().collection('_system').doc('config').collection('payments').where('contractId', '==', id).limit(200).get();
     const items = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
     res.json({ items });
   } catch (e) {

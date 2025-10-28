@@ -117,7 +117,14 @@ async function captureSearch(searchData) {
  * Sin NLP complejo, solo tokenización básica
  */
 function extractSimpleKeywords(query = '', service = '') {
+  const stripDiacritics = (value = '') =>
+    String(value)
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
+
   const text = `${query} ${service}`.toLowerCase();
+  const normalizedQuery = stripDiacritics(query);
   
   // Tokenizar (separar por espacios y limpiar)
   let words = text
@@ -134,7 +141,7 @@ function extractSimpleKeywords(query = '', service = '') {
     word,
     position: index,
     length: word.length,
-    source: query.includes(word) ? 'query' : 'service'
+    source: normalizedQuery.includes(stripDiacritics(word)) ? 'query' : 'service'
   }));
 }
 

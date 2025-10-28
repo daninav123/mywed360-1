@@ -10,7 +10,7 @@ router.get('/', async (req, res) => {
     const { default: admin } = await import('firebase-admin');
     if (!admin?.firestore) return res.json({ items: [] });
     const { contractId } = req.query || {};
-    let q = admin.firestore().collection('payments');
+    let q = admin.firestore().collection('_system').doc('config').collection('payments');
     if (contractId) q = q.where('contractId', '==', String(contractId));
     const snap = await q.limit(200).get();
     const items = snap.docs.map((d) => ({ id: d.id, ...d.data() }));

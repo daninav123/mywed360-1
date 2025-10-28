@@ -50,7 +50,7 @@ router.get('/:token', async (req, res) => {
 
   try {
     // Buscar el código de descuento por token
-    const discountSnapshot = await db.collection('discountLinks')
+    const discountSnapshot = await db.collection('_system').doc('config').collection('discounts')
       .where('partnerToken', '==', token)
       .limit(1)
       .get();
@@ -96,7 +96,7 @@ router.get('/:token', async (req, res) => {
     }
 
     // Buscar todos los pagos que usaron este código
-    const paymentsSnapshot = await db.collection('payments')
+    const paymentsSnapshot = await db.collection('_system').doc('config').collection('payments')
       .where('discountCode', '==', discountData.code)
       .where('status', 'in', ['paid', 'succeeded', 'completed'])
       .get();
@@ -231,7 +231,7 @@ router.post('/generate-token', async (req, res) => {
   }
 
   try {
-    const discountRef = db.collection('discountLinks').doc(discountId);
+    const discountRef = db.collection('_system').doc('config').collection('discounts').doc(discountId);
     const discountDoc = await discountRef.get();
 
     if (!discountDoc.exists) {

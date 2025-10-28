@@ -218,13 +218,13 @@ router.get('/:id/status', validate(statusParams, 'params'), async (req, res) => 
     let paymentsSnap = { empty: true, docs: [] };
     try {
       // Intento principal: payments con providerId directo
-      paymentsSnap = await admin.firestore().collection('payments').where('providerId', '==', id).limit(1000).get();
+      paymentsSnap = await admin.firestore().collection('_system').doc('config').collection('payments').where('providerId', '==', id).limit(1000).get();
       if (paymentsSnap.empty) {
         // Fallback: si no hay providerId directo, recuperar por contratos del proveedor
         const contractIds = new Set(contracts.map((c) => c.id));
         if (contractIds.size) {
           // No hay where IN garantizado en el mock; cargamos y filtramos localmente (limit 1000 para no explotar)
-          const allPay = await admin.firestore().collection('payments').limit(1000).get();
+          const allPay = await admin.firestore().collection('_system').doc('config').collection('payments').limit(1000).get();
           const docs = [];
           allPay.docs.forEach((doc) => {
             const d = doc.data() || {};
