@@ -195,7 +195,15 @@ const generateDemoResults = (query, t) => {
       returnObjects: true,
     }) || [];
 
-  return demoDatabase.map((item, index) =>
+  // Asegurarse de que demoDatabase es un array
+  const databaseArray = Array.isArray(demoDatabase) ? demoDatabase : [];
+  
+  if (databaseArray.length === 0) {
+    console.warn('[useAISearch] demoResults no es un array o está vacío, devolviendo array vacío');
+    return [];
+  }
+
+  return databaseArray.map((item, index) =>
     normalizeResult(
       {
         ...item,
