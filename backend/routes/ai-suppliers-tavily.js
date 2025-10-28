@@ -809,12 +809,12 @@ async function saveToFirestoreBackground(providers, service, location) {
           source: 'tavily',               // Origen: Tavily
           status: 'discovered',           // Estado: descubierto
           
-          // Fuentes
+          // Fuentes (sin usar serverTimestamp en arrays)
           sources: [
             {
               platform: 'tavily',
               url: provider.link,
-              lastChecked: admin.firestore.FieldValue.serverTimestamp(),
+              lastChecked: new Date().toISOString(),
               status: 'active'
             }
           ],
@@ -1014,30 +1014,22 @@ router.post('/', async (req, res) => {
         const urlObj = new URL(url);
         const pathSegments = urlObj.pathname.split('/').filter(s => s.length > 0);
         
-        // Si tiene muy pocos segmentos, probablemente es una página genérica
-        if (pathSegments.length < 1) {
-          console.log(`❌ [FILTRO-URL] URL vacía o inválida: ${url}`);
-          return false;
-        }
+        // ✅ ACEPTAR URLs de raíz de proveedor (ej: franbarba.com, pedrotalens.com)
+        // Estas son páginas principales de fotógrafos, SON VÁLIDAS
         
-        // Para bodas.net: REQUERIR ID numérico (perfil específico)
-        // ✅ bodas.net/fotografia/nombre--e123456 → ACEPTAR (tiene --e12345)
-        // ❌ bodas.net/bodas/proveedores/fotografos/valencia → DESCARTAR (sin ID)
+        // Para bodas.net: PRIORIZAR pero ACEPTAR ambos tipos
+        // ✅ bodas.net/fotografia/nombre--e123456 → PERFIL ESPECÍFICO (mejor)
+        // ✅ bodas.net/bodas/proveedores/fotografos/valencia → LISTADO (también válido)
+        // No rechazamos bodas.net, solo lo priorizamos después
         if (urlLower.includes('bodas.net')) {
           const hasNumericId = /--e\d{5,}/.test(urlObj.pathname);
-          if (!hasNumericId) {
-            console.log(`❌ [FILTRO-URL] bodas.net sin ID de proveedor (página de listado): ${url}`);
-            return false;
-          }
+          // Marcar si es perfil específico o listado (para priorización posterior)
+          // Pero NO rechazar
         }
         
-        // Solo descartar si el último segmento es EXACTAMENTE una categoría y no hay más info
-        const lastSegment = pathSegments[pathSegments.length - 1];
-        const exactCategoryMatches = ['fotografia', 'video', 'catering', 'flores', 'musica', 'dj'];
-        if (exactCategoryMatches.includes(lastSegment.toLowerCase()) && pathSegments.length === 1) {
-          console.log(`❌ [FILTRO-URL] Solo categoría sin proveedor: ${url}`);
-          return false;
-        }
+        // ✅ RELAJADO: Solo descartar URLs obvias de listado genérico
+        // Aceptar todo lo demás (páginas de proveedor, incluso si son simples)
+        // La mayoría de fotógrafos tienen webs simples como: fotografo.com/
         
         return true;
       } catch (e) {

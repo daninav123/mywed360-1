@@ -3,7 +3,7 @@
 // 
 // Busca primero en proveedores REGISTRADOS (Firestore)
 // Si NO hay resultados (0), busca en INTERNET (Tavily)
-// Resultado: [VERIFICADOS] primero + [Internet] solo si no hay nada en BD
+// Priorización: [BD PROPIA] → [BODAS.NET] → [OTROS INTERNET]
 
 import express from 'express';
 import admin from 'firebase-admin';
@@ -184,19 +184,32 @@ router.post('/search', async (req, res) => {
             .filter(u => u)
         );
         
-        internetResults = tavilyResults
-          .filter(r => {
-            const email = r.email?.toLowerCase();
-            const url = r.url?.toLowerCase();
-            
-            // Excluir si ya está en Firestore
-            if (email && registeredEmails.has(email)) return false;
-            if (url && registeredUrls.has(url)) return false;
-            
-            return true;
-          })
-          .slice(0, 8) // Máximo 8 de internet
-          .map(r => ({
+        // Separar resultados de bodas.net vs otros
+        const bodasNetResults = [];
+        const otherResults = [];
+        
+        tavilyResults.forEach(r => {
+          const email = r.email?.toLowerCase();
+          const url = r.url?.toLowerCase();
+          
+          // Excluir si ya está en Firestore
+          if (email && registeredEmails.has(email)) return;
+          if (url && registeredUrls.has(url)) return;
+          
+          // Separar bodas.net de otros
+          if (url && url.includes('bodas.net')) {
+            bodasNetResults.push(r);
+          } else {
+            otherResults.push(r);
+          }
+        });
+        
+        // PRIORIZAR: Bodas.net primero, luego otros
+        const prioritizedResults = [...bodasNetResults, ...otherResults].slice(0, 8);
+        
+        console.log(`   📊 Resultados internet: ${bodasNetResults.length} de bodas.net, ${otherResults.length} otros`);
+        
+        internetResults = prioritizedResults.map(r => ({
             // Convertir formato Tavily a formato supplier
             name: r.title,
             slug: null, // No tiene slug aún
@@ -231,11 +244,11 @@ router.post('/search', async (req, res) => {
               reviewCount: 0
             },
             registered: false,
-            source: 'tavily-realtime',
+            source: r.url?.includes('bodas.net') ? 'bodas-net' : 'tavily-realtime',
             status: 'discovered',
             priority: 'internet',
-            badge: 'De internet 🌐',
-            badgeType: 'default'
+            badge: r.url?.includes('bodas.net') ? 'Bodas.net 💒' : 'De internet 🌐',
+            badgeType: r.url?.includes('bodas.net') ? 'info' : 'default'
           }));
         
         usedTavily = true;
