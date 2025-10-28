@@ -7,12 +7,24 @@ const OPENAI_API_KEY =
   process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY || process.env.OPENAI_TOKEN || '';
 const FALLBACK_COVER_PROMPT =
   'Editorial wedding photography, elegant pastel palette, minimal styling, soft natural light';
+const DEFAULT_IMAGE_MODEL = process.env.OPENAI_IMAGE_MODEL || 'gpt-image-1';
 
 async function ensureOpenAI() {
   if (openaiClient || !OPENAI_API_KEY) return openaiClient;
   const { default: OpenAI } = await import('openai');
   openaiClient = new OpenAI({ apiKey: OPENAI_API_KEY });
   return openaiClient;
+}
+
+export async function getOpenAiClient() {
+  if (!OPENAI_API_KEY) {
+    throw new Error('openai-missing-api-key');
+  }
+  const client = await ensureOpenAI();
+  if (!client) {
+    throw new Error('openai-client-unavailable');
+  }
+  return client;
 }
 
 const SectionSchema = z.object({
@@ -40,6 +52,21 @@ const GenerationInputSchema = z.object({
   audience: z.string().optional(),
   includeTips: z.boolean().default(true),
   includeCTA: z.boolean().default(true),
+  research: z
+    .object({
+      summary: z.string().min(10).max(4000).optional(),
+      references: z
+        .array(
+          z.object({
+            title: z.string().min(2),
+            url: z.string().url(),
+            snippet: z.string().optional(),
+          })
+        )
+        .max(12)
+        .optional(),
+    })
+    .optional(),
 });
 
 function safeJsonParse(text = '') {
@@ -83,6 +110,41 @@ function mapLengthToWords(length = 'medio') {
   }
 }
 
+function buildResearchContext(research, language) {
+  if (!research) {
+    return language === 'en'
+      ? 'No external research was provided. Focus on verified guidance for Spanish weddings.'
+      : 'No se proporcionó investigación externa. Ofrece orientación verificada para bodas en España.';
+  }
+
+  const lines = [];
+  if (research.summary) {
+    lines.push(research.summary.trim());
+  }
+
+  const references = Array.isArray(research.references) ? research.references.slice(0, 6) : [];
+  if (references.length > 0) {
+    lines.push(language === 'en' ? 'Key references:' : 'Referencias clave:');
+    references.forEach((ref, index) => {
+      const title = String(ref.title || `Fuente ${index + 1}`).trim();
+      const snippet = ref.snippet ? String(ref.snippet).trim() : '';
+      const url = ref.url ? String(ref.url).trim() : '';
+      const line = [`${index + 1}. ${title}`, url ? `(${url})` : '', snippet ? `– ${snippet}` : '']
+        .filter(Boolean)
+        .join(' ');
+      lines.push(line);
+    });
+  }
+
+  if (lines.length === 0) {
+    return language === 'en'
+      ? 'No external research was provided. Focus on verified guidance for Spanish weddings.'
+      : 'No se proporcionó investigación externa. Ofrece orientación verificada para bodas en España.';
+  }
+
+  return lines.join('\n');
+}
+
 function buildMarkdownFromAi(ai) {
   const lines = [];
   if (ai.title) lines.push(`# ${ai.title}`, '');
@@ -118,17 +180,23 @@ function buildMarkdownFromAi(ai) {
 
 function buildExcerpt(markdown) {
   if (!markdown) return '';
-  const plain = markdown.replace(/[#>*`]/g, '').replace(/\s+/g, ' ').trim();
+  const plain = markdown
+    .replace(/[#>*`]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
   return plain.slice(0, 220);
 }
 
 function fallbackArticle(input) {
   const title = toTitleCase(`${input.topic} - inspiración para parejas modernas`);
+  const researchSummary =
+    input.research?.summary ||
+    `Explora tendencias recientes relacionadas con ${input.topic}. Adapta las propuestas a distintos estilos de boda y mantén un tono ${input.tone}.`;
   const sections = [
     {
       heading: 'Ideas principales',
       body: [
-        `Explora tendencias recientes relacionadas con ${input.topic}. Adapta las propuestas a distintos estilos de boda y mantén un tono ${input.tone}.`,
+        researchSummary,
         'Incluye recomendaciones prácticas y recursos útiles para comenzar a planificar.',
       ],
     },
@@ -191,9 +259,14 @@ export async function generateBlogArticle(options) {
         ? 'You are a senior wedding editor for Lovenda. You craft helpful, actionable wedding articles with a warm expert tone. Always deliver detailed advice without inventing facts that cannot be verified.'
         : 'Eres editor senior de bodas en Lovenda. Redactas artículos útiles y accionables con tono cálido y experto. Ofrece detalle práctico sin inventar hechos que no se puedan verificar.';
 
+    const researchContext = buildResearchContext(input.research, language);
+
     const userPrompt =
       language === 'en'
-        ? `Write a complete wedding blog post about "${input.topic}". Audience: engaged couples. Target length: ${wordsRange}. Tone: ${input.tone}. ${keywordsText} If relevant, mention Spanish wedding context. Return valid JSON matching this structure:
+        ? `Write a complete wedding blog post about "${input.topic}". Audience: engaged couples. Target length: ${wordsRange}. Tone: ${input.tone}. ${keywordsText} If relevant, mention Spanish wedding context. Ground every fact in this research:
+${researchContext}
+
+Return valid JSON matching this structure:
 {
   "title": "string",
   "excerpt": "string",
@@ -206,7 +279,10 @@ export async function generateBlogArticle(options) {
   "tags": ["string"],
   "coverPrompt": "string"
 }`
-        : `Redacta un artículo completo de blog de bodas sobre "${input.topic}". Público: parejas que planean su boda. Longitud objetivo: ${wordsRange}. Tono: ${input.tone}. ${keywordsText} Si procede, menciona contexto de bodas en España. Devuelve JSON válido con esta estructura:
+        : `Redacta un artículo completo de blog de bodas sobre "${input.topic}". Público: parejas que planean su boda. Longitud objetivo: ${wordsRange}. Tono: ${input.tone}. ${keywordsText} Si procede, menciona contexto de bodas en España. Basado en esta investigación contrastada:
+${researchContext}
+
+Devuelve JSON válido con esta estructura:
 {
   "title": "string",
   "excerpt": "string",
@@ -278,7 +354,10 @@ export function computeDefaultTags(keywords = [], sections = []) {
   }
   for (const section of sections) {
     if (!section?.heading) continue;
-    const slug = section.heading.toLowerCase().replace(/[^a-záéíóúñ\s]/gi, '').trim();
+    const slug = section.heading
+      .toLowerCase()
+      .replace(/[^a-záéíóúñ\s]/gi, '')
+      .trim();
     const tokens = slug.split(/\s+/).filter((t) => t.length > 4);
     for (const tk of tokens.slice(0, 2)) {
       base.add(tk);
@@ -291,3 +370,58 @@ export function createLocalId() {
   return randomUUID();
 }
 
+export async function generateCoverImageFromPrompt(prompt, options = {}) {
+  if (!prompt || typeof prompt !== 'string' || !prompt.trim()) {
+    throw new Error('cover-image-missing-prompt');
+  }
+
+  if (!OPENAI_API_KEY) {
+    return {
+      status: 'skipped',
+      reason: 'missing-openai-key',
+      url: null,
+      provider: 'none',
+    };
+  }
+
+  const size = options.size || '1024x1024';
+  const quality = options.quality || 'hd';
+
+  try {
+    await ensureOpenAI();
+    const client = openaiClient;
+
+    const response = await client.images.generate({
+      model: DEFAULT_IMAGE_MODEL,
+      prompt: `${prompt}\nEscenario editorial de bodas, estilo Lovenda, alta calidad.`,
+      size,
+      quality,
+      n: 1,
+    });
+
+    const imageUrl = response?.data?.[0]?.url || null;
+    if (!imageUrl) {
+      throw new Error('cover-image-empty-response');
+    }
+
+    return {
+      status: 'ready',
+      url: imageUrl,
+      provider: 'openai',
+      model: DEFAULT_IMAGE_MODEL,
+      raw: {
+        id: response.id,
+        created: response.created,
+        usage: response.usage,
+      },
+    };
+  } catch (error) {
+    console.error('[blogAiService] generateCoverImageFromPrompt failed:', error?.message || error);
+    return {
+      status: 'failed',
+      url: null,
+      provider: 'openai',
+      error: error?.message || 'unknown-error',
+    };
+  }
+}

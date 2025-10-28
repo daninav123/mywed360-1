@@ -8,7 +8,9 @@ import {
   computeDefaultTags,
   ensureExcerpt,
   generateBlogArticle,
+  generateCoverImageFromPrompt,
 } from '../services/blogAiService.js';
+import { researchTopic } from '../services/blogResearchService.js';
 
 const router = express.Router();
 
@@ -81,6 +83,8 @@ function mapDoc(doc) {
     rawSource: data.rawSource || null,
     createdBy: data.createdBy || null,
     approvedBy: data.approvedBy || null,
+    research: data.research || null,
+    automation: data.automation || null,
   };
 }
 
@@ -180,10 +184,73 @@ const createSchema = z.object({
 router.post('/', async (req, res) => {
   try {
     const input = createSchema.parse(req.body || {});
-    const aiArticle = await generateBlogArticle(input);
+
+    const researchData = await researchTopic({
+      topic: input.topic,
+      language: input.language || 'es',
+    }).catch((error) => {
+      logger.error('[admin-blog] research failed:', error?.message || error);
+      return { provider: 'none', summary: '', references: [], raw: { error: error?.message } };
+    });
+
+    const researchSummary =
+      typeof researchData.summary === 'string' ? researchData.summary.slice(0, 2000) : '';
+    const researchReferences = Array.isArray(researchData.references)
+      ? researchData.references.slice(0, 8)
+      : [];
+
+    const aiArticle = await generateBlogArticle({
+      ...input,
+      research: {
+        summary: researchSummary,
+        references: researchReferences,
+      },
+    });
     const slug = await ensureUniqueSlug(aiArticle.title);
 
+    let coverGeneration = null;
+    if (aiArticle.coverPrompt) {
+      try {
+        coverGeneration = await generateCoverImageFromPrompt(aiArticle.coverPrompt, {
+          size: process.env.BLOG_COVER_IMAGE_SIZE || '1792x1024',
+          quality: process.env.BLOG_COVER_IMAGE_QUALITY || 'hd',
+        });
+      } catch (coverError) {
+        logger.error(
+          '[admin-blog] cover image generation failed:',
+          coverError?.message || coverError
+        );
+        coverGeneration = {
+          status: 'failed',
+          provider: 'openai',
+          error: coverError?.message || 'unknown-error',
+        };
+      }
+    }
+
     const now = admin.firestore.FieldValue.serverTimestamp();
+    let coverImage = null;
+    if (aiArticle.coverPrompt) {
+      coverImage = {
+        prompt: aiArticle.coverPrompt,
+        status: 'pending',
+        url: null,
+        provider: aiArticle.source || 'openai',
+      };
+      if (coverGeneration) {
+        coverImage.status = coverGeneration.status || coverImage.status;
+        coverImage.url = coverGeneration.url || null;
+        coverImage.provider = coverGeneration.provider || coverImage.provider;
+        if (coverGeneration.model) coverImage.model = coverGeneration.model;
+        if (coverGeneration.status === 'ready') {
+          coverImage.generatedAt = now;
+        }
+        if (coverGeneration.error || coverGeneration.reason) {
+          coverImage.error = coverGeneration.error || coverGeneration.reason;
+        }
+      }
+    }
+
     const doc = {
       title: aiArticle.title,
       slug,
@@ -200,23 +267,41 @@ router.post('/', async (req, res) => {
         tips: aiArticle.tips || [],
         conclusion: aiArticle.conclusion || '',
         cta: aiArticle.cta || '',
+        references: researchReferences,
       },
       tags:
         aiArticle.tags && aiArticle.tags.length
           ? aiArticle.tags
           : computeDefaultTags(input.keywords, aiArticle.sections),
-      coverImage: aiArticle.coverPrompt
-        ? {
-            prompt: aiArticle.coverPrompt,
-            status: 'pending',
-            url: null,
-            source: aiArticle.source || 'openai',
-          }
-        : null,
+      coverImage,
       prompt: {
         input,
         source: aiArticle.source || 'openai',
         raw: aiArticle.raw,
+        research: {
+          provider: researchData.provider,
+          summary: researchSummary,
+          references: researchReferences.map((ref) => ({
+            title: ref.title,
+            url: ref.url,
+          })),
+        },
+      },
+      research: {
+        provider: researchData.provider,
+        summary: researchSummary,
+        references: researchReferences,
+      },
+      rawSource: {
+        article: aiArticle.raw,
+        research: researchData.raw,
+      },
+      automation: {
+        generatedBy: 'admin:manual',
+        runAt: now,
+        researchProvider: researchData.provider || null,
+        articleSource: aiArticle.source || null,
+        coverStatus: coverImage ? coverImage.status : 'none',
       },
       metrics: {
         views: 0,
