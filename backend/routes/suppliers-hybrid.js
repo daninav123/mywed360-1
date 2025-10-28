@@ -184,6 +184,7 @@ router.post('/search', async (req, res) => {
     // ===== 1. BUSCAR PROVEEDORES REGISTRADOS EN FIRESTORE =====
     // (Saltar si modo es 'internet')
     if (searchMode !== 'internet') {
+      const firestoreStart = Date.now();
       console.log('📊 [FIRESTORE] Buscando proveedores por nombre...');
       console.log(`   Servicio: "${service}" | Query: "${query || '—'}"`);
 
@@ -217,15 +218,17 @@ router.post('/search', async (req, res) => {
         .map((doc) => {
           const data = doc.data();
 
-          // DEBUG: Log completo del proveedor
-          console.log(`\n[DEBUG] Proveedor ID: ${doc.id}`);
-          console.log(`   name: "${data.name || data.profile?.name}"`);
-          console.log(`   status: "${data.status}"`);
-          console.log(`   category: "${data.category || data.profile?.category}"`);
-          console.log(`   tags: [${(data.tags || []).join(', ')}]`);
-          console.log(
-            `   description: "${(data.business?.description || '').substring(0, 50)}..."`
-          );
+          // ⭐ OPTIMIZADO: Solo log si variable DEBUG está activada
+          if (process.env.DEBUG_SUPPLIERS === 'true') {
+            console.log(`\n[DEBUG] Proveedor ID: ${doc.id}`);
+            console.log(`   name: "${data.name || data.profile?.name}"`);
+            console.log(`   status: "${data.status}"`);
+            console.log(`   category: "${data.category || data.profile?.category}"`);
+            console.log(`   tags: [${(data.tags || []).join(', ')}]`);
+            console.log(
+              `   description: "${(data.business?.description || '').substring(0, 50)}..."`
+            );
+          }
 
           return {
             id: doc.id,
@@ -269,15 +272,17 @@ router.post('/search', async (req, res) => {
 
           const tokens = [...new Set(searchTokens.filter(Boolean))];
 
-          console.log(`\n🔍 [FILTER] Evaluando: ${supplier.name || supplier.profile?.name}`);
-          console.log(`   Tokens búsqueda: [${tokens.join(', ')}]`);
-          console.log(`   Name: "${supplierName}"`);
-          console.log(`   Category: "${supplierCategory}"`);
-          console.log(`   Tags: "${supplierTags}"`);
-          console.log(`   Desc: "${supplierDesc.substring(0, 50)}..."`);
+          // ⭐ OPTIMIZADO: Solo log detallado si DEBUG activado
+          if (process.env.DEBUG_SUPPLIERS === 'true') {
+            console.log(`\n🔍 [FILTER] Evaluando: ${supplier.name || supplier.profile?.name}`);
+            console.log(`   Tokens búsqueda: [${tokens.join(', ')}]`);
+            console.log(`   Name: "${supplierName}"`);
+            console.log(`   Category: "${supplierCategory}"`);
+            console.log(`   Tags: "${supplierTags}"`);
+            console.log(`   Desc: "${supplierDesc.substring(0, 50)}..."`);
+          }
 
           if (tokens.length === 0) {
-            console.log(`   ✅ SIN TOKENS - Incluido`);
             return true;
           }
 
@@ -292,14 +297,14 @@ router.post('/search', async (req, res) => {
               haystacks.some((h) => h.includes(token)) ||
               normalizedHaystacks.some((h) => h.includes(normalizedToken));
 
-            if (found) {
+            if (found && process.env.DEBUG_SUPPLIERS === 'true') {
               console.log(`   ✅ MATCH con token "${term}"`);
             }
 
             return found;
           });
 
-          if (!matches) {
+          if (!matches && process.env.DEBUG_SUPPLIERS === 'true') {
             console.log(`   ❌ NO MATCH - Filtrado`);
           }
 
@@ -310,7 +315,7 @@ router.post('/search', async (req, res) => {
           const status = supplier.status || 'active';
           const isValid = status === 'active' || status === 'discovered';
 
-          if (!isValid) {
+          if (!isValid && process.env.DEBUG_SUPPLIERS === 'true') {
             console.log(`❌ [STATUS] ${supplier.name} filtrado por status: "${status}"`);
           }
 
@@ -393,8 +398,10 @@ router.post('/search', async (req, res) => {
       trueRegistered = registeredResults; // Todos son registrados
       cachedResults = []; // No hay caché si todos están en suppliers
 
+      const firestoreEnd = Date.now();
+      const firestoreDuration = firestoreEnd - firestoreStart;
       console.log(
-        `✅ [FIRESTORE] ${registeredResults.length} proveedores encontrados en base de datos`
+        `✅ [FIRESTORE] ${registeredResults.length} proveedores encontrados en ${firestoreDuration}ms`
       );
       console.log(`   - Todos son REGISTRADOS (están en colección suppliers)`);
       console.log(`   - Registrados: ${trueRegistered.length}`);
@@ -410,6 +417,7 @@ router.post('/search', async (req, res) => {
       searchMode === 'internet' || (searchMode === 'auto' && trueRegistered.length < MIN_RESULTS);
 
     if (searchMode !== 'database' && shouldSearchInternet) {
+      const tavilyStart = Date.now();
       console.log(
         `\n🌐 [TAVILY] Solo ${trueRegistered.length} proveedores registrados (mínimo: ${MIN_RESULTS}). Buscando en internet...`
       );
@@ -417,7 +425,10 @@ router.post('/search', async (req, res) => {
       try {
         const tavilyResults = await searchTavilySimple(query || service, location, service);
 
-        console.log(`✅ [TAVILY] ${tavilyResults.length} proveedores encontrados en internet`);
+        const tavilyDuration = Date.now() - tavilyStart;
+        console.log(
+          `✅ [TAVILY] ${tavilyResults.length} proveedores encontrados en ${tavilyDuration}ms`
+        );
 
         // Filtrar duplicados (que ya estén en Firestore)
         const registeredEmails = new Set(

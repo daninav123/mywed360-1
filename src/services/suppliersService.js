@@ -7,7 +7,13 @@ import { auth } from '../firebaseConfig';
  * Buscar proveedores con el nuevo sistema híbrido
  * Primero busca en BD (registrados + cache), luego complementa con Tavily
  */
-export async function searchSuppliersHybrid(service, location, query = '', budget = null, filters = {}) {
+export async function searchSuppliersHybrid(
+  service,
+  location,
+  query = '',
+  budget = null,
+  filters = {}
+) {
   const normalizeInput = (value, fallback = '') => {
     if (typeof value === 'string') {
       const trimmed = value.trim();
@@ -34,40 +40,73 @@ export async function searchSuppliersHybrid(service, location, query = '', budge
     // Obtener token de Firebase Auth
     const user = auth.currentUser;
     const token = user ? await user.getIdToken() : null;
-    
+
     const headers = {
       'Content-Type': 'application/json',
     };
-    
+
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
-    
+
     const payload = {
       service: normalizeInput(service),
       location: normalizeInput(location),
       query: typeof query === 'string' ? query.trim() : '',
       budget,
-      filters: filters && typeof filters === 'object' ? filters : {}
+      filters: filters && typeof filters === 'object' ? filters : {},
     };
-    
-    const response = await fetch('/api/suppliers/search', {
-      method: 'POST',
-      headers,
-      credentials: 'include',
-      body: JSON.stringify(payload)
-    });
 
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
-      throw new Error(error.error || `Error ${response.status}: ${response.statusText}`);
+    console.log('🔍 [searchSuppliersHybrid] Iniciando búsqueda:', payload);
+    const startTime = Date.now();
+
+    // ⭐ NUEVO: Timeout de 30 segundos
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => {
+      controller.abort();
+      console.error('⏱️ [searchSuppliersHybrid] Timeout después de 30s');
+    }, 30000);
+
+    try {
+      const response = await fetch('/api/suppliers/search', {
+        method: 'POST',
+        headers,
+        credentials: 'include',
+        body: JSON.stringify(payload),
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      const elapsed = Date.now() - startTime;
+      console.log(`✅ [searchSuppliersHybrid] Respuesta recibida en ${elapsed}ms`);
+
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        console.error('❌ [searchSuppliersHybrid] Error del servidor:', error);
+        throw new Error(error.error || `Error ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log('📊 [searchSuppliersHybrid] Datos recibidos:', {
+        count: data.count,
+        breakdown: data.breakdown,
+        suppliersLength: data.suppliers?.length,
+      });
+      return data;
+    } catch (fetchError) {
+      clearTimeout(timeoutId);
+
+      if (fetchError.name === 'AbortError') {
+        console.error('⏱️ [searchSuppliersHybrid] Request abortado por timeout');
+        throw new Error(
+          'La búsqueda está tardando demasiado. Por favor, intenta con términos más específicos.'
+        );
+      }
+      throw fetchError;
     }
-
-    const data = await response.json();
-    return data;
-    
   } catch (error) {
-    console.error('Error en búsqueda híbrida:', error);
+    console.error('💥 [searchSuppliersHybrid] Error en búsqueda híbrida:', error);
     throw error;
   }
 }
@@ -81,8 +120,9 @@ export async function searchSuppliersHybrid(service, location, query = '', budge
 export async function trackSupplierAction(supplierId, action, userIdOrMetadata = null) {
   try {
     // Soporte para metadata como objeto o solo userId
-    const metadata = typeof userIdOrMetadata === 'object' ? userIdOrMetadata : { userId: userIdOrMetadata };
-    
+    const metadata =
+      typeof userIdOrMetadata === 'object' ? userIdOrMetadata : { userId: userIdOrMetadata };
+
     await fetch(`/api/suppliers/${supplierId}/track`, {
       method: 'POST',
       headers: {
@@ -91,8 +131,8 @@ export async function trackSupplierAction(supplierId, action, userIdOrMetadata =
       credentials: 'include',
       body: JSON.stringify({
         action,
-        ...metadata
-      })
+        ...metadata,
+      }),
     });
   } catch (error) {
     // No propagar error, es tracking
@@ -107,7 +147,7 @@ export async function getSupplierDetails(supplierId) {
   try {
     const response = await fetch(`/api/suppliers/${supplierId}`, {
       method: 'GET',
-      credentials: 'include'
+      credentials: 'include',
     });
 
     if (!response.ok) {
@@ -116,7 +156,6 @@ export async function getSupplierDetails(supplierId) {
 
     const data = await response.json();
     return data.supplier;
-    
   } catch (error) {
     console.error('Error obteniendo detalles:', error);
     throw error;
@@ -138,8 +177,8 @@ export async function searchSuppliersTavily(query, location, budget, service) {
         query,
         location,
         budget,
-        service
-      })
+        service,
+      }),
     });
 
     if (!response.ok) {
@@ -147,7 +186,6 @@ export async function searchSuppliersTavily(query, location, budget, service) {
     }
 
     return await response.json();
-    
   } catch (error) {
     console.error('Error en Tavily:', error);
     throw error;

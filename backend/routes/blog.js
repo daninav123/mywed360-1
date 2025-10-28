@@ -36,37 +36,87 @@ function mapDoc(doc) {
 }
 
 router.get('/', async (req, res) => {
-  try {
-    const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 10, 1), 24);
-    const language = req.query.language;
-    const cursor = req.query.cursor;
+  const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 10, 1), 24);
+  const languageRaw = typeof req.query.language === 'string' ? req.query.language.trim() : '';
+  const language = languageRaw ? languageRaw.toLowerCase() : '';
+  const cursorRaw = req.query.cursor;
 
-    let query = db
-      .collection(BLOG_COLLECTION)
-      .where('status', '==', 'published')
-      .orderBy('publishedAt', 'desc');
+  const baseQuery = db
+    .collection(BLOG_COLLECTION)
+    .where('status', '==', 'published')
+    .orderBy('publishedAt', 'desc');
 
-    if (language) {
+  const buildQuery = (withLanguage) => {
+    let query = baseQuery;
+    if (withLanguage && language) {
       query = query.where('language', '==', language);
     }
-
-    if (cursor) {
-      const cursorDate = new Date(cursor);
+    if (cursorRaw) {
+      const cursorDate = new Date(cursorRaw);
       if (!Number.isNaN(cursorDate.getTime())) {
         const cursorTimestamp = admin.firestore.Timestamp.fromDate(cursorDate);
         query = query.where('publishedAt', '<', cursorTimestamp).orderBy('publishedAt', 'desc');
       }
     }
+    return query.limit(limit);
+  };
 
-    const snapshot = await query.limit(limit).get();
+  try {
+    const snapshot = await buildQuery(true).get();
     const posts = snapshot.docs.map(mapDoc).filter((post) => post.publishedAt);
-    const nextCursor =
-      posts.length === limit ? posts[posts.length - 1].publishedAt || null : null;
-
+    const nextCursor = posts.length === limit ? posts[posts.length - 1].publishedAt || null : null;
     res.json({ posts, nextCursor });
+    return;
   } catch (error) {
-    console.error('[blog] list failed:', error?.message || error);
-    res.status(500).json({ error: 'blog-fetch-failed' });
+    const isIndexError =
+      error?.code === 'failed-precondition' || error?.message?.includes('requires an index');
+    console.warn('[blog] Query fallback activado. Motivo:', error?.message || error);
+
+    try {
+      const fallbackSnapshot = await db
+        .collection(BLOG_COLLECTION)
+        .where('status', '==', 'published')
+        .limit(200)
+        .get();
+
+      let posts = fallbackSnapshot.docs.map(mapDoc).filter((post) => post.publishedAt);
+
+      if (language) {
+        posts = posts.filter((post) => (post.language || '').toLowerCase() === language);
+      }
+
+      if (cursorRaw) {
+        const cursorDate = new Date(cursorRaw);
+        if (!Number.isNaN(cursorDate.getTime())) {
+          posts = posts.filter((post) => {
+            const publishedDate = new Date(post.publishedAt);
+            return publishedDate < cursorDate;
+          });
+        }
+      }
+
+      posts.sort((a, b) => {
+        const dateA = new Date(a.publishedAt).getTime();
+        const dateB = new Date(b.publishedAt).getTime();
+        return (Number.isNaN(dateB) ? 0 : dateB) - (Number.isNaN(dateA) ? 0 : dateA);
+      });
+
+      const pagePosts = posts.slice(0, limit);
+      const nextCursor =
+        pagePosts.length === limit ? pagePosts[pagePosts.length - 1].publishedAt || null : null;
+
+      res.json({
+        posts: pagePosts,
+        nextCursor,
+        fallback: true,
+        indexError: isIndexError,
+      });
+      return;
+    } catch (fallbackError) {
+      console.error('[blog] Fallback query failed:', fallbackError?.message || fallbackError);
+      res.status(500).json({ error: 'blog-fetch-failed' });
+      return;
+    }
   }
 });
 
@@ -94,4 +144,3 @@ router.get('/:slug', async (req, res) => {
 });
 
 export default router;
-

@@ -1,6 +1,16 @@
-import { User, Phone, Mail, Edit2, Trash2, MessageCircle } from 'lucide-react';
+import {
+  User,
+  Phone,
+  Mail,
+  Edit2,
+  Trash2,
+  MessageCircle,
+  Plus,
+  Search,
+  Filter,
+  Download,
+} from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Plus, Search, Filter, Download, Mail } from 'lucide-react';
 import { toast } from 'react-toastify';
 import useTranslations from '../../hooks/useTranslations';
 import { Button } from '../ui';
@@ -36,8 +46,8 @@ const GuestList = React.memo(
     const safeWedding = wedding || { guestStatus: (s) => s };
 
     // Defensivos por si llegan props mal formadas
-    const safeGuests = Array.isArray(guests) ?guests : [];
-    const safeSelectedIds = Array.isArray(selectedIds) ?selectedIds : [];
+    const safeGuests = Array.isArray(guests) ? guests : [];
+    const safeSelectedIds = Array.isArray(selectedIds) ? selectedIds : [];
 
     // Filtrado optimizado con useMemo
     const filteredGuests = useMemo(() => {
@@ -209,7 +219,7 @@ const GuestList = React.memo(
         </div>
 
         {/* Lista de invitados */}
-        {filteredGuests.length === 0 ?(
+        {filteredGuests.length === 0 ? (
           <div className="text-center py-12 bg-gray-50 rounded-lg">
             <User size={48} className="mx-auto text-muted mb-4" />
             <h3 className="text-lg font-medium text-body mb-2">{t('guests.empty.title')}</h3>
