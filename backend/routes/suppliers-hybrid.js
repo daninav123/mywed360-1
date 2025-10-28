@@ -101,7 +101,7 @@ async function searchTavilySimple(query, location, service) {
           'aliexpress',
           'milanuncios',
           'wallapop',
-          // ✅ NUEVOS: Directorios y agregadores
+          // Directorios de bodas
           'weddyplace.com',
           'eventosybodas.com',
           'tulistadebodas.com',
@@ -111,12 +111,31 @@ async function searchTavilySimple(query, location, service) {
           'bodasyweddings.com',
           'eventopedia.es',
           'guianovias.com',
-          // ✅ NUEVOS: Portales genéricos
+          // NUEVO: Más directorios y agregadores de bodas
+          'bodamas.es',
+          'bodasdecuento.com',
+          'enlaceboda.com',
+          'noviatica.com',
+          'bodasenvalencia.com',
+          'directoriodebodas.com',
+          'guiadebodas.es',
+          'bodasnet.es',
+          'celebracionesperfectas.com',
+          'tusbodasdecuento.com',
+          // Portales genéricos
           'milanuncios.com',
           'segundamano.es',
           'olx.es',
           'vibbo.com',
           'tablondeanuncios.com',
+          // NUEVO: Portales de recomendaciones/rankings
+          'tripadvisor',
+          'yelp',
+          'foursquare',
+          'facebook.com/pages', // Páginas de FB que listan proveedores
+          'mejores10.com',
+          'top10.com',
+          'rankia.com',
         ],
       }),
     });
@@ -401,16 +420,42 @@ router.post('/search', async (req, res) => {
           if (email && registeredEmails.has(email)) return false;
           if (url && registeredUrls.has(url)) return false;
 
-          // ✅ Filtrar resultados de baja calidad
+          // ✅ Filtrar resultados de baja calidad y LISTADOS/DIRECTORIOS
           const lowQualityIndicators = [
+            // Opiniones y comparativas
             'opiniones de',
             'precios desde',
             'comparar precios',
+            'reseñas de',
+            'valoraciones de',
+
+            // Directorios y listados
             'encuentra los mejores',
             'directorio de',
             'listado de',
             'guía de proveedores',
             'selección de',
+
+            // ⭐ NUEVO: Detectar "Los X mejores..." o "Top X..."
+            'los 10 mejores',
+            'los 5 mejores',
+            'los mejores',
+            'las mejores',
+            'mejores proveedores',
+            'mejores grupos',
+            'mejores empresas',
+            'mejores servicios',
+            'top 10',
+            'top 5',
+            'ranking de',
+            'clasificación de',
+
+            // Agregadores
+            'encuentra tu',
+            'busca el mejor',
+            'compara proveedores',
+            'todos los proveedores',
+            'proveedores de',
           ];
 
           const hasLowQualityIndicator = lowQualityIndicators.some(
@@ -418,12 +463,30 @@ router.post('/search', async (req, res) => {
           );
 
           if (hasLowQualityIndicator) {
-            console.log(`   ❌ Filtrado por baja calidad: ${r.title}`);
+            console.log(`   ❌ Filtrado por baja calidad/listado: ${r.title}`);
             return false;
           }
 
           // ✅ Debe tener al menos título y URL
           if (!r.title || !r.url) return false;
+
+          // ⭐ NUEVO: Detectar si parece un listado por patrones en el título
+          const listPatterns = [
+            /^\d+\s+(mejores?|top)/i, // "10 mejores...", "5 top..."
+            /(los|las)\s+\d+\s+mejores?/i, // "Los 10 mejores..."
+            /top\s+\d+/i, // "Top 10..."
+            /ranking\s+(de|del)/i, // "Ranking de..."
+            /clasificación\s+(de|del)/i, // "Clasificación de..."
+            /encuentra\s+(los|las|tu|el)/i, // "Encuentra los..."
+            /todos?\s+(los|las)\s+\w+\s+de/i, // "Todos los proveedores de..."
+          ];
+
+          const seemsLikeListing = listPatterns.some((pattern) => pattern.test(title));
+
+          if (seemsLikeListing) {
+            console.log(`   ❌ Filtrado por patrón de listado: ${r.title}`);
+            return false;
+          }
 
           // ✅ Score mínimo de calidad (Tavily score 0-1)
           if ((r.score || 0) < 0.3) {
