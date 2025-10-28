@@ -405,22 +405,52 @@ router.post('/search', async (req, res) => {
             return true;
           }
 
-          const haystacks = [supplierName, supplierCategory, supplierDesc, supplierTags];
-          const normalizedHaystacks = haystacks.map(normalizeText);
-
+          // ⭐ MEJORADO: Match ponderado - priorizar nombre y categoría
           const matches = tokens.some((term) => {
             const token = term.toLowerCase();
             const normalizedToken = normalizeText(token);
 
-            const found =
-              haystacks.some((h) => h.includes(token)) ||
-              normalizedHaystacks.some((h) => h.includes(normalizedToken));
+            // 1. Match en nombre o categoría (más importante)
+            const matchInNameOrCategory =
+              supplierName.includes(token) ||
+              supplierCategory.includes(token) ||
+              normalizeText(supplierName).includes(normalizedToken) ||
+              normalizeText(supplierCategory).includes(normalizedToken);
 
-            if (found && process.env.DEBUG_SUPPLIERS === 'true') {
-              console.log(`   ✅ MATCH con token "${term}"`);
+            if (matchInNameOrCategory) {
+              if (process.env.DEBUG_SUPPLIERS === 'true') {
+                console.log(`   ✅ MATCH en nombre/categoría con token "${term}"`);
+              }
+              return true;
             }
 
-            return found;
+            // 2. Match en tags (menos importante, pero aceptable)
+            const matchInTags =
+              supplierTags.includes(token) || normalizeText(supplierTags).includes(normalizedToken);
+
+            if (matchInTags) {
+              if (process.env.DEBUG_SUPPLIERS === 'true') {
+                console.log(`   ✅ MATCH en tags con token "${term}"`);
+              }
+              return true;
+            }
+
+            // 3. Match en descripción SOLO si el token es largo (>4 caracteres)
+            // Esto evita falsos positivos con palabras cortas en descripciones largas
+            if (token.length > 4) {
+              const matchInDesc =
+                supplierDesc.includes(token) ||
+                normalizeText(supplierDesc).includes(normalizedToken);
+
+              if (matchInDesc) {
+                if (process.env.DEBUG_SUPPLIERS === 'true') {
+                  console.log(`   ✅ MATCH en descripción con token "${term}"`);
+                }
+                return true;
+              }
+            }
+
+            return false;
           });
 
           if (!matches && process.env.DEBUG_SUPPLIERS === 'true') {
