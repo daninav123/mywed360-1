@@ -325,25 +325,33 @@ router.post('/search', async (req, res) => {
 
           // Si hay query específica, priorizar coincidencias de nombre
           if (query && query.trim()) {
-            const searchTerm = query.toLowerCase().trim();
+            // ⭐ CLAVE: Extraer tokens individuales de la query
+            const queryTokens = String(query)
+              .toLowerCase()
+              .trim()
+              .split(/\s+/)
+              .filter((t) => t.length > 0);
 
-            // Coincidencia exacta de nombre (máxima prioridad)
-            const exactMatchA = nameA === searchTerm;
-            const exactMatchB = nameB === searchTerm;
-            if (exactMatchA && !exactMatchB) return -1;
-            if (!exactMatchA && exactMatchB) return 1;
+            // Buscar coincidencias con CADA token
+            for (const searchTerm of queryTokens) {
+              // Coincidencia exacta de nombre (máxima prioridad)
+              const exactMatchA = nameA === searchTerm;
+              const exactMatchB = nameB === searchTerm;
+              if (exactMatchA && !exactMatchB) return -1;
+              if (!exactMatchA && exactMatchB) return 1;
 
-            // Nombre comienza con el término (segunda prioridad)
-            const startsWithA = nameA.startsWith(searchTerm);
-            const startsWithB = nameB.startsWith(searchTerm);
-            if (startsWithA && !startsWithB) return -1;
-            if (!startsWithA && startsWithB) return 1;
+              // Nombre comienza con el término (segunda prioridad)
+              const startsWithA = nameA.startsWith(searchTerm);
+              const startsWithB = nameB.startsWith(searchTerm);
+              if (startsWithA && !startsWithB) return -1;
+              if (!startsWithA && startsWithB) return 1;
 
-            // Nombre contiene el término (tercera prioridad)
-            const containsA = nameA.includes(searchTerm);
-            const containsB = nameB.includes(searchTerm);
-            if (containsA && !containsB) return -1;
-            if (!containsA && containsB) return 1;
+              // Nombre contiene el término (tercera prioridad)
+              const containsA = nameA.includes(searchTerm);
+              const containsB = nameB.includes(searchTerm);
+              if (containsA && !containsB) return -1;
+              if (!containsA && containsB) return 1;
+            }
           }
 
           // Si no hay coincidencias de nombre especiales, ordenar por matchScore
