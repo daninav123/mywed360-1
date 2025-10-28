@@ -1,10 +1,12 @@
 // components/suppliers/SupplierCard.jsx
 // Tarjeta de proveedor con diferenciación visual (Registrado vs Internet)
 
-import React from 'react';
-import { CheckCircle, Globe, Mail, Phone, Instagram, ExternalLink } from 'lucide-react';
+import React, { useState } from 'react';
+import { CheckCircle, Globe, Mail, Phone, Instagram, ExternalLink, MessageCircle, Star, MapPin } from 'lucide-react';
 
-export default function SupplierCard({ supplier, onContact, onViewDetails }) {
+export default function SupplierCard({ supplier, onContact, onViewDetails, onMarkAsConfirmed }) {
+  const [showContactMenu, setShowContactMenu] = useState(false);
+  
   const isRegistered = supplier.priority === 'registered';
   const isCached = supplier.priority === 'cached';
   const isInternet = supplier.priority === 'internet';
@@ -21,6 +23,29 @@ export default function SupplierCard({ supplier, onContact, onViewDetails }) {
     : isCached
     ? 'bg-blue-50'
     : 'bg-white';
+  
+  // Funciones de contacto
+  const handleContactWhatsApp = () => {
+    const phone = supplier.contact?.phone?.replace(/\D/g, ''); // Solo números
+    const message = `Hola ${supplier.name}, encontré su servicio de ${supplier.category || 'bodas'} en MyWed360 y me gustaría más información.`;
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
+    onContact?.({ method: 'whatsapp', supplier });
+    setShowContactMenu(false);
+  };
+  
+  const handleContactEmail = () => {
+    const subject = `Consulta desde MyWed360 - ${supplier.category || 'Servicio'}`;
+    const body = `Hola ${supplier.name},\n\nEncontré su servicio en MyWed360 y me gustaría recibir más información.\n\nGracias!`;
+    window.open(`mailto:${supplier.contact?.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`, '_blank');
+    onContact?.({ method: 'email', supplier });
+    setShowContactMenu(false);
+  };
+  
+  const handleContactPhone = () => {
+    window.open(`tel:${supplier.contact?.phone}`, '_blank');
+    onContact?.({ method: 'phone', supplier });
+    setShowContactMenu(false);
+  };
   
   return (
     <div className={`
@@ -126,41 +151,110 @@ export default function SupplierCard({ supplier, onContact, onViewDetails }) {
       )}
       
       {/* Acciones */}
-      <div className="flex gap-2 mt-4">
+      <div className="space-y-2 mt-4">
         {isRegistered || isCached ? (
           <>
-            <button
-              onClick={() => onContact?.(supplier)}
-              className="flex-1 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors font-medium text-sm"
-            >
-              💬 Contactar
-            </button>
-            <button
-              onClick={() => onViewDetails?.(supplier)}
-              className="px-4 py-2 border border-green-600 text-green-600 rounded-md hover:bg-green-50 transition-colors font-medium text-sm"
-            >
-              Ver perfil
-            </button>
+            {/* Botón principal de contacto */}
+            <div className="relative">
+              <button
+                onClick={() => setShowContactMenu(!showContactMenu)}
+                className="w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors font-medium text-sm flex items-center justify-center gap-2"
+              >
+                <MessageCircle size={16} />
+                Contactar
+              </button>
+              
+              {/* Menú de opciones de contacto */}
+              {showContactMenu && (
+                <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-10 overflow-hidden">
+                  {supplier.contact?.phone && (
+                    <button
+                      onClick={handleContactWhatsApp}
+                      className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-2 text-sm"
+                    >
+                      <MessageCircle size={16} className="text-green-600" />
+                      WhatsApp
+                    </button>
+                  )}
+                  {supplier.contact?.email && (
+                    <button
+                      onClick={handleContactEmail}
+                      className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-2 text-sm border-t"
+                    >
+                      <Mail size={16} className="text-blue-600" />
+                      Email
+                    </button>
+                  )}
+                  {supplier.contact?.phone && (
+                    <button
+                      onClick={handleContactPhone}
+                      className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-2 text-sm border-t"
+                    >
+                      <Phone size={16} className="text-purple-600" />
+                      Llamar
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+            
+            {/* Botones secundarios */}
+            <div className="flex gap-2">
+              {onViewDetails && (
+                <button
+                  onClick={() => onViewDetails(supplier)}
+                  className="flex-1 px-4 py-2 border border-green-600 text-green-600 rounded-md hover:bg-green-50 transition-colors font-medium text-sm"
+                >
+                  Ver perfil
+                </button>
+              )}
+              {onMarkAsConfirmed && (
+                <button
+                  onClick={() => onMarkAsConfirmed(supplier)}
+                  className="flex-1 px-4 py-2 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-50 transition-colors font-medium text-sm flex items-center justify-center gap-1"
+                >
+                  <CheckCircle size={16} />
+                  Contratar
+                </button>
+              )}
+            </div>
           </>
         ) : (
           <>
-            <a
-              href={supplier.contact?.website || supplier.sources?.[0]?.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors font-medium text-sm flex items-center justify-center gap-2"
-            >
-              <ExternalLink size={16} />
-              Ver web
-            </a>
-            <button
-              onClick={() => {
-                alert('Este proveedor puede registrarse en nuestra plataforma para aparecer destacado. ¡Invítalo!');
-              }}
-              className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 font-medium"
-            >
-              Sugerir registro
-            </button>
+            {/* Proveedores de internet */}
+            <div className="flex gap-2">
+              {supplier.contact?.website || supplier.sources?.[0]?.url ? (
+                <a
+                  href={supplier.contact?.website || supplier.sources?.[0]?.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors font-medium text-sm flex items-center justify-center gap-2"
+                >
+                  <ExternalLink size={16} />
+                  Ver web
+                </a>
+              ) : null}
+              
+              {supplier.contact?.phone && (
+                <button
+                  onClick={handleContactWhatsApp}
+                  className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-sm"
+                  title="Contactar por WhatsApp"
+                >
+                  <MessageCircle size={16} />
+                </button>
+              )}
+              
+              {supplier.contact?.email && (
+                <button
+                  onClick={handleContactEmail}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm"
+                  title="Enviar Email"
+                >
+                  <Mail size={16} />
+                </button>
+              )}
+            </div>
           </>
         )}
       </div>

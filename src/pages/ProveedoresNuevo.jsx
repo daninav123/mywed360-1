@@ -216,8 +216,8 @@ const ServiceOptionsModal = ({ open, card, onClose, t }) => {
 
 const Proveedores = () => {
   const { t, currentLanguage } = useTranslations();
-  const { providers, filteredProviders, loading, error, searchTerm, setSearchTerm, loadProviders, addProvider } = useProveedores();
-  const { shortlist, loading: shortlistLoading, error: shortlistError } = useSupplierShortlist();
+  const { providers, filteredProviders, loading, error, searchTerm, setSearchTerm, loadProviders, addProvider, updateProvider } = useProveedores();
+  const { shortlist, loading: shortlistLoading, error: shortlistError, addEntry: addToShortlist } = useSupplierShortlist();
   const { activeWedding } = useWedding();
   const { info: weddingProfile } = useActiveWeddingInfo();
   // Sistema de búsqueda híbrido (prioriza BD propia)
@@ -507,6 +507,78 @@ const Proveedores = () => {
     setSearchDrawerOpen(true);
   }, []);
 
+  // 🆕 Marcar proveedor como contratado
+  const handleMarkAsConfirmed = useCallback(async (supplier) => {
+    if (!supplier) return;
+    
+    try {
+      // Verificar si el proveedor ya existe en nuestra base de datos
+      const existingProvider = providers.find(p => 
+        p.email === supplier.contact?.email || 
+        p.name === supplier.name
+      );
+      
+      if (existingProvider) {
+        // Actualizar proveedor existente
+        await updateProvider(existingProvider.id, {
+          status: 'Confirmado',
+          confirmedAt: new Date(),
+        });
+        
+        toast.success(`✅ ${supplier.name} marcado como contratado`);
+      } else {
+        // Crear nuevo proveedor en la base de datos
+        const newProviderData = {
+          name: supplier.name,
+          service: supplier.category || supplier.service || 'otros',
+          contact: supplier.contact?.name || supplier.name,
+          email: supplier.contact?.email || '',
+          phone: supplier.contact?.phone || '',
+          status: 'Confirmado',
+          date: new Date().toISOString(),
+          rating: supplier.metrics?.rating || 0,
+          ratingCount: supplier.metrics?.reviewCount || 0,
+          snippet: supplier.business?.description || '',
+          link: supplier.contact?.website || '',
+          image: supplier.media?.logo || '',
+          isFavorite: false,
+          confirmedAt: new Date(),
+          source: 'search', // Indica que viene de búsqueda
+          originalData: {
+            supplierId: supplier.id || supplier.slug,
+            registered: supplier.registered || false,
+            priority: supplier.priority
+          }
+        };
+        
+        await addProvider(newProviderData);
+        toast.success(`✅ ${supplier.name} agregado y marcado como contratado`);
+      }
+      
+      // Trackear la acción
+      await trackSupplierAction(supplier.id || supplier.slug, 'confirm');
+      
+      // Agregar al shortlist si no está
+      try {
+        await addToShortlist({
+          supplierId: supplier.id || supplier.slug,
+          supplierName: supplier.name,
+          service: supplier.category || supplier.service || 'otros',
+          notes: `Contratado el ${new Date().toLocaleDateString()}`,
+        });
+      } catch (err) {
+        console.log('[Shortlist] Ya existe o error:', err);
+      }
+      
+      // Recargar proveedores
+      loadProviders();
+      
+    } catch (error) {
+      console.error('[MarkAsConfirmed] Error:', error);
+      toast.error(`Error al marcar ${supplier.name} como contratado`);
+    }
+  }, [providers, updateProvider, addProvider, addToShortlist, loadProviders]);
+
   const handleSaveWantedServices = useCallback(
     async (list) => {
       setWantedServices(list);
@@ -779,14 +851,18 @@ const Proveedores = () => {
                         <SupplierCard
                           key={supplier.id || supplier.slug || Math.random()}
                           supplier={supplier}
-                          onContact={(s) => {
-                            trackSupplierAction(s.id || s.slug, 'contact');
-                            handleSelectSearchResult(s);
+                          onContact={(contactInfo) => {
+                            // contactInfo puede ser { method, supplier } o simplemente supplier
+                            const sup = contactInfo.supplier || contactInfo;
+                            trackSupplierAction(sup.id || sup.slug, 'contact', {
+                              method: contactInfo.method || 'unknown'
+                            });
                           }}
                           onViewDetails={(s) => {
                             trackSupplierAction(s.id || s.slug, 'click');
                             handleSelectSearchResult(s);
                           }}
+                          onMarkAsConfirmed={handleMarkAsConfirmed}
                         />
                       ))}
                     </div>

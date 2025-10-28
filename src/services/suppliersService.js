@@ -49,10 +49,16 @@ export async function searchSuppliersHybrid(service, location, query = '', budge
 }
 
 /**
- * Registrar acción de usuario (view, click, contact)
+ * Registrar acción de usuario (view, click, contact, confirm)
+ * @param {string} supplierId - ID del proveedor
+ * @param {string} action - Acción realizada (view, click, contact, confirm)
+ * @param {string|object} userIdOrMetadata - userId o metadata adicional { userId, method, ... }
  */
-export async function trackSupplierAction(supplierId, action, userId = null) {
+export async function trackSupplierAction(supplierId, action, userIdOrMetadata = null) {
   try {
+    // Soporte para metadata como objeto o solo userId
+    const metadata = typeof userIdOrMetadata === 'object' ? userIdOrMetadata : { userId: userIdOrMetadata };
+    
     await fetch(`/api/suppliers/${supplierId}/track`, {
       method: 'POST',
       headers: {
@@ -61,7 +67,7 @@ export async function trackSupplierAction(supplierId, action, userId = null) {
       credentials: 'include',
       body: JSON.stringify({
         action,
-        userId
+        ...metadata
       })
     });
   } catch (error) {
