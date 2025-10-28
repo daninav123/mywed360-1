@@ -158,8 +158,7 @@ router.post('/search', async (req, res) => {
 
           // DEBUG: Log completo del proveedor
           console.log(`\n[DEBUG] Proveedor ID: ${doc.id}`);
-          console.log(`   name: "${data.name}"`);
-          console.log(`   registered: ${data.registered} (${typeof data.registered})`);
+          console.log(`   name: "${data.name || data.profile?.name}"`);
           console.log(`   status: "${data.status}"`);
           console.log(`   category: "${data.category || data.profile?.category}"`);
           console.log(`   tags: [${(data.tags || []).join(', ')}]`);
@@ -170,16 +169,25 @@ router.post('/search', async (req, res) => {
           return {
             id: doc.id,
             ...data,
-            priority: data.registered === true ? 'registered' : 'cached',
-            badge: data.registered === true ? 'Verificado ✓' : 'En caché',
-            badgeType: data.registered === true ? 'success' : 'info',
+            // Todos los de la colección suppliers son registrados
+            registered: true,
+            priority: 'registered',
+            badge: 'Verificado ',
+            badgeType: 'success',
           };
         })
         // Filtrar por nombre/término de búsqueda
         .filter((supplier) => {
-          const supplierName = (supplier.name || '').toLowerCase();
+          const supplierName = (supplier.name || supplier.profile?.name || '').toLowerCase();
           const supplierDesc = (supplier.business?.description || '').toLowerCase();
-          const supplierTags = (supplier.tags || []).join(' ').toLowerCase();
+          const supplierTags = (supplier.tags || supplier.business?.services || [])
+            .join(' ')
+            .toLowerCase();
+          const supplierCategory = (
+            supplier.category ||
+            supplier.profile?.category ||
+            ''
+          ).toLowerCase();
 
           const searchTokens = [];
 
@@ -200,9 +208,10 @@ router.post('/search', async (req, res) => {
 
           const tokens = [...new Set(searchTokens.filter(Boolean))];
 
-          console.log(`\n🔍 [FILTER] Evaluando: ${supplier.name}`);
+          console.log(`\n🔍 [FILTER] Evaluando: ${supplier.name || supplier.profile?.name}`);
           console.log(`   Tokens búsqueda: [${tokens.join(', ')}]`);
           console.log(`   Name: "${supplierName}"`);
+          console.log(`   Category: "${supplierCategory}"`);
           console.log(`   Tags: "${supplierTags}"`);
           console.log(`   Desc: "${supplierDesc.substring(0, 50)}..."`);
 
@@ -211,7 +220,7 @@ router.post('/search', async (req, res) => {
             return true;
           }
 
-          const haystacks = [supplierName, supplierDesc, supplierTags];
+          const haystacks = [supplierName, supplierCategory, supplierDesc, supplierTags];
           const normalizedHaystacks = haystacks.map(normalizeText);
 
           const matches = tokens.some((term) => {
@@ -283,15 +292,16 @@ router.post('/search', async (req, res) => {
         }
       }
 
-      // Separar proveedores registrados de caché
-      trueRegistered = registeredResults.filter((r) => r.registered === true);
-      cachedResults = registeredResults.filter((r) => r.registered !== true);
+      // TODOS los proveedores en la colección 'suppliers' son registrados
+      // No necesitamos filtrar por un campo 'registered'
+      trueRegistered = registeredResults; // Todos son registrados
+      cachedResults = []; // No hay caché si todos están en suppliers
 
       console.log(
         `✅ [FIRESTORE] ${registeredResults.length} proveedores encontrados en base de datos`
       );
-      console.log(`   - Registrados reales: ${trueRegistered.length}`);
-      console.log(`   - En caché: ${cachedResults.length}`);
+      console.log(`   - Todos son REGISTRADOS (están en colección suppliers)`);
+      console.log(`   - Registrados: ${trueRegistered.length}`);
     } else {
       console.log('⏭️ [FIRESTORE] Saltando búsqueda en base de datos (modo: internet)');
     }
