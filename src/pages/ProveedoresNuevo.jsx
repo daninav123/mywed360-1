@@ -19,6 +19,8 @@ import useAISearch from '../hooks/useAISearch';
 import useProveedores from '../hooks/useProveedores';
 import useSupplierShortlist from '../hooks/useSupplierShortlist';
 import { loadData, saveData } from '../services/SyncService';
+import { searchSuppliersHybrid, trackSupplierAction } from '../services/suppliersService';
+import SupplierCard from '../components/suppliers/SupplierCard';
 
 const CONFIRMED_KEYWORDS = ['confirm', 'contrat', 'reserva', 'firm'];
 
@@ -177,14 +179,17 @@ const Proveedores = () => {
   const { shortlist, loading: shortlistLoading, error: shortlistError } = useSupplierShortlist();
   const { activeWedding } = useWedding();
   const { info: weddingProfile } = useActiveWeddingInfo();
-  const {
-    results: aiResults,
-    loading: aiLoading,
-    error: aiError,
-    usedFallback: aiUsedFallback,
-    searchProviders: runAISearch,
-    clearResults: clearAISearch,
-  } = useAISearch();
+  // Sistema de búsqueda híbrido (prioriza BD propia)
+  const [aiResults, setAiResults] = useState([]);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState(null);
+  const [searchBreakdown, setSearchBreakdown] = useState(null);
+  
+  const clearAISearch = () => {
+    setAiResults([]);
+    setAiError(null);
+    setSearchBreakdown(null);
+  };
 
   const [showNewProviderForm, setShowNewProviderForm] = useState(false);
   const [newProviderInitial, setNewProviderInitial] = useState(null);
@@ -347,20 +352,38 @@ const Proveedores = () => {
       setSearchDrawerResult(null);
 
       try {
-        const results = await runAISearch(enrichedQuery || trimmed, {
-          service: trimmed,
-          allowFallback: true, // Activar fallback para mostrar resultados demo si backend no está disponible
-        });
-        const safeResults = Array.isArray(results) ? results : [];
-        if (!safeResults.length && !silent) {
-          toast.info('No encontramos coincidencias directas. Ajusta la búsqueda o actualiza tu perfil.');
+        setAiLoading(true);
+        setAiError(null);
+        
+        // Usar nuevo sistema híbrido (BD propia → bodas.net → internet)
+        const result = await searchSuppliersHybrid(
+          trimmed, // service/category
+          weddingProfile?.location || weddingProfile?.city || 'España', // location
+          enrichedQuery || '', // query adicional
+          weddingProfile?.budget, // budget
+          {} // filters
+        );
+        
+        console.log('🔍 [Hybrid Search] Resultados:', result);
+        console.log('📊 Breakdown:', result.breakdown);
+        
+        setAiResults(result.suppliers || []);
+        setSearchBreakdown(result.breakdown);
+        
+        if (result.count === 0 && !silent) {
+          toast.info('No encontramos coincidencias. Intenta con otros términos de búsqueda.');
+        } else if (result.count > 0) {
+          toast.success(`✅ ${result.count} proveedores encontrados (${result.breakdown?.registered || 0} verificados, ${result.breakdown?.cached || 0} en caché, ${result.breakdown?.internet || 0} de internet)`);
         }
       } catch (err) {
-        console.warn('[Proveedores] searchProviders failed', err);
+        console.error('[Proveedores] Hybrid search failed', err);
+        setAiError(err);
         if (!silent) toast.error('No se pudo completar la búsqueda.');
+      } finally {
+        setAiLoading(false);
       }
     },
-    [profileSearchTokens, registerSearchQuery, runAISearch, setSearchTerm]
+    [profileSearchTokens, registerSearchQuery, setSearchTerm, weddingProfile]
   );
 
   const totalSearchPages = useMemo(() => {
@@ -658,60 +681,29 @@ const Proveedores = () => {
                   </Card>
                 ) : (
                   <>
+                    {/* Mostrar breakdown de resultados */}
+                    {searchBreakdown && searchBreakdown.registered + searchBreakdown.cached + searchBreakdown.internet > 0 && (
+                      <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                        <p className="text-sm text-blue-900 font-medium">
+                          📊 Encontrados: {searchBreakdown.registered} verificados · {searchBreakdown.cached} en caché · {searchBreakdown.internet} de internet
+                        </p>
+                      </div>
+                    )}
+                    
                     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                      {paginatedResults.map((result) => (
-                        <Card
-                          key={result.id}
-                          className="border border-soft bg-surface overflow-hidden flex flex-col gap-3"
-                        >
-                          <div className="h-36 w-full overflow-hidden rounded-md">
-                            <img
-                              src={result.image || DEFAULT_PROVIDER_IMAGE}
-                              alt={`Imagen de ${result.name || 'proveedor'}`}
-                              className="h-full w-full object-cover"
-                              onError={(event) => {
-                                event.currentTarget.src = DEFAULT_PROVIDER_IMAGE;
-                              }}
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <div className="flex items-start justify-between gap-2">
-                              <div>
-                                <h4 className="text-base font-semibold text-body">{result.name || 'Proveedor sugerido'}</h4>
-                                <p className="text-xs text-muted">{result.service || 'Servicio'}</p>
-                              </div>
-                              {result.match != null && (
-                                <span className="rounded-full bg-primary-soft px-2 py-0.5 text-xs font-semibold text-primary">
-                                  Match {Math.round(result.match)}
-                                </span>
-                              )}
-                            </div>
-                            {result.location && (
-                              <p className="text-xs text-muted">Ubicación · {result.location}</p>
-                            )}
-                            {result.priceRange && (
-                              <p className="text-xs text-muted">Precio estimado · {result.priceRange}</p>
-                            )}
-                            {result.snippet && (
-                              <p className="text-sm text-body/75">{result.snippet}</p>
-                            )}
-                          </div>
-                          <div className="mt-auto flex items-center justify-between gap-3">
-                            <Button
-                              type="button"
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleSelectSearchResult(result)}
-                            >
-                              Ver detalles
-                            </Button>
-                            {result.source && (
-                              <span className="text-[10px] uppercase tracking-wide text-muted">
-                                {result.source}
-                              </span>
-                            )}
-                          </div>
-                        </Card>
+                      {paginatedResults.map((supplier) => (
+                        <SupplierCard
+                          key={supplier.id || supplier.slug || Math.random()}
+                          supplier={supplier}
+                          onContact={(s) => {
+                            trackSupplierAction(s.id || s.slug, 'contact');
+                            handleSelectSearchResult(s);
+                          }}
+                          onViewDetails={(s) => {
+                            trackSupplierAction(s.id || s.slug, 'click');
+                            handleSelectSearchResult(s);
+                          }}
+                        />
                       ))}
                     </div>
 
