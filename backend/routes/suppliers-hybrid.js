@@ -420,6 +420,26 @@ router.post('/search', async (req, res) => {
           if (email && registeredEmails.has(email)) return false;
           if (url && registeredUrls.has(url)) return false;
 
+          // ⭐ EXCEPCIÓN ESPECIAL: Bodas.net - Detectar si es perfil individual o listado
+          const isBodasNet = url && url.includes('bodas.net');
+          if (isBodasNet) {
+            // Perfiles individuales de bodas.net tienen un slug único con ID
+            // Ejemplo BUENO: bodas.net/musicos/angeli-musica--e123456
+            // Ejemplo MALO:  bodas.net/musicos/valencia (listado)
+
+            const hasProfileSlug = /bodas\.net\/[^\/]+\/[^\/]+--[a-z0-9]+/i.test(url);
+
+            if (hasProfileSlug) {
+              // Es un perfil individual de bodas.net → ACEPTAR siempre
+              console.log(`   ✅ Bodas.net perfil individual aceptado: ${r.title}`);
+              return true;
+            } else {
+              // Es un listado de bodas.net → RECHAZAR
+              console.log(`   ❌ Bodas.net listado rechazado: ${r.title}`);
+              return false;
+            }
+          }
+
           // ✅ Filtrar resultados de baja calidad y LISTADOS/DIRECTORIOS
           const lowQualityIndicators = [
             // Opiniones y comparativas
