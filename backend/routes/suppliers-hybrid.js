@@ -316,10 +316,37 @@ router.post('/search', async (req, res) => {
 
           return isValid;
         })
-        // Ordenar por matchScore en memoria (evita índice compuesto)
+        // ⭐ ORDENAMIENTO INTELIGENTE: Priorizar coincidencias de nombre
         .sort((a, b) => {
+          const nameA = (a.name || a.profile?.name || '').toLowerCase();
+          const nameB = (b.name || b.profile?.name || '').toLowerCase();
           const scoreA = a.metrics?.matchScore || 0;
           const scoreB = b.metrics?.matchScore || 0;
+
+          // Si hay query específica, priorizar coincidencias de nombre
+          if (query && query.trim()) {
+            const searchTerm = query.toLowerCase().trim();
+
+            // Coincidencia exacta de nombre (máxima prioridad)
+            const exactMatchA = nameA === searchTerm;
+            const exactMatchB = nameB === searchTerm;
+            if (exactMatchA && !exactMatchB) return -1;
+            if (!exactMatchA && exactMatchB) return 1;
+
+            // Nombre comienza con el término (segunda prioridad)
+            const startsWithA = nameA.startsWith(searchTerm);
+            const startsWithB = nameB.startsWith(searchTerm);
+            if (startsWithA && !startsWithB) return -1;
+            if (!startsWithA && startsWithB) return 1;
+
+            // Nombre contiene el término (tercera prioridad)
+            const containsA = nameA.includes(searchTerm);
+            const containsB = nameB.includes(searchTerm);
+            if (containsA && !containsB) return -1;
+            if (!containsA && containsB) return 1;
+          }
+
+          // Si no hay coincidencias de nombre especiales, ordenar por matchScore
           return scoreB - scoreA; // Descendente
         })
         // Limitar resultados después de ordenar
