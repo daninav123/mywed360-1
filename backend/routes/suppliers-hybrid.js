@@ -81,9 +81,10 @@ router.post('/search', async (req, res) => {
     // ===== 1. BUSCAR PROVEEDORES REGISTRADOS EN FIRESTORE =====
     console.log('📊 [FIRESTORE] Buscando proveedores registrados...');
     
+    // Query simplificada sin índice compuesto (ordenamos en memoria)
     let firestoreQuery = db.collection('suppliers')
-      .where('status', 'in', ['active', 'discovered']) // Incluir discovered también
-      .where('category', '==', service);
+      .where('category', '==', service)
+      .limit(50); // Aumentar límite para compensar filtrado en memoria
     
     // Filtro por ubicación (ciudad exacta)
     // TODO: Mejorar para buscar en serviceArea también
@@ -91,23 +92,32 @@ router.post('/search', async (req, res) => {
       firestoreQuery = firestoreQuery.where('location.city', '==', location);
     }
     
-    // Ordenar por matchScore (mejores primero)
-    firestoreQuery = firestoreQuery
-      .orderBy('metrics.matchScore', 'desc')
-      .limit(20);
-    
     const snapshot = await firestoreQuery.get();
     
-    let registeredResults = snapshot.docs.map(doc => {
-      const data = doc.data();
-      return {
-        id: doc.id,
-        ...data,
-        priority: data.registered ? 'registered' : 'cached', // Diferenciar registrados de cache
-        badge: data.registered ? 'Verificado ✓' : 'En caché',
-        badgeType: data.registered ? 'success' : 'info'
-      };
-    });
+    let registeredResults = snapshot.docs
+      .map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          priority: data.registered ? 'registered' : 'cached',
+          badge: data.registered ? 'Verificado ✓' : 'En caché',
+          badgeType: data.registered ? 'success' : 'info'
+        };
+      })
+      // Filtrar por status en memoria (evita índice compuesto)
+      .filter(supplier => {
+        const status = supplier.status || 'active';
+        return status === 'active' || status === 'discovered';
+      })
+      // Ordenar por matchScore en memoria (evita índice compuesto)
+      .sort((a, b) => {
+        const scoreA = a.metrics?.matchScore || 0;
+        const scoreB = b.metrics?.matchScore || 0;
+        return scoreB - scoreA; // Descendente
+      })
+      // Limitar resultados después de ordenar
+      .slice(0, 20);
     
     // Filtro adicional por keywords si hay query específica
     if (query && query.trim()) {
