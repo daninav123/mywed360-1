@@ -764,6 +764,29 @@ try {
   console.error('[backend] Failed to load admin dashboard routes:', error.message);
 }
 
+// Admin tasks - Limpieza de favoritos expirados
+app.post('/api/admin/tasks/cleanup-favorites', requireAdmin, async (req, res) => {
+  try {
+    logger.info('[admin-tasks] Iniciando limpieza de favoritos expirados (manual)');
+    const result = await cleanupExpiredFavorites();
+    logger.info(
+      `[admin-tasks] Limpieza completada: ${result.deleted} eliminados, ${result.errors} errores`
+    );
+    res.json({
+      success: true,
+      message: 'Limpieza de favoritos completada',
+      ...result,
+    });
+  } catch (error) {
+    logger.error('[admin-tasks] Error en limpieza de favoritos:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+console.log('[backend] Admin tasks endpoint mounted on /api/admin/tasks/cleanup-favorites');
+
 // Fallback monitor (requiere autenticación, admins para stats)
 try {
   const fallbackMonitorRouter = (await import('./routes/fallback-monitor.js')).default;
