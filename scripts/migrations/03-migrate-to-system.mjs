@@ -19,9 +19,11 @@ const DRY_RUN = !process.argv.includes('--force');
 const BATCH_SIZE = 500;
 
 // Colecciones a migrar
+// Firestore requiere rutas con número impar de segmentos
+// Solución: Crear documento padre _system/config y colecciones bajo él
 const MIGRATIONS = [
-  { from: 'payments', to: 'system/payments', subCollection: false },
-  { from: 'discountLinks', to: 'system/discounts', subCollection: false },
+  { from: 'payments', to: '_system', collection: 'payments' },
+  { from: 'discountLinks', to: '_system', collection: 'discounts' },
 ];
 
 async function migrateToSystem() {
@@ -37,7 +39,8 @@ async function migrateToSystem() {
   const results = [];
   
   for (const migration of MIGRATIONS) {
-    console.log(`\n📦 Migrando: ${migration.from} → ${migration.to}\n`);
+    const destination = `${migration.to}/config/${migration.collection}`;
+    console.log(`\n📦 Migrando: ${migration.from} → ${destination}\n`);
     console.log('-'.repeat(80));
     
     try {
@@ -56,9 +59,6 @@ async function migrateToSystem() {
       if (!DRY_RUN) {
         console.log('🔄 Migrando documentos...\n');
         
-        // Para system/ necesitamos crear un documento padre
-        const [systemPath, collectionName] = migration.to.split('/');
-        
         let batch = db.batch();
         let batchCount = 0;
         let totalMigrated = 0;
@@ -66,9 +66,11 @@ async function migrateToSystem() {
         for (const doc of snapshot.docs) {
           const data = doc.data();
           
-          // Crear en nueva ubicación
-          // system/payments → system/{doc}/payments/{id}
-          const newRef = db.collection(migration.to).doc(doc.id);
+          // Crear en nueva ubicación: _system/config/{collection}/{id}
+          const newRef = db.collection(migration.to)
+            .doc('config')
+            .collection(migration.collection)
+            .doc(doc.id);
           
           batch.set(newRef, {
             ...data,
@@ -98,7 +100,10 @@ async function migrateToSystem() {
         console.log(`\n✅ ${migration.from} migrado: ${totalMigrated} docs\n`);
         
         // Verificar
-        const verifySnapshot = await db.collection(migration.to).get();
+        const verifySnapshot = await db.collection(migration.to)
+          .doc('config')
+          .collection(migration.collection)
+          .get();
         console.log(`🔍 Verificación: ${verifySnapshot.size} docs en destino`);
         
         if (verifySnapshot.size === totalMigrated) {
@@ -111,7 +116,7 @@ async function migrateToSystem() {
         
       } else {
         // DRY RUN
-        console.log(`🔍 Se migrarían ${snapshot.size} docs a ${migration.to}\n`);
+        console.log(`🔍 Se migrarían ${snapshot.size} docs a ${destination}\n`);
         results.push({ collection: migration.from, count: snapshot.size, success: true });
       }
       
