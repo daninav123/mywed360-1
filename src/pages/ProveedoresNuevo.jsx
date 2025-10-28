@@ -661,11 +661,7 @@ const Proveedores = () => {
                   </div>
                 </div>
 
-                {aiUsedFallback && !aiLoading && !aiError && aiResults.length > 0 && (
-                  <Card className="border border-soft bg-primary-soft/20 text-xs text-primary">
-                    Mostramos sugerencias de referencia porque la búsqueda en vivo no respondió.
-                  </Card>
-                )}
+                {/* Mensaje de fallback eliminado - ya no se usa */}
 
                 {aiLoading ? (
                   <Card className="border border-soft bg-surface text-sm text-muted">

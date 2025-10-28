@@ -1,17 +1,29 @@
 // services/suppliersService.js
 // Servicio para búsqueda híbrida de proveedores (Fase 2)
 
+import { auth } from '../firebaseConfig';
+
 /**
  * Buscar proveedores con el nuevo sistema híbrido
  * Primero busca en BD (registrados + cache), luego complementa con Tavily
  */
 export async function searchSuppliersHybrid(service, location, query = '', budget = null, filters = {}) {
   try {
+    // Obtener token de Firebase Auth
+    const user = auth.currentUser;
+    const token = user ? await user.getIdToken() : null;
+    
+    const headers = {
+      'Content-Type': 'application/json',
+    };
+    
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    
     const response = await fetch('/api/suppliers/search', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       credentials: 'include',
       body: JSON.stringify({
         service,
@@ -23,8 +35,8 @@ export async function searchSuppliersHybrid(service, location, query = '', budge
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Error en búsqueda');
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error.error || `Error ${response.status}: ${response.statusText}`);
     }
 
     const data = await response.json();
