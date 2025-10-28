@@ -8,6 +8,7 @@
 import express from 'express';
 import admin from 'firebase-admin';
 import logger from '../logger.js';
+import searchAnalyticsService from '../services/searchAnalyticsService.js';
 
 const router = express.Router();
 
@@ -62,7 +63,7 @@ async function searchTavilySimple(query, location, service) {
 // POST /api/suppliers/search - Búsqueda híbrida
 router.post('/search', async (req, res) => {
   try {
-    const { service, location, query, budget, filters } = req.body;
+    const { service, location, query, budget, filters, user_id, wedding_id } = req.body;
     
     // Validaciones
     if (!service || !location) {
@@ -75,6 +76,16 @@ router.post('/search', async (req, res) => {
     console.log(`\n🔍 [HYBRID-SEARCH] ${service} en ${location}`);
     console.log(`   Query: "${query || 'sin query específica'}"`);
     console.log(`   Budget: ${budget || 'no especificado'}\n`);
+    
+    // 🧠 CAPTURAR BÚSQUEDA PARA ANÁLISIS (async, no bloquea)
+    searchAnalyticsService.captureSearch({
+      query,
+      service,
+      location,
+      filters: { budget, ...filters },
+      user_id,
+      wedding_id
+    }).catch(err => console.error('[ANALYTICS] Error:', err));
     
     const db = admin.firestore();
     
