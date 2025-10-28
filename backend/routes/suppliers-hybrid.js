@@ -79,15 +79,15 @@ router.post('/search', async (req, res) => {
     const db = admin.firestore();
     
     // ===== 1. BUSCAR PROVEEDORES REGISTRADOS EN FIRESTORE =====
-    console.log('📊 [FIRESTORE] Buscando proveedores registrados...');
+    console.log('📊 [FIRESTORE] Buscando proveedores por nombre...');
+    console.log(`   Término de búsqueda: "${service}"`);
     
-    // Query simplificada sin índice compuesto (ordenamos en memoria)
+    // Traer todos los proveedores (sin filtro de categoría)
+    // Filtraremos por nombre en memoria
     let firestoreQuery = db.collection('suppliers')
-      .where('category', '==', service)
-      .limit(50); // Aumentar límite para compensar filtrado en memoria
+      .limit(100); // Traer más documentos para buscar por nombre
     
-    // Filtro por ubicación (ciudad exacta)
-    // TODO: Mejorar para buscar en serviceArea también
+    // Filtro por ubicación si se especifica
     if (location && location !== 'España') {
       firestoreQuery = firestoreQuery.where('location.city', '==', location);
     }
@@ -108,6 +108,18 @@ router.post('/search', async (req, res) => {
           badge: data.registered === true ? 'Verificado ✓' : 'En caché',
           badgeType: data.registered === true ? 'success' : 'info'
         };
+      })
+      // Filtrar por nombre/término de búsqueda
+      .filter(supplier => {
+        const searchTerm = (service || '').toLowerCase();
+        const supplierName = (supplier.name || '').toLowerCase();
+        const supplierDesc = (supplier.business?.description || '').toLowerCase();
+        const supplierTags = (supplier.tags || []).join(' ').toLowerCase();
+        
+        // Buscar coincidencia en nombre, descripción o tags
+        return supplierName.includes(searchTerm) || 
+               supplierDesc.includes(searchTerm) ||
+               supplierTags.includes(searchTerm);
       })
       // Filtrar por status en memoria (evita índice compuesto)
       .filter(supplier => {
