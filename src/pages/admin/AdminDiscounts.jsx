@@ -1,4 +1,8 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
+import { Eye, EyeOff, Link as LinkIcon, Percent, Plus, RefreshCw, Trash2 } from 'lucide-react';
+import { toast } from 'react-toastify';
+
+import useTranslations from '../../hooks/useTranslations';
 
 import {
   getDiscountLinks,
@@ -979,10 +983,10 @@ const AdminDiscounts = () => {
   const copyToClipboard = async (text) => {
     try {
       await navigator.clipboard.writeText(text);
-      alert('Copiado al portapapeles');
+      toast.success(t('admin.clipboard.copied'));
     } catch (copyError) {
       console.warn('[AdminDiscounts] clipboard copy failed:', copyError);
-      alert('Error al copiar');
+      toast.error(t('admin.clipboard.copyError'));
     }
   };
 
@@ -992,10 +996,10 @@ const AdminDiscounts = () => {
     try {
       const result = await generatePartnerToken(discountId);
       await copyToClipboard(result.url);
-      alert(`Enlace generado y copiado:\n${result.url}`);
+      toast.success(t('admin.partner.linkGenerated', { url: result.url }));
     } catch (err) {
       console.error('[AdminDiscounts] generate partner link failed:', err);
-      alert(err.message || 'Error al generar enlace');
+      toast.error(err.message || t('admin.partner.linkError'));
     }
   };
 
@@ -1056,9 +1060,9 @@ const AdminDiscounts = () => {
             return true;
           });
         });
-        alert('Jefe de comerciales creado correctamente.');
+        toast.success(t('admin.partner.managerCreated'));
       } else {
-        alert('No se recibió confirmación del nuevo jefe. Revisa el backend.');
+        toast.warning(t('admin.partner.managerConfirmError'));
       }
       setShowCreateManagerModal(false);
       resetManagerForm();
@@ -1117,9 +1121,9 @@ const AdminDiscounts = () => {
             });
           });
         }
-        alert('Comercial creado correctamente.');
+        toast.success(t('admin.partner.commercialCreated'));
       } else {
-        alert('No se recibió confirmación del nuevo comercial. Revisa el backend.');
+        toast.warning(t('admin.partner.commercialConfirmError'));
       }
       setShowCreateCommercialModal(false);
       resetCommercialForm();

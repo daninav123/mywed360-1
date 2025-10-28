@@ -1,11 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 import WebGenerator from '../components/web/WebGenerator';
 import WebTemplateGallery from '../components/web/WebTemplateGallery';
 import WebsitePreview from '../components/web/WebsitePreview';
 import { useWedding } from '../context/WeddingContext';
 import { useAuth } from '../hooks/useAuth';
+import useTranslations from '../hooks/useTranslations';
 import {
   buildSlugSuggestions,
   checkSlugAvailability,
@@ -1250,10 +1252,10 @@ const LogisticsEditor = ({
   );
 };
 
-const DisenoWeb = ({ mode }) => {
+export default function DisenoWeb() {
   const { currentUser } = useAuth();
-  const uid = currentUser?.uid || 'dev';
   const { activeWedding } = useWedding();
+  const { t } = useTranslations();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -1585,11 +1587,11 @@ const DisenoWeb = ({ mode }) => {
       } catch (logErr) {
         console.warn('recordWebsiteEvent logistics', logErr);
       }
-      alert('Log�stica actualizada correctamente.');
+      toast.success(t('messages.logisticsUpdated'));
       setShowLogisticsEditor(false);
     } catch (err) {
       console.error('Error guardando log�stica', err);
-      alert('No se pudo guardar la log�stica. Int�ntalo de nuevo.');
+      toast.error(t('errors.saveLogisticsError'));
     } finally {
       setSavingLogistics(false);
     }
@@ -1775,7 +1777,7 @@ const DisenoWeb = ({ mode }) => {
         setError(`Error al generar con IA: ${detail}`);
       }
 
-      alert('Ha ocurrido un error al generar la p�gina web. Por favor, int�ntalo de nuevo.');
+      toast.error(t('errors.generateWebError'));
       try {
         await recordWebsiteEvent({
           uid,
@@ -1801,7 +1803,7 @@ const DisenoWeb = ({ mode }) => {
 
     const trimmedHtml = html.trim();
     if (!trimmedHtml) {
-      alert('Genera la web primero');
+      toast.warning(t('messages.generateWebFirst'));
       return;
     }
     const slug = publishSlug || null;
@@ -1815,7 +1817,7 @@ const DisenoWeb = ({ mode }) => {
           reason: 'offline',
         },
       }).catch(() => {});
-      alert('Est�s sin conexi�n. Con�ctate a internet para publicar el micrositio.');
+      toast.error(t('errors.offlineError'));
       return;
     }
 
@@ -1856,7 +1858,7 @@ const DisenoWeb = ({ mode }) => {
             },
           }).catch(() => {});
           console.warn('No se pudo activar la URL p�blica.', result.error);
-          alert('No se pudo activar la URL p�blica en este momento. Int�ntalo de nuevo m�s tarde.');
+          toast.error(t('errors.activateUrlError'));
           if (versions[0]?.html) {
             setHtml(versions[0].html);
           }
@@ -1865,9 +1867,9 @@ const DisenoWeb = ({ mode }) => {
         const url = result.publicUrl || '';
         setPublicUrl(url);
         setShowQR(false);
-        alert(url ? `�P�gina publicada! URL p�blica: ${url}` : '�P�gina publicada!');
+        toast.success(url ? t('messages.publishSuccessWithUrl', { url }) : t('messages.publishSuccess'));
       } else {
-        alert('P�gina guardada. No hay boda activa para publicar p�blicamente.');
+        toast.info(t('messages.savedNoActiveWedding'));
       }
 
       const updatedVersions = await saveWebsiteVersion({
@@ -1907,7 +1909,7 @@ const DisenoWeb = ({ mode }) => {
       if (versions[0]?.html) {
         setHtml(versions[0].html);
       }
-      alert('Error al publicar');
+      toast.error(t('errors.publishError'));
     } finally {
       setIsPublishing(false);
     }

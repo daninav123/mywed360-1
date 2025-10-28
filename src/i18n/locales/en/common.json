@@ -2042,6 +2042,114 @@
     "suggested": "Sugeridos",
     "addServicePlaceholder": "Añadir servicio (ej. Fotografía)",
     "noServicesAdded": "An no has aadido servicios.",
+    "labels": {
+      "provider": "Supplier",
+      "service": "Service"
+    },
+    "overview": {
+      "title": "Supplier management",
+      "metrics": {
+        "confirmed": "Confirmed",
+        "pending": "Pending",
+        "shortlist": "Shortlist"
+      },
+      "defaults": {
+        "country": "Spain",
+        "serviceGroup": "Services",
+        "otherService": "Other",
+        "fallbackName": "supplier"
+      },
+      "shortlist": {
+        "loading": "Loading shortlist…",
+        "error": "We couldn't load the shortlist.",
+        "empty": "Save candidates from your searches or manual records to build the initial shortlist.",
+        "savedAt": "Saved {{value}}",
+        "match": "Match {{value}}"
+      },
+      "status": {
+        "pending": "Pending",
+        "confirmed": "Confirmed"
+      },
+      "toasts": {
+        "missingQuery": "Add a term or complete your profile to improve searches.",
+        "noResults": "No matches found. Try different search terms.",
+        "success": "✅ {{count}} suppliers found ({{registered}} verified, {{cached}} cached, {{internet}} from the web)",
+        "error": "We couldn't complete the search.",
+        "wantedServicesSaved": "Desired services updated.",
+        "wantedServicesError": "We couldn't save the desired services.",
+        "providerSaved": "Supplier saved.",
+        "providerError": "We couldn't save the supplier."
+      },
+      "actions": {
+        "manageServices": "Manage services",
+        "newSupplier": "New supplier",
+        "clear": "Clear"
+      },
+      "exploration": {
+        "title": "Exploration & shortlist",
+        "subtitle": "Explore suppliers, save ideas, and review your pending candidates",
+        "collapseAria": "Collapse exploration panel",
+        "searchPlaceholder": "Search by supplier, service, or note",
+        "recentSearches": "Recent searches:"
+      },
+      "results": {
+        "title": "Search results",
+        "query": "Query: {{value}}",
+        "loading": "Searching suppliers…",
+        "empty": "We couldn't find results with the current filters.",
+        "breakdown": "📊 Found: {{registered}} verified · {{cached}} cached · {{internet}} from the web"
+      },
+      "pagination": {
+        "label": "Page {{current}} of {{total}}"
+      },
+      "buttons": {
+        "explore": "Explore suppliers"
+      },
+      "services": {
+        "title": "Services by category",
+        "count": "{{count}} service",
+        "count_other": "{{count}} services",
+        "confirmedCount": "{{count}} confirmed",
+        "confirmedCount_other": "{{count}} confirmed",
+        "pendingCount": "{{count}} pending",
+        "pendingCount_other": "{{count}} pending",
+        "shortlistCount": "{{count}} saved option",
+        "shortlistCount_other": "{{count}} saved options",
+        "reviewShortlist": "Review the saved options",
+        "emptyShortlist": "No options saved yet",
+        "exploreHint": "Click to explore"
+      },
+      "modals": {
+        "options": {
+          "title": "Saved options · {{label}}",
+          "confirmedTitle": "Confirmed supplier",
+          "contactTitle": "Contacted suppliers",
+          "contactEmpty": "No candidates recorded within current suppliers.",
+          "shortlistTitle": "Shortlist",
+          "shortlistEmpty": "You haven't saved proposals for this service yet."
+        },
+        "newProvider": {
+          "title": "New supplier"
+        },
+        "board": {
+          "title": "Services board",
+          "description": "Review each service status and add options directly from this panel."
+        }
+      },
+      "drawer": {
+        "title": "Supplier details",
+        "titleWithName": "Supplier details · {{name}}",
+        "imageAlt": "Image of {{name}}",
+        "serviceUnknown": "Unknown service",
+        "location": "Location: {{value}}",
+        "priceRange": "Estimated price: {{value}}",
+        "email": "Email: {{value}}",
+        "phone": "Phone: {{value}}",
+        "openLink": "Open link",
+        "empty": "Select a supplier from the list to see more details.",
+        "fallbackName": "supplier"
+      }
+    },
     "rfqModal": {
       "defaults": {
         "subject": "Request for proposal: {servicio}",
@@ -2762,6 +2870,19 @@
       "service": "Service"
     },
     "overview": {
+      "title": "Supplier Management",
+      "metrics": {
+        "totalProviders": "Total Providers",
+        "confirmed": "Confirmed",
+        "pending": "Pending",
+        "shortlist": "Shortlist"
+      },
+      "defaults": {
+        "country": "Spain",
+        "serviceGroup": "Services",
+        "otherService": "Other",
+        "fallbackName": "provider"
+      },
       "shortlist": {
         "loading": "Loading shortlist...",
         "error": "Could not load the shortlist.",
@@ -2770,7 +2891,70 @@
         "match": "Match {{value}}"
       },
       "status": {
-        "pending": "Pending"
+        "pending": "Pending",
+        "confirmed": "Confirmed"
+      },
+      "toasts": {
+        "missingQuery": "Add a term or complete your profile to improve searches.",
+        "noResults": "No matches found. Try with other search terms.",
+        "success": "✅ {{count}} suppliers found ({{registered}} verified, {{cached}} cached, {{internet}} from internet)",
+        "error": "Could not complete search.",
+        "wantedServicesSaved": "Desired services updated.",
+        "wantedServicesError": "Could not save desired services.",
+        "providerSaved": "Provider saved.",
+        "providerError": "Could not save provider."
+      },
+      "actions": {
+        "manageServices": "Manage services",
+        "newSupplier": "New supplier",
+        "clear": "Clear"
+      },
+      "exploration": {
+        "title": "Exploration and shortlist",
+        "subtitle": "Explore suppliers, save ideas and review your pending candidates",
+        "collapseAria": "Collapse exploration",
+        "searchPlaceholder": "Search by supplier, service or note",
+        "recentSearches": "Recent searches:"
+      },
+      "results": {
+        "title": "Search results",
+        "query": "Query: {{value}}",
+        "loading": "Searching suppliers...",
+        "empty": "No results found with current filters.",
+        "breakdown": "📊 Found: {{registered}} verified · {{cached}} cached · {{internet}} from internet"
+      },
+      "pagination": {
+        "label": "Page {{current}} of {{total}}"
+      },
+      "buttons": {
+        "explore": "Explore suppliers"
+      },
+      "services": {
+        "title": "Services by category",
+        "count": "{{count}} service",
+        "count_other": "{{count}} services",
+        "confirmedCount": "{{count}} confirmed",
+        "confirmedCount_other": "{{count}} confirmed",
+        "pendingCount": "{{count}} pending",
+        "pendingCount_other": "{{count}} pending",
+        "shortlistCount": "{{count}} saved option",
+        "shortlistCount_other": "{{count}} saved options",
+        "reviewShortlist": "Review saved options",
+        "emptyShortlist": "No saved options yet",
+        "exploreHint": "Click to explore"
+      },
+      "drawer": {
+        "title": "Supplier details",
+        "titleWithName": "{{name}} - Details",
+        "imageAlt": "Image of {{name}}",
+        "fallbackName": "supplier",
+        "serviceUnknown": "Unknown service",
+        "location": "Location: {{value}}",
+        "priceRange": "Price range: {{value}}",
+        "email": "Email: {{value}}",
+        "phone": "Phone: {{value}}",
+        "openLink": "Open link",
+        "empty": "No supplier selected"
       },
       "modals": {
         "options": {
@@ -2780,6 +2964,13 @@
           "contactEmpty": "No candidates registered among current providers.",
           "shortlistTitle": "Shortlist",
           "shortlistEmpty": "You haven't saved proposals for this service yet."
+        },
+        "newProvider": {
+          "title": "New provider"
+        },
+        "board": {
+          "title": "Services board",
+          "description": "Review the status of each service and add options directly from this panel."
         }
       }
     }
@@ -2788,18 +2979,109 @@
     "close": "Close"
   },
   "validation": {
-    "nameRequired": "El nombre es obligatorio",
-    "serviceRequired": "El servicio es obligatorio",
-    "emailInvalid": "Email inválido",
-    "linkMustStartHttp": "El enlace debe comenzar con http:// o https://",
-    "titleRequired": "El ttulo es obligatorio",
-    "companionNegative": "El número de acompaantes no puede ser negativo",
-    "selectCompanionType": "Selecciona el tipo de acompaante",
-    "companionMismatch": "Establece \"Sin acompaante\" o aade alguno"
+    "nameRequired": "Name is required",
+    "serviceRequired": "Service is required",
+    "emailInvalid": "Invalid email",
+    "linkMustStartHttp": "Link must start with http:// or https://",
+    "titleRequired": "Title is required",
+    "companionNegative": "Number of companions cannot be negative",
+    "selectCompanionType": "Select companion type",
+    "companionMismatch": "Set \"No companion\" or add one",
+    "fieldRequired": "This field is required",
+    "emailRequired": "Email is required",
+    "emailFormat": "Email format is invalid",
+    "phoneFormat": "Phone format is invalid",
+    "urlFormat": "URL must start with http:// or https://",
+    "passwordRequired": "Password is required",
+    "passwordMinLength": "Password must be at least {{count}} characters",
+    "nameMinLength": "Name must be at least {{count}} characters",
+    "nameMaxLength": "Name cannot exceed {{count}} characters",
+    "postalCodeInvalid": "Postal code is invalid",
+    "dniInvalid": "DNI/NIE is invalid",
+    "password": {
+      "veryWeak": "Very weak",
+      "weak": "Weak",
+      "acceptable": "Acceptable",
+      "good": "Good",
+      "excellent": "Excellent",
+      "suggestions": {
+        "minLength": "Enter a password with at least {{count}} characters.",
+        "useMinChars": "Use at least {{count}} characters.",
+        "increase12": "Increase length to 12 characters or more.",
+        "mixCase": "Combine uppercase and lowercase.",
+        "addNumbers": "Add numbers to strengthen it.",
+        "addSymbols": "Include symbols like !, %, # or similar.",
+        "avoidRepetition": "Avoid repeating the same character multiple times in a row.",
+        "avoidCommon": "Avoid common words or predictable sequences."
+      }
+    }
+  },
+  "errors": {
+    "generic": "An unexpected error occurred",
+    "networkError": "Network error. Check your connection.",
+    "permissionDenied": "Insufficient permissions",
+    "openaiDisabled": "Direct OpenAI disabled (use backend)",
+    "missingOpenAIKey": "Missing OpenAI key",
+    "openaiError": "Error connecting to OpenAI",
+    "loadError": "Error loading data",
+    "saveError": "Error saving changes",
+    "deleteError": "Error deleting",
+    "updateError": "Error updating",
+    "publishError": "Error publishing",
+    "offlineError": "You're offline. Connect to the internet to publish the microsite.",
+    "generateWebError": "An error occurred while generating the web page. Please try again.",
+    "activateUrlError": "Could not activate public URL at this time. Please try again later.",
+    "saveLogisticsError": "Could not save logistics. Please try again."
+  },
+  "messages": {
+    "saveSuccess": "Saved successfully",
+    "saveError": "Error saving",
+    "deleteSuccess": "Deleted successfully",
+    "updateSuccess": "Updated successfully",
+    "logisticsUpdated": "Logistics updated successfully",
+    "publishSuccess": "Page published!",
+    "publishSuccessWithUrl": "Page published! Public URL: {{url}}",
+    "savedNoActiveWedding": "Page saved. No active wedding to publish publicly.",
+    "generateWebFirst": "Generate the web first"
+  },
+  "website": {
+    "generate": "Generate website",
+    "publish": "Publish",
+    "preview": "Preview",
+    "edit": "Edit",
+    "logistics": {
+      "title": "Logistics",
+      "venue": "Venue",
+      "address": "Address",
+      "time": "Time",
+      "parking": "Parking",
+      "accommodation": "Accommodation"
+    }
+  },
+  "admin": {
+    "clipboard": {
+      "copied": "Copied to clipboard",
+      "copyError": "Error copying"
+    },
+    "partner": {
+      "linkGenerated": "Link generated and copied:\n{{url}}",
+      "linkError": "Error generating link",
+      "managerCreated": "Sales manager created successfully",
+      "managerConfirmError": "No confirmation received for new manager. Check backend.",
+      "commercialCreated": "Sales representative created successfully",
+      "commercialConfirmError": "No confirmation received for new representative. Check backend."
+    }
+  },
+  "rsvp": {
+    "reminderSimulation": "Simulation: candidates={{attempted}}, sent={{sent}}, skipped={{skipped}}",
+    "reminderSent": "Sent: candidates={{attempted}}, sent={{sent}}, skipped={{skipped}}",
+    "reminderSimulationError": "Error simulating reminders",
+    "reminderSendError": "Error sending reminders",
+    "linkCopied": "RSVP link copied",
+    "linkCopyError": "Could not generate/copy link"
   },
   "general": "General",
   "notes": "Notas",
   "apply": "Aplicar",
   "pagination": "Paginacin"
 }
-

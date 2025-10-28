@@ -2524,15 +2524,222 @@
   "validacion_limites_por_tier_del_planner": ") {\n    // Validación de límites por tier del planner antes de añadirlo\n    try {\n      const userSnap = await getDoc(doc(db, ",
   "validaciones_tamano_tipo_const_size_numberfilesize": ");\n\n      // Validaciones: tamaño y tipo\n      const size = Number(file.size || 0);\n      const validSize = size >= 0 && size <= MAX_BYTES;\n      const validType = isAllowedType(file);\n      if (!validSize || !validType) {\n        console.warn(",
   "validar_actualizacion": "validar actualización",
+  "suppliers": {
+    "configureServices": "Configurer les services souhaités",
+    "suggested": "Suggérés",
+    "addServicePlaceholder": "Ajouter un service (ex. Photographie)",
+    "noServicesAdded": "Vous n'avez pas encore ajouté de services.",
+    "labels": {
+      "provider": "Fournisseur",
+      "service": "Service"
+    },
+    "overview": {
+      "title": "Gestion des fournisseurs",
+      "metrics": {
+        "totalProviders": "Total Fournisseurs",
+        "confirmed": "Confirmés",
+        "pending": "En attente",
+        "shortlist": "Liste restreinte"
+      },
+      "defaults": {
+        "country": "Espagne",
+        "serviceGroup": "Services",
+        "otherService": "Autres",
+        "fallbackName": "fournisseur"
+      },
+      "shortlist": {
+        "loading": "Chargement de la liste...",
+        "error": "Impossible de charger la liste.",
+        "empty": "Sauvegardez des candidats depuis vos recherches ou enregistrements manuels pour créer la liste initiale.",
+        "savedAt": "Enregistré {{value}}",
+        "match": "Correspondance {{value}}"
+      },
+      "status": {
+        "pending": "En attente",
+        "confirmed": "Confirmé"
+      },
+      "toasts": {
+        "missingQuery": "Ajoutez un terme ou complétez votre profil pour améliorer les recherches.",
+        "noResults": "Aucune correspondance trouvée. Essayez avec d'autres termes de recherche.",
+        "success": "✅ {{count}} fournisseurs trouvés ({{registered}} vérifiés, {{cached}} en cache, {{internet}} d'internet)",
+        "error": "Impossible de terminer la recherche.",
+        "wantedServicesSaved": "Services souhaités mis à jour.",
+        "wantedServicesError": "Impossible de sauvegarder les services souhaités.",
+        "providerSaved": "Fournisseur enregistré.",
+        "providerError": "Impossible d'enregistrer le fournisseur."
+      },
+      "actions": {
+        "manageServices": "Gérer les services",
+        "newSupplier": "Nouveau fournisseur",
+        "clear": "Effacer"
+      },
+      "exploration": {
+        "title": "Exploration et liste restreinte",
+        "subtitle": "Explorez les fournisseurs, sauvegardez des idées et consultez vos candidats en attente",
+        "collapseAria": "Replier l'exploration",
+        "searchPlaceholder": "Rechercher par fournisseur, service ou note",
+        "recentSearches": "Recherches récentes:"
+      },
+      "results": {
+        "title": "Résultats de recherche",
+        "query": "Requête: {{value}}",
+        "loading": "Recherche de fournisseurs...",
+        "empty": "Aucun résultat trouvé avec les filtres actuels.",
+        "breakdown": "📊 Trouvés: {{registered}} vérifiés · {{cached}} en cache · {{internet}} d'internet"
+      },
+      "pagination": {
+        "label": "Page {{current}} sur {{total}}"
+      },
+      "buttons": {
+        "explore": "Explorer les fournisseurs"
+      },
+      "services": {
+        "title": "Services par catégorie",
+        "count": "{{count}} service",
+        "count_other": "{{count}} services",
+        "confirmedCount": "{{count}} confirmé",
+        "confirmedCount_other": "{{count}} confirmés",
+        "pendingCount": "{{count}} en attente",
+        "pendingCount_other": "{{count}} en attente",
+        "shortlistCount": "{{count}} option sauvegardée",
+        "shortlistCount_other": "{{count}} options sauvegardées",
+        "reviewShortlist": "Consulter les options sauvegardées",
+        "emptyShortlist": "Aucune option sauvegardée pour le moment",
+        "exploreHint": "Cliquez pour explorer"
+      },
+      "drawer": {
+        "title": "Détails du fournisseur",
+        "titleWithName": "{{name}} - Détails",
+        "imageAlt": "Image de {{name}}",
+        "fallbackName": "fournisseur",
+        "serviceUnknown": "Service inconnu",
+        "location": "Emplacement: {{value}}",
+        "priceRange": "Fourchette de prix: {{value}}",
+        "email": "Email: {{value}}",
+        "phone": "Téléphone: {{value}}",
+        "openLink": "Ouvrir le lien",
+        "empty": "Aucun fournisseur sélectionné"
+      },
+      "modals": {
+        "options": {
+          "title": "Options sauvegardées · {{label}}",
+          "confirmedTitle": "Fournisseur confirmé",
+          "contactTitle": "Fournisseurs contactés",
+          "contactEmpty": "Aucun candidat enregistré parmi les fournisseurs actuels.",
+          "shortlistTitle": "Liste restreinte",
+          "shortlistEmpty": "Vous n'avez pas encore sauvegardé de propositions pour ce service."
+        },
+        "newProvider": {
+          "title": "Nouveau fournisseur"
+        },
+        "board": {
+          "title": "Tableau des services",
+          "description": "Consultez l'état de chaque service et ajoutez des options directement depuis ce panneau."
+        }
+      }
+    }
+  },
   "validation": {
-    "nameRequired": "El nombre es obligatorio",
-    "serviceRequired": "El servicio es obligatorio",
-    "emailInvalid": "Email inválido",
-    "linkMustStartHttp": "El enlace debe comenzar con http:// o https://",
-    "titleRequired": "El ttulo es obligatorio",
-    "companionNegative": "El número de acompaantes no puede ser negativo",
-    "selectCompanionType": "Selecciona el tipo de acompaante",
-    "companionMismatch": "Establece \"Sin acompaante\" o aade alguno"
+    "nameRequired": "Le nom est obligatoire",
+    "serviceRequired": "Le service est obligatoire",
+    "emailInvalid": "Email invalide",
+    "linkMustStartHttp": "Le lien doit commencer par http:// ou https://",
+    "titleRequired": "Le titre est obligatoire",
+    "companionNegative": "Le nombre de compagnons ne peut pas être négatif",
+    "selectCompanionType": "Sélectionnez le type de compagnon",
+    "companionMismatch": "Définissez \"Sans compagnon\" ou ajoutez-en un",
+    "fieldRequired": "Ce champ est obligatoire",
+    "emailRequired": "L'email est obligatoire",
+    "emailFormat": "Le format de l'email n'est pas valide",
+    "phoneFormat": "Le format du téléphone n'est pas valide",
+    "urlFormat": "L'URL doit commencer par http:// ou https://",
+    "passwordRequired": "Le mot de passe est obligatoire",
+    "passwordMinLength": "Le mot de passe doit comporter au moins {{count}} caractères",
+    "nameMinLength": "Le nom doit comporter au moins {{count}} caractères",
+    "nameMaxLength": "Le nom ne peut pas dépasser {{count}} caractères",
+    "postalCodeInvalid": "Le code postal n'est pas valide",
+    "dniInvalid": "Le DNI/NIE n'est pas valide",
+    "password": {
+      "veryWeak": "Très faible",
+      "weak": "Faible",
+      "acceptable": "Acceptable",
+      "good": "Bon",
+      "excellent": "Excellent",
+      "suggestions": {
+        "minLength": "Entrez un mot de passe avec au moins {{count}} caractères.",
+        "useMinChars": "Utilisez au moins {{count}} caractères.",
+        "increase12": "Augmentez la longueur à 12 caractères ou plus.",
+        "mixCase": "Combinez majuscules et minuscules.",
+        "addNumbers": "Ajoutez des chiffres pour le renforcer.",
+        "addSymbols": "Incluez des symboles comme !, %, # ou similaires.",
+        "avoidRepetition": "Évitez de répéter le même caractère plusieurs fois de suite.",
+        "avoidCommon": "Évitez les mots courants ou les séquences prévisibles."
+      }
+    }
+  },
+  "errors": {
+    "generic": "Une erreur inattendue s'est produite",
+    "networkError": "Erreur réseau. Vérifiez votre connexion.",
+    "permissionDenied": "Permissions insuffisantes",
+    "openaiDisabled": "OpenAI direct désactivé (utilisez le backend)",
+    "missingOpenAIKey": "Clé OpenAI manquante",
+    "openaiError": "Erreur de connexion à OpenAI",
+    "loadError": "Erreur de chargement des données",
+    "saveError": "Erreur lors de l'enregistrement des modifications",
+    "deleteError": "Erreur lors de la suppression",
+    "updateError": "Erreur lors de la mise à jour",
+    "publishError": "Erreur lors de la publication",
+    "offlineError": "Vous êtes hors ligne. Connectez-vous à internet pour publier le microsite.",
+    "generateWebError": "Une erreur s'est produite lors de la génération de la page web. Veuillez réessayer.",
+    "activateUrlError": "Impossible d'activer l'URL publique pour le moment. Veuillez réessayer plus tard.",
+    "saveLogisticsError": "Impossible d'enregistrer la logistique. Veuillez réessayer."
+  },
+  "messages": {
+    "saveSuccess": "Enregistré avec succès",
+    "saveError": "Erreur lors de l'enregistrement",
+    "deleteSuccess": "Supprimé avec succès",
+    "updateSuccess": "Mis à jour avec succès",
+    "logisticsUpdated": "Logistique mise à jour avec succès",
+    "publishSuccess": "Page publiée !",
+    "publishSuccessWithUrl": "Page publiée ! URL publique : {{url}}",
+    "savedNoActiveWedding": "Page enregistrée. Aucun mariage actif à publier publiquement.",
+    "generateWebFirst": "Générez d'abord le site web"
+  },
+  "website": {
+    "generate": "Générer le site",
+    "publish": "Publier",
+    "preview": "Aperçu",
+    "edit": "Éditer",
+    "logistics": {
+      "title": "Logistique",
+      "venue": "Lieu",
+      "address": "Adresse",
+      "time": "Heure",
+      "parking": "Parking",
+      "accommodation": "Hébergement"
+    }
+  },
+  "admin": {
+    "clipboard": {
+      "copied": "Copié dans le presse-papiers",
+      "copyError": "Erreur lors de la copie"
+    },
+    "partner": {
+      "linkGenerated": "Lien généré et copié :\n{{url}}",
+      "linkError": "Erreur lors de la génération du lien",
+      "managerCreated": "Chef des ventes créé avec succès",
+      "managerConfirmError": "Aucune confirmation reçue pour le nouveau chef. Vérifiez le backend.",
+      "commercialCreated": "Commercial créé avec succès",
+      "commercialConfirmError": "Aucune confirmation reçue pour le nouveau commercial. Vérifiez le backend."
+    }
+  },
+  "rsvp": {
+    "reminderSimulation": "Simulation : candidats={{attempted}}, envoyés={{sent}}, ignorés={{skipped}}",
+    "reminderSent": "Envoi : candidats={{attempted}}, envoyés={{sent}}, ignorés={{skipped}}",
+    "reminderSimulationError": "Erreur lors de la simulation des rappels",
+    "reminderSendError": "Erreur lors de l'envoi des rappels",
+    "linkCopied": "Lien RSVP copié",
+    "linkCopyError": "Impossible de générer/copier le lien"
   },
   "verifica_conexion_con_backend_async_checkbackendconnection": ",\n        },\n      };\n    }\n  }\n\n  /**\n   * Verifica la conexión con el backend\n   */\n  async checkBackendConnection() {\n    try {\n      const backendUrl = import.meta.env.VITE_BACKEND_BASE_URL;\n      if (!backendUrl) {\n        throw new Error(",
   "verifica_estado_una_sesion_checkout_param": ",\n};\n\n/**\n * Verifica el estado de una sesión de checkout\n * @param {string} sessionId - ID de la sesión\n * @returns {Promise<Object>} - Estado de la sesión\n */\nexport async function getCheckoutSession(sessionId) {\n  try {\n    const token = localStorage.getItem(",

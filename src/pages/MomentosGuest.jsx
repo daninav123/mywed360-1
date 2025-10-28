@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { formatDate } from '../utils/formatUtils';
+import { useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 import UploadWidget from '@/components/momentos/UploadWidget';
@@ -11,6 +10,8 @@ import {
   validateGuestToken,
 } from '@/services/momentosService';
 import { firebaseReady } from '@/firebaseConfig';
+import useTranslations from '@/hooks/useTranslations';
+import { formatDate } from '../utils/formatUtils';
 
 const ALBUM_ID = 'momentos';
 
@@ -33,6 +34,7 @@ const formatDateLocal = (dateLike) => {
 };
 
 export default function MomentosGuest() {
+  const { t } = useTranslations();
   const [searchParams] = useSearchParams();
   const tokenParam = searchParams.get('token') || '';
   const weddingId = searchParams.get('w') || '';
@@ -50,13 +52,14 @@ export default function MomentosGuest() {
   const uploadsClosed = uploadState ? !uploadState.isWindowOpen : false;
   const remainingDays =
     typeof uploadState?.remainingDays === 'number' ? uploadState.remainingDays : null;
+  const defaultErrorMessage = t('common.public.moments.guest.errors.invalidLink');
 
   useEffect(() => {
     let unsubscribeAlbum = null;
     const initialize = async () => {
       try {
         if (!tokenParam || !weddingId) {
-          throw new Error('El enlace est� incompleto. Solicita un nuevo QR al anfitri�n.');
+          throw new Error(t('common.public.moments.guest.errors.incompleteLink'));
         }
         await firebaseReady;
         const tokenData = await validateGuestToken(weddingId, tokenParam, { albumId: ALBUM_ID });
@@ -69,8 +72,8 @@ export default function MomentosGuest() {
           ALBUM_ID
         );
       } catch (error) {
-        console.error('Validaci�n de token de la galer�a de recuerdos', error);
-        setErrorMessage(error?.message || 'Este enlace ya no es v�lido.');
+        console.error('Validación de token de la galería de recuerdos', error);
+        setErrorMessage(error?.message || t('common.public.moments.guest.errors.invalidLink'));
         setStatus('error');
       }
     };
@@ -82,28 +85,32 @@ export default function MomentosGuest() {
         unsubscribeAlbum && unsubscribeAlbum();
       } catch {}
     };
-  }, [tokenParam, weddingId]);
+  }, [tokenParam, weddingId, t]);
 
   useEffect(() => {
     if (!uploadState) return;
     if (uploadState.isWindowOpen) return;
     if (status === 'error') return;
     setStatus('closed');
+    const closesAtLabel = uploadState?.closesAt ? formatDate(uploadState.closesAt) : null;
     setErrorMessage(
-      `La galer�a dej� de aceptar fotos el ${formatDate(uploadState.closesAt)}.`
+      t('common.public.moments.guest.closedDescription', {
+        date: closesAtLabel ? ` ${closesAtLabel}` : '',
+      })
     );
-  }, [uploadState, status]);
+  }, [status, t, uploadState]);
 
   const scenes = useMemo(() => {
     const base = getAlbumScenes(album);
+    const fallback = [{ id: 'otros', label: t('common.public.moments.guest.scenes.other') }];
     if (tokenDoc?.sceneTargets?.length) {
       const allowed = tokenDoc.sceneTargets.map((scene) => scene.toLowerCase());
       const filtered = base.filter((scene) => allowed.includes(scene.id.toLowerCase()));
       const effective = filtered.length ? filtered : base;
-      return effective.length ? effective : [{ id: 'otros', label: 'Otros' }];
+      return effective.length ? effective : fallback;
     }
-    return base.length ? base : [{ id: 'otros', label: 'Otros' }];
-  }, [album, tokenDoc]);
+    return base.length ? base : fallback;
+  }, [album, t, tokenDoc]);
 
   const guestId = useMemo(() => {
     const nameSlug = slugifyGuest(guestName);
@@ -115,25 +122,25 @@ export default function MomentosGuest() {
       type: 'guest',
       uid: guestId,
       guestId,
-      displayName: guestName || 'Invitado',
+      displayName: guestName || t('common.public.moments.guest.uploadStates.guestFallback'),
       tokenId: tokenDoc?.id || null,
       source: 'guest-portal',
     }),
-    [guestId, guestName, tokenDoc?.id]
+    [guestId, guestName, t, tokenDoc?.id]
   );
 
   const handleStart = (event) => {
     event.preventDefault();
     if (!guestName.trim()) {
-      toast.warn('Indica tu nombre para personalizar tus aportaciones');
+      toast.warn(t('common.public.moments.guest.form.errors.missingName'));
       return;
     }
     if (!acceptedTerms) {
-      toast.warn('Debes aceptar la pol�tica de privacidad');
+      toast.warn(t('common.public.moments.guest.form.errors.missingTerms'));
       return;
     }
     if (uploadsClosed) {
-      toast.warn('Esta galer�a ya no acepta nuevas fotos.');
+      toast.warn(t('common.public.moments.guest.form.errors.uploadsClosed'));
       setStatus('closed');
       return;
     }
@@ -148,13 +155,13 @@ export default function MomentosGuest() {
       ...prev.slice(0, 4),
     ]);
     if (nextCount === 1) {
-      toast.success('<� �Logro desbloqueado! Primer recuerdo compartido (');
+      toast.success(t('common.public.moments.guest.toasts.firstUpload'));
     } else if (nextCount === 3) {
-      toast.success('<� �Eres un colaborador entusiasta! Sigue compartiendo recuerdos.');
+      toast.success(t('common.public.moments.guest.toasts.thirdUpload'));
     } else if (nextCount === 5) {
-      toast.success('< �Recuerdos Estrella! Tus fotos dar�n vida al slideshow.');
+      toast.success(t('common.public.moments.guest.toasts.fifthUpload'));
     } else {
-      toast.success('Foto enviada correctamente');
+      toast.success(t('common.public.moments.guest.toasts.default'));
     }
   };
 
@@ -167,7 +174,7 @@ export default function MomentosGuest() {
       <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
         <div className="bg-white border border-slate-200 rounded-xl shadow-sm px-6 py-8 space-y-3 text-center">
           <div className="animate-spin h-8 w-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto"></div>
-          <p className="text-sm text-slate-600">Preparando tu espacio para compartir recuerdos&</p>
+          <p className="text-sm text-slate-600">{t('common.public.moments.guest.loading')}</p>
         </div>
       </div>
     );
@@ -177,11 +184,15 @@ export default function MomentosGuest() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
         <div className="bg-white border border-red-100 rounded-xl shadow-sm px-6 py-8 max-w-md text-center space-y-3">
-          <h1 className="text-xl font-semibold text-red-600">No pudimos abrir la galer�a de recuerdos</h1>
-          <p className="text-sm text-slate-600">{errorMessage}</p>
-          <p className="text-xs text-slate-400">
-            Si crees que es un error, ponte en contacto con la pareja anfitriona para solicitar un nuevo enlace.
+          <h1 className="text-xl font-semibold text-red-600">
+            {t('common.public.moments.guest.errorTitle')}
+          </h1>
+          <p className="text-sm text-slate-600">
+            {t('common.public.moments.guest.errorDescription', {
+              message: errorMessage || defaultErrorMessage,
+            })}
           </p>
+          <p className="text-xs text-slate-400">{t('common.public.moments.guest.errorHint')}</p>
         </div>
       </div>
     );
@@ -191,13 +202,19 @@ export default function MomentosGuest() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
         <div className="bg-white border border-amber-100 rounded-xl shadow-sm px-6 py-8 max-w-md text-center space-y-3">
-          <h1 className="text-xl font-semibold text-amber-600">La galer�a est� cerrada</h1>
+          <h1 className="text-xl font-semibold text-amber-600">
+            {t('common.public.moments.guest.closedTitle')}
+          </h1>
           <p className="text-sm text-slate-600">
             {errorMessage ||
-              `El periodo para subir fotos terminó${uploadState?.closesAt ? ` el ${formatDateLocal(uploadState.closesAt)}` : ''}.`}
+              t('common.public.moments.guest.closedDescription', {
+                date: uploadState?.closesAt
+                  ? ` ${formatDateLocal(uploadState.closesAt)}`
+                  : '',
+              })}
           </p>
           <p className="text-xs text-slate-400">
-            Si todav�a tienes recuerdos que compartir, avisa a la pareja anfitriona para que reabra el enlace.
+            {t('common.public.moments.guest.closedHint')}
           </p>
         </div>
       </div>
@@ -213,27 +230,29 @@ export default function MomentosGuest() {
         >
           <header className="space-y-2 text-center">
             <p className="text-sm uppercase tracking-wide text-blue-500 font-semibold">
-              Recuerdos compartidos
+              {t('common.public.moments.guest.form.badge')}
             </p>
             <h1 className="text-2xl font-semibold text-slate-800">
-              �Gracias por capturar recuerdos!
+              {t('common.public.moments.guest.form.title')}
             </h1>
             <p className="text-sm text-slate-500">
-              Sube tus fotos favoritas del evento. El anfitri�n podr� revisarlas y mostrarlas en el slideshow en vivo.
+              {t('common.public.moments.guest.form.description')}
             </p>
             {uploadState?.closesAt && (
               <p className="text-xs text-slate-400">
-                La galer�a admite nuevas fotos hasta {formatDate(uploadState.closesAt)}.
+                {t('common.public.moments.guest.form.deadline', {
+                  date: formatDate(uploadState.closesAt),
+                })}
               </p>
             )}
             {uploadState?.isWindowOpen && remainingDays !== null && remainingDays >= 0 && (
               <p className="text-xs text-slate-400">
-                Te quedan {remainingDays === 1 ? '1 d�a' : `${remainingDays} d�as`} para compartir recuerdos.
+                {t('common.public.moments.guest.form.remainingDays', { count: remainingDays })}
               </p>
             )}
             {uploadState?.compressionActive && (
               <p className="text-xs text-slate-400">
-                Las fotos se optimizar�n autom�ticamente para no ocupar tanto espacio.
+                {t('common.public.moments.guest.form.compressionNotice')}
               </p>
             )}
           </header>
@@ -241,13 +260,13 @@ export default function MomentosGuest() {
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-slate-700">
-                Tu nombre
+                {t('common.public.moments.guest.form.nameLabel')}
               </label>
               <input
                 type="text"
                 value={guestName}
                 onChange={(event) => setGuestName(event.target.value)}
-                placeholder="Ej. Laura G."
+                placeholder={t('common.public.moments.guest.form.namePlaceholder')}
                 className="mt-1 w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
@@ -255,13 +274,13 @@ export default function MomentosGuest() {
 
             <div>
               <label className="block text-sm font-medium text-slate-700">
-                Correo electr�nico (opcional)
+                {t('common.public.moments.guest.form.emailLabel')}
               </label>
               <input
                 type="email"
                 value={guestEmail}
                 onChange={(event) => setGuestEmail(event.target.value)}
-                placeholder="Te avisaremos cuando tus fotos est�n destacadas"
+                placeholder={t('common.public.moments.guest.form.emailPlaceholder')}
                 className="mt-1 w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -275,7 +294,7 @@ export default function MomentosGuest() {
                 required
               />
               <span>
-                Acepto compartir mis fotos con la pareja anfitriona y confirmo que tengo permiso para hacerlo.
+                {t('common.public.moments.guest.form.termsLabel')}
               </span>
             </label>
           </div>
@@ -284,10 +303,10 @@ export default function MomentosGuest() {
             type="submit"
             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm py-2.5 rounded-md transition"
           >
-            Comenzar a subir fotos
+            {t('common.public.moments.guest.form.submit')}
           </button>
           <p className="text-xs text-slate-400 text-center">
-            Tip: las fotos se agrupan por escena (ceremonia, banquete, fiesta&) para ayudar al anfitri�n.
+            {t('common.public.moments.guest.form.tip')}
           </p>
         </form>
       </div>
@@ -298,34 +317,48 @@ export default function MomentosGuest() {
     tokenDoc?.maxUsages && tokenDoc.maxUsages > 0
       ? Math.max(tokenDoc.maxUsages - (tokenDoc.usedCount || 0) - uploadedCount, 0)
       : null;
+  const guestDisplayName =
+    guestName || t('common.public.moments.guest.uploadStates.guestFallback');
+  const remainingUploadsText =
+    remainingUploads === null
+      ? t('common.public.moments.guest.uploadStates.remainingUploadsUnlimited')
+      : remainingUploads === 1
+        ? t('common.public.moments.guest.uploadStates.remainingUploadsOne')
+        : t('common.public.moments.guest.uploadStates.remainingUploads', {
+            count: remainingUploads,
+          });
 
   return (
     <div className="min-h-screen bg-slate-50 py-10 px-4">
       <div className="max-w-3xl mx-auto space-y-6">
         <header className="bg-white border border-slate-200 rounded-2xl shadow-sm px-6 py-5 space-y-2">
           <p className="text-xs uppercase tracking-wide text-blue-500 font-semibold">
-            Recuerdos colaborativos
+            {t('common.public.moments.guest.uploadStates.badge')}
           </p>
           <h1 className="text-xl font-semibold text-slate-800">
-            Hola, {guestName || 'Invitado'} =K
+            {t('common.public.moments.guest.uploadStates.greeting', { name: guestDisplayName })}
           </h1>
           <p className="text-sm text-slate-600">
-            Sube hasta {remainingUploads !== null ? `${remainingUploads} fotos adicionales` : 'todas las fotos que quieras'}.
-            El anfitri�n revisar� y las compartir� con el grupo.
+            {remainingUploadsText}{' '}
+            {t('common.public.moments.guest.uploadStates.reviewHint')}
           </p>
           {uploadState?.isWindowOpen && remainingDays !== null && remainingDays >= 0 && (
             <p className="text-xs text-slate-400">
-              A�n tienes {remainingDays === 1 ? '1 d�a' : `${remainingDays} d�as`} para enviar tus mejores fotos.
+              {t('common.public.moments.guest.uploadStates.remainingDays', {
+                count: remainingDays,
+              })}
             </p>
           )}
           {uploadState?.closesAt && (
             <p className="text-xs text-slate-400">
-              Disponible hasta {formatDate(uploadState.closesAt)}.
+              {t('common.public.moments.guest.uploadStates.deadline', {
+                date: formatDate(uploadState.closesAt),
+              })}
             </p>
           )}
           {uploadState?.compressionActive && (
             <p className="text-xs text-slate-400">
-              Las fotos nuevas se optimizan autom�ticamente para ahorrar espacio.
+              {t('common.public.moments.guest.uploadStates.compressionNotice')}
             </p>
           )}
         </header>
@@ -341,13 +374,19 @@ export default function MomentosGuest() {
         />
 
         <section className="bg-white border border-slate-200 rounded-xl shadow-sm px-6 py-5 space-y-3">
-          <h2 className="text-lg font-semibold text-slate-800">Tus progresos</h2>
+          <h2 className="text-lg font-semibold text-slate-800">
+            {t('common.public.moments.guest.uploadStates.progressTitle')}
+          </h2>
           <p className="text-sm text-slate-500">
-            Has compartido <strong>{uploadedCount}</strong> {uploadedCount === 1 ? 'foto' : 'fotos'}.
-            �Gracias por sumar a los recuerdos!
+            {t('common.public.moments.guest.uploadStates.progressDescription', {
+              count: uploadedCount,
+            })}
           </p>
           {recentUploads.length > 0 && (
             <div className="space-y-2">
+              <p className="text-xs text-slate-400 uppercase tracking-wide font-semibold">
+                {t('common.public.moments.guest.uploadStates.recentUploadsTitle')}
+              </p>
               {recentUploads.map((item, index) => (
                 <div
                   key={`${item.name}-${index}`}
@@ -356,16 +395,21 @@ export default function MomentosGuest() {
                   <div className="min-w-0">
                     <p className="font-medium text-slate-700 truncate">{item.name}</p>
                     <p className="text-xs text-slate-400">
-                      Escena: {item.scene} � {Math.round(item.size / 1024)} KB
+                      {t('common.public.moments.guest.uploadStates.uploadStatus', {
+                        scene: item.scene,
+                        size: Math.round(item.size / 1024),
+                      })}
                     </p>
                   </div>
-                  <span className="text-xs text-green-600 font-semibold">En revisi�n</span>
+                  <span className="text-xs text-green-600 font-semibold">
+                    {t('common.public.moments.guest.uploadStates.uploadReview')}
+                  </span>
                 </div>
               ))}
             </div>
           )}
           <p className="text-xs text-slate-400">
-            Las fotos aprobadas aparecer�n en el slideshow del evento y en la galer�a final. El anfitri�n avisar� cuando est�n listas.
+            {t('common.public.moments.guest.uploadStates.uploadsEmpty')}
           </p>
         </section>
       </div>

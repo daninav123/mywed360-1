@@ -31,7 +31,7 @@ const ADMIN_NAVIGATION = [
         id: 'suppliers',
         label: 'Proveedores',
         path: '/admin/suppliers',
-        description: 'Catálogo y verificaciones de proveedores (próximamente).',
+        description: 'Catálogo, verificaciones y analítica del ecosistema de proveedores.',
       },
       {
         id: 'commerce',

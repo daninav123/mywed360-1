@@ -1523,22 +1523,6 @@
   "message_message_details_errorrequestid_request_errorrequestid": ",\r\n        message: message,\r\n        details: error.requestId ? `Request ID: ${error.requestId}` : undefined,\r\n      });\r\n    }\r\n\r\n    return details;\r\n  }\r\n\r\n  // Error genérico\r\n  console.error(",
   "message_muchas_mesas_estan_demasiado_juntas": ",\n      message: `Muchas mesas están demasiado juntas (${tooClose} conflictos)`,\n      severity: ",
   "message_tooclose_mesas_estan_muy_cerca": ",\n      message: `${tooClose} mesas están muy cerca. Sepáralas al menos ${MIN_SPACING}cm`,\n      priority: ",
-  "messages": {
-    "saveSuccess": "Guardado correctamente",
-    "saveError": "Error al guardar",
-    "deleteSuccess": "Eliminado correctamente",
-    "deleteError": "Error al eliminar",
-    "updateSuccess": "Actualizado correctamente",
-    "updateError": "Error al actualizar",
-    "loadError": "Error al cargar datos",
-    "networkError": "Error de red",
-    "confirmDelete": "Seguro que deseas eliminar?",
-    "unsavedChanges": "Tienes cambios sin guardar",
-    "permissionDenied": "Permission denied",
-    "notFound": "Not found",
-    "sessionExpired": "Your session has expired",
-    "pleaseLogin": "Please log in"
-  },
   "metodo": "Método",
   "metodo_pago": "Método de pago",
   "metricas": "Métricas",
@@ -2962,6 +2946,190 @@
       "alerts": {
         "submitError": "No se pudo enviar: {{message}}"
       }
+    },
+    "weddingSite": {
+      "loading": "Cargando...",
+      "alerts": {
+        "success": "¡Gracias por tu respuesta!",
+        "error": "Error al enviar."
+      },
+      "defaults": {
+        "title": "Nuestra boda",
+        "storyTitle": "Nuestra historia",
+        "timelineTitle": "Programa",
+        "galleryTitle": "Galería",
+        "rsvpTitle": "Confirma tu asistencia",
+        "giftsTitle": "Lista de regalos",
+        "giftsDescription": "Agradecemos tu regalo en la siguiente cuenta:",
+        "mapTitle": "Cómo llegar"
+      },
+      "countdown": {
+        "days": "{{value}}d",
+        "hours": "{{value}}h",
+        "minutes": "{{value}}m",
+        "seconds": "{{value}}s"
+      },
+      "rsvp": {
+        "placeholders": {
+          "name": "Nombre",
+          "guests": "Número de personas",
+          "message": "Mensaje"
+        },
+        "options": {
+          "yes": "Asistiré",
+          "no": "No podré asistir"
+        },
+        "button": "Enviar"
+      }
+    },
+    "publicWedding": {
+      "loading": "Cargando...",
+      "error": "No disponible ({{reason}})",
+      "defaults": {
+        "title": "Nuestra boda",
+        "storyTitle": "Nuestra historia",
+        "timelineTitle": "Programa",
+        "galleryTitle": "Galería",
+        "iframeTitle": "Wedding Site"
+      }
+    },
+    "moments": {
+      "guest": {
+        "loading": "Preparando tu espacio para compartir recuerdos...",
+        "errorTitle": "No pudimos abrir la galería de recuerdos",
+        "errorDescription": "{{message}}",
+        "errorHint": "Si crees que es un error, contacta con la pareja anfitriona para solicitar un nuevo enlace.",
+        "errors": {
+          "incompleteLink": "El enlace está incompleto. Solicita un nuevo QR al anfitrión.",
+          "invalidLink": "Este enlace ya no es válido."
+        },
+        "closedTitle": "La galería está cerrada",
+        "closedDescription": "El periodo para subir fotos terminó{{date}}.",
+        "closedHint": "Si aún tienes recuerdos que compartir, avisa a la pareja anfitriona para que reabra el enlace.",
+        "form": {
+          "badge": "Recuerdos compartidos",
+          "title": "¡Gracias por capturar recuerdos!",
+          "description": "Sube tus fotos favoritas del evento. El anfitrión podrá revisarlas y mostrarlas en el slideshow en vivo.",
+          "deadline": "La galería admite nuevas fotos hasta {{date}}.",
+          "remainingDays": {
+            "one": "Te queda 1 día para compartir recuerdos.",
+            "other": "Te quedan {{count}} días para compartir recuerdos."
+          },
+          "compressionNotice": "Las fotos se optimizarán automáticamente para no ocupar tanto espacio.",
+          "nameLabel": "Tu nombre",
+          "namePlaceholder": "Ej. Laura G.",
+          "emailLabel": "Correo electrónico (opcional)",
+          "emailPlaceholder": "Te avisaremos cuando tus fotos estén destacadas",
+          "termsLabel": "Acepto compartir mis fotos con la pareja anfitriona y confirmo que tengo permiso para hacerlo.",
+          "submit": "Comenzar a subir fotos",
+          "tip": "Tip: las fotos se agrupan por escena (ceremonia, banquete, fiesta…) para ayudar al anfitrión.",
+          "errors": {
+            "missingName": "Indica tu nombre para personalizar tus aportaciones",
+            "missingTerms": "Debes aceptar la política de privacidad",
+            "uploadsClosed": "Esta galería ya no acepta nuevas fotos."
+          }
+        },
+        "scenes": {
+          "other": "Otros"
+        },
+        "uploadStates": {
+          "badge": "Recuerdos colaborativos",
+          "greeting": "Hola, {{name}} ✨",
+          "remainingUploads": "Sube hasta {{count}} fotos adicionales.",
+          "remainingUploadsOne": "Sube 1 foto adicional.",
+          "remainingUploadsUnlimited": "Sube todas las fotos que quieras.",
+          "reviewHint": "El anfitrión revisará y las compartirá con el grupo.",
+          "remainingDays": {
+            "one": "Aún tienes 1 día para enviar tus mejores fotos.",
+            "other": "Aún tienes {{count}} días para enviar tus mejores fotos."
+          },
+          "deadline": "Disponible hasta {{date}}.",
+          "compressionNotice": "Las fotos nuevas se optimizan automáticamente para ahorrar espacio.",
+          "progressTitle": "Tus progresos",
+          "progressDescription": "Has compartido {{count}} {{count, plural, one {foto} other {fotos}}}. ¡Gracias por sumar a los recuerdos!",
+            "uploadsEmpty": "Las fotos aprobadas aparecerán en el slideshow del evento y en la galería final. El anfitrión avisará cuando estén listas.",
+            "uploadStatus": "Escena: {{scene}} · {{size}} KB",
+            "uploadReview": "En revisión",
+            "recentUploadsTitle": "Tus últimos envíos",
+            "guestFallback": "Invitado"
+        },
+        "toasts": {
+          "firstUpload": "¡Logro desbloqueado! Primer recuerdo compartido ✨",
+          "thirdUpload": "¡Eres un colaborador entusiasta! Sigue compartiendo recuerdos.",
+          "fifthUpload": "¡Recuerdos estrella! Tus fotos darán vida al slideshow.",
+          "default": "Foto enviada correctamente"
+        }
+      },
+        "public": {
+          "loading": "Preparando la galería...",
+          "error": "Este enlace ya no es válido. Pide uno nuevo a la pareja anfitriona.",
+          "errorTitle": "No pudimos abrir la galería",
+          "errorDescription": "Este enlace ya no es válido o ha sido revocado. Contacta con la pareja anfitriona para solicitar uno nuevo.",
+          "errors": {
+            "incompleteLink": "El enlace está incompleto. Solicita un nuevo QR al anfitrión.",
+            "invalidLink": "Este enlace ya no es válido."
+          },
+          "hero": {
+            "badge": "Galería de recuerdos",
+            "titleFallback": "Comparte tus mejores momentos",
+            "description": "Elige un momento para tus recuerdos y súbelos directamente desde tu móvil.",
+            "deadline": "Disponible hasta {{date}} · {{remaining}}",
+            "remaining": {
+              "lastDay": "Último día",
+              "days": "{{count}} días restantes"
+            },
+            "closed": "La subida de archivos ha finalizado para esta galería."
+          },
+          "form": {
+            "title": "Comparte tus recuerdos",
+            "description": "Carga tus fotos, añade un mensaje y aparecerán en la galería de todos los invitados.",
+            "nameLabel": "Tu nombre",
+            "namePlaceholder": "Ej. Laura G.",
+            "emailLabel": "Correo electrónico (opcional)",
+            "emailPlaceholder": "Te avisaremos cuando destaquen tus recuerdos",
+            "sceneLabel": "Escena o momento",
+            "termsLabel": "Acepto compartir mis fotos con la pareja anfitriona.",
+            "termsDescription": "Confirmo que tengo permiso para compartir estas imágenes y acepto que la pareja anfitriona las utilice en la galería.",
+            "start": "Comenzar",
+            "startUpload": "Empezar a subir recuerdos",
+            "tip": "¡Consejo! Elige la escena correcta para ayudar a la pareja a organizar las fotos."
+          },
+          "list": {
+            "title": "Momentos destacados",
+            "count": "{{count}} momentos disponibles",
+            "cardDescription": "Sube instantáneamente tus fotos o videos de este momento.",
+            "empty": "Los anfitriones aún no han configurado momentos específicos. Vuelve más tarde para compartir tus recuerdos."
+          },
+          "recent": {
+            "title": "Últimas aportaciones",
+            "item": "{{scene}} · {{size}} KB"
+          },
+          "status": {
+            "cleanup": "La galería permanecerá disponible aproximadamente {{duration}} antes de archivarse automáticamente.",
+            "cleanupToday": "un día más",
+            "cleanupDays": "{{count}} días más"
+          },
+          "overlay": {
+            "selected": "Momento seleccionado",
+            "close": "Cerrar",
+            "start": "Empezar a subir recuerdos",
+            "remainingUploads": "Puedes subir {{count, plural, one {1 archivo adicional} other {{count} archivos adicionales}} con este enlace."
+          },
+          "uploadStates": {
+            "title": "Recuerdos compartidos",
+            "description": "Gracias por colaborar. Tus fotos se revisarán antes de mostrarse al resto de invitados.",
+            "recentUploads": "Últimas fotos enviadas",
+            "statusReview": "En revisión",
+            "dropzoneTitle": "Arrastra y suelta tus fotos aquí",
+            "dropzoneSubtitle": "Hasta 20 archivos, formato JPG o PNG"
+          },
+          "toasts": {
+            "uploadsClosed": "Esta galería ya no acepta nuevas fotos.",
+            "missingName": "Indica tu nombre para personalizar tus aportaciones.",
+            "missingTerms": "Debes aceptar la política de privacidad.",
+            "success": "¡Gracias! Tu archivo se ha enviado correctamente."
+          }
+        }
     }
   },
   "suppliers": {
@@ -2969,6 +3137,115 @@
     "suggested": "Sugeridos",
     "addServicePlaceholder": "Añadir servicio (ej. Fotografía)",
     "noServicesAdded": "An no has aadido servicios.",
+    "labels": {
+      "provider": "Proveedor",
+      "service": "Servicio"
+    },
+    "overview": {
+      "title": "Gestión de proveedores",
+      "metrics": {
+        "totalProviders": "Total Proveedores",
+        "confirmed": "Confirmados",
+        "pending": "Pendientes",
+        "shortlist": "Shortlist"
+      },
+      "defaults": {
+        "country": "España",
+        "serviceGroup": "Servicios",
+        "otherService": "Otros",
+        "fallbackName": "proveedor"
+      },
+      "shortlist": {
+        "loading": "Cargando shortlist…",
+        "error": "No se pudo cargar la shortlist.",
+        "empty": "Guarda candidatos desde tus búsquedas o registros manuales para construir la shortlist inicial.",
+        "savedAt": "Guardado {{value}}",
+        "match": "Match {{value}}"
+      },
+      "status": {
+        "pending": "Pendiente",
+        "confirmed": "Confirmado"
+      },
+      "toasts": {
+        "missingQuery": "Añade un término o completa tu perfil para mejorar las búsquedas.",
+        "noResults": "No encontramos coincidencias. Intenta con otros términos de búsqueda.",
+        "success": "✅ {{count}} proveedores encontrados ({{registered}} verificados, {{cached}} en caché, {{internet}} de internet)",
+        "error": "No se pudo completar la búsqueda.",
+        "wantedServicesSaved": "Servicios deseados actualizados.",
+        "wantedServicesError": "No se pudieron guardar los servicios deseados.",
+        "providerSaved": "Proveedor guardado.",
+        "providerError": "No se pudo guardar el proveedor."
+      },
+      "actions": {
+        "manageServices": "Gestionar servicios",
+        "newSupplier": "Nuevo proveedor",
+        "clear": "Limpiar"
+      },
+      "exploration": {
+        "title": "Exploración y shortlist",
+        "subtitle": "Explora proveedores, guarda ideas y revisa tus candidatos pendientes",
+        "collapseAria": "Plegar exploración",
+        "searchPlaceholder": "Buscar por proveedor, servicio o nota",
+        "recentSearches": "Búsquedas recientes:"
+      },
+      "results": {
+        "title": "Resultados de búsqueda",
+        "query": "Consulta: {{value}}",
+        "loading": "Buscando proveedores…",
+        "empty": "No encontramos resultados con los filtros actuales.",
+        "breakdown": "📊 Encontrados: {{registered}} verificados · {{cached}} en caché · {{internet}} de internet"
+      },
+      "pagination": {
+        "label": "Página {{current}} de {{total}}"
+      },
+      "buttons": {
+        "explore": "Explorar proveedores"
+      },
+      "services": {
+        "title": "Servicios por categoría",
+        "count": "{{count}} servicio",
+        "count_other": "{{count}} servicios",
+        "confirmedCount": "{{count}} confirmado",
+        "confirmedCount_other": "{{count}} confirmados",
+        "pendingCount": "{{count}} pendiente",
+        "pendingCount_other": "{{count}} pendientes",
+        "shortlistCount": "{{count}} opción guardada",
+        "shortlistCount_other": "{{count}} opciones guardadas",
+        "reviewShortlist": "Revisa las opciones guardadas",
+        "emptyShortlist": "Sin opciones guardadas aún",
+        "exploreHint": "Haz clic para explorar"
+      },
+      "modals": {
+        "options": {
+          "title": "Opciones guardadas · {{label}}",
+          "confirmedTitle": "Proveedor confirmado",
+          "contactTitle": "Proveedores contactados",
+          "contactEmpty": "Sin candidatos registrados dentro de los proveedores actuales.",
+          "shortlistTitle": "Shortlist",
+          "shortlistEmpty": "Todavía no has guardado propuestas para este servicio."
+        },
+        "newProvider": {
+          "title": "Nuevo proveedor"
+        },
+        "board": {
+          "title": "Panel de servicios",
+          "description": "Revisa el estado de cada servicio y añade opciones directamente desde este panel."
+        }
+      },
+      "drawer": {
+        "title": "Detalle del proveedor",
+        "titleWithName": "Detalle del proveedor · {{name}}",
+        "imageAlt": "Imagen de {{name}}",
+        "serviceUnknown": "Servicio desconocido",
+        "location": "Ubicación: {{value}}",
+        "priceRange": "Precio estimado: {{value}}",
+        "email": "Correo: {{value}}",
+        "phone": "Teléfono: {{value}}",
+        "openLink": "Abrir enlace",
+        "empty": "Selecciona un proveedor de la lista para ver más detalles.",
+        "fallbackName": "proveedor"
+      }
+    },
     "assignModal": {
       "title": "Agrupar ({{count}})",
       "selectedWithNames": "Seleccionados: {{names}}",
@@ -4365,10 +4642,116 @@
     "serviceRequired": "El servicio es obligatorio",
     "emailInvalid": "Email inválido",
     "linkMustStartHttp": "El enlace debe comenzar con http:// o https://",
-    "titleRequired": "El ttulo es obligatorio",
-    "companionNegative": "El número de acompaantes no puede ser negativo",
-    "selectCompanionType": "Selecciona el tipo de acompaante",
-    "companionMismatch": "Establece \"Sin acompaante\" o aade alguno"
+    "titleRequired": "El título es obligatorio",
+    "companionNegative": "El número de acompañantes no puede ser negativo",
+    "selectCompanionType": "Selecciona el tipo de acompañante",
+    "companionMismatch": "Establece \"Sin acompañante\" o añade alguno",
+    "fieldRequired": "Este campo es obligatorio",
+    "emailRequired": "El email es obligatorio",
+    "emailFormat": "El formato del email no es válido",
+    "phoneFormat": "El formato del teléfono no es válido",
+    "urlFormat": "La URL debe empezar con http:// o https://",
+    "passwordRequired": "La contraseña es obligatoria",
+    "passwordMinLength": "La contraseña debe tener al menos {{count}} caracteres",
+    "nameMinLength": "El nombre debe tener al menos {{count}} caracteres",
+    "nameMaxLength": "El nombre no puede tener más de {{count}} caracteres",
+    "postalCodeInvalid": "El código postal no es válido",
+    "dniInvalid": "El DNI/NIE no es válido",
+    "dniRequired": "El DNI/NIE es obligatorio",
+    "dniFormat": "El formato del DNI/NIE no es válido",
+    "passwordMatch": "Las contraseñas no coinciden",
+    "passwordStrength": "La contraseña debe tener al menos una letra mayúscula, una letra minúscula y un número",
+    "password": {
+      "veryWeak": "Muy débil",
+      "weak": "Débil",
+      "acceptable": "Aceptable",
+      "good": "Buena",
+      "excellent": "Excelente",
+      "suggestions": {
+        "minLength": "Introduce una contraseña con al menos {{count}} caracteres.",
+        "useMinChars": "Usa al menos {{count}} caracteres.",
+        "increase12": "Aumenta la longitud a 12 caracteres o más.",
+        "mixCase": "Combina mayúsculas y minúsculas.",
+        "addNumbers": "Añade números para reforzarla.",
+        "addSymbols": "Incluye símbolos como !, %, # o similares.",
+        "avoidRepetition": "Evita repetir el mismo carácter varias veces seguidas.",
+        "avoidCommon": "Evita palabras comunes o secuencias previsibles."
+      }
+    }
+  },
+  "errors": {
+    "generic": "Ha ocurrido un error inesperado",
+    "networkError": "Error de red. Verifica tu conexión.",
+    "permissionDenied": "Permisos insuficientes",
+    "openaiDisabled": "OpenAI directo deshabilitado (usa backend)",
+    "missingOpenAIKey": "Falta la clave de OpenAI",
+    "openaiError": "Error al conectar con OpenAI",
+    "loadError": "Error al cargar los datos",
+    "saveError": "Error al guardar los cambios",
+    "deleteError": "Error al eliminar",
+    "updateError": "Error al actualizar",
+    "publishError": "Error al publicar",
+    "offlineError": "Estás sin conexión. Conéctate a internet para publicar el micrositio.",
+    "generateWebError": "Ha ocurrido un error al generar la página web. Por favor, inténtalo de nuevo.",
+    "activateUrlError": "No se pudo activar la URL pública en este momento. Inténtalo de nuevo más tarde.",
+    "saveLogisticsError": "No se pudo guardar la logística. Inténtalo de nuevo."
+  },
+  "messages": {
+    "saveSuccess": "Guardado correctamente",
+    "saveError": "Error al guardar",
+    "deleteSuccess": "Eliminado correctamente",
+    "deleteError": "Error al eliminar",
+    "updateSuccess": "Actualizado correctamente",
+    "updateError": "Error al actualizar",
+    "loadError": "Error al cargar datos",
+    "networkError": "Error de red",
+    "confirmDelete": "¿Seguro que deseas eliminar?",
+    "unsavedChanges": "Tienes cambios sin guardar",
+    "permissionDenied": "Permiso denegado",
+    "notFound": "No encontrado",
+    "sessionExpired": "Tu sesión ha expirado",
+    "pleaseLogin": "Por favor inicia sesión",
+    "logisticsUpdated": "Logística actualizada correctamente",
+    "publishSuccess": "¡Página publicada!",
+    "publishSuccessWithUrl": "¡Página publicada! URL pública: {{url}}",
+    "savedNoActiveWedding": "Página guardada. No hay boda activa para publicar públicamente.",
+    "generateWebFirst": "Genera la web primero"
+  },
+  "website": {
+    "generate": "Generar web",
+    "publish": "Publicar",
+    "preview": "Vista previa",
+    "edit": "Editar",
+    "logistics": {
+      "title": "Logística",
+      "venue": "Lugar",
+      "address": "Dirección",
+      "time": "Hora",
+      "parking": "Parking",
+      "accommodation": "Alojamiento"
+    }
+  },
+  "admin": {
+    "clipboard": {
+      "copied": "Copiado al portapapeles",
+      "copyError": "Error al copiar"
+    },
+    "partner": {
+      "linkGenerated": "Enlace generado y copiado:\n{{url}}",
+      "linkError": "Error al generar enlace",
+      "managerCreated": "Jefe de comerciales creado correctamente",
+      "managerConfirmError": "No se recibió confirmación del nuevo jefe. Revisa el backend.",
+      "commercialCreated": "Comercial creado correctamente",
+      "commercialConfirmError": "No se recibió confirmación del nuevo comercial. Revisa el backend."
+    }
+  },
+  "rsvp": {
+    "reminderSimulation": "Simulación: candidatos={{attempted}}, enviados={{sent}}, omitidos={{skipped}}",
+    "reminderSent": "Envío: candidatos={{attempted}}, enviados={{sent}}, omitidos={{skipped}}",
+    "reminderSimulationError": "Error simulando recordatorios",
+    "reminderSendError": "Error enviando recordatorios",
+    "linkCopied": "Enlace RSVP copiado",
+    "linkCopyError": "No se pudo generar/copiar el enlace"
   },
   "verifica_conexion_con_backend_async_checkbackendconnection": ",\n        },\n      };\n    }\n  }\n\n  /**\n   * Verifica la conexión con el backend\n   */\n  async checkBackendConnection() {\n    try {\n      const backendUrl = import.meta.env.VITE_BACKEND_BASE_URL;\n      if (!backendUrl) {\n        throw new Error(",
   "verifica_estado_una_sesion_checkout_param": ",\n};\n\n/**\n * Verifica el estado de una sesión de checkout\n * @param {string} sessionId - ID de la sesión\n * @returns {Promise<Object>} - Estado de la sesión\n */\nexport async function getCheckoutSession(sessionId) {\n  try {\n    const token = localStorage.getItem(",
@@ -4411,5 +4794,9 @@
   "windowlocalstorage_windowlocalstorage_getstorage_const_raw_storegetitemkey": " && window.localStorage ? window.localStorage : _getStorage();\n    const raw = store.getItem(key);\n    if (!raw) return defaultValue;\n    return JSON.parse(raw);\n  } catch (error) {\n    console.error(`storage.loadJson error for key ${key}:`, error);\n    return defaultValue;\n  }\n};\n\n/**\n * Guarda un valor JSON en localStorage.\n * @param {string} key - Clave.\n * @param {*} value - Valor a serializar.\n * @returns {boolean} Éxito de la operación.\n */\nexport const saveJson = (key, value) => {\n  try {\n    const store =\n      typeof window !== ",
   "windowtoasttypemessage_else_consolelogtypetouppercase_message_registra_los": ") {\n    window.toast[type](message);\n  } else {\n    console.log(`[${type.toUpperCase()}] ${message}`);\n  }\n};\n\n// Registra los listeners de cambios de conexión\nexport const setupSyncListeners = () => {\n  window.addEventListener(",
   "withcacheavg_resultswithcacheavgtime_withoutcacheavg_resultswithoutcacheavgtime_improvementpercent_resultsimprovementpercent": ", {\n    withCacheAvg: results.withCache.avgTime,\n    withoutCacheAvg: results.withoutCache.avgTime,\n    improvementPercent: results.improvement.percent,\n    timesSaved: results.improvement.timesSaved,\n    templatesCount: templatesForTest.length,\n    iterations,\n  });\n\n  return results;\n}\n\n/**\n * Genera un informe detallado del estado actual de la caché\n * @returns {Object} Estadísticas detalladas de la caché\n */\nexport function generateCacheReport() {\n  // Obtener estadísticas del servicio de caché\n  const stats = templateCache.getCacheStats();\n\n  // Obtener entradas actuales\n  const memoryEntries = templateCache.getMemoryCacheEntries();\n  const localStorageSize = templateCache.getStorageCacheSize();\n\n  // Calcular tiempos promedio\n  const avgHitTime =\n    stats.hitTimes.length > 0\n      ? stats.hitTimes.reduce((sum, time) => sum + time, 0) / stats.hitTimes.length\n      : 0;\n\n  const avgMissTime =\n    stats.missTimes.length > 0\n      ? stats.missTimes.reduce((sum, time) => sum + time, 0) / stats.missTimes.length\n      : 0;\n\n  // Calcular efectividad\n  const hitRatio =\n    stats.hits + stats.misses > 0 ? (stats.hits / (stats.hits + stats.misses)) * 100 : 0;\n\n  // Preparar detalles de uso por categoría\n  const categoryUsage = {};\n  if (stats.categoryHits) {\n    Object.keys(stats.categoryHits).forEach((category) => {\n      categoryUsage[category] = {\n        hits: stats.categoryHits[category] || 0,\n        misses: stats.categoryMisses?.[category] || 0,\n        total: (stats.categoryHits[category] || 0) + (stats.categoryMisses?.[category] || 0),\n      };\n    });\n  }\n\n  return {\n    timestamp: Date.now(),\n    stats: {\n      hits: stats.hits,\n      misses: stats.misses,\n      total: stats.hits + stats.misses,\n      hitRatio: hitRatio.toFixed(2),\n      avgHitTime: avgHitTime.toFixed(2),\n      avgMissTime: avgMissTime.toFixed(2),\n      avgTimeSaved: avgMissTime - avgHitTime > 0 ? (avgMissTime - avgHitTime).toFixed(2) : 0,\n    },\n    memory: {\n      entryCount: memoryEntries.length,\n      byCategory: memoryEntries.reduce((acc, entry) => {\n        const cat = entry.category || ",
-  "writestorestore_export_const_updatelocalfinance_uid_weddingid": ";\n  writeStore(store);\n};\n\nexport const updateLocalFinance = (uid, weddingId, patch) => {\n  if (!weddingId) return;\n  const store = readStore();\n  const entry = ensureUserEntry(store, uid);\n  const idx = entry.weddings.findIndex((item) => item.id === weddingId);\n  if (idx === -1) {\n    // Si la boda no existe todavía, creamos una copia por defecto para mantener consistencia.\n    const created = {\n      ...createDefaultWedding(uid),\n      id: weddingId,\n      financeMain: mergeFinance(undefined, patch),\n    };\n    entry.weddings.push(created);\n    if (!entry.activeWeddingId) entry.activeWeddingId = weddingId;\n  } else {\n    const current = entry.weddings[idx];\n    entry.weddings[idx] = {\n      ...current,\n      financeMain: mergeFinance(current.financeMain, patch),\n      updatedAt: new Date().toISOString(),\n    };\n  }\n  writeStore(store);\n};\n\nexport const getLocalFinance = (uid, weddingId) => {\n  const store = readStore();\n  const entry = ensureUserEntry(store, uid);\n  const wedding = entry.weddings.find((item) => item.id === weddingId);\n  return wedding?.financeMain || null;\n};\n\nexport const clearLocalWeddings = (uid) => {\n  const store = readStore();\n  if (uid) {\n    store.users[uid] = { weddings: [], activeWeddingId: "
+  "writestorestore_export_const_updatelocalfinance_uid_weddingid": ";\n  writeStore(store);\n};\n\nexport const updateLocalFinance = (uid, weddingId, patch) => {\n  if (!weddingId) return;\n  const store = readStore();\n  const entry = ensureUserEntry(store, uid);\n  const idx = entry.weddings.findIndex((item) => item.id === weddingId);\n  if (idx === -1) {\n    // Si la boda no existe todavía, creamos una copia por defecto para mantener consistencia.\n    const created = {\n      ...createDefaultWedding(uid),\n      id: weddingId,\n      financeMain: mergeFinance(undefined, patch),\n    };\n    entry.weddings.push(created);\n    if (!entry.activeWeddingId) entry.activeWeddingId = weddingId;\n  } else {\n    const current = entry.weddings[idx];\n    entry.weddings[idx] = {\n      ...current,\n      financeMain: mergeFinance(current.financeMain, patch),\n      updatedAt: new Date().toISOString(),\n    };\n  }\n  writeStore(store);\n};\n\nexport const getLocalFinance = (uid, weddingId) => {\n  const store = readStore();\n  const entry = ensureUserEntry(store, uid);\n  const wedding = entry.weddings.find((item) => item.id === weddingId);\n  return wedding?.financeMain || null;\n};\n\nexport const clearLocalWeddings = (uid) => {\n  const store = readStore();\n  if (uid) {\n    store.users[uid] = { weddings: [], activeWeddingId: ",
+  "actions": {
+    "close": "Cerrar"
+  }
 }
+

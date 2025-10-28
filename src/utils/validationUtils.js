@@ -3,6 +3,8 @@
  * Centraliza las validaciones más comunes del proyecto
  */
 
+import i18n from '../i18n';
+
 /**
  * Valida formato de email
  * @param {string} email - Email a validar
@@ -51,9 +53,17 @@ export const isNotEmpty = (value) => {
   return value && typeof value === 'string' && value.trim().length > 0;
 };
 
-const PASSWORD_SCORE_LABELS = ['Muy débil', 'Débil', 'Aceptable', 'Buena', 'Excelente'];
 const PASSWORD_SCORE_COLORS = ['#ef4444', '#f97316', '#facc15', '#22c55e', '#15803d'];
 const PASSWORD_PROGRESS_STEPS = [8, 35, 60, 85, 100];
+
+// Función para obtener las etiquetas de password traducidas
+const getPasswordScoreLabels = () => [
+  i18n.t('validation.password.veryWeak', { defaultValue: 'Muy débil' }),
+  i18n.t('validation.password.weak', { defaultValue: 'Débil' }),
+  i18n.t('validation.password.acceptable', { defaultValue: 'Aceptable' }),
+  i18n.t('validation.password.good', { defaultValue: 'Buena' }),
+  i18n.t('validation.password.excellent', { defaultValue: 'Excelente' }),
+];
 
 /**
  * Evalúa la fuerza de una contraseña y ofrece recomendaciones de mejora.
@@ -62,13 +72,15 @@ const PASSWORD_PROGRESS_STEPS = [8, 35, 60, 85, 100];
  */
 export const evaluatePasswordStrength = (password = '') => {
   const value = password.trim();
+  const labels = getPasswordScoreLabels();
+  
   if (!value) {
     return {
       score: 0,
-      label: PASSWORD_SCORE_LABELS[0],
+      label: labels[0],
       color: PASSWORD_SCORE_COLORS[0],
       progress: PASSWORD_PROGRESS_STEPS[0],
-      suggestions: ['Introduce una contraseña con al menos 8 caracteres.'],
+      suggestions: [i18n.t('validation.password.suggestions.minLength', { count: 8, defaultValue: 'Introduce una contraseña con al menos 8 caracteres.' })],
     };
   }
 
@@ -78,46 +90,46 @@ export const evaluatePasswordStrength = (password = '') => {
   if (value.length >= 8) {
     score += 1;
   } else {
-    suggestions.push('Usa al menos 8 caracteres.');
+    suggestions.push(i18n.t('validation.password.suggestions.useMinChars', { count: 8, defaultValue: 'Usa al menos 8 caracteres.' }));
   }
 
   if (value.length >= 12) {
     score += 1;
   } else {
-    suggestions.push('Aumenta la longitud a 12 caracteres o más.');
+    suggestions.push(i18n.t('validation.password.suggestions.increase12', { defaultValue: 'Aumenta la longitud a 12 caracteres o más.' }));
   }
 
   if (/[a-z]/.test(value) && /[A-Z]/.test(value)) {
     score += 1;
   } else {
-    suggestions.push('Combina mayúsculas y minúsculas.');
+    suggestions.push(i18n.t('validation.password.suggestions.mixCase', { defaultValue: 'Combina mayúsculas y minúsculas.' }));
   }
 
   if (/\d/.test(value)) {
     score += 1;
   } else {
-    suggestions.push('Añade números para reforzarla.');
+    suggestions.push(i18n.t('validation.password.suggestions.addNumbers', { defaultValue: 'Añade números para reforzarla.' }));
   }
 
   if (/[^A-Za-z0-9]/.test(value)) {
     score += 1;
   } else {
-    suggestions.push('Incluye símbolos como !, %, # o similares.');
+    suggestions.push(i18n.t('validation.password.suggestions.addSymbols', { defaultValue: 'Incluye símbolos como !, %, # o similares.' }));
   }
 
   if (/(\w)\1{2,}/.test(value)) {
-    suggestions.push('Evita repetir el mismo carácter varias veces seguidas.');
+    suggestions.push(i18n.t('validation.password.suggestions.avoidRepetition', { defaultValue: 'Evita repetir el mismo carácter varias veces seguidas.' }));
   }
 
   if (/password|1234|abcd|qwer|admin/i.test(value)) {
-    suggestions.push('Evita palabras comunes o secuencias previsibles.');
+    suggestions.push(i18n.t('validation.password.suggestions.avoidCommon', { defaultValue: 'Evita palabras comunes o secuencias previsibles.' }));
   }
 
   score = Math.min(score, 4);
 
   return {
     score,
-    label: PASSWORD_SCORE_LABELS[score],
+    label: labels[score],
     color: PASSWORD_SCORE_COLORS[score],
     progress: PASSWORD_PROGRESS_STEPS[score],
     suggestions: Array.from(new Set(suggestions)).slice(0, 4),
@@ -272,62 +284,85 @@ export const normalizeString = (str) => {
 };
 
 /**
- * Reglas de validación predefinidas para useForm
+ * Función que genera reglas de validación con i18n
+ * Debe llamarse cada vez que se necesiten las reglas para obtener traducciones actualizadas
+ * @returns {Object} Objeto con reglas de validación traducidas
  */
-export const commonValidationRules = {
+export const getValidationRules = () => ({
   required: {
     required: true,
-    requiredMessage: 'Este campo es obligatorio',
+    requiredMessage: i18n.t('validation.fieldRequired', { defaultValue: 'Este campo es obligatorio' }),
   },
 
   email: {
     required: true,
     email: true,
-    requiredMessage: 'El email es obligatorio',
-    emailMessage: 'El formato del email no es válido',
+    requiredMessage: i18n.t('validation.emailRequired', { defaultValue: 'El email es obligatorio' }),
+    emailMessage: i18n.t('validation.emailFormat', { defaultValue: 'El formato del email no es válido' }),
   },
 
   phone: {
     custom: (value) => {
       if (!value) return null;
-      return isValidPhone(value) ? null : 'El formato del teléfono no es válido';
+      return isValidPhone(value) 
+        ? null 
+        : i18n.t('validation.phoneFormat', { defaultValue: 'El formato del teléfono no es válido' });
     },
   },
 
   url: {
     custom: (value) => {
       if (!value) return null;
-      return isValidUrl(value) ? null : 'La URL debe empezar con http:// o https://';
+      return isValidUrl(value) 
+        ? null 
+        : i18n.t('validation.urlFormat', { defaultValue: 'La URL debe empezar con http:// o https://' });
     },
   },
 
   password: {
     required: true,
     minLength: 6,
-    requiredMessage: 'La contraseña es obligatoria',
-    minLengthMessage: 'La contraseña debe tener al menos 6 caracteres',
+    requiredMessage: i18n.t('validation.passwordRequired', { defaultValue: 'La contraseña es obligatoria' }),
+    minLengthMessage: i18n.t('validation.passwordMinLength', { count: 6, defaultValue: 'La contraseña debe tener al menos 6 caracteres' }),
   },
 
   name: {
     required: true,
     minLength: 2,
     maxLength: 50,
-    requiredMessage: 'El nombre es obligatorio',
-    minLengthMessage: 'El nombre debe tener al menos 2 caracteres',
-    maxLengthMessage: 'El nombre no puede tener más de 50 caracteres',
+    requiredMessage: i18n.t('validation.nameRequired', { defaultValue: 'El nombre es obligatorio' }),
+    minLengthMessage: i18n.t('validation.nameMinLength', { count: 2, defaultValue: 'El nombre debe tener al menos 2 caracteres' }),
+    maxLengthMessage: i18n.t('validation.nameMaxLength', { count: 50, defaultValue: 'El nombre no puede tener más de 50 caracteres' }),
   },
 
   postalCode: {
     custom: (value) => {
       if (!value) return null;
-      return isValidSpanishPostalCode(value) ? null : 'El código postal no es válido';
+      return isValidSpanishPostalCode(value) 
+        ? null 
+        : i18n.t('validation.postalCodeInvalid', { defaultValue: 'El código postal no es válido' });
     },
   },
 
   dni: {
     custom: (value) => {
       if (!value) return null;
-      return isValidSpanishDNI(value) ? null : 'El DNI/NIE no es válido';
+      return isValidSpanishDNI(value) 
+        ? null 
+        : i18n.t('validation.dniInvalid', { defaultValue: 'El DNI/NIE no es válido' });
     },
   },
-};
+});
+
+/**
+ * Reglas de validación predefinidas para useForm
+ * @deprecated Usa getValidationRules() en su lugar para obtener traducciones actualizadas
+ */
+export let commonValidationRules = getValidationRules();
+
+// Actualizar reglas cuando cambie el idioma
+if (typeof window !== 'undefined' && i18n) {
+  i18n.on('languageChanged', () => {
+    commonValidationRules = getValidationRules();
+  });
+}

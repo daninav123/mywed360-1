@@ -4,7 +4,6 @@ import { toast } from 'react-toastify';
 import { Camera, Sparkles, ChevronRight, UploadCloud, X } from 'lucide-react';
 
 import UploadWidget from '@/components/momentos/UploadWidget';
-import { db } from '../firebaseConfig';
 import { formatDate } from '../utils/formatUtils';
 import {
   getAlbumScenes,
@@ -13,6 +12,7 @@ import {
   validateGuestToken,
 } from '@/services/momentosService';
 import { firebaseReady } from '@/firebaseConfig';
+import useTranslations from '@/hooks/useTranslations';
 
 const ALBUM_ID = 'momentos';
 
@@ -29,6 +29,7 @@ const formatDateLocal = (value) => {
 };
 
 export default function MomentosPublic() {
+  const { t } = useTranslations();
   const [searchParams] = useSearchParams();
   const tokenParam = searchParams.get('token') || '';
   const weddingId = searchParams.get('w') || '';
@@ -85,7 +86,7 @@ export default function MomentosPublic() {
     const initialize = async () => {
       try {
         if (!tokenParam || !weddingId) {
-          throw new Error('El enlace est� incompleto. Solicita un nuevo QR al anfitri�n.');
+          throw new Error(t('common.public.moments.public.errors.incompleteLink'));
         }
         await firebaseReady;
         const tokenData = await validateGuestToken(weddingId, tokenParam, { albumId: ALBUM_ID });
@@ -110,7 +111,7 @@ export default function MomentosPublic() {
         unsubscribeAlbum && unsubscribeAlbum();
       } catch {}
     };
-  }, [tokenParam, weddingId]);
+  }, [t, tokenParam, weddingId]);
 
   const scenes = useMemo(() => {
     const base = getAlbumScenes(album);
@@ -127,7 +128,7 @@ export default function MomentosPublic() {
 
   const guestId = useMemo(() => {
     const slug = (guestName || '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '-');
-    return `${tokenDoc?.id || 'token'}-${slug || 'invitado'}`;
+    return `${tokenDoc?.id || 'token'}-${slug || 'guest'}`;
   }, [guestName, tokenDoc?.id]);
 
   const uploader = useMemo(
@@ -135,11 +136,11 @@ export default function MomentosPublic() {
       type: 'guest',
       uid: guestId,
       guestId,
-      displayName: guestName || 'Invitado',
+      displayName: guestName || t('common.public.moments.guest.uploadStates.guestFallback'),
       tokenId: tokenDoc?.id || null,
       source: 'guest-public',
     }),
-    [guestId, guestName, tokenDoc?.id]
+    [guestId, guestName, t, tokenDoc?.id]
   );
 
   const remainingUploads = useMemo(() => {
@@ -162,7 +163,7 @@ export default function MomentosPublic() {
 
   const handleSceneSelect = (scene) => {
     if (uploadsClosed) {
-      toast.warn('La galer�a ya no acepta nuevas fotos.');
+      toast.warn(t('common.public.moments.public.toasts.uploadsClosed'));
       return;
     }
     setSelectedScene(scene);
@@ -176,11 +177,11 @@ export default function MomentosPublic() {
   const handleStart = (event) => {
     event?.preventDefault();
     if (!guestName.trim()) {
-      toast.warn('Indica tu nombre para personalizar tus aportaciones');
+      toast.warn(t('common.public.moments.public.toasts.missingName'));
       return;
     }
     if (!acceptedTerms) {
-      toast.warn('Debes aceptar la pol�tica de privacidad');
+      toast.warn(t('common.public.moments.public.toasts.missingTerms'));
       return;
     }
     persistGuestPrefs({ guestName: guestName.trim(), guestEmail, acceptedTerms: true });
@@ -197,7 +198,7 @@ export default function MomentosPublic() {
       },
       ...prev.slice(0, 4),
     ]);
-    toast.success('�Gracias! Tu archivo se ha enviado correctamente.');
+    toast.success(t('common.public.moments.public.toasts.success'));
   };
 
   const handleCloseOverlay = () => {
@@ -210,7 +211,7 @@ export default function MomentosPublic() {
       <div className="min-h-screen flex items-center justify-center bg-slate-900 text-white">
         <div className="text-center space-y-3">
           <div className="animate-spin h-10 w-10 border-2 border-slate-600 border-t-transparent rounded-full mx-auto" />
-          <p className="text-sm text-slate-400">Preparando la galer�a&</p>
+          <p className="text-sm text-slate-400">{t('common.public.moments.public.loading')}</p>
         </div>
       </div>
     );
@@ -220,9 +221,11 @@ export default function MomentosPublic() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-900 text-white px-6">
         <div className="bg-white/5 backdrop-blur border border-white/10 rounded-3xl px-6 py-8 max-w-md text-center space-y-3">
-          <h1 className="text-xl font-semibold text-white">No pudimos abrir la galer�a</h1>
+          <h1 className="text-xl font-semibold text-white">
+            {t('common.public.moments.public.errorTitle')}
+          </h1>
           <p className="text-sm text-slate-300">
-            Este enlace ya no es v�lido o ha sido revocado. Contacta con la pareja anfitriona para solicitar uno nuevo.
+            {t('common.public.moments.public.errorDescription')}
           </p>
         </div>
       </div>
@@ -231,28 +234,45 @@ export default function MomentosPublic() {
 
   const remainingDays = uploadState?.remainingDays ?? null;
   const cleanupDays = uploadState?.cleanupDaysRemaining ?? null;
+  const albumTitle =
+    album?.settings?.publicTitle || t('common.public.moments.public.hero.titleFallback');
+  const heroRemainingLabel =
+    uploadState?.closesAt && uploadState.isWindowOpen && remainingDays !== null
+      ? remainingDays === 0
+        ? t('common.public.moments.public.hero.remaining.lastDay')
+        : t('common.public.moments.public.hero.remaining.days', { count: remainingDays })
+      : null;
+  const cleanupDurationLabel =
+    cleanupDays === null || cleanupDays < 0
+      ? null
+      : cleanupDays === 0
+        ? t('common.public.moments.public.status.cleanupToday')
+        : t('common.public.moments.public.status.cleanupDays', { count: cleanupDays });
 
   return (
     <div className="min-h-screen bg-slate-950 text-white flex flex-col">
       <header className="px-6 pt-10 pb-6 bg-gradient-to-b from-slate-900 to-slate-950">
         <p className="text-xs uppercase tracking-[0.2em] text-blue-300 font-semibold">
-          Galer�a de recuerdos
+          {t('common.public.moments.public.hero.badge')}
         </p>
         <h1 className="text-3xl font-bold mt-3">
-          {album?.settings?.publicTitle || 'Comparte tus mejores momentos'}
+          {albumTitle}
         </h1>
         <p className="text-sm text-slate-300 mt-3 max-w-sm">
-          Elige un momento para tus recuerdos y s�belos directamente desde tu m�vil.
+          {t('common.public.moments.public.hero.description')}
         </p>
-        {uploadState?.closesAt && uploadState.isWindowOpen && remainingDays !== null && (
+        {uploadState?.closesAt && uploadState.isWindowOpen && heroRemainingLabel && (
           <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-blue-500/10 border border-blue-400/40 px-4 py-2 text-xs font-medium text-blue-200">
             <Sparkles size={14} />
-            Disponible hasta {formatDateLocal(uploadState.closesAt)} · {remainingDays === 0 ? 'Último día' : `${remainingDays} días restantes`}
+            {t('common.public.moments.public.hero.deadline', {
+              date: formatDateLocal(uploadState.closesAt),
+              remaining: heroRemainingLabel,
+            })}
           </div>
         )}
         {uploadsClosed && (
           <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-amber-500/10 border border-amber-400/40 px-4 py-2 text-xs font-medium text-amber-200">
-            La subida de archivos ha finalizado para esta galer�a.
+            {t('common.public.moments.public.hero.closed')}
           </div>
         )}
       </header>
@@ -260,9 +280,11 @@ export default function MomentosPublic() {
       <main className="flex-1 bg-white text-slate-900 rounded-t-[32px] -mt-4 relative z-10">
         <div className="px-5 py-6 space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-slate-800">Momentos destacados</h2>
+            <h2 className="text-lg font-semibold text-slate-800">
+              {t('common.public.moments.public.list.title')}
+            </h2>
             <span className="text-xs text-slate-400">
-              {scenes.length} momentos disponibles
+              {t('common.public.moments.public.list.count', { count: scenes.length })}
             </span>
           </div>
 
@@ -285,7 +307,7 @@ export default function MomentosPublic() {
                   <div>
                     <p className="font-semibold text-slate-900">{scene.label || scene.id}</p>
                     <p className="text-xs text-slate-500">
-                      Sube instant�neamente tus fotos o videos de este momento.
+                      {t('common.public.moments.public.list.cardDescription')}
                     </p>
                   </div>
                 </div>
@@ -295,7 +317,7 @@ export default function MomentosPublic() {
 
             {!scenes.length && (
               <div className="rounded-2xl border border-dashed border-slate-200 px-4 py-6 text-center text-sm text-slate-500">
-                Los anfitriones a�n no han configurado momentos espec�ficos. Vuelve m�s tarde para compartir tus recuerdos.
+                {t('common.public.moments.public.list.empty')}
               </div>
             )}
           </div>
@@ -304,7 +326,7 @@ export default function MomentosPublic() {
             <section className="bg-slate-900 text-white rounded-2xl px-4 py-4">
               <div className="flex items-center gap-2 text-sm font-semibold">
                 <UploadCloud size={18} />
-                �ltimas aportaciones
+                {t('common.public.moments.public.recent.title')}
               </div>
               <div className="mt-3 space-y-2">
                 {recentUploads.map((item, index) => (
@@ -315,19 +337,26 @@ export default function MomentosPublic() {
                     <div className="min-w-0">
                       <p className="truncate font-medium">{item.name}</p>
                       <p className="text-[11px] text-slate-400">
-                        {item.scene} � {Math.round(item.size / 1024)} KB
+                        {t('common.public.moments.public.recent.item', {
+                          scene: item.scene,
+                          size: Math.round(item.size / 1024),
+                        })}
                       </p>
                     </div>
-                    <span className="text-[11px] text-green-300">En revisi�n</span>
+                    <span className="text-[11px] text-green-300">
+                      {t('common.public.moments.public.uploadStates.statusReview')}
+                    </span>
                   </div>
                 ))}
               </div>
             </section>
           )}
 
-          {cleanupDays !== null && cleanupDays >= 0 && (
+          {cleanupDurationLabel && (
             <p className="text-xs text-slate-400 text-center">
-              La galer�a permanecer� disponible aproximadamente {cleanupDays === 0 ? 'un d�a m�s' : `${cleanupDays} d�as m�s`} antes de archivarse autom�ticamente.
+              {t('common.public.moments.public.status.cleanup', {
+                duration: cleanupDurationLabel,
+              })}
             </p>
           )}
         </div>
@@ -338,7 +367,9 @@ export default function MomentosPublic() {
           <div className="mt-auto bg-white rounded-t-3xl px-5 py-6 shadow-2xl">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs uppercase tracking-wide text-slate-400">Momento seleccionado</p>
+                <p className="text-xs uppercase tracking-wide text-slate-400">
+                  {t('common.public.moments.public.overlay.selected')}
+                </p>
                 <h3 className="text-lg font-semibold text-slate-800">
                   {selectedScene.label || selectedScene.id}
                 </h3>
@@ -347,7 +378,7 @@ export default function MomentosPublic() {
                 type="button"
                 onClick={handleCloseOverlay}
                 className="rounded-full border border-slate-200 p-2 text-slate-500 hover:text-slate-700 hover:border-slate-300"
-                aria-label="Cerrar"
+                aria-label={t('common.public.moments.public.overlay.close')}
               >
                 <X size={18} />
               </button>
@@ -356,24 +387,28 @@ export default function MomentosPublic() {
             {!startedUpload ? (
               <form onSubmit={handleStart} className="mt-4 space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700">Tu nombre</label>
+                  <label className="block text-sm font-medium text-slate-700">
+                    {t('common.public.moments.public.form.nameLabel')}
+                  </label>
                   <input
                     type="text"
                     value={guestName}
                     onChange={(event) => setGuestName(event.target.value)}
-                    placeholder="Ej. Laura G."
+                    placeholder={t('common.public.moments.public.form.namePlaceholder')}
                     className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700">Correo electr�nico (opcional)</label>
+                  <label className="block text-sm font-medium text-slate-700">
+                    {t('common.public.moments.public.form.emailLabel')}
+                  </label>
                   <input
                     type="email"
                     value={guestEmail}
                     onChange={(event) => setGuestEmail(event.target.value)}
-                    placeholder="Te avisaremos cuando destaquen tus recuerdos"
+                    placeholder={t('common.public.moments.public.form.emailPlaceholder')}
                     className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -387,7 +422,7 @@ export default function MomentosPublic() {
                     required
                   />
                   <span>
-                    Confirmo que tengo permiso para compartir estas im�genes y acepto que la pareja anfitriona las utilice en la galer�a.
+                    {t('common.public.moments.public.form.termsDescription')}
                   </span>
                 </label>
 
@@ -395,7 +430,7 @@ export default function MomentosPublic() {
                   type="submit"
                   className="w-full rounded-xl bg-blue-600 py-3 text-sm font-semibold text-white shadow hover:bg-blue-700 transition"
                 >
-                  Empezar a subir recuerdos
+                  {t('common.public.moments.public.overlay.start')}
                 </button>
               </form>
             ) : (
@@ -413,7 +448,9 @@ export default function MomentosPublic() {
                 />
                 {remainingUploads !== null && (
                   <p className="mt-3 text-xs text-slate-500 text-center">
-                    Puedes subir {remainingUploads === 0 ? '0 archivos adicionales' : `${remainingUploads} archivos adicionales`} con este enlace.
+                    {t('common.public.moments.public.overlay.remainingUploads', {
+                      count: remainingUploads,
+                    })}
                   </p>
                 )}
               </div>

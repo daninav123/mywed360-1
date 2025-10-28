@@ -21,9 +21,10 @@ const resources = Object.entries(localeModules).reduce((acc, [path, module]) => 
   return acc;
 }, {});
 
-const DEBUG_LANGUAGE_CODE = 'i18n';
-
-resources[DEBUG_LANGUAGE_CODE] ??= {};
+// Código de debug para visualizar qué elementos tienen traducción i18n
+// Usa 'en-x-i18n' que es válido según BCP 47 (extensión privada)
+const DEBUG_LANGUAGE_CODE = 'en-x-i18n';
+resources[DEBUG_LANGUAGE_CODE] = { common: {} };
 
 const missingKeyLog = [];
 const registerMissingKey = (languages, namespace, key, res) => {
@@ -51,7 +52,7 @@ const registerMissingKey = (languages, namespace, key, res) => {
 
 const LANGUAGE_METADATA = {
   [DEBUG_LANGUAGE_CODE]: {
-    name: 'i18n (sin traducciones)',
+    name: '🔧 i18n Debug (mostrar claves)',
     flag: 'DBG',
     order: 999,
   },
@@ -96,9 +97,11 @@ const FALLBACK_LANGUAGES = [FALLBACK_LANGUAGE, 'en'];
 const buildAvailableLanguages = () =>
   Object.keys(resources)
     .filter((code) => {
+      // Incluir modo debug para desarrollo
       if (code === DEBUG_LANGUAGE_CODE) {
-        return true;
+        return process.env.NODE_ENV === 'development';
       }
+      // Filtrar solo idiomas con traducciones válidas
       return Object.keys(resources[code] || {}).length > 0;
     })
     .map((code) => {
@@ -180,6 +183,7 @@ i18n
     resources,
     fallbackLng: (code) => {
       const candidates = Array.isArray(code) ? code : [code];
+      // En modo debug, no usar fallback para ver claves faltantes
       if (candidates.includes(DEBUG_LANGUAGE_CODE)) {
         return [];
       }
@@ -215,6 +219,7 @@ export const changeLanguage = (lng) => {
 export const getCurrentLanguage = () => i18n.language || FALLBACK_LANGUAGE;
 const getIntlLanguage = () => {
   const current = getCurrentLanguage();
+  // En modo debug, usar español para formateo de fechas/números
   return current === DEBUG_LANGUAGE_CODE ? FALLBACK_LANGUAGE : current;
 };
 export const getAvailableLanguages = () =>

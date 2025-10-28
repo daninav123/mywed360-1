@@ -536,7 +536,7 @@ app.use('/api/ai-suppliers', authMiddleware(), aiSuppliersRouter);
 app.use('/api/ai-suppliers-web', authMiddleware(), aiSuppliersWebRouter);
 app.use('/api/ai-suppliers-real', authMiddleware(), aiSuppliersRealRouter);
 app.use('/api/ai-suppliers-tavily', authMiddleware(), aiSuppliersTavilyRouter);
-app.use('/api/suppliers', authMiddleware(), suppliersHybridRouter);
+app.use('/api/suppliers', suppliersHybridRouter); // Búsqueda pública, sin auth
 app.use('/api/suppliers', suppliersRegisterRouter); // No requiere auth para registro
 app.use('/api/ai/budget-estimate', authMiddleware(), aiBudgetRouter);
 app.use('/api/ai', authMiddleware(), aiRouter);

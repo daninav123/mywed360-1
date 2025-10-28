@@ -1,8 +1,10 @@
 import { doc, getDoc, setDoc, collection, getDocs, addDoc, deleteDoc } from 'firebase/firestore';
 import { Plus, Trash, Zap } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 
 import { useAuth } from '../hooks/useAuth';
+import useTranslations from '../hooks/useTranslations';
 import { db } from '../lib/firebase';
 
 /*
@@ -12,6 +14,7 @@ import { db } from '../lib/firebase';
 
 export default function WebEditor() {
   const { currentUser } = useAuth();
+  const { t } = useTranslations();
   const uid = currentUser?.uid || 'dev';
 
   const [info, setInfo] = useState({
@@ -54,10 +57,10 @@ export default function WebEditor() {
     setLoading(true);
     try {
       await setDoc(doc(db, 'users', uid), { weddingInfo: info }, { merge: true });
-      alert('Información guardada');
+      toast.success(t('messages.saveSuccess'));
     } catch (err) {
       console.error(err);
-      alert('Error al guardar');
+      toast.error(t('messages.saveError'));
     }
     setLoading(false);
   };
@@ -80,10 +83,10 @@ export default function WebEditor() {
       await Promise.all(
         schedule.map((item) => addDoc(colRef, { time: item.time, title: item.title }))
       );
-      alert('Programa guardado');
+      toast.success(t('messages.saveSuccess'));
     } catch (e) {
       console.error(e);
-      alert('Error');
+      toast.error(t('errors.generic'));
     }
     setLoading(false);
   };
@@ -93,11 +96,11 @@ export default function WebEditor() {
     if (aiLoading) return;
     const allowDirect = import.meta.env.VITE_ENABLE_DIRECT_OPENAI === 'true' || import.meta.env.DEV;
     if (!allowDirect) {
-      alert('OpenAI directo deshabilitado (usa backend).');
+      toast.warning(t('errors.openaiDisabled'));
       return;
     }
     if (!import.meta.env.VITE_OPENAI_API_KEY) {
-      alert('Falta la clave de OpenAI');
+      toast.error(t('errors.missingOpenAIKey'));
       return;
     }
     setAiLoading(true);
@@ -130,7 +133,7 @@ export default function WebEditor() {
       if (text) setInfo((prev) => ({ ...prev, story: text }));
     } catch (err) {
       console.error(err);
-      alert('Error OpenAI');
+      toast.error(t('errors.openaiError'));
     }
     setAiLoading(false);
   };
@@ -140,11 +143,11 @@ export default function WebEditor() {
     const allowDirect2 =
       import.meta.env.VITE_ENABLE_DIRECT_OPENAI === 'true' || import.meta.env.DEV;
     if (!allowDirect2) {
-      alert('OpenAI directo deshabilitado (usa backend).');
+      toast.warning(t('errors.openaiDisabled'));
       return;
     }
     if (!import.meta.env.VITE_OPENAI_API_KEY) {
-      alert('Falta la clave de OpenAI');
+      toast.error(t('errors.missingOpenAIKey'));
       return;
     }
     setAiLoading(true);
@@ -181,7 +184,7 @@ export default function WebEditor() {
       if (Array.isArray(arr)) setSchedule(arr.map((item, i) => ({ ...item, temp: i })));
     } catch (err) {
       console.error(err);
-      alert('Error OpenAI');
+      toast.error(t('errors.openaiError'));
     }
     setAiLoading(false);
   };
@@ -203,10 +206,10 @@ export default function WebEditor() {
       await Promise.all(
         gallery.filter((g) => g.url).map((img) => addDoc(colRef, { url: img.url }))
       );
-      alert('Galería guardada');
+      toast.success(t('messages.saveSuccess'));
     } catch (e) {
       console.error(e);
-      alert('Error');
+      toast.error(t('errors.generic'));
     }
     setLoading(false);
   };

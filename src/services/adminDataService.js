@@ -1,6 +1,7 @@
 import errorLogger from '../utils/errorLogger';
 import { getAdminFetchOptions, getAdminHeaders, getAdminSessionToken } from './adminSession';
 import { apiGet, apiPost, apiPut } from './apiClient';
+import { adminTaskTemplatesFallback } from '../data/adminTaskTemplatesFallback';
 
 const ADMIN_BASE_PATH = '/api/admin/dashboard';
 
@@ -76,6 +77,55 @@ const DEFAULT_USER_ACQUISITION = {
   byMonth: [],
   paidTotal: 0,
   paidByMonth: [],
+};
+
+const DEFAULT_SUPPLIER_ANALYTICS = {
+  generatedAt: null,
+  totals: {
+    suppliers: 0,
+    weddings: 0,
+  },
+  score: {
+    average: 0,
+    distribution: [],
+  },
+  portal: {
+    enabled: 0,
+    responded: 0,
+    pending: 0,
+  },
+  serviceStats: [],
+  statusBreakdown: [],
+  topProviders: [],
+};
+
+const DEFAULT_SUPPLIER_LIST = {
+  generatedAt: null,
+  total: 0,
+  limit: 0,
+  hasMore: false,
+  summary: {
+    registered: 0,
+    cached: 0,
+    portal: {
+      enabled: 0,
+      responded: 0,
+      pending: 0,
+    },
+  },
+  facets: {
+    status: [],
+    service: [],
+    city: [],
+    portal: [],
+  },
+  allFacets: {
+    status: [],
+    service: [],
+    city: [],
+    portal: [],
+  },
+  items: [],
 };
 
 const DEFAULT_METRICS = {
@@ -462,6 +512,60 @@ const normalizeRevolutTransfer = (raw = {}) => {
         ? raw.direction
         : 'out',
   };
+};
+
+const normalizePercentage = (value) => {
+  const num = Number(value);
+  return Number.isFinite(num) ? num : 0;
+};
+
+const normalizeFacetList = (raw, limit = 50) => {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .map((entry) => ({
+      value: String(entry?.value ?? entry?.label ?? '').trim(),
+      count: normalizeMetricNumber(entry?.count),
+    }))
+    .filter((entry) => entry.value)
+    .slice(0, limit);
+};
+
+const normalizeSupplierListItems = (items) => {
+  if (!Array.isArray(items)) return [];
+  return items.map((item) => ({
+    id: String(item?.id || ''),
+    name: item?.name || 'Proveedor sin nombre',
+    service: item?.service || 'General',
+    services: Array.isArray(item?.services) ? item.services.filter(Boolean) : [],
+    status: item?.status || 'Sin estado',
+    registered: Boolean(item?.registered),
+    city: item?.city || '',
+    country: item?.country || '',
+    emails: Array.isArray(item?.emails) ? item.emails.filter(Boolean) : [],
+    phone: item?.phone || '',
+    website: item?.website || '',
+    score: normalizeMetricNumber(item?.score),
+    match: normalizeMetricNumber(item?.match),
+    weddingsCount: normalizeMetricNumber(item?.weddingsCount),
+    portal: {
+      enabled: Boolean(item?.portal?.enabled),
+      lastSubmitAt: item?.portal?.lastSubmitAt || null,
+      status: (item?.portal?.status || 'disabled').toLowerCase(),
+      label:
+        {
+          responded: 'Respondió',
+          pending: 'Pendiente',
+          disabled: 'Sin portal',
+        }[(item?.portal?.status || 'disabled').toLowerCase()] || 'Sin portal',
+    },
+    lastInteractionAt: item?.lastInteractionAt || null,
+    createdAt: item?.createdAt || null,
+    updatedAt: item?.updatedAt || null,
+    tags: Array.isArray(item?.tags) ? item.tags.filter(Boolean) : [],
+    notes: item?.notes || '',
+    manager: item?.manager || null,
+    source: item?.source || null,
+  }));
 };
 
 async function fetchAdminEndpoint(path) {
@@ -998,8 +1102,30 @@ export async function getTaskTemplates(options = {}) {
   const qs = params.length ? `?${params.join('&')}` : '';
 
   const data = await fetchAdminEndpoint(`${ADMIN_BASE_PATH}/task-templates${qs}`);
-  const templates = Array.isArray(data?.templates) ? data.templates : [];
-  const meta = data?.meta && typeof data.meta === 'object' ? data.meta : {};
+  let templates = Array.isArray(data?.templates) ? data.templates : [];
+  let meta = data?.meta && typeof data.meta === 'object' ? data.meta : {};
+
+  if (!templates.length) {
+    const fallbackCopies = adminTaskTemplatesFallback.map((tpl) => ({ ...tpl }));
+    if (fallbackCopies.length) {
+      templates = fallbackCopies;
+      const publishedTemplate = fallbackCopies.find((tpl) => tpl.status === 'published') || null;
+      const baseMeta = (meta && typeof meta === 'object') ? { ...meta } : {};
+      if (!baseMeta.status) {
+        baseMeta.status = status || 'all';
+      }
+      baseMeta.source = 'fallback';
+      if (noFilters && (baseMeta.limit === undefined || baseMeta.limit === null)) {
+        baseMeta.limit = 20;
+      }
+      if (baseMeta.latestPublished === undefined) {
+        baseMeta.latestPublished = publishedTemplate
+          ? { id: publishedTemplate.id, version: publishedTemplate.version ?? null }
+          : null;
+      }
+      meta = baseMeta;
+    }
+  }
 
   if (noFilters && !forceRefresh) {
     taskTemplatesCache = {
@@ -1159,3 +1285,120 @@ export const getEconomicMetrics = async () => {
   const data = await fetchAdminEndpoint(`${ADMIN_BASE_PATH}/metrics/economic`);
   return data || { cac: 0, ltv: 0, cacLtvRatio: 0 };
 };
+
+export const getAdminSupplierAnalytics = async (opts = {}) => {
+  const params = new URLSearchParams();
+  if (Number.isFinite(opts.topLimit)) params.set('topLimit', String(opts.topLimit));
+  const query = params.toString();
+  const endpoint = `/api/admin/suppliers/analytics${query ? `?${query}` : ''}`;
+  const data = await fetchAdminEndpoint(endpoint);
+  if (!data || typeof data !== 'object') return { ...DEFAULT_SUPPLIER_ANALYTICS };
+
+  const distribution = Array.isArray(data?.score?.distribution)
+    ? data.score.distribution.map((entry) => ({
+        label: String(entry?.label || ''),
+        count: normalizeMetricNumber(entry?.count),
+        percentage: normalizePercentage(entry?.percentage),
+      }))
+    : [];
+
+  const topProviders = Array.isArray(data?.topProviders)
+    ? data.topProviders.map((provider) => ({
+        id: String(provider?.id || ''),
+        weddingId: provider?.weddingId ? String(provider.weddingId) : null,
+        name: provider?.name || 'Proveedor',
+        service: provider?.service || 'General',
+        status: provider?.status || 'Sin estado',
+        score: normalizeMetricNumber(provider?.score),
+      }))
+    : [];
+
+  const statusBreakdown = Array.isArray(data?.statusBreakdown)
+    ? data.statusBreakdown.map((entry) => ({
+        status: entry?.status || 'Sin estado',
+        count: normalizeMetricNumber(entry?.count),
+        percentage: normalizePercentage(entry?.percentage),
+      }))
+    : [];
+
+  const serviceStats = Array.isArray(data?.serviceStats)
+    ? data.serviceStats.map((entry) => ({
+        service: entry?.service || 'General',
+        total: normalizeMetricNumber(entry?.total),
+        averageScore: normalizeMetricNumber(entry?.averageScore),
+        averageMatch: normalizeMetricNumber(entry?.averageMatch),
+        hired: normalizeMetricNumber(entry?.hired),
+        shortlisted: normalizeMetricNumber(entry?.shortlisted),
+      }))
+    : [];
+
+  return {
+    generatedAt: data.generatedAt || Date.now(),
+    totals: {
+      suppliers: normalizeMetricNumber(data?.totals?.suppliers),
+      weddings: normalizeMetricNumber(data?.totals?.weddings),
+    },
+    score: {
+      average: normalizeMetricNumber(data?.score?.average),
+      distribution,
+    },
+    portal: {
+      enabled: normalizeMetricNumber(data?.portal?.enabled),
+      responded: normalizeMetricNumber(data?.portal?.responded),
+      pending: normalizeMetricNumber(data?.portal?.pending),
+    },
+    serviceStats,
+    statusBreakdown,
+    topProviders,
+  };
+};
+
+export const getAdminSupplierList = async (filters = {}) => {
+  const params = new URLSearchParams();
+  if (filters.search) params.set('search', filters.search);
+  if (filters.status && filters.status !== 'all') params.set('status', filters.status);
+  if (filters.service && filters.service !== 'all') params.set('service', filters.service);
+  if (filters.city && filters.city !== 'all') params.set('city', filters.city);
+  if (filters.portal && filters.portal !== 'all') params.set('portal', filters.portal);
+  if (filters.registered === true || filters.verified === true) params.set('registered', 'true');
+  if (Number.isFinite(filters.limit)) params.set('limit', String(filters.limit));
+
+  const query = params.toString();
+  const endpoint = `/api/admin/suppliers/list${query ? `?${query}` : ''}`;
+  const data = await fetchAdminEndpoint(endpoint);
+
+  if (!data || typeof data !== 'object') {
+    return { ...DEFAULT_SUPPLIER_LIST };
+  }
+
+  return {
+    generatedAt: data.generatedAt || Date.now(),
+    total: normalizeMetricNumber(data.total),
+    limit: normalizeMetricNumber(data.limit),
+    hasMore: Boolean(data.hasMore),
+    summary: {
+      registered: normalizeMetricNumber(data?.summary?.registered),
+      cached: normalizeMetricNumber(data?.summary?.cached),
+      portal: {
+        enabled: normalizeMetricNumber(data?.summary?.portal?.enabled),
+        responded: normalizeMetricNumber(data?.summary?.portal?.responded),
+        pending: normalizeMetricNumber(data?.summary?.portal?.pending),
+      },
+    },
+    facets: {
+      status: normalizeFacetList(data?.facets?.status),
+      service: normalizeFacetList(data?.facets?.service, 100),
+      city: normalizeFacetList(data?.facets?.city, 100),
+      portal: normalizeFacetList(data?.facets?.portal),
+    },
+    allFacets: {
+      status: normalizeFacetList(data?.allFacets?.status),
+      service: normalizeFacetList(data?.allFacets?.service, 100),
+      city: normalizeFacetList(data?.allFacets?.city, 100),
+      portal: normalizeFacetList(data?.allFacets?.portal),
+    },
+    items: normalizeSupplierListItems(data.items),
+  };
+};
+
+export { DEFAULT_SUPPLIER_ANALYTICS, DEFAULT_SUPPLIER_LIST };
