@@ -185,13 +185,14 @@ router.post('/search', async (req, res) => {
     console.log(`   - Registrados reales: ${trueRegistered.length}`);
     console.log(`   - En caché: ${cachedResults.length}`);
     
-    // ===== 2. SI NO HAY RESULTADOS REGISTRADOS REALES, BUSCAR EN INTERNET (TAVILY) =====
+    // ===== 2. BUSCAR EN INTERNET SI HAY MENOS DE 5 PROVEEDORES REGISTRADOS =====
     let internetResults = [];
     let usedTavily = false;
     
-    // Solo buscar en internet si NO hay proveedores registrados reales
-    if (trueRegistered.length === 0) {
-      console.log(`\n🌐 [TAVILY] No hay proveedores registrados. Buscando en internet...`);
+    // Buscar en internet si hay menos de 5 proveedores registrados
+    const MIN_RESULTS = 5;
+    if (trueRegistered.length < MIN_RESULTS) {
+      console.log(`\n🌐 [TAVILY] Solo ${trueRegistered.length} proveedores registrados (mínimo: ${MIN_RESULTS}). Buscando en internet...`);
       
       try {
         const tavilyResults = await searchTavilySimple(
@@ -290,16 +291,23 @@ router.post('/search', async (req, res) => {
         // Continuar con solo resultados de Firestore
       }
     } else {
-      console.log(`\n✅ [FIRESTORE] ${trueRegistered.length} proveedores registrados encontrados. Ignorando caché e internet.`);
+      console.log(`\n✅ [FIRESTORE] ${trueRegistered.length} proveedores registrados (≥${MIN_RESULTS}). No es necesario buscar en internet.`);
     }
     
-    // ===== 3. MEZCLAR RESULTADOS: SI HAY REGISTRADOS REALES, SOLO ESOS =====
+    // ===== 3. MEZCLAR RESULTADOS: LÓGICA INTELIGENTE =====
     let allResults;
     
-    if (trueRegistered.length > 0) {
-      // Si hay proveedores registrados reales, SOLO mostrar esos (ignorar caché e internet)
+    if (trueRegistered.length >= MIN_RESULTS) {
+      // Si hay 5+ proveedores registrados, SOLO mostrar esos
       allResults = [...trueRegistered];
-      console.log(`📊 [RESULTADO FINAL] Mostrando solo proveedores registrados: ${trueRegistered.length}`);
+      console.log(`📊 [RESULTADO FINAL] ≥${MIN_RESULTS} registrados. Mostrando solo registrados: ${trueRegistered.length}`);
+    } else if (trueRegistered.length > 0) {
+      // Si hay 1-4 registrados, complementar con internet
+      allResults = [
+        ...trueRegistered,  // 🟢 Registrados primero
+        ...internetResults  // 🌐 Internet para complementar
+      ];
+      console.log(`📊 [RESULTADO FINAL] <${MIN_RESULTS} registrados. Mostrando registrados (${trueRegistered.length}) + internet (${internetResults.length})`);
     } else {
       // Si NO hay registrados, mostrar caché + internet
       allResults = [
@@ -311,9 +319,18 @@ router.post('/search', async (req, res) => {
     
     console.log(`\n📊 [RESULTADO] Total: ${allResults.length} proveedores`);
     console.log(`   🟢 Registrados reales: ${trueRegistered.length}`);
-    console.log(`   🟡 En caché: ${trueRegistered.length > 0 ? 0 : cachedResults.length} (ocultos si hay registrados)`);
-    console.log(`   🌐 Internet: ${trueRegistered.length > 0 ? 0 : internetResults.length} (ocultos si hay registrados)`);
-    console.log(`   📡 Fuente: ${trueRegistered.length > 0 ? 'Solo registrados' : (usedTavily ? 'Caché + Internet' : 'Solo caché')}\n`);
+    console.log(`   🟡 En caché: ${trueRegistered.length >= MIN_RESULTS ? 0 : (trueRegistered.length > 0 ? 0 : cachedResults.length)}`);
+    console.log(`   🌐 Internet: ${trueRegistered.length >= MIN_RESULTS ? 0 : internetResults.length}`);
+    
+    let sourceMsg = 'Solo caché';
+    if (trueRegistered.length >= MIN_RESULTS) {
+      sourceMsg = `Solo registrados (≥${MIN_RESULTS})`;
+    } else if (trueRegistered.length > 0) {
+      sourceMsg = `Registrados + Internet (<${MIN_RESULTS})`;
+    } else if (usedTavily) {
+      sourceMsg = 'Caché + Internet';
+    }
+    console.log(`   📡 Fuente: ${sourceMsg}\n`);
     
     // ===== 4. ACTUALIZAR MÉTRICAS DE VISTAS (solo para registrados reales) =====
     if (trueRegistered.length > 0) {
@@ -339,10 +356,12 @@ router.post('/search', async (req, res) => {
       count: allResults.length,
       breakdown: {
         registered: trueRegistered.length,
-        cached: trueRegistered.length > 0 ? 0 : cachedResults.length, // 0 si hay registrados
-        internet: trueRegistered.length > 0 ? 0 : internetResults.length // 0 si hay registrados
+        cached: trueRegistered.length >= MIN_RESULTS ? 0 : (trueRegistered.length > 0 ? 0 : cachedResults.length),
+        internet: trueRegistered.length >= MIN_RESULTS ? 0 : internetResults.length
       },
       source: usedTavily ? 'firestore+tavily' : 'firestore',
+      minResults: MIN_RESULTS,
+      showingInternetComplement: trueRegistered.length > 0 && trueRegistered.length < MIN_RESULTS,
       suppliers: allResults
     });
     
