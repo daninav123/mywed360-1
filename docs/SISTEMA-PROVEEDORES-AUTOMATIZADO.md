@@ -1,91 +1,97 @@
-# 🤖 Sistema de Proveedores Automatizado con Firebase
+# 🔄 Sistema de Proveedores Híbrido con Firebase
 
 **Última actualización:** 2025-01-28  
-**Estado:** Diseñado (Pendiente de implementación)
+**Estrategia:** Internet → Transición Progresiva → Plataforma Propia
 
 ---
 
 ## 📋 ÍNDICE
 
-Este documento describe el sistema de base de datos automática de proveedores alimentada por internet.
+Sistema que evoluciona desde búsquedas en internet hacia una plataforma propia de proveedores registrados.
 
 ### Documentación por secciones:
 
-1. **[Schema Firebase](./proveedores/FIREBASE-SCHEMA.md)** - Estructura de datos en Firestore
-2. **[Cron Jobs](./proveedores/CRON-JOBS.md)** - Sistema de actualización automática
-3. **[API Endpoints](./proveedores/API-ENDPOINTS.md)** - Endpoints de búsqueda y métricas
-4. **[Sistema Claim](./proveedores/CLAIM-SYSTEM.md)** - Perfiles editables por proveedores
-5. **[Plan de Implementación](./proveedores/PLAN-IMPLEMENTACION.md)** - Pasos para implementar
+1. **[Enfoque Híbrido](./proveedores/ENFOQUE-HIBRIDO.md)** ⭐ **LEER PRIMERO** - Estrategia completa
+2. **[Plan de Implementación](./proveedores/PLAN-IMPLEMENTACION.md)** - Pasos progresivos (4 fases)
+3. **[Schema Firebase](./proveedores/FIREBASE-SCHEMA.md)** - Estructura de datos en Firestore
+4. **[API Endpoints](./proveedores/API-ENDPOINTS.md)** - Endpoints de búsqueda híbrida
+5. **[Sistema Claim](./proveedores/CLAIM-SYSTEM.md)** - Perfiles editables (futuro)
+6. **[Cron Jobs](./proveedores/CRON-JOBS.md)** - Actualización automática (futuro)
 
 ---
 
-## 🎯 VISIÓN GENERAL
+## 🎯 NUEVA ESTRATEGIA: ENFOQUE HÍBRIDO
 
 ### **Problema actual:**
-- ❌ Cada búsqueda hace llamada a Tavily API (coste por búsqueda)
-- ❌ No hay persistencia de datos entre búsquedas
-- ❌ No se pueden rastrear métricas de proveedores
-- ❌ Proveedores duplicados en resultados
-- ❌ Resultados irrelevantes (marketplaces, compraventa)
+- ❌ Cada búsqueda hace llamada a Tavily API ($150/mes)
+- ❌ No hay persistencia entre búsquedas
+- ❌ No se rastrean métricas
+- ❌ Proveedores duplicados
+- ❌ No hay incentivo para que proveedores se registren
 
-### **Solución propuesta:**
-Base de datos centralizada en **Firebase Firestore** que:
-- ✅ Almacena proveedores verificados
-- ✅ Se actualiza automáticamente con cron jobs
-- ✅ Registra métricas de uso sin registro de proveedores
-- ✅ Permite búsquedas ultrarrápidas (sin llamadas API externas)
-- ✅ **Tavily solo para descubrir nuevos proveedores** (búsqueda programada)
-- ✅ Permite que proveedores reclamen y editen su perfil en el futuro
+### **Solución híbrida progresiva:**
+
+**FASE 1 (Inmediata):** Tavily + Cache silencioso
+- ✅ Sistema funciona igual que ahora
+- ✅ Guarda resultados en Firestore automáticamente
+- ✅ Usuario NO nota cambios
+- ✅ Construye base de datos en background
+
+**FASE 2 (1-2 semanas):** Búsqueda híbrida
+- ✅ Busca primero en proveedores REGISTRADOS (Firestore)
+- ✅ Complementa con INTERNET (Tavily) si hay pocos
+- ✅ Registrados aparecen primero (badge verde ✓)
+- ✅ Internet aparece después (badge gris)
+
+**FASE 3 (1-2 meses):** Registro de proveedores
+- ✅ Proveedores pueden registrarse en plataforma
+- ✅ Actualiza perfil de "discovered" → "registered"
+- ✅ Aparecen destacados en búsquedas
+
+**FASE 4 (Futuro):** Plataforma madura
+- ✅ 90% proveedores registrados
+- ✅ Tavily solo fallback
+- ✅ Ahorro 80% costes ($150 → $30/mes)
 
 ---
 
-## 🏗️ ARQUITECTURA SIMPLIFICADA
+## 🏗️ EVOLUCIÓN DEL SISTEMA
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    USUARIO (Frontend)                        │
-│  Busca: "fotógrafo boda valencia"                           │
-└────────────────────────┬────────────────────────────────────┘
-                         │
-                         ▼
-┌─────────────────────────────────────────────────────────────┐
-│              API Backend (Express + Firebase)                │
-│                                                              │
-│  1. Buscar en Firestore (cache local) ⚡ RÁPIDO             │
-│     - Filtros: categoría, ubicación, keywords               │
-│     - Sort: matchScore, rating                              │
-│                                                              │
-│  2. Si < 3 resultados → Tavily Fallback                     │
-│     - Buscar en tiempo real                                 │
-│     - Guardar nuevos proveedores en Firestore              │
-│                                                              │
-│  3. Registrar métricas                                      │
-│     - views++, clicks++, conversions++                      │
-└────────────────────────┬────────────────────────────────────┘
-                         │
-                         ▼
-┌─────────────────────────────────────────────────────────────┐
-│                 FIREBASE FIRESTORE                          │
-│                                                              │
-│  Collection: suppliers                                      │
-│  ├── alfonso-calza-valencia                                 │
-│  ├── bodas-palacio-alicante                                 │
-│  ├── dj-music-madrid                                        │
-│  └── ...                                                     │
-│                                                              │
-│  Indexes:                                                    │
-│  - category + location.city + metrics.matchScore           │
-│  - status + lastUpdated                                     │
-└─────────────────────────────────────────────────────────────┘
-                         ▲
-                         │
-┌────────────────────────┴────────────────────────────────────┐
-│       CRON JOBS (Node-cron o Cloud Functions)               │
-│                                                              │
-│  📅 Daily (02:00):    Verificar URLs activas                │
-│  📅 Weekly (03:00):   Buscar nuevos proveedores (Tavily)   │
-│  📅 Monthly (04:00):  Limpiar proveedores inactivos         │
-└─────────────────────────────────────────────────────────────┘
+═══════════════════════════════════════════════════════════════
+FASE 1: CACHE SILENCIOSO (Ahora)
+═══════════════════════════════════════════════════════════════
+
+Usuario busca → Tavily API → Resultados
+                     ↓
+            Guardar en Firestore (background)
+                     ↓
+              Cache construido
+
+───────────────────────────────────────────────────────────────
+FASE 2: BÚSQUEDA HÍBRIDA (1-2 semanas)
+───────────────────────────────────────────────────────────────
+
+Usuario busca → 1️⃣ Firestore (registrados) ✓
+                2️⃣ Tavily (complemento)
+                     ↓
+              [VERIFICADOS] primero
+              [Internet] después
+
+───────────────────────────────────────────────────────────────
+FASE 3: REGISTRO (1-2 meses)
+───────────────────────────────────────────────────────────────
+
+Proveedores se registran → registered: true
+                                ↓
+                    Aparecen destacados
+                    Badge verde ✓
+
+───────────────────────────────────────────────────────────────
+FASE 4: PLATAFORMA MADURA (6+ meses)
+───────────────────────────────────────────────────────────────
+
+90% registrados → Tavily solo fallback → Ahorro 80% costes
 ```
 
 ---
