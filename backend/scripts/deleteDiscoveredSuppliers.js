@@ -3,20 +3,20 @@
 // Motivo: Implicaciones legales - no debemos almacenar datos scraped de internet
 
 import admin from 'firebase-admin';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
-import { readFileSync } from 'fs';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-// Inicializar Firebase Admin
-const serviceAccountPath = join(__dirname, '..', 'lovenda-service-account.json');
-const serviceAccount = JSON.parse(readFileSync(serviceAccountPath, 'utf8'));
-
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-});
+// Inicializar Firebase Admin usando credenciales por defecto
+if (!admin.apps.length) {
+  try {
+    admin.initializeApp({
+      credential: admin.credential.applicationDefault(),
+    });
+  } catch (error) {
+    console.error('❌ Error inicializando Firebase Admin:', error.message);
+    console.error('\n⚠️  Asegúrate de tener GOOGLE_APPLICATION_CREDENTIALS configurado');
+    console.error('   o ejecuta: gcloud auth application-default login\n');
+    process.exit(1);
+  }
+}
 
 const db = admin.firestore();
 
