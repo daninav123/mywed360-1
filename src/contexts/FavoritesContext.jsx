@@ -36,7 +36,7 @@ async function getAuthToken() {
 
 export function FavoritesProvider({ children }) {
   const { user } = useAuth();
-  const { activeWedding } = useWedding();
+  const { activeWedding, activeWeddingData } = useWedding(); // ← Obtener AMBOS
   const [favorites, setFavorites] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -52,7 +52,10 @@ export function FavoritesProvider({ children }) {
     }
 
     // Esperar a que se cargue la boda activa
-    if (!activeWedding?.id) {
+    // activeWedding es un STRING (ID), activeWeddingData es el OBJETO
+    const weddingId = activeWedding || activeWeddingData?.id;
+
+    if (!weddingId) {
       console.warn('[FavoritesContext] No hay boda activa, esperando...');
       setFavorites([]);
       setLoading(false);
@@ -76,7 +79,7 @@ export function FavoritesProvider({ children }) {
 
       const headers = {
         Authorization: `Bearer ${token}`,
-        'x-wedding-id': activeWedding.id, // Siempre incluir (ya verificamos que existe)
+        'x-wedding-id': weddingId, // Usar el ID directamente
       };
 
       const response = await axios.get(`${API_URL}/api/favorites`, { headers });
@@ -95,7 +98,7 @@ export function FavoritesProvider({ children }) {
     } finally {
       setLoading(false);
     }
-  }, [user, activeWedding, API_URL]);
+  }, [user, activeWedding, activeWeddingData, API_URL]);
 
   // Cargar favoritos cuando cambia el usuario o boda
   useEffect(() => {
@@ -108,7 +111,9 @@ export function FavoritesProvider({ children }) {
       throw new Error('Debes iniciar sesión para guardar favoritos');
     }
 
-    if (!activeWedding?.id) {
+    const weddingId = activeWedding || activeWeddingData?.id;
+
+    if (!weddingId) {
       throw new Error('Debes tener una boda activa para guardar favoritos');
     }
 
@@ -121,7 +126,7 @@ export function FavoritesProvider({ children }) {
 
       const headers = {
         Authorization: `Bearer ${token}`,
-        'x-wedding-id': activeWedding.id, // Siempre incluir (ya verificamos que existe)
+        'x-wedding-id': weddingId, // Usar el ID directamente
       };
 
       const response = await axios.post(
@@ -151,7 +156,9 @@ export function FavoritesProvider({ children }) {
       throw new Error('Debes iniciar sesión');
     }
 
-    if (!activeWedding?.id) {
+    const weddingId = activeWedding || activeWeddingData?.id;
+
+    if (!weddingId) {
       throw new Error('Debes tener una boda activa');
     }
 
@@ -164,7 +171,7 @@ export function FavoritesProvider({ children }) {
 
       const headers = {
         Authorization: `Bearer ${token}`,
-        'x-wedding-id': activeWedding.id, // Siempre incluir (ya verificamos que existe)
+        'x-wedding-id': weddingId, // Usar el ID directamente
       };
 
       await axios.delete(`${API_URL}/api/favorites/${supplierId}`, { headers });
