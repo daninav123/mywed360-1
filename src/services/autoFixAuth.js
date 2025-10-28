@@ -41,7 +41,6 @@ function clearExpiredToken() {
         return true;
       } else {
         const timeLeft = Math.floor((exp - now) / 1000 / 60);
-        console.log(`[autoFixAuth] ✅ Token válido (${timeLeft} min restantes)`);
         return false;
       }
     } catch (decodeError) {

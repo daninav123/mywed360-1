@@ -82,6 +82,7 @@ import supplierPortalRouter from './routes/supplier-portal.js';
 import supplierRegistrationRouter from './routes/supplier-registration.js';
 import supplierDashboardRouter from './routes/supplier-dashboard.js';
 import supplierBudgetRouter from './routes/supplier-budget.js';
+import migrateSuppliersRouter from './routes/migrate-suppliers.js';
 import publicWeddingRouter from './routes/public-wedding.js';
 import rsvpRouter from './routes/rsvp.js';
 import automationRouter from './routes/automation.js';
@@ -133,8 +134,18 @@ import { startMetricAggregatorWorker } from './workers/metricAggregatorWorker.js
 import { startMomentosCleanupWorker } from './workers/momentosCleanupWorker.js';
 import { startMomentosModerationWorker } from './workers/momentosModerationWorker.js';
 
-
-const { PORT, ALLOWED_ORIGINS, RATE_LIMIT_AI_MAX, RATE_LIMIT_GLOBAL_MAX, CORS_EXPOSE_HEADERS, ADMIN_IP_ALLOWLIST, WHATSAPP_WEBHOOK_RATE_LIMIT_MAX, MAILGUN_WEBHOOK_RATE_LIMIT_MAX, WHATSAPP_WEBHOOK_IP_ALLOWLIST, MAILGUN_WEBHOOK_IP_ALLOWLIST } = await import('./config.js');
+const {
+  PORT,
+  ALLOWED_ORIGINS,
+  RATE_LIMIT_AI_MAX,
+  RATE_LIMIT_GLOBAL_MAX,
+  CORS_EXPOSE_HEADERS,
+  ADMIN_IP_ALLOWLIST,
+  WHATSAPP_WEBHOOK_RATE_LIMIT_MAX,
+  MAILGUN_WEBHOOK_RATE_LIMIT_MAX,
+  WHATSAPP_WEBHOOK_IP_ALLOWLIST,
+  MAILGUN_WEBHOOK_IP_ALLOWLIST,
+} = await import('./config.js');
 if (!process.env.OPENAI_API_KEY) {
   console.warn('[env] OPENAI_API_KEY not set. Chat AI endpoints will return 500.');
 }
@@ -147,63 +158,74 @@ const app = express();
 app.set('trust proxy', 1);
 
 // Timeout de red por defecto (evita cuelgues con integraciones externas)
-try { axios.defaults.timeout = Number(process.env.AXIOS_TIMEOUT_MS || 10000); } catch {}
+try {
+  axios.defaults.timeout = Number(process.env.AXIOS_TIMEOUT_MS || 10000);
+} catch {}
 
 // Compresión HTTP (gzip/br) para respuestas
 app.use(compression());
 
 // Seguridad básica
-app.use(helmet({
-  contentSecurityPolicy: false,
-  crossOriginResourcePolicy: { policy: 'cross-origin' },
-  referrerPolicy: { policy: 'no-referrer' },
-}));
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+    referrerPolicy: { policy: 'no-referrer' },
+  })
+);
 
 // Configurar CORS por allowlist (coma-separado)
-app.use(cors({
-  origin: (origin, cb) => {
-    if (!origin || ALLOWED_ORIGINS.includes(origin)) return cb(null, true);
-    // log denegación sin detalles sensibles
-    try { logger.warn(`[CORS] Origin no permitido: ${origin || 'n/a'}`); } catch {}
-    return cb(new Error('Not allowed by CORS'));
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: [
-    'Content-Type',
-    'Authorization',
-    'X-Admin-Session',
-    'x-admin-session',
-    'X-Admin-Session-Token',
-    'x-admin-session-token',
-    'X-Admin-Token',
-    'x-admin-token',
-  ],
-  exposedHeaders: CORS_EXPOSE_HEADERS,
-  optionsSuccessStatus: 204
-}));
+app.use(
+  cors({
+    origin: (origin, cb) => {
+      if (!origin || ALLOWED_ORIGINS.includes(origin)) return cb(null, true);
+      // log denegación sin detalles sensibles
+      try {
+        logger.warn(`[CORS] Origin no permitido: ${origin || 'n/a'}`);
+      } catch {}
+      return cb(new Error('Not allowed by CORS'));
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'X-Admin-Session',
+      'x-admin-session',
+      'X-Admin-Session-Token',
+      'x-admin-session-token',
+      'X-Admin-Token',
+      'x-admin-token',
+    ],
+    exposedHeaders: CORS_EXPOSE_HEADERS,
+    optionsSuccessStatus: 204,
+  })
+);
 
 // Responder preflight explícitamente y cachear durante 10 minutos
-app.options('*', cors({
-  origin: (origin, cb) => {
-    if (!origin || ALLOWED_ORIGINS.includes(origin)) return cb(null, true);
-    return cb(new Error('Not allowed by CORS'));
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: [
-    'Content-Type',
-    'Authorization',
-    'X-Admin-Session',
-    'x-admin-session',
-    'X-Admin-Session-Token',
-    'x-admin-session-token',
-    'X-Admin-Token',
-    'x-admin-token',
-  ],
-  optionsSuccessStatus: 204,
-  maxAge: 600
-}));
+app.options(
+  '*',
+  cors({
+    origin: (origin, cb) => {
+      if (!origin || ALLOWED_ORIGINS.includes(origin)) return cb(null, true);
+      return cb(new Error('Not allowed by CORS'));
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'X-Admin-Session',
+      'x-admin-session',
+      'X-Admin-Session-Token',
+      'x-admin-session-token',
+      'X-Admin-Token',
+      'x-admin-token',
+    ],
+    optionsSuccessStatus: 204,
+    maxAge: 600,
+  })
+);
 
 // Rate limiting: por defecto 120/min en producción, 0 en otros entornos (puede sobreescribirse con RATE_LIMIT_AI_MAX)
 if (RATE_LIMIT_AI_MAX > 0) {
@@ -218,7 +240,12 @@ if (RATE_LIMIT_AI_MAX > 0) {
         const uid = req?.user?.uid || req?.userProfile?.uid;
         if (uid) return `uid:${uid}`;
       } catch {}
-      const ip = req.ip || (Array.isArray(req.ips) && req.ips[0]) || req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown';
+      const ip =
+        req.ip ||
+        (Array.isArray(req.ips) && req.ips[0]) ||
+        req.headers['x-forwarded-for'] ||
+        req.socket?.remoteAddress ||
+        'unknown';
       return `ip:${ip}`;
     },
     message: { success: false, error: { code: 'rate_limit', message: 'Too many requests' } },
@@ -243,11 +270,20 @@ if (RATE_LIMIT_GLOBAL_MAX > 0) {
     legacyHeaders: false,
     skip: (req) => {
       const p = req.path || '';
-      return p.startsWith('/api/health') || p.startsWith('/api/web-vitals') || p.startsWith('/metrics');
+      return (
+        p.startsWith('/api/health') || p.startsWith('/api/web-vitals') || p.startsWith('/metrics')
+      );
     },
     keyGenerator: (req, _res) => {
-      try { if (req?.user?.uid) return `uid:${req.user.uid}`; } catch {}
-      const ip = req.ip || (Array.isArray(req.ips) && req.ips[0]) || req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown';
+      try {
+        if (req?.user?.uid) return `uid:${req.user.uid}`;
+      } catch {}
+      const ip =
+        req.ip ||
+        (Array.isArray(req.ips) && req.ips[0]) ||
+        req.headers['x-forwarded-for'] ||
+        req.socket?.remoteAddress ||
+        'unknown';
       return `ip:${ip}`;
     },
     message: { success: false, error: { code: 'rate_limit', message: 'Too many requests' } },
@@ -259,7 +295,7 @@ if (RATE_LIMIT_GLOBAL_MAX > 0) {
 app.use((req, res, next) => {
   try {
     const incoming = req.headers['x-request-id'];
-    const id = (typeof incoming === 'string' && incoming.trim()) ? incoming.trim() : randomUUID();
+    const id = typeof incoming === 'string' && incoming.trim() ? incoming.trim() : randomUUID();
     req.id = id;
     res.setHeader('X-Request-ID', id);
   } catch {
@@ -313,7 +349,15 @@ async function ensureMetrics() {
       registers: [registry],
     });
 
-    metrics = { loaded: true, prom, registry, httpRequestsTotal, httpRequestDuration, httpErrorsTotal, httpResponseSize };
+    metrics = {
+      loaded: true,
+      prom,
+      registry,
+      httpRequestsTotal,
+      httpRequestDuration,
+      httpErrorsTotal,
+      httpResponseSize,
+    };
   } catch (e) {
     // prom-client no está instalado; se omite sin romper
     metrics.loaded = false;
@@ -330,7 +374,10 @@ app.use((req, res, next) => {
       const diffNs = Number(end - start);
       const durationSec = diffNs / 1e9;
       const method = req.method;
-      const route = (req.route && req.route.path) || req.path || (req.originalUrl ? req.originalUrl.split('?')[0] : 'unknown');
+      const route =
+        (req.route && req.route.path) ||
+        req.path ||
+        (req.originalUrl ? req.originalUrl.split('?')[0] : 'unknown');
       const status = String(res.statusCode || 0);
       metrics.httpRequestsTotal.labels(method, route, status).inc(1);
       metrics.httpRequestDuration.labels(method, route, status).observe(durationSec);
@@ -343,7 +390,12 @@ app.use((req, res, next) => {
       // tamaño de respuesta
       try {
         const lenHeader = res.getHeader('Content-Length');
-        const bytes = typeof lenHeader === 'string' ? parseInt(lenHeader, 10) : (typeof lenHeader === 'number' ? lenHeader : 0);
+        const bytes =
+          typeof lenHeader === 'string'
+            ? parseInt(lenHeader, 10)
+            : typeof lenHeader === 'number'
+              ? lenHeader
+              : 0;
         if (Number.isFinite(bytes) && bytes >= 0) {
           metrics.httpResponseSize.labels(method, route, status).observe(bytes);
         }
@@ -360,7 +412,13 @@ app.use((req, _res, next) => {
 });
 
 // Para que Mailgun (form-urlencoded) sea aceptado
-app.use(express.urlencoded({ extended: true, parameterLimit: Number(process.env.BODY_PARAMETER_LIMIT || '1000'), limit: process.env.BODY_URLENCODED_LIMIT || '2mb' }));
+app.use(
+  express.urlencoded({
+    extended: true,
+    parameterLimit: Number(process.env.BODY_PARAMETER_LIMIT || '1000'),
+    limit: process.env.BODY_URLENCODED_LIMIT || '2mb',
+  })
+);
 app.use(express.json({ limit: process.env.BODY_JSON_LIMIT || '1mb' }));
 
 // Endpoint de métricas (activa prom-client si está disponible)
@@ -377,112 +435,135 @@ app.get('/metrics', requireAdmin, async (req, res) => {
 });
 
 // HTTP metrics summary for admin (JSON)
-app.get('/api/admin/metrics/http', ipAllowlist(ADMIN_IP_ALLOWLIST), requireAdmin, async (req, res) => {
-  try {
-    await ensureMetrics();
-    if (!metrics.loaded) return res.status(503).json({ error: 'metrics-unavailable' });
-
-    // Extract counters by method/route/status
-    const totalMetric = metrics.httpRequestsTotal;
-    const histMetric = metrics.httpRequestDuration;
-    const totals = {};
-    const byRoute = new Map(); // key: method|route
-
+app.get(
+  '/api/admin/metrics/http',
+  ipAllowlist(ADMIN_IP_ALLOWLIST),
+  requireAdmin,
+  async (req, res) => {
     try {
-      const data = totalMetric?.get()?.values || [];
-      for (const v of data) {
-        if (!v || !v.labels) continue;
-        const method = String(v.labels.method || 'GET');
-        const route = String(v.labels.route || 'unknown');
-        const status = String(v.labels.status || '0');
-        const key = `${method} ${route}`;
-        const entry = byRoute.get(key) || { method, route, total: 0, byStatus: {} };
-        entry.total += Number(v.value || 0);
-        entry.byStatus[status] = (entry.byStatus[status] || 0) + Number(v.value || 0);
-        byRoute.set(key, entry);
-      }
-    } catch {}
+      await ensureMetrics();
+      if (!metrics.loaded) return res.status(503).json({ error: 'metrics-unavailable' });
 
-    // Derive errors and averages from histogram buckets
-    const hist = {};
-    try {
-      const values = histMetric?.get()?.values || [];
-      for (const v of values) {
-        const l = v.labels || {};
-        const method = String(l.method || 'GET');
-        const route = String(l.route || 'unknown');
-        const status = String(l.status || '0');
-        const key = `${method} ${route} ${status}`;
-        const typ = (typeof l.le !== 'undefined') ? 'bucket' : (l.quantile ? 'quantile' : (l.stat || 'value'));
-        const rec = hist[key] || { buckets: [], sum: 0, count: 0 };
-        if (Object.prototype.hasOwnProperty.call(l, 'le')) {
-          const le = Number(l.le);
-          rec.buckets.push({ le, value: Number(v.value || 0) });
-        } else if (l && l.hasOwnProperty('sum')) {
-          rec.sum = Number(v.value || 0);
-        } else if (l && l.hasOwnProperty('count')) {
-          rec.count = Number(v.value || 0);
-        }
-        hist[key] = rec;
-      }
-    } catch {}
+      // Extract counters by method/route/status
+      const totalMetric = metrics.httpRequestsTotal;
+      const histMetric = metrics.httpRequestDuration;
+      const totals = {};
+      const byRoute = new Map(); // key: method|route
 
-    // Compute per route stats aggregating by status
-    const results = [];
-    for (const [key, entry] of byRoute.entries()) {
-      const [method, route] = key.split(' ', 2);
-      let errors = 0;
-      for (const [st, n] of Object.entries(entry.byStatus)) {
-        const sc = Number(st);
-        if (sc >= 400) errors += Number(n);
-      }
-      // Aggregate histogram across statuses for approximate avg/p95/p99
-      let sum = 0, count = 0; const buckets = [];
-      for (const st of Object.keys(entry.byStatus)) {
-        const hkey = `${method} ${route} ${st}`;
-        const rec = hist[hkey];
-        if (!rec) continue;
-        sum += rec.sum || 0;
-        count += rec.count || 0;
-        for (const b of (rec.buckets || [])) buckets.push(b);
-      }
-      // Merge buckets by le
-      const bucketMap = new Map();
-      for (const b of buckets) {
-        const prev = bucketMap.get(b.le) || 0;
-        bucketMap.set(b.le, prev + Number(b.value || 0));
-      }
-      const merged = Array.from(bucketMap.entries()).map(([le, value]) => ({ le: Number(le), value: Number(value) }))
-        .sort((a, b) => a.le - b.le);
-      const getPct = (p) => {
-        if (!merged.length || count === 0) return 0;
-        const target = p * count;
-        let acc = 0;
-        for (const b of merged) {
-          acc += b.value;
-          if (acc >= target) return b.le;
+      try {
+        const data = totalMetric?.get()?.values || [];
+        for (const v of data) {
+          if (!v || !v.labels) continue;
+          const method = String(v.labels.method || 'GET');
+          const route = String(v.labels.route || 'unknown');
+          const status = String(v.labels.status || '0');
+          const key = `${method} ${route}`;
+          const entry = byRoute.get(key) || { method, route, total: 0, byStatus: {} };
+          entry.total += Number(v.value || 0);
+          entry.byStatus[status] = (entry.byStatus[status] || 0) + Number(v.value || 0);
+          byRoute.set(key, entry);
         }
-        return merged[merged.length - 1].le;
-      };
-      const avg = count ? (sum / count) : 0;
-      const p95 = getPct(0.95);
-      const p99 = getPct(0.99);
-      results.push({ method, route, total: entry.total, errors, errorRate: entry.total ? (errors / entry.total) : 0, avg, p95, p99, byStatus: entry.byStatus });
+      } catch {}
+
+      // Derive errors and averages from histogram buckets
+      const hist = {};
+      try {
+        const values = histMetric?.get()?.values || [];
+        for (const v of values) {
+          const l = v.labels || {};
+          const method = String(l.method || 'GET');
+          const route = String(l.route || 'unknown');
+          const status = String(l.status || '0');
+          const key = `${method} ${route} ${status}`;
+          const typ =
+            typeof l.le !== 'undefined' ? 'bucket' : l.quantile ? 'quantile' : l.stat || 'value';
+          const rec = hist[key] || { buckets: [], sum: 0, count: 0 };
+          if (Object.prototype.hasOwnProperty.call(l, 'le')) {
+            const le = Number(l.le);
+            rec.buckets.push({ le, value: Number(v.value || 0) });
+          } else if (l && l.hasOwnProperty('sum')) {
+            rec.sum = Number(v.value || 0);
+          } else if (l && l.hasOwnProperty('count')) {
+            rec.count = Number(v.value || 0);
+          }
+          hist[key] = rec;
+        }
+      } catch {}
+
+      // Compute per route stats aggregating by status
+      const results = [];
+      for (const [key, entry] of byRoute.entries()) {
+        const [method, route] = key.split(' ', 2);
+        let errors = 0;
+        for (const [st, n] of Object.entries(entry.byStatus)) {
+          const sc = Number(st);
+          if (sc >= 400) errors += Number(n);
+        }
+        // Aggregate histogram across statuses for approximate avg/p95/p99
+        let sum = 0,
+          count = 0;
+        const buckets = [];
+        for (const st of Object.keys(entry.byStatus)) {
+          const hkey = `${method} ${route} ${st}`;
+          const rec = hist[hkey];
+          if (!rec) continue;
+          sum += rec.sum || 0;
+          count += rec.count || 0;
+          for (const b of rec.buckets || []) buckets.push(b);
+        }
+        // Merge buckets by le
+        const bucketMap = new Map();
+        for (const b of buckets) {
+          const prev = bucketMap.get(b.le) || 0;
+          bucketMap.set(b.le, prev + Number(b.value || 0));
+        }
+        const merged = Array.from(bucketMap.entries())
+          .map(([le, value]) => ({ le: Number(le), value: Number(value) }))
+          .sort((a, b) => a.le - b.le);
+        const getPct = (p) => {
+          if (!merged.length || count === 0) return 0;
+          const target = p * count;
+          let acc = 0;
+          for (const b of merged) {
+            acc += b.value;
+            if (acc >= target) return b.le;
+          }
+          return merged[merged.length - 1].le;
+        };
+        const avg = count ? sum / count : 0;
+        const p95 = getPct(0.95);
+        const p99 = getPct(0.99);
+        results.push({
+          method,
+          route,
+          total: entry.total,
+          errors,
+          errorRate: entry.total ? errors / entry.total : 0,
+          avg,
+          p95,
+          p99,
+          byStatus: entry.byStatus,
+        });
+      }
+
+      // Sort by total desc and limit
+      const limit = Math.max(1, Math.min(200, Number(req.query.limit || 50)));
+      results.sort((a, b) => b.total - a.total);
+      const routes = results.slice(0, limit);
+
+      const totalRequests = routes.reduce((s, r) => s + r.total, 0);
+      const totalErrors = routes.reduce((s, r) => s + r.errors, 0);
+      const errorRate = totalRequests ? totalErrors / totalRequests : 0;
+      return res.json({
+        routes,
+        totals: { totalRequests, totalErrors, errorRate },
+        timestamp: Date.now(),
+      });
+    } catch (e) {
+      res.status(500).json({ error: 'http-metrics-failed' });
     }
-
-    // Sort by total desc and limit
-    const limit = Math.max(1, Math.min(200, Number(req.query.limit || 50)));
-    results.sort((a, b) => b.total - a.total);
-    const routes = results.slice(0, limit);
-
-    const totalRequests = routes.reduce((s, r) => s + r.total, 0);
-    const totalErrors = routes.reduce((s, r) => s + r.errors, 0);
-    const errorRate = totalRequests ? (totalErrors / totalRequests) : 0;
-    return res.json({ routes, totals: { totalRequests, totalErrors, errorRate }, timestamp: Date.now() });
-  } catch (e) {
-    res.status(500).json({ error: 'http-metrics-failed' });
   }
-});
+);
 
 // Rutas públicas (sin autenticación)
 // Allowlist y rate limit específico para webhooks
@@ -496,7 +577,12 @@ if (Number(MAILGUN_WEBHOOK_RATE_LIMIT_MAX) > 0) {
     standardHeaders: true,
     legacyHeaders: false,
     keyGenerator: (req) => {
-      const ip = req.ip || (Array.isArray(req.ips) && req.ips[0]) || req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown';
+      const ip =
+        req.ip ||
+        (Array.isArray(req.ips) && req.ips[0]) ||
+        req.headers['x-forwarded-for'] ||
+        req.socket?.remoteAddress ||
+        'unknown';
       return `ip:${ip}`;
     },
     message: 'Too many webhook requests',
@@ -576,6 +662,8 @@ app.use('/api/supplier-portal', supplierPortalRouter);
 app.use('/api/supplier-registration', supplierRegistrationRouter);
 // Supplier dashboard (protected, JWT auth)
 app.use('/api/supplier-dashboard', supplierDashboardRouter);
+// Supplier migration (temporal, para migrar proveedores existentes)
+app.use('/api/migrate-suppliers', migrateSuppliersRouter);
 
 // Nuevos módulos transversales
 app.use('/api/automation', automationRouter);
@@ -599,7 +687,12 @@ if (Number(WHATSAPP_WEBHOOK_RATE_LIMIT_MAX) > 0) {
     standardHeaders: true,
     legacyHeaders: false,
     keyGenerator: (req) => {
-      const ip = req.ip || (Array.isArray(req.ips) && req.ips[0]) || req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown';
+      const ip =
+        req.ip ||
+        (Array.isArray(req.ips) && req.ips[0]) ||
+        req.headers['x-forwarded-for'] ||
+        req.socket?.remoteAddress ||
+        'unknown';
       return `ip:${ip}`;
     },
     message: 'Too many webhook requests',
@@ -628,7 +721,12 @@ app.use('/api/web-vitals', (await import('./routes/web-vitals.js')).default);
 app.use('/api/weddings', (await import('./routes/wedding-metrics.js')).default);
 // Rutas de autenticación de administración (login/MFA/logout)
 app.use('/api/admin', adminAuthRouter);
-app.use('/api/admin/suppliers', ipAllowlist(ADMIN_IP_ALLOWLIST), requireAdmin, adminSuppliersRouter);
+app.use(
+  '/api/admin/suppliers',
+  ipAllowlist(ADMIN_IP_ALLOWLIST),
+  requireAdmin,
+  adminSuppliersRouter
+);
 app.use('/api/admin/audit', ipAllowlist(ADMIN_IP_ALLOWLIST), requireAdmin, adminAuditRouter);
 // Admin metrics dashboard API (solo admin) en ruta separada para no bloquear /api/metrics/* públicos
 // Rutas de métricas y dashboard de admin
@@ -642,7 +740,12 @@ try {
 
 try {
   const adminDashboardRouter = (await import('./routes/admin-dashboard.js')).default;
-  app.use('/api/admin/dashboard', ipAllowlist(ADMIN_IP_ALLOWLIST), requireAdmin, adminDashboardRouter);
+  app.use(
+    '/api/admin/dashboard',
+    ipAllowlist(ADMIN_IP_ALLOWLIST),
+    requireAdmin,
+    adminDashboardRouter
+  );
   console.log('[backend] Admin dashboard routes mounted on /api/admin/dashboard');
 } catch (error) {
   console.error('[backend] Failed to load admin dashboard routes:', error.message);
@@ -697,25 +800,30 @@ app.get('/api/transactions', async (req, res) => {
     const { bankId, from, to } = req.query;
 
     const { NORDIGEN_SECRET_ID, NORDIGEN_SECRET_KEY } = process.env;
-    const STATIC_TOKEN = process.env.NORDIGEN_ACCESS_TOKEN || process.env.GOCARDLESS_ACCESS_TOKEN || process.env.BANK_ACCESS_TOKEN;
+    const STATIC_TOKEN =
+      process.env.NORDIGEN_ACCESS_TOKEN ||
+      process.env.GOCARDLESS_ACCESS_TOKEN ||
+      process.env.BANK_ACCESS_TOKEN;
     const NORDIGEN_BASE_URL = process.env.NORDIGEN_BASE_URL || 'https://ob.gocardless.com/api/v2';
     if (!NORDIGEN_SECRET_ID && !NORDIGEN_SECRET_KEY && !STATIC_TOKEN) {
       return res.status(500).json({
         error: 'missing-bank-credentials',
-        message: 'No se encontraron credenciales válidas para el agregador bancario. Configura las variables de entorno requeridas.',
+        message:
+          'No se encontraron credenciales válidas para el agregador bancario. Configura las variables de entorno requeridas.',
       });
     }
 
     // 1. Get access token from Nordigen/GoCardless (or use static token if set)
-    const access = STATIC_TOKEN || (
-      await requestWithRetry(() => http.post(
-        `${NORDIGEN_BASE_URL}/token/new/`,
-        {
-          secret_id: NORDIGEN_SECRET_ID,
-          secret_key: NORDIGEN_SECRET_KEY,
-        }
-      ))
-    ).data.access;
+    const access =
+      STATIC_TOKEN ||
+      (
+        await requestWithRetry(() =>
+          http.post(`${NORDIGEN_BASE_URL}/token/new/`, {
+            secret_id: NORDIGEN_SECRET_ID,
+            secret_key: NORDIGEN_SECRET_KEY,
+          })
+        )
+      ).data.access;
 
     // 2. Build query params
     const params = new URLSearchParams();
@@ -724,14 +832,13 @@ app.get('/api/transactions', async (req, res) => {
     if (to) params.append('to', to);
 
     // 3. Fetch transactions from your own aggregator endpoint or Nordigen endpoint directly
-    const txnResp = await requestWithRetry(() => http.get(
-      `${NORDIGEN_BASE_URL}/accounts/${bankId}/transactions/?${params}`,
-      {
+    const txnResp = await requestWithRetry(() =>
+      http.get(`${NORDIGEN_BASE_URL}/accounts/${bankId}/transactions/?${params}`, {
         headers: {
           Authorization: `Bearer ${access}`,
         },
-      }
-    ));
+      })
+    );
 
     res.json(txnResp.data.transactions.booked);
   } catch (err) {
@@ -749,12 +856,18 @@ app.get('*', async (req, res, next) => {
     if (!base) return next();
     const host = (req.headers.host || '').toLowerCase();
     // Ignore API and health/metrics paths
-    if (req.path.startsWith('/api') || req.path.startsWith('/metrics') || req.path === '/health') return next();
+    if (req.path.startsWith('/api') || req.path.startsWith('/metrics') || req.path === '/health')
+      return next();
     if (!host.endsWith(base)) return next();
     const sub = host.slice(0, -base.length).replace(/\.$/, '');
     if (!sub || sub.includes(':')) return next();
     // Exclusion list: comma-separated env PUBLIC_SITES_EXCLUDED_SUBDOMAINS
-    const excluded = (process.env.PUBLIC_SITES_EXCLUDED_SUBDOMAINS || 'www,api,mail,mg,cdn,static,assets,admin').split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
+    const excluded = (
+      process.env.PUBLIC_SITES_EXCLUDED_SUBDOMAINS || 'www,api,mail,mg,cdn,static,assets,admin'
+    )
+      .split(',')
+      .map((s) => s.trim().toLowerCase())
+      .filter(Boolean);
     if (excluded.includes(sub)) return next();
     // Lazy import to avoid circular
     const mod = await import('./routes/public-wedding.js');
@@ -770,7 +883,9 @@ app.get('*', async (req, res, next) => {
 // 404 JSON handler
 app.use((req, res) => {
   const id = req?.id || null;
-  res.status(404).json({ success: false, error: { code: 'not_found', message: 'Not found' }, requestId: id });
+  res
+    .status(404)
+    .json({ success: false, error: { code: 'not_found', message: 'Not found' }, requestId: id });
 });
 
 // Middleware de manejo de errores
@@ -780,11 +895,19 @@ app.use((err, req, res, _next) => {
     const status = Number(err?.status || err?.statusCode || 500);
     const code = String(err?.code || 'internal_error');
     const message = String(err?.message || 'Internal server error');
-    const uid = (req?.user && req.user.uid) ? req.user.uid : 'anon';
-    logger.error(`[${requestId || 'n/a'}] uid:${uid} ${req?.method || ''} ${req?.originalUrl || ''} -> ${status} ${code}`, err);
+    const uid = req?.user && req.user.uid ? req.user.uid : 'anon';
+    logger.error(
+      `[${requestId || 'n/a'}] uid:${uid} ${req?.method || ''} ${req?.originalUrl || ''} -> ${status} ${code}`,
+      err
+    );
     res.status(status).json({ success: false, error: { code, message }, requestId });
   } catch (e) {
-    res.status(500).json({ success: false, error: { code: 'internal_error', message: 'Internal server error' } });
+    res
+      .status(500)
+      .json({
+        success: false,
+        error: { code: 'internal_error', message: 'Internal server error' },
+      });
   }
 });
 

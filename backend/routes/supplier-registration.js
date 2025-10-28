@@ -19,12 +19,12 @@ const registrationSchema = z.object({
   email: z.string().email().max(100),
   phone: z.string().min(9).max(20).optional(),
   website: z.string().url().max(200).optional(),
-  
+
   // Negocio
   businessName: z.string().min(2).max(100).optional(),
   category: z.string().min(2).max(50), // fotógrafo, catering, música, etc.
   services: z.array(z.string()).min(1).max(10), // servicios específicos
-  
+
   // Ubicación
   location: z.object({
     city: z.string().min(2).max(100),
@@ -32,23 +32,25 @@ const registrationSchema = z.object({
     country: z.string().min(2).max(100).default('España'),
     postalCode: z.string().max(10).optional(),
   }),
-  
+
   // Descripción
   description: z.string().min(10).max(2000),
-  
+
   // Rango de precios
-  priceRange: z.object({
-    min: z.number().nonnegative().optional(),
-    max: z.number().nonnegative().optional(),
-    currency: z.string().max(3).default('EUR'),
-  }).optional(),
-  
+  priceRange: z
+    .object({
+      min: z.number().nonnegative().optional(),
+      max: z.number().nonnegative().optional(),
+      currency: z.string().max(3).default('EUR'),
+    })
+    .optional(),
+
   // Disponibilidad
   availability: z.enum(['available', 'limited', 'unavailable']).default('available'),
-  
+
   // Términos y condiciones
-  acceptedTerms: z.boolean().refine(val => val === true, {
-    message: 'Debes aceptar los términos y condiciones'
+  acceptedTerms: z.boolean().refine((val) => val === true, {
+    message: 'Debes aceptar los términos y condiciones',
   }),
 });
 
@@ -60,20 +62,21 @@ router.post('/register', express.json({ limit: '2mb' }), async (req, res) => {
   try {
     // Validar datos
     const data = registrationSchema.parse(req.body);
-    
+
     // Verificar si el email ya existe
-    const existingQuery = await db.collection('suppliers')
+    const existingQuery = await db
+      .collection('suppliers')
       .where('contact.email', '==', data.email)
       .limit(1)
       .get();
-    
+
     if (!existingQuery.empty) {
       return res.status(409).json({
         error: 'email_exists',
-        message: 'Este email ya está registrado'
+        message: 'Este email ya está registrado',
       });
     }
-    
+
     // Generar slug único
     const baseSlug = data.name
       .toLowerCase()
@@ -81,29 +84,30 @@ router.post('/register', express.json({ limit: '2mb' }), async (req, res) => {
       .replace(/[\u0300-\u036f]/g, '')
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '');
-    
+
     let slug = baseSlug;
     let counter = 1;
-    
+
     // Verificar slug único
     while (true) {
-      const slugQuery = await db.collection('suppliers')
+      const slugQuery = await db
+        .collection('suppliers')
         .where('profile.slug', '==', slug)
         .limit(1)
         .get();
-      
+
       if (slugQuery.empty) break;
       slug = `${baseSlug}-${counter}`;
       counter++;
     }
-    
+
     // Crear documento de proveedor
     const supplierRef = db.collection('suppliers').doc();
     const supplierId = supplierRef.id;
-    
+
     // Generar token de verificación de email
     const verificationToken = crypto.randomBytes(32).toString('hex');
-    
+
     const supplierData = {
       // Profile
       profile: {
@@ -116,14 +120,14 @@ router.post('/register', express.json({ limit: '2mb' }), async (req, res) => {
         status: 'pending_verification', // pending_verification, verified, active, suspended
         source: 'public_registration',
       },
-      
+
       // Contact
       contact: {
         email: data.email,
         phone: data.phone || null,
         website: data.website || null,
       },
-      
+
       // Location
       location: {
         city: data.location.city,
@@ -132,18 +136,20 @@ router.post('/register', express.json({ limit: '2mb' }), async (req, res) => {
         postalCode: data.location.postalCode || null,
         coordinates: null, // Se puede geocodificar después
       },
-      
+
       // Business
       business: {
         services: data.services,
-        priceRange: data.priceRange ? {
-          min: data.priceRange.min || 0,
-          max: data.priceRange.max || null,
-          currency: data.priceRange.currency || 'EUR',
-        } : null,
+        priceRange: data.priceRange
+          ? {
+              min: data.priceRange.min || 0,
+              max: data.priceRange.max || null,
+              currency: data.priceRange.currency || 'EUR',
+            }
+          : null,
         availability: data.availability,
       },
-      
+
       // Verification
       verification: {
         emailVerified: false,
@@ -152,18 +158,18 @@ router.post('/register', express.json({ limit: '2mb' }), async (req, res) => {
         phoneVerified: false,
         documentsVerified: false,
       },
-      
+
       // Authentication
       auth: {
         passwordHash: null, // Se establece después de verificar email
         passwordSetAt: null,
       },
-      
+
       // Metadata
       createdAt: FieldValue.serverTimestamp(),
       updatedAt: FieldValue.serverTimestamp(),
       lastLoginAt: null,
-      
+
       // Metrics iniciales
       metrics: {
         views: 0,
@@ -171,56 +177,63 @@ router.post('/register', express.json({ limit: '2mb' }), async (req, res) => {
         conversions: 0,
         rating: 0,
         reviewCount: 0,
+        matchScore: 50, // Score inicial
       },
+
+      // IMPORTANTE: Campos para búsqueda híbrida
+      registered: true, // Marcar como proveedor REGISTRADO (no de caché)
+      name: data.name, // Duplicar en nivel superior para búsqueda
+      category: data.category, // Duplicar para búsqueda
+      tags: data.services || [], // Tags para búsqueda
     };
-    
+
     await supplierRef.set(supplierData);
-    
+
     // Generar enlace para establecer contraseña
     const baseUrl = process.env.PUBLIC_APP_BASE_URL || 'http://localhost:5173';
     const setupPasswordUrl = `${baseUrl}/supplier/setup-password?email=${encodeURIComponent(data.email)}&token=${verificationToken}`;
-    
+
     // TODO: Enviar email de verificación con el enlace
     // await sendVerificationEmail(data.email, verificationToken, setupPasswordUrl);
-    
+
     logger.info('Nuevo proveedor registrado', {
       supplierId,
       email: data.email,
       name: data.name,
       category: data.category,
     });
-    
+
     return res.status(201).json({
       success: true,
       supplierId,
       slug,
       setupPasswordUrl, // Para testing, en producción solo se envía por email
-      message: 'Registro exitoso. Revisa tu email para verificar tu cuenta y establecer tu contraseña.',
+      message:
+        'Registro exitoso. Revisa tu email para verificar tu cuenta y establecer tu contraseña.',
       nextSteps: [
         'Verifica tu email y establece tu contraseña',
         'Inicia sesión en tu dashboard',
         'Completa tu perfil',
         'Sube fotos de tu portfolio',
-        'Activa tu cuenta'
-      ]
+        'Activa tu cuenta',
+      ],
     });
-    
   } catch (error) {
     if (error instanceof z.ZodError) {
       return res.status(400).json({
         error: 'validation_error',
         message: 'Datos inválidos',
-        details: error.errors.map(e => ({
+        details: error.errors.map((e) => ({
           field: e.path.join('.'),
           message: e.message,
-        }))
+        })),
       });
     }
-    
+
     logger.error('Error en registro de proveedor', error);
     return res.status(500).json({
       error: 'internal_error',
-      message: 'Error al procesar el registro'
+      message: 'Error al procesar el registro',
     });
   }
 });
@@ -232,36 +245,37 @@ router.post('/register', express.json({ limit: '2mb' }), async (req, res) => {
 router.post('/verify-email', express.json(), async (req, res) => {
   try {
     const { token } = req.body;
-    
+
     if (!token) {
       return res.status(400).json({ error: 'token_required' });
     }
-    
+
     // Buscar proveedor con este token
-    const query = await db.collection('suppliers')
+    const query = await db
+      .collection('suppliers')
       .where('verification.emailVerificationToken', '==', token)
       .limit(1)
       .get();
-    
+
     if (query.empty) {
       return res.status(404).json({
         error: 'invalid_token',
-        message: 'Token inválido o expirado'
+        message: 'Token inválido o expirado',
       });
     }
-    
+
     const supplierDoc = query.docs[0];
     const supplierData = supplierDoc.data();
-    
+
     // Verificar si ya está verificado
     if (supplierData.verification?.emailVerified) {
       return res.json({
         success: true,
         message: 'Email ya verificado',
-        alreadyVerified: true
+        alreadyVerified: true,
       });
     }
-    
+
     // Marcar como verificado
     await supplierDoc.ref.update({
       'verification.emailVerified': true,
@@ -270,13 +284,12 @@ router.post('/verify-email', express.json(), async (req, res) => {
       'profile.status': 'verified',
       updatedAt: FieldValue.serverTimestamp(),
     });
-    
+
     return res.json({
       success: true,
       message: 'Email verificado exitosamente',
       supplierId: supplierDoc.id,
     });
-    
   } catch (error) {
     logger.error('Error verificando email', error);
     return res.status(500).json({ error: 'internal_error' });
@@ -290,21 +303,21 @@ router.post('/verify-email', express.json(), async (req, res) => {
 router.get('/check-email/:email', async (req, res) => {
   try {
     const { email } = req.params;
-    
+
     if (!email || !email.includes('@')) {
       return res.status(400).json({ error: 'invalid_email' });
     }
-    
-    const query = await db.collection('suppliers')
+
+    const query = await db
+      .collection('suppliers')
       .where('contact.email', '==', email.toLowerCase())
       .limit(1)
       .get();
-    
+
     return res.json({
       exists: !query.empty,
-      available: query.empty
+      available: query.empty,
     });
-    
   } catch (error) {
     logger.error('Error checking email', error);
     return res.status(500).json({ error: 'internal_error' });
@@ -332,7 +345,7 @@ router.get('/categories', async (req, res) => {
     { value: 'wedding-planner', label: 'Wedding Planner' },
     { value: 'otro', label: 'Otro' },
   ];
-  
+
   res.json({ categories });
 });
 

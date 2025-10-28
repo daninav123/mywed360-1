@@ -40,11 +40,15 @@ async function listProviders({ category, status, q, limit = 20 }) {
       const locationMatch = matches(it.location);
       const categoryMatch = matches(it.category);
       const tagMatch = Array.isArray(it.tags) ? it.tags.some((tag) => matches(tag)) : false;
-      const keywordMatch = Array.isArray(it.keywords) ? it.keywords.some((tag) => matches(tag)) : false;
+      const keywordMatch = Array.isArray(it.keywords)
+        ? it.keywords.some((tag) => matches(tag))
+        : false;
       const servicesMatch = Array.isArray(it.services)
         ? it.services.some((svc) => matches(svc?.name) || matches(svc?.description))
         : false;
-      return nameMatch || locationMatch || categoryMatch || tagMatch || keywordMatch || servicesMatch;
+      return (
+        nameMatch || locationMatch || categoryMatch || tagMatch || keywordMatch || servicesMatch
+      );
     });
   }
   return items;
@@ -87,7 +91,15 @@ router.post('/', express.json(), validate(createBody), async (req, res) => {
     const body = req.body || {};
     const name = String(body.name || '').trim();
     let now;
-    try { now = admin.firestore.FieldValue.serverTimestamp(); } catch { try { now = admin.firestore().FieldValue.serverTimestamp(); } catch { now = new Date(); } }
+    try {
+      now = admin.firestore.FieldValue.serverTimestamp();
+    } catch {
+      try {
+        now = admin.firestore().FieldValue.serverTimestamp();
+      } catch {
+        now = new Date();
+      }
+    }
     const doc = {
       name,
       category: body.category || null,
@@ -109,13 +121,102 @@ router.post('/', express.json(), validate(createBody), async (req, res) => {
 });
 
 // GET /api/providers/search
+// MEJORADO: Busca en proveedores internos (providers) Y registrados (suppliers)
 const searchQuery = z.object({ q: z.string().min(1) });
 router.get('/search', validate(searchQuery, 'query'), async (req, res) => {
   try {
     const { q } = req.query || {};
-    const items = await listProviders({ q: String(q), limit: 50 });
-    res.json({ items });
+    const searchTerm = String(q).trim().toLowerCase();
+
+    // 1. Buscar en proveedores internos (colección providers)
+    const internalProviders = await listProviders({ q: searchTerm, limit: 50 });
+
+    // 2. Buscar en proveedores REGISTRADOS (colección suppliers)
+    let registeredSuppliers = [];
+    try {
+      const suppliersSnap = await admin
+        .firestore()
+        .collection('suppliers')
+        .where('status', '==', 'active')
+        .limit(50)
+        .get();
+
+      const allSuppliers = suppliersSnap.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+        _source: 'registered', // Marcar como registrado
+      }));
+
+      // Filtrar por búsqueda
+      const matches = buildMatcher(searchTerm);
+      registeredSuppliers = allSuppliers.filter((supplier) => {
+        const nameMatch = matches(supplier.profile?.name || supplier.name || '');
+        const categoryMatch = matches(supplier.profile?.category || supplier.category || '');
+        const locationMatch = matches(supplier.location?.city || supplier.location?.province || '');
+        const servicesMatch = Array.isArray(supplier.business?.services)
+          ? supplier.business.services.some((svc) => matches(svc))
+          : false;
+        const descriptionMatch = matches(supplier.business?.description || '');
+
+        return nameMatch || categoryMatch || locationMatch || servicesMatch || descriptionMatch;
+      });
+
+      // Normalizar formato para que coincida con providers
+      registeredSuppliers = registeredSuppliers.map((supplier) => ({
+        id: supplier.id,
+        name: supplier.profile?.name || supplier.name || 'Sin nombre',
+        category: supplier.profile?.category || supplier.category || '',
+        location: supplier.location?.city || supplier.location?.province || '',
+        phone: supplier.contact?.phone || '',
+        email: supplier.contact?.email || '',
+        services: supplier.business?.services || [],
+        description: supplier.business?.description || '',
+        priceRange: supplier.business?.priceRange || '',
+        rating: supplier.metrics?.averageRating || null,
+        image: supplier.media?.profilePhoto || supplier.media?.logo || '',
+        slug: supplier.profile?.slug || '',
+        status: 'active',
+        _source: 'registered', // Identificador importante
+        _registered: true,
+      }));
+
+      logger.info('[providers/search] Proveedores registrados encontrados', {
+        query: searchTerm,
+        count: registeredSuppliers.length,
+      });
+    } catch (suppliersError) {
+      logger.error('[providers/search] Error buscando suppliers', {
+        error: suppliersError.message,
+      });
+      // No fallar la búsqueda si hay error en suppliers
+    }
+
+    // 3. Mezclar resultados: PRIORIZAR REGISTRADOS primero
+    const allResults = [
+      ...registeredSuppliers,
+      ...internalProviders.filter((p) => !p._registered), // Evitar duplicados
+    ];
+
+    logger.info('[providers/search] Resultados de búsqueda', {
+      query: searchTerm,
+      total: allResults.length,
+      registered: registeredSuppliers.length,
+      internal: internalProviders.length,
+    });
+
+    res.json({
+      items: allResults,
+      meta: {
+        total: allResults.length,
+        registered: registeredSuppliers.length,
+        internal: internalProviders.length,
+      },
+    });
   } catch (e) {
+    logger.error('[providers/search] Error en búsqueda', {
+      error: e.message,
+      stack: e.stack,
+    });
     res.status(500).json({ success: false, error: e?.message || 'internal' });
   }
 });
@@ -134,49 +235,64 @@ router.get('/:id', validate(idParams, 'params'), async (req, res) => {
 });
 
 // PATCH /api/providers/:id
-const patchBody = z.object({
-  name: z.string().min(1).optional(),
-  category: z.string().optional().nullable(),
-  status: z.enum(['prospect', 'active', 'archived']).optional(),
-  phone: z.string().optional().nullable(),
-  email: z.string().email().optional().nullable(),
-  location: z.string().optional().nullable(),
-  services: z.array(z.any()).optional(),
-  rating: z.number().min(0).max(5).optional().nullable(),
-  notes: z.string().optional().nullable(),
-}).strict();
-router.patch('/:id', express.json(), validate(idParams, 'params'), validate(patchBody), async (req, res) => {
-  try {
-    const id = req.params.id;
-    const patch = req.body || {};
-    const allowed = [
-      'name',
-      'category',
-      'status',
-      'phone',
-      'email',
-      'location',
-      'services',
-      'rating',
-      'notes',
-    ];
-    const data = {};
-    for (const k of allowed) {
-      if (Object.prototype.hasOwnProperty.call(patch, k)) data[k] = patch[k];
+const patchBody = z
+  .object({
+    name: z.string().min(1).optional(),
+    category: z.string().optional().nullable(),
+    status: z.enum(['prospect', 'active', 'archived']).optional(),
+    phone: z.string().optional().nullable(),
+    email: z.string().email().optional().nullable(),
+    location: z.string().optional().nullable(),
+    services: z.array(z.any()).optional(),
+    rating: z.number().min(0).max(5).optional().nullable(),
+    notes: z.string().optional().nullable(),
+  })
+  .strict();
+router.patch(
+  '/:id',
+  express.json(),
+  validate(idParams, 'params'),
+  validate(patchBody),
+  async (req, res) => {
+    try {
+      const id = req.params.id;
+      const patch = req.body || {};
+      const allowed = [
+        'name',
+        'category',
+        'status',
+        'phone',
+        'email',
+        'location',
+        'services',
+        'rating',
+        'notes',
+      ];
+      const data = {};
+      for (const k of allowed) {
+        if (Object.prototype.hasOwnProperty.call(patch, k)) data[k] = patch[k];
+      }
+      if (Object.prototype.hasOwnProperty.call(data, 'status')) {
+        const st = data.status;
+        if (!['prospect', 'active', 'archived'].includes(st))
+          return res.status(400).json({ success: false, error: 'status inválido' });
+      }
+      try {
+        data.updatedAt = admin.firestore.FieldValue.serverTimestamp();
+      } catch {
+        try {
+          data.updatedAt = admin.firestore().FieldValue.serverTimestamp();
+        } catch {
+          data.updatedAt = new Date();
+        }
+      }
+      await admin.firestore().collection('providers').doc(id).set(data, { merge: true });
+      res.json({ success: true });
+    } catch (e) {
+      res.status(500).json({ success: false, error: e?.message || 'internal' });
     }
-    if (Object.prototype.hasOwnProperty.call(data, 'status')) {
-      const st = data.status;
-      if (!['prospect', 'active', 'archived'].includes(st))
-        return res.status(400).json({ success: false, error: 'status inválido' });
-    }
-    try { data.updatedAt = admin.firestore.FieldValue.serverTimestamp(); }
-    catch { try { data.updatedAt = admin.firestore().FieldValue.serverTimestamp(); } catch { data.updatedAt = new Date(); } }
-    await admin.firestore().collection('providers').doc(id).set(data, { merge: true });
-    res.json({ success: true });
-  } catch (e) {
-    res.status(500).json({ success: false, error: e?.message || 'internal' });
   }
-});
+);
 
 // DELETE /api/providers/:id
 router.delete('/:id', validate(idParams, 'params'), async (req, res) => {
@@ -200,9 +316,16 @@ router.get('/:id/status', validate(statusParams, 'params'), async (req, res) => 
     // Contratos por proveedor
     let contractsSnap = { empty: true, docs: [] };
     try {
-      contractsSnap = await admin.firestore().collection('contracts').where('providerId', '==', id).limit(500).get();
+      contractsSnap = await admin
+        .firestore()
+        .collection('contracts')
+        .where('providerId', '==', id)
+        .limit(500)
+        .get();
     } catch {}
-    const contracts = contractsSnap.empty ? [] : contractsSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    const contracts = contractsSnap.empty
+      ? []
+      : contractsSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
     const cByStatus = { draft: 0, sent: 0, signed: 0, cancelled: 0 };
     let cAmountSigned = 0;
     let lastContractUpdate = null;
@@ -210,7 +333,8 @@ router.get('/:id/status', validate(statusParams, 'params'), async (req, res) => 
       const st = String(c.status || 'draft');
       if (Object.prototype.hasOwnProperty.call(cByStatus, st)) cByStatus[st] += 1;
       if (st === 'signed' && typeof c.amount === 'number') cAmountSigned += Number(c.amount) || 0;
-      const ts = c.updatedAt?.toDate?.() || c.updatedAt || c.createdAt?.toDate?.() || c.createdAt || null;
+      const ts =
+        c.updatedAt?.toDate?.() || c.updatedAt || c.createdAt?.toDate?.() || c.createdAt || null;
       if (ts && (!lastContractUpdate || ts > lastContractUpdate)) lastContractUpdate = ts;
     }
 
@@ -218,26 +342,46 @@ router.get('/:id/status', validate(statusParams, 'params'), async (req, res) => 
     let paymentsSnap = { empty: true, docs: [] };
     try {
       // Intento principal: payments con providerId directo
-      paymentsSnap = await admin.firestore().collection('_system').doc('config').collection('payments').where('providerId', '==', id).limit(1000).get();
+      paymentsSnap = await admin
+        .firestore()
+        .collection('_system')
+        .doc('config')
+        .collection('payments')
+        .where('providerId', '==', id)
+        .limit(1000)
+        .get();
       if (paymentsSnap.empty) {
         // Fallback: si no hay providerId directo, recuperar por contratos del proveedor
         const contractIds = new Set(contracts.map((c) => c.id));
         if (contractIds.size) {
           // No hay where IN garantizado en el mock; cargamos y filtramos localmente (limit 1000 para no explotar)
-          const allPay = await admin.firestore().collection('_system').doc('config').collection('payments').limit(1000).get();
+          const allPay = await admin
+            .firestore()
+            .collection('_system')
+            .doc('config')
+            .collection('payments')
+            .limit(1000)
+            .get();
           const docs = [];
           allPay.docs.forEach((doc) => {
             const d = doc.data() || {};
             if (d.contractId && contractIds.has(d.contractId)) docs.push({ id: doc.id, ...d });
           });
-          paymentsSnap = { empty: docs.length === 0, docs: docs.map((d) => ({ id: d.id, data: () => ({ ...d }) })) };
+          paymentsSnap = {
+            empty: docs.length === 0,
+            docs: docs.map((d) => ({ id: d.id, data: () => ({ ...d }) })),
+          };
         }
       }
     } catch {}
 
-    const payments = paymentsSnap.empty ? [] : paymentsSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    const payments = paymentsSnap.empty
+      ? []
+      : paymentsSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
     const pByStatus = { pending: 0, authorized: 0, paid: 0, failed: 0, refunded: 0 };
-    let paid = 0, pending = 0, failed = 0;
+    let paid = 0,
+      pending = 0,
+      failed = 0;
     let lastPaymentUpdate = null;
     for (const p of payments) {
       const st = String(p.status || 'pending');
@@ -246,7 +390,8 @@ router.get('/:id/status', validate(statusParams, 'params'), async (req, res) => 
       if (st === 'paid') paid += amt;
       else if (st === 'pending' || st === 'authorized') pending += amt;
       else if (st === 'failed') failed += amt;
-      const ts = p.updatedAt?.toDate?.() || p.updatedAt || p.createdAt?.toDate?.() || p.createdAt || null;
+      const ts =
+        p.updatedAt?.toDate?.() || p.updatedAt || p.createdAt?.toDate?.() || p.createdAt || null;
       if (ts && (!lastPaymentUpdate || ts > lastPaymentUpdate)) lastPaymentUpdate = ts;
     }
 
