@@ -37,10 +37,7 @@ async function ensureUniqueSlug(baseTitle, currentId = null) {
       .where('slug', '==', candidate)
       .limit(1)
       .get();
-    if (
-      snapshot.empty ||
-      snapshot.docs.every((doc) => !currentId || doc.id === currentId)
-    ) {
+    if (snapshot.empty || snapshot.docs.every((doc) => !currentId || doc.id === currentId)) {
       return candidate;
     }
     attempts += 1;
@@ -100,21 +97,72 @@ const listSchema = z.object({
 });
 
 router.get('/', async (req, res) => {
+  let filters;
   try {
-    const { status, language, limit } = listSchema.parse(req.query || {});
+    filters = listSchema.parse(req.query || {});
+  } catch (error) {
+    logger.error('[admin-blog] list validation failed:', error?.message || error);
+    res.status(400).json({ error: 'invalid-parameters' });
+    return;
+  }
+
+  const { status, language, limit } = filters;
+  const limitNumber = Number(limit) || 50;
+  const normalizedLanguage = language ? String(language).toLowerCase() : '';
+
+  const buildQuery = () => {
     let query = db.collection(BLOG_COLLECTION).orderBy('generatedAt', 'desc');
     if (status !== 'all') {
       query = query.where('status', '==', status);
     }
-    if (language) {
-      query = query.where('language', '==', language);
+    if (normalizedLanguage) {
+      query = query.where('language', '==', normalizedLanguage);
     }
-    const snapshot = await query.limit(Number(limit) || 50).get();
+    return query.limit(limitNumber);
+  };
+
+  try {
+    const snapshot = await buildQuery().get();
     const posts = snapshot.docs.map(mapDoc);
     res.json({ posts });
   } catch (error) {
-    logger.error('[admin-blog] list failed:', error?.message || error);
-    res.status(400).json({ error: 'invalid-parameters' });
+    const isIndexError =
+      error?.code === 'failed-precondition' || error?.message?.includes('requires an index');
+
+    if (!isIndexError) {
+      logger.error('[admin-blog] list failed:', error?.message || error);
+      res.status(500).json({ error: 'list-failed' });
+      return;
+    }
+
+    logger.warn('[admin-blog] list query fallback activado:', error?.message || error);
+
+    try {
+      const fallbackSnapshot = await db.collection(BLOG_COLLECTION).limit(400).get();
+      let posts = fallbackSnapshot.docs.map(mapDoc);
+
+      if (status !== 'all') {
+        posts = posts.filter((post) => post.status === status);
+      }
+      if (normalizedLanguage) {
+        posts = posts.filter((post) => (post.language || '').toLowerCase() === normalizedLanguage);
+      }
+
+      posts.sort((a, b) => {
+        const dateA = a.generatedAt ? new Date(a.generatedAt).getTime() : 0;
+        const dateB = b.generatedAt ? new Date(b.generatedAt).getTime() : 0;
+        return dateB - dateA;
+      });
+
+      res.json({
+        posts: posts.slice(0, limitNumber),
+        fallback: true,
+        indexError: true,
+      });
+    } catch (fallbackError) {
+      logger.error('[admin-blog] list fallback failed:', fallbackError?.message || fallbackError);
+      res.status(500).json({ error: 'list-failed' });
+    }
   }
 });
 
@@ -153,9 +201,10 @@ router.post('/', async (req, res) => {
         conclusion: aiArticle.conclusion || '',
         cta: aiArticle.cta || '',
       },
-      tags: aiArticle.tags && aiArticle.tags.length
-        ? aiArticle.tags
-        : computeDefaultTags(input.keywords, aiArticle.sections),
+      tags:
+        aiArticle.tags && aiArticle.tags.length
+          ? aiArticle.tags
+          : computeDefaultTags(input.keywords, aiArticle.sections),
       coverImage: aiArticle.coverPrompt
         ? {
             prompt: aiArticle.coverPrompt,
@@ -275,7 +324,7 @@ router.post('/:id/publish', async (req, res) => {
           scheduledAt: null,
           approvedBy: approvedBy || admin.firestore.FieldValue.delete(),
         },
-        { merge: true },
+        { merge: true }
       );
     const saved = await db.collection(BLOG_COLLECTION).doc(id).get();
     res.json({ post: mapDoc(saved) });
@@ -294,17 +343,14 @@ router.post('/:id/schedule', async (req, res) => {
   try {
     const { scheduledAt } = scheduleSchema.parse(req.body || {});
     const timestamp = admin.firestore.Timestamp.fromDate(new Date(scheduledAt));
-    await db
-      .collection(BLOG_COLLECTION)
-      .doc(id)
-      .set(
-        {
-          status: 'scheduled',
-          scheduledAt: timestamp,
-          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-        },
-        { merge: true },
-      );
+    await db.collection(BLOG_COLLECTION).doc(id).set(
+      {
+        status: 'scheduled',
+        scheduledAt: timestamp,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      },
+      { merge: true }
+    );
     const saved = await db.collection(BLOG_COLLECTION).doc(id).get();
     res.json({ post: mapDoc(saved) });
   } catch (error) {
@@ -316,16 +362,13 @@ router.post('/:id/schedule', async (req, res) => {
 router.post('/:id/archive', async (req, res) => {
   const { id } = req.params;
   try {
-    await db
-      .collection(BLOG_COLLECTION)
-      .doc(id)
-      .set(
-        {
-          status: 'archived',
-          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-        },
-        { merge: true },
-      );
+    await db.collection(BLOG_COLLECTION).doc(id).set(
+      {
+        status: 'archived',
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      },
+      { merge: true }
+    );
     const saved = await db.collection(BLOG_COLLECTION).doc(id).get();
     res.json({ post: mapDoc(saved) });
   } catch (error) {
@@ -335,4 +378,3 @@ router.post('/:id/archive', async (req, res) => {
 });
 
 export default router;
-

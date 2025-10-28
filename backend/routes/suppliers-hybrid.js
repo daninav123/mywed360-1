@@ -430,9 +430,10 @@ router.post('/search', async (req, res) => {
           return matches;
         })
         // Filtrar por status en memoria (evita índice compuesto)
+        // ⚠️ PERMITIR: "active" y "cached" - NO "discovered" por implicaciones legales
         .filter((supplier) => {
           const status = supplier.status || 'active';
-          const isValid = status === 'active' || status === 'discovered';
+          const isValid = status === 'active' || status === 'cached'; // Activos + cached OK, NO discovered
 
           if (!isValid && process.env.DEBUG_SUPPLIERS === 'true') {
             console.log(`❌ [STATUS] ${supplier.name} filtrado por status: "${status}"`);
@@ -774,7 +775,7 @@ router.post('/search', async (req, res) => {
             },
             registered: false,
             source: isBodas ? 'bodas-net' : 'tavily-realtime',
-            status: 'discovered',
+            status: 'internet-only', // ⚠️ NO "discovered" - no se guarda en BD
             priority: isBodas ? 'high' : score > 0.7 ? 'medium' : 'low', // ✅ NUEVO: Prioridad dinámica
             badge: isBodas ? 'Bodas.net 💒' : score > 0.7 ? 'Alta calidad ⭐' : 'De internet 🌐',
             badgeType: isBodas ? 'info' : score > 0.7 ? 'success' : 'default',
@@ -852,58 +853,9 @@ router.post('/search', async (req, res) => {
     }
     console.log(`   📡 Fuente: ${sourceMsg}\n`);
 
-    // ===== 3.5. GUARDAR RESULTADOS DE INTERNET EN FIRESTORE =====
-    // ✅ NUEVO: Guardar proveedores descubiertos en Firestore para futuras búsquedas
-    if (internetResults.length > 0) {
-      console.log(
-        `\n💾 [SAVE] Guardando ${internetResults.length} proveedores de internet en Firestore...`
-      );
-
-      const batch = db.batch();
-      let savedCount = 0;
-
-      for (const supplier of internetResults) {
-        try {
-          // Generar ID único basado en URL
-          const urlHash = Buffer.from(supplier.contact.website)
-            .toString('base64')
-            .replace(/[^a-zA-Z0-9]/g, '')
-            .substring(0, 20);
-          const supplierId = `discovered_${urlHash}_${Date.now()}`;
-
-          const docRef = db.collection('suppliers').doc(supplierId);
-
-          // Preparar datos para guardar
-          const supplierData = {
-            ...supplier,
-            id: supplierId,
-            status: 'discovered', // Estado especial
-            createdAt: admin.firestore.FieldValue.serverTimestamp(),
-            lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
-            discoverySource: 'tavily',
-            autoDiscovered: true,
-          };
-
-          batch.set(docRef, supplierData, { merge: true });
-          savedCount++;
-
-          // Batch tiene límite de 500 operaciones
-          if (savedCount % 500 === 0) {
-            await batch.commit();
-            console.log(`   ✅ Guardados ${savedCount}/${internetResults.length}...`);
-          }
-        } catch (error) {
-          console.error(`   ❌ Error guardando ${supplier.name}:`, error.message);
-        }
-      }
-
-      // Commit final
-      if (savedCount % 500 !== 0) {
-        await batch.commit();
-      }
-
-      console.log(`✅ [SAVE] ${savedCount} proveedores guardados en Firestore como 'discovered'`);
-    }
+    // ⚠️ REMOVED: NO GUARDAR PROVEEDORES DISCOVERED EN FIRESTORE
+    // Motivo: Implicaciones legales - no debemos almacenar datos scraped de internet
+    // Los proveedores de internet solo se devuelven en la respuesta, NO se guardan en BD
 
     // ===== 4. ACTUALIZAR MÉTRICAS DE VISTAS (solo para registrados reales) =====
     if (trueRegistered.length > 0) {
