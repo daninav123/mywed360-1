@@ -97,12 +97,16 @@ router.post('/search', async (req, res) => {
     let registeredResults = snapshot.docs
       .map(doc => {
         const data = doc.data();
+        
+        // DEBUG: Log para ver el valor de registered
+        console.log(`[DEBUG] Proveedor: ${data.name}, registered: ${data.registered}, type: ${typeof data.registered}`);
+        
         return {
           id: doc.id,
           ...data,
-          priority: data.registered ? 'registered' : 'cached',
-          badge: data.registered ? 'Verificado ✓' : 'En caché',
-          badgeType: data.registered ? 'success' : 'info'
+          priority: data.registered === true ? 'registered' : 'cached',
+          badge: data.registered === true ? 'Verificado ✓' : 'En caché',
+          badgeType: data.registered === true ? 'success' : 'info'
         };
       })
       // Filtrar por status en memoria (evita índice compuesto)
@@ -162,8 +166,8 @@ router.post('/search', async (req, res) => {
     }
     
     console.log(`✅ [FIRESTORE] ${registeredResults.length} proveedores encontrados en base de datos`);
-    console.log(`   - Registrados: ${registeredResults.filter(r => r.registered).length}`);
-    console.log(`   - En caché: ${registeredResults.filter(r => !r.registered).length}`);
+    console.log(`   - Registrados: ${registeredResults.filter(r => r.registered === true).length}`);
+    console.log(`   - En caché: ${registeredResults.filter(r => r.registered !== true).length}`);
     
     // ===== 2. SI NO HAY RESULTADOS, BUSCAR EN INTERNET (TAVILY) =====
     let internetResults = [];
