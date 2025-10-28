@@ -189,47 +189,47 @@ export default function SupplierDashboard() {
           
           {/* Estadísticas */}
           <div className="lg:col-span-3">
-            <div className="bg-white shadow-md rounded-lg p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <div className="shadow-md rounded-lg p-6" style={{ backgroundColor: 'var(--color-surface)' }}>
+              <h2 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: 'var(--color-text)' }}>
                 <BarChart3 size={20} />
                 Estadísticas
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-blue-50 p-4 rounded-lg">
-                  <div className="flex items-center gap-2 text-blue-600 mb-2">
+                <div className="p-4 rounded-lg" style={{ backgroundColor: 'rgba(94, 187, 255, 0.1)' }}>
+                  <div className="flex items-center gap-2 mb-2" style={{ color: 'var(--color-info)' }}>
                     <Eye size={20} />
                     <span className="font-medium">Vistas</span>
                   </div>
-                  <p className="text-3xl font-bold text-blue-900">
+                  <p className="text-3xl font-bold" style={{ color: 'var(--color-text)' }}>
                     {supplier.metrics?.views || 0}
                   </p>
-                  <p className="text-sm text-blue-600 mt-1">
+                  <p className="text-sm mt-1" style={{ color: 'var(--color-info)' }}>
                     Veces que apareciste en búsquedas
                   </p>
                 </div>
                 
-                <div className="bg-purple-50 p-4 rounded-lg">
-                  <div className="flex items-center gap-2 text-purple-600 mb-2">
+                <div className="p-4 rounded-lg" style={{ backgroundColor: 'rgba(168, 85, 247, 0.1)' }}>
+                  <div className="flex items-center gap-2 mb-2" style={{ color: '#a855f7' }}>
                     <MousePointer size={20} />
                     <span className="font-medium">Clics</span>
                   </div>
-                  <p className="text-3xl font-bold text-purple-900">
+                  <p className="text-3xl font-bold" style={{ color: 'var(--color-text)' }}>
                     {supplier.metrics?.clicks || 0}
                   </p>
-                  <p className="text-sm text-purple-600 mt-1">
+                  <p className="text-sm mt-1" style={{ color: '#a855f7' }}>
                     Veces que visitaron tu perfil
                   </p>
                 </div>
                 
-                <div className="bg-green-50 p-4 rounded-lg">
-                  <div className="flex items-center gap-2 text-green-600 mb-2">
+                <div className="p-4 rounded-lg" style={{ backgroundColor: 'rgba(34, 197, 94, 0.1)' }}>
+                  <div className="flex items-center gap-2 mb-2" style={{ color: 'var(--color-success)' }}>
                     <Mail size={20} />
                     <span className="font-medium">Contactos</span>
                   </div>
-                  <p className="text-3xl font-bold text-green-900">
+                  <p className="text-3xl font-bold" style={{ color: 'var(--color-text)' }}>
                     {supplier.metrics?.conversions || 0}
                   </p>
-                  <p className="text-sm text-green-600 mt-1">
+                  <p className="text-sm mt-1" style={{ color: 'var(--color-success)' }}>
                     Parejas que te contactaron
                   </p>
                 </div>
@@ -239,45 +239,45 @@ export default function SupplierDashboard() {
           
           {/* Información del perfil */}
           <div className="lg:col-span-2">
-            <div className="bg-white shadow-md rounded-lg p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">
+            <div className="shadow-md rounded-lg p-6" style={{ backgroundColor: 'var(--color-surface)' }}>
+              <h2 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text)' }}>
                 Información del Perfil
               </h2>
               
               {editing ? (
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text)' }}>
                       Nombre del negocio
                     </label>
                     <input
                       type="text"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                      className="w-full px-3 py-2 border rounded-md" style={{ borderColor: 'var(--color-border)' }}
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text)' }}>
                       Descripción
                     </label>
                     <textarea
                       value={formData.description}
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                       rows={4}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                      className="w-full px-3 py-2 border rounded-md" style={{ borderColor: 'var(--color-border)' }}
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text)' }}>
                       Rango de precio
                     </label>
                     <select
                       value={formData.priceRange}
                       onChange={(e) => setFormData({ ...formData, priceRange: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                      className="w-full px-3 py-2 border rounded-md" style={{ borderColor: 'var(--color-border)' }}
                     >
                       <option value="">Seleccionar...</option>
                       <option value="€">€ - Económico</option>
@@ -288,31 +288,31 @@ export default function SupplierDashboard() {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text)' }}>
                       Teléfono
                     </label>
                     <input
                       type="tel"
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                      className="w-full px-3 py-2 border rounded-md" style={{ borderColor: 'var(--color-border)' }}
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text)' }}>
                       Sitio web
                     </label>
                     <input
                       type="url"
                       value={formData.website}
                       onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                      className="w-full px-3 py-2 border rounded-md" style={{ borderColor: 'var(--color-border)' }}
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text)' }}>
                       Instagram
                     </label>
                     <input
@@ -320,38 +320,38 @@ export default function SupplierDashboard() {
                       value={formData.instagram}
                       onChange={(e) => setFormData({ ...formData, instagram: e.target.value })}
                       placeholder="@tuusuario"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                      className="w-full px-3 py-2 border rounded-md" style={{ borderColor: 'var(--color-border)' }}
                     />
                   </div>
                 </div>
               ) : (
                 <div className="space-y-4">
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Descripción</p>
-                    <p className="mt-1 text-gray-900">
+                    <p className="text-sm font-medium" style={{ color: 'var(--color-muted)' }}>Descripción</p>
+                    <p className="mt-1" style={{ color: 'var(--color-text)' }}>
                       {supplier.business?.description || 'Sin descripción'}
                     </p>
                   </div>
                   
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Rango de precio</p>
-                    <p className="mt-1 text-gray-900">
+                    <p className="text-sm font-medium" style={{ color: 'var(--color-muted)' }}>Rango de precio</p>
+                    <p className="mt-1" style={{ color: 'var(--color-text)' }}>
                       {supplier.business?.priceRange || 'No especificado'}
                     </p>
                   </div>
                   
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Teléfono</p>
-                    <p className="mt-1 text-gray-900">
+                    <p className="text-sm font-medium" style={{ color: 'var(--color-muted)' }}>Teléfono</p>
+                    <p className="mt-1" style={{ color: 'var(--color-text)' }}>
                       {supplier.contact?.phone || 'No especificado'}
                     </p>
                   </div>
                   
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Sitio web</p>
-                    <p className="mt-1 text-gray-900">
+                    <p className="text-sm font-medium" style={{ color: 'var(--color-muted)' }}>Sitio web</p>
+                    <p className="mt-1" style={{ color: 'var(--color-text)' }}>
                       {supplier.contact?.website ? (
-                        <a href={supplier.contact.website} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                        <a href={supplier.contact.website} target="_blank" rel="noopener noreferrer" className="hover:underline" style={{ color: 'var(--color-primary)' }}>
                           {supplier.contact.website}
                         </a>
                       ) : 'No especificado'}
@@ -359,8 +359,8 @@ export default function SupplierDashboard() {
                   </div>
                   
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Instagram</p>
-                    <p className="mt-1 text-gray-900">
+                    <p className="text-sm font-medium" style={{ color: 'var(--color-muted)' }}>Instagram</p>
+                    <p className="mt-1" style={{ color: 'var(--color-text)' }}>
                       {supplier.contact?.instagram || 'No especificado'}
                     </p>
                   </div>
@@ -371,33 +371,33 @@ export default function SupplierDashboard() {
           
           {/* Info adicional */}
           <div className="space-y-6">
-            <div className="bg-white shadow-md rounded-lg p-6">
-              <h3 className="font-semibold text-gray-900 mb-3">Estado del perfil</h3>
+            <div className="shadow-md rounded-lg p-6" style={{ backgroundColor: 'var(--color-surface)' }}>
+              <h3 className="font-semibold mb-3" style={{ color: 'var(--color-text)' }}>Estado del perfil</h3>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Registrado:</span>
-                  <span className={supplier.registered ? 'text-green-600 font-medium' : 'text-gray-400'}>
+                  <span style={{ color: 'var(--color-muted)' }}>Registrado:</span>
+                  <span className="font-medium" style={{ color: supplier.registered ? 'var(--color-success)' : 'var(--color-muted)' }}>
                     {supplier.registered ? 'Sí ✓' : 'No'}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Estado:</span>
-                  <span className={supplier.status === 'active' ? 'text-green-600 font-medium' : 'text-gray-400'}>
+                  <span style={{ color: 'var(--color-muted)' }}>Estado:</span>
+                  <span className="font-medium" style={{ color: supplier.status === 'active' ? 'var(--color-success)' : 'var(--color-muted)' }}>
                     {supplier.status === 'active' ? 'Activo' : 'Inactivo'}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Match Score:</span>
-                  <span className="text-blue-600 font-medium">
+                  <span style={{ color: 'var(--color-muted)' }}>Match Score:</span>
+                  <span className="font-medium" style={{ color: 'var(--color-primary)' }}>
                     {supplier.metrics?.matchScore || 0}/100
                   </span>
                 </div>
               </div>
             </div>
             
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h4 className="font-medium text-blue-900 mb-2">💡 Consejo</h4>
-              <p className="text-sm text-blue-700">
+            <div className="border rounded-lg p-4" style={{ backgroundColor: 'rgba(94, 187, 255, 0.1)', borderColor: 'var(--color-primary)' }}>
+              <h4 className="font-medium mb-2" style={{ color: 'var(--color-text)' }}>💡 Consejo</h4>
+              <p className="text-sm" style={{ color: 'var(--color-muted)' }}>
                 Completa toda tu información para aparecer mejor posicionado en las búsquedas. 
                 Los perfiles con fotos y descripciones detalladas reciben 3x más contactos.
               </p>
