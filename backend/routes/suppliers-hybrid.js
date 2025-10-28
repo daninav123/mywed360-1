@@ -7,7 +7,7 @@
 
 import express from 'express';
 import OpenAI from 'openai';
-import { db } from '../db.js';
+import { db, admin } from '../db.js';
 import axios from 'axios';
 import crypto from 'crypto';
 import logger from '../logger.js';
