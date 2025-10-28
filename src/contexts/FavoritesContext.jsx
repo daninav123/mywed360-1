@@ -1,9 +1,38 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useWedding } from '../context/WeddingContext';
+import { auth } from '../firebaseConfig';
 import axios from 'axios';
 
 const FavoritesContext = createContext();
+
+// Helper para obtener token (soporta Firebase User y sesión admin)
+async function getAuthToken() {
+  try {
+    // Intentar obtener usuario de Firebase
+    const firebaseUser = auth?.currentUser;
+
+    if (firebaseUser && typeof firebaseUser.getIdToken === 'function') {
+      return await firebaseUser.getIdToken();
+    }
+
+    // Si no hay usuario Firebase, verificar sesión admin en localStorage
+    try {
+      const adminSession = localStorage.getItem('adminSession');
+      if (adminSession) {
+        const session = JSON.parse(adminSession);
+        if (session.token) {
+          return session.token;
+        }
+      }
+    } catch {}
+
+    return null;
+  } catch (err) {
+    console.error('[FavoritesContext] Error obteniendo token:', err);
+    return null;
+  }
+}
 
 export function FavoritesProvider({ children }) {
   const { user } = useAuth();
@@ -26,7 +55,15 @@ export function FavoritesProvider({ children }) {
       setLoading(true);
       setError(null);
 
-      const token = await user.getIdToken();
+      const token = await getAuthToken();
+
+      if (!token) {
+        console.warn('[FavoritesContext] No se pudo obtener token de autenticación');
+        setFavorites([]);
+        setLoading(false);
+        return;
+      }
+
       const headers = {
         Authorization: `Bearer ${token}`,
       };
@@ -59,7 +96,12 @@ export function FavoritesProvider({ children }) {
     }
 
     try {
-      const token = await user.getIdToken();
+      const token = await getAuthToken();
+
+      if (!token) {
+        throw new Error('No se pudo obtener token de autenticación');
+      }
+
       const headers = {
         Authorization: `Bearer ${token}`,
       };
@@ -96,7 +138,12 @@ export function FavoritesProvider({ children }) {
     }
 
     try {
-      const token = await user.getIdToken();
+      const token = await getAuthToken();
+
+      if (!token) {
+        throw new Error('No se pudo obtener token de autenticación');
+      }
+
       const headers = {
         Authorization: `Bearer ${token}`,
       };
