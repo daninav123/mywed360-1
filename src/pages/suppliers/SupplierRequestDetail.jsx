@@ -204,10 +204,10 @@ Un abrazo,`
   
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--color-bg)' }}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Cargando solicitud...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto" style={{ borderColor: 'var(--color-primary)' }}></div>
+          <p className="mt-4" style={{ color: 'var(--color-muted)' }}>Cargando solicitud...</p>
         </div>
       </div>
     );
@@ -215,13 +215,14 @@ Un abrazo,`
   
   if (error || !request) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-lg shadow-lg p-8 max-w-md">
-          <h2 className="text-xl font-bold text-red-600 mb-4">Error</h2>
-          <p className="text-gray-600 mb-4">{error || 'Solicitud no encontrada'}</p>
+      <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: 'var(--color-bg)' }}>
+        <div className="rounded-lg shadow-lg p-8 max-w-md" style={{ backgroundColor: 'var(--color-surface)' }}>
+          <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--color-danger)' }}>Error</h2>
+          <p className="mb-4" style={{ color: 'var(--color-muted)' }}>{error || 'Solicitud no encontrada'}</p>
           <button
             onClick={() => navigate(`/supplier/dashboard/${id}`)}
-            className="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+            className="w-full px-4 py-2 text-white rounded-lg"
+            style={{ backgroundColor: 'var(--color-primary)' }}
           >
             Volver al Dashboard
           </button>
@@ -233,13 +234,14 @@ Un abrazo,`
   const alreadyResponded = request.status === 'responded';
   
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <div className="max-w-5xl mx-auto">
+    <div className="min-h-screen py-8 px-4" style={{ backgroundColor: 'var(--color-bg)' }}>
+      <div className="layout-container max-w-5xl">
         
         {/* Header con botón volver */}
         <button
           onClick={() => navigate(`/supplier/dashboard/${id}`)}
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6"
+          className="flex items-center gap-2 mb-6"
+          style={{ color: 'var(--color-muted)' }}
         >
           <ArrowLeft size={20} />
           Volver al Dashboard
@@ -251,29 +253,29 @@ Un abrazo,`
           <div className="lg:col-span-2 space-y-6">
             
             {/* Card principal */}
-            <div className="bg-white rounded-lg shadow-lg p-6">
+            <div className="rounded-lg shadow-lg p-6" style={{ backgroundColor: 'var(--color-surface)' }}>
               <div className="flex items-start justify-between mb-6">
                 <div>
-                  <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                  <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--color-text)' }}>
                     {request.coupleName}
                   </h1>
                   {request.status === 'new' && (
-                    <span className="inline-block px-3 py-1 bg-green-100 text-green-800 text-sm font-medium rounded-full">
+                    <span className="inline-block px-3 py-1 text-sm font-medium rounded-full" style={{ backgroundColor: 'rgba(34, 197, 94, 0.1)', color: 'var(--color-success)' }}>
                       🆕 NUEVA
                     </span>
                   )}
                   {request.status === 'viewed' && (
-                    <span className="inline-block px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
+                    <span className="inline-block px-3 py-1 text-sm font-medium rounded-full" style={{ backgroundColor: 'rgba(94, 187, 255, 0.1)', color: 'var(--color-info)' }}>
                       👁️ VISTA
                     </span>
                   )}
                   {request.status === 'responded' && (
-                    <span className="inline-block px-3 py-1 bg-gray-100 text-gray-800 text-sm font-medium rounded-full">
+                    <span className="inline-block px-3 py-1 text-sm font-medium rounded-full" style={{ backgroundColor: 'var(--color-bg)', color: 'var(--color-text)' }}>
                       ✓ RESPONDIDA
                     </span>
                   )}
                 </div>
-                <div className="text-right text-sm text-gray-500">
+                <div className="text-right text-sm" style={{ color: 'var(--color-muted)' }}>
                   <Clock size={16} className="inline mr-1" />
                   Recibida: {new Date(request.receivedAt).toLocaleString('es-ES')}
                 </div>
@@ -281,38 +283,38 @@ Un abrazo,`
               
               {/* Información de la boda */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
-                  <Calendar size={24} className="text-indigo-600" />
+                <div className="flex items-center gap-3 p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
+                  <Calendar size={24} style={{ color: 'var(--color-primary)' }} />
                   <div>
-                    <p className="text-sm text-gray-600">Fecha de la boda</p>
-                    <p className="font-semibold text-gray-900">{request.weddingDate}</p>
+                    <p className="text-sm" style={{ color: 'var(--color-muted)' }}>Fecha de la boda</p>
+                    <p className="font-semibold" style={{ color: 'var(--color-text)' }}>{request.weddingDate}</p>
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
-                  <MapPin size={24} className="text-indigo-600" />
+                <div className="flex items-center gap-3 p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
+                  <MapPin size={24} style={{ color: 'var(--color-primary)' }} />
                   <div>
-                    <p className="text-sm text-gray-600">Ubicación</p>
-                    <p className="font-semibold text-gray-900">{request.location?.city}</p>
+                    <p className="text-sm" style={{ color: 'var(--color-muted)' }}>Ubicación</p>
+                    <p className="font-semibold" style={{ color: 'var(--color-text)' }}>{request.location?.city}</p>
                   </div>
                 </div>
                 
                 {request.guestCount && (
-                  <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
-                    <Users size={24} className="text-indigo-600" />
+                  <div className="flex items-center gap-3 p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
+                    <Users size={24} style={{ color: 'var(--color-primary)' }} />
                     <div>
-                      <p className="text-sm text-gray-600">Invitados</p>
-                      <p className="font-semibold text-gray-900">{request.guestCount}</p>
+                      <p className="text-sm" style={{ color: 'var(--color-muted)' }}>Invitados</p>
+                      <p className="font-semibold" style={{ color: 'var(--color-text)' }}>{request.guestCount}</p>
                     </div>
                   </div>
                 )}
                 
                 {request.budget && (
-                  <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
-                    <Euro size={24} className="text-indigo-600" />
+                  <div className="flex items-center gap-3 p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
+                    <Euro size={24} style={{ color: 'var(--color-primary)' }} />
                     <div>
-                      <p className="text-sm text-gray-600">Presupuesto</p>
-                      <p className="font-semibold text-gray-900">
+                      <p className="text-sm" style={{ color: 'var(--color-muted)' }}>Presupuesto</p>
+                      <p className="font-semibold" style={{ color: 'var(--color-text)' }}>
                         {request.budget.min} - {request.budget.max} {request.budget.currency}
                       </p>
                     </div>
@@ -323,11 +325,11 @@ Un abrazo,`
               {/* Mensaje de la pareja */}
               {request.message && (
                 <div className="border-t pt-6">
-                  <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                  <h3 className="font-semibold mb-3 flex items-center gap-2" style={{ color: 'var(--color-text)' }}>
                     <MessageSquare size={20} />
                     Mensaje de la pareja
                   </h3>
-                  <p className="text-gray-700 whitespace-pre-wrap bg-gray-50 p-4 rounded-lg">
+                  <p className="whitespace-pre-wrap p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg)', color: 'var(--color-text)' }}>
                     {request.message}
                   </p>
                 </div>
@@ -336,22 +338,22 @@ Un abrazo,`
               {/* Respuesta enviada (si ya respondió) */}
               {alreadyResponded && request.response && (
                 <div className="border-t pt-6 mt-6">
-                  <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                    <CheckCircle size={20} className="text-green-600" />
+                  <h3 className="font-semibold mb-3 flex items-center gap-2" style={{ color: 'var(--color-text)' }}>
+                    <CheckCircle size={20} style={{ color: 'var(--color-success)' }} />
                     Tu respuesta enviada
                   </h3>
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                    <p className="text-gray-700 whitespace-pre-wrap mb-4">
+                  <div className="border rounded-lg p-4" style={{ backgroundColor: 'rgba(34, 197, 94, 0.1)', borderColor: 'var(--color-success)' }}>
+                    <p className="whitespace-pre-wrap mb-4" style={{ color: 'var(--color-text)' }}>
                       {request.response.message}
                     </p>
                     {request.response.quotedPrice && (
-                      <div className="text-sm text-gray-600">
+                      <div className="text-sm" style={{ color: 'var(--color-muted)' }}>
                         <strong>Presupuesto cotizado:</strong>{' '}
                         {request.response.quotedPrice.min} - {request.response.quotedPrice.max}{' '}
                         {request.response.quotedPrice.currency}
                       </div>
                     )}
-                    <div className="text-xs text-gray-500 mt-2">
+                    <div className="text-xs mt-2" style={{ color: 'var(--color-muted)' }}>
                       Enviado: {new Date(request.respondedAt).toLocaleString('es-ES')}
                     </div>
                   </div>
@@ -361,8 +363,8 @@ Un abrazo,`
             
             {/* Formulario de respuesta */}
             {showResponseForm && !alreadyResponded && (
-              <div className="bg-white rounded-lg shadow-lg p-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              <div className="rounded-lg shadow-lg p-6" style={{ backgroundColor: 'var(--color-surface)' }}>
+                <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--color-text)' }}>
                   Responder Solicitud
                 </h2>
                 
@@ -370,7 +372,7 @@ Un abrazo,`
                   
                   {/* Plantillas */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                    <label className="block text-sm font-medium mb-3" style={{ color: 'var(--color-text)' }}>
                       Usar plantilla (opcional)
                     </label>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -379,13 +381,13 @@ Un abrazo,`
                           key={template.id}
                           type="button"
                           onClick={() => handleApplyTemplate(template)}
-                          className={`px-4 py-3 text-left border rounded-lg hover:bg-indigo-50 transition-colors ${
-                            responseData.template === template.id
-                              ? 'border-indigo-500 bg-indigo-50'
-                              : 'border-gray-300'
-                          }`}
+                          className="px-4 py-3 text-left border rounded-lg transition-colors"
+                          style={{
+                            borderColor: responseData.template === template.id ? 'var(--color-primary)' : 'var(--color-border)',
+                            backgroundColor: responseData.template === template.id ? 'rgba(94, 187, 255, 0.1)' : 'transparent'
+                          }}
                         >
-                          <FileText size={16} className="inline mr-2 text-indigo-600" />
+                          <FileText size={16} className="inline mr-2" style={{ color: 'var(--color-primary)' }} />
                           {template.name}
                         </button>
                       ))}
@@ -394,30 +396,31 @@ Un abrazo,`
                   
                   {/* Mensaje */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text)' }}>
                       Mensaje *
                     </label>
                     <textarea
                       value={responseData.message}
                       onChange={(e) => setResponseData({ ...responseData, message: e.target.value })}
                       rows={12}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:border-transparent"
+                      style={{ borderColor: 'var(--color-border)', '--tw-ring-color': 'var(--color-primary)' }}
                       placeholder="Escribe tu respuesta personalizada..."
                       required
                     />
-                    <p className="text-sm text-gray-500 mt-1">
+                    <p className="text-sm mt-1" style={{ color: 'var(--color-muted)' }}>
                       {responseData.message.length} caracteres
                     </p>
                   </div>
                   
                   {/* Presupuesto cotizado */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                    <label className="block text-sm font-medium mb-3" style={{ color: 'var(--color-text)' }}>
                       Presupuesto cotizado (opcional)
                     </label>
                     <div className="grid grid-cols-3 gap-4">
                       <div>
-                        <label className="block text-xs text-gray-600 mb-1">Desde</label>
+                        <label className="block text-xs mb-1" style={{ color: 'var(--color-muted)' }}>Desde</label>
                         <input
                           type="number"
                           value={responseData.quotedPrice.min}
@@ -425,13 +428,14 @@ Un abrazo,`
                             ...responseData,
                             quotedPrice: { ...responseData.quotedPrice, min: e.target.value }
                           })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                          className="w-full px-3 py-2 border rounded-lg"
+                          style={{ borderColor: 'var(--color-border)' }}
                           placeholder="1500"
                           min="0"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs text-gray-600 mb-1">Hasta</label>
+                        <label className="block text-xs mb-1" style={{ color: 'var(--color-muted)' }}>Hasta</label>
                         <input
                           type="number"
                           value={responseData.quotedPrice.max}
@@ -439,20 +443,22 @@ Un abrazo,`
                             ...responseData,
                             quotedPrice: { ...responseData.quotedPrice, max: e.target.value }
                           })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                          className="w-full px-3 py-2 border rounded-lg"
+                          style={{ borderColor: 'var(--color-border)' }}
                           placeholder="2500"
                           min="0"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs text-gray-600 mb-1">Moneda</label>
+                        <label className="block text-xs mb-1" style={{ color: 'var(--color-muted)' }}>Moneda</label>
                         <select
                           value={responseData.quotedPrice.currency}
                           onChange={(e) => setResponseData({
                             ...responseData,
                             quotedPrice: { ...responseData.quotedPrice, currency: e.target.value }
                           })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                          className="w-full px-3 py-2 border rounded-lg"
+                          style={{ borderColor: 'var(--color-border)' }}
                         >
                           <option value="EUR">EUR</option>
                           <option value="USD">USD</option>
@@ -467,7 +473,8 @@ Un abrazo,`
                     <button
                       type="submit"
                       disabled={responding}
-                      className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
+                      className="flex-1 flex items-center justify-center gap-2 px-6 py-3 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
+                      style={{ backgroundColor: 'var(--color-primary)' }}
                     >
                       <Send size={20} />
                       {responding ? 'Enviando...' : 'Enviar Respuesta'}
@@ -480,18 +487,19 @@ Un abrazo,`
           
           {/* Columna derecha - Información de contacto */}
           <div className="space-y-6">
-            <div className="bg-white rounded-lg shadow-lg p-6">
-              <h3 className="font-semibold text-gray-900 mb-4">Información de Contacto</h3>
+            <div className="rounded-lg shadow-lg p-6" style={{ backgroundColor: 'var(--color-surface)' }}>
+              <h3 className="font-semibold mb-4" style={{ color: 'var(--color-text)' }}>Información de Contacto</h3>
               
               <div className="space-y-4">
                 {request.contactEmail && (
                   <div className="flex items-start gap-3">
-                    <Mail size={20} className="text-indigo-600 mt-0.5" />
+                    <Mail size={20} className="mt-0.5" style={{ color: 'var(--color-primary)' }} />
                     <div>
-                      <p className="text-sm text-gray-600">Email</p>
+                      <p className="text-sm" style={{ color: 'var(--color-muted)' }}>Email</p>
                       <a 
                         href={`mailto:${request.contactEmail}`}
-                        className="font-medium text-indigo-600 hover:underline break-all"
+                        className="font-medium hover:underline break-all"
+                        style={{ color: 'var(--color-primary)' }}
                       >
                         {request.contactEmail}
                       </a>
@@ -501,12 +509,13 @@ Un abrazo,`
                 
                 {request.contactPhone && (
                   <div className="flex items-start gap-3">
-                    <Phone size={20} className="text-indigo-600 mt-0.5" />
+                    <Phone size={20} className="mt-0.5" style={{ color: 'var(--color-primary)' }} />
                     <div>
-                      <p className="text-sm text-gray-600">Teléfono</p>
+                      <p className="text-sm" style={{ color: 'var(--color-muted)' }}>Teléfono</p>
                       <a 
                         href={`tel:${request.contactPhone}`}
-                        className="font-medium text-indigo-600 hover:underline"
+                        className="font-medium hover:underline"
+                        style={{ color: 'var(--color-primary)' }}
                       >
                         {request.contactPhone}
                       </a>
@@ -517,7 +526,7 @@ Un abrazo,`
             </div>
             
             {/* Tips */}
-            <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg shadow-lg p-6 text-white">
+            <div className="rounded-lg shadow-lg p-6 text-white" style={{ backgroundColor: 'var(--color-primary)' }}>
               <h4 className="font-semibold mb-3">💡 Consejos</h4>
               <ul className="space-y-2 text-sm">
                 <li className="flex items-start gap-2">
