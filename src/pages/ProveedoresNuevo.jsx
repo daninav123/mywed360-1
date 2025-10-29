@@ -1177,76 +1177,6 @@ const Proveedores = () => {
         </section>
       </PageWrapper>
 
-      <ServiceOptionsModal
-        open={serviceModal.open}
-        card={serviceModal.card}
-        onClose={handleCloseServiceModal}
-        t={t}
-      />
-
-      {showNewProviderForm && (
-        <Modal
-          open={showNewProviderForm}
-          onClose={() => setShowNewProviderForm(false)}
-          title={t('common.suppliers.overview.modals.newProvider.title')}
-          size="lg"
-        >
-          <ProveedorForm
-            initialData={newProviderInitial || undefined}
-            onSubmit={handleSubmitProvider}
-            onCancel={() => {
-              setShowNewProviderForm(false);
-              setNewProviderInitial(null);
-            }}
-          />
-        </Modal>
-      )}
-
-      <Modal
-        open={servicePanelView === 'board'}
-        onClose={() => setServicePanelView(null)}
-        title={t('common.suppliers.overview.modals.board.title')}
-        size="full"
-        className="max-w-6xl"
-      >
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-          <p className="text-sm text-muted">
-            {t('common.suppliers.overview.modals.board.description')}
-          </p>
-          <Button variant="outline" size="sm" onClick={() => setServicePanelView('configure')}>
-            {t('common.suppliers.configureServices')}
-          </Button>
-        </div>
-        <ServicesBoard
-          proveedores={providers || []}
-          onOpenSearch={(service) => {
-            setSearchPanelCollapsed(false);
-            if (service) {
-              setSearchInput(service);
-              setSearchTerm(service);
-              registerSearchQuery(service);
-              performSearch(service, { saveHistory: true });
-            }
-          }}
-          onOpenNew={(service) => {
-            setNewProviderInitial({ service: service || '' });
-            setShowNewProviderForm(true);
-          }}
-          onOpenAI={(service) => {
-            const base = service || '';
-            setSearchInput(base);
-            performSearch(base, { saveHistory: true });
-          }}
-        />
-      </Modal>
-
-      <WantedServicesModal
-        open={servicePanelView === 'configure'}
-        onClose={() => setServicePanelView(null)}
-        value={wantedServices}
-        onSave={handleSaveWantedServices}
-      />
-
       <Modal
         open={searchDrawerOpen}
         onClose={() => {
@@ -1358,6 +1288,57 @@ const Proveedores = () => {
         </>
         )}
       </PageWrapper>
+
+      <ServiceOptionsModal
+        open={serviceModal.open}
+        card={serviceModal.card}
+        onClose={handleCloseServiceModal}
+        t={t}
+      />
+
+      {showNewProviderForm && (
+        <Modal
+          open={showNewProviderForm}
+          onClose={() => {
+            setShowNewProviderForm(false);
+            setNewProviderInitial(null);
+          }}
+          size="xl"
+        >
+          <ProveedorForm
+            initialData={newProviderInitial}
+            onSubmit={async (data) => {
+              await addProvider(data);
+              setShowNewProviderForm(false);
+              setNewProviderInitial(null);
+            }}
+            onCancel={() => {
+              setShowNewProviderForm(false);
+              setNewProviderInitial(null);
+            }}
+          />
+        </Modal>
+      )}
+
+      <WantedServicesModal
+        open={!!servicePanelView}
+        onClose={() => setServicePanelView(null)}
+        services={wantedServices}
+        onAdd={(service) => {
+          const updated = [...wantedServices, service];
+          setWantedServices(updated);
+          saveData('wantedServices', updated).catch(() => {});
+        }}
+        onRemove={(service) => {
+          const updated = wantedServices.filter((s) => {
+            const sId = typeof s === 'string' ? s : s.id;
+            const targetId = typeof service === 'string' ? service : service.id;
+            return sId !== targetId;
+          });
+          setWantedServices(updated);
+          saveData('wantedServices', updated).catch(() => {});
+        }}
+      />
     </>
   );
 };
