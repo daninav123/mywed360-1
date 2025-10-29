@@ -619,39 +619,31 @@ router.post('/search', async (req, res) => {
           // Los filtros de contenido funcionan para TODOS los portales (bodas.net, zankyou, etc.)
           const lowQualityIndicators = [
             // Opiniones y comparativas
-            'opiniones de',
+            'opiniones de usuarios',
             'precios desde',
             'comparar precios',
-            'reseñas de',
-            'valoraciones de',
+            'reseñas verificadas',
+            'valoraciones de clientes',
 
-            // Directorios y listados
-            'encuentra los mejores',
-            'directorio de',
-            'listado de',
-            'guía de proveedores',
-            'selección de',
+            // Directorios y listados ESPECÍFICOS
+            'encuentra los mejores proveedores',
+            'directorio oficial',
+            'listado completo',
+            'guía de proveedores de',
 
-            // ⭐ NUEVO: Detectar "Los X mejores..." o "Top X..."
+            // ⭐ NUEVO: Solo filtrar títulos MUY obvios de listado
             'los 10 mejores',
             'los 5 mejores',
-            'los mejores',
-            'las mejores',
-            'mejores proveedores',
-            'mejores grupos',
-            'mejores empresas',
-            'mejores servicios',
+            'las 10 mejores',
             'top 10',
             'top 5',
-            'ranking de',
-            'clasificación de',
+            'ranking de proveedores',
+            'clasificación de empresas',
 
-            // Agregadores
-            'encuentra tu',
-            'busca el mejor',
-            'compara proveedores',
-            'todos los proveedores',
-            'proveedores de',
+            // Agregadores específicos
+            'busca y compara',
+            'compara y contrata',
+            'todos los proveedores de bodas',
           ];
 
           const hasLowQualityIndicator = lowQualityIndicators.some(
@@ -668,13 +660,13 @@ router.post('/search', async (req, res) => {
 
           // ⭐ NUEVO: Detectar si parece un listado por patrones en el título
           const listPatterns = [
-            /^\d+\s+(mejores?|top)/i, // "10 mejores...", "5 top..."
-            /(los|las)\s+\d+\s+mejores?/i, // "Los 10 mejores..."
-            /top\s+\d+/i, // "Top 10..."
-            /ranking\s+(de|del)/i, // "Ranking de..."
-            /clasificación\s+(de|del)/i, // "Clasificación de..."
-            /encuentra\s+(los|las|tu|el)/i, // "Encuentra los..."
-            /todos?\s+(los|las)\s+\w+\s+de/i, // "Todos los proveedores de..."
+            /^\d+\s+(mejores?|top)\s+(profesionales|empresas|proveedores)/i, // "10 mejores profesionales..."
+            /(los|las)\s+\d+\s+mejores?\s+(profesionales|empresas|proveedores)/i, // "Los 10 mejores proveedores..."
+            /^top\s+\d+\s+(profesionales|empresas|proveedores)/i, // "Top 10 empresas..."
+            /^ranking\s+(de|del)\s+los/i, // "Ranking de los..."
+            /^clasificación\s+(de|del)\s+los/i, // "Clasificación de los..."
+            /encuentra\s+los\s+mejores\s+(proveedores|profesionales)/i, // "Encuentra los mejores proveedores..."
+            /todos?\s+los\s+proveedores\s+de\s+bodas/i, // "Todos los proveedores de bodas"
           ];
 
           const seemsLikeListing = listPatterns.some((pattern) => pattern.test(title));
