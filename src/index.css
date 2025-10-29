@@ -4,11 +4,12 @@
 
 /* Variables de color (Claro / Oscuro) */
 :root {
-  --color-bg: #F7F1E7;
+  --color-bg: #f7f1e7;
   --color-surface: #ffffff;
   --color-text: #1f2937;
   --color-primary: #5ebbff;
   --color-accent: #5ebbff;
+  --color-on-primary: #ffffff;
   /* Extended tokens */
   --color-success: #22c55e; /* green-500 */
   --color-warning: #f59e0b; /* amber-500 */
@@ -29,6 +30,7 @@
   --color-text: #f3f4f6;
   --color-primary: #5ebbff;
   --color-accent: #5ebbff;
+  --color-on-primary: #ffffff;
   --color-success: #22c55e;
   --color-warning: #f59e0b;
   --color-danger: #ef4444;
@@ -106,6 +108,12 @@ input[type='number'] {
   }
   .bg-surface {
     background-color: var(--color-surface);
+  }
+  .bg-surface-muted {
+    background-color: color-mix(in srgb, var(--color-surface) 90%, var(--color-border) 10%);
+  }
+  .hover\:bg-surface-muted:hover {
+    background-color: color-mix(in srgb, var(--color-surface) 90%, var(--color-border) 10%);
   }
   .border-primary {
     border-color: var(--color-primary);
@@ -236,16 +244,3 @@ input[type='number'] {
     padding-right: var(--layout-padding);
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -3534,6 +3534,45 @@
           "providerError": "Error saving supplier"
         }
       },
+      "smartFilters": {
+        "title": "Smart filters",
+        "subtitle": "(from your profile)",
+        "buttons": {
+          "reset": "Reset",
+          "resetTitle": "Reset to profile values",
+          "clear": "Clear all",
+          "clearTitle": "Clear all filters"
+        },
+        "empty": {
+          "title": "We couldn't detect filters in your wedding profile.",
+          "hint": "Go to {{section}} to set budget, guests and style."
+        },
+        "fields": {
+          "budget": {
+            "label": "Budget",
+            "placeholder": "Budget",
+            "editTitle": "Edit budget"
+          },
+          "guests": {
+            "label": "Guests",
+            "placeholder": "Guests",
+            "editTitle": "Edit guest count"
+          },
+          "style": {
+            "label": "Style",
+            "placeholder": "Style",
+            "editTitle": "Edit style"
+          },
+          "location": {
+            "label": "Location",
+            "placeholder": "Location",
+            "editTitle": "Edit location"
+          }
+        },
+        "hints": {
+          "automated": "AI applied these filters automatically. Click edit to adjust them."
+        }
+      },
       "configureServices": "Configure services",
       "labels": {
         "provider": "Provider",

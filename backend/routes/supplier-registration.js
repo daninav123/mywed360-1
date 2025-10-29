@@ -7,6 +7,7 @@ import { db } from '../db.js';
 import { FieldValue } from 'firebase-admin/firestore';
 import logger from '../logger.js';
 import crypto from 'crypto';
+import { generateSupplierSlug } from '../utils/slugGenerator.js';
 
 const router = express.Router();
 
@@ -77,29 +78,8 @@ router.post('/register', express.json({ limit: '2mb' }), async (req, res) => {
       });
     }
 
-    // Generar slug único
-    const baseSlug = data.name
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '');
-
-    let slug = baseSlug;
-    let counter = 1;
-
-    // Verificar slug único
-    while (true) {
-      const slugQuery = await db
-        .collection('suppliers')
-        .where('profile.slug', '==', slug)
-        .limit(1)
-        .get();
-
-      if (slugQuery.empty) break;
-      slug = `${baseSlug}-${counter}`;
-      counter++;
-    }
+    // Generar slug único usando la utilidad centralizada
+    const slug = await generateSupplierSlug(data.name, data.location.city);
 
     // Crear documento de proveedor
     const supplierRef = db.collection('suppliers').doc();

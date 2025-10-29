@@ -1,17 +1,18 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import PageWrapper from '../components/PageWrapper';
 import Spinner from '../components/Spinner';
 import { formatDate } from '../utils/formatUtils';
 import { fetchBlogPosts } from '../services/blogContentService';
+import useTranslations from '../hooks/useTranslations';
 
 const PAGE_SIZE = 12;
 
-const ArticleCard = React.forwardRef(({ post, onOpen }, ref) => {
+const ArticleCard = React.forwardRef(({ post, onOpen, ctaLabel }, ref) => {
   const published = post?.publishedAt ? new Date(post.publishedAt) : null;
   const coverUrl = post?.coverImage?.url || post?.coverImage?.placeholder || null;
+
   return (
     <article
       ref={ref}
@@ -56,7 +57,7 @@ const ArticleCard = React.forwardRef(({ post, onOpen }, ref) => {
           </div>
         </div>
         <span className="inline-flex text-sm text-[var(--color-primary,#6366f1)] hover:text-[var(--color-primary-dark,#4f46e5)]">
-          Ver detalle
+          {ctaLabel}
         </span>
       </div>
     </article>
@@ -66,11 +67,14 @@ const ArticleCard = React.forwardRef(({ post, onOpen }, ref) => {
 ArticleCard.displayName = 'ArticleCard';
 
 function Blog() {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslations();
   const navigate = useNavigate();
+
   const normalizedLang = useMemo(() => {
     const lang = i18n.language || 'es';
-    const match = String(lang).toLowerCase().match(/^[a-z]{2}/);
+    const match = String(lang)
+      .toLowerCase()
+      .match(/^[a-z]{2}/);
     return match ? match[0] : 'es';
   }, [i18n.language]);
 
@@ -78,39 +82,46 @@ function Blog() {
   const [nextCursor, setNextCursor] = useState(null);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const [error, setError] = useState(null);
+  const [errorKey, setErrorKey] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const observerRef = useRef(null);
 
   useEffect(() => {
     let cancelled = false;
+
     async function loadInitial() {
       setLoading(true);
-      setError(null);
+      setErrorKey(null);
       setHasMore(true);
       setNextCursor(null);
       setPosts([]);
+
       try {
         const response = await fetchBlogPosts({ language: normalizedLang, limit: PAGE_SIZE });
         if (cancelled) return;
+
         const newPosts = response?.posts || [];
         setPosts(newPosts);
         setNextCursor(response?.nextCursor || null);
         setHasMore(Boolean(response?.nextCursor));
+
         if (!newPosts.length) {
-          setError('No encontramos artículos publicados todavía.');
+          setErrorKey('common.blog.errors.nonePublished');
         }
       } catch (err) {
         if (cancelled) return;
         console.error('[Blog] load initial failed', err);
-        setError('No se pudieron cargar las noticias. Vuelve a intentarlo más tarde.');
+        setErrorKey('common.blog.errors.loadFailed');
       } finally {
         if (!cancelled) {
           setLoading(false);
         }
       }
     }
+
     loadInitial();
+
     return () => {
       cancelled = true;
     };
@@ -137,9 +148,29 @@ function Blog() {
     }
   }, [hasMore, loading, nextCursor, normalizedLang]);
 
+  const isFiltering = useMemo(() => Boolean(searchTerm.trim()), [searchTerm]);
+
+  const visiblePosts = useMemo(() => {
+    if (!isFiltering) return posts;
+    const query = searchTerm.trim().toLowerCase();
+    return posts.filter((post) => {
+      const corpus = [
+        post?.title,
+        post?.excerpt,
+        (post?.tags || []).join(' '),
+        post?.content?.markdown,
+        post?.research?.summary,
+      ]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase();
+      return corpus.includes(query);
+    });
+  }, [isFiltering, posts, searchTerm]);
+
   const lastCardRef = useCallback(
     (node) => {
-      if (loading) return;
+      if (loading || isFiltering) return;
       if (observerRef.current) observerRef.current.disconnect();
       observerRef.current = new IntersectionObserver((entries) => {
         if (entries[0]?.isIntersecting) {
@@ -148,7 +179,7 @@ function Blog() {
       });
       if (node) observerRef.current.observe(node);
     },
-    [loadMore, loading],
+    [isFiltering, loadMore, loading]
   );
 
   const handleOpenPost = useCallback(
@@ -156,40 +187,64 @@ function Blog() {
       if (!post?.slug) return;
       navigate(`/blog/${post.slug}`);
     },
-    [navigate],
+    [navigate]
   );
 
-  return (
-    <PageWrapper title="Blog" className="max-w-5xl mx-auto">
-      <p className="text-sm text-gray-600 mb-6">
-        Descubre tendencias, guías y consejos para organizar tu boda con la ayuda del equipo Lovenda.
-      </p>
+  const searchQuery = searchTerm.trim();
 
-      {error ? (
+  return (
+    <PageWrapper title={t('common.blog.title')} className="max-w-5xl mx-auto">
+      <p className="text-sm text-gray-600 mb-6">{t('common.blog.lead')}</p>
+
+      <div className="mb-6">
+        <label htmlFor="blog-search" className="sr-only">
+          {t('common.blog.search.label')}
+        </label>
+        <input
+          id="blog-search"
+          type="search"
+          value={searchTerm}
+          onChange={(event) => setSearchTerm(event.target.value)}
+          placeholder={t('common.blog.search.placeholder')}
+          className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary,#6366f1)]"
+        />
+        {isFiltering ? (
+          <p className="mt-2 text-xs text-gray-500">
+            {t('common.blog.search.matches', { query: searchQuery })}
+          </p>
+        ) : null}
+      </div>
+
+      {errorKey ? (
         <div className="mb-6 rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
-          {error}
+          {t(errorKey)}
         </div>
       ) : null}
 
       <section className="grid gap-5 md:grid-cols-2">
-        {posts.map((post, index) => (
+        {visiblePosts.map((post, index) => (
           <ArticleCard
             key={post.id || post.slug || index}
             post={post}
             onOpen={handleOpenPost}
-            ref={index === posts.length - 1 ? lastCardRef : null}
+            ctaLabel={t('common.blog.card.viewDetails')}
+            ref={!isFiltering && index === visiblePosts.length - 1 ? lastCardRef : null}
           />
         ))}
       </section>
 
-      {!loading && posts.length === 0 && !error ? (
+      {!loading && visiblePosts.length === 0 && !errorKey ? (
         <div className="border border-dashed border-gray-300 rounded-md p-6 text-center text-sm text-gray-500">
-          No hay artículos disponibles todavía. Vuelve en unas horas mientras generamos nuevas historias.
+          {isFiltering ? t('common.blog.empty.filtered') : t('common.blog.empty.all')}
         </div>
       ) : null}
 
       {loading ? (
-        <div className="flex justify-center mt-8" role="status" aria-label="Cargando artículos">
+        <div
+          className="flex justify-center mt-8"
+          role="status"
+          aria-label={t('common.blog.loadingAria')}
+        >
           <Spinner />
         </div>
       ) : null}
@@ -198,4 +253,3 @@ function Blog() {
 }
 
 export default Blog;
-

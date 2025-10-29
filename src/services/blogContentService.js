@@ -26,9 +26,12 @@ export async function fetchBlogPosts(options = {}) {
   return sendRequest(url.toString().replace(window.location.origin, ''));
 }
 
-export async function fetchBlogPostBySlug(slug) {
+export async function fetchBlogPostBySlug(slug, options = {}) {
   if (!slug) throw new Error('missing-slug');
-  const url = `${BASE_URL}/${encodeURIComponent(slug)}`;
+  const urlObj = new URL(`${BASE_URL}/${encodeURIComponent(slug)}`, window.location.origin);
+  if (options.language) {
+    urlObj.searchParams.set('language', options.language);
+  }
+  const url = urlObj.toString().replace(window.location.origin, '');
   return sendRequest(url);
 }
-

@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
 
 import PageWrapper from '../components/PageWrapper';
@@ -119,9 +120,18 @@ const MarkdownRenderer = ({ markdown }) => {
 
 const BlogPost = () => {
   const { slug } = useParams();
+  const { i18n } = useTranslation();
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const normalizedLanguage = useMemo(() => {
+    const lang = i18n.language || 'es';
+    const match = String(lang)
+      .toLowerCase()
+      .match(/^[a-z]{2}/);
+    return match ? match[0] : 'es';
+  }, [i18n.language]);
 
   useEffect(() => {
     let cancelled = false;
@@ -129,7 +139,7 @@ const BlogPost = () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetchBlogPostBySlug(slug);
+        const response = await fetchBlogPostBySlug(slug, { language: normalizedLanguage });
         if (cancelled) return;
         setPost(response?.post || null);
         if (!response?.post) {
@@ -147,7 +157,7 @@ const BlogPost = () => {
     return () => {
       cancelled = true;
     };
-  }, [slug]);
+  }, [slug, normalizedLanguage]);
 
   const publishedAt = useMemo(() => {
     if (!post?.publishedAt) return null;
@@ -183,9 +193,7 @@ const BlogPost = () => {
           <header className="space-y-3">
             <h1 className="text-3xl font-semibold text-gray-900">{post.title}</h1>
             <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
-              {publishedAt ? (
-                <span>Publicado el {formatDate(publishedAt, 'long')}</span>
-              ) : null}
+              {publishedAt ? <span>Publicado el {formatDate(publishedAt, 'long')}</span> : null}
               <div className="flex flex-wrap gap-2">
                 {(post.tags || []).map((tag) => (
                   <span
@@ -219,4 +227,3 @@ const BlogPost = () => {
 };
 
 export default BlogPost;
-

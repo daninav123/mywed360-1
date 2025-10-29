@@ -8,6 +8,8 @@ import {
   ensureExcerpt,
   generateBlogArticle,
   generateCoverImageFromPrompt,
+  getSupportedBlogLanguages,
+  translateBlogArticleToLanguages,
 } from './blogAiService.js';
 import { generateDailyTopicPlan } from './blogTopicPlanner.js';
 import { researchTopic } from './blogResearchService.js';
@@ -131,10 +133,34 @@ export async function saveGeneratedBlogPost({
   const now = admin.firestore.FieldValue.serverTimestamp();
   const coverImage = applyCoverImage(aiArticle, coverGeneration, now);
 
+  const baseLanguage = (input.language || 'es').toLowerCase();
+  const supportedLanguages = getSupportedBlogLanguages();
+  const targetLanguages = supportedLanguages.filter((lang) => lang && lang !== baseLanguage);
+
+  let translationMap = {};
+  if (targetLanguages.length) {
+    const translations = await translateBlogArticleToLanguages({
+      article: aiArticle,
+      fromLanguage: baseLanguage,
+      targetLanguages,
+      tone: input.tone || (baseLanguage === 'en' ? 'warm and human' : 'cálido cercano'),
+      references: researchReferences,
+    }).catch((error) => {
+      logger.error(
+        '[blogAutomation] translations failed %s -> %s: %s',
+        baseLanguage,
+        targetLanguages.join(','),
+        error?.message || error
+      );
+      return {};
+    });
+    translationMap = translations || {};
+  }
+
   const doc = {
     title: aiArticle.title,
     slug: await ensureUniqueSlug(aiArticle.title),
-    language: input.language || 'es',
+    language: baseLanguage,
     status,
     generatedAt: now,
     updatedAt: now,
@@ -188,7 +214,16 @@ export async function saveGeneratedBlogPost({
       views: 0,
       shares: 0,
     },
+    translations: translationMap,
   };
+
+  const availableLanguages = new Set([baseLanguage]);
+  Object.entries(translationMap).forEach(([lang, value]) => {
+    if (value && value.status === 'ready') {
+      availableLanguages.add(lang);
+    }
+  });
+  doc.availableLanguages = Array.from(availableLanguages);
 
   const ref = await db.collection(BLOG_COLLECTION).add(doc);
   return ref.get();
@@ -267,7 +302,8 @@ export async function ensurePlanWindow({
         topic: entry?.topic || `Inspiración Lovenda ${key}`,
         angle: entry?.angle || '',
         keywords: entry?.keywords || [],
-        tone: entry?.tone || (languageCode === 'en' ? 'warm expert' : 'experto cercano'),
+        tone:
+          entry?.tone || (languageCode === 'en' ? 'warm human expert' : 'experto cercano y humano'),
         audience:
           entry?.audience || (languageCode === 'en' ? 'engaged couples' : 'parejas comprometidas'),
         language: languageCode,

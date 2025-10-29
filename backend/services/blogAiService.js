@@ -10,6 +10,12 @@ const OPENAI_API_KEY =
 const FALLBACK_COVER_PROMPT =
   'Editorial wedding photography, elegant pastel palette, minimal styling, soft natural light';
 const DEFAULT_IMAGE_MODEL = process.env.OPENAI_IMAGE_MODEL || 'gpt-image-1';
+const DEFAULT_TRANSLATION_MODEL =
+  process.env.OPENAI_MODEL_TRANSLATION || process.env.OPENAI_MODEL || 'gpt-4o-mini';
+const SUPPORTED_TRANSLATION_LANGUAGES = (process.env.BLOG_SUPPORTED_LANGUAGES || 'es,en,fr')
+  .split(',')
+  .map((code) => code.trim().toLowerCase())
+  .filter(Boolean);
 
 async function ensureOpenAI() {
   if (openaiClient || !OPENAI_API_KEY) return openaiClient;
@@ -45,10 +51,34 @@ const AiResponseSchema = z.object({
   coverPrompt: z.string().min(8).optional(),
 });
 
+const TranslationResponseSchema = AiResponseSchema.omit({ coverPrompt: true });
+
+function resolveLanguageDescriptor(code = '') {
+  const normalized = String(code || '').toLowerCase();
+  switch (normalized) {
+    case 'es':
+      return { code: 'es', english: 'Spanish', native: 'español' };
+    case 'en':
+      return { code: 'en', english: 'English', native: 'inglés' };
+    case 'fr':
+      return { code: 'fr', english: 'French', native: 'francés' };
+    case 'pt':
+      return { code: 'pt', english: 'Portuguese', native: 'portugués' };
+    case 'it':
+      return { code: 'it', english: 'Italian', native: 'italiano' };
+    default:
+      return {
+        code: normalized || 'es',
+        english: normalized || 'Spanish',
+        native: normalized || 'español',
+      };
+  }
+}
+
 const GenerationInputSchema = z.object({
   topic: z.string().min(6),
   language: z.string().default('es'),
-  tone: z.string().default('inspiracional'),
+  tone: z.string().default('cálido cercano'),
   length: z.enum(['corto', 'medio', 'largo', 'short', 'medium', 'long']).default('medio'),
   keywords: z.array(z.string().min(2)).max(12).optional(),
   audience: z.string().optional(),
@@ -258,14 +288,14 @@ export async function generateBlogArticle(options) {
 
     const systemPrompt =
       language === 'en'
-        ? 'You are a senior wedding editor for Lovenda. You craft helpful, actionable wedding articles with a warm expert tone. Always deliver detailed advice without inventing facts that cannot be verified.'
-        : 'Eres editor senior de bodas en Lovenda. Redactas artículos útiles y accionables con tono cálido y experto. Ofrece detalle práctico sin inventar hechos que no se puedan verificar.';
+        ? 'You are a senior wedding editor for Lovenda. You craft helpful, actionable wedding articles with a warm, empathetic tone — sounding like a trusted planner speaking directly to engaged couples. Provide vivid examples grounded in verified information and never invent facts.'
+        : 'Eres editor senior de bodas en Lovenda. Redactas artículos útiles y accionables con un tono cercano, humano y experto, como una planner de confianza que asesora a la pareja. Incluye ejemplos concretos basados en información verificada y nunca inventes datos.';
 
     const researchContext = buildResearchContext(input.research, language);
 
     const userPrompt =
       language === 'en'
-        ? `Write a complete wedding blog post about "${input.topic}". Audience: engaged couples. Target length: ${wordsRange}. Tone: ${input.tone}. ${keywordsText} If relevant, mention Spanish wedding context. Ground every fact in this research:
+        ? `Write a complete wedding blog post about "${input.topic}". Audience: engaged couples. Target length: ${wordsRange}. Tone: ${input.tone}. ${keywordsText} If relevant, mention Spanish wedding context. Use a warm, human voice that opens with an empathetic hook, sprinkles in real-life style examples, and closes with an encouraging note. Ground every fact in this research:
 ${researchContext}
 
 Return valid JSON matching this structure:
@@ -281,7 +311,7 @@ Return valid JSON matching this structure:
   "tags": ["string"],
   "coverPrompt": "string"
 }`
-        : `Redacta un artículo completo de blog de bodas sobre "${input.topic}". Público: parejas que planean su boda. Longitud objetivo: ${wordsRange}. Tono: ${input.tone}. ${keywordsText} Si procede, menciona contexto de bodas en España. Basado en esta investigación contrastada:
+        : `Redacta un artículo completo de blog de bodas sobre "${input.topic}". Público: parejas que planean su boda. Longitud objetivo: ${wordsRange}. Tono: ${input.tone}. ${keywordsText} Si procede, menciona contexto de bodas en España. Usa una voz cálida y cercana que abra con un gancho empático, incluya ejemplos reales y cierre con un mensaje de ánimo. Basado en esta investigación contrastada:
 ${researchContext}
 
 Devuelve JSON válido con esta estructura:
@@ -342,6 +372,159 @@ Devuelve JSON válido con esta estructura:
     console.error('[blogAiService] generateBlogArticle failed:', error?.message || error);
     return { ...fallbackArticle(input), source: 'error', error: error?.message || 'unknown-error' };
   }
+}
+
+export async function translateBlogArticleToLanguages({
+  article,
+  fromLanguage = 'es',
+  targetLanguages = [],
+  tone = 'cálido cercano',
+  references = [],
+} = {}) {
+  const baseSections =
+    Array.isArray(article.sections) && article.sections.length
+      ? article.sections
+      : [
+          {
+            heading: 'Contenido',
+            body: article.markdown ? article.markdown.split('\n\n') : [''],
+          },
+        ];
+  const baseTips = Array.isArray(article.tips) ? article.tips : [];
+  const baseConclusion = typeof article.conclusion === 'string' ? article.conclusion : '';
+  const baseCta = typeof article.cta === 'string' ? article.cta : '';
+  const baseTags = Array.isArray(article.tags) ? article.tags : [];
+  const baseTitle = article.title || 'Artículo de Lovenda';
+  const baseExcerpt = typeof article.excerpt === 'string' ? article.excerpt : '';
+
+  const uniqueTargets = Array.from(
+    new Set(
+      targetLanguages
+        .map((code) => code && code.toLowerCase())
+        .filter((code) => code && code !== fromLanguage.toLowerCase())
+    )
+  );
+
+  if (!uniqueTargets.length) {
+    return {};
+  }
+
+  if (!OPENAI_API_KEY) {
+    return {};
+  }
+
+  await ensureOpenAI();
+  const client = openaiClient;
+
+  const payload = {
+    title: baseTitle,
+    excerpt: baseExcerpt || '',
+    sections: baseSections,
+    tips: baseTips,
+    conclusion: baseConclusion,
+    cta: baseCta,
+  };
+
+  const results = {};
+  for (const target of uniqueTargets) {
+    const fromDescriptor = resolveLanguageDescriptor(fromLanguage);
+    const targetDescriptor = resolveLanguageDescriptor(target);
+
+    try {
+      const systemPrompt = `You are a bilingual wedding editor for Lovenda. Translate wedding content from ${fromDescriptor.english} into ${targetDescriptor.english} while keeping a warm, human, conversational tone. Preserve structure, actionable advice, and factual accuracy.`;
+
+      const userPrompt = `Translate the following Lovenda wedding article.
+Source language: ${fromDescriptor.english} (${fromDescriptor.native}).
+Target language: ${targetDescriptor.english} (${targetDescriptor.native}).
+Desired tone: ${tone}.
+Keep sections, tips, and CTA structure exactly as the source. Use natural wording that sounds like a trusted wedding planner speaking to engaged couples.
+Return valid JSON with this structure:
+{
+  "title": "string",
+  "excerpt": "string",
+  "sections": [
+    { "heading": "string", "body": ["paragraph 1", "paragraph 2"] }
+  ],
+  "tips": ["string"],
+  "conclusion": "string",
+  "cta": "string",
+  "tags": ["string"]
+}
+
+Article JSON:
+${JSON.stringify(payload, null, 2)}
+
+Useful references to keep context (do not translate URLs): ${JSON.stringify(
+        references.map((ref) => ({ title: ref.title, url: ref.url })),
+        null,
+        2
+      )}`;
+
+      const completion = await client.chat.completions.create({
+        model: DEFAULT_TRANSLATION_MODEL,
+        temperature: 0.4,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
+        ],
+      });
+
+      const text = completion.choices?.[0]?.message?.content || '';
+      const parsed = TranslationResponseSchema.safeParse(safeJsonParse(text) || {});
+      if (!parsed.success) {
+        results[target] = {
+          status: 'failed',
+          error: parsed.error.flatten?.() || 'invalid-translation-schema',
+        };
+        continue;
+      }
+
+      const translated = parsed.data;
+      const markdown = buildMarkdownFromAi(translated);
+      const excerpt = translated.excerpt ? translated.excerpt.trim() : buildExcerpt(markdown);
+
+      results[target] = {
+        status: 'ready',
+        title: translated.title.trim(),
+        excerpt,
+        content: {
+          markdown,
+          outline: translated.sections || [],
+          tips: translated.tips || [],
+          conclusion: translated.conclusion || '',
+          cta: translated.cta || '',
+          references,
+        },
+        tags: translated.tags || baseTags || [],
+        generatedAt: new Date().toISOString(),
+        provider: 'openai',
+        model: DEFAULT_TRANSLATION_MODEL,
+        raw: {
+          id: completion.id,
+          usage: completion.usage,
+        },
+      };
+    } catch (error) {
+      console.error(
+        '[blogAiService] translateBlogArticleToLanguages failed for %s -> %s: %s',
+        fromLanguage,
+        target,
+        error?.message || error
+      );
+      results[target] = {
+        status: 'failed',
+        error: error?.message || 'translation-error',
+      };
+    }
+  }
+
+  return results;
+}
+
+export function getSupportedBlogLanguages() {
+  return SUPPORTED_TRANSLATION_LANGUAGES.length
+    ? Array.from(new Set(SUPPORTED_TRANSLATION_LANGUAGES))
+    : ['es', 'en', 'fr'];
 }
 
 export function ensureExcerpt(markdown, existing) {

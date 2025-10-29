@@ -599,6 +599,45 @@
           "hintPrefix": "Haz clic en el",
           "hintSuffix": "de cualquier proveedor"
         }
+      },
+      "smartFilters": {
+        "title": "Filtros inteligentes",
+        "subtitle": "(desde tu perfil)",
+        "buttons": {
+          "reset": "Restablecer",
+          "resetTitle": "Restablecer a los valores del perfil",
+          "clear": "Limpiar todo",
+          "clearTitle": "Limpiar todos los filtros"
+        },
+        "empty": {
+          "title": "No detectamos filtros en tu perfil de boda.",
+          "hint": "Ve a {{section}} para configurar presupuesto, invitados y estilo."
+        },
+        "fields": {
+          "budget": {
+            "label": "Presupuesto",
+            "placeholder": "Presupuesto",
+            "editTitle": "Editar presupuesto"
+          },
+          "guests": {
+            "label": "Invitados",
+            "placeholder": "Invitados",
+            "editTitle": "Editar número de invitados"
+          },
+          "style": {
+            "label": "Estilo",
+            "placeholder": "Estilo",
+            "editTitle": "Editar estilo"
+          },
+          "location": {
+            "label": "Ubicación",
+            "placeholder": "Ubicación",
+            "editTitle": "Editar ubicación"
+          }
+        },
+        "hints": {
+          "automated": "La IA aplicó estos filtros automáticamente. Pulsa editar para ajustarlos."
+        }
       }
     },
     "blog": {
@@ -5119,6 +5158,83 @@
     "register": {
       "claimedSuccess": "Profile claimed successfully! You can now manage your information.",
       "registerSuccess": "Registration successful! Welcome to the platform."
+    },
+    "portfolio": {
+      "title": "Mi Portfolio",
+      "addPhoto": "Añadir Foto",
+      "uploadPhoto": "Subir Foto",
+      "editPhoto": "Editar Foto",
+      "deletePhoto": "Eliminar Foto",
+      "confirmDelete": "¿Eliminar esta foto?",
+      "photoUploaded": "Foto subida correctamente",
+      "photoUpdated": "Foto actualizada",
+      "photoDeleted": "Foto eliminada",
+      "noCoverPhoto": "No hay foto de portada",
+      "setCover": "Establecer como portada",
+      "featured": "Destacada",
+      "noPhotos": "No hay fotos todavía",
+      "uploadFirst": "Sube tu primera foto para mostrar tu trabajo",
+      "coverPhoto": "Foto de Portada",
+      "viewGrid": "Vista en cuadrícula",
+      "viewList": "Vista en lista",
+      "categories": {
+        "all": "Todas",
+        "bodas": "Bodas",
+        "decoracion": "Decoración",
+        "flores": "Flores",
+        "ceremonia": "Ceremonia",
+        "recepcion": "Recepción",
+        "otros": "Otros"
+      },
+      "stats": {
+        "views": "Vistas",
+        "likes": "Me gusta",
+        "photos": "fotos",
+        "cover": "portada"
+      },
+      "upload": {
+        "title": "Título (opcional)",
+        "description": "Descripción (opcional)",
+        "category": "Categoría",
+        "categoryRequired": "Categoría *",
+        "tags": "Tags (separados por comas)",
+        "featured": "Marcar como destacada",
+        "setCover": "Establecer como foto de portada",
+        "dragDrop": "Arrastra tu imagen aquí",
+        "clickSelect": "o haz click para seleccionar archivo",
+        "formats": "Formatos: JPG, PNG, WebP",
+        "maxSize": "Tamaño máx: 5MB",
+        "uploading": "Subiendo...",
+        "progress": "Subiendo...",
+        "changeImage": "Cambiar imagen",
+        "titlePlaceholder": "Boda de María y Juan - Valencia",
+        "descriptionPlaceholder": "Ceremonia en la playa al atardecer...",
+        "tagsPlaceholder": "atardecer, playa, ceremonia"
+      },
+      "errors": {
+        "invalidType": "Tipo de archivo inválido. Solo JPG, PNG y WebP",
+        "tooLarge": "El archivo es demasiado grande. Máximo 5MB",
+        "uploadFailed": "Error al subir la foto",
+        "loadFailed": "Error al cargar el portfolio",
+        "deleteFailed": "Error al eliminar la foto",
+        "updateFailed": "Error al actualizar la foto",
+        "noImage": "Selecciona una imagen",
+        "noCategory": "Selecciona una categoría"
+      }
+    },
+    "public": {
+      "requestQuote": "Solicitar Presupuesto",
+      "saveSupplier": "Guardar",
+      "share": "Compartir",
+      "contact": "Contacto",
+      "about": "Sobre Nosotros",
+      "portfolio": "Portfolio",
+      "reviews": "Reseñas",
+      "noPhotos": "No hay fotos todavía",
+      "noReviews": "No hay reseñas todavía",
+      "photosCount": "{{count}} fotos",
+      "allCategories": "Todas las categorías",
+      "supplierNotFound": "Proveedor no encontrado"
     }
   },
   "invitations": {

@@ -3,17 +3,13 @@ import { Sparkles, Edit2, RotateCcw, DollarSign, Users, Palette, MapPin } from '
 import Button from '../ui/Button';
 import Card from '../ui/Card';
 import Input from '../Input';
+import useTranslations from '../../hooks/useTranslations';
 
-/**
- * Helper: Detectar filtros desde el perfil de boda
- * Usa múltiples fallbacks para máxima compatibilidad con diferentes estructuras
- */
 const detectFiltersFromProfile = (weddingProfile) => {
   if (!weddingProfile) {
     return { budget: null, guests: null, style: null, location: null };
   }
 
-  // Acceder a datos que pueden estar en weddingInfo o directamente en el perfil
   const profile = weddingProfile.weddingInfo || weddingProfile;
 
   return {
@@ -40,16 +36,9 @@ const detectFiltersFromProfile = (weddingProfile) => {
   };
 };
 
-/**
- * SmartFiltersBar - Muestra y permite editar filtros inteligentes detectados por la IA
- *
- * Props:
- * - weddingProfile: Perfil de la boda con presupuesto, invitados, estilo, ubicación
- * - onFiltersChange: Callback cuando usuario cambia filtros (filters) => void
- * - className: Clases CSS adicionales
- */
 const SmartFiltersBar = ({ weddingProfile, onFiltersChange, className = '' }) => {
-  // Estado de filtros (puede ser editado por usuario)
+  const { t, format } = useTranslations();
+
   const [filters, setFilters] = useState({
     budget: null,
     guests: null,
@@ -57,7 +46,6 @@ const SmartFiltersBar = ({ weddingProfile, onFiltersChange, className = '' }) =>
     location: null,
   });
 
-  // Estado de edición (qué campo está siendo editado)
   const [editing, setEditing] = useState({
     budget: false,
     guests: false,
@@ -65,7 +53,6 @@ const SmartFiltersBar = ({ weddingProfile, onFiltersChange, className = '' }) =>
     location: false,
   });
 
-  // Valores temporales durante edición
   const [tempValues, setTempValues] = useState({
     budget: '',
     guests: '',
@@ -73,99 +60,102 @@ const SmartFiltersBar = ({ weddingProfile, onFiltersChange, className = '' }) =>
     location: '',
   });
 
-  // Inicializar filtros desde el perfil de la boda Y aplicarlos automáticamente
   useEffect(() => {
     if (!weddingProfile) {
-      console.warn('[SmartFiltersBar] No wedding profile available');
       return;
     }
 
     const detected = detectFiltersFromProfile(weddingProfile);
-
-    console.log('[SmartFiltersBar] Filtros detectados del perfil:', detected);
-    console.log('[SmartFiltersBar] Wedding profile completo:', weddingProfile);
-
     setFilters(detected);
 
-    // ✅ APLICAR AUTOMÁTICAMENTE desde el inicio
     if (onFiltersChange) {
       onFiltersChange(detected);
     }
-  }, [weddingProfile]); // Removido onFiltersChange de dependencias (es función setState estable)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [weddingProfile]);
 
-  // Manejar inicio de edición
   const handleStartEdit = (field) => {
     setEditing((prev) => ({ ...prev, [field]: true }));
     setTempValues((prev) => ({
       ...prev,
-      [field]: filters[field]?.toString() || '',
+      [field]:
+        filters[field] !== null && filters[field] !== undefined ? String(filters[field]) : '',
     }));
   };
 
-  // Manejar guardado de edición
   const handleSaveEdit = (field) => {
     const value = tempValues[field].trim();
+    let parsedValue = null;
 
-    // Convertir a número si es necesario
-    let parsedValue = value;
-    if (field === 'budget' || field === 'guests') {
-      parsedValue = value ? parseInt(value, 10) : null;
-      if (isNaN(parsedValue)) parsedValue = null;
+    if (value.length > 0) {
+      if (field === 'budget' || field === 'guests') {
+        const numericValue = Number(value);
+        parsedValue = Number.isFinite(numericValue) ? numericValue : null;
+      } else {
+        parsedValue = value;
+      }
     }
 
-    const newFilters = { ...filters, [field]: parsedValue || null };
+    const newFilters = { ...filters, [field]: parsedValue };
     setFilters(newFilters);
     setEditing((prev) => ({ ...prev, [field]: false }));
+    setTempValues((prev) => ({ ...prev, [field]: '' }));
+
     if (onFiltersChange) {
       onFiltersChange(newFilters);
     }
   };
 
-  // Manejar cancelación de edición
   const handleCancelEdit = (field) => {
     setEditing((prev) => ({ ...prev, [field]: false }));
     setTempValues((prev) => ({ ...prev, [field]: '' }));
   };
 
-  // Restablecer a valores originales del perfil
   const handleReset = () => {
     const detected = detectFiltersFromProfile(weddingProfile);
-
     setFilters(detected);
     setEditing({ budget: false, guests: false, style: false, location: false });
+    setTempValues({ budget: '', guests: '', style: '', location: '' });
+
     if (onFiltersChange) {
       onFiltersChange(detected);
     }
   };
 
-  // Limpiar todos los filtros
   const handleClear = () => {
     const empty = { budget: null, guests: null, style: null, location: null };
     setFilters(empty);
     setEditing({ budget: false, guests: false, style: false, location: false });
+    setTempValues({ budget: '', guests: '', style: '', location: '' });
+
     if (onFiltersChange) {
       onFiltersChange(empty);
     }
   };
 
-  // Mostrar siempre si hay perfil (aunque no haya filtros, para visibilidad)
-  // Usuario puede ver que la IA está activa pero sin filtros
   if (!weddingProfile) {
-    return null; // Solo ocultar si no hay perfil de boda
+    return null;
   }
 
-  // Verificar si hay al menos un filtro activo
-  const hasActiveFilters = Object.values(filters).some((value) => value !== null);
+  const hasValue = (value) => value !== null && value !== undefined && value !== '';
+  const hasActiveFilters = Object.values(filters).some((value) => hasValue(value));
+  const financeSection = t('navigation.finance');
+
+  const containerClassName =
+    `bg-gradient-to-r from-primary/5 to-accent/5 border-primary/20 ${className}`.trim();
 
   return (
-    <Card className={`bg-gradient-to-r from-primary/5 to-accent/5 border-primary/20 ${className}`}>
+    <Card className={containerClassName}>
       <div className="space-y-3">
-        {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-primary" />
-            <h3 className="font-semibold text-foreground">Filtros Inteligentes</h3>
-            <span className="text-xs text-muted">(de tu perfil)</span>
+            <h3 className="font-semibold text-foreground">
+              {t('common.suppliers.smartFilters.title')}
+            </h3>
+            <span className="text-xs text-muted">
+              {t('common.suppliers.smartFilters.subtitle')}
+            </span>
           </div>
 
           <div className="flex items-center gap-2">
@@ -173,38 +163,37 @@ const SmartFiltersBar = ({ weddingProfile, onFiltersChange, className = '' }) =>
               variant="ghost"
               size="sm"
               onClick={handleReset}
-              title="Restablecer a valores del perfil"
+              title={t('common.suppliers.smartFilters.buttons.resetTitle')}
             >
               <RotateCcw className="h-4 w-4" />
-              <span className="hidden sm:inline">Restablecer</span>
+              <span className="hidden sm:inline">
+                {t('common.suppliers.smartFilters.buttons.reset')}
+              </span>
             </Button>
             <Button
               variant="ghost"
               size="sm"
               onClick={handleClear}
-              title="Limpiar todos los filtros"
+              title={t('common.suppliers.smartFilters.buttons.clearTitle')}
             >
-              Limpiar todo
+              {t('common.suppliers.smartFilters.buttons.clear')}
             </Button>
           </div>
         </div>
 
-        {/* Mensaje si no hay filtros */}
         {!hasActiveFilters && (
           <div className="text-sm text-muted">
-            <p>⚠️ No se detectaron filtros en tu perfil de boda.</p>
+            <p>{t('common.suppliers.smartFilters.empty.title')}</p>
             <p className="mt-1">
-              Ve a <strong>Finanzas</strong> para configurar presupuesto, invitados y estilo.
+              {t('common.suppliers.smartFilters.empty.hint', { section: financeSection })}
             </p>
           </div>
         )}
 
-        {/* Filtros */}
         {hasActiveFilters && (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-              {/* Presupuesto */}
-              {filters.budget && (
+              {hasValue(filters.budget) && (
                 <div className="flex items-center gap-2 bg-surface/50 rounded-lg p-3 border border-soft">
                   <DollarSign className="h-4 w-4 text-primary flex-shrink-0" />
                   {editing.budget ? (
@@ -215,29 +204,33 @@ const SmartFiltersBar = ({ weddingProfile, onFiltersChange, className = '' }) =>
                         onChange={(e) =>
                           setTempValues((prev) => ({ ...prev, budget: e.target.value }))
                         }
-                        placeholder="Presupuesto"
+                        placeholder={t('common.suppliers.smartFilters.fields.budget.placeholder')}
                         className="h-8 text-sm"
                         autoFocus
                       />
                       <Button size="sm" onClick={() => handleSaveEdit('budget')}>
-                        ✓
+                        {t('app.save')}
                       </Button>
                       <Button size="sm" variant="ghost" onClick={() => handleCancelEdit('budget')}>
-                        ✕
+                        {t('app.cancel')}
                       </Button>
                     </div>
                   ) : (
                     <>
                       <div className="flex-1">
-                        <div className="text-xs text-muted">Presupuesto</div>
+                        <div className="text-xs text-muted">
+                          {t('common.suppliers.smartFilters.fields.budget.label')}
+                        </div>
                         <div className="font-medium text-foreground">
-                          {filters.budget.toLocaleString('es-ES')}€
+                          {format.number(Number(filters.budget))}
                         </div>
                       </div>
                       <button
+                        type="button"
                         onClick={() => handleStartEdit('budget')}
                         className="text-muted hover:text-primary transition-colors"
-                        title="Editar presupuesto"
+                        title={t('common.suppliers.smartFilters.fields.budget.editTitle')}
+                        aria-label={t('common.suppliers.smartFilters.fields.budget.editTitle')}
                       >
                         <Edit2 className="h-4 w-4" />
                       </button>
@@ -246,8 +239,7 @@ const SmartFiltersBar = ({ weddingProfile, onFiltersChange, className = '' }) =>
                 </div>
               )}
 
-              {/* Invitados */}
-              {filters.guests && (
+              {hasValue(filters.guests) && (
                 <div className="flex items-center gap-2 bg-surface/50 rounded-lg p-3 border border-soft">
                   <Users className="h-4 w-4 text-primary flex-shrink-0" />
                   {editing.guests ? (
@@ -258,27 +250,33 @@ const SmartFiltersBar = ({ weddingProfile, onFiltersChange, className = '' }) =>
                         onChange={(e) =>
                           setTempValues((prev) => ({ ...prev, guests: e.target.value }))
                         }
-                        placeholder="Invitados"
+                        placeholder={t('common.suppliers.smartFilters.fields.guests.placeholder')}
                         className="h-8 text-sm"
                         autoFocus
                       />
                       <Button size="sm" onClick={() => handleSaveEdit('guests')}>
-                        ✓
+                        {t('app.save')}
                       </Button>
                       <Button size="sm" variant="ghost" onClick={() => handleCancelEdit('guests')}>
-                        ✕
+                        {t('app.cancel')}
                       </Button>
                     </div>
                   ) : (
                     <>
                       <div className="flex-1">
-                        <div className="text-xs text-muted">Invitados</div>
-                        <div className="font-medium text-foreground">{filters.guests}</div>
+                        <div className="text-xs text-muted">
+                          {t('common.suppliers.smartFilters.fields.guests.label')}
+                        </div>
+                        <div className="font-medium text-foreground">
+                          {format.number(Number(filters.guests))}
+                        </div>
                       </div>
                       <button
+                        type="button"
                         onClick={() => handleStartEdit('guests')}
                         className="text-muted hover:text-primary transition-colors"
-                        title="Editar número de invitados"
+                        title={t('common.suppliers.smartFilters.fields.guests.editTitle')}
+                        aria-label={t('common.suppliers.smartFilters.fields.guests.editTitle')}
                       >
                         <Edit2 className="h-4 w-4" />
                       </button>
@@ -287,8 +285,7 @@ const SmartFiltersBar = ({ weddingProfile, onFiltersChange, className = '' }) =>
                 </div>
               )}
 
-              {/* Estilo */}
-              {filters.style && (
+              {hasValue(filters.style) && (
                 <div className="flex items-center gap-2 bg-surface/50 rounded-lg p-3 border border-soft">
                   <Palette className="h-4 w-4 text-primary flex-shrink-0" />
                   {editing.style ? (
@@ -299,29 +296,33 @@ const SmartFiltersBar = ({ weddingProfile, onFiltersChange, className = '' }) =>
                         onChange={(e) =>
                           setTempValues((prev) => ({ ...prev, style: e.target.value }))
                         }
-                        placeholder="Estilo"
+                        placeholder={t('common.suppliers.smartFilters.fields.style.placeholder')}
                         className="h-8 text-sm"
                         autoFocus
                       />
                       <Button size="sm" onClick={() => handleSaveEdit('style')}>
-                        ✓
+                        {t('app.save')}
                       </Button>
                       <Button size="sm" variant="ghost" onClick={() => handleCancelEdit('style')}>
-                        ✕
+                        {t('app.cancel')}
                       </Button>
                     </div>
                   ) : (
                     <>
                       <div className="flex-1">
-                        <div className="text-xs text-muted">Estilo</div>
+                        <div className="text-xs text-muted">
+                          {t('common.suppliers.smartFilters.fields.style.label')}
+                        </div>
                         <div className="font-medium text-foreground capitalize">
                           {filters.style}
                         </div>
                       </div>
                       <button
+                        type="button"
                         onClick={() => handleStartEdit('style')}
                         className="text-muted hover:text-primary transition-colors"
-                        title="Editar estilo"
+                        title={t('common.suppliers.smartFilters.fields.style.editTitle')}
+                        aria-label={t('common.suppliers.smartFilters.fields.style.editTitle')}
                       >
                         <Edit2 className="h-4 w-4" />
                       </button>
@@ -330,8 +331,7 @@ const SmartFiltersBar = ({ weddingProfile, onFiltersChange, className = '' }) =>
                 </div>
               )}
 
-              {/* Ubicación */}
-              {filters.location && (
+              {hasValue(filters.location) && (
                 <div className="flex items-center gap-2 bg-surface/50 rounded-lg p-3 border border-soft">
                   <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
                   {editing.location ? (
@@ -342,33 +342,37 @@ const SmartFiltersBar = ({ weddingProfile, onFiltersChange, className = '' }) =>
                         onChange={(e) =>
                           setTempValues((prev) => ({ ...prev, location: e.target.value }))
                         }
-                        placeholder="Ubicación"
+                        placeholder={t('common.suppliers.smartFilters.fields.location.placeholder')}
                         className="h-8 text-sm"
                         autoFocus
                       />
                       <Button size="sm" onClick={() => handleSaveEdit('location')}>
-                        ✓
+                        {t('app.save')}
                       </Button>
                       <Button
                         size="sm"
                         variant="ghost"
                         onClick={() => handleCancelEdit('location')}
                       >
-                        ✕
+                        {t('app.cancel')}
                       </Button>
                     </div>
                   ) : (
                     <>
                       <div className="flex-1">
-                        <div className="text-xs text-muted">Ubicación</div>
+                        <div className="text-xs text-muted">
+                          {t('common.suppliers.smartFilters.fields.location.label')}
+                        </div>
                         <div className="font-medium text-foreground capitalize">
                           {filters.location}
                         </div>
                       </div>
                       <button
+                        type="button"
                         onClick={() => handleStartEdit('location')}
                         className="text-muted hover:text-primary transition-colors"
-                        title="Editar ubicación"
+                        title={t('common.suppliers.smartFilters.fields.location.editTitle')}
+                        aria-label={t('common.suppliers.smartFilters.fields.location.editTitle')}
                       >
                         <Edit2 className="h-4 w-4" />
                       </button>
@@ -378,10 +382,8 @@ const SmartFiltersBar = ({ weddingProfile, onFiltersChange, className = '' }) =>
               )}
             </div>
 
-            {/* Info adicional */}
             <p className="text-xs text-muted">
-              💡 La IA aplicó estos filtros automáticamente. Click en ✏️ para cambiarlos si lo
-              deseas.
+              {t('common.suppliers.smartFilters.hints.automated')}
             </p>
           </>
         )}

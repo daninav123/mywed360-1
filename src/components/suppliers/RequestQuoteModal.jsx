@@ -64,7 +64,7 @@ const RequestQuoteModal = ({ supplier, weddingInfo, open, onClose, onSuccess }) 
 
     // Validaciones
     if (!formData.coupleName || !formData.contactEmail || !formData.message) {
-      toast.error('Por favor completa los campos obligatorios');
+      toast.error(t('common.suppliers.requestQuoteModal.validation.requiredFields'));
       return;
     }
 
@@ -84,7 +84,7 @@ const RequestQuoteModal = ({ supplier, weddingInfo, open, onClose, onSuccess }) 
       const data = await response.json();
 
       if (response.ok) {
-        toast.success('¡Solicitud enviada! El proveedor se pondrá en contacto pronto.');
+        toast.success(t('common.suppliers.requestQuoteModal.toasts.success'));
 
         if (onSuccess) {
           onSuccess(data);
@@ -92,11 +92,11 @@ const RequestQuoteModal = ({ supplier, weddingInfo, open, onClose, onSuccess }) 
 
         onClose();
       } else {
-        toast.error(data.error || 'Error al enviar la solicitud');
+        toast.error(data.error || t('common.suppliers.requestQuoteModal.toasts.error'));
       }
     } catch (error) {
       console.error('Error:', error);
-      toast.error('Error al enviar la solicitud');
+      toast.error(t('common.suppliers.requestQuoteModal.toasts.error'));
     } finally {
       setLoading(false);
     }
@@ -118,13 +118,19 @@ const RequestQuoteModal = ({ supplier, weddingInfo, open, onClose, onSuccess }) 
               />
             )}
             <div>
-              <h2 className="text-2xl font-bold text-foreground">Solicitar Presupuesto</h2>
+              <h2 className="text-2xl font-bold text-foreground">
+                {t('common.suppliers.requestQuoteModal.title')}
+              </h2>
               <p className="text-muted">
                 {supplier?.name} - {supplier?.category}
               </p>
             </div>
           </div>
-          <button onClick={onClose} className="text-muted hover:text-foreground transition-colors">
+          <button
+            onClick={onClose}
+            className="text-muted hover:text-foreground transition-colors"
+            aria-label={t('app.close')}
+          >
             <X className="h-6 w-6" />
           </button>
         </div>
@@ -134,27 +140,33 @@ const RequestQuoteModal = ({ supplier, weddingInfo, open, onClose, onSuccess }) 
           <Card className="bg-primary/5 border-primary/20">
             <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
               <Calendar className="h-5 w-5 text-primary" />
-              Información de tu Boda
+              {t('common.suppliers.requestQuoteModal.sections.eventInfo.title')}
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
-                  Nombres de la Pareja *
+                  {t(
+                    'common.suppliers.requestQuoteModal.sections.eventInfo.fields.coupleName.label'
+                  )}
                 </label>
                 <Input
                   type="text"
                   name="coupleName"
                   value={formData.coupleName}
                   onChange={handleChange}
-                  placeholder="Juan y María"
+                  placeholder={t(
+                    'common.suppliers.requestQuoteModal.sections.eventInfo.fields.coupleName.placeholder'
+                  )}
                   required
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
-                  Fecha de la Boda
+                  {t(
+                    'common.suppliers.requestQuoteModal.sections.eventInfo.fields.weddingDate.label'
+                  )}
                 </label>
                 <Input
                   type="date"
@@ -167,28 +179,34 @@ const RequestQuoteModal = ({ supplier, weddingInfo, open, onClose, onSuccess }) 
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2 flex items-center gap-2">
                   <MapPin className="h-4 w-4" />
-                  Ubicación
+                  {t('common.suppliers.requestQuoteModal.sections.eventInfo.fields.location.label')}
                 </label>
                 <Input
                   type="text"
                   name="location"
                   value={formData.location}
                   onChange={handleChange}
-                  placeholder="Valencia, España"
+                  placeholder={t(
+                    'common.suppliers.requestQuoteModal.sections.eventInfo.fields.location.placeholder'
+                  )}
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2 flex items-center gap-2">
                   <Users className="h-4 w-4" />
-                  Número de Invitados
+                  {t(
+                    'common.suppliers.requestQuoteModal.sections.eventInfo.fields.guestCount.label'
+                  )}
                 </label>
                 <Input
                   type="number"
                   name="guestCount"
                   value={formData.guestCount}
                   onChange={handleChange}
-                  placeholder="100"
+                  placeholder={t(
+                    'common.suppliers.requestQuoteModal.sections.eventInfo.fields.guestCount.placeholder'
+                  )}
                   min="1"
                 />
               </div>
@@ -196,18 +214,20 @@ const RequestQuoteModal = ({ supplier, weddingInfo, open, onClose, onSuccess }) 
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-foreground mb-2 flex items-center gap-2">
                   <DollarSign className="h-4 w-4" />
-                  Presupuesto Estimado (opcional)
+                  {t('common.suppliers.requestQuoteModal.sections.eventInfo.fields.budget.label')}
                 </label>
                 <Input
                   type="number"
                   name="budget"
                   value={formData.budget}
                   onChange={handleChange}
-                  placeholder="1500"
+                  placeholder={t(
+                    'common.suppliers.requestQuoteModal.sections.eventInfo.fields.budget.placeholder'
+                  )}
                   min="0"
                 />
                 <p className="text-xs text-muted mt-1">
-                  Esto ayuda al proveedor a ofrecerte opciones dentro de tu rango
+                  {t('common.suppliers.requestQuoteModal.sections.eventInfo.fields.budget.hint')}
                 </p>
               </div>
             </div>
@@ -217,7 +237,7 @@ const RequestQuoteModal = ({ supplier, weddingInfo, open, onClose, onSuccess }) 
           <Card>
             <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
               <Send className="h-5 w-5 text-primary" />
-              Mensaje Personalizado *
+              {t('common.suppliers.requestQuoteModal.sections.message.title')}
             </h3>
 
             <textarea
@@ -226,49 +246,57 @@ const RequestQuoteModal = ({ supplier, weddingInfo, open, onClose, onSuccess }) 
               onChange={handleChange}
               rows={6}
               className="w-full px-4 py-3 border border-border rounded-lg bg-surface text-foreground focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
-              placeholder="Describe qué servicios necesitas y cualquier detalle importante..."
+              placeholder={t('common.suppliers.requestQuoteModal.sections.message.placeholder')}
               required
             />
             <p className="text-xs text-muted mt-2">
-              💡 Tip: Sé específico sobre lo que necesitas para recibir un presupuesto más preciso
+              {t('common.suppliers.requestQuoteModal.sections.message.hint')}
             </p>
           </Card>
 
           {/* Información de Contacto */}
           <Card>
             <h3 className="text-lg font-semibold text-foreground mb-4">
-              Tu Información de Contacto *
+              {t('common.suppliers.requestQuoteModal.sections.contact.title')}
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-foreground mb-2">Email *</label>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  {t('common.suppliers.requestQuoteModal.sections.contact.fields.email.label')}
+                </label>
                 <Input
                   type="email"
                   name="contactEmail"
                   value={formData.contactEmail}
                   onChange={handleChange}
-                  placeholder="tu@email.com"
+                  placeholder={t(
+                    'common.suppliers.requestQuoteModal.sections.contact.fields.email.placeholder'
+                  )}
                   required
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
-                  Teléfono (opcional)
+                  {t('common.suppliers.requestQuoteModal.sections.contact.fields.phone.label')}
                 </label>
                 <Input
                   type="tel"
                   name="contactPhone"
                   value={formData.contactPhone}
                   onChange={handleChange}
-                  placeholder="+34 600 123 456"
+                  placeholder={t(
+                    'common.suppliers.requestQuoteModal.sections.contact.fields.phone.placeholder'
+                  )}
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
-                  Método de Contacto Preferido
+                  {t(
+                    'common.suppliers.requestQuoteModal.sections.contact.fields.preferredContactMethod.label'
+                  )}
                 </label>
                 <select
                   name="preferredContactMethod"
@@ -276,22 +304,44 @@ const RequestQuoteModal = ({ supplier, weddingInfo, open, onClose, onSuccess }) 
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-border rounded-lg bg-surface text-foreground focus:ring-2 focus:ring-primary"
                 >
-                  <option value="email">Email</option>
-                  <option value="phone">Teléfono</option>
-                  <option value="whatsapp">WhatsApp</option>
+                  <option value="email">
+                    {t(
+                      'common.suppliers.requestQuoteModal.sections.contact.fields.preferredContactMethod.options.email'
+                    )}
+                  </option>
+                  <option value="phone">
+                    {t(
+                      'common.suppliers.requestQuoteModal.sections.contact.fields.preferredContactMethod.options.phone'
+                    )}
+                  </option>
+                  <option value="whatsapp">
+                    {t(
+                      'common.suppliers.requestQuoteModal.sections.contact.fields.preferredContactMethod.options.whatsapp'
+                    )}
+                  </option>
                 </select>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-foreground mb-2">Urgencia</label>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  {t('common.suppliers.requestQuoteModal.sections.contact.fields.urgency.label')}
+                </label>
                 <select
                   name="urgency"
                   value={formData.urgency}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-border rounded-lg bg-surface text-foreground focus:ring-2 focus:ring-primary"
                 >
-                  <option value="normal">Normal</option>
-                  <option value="urgent">Urgente (menos de 1 mes)</option>
+                  <option value="normal">
+                    {t(
+                      'common.suppliers.requestQuoteModal.sections.contact.fields.urgency.options.normal'
+                    )}
+                  </option>
+                  <option value="urgent">
+                    {t(
+                      'common.suppliers.requestQuoteModal.sections.contact.fields.urgency.options.urgent'
+                    )}
+                  </option>
                 </select>
               </div>
             </div>
@@ -299,21 +349,23 @@ const RequestQuoteModal = ({ supplier, weddingInfo, open, onClose, onSuccess }) 
 
           {/* Footer con acciones */}
           <div className="flex items-center justify-between pt-4 border-t border-border">
-            <p className="text-sm text-muted">* Campos obligatorios</p>
+            <p className="text-sm text-muted">
+              {t('common.suppliers.requestQuoteModal.footer.requiredNote')}
+            </p>
             <div className="flex items-center gap-3">
               <Button type="button" variant="ghost" onClick={onClose} disabled={loading}>
-                Cancelar
+                {t('app.cancel')}
               </Button>
               <Button type="submit" disabled={loading} className="flex items-center gap-2">
                 {loading ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    Enviando...
+                    {t('common.suppliers.requestQuoteModal.footer.buttons.submitting')}
                   </>
                 ) : (
                   <>
                     <Send className="h-4 w-4" />
-                    Enviar Solicitud
+                    {t('common.suppliers.requestQuoteModal.footer.buttons.submit')}
                   </>
                 )}
               </Button>

@@ -38,6 +38,8 @@ import SupplierSetPassword from './pages/suppliers/SupplierSetPassword';
 import SupplierRegister from './pages/suppliers/SupplierRegister';
 import SupplierDashboard from './pages/suppliers/SupplierDashboard';
 import SupplierRequestDetail from './pages/suppliers/SupplierRequestDetail';
+import SupplierPortfolio from './pages/suppliers/SupplierPortfolio';
+import SupplierPublicPage from './pages/SupplierPublicPage';
 import Tasks from './pages/Tasks';
 import VerifyEmail from './pages/VerifyEmail.jsx';
 import Login from './pages/Login.jsx';
@@ -344,10 +346,12 @@ function App() {
                   <Route path="supplier/setup-password" element={<SupplierSetPassword />} />
                   <Route path="supplier/register" element={<SupplierRegister />} />
                   <Route path="supplier/dashboard/:id" element={<SupplierDashboard />} />
+                  <Route path="supplier/dashboard/:id/portfolio" element={<SupplierPortfolio />} />
                   <Route
                     path="supplier/dashboard/:id/request/:requestId"
                     element={<SupplierRequestDetail />}
                   />
+                  <Route path="proveedor/:slug" element={<SupplierPublicPage />} />
                   <Route path="supplier/:token" element={<SupplierPortal />} />
                   <Route path="invitation/:code" element={<AcceptInvitation />} />
                   <Route path="rsvp/:token" element={<RSVPConfirm />} />

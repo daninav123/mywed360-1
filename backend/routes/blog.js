@@ -20,19 +20,83 @@ function convertTimestamp(field) {
   return null;
 }
 
-function mapDoc(doc) {
+function mapDoc(doc, targetLanguage) {
   const data = doc.data() || {};
+  const translations = data.translations || {};
+  const translation =
+    targetLanguage &&
+    translations[targetLanguage] &&
+    translations[targetLanguage].status === 'ready'
+      ? translations[targetLanguage]
+      : null;
+  const baseContent = data.content || {};
+  const translatedContent = translation?.content || null;
+  const content = translatedContent
+    ? {
+        ...baseContent,
+        ...translatedContent,
+        references: translatedContent.references || baseContent.references || [],
+      }
+    : {
+        ...baseContent,
+        references: baseContent.references || [],
+      };
   return {
     id: doc.id,
-    title: data.title || '',
+    title: translation?.title || data.title || '',
     slug: data.slug || '',
-    language: data.language || 'es',
-    excerpt: data.excerpt || '',
-    content: data.content || {},
+    language: translation ? targetLanguage : data.language || 'es',
+    originalLanguage: data.language || 'es',
+    availableLanguages: data.availableLanguages || [data.language || 'es'],
+    excerpt: translation?.excerpt || data.excerpt || '',
+    content,
     coverImage: data.coverImage || null,
-    tags: data.tags || [],
+    tags:
+      (translation?.tags && translation.tags.length ? translation.tags : null) || data.tags || [],
     publishedAt: convertTimestamp(data.publishedAt),
   };
+}
+
+async function runFallbackQuery({ language, cursorRaw, limit }) {
+  const fallbackSnapshot = await db
+    .collection(BLOG_COLLECTION)
+    .where('status', '==', 'published')
+    .limit(200)
+    .get();
+
+  let posts = fallbackSnapshot.docs
+    .map((doc) => mapDoc(doc, language))
+    .filter((post) => post.publishedAt);
+
+  if (language) {
+    posts = posts.filter((post) =>
+      (post.availableLanguages || [post.language || ''])
+        .map((code) => code.toLowerCase())
+        .includes(language)
+    );
+  }
+
+  if (cursorRaw) {
+    const cursorDate = new Date(cursorRaw);
+    if (!Number.isNaN(cursorDate.getTime())) {
+      posts = posts.filter((post) => {
+        const publishedDate = new Date(post.publishedAt);
+        return publishedDate < cursorDate;
+      });
+    }
+  }
+
+  posts.sort((a, b) => {
+    const dateA = new Date(a.publishedAt).getTime();
+    const dateB = new Date(b.publishedAt).getTime();
+    return (Number.isNaN(dateB) ? 0 : dateB) - (Number.isNaN(dateA) ? 0 : dateA);
+  });
+
+  const pagePosts = posts.slice(0, limit);
+  const nextCursor =
+    pagePosts.length === limit ? pagePosts[pagePosts.length - 1].publishedAt || null : null;
+
+  return { posts: pagePosts, nextCursor };
 }
 
 router.get('/', async (req, res) => {
@@ -49,13 +113,13 @@ router.get('/', async (req, res) => {
   const buildQuery = (withLanguage) => {
     let query = baseQuery;
     if (withLanguage && language) {
-      query = query.where('language', '==', language);
+      query = query.where('availableLanguages', 'array-contains', language);
     }
     if (cursorRaw) {
       const cursorDate = new Date(cursorRaw);
       if (!Number.isNaN(cursorDate.getTime())) {
         const cursorTimestamp = admin.firestore.Timestamp.fromDate(cursorDate);
-        query = query.where('publishedAt', '<', cursorTimestamp).orderBy('publishedAt', 'desc');
+        query = query.where('publishedAt', '<', cursorTimestamp);
       }
     }
     return query.limit(limit);
@@ -63,7 +127,18 @@ router.get('/', async (req, res) => {
 
   try {
     const snapshot = await buildQuery(true).get();
-    const posts = snapshot.docs.map(mapDoc).filter((post) => post.publishedAt);
+    let posts = snapshot.docs
+      .map((doc) => mapDoc(doc, language))
+      .filter((post) => post.publishedAt);
+    if (language && posts.length === 0) {
+      const { posts: pagePosts, nextCursor } = await runFallbackQuery({
+        language,
+        cursorRaw,
+        limit,
+      });
+      res.json({ posts: pagePosts, nextCursor, fallback: true, indexError: false });
+      return;
+    }
     const nextCursor = posts.length === limit ? posts[posts.length - 1].publishedAt || null : null;
     res.json({ posts, nextCursor });
     return;
@@ -73,44 +148,12 @@ router.get('/', async (req, res) => {
     console.warn('[blog] Query fallback activado. Motivo:', error?.message || error);
 
     try {
-      const fallbackSnapshot = await db
-        .collection(BLOG_COLLECTION)
-        .where('status', '==', 'published')
-        .limit(200)
-        .get();
-
-      let posts = fallbackSnapshot.docs.map(mapDoc).filter((post) => post.publishedAt);
-
-      if (language) {
-        posts = posts.filter((post) => (post.language || '').toLowerCase() === language);
-      }
-
-      if (cursorRaw) {
-        const cursorDate = new Date(cursorRaw);
-        if (!Number.isNaN(cursorDate.getTime())) {
-          posts = posts.filter((post) => {
-            const publishedDate = new Date(post.publishedAt);
-            return publishedDate < cursorDate;
-          });
-        }
-      }
-
-      posts.sort((a, b) => {
-        const dateA = new Date(a.publishedAt).getTime();
-        const dateB = new Date(b.publishedAt).getTime();
-        return (Number.isNaN(dateB) ? 0 : dateB) - (Number.isNaN(dateA) ? 0 : dateA);
+      const { posts: pagePosts, nextCursor } = await runFallbackQuery({
+        language,
+        cursorRaw,
+        limit,
       });
-
-      const pagePosts = posts.slice(0, limit);
-      const nextCursor =
-        pagePosts.length === limit ? pagePosts[pagePosts.length - 1].publishedAt || null : null;
-
-      res.json({
-        posts: pagePosts,
-        nextCursor,
-        fallback: true,
-        indexError: isIndexError,
-      });
+      res.json({ posts: pagePosts, nextCursor, fallback: true, indexError: isIndexError });
       return;
     } catch (fallbackError) {
       console.error('[blog] Fallback query failed:', fallbackError?.message || fallbackError);
@@ -123,6 +166,8 @@ router.get('/', async (req, res) => {
 router.get('/:slug', async (req, res) => {
   try {
     const { slug } = req.params;
+    const requestedLanguageRaw =
+      typeof req.query.language === 'string' ? req.query.language.trim().toLowerCase() : '';
     if (!slug) {
       return res.status(400).json({ error: 'missing-slug' });
     }
@@ -136,7 +181,7 @@ router.get('/:slug', async (req, res) => {
       return res.status(404).json({ error: 'not-found' });
     }
     const doc = snapshot.docs[0];
-    res.json({ post: mapDoc(doc) });
+    res.json({ post: mapDoc(doc, requestedLanguageRaw || null) });
   } catch (error) {
     console.error('[blog] slug fetch failed:', error?.message || error);
     res.status(500).json({ error: 'blog-fetch-failed' });

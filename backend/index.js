@@ -82,6 +82,7 @@ import weddingNewsRouter from './routes/wedding-news.js';
 import supplierPortalRouter from './routes/supplier-portal.js';
 import supplierRegistrationRouter from './routes/supplier-registration.js';
 import supplierDashboardRouter from './routes/supplier-dashboard.js';
+import supplierPublicRouter from './routes/supplier-public.js';
 import supplierBudgetRouter from './routes/supplier-budget.js';
 import migrateSuppliersRouter from './routes/migrate-suppliers.js';
 import publicWeddingRouter from './routes/public-wedding.js';
@@ -635,6 +636,7 @@ app.use('/api/ai-suppliers-real', authMiddleware(), aiSuppliersRealRouter);
 app.use('/api/ai-suppliers-tavily', authMiddleware(), aiSuppliersTavilyRouter);
 app.use('/api/suppliers', suppliersHybridRouter); // Búsqueda pública, sin auth
 app.use('/api/suppliers', suppliersRegisterRouter); // No requiere auth para registro
+app.use('/api/suppliers', supplierPublicRouter); // Portfolio público (sin auth)
 app.use('/api/suppliers', supplierRequestsRouter); // Solicitudes de presupuesto (público)
 app.use('/api/favorites', authMiddleware(), favoritesRouter); // Favoritos requiere auth
 app.use('/api/ai/budget-estimate', authMiddleware(), aiBudgetRouter);

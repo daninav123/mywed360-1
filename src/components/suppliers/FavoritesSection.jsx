@@ -280,7 +280,7 @@ const FavoritesSection = () => {
           open={showQuoteModal}
           onClose={() => setShowQuoteModal(false)}
           onSuccess={() => {
-            toast.success('Solicitud enviada correctamente');
+            toast.success(t('common.suppliers.requestQuoteModal.toasts.success'));
           }}
         />
       )}

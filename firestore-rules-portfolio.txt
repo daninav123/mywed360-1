@@ -1,0 +1,79 @@
+// ============================================
+// REGLAS FIRESTORE PARA PORTFOLIO DE PROVEEDORES
+// ============================================
+// Agregar estas reglas al archivo firestore.rules existente
+
+// Dentro de la sección "match /suppliers/{supplierId} {"
+
+    // Portfolio del proveedor (subcolección)
+    match /portfolio/{photoId} {
+      // Lectura pública - cualquiera puede ver el portfolio
+      allow read: if true;
+      
+      // Escritura solo para el proveedor autenticado propietario
+      allow create, update, delete: if request.auth != null 
+        && request.auth.uid == get(/databases/$(database)/documents/suppliers/$(supplierId)).data.uid;
+      
+      // Validaciones de datos al crear/actualizar
+      allow create, update: if request.resource.data.keys().hasAll(['category', 'original', 'uploadedAt'])
+        && request.resource.data.category is string
+        && request.resource.data.original is string
+        && request.resource.data.uploadedAt is timestamp;
+    }
+
+// ============================================
+// ÍNDICES COMPUESTOS NECESARIOS
+// ============================================
+// Crear en Firebase Console > Firestore > Índices
+
+/*
+Colección: suppliers/{supplierId}/portfolio
+Campos indexados:
+  - category (Ascendente)
+  - uploadedAt (Descendente)
+
+Colección: suppliers/{supplierId}/portfolio
+Campos indexados:
+  - featured (Ascendente)
+  - uploadedAt (Descendente)
+
+Colección: suppliers/{supplierId}/portfolio
+Campos indexados:
+  - isCover (Ascendente)
+  - uploadedAt (Descendente)
+*/
+
+// ============================================
+// EJEMPLO COMPLETO DE REGLAS PARA SUPPLIERS
+// ============================================
+
+/*
+match /suppliers/{supplierId} {
+  // Lectura pública de perfiles de proveedores
+  allow read: if true;
+  
+  // Creación de nuevos proveedores (registro público)
+  allow create: if request.auth != null
+    && request.resource.data.keys().hasAll(['profile', 'contact', 'location'])
+    && request.resource.data.profile.registered == true;
+  
+  // Actualización solo por el propietario
+  allow update: if request.auth != null
+    && request.auth.uid == resource.data.uid;
+  
+  // Eliminación solo por el propietario o admin
+  allow delete: if request.auth != null
+    && (request.auth.uid == resource.data.uid 
+        || request.auth.token.admin == true);
+  
+  // Portfolio del proveedor (subcolección)
+  match /portfolio/{photoId} {
+    // Lectura pública
+    allow read: if true;
+    
+    // Escritura solo para el proveedor propietario
+    allow create, update, delete: if request.auth != null 
+      && request.auth.uid == get(/databases/$(database)/documents/suppliers/$(supplierId)).data.uid;
+  }
+}
+*/

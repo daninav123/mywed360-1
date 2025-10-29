@@ -101,12 +101,12 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
       await toggleFavorite(supplier);
 
       if (isFav) {
-        toast.success('❤️ Eliminado de favoritos');
+        toast.success(t('common.suppliers.card.hybrid.toasts.removed'));
       } else {
-        toast.success('❤️ Añadido a favoritos');
+        toast.success(t('common.suppliers.card.hybrid.toasts.added'));
       }
     } catch (error) {
-      toast.error(error.message || 'Error al guardar favorito');
+      toast.error(error.message || t('common.suppliers.card.hybrid.toasts.error'));
     } finally {
       setIsFavoriting(false);
     }
@@ -375,7 +375,7 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
           onClick={() => setShowDetailModal(true)}
           className="w-full py-2 px-4 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors font-medium"
         >
-          Ver detalles completos
+          {t('common.suppliers.card.hybrid.actions.viewDetails')}
         </button>
       </div>
 
@@ -399,7 +399,7 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
         open={showQuoteModal}
         onClose={() => setShowQuoteModal(false)}
         onSuccess={() => {
-          toast.success('Solicitud enviada correctamente');
+          toast.success(t('common.suppliers.requestQuoteModal.toasts.success'));
         }}
       />
     </div>
