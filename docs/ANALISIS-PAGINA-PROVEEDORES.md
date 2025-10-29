@@ -170,97 +170,105 @@ La página `/proveedores` es la principal herramienta de búsqueda y gestión de
 
 ---
 
-### 🟡 **PRIORIDAD MEDIA**
+### 🟡 **PRIORIDAD MEDIA** (Features Útiles)
 
-#### 6. **Ordenar Resultados**
+#### 6. **Ordenar Resultados** ⭐⭐⭐⭐ ALTO
 
 **Qué falta:**
 
-- Ordenar por relevancia (default)
+- Ordenar por relevancia (default) ✅ Ya existe
 - Ordenar por rating (mayor a menor)
-- Ordenar por distancia
 - Ordenar por precio (menor a mayor)
+- Ordenar por número de reseñas
 
-**Ubicación:** Añadir selector en la sección de resultados
+**Ubicación:** Añadir selector dropdown junto al filtro portfolio
 
-**Impacto:** ⭐⭐⭐ MEDIO
-
----
-
-#### 7. **Mapa de Proveedores**
-
-**Qué falta:**
-
-- Vista de mapa con marcadores de proveedores
-- Toggle entre vista grid y vista mapa
-- Integración con Google Maps o Mapbox
-
-**Impacto:** ⭐⭐⭐ MEDIO
+**Impacto:** ⭐⭐⭐⭐ ALTO  
+**Tiempo:** 1-2 horas  
+**Justificación:** Los usuarios necesitan ordenar para encontrar los mejores proveedores rápidamente
 
 ---
 
-#### 8. **Comparador de Proveedores**
+#### 7. **Comparador de Proveedores** ⭐⭐⭐ MEDIO
 
 **Qué falta:**
 
-- Checkbox en tarjetas para "Añadir a comparación"
-- Página `/proveedores/comparar` con tabla comparativa
-- Comparar: precio, servicios, rating, portfolio, etc.
+- Checkbox "Comparar" en cada tarjeta
+- Barra flotante con proveedores seleccionados (máx 3-4)
+- Página `/proveedores/comparar` con tabla lado a lado
+- Comparar: precio, rating, servicios incluidos, portfolio, reseñas
 
-**Impacto:** ⭐⭐ BAJO
+**Impacto:** ⭐⭐⭐ MEDIO  
+**Tiempo:** 2-3 horas  
+**Justificación:** Ayuda a tomar decisiones informadas comparando opciones
 
 ---
 
-#### 9. **Estadísticas de la Búsqueda**
+#### 8. **Estadísticas de Búsqueda Mejoradas** ⭐⭐ BAJO
 
 **Qué falta:**
 
-- Mostrar tiempo de búsqueda
-- Mostrar número total de resultados encontrados
-- Mostrar fuentes consultadas
+- Mostrar tiempo de búsqueda en UI
+- Badge con número total de resultados
+- Mejor visualización del breakdown actual
 
-**Impacto:** ⭐⭐ BAJO
+**Impacto:** ⭐⭐ BAJO  
+**Tiempo:** 30 minutos  
+**Justificación:** Mejora transparencia, pero no es crítico
 
----
-
-#### 10. **Guardar Búsqueda**
-
-**Qué falta:**
-
-- Botón "Guardar esta búsqueda"
-- Página `/proveedores/busquedas-guardadas`
-- Recibir alertas cuando haya nuevos proveedores
-
-**Impacto:** ⭐⭐ BAJO
+**Nota:** El breakdown ya está implementado, solo falta mejorarlo visualmente
 
 ---
 
 ### 🟢 **PRIORIDAD BAJA (Nice to Have)**
 
-#### 11. **Compartir Proveedor**
+#### 9. **Compartir Proveedor** ⭐
 
-- Botón "Compartir" que genere link
-- Share en redes sociales
+- Botón "Compartir" en tarjeta y modal
+- Generar link compartible
+- Share directo en WhatsApp (más usado)
 
-#### 12. **Notas Privadas por Proveedor**
+**Tiempo:** 30 minutos
 
-- Añadir notas en la tarjeta
-- Ver notas en el modal de detalles
+#### 10. **Notas Privadas por Proveedor** ⭐⭐
 
-#### 13. **Timeline de Contactos**
+- Campo de notas en cada proveedor guardado
+- Ver/editar notas en modal de detalles
+- Útil para recordar detalles de conversaciones
 
-- Historial de cuándo contactaste a cada proveedor
+**Tiempo:** 1-2 horas
+
+#### 11. **Timeline de Contactos** ⭐
+
+- Historial de cuándo contactaste
+- Log automático al usar botones de contacto
 - Recordatorios de seguimiento
 
-#### 14. **Integración con Calendario**
+**Tiempo:** 2-3 horas
 
-- Añadir cita con proveedor desde la tarjeta
-- Sincronizar con Google Calendar
-
-#### 15. **Recomendaciones IA**
+#### 12. **Recomendaciones IA** ⭐⭐⭐
 
 - "Proveedores recomendados para ti"
-- Basado en tu perfil de boda y búsquedas previas
+- Basado en perfil de boda + búsquedas previas
+- Análisis de similitud con otros usuarios
+
+**Tiempo:** 3-4 horas (requiere lógica IA)
+
+---
+
+### ❌ **DESCARTADO (No Necesario)**
+
+#### ~~Mapa de Proveedores~~
+
+**Razón:** Los proveedores listados ya cubren el área del evento. No aporta valor adicional.
+
+#### ~~Guardar Búsqueda~~
+
+**Razón:** Ya existe el sistema de favoritos que cubre esta necesidad.
+
+#### ~~Integración Calendario~~
+
+**Razón:** Se implementará desde la página de mails donde la IA analiza todos los correos.
 
 ---
 
@@ -280,71 +288,135 @@ La página `/proveedores` es la principal herramienta de búsqueda y gestión de
 
 ## 📝 IMPLEMENTACIÓN RECOMENDADA
 
-### **FASE 1: Links a Portfolio (1-2 horas)**
+### ✅ **FASE 1: Links a Portfolio** (COMPLETADA)
 
-1. Añadir botón "Ver Portfolio" en `SupplierCard.jsx`
-2. Añadir badge "Portfolio disponible"
-3. Link a `/proveedor/:slug`
+1. ✅ Añadir botón "Ver Portfolio" en `SupplierCard.jsx`
+2. ✅ Añadir badge "Portfolio disponible"
+3. ✅ Link a `/proveedor/:slug`
+4. ✅ Portfolio en Modal con galería
+5. ✅ Filtro "Con portfolio"
+6. ✅ Reseñas mejoradas
 
-### **FASE 2: Portfolio en Modal (2-3 horas)**
+**Estado:** 100% completado | Commit: b830e4ca
 
-1. Modificar `SupplierDetailModal.jsx`
-2. Añadir sección de galería de fotos
-3. Integrar PhotoLightbox para ver fotos grandes
+---
 
-### **FASE 3: Filtros y Orden (1-2 horas)**
+### 🎯 **FASE 2: Ordenamiento** (RECOMENDADO AHORA)
 
-1. Añadir filtro "Con portfolio"
-2. Añadir selector de ordenamiento
-3. Aplicar filtros y orden en resultados
+**Tiempo estimado:** 1-2 horas  
+**Impacto:** ⭐⭐⭐⭐ ALTO
 
-### **FASE 4: Reseñas Visibles (1 hora)**
+1. Añadir dropdown de ordenamiento
+2. Implementar lógica de sort por:
+   - Rating (mayor a menor)
+   - Precio (menor a mayor)
+   - Número de reseñas
+3. Mantener ordenamiento en paginación
 
-1. Mostrar resumen de reseñas en tarjetas
-2. Mostrar reseñas completas en modal de detalles
+**Justificación:** Feature muy solicitada y rápida de implementar
+
+---
+
+### 🔮 **FASE 3: Comparador** (Opcional)
+
+**Tiempo estimado:** 2-3 horas  
+**Impacto:** ⭐⭐⭐ MEDIO
+
+1. Checkbox "Comparar" en tarjetas
+2. Barra flotante con seleccionados
+3. Página de comparación con tabla
+4. Comparar métricas clave
+
+**Justificación:** Útil pero no crítico
+
+---
+
+### 📊 **FASE 4: Estadísticas + Nice-to-have** (Si sobra tiempo)
+
+- Mejorar visualización de estadísticas (30min)
+- Compartir proveedor (30min)
+- Notas privadas (1-2h)
+- Timeline contactos (2-3h)
+- Recomendaciones IA (3-4h)
 
 ---
 
 ## 🎯 RESUMEN EJECUTIVO
 
-### **LO MÁS URGENTE (hacer YA):**
+### ✅ **COMPLETADO (FASE 1):**
 
-1. ✅ **Link a portfolio público** - Los usuarios DEBEN poder ver portfolios
-2. ✅ **Badge "Tiene portfolio"** - Indicar visualmente qué proveedores tienen fotos
-3. ✅ **Galería en modal** - Mostrar fotos en el modal de detalles
+1. ✅ **Link a portfolio público** - Botón "Ver Portfolio" en tarjetas
+2. ✅ **Badge "Tiene portfolio"** - Badge morado con icono cámara
+3. ✅ **Galería en modal** - Grid 2x3 con lightbox integrado
+4. ✅ **Filtro "Con portfolio"** - Checkbox con contador de resultados
+5. ✅ **Reseñas mejoradas** - Estrella rellena + contador de reseñas
 
-**Tiempo estimado:** 4-6 horas  
+**Estado:** 100% completado | Commit: b830e4ca  
+**Tiempo invertido:** 4 horas  
 **Impacto:** ⭐⭐⭐⭐⭐ CRÍTICO
 
-### **LO IMPORTANTE (hacer pronto):**
+---
 
-4. Filtro "Con portfolio"
-5. Reseñas visibles en tarjetas
-6. Ordenar resultados
+### 🎯 **RECOMENDADO SIGUIENTE (FASE 2):**
 
-**Tiempo estimado:** 3-4 horas  
-**Impacto:** ⭐⭐⭐⭐ ALTO
+#### **Ordenar Resultados** ⭐⭐⭐⭐
 
-### **LO OPCIONAL (hacer después):**
+**Tiempo:** 1-2 horas  
+**Impacto:** ALTO
 
-7-15. Features adicionales (mapa, comparador, guardar búsqueda, etc.)
+Por qué es importante:
 
-**Tiempo estimado:** 10-15 horas  
-**Impacto:** ⭐⭐ BAJO-MEDIO
+- Los usuarios quieren ver primero los mejores proveedores
+- Ayuda a tomar decisiones más rápido
+- Es una feature esperada en cualquier búsqueda
+
+**Opciones de ordenamiento:**
+
+- Por rating (⭐ mayor a menor)
+- Por precio (€ menor a mayor)
+- Por número de reseñas (más popular)
+- Por relevancia (default)
 
 ---
 
-## 📊 ESTADO GENERAL
+### 🔮 **OPCIONAL (FASE 3+):**
 
-```
-Funcionalidad Core:     ████████░░ 85%
-Portfolio Integration:  ██░░░░░░░░ 20%
-Filtros Avanzados:      ██████░░░░ 65%
-UX/UI:                  ███████░░░ 75%
-─────────────────────────────────────
-TOTAL:                  ██████░░░░ 61%
-```
+- **Comparador** (2-3h) - Comparar hasta 4 proveedores lado a lado
+- **Compartir** (30min) - Botón compartir en WhatsApp
+- **Notas privadas** (1-2h) - Añadir notas personales
+- **Recomendaciones IA** (3-4h) - Sugerencias personalizadas
 
 ---
 
-**Conclusión:** La página funciona bien para búsqueda básica, pero necesita urgentemente integrar el sistema de portfolio para que los usuarios puedan ver las fotos de los proveedores registrados.
+### ❌ **DESCARTADO:**
+
+- ~~Mapa de proveedores~~ - No aporta valor (ya filtrados por zona)
+- ~~Guardar búsqueda~~ - Ya existe favoritos
+- ~~Calendario~~ - Se hará desde página de mails con IA
+
+---
+
+## 📊 ESTADO ACTUAL
+
+```
+Funcionalidad Core:            ██████████ 100% ✅
+Portfolio Integration:         ██████████ 100% ✅
+Filtros Básicos:               ██████████ 100% ✅
+UX/UI:                         █████████░  90% ✅
+Ordenamiento:                  ░░░░░░░░░░   0% ⏳
+Comparador:                    ░░░░░░░░░░   0% ⏳
+Features Adicionales:          ░░░░░░░░░░   0% ⏳
+──────────────────────────────────────────────
+TOTAL FUNCIONALIDAD CRÍTICA:   ██████████ 100% ✅
+TOTAL GENERAL:                 ████████░░  80% 🎯
+```
+
+### **Resumen:**
+
+✅ **FASE 1 COMPLETADA** - Integración portfolio (5/5 items)  
+⏳ **FASE 2 PENDIENTE** - Ordenamiento (recomendado)  
+⏳ **FASE 3+ OPCIONAL** - Comparador y extras
+
+---
+
+**Conclusión:** La página `/proveedores` tiene **toda la funcionalidad crítica implementada**. Los usuarios pueden buscar, filtrar, ver portfolios y guardar favoritos. El ordenamiento sería el siguiente paso lógico para mejorar la experiencia.
