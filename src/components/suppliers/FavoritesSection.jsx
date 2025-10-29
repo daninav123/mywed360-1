@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Heart, Filter, Download, Trash2, Search } from 'lucide-react';
+import { Heart, Filter, Download, Trash2, Search, Send } from 'lucide-react';
 import { toast } from 'react-toastify';
 
 import { useFavorites } from '../../contexts/FavoritesContext';
@@ -205,14 +205,28 @@ const FavoritesSection = () => {
                 onViewDetails={() => handleViewDetails(favorite.supplier)}
               />
 
-              <button
-                type="button"
-                onClick={() => handleRemove(favorite.id)}
-                className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors shadow-lg z-10"
-                title={t('common.suppliers.favorites.actions.removeTooltip')}
-              >
-                <Trash2 className="h-4 w-4" />
-              </button>
+              <div className="absolute top-2 right-2 flex flex-col gap-2 z-10">
+                <button
+                  type="button"
+                  onClick={() => handleRemove(favorite.id)}
+                  className="p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors shadow-lg"
+                  title={t('common.suppliers.favorites.actions.removeTooltip')}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedSupplier(favorite.supplier);
+                    setShowQuoteModal(true);
+                  }}
+                  className="p-2 bg-primary text-white rounded-full hover:bg-primary/90 transition-colors shadow-lg"
+                  title={t('common.suppliers.detail.actions.requestQuote')}
+                >
+                  <Send className="h-4 w-4" />
+                </button>
+              </div>
 
               {favorite.notes && (
                 <div className="mt-2 p-3 bg-surface rounded-lg border border-border">
