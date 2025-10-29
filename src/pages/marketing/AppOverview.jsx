@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 
@@ -41,25 +41,22 @@ const stats = [
   { value: '4.8/5', label: 'satisfacción promedio de planners' },
   { value: '30%', label: 'tiempo ahorrado en coordinación logística' },
 ];
-const overviewStructuredData = useMemo(
-  () => ({
-    '@context': 'https://schema.org',
-    '@type': 'SoftwareApplication',
-    name: 'MaLove.App',
-    description:
-      'Plataforma integral para planificar bodas con CRM de proveedores, automatizaciones y herramientas para invitados.',
-    applicationCategory: 'EventPlanningApplication',
-    operatingSystem: 'Web',
-    url: 'https://malove.app/app',
-    featureList: modules.map((module) => module.title),
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.8',
-      reviewCount: '120',
-    },
-  }),
-  []
-);
+const overviewStructuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'MaLove.App',
+  description:
+    'Plataforma integral para planificar bodas con CRM de proveedores, automatizaciones y herramientas para invitados.',
+  applicationCategory: 'EventPlanningApplication',
+  operatingSystem: 'Web',
+  url: 'https://malove.app/app',
+  featureList: modules.map((module) => module.title),
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.8',
+    reviewCount: '120',
+  },
+};
 
 const AppOverview = () => {
   return (

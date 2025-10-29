@@ -21,7 +21,21 @@ const MarketingLayout = ({ children }) => {
     () => [
       { to: '/', label: safeT('nav.home', 'Inicio') },
       { to: '/app', label: safeT('nav.app', 'La App') },
+      { to: '/para-planners', label: safeT('nav.forPlanners', 'Para planners') },
+      { to: '/para-proveedores', label: safeT('nav.forSuppliers', 'Para proveedores') },
+      { to: '/partners', label: safeT('nav.partners', 'Programa de partners') },
       { to: '/precios', label: safeT('nav.pricing', 'Precios') },
+    ],
+    [safeT]
+  );
+
+  const footerLinks = React.useMemo(
+    () => [
+      { to: '/precios', label: safeT('nav.plans', 'Planes') },
+      { to: '/para-planners', label: safeT('nav.forPlanners', 'Para planners') },
+      { to: '/para-proveedores', label: safeT('nav.forSuppliers', 'Para proveedores') },
+      { to: '/partners', label: safeT('nav.partners', 'Programa de partners') },
+      { to: '/acceso', label: safeT('nav.accessCenter', 'Centro de acceso') },
     ],
     [safeT]
   );
@@ -81,7 +95,7 @@ const MarketingLayout = ({ children }) => {
               to="/login"
               className="rounded-md px-4 py-2 text-sm font-medium text-muted transition-colors hover:text-body"
             >
-              {safeT('nav.loginShort', 'Iniciar sesion')}
+              {safeT('nav.loginShort', 'Iniciar sesión')}
             </Link>
             <Link
               to="/signup"
@@ -141,13 +155,12 @@ const MarketingLayout = ({ children }) => {
               { year: currentYear }
             )}
           </p>
-          <div className="flex flex-wrap gap-4">
-            <Link to="/precios" className="hover:text-body">
-              {safeT('nav.plans', 'Planes')}
-            </Link>
-            <Link to="/acceso" className="hover:text-body">
-              {safeT('nav.accessCenter', 'Centro de acceso')}
-            </Link>
+          <div className="flex flex-wrap items-center gap-4">
+            {footerLinks.map((link) => (
+              <Link key={link.to} to={link.to} className="hover:text-body">
+                {link.label}
+              </Link>
+            ))}
             <a
               href="mailto:hola@malove.app"
               className="hover:text-body"
@@ -163,12 +176,6 @@ const MarketingLayout = ({ children }) => {
             >
               {safeT('nav.legal', 'Legal')}
             </a>
-            <Link
-              to="/partners"
-              className="text-xs opacity-60 hover:opacity-100 hover:text-body transition-opacity"
-            >
-              Partners
-            </Link>
           </div>
         </div>
       </footer>
