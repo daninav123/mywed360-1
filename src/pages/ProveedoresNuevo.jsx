@@ -1334,21 +1334,8 @@ const Proveedores = () => {
       <WantedServicesModal
         open={!!servicePanelView}
         onClose={() => setServicePanelView(null)}
-        services={wantedServices}
-        onAdd={(service) => {
-          const updated = [...wantedServices, service];
-          setWantedServices(updated);
-          saveData('wantedServices', updated).catch(() => {});
-        }}
-        onRemove={(service) => {
-          const updated = wantedServices.filter((s) => {
-            const sId = typeof s === 'string' ? s : s.id;
-            const targetId = typeof service === 'string' ? service : service.id;
-            return sId !== targetId;
-          });
-          setWantedServices(updated);
-          saveData('wantedServices', updated).catch(() => {});
-        }}
+        value={wantedServices}
+        onSave={handleSaveWantedServices}
       />
     </>
   );
