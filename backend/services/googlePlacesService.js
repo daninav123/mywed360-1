@@ -4,44 +4,21 @@
  */
 
 import fetch from 'node-fetch';
+import {
+  getHighCoverageCategories,
+  getMediumCoverageCategories,
+  getLowCoverageCategories,
+  getGooglePlacesType,
+  findCategoryByKeyword,
+} from '../shared/supplierCategories.js';
 
 // Configuración de API
 const GOOGLE_PLACES_API_KEY = process.env.GOOGLE_PLACES_API_KEY;
 
-// Categorías con alta cobertura en Google Places
-const HIGH_COVERAGE_CATEGORIES = [
-  'salones-banquetes',
-  'restaurantes',
-  'floristerias',
-  'floristas',
-  'pasteleria',
-  'pastelerias',
-  'joyeria',
-  'joyerias',
-  'vestidos-novia',
-  'vestidos',
-  'peluqueria',
-  'peluquerias',
-  'belleza',
-  'hoteles',
-];
-
-// Categorías con cobertura media
-const MEDIUM_COVERAGE_CATEGORIES = [
-  'fotografos',
-  'fotografia',
-  'videografos',
-  'video',
-  'catering',
-  'decoracion',
-  'musica', // Añadido: grupos musicales con local
-  'musicos',
-  'orquestas',
-  'banda',
-];
-
-// Categorías con baja cobertura (mejor usar Tavily)
-const LOW_COVERAGE_CATEGORIES = ['wedding-planners', 'planners', 'dj', 'cantantes'];
+// Categorías desde archivo centralizado
+const HIGH_COVERAGE_CATEGORIES = getHighCoverageCategories().flatMap((cat) => cat.keywords);
+const MEDIUM_COVERAGE_CATEGORIES = getMediumCoverageCategories().flatMap((cat) => cat.keywords);
+const LOW_COVERAGE_CATEGORIES = getLowCoverageCategories().flatMap((cat) => cat.keywords);
 
 /**
  * Determina si debemos usar Google Places para esta categoría
@@ -61,35 +38,21 @@ function shouldUseGooglePlaces(service) {
 function mapServiceToPlaceType(service) {
   const serviceLower = (service || '').toLowerCase().trim();
 
-  const mapping = {
-    // Alta cobertura
-    'salones-banquetes': 'banquet hall',
-    restaurantes: 'restaurant',
-    floristerias: 'florist',
-    floristas: 'florist',
-    pasteleria: 'bakery',
-    pastelerias: 'bakery',
-    joyeria: 'jewelry store',
-    joyerias: 'jewelry store',
-    'vestidos-novia': 'bridal shop',
-    vestidos: 'bridal shop',
-    peluqueria: 'hair salon',
-    peluquerias: 'hair salon',
-    belleza: 'beauty salon',
-    hoteles: 'lodging',
+  // Intentar encontrar categoría por keyword
+  const category = findCategoryByKeyword(service);
+  if (category && category.googlePlacesType) {
+    return category.googlePlacesType;
+  }
 
-    // Media cobertura
+  // Fallback: mapeo manual legacy (por si acaso)
+  const legacyMapping = {
     fotografos: 'photographer',
-    fotografia: 'photographer',
     videografos: 'videographer',
-    video: 'videographer',
-    catering: 'caterer',
-    decoracion: 'event planner',
-    // Música: Sin tipo específico, búsqueda por texto
-    // musica, musicos, orquestas, banda → null para usar búsqueda de texto libre
+    musicos: null,
+    dj: null,
   };
 
-  return mapping[serviceLower] || null;
+  return legacyMapping[serviceLower] || null;
 }
 
 /**
@@ -279,6 +242,7 @@ export {
   searchGooglePlaces,
   shouldUseGooglePlaces,
   getPhotoUrl,
+  mapServiceToPlaceType,
   HIGH_COVERAGE_CATEGORIES,
   MEDIUM_COVERAGE_CATEGORIES,
   LOW_COVERAGE_CATEGORIES,
