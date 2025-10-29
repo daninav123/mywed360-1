@@ -3746,5 +3746,68 @@
   },
   "actions": {
     "close": "Close"
+  },
+  "common": {
+    "suppliers": {
+      "portfolio": {
+        "lightbox": {
+          "categories": {
+            "bodas": "Mariages",
+            "decoracion": "Décoration",
+            "flores": "Fleurs",
+            "ceremonia": "Cérémonie",
+            "recepcion": "Réception",
+            "otros": "Autres",
+            "unknown": "Sans catégorie"
+          },
+          "tooltips": {
+            "editPhoto": "Modifier la photo",
+            "cancelEdit": "Annuler la modification",
+            "deletePhoto": "Supprimer la photo"
+          },
+          "toasts": {
+            "updated": "Photo mise à jour",
+            "updateError": "Impossible de mettre à jour la photo",
+            "genericError": "Erreur inattendue lors de la mise à jour de la photo"
+          },
+          "image": {
+            "altFallback": "Photo du portfolio"
+          },
+          "tags": {
+            "featured": "Mise en avant"
+          },
+          "view": {
+            "noTitle": "Photo sans titre",
+            "categoryLabel": "Catégorie :",
+            "tagsLabel": "Tags :"
+          },
+          "meta": {
+            "uploadedAt": "Importée : {{value}}"
+          },
+          "form": {
+            "title": {
+              "label": "Titre",
+              "placeholder": "Titre de la photo"
+            },
+            "description": {
+              "label": "Description",
+              "placeholder": "Description de la photo"
+            },
+            "category": {
+              "label": "Catégorie"
+            },
+            "tags": {
+              "label": "Tags (séparés par des virgules)",
+              "placeholder": "tag1, tag2, tag3"
+            },
+            "featured": "Marquer comme mise en avant",
+            "isCover": "Définir comme photo de couverture",
+            "save": {
+              "loading": "Enregistrement..."
+            }
+          }
+        }
+      }
+    }
   }
 }

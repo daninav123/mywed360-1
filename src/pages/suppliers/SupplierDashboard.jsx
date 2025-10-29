@@ -4,15 +4,15 @@ import {
   BarChart3,
   User,
   Edit,
-  Save,
-  X,
-  Eye,
-  MousePointer,
-  Mail,
+  TrendingUp,
+  MessageSquare,
+  FileText,
+  ChevronRight,
   Camera,
   ArrowRight,
 } from 'lucide-react';
 import useTranslations from '../../hooks/useTranslations';
+import Spinner from '../../components/ui/Spinner';
 
 const PRICE_RANGE_OPTIONS = [
   { value: '', labelKey: 'common.suppliers.dashboard.profile.priceRange.placeholder' },
