@@ -1,20 +1,9 @@
 import express from 'express';
 import { db, FieldValue } from '../config/firebase.js';
 import logger from '../logger.js';
-import { createTransport } from 'nodemailer';
+import { sendEmail } from '../services/mailgunService.js';
 
 const router = express.Router();
-
-// Configurar transporter de nodemailer
-const transporter = createTransport({
-  host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: process.env.SMTP_PORT || 587,
-  secure: false,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
 
 /**
  * POST /api/suppliers/:supplierId/request-quote
@@ -215,8 +204,7 @@ router.post('/:supplierId/request-quote', express.json(), async (req, res) => {
           </html>
         `;
 
-        await transporter.sendMail({
-          from: `"MyWed360" <${process.env.SMTP_USER}>`,
+        await sendEmail({
           to: supplierEmail,
           subject: `📧 Nueva Solicitud de Presupuesto - ${coupleName}`,
           html: emailHTML,
@@ -265,8 +253,7 @@ router.post('/:supplierId/request-quote', express.json(), async (req, res) => {
         </html>
       `;
 
-      await transporter.sendMail({
-        from: `"MyWed360" <${process.env.SMTP_USER}>`,
+      await sendEmail({
         to: contactEmail,
         subject: `✅ Solicitud Enviada a ${supplierName}`,
         html: clientEmailHTML,
