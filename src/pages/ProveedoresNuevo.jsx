@@ -38,6 +38,7 @@ import SupplierCard from '../components/suppliers/SupplierCard';
 import SmartFiltersBar from '../components/suppliers/SmartFiltersBar';
 import FavoritesSection from '../components/suppliers/FavoritesSection';
 import CompareBar from '../components/suppliers/CompareBar';
+import RecommendedSuppliers from '../components/suppliers/RecommendedSuppliers';
 
 const CONFIRMED_KEYWORDS = ['confirm', 'contrat', 'reserva', 'firm'];
 
@@ -1042,6 +1043,9 @@ const Proveedores = () => {
                     error={shortlistError}
                     t={t}
                   />
+
+                  {/* Recomendaciones IA - Solo mostrar si no hay búsqueda activa */}
+                  {!aiLoading && !searchCompleted && <RecommendedSuppliers />}
 
                   {(aiLoading || searchCompleted) && (
                     <section className="space-y-3">
