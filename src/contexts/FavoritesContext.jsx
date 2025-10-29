@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useWedding } from '../context/WeddingContext';
 import { auth } from '../firebaseConfig';
@@ -37,74 +37,64 @@ async function getAuthToken() {
 
 export function FavoritesProvider({ children }) {
   const { user } = useAuth();
-  const { activeWedding } = useWedding(); // Solo necesitamos el ID (string estable)
+  const { activeWedding } = useWedding();
   const [favorites, setFavorites] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { t } = useTranslations();
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004';
+  const loadingRef = useRef(false); // Para evitar múltiples cargas simultáneas
 
-  // Cargar favoritos al iniciar
-  const loadFavorites = useCallback(async () => {
-    if (!user) {
+  // Cargar favoritos SOLO cuando cambian user o activeWedding
+  useEffect(() => {
+    // Prevenir múltiples cargas simultáneas
+    if (loadingRef.current) return;
+
+    if (!user || !activeWedding) {
       setFavorites([]);
       setLoading(false);
       return;
     }
 
-    // Solo usar activeWedding (es un string estable, no se recrea en cada render)
-    const weddingId = activeWedding;
-
-    if (!weddingId) {
-      // Silencioso en primera carga (WeddingContext aún cargando)
-      setFavorites([]);
-      setLoading(false);
-      return;
-    }
-
-    try {
+    const loadFavorites = async () => {
+      loadingRef.current = true;
       setLoading(true);
       setError(null);
 
-      const token = await getAuthToken();
+      try {
+        const token = await getAuthToken();
 
-      if (!token) {
-        console.warn(
-          '[FavoritesContext] No se pudo obtener token de autenticación, favoritos no disponibles'
-        );
-        setFavorites([]);
+        if (!token) {
+          console.warn('[FavoritesContext] No se pudo obtener token');
+          setFavorites([]);
+          return;
+        }
+
+        const headers = {
+          Authorization: `Bearer ${token}`,
+          'x-wedding-id': activeWedding,
+        };
+
+        const response = await axios.get(`${API_URL}/api/favorites`, { headers });
+        setFavorites(response.data.favorites || []);
+      } catch (err) {
+        if (err.response?.status === 401 || err.response?.status === 500) {
+          console.warn('[FavoritesContext] Favoritos no disponibles (error auth)');
+          setFavorites([]);
+        } else {
+          console.error('[FavoritesContext] Error cargando favoritos:', err);
+          setError(t('common.suppliers.favorites.errors.loadFailed'));
+          setFavorites([]);
+        }
+      } finally {
         setLoading(false);
-        return;
+        loadingRef.current = false;
       }
+    };
 
-      const headers = {
-        Authorization: `Bearer ${token}`,
-        'x-wedding-id': weddingId,
-      };
-
-      const response = await axios.get(`${API_URL}/api/favorites`, { headers });
-
-      setFavorites(response.data.favorites || []);
-    } catch (err) {
-      // Silenciosamente fallar si es un error de autenticación
-      if (err.response?.status === 401 || err.response?.status === 500) {
-        console.warn('[FavoritesContext] Favoritos no disponibles (error auth)');
-        setFavorites([]);
-      } else {
-        console.error('[FavoritesContext] Error cargando favoritos:', err);
-        setError(t('common.suppliers.favorites.errors.loadFailed'));
-        setFavorites([]);
-      }
-    } finally {
-      setLoading(false);
-    }
-  }, [user, activeWedding, API_URL, t]); // ← Removido activeWeddingData
-
-  // Cargar favoritos cuando cambia el usuario o boda
-  useEffect(() => {
     loadFavorites();
-  }, [loadFavorites]);
+  }, [user, activeWedding]); // Solo valores primitivos estables
 
   // Añadir a favoritos
   const addFavorite = async (supplier, notes = '') => {
