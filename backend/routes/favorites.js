@@ -114,26 +114,41 @@ router.post('/', async (req, res) => {
     const now = new Date();
     const expiresAt = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000); // +30 días
 
-    // Crear documento de favorito
-    const favoriteData = {
+    // Helper: Eliminar valores undefined (Firestore no los acepta)
+    const cleanObject = (obj) => {
+      if (!obj || typeof obj !== 'object') return obj;
+      const cleaned = {};
+      for (const key in obj) {
+        if (obj[key] !== undefined && obj[key] !== null) {
+          cleaned[key] =
+            typeof obj[key] === 'object' && !Array.isArray(obj[key])
+              ? cleanObject(obj[key])
+              : obj[key];
+        }
+      }
+      return cleaned;
+    };
+
+    // Crear documento de favorito (limpio de undefined)
+    const favoriteData = cleanObject({
       userId,
       weddingId,
       supplierId: supplier.id,
       supplier: {
         id: supplier.id,
-        name: supplier.name,
-        category: supplier.category,
+        name: supplier.name || 'Sin nombre',
+        category: supplier.category || 'Sin categoría',
         location: supplier.location,
         contact: supplier.contact,
         media: supplier.media,
         registered: supplier.registered || false,
         badge: supplier.badge,
-        source: supplier.source,
+        source: supplier.source || 'unknown',
       },
       notes: notes || '',
       addedAt: now.toISOString(),
       expiresAt: expiresAt.toISOString(), // ⭐ TTL de 30 días
-    };
+    });
 
     const docRef = await favoritesRef.add(favoriteData);
 
