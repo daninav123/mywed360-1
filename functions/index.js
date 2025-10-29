@@ -3,11 +3,15 @@ const createCors = require('cors');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const { authenticator } = require('otplib');
-const { z} = require('zod');
+const { z } = require('zod');
 // Usar fetch nativo de Node 18+ (Cloud Functions Node 20)
 const fetch = globalThis.fetch;
 let FormDataLib = null;
-try { FormDataLib = require('form-data'); } catch (_) { FormDataLib = null; }
+try {
+  FormDataLib = require('form-data');
+} catch (_) {
+  FormDataLib = null;
+}
 const admin = require('firebase-admin');
 // Inicializar Admin SDK solo una vez
 if (!admin.apps?.length) {
@@ -26,33 +30,33 @@ exports.onMailUpdated = functions.firestore
     const before = change.before.data();
     const after = change.after.data();
     const uid = context.params.uid;
-    
+
     console.log('[onMailUpdated] Procesando cambio', { uid, emailId: context.params.emailId });
-    
+
     try {
       // Si cambió la carpeta
       if (before.folder !== after.folder) {
         console.log('[onMailUpdated] Carpeta cambió:', before.folder, '->', after.folder);
-        
+
         // Decrementar contador de carpeta anterior
         if (before.folder) {
           await updateFolderCount(uid, before.folder, -1, before.read ? 0 : -1);
         }
-        
+
         // Incrementar contador de carpeta nueva
         if (after.folder) {
           await updateFolderCount(uid, after.folder, 1, after.read ? 0 : 1);
         }
       }
-      
+
       // Si cambió el estado de leído (dentro de la misma carpeta)
       else if (before.read !== after.read && after.folder) {
         console.log('[onMailUpdated] Estado read cambió:', before.read, '->', after.read);
-        
+
         const unreadDelta = after.read ? -1 : 1; // Si se marcó como leído, decrementar unread
         await updateFolderCount(uid, after.folder, 0, unreadDelta);
       }
-      
+
       return null;
     } catch (error) {
       console.error('[onMailUpdated] Error:', error);
@@ -70,26 +74,26 @@ exports.onMailUpdated = functions.firestore
  */
 async function updateFolderCount(uid, folder, totalDelta, unreadDelta) {
   if (!folder) return;
-  
+
   try {
     const statsRef = db.collection('emailFolderStats').doc(`${uid}_${folder}`);
-    
+
     const updates = {
       uid,
       folder,
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     };
-    
+
     if (totalDelta !== 0) {
       updates.totalCount = admin.firestore.FieldValue.increment(totalDelta);
     }
-    
+
     if (unreadDelta !== 0) {
       updates.unreadCount = admin.firestore.FieldValue.increment(unreadDelta);
     }
-    
+
     await statsRef.set(updates, { merge: true });
-    
+
     console.log(`[updateFolderCount] Actualizado ${uid}/${folder}:`, { totalDelta, unreadDelta });
   } catch (error) {
     console.error('[updateFolderCount] Error:', error);
@@ -101,17 +105,17 @@ exports.getFolderStats = functions.https.onCall(async (data, context) => {
   if (!context.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'Usuario no autenticado');
   }
-  
+
   const uid = context.auth.uid;
   const folder = data.folder || 'inbox';
-  
+
   try {
     const doc = await db.collection('emailFolderStats').doc(`${uid}_${folder}`).get();
-    
+
     if (!doc.exists) {
       return { totalCount: 0, unreadCount: 0 };
     }
-    
+
     const data = doc.data();
     return {
       totalCount: data.totalCount || 0,
@@ -148,12 +152,11 @@ const BUDGET_CATEGORY_ALIASES = new Map([
 ]);
 
 // ----- CORS estricto para Functions -----
-const DEFAULT_ALLOWED_ORIGINS = [
-  'http://localhost:5173',
-  'https://maloveapp.netlify.app',
-];
+const DEFAULT_ALLOWED_ORIGINS = ['http://localhost:5173', 'https://maloveapp.netlify.app'];
 const ALLOWED_ORIGINS = String(
-  process.env.FUNCTIONS_ALLOWED_ORIGINS || process.env.ALLOWED_ORIGIN || DEFAULT_ALLOWED_ORIGINS.join(',')
+  process.env.FUNCTIONS_ALLOWED_ORIGINS ||
+    process.env.ALLOWED_ORIGIN ||
+    DEFAULT_ALLOWED_ORIGINS.join(',')
 )
   .split(',')
   .map((s) => s.trim())
@@ -179,55 +182,34 @@ const ADMIN_EMAIL = String(
   .trim()
   .toLowerCase();
 const ADMIN_NAME =
-  process.env.ADMIN_NAME ||
-  process.env.VITE_ADMIN_NAME ||
-  'Administrador MaLoveApp';
+  process.env.ADMIN_NAME || process.env.VITE_ADMIN_NAME || 'Administrador MaLoveApp';
 const ADMIN_PASSWORD_HASH =
   process.env.ADMIN_PASSWORD_HASH || process.env.VITE_ADMIN_PASSWORD_HASH || '';
-const ADMIN_PASSWORD_FALLBACK =
-  process.env.ADMIN_PASSWORD ||
-  process.env.VITE_ADMIN_PASSWORD ||
-  '';
-const ADMIN_REQUIRE_MFA = String(
-  process.env.ADMIN_REQUIRE_MFA ||
-    process.env.VITE_ADMIN_REQUIRE_MFA ||
-    'true'
-)
-  .toLowerCase()
-  .trim() !== 'false';
-const ADMIN_MFA_SECRET =
-  process.env.ADMIN_MFA_SECRET || process.env.VITE_ADMIN_MFA_SECRET || '';
+const ADMIN_PASSWORD_FALLBACK = process.env.ADMIN_PASSWORD || process.env.VITE_ADMIN_PASSWORD || '';
+const ADMIN_REQUIRE_MFA =
+  String(process.env.ADMIN_REQUIRE_MFA || process.env.VITE_ADMIN_REQUIRE_MFA || 'true')
+    .toLowerCase()
+    .trim() !== 'false';
+const ADMIN_MFA_SECRET = process.env.ADMIN_MFA_SECRET || process.env.VITE_ADMIN_MFA_SECRET || '';
 const ADMIN_MFA_WINDOW_SECONDS = Number(
-  process.env.ADMIN_MFA_WINDOW_SECONDS ||
-    process.env.VITE_ADMIN_MFA_WINDOW_SECONDS ||
-    90
+  process.env.ADMIN_MFA_WINDOW_SECONDS || process.env.VITE_ADMIN_MFA_WINDOW_SECONDS || 90
 );
 const ADMIN_LOGIN_MAX_ATTEMPTS = Number(
-  process.env.ADMIN_LOGIN_MAX_ATTEMPTS ||
-    process.env.VITE_ADMIN_LOGIN_MAX_ATTEMPTS ||
-    5
+  process.env.ADMIN_LOGIN_MAX_ATTEMPTS || process.env.VITE_ADMIN_LOGIN_MAX_ATTEMPTS || 5
 );
 const ADMIN_LOGIN_WINDOW_MINUTES = Number(
-  process.env.ADMIN_LOGIN_WINDOW_MINUTES ||
-    process.env.VITE_ADMIN_LOGIN_WINDOW_MINUTES ||
-    60
+  process.env.ADMIN_LOGIN_WINDOW_MINUTES || process.env.VITE_ADMIN_LOGIN_WINDOW_MINUTES || 60
 );
 const ADMIN_LOGIN_LOCK_MINUTES = Number(
-  process.env.ADMIN_LOGIN_LOCK_MINUTES ||
-    process.env.VITE_ADMIN_LOGIN_LOCK_MINUTES ||
-    15
+  process.env.ADMIN_LOGIN_LOCK_MINUTES || process.env.VITE_ADMIN_LOGIN_LOCK_MINUTES || 15
 );
 const ADMIN_SESSION_TTL_MINUTES = Number(
-  process.env.ADMIN_SESSION_TTL_MINUTES ||
-    process.env.VITE_ADMIN_SESSION_TTL_MINUTES ||
-    720
+  process.env.ADMIN_SESSION_TTL_MINUTES || process.env.VITE_ADMIN_SESSION_TTL_MINUTES || 720
 );
 
 authenticator.options = {
   window: Number(
-    process.env.ADMIN_MFA_WINDOW_DRIFT ||
-      process.env.VITE_ADMIN_MFA_WINDOW_DRIFT ||
-      1
+    process.env.ADMIN_MFA_WINDOW_DRIFT || process.env.VITE_ADMIN_MFA_WINDOW_DRIFT || 1
   ),
 };
 
@@ -310,11 +292,7 @@ function getClientIp(req) {
 }
 
 function getUserAgent(req) {
-  return (
-    req.headers['user-agent'] ||
-    req.headers['User-Agent'] ||
-    'unknown'
-  );
+  return req.headers['user-agent'] || req.headers['User-Agent'] || 'unknown';
 }
 
 async function recordAdminAudit(action, payload = {}) {
@@ -341,9 +319,7 @@ async function getLoginAttemptState(email, ip) {
   if (!snapshot.exists) return { ref, locked: false, data: null };
   const data = snapshot.data() || {};
   const now = Date.now();
-  const lockedUntil = data.lockedUntil?.toMillis
-    ? data.lockedUntil.toMillis()
-    : null;
+  const lockedUntil = data.lockedUntil?.toMillis ? data.lockedUntil.toMillis() : null;
   if (lockedUntil && lockedUntil > now) {
     return {
       ref,
@@ -352,13 +328,8 @@ async function getLoginAttemptState(email, ip) {
       data,
     };
   }
-  const firstAttemptAt = data.firstAttemptAt?.toMillis
-    ? data.firstAttemptAt.toMillis()
-    : null;
-  if (
-    firstAttemptAt &&
-    now - firstAttemptAt > ADMIN_LOGIN_WINDOW_MINUTES * 60 * 1000
-  ) {
+  const firstAttemptAt = data.firstAttemptAt?.toMillis ? data.firstAttemptAt.toMillis() : null;
+  if (firstAttemptAt && now - firstAttemptAt > ADMIN_LOGIN_WINDOW_MINUTES * 60 * 1000) {
     await ref.delete().catch(() => {});
     return { ref, locked: false, data: null };
   }
@@ -369,8 +340,7 @@ async function incrementLoginFailure(email, ip) {
   const { ref, data } = await getLoginAttemptState(email, ip);
   const now = Date.now();
   const base = data || {};
-  const firstAttemptAt =
-    base.firstAttemptAt?.toMillis?.() || now;
+  const firstAttemptAt = base.firstAttemptAt?.toMillis?.() || now;
   const count = Number(base.count || 0) + 1;
   const update = {
     email,
@@ -381,12 +351,9 @@ async function incrementLoginFailure(email, ip) {
   };
 
   if (count >= ADMIN_LOGIN_MAX_ATTEMPTS) {
-    const lockedUntilDate = new Date(
-      now + ADMIN_LOGIN_LOCK_MINUTES * 60 * 1000
-    );
+    const lockedUntilDate = new Date(now + ADMIN_LOGIN_LOCK_MINUTES * 60 * 1000);
     update.count = 0;
-    update.lockedUntil =
-      admin.firestore.Timestamp.fromDate(lockedUntilDate);
+    update.lockedUntil = admin.firestore.Timestamp.fromDate(lockedUntilDate);
     await ref.set(update, { merge: true });
     return {
       locked: true,
@@ -447,16 +414,13 @@ async function createMfaChallenge(email, ip, userAgent) {
 
 async function consumeMfaChallenge(challengeId) {
   try {
-    await db
-      .collection(LOGIN_CHALLENGES_COLLECTION)
-      .doc(challengeId)
-      .set(
-        {
-          status: 'consumed',
-          consumedAt: admin.firestore.FieldValue.serverTimestamp(),
-        },
-        { merge: true }
-      );
+    await db.collection(LOGIN_CHALLENGES_COLLECTION).doc(challengeId).set(
+      {
+        status: 'consumed',
+        consumedAt: admin.firestore.FieldValue.serverTimestamp(),
+      },
+      { merge: true }
+    );
   } catch (error) {
     console.warn('[adminLogin] No se pudo marcar challenge como consumido', error);
   }
@@ -465,24 +429,25 @@ async function consumeMfaChallenge(challengeId) {
 async function createAdminSession(email, metadata = {}) {
   const sessionId = crypto.randomUUID();
   const sessionToken = crypto.randomBytes(48).toString('base64url');
-  const expiresAt = new Date(
-    Date.now() + ADMIN_SESSION_TTL_MINUTES * 60 * 1000
-  );
+  const expiresAt = new Date(Date.now() + ADMIN_SESSION_TTL_MINUTES * 60 * 1000);
   const tokenHash = hashToken(sessionToken);
 
-  await db.collection(ADMIN_SESSIONS_COLLECTION).doc(sessionId).set({
-    sessionId,
-    email,
-    tokenHash,
-    status: 'active',
-    createdAt: admin.firestore.FieldValue.serverTimestamp(),
-    expiresAt: admin.firestore.Timestamp.fromDate(expiresAt),
-    metadata: {
-      ip: metadata.ip || null,
-      userAgent: metadata.userAgent || null,
-      reason: metadata.reason || 'login',
-    },
-  });
+  await db
+    .collection(ADMIN_SESSIONS_COLLECTION)
+    .doc(sessionId)
+    .set({
+      sessionId,
+      email,
+      tokenHash,
+      status: 'active',
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      expiresAt: admin.firestore.Timestamp.fromDate(expiresAt),
+      metadata: {
+        ip: metadata.ip || null,
+        userAgent: metadata.userAgent || null,
+        reason: metadata.reason || 'login',
+      },
+    });
 
   return {
     sessionId,
@@ -519,7 +484,7 @@ async function endAdminSession(sessionToken, reason = 'logout') {
 // ----- Helpers de autenticación (Firebase ID token) -----
 const allowMockTokens = (() => {
   const v = process.env.ALLOW_MOCK_TOKENS;
-  return v ? v !== 'false' : (process.env.NODE_ENV !== 'production');
+  return v ? v !== 'false' : process.env.NODE_ENV !== 'production';
 })();
 
 function getBearerToken(req) {
@@ -529,7 +494,9 @@ function getBearerToken(req) {
     const p = String(h).split(' ');
     if (p.length !== 2 || p[0] !== 'Bearer') return null;
     return p[1];
-  } catch { return null; }
+  } catch {
+    return null;
+  }
 }
 
 async function verifyIdTokenOrMock(req) {
@@ -551,10 +518,15 @@ async function verifyIdTokenOrMock(req) {
 // Configuración para Mailgun
 // Usar variable de entorno primero; si no existe, intentar leer de funciones config y evitar TypeError
 const MAILGUN_API_KEY = process.env.MAILGUN_API_KEY || functions.config().mailgun?.key || '';
-const MAILGUN_DOMAIN = process.env.MAILGUN_DOMAIN || functions.config().mailgun?.domain || 'maloveapp.com';
+const MAILGUN_DOMAIN =
+  process.env.MAILGUN_DOMAIN || functions.config().mailgun?.domain || 'maloveapp.com';
 // Permitir sobreescribir la URL base (soporta US y EU)
-const MAILGUN_BASE_URL = process.env.MAILGUN_BASE_URL || functions.config().mailgun?.base_url || 'https://api.mailgun.net/v3';
-const MAILGUN_SIGNING_KEY = process.env.MAILGUN_SIGNING_KEY || functions.config().mailgun?.signing_key || '';
+const MAILGUN_BASE_URL =
+  process.env.MAILGUN_BASE_URL ||
+  functions.config().mailgun?.base_url ||
+  'https://api.mailgun.net/v3';
+const MAILGUN_SIGNING_KEY =
+  process.env.MAILGUN_SIGNING_KEY || functions.config().mailgun?.signing_key || '';
 
 // Función para obtener eventos de Mailgun
 exports.getMailgunEvents = functions.https.onRequest((request, response) => {
@@ -574,15 +546,15 @@ exports.getMailgunEvents = functions.https.onRequest((request, response) => {
 
       // Obtener parámetros de consulta
       const { recipient, from, event = 'delivered', limit = 50 } = request.query;
-      
+
       if (!recipient && !from) {
         return response.status(400).json({ error: 'Se requiere "recipient" o "from"' });
       }
-      
+
       // Construir URL para Mailgun
       const params = new URLSearchParams({
         event,
-        limit: String(Math.min(300, Math.max(1, Number(limit) || 50)))
+        limit: String(Math.min(300, Math.max(1, Number(limit) || 50))),
       });
       if (recipient) params.append('recipient', recipient);
       if (from) params.append('from', from);
@@ -598,29 +570,31 @@ exports.getMailgunEvents = functions.https.onRequest((request, response) => {
           targetDomain = 'mg.maloveapp.com';
         }
       }
-      
+
       // Crear autenticación Basic para Mailgun
       const auth = Buffer.from(`api:${MAILGUN_API_KEY}`).toString('base64');
-      
+
       // Hacer solicitud a Mailgun API
-      const mailgunResponse = await fetch(`${MAILGUN_BASE_URL}/${targetDomain}/events?${params.toString()}`, {
-        headers: {
-          'Authorization': `Basic ${auth}`
+      const mailgunResponse = await fetch(
+        `${MAILGUN_BASE_URL}/${targetDomain}/events?${params.toString()}`,
+        {
+          headers: {
+            Authorization: `Basic ${auth}`,
+          },
         }
-      });
-      
+      );
+
       if (!mailgunResponse.ok) {
         const errorText = await mailgunResponse.text();
         console.error('Error from Mailgun:', mailgunResponse.status, errorText);
-        return response.status(mailgunResponse.status).json({ 
+        return response.status(mailgunResponse.status).json({
           error: `Error de Mailgun: ${mailgunResponse.status}`,
-          details: errorText
+          details: errorText,
         });
       }
-      
+
       const data = await mailgunResponse.json();
       return response.json(data);
-      
     } catch (error) {
       console.error('Error processing Mailgun events request:', error);
       return response.status(500).json({ error: error.message });
@@ -641,7 +615,7 @@ exports.sendEmail = functions.https.onRequest((request, response) => {
     if (request.method !== 'POST') {
       return response.status(405).json({ error: 'Method not allowed' });
     }
-    
+
     try {
       // Requiere autenticación Firebase
       const user = await verifyIdTokenOrMock(request);
@@ -650,27 +624,35 @@ exports.sendEmail = functions.https.onRequest((request, response) => {
       }
       // Extraer datos del cuerpo
       const { from, to, subject, body, html, attachments } = request.body;
-      
+
       if (!from || !to || !subject || (!body && !html)) {
         return response.status(400).json({ error: 'Missing required fields' });
       }
-      
+
       // Construir formData para Mailgun
-            // Crear autenticación Basic para Mailgun
+      // Crear autenticación Basic para Mailgun
       const auth = Buffer.from(`api:${MAILGUN_API_KEY}`).toString('base64');
 
       // Si hay adjuntos, usar multipart/form-data con descarga de URLs
       const hasAttachments = Array.isArray(attachments) && attachments.length > 0;
       let mailgunResponse;
       if (hasAttachments && FormDataLib) {
-        const ATTACHMENT_MAX_BYTES = Number(process.env.EMAIL_ATTACHMENT_MAX_BYTES || 5 * 1024 * 1024);
+        const ATTACHMENT_MAX_BYTES = Number(
+          process.env.EMAIL_ATTACHMENT_MAX_BYTES || 5 * 1024 * 1024
+        );
         const ATTACHMENT_TIMEOUT_MS = Number(process.env.EMAIL_ATTACHMENT_TIMEOUT_MS || 10000);
         const DEFAULT_ALLOWED_MIME = [
           'application/pdf',
-          'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml',
+          'image/jpeg',
+          'image/png',
+          'image/gif',
+          'image/webp',
+          'image/svg+xml',
           'text/plain',
         ];
-        const ALLOWED_MIME = String(process.env.EMAIL_ATTACHMENT_ALLOWED_MIME || DEFAULT_ALLOWED_MIME.join(','))
+        const ALLOWED_MIME = String(
+          process.env.EMAIL_ATTACHMENT_ALLOWED_MIME || DEFAULT_ALLOWED_MIME.join(',')
+        )
           .split(',')
           .map((s) => s.trim().toLowerCase())
           .filter(Boolean);
@@ -707,20 +689,36 @@ exports.sendEmail = functions.https.onRequest((request, response) => {
               if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
               // Validar tipo MIME permitido
               let ctype = '';
-              try { ctype = (resp.headers && (resp.headers.get ? resp.headers.get('content-type') : resp.headers['content-type'])) || ''; } catch {}
-              const baseType = String(ctype || '').split(';')[0].trim().toLowerCase();
+              try {
+                ctype =
+                  (resp.headers &&
+                    (resp.headers.get
+                      ? resp.headers.get('content-type')
+                      : resp.headers['content-type'])) ||
+                  '';
+              } catch {}
+              const baseType = String(ctype || '')
+                .split(';')[0]
+                .trim()
+                .toLowerCase();
               const inferred = baseType || inferMimeFromName(filename || att.url || '');
               if (ALLOWED_MIME.length && inferred && !ALLOWED_MIME.includes(inferred)) {
                 throw new Error(`Attachment content-type not allowed: ${inferred}`);
               }
-              const lenHeader = resp.headers?.get ? resp.headers.get('content-length') : (resp.headers && resp.headers['content-length']);
+              const lenHeader = resp.headers?.get
+                ? resp.headers.get('content-length')
+                : resp.headers && resp.headers['content-length'];
               const contentLength = Number(lenHeader || 0);
               if (contentLength && contentLength > ATTACHMENT_MAX_BYTES) {
-                throw new Error(`Attachment too large (${contentLength} > ${ATTACHMENT_MAX_BYTES})`);
+                throw new Error(
+                  `Attachment too large (${contentLength} > ${ATTACHMENT_MAX_BYTES})`
+                );
               }
               const buf = Buffer.from(await resp.arrayBuffer());
               if (buf.length > ATTACHMENT_MAX_BYTES) {
-                throw new Error(`Attachment too large after download (${buf.length} > ${ATTACHMENT_MAX_BYTES})`);
+                throw new Error(
+                  `Attachment too large after download (${buf.length} > ${ATTACHMENT_MAX_BYTES})`
+                );
               }
               form.append('attachment', buf, { filename });
             } catch (e) {
@@ -732,10 +730,10 @@ exports.sendEmail = functions.https.onRequest((request, response) => {
         mailgunResponse = await fetch(`${MAILGUN_BASE_URL}/${MAILGUN_DOMAIN}/messages`, {
           method: 'POST',
           headers: {
-            'Authorization': `Basic ${auth}`,
-            ...form.getHeaders()
+            Authorization: `Basic ${auth}`,
+            ...form.getHeaders(),
           },
-          body: form
+          body: form,
         });
       } else {
         const formData = new URLSearchParams();
@@ -747,25 +745,24 @@ exports.sendEmail = functions.https.onRequest((request, response) => {
         mailgunResponse = await fetch(`${MAILGUN_BASE_URL}/${MAILGUN_DOMAIN}/messages`, {
           method: 'POST',
           headers: {
-            'Authorization': `Basic ${auth}`,
-            'Content-Type': 'application/x-www-form-urlencoded'
+            Authorization: `Basic ${auth}`,
+            'Content-Type': 'application/x-www-form-urlencoded',
           },
-          body: formData.toString()
+          body: formData.toString(),
         });
-      };
-      
+      }
+
       if (!mailgunResponse.ok) {
         const errorText = await mailgunResponse.text();
         console.error('Error from Mailgun:', mailgunResponse.status, errorText);
-        return response.status(mailgunResponse.status).json({ 
+        return response.status(mailgunResponse.status).json({
           error: `Error de Mailgun: ${mailgunResponse.status}`,
-          details: errorText
+          details: errorText,
         });
       }
-      
+
       const data = await mailgunResponse.json();
       return response.json(data);
-      
     } catch (error) {
       console.error('Error sending email:', error);
       return response.status(500).json({ error: error.message });
@@ -781,9 +778,7 @@ exports.adminLogin = functions.https.onRequest((request, response) => {
       return response.status(204).send('');
     }
     if (request.method !== 'POST') {
-      return response
-        .status(405)
-        .json({ success: false, code: 'method_not_allowed' });
+      return response.status(405).json({ success: false, code: 'method_not_allowed' });
     }
 
     let payload = request.body;
@@ -827,8 +822,7 @@ exports.adminLogin = functions.https.onRequest((request, response) => {
       return response.status(429).json({
         success: false,
         code: 'locked',
-        message:
-          'Acceso bloqueado temporalmente. Inténtalo de nuevo en unos minutos.',
+        message: 'Acceso bloqueado temporalmente. Inténtalo de nuevo en unos minutos.',
         lockedUntil: toIsoDate(lockStatus.lockedUntil),
       });
     }
@@ -876,9 +870,7 @@ exports.adminLogin = functions.https.onRequest((request, response) => {
 
     if (ADMIN_REQUIRE_MFA) {
       if (!ADMIN_MFA_SECRET) {
-        console.error(
-          '[adminLogin] MFA requerido pero ADMIN_MFA_SECRET no está configurado'
-        );
+        console.error('[adminLogin] MFA requerido pero ADMIN_MFA_SECRET no está configurado');
         return response.status(500).json({
           success: false,
           code: 'mfa_not_configured',
@@ -942,9 +934,7 @@ exports.adminLoginMfa = functions.https.onRequest((request, response) => {
       return response.status(204).send('');
     }
     if (request.method !== 'POST') {
-      return response
-        .status(405)
-        .json({ success: false, code: 'method_not_allowed' });
+      return response.status(405).json({ success: false, code: 'method_not_allowed' });
     }
 
     let payload = request.body;
@@ -1048,8 +1038,7 @@ exports.adminLoginMfa = functions.https.onRequest((request, response) => {
       });
     }
 
-    const validMfa =
-      !ADMIN_REQUIRE_MFA || authenticator.check(code, ADMIN_MFA_SECRET);
+    const validMfa = !ADMIN_REQUIRE_MFA || authenticator.check(code, ADMIN_MFA_SECRET);
 
     if (!validMfa) {
       await challengeRef.set(
@@ -1129,9 +1118,7 @@ exports.adminLogout = functions.https.onRequest((request, response) => {
       return response.status(204).send('');
     }
     if (request.method !== 'POST') {
-      return response
-        .status(405)
-        .json({ success: false, code: 'method_not_allowed' });
+      return response.status(405).json({ success: false, code: 'method_not_allowed' });
     }
 
     let payload = request.body;
@@ -1202,28 +1189,32 @@ exports.mailgunWebhook = functions.https.onRequest((request, response) => {
       if (MAILGUN_SIGNING_KEY) {
         for (const evt of events) {
           const sig = evt?.signature;
-        if (!sig) {
-          console.warn('Webhook Mailgun sin firma');
-          return response.status(401).json({ error: 'Missing signature' });
-        }
-        const signed = String(sig.signature || '');
-        const token = String(sig.token || '');
-        const timestamp = String(sig.timestamp || '');
-        const hmac = crypto
-          .createHmac('sha256', MAILGUN_SIGNING_KEY)
-          .update(timestamp + token)
-          .digest('hex');
-        const ok = signed && hmac && signed.length === hmac.length && crypto.timingSafeEqual(Buffer.from(signed), Buffer.from(hmac));
-        if (!ok) {
-          console.warn('Webhook Mailgun firma inválida');
-          return response.status(401).json({ error: 'Invalid signature' });
-        }
+          if (!sig) {
+            console.warn('Webhook Mailgun sin firma');
+            return response.status(401).json({ error: 'Missing signature' });
+          }
+          const signed = String(sig.signature || '');
+          const token = String(sig.token || '');
+          const timestamp = String(sig.timestamp || '');
+          const hmac = crypto
+            .createHmac('sha256', MAILGUN_SIGNING_KEY)
+            .update(timestamp + token)
+            .digest('hex');
+          const ok =
+            signed &&
+            hmac &&
+            signed.length === hmac.length &&
+            crypto.timingSafeEqual(Buffer.from(signed), Buffer.from(hmac));
+          if (!ok) {
+            console.warn('Webhook Mailgun firma inválida');
+            return response.status(401).json({ error: 'Invalid signature' });
+          }
         }
       }
 
       const batch = db.batch();
 
-      events.forEach(evt => {
+      events.forEach((evt) => {
         const id = evt['event-data']?.id || evt.id || `${Date.now()}-${Math.random()}`;
         const data = evt['event-data'] || evt;
         batch.set(db.collection('mailgunEvents').doc(id), data, { merge: true });
@@ -1260,7 +1251,7 @@ exports.aggregateDailyMetrics = functions.pubsub
 
     const metricsByUser = {};
 
-    snapshot.forEach(doc => {
+    snapshot.forEach((doc) => {
       const evt = doc.data()['event-data'] || doc.data();
       const { event, recipient } = evt;
       if (!recipient) return;
@@ -1344,16 +1335,12 @@ exports.initWeddingSubcollections = functions.firestore
       'checklist',
       'ayudaCeremonia',
       'disenoWeb',
-      'ideas'
+      'ideas',
     ];
 
     const batch = db.batch();
     subCollections.forEach((sub) => {
-      const ref = db
-        .collection('weddings')
-        .doc(weddingId)
-        .collection(sub)
-        .doc('_placeholder');
+      const ref = db.collection('weddings').doc(weddingId).collection(sub).doc('_placeholder');
       batch.set(ref, { createdAt: admin.firestore.FieldValue.serverTimestamp() });
     });
 
@@ -1569,7 +1556,8 @@ exports.syncBanquetTablesOnGuestWrite = functions.firestore
     const beforeTable = before ? before.tableId : null;
     const afterTable = after ? after.tableId : null;
 
-    const tableRef = (tableId) => db.doc(`weddings/${weddingId}/seatingPlan/banquet/tables/${tableId}`);
+    const tableRef = (tableId) =>
+      db.doc(`weddings/${weddingId}/seatingPlan/banquet/tables/${tableId}`);
 
     // Si el invitado estaba en una mesa y cambia/elimina
     if (beforeTable && beforeTable !== afterTable) {
@@ -1622,14 +1610,16 @@ exports.syncUserWeddingRefs = functions.firestore
       const before = change.before.data() || {};
       const roles = ['ownerIds', 'plannerIds', 'assistantIds'];
       const uids = new Set();
-      roles.forEach(r => (before[r] || []).forEach(uid => uids.add(uid)));
+      roles.forEach((r) => (before[r] || []).forEach((uid) => uids.add(uid)));
       const batch = db.batch();
-      uids.forEach(uid => {
+      uids.forEach((uid) => {
         const ref = db.collection('users').doc(uid).collection('weddings').doc(weddingId);
         batch.delete(ref);
       });
       await batch.commit();
-      console.log(`syncUserWeddingRefs: Eliminadas refs de boda ${weddingId} en ${uids.size} usuarios`);
+      console.log(
+        `syncUserWeddingRefs: Eliminadas refs de boda ${weddingId} en ${uids.size} usuarios`
+      );
       return;
     }
 
@@ -1638,33 +1628,37 @@ exports.syncUserWeddingRefs = functions.firestore
     const roles = ['ownerIds', 'plannerIds', 'assistantIds'];
 
     const uidRoleMap = new Map();
-    roles.forEach(role => {
-      (after[role] || []).forEach(uid => {
+    roles.forEach((role) => {
+      (after[role] || []).forEach((uid) => {
         const prev = uidRoleMap.get(uid) || [];
-        uidRoleMap.set(uid, [...prev, role.replace('Ids','')]);
+        uidRoleMap.set(uid, [...prev, role.replace('Ids', '')]);
       });
     });
     const newUids = new Set(uidRoleMap.keys());
 
     // Detectar removidos
     const prevUids = new Set();
-    roles.forEach(role => (before[role] || []).forEach(uid => prevUids.add(uid)));
-    const removed = [...prevUids].filter(uid => !newUids.has(uid));
+    roles.forEach((role) => (before[role] || []).forEach((uid) => prevUids.add(uid)));
+    const removed = [...prevUids].filter((uid) => !newUids.has(uid));
 
     const batch = db.batch();
 
     // Añadir/actualizar docs para nuevos uids
     uidRoleMap.forEach((rolesArr, uid) => {
       const ref = db.collection('users').doc(uid).collection('weddings').doc(weddingId);
-      batch.set(ref, {
-        name: after.name || after.slug || 'Boda',
-        roles: rolesArr,
-        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-      }, { merge: true });
+      batch.set(
+        ref,
+        {
+          name: after.name || after.slug || 'Boda',
+          roles: rolesArr,
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        },
+        { merge: true }
+      );
     });
 
     // Eliminar docs para uids quitados
-    removed.forEach(uid => {
+    removed.forEach((uid) => {
       const ref = db.collection('users').doc(uid).collection('weddings').doc(weddingId);
       batch.delete(ref);
     });
@@ -1677,40 +1671,41 @@ exports.validateEmail = functions.https.onRequest((request, response) => {
   cors(request, response, async () => {
     try {
       const { email } = request.query;
-      
+
       if (!email) {
         return response.status(400).json({ error: 'Email is required' });
       }
-      
+
       // Crear autenticación Basic para Mailgun
       const auth = Buffer.from(`api:${MAILGUN_API_KEY}`).toString('base64');
-      
+
       // Hacer solicitud a Mailgun API
-      const mailgunResponse = await fetch(`${MAILGUN_BASE_URL}/address/validate?address=${encodeURIComponent(email)}`, {
-        headers: {
-          'Authorization': `Basic ${auth}`
+      const mailgunResponse = await fetch(
+        `${MAILGUN_BASE_URL}/address/validate?address=${encodeURIComponent(email)}`,
+        {
+          headers: {
+            Authorization: `Basic ${auth}`,
+          },
         }
-      });
-      
+      );
+
       if (!mailgunResponse.ok) {
         const errorText = await mailgunResponse.text();
         console.error('Error from Mailgun:', mailgunResponse.status, errorText);
-        return response.status(mailgunResponse.status).json({ 
+        return response.status(mailgunResponse.status).json({
           error: `Error de Mailgun: ${mailgunResponse.status}`,
-          details: errorText
+          details: errorText,
         });
       }
-      
+
       const data = await mailgunResponse.json();
       return response.json(data);
-      
     } catch (error) {
       console.error('Error validating email:', error);
       return response.status(500).json({ error: error.message });
     }
   });
 });
-
 
 const normalizeBudgetCategoryKey = (value) => {
   if (!value) return '';
@@ -1768,10 +1763,11 @@ exports.aggregateBudgetBenchmarks = functions.firestore
       return null;
     }
 
-    const regionKey =
-      (snap.regionKey ||
-        normalizeBudgetCategoryKey(snap?.wedding?.country) ||
-        'global').toLowerCase();
+    const regionKey = (
+      snap.regionKey ||
+      normalizeBudgetCategoryKey(snap?.wedding?.country) ||
+      'global'
+    ).toLowerCase();
     const guestBucket = snap.guestBucket || computeGuestBucket(snap?.wedding?.guestCount);
 
     const confirmedSnapshots = await db
@@ -1837,26 +1833,22 @@ exports.aggregateBudgetBenchmarks = functions.firestore
       const stats = computeStatsFromValues(values);
       if (!stats) return;
       const perGuestValues = categoryPerGuestMap.get(key) || [];
-      const perGuestStats = perGuestValues.length >= 3 ? computeStatsFromValues(perGuestValues) : null;
-      categoriesPayload[key] = perGuestStats
-        ? { ...stats, perGuest: perGuestStats }
-        : { ...stats };
+      const perGuestStats =
+        perGuestValues.length >= 3 ? computeStatsFromValues(perGuestValues) : null;
+      categoriesPayload[key] = perGuestStats ? { ...stats, perGuest: perGuestStats } : { ...stats };
     });
 
-    await db
-      .collection('budgetBenchmarks')
-      .doc(`${regionKey}_${guestBucket}`)
-      .set(
-        {
-          region: regionKey,
-          guestBucket,
-          count: totalStats.count,
-          total: totalStats,
-          categories: categoriesPayload,
-          lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
-        },
-        { merge: true }
-      );
+    await db.collection('budgetBenchmarks').doc(`${regionKey}_${guestBucket}`).set(
+      {
+        region: regionKey,
+        guestBucket,
+        count: totalStats.count,
+        total: totalStats,
+        categories: categoriesPayload,
+        lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
+      },
+      { merge: true }
+    );
 
     return null;
   });
@@ -1875,3 +1867,10 @@ exports.cleanupWebhookDedup = functions.pubsub
     console.log(`cleanupWebhookDedup: removed ${snap.size} expired docs`);
     return null;
   });
+
+// ==========================================
+// PORTFOLIO: Cloud Function para Thumbnails
+// ==========================================
+// Importar y exportar la Cloud Function de thumbnails
+const { generatePortfolioThumbnails } = require('./generateThumbnails');
+exports.generatePortfolioThumbnails = generatePortfolioThumbnails;

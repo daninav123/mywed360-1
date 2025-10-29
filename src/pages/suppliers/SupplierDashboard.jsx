@@ -1,6 +1,17 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { BarChart3, User, Edit, Save, X, Eye, MousePointer, Mail } from 'lucide-react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import {
+  BarChart3,
+  User,
+  Edit,
+  Save,
+  X,
+  Eye,
+  MousePointer,
+  Mail,
+  Camera,
+  ArrowRight,
+} from 'lucide-react';
 import useTranslations from '../../hooks/useTranslations';
 
 const PRICE_RANGE_OPTIONS = [
@@ -283,6 +294,36 @@ export default function SupplierDashboard() {
             </div>
           </div>
         </div>
+
+        {/* Acceso rápido al Portfolio */}
+        <Link
+          to={`/supplier/dashboard/${id}/portfolio`}
+          className="block shadow-md rounded-lg p-6 mb-6 hover:shadow-lg transition-shadow"
+          style={{
+            backgroundColor: 'var(--color-surface)',
+            borderLeft: '4px solid var(--color-primary)',
+          }}
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div
+                className="p-3 rounded-lg"
+                style={{ backgroundColor: 'rgba(109, 40, 217, 0.1)' }}
+              >
+                <Camera size={24} style={{ color: 'var(--color-primary)' }} />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>
+                  Mi Portfolio
+                </h3>
+                <p className="text-sm" style={{ color: 'var(--color-muted)' }}>
+                  Gestiona las fotos de tu trabajo y muestra tu mejor portfolio
+                </p>
+              </div>
+            </div>
+            <ArrowRight size={20} style={{ color: 'var(--color-primary)' }} />
+          </div>
+        </Link>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-3">

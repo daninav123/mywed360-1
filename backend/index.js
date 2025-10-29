@@ -83,6 +83,8 @@ import supplierPortalRouter from './routes/supplier-portal.js';
 import supplierRegistrationRouter from './routes/supplier-registration.js';
 import supplierDashboardRouter from './routes/supplier-dashboard.js';
 import supplierPublicRouter from './routes/supplier-public.js';
+import supplierReviewsRouter from './routes/supplier-reviews.js';
+import supplierQuoteRequestsRouter from './routes/supplier-quote-requests.js';
 import supplierBudgetRouter from './routes/supplier-budget.js';
 import migrateSuppliersRouter from './routes/migrate-suppliers.js';
 import publicWeddingRouter from './routes/public-wedding.js';
@@ -637,7 +639,9 @@ app.use('/api/ai-suppliers-tavily', authMiddleware(), aiSuppliersTavilyRouter);
 app.use('/api/suppliers', suppliersHybridRouter); // Búsqueda pública, sin auth
 app.use('/api/suppliers', suppliersRegisterRouter); // No requiere auth para registro
 app.use('/api/suppliers', supplierPublicRouter); // Portfolio público (sin auth)
-app.use('/api/suppliers', supplierRequestsRouter); // Solicitudes de presupuesto (público)
+app.use('/api/suppliers', supplierReviewsRouter); // Reseñas (público lectura, auth escritura)
+app.use('/api/suppliers', supplierQuoteRequestsRouter); // Solicitudes de presupuesto (público)
+app.use('/api/suppliers', supplierRequestsRouter); // Solicitudes de presupuesto (legacy - mantener por compatibilidad)
 app.use('/api/favorites', authMiddleware(), favoritesRouter); // Favoritos requiere auth
 app.use('/api/ai/budget-estimate', authMiddleware(), aiBudgetRouter);
 app.use('/api/ai', authMiddleware(), aiRouter);
