@@ -8,6 +8,7 @@ import {
   Sparkles,
   TrendingUp,
   Building2,
+  Heart,
 } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -33,6 +34,7 @@ import { loadData, saveData } from '../services/SyncService';
 import { searchSuppliersHybrid, trackSupplierAction } from '../services/suppliersService';
 import SupplierCard from '../components/suppliers/SupplierCard';
 import SmartFiltersBar from '../components/suppliers/SmartFiltersBar';
+import FavoritesSection from '../components/suppliers/FavoritesSection';
 
 const CONFIRMED_KEYWORDS = ['confirm', 'contrat', 'reserva', 'firm'];
 
@@ -270,6 +272,7 @@ const Proveedores = () => {
   const [searchResultsQuery, setSearchResultsQuery] = useState('');
   const [searchResultsPage, setSearchResultsPage] = useState(1);
   const [searchCompleted, setSearchCompleted] = useState(false);
+  const [activeTab, setActiveTab] = useState('search'); // 'search' | 'favorites'
 
   // Estado para filtros inteligentes
   const [smartFilters, setSmartFilters] = useState(null);
@@ -740,6 +743,43 @@ const Proveedores = () => {
       >
         {error && <Card className="border border-danger bg-danger-soft text-danger">{error}</Card>}
 
+        {/* Tabs */}
+        <Card className="p-1">
+          <div className="flex gap-2">
+            <button
+              onClick={() => setActiveTab('search')}
+              className={`flex-1 py-3 px-6 rounded-lg font-medium transition-colors ${
+                activeTab === 'search'
+                  ? 'bg-primary text-white'
+                  : 'bg-transparent text-muted hover:bg-surface'
+              }`}
+            >
+              <div className="flex items-center justify-center gap-2">
+                <Search className="h-5 w-5" />
+                <span>Buscar Proveedores</span>
+              </div>
+            </button>
+            <button
+              onClick={() => setActiveTab('favorites')}
+              className={`flex-1 py-3 px-6 rounded-lg font-medium transition-colors ${
+                activeTab === 'favorites'
+                  ? 'bg-primary text-white'
+                  : 'bg-transparent text-muted hover:bg-surface'
+              }`}
+            >
+              <div className="flex items-center justify-center gap-2">
+                <Heart className="h-5 w-5" />
+                <span>Mis Favoritos</span>
+              </div>
+            </button>
+          </div>
+        </Card>
+
+        {/* Contenido según tab activo */}
+        {activeTab === 'favorites' ? (
+          <FavoritesSection />
+        ) : (
+          <>
         {/* Stats Cards Premium */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card className="p-4 bg-gradient-to-br from-[var(--color-primary)]/10 to-transparent border-[var(--color-primary)]/30">
@@ -1315,6 +1355,9 @@ const Proveedores = () => {
           </Card>
         )}
       </Modal>
+        </>
+        )}
+      </PageWrapper>
     </>
   );
 };
