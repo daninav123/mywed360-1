@@ -13,6 +13,7 @@ import {
   persistentMultipleTabManager,
   memoryLocalCache,
 } from 'firebase/firestore';
+import { getStorage } from 'firebase/storage';
 
 // Configuraci�n de Firebase desde variables de entorno (sin secretos hard-coded)
 const rawFirebaseConfig = {
@@ -103,6 +104,7 @@ let db =
       })()
     : null;
 let auth;
+let storage;
 let analytics;
 
 // Prueba la conexión con Firestore sin requerir autenticación (solo lectura)
@@ -207,6 +209,12 @@ const inicializarFirebase = async () => {
     auth.languageCode = 'es';
     if (typeof window !== 'undefined') window.auth = auth;
 
+    // Storage
+    storage = getStorage(app);
+    if (typeof window !== 'undefined' && import.meta.env && import.meta.env.DEV) {
+      window.storage = storage;
+    }
+
     // Firestore si es necesario
     if (!db) {
       try {
@@ -299,4 +307,4 @@ const firebaseReady = FIREBASE_CONFIGURED
 
 const getFirebaseAuth = () => auth;
 
-export { auth, db, analytics, firebaseReady, getFirebaseAuth, isOnline };
+export { auth, db, storage, analytics, firebaseReady, getFirebaseAuth, isOnline };
