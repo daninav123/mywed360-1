@@ -19,6 +19,9 @@ const router = express.Router();
 // (Necesitaremos refactorizar esto)
 import fetch from 'node-fetch';
 
+// Importar servicio de Google Places
+const googlePlacesService = require('../services/googlePlacesService.js');
+
 const NEUTRAL_LOCATIONS = new Set(['españa', 'spain', 'nacional', 'todo españa', 'toda españa']);
 
 /**
@@ -573,17 +576,81 @@ router.post('/search', async (req, res) => {
       console.log('⏭️ [FIRESTORE] Saltando búsqueda en base de datos (modo: internet)');
     }
 
-    // ===== 2. BUSCAR EN INTERNET =====
+    // ===== 2. BUSCAR EN INTERNET (ESTRATEGIA HÍBRIDA) =====
+    // Flujo: FIRESTORE → GOOGLE PLACES → TAVILY
     // (Saltar si modo es 'database')
     const MIN_RESULTS = 5;
-    // trueRegistered ya está calculado arriba o inicializado vacío
-    const shouldSearchInternet =
-      searchMode === 'internet' || (searchMode === 'auto' && trueRegistered.length < MIN_RESULTS);
+    const MIN_RESULTS_FOR_TAVILY = 10;
 
-    if (searchMode !== 'database' && shouldSearchInternet) {
+    let googlePlacesResults = [];
+    let usedGooglePlaces = false;
+
+    // 2.1 GOOGLE PLACES (si categoría tiene alta/media cobertura)
+    const shouldSearchGooglePlaces =
+      searchMode !== 'database' &&
+      (searchMode === 'internet' ||
+        (searchMode === 'auto' && trueRegistered.length < MIN_RESULTS)) &&
+      googlePlacesService.shouldUseGooglePlaces(service);
+
+    if (shouldSearchGooglePlaces) {
+      const googleStart = Date.now();
+      console.log(
+        `\n🌍 [GOOGLE PLACES] Solo ${trueRegistered.length} proveedores registrados (mínimo: ${MIN_RESULTS}). Buscando en Google Places...`
+      );
+
+      try {
+        const googleResults = await googlePlacesService.searchGooglePlaces(service, location, 20);
+
+        if (googleResults && googleResults.length > 0) {
+          const googleDuration = Date.now() - googleStart;
+          console.log(
+            `✅ [GOOGLE PLACES] ${googleResults.length} proveedores encontrados en ${googleDuration}ms`
+          );
+
+          // Convertir a formato estándar
+          googlePlacesResults = googleResults.map((gp) => ({
+            id: generateSupplierId(gp.contact?.email || gp.name, gp.name),
+            name: gp.name,
+            contact: gp.contact,
+            location: gp.location,
+            rating: gp.rating,
+            reviewCount: gp.reviewCount,
+            photos: gp.photos,
+            verified: gp.verified,
+            registered: false,
+            source: 'google-places',
+            status: 'google-verified',
+            badge: gp.badge,
+            badgeType: gp.badgeType,
+            googlePlaceId: gp.googlePlaceId,
+          }));
+
+          usedGooglePlaces = true;
+        } else {
+          console.log(`📊 [GOOGLE PLACES] 0 resultados`);
+        }
+      } catch (error) {
+        console.error(`❌ [GOOGLE PLACES] Error:`, error.message);
+      }
+    } else if (searchMode !== 'database') {
+      if (!googlePlacesService.shouldUseGooglePlaces(service)) {
+        console.log(
+          `⏭️ [GOOGLE PLACES] Categoría "${service}" no usa Google Places (mejor cobertura con Tavily)`
+        );
+      }
+    }
+
+    // 2.2 TAVILY (complementar si todavía < 10 resultados)
+    const currentTotalResults = trueRegistered.length + googlePlacesResults.length;
+    const shouldSearchTavily =
+      searchMode !== 'database' &&
+      (searchMode === 'internet' ||
+        (searchMode === 'auto' && currentTotalResults < MIN_RESULTS_FOR_TAVILY));
+
+    if (shouldSearchTavily) {
       const tavilyStart = Date.now();
       console.log(
-        `\n🌐 [TAVILY] Solo ${trueRegistered.length} proveedores registrados (mínimo: ${MIN_RESULTS}). Buscando en internet...`
+        `\n🌐 [TAVILY] ${currentTotalResults} proveedores hasta ahora (mínimo: ${MIN_RESULTS_FOR_TAVILY}). Buscando en Tavily...`
       );
 
       try {
@@ -968,7 +1035,8 @@ router.post('/search', async (req, res) => {
       }
     }
 
-    // ===== 3. MEZCLAR RESULTADOS: LÓGICA INTELIGENTE =====
+    // ===== 3. MEZCLAR RESULTADOS: ESTRATEGIA HÍBRIDA =====
+    // Prioridad: REGISTRADOS → GOOGLE PLACES → TAVILY
     let allResults;
 
     if (trueRegistered.length >= MIN_RESULTS) {
@@ -978,22 +1046,24 @@ router.post('/search', async (req, res) => {
         `📊 [RESULTADO FINAL] ≥${MIN_RESULTS} registrados. Mostrando solo registrados: ${trueRegistered.length}`
       );
     } else if (trueRegistered.length > 0) {
-      // Si hay 1-4 registrados, complementar con internet
+      // Si hay 1-4 registrados, complementar con Google Places + Tavily
       allResults = [
-        ...trueRegistered, // 🟢 Registrados primero
-        ...internetResults, // 🌐 Internet para complementar
+        ...trueRegistered, // 🟢 Registrados primero (PRIORIDAD 1)
+        ...googlePlacesResults, // 🌍 Google Places (PRIORIDAD 2)
+        ...internetResults, // 🌐 Tavily (PRIORIDAD 3)
       ];
       console.log(
-        `📊 [RESULTADO FINAL] <${MIN_RESULTS} registrados. Mostrando registrados (${trueRegistered.length}) + internet (${internetResults.length})`
+        `📊 [RESULTADO FINAL] <${MIN_RESULTS} registrados. Mostrando registrados (${trueRegistered.length}) + Google Places (${googlePlacesResults.length}) + Tavily (${internetResults.length})`
       );
     } else {
-      // Si NO hay registrados, mostrar caché + internet
+      // Si NO hay registrados, mostrar caché + Google Places + Tavily
       allResults = [
         ...cachedResults, // 🟡 Proveedores en caché
-        ...internetResults, // 🔵 De internet
+        ...googlePlacesResults, // 🌍 Google Places
+        ...internetResults, // 🔵 Tavily
       ];
       console.log(
-        `📊 [RESULTADO FINAL] Sin registrados. Mostrando caché (${cachedResults.length}) + internet (${internetResults.length})`
+        `📊 [RESULTADO FINAL] Sin registrados. Mostrando caché (${cachedResults.length}) + Google Places (${googlePlacesResults.length}) + Tavily (${internetResults.length})`
       );
     }
 
@@ -1003,16 +1073,27 @@ router.post('/search', async (req, res) => {
       `   🟡 En caché: ${trueRegistered.length >= MIN_RESULTS ? 0 : trueRegistered.length > 0 ? 0 : cachedResults.length}`
     );
     console.log(
-      `   🌐 Internet: ${trueRegistered.length >= MIN_RESULTS ? 0 : internetResults.length}`
+      `   🌍 Google Places: ${trueRegistered.length >= MIN_RESULTS ? 0 : googlePlacesResults.length}`
+    );
+    console.log(
+      `   🌐 Tavily: ${trueRegistered.length >= MIN_RESULTS ? 0 : internetResults.length}`
     );
 
     let sourceMsg = 'Solo caché';
     if (trueRegistered.length >= MIN_RESULTS) {
       sourceMsg = `Solo registrados (≥${MIN_RESULTS})`;
     } else if (trueRegistered.length > 0) {
-      sourceMsg = `Registrados + Internet (<${MIN_RESULTS})`;
-    } else if (usedTavily) {
-      sourceMsg = 'Caché + Internet';
+      const sources = [];
+      sources.push('Registrados');
+      if (googlePlacesResults.length > 0) sources.push('Google Places');
+      if (internetResults.length > 0) sources.push('Tavily');
+      sourceMsg = sources.join(' + ');
+    } else {
+      const sources = [];
+      if (cachedResults.length > 0) sources.push('Caché');
+      if (googlePlacesResults.length > 0) sources.push('Google Places');
+      if (internetResults.length > 0) sources.push('Tavily');
+      sourceMsg = sources.join(' + ') || 'Sin resultados';
     }
     console.log(`   📡 Fuente: ${sourceMsg}\n`);
 
@@ -1049,18 +1130,32 @@ router.post('/search', async (req, res) => {
           ? 0
           : registeredResults.filter((r) => r.registered !== true).length;
 
+    // Determinar fuente
+    let finalSource = 'firestore';
+    if (usedGooglePlaces && usedTavily) {
+      finalSource = 'firestore+google-places+tavily';
+    } else if (usedGooglePlaces) {
+      finalSource = 'firestore+google-places';
+    } else if (usedTavily) {
+      finalSource = 'firestore+tavily';
+    }
+
     res.json({
       success: true,
       count: allResults.length,
       breakdown: {
         registered: trueRegistered.length,
         cached: cachedCount,
-        internet: internetResults.length,
+        googlePlaces: googlePlacesResults.length,
+        tavily: internetResults.length,
+        total: allResults.length,
       },
       searchMode: searchMode, // Modo de búsqueda usado
-      source: usedTavily ? 'firestore+tavily' : 'firestore',
+      source: finalSource,
       minResults: MIN_RESULTS,
       showingInternetComplement: trueRegistered.length > 0 && trueRegistered.length < MIN_RESULTS,
+      usedGooglePlaces: usedGooglePlaces,
+      usedTavily: usedTavily,
       suppliers: allResults,
     });
   } catch (error) {
