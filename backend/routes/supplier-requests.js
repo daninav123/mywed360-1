@@ -1,11 +1,9 @@
 import express from 'express';
-import admin from '../firebaseAdmin.js';
+import { db, FieldValue } from '../config/firebase.js';
 import logger from '../logger.js';
 import nodemailer from 'nodemailer';
 
 const router = express.Router();
-const db = admin.firestore();
-const FieldValue = admin.firestore.FieldValue;
 
 // Configurar transporter de nodemailer
 const transporter = nodemailer.createTransporter({
