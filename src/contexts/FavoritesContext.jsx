@@ -44,14 +44,27 @@ export function FavoritesProvider({ children }) {
   const { t } = useTranslations();
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004';
-  const loadingRef = useRef(false); // Para evitar múltiples cargas simultáneas
+  const loadingRef = useRef(false);
+  const prevUserIdRef = useRef(null);
+  const prevWeddingIdRef = useRef(null);
 
-  // Cargar favoritos SOLO cuando cambian user o activeWedding
+  // Extraer solo el UID del user (primitivo)
+  const userId = user?.uid || null;
+
+  // Cargar favoritos SOLO cuando cambian userId o activeWedding (ambos primitivos)
   useEffect(() => {
+    // Verificar si realmente cambió (no solo se recreó el objeto)
+    if (userId === prevUserIdRef.current && activeWedding === prevWeddingIdRef.current) {
+      return; // No hay cambios reales
+    }
+
+    prevUserIdRef.current = userId;
+    prevWeddingIdRef.current = activeWedding;
+
     // Prevenir múltiples cargas simultáneas
     if (loadingRef.current) return;
 
-    if (!user || !activeWedding) {
+    if (!userId || !activeWedding) {
       setFavorites([]);
       setLoading(false);
       return;
@@ -94,7 +107,7 @@ export function FavoritesProvider({ children }) {
     };
 
     loadFavorites();
-  }, [user, activeWedding]); // Solo valores primitivos estables
+  }, [userId, activeWedding]); // Solo valores primitivos estables
 
   // Añadir a favoritos
   const addFavorite = async (supplier, notes = '') => {
