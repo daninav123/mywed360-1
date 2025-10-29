@@ -8,9 +8,6 @@ import fetch from 'node-fetch';
 // Configuración de API
 const GOOGLE_PLACES_API_KEY = process.env.GOOGLE_PLACES_API_KEY;
 
-// Debug: Verificar que la API key está cargada
-console.log('🔑 [GOOGLE PLACES] API Key configurada:', GOOGLE_PLACES_API_KEY ? '✅ Sí' : '❌ No');
-
 // Categorías con alta cobertura en Google Places
 const HIGH_COVERAGE_CATEGORIES = [
   'salones-banquetes',
@@ -115,9 +112,16 @@ async function searchGooglePlaces(service, location, maxResults = 20) {
     console.log(`\n🌍 [GOOGLE PLACES] Buscando: ${service} en ${location}`);
 
     // 1. Text Search para encontrar lugares
-    const query = placeType
-      ? `${placeType} wedding ${location} Spain`
-      : `${service} bodas ${location} España`;
+    // Mejorar query con palabras clave adicionales
+    let query;
+    if (placeType) {
+      query = `${placeType} wedding ${location} Spain`;
+    } else {
+      // Para servicios sin tipo específico, usar múltiples palabras clave
+      query = `${service} eventos bodas ${location} España`;
+    }
+
+    console.log(`📝 [GOOGLE PLACES] Query: "${query}"`);
 
     const searchUrl = new URL('https://maps.googleapis.com/maps/api/place/textsearch/json');
     searchUrl.searchParams.append('query', query);

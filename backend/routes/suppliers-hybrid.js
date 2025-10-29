@@ -580,36 +580,23 @@ router.post('/search', async (req, res) => {
     // Flujo: FIRESTORE → GOOGLE PLACES → TAVILY
     // (Saltar si modo es 'database')
     const MIN_RESULTS = 5;
-    const MIN_RESULTS_FOR_TAVILY = 10;
+    const MIN_RESULTS_FOR_TAVILY = 15; // Aumentado para obtener más resultados antes de complementar con Tavily
 
     let googlePlacesResults = [];
     let usedGooglePlaces = false;
 
     // 2.1 GOOGLE PLACES (si categoría tiene alta/media cobertura)
-    console.log(`\n🔍 [DEBUG] Verificando Google Places para servicio: "${service}"`);
-    console.log(`   - searchMode: ${searchMode}`);
-    console.log(`   - trueRegistered: ${trueRegistered.length}`);
-    console.log(`   - googlePlacesService disponible: ${!!googlePlacesService}`);
-    console.log(
-      `   - shouldUseGooglePlaces: ${googlePlacesService?.shouldUseGooglePlaces(service)}`
-    );
-
     const shouldSearchGooglePlaces =
       searchMode !== 'database' &&
       (searchMode === 'internet' ||
         (searchMode === 'auto' && trueRegistered.length < MIN_RESULTS)) &&
       googlePlacesService.shouldUseGooglePlaces(service);
 
-    console.log(`   - shouldSearchGooglePlaces: ${shouldSearchGooglePlaces}`);
-
     if (shouldSearchGooglePlaces) {
       const googleStart = Date.now();
-      console.log(
-        `\n🌍 [GOOGLE PLACES] Solo ${trueRegistered.length} proveedores registrados (mínimo: ${MIN_RESULTS}). Buscando en Google Places...`
-      );
 
       try {
-        const googleResults = await googlePlacesService.searchGooglePlaces(service, location, 20);
+        const googleResults = await googlePlacesService.searchGooglePlaces(service, location, 40);
 
         if (googleResults && googleResults.length > 0) {
           const googleDuration = Date.now() - googleStart;
