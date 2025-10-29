@@ -120,6 +120,8 @@ import emailAliasRouter from './routes/email-alias.js';
 import crmRouter from './routes/crm.js';
 import providersRouter from './routes/providers.js';
 import favoritesRouter from './routes/favorites.js';
+import mailboxRouter from './routes/mailbox.js';
+import quotesRouter from './routes/quotes.js';
 import projectMetricsRouter from './routes/project-metrics.js';
 import weddingsRouter from './routes/weddings.js';
 import usersRouter from './routes/users.js';
@@ -635,6 +637,8 @@ app.use('/api/ai-suppliers-tavily', authMiddleware(), aiSuppliersTavilyRouter);
 app.use('/api/suppliers', suppliersHybridRouter); // Búsqueda pública, sin auth
 app.use('/api/suppliers', suppliersRegisterRouter); // No requiere auth para registro
 app.use('/api/favorites', authMiddleware(), favoritesRouter); // Favoritos requiere auth
+app.use('/api/mailbox', requireAuth, mailboxRouter); // Bandeja de mensajes requiere auth
+app.use('/api/quotes', authMiddleware(), quotesRouter); // Solicitudes de presupuesto
 app.use('/api/ai/budget-estimate', authMiddleware(), aiBudgetRouter);
 app.use('/api/ai', authMiddleware(), aiRouter);
 app.use('/api/ai-assign', requireAuth, aiAssignRouter);
