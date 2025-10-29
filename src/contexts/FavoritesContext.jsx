@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect, useCallback } from 'rea
 import { useAuth } from '../hooks/useAuth';
 import { useWedding } from '../context/WeddingContext';
 import { auth } from '../firebaseConfig';
+import useTranslations from '../hooks/useTranslations';
 import axios from 'axios';
 
 const FavoritesContext = createContext();
@@ -36,10 +37,11 @@ async function getAuthToken() {
 
 export function FavoritesProvider({ children }) {
   const { user } = useAuth();
-  const { activeWedding, activeWeddingData } = useWedding(); // ← Obtener AMBOS
+  const { activeWedding } = useWedding(); // Solo necesitamos el ID (string estable)
   const [favorites, setFavorites] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { t } = useTranslations();
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004';
 
@@ -51,13 +53,11 @@ export function FavoritesProvider({ children }) {
       return;
     }
 
-    // Esperar a que se cargue la boda activa
-    // activeWedding es un STRING (ID), activeWeddingData es el OBJETO
-    const weddingId = activeWedding || activeWeddingData?.id;
+    // Solo usar activeWedding (es un string estable, no se recrea en cada render)
+    const weddingId = activeWedding;
 
     if (!weddingId) {
       // Silencioso en primera carga (WeddingContext aún cargando)
-      // Solo loguear si ya pasó tiempo suficiente
       setFavorites([]);
       setLoading(false);
       return;
@@ -80,7 +80,7 @@ export function FavoritesProvider({ children }) {
 
       const headers = {
         Authorization: `Bearer ${token}`,
-        'x-wedding-id': weddingId, // Usar el ID directamente
+        'x-wedding-id': weddingId,
       };
 
       const response = await axios.get(`${API_URL}/api/favorites`, { headers });
@@ -93,13 +93,13 @@ export function FavoritesProvider({ children }) {
         setFavorites([]);
       } else {
         console.error('[FavoritesContext] Error cargando favoritos:', err);
-        setError(err.message);
+        setError(t('common.suppliers.favorites.errors.loadFailed'));
         setFavorites([]);
       }
     } finally {
       setLoading(false);
     }
-  }, [user, activeWedding, activeWeddingData, API_URL]);
+  }, [user, activeWedding, API_URL, t]); // ← Removido activeWeddingData
 
   // Cargar favoritos cuando cambia el usuario o boda
   useEffect(() => {
@@ -109,20 +109,20 @@ export function FavoritesProvider({ children }) {
   // Añadir a favoritos
   const addFavorite = async (supplier, notes = '') => {
     if (!user) {
-      throw new Error('Debes iniciar sesión para guardar favoritos');
+      throw new Error(t('common.suppliers.favorites.errors.loginRequired'));
     }
 
-    const weddingId = activeWedding || activeWeddingData?.id;
+    const weddingId = activeWedding;
 
     if (!weddingId) {
-      throw new Error('Debes tener una boda activa para guardar favoritos');
+      throw new Error(t('common.suppliers.favorites.errors.activeWeddingRequired'));
     }
 
     try {
       const token = await getAuthToken();
 
       if (!token) {
-        throw new Error('No se pudo obtener token de autenticación');
+        throw new Error(t('common.suppliers.favorites.errors.authToken'));
       }
 
       const headers = {
@@ -144,30 +144,32 @@ export function FavoritesProvider({ children }) {
       console.error('[FavoritesContext] Error añadiendo favorito:', err);
 
       if (err.response?.status === 409) {
-        throw new Error('Este proveedor ya está en tus favoritos');
+        throw new Error(t('common.suppliers.favorites.errors.alreadyExists'));
       }
 
-      throw new Error(err.response?.data?.message || 'Error al guardar favorito');
+      throw new Error(
+        err.response?.data?.message || t('common.suppliers.favorites.errors.saveFailed')
+      );
     }
   };
 
   // Eliminar de favoritos
   const removeFavorite = async (supplierId) => {
     if (!user) {
-      throw new Error('Debes iniciar sesión');
+      throw new Error(t('common.suppliers.favorites.errors.loginRequired'));
     }
 
-    const weddingId = activeWedding || activeWeddingData?.id;
+    const weddingId = activeWedding;
 
     if (!weddingId) {
-      throw new Error('Debes tener una boda activa');
+      throw new Error(t('common.suppliers.favorites.errors.activeWeddingRequired'));
     }
 
     try {
       const token = await getAuthToken();
 
       if (!token) {
-        throw new Error('No se pudo obtener token de autenticación');
+        throw new Error(t('common.suppliers.favorites.errors.authToken'));
       }
 
       const headers = {
@@ -181,7 +183,9 @@ export function FavoritesProvider({ children }) {
       setFavorites((prev) => prev.filter((fav) => fav.supplierId !== supplierId));
     } catch (err) {
       console.error('[FavoritesContext] Error eliminando favorito:', err);
-      throw new Error(err.response?.data?.message || 'Error al eliminar favorito');
+      throw new Error(
+        err.response?.data?.message || t('common.suppliers.favorites.errors.removeFailed')
+      );
     }
   };
 
