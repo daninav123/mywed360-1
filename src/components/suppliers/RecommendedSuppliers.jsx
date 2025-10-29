@@ -17,18 +17,25 @@ export default function RecommendedSuppliers({ onClose }) {
       setLoading(true);
       try {
         const results = [];
+        const location = weddingProfile?.location || weddingProfile?.city || 'españa';
 
         // 1. Basado en categorías de favoritos
         if (favorites && favorites.length > 0) {
-          const categories = [...new Set(favorites.map((f) => f.category || f.service))];
+          const categories = [...new Set(favorites.map((f) => f.category || f.service))].filter(
+            Boolean
+          );
           for (const category of categories.slice(0, 2)) {
+            if (!category) continue; // Skip empty categories
             try {
-              const response = await searchSuppliersHybrid(category, {
-                location: weddingProfile?.location || weddingProfile?.city,
-                mode: 'database',
-              });
-              if (response.results && response.results.length > 0) {
-                results.push(...response.results.slice(0, 2));
+              const response = await searchSuppliersHybrid(
+                category, // service
+                location, // location
+                '', // query
+                null, // budget
+                { mode: 'database' } // filters
+              );
+              if (response.suppliers && response.suppliers.length > 0) {
+                results.push(...response.suppliers.slice(0, 2));
               }
             } catch (err) {
               console.log('Error fetching by category:', err);
@@ -40,29 +47,37 @@ export default function RecommendedSuppliers({ onClose }) {
         if (weddingProfile?.weddingStyle) {
           try {
             const styleQuery = `${weddingProfile.weddingStyle} wedding`;
-            const response = await searchSuppliersHybrid(styleQuery, {
-              location: weddingProfile?.location || weddingProfile?.city,
-              mode: 'database',
-            });
-            if (response.results && response.results.length > 0) {
-              results.push(...response.results.slice(0, 2));
+            const response = await searchSuppliersHybrid(
+              'bodas', // service genérico
+              location, // location
+              styleQuery, // query con el estilo
+              null, // budget
+              { mode: 'database' } // filters
+            );
+            if (response.suppliers && response.suppliers.length > 0) {
+              results.push(...response.suppliers.slice(0, 2));
             }
           } catch (err) {
             console.log('Error fetching by style:', err);
           }
         }
 
-        // 3. Proveedores populares generales
-        try {
-          const response = await searchSuppliersHybrid('wedding services', {
-            location: weddingProfile?.location || weddingProfile?.city,
-            mode: 'database',
-          });
-          if (response.results && response.results.length > 0) {
-            results.push(...response.results.slice(0, 2));
+        // 3. Proveedores populares generales (solo si tenemos pocos resultados)
+        if (results.length < 4) {
+          try {
+            const response = await searchSuppliersHybrid(
+              'bodas', // service genérico
+              location, // location
+              '', // query
+              null, // budget
+              { mode: 'database' } // filters
+            );
+            if (response.suppliers && response.suppliers.length > 0) {
+              results.push(...response.suppliers.slice(0, 3));
+            }
+          } catch (err) {
+            console.log('Error fetching popular:', err);
           }
-        } catch (err) {
-          console.log('Error fetching popular:', err);
         }
 
         // Eliminar duplicados y favoritos existentes

@@ -172,12 +172,7 @@
         ],
         "trust": {
           "title": "Confían en MaLove.App",
-          "brands": [
-            "Lumiere Events",
-            "Novia Atelier",
-            "Festiva Group",
-            "Urban Weddings"
-          ],
+          "brands": ["Lumiere Events", "Novia Atelier", "Festiva Group", "Urban Weddings"],
           "note": "Más de 200 planners activos en Europa y LATAM utilizan MaLove.App para estandarizar procesos y ofrecer experiencias memorables."
         }
       },
@@ -310,6 +305,249 @@
       "pro": "Profesional",
       "enterprise": "Empresa",
       "cta": "Empezar ahora"
+    }
+  },
+  "suppliers": {
+    "meta": {
+      "title": "MaLove.App para proveedores | Consigue parejas cualificadas",
+      "description": "Crea tu portafolio en MaLove.App, llega a parejas en tu zona y recibe solicitudes cualificadas con métricas y mensajería centralizadas.",
+      "ogTitle": "MaLove.App para proveedores | Consigue parejas cualificadas",
+      "ogDescription": "Gestiona tu presencia, paga solo por visualizaciones y convierte parejas en clientes con herramientas profesionales.",
+      "twitterTitle": "MaLove.App para proveedores | Consigue parejas cualificadas",
+      "twitterDescription": "Destaca tu negocio de bodas, recibe leads cualificados y obtén estadísticas en tiempo real.",
+      "canonical": "https://malove.app/para-proveedores",
+      "image": "https://malove.app/maloveapp-logo.png"
+    },
+    "hero": {
+      "brand": "MaLove.App",
+      "logoAlt": "Logo MaLove.App",
+      "badge": "Para Proveedores de Bodas",
+      "title": "Conecta con parejas que buscan tus servicios",
+      "description": [
+        "MaLove.App te ayuda a llegar a miles de parejas organizando su boda. Sistema de pago por visualización sin suscripciones mensuales ni comisiones por contrato.",
+        "Crea tu portafolio profesional, recibe solicitudes cualificadas y gestiona todo desde tu dashboard."
+      ],
+      "primaryCta": "Registra tu negocio gratis",
+      "secondaryCta": "Ver cómo funciona",
+      "stats": {
+        "label": "Tu Dashboard",
+        "title": "Panel de Proveedor",
+        "growthBadge": "+24% este mes",
+        "metrics": [
+          {
+            "icon": "eye",
+            "label": "Visualizaciones",
+            "value": "1,248",
+            "hint": "156 tokens disponibles"
+          },
+          {
+            "icon": "messageSquare",
+            "label": "Solicitudes",
+            "value": "47",
+            "hint": "12 pendientes de respuesta"
+          },
+          {
+            "icon": "star",
+            "label": "Valoración",
+            "value": "4.9",
+            "hint": "Basado en 28 reseñas"
+          }
+        ]
+      }
+    },
+    "benefits": {
+      "title": "Por qué proveedores eligen MaLove.App",
+      "subtitle": "Herramientas profesionales para hacer crecer tu negocio de bodas",
+      "items": [
+        {
+          "icon": "users",
+          "title": "Llega a miles de parejas",
+          "description": "Aparece en las búsquedas cuando parejas buscan servicios como el tuyo en tu zona."
+        },
+        {
+          "icon": "camera",
+          "title": "Portafolio profesional",
+          "description": "Crea tu página pública con galería de fotos, servicios, precios y reseñas."
+        },
+        {
+          "icon": "messageSquare",
+          "title": "Recibe solicitudes directas",
+          "description": "Las parejas te contactan directamente desde la plataforma con su información y necesidades."
+        },
+        {
+          "icon": "barChart",
+          "title": "Dashboard de gestión",
+          "description": "Gestiona todas tus solicitudes, conversaciones y proyectos desde un panel."
+        },
+        {
+          "icon": "trendingUp",
+          "title": "Sin comisiones",
+          "description": "Solo pagas por visualización. No cobramos comisión por contrato cerrado."
+        },
+        {
+          "icon": "shield",
+          "title": "Verificación profesional",
+          "description": "Badge de proveedor verificado que aumenta la confianza de potenciales clientes."
+        }
+      ]
+    },
+    "howItWorks": {
+      "badge": "Proceso Simple",
+      "title": "Cómo funciona",
+      "description": "En 5 pasos estás listo para recibir solicitudes de parejas",
+      "steps": [
+        {
+          "title": "Regístrate gratis",
+          "description": "Crea tu cuenta de proveedor sin coste ni compromiso."
+        },
+        {
+          "title": "Completa tu perfil",
+          "description": "Añade fotos de tu trabajo, servicios, precios y zona de cobertura."
+        },
+        {
+          "title": "Compra créditos",
+          "description": "Adquiere tokens de visualización según tus necesidades. Sin suscripciones mensuales."
+        },
+        {
+          "title": "Aparece en búsquedas",
+          "description": "Cuando una pareja busca tu categoría, apareces en los resultados y se consume 1 token."
+        },
+        {
+          "title": "Recibe solicitudes",
+          "description": "Las parejas interesadas te envían solicitudes de presupuesto con toda su información."
+        }
+      ]
+    },
+    "tokens": {
+      "badge": "Sistema de Tokens",
+      "title": "Pago por visualización, sin sorpresas",
+      "description": "Solo pagas cuando tu perfil aparece en los resultados de búsqueda de una pareja",
+      "howTitle": "¿Cómo funcionan los tokens?",
+      "howList": [
+        "Compras un pack de tokens según tus necesidades (ej: 100, 500, 1000 tokens)",
+        "Cuando una pareja busca servicios en tu categoría, tu perfil puede aparecer",
+        "Si apareces en sus resultados, se consume 1 token",
+        "Los tokens no caducan: los usas a tu ritmo",
+        "Puedes pausar tu perfil cuando quieras sin perder tokens"
+      ],
+      "includedTitle": "Lo que está incluido",
+      "included": [
+        "Sistema de pago por visualización (tokens)",
+        "Sin suscripción mensual fija",
+        "Compra solo los tokens que necesites",
+        "Los tokens no caducan",
+        "Sin comisiones por contrato cerrado",
+        "Dashboard y mensajería incluidos",
+        "Página pública personalizable",
+        "Actualización de portafolio ilimitada"
+      ],
+      "notice": "💡 Los precios de los packs de tokens se anunciarán próximamente"
+    },
+    "testimonials": {
+      "badge": "Testimonios",
+      "title": "Proveedores que ya confían en nosotros",
+      "items": [
+        {
+          "quote": "Desde que estoy en MaLove.App recibo solicitudes cualificadas cada semana. Las parejas llegan con información clara y presupuesto definido.",
+          "name": "Carlos Mendoza",
+          "role": "Fotógrafo de bodas",
+          "rating": 5
+        },
+        {
+          "quote": "Me gusta el sistema de tokens. Solo pago cuando me ven. No como otras plataformas donde pagas suscripción mensual aunque no consigas clientes.",
+          "name": "Laura Vega",
+          "role": "Wedding Planner",
+          "rating": 5
+        },
+        {
+          "quote": "El dashboard es muy completo. Gestiono todas mis solicitudes, conversaciones y contratos desde un solo sitio.",
+          "name": "Roberto Jiménez",
+          "role": "Catering & Eventos",
+          "rating": 5
+        }
+      ]
+    },
+    "categoriesSection": {
+      "badge": "Categorías Disponibles",
+      "title": "¿Tu negocio encaja en MaLove.App?",
+      "description": "Trabajamos con todo tipo de proveedores del sector nupcial",
+      "list": [
+        "Fotografía y Video",
+        "Catering y Banquetes",
+        "Locales y Venues",
+        "Música y DJ",
+        "Decoración y Flores",
+        "Vestidos y Trajes",
+        "Belleza y Estilismo",
+        "Invitaciones y Papelería",
+        "Pastelería",
+        "Transporte",
+        "Animación",
+        "Wedding Planner",
+        "Otro"
+      ],
+      "formTitle": "Solicita más información",
+      "formDescription": "Completa este formulario y nuestro equipo se pondrá en contacto contigo para explicarte todo el proceso."
+    },
+    "form": {
+      "fields": {
+        "name": {
+          "label": "Nombre completo *",
+          "placeholder": "Tu nombre"
+        },
+        "email": {
+          "label": "Email *",
+          "placeholder": "tu@email.com"
+        },
+        "business": {
+          "label": "Nombre del negocio *",
+          "placeholder": "Nombre de tu empresa"
+        },
+        "category": {
+          "label": "Categoría",
+          "placeholder": "Selecciona una categoría"
+        }
+      },
+      "submit": "Solicitar información",
+      "submitting": "Enviando...",
+      "consent": "Al enviar este formulario aceptas que nos pongamos en contacto contigo para informarte sobre MaLove.App para proveedores.",
+      "messages": {
+        "success": "¡Gracias! Nos pondremos en contacto contigo en menos de 24 horas.",
+        "error": "Por favor completa todos los campos obligatorios."
+      }
+    },
+    "finalCta": {
+      "title": "Empieza a recibir solicitudes de parejas hoy",
+      "description": "Regístrate gratis, completa tu perfil y empieza a aparecer en las búsquedas de miles de parejas.",
+      "primary": "Registrarme ahora",
+      "secondary": "Ver más detalles"
+    },
+    "structuredData": {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "name": "MaLove.App para proveedores",
+      "serviceType": "Generación de leads cualificados para proveedores de bodas",
+      "provider": {
+        "@type": "Organization",
+        "name": "MaLove.App",
+        "url": "https://malove.app",
+        "logo": "https://malove.app/maloveapp-logo.png"
+      },
+      "areaServed": {
+        "@type": "Country",
+        "name": "España"
+      },
+      "serviceAudience": {
+        "@type": "Audience",
+        "audienceType": "Proveedores y profesionales de bodas"
+      },
+      "offers": {
+        "@type": "Offer",
+        "url": "https://malove.app/para-proveedores",
+        "priceCurrency": "EUR",
+        "availability": "https://schema.org/InStock",
+        "description": "Sistema de pago por visualización con herramientas de portafolio, analítica y mensajería integrada."
+      }
     }
   }
 }

@@ -172,12 +172,7 @@
         ],
         "trust": {
           "title": "Trusted by MaLove.App",
-          "brands": [
-            "Lumiere Events",
-            "Novia Atelier",
-            "Festiva Group",
-            "Urban Weddings"
-          ],
+          "brands": ["Lumiere Events", "Novia Atelier", "Festiva Group", "Urban Weddings"],
           "note": "200+ active planners across Europe and LATAM rely on MaLove.App to standardize processes and deliver memorable experiences."
         }
       },
@@ -249,14 +244,7 @@
           "badge": "MaLove.App Workspace",
           "title": "A connected ecosystem",
           "description": "Synced modules, personalised roles, and granular permissions so you can collaborate without losing context.",
-          "tags": [
-            "Dashboard",
-            "Guests",
-            "Finance",
-            "Communication",
-            "Design",
-            "Automations"
-          ]
+          "tags": ["Dashboard", "Guests", "Finance", "Communication", "Design", "Automations"]
         }
       },
       "modules": {
@@ -310,6 +298,249 @@
       "pro": "Professional",
       "enterprise": "Enterprise",
       "cta": "Get started"
+    }
+  },
+  "suppliers": {
+    "meta": {
+      "title": "MaLove.App for suppliers | Reach qualified couples",
+      "description": "Publish your portfolio on MaLove.App, reach couples in your area and receive qualified enquiries with centralised metrics and messaging.",
+      "ogTitle": "MaLove.App for suppliers | Reach qualified couples",
+      "ogDescription": "Manage your presence, pay only per view and convert couples into clients with professional tools.",
+      "twitterTitle": "MaLove.App for suppliers | Reach qualified couples",
+      "twitterDescription": "Showcase your wedding business, receive qualified leads and get real-time analytics.",
+      "canonical": "https://malove.app/para-proveedores",
+      "image": "https://malove.app/maloveapp-logo.png"
+    },
+    "hero": {
+      "brand": "MaLove.App",
+      "logoAlt": "MaLove.App logo",
+      "badge": "For Wedding Suppliers",
+      "title": "Connect with couples looking for your services",
+      "description": [
+        "MaLove.App helps you reach thousands of couples planning their wedding. Pay-per-view model with no monthly subscriptions or commission fees.",
+        "Build a professional portfolio, receive qualified requests and manage everything from your dashboard."
+      ],
+      "primaryCta": "Create your profile for free",
+      "secondaryCta": "See how it works",
+      "stats": {
+        "label": "Your dashboard",
+        "title": "Supplier panel",
+        "growthBadge": "+24% this month",
+        "metrics": [
+          {
+            "icon": "eye",
+            "label": "Profile views",
+            "value": "1,248",
+            "hint": "156 tokens available"
+          },
+          {
+            "icon": "messageSquare",
+            "label": "Requests",
+            "value": "47",
+            "hint": "12 waiting for reply"
+          },
+          {
+            "icon": "star",
+            "label": "Rating",
+            "value": "4.9",
+            "hint": "Based on 28 reviews"
+          }
+        ]
+      }
+    },
+    "benefits": {
+      "title": "Why suppliers choose MaLove.App",
+      "subtitle": "Professional tools to grow your wedding business",
+      "items": [
+        {
+          "icon": "users",
+          "title": "Reach thousands of couples",
+          "description": "Appear in search results when couples look for services like yours in their area."
+        },
+        {
+          "icon": "camera",
+          "title": "Professional portfolio",
+          "description": "Create a public page with photo gallery, services, pricing and reviews."
+        },
+        {
+          "icon": "messageSquare",
+          "title": "Direct enquiries",
+          "description": "Couples contact you directly within the platform with their needs and contact details."
+        },
+        {
+          "icon": "barChart",
+          "title": "Management dashboard",
+          "description": "Track enquiries, conversations and projects from a single panel."
+        },
+        {
+          "icon": "trendingUp",
+          "title": "No commission fees",
+          "description": "Only pay per view. We never charge commission on signed contracts."
+        },
+        {
+          "icon": "shield",
+          "title": "Verified supplier badge",
+          "description": "Increase trust with a verification badge for potential clients."
+        }
+      ]
+    },
+    "howItWorks": {
+      "badge": "Simple process",
+      "title": "How it works",
+      "description": "Five steps to start receiving wedding enquiries",
+      "steps": [
+        {
+          "title": "Sign up for free",
+          "description": "Create your supplier account with no cost or obligation."
+        },
+        {
+          "title": "Complete your profile",
+          "description": "Add photos, services, pricing and coverage areas."
+        },
+        {
+          "title": "Buy credits",
+          "description": "Purchase view tokens according to your needs. No monthly subscriptions."
+        },
+        {
+          "title": "Appear in searches",
+          "description": "When a couple looks for your category, your profile can show up and uses 1 token."
+        },
+        {
+          "title": "Receive enquiries",
+          "description": "Interested couples send you quote requests with all their information."
+        }
+      ]
+    },
+    "tokens": {
+      "badge": "Token system",
+      "title": "Pay per view, no surprises",
+      "description": "You only pay when your profile appears in a couple’s search results",
+      "howTitle": "How do tokens work?",
+      "howList": [
+        "Purchase token packs that fit your goals (e.g. 100, 500, 1,000 tokens)",
+        "When a couple searches your category, your profile can be shown",
+        "If you appear in their results, 1 token is consumed",
+        "Tokens never expire—you use them at your own pace",
+        "Pause your profile whenever you want without losing tokens"
+      ],
+      "includedTitle": "What’s included",
+      "included": [
+        "Pay-per-view token model",
+        "No fixed monthly subscription",
+        "Buy exactly the tokens you need",
+        "Tokens never expire",
+        "No commission on booked contracts",
+        "Dashboard and messaging included",
+        "Customisable public portfolio page",
+        "Unlimited portfolio updates"
+      ],
+      "notice": "💡 Pricing for token packs will be announced soon"
+    },
+    "testimonials": {
+      "badge": "Testimonials",
+      "title": "Suppliers already growing with MaLove.App",
+      "items": [
+        {
+          "quote": "Since joining MaLove.App I receive qualified enquiries every week. Couples arrive with clear information and defined budgets.",
+          "name": "Carlos Mendoza",
+          "role": "Wedding photographer",
+          "rating": 5
+        },
+        {
+          "quote": "I love the token system. I only pay when I am seen, unlike other platforms with monthly fees even if you get no clients.",
+          "name": "Laura Vega",
+          "role": "Wedding planner",
+          "rating": 5
+        },
+        {
+          "quote": "The dashboard is complete. I manage enquiries, chats and contracts from a single place.",
+          "name": "Roberto Jiménez",
+          "role": "Catering & events",
+          "rating": 5
+        }
+      ]
+    },
+    "categoriesSection": {
+      "badge": "Available categories",
+      "title": "Does your business fit MaLove.App?",
+      "description": "We work with every kind of wedding supplier",
+      "list": [
+        "Photography & Video",
+        "Catering & Banquets",
+        "Venues",
+        "Music & DJs",
+        "Decor & Flowers",
+        "Dresses & Suits",
+        "Beauty & Styling",
+        "Invitations & Stationery",
+        "Cakes & Desserts",
+        "Transportation",
+        "Entertainment",
+        "Wedding Planner",
+        "Other"
+      ],
+      "formTitle": "Request more information",
+      "formDescription": "Fill in the form and our team will reach out to explain every step."
+    },
+    "form": {
+      "fields": {
+        "name": {
+          "label": "Full name *",
+          "placeholder": "Your name"
+        },
+        "email": {
+          "label": "Email *",
+          "placeholder": "you@email.com"
+        },
+        "business": {
+          "label": "Business name *",
+          "placeholder": "Your company"
+        },
+        "category": {
+          "label": "Category",
+          "placeholder": "Select a category"
+        }
+      },
+      "submit": "Request information",
+      "submitting": "Sending...",
+      "consent": "By submitting you agree to be contacted about MaLove.App for suppliers.",
+      "messages": {
+        "success": "Thank you! We will get in touch within 24 hours.",
+        "error": "Please fill in all the required fields."
+      }
+    },
+    "finalCta": {
+      "title": "Start receiving wedding enquiries today",
+      "description": "Register for free, complete your profile and appear in thousands of searches.",
+      "primary": "Register now",
+      "secondary": "See more details"
+    },
+    "structuredData": {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "name": "MaLove.App for suppliers",
+      "serviceType": "Qualified lead generation for wedding suppliers",
+      "provider": {
+        "@type": "Organization",
+        "name": "MaLove.App",
+        "url": "https://malove.app",
+        "logo": "https://malove.app/maloveapp-logo.png"
+      },
+      "areaServed": {
+        "@type": "Country",
+        "name": "Spain"
+      },
+      "serviceAudience": {
+        "@type": "Audience",
+        "audienceType": "Wedding suppliers and professionals"
+      },
+      "offers": {
+        "@type": "Offer",
+        "url": "https://malove.app/para-proveedores",
+        "priceCurrency": "EUR",
+        "availability": "https://schema.org/InStock",
+        "description": "Pay-per-view system with portfolio, analytics and integrated messaging tools."
+      }
     }
   }
 }
