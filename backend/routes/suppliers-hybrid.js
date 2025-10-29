@@ -22,6 +22,9 @@ import fetch from 'node-fetch';
 // Importar servicio de Google Places
 import * as googlePlacesService from '../services/googlePlacesService.js';
 
+// Importar utilidades de ubicación
+import { filterSuppliersByLocation } from '../utils/locationMatcher.js';
+
 const NEUTRAL_LOCATIONS = new Set(['españa', 'spain', 'nacional', 'todo españa', 'toda españa']);
 
 /**
@@ -324,27 +327,9 @@ router.post('/search', async (req, res) => {
       console.log('📊 [FIRESTORE] Buscando proveedores por nombre...');
       console.log(`   Servicio: "${service}" | Query: "${query || '—'}"`);
 
-      // Traer todos los proveedores (sin filtro de categoría)
-      // Filtraremos por nombre en memoria
-      let firestoreQuery = db.collection('suppliers').limit(100); // Traer más documentos para buscar por nombre
-
-      // DESHABILITADO TEMPORALMENTE: Filtro de ubicación causa 0 resultados
-      // El filtro location.city es muy estricto y elimina todos los proveedores
-      // TODO: Buscar en ubicación DESPUÉS de obtener todos los documentos
-
-      console.log(`⚠️ [UBICACION] Filtro de ubicación DESHABILITADO temporalmente`);
-      console.log(`   Location solicitada: "${location}"`);
-
-      // const locationValue = typeof location === 'string' ? location.trim() : location;
-      // const shouldFilterByLocation = (() => {
-      //   if (!locationValue) return false;
-      //   const normalized = normalizeText(locationValue);
-      //   return normalized.length > 0 && !NEUTRAL_LOCATIONS.has(normalized);
-      // })();
-
-      // if (shouldFilterByLocation) {
-      //   firestoreQuery = firestoreQuery.where('location.city', '==', locationValue);
-      // }
+      // Traer todos los proveedores (sin filtro de categoría ni ubicación)
+      // Filtraremos por nombre y ubicación en memoria con lógica de ámbito geográfico
+      let firestoreQuery = db.collection('suppliers').limit(100);
 
       const snapshot = await firestoreQuery.get();
 
@@ -487,7 +472,22 @@ router.post('/search', async (req, res) => {
           }
 
           return isValid;
-        })
+        });
+
+      // ⭐ NUEVO: Filtrar por ubicación con lógica de ámbito geográfico
+      const beforeLocationFilter = registeredResults.length;
+      registeredResults = filterSuppliersByLocation(registeredResults, location);
+      const filteredByLocation = beforeLocationFilter - registeredResults.length;
+
+      if (filteredByLocation > 0) {
+        console.log(
+          `\n🌍 [UBICACIÓN] ${filteredByLocation} proveedores filtrados por ámbito geográfico`
+        );
+        console.log(`   Ubicación solicitada: "${location}"`);
+        console.log(`   Proveedores que pueden trabajar ahí: ${registeredResults.length}`);
+      }
+
+      registeredResults = registeredResults
         // ⭐ ORDENAMIENTO INTELIGENTE: Priorizar coincidencias de nombre
         .sort((a, b) => {
           const nameA = (a.name || a.profile?.name || '').toLowerCase();
