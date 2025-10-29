@@ -1,12 +1,12 @@
 import express from 'express';
 import { db, FieldValue } from '../config/firebase.js';
 import logger from '../logger.js';
-import nodemailer from 'nodemailer';
+import { createTransport } from 'nodemailer';
 
 const router = express.Router();
 
 // Configurar transporter de nodemailer
-const transporter = nodemailer.createTransporter({
+const transporter = createTransport({
   host: process.env.SMTP_HOST || 'smtp.gmail.com',
   port: process.env.SMTP_PORT || 587,
   secure: false,
