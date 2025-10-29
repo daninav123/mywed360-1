@@ -780,514 +780,525 @@ const Proveedores = () => {
           <FavoritesSection />
         ) : (
           <>
-        {/* Stats Cards Premium */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card className="p-4 bg-gradient-to-br from-[var(--color-primary)]/10 to-transparent border-[var(--color-primary)]/30">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-primary)] mb-1">
-                  {t('common.suppliers.overview.metrics.totalProviders')}
-                </p>
-                <p className="text-2xl font-black text-body">{totalProviders}</p>
-              </div>
-              <Building2 className="w-8 h-8 text-[color:var(--color-primary)]/40" />
-            </div>
-          </Card>
-
-          <Card className="p-4 bg-gradient-to-br from-[var(--color-success)]/10 to-transparent border-[var(--color-success)]/30">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-success)] mb-1">
-                  {t('common.suppliers.overview.metrics.confirmed')}
-                </p>
-                <p className="text-2xl font-black text-[color:var(--color-success)]">
-                  {confirmedCount}
-                </p>
-              </div>
-              <CheckCircle className="w-8 h-8 text-[color:var(--color-success)]/40" />
-            </div>
-          </Card>
-
-          <Card className="p-4 bg-gradient-to-br from-[var(--color-warning)]/10 to-transparent border-[var(--color-warning)]/30">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-warning)] mb-1">
-                  {t('common.suppliers.overview.metrics.pending')}
-                </p>
-                <p className="text-2xl font-black text-[color:var(--color-warning)]">
-                  {pendingCount}
-                </p>
-              </div>
-              <Clock className="w-8 h-8 text-[color:var(--color-warning)]/40" />
-            </div>
-          </Card>
-
-          <Card className="p-4 bg-gradient-to-br from-[var(--color-accent)]/10 to-transparent border-[var(--color-accent)]/30">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-accent)] mb-1">
-                  {t('common.suppliers.overview.metrics.shortlist')}
-                </p>
-                <p className="text-2xl font-black text-[color:var(--color-accent)]">
-                  {shortlistTotal}
-                </p>
-              </div>
-              <Sparkles className="w-8 h-8 text-[color:var(--color-accent)]/40" />
-            </div>
-          </Card>
-        </div>
-
-        {!searchPanelCollapsed ? (
-          <Card className="p-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft shadow-lg">
-            <div className="flex flex-wrap items-start justify-between gap-3 mb-6">
-              <div className="flex items-center gap-3">
-                <div className="p-3 rounded-xl bg-[var(--color-primary)]/15">
-                  <Search className="w-6 h-6 text-[color:var(--color-primary)]" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold text-body">
-                    {t('common.suppliers.overview.exploration.title')}
-                  </h2>
-                  <p className="text-sm text-muted">
-                    {t('common.suppliers.overview.exploration.subtitle')}
-                  </p>
-                </div>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                aria-label={t('common.suppliers.overview.exploration.collapseAria')}
-                onClick={() => setSearchPanelCollapsed(true)}
-                className="h-8 w-8 justify-center hover:bg-[var(--color-primary)]/10"
-              >
-                <ChevronUp className="h-4 w-4" />
-              </Button>
-            </div>
-
-            <div className="space-y-6">
-              <form onSubmit={handleSearchSubmit} className="space-y-3">
-                <div className="flex flex-wrap items-center gap-3">
-                  <div className="relative flex-1 min-w-[220px]">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted" />
-                    <Input
-                      type="search"
-                      value={searchInput}
-                      onChange={(event) => setSearchInput(event.target.value)}
-                      placeholder={t('common.suppliers.overview.exploration.searchPlaceholder')}
-                      className="pl-10"
-                    />
+            {/* Stats Cards Premium */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <Card className="p-4 bg-gradient-to-br from-[var(--color-primary)]/10 to-transparent border-[var(--color-primary)]/30">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-primary)] mb-1">
+                      {t('common.suppliers.overview.metrics.totalProviders')}
+                    </p>
+                    <p className="text-2xl font-black text-body">{totalProviders}</p>
                   </div>
-
-                  {/* Selector de modo de búsqueda (DEBUG) */}
-                  <div className="flex items-center gap-2">
-                    <label className="text-xs font-medium text-muted whitespace-nowrap">
-                      {t('common.suppliers.overview.searchMode.label')}
-                    </label>
-                    <select
-                      value={searchMode}
-                      onChange={(e) => setSearchMode(e.target.value)}
-                      className="px-3 py-1.5 text-sm border border-border rounded-md bg-surface text-body focus:outline-none focus:ring-2 focus:ring-primary"
-                    >
-                      <option value="auto">{t('common.suppliers.overview.searchMode.auto')}</option>
-                      <option value="database">
-                        {t('common.suppliers.overview.searchMode.database')}
-                      </option>
-                      <option value="internet">
-                        {t('common.suppliers.overview.searchMode.internet')}
-                      </option>
-                    </select>
-                  </div>
-
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Button type="submit" size="sm" leftIcon={<Search size={16} />}>
-                      {t('app.search')}
-                    </Button>
-                    {searchInput && (
-                      <Button type="button" variant="outline" size="sm" onClick={handleClearSearch}>
-                        {t('common.suppliers.overview.actions.clear')}
-                      </Button>
-                    )}
-                  </div>
+                  <Building2 className="w-8 h-8 text-[color:var(--color-primary)]/40" />
                 </div>
-              </form>
+              </Card>
 
-              {/* Smart Filters Bar */}
-              <SmartFiltersBar weddingProfile={weddingProfile} onFiltersChange={setSmartFilters} />
-
-              {searchHistory.length > 0 && (
-                <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
-                  <span className="font-medium text-body">
-                    {t('common.suppliers.overview.exploration.recentSearches')}
-                  </span>
-                  {searchHistory.map((query) => (
-                    <button
-                      key={query}
-                      type="button"
-                      onClick={() => {
-                        setSearchInput(query);
-                        setSearchTerm(query);
-                      }}
-                      className="px-3 py-1.5 rounded-full border border-soft bg-surface hover:border-primary hover:text-primary hover:bg-[var(--color-primary)]/5 transition-all duration-200"
-                    >
-                      {query}
-                    </button>
-                  ))}
+              <Card className="p-4 bg-gradient-to-br from-[var(--color-success)]/10 to-transparent border-[var(--color-success)]/30">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-success)] mb-1">
+                      {t('common.suppliers.overview.metrics.confirmed')}
+                    </p>
+                    <p className="text-2xl font-black text-[color:var(--color-success)]">
+                      {confirmedCount}
+                    </p>
+                  </div>
+                  <CheckCircle className="w-8 h-8 text-[color:var(--color-success)]/40" />
                 </div>
-              )}
+              </Card>
 
-              <ShortlistList
-                items={shortlist}
-                loading={shortlistLoading}
-                error={shortlistError}
-                t={t}
-              />
+              <Card className="p-4 bg-gradient-to-br from-[var(--color-warning)]/10 to-transparent border-[var(--color-warning)]/30">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-warning)] mb-1">
+                      {t('common.suppliers.overview.metrics.pending')}
+                    </p>
+                    <p className="text-2xl font-black text-[color:var(--color-warning)]">
+                      {pendingCount}
+                    </p>
+                  </div>
+                  <Clock className="w-8 h-8 text-[color:var(--color-warning)]/40" />
+                </div>
+              </Card>
 
-              {(aiLoading || searchCompleted) && (
-                <section className="space-y-3">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <div className="space-y-1">
-                      <h3 className="text-lg font-semibold text-body">
-                        {t('common.suppliers.overview.results.title')}
-                      </h3>
-                      {searchResultsQuery && (
-                        <p className="text-xs text-muted">
-                          {t('common.suppliers.overview.results.query', {
-                            value: searchResultsQuery,
-                          })}
-                        </p>
-                      )}
+              <Card className="p-4 bg-gradient-to-br from-[var(--color-accent)]/10 to-transparent border-[var(--color-accent)]/30">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-accent)] mb-1">
+                      {t('common.suppliers.overview.metrics.shortlist')}
+                    </p>
+                    <p className="text-2xl font-black text-[color:var(--color-accent)]">
+                      {shortlistTotal}
+                    </p>
+                  </div>
+                  <Sparkles className="w-8 h-8 text-[color:var(--color-accent)]/40" />
+                </div>
+              </Card>
+            </div>
+
+            {!searchPanelCollapsed ? (
+              <Card className="p-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft shadow-lg">
+                <div className="flex flex-wrap items-start justify-between gap-3 mb-6">
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 rounded-xl bg-[var(--color-primary)]/15">
+                      <Search className="w-6 h-6 text-[color:var(--color-primary)]" />
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-bold text-body">
+                        {t('common.suppliers.overview.exploration.title')}
+                      </h2>
+                      <p className="text-sm text-muted">
+                        {t('common.suppliers.overview.exploration.subtitle')}
+                      </p>
                     </div>
                   </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    aria-label={t('common.suppliers.overview.exploration.collapseAria')}
+                    onClick={() => setSearchPanelCollapsed(true)}
+                    className="h-8 w-8 justify-center hover:bg-[var(--color-primary)]/10"
+                  >
+                    <ChevronUp className="h-4 w-4" />
+                  </Button>
+                </div>
 
-                  {/* Mensaje de fallback eliminado - ya no se usa */}
+                <div className="space-y-6">
+                  <form onSubmit={handleSearchSubmit} className="space-y-3">
+                    <div className="flex flex-wrap items-center gap-3">
+                      <div className="relative flex-1 min-w-[220px]">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted" />
+                        <Input
+                          type="search"
+                          value={searchInput}
+                          onChange={(event) => setSearchInput(event.target.value)}
+                          placeholder={t('common.suppliers.overview.exploration.searchPlaceholder')}
+                          className="pl-10"
+                        />
+                      </div>
 
-                  {aiLoading ? (
-                    <Card className="border border-soft bg-surface text-sm text-muted">
-                      {t('common.suppliers.overview.results.loading')}
-                    </Card>
-                  ) : aiError ? (
-                    <Card className="border border-danger bg-danger-soft text-sm text-danger">
-                      {aiError?.message || t('common.suppliers.overview.toasts.error')}
-                    </Card>
-                  ) : aiResults.length === 0 ? (
-                    <Card className="border border-dashed border-soft bg-surface/80 text-sm text-muted">
-                      {t('common.suppliers.overview.results.empty')}
-                    </Card>
-                  ) : (
-                    <>
-                      {/* Mostrar breakdown de resultados + modo de búsqueda */}
-                      {searchBreakdown &&
-                        searchBreakdown.registered +
-                          searchBreakdown.cached +
-                          searchBreakdown.internet >
-                          0 && (
-                          <div className="mb-4 space-y-2">
-                            {/* Indicador de modo de búsqueda activo */}
-                            <div
-                              className={`p-2 border rounded-lg text-xs font-medium ${
-                                searchMode === 'database'
-                                  ? 'bg-purple-50 border-purple-200 text-purple-900'
-                                  : searchMode === 'internet'
-                                    ? 'bg-orange-50 border-orange-200 text-orange-900'
-                                    : 'bg-green-50 border-green-200 text-green-900'
-                              }`}
-                            >
-                              {t('common.suppliers.overview.searchMode.indicator', {
-                                mode:
-                                  searchMode === 'database'
-                                    ? t('common.suppliers.overview.searchMode.database')
-                                    : searchMode === 'internet'
-                                      ? t('common.suppliers.overview.searchMode.internet')
-                                      : t('common.suppliers.overview.searchMode.auto'),
+                      {/* Selector de modo de búsqueda (DEBUG) */}
+                      <div className="flex items-center gap-2">
+                        <label className="text-xs font-medium text-muted whitespace-nowrap">
+                          {t('common.suppliers.overview.searchMode.label')}
+                        </label>
+                        <select
+                          value={searchMode}
+                          onChange={(e) => setSearchMode(e.target.value)}
+                          className="px-3 py-1.5 text-sm border border-border rounded-md bg-surface text-body focus:outline-none focus:ring-2 focus:ring-primary"
+                        >
+                          <option value="auto">
+                            {t('common.suppliers.overview.searchMode.auto')}
+                          </option>
+                          <option value="database">
+                            {t('common.suppliers.overview.searchMode.database')}
+                          </option>
+                          <option value="internet">
+                            {t('common.suppliers.overview.searchMode.internet')}
+                          </option>
+                        </select>
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Button type="submit" size="sm" leftIcon={<Search size={16} />}>
+                          {t('app.search')}
+                        </Button>
+                        {searchInput && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={handleClearSearch}
+                          >
+                            {t('common.suppliers.overview.actions.clear')}
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </form>
+
+                  {/* Smart Filters Bar */}
+                  <SmartFiltersBar
+                    weddingProfile={weddingProfile}
+                    onFiltersChange={setSmartFilters}
+                  />
+
+                  {searchHistory.length > 0 && (
+                    <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
+                      <span className="font-medium text-body">
+                        {t('common.suppliers.overview.exploration.recentSearches')}
+                      </span>
+                      {searchHistory.map((query) => (
+                        <button
+                          key={query}
+                          type="button"
+                          onClick={() => {
+                            setSearchInput(query);
+                            setSearchTerm(query);
+                          }}
+                          className="px-3 py-1.5 rounded-full border border-soft bg-surface hover:border-primary hover:text-primary hover:bg-[var(--color-primary)]/5 transition-all duration-200"
+                        >
+                          {query}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  <ShortlistList
+                    items={shortlist}
+                    loading={shortlistLoading}
+                    error={shortlistError}
+                    t={t}
+                  />
+
+                  {(aiLoading || searchCompleted) && (
+                    <section className="space-y-3">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <div className="space-y-1">
+                          <h3 className="text-lg font-semibold text-body">
+                            {t('common.suppliers.overview.results.title')}
+                          </h3>
+                          {searchResultsQuery && (
+                            <p className="text-xs text-muted">
+                              {t('common.suppliers.overview.results.query', {
+                                value: searchResultsQuery,
                               })}
-                            </div>
+                            </p>
+                          )}
+                        </div>
+                      </div>
 
-                            {/* Breakdown de resultados */}
-                            <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                              <p className="text-sm text-blue-900 font-medium">
-                                {t('common.suppliers.overview.breakdown.title', {
-                                  total:
-                                    searchBreakdown.registered +
-                                    searchBreakdown.cached +
-                                    searchBreakdown.internet,
-                                  registered: searchBreakdown.registered,
-                                  cached: searchBreakdown.cached,
-                                  internet: searchBreakdown.internet,
+                      {/* Mensaje de fallback eliminado - ya no se usa */}
+
+                      {aiLoading ? (
+                        <Card className="border border-soft bg-surface text-sm text-muted">
+                          {t('common.suppliers.overview.results.loading')}
+                        </Card>
+                      ) : aiError ? (
+                        <Card className="border border-danger bg-danger-soft text-sm text-danger">
+                          {aiError?.message || t('common.suppliers.overview.toasts.error')}
+                        </Card>
+                      ) : aiResults.length === 0 ? (
+                        <Card className="border border-dashed border-soft bg-surface/80 text-sm text-muted">
+                          {t('common.suppliers.overview.results.empty')}
+                        </Card>
+                      ) : (
+                        <>
+                          {/* Mostrar breakdown de resultados + modo de búsqueda */}
+                          {searchBreakdown &&
+                            searchBreakdown.registered +
+                              searchBreakdown.cached +
+                              searchBreakdown.internet >
+                              0 && (
+                              <div className="mb-4 space-y-2">
+                                {/* Indicador de modo de búsqueda activo */}
+                                <div
+                                  className={`p-2 border rounded-lg text-xs font-medium ${
+                                    searchMode === 'database'
+                                      ? 'bg-purple-50 border-purple-200 text-purple-900'
+                                      : searchMode === 'internet'
+                                        ? 'bg-orange-50 border-orange-200 text-orange-900'
+                                        : 'bg-green-50 border-green-200 text-green-900'
+                                  }`}
+                                >
+                                  {t('common.suppliers.overview.searchMode.indicator', {
+                                    mode:
+                                      searchMode === 'database'
+                                        ? t('common.suppliers.overview.searchMode.database')
+                                        : searchMode === 'internet'
+                                          ? t('common.suppliers.overview.searchMode.internet')
+                                          : t('common.suppliers.overview.searchMode.auto'),
+                                  })}
+                                </div>
+
+                                {/* Breakdown de resultados */}
+                                <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                                  <p className="text-sm text-blue-900 font-medium">
+                                    {t('common.suppliers.overview.breakdown.title', {
+                                      total:
+                                        searchBreakdown.registered +
+                                        searchBreakdown.cached +
+                                        searchBreakdown.internet,
+                                      registered: searchBreakdown.registered,
+                                      cached: searchBreakdown.cached,
+                                      internet: searchBreakdown.internet,
+                                    })}
+                                  </p>
+                                </div>
+                              </div>
+                            )}
+
+                          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                            {paginatedResults.map((supplier) => (
+                              <SupplierCard
+                                key={supplier.id || supplier.slug || Math.random()}
+                                supplier={supplier}
+                                onContact={(contactInfo) => {
+                                  // contactInfo puede ser { method, supplier } o simplemente supplier
+                                  const sup = contactInfo.supplier || contactInfo;
+                                  trackSupplierAction(sup.id || sup.slug, 'contact', {
+                                    method: contactInfo.method || 'unknown',
+                                  });
+                                }}
+                                onViewDetails={(s) => {
+                                  trackSupplierAction(s.id || s.slug, 'click');
+                                  handleSelectSearchResult(s);
+                                }}
+                                onMarkAsConfirmed={handleMarkAsConfirmed}
+                              />
+                            ))}
+                          </div>
+
+                          {totalSearchPages > 1 && (
+                            <div className="flex items-center justify-between gap-3 pt-2">
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant="outline"
+                                onClick={handlePrevSearchPage}
+                                disabled={searchResultsPage === 1}
+                              >
+                                {t('app.previous')}
+                              </Button>
+                              <span className="text-xs text-muted">
+                                {t('common.suppliers.overview.pagination.label', {
+                                  current: searchResultsPage,
+                                  total: totalSearchPages,
                                 })}
+                              </span>
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant="outline"
+                                onClick={handleNextSearchPage}
+                                disabled={searchResultsPage === totalSearchPages}
+                              >
+                                {t('app.next')}
+                              </Button>
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </section>
+                  )}
+                </div>
+              </Card>
+            ) : (
+              <div className="flex justify-center">
+                <Button
+                  type="button"
+                  variant="primary"
+                  size="sm"
+                  className="rounded-full"
+                  onClick={() => setSearchPanelCollapsed(false)}
+                >
+                  {t('common.suppliers.overview.buttons.explore')}
+                </Button>
+              </div>
+            )}
+
+            <section className="space-y-5">
+              <Card className="p-4 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-[var(--color-primary)]/10">
+                    <Users className="w-5 h-5 text-[color:var(--color-primary)]" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-body">
+                      {t('common.suppliers.overview.services.title')}
+                    </h2>
+                    <p className="text-sm text-muted">
+                      {servicesSummary.services} · {servicesSummary.confirmed} ·{' '}
+                      {servicesSummary.pending}
+                    </p>
+                  </div>
+                </div>
+              </Card>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                {serviceCards.map((card) => {
+                  const isPending = !card.confirmed;
+                  const borderColor = isPending
+                    ? 'border-[var(--color-warning)]/40'
+                    : 'border-[var(--color-success)]/40';
+                  const gradientFrom = isPending
+                    ? 'from-[var(--color-warning)]/10'
+                    : 'from-[var(--color-success)]/10';
+                  const shortlistLabel = t('common.suppliers.overview.services.shortlistCount', {
+                    count: card.shortlist.length,
+                  });
+                  const statusLabel = isPending
+                    ? t('common.suppliers.overview.status.pending')
+                    : t('common.suppliers.overview.status.confirmed');
+                  const confirmedStatusLabel =
+                    card.confirmed?.status || t('common.suppliers.overview.status.confirmed');
+
+                  return (
+                    <Card
+                      key={card.key}
+                      className={`relative overflow-hidden border-2 ${borderColor} bg-gradient-to-br ${gradientFrom} to-transparent backdrop-blur-sm transition-all duration-300 ${isPending ? 'cursor-pointer hover:shadow-lg hover:scale-[1.02] hover:border-[var(--color-warning)]/60' : 'shadow-md'}`}
+                      onClick={() => {
+                        if (isPending) handleOpenServiceModal(card);
+                      }}
+                    >
+                      <div className="space-y-3">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1">
+                            <h3 className="text-lg font-bold text-body mb-1">{card.label}</h3>
+                            {isPending && card.shortlist.length > 0 && (
+                              <p className="text-xs text-muted flex items-center gap-1">
+                                <Sparkles size={12} />
+                                {shortlistLabel}
                               </p>
+                            )}
+                          </div>
+                          <span
+                            className={`inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full ${isPending ? 'bg-[var(--color-warning)]/15 text-[color:var(--color-warning)]' : 'bg-[var(--color-success)]/15 text-[color:var(--color-success)]'}`}
+                          >
+                            {isPending ? <Clock size={12} /> : <CheckCircle size={12} />}
+                            {statusLabel}
+                          </span>
+                        </div>
+
+                        {card.confirmed ? (
+                          <div className="p-3 rounded-lg bg-[var(--color-success)]/10 border border-[var(--color-success)]/20">
+                            <p className="font-semibold text-body mb-1">{card.confirmed.name}</p>
+                            <p className="text-xs text-muted">{confirmedStatusLabel}</p>
+                          </div>
+                        ) : (
+                          <div className="text-sm text-muted">
+                            <p className="mb-2">
+                              {card.shortlist.length
+                                ? t('common.suppliers.overview.services.reviewShortlist')
+                                : t('common.suppliers.overview.services.emptyShortlist')}
+                            </p>
+                            <div className="flex items-center gap-1 text-xs text-[color:var(--color-primary)]">
+                              <TrendingUp size={12} />
+                              <span>{t('common.suppliers.overview.services.exploreHint')}</span>
                             </div>
                           </div>
                         )}
-
-                      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                        {paginatedResults.map((supplier) => (
-                          <SupplierCard
-                            key={supplier.id || supplier.slug || Math.random()}
-                            supplier={supplier}
-                            onContact={(contactInfo) => {
-                              // contactInfo puede ser { method, supplier } o simplemente supplier
-                              const sup = contactInfo.supplier || contactInfo;
-                              trackSupplierAction(sup.id || sup.slug, 'contact', {
-                                method: contactInfo.method || 'unknown',
-                              });
-                            }}
-                            onViewDetails={(s) => {
-                              trackSupplierAction(s.id || s.slug, 'click');
-                              handleSelectSearchResult(s);
-                            }}
-                            onMarkAsConfirmed={handleMarkAsConfirmed}
-                          />
-                        ))}
                       </div>
+                    </Card>
+                  );
+                })}
+              </div>
+            </section>
 
-                      {totalSearchPages > 1 && (
-                        <div className="flex items-center justify-between gap-3 pt-2">
-                          <Button
-                            type="button"
-                            size="sm"
-                            variant="outline"
-                            onClick={handlePrevSearchPage}
-                            disabled={searchResultsPage === 1}
-                          >
-                            {t('app.previous')}
-                          </Button>
-                          <span className="text-xs text-muted">
-                            {t('common.suppliers.overview.pagination.label', {
-                              current: searchResultsPage,
-                              total: totalSearchPages,
-                            })}
-                          </span>
-                          <Button
-                            type="button"
-                            size="sm"
-                            variant="outline"
-                            onClick={handleNextSearchPage}
-                            disabled={searchResultsPage === totalSearchPages}
-                          >
-                            {t('app.next')}
-                          </Button>
-                        </div>
-                      )}
-                    </>
-                  )}
-                </section>
-              )}
-            </div>
-          </Card>
-        ) : (
-          <div className="flex justify-center">
-            <Button
-              type="button"
-              variant="primary"
-              size="sm"
-              className="rounded-full"
-              onClick={() => setSearchPanelCollapsed(false)}
+            <Modal
+              open={searchDrawerOpen}
+              onClose={() => {
+                setSearchDrawerOpen(false);
+                setSearchDrawerResult(null);
+              }}
+              title={
+                searchDrawerResult?.name
+                  ? t('common.suppliers.overview.drawer.titleWithName', {
+                      name: searchDrawerResult.name,
+                    })
+                  : t('common.suppliers.overview.drawer.title')
+              }
+              size="lg"
             >
-              {t('common.suppliers.overview.buttons.explore')}
-            </Button>
-          </div>
-        )}
+              {searchDrawerResult ? (
+                <div className="space-y-4">
+                  <div className="h-48 w-full overflow-hidden rounded-lg">
+                    <img
+                      src={searchDrawerResult.image || DEFAULT_PROVIDER_IMAGE}
+                      alt={t('common.suppliers.overview.drawer.imageAlt', {
+                        name:
+                          searchDrawerResult.name ||
+                          t('common.suppliers.overview.drawer.fallbackName'),
+                      })}
+                      className="h-full w-full object-cover"
+                      onError={(event) => {
+                        event.currentTarget.src = DEFAULT_PROVIDER_IMAGE;
+                      }}
+                    />
+                  </div>
 
-        <section className="space-y-5">
-          <Card className="p-4 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-[var(--color-primary)]/10">
-                <Users className="w-5 h-5 text-[color:var(--color-primary)]" />
-              </div>
-              <div>
-                <h2 className="text-xl font-bold text-body">
-                  {t('common.suppliers.overview.services.title')}
-                </h2>
-                <p className="text-sm text-muted">
-                  {servicesSummary.services} · {servicesSummary.confirmed} ·{' '}
-                  {servicesSummary.pending}
-                </p>
-              </div>
-            </div>
-          </Card>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-            {serviceCards.map((card) => {
-              const isPending = !card.confirmed;
-              const borderColor = isPending
-                ? 'border-[var(--color-warning)]/40'
-                : 'border-[var(--color-success)]/40';
-              const gradientFrom = isPending
-                ? 'from-[var(--color-warning)]/10'
-                : 'from-[var(--color-success)]/10';
-              const shortlistLabel = t('common.suppliers.overview.services.shortlistCount', {
-                count: card.shortlist.length,
-              });
-              const statusLabel = isPending
-                ? t('common.suppliers.overview.status.pending')
-                : t('common.suppliers.overview.status.confirmed');
-              const confirmedStatusLabel =
-                card.confirmed?.status || t('common.suppliers.overview.status.confirmed');
-
-              return (
-                <Card
-                  key={card.key}
-                  className={`relative overflow-hidden border-2 ${borderColor} bg-gradient-to-br ${gradientFrom} to-transparent backdrop-blur-sm transition-all duration-300 ${isPending ? 'cursor-pointer hover:shadow-lg hover:scale-[1.02] hover:border-[var(--color-warning)]/60' : 'shadow-md'}`}
-                  onClick={() => {
-                    if (isPending) handleOpenServiceModal(card);
-                  }}
-                >
-                  <div className="space-y-3">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex-1">
-                        <h3 className="text-lg font-bold text-body mb-1">{card.label}</h3>
-                        {isPending && card.shortlist.length > 0 && (
-                          <p className="text-xs text-muted flex items-center gap-1">
-                            <Sparkles size={12} />
-                            {shortlistLabel}
-                          </p>
-                        )}
-                      </div>
-                      <span
-                        className={`inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full ${isPending ? 'bg-[var(--color-warning)]/15 text-[color:var(--color-warning)]' : 'bg-[var(--color-success)]/15 text-[color:var(--color-success)]'}`}
-                      >
-                        {isPending ? <Clock size={12} /> : <CheckCircle size={12} />}
-                        {statusLabel}
-                      </span>
+                  <div className="space-y-2">
+                    <p className="text-sm text-muted">
+                      {searchDrawerResult.service ||
+                        t('common.suppliers.overview.drawer.serviceUnknown')}
+                    </p>
+                    {searchDrawerResult.location && (
+                      <p className="text-sm text-muted">
+                        {t('common.suppliers.overview.drawer.location', {
+                          value: searchDrawerResult.location,
+                        })}
+                      </p>
+                    )}
+                    {searchDrawerResult.priceRange && (
+                      <p className="text-sm text-muted">
+                        {t('common.suppliers.overview.drawer.priceRange', {
+                          value: searchDrawerResult.priceRange,
+                        })}
+                      </p>
+                    )}
+                    {searchDrawerResult.aiSummary && (
+                      <p className="text-sm text-body/75">{searchDrawerResult.aiSummary}</p>
+                    )}
+                    {searchDrawerResult.snippet && (
+                      <p className="text-sm text-body/75">{searchDrawerResult.snippet}</p>
+                    )}
+                    <div className="flex flex-wrap gap-2 pt-1">
+                      {Array.isArray(searchDrawerResult.tags) &&
+                        searchDrawerResult.tags.slice(0, 8).map((tag) => (
+                          <span
+                            key={tag}
+                            className="rounded-full border border-soft bg-surface px-2 py-0.5 text-xs text-muted"
+                          >
+                            {tag}
+                          </span>
+                        ))}
                     </div>
+                  </div>
 
-                    {card.confirmed ? (
-                      <div className="p-3 rounded-lg bg-[var(--color-success)]/10 border border-[var(--color-success)]/20">
-                        <p className="font-semibold text-body mb-1">{card.confirmed.name}</p>
-                        <p className="text-xs text-muted">{confirmedStatusLabel}</p>
-                      </div>
-                    ) : (
-                      <div className="text-sm text-muted">
-                        <p className="mb-2">
-                          {card.shortlist.length
-                            ? t('common.suppliers.overview.services.reviewShortlist')
-                            : t('common.suppliers.overview.services.emptyShortlist')}
-                        </p>
-                        <div className="flex items-center gap-1 text-xs text-[color:var(--color-primary)]">
-                          <TrendingUp size={12} />
-                          <span>{t('common.suppliers.overview.services.exploreHint')}</span>
-                        </div>
-                      </div>
+                  <div className="space-y-1 text-sm text-muted">
+                    {searchDrawerResult.email && (
+                      <p>
+                        {t('common.suppliers.overview.drawer.email', {
+                          value: searchDrawerResult.email,
+                        })}
+                      </p>
+                    )}
+                    {searchDrawerResult.phone && (
+                      <p>
+                        {t('common.suppliers.overview.drawer.phone', {
+                          value: searchDrawerResult.phone,
+                        })}
+                      </p>
                     )}
                   </div>
+
+                  <div className="flex justify-end gap-2">
+                    {searchDrawerResult.link && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() =>
+                          window.open(searchDrawerResult.link, '_blank', 'noopener,noreferrer')
+                        }
+                      >
+                        {t('common.suppliers.overview.drawer.openLink')}
+                      </Button>
+                    )}
+                    <Button type="button" onClick={() => setSearchDrawerOpen(false)}>
+                      {t('app.close')}
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <Card className="border border-soft bg-surface text-sm text-muted">
+                  {t('common.suppliers.overview.drawer.empty')}
                 </Card>
-              );
-            })}
-          </div>
-        </section>
-
-      <Modal
-        open={searchDrawerOpen}
-        onClose={() => {
-          setSearchDrawerOpen(false);
-          setSearchDrawerResult(null);
-        }}
-        title={
-          searchDrawerResult?.name
-            ? t('common.suppliers.overview.drawer.titleWithName', {
-                name: searchDrawerResult.name,
-              })
-            : t('common.suppliers.overview.drawer.title')
-        }
-        size="lg"
-      >
-        {searchDrawerResult ? (
-          <div className="space-y-4">
-            <div className="h-48 w-full overflow-hidden rounded-lg">
-              <img
-                src={searchDrawerResult.image || DEFAULT_PROVIDER_IMAGE}
-                alt={t('common.suppliers.overview.drawer.imageAlt', {
-                  name:
-                    searchDrawerResult.name || t('common.suppliers.overview.drawer.fallbackName'),
-                })}
-                className="h-full w-full object-cover"
-                onError={(event) => {
-                  event.currentTarget.src = DEFAULT_PROVIDER_IMAGE;
-                }}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <p className="text-sm text-muted">
-                {searchDrawerResult.service || t('common.suppliers.overview.drawer.serviceUnknown')}
-              </p>
-              {searchDrawerResult.location && (
-                <p className="text-sm text-muted">
-                  {t('common.suppliers.overview.drawer.location', {
-                    value: searchDrawerResult.location,
-                  })}
-                </p>
               )}
-              {searchDrawerResult.priceRange && (
-                <p className="text-sm text-muted">
-                  {t('common.suppliers.overview.drawer.priceRange', {
-                    value: searchDrawerResult.priceRange,
-                  })}
-                </p>
-              )}
-              {searchDrawerResult.aiSummary && (
-                <p className="text-sm text-body/75">{searchDrawerResult.aiSummary}</p>
-              )}
-              {searchDrawerResult.snippet && (
-                <p className="text-sm text-body/75">{searchDrawerResult.snippet}</p>
-              )}
-              <div className="flex flex-wrap gap-2 pt-1">
-                {Array.isArray(searchDrawerResult.tags) &&
-                  searchDrawerResult.tags.slice(0, 8).map((tag) => (
-                    <span
-                      key={tag}
-                      className="rounded-full border border-soft bg-surface px-2 py-0.5 text-xs text-muted"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-              </div>
-            </div>
-
-            <div className="space-y-1 text-sm text-muted">
-              {searchDrawerResult.email && (
-                <p>
-                  {t('common.suppliers.overview.drawer.email', {
-                    value: searchDrawerResult.email,
-                  })}
-                </p>
-              )}
-              {searchDrawerResult.phone && (
-                <p>
-                  {t('common.suppliers.overview.drawer.phone', {
-                    value: searchDrawerResult.phone,
-                  })}
-                </p>
-              )}
-            </div>
-
-            <div className="flex justify-end gap-2">
-              {searchDrawerResult.link && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() =>
-                    window.open(searchDrawerResult.link, '_blank', 'noopener,noreferrer')
-                  }
-                >
-                  {t('common.suppliers.overview.drawer.openLink')}
-                </Button>
-              )}
-              <Button type="button" onClick={() => setSearchDrawerOpen(false)}>
-                {t('app.close')}
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <Card className="border border-soft bg-surface text-sm text-muted">
-            {t('common.suppliers.overview.drawer.empty')}
-          </Card>
-        )}
-      </Modal>
-        </>
+            </Modal>
+          </>
         )}
       </PageWrapper>
-    </>
 
       <ServiceOptionsModal
         open={serviceModal.open}
