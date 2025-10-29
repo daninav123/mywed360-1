@@ -37,9 +37,12 @@ const SmartFiltersBar = ({ weddingProfile, onFiltersChange, className = '' }) =>
     location: '',
   });
 
-  // Inicializar filtros desde el perfil de la boda
+  // Inicializar filtros desde el perfil de la boda Y aplicarlos automáticamente
   useEffect(() => {
-    if (!weddingProfile) return;
+    if (!weddingProfile) {
+      console.warn('[SmartFiltersBar] No wedding profile available');
+      return;
+    }
 
     const detected = {
       budget: weddingProfile.totalBudget || weddingProfile.budget || null,
@@ -48,9 +51,14 @@ const SmartFiltersBar = ({ weddingProfile, onFiltersChange, className = '' }) =>
       location: weddingProfile.location?.city || weddingProfile.city || null,
     };
 
+    console.log('[SmartFiltersBar] Filtros detectados del perfil:', detected);
+    console.log('[SmartFiltersBar] Wedding profile completo:', weddingProfile);
+
     setFilters(detected);
+
+    // ✅ APLICAR AUTOMÁTICAMENTE desde el inicio
     onFiltersChange?.(detected);
-  }, [weddingProfile]);
+  }, [weddingProfile, onFiltersChange]);
 
   // Manejar inicio de edición
   const handleStartEdit = (field) => {
@@ -106,12 +114,14 @@ const SmartFiltersBar = ({ weddingProfile, onFiltersChange, className = '' }) =>
     onFiltersChange?.(empty);
   };
 
+  // Mostrar siempre si hay perfil (aunque no haya filtros, para visibilidad)
+  // Usuario puede ver que la IA está activa pero sin filtros
+  if (!weddingProfile) {
+    return null; // Solo ocultar si no hay perfil de boda
+  }
+
   // Verificar si hay al menos un filtro activo
   const hasActiveFilters = Object.values(filters).some((value) => value !== null);
-
-  if (!hasActiveFilters) {
-    return null; // No mostrar si no hay filtros
-  }
 
   return (
     <Card className={`bg-gradient-to-r from-primary/5 to-accent/5 border-primary/20 ${className}`}>
@@ -145,173 +155,195 @@ const SmartFiltersBar = ({ weddingProfile, onFiltersChange, className = '' }) =>
           </div>
         </div>
 
+        {/* Mensaje si no hay filtros */}
+        {!hasActiveFilters && (
+          <div className="text-sm text-muted">
+            <p>⚠️ No se detectaron filtros en tu perfil de boda.</p>
+            <p className="mt-1">
+              Ve a <strong>Finanzas</strong> para configurar presupuesto, invitados y estilo.
+            </p>
+          </div>
+        )}
+
         {/* Filtros */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {/* Presupuesto */}
-          {filters.budget && (
-            <div className="flex items-center gap-2 bg-surface/50 rounded-lg p-3 border border-soft">
-              <DollarSign className="h-4 w-4 text-primary flex-shrink-0" />
-              {editing.budget ? (
-                <div className="flex-1 flex items-center gap-2">
-                  <Input
-                    type="number"
-                    value={tempValues.budget}
-                    onChange={(e) => setTempValues((prev) => ({ ...prev, budget: e.target.value }))}
-                    placeholder="Presupuesto"
-                    className="h-8 text-sm"
-                    autoFocus
-                  />
-                  <Button size="sm" onClick={() => handleSaveEdit('budget')}>
-                    ✓
-                  </Button>
-                  <Button size="sm" variant="ghost" onClick={() => handleCancelEdit('budget')}>
-                    ✕
-                  </Button>
-                </div>
-              ) : (
-                <>
-                  <div className="flex-1">
-                    <div className="text-xs text-muted">Presupuesto</div>
-                    <div className="font-medium text-foreground">
-                      {filters.budget.toLocaleString('es-ES')}€
+        {hasActiveFilters && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {/* Presupuesto */}
+            {filters.budget && (
+              <div className="flex items-center gap-2 bg-surface/50 rounded-lg p-3 border border-soft">
+                <DollarSign className="h-4 w-4 text-primary flex-shrink-0" />
+                {editing.budget ? (
+                  <div className="flex-1 flex items-center gap-2">
+                    <Input
+                      type="number"
+                      value={tempValues.budget}
+                      onChange={(e) =>
+                        setTempValues((prev) => ({ ...prev, budget: e.target.value }))
+                      }
+                      placeholder="Presupuesto"
+                      className="h-8 text-sm"
+                      autoFocus
+                    />
+                    <Button size="sm" onClick={() => handleSaveEdit('budget')}>
+                      ✓
+                    </Button>
+                    <Button size="sm" variant="ghost" onClick={() => handleCancelEdit('budget')}>
+                      ✕
+                    </Button>
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex-1">
+                      <div className="text-xs text-muted">Presupuesto</div>
+                      <div className="font-medium text-foreground">
+                        {filters.budget.toLocaleString('es-ES')}€
+                      </div>
                     </div>
-                  </div>
-                  <button
-                    onClick={() => handleStartEdit('budget')}
-                    className="text-muted hover:text-primary transition-colors"
-                    title="Editar presupuesto"
-                  >
-                    <Edit2 className="h-4 w-4" />
-                  </button>
-                </>
-              )}
-            </div>
-          )}
+                    <button
+                      onClick={() => handleStartEdit('budget')}
+                      className="text-muted hover:text-primary transition-colors"
+                      title="Editar presupuesto"
+                    >
+                      <Edit2 className="h-4 w-4" />
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
 
-          {/* Invitados */}
-          {filters.guests && (
-            <div className="flex items-center gap-2 bg-surface/50 rounded-lg p-3 border border-soft">
-              <Users className="h-4 w-4 text-primary flex-shrink-0" />
-              {editing.guests ? (
-                <div className="flex-1 flex items-center gap-2">
-                  <Input
-                    type="number"
-                    value={tempValues.guests}
-                    onChange={(e) => setTempValues((prev) => ({ ...prev, guests: e.target.value }))}
-                    placeholder="Invitados"
-                    className="h-8 text-sm"
-                    autoFocus
-                  />
-                  <Button size="sm" onClick={() => handleSaveEdit('guests')}>
-                    ✓
-                  </Button>
-                  <Button size="sm" variant="ghost" onClick={() => handleCancelEdit('guests')}>
-                    ✕
-                  </Button>
-                </div>
-              ) : (
-                <>
-                  <div className="flex-1">
-                    <div className="text-xs text-muted">Invitados</div>
-                    <div className="font-medium text-foreground">{filters.guests}</div>
+            {/* Invitados */}
+            {filters.guests && (
+              <div className="flex items-center gap-2 bg-surface/50 rounded-lg p-3 border border-soft">
+                <Users className="h-4 w-4 text-primary flex-shrink-0" />
+                {editing.guests ? (
+                  <div className="flex-1 flex items-center gap-2">
+                    <Input
+                      type="number"
+                      value={tempValues.guests}
+                      onChange={(e) =>
+                        setTempValues((prev) => ({ ...prev, guests: e.target.value }))
+                      }
+                      placeholder="Invitados"
+                      className="h-8 text-sm"
+                      autoFocus
+                    />
+                    <Button size="sm" onClick={() => handleSaveEdit('guests')}>
+                      ✓
+                    </Button>
+                    <Button size="sm" variant="ghost" onClick={() => handleCancelEdit('guests')}>
+                      ✕
+                    </Button>
                   </div>
-                  <button
-                    onClick={() => handleStartEdit('guests')}
-                    className="text-muted hover:text-primary transition-colors"
-                    title="Editar número de invitados"
-                  >
-                    <Edit2 className="h-4 w-4" />
-                  </button>
-                </>
-              )}
-            </div>
-          )}
+                ) : (
+                  <>
+                    <div className="flex-1">
+                      <div className="text-xs text-muted">Invitados</div>
+                      <div className="font-medium text-foreground">{filters.guests}</div>
+                    </div>
+                    <button
+                      onClick={() => handleStartEdit('guests')}
+                      className="text-muted hover:text-primary transition-colors"
+                      title="Editar número de invitados"
+                    >
+                      <Edit2 className="h-4 w-4" />
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
 
-          {/* Estilo */}
-          {filters.style && (
-            <div className="flex items-center gap-2 bg-surface/50 rounded-lg p-3 border border-soft">
-              <Palette className="h-4 w-4 text-primary flex-shrink-0" />
-              {editing.style ? (
-                <div className="flex-1 flex items-center gap-2">
-                  <Input
-                    type="text"
-                    value={tempValues.style}
-                    onChange={(e) => setTempValues((prev) => ({ ...prev, style: e.target.value }))}
-                    placeholder="Estilo"
-                    className="h-8 text-sm"
-                    autoFocus
-                  />
-                  <Button size="sm" onClick={() => handleSaveEdit('style')}>
-                    ✓
-                  </Button>
-                  <Button size="sm" variant="ghost" onClick={() => handleCancelEdit('style')}>
-                    ✕
-                  </Button>
-                </div>
-              ) : (
-                <>
-                  <div className="flex-1">
-                    <div className="text-xs text-muted">Estilo</div>
-                    <div className="font-medium text-foreground capitalize">{filters.style}</div>
+            {/* Estilo */}
+            {filters.style && (
+              <div className="flex items-center gap-2 bg-surface/50 rounded-lg p-3 border border-soft">
+                <Palette className="h-4 w-4 text-primary flex-shrink-0" />
+                {editing.style ? (
+                  <div className="flex-1 flex items-center gap-2">
+                    <Input
+                      type="text"
+                      value={tempValues.style}
+                      onChange={(e) =>
+                        setTempValues((prev) => ({ ...prev, style: e.target.value }))
+                      }
+                      placeholder="Estilo"
+                      className="h-8 text-sm"
+                      autoFocus
+                    />
+                    <Button size="sm" onClick={() => handleSaveEdit('style')}>
+                      ✓
+                    </Button>
+                    <Button size="sm" variant="ghost" onClick={() => handleCancelEdit('style')}>
+                      ✕
+                    </Button>
                   </div>
-                  <button
-                    onClick={() => handleStartEdit('style')}
-                    className="text-muted hover:text-primary transition-colors"
-                    title="Editar estilo"
-                  >
-                    <Edit2 className="h-4 w-4" />
-                  </button>
-                </>
-              )}
-            </div>
-          )}
+                ) : (
+                  <>
+                    <div className="flex-1">
+                      <div className="text-xs text-muted">Estilo</div>
+                      <div className="font-medium text-foreground capitalize">{filters.style}</div>
+                    </div>
+                    <button
+                      onClick={() => handleStartEdit('style')}
+                      className="text-muted hover:text-primary transition-colors"
+                      title="Editar estilo"
+                    >
+                      <Edit2 className="h-4 w-4" />
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
 
-          {/* Ubicación */}
-          {filters.location && (
-            <div className="flex items-center gap-2 bg-surface/50 rounded-lg p-3 border border-soft">
-              <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
-              {editing.location ? (
-                <div className="flex-1 flex items-center gap-2">
-                  <Input
-                    type="text"
-                    value={tempValues.location}
-                    onChange={(e) =>
-                      setTempValues((prev) => ({ ...prev, location: e.target.value }))
-                    }
-                    placeholder="Ubicación"
-                    className="h-8 text-sm"
-                    autoFocus
-                  />
-                  <Button size="sm" onClick={() => handleSaveEdit('location')}>
-                    ✓
-                  </Button>
-                  <Button size="sm" variant="ghost" onClick={() => handleCancelEdit('location')}>
-                    ✕
-                  </Button>
-                </div>
-              ) : (
-                <>
-                  <div className="flex-1">
-                    <div className="text-xs text-muted">Ubicación</div>
-                    <div className="font-medium text-foreground capitalize">{filters.location}</div>
+            {/* Ubicación */}
+            {filters.location && (
+              <div className="flex items-center gap-2 bg-surface/50 rounded-lg p-3 border border-soft">
+                <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
+                {editing.location ? (
+                  <div className="flex-1 flex items-center gap-2">
+                    <Input
+                      type="text"
+                      value={tempValues.location}
+                      onChange={(e) =>
+                        setTempValues((prev) => ({ ...prev, location: e.target.value }))
+                      }
+                      placeholder="Ubicación"
+                      className="h-8 text-sm"
+                      autoFocus
+                    />
+                    <Button size="sm" onClick={() => handleSaveEdit('location')}>
+                      ✓
+                    </Button>
+                    <Button size="sm" variant="ghost" onClick={() => handleCancelEdit('location')}>
+                      ✕
+                    </Button>
                   </div>
-                  <button
-                    onClick={() => handleStartEdit('location')}
-                    className="text-muted hover:text-primary transition-colors"
-                    title="Editar ubicación"
-                  >
-                    <Edit2 className="h-4 w-4" />
-                  </button>
-                </>
-              )}
-            </div>
-          )}
-        </div>
+                ) : (
+                  <>
+                    <div className="flex-1">
+                      <div className="text-xs text-muted">Ubicación</div>
+                      <div className="font-medium text-foreground capitalize">
+                        {filters.location}
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleStartEdit('location')}
+                      className="text-muted hover:text-primary transition-colors"
+                      title="Editar ubicación"
+                    >
+                      <Edit2 className="h-4 w-4" />
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Info adicional */}
-        <p className="text-xs text-muted">
-          💡 Estos filtros se aplican automáticamente. Click en ✏️ para ajustarlos temporalmente.
-        </p>
+        {hasActiveFilters && (
+          <p className="text-xs text-muted">
+            💡 La IA aplicó estos filtros automáticamente. Click en ✏️ para cambiarlos si lo deseas.
+          </p>
+        )}
       </div>
     </Card>
   );
