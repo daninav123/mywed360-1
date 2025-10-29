@@ -99,7 +99,7 @@ router.post('/request', async (req, res) => {
             <div class="info-box">
               <h3>🎯 Servicios Solicitados</h3>
               <ul>
-                ${services.map(s => `<li>${s}</li>`).join('')}
+                ${services.map((s) => `<li>${s}</li>`).join('')}
               </ul>
             </div>
             
@@ -112,7 +112,7 @@ router.post('/request', async (req, res) => {
               <h3>📞 Contacto</h3>
               <p><strong>Email:</strong> ${contactEmail}</p>
               ${contactPhone ? `<p><strong>Teléfono:</strong> ${contactPhone}</p>` : ''}
-              ${urgency === 'urgent' ? '<p style="color: red;"><strong>⚠️ URGENTE</strong></p>` : ''}
+              ${urgency === 'urgent' ? '<p style="color: red;"><strong>⚠️ URGENTE</strong></p>' : ''}
             </div>
             
             <center style="margin-top: 20px;">
@@ -130,15 +130,15 @@ router.post('/request', async (req, res) => {
       fromEmail: contactEmail,
       fromName: coupleName,
       fromUserId: userId,
-      
+
       toEmail: supplierEmail,
       toName: supplierName,
       toSupplierId: supplierId,
-      
+
       subject: `📧 Nueva Solicitud de Presupuesto - ${coupleName}`,
       textMessage: message,
       htmlMessage: supplierEmailHTML,
-      
+
       category: 'quote_request',
       relatedTo: {
         type: 'quote',
@@ -173,15 +173,15 @@ router.post('/request', async (req, res) => {
       fromEmail: process.env.SMTP_USER || 'noreply@mywed360.com',
       fromName: 'MyWed360',
       fromUserId: null,
-      
+
       toEmail: contactEmail,
       toName: coupleName,
       toUserId: userId,
-      
+
       subject: `✅ Solicitud Enviada a ${supplierName}`,
       textMessage: `Tu solicitud a ${supplierName} ha sido enviada.`,
       htmlMessage: clientEmailHTML,
-      
+
       category: 'notification',
       relatedTo: {
         type: 'quote',
@@ -194,7 +194,6 @@ router.post('/request', async (req, res) => {
       requestId,
       message: 'Quote request sent and saved to mailbox',
     });
-
   } catch (error) {
     console.error('Error creating quote request:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -208,18 +207,19 @@ router.post('/request', async (req, res) => {
 router.get('/my-requests', async (req, res) => {
   try {
     const { userId } = req.query;
-    
+
     if (!userId) {
       return res.status(400).json({ error: 'userId is required' });
     }
 
-    const snapshot = await db.collection('quoteRequests')
+    const snapshot = await db
+      .collection('quoteRequests')
       .where('userId', '==', userId)
       .orderBy('requestedAt', 'desc')
       .get();
 
     const requests = [];
-    snapshot.forEach(doc => {
+    snapshot.forEach((doc) => {
       requests.push({ id: doc.id, ...doc.data() });
     });
 
