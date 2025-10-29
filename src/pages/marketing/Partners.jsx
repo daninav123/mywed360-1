@@ -12,7 +12,7 @@ import {
   Send,
   Target,
   Award,
-  Handshake,
+  UserPlus,
 } from 'lucide-react';
 
 import MarketingLayout from '../../components/marketing/MarketingLayout';
@@ -118,7 +118,7 @@ const Partners = () => {
       title: 'Consultores de Bodas',
       description:
         'Asesores que trabajan con parejas y pueden recomendar herramientas profesionales.',
-      icon: <Handshake className="h-6 w-6" />,
+      icon: <UserPlus className="h-6 w-6" />,
     },
     {
       title: 'Influencers del Sector',
