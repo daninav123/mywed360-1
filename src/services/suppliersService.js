@@ -21,19 +21,34 @@ export async function searchSuppliersHybrid(
     }
 
     if (value && typeof value === 'object') {
-      const candidates = [value.city, value.name, value.label, value.value];
+      const candidates = [
+        value.city,
+        value.location, // Añadido
+        value.name,
+        value.label,
+        value.value,
+        value.address, // Añadido
+        value.provincia, // Añadido para España
+        value.comunidad, // Añadido para España
+      ];
       for (const candidate of candidates) {
         if (typeof candidate === 'string') {
           const trimmed = candidate.trim();
           if (trimmed) return trimmed;
         }
       }
+      // Si no encontramos nada, devolver fallback en lugar de [object Object]
+      return fallback;
     }
 
     if (value == null) return fallback;
 
-    const coerced = String(value).trim();
-    return coerced || fallback;
+    // Última opción: solo si es primitivo convertir a string
+    if (typeof value === 'number' || typeof value === 'boolean') {
+      return String(value).trim() || fallback;
+    }
+
+    return fallback;
   };
 
   try {
