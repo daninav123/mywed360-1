@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useMemo } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 
 import MarketingLayout from '../../components/marketing/MarketingLayout';
@@ -11,20 +12,22 @@ const modules = [
   },
   {
     title: 'CRM de proveedores',
-    description: 'Compara propuestas, gestiona contratos y lleva seguimiento de pagos y entregables.',
+    description:
+      'Compara propuestas, gestiona contratos y lleva seguimiento de pagos y entregables.',
   },
   {
-    title: 'Gestion financiera',
-    description: 'Presupuestos inteligentes, control de gastos y reportes detallados por categoria.',
+    title: 'Gestión financiera',
+    description:
+      'Presupuestos inteligentes, control de gastos y reportes detallados por categoría.',
   },
   {
     title: 'Experiencia para invitados',
     description:
-      'Sitio web, RSVP automatico, mesas interactivas y mensajes personalizados en un solo flujo.',
+      'Sitio web, RSVP automático, mesas interactivas y mensajes personalizados en un solo flujo.',
   },
   {
-    title: 'Automatizacion de emails',
-    description: 'Flujos preconfigurados, segmentos dinamicos y metricas para medir engagement.',
+    title: 'Automatización de emails',
+    description: 'Flujos preconfigurados, segmentos dinámicos y métricas para medir engagement.',
   },
   {
     title: 'Asistente inteligente',
@@ -35,8 +38,8 @@ const modules = [
 
 const stats = [
   { value: '12k+', label: 'bodas planificadas con MaLove.App' },
-  { value: '4.8/5', label: 'satisfaccion promedio de planners' },
-  { value: '30%', label: 'tiempo ahorrado en coordinacion logistica' },
+  { value: '4.8/5', label: 'satisfacción promedio de planners' },
+  { value: '30%', label: 'tiempo ahorrado en coordinación logística' },
 ];
 
 const AppOverview = () => {
@@ -49,8 +52,8 @@ const AppOverview = () => {
               La app que reune todo tu flujo de planificacion en un solo lugar.
             </h1>
             <p className="mt-5 text-lg text-muted">
-              Desde el primer checklist hasta el informe final, MaLove.App acompana a equipos profesionales y
-              parejas que buscan tener control total del evento.
+              Desde el primer checklist hasta el informe final, MaLove.App acompana a equipos
+              profesionales y parejas que buscan tener control total del evento.
             </p>
             <div className="mt-6 grid gap-4 sm:grid-cols-3">
               {stats.map((item) => (
@@ -59,7 +62,9 @@ const AppOverview = () => {
                   className="rounded-2xl border border-soft bg-white p-4 text-body shadow-sm shadow-[var(--color-primary)]/10"
                 >
                   <p className="text-2xl font-semibold text-[var(--color-primary)]">{item.value}</p>
-                  <p className="text-xs font-medium uppercase tracking-widest text-muted">{item.label}</p>
+                  <p className="text-xs font-medium uppercase tracking-widest text-muted">
+                    {item.label}
+                  </p>
                 </div>
               ))}
             </div>
@@ -68,20 +73,25 @@ const AppOverview = () => {
             <p className="text-sm uppercase tracking-[0.2em] text-white/70">MaLove.App Workspace</p>
             <h2 className="mt-4 text-2xl font-semibold">Un ecosistema conectado</h2>
             <p className="mt-4 text-sm text-white/80">
-              Modulos sincronizados, roles personalizados y permisos granulares para colaborar sin perder
-              contexto.
+              Modulos sincronizados, roles personalizados y permisos granulares para colaborar sin
+              perder contexto.
             </p>
             <div className="mt-6 flex flex-wrap gap-3 text-xs">
-              {['Dashboard', 'Invitados', 'Finanzas', 'Comunicacion', 'Diseno', 'Automatizaciones'].map(
-                (chip) => (
-                  <span
-                    key={chip}
-                    className="rounded-full border border-white/25 bg-white/10 px-4 py-1 text-white/90"
-                  >
-                    {chip}
-                  </span>
-                )
-              )}
+              {[
+                'Dashboard',
+                'Invitados',
+                'Finanzas',
+                'Comunicacion',
+                'Diseno',
+                'Automatizaciones',
+              ].map((chip) => (
+                <span
+                  key={chip}
+                  className="rounded-full border border-white/25 bg-white/10 px-4 py-1 text-white/90"
+                >
+                  {chip}
+                </span>
+              ))}
             </div>
           </div>
         </div>
@@ -92,8 +102,8 @@ const AppOverview = () => {
           Modulos clave listos para tu equipo
         </h2>
         <p className="mt-3 text-base text-muted">
-          Cada modulo esta disenado para integrarse con el resto, evitando informacion dispersa y manteniendo
-          a todos en la misma pagina.
+          Cada modulo esta disenado para integrarse con el resto, evitando informacion dispersa y
+          manteniendo a todos en la misma pagina.
         </p>
 
         <div className="mt-10 grid gap-6 md:grid-cols-2">
@@ -116,8 +126,9 @@ const AppOverview = () => {
               Integraciones y automatizaciones que trabajan por ti.
             </h2>
             <p className="mt-4 text-base text-muted">
-              Conecta MaLove.App con servicios de pago, calendarios y herramientas de comunicacion. Configura
-              disparadores automaticos para RSVP, confirmaciones de proveedores o seguimiento de tareas.
+              Conecta MaLove.App con servicios de pago, calendarios y herramientas de comunicacion.
+              Configura disparadores automaticos para RSVP, confirmaciones de proveedores o
+              seguimiento de tareas.
             </p>
             <ul className="mt-6 space-y-3 text-sm text-muted">
               <li className="flex items-start gap-3">
@@ -137,7 +148,8 @@ const AppOverview = () => {
           <div className="rounded-2xl border border-soft bg-white p-6 shadow-sm shadow-[var(--color-primary)]/10">
             <h3 className="text-lg font-semibold text-body">Acceso inmediato</h3>
             <p className="mt-3 text-sm text-muted">
-              Todas las cuentas incluyen prueba gratuita y demo guiada con nuestro equipo de onboarding.
+              Todas las cuentas incluyen prueba gratuita y demo guiada con nuestro equipo de
+              onboarding.
             </p>
             <Link
               to="/signup"

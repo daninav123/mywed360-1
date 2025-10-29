@@ -2315,7 +2315,8 @@
           "badges": {
             "registered": "Verified ✓",
             "cached": "Cached",
-            "internet": "From the web"
+            "internet": "From the web",
+            "portfolio": "Portfolio"
           },
           "favorite": {
             "add": "Add to favorites",

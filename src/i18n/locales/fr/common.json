@@ -2443,7 +2443,8 @@
           "badges": {
             "registered": "Vérifié ✓",
             "cached": "En cache",
-            "internet": "Depuis le web"
+            "internet": "Depuis le web",
+            "portfolio": "Portfolio"
           },
           "favorite": {
             "add": "Ajouter aux favoris",
@@ -2856,11 +2857,31 @@
     },
     "detail": {
       "info": {
-        "nameFallback": "Unnamed supplier",
-        "serviceFallback": "Service not set"
+        "nameFallback": "Fournisseur sans nom",
+        "serviceFallback": "Service non défini"
       },
       "placeholders": {
         "notAvailable": "—"
+      },
+      "sections": {
+        "about": "À propos de {{name}}",
+        "contact": "Contact"
+      },
+      "contact": {
+        "email": "Email",
+        "phone": "Téléphone",
+        "website": "Site web"
+      },
+      "gallery": {
+        "previous": "Image précédente",
+        "next": "Image suivante"
+      },
+      "portfolio": {
+        "title": "Portfolio",
+        "viewPublic": "Voir la page complète",
+        "photoAlt": "Photo {{index}}",
+        "empty": "Aucune photo disponible pour le moment",
+        "viewAll": "Voir toutes les photos ({{count}})"
       }
     }
   },

@@ -14,12 +14,15 @@ import {
   Heart,
   Camera,
   Star,
+  Share2,
+  Clock,
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 
 import useTranslations from '../../hooks/useTranslations';
 import { useFavorites } from '../../contexts/FavoritesContext';
 import { useSupplierCompare } from '../../contexts/SupplierCompareContext';
+import { useSupplierContacts } from '../../contexts/SupplierContactsContext';
 import { useWedding } from '../../context/WeddingContext';
 import useActiveWeddingInfo from '../../hooks/useActiveWeddingInfo';
 import SupplierDetailModal from './SupplierDetailModal';
@@ -29,6 +32,7 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
   const { t } = useTranslations();
   const { isFavorite, toggleFavorite } = useFavorites();
   const { isInCompareList, addToCompare, removeFromCompare } = useSupplierCompare();
+  const { logContact, getLastContact, needsFollowUp } = useSupplierContacts();
   const { info: weddingProfile } = useActiveWeddingInfo();
   const [showContactMenu, setShowContactMenu] = useState(false);
   const [isFavoriting, setIsFavoriting] = useState(false);
@@ -37,6 +41,9 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
 
   const isFav = isFavorite(supplier.id);
   const isComparing = isInCompareList(supplier.id || supplier.slug);
+  const supplierId = supplier.id || supplier.slug;
+  const lastContact = getLastContact(supplierId);
+  const shouldFollowUp = needsFollowUp(supplierId);
 
   const isRegistered = supplier.priority === 'registered';
   const isCached = supplier.priority === 'cached';
@@ -69,6 +76,9 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
       brand: brandName,
     });
     window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
+
+    // Registrar contacto
+    logContact(supplierId, 'whatsapp', supplier.name || fallbackName);
     onContact?.({ method: 'whatsapp', supplier });
     setShowContactMenu(false);
   };
@@ -87,6 +97,9 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
       `mailto:${supplier.contact?.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
       '_blank'
     );
+
+    // Registrar contacto
+    logContact(supplierId, 'email', supplier.name || fallbackName);
     onContact?.({ method: 'email', supplier });
     setShowContactMenu(false);
   };
@@ -94,6 +107,9 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
   const handleContactPhone = () => {
     if (!supplier.contact?.phone) return;
     window.open(`tel:${supplier.contact?.phone}`, '_blank');
+
+    // Registrar contacto
+    logContact(supplierId, 'phone', supplier.name || fallbackName);
     onContact?.({ method: 'phone', supplier });
     setShowContactMenu(false);
   };
@@ -126,6 +142,23 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
     } else {
       addToCompare(supplier);
     }
+  };
+
+  // Manejar compartir
+  const handleShare = async (e) => {
+    e?.stopPropagation?.();
+
+    const shareUrl = supplier.slug
+      ? `${window.location.origin}/proveedor/${supplier.slug}`
+      : window.location.href;
+
+    const shareText = `¡Mira este proveedor! ${supplier.name} - ${supplier.category || supplier.service || 'Proveedor'}`;
+
+    // Compartir en WhatsApp
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(`${shareText}\n\n${shareUrl}`)}`;
+    window.open(whatsappUrl, '_blank');
+
+    toast.success('Abriendo WhatsApp para compartir');
   };
 
   return (
@@ -202,7 +235,7 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
           {supplier.hasPortfolio && supplier.slug && (
             <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
               <Camera size={14} />
-              Portfolio
+              {t('common.suppliers.card.hybrid.badges.portfolio')}
             </span>
           )}
         </div>
@@ -285,12 +318,32 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
           </div>
           {supplier.metrics?.reviewCount > 0 && (
             <span className="text-sm text-gray-600">
-              (
-              {tPlural('common.suppliers.card.hybrid.reviews.count', supplier.metrics.reviewCount, {
-                count: supplier.metrics.reviewCount,
-              })}
-              )
+              ({supplier.metrics.reviewCount}{' '}
+              {supplier.metrics.reviewCount === 1 ? 'reseña' : 'reseñas'})
             </span>
+          )}
+        </div>
+      )}
+
+      {/* Indicador de último contacto / seguimiento */}
+      {lastContact && (
+        <div className="mb-3">
+          {shouldFollowUp ? (
+            <div className="flex items-center gap-2 px-3 py-2 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <Clock size={14} className="text-yellow-600" />
+              <span className="text-xs text-yellow-800 font-medium">
+                💡 Hace más de 7 días • Considera hacer seguimiento
+              </span>
+            </div>
+          ) : (
+            <div className="text-xs text-gray-500">
+              Último contacto:{' '}
+              {new Date(lastContact.timestamp).toLocaleDateString('es-ES', {
+                day: 'numeric',
+                month: 'short',
+              })}{' '}
+              vía {lastContact.method}
+            </div>
           )}
         </div>
       )}
@@ -374,6 +427,15 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
                 </button>
               )}
             </div>
+
+            {/* Botón Compartir */}
+            <button
+              onClick={handleShare}
+              className="w-full mt-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors font-medium text-sm flex items-center justify-center gap-2"
+            >
+              <Share2 size={16} />
+              Compartir
+            </button>
           </>
         ) : (
           <>

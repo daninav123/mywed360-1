@@ -69,9 +69,7 @@ const MarketingLayout = ({ children }) => {
               <NavLink
                 key={link.to}
                 to={link.to}
-                className={({ isActive }) =>
-                  `${linkBaseClasses} ${isActive ? activeClasses : ''}`
-                }
+                className={({ isActive }) => `${linkBaseClasses} ${isActive ? activeClasses : ''}`}
               >
                 {link.label}
               </NavLink>
@@ -165,6 +163,12 @@ const MarketingLayout = ({ children }) => {
             >
               {safeT('nav.legal', 'Legal')}
             </a>
+            <Link
+              to="/partners"
+              className="text-xs opacity-60 hover:opacity-100 hover:text-body transition-opacity"
+            >
+              Partners
+            </Link>
           </div>
         </div>
       </footer>

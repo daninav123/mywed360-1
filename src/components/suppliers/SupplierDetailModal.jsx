@@ -14,12 +14,15 @@ import {
   ExternalLink,
   Camera,
   Loader2,
+  FileText,
+  Save,
 } from 'lucide-react';
 import Modal from '../Modal';
 import Button from '../ui/Button';
 import Badge from '../ui/Badge';
 import PhotoLightbox from './PhotoLightbox';
 import useTranslations from '../../hooks/useTranslations';
+import { useSupplierNotes } from '../../contexts/SupplierNotesContext';
 
 const SupplierDetailModal = ({
   supplier,
@@ -35,6 +38,25 @@ const SupplierDetailModal = ({
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const { t } = useTranslations();
+  const { getNote, setNote } = useSupplierNotes();
+
+  const [noteText, setNoteText] = useState('');
+  const [noteEditing, setNoteEditing] = useState(false);
+
+  // Cargar nota al abrir modal
+  useEffect(() => {
+    if (open && supplier) {
+      const supplierId = supplier.id || supplier.slug;
+      const existingNote = getNote(supplierId);
+      setNoteText(existingNote);
+    }
+  }, [open, supplier, getNote]);
+
+  const handleSaveNote = () => {
+    const supplierId = supplier.id || supplier.slug;
+    setNote(supplierId, noteText);
+    setNoteEditing(false);
+  };
 
   // Cargar portfolio si el proveedor tiene slug
   useEffect(() => {
@@ -252,6 +274,63 @@ const SupplierDetailModal = ({
                 </a>
               )}
             </div>
+          </div>
+
+          {/* Sección Notas Privadas */}
+          <div>
+            <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+              <FileText className="h-5 w-5 text-blue-600" />
+              Notas privadas
+            </h3>
+            {noteEditing ? (
+              <div className="space-y-3">
+                <textarea
+                  value={noteText}
+                  onChange={(e) => setNoteText(e.target.value)}
+                  placeholder="Añade notas personales sobre este proveedor..."
+                  className="w-full p-3 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+                  rows={4}
+                />
+                <div className="flex gap-2">
+                  <Button size="sm" onClick={handleSaveNote}>
+                    <Save className="h-4 w-4 mr-2" />
+                    Guardar nota
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      setNoteEditing(false);
+                      const supplierId = supplier.id || supplier.slug;
+                      setNoteText(getNote(supplierId));
+                    }}
+                  >
+                    Cancelar
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div>
+                {noteText ? (
+                  <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p className="text-sm text-gray-700 whitespace-pre-wrap">{noteText}</p>
+                    <button
+                      onClick={() => setNoteEditing(true)}
+                      className="mt-2 text-sm text-blue-600 hover:text-blue-700 font-medium"
+                    >
+                      Editar nota
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setNoteEditing(true)}
+                    className="w-full p-4 border-2 border-dashed border-gray-300 rounded-lg text-sm text-gray-600 hover:border-blue-400 hover:text-blue-600 transition-colors"
+                  >
+                    + Añadir nota privada
+                  </button>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Sección Portfolio */}

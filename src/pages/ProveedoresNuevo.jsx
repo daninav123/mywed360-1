@@ -1045,7 +1045,7 @@ const Proveedores = () => {
 
                   {(aiLoading || searchCompleted) && (
                     <section className="space-y-3">
-                      <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex flex-wrap items-center justify-between gap-3">
                         <div className="space-y-1">
                           <h3 className="text-lg font-semibold text-body">
                             {t('common.suppliers.overview.results.title')}
@@ -1058,6 +1058,33 @@ const Proveedores = () => {
                             </p>
                           )}
                         </div>
+
+                        {/* Badges de estadísticas mejoradas */}
+                        {!aiLoading && filteredResults.length > 0 && (
+                          <div className="flex flex-wrap items-center gap-2">
+                            {/* Total de resultados */}
+                            <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
+                              📊 {filteredResults.length}{' '}
+                              {filteredResults.length === 1 ? 'resultado' : 'resultados'}
+                            </span>
+
+                            {/* Ordenamiento activo */}
+                            {sortBy !== 'relevance' && (
+                              <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-800">
+                                {sortBy === 'rating' && '⭐ Por rating'}
+                                {sortBy === 'price' && '€ Por precio'}
+                                {sortBy === 'reviews' && '💬 Por reseñas'}
+                              </span>
+                            )}
+
+                            {/* Filtro portfolio activo */}
+                            {hasPortfolioFilter && (
+                              <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-800">
+                                📷 Con portfolio
+                              </span>
+                            )}
+                          </div>
+                        )}
                       </div>
 
                       {/* Mensaje de fallback eliminado - ya no se usa */}

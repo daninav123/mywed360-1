@@ -535,7 +535,8 @@
           "badges": {
             "registered": "Verificado âœ“",
             "cached": "En cachÃ©",
-            "internet": "De internet"
+            "internet": "De internet",
+            "portfolio": "Portfolio"
           },
           "contact": {
             "primary": "Contactar",
@@ -3831,7 +3832,8 @@
           "badges": {
             "registered": "Verificado âœ“",
             "cached": "En cachÃ©",
-            "internet": "De internet"
+            "internet": "De internet",
+            "portfolio": "Portfolio"
           },
           "favorite": {
             "add": "AÃ±adir a favoritos",
