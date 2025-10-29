@@ -49,68 +49,72 @@ export function FavoritesProvider({ children }) {
   const currentWeddingRef = useRef(null);
 
   // Función de carga (no depende de nada, se llama manualmente)
-  const loadFavorites = useCallback(async (forceReload = false) => {
-    const userId = user?.uid;
+  const loadFavorites = useCallback(
+    async (forceReload = false) => {
+      const userId = user?.uid;
 
-    if (!userId || !activeWedding) {
-      setFavorites([]);
-      setLoading(false);
-      return;
-    }
-
-    // Si ya se cargó y no es forzado, no recargar
-    if (
-      hasLoadedRef.current &&
-      !forceReload &&
-      currentUserRef.current === userId &&
-      currentWeddingRef.current === activeWedding
-    ) {
-      return;
-    }
-
-    currentUserRef.current = userId;
-    currentWeddingRef.current = activeWedding;
-    hasLoadedRef.current = true;
-
-    try {
-      setLoading(true);
-      setError(null);
-
-      const token = await getAuthToken();
-
-      if (!token) {
-        console.warn('[FavoritesContext] No se pudo obtener token');
+      if (!userId || !activeWedding) {
         setFavorites([]);
+        setLoading(false);
         return;
       }
 
-      const headers = {
-        Authorization: `Bearer ${token}`,
-        'x-wedding-id': activeWedding,
-      };
-
-      const response = await axios.get(`${API_URL}/api/favorites`, { headers });
-      setFavorites(response.data.favorites || []);
-    } catch (err) {
-      if (err.response?.status === 401 || err.response?.status === 500) {
-        console.warn('[FavoritesContext] Favoritos no disponibles (error auth)');
-        setFavorites([]);
-      } else {
-        console.error('[FavoritesContext] Error cargando favoritos:', err);
-        setError(t('common.suppliers.favorites.errors.loadFailed'));
-        setFavorites([]);
+      // Si ya se cargó y no es forzado, no recargar
+      if (
+        hasLoadedRef.current &&
+        !forceReload &&
+        currentUserRef.current === userId &&
+        currentWeddingRef.current === activeWedding
+      ) {
+        return;
       }
-    } finally {
-      setLoading(false);
-    }
-  }, []); // Sin dependencias, se llama manualmente
+
+      currentUserRef.current = userId;
+      currentWeddingRef.current = activeWedding;
+      hasLoadedRef.current = true;
+
+      try {
+        setLoading(true);
+        setError(null);
+
+        const token = await getAuthToken();
+
+        if (!token) {
+          console.warn('[FavoritesContext] No se pudo obtener token');
+          setFavorites([]);
+          return;
+        }
+
+        const headers = {
+          Authorization: `Bearer ${token}`,
+          'x-wedding-id': activeWedding,
+        };
+
+        const response = await axios.get(`${API_URL}/api/favorites`, { headers });
+        setFavorites(response.data.favorites || []);
+      } catch (err) {
+        if (err.response?.status === 401 || err.response?.status === 500) {
+          console.warn('[FavoritesContext] Favoritos no disponibles (error auth)');
+          setFavorites([]);
+        } else {
+          console.error('[FavoritesContext] Error cargando favoritos:', err);
+          setError('Error al cargar favoritos');
+          setFavorites([]);
+        }
+      } finally {
+        setLoading(false);
+      }
+    },
+    [user, activeWedding, API_URL]
+  ); // Sin t para evitar recreaciones
 
   // Cargar SOLO cuando hay user Y wedding (una sola vez)
   useEffect(() => {
     if (user?.uid && activeWedding && !hasLoadedRef.current) {
       loadFavorites();
     }
-  }, [user?.uid, activeWedding, loadFavorites]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.uid, activeWedding]); // loadFavorites no incluido para evitar loop
 
   // Añadir a favoritos
   const addFavorite = async (supplier, notes = '') => {
