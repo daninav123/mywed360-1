@@ -56,7 +56,8 @@ export function FavoritesProvider({ children }) {
     const weddingId = activeWedding || activeWeddingData?.id;
 
     if (!weddingId) {
-      console.warn('[FavoritesContext] No hay boda activa, esperando...');
+      // Silencioso en primera carga (WeddingContext aún cargando)
+      // Solo loguear si ya pasó tiempo suficiente
       setFavorites([]);
       setLoading(false);
       return;

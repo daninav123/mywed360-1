@@ -32,6 +32,7 @@ import useSupplierShortlist from '../hooks/useSupplierShortlist';
 import { loadData, saveData } from '../services/SyncService';
 import { searchSuppliersHybrid, trackSupplierAction } from '../services/suppliersService';
 import SupplierCard from '../components/suppliers/SupplierCard';
+import SmartFiltersBar from '../components/suppliers/SmartFiltersBar';
 
 const CONFIRMED_KEYWORDS = ['confirm', 'contrat', 'reserva', 'firm'];
 
@@ -270,6 +271,9 @@ const Proveedores = () => {
   const [searchResultsPage, setSearchResultsPage] = useState(1);
   const [searchCompleted, setSearchCompleted] = useState(false);
 
+  // Estado para filtros inteligentes
+  const [smartFilters, setSmartFilters] = useState(null);
+
   useEffect(() => {
     loadProviders();
   }, [loadProviders]);
@@ -458,12 +462,20 @@ const Proveedores = () => {
         setAiError(null);
 
         // Usar nuevo sistema híbrido (BD propia → bodas.net → internet)
+        // Usar smartFilters si están disponibles, sino usar perfil
+        const filters = {
+          searchMode,
+          budget: smartFilters?.budget ?? weddingProfile?.budget,
+          guests: smartFilters?.guests ?? weddingProfile?.guestCount,
+          style: smartFilters?.style ?? weddingProfile?.style,
+        };
+
         const result = await searchSuppliersHybrid(
           trimmed, // service/category
-          resolvedLocation,
+          smartFilters?.location || resolvedLocation, // location (puede ser override)
           enrichedQuery || '', // query adicional
-          weddingProfile?.budget, // budget
-          { searchMode } // filters - incluir modo de búsqueda
+          filters.budget, // budget (puede ser override)
+          filters // filters completos
         );
 
         console.log('🔍 [Hybrid Search] Resultados:', result);
@@ -501,6 +513,8 @@ const Proveedores = () => {
       setSearchTerm,
       weddingProfile,
       searchMode,
+      smartFilters,
+      t,
     ]
   );
 
@@ -856,6 +870,9 @@ const Proveedores = () => {
                   </div>
                 </div>
               </form>
+
+              {/* Smart Filters Bar */}
+              <SmartFiltersBar weddingProfile={weddingProfile} onFiltersChange={setSmartFilters} />
 
               {searchHistory.length > 0 && (
                 <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
