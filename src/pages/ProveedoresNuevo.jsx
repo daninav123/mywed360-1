@@ -9,6 +9,7 @@ import {
   TrendingUp,
   Building2,
   Heart,
+  Camera,
 } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -276,6 +277,7 @@ const Proveedores = () => {
 
   // Estado para filtros inteligentes
   const [smartFilters, setSmartFilters] = useState(null);
+  const [hasPortfolioFilter, setHasPortfolioFilter] = useState(false);
 
   useEffect(() => {
     loadProviders();
@@ -521,16 +523,24 @@ const Proveedores = () => {
     ]
   );
 
+  const filteredResults = useMemo(() => {
+    if (!aiResults.length) return [];
+    // Aplicar filtro de portfolio si está activado
+    if (hasPortfolioFilter) {
+      return aiResults.filter(supplier => supplier.hasPortfolio && supplier.slug);
+    }
+    return aiResults;
+  }, [aiResults, hasPortfolioFilter]);
+
   const totalSearchPages = useMemo(() => {
-    if (!aiResults.length) return 0;
-    return Math.max(1, Math.ceil(aiResults.length / SEARCH_PAGE_SIZE));
-  }, [aiResults]);
+    return Math.max(1, Math.ceil(filteredResults.length / SEARCH_PAGE_SIZE));
+  }, [filteredResults]);
 
   const paginatedResults = useMemo(() => {
-    if (!aiResults.length) return [];
+    if (!filteredResults.length) return [];
     const start = (searchResultsPage - 1) * SEARCH_PAGE_SIZE;
-    return aiResults.slice(start, start + SEARCH_PAGE_SIZE);
-  }, [aiResults, searchResultsPage]);
+    return filteredResults.slice(start, start + SEARCH_PAGE_SIZE);
+  }, [filteredResults, searchResultsPage]);
 
   useEffect(() => {
     if (!aiResults.length) {
@@ -923,6 +933,26 @@ const Proveedores = () => {
                     weddingProfile={weddingProfile}
                     onFiltersChange={setSmartFilters}
                   />
+
+                  {/* Filtro Con Portfolio */}
+                  <div className="flex items-center gap-3 p-3 bg-purple-50 border border-purple-200 rounded-lg">
+                    <input
+                      type="checkbox"
+                      id="hasPortfolioFilter"
+                      checked={hasPortfolioFilter}
+                      onChange={(e) => setHasPortfolioFilter(e.target.checked)}
+                      className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                    />
+                    <label htmlFor="hasPortfolioFilter" className="flex items-center gap-2 text-sm font-medium text-purple-900 cursor-pointer">
+                      <Camera size={16} />
+                      Solo proveedores con portfolio
+                    </label>
+                    {hasPortfolioFilter && filteredResults.length > 0 && (
+                      <span className="ml-auto text-xs text-purple-700">
+                        {filteredResults.length} {filteredResults.length === 1 ? 'resultado' : 'resultados'}
+                      </span>
+                    )}
+                  </div>
 
                   {searchHistory.length > 0 && (
                     <div className="flex flex-wrap items-center gap-2 text-xs text-muted">

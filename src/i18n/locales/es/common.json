@@ -640,6 +640,111 @@
         }
       },
       "portfolio": {
+        "categories": {
+          "all": "Todas",
+          "bodas": "Bodas",
+          "decoracion": "Decoración",
+          "flores": "Flores",
+          "ceremonia": "Ceremonia",
+          "recepcion": "Recepción",
+          "otros": "Otros"
+        },
+        "toasts": {
+          "loadError": "No pudimos cargar el portfolio.",
+          "uploaded": "Foto subida correctamente",
+          "deleted": "Foto eliminada",
+          "updated": "Foto actualizada",
+          "deleteError": "No pudimos eliminar la foto",
+          "genericError": "Error inesperado. Inténtalo de nuevo."
+        },
+        "dashboard": {
+          "title": "Portfolio de fotos",
+          "loading": "Cargando portfolio…",
+          "deleteConfirm": "¿Eliminar esta foto?",
+          "actions": {
+            "addPhoto": "Añadir foto"
+          },
+          "photoCount": {
+            "one": "1 foto",
+            "other": "{{count}} fotos"
+          },
+          "coverCount": {
+            "one": "1 portada",
+            "other": "{{count}} portadas"
+          },
+          "coverPhoto": {
+            "untitled": "Portada sin título"
+          },
+          "viewModes": {
+            "grid": "Vista de cuadrícula",
+            "list": "Vista de lista"
+          },
+          "filters": {
+            "label": "Filtrar por categoría",
+            "placeholder": "Selecciona una categoría"
+          },
+          "zeroState": {
+            "title": "Aún no has subido fotos",
+            "description": "Comparte tus mejores trabajos para atraer a nuevas parejas.",
+            "cta": "Subir primera foto"
+          },
+          "coverPhotoCard": {
+            "title": "Foto de portada",
+            "description": "Esta foto se muestra al inicio de tu portfolio público."
+          },
+          "stats": {
+            "views": "Vistas",
+            "likes": "Favoritos"
+          },
+          "photoCard": {
+            "open": "Abrir detalles",
+            "edit": "Editar",
+            "delete": "Eliminar"
+          }
+        },
+        "upload": {
+          "title": "Añadir foto",
+          "dropzone": {
+            "title": "Arrastra tu imagen aquí",
+            "subtitle": "o haz clic para seleccionar un archivo",
+            "requirements": "Formatos: JPG, PNG, WebP · Tamaño máximo: 5MB",
+            "change": "Cambiar imagen"
+          },
+          "form": {
+            "title": {
+              "label": "Título (opcional)",
+              "placeholder": "Boda de María y Juan - Valencia"
+            },
+            "description": {
+              "label": "Descripción (opcional)",
+              "placeholder": "Ceremonia en la playa al atardecer…"
+            },
+            "category": {
+              "label": "Categoría *"
+            },
+            "tags": {
+              "label": "Tags (separados por comas)",
+              "placeholder": "atardecer, playa, ceremonia"
+            },
+            "featured": "Marcar como destacada",
+            "isCover": "Establecer como foto de portada"
+          },
+          "progress": {
+            "uploading": "Subiendo..."
+          },
+          "actions": {
+            "submit": "Subir foto",
+            "submitting": "Subiendo..."
+          },
+          "errors": {
+            "invalidType": "Tipo de archivo inválido. Solo JPG, PNG y WebP.",
+            "tooLarge": "El archivo es demasiado grande. Máximo 5MB.",
+            "noImage": "Selecciona una imagen antes de continuar.",
+            "noCategory": "Selecciona una categoría.",
+            "uploadFailed": "Error al guardar la foto.",
+            "generic": "No pudimos subir la foto. Inténtalo de nuevo."
+          }
+        },
         "lightbox": {
           "categories": {
             "bodas": "Bodas",

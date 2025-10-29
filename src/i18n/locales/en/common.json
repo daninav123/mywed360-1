@@ -1261,6 +1261,111 @@
         }
       },
       "portfolio": {
+        "categories": {
+          "all": "All",
+          "bodas": "Weddings",
+          "decoracion": "Decor",
+          "flores": "Flowers",
+          "ceremonia": "Ceremony",
+          "recepcion": "Reception",
+          "otros": "Other"
+        },
+        "toasts": {
+          "loadError": "We couldn't load the portfolio.",
+          "uploaded": "Photo uploaded successfully",
+          "deleted": "Photo deleted",
+          "updated": "Photo updated",
+          "deleteError": "We couldn't delete the photo",
+          "genericError": "Unexpected error. Please try again."
+        },
+        "dashboard": {
+          "title": "Photo portfolio",
+          "loading": "Loading portfolio...",
+          "deleteConfirm": "Delete this photo?",
+          "actions": {
+            "addPhoto": "Add photo"
+          },
+          "photoCount": {
+            "one": "1 photo",
+            "other": "{{count}} photos"
+          },
+          "coverCount": {
+            "one": "1 cover",
+            "other": "{{count}} covers"
+          },
+          "coverPhoto": {
+            "untitled": "Untitled cover"
+          },
+          "viewModes": {
+            "grid": "Grid view",
+            "list": "List view"
+          },
+          "filters": {
+            "label": "Filter by category",
+            "placeholder": "Select a category"
+          },
+          "zeroState": {
+            "title": "No photos yet",
+            "description": "Showcase your best work to attract new couples.",
+            "cta": "Upload first photo"
+          },
+          "coverPhotoCard": {
+            "title": "Cover photo",
+            "description": "This photo appears at the top of your public portfolio."
+          },
+          "stats": {
+            "views": "Views",
+            "likes": "Favorites"
+          },
+          "photoCard": {
+            "open": "Open details",
+            "edit": "Edit",
+            "delete": "Delete"
+          }
+        },
+        "upload": {
+          "title": "Add photo",
+          "dropzone": {
+            "title": "Drag your image here",
+            "subtitle": "or click to select a file",
+            "requirements": "Formats: JPG, PNG, WebP · Max size: 5MB",
+            "change": "Change image"
+          },
+          "form": {
+            "title": {
+              "label": "Title (optional)",
+              "placeholder": "Maria & John's wedding - Valencia"
+            },
+            "description": {
+              "label": "Description (optional)",
+              "placeholder": "Sunset beach ceremony..."
+            },
+            "category": {
+              "label": "Category *"
+            },
+            "tags": {
+              "label": "Tags (comma separated)",
+              "placeholder": "sunset, beach, ceremony"
+            },
+            "featured": "Mark as featured",
+            "isCover": "Set as cover photo"
+          },
+          "progress": {
+            "uploading": "Uploading..."
+          },
+          "actions": {
+            "submit": "Upload photo",
+            "submitting": "Uploading..."
+          },
+          "errors": {
+            "invalidType": "Invalid file type. Only JPG, PNG and WebP are allowed.",
+            "tooLarge": "File is too large. Maximum size is 5MB.",
+            "noImage": "Select an image before continuing.",
+            "noCategory": "Select a category.",
+            "uploadFailed": "We couldn't save the photo.",
+            "generic": "We couldn't upload the photo. Please try again."
+          }
+        },
         "lightbox": {
           "categories": {
             "bodas": "Weddings",

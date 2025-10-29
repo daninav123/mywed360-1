@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   X,
   Heart,
@@ -12,10 +12,13 @@ import {
   ChevronLeft,
   ChevronRight,
   ExternalLink,
+  Camera,
+  Loader2,
 } from 'lucide-react';
 import Modal from '../Modal';
 import Button from '../ui/Button';
 import Badge from '../ui/Badge';
+import PhotoLightbox from './PhotoLightbox';
 import useTranslations from '../../hooks/useTranslations';
 
 const SupplierDetailModal = ({
@@ -27,7 +30,38 @@ const SupplierDetailModal = ({
   onRequestQuote,
 }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [portfolioPhotos, setPortfolioPhotos] = useState([]);
+  const [loadingPortfolio, setLoadingPortfolio] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
   const { t } = useTranslations();
+
+  // Cargar portfolio si el proveedor tiene slug
+  useEffect(() => {
+    if (!open || !supplier?.slug || !supplier?.hasPortfolio) {
+      setPortfolioPhotos([]);
+      return;
+    }
+
+    const fetchPortfolio = async () => {
+      setLoadingPortfolio(true);
+      try {
+        const response = await fetch(`/api/suppliers/public/${supplier.slug}`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.portfolio && Array.isArray(data.portfolio)) {
+            setPortfolioPhotos(data.portfolio);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading portfolio:', error);
+      } finally {
+        setLoadingPortfolio(false);
+      }
+    };
+
+    fetchPortfolio();
+  }, [open, supplier?.slug, supplier?.hasPortfolio]);
 
   if (!open || !supplier) return null;
 
@@ -219,8 +253,89 @@ const SupplierDetailModal = ({
               )}
             </div>
           </div>
+
+          {/* Sección Portfolio */}
+          {supplier.hasPortfolio && supplier.slug && (
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold flex items-center gap-2">
+                  <Camera className="h-5 w-5 text-purple-600" />
+                  Portfolio
+                </h3>
+                <a
+                  href={`/proveedor/${supplier.slug}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-purple-600 hover:text-purple-700 flex items-center gap-1"
+                >
+                  Ver página completa
+                  <ExternalLink className="h-4 w-4" />
+                </a>
+              </div>
+
+              {loadingPortfolio ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+              ) : portfolioPhotos.length > 0 ? (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {portfolioPhotos.slice(0, 6).map((photo, index) => (
+                    <div
+                      key={photo.id || index}
+                      className="relative aspect-square rounded-lg overflow-hidden cursor-pointer group"
+                      onClick={() => {
+                        setLightboxIndex(index);
+                        setLightboxOpen(true);
+                      }}
+                    >
+                      <img
+                        src={photo.url}
+                        alt={photo.title || `Foto ${index + 1}`}
+                        className="w-full h-full object-cover transition-transform group-hover:scale-110"
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all flex items-center justify-center">
+                        <Camera className="h-8 w-8 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
+                      {photo.featured && (
+                        <div className="absolute top-2 right-2 bg-purple-600 text-white text-xs px-2 py-1 rounded-full">
+                          Destacada
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 bg-gray-50 rounded-lg">
+                  <Camera className="h-12 w-12 text-gray-400 mx-auto mb-2" />
+                  <p className="text-sm text-gray-600">No hay fotos en el portfolio</p>
+                </div>
+              )}
+
+              {portfolioPhotos.length > 6 && (
+                <div className="mt-4 text-center">
+                  <a
+                    href={`/proveedor/${supplier.slug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-purple-600 hover:text-purple-700 font-medium"
+                  >
+                    Ver todas las fotos ({portfolioPhotos.length})
+                  </a>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
+
+      {/* Lightbox para ver fotos en grande */}
+      {lightboxOpen && portfolioPhotos.length > 0 && (
+        <PhotoLightbox
+          photos={portfolioPhotos}
+          initialIndex={lightboxIndex}
+          onClose={() => setLightboxOpen(false)}
+        />
+      )}
     </Modal>
   );
 };

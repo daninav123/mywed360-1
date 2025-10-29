@@ -2,6 +2,7 @@
 // Tarjeta de proveedor con diferenciación visual (Registrado vs Internet)
 
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   CheckCircle,
   Globe,
@@ -11,6 +12,8 @@ import {
   ExternalLink,
   MessageCircle,
   Heart,
+  Camera,
+  Star,
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 
@@ -146,8 +149,8 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
           />
         </button>
 
-        {/* Badge según tipo */}
-        <div className="ml-2">
+        {/* Badges según tipo y portfolio */}
+        <div className="ml-2 flex flex-wrap gap-1">
           {isRegistered && (
             <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
               <CheckCircle size={14} />
@@ -163,6 +166,13 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
             <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
               <Globe size={14} />
               {t('common.suppliers.card.hybrid.badges.internet')}
+            </span>
+          )}
+          {/* Badge Portfolio Disponible */}
+          {supplier.hasPortfolio && supplier.slug && (
+            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+              <Camera size={14} />
+              Portfolio
             </span>
           )}
         </div>
@@ -234,14 +244,16 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
         </div>
       )}
 
-      {/* Rating (si disponible) */}
+      {/* Rating con mejor visualización */}
       {supplier.metrics?.rating > 0 && (
-        <div className="flex items-center gap-1 mb-3 text-sm">
-          <span className="text-yellow-500">⭐</span>
-          <span className="font-medium">{supplier.metrics.rating.toFixed(1)}</span>
+        <div className="flex items-center gap-2 mb-3">
+          <div className="flex items-center gap-1">
+            <Star size={16} className="text-yellow-500 fill-yellow-500" />
+            <span className="font-semibold text-gray-900">{supplier.metrics.rating.toFixed(1)}</span>
+          </div>
           {supplier.metrics?.reviewCount > 0 && (
-            <span className="text-gray-500">
-              {t('common.suppliers.card.hybrid.reviews', { count: supplier.metrics.reviewCount })}
+            <span className="text-sm text-gray-600">
+              ({supplier.metrics.reviewCount} {supplier.metrics.reviewCount === 1 ? 'reseña' : 'reseñas'})
             </span>
           )}
         </div>
@@ -297,6 +309,17 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
 
             {/* Botones secundarios */}
             <div className="flex gap-2">
+              {/* Botón Ver Portfolio (solo si tiene slug y portfolio) */}
+              {supplier.hasPortfolio && supplier.slug && (
+                <Link
+                  to={`/proveedor/${supplier.slug}`}
+                  className="flex-1 px-4 py-2 border-2 border-purple-600 text-purple-600 rounded-md hover:bg-purple-50 transition-colors font-medium text-sm flex items-center justify-center gap-2"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Camera size={16} />
+                  Ver Portfolio
+                </Link>
+              )}
               {onViewDetails && (
                 <button
                   onClick={() => onViewDetails(supplier)}

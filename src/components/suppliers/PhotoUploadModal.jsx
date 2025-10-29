@@ -1,18 +1,16 @@
-import React, { useState, useRef } from 'react';
-import { X, Upload, Image as ImageIcon } from 'lucide-react';
+import React, { useMemo, useRef, useState } from 'react';
+import { X, Upload } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { uploadPortfolioImage } from '../../services/portfolioStorageService';
+import useTranslations from '../../hooks/useTranslations';
 
-const CATEGORIES = [
-  { value: 'bodas', label: 'Bodas' },
-  { value: 'decoracion', label: 'Decoración' },
-  { value: 'flores', label: 'Flores' },
-  { value: 'ceremonia', label: 'Ceremonia' },
-  { value: 'recepcion', label: 'Recepción' },
-  { value: 'otros', label: 'Otros' },
-];
+const CATEGORY_KEYS = ['bodas', 'decoracion', 'flores', 'ceremonia', 'recepcion', 'otros'];
+const ACCEPTED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 export default function PhotoUploadModal({ onClose, onSuccess }) {
+  const { t, format } = useTranslations();
+
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -29,26 +27,36 @@ export default function PhotoUploadModal({ onClose, onSuccess }) {
 
   const fileInputRef = useRef(null);
 
-  const handleFileSelect = (e) => {
-    const selectedFile = e.target.files?.[0];
+  const categoryOptions = useMemo(
+    () =>
+      CATEGORY_KEYS.map((value) => ({
+        value,
+        label: t(`common.suppliers.portfolio.lightbox.categories.${value}`),
+      })),
+    [t],
+  );
+
+  const resetFileSelection = () => {
+    setFile(null);
+    setPreview(null);
+  };
+
+  const handleFileSelect = (event) => {
+    const selectedFile = event.target.files?.[0];
     if (!selectedFile) return;
 
-    // Validar tipo
-    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-    if (!validTypes.includes(selectedFile.type)) {
-      toast.error('Tipo de archivo inválido. Solo JPG, PNG y WebP');
+    if (!ACCEPTED_TYPES.includes(selectedFile.type)) {
+      toast.error(t('common.suppliers.portfolio.upload.errors.invalidType'));
       return;
     }
 
-    // Validar tamaño (5MB)
-    if (selectedFile.size > 5 * 1024 * 1024) {
-      toast.error('El archivo es demasiado grande. Máximo 5MB');
+    if (selectedFile.size > MAX_FILE_SIZE) {
+      toast.error(t('common.suppliers.portfolio.upload.errors.tooLarge'));
       return;
     }
 
     setFile(selectedFile);
 
-    // Generar preview
     const reader = new FileReader();
     reader.onloadend = () => {
       setPreview(reader.result);
@@ -56,29 +64,29 @@ export default function PhotoUploadModal({ onClose, onSuccess }) {
     reader.readAsDataURL(selectedFile);
   };
 
-  const handleDrop = (e) => {
-    e.preventDefault();
-    const droppedFile = e.dataTransfer.files?.[0];
+  const handleDrop = (event) => {
+    event.preventDefault();
+    const droppedFile = event.dataTransfer.files?.[0];
     if (droppedFile) {
-      const fakeEvent = { target: { files: [droppedFile] } };
-      handleFileSelect(fakeEvent);
+      const syntheticEvent = { target: { files: [droppedFile] } };
+      handleFileSelect(syntheticEvent);
     }
   };
 
-  const handleDragOver = (e) => {
-    e.preventDefault();
+  const handleDragOver = (event) => {
+    event.preventDefault();
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
 
     if (!file) {
-      toast.error('Selecciona una imagen');
+      toast.error(t('common.suppliers.portfolio.upload.errors.noImage'));
       return;
     }
 
     if (!formData.category) {
-      toast.error('Selecciona una categoría');
+      toast.error(t('common.suppliers.portfolio.upload.errors.noCategory'));
       return;
     }
 
@@ -88,12 +96,10 @@ export default function PhotoUploadModal({ onClose, onSuccess }) {
     try {
       const supplierId = localStorage.getItem('supplier_id');
 
-      // Subir imagen a Firebase Storage
       const imageUrls = await uploadPortfolioImage(file, supplierId, (progress) => {
         setUploadProgress(progress);
       });
 
-      // Guardar en base de datos via API
       const token = localStorage.getItem('supplier_token');
       const response = await fetch('/api/supplier-dashboard/portfolio', {
         method: 'POST',
@@ -107,7 +113,7 @@ export default function PhotoUploadModal({ onClose, onSuccess }) {
           category: formData.category,
           tags: formData.tags
             .split(',')
-            .map((t) => t.trim())
+            .map((tag) => tag.trim())
             .filter(Boolean),
           featured: formData.featured,
           isCover: formData.isCover,
@@ -117,87 +123,111 @@ export default function PhotoUploadModal({ onClose, onSuccess }) {
       });
 
       if (!response.ok) {
-        throw new Error('Error saving photo');
+        throw new Error('upload_failed');
       }
 
-      toast.success('Foto subida correctamente');
+      toast.success(t('common.suppliers.portfolio.toasts.uploaded'));
       onSuccess();
+      resetFileSelection();
+      setFormData((prev) => ({
+        ...prev,
+        title: '',
+        description: '',
+        tags: '',
+        featured: false,
+        isCover: false,
+      }));
     } catch (error) {
-      console.error('Error uploading photo:', error);
-      toast.error(error.message || 'Error al subir la foto');
+      console.error('[PhotoUploadModal] upload error', error);
+      toast.error(
+        error.message === 'upload_failed'
+          ? t('common.suppliers.portfolio.upload.errors.uploadFailed')
+          : t('common.suppliers.portfolio.upload.errors.generic'),
+      );
     } finally {
       setUploading(false);
+      setUploadProgress(0);
     }
   };
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
       <div className="bg-surface rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-border">
-          <h2 className="text-xl font-bold text-foreground">Añadir Foto</h2>
+          <h2 className="text-xl font-bold text-foreground">
+            {t('common.suppliers.portfolio.upload.title')}
+          </h2>
           <button
             onClick={onClose}
             className="text-muted hover:text-foreground"
+            aria-label={t('app.close')}
             disabled={uploading}
           >
             <X className="h-6 w-6" />
           </button>
         </div>
 
-        {/* Content */}
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {/* Zona de Drop */}
           <div
             className="border-2 border-dashed border-border rounded-lg p-8 text-center cursor-pointer hover:border-primary transition-colors"
             onClick={() => fileInputRef.current?.click()}
             onDrop={handleDrop}
             onDragOver={handleDragOver}
+            role="presentation"
           >
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/jpeg,image/jpg,image/png,image/webp"
+              accept={ACCEPTED_TYPES.join(',')}
               onChange={handleFileSelect}
               className="hidden"
             />
 
             {preview ? (
               <div className="space-y-4">
-                <img src={preview} alt="Preview" className="max-h-64 mx-auto rounded-lg" />
+                <img
+                  src={preview}
+                  alt={formData.title || t('common.suppliers.portfolio.lightbox.image.altFallback')}
+                  className="max-h-64 mx-auto rounded-lg object-cover"
+                />
                 <button
                   type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setFile(null);
-                    setPreview(null);
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    resetFileSelection();
                   }}
                   className="text-sm text-muted hover:text-foreground"
+                  disabled={uploading}
                 >
-                  Cambiar imagen
+                  {t('common.suppliers.portfolio.upload.dropzone.change')}
                 </button>
               </div>
             ) : (
               <div>
                 <Upload className="h-12 w-12 text-muted mx-auto mb-4" />
-                <p className="text-foreground font-medium mb-2">Arrastra tu imagen aquí</p>
-                <p className="text-sm text-muted mb-4">o haz click para seleccionar archivo</p>
-                <p className="text-xs text-muted">Formatos: JPG, PNG, WebP · Tamaño máx: 5MB</p>
+                <p className="text-foreground font-medium mb-2">
+                  {t('common.suppliers.portfolio.upload.dropzone.title')}
+                </p>
+                <p className="text-sm text-muted mb-4">
+                  {t('common.suppliers.portfolio.upload.dropzone.subtitle')}
+                </p>
+                <p className="text-xs text-muted">
+                  {t('common.suppliers.portfolio.upload.dropzone.requirements')}
+                </p>
               </div>
             )}
           </div>
 
-          {/* Formulario */}
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
-                Título (opcional)
+                {t('common.suppliers.portfolio.upload.form.title.label')}
               </label>
               <input
                 type="text"
                 value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                placeholder="Boda de María y Juan - Valencia"
+                onChange={(event) => setFormData({ ...formData, title: event.target.value })}
+                placeholder={t('common.suppliers.portfolio.upload.form.title.placeholder')}
                 className="w-full px-4 py-2 border border-border rounded-lg bg-background text-body focus:outline-none focus:ring-2 focus:ring-primary"
                 disabled={uploading}
               />
@@ -205,12 +235,14 @@ export default function PhotoUploadModal({ onClose, onSuccess }) {
 
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
-                Descripción (opcional)
+                {t('common.suppliers.portfolio.upload.form.description.label')}
               </label>
               <textarea
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Ceremonia en la playa al atardecer..."
+                onChange={(event) =>
+                  setFormData({ ...formData, description: event.target.value })
+                }
+                placeholder={t('common.suppliers.portfolio.upload.form.description.placeholder')}
                 rows={3}
                 className="w-full px-4 py-2 border border-border rounded-lg bg-background text-body focus:outline-none focus:ring-2 focus:ring-primary resize-none"
                 disabled={uploading}
@@ -218,17 +250,19 @@ export default function PhotoUploadModal({ onClose, onSuccess }) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">Categoría *</label>
+              <label className="block text-sm font-medium text-foreground mb-2">
+                {t('common.suppliers.portfolio.upload.form.category.label')}
+              </label>
               <select
                 value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                onChange={(event) => setFormData({ ...formData, category: event.target.value })}
                 className="w-full px-4 py-2 border border-border rounded-lg bg-background text-body focus:outline-none focus:ring-2 focus:ring-primary"
                 disabled={uploading}
                 required
               >
-                {CATEGORIES.map((cat) => (
-                  <option key={cat.value} value={cat.value}>
-                    {cat.label}
+                {categoryOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
                   </option>
                 ))}
               </select>
@@ -236,50 +270,60 @@ export default function PhotoUploadModal({ onClose, onSuccess }) {
 
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
-                Tags (separados por comas)
+                {t('common.suppliers.portfolio.upload.form.tags.label')}
               </label>
               <input
                 type="text"
                 value={formData.tags}
-                onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-                placeholder="atardecer, playa, ceremonia"
+                onChange={(event) => setFormData({ ...formData, tags: event.target.value })}
+                placeholder={t('common.suppliers.portfolio.upload.form.tags.placeholder')}
                 className="w-full px-4 py-2 border border-border rounded-lg bg-background text-body focus:outline-none focus:ring-2 focus:ring-primary"
                 disabled={uploading}
               />
             </div>
 
-            {/* Checkboxes */}
             <div className="space-y-2">
               <label className="flex items-center gap-2">
                 <input
                   type="checkbox"
                   checked={formData.featured}
-                  onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
+                  onChange={(event) =>
+                    setFormData({ ...formData, featured: event.target.checked })
+                  }
                   className="rounded border-border text-primary focus:ring-primary"
                   disabled={uploading}
                 />
-                <span className="text-sm text-body">Marcar como destacada</span>
+                <span className="text-sm text-body">
+                  {t('common.suppliers.portfolio.upload.form.featured')}
+                </span>
               </label>
 
               <label className="flex items-center gap-2">
                 <input
                   type="checkbox"
                   checked={formData.isCover}
-                  onChange={(e) => setFormData({ ...formData, isCover: e.target.checked })}
+                  onChange={(event) =>
+                    setFormData({ ...formData, isCover: event.target.checked })
+                  }
                   className="rounded border-border text-primary focus:ring-primary"
                   disabled={uploading}
                 />
-                <span className="text-sm text-body">Establecer como foto de portada</span>
+                <span className="text-sm text-body">
+                  {t('common.suppliers.portfolio.upload.form.isCover')}
+                </span>
               </label>
             </div>
           </div>
 
-          {/* Progress Bar */}
           {uploading && uploadProgress > 0 && (
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-muted">Subiendo...</span>
-                <span className="text-foreground font-medium">{uploadProgress}%</span>
+                <span className="text-muted">
+                  {t('common.suppliers.portfolio.upload.progress.uploading')}
+                </span>
+                <span className="text-foreground font-medium">
+                  {format?.number ? format.number(uploadProgress) : uploadProgress}%
+                </span>
               </div>
               <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
                 <div
@@ -290,7 +334,6 @@ export default function PhotoUploadModal({ onClose, onSuccess }) {
             </div>
           )}
 
-          {/* Buttons */}
           <div className="flex items-center gap-3 pt-4">
             <button
               type="button"
@@ -298,14 +341,16 @@ export default function PhotoUploadModal({ onClose, onSuccess }) {
               className="flex-1 px-4 py-2 border border-border rounded-lg text-body hover:bg-muted/50 transition-colors"
               disabled={uploading}
             >
-              Cancelar
+              {t('app.cancel')}
             </button>
             <button
               type="submit"
               className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={!file || uploading}
             >
-              {uploading ? 'Subiendo...' : 'Subir Foto'}
+              {uploading
+                ? t('common.suppliers.portfolio.upload.actions.submitting')
+                : t('common.suppliers.portfolio.upload.actions.submit')}
             </button>
           </div>
         </form>
