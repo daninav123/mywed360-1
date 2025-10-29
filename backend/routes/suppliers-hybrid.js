@@ -20,7 +20,7 @@ const router = express.Router();
 import fetch from 'node-fetch';
 
 // Importar servicio de Google Places
-const googlePlacesService = require('../services/googlePlacesService.js');
+import * as googlePlacesService from '../services/googlePlacesService.js';
 
 const NEUTRAL_LOCATIONS = new Set(['españa', 'spain', 'nacional', 'todo españa', 'toda españa']);
 
@@ -586,11 +586,21 @@ router.post('/search', async (req, res) => {
     let usedGooglePlaces = false;
 
     // 2.1 GOOGLE PLACES (si categoría tiene alta/media cobertura)
+    console.log(`\n🔍 [DEBUG] Verificando Google Places para servicio: "${service}"`);
+    console.log(`   - searchMode: ${searchMode}`);
+    console.log(`   - trueRegistered: ${trueRegistered.length}`);
+    console.log(`   - googlePlacesService disponible: ${!!googlePlacesService}`);
+    console.log(
+      `   - shouldUseGooglePlaces: ${googlePlacesService?.shouldUseGooglePlaces(service)}`
+    );
+
     const shouldSearchGooglePlaces =
       searchMode !== 'database' &&
       (searchMode === 'internet' ||
         (searchMode === 'auto' && trueRegistered.length < MIN_RESULTS)) &&
       googlePlacesService.shouldUseGooglePlaces(service);
+
+    console.log(`   - shouldSearchGooglePlaces: ${shouldSearchGooglePlaces}`);
 
     if (shouldSearchGooglePlaces) {
       const googleStart = Date.now();

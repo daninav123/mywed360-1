@@ -3,10 +3,13 @@
  * Para buscar proveedores de bodas con datos verificados
  */
 
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
 // Configuración de API
 const GOOGLE_PLACES_API_KEY = process.env.GOOGLE_PLACES_API_KEY;
+
+// Debug: Verificar que la API key está cargada
+console.log('🔑 [GOOGLE PLACES] API Key configurada:', GOOGLE_PLACES_API_KEY ? '✅ Sí' : '❌ No');
 
 // Categorías con alta cobertura en Google Places
 const HIGH_COVERAGE_CATEGORIES = [
@@ -34,17 +37,14 @@ const MEDIUM_COVERAGE_CATEGORIES = [
   'video',
   'catering',
   'decoracion',
+  'musica', // Añadido: grupos musicales con local
+  'musicos',
+  'orquestas',
+  'banda',
 ];
 
 // Categorías con baja cobertura (mejor usar Tavily)
-const LOW_COVERAGE_CATEGORIES = [
-  'wedding-planners',
-  'planners',
-  'musicos',
-  'musica',
-  'dj',
-  'cantantes',
-];
+const LOW_COVERAGE_CATEGORIES = ['wedding-planners', 'planners', 'dj', 'cantantes'];
 
 /**
  * Determina si debemos usar Google Places para esta categoría
@@ -88,6 +88,8 @@ function mapServiceToPlaceType(service) {
     video: 'videographer',
     catering: 'caterer',
     decoracion: 'event planner',
+    // Música: Sin tipo específico, búsqueda por texto
+    // musica, musicos, orquestas, banda → null para usar búsqueda de texto libre
   };
 
   return mapping[serviceLower] || null;
@@ -269,7 +271,7 @@ function getPhotoUrl(photoReference, maxWidth = 400) {
   return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=${maxWidth}&photo_reference=${photoReference}&key=${GOOGLE_PLACES_API_KEY}`;
 }
 
-module.exports = {
+export {
   searchGooglePlaces,
   shouldUseGooglePlaces,
   getPhotoUrl,
