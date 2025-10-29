@@ -36,6 +36,8 @@
     "cypress:run:single": "cross-env VITE_TEST_MODE=true cypress run --spec",
     "cypress:run:seating": "cypress run --spec \"cypress/e2e/seating/**/*.cy.js\" --config video=false",
     "cypress:run:proveedores": "cypress run --spec \"cypress/e2e/proveedores_*.cy.js\" --config video=false",
+    "cypress:run:portfolio": "cypress run --spec \"cypress/e2e/portfolio-proveedores/**/*.cy.js\" --config video=false",
+    "cypress:open:portfolio": "cypress open --e2e --config specPattern=cypress/e2e/portfolio-proveedores/**/*.cy.js",
     "cypress:run:ai-search": "cypress run --spec \"cypress/e2e/ai-supplier-search.cy.js\" --browser chrome --headed",
     "cypress:open:seating": "cypress open --e2e --config specPattern=cypress/e2e/seating/**/*.cy.js",
     "test:ai-search": "node scripts/testAISearchE2E.js",
