@@ -44,25 +44,13 @@ export function FavoritesProvider({ children }) {
   const { t } = useTranslations();
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4004';
-  const loadingRef = useRef(false);
-  const prevUserIdRef = useRef(null);
-  const prevWeddingIdRef = useRef(null);
+  const hasLoadedRef = useRef(false); // Para cargar SOLO UNA VEZ
+  const currentUserRef = useRef(null);
+  const currentWeddingRef = useRef(null);
 
-  // Extraer solo el UID del user (primitivo)
-  const userId = user?.uid || null;
-
-  // Cargar favoritos SOLO cuando cambian userId o activeWedding (ambos primitivos)
-  useEffect(() => {
-    // Verificar si realmente cambió (no solo se recreó el objeto)
-    if (userId === prevUserIdRef.current && activeWedding === prevWeddingIdRef.current) {
-      return; // No hay cambios reales
-    }
-
-    prevUserIdRef.current = userId;
-    prevWeddingIdRef.current = activeWedding;
-
-    // Prevenir múltiples cargas simultáneas
-    if (loadingRef.current) return;
+  // Función de carga (no depende de nada, se llama manualmente)
+  const loadFavorites = useCallback(async (forceReload = false) => {
+    const userId = user?.uid;
 
     if (!userId || !activeWedding) {
       setFavorites([]);
@@ -70,44 +58,59 @@ export function FavoritesProvider({ children }) {
       return;
     }
 
-    const loadFavorites = async () => {
-      loadingRef.current = true;
+    // Si ya se cargó y no es forzado, no recargar
+    if (
+      hasLoadedRef.current &&
+      !forceReload &&
+      currentUserRef.current === userId &&
+      currentWeddingRef.current === activeWedding
+    ) {
+      return;
+    }
+
+    currentUserRef.current = userId;
+    currentWeddingRef.current = activeWedding;
+    hasLoadedRef.current = true;
+
+    try {
       setLoading(true);
       setError(null);
 
-      try {
-        const token = await getAuthToken();
+      const token = await getAuthToken();
 
-        if (!token) {
-          console.warn('[FavoritesContext] No se pudo obtener token');
-          setFavorites([]);
-          return;
-        }
-
-        const headers = {
-          Authorization: `Bearer ${token}`,
-          'x-wedding-id': activeWedding,
-        };
-
-        const response = await axios.get(`${API_URL}/api/favorites`, { headers });
-        setFavorites(response.data.favorites || []);
-      } catch (err) {
-        if (err.response?.status === 401 || err.response?.status === 500) {
-          console.warn('[FavoritesContext] Favoritos no disponibles (error auth)');
-          setFavorites([]);
-        } else {
-          console.error('[FavoritesContext] Error cargando favoritos:', err);
-          setError(t('common.suppliers.favorites.errors.loadFailed'));
-          setFavorites([]);
-        }
-      } finally {
-        setLoading(false);
-        loadingRef.current = false;
+      if (!token) {
+        console.warn('[FavoritesContext] No se pudo obtener token');
+        setFavorites([]);
+        return;
       }
-    };
 
-    loadFavorites();
-  }, [userId, activeWedding]); // Solo valores primitivos estables
+      const headers = {
+        Authorization: `Bearer ${token}`,
+        'x-wedding-id': activeWedding,
+      };
+
+      const response = await axios.get(`${API_URL}/api/favorites`, { headers });
+      setFavorites(response.data.favorites || []);
+    } catch (err) {
+      if (err.response?.status === 401 || err.response?.status === 500) {
+        console.warn('[FavoritesContext] Favoritos no disponibles (error auth)');
+        setFavorites([]);
+      } else {
+        console.error('[FavoritesContext] Error cargando favoritos:', err);
+        setError(t('common.suppliers.favorites.errors.loadFailed'));
+        setFavorites([]);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, []); // Sin dependencias, se llama manualmente
+
+  // Cargar SOLO cuando hay user Y wedding (una sola vez)
+  useEffect(() => {
+    if (user?.uid && activeWedding && !hasLoadedRef.current) {
+      loadFavorites();
+    }
+  }, [user?.uid, activeWedding, loadFavorites]);
 
   // Añadir a favoritos
   const addFavorite = async (supplier, notes = '') => {
