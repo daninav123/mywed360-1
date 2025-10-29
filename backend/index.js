@@ -56,6 +56,7 @@ import aiSuppliersRealRouter from './routes/ai-suppliers-real-search.js';
 import aiSuppliersTavilyRouter from './routes/ai-suppliers-tavily.js';
 import suppliersHybridRouter from './routes/suppliers-hybrid.js';
 import suppliersRegisterRouter from './routes/suppliers-register.js';
+import supplierRequestsRouter from './routes/supplier-requests.js';
 import aiBudgetRouter from './routes/ai-budget.js';
 import aiSongsRouter from './routes/ai-songs.js';
 import aiWebsiteRouter from './routes/ai-website.js';
@@ -634,6 +635,7 @@ app.use('/api/ai-suppliers-real', authMiddleware(), aiSuppliersRealRouter);
 app.use('/api/ai-suppliers-tavily', authMiddleware(), aiSuppliersTavilyRouter);
 app.use('/api/suppliers', suppliersHybridRouter); // Búsqueda pública, sin auth
 app.use('/api/suppliers', suppliersRegisterRouter); // No requiere auth para registro
+app.use('/api/suppliers', supplierRequestsRouter); // Solicitudes de presupuesto (público)
 app.use('/api/favorites', authMiddleware(), favoritesRouter); // Favoritos requiere auth
 app.use('/api/ai/budget-estimate', authMiddleware(), aiBudgetRouter);
 app.use('/api/ai', authMiddleware(), aiRouter);
