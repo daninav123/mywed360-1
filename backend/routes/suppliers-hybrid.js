@@ -223,7 +223,7 @@ async function searchTavilySimple(query, location, service) {
         include_answer: false,
         include_raw_content: true, // ⭐ ACTIVADO: Para extraer email/teléfono del HTML
         include_images: true,
-        max_results: 15, // ✅ Reducido de 20 a 15 (más eficiente)
+        max_results: 30, // ✅ Aumentado para obtener más resultados
         exclude_domains: [
           // ⭐ CAMBIO: Solo excluimos marketplaces genéricos y portales NO relacionados con bodas
           // Los portales de bodas (bodas.net, zankyou, etc.) se permiten y se filtran por CONTENIDO
@@ -684,8 +684,8 @@ router.post('/search', async (req, res) => {
             return false;
           }
 
-          // ✅ Score mínimo de calidad (Tavily score 0-1)
-          if ((r.score || 0) < 0.3) {
+          // ✅ Score mínimo de calidad (Tavily score 0-1) - Reducido para más resultados
+          if ((r.score || 0) < 0.15) {
             console.log(`   ❌ Filtrado por score bajo (${r.score}): ${r.title}`);
             return false;
           }
