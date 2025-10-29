@@ -202,7 +202,16 @@ export function FavoritesProvider({ children }) {
     if (isFav) {
       await removeFavorite(supplier.id);
     } else {
-      await addFavorite(supplier, notes);
+      try {
+        await addFavorite(supplier, notes);
+      } catch (error) {
+        // Si ya existe (409), recargar favoritos para sincronizar
+        if (error.message?.includes('already') || error.message?.includes('existe')) {
+          await loadFavorites(true); // Forzar recarga
+        } else {
+          throw error; // Re-lanzar otros errores
+        }
+      }
     }
   };
 
