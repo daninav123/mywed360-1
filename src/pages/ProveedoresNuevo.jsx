@@ -1175,7 +1175,6 @@ const Proveedores = () => {
             })}
           </div>
         </section>
-      </PageWrapper>
 
       <Modal
         open={searchDrawerOpen}
@@ -1288,6 +1287,7 @@ const Proveedores = () => {
         </>
         )}
       </PageWrapper>
+    </>
 
       <ServiceOptionsModal
         open={serviceModal.open}
