@@ -16,12 +16,14 @@ import { toast } from 'react-toastify';
 
 import useTranslations from '../../hooks/useTranslations';
 import { useFavorites } from '../../contexts/FavoritesContext';
+import SupplierDetailModal from './SupplierDetailModal';
 
 export default function SupplierCard({ supplier, onContact, onViewDetails, onMarkAsConfirmed }) {
   const { t } = useTranslations();
   const { isFavorite, toggleFavorite } = useFavorites();
   const [showContactMenu, setShowContactMenu] = useState(false);
   const [isFavoriting, setIsFavoriting] = useState(false);
+  const [showDetailModal, setShowDetailModal] = useState(false);
 
   const isFav = isFavorite(supplier.id);
 
@@ -361,6 +363,29 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
           </p>
         </div>
       )}
+
+      {/* Botón Ver Detalles */}
+      <div className="mt-4 pt-4 border-t border-gray-200">
+        <button
+          onClick={() => setShowDetailModal(true)}
+          className="w-full py-2 px-4 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors font-medium"
+        >
+          Ver detalles completos
+        </button>
+      </div>
+
+      {/* Modal de Detalles */}
+      <SupplierDetailModal
+        supplier={supplier}
+        open={showDetailModal}
+        onClose={() => setShowDetailModal(false)}
+        onFavoriteToggle={handleToggleFavorite}
+        isFavorite={isFav}
+        onRequestQuote={(supp) => {
+          toast.info('Formulario de presupuesto próximamente');
+          setShowDetailModal(false);
+        }}
+      />
     </div>
   );
 }
