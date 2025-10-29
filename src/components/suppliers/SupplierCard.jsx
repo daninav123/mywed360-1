@@ -94,7 +94,7 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
 
   // Manejar favoritos
   const handleToggleFavorite = async (e) => {
-    e.stopPropagation(); // Evitar propagación al card
+    e?.stopPropagation?.(); // Evitar propagación al card (opcional)
 
     setIsFavoriting(true);
     try {
