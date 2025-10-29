@@ -260,7 +260,7 @@ const SupplierDetailModal = ({
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold flex items-center gap-2">
                   <Camera className="h-5 w-5 text-purple-600" />
-                  Portfolio
+                  {t('common.suppliers.detail.portfolio.title')}
                 </h3>
                 <a
                   href={`/proveedor/${supplier.slug}`}
@@ -268,7 +268,7 @@ const SupplierDetailModal = ({
                   rel="noopener noreferrer"
                   className="text-sm text-purple-600 hover:text-purple-700 flex items-center gap-1"
                 >
-                  Ver página completa
+                  {t('common.suppliers.detail.portfolio.viewPublic')}
                   <ExternalLink className="h-4 w-4" />
                 </a>
               </div>
@@ -290,7 +290,12 @@ const SupplierDetailModal = ({
                     >
                       <img
                         src={photo.url}
-                        alt={photo.title || `Foto ${index + 1}`}
+                        alt={
+                          photo.title ||
+                          t('common.suppliers.detail.portfolio.photoAlt', {
+                            index: index + 1,
+                          })
+                        }
                         className="w-full h-full object-cover transition-transform group-hover:scale-110"
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all flex items-center justify-center">
@@ -298,7 +303,7 @@ const SupplierDetailModal = ({
                       </div>
                       {photo.featured && (
                         <div className="absolute top-2 right-2 bg-purple-600 text-white text-xs px-2 py-1 rounded-full">
-                          Destacada
+                          {t('common.suppliers.portfolio.lightbox.tags.featured')}
                         </div>
                       )}
                     </div>
@@ -307,7 +312,9 @@ const SupplierDetailModal = ({
               ) : (
                 <div className="text-center py-8 bg-gray-50 rounded-lg">
                   <Camera className="h-12 w-12 text-gray-400 mx-auto mb-2" />
-                  <p className="text-sm text-gray-600">No hay fotos en el portfolio</p>
+                  <p className="text-sm text-gray-600">
+                    {t('common.suppliers.detail.portfolio.empty')}
+                  </p>
                 </div>
               )}
 
@@ -319,7 +326,9 @@ const SupplierDetailModal = ({
                     rel="noopener noreferrer"
                     className="text-sm text-purple-600 hover:text-purple-700 font-medium"
                   >
-                    Ver todas las fotos ({portfolioPhotos.length})
+                    {t('common.suppliers.detail.portfolio.viewAll', {
+                      count: portfolioPhotos.length,
+                    })}
                   </a>
                 </div>
               )}

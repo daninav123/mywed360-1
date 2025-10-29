@@ -550,13 +550,24 @@
             "whatsappTitle": "Contactar por WhatsApp",
             "emailTitle": "Enviar email"
           },
+          "favorite": {
+            "add": "AÃ±adir a favoritos",
+            "remove": "Eliminar de favoritos"
+          },
           "actions": {
             "viewProfile": "Ver perfil",
             "markConfirmed": "Marcar como confirmado",
-            "viewWebsite": "Ver sitio web"
+            "viewWebsite": "Ver sitio web",
+            "viewDetails": "Ver detalle",
+            "viewPortfolio": "Ver portfolio"
           },
           "imageAlt": "Imagen de {{name}}",
-          "reviews": "({{count}} reseÃ±as)",
+          "reviews": {
+            "count": {
+              "one": "{{count}} reseÃ±a",
+              "other": "{{count}} reseÃ±as"
+            }
+          },
           "source": {
             "label": "Fuente: {{source}}",
             "internet": "Internet"
@@ -581,6 +592,13 @@
           "contact": {
             "email": "Email",
             "phone": "Teléfono"
+          },
+          "portfolio": {
+            "title": "Portfolio",
+            "viewPublic": "Ver página completa",
+            "photoAlt": "Foto {{index}}",
+            "empty": "No hay fotos en el portfolio",
+            "viewAll": "Ver todas las fotos ({{count}})"
           }
         }
       },
@@ -3815,7 +3833,16 @@
             "cached": "En cachÃ©",
             "internet": "De internet"
           },
-          "reviews": "({{count, plural, one={{count}} reseÃ±a, other={{count}} reseÃ±as}})",
+          "favorite": {
+            "add": "AÃ±adir a favoritos",
+            "remove": "Eliminar de favoritos"
+          },
+          "reviews": {
+            "count": {
+              "one": "{{count}} reseÃ±a",
+              "other": "{{count}} reseÃ±as"
+            }
+          },
           "contact": {
             "primary": "Contactar",
             "whatsapp": "WhatsApp",
@@ -3830,7 +3857,9 @@
           "actions": {
             "viewProfile": "Ver perfil",
             "markConfirmed": "Contratar",
-            "viewWebsite": "Ver web"
+            "viewWebsite": "Ver web",
+            "viewDetails": "Ver detalle",
+            "viewPortfolio": "Ver portfolio"
           },
           "source": {
             "label": "Fuente: {{source}}",
@@ -4623,6 +4652,13 @@
       "gallery": {
         "previous": "Imagen anterior",
         "next": "Imagen siguiente"
+      },
+      "portfolio": {
+        "title": "Portfolio",
+        "viewPublic": "Ver pÃ¡gina completa",
+        "photoAlt": "Foto {{index}}",
+        "empty": "No hay fotos en el portfolio",
+        "viewAll": "Ver todas las fotos ({{count}})"
       }
     },
     "analyticsPanel": {

@@ -19,6 +19,7 @@ import { toast } from 'react-toastify';
 
 import useTranslations from '../../hooks/useTranslations';
 import { useFavorites } from '../../contexts/FavoritesContext';
+import { useSupplierCompare } from '../../contexts/SupplierCompareContext';
 import { useWedding } from '../../context/WeddingContext';
 import useActiveWeddingInfo from '../../hooks/useActiveWeddingInfo';
 import SupplierDetailModal from './SupplierDetailModal';
@@ -27,6 +28,7 @@ import RequestQuoteModal from './RequestQuoteModal';
 export default function SupplierCard({ supplier, onContact, onViewDetails, onMarkAsConfirmed }) {
   const { t } = useTranslations();
   const { isFavorite, toggleFavorite } = useFavorites();
+  const { isInCompareList, addToCompare, removeFromCompare } = useSupplierCompare();
   const { info: weddingProfile } = useActiveWeddingInfo();
   const [showContactMenu, setShowContactMenu] = useState(false);
   const [isFavoriting, setIsFavoriting] = useState(false);
@@ -34,6 +36,7 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
   const [showQuoteModal, setShowQuoteModal] = useState(false);
 
   const isFav = isFavorite(supplier.id);
+  const isComparing = isInCompareList(supplier.id || supplier.slug);
 
   const isRegistered = supplier.priority === 'registered';
   const isCached = supplier.priority === 'cached';
@@ -115,6 +118,16 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
     }
   };
 
+  // Manejar comparador
+  const handleToggleCompare = (e) => {
+    e?.stopPropagation?.();
+    if (isComparing) {
+      removeFromCompare(supplier.id || supplier.slug);
+    } else {
+      addToCompare(supplier);
+    }
+  };
+
   return (
     <div
       className={`
@@ -131,23 +144,40 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
           {locationLabel && <p className="text-sm text-gray-600">{locationLabel}</p>}
         </div>
 
-        {/* Botón de favorito */}
-        <button
-          onClick={handleToggleFavorite}
-          disabled={isFavoriting}
-          className={`
-            p-2 rounded-full transition-all hover:scale-110 mr-2
-            ${isFav ? 'text-red-500 hover:bg-red-50' : 'text-gray-400 hover:bg-gray-100'}
-            ${isFavoriting ? 'opacity-50 cursor-not-allowed' : ''}
-          `}
-          title={isFav ? 'Eliminar de favoritos' : 'Añadir a favoritos'}
-        >
-          <Heart
-            size={20}
-            fill={isFav ? 'currentColor' : 'none'}
-            className={isFavoriting ? 'animate-pulse' : ''}
-          />
-        </button>
+        <div className="flex items-center gap-2">
+          {/* Checkbox Comparar */}
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              checked={isComparing}
+              onChange={handleToggleCompare}
+              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
+              title={isComparing ? 'Quitar de comparación' : 'Añadir a comparación'}
+            />
+          </div>
+
+          {/* Botón de favorito */}
+          <button
+            onClick={handleToggleFavorite}
+            disabled={isFavoriting}
+            className={`
+              p-2 rounded-full transition-all hover:scale-110
+              ${isFav ? 'text-red-500 hover:bg-red-50' : 'text-gray-400 hover:bg-gray-100'}
+              ${isFavoriting ? 'opacity-50 cursor-not-allowed' : ''}
+            `}
+            title={
+              isFav
+                ? t('common.suppliers.card.hybrid.favorite.remove')
+                : t('common.suppliers.card.hybrid.favorite.add')
+            }
+          >
+            <Heart
+              size={20}
+              fill={isFav ? 'currentColor' : 'none'}
+              className={isFavoriting ? 'animate-pulse' : ''}
+            />
+          </button>
+        </div>
 
         {/* Badges según tipo y portfolio */}
         <div className="ml-2 flex flex-wrap gap-1">
@@ -249,11 +279,17 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
         <div className="flex items-center gap-2 mb-3">
           <div className="flex items-center gap-1">
             <Star size={16} className="text-yellow-500 fill-yellow-500" />
-            <span className="font-semibold text-gray-900">{supplier.metrics.rating.toFixed(1)}</span>
+            <span className="font-semibold text-gray-900">
+              {supplier.metrics.rating.toFixed(1)}
+            </span>
           </div>
           {supplier.metrics?.reviewCount > 0 && (
             <span className="text-sm text-gray-600">
-              ({supplier.metrics.reviewCount} {supplier.metrics.reviewCount === 1 ? 'reseña' : 'reseñas'})
+              (
+              {tPlural('common.suppliers.card.hybrid.reviews.count', supplier.metrics.reviewCount, {
+                count: supplier.metrics.reviewCount,
+              })}
+              )
             </span>
           )}
         </div>
@@ -317,7 +353,7 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
                   onClick={(e) => e.stopPropagation()}
                 >
                   <Camera size={16} />
-                  Ver Portfolio
+                  {t('common.suppliers.card.hybrid.actions.viewPortfolio')}
                 </Link>
               )}
               {onViewDetails && (

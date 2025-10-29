@@ -1925,6 +1925,67 @@
       "provider": "Fournisseur",
       "service": "Service"
     },
+    "smartFilters": {
+      "title": "Filtres intelligents",
+      "subtitle": "(depuis votre profil)",
+      "buttons": {
+        "reset": "Réinitialiser",
+        "resetTitle": "Revenir aux valeurs du profil",
+        "clear": "Tout effacer",
+        "clearTitle": "Effacer tous les filtres"
+      },
+      "empty": {
+        "title": "Nous n'avons pas détecté de filtres dans votre profil de mariage.",
+        "hint": "Accédez à {{section}} pour définir budget, invités et style."
+      },
+      "fields": {
+        "budget": {
+          "label": "Budget",
+          "placeholder": "Budget",
+          "editTitle": "Modifier le budget"
+        },
+        "guests": {
+          "label": "Invités",
+          "placeholder": "Invités",
+          "editTitle": "Modifier le nombre d'invités"
+        },
+        "style": {
+          "label": "Style",
+          "placeholder": "Style",
+          "editTitle": "Modifier le style"
+        },
+        "location": {
+          "label": "Lieu",
+          "placeholder": "Lieu",
+          "editTitle": "Modifier le lieu"
+        }
+      },
+      "hints": {
+        "automated": "L'IA a appliqué ces filtres automatiquement. Cliquez sur modifier pour les ajuster."
+      }
+    },
+    "detail": {
+      "sections": {
+        "about": "À propos de {{name}}",
+        "contact": "Contact"
+      },
+      "contact": {
+        "email": "Email",
+        "phone": "Téléphone",
+        "website": "Site web"
+      },
+      "gallery": {
+        "previous": "Image précédente",
+        "next": "Image suivante"
+      },
+      "portfolio": {
+        "title": "Portfolio",
+        "viewPublic": "Voir la page complète",
+        "photoAlt": "Photo {{index}}",
+        "empty": "Aucune photo disponible pour le moment",
+        "viewAll": "Voir toutes les photos ({{count}})"
+      }
+    },
     "overview": {
       "title": "Gestion des fournisseurs",
       "metrics": {
@@ -2371,6 +2432,53 @@
         "favorite": {
           "add": "Ajouter aux favoris",
           "remove": "Retirer des favoris"
+        },
+        "hybrid": {
+          "defaults": {
+            "name": "Fournisseur sans nom",
+            "service": "Service non spécifié"
+          },
+          "location": "{{city}}",
+          "imageAlt": "Image de {{name}}",
+          "badges": {
+            "registered": "Vérifié ✓",
+            "cached": "En cache",
+            "internet": "Depuis le web"
+          },
+          "favorite": {
+            "add": "Ajouter aux favoris",
+            "remove": "Retirer des favoris"
+          },
+          "reviews": {
+            "count": {
+              "one": "{{count}} avis",
+              "other": "{{count}} avis"
+            }
+          },
+          "contact": {
+            "primary": "Contacter",
+            "whatsapp": "WhatsApp",
+            "email": "Email",
+            "phone": "Téléphone",
+            "noEmail": "Email non disponible",
+            "noPhone": "Téléphone non disponible",
+            "whatsappMessage": "Bonjour {{name}}, je suis intéressé(e) par {{service}} pour mon mariage. J'ai trouvé ton profil sur {{brand}}.",
+            "emailSubject": "Demande d'information - {{service}}",
+            "emailBody": "Bonjour {{name}},\n\nNous préparons notre mariage et aimerions en savoir plus sur tes services.\n\nMerci,\n{{brand}}",
+            "whatsappTitle": "Contacter via WhatsApp",
+            "emailTitle": "Envoyer un email"
+          },
+          "actions": {
+            "viewProfile": "Voir le profil",
+            "markConfirmed": "Marquer comme confirmé",
+            "viewWebsite": "Voir le site web",
+            "viewDetails": "Voir les détails",
+            "viewPortfolio": "Voir le portfolio"
+          },
+          "source": {
+            "label": "Source : {{source}}",
+            "internet": "Internet"
+          }
         }
       },
       "pendingTodos": {
@@ -3750,6 +3858,111 @@
   "common": {
     "suppliers": {
       "portfolio": {
+        "categories": {
+          "all": "Toutes",
+          "bodas": "Mariages",
+          "decoracion": "Décoration",
+          "flores": "Fleurs",
+          "ceremonia": "Cérémonie",
+          "recepcion": "Réception",
+          "otros": "Autres"
+        },
+        "toasts": {
+          "loadError": "Impossible de charger le portfolio.",
+          "uploaded": "Photo téléversée avec succès",
+          "deleted": "Photo supprimée",
+          "updated": "Photo mise à jour",
+          "deleteError": "Impossible de supprimer la photo",
+          "genericError": "Erreur inattendue. Réessayez."
+        },
+        "dashboard": {
+          "title": "Portfolio photos",
+          "loading": "Chargement du portfolio...",
+          "deleteConfirm": "Supprimer cette photo ?",
+          "actions": {
+            "addPhoto": "Ajouter une photo"
+          },
+          "photoCount": {
+            "one": "1 photo",
+            "other": "{{count}} photos"
+          },
+          "coverCount": {
+            "one": "1 photo de couverture",
+            "other": "{{count}} photos de couverture"
+          },
+          "coverPhoto": {
+            "untitled": "Photo de couverture sans titre"
+          },
+          "viewModes": {
+            "grid": "Vue grille",
+            "list": "Vue liste"
+          },
+          "filters": {
+            "label": "Filtrer par catégorie",
+            "placeholder": "Sélectionnez une catégorie"
+          },
+          "zeroState": {
+            "title": "Aucune photo pour le moment",
+            "description": "Présentez vos meilleurs travaux pour attirer de nouveaux couples.",
+            "cta": "Téléverser la première photo"
+          },
+          "coverPhotoCard": {
+            "title": "Photo de couverture",
+            "description": "Cette photo apparaît en haut de votre portfolio public."
+          },
+          "stats": {
+            "views": "Vues",
+            "likes": "Favoris"
+          },
+          "photoCard": {
+            "open": "Ouvrir les détails",
+            "edit": "Modifier",
+            "delete": "Supprimer"
+          }
+        },
+        "upload": {
+          "title": "Ajouter une photo",
+          "dropzone": {
+            "title": "Glissez votre image ici",
+            "subtitle": "ou cliquez pour sélectionner un fichier",
+            "requirements": "Formats : JPG, PNG, WebP · Taille max : 5 Mo",
+            "change": "Changer l'image"
+          },
+          "form": {
+            "title": {
+              "label": "Titre (optionnel)",
+              "placeholder": "Mariage de Marie et Jean - Valence"
+            },
+            "description": {
+              "label": "Description (optionnelle)",
+              "placeholder": "Cérémonie au coucher du soleil..."
+            },
+            "category": {
+              "label": "Catégorie *"
+            },
+            "tags": {
+              "label": "Tags (séparés par des virgules)",
+              "placeholder": "coucher de soleil, plage, cérémonie"
+            },
+            "featured": "Mettre à la une",
+            "isCover": "Définir comme photo de couverture"
+          },
+          "progress": {
+            "uploading": "Téléversement..."
+          },
+          "actions": {
+            "submit": "Téléverser la photo",
+            "submitting": "Téléversement..."
+          },
+          "errors": {
+            "invalidType": "Type de fichier invalide. Seuls JPG, PNG et WebP sont acceptés.",
+            "tooLarge": "Le fichier est trop volumineux. Taille maximale : 5 Mo.",
+            "noImage": "Sélectionnez une image avant de continuer.",
+            "noCategory": "Sélectionnez une catégorie.",
+            "uploadFailed": "Impossible d'enregistrer la photo.",
+            "generic": "Impossible de téléverser la photo. Réessayez."
+          }
+        },
         "lightbox": {
           "categories": {
             "bodas": "Mariages",
@@ -3778,11 +3991,11 @@
           },
           "view": {
             "noTitle": "Photo sans titre",
-            "categoryLabel": "Catégorie :",
-            "tagsLabel": "Tags :"
+            "categoryLabel": "Catégorie :",
+            "tagsLabel": "Tags :"
           },
           "meta": {
-            "uploadedAt": "Importée : {{value}}"
+            "uploadedAt": "Importée : {{value}}"
           },
           "form": {
             "title": {
@@ -3800,7 +4013,7 @@
               "label": "Tags (séparés par des virgules)",
               "placeholder": "tag1, tag2, tag3"
             },
-            "featured": "Marquer comme mise en avant",
+            "featured": "Mettre à la une",
             "isCover": "Définir comme photo de couverture",
             "save": {
               "loading": "Enregistrement..."

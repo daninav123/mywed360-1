@@ -10,6 +10,7 @@ import {
   Building2,
   Heart,
   Camera,
+  ArrowUpDown,
 } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -36,6 +37,7 @@ import { searchSuppliersHybrid, trackSupplierAction } from '../services/supplier
 import SupplierCard from '../components/suppliers/SupplierCard';
 import SmartFiltersBar from '../components/suppliers/SmartFiltersBar';
 import FavoritesSection from '../components/suppliers/FavoritesSection';
+import CompareBar from '../components/suppliers/CompareBar';
 
 const CONFIRMED_KEYWORDS = ['confirm', 'contrat', 'reserva', 'firm'];
 
@@ -278,6 +280,7 @@ const Proveedores = () => {
   // Estado para filtros inteligentes
   const [smartFilters, setSmartFilters] = useState(null);
   const [hasPortfolioFilter, setHasPortfolioFilter] = useState(false);
+  const [sortBy, setSortBy] = useState('relevance'); // 'relevance', 'rating', 'price', 'reviews'
 
   useEffect(() => {
     loadProviders();
@@ -525,12 +528,42 @@ const Proveedores = () => {
 
   const filteredResults = useMemo(() => {
     if (!aiResults.length) return [];
-    // Aplicar filtro de portfolio si está activado
-    if (hasPortfolioFilter) {
-      return aiResults.filter(supplier => supplier.hasPortfolio && supplier.slug);
+
+    // 1. Aplicar filtro de portfolio si está activado
+    let results = hasPortfolioFilter
+      ? aiResults.filter((supplier) => supplier.hasPortfolio && supplier.slug)
+      : [...aiResults];
+
+    // 2. Aplicar ordenamiento
+    if (sortBy !== 'relevance') {
+      results.sort((a, b) => {
+        switch (sortBy) {
+          case 'rating':
+            // Mayor rating primero
+            const ratingA = a.metrics?.rating || a.rating || 0;
+            const ratingB = b.metrics?.rating || b.rating || 0;
+            return ratingB - ratingA;
+
+          case 'price':
+            // Menor precio primero (contar € symbols)
+            const priceA = (a.business?.priceRange || a.pricing?.priceRange || '').length;
+            const priceB = (b.business?.priceRange || b.pricing?.priceRange || '').length;
+            return priceA - priceB;
+
+          case 'reviews':
+            // Más reseñas primero
+            const reviewsA = a.metrics?.reviewCount || 0;
+            const reviewsB = b.metrics?.reviewCount || 0;
+            return reviewsB - reviewsA;
+
+          default:
+            return 0;
+        }
+      });
     }
-    return aiResults;
-  }, [aiResults, hasPortfolioFilter]);
+
+    return results;
+  }, [aiResults, hasPortfolioFilter, sortBy]);
 
   const totalSearchPages = useMemo(() => {
     return Math.max(1, Math.ceil(filteredResults.length / SEARCH_PAGE_SIZE));
@@ -934,24 +967,52 @@ const Proveedores = () => {
                     onFiltersChange={setSmartFilters}
                   />
 
-                  {/* Filtro Con Portfolio */}
-                  <div className="flex items-center gap-3 p-3 bg-purple-50 border border-purple-200 rounded-lg">
-                    <input
-                      type="checkbox"
-                      id="hasPortfolioFilter"
-                      checked={hasPortfolioFilter}
-                      onChange={(e) => setHasPortfolioFilter(e.target.checked)}
-                      className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
-                    />
-                    <label htmlFor="hasPortfolioFilter" className="flex items-center gap-2 text-sm font-medium text-purple-900 cursor-pointer">
-                      <Camera size={16} />
-                      Solo proveedores con portfolio
-                    </label>
-                    {hasPortfolioFilter && filteredResults.length > 0 && (
-                      <span className="ml-auto text-xs text-purple-700">
-                        {filteredResults.length} {filteredResults.length === 1 ? 'resultado' : 'resultados'}
-                      </span>
-                    )}
+                  {/* Filtros y Ordenamiento */}
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    {/* Filtro Con Portfolio */}
+                    <div className="flex items-center gap-3 p-3 bg-purple-50 border border-purple-200 rounded-lg flex-1">
+                      <input
+                        type="checkbox"
+                        id="hasPortfolioFilter"
+                        checked={hasPortfolioFilter}
+                        onChange={(e) => setHasPortfolioFilter(e.target.checked)}
+                        className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                      />
+                      <label
+                        htmlFor="hasPortfolioFilter"
+                        className="flex items-center gap-2 text-sm font-medium text-purple-900 cursor-pointer"
+                      >
+                        <Camera size={16} />
+                        Solo con portfolio
+                      </label>
+                      {hasPortfolioFilter && filteredResults.length > 0 && (
+                        <span className="ml-auto text-xs text-purple-700">
+                          {filteredResults.length}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Ordenar por */}
+                    <div className="flex items-center gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                      <ArrowUpDown size={16} className="text-blue-900" />
+                      <label
+                        htmlFor="sortBy"
+                        className="text-sm font-medium text-blue-900 whitespace-nowrap"
+                      >
+                        Ordenar:
+                      </label>
+                      <select
+                        id="sortBy"
+                        value={sortBy}
+                        onChange={(e) => setSortBy(e.target.value)}
+                        className="px-3 py-1.5 text-sm border border-blue-300 rounded-md bg-white text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="relevance">Relevancia</option>
+                        <option value="rating">Rating ⭐</option>
+                        <option value="price">Precio €</option>
+                        <option value="reviews">Más reseñas</option>
+                      </select>
+                    </div>
                   </div>
 
                   {searchHistory.length > 0 && (
@@ -1367,6 +1428,9 @@ const Proveedores = () => {
         value={wantedServices}
         onSave={handleSaveWantedServices}
       />
+
+      {/* Barra flotante de comparación */}
+      <CompareBar />
     </>
   );
 };

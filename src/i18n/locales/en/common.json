@@ -2317,7 +2317,16 @@
             "cached": "Cached",
             "internet": "From the web"
           },
-          "reviews": "({{count, plural, one={{count}} review, other={{count}} reviews}})",
+          "favorite": {
+            "add": "Add to favorites",
+            "remove": "Remove from favorites"
+          },
+          "reviews": {
+            "count": {
+              "one": "{{count}} review",
+              "other": "{{count}} reviews"
+            }
+          },
           "contact": {
             "primary": "Contact",
             "whatsapp": "WhatsApp",
@@ -2332,7 +2341,9 @@
           "actions": {
             "viewProfile": "View profile",
             "markConfirmed": "Book supplier",
-            "viewWebsite": "Visit website"
+            "viewWebsite": "Visit website",
+            "viewDetails": "View details",
+            "viewPortfolio": "View portfolio"
           },
           "source": {
             "label": "Source: {{source}}",
@@ -2720,6 +2731,26 @@
       },
       "placeholders": {
         "notAvailable": "—"
+      },
+      "sections": {
+        "about": "About {{name}}",
+        "contact": "Contact"
+      },
+      "contact": {
+        "email": "Email",
+        "phone": "Phone",
+        "website": "Website"
+      },
+      "gallery": {
+        "previous": "Previous image",
+        "next": "Next image"
+      },
+      "portfolio": {
+        "title": "Portfolio",
+        "viewPublic": "View full page",
+        "photoAlt": "Photo {{index}}",
+        "empty": "No photos available yet",
+        "viewAll": "View all photos ({{count}})"
       }
     }
   },
