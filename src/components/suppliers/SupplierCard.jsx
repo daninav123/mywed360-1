@@ -16,14 +16,19 @@ import { toast } from 'react-toastify';
 
 import useTranslations from '../../hooks/useTranslations';
 import { useFavorites } from '../../contexts/FavoritesContext';
+import { useWedding } from '../../context/WeddingContext';
+import useActiveWeddingInfo from '../../hooks/useActiveWeddingInfo';
 import SupplierDetailModal from './SupplierDetailModal';
+import RequestQuoteModal from './RequestQuoteModal';
 
 export default function SupplierCard({ supplier, onContact, onViewDetails, onMarkAsConfirmed }) {
   const { t } = useTranslations();
   const { isFavorite, toggleFavorite } = useFavorites();
+  const { info: weddingProfile } = useActiveWeddingInfo();
   const [showContactMenu, setShowContactMenu] = useState(false);
   const [isFavoriting, setIsFavoriting] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
+  const [showQuoteModal, setShowQuoteModal] = useState(false);
 
   const isFav = isFavorite(supplier.id);
 
@@ -381,9 +386,20 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
         onClose={() => setShowDetailModal(false)}
         onFavoriteToggle={handleToggleFavorite}
         isFavorite={isFav}
-        onRequestQuote={(supp) => {
-          toast.info('Formulario de presupuesto próximamente');
+        onRequestQuote={() => {
           setShowDetailModal(false);
+          setShowQuoteModal(true);
+        }}
+      />
+
+      {/* Modal Solicitar Presupuesto */}
+      <RequestQuoteModal
+        supplier={supplier}
+        weddingInfo={weddingProfile}
+        open={showQuoteModal}
+        onClose={() => setShowQuoteModal(false)}
+        onSuccess={() => {
+          toast.success('Solicitud enviada correctamente');
         }}
       />
     </div>
