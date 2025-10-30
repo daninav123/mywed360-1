@@ -25,6 +25,9 @@ import * as googlePlacesService from '../services/googlePlacesService.js';
 // Importar utilidades de ubicación
 import { filterSuppliersByLocation } from '../utils/locationMatcher.js';
 
+// Importar categorías
+import { findCategoryByKeyword, SUPPLIER_CATEGORIES } from '../../shared/supplierCategories.js';
+
 const NEUTRAL_LOCATIONS = new Set(['españa', 'spain', 'nacional', 'todo españa', 'toda españa']);
 
 /**
@@ -360,6 +363,79 @@ router.post('/search', async (req, res) => {
             badge: 'Verificado ',
             badgeType: 'success',
           };
+        })
+        // ⭐ NUEVO: Filtrar por categoría compatible PRIMERO
+        .filter((supplier) => {
+          // Si el usuario busca un servicio específico, verificar categoría
+          if (!service) return true; // Sin filtro si no hay servicio
+
+          const supplierCategory = (
+            supplier.category ||
+            supplier.profile?.category ||
+            ''
+          ).toLowerCase();
+
+          // Intentar detectar la categoría buscada
+          const searchedCategory = findCategoryByKeyword(service);
+
+          if (!searchedCategory) {
+            // No encontramos categoría específica, permitir todo
+            return true;
+          }
+
+          // Obtener categoría del proveedor
+          const supplierCategoryObj = findCategoryByKeyword(supplierCategory);
+
+          if (!supplierCategoryObj) {
+            // Proveedor sin categoría reconocida, permitir (legacy)
+            return true;
+          }
+
+          // Definir categorías compatibles por grupo
+          const categoryGroups = {
+            // Grupo música/entretenimiento
+            entertainment: ['musica', 'dj', 'animacion'],
+            // Grupo lugares
+            venues: ['lugares', 'restaurantes'],
+            // Grupo decoración
+            decoration: ['flores-decoracion', 'decoracion'],
+            // Grupo imagen
+            media: ['fotografia', 'video'],
+            // Grupo moda
+            fashion: ['vestidos-trajes', 'belleza', 'joyeria'],
+            // Grupo comida
+            food: ['catering', 'tartas'],
+          };
+
+          // Encontrar grupo de la categoría buscada
+          let searchGroup = null;
+          for (const [groupName, categories] of Object.entries(categoryGroups)) {
+            if (categories.includes(searchedCategory.id)) {
+              searchGroup = categories;
+              break;
+            }
+          }
+
+          // Si están en el mismo grupo, es compatible
+          if (searchGroup && searchGroup.includes(supplierCategoryObj.id)) {
+            return true;
+          }
+
+          // Si la categoría del proveedor coincide exactamente
+          if (supplierCategoryObj.id === searchedCategory.id) {
+            return true;
+          }
+
+          // Si las keywords del proveedor incluyen la categoría buscada
+          if (supplierCategoryObj.keywords.some((kw) => searchedCategory.keywords.includes(kw))) {
+            return true;
+          }
+
+          // Si no coincide, DESCARTAR
+          console.log(
+            `   ❌ [CATEGORIA] ${supplier.name} descartado: categoría "${supplierCategoryObj.name}" no compatible con búsqueda de "${searchedCategory.name}"`
+          );
+          return false;
         })
         // Filtrar por nombre/término de búsqueda
         .filter((supplier) => {

@@ -10,7 +10,7 @@ import {
   getLowCoverageCategories,
   getGooglePlacesType,
   findCategoryByKeyword,
-} from '../shared/supplierCategories.js';
+} from '../../shared/supplierCategories.js';
 
 // Configuración de API
 const GOOGLE_PLACES_API_KEY = process.env.GOOGLE_PLACES_API_KEY;
