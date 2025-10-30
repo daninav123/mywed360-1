@@ -39,6 +39,7 @@ import SmartFiltersBar from '../components/suppliers/SmartFiltersBar';
 import FavoritesSection from '../components/suppliers/FavoritesSection';
 import CompareBar from '../components/suppliers/CompareBar';
 import RecommendedSuppliers from '../components/suppliers/RecommendedSuppliers';
+import WeddingServicesOverview from '../components/wedding/WeddingServicesOverview';
 
 const CONFIRMED_KEYWORDS = ['confirm', 'contrat', 'reserva', 'firm'];
 
@@ -824,6 +825,24 @@ const Proveedores = () => {
           <FavoritesSection />
         ) : (
           <>
+            {/* Servicios de tu boda - Vista general con progreso */}
+            <div className="mb-6">
+              <WeddingServicesOverview
+                onSearch={(service) => {
+                  // Cuando se hace click en "Buscar proveedores" de un servicio
+                  setSearchInput(service);
+                  setSearchPanelCollapsed(false);
+                  // Scroll al panel de búsqueda
+                  setTimeout(() => {
+                    document.querySelector('[data-search-panel]')?.scrollIntoView({
+                      behavior: 'smooth',
+                      block: 'start',
+                    });
+                  }, 100);
+                }}
+              />
+            </div>
+
             {/* Stats Cards Premium */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <Card className="p-4 bg-gradient-to-br from-[var(--color-primary)]/10 to-transparent border-[var(--color-primary)]/30">
@@ -882,7 +901,10 @@ const Proveedores = () => {
             </div>
 
             {!searchPanelCollapsed ? (
-              <Card className="p-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft shadow-lg">
+              <Card
+                data-search-panel
+                className="p-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft shadow-lg"
+              >
                 <div className="flex flex-wrap items-start justify-between gap-3 mb-6">
                   <div className="flex items-center gap-3">
                     <div className="p-3 rounded-xl bg-[var(--color-primary)]/15">
