@@ -31,7 +31,6 @@ import Perfil from './pages/Perfil';
 import GestionProveedores from './pages/GestionProveedores.jsx';
 import SavedSuppliers from './pages/SavedSuppliers.jsx';
 import SupplierCompare from './pages/SupplierCompare.jsx';
-import WeddingServices from './pages/WeddingServices.jsx';
 import ResetPassword from './pages/ResetPassword.jsx';
 import PublicWedding from './pages/PublicWedding';
 import RSVPConfirm from './pages/RSVPConfirm';
@@ -422,10 +421,14 @@ function App() {
                               <Route path="proveedores/favoritos" element={<SavedSuppliers />} />
                               <Route path="proveedores/comparar" element={<SupplierCompare />} />
                               <Route path="proveedores/contratos" element={<Contratos />} />
-                              <Route path="servicios" element={<WeddingServices />} />
+                              {/* Redirect /servicios to /proveedores (unified page) */}
+                              <Route
+                                path="servicios"
+                                element={<Navigate to="/proveedores" replace />}
+                              />
                               <Route
                                 path="wedding-services"
-                                element={<Navigate to="/servicios" replace />}
+                                element={<Navigate to="/proveedores" replace />}
                               />
                               <Route path="subscription" element={<SubscriptionDashboard />} />
 
