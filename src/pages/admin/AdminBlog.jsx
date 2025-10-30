@@ -793,6 +793,19 @@ const AdminBlog = () => {
                 </div>
               ) : null}
 
+              {selectedPost?.byline?.name ? (
+                <div className="rounded-md border border-soft bg-surface px-3 py-2 text-xs text-muted">
+                  <p>
+                    Autor asignado:{' '}
+                    <span className="font-semibold text-body">{selectedPost.byline.name}</span>
+                    {selectedPost.byline.title ? ` · ${selectedPost.byline.title}` : ''}
+                  </p>
+                  {selectedPost.byline.signature ? (
+                    <p className="mt-1 italic text-muted">{selectedPost.byline.signature}</p>
+                  ) : null}
+                </div>
+              ) : null}
+
               <div className="grid gap-4 md:grid-cols-2">
                 <div>
                   <label className="text-xs font-semibold uppercase text-muted block mb-1">

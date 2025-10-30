@@ -29,7 +29,7 @@ import SupplierDetailModal from './SupplierDetailModal';
 import RequestQuoteModal from './RequestQuoteModal';
 
 export default function SupplierCard({ supplier, onContact, onViewDetails, onMarkAsConfirmed }) {
-  const { t } = useTranslations();
+  const { t, tPlural, format } = useTranslations();
   const { isFavorite, toggleFavorite } = useFavorites();
   const { isInCompareList, addToCompare, removeFromCompare } = useSupplierCompare();
   const { logContact, getLastContact, needsFollowUp } = useSupplierContacts();
@@ -44,6 +44,41 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
   const supplierId = supplier.id || supplier.slug;
   const lastContact = getLastContact(supplierId);
   const shouldFollowUp = needsFollowUp(supplierId);
+  const contactDate = lastContact?.timestamp ? new Date(lastContact.timestamp) : null;
+  const isValidContactDate = contactDate && !Number.isNaN(contactDate.getTime());
+  const formattedLastContact =
+    isValidContactDate && typeof format?.dateShort === 'function'
+      ? format.dateShort(contactDate)
+      : isValidContactDate
+        ? contactDate.toLocaleDateString()
+        : '';
+  const followUpMethodKey = lastContact?.method
+    ? `common.suppliers.card.hybrid.followUp.methods.${lastContact.method}`
+    : null;
+  let followUpMethodLabel =
+    followUpMethodKey && lastContact?.method
+      ? t(followUpMethodKey, { method: lastContact.method })
+      : null;
+  if (
+    followUpMethodLabel &&
+    followUpMethodLabel === followUpMethodKey &&
+    lastContact?.method
+  ) {
+    followUpMethodLabel = t('common.suppliers.card.hybrid.followUp.methods.other', {
+      method: lastContact.method,
+    });
+  }
+  const lastContactLabel =
+    formattedLastContact &&
+    t(
+      followUpMethodLabel
+        ? 'common.suppliers.card.hybrid.followUp.lastContact'
+        : 'common.suppliers.card.hybrid.followUp.lastContactNoMethod',
+      {
+        date: formattedLastContact,
+        method: followUpMethodLabel || '',
+      }
+    );
 
   const isRegistered = supplier.priority === 'registered';
   const isCached = supplier.priority === 'cached';
@@ -152,13 +187,17 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
       ? `${window.location.origin}/proveedor/${supplier.slug}`
       : window.location.href;
 
-    const shareText = `¡Mira este proveedor! ${supplier.name} - ${supplier.category || supplier.service || 'Proveedor'}`;
+    const shareService = supplier.category || supplier.service || fallbackService;
+    const shareText = t('common.suppliers.card.hybrid.share.message', {
+      name: supplier.name || fallbackName,
+      service: shareService,
+    });
 
     // Compartir en WhatsApp
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(`${shareText}\n\n${shareUrl}`)}`;
     window.open(whatsappUrl, '_blank');
 
-    toast.success('Abriendo WhatsApp para compartir');
+    toast.success(t('common.suppliers.card.hybrid.share.toast', 'Abriendo WhatsApp para compartir'));
   };
 
   return (
@@ -185,7 +224,11 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
               checked={isComparing}
               onChange={handleToggleCompare}
               className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
-              title={isComparing ? 'Quitar de comparación' : 'Añadir a comparación'}
+              title={
+                isComparing
+                  ? t('common.suppliers.card.hybrid.compare.remove', 'Quitar de comparación')
+                  : t('common.suppliers.card.hybrid.compare.add', 'Añadir a comparación')
+              }
             />
           </div>
 
@@ -318,8 +361,11 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
           </div>
           {supplier.metrics?.reviewCount > 0 && (
             <span className="text-sm text-gray-600">
-              ({supplier.metrics.reviewCount}{' '}
-              {supplier.metrics.reviewCount === 1 ? 'reseña' : 'reseñas'})
+              (
+              {tPlural('common.suppliers.card.hybrid.reviews.count', supplier.metrics.reviewCount, {
+                count: supplier.metrics.reviewCount,
+              })}
+              )
             </span>
           )}
         </div>
@@ -332,18 +378,14 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
             <div className="flex items-center gap-2 px-3 py-2 bg-yellow-50 border border-yellow-200 rounded-lg">
               <Clock size={14} className="text-yellow-600" />
               <span className="text-xs text-yellow-800 font-medium">
-                💡 Hace más de 7 días • Considera hacer seguimiento
+                {t(
+                  'common.suppliers.card.hybrid.followUp.reminder',
+                  '💡 Hace más de 7 días • Considera hacer seguimiento'
+                )}
               </span>
             </div>
           ) : (
-            <div className="text-xs text-gray-500">
-              Último contacto:{' '}
-              {new Date(lastContact.timestamp).toLocaleDateString('es-ES', {
-                day: 'numeric',
-                month: 'short',
-              })}{' '}
-              vía {lastContact.method}
-            </div>
+            lastContactLabel && <div className="text-xs text-gray-500">{lastContactLabel}</div>
           )}
         </div>
       )}
@@ -434,7 +476,7 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
               className="w-full mt-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors font-medium text-sm flex items-center justify-center gap-2"
             >
               <Share2 size={16} />
-              Compartir
+              {t('common.suppliers.card.hybrid.actions.share', 'Compartir')}
             </button>
           </>
         ) : (

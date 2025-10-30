@@ -1,32 +1,14 @@
 // components/wedding/WeddingServicesOverview.jsx
 // Vista general de todos los servicios de la boda con sus proveedores
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import WeddingServiceCard from './WeddingServiceCard';
 import useProveedores from '../../hooks/useProveedores';
 import useSupplierShortlist from '../../hooks/useSupplierShortlist';
-import { SUPPLIER_CATEGORIES } from '../../../shared/supplierCategories';
-
-// Usar categorías centralizadas como servicios de la boda
-// Solo los más comunes en orden de prioridad
-const WEDDING_SERVICES = [
-  'fotografia',
-  'video',
-  'catering',
-  'venue',
-  'musica',
-  'dj',
-  'flores',
-  'decoracion',
-  'tarta',
-].map((id, index) => {
-  const category = SUPPLIER_CATEGORIES.find((cat) => cat.id === id);
-  return {
-    id,
-    name: category?.name || id,
-    priority: index + 1,
-  };
-});
+import { useWeddingCategories } from '../../hooks/useWeddingCategories';
+import ManageServicesModal from './ManageServicesModal';
+import { Settings } from 'lucide-react';
+import Button from '../ui/Button';
 
 /**
  * Vista general de servicios de la boda
@@ -35,6 +17,17 @@ const WEDDING_SERVICES = [
 export default function WeddingServicesOverview({ onSearch }) {
   const { providers } = useProveedores();
   const { shortlist } = useSupplierShortlist();
+  const { getActiveCategoriesDetails, loading: loadingCategories } = useWeddingCategories();
+  const [showManageModal, setShowManageModal] = useState(false);
+
+  // Obtener servicios activos de la boda (personalizados por el owner)
+  const weddingServices = useMemo(() => {
+    return getActiveCategoriesDetails().map((cat, index) => ({
+      id: cat.id,
+      name: cat.name,
+      priority: index + 1,
+    }));
+  }, [getActiveCategoriesDetails]);
 
   // Agrupar proveedores confirmados por servicio
   const confirmedByService = useMemo(() => {
@@ -69,7 +62,7 @@ export default function WeddingServicesOverview({ onSearch }) {
 
   // Calcular estadísticas
   const stats = useMemo(() => {
-    const totalServices = WEDDING_SERVICES.length;
+    const totalServices = weddingServices.length;
     const confirmedCount = Object.keys(confirmedByService).length;
     const inEvaluationCount = Object.keys(shortlistCountByService).length - confirmedCount;
     const pendingCount = totalServices - confirmedCount - inEvaluationCount;
@@ -81,15 +74,35 @@ export default function WeddingServicesOverview({ onSearch }) {
       pending: pendingCount > 0 ? pendingCount : 0,
       progress: (confirmedCount / totalServices) * 100,
     };
-  }, [confirmedByService, shortlistCountByService]);
+  }, [confirmedByService, shortlistCountByService, weddingServices]);
+
+  if (loadingCategories) {
+    return (
+      <div className="text-center py-12">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4" />
+        <p className="text-gray-600">Cargando servicios...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       {/* Estadísticas generales */}
       <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Servicios de tu boda</h2>
+        <div className="flex items-center justify-between mb-2">
+          <h2 className="text-2xl font-bold text-gray-900">Servicios de tu boda</h2>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowManageModal(true)}
+            className="flex items-center gap-2"
+          >
+            <Settings className="h-4 w-4" />
+            Gestionar servicios
+          </Button>
+        </div>
         <p className="text-gray-600 mb-4">
-          Gestiona todos los proveedores que necesitas para tu gran día
+          {weddingServices.length} servicios personalizados para tu gran día
         </p>
 
         {/* Barra de progreso */}
@@ -129,7 +142,7 @@ export default function WeddingServicesOverview({ onSearch }) {
 
       {/* Tarjetas de servicios */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {WEDDING_SERVICES.map((service) => {
+        {weddingServices.map((service) => {
           const serviceKey = service.id.toLowerCase();
           const confirmed = confirmedByService[serviceKey];
           const shortlistCount = shortlistCountByService[serviceKey] || 0;
@@ -156,6 +169,9 @@ export default function WeddingServicesOverview({ onSearch }) {
           </p>
         </div>
       )}
+
+      {/* Modal de gestión de servicios */}
+      <ManageServicesModal open={showManageModal} onClose={() => setShowManageModal(false)} />
     </div>
   );
 }

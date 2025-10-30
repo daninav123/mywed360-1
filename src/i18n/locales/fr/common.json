@@ -2011,6 +2011,32 @@
         "automated": "L'IA a appliqué ces filtres automatiquement. Cliquez sur modifier pour les ajuster."
       }
     },
+      "favorites": {
+        "button": {
+          "save": "Enregistrer",
+          "saved": "Enregistré"
+        }
+      },
+      "selectFavorites": {
+        "subtitle": "Choisissez l'un de vos favoris",
+        "empty": {
+          "title": "Vous n'avez pas de favoris dans cette catégorie",
+          "description": "Recherchez des prestataires et ajoutez-les aux favoris avec le bouton ❤️",
+          "cta": "Chercher des prestataires"
+        },
+        "assign": {
+          "action": "Assigner",
+          "loading": "Assignation..."
+        },
+        "toast": {
+          "assigned": "{{name}} assigné avec succès",
+          "error": "Impossible d'assigner le prestataire"
+        },
+        "footer": {
+          "more": "Chercher d'autres prestataires"
+        },
+        "notes": "\"{{note}}\""
+      },
     "detail": {
       "sections": {
         "about": "À propos de {{name}}",
@@ -2497,6 +2523,10 @@
             "add": "Ajouter aux favoris",
             "remove": "Retirer des favoris"
           },
+          "compare": {
+            "add": "Ajouter à la comparaison",
+            "remove": "Retirer de la comparaison"
+          },
           "reviews": {
             "count": {
               "one": "{{count}} avis",
@@ -2521,7 +2551,23 @@
             "markConfirmed": "Marquer comme confirmé",
             "viewWebsite": "Voir le site web",
             "viewDetails": "Voir les détails",
-            "viewPortfolio": "Voir le portfolio"
+            "viewPortfolio": "Voir le portfolio",
+            "share": "Partager"
+          },
+          "share": {
+            "message": "Découvre ce prestataire ! {{name}} - {{service}}",
+            "toast": "Ouverture de WhatsApp pour partager"
+          },
+          "followUp": {
+            "reminder": "💡 Plus de 7 jours • Pense à relancer",
+            "lastContact": "Dernier contact : {{date}} via {{method}}",
+            "lastContactNoMethod": "Dernier contact : {{date}}",
+            "methods": {
+              "whatsapp": "WhatsApp",
+              "email": "Email",
+              "phone": "Téléphone",
+              "other": "{{method}}"
+            }
           },
           "source": {
             "label": "Source : {{source}}",
@@ -3061,6 +3107,87 @@
       "exploreLibrary": "Browse prompt library",
       "variablesHint": "Use variables like {nombres}, {fecha}, {ubicacion}",
       "placeholder": "Describe how you want your site to look (style, colours, sections, logistics, etc.)"
+    },
+    "promptLibrary": {
+      "title": "Prompt library",
+      "close": "Close",
+      "intro": "Choose a prompt to auto-fill the generator.",
+      "tokensIntro": "Replace the variables with your own data:",
+      "tokens": {
+        "names": "{nombres}",
+        "date": "{fecha}",
+        "location": "{ubicacion}"
+      },
+      "builtIn": {
+        "title": "Default prompts",
+        "use": "Use prompt"
+      },
+      "custom": {
+        "title": "My prompts",
+        "new": "New prompt",
+        "loading": "Loading personal library…",
+        "empty": "You don't have any custom prompts yet. Create one to reuse your favourite instructions.",
+        "templateLabel": "Suggested template:",
+        "templateFallback": "Custom",
+        "untitled": "Untitled"
+      },
+      "buttons": {
+        "use": "Use",
+        "edit": "Edit",
+        "delete": "Delete"
+      },
+      "form": {
+        "editTitle": "Edit custom prompt",
+        "createTitle": "New custom prompt",
+        "labels": {
+          "name": "Name",
+          "template": "Suggested template",
+          "description": "Description",
+          "prompt": "Prompt"
+        },
+        "placeholders": {
+          "name": "Prompt for modern style",
+          "description": "Short note to identify the type of instructions.",
+          "prompt": "Describe the tone, structure and key elements you want."
+        },
+        "cancel": "Cancel",
+        "save": "Save prompt",
+        "saving": "Saving…"
+      },
+      "errors": {
+        "required": "Prompt cannot be empty.",
+        "save": "Could not save prompt.",
+        "delete": "Could not delete prompt."
+      },
+      "confirmDelete": "Delete this custom prompt?"
+    },
+    "profileSummary": {
+      "title": "Profile data applied",
+      "conjunction": "and",
+      "labels": {
+        "couple": "Couple",
+        "date": "Date",
+        "ceremony": "Ceremony",
+        "reception": "Reception",
+        "contact": "Contact",
+        "additionalInfo": "Additional info"
+      }
+    },
+    "versions": {
+      "title": "Published versions",
+      "columns": {
+        "date": "Date",
+        "template": "Template",
+        "prompt": "Prompts",
+        "actions": "Actions"
+      },
+      "fallbackTemplate": "Custom",
+      "noPrompt": "No instructions"
+    },
+    "logisticsActions": {
+      "cancel": "Cancel",
+      "save": "Save logistics",
+      "saving": "Saving…"
     },
     "actions": {
       "generate": "Generate Website",

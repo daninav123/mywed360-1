@@ -205,12 +205,14 @@ router.post('/', async (req, res) => {
     const input = createSchema.parse(req.body || {});
     const assets = await generateBlogAssets(input);
     const saved = await saveGeneratedBlogPost({
-      input,
+      input: { ...input, authorId: assets.authorProfile?.id },
       aiArticle: assets.aiArticle,
       researchData: assets.researchData,
       researchSummary: assets.researchSummary,
       researchReferences: assets.researchReferences,
       coverGeneration: assets.coverGeneration,
+      authorProfile: assets.authorProfile,
+      authorPrompt: assets.authorPrompt,
       status: 'draft',
       scheduledAt: null,
       createdBy: 'admin:manual',

@@ -1,4 +1,4 @@
-{
+﻿{
   "app": {
     "name": "MaLove.App",
     "brandName": "MaLoveApp",
@@ -3346,3 +3346,4 @@
   "apply": "Aplicar",
   "pagination": "Paginacin"
 }
+

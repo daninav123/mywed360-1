@@ -9,9 +9,14 @@ import useTranslations from '../hooks/useTranslations';
 
 const PAGE_SIZE = 12;
 
-const ArticleCard = React.forwardRef(({ post, onOpen, ctaLabel }, ref) => {
+const ArticleCard = React.forwardRef(({ post, onOpen, onOpenAuthor, ctaLabel }, ref) => {
   const published = post?.publishedAt ? new Date(post.publishedAt) : null;
   const coverUrl = post?.coverImage?.url || post?.coverImage?.placeholder || null;
+  const handleAuthorClick = (event) => {
+    event.stopPropagation();
+    if (!post?.byline?.slug) return;
+    onOpenAuthor?.(post);
+  };
 
   return (
     <article
@@ -41,6 +46,16 @@ const ArticleCard = React.forwardRef(({ post, onOpen, ctaLabel }, ref) => {
           <h2 className="text-lg font-semibold text-gray-900">{post?.title}</h2>
           {post?.excerpt ? (
             <p className="text-sm text-gray-700 line-clamp-3">{post.excerpt}</p>
+          ) : null}
+          {post?.byline?.name ? (
+            <button
+              type="button"
+              onClick={handleAuthorClick}
+              className="text-xs font-medium text-[var(--color-primary,#6366f1)] hover:text-[var(--color-primary-dark,#4f46e5)] focus:outline-none"
+            >
+              Por {post.byline.name}
+              {post.byline.title ? ` · ${post.byline.title}` : ''}
+            </button>
           ) : null}
         </div>
         <div className="mt-auto flex flex-wrap items-center justify-between gap-2 text-xs text-gray-500">
@@ -190,6 +205,14 @@ function Blog() {
     [navigate]
   );
 
+  const handleOpenAuthor = useCallback(
+    (post) => {
+      if (!post?.byline?.slug) return;
+      navigate(`/blog/autor/${post.byline.slug}`);
+    },
+    [navigate]
+  );
+
   const searchQuery = searchTerm.trim();
 
   return (
@@ -227,6 +250,7 @@ function Blog() {
             key={post.id || post.slug || index}
             post={post}
             onOpen={handleOpenPost}
+            onOpenAuthor={handleOpenAuthor}
             ctaLabel={t('common.blog.card.viewDetails')}
             ref={!isFiltering && index === visiblePosts.length - 1 ? lastCardRef : null}
           />

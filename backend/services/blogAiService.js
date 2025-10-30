@@ -84,6 +84,16 @@ const GenerationInputSchema = z.object({
   audience: z.string().optional(),
   includeTips: z.boolean().default(true),
   includeCTA: z.boolean().default(true),
+  authorPrompt: z.string().max(2000).optional(),
+  author: z
+    .object({
+      id: z.string(),
+      name: z.string(),
+      title: z.string().optional(),
+      signature: z.string().optional(),
+      narrativeStyle: z.string().optional(),
+    })
+    .optional(),
   research: z
     .object({
       summary: z.string().min(10).max(4000).optional(),
@@ -286,17 +296,36 @@ export async function generateBlogArticle(options) {
         ? `Palabras clave: ${input.keywords.join(', ')}.`
         : 'Palabras clave opcionales.';
 
-    const systemPrompt =
+    const baseSystemPrompt =
       language === 'en'
         ? 'You are a senior wedding editor for Lovenda. You craft helpful, actionable wedding articles with a warm, empathetic tone — sounding like a trusted planner speaking directly to engaged couples. Provide vivid examples grounded in verified information and never invent facts.'
         : 'Eres editor senior de bodas en Lovenda. Redactas artículos útiles y accionables con un tono cercano, humano y experto, como una planner de confianza que asesora a la pareja. Incluye ejemplos concretos basados en información verificada y nunca inventes datos.';
+    const authorRolePrompt = input.author
+      ? language === 'en'
+        ? `Your byline is ${input.author.name}${input.author.title ? `, ${input.author.title}` : ''}.`
+        : `Tu firma es ${input.author.name}${input.author.title ? `, ${input.author.title}` : ''}.`
+      : '';
+    const systemPrompt = `${baseSystemPrompt} ${authorRolePrompt}${
+      input.authorPrompt ? ` ${input.authorPrompt}` : ''
+    }`.trim();
 
     const researchContext = buildResearchContext(input.research, language);
+    const authorQuoteInstruction = input.author
+      ? language === 'en'
+        ? `Include at least one brief quote or field observation attributed to ${input.author.name}.`
+        : `Incluye al menos una cita breve u observación de campo atribuida a ${input.author.name}.`
+      : '';
+    const humanTouchInstruction =
+      language === 'en'
+        ? 'Let the article feel reported: weave mini anecdotes, sensory details, and transitions that connect paragraphs naturally.'
+        : 'Haz que el artículo tenga sensación de reporterismo: añade mini anécdotas, detalles sensoriales y transiciones naturales entre párrafos.';
 
     const userPrompt =
       language === 'en'
         ? `Write a complete wedding blog post about "${input.topic}". Audience: engaged couples. Target length: ${wordsRange}. Tone: ${input.tone}. ${keywordsText} If relevant, mention Spanish wedding context. Use a warm, human voice that opens with an empathetic hook, sprinkles in real-life style examples, and closes with an encouraging note. Ground every fact in this research:
 ${researchContext}
+
+${humanTouchInstruction} ${authorQuoteInstruction}
 
 Return valid JSON matching this structure:
 {
@@ -313,6 +342,8 @@ Return valid JSON matching this structure:
 }`
         : `Redacta un artículo completo de blog de bodas sobre "${input.topic}". Público: parejas que planean su boda. Longitud objetivo: ${wordsRange}. Tono: ${input.tone}. ${keywordsText} Si procede, menciona contexto de bodas en España. Usa una voz cálida y cercana que abra con un gancho empático, incluya ejemplos reales y cierre con un mensaje de ánimo. Basado en esta investigación contrastada:
 ${researchContext}
+
+${humanTouchInstruction} ${authorQuoteInstruction}
 
 Devuelve JSON válido con esta estructura:
 {
@@ -380,6 +411,7 @@ export async function translateBlogArticleToLanguages({
   targetLanguages = [],
   tone = 'cálido cercano',
   references = [],
+  author = null,
 } = {}) {
   const baseSections =
     Array.isArray(article.sections) && article.sections.length
@@ -431,13 +463,18 @@ export async function translateBlogArticleToLanguages({
     const targetDescriptor = resolveLanguageDescriptor(target);
 
     try {
-      const systemPrompt = `You are a bilingual wedding editor for Lovenda. Translate wedding content from ${fromDescriptor.english} into ${targetDescriptor.english} while keeping a warm, human, conversational tone. Preserve structure, actionable advice, and factual accuracy.`;
+      const authorStyle = author?.name
+        ? `The article voice belongs to ${author.name}${
+            author.title ? `, ${author.title}` : ''
+          }. Preserve this voice, cadence, and personality.`
+        : 'Preserve the original narrative voice and warmth.';
+      const systemPrompt = `You are a bilingual wedding editor for Lovenda. Translate wedding content from ${fromDescriptor.english} into ${targetDescriptor.english} while keeping a warm, human, conversational tone. Preserve structure, actionable advice, and factual accuracy. ${authorStyle}`;
 
       const userPrompt = `Translate the following Lovenda wedding article.
 Source language: ${fromDescriptor.english} (${fromDescriptor.native}).
 Target language: ${targetDescriptor.english} (${targetDescriptor.native}).
 Desired tone: ${tone}.
-Keep sections, tips, and CTA structure exactly as the source. Use natural wording that sounds like a trusted wedding planner speaking to engaged couples.
+Keep sections, tips, and CTA structure exactly as the source. Use natural wording that sounds like a trusted wedding planner speaking to engaged couples. If the article includes quotes or observations, keep them meaningful in the new language without inventing data.
 Return valid JSON with this structure:
 {
   "title": "string",

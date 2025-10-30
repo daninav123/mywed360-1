@@ -18,11 +18,12 @@ async function sendRequest(url, init = {}) {
 }
 
 export async function fetchBlogPosts(options = {}) {
-  const { language, limit, cursor } = options;
+  const { language, limit, cursor, authorId } = options;
   const url = new URL(BASE_URL, window.location.origin);
   if (language) url.searchParams.set('language', language);
   if (limit) url.searchParams.set('limit', String(limit));
   if (cursor) url.searchParams.set('cursor', cursor);
+  if (authorId) url.searchParams.set('author', authorId);
   return sendRequest(url.toString().replace(window.location.origin, ''));
 }
 

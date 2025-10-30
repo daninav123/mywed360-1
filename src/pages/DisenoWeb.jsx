@@ -389,11 +389,15 @@ const buildFallbackHtml = (weddingInfo, template) => {
 };
 
 const ProfileSummary = ({ profile, publishDisabledReason }) => {
+  const { t } = useTranslations();
   if (!profile) return null;
 
   const bride = profile?.brideInfo?.nombre?.trim();
   const groom = profile?.groomInfo?.nombre?.trim();
-  const couple = [bride, groom].filter(Boolean).join(' y ');
+  const couple =
+    [bride, groom].filter(Boolean).join(
+      ` ${t('common.websiteGenerator.profileSummary.conjunction', 'y')} `
+    );
   const ceremonyDate = profile?.ceremonyInfo?.fecha;
   const ceremony = [profile?.ceremonyInfo?.lugar, profile?.ceremonyInfo?.hora]
     .filter(Boolean)
@@ -405,41 +409,58 @@ const ProfileSummary = ({ profile, publishDisabledReason }) => {
 
   return (
     <div className="bg-white rounded-lg shadow p-6 mb-8">
-      <h2 className="text-xl font-semibold mb-3">Datos del perfil aplicados</h2>
+      <h2 className="text-xl font-semibold mb-3">
+        {t('common.websiteGenerator.profileSummary.title', 'Datos del perfil aplicados')}
+      </h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-700">
         {couple && (
           <div>
-            <span className="text-gray-500">Pareja: </span>
+            <span className="text-gray-500">
+              {t('common.websiteGenerator.profileSummary.labels.couple', 'Pareja')}:&nbsp;
+            </span>
             {couple}
           </div>
         )}
         {ceremonyDate && (
           <div>
-            <span className="text-gray-500">Fecha: </span>
+            <span className="text-gray-500">
+              {t('common.websiteGenerator.profileSummary.labels.date', 'Fecha')}:&nbsp;
+            </span>
             {ceremonyDate}
           </div>
         )}
         {ceremony && (
           <div>
-            <span className="text-gray-500">Ceremonia: </span>
+            <span className="text-gray-500">
+              {t('common.websiteGenerator.profileSummary.labels.ceremony', 'Ceremonia')}:&nbsp;
+            </span>
             {ceremony}
           </div>
         )}
         {reception && (
           <div>
-            <span className="text-gray-500">Recepci�n: </span>
+            <span className="text-gray-500">
+              {t('common.websiteGenerator.profileSummary.labels.reception', 'Recepción')}:&nbsp;
+            </span>
             {reception}
           </div>
         )}
         {contact && (
           <div className="sm:col-span-2">
-            <span className="text-gray-500">Contacto: </span>
+            <span className="text-gray-500">
+              {t('common.websiteGenerator.profileSummary.labels.contact', 'Contacto')}:&nbsp;
+            </span>
             {contact}
           </div>
         )}
         {profile?.additionalInfo && (
           <div className="sm:col-span-2">
-            <span className="text-gray-500">Info adicional: </span>
+            <span className="text-gray-500">
+              {t(
+                'common.websiteGenerator.profileSummary.labels.additionalInfo',
+                'Info adicional'
+              )}:&nbsp;
+            </span>
             {profile.additionalInfo}
           </div>
         )}
@@ -533,6 +554,7 @@ const PromptLibraryModal = ({
   onDelete,
   loading = false,
 }) => {
+  const { t } = useTranslations();
   const [editingPrompt, setEditingPrompt] = useState(null);
   const [formState, setFormState] = useState({
     name: '',
@@ -542,6 +564,15 @@ const PromptLibraryModal = ({
   });
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState('');
+  const promptTokens = useMemo(
+    () => [
+      t('common.websiteGenerator.promptLibrary.tokens.names', '{nombres}'),
+      t('common.websiteGenerator.promptLibrary.tokens.date', '{fecha}'),
+      t('common.websiteGenerator.promptLibrary.tokens.location', '{ubicacion}'),
+    ],
+    [t]
+  );
+  const tokenConjunction = t('common.websiteGenerator.profileSummary.conjunction', 'y');
 
   useEffect(() => {
     if (!open) {
@@ -591,7 +622,12 @@ const PromptLibraryModal = ({
   const handleSubmit = async (event) => {
     event?.preventDefault?.();
     if (!formState.prompt.trim()) {
-      setFormError('El prompt no puede estar vac�o.');
+      setFormError(
+        t(
+          'common.websiteGenerator.promptLibrary.errors.required',
+          'El prompt no puede estar vacío.'
+        )
+      );
       return;
     }
     try {
@@ -615,7 +651,13 @@ const PromptLibraryModal = ({
       }
       cancelEdit();
     } catch (err) {
-      setFormError(err?.message || 'No se pudo guardar el prompt.');
+      setFormError(
+        err?.message ||
+          t(
+            'common.websiteGenerator.promptLibrary.errors.save',
+            'No se pudo guardar el prompt.'
+          )
+      );
     } finally {
       setSaving(false);
     }
@@ -623,7 +665,12 @@ const PromptLibraryModal = ({
 
   const handleDelete = async (id) => {
     if (!onDelete) return;
-    const confirmDelete = window.confirm('�Eliminar este prompt personalizado?');
+    const confirmDelete = window.confirm(
+      t(
+        'common.websiteGenerator.promptLibrary.confirmDelete',
+        '¿Eliminar este prompt personalizado?'
+      )
+    );
     if (!confirmDelete) return;
     try {
       setSaving(true);
@@ -633,7 +680,13 @@ const PromptLibraryModal = ({
         cancelEdit();
       }
     } catch (err) {
-      setFormError(err?.message || 'No se pudo eliminar el prompt.');
+      setFormError(
+        err?.message ||
+          t(
+            'common.websiteGenerator.promptLibrary.errors.delete',
+            'No se pudo eliminar el prompt.'
+          )
+      );
     } finally {
       setSaving(false);
     }
@@ -643,24 +696,48 @@ const PromptLibraryModal = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
       <div className="bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[85vh] overflow-hidden flex flex-col">
         <header className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-800">Biblioteca de prompts</h3>
+          <h3 className="text-lg font-semibold text-gray-800">
+            {t(
+              'common.websiteGenerator.promptLibrary.title',
+              'Biblioteca de prompts'
+            )}
+          </h3>
           <button
             type="button"
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700 transition-colors"
           >
-            Cerrar
+            {t('common.websiteGenerator.promptLibrary.close', 'Cerrar')}
           </button>
         </header>
         <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
           <section>
             <p className="text-sm text-gray-600 mb-3">
-              Selecciona un prompt para rellenar autom�ticamente el generador. Reemplaza las variables{' '}
-              <code className="bg-gray-100 px-1 rounded">{'{nombres}'}</code>,{' '}
-              <code className="bg-gray-100 px-1 rounded">{'{fecha}'}</code> y{' '}
-              <code className="bg-gray-100 px-1 rounded">{'{ubicacion}'}</code> por tus datos.
+              {t(
+                'common.websiteGenerator.promptLibrary.intro',
+                'Selecciona un prompt para rellenar automáticamente el generador.'
+              )}{' '}
+              {t(
+                'common.websiteGenerator.promptLibrary.tokensIntro',
+                'Reemplaza las variables por tus datos:'
+              )}{' '}
+              {promptTokens.map((token, index) => (
+                <React.Fragment key={`${token}-${index}`}>
+                  {index > 0
+                    ? index === promptTokens.length - 1
+                      ? ` ${tokenConjunction} `
+                      : ', '
+                    : ''}
+                  <code className="bg-gray-100 px-1 rounded">{token}</code>
+                </React.Fragment>
+              ))}
             </p>
-            <h4 className="text-sm font-semibold text-gray-700 mb-2">Prompts predeterminados</h4>
+            <h4 className="text-sm font-semibold text-gray-700 mb-2">
+              {t(
+                'common.websiteGenerator.promptLibrary.builtIn.title',
+                'Prompts predeterminados'
+              )}
+            </h4>
             <div className="space-y-3">
               {builtInOptions.map((option) => (
                 <div
@@ -677,7 +754,10 @@ const PromptLibraryModal = ({
                       onClick={() => handleUsePrompt(option)}
                       className="shrink-0 inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-full text-sm transition-colors"
                     >
-                      Usar prompt
+                      {t(
+                        'common.websiteGenerator.promptLibrary.builtIn.use',
+                        'Usar prompt'
+                      )}
                     </button>
                   </div>
                   <pre className="mt-3 text-sm bg-gray-50 rounded-lg p-3 whitespace-pre-wrap text-gray-700">
@@ -690,21 +770,37 @@ const PromptLibraryModal = ({
 
           <section>
             <div className="flex items-center justify-between mb-3">
-              <h4 className="text-sm font-semibold text-gray-700">Mis prompts</h4>
+              <h4 className="text-sm font-semibold text-gray-700">
+                {t(
+                  'common.websiteGenerator.promptLibrary.custom.title',
+                  'Mis prompts'
+                )}
+              </h4>
               <button
                 type="button"
                 onClick={beginCreate}
                 className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-full text-sm transition-colors"
                 disabled={saving}
               >
-                Nuevo prompt
+                {t(
+                  'common.websiteGenerator.promptLibrary.custom.new',
+                  'Nuevo prompt'
+                )}
               </button>
             </div>
             {loading ? (
-              <p className="text-sm text-gray-500">Cargando biblioteca personal&</p>
+              <p className="text-sm text-gray-500">
+                {t(
+                  'common.websiteGenerator.promptLibrary.custom.loading',
+                  'Cargando biblioteca personal…'
+                )}
+              </p>
             ) : customPrompts.length === 0 ? (
               <p className="text-sm text-gray-500">
-                A�n no tienes prompts personalizados. Crea uno para reutilizar tus indicaciones favoritas.
+                {t(
+                  'common.websiteGenerator.promptLibrary.custom.empty',
+                  'Aún no tienes prompts personalizados. Crea uno para reutilizar tus indicaciones favoritas.'
+                )}
               </p>
             ) : (
               <div className="space-y-3">
@@ -715,10 +811,23 @@ const PromptLibraryModal = ({
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div>
-                        <h5 className="text-base font-semibold text-gray-800">{item.name || 'Sin t�tulo'}</h5>
+                        <h5 className="text-base font-semibold text-gray-800">
+                          {item.name ||
+                            t(
+                              'common.websiteGenerator.promptLibrary.custom.untitled',
+                              'Sin título'
+                            )}
+                        </h5>
                         <p className="text-xs text-gray-500 mt-1">
-                          Plantilla sugerida:{' '}
-                          {templates[item.templateKey || 'personalizada']?.name || 'Personalizada'}
+                          {t(
+                            'common.websiteGenerator.promptLibrary.custom.templateLabel',
+                            'Plantilla sugerida:'
+                          )}{' '}
+                          {templates[item.templateKey || 'personalizada']?.name ||
+                            t(
+                              'common.websiteGenerator.promptLibrary.custom.templateFallback',
+                              'Personalizada'
+                            )}
                         </p>
                         {item.description ? (
                           <p className="text-sm text-gray-500 mt-1">{item.description}</p>
@@ -733,7 +842,7 @@ const PromptLibraryModal = ({
                           })}
                           className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-full text-sm transition-colors"
                         >
-                          Usar
+                          {t('common.websiteGenerator.promptLibrary.buttons.use', 'Usar')}
                         </button>
                         <button
                           type="button"
@@ -741,7 +850,7 @@ const PromptLibraryModal = ({
                           className="inline-flex items-center gap-2 border border-gray-300 px-3 py-2 rounded-full text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                           disabled={saving}
                         >
-                          Editar
+                          {t('common.websiteGenerator.promptLibrary.buttons.edit', 'Editar')}
                         </button>
                         <button
                           type="button"
@@ -749,7 +858,7 @@ const PromptLibraryModal = ({
                           className="inline-flex items-center gap-2 border border-red-200 px-3 py-2 rounded-full text-sm text-red-600 hover:bg-red-50 transition-colors"
                           disabled={saving}
                         >
-                          Eliminar
+                          {t('common.websiteGenerator.promptLibrary.buttons.delete', 'Eliminar')}
                         </button>
                       </div>
                     </div>
@@ -765,7 +874,15 @@ const PromptLibraryModal = ({
           {editingPrompt && (
             <section className="border border-blue-100 rounded-xl p-4 bg-blue-50/40 space-y-4">
               <h4 className="text-sm font-semibold text-gray-700">
-                {editingPrompt.id ? 'Editar prompt personalizado' : 'Nuevo prompt personalizado'}
+                {editingPrompt.id
+                  ? t(
+                      'common.websiteGenerator.promptLibrary.form.editTitle',
+                      'Editar prompt personalizado'
+                    )
+                  : t(
+                      'common.websiteGenerator.promptLibrary.form.createTitle',
+                      'Nuevo prompt personalizado'
+                    )}
               </h4>
               {formError && (
                 <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded px-3 py-2">
@@ -775,17 +892,24 @@ const PromptLibraryModal = ({
               <form className="space-y-4" onSubmit={handleSubmit}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-semibold text-gray-600 mb-1">Nombre</label>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1">
+                      {t('common.websiteGenerator.promptLibrary.form.labels.name', 'Nombre')}
+                    </label>
                     <input
                       type="text"
                       value={formState.name}
                       onChange={(event) => setFormState((prev) => ({ ...prev, name: event.target.value }))}
                       className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
-                      placeholder="Prompt para estilo moderno"
+                      placeholder={t(
+                        'common.websiteGenerator.promptLibrary.form.placeholders.name',
+                        'Prompt para estilo moderno'
+                      )}
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-gray-600 mb-1">Plantilla sugerida</label>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1">
+                      {t('common.websiteGenerator.promptLibrary.form.labels.template', 'Plantilla sugerida')}
+                    </label>
                     <select
                       value={formState.templateKey}
                       onChange={(event) =>
@@ -802,7 +926,12 @@ const PromptLibraryModal = ({
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-600 mb-1">Descripci�n</label>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1">
+                    {t(
+                      'common.websiteGenerator.promptLibrary.form.labels.description',
+                      'Descripción'
+                    )}
+                  </label>
                   <textarea
                     value={formState.description}
                     onChange={(event) =>
@@ -810,11 +939,16 @@ const PromptLibraryModal = ({
                     }
                     className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
                     rows={2}
-                    placeholder="Detalle para identificar r�pidamente el tipo de propuesta."
+                    placeholder={t(
+                      'common.websiteGenerator.promptLibrary.form.placeholders.description',
+                      'Detalle para identificar rápidamente el tipo de propuesta.'
+                    )}
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-600 mb-1">Prompt</label>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1">
+                    {t('common.websiteGenerator.promptLibrary.form.labels.prompt', 'Prompt')}
+                  </label>
                   <textarea
                     value={formState.prompt}
                     onChange={(event) =>
@@ -822,7 +956,10 @@ const PromptLibraryModal = ({
                     }
                     className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
                     rows={5}
-                    placeholder="Describe el tono, estructura y elementos clave que deseas."
+                    placeholder={t(
+                      'common.websiteGenerator.promptLibrary.form.placeholders.prompt',
+                      'Describe el tono, estructura y elementos clave que deseas.'
+                    )}
                   />
                 </div>
                 <div className="flex justify-end gap-3">
@@ -832,14 +969,22 @@ const PromptLibraryModal = ({
                     className="inline-flex items-center px-4 py-2 rounded-full border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
                     disabled={saving}
                   >
-                    Cancelar
+                    {t('common.websiteGenerator.promptLibrary.form.cancel', 'Cancelar')}
                   </button>
                   <button
                     type="submit"
                     className="inline-flex items-center px-5 py-2 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-colors disabled:opacity-60"
                     disabled={saving}
                   >
-                    {saving ? 'Guardando&' : 'Guardar prompt'}
+                    {saving
+                      ? t(
+                          'common.websiteGenerator.promptLibrary.form.saving',
+                          'Guardando…'
+                        )
+                      : t(
+                          'common.websiteGenerator.promptLibrary.form.save',
+                          'Guardar prompt'
+                        )}
                   </button>
                 </div>
               </form>
@@ -853,7 +998,7 @@ const PromptLibraryModal = ({
             className="inline-flex items-center px-4 py-2 rounded-full border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
             disabled={saving}
           >
-            Cerrar
+            {t('common.websiteGenerator.promptLibrary.close', 'Cerrar')}
           </button>
         </footer>
       </div>
@@ -869,6 +1014,7 @@ const LogisticsEditor = ({
   onSave,
   saving,
 }) => {
+  const { t } = useTranslations();
   if (!open) return null;
 
   const updateTransportation = (value) =>
@@ -948,9 +1094,14 @@ const LogisticsEditor = ({
       <div className="bg-white w-full max-w-4xl h-full sm:h-auto sm:rounded-l-3xl shadow-2xl overflow-hidden flex flex-col">
         <header className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
           <div>
-            <h3 className="text-lg font-semibold text-gray-800">Editar log�stica del sitio</h3>
+            <h3 className="text-lg font-semibold text-gray-800">
+              {t('common.websiteGenerator.logistics.title', 'Editar logística del sitio')}
+            </h3>
             <p className="text-sm text-gray-500">
-              Ajusta horarios de autobuses, hospedajes recomendados y gu�a de llegada. Los cambios se guardan en la boda activa.
+              {t(
+                'common.websiteGenerator.logistics.description',
+                'Ajusta horarios de autobuses, hospedajes recomendados y guía de llegada. Los cambios se guardan en la boda activa.'
+              )}
             </p>
           </div>
           <button
@@ -958,54 +1109,83 @@ const LogisticsEditor = ({
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700 transition-colors"
           >
-            Cerrar
+            {t('common.actions.close', 'Cerrar')}
           </button>
         </header>
 
         <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
           <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <h4 className="text-sm font-semibold text-gray-700 mb-2">Historia de la pareja</h4>
+              <h4 className="text-sm font-semibold text-gray-700 mb-2">
+                {t(
+                  'common.websiteGenerator.logistics.story.title',
+                  'Historia de la pareja'
+                )}
+              </h4>
               <textarea
                 className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
                 rows={4}
                 value={draft.story || ''}
                 onChange={(event) => updateStory(event.target.value)}
-                placeholder="Cuenta la historia de la pareja en 2-3 p�rrafos."
+                placeholder={t(
+                  'common.websiteGenerator.logistics.story.placeholder',
+                  'Cuenta la historia de la pareja en 2-3 párrafos.'
+                )}
               />
             </div>
             <div>
-              <h4 className="text-sm font-semibold text-gray-700 mb-2">Notas / recomendaciones</h4>
+              <h4 className="text-sm font-semibold text-gray-700 mb-2">
+                {t(
+                  'common.websiteGenerator.logistics.notes.title',
+                  'Notas / recomendaciones'
+                )}
+              </h4>
               <textarea
                 className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
                 rows={4}
                 value={draft.additionalInfo || ''}
                 onChange={(event) => updateAdditionalInfo(event.target.value)}
-                placeholder="Incluye recomendaciones, dress code u otra informaci�n �til."
+                placeholder={t(
+                  'common.websiteGenerator.logistics.notes.placeholder',
+                  'Incluye recomendaciones, dress code u otra información útil.'
+                )}
               />
             </div>
           </section>
 
           <section>
-            <h4 className="text-sm font-semibold text-gray-700 mb-2">Transporte general</h4>
+            <h4 className="text-sm font-semibold text-gray-700 mb-2">
+              {t(
+                'common.websiteGenerator.logistics.transportation.title',
+                'Transporte general'
+              )}
+            </h4>
             <textarea
               className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
               rows={3}
               value={draft.transportation}
               onChange={(event) => updateTransportation(event.target.value)}
-              placeholder="Ej: Habr� autobuses desde el hotel principal 45 minutos antes de la ceremonia..."
+              placeholder={t(
+                'common.websiteGenerator.logistics.transportation.placeholder',
+                'Ej: Habrá autobuses desde el hotel principal 45 minutos antes de la ceremonia...'
+              )}
             />
           </section>
 
           <section>
             <div className="flex items-center justify-between mb-2">
-              <h4 className="text-sm font-semibold text-gray-700">Horarios de autobuses</h4>
+              <h4 className="text-sm font-semibold text-gray-700">
+                {t(
+                  'common.websiteGenerator.logistics.schedule.title',
+                  'Horarios de autobuses'
+                )}
+              </h4>
               <button
                 type="button"
                 onClick={addScheduleItem}
                 className="text-sm text-blue-600 hover:text-blue-700"
               >
-                A�adir horario
+                {t('common.websiteGenerator.logistics.schedule.add', 'Añadir horario')}
               </button>
             </div>
             <div className="space-y-3">
@@ -1022,14 +1202,20 @@ const LogisticsEditor = ({
                   />
                   <input
                     type="text"
-                    placeholder="Sale de"
+                    placeholder={t(
+                      'common.websiteGenerator.logistics.schedule.departure',
+                      'Sale de'
+                    )}
                     className="border border-gray-200 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
                     value={item.departure}
                     onChange={(event) => updateScheduleItem(index, 'departure', event.target.value)}
                   />
                   <input
                     type="text"
-                    placeholder="Llega a"
+                    placeholder={t(
+                      'common.websiteGenerator.logistics.schedule.destination',
+                      'Llega a'
+                    )}
                     className="border border-gray-200 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
                     value={item.destination}
                     onChange={(event) => updateScheduleItem(index, 'destination', event.target.value)}
@@ -1037,7 +1223,10 @@ const LogisticsEditor = ({
                   <div className="flex items-center gap-2">
                     <input
                       type="text"
-                      placeholder="Notas"
+                      placeholder={t(
+                        'common.websiteGenerator.logistics.schedule.notes',
+                        'Notas'
+                      )}
                       className="flex-1 border border-gray-200 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
                       value={item.notes}
                       onChange={(event) => updateScheduleItem(index, 'notes', event.target.value)}
@@ -1047,7 +1236,7 @@ const LogisticsEditor = ({
                       onClick={() => removeScheduleItem(index)}
                       className="text-xs text-red-500 hover:text-red-600"
                     >
-                      Quitar
+                      {t('common.actions.remove', 'Quitar')}
                     </button>
                   </div>
                 </div>
@@ -1057,13 +1246,21 @@ const LogisticsEditor = ({
 
           <section>
             <div className="flex items-center justify-between mb-2">
-              <h4 className="text-sm font-semibold text-gray-700">Hospedaje recomendado</h4>
+              <h4 className="text-sm font-semibold text-gray-700">
+                {t(
+                  'common.websiteGenerator.logistics.lodging.title',
+                  'Hospedaje recomendado'
+                )}
+              </h4>
               <button
                 type="button"
                 onClick={addLodgingItem}
                 className="text-sm text-blue-600 hover:text-blue-700"
               >
-                A�adir hospedaje
+                {t(
+                  'common.websiteGenerator.logistics.lodging.add',
+                  'Añadir hospedaje'
+                )}
               </button>
             </div>
             <div className="space-y-3">
@@ -1075,14 +1272,20 @@ const LogisticsEditor = ({
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <input
                       type="text"
-                      placeholder="Nombre del hotel o alojamiento"
+                      placeholder={t(
+                        'common.websiteGenerator.logistics.lodging.placeholders.name',
+                        'Nombre del hotel o alojamiento'
+                      )}
                       className="border border-gray-200 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
                       value={item.name}
                       onChange={(event) => updateLodgingItem(index, 'name', event.target.value)}
                     />
                     <input
                       type="text"
-                      placeholder="Distancia o tiempo"
+                      placeholder={t(
+                        'common.websiteGenerator.logistics.lodging.placeholders.distance',
+                        'Distancia o tiempo'
+                      )}
                       className="border border-gray-200 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
                       value={item.distance}
                       onChange={(event) => updateLodgingItem(index, 'distance', event.target.value)}
@@ -1091,14 +1294,20 @@ const LogisticsEditor = ({
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <input
                       type="text"
-                      placeholder="Rango de precio"
+                      placeholder={t(
+                        'common.websiteGenerator.logistics.lodging.placeholders.priceRange',
+                        'Rango de precio'
+                      )}
                       className="border border-gray-200 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
                       value={item.priceRange}
                       onChange={(event) => updateLodgingItem(index, 'priceRange', event.target.value)}
                     />
                     <input
                       type="url"
-                      placeholder="Enlace de reserva"
+                      placeholder={t(
+                        'common.websiteGenerator.logistics.lodging.placeholders.link',
+                        'Enlace de reserva'
+                      )}
                       className="border border-gray-200 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
                       value={item.link}
                       onChange={(event) => updateLodgingItem(index, 'link', event.target.value)}
@@ -1107,7 +1316,10 @@ const LogisticsEditor = ({
                   <textarea
                     className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
                     rows={2}
-                    placeholder="Servicios o notas (separados por coma o salto de l�nea)"
+                    placeholder={t(
+                      'common.websiteGenerator.logistics.lodging.placeholders.amenities',
+                      'Servicios o notas (separados por coma o salto de línea)'
+                    )}
                     value={item.amenities}
                     onChange={(event) => updateLodgingItem(index, 'amenities', event.target.value)}
                   />
@@ -1117,7 +1329,10 @@ const LogisticsEditor = ({
                       onClick={() => removeLodgingItem(index)}
                       className="text-xs text-red-500 hover:text-red-600"
                     >
-                      Quitar hospedaje
+                      {t(
+                        'common.websiteGenerator.logistics.lodging.remove',
+                        'Quitar hospedaje'
+                      )}
                     </button>
                   </div>
                 </div>
@@ -1126,11 +1341,16 @@ const LogisticsEditor = ({
           </section>
 
           <section className="space-y-3">
-            <h4 className="text-sm font-semibold text-gray-700">Gu�a de llegada</h4>
+            <h4 className="text-sm font-semibold text-gray-700">
+              {t('common.websiteGenerator.logistics.travel.title', 'Guía de llegada')}
+            </h4>
             <textarea
               className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
               rows={2}
-              placeholder="Resumen general"
+              placeholder={t(
+                'common.websiteGenerator.logistics.travel.summaryPlaceholder',
+                'Resumen general'
+              )}
               value={draft.travel.summary}
               onChange={(event) => updateTravel('summary', event.target.value)}
             />
@@ -1138,14 +1358,20 @@ const LogisticsEditor = ({
               <textarea
                 className="border border-gray-200 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
                 rows={2}
-                placeholder="C�mo llegar en avi�n"
+                placeholder={t(
+                  'common.websiteGenerator.logistics.travel.byPlanePlaceholder',
+                  'Cómo llegar en avión'
+                )}
                 value={draft.travel.byPlane}
                 onChange={(event) => updateTravel('byPlane', event.target.value)}
               />
               <textarea
                 className="border border-gray-200 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
                 rows={2}
-                placeholder="C�mo llegar en tren o bus"
+                placeholder={t(
+                  'common.websiteGenerator.logistics.travel.byTrainPlaceholder',
+                  'Cómo llegar en tren o bus'
+                )}
                 value={draft.travel.byTrain}
                 onChange={(event) => updateTravel('byTrain', event.target.value)}
               />
@@ -1153,14 +1379,20 @@ const LogisticsEditor = ({
             <textarea
               className="border border-gray-200 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
               rows={2}
-              placeholder="C�mo llegar en coche"
+              placeholder={t(
+                'common.websiteGenerator.logistics.travel.byCarPlaceholder',
+                'Cómo llegar en coche'
+              )}
               value={draft.travel.byCar}
               onChange={(event) => updateTravel('byCar', event.target.value)}
             />
             <textarea
               className="border border-gray-200 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
               rows={2}
-              placeholder="Tips adicionales"
+              placeholder={t(
+                'common.websiteGenerator.logistics.travel.tipsPlaceholder',
+                'Tips adicionales'
+              )}
               value={draft.travel.tips}
               onChange={(event) => updateTravel('tips', event.target.value)}
             />
@@ -1168,14 +1400,20 @@ const LogisticsEditor = ({
               <textarea
                 className="border border-gray-200 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
                 rows={3}
-                placeholder="Aeropuertos cercanos (uno por l�nea)"
+                placeholder={t(
+                  'common.websiteGenerator.logistics.travel.airportsPlaceholder',
+                  'Aeropuertos cercanos (uno por línea)'
+                )}
                 value={draft.travel.airportsText}
                 onChange={(event) => updateTravel('airportsText', event.target.value)}
               />
               <textarea
                 className="border border-gray-200 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
                 rows={3}
-                placeholder="Estaciones cercanas (uno por l�nea)"
+                placeholder={t(
+                  'common.websiteGenerator.logistics.travel.stationsPlaceholder',
+                  'Estaciones cercanas (uno por línea)'
+                )}
                 value={draft.travel.stationsText}
                 onChange={(event) => updateTravel('stationsText', event.target.value)}
               />
@@ -1184,13 +1422,15 @@ const LogisticsEditor = ({
 
           <section>
             <div className="flex items-center justify-between mb-2">
-              <h4 className="text-sm font-semibold text-gray-700">Preguntas frecuentes</h4>
+              <h4 className="text-sm font-semibold text-gray-700">
+                {t('common.websiteGenerator.logistics.faq.title', 'Preguntas frecuentes')}
+              </h4>
               <button
                 type="button"
                 onClick={addFaqItem}
                 className="text-sm text-blue-600 hover:text-blue-700"
               >
-                A�adir pregunta
+                {t('common.websiteGenerator.logistics.faq.add', 'Añadir pregunta')}
               </button>
             </div>
             <div className="space-y-3">
@@ -1201,13 +1441,19 @@ const LogisticsEditor = ({
                 >
                   <input
                     type="text"
-                    placeholder="Pregunta"
+                    placeholder={t(
+                      'common.websiteGenerator.logistics.faq.questionPlaceholder',
+                      'Pregunta'
+                    )}
                     className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
                     value={item.question}
                     onChange={(event) => updateFaqItem(index, 'question', event.target.value)}
                   />
                   <textarea
-                    placeholder="Respuesta"
+                    placeholder={t(
+                      'common.websiteGenerator.logistics.faq.answerPlaceholder',
+                      'Respuesta'
+                    )}
                     className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
                     rows={2}
                     value={item.answer}
@@ -1219,7 +1465,10 @@ const LogisticsEditor = ({
                       onClick={() => removeFaqItem(index)}
                       className="text-xs text-red-500 hover:text-red-600"
                     >
-                      Quitar pregunta
+                      {t(
+                        'common.websiteGenerator.logistics.faq.remove',
+                        'Quitar pregunta'
+                      )}
                     </button>
                   </div>
                 </div>
@@ -1234,7 +1483,7 @@ const LogisticsEditor = ({
             onClick={onClose}
             className="inline-flex items-center px-4 py-2 rounded-full border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
           >
-            Cancelar
+            {t('common.websiteGenerator.logisticsActions.cancel', 'Cancelar')}
           </button>
           <button
             type="button"
@@ -1244,7 +1493,12 @@ const LogisticsEditor = ({
               saving ? 'opacity-70 cursor-not-allowed' : ''
             }`}
           >
-            {saving ? 'Guardando&' : 'Guardar log�stica'}
+            {saving
+              ? t(
+                  'common.websiteGenerator.logisticsActions.saving',
+                  'Guardando…'
+                )
+              : t('common.websiteGenerator.logisticsActions.save', 'Guardar logística')}
           </button>
         </footer>
       </div>

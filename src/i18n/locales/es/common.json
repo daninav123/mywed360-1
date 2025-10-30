@@ -552,21 +552,41 @@
             "emailTitle": "Enviar email"
           },
           "favorite": {
-            "add": "AÃ±adir a favoritos",
+            "add": "Añadir a favoritos",
             "remove": "Eliminar de favoritos"
+          },
+          "compare": {
+            "add": "Añadir a comparación",
+            "remove": "Quitar de comparación"
           },
           "actions": {
             "viewProfile": "Ver perfil",
             "markConfirmed": "Marcar como confirmado",
             "viewWebsite": "Ver sitio web",
             "viewDetails": "Ver detalle",
-            "viewPortfolio": "Ver portfolio"
+            "viewPortfolio": "Ver portfolio",
+            "share": "Compartir"
           },
           "imageAlt": "Imagen de {{name}}",
+          "share": {
+            "message": "¡Mira este proveedor! {{name}} - {{service}}",
+            "toast": "Abriendo WhatsApp para compartir"
+          },
           "reviews": {
             "count": {
               "one": "{{count}} reseÃ±a",
               "other": "{{count}} reseÃ±as"
+            }
+          },
+          "followUp": {
+            "reminder": "💡 Hace más de 7 días • Considera hacer seguimiento",
+            "lastContact": "Último contacto: {{date}} vía {{method}}",
+            "lastContactNoMethod": "Último contacto: {{date}}",
+            "methods": {
+              "whatsapp": "WhatsApp",
+              "email": "Email",
+              "phone": "Teléfono",
+              "other": "{{method}}"
             }
           },
           "source": {
@@ -617,7 +637,31 @@
           "description": "Añade proveedores a favoritos para verlos aquí",
           "hintPrefix": "Haz clic en el",
           "hintSuffix": "de cualquier proveedor"
+        },
+        "button": {
+          "save": "Guardar",
+          "saved": "Guardado"
         }
+      },
+      "selectFavorites": {
+        "subtitle": "Elige uno de tus favoritos",
+        "empty": {
+          "title": "No tienes favoritos en esta categoría",
+          "description": "Busca proveedores y guárdalos en favoritos con el botón ❤️",
+          "cta": "Buscar proveedores"
+        },
+        "assign": {
+          "action": "Asignar",
+          "loading": "Asignando..."
+        },
+        "toast": {
+          "assigned": "{{name}} asignado correctamente",
+          "error": "Error al asignar proveedor"
+        },
+        "footer": {
+          "more": "Buscar más proveedores"
+        },
+        "notes": "\"{{note}}\""
       },
       "smartFilters": {
         "title": "Filtros inteligentes",
@@ -3883,8 +3927,12 @@
             "portfolio": "Portfolio"
           },
           "favorite": {
-            "add": "AÃ±adir a favoritos",
+            "add": "Añadir a favoritos",
             "remove": "Eliminar de favoritos"
+          },
+          "compare": {
+            "add": "Añadir a comparación",
+            "remove": "Quitar de comparación"
           },
           "reviews": {
             "count": {
@@ -3908,7 +3956,23 @@
             "markConfirmed": "Contratar",
             "viewWebsite": "Ver web",
             "viewDetails": "Ver detalle",
-            "viewPortfolio": "Ver portfolio"
+            "viewPortfolio": "Ver portfolio",
+            "share": "Compartir"
+          },
+          "share": {
+            "message": "¡Mira este proveedor! {{name}} - {{service}}",
+            "toast": "Abriendo WhatsApp para compartir"
+          },
+          "followUp": {
+            "reminder": "💡 Hace más de 7 días • Considera hacer seguimiento",
+            "lastContact": "Último contacto: {{date}} vía {{method}}",
+            "lastContactNoMethod": "Último contacto: {{date}}",
+            "methods": {
+              "whatsapp": "WhatsApp",
+              "email": "Email",
+              "phone": "Teléfono",
+              "other": "{{method}}"
+            }
           },
           "source": {
             "label": "Fuente: {{source}}",
@@ -4799,6 +4863,10 @@
         "hintPrefix": "Usa el botÃ³n",
         "hintSuffix": "en cualquier proveedor para aÃ±adirlo."
       },
+      "button": {
+        "save": "Guardar",
+        "saved": "Guardado"
+      },
       "errors": {
         "loginRequired": "Debes iniciar sesiÃ³n para gestionar favoritos.",
         "activeWeddingRequired": "Selecciona una boda activa para gestionar favoritos.",
@@ -4808,6 +4876,26 @@
         "removeFailed": "No pudimos eliminar el favorito.",
         "loadFailed": "No pudimos cargar tus favoritos. IntÃ©ntalo mÃ¡s tarde."
       }
+    },
+    "selectFavorites": {
+      "subtitle": "Elige uno de tus favoritos",
+      "empty": {
+        "title": "No tienes favoritos en esta categorÃ­a",
+        "description": "Busca proveedores y guÃ¡rdalos en favoritos con el botÃ³n ❤️",
+        "cta": "Buscar proveedores"
+      },
+      "assign": {
+        "action": "Asignar",
+        "loading": "Asignando..."
+      },
+      "toast": {
+        "assigned": "{{name}} asignado correctamente",
+        "error": "Error al asignar proveedor"
+      },
+      "footer": {
+        "more": "Buscar mÃ¡s proveedores"
+      },
+      "notes": "\"{{note}}\""
     },
     "smartFilters": {
       "title": "Filtros inteligentes",
@@ -5206,6 +5294,139 @@
       "variablesHint": "Usa variables como {nombres}, {fecha}, {ubicacion}",
       "placeholder": "Describe cómo quieres que sea tu web (estilo, colores, secciones, logística, etc.)"
     },
+    "promptLibrary": {
+      "title": "Biblioteca de prompts",
+      "close": "Cerrar",
+      "intro": "Selecciona un prompt para rellenar automáticamente el generador.",
+      "tokensIntro": "Reemplaza las variables por tus datos:",
+      "tokens": {
+        "names": "{nombres}",
+        "date": "{fecha}",
+        "location": "{ubicacion}"
+      },
+      "builtIn": {
+        "title": "Prompts predeterminados",
+        "use": "Usar prompt"
+      },
+      "custom": {
+        "title": "Mis prompts",
+        "new": "Nuevo prompt",
+        "loading": "Cargando biblioteca personal…",
+        "empty": "Aún no tienes prompts personalizados. Crea uno para reutilizar tus indicaciones favoritas.",
+        "templateLabel": "Plantilla sugerida:",
+        "templateFallback": "Personalizada",
+        "untitled": "Sin título"
+      },
+      "buttons": {
+        "use": "Usar",
+        "edit": "Editar",
+        "delete": "Eliminar"
+      },
+      "form": {
+        "editTitle": "Editar prompt personalizado",
+        "createTitle": "Nuevo prompt personalizado",
+        "labels": {
+          "name": "Nombre",
+          "template": "Plantilla sugerida",
+          "description": "Descripción",
+          "prompt": "Prompt"
+        },
+        "placeholders": {
+          "name": "Prompt para estilo moderno",
+          "description": "Detalle para identificar rápidamente el tipo de propuesta.",
+          "prompt": "Describe el tono, estructura y elementos clave que deseas."
+        },
+        "cancel": "Cancelar",
+        "save": "Guardar prompt",
+        "saving": "Guardando…"
+      },
+      "errors": {
+        "required": "El prompt no puede estar vacío.",
+        "save": "No se pudo guardar el prompt.",
+        "delete": "No se pudo eliminar el prompt."
+      },
+      "confirmDelete": "¿Eliminar este prompt personalizado?"
+    },
+    "profileSummary": {
+      "title": "Datos del perfil aplicados",
+      "conjunction": "y",
+      "labels": {
+        "couple": "Pareja",
+        "date": "Fecha",
+        "ceremony": "Ceremonia",
+        "reception": "Recepción",
+        "contact": "Contacto",
+        "additionalInfo": "Info adicional"
+      }
+    },
+    "versions": {
+      "title": "Versiones publicadas",
+      "columns": {
+        "date": "Fecha",
+        "template": "Plantilla",
+        "prompt": "Indicaciones",
+        "actions": "Acciones"
+      },
+      "fallbackTemplate": "Personalizada",
+      "noPrompt": "Sin indicaciones"
+    },
+    "logistics": {
+      "title": "Editar logística del sitio",
+      "description": "Ajusta horarios de autobuses, hospedajes recomendados y guía de llegada. Los cambios se guardan en la boda activa.",
+      "story": {
+        "title": "Historia de la pareja",
+        "placeholder": "Cuenta la historia de la pareja en 2-3 párrafos."
+      },
+      "notes": {
+        "title": "Notas / recomendaciones",
+        "placeholder": "Incluye recomendaciones, dress code u otra información útil."
+      },
+      "transportation": {
+        "title": "Transporte general",
+        "placeholder": "Ej: Habrá autobuses desde el hotel principal 45 minutos antes de la ceremonia..."
+      },
+      "schedule": {
+        "title": "Horarios de autobuses",
+        "add": "Añadir horario",
+        "departure": "Sale de",
+        "destination": "Llega a",
+        "notes": "Notas"
+      },
+      "lodging": {
+        "title": "Hospedaje recomendado",
+        "add": "Añadir hospedaje",
+        "remove": "Quitar hospedaje",
+        "placeholders": {
+          "name": "Nombre del hotel o alojamiento",
+          "distance": "Distancia o tiempo",
+          "priceRange": "Rango de precio",
+          "link": "Enlace de reserva",
+          "amenities": "Servicios o notas (separados por coma o salto de línea)"
+        }
+      },
+      "travel": {
+        "title": "Guía de llegada",
+        "summaryPlaceholder": "Resumen general",
+        "byPlanePlaceholder": "Cómo llegar en avión",
+        "byTrainPlaceholder": "Cómo llegar en tren o bus",
+        "byCarPlaceholder": "Cómo llegar en coche",
+        "tipsPlaceholder": "Tips adicionales",
+        "airportsPlaceholder": "Aeropuertos cercanos (uno por línea)",
+        "stationsPlaceholder": "Estaciones cercanas (uno por línea)"
+      },
+      "faq": {
+        "title": "Preguntas frecuentes",
+        "add": "Añadir pregunta",
+        "remove": "Quitar pregunta",
+        "questionPlaceholder": "Pregunta",
+        "answerPlaceholder": "Respuesta"
+      }
+    },
+    "logisticsActions": {
+      "cancel": "Cancelar",
+      "save": "Guardar logística",
+      "saving": "Guardando…"
+    },
     "actions": {
       "generate": "Generar Página Web",
       "generating": "Generando..."
@@ -5433,12 +5654,12 @@
       "exported": "âœ… Portfolio exportado: {{total}} bodas",
       "exportError": "Error al exportar portfolio: {{message}}"
     },
-    "support": {
-      "responseSuccess": "Respuesta enviada exitosamente",
-      "responseError": "Error al enviar la respuesta: {{message}}"
-    },
-    "alerts": {
-      "resolveError": "No se pudo marcar la alerta como resuelta."
+  "support": {
+    "responseSuccess": "Respuesta enviada exitosamente",
+    "responseError": "Error al enviar la respuesta: {{message}}"
+  },
+  "alerts": {
+    "resolveError": "No se pudo marcar la alerta como resuelta."
     }
   },
   "weddings": {

@@ -53,11 +53,12 @@ function mapDoc(doc, targetLanguage) {
     coverImage: data.coverImage || null,
     tags:
       (translation?.tags && translation.tags.length ? translation.tags : null) || data.tags || [],
+    byline: data.byline || null,
     publishedAt: convertTimestamp(data.publishedAt),
   };
 }
 
-async function runFallbackQuery({ language, cursorRaw, limit }) {
+async function runFallbackQuery({ language, cursorRaw, limit, authorId }) {
   const fallbackSnapshot = await db
     .collection(BLOG_COLLECTION)
     .where('status', '==', 'published')
@@ -74,6 +75,9 @@ async function runFallbackQuery({ language, cursorRaw, limit }) {
         .map((code) => code.toLowerCase())
         .includes(language)
     );
+  }
+  if (authorId) {
+    posts = posts.filter((post) => (post.byline?.id || '') === authorId);
   }
 
   if (cursorRaw) {
@@ -104,6 +108,8 @@ router.get('/', async (req, res) => {
   const languageRaw = typeof req.query.language === 'string' ? req.query.language.trim() : '';
   const language = languageRaw ? languageRaw.toLowerCase() : '';
   const cursorRaw = req.query.cursor;
+  const authorRaw = typeof req.query.author === 'string' ? req.query.author.trim() : '';
+  const authorId = authorRaw || '';
 
   const baseQuery = db
     .collection(BLOG_COLLECTION)
@@ -114,6 +120,9 @@ router.get('/', async (req, res) => {
     let query = baseQuery;
     if (withLanguage && language) {
       query = query.where('availableLanguages', 'array-contains', language);
+    }
+    if (authorId) {
+      query = query.where('byline.id', '==', authorId);
     }
     if (cursorRaw) {
       const cursorDate = new Date(cursorRaw);
@@ -135,6 +144,7 @@ router.get('/', async (req, res) => {
         language,
         cursorRaw,
         limit,
+        authorId,
       });
       res.json({ posts: pagePosts, nextCursor, fallback: true, indexError: false });
       return;
@@ -152,6 +162,7 @@ router.get('/', async (req, res) => {
         language,
         cursorRaw,
         limit,
+        authorId,
       });
       res.json({ posts: pagePosts, nextCursor, fallback: true, indexError: isIndexError });
       return;

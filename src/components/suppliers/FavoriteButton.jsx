@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { Heart } from 'lucide-react';
 import { useSupplierFavorites } from '../../contexts/SupplierFavoritesContext';
 import { useAuth } from '../../contexts/AuthContext';
+import useTranslations from '../../hooks/useTranslations';
 
 export default function FavoriteButton({ supplier, size = 'md', showLabel = false }) {
   const { currentUser } = useAuth();
   const { isFavorite, addToFavorites, removeFromFavorites } = useSupplierFavorites();
   const [loading, setLoading] = useState(false);
+  const { t } = useTranslations();
 
   const favorite = isFavorite(supplier.id || supplier.slug);
 
@@ -15,7 +17,7 @@ export default function FavoriteButton({ supplier, size = 'md', showLabel = fals
     e.stopPropagation();
 
     if (!currentUser) {
-      alert('Debes iniciar sesión para añadir favoritos');
+      alert(t('common.suppliers.favorites.errors.loginRequired'));
       return;
     }
 
@@ -28,7 +30,10 @@ export default function FavoriteButton({ supplier, size = 'md', showLabel = fals
       }
     } catch (error) {
       console.error('Error toggling favorite:', error);
-      alert('Error al actualizar favoritos');
+      const fallbackMessage = favorite
+        ? t('common.suppliers.favorites.errors.removeFailed')
+        : t('common.suppliers.favorites.errors.saveFailed');
+      alert(error?.message || fallbackMessage);
     } finally {
       setLoading(false);
     }
@@ -65,7 +70,11 @@ export default function FavoriteButton({ supplier, size = 'md', showLabel = fals
         disabled:opacity-50 disabled:cursor-not-allowed
         ${showLabel ? 'px-4 gap-2 w-auto' : ''}
       `}
-      title={favorite ? 'Quitar de favoritos' : 'Añadir a favoritos'}
+      title={
+        favorite
+          ? t('common.suppliers.card.hybrid.favorite.remove', 'Quitar de favoritos')
+          : t('common.suppliers.card.hybrid.favorite.add', 'Añadir a favoritos')
+      }
     >
       <Heart
         size={iconSizes[size]}
@@ -73,7 +82,11 @@ export default function FavoriteButton({ supplier, size = 'md', showLabel = fals
         className={`transition-transform ${loading ? 'animate-pulse' : favorite ? 'scale-110' : ''}`}
       />
       {showLabel && (
-        <span className="text-sm font-medium">{favorite ? 'Guardado' : 'Guardar'}</span>
+        <span className="text-sm font-medium">
+          {favorite
+            ? t('common.suppliers.favorites.button.saved', 'Guardado')
+            : t('common.suppliers.favorites.button.save', 'Guardar')}
+        </span>
       )}
     </button>
   );

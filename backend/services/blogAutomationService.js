@@ -11,6 +11,7 @@ import {
   getSupportedBlogLanguages,
   translateBlogArticleToLanguages,
 } from './blogAiService.js';
+import { assignAuthorProfile } from '../../shared/blogAuthors.js';
 import { generateDailyTopicPlan } from './blogTopicPlanner.js';
 import { researchTopic } from './blogResearchService.js';
 
@@ -41,13 +42,23 @@ export async function generateBlogAssets(input) {
       ? researchSummary.trim()
       : 'Resumen provisional: analiza tendencias, recomendaciones y buenas prácticas de planificación de bodas en España.';
 
-  const aiArticle = await generateBlogArticle({
+  const { author, promptSnippet } = assignAuthorProfile({
+    topic: input.topic,
+    keywords: input.keywords,
+  });
+
+  const generationInput = {
     ...input,
+    tone: input.tone || 'cálido cercano',
+    authorPrompt: promptSnippet,
+    author,
     research: {
       summary: normalizedSummary,
       references: researchReferences,
     },
-  });
+  };
+
+  const aiArticle = await generateBlogArticle(generationInput);
 
   let coverGeneration = null;
   if (aiArticle.coverPrompt) {
@@ -75,6 +86,8 @@ export async function generateBlogAssets(input) {
     researchReferences,
     aiArticle,
     coverGeneration,
+    authorProfile: author,
+    authorPrompt: promptSnippet,
   };
 }
 
@@ -121,6 +134,8 @@ export async function saveGeneratedBlogPost({
   researchSummary,
   researchReferences,
   coverGeneration,
+  authorProfile,
+  authorPrompt,
   status = 'draft',
   scheduledAt = null,
   createdBy = 'automation',
@@ -136,6 +151,15 @@ export async function saveGeneratedBlogPost({
   const baseLanguage = (input.language || 'es').toLowerCase();
   const supportedLanguages = getSupportedBlogLanguages();
   const targetLanguages = supportedLanguages.filter((lang) => lang && lang !== baseLanguage);
+  const byline = authorProfile
+    ? {
+        id: authorProfile.id,
+        slug: authorProfile.slug,
+        name: authorProfile.name,
+        title: authorProfile.title || '',
+        signature: authorProfile.signature || '',
+      }
+    : null;
 
   let translationMap = {};
   if (targetLanguages.length) {
@@ -145,6 +169,7 @@ export async function saveGeneratedBlogPost({
       targetLanguages,
       tone: input.tone || (baseLanguage === 'en' ? 'warm and human' : 'cálido cercano'),
       references: researchReferences,
+      author: byline,
     }).catch((error) => {
       logger.error(
         '[blogAutomation] translations failed %s -> %s: %s',
@@ -175,6 +200,7 @@ export async function saveGeneratedBlogPost({
       cta: aiArticle.cta || '',
       references: researchReferences,
     },
+    byline,
     tags:
       aiArticle.tags && aiArticle.tags.length
         ? aiArticle.tags
@@ -184,6 +210,7 @@ export async function saveGeneratedBlogPost({
       input,
       source: aiArticle.source || 'openai',
       raw: aiArticle.raw,
+      authorPrompt: authorPrompt || null,
       research: {
         provider: researchData.provider,
         summary: researchSummary,
@@ -208,6 +235,7 @@ export async function saveGeneratedBlogPost({
       researchProvider: researchData.provider || null,
       articleSource: aiArticle.source || null,
       coverStatus: coverImage ? coverImage.status : 'none',
+      authorId: byline?.id || null,
       ...automationMeta,
     },
     metrics: {
@@ -368,6 +396,7 @@ async function finalizePlanSuccess(docRef, { postId, scheduledAtIso, assets }) {
       articleSource: assets.aiArticle?.source || null,
       researchProvider: assets.researchData?.provider || null,
       coverStatus: assets.coverGeneration?.status || 'none',
+      authorId: assets.authorProfile?.id || null,
     },
   };
   if (scheduledAtIso) {
@@ -433,18 +462,21 @@ export async function runBlogAutomationCycle({
       postStatus === 'scheduled' ? computeScheduledIso(docRef.id, publishHour) : null;
 
     const saved = await saveGeneratedBlogPost({
-      input: generationInput,
+      input: { ...generationInput, authorId: assets.authorProfile?.id },
       aiArticle: assets.aiArticle,
       researchData: assets.researchData,
       researchSummary: assets.researchSummary,
       researchReferences: assets.researchReferences,
       coverGeneration: assets.coverGeneration,
+      authorProfile: assets.authorProfile,
+      authorPrompt: assets.authorPrompt,
       status: postStatus,
       scheduledAt: scheduledIso,
       createdBy: 'automation:worker',
       automationMeta: {
         planDate: docRef.id,
         planSource: data.source || 'auto',
+        authorId: assets.authorProfile?.id || null,
       },
     });
 
