@@ -12,6 +12,7 @@ import {
 } from '@mui/material';
 import { Calendar, Coins, Download, Bell, Shield } from 'lucide-react';
 import React, { useEffect, useMemo, useState } from 'react';
+import { toast } from 'react-toastify';
 
 import { db } from '../../firebaseConfig';
 import { formatDate } from '../../utils/formatUtils';
@@ -20,6 +21,7 @@ import { resolveAdminAlert } from '../../services/adminDataService';
 import { getAdminFetchOptions } from '../../services/adminSession';
 import { decodeMojibakeDeep } from '../../utils/mojibake';
 import { useAuth } from '../../hooks/useAuth';
+import useTranslations from '../../hooks/useTranslations';
 
 const KPI_CONFIG = {
   'active-weddings': { icon: <Calendar size={24} />, color: 'rgb(37, 99, 235)' },
@@ -41,13 +43,14 @@ const SEVERITY_COLOR = {
 };
 
 const formatGigabytes = (value) =>
-  Number.isFinite(value) ? `${value.toLocaleString('es-ES', { maximumFractionDigits: 2 })} GB` : '0 GB';
+  Number.isFinite(value)
+    ? `${value.toLocaleString('es-ES', { maximumFractionDigits: 2 })} GB`
+    : '0 GB';
 
 const formatPercent = (value, fractionDigits = 1) =>
   Number.isFinite(value) ? `${value.toFixed(fractionDigits)}%` : '0%';
 
-const formatInteger = (value) =>
-  Number.isFinite(value) ? value.toLocaleString('es-ES') : '0';
+const formatInteger = (value) => (Number.isFinite(value) ? value.toLocaleString('es-ES') : '0');
 
 const formatSourceLabel = (value) => {
   if (!value) return 'sin datos';
@@ -58,12 +61,8 @@ const formatSourceLabel = (value) => {
   return value;
 };
 
-const formatSinceDate = (value) => {
-  if (!value) return 'sin datos';
-  return formatDate(value, 'short');
-};
-
 const AdminDashboard = () => {
+  const { t } = useTranslations();
   const { currentUser } = useAuth();
   const [overview, setOverview] = useState(null);
   const [services, setServices] = useState([]);
@@ -117,7 +116,7 @@ const AdminDashboard = () => {
       try {
         const res = await apiGet(
           '/api/admin/dashboard/overview',
-          getAdminFetchOptions({ auth: false, silent: true }),
+          getAdminFetchOptions({ auth: false, silent: true })
         );
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
@@ -134,7 +133,12 @@ const AdminDashboard = () => {
         setServices([]);
         setAlerts([]);
         setNewTasks([]);
-        setOverviewError('No se pudo cargar el resumen administrativo.');
+        setOverviewError(
+          t(
+            'common.admin.dashboard.errors.overview',
+            'No se pudo cargar el resumen administrativo.'
+          )
+        );
         console.warn('[AdminDashboard] overview load error:', error);
       } finally {
         if (!cancelled) setLoadingOverview(false);
@@ -145,7 +149,7 @@ const AdminDashboard = () => {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     let cancelled = false;
@@ -154,7 +158,7 @@ const AdminDashboard = () => {
       try {
         const res = await apiGet(
           '/api/admin/dashboard/metrics',
-          getAdminFetchOptions({ auth: false, silent: true }),
+          getAdminFetchOptions({ auth: false, silent: true })
         );
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
@@ -181,18 +185,35 @@ const AdminDashboard = () => {
   const kpiCards = useMemo(() => {
     if (!overview?.kpis?.length) {
       return [
-        { id: 'active-weddings', label: 'Bodas activas', value: '—', testId: 'admin-kpi-active-weddings' },
-        { id: 'revenue-30d', label: 'Facturación (30 días)', value: '€ 0', testId: 'admin-kpi-revenue-30d' },
-        { id: 'downloads-30d', label: 'Descargas app (30 días)', value: '—', testId: 'admin-kpi-downloads-30d' },
-        { id: 'open-alerts', label: 'Alertas activas', value: '—', testId: 'admin-kpi-open-alerts' },
+        {
+          id: 'active-weddings',
+          label: 'Bodas activas',
+          value: '—',
+          testId: 'admin-kpi-active-weddings',
+        },
+        {
+          id: 'revenue-30d',
+          label: 'Facturación (30 días)',
+          value: '€ 0',
+          testId: 'admin-kpi-revenue-30d',
+        },
+        {
+          id: 'downloads-30d',
+          label: 'Descargas app (30 días)',
+          value: '—',
+          testId: 'admin-kpi-downloads-30d',
+        },
+        {
+          id: 'open-alerts',
+          label: 'Alertas activas',
+          value: '—',
+          testId: 'admin-kpi-open-alerts',
+        },
       ];
     }
     return overview.kpis.map((kpi) => ({
       ...kpi,
-      value:
-        typeof kpi.value === 'number'
-          ? kpi.value.toLocaleString('es-ES')
-          : kpi.value ?? '—',
+      value: typeof kpi.value === 'number' ? kpi.value.toLocaleString('es-ES') : (kpi.value ?? '—'),
     }));
   }, [overview?.kpis]);
 
@@ -216,10 +237,7 @@ const AdminDashboard = () => {
     return arr.reduce((acc, item) => acc + (Number(item?.total) || 0), 0);
   }, [metricsSummary?.communications]);
 
-  const openAlertsCount = useMemo(
-    () => alerts.filter((alert) => !alert.resolved).length,
-    [alerts],
-  );
+  const openAlertsCount = useMemo(() => alerts.filter((alert) => !alert.resolved).length, [alerts]);
 
   const handleResolveAlert = async (alertId) => {
     if (resolvingAlertId) return;
@@ -228,12 +246,14 @@ const AdminDashboard = () => {
       await resolveAdminAlert(alertId);
       setAlerts((prev) =>
         prev.map((alert) =>
-          alert.id === alertId ? { ...alert, resolved: true, timestamp: alert.timestamp } : alert,
-        ),
+          alert.id === alertId ? { ...alert, resolved: true, timestamp: alert.timestamp } : alert
+        )
       );
     } catch (error) {
       console.error('[AdminDashboard] resolve alert error:', error);
-      window.alert('No se pudo marcar la alerta como resuelta.');
+      toast.error(
+        t('common.admin.alerts.resolveError', 'No se pudo marcar la alerta como resuelta.')
+      );
     } finally {
       setResolvingAlertId(null);
     }
@@ -272,8 +292,8 @@ const AdminDashboard = () => {
   const premiumSharePercent = userGrowthMetrics.newPremiumShare
     ? userGrowthMetrics.newPremiumShare * 100
     : userGrowthMetrics.newUsers > 0
-    ? (userGrowthMetrics.newPremiumUsers / userGrowthMetrics.newUsers) * 100
-    : 0;
+      ? (userGrowthMetrics.newPremiumUsers / userGrowthMetrics.newUsers) * 100
+      : 0;
 
   return (
     <div className="p-6 space-y-6">
@@ -310,7 +330,10 @@ const AdminDashboard = () => {
           )}
           <Grid container spacing={3}>
             {kpiCards.map((card) => {
-              const config = KPI_CONFIG[card.id] || { icon: <Shield size={24} />, color: 'rgb(109, 40, 217)' };
+              const config = KPI_CONFIG[card.id] || {
+                icon: <Shield size={24} />,
+                color: 'rgb(109, 40, 217)',
+              };
               const value =
                 typeof card.value === 'number'
                   ? card.value.toLocaleString('es-ES')
@@ -333,7 +356,9 @@ const AdminDashboard = () => {
                             </Typography>
                           )}
                         </Box>
-                        <Avatar sx={{ bgcolor: config.color, width: 56, height: 56 }}>{config.icon}</Avatar>
+                        <Avatar sx={{ bgcolor: config.color, width: 56, height: 56 }}>
+                          {config.icon}
+                        </Avatar>
                       </Box>
                     </CardContent>
                   </Card>
@@ -366,7 +391,9 @@ const AdminDashboard = () => {
                         {service.note ? (
                           <Typography
                             variant="caption"
-                            color={service.status === 'operational' ? 'textSecondary' : 'error.main'}
+                            color={
+                              service.status === 'operational' ? 'textSecondary' : 'error.main'
+                            }
                           >
                             {service.note}
                           </Typography>
@@ -374,7 +401,13 @@ const AdminDashboard = () => {
                       </Box>
                       <Chip
                         size="small"
-                        label={service.status === 'operational' ? 'Operativo' : service.status === 'down' ? 'Caído' : 'Degradado'}
+                        label={
+                          service.status === 'operational'
+                            ? 'Operativo'
+                            : service.status === 'down'
+                              ? 'Caído'
+                              : 'Degradado'
+                        }
                         color={STATUS_COLOR[service.status] || 'default'}
                       />
                     </Box>
@@ -425,7 +458,9 @@ const AdminDashboard = () => {
                           onClick={() => handleResolveAlert(alert.id)}
                           disabled={resolvingAlertId === alert.id}
                         >
-                          {resolvingAlertId === alert.id ? 'Resolviendo…' : 'Marcar resuelta'}
+                          {resolvingAlertId === alert.id
+                            ? t('common.admin.alerts.resolving', 'Resolviendo…')
+                            : t('common.admin.alerts.resolveAction', 'Marcar resuelta')}
                         </Button>
                       ) : (
                         <Chip size="small" label="Resuelta" color="success" variant="outlined" />
@@ -448,10 +483,7 @@ const AdminDashboard = () => {
           {Array.isArray(newTasks) && newTasks.length > 0 ? (
             <Box className="space-y-3">
               {newTasks.map((task) => (
-                <Box
-                  key={task.key}
-                  className="rounded border border-soft px-3 py-2"
-                >
+                <Box key={task.key} className="rounded border border-soft px-3 py-2">
                   <Box className="flex items-start justify-between gap-4">
                     <Box>
                       <Typography variant="subtitle1" className="font-semibold">
@@ -509,7 +541,9 @@ const AdminDashboard = () => {
                   Coste IA estimado (mes)
                 </Typography>
                 <Typography variant="h5">
-                  {totalIaCost ? totalIaCost.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' }) : '—'}
+                  {totalIaCost
+                    ? totalIaCost.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })
+                    : '—'}
                 </Typography>
               </Box>
             </Grid>
@@ -539,7 +573,10 @@ const AdminDashboard = () => {
       <Grid container spacing={3}>
         <Grid size={{ xs: 12, md: 6, xl: 3 }}>
           <Card className="h-full" data-testid="admin-metrics-storage-card">
-            <CardHeader title="Uso de almacenamiento" subheader={`Fuente: ${formatSourceLabel(storageMetrics.source)}`} />
+            <CardHeader
+              title="Uso de almacenamiento"
+              subheader={`Fuente: ${formatSourceLabel(storageMetrics.source)}`}
+            />
             <CardContent>
               <Box className="grid grid-cols-2 gap-3">
                 <Box>
@@ -573,7 +610,10 @@ const AdminDashboard = () => {
 
         <Grid size={{ xs: 12, md: 6, xl: 3 }}>
           <Card className="h-full" data-testid="admin-metrics-downloads-card">
-            <CardHeader title="Descargas" subheader={`Fuente: ${formatSourceLabel(downloadMetrics.source)}`} />
+            <CardHeader
+              title="Descargas"
+              subheader={`Fuente: ${formatSourceLabel(downloadMetrics.source)}`}
+            />
             <CardContent>
               <Box className="space-y-3">
                 <Box>
@@ -602,7 +642,10 @@ const AdminDashboard = () => {
 
         <Grid size={{ xs: 12, md: 6, xl: 3 }}>
           <Card className="h-full" data-testid="admin-metrics-traffic-card">
-            <CardHeader title="Trafico web" subheader={`Fuente: ${formatSourceLabel(trafficMetrics.source)}`} />
+            <CardHeader
+              title="Trafico web"
+              subheader={`Fuente: ${formatSourceLabel(trafficMetrics.source)}`}
+            />
             <CardContent>
               <Box className="space-y-3">
                 <Box>
@@ -629,7 +672,11 @@ const AdminDashboard = () => {
                     {formatPercent(visitsToUsersRatio)}
                   </Typography>
                 </Box>
-                <Typography variant="caption" color="textSecondary" data-testid="admin-metrics-traffic-since">
+                <Typography
+                  variant="caption"
+                  color="textSecondary"
+                  data-testid="admin-metrics-traffic-since"
+                >
                   Periodo desde {formatSinceDate(trafficMetrics.since)}
                 </Typography>
               </Box>
@@ -639,7 +686,10 @@ const AdminDashboard = () => {
 
         <Grid size={{ xs: 12, md: 6, xl: 3 }}>
           <Card className="h-full" data-testid="admin-metrics-usergrowth-card">
-            <CardHeader title="Crecimiento usuarios" subheader={`Fuente: ${formatSourceLabel(userGrowthMetrics.source)}`} />
+            <CardHeader
+              title="Crecimiento usuarios"
+              subheader={`Fuente: ${formatSourceLabel(userGrowthMetrics.source)}`}
+            />
             <CardContent>
               <Box className="grid grid-cols-2 gap-3">
                 <Box>
@@ -759,3 +809,7 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
+const formatSinceDate = (value) => {
+  if (!value) return t('common.admin.dashboard.noData', 'sin datos');
+  return formatDate(value, 'short');
+};

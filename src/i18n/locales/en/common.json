@@ -3212,9 +3212,20 @@
       "exported": "✅ Portfolio exported: {{total}} weddings",
       "exportError": "Error exporting portfolio: {{message}}"
     },
+    "dashboard": {
+      "errors": {
+        "overview": "We couldn't load the admin overview."
+      },
+      "noData": "no data"
+    },
     "support": {
       "responseSuccess": "Response sent successfully",
       "responseError": "Error sending response: {{message}}"
+    },
+    "alerts": {
+      "resolveError": "Could not mark the alert as resolved.",
+      "resolveAction": "Mark as resolved",
+      "resolving": "Resolving…"
     }
   },
   "weddings": {

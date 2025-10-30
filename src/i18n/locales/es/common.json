@@ -5654,12 +5654,20 @@
       "exported": "âœ… Portfolio exportado: {{total}} bodas",
       "exportError": "Error al exportar portfolio: {{message}}"
     },
-  "support": {
-    "responseSuccess": "Respuesta enviada exitosamente",
-    "responseError": "Error al enviar la respuesta: {{message}}"
-  },
-  "alerts": {
-    "resolveError": "No se pudo marcar la alerta como resuelta."
+    "dashboard": {
+      "errors": {
+        "overview": "No se pudo cargar el resumen administrativo."
+      },
+      "noData": "sin datos"
+    },
+    "support": {
+      "responseSuccess": "Respuesta enviada exitosamente",
+      "responseError": "Error al enviar la respuesta: {{message}}"
+    },
+    "alerts": {
+      "resolveError": "No se pudo marcar la alerta como resuelta.",
+      "resolveAction": "Marcar resuelta",
+      "resolving": "Resolviendo…"
     }
   },
   "weddings": {

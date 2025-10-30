@@ -2011,32 +2011,32 @@
         "automated": "L'IA a appliqué ces filtres automatiquement. Cliquez sur modifier pour les ajuster."
       }
     },
-      "favorites": {
-        "button": {
-          "save": "Enregistrer",
-          "saved": "Enregistré"
-        }
+    "favorites": {
+      "button": {
+        "save": "Enregistrer",
+        "saved": "Enregistré"
+      }
+    },
+    "selectFavorites": {
+      "subtitle": "Choisissez l'un de vos favoris",
+      "empty": {
+        "title": "Vous n'avez pas de favoris dans cette catégorie",
+        "description": "Recherchez des prestataires et ajoutez-les aux favoris avec le bouton ❤️",
+        "cta": "Chercher des prestataires"
       },
-      "selectFavorites": {
-        "subtitle": "Choisissez l'un de vos favoris",
-        "empty": {
-          "title": "Vous n'avez pas de favoris dans cette catégorie",
-          "description": "Recherchez des prestataires et ajoutez-les aux favoris avec le bouton ❤️",
-          "cta": "Chercher des prestataires"
-        },
-        "assign": {
-          "action": "Assigner",
-          "loading": "Assignation..."
-        },
-        "toast": {
-          "assigned": "{{name}} assigné avec succès",
-          "error": "Impossible d'assigner le prestataire"
-        },
-        "footer": {
-          "more": "Chercher d'autres prestataires"
-        },
-        "notes": "\"{{note}}\""
+      "assign": {
+        "action": "Assigner",
+        "loading": "Assignation..."
       },
+      "toast": {
+        "assigned": "{{name}} assigné avec succès",
+        "error": "Impossible d'assigner le prestataire"
+      },
+      "footer": {
+        "more": "Chercher d'autres prestataires"
+      },
+      "notes": "\"{{note}}\""
+    },
     "detail": {
       "sections": {
         "about": "À propos de {{name}}",
@@ -3395,9 +3395,20 @@
       "exported": "✅ Portfolio exporté : {{total}} mariages",
       "exportError": "Erreur lors de l'exportation du portfolio : {{message}}"
     },
+    "dashboard": {
+      "errors": {
+        "overview": "Impossible de charger le résumé administratif."
+      },
+      "noData": "sans données"
+    },
     "support": {
       "responseSuccess": "Réponse envoyée avec succès",
       "responseError": "Erreur lors de l'envoi de la réponse : {{message}}"
+    },
+    "alerts": {
+      "resolveError": "Impossible de marquer l'alerte comme résolue.",
+      "resolveAction": "Marquer comme résolue",
+      "resolving": "Résolution en cours…"
     }
   },
   "weddings": {

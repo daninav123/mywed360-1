@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import PageWrapper from '../components/PageWrapper';
@@ -113,126 +114,145 @@ const BlogAuthor = () => {
   }, [author]);
 
   return (
-    <PageWrapper
-      title={author ? author.name : t('common.blog.author.pageTitle', { defaultValue: 'Autor del blog' })}
-      className="max-w-5xl mx-auto"
-    >
-      <div className="mb-6">
-        <Link
-          to="/blog"
-          className="text-sm text-[var(--color-primary,#6366f1)] hover:text-[var(--color-primary-dark,#4f46e5)]"
-        >
-          ← {t('common.blog.author.backToBlog', { defaultValue: 'Volver al blog' })}
-        </Link>
-      </div>
-
-      {!author ? (
-        <div className="rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
-          {t(error || 'common.blog.author.errors.notFound', {
-            defaultValue: 'No encontramos a esta persona en nuestro equipo editorial.',
-          })}
+    <>
+      <Helmet>
+        <title>{pageTitle}</title>
+        <meta name="description" content={metaDescription} />
+        <link rel="canonical" href={canonicalHref} />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={metaDescription} />
+        <meta property="og:url" content={canonicalHref} />
+        <meta property="og:type" content="profile" />
+        {authorAvatar ? <meta property="og:image" content={authorAvatar} /> : null}
+      </Helmet>
+      <PageWrapper
+        title={
+          author
+            ? author.name
+            : t('common.blog.author.pageTitle', { defaultValue: 'Autor del blog' })
+        }
+        className="max-w-5xl mx-auto"
+      >
+        <div className="mb-6">
+          <Link
+            to="/blog"
+            className="text-sm text-[var(--color-primary,#6366f1)] hover:text-[var(--color-primary-dark,#4f46e5)]"
+          >
+            ← {t('common.blog.author.backToBlog', { defaultValue: 'Volver al blog' })}
+          </Link>
         </div>
-      ) : (
-        <>
-          <header className="flex flex-col gap-4 rounded-2xl border border-soft bg-white p-6 shadow-sm md:flex-row md:items-center">
-            <div className="flex-shrink-0">
-              <div className="h-24 w-24 overflow-hidden rounded-full border border-soft bg-gradient-to-br from-indigo-200 to-pink-200">
-                {author.avatar ? (
-                  <img
-                    src={author.avatar}
-                    alt={author.name}
-                    className="h-full w-full object-cover"
-                    loading="lazy"
-                  />
+
+        {!author ? (
+          <div className="rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+            {t(error || 'common.blog.author.errors.notFound', {
+              defaultValue: 'No encontramos a esta persona en nuestro equipo editorial.',
+            })}
+          </div>
+        ) : (
+          <>
+            <header className="flex flex-col gap-4 rounded-2xl border border-soft bg-white p-6 shadow-sm md:flex-row md:items-center">
+              <div className="flex-shrink-0">
+                <div className="h-24 w-24 overflow-hidden rounded-full border border-soft bg-gradient-to-br from-indigo-200 to-pink-200">
+                  {authorAvatar ? (
+                    <img
+                      src={authorAvatar}
+                      alt={author.name}
+                      className="h-full w-full object-cover"
+                      loading="lazy"
+                    />
+                  ) : null}
+                </div>
+              </div>
+              <div className="flex-1 space-y-2">
+                <div>
+                  <p className="text-sm uppercase tracking-widest text-[var(--color-primary,#6366f1)]">
+                    {t('common.blog.author.badge', { defaultValue: 'Equipo editorial Lovenda' })}
+                  </p>
+                  <h1 className="text-2xl font-semibold text-gray-900">{author.name}</h1>
+                  {author.title ? (
+                    <p className="text-sm font-medium text-gray-600">{author.title}</p>
+                  ) : null}
+                </div>
+                {author.signature ? (
+                  <p className="text-sm italic text-gray-600">{author.signature}</p>
+                ) : null}
+                {author.bio ? <p className="text-base text-gray-700">{author.bio}</p> : null}
+                {author.social && Object.keys(author.social).length ? (
+                  <div className="flex flex-wrap gap-3 text-sm text-[var(--color-primary,#6366f1)]">
+                    {Object.entries(author.social).map(([network, url]) => (
+                      <a
+                        key={network}
+                        href={url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="hover:text-[var(--color-primary-dark,#4f46e5)]"
+                      >
+                        {t(`common.blog.author.social.${network}`, { defaultValue: network })}
+                      </a>
+                    ))}
+                  </div>
                 ) : null}
               </div>
-            </div>
-            <div className="flex-1 space-y-2">
-              <div>
-                <p className="text-sm uppercase tracking-widest text-[var(--color-primary,#6366f1)]">
-                  {t('common.blog.author.badge', { defaultValue: 'Equipo editorial Lovenda' })}
-                </p>
-                <h1 className="text-2xl font-semibold text-gray-900">{author.name}</h1>
-                {author.title ? (
-                  <p className="text-sm font-medium text-gray-600">{author.title}</p>
-                ) : null}
+            </header>
+
+            <section className="mt-10 space-y-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-gray-900">
+                  {t('common.blog.author.latestArticles', { defaultValue: 'Artículos recientes' })}
+                </h2>
+                <span className="text-sm text-gray-500">
+                  {posts.length}{' '}
+                  {posts.length === 1
+                    ? t('common.blog.author.article', { defaultValue: 'artículo' })
+                    : t('common.blog.author.articles', { defaultValue: 'artículos' })}
+                </span>
               </div>
-              {author.signature ? (
-                <p className="text-sm italic text-gray-600">{author.signature}</p>
-              ) : null}
-              {author.bio ? (
-                <p className="text-base text-gray-700">{author.bio}</p>
-              ) : null}
-              {author.social && Object.keys(author.social).length ? (
-                <div className="flex flex-wrap gap-3 text-sm text-[var(--color-primary,#6366f1)]">
-                  {Object.entries(author.social).map(([network, url]) => (
-                    <a
-                      key={network}
-                      href={url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="hover:text-[var(--color-primary-dark,#4f46e5)]"
-                    >
-                      {t(`common.blog.author.social.${network}`, { defaultValue: network })}
-                    </a>
+
+              {loading ? (
+                <div className="flex justify-center py-12">
+                  <Spinner />
+                </div>
+              ) : error ? (
+                <div className="rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+                  {t(error, {
+                    defaultValue:
+                      'No se pudieron cargar los artículos de esta firma. Intenta de nuevo.',
+                  })}
+                </div>
+              ) : (
+                <div className="grid gap-5 md:grid-cols-2">
+                  {posts.map((post) => (
+                    <AuthorPostCard key={post.id} post={post} onOpen={handleOpenPost} />
                   ))}
                 </div>
-              ) : null}
-            </div>
-          </header>
-
-          <section className="mt-10 space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900">
-                {t('common.blog.author.latestArticles', { defaultValue: 'Artículos recientes' })}
-              </h2>
-              <span className="text-sm text-gray-500">
-                {posts.length}{' '}
-                {posts.length === 1
-                  ? t('common.blog.author.article', { defaultValue: 'artículo' })
-                  : t('common.blog.author.articles', { defaultValue: 'artículos' })}
-              </span>
-            </div>
-
-            {loading ? (
-              <div className="flex justify-center py-12">
-                <Spinner />
-              </div>
-            ) : error ? (
-              <div className="rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
-                {t(error, { defaultValue: 'No se pudieron cargar los artículos de esta firma. Intenta de nuevo.' })}
-              </div>
-            ) : (
-              <div className="grid gap-5 md:grid-cols-2">
-                {posts.map((post) => (
-                  <AuthorPostCard key={post.id} post={post} onOpen={handleOpenPost} />
-                ))}
-              </div>
-            )}
-          </section>
-
-          {otherAuthors.length ? (
-            <section className="mt-12 rounded-2xl border border-soft bg-white p-6 shadow-sm">
-              <h3 className="text-base font-semibold text-gray-900">
-                {t('common.blog.author.discoverOthers', { defaultValue: 'Descubre otros autores' })}
-              </h3>
-              <div className="mt-4 grid gap-4 md:grid-cols-3">
-                {otherAuthors.map((profile) => (
-                  <Link
-                    key={profile.id}
-                    to={`/blog/autor/${profile.slug}`}
-                    className="rounded-lg border border-soft bg-surface px-4 py-3 text-sm hover:border-[var(--color-primary,#6366f1)] hover:text-[var(--color-primary,#6366f1)] transition"
-                  >
-                    <p className="font-semibold text-body">{profile.name}</p>
-                    {profile.title ? <p className="text-xs text-muted">{profile.title}</p> : null}
-                  </Link>
-                ))}
-              </div>
+              )}
             </section>
-          ) : null}
-        </>
-      )}
-    </PageWrapper>
+
+            {otherAuthors.length ? (
+              <section className="mt-12 rounded-2xl border border-soft bg-white p-6 shadow-sm">
+                <h3 className="text-base font-semibold text-gray-900">
+                  {t('common.blog.author.discoverOthers', {
+                    defaultValue: 'Descubre otros autores',
+                  })}
+                </h3>
+                <div className="mt-4 grid gap-4 md:grid-cols-3">
+                  {otherAuthors.map((profile) => (
+                    <Link
+                      key={profile.id}
+                      to={`/blog/autor/${profile.slug}`}
+                      className="rounded-lg border border-soft bg-surface px-4 py-3 text-sm hover:border-[var(--color-primary,#6366f1)] hover:text-[var(--color-primary,#6366f1)] transition"
+                    >
+                      <p className="font-semibold text-body">{profile.name}</p>
+                      {profile.title ? <p className="text-xs text-muted">{profile.title}</p> : null}
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            ) : null}
+          </>
+        )}
+      </PageWrapper>
+    </>
   );
 };
 

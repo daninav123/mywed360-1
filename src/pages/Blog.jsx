@@ -14,8 +14,9 @@ const ArticleCard = React.forwardRef(({ post, onOpen, onOpenAuthor, ctaLabel }, 
   const coverUrl = post?.coverImage?.url || post?.coverImage?.placeholder || null;
   const handleAuthorClick = (event) => {
     event.stopPropagation();
-    if (!post?.byline?.slug) return;
-    onOpenAuthor?.(post);
+    const authorSlug = post?.byline?.slug || post?.byline?.id;
+    if (!authorSlug) return;
+    onOpenAuthor?.(authorSlug);
   };
 
   return (
@@ -206,9 +207,9 @@ function Blog() {
   );
 
   const handleOpenAuthor = useCallback(
-    (post) => {
-      if (!post?.byline?.slug) return;
-      navigate(`/blog/autor/${post.byline.slug}`);
+    (slugValue) => {
+      if (!slugValue) return;
+      navigate(`/blog/autor/${slugValue}`);
     },
     [navigate]
   );

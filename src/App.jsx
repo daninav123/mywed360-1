@@ -125,6 +125,7 @@ const Ideas = React.lazy(() => import('./pages/Ideas'));
 const Inspiration = React.lazy(() => import('./pages/Inspiration'));
 const Blog = React.lazy(() => import('./pages/Blog'));
 const BlogPost = React.lazy(() => import('./pages/BlogPost.jsx'));
+const BlogAuthor = React.lazy(() => import('./pages/BlogAuthor.jsx'));
 import ProveedoresCompareTest from './pages/test/ProveedoresCompareTest.jsx';
 import ProveedoresSmoke from './pages/test/ProveedoresSmoke.jsx';
 import ProveedoresFlowHarness from './pages/test/ProveedoresFlowHarness.jsx';
@@ -287,6 +288,9 @@ function App() {
                           <Route path="/para-proveedores" element={<ForSuppliers />} />
                           <Route path="/para-planners" element={<ForPlanners />} />
                           <Route path="/partners" element={<Partners />} />
+                          <Route path="/blog" element={<Blog />} />
+                          <Route path="/blog/autor/:slug" element={<BlogAuthor />} />
+                          <Route path="/blog/:slug" element={<BlogPost />} />
                           <Route path="/payment/success" element={<PaymentSuccess />} />
                           <Route path="/payment/cancel" element={<PaymentCancel />} />
                           <Route path="/login" element={<Login />} />
@@ -472,6 +476,7 @@ function App() {
                               <Route path="ideas" element={<Ideas />} />
                               <Route path="inspiracion" element={<Inspiration />} />
                               <Route path="blog" element={<Blog />} />
+                              <Route path="blog/autor/:slug" element={<BlogAuthor />} />
                               <Route path="blog/:slug" element={<BlogPost />} />
                               <Route path="momentos" element={<Momentos />} />
                               <Route path="more" element={<More />} />

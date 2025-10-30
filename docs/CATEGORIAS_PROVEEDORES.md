@@ -400,9 +400,76 @@ const topCategories = [
 
 ---
 
+## 🗄️ **Almacenamiento en Firestore**
+
+Las categorías se sincronizan automáticamente en Firestore para mantener una fuente de verdad centralizada.
+
+### **Ubicación en Firestore:**
+
+```
+Collection: suppliers
+Document: config
+Fields:
+  - categories: Array[23] - Lista completa de categorías
+  - categoriesById: Object - Índice por ID para búsquedas rápidas
+  - version: String - Versión del schema
+  - totalCategories: Number - Total de categorías
+  - lastSync: String - Fecha de última sincronización
+```
+
+### **Sincronizar categorías:**
+
+```bash
+npm run sync:categories
+```
+
+Este comando ejecuta `scripts/syncCategoriesToFirestore.js` que:
+
+1. Lee las categorías de `shared/supplierCategories.js`
+2. Las guarda en `suppliers/config` en Firestore
+3. Crea un índice por ID para búsquedas rápidas
+4. Registra la fecha de sincronización
+
+### **Ejemplo de documento en Firestore:**
+
+```javascript
+suppliers/config
+{
+  categories: [
+    {
+      id: 'fotografia',
+      name: 'Fotografía',
+      nameEn: 'Photography',
+      icon: 'camera',
+      description: 'Fotógrafos profesionales de bodas',
+      googlePlacesType: 'photographer',
+      keywords: ['fotografia', 'fotografo', 'photo', 'photography'],
+      coverage: 'medium'
+    },
+    // ... 22 más
+  ],
+  categoriesById: {
+    fotografia: {
+      name: 'Fotografía',
+      nameEn: 'Photography',
+      icon: 'camera',
+      description: 'Fotógrafos profesionales de bodas'
+    },
+    // ... 22 más
+  },
+  version: '1.0',
+  totalCategories: 23,
+  lastSync: '2025-10-30T02:58:00Z',
+  syncedBy: 'syncCategoriesToFirestore script'
+}
+```
+
+---
+
 ## 🔗 **Referencias**
 
 - **Archivo principal:** `shared/supplierCategories.js`
+- **Script de sincronización:** `scripts/syncCategoriesToFirestore.js`
 - **Google Places Service:** `backend/services/googlePlacesService.js`
 - **Documentación ubicaciones:** `docs/GOOGLE_PLACES_SETUP.md`
 
