@@ -117,6 +117,9 @@ export default function WeddingServicesOverview({ onSearch }) {
           >
             <Settings className="h-4 w-4" />
             Gestionar servicios
+            <span className="ml-1 px-2 py-0.5 bg-purple-600 text-white text-xs font-semibold rounded-full">
+              {activeServices.length}
+            </span>
           </Button>
         </div>
         <p className="text-gray-600 mb-4">

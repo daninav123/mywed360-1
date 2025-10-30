@@ -4,20 +4,36 @@ import { useWeddingCategories } from '../../hooks/useWeddingCategories';
 import Button from '../ui/Button';
 import { toast } from 'react-toastify';
 
+import useTranslations from '../../hooks/useTranslations';
 export default function ManageServicesModal({ open, onClose }) {
   const { allCategories, isCategoryActive, toggleCategory, loading } = useWeddingCategories();
   const [toggling, setToggling] = useState(null);
+  const { t } = useTranslations();
 
-  // Debug: Ver qué categorías tenemos
+  // Debug: Ver qué categorías tenemos y cuáles están activas
   React.useEffect(() => {
     if (open) {
       console.log('🎯 ===== ManageServicesModal SE ESTÁ ABRIENDO =====');
-      console.log('🔍 allCategories:', allCategories);
-      console.log('🔍 Total categorías:', allCategories.length);
-      console.log('🔍 URL actual:', window.location.pathname);
+      console.log('📋 Total categorías disponibles:', allCategories.length);
+
+      // Verificar cada categoría
+      const activeStatus = allCategories.map((cat) => ({
+        id: cat.id,
+        name: cat.name,
+        isActive: isCategoryActive(cat.id),
+      }));
+
+      const activeCats = activeStatus.filter((c) => c.isActive);
+      console.log('✅ Servicios ACTIVOS:', activeCats.length);
+      console.log('   ', activeCats.map((c) => c.name).join(', '));
+
+      const inactiveCats = activeStatus.filter((c) => !c.isActive);
+      console.log('❌ Servicios INACTIVOS:', inactiveCats.length);
+      console.log('   ', inactiveCats.map((c) => c.name).join(', '));
+
       console.log('🎯 ===============================================');
     }
-  }, [open, allCategories]);
+  }, [open, allCategories, isCategoryActive]);
 
   if (!open) return null;
 
@@ -30,19 +46,26 @@ export default function ManageServicesModal({ open, onClose }) {
     setToggling(categoryId);
     try {
       await toggleCategory(categoryId);
-      console.log('   ✅ toggleCategory completado');
+      console.log('   âœ… toggleCategory completado');
     } catch (error) {
-      console.error('   ❌ Error en toggleCategory:', error);
-      toast.error('Error al actualizar servicio');
+      console.error('   âŒ Error en toggleCategory:', error);
+      toast.error(
+        t('wedding.manageServices.toast.updateError', {
+          defaultValue: 'Error al actualizar servicio',
+        })
+      );
     } finally {
       setToggling(null);
-      console.log('   🔓 Toggle desbloqueado');
+      console.log('   ðŸ”“ Toggle desbloqueado');
     }
   };
 
   // Agrupar categorías por tipo (principales vs secundarias)
   const mainCategories = allCategories.slice(0, 10);
   const otherCategories = allCategories.slice(10);
+
+  // Contar servicios activos
+  const activeCount = allCategories.filter((cat) => isCategoryActive(cat.id)).length;
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -52,9 +75,16 @@ export default function ManageServicesModal({ open, onClose }) {
           <div className="flex items-center gap-2">
             <Settings className="h-6 w-6 text-purple-600" />
             <div>
-              <h2 className="text-xl font-bold text-gray-900">Gestionar servicios</h2>
+              <h2 className="text-xl font-bold text-gray-900">
+                {t('wedding.manageServices.title', { defaultValue: 'Gestionar servicios' })}
+                <span className="ml-2 text-lg font-normal text-purple-600">
+                  ({activeCount} {activeCount === 1 ? 'seleccionado' : 'seleccionados'})
+                </span>
+              </h2>
               <p className="text-sm text-gray-600">
-                Selecciona los servicios que necesitas para tu boda
+                {t('wedding.manageServices.subtitle', {
+                  defaultValue: 'Selecciona los servicios que necesitas para tu boda',
+                })}
               </p>
             </div>
           </div>
@@ -67,7 +97,9 @@ export default function ManageServicesModal({ open, onClose }) {
         <div className="flex-1 overflow-y-auto p-6">
           {/* Servicios principales */}
           <div className="mb-8">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Servicios principales</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              {t('wedding.manageServices.primaryTitle', { defaultValue: 'Servicios principales' })}
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {mainCategories.map((category) => {
                 const isActive = isCategoryActive(category.id);
@@ -94,11 +126,18 @@ export default function ManageServicesModal({ open, onClose }) {
                       <Circle className="h-6 w-6 text-gray-400 flex-shrink-0" />
                     )}
                     <div className="text-left flex-1">
-                      <p
-                        className={`font-medium ${isActive ? 'text-purple-900' : 'text-gray-900'}`}
-                      >
-                        {category.name}
-                      </p>
+                      <div className="flex items-center gap-2">
+                        <p
+                          className={`font-medium ${isActive ? 'text-purple-900' : 'text-gray-900'}`}
+                        >
+                          {category.name}
+                        </p>
+                        {isActive && (
+                          <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-purple-600 text-white">
+                            ACTIVO
+                          </span>
+                        )}
+                      </div>
                       {category.description && (
                         <p className="text-xs text-gray-500 mt-0.5">{category.description}</p>
                       )}
@@ -111,7 +150,9 @@ export default function ManageServicesModal({ open, onClose }) {
 
           {/* Otros servicios */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Otros servicios</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              {t('wedding.manageServices.otherTitle', { defaultValue: 'Otros servicios' })}
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {otherCategories.map((category) => {
                 const isActive = isCategoryActive(category.id);
@@ -137,9 +178,18 @@ export default function ManageServicesModal({ open, onClose }) {
                     ) : (
                       <Circle className="h-5 w-5 text-gray-400 flex-shrink-0" />
                     )}
-                    <p className={`font-medium ${isActive ? 'text-purple-900' : 'text-gray-700'}`}>
-                      {category.name}
-                    </p>
+                    <div className="flex items-center gap-2 flex-1">
+                      <p
+                        className={`font-medium ${isActive ? 'text-purple-900' : 'text-gray-700'}`}
+                      >
+                        {category.name}
+                      </p>
+                      {isActive && (
+                        <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-purple-600 text-white">
+                          ACTIVO
+                        </span>
+                      )}
+                    </div>
                   </button>
                 );
               })}
@@ -149,8 +199,11 @@ export default function ManageServicesModal({ open, onClose }) {
           {/* Info */}
           <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
             <p className="text-sm text-blue-800">
-              <strong>💡 Tip:</strong> Los servicios seleccionados aparecerán como tarjetas en tu
-              dashboard. También se añaden automáticamente cuando guardas un proveedor en favoritos.
+              <strong>ðŸ’¡ Tip:</strong>{' '}
+              {t('wedding.manageServices.tip', {
+                defaultValue:
+                  'Los servicios seleccionados aparecerán como tarjetas en tu dashboard. También se añaden automáticamente cuando guardas un proveedor en favoritos.',
+              })}
             </p>
           </div>
         </div>
@@ -158,7 +211,7 @@ export default function ManageServicesModal({ open, onClose }) {
         {/* Footer */}
         <div className="p-6 border-t border-gray-200 bg-gray-50">
           <Button onClick={onClose} className="w-full">
-            Guardar y cerrar
+            {t('wedding.manageServices.saveAndClose', { defaultValue: 'Guardar y cerrar' })}
           </Button>
         </div>
       </div>
