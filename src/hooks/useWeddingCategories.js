@@ -5,7 +5,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { doc, updateDoc, getDoc } from 'firebase/firestore';
+import { doc, updateDoc, getDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import { useAuth } from './useAuth';
 import { useWedding } from '../context/WeddingContext';
@@ -30,32 +30,51 @@ export function useWeddingCategories() {
     'tarta',
   ];
 
-  // Cargar categorías activas de la boda
-  const loadActiveCategories = useCallback(async () => {
+  // ⚡ OPTIMIZACIÓN: Usar onSnapshot para actualización en tiempo real
+  // Esto permite que las tarjetas se actualicen instantáneamente sin recargar
+  useEffect(() => {
     if (!user?.uid || !activeWedding) {
       setLoading(false);
+      setActiveCategories(DEFAULT_CATEGORIES);
       return;
     }
 
-    try {
-      setLoading(true);
-      const weddingRef = doc(db, 'users', user.uid, 'weddings', activeWedding);
-      const weddingDoc = await getDoc(weddingRef);
+    console.log('🔄 [useWeddingCategories] Iniciando listener en tiempo real...');
+    setLoading(true);
 
-      if (weddingDoc.exists()) {
-        const data = weddingDoc.data();
-        // Si no tiene categorías, usar defaults
-        const categories = data.activeCategories || DEFAULT_CATEGORIES;
-        setActiveCategories(categories);
-      } else {
+    const weddingRef = doc(db, 'users', user.uid, 'weddings', activeWedding);
+
+    // ✅ LISTENER EN TIEMPO REAL: Se actualiza automáticamente cuando cambia Firestore
+    const unsubscribe = onSnapshot(
+      weddingRef,
+      (snapshot) => {
+        console.log('📡 [useWeddingCategories] Snapshot recibido');
+
+        if (snapshot.exists()) {
+          const data = snapshot.data();
+          const categories = data.activeCategories || DEFAULT_CATEGORIES;
+
+          console.log('   ✅ Categorías actualizadas:', categories);
+          setActiveCategories(categories);
+        } else {
+          console.log('   ⚠️ Documento no existe, usando defaults');
+          setActiveCategories(DEFAULT_CATEGORIES);
+        }
+
+        setLoading(false);
+      },
+      (error) => {
+        console.error('❌ [useWeddingCategories] Error en snapshot:', error);
         setActiveCategories(DEFAULT_CATEGORIES);
+        setLoading(false);
       }
-    } catch (error) {
-      console.error('Error loading active categories:', error);
-      setActiveCategories(DEFAULT_CATEGORIES);
-    } finally {
-      setLoading(false);
-    }
+    );
+
+    // Cleanup: Desuscribirse cuando el componente se desmonte o cambien las dependencias
+    return () => {
+      console.log('🔌 [useWeddingCategories] Deteniendo listener...');
+      unsubscribe();
+    };
   }, [user?.uid, activeWedding]);
 
   // Actualizar categorías activas
@@ -141,10 +160,6 @@ export function useWeddingCategories() {
     },
     [activeCategories]
   );
-
-  useEffect(() => {
-    loadActiveCategories();
-  }, [loadActiveCategories]);
 
   return {
     activeCategories,
