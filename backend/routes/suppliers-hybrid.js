@@ -58,6 +58,42 @@ const normalizeText = (value = '') =>
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '');
 
+/**
+ * Mapea la categoría del supplier a una categoría válida del sistema
+ * Prioridad: category > service > tags > "otros"
+ */
+const mapSupplierCategory = (supplier, searchService) => {
+  // 1. Intentar con el campo category del supplier
+  const supplierCategory = supplier.category || supplier.profile?.category;
+  if (supplierCategory) {
+    const found = findCategoryByKeyword(supplierCategory);
+    if (found) return found.id;
+  }
+
+  // 2. Intentar con el service del supplier
+  const supplierService = supplier.service || supplier.business?.primaryService;
+  if (supplierService) {
+    const found = findCategoryByKeyword(supplierService);
+    if (found) return found.id;
+  }
+
+  // 3. Intentar con los tags del supplier
+  const tags = supplier.tags || supplier.business?.services || [];
+  for (const tag of tags) {
+    const found = findCategoryByKeyword(tag);
+    if (found) return found.id;
+  }
+
+  // 4. Si no encuentra nada, usar el servicio buscado
+  if (searchService) {
+    const found = findCategoryByKeyword(searchService);
+    if (found) return found.id;
+  }
+
+  // 5. Fallback: "otros"
+  return 'otros';
+};
+
 // ⭐ NUEVA: Función para extraer email del contenido
 const extractEmail = (text = '') => {
   if (!text) return null;
@@ -1195,7 +1231,23 @@ router.post('/search', async (req, res) => {
       );
     }
 
-    // ===== 5. RESPONDER =====
+    // ===== 5. MAPEAR CATEGORÍAS =====
+    // ⭐ CRÍTICO: Asegurar que TODOS los suppliers tengan category correcta
+    const suppliersWithCategory = allResults.map((supplier) => ({
+      ...supplier,
+      category: mapSupplierCategory(supplier, service),
+    }));
+
+    console.log(
+      `\n✅ [CATEGORY] Categorías mapeadas para ${suppliersWithCategory.length} proveedores`
+    );
+    if (process.env.DEBUG_SUPPLIERS === 'true') {
+      suppliersWithCategory.slice(0, 3).forEach((s, idx) => {
+        console.log(`  [${idx}] ${s.name} → category: "${s.category}"`);
+      });
+    }
+
+    // ===== 6. RESPONDER =====
     const cachedCount =
       trueRegistered.length >= MIN_RESULTS
         ? 0
@@ -1215,13 +1267,13 @@ router.post('/search', async (req, res) => {
 
     res.json({
       success: true,
-      count: allResults.length,
+      count: suppliersWithCategory.length,
       breakdown: {
         registered: trueRegistered.length,
         cached: cachedCount,
         googlePlaces: googlePlacesResults.length,
         tavily: internetResults.length,
-        total: allResults.length,
+        total: suppliersWithCategory.length,
       },
       searchMode: searchMode, // Modo de búsqueda usado
       source: finalSource,
@@ -1229,7 +1281,7 @@ router.post('/search', async (req, res) => {
       showingInternetComplement: trueRegistered.length > 0 && trueRegistered.length < MIN_RESULTS,
       usedGooglePlaces: usedGooglePlaces,
       usedTavily: usedTavily,
-      suppliers: allResults,
+      suppliers: suppliersWithCategory, // ⭐ CON CATEGORÍAS MAPEADAS
     });
   } catch (error) {
     console.error('❌ [HYBRID-SEARCH] Error:', error);
