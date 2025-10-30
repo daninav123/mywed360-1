@@ -59,11 +59,7 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
     followUpMethodKey && lastContact?.method
       ? t(followUpMethodKey, { method: lastContact.method })
       : null;
-  if (
-    followUpMethodLabel &&
-    followUpMethodLabel === followUpMethodKey &&
-    lastContact?.method
-  ) {
+  if (followUpMethodLabel && followUpMethodLabel === followUpMethodKey && lastContact?.method) {
     followUpMethodLabel = t('common.suppliers.card.hybrid.followUp.methods.other', {
       method: lastContact.method,
     });
@@ -155,6 +151,12 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
 
     setIsFavoriting(true);
     try {
+      console.log('🔍 [SupplierCard] Guardando favorito con:', {
+        name: supplier.name,
+        category: supplier.category,
+        service: supplier.service,
+        fullSupplier: supplier,
+      });
       await toggleFavorite(supplier);
 
       if (isFav) {
@@ -197,7 +199,9 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(`${shareText}\n\n${shareUrl}`)}`;
     window.open(whatsappUrl, '_blank');
 
-    toast.success(t('common.suppliers.card.hybrid.share.toast', 'Abriendo WhatsApp para compartir'));
+    toast.success(
+      t('common.suppliers.card.hybrid.share.toast', 'Abriendo WhatsApp para compartir')
+    );
   };
 
   return (

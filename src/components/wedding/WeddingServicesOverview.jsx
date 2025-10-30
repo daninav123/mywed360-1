@@ -17,7 +17,11 @@ import Button from '../ui/Button';
 export default function WeddingServicesOverview({ onSearch }) {
   const { providers } = useProveedores();
   const { shortlist } = useSupplierShortlist();
-  const { getActiveCategoriesDetails, loading: loadingCategories } = useWeddingCategories();
+  const {
+    getActiveCategoriesDetails,
+    activeCategories,
+    loading: loadingCategories,
+  } = useWeddingCategories();
   const [showManageModal, setShowManageModal] = useState(false);
 
   // Obtener servicios activos de la boda (personalizados por el owner)
@@ -27,7 +31,7 @@ export default function WeddingServicesOverview({ onSearch }) {
       name: cat.name,
       priority: index + 1,
     }));
-  }, [getActiveCategoriesDetails]);
+  }, [getActiveCategoriesDetails, activeCategories]);
 
   // Agrupar proveedores confirmados por servicio
   const confirmedByService = useMemo(() => {

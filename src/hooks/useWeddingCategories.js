@@ -107,11 +107,11 @@ export function useWeddingCategories() {
   };
 
   // Obtener detalles de categorías activas
-  const getActiveCategoriesDetails = () => {
+  const getActiveCategoriesDetails = useCallback(() => {
     return activeCategories
       .map((id) => SUPPLIER_CATEGORIES.find((cat) => cat.id === id))
       .filter(Boolean); // Filtrar undefined
-  };
+  }, [activeCategories]);
 
   // Verificar si una categoría está activa
   const isCategoryActive = (categoryId) => {
