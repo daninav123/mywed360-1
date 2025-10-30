@@ -172,7 +172,8 @@ export function useWeddingServices() {
   // Cargar servicios cuando cambia el usuario o la boda
   useEffect(() => {
     loadServices();
-  }, [user, activeWedding]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.uid, activeWedding]); // Solo uid para evitar loops
 
   return {
     services,
