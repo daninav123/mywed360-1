@@ -1,7 +1,7 @@
 // components/wedding/WeddingServiceCard.jsx
 // Tarjeta de servicio que muestra el proveedor confirmado o estado pendiente
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   CheckCircle,
   Search,
@@ -45,6 +45,17 @@ export default function WeddingServiceCard({
   // Filtrar favoritos por categoría del servicio (usar ID directo)
   const serviceFavorites = favorites.filter((fav) => fav.supplier?.category === categoryId);
   const hasFavorites = serviceFavorites.length > 0;
+
+  // Debug: ver qué está pasando
+  useEffect(() => {
+    console.log('🔍 WeddingServiceCard Debug:', {
+      categoryId,
+      displayName,
+      totalFavorites: favorites.length,
+      serviceFavorites: serviceFavorites.length,
+      favoritesCategories: favorites.map((f) => f.supplier?.category),
+    });
+  }, [categoryId, displayName, favorites, serviceFavorites]);
 
   // Función para asignar proveedor
   const handleAssign = async (supplier) => {

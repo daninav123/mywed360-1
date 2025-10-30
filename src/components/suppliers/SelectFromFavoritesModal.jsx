@@ -3,6 +3,7 @@ import { X, Heart, Star, MapPin, CheckCircle, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../ui/Button';
 import { toast } from 'react-toastify';
+import useTranslations from '../../hooks/useTranslations';
 
 export default function SelectFromFavoritesModal({
   open,
@@ -14,6 +15,7 @@ export default function SelectFromFavoritesModal({
   const [loading, setLoading] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState(null);
   const navigate = useNavigate();
+  const { t } = useTranslations();
 
   if (!open) return null;
 
@@ -23,10 +25,17 @@ export default function SelectFromFavoritesModal({
 
     try {
       await onAssign(supplier);
-      toast.success(`${supplier.name} asignado correctamente`);
+      toast.success(
+        t('common.suppliers.selectFavorites.toast.assigned', {
+          name: supplier.name || t('common.suppliers.card.hybrid.defaults.name', 'Proveedor'),
+        })
+      );
       onClose();
     } catch (error) {
-      toast.error(error.message || 'Error al asignar proveedor');
+      toast.error(
+        error?.message ||
+          t('common.suppliers.selectFavorites.toast.error', 'Error al asignar proveedor')
+      );
       console.error(error);
     } finally {
       setLoading(false);
@@ -43,7 +52,9 @@ export default function SelectFromFavoritesModal({
             <Heart className="h-6 w-6 text-red-500" fill="currentColor" />
             <div>
               <h2 className="text-xl font-bold text-gray-900">{serviceName}</h2>
-              <p className="text-sm text-gray-600">Elige uno de tus favoritos</p>
+              <p className="text-sm text-gray-600">
+                {t('common.suppliers.selectFavorites.subtitle', 'Elige uno de tus favoritos')}
+              </p>
             </div>
           </div>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
@@ -58,10 +69,16 @@ export default function SelectFromFavoritesModal({
             <div className="text-center py-12">
               <Heart className="h-16 w-16 text-gray-300 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                No tienes favoritos en esta categoría
+                {t(
+                  'common.suppliers.selectFavorites.empty.title',
+                  'No tienes favoritos en esta categoría'
+                )}
               </h3>
               <p className="text-gray-600 mb-6">
-                Busca proveedores y guárdalos en favoritos con el botón ❤️
+                {t(
+                  'common.suppliers.selectFavorites.empty.description',
+                  'Busca proveedores y guárdalos en favoritos con el botón ❤️'
+                )}
               </p>
               <Button
                 onClick={() => {
@@ -70,7 +87,7 @@ export default function SelectFromFavoritesModal({
                 }}
               >
                 <Search className="h-4 w-4 mr-2" />
-                Buscar proveedores
+                {t('common.suppliers.selectFavorites.empty.cta', 'Buscar proveedores')}
               </Button>
             </div>
           ) : (
@@ -128,7 +145,11 @@ export default function SelectFromFavoritesModal({
 
                         {/* Notes */}
                         {favorite.notes && (
-                          <p className="text-sm text-gray-600 italic mt-2">"{favorite.notes}"</p>
+                          <p className="text-sm text-gray-600 italic mt-2">
+                            {t('common.suppliers.selectFavorites.notes', {
+                              note: favorite.notes,
+                            })}
+                          </p>
                         )}
                       </div>
 
@@ -142,12 +163,12 @@ export default function SelectFromFavoritesModal({
                         {isLoading ? (
                           <>
                             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                            Asignando...
+                            {t('common.suppliers.selectFavorites.assign.loading', 'Asignando...')}
                           </>
                         ) : (
                           <>
                             <CheckCircle className="h-4 w-4 mr-2" />
-                            Asignar
+                            {t('common.suppliers.selectFavorites.assign.action', 'Asignar')}
                           </>
                         )}
                       </Button>
@@ -171,7 +192,7 @@ export default function SelectFromFavoritesModal({
               className="w-full"
             >
               <Search className="h-4 w-4 mr-2" />
-              Buscar más proveedores
+              {t('common.suppliers.selectFavorites.footer.more', 'Buscar más proveedores')}
             </Button>
           </div>
         )}
