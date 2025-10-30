@@ -825,24 +825,6 @@ const Proveedores = () => {
           <FavoritesSection />
         ) : (
           <>
-            {/* Servicios de tu boda - Vista general con progreso */}
-            <div className="mb-6">
-              <WeddingServicesOverview
-                onSearch={(service) => {
-                  // Cuando se hace click en "Buscar proveedores" de un servicio
-                  setSearchInput(service);
-                  setSearchPanelCollapsed(false);
-                  // Scroll al panel de búsqueda
-                  setTimeout(() => {
-                    document.querySelector('[data-search-panel]')?.scrollIntoView({
-                      behavior: 'smooth',
-                      block: 'start',
-                    });
-                  }, 100);
-                }}
-              />
-            </div>
-
             {!searchPanelCollapsed ? (
               <Card
                 data-search-panel
@@ -1185,93 +1167,23 @@ const Proveedores = () => {
               </div>
             )}
 
-            <section className="space-y-5">
-              <Card className="p-4 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-[var(--color-primary)]/10">
-                    <Users className="w-5 h-5 text-[color:var(--color-primary)]" />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-bold text-body">
-                      {t('common.suppliers.overview.services.title')}
-                    </h2>
-                    <p className="text-sm text-muted">
-                      {servicesSummary.services} · {servicesSummary.confirmed} ·{' '}
-                      {servicesSummary.pending}
-                    </p>
-                  </div>
-                </div>
-              </Card>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                {serviceCards.map((card) => {
-                  const isPending = !card.confirmed;
-                  const borderColor = isPending
-                    ? 'border-[var(--color-warning)]/40'
-                    : 'border-[var(--color-success)]/40';
-                  const gradientFrom = isPending
-                    ? 'from-[var(--color-warning)]/10'
-                    : 'from-[var(--color-success)]/10';
-                  const shortlistLabel = t('common.suppliers.overview.services.shortlistCount', {
-                    count: card.shortlist.length,
-                  });
-                  const statusLabel = isPending
-                    ? t('common.suppliers.overview.status.pending')
-                    : t('common.suppliers.overview.status.confirmed');
-                  const confirmedStatusLabel =
-                    card.confirmed?.status || t('common.suppliers.overview.status.confirmed');
-
-                  return (
-                    <Card
-                      key={card.key}
-                      className={`relative overflow-hidden border-2 ${borderColor} bg-gradient-to-br ${gradientFrom} to-transparent backdrop-blur-sm transition-all duration-300 ${isPending ? 'cursor-pointer hover:shadow-lg hover:scale-[1.02] hover:border-[var(--color-warning)]/60' : 'shadow-md'}`}
-                      onClick={() => {
-                        if (isPending) handleOpenServiceModal(card);
-                      }}
-                    >
-                      <div className="space-y-3">
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex-1">
-                            <h3 className="text-lg font-bold text-body mb-1">{card.label}</h3>
-                            {isPending && card.shortlist.length > 0 && (
-                              <p className="text-xs text-muted flex items-center gap-1">
-                                <Sparkles size={12} />
-                                {shortlistLabel}
-                              </p>
-                            )}
-                          </div>
-                          <span
-                            className={`inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full ${isPending ? 'bg-[var(--color-warning)]/15 text-[color:var(--color-warning)]' : 'bg-[var(--color-success)]/15 text-[color:var(--color-success)]'}`}
-                          >
-                            {isPending ? <Clock size={12} /> : <CheckCircle size={12} />}
-                            {statusLabel}
-                          </span>
-                        </div>
-
-                        {card.confirmed ? (
-                          <div className="p-3 rounded-lg bg-[var(--color-success)]/10 border border-[var(--color-success)]/20">
-                            <p className="font-semibold text-body mb-1">{card.confirmed.name}</p>
-                            <p className="text-xs text-muted">{confirmedStatusLabel}</p>
-                          </div>
-                        ) : (
-                          <div className="text-sm text-muted">
-                            <p className="mb-2">
-                              {card.shortlist.length
-                                ? t('common.suppliers.overview.services.reviewShortlist')
-                                : t('common.suppliers.overview.services.emptyShortlist')}
-                            </p>
-                            <div className="flex items-center gap-1 text-xs text-[color:var(--color-primary)]">
-                              <TrendingUp size={12} />
-                              <span>{t('common.suppliers.overview.services.exploreHint')}</span>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </Card>
-                  );
-                })}
-              </div>
-            </section>
+            {/* Servicios de tu boda - Vista general con progreso */}
+            <div className="mt-6">
+              <WeddingServicesOverview
+                onSearch={(service) => {
+                  // Cuando se hace click en "Buscar proveedores" de un servicio
+                  setSearchInput(service);
+                  setSearchPanelCollapsed(false);
+                  // Scroll al panel de búsqueda
+                  setTimeout(() => {
+                    document.querySelector('[data-search-panel]')?.scrollIntoView({
+                      behavior: 'smooth',
+                      block: 'start',
+                    });
+                  }, 100);
+                }}
+              />
+            </div>
 
             <Modal
               open={searchDrawerOpen}
