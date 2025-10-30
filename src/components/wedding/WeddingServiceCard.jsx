@@ -23,7 +23,9 @@ import { toast } from 'react-toastify';
  * Muestra el proveedor confirmado o botones para buscar
  */
 export default function WeddingServiceCard({
-  service,
+  serviceId, // ID de la categoría (ej: 'fotografia')
+  serviceName, // Nombre para mostrar (ej: 'Fotografía')
+  service, // Retrocompatibilidad
   confirmedProvider,
   shortlistCount = 0,
   onSearch,
@@ -33,19 +35,21 @@ export default function WeddingServiceCard({
   const { assignSupplier } = useWeddingServices();
   const [showFavoritesModal, setShowFavoritesModal] = useState(false);
 
+  // Usar serviceId si está disponible, sino usar service
+  const categoryId = serviceId || service?.toLowerCase();
+  const displayName = serviceName || service;
+
   const hasConfirmed = !!confirmedProvider;
   const hasShortlist = shortlistCount > 0;
 
-  // Filtrar favoritos por categoría del servicio
-  const serviceFavorites = favorites.filter(
-    (fav) => fav.supplier?.category === service.toLowerCase()
-  );
+  // Filtrar favoritos por categoría del servicio (usar ID directo)
+  const serviceFavorites = favorites.filter((fav) => fav.supplier?.category === categoryId);
   const hasFavorites = serviceFavorites.length > 0;
 
   // Función para asignar proveedor
   const handleAssign = async (supplier) => {
     try {
-      await assignSupplier(service.toLowerCase(), supplier, null, '', 'contratado');
+      await assignSupplier(categoryId, supplier, null, '', 'contratado');
       // No cerramos el modal aquí, lo hace SelectFromFavoritesModal
     } catch (error) {
       throw error; // Re-lanzar para que lo maneje el modal
@@ -55,18 +59,19 @@ export default function WeddingServiceCard({
   // Iconos por servicio
   const serviceIcons = {
     fotografia: '📸',
-    catering: '🍽️',
-    musica: '🎵',
-    venue: '🏛️',
-    flores: '💐',
-    tarta: '🍰',
-    decoracion: '🎨',
     video: '🎥',
+    catering: '🍽️',
+    venue: '🏛️',
+    musica: '🎵',
+    dj: '🎧',
+    flores: '💐',
+    decoracion: '🎨',
+    tarta: '🍰',
     animacion: '🎪',
     transporte: '🚗',
   };
 
-  const icon = serviceIcons[service.toLowerCase()] || '💼';
+  const icon = serviceIcons[categoryId] || '💼';
 
   return (
     <div className="border rounded-lg p-4 hover:shadow-md transition-shadow bg-white">
@@ -74,7 +79,7 @@ export default function WeddingServiceCard({
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <span className="text-2xl">{icon}</span>
-          <h3 className="font-semibold text-lg text-gray-900 capitalize">{service}</h3>
+          <h3 className="font-semibold text-lg text-gray-900">{displayName}</h3>
         </div>
 
         {/* Estado */}
@@ -186,7 +191,7 @@ export default function WeddingServiceCard({
 
             {hasShortlist && (
               <button
-                onClick={() => navigate(`/proveedores?service=${service}`)}
+                onClick={() => navigate(`/proveedores?service=${categoryId}`)}
                 className="w-full px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition-colors text-sm font-medium flex items-center justify-center gap-2"
               >
                 <Clock size={16} />
@@ -196,9 +201,9 @@ export default function WeddingServiceCard({
             <button
               onClick={() => {
                 if (onSearch) {
-                  onSearch(service);
+                  onSearch(categoryId);
                 } else {
-                  navigate(`/proveedores?service=${service}`);
+                  navigate(`/proveedores?service=${categoryId}`);
                 }
               }}
               className={`w-full px-4 py-2 border rounded-md transition-colors text-sm font-medium flex items-center justify-center gap-2 ${
@@ -224,7 +229,7 @@ export default function WeddingServiceCard({
       <SelectFromFavoritesModal
         open={showFavoritesModal}
         onClose={() => setShowFavoritesModal(false)}
-        serviceName={service}
+        serviceName={displayName}
         favorites={serviceFavorites}
         onAssign={handleAssign}
       />
