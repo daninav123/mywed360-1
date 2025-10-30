@@ -65,6 +65,10 @@ export function useWeddingCategories() {
     }
 
     try {
+      console.log('📝 [useWeddingCategories] Actualizando categorías activas...');
+      console.log('   Antes:', activeCategories);
+      console.log('   Después:', categories);
+
       const weddingRef = doc(db, 'users', user.uid, 'weddings', activeWedding);
       await updateDoc(weddingRef, {
         activeCategories: categories,
@@ -72,6 +76,7 @@ export function useWeddingCategories() {
       });
 
       setActiveCategories(categories);
+      console.log('   ✅ Estado actualizado en hook');
       toast.success('Servicios actualizados correctamente');
     } catch (error) {
       console.error('Error updating active categories:', error);

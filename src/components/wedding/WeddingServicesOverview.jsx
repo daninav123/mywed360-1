@@ -25,13 +25,30 @@ export default function WeddingServicesOverview({ onSearch }) {
   const [showManageModal, setShowManageModal] = useState(false);
 
   // Obtener servicios activos de la boda (personalizados por el owner)
+  // ⚠️ CRÍTICO: Depender solo de activeCategories, NO de getActiveCategoriesDetails
+  // Porque React no puede comparar funciones correctamente en useMemo
   const weddingServices = useMemo(() => {
-    return getActiveCategoriesDetails().map((cat, index) => ({
+    console.log('🔄 [WeddingServicesOverview] Recalculando weddingServices...');
+    console.log('   activeCategories:', activeCategories);
+
+    if (!activeCategories || activeCategories.length === 0) {
+      console.log('   ⚠️ No hay categorías activas, devolviendo array vacío');
+      return [];
+    }
+
+    const services = getActiveCategoriesDetails().map((cat, index) => ({
       id: cat.id,
       name: cat.name,
       priority: index + 1,
     }));
-  }, [getActiveCategoriesDetails, activeCategories]);
+
+    console.log(
+      '   ✅ Servicios calculados:',
+      services.length,
+      services.map((s) => s.name)
+    );
+    return services;
+  }, [activeCategories, getActiveCategoriesDetails]);
 
   // Agrupar proveedores confirmados por servicio
   const confirmedByService = useMemo(() => {
