@@ -1775,6 +1775,53 @@
       "provider": "Provider",
       "service": "Service"
     },
+    "compare": {
+      "title": "Compare suppliers",
+      "summary": "Comparing {{count}} supplier",
+      "summary_plural": "Comparing {{count}} suppliers",
+      "empty": {
+        "title": "No suppliers to compare",
+        "description": "Select suppliers from the search results using the compare checkbox.",
+        "cta": "Back to search"
+      },
+      "actions": {
+        "back": "Back to search",
+        "clearAll": "Clear all",
+        "clear": "Clear comparison",
+        "remove": "Remove"
+      },
+      "features": {
+        "basic": "Basic information",
+        "rating": "Rating",
+        "location": "Location",
+        "price": "Price",
+        "portfolio": "Portfolio",
+        "reviews": "Reviews"
+      },
+      "table": {
+        "feature": "Feature",
+        "image": "Image",
+        "description": "Description",
+        "contact": "Contact",
+        "type": "Type",
+        "notAvailable": "Not available",
+        "notSpecified": "Not specified",
+        "noRatings": "No ratings yet",
+        "noLocation": "Not specified",
+        "seePortfolio": "View portfolio →",
+        "reviewsCount": "{{count}} review",
+        "reviewsCount_plural": "{{count}} reviews",
+        "categoryFallback": "Uncategorised"
+      },
+      "price": {
+        "notSpecified": "Not specified"
+      },
+      "typeBadges": {
+        "registered": "Registered",
+        "cached": "Cached",
+        "internet": "Internet"
+      }
+    },
     "register": {
       "title": "Register your business",
       "subtitle": "Join the platform and stand out to thousands of couples searching for suppliers",
@@ -2753,6 +2800,141 @@
         "empty": "No photos available yet",
         "viewAll": "View all photos ({{count}})"
       }
+    }
+  },
+  "designsLibrary": {
+    "myDesigns": {
+      "title": "My designs",
+      "backLink": "Back to Designs",
+      "warning": {
+        "noWedding": "Select a wedding to view its designs."
+      },
+      "loading": "Loading...",
+      "messages": {
+        "loadError": "We couldn’t load your designs",
+        "deleteError": "We couldn’t delete the design"
+      },
+      "confirmDelete": "Delete this design permanently?",
+      "noItems": "You don’t have any saved designs yet.",
+      "item": {
+        "typeFallback": "design",
+        "categoryFallback": "general",
+        "noPreview": "No preview available"
+      },
+      "actions": {
+        "edit": "Edit",
+        "download": "Download",
+        "delete": "Delete"
+      }
+    },
+    "vectorEditor": {
+      "title": "Vector editor (AI)",
+      "warning": {
+        "openHint": "Open this editor from an AI generated image to vectorise it automatically."
+      },
+      "controls": {
+        "modeLabel": "Mode",
+        "modes": {
+          "color": "Colour (ImageTracer)",
+          "mono": "Monochrome (Potrace)"
+        },
+        "color": {
+          "colors": "Colours",
+          "ltres": "ltres (0-1)",
+          "qtres": "qtres (0-1)",
+          "stroke": "Stroke"
+        },
+        "mono": {
+          "threshold": "Threshold (0-255)"
+        },
+        "vectorize": {
+          "action": "Vectorise again",
+          "loading": "Vectorising..."
+        },
+        "viewOriginal": "View original",
+        "saveToWedding": "Save to wedding"
+      },
+      "palette": {
+        "title": "Wedding palette",
+        "save": "Save palette",
+        "addColor": "+ colour"
+      },
+      "messages": {
+        "vectorizeError": "We couldn't vectorise the image",
+        "loadSvgError": "We couldn't load the SVG",
+        "paletteLoadWarning": "We couldn't load the palette",
+        "noSvg": "No SVG available yet."
+      },
+      "toasts": {
+        "noContent": "There is no SVG content to save.",
+        "saveSuccess": "SVG saved successfully.",
+        "saveError": "We couldn't save the SVG.",
+        "paletteSaved": "Palette saved successfully.",
+        "paletteSaveError": "We couldn't save the palette."
+      }
+    }
+  },
+  "websitePreview": {
+    "empty": {
+      "title": "Preview your wedding website",
+      "description": "Generate the page with the assistant to preview the result and publish it.",
+      "editLogistics": "Edit logistics before generating"
+    },
+    "previewTitle": "Preview your wedding website",
+    "windowTitle": "Preview – Your wedding site",
+    "previewFrameTitle": "Preview",
+    "status": {
+      "checking": "Checking…",
+      "invalid": "Invalid slug",
+      "reserved": "Slug reserved",
+      "taken": "Taken",
+      "available": "Available",
+      "unknown": "We couldn’t verify"
+    },
+    "actions": {
+      "publish": {
+        "default": "Publish page",
+        "loading": "Publishing..."
+      },
+      "editLogistics": "Edit logistics",
+      "openNewTab": "Open in new tab",
+      "downloadHtml": "Download HTML",
+      "copyLink": "Copy link",
+      "showQr": "Show QR",
+      "hideQr": "Hide QR"
+    },
+    "slug": {
+      "label": "Public slug",
+      "placeholder": "my-wedding-anna-luis",
+      "suggestions": "Suggestions:"
+    },
+    "qr": {
+      "title": "QR for the public site",
+      "close": "Close",
+      "alt": "QR"
+    },
+    "toasts": {
+      "linkCopied": "Link copied to clipboard"
+    }
+  },
+  "websiteGenerator": {
+    "gallery": {
+      "title": "Choose a style for your site"
+    },
+    "prompt": {
+      "title": "Customise your site",
+      "description": "Describe how you want your website to look, colours, style, or any specific requirements.",
+      "selectedTemplate": {
+        "prefix": "Using template: ",
+        "suffix": ". You can edit the suggested text or add more details."
+      },
+      "exploreLibrary": "Browse prompt library",
+      "variablesHint": "Use variables like {nombres}, {fecha}, {ubicacion}",
+      "placeholder": "Describe how you want your site to look (style, colours, sections, logistics, etc.)"
+    },
+    "actions": {
+      "generate": "Generate Website",
+      "generating": "Generating..."
     }
   },
   "actions": {

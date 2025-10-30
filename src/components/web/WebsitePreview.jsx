@@ -1,25 +1,6 @@
 import React, { useMemo } from 'react';
-import { ExternalLink, Copy } from 'lucide-react';
 import { toast } from 'react-toastify';
 import useTranslations from '../../hooks/useTranslations';
-
-const statusMessage = (slugStatus, checking) => {
-  if (checking) return { text: 'Comprobando…', tone: 'neutral' };
-  switch (slugStatus) {
-    case 'invalid':
-      return { text: 'Slug inválido', tone: 'error' };
-    case 'reserved':
-      return { text: 'Slug reservado', tone: 'error' };
-    case 'taken':
-      return { text: 'Ocupado', tone: 'error' };
-    case 'available':
-      return { text: 'Disponible', tone: 'success' };
-    case 'unknown':
-      return { text: 'No pudimos verificar', tone: 'neutral' };
-    default:
-      return null;
-  }
-};
 
 const WebsitePreview = ({
   html,
@@ -39,12 +20,57 @@ const WebsitePreview = ({
   publishDisabledReason = '',
   isPublishing = false,
 }) => {
+  const { t } = useTranslations();
+
+  const statusMessage = useMemo(() => {
+    if (checkingSlug) {
+      return {
+        text: t('common.websitePreview.status.checking', 'Comprobando…'),
+        tone: 'neutral',
+      };
+    }
+    switch (slugStatus) {
+      case 'invalid':
+        return {
+          text: t('common.websitePreview.status.invalid', 'Slug inválido'),
+          tone: 'error',
+        };
+      case 'reserved':
+        return {
+          text: t('common.websitePreview.status.reserved', 'Slug reservado'),
+          tone: 'error',
+        };
+      case 'taken':
+        return {
+          text: t('common.websitePreview.status.taken', 'Ocupado'),
+          tone: 'error',
+        };
+      case 'available':
+        return {
+          text: t('common.websitePreview.status.available', 'Disponible'),
+          tone: 'success',
+        };
+      case 'unknown':
+        return {
+          text: t('common.websitePreview.status.unknown', 'No pudimos verificar'),
+          tone: 'neutral',
+        };
+      default:
+        return null;
+    }
+  }, [checkingSlug, slugStatus, t]);
+
   if (!html) {
     return (
       <div className="bg-white rounded-lg shadow p-6 mb-8">
-        <h2 className="text-xl font-semibold mb-3">Vista previa de tu página web</h2>
+        <h2 className="text-xl font-semibold mb-3">
+          {t('common.websitePreview.empty.title', 'Vista previa de tu página web')}
+        </h2>
         <p className="text-sm text-gray-600">
-          Genera la página con el asistente para previsualizar el resultado y poder publicarla.
+          {t(
+            'common.websitePreview.empty.description',
+            'Genera la página con el asistente para previsualizar el resultado y poder publicarla.'
+          )}
         </p>
         {onEditLogistics && (
           <div className="mt-4">
@@ -53,7 +79,7 @@ const WebsitePreview = ({
               onClick={onEditLogistics}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-blue-200 text-blue-700 hover:bg-blue-50 transition-colors"
             >
-              Editar logística antes de generar
+              {t('common.websitePreview.empty.editLogistics', 'Editar logística antes de generar')}
             </button>
           </div>
         )}
@@ -70,13 +96,13 @@ const WebsitePreview = ({
 
   const copyDisabled = !shareUrl || ['invalid', 'reserved', 'taken'].includes(slugStatus || '');
 
-  const message = statusMessage(slugStatus, checkingSlug);
+  const message = statusMessage;
   const statusClass =
     message?.tone === 'error'
       ? 'text-red-600'
       : message?.tone === 'success'
-      ? 'text-green-600'
-      : 'text-gray-600';
+        ? 'text-green-600'
+        : 'text-gray-600';
 
   const handleOpenNewTab = () => {
     const blob = new Blob([html], { type: 'text/html' });
@@ -101,7 +127,7 @@ const WebsitePreview = ({
     if (!shareUrl) return;
     try {
       await navigator.clipboard.writeText(shareUrl);
-      toast.success(t('wedding.share.linkCopied'));
+      toast.success(t('common.websitePreview.toasts.linkCopied', 'Enlace copiado al portapapeles'));
     } catch {
       toast.info(shareUrl);
     }
@@ -116,7 +142,9 @@ const WebsitePreview = ({
 
   return (
     <div className="bg-white rounded-lg shadow p-6 mb-8">
-      <h2 className="text-xl font-semibold mb-4">Vista previa de tu página web</h2>
+      <h2 className="text-xl font-semibold mb-4">
+        {t('common.websitePreview.previewTitle', 'Vista previa de tu página web')}
+      </h2>
 
       <div className="border rounded-lg overflow-hidden shadow-lg">
         <div className="bg-gray-100 p-2 border-b flex items-center space-x-2">
@@ -124,11 +152,11 @@ const WebsitePreview = ({
           <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
           <div className="w-3 h-3 bg-green-500 rounded-full"></div>
           <div className="flex-1 text-center text-sm text-gray-600">
-            Vista previa - Tu web de boda
+            {t('common.websitePreview.windowTitle', 'Vista previa - Tu web de boda')}
           </div>
         </div>
         <iframe
-          title="Vista previa"
+          title={t('common.websitePreview.previewFrameTitle', 'Vista previa')}
           srcDoc={html}
           sandbox="allow-same-origin allow-scripts"
           className="w-full h-[600px] border-none"
@@ -166,18 +194,23 @@ const WebsitePreview = ({
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                 ></path>
               </svg>
-              <span>Publicando...</span>
+              <span>{t('common.websitePreview.actions.publish.loading', 'Publicando...')}</span>
             </>
           ) : (
             <>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
                 <path
                   fillRule="evenodd"
                   d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z"
                   clipRule="evenodd"
                 />
               </svg>
-              <span>Publicar página</span>
+              <span>{t('common.websitePreview.actions.publish.default', 'Publicar página')}</span>
             </>
           )}
         </button>
@@ -187,11 +220,16 @@ const WebsitePreview = ({
           onClick={onEditLogistics}
           className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-lg font-medium flex items-center gap-2 transition-colors"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
             <path d="M17.414 2.586a2 2 0 010 2.828l-1.121 1.121-2.828-2.828 1.121-1.121a2 2 0 012.828 0z" />
             <path d="M2 13.5V17h3.5l9.193-9.193-3.5-3.5L2 13.5z" />
           </svg>
-          <span>Editar logística</span>
+          <span>{t('common.websitePreview.actions.editLogistics', 'Editar logística')}</span>
         </button>
 
         <button
@@ -199,11 +237,16 @@ const WebsitePreview = ({
           onClick={handleOpenNewTab}
           className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium flex items-center gap-2 transition-colors"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
             <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
             <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
           </svg>
-          <span>Abrir en nueva pestaña</span>
+          <span>{t('common.websitePreview.actions.openNewTab', 'Abrir en nueva pestaña')}</span>
         </button>
 
         <button
@@ -211,11 +254,16 @@ const WebsitePreview = ({
           onClick={handleDownload}
           className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-medium flex items-center gap-2 transition-colors"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
             <path d="M3 3a1 1 0 011-1h2a1 1 0 110 2H5v12h10V4h-1a1 1 0 110-2h2a1 1 0 011 1v14a2 2 0 01-2 2H5a2 2 0 01-2-2V3z" />
             <path d="M7 9a1 1 0 011-1h1V4a1 1 0 112 0v4h1a1 1 0 01.707 1.707l-3 3a1 1 0 01-1.414 0l-3-3A1 1 0 017 9z" />
           </svg>
-          <span>Descargar HTML</span>
+          <span>{t('common.websitePreview.actions.downloadHtml', 'Descargar HTML')}</span>
         </button>
       </div>
 
@@ -227,13 +275,13 @@ const WebsitePreview = ({
         )}
         <div className="flex flex-wrap items-center gap-3">
           <label className="text-sm text-gray-600" htmlFor="publish-slug">
-            Slug público
+            {t('common.websitePreview.slug.label', 'Slug público')}
           </label>
           <input
             id="publish-slug"
             value={publishSlug}
             onChange={(event) => onSlugChange?.(event.target.value)}
-            placeholder="mi-boda-ana-luis"
+            placeholder={t('common.websitePreview.slug.placeholder', 'mi-boda-ana-luis')}
             className="border rounded px-3 py-2 text-sm"
           />
           {message && <span className={`text-sm ${statusClass}`}>{message.text}</span>}
@@ -241,14 +289,16 @@ const WebsitePreview = ({
 
         {slugSuggestions.length > 0 && (
           <div className="flex flex-wrap items-center gap-2 text-sm text-gray-600">
-            <span>Sugerencias:</span>
+            <span>{t('common.websitePreview.slug.suggestions', 'Sugerencias:')}</span>
             {slugSuggestions.map((suggestion) => (
               <button
                 key={suggestion}
                 type="button"
                 onClick={() => onSuggestionSelect?.(suggestion)}
                 className={`px-2 py-1 rounded border ${
-                  publishSlug === suggestion ? 'bg-blue-50 border-blue-400' : 'border-gray-300 hover:border-blue-300'
+                  publishSlug === suggestion
+                    ? 'bg-blue-50 border-blue-400'
+                    : 'border-gray-300 hover:border-blue-300'
                 }`}
               >
                 {suggestion}
@@ -264,30 +314,39 @@ const WebsitePreview = ({
             disabled={copyDisabled}
             className="bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded disabled:opacity-50"
           >
-            Copiar enlace
+            {t('common.websitePreview.actions.copyLink', 'Copiar enlace')}
           </button>
           <button
             type="button"
             onClick={showQR ? onHideQR : onShowQR}
             className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded"
           >
-            {showQR ? 'Ocultar QR' : 'Mostrar QR'}
+            {showQR
+              ? t('common.websitePreview.actions.hideQr', 'Ocultar QR')
+              : t('common.websitePreview.actions.showQr', 'Mostrar QR')}
           </button>
         </div>
 
         {showQR && qrUrl && (
           <div className="mt-2 p-4 border rounded inline-block">
             <div className="flex items-center justify-between mb-2">
-              <div className="text-sm text-gray-600">QR de la web pública</div>
+              <div className="text-sm text-gray-600">
+                {t('common.websitePreview.qr.title', 'QR de la web pública')}
+              </div>
               <button
                 type="button"
                 onClick={onHideQR}
                 className="text-gray-500 hover:text-gray-700"
               >
-                Cerrar
+                {t('common.websitePreview.qr.close', 'Cerrar')}
               </button>
             </div>
-            <img src={qrUrl} alt="QR" width={220} height={220} />
+            <img
+              src={qrUrl}
+              alt={t('common.websitePreview.qr.alt', 'QR')}
+              width={220}
+              height={220}
+            />
           </div>
         )}
       </div>

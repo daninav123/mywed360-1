@@ -24,6 +24,7 @@ import {
   updateTableWithField,
   inferTableType,
 } from '../utils/seatingTables';
+import { generateAutoLayout, analyzeGuestAssignments } from '../utils/seatingLayoutGenerator';
 
 // Utilidad para normalizar IDs de mesas
 export const normalizeId = (id) => {
@@ -34,10 +35,11 @@ export const normalizeId = (id) => {
 export const useSeatingPlan = () => {
   const { activeWedding } = useWedding();
   // Detectar entorno de test (Cypress o Vitest) para evitar persistencia en Firestore
-  const isVitest = (
-    (typeof import.meta !== 'undefined' && import.meta.env && (import.meta.env.MODE === 'test' || import.meta.env.VITEST)) ||
-    (typeof globalThis !== 'undefined' && !!globalThis.vi)
-  );
+  const isVitest =
+    (typeof import.meta !== 'undefined' &&
+      import.meta.env &&
+      (import.meta.env.MODE === 'test' || import.meta.env.VITEST)) ||
+    (typeof globalThis !== 'undefined' && !!globalThis.vi);
   const isTestEnv = (typeof window !== 'undefined' && !!window.Cypress) || isVitest;
   const canPersist = !!db && !isTestEnv;
   const { user: authUser } = useUserContext() || {};
@@ -89,8 +91,7 @@ export const useSeatingPlan = () => {
     return null;
   };
   const localStorageRef = getLocalStorage();
-  const makeStorageKey = (suffix) =>
-    `seatingPlan:${activeWedding || 'default'}:${suffix}`;
+  const makeStorageKey = (suffix) => `seatingPlan:${activeWedding || 'default'}:${suffix}`;
   const pendingWritesRef = useRef({ ceremony: false, banquet: false });
   const [collaborators, setCollaborators] = useState([]);
   const [collaborationStatus, setCollaborationStatus] = useState(
@@ -120,7 +121,7 @@ export const useSeatingPlan = () => {
       }));
   };
 
-const normalizeSpecialMoments = (moments = {}) => {
+  const normalizeSpecialMoments = (moments = {}) => {
     const normalized = {};
     Object.entries(moments || {}).forEach(([blockId, list]) => {
       if (blockId === 'blocks') return;
@@ -131,9 +132,7 @@ const normalizeSpecialMoments = (moments = {}) => {
             ? String(moment.recipientId)
             : '';
         const recipientName =
-          moment && moment.recipientName != null
-            ? String(moment.recipientName)
-            : '';
+          moment && moment.recipientName != null ? String(moment.recipientName) : '';
         return {
           ...moment,
           recipientId,
@@ -216,8 +215,7 @@ const normalizeSpecialMoments = (moments = {}) => {
           const snap = await tx.get(docRef);
           if (!snap.exists()) return;
           const data = snap.data() || {};
-          const updatedAt =
-            data.updatedAt instanceof Timestamp ? data.updatedAt.toMillis() : 0;
+          const updatedAt = data.updatedAt instanceof Timestamp ? data.updatedAt.toMillis() : 0;
           const isMine = data.clientId === collabClientIdRef.current;
           const expired = !updatedAt || Date.now() - updatedAt > LOCK_TTL_MS;
           if (isMine || expired) {
@@ -241,8 +239,7 @@ const normalizeSpecialMoments = (moments = {}) => {
           const snap = await tx.get(docRef);
           if (snap.exists()) {
             const data = snap.data() || {};
-            const updatedAt =
-              data.updatedAt instanceof Timestamp ? data.updatedAt.toMillis() : 0;
+            const updatedAt = data.updatedAt instanceof Timestamp ? data.updatedAt.toMillis() : 0;
             const isMine = data.clientId === collabClientIdRef.current;
             const expired = !updatedAt || Date.now() - updatedAt > LOCK_TTL_MS;
             if (!expired && !isMine) {
@@ -295,9 +292,7 @@ const normalizeSpecialMoments = (moments = {}) => {
         return true;
       }
       if (existing && existing.clientId && existing.clientId !== collabClientIdRef.current) {
-        const fresh =
-          existing.updatedAt &&
-          Date.now() - existing.updatedAt < LOCK_TTL_MS;
+        const fresh = existing.updatedAt && Date.now() - existing.updatedAt < LOCK_TTL_MS;
         if (fresh) {
           emitLockEvent({
             kind: 'lock-denied',
@@ -430,8 +425,7 @@ const normalizeSpecialMoments = (moments = {}) => {
         const list = [];
         snapshot.forEach((docSnap) => {
           const data = docSnap.data() || {};
-          const updatedAt =
-            data.updatedAt instanceof Timestamp ? data.updatedAt.toMillis() : 0;
+          const updatedAt = data.updatedAt instanceof Timestamp ? data.updatedAt.toMillis() : 0;
           const isExpired = updatedAt && now - updatedAt > LOCK_TTL_MS;
           if (isExpired && data.clientId !== collabClientIdRef.current) {
             deleteDoc(docSnap.ref).catch(() => {});
@@ -452,9 +446,7 @@ const normalizeSpecialMoments = (moments = {}) => {
           });
         });
         const map = new Map();
-        list.forEach((item) =>
-          map.set(`${item.resourceType}-${item.resourceId}`, item)
-        );
+        list.forEach((item) => map.set(`${item.resourceType}-${item.resourceId}`, item));
         locksRef.current = map;
         setLocks(list);
       },
@@ -475,7 +467,12 @@ const normalizeSpecialMoments = (moments = {}) => {
   const [gridStep] = useState(20);
   const [globalMaxSeats, setGlobalMaxSeats] = useState(0);
   const [background, setBackground] = useState(null);
-  const [scoringWeights, setScoringWeights] = useState({ fit: 50, side: 10, wants: 20, avoid: -10 });
+  const [scoringWeights, setScoringWeights] = useState({
+    fit: 50,
+    side: 10,
+    wants: 20,
+    avoid: -10,
+  });
   const [selectedIds, setSelectedIds] = useState([]);
   const [ceremonySettings, setCeremonySettings] = useState({
     vipRows: [],
@@ -514,7 +511,17 @@ const normalizeSpecialMoments = (moments = {}) => {
       };
       writeLocalState('banquet', payload);
     } catch (_) {}
-  }, [activeWedding, canPersist, tablesBanquet, areasBanquet, hallSize?.width, hallSize?.height, hallSize?.aisleMin, globalMaxSeats, background]);
+  }, [
+    activeWedding,
+    canPersist,
+    tablesBanquet,
+    areasBanquet,
+    hallSize?.width,
+    hallSize?.height,
+    hallSize?.aisleMin,
+    globalMaxSeats,
+    background,
+  ]);
 
   // Estados de UI
   const [selectedTable, setSelectedTable] = useState(null);
@@ -586,7 +593,11 @@ const normalizeSpecialMoments = (moments = {}) => {
     if (!canPersist) {
       const stored = readLocalState('banquet');
       if (stored && typeof stored === 'object') {
-        if (stored.hallSize && typeof stored.hallSize.width === 'number' && typeof stored.hallSize.height === 'number') {
+        if (
+          stored.hallSize &&
+          typeof stored.hallSize.width === 'number' &&
+          typeof stored.hallSize.height === 'number'
+        ) {
           setHallSize(stored.hallSize);
         }
         if (Number.isFinite(stored.globalMaxSeats)) {
@@ -773,7 +784,7 @@ const normalizeSpecialMoments = (moments = {}) => {
   }, [activeWedding, canPersist]);
 
   // Suscribirse a cambios en el estado de sincronización
-  useEffect(() => {  }, []);
+  useEffect(() => {}, []);
 
   // Semilla local de invitados en Cypress si no hay datos
   useEffect(() => {
@@ -841,7 +852,9 @@ const normalizeSpecialMoments = (moments = {}) => {
         }
       }, 800);
       return () => {
-        try { clearTimeout(ceremonySaveTimerRef.current); } catch (_) {}
+        try {
+          clearTimeout(ceremonySaveTimerRef.current);
+        } catch (_) {}
       };
     } catch (_) {}
   }, [activeWedding, seatsCeremony, tablesCeremony, areasCeremony, ceremonySettings]);
@@ -857,7 +870,11 @@ const normalizeSpecialMoments = (moments = {}) => {
         try {
           const ref = fsDoc(db, 'weddings', activeWedding, 'seatingPlan', 'banquet');
           const cfg = {};
-          if (hallSize && typeof hallSize.width === 'number' && typeof hallSize.height === 'number') {
+          if (
+            hallSize &&
+            typeof hallSize.width === 'number' &&
+            typeof hallSize.height === 'number'
+          ) {
             cfg.width = hallSize.width;
             cfg.height = hallSize.height;
             if (Number.isFinite(hallSize.aisleMin)) cfg.aisleMin = hallSize.aisleMin;
@@ -890,10 +907,21 @@ const normalizeSpecialMoments = (moments = {}) => {
         }
       }, 800);
       return () => {
-        try { clearTimeout(banquetSaveTimerRef.current); } catch (_) {}
+        try {
+          clearTimeout(banquetSaveTimerRef.current);
+        } catch (_) {}
       };
     } catch (_) {}
-  }, [activeWedding, tablesBanquet, areasBanquet, hallSize?.width, hallSize?.height, hallSize?.aisleMin, globalMaxSeats, background]);
+  }, [
+    activeWedding,
+    tablesBanquet,
+    areasBanquet,
+    hallSize?.width,
+    hallSize?.height,
+    hallSize?.aisleMin,
+    globalMaxSeats,
+    background,
+  ]);
 
   useEffect(() => {
     if (!activeWedding || canPersist) return;
@@ -913,18 +941,9 @@ const normalizeSpecialMoments = (moments = {}) => {
       settings: normalizedSettings,
     };
     const isEmpty =
-      payload.seats.length === 0 &&
-      payload.tables.length === 0 &&
-      payload.areas.length === 0;
+      payload.seats.length === 0 && payload.tables.length === 0 && payload.areas.length === 0;
     writeLocalState('ceremony', isEmpty ? null : payload);
-  }, [
-    activeWedding,
-    seatsCeremony,
-    tablesCeremony,
-    areasCeremony,
-    ceremonySettings,
-    canPersist,
-  ]);
+  }, [activeWedding, seatsCeremony, tablesCeremony, areasCeremony, ceremonySettings, canPersist]);
 
   useEffect(() => {
     if (!activeWedding || canPersist) return;
@@ -990,82 +1009,75 @@ const normalizeSpecialMoments = (moments = {}) => {
       }
     } catch (_) {}
   };
-  
-useEffect(() => {
-  if (specialMomentsUnsubRef.current) {
-    try {
-      specialMomentsUnsubRef.current();
-    } catch {}
-    specialMomentsUnsubRef.current = null;
-  }
 
-  if (!activeWedding) {
-    try {
-      const localValue =
-        localStorageRef && typeof localStorageRef.getItem === 'function'
-          ? localStorageRef.getItem('mywed360SpecialMoments')
-          : null;
-      if (localValue) {
-        const parsed = JSON.parse(localValue);
-        const rawBlocks = Array.isArray(parsed?.blocks) ? parsed.blocks : [];
-        const payload =
-          parsed?.moments && typeof parsed.moments === 'object'
-            ? parsed.moments
-            : parsed || {};
-        const resolvedBlocks = rawBlocks.length
-          ? rawBlocks
-          : buildBlocksFromMoments(payload);
-        setSpecialMomentsData({
-          blocks: resolvedBlocks,
-          moments: normalizeSpecialMoments(payload),
-        });
-      } else {
+  useEffect(() => {
+    if (specialMomentsUnsubRef.current) {
+      try {
+        specialMomentsUnsubRef.current();
+      } catch {}
+      specialMomentsUnsubRef.current = null;
+    }
+
+    if (!activeWedding) {
+      try {
+        const localValue =
+          localStorageRef && typeof localStorageRef.getItem === 'function'
+            ? localStorageRef.getItem('mywed360SpecialMoments')
+            : null;
+        if (localValue) {
+          const parsed = JSON.parse(localValue);
+          const rawBlocks = Array.isArray(parsed?.blocks) ? parsed.blocks : [];
+          const payload =
+            parsed?.moments && typeof parsed.moments === 'object' ? parsed.moments : parsed || {};
+          const resolvedBlocks = rawBlocks.length ? rawBlocks : buildBlocksFromMoments(payload);
+          setSpecialMomentsData({
+            blocks: resolvedBlocks,
+            moments: normalizeSpecialMoments(payload),
+          });
+        } else {
+          setSpecialMomentsData(null);
+        }
+      } catch {
         setSpecialMomentsData(null);
       }
-    } catch {
-      setSpecialMomentsData(null);
-    }
-    return;
-  }
-
-  const ref = fsDoc(db, 'weddings', activeWedding, 'specialMoments', 'main');
-  const unsubscribe = onSnapshot(ref, (snap) => {
-    if (!snap.exists()) {
-      setSpecialMomentsData(null);
       return;
     }
-    const data = snap.data() || {};
-    const rawBlocks = Array.isArray(data?.blocks) ? data.blocks : [];
-    const payload =
-      data?.moments && typeof data.moments === 'object'
-        ? data.moments
-        : Object.fromEntries(
-            Object.entries(data).filter(
-              ([key]) => !['updatedAt', 'blocks', 'migratedFrom'].includes(key)
-            )
-          );
-    const resolvedBlocks = rawBlocks.length
-      ? rawBlocks
-      : buildBlocksFromMoments(payload);
-    setSpecialMomentsData({
-      blocks: resolvedBlocks,
-      moments: normalizeSpecialMoments(payload),
-    });
-  });
 
-  specialMomentsUnsubRef.current = unsubscribe;
-  return () => {
-    try {
-      if (specialMomentsUnsubRef.current) {
-        specialMomentsUnsubRef.current();
+    const ref = fsDoc(db, 'weddings', activeWedding, 'specialMoments', 'main');
+    const unsubscribe = onSnapshot(ref, (snap) => {
+      if (!snap.exists()) {
+        setSpecialMomentsData(null);
+        return;
       }
-    } catch {}
-    specialMomentsUnsubRef.current = null;
-  };
-}, [activeWedding, localStorageRef]);
+      const data = snap.data() || {};
+      const rawBlocks = Array.isArray(data?.blocks) ? data.blocks : [];
+      const payload =
+        data?.moments && typeof data.moments === 'object'
+          ? data.moments
+          : Object.fromEntries(
+              Object.entries(data).filter(
+                ([key]) => !['updatedAt', 'blocks', 'migratedFrom'].includes(key)
+              )
+            );
+      const resolvedBlocks = rawBlocks.length ? rawBlocks : buildBlocksFromMoments(payload);
+      setSpecialMomentsData({
+        blocks: resolvedBlocks,
+        moments: normalizeSpecialMoments(payload),
+      });
+    });
 
+    specialMomentsUnsubRef.current = unsubscribe;
+    return () => {
+      try {
+        if (specialMomentsUnsubRef.current) {
+          specialMomentsUnsubRef.current();
+        }
+      } catch {}
+      specialMomentsUnsubRef.current = null;
+    };
+  }, [activeWedding, localStorageRef]);
 
-const pushHistory = (snapshot) => {
+  const pushHistory = (snapshot) => {
     const snap = snapshot && typeof snapshot === 'object' ? snapshot : makeSnapshot();
     if (!snap.ceremonySettings && ceremonySettings) {
       snap.ceremonySettings = { ...ceremonySettings };
@@ -1106,7 +1118,8 @@ const pushHistory = (snapshot) => {
     setSelectedIds((prev) => {
       const s = new Set((prev || []).map(String));
       const key = String(id);
-      if (s.has(key)) s.delete(key); else s.add(key);
+      if (s.has(key)) s.delete(key);
+      else s.add(key);
       return Array.from(s);
     });
     setSelectedTable(table || null);
@@ -1123,66 +1136,76 @@ const pushHistory = (snapshot) => {
   const toggleSelectedTableShape = () => {
     if (!selectedTable) return;
     const nextType =
-      selectedTable.tableType === 'round' || selectedTable.shape === 'circle'
-        ? 'square'
-        : 'round';
+      selectedTable.tableType === 'round' || selectedTable.shape === 'circle' ? 'square' : 'round';
     const updated = updateTableWithField(selectedTable, 'tableType', nextType);
     const sanitized = sanitizeTable(updated, { forceAuto: true });
     setSelectedTable(sanitized);
     setTables((prev) => prev.map((t) => (t.id === selectedTable.id ? sanitized : t)));
   };
   const moveTable = (tableId, pos, { finalize } = { finalize: true }) => {
-    const apply = (prev) => prev.map((t) => (String(t.id) === String(tableId) ? { ...t, x: pos.x, y: pos.y } : t));
-    if (tab === 'ceremony') setTablesCeremony((p) => apply(p)); else setTablesBanquet((p) => apply(p));
+    const apply = (prev) =>
+      prev.map((t) => (String(t.id) === String(tableId) ? { ...t, x: pos.x, y: pos.y } : t));
+    if (tab === 'ceremony') setTablesCeremony((p) => apply(p));
+    else setTablesBanquet((p) => apply(p));
     if (finalize) {
       try {
-        pushHistory({ type: tab, tables: tab === 'ceremony' ? tablesCeremony : tablesBanquet, areas: tab === 'ceremony' ? areasCeremony : areasBanquet, seats: tab === 'ceremony' ? seatsCeremony : [] });
+        pushHistory({
+          type: tab,
+          tables: tab === 'ceremony' ? tablesCeremony : tablesBanquet,
+          areas: tab === 'ceremony' ? areasCeremony : areasBanquet,
+          seats: tab === 'ceremony' ? seatsCeremony : [],
+        });
       } catch (_) {}
     }
   };
   const deleteTable = (tableId) => {
     releaseLock('table', tableId);
-    if (tab === 'ceremony') setTablesCeremony((prev) => prev.filter((t) => String(t.id) !== String(tableId)));
+    if (tab === 'ceremony')
+      setTablesCeremony((prev) => prev.filter((t) => String(t.id) !== String(tableId)));
     else setTablesBanquet((prev) => prev.filter((t) => String(t.id) !== String(tableId)));
   };
   const duplicateTable = (tableId) => {
-      const source = tab === 'ceremony' ? tablesCeremony : tablesBanquet;
-      const setFn = tab === 'ceremony' ? setTablesCeremony : setTablesBanquet;
-      const t = source.find((x) => String(x.id) === String(tableId));
-      if (!t) return;
-      const maxId = source.reduce((m, x) => { const n = parseInt(x.id, 10); return Number.isFinite(n) ? Math.max(m, n) : m; }, 0);
-      const copy = sanitizeTable({
-        ...t,
-        id: maxId + 1,
-        x: (t.x || 0) + 30,
-        y: (t.y || 0) + 30,
-        name: `Mesa ${maxId + 1}`,
-      });
-      setFn((prev) => [...prev, copy]);
-    };
+    const source = tab === 'ceremony' ? tablesCeremony : tablesBanquet;
+    const setFn = tab === 'ceremony' ? setTablesCeremony : setTablesBanquet;
+    const t = source.find((x) => String(x.id) === String(tableId));
+    if (!t) return;
+    const maxId = source.reduce((m, x) => {
+      const n = parseInt(x.id, 10);
+      return Number.isFinite(n) ? Math.max(m, n) : m;
+    }, 0);
+    const copy = sanitizeTable({
+      ...t,
+      id: maxId + 1,
+      x: (t.x || 0) + 30,
+      y: (t.y || 0) + 30,
+      name: `Mesa ${maxId + 1}`,
+    });
+    setFn((prev) => [...prev, copy]);
+  };
   const toggleTableLocked = (tableId) => {
     const setFn = tab === 'ceremony' ? setTablesCeremony : setTablesBanquet;
-    setFn((prev) => prev.map((t) => (String(t.id) === String(tableId) ? { ...t, locked: !t.locked } : t)));
+    setFn((prev) =>
+      prev.map((t) => (String(t.id) === String(tableId) ? { ...t, locked: !t.locked } : t))
+    );
   };
 
   const addTable = (table = {}) => {
     try {
       console.log('[addTable] Input:', table);
       console.log('[addTable] Current tab:', tab);
-      
+
       const typeHint =
-        table.tableType ||
-        (table.shape === 'circle' ? 'round' : inferTableType(table));
-      
+        table.tableType || (table.shape === 'circle' ? 'round' : inferTableType(table));
+
       const base = createTableFromType(typeHint, {
         ...table,
         id: table.id || Date.now(),
         autoCapacity: table.autoCapacity ?? true,
       });
-      
+
       const sanitized = sanitizeTable(base, { forceAuto: base.autoCapacity });
       console.log('[addTable] Sanitized table:', sanitized);
-      
+
       if (tab === 'ceremony') {
         setTablesCeremony((prev) => {
           const newTables = [...prev, sanitized];
@@ -1197,7 +1220,7 @@ const pushHistory = (snapshot) => {
           return newTables;
         });
       }
-      
+
       // A�adir al historial
       try {
         pushHistory();
@@ -1216,15 +1239,19 @@ const pushHistory = (snapshot) => {
     if (tab === 'ceremony') setAreasCeremony((prev) => [...prev, normalize(area)]);
     else setAreasBanquet((prev) => [...prev, normalize(area)]);
     // Guardar en historial tras añadir área
-    try { pushHistory(); } catch (_) {}
+    try {
+      pushHistory();
+    } catch (_) {}
   };
   const deleteArea = (index) => {
     const del = (arr) => arr.filter((_, i) => i !== index);
-    if (tab === 'ceremony') setAreasCeremony((prev) => del(prev)); else setAreasBanquet((prev) => del(prev));
+    if (tab === 'ceremony') setAreasCeremony((prev) => del(prev));
+    else setAreasBanquet((prev) => del(prev));
   };
   const updateArea = (index, updated) => {
     const upd = (arr) => arr.map((a, i) => (i === index ? updated : a));
-    if (tab === 'ceremony') setAreasCeremony((prev) => upd(prev)); else setAreasBanquet((prev) => upd(prev));
+    if (tab === 'ceremony') setAreasCeremony((prev) => upd(prev));
+    else setAreasBanquet((prev) => upd(prev));
   };
 
   // Generación de layouts
@@ -1369,6 +1396,58 @@ const pushHistory = (snapshot) => {
       pushHistory({ type: 'banquet', tables: sanitized, areas: areasBanquet });
     } catch (_) {}
   };
+
+  /**
+   * Genera el layout automáticamente basándose en los invitados y sus asignaciones de mesa
+   */
+  const generateAutoLayoutFromGuests = (layoutType = 'columns') => {
+    try {
+      const result = generateAutoLayout(guests, layoutType, hallSize);
+
+      if (result.tables.length === 0) {
+        return {
+          success: false,
+          message: result.message || 'No hay mesas para generar',
+          unassignedGuests: result.unassignedGuests || [],
+        };
+      }
+
+      // Aplicar las mesas generadas al estado
+      applyBanquetTables(result.tables);
+
+      return {
+        success: true,
+        message: result.message,
+        tablesGenerated: result.totalTables,
+        guestsAssigned: result.totalAssigned,
+        unassignedGuests: result.unassignedGuests || [],
+      };
+    } catch (error) {
+      console.error('[generateAutoLayoutFromGuests] Error:', error);
+      return {
+        success: false,
+        message: 'Error generando el layout automático',
+        error: error.message,
+      };
+    }
+  };
+
+  /**
+   * Analiza los invitados actuales para obtener estadísticas
+   */
+  const analyzeCurrentGuests = () => {
+    try {
+      return analyzeGuestAssignments(guests);
+    } catch (error) {
+      console.error('[analyzeCurrentGuests] Error:', error);
+      return {
+        tables: [],
+        unassignedGuests: [],
+        totalTables: 0,
+        totalAssigned: 0,
+      };
+    }
+  };
   const clearBanquetLayout = () => {
     releaseTableLocksExcept([]);
     setTablesBanquet([]);
@@ -1376,15 +1455,43 @@ const pushHistory = (snapshot) => {
 
   // Invitados y asientos
   const moveGuest = (guestId, tableId) => {
-    setGuests((prev) => prev.map((g) => (String(g.id) === String(guestId) ? { ...g, tableId: tableId == null ? null : tableId, table: tableId == null ? null : String(tableId) } : g)));
+    setGuests((prev) =>
+      prev.map((g) =>
+        String(g.id) === String(guestId)
+          ? {
+              ...g,
+              tableId: tableId == null ? null : tableId,
+              table: tableId == null ? null : String(tableId),
+            }
+          : g
+      )
+    );
   };
-  const moveGuestToSeat = (guestId, tableId, _seatIdx) => { moveGuest(guestId, tableId); };
+  const moveGuestToSeat = (guestId, tableId, _seatIdx) => {
+    moveGuest(guestId, tableId);
+  };
   const assignGuestToCeremonySeat = async (seatId, guestId) => {
-    setSeatsCeremony((prev) => prev.map((s) => (String(s.id) === String(seatId) ? { ...s, guestId, guestName: (guests.find((g) => String(g.id) === String(guestId)) || {}).name || null } : s)));
+    setSeatsCeremony((prev) =>
+      prev.map((s) =>
+        String(s.id) === String(seatId)
+          ? {
+              ...s,
+              guestId,
+              guestName: (guests.find((g) => String(g.id) === String(guestId)) || {}).name || null,
+            }
+          : s
+      )
+    );
     return true;
   };
   const toggleSeatEnabled = (seatId) => {
-    setSeatsCeremony((prev) => prev.map((s) => (String(s.id) === String(seatId) ? { ...s, enabled: s.enabled === false ? true : !s.enabled } : s)));
+    setSeatsCeremony((prev) =>
+      prev.map((s) =>
+        String(s.id) === String(seatId)
+          ? { ...s, enabled: s.enabled === false ? true : !s.enabled }
+          : s
+      )
+    );
   };
 
   // Selección múltiple directa desde el canvas (reemplazo o unión)
@@ -1431,7 +1538,8 @@ const pushHistory = (snapshot) => {
           occ.set(tid, (occ.get(tid) || 0) + 1 + (parseInt(g.companion, 10) || 0));
           assigned += 1 + (parseInt(g.companion, 10) || 0);
           const idx = updated.findIndex((x) => String(x.id) === String(g.id));
-          if (idx >= 0) updated[idx] = { ...updated[idx], tableId: table.id, table: String(table.id) };
+          if (idx >= 0)
+            updated[idx] = { ...updated[idx], tableId: table.id, table: String(table.id) };
         }
       });
       setGuests(updated);
@@ -1501,12 +1609,7 @@ const pushHistory = (snapshot) => {
       const remainingAfter = freeSeats - desiredSeats;
       const capacityScore = Math.max(0, 28 - Math.max(0, remainingAfter) * 5);
       score += capacityScore;
-      reasons.push(
-        buildReason(
-          `Quedan ${meta.free} asientos libres`,
-          capacityScore
-        )
-      );
+      reasons.push(buildReason(`Quedan ${meta.free} asientos libres`, capacityScore));
     } else {
       score += 8;
       reasons.push(buildReason('Mesa sin l�mite de asientos configurado', 8));
@@ -1530,10 +1633,7 @@ const pushHistory = (snapshot) => {
         const bonus = Math.min(15, sameGroupCount * 5);
         score += bonus;
         reasons.push(
-          buildReason(
-            `Mesa con ${sameGroupCount} invitado(s) del grupo "${group}"`,
-            bonus
-          )
+          buildReason(`Mesa con ${sameGroupCount} invitado(s) del grupo "${group}"`, bonus)
         );
       }
     }
@@ -1549,16 +1649,13 @@ const pushHistory = (snapshot) => {
       if (sameCompanionGroup > 0) {
         const bonus = Math.min(12, 4 + sameCompanionGroup * 4);
         score += bonus;
-        reasons.push(
-          buildReason(
-            `Mesa con acompa�antes del grupo ${companionGroup}`,
-            bonus
-          )
-        );
+        reasons.push(buildReason(`Mesa con acompa�antes del grupo ${companionGroup}`, bonus));
       }
     }
 
-    const guestDiet = String(guest?.dietaryRestrictions || '').trim().toLowerCase();
+    const guestDiet = String(guest?.dietaryRestrictions || '')
+      .trim()
+      .toLowerCase();
     if (guestDiet) {
       const dietMatches = meta.assignedGuests.filter((assigned) =>
         String(assigned?.dietaryRestrictions || '')
@@ -1569,9 +1666,7 @@ const pushHistory = (snapshot) => {
       if (dietMatches > 0) {
         const bonus = Math.min(10, 4 + dietMatches * 2);
         score += bonus;
-        reasons.push(
-          buildReason(`Mesa con ${dietMatches} invitado(s) con dieta similar`, bonus)
-        );
+        reasons.push(buildReason(`Mesa con ${dietMatches} invitado(s) con dieta similar`, bonus));
       } else {
         score -= 6;
         reasons.push(buildReason('La mesa no tiene invitados con la misma dieta', -6));
@@ -1603,19 +1698,14 @@ const pushHistory = (snapshot) => {
 
     if (meta.conflictReasons.length) {
       score -= 14;
-      reasons.push(
-        buildReason(`Mesa con ${meta.conflictReasons.length} conflicto(s)`, -14)
-      );
+      reasons.push(buildReason(`Mesa con ${meta.conflictReasons.length} conflicto(s)`, -14));
     }
 
     if (Number.isFinite(meta.overCapacity) && meta.overCapacity > 0) {
       const penalty = meta.overCapacity * 18;
       score -= penalty;
       reasons.push(
-        buildReason(
-          `Mesa sobre capacidad por ${meta.overCapacity} asiento(s)`,
-          -penalty
-        )
+        buildReason(`Mesa sobre capacidad por ${meta.overCapacity} asiento(s)`, -penalty)
       );
     }
 
@@ -1635,7 +1725,11 @@ const pushHistory = (snapshot) => {
       const boundary = (() => {
         try {
           const b = (areasBanquet || []).find(
-            (a) => !Array.isArray(a) && a?.type === 'boundary' && Array.isArray(a?.points) && a.points.length >= 3
+            (a) =>
+              !Array.isArray(a) &&
+              a?.type === 'boundary' &&
+              Array.isArray(a?.points) &&
+              a.points.length >= 3
           );
           return b ? b.points : null;
         } catch (e) {
@@ -1666,7 +1760,12 @@ const pushHistory = (snapshot) => {
         if (!t) return { minX: 0, minY: 0, maxX: 0, maxY: 0 };
         if (t.shape === 'circle') {
           const r = (t.diameter || 60) / 2;
-          return { minX: (t.x || 0) - r, minY: (t.y || 0) - r, maxX: (t.x || 0) + r, maxY: (t.y || 0) + r };
+          return {
+            minX: (t.x || 0) - r,
+            minY: (t.y || 0) - r,
+            maxX: (t.x || 0) + r,
+            maxY: (t.y || 0) + r,
+          };
         }
         const hw = (t.width || 80) / 2;
         const hh = (t.height || t.length || 60) / 2;
@@ -1693,7 +1792,8 @@ const pushHistory = (snapshot) => {
           const yi = pts[i].y;
           const xj = pts[j].x;
           const yj = pts[j].y;
-          const intersect = (yi > py) !== (yj > py) && px < ((xj - xi) * (py - yi)) / (yj - yi || 1e-9) + xi;
+          const intersect =
+            yi > py !== yj > py && px < ((xj - xi) * (py - yi)) / (yj - yi || 1e-9) + xi;
           if (intersect) inside = !inside;
         }
         return inside;
@@ -1712,9 +1812,7 @@ const pushHistory = (snapshot) => {
       // Overbooking map
       const idSet = new Set((tablesBanquet || []).map((t) => String(t?.id)));
       const nameSet = new Set(
-        (tablesBanquet || [])
-          .map((t) => String(t?.name || '').trim())
-          .filter(Boolean)
+        (tablesBanquet || []).map((t) => String(t?.name || '').trim()).filter(Boolean)
       );
       const occ = new Map();
       (guests || []).forEach((g) => {
@@ -1746,7 +1844,11 @@ const pushHistory = (snapshot) => {
         const others = (tablesBanquet || []).filter((x) => String(x?.id) !== tid);
         const otherExpanded = others.map(getTableBox).map((b) => expandBox(b, aisle / 2));
         if (otherExpanded.some((o) => rectsOverlap(padded, o))) {
-          out.push({ type: 'spacing', tableId: t.id, message: 'Distancia insuficiente entre mesas' });
+          out.push({
+            type: 'spacing',
+            tableId: t.id,
+            message: 'Distancia insuficiente entre mesas',
+          });
           return;
         }
       });
@@ -1756,10 +1858,7 @@ const pushHistory = (snapshot) => {
         const cap = parseInt(t.seats, 10) || globalMaxSeats || 0;
         if (!Number.isFinite(cap) || cap <= 0) return;
         const nameKey = String(t?.name || '').trim();
-        const used =
-          occ.get(tid) ||
-          (nameKey ? occ.get(nameKey) : 0) ||
-          0;
+        const used = occ.get(tid) || (nameKey ? occ.get(nameKey) : 0) || 0;
         const overflow = used > cap ? used - cap : 0;
         if (overflow > 0) {
           out.push({
@@ -1776,7 +1875,11 @@ const pushHistory = (snapshot) => {
       try {
         const cerBoundary = (() => {
           const b = (areasCeremony || []).find(
-            (a) => !Array.isArray(a) && a?.type === 'boundary' && Array.isArray(a?.points) && a.points.length >= 3
+            (a) =>
+              !Array.isArray(a) &&
+              a?.type === 'boundary' &&
+              Array.isArray(a?.points) &&
+              a.points.length >= 3
           );
           return b ? b.points : null;
         })();
@@ -1802,11 +1905,21 @@ const pushHistory = (snapshot) => {
           const px = s.x || 0;
           const py = s.y || 0;
           if (cerBoundary && !pointInPoly(px, py, cerBoundary)) {
-            out.push({ type: 'perimeter', tableId: `S${s.id}`, message: 'Silla fuera del per�metro' });
+            out.push({
+              type: 'perimeter',
+              tableId: `S${s.id}`,
+              message: 'Silla fuera del per�metro',
+            });
             return;
           }
-          if (cerObstacles.some((o) => px >= o.minX && px <= o.maxX && py >= o.minY && py <= o.maxY)) {
-            out.push({ type: 'obstacle', tableId: `S${s.id}`, message: 'Silla sobre obst�culo/puerta' });
+          if (
+            cerObstacles.some((o) => px >= o.minX && px <= o.maxX && py >= o.minY && py <= o.maxY)
+          ) {
+            out.push({
+              type: 'obstacle',
+              tableId: `S${s.id}`,
+              message: 'Silla sobre obst�culo/puerta',
+            });
           }
         });
       } catch (e) {
@@ -1834,8 +1947,8 @@ const pushHistory = (snapshot) => {
         guest?.tableId != null
           ? `id-${guest.tableId}`
           : guest?.table != null
-          ? `name-${String(guest.table).trim()}`
-          : null;
+            ? `name-${String(guest.table).trim()}`
+            : null;
       if (!key) return;
       if (!assignments.has(key)) assignments.set(key, []);
       assignments.get(key).push(guest);
@@ -1852,9 +1965,7 @@ const pushHistory = (snapshot) => {
     return (tablesBanquet || []).map((table) => {
       const idKey = `id-${table.id}`;
       const nameKey =
-        table?.name && String(table.name).trim()
-          ? `name-${String(table.name).trim()}`
-          : null;
+        table?.name && String(table.name).trim() ? `name-${String(table.name).trim()}` : null;
       const assignedGuests = [
         ...(assignments.get(idKey) || []),
         ...(nameKey ? assignments.get(nameKey) || [] : []),
@@ -1891,16 +2002,13 @@ const pushHistory = (snapshot) => {
         conflictReasons,
         isVipTable: keywordMatch(table?.name, SMART_VIP_KEYWORDS),
         sideHints,
-        tableName:
-          (typeof table?.name === 'string' && table.name.trim()) || `Mesa ${table.id}`,
+        tableName: (typeof table?.name === 'string' && table.name.trim()) || `Mesa ${table.id}`,
       };
     });
   }, [tablesBanquet, guests, conflicts, globalMaxSeats]);
 
   const smartRecommendations = useMemo(() => {
-    const pendingGuests = (guests || []).filter(
-      (guest) => !guest?.tableId && !guest?.table
-    );
+    const pendingGuests = (guests || []).filter((guest) => !guest?.tableId && !guest?.table);
     if (!pendingGuests.length || !smartTableMeta.length) return [];
 
     return pendingGuests
@@ -1932,8 +2040,8 @@ const pushHistory = (snapshot) => {
         const cluster = keywordMatch(guestKeywords, SMART_VIP_KEYWORDS)
           ? 'vip'
           : keywordMatch(guestKeywords, ['familia', 'family', 'herman', 'padre', 'madre'])
-          ? 'familia'
-          : 'otros';
+            ? 'familia'
+            : 'otros';
 
         return {
           guest,
@@ -1945,51 +2053,46 @@ const pushHistory = (snapshot) => {
       .sort((a, b) => b.topRecommendations[0].score - a.topRecommendations[0].score);
   }, [guests, smartTableMeta]);
 
-  
-const vipRecipients = useMemo(() => {
-  if (!specialMomentsData || !specialMomentsData.moments) return [];
-  const blockNameMap = new Map(
-    (specialMomentsData.blocks || []).map((block) => {
-      const blockId = String(block?.id ?? block?.key ?? '');
-      const label = block?.name || block?.title || blockId || 'Bloque';
-      return [blockId, label];
-    })
-  );
+  const vipRecipients = useMemo(() => {
+    if (!specialMomentsData || !specialMomentsData.moments) return [];
+    const blockNameMap = new Map(
+      (specialMomentsData.blocks || []).map((block) => {
+        const blockId = String(block?.id ?? block?.key ?? '');
+        const label = block?.name || block?.title || blockId || 'Bloque';
+        return [blockId, label];
+      })
+    );
 
-  const entries = [];
-  Object.entries(specialMomentsData.moments || {}).forEach(([blockId, list]) => {
-    if (!Array.isArray(list)) return;
-    list.forEach((moment) => {
-      const recipientId = moment?.recipientId ? String(moment.recipientId) : '';
-      const recipientName = moment?.recipientName ? String(moment.recipientName) : '';
-      if (!recipientId && !recipientName) return;
-      entries.push({
-        key: `${blockId || 'block'}-${moment?.id || ''}-${recipientId || recipientName}`,
-        blockId,
-        blockName: blockNameMap.get(String(blockId)) || String(blockId),
-        momentId: moment?.id || '',
-        momentTitle: moment?.title || '',
-        time: moment?.time || '',
-        recipientId,
-        recipientName,
+    const entries = [];
+    Object.entries(specialMomentsData.moments || {}).forEach(([blockId, list]) => {
+      if (!Array.isArray(list)) return;
+      list.forEach((moment) => {
+        const recipientId = moment?.recipientId ? String(moment.recipientId) : '';
+        const recipientName = moment?.recipientName ? String(moment.recipientName) : '';
+        if (!recipientId && !recipientName) return;
+        entries.push({
+          key: `${blockId || 'block'}-${moment?.id || ''}-${recipientId || recipientName}`,
+          blockId,
+          blockName: blockNameMap.get(String(blockId)) || String(blockId),
+          momentId: moment?.id || '',
+          momentTitle: moment?.title || '',
+          time: moment?.time || '',
+          recipientId,
+          recipientName,
+        });
       });
     });
-  });
-  return entries;
-}, [specialMomentsData]);
+    return entries;
+  }, [specialMomentsData]);
 
-const smartConflictSuggestions = useMemo(() => {
+  const smartConflictSuggestions = useMemo(() => {
     if (!Array.isArray(conflicts) || conflicts.length === 0) return [];
-    const tableMetaIndex = new Map(
-      smartTableMeta.map((meta) => [String(meta.tableId), meta])
-    );
+    const tableMetaIndex = new Map(smartTableMeta.map((meta) => [String(meta.tableId), meta]));
     const availableTargets = smartTableMeta.filter(
       (meta) =>
         String(meta.tableId) &&
         meta.conflictReasons.length === 0 &&
-        (meta.free > 0 ||
-          !Number.isFinite(meta.capacity) ||
-          meta.capacity <= 0)
+        (meta.free > 0 || !Number.isFinite(meta.capacity) || meta.capacity <= 0)
     );
     const suggestions = [];
 
@@ -2086,9 +2189,7 @@ const smartConflictSuggestions = useMemo(() => {
   }, [conflicts, smartTableMeta]);
 
   const smartInsights = useMemo(() => {
-    const pendingGuests = (guests || []).filter(
-      (guest) => !guest?.tableId && !guest?.table
-    );
+    const pendingGuests = (guests || []).filter((guest) => !guest?.tableId && !guest?.table);
     const vipRecipientIds = new Set(
       (vipRecipients || [])
         .map((entry) => entry.recipientId)
@@ -2097,9 +2198,7 @@ const smartConflictSuggestions = useMemo(() => {
     );
     let vipPending = 0;
     if (vipRecipientIds.size) {
-      vipPending = pendingGuests.filter((guest) =>
-        vipRecipientIds.has(String(guest?.id))
-      ).length;
+      vipPending = pendingGuests.filter((guest) => vipRecipientIds.has(String(guest?.id))).length;
     } else {
       vipPending = pendingGuests.filter((guest) =>
         keywordMatch(
@@ -2122,13 +2221,11 @@ const smartConflictSuggestions = useMemo(() => {
       tablesNearlyFull,
       conflictCount: conflicts.length,
       companionSeats,
-      highSeverityConflicts: smartConflictSuggestions.filter(
-        (item) => item.severity === 'high'
-      ).length,
+      highSeverityConflicts: smartConflictSuggestions.filter((item) => item.severity === 'high')
+        .length,
       overbookedTables: smartTableMeta.filter((meta) => meta.overCapacity > 0).length,
     };
   }, [guests, smartTableMeta, conflicts, smartConflictSuggestions]);
-
 
   // Conflictos: perímetro, obstáculos/puertas, pasillos (espaciado) y overbooking
   const guestMap = useMemo(() => {
@@ -2150,7 +2247,9 @@ const smartConflictSuggestions = useMemo(() => {
       link.download = `seating-plan-${tab}-${Date.now()}.png`;
       link.href = canvas.toDataURL();
       link.click();
-    } catch (error) { console.error('Error exportando PNG:', error); }
+    } catch (error) {
+      console.error('Error exportando PNG:', error);
+    }
   };
   const exportPDF = async () => {
     if (!canvasRef.current) return;
@@ -2172,19 +2271,25 @@ const smartConflictSuggestions = useMemo(() => {
         heightLeft -= pageHeight;
       }
       pdf.save(`seating-plan-${tab}-${Date.now()}.pdf`);
-    } catch (error) { console.error('Error exportando PDF:', error); }
+    } catch (error) {
+      console.error('Error exportando PDF:', error);
+    }
   };
   const exportCSV = async (options = {}) => {
     const { tabs: selectedTabs, returnBlob = false, filename } = options || {};
     try {
-      const requestedTabs = Array.isArray(selectedTabs) && selectedTabs.length ? selectedTabs : ['banquet', 'ceremony'];
+      const requestedTabs =
+        Array.isArray(selectedTabs) && selectedTabs.length ? selectedTabs : ['banquet', 'ceremony'];
       const rows = [
         ['guestId', 'name', 'tab', 'table', 'companions', 'notes'].join(','),
         ...guests.map((g) => {
           const tableName = g.table ?? g.tableId ?? '';
           const tabForGuest = (() => {
             if (requestedTabs.includes('banquet') && tableName) return 'banquet';
-            if (requestedTabs.includes('ceremony') && seatsCeremony.some((seat) => String(seat.guestId) === String(g.id))) {
+            if (
+              requestedTabs.includes('ceremony') &&
+              seatsCeremony.some((seat) => String(seat.guestId) === String(g.id))
+            ) {
               return 'ceremony';
             }
             return 'general';
@@ -2232,7 +2337,9 @@ const smartConflictSuggestions = useMemo(() => {
       const body = [
         ...areasBanquet.map((a) => {
           const pts = Array.isArray(a?.points) ? a.points : Array.isArray(a) ? a : [];
-          const d = pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ') + (pts.length ? ' Z' : '');
+          const d =
+            pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ') +
+            (pts.length ? ' Z' : '');
           return `<path d=\"${d}\" stroke=\"#10b981\" stroke-width=\"2\" fill=\"none\"/>`;
         }),
         ...tablesBanquet.map((t) => {
@@ -2301,8 +2408,8 @@ const smartConflictSuggestions = useMemo(() => {
         guest?.tableId != null
           ? `id-${guest.tableId}`
           : guest?.table
-          ? `name-${String(guest.table).trim()}`
-          : null;
+            ? `name-${String(guest.table).trim()}`
+            : null;
       if (!key) return;
       if (!guestsIndexByTable.has(key)) guestsIndexByTable.set(key, []);
       guestsIndexByTable.get(key).push(guest);
@@ -2472,12 +2579,8 @@ const smartConflictSuggestions = useMemo(() => {
     return langDict[key] || fallback || key;
   };
 
-  
-const exportDetailedPDF = async (options = {}) => {
-    const {
-      config: exportConfig = {},
-      logoDataUrl = null,
-    } = options || {};
+  const exportDetailedPDF = async (options = {}) => {
+    const { config: exportConfig = {}, logoDataUrl = null } = options || {};
 
     const pdf = new jsPDF('landscape', 'mm', 'a4');
     const margin = 16;
@@ -2503,10 +2606,7 @@ const exportDetailedPDF = async (options = {}) => {
     );
     const tablesList = Array.isArray(tablesBanquet) ? tablesBanquet : [];
     const tableNameById = new Map(
-      tablesList.map((table) => [
-        String(table.id),
-        table?.name || `Mesa ${table?.id ?? ''}`,
-      ])
+      tablesList.map((table) => [String(table.id), table?.name || `Mesa ${table?.id ?? ''}`])
     );
 
     const renderLegend = (items = []) => {
@@ -2608,7 +2708,7 @@ const exportDetailedPDF = async (options = {}) => {
         if (typeof seat?.x !== 'number' || typeof seat?.y !== 'number') return;
         const x = mapX(seat.x);
         const y = mapY(seat.y);
-        const radius = Math.max(1.6, Math.min(4, scale * 4 / 100));
+        const radius = Math.max(1.6, Math.min(4, (scale * 4) / 100));
         if (seat?.reservedFor) {
           pdf.setFillColor(253, 224, 71);
         } else if (seat?.guestId || seat?.guestName) {
@@ -2649,7 +2749,8 @@ const exportDetailedPDF = async (options = {}) => {
         (area) => area && area.type === 'boundary' && Array.isArray(area.points)
       );
       const obstacleAreas = areas.filter(
-        (area) => area && (area.type === 'obstacle' || area.type === 'door') && Array.isArray(area.points)
+        (area) =>
+          area && (area.type === 'obstacle' || area.type === 'door') && Array.isArray(area.points)
       );
 
       const { width: pageWidth, height: pageHeight } = getPageMetrics();
@@ -2818,8 +2919,8 @@ const exportDetailedPDF = async (options = {}) => {
         const tableLabel = guest?.table
           ? String(guest.table)
           : guest?.tableId != null
-          ? tableNameById.get(String(guest.tableId)) || String(guest.tableId)
-          : '';
+            ? tableNameById.get(String(guest.tableId)) || String(guest.tableId)
+            : '';
         const line = [
           guest?.name || '',
           guest?.response || guest?.status || '',
@@ -2897,9 +2998,7 @@ const exportDetailedPDF = async (options = {}) => {
         tableSections.push({ name: `Mesa ${key}`, guests: value });
       });
 
-      const unassigned = allGuests.filter(
-        (guest) => !guest?.table && guest?.tableId == null
-      );
+      const unassigned = allGuests.filter((guest) => !guest?.table && guest?.tableId == null);
       if (unassigned.length) {
         tableSections.push({ name: 'Sin mesa asignada', guests: unassigned });
       }
@@ -3051,8 +3150,8 @@ const exportDetailedPDF = async (options = {}) => {
         const tableLabel = guest?.table
           ? String(guest.table)
           : guest?.tableId != null
-          ? tableNameById.get(String(guest.tableId)) || String(guest.tableId)
-          : '';
+            ? tableNameById.get(String(guest.tableId)) || String(guest.tableId)
+            : '';
         return {
           ...entry,
           guest,
@@ -3112,7 +3211,7 @@ const exportDetailedPDF = async (options = {}) => {
       filename: exportName,
     };
   };
-const exportDetailedSVG = (options = {}) => {
+  const exportDetailedSVG = (options = {}) => {
     const {
       tabs: requestedTabs = ['ceremony', 'banquet'],
       config: exportConfig = {},
@@ -3129,7 +3228,9 @@ const exportDetailedSVG = (options = {}) => {
         width + padding * 2
       } ${totalHeight}" font-family="Helvetica, Arial, sans-serif">`
     );
-    svgParts.push(`<rect x="0" y="0" width="${width + padding * 2}" height="${totalHeight}" fill="#ffffff"/>`);
+    svgParts.push(
+      `<rect x="0" y="0" width="${width + padding * 2}" height="${totalHeight}" fill="#ffffff"/>`
+    );
 
     if (logoDataUrl) {
       svgParts.push(
@@ -3140,9 +3241,7 @@ const exportDetailedSVG = (options = {}) => {
     requestedTabs.forEach((tab, index) => {
       const tabId = normalizeTabId(tab);
       const yOffset = padding + index * (height + padding);
-      svgParts.push(
-        `<g transform="translate(${padding}, ${yOffset})" data-tab="${tabId}">`
-      );
+      svgParts.push(`<g transform="translate(${padding}, ${yOffset})" data-tab="${tabId}">`);
       svgParts.push(
         `<text x="${width / 2}" y="-20" font-size="32" fill="#111" text-anchor="middle">${tabId.toUpperCase()}</text>`
       );
@@ -3168,7 +3267,9 @@ const exportDetailedSVG = (options = {}) => {
           const pts = Array.isArray(area?.points) ? area.points : Array.isArray(area) ? area : [];
           if (!pts.length) return;
           const d = pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ') + ' Z';
-          svgParts.push(`<path d="${d}" fill="none" stroke="#10b981" stroke-width="4" opacity="0.8"/>`);
+          svgParts.push(
+            `<path d="${d}" fill="none" stroke="#10b981" stroke-width="4" opacity="0.8"/>`
+          );
         });
         (tablesBanquet || []).forEach((table) => {
           if (table.shape === 'circle') {
@@ -3184,16 +3285,23 @@ const exportDetailedSVG = (options = {}) => {
             );
           }
           svgParts.push(
-            `<text x="${table.x}" y="${table.y + 6}" font-size="28" fill="#1f2937" text-anchor="middle">${table.name ||
-              `Mesa ${table.id}`}</text>`
+            `<text x="${table.x}" y="${table.y + 6}" font-size="28" fill="#1f2937" text-anchor="middle">${
+              table.name || `Mesa ${table.id}`
+            }</text>`
           );
         });
       } else if (tabId === 'free-draw') {
         (areasBanquet || []).forEach((shape) => {
-          const pts = Array.isArray(shape?.points) ? shape.points : Array.isArray(shape) ? shape : [];
+          const pts = Array.isArray(shape?.points)
+            ? shape.points
+            : Array.isArray(shape)
+              ? shape
+              : [];
           if (!pts.length) return;
           const d = pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ') + ' Z';
-          svgParts.push(`<path d="${d}" fill="#dbeafe" stroke="#3b82f6" stroke-width="3" opacity="0.6"/>`);
+          svgParts.push(
+            `<path d="${d}" fill="#dbeafe" stroke="#3b82f6" stroke-width="3" opacity="0.6"/>`
+          );
         });
       }
       svgParts.push(`</g>`);
@@ -3242,9 +3350,7 @@ const exportDetailedSVG = (options = {}) => {
       orientation: exportConfig.orientation || 'portrait',
       scale: exportConfig.scale || '1:75',
       includeMeasures:
-        typeof exportConfig.includeMeasures === 'boolean'
-          ? exportConfig.includeMeasures
-          : true,
+        typeof exportConfig.includeMeasures === 'boolean' ? exportConfig.includeMeasures : true,
       language: exportConfig.language || 'es',
       logoUrl: exportConfig.logoUrl || '',
     };
@@ -3256,11 +3362,12 @@ const exportDetailedSVG = (options = {}) => {
     const artifactPromises = [];
     const artifactConfig = { ...sanitizedConfig, returnBlob: wantsPersistence };
 
-    const toArtifact = (result) => Promise.resolve(result).catch((error) => {
-      console.warn('[useSeatingPlan] export artifact failed', error);
-      if (wantsPersistence) throw error;
-      return null;
-    });
+    const toArtifact = (result) =>
+      Promise.resolve(result).catch((error) => {
+        console.warn('[useSeatingPlan] export artifact failed', error);
+        if (wantsPersistence) throw error;
+        return null;
+      });
 
     if (uniqueFormats.includes('pdf')) {
       artifactPromises.push(
@@ -3307,7 +3414,8 @@ const exportDetailedSVG = (options = {}) => {
         const url = URL.createObjectURL(artifact.blob);
         const anchor = document.createElement('a');
         anchor.href = url;
-        anchor.download = artifact.filename || `seating-export-${Date.now()}.${artifact.format || 'dat'}`;
+        anchor.download =
+          artifact.filename || `seating-export-${Date.now()}.${artifact.format || 'dat'}`;
         anchor.click();
         URL.revokeObjectURL(url);
       } catch (error) {
@@ -3328,7 +3436,8 @@ const exportDetailedSVG = (options = {}) => {
             hallWidth: summarySource.hallSize?.width ?? null,
             hallHeight: summarySource.hallSize?.height ?? null,
             tables: Array.isArray(summarySource.tables) ? summarySource.tables.length : null,
-            guests: typeof summarySource.guestsCount === 'number' ? summarySource.guestsCount : null,
+            guests:
+              typeof summarySource.guestsCount === 'number' ? summarySource.guestsCount : null,
             areas: Array.isArray(summarySource.areas) ? summarySource.areas.length : null,
           }).filter(([, value]) => value !== null && value !== undefined)
         )
@@ -3453,7 +3562,9 @@ const exportDetailedSVG = (options = {}) => {
           },
           { merge: true }
         );
-      } catch (err) { console.error('Error guardando dimensiones del salón:', err); }
+      } catch (err) {
+        console.error('Error guardando dimensiones del salón:', err);
+      }
     }
   };
   const saveGlobalMaxGuests = async (n) => {
@@ -3495,7 +3606,9 @@ const exportDetailedSVG = (options = {}) => {
           },
           { merge: true }
         );
-      } catch (e) { console.warn('saveGlobalMaxGuests failed', e); }
+      } catch (e) {
+        console.warn('saveGlobalMaxGuests failed', e);
+      }
     }
   };
   const saveBackground = async (bg) => {
@@ -3532,7 +3645,9 @@ const exportDetailedSVG = (options = {}) => {
           },
           { merge: true }
         );
-      } catch (e) { console.warn('saveBackground failed', e); }
+      } catch (e) {
+        console.warn('saveBackground failed', e);
+      }
     }
   };
 
@@ -3541,7 +3656,9 @@ const exportDetailedSVG = (options = {}) => {
     try {
       if (!selectedTable) return;
       const setFn = tab === 'ceremony' ? setTablesCeremony : setTablesBanquet;
-      setFn((prev) => prev.map((t) => (t.id === selectedTable.id ? { ...t, angle: (t.angle || 0) + deg } : t)));
+      setFn((prev) =>
+        prev.map((t) => (t.id === selectedTable.id ? { ...t, angle: (t.angle || 0) + deg } : t))
+      );
     } catch (_) {}
   };
   const alignSelected = (axis = 'x', mode = 'center') => {
@@ -3557,7 +3674,9 @@ const exportDetailedSVG = (options = {}) => {
       else if (mode === 'end') target = Math.max(...sel.map(getCoord));
       else target = Math.round(sel.reduce((s, t) => s + getCoord(t), 0) / sel.length);
       const setFn = tab === 'ceremony' ? setTablesCeremony : setTablesBanquet;
-      setFn((prev) => prev.map((t) => (ids.map(String).includes(String(t.id)) ? { ...t, [axis]: target } : t)));
+      setFn((prev) =>
+        prev.map((t) => (ids.map(String).includes(String(t.id)) ? { ...t, [axis]: target } : t))
+      );
     } catch (_) {}
   };
   const distributeSelected = (axis = 'x') => {
@@ -3565,7 +3684,9 @@ const exportDetailedSVG = (options = {}) => {
       const ids = Array.isArray(selectedIds) && selectedIds.length > 2 ? selectedIds : [];
       if (ids.length < 3) return;
       const arr = tab === 'ceremony' ? [...tablesCeremony] : [...tablesBanquet];
-      const sel = arr.filter((t) => ids.map(String).includes(String(t.id))).sort((a, b) => (axis === 'x' ? (a.x || 0) - (b.x || 0) : (a.y || 0) - (b.y || 0)));
+      const sel = arr
+        .filter((t) => ids.map(String).includes(String(t.id)))
+        .sort((a, b) => (axis === 'x' ? (a.x || 0) - (b.x || 0) : (a.y || 0) - (b.y || 0)));
       const first = axis === 'x' ? sel[0].x || 0 : sel[0].y || 0;
       const last = axis === 'x' ? sel[sel.length - 1].x || 0 : sel[sel.length - 1].y || 0;
       const step = (last - first) / (sel.length - 1);
@@ -3635,7 +3756,9 @@ const exportDetailedSVG = (options = {}) => {
       const raw = localStorage.getItem(indexKey);
       const arr = raw ? JSON.parse(raw) : [];
       return Array.isArray(arr) ? arr : [];
-    } catch (e) { return []; }
+    } catch (e) {
+      return [];
+    }
   };
   const saveSnapshot = (name) => {
     try {
@@ -3648,7 +3771,9 @@ const exportDetailedSVG = (options = {}) => {
         localStorage.setItem(indexKey, JSON.stringify([...idx, safe]));
       }
       return true;
-    } catch (e) { return false; }
+    } catch (e) {
+      return false;
+    }
   };
   const loadSnapshot = (name) => {
     try {
@@ -3657,7 +3782,9 @@ const exportDetailedSVG = (options = {}) => {
       if (!raw) return false;
       applySnapshot(JSON.parse(raw));
       return true;
-    } catch (e) { return false; }
+    } catch (e) {
+      return false;
+    }
   };
   const deleteSnapshot = (name) => {
     try {
@@ -3667,18 +3794,23 @@ const exportDetailedSVG = (options = {}) => {
       const idx = listSnapshots().filter((n) => n !== safe);
       localStorage.setItem(indexKey, JSON.stringify(idx));
       return true;
-    } catch (e) { return false; }
+    } catch (e) {
+      return false;
+    }
   };
 
   // Setter merge para scoringWeights
   const updateScoringWeights = (patch) => {
-    try { setScoringWeights((prev) => ({ ...(prev || {}), ...(patch || {}) })); } catch (e) {}
+    try {
+      setScoringWeights((prev) => ({ ...(prev || {}), ...(patch || {}) }));
+    } catch (e) {}
   };
 
   return {
     // Estados
     tab,
-    setTab,    hallSize,
+    setTab,
+    hallSize,
     areas,
     tables,
     seats,
@@ -3804,5 +3936,9 @@ const exportDetailedSVG = (options = {}) => {
 
     // Utilidades
     normalizeId,
+
+    // Generación automática
+    generateAutoLayoutFromGuests,
+    analyzeCurrentGuests,
   };
 };

@@ -3,12 +3,14 @@ import { Link, useNavigate } from 'react-router-dom';
 
 import { useWedding } from '../../context/WeddingContext';
 import { db, firebaseReady } from '../../firebaseConfig';
+import useTranslations from '../../hooks/useTranslations';
 
 const fsImport = () => import('firebase/firestore');
 const stImport = () => import('firebase/storage');
 
 export default function MisDiseños() {
   const { activeWedding } = useWedding();
+  const { t } = useTranslations();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -30,16 +32,24 @@ export default function MisDiseños() {
         setItems(arr);
       } catch (e) {
         console.error(e);
-        setError('No se pudo cargar tus diseños');
+        setError(
+          t('common.designsLibrary.myDesigns.messages.loadError', 'No se pudo cargar tus diseños')
+        );
       } finally {
         setLoading(false);
       }
     };
     load();
-  }, [activeWedding]);
+  }, [activeWedding, t]);
 
   const handleDelete = async (it) => {
-    if (!confirm('¿Eliminar este diseño definitivamente?')) return;
+    if (
+      !confirm(
+        t('common.designsLibrary.myDesigns.confirmDelete', '¿Eliminar este diseño definitivamente?')
+      )
+    ) {
+      return;
+    }
     try {
       await firebaseReady;
       const { doc, deleteDoc } = await fsImport();
@@ -52,42 +62,61 @@ export default function MisDiseños() {
       setItems((prev) => prev.filter((x) => x.id !== it.id));
     } catch (e) {
       console.error(e);
-      alert('No se pudo eliminar');
+      alert(t('common.designsLibrary.myDesigns.messages.deleteError', 'No se pudo eliminar'));
     }
   };
 
   return (
     <div className="p-4 space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Mis diseños</h1>
+        <h1 className="text-xl font-semibold">
+          {t('common.designsLibrary.myDesigns.title', 'Mis diseños')}
+        </h1>
         <Link to="/disenos" className="text-blue-600 hover:underline">
-          Volver a Diseños
+          {t('common.designsLibrary.myDesigns.backLink', 'Volver a Diseños')}
         </Link>
       </div>
       {!activeWedding && (
         <div className="p-3 border rounded bg-yellow-50 text-yellow-900">
-          Selecciona una boda para ver sus diseños.
+          {t(
+            'common.designsLibrary.myDesigns.warning.noWedding',
+            'Selecciona una boda para ver sus diseños.'
+          )}
         </div>
       )}
       {error && <div className="p-3 border rounded bg-red-50 text-red-700">{error}</div>}
-      {loading && <div className="text-sm text-gray-600">Cargando...</div>}
+      {loading && (
+        <div className="text-sm text-gray-600">
+          {t('common.designsLibrary.myDesigns.loading', 'Cargando...')}
+        </div>
+      )}
       {!loading && activeWedding && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {items.map((it) => (
             <div key={it.id} className="border rounded overflow-hidden bg-white">
               <div className="p-2 bg-gray-50 text-xs text-gray-600 flex items-center justify-between">
-                <span>{it.type || 'diseño'}</span>
-                <span>{it.category || 'general'}</span>
+                <span>
+                  {it.type || t('common.designsLibrary.myDesigns.item.typeFallback', 'diseño')}
+                </span>
+                <span>
+                  {it.category ||
+                    t('common.designsLibrary.myDesigns.item.categoryFallback', 'general')}
+                </span>
               </div>
               <div className="aspect-square w-full overflow-hidden flex items-center justify-center bg-white">
                 {it.url ? (
                   <img
                     src={it.url}
-                    alt={it.category || 'diseño'}
+                    alt={
+                      it.category ||
+                      t('common.designsLibrary.myDesigns.item.typeFallback', 'diseño')
+                    }
                     className="max-w-full max-h-full object-contain"
                   />
                 ) : (
-                  <div className="text-gray-400 text-sm">Sin vista previa</div>
+                  <div className="text-gray-400 text-sm">
+                    {t('common.designsLibrary.myDesigns.item.noPreview', 'Sin vista previa')}
+                  </div>
                 )}
               </div>
               <div className="p-2 flex gap-2">
@@ -96,11 +125,14 @@ export default function MisDiseños() {
                     className="px-2 py-1 text-sm rounded border"
                     onClick={() =>
                       navigate(
-                        `/disenos/vector-editor?svg=${encodeURIComponent(it.url)}&category=${encodeURIComponent(it.category || 'general')}`
+                        `/disenos/vector-editor?svg=${encodeURIComponent(it.url)}&category=${encodeURIComponent(
+                          it.category ||
+                            t('common.designsLibrary.myDesigns.item.categoryFallback', 'general')
+                        )}`
                       )
                     }
                   >
-                    Editar
+                    {t('common.designsLibrary.myDesigns.actions.edit', 'Editar')}
                   </button>
                 )}
                 {it.url && (
@@ -110,20 +142,22 @@ export default function MisDiseños() {
                     rel="noreferrer"
                     className="px-2 py-1 text-sm rounded border"
                   >
-                    Descargar
+                    {t('common.designsLibrary.myDesigns.actions.download', 'Descargar')}
                   </a>
                 )}
                 <button
                   className="px-2 py-1 text-sm rounded border text-red-600"
                   onClick={() => handleDelete(it)}
                 >
-                  Eliminar
+                  {t('common.designsLibrary.myDesigns.actions.delete', 'Eliminar')}
                 </button>
               </div>
             </div>
           ))}
           {items.length === 0 && (
-            <div className="text-sm text-gray-600">No hay diseños guardados todavía.</div>
+            <div className="text-sm text-gray-600">
+              {t('common.designsLibrary.myDesigns.noItems', 'No hay diseños guardados todavía.')}
+            </div>
           )}
         </div>
       )}

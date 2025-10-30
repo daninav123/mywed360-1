@@ -3163,6 +3163,53 @@
       "provider": "Proveedor",
       "service": "Servicio"
     },
+    "compare": {
+      "title": "Comparar proveedores",
+      "summary": "Comparando {{count}} proveedor",
+      "summary_plural": "Comparando {{count}} proveedores",
+      "empty": {
+        "title": "No hay proveedores para comparar",
+        "description": "Selecciona proveedores desde la búsqueda usando el checkbox de comparar.",
+        "cta": "Volver a la búsqueda"
+      },
+      "actions": {
+        "back": "Volver a búsqueda",
+        "clearAll": "Limpiar todos",
+        "clear": "Limpiar comparación",
+        "remove": "Quitar"
+      },
+      "features": {
+        "basic": "Información básica",
+        "rating": "Valoración",
+        "location": "Ubicación",
+        "price": "Precio",
+        "portfolio": "Portfolio",
+        "reviews": "Reseñas"
+      },
+      "table": {
+        "feature": "Característica",
+        "image": "Imagen",
+        "description": "Descripción",
+        "contact": "Contacto",
+        "type": "Tipo",
+        "notAvailable": "No disponible",
+        "notSpecified": "No especificado",
+        "noRatings": "Sin valoraciones",
+        "noLocation": "No especificada",
+        "seePortfolio": "Ver portfolio →",
+        "reviewsCount": "{{count}} reseña",
+        "reviewsCount_plural": "{{count}} reseñas",
+        "categoryFallback": "Sin categoría"
+      },
+      "price": {
+        "notSpecified": "No especificado"
+      },
+      "typeBadges": {
+        "registered": "Registrado",
+        "cached": "En caché",
+        "internet": "Internet"
+      }
+    },
     "register": {
       "title": "Registra tu negocio",
       "subtitle": "Ãšnete a la plataforma y destaca entre miles de parejas buscando proveedores",
@@ -5027,6 +5074,141 @@
         "description": "Completa toda tu información para aparecer mejor posicionado en las búsquedas. Los perfiles con fotos y descripciones detalladas reciben 3x más contactos.",
         "title": "Consejo"
       }
+    }
+  },
+  "designsLibrary": {
+    "myDesigns": {
+      "title": "Mis diseños",
+      "backLink": "Volver a Diseños",
+      "warning": {
+        "noWedding": "Selecciona una boda para ver sus diseños."
+      },
+      "loading": "Cargando...",
+      "messages": {
+        "loadError": "No se pudo cargar tus diseños",
+        "deleteError": "No se pudo eliminar"
+      },
+      "confirmDelete": "¿Eliminar este diseño definitivamente?",
+      "noItems": "No hay diseños guardados todavía.",
+      "item": {
+        "typeFallback": "diseño",
+        "categoryFallback": "general",
+        "noPreview": "Sin vista previa"
+      },
+      "actions": {
+        "edit": "Editar",
+        "download": "Descargar",
+        "delete": "Eliminar"
+      }
+    },
+    "vectorEditor": {
+      "title": "Editor vectorial (IA)",
+      "warning": {
+        "openHint": "Abre este editor desde una imagen generada con IA para vectorizarla automáticamente."
+      },
+      "controls": {
+        "modeLabel": "Modo",
+        "modes": {
+          "color": "Color (ImageTracer)",
+          "mono": "Monocromo (Potrace)"
+        },
+        "color": {
+          "colors": "Colores",
+          "ltres": "ltres (0-1)",
+          "qtres": "qtres (0-1)",
+          "stroke": "Trazo"
+        },
+        "mono": {
+          "threshold": "Umbral (0-255)"
+        },
+        "vectorize": {
+          "action": "Revectorizar",
+          "loading": "Vectorizando..."
+        },
+        "viewOriginal": "Ver original",
+        "saveToWedding": "Guardar en la boda"
+      },
+      "palette": {
+        "title": "Paleta de la boda",
+        "save": "Guardar paleta",
+        "addColor": "+ color"
+      },
+      "messages": {
+        "vectorizeError": "No se pudo vectorizar la imagen",
+        "loadSvgError": "No se pudo cargar el SVG",
+        "paletteLoadWarning": "No se pudo cargar la paleta",
+        "noSvg": "No hay SVG disponible aún."
+      },
+      "toasts": {
+        "noContent": "No hay contenido SVG para guardar.",
+        "saveSuccess": "SVG guardado correctamente.",
+        "saveError": "No se pudo guardar el SVG.",
+        "paletteSaved": "Paleta guardada correctamente.",
+        "paletteSaveError": "No se pudo guardar la paleta."
+      }
+    }
+  },
+  "websitePreview": {
+    "empty": {
+      "title": "Vista previa de tu página web",
+      "description": "Genera la página con el asistente para previsualizar el resultado y poder publicarla.",
+      "editLogistics": "Editar logística antes de generar"
+    },
+    "previewTitle": "Vista previa de tu página web",
+    "windowTitle": "Vista previa - Tu web de boda",
+    "previewFrameTitle": "Vista previa",
+    "status": {
+      "checking": "Comprobando…",
+      "invalid": "Slug inválido",
+      "reserved": "Slug reservado",
+      "taken": "Ocupado",
+      "available": "Disponible",
+      "unknown": "No pudimos verificar"
+    },
+    "actions": {
+      "publish": {
+        "default": "Publicar página",
+        "loading": "Publicando..."
+      },
+      "editLogistics": "Editar logística",
+      "openNewTab": "Abrir en nueva pestaña",
+      "downloadHtml": "Descargar HTML",
+      "copyLink": "Copiar enlace",
+      "showQr": "Mostrar QR",
+      "hideQr": "Ocultar QR"
+    },
+    "slug": {
+      "label": "Slug público",
+      "placeholder": "mi-boda-ana-luis",
+      "suggestions": "Sugerencias:"
+    },
+    "qr": {
+      "title": "QR de la web pública",
+      "close": "Cerrar",
+      "alt": "QR"
+    },
+    "toasts": {
+      "linkCopied": "Enlace copiado al portapapeles"
+    }
+  },
+  "websiteGenerator": {
+    "gallery": {
+      "title": "Selecciona un estilo para tu web"
+    },
+    "prompt": {
+      "title": "Personaliza tu web",
+      "description": "Describe cómo quieres que sea tu página web, colores, estilos o cualquier requisito específico.",
+      "selectedTemplate": {
+        "prefix": "Usando plantilla: ",
+        "suffix": ". Puedes modificar el texto sugerido o añadir más detalles."
+      },
+      "exploreLibrary": "Explorar biblioteca de prompts",
+      "variablesHint": "Usa variables como {nombres}, {fecha}, {ubicacion}",
+      "placeholder": "Describe cómo quieres que sea tu web (estilo, colores, secciones, logística, etc.)"
+    },
+    "actions": {
+      "generate": "Generar Página Web",
+      "generating": "Generando..."
     }
   },
   "supportsla_null_features_editguests_true_edittasks": ",\n      supportSLA: null\n    },\n    features: {\n      editGuests: true,\n      editTasks: true,\n      editTimeline: true,\n      editSeating: true,\n      viewBudget: false, // Sin permisos de facturaciÃ³n\n      sendInvitations: false // Sin re-invitaciones\n    }\n  }\n};\n\n/**\n * Servicio para gestiÃ³n de lÃ­mites de planes\n */\nclass PlanLimitsService {\n  /**\n   * Obtiene la configuraciÃ³n de un plan\n   * @param {string} planId - ID del plan\n   * @returns {Object|null} ConfiguraciÃ³n del plan o null si no existe\n   */\n  getPlanConfig(planId) {\n    return PLAN_LIMITS[planId] || null;\n  }\n\n  /**\n   * Obtiene los lÃ­mites de un plan\n   * @param {string} planId - ID del plan\n   * @returns {Object} LÃ­mites del plan\n   */\n  getPlanLimits(planId) {\n    const config = this.getPlanConfig(planId);\n    return config ? config.limits : {};\n  }\n\n  /**\n   * Obtiene las caracterÃ­sticas de un plan\n   * @param {string} planId - ID del plan\n   * @returns {Object} CaracterÃ­sticas del plan\n   */\n  getPlanFeatures(planId) {\n    const config = this.getPlanConfig(planId);\n    return config ? config.features : {};\n  }\n\n  /**\n   * Verifica si un plan tiene una caracterÃ­stica especÃ­fica\n   * @param {string} planId - ID del plan\n   * @param {string} feature - Nombre de la caracterÃ­stica\n   * @returns {boolean} true si tiene la caracterÃ­stica\n   */\n  hasFeature(planId, feature) {\n    const features = this.getPlanFeatures(planId);\n    return features[feature] === true;\n  }\n\n  /**\n   * Verifica si se ha alcanzado el lÃ­mite de invitados\n   * @param {string} planId - ID del plan\n   * @param {number} currentGuests - NÃºmero actual de invitados\n   * @returns {Object} { exceeded: boolean, limit: number, current: number }\n   */\n  checkGuestLimit(planId, currentGuests) {\n    const limits = this.getPlanLimits(planId);\n    const maxGuests = limits.maxGuests;\n    \n    if (maxGuests === -1) {\n      return { exceeded: false, limit: -1, current: currentGuests, message: ",

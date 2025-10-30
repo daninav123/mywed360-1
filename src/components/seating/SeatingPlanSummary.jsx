@@ -1,4 +1,4 @@
-import { Gauge, Table, Users } from 'lucide-react';
+import { Gauge, Table, Users, Sparkles } from 'lucide-react';
 import React from 'react';
 
 function formatNumber(value) {
@@ -36,6 +36,8 @@ export default function SeatingPlanSummary({
   banquetProgress = 0,
   areaSummary = [],
   onOpenGuestDrawer,
+  onOpenAutoLayout,
+  hasAssignedTables = false,
 }) {
   const capacityTarget = globalCapacity > 0 ? globalCapacity : seatCapacity;
   const occupancyPercent =
@@ -75,15 +77,27 @@ export default function SeatingPlanSummary({
             </span>
           </div>
 
-          {typeof onOpenGuestDrawer === 'function' && pendingGuests > 0 ? (
-            <button
-              type="button"
-              onClick={onOpenGuestDrawer}
-              className="inline-flex w-fit items-center gap-2 rounded-full border border-slate-300 px-4 py-1.5 text-xs font-medium text-slate-700 transition hover:border-slate-400 hover:text-slate-900"
-            >
-              Revisar invitados pendientes
-            </button>
-          ) : null}
+          <div className="flex flex-wrap gap-2">
+            {typeof onOpenAutoLayout === 'function' && hasAssignedTables && tableCount === 0 ? (
+              <button
+                type="button"
+                onClick={onOpenAutoLayout}
+                className="inline-flex w-fit items-center gap-2 rounded-full bg-gradient-to-r from-blue-600 to-blue-500 px-5 py-2 text-sm font-semibold text-white shadow-md transition hover:from-blue-700 hover:to-blue-600 hover:shadow-lg"
+              >
+                <Sparkles className="h-4 w-4" />
+                Generar Layout Automático
+              </button>
+            ) : null}
+            {typeof onOpenGuestDrawer === 'function' && pendingGuests > 0 ? (
+              <button
+                type="button"
+                onClick={onOpenGuestDrawer}
+                className="inline-flex w-fit items-center gap-2 rounded-full border border-slate-300 px-4 py-1.5 text-xs font-medium text-slate-700 transition hover:border-slate-400 hover:text-slate-900"
+              >
+                Revisar invitados pendientes
+              </button>
+            ) : null}
+          </div>
         </div>
 
         <div className="flex w-full flex-col gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 md:max-w-sm">

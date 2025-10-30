@@ -1,11 +1,16 @@
 import React from 'react';
+import useTranslations from '../../hooks/useTranslations';
 
 const WebTemplateGallery = ({ templates, selectedTemplate, onSelect }) => {
+  const { t } = useTranslations();
+
   if (!templates || !Object.keys(templates).length) return null;
 
   return (
     <div className="bg-white rounded-lg shadow p-6 mb-8">
-      <h2 className="text-xl font-semibold mb-4">Selecciona un estilo para tu web</h2>
+      <h2 className="text-xl font-semibold mb-4">
+        {t('common.websiteGenerator.gallery.title', 'Selecciona un estilo para tu web')}
+      </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {Object.entries(templates).map(([key, template]) => (

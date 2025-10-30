@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Save, Download, Palette } from 'lucide-react';
 import { toast } from 'react-toastify';
 
 import useTranslations from '../../hooks/useTranslations';
@@ -33,6 +32,7 @@ export default function VectorEditorPage() {
   const { currentUser } = useAuth();
   const category = params.get('category') || 'general';
 
+  const { t } = useTranslations();
   const canVectorize = Boolean(imageUrl);
 
   const doVectorize = async () => {
@@ -56,7 +56,12 @@ export default function VectorEditorPage() {
       setSvg(data.svg || '');
     } catch (e) {
       console.error(e);
-      setError(e.message || 'No se pudo vectorizar la imagen');
+      setError(
+        t(
+          'common.designsLibrary.vectorEditor.messages.vectorizeError',
+          'No se pudo vectorizar la imagen'
+        )
+      );
     } finally {
       setLoading(false);
     }
@@ -80,7 +85,13 @@ export default function VectorEditorPage() {
         if (!ignore) setSvg(text);
       } catch (e) {
         console.error('Cargar SVG error', e);
-        if (!ignore) setError('No se pudo cargar el SVG');
+        if (!ignore)
+          setError(
+            t(
+              'common.designsLibrary.vectorEditor.messages.loadSvgError',
+              'No se pudo cargar el SVG'
+            )
+          );
       } finally {
         if (!ignore) setLoading(false);
       }
@@ -117,24 +128,35 @@ export default function VectorEditorPage() {
           }
         }
       } catch (e) {
-        console.warn('No se pudo cargar paleta', e);
+        console.warn(
+          t(
+            'common.designsLibrary.vectorEditor.messages.paletteLoadWarning',
+            'No se pudo cargar la paleta'
+          ),
+          e
+        );
       }
     };
     loadBrand();
-  }, [activeWedding]);
+  }, [activeWedding, t]);
 
   return (
     <div className="p-4 space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Editor vectorial (IA)</h1>
+        <h1 className="text-xl font-semibold">
+          {t('common.designsLibrary.vectorEditor.title', 'Editor vectorial (IA)')}
+        </h1>
         <Link to="/disenos" className="text-blue-600 hover:underline">
-          Volver a Diseños
+          {t('common.designsLibrary.myDesigns.backLink', 'Volver a Diseños')}
         </Link>
       </div>
 
       {!canVectorize && (
         <div className="p-3 border rounded bg-yellow-50 text-yellow-900">
-          Abre este editor desde una imagen generada con IA para vectorizarla automáticamente.
+          {t(
+            'common.designsLibrary.vectorEditor.warning.openHint',
+            'Abre este editor desde una imagen generada con IA para vectorizarla automáticamente.'
+          )}
         </div>
       )}
 
@@ -142,20 +164,34 @@ export default function VectorEditorPage() {
         <div className="bg-white border rounded p-3">
           <div className="flex flex-wrap gap-3 items-end">
             <div className="flex items-center gap-2">
-              <label className="text-sm">Modo</label>
+              <label className="text-sm">
+                {t('common.designsLibrary.vectorEditor.controls.modeLabel', 'Modo')}
+              </label>
               <select
                 value={mode}
                 onChange={(e) => setMode(e.target.value)}
                 className="border rounded p-1"
               >
-                <option value="color">Color (ImageTracer)</option>
-                <option value="mono">Monocromo (Potrace)</option>
+                <option value="color">
+                  {t(
+                    'common.designsLibrary.vectorEditor.controls.modes.color',
+                    'Color (ImageTracer)'
+                  )}
+                </option>
+                <option value="mono">
+                  {t(
+                    'common.designsLibrary.vectorEditor.controls.modes.mono',
+                    'Monocromo (Potrace)'
+                  )}
+                </option>
               </select>
             </div>
             {mode === 'color' && (
               <>
                 <div>
-                  <label className="block text-sm">Colores</label>
+                  <label className="block text-sm">
+                    {t('common.designsLibrary.vectorEditor.controls.color.colors', 'Colores')}
+                  </label>
                   <input
                     type="number"
                     min={2}
@@ -171,7 +207,9 @@ export default function VectorEditorPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm">ltres (0-1)</label>
+                  <label className="block text-sm">
+                    {t('common.designsLibrary.vectorEditor.controls.color.ltres', 'ltres (0-1)')}
+                  </label>
                   <input
                     type="number"
                     step={0.05}
@@ -188,7 +226,9 @@ export default function VectorEditorPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm">qtres (0-1)</label>
+                  <label className="block text-sm">
+                    {t('common.designsLibrary.vectorEditor.controls.color.qtres', 'qtres (0-1)')}
+                  </label>
                   <input
                     type="number"
                     step={0.05}
@@ -205,7 +245,9 @@ export default function VectorEditorPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm">Trazo</label>
+                  <label className="block text-sm">
+                    {t('common.designsLibrary.vectorEditor.controls.color.stroke', 'Trazo')}
+                  </label>
                   <input
                     type="number"
                     step={0.5}
@@ -225,7 +267,12 @@ export default function VectorEditorPage() {
             {mode === 'mono' && (
               <>
                 <div>
-                  <label className="block text-sm">Umbral (0-255)</label>
+                  <label className="block text-sm">
+                    {t(
+                      'common.designsLibrary.vectorEditor.controls.mono.threshold',
+                      'Umbral (0-255)'
+                    )}
+                  </label>
                   <input
                     type="number"
                     min={0}
@@ -244,7 +291,12 @@ export default function VectorEditorPage() {
               disabled={loading}
               className={`px-3 py-2 rounded ${loading ? 'bg-gray-300' : 'bg-blue-600 text-white hover:bg-blue-700'}`}
             >
-              {loading ? 'Vectorizando...' : 'Revectorizar'}
+              {loading
+                ? t(
+                    'common.designsLibrary.vectorEditor.controls.vectorize.loading',
+                    'Vectorizando...'
+                  )
+                : t('common.designsLibrary.vectorEditor.controls.vectorize.action', 'Revectorizar')}
             </button>
             <a
               href={imageUrl}
@@ -252,14 +304,20 @@ export default function VectorEditorPage() {
               rel="noreferrer"
               className="text-sm text-gray-600 hover:underline"
             >
-              Ver original
+              {t('common.designsLibrary.vectorEditor.controls.viewOriginal', 'Ver original')}
             </a>
             {activeWedding && (
               <button
                 onClick={async () => {
                   try {
                     const content = editorRef.current?.getSvg?.();
-                    if (!content) return toast.error(t('design.svg.noContent'));
+                    if (!content)
+                      return toast.error(
+                        t(
+                          'common.designsLibrary.vectorEditor.toasts.noContent',
+                          'No hay contenido SVG para guardar.'
+                        )
+                      );
                     await firebaseReady;
                     const { collection, doc, setDoc, serverTimestamp } = await fsImport();
                     const { getStorage, ref: sRef, uploadBytes, getDownloadURL } = await stImport();
@@ -279,15 +337,28 @@ export default function VectorEditorPage() {
                       createdAt: serverTimestamp(),
                       createdBy: currentUser?.uid || 'unknown',
                     });
-                    toast.success(t('design.svg.saved'));
+                    toast.success(
+                      t(
+                        'common.designsLibrary.vectorEditor.toasts.saveSuccess',
+                        'SVG guardado correctamente.'
+                      )
+                    );
                   } catch (e) {
                     console.error('Guardar SVG error', e);
-                    toast.error(t('design.svg.saveError'));
+                    toast.error(
+                      t(
+                        'common.designsLibrary.vectorEditor.toasts.saveError',
+                        'No se pudo guardar el SVG.'
+                      )
+                    );
                   }
                 }}
                 className="px-3 py-2 rounded bg-emerald-600 text-white hover:bg-emerald-700"
               >
-                Guardar en la boda
+                {t(
+                  'common.designsLibrary.vectorEditor.controls.saveToWedding',
+                  'Guardar en la boda'
+                )}
               </button>
             )}
           </div>
@@ -298,7 +369,9 @@ export default function VectorEditorPage() {
       {activeWedding && (
         <div className="bg-white border rounded p-3">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="font-semibold">Paleta de la boda</h3>
+            <h3 className="font-semibold">
+              {t('common.designsLibrary.vectorEditor.palette.title', 'Paleta de la boda')}
+            </h3>
             <button
               className="px-3 py-1 rounded bg-blue-600 text-white hover:bg-blue-700"
               onClick={async () => {
@@ -307,14 +380,24 @@ export default function VectorEditorPage() {
                   const { doc, setDoc, serverTimestamp } = await fsImport();
                   const ref = doc(db, 'weddings', activeWedding, 'branding', 'main');
                   await setDoc(ref, { palette, updatedAt: serverTimestamp() }, { merge: true });
-                  toast.success(t('design.palette.saved'));
+                  toast.success(
+                    t(
+                      'common.designsLibrary.vectorEditor.toasts.paletteSaved',
+                      'Paleta guardada correctamente.'
+                    )
+                  );
                 } catch (e) {
                   console.error(e);
-                  toast.error(t('design.palette.saveError'));
+                  toast.error(
+                    t(
+                      'common.designsLibrary.vectorEditor.toasts.paletteSaveError',
+                      'No se pudo guardar la paleta.'
+                    )
+                  );
                 }
               }}
             >
-              Guardar paleta
+              {t('common.designsLibrary.vectorEditor.palette.save', 'Guardar paleta')}
             </button>
           </div>
           <div className="flex flex-wrap gap-3 items-center">
@@ -344,7 +427,7 @@ export default function VectorEditorPage() {
               className="px-2 py-1 border rounded"
               onClick={() => setPalette((prev) => [...prev, '#000000'])}
             >
-              + color
+              {t('common.designsLibrary.vectorEditor.palette.addColor', '+ color')}
             </button>
           </div>
         </div>
@@ -355,7 +438,9 @@ export default function VectorEditorPage() {
       {svg ? (
         <VectorEditor ref={editorRef} svg={svg} palette={palette} />
       ) : canVectorize && !loading ? (
-        <div className="text-sm text-gray-600">No hay SVG disponible aún.</div>
+        <div className="text-sm text-gray-600">
+          {t('common.designsLibrary.vectorEditor.messages.noSvg', 'No hay SVG disponible aún.')}
+        </div>
       ) : null}
     </div>
   );

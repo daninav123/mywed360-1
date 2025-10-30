@@ -20,8 +20,9 @@ import SeatingGuestSidebar from './SeatingGuestSidebar';
 import SeatingPlanModals from './SeatingPlanModals';
 import SeatingPlanOnboardingChecklist from './SeatingPlanOnboardingChecklist';
 import SeatingPlanSummary from './SeatingPlanSummary';
+import AutoLayoutModal from './AutoLayoutModal';
 import { useWedding } from '../../context/WeddingContext';
-// Importar v�a alias estable para permitir vi.mock en tests y usar el hook deshabilitado en test
+// Importar va alias estable para permitir vi.mock en tests y usar el hook deshabilitado en test
 import { useSeatingPlan } from '../../hooks/useSeatingPlan';
 
 import { post as apiPost } from '../../services/apiClient';
@@ -222,6 +223,8 @@ const SeatingPlanRefactored = () => {
     ensureTableLock,
     releaseTableLocksExcept,
     collabClientId,
+    generateAutoLayoutFromGuests,
+    analyzeCurrentGuests,
   } = useSeatingPlan();
 
   // Mostrar/ocultar mesas
@@ -386,11 +389,10 @@ const SeatingPlanRefactored = () => {
   const [guestDrawerOpen, setGuestDrawerOpen] = React.useState(false);
   const [viewport, setViewport] = React.useState({ scale: 1, offset: { x: 0, y: 0 } });
   const [exportWizardOpen, setExportWizardOpen] = React.useState(false);
+  const [autoLayoutModalOpen, setAutoLayoutModalOpen] = React.useState(false);
   const otherCollaborators = React.useMemo(
     () =>
-      Array.isArray(collaborators)
-        ? collaborators.filter((member) => !member?.isCurrent)
-        : [],
+      Array.isArray(collaborators) ? collaborators.filter((member) => !member?.isCurrent) : [],
     [collaborators]
   );
   useEffect(() => {
@@ -443,9 +445,7 @@ const SeatingPlanRefactored = () => {
         }
         const ok = await ensureTableLock(id);
         if (!ok) return;
-        const nextIds = multi
-          ? Array.from(new Set([...(selectedIds || []), id]))
-          : [id];
+        const nextIds = multi ? Array.from(new Set([...(selectedIds || []), id])) : [id];
         releaseTableLocksExcept(nextIds);
         await Promise.resolve(baseHandleSelectTable(id, multi));
       };
@@ -590,10 +590,7 @@ const SeatingPlanRefactored = () => {
 
   const onboardingCompletedCount = React.useMemo(
     () =>
-      ONBOARDING_STEP_KEYS.reduce(
-        (acc, key) => (onboardingPrefs.steps?.[key] ? acc + 1 : acc),
-        0
-      ),
+      ONBOARDING_STEP_KEYS.reduce((acc, key) => (onboardingPrefs.steps?.[key] ? acc + 1 : acc), 0),
     [onboardingPrefs.steps]
   );
 
@@ -647,15 +644,9 @@ const SeatingPlanRefactored = () => {
     []
   );
 
-  const handleToggleGuestPanel = React.useCallback(
-    () => setGuestSidebarOpen((prev) => !prev),
-    []
-  );
+  const handleToggleGuestPanel = React.useCallback(() => setGuestSidebarOpen((prev) => !prev), []);
 
-  const handleToggleDesignFocus = React.useCallback(
-    () => setDesignFocusMode((prev) => !prev),
-    []
-  );
+  const handleToggleDesignFocus = React.useCallback(() => setDesignFocusMode((prev) => !prev), []);
 
   const handleResetOnboarding = React.useCallback(() => {
     setOnboardingPrefs((prev) => {
@@ -670,9 +661,7 @@ const SeatingPlanRefactored = () => {
   useEffect(() => {
     if (!lockEvent) return;
     if (lockEvent.kind === 'lock-denied' && lockEvent.resourceType === 'table') {
-      toast.warn(
-        `Esta mesa est� en edici�n por ${lockEvent.ownerName || 'otro colaborador'}`
-      );
+      toast.warn(`Esta mesa est� en edici�n por ${lockEvent.ownerName || 'otro colaborador'}`);
     }
     consumeLockEvent();
   }, [lockEvent, consumeLockEvent]);
@@ -914,10 +903,7 @@ const SeatingPlanRefactored = () => {
     () => setSpaceConfigOpen(true),
     [setSpaceConfigOpen]
   );
-  const handleOpenTemplates = React.useCallback(
-    () => setTemplateOpen(true),
-    [setTemplateOpen]
-  );
+  const handleOpenTemplates = React.useCallback(() => setTemplateOpen(true), [setTemplateOpen]);
 
   // Atajos extra: rotaci�n, alinear/distribuir, tabs, toggles y paneles
   useEffect(() => {
@@ -939,7 +925,10 @@ const SeatingPlanRefactored = () => {
         }
 
         // Alinear/Distribuir: Alt+Arrow (align), Shift+Alt+Arrow (distribute)
-        if (alt && ['arrowleft', 'arrowright', 'arrowup', 'arrowdown'].includes(e.key.toLowerCase())) {
+        if (
+          alt &&
+          ['arrowleft', 'arrowright', 'arrowup', 'arrowdown'].includes(e.key.toLowerCase())
+        ) {
           e.preventDefault();
           const axis = ['arrowleft', 'arrowright'].includes(key) ? 'x' : 'y';
           if (shift) {
@@ -960,18 +949,48 @@ const SeatingPlanRefactored = () => {
         }
 
         // Toggles: R (reglas), N (n�meros), V (validaciones)
-        if (!meta && !alt && key === 'r') { e.preventDefault(); setShowRulers((v) => !v); return; }
-        if (!meta && !alt && key === 'n') { e.preventDefault(); setShowSeatNumbers((v) => !v); return; }
-        if (!meta && !alt && key === 'v') { e.preventDefault(); setValidationsEnabled?.((v) => !v); return; }
+        if (!meta && !alt && key === 'r') {
+          e.preventDefault();
+          setShowRulers((v) => !v);
+          return;
+        }
+        if (!meta && !alt && key === 'n') {
+          e.preventDefault();
+          setShowSeatNumbers((v) => !v);
+          return;
+        }
+        if (!meta && !alt && key === 'v') {
+          e.preventDefault();
+          setValidationsEnabled?.((v) => !v);
+          return;
+        }
 
         // Paneles: P (plantillas), S (espacio)
-        if (!meta && !alt && key === 'p') { e.preventDefault(); handleOpenTemplates(); return; }
-        if (!meta && !alt && key === 's') { e.preventDefault(); handleOpenSpaceConfig(); return; }
+        if (!meta && !alt && key === 'p') {
+          e.preventDefault();
+          handleOpenTemplates();
+          return;
+        }
+        if (!meta && !alt && key === 's') {
+          e.preventDefault();
+          handleOpenSpaceConfig();
+          return;
+        }
       } catch (_) {}
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [rotateSelected, alignSelected, distributeSelected, setTab, setShowRulers, setShowSeatNumbers, setValidationsEnabled, handleOpenTemplates, handleOpenSpaceConfig]);
+  }, [
+    rotateSelected,
+    alignSelected,
+    distributeSelected,
+    setTab,
+    setShowRulers,
+    setShowSeatNumbers,
+    setValidationsEnabled,
+    handleOpenTemplates,
+    handleOpenSpaceConfig,
+  ]);
 
   // Backspace: eliminar mesa seleccionada (con confirmaci�n)
   useEffect(() => {
@@ -1160,9 +1179,7 @@ const SeatingPlanRefactored = () => {
       const result = executeSmartAction?.(action);
       if (result?.ok) {
         if (action.type === 'reassign') {
-          toast.success(
-            `Invitado reubicado${action.guestName ? `: ${action.guestName}` : ''}`
-          );
+          toast.success(`Invitado reubicado${action.guestName ? `: ${action.guestName}` : ''}`);
           if (action.toTableId) {
             focusTable(action.toTableId);
           }
@@ -1350,7 +1367,9 @@ const SeatingPlanRefactored = () => {
       const rows = Array.isArray(ceremonyRows) ? ceremonyRows : [];
       if (!rows.length) return { ok: false, error: 'no-rows' };
       const index =
-        typeof targetRowIndex === 'number' && targetRowIndex >= 0 ? targetRowIndex : ceremonyActiveRow;
+        typeof targetRowIndex === 'number' && targetRowIndex >= 0
+          ? targetRowIndex
+          : ceremonyActiveRow;
       const row = rows[index];
       if (!row) return { ok: false, error: 'row-not-found' };
       const availableSeats = row.seats.filter((seat) => seat?.enabled !== false && !seat?.guestId);
@@ -1373,11 +1392,56 @@ const SeatingPlanRefactored = () => {
     [assignGuestToCeremonySeat, ceremonyRows, ceremonyActiveRow]
   );
 
+  // Análisis de invitados para el modal de auto layout
+  const guestAnalysis = React.useMemo(() => {
+    if (typeof analyzeCurrentGuests === 'function') {
+      return analyzeCurrentGuests();
+    }
+    return {
+      tables: [],
+      unassignedGuests: [],
+      totalTables: 0,
+      totalAssigned: 0,
+    };
+  }, [analyzeCurrentGuests, safeGuests]);
+
+  // Handler para generar layout automático
+  const handleGenerateAutoLayout = React.useCallback(
+    async (layoutType) => {
+      try {
+        if (typeof generateAutoLayoutFromGuests !== 'function') {
+          toast.error('Función de generación automática no disponible');
+          return;
+        }
+
+        const result = generateAutoLayoutFromGuests(layoutType);
+
+        if (result.success) {
+          toast.success(result.message || 'Layout generado correctamente');
+
+          // Si cambiamos al tab de banquete si no estamos ahí
+          if (tab !== 'banquet') {
+            setTab('banquet');
+          }
+        } else {
+          toast.error(result.message || 'No se pudo generar el layout');
+        }
+      } catch (error) {
+        console.error('Error generando auto layout:', error);
+        toast.error('Error generando el layout automático');
+      }
+    },
+    [generateAutoLayoutFromGuests, tab, setTab]
+  );
+
+  // Abrir modal de auto layout
+  const handleOpenAutoLayout = React.useCallback(() => {
+    setAutoLayoutModalOpen(true);
+  }, []);
+
   const renderLibraryPanel = (wrapperClassName = 'h-full') =>
     showLibraryPanel ? (
-      <div
-        className={`rounded-3xl border border-slate-200 bg-white shadow-sm ${wrapperClassName}`}
-      >
+      <div className={`rounded-3xl border border-slate-200 bg-white shadow-sm ${wrapperClassName}`}>
         <SeatingLibraryPanel
           tab={tab}
           drawMode={drawMode}
@@ -1402,9 +1466,7 @@ const SeatingPlanRefactored = () => {
 
   const renderSmartPanel = (wrapperClassName = 'h-full') =>
     showSmartPanel ? (
-      <div
-        className={`rounded-3xl border border-slate-200 bg-white shadow-sm ${wrapperClassName}`}
-      >
+      <div className={`rounded-3xl border border-slate-200 bg-white shadow-sm ${wrapperClassName}`}>
         <SeatingSmartPanel
           recommendations={smartRecommendations}
           conflictSuggestions={smartConflictSuggestions}
@@ -1418,9 +1480,7 @@ const SeatingPlanRefactored = () => {
 
   const renderGuestPanel = (wrapperClassName = 'h-full') =>
     showGuestSidebar ? (
-      <div
-        className={`rounded-3xl border border-slate-200 bg-white shadow-sm ${wrapperClassName}`}
-      >
+      <div className={`rounded-3xl border border-slate-200 bg-white shadow-sm ${wrapperClassName}`}>
         <SeatingGuestSidebar
           guests={safeGuests}
           pendingGuests={pendingGuests}
@@ -1494,9 +1554,7 @@ const SeatingPlanRefactored = () => {
 
   const renderInspector = (wrapperClassName = 'h-full', panelClassName = 'h-full') =>
     showInspectorPanel ? (
-      <div
-        className={`rounded-3xl border border-slate-200 bg-white shadow-sm ${wrapperClassName}`}
-      >
+      <div className={`rounded-3xl border border-slate-200 bg-white shadow-sm ${wrapperClassName}`}>
         <SeatingInspectorPanel
           selectedTable={selectedTable}
           tab={tab}
@@ -1529,9 +1587,7 @@ const SeatingPlanRefactored = () => {
   if (!isHallReady) {
     return (
       <DndProvider backend={HTML5Backend}>
-        <div className="h-full flex items-center justify-center text-muted">
-          Cargando plano...
-        </div>
+        <div className="h-full flex items-center justify-center text-muted">Cargando plano...</div>
       </DndProvider>
     );
   }
@@ -1567,6 +1623,8 @@ const SeatingPlanRefactored = () => {
                 banquetProgress={seatingProgress.banquetProgress}
                 areaSummary={areaSummary}
                 onOpenGuestDrawer={() => setGuestDrawerOpen(true)}
+                onOpenAutoLayout={handleOpenAutoLayout}
+                hasAssignedTables={guestAnalysis.totalTables > 0}
               />
             </div>
 
@@ -1650,7 +1708,9 @@ const SeatingPlanRefactored = () => {
                       description: 'Ubica a cada invitado en una mesa o fila de ceremonia.',
                       done: onboardingPrefs.steps.firstAssignment,
                       actionLabel:
-                        seatingProgress.assignedPersons > 0 ? 'Revisar asignaciones' : 'Asignar ahora',
+                        seatingProgress.assignedPersons > 0
+                          ? 'Revisar asignaciones'
+                          : 'Asignar ahora',
                       onAction: () => {
                         if (pendingGuests.length > 0) {
                           setGuidedGuestId(pendingGuests[0]?.id || null);
@@ -1786,10 +1846,7 @@ const SeatingPlanRefactored = () => {
             {renderInspector('max-h-60 overflow-y-auto', 'max-h-60 overflow-y-auto')}
           </div>
         ) : (
-          <div
-            className="flex-1 grid gap-4 px-4 pb-6"
-            style={{ gridTemplateColumns: gridColumns }}
-          >
+          <div className="flex-1 grid gap-4 px-4 pb-6" style={{ gridTemplateColumns: gridColumns }}>
             {renderLibraryPanel()}
             <div className="h-full rounded-3xl border border-slate-200 bg-white shadow-sm">
               {renderCanvas('h-full')}
@@ -1930,10 +1987,16 @@ const SeatingPlanRefactored = () => {
           onClose={() => setExportWizardOpen(false)}
           onGenerateExport={handleGenerateAdvancedExport}
           availableTabs={availableExportTabs}
-          storageKey={
-            activeWedding ? `seatingPlan:${activeWedding}:export-presets` : undefined
-          }
+          storageKey={activeWedding ? `seatingPlan:${activeWedding}:export-presets` : undefined}
           previewData={exportPreviewSnapshot}
+        />
+
+        {/* Modal de Auto Layout */}
+        <AutoLayoutModal
+          isOpen={autoLayoutModalOpen}
+          onClose={() => setAutoLayoutModalOpen(false)}
+          onGenerate={handleGenerateAutoLayout}
+          analysis={guestAnalysis}
         />
       </div>
     </DndProvider>
