@@ -1,29 +1,33 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 
-// Asegurar inicialización de i18n antes de cualquier uso de useTranslation
+// ✅ CRÍTICO: Cargar antes de renderizar
 import './i18n';
-import './sentry';
 import App from './App';
 import ErrorBoundary from './components/debug/ErrorBoundary';
-import './debug/setupDebug';
-// Registrar comandos de diagnóstico globales antes de montar la aplicación
-import './utils/consoleCommands';
+import './index.css';
 // Auto-fix: Limpiar tokens expirados automáticamente
 import { setupAutoFix } from './services/autoFixAuth';
-// Compat: migración de claves/eventos maloveapp_* -> maloveapp_*
 import './utils/compatMigration';
-import './index.css';
-import './debug/devServiceWorkerCleanup';
 
 // Ejecutar auto-fix de autenticación
 setupAutoFix();
-// Registrar SW solo si PWA está habilitado
-if (import.meta.env?.VITE_ENABLE_PWA === '1') {
-  import('./pwa/registerServiceWorker');
-}
-import './pwa/setupPwaToasts';
-import './utils/webVitals';
+
+// ⚡ OPTIMIZACIÓN: Lazy load de inicializaciones no críticas
+// Estas se cargan DESPUÉS del primer render para no bloquear la UI
+setTimeout(() => {
+  import('./sentry');
+  import('./debug/setupDebug');
+  import('./utils/consoleCommands');
+  import('./debug/devServiceWorkerCleanup');
+  import('./pwa/setupPwaToasts');
+  import('./utils/webVitals');
+
+  // Registrar SW solo si PWA está habilitado
+  if (import.meta.env?.VITE_ENABLE_PWA === '1') {
+    import('./pwa/registerServiceWorker');
+  }
+}, 0);
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

@@ -1,11 +1,4 @@
-import {
-  collection,
-  doc,
-  getDoc,
-  onSnapshot,
-  serverTimestamp,
-  setDoc,
-} from 'firebase/firestore';
+import { collection, doc, getDoc, onSnapshot, serverTimestamp, setDoc } from 'firebase/firestore';
 import React, {
   createContext,
   useCallback,
@@ -78,13 +71,17 @@ const readSafeJson = (key) => {
 
 export function WeddingProvider({ children }) {
   const { currentUser, userProfile } = useAuth();
-  
+
   // Detectar si estamos en modo test y cargar datos mock (memoizado para evitar loops)
-  const isTestMode = useMemo(() => 
-    typeof window !== 'undefined' && (window.Cypress || window.__MALOVEAPP_TEST_MODE__ || import.meta.env.VITE_TEST_MODE === 'true'),
+  const isTestMode = useMemo(
+    () =>
+      typeof window !== 'undefined' &&
+      (window.Cypress ||
+        window.__MALOVEAPP_TEST_MODE__ ||
+        import.meta.env.VITE_TEST_MODE === 'true'),
     []
   );
-  
+
   // Cargar bodas mock de localStorage o window.__MOCK_WEDDING__ si estamos en tests (memoizado)
   const testData = useMemo(() => {
     if (!isTestMode) return { weddings: [], activeWedding: '' };
@@ -93,13 +90,17 @@ export function WeddingProvider({ children }) {
       if (typeof window !== 'undefined' && window.__MOCK_WEDDING__) {
         const mockWedding = window.__MOCK_WEDDING__;
         const weddings = Array.isArray(mockWedding.weddings) ? mockWedding.weddings : [];
-        const activeWedding = mockWedding.activeWedding?.id || (weddings.length > 0 ? weddings[0].id : '');
+        const activeWedding =
+          mockWedding.activeWedding?.id || (weddings.length > 0 ? weddings[0].id : '');
         if (import.meta.env.DEV) {
-          console.log('[WeddingContext] Usando mock de window.__MOCK_WEDDING__', { weddings, activeWedding });
+          console.log('[WeddingContext] Usando mock de window.__MOCK_WEDDING__', {
+            weddings,
+            activeWedding,
+          });
         }
         return { weddings, activeWedding };
       }
-      
+
       // Fallback a localStorage
       const storedWeddings = window.localStorage.getItem('MaLoveApp_weddings');
       const storedActive = window.localStorage.getItem('MaLoveApp_active_wedding');
@@ -107,14 +108,14 @@ export function WeddingProvider({ children }) {
       const activeWedding = storedActive ? JSON.parse(storedActive) : null;
       return {
         weddings: Array.isArray(weddings) ? weddings : [],
-        activeWedding: activeWedding?.id || ''
+        activeWedding: activeWedding?.id || '',
       };
     } catch (e) {
       console.warn('Error loading test weddings:', e);
       return { weddings: [], activeWedding: '' };
     }
   }, [isTestMode]);
-  
+
   // Estado inicial - usar datos de test si están disponibles
   const [weddings, setWeddings] = useState([]);
   const [weddingsReady, setWeddingsReady] = useState(false);
@@ -170,68 +171,71 @@ export function WeddingProvider({ children }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Solo ejecutar una vez al montar
 
-  // Inicializar activeWedding cuando cambie el usuario
+  // ⚡ OPTIMIZACIÓN: Consolidar inicialización y localStorage en un solo useEffect
   useEffect(() => {
     // En modo test, los mocks ya están configurados
-    if (isTestMode) return;
-    
-    const uid = currentUser?.uid || getLocalProfileUid();
-    if (!uid) {
-      setActiveWeddingState('');
-      return;
-    }
-    const stored = resolveActiveWeddingFromStorage(uid);
-    if (stored) {
-      setActiveWeddingState(stored);
-    }
-  }, [currentUser, getLocalProfileUid, resolveActiveWeddingFromStorage, isTestMode]);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    // En modo test con mock directo, no leer de localStorage
     if (isTestMode && window.__MOCK_WEDDING__) return;
-    
-    let cancelled = false;
+    if (typeof window === 'undefined') return;
 
+    let cancelled = false;
     const uid = currentUser?.uid || getLocalProfileUid() || 'anonymous';
 
-    const readLocal = () => {
-      const { weddings: localWeddings, activeWeddingId } = loadLocalWeddings(uid);
+    // Si no hay usuario, limpiar todo
+    if (!uid || uid === 'anonymous') {
+      setActiveWeddingState('');
+      setWeddings([]);
+      setWeddingsReady(true);
+      return;
+    }
+
+    const initializeUser = () => {
       if (cancelled) return;
+
+      // 1. Inicializar activeWedding desde storage
+      const storedActive = resolveActiveWeddingFromStorage(uid);
+      if (storedActive) {
+        setActiveWeddingState(storedActive);
+      }
+
+      // 2. Cargar weddings desde localStorage
+      const { weddings: localWeddings, activeWeddingId } = loadLocalWeddings(uid);
+
+      // 3. Actualizar localMirror
       setLocalMirror({
         weddings: Array.isArray(localWeddings) ? localWeddings : [],
-        activeWeddingId: activeWeddingId || '',
+        activeWeddingId: activeWeddingId || storedActive || '',
         uid,
       });
+
+      // 4. Si no estamos usando Firestore, aplicar datos locales
+      if (!usingFirestore) {
+        setWeddings(localWeddings);
+        setWeddingsReady(true);
+        const nextActive =
+          activeWeddingId || storedActive || (localWeddings.length ? localWeddings[0].id : '');
+        if (nextActive) {
+          setActiveWeddingState(nextActive);
+        }
+      }
     };
 
-    readLocal();
-    const handleUpdate = () => readLocal();
+    initializeUser();
+
+    // Listener para cambios en localStorage
+    const handleUpdate = () => initializeUser();
     window.addEventListener(LOCAL_WEDDINGS_EVENT, handleUpdate);
 
     return () => {
       cancelled = true;
       window.removeEventListener(LOCAL_WEDDINGS_EVENT, handleUpdate);
     };
-  }, [currentUser, getLocalProfileUid, isTestMode]);
-
-  useEffect(() => {
-    if (!localMirror.uid) return;
-    if (usingFirestore) return;
-    // En modo test con mock directo, no actualizar desde localStorage
-    if (isTestMode && typeof window !== 'undefined' && window.__MOCK_WEDDING__) return;
-    
-    setWeddings(localMirror.weddings);
-    setWeddingsReady(true);
-    const nextActive =
-      localMirror.activeWeddingId ||
-      (localMirror.weddings.length ? localMirror.weddings[0].id : '');
-    if (nextActive) {
-      setActiveWeddingState(nextActive);
-    } else {
-      setActiveWeddingState('');
-    }
-  }, [localMirror, usingFirestore, isTestMode]);
+  }, [
+    currentUser,
+    getLocalProfileUid,
+    resolveActiveWeddingFromStorage,
+    usingFirestore,
+    isTestMode,
+  ]);
 
   // Suscribirse a Firestore usando subcolección users/{uid}/weddings
   useEffect(() => {
@@ -240,7 +244,7 @@ export function WeddingProvider({ children }) {
       setWeddingsReady(true);
       return;
     }
-    
+
     let unsub = null;
     let cancelled = false;
 
@@ -249,8 +253,7 @@ export function WeddingProvider({ children }) {
       setUsingFirestore(false);
       setWeddings(localWeddings);
       setWeddingsReady(true);
-      const nextActive =
-        activeWeddingId || (localWeddings.length ? localWeddings[0].id : '');
+      const nextActive = activeWeddingId || (localWeddings.length ? localWeddings[0].id : '');
       if (nextActive) {
         setActiveWeddingState(nextActive);
       } else {
@@ -260,7 +263,7 @@ export function WeddingProvider({ children }) {
 
     const listen = async () => {
       // Siempre preferir el UID real de Firebase Auth para cumplir reglas de Firestore
-      const activeAuth = (typeof getFirebaseAuth === 'function' ? getFirebaseAuth() : null);
+      const activeAuth = typeof getFirebaseAuth === 'function' ? getFirebaseAuth() : null;
       const authUid = activeAuth?.currentUser?.uid || null;
       const localUid = authUid || currentUser?.uid || getLocalProfileUid() || 'anonymous';
       if (!localUid) {
@@ -436,7 +439,7 @@ export function WeddingProvider({ children }) {
         ensureFinance(nextId);
       }
 
-      const activeAuth = (typeof getFirebaseAuth === 'function' ? getFirebaseAuth() : null);
+      const activeAuth = typeof getFirebaseAuth === 'function' ? getFirebaseAuth() : null;
       const authUid = activeAuth?.currentUser?.uid || null;
       if (uid && db && authUid && uid === authUid) {
         try {
