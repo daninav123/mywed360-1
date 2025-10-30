@@ -8,6 +8,14 @@ export default function ManageServicesModal({ open, onClose }) {
   const { allCategories, isCategoryActive, toggleCategory, loading } = useWeddingCategories();
   const [toggling, setToggling] = useState(null);
 
+  // Debug: Ver qué categorías tenemos
+  React.useEffect(() => {
+    if (open) {
+      console.log('🔍 ManageServicesModal - allCategories:', allCategories);
+      console.log('🔍 ManageServicesModal - total:', allCategories.length);
+    }
+  }, [open, allCategories]);
+
   if (!open) return null;
 
   const handleToggle = async (categoryId) => {
@@ -35,7 +43,9 @@ export default function ManageServicesModal({ open, onClose }) {
             <Settings className="h-6 w-6 text-purple-600" />
             <div>
               <h2 className="text-xl font-bold text-gray-900">Gestionar servicios</h2>
-              <p className="text-sm text-gray-600">Selecciona los servicios que necesitas para tu boda</p>
+              <p className="text-sm text-gray-600">
+                Selecciona los servicios que necesitas para tu boda
+              </p>
             </div>
           </div>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
@@ -74,7 +84,9 @@ export default function ManageServicesModal({ open, onClose }) {
                       <Circle className="h-6 w-6 text-gray-400 flex-shrink-0" />
                     )}
                     <div className="text-left flex-1">
-                      <p className={`font-medium ${isActive ? 'text-purple-900' : 'text-gray-900'}`}>
+                      <p
+                        className={`font-medium ${isActive ? 'text-purple-900' : 'text-gray-900'}`}
+                      >
                         {category.name}
                       </p>
                       {category.description && (
@@ -127,8 +139,8 @@ export default function ManageServicesModal({ open, onClose }) {
           {/* Info */}
           <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
             <p className="text-sm text-blue-800">
-              <strong>💡 Tip:</strong> Los servicios seleccionados aparecerán como tarjetas en tu dashboard.
-              También se añaden automáticamente cuando guardas un proveedor en favoritos.
+              <strong>💡 Tip:</strong> Los servicios seleccionados aparecerán como tarjetas en tu
+              dashboard. También se añaden automáticamente cuando guardas un proveedor en favoritos.
             </p>
           </div>
         </div>
