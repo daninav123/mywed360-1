@@ -1,12 +1,15 @@
 // components/wedding/WeddingServicesOverview.jsx
 // Vista general de todos los servicios de la boda con sus proveedores
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import WeddingServiceCard from './WeddingServiceCard';
 import useProveedores from '../../hooks/useProveedores';
 import useSupplierShortlist from '../../hooks/useSupplierShortlist';
 import { useWeddingCategories } from '../../hooks/useWeddingCategories';
 import { SUPPLIER_CATEGORIES } from '../../../shared/supplierCategories';
+import ManageServicesModal from './ManageServicesModal';
+import { Settings } from 'lucide-react';
+import Button from '../ui/Button';
 
 /**
  * Vista general de servicios de la boda
@@ -16,6 +19,7 @@ export default function WeddingServicesOverview({ onSearch }) {
   const { providers } = useProveedores();
   const { shortlist } = useSupplierShortlist();
   const { isCategoryActive, activeCategories, loading: loadingCategories } = useWeddingCategories();
+  const [showManageModal, setShowManageModal] = useState(false);
 
   // ⭐ CRÍTICO: useMemo con dependencia en activeCategories
   // Para que React re-renderice cuando cambian los servicios activos
@@ -103,8 +107,17 @@ export default function WeddingServicesOverview({ onSearch }) {
     <div className="space-y-6">
       {/* Estadísticas generales */}
       <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6">
-        <div className="mb-2">
+        <div className="flex items-center justify-between mb-2">
           <h2 className="text-2xl font-bold text-gray-900">Servicios de tu boda</h2>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowManageModal(true)}
+            className="flex items-center gap-2"
+          >
+            <Settings className="h-4 w-4" />
+            Gestionar servicios
+          </Button>
         </div>
         <p className="text-gray-600 mb-4">
           {activeServices.length} servicios personalizados para tu gran día
@@ -174,6 +187,9 @@ export default function WeddingServicesOverview({ onSearch }) {
           </p>
         </div>
       )}
+
+      {/* Modal de gestión de servicios */}
+      <ManageServicesModal open={showManageModal} onClose={() => setShowManageModal(false)} />
     </div>
   );
 }
