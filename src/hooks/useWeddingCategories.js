@@ -134,9 +134,13 @@ export function useWeddingCategories() {
   }, [activeCategories]);
 
   // Verificar si una categoría está activa
-  const isCategoryActive = (categoryId) => {
-    return activeCategories.includes(categoryId);
-  };
+  // ⭐ CRÍTICO: Usar useCallback para que la función no se recree en cada render
+  const isCategoryActive = useCallback(
+    (categoryId) => {
+      return activeCategories.includes(categoryId);
+    },
+    [activeCategories]
+  );
 
   useEffect(() => {
     loadActiveCategories();

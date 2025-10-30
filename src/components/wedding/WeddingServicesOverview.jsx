@@ -21,23 +21,31 @@ export default function WeddingServicesOverview({ onSearch }) {
   const { isCategoryActive, activeCategories, loading: loadingCategories } = useWeddingCategories();
   const [showManageModal, setShowManageModal] = useState(false);
 
-  // ⭐ NUEVA ESTRATEGIA: Renderizar TODAS las categorías, filtrar por activas
-  // Mucho más simple que intentar que React detecte cambios en arrays
-  const allServices = SUPPLIER_CATEGORIES.map((cat) => ({
-    id: cat.id,
-    name: cat.name,
-    icon: cat.icon,
-    isActive: isCategoryActive(cat.id),
-  }));
+  // ⭐ CRÍTICO: useMemo con dependencia en activeCategories
+  // Para que React re-renderice cuando cambian los servicios activos
+  const activeServices = useMemo(() => {
+    console.log('🔄 [WeddingServicesOverview] Recalculando servicios activos...');
+    console.log('   activeCategories:', activeCategories);
 
-  // Solo mostrar servicios activos
-  const activeServices = allServices.filter((s) => s.isActive);
+    // Mapear TODAS las categorías y verificar cuáles están activas
+    const allServices = SUPPLIER_CATEGORIES.map((cat) => ({
+      id: cat.id,
+      name: cat.name,
+      icon: cat.icon,
+      isActive: isCategoryActive(cat.id),
+    }));
 
-  console.log('📊 [WeddingServicesOverview] Servicios activos:', activeServices.length);
-  console.log(
-    '   IDs activos:',
-    activeServices.map((s) => s.id)
-  );
+    // Filtrar solo las activas
+    const active = allServices.filter((s) => s.isActive);
+
+    console.log('   ✅ Servicios activos:', active.length);
+    console.log(
+      '   IDs:',
+      active.map((s) => s.id)
+    );
+
+    return active;
+  }, [activeCategories, isCategoryActive]); // ← DEPENDENCIAS CRÍTICAS
 
   // Agrupar proveedores confirmados por servicio
   const confirmedByService = useMemo(() => {
