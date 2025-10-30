@@ -6,6 +6,7 @@ import WeddingServiceCard from './WeddingServiceCard';
 import useProveedores from '../../hooks/useProveedores';
 import useSupplierShortlist from '../../hooks/useSupplierShortlist';
 import { useWeddingCategories } from '../../hooks/useWeddingCategories';
+import { SUPPLIER_CATEGORIES } from '../../../shared/supplierCategories';
 import ManageServicesModal from './ManageServicesModal';
 import { Settings } from 'lucide-react';
 import Button from '../ui/Button';
@@ -17,43 +18,26 @@ import Button from '../ui/Button';
 export default function WeddingServicesOverview({ onSearch }) {
   const { providers } = useProveedores();
   const { shortlist } = useSupplierShortlist();
-  const {
-    getActiveCategoriesDetails,
-    activeCategories,
-    loading: loadingCategories,
-  } = useWeddingCategories();
+  const { isCategoryActive, activeCategories, loading: loadingCategories } = useWeddingCategories();
   const [showManageModal, setShowManageModal] = useState(false);
 
-  // 🔍 DEBUG: Loguear cuando activeCategories cambia
-  React.useEffect(() => {
-    console.log('👁️ [WeddingServicesOverview] activeCategories CAMBIÓ:', activeCategories);
-  }, [activeCategories]);
+  // ⭐ NUEVA ESTRATEGIA: Renderizar TODAS las categorías, filtrar por activas
+  // Mucho más simple que intentar que React detecte cambios en arrays
+  const allServices = SUPPLIER_CATEGORIES.map((cat) => ({
+    id: cat.id,
+    name: cat.name,
+    icon: cat.icon,
+    isActive: isCategoryActive(cat.id),
+  }));
 
-  // Obtener servicios activos de la boda (personalizados por el owner)
-  // ⚠️ CRÍTICO: Depender solo de activeCategories, NO de getActiveCategoriesDetails
-  // Porque React no puede comparar funciones correctamente en useMemo
-  const weddingServices = useMemo(() => {
-    console.log('🔄 [WeddingServicesOverview] Recalculando weddingServices...');
-    console.log('   activeCategories:', activeCategories);
+  // Solo mostrar servicios activos
+  const activeServices = allServices.filter((s) => s.isActive);
 
-    if (!activeCategories || activeCategories.length === 0) {
-      console.log('   ⚠️ No hay categorías activas, devolviendo array vacío');
-      return [];
-    }
-
-    const services = getActiveCategoriesDetails().map((cat, index) => ({
-      id: cat.id,
-      name: cat.name,
-      priority: index + 1,
-    }));
-
-    console.log(
-      '   ✅ Servicios calculados:',
-      services.length,
-      services.map((s) => s.name)
-    );
-    return services;
-  }, [activeCategories, getActiveCategoriesDetails]);
+  console.log('📊 [WeddingServicesOverview] Servicios activos:', activeServices.length);
+  console.log(
+    '   IDs activos:',
+    activeServices.map((s) => s.id)
+  );
 
   // Agrupar proveedores confirmados por servicio
   const confirmedByService = useMemo(() => {
@@ -88,7 +72,7 @@ export default function WeddingServicesOverview({ onSearch }) {
 
   // Calcular estadísticas
   const stats = useMemo(() => {
-    const totalServices = weddingServices.length;
+    const totalServices = activeServices.length;
     const confirmedCount = Object.keys(confirmedByService).length;
     const inEvaluationCount = Object.keys(shortlistCountByService).length - confirmedCount;
     const pendingCount = totalServices - confirmedCount - inEvaluationCount;
@@ -98,9 +82,9 @@ export default function WeddingServicesOverview({ onSearch }) {
       confirmed: confirmedCount,
       inEvaluation: inEvaluationCount > 0 ? inEvaluationCount : 0,
       pending: pendingCount > 0 ? pendingCount : 0,
-      progress: (confirmedCount / totalServices) * 100,
+      progress: totalServices > 0 ? (confirmedCount / totalServices) * 100 : 0,
     };
-  }, [confirmedByService, shortlistCountByService, weddingServices]);
+  }, [confirmedByService, shortlistCountByService, activeServices.length]);
 
   if (loadingCategories) {
     return (
@@ -128,7 +112,7 @@ export default function WeddingServicesOverview({ onSearch }) {
           </Button>
         </div>
         <p className="text-gray-600 mb-4">
-          {weddingServices.length} servicios personalizados para tu gran día
+          {activeServices.length} servicios personalizados para tu gran día
         </p>
 
         {/* Barra de progreso */}
@@ -168,7 +152,7 @@ export default function WeddingServicesOverview({ onSearch }) {
 
       {/* Tarjetas de servicios */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {weddingServices.map((service) => {
+        {activeServices.map((service) => {
           const serviceKey = service.id.toLowerCase();
           const confirmed = confirmedByService[serviceKey];
           const shortlistCount = shortlistCountByService[serviceKey] || 0;
