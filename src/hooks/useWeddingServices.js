@@ -2,6 +2,27 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from './useAuth';
 import { useWedding } from '../context/WeddingContext';
+import { auth } from '../firebaseConfig';
+
+// Helper para obtener token (igual que FavoritesContext)
+async function getAuthToken() {
+  try {
+    const firebaseUser = auth?.currentUser;
+    if (firebaseUser && typeof firebaseUser.getIdToken === 'function') {
+      return await firebaseUser.getIdToken();
+    }
+    // Fallback: admin session
+    const adminSession = localStorage.getItem('adminSession');
+    if (adminSession) {
+      const session = JSON.parse(adminSession);
+      if (session.token) return session.token;
+    }
+    return null;
+  } catch (err) {
+    console.error('[useWeddingServices] Error obteniendo token:', err);
+    return null;
+  }
+}
 
 /**
  * Hook para gestionar servicios de boda y asignación de proveedores
@@ -26,7 +47,14 @@ export function useWeddingServices() {
     try {
       setLoading(true);
       setError(null);
-      const token = await user.getIdToken();
+      const token = await getAuthToken();
+
+      if (!token) {
+        console.warn('[useWeddingServices] No se pudo obtener token');
+        setServices([]);
+        setLoading(false);
+        return;
+      }
       const response = await axios.get(`${API_URL}/api/weddings/${activeWedding}/services`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -53,7 +81,7 @@ export function useWeddingServices() {
     }
 
     try {
-      const token = await user.getIdToken();
+      const token = await getAuthToken();
       const response = await axios.post(
         `${API_URL}/api/weddings/${activeWedding}/services/${serviceId}/assign`,
         {
@@ -89,7 +117,7 @@ export function useWeddingServices() {
     }
 
     try {
-      const token = await user.getIdToken();
+      const token = await getAuthToken();
       await axios.put(
         `${API_URL}/api/weddings/${activeWedding}/services/${serviceId}/status`,
         { status },
@@ -111,7 +139,7 @@ export function useWeddingServices() {
     }
 
     try {
-      const token = await user.getIdToken();
+      const token = await getAuthToken();
       await axios.delete(
         `${API_URL}/api/weddings/${activeWedding}/services/${serviceId}/assigned`,
         { headers: { Authorization: `Bearer ${token}` } }
@@ -132,7 +160,7 @@ export function useWeddingServices() {
     }
 
     try {
-      const token = await user.getIdToken();
+      const token = await getAuthToken();
       const response = await axios.post(
         `${API_URL}/api/weddings/${activeWedding}/services/${serviceId}/payments`,
         {

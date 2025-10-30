@@ -209,6 +209,51 @@ curl -X POST http://localhost:4004/api/suppliers/search \
 
 ---
 
+## ❌ PROBLEMA 3: useWeddingServices usaba user.getIdToken() (CRÍTICO)
+
+### **ARCHIVO:** `src/hooks/useWeddingServices.js`
+
+**ERROR:**
+
+```javascript
+TypeError: user.getIdToken is not a function
+```
+
+**CAUSA:**
+El `user` del contexto `useAuth` NO es el objeto Firebase User, sino un objeto simplificado. No tiene el método `getIdToken()`.
+
+**OCURRENCIAS:**
+
+- Línea 29: `loadServices()`
+- Línea 84: `assignSupplier()`
+- Línea 120: `updateServiceStatus()`
+- Línea 142: `removeAssignedSupplier()`
+- Línea 163: `addPayment()`
+
+**SOLUCIÓN:**
+
+```javascript
+// ✅ Usar getAuthToken() helper (igual que FavoritesContext)
+async function getAuthToken() {
+  const firebaseUser = auth?.currentUser;
+  if (firebaseUser && typeof firebaseUser.getIdToken === 'function') {
+    return await firebaseUser.getIdToken();
+  }
+  return null;
+}
+
+// Reemplazar TODAS las llamadas:
+const token = await getAuthToken(); // ✅
+```
+
+**IMPACTO:**
+
+- ❌ Las tarjetas NO se actualizan porque `loadServices()` falla
+- ❌ No se pueden cargar los servicios de la boda
+- ❌ `WeddingServicesOverview` no tiene datos para renderizar
+
+---
+
 ## 📊 FLUJO COMPLETO ESPERADO:
 
 ```
