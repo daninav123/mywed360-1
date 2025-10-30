@@ -77,7 +77,7 @@ export function useWeddingCategories() {
 
       setActiveCategories(categories);
       console.log('   ✅ Estado actualizado en hook');
-      toast.success('Servicios actualizados correctamente');
+      // No mostrar toast aquí - se muestra en addCategory/removeCategory
     } catch (error) {
       console.error('Error updating active categories:', error);
       toast.error('Error al actualizar servicios');
@@ -87,19 +87,32 @@ export function useWeddingCategories() {
 
   // Añadir una categoría (por ejemplo, al guardar favorito de nueva categoría)
   const addCategory = async (categoryId) => {
+    console.log('➕ [useWeddingCategories] addCategory:', categoryId);
+
     if (!activeCategories.includes(categoryId)) {
       const newCategories = [...activeCategories, categoryId];
+      const category = SUPPLIER_CATEGORIES.find((c) => c.id === categoryId);
+
+      console.log('   Añadiendo categoría:', category?.name);
       await updateActiveCategories(newCategories);
 
-      const category = SUPPLIER_CATEGORIES.find((c) => c.id === categoryId);
-      toast.info(`Servicio "${category?.name || categoryId}" añadido a tu boda`);
+      toast.success(`✅ "${category?.name || categoryId}" añadido`);
+    } else {
+      console.log('   ⚠️ Ya está activa, no se hace nada');
     }
   };
 
   // Remover una categoría
   const removeCategory = async (categoryId) => {
+    console.log('➖ [useWeddingCategories] removeCategory:', categoryId);
+
+    const category = SUPPLIER_CATEGORIES.find((c) => c.id === categoryId);
+    console.log('   Removiendo categoría:', category?.name);
+
     const newCategories = activeCategories.filter((id) => id !== categoryId);
     await updateActiveCategories(newCategories);
+
+    toast.info(`❌ "${category?.name || categoryId}" desactivado`);
   };
 
   // Alternar categoría (activar/desactivar)

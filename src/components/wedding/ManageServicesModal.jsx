@@ -24,14 +24,19 @@ export default function ManageServicesModal({ open, onClose }) {
   console.log('🚀 ManageServicesModal está renderizando...');
 
   const handleToggle = async (categoryId) => {
+    console.log('🎯 [ManageServicesModal] handleToggle:', categoryId);
+    console.log('   Estado actual:', isCategoryActive(categoryId) ? 'ACTIVO' : 'INACTIVO');
+
     setToggling(categoryId);
     try {
       await toggleCategory(categoryId);
+      console.log('   ✅ toggleCategory completado');
     } catch (error) {
+      console.error('   ❌ Error en toggleCategory:', error);
       toast.error('Error al actualizar servicio');
-      console.error(error);
     } finally {
       setToggling(null);
+      console.log('   🔓 Toggle desbloqueado');
     }
   };
 
