@@ -820,6 +820,25 @@ const Proveedores = () => {
           </div>
         </Card>
 
+        {/* Servicios de tu boda - Header con progreso */}
+        <div className="mb-6">
+          <WeddingServicesOverview
+            onSearch={(service) => {
+              // Cuando se hace click en "Buscar proveedores" de un servicio
+              setSearchInput(service);
+              setSearchPanelCollapsed(false);
+              setActiveTab('search');
+              // Scroll al panel de búsqueda
+              setTimeout(() => {
+                document.querySelector('[data-search-panel]')?.scrollIntoView({
+                  behavior: 'smooth',
+                  block: 'start',
+                });
+              }, 100);
+            }}
+          />
+        </div>
+
         {/* Contenido según tab activo */}
         {activeTab === 'favorites' ? (
           <FavoritesSection />
@@ -1166,24 +1185,6 @@ const Proveedores = () => {
                 </Button>
               </div>
             )}
-
-            {/* Servicios de tu boda - Vista general con progreso */}
-            <div className="mt-6">
-              <WeddingServicesOverview
-                onSearch={(service) => {
-                  // Cuando se hace click en "Buscar proveedores" de un servicio
-                  setSearchInput(service);
-                  setSearchPanelCollapsed(false);
-                  // Scroll al panel de búsqueda
-                  setTimeout(() => {
-                    document.querySelector('[data-search-panel]')?.scrollIntoView({
-                      behavior: 'smooth',
-                      block: 'start',
-                    });
-                  }, 100);
-                }}
-              />
-            </div>
 
             <Modal
               open={searchDrawerOpen}
