@@ -88,6 +88,7 @@ import supplierQuoteRequestsRouter from './routes/supplier-quote-requests.js';
 import supplierBudgetRouter from './routes/supplier-budget.js';
 import migrateSuppliersRouter from './routes/migrate-suppliers.js';
 import publicWeddingRouter from './routes/public-wedding.js';
+import weddingServicesRouter from './routes/wedding-services.js';
 import rsvpRouter from './routes/rsvp.js';
 import automationRouter from './routes/automation.js';
 import automationOrchestratorRouter from './routes/automation-orchestrator.js';
@@ -670,6 +671,8 @@ app.use('/api/wedding-news', publicCors, weddingNewsRouter); // Público, sin ve
 app.use('/api/public/weddings', optionalAuth, publicWeddingRouter);
 // Presupuestos de proveedores (aceptar/rechazar)
 app.use('/api/weddings', requireAuth, supplierBudgetRouter);
+// Wedding services (asignar proveedores a servicios)
+app.use('/api', requireAuth, weddingServicesRouter);
 // Weddings general (autofix permisos, etc.)
 app.use('/api/weddings', requireAuth, weddingsRouter);
 app.use('/api/crm', crmRouter);
