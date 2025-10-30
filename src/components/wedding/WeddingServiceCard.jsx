@@ -85,7 +85,12 @@ export default function WeddingServiceCard({
   const icon = serviceIcons[categoryId] || '💼';
 
   return (
-    <div className="border rounded-lg p-4 hover:shadow-md transition-shadow bg-white">
+    <div
+      data-testid="wedding-service-card"
+      data-service-id={categoryId}
+      data-service-name={displayName}
+      className="border rounded-lg p-4 hover:shadow-md transition-shadow bg-white"
+    >
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
