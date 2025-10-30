@@ -75,8 +75,10 @@ export function useWeddingCategories() {
         updatedAt: new Date().toISOString(),
       });
 
-      setActiveCategories(categories);
-      console.log('   ✅ Estado actualizado en hook');
+      // ⚠️ CRÍTICO: Crear una NUEVA referencia del array para que React detecte el cambio
+      setActiveCategories([...categories]);
+      console.log('   ✅ Estado actualizado en hook (nueva referencia del array)');
+      console.log('   Nueva referencia:', [...categories]);
       // No mostrar toast aquí - se muestra en addCategory/removeCategory
     } catch (error) {
       console.error('Error updating active categories:', error);

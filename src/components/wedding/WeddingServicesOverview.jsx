@@ -24,6 +24,11 @@ export default function WeddingServicesOverview({ onSearch }) {
   } = useWeddingCategories();
   const [showManageModal, setShowManageModal] = useState(false);
 
+  // 🔍 DEBUG: Loguear cuando activeCategories cambia
+  React.useEffect(() => {
+    console.log('👁️ [WeddingServicesOverview] activeCategories CAMBIÓ:', activeCategories);
+  }, [activeCategories]);
+
   // Obtener servicios activos de la boda (personalizados por el owner)
   // ⚠️ CRÍTICO: Depender solo de activeCategories, NO de getActiveCategoriesDetails
   // Porque React no puede comparar funciones correctamente en useMemo
