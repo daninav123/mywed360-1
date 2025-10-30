@@ -46,16 +46,16 @@ export default function WeddingServiceCard({
   const serviceFavorites = favorites.filter((fav) => fav.supplier?.category === categoryId);
   const hasFavorites = serviceFavorites.length > 0;
 
-  // Debug: ver qué está pasando
+  // Debug SIMPLIFICADO - solo una vez al montar
   useEffect(() => {
-    console.log('🔍 WeddingServiceCard Debug:', {
-      categoryId,
-      displayName,
-      totalFavorites: favorites.length,
-      serviceFavorites: serviceFavorites.length,
-      favoritesCategories: favorites.map((f) => f.supplier?.category),
-    });
-  }, [categoryId, displayName, favorites, serviceFavorites]);
+    if (categoryId === 'fotografia' && favorites.length > 0) {
+      console.log('🔍 DEBUG FOTOGRAFÍA - Categorías guardadas:');
+      favorites.forEach((fav, idx) => {
+        console.log(`  [${idx}] "${fav.supplier?.category}" - ${fav.supplier?.name}`);
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Solo ejecutar una vez al montar
 
   // Función para asignar proveedor
   const handleAssign = async (supplier) => {

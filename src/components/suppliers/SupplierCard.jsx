@@ -20,7 +20,7 @@ import {
 import { toast } from 'react-toastify';
 
 import useTranslations from '../../hooks/useTranslations';
-import { useFavorites } from '../../contexts/FavoritesContext';
+import { useFavoritesWithAutoCategory } from '../../hooks/useFavoritesWithAutoCategory';
 import { useSupplierCompare } from '../../contexts/SupplierCompareContext';
 import { useSupplierContacts } from '../../contexts/SupplierContactsContext';
 import { useWedding } from '../../context/WeddingContext';
@@ -30,7 +30,7 @@ import RequestQuoteModal from './RequestQuoteModal';
 
 export default function SupplierCard({ supplier, onContact, onViewDetails, onMarkAsConfirmed }) {
   const { t, tPlural, format } = useTranslations();
-  const { isFavorite, toggleFavorite } = useFavorites();
+  const { isFavorite, toggleFavorite } = useFavoritesWithAutoCategory();
   const { isInCompareList, addToCompare, removeFromCompare } = useSupplierCompare();
   const { logContact, getLastContact, needsFollowUp } = useSupplierContacts();
   const { info: weddingProfile } = useActiveWeddingInfo();
