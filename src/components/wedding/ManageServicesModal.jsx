@@ -11,12 +11,17 @@ export default function ManageServicesModal({ open, onClose }) {
   // Debug: Ver qué categorías tenemos
   React.useEffect(() => {
     if (open) {
-      console.log('🔍 ManageServicesModal - allCategories:', allCategories);
-      console.log('🔍 ManageServicesModal - total:', allCategories.length);
+      console.log('🎯 ===== ManageServicesModal SE ESTÁ ABRIENDO =====');
+      console.log('🔍 allCategories:', allCategories);
+      console.log('🔍 Total categorías:', allCategories.length);
+      console.log('🔍 URL actual:', window.location.pathname);
+      console.log('🎯 ===============================================');
     }
   }, [open, allCategories]);
 
   if (!open) return null;
+
+  console.log('🚀 ManageServicesModal está renderizando...');
 
   const handleToggle = async (categoryId) => {
     setToggling(categoryId);
