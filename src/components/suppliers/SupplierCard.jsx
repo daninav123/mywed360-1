@@ -25,8 +25,10 @@ import { useSupplierCompare } from '../../contexts/SupplierCompareContext';
 import { useSupplierContacts } from '../../contexts/SupplierContactsContext';
 import { useWedding } from '../../context/WeddingContext';
 import useActiveWeddingInfo from '../../hooks/useActiveWeddingInfo';
+import { useWeddingServices } from '../../hooks/useWeddingServices';
 import SupplierDetailModal from './SupplierDetailModal';
 import RequestQuoteModal from './RequestQuoteModal';
+import AssignSupplierModal from './AssignSupplierModal';
 
 export default function SupplierCard({ supplier, onContact, onViewDetails, onMarkAsConfirmed }) {
   const { t } = useTranslations();
@@ -38,6 +40,8 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
   const [isFavoriting, setIsFavoriting] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showQuoteModal, setShowQuoteModal] = useState(false);
+  const [showAssignModal, setShowAssignModal] = useState(false);
+  const { assignSupplier } = useWeddingServices();
 
   const isFav = isFavorite(supplier.id);
   const isComparing = isInCompareList(supplier.id || supplier.slug);
@@ -428,6 +432,15 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
               )}
             </div>
 
+            {/* Botón Asignar a Servicio */}
+            <button
+              onClick={() => setShowAssignModal(true)}
+              className="w-full mt-2 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors font-medium text-sm flex items-center justify-center gap-2"
+            >
+              <CheckCircle size={16} />
+              Asignar a servicio
+            </button>
+
             {/* Botón Compartir */}
             <button
               onClick={handleShare}
@@ -522,6 +535,14 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
         onSuccess={() => {
           toast.success(t('common.suppliers.requestQuoteModal.toasts.success'));
         }}
+      />
+
+      {/* Modal Asignar a Servicio */}
+      <AssignSupplierModal
+        supplier={supplier}
+        open={showAssignModal}
+        onClose={() => setShowAssignModal(false)}
+        onAssign={assignSupplier}
       />
     </div>
   );

@@ -1,13 +1,15 @@
 import React, { useState, useMemo } from 'react';
-import { Heart, Filter, Download, Trash2, Search, Send } from 'lucide-react';
+import { Heart, Filter, Download, Trash2, Search, Send, CheckCircle } from 'lucide-react';
 import { toast } from 'react-toastify';
 
 import { useFavorites } from '../../contexts/FavoritesContext';
+import { useWeddingServices } from '../../hooks/useWeddingServices';
 import useTranslations from '../../hooks/useTranslations';
 import useActiveWeddingInfo from '../../hooks/useActiveWeddingInfo';
 import SupplierCard from './SupplierCard';
 import SupplierDetailModal from './SupplierDetailModal';
 import RequestQuoteModal from './RequestQuoteModal';
+import AssignSupplierModal from './AssignSupplierModal';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
 import Input from '../Input';
@@ -22,6 +24,8 @@ const FavoritesSection = () => {
   const [selectedSupplier, setSelectedSupplier] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showQuoteModal, setShowQuoteModal] = useState(false);
+  const [showAssignModal, setShowAssignModal] = useState(false);
+  const { assignSupplier } = useWeddingServices();
 
   const categories = useMemo(() => {
     if (!favorites || favorites.length === 0) return [];
@@ -226,6 +230,18 @@ const FavoritesSection = () => {
                 >
                   <Send className="h-4 w-4" />
                 </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedSupplier(favorite.supplier);
+                    setShowAssignModal(true);
+                  }}
+                  className="p-2 bg-purple-600 text-white rounded-full hover:bg-purple-700 transition-colors shadow-lg"
+                  title="Asignar a servicio"
+                >
+                  <CheckCircle className="h-4 w-4" />
+                </button>
               </div>
 
               {favorite.notes && (
@@ -282,6 +298,16 @@ const FavoritesSection = () => {
           onSuccess={() => {
             toast.success(t('common.suppliers.requestQuoteModal.toasts.success'));
           }}
+        />
+      )}
+
+      {/* Modal Asignar a Servicio */}
+      {selectedSupplier && (
+        <AssignSupplierModal
+          supplier={selectedSupplier}
+          open={showAssignModal}
+          onClose={() => setShowAssignModal(false)}
+          onAssign={assignSupplier}
         />
       )}
     </div>
