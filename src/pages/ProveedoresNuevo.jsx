@@ -738,9 +738,6 @@ const Proveedores = () => {
 
   const headerActions = (
     <div className="flex flex-wrap gap-2">
-      <Button variant="outline" onClick={() => setServicePanelView('configure')}>
-        {t('common.suppliers.overview.actions.manageServices')}
-      </Button>
       <Button
         onClick={() => {
           setNewProviderInitial(null);
