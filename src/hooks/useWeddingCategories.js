@@ -6,7 +6,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { doc, updateDoc, getDoc } from 'firebase/firestore';
-import { db } from '../config/firebase';
+import { db } from '../firebaseConfig';
 import { useAuth } from './useAuth';
 import { useWedding } from '../context/WeddingContext';
 import { SUPPLIER_CATEGORIES } from '../../shared/supplierCategories';
@@ -85,15 +85,15 @@ export function useWeddingCategories() {
     if (!activeCategories.includes(categoryId)) {
       const newCategories = [...activeCategories, categoryId];
       await updateActiveCategories(newCategories);
-      
-      const category = SUPPLIER_CATEGORIES.find(c => c.id === categoryId);
+
+      const category = SUPPLIER_CATEGORIES.find((c) => c.id === categoryId);
       toast.info(`Servicio "${category?.name || categoryId}" añadido a tu boda`);
     }
   };
 
   // Remover una categoría
   const removeCategory = async (categoryId) => {
-    const newCategories = activeCategories.filter(id => id !== categoryId);
+    const newCategories = activeCategories.filter((id) => id !== categoryId);
     await updateActiveCategories(newCategories);
   };
 
@@ -109,7 +109,7 @@ export function useWeddingCategories() {
   // Obtener detalles de categorías activas
   const getActiveCategoriesDetails = () => {
     return activeCategories
-      .map(id => SUPPLIER_CATEGORIES.find(cat => cat.id === id))
+      .map((id) => SUPPLIER_CATEGORIES.find((cat) => cat.id === id))
       .filter(Boolean); // Filtrar undefined
   };
 
