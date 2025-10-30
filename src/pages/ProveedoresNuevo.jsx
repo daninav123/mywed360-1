@@ -843,63 +843,6 @@ const Proveedores = () => {
               />
             </div>
 
-            {/* Stats Cards Premium */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <Card className="p-4 bg-gradient-to-br from-[var(--color-primary)]/10 to-transparent border-[var(--color-primary)]/30">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-primary)] mb-1">
-                      {t('common.suppliers.overview.metrics.totalProviders')}
-                    </p>
-                    <p className="text-2xl font-black text-body">{totalProviders}</p>
-                  </div>
-                  <Building2 className="w-8 h-8 text-[color:var(--color-primary)]/40" />
-                </div>
-              </Card>
-
-              <Card className="p-4 bg-gradient-to-br from-[var(--color-success)]/10 to-transparent border-[var(--color-success)]/30">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-success)] mb-1">
-                      {t('common.suppliers.overview.metrics.confirmed')}
-                    </p>
-                    <p className="text-2xl font-black text-[color:var(--color-success)]">
-                      {confirmedCount}
-                    </p>
-                  </div>
-                  <CheckCircle className="w-8 h-8 text-[color:var(--color-success)]/40" />
-                </div>
-              </Card>
-
-              <Card className="p-4 bg-gradient-to-br from-[var(--color-warning)]/10 to-transparent border-[var(--color-warning)]/30">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-warning)] mb-1">
-                      {t('common.suppliers.overview.metrics.pending')}
-                    </p>
-                    <p className="text-2xl font-black text-[color:var(--color-warning)]">
-                      {pendingCount}
-                    </p>
-                  </div>
-                  <Clock className="w-8 h-8 text-[color:var(--color-warning)]/40" />
-                </div>
-              </Card>
-
-              <Card className="p-4 bg-gradient-to-br from-[var(--color-accent)]/10 to-transparent border-[var(--color-accent)]/30">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-accent)] mb-1">
-                      {t('common.suppliers.overview.metrics.shortlist')}
-                    </p>
-                    <p className="text-2xl font-black text-[color:var(--color-accent)]">
-                      {shortlistTotal}
-                    </p>
-                  </div>
-                  <Sparkles className="w-8 h-8 text-[color:var(--color-accent)]/40" />
-                </div>
-              </Card>
-            </div>
-
             {!searchPanelCollapsed ? (
               <Card
                 data-search-panel
