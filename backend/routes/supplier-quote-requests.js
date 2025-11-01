@@ -2,8 +2,14 @@ import express from 'express';
 import { db } from '../db.js';
 import { FieldValue } from 'firebase-admin/firestore';
 import logger from '../logger.js';
+import { randomBytes } from 'crypto';
 
 const router = express.Router();
+
+// Generar token único para respuesta pública
+function generateResponseToken() {
+  return randomBytes(32).toString('hex');
+}
 
 /**
  * POST /api/suppliers/:id/quote-requests
@@ -32,6 +38,9 @@ router.post('/:id/quote-requests', express.json(), async (req, res) => {
     }
 
     const supplier = supplierDoc.data();
+
+    // Generar token único para respuesta pública
+    const responseToken = generateResponseToken();
 
     // 🤖 Crear solicitud de presupuesto con nuevo formato
     const quoteRequestData = {
@@ -62,6 +71,10 @@ router.post('/:id/quote-requests', express.json(), async (req, res) => {
 
       // Mensaje personalizado
       customMessage: customMessage || '',
+
+      // Token para respuesta pública (proveedores)
+      responseToken,
+      responseUrl: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/responder-presupuesto/${responseToken}`,
 
       // Estado
       status: 'pending', // pending, contacted, quoted, accepted, rejected
@@ -275,6 +288,145 @@ router.get('/:id/quote-requests/stats', async (req, res) => {
     });
   } catch (error) {
     logger.error('Error fetching quote request stats:', error);
+    return res.status(500).json({ error: 'internal_error' });
+  }
+});
+
+/**
+ * GET /api/quote-requests/public/:token
+ * Cargar solicitud de presupuesto desde token público (para proveedor)
+ * NO requiere autenticación
+ */
+router.get('/public/:token', async (req, res) => {
+  try {
+    const { token } = req.params;
+
+    if (!token) {
+      return res.status(400).json({ error: 'token_required' });
+    }
+
+    // Buscar la solicitud por token
+    const suppliersSnapshot = await db.collection('suppliers').get();
+
+    let foundRequest = null;
+    let foundSupplierId = null;
+    let foundRequestId = null;
+
+    for (const supplierDoc of suppliersSnapshot.docs) {
+      const requestsSnapshot = await db
+        .collection('suppliers')
+        .doc(supplierDoc.id)
+        .collection('quote-requests')
+        .where('responseToken', '==', token)
+        .limit(1)
+        .get();
+
+      if (!requestsSnapshot.empty) {
+        foundRequest = requestsSnapshot.docs[0].data();
+        foundSupplierId = supplierDoc.id;
+        foundRequestId = requestsSnapshot.docs[0].id;
+        break;
+      }
+    }
+
+    if (!foundRequest) {
+      return res.status(404).json({ error: 'request_not_found' });
+    }
+
+    // Verificar que no esté ya respondida (opcional, permitir múltiples respuestas)
+    if (foundRequest.status === 'quoted' && foundRequest.quotes && foundRequest.quotes.length > 0) {
+      logger.info(`Request ${foundRequestId} already has quotes, allowing update`);
+    }
+
+    // Devolver la solicitud
+    return res.json({
+      success: true,
+      request: {
+        id: foundRequestId,
+        supplierId: foundSupplierId,
+        ...foundRequest,
+      },
+    });
+  } catch (error) {
+    logger.error('Error fetching public quote request:', error);
+    return res.status(500).json({ error: 'internal_error' });
+  }
+});
+
+/**
+ * POST /api/quote-requests/public/:token/respond
+ * Responder a solicitud de presupuesto (para proveedor)
+ * NO requiere autenticación
+ */
+router.post('/public/:token/respond', express.json(), async (req, res) => {
+  try {
+    const { token } = req.params;
+    const { quote } = req.body;
+
+    if (!token) {
+      return res.status(400).json({ error: 'token_required' });
+    }
+
+    if (!quote || !quote.pricing || !quote.pricing.total) {
+      return res.status(400).json({ error: 'invalid_quote_data' });
+    }
+
+    // Buscar la solicitud por token
+    const suppliersSnapshot = await db.collection('suppliers').get();
+
+    let foundRequestRef = null;
+    let foundRequest = null;
+
+    for (const supplierDoc of suppliersSnapshot.docs) {
+      const requestsSnapshot = await db
+        .collection('suppliers')
+        .doc(supplierDoc.id)
+        .collection('quote-requests')
+        .where('responseToken', '==', token)
+        .limit(1)
+        .get();
+
+      if (!requestsSnapshot.empty) {
+        foundRequestRef = requestsSnapshot.docs[0].ref;
+        foundRequest = requestsSnapshot.docs[0].data();
+        break;
+      }
+    }
+
+    if (!foundRequestRef) {
+      return res.status(404).json({ error: 'request_not_found' });
+    }
+
+    // Crear el objeto quote con metadata
+    const quoteWithMetadata = {
+      ...quote,
+      quoteId: `quote_${Date.now()}`,
+      version: 1,
+      status: 'active',
+      createdAt: FieldValue.serverTimestamp(),
+      updatedAt: FieldValue.serverTimestamp(),
+    };
+
+    // Guardar la respuesta
+    await foundRequestRef.update({
+      quotes: FieldValue.arrayUnion(quoteWithMetadata),
+      status: 'quoted',
+      respondedAt: FieldValue.serverTimestamp(),
+      updatedAt: FieldValue.serverTimestamp(),
+    });
+
+    logger.info(`✅ Quote response saved for request with token ${token.substring(0, 10)}...`);
+
+    // TODO: Enviar notificación al usuario
+    // sendQuoteReceivedNotification(foundRequest.userId, quoteWithMetadata);
+
+    return res.json({
+      success: true,
+      message: 'Presupuesto enviado correctamente',
+      quoteId: quoteWithMetadata.quoteId,
+    });
+  } catch (error) {
+    logger.error('Error saving quote response:', error);
     return res.status(500).json({ error: 'internal_error' });
   }
 });

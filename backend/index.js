@@ -642,6 +642,7 @@ app.use('/api/suppliers', suppliersRegisterRouter); // No requiere auth para reg
 app.use('/api/suppliers', supplierPublicRouter); // Portfolio público (sin auth)
 app.use('/api/suppliers', supplierReviewsRouter); // Reseñas (público lectura, auth escritura)
 app.use('/api/suppliers', supplierQuoteRequestsRouter); // Solicitudes de presupuesto (público)
+app.use('/api/quote-requests', supplierQuoteRequestsRouter); // Rutas públicas de respuesta de presupuestos
 app.use('/api/suppliers', supplierRequestsRouter); // Solicitudes de presupuesto (legacy - mantener por compatibilidad)
 app.use('/api/favorites', authMiddleware(), favoritesRouter); // Favoritos requiere auth
 app.use('/api/ai/budget-estimate', authMiddleware(), aiBudgetRouter);
@@ -672,7 +673,7 @@ app.use('/api/public/weddings', optionalAuth, publicWeddingRouter);
 // Presupuestos de proveedores (aceptar/rechazar)
 app.use('/api/weddings', requireAuth, supplierBudgetRouter);
 // Wedding services (asignar proveedores a servicios)
-app.use('/api', requireAuth, weddingServicesRouter);
+app.use('/api', weddingServicesRouter);
 // Weddings general (autofix permisos, etc.)
 app.use('/api/weddings', requireAuth, weddingsRouter);
 app.use('/api/crm', crmRouter);

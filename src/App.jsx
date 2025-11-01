@@ -33,6 +33,7 @@ import SavedSuppliers from './pages/SavedSuppliers.jsx';
 import SupplierCompare from './pages/SupplierCompare.jsx';
 import ResetPassword from './pages/ResetPassword.jsx';
 import PublicWedding from './pages/PublicWedding';
+import PublicQuoteResponse from './pages/PublicQuoteResponse';
 import RSVPConfirm from './pages/RSVPConfirm';
 import RSVPDashboard from './pages/RSVPDashboard';
 import SupplierPortal from './pages/SupplierPortal';
@@ -364,6 +365,12 @@ function App() {
                           {/* Rutas públicas */}
                           <Route path="w/:uid" element={<WeddingSite />} />
                           <Route path="p/:slug" element={<PublicWedding />} />
+
+                          {/* Respuesta pública de presupuestos (proveedores responden por email) */}
+                          <Route
+                            path="responder-presupuesto/:token"
+                            element={<PublicQuoteResponse />}
+                          />
 
                           {/* Portal de proveedores */}
                           <Route path="supplier/registro" element={<SupplierRegistration />} />
