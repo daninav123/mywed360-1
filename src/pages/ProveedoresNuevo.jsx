@@ -817,200 +817,204 @@ const Proveedores = () => {
           </div>
         </Card>
 
-        {/* Servicios de tu boda - Header con progreso */}
-        <div className="mb-6">
-          <WeddingServicesOverview
-            onSearch={(service) => {
-              // Cuando se hace click en "Buscar proveedores" de un servicio
-              setSearchInput(service);
-              setSearchPanelCollapsed(false);
-              setActiveTab('search');
-              // Scroll al panel de búsqueda
-              setTimeout(() => {
-                document.querySelector('[data-search-panel]')?.scrollIntoView({
-                  behavior: 'smooth',
-                  block: 'start',
-                });
-              }, 100);
-            }}
-          />
-        </div>
-
         {/* Contenido según tab activo */}
         {activeTab === 'favorites' ? (
           <FavoritesSection />
         ) : (
           <>
-            {!searchPanelCollapsed ? (
-              <Card
-                data-search-panel
-                className="p-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft shadow-lg"
-              >
-                <div className="flex flex-wrap items-start justify-between gap-3 mb-6">
-                  <div className="flex items-center gap-3">
-                    <div className="p-3 rounded-xl bg-[var(--color-primary)]/15">
-                      <Search className="w-6 h-6 text-[color:var(--color-primary)]" />
-                    </div>
-                    <div>
-                      <h2 className="text-xl font-bold text-body">
-                        {t('common.suppliers.overview.exploration.title')}
-                      </h2>
-                      <p className="text-sm text-muted">
-                        {t('common.suppliers.overview.exploration.subtitle')}
-                      </p>
-                    </div>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    aria-label={t('common.suppliers.overview.exploration.collapseAria')}
-                    onClick={() => setSearchPanelCollapsed(true)}
-                    className="h-8 w-8 justify-center hover:bg-[var(--color-primary)]/10"
-                  >
-                    <ChevronUp className="h-4 w-4" />
-                  </Button>
-                </div>
-
-                <div className="space-y-6">
-                  <form onSubmit={handleSearchSubmit} className="space-y-3">
-                    <div className="flex flex-wrap items-center gap-3">
-                      <div className="relative flex-1 min-w-[220px]">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted" />
-                        <Input
-                          type="search"
-                          value={searchInput}
-                          onChange={(event) => setSearchInput(event.target.value)}
-                          placeholder={t('common.suppliers.overview.exploration.searchPlaceholder')}
-                          className="pl-10"
-                        />
-                      </div>
-
-                      {/* Selector de modo de búsqueda (DEBUG) */}
-                      <div className="flex items-center gap-2">
-                        <label className="text-xs font-medium text-muted whitespace-nowrap">
-                          {t('common.suppliers.overview.searchMode.label')}
-                        </label>
-                        <select
-                          value={searchMode}
-                          onChange={(e) => setSearchMode(e.target.value)}
-                          className="px-3 py-1.5 text-sm border border-border rounded-md bg-surface text-body focus:outline-none focus:ring-2 focus:ring-primary"
+            {/* Servicios de tu boda - Header con progreso + Buscador integrado */}
+            <div className="mb-6">
+              <WeddingServicesOverview
+                onSearch={(service) => {
+                  // Cuando se hace click en "Buscar proveedores" de un servicio
+                  setSearchInput(service);
+                  setSearchPanelCollapsed(false);
+                  setActiveTab('search');
+                  // Scroll al panel de búsqueda
+                  setTimeout(() => {
+                    document.querySelector('[data-search-panel]')?.scrollIntoView({
+                      behavior: 'smooth',
+                      block: 'start',
+                    });
+                  }, 100);
+                }}
+                searchPanel={
+                  !searchPanelCollapsed ? (
+                    <Card
+                      data-search-panel
+                      className="p-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft shadow-lg"
+                    >
+                      <div className="flex flex-wrap items-start justify-between gap-3 mb-6">
+                        <div className="flex items-center gap-3">
+                          <div className="p-3 rounded-xl bg-[var(--color-primary)]/15">
+                            <Search className="w-6 h-6 text-[color:var(--color-primary)]" />
+                          </div>
+                          <div>
+                            <h2 className="text-xl font-bold text-body">
+                              {t('common.suppliers.overview.exploration.title')}
+                            </h2>
+                            <p className="text-sm text-muted">
+                              {t('common.suppliers.overview.exploration.subtitle')}
+                            </p>
+                          </div>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          aria-label={t('common.suppliers.overview.exploration.collapseAria')}
+                          onClick={() => setSearchPanelCollapsed(true)}
+                          className="h-8 w-8 justify-center hover:bg-[var(--color-primary)]/10"
                         >
-                          <option value="auto">
-                            {t('common.suppliers.overview.searchMode.auto')}
-                          </option>
-                          <option value="database">
-                            {t('common.suppliers.overview.searchMode.database')}
-                          </option>
-                          <option value="internet">
-                            {t('common.suppliers.overview.searchMode.internet')}
-                          </option>
-                        </select>
-                      </div>
-
-                      <div className="flex flex-wrap items-center gap-2">
-                        <Button type="submit" size="sm" leftIcon={<Search size={16} />}>
-                          {t('app.search')}
+                          <ChevronUp className="h-4 w-4" />
                         </Button>
-                        {searchInput && (
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={handleClearSearch}
-                          >
-                            {t('common.suppliers.overview.actions.clear')}
-                          </Button>
-                        )}
                       </div>
-                    </div>
-                  </form>
 
-                  {/* Smart Filters Bar */}
-                  <SmartFiltersBar
-                    weddingProfile={weddingProfile}
-                    onFiltersChange={setSmartFilters}
-                  />
+                      <div className="space-y-6">
+                        <form onSubmit={handleSearchSubmit} className="space-y-3">
+                          <div className="flex flex-wrap items-center gap-3">
+                            <div className="relative flex-1 min-w-[220px]">
+                              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted" />
+                              <Input
+                                type="search"
+                                value={searchInput}
+                                onChange={(event) => setSearchInput(event.target.value)}
+                                placeholder={t('common.suppliers.overview.exploration.searchPlaceholder')}
+                                className="pl-10"
+                              />
+                            </div>
 
-                  {/* Filtros y Ordenamiento */}
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    {/* Filtro Con Portfolio */}
-                    <div className="flex items-center gap-3 p-3 bg-purple-50 border border-purple-200 rounded-lg flex-1">
-                      <input
-                        type="checkbox"
-                        id="hasPortfolioFilter"
-                        checked={hasPortfolioFilter}
-                        onChange={(e) => setHasPortfolioFilter(e.target.checked)}
-                        className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
-                      />
-                      <label
-                        htmlFor="hasPortfolioFilter"
-                        className="flex items-center gap-2 text-sm font-medium text-purple-900 cursor-pointer"
-                      >
-                        <Camera size={16} />
-                        Solo con portfolio
-                      </label>
-                      {hasPortfolioFilter && filteredResults.length > 0 && (
-                        <span className="ml-auto text-xs text-purple-700">
-                          {filteredResults.length}
-                        </span>
-                      )}
-                    </div>
+                            {/* Selector de modo de búsqueda (DEBUG) */}
+                            <div className="flex items-center gap-2">
+                              <label className="text-xs font-medium text-muted whitespace-nowrap">
+                                {t('common.suppliers.overview.searchMode.label')}
+                              </label>
+                              <select
+                                value={searchMode}
+                                onChange={(e) => setSearchMode(e.target.value)}
+                                className="px-3 py-1.5 text-sm border border-border rounded-md bg-surface text-body focus:outline-none focus:ring-2 focus:ring-primary"
+                              >
+                                <option value="auto">
+                                  {t('common.suppliers.overview.searchMode.auto')}
+                                </option>
+                                <option value="database">
+                                  {t('common.suppliers.overview.searchMode.database')}
+                                </option>
+                                <option value="internet">
+                                  {t('common.suppliers.overview.searchMode.internet')}
+                                </option>
+                              </select>
+                            </div>
 
-                    {/* Ordenar por */}
-                    <div className="flex items-center gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                      <ArrowUpDown size={16} className="text-blue-900" />
-                      <label
-                        htmlFor="sortBy"
-                        className="text-sm font-medium text-blue-900 whitespace-nowrap"
-                      >
-                        Ordenar:
-                      </label>
-                      <select
-                        id="sortBy"
-                        value={sortBy}
-                        onChange={(e) => setSortBy(e.target.value)}
-                        className="px-3 py-1.5 text-sm border border-blue-300 rounded-md bg-white text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      >
-                        <option value="relevance">Relevancia</option>
-                        <option value="rating">Rating ⭐</option>
-                        <option value="price">Precio €</option>
-                        <option value="reviews">Más reseñas</option>
-                      </select>
-                    </div>
-                  </div>
+                            <div className="flex flex-wrap items-center gap-2">
+                              <Button type="submit" size="sm" leftIcon={<Search size={16} />}>
+                                {t('app.search')}
+                              </Button>
+                              {searchInput && (
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={handleClearSearch}
+                                >
+                                  {t('common.suppliers.overview.actions.clear')}
+                                </Button>
+                              )}
+                            </div>
+                          </div>
+                        </form>
 
-                  {searchHistory.length > 0 && (
-                    <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
-                      <span className="font-medium text-body">
-                        {t('common.suppliers.overview.exploration.recentSearches')}
-                      </span>
-                      {searchHistory.map((query) => (
-                        <button
-                          key={query}
-                          type="button"
-                          onClick={() => {
-                            setSearchInput(query);
-                            setSearchTerm(query);
-                          }}
-                          className="px-3 py-1.5 rounded-full border border-soft bg-surface hover:border-primary hover:text-primary hover:bg-[var(--color-primary)]/5 transition-all duration-200"
-                        >
-                          {query}
-                        </button>
-                      ))}
-                    </div>
-                  )}
+                        {/* Smart Filters Bar */}
+                        <SmartFiltersBar
+                          weddingProfile={weddingProfile}
+                          onFiltersChange={setSmartFilters}
+                        />
 
-                  <ShortlistList
-                    items={shortlist}
-                    loading={shortlistLoading}
-                    error={shortlistError}
-                    t={t}
-                  />
+                        {/* Filtros y Ordenamiento */}
+                        <div className="flex flex-col sm:flex-row gap-3">
+                          {/* Filtro Con Portfolio */}
+                          <div className="flex items-center gap-3 p-3 bg-purple-50 border border-purple-200 rounded-lg flex-1">
+                            <input
+                              type="checkbox"
+                              id="hasPortfolioFilter"
+                              checked={hasPortfolioFilter}
+                              onChange={(e) => setHasPortfolioFilter(e.target.checked)}
+                              className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                            />
+                            <label
+                              htmlFor="hasPortfolioFilter"
+                              className="flex items-center gap-2 text-sm font-medium text-purple-900 cursor-pointer"
+                            >
+                              <Camera size={16} />
+                              Solo con portfolio
+                            </label>
+                            {hasPortfolioFilter && filteredResults.length > 0 && (
+                              <span className="ml-auto text-xs text-purple-700">
+                                {filteredResults.length}
+                              </span>
+                            )}
+                          </div>
 
-                  {/* Recomendaciones IA - Solo mostrar si no hay búsqueda activa */}
-                  {!aiLoading && !searchCompleted && <RecommendedSuppliers />}
+                          {/* Ordenar por */}
+                          <div className="flex items-center gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                            <ArrowUpDown size={16} className="text-blue-900" />
+                            <label
+                              htmlFor="sortBy"
+                              className="text-sm font-medium text-blue-900 whitespace-nowrap"
+                            >
+                              Ordenar:
+                            </label>
+                            <select
+                              id="sortBy"
+                              value={sortBy}
+                              onChange={(e) => setSortBy(e.target.value)}
+                              className="px-3 py-1.5 text-sm border border-blue-300 rounded-md bg-white text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                              <option value="relevance">Relevancia</option>
+                              <option value="rating">Rating ⭐</option>
+                              <option value="price">Precio €</option>
+                              <option value="reviews">Más reseñas</option>
+                            </select>
+                          </div>
+                        </div>
 
-                  {(aiLoading || searchCompleted) && (
+                        {searchHistory.length > 0 && (
+                          <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
+                            <span className="font-medium text-body">
+                              {t('common.suppliers.overview.exploration.recentSearches')}
+                            </span>
+                            {searchHistory.map((query) => (
+                              <button
+                                key={query}
+                                type="button"
+                                onClick={() => {
+                                  setSearchInput(query);
+                                  setSearchTerm(query);
+                                }}
+                                className="px-3 py-1.5 rounded-full border border-soft bg-surface hover:border-primary hover:text-primary hover:bg-[var(--color-primary)]/5 transition-all duration-200"
+                              >
+                                {query}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+
+                        <ShortlistList
+                          items={shortlist}
+                          loading={shortlistLoading}
+                          error={shortlistError}
+                          t={t}
+                        />
+
+                        {/* Recomendaciones IA - Solo mostrar si no hay búsqueda activa */}
+                        {!aiLoading && !searchCompleted && <RecommendedSuppliers />}
+                      </div>
+                    </Card>
+              ) : null
+            }
+          />
+        </div>
+
+            {(aiLoading || searchCompleted) && (
                     <section className="space-y-3">
                       <div className="flex flex-wrap items-center justify-between gap-3">
                         <div className="space-y-1">

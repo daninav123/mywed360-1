@@ -42,10 +42,23 @@ export default function PaymentSuggestions({
   }, [load]);
 
   const emailDomain = (addr) => {
-    try { return String(addr || '').split('@')[1]?.toLowerCase() || ''; } catch { return ''; }
+    try {
+      return (
+        String(addr || '')
+          .split('@')[1]
+          ?.toLowerCase() || ''
+      );
+    } catch {
+      return '';
+    }
   };
   const linkDomain = (url) => {
-    try { const u = new URL(url); return u.hostname.replace(/^www\./,'').toLowerCase(); } catch { return ''; }
+    try {
+      const u = new URL(url);
+      return u.hostname.replace(/^www\./, '').toLowerCase();
+    } catch {
+      return '';
+    }
   };
   const normalizeMethod = (raw) => {
     const value = String(raw || '').toLowerCase();
@@ -63,7 +76,9 @@ export default function PaymentSuggestions({
     let providerName = '';
     if (Array.isArray(providers) && providers.length) {
       // 1) match by email exact
-      const byEmail = providers.find((p) => p?.email && from.includes(String(p.email).toLowerCase()));
+      const byEmail = providers.find(
+        (p) => p?.email && from.includes(String(p.email).toLowerCase())
+      );
       if (byEmail) providerName = byEmail.name || '';
       // 2) match by domain (provider email domain or website domain)
       if (!providerName && fromDom) {
@@ -76,7 +91,13 @@ export default function PaymentSuggestions({
       }
       // 3) match by provider name in subject
       if (!providerName) {
-        const bySubject = providers.find((p) => p?.name && String(s.subject || '').toLowerCase().includes(String(p.name).toLowerCase()));
+        const bySubject = providers.find(
+          (p) =>
+            p?.name &&
+            String(s.subject || '')
+              .toLowerCase()
+              .includes(String(p.name).toLowerCase())
+        );
         if (bySubject) providerName = bySubject.name || '';
       }
     }
@@ -107,7 +128,8 @@ export default function PaymentSuggestions({
         <div>
           <h3 className="text-lg font-medium">Sugerencias de pago desde emails</h3>
           <p className="text-xs text-[color:var(--color-text)]/70">
-            Estas sugerencias solo crean registros contables en la app; no envían pagos reales ni transfieren dinero.
+            Estas sugerencias solo crean registros contables en la app; no envían pagos reales ni
+            transfieren dinero.
           </p>
           <p className="text-xs text-[color:var(--color-text)]/60 mt-1">
             Siempre puedes registrar pagos o ingresos manuales con el botón «Nueva transacción».
@@ -178,7 +200,7 @@ export default function PaymentSuggestions({
               if (!res || res.success) {
                 setOpen(false);
                 // Remove first matching suggestion by subject/amount
-                setItems((prev) => prev.filter((x) => x.mailId !== (prefill?.meta?.mailId)));
+                setItems((prev) => prev.filter((x) => x.mailId !== prefill?.meta?.mailId));
               }
             } catch {}
           }}

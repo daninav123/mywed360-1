@@ -10,16 +10,18 @@ import { SUPPLIER_CATEGORIES } from '../../../shared/supplierCategories';
 import ManageServicesModal from './ManageServicesModal';
 import { Settings } from 'lucide-react';
 import Button from '../ui/Button';
+import useTranslations from '../../hooks/useTranslations';
 
 /**
  * Vista general de servicios de la boda
  * Muestra el estado de cada servicio (confirmado, en evaluación, pendiente)
  */
-export default function WeddingServicesOverview({ onSearch }) {
+export default function WeddingServicesOverview({ onSearch, searchPanel }) {
   const { providers } = useProveedores();
   const { shortlist } = useSupplierShortlist();
   const { isCategoryActive, activeCategories, loading: loadingCategories } = useWeddingCategories();
   const [showManageModal, setShowManageModal] = useState(false);
+  const { t } = useTranslations();
 
   // ⭐ CRÍTICO: useMemo con dependencia en activeCategories
   // Para que React re-renderice cuando cambian los servicios activos
@@ -98,7 +100,7 @@ export default function WeddingServicesOverview({ onSearch }) {
     return (
       <div className="text-center py-12">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4" />
-        <p className="text-gray-600">Cargando servicios...</p>
+        <p className="text-gray-600">{t('wedding.servicesOverview.loading', { defaultValue: 'Cargando servicios...' })}</p>
       </div>
     );
   }
@@ -108,7 +110,9 @@ export default function WeddingServicesOverview({ onSearch }) {
       {/* Estadísticas generales */}
       <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6">
         <div className="flex items-center justify-between mb-2">
-          <h2 className="text-2xl font-bold text-gray-900">Servicios de tu boda</h2>
+          <h2 className="text-2xl font-bold text-gray-900">
+            {t('wedding.servicesOverview.title', { defaultValue: 'Servicios de tu boda' })}
+          </h2>
           <Button
             variant="outline"
             size="sm"
@@ -116,20 +120,25 @@ export default function WeddingServicesOverview({ onSearch }) {
             className="flex items-center gap-2"
           >
             <Settings className="h-4 w-4" />
-            Gestionar servicios
+            {t('wedding.manageServices.title', { defaultValue: 'Gestionar servicios' })}
             <span className="ml-1 px-2 py-0.5 bg-purple-600 text-white text-xs font-semibold rounded-full">
               {activeServices.length}
             </span>
           </Button>
         </div>
         <p className="text-gray-600 mb-4">
-          {activeServices.length} servicios personalizados para tu gran día
+          {t('wedding.servicesOverview.subtitle', {
+            count: activeServices.length,
+            defaultValue: '{{count}} servicios personalizados para tu gran día',
+          })}
         </p>
 
         {/* Barra de progreso */}
         <div className="mb-4">
           <div className="flex items-center justify-between text-sm mb-1">
-            <span className="text-gray-700 font-medium">Progreso</span>
+            <span className="text-gray-700 font-medium">
+              {t('wedding.servicesOverview.progress', { defaultValue: 'Progreso' })}
+            </span>
             <span className="text-gray-900 font-bold">{stats.progress.toFixed(0)}%</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2.5">
@@ -144,22 +153,33 @@ export default function WeddingServicesOverview({ onSearch }) {
         <div className="grid grid-cols-4 gap-4">
           <div className="text-center">
             <p className="text-3xl font-bold text-gray-900">{stats.total}</p>
-            <p className="text-sm text-gray-600">Total</p>
+            <p className="text-sm text-gray-600">
+              {t('wedding.servicesOverview.counters.total', { defaultValue: 'Total' })}
+            </p>
           </div>
           <div className="text-center">
             <p className="text-3xl font-bold text-green-600">{stats.confirmed}</p>
-            <p className="text-sm text-gray-600">Confirmados</p>
+            <p className="text-sm text-gray-600">
+              {t('wedding.servicesOverview.counters.confirmed', { defaultValue: 'Confirmados' })}
+            </p>
           </div>
           <div className="text-center">
             <p className="text-3xl font-bold text-yellow-600">{stats.inEvaluation}</p>
-            <p className="text-sm text-gray-600">En evaluación</p>
+            <p className="text-sm text-gray-600">
+              {t('wedding.servicesOverview.counters.inEvaluation', { defaultValue: 'En evaluación' })}
+            </p>
           </div>
           <div className="text-center">
             <p className="text-3xl font-bold text-gray-400">{stats.pending}</p>
-            <p className="text-sm text-gray-600">Pendientes</p>
+            <p className="text-sm text-gray-600">
+              {t('wedding.servicesOverview.counters.pending', { defaultValue: 'Pendientes' })}
+            </p>
           </div>
         </div>
       </div>
+
+      {/* Panel de búsqueda (si se proporciona) */}
+      {searchPanel && <div className="my-6">{searchPanel}</div>}
 
       {/* Tarjetas de servicios */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -184,9 +204,15 @@ export default function WeddingServicesOverview({ onSearch }) {
       {/* Mensaje de ayuda */}
       {stats.confirmed === 0 && (
         <div className="text-center py-8 bg-gray-50 rounded-lg">
-          <p className="text-gray-600 mb-2">👋 ¡Empieza buscando proveedores para tu boda!</p>
+          <p className="text-gray-600 mb-2">
+            {t('wedding.servicesOverview.empty.title', {
+              defaultValue: '👋 ¡Empieza buscando proveedores para tu boda!',
+            })}
+          </p>
           <p className="text-sm text-gray-500">
-            Haz clic en "Buscar proveedores" en cualquier servicio para comenzar
+            {t('wedding.servicesOverview.empty.hint', {
+              defaultValue: 'Haz clic en "Buscar proveedores" en cualquier servicio para comenzar',
+            })}
           </p>
         </div>
       )}
