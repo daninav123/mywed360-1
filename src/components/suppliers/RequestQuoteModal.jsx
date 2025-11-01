@@ -138,11 +138,14 @@ const RequestQuoteModal = ({ supplier, open, onClose, onSuccess }) => {
 
       console.log('📤 Enviando solicitud de presupuesto:', payload);
 
-      const response = await fetch(`/api/suppliers/${supplier.id || supplier.slug}/request-quote`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
+      const response = await fetch(
+        `/api/suppliers/${supplier.id || supplier.slug}/quote-requests`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        }
+      );
 
       const data = await response.json();
 

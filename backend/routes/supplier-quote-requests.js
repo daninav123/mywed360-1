@@ -7,26 +7,22 @@ const router = express.Router();
 
 /**
  * POST /api/suppliers/:id/quote-requests
- * Solicitar presupuesto a un proveedor
+ * 💰 Sistema Inteligente V2 - Solicitar presupuesto con templates dinámicos
  * NO requiere autenticación (público)
  */
 router.post('/:id/quote-requests', express.json(), async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, email, phone, weddingDate, location, guestCount, budget, message, serviceType } =
+    const { weddingInfo, contacto, proveedor, serviceDetails, customMessage, userId, weddingId } =
       req.body;
 
-    // Validaciones
-    if (!name || name.trim().length < 2) {
-      return res.status(400).json({ error: 'name_required' });
-    }
-
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    // Validaciones del nuevo formato
+    if (!contacto || !contacto.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contacto.email)) {
       return res.status(400).json({ error: 'invalid_email' });
     }
 
-    if (!message || message.trim().length < 10) {
-      return res.status(400).json({ error: 'message_too_short' });
+    if (!contacto.nombre || contacto.nombre.trim().length < 2) {
+      return res.status(400).json({ error: 'name_required' });
     }
 
     // Verificar que el proveedor existe
@@ -37,32 +33,43 @@ router.post('/:id/quote-requests', express.json(), async (req, res) => {
 
     const supplier = supplierDoc.data();
 
-    // Crear solicitud de presupuesto
+    // 🤖 Crear solicitud de presupuesto con nuevo formato
     const quoteRequestData = {
+      // Info del proveedor
       supplierId: id,
       supplierName: supplier.profile?.name || supplier.name || 'Proveedor',
       supplierEmail: supplier.contact?.email || null,
+      supplierCategory: proveedor?.category || null,
+      supplierCategoryName: proveedor?.categoryName || null,
 
-      // Datos del cliente
-      name: name.trim(),
-      email: email.trim().toLowerCase(),
-      phone: phone || null,
+      // Info de la boda (automática)
+      weddingInfo: {
+        fecha: weddingInfo?.fecha || null,
+        ciudad: weddingInfo?.ciudad || null,
+        numeroInvitados: weddingInfo?.numeroInvitados || null,
+        presupuestoTotal: weddingInfo?.presupuestoTotal || null,
+      },
 
-      // Datos del evento
-      weddingDate: weddingDate || null,
-      location: location || null,
-      guestCount: guestCount ? parseInt(guestCount) : null,
-      budget: budget || null,
-      serviceType: serviceType || null,
+      // Info de contacto del cliente
+      contacto: {
+        nombre: contacto.nombre.trim(),
+        email: contacto.email.trim().toLowerCase(),
+        telefono: contacto.telefono || null,
+      },
 
-      // Mensaje
-      message: message.trim(),
+      // 🎯 Detalles del servicio (dinámico por categoría)
+      serviceDetails: serviceDetails || {},
+
+      // Mensaje personalizado
+      customMessage: customMessage || '',
 
       // Estado
       status: 'pending', // pending, contacted, quoted, accepted, rejected
 
       // Metadata
-      source: 'public_page',
+      source: 'intelligent_quote_system_v2',
+      userId: userId || null,
+      weddingId: weddingId || null,
       viewed: false,
       viewedAt: null,
       respondedAt: null,
@@ -79,10 +86,12 @@ router.post('/:id/quote-requests', express.json(), async (req, res) => {
       .collection('quote-requests')
       .add(quoteRequestData);
 
-    logger.info(`Nueva solicitud de presupuesto: ${docRef.id} para proveedor ${id}`);
+    logger.info(
+      `✅ Nueva solicitud presupuesto V2: ${docRef.id} para proveedor ${id} (${proveedor?.categoryName || 'sin categoría'})`
+    );
 
-    // TODO: Enviar email de notificación al proveedor
-    // sendQuoteRequestEmail(supplier.contact.email, quoteRequestData);
+    // TODO: Enviar email de notificación al proveedor con template específico
+    // sendQuoteRequestEmailV2(supplier.contact.email, quoteRequestData);
 
     // Incrementar contador de solicitudes (analytics)
     try {
