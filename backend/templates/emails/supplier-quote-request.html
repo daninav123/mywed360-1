@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nueva Solicitud de Presupuesto</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        .header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+            font-size: 16px;
+        }
+        .content {
+            padding: 30px 20px;
+        }
+        .alert {
+            background-color: #e0f2fe;
+            border-left: 4px solid #0ea5e9;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        .alert-icon {
+            display: inline-block;
+            margin-right: 8px;
+            font-size: 20px;
+        }
+        .section {
+            margin-bottom: 25px;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        .info-item {
+            background-color: #f8fafc;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+        }
+        .info-label {
+            font-size: 12px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        .info-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        .service-list {
+            background-color: #f8fafc;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+        }
+        .service-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .service-item:last-child {
+            border-bottom: none;
+        }
+        .service-icon {
+            color: #10b981;
+            font-weight: bold;
+        }
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            padding: 16px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            text-align: center;
+            margin: 20px 0;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            transition: transform 0.2s;
+        }
+        .cta-button:hover {
+            transform: translateY(-2px);
+        }
+        .cta-container {
+            text-align: center;
+            padding: 20px;
+            background-color: #f8fafc;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .footer {
+            background-color: #f8fafc;
+            padding: 20px;
+            text-align: center;
+            color: #64748b;
+            font-size: 14px;
+            border-top: 1px solid #e2e8f0;
+        }
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        .message-box {
+            background-color: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 15px;
+        }
+        .highlight {
+            color: #667eea;
+            font-weight: 600;
+        }
+        @media only screen and (max-width: 600px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>💼 Nueva Solicitud de Presupuesto</h1>
+            <p>Un cliente está interesado en tus servicios</p>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Alert -->
+            <div class="alert">
+                <span class="alert-icon">⏰</span>
+                <strong>Acción requerida:</strong> Responde antes de {{validUntil}} para no perder esta oportunidad.
+            </div>
+
+            <!-- Cliente info -->
+            <div class="section">
+                <div class="section-title">
+                    <span>👤</span>
+                    <span>Información del Cliente</span>
+                </div>
+                <p><strong>{{clientName}}</strong> está buscando un proveedor de <strong>{{categoryName}}</strong> para su boda.</p>
+            </div>
+
+            <!-- Evento info -->
+            <div class="section">
+                <div class="section-title">
+                    <span>💍</span>
+                    <span>Detalles del Evento</span>
+                </div>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Fecha de la boda</div>
+                        <div class="info-value">{{weddingDate}}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Ciudad</div>
+                        <div class="info-value">{{city}}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Número de invitados</div>
+                        <div class="info-value">{{guestCount}}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Presupuesto total boda</div>
+                        <div class="info-value">{{totalBudget}}€</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Servicio solicitado -->
+            <div class="section">
+                <div class="section-title">
+                    <span>📋</span>
+                    <span>Servicio Solicitado</span>
+                </div>
+                <div class="service-list">
+                    {{#each serviceDetails}}
+                    <div class="service-item">
+                        <span class="service-icon">✓</span>
+                        <span><strong>{{this.label}}:</strong> {{this.value}}</span>
+                    </div>
+                    {{/each}}
+                </div>
+            </div>
+
+            <!-- Mensaje del cliente -->
+            {{#if customMessage}}
+            <div class="section">
+                <div class="section-title">
+                    <span>💬</span>
+                    <span>Mensaje del Cliente</span>
+                </div>
+                <div class="message-box">
+                    <p style="margin: 0; font-style: italic;">"{{customMessage}}"</p>
+                </div>
+            </div>
+            {{/if}}
+
+            <!-- CTA -->
+            <div class="cta-container">
+                <p style="font-size: 18px; margin-bottom: 15px;">
+                    <strong>¿Listo para enviar tu presupuesto?</strong>
+                </p>
+                <p style="color: #64748b; margin-bottom: 20px;">
+                    Completa el formulario con tu mejor oferta. Solo te tomará 2-3 minutos.
+                </p>
+                <a href="{{responseUrl}}" class="cta-button">
+                    📤 Responder con mi Presupuesto
+                </a>
+                <p style="font-size: 12px; color: #64748b; margin-top: 15px;">
+                    Este enlace es único y seguro. Solo tú puedes acceder.
+                </p>
+            </div>
+
+            <!-- Contacto -->
+            <div class="section">
+                <div class="section-title">
+                    <span>📞</span>
+                    <span>Datos de Contacto del Cliente</span>
+                </div>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Email</div>
+                        <div class="info-value">{{clientEmail}}</div>
+                    </div>
+                    {{#if clientPhone}}
+                    <div class="info-item">
+                        <div class="info-label">Teléfono</div>
+                        <div class="info-value">{{clientPhone}}</div>
+                    </div>
+                    {{/if}}
+                </div>
+            </div>
+
+            <!-- Tips -->
+            <div class="alert" style="background-color: #f0fdf4; border-color: #10b981;">
+                <span class="alert-icon">💡</span>
+                <strong>Consejo:</strong> Los presupuestos que se envían en las primeras 24 horas tienen un 80% más de probabilidad de ser seleccionados.
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p><strong>MyWed360</strong> - Plataforma de gestión de bodas</p>
+            <p>Este email fue enviado porque {{clientName}} solicitó un presupuesto desde tu perfil.</p>
+            <p>Si tienes alguna pregunta, contáctanos en <a href="mailto:soporte@mywed360.com">soporte@mywed360.com</a></p>
+            <p style="margin-top: 15px; font-size: 12px;">
+                <a href="{{responseUrl}}">Responder presupuesto</a> • 
+                <a href="https://app.mywed360.com">Ver mi perfil</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

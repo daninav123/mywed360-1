@@ -3,6 +3,10 @@ import { db } from '../db.js';
 import { FieldValue } from 'firebase-admin/firestore';
 import logger from '../logger.js';
 import { randomBytes } from 'crypto';
+import {
+  sendQuoteRequestEmail,
+  sendQuoteReceivedNotification,
+} from '../services/quoteRequestEmailService.js';
 
 const router = express.Router();
 
@@ -103,8 +107,38 @@ router.post('/:id/quote-requests', express.json(), async (req, res) => {
       `✅ Nueva solicitud presupuesto V2: ${docRef.id} para proveedor ${id} (${proveedor?.categoryName || 'sin categoría'})`
     );
 
-    // TODO: Enviar email de notificación al proveedor con template específico
-    // sendQuoteRequestEmailV2(supplier.contact.email, quoteRequestData);
+    // Enviar email de notificación al proveedor
+    if (supplier.contact?.email || supplier.email) {
+      try {
+        await sendQuoteRequestEmail({
+          supplierEmail: supplier.contact?.email || supplier.email,
+          supplierName: supplier.profile?.name || supplier.name || 'Proveedor',
+          clientName: contacto.nombre,
+          clientEmail: contacto.email,
+          clientPhone: contacto.telefono,
+          weddingDate: weddingInfo?.fecha,
+          city: weddingInfo?.ciudad,
+          guestCount: weddingInfo?.numeroInvitados,
+          totalBudget: weddingInfo?.presupuestoTotal,
+          categoryName: proveedor?.categoryName || 'Servicio',
+          serviceDetails: serviceDetails || {},
+          customMessage: customMessage || '',
+          responseUrl: quoteRequestData.responseUrl,
+          requestId: docRef.id,
+        });
+
+        logger.info(
+          `📧 Email enviado a ${supplier.contact?.email || supplier.email} para solicitud ${docRef.id}`
+        );
+      } catch (emailError) {
+        // No fallar la solicitud si el email falla
+        logger.error('Error enviando email al proveedor:', emailError);
+      }
+    } else {
+      logger.warn(
+        `⚠️  Proveedor ${id} no tiene email configurado, no se puede enviar notificación`
+      );
+    }
 
     // Incrementar contador de solicitudes (analytics)
     try {
@@ -417,8 +451,33 @@ router.post('/public/:token/respond', express.json(), async (req, res) => {
 
     logger.info(`✅ Quote response saved for request with token ${token.substring(0, 10)}...`);
 
-    // TODO: Enviar notificación al usuario
-    // sendQuoteReceivedNotification(foundRequest.userId, quoteWithMetadata);
+    // Enviar notificación al usuario
+    if (foundRequest.contacto?.email) {
+      try {
+        // Obtener nombre del usuario
+        let userName = foundRequest.contacto?.nombre || 'Usuario';
+
+        // Obtener nombre del proveedor
+        const supplierName = foundRequest.supplierName || 'Proveedor';
+
+        // URL para ver el presupuesto
+        const viewUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/proveedores`;
+
+        await sendQuoteReceivedNotification({
+          userEmail: foundRequest.contacto.email,
+          userName,
+          supplierName,
+          categoryName: foundRequest.supplierCategoryName || 'Servicio',
+          quoteAmount: quoteWithMetadata.pricing?.total,
+          viewUrl,
+        });
+
+        logger.info(`📧 Notificación enviada a ${foundRequest.contacto.email}`);
+      } catch (emailError) {
+        // No fallar la respuesta si el email falla
+        logger.error('Error enviando notificación al usuario:', emailError);
+      }
+    }
 
     return res.json({
       success: true,
