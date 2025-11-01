@@ -6,12 +6,23 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Calendar, MapPin, Users, Clock, CheckCircle, XCircle, Loader } from 'lucide-react';
+import {
+  Calendar,
+  MapPin,
+  Users,
+  Clock,
+  CheckCircle,
+  XCircle,
+  Loader,
+  GitCompare,
+} from 'lucide-react';
 import Card from '../ui/Card';
+import Button from '../ui/Button';
 import { useAuth } from '../../hooks/useAuth';
 import { useWedding } from '../../context/WeddingContext';
 import { db } from '../../firebaseConfig';
 import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
+import QuoteComparator from './QuoteComparator';
 
 export default function QuoteRequestsTracker() {
   const { user } = useAuth();
@@ -19,6 +30,8 @@ export default function QuoteRequestsTracker() {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all'); // all, pending, contacted, quoted
+  const [showComparator, setShowComparator] = useState(false);
+  const [comparingCategory, setComparingCategory] = useState(null);
 
   useEffect(() => {
     loadQuoteRequests();
@@ -71,6 +84,37 @@ export default function QuoteRequestsTracker() {
     return req.status === filter;
   });
 
+  // Agrupar requests por categoría para detectar si hay múltiples
+  const requestsByCategory = filteredRequests.reduce((acc, req) => {
+    const cat = req.supplierCategory || 'otros';
+    if (!acc[cat]) acc[cat] = [];
+    acc[cat].push(req);
+    return acc;
+  }, {});
+
+  // Encontrar categorías con presupuestos recibidos para comparar
+  const categoriesToCompare = Object.entries(requestsByCategory)
+    .filter(([cat, reqs]) => {
+      const withQuotes = reqs.filter((r) => r.quotes && r.quotes.length > 0);
+      return withQuotes.length >= 2; // Mínimo 2 para comparar
+    })
+    .map(([cat, reqs]) => ({
+      category: cat,
+      categoryName: reqs[0].supplierCategoryName,
+      count: reqs.filter((r) => r.quotes && r.quotes.length > 0).length,
+      requests: reqs.filter((r) => r.quotes && r.quotes.length > 0),
+    }));
+
+  const handleCompareCategory = (category) => {
+    setComparingCategory(category);
+    setShowComparator(true);
+  };
+
+  const handleSelectQuote = (quote) => {
+    console.log('Quote selected:', quote);
+    // TODO: Implementar lógica de selección
+  };
+
   const getStatusBadge = (status) => {
     const badges = {
       pending: { label: 'Pendiente', color: 'bg-yellow-100 text-yellow-800', icon: Clock },
@@ -115,6 +159,32 @@ export default function QuoteRequestsTracker() {
           <span className="ml-3 text-gray-600">Cargando presupuestos...</span>
         </div>
       </Card>
+    );
+  }
+
+  // Si está mostrando el comparador
+  if (showComparator && comparingCategory) {
+    const quotesToCompare = comparingCategory.requests.flatMap((req) =>
+      (req.quotes || []).map((quote) => ({
+        ...quote,
+        supplierId: req.supplierId,
+        supplierName: req.supplierName,
+        supplierCategory: req.supplierCategory,
+        supplierCategoryName: req.supplierCategoryName,
+        supplier: {
+          rating: 4.5, // TODO: Obtener del proveedor real
+          reviewCount: 25,
+        },
+      }))
+    );
+
+    return (
+      <QuoteComparator
+        quotes={quotesToCompare}
+        request={comparingCategory.requests[0]} // Usar el primero como base
+        onSelect={handleSelectQuote}
+        onClose={() => setShowComparator(false)}
+      />
     );
   }
 
@@ -166,6 +236,38 @@ export default function QuoteRequestsTracker() {
         </div>
       </Card>
 
+      {/* Sección de comparar presupuestos */}
+      {categoriesToCompare.length > 0 && (
+        <Card className="bg-gradient-to-r from-purple-50 to-indigo-50 border-2 border-purple-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                <GitCompare className="text-purple-600" size={24} />
+                📊 Comparar Presupuestos
+              </h3>
+              <p className="text-sm text-gray-600 mt-1">
+                Tienes presupuestos de múltiples proveedores. ¡Compáralos para elegir el mejor!
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              {categoriesToCompare.map((cat) => (
+                <Button
+                  key={cat.category}
+                  variant="primary"
+                  size="sm"
+                  onClick={() => handleCompareCategory(cat)}
+                  className="flex items-center gap-2"
+                >
+                  <GitCompare size={16} />
+                  Comparar {cat.categoryName} ({cat.count})
+                </Button>
+              ))}
+            </div>
+          </div>
+        </Card>
+      )}
+
       {/* Lista de solicitudes */}
       {filteredRequests.length === 0 ? (
         <Card>
@@ -183,11 +285,18 @@ export default function QuoteRequestsTracker() {
             <Card key={request.id} className="hover:shadow-md transition-shadow">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
+                  <div className="flex items-center gap-3 mb-2 flex-wrap">
                     <h3 className="text-lg font-semibold text-gray-900">{request.supplierName}</h3>
                     {request.supplierCategoryName && (
                       <span className="text-sm text-indigo-600">
                         • {request.supplierCategoryName}
+                      </span>
+                    )}
+                    {/* Badge de presupuestos recibidos */}
+                    {request.quotes && request.quotes.length > 0 && (
+                      <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">
+                        💰 {request.quotes.length}{' '}
+                        {request.quotes.length === 1 ? 'presupuesto' : 'presupuestos'}
                       </span>
                     )}
                   </div>
