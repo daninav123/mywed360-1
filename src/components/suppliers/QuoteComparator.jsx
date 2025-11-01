@@ -9,24 +9,21 @@
  */
 
 import React, { useState, useMemo } from 'react';
-import {
-  TrendingUp,
-  TrendingDown,
-  Star,
-  Check,
-  X,
-  AlertTriangle,
-  Download,
-  Settings,
-} from 'lucide-react';
+import { X, TrendingUp, TrendingDown, Check, AlertCircle, DollarSign } from 'lucide-react';
+import { toast } from 'react-toastify';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
+import QuoteSelectionConfirmModal from './QuoteSelectionConfirmModal';
 import { compareQuotes, formatQuoteForComparison } from '../../utils/quoteScoring';
+import { useWedding } from '../../context/WeddingContext';
 
 export default function QuoteComparator({ quotes, request, onSelect, onClose }) {
+  const { activeWedding } = useWedding();
   const [sortBy, setSortBy] = useState('score'); // score, price, rating
   const [showAnalysis, setShowAnalysis] = useState(true);
   const [selectedQuote, setSelectedQuote] = useState(null);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [confirming, setConfirming] = useState(false);
 
   // Preferences del usuario (esto podría venir de un contexto)
   const [userPreferences] = useState({
@@ -56,10 +53,73 @@ export default function QuoteComparator({ quotes, request, onSelect, onClose }) 
     }
   }, [comparison.quotes, sortBy]);
 
+  // Manejar selección
   const handleSelect = (quote) => {
     setSelectedQuote(quote);
-    if (onSelect) {
-      onSelect(quote);
+  };
+
+  // Abrir modal de confirmación
+  const handleOpenConfirm = () => {
+    if (!selectedQuote) {
+      toast.warning('Por favor selecciona un presupuesto primero');
+      return;
+    }
+    setShowConfirmModal(true);
+  };
+
+  // Confirmar selección final y guardar
+  const handleConfirmSelection = async ({ quote, notes }) => {
+    setConfirming(true);
+
+    try {
+      // Guardar en backend
+      const response = await fetch('/api/weddings/' + activeWedding.id + '/services/assign', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          category: request.supplierCategoryName || request.category,
+          categoryKey: request.supplierCategory || 'otros',
+          supplier: {
+            id: request.supplierId,
+            name: quote.supplierName,
+            email: request.supplierEmail,
+          },
+          quote: {
+            quoteId: quote.quoteId,
+            pricing: quote.pricing,
+            serviceOffered: quote.serviceOffered,
+            terms: quote.terms,
+            message: quote.message,
+          },
+          notes,
+          status: 'contracted',
+          requestId: request.id,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al guardar la selección');
+      }
+
+      toast.success(`✅ ${quote.supplierName} contratado para ${request.supplierCategoryName}!`);
+
+      // Notificar al padre
+      if (onSelect) {
+        onSelect(quote);
+      }
+
+      // Cerrar modal y comparador
+      setShowConfirmModal(false);
+      setTimeout(() => {
+        if (onClose) {
+          onClose();
+        }
+      }, 500);
+    } catch (error) {
+      console.error('Error confirming selection:', error);
+      toast.error('Error al guardar la selección. Intenta de nuevo.');
+    } finally {
+      setConfirming(false);
     }
   };
 
@@ -441,12 +501,22 @@ export default function QuoteComparator({ quotes, request, onSelect, onClose }) 
                 {selectedQuote.analysis.total}/100
               </p>
             </div>
-            <Button variant="primary" size="lg">
+            <Button variant="primary" size="lg" onClick={handleOpenConfirm}>
               ✅ Continuar con esta opción
             </Button>
           </div>
         </Card>
       )}
+
+      {/* Modal de confirmación */}
+      <QuoteSelectionConfirmModal
+        open={showConfirmModal}
+        onClose={() => setShowConfirmModal(false)}
+        quote={selectedQuote}
+        category={request.supplierCategoryName || request.category}
+        onConfirm={handleConfirmSelection}
+        loading={confirming}
+      />
     </div>
   );
 }

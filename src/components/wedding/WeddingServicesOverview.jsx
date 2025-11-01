@@ -6,6 +6,7 @@ import WeddingServiceCard from './WeddingServiceCard';
 import useProveedores from '../../hooks/useProveedores';
 import useSupplierShortlist from '../../hooks/useSupplierShortlist';
 import { useWeddingCategories } from '../../hooks/useWeddingCategories';
+import { useWeddingServices } from '../../hooks/useWeddingServices';
 import { SUPPLIER_CATEGORIES } from '../../../shared/supplierCategories';
 import ManageServicesModal from './ManageServicesModal';
 import { Settings } from 'lucide-react';
@@ -20,6 +21,7 @@ export default function WeddingServicesOverview({ onSearch, searchPanel }) {
   const { providers } = useProveedores();
   const { shortlist } = useSupplierShortlist();
   const { isCategoryActive, activeCategories, loading: loadingCategories } = useWeddingCategories();
+  const { services, loading: loadingServices } = useWeddingServices();
   const [showManageModal, setShowManageModal] = useState(false);
   const { t } = useTranslations();
 
@@ -50,23 +52,40 @@ export default function WeddingServicesOverview({ onSearch, searchPanel }) {
   }, [activeCategories, isCategoryActive]); // ← DEPENDENCIAS CRÍTICAS
 
   // Agrupar proveedores confirmados por servicio
+  // PRIORIDAD: servicios asignados desde comparador > proveedores legacy
   const confirmedByService = useMemo(() => {
     const map = {};
 
+    // 1. Primero cargar servicios asignados desde el nuevo sistema
+    (services || []).forEach((service) => {
+      if (service.assignedSupplier && service.category) {
+        map[service.category] = {
+          name: service.assignedSupplier.name,
+          contact: service.assignedSupplier.email || service.assignedSupplier.contact?.email,
+          email: service.assignedSupplier.email,
+          phone: service.assignedSupplier.contact?.phone,
+          rating: service.assignedSupplier.rating || 0,
+          ratingCount: service.assignedSupplier.ratingCount || 0,
+          price: service.assignedSupplier.price,
+          quote: service.assignedSupplier.quote, // Datos del quote seleccionado
+          confirmedAt: service.assignedSupplier.contractedAt || service.assignedSupplier.assignedAt,
+          status: service.assignedSupplier.status,
+        };
+      }
+    });
+
+    // 2. Luego proveedores legacy (solo si no hay uno asignado ya)
     (providers || []).forEach((provider) => {
       const serviceKey = provider.service?.toLowerCase() || 'otros';
 
-      // Solo considerar confirmados
-      if (provider.status?.toLowerCase().includes('confirm')) {
-        // Tomar el primero (el más reciente suele ser el más relevante)
-        if (!map[serviceKey]) {
-          map[serviceKey] = provider;
-        }
+      // Solo considerar confirmados y si no hay ya uno asignado
+      if (provider.status?.toLowerCase().includes('confirm') && !map[serviceKey]) {
+        map[serviceKey] = provider;
       }
     });
 
     return map;
-  }, [providers]);
+  }, [providers, services]);
 
   // Contar proveedores en shortlist por servicio
   const shortlistCountByService = useMemo(() => {
@@ -100,7 +119,9 @@ export default function WeddingServicesOverview({ onSearch, searchPanel }) {
     return (
       <div className="text-center py-12">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4" />
-        <p className="text-gray-600">{t('wedding.servicesOverview.loading', { defaultValue: 'Cargando servicios...' })}</p>
+        <p className="text-gray-600">
+          {t('wedding.servicesOverview.loading', { defaultValue: 'Cargando servicios...' })}
+        </p>
       </div>
     );
   }
@@ -166,7 +187,9 @@ export default function WeddingServicesOverview({ onSearch, searchPanel }) {
           <div className="text-center">
             <p className="text-3xl font-bold text-yellow-600">{stats.inEvaluation}</p>
             <p className="text-sm text-gray-600">
-              {t('wedding.servicesOverview.counters.inEvaluation', { defaultValue: 'En evaluación' })}
+              {t('wedding.servicesOverview.counters.inEvaluation', {
+                defaultValue: 'En evaluación',
+              })}
             </p>
           </div>
           <div className="text-center">

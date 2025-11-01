@@ -42,8 +42,113 @@ router.get('/weddings/:weddingId/services', requireAuth, async (req, res) => {
 });
 
 /**
+ * POST /api/weddings/:weddingId/services/assign
+ * Asignar proveedor desde comparador de presupuestos (sin serviceId previo)
+ */
+router.post('/weddings/:weddingId/services/assign', requireAuth, async (req, res) => {
+  try {
+    const { weddingId } = req.params;
+    const { category, categoryKey, supplier, quote, notes, status, requestId } = req.body;
+    const userId = req.user.uid;
+
+    // Validaciones
+    if (!category || !supplier || !supplier.id) {
+      return res.status(400).json({ error: 'Datos incompletos' });
+    }
+
+    // Verificar acceso a la boda
+    const weddingRef = db.collection('users').doc(userId).collection('weddings').doc(weddingId);
+    const weddingDoc = await weddingRef.get();
+
+    if (!weddingDoc.exists) {
+      return res.status(404).json({ error: 'Boda no encontrada' });
+    }
+
+    // ID del servicio basado en categoryKey
+    const serviceId = categoryKey || category.toLowerCase().replace(/\s+/g, '-');
+
+    // Preparar datos del proveedor asignado
+    const assignedSupplier = {
+      supplierId: supplier.id,
+      name: supplier.name,
+      email: supplier.email,
+      contact: {
+        email: supplier.email || null,
+        phone: supplier.phone || null,
+      },
+      status: status || 'contracted',
+
+      // Datos del quote seleccionado
+      quote: {
+        quoteId: quote?.quoteId || null,
+        pricing: quote?.pricing || null,
+        serviceOffered: quote?.serviceOffered || null,
+        terms: quote?.terms || null,
+        message: quote?.message || null,
+      },
+
+      price: quote?.pricing?.total || null,
+      currency: 'EUR',
+      notes: notes || '',
+      requestId: requestId || null,
+
+      assignedAt: new Date().toISOString(),
+      contractedAt: new Date().toISOString(),
+      confirmedAt: null,
+      paidAt: null,
+
+      payments: [],
+      totalPaid: 0,
+      remaining: quote?.pricing?.total || 0,
+    };
+
+    // Actualizar o crear servicio
+    const serviceRef = weddingRef.collection('services').doc(serviceId);
+    const serviceDoc = await serviceRef.get();
+
+    if (serviceDoc.exists) {
+      // Actualizar servicio existente
+      await serviceRef.update({
+        assignedSupplier,
+        category: categoryKey || serviceId,
+        name: category,
+        updatedAt: new Date().toISOString(),
+      });
+    } else {
+      // Crear servicio nuevo
+      await serviceRef.set({
+        category: categoryKey || serviceId,
+        name: category,
+        assignedSupplier,
+        candidates: [],
+        priority: 'high',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      });
+    }
+
+    console.log(
+      `✅ Proveedor ${supplier.name} asignado a servicio ${category} en boda ${weddingId}`
+    );
+
+    res.json({
+      success: true,
+      message: 'Proveedor contratado correctamente',
+      service: {
+        id: serviceId,
+        category,
+        assignedSupplier,
+      },
+    });
+  } catch (error) {
+    console.error('Error assigning supplier from quote:', error);
+    res.status(500).json({ error: 'Error al contratar proveedor' });
+  }
+});
+
+/**
  * POST /api/weddings/:weddingId/services/:serviceId/assign
- * Asignar un proveedor a un servicio
+ * Asignar un proveedor a un servicio existente (legacy)
  */
 router.post('/weddings/:weddingId/services/:serviceId/assign', requireAuth, async (req, res) => {
   try {
