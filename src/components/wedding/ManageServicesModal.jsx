@@ -60,9 +60,13 @@ export default function ManageServicesModal({ open, onClose }) {
     }
   };
 
-  // Agrupar categorías por tipo (principales vs secundarias)
-  const mainCategories = allCategories.slice(0, 10);
-  const otherCategories = allCategories.slice(10);
+  // ⚡ DINÁMICO: Agrupar categorías por coverage en lugar de posición arbitraria
+  // Principales: alta/media cobertura en Google Places (más fáciles de encontrar)
+  // Secundarias: baja cobertura (más nicho/específicas)
+  const mainCategories = allCategories.filter(
+    (cat) => cat.coverage === 'high' || cat.coverage === 'medium'
+  );
+  const otherCategories = allCategories.filter((cat) => cat.coverage === 'low');
 
   // Contar servicios activos
   const activeCount = allCategories.filter((cat) => isCategoryActive(cat.id)).length;

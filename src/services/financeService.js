@@ -4,24 +4,91 @@
  * Sprint 4 - Completar Finance
  */
 
-import { collection, doc, getDoc, setDoc, updateDoc, addDoc, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
+import {
+  collection,
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  addDoc,
+  query,
+  where,
+  getDocs,
+  serverTimestamp,
+} from 'firebase/firestore';
 import { db } from '../firebaseConfig';
+import { SUPPLIER_CATEGORIES } from '../../shared/supplierCategories';
 
 /**
- * Categorías de gastos predefinidas
+ * ⚡ DINÁMICO: Mapeo de iconos para categorías de finanzas
  */
-export const EXPENSE_CATEGORIES = {
-  VENUE: { id: 'venue', name: 'Lugar', icon: '🏛️', color: '#3B82F6' },
-  CATERING: { id: 'catering', name: 'Catering', icon: '🍽️', color: '#10B981' },
-  PHOTOGRAPHY: { id: 'photography', name: 'Fotografía', icon: '📸', color: '#8B5CF6' },
-  MUSIC: { id: 'music', name: 'Música', icon: '🎵', color: '#F59E0B' },
-  DECORATION: { id: 'decoration', name: 'Decoración', icon: '🌸', color: '#EC4899' },
-  ATTIRE: { id: 'attire', name: 'Vestuario', icon: '👗', color: '#6366F1' },
-  INVITATIONS: { id: 'invitations', name: 'Invitaciones', icon: '✉️', color: '#14B8A6' },
-  TRANSPORTATION: { id: 'transportation', name: 'Transporte', icon: '🚗', color: '#EF4444' },
-  ACCOMMODATION: { id: 'accommodation', name: 'Alojamiento', icon: '🏨', color: '#F97316' },
-  OTHER: { id: 'other', name: 'Otros', icon: '💰', color: '#6B7280' }
+const CATEGORY_ICONS = {
+  lugares: '🏛️',
+  restaurantes: '🏛️',
+  catering: '🍽️',
+  fotografia: '📸',
+  video: '🎥',
+  musica: '🎵',
+  dj: '🎵',
+  decoracion: '🌸',
+  'flores-decoracion': '🌸',
+  'vestidos-trajes': '👗',
+  belleza: '💅',
+  invitaciones: '✉️',
+  transporte: '🚗',
+  'luna-de-miel': '🏨',
+  tartas: '🎂',
+  joyeria: '💍',
+  animacion: '🎉',
+  'fuegos-artificiales': '🎆',
+  organizacion: '📋',
+  ceremonia: '⛪',
+  detalles: '🎁',
+  otros: '💰',
 };
+
+/**
+ * ⚡ DINÁMICO: Mapeo de colores para categorías
+ */
+const CATEGORY_COLORS = {
+  lugares: '#3B82F6',
+  restaurantes: '#3B82F6',
+  catering: '#10B981',
+  fotografia: '#8B5CF6',
+  video: '#8B5CF6',
+  musica: '#F59E0B',
+  dj: '#F59E0B',
+  decoracion: '#EC4899',
+  'flores-decoracion': '#EC4899',
+  'vestidos-trajes': '#6366F1',
+  belleza: '#6366F1',
+  invitaciones: '#14B8A6',
+  transporte: '#EF4444',
+  'luna-de-miel': '#F97316',
+  tartas: '#F59E0B',
+  joyeria: '#6366F1',
+  animacion: '#F59E0B',
+  'fuegos-artificiales': '#EF4444',
+  organizacion: '#14B8A6',
+  ceremonia: '#8B5CF6',
+  detalles: '#14B8A6',
+  otros: '#6B7280',
+};
+
+/**
+ * ⚡ DINÁMICO: Categorías de gastos generadas desde SUPPLIER_CATEGORIES
+ * Esto garantiza que siempre están sincronizadas con las categorías de proveedores
+ */
+export const EXPENSE_CATEGORIES = SUPPLIER_CATEGORIES.reduce((acc, cat) => {
+  const key = cat.id.toUpperCase().replace(/-/g, '_');
+  acc[key] = {
+    id: cat.id,
+    name: cat.name,
+    icon: CATEGORY_ICONS[cat.id] || '💰',
+    color: CATEGORY_COLORS[cat.id] || '#6B7280',
+  };
+  return acc;
+}, {});
 
 /**
  * Estados de pago
@@ -30,7 +97,7 @@ export const PAYMENT_STATUS = {
   PENDING: 'pending',
   PAID: 'paid',
   PARTIAL: 'partial',
-  OVERDUE: 'overdue'
+  OVERDUE: 'overdue',
 };
 
 /**
@@ -51,7 +118,7 @@ class FinanceService {
 
       return {
         id: budgetDoc.id,
-        ...budgetDoc.data()
+        ...budgetDoc.data(),
       };
     } catch (error) {
       console.error('Error getting budget:', error);
@@ -66,10 +133,14 @@ class FinanceService {
     try {
       const budgetRef = doc(db, 'weddings', weddingId, 'finance', 'budget');
 
-      await setDoc(budgetRef, {
-        ...budgetData,
-        updatedAt: serverTimestamp()
-      }, { merge: true });
+      await setDoc(
+        budgetRef,
+        {
+          ...budgetData,
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true }
+      );
 
       return true;
     } catch (error) {
@@ -94,10 +165,10 @@ class FinanceService {
       }
 
       const snapshot = await getDocs(expensesQuery);
-      
-      return snapshot.docs.map(doc => ({
+
+      return snapshot.docs.map((doc) => ({
         id: doc.id,
-        ...doc.data()
+        ...doc.data(),
       }));
     } catch (error) {
       console.error('Error getting expenses:', error);
@@ -115,12 +186,12 @@ class FinanceService {
       const docRef = await addDoc(expensesRef, {
         ...expenseData,
         createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp()
+        updatedAt: serverTimestamp(),
       });
 
       return {
         id: docRef.id,
-        ...expenseData
+        ...expenseData,
       };
     } catch (error) {
       console.error('Error creating expense:', error);
@@ -137,7 +208,7 @@ class FinanceService {
 
       await updateDoc(expenseRef, {
         ...updates,
-        updatedAt: serverTimestamp()
+        updatedAt: serverTimestamp(),
       });
 
       return true;
@@ -170,7 +241,7 @@ class FinanceService {
 
       await addDoc(paymentRef, {
         ...payment,
-        paidAt: serverTimestamp()
+        paidAt: serverTimestamp(),
       });
 
       // Actualizar estado del gasto
@@ -216,7 +287,7 @@ class FinanceService {
         status,
         totalPaid,
         remaining: expense.amount - totalPaid,
-        updatedAt: serverTimestamp()
+        updatedAt: serverTimestamp(),
       });
 
       return status;
@@ -243,24 +314,24 @@ class FinanceService {
 
       // Por categoría
       const byCategory = {};
-      Object.keys(EXPENSE_CATEGORIES).forEach(key => {
-        const categoryExpenses = expenses.filter(e => e.category === EXPENSE_CATEGORIES[key].id);
+      Object.keys(EXPENSE_CATEGORIES).forEach((key) => {
+        const categoryExpenses = expenses.filter((e) => e.category === EXPENSE_CATEGORIES[key].id);
         const categoryTotal = categoryExpenses.reduce((sum, e) => sum + (e.amount || 0), 0);
-        
+
         byCategory[EXPENSE_CATEGORIES[key].id] = {
           ...EXPENSE_CATEGORIES[key],
           total: categoryTotal,
           count: categoryExpenses.length,
-          percentage: totalSpent > 0 ? (categoryTotal / totalSpent) * 100 : 0
+          percentage: totalSpent > 0 ? (categoryTotal / totalSpent) * 100 : 0,
         };
       });
 
       // Por estado
       const byStatus = {
-        paid: expenses.filter(e => e.status === PAYMENT_STATUS.PAID).length,
-        pending: expenses.filter(e => e.status === PAYMENT_STATUS.PENDING).length,
-        partial: expenses.filter(e => e.status === PAYMENT_STATUS.PARTIAL).length,
-        overdue: expenses.filter(e => e.status === PAYMENT_STATUS.OVERDUE).length
+        paid: expenses.filter((e) => e.status === PAYMENT_STATUS.PAID).length,
+        pending: expenses.filter((e) => e.status === PAYMENT_STATUS.PENDING).length,
+        partial: expenses.filter((e) => e.status === PAYMENT_STATUS.PARTIAL).length,
+        overdue: expenses.filter((e) => e.status === PAYMENT_STATUS.OVERDUE).length,
       };
 
       return {
@@ -273,7 +344,7 @@ class FinanceService {
         byCategory,
         byStatus,
         isOverBudget: remaining < 0,
-        expensesCount: expenses.length
+        expensesCount: expenses.length,
       };
     } catch (error) {
       console.error('Error calculating budget stats:', error);
@@ -299,18 +370,18 @@ class FinanceService {
           percentageUsed: stats.percentageUsed,
           topCategories: Object.values(stats.byCategory)
             .sort((a, b) => b.total - a.total)
-            .slice(0, 5)
+            .slice(0, 5),
         };
       }
 
       if (format === 'detailed') {
         return {
           summary: stats,
-          expenses: expenses.map(e => ({
+          expenses: expenses.map((e) => ({
             ...e,
-            category: EXPENSE_CATEGORIES[e.category.toUpperCase()] || EXPENSE_CATEGORIES.OTHER
+            category: EXPENSE_CATEGORIES[e.category.toUpperCase()] || EXPENSE_CATEGORIES.OTHER,
           })),
-          budget
+          budget,
         };
       }
 
@@ -327,17 +398,17 @@ class FinanceService {
   async exportData(weddingId) {
     try {
       const expenses = await this.getExpenses(weddingId);
-      
-      return expenses.map(expense => ({
-        'Concepto': expense.name,
-        'Categoría': EXPENSE_CATEGORIES[expense.category?.toUpperCase()]?.name || 'Otros',
-        'Proveedor': expense.vendor || '-',
-        'Monto': expense.amount,
-        'Pagado': expense.totalPaid || 0,
-        'Pendiente': expense.remaining || 0,
-        'Estado': expense.status,
+
+      return expenses.map((expense) => ({
+        Concepto: expense.name,
+        Categoría: EXPENSE_CATEGORIES[expense.category?.toUpperCase()]?.name || 'Otros',
+        Proveedor: expense.vendor || '-',
+        Monto: expense.amount,
+        Pagado: expense.totalPaid || 0,
+        Pendiente: expense.remaining || 0,
+        Estado: expense.status,
         'Fecha Vencimiento': expense.dueDate || '-',
-        'Notas': expense.notes || ''
+        Notas: expense.notes || '',
       }));
     } catch (error) {
       console.error('Error exporting data:', error);
@@ -369,7 +440,7 @@ export function useFinance(weddingId) {
         const [budgetData, expensesData, statsData] = await Promise.all([
           financeService.getBudget(weddingId),
           financeService.getExpenses(weddingId),
-          financeService.calculateBudgetStats(weddingId)
+          financeService.calculateBudgetStats(weddingId),
         ]);
 
         setBudget(budgetData);
@@ -385,29 +456,35 @@ export function useFinance(weddingId) {
     loadData();
   }, [weddingId]);
 
-  const createExpense = React.useCallback(async (expenseData) => {
-    const newExpense = await financeService.createExpense(weddingId, expenseData);
-    setExpenses(prev => [...prev, newExpense]);
-    
-    // Recalcular stats
-    const newStats = await financeService.calculateBudgetStats(weddingId);
-    setStats(newStats);
-    
-    return newExpense;
-  }, [weddingId]);
+  const createExpense = React.useCallback(
+    async (expenseData) => {
+      const newExpense = await financeService.createExpense(weddingId, expenseData);
+      setExpenses((prev) => [...prev, newExpense]);
 
-  const updateExpense = React.useCallback(async (expenseId, updates) => {
-    await financeService.updateExpense(weddingId, expenseId, updates);
-    
-    // Recargar datos
-    const [updatedExpenses, newStats] = await Promise.all([
-      financeService.getExpenses(weddingId),
-      financeService.calculateBudgetStats(weddingId)
-    ]);
-    
-    setExpenses(updatedExpenses);
-    setStats(newStats);
-  }, [weddingId]);
+      // Recalcular stats
+      const newStats = await financeService.calculateBudgetStats(weddingId);
+      setStats(newStats);
+
+      return newExpense;
+    },
+    [weddingId]
+  );
+
+  const updateExpense = React.useCallback(
+    async (expenseId, updates) => {
+      await financeService.updateExpense(weddingId, expenseId, updates);
+
+      // Recargar datos
+      const [updatedExpenses, newStats] = await Promise.all([
+        financeService.getExpenses(weddingId),
+        financeService.calculateBudgetStats(weddingId),
+      ]);
+
+      setExpenses(updatedExpenses);
+      setStats(newStats);
+    },
+    [weddingId]
+  );
 
   return {
     budget,
@@ -416,6 +493,6 @@ export function useFinance(weddingId) {
     loading,
     createExpense,
     updateExpense,
-    financeService
+    financeService,
   };
 }

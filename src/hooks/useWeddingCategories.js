@@ -18,17 +18,13 @@ export function useWeddingCategories() {
   const [activeCategories, setActiveCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Categorías por defecto para bodas nuevas (las más comunes)
-  const DEFAULT_CATEGORIES = [
-    'fotografia',
-    'video',
-    'catering',
-    'venue',
-    'musica',
-    'flores',
-    'decoracion',
-    'tarta',
-  ];
+  // ⚡ DINÁMICO: Categorías por defecto basadas en coverage (alta/media)
+  // Esto garantiza que siempre usamos IDs válidos de SUPPLIER_CATEGORIES
+  const DEFAULT_CATEGORIES = SUPPLIER_CATEGORIES.filter(
+    (cat) => cat.coverage === 'high' || cat.coverage === 'medium'
+  )
+    .slice(0, 8) // Limitar a las 8 más importantes
+    .map((cat) => cat.id);
 
   // ⚡ OPTIMIZACIÓN: Usar onSnapshot para actualización en tiempo real
   // Esto permite que las tarjetas se actualicen instantáneamente sin recargar
