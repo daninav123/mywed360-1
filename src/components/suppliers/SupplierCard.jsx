@@ -285,6 +285,23 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
               {t('common.suppliers.card.hybrid.badges.portfolio')}
             </span>
           )}
+          {/* 🤖 Badge Categoría Detectada */}
+          {supplier.categoryName && supplier.categoryConfidence && (
+            <span
+              className={`
+                inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium
+                ${
+                  supplier.categoryConfidence >= 70
+                    ? 'bg-indigo-100 text-indigo-800'
+                    : 'bg-yellow-100 text-yellow-800'
+                }
+              `}
+              title={`Categoría detectada automáticamente (${supplier.categoryConfidence}% confianza)`}
+            >
+              🏷️ {supplier.categoryName}
+              {supplier.categoryConfidence < 70 && ' ?'}
+            </span>
+          )}
         </div>
       </div>
 

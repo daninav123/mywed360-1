@@ -2,6 +2,7 @@
 // Servicio para búsqueda híbrida de proveedores (Fase 2)
 
 import { auth } from '../firebaseConfig';
+import { classifySuppliers } from './supplierCategoryClassifier';
 
 /**
  * Buscar proveedores con el nuevo sistema híbrido
@@ -108,6 +109,13 @@ export async function searchSuppliersHybrid(
         breakdown: data.breakdown,
         suppliersLength: data.suppliers?.length,
       });
+
+      // 🤖 CLASIFICACIÓN AUTOMÁTICA: Asignar categoría a cada proveedor
+      if (data.suppliers && Array.isArray(data.suppliers)) {
+        console.log('🤖 [searchSuppliersHybrid] Clasificando proveedores automáticamente...');
+        data.suppliers = classifySuppliers(data.suppliers);
+      }
+
       return data;
     } catch (fetchError) {
       clearTimeout(timeoutId);
