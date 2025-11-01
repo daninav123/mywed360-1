@@ -878,7 +878,9 @@ const Proveedores = () => {
                                 type="search"
                                 value={searchInput}
                                 onChange={(event) => setSearchInput(event.target.value)}
-                                placeholder={t('common.suppliers.overview.exploration.searchPlaceholder')}
+                                placeholder={t(
+                                  'common.suppliers.overview.exploration.searchPlaceholder'
+                                )}
                                 className="pl-10"
                               />
                             </div>
@@ -1009,182 +1011,167 @@ const Proveedores = () => {
                         {!aiLoading && !searchCompleted && <RecommendedSuppliers />}
                       </div>
                     </Card>
-              ) : null
-            }
-          />
-        </div>
+                  ) : null
+                }
+              />
+            </div>
 
             {(aiLoading || searchCompleted) && (
-                    <section className="space-y-3">
-                      <div className="flex flex-wrap items-center justify-between gap-3">
-                        <div className="space-y-1">
-                          <h3 className="text-lg font-semibold text-body">
-                            {t('common.suppliers.overview.results.title')}
-                          </h3>
-                          {searchResultsQuery && (
-                            <p className="text-xs text-muted">
-                              {t('common.suppliers.overview.results.query', {
-                                value: searchResultsQuery,
-                              })}
-                            </p>
-                          )}
-                        </div>
+              <section className="space-y-3">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="space-y-1">
+                    <h3 className="text-lg font-semibold text-body">
+                      {t('common.suppliers.overview.results.title')}
+                    </h3>
+                    {searchResultsQuery && (
+                      <p className="text-xs text-muted">
+                        {t('common.suppliers.overview.results.query', {
+                          value: searchResultsQuery,
+                        })}
+                      </p>
+                    )}
+                  </div>
 
-                        {/* Badges de estadísticas mejoradas */}
-                        {!aiLoading && filteredResults.length > 0 && (
-                          <div className="flex flex-wrap items-center gap-2">
-                            {/* Total de resultados */}
-                            <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
-                              📊 {filteredResults.length}{' '}
-                              {filteredResults.length === 1 ? 'resultado' : 'resultados'}
-                            </span>
+                  {/* Badges de estadísticas mejoradas */}
+                  {!aiLoading && filteredResults.length > 0 && (
+                    <div className="flex flex-wrap items-center gap-2">
+                      {/* Total de resultados */}
+                      <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
+                        📊 {filteredResults.length}{' '}
+                        {filteredResults.length === 1 ? 'resultado' : 'resultados'}
+                      </span>
 
-                            {/* Ordenamiento activo */}
-                            {sortBy !== 'relevance' && (
-                              <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-800">
-                                {sortBy === 'rating' && '⭐ Por rating'}
-                                {sortBy === 'price' && '€ Por precio'}
-                                {sortBy === 'reviews' && '💬 Por reseñas'}
-                              </span>
-                            )}
-
-                            {/* Filtro portfolio activo */}
-                            {hasPortfolioFilter && (
-                              <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-800">
-                                📷 Con portfolio
-                              </span>
-                            )}
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Mensaje de fallback eliminado - ya no se usa */}
-
-                      {aiLoading ? (
-                        <Card className="border border-soft bg-surface text-sm text-muted">
-                          {t('common.suppliers.overview.results.loading')}
-                        </Card>
-                      ) : aiError ? (
-                        <Card className="border border-danger bg-danger-soft text-sm text-danger">
-                          {aiError?.message || t('common.suppliers.overview.toasts.error')}
-                        </Card>
-                      ) : aiResults.length === 0 ? (
-                        <Card className="border border-dashed border-soft bg-surface/80 text-sm text-muted">
-                          {t('common.suppliers.overview.results.empty')}
-                        </Card>
-                      ) : (
-                        <>
-                          {/* Mostrar breakdown de resultados + modo de búsqueda */}
-                          {searchBreakdown &&
-                            searchBreakdown.registered +
-                              searchBreakdown.cached +
-                              searchBreakdown.internet >
-                              0 && (
-                              <div className="mb-4 space-y-2">
-                                {/* Indicador de modo de búsqueda activo */}
-                                <div
-                                  className={`p-2 border rounded-lg text-xs font-medium ${
-                                    searchMode === 'database'
-                                      ? 'bg-purple-50 border-purple-200 text-purple-900'
-                                      : searchMode === 'internet'
-                                        ? 'bg-orange-50 border-orange-200 text-orange-900'
-                                        : 'bg-green-50 border-green-200 text-green-900'
-                                  }`}
-                                >
-                                  {t('common.suppliers.overview.searchMode.indicator', {
-                                    mode:
-                                      searchMode === 'database'
-                                        ? t('common.suppliers.overview.searchMode.database')
-                                        : searchMode === 'internet'
-                                          ? t('common.suppliers.overview.searchMode.internet')
-                                          : t('common.suppliers.overview.searchMode.auto'),
-                                  })}
-                                </div>
-
-                                {/* Breakdown de resultados */}
-                                <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                                  <p className="text-sm text-blue-900 font-medium">
-                                    {t('common.suppliers.overview.breakdown.title', {
-                                      total:
-                                        searchBreakdown.registered +
-                                        searchBreakdown.cached +
-                                        searchBreakdown.internet,
-                                      registered: searchBreakdown.registered,
-                                      cached: searchBreakdown.cached,
-                                      internet: searchBreakdown.internet,
-                                    })}
-                                  </p>
-                                </div>
-                              </div>
-                            )}
-
-                          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                            {paginatedResults.map((supplier) => (
-                              <SupplierCard
-                                key={supplier.id || supplier.slug || Math.random()}
-                                supplier={supplier}
-                                onContact={(contactInfo) => {
-                                  // contactInfo puede ser { method, supplier } o simplemente supplier
-                                  const sup = contactInfo.supplier || contactInfo;
-                                  trackSupplierAction(sup.id || sup.slug, 'contact', {
-                                    method: contactInfo.method || 'unknown',
-                                  });
-                                }}
-                                onViewDetails={(s) => {
-                                  trackSupplierAction(s.id || s.slug, 'click');
-                                  handleSelectSearchResult(s);
-                                }}
-                                onMarkAsConfirmed={handleMarkAsConfirmed}
-                              />
-                            ))}
-                          </div>
-
-                          {totalSearchPages > 1 && (
-                            <div className="flex items-center justify-between gap-3 pt-2">
-                              <Button
-                                type="button"
-                                size="sm"
-                                variant="outline"
-                                onClick={handlePrevSearchPage}
-                                disabled={searchResultsPage === 1}
-                              >
-                                {t('app.previous')}
-                              </Button>
-                              <span className="text-xs text-muted">
-                                {t('common.suppliers.overview.pagination.label', {
-                                  current: searchResultsPage,
-                                  total: totalSearchPages,
-                                })}
-                              </span>
-                              <Button
-                                type="button"
-                                size="sm"
-                                variant="outline"
-                                onClick={handleNextSearchPage}
-                                disabled={searchResultsPage === totalSearchPages}
-                              >
-                                {t('app.next')}
-                              </Button>
-                            </div>
-                          )}
-                        </>
+                      {/* Ordenamiento activo */}
+                      {sortBy !== 'relevance' && (
+                        <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-800">
+                          {sortBy === 'rating' && '⭐ Por rating'}
+                          {sortBy === 'price' && '€ Por precio'}
+                          {sortBy === 'reviews' && '💬 Por reseñas'}
+                        </span>
                       )}
-                    </section>
+
+                      {/* Filtro portfolio activo */}
+                      {hasPortfolioFilter && (
+                        <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-800">
+                          📷 Con portfolio
+                        </span>
+                      )}
+                    </div>
                   )}
                 </div>
-              </Card>
-            ) : (
-              <div className="flex justify-center">
-                <Button
-                  type="button"
-                  variant="primary"
-                  size="sm"
-                  className="rounded-full"
-                  onClick={() => setSearchPanelCollapsed(false)}
-                >
-                  {t('common.suppliers.overview.buttons.explore')}
-                </Button>
-              </div>
+
+                {/* Mensaje de fallback eliminado - ya no se usa */}
+
+                {aiLoading ? (
+                  <Card className="border border-soft bg-surface text-sm text-muted">
+                    {t('common.suppliers.overview.results.loading')}
+                  </Card>
+                ) : aiError ? (
+                  <Card className="border border-danger bg-danger-soft text-sm text-danger">
+                    {aiError?.message || t('common.suppliers.overview.toasts.error')}
+                  </Card>
+                ) : aiResults.length === 0 ? (
+                  <Card className="border border-dashed border-soft bg-surface/80 text-sm text-muted">
+                    {t('common.suppliers.overview.results.empty')}
+                  </Card>
+                ) : (
+                  <>
+                    {/* Mostrar breakdown de resultados + modo de búsqueda */}
+                    {searchBreakdown &&
+                      searchBreakdown.registered +
+                        searchBreakdown.cached +
+                        searchBreakdown.internet >
+                        0 && (
+                        <div className="mb-4 space-y-2">
+                          {/* Indicador de modo de búsqueda activo */}
+                          <div
+                            className={`p-2 border rounded-lg text-xs font-medium ${
+                              searchMode === 'database'
+                                ? 'bg-purple-50 border-purple-200 text-purple-900'
+                                : searchMode === 'internet'
+                                  ? 'bg-orange-50 border-orange-200 text-orange-900'
+                                  : 'bg-green-50 border-green-200 text-green-900'
+                            }`}
+                          >
+                            {t('common.suppliers.overview.searchMode.indicator', {
+                              mode:
+                                searchMode === 'database'
+                                  ? t('common.suppliers.overview.searchMode.database')
+                                  : searchMode === 'internet'
+                                    ? t('common.suppliers.overview.searchMode.internet')
+                                    : t('common.suppliers.overview.searchMode.auto'),
+                            })}
+                          </div>
+
+                          {/* Breakdown de resultados */}
+                          <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                            <p className="text-sm text-blue-900 font-medium">
+                              {t('common.suppliers.overview.breakdown.title', {
+                                total:
+                                  searchBreakdown.registered +
+                                  searchBreakdown.cached +
+                                  searchBreakdown.internet,
+                                registered: searchBreakdown.registered,
+                                cached: searchBreakdown.cached,
+                                internet: searchBreakdown.internet,
+                              })}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                      {paginatedResults.map((supplier) => (
+                        <SupplierCard
+                          key={supplier.id || supplier.slug || Math.random()}
+                          supplier={supplier}
+                          onContact={(contactInfo) => {
+                            // contactInfo puede ser { method, supplier } o simplemente supplier
+                            const sup = contactInfo.supplier || contactInfo;
+                            trackSupplierAction(sup.id || sup.slug, 'contact', {
+                              method: contactInfo.method || 'unknown',
+                            });
+                          }}
+                          onViewDetails={(s) => {
+                            trackSupplierAction(s.id || s.slug, 'click');
+                            handleSelectSearchResult(s);
+                          }}
+                          onMarkAsConfirmed={handleMarkAsConfirmed}
+                        />
+                      ))}
+                    </div>
+
+                    {totalSearchPages > 1 && (
+                      <div className="flex items-center justify-between gap-3 pt-2">
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={handlePrevSearchPage}
+                          disabled={searchResultsPage === 1}
+                        >
+                          {t('app.previous')}
+                        </Button>
+                        <span className="text-xs text-muted">
+                          {t('common.suppliers.overview.pagination.label', {
+                            current: searchResultsPage,
+                            total: totalSearchPages,
+                          })}
+                        </span>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={handleNextSearchPage}
+                          disabled={searchResultsPage === totalSearchPages}
+                        >
+                          {t('app.next')}
+                        </Button>
+                      </div>
+                    )}
+                  </>
+                )}
+              </section>
             )}
 
             <Modal
