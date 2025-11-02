@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Clock, AlertCircle, CheckCircle, Play, Pause, RotateCcw } from 'lucide-react';
 import Button from '../ui/Button';
 
@@ -36,7 +36,7 @@ const EventTimeline = ({ events = [], startTime, onEventComplete }) => {
         index,
         scheduledStart: eventStart,
         scheduledEnd: eventEnd,
-        status: getEventStatus(eventStart, eventEnd)
+        status: getEventStatus(eventStart, eventEnd),
       });
 
       currentEventTime = eventEnd;
@@ -47,7 +47,7 @@ const EventTimeline = ({ events = [], startTime, onEventComplete }) => {
 
   const getEventStatus = (start, end) => {
     if (!isLive) return 'pending';
-    
+
     if (completedEvents.has(start.toISOString())) return 'completed';
     if (currentTime >= start && currentTime <= end) return 'active';
     if (currentTime > end) return 'overdue';
@@ -69,7 +69,7 @@ const EventTimeline = ({ events = [], startTime, onEventComplete }) => {
   };
 
   const formatTime = (date) => {
-    return date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+    return date.toLocaleTimeString(currentLanguage || 'es', { hour: '2-digit', minute: '2-digit' });
   };
 
   const getTimeRemaining = (targetTime) => {
@@ -111,8 +111,8 @@ const EventTimeline = ({ events = [], startTime, onEventComplete }) => {
   };
 
   const schedule = getEventSchedule();
-  const activeEvent = schedule.find(e => e.status === 'active');
-  const nextEvent = schedule.find(e => e.status === 'pending');
+  const activeEvent = schedule.find((e) => e.status === 'active');
+  const nextEvent = schedule.find((e) => e.status === 'pending');
 
   return (
     <div className="space-y-6">
@@ -171,7 +171,7 @@ const EventTimeline = ({ events = [], startTime, onEventComplete }) => {
         <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg p-6 text-center">
           <p className="text-sm mb-2 opacity-90">Hora Actual</p>
           <p className="text-4xl font-bold">
-            {currentTime.toLocaleTimeString('es-ES')}
+            {currentTime.toLocaleTimeString(currentLanguage || 'es')}
           </p>
         </div>
       )}
@@ -190,11 +190,11 @@ const EventTimeline = ({ events = [], startTime, onEventComplete }) => {
                   Termina en {getTimeRemaining(activeEvent.scheduledEnd)}
                 </span>
               </div>
-              <p className="text-lg font-semibold text-gray-900 mb-1">
-                {activeEvent.title}
-              </p>
+              <p className="text-lg font-semibold text-gray-900 mb-1">{activeEvent.title}</p>
               <div className="flex items-center gap-4 text-sm text-gray-700">
-                <span>{formatTime(activeEvent.scheduledStart)} - {formatTime(activeEvent.scheduledEnd)}</span>
+                <span>
+                  {formatTime(activeEvent.scheduledStart)} - {formatTime(activeEvent.scheduledEnd)}
+                </span>
                 <span>•</span>
                 <span>{activeEvent.duration} min</span>
                 {activeEvent.location && (
@@ -247,13 +247,17 @@ const EventTimeline = ({ events = [], startTime, onEventComplete }) => {
               <div className="flex items-start gap-4">
                 {/* Timeline indicator */}
                 <div className="flex flex-col items-center">
-                  <div className={`w-10 h-10 rounded-full border-2 flex items-center justify-center ${getStatusColor(event.status)}`}>
+                  <div
+                    className={`w-10 h-10 rounded-full border-2 flex items-center justify-center ${getStatusColor(event.status)}`}
+                  >
                     {getStatusIcon(event.status)}
                   </div>
                   {index < schedule.length - 1 && (
-                    <div className={`w-0.5 h-12 ${
-                      event.status === 'completed' ? 'bg-blue-500' : 'bg-gray-300'
-                    }`} />
+                    <div
+                      className={`w-0.5 h-12 ${
+                        event.status === 'completed' ? 'bg-blue-500' : 'bg-gray-300'
+                      }`}
+                    />
                   )}
                 </div>
 

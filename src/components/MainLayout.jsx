@@ -19,6 +19,8 @@ import { useAuth } from '../hooks/useAuth';
 import { useWedding } from '../context/WeddingContext';
 import { prefetchModule } from '../utils/prefetch';
 import NotificationWatcher from './notifications/NotificationWatcher';
+import LanguageSelector from './ui/LanguageSelector';
+import I18nDebugPanel from './i18n/I18nDebugPanel';
 import OnboardingModeSelector from './Onboarding/OnboardingModeSelector.jsx';
 import OnboardingTutorial from './Onboarding/OnboardingTutorial';
 import RoleBadge from './RoleBadge';
@@ -134,6 +136,9 @@ export default function MainLayout() {
         <TaskNotificationWatcher intervalMs={5 * 60 * 1000} />
         {(import.meta.env.PROD || import.meta.env.VITE_SHOW_ROLE_BADGE === 'true') && <RoleBadge />}
 
+        {/* Selector de idioma global */}
+        <LanguageSelector variant="minimal" />
+
         {/* Avatar y menú de usuario */}
         <div className="relative" data-user-menu>
           <div
@@ -146,7 +151,7 @@ export default function MainLayout() {
             title={t('navigation.userMenu', { defaultValue: 'Menú de usuario' })}
             style={{
               '--tw-ring-color': 'var(--color-primary)',
-              '--tw-ring-offset-color': 'var(--color-bg)'
+              '--tw-ring-offset-color': 'var(--color-bg)',
             }}
           >
             <img
@@ -232,6 +237,7 @@ export default function MainLayout() {
       </main>
       <Nav />
       <ChatWidget />
+      <I18nDebugPanel />
     </div>
   );
 }

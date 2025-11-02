@@ -1,11 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, Users, Euro, Calendar, CheckCircle, Clock, XCircle, Edit2, Trash2 } from 'lucide-react';
+﻿import React, { useState, useEffect } from 'react';
+import {
+  Plus,
+  Users,
+  Euro,
+  Calendar,
+  CheckCircle,
+  Clock,
+  XCircle,
+  Edit2,
+  Trash2,
+} from 'lucide-react';
+import { toast } from 'react-toastify';
 import Button from '../ui/Button';
+import useTranslations from '../../hooks/useTranslations';
 
 /**
  * Gestor de aportaciones familiares/amigos para la boda
  */
 const ContributionsManager = ({ weddingId, onUpdate }) => {
+  const { t, currentLanguage } = useTranslations();
   const [contributions, setContributions] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingContribution, setEditingContribution] = useState(null);
@@ -14,7 +27,7 @@ const ContributionsManager = ({ weddingId, onUpdate }) => {
     amount: '',
     promisedDate: '',
     status: 'pending', // pending, confirmed, received
-    notes: ''
+    notes: '',
   });
 
   useEffect(() => {
@@ -37,7 +50,9 @@ const ContributionsManager = ({ weddingId, onUpdate }) => {
 
   const handleAddContribution = () => {
     if (!formData.name || !formData.amount) {
-      alert('Nombre y monto son obligatorios');
+      toast.warn(
+        t('common.finance.contributions.nameAmountRequired', 'Nombre y monto son obligatorios')
+      );
       return;
     }
 
@@ -45,7 +60,7 @@ const ContributionsManager = ({ weddingId, onUpdate }) => {
       id: Date.now().toString(),
       ...formData,
       amount: parseFloat(formData.amount),
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     };
 
     saveContributions([...contributions, newContribution]);
@@ -55,7 +70,7 @@ const ContributionsManager = ({ weddingId, onUpdate }) => {
   const handleUpdateContribution = () => {
     if (!editingContribution) return;
 
-    const updated = contributions.map(c =>
+    const updated = contributions.map((c) =>
       c.id === editingContribution.id
         ? { ...c, ...formData, amount: parseFloat(formData.amount) }
         : c
@@ -66,8 +81,10 @@ const ContributionsManager = ({ weddingId, onUpdate }) => {
   };
 
   const handleDeleteContribution = (id) => {
-    if (confirm('¿Eliminar esta aportación?')) {
-      saveContributions(contributions.filter(c => c.id !== id));
+    if (
+      window.confirm(t('common.finance.contributions.confirmDelete', '¿Eliminar esta aportación?'))
+    ) {
+      saveContributions(contributions.filter((c) => c.id !== id));
     }
   };
 
@@ -78,7 +95,7 @@ const ContributionsManager = ({ weddingId, onUpdate }) => {
       amount: contribution.amount.toString(),
       promisedDate: contribution.promisedDate || '',
       status: contribution.status,
-      notes: contribution.notes || ''
+      notes: contribution.notes || '',
     });
     setShowAddModal(true);
   };
@@ -89,7 +106,7 @@ const ContributionsManager = ({ weddingId, onUpdate }) => {
       amount: '',
       promisedDate: '',
       status: 'pending',
-      notes: ''
+      notes: '',
     });
     setEditingContribution(null);
     setShowAddModal(false);
@@ -98,10 +115,10 @@ const ContributionsManager = ({ weddingId, onUpdate }) => {
   // Calcular totales
   const totalPromised = contributions.reduce((sum, c) => sum + c.amount, 0);
   const totalReceived = contributions
-    .filter(c => c.status === 'received')
+    .filter((c) => c.status === 'received')
     .reduce((sum, c) => sum + c.amount, 0);
   const totalPending = contributions
-    .filter(c => c.status !== 'received')
+    .filter((c) => c.status !== 'received')
     .reduce((sum, c) => sum + c.amount, 0);
 
   const getStatusIcon = (status) => {
@@ -116,14 +133,12 @@ const ContributionsManager = ({ weddingId, onUpdate }) => {
   };
 
   const getStatusLabel = (status) => {
-    switch (status) {
-      case 'received':
-        return 'Recibida';
-      case 'confirmed':
-        return 'Confirmada';
-      default:
-        return 'Pendiente';
-    }
+    const labels = {
+      received: t('common.finance.contributions.status.received', 'Recibida'),
+      confirmed: t('common.finance.contributions.status.confirmed', 'Confirmada'),
+      pending: t('common.finance.contributions.status.pending', 'Pendiente'),
+    };
+    return labels[status] || labels.pending;
   };
 
   return (
@@ -139,10 +154,7 @@ const ContributionsManager = ({ weddingId, onUpdate }) => {
             Gestiona las contribuciones de familiares y amigos
           </p>
         </div>
-        <Button
-          onClick={() => setShowAddModal(true)}
-          className="flex items-center gap-2"
-        >
+        <Button onClick={() => setShowAddModal(true)} className="flex items-center gap-2">
           <Plus className="w-4 h-4" />
           Nueva Aportación
         </Button>
@@ -218,7 +230,9 @@ const ContributionsManager = ({ weddingId, onUpdate }) => {
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-600">
                     {contribution.promisedDate
-                      ? new Date(contribution.promisedDate).toLocaleDateString('es-ES')
+                      ? new Date(contribution.promisedDate).toLocaleDateString(
+                          currentLanguage || 'es'
+                        )
                       : '-'}
                   </td>
                   <td className="px-4 py-3">
@@ -280,9 +294,7 @@ const ContributionsManager = ({ weddingId, onUpdate }) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Monto (€) *
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Monto (€) *</label>
                 <input
                   type="number"
                   step="0.01"
@@ -306,9 +318,7 @@ const ContributionsManager = ({ weddingId, onUpdate }) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Estado
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Estado</label>
                 <select
                   value={formData.status}
                   onChange={(e) => setFormData({ ...formData, status: e.target.value })}
@@ -321,9 +331,7 @@ const ContributionsManager = ({ weddingId, onUpdate }) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Notas
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Notas</label>
                 <textarea
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}

@@ -7,6 +7,7 @@ import {
   Tag as TagIcon,
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
+import useTranslations from '../../../hooks/useTranslations';
 import { get as apiGet } from '../../../services/apiClient';
 
 import { safeRender, safeMap } from '../../../utils/promiseSafeRenderer';
@@ -14,7 +15,7 @@ import { safeRender, safeMap } from '../../../utils/promiseSafeRenderer';
 const IS_CYPRESS = typeof window !== 'undefined' && typeof window.Cypress !== 'undefined';
 const apiOptions = (extra = {}) => ({
   ...(extra || {}),
-  auth: IS_CYPRESS ? false : extra?.auth ?? true,
+  auth: IS_CYPRESS ? false : (extra?.auth ?? true),
   silent: extra?.silent ?? true,
 });
 
@@ -46,15 +47,14 @@ const EmailList = ({
   density = 'comfortable',
 }) => {
   const [selectedEmailIds, setSelectedEmailIds] = useState([]);
+  const { currentLanguage } = useTranslations();
 
   useEffect(() => {
     if (!Array.isArray(emails) || emails.length === 0) {
       setSelectedEmailIds([]);
       return;
     }
-    const validIds = new Set(
-      safeMap(emails, (mail) => safeRender(mail?.id, '')).filter(Boolean)
-    );
+    const validIds = new Set(safeMap(emails, (mail) => safeRender(mail?.id, '')).filter(Boolean));
     setSelectedEmailIds((prev) => prev.filter((id) => validIds.has(id)));
   }, [emails]);
 
@@ -80,7 +80,10 @@ const EmailList = ({
   const extractSnippet = (mail) => {
     const base = safeRender(mail?.preview, '') || safeRender(mail?.body, '');
     if (typeof base !== 'string' || !base) return '';
-    const plain = base.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    const plain = base
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
     if (!plain) return '';
     const limit = density === 'compact' ? 90 : 140;
     return plain.length > limit ? `${plain.slice(0, limit)}...` : plain;
@@ -113,9 +116,7 @@ const EmailList = ({
       setSelectedEmailIds([]);
       return;
     }
-    selectedEmailIds.forEach((id) =>
-      onDeleteEmail(id, { permanent: currentFolder === 'trash' })
-    );
+    selectedEmailIds.forEach((id) => onDeleteEmail(id, { permanent: currentFolder === 'trash' }));
     setSelectedEmailIds([]);
   };
 
@@ -126,24 +127,36 @@ const EmailList = ({
     const now = new Date();
 
     if (date.toDateString() === now.toDateString()) {
-      return date.toLocaleTimeString('es-ES', {
-        hour: '2-digit',
-        minute: '2-digit',
-      });
+      try {
+        return new Intl.DateTimeFormat(currentLanguage || 'es', {
+          hour: '2-digit',
+          minute: '2-digit',
+        }).format(date);
+      } catch {
+        return date.toTimeString();
+      }
     }
 
     if (date.getFullYear() === now.getFullYear()) {
-      return date.toLocaleDateString('es-ES', {
-        day: '2-digit',
-        month: '2-digit',
-      });
+      try {
+        return new Intl.DateTimeFormat(currentLanguage || 'es', {
+          day: '2-digit',
+          month: '2-digit',
+        }).format(date);
+      } catch {
+        return date.toDateString();
+      }
     }
 
-    return date.toLocaleDateString('es-ES', {
-      day: '2-digit',
-      month: '2-digit',
-      year: '2-digit',
-    });
+    try {
+      return new Intl.DateTimeFormat(currentLanguage || 'es', {
+        day: '2-digit',
+        month: '2-digit',
+        year: '2-digit',
+      }).format(date);
+    } catch {
+      return date.toDateString();
+    }
   };
 
   const StatusMessage = ({ icon, title, description, className = '', dataTestId }) => (
@@ -153,9 +166,7 @@ const EmailList = ({
     >
       {icon}
       <p className="mt-4 text-sm font-medium text-body">{title}</p>
-      {description ? (
-        <p className="mt-2 max-w-sm text-xs text-muted">{description}</p>
-      ) : null}
+      {description ? <p className="mt-2 max-w-sm text-xs text-muted">{description}</p> : null}
     </div>
   );
 
@@ -253,8 +264,7 @@ const EmailList = ({
               const suggestedLabel = safeRender(email?._suggestedFolderLabel, null);
               const hasSuggestion = Boolean(email?._hasSuggestion && suggestedLabel);
               const trashMeta = email?.trashMeta || {};
-              const previousFolderId =
-                trashMeta.previousFolder || trashMeta.restoredTo || null;
+              const previousFolderId = trashMeta.previousFolder || trashMeta.restoredTo || null;
               const originalFolderName =
                 currentFolder === 'trash' && typeof folderNameResolver === 'function'
                   ? folderNameResolver(previousFolderId)
@@ -394,11 +404,17 @@ function InsightsBadge({ id }) {
         if (!res.ok) return;
         const json = await res.json();
         if (ignore) return;
-        const t = (json?.tasks?.length || 0) + (json?.meetings?.length || 0) + (json?.budgets?.length || 0) + (json?.contracts?.length || 0);
+        const t =
+          (json?.tasks?.length || 0) +
+          (json?.meetings?.length || 0) +
+          (json?.budgets?.length || 0) +
+          (json?.contracts?.length || 0);
         setTotal(t);
       } catch {}
     })();
-    return () => { ignore = true; };
+    return () => {
+      ignore = true;
+    };
   }, [id]);
   if (total <= 0) return null;
   return (
@@ -412,5 +428,3 @@ function InsightsBadge({ id }) {
 }
 
 export default EmailList;
-
-

@@ -12,14 +12,14 @@ const parseISODate = (value) => {
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 };
 
-const getMonthLabel = (isoMonth) => {
-  if (!isoMonth) return '';
+// Localized month label
+const getMonthDate = (isoMonth) => {
+  if (!isoMonth) return null;
   const parts = isoMonth.split('-');
-  if (parts.length < 2) return isoMonth;
-  const year = parts[0];
+  if (parts.length < 2) return null;
+  const year = Number(parts[0]);
   const monthIndex = Number(parts[1]) - 1;
-  const date = new Date(Number(year), monthIndex, 1);
-  return date.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' });
+  return new Date(year, monthIndex, 1);
 };
 
 const computeBarScale = (values) => {
@@ -28,8 +28,14 @@ const computeBarScale = (values) => {
   return maxAbs;
 };
 
-const FinanceCashflowTimeline = ({ monthlySeries, predictiveInsights, stats, budget, projection }) => {
-  const { t } = useTranslations();
+const FinanceCashflowTimeline = ({
+  monthlySeries,
+  predictiveInsights,
+  stats,
+  budget,
+  projection,
+}) => {
+  const { t, currentLanguage } = useTranslations();
   const upcomingPayments = Array.isArray(predictiveInsights?.upcomingPayments)
     ? predictiveInsights.upcomingPayments
     : [];
@@ -45,13 +51,7 @@ const FinanceCashflowTimeline = ({ monthlySeries, predictiveInsights, stats, bud
         if (!date) return null;
         return { ...payment, date };
       })
-      .filter(
-        (entry) =>
-          entry &&
-          entry.outstanding > 0 &&
-          entry.date >= now &&
-          entry.date <= limit
-      )
+      .filter((entry) => entry && entry.outstanding > 0 && entry.date >= now && entry.date <= limit)
       .slice(0, 6);
   }, [upcomingPayments]);
 
@@ -65,14 +65,25 @@ const FinanceCashflowTimeline = ({ monthlySeries, predictiveInsights, stats, bud
     const expenseValues = monthlySeries.expense.slice(start);
     const maxScale = computeBarScale(netValues);
     return months.map((iso, index) => ({
-      label: getMonthLabel(iso),
+      label: (() => {
+        const date = getMonthDate(iso);
+        if (!date) return iso;
+        try {
+          return new Intl.DateTimeFormat(currentLanguage || 'es', {
+            month: 'short',
+            year: 'numeric',
+          }).format(date);
+        } catch {
+          return iso;
+        }
+      })(),
       net: netValues[index] || 0,
       income: incomeValues[index] || 0,
       expense: expenseValues[index] || 0,
       width: maxScale > 0 ? Math.abs(netValues[index] || 0) / maxScale : 0,
       positive: (netValues[index] || 0) >= 0,
     }));
-  }, [monthlySeries]);
+  }, [monthlySeries, currentLanguage]);
 
   const budgetRemaining = Math.max(0, (stats?.totalBudget || 0) - (stats?.totalSpent || 0));
   const burnRate = predictiveInsights?.burnRate || 0;
@@ -131,7 +142,9 @@ const FinanceCashflowTimeline = ({ monthlySeries, predictiveInsights, stats, bud
           {upcomingWithinWindow.length === 0 ? (
             <div className="flex items-center justify-center p-8 rounded-xl bg-[var(--color-success)]/5 border border-dashed border-[color:var(--color-success)]/30">
               <p className="text-sm text-muted font-medium">
-                {t('finance.cashflow.noUpcoming', { defaultValue: 'Sin pagos pendientes en las próximas semanas.' })}
+                {t('finance.cashflow.noUpcoming', {
+                  defaultValue: 'Sin pagos pendientes en las próximas semanas.',
+                })}
               </p>
             </div>
           ) : (
@@ -146,10 +159,16 @@ const FinanceCashflowTimeline = ({ monthlySeries, predictiveInsights, stats, bud
                       {payment.concept}
                     </p>
                     <p className="text-xs text-muted font-medium mt-0.5">
-                      {new Date(payment.date).toLocaleDateString('es-ES', {
-                        day: '2-digit',
-                        month: 'short',
-                      })}
+                      {(() => {
+                        try {
+                          return new Intl.DateTimeFormat(currentLanguage || 'es', {
+                            day: '2-digit',
+                            month: 'short',
+                          }).format(new Date(payment.date));
+                        } catch {
+                          return new Date(payment.date).toDateString();
+                        }
+                      })()}
                       {payment.provider ? ` · ${payment.provider}` : ''}
                     </p>
                   </div>
@@ -167,7 +186,9 @@ const FinanceCashflowTimeline = ({ monthlySeries, predictiveInsights, stats, bud
             <div className="flex items-center gap-2">
               <div className="w-1 h-6 bg-gradient-to-b from-[var(--color-primary)] to-blue-600 rounded-full" />
               <h3 className="text-sm font-bold uppercase tracking-wider text-body">
-                {t('finance.cashflow.netTimeline', { defaultValue: 'Flujo neto mensual (6 meses)' })}
+                {t('finance.cashflow.netTimeline', {
+                  defaultValue: 'Flujo neto mensual (6 meses)',
+                })}
               </h3>
             </div>
             <span className="text-xs text-muted font-semibold px-2 py-1 rounded bg-[var(--color-text)]/5">
@@ -178,25 +199,36 @@ const FinanceCashflowTimeline = ({ monthlySeries, predictiveInsights, stats, bud
             {monthlyBars.length === 0 ? (
               <div className="flex items-center justify-center p-8 rounded-xl bg-[var(--color-info)]/5 border border-dashed border-[color:var(--color-info)]/30">
                 <p className="text-sm text-muted font-medium">
-                  {t('finance.cashflow.noHistory', { defaultValue: 'Necesitamos más historial para calcular la tendencia.' })}
+                  {t('finance.cashflow.noHistory', {
+                    defaultValue: 'Necesitamos más historial para calcular la tendencia.',
+                  })}
                 </p>
               </div>
             ) : (
               monthlyBars.map((bar) => (
-                <div key={bar.label} className="space-y-2 p-3 rounded-lg hover:bg-[var(--color-primary)]/5 transition-colors duration-200">
+                <div
+                  key={bar.label}
+                  className="space-y-2 p-3 rounded-lg hover:bg-[var(--color-primary)]/5 transition-colors duration-200"
+                >
                   <div className="flex items-center justify-between text-xs">
-                    <span className="text-muted font-semibold uppercase tracking-wide">{bar.label}</span>
-                    <span className={`font-bold px-2 py-1 rounded ${
-                      bar.positive ? 'text-[color:var(--color-success)] bg-[var(--color-success)]/10' : 'text-[color:var(--color-danger)] bg-[var(--color-danger)]/10'
-                    }`}>
+                    <span className="text-muted font-semibold uppercase tracking-wide">
+                      {bar.label}
+                    </span>
+                    <span
+                      className={`font-bold px-2 py-1 rounded ${
+                        bar.positive
+                          ? 'text-[color:var(--color-success)] bg-[var(--color-success)]/10'
+                          : 'text-[color:var(--color-danger)] bg-[var(--color-danger)]/10'
+                      }`}
+                    >
                       {formatCurrency(bar.net)}
                     </span>
                   </div>
                   <div className="h-3 rounded-full bg-[color:var(--color-text)]/10 overflow-hidden shadow-inner">
                     <div
                       className={`h-3 rounded-full transition-all duration-500 shadow-md ${
-                        bar.positive 
-                          ? 'bg-gradient-to-r from-[var(--color-success)] to-emerald-500' 
+                        bar.positive
+                          ? 'bg-gradient-to-r from-[var(--color-success)] to-emerald-500'
                           : 'bg-gradient-to-r from-[var(--color-danger)] to-red-600'
                       }`}
                       style={{ width: `${Math.max(bar.width * 100, 5)}%` }}
@@ -228,14 +260,17 @@ const FinanceCashflowTimeline = ({ monthlySeries, predictiveInsights, stats, bud
             </h3>
             <p className="text-xs text-muted font-medium">
               {t('finance.overview.projectionHint', {
-                defaultValue: 'Estimaciones basadas en aportaciones configuradas, regalos esperados e importes pendientes.',
+                defaultValue:
+                  'Estimaciones basadas en aportaciones configuradas, regalos esperados e importes pendientes.',
               })}
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
             <div className="group bg-gradient-to-br from-[var(--color-success)]/15 via-[var(--color-success)]/5 to-transparent border border-[color:var(--color-success)]/30 rounded-xl p-4 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5">
               <p className="text-xs uppercase tracking-wider text-[color:var(--color-success)] font-bold mb-2">
-                {t('finance.overview.projectedAtWedding', { defaultValue: 'Balance el día de la boda' })}
+                {t('finance.overview.projectedAtWedding', {
+                  defaultValue: 'Balance el día de la boda',
+                })}
               </p>
               <p className="text-xl md:text-2xl font-bold text-[color:var(--color-success)]">
                 {formatCurrency(projection.summary.projectedAtWedding ?? 0)}
@@ -250,7 +285,8 @@ const FinanceCashflowTimeline = ({ monthlySeries, predictiveInsights, stats, bud
               </p>
               {projection.summary.minProjectedBalanceDate && (
                 <p className="text-xs text-muted mt-1">
-                  {t('finance.overview.onDate', { defaultValue: 'en' })} {projection.summary.minProjectedBalanceDate}
+                  {t('finance.overview.onDate', { defaultValue: 'en' })}{' '}
+                  {projection.summary.minProjectedBalanceDate}
                 </p>
               )}
             </div>
@@ -262,7 +298,9 @@ const FinanceCashflowTimeline = ({ monthlySeries, predictiveInsights, stats, bud
                 {projection.summary.riskDays ?? 0}
               </p>
               <p className="text-xs text-muted mt-1">
-                {t('finance.overview.totalProjectedGifts', { defaultValue: 'Regalos proyectados:' })}{' '}
+                {t('finance.overview.totalProjectedGifts', {
+                  defaultValue: 'Regalos proyectados:',
+                })}{' '}
                 {formatCurrency(projection.summary.totalProjectedGifts ?? 0)}
               </p>
             </div>

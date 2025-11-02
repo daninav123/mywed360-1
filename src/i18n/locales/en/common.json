@@ -24,6 +24,10 @@
     "continue": "Continue",
     "finish": "Finish"
   },
+  "add": "Add",
+  "delete": "Delete",
+  "save": "Save",
+  "cancel": "Cancel",
   "navigation": {
     "home": "Home",
     "dashboard": "Dashboard",
@@ -109,6 +113,10 @@
     }
   },
   "protocol": {
+    "ceremony": {
+      "titleRequired": "Title is required",
+      "confirmDelete": "Delete this event?"
+    },
     "specialMoments": {
       "title": "Special Moments",
       "description": "Plan each key moment with the right music and timing.",
@@ -816,6 +824,17 @@
     },
     "share": {
       "linkCopied": "Link copied"
+    },
+    "manageServices": {
+      "title": "Manage services",
+      "subtitle": "Select the services you need for your wedding",
+      "primaryTitle": "Main services",
+      "otherTitle": "Other services",
+      "tip": "Selected services will appear as cards on your dashboard. They are also added automatically when you save a supplier as a favorite.",
+      "saveAndClose": "Save and close",
+      "toast": {
+        "updateError": "Failed to update service"
+      }
     }
   },
   "guests": {
@@ -824,6 +843,25 @@
       "sentSuccess": "Email sent successfully",
       "sendError": "Error sending email: {{error}}",
       "sendFailed": "Could not send email"
+    },
+    "filters": {
+      "allStatuses": "All statuses",
+      "noGuestsForBulk": "There are no guests to send invitations",
+      "totalGuests": "{{count}} guest in total",
+      "totalGuests_plural": "{{count}} guests in total",
+      "searchPlaceholder": "Search by name, email or phone...",
+      "tablePlaceholder": "Filter by table...",
+      "saveTheDate": {
+        "title": "Send SAVE THE DATE via WhatsApp",
+        "label": "Send SAVE THE DATE"
+      },
+      "bulkInvite": {
+        "title": "Send the formal invitation via WhatsApp API",
+        "label": "Bulk invitations (API)"
+      }
+    },
+    "errors": {
+      "missingPhone": "Guest phone number is missing"
     }
   },
   "providers": {
@@ -856,6 +894,19 @@
     "hairdresser": "Hairdresser"
   },
   "finance": {
+    "contributions": {
+      "nameAmountRequired": "Name and amount are required",
+      "confirmDelete": "Delete this contribution?",
+      "status": {
+        "received": "Received",
+        "confirmed": "Confirmed",
+        "pending": "Pending"
+      }
+    },
+    "reports": {
+      "generateError": "We couldn't generate the report. Please try again.",
+      "exported": "Report exported in {{format}} format"
+    },
     "budget": {
       "errors": {
         "nameRequired": "Category name is required",
@@ -888,6 +939,53 @@
     "editLayout": "Edit Layout",
     "saveLayout": "Save Layout",
     "resetLayout": "Reset Layout",
+    "summary": {
+      "sectionLabel": "Overview",
+      "assignedTitle": "{{count}} guests seated",
+      "assignedSubtitle": "{{assigned}} of {{total}} guests and companions",
+      "noGuests": "No guests added yet",
+      "metrics": {
+        "pending": "Pending:",
+        "tables": "Active tables:",
+        "capacity": "Available capacity:",
+        "capacitySuffix": "pax"
+      },
+      "actions": {
+        "generateLayout": "Generate Auto Layout",
+        "regenerateLayout": "Regenerate Layout",
+        "reviewPending": "Review pending guests"
+      },
+      "progress": {
+        "ceremony": "Ceremony ready",
+        "banquet": "Banquet assigned",
+        "occupancy": "Capacity used"
+      },
+      "map": {
+        "title": "Venue map",
+        "separator": "•"
+      }
+    },
+    "footer": {
+      "stats": {
+        "assignedValue": "{{value}}%",
+        "assigned": "assigned ({{assigned}}/{{total}})",
+        "tables": "tables",
+        "conflicts": "conflicts",
+        "trendIncrease": "+{{value}}%"
+      },
+      "buttons": {
+        "export": "Export",
+        "autoAssign": "Auto AI",
+        "autoAssignLoading": "Assigning..."
+      }
+    },
+    "collaborators": {
+      "title": "Active collaborators ({{count}})",
+      "unknown": "User",
+      "editing_one": "Editing {{count}} element",
+      "editing_other": "Editing {{count}} elements",
+      "synced": "Synced in real time"
+    },
     "toolbar": {
       "syncing": "Syncing...",
       "synced": "Synced",
@@ -1146,6 +1244,10 @@
     "linkCopyError": "Could not generate/copy link"
   },
   "common": {
+    "add": "Add",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "save": "Save",
     "suppliers": {
       "overview": {
         "defaults": {
@@ -1164,6 +1266,7 @@
           "pendingCount": "{{count}} pending",
           "title": "Hired services",
           "shortlistCount": "{{count}} in list",
+          "reviewShortlist": "Review shortlist",
           "emptyShortlist": "No suppliers in the list",
           "exploreHint": "Explore suppliers to add to your list"
         },
@@ -1261,9 +1364,48 @@
         }
       },
       "favorites": {
+        "title": "Saved suppliers",
+        "loading": "Loading your saved suppliers...",
+        "confirmRemove": "Remove this supplier from favorites?",
+        "stats_one": "{{filtered}} of {{total}} saved supplier",
+        "stats_other": "{{filtered}} of {{total}} saved suppliers",
+        "searchPlaceholder": "Search by name, category or city",
+        "actions": {
+          "export": "Export shortlist",
+          "removeTooltip": "Remove from favorites"
+        },
+        "filters": {
+          "allCategories": "All categories",
+          "results_one": "{{count}} supplier matches your filters",
+          "results_other": "{{count}} suppliers match your filters",
+          "clear": "Clear filters",
+          "empty": "No suppliers match the current filters."
+        },
+        "empty": {
+          "title": "No saved suppliers yet",
+          "description": "Save the vendors you love to compare them later.",
+          "hintPrefix": "Use the",
+          "hintSuffix": "icon to add them to your list."
+        },
+        "toasts": {
+          "removed": "Supplier removed from favorites",
+          "removeError": "We couldn't remove the supplier. Try again.",
+          "exportSoon": "Export coming soon. We're working on it!"
+        },
+        "notesLabel": "Notes:",
+        "addedAt": "Saved {{value}}",
         "button": {
           "save": "Save",
           "saved": "Saved"
+        },
+        "errors": {
+          "loginRequired": "You need to sign in to manage favorites.",
+          "activeWeddingRequired": "Select an active wedding to manage favorites.",
+          "authToken": "We couldn't refresh your authentication token.",
+          "alreadyExists": "This supplier is already in your favorites.",
+          "saveFailed": "We couldn't save the favorite. Try again.",
+          "removeFailed": "We couldn't remove the favorite. Try again.",
+          "loadFailed": "We couldn't load your favorites. Please retry later."
         }
       },
       "selectFavorites": {
@@ -1285,6 +1427,15 @@
           "more": "Browse more suppliers"
         },
         "notes": "\"{{note}}\""
+      },
+      "wantedServices": {
+        "title": "Services you need",
+        "subtitle": "Select services for your wedding ({{count}} selected)",
+        "primaryTitle": "📌 Main services",
+        "otherTitle": "✨ Other services",
+        "tip": "These services will be used to filter suppliers and personalize your search experience.",
+        "cancel": "Cancel",
+        "save": "Save services ({{count}})"
       },
       "portfolio": {
         "categories": {
@@ -1451,6 +1602,8 @@
         }
       },
       "configureServices": "Configure services",
+      "suggested": "Suggested",
+      "addServicePlaceholder": "Add service (e.g. Photography)",
       "labels": {
         "provider": "Provider",
         "service": "Service"
@@ -1793,10 +1946,10 @@
     "other": "Otro"
   },
   "suppliers": {
-    "configureServices": "Configurar servicios deseados",
-    "suggested": "Sugeridos",
-    "addServicePlaceholder": "Añadir servicio (ej. Fotografía)",
-    "noServicesAdded": "An no has aadido servicios.",
+    "configureServices": "Configure desired services",
+    "suggested": "Suggested",
+    "addServicePlaceholder": "Add service (e.g. Photography)",
+    "noServicesAdded": "You haven't added services yet.",
     "labels": {
       "provider": "Provider",
       "service": "Service"
@@ -1968,9 +2121,9 @@
       },
       "searchMode": {
         "label": "Search in:",
-        "auto": "🔍 Auto (Hybrid)",
+        "auto": "ðŸ” Auto (Hybrid)",
         "database": "💾 Database only",
-        "internet": "🌐 Internet only",
+        "internet": "ðŸŒ Internet only",
         "indicator": "🎯 Search mode: {{mode}}"
       },
       "breakdown": {
@@ -2383,7 +2536,7 @@
             "name": "Supplier",
             "service": "weddings"
           },
-          "location": "📍 {{city}}",
+          "location": "ðŸ“ {{city}}",
           "imageAlt": "Image of {{name}}",
           "badges": {
             "registered": "Verified ✓",

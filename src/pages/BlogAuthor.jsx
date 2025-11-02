@@ -113,6 +113,34 @@ const BlogAuthor = () => {
     return profiles.filter((profile) => profile.id !== author.id).slice(0, 3);
   }, [author]);
 
+  const pageTitle = author
+    ? `${author.name} | Equipo editorial Lovenda`
+    : t('common.blog.author.pageTitle', { defaultValue: 'Autor del blog' });
+  const metaDescription =
+    author?.bio ||
+    author?.signature ||
+    t('common.blog.lead', {
+      defaultValue:
+        'Descubre tendencias, guías y consejos para organizar tu boda con la ayuda del equipo Lovenda.',
+    });
+  const canonicalHref =
+    typeof window !== 'undefined'
+      ? `${window.location.origin}/blog/autor/${slug}`
+      : `https://malove.app/blog/autor/${slug}`;
+  const authorAvatar = author?.avatar || null;
+  const authorLd = useMemo(() => {
+    if (!author) return null;
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'Person',
+      name: author.name,
+      description: author.bio || author.signature || undefined,
+      jobTitle: author.title || undefined,
+      url: canonicalHref,
+      image: authorAvatar || undefined,
+    };
+  }, [author, canonicalHref, authorAvatar]);
+
   return (
     <>
       <Helmet>
@@ -124,6 +152,7 @@ const BlogAuthor = () => {
         <meta property="og:url" content={canonicalHref} />
         <meta property="og:type" content="profile" />
         {authorAvatar ? <meta property="og:image" content={authorAvatar} /> : null}
+        {authorLd ? <script type="application/ld+json">{JSON.stringify(authorLd)}</script> : null}
       </Helmet>
       <PageWrapper
         title={

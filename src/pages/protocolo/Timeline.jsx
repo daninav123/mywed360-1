@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+﻿import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import {
   Clock,
@@ -84,21 +84,24 @@ const Timeline = () => {
   const scheduleIssues = useMemo(() => validateSchedule(), [validateSchedule]);
 
   // Manejar drag & drop
-  const handleDragEnd = useCallback((result) => {
-    if (!result.destination) return;
+  const handleDragEnd = useCallback(
+    (result) => {
+      if (!result.destination) return;
 
-    const { source, destination } = result;
-    
-    if (source.index !== destination.index) {
-      reorderBlocks(source.index, destination.index);
-      toast.info('Bloques reordenados');
-    }
-  }, [reorderBlocks]);
+      const { source, destination } = result;
+
+      if (source.index !== destination.index) {
+        reorderBlocks(source.index, destination.index);
+        toast.info('Bloques reordenados');
+      }
+    },
+    [reorderBlocks]
+  );
 
   // Añadir nuevo bloque
   const handleAddBlock = useCallback(() => {
     const { name, startTime, endTime } = newBlockData;
-    
+
     if (!name || !startTime || !endTime) {
       toast.error('Completa todos los campos del bloque');
       return;
@@ -118,31 +121,37 @@ const Timeline = () => {
   }, [newBlockData, addBlock]);
 
   // Actualizar horarios de un bloque
-  const handleUpdateBlockTime = useCallback((blockId, field, value) => {
-    const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
-    
-    if (!timeRegex.test(value)) {
-      toast.error('Formato de hora inválido (HH:MM)');
-      return;
-    }
+  const handleUpdateBlockTime = useCallback(
+    (blockId, field, value) => {
+      const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
 
-    updateBlock(blockId, { [field]: value });
-  }, [updateBlock]);
+      if (!timeRegex.test(value)) {
+        toast.error('Formato de hora inválido (HH:MM)');
+        return;
+      }
+
+      updateBlock(blockId, { [field]: value });
+    },
+    [updateBlock]
+  );
 
   // Cambiar estado del bloque
-  const handleStatusChange = useCallback((blockId, status) => {
-    setBlockStatus(blockId, status);
-    
-    const block = blocks.find(b => b.id === blockId);
-    if (block) {
-      const statusText = {
-        [BLOCK_STATES.ON_TIME]: 'a tiempo',
-        [BLOCK_STATES.SLIGHTLY_DELAYED]: 'con ligero retraso',
-        [BLOCK_STATES.DELAYED]: 'retrasado',
-      };
-      toast.info(`${block.name} marcado como ${statusText[status]}`);
-    }
-  }, [setBlockStatus, blocks, BLOCK_STATES]);
+  const handleStatusChange = useCallback(
+    (blockId, status) => {
+      setBlockStatus(blockId, status);
+
+      const block = blocks.find((b) => b.id === blockId);
+      if (block) {
+        const statusText = {
+          [BLOCK_STATES.ON_TIME]: 'a tiempo',
+          [BLOCK_STATES.SLIGHTLY_DELAYED]: 'con ligero retraso',
+          [BLOCK_STATES.DELAYED]: 'retrasado',
+        };
+        toast.info(`${block.name} marcado como ${statusText[status]}`);
+      }
+    },
+    [setBlockStatus, blocks, BLOCK_STATES]
+  );
 
   // Generar alerta manual
   const handleAddManualAlert = useCallback(() => {
@@ -154,34 +163,41 @@ const Timeline = () => {
   }, [addAlert]);
 
   // Renderizar badge de estado
-  const renderStatusBadge = useCallback((status) => {
-    const config = {
-      [BLOCK_STATES.ON_TIME]: { type: 'success', label: 'A tiempo' },
-      [BLOCK_STATES.SLIGHTLY_DELAYED]: { type: 'warning', label: 'Ligero retraso' },
-      [BLOCK_STATES.DELAYED]: { type: 'error', label: 'Retrasado' },
-    };
+  const renderStatusBadge = useCallback(
+    (status) => {
+      const config = {
+        [BLOCK_STATES.ON_TIME]: { type: 'success', label: 'A tiempo' },
+        [BLOCK_STATES.SLIGHTLY_DELAYED]: { type: 'warning', label: 'Ligero retraso' },
+        [BLOCK_STATES.DELAYED]: { type: 'error', label: 'Retrasado' },
+      };
 
-    const { type, label } = config[status] || { type: 'default', label: 'Desconocido' };
-    
-    return <Badge type={type}>{label}</Badge>;
-  }, [BLOCK_STATES]);
+      const { type, label } = config[status] || { type: 'default', label: 'Desconocido' };
+
+      return <Badge type={type}>{label}</Badge>;
+    },
+    [BLOCK_STATES]
+  );
 
   // Renderizar momento del timeline
-  const renderMoment = useCallback((moment, index) => (
-    <div key={moment.id} className="flex items-center gap-2 py-1 px-2 text-xs hover:bg-gray-50 rounded">
-      <span className="text-gray-400 font-mono">{moment.time || '--:--'}</span>
-      <span className="flex-1">
-        {moment.title}
-        {moment.song && <Music className="inline ml-1" size={10} />}
-      </span>
-      {moment.responsible && (
-        <span className="text-gray-500 italic">({moment.responsible})</span>
-      )}
-      <Badge type={moment.status === 'confirmado' ? 'success' : 'default'} size="xs">
-        {moment.status}
-      </Badge>
-    </div>
-  ), []);
+  const renderMoment = useCallback(
+    (moment, index) => (
+      <div
+        key={moment.id}
+        className="flex items-center gap-2 py-1 px-2 text-xs hover:bg-gray-50 rounded"
+      >
+        <span className="text-gray-400 font-mono">{moment.time || '--:--'}</span>
+        <span className="flex-1">
+          {moment.title}
+          {moment.song && <Music className="inline ml-1" size={10} />}
+        </span>
+        {moment.responsible && <span className="text-gray-500 italic">({moment.responsible})</span>}
+        <Badge type={moment.status === 'confirmado' ? 'success' : 'default'} size="xs">
+          {moment.status}
+        </Badge>
+      </div>
+    ),
+    []
+  );
 
   return (
     <PageWrapper
@@ -204,9 +220,7 @@ const Timeline = () => {
               {summary.delayedBlocks.length === 0 ? (
                 <span className="text-green-600">Todo a tiempo</span>
               ) : (
-                <span className="text-yellow-600">
-                  {summary.delayedBlocks.length} con retraso
-                </span>
+                <span className="text-yellow-600">{summary.delayedBlocks.length} con retraso</span>
               )}
             </div>
           </div>
@@ -219,9 +233,9 @@ const Timeline = () => {
           <div>
             <div className="text-sm text-gray-600">Hora actual</div>
             <div className="font-bold text-lg font-mono">
-              {currentTime.toLocaleTimeString('es-ES', { 
-                hour: '2-digit', 
-                minute: '2-digit' 
+              {currentTime.toLocaleTimeString(currentLanguage || 'es', {
+                hour: '2-digit',
+                minute: '2-digit',
               })}
             </div>
           </div>
@@ -237,19 +251,11 @@ const Timeline = () => {
             {liveMode ? <Pause size={14} /> : <Play size={14} />}
             Modo {liveMode ? 'live' : 'estático'}
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setAutomaticAlerts(!automaticAlerts)}
-          >
+          <Button variant="outline" size="sm" onClick={() => setAutomaticAlerts(!automaticAlerts)}>
             {automaticAlerts ? <Bell size={14} /> : <BellOff size={14} />}
             Alertas {automaticAlerts ? 'automáticas' : 'manuales'}
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleAddManualAlert}
-          >
+          <Button variant="outline" size="sm" onClick={handleAddManualAlert}>
             <Plus size={14} />
             Añadir alerta
           </Button>
@@ -268,7 +274,7 @@ const Timeline = () => {
       {/* Alertas */}
       {alerts.length > 0 && (
         <Card className="mb-6">
-          <div 
+          <div
             className="flex items-center justify-between cursor-pointer"
             onClick={() => setAlertsExpanded(!alertsExpanded)}
           >
@@ -282,29 +288,33 @@ const Timeline = () => {
           {alertsExpanded && (
             <div className="mt-4 space-y-2">
               {alerts
-                .filter(alert => !alert.acknowledged)
-                .map(alert => (
+                .filter((alert) => !alert.acknowledged)
+                .map((alert) => (
                   <div
                     key={alert.id}
                     className={`flex items-center justify-between p-3 rounded-lg border ${
-                      alert.type === 'error' ? 'bg-red-50 border-red-200' :
-                      alert.type === 'warning' ? 'bg-yellow-50 border-yellow-200' :
-                      'bg-blue-50 border-blue-200'
+                      alert.type === 'error'
+                        ? 'bg-red-50 border-red-200'
+                        : alert.type === 'warning'
+                          ? 'bg-yellow-50 border-yellow-200'
+                          : 'bg-blue-50 border-blue-200'
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <AlertTriangle 
+                      <AlertTriangle
                         className={
-                          alert.type === 'error' ? 'text-red-500' :
-                          alert.type === 'warning' ? 'text-yellow-500' :
-                          'text-blue-500'
-                        } 
-                        size={20} 
+                          alert.type === 'error'
+                            ? 'text-red-500'
+                            : alert.type === 'warning'
+                              ? 'text-yellow-500'
+                              : 'text-blue-500'
+                        }
+                        size={20}
                       />
                       <div>
                         <div className="font-medium">{alert.message}</div>
                         <div className="text-xs text-gray-500">
-                          {new Date(alert.timestamp).toLocaleTimeString('es-ES')}
+                          {new Date(alert.timestamp).toLocaleTimeString(currentLanguage || 'es')}
                         </div>
                       </div>
                     </div>
@@ -334,7 +344,7 @@ const Timeline = () => {
       {/* Problemas de horario */}
       {scheduleIssues.length > 0 && (
         <Card className="mb-6 border-yellow-200 bg-yellow-50">
-          <div 
+          <div
             className="flex items-center justify-between cursor-pointer"
             onClick={() => setScheduleIssuesExpanded(!scheduleIssuesExpanded)}
           >
@@ -373,16 +383,14 @@ const Timeline = () => {
                       <Card
                         ref={provided.innerRef}
                         {...provided.draggableProps}
-                        className={`mb-4 ${
-                          snapshot.isDragging ? 'shadow-xl opacity-90' : ''
-                        } ${
+                        className={`mb-4 ${snapshot.isDragging ? 'shadow-xl opacity-90' : ''} ${
                           timing.isActive ? 'border-2 border-blue-400' : ''
                         }`}
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
-                            <div 
-                              {...provided.dragHandleProps} 
+                            <div
+                              {...provided.dragHandleProps}
                               className="cursor-grab"
                               title="Arrastrar para reordenar"
                             >
@@ -397,7 +405,7 @@ const Timeline = () => {
                                     <input
                                       type="text"
                                       value={block.startTime}
-                                      onChange={(e) => 
+                                      onChange={(e) =>
                                         handleUpdateBlockTime(block.id, 'startTime', e.target.value)
                                       }
                                       className="w-20 px-2 py-1 border rounded"
@@ -407,7 +415,7 @@ const Timeline = () => {
                                     <input
                                       type="text"
                                       value={block.endTime}
-                                      onChange={(e) => 
+                                      onChange={(e) =>
                                         handleUpdateBlockTime(block.id, 'endTime', e.target.value)
                                       }
                                       className="w-20 px-2 py-1 border rounded"
@@ -443,13 +451,17 @@ const Timeline = () => {
                               value={block.status}
                               onChange={(e) => handleStatusChange(block.id, e.target.value)}
                               className={`px-2 py-1 rounded text-sm border ${
-                                block.status === BLOCK_STATES.ON_TIME ? 'border-green-400 bg-green-50' :
-                                block.status === BLOCK_STATES.SLIGHTLY_DELAYED ? 'border-yellow-400 bg-yellow-50' :
-                                'border-red-400 bg-red-50'
+                                block.status === BLOCK_STATES.ON_TIME
+                                  ? 'border-green-400 bg-green-50'
+                                  : block.status === BLOCK_STATES.SLIGHTLY_DELAYED
+                                    ? 'border-yellow-400 bg-yellow-50'
+                                    : 'border-red-400 bg-red-50'
                               }`}
                             >
                               <option value={BLOCK_STATES.ON_TIME}>✅ A tiempo</option>
-                              <option value={BLOCK_STATES.SLIGHTLY_DELAYED}>⚠️ Ligero retraso</option>
+                              <option value={BLOCK_STATES.SLIGHTLY_DELAYED}>
+                                ⚠️ Ligero retraso
+                              </option>
                               <option value={BLOCK_STATES.DELAYED}>❌ Retrasado</option>
                             </select>
 
@@ -502,8 +514,9 @@ const Timeline = () => {
                         {/* Resumen de momentos (contraído) */}
                         {!isExpanded && block.moments.length > 0 && (
                           <div className="mt-2 text-xs text-gray-500">
-                            {block.moments.length} momentos · 
-                            {block.moments.filter(m => m.status === 'confirmado').length} confirmados
+                            {block.moments.length} momentos ·
+                            {block.moments.filter((m) => m.status === 'confirmado').length}{' '}
+                            confirmados
                           </div>
                         )}
                       </Card>
@@ -556,12 +569,12 @@ const Timeline = () => {
                   <CheckCircle size={16} />
                   Añadir
                 </Button>
-                <Button 
+                <Button
                   onClick={() => {
                     setShowAddBlock(false);
                     setNewBlockData({ name: '', startTime: '', endTime: '' });
-                  }} 
-                  variant="outline" 
+                  }}
+                  variant="outline"
                   size="sm"
                 >
                   <X size={16} />

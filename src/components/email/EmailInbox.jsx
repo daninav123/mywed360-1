@@ -1,6 +1,7 @@
-import React, { useEffect, useState, useRef } from 'react';
+﻿import React, { useEffect, useState, useRef } from 'react';
 
 import EmailDetail from './EmailDetail';
+import useTranslations from '../../hooks/useTranslations';
 import { useAuth } from '../../hooks/useAuth';
 import { processIncomingEmails } from '../../services/emailAutomationService';
 import {
@@ -70,6 +71,7 @@ const defaultMailsTest = [
 export default function EmailInbox() {
   // useAuth puede ser undefined en entorno de pruebas; usamos {} como fallback
   const { user, profile } = useAuth() || {};
+  const { currentLanguage } = useTranslations();
   const [emails, setEmails] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -521,7 +523,9 @@ export default function EmailInbox() {
                     {safeRender(email.from, 'Desconocido')}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-500">
-                    {email.date ? new Date(email.date).toLocaleDateString('es-ES') : 'Sin fecha'}
+                    {email.date
+                      ? new Date(email.date).toLocaleDateString(currentLanguage || 'es')
+                      : 'Sin fecha'}
                   </td>
                 </tr>
               ))}
@@ -535,4 +539,3 @@ export default function EmailInbox() {
     </div>
   );
 }
-

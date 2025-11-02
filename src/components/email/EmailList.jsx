@@ -2,11 +2,12 @@ import { Mail, Paperclip } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 import { FixedSizeList as List } from 'react-window';
 import { get as apiGet } from '../../services/apiClient';
+import useTranslations from '../../hooks/useTranslations';
 
 const IS_E2E = typeof window !== 'undefined' && typeof window.Cypress !== 'undefined';
 const apiOptions = (extra = {}) => ({
   ...(extra || {}),
-  auth: IS_E2E ? false : extra?.auth ?? true,
+  auth: IS_E2E ? false : (extra?.auth ?? true),
   silent: extra?.silent ?? true,
 });
 
@@ -30,6 +31,7 @@ const EmailList = ({
   itemHeight = 88,
 }) => {
   const listRef = useRef();
+  const { currentLanguage } = useTranslations();
 
   // Desplazar a la posición del elemento seleccionado en la lista virtual
   useEffect(() => {
@@ -51,7 +53,14 @@ const EmailList = ({
 
       // Si es hoy, mostrar solo la hora
       if (date.toDateString() === now.toDateString()) {
-        return date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+        try {
+          return new Intl.DateTimeFormat(currentLanguage || 'es', {
+            hour: '2-digit',
+            minute: '2-digit',
+          }).format(date);
+        } catch {
+          return date.toTimeString();
+        }
       }
 
       // Si es ayer, mostrar "Ayer"
@@ -61,15 +70,26 @@ const EmailList = ({
 
       // Si es este año, mostrar día y mes
       if (date.getFullYear() === now.getFullYear()) {
-        return date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
+        try {
+          return new Intl.DateTimeFormat(currentLanguage || 'es', {
+            day: '2-digit',
+            month: 'short',
+          }).format(date);
+        } catch {
+          return date.toDateString();
+        }
       }
 
       // Si es otro año, mostrar día/mes/año
-      return date.toLocaleDateString('es-ES', {
-        day: '2-digit',
-        month: '2-digit',
-        year: '2-digit',
-      });
+      try {
+        return new Intl.DateTimeFormat(currentLanguage || 'es', {
+          day: '2-digit',
+          month: '2-digit',
+          year: '2-digit',
+        }).format(date);
+      } catch {
+        return date.toDateString();
+      }
     } catch (e) {
       console.error('Error al formatear fecha:', e);
       return dateStr;
@@ -171,13 +191,21 @@ const EmailList = ({
           if (!ignore) setInsights(json);
         } catch {}
       })();
-      return () => { ignore = true; };
+      return () => {
+        ignore = true;
+      };
     }, [email?.id]);
     const totalActions = (() => {
       try {
-        const t = (insights?.tasks?.length || 0) + (insights?.meetings?.length || 0) + (insights?.budgets?.length || 0) + (insights?.contracts?.length || 0);
+        const t =
+          (insights?.tasks?.length || 0) +
+          (insights?.meetings?.length || 0) +
+          (insights?.budgets?.length || 0) +
+          (insights?.contracts?.length || 0);
         return t;
-      } catch { return 0; }
+      } catch {
+        return 0;
+      }
     })();
     return (
       <div

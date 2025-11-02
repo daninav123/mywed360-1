@@ -1,4 +1,6 @@
-﻿import React from 'react';
+import React from 'react';
+import { Helmet } from 'react-helmet-async';
+import { useTranslation } from 'react-i18next';
 
 import Button from './Button';
 
@@ -12,8 +14,17 @@ import Button from './Button';
  *  - children: contenido de la página (Cards y secciones)
  */
 export default function PageWrapper({ title, actions = null, className = '', children }) {
+  const { t } = useTranslation();
+  const brand = t('app.brandName', { defaultValue: 'Lovenda' });
+  const pageTitle = title ? `${title} · ${brand}` : brand;
+
   return (
     <div className={`p-4 md:p-6 space-y-8 ${className}`}>
+      <Helmet>
+        <title>{pageTitle}</title>
+        <meta name="og:site_name" content={brand} />
+        {title && <meta name="og:title" content={String(title)} />}
+      </Helmet>
       {(title || actions) && (
         <div className="page-header">
           {title && <h1 className="page-title mr-auto">{title}</h1>}
@@ -24,4 +35,3 @@ export default function PageWrapper({ title, actions = null, className = '', chi
     </div>
   );
 }
-

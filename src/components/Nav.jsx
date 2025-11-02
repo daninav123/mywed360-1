@@ -3,7 +3,6 @@ import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 import { useAuth } from '../hooks/useAuth';
-import LanguageSelector from './ui/LanguageSelector';
 import useTranslations from '../hooks/useTranslations';
 import { prefetchModule } from '../utils/prefetch';
 
@@ -108,16 +107,10 @@ function Nav() {
         })}
       </div>
 
-      {/* Selector de idioma */}
-      <div className="ml-2">
-        <LanguageSelector variant="minimal" className="text-[color:var(--color-text)]" />
-      </div>
+      {/* Espaciador derecho */}
+      <div className="ml-2" />
     </nav>
   );
 }
 
 export default Nav;
-
-
-
-

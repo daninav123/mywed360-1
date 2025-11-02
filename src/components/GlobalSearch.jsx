@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 
 import * as EmailService from '../services/EmailService';
 import * as ProveedorService from '../services/ProveedorService';
+import useTranslations from '../hooks/useTranslations';
 
 /**
  * Componente de búsqueda global que permite buscar en emails, eventos y proveedores
@@ -28,6 +29,7 @@ const GlobalSearch = () => {
   const inputRef = useRef(null);
   const resultsRef = useRef(null);
   const navigate = useNavigate();
+  const { format, currentLanguage } = useTranslations();
 
   // Cerrar al hacer clic fuera del componente
   useEffect(() => {
@@ -198,11 +200,15 @@ const GlobalSearch = () => {
   // Formatear fecha para mostrar
   const formatDate = (dateStr) => {
     const date = new Date(dateStr);
-    return date.toLocaleDateString('es-ES', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    });
+    try {
+      return new Intl.DateTimeFormat(currentLanguage || 'es', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      }).format(date);
+    } catch {
+      return date.toDateString();
+    }
   };
 
   // Resaltar coincidencias en el texto
@@ -406,11 +412,20 @@ const GlobalSearch = () => {
                                 <div className="text-sm text-gray-600 flex items-center">
                                   <Calendar size={14} className="mr-1 text-blue-500" />
                                   <span>
-                                    {new Date(event.dateTime).toLocaleDateString('es-ES')} -{' '}
-                                    {new Date(event.dateTime).toLocaleTimeString('es-ES', {
-                                      hour: '2-digit',
-                                      minute: '2-digit',
-                                    })}
+                                    {(() => {
+                                      try {
+                                        const date = new Date(event.dateTime);
+                                        if (format && typeof format.datetime === 'function') {
+                                          return format.datetime(date);
+                                        }
+                                        return new Intl.DateTimeFormat(currentLanguage || 'es', {
+                                          dateStyle: 'short',
+                                          timeStyle: 'short',
+                                        }).format(date);
+                                      } catch {
+                                        return new Date(event.dateTime).toString();
+                                      }
+                                    })()}
                                   </span>
                                 </div>
                                 {event.location && (
@@ -489,5 +504,3 @@ const GlobalSearch = () => {
 };
 
 export default GlobalSearch;
-
-

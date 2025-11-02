@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+﻿import { motion } from 'framer-motion';
 import { Star } from 'lucide-react';
 import { MessageSquare } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
@@ -146,7 +146,10 @@ export default function ChatWidget() {
     const toSummarize = arr.slice(0, excess);
     const rest = arr.slice(excess);
     const summaryPart = toSummarize
-      .map((m) => `${m.from === 'user' ? t('chat.messages.user') : t('chat.messages.assistant')}: ${m.text}`)
+      .map(
+        (m) =>
+          `${m.from === 'user' ? t('chat.messages.user') : t('chat.messages.assistant')}: ${m.text}`
+      )
       .join('\n');
     setSummary((prev) => (prev ? `${prev}\n${summaryPart}` : summaryPart));
     return rest;
@@ -161,16 +164,22 @@ export default function ChatWidget() {
       const has = (re) => re.test(t);
 
       // Reprogramar reuniones: "reprograma/mueve/cambia la reunión ... al 20/10 a las 11:00"
-      if (has(/(reprogram|reagend|mueve|cambia|pospon|adelant)/i) && has(/reuni[oó]n|cita|llamada|meeting/i)) {
+      if (
+        has(/(reprogram|reagend|mueve|cambia|pospon|adelant)/i) &&
+        has(/reuni[oó]n|cita|llamada|meeting/i)
+      ) {
         const titleMatch =
-          t.match(/reuni[oó]n\s+(?:de\s+|sobre\s+)?([^\n,.]+?)(?:\s+(?:al|para|el)\s+|\s+a\s+las|[\.,]|$)/i) ||
-          t.match(/(?:sobre|para|con)\s+([^\n,.]+)(?:[\.,]|$)/i);
+          t.match(
+            /reuni[oó]n\s+(?:de\s+|sobre\s+)?([^\n,.]+?)(?:\s+(?:al|para|el)\s+|\s+a\s+las|[\.,]|$)/i
+          ) || t.match(/(?:sobre|para|con)\s+([^\n,.]+)(?:[\.,]|$)/i);
         const title = (titleMatch ? titleMatch[1] : '').trim();
 
         const now = new Date();
         let start = null;
         let end = null;
-        const rel = t.match(/\b(hoy|ma(?:n|ñ)ana|pasado\s+ma(?:n|ñ)ana)\b.*?(?:a\s+las\s+)?(\d{1,2})(?::|h|\.|,)?(\d{2})?/i);
+        const rel = t.match(
+          /\b(hoy|ma(?:n|ñ)ana|pasado\s+ma(?:n|ñ)ana)\b.*?(?:a\s+las\s+)?(\d{1,2})(?::|h|\.|,)?(\d{2})?/i
+        );
         if (rel) {
           const base = new Date();
           const kw = (rel[1] || '').toLowerCase();
@@ -182,8 +191,13 @@ export default function ChatWidget() {
           start = base;
           end = new Date(base.getTime() + 60 * 60 * 1000);
         }
-        const abs = t.match(/\bel\s+(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{2,4}))?(?:\s+a\s+las\s+(\d{1,2})(?::|h|\.|,)?(\d{2})?)?/i) ||
-                    t.match(/\bal\s+(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{2,4}))?(?:\s+a\s+las\s+(\d{1,2})(?::|h|\.|,)?(\d{2})?)?/i);
+        const abs =
+          t.match(
+            /\bel\s+(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{2,4}))?(?:\s+a\s+las\s+(\d{1,2})(?::|h|\.|,)?(\d{2})?)?/i
+          ) ||
+          t.match(
+            /\bal\s+(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{2,4}))?(?:\s+a\s+las\s+(\d{1,2})(?::|h|\.|,)?(\d{2})?)?/i
+          );
         if (!start && abs) {
           const d = parseInt(abs[1], 10);
           const m = parseInt(abs[2], 10) - 1;
@@ -198,9 +212,28 @@ export default function ChatWidget() {
           out.commands.push({
             entity: 'meeting',
             action: 'update',
-            payload: { title: title || 'Reunión', start: start.toISOString(), end: end.toISOString() },
+            payload: {
+              title: title || 'Reunión',
+              start: start.toISOString(),
+              end: end.toISOString(),
+            },
           });
-          out.reply = `Reunión${title ? ` "${title}"` : ''} reprogramada al ${start.toLocaleDateString('es-ES')} ${start.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}.`;
+          const when = (() => {
+            try {
+              if (format && typeof format.datetime === 'function') return format.datetime(start);
+              return new Intl.DateTimeFormat(currentLanguage || 'es', {
+                dateStyle: 'short',
+                timeStyle: 'short',
+              }).format(start);
+            } catch {
+              return start.toString();
+            }
+          })();
+          out.reply = t('chat.messages.meetingRescheduled', {
+            title: title || '',
+            when,
+            defaultValue: `Reunión${title ? ` "${title}"` : ''} reprogramada al ${when}.`,
+          });
           return out;
         }
       }
@@ -216,7 +249,9 @@ export default function ChatWidget() {
     const lower = String(text || '').toLowerCase();
     const fallback = { extracted: {}, reply: '' };
     const baseKind =
-      context?.eventType && context.eventType !== 'boda' ? t('chat.defaults.event') : t('chat.defaults.wedding');
+      context?.eventType && context.eventType !== 'boda'
+        ? t('chat.defaults.event')
+        : t('chat.defaults.wedding');
     const styleLabel = context?.styleLabel || context?.style || '';
     const descriptorParts = [];
     if (styleLabel) descriptorParts.push(`de estilo ${styleLabel}`);
@@ -288,8 +323,14 @@ export default function ChatWidget() {
             const endDate = payload.end ? new Date(payload.end) : startDate;
             meetings.push({
               id: newId,
-              title: payload.title || payload.name || (entity === 'task' ? t('chat.defaults.task') : t('chat.defaults.meeting')),
-              name: payload.title || payload.name || (entity === 'task' ? t('chat.defaults.task') : t('chat.defaults.meeting')),
+              title:
+                payload.title ||
+                payload.name ||
+                (entity === 'task' ? t('chat.defaults.task') : t('chat.defaults.meeting')),
+              name:
+                payload.title ||
+                payload.name ||
+                (entity === 'task' ? t('chat.defaults.task') : t('chat.defaults.meeting')),
               desc: payload.desc || '',
               start: startDate.toISOString(),
               end: endDate.toISOString(),
@@ -302,8 +343,14 @@ export default function ChatWidget() {
             try {
               const base = {
                 id: newId,
-                title: payload.title || payload.name || (entity === 'task' ? t('chat.defaults.task') : t('chat.defaults.meeting')),
-                name: payload.title || payload.name || (entity === 'task' ? t('chat.defaults.task') : t('chat.defaults.meeting')),
+                title:
+                  payload.title ||
+                  payload.name ||
+                  (entity === 'task' ? t('chat.defaults.task') : t('chat.defaults.meeting')),
+                name:
+                  payload.title ||
+                  payload.name ||
+                  (entity === 'task' ? t('chat.defaults.task') : t('chat.defaults.meeting')),
                 desc: payload.desc || '',
                 start: startDate,
                 end: endDate,
@@ -315,7 +362,9 @@ export default function ChatWidget() {
               const detail = entity === 'meeting' ? { meeting: base } : { task: base };
               window.dispatchEvent(new CustomEvent('maloveapp-tasks', { detail }));
             } catch (_) {}
-            toast.success(entity === 'task' ? t('chat.commands.taskAdded') : t('chat.commands.meetingAdded'));
+            toast.success(
+              entity === 'task' ? t('chat.commands.taskAdded') : t('chat.commands.meetingAdded')
+            );
             changed = true;
             break;
           }
@@ -342,7 +391,10 @@ export default function ChatWidget() {
                   end: new Date(meetings[idx].end),
                   category: meetings[idx].category,
                 };
-                const detail = entity === 'meeting' ? { meeting: base, action: 'update' } : { task: base, action: 'update' };
+                const detail =
+                  entity === 'meeting'
+                    ? { meeting: base, action: 'update' }
+                    : { task: base, action: 'update' };
                 window.dispatchEvent(new CustomEvent('maloveapp-tasks', { detail }));
               } catch (_) {}
               changed = true;
@@ -361,7 +413,10 @@ export default function ChatWidget() {
               // Bridge: delete en Firestore
               try {
                 const base = { id: payload.id || null, title: payload.title || '' };
-                const detail = entity === 'meeting' ? { meeting: base, action: 'delete' } : { task: base, action: 'delete' };
+                const detail =
+                  entity === 'meeting'
+                    ? { meeting: base, action: 'delete' }
+                    : { task: base, action: 'delete' };
                 window.dispatchEvent(new CustomEvent('maloveapp-tasks', { detail }));
               } catch (_) {}
               changed = true;
@@ -378,7 +433,10 @@ export default function ChatWidget() {
               // Bridge: complete en Firestore (tasksCompleted)
               try {
                 const base = { id: meetings[idx].id, title: meetings[idx].title };
-                const detail = entity === 'meeting' ? { meeting: base, action: 'complete' } : { task: base, action: 'complete' };
+                const detail =
+                  entity === 'meeting'
+                    ? { meeting: base, action: 'complete' }
+                    : { task: base, action: 'complete' };
                 window.dispatchEvent(new CustomEvent('maloveapp-tasks', { detail }));
               } catch (_) {}
               changed = true;
@@ -431,7 +489,9 @@ export default function ChatWidget() {
               // Bridge: update invitado
               try {
                 window.dispatchEvent(
-                  new CustomEvent('maloveapp-guests', { detail: { guest: { ...guests[idx] }, action: 'update' } })
+                  new CustomEvent('maloveapp-guests', {
+                    detail: { guest: { ...guests[idx] }, action: 'update' },
+                  })
                 );
               } catch (_) {}
               changedG = true;
@@ -449,7 +509,12 @@ export default function ChatWidget() {
               // Bridge: delete invitado
               try {
                 window.dispatchEvent(
-                  new CustomEvent('maloveapp-guests', { detail: { guest: { id: payload.id || null, name: payload.name || '' }, action: 'delete' } })
+                  new CustomEvent('maloveapp-guests', {
+                    detail: {
+                      guest: { id: payload.id || null, name: payload.name || '' },
+                      action: 'delete',
+                    },
+                  })
                 );
               } catch (_) {}
               changedG = true;
@@ -491,7 +556,9 @@ export default function ChatWidget() {
             // Persistir vía puente de finanzas
             try {
               window.dispatchEvent(
-                new CustomEvent('maloveapp-finance', { detail: { movement: { ...mov }, action: 'add' } })
+                new CustomEvent('maloveapp-finance', {
+                  detail: { movement: { ...mov }, action: 'add' },
+                })
               );
             } catch (_) {}
             toast.success(t('chat.commands.movementAdded'));
@@ -535,7 +602,10 @@ export default function ChatWidget() {
                 window.dispatchEvent(
                   new CustomEvent('maloveapp-finance', {
                     detail: {
-                      movement: { id: payload.id || null, name: payload.concept || payload.name || '' },
+                      movement: {
+                        id: payload.id || null,
+                        name: payload.concept || payload.name || '',
+                      },
                       action: 'delete',
                     },
                   })
@@ -559,24 +629,28 @@ export default function ChatWidget() {
           if (query) {
             try {
               // Resolver base del backend de forma unificada
-      const baseFromEnv = (import.meta?.env?.VITE_BACKEND_BASE_URL || '').toString();
-      const resolvedBase = (baseFromEnv || getBackendBase() || '').replace(/\/$/, '');
-      const apiBase = resolvedBase || 'http://localhost:4004';
-      const resp = await fetch(`${apiBase}/api/ai/search-suppliers?q=${encodeURIComponent(query)}`);
-      if (!resp.ok) {
-        throw new Error(`HTTP ${resp.status}`);
-      }
-      const dataS = await resp.json();
-      if (Array.isArray(dataS.results) && dataS.results.length) {
-        localStorage.setItem('mywed360Suppliers', JSON.stringify(dataS.results));
-        window.dispatchEvent(new Event('maloveapp-suppliers'));
-        toast.success(tVars('chat.commands.suppliersFound', { count: dataS.results.length }));
-      } else {
-        toast.info(t('chat.commands.suppliersNotFound'));
-      }
-    } catch (err) {
-      toast.error(t('chat.commands.suppliersSearchError'));
-    }
+              const baseFromEnv = (import.meta?.env?.VITE_BACKEND_BASE_URL || '').toString();
+              const resolvedBase = (baseFromEnv || getBackendBase() || '').replace(/\/$/, '');
+              const apiBase = resolvedBase || 'http://localhost:4004';
+              const resp = await fetch(
+                `${apiBase}/api/ai/search-suppliers?q=${encodeURIComponent(query)}`
+              );
+              if (!resp.ok) {
+                throw new Error(`HTTP ${resp.status}`);
+              }
+              const dataS = await resp.json();
+              if (Array.isArray(dataS.results) && dataS.results.length) {
+                localStorage.setItem('mywed360Suppliers', JSON.stringify(dataS.results));
+                window.dispatchEvent(new Event('maloveapp-suppliers'));
+                toast.success(
+                  tVars('chat.commands.suppliersFound', { count: dataS.results.length })
+                );
+              } else {
+                toast.info(t('chat.commands.suppliersNotFound'));
+              }
+            } catch (err) {
+              toast.error(t('chat.commands.suppliersSearchError'));
+            }
           }
         } else if (action === 'add') {
           const newId = payload.id || `sup-${Date.now()}`;
@@ -598,17 +672,26 @@ export default function ChatWidget() {
           } catch {}
           try {
             window.dispatchEvent(
-              new CustomEvent('maloveapp-suppliers', { detail: { supplier: { ...supplier }, action: 'add' } })
+              new CustomEvent('maloveapp-suppliers', {
+                detail: { supplier: { ...supplier }, action: 'add' },
+              })
             );
           } catch {}
           toast.success(t('chat.commands.supplierAdded'));
-        } else if (action === 'update' || action === 'edit' || action === 'editar' || action === 'modificar') {
+        } else if (
+          action === 'update' ||
+          action === 'edit' ||
+          action === 'editar' ||
+          action === 'modificar'
+        ) {
           try {
             const stored = JSON.parse(localStorage.getItem('mywed360Suppliers') || '[]');
             const findIdx = (idOrName) => {
               const byId = stored.findIndex((s) => s.id === idOrName);
               if (byId !== -1) return byId;
-              return stored.findIndex((s) => s.name?.toLowerCase() === String(idOrName || '').toLowerCase());
+              return stored.findIndex(
+                (s) => s.name?.toLowerCase() === String(idOrName || '').toLowerCase()
+              );
             };
             const idx = findIdx(payload.id || payload.name || payload.title || payload.provider);
             if (idx !== -1) {
@@ -631,9 +714,12 @@ export default function ChatWidget() {
             const stored = JSON.parse(localStorage.getItem('mywed360Suppliers') || '[]');
             const before = stored.length;
             const filtered = stored.filter(
-              (s) => !(
-                s.id === payload.id || s.name?.toLowerCase() === String(payload.name || payload.title || payload.provider || '').toLowerCase()
-              )
+              (s) =>
+                !(
+                  s.id === payload.id ||
+                  s.name?.toLowerCase() ===
+                    String(payload.name || payload.title || payload.provider || '').toLowerCase()
+                )
             );
             if (filtered.length < before) {
               localStorage.setItem('mywed360Suppliers', JSON.stringify(filtered));
@@ -641,7 +727,13 @@ export default function ChatWidget() {
               try {
                 window.dispatchEvent(
                   new CustomEvent('maloveapp-suppliers', {
-                    detail: { supplier: { id: payload.id || null, name: payload.name || payload.title || payload.provider || '' }, action: 'delete' },
+                    detail: {
+                      supplier: {
+                        id: payload.id || null,
+                        name: payload.name || payload.title || payload.provider || '',
+                      },
+                      action: 'delete',
+                    },
                   })
                 );
               } catch {}
@@ -947,7 +1039,10 @@ export default function ChatWidget() {
         toast.error(t('chat.errors.connection'), { autoClose: 3000 });
       } else {
         console.error('Error genérico en la API de IA:', error.message);
-        errMsg = { from: 'system', text: tVars('chat.messages.genericError', { error: error.message }) };
+        errMsg = {
+          from: 'system',
+          text: tVars('chat.messages.genericError', { error: error.message }),
+        };
         toast.error(t('chat.errors.communication'), { autoClose: 3000 });
       }
 

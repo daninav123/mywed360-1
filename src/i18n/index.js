@@ -24,7 +24,15 @@ const resources = Object.entries(localeModules).reduce((acc, [path, module]) => 
 // Código de debug para visualizar qué elementos tienen traducción i18n
 // Usa 'en-x-i18n' que es válido según BCP 47 (extensión privada)
 const DEBUG_LANGUAGE_CODE = 'en-x-i18n';
-resources[DEBUG_LANGUAGE_CODE] = { common: {} };
+// Crear recursos vacíos para el modo debug - devolverá las claves
+resources[DEBUG_LANGUAGE_CODE] = {};
+Object.values(resources).forEach((namespaceMap) => {
+  Object.keys(namespaceMap).forEach((ns) => {
+    if (!resources[DEBUG_LANGUAGE_CODE][ns]) {
+      resources[DEBUG_LANGUAGE_CODE][ns] = {};
+    }
+  });
+});
 
 const missingKeyLog = [];
 const registerMissingKey = (languages, namespace, key, res) => {
@@ -52,9 +60,9 @@ const registerMissingKey = (languages, namespace, key, res) => {
 
 const LANGUAGE_METADATA = {
   [DEBUG_LANGUAGE_CODE]: {
-    name: '🔧 i18n Debug (mostrar claves)',
-    flag: 'DBG',
-    order: 999,
+    name: '🔍 i18n Debug (mostrar claves)',
+    flag: '🔍',
+    order: -1,
   },
   ar: { name: 'Arabic', flag: 'AR', dir: 'rtl', order: 20 },
   bg: { name: 'Bulgarian', flag: 'BG', order: 20 },
@@ -97,9 +105,9 @@ const FALLBACK_LANGUAGES = [FALLBACK_LANGUAGE, 'en'];
 const buildAvailableLanguages = () =>
   Object.keys(resources)
     .filter((code) => {
-      // Incluir modo debug para desarrollo
+      // Incluir modo debug SIEMPRE para detectar claves faltantes
       if (code === DEBUG_LANGUAGE_CODE) {
-        return process.env.NODE_ENV === 'development';
+        return true;
       }
       // Filtrar solo idiomas con traducciones válidas
       return Object.keys(resources[code] || {}).length > 0;
@@ -135,8 +143,8 @@ const SUPPORTED_NAMESPACES = (() => {
   });
 
   if (!namespaces.size) {
-    ['common', 'finance', 'tasks', 'seating', 'email', 'admin', 'marketing', 'chat'].forEach(
-      (ns) => namespaces.add(ns)
+    ['common', 'finance', 'tasks', 'seating', 'email', 'admin', 'marketing', 'chat'].forEach((ns) =>
+      namespaces.add(ns)
     );
   }
 
@@ -211,8 +219,7 @@ i18n
   });
 
 export const changeLanguage = (lng) => {
-  const target =
-    AVAILABLE_LANGUAGES.find((lang) => lang.code === lng)?.code ?? FALLBACK_LANGUAGE;
+  const target = AVAILABLE_LANGUAGES.find((lang) => lang.code === lng)?.code ?? FALLBACK_LANGUAGE;
   return i18n.changeLanguage(target);
 };
 
@@ -222,19 +229,32 @@ const getIntlLanguage = () => {
   // En modo debug, usar español para formateo de fechas/números
   return current === DEBUG_LANGUAGE_CODE ? FALLBACK_LANGUAGE : current;
 };
-export const getAvailableLanguages = () =>
-  AVAILABLE_LANGUAGES.map((lang) => ({ ...lang }));
+export const getAvailableLanguages = () => AVAILABLE_LANGUAGES.map((lang) => ({ ...lang }));
 
 export const formatDate = (date, options = {}) =>
   new Intl.DateTimeFormat(getIntlLanguage(), options).format(new Date(date));
 export const formatCurrency = (amount, currency = 'EUR') =>
-  new Intl.NumberFormat(getIntlLanguage(), { style: 'currency', currency }).format(
-    amount
-  );
-export const formatNumber = (number) =>
-  new Intl.NumberFormat(getIntlLanguage()).format(number);
+  new Intl.NumberFormat(getIntlLanguage(), { style: 'currency', currency }).format(amount);
+export const formatNumber = (number) => new Intl.NumberFormat(getIntlLanguage()).format(number);
 
 export const getMissingTranslationLog = () => missingKeyLog.slice();
+
+/**
+ * Exporta las claves faltantes en formato JSON organizado por idioma y namespace
+ */
+export const exportMissingKeys = () => {
+  const organized = {};
+  missingKeyLog.forEach((entry) => {
+    entry.languages.forEach((lang) => {
+      if (!organized[lang]) organized[lang] = {};
+      if (!organized[lang][entry.namespace]) organized[lang][entry.namespace] = [];
+      if (!organized[lang][entry.namespace].includes(entry.key)) {
+        organized[lang][entry.namespace].push(entry.key);
+      }
+    });
+  });
+  return organized;
+};
 
 if (typeof window !== 'undefined') {
   window.__I18N_INSTANCE__ = i18n;
@@ -244,6 +264,18 @@ if (typeof window !== 'undefined') {
     return missingKeyLog;
   };
   window.__I18N_GET_MISSING__ = () => missingKeyLog.slice();
+  window.__I18N_EXPORT_MISSING__ = exportMissingKeys;
+  window.__I18N_DOWNLOAD_MISSING__ = () => {
+    const data = exportMissingKeys();
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `missing-i18n-keys-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    return data;
+  };
 }
 
 export default i18n;

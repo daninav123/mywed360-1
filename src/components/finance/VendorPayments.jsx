@@ -1,9 +1,11 @@
-import { AlertCircle, Clock, CheckCircle, AlertTriangle } from 'lucide-react';
+﻿import { AlertCircle, Clock, CheckCircle, AlertTriangle } from 'lucide-react';
 import React from 'react';
+import useTranslations from '../../hooks/useTranslations';
 
 import Card from '../Card';
 
 export const VendorPayments = ({ transactions }) => {
+  const { currentLanguage } = useTranslations();
   const now = new Date();
   const oneWeekFromNow = new Date();
   oneWeekFromNow.setDate(now.getDate() + 7);
@@ -72,7 +74,18 @@ export const VendorPayments = ({ transactions }) => {
                   <span>{formatCurrency(item.realCost)}</span>
                 </div>
                 <div className="text-xs text-[color:var(--color-text)]/60">
-                  {item.item} • {new Date(item.paymentDate).toLocaleDateString()}
+                  {item.item} •{' '}
+                  {(() => {
+                    try {
+                      return new Intl.DateTimeFormat(currentLanguage || 'es', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                      }).format(new Date(item.paymentDate));
+                    } catch {
+                      return new Date(item.paymentDate).toString();
+                    }
+                  })()}
                 </div>
               </div>
             ))}

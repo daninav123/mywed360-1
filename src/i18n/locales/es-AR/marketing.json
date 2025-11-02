@@ -2,63 +2,63 @@
   "marketing": {
     "landing": {
       "hero": {
-        "title": "Organiza tu boda perfecta",
+        "title": "Organizá tu boda perfecta",
         "subtitle": "La plataforma todo-en-uno para bodas",
-        "cta": "Empieza gratis",
+        "cta": "Empezá gratis",
         "brandLabel": "MaLove.App",
-        "logoAlt": "MaLove.App logo",
-        "badge": "All-in-one wedding planning platform",
+        "logoAlt": "Logotipo de MaLove.App",
+        "badge": "Plataforma integral para planificar bodas",
         "description": [
-          "MaLove.App unifies planning, finances, communication, and design in one workspace.",
-          "Streamline daily tasks, engage vendors, and deliver a memorable experience for every guest."
+          "MaLove.App unifica planificación, finanzas, comunicación y diseño en un solo espacio de trabajo.",
+          "Simplificá las tareas diarias, involucrá a tus proveedores y ofrecé a cada invitado una experiencia memorable."
         ],
         "actions": {
-          "primary": "Start for free",
-          "secondary": "See everything the app includes"
+          "primary": "Empezá gratis",
+          "secondary": "Conocé todo lo que incluye la app"
         },
         "highlights": [
           {
             "value": "360°",
-            "label": "Full event visibility"
+            "label": "Visibilidad total del evento"
           },
           {
             "value": "+50",
-            "label": "Active integrations"
+            "label": "Integraciones activas"
           },
           {
             "value": "24/7",
-            "label": "Access from any device"
+            "label": "Acceso desde cualquier dispositivo"
           }
         ],
         "widget": {
-          "summaryLabel": "Overview",
-          "eventName": "Valeria & Tomás Wedding",
-          "growth": "+18% this week",
+          "summaryLabel": "Resumen general",
+          "eventName": "Boda Valeria & Tomás",
+          "growth": "+18 % esta semana",
           "confirmedGuests": {
-            "label": "Confirmed guests",
+            "label": "Invitados confirmados",
             "value": "132"
           },
           "budget": {
-            "label": "Budget executed",
+            "label": "Presupuesto ejecutado",
             "value": "$18.4k",
-            "pendingInvoices": "4 invoices pending"
+            "pendingInvoices": "4 facturas pendientes"
           },
           "tasks": {
-            "label": "Critical tasks this week",
+            "label": "Tareas críticas de la semana",
             "items": [
               {
                 "day": "21",
-                "text": "Confirm menu tasting and send feedback to catering."
+                "text": "Confirmá la degustación del menú y enviá comentarios al catering."
               },
               {
                 "day": "22",
-                "text": "Draft VIP seating plan and share it with protocol."
+                "text": "Armá el plano VIP de mesas y compartilo con protocolo."
               }
             ]
           },
           "assistant": {
-            "label": "MaLove.App assistant",
-            "message": "\"Your timeline is 82% complete. Send the lodging reminder before Monday and confirm the remaining vendors.\""
+            "label": "Asistente MaLove.App",
+            "message": "\"Tu cronograma va 82 % completo. Enviá el recordatorio de alojamiento antes del lunes y confirmá los proveedores restantes.\""
           }
         }
       },
@@ -70,153 +70,148 @@
         "seating": "Plan de mesas"
       },
       "modules": {
-        "title": "Everything you need in one place",
-        "description": "MaLove.App streamlines logistics with collaborative modules for planners, vendors, and guests.",
+        "title": "Todo lo que necesitás en un solo lugar",
+        "description": "MaLove.App agiliza la logística con módulos colaborativos para organizadores, proveedores e invitados.",
         "items": [
           {
-            "title": "Guest management",
-            "description": "Centralize RSVPs, seating, and preferences in one place with always-synced information."
+            "title": "Gestión integral de invitados",
+            "description": "Centralizá confirmaciones, mesas y preferencias con información siempre sincronizada."
           },
           {
-            "title": "Finance control",
-            "description": "Track budgets, payments, and contracts with smart reminders and clear reports for your team."
+            "title": "Control financiero",
+            "description": "Seguimiento de presupuestos, pagos y contratos con recordatorios inteligentes y reportes claros."
           },
           {
-            "title": "Design and communication",
-            "description": "Wedding website, invitations, and email campaigns ready to send from a single workflow."
+            "title": "Diseño y comunicación",
+            "description": "Sitio web, invitaciones y campañas de correo listas para enviar desde un mismo flujo."
           }
         ]
       },
       "planner": {
-        "badge": "Built for planners",
-        "title": "Total control of your event portfolio without spreadsheets.",
-        "description": "MaLove.App makes it easy to run multiple weddings with dashboards, reusable templates, and exportable reports. Coordinate your team and stay ahead with a single platform.",
+        "badge": "Pensado para organizadores",
+        "title": "Control total de tu cartera de eventos sin planillas.",
+        "description": "MaLove.App te ayuda a llevar múltiples bodas con paneles, plantillas reutilizables y reportes exportables. Coordiná a tu equipo y adelantate a cada entrega desde una sola plataforma.",
         "highlights": [
           {
             "key": "portfolio",
-            "title": "Multi-wedding portfolio",
-            "description": "Manage simultaneous events with independent boards. Switch weddings in one click without losing context."
+            "title": "Portafolio multievento",
+            "description": "Gestioná eventos simultáneos con tableros independientes. Cambiá de boda en un clic sin perder contexto."
           },
           {
             "key": "kits",
-            "title": "Repeatable kits",
-            "description": "Duplicate checklists, budgets, and communication templates to reuse your best workflows in seconds."
+            "title": "Kits repetibles",
+            "description": "Duplicá checklists, presupuestos y plantillas de comunicación para reutilizar tus mejores flujos en segundos."
           },
           {
             "key": "alerts",
-            "title": "Proactive alerts",
-            "description": "Get notified about critical tasks, expiring contracts, and pending payments for every client."
+            "title": "Alertas proactivas",
+            "description": "Recibí avisos de tareas críticas, contratos por vencer y pagos pendientes para cada cliente."
           }
         ],
         "dashboard": {
-          "title": "Planner view",
-          "portfolioLabel": "Current portfolio",
-          "portfolioValue": "8 active weddings",
-          "portfolioBadge": "2 new this month",
-          "statusLabel": "Client status",
+          "title": "Vista de organizadores",
+          "portfolioLabel": "Portafolio actual",
+          "portfolioValue": "8 bodas activas",
+          "portfolioBadge": "2 nuevas este mes",
+          "statusLabel": "Estado de clientes",
           "statusItems": [
-            "⬢ Ana & Diego – timeline: 92%",
-            "⬢ Laura & Marco – payments: 3 invoices pending",
-            "⬢ Carolina & Javier – guests: 156 confirmed"
+            "⬢ Ana & Diego – cronograma: 92 %",
+            "⬢ Laura & Marco – pagos: 3 facturas pendientes",
+            "⬢ Carolina & Javier – invitados: 156 confirmados"
           ],
-          "performanceLabel": "Monthly performance",
-          "performanceNote": "Average time per wedding: 38% less than last year."
+          "performanceLabel": "Rendimiento mensual",
+          "performanceNote": "Tiempo promedio por boda: 38 % menos que el año pasado."
         }
       },
       "benefits": {
-        "badge": "Key benefits",
-        "title": "A carefully managed operation from start to finish",
-        "description": "Designed for planners who need visibility and couples who want peace of mind. MaLove.App automates repetitive tasks and keeps everyone aligned.",
+        "badge": "Beneficios clave",
+        "title": "Una operación cuidada de principio a fin",
+        "description": "Pensada para organizadores que necesitan visibilidad y parejas que buscan tranquilidad. MaLove.App automatiza tareas repetitivas y mantiene a todos alineados.",
         "items": {
           "timelines": {
-            "title": "Timelines under control",
-            "description": "Dynamic checklists, smart reminders, and shareable schedules for your team."
+            "title": "Cronogramas bajo control",
+            "description": "Listas dinámicas, recordatorios inteligentes y agendas compartibles para todo tu equipo."
           },
           "collaboration": {
-            "title": "Real collaboration",
-            "description": "Roles for planners, assistants, vendors, and guests with personalized views."
+            "title": "Colaboración real",
+            "description": "Roles para organizadores, asistentes, proveedores e invitados con vistas personalizadas."
           },
           "branding": {
-            "title": "Consistent design",
-            "description": "Wedding website, invitations, and communications with your branding in minutes."
+            "title": "Diseño consistente",
+            "description": "Sitio web, invitaciones y comunicaciones con tu branding en minutos."
           },
           "security": {
-            "title": "Secure data",
-            "description": "Cloud infrastructure and granular permissions to protect contracts, payments, and contacts."
+            "title": "Datos protegidos",
+            "description": "Infraestructura en la nube y permisos granulares para resguardar contratos, pagos y contactos."
           }
         }
       },
       "stories": {
-        "badge": "Real stories",
-        "title": "MaLove.App empowers planners and couples worldwide",
-        "description": "More than 12k weddings are managed in MaLove.App. Every team leverages automations, insights, and templates to spend more time on creativity.",
+        "badge": "Historias reales",
+        "title": "MaLove.App potencia a organizadores y parejas en todo el mundo",
+        "description": "Más de 12 mil bodas se gestionan con MaLove.App. Cada equipo aprovecha automatizaciones, insights y plantillas para dedicar más tiempo a la creatividad.",
         "testimonials": [
           {
-            "quote": "We integrated MaLove.App into our process and now share dashboards with key vendors. The team arrives prepared to every meeting.",
+            "quote": "Integramos MaLove.App a nuestro proceso y ahora compartimos tableros con proveedores clave. El equipo llega preparado a cada reunión.",
             "name": "Martina R.",
-            "role": "Boutique planner in Madrid"
+            "role": "Organizadora boutique en Madrid"
           },
           {
-            "quote": "As a couple we needed clarity. The reminders and guest portal let us respond fast without duplicate emails.",
-            "name": "David & Sofía",
-            "role": "250-guest celebration, Bogotá"
+            "quote": "Como pareja necesitábamos claridad. Los recordatorios y el portal de invitados nos permitieron responder rápido y sin correos duplicados.",
+            "name": "David y Sofía",
+            "role": "Boda de 250 invitados, Bogotá"
           }
         ],
         "trust": {
-          "title": "Trusted by MaLove.App",
-          "brands": [
-            "Lumiere Events",
-            "Novia Atelier",
-            "Festiva Group",
-            "Urban Weddings"
-          ],
-          "note": "200+ active planners across Europe and LATAM rely on MaLove.App to standardize processes and deliver memorable experiences."
+          "title": "Confían en MaLove.App",
+          "brands": ["Lumiere Events", "Novia Atelier", "Festiva Group", "Urban Weddings"],
+          "note": "Más de 200 organizadores activos en Europa y LATAM usan MaLove.App para estandarizar procesos y crear experiencias memorables."
         }
       },
       "faq": {
-        "badge": "Frequently asked questions",
-        "title": "Everything you need to know before getting started",
+        "badge": "Preguntas frecuentes",
+        "title": "Todo lo que necesitás saber antes de empezar",
         "items": [
           {
-            "question": "Can I try MaLove.App for free?",
-            "answer": "Yes. The Essentials plan is free forever and unlocks core features (guests, tasks, website). The Professional plan offers a 14-day trial with advanced integrations."
+            "question": "¿Puedo probar MaLove.App gratis?",
+            "answer": "Sí. El plan Essentials es gratis para siempre e incluye funciones clave (invitados, tareas, sitio web). El plan Professional ofrece 14 días de prueba con integraciones avanzadas."
           },
           {
-            "question": "Does MaLove.App work for planners running multiple events?",
-            "answer": "Absolutely. The multi-event dashboard lets you switch weddings, share permissions with collaborators, and automate updates with vendors for each event."
+            "question": "¿MaLove.App funciona si llevo varios eventos a la vez?",
+            "answer": "Claro. El panel multievento te permite alternar bodas, compartir permisos con colaboradores y automatizar actualizaciones con proveedores en cada proyecto."
           },
           {
-            "question": "What onboarding support will I receive?",
-            "answer": "We provide guided onboarding, a template library, and optional consulting. The Enterprise plan includes a dedicated manager and training sessions for your team."
+            "question": "¿Qué soporte recibo durante la implementación?",
+            "answer": "Contás con onboarding guiado, biblioteca de plantillas y consultorías opcionales. El plan Enterprise suma un gestor dedicado y sesiones de capacitación para tu equipo."
           }
         ],
         "form": {
-          "title": "Request a personalized demo",
-          "description": "Tell us about your operation and schedule a video call with our team. You will receive recommendations tailored to your current workflow and a quick-start guide.",
+          "title": "Solicitá una demo personalizada",
+          "description": "Contanos sobre tu operación y coordiná una videollamada con nuestro equipo. Vas a recibir recomendaciones para tu flujo actual y una guía de inicio rápido.",
           "fields": {
             "name": {
-              "label": "Full name",
-              "placeholder": "Your name"
+              "label": "Nombre completo",
+              "placeholder": "Tu nombre"
             },
             "email": {
-              "label": "Contact email",
-              "placeholder": "you@youragency.com"
+              "label": "Correo de contacto",
+              "placeholder": "vos@tuagencia.com"
             }
           },
           "messages": {
-            "submit": "Schedule demo",
-            "submitting": "Sending request...",
-            "success": "Thank you! Our team will reach out in less than 24 hours.",
-            "error": "Please fill in your name and email to request a demo."
+            "submit": "Agendar demo",
+            "submitting": "Enviando solicitud...",
+            "success": "¡Gracias! Te vamos a contactar en menos de 24 horas.",
+            "error": "Completá tu nombre y correo para solicitar la demo."
           },
-          "consent": "By submitting you agree to receive MaLove.App related communications. You can unsubscribe at any time."
+          "consent": "Al enviar aceptás recibir comunicaciones relacionadas con MaLove.App. Podés cancelar la suscripción cuando quieras."
         }
       },
       "cta": {
-        "title": "Ready to use in minutes.",
-        "description": "Create your account, import your guest list, and enable automations that support you from day one.",
-        "primary": "Create free account",
-        "secondary": "Compare plans"
+        "title": "Listo para usar en minutos.",
+        "description": "Creá tu cuenta, importá la lista de invitados y activá automatizaciones que te acompañen desde el primer día.",
+        "primary": "Crear cuenta gratis",
+        "secondary": "Comparar planes"
       }
     },
     "pricing": {
@@ -228,78 +223,71 @@
     },
     "appOverview": {
       "hero": {
-        "title": "The app that brings your entire planning flow together in one place.",
-        "description": "From the first checklist to the final report, MaLove.App supports professional teams and couples who want complete control of their event.",
+        "title": "La app que reúne todo tu flujo de planificación en un solo lugar.",
+        "description": "Desde la primera checklist hasta el informe final, MaLove.App acompaña a equipos profesionales y parejas que buscan control total del evento.",
         "stats": [
           {
             "value": "12k+",
-            "label": "weddings planned with MaLove.App"
+            "label": "bodas planificadas con MaLove.App"
           },
           {
             "value": "4.8/5",
-            "label": "average planner satisfaction"
+            "label": "satisfacción promedio de organizadores"
           },
           {
             "value": "30%",
-            "label": "time saved in logistics coordination"
+            "label": "tiempo ahorrado en coordinación logística"
           }
         ],
         "workspace": {
-          "badge": "MaLove.App Workspace",
-          "title": "A connected ecosystem",
-          "description": "Synced modules, personalised roles, and granular permissions so you can collaborate without losing context.",
-          "tags": [
-            "Dashboard",
-            "Guests",
-            "Finance",
-            "Communication",
-            "Design",
-            "Automations"
-          ]
+          "badge": "Espacio de trabajo MaLove.App",
+          "title": "Un ecosistema conectado",
+          "description": "Módulos sincronizados, roles personalizados y permisos granulares para colaborar sin perder contexto.",
+          "tags": ["Panel", "Invitados", "Finanzas", "Comunicación", "Diseño", "Automatizaciones"]
         }
       },
       "modules": {
-        "title": "Key modules ready for your team",
-        "description": "Each module is designed to connect with the rest, eliminating scattered information and keeping everyone on the same page.",
+        "title": "Módulos clave listos para tu equipo",
+        "description": "Cada módulo está pensado para conectarse con los demás, evitar la información dispersa y mantener a todo el equipo alineado.",
         "items": [
           {
-            "title": "Collaborative dashboard",
-            "description": "Tasks, milestones, and reminders in a central board that updates in real time."
+            "title": "Tablero colaborativo",
+            "description": "Tareas, hitos y recordatorios en un tablero central que se actualiza en tiempo real."
           },
           {
-            "title": "Provider CRM",
-            "description": "Compare proposals, manage contracts, and track payments and deliverables."
+            "title": "CRM de proveedores",
+            "description": "Compará propuestas, gestioná contratos y seguí pagos y entregables."
           },
           {
-            "title": "Financial management",
-            "description": "Smart budgets, spending control, and detailed reports by category."
+            "title": "Gestión financiera",
+            "description": "Presupuestos inteligentes, control de gastos y reportes detallados por categoría."
           },
           {
-            "title": "Guest experience",
-            "description": "Website, automatic RSVP, interactive seating, and personalised messages in a single flow."
+            "title": "Experiencia de invitados",
+            "description": "Sitio web, RSVP automático, seating interactivo y mensajes personalizados en un solo flujo."
           },
           {
-            "title": "Email automation",
-            "description": "Prebuilt flows, dynamic segments, and metrics to measure engagement."
+            "title": "Automatización de correos",
+            "description": "Flujos preconfigurados, segmentos dinámicos y métricas para medir el nivel de interacción."
           },
           {
-            "title": "Intelligent assistant",
-            "description": "AI-powered recommendations to build agendas, checklists, and answer contextual questions."
+            "title": "Asistente inteligente",
+            "description": "Recomendaciones con IA para armar agendas, checklists y responder preguntas contextuales."
           }
         ]
       },
       "integrations": {
-        "title": "Integrations and automations that work for you.",
-        "description": "Connect MaLove.App with payment services, calendars, and communication tools. Configure automatic triggers for RSVP, provider confirmations, or task follow-ups.",
+        "title": "Integraciones y automatizaciones que trabajan para vos.",
+        "description": "Conectá MaLove.App con servicios de pago, calendarios y herramientas de comunicación. Configurá disparadores automáticos para RSVP, confirmaciones de proveedores o seguimientos de tareas.",
         "items": [
-          "Integrations with Google Calendar, Gmail, and productivity suites.",
-          "Visual automations with conditions and reusable templates.",
-          "API for internal developments and connections to external systems."
+          "Integraciones con Google Calendar, Gmail y suites de productividad.",
+          "Automatizaciones visuales con condiciones y plantillas reutilizables.",
+          "API para desarrollos internos y conexiones con sistemas externos."
         ],
         "cta": {
-          "title": "Immediate access",
-          "description": "Every account includes a free trial and a guided demo with our onboarding team.",
-          "button": "Request demo"
+          "title": "Acceso inmediato",
+          "description": "Cada cuenta incluye una prueba gratuita y una demo guiada con nuestro equipo de onboarding.",
+          "button": "Solicitá una demo"
         }
       }
     }

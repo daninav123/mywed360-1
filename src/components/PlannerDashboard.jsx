@@ -1,5 +1,6 @@
 import { Briefcase, AlertCircle, CheckSquare, Building2 } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import useTranslations from '../hooks/useTranslations';
 import { Link } from 'react-router-dom';
 
 import ExternalImage from './ExternalImage';
@@ -33,25 +34,25 @@ const toTestId = (text) =>
 const DashCard = ({ to, icon: Icon, title, count, loading, onClick }) => {
   const cardId = toTestId(title);
   return (
-  <Link
-    to={to}
-    className="flex-1 min-w-[150px]"
-    aria-label={`${title}: ${loading ? 'cargando' : count}`}
-    onClick={() => onClick?.()}
-    data-testid={`planner-card-${cardId}`}
-  >
-    <Card className="flex flex-col items-center hover:bg-gray-50 focus-visible:ring focus-visible:ring-rose-200 transition-colors">
-      <Icon className="w-8 h-8 text-rose-500 mb-2" aria-hidden="true" />
-      <span className="text-lg font-semibold mb-1 text-gray-800">{title}</span>
-      <span
-        className="text-2xl font-bold text-gray-700"
-        aria-live="polite"
-        data-testid={`planner-card-${cardId}-value`}
-      >
-        {loading ? '—' : count}
-      </span>
-    </Card>
-  </Link>
+    <Link
+      to={to}
+      className="flex-1 min-w-[150px]"
+      aria-label={`${title}: ${loading ? 'cargando' : count}`}
+      onClick={() => onClick?.()}
+      data-testid={`planner-card-${cardId}`}
+    >
+      <Card className="flex flex-col items-center hover:bg-gray-50 focus-visible:ring focus-visible:ring-rose-200 transition-colors">
+        <Icon className="w-8 h-8 text-rose-500 mb-2" aria-hidden="true" />
+        <span className="text-lg font-semibold mb-1 text-gray-800">{title}</span>
+        <span
+          className="text-2xl font-bold text-gray-700"
+          aria-live="polite"
+          data-testid={`planner-card-${cardId}-value`}
+        >
+          {loading ? '—' : count}
+        </span>
+      </Card>
+    </Link>
   );
 };
 
@@ -67,19 +68,12 @@ const useBrowserLang = () => {
 
 export default function PlannerDashboard() {
   const { weddings, activeWedding } = useWedding();
-  const {
-    data: meetings = [],
-    loading: meetingsLoading,
-  } = useFirestoreCollection('meetings', []);
-  const {
-    data: suppliersList = [],
-    loading: suppliersLoading,
-  } = useFirestoreCollection('suppliers', []);
-  const {
-    count: alertCount,
-    loading: alertsLoading,
-    error: alertsError,
-  } = usePlannerAlerts();
+  const { data: meetings = [], loading: meetingsLoading } = useFirestoreCollection('meetings', []);
+  const { data: suppliersList = [], loading: suppliersLoading } = useFirestoreCollection(
+    'suppliers',
+    []
+  );
+  const { count: alertCount, loading: alertsLoading, error: alertsError } = usePlannerAlerts();
   const localeLang = useBrowserLang();
 
   const [inspiration, setInspiration] = useState({
@@ -99,6 +93,7 @@ export default function PlannerDashboard() {
     [meetings]
   );
   const suppliers = Array.isArray(suppliersList) ? suppliersList.length : 0;
+  const { currentLanguage } = useTranslations();
 
   const logCardClick = useCallback(
     (target) => {
@@ -182,15 +177,18 @@ export default function PlannerDashboard() {
     };
   }, [localeLang]);
 
-  const handleInspirationClick = useCallback((item) => {
-    try {
-      performanceMonitor.logEvent('planner_inspiration_clicked', {
-        slug: item?.slug,
-        label: item?.label,
-        activeWeddingId: activeWedding || null,
-      });
-    } catch {}
-  }, [activeWedding]);
+  const handleInspirationClick = useCallback(
+    (item) => {
+      try {
+        performanceMonitor.logEvent('planner_inspiration_clicked', {
+          slug: item?.slug,
+          label: item?.label,
+          activeWeddingId: activeWedding || null,
+        });
+      } catch {}
+    },
+    [activeWedding]
+  );
 
   const handleBlogClick = useCallback(
     (post) => {
@@ -202,7 +200,7 @@ export default function PlannerDashboard() {
         });
       } catch {}
     },
-    [activeWedding, localeLang],
+    [activeWedding, localeLang]
   );
 
   const handleEmptyStateCta = useCallback(() => {
@@ -285,7 +283,9 @@ export default function PlannerDashboard() {
           </Link>
         </div>
         {inspiration.error ? (
-          <p className="text-sm text-gray-500">No se pudieron cargar las imágenes de inspiración.</p>
+          <p className="text-sm text-gray-500">
+            No se pudieron cargar las imágenes de inspiración.
+          </p>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {inspiration.loading
@@ -356,10 +356,22 @@ export default function PlannerDashboard() {
               : blogPosts.items.map((post) => {
                   const published = post.publishedAt ? new Date(post.publishedAt) : null;
                   const subtitle = published
-                    ? published.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })
+                    ? (() => {
+                        try {
+                          return new Intl.DateTimeFormat(currentLanguage || 'es', {
+                            day: 'numeric',
+                            month: 'short',
+                          }).format(published);
+                        } catch {
+                          return published.toDateString();
+                        }
+                      })()
                     : post.language?.toUpperCase();
                   return (
-                    <li key={post.id || post.slug} className="bg-white rounded shadow p-3 hover:bg-gray-50">
+                    <li
+                      key={post.id || post.slug}
+                      className="bg-white rounded shadow p-3 hover:bg-gray-50"
+                    >
                       <Link
                         to={post.slug ? `/blog/${post.slug}` : '/blog'}
                         onClick={() => handleBlogClick(post)}

@@ -9,28 +9,33 @@ export const AUTHOR_PROFILES = [
     avatar: '/img/blog/authors/clara-martin.jpg',
     expertise: ['historias reales', 'experiencia de parejas', 'emociones'],
     narrativeStyle:
-      'Tono cálido y empático con testimonios y observaciones sensoriales que acercan al lector.',
+      'Tono cálido, empático y eléctrico; mezcla observaciones sensoriales con escenas festivas y testimonios espontáneos.',
     focusKeywords: ['experiencia', 'pareja', 'emocion', 'historia', 'anécdota', 'bodas reales'],
     social: {
       instagram: 'https://instagram.com/maloveapp',
       linkedin: 'https://www.linkedin.com/company/maloveapp/',
     },
+    promptInstruction:
+      'Imagina que eres una periodista animada y curiosa que disfruta narrando los momentos más festivos de la boda. Describe música, colores, risas y anécdotas inesperadas; intercala citas breves de parejas y proveedores que confirmen cada idea.',
   },
   {
     id: 'diego-navarro',
     slug: 'diego-navarro',
     name: 'Diego Navarro',
     title: 'Analista de la industria nupcial',
-    signature: 'Investigaciones con datos, comparativas y recomendaciones accionables para proveedores.',
+    signature:
+      'Investigaciones con datos, comparativas y recomendaciones accionables para proveedores.',
     bio: 'Diego desglosa tarifas, herramientas y métricas para ayudar a planners y proveedores a tomar decisiones inteligentes. Ha asesorado a más de 50 negocios nupciales en España.',
     avatar: '/img/blog/authors/diego-navarro.jpg',
     expertise: ['proveedores', 'negocio', 'tendencias de mercado'],
     narrativeStyle:
-      'Tono experto, directo y cercano; usa cifras redondeadas, listas de acciones y conclusiones claras.',
+      'Tono experto, directo y minucioso; apoya cada afirmación con cifras redondeadas, mini tablas mentales y conclusiones accionables.',
     focusKeywords: ['proveedor', 'finanzas', 'coste', 'presupuesto', 'negocio', 'tool', 'metricas'],
     social: {
       linkedin: 'https://www.linkedin.com/company/maloveapp/',
     },
+    promptInstruction:
+      'Imagina que eres un periodista analista con vocación de consultor. Descompón cada tema en datos claros, comparativas y una lista de acciones concretas. Aporta cifras estimadas, porcentajes y recomendaciones para optimizar presupuesto y rendimiento.',
   },
   {
     id: 'anais-dupont',
@@ -42,12 +47,14 @@ export const AUTHOR_PROFILES = [
     avatar: '/img/blog/authors/anais-dupont.jpg',
     expertise: ['estilo', 'moda', 'decoración', 'experiencias'],
     narrativeStyle:
-      'Lenguaje evocador con metáforas sutiles, describe ambientes y recursos visuales que pueden aplicarse a cualquier boda.',
+      'Lenguaje evocador y delicado; utiliza metáforas suaves, detalles sensoriales y referencias de moda o diseño internacional.',
     focusKeywords: ['tendencia', 'decoración', 'estilo', 'moda', 'diseño', 'inspiración'],
     social: {
       pinterest: 'https://www.pinterest.com/maloveapp/',
       instagram: 'https://instagram.com/maloveapp',
     },
+    promptInstruction:
+      'Imagina que eres una cronista de tendencias que viaja por ferias internacionales. Pinta escenarios con luz, texturas y fragancias; conecta cada idea con referentes creativos y explica cómo adaptarla a bodas españolas contemporáneas.',
   },
   {
     id: 'javier-mendoza',
@@ -59,11 +66,13 @@ export const AUTHOR_PROFILES = [
     avatar: '/img/blog/authors/javier-mendoza.jpg',
     expertise: ['contratos', 'legalidad', 'gestión financiera'],
     narrativeStyle:
-      'Tono didáctico y cercano; utiliza ejemplos cotidianos, mini casos y checklists paso a paso.',
+      'Tono didáctico y sereno; utiliza ejemplos cotidianos, escenarios “qué pasaría si” y checklists bien ordenados.',
     focusKeywords: ['contrato', 'legal', 'documento', 'reglamento', 'factura', 'pago', 'ahorro'],
     social: {
       linkedin: 'https://www.linkedin.com/company/maloveapp/',
     },
+    promptInstruction:
+      'Imagina que eres un asesor legal-financiero que conversa con una pareja sin experiencia. Explica cada concepto con calma, usa ejemplos concretos y cierra cada sección con una checklist o plan paso a paso.',
   },
 ];
 
@@ -96,19 +105,20 @@ export function assignAuthorProfile({ topic = '', keywords = [], fallbackId } = 
   }
 
   if (!bestAuthor) {
-    bestAuthor =
-      AUTHOR_PROFILES.find((author) => author.id === fallbackId) || AUTHOR_PROFILES[0];
+    bestAuthor = AUTHOR_PROFILES.find((author) => author.id === fallbackId) || AUTHOR_PROFILES[0];
   }
 
   return {
     author: bestAuthor,
     promptSnippet: [
-      `Actúa como ${bestAuthor.name}${bestAuthor.title ? `, ${bestAuthor.title}` : ''}.`,
-      `Estilo narrativo: ${bestAuthor.narrativeStyle}.`,
-      `Especialidad: ${bestAuthor.expertise.join(', ')}.`,
-      `Añade observaciones humanas coherentes con "${bestAuthor.signature}".`,
-      'Incluye citas breves realistas (sin datos sensibles) y recomendaciones accionables.',
-    ].join(' '),
+      bestAuthor.promptInstruction,
+      `Mantén el estilo narrativo: ${bestAuthor.narrativeStyle}.`,
+      `Especialidad principal: ${bestAuthor.expertise.join(', ')}.`,
+      `Recuerda reforzar la firma editorial: "${bestAuthor.signature}".`,
+      'Incluye citas o casos verosímiles, evita datos sensibles y ofrece recomendaciones accionables.',
+    ]
+      .filter(Boolean)
+      .join(' '),
   };
 }
 

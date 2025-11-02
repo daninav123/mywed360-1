@@ -1,27 +1,30 @@
 import React, { useState } from 'react';
 import { Download, FileText, FileSpreadsheet, Loader2, Calendar, Filter } from 'lucide-react';
+import { toast } from 'react-toastify';
 import Button from '../ui/Button';
 import { formatDate } from '../../utils/formatUtils';
+import useTranslations from '../../hooks/useTranslations';
 
 /**
  * Generador de reportes financieros en PDF y Excel
  */
 const ReportGenerator = ({ transactions = [], weddingInfo = {} }) => {
+  const { t } = useTranslations();
   const [generating, setGenerating] = useState(false);
   const [reportType, setReportType] = useState('summary'); // summary, detailed, supplier
   const [format, setFormat] = useState('pdf'); // pdf, excel
   const [dateRange, setDateRange] = useState({
     start: '',
-    end: ''
+    end: '',
   });
   const [selectedSupplier, setSelectedSupplier] = useState('');
 
   // Obtener proveedores únicos
-  const suppliers = [...new Set(
-    transactions
-      .filter(t => t.supplier || t.concept)
-      .map(t => t.supplier || t.concept)
-  )].sort();
+  const suppliers = [
+    ...new Set(
+      transactions.filter((t) => t.supplier || t.concept).map((t) => t.supplier || t.concept)
+    ),
+  ].sort();
 
   const generateReport = async () => {
     setGenerating(true);
@@ -31,20 +34,20 @@ const ReportGenerator = ({ transactions = [], weddingInfo = {} }) => {
       let filteredTransactions = [...transactions];
 
       if (dateRange.start) {
-        filteredTransactions = filteredTransactions.filter(t => 
-          new Date(t.date) >= new Date(dateRange.start)
+        filteredTransactions = filteredTransactions.filter(
+          (t) => new Date(t.date) >= new Date(dateRange.start)
         );
       }
 
       if (dateRange.end) {
-        filteredTransactions = filteredTransactions.filter(t => 
-          new Date(t.date) <= new Date(dateRange.end)
+        filteredTransactions = filteredTransactions.filter(
+          (t) => new Date(t.date) <= new Date(dateRange.end)
         );
       }
 
       if (selectedSupplier) {
-        filteredTransactions = filteredTransactions.filter(t => 
-          t.supplier === selectedSupplier || t.concept === selectedSupplier
+        filteredTransactions = filteredTransactions.filter(
+          (t) => t.supplier === selectedSupplier || t.concept === selectedSupplier
         );
       }
 
@@ -56,7 +59,12 @@ const ReportGenerator = ({ transactions = [], weddingInfo = {} }) => {
       }
     } catch (error) {
       console.error('Error generating report:', error);
-      alert('Error al generar el reporte. Por favor, intenta nuevamente.');
+      toast.error(
+        t(
+          'finance.reports.generateError',
+          'Error al generar el reporte. Por favor, intenta nuevamente.'
+        )
+      );
     } finally {
       setGenerating(false);
     }
@@ -73,35 +81,39 @@ const ReportGenerator = ({ transactions = [], weddingInfo = {} }) => {
     // Header
     doc.setFontSize(20);
     doc.text('Reporte Financiero', pageWidth / 2, 20, { align: 'center' });
-    
+
     doc.setFontSize(10);
     doc.text(weddingInfo.name || 'Mi Boda', pageWidth / 2, 28, { align: 'center' });
-    
+
     if (dateRange.start || dateRange.end) {
       const rangeText = `Período: ${dateRange.start || 'Inicio'} - ${dateRange.end || 'Actual'}`;
       doc.text(rangeText, pageWidth / 2, 34, { align: 'center' });
     }
 
     // Resumen
-    const totalExpenses = data.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
-    const totalIncome = data.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+    const totalExpenses = data
+      .filter((t) => t.type === 'expense')
+      .reduce((sum, t) => sum + t.amount, 0);
+    const totalIncome = data
+      .filter((t) => t.type === 'income')
+      .reduce((sum, t) => sum + t.amount, 0);
     const balance = totalIncome - totalExpenses;
 
     doc.setFontSize(12);
     doc.text('Resumen', 14, 45);
-    
+
     doc.setFontSize(10);
     doc.text(`Total Gastos: €${totalExpenses.toFixed(2)}`, 14, 52);
     doc.text(`Total Ingresos: €${totalIncome.toFixed(2)}`, 14, 58);
     doc.text(`Balance: €${balance.toFixed(2)}`, 14, 64);
 
     // Tabla de transacciones
-    const tableData = data.map(t => [
+    const tableData = data.map((t) => [
       formatDate(t.date, 'short'),
       t.concept || t.description || '-',
       t.supplier || '-',
       t.type === 'expense' ? 'Gasto' : 'Ingreso',
-      `€${t.amount.toFixed(2)}`
+      `€${t.amount.toFixed(2)}`,
     ]);
 
     doc.autoTable({
@@ -110,7 +122,7 @@ const ReportGenerator = ({ transactions = [], weddingInfo = {} }) => {
       body: tableData,
       styles: { fontSize: 8 },
       headStyles: { fillColor: [59, 130, 246] },
-      alternateRowStyles: { fillColor: [245, 247, 250] }
+      alternateRowStyles: { fillColor: [245, 247, 250] },
     });
 
     // Footer
@@ -149,12 +161,21 @@ const ReportGenerator = ({ transactions = [], weddingInfo = {} }) => {
       [weddingInfo.name || 'Mi Boda'],
       [],
       ['Resumen'],
-      ['Total Gastos', data.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0)],
-      ['Total Ingresos', data.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0)],
-      ['Balance', data.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0) - 
-                  data.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0)],
+      [
+        'Total Gastos',
+        data.filter((t) => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0),
+      ],
+      [
+        'Total Ingresos',
+        data.filter((t) => t.type === 'income').reduce((sum, t) => sum + t.amount, 0),
+      ],
+      [
+        'Balance',
+        data.filter((t) => t.type === 'income').reduce((sum, t) => sum + t.amount, 0) -
+          data.filter((t) => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0),
+      ],
       [],
-      ['Generado el', formatDate(new Date(), 'short')]
+      ['Generado el', formatDate(new Date(), 'short')],
     ];
 
     const wsResumen = XLSX.utils.aoa_to_sheet(summaryData);
@@ -163,14 +184,14 @@ const ReportGenerator = ({ transactions = [], weddingInfo = {} }) => {
     // Hoja 2: Transacciones
     const transactionsData = [
       ['Fecha', 'Concepto', 'Proveedor', 'Tipo', 'Monto', 'Categoría'],
-      ...data.map(t => [
+      ...data.map((t) => [
         formatDate(t.date, 'short'),
         t.concept || t.description || '-',
         t.supplier || '-',
         t.type === 'expense' ? 'Gasto' : 'Ingreso',
         t.amount,
-        t.category || '-'
-      ])
+        t.category || '-',
+      ]),
     ];
 
     const wsTransactions = XLSX.utils.aoa_to_sheet(transactionsData);
@@ -178,9 +199,9 @@ const ReportGenerator = ({ transactions = [], weddingInfo = {} }) => {
 
     // Hoja 3: Por Proveedor (si hay datos)
     if (reportType === 'supplier' || suppliers.length > 0) {
-      const supplierSummary = suppliers.map(supplier => {
-        const supplierTransactions = data.filter(t => 
-          t.supplier === supplier || t.concept === supplier
+      const supplierSummary = suppliers.map((supplier) => {
+        const supplierTransactions = data.filter(
+          (t) => t.supplier === supplier || t.concept === supplier
         );
         const total = supplierTransactions.reduce((sum, t) => sum + t.amount, 0);
         return [supplier, supplierTransactions.length, total];
@@ -188,7 +209,7 @@ const ReportGenerator = ({ transactions = [], weddingInfo = {} }) => {
 
       const wsSuppliers = XLSX.utils.aoa_to_sheet([
         ['Proveedor', 'Transacciones', 'Total'],
-        ...supplierSummary
+        ...supplierSummary,
       ]);
       XLSX.utils.book_append_sheet(wb, wsSuppliers, 'Por Proveedor');
     }
@@ -202,26 +223,20 @@ const ReportGenerator = ({ transactions = [], weddingInfo = {} }) => {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h2 className="text-xl font-semibold text-gray-900">
-          Generar Reporte
-        </h2>
-        <p className="text-sm text-gray-600 mt-1">
-          Exporta tus datos financieros en PDF o Excel
-        </p>
+        <h2 className="text-xl font-semibold text-gray-900">Generar Reporte</h2>
+        <p className="text-sm text-gray-600 mt-1">Exporta tus datos financieros en PDF o Excel</p>
       </div>
 
       {/* Configuración */}
       <div className="bg-white border border-gray-200 rounded-lg p-4 space-y-4">
         {/* Tipo de Reporte */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Tipo de Reporte
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Tipo de Reporte</label>
           <div className="grid grid-cols-3 gap-2">
             {[
               { value: 'summary', label: 'Resumen' },
               { value: 'detailed', label: 'Detallado' },
-              { value: 'supplier', label: 'Por Proveedor' }
+              { value: 'supplier', label: 'Por Proveedor' },
             ].map(({ value, label }) => (
               <button
                 key={value}
@@ -240,9 +255,7 @@ const ReportGenerator = ({ transactions = [], weddingInfo = {} }) => {
 
         {/* Formato */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Formato
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Formato</label>
           <div className="grid grid-cols-2 gap-2">
             <button
               onClick={() => setFormat('pdf')}
@@ -310,8 +323,10 @@ const ReportGenerator = ({ transactions = [], weddingInfo = {} }) => {
               className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
             >
               <option value="">Todos los proveedores</option>
-              {suppliers.map(supplier => (
-                <option key={supplier} value={supplier}>{supplier}</option>
+              {suppliers.map((supplier) => (
+                <option key={supplier} value={supplier}>
+                  {supplier}
+                </option>
               ))}
             </select>
           </div>

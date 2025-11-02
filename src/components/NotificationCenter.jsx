@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from './ui';
 import useNotifications from '../hooks/useNotifications';
 import { formatDate } from '../utils/formatUtils';
+import useTranslations from '../hooks/useTranslations';
 
 /**
  * Centro de notificaciones unificado para toda la aplicación
@@ -14,6 +15,7 @@ import { formatDate } from '../utils/formatUtils';
  * @returns {React.ReactElement} Componente del centro de notificaciones
  */
 const NotificationCenter = () => {
+  const { currentLanguage } = useTranslations();
   const [isOpen, setIsOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -391,7 +393,17 @@ const NotificationCenter = () => {
                         {notification.message}
                       </p>
                       <p className="text-xs text-gray-500 mt-1">
-                        {formatDate(notification.timestamp, 'custom') + ' ' + new Date(notification.timestamp).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
+                        {(() => {
+                          try {
+                            const time = new Intl.DateTimeFormat(currentLanguage || 'es', {
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            }).format(new Date(notification.timestamp));
+                            return `${formatDate(notification.timestamp, 'custom')} ${time}`;
+                          } catch {
+                            return formatDate(notification.timestamp, 'custom');
+                          }
+                        })()}
                       </p>
                       {/* Acciones para notificaciones inteligentes */}
                       {notification?.payload?.kind === 'meeting_suggested' && (
@@ -575,5 +587,3 @@ const NotificationCenter = () => {
 };
 
 export default NotificationCenter;
-
-

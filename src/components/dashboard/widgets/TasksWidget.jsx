@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import useTranslations from '../../../hooks/useTranslations';
 import { useNavigate } from 'react-router-dom';
 
 import { useFirestoreCollection } from '../../../hooks/useFirestoreCollection';
@@ -30,6 +31,7 @@ const normalizeDate = (d) => {
 export const TasksWidget = ({ config }) => {
   const navigate = useNavigate();
   const { data: meetings = [] } = useFirestoreCollection('meetings', []);
+  const { currentLanguage } = useTranslations();
 
   const items = useMemo(() => {
     const mapped = (Array.isArray(meetings) ? meetings : [])
@@ -103,10 +105,16 @@ export const TasksWidget = ({ config }) => {
                   <div className={`flex justify-between ${task.completed ? 'line-through' : ''}`}>
                     <span>{task.title}</span>
                     <span className="text-sm text-gray-500">
-                      {task.dueDate.toLocaleDateString('es-ES', {
-                        day: '2-digit',
-                        month: 'short',
-                      })}
+                      {(() => {
+                        try {
+                          return new Intl.DateTimeFormat(currentLanguage || 'es', {
+                            day: '2-digit',
+                            month: 'short',
+                          }).format(task.dueDate);
+                        } catch {
+                          return task.dueDate.toString();
+                        }
+                      })()}
                     </span>
                   </div>
                   {!task.completed && (
@@ -139,4 +147,3 @@ export const TasksWidget = ({ config }) => {
     </div>
   );
 };
-

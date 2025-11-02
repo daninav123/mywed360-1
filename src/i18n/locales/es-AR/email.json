@@ -65,11 +65,11 @@
         },
         "to": {
           "label": "Para",
-          "placeholder": "Destinatarios (email@ejemplo.com, email2@ejemplo.com)"
+          "placeholder": "Destinatarios (correo@ejemplo.com, correo2@ejemplo.com)"
         },
         "cc": {
           "label": "CC",
-          "placeholder": "CC (email@ejemplo.com, email2@ejemplo.com)"
+          "placeholder": "CC (correo@ejemplo.com, correo2@ejemplo.com)"
         },
         "subject": {
           "label": "Asunto",
@@ -134,8 +134,8 @@
     "calendarIntegration": {
       "header": "Añadir evento al calendario",
       "status": {
-        "analyzing": "Analizando contenido del email...",
-        "detectedInfo": "Información detectada en el email:"
+        "analyzing": "Analizando contenido del correo...",
+        "detectedInfo": "Información detectada en el correo:"
       },
       "tooltips": {
         "useDate": "Usar esta fecha",
@@ -144,13 +144,13 @@
         "useAttendee": "Usar este asistente"
       },
       "errors": {
-        "noEmail": "No hay un email para analizar.",
-        "analyzeFailed": "No se pudo analizar correctamente el contenido del email.",
+        "noEmail": "No hay un correo para analizar.",
+        "analyzeFailed": "No se pudo analizar correctamente el contenido del correo.",
         "missingTitle": "El título del evento es obligatorio.",
         "missingDate": "Debes seleccionar una fecha para el evento."
       },
       "defaults": {
-        "description": "Evento creado a partir del email: \"{{subject}}\"",
+        "description": "Evento creado a partir del correo: \"{{subject}}\"",
         "noSubject": "(Sin asunto)"
       },
       "detection": {
@@ -163,11 +163,7 @@
           "local",
           "ubicación"
         ],
-        "providerKeywords": [
-          "proveedor",
-          "servicio",
-          "contratación"
-        ]
+        "providerKeywords": ["proveedor", "servicio", "contratación"]
       },
       "fields": {
         "title": {
@@ -204,15 +200,15 @@
     },
     "aliasConfig": {
       "header": {
-        "title": "Configura tu email",
+        "title": "Configura tu correo electrónico",
         "subtitle": "Elige tu alias personalizado"
       },
       "currentEmail": {
-        "label": "Email actual:"
+        "label": "Correo actual:"
       },
       "fields": {
         "alias": {
-          "label": "Tu alias de email",
+          "label": "Tu alias de correo",
           "placeholder": "ejemplo: ana, pedro, boda2025"
         }
       },
@@ -222,7 +218,7 @@
         "Ejemplos: ana, pedro-2025, mi.boda"
       ],
       "preview": {
-        "label": "Tu nuevo email será:"
+        "label": "Tu nuevo correo será:"
       },
       "errors": {
         "required": "El alias es obligatorio.",
@@ -242,29 +238,29 @@
       }
     },
     "configValidation": {
-      "title": "Validacion de configuracion",
-      "subtitle": "Verifica que tu dominio este configurado para enviar emails",
+      "title": "Validación de configuración",
+      "subtitle": "Verificá que tu dominio esté configurado para enviar correos electrónicos",
       "buttons": {
-        "validate": "Validar configuracion",
+        "validate": "Validar configuración",
         "validating": "Validando...",
-        "sendTest": "Enviar email de prueba",
+        "sendTest": "Enviar correo de prueba",
         "sendingTest": "Enviando...",
-        "sent": "Email enviado"
+        "sent": "Correo enviado"
       },
       "current": {
         "domain": "Dominio:",
-        "email": "Email:"
+        "email": "Correo:"
       },
       "errorTitle": "Error",
       "errors": {
-        "invalidEmail": "Email no valido",
-        "validateGeneric": "Error al validar configuracion. Intenta nuevamente.",
-        "sendTestGeneric": "Error al enviar email de prueba. Verifica tu configuracion."
+        "invalidEmail": "Correo electrónico no válido",
+        "validateGeneric": "Error al validar la configuración. Intentá nuevamente.",
+        "sendTestGeneric": "Error al enviar el correo de prueba. Verificá tu configuración."
       },
       "summary": {
-        "successTitle": "Configuracion correcta",
-        "warningTitle": "Configuracion incompleta",
-        "cta": "Tu configuracion esta lista. Envia un email de prueba para verificar que todo funciona correctamente."
+        "successTitle": "Configuración correcta",
+        "warningTitle": "Configuración incompleta",
+        "cta": "Tu configuración está lista. Enviá un correo de prueba para verificar que todo funciona correctamente."
       },
       "checks": {
         "spfTitle": "SPF (Sender Policy Framework)",
@@ -272,79 +268,79 @@
         "dkimTitle": "DKIM (DomainKeys Identified Mail)",
         "dkimValid": "Registro DKIM configurado correctamente",
         "dmarcTitle": "DMARC (Recomendado)",
-        "dmarcValid": "Registro DMARC configurado (mejora deliverability)"
+        "dmarcValid": "Registro DMARC configurado (mejora la entregabilidad)"
       },
       "successNotice": {
-        "description": "Email de prueba enviado a {{email}}. Revisa tu bandeja de entrada."
+        "description": "Correo de prueba enviado a {{email}}. Revisá tu bandeja de entrada."
       },
       "help": {
-        "title": "Que se valida",
-        "spf": "Verifica que tu dominio autorice a MaLoveApp para enviar emails",
-        "dkim": "Confirma que los emails estan firmados digitalmente",
-        "dmarc": "Mejora la entregabilidad y protege contra suplantacion"
+        "title": "¿Qué se valida?",
+        "spf": "Verifica que tu dominio autorice a MaLoveApp para enviar correos.",
+        "dkim": "Confirma que los correos estén firmados digitalmente.",
+        "dmarc": "Mejora la entregabilidad y protege contra suplantación."
       }
     },
     "feedback": {
       "header": {
-        "title": "Tu opinion importa",
-        "toggleAria": "Dar feedback sobre el sistema de email",
+        "title": "Tu opinión importa",
+        "toggleAria": "Dar feedback sobre el sistema de correo",
         "closeAria": "Cerrar formulario de feedback"
       },
       "thanks": {
         "title": "Gracias por tu feedback",
-        "subtitle": "Tu opinion nos ayuda a mejorar el sistema de emails de MaLoveApp."
+        "subtitle": "Tu opinión nos ayuda a mejorar el sistema de correos de MaLoveApp."
       },
       "common": {
         "next": "Siguiente",
-        "back": "Atras",
-        "selectOption": "Selecciona una opcion",
+        "back": "Atrás",
+        "selectOption": "Seleccioná una opción",
         "sending": "Enviando..."
       },
       "messages": {
-        "submitError": "No se pudo enviar tu feedback. Intentalo mas tarde."
+        "submitError": "No se pudo enviar tu feedback. Intentá más tarde."
       },
       "options": {
         "features": {
           "alias": "Alias de correo",
-          "templates": "Plantillas de email",
-          "tracking": "Seguimiento de emails",
-          "events": "Deteccion de eventos",
-          "search": "Busqueda en emails",
+          "templates": "Plantillas de correo",
+          "tracking": "Seguimiento de correos",
+          "events": "Detección de eventos",
+          "search": "Búsqueda en correos",
           "notifications": "Notificaciones"
         },
         "performance": {
           "verySlow": "Muy lento",
           "slow": "Algo lento",
           "acceptable": "Aceptable",
-          "fast": "Rapido",
-          "veryFast": "Muy rapido"
+          "fast": "Rápido",
+          "veryFast": "Muy rápido"
         },
         "usability": {
-          "veryDifficult": "Muy dificil de usar",
-          "difficult": "Algo dificil",
+          "veryDifficult": "Muy difícil de usar",
+          "difficult": "Algo difícil",
           "neutral": "Neutral",
-          "easy": "Facil de usar",
-          "veryEasy": "Muy facil de usar"
+          "easy": "Fácil de usar",
+          "veryEasy": "Muy fácil de usar"
         }
       },
       "steps": {
         "rating": {
-          "question": "Como valorarias tu experiencia con el email de MaLoveApp?",
+          "question": "¿Cómo valorarías tu experiencia con el correo de MaLoveApp?",
           "scaleStart": "Muy malo",
           "scaleEnd": "Excelente",
-          "ratingAria": "Seleccionar puntuacion {{value}}"
+          "ratingAria": "Seleccionar puntuación {{value}}"
         },
         "usability": {
-          "title": "Sobre la usabilidad y rendimiento",
-          "usabilityLabel": "Que tan facil es usar el sistema de email?",
-          "performanceLabel": "Como valoras la velocidad del sistema de email?"
+          "title": "Sobre la usabilidad y el rendimiento",
+          "usabilityLabel": "¿Qué tan fácil es usar el sistema de correo?",
+          "performanceLabel": "¿Cómo valorás la velocidad del sistema de correo?"
         },
         "features": {
           "title": "Funcionalidades y sugerencias",
-          "featureLabel": "Que funcionalidades has utilizado? (selecciona todas las que apliquen)",
-          "improvementLabel": "Que podemos mejorar en nuestro sistema de email?",
-          "improvementPlaceholder": "Comparte tus sugerencias...",
-          "featureRequestLabel": "Hay alguna funcionalidad que te gustaria ver en el futuro?",
+          "featureLabel": "¿Qué funcionalidades usaste? (seleccioná todas las que apliquen)",
+          "improvementLabel": "¿Qué podemos mejorar en nuestro sistema de correo?",
+          "improvementPlaceholder": "Compartí tus sugerencias...",
+          "featureRequestLabel": "¿Hay alguna funcionalidad que te gustaría ver en el futuro?",
           "featureRequestPlaceholder": "Tus ideas son importantes para nosotros...",
           "submit": "Enviar feedback"
         }
@@ -353,30 +349,30 @@
     "onboarding": {
       "steps": {
         "welcome": {
-          "title": "Bienvenido a Email",
-          "description": "Configura tu sistema de correo en 3 simples pasos"
+          "title": "Bienvenido al módulo de correo",
+          "description": "Configurá tu sistema de correo en 3 simples pasos"
         },
         "domain": {
-          "title": "Configuracion de Dominio",
-          "description": "Configura tu dominio de envio"
+          "title": "Configuración de dominio",
+          "description": "Configurá tu dominio de envío"
         },
         "validation": {
-          "title": "Validacion DNS",
-          "description": "Verificaremos tu configuracion DKIM y SPF"
+          "title": "Validación DNS",
+          "description": "Verificaremos tu configuración DKIM y SPF"
         },
         "test": {
-          "title": "Envio de Prueba",
-          "description": "Envia un email de prueba"
+          "title": "Envío de prueba",
+          "description": "Enviá un correo de prueba"
         },
         "complete": {
           "title": "Listo",
-          "description": "Tu email esta configurado correctamente"
+          "description": "Tu correo electrónico quedó configurado correctamente"
         }
       },
       "welcome": {
         "intro": "Vamos a configurar tu sistema de correo para que puedas enviar invitaciones y comunicarte con tus invitados.",
         "noteLabel": "Nota:",
-        "noteText": "Necesitaras acceso a la configuracion DNS de tu dominio."
+        "noteText": "Necesitás acceso a la configuración DNS de tu dominio."
       },
       "domain": {
         "fields": {
@@ -385,15 +381,15 @@
             "placeholder": "miboda.com"
           },
           "fromEmail": {
-            "label": "Email de Envio *",
+            "label": "Correo de envío *",
             "placeholder": "invitaciones@miboda.com"
           },
           "fromName": {
             "label": "Nombre del Remitente *",
-            "placeholder": "Maria & Juan"
+            "placeholder": "María & Juan"
           },
           "replyTo": {
-            "label": "Email de Respuesta (opcional)",
+            "label": "Correo de respuesta (opcional)",
             "placeholder": "contacto@miboda.com"
           }
         }
@@ -405,37 +401,37 @@
           "validating": "Validando..."
         },
         "errors": {
-          "recordsMissing": "Verifica que hayas anadido correctamente los registros DNS",
-          "generic": "Error al validar DNS. Intenta de nuevo."
+          "recordsMissing": "Verificá que hayas añadido correctamente los registros DNS.",
+          "generic": "Error al validar DNS. Intentá de nuevo."
         }
       },
       "test": {
-        "description": "Envia un email de prueba para verificar que todo funciona correctamente.",
+        "description": "Enviá un correo de prueba para verificar que todo funciona correctamente.",
         "fields": {
           "recipient": {
-            "label": "Email de Destino",
+            "label": "Correo de destino",
             "placeholder": "tu@email.com"
           }
         },
-        "button": "Enviar Email de Prueba",
-        "success": "Email de prueba enviado correctamente. Revisa tu bandeja de entrada."
+        "button": "Enviar correo de prueba",
+        "success": "Correo de prueba enviado correctamente. Revisá tu bandeja de entrada."
       },
       "complete": {
-        "message": "Tu configuracion de email esta completa. Ya puedes empezar a enviar invitaciones.",
-        "reminder": "Recuerda: Puedes cambiar esta configuracion en cualquier momento desde Ajustes."
+        "message": "Tu configuración de correo está completa. Ya podés empezar a enviar invitaciones.",
+        "reminder": "Recordá: podés cambiar esta configuración en cualquier momento desde Ajustes."
       },
       "actions": {
         "skip": "Saltar por ahora",
-        "back": "Atras",
+        "back": "Atrás",
         "next": "Siguiente",
         "finish": "Finalizar"
       },
       "errors": {
-        "missingDomainFields": "Por favor completa todos los campos obligatorios",
-        "dnsIncomplete": "Por favor completa la configuracion DNS antes de continuar",
-        "testNotSent": "Por favor envia un email de prueba antes de continuar",
-        "missingTestRecipient": "Por favor ingresa un email de destino",
-        "testSendFailed": "Error al enviar email de prueba"
+        "missingDomainFields": "Completá todos los campos obligatorios.",
+        "dnsIncomplete": "Completá la configuración DNS antes de continuar.",
+        "testNotSent": "Enviá un correo de prueba antes de continuar.",
+        "missingTestRecipient": "Ingresá un correo de destino.",
+        "testSendFailed": "Error al enviar el correo de prueba."
       }
     },
     "mailgunTester": {
@@ -443,7 +439,7 @@
       "subtitle": "Utiliza estas herramientas para probar la integracion con Mailgun.",
       "sections": {
         "send": {
-          "title": "1. Enviar Email",
+          "title": "1. Enviar correo",
           "fields": {
             "from": "Remitente",
             "to": "Destinatario",
@@ -457,13 +453,13 @@
             "text": "Este es un correo de prueba enviado desde la aplicacion MaLoveApp."
           },
           "button": {
-            "default": "Enviar Email",
+            "default": "Enviar correo",
             "loading": "Enviando..."
           }
         },
         "validate": {
-          "title": "2. Validar Email",
-          "field": "Email para validar",
+          "title": "2. Validar correo",
+          "field": "Correo para validar",
           "placeholder": "ejemplo@gmail.com",
           "button": {
             "default": "Validar",
@@ -483,16 +479,16 @@
         }
       },
       "notifications": {
-        "sendSuccess": "Email enviado correctamente. ID: {{id}}",
-        "sendError": "Error al enviar email: {{message}}",
+        "sendSuccess": "Correo enviado correctamente. ID: {{id}}",
+        "sendError": "Error al enviar el correo: {{message}}",
         "validateError": "Error al validar: {{message}}",
         "availabilityError": "Error al verificar disponibilidad: {{message}}"
       },
       "validation": {
-        "success": "El email es valido",
-        "invalid": "El email no es valido: {{reason}}",
-        "resultValid": "✅ Email valido",
-        "resultInvalid": "❌ Email invalido"
+        "success": "El correo es válido",
+        "invalid": "El correo no es válido: {{reason}}",
+        "resultValid": "✅ Correo válido",
+        "resultInvalid": "❌ Correo inválido"
       },
       "availability": {
         "available": "El nombre de usuario \"{{username}}@maloveapp.com\" esta disponible",
@@ -563,7 +559,7 @@
         "lastSync": "Ultima sincronizacion: {{value}}",
         "lastSyncPending": "pendiente",
         "syncing": "Sincronizando...",
-        "description": "Configura mensajes automaticos segun el tipo de correo mientras la IA analiza los emails entrantes.",
+        "description": "Configurá mensajes automáticos según el tipo de correo mientras la IA analiza los correos entrantes.",
         "success": "Configuracion guardada correctamente.",
         "errors": {
           "sync": "No se pudo sincronizar la configuracion de auto-respuestas.",
@@ -707,7 +703,7 @@
         }
       },
       "search": {
-        "placeholder": "Buscar emails..."
+        "placeholder": "Buscar correos..."
       },
       "labels": {
         "suggestedOnly": "Solo sugeridos",

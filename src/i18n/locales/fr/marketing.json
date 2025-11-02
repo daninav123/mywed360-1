@@ -521,8 +521,6 @@
       }
     },
     "testimonials": {
-      "badge": "Testimonials",
-      "sectionTitle": "Wedding planners already trust us",
       "0": {
         "quote": "MaLove.App transformed our operation. We used to rely on spreadsheets and lost hours on manual tasks. Now everything is centralized and automated.",
         "name": "María González",
@@ -537,7 +535,9 @@
         "quote": "Reusable templates are a game changer. We clone a successful wedding and have the entire setup ready in minutes.",
         "name": "Ana Martínez",
         "role": "Founder, Eventos Especiales"
-      }
+      },
+      "badge": "Testimonials",
+      "sectionTitle": "Wedding planners already trust us"
     },
     "demo": {
       "badge": "Personalized Demo",

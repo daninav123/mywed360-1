@@ -10,6 +10,7 @@ import {
   Download,
 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
+import useTranslations from '../../hooks/useTranslations';
 
 import * as emailService from '../../services/emailService';
 import { safeExecute } from '../../utils/promiseSafeRenderer';
@@ -34,6 +35,7 @@ const EmailViewer = ({ email, onBack, onDelete, onReply, onForward, onToggleImpo
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [replyText, setReplyText] = useState('');
   const isImportant = email?.folder === 'important';
+  const { t, currentLanguage, format } = useTranslations();
 
   // Marcar como leído al visualizar
   useEffect(() => {
@@ -46,14 +48,19 @@ const EmailViewer = ({ email, onBack, onDelete, onReply, onForward, onToggleImpo
   const formatDate = (dateStr) => {
     if (!dateStr) return '';
     const date = new Date(dateStr);
-    return date.toLocaleDateString('es-ES', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+    try {
+      if (format && typeof format.datetime === 'function') return format.datetime(date);
+      return new Intl.DateTimeFormat(currentLanguage || 'es', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      }).format(date);
+    } catch {
+      return date.toString();
+    }
   };
 
   // Manejar envío de respuesta
@@ -87,7 +94,7 @@ const EmailViewer = ({ email, onBack, onDelete, onReply, onForward, onToggleImpo
         <div className="flex items-center justify-between mb-4">
           <Button variant="ghost" size="sm" onClick={onBack} className="flex items-center">
             <ArrowLeft size={18} className="mr-1" />
-            Volver
+            {t('email.viewer.back', { defaultValue: 'Volver' })}
           </Button>
 
           <div className="flex space-x-2">
@@ -96,7 +103,11 @@ const EmailViewer = ({ email, onBack, onDelete, onReply, onForward, onToggleImpo
               size="sm"
               onClick={() => onToggleImportant(email.id, !isImportant)}
               className="flex items-center"
-              title={isImportant ? 'Quitar estrella' : 'Marcar con estrella'}
+              title={
+                isImportant
+                  ? t('email.viewer.unstar', { defaultValue: 'Quitar estrella' })
+                  : t('email.viewer.star', { defaultValue: 'Marcar con estrella' })
+              }
             >
               {isImportant ? (
                 <StarOff size={18} className="text-gray-600" />
@@ -109,7 +120,7 @@ const EmailViewer = ({ email, onBack, onDelete, onReply, onForward, onToggleImpo
               size="sm"
               onClick={() => onReply(email)}
               className="flex items-center"
-              title="Responder"
+              title={t('email.viewer.reply', { defaultValue: 'Responder' })}
             >
               <Reply size={18} className="text-gray-600" />
             </Button>
@@ -118,7 +129,7 @@ const EmailViewer = ({ email, onBack, onDelete, onReply, onForward, onToggleImpo
               size="sm"
               onClick={() => onForward(email)}
               className="flex items-center"
-              title="Reenviar"
+              title={t('email.viewer.forward', { defaultValue: 'Reenviar' })}
             >
               <Forward size={18} className="text-gray-600" />
             </Button>
@@ -134,19 +145,26 @@ const EmailViewer = ({ email, onBack, onDelete, onReply, onForward, onToggleImpo
           </div>
         </div>
 
-        <h1 className="text-xl font-semibold mb-2">{email.subject || '(Sin asunto)'}</h1>
+        <h1 className="text-xl font-semibold mb-2">
+          {email.subject || t('email.viewer.noSubject', { defaultValue: '(Sin asunto)' })}
+        </h1>
 
         <div className="flex flex-col sm:flex-row justify-between text-sm text-gray-600">
           <div>
-            <span className="font-medium">De:</span> {email.from}
+            <span className="font-medium">{t('email.viewer.from', { defaultValue: 'De:' })}</span>{' '}
+            {email.from}
           </div>
           <div>
-            <span className="font-medium">Fecha:</span> {formatDate(email.date)}
+            <span className="font-medium">
+              {t('email.viewer.date', { defaultValue: 'Fecha:' })}
+            </span>{' '}
+            {formatDate(email.date)}
           </div>
         </div>
 
         <div className="text-sm text-gray-600 mt-1">
-          <span className="font-medium">Para:</span> {email.to}
+          <span className="font-medium">{t('email.viewer.to', { defaultValue: 'Para:' })}</span>{' '}
+          {email.to}
         </div>
 
         {email.cc && (
@@ -211,7 +229,7 @@ const EmailViewer = ({ email, onBack, onDelete, onReply, onForward, onToggleImpo
         <div className="border-t border-gray-200 p-4">
           <h3 className="font-medium mb-2 flex items-center">
             <Reply size={16} className="mr-1" />
-            Responder
+            {t('email.viewer.reply', { defaultValue: 'Responder' })}
           </h3>
 
           <textarea
@@ -219,15 +237,17 @@ const EmailViewer = ({ email, onBack, onDelete, onReply, onForward, onToggleImpo
             onChange={(e) => setReplyText(e.target.value)}
             className="w-full border border-gray-300 rounded-md p-2 mb-2"
             rows="4"
-            placeholder="Escribe tu respuesta aquí..."
+            placeholder={t('email.viewer.replyPlaceholder', {
+              defaultValue: 'Escribe tu respuesta aquí...',
+            })}
           ></textarea>
 
           <div className="flex justify-end space-x-2">
             <Button variant="outline" size="sm" onClick={() => setShowReplyForm(false)}>
-              Cancelar
+              {t('app.cancel', { defaultValue: 'Cancelar' })}
             </Button>
             <Button size="sm" onClick={handleSendReply} disabled={!replyText.trim()}>
-              Enviar respuesta
+              {t('email.viewer.sendReply', { defaultValue: 'Enviar respuesta' })}
             </Button>
           </div>
         </div>
@@ -243,11 +263,11 @@ const EmailViewer = ({ email, onBack, onDelete, onReply, onForward, onToggleImpo
             onClick={() => setShowReplyForm(!showReplyForm)}
           >
             <Reply size={16} className="mr-1" />
-            Respuesta rápida
+            {t('email.viewer.quickReply', { defaultValue: 'Respuesta rápida' })}
           </Button>
           <Button variant="outline" size="sm" className="flex items-center">
             <Calendar size={16} className="mr-1" />
-            Añadir al calendario
+            {t('email.viewer.addToCalendar', { defaultValue: 'Añadir al calendario' })}
           </Button>
         </div>
       </div>

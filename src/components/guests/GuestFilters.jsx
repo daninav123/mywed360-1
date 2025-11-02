@@ -1,5 +1,6 @@
 import { Search, Filter, Plus, MessageSquare } from 'lucide-react';
 import React, { useCallback } from 'react';
+import { toast } from 'react-toastify';
 
 import useTranslations from '../../hooks/useTranslations';
 import wh from '../../utils/whDebug';
@@ -28,7 +29,10 @@ const GuestFilters = React.memo(
 
     // Opciones de estado para el filtro
     const statusOptions = [
-      { value: '', label: 'Todos los estados' },
+      {
+        value: '',
+        label: t('common.guests.filters.allStatuses', 'Todos los estados'),
+      },
       { value: 'pending', label: wedding?.guestStatus?.('pending') || 'Pendiente' },
       { value: 'confirmed', label: wedding?.guestStatus?.('confirmed') || 'Confirmado' },
       { value: 'declined', label: wedding?.guestStatus?.('declined') || 'Rechazado' },
@@ -64,7 +68,9 @@ const GuestFilters = React.memo(
     const handleBulkInviteApi = useCallback(() => {
       wh('UI – BulkInvite click', { guestCount });
       if (guestCount === 0) {
-        alert('No hay invitados para enviar invitaciones');
+        toast.info(
+          t('common.guests.filters.noGuestsForBulk', 'No hay invitados para enviar invitaciones')
+        );
         return;
       }
       onBulkInvite?.();
@@ -78,7 +84,11 @@ const GuestFilters = React.memo(
             <div>
               <h2 className="text-xl font-semibold text-body">{t('guests.guestList')}</h2>
               <p className="text-sm text-muted mt-1">
-                {guestCount} {guestCount === 1 ?'invitado' : 'invitados'} en total
+                {t('common.guests.filters.totalGuests', {
+                  count: guestCount,
+                  defaultValue:
+                    guestCount === 1 ? '1 invitado en total' : `${guestCount} invitados en total`,
+                })}
               </p>
             </div>
 
@@ -104,7 +114,10 @@ const GuestFilters = React.memo(
               />
               <Input
                 type="text"
-                placeholder="Buscar por nombre, email o teléfono..."
+                placeholder={t(
+                  'common.guests.filters.searchPlaceholder',
+                  'Buscar por nombre, email o teléfono...'
+                )}
                 value={searchTerm}
                 onChange={handleSearchChange}
                 className="pl-10"
@@ -137,7 +150,7 @@ const GuestFilters = React.memo(
             <div>
               <Input
                 type="text"
-                placeholder="Filtrar por mesa..."
+                placeholder={t('common.guests.filters.tablePlaceholder', 'Filtrar por mesa...')}
                 value={tableFilter}
                 onChange={handleTableChange}
                 disabled={isLoading}
@@ -151,9 +164,12 @@ const GuestFilters = React.memo(
               variant="outline"
               onClick={() => onOpenSaveTheDate?.()}
               disabled={isLoading || guestCount === 0}
-              title="Enviar SAVE THE DATE por WhatsApp"
+              title={t(
+                'common.guests.filters.saveTheDate.title',
+                'Enviar SAVE THE DATE por WhatsApp'
+              )}
             >
-              Enviar SAVE THE DATE
+              {t('common.guests.filters.saveTheDate.label', 'Enviar SAVE THE DATE')}
             </Button>
 
             <Button
@@ -161,12 +177,14 @@ const GuestFilters = React.memo(
               onClick={handleBulkInviteApi}
               disabled={isLoading || guestCount === 0}
               className="flex items-center"
-              title="Enviar la invitación formal por WhatsApp API"
+              title={t(
+                'common.guests.filters.bulkInvite.title',
+                'Enviar la invitación formal por WhatsApp API'
+              )}
             >
               <MessageSquare size={16} className="mr-2" />
-              Invitaciones masivas (API)
+              {t('common.guests.filters.bulkInvite.label', 'Invitaciones masivas (API)')}
             </Button>
-
           </div>
         </div>
       </>

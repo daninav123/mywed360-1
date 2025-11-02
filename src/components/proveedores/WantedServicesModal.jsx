@@ -2,9 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { X, CheckCircle, Circle } from 'lucide-react';
 import { SUPPLIER_CATEGORIES } from '../../../shared/supplierCategories';
 import Button from '../ui/Button';
+import useTranslations from '../../hooks/useTranslations';
 
 export default function WantedServicesModal({ open, onClose, value = [], onSave }) {
   const [services, setServices] = useState([]);
+  const { t } = useTranslations();
 
   // Usar categorías centralizadas
   const allCategories = SUPPLIER_CATEGORIES;
@@ -54,9 +56,14 @@ export default function WantedServicesModal({ open, onClose, value = [], onSave 
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div>
-            <h2 className="text-xl font-bold text-gray-900">Servicios que necesitas</h2>
+            <h2 className="text-xl font-bold text-gray-900">
+              {t('suppliers.wantedServices.title', { defaultValue: 'Servicios que necesitas' })}
+            </h2>
             <p className="text-sm text-gray-600 mt-1">
-              Selecciona los servicios para tu boda ({services.length} seleccionados)
+              {t('suppliers.wantedServices.subtitle', {
+                count: services.length,
+                defaultValue: 'Selecciona los servicios para tu boda ({{count}} seleccionados)',
+              })}
             </p>
           </div>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
@@ -68,7 +75,11 @@ export default function WantedServicesModal({ open, onClose, value = [], onSave 
         <div className="flex-1 overflow-y-auto p-6">
           {/* Servicios principales */}
           <div className="mb-8">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">📌 Servicios principales</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              {t('suppliers.wantedServices.primaryTitle', {
+                defaultValue: '📌 Servicios principales',
+              })}
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {mainCategories.map((category) => {
                 const isActive = services.includes(category.id);
@@ -113,7 +124,9 @@ export default function WantedServicesModal({ open, onClose, value = [], onSave 
 
           {/* Otros servicios */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">✨ Otros servicios</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              {t('suppliers.wantedServices.otherTitle', { defaultValue: '✨ Otros servicios' })}
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {otherCategories.map((category) => {
                 const isActive = services.includes(category.id);
@@ -152,8 +165,11 @@ export default function WantedServicesModal({ open, onClose, value = [], onSave 
           {/* Info */}
           <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
             <p className="text-sm text-blue-800">
-              <strong>💡 Tip:</strong> Estos servicios se usarán para filtrar proveedores y
-              personalizar tu experiencia de búsqueda.
+              <strong>💡 Tip:</strong>{' '}
+              {t('suppliers.wantedServices.tip', {
+                defaultValue:
+                  'Estos servicios se usarán para filtrar proveedores y personalizar tu experiencia de búsqueda.',
+              })}
             </p>
           </div>
         </div>
@@ -161,10 +177,13 @@ export default function WantedServicesModal({ open, onClose, value = [], onSave 
         {/* Footer */}
         <div className="p-6 border-t border-gray-200 bg-gray-50 flex gap-3">
           <Button variant="outline" onClick={onClose} className="flex-1">
-            Cancelar
+            {t('suppliers.wantedServices.cancel', { defaultValue: 'Cancelar' })}
           </Button>
           <Button onClick={save} className="flex-1">
-            Guardar servicios ({services.length})
+            {t('suppliers.wantedServices.save', {
+              count: services.length,
+              defaultValue: 'Guardar servicios ({{count}})',
+            })}
           </Button>
         </div>
       </div>

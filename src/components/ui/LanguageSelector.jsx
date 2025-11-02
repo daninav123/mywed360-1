@@ -77,8 +77,24 @@ const LanguageSelector = ({
     const onDocClick = (e) => {
       if (!e.target.closest('.language-selector')) setIsOpen(false);
     };
-    document.addEventListener('click', onDocClick);
-    return () => document.removeEventListener('click', onDocClick);
+    // Delay para permitir que el click del botón se procese primero
+    const timeoutId = setTimeout(() => {
+      document.addEventListener('click', onDocClick);
+    }, 0);
+    return () => {
+      clearTimeout(timeoutId);
+      document.removeEventListener('click', onDocClick);
+    };
+  }, [isOpen]);
+
+  // Cerrar con tecla ESC
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleEscape = (e) => {
+      if (e.key === 'Escape') setIsOpen(false);
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
   }, [isOpen]);
 
   if (variant === 'minimal') {

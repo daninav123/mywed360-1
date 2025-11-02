@@ -171,11 +171,7 @@
           "local",
           "ubicación"
         ],
-        "providerKeywords": [
-          "proveedor",
-          "servicio",
-          "contratación"
-        ]
+        "providerKeywords": ["proveedor", "servicio", "contratación"]
       },
       "fields": {
         "title": {

@@ -271,16 +271,32 @@ const UserManagement = () => {
                 <TableCell>{user.email}</TableCell>
                 <TableCell>{renderRoleChip(user.role)}</TableCell>
                 <TableCell>{renderStatusChip(user.status)}</TableCell>
-                <TableCell>{formatDate(new Date(user.createdAt._seconds * 1000), 'short')}</TableCell>
                 <TableCell>
-                  {user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : 'Nunca'}
+                  {formatDate(new Date(user.createdAt._seconds * 1000), 'short')}
+                </TableCell>
+                <TableCell>
+                  {user.lastLogin
+                    ? (() => {
+                        try {
+                          return new Intl.DateTimeFormat(
+                            (typeof window !== 'undefined' && window.__I18N_INSTANCE__?.language) ||
+                              'es',
+                            { day: '2-digit', month: '2-digit', year: 'numeric' }
+                          ).format(new Date(user.lastLogin));
+                        } catch {
+                          return new Date(user.lastLogin).toString();
+                        }
+                      })()
+                    : 'Nunca'}
                 </TableCell>
                 <TableCell align="right">
                   <Box className="flex justify-end">
                     <Tooltip title="Enviar email">
                       <IconButton
                         size="small"
-                        onClick={() => toast.info(t('admin.users.sendEmail', { email: user.email }))}
+                        onClick={() =>
+                          toast.info(t('admin.users.sendEmail', { email: user.email }))
+                        }
                       >
                         <Mail size={18} />
                       </IconButton>
@@ -288,7 +304,9 @@ const UserManagement = () => {
                     <Tooltip title="Resetear contraseña">
                       <IconButton
                         size="small"
-                        onClick={() => toast.info(t('admin.users.resetPassword', { name: user.name }))}
+                        onClick={() =>
+                          toast.info(t('admin.users.resetPassword', { name: user.name }))
+                        }
                       >
                         <Key size={18} />
                       </IconButton>

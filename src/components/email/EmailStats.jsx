@@ -12,6 +12,7 @@ import {
 } from 'chart.js';
 import { RefreshCw, Mail, Clock, User, Tag, Folder, Eye, MousePointerClick } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
+import useTranslations from '../../hooks/useTranslations';
 import { Bar, Line, Pie, Doughnut } from 'react-chartjs-2';
 
 import { getDailyStats } from '../../services/emailMetricsService';
@@ -43,6 +44,7 @@ const EmailStats = ({ userId }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [dailyStats, setDailyStats] = useState([]);
+  const { currentLanguage } = useTranslations();
 
   // Cargar estadísticas al iniciar
   useEffect(() => {
@@ -123,8 +125,14 @@ const EmailStats = ({ userId }) => {
   // Formateador de fechas para legibilidad
   const formatDate = (dateString) => {
     if (!dateString) return '';
-    const options = { day: 'numeric', month: 'short' };
-    return new Date(dateString).toLocaleDateString('es-ES', options);
+    try {
+      return new Intl.DateTimeFormat(currentLanguage || 'es', {
+        day: 'numeric',
+        month: 'short',
+      }).format(new Date(dateString));
+    } catch {
+      return new Date(dateString).toDateString();
+    }
   };
 
   // Datos para gráfico de actividad diaria (con fallback seguro)

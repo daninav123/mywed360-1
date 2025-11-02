@@ -336,9 +336,14 @@ export function WeddingProvider({ children }) {
 
     return () => {
       cancelled = true;
-      if (typeof unsub === 'function') unsub();
+      if (typeof unsub === 'function') {
+        if (import.meta.env.DEV) {
+          console.log('[WeddingContext] Limpiando listener de weddings');
+        }
+        unsub();
+      }
     };
-  }, [currentUser, getLocalProfileUid, activeWedding]);
+  }, [currentUser, getLocalProfileUid]); // ← Removido activeWedding de deps para evitar re-suscripciones
 
   // Asegurar activeWedding válido cuando cambia la lista
   useEffect(() => {

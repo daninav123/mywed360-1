@@ -1,16 +1,30 @@
 import React, { useEffect, useRef, useState } from 'react';
+import useTranslations from '../../hooks/useTranslations';
 
 import Avatar from './Avatar';
 import { getEmailTagsDetails } from '../../services/tagService';
 
-const formatDateShort = (d) => {
-  if (!d) return '';
-  const dt = new Date(d);
-  if (Number.isNaN(dt.getTime())) return '';
-  const now = new Date();
-  const sameDay = dt.toDateString() === now.toDateString();
-  if (sameDay) return dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  return dt.toLocaleDateString();
+const useFormatters = () => {
+  const { currentLanguage } = useTranslations();
+  const formatDateShort = (d) => {
+    if (!d) return '';
+    const dt = new Date(d);
+    if (Number.isNaN(dt.getTime())) return '';
+    const now = new Date();
+    const sameDay = dt.toDateString() === now.toDateString();
+    try {
+      if (sameDay) {
+        return new Intl.DateTimeFormat(currentLanguage || 'es', {
+          hour: '2-digit',
+          minute: '2-digit',
+        }).format(dt);
+      }
+      return new Intl.DateTimeFormat(currentLanguage || 'es', {}).format(dt);
+    } catch {
+      return dt.toString();
+    }
+  };
+  return { formatDateShort };
 };
 
 export default function MailList({
@@ -30,6 +44,7 @@ export default function MailList({
   loadingMore = false,
   onLoadMore = null,
 }) {
+  const { formatDateShort } = useFormatters();
   const [visible, setVisible] = useState(30);
   const [menuOpenId, setMenuOpenId] = useState(null);
   const [tick, setTick] = useState(0);
@@ -77,7 +92,14 @@ export default function MailList({
     if (diffDays === 0) return 'Hoy';
     if (diffDays === 1) return 'Ayer';
     if (diffDays < 7 && diffDays > 1) return 'Esta semana';
-    return dt.toLocaleDateString();
+    try {
+      return new Intl.DateTimeFormat(
+        (typeof window !== 'undefined' && window.__I18N_INSTANCE__?.language) || 'es',
+        { day: '2-digit', month: 'short', year: 'numeric' }
+      ).format(dt);
+    } catch {
+      return dt.toString();
+    }
   };
 
   const renderSkeleton = (i) => (
@@ -291,4 +313,3 @@ export default function MailList({
     </div>
   );
 }
-

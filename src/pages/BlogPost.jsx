@@ -282,6 +282,60 @@ const BlogPost = () => {
       ? `${window.location.origin}${canonicalUrl}`
       : `https://malove.app${canonicalUrl}`;
   const coverImage = post?.coverImage?.url || null;
+  const articleLd = useMemo(() => {
+    if (!post) return null;
+    const publishedIso = post.publishedAt || null;
+    const authorData =
+      post.byline?.name || post.byline?.title
+        ? {
+            '@type': 'Person',
+            name: post.byline?.name || 'Lovenda',
+            ...(post.byline?.title ? { jobTitle: post.byline.title } : {}),
+          }
+        : undefined;
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'Article',
+      headline: post.title,
+      description: metaDescription,
+      image: coverImage ? [coverImage] : undefined,
+      datePublished: publishedIso,
+      dateModified: post.updatedAt || publishedIso,
+      author: authorData,
+      publisher: {
+        '@type': 'Organization',
+        name: 'Lovenda',
+        logo: {
+          '@type': 'ImageObject',
+          url: 'https://malove.app/maloveapp-logo.png',
+        },
+      },
+      mainEntityOfPage: canonicalHref,
+    };
+  }, [post, metaDescription, coverImage, canonicalHref]);
+  const breadcrumbLd = useMemo(() => {
+    if (!post) return null;
+    const blogUrl =
+      typeof window !== 'undefined' ? `${window.location.origin}/blog` : 'https://malove.app/blog';
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        {
+          '@type': 'ListItem',
+          position: 1,
+          name: t('common.blog.title', { defaultValue: 'Blog' }),
+          item: blogUrl,
+        },
+        {
+          '@type': 'ListItem',
+          position: 2,
+          name: post.title,
+          item: canonicalHref,
+        },
+      ],
+    };
+  }, [post, canonicalHref, t]);
 
   return (
     <>
@@ -294,6 +348,10 @@ const BlogPost = () => {
         <meta property="og:url" content={canonicalHref} />
         <meta property="og:type" content="article" />
         {coverImage ? <meta property="og:image" content={coverImage} /> : null}
+        {articleLd ? <script type="application/ld+json">{JSON.stringify(articleLd)}</script> : null}
+        {breadcrumbLd ? (
+          <script type="application/ld+json">{JSON.stringify(breadcrumbLd)}</script>
+        ) : null}
       </Helmet>
       <PageWrapper
         title={

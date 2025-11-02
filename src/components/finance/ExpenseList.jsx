@@ -1,11 +1,21 @@
-/**
- * ExpenseList Component  
+﻿/**
+ * ExpenseList Component
  * Lista y gestión de gastos
  * Sprint 4 - Completar Finance, S4-T004
  */
 
 import React, { useState } from 'react';
-import { Edit2, Trash2, CheckCircle, Clock, AlertCircle, DollarSign, Search, Filter } from 'lucide-react';
+import useTranslations from '../../hooks/useTranslations';
+import {
+  Edit2,
+  Trash2,
+  CheckCircle,
+  Clock,
+  AlertCircle,
+  DollarSign,
+  Search,
+  Filter,
+} from 'lucide-react';
 import { EXPENSE_CATEGORIES, PAYMENT_STATUS } from '../../services/financeService';
 
 /**
@@ -17,6 +27,7 @@ import { EXPENSE_CATEGORIES, PAYMENT_STATUS } from '../../services/financeServic
  * @param {Function} props.onPayment - Callback al registrar pago
  */
 export function ExpenseList({ expenses = [], onEdit, onDelete, onPayment }) {
+  const { currentLanguage } = useTranslations();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
@@ -24,9 +35,10 @@ export function ExpenseList({ expenses = [], onEdit, onDelete, onPayment }) {
 
   // Filtrar y ordenar gastos
   const filteredExpenses = expenses
-    .filter(expense => {
-      const matchesSearch = expense.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          expense.vendor?.toLowerCase().includes(searchTerm.toLowerCase());
+    .filter((expense) => {
+      const matchesSearch =
+        expense.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        expense.vendor?.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesCategory = filterCategory === 'all' || expense.category === filterCategory;
       const matchesStatus = filterStatus === 'all' || expense.status === filterStatus;
       return matchesSearch && matchesCategory && matchesStatus;
@@ -113,7 +125,7 @@ export function ExpenseList({ expenses = [], onEdit, onDelete, onPayment }) {
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
             >
               <option value="all">Todas las categorías</option>
-              {Object.values(EXPENSE_CATEGORIES).map(cat => (
+              {Object.values(EXPENSE_CATEGORIES).map((cat) => (
                 <option key={cat.id} value={cat.id}>
                   {cat.icon} {cat.name}
                 </option>
@@ -178,11 +190,11 @@ export function ExpenseList({ expenses = [], onEdit, onDelete, onPayment }) {
         </div>
       ) : (
         <div className="space-y-3">
-          {filteredExpenses.map(expense => {
-            const category = EXPENSE_CATEGORIES[expense.category?.toUpperCase()] || EXPENSE_CATEGORIES.OTHER;
-            const percentPaid = expense.amount > 0 
-              ? ((expense.totalPaid || 0) / expense.amount) * 100 
-              : 0;
+          {filteredExpenses.map((expense) => {
+            const category =
+              EXPENSE_CATEGORIES[expense.category?.toUpperCase()] || EXPENSE_CATEGORIES.OTHER;
+            const percentPaid =
+              expense.amount > 0 ? ((expense.totalPaid || 0) / expense.amount) * 100 : 0;
 
             return (
               <div
@@ -211,32 +223,46 @@ export function ExpenseList({ expenses = [], onEdit, onDelete, onPayment }) {
                       <span className="text-xs px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
                         {category.name}
                       </span>
-                      <span className={`text-xs px-2 py-1 rounded-full flex items-center gap-1 ${getStatusColor(expense.status)}`}>
+                      <span
+                        className={`text-xs px-2 py-1 rounded-full flex items-center gap-1 ${getStatusColor(expense.status)}`}
+                      >
                         {getStatusIcon(expense.status)}
                         {getStatusText(expense.status)}
                       </span>
                       {expense.dueDate && (
                         <span className="text-xs text-gray-500 dark:text-gray-400">
-                          Vence: {new Date(expense.dueDate).toLocaleDateString()}
+                          Vence:{' '}
+                          {(() => {
+                            try {
+                              return new Intl.DateTimeFormat(currentLanguage || 'es', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric',
+                              }).format(new Date(expense.dueDate));
+                            } catch {
+                              return new Date(expense.dueDate).toString();
+                            }
+                          })()}
                         </span>
                       )}
                     </div>
 
                     {/* Payment Progress */}
-                    {expense.status !== PAYMENT_STATUS.PAID && expense.status !== PAYMENT_STATUS.PENDING && (
-                      <div className="mb-2">
-                        <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
-                          <span>Pagado: ${(expense.totalPaid || 0).toLocaleString()}</span>
-                          <span>{percentPaid.toFixed(0)}%</span>
+                    {expense.status !== PAYMENT_STATUS.PAID &&
+                      expense.status !== PAYMENT_STATUS.PENDING && (
+                        <div className="mb-2">
+                          <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
+                            <span>Pagado: ${(expense.totalPaid || 0).toLocaleString()}</span>
+                            <span>{percentPaid.toFixed(0)}%</span>
+                          </div>
+                          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                            <div
+                              className="bg-blue-500 h-2 rounded-full transition-all"
+                              style={{ width: `${Math.min(percentPaid, 100)}%` }}
+                            />
+                          </div>
                         </div>
-                        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                          <div
-                            className="bg-blue-500 h-2 rounded-full transition-all"
-                            style={{ width: `${Math.min(percentPaid, 100)}%` }}
-                          />
-                        </div>
-                      </div>
-                    )}
+                      )}
                   </div>
 
                   {/* Right: Amount & Actions */}
@@ -288,9 +314,7 @@ export function ExpenseList({ expenses = [], onEdit, onDelete, onPayment }) {
                 {/* Notes */}
                 {expense.notes && (
                   <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {expense.notes}
-                    </p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">{expense.notes}</p>
                   </div>
                 )}
               </div>

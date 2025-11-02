@@ -1,16 +1,29 @@
 import React, { useState } from 'react';
-import { Clock, Users, MapPin, FileText, Plus, Edit2, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
+import {
+  Clock,
+  Users,
+  MapPin,
+  FileText,
+  Plus,
+  Edit2,
+  Trash2,
+  ChevronDown,
+  ChevronUp,
+} from 'lucide-react';
 import Button from '../ui/Button';
+import { toast } from 'react-toastify';
+import useTranslations from '../../hooks/useTranslations';
 
 /**
  * Gestor de Protocolo de Ceremonias
  * Define orden de eventos, participantes, ubicaciones
  */
 const CeremonyProtocol = ({ weddingId, onSave }) => {
+  const { t } = useTranslations();
   const [protocol, setProtocol] = useState({
     ceremony: [],
     reception: [],
-    party: []
+    party: [],
   });
 
   const [expandedSection, setExpandedSection] = useState('ceremony');
@@ -25,7 +38,7 @@ const CeremonyProtocol = ({ weddingId, onSave }) => {
     location: '',
     participants: '',
     description: '',
-    notes: ''
+    notes: '',
   });
 
   // Templates de eventos comunes
@@ -39,7 +52,7 @@ const CeremonyProtocol = ({ weddingId, onSave }) => {
       { title: 'Intercambio de Anillos', duration: 5, participants: 'Novios + Padrinos' },
       { title: 'Declaración de Matrimonio', duration: 5, participants: 'Oficiante + Novios' },
       { title: 'Salida de Novios', duration: 5, participants: 'Novios' },
-      { title: 'Sesión de Fotos', duration: 45, participants: 'Novios + Fotógrafo' }
+      { title: 'Sesión de Fotos', duration: 45, participants: 'Novios + Fotógrafo' },
     ],
     reception: [
       { title: 'Cóctel de Bienvenida', duration: 60, participants: 'Todos' },
@@ -48,7 +61,7 @@ const CeremonyProtocol = ({ weddingId, onSave }) => {
       { title: 'Primer Plato', duration: 30, participants: 'Todos' },
       { title: 'Segundo Plato', duration: 30, participants: 'Todos' },
       { title: 'Postre', duration: 20, participants: 'Todos' },
-      { title: 'Discursos y Brindis', duration: 30, participants: 'Padrinos + Familia' }
+      { title: 'Discursos y Brindis', duration: 30, participants: 'Padrinos + Familia' },
     ],
     party: [
       { title: 'Primer Baile', duration: 5, participants: 'Novios' },
@@ -57,13 +70,13 @@ const CeremonyProtocol = ({ weddingId, onSave }) => {
       { title: 'Corte de Tarta', duration: 15, participants: 'Novios' },
       { title: 'Lanzamiento de Ramo', duration: 10, participants: 'Novia + Invitadas' },
       { title: 'Baile Libre', duration: 120, participants: 'Todos' },
-      { title: 'Despedida de Novios', duration: 15, participants: 'Todos' }
-    ]
+      { title: 'Despedida de Novios', duration: 15, participants: 'Todos' },
+    ],
   };
 
   const handleAddEvent = () => {
     if (!formData.title) {
-      alert('El título es obligatorio');
+      toast.warn(t('common.protocol.ceremony.titleRequired', 'El título es obligatorio'));
       return;
     }
 
@@ -71,12 +84,12 @@ const CeremonyProtocol = ({ weddingId, onSave }) => {
       id: Date.now().toString(),
       ...formData,
       duration: parseInt(formData.duration) || 15,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     };
 
     setProtocol({
       ...protocol,
-      [activeTab]: [...protocol[activeTab], newEvent]
+      [activeTab]: [...protocol[activeTab], newEvent],
     });
 
     resetForm();
@@ -87,19 +100,19 @@ const CeremonyProtocol = ({ weddingId, onSave }) => {
 
     setProtocol({
       ...protocol,
-      [activeTab]: protocol[activeTab].map(e =>
+      [activeTab]: protocol[activeTab].map((e) =>
         e.id === editingEvent.id ? { ...e, ...formData, duration: parseInt(formData.duration) } : e
-      )
+      ),
     });
 
     resetForm();
   };
 
   const handleDeleteEvent = (id) => {
-    if (confirm('¿Eliminar este evento?')) {
+    if (window.confirm(t('common.protocol.ceremony.confirmDelete', '¿Eliminar este evento?'))) {
       setProtocol({
         ...protocol,
-        [activeTab]: protocol[activeTab].filter(e => e.id !== id)
+        [activeTab]: protocol[activeTab].filter((e) => e.id !== id),
       });
     }
   };
@@ -113,7 +126,7 @@ const CeremonyProtocol = ({ weddingId, onSave }) => {
       location: event.location || '',
       participants: event.participants || '',
       description: event.description || '',
-      notes: event.notes || ''
+      notes: event.notes || '',
     });
     setShowAddModal(true);
   };
@@ -123,7 +136,7 @@ const CeremonyProtocol = ({ weddingId, onSave }) => {
       ...formData,
       title: template.title,
       duration: template.duration,
-      participants: template.participants
+      participants: template.participants,
     });
   };
 
@@ -135,7 +148,7 @@ const CeremonyProtocol = ({ weddingId, onSave }) => {
       location: '',
       participants: '',
       description: '',
-      notes: ''
+      notes: '',
     });
     setEditingEvent(null);
     setShowAddModal(false);
@@ -147,10 +160,14 @@ const CeremonyProtocol = ({ weddingId, onSave }) => {
 
   const getSectionTitle = (section) => {
     switch (section) {
-      case 'ceremony': return 'Ceremonia';
-      case 'reception': return 'Recepción';
-      case 'party': return 'Fiesta';
-      default: return section;
+      case 'ceremony':
+        return 'Ceremonia';
+      case 'reception':
+        return 'Recepción';
+      case 'party':
+        return 'Fiesta';
+      default:
+        return section;
     }
   };
 
@@ -159,17 +176,10 @@ const CeremonyProtocol = ({ weddingId, onSave }) => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900">
-            Protocolo de Ceremonia
-          </h2>
-          <p className="text-sm text-gray-600 mt-1">
-            Organiza el orden y timing de cada momento
-          </p>
+          <h2 className="text-xl font-semibold text-gray-900">Protocolo de Ceremonia</h2>
+          <p className="text-sm text-gray-600 mt-1">Organiza el orden y timing de cada momento</p>
         </div>
-        <Button
-          onClick={() => onSave?.(protocol)}
-          variant="primary"
-        >
+        <Button onClick={() => onSave?.(protocol)} variant="primary">
           Guardar Protocolo
         </Button>
       </div>
@@ -177,7 +187,7 @@ const CeremonyProtocol = ({ weddingId, onSave }) => {
       {/* Tabs */}
       <div className="border-b border-gray-200">
         <div className="flex gap-4">
-          {['ceremony', 'reception', 'party'].map(tab => (
+          {['ceremony', 'reception', 'party'].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -205,9 +215,7 @@ const CeremonyProtocol = ({ weddingId, onSave }) => {
             <FileText className="w-4 h-4 text-blue-600" />
             <span className="text-sm font-medium text-blue-900">Eventos</span>
           </div>
-          <p className="text-2xl font-bold text-blue-700">
-            {protocol[activeTab].length}
-          </p>
+          <p className="text-2xl font-bold text-blue-700">{protocol[activeTab].length}</p>
         </div>
 
         <div className="bg-green-50 border border-green-200 rounded-lg p-4">
@@ -226,7 +234,7 @@ const CeremonyProtocol = ({ weddingId, onSave }) => {
             <span className="text-sm font-medium text-purple-900">Participantes</span>
           </div>
           <p className="text-2xl font-bold text-purple-700">
-            {new Set(protocol[activeTab].map(e => e.participants).filter(Boolean)).size}
+            {new Set(protocol[activeTab].map((e) => e.participants).filter(Boolean)).size}
           </p>
         </div>
       </div>
@@ -245,7 +253,9 @@ const CeremonyProtocol = ({ weddingId, onSave }) => {
       {protocol[activeTab].length === 0 ? (
         <div className="text-center py-12 bg-gray-50 rounded-lg border border-gray-200">
           <FileText className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-          <p className="text-gray-600 mb-2">No hay eventos en {getSectionTitle(activeTab).toLowerCase()}</p>
+          <p className="text-gray-600 mb-2">
+            No hay eventos en {getSectionTitle(activeTab).toLowerCase()}
+          </p>
           <p className="text-sm text-gray-500">Añade eventos o usa una plantilla</p>
         </div>
       ) : (
@@ -343,9 +353,7 @@ const CeremonyProtocol = ({ weddingId, onSave }) => {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Título *
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Título *</label>
                 <input
                   type="text"
                   value={formData.title}
@@ -383,9 +391,7 @@ const CeremonyProtocol = ({ weddingId, onSave }) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Ubicación
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Ubicación</label>
                 <input
                   type="text"
                   value={formData.location}
@@ -409,9 +415,7 @@ const CeremonyProtocol = ({ weddingId, onSave }) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Descripción
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}

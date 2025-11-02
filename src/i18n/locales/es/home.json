@@ -1,20 +1,20 @@
 {
   "header": {
     "title": "Bienvenidos, {{name}}",
-    "subtitle": "Cada detalle hace tu boda inolvidable",
+    "subtitle": "Cada detalle hace que tu boda sea inolvidable",
     "logoAlt": "Logo de la boda",
     "titleFallback": "tu boda",
     "redo": {
       "button": "Rehacer tutorial",
       "confirm": "Esto eliminará datos locales y creará una nueva boda de prueba. ¿Continuar?",
-      "success": "Tutorial reiniciado: recargando...",
+      "success": "Tutorial reiniciado. Recargando...",
       "error": "No se pudo reiniciar el tutorial"
     }
   },
   "progress": {
     "tasksLabel": "Progreso de tareas",
     "completion": "{{value}}% completado",
-    "expected": " · Esperado: {{value}}%",
+    "expected": " · Objetivo: {{value}}%",
     "loading": "Actualizando progreso...",
     "error": "No pudimos sincronizar el avance. Se muestra el último valor guardado.",
     "status": {
@@ -27,7 +27,7 @@
   "quickActions": {
     "provider": "Buscar proveedor",
     "guest": "Añadir invitado",
-    "movement": "Añadir movimiento",
+    "movement": "Registrar movimiento",
     "note": "Nueva nota"
   },
   "stats": {
@@ -52,8 +52,8 @@
   },
   "providers": {
     "fallbackName": "Proveedor sin nombre",
-    "addSuccess": "Proveedor añadido al panel rápido",
-    "addError": "No se pudo guardar el proveedor seleccionado"
+    "addSuccess": "Proveedor añadido al panel de acceso rápido",
+    "addError": "No pudimos guardar el proveedor seleccionado."
   },
   "weddingName": {
     "connector": " y "
@@ -62,27 +62,27 @@
     "shared": {
       "cancel": "Cancelar",
       "save": "Guardar",
-      "goToGuests": "Ir a invitados",
-      "goToFinance": "Ir a finanzas",
-      "goToIdeas": "Ir a ideas"
+      "goToGuests": "Ir a Invitados",
+      "goToFinance": "Ir a Finanzas",
+      "goToIdeas": "Ir a Ideas"
     },
     "guest": {
       "title": "Añadir invitado",
       "name": "Nombre",
-      "side": "Parte de",
+      "side": "Pertenece a",
       "sideBride": "Novia",
       "sideGroom": "Novio",
       "sideBoth": "Ambos",
       "contact": "Contacto",
       "missingName": "Añade un nombre para el invitado.",
       "contactNote": "Contacto: {{value}}",
-      "note": "Añadido desde la pantalla principal",
+      "note": "Añadido desde la pantalla de inicio",
       "success": "Invitado añadido",
       "error": "No se pudo añadir el invitado",
       "unknownError": "Ocurrió un error al añadir el invitado."
     },
     "movement": {
-      "title": "Nuevo movimiento",
+      "title": "Registrar movimiento",
       "concept": "Concepto",
       "amount": "Cantidad",
       "date": "Fecha",

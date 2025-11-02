@@ -46,22 +46,22 @@ async function findBakFiles() {
 function findBakFilesManually(dir, results = []) {
   try {
     const files = fs.readdirSync(dir);
-    
+
     for (const file of files) {
       const filePath = path.join(dir, file);
-      
+
       // Ignorar node_modules, dist, etc.
       if (file === 'node_modules' || file === 'dist' || file === '.git' || file === 'coverage') {
         continue;
       }
-      
+
       try {
         const stat = fs.statSync(filePath);
-        
+
         if (stat.isDirectory()) {
           findBakFilesManually(filePath, results);
-        } else if (file.endsWith('.bak')) {
-          // Ruta relativa desde root
+        } else if (file.includes('.bak')) {
+          // Buscar cualquier archivo que contenga .bak (ej: .bak3, .bak-json, etc.)
           const relativePath = path.relative(rootDir, filePath);
           results.push(relativePath);
         }
@@ -72,7 +72,7 @@ function findBakFilesManually(dir, results = []) {
   } catch (err) {
     console.error(`Error leyendo directorio ${dir}:`, err.message);
   }
-  
+
   return results;
 }
 
@@ -108,61 +108,61 @@ async function deleteBakFiles(files) {
     console.log('✅ No se encontraron archivos .bak para eliminar.\n');
     return { deleted: 0, totalSize: 0 };
   }
-  
+
   console.log(`📦 Archivos .bak encontrados: ${files.length}\n`);
-  
+
   let totalSize = 0;
   const byCategory = {};
-  
+
   // Agrupar por categoría
   for (const file of files) {
     const size = getFileSize(file);
     totalSize += size;
-    
+
     let category = 'Otros';
     if (file.includes('i18n/locales')) category = 'Traducciones (i18n)';
     else if (file.includes('backend')) category = 'Backend';
     else if (file.includes('pages')) category = 'Páginas';
     else if (file.includes('components')) category = 'Componentes';
-    
+
     if (!byCategory[category]) byCategory[category] = [];
     byCategory[category].push({ path: file, size });
   }
-  
+
   // Mostrar resumen por categoría
   for (const [category, items] of Object.entries(byCategory)) {
     const categorySize = items.reduce((sum, item) => sum + item.size, 0);
     console.log(`\n📁 ${category} (${items.length} archivos, ${formatBytes(categorySize)})`);
-    
+
     for (const item of items.slice(0, 5)) {
       console.log(`   - ${item.path} (${formatBytes(item.size)})`);
     }
-    
+
     if (items.length > 5) {
       console.log(`   ... y ${items.length - 5} más`);
     }
   }
-  
+
   console.log(`\n📊 Total: ${files.length} archivos, ${formatBytes(totalSize)}\n`);
-  
+
   if (isDryRun) {
     console.log('🔍 DRY-RUN: Los archivos NO fueron eliminados.\n');
     console.log('Para eliminar realmente, ejecuta:');
     console.log('   node scripts/cleanup-bak-files.js\n');
     return { deleted: 0, totalSize: 0 };
   }
-  
+
   // Confirmar eliminación
   console.log('⚠️  ¿Estás seguro de que deseas eliminar estos archivos?\n');
   console.log('   Presiona Ctrl+C para cancelar...\n');
-  
+
   // Dar 3 segundos para cancelar
-  await new Promise(resolve => setTimeout(resolve, 3000));
-  
+  await new Promise((resolve) => setTimeout(resolve, 3000));
+
   console.log('🗑️  Eliminando archivos...\n');
-  
+
   let deleted = 0;
-  
+
   for (const file of files) {
     try {
       // Usar git rm si está disponible
@@ -181,9 +181,11 @@ async function deleteBakFiles(files) {
       console.error(`   ❌ Error eliminando ${file}:`, error.message);
     }
   }
-  
-  console.log(`\n✅ Eliminados ${deleted} de ${files.length} archivos (${formatBytes(totalSize)} liberados)\n`);
-  
+
+  console.log(
+    `\n✅ Eliminados ${deleted} de ${files.length} archivos (${formatBytes(totalSize)} liberados)\n`
+  );
+
   return { deleted, totalSize };
 }
 
@@ -194,16 +196,15 @@ async function main() {
   try {
     const bakFiles = await findBakFiles();
     const result = await deleteBakFiles(bakFiles);
-    
+
     if (result.deleted > 0 && !isDryRun) {
       console.log('📝 Próximos pasos:\n');
       console.log('   1. Revisar cambios: git status');
       console.log('   2. Commitear: git commit -m "chore: eliminar archivos .bak huérfanos"');
       console.log('   3. Subir: git push origin windows\n');
     }
-    
+
     console.log('==============================\n');
-    
   } catch (error) {
     console.error('\n❌ Error:', error.message);
     process.exit(1);

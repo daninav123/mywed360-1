@@ -1,6 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import useTranslations from '../../hooks/useTranslations';
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
 } from 'recharts';
 
 import { get as apiGet } from '../../services/apiClient';
@@ -39,7 +46,9 @@ function UsersWithErrorsTable({ timeframe = 'day' }) {
       }
     };
     load();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, [timeframe]);
 
   if (loading) return <div className="text-sm text-gray-500">Cargando usuarios...</div>;
@@ -62,11 +71,27 @@ function UsersWithErrorsTable({ timeframe = 'day' }) {
               <td className="py-2 px-3">{r.user?.email || r.user?.uid || 'unknown'}</td>
               <td className="py-2 px-3 text-right">{r.count}</td>
               <td className="py-2 px-3">{(r.sources || []).join(', ')}</td>
-              <td className="py-2 px-3">{new Date(r.lastTimestamp || Date.now()).toLocaleString()}</td>
+              <td className="py-2 px-3">
+                {(() => {
+                  try {
+                    const { currentLanguage } = useTranslations();
+                    return new Intl.DateTimeFormat(currentLanguage || 'es', {
+                      dateStyle: 'short',
+                      timeStyle: 'short',
+                    }).format(new Date(r.lastTimestamp || Date.now()));
+                  } catch {
+                    return new Date(r.lastTimestamp || Date.now()).toString();
+                  }
+                })()}
+              </td>
             </tr>
           ))}
           {items.length === 0 && (
-            <tr><td className="py-2 px-3" colSpan={4}>Sin usuarios con errores recientes</td></tr>
+            <tr>
+              <td className="py-2 px-3" colSpan={4}>
+                Sin usuarios con errores recientes
+              </td>
+            </tr>
           )}
         </tbody>
       </table>
@@ -94,11 +119,16 @@ function ErrorRateChart({ timeframe = 'day' }) {
         } else {
           setErrors([]);
         }
-      } catch { setErrors([]); }
-      finally { if (mounted) setLoading(false); }
+      } catch {
+        setErrors([]);
+      } finally {
+        if (mounted) setLoading(false);
+      }
     };
     load();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, [timeframe]);
 
   const series = useMemo(() => {
@@ -108,7 +138,22 @@ function ErrorRateChart({ timeframe = 'day' }) {
       const min = Math.floor(ts / 60000) * 60000;
       byMin.set(min, (byMin.get(min) || 0) + 1);
     }
-    return Array.from(byMin.entries()).sort((a,b)=>a[0]-b[0]).map(([t,c])=>({ date: new Date(t).toLocaleTimeString(), count: c }));
+    try {
+      const { currentLanguage } = useTranslations();
+      return Array.from(byMin.entries())
+        .sort((a, b) => a[0] - b[0])
+        .map(([t, c]) => ({
+          date: new Intl.DateTimeFormat(currentLanguage || 'es', {
+            hour: '2-digit',
+            minute: '2-digit',
+          }).format(new Date(t)),
+          count: c,
+        }));
+    } catch {
+      return Array.from(byMin.entries())
+        .sort((a, b) => a[0] - b[0])
+        .map(([t, c]) => ({ date: new Date(t).toString(), count: c }));
+    }
   }, [errors]);
 
   if (loading) return <div className="text-sm text-gray-500">Cargando errores...</div>;
@@ -135,9 +180,13 @@ export default function AdminHealth() {
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-semibold">Salud del Sistema</h2>
         <div className="flex gap-2">
-          {['day','week','month'].map(tf => (
-            <button key={tf} onClick={() => setTimeframe(tf)} className={`px-3 py-1 rounded text-sm ${timeframe===tf? 'bg-indigo-600 text-white':'bg-gray-200'}`}>
-              {tf==='day'?'Día':tf==='week'?'Semana':'Mes'}
+          {['day', 'week', 'month'].map((tf) => (
+            <button
+              key={tf}
+              onClick={() => setTimeframe(tf)}
+              className={`px-3 py-1 rounded text-sm ${timeframe === tf ? 'bg-indigo-600 text-white' : 'bg-gray-200'}`}
+            >
+              {tf === 'day' ? 'Día' : tf === 'week' ? 'Semana' : 'Mes'}
             </button>
           ))}
         </div>

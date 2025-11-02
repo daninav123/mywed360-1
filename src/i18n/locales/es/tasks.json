@@ -57,7 +57,7 @@
       "today": "Hoy"
     },
     "templates": {
-      "confirmMenu": "Confirmar menúú final con catering",
+      "confirmMenu": "Confirmar menú final con el catering",
       "reviewDecoration": "Revisar decoración floral",
       "confirmPlaylist": "Confirmar playlist con DJ",
       "coordinatePhotographer": "Coordinar horarios con fotógrafo",
@@ -65,7 +65,7 @@
       "confirmSeating": "Confirmar asientos para ceremonia",
       "reviewTableSetup": "Revisar montaje de mesas",
       "soundCheck": "Prueba de sonido",
-      "confirmKidsMenu": "Confirmar menúú infantil",
+      "confirmKidsMenu": "Confirmar menú infantil",
       "prepareEmergencyKit": "Preparar kit de emergencia"
     },
     "confirmDelete": "¿Eliminar esta tarea?",
@@ -276,27 +276,27 @@
       },
       "calendar": {
         "zoom": {
-          "less": "Reducir zoom del timeline",
-          "more": "Aumentar zoom del timeline",
-          "reset": "Ajustar zoom para mostrar todo el Gantt",
+          "less": "Reducir zoom del cronograma",
+          "more": "Aumentar zoom del cronograma",
+          "reset": "Ajustar el zoom para mostrar todo el Gantt",
           "label": "Zoom horizontal del Gantt"
         },
-        "title": "Calendario de Eventos",
+        "title": "Calendario de eventos",
         "errors": {
           "title": "Error al cargar el calendario",
-          "description": "Hubo un problema al cargar el calendario. Puedes gestionar tus eventos a trav�s de la lista inferior."
+          "description": "Hubo un problema al cargar el calendario. Puedes gestionar tus eventos a través de la lista inferior."
         },
         "empty": "No hay tareas disponibles",
         "fallback": {
-          "eventUntitled": "Evento sin t�tulo"
+          "eventUntitled": "Evento sin título"
         }
       },
       "gantt": {
-        "title": "Planificación a Largo Plazo",
+        "title": "Planificación a largo plazo",
         "controls": {
           "showSubtasks": "Mostrar subtareas",
           "zoomLabel": "Zoom",
-          "fit": "Ajustar",
+          "fit": "Ajustar vista",
           "clearFilters": "Limpiar filtros"
         },
         "filters": {
@@ -310,26 +310,26 @@
           "statusOk": "Solo en curso"
         },
         "empty": {
-          "noScheduled": "Aún no hay bloques planificados en el timeline. Importa una plantilla o crea una tarea padre desde la checklist para empezar."
+          "noScheduled": "Aún no hay bloques planificados en el cronograma. Importa una plantilla o crea una tarea padre desde la checklist para empezar."
         }
       },
       "common": {
         "noWeddingTitle": "Selecciona o crea una boda para ver tareas",
         "noWeddingDescription": "No hay una boda activa en este momento. Dirígete a la sección \"Bodas\" para elegir una existente o crear una nueva.",
         "errors": {
-          "generic": "Algo sali� mal."
+          "generic": "Algo salió mal."
         },
         "fallbacks": {
           "task": "Tarea",
-          "untitled": "Sin t�tulo",
-          "untitledTask": "Tarea sin t�tulo"
+          "untitled": "Sin título",
+          "untitledTask": "Tarea sin título"
         }
       },
       "notifications": {
         "overdueTitle": "Tarea vencida",
-        "upcomingTitle": "Tarea pr�xima a vencer",
-        "overdueMessage": "{{name}} venci� ({{date}})",
-        "upcomingMessage": "{{name}} vence antes de 24h ({{date}})",
+        "upcomingTitle": "Tarea próxima a vencer",
+        "overdueMessage": "{{name}} venció ({{date}})",
+        "upcomingMessage": "{{name}} vence en menos de 24 h ({{date}})",
         "blocks": {
           "delayed": "Bloque atrasado y sin finalizar",
           "overdueSubtasks": "{{count}} subtareas vencidas",

@@ -1,0 +1,33 @@
+﻿*** Begin Patch
+*** Update File: src/components/ChatWidget.jsx
+@@
+-          out.commands.push({
+-            entity: 'meeting',
+-            action: 'update',
+-            payload: { title: title || 'Reunión', start: start.toISOString(), end: end.toISOString() },
+-          });
+-          out.reply = `Reunión${title ? ` "${title}"` : ''} reprogramada al ${start.toLocaleDateString('es-ES')} ${start.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}.`;
+-          return out;
++          out.commands.push({
++            entity: 'meeting',
++            action: 'update',
++            payload: { title: title || 'Reunión', start: start.toISOString(), end: end.toISOString() },
++          });
++          const when = (() => {
++            try {
++              if (format && typeof format.datetime === 'function') return format.datetime(start);
++              return new Intl.DateTimeFormat(currentLanguage || 'es', {
++                dateStyle: 'short',
++                timeStyle: 'short',
++              }).format(start);
++            } catch {
++              return start.toString();
++            }
++          })();
++          out.reply = t('chat.messages.meetingRescheduled', {
++            title: title || '',
++            when,
++            defaultValue: `Reunión${title ? ` "${title}"` : ''} reprogramada al ${when}.`,
++          });
++          return out;
+*** End Patch

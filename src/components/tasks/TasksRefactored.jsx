@@ -61,7 +61,6 @@ const clampZoomValue = (value, { min = GANTT_ZOOM_MIN, max = GANTT_ZOOM_MAX } = 
 
 // Funcin helper para cargar datos de Firestore de forma segura con fallbacks
 
-
 // Componente principal Tasks refactorizado
 export default function TasksRefactored() {
   // Estados - Inicializacin segura con manejo de errores
@@ -69,17 +68,11 @@ export default function TasksRefactored() {
   // Contexto de boda activa
   const { activeWedding } = useWedding();
   const navigate = useNavigate();
-  const { t } = useTranslations();
+  const { t, currentLanguage } = useTranslations();
 
   const fallbackTaskLabel = useMemo(() => t('tasks.page.common.fallbacks.task'), [t]);
-  const fallbackUntitledTask = useMemo(
-    () => t('tasks.page.common.fallbacks.untitledTask'),
-    [t]
-  );
-  const fallbackSubtaskLabel = useMemo(
-    () => t('tasks.page.sidePanel.subtasks.default'),
-    [t]
-  );
+  const fallbackUntitledTask = useMemo(() => t('tasks.page.common.fallbacks.untitledTask'), [t]);
+  const fallbackSubtaskLabel = useMemo(() => t('tasks.page.sidePanel.subtasks.default'), [t]);
 
   // Hooks Firestore para tasks y meetings dentro de la boda
   const {
@@ -127,59 +120,88 @@ export default function TasksRefactored() {
     try {
       const hasCG = Array.isArray(nestedSubtasks) && nestedSubtasks.length > 0;
       if (hasCG) {
-        try { nestedFallbackUnsubsRef.current.forEach((u) => u && u()); } catch {}
+        try {
+          nestedFallbackUnsubsRef.current.forEach((u) => u && u());
+        } catch {}
         nestedFallbackUnsubsRef.current = [];
         setNestedSubtasksFallback([]);
         return;
       }
       if (!activeWedding || !db) return;
-      try { nestedFallbackUnsubsRef.current.forEach((u) => u && u()); } catch {}
+      try {
+        nestedFallbackUnsubsRef.current.forEach((u) => u && u());
+      } catch {}
       nestedFallbackUnsubsRef.current = [];
 
       const parents = parentTaskIds.split(',').filter(Boolean);
-      if (parents.length === 0) { setNestedSubtasksFallback([]); return; }
+      if (parents.length === 0) {
+        setNestedSubtasksFallback([]);
+        return;
+      }
 
       const acc = new Map();
       parents.forEach((pid) => {
         try {
           const colRef = collection(db, 'weddings', activeWedding, 'tasks', pid, 'subtasks');
-          const unsub = onSnapshot(colRef, (snap) => {
-            try {
-              for (const [k, v] of Array.from(acc.entries())) {
-                if (String(v.__path || '').includes(`/tasks/${pid}/subtasks/`)) acc.delete(k);
-              }
-              snap.docs.forEach((d) => {
-                const data = d.data() || {};
-                const docObj = { ...data, id: d.id, __path: d.ref.path, parentId: data.parentId || pid, weddingId: activeWedding };
-                acc.set(docObj.__path || `${pid}:${d.id}`, docObj);
-              });
-              setNestedSubtasksFallback(Array.from(acc.values()));
-            } catch {}
-          }, () => {});
+          const unsub = onSnapshot(
+            colRef,
+            (snap) => {
+              try {
+                for (const [k, v] of Array.from(acc.entries())) {
+                  if (String(v.__path || '').includes(`/tasks/${pid}/subtasks/`)) acc.delete(k);
+                }
+                snap.docs.forEach((d) => {
+                  const data = d.data() || {};
+                  const docObj = {
+                    ...data,
+                    id: d.id,
+                    __path: d.ref.path,
+                    parentId: data.parentId || pid,
+                    weddingId: activeWedding,
+                  };
+                  acc.set(docObj.__path || `${pid}:${d.id}`, docObj);
+                });
+                setNestedSubtasksFallback(Array.from(acc.values()));
+              } catch {}
+            },
+            () => {}
+          );
           nestedFallbackUnsubsRef.current.push(unsub);
         } catch {}
         // Intentar tambi�n ruta singular 'task/{pid}/subtasks' por compatibilidad
         try {
           const colRefAlt = collection(db, 'weddings', activeWedding, 'task', pid, 'subtasks');
-          const unsubAlt = onSnapshot(colRefAlt, (snap) => {
-            try {
-              for (const [k, v] of Array.from(acc.entries())) {
-                if (String(v.__path || '').includes(`/task/${pid}/subtasks/`)) acc.delete(k);
-              }
-              snap.docs.forEach((d) => {
-                const data = d.data() || {};
-                const docObj = { ...data, id: d.id, __path: d.ref.path, parentId: data.parentId || pid, weddingId: activeWedding };
-                acc.set(docObj.__path || `${pid}:${d.id}`, docObj);
-              });
-              setNestedSubtasksFallback(Array.from(acc.values()));
-            } catch {}
-          }, () => {});
+          const unsubAlt = onSnapshot(
+            colRefAlt,
+            (snap) => {
+              try {
+                for (const [k, v] of Array.from(acc.entries())) {
+                  if (String(v.__path || '').includes(`/task/${pid}/subtasks/`)) acc.delete(k);
+                }
+                snap.docs.forEach((d) => {
+                  const data = d.data() || {};
+                  const docObj = {
+                    ...data,
+                    id: d.id,
+                    __path: d.ref.path,
+                    parentId: data.parentId || pid,
+                    weddingId: activeWedding,
+                  };
+                  acc.set(docObj.__path || `${pid}:${d.id}`, docObj);
+                });
+                setNestedSubtasksFallback(Array.from(acc.values()));
+              } catch {}
+            },
+            () => {}
+          );
           nestedFallbackUnsubsRef.current.push(unsubAlt);
         } catch {}
       });
 
       return () => {
-        try { nestedFallbackUnsubsRef.current.forEach((u) => u && u()); } catch {}
+        try {
+          nestedFallbackUnsubsRef.current.forEach((u) => u && u());
+        } catch {}
         nestedFallbackUnsubsRef.current = [];
       };
     } catch (_) {}
@@ -187,7 +209,6 @@ export default function TasksRefactored() {
 
   // Fallback para estructura con coleccin singular 'task':
   // Escucha weddings/{id}/task/*/subtasks/* si el collectionGroup no devuelve nada
-  
 
   // Migracin suave de subtareas planas -> anidadas (una vez por boda)
   const migrationAttemptedRef = useRef(new Set());
@@ -195,15 +216,15 @@ export default function TasksRefactored() {
     (async () => {
       try {
         if (!activeWedding) return;
-        
+
         // Prevenir múltiples migraciones para la misma boda
         if (migrationAttemptedRef.current.has(activeWedding)) return;
-        
+
         const flatCount = Array.isArray(tasksState)
           ? tasksState.filter((t) => String(t?.type || '') === 'subtask').length
           : 0;
         const nestedCount = Array.isArray(nestedSubtasks) ? nestedSubtasks.length : 0;
-        
+
         if (flatCount > 0 && nestedCount < flatCount) {
           // Marcar como intentado antes de ejecutar
           migrationAttemptedRef.current.add(activeWedding);
@@ -227,7 +248,7 @@ export default function TasksRefactored() {
   const [showAllTasks, setShowAllTasks] = useState(() => {
     try {
       const qs = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
-      const raw = qs ? (qs.get('showAllTasks') || qs.get('allTasks') || qs.get('view') || '') : '';
+      const raw = qs ? qs.get('showAllTasks') || qs.get('allTasks') || qs.get('view') || '' : '';
       const v = String(raw).toLowerCase();
       return v === '1' || v === 'true' || v === 'yes' || v === 'all-tasks';
     } catch (_) {
@@ -282,65 +303,136 @@ export default function TasksRefactored() {
       const raw = String(task?.title || task?.name || '').toLowerCase();
       const category = String(task?.category || '').toUpperCase();
       let title = raw;
-      try { title = raw.normalize('NFD').replace(/[\\u0300-\\u036f]/g, ''); } catch {}
+      try {
+        title = raw.normalize('NFD').replace(/[\\u0300-\\u036f]/g, '');
+      } catch {}
 
       // Guests / RSVP
       if (category === 'INVITADOS') return '/invitados';
-      if (title.includes('invitad') || title.includes('rsvp') || title.includes('lista de invitados') || title.includes('confirmaciones')) return '/invitados';
+      if (
+        title.includes('invitad') ||
+        title.includes('rsvp') ||
+        title.includes('lista de invitados') ||
+        title.includes('confirmaciones')
+      )
+        return '/invitados';
 
       if (category === 'CEREMONIA' || title.includes('ceremonia') || title.includes('protocolo'))
         return '/protocolo/momentos-especiales';
 
       // Website / design
-      if (title.includes('pagina web') || title.includes('hacer pagina web') || title.includes('crear web') || title.includes('diseno web') || title.includes('wedding site') || title.includes('web boda') || title.includes('diseno-web')) return '/diseno-web';
+      if (
+        title.includes('pagina web') ||
+        title.includes('hacer pagina web') ||
+        title.includes('crear web') ||
+        title.includes('diseno web') ||
+        title.includes('wedding site') ||
+        title.includes('web boda') ||
+        title.includes('diseno-web')
+      )
+        return '/diseno-web';
       // Public website
-      if (title.includes('web publica') || title.includes('publicar web') || title.includes('editar web publica')) return '/web';
+      if (
+        title.includes('web publica') ||
+        title.includes('publicar web') ||
+        title.includes('editar web publica')
+      )
+        return '/web';
 
       // Invitations / stationery
-      if (category === 'PAPELERIA' || title.includes('invitacion') || title.includes('invitaciones') || title.includes('save-the-date') || title.includes('save the date') || title.includes('papeleria')) return '/disenos/invitaciones';
+      if (
+        category === 'PAPELERIA' ||
+        title.includes('invitacion') ||
+        title.includes('invitaciones') ||
+        title.includes('save-the-date') ||
+        title.includes('save the date') ||
+        title.includes('papeleria')
+      )
+        return '/disenos/invitaciones';
 
       // Seating plan
-      if (title.includes('plano de mesas') || title.includes('seating') || title.includes('asiento') || title.includes('colocar mesas')) return '/disenos/seating-plan';
+      if (
+        title.includes('plano de mesas') ||
+        title.includes('seating') ||
+        title.includes('asiento') ||
+        title.includes('colocar mesas')
+      )
+        return '/disenos/seating-plan';
 
       // Menu / catering
-      if (category === 'COMIDA' || title.includes('menu') || title.includes('catering') || title.includes('degustacion')) return '/disenos/menu-catering';
+      if (
+        category === 'COMIDA' ||
+        title.includes('menu') ||
+        title.includes('catering') ||
+        title.includes('degustacion')
+      )
+        return '/disenos/menu-catering';
 
       // Suppliers (contracts and budgets)
-      if (title.includes('contrato') || title.includes('firmar contrato')) return '/proveedores/contratos';
+      if (title.includes('contrato') || title.includes('firmar contrato'))
+        return '/proveedores/contratos';
       if (title.includes('presupuesto') || title.includes('proveedor')) return '/proveedores';
 
       // Protocol
-      if (title.includes('lista de verificacion') || title.includes('checklist')) return '/protocolo/checklist';
-      if (title.includes('momentos especiales') || title.includes('votos') || title.includes('discurso')) return '/protocolo/momentos-especiales';
-      if (title.includes('ensayo') || title.includes('timing') || title.includes('cronograma')) return '/protocolo/timing';
-      if (title.includes('documentos legales') || title.includes('documentacion')) return '/protocolo/documentos';
+      if (title.includes('lista de verificacion') || title.includes('checklist'))
+        return '/protocolo/checklist';
+      if (
+        title.includes('momentos especiales') ||
+        title.includes('votos') ||
+        title.includes('discurso')
+      )
+        return '/protocolo/momentos-especiales';
+      if (title.includes('ensayo') || title.includes('timing') || title.includes('cronograma'))
+        return '/protocolo/timing';
+      if (title.includes('documentos legales') || title.includes('documentacion'))
+        return '/protocolo/documentos';
 
       // Ideas / inspiration
-      if (title.includes('ideas') || title.includes('inspiracion') || title.includes('moodboard')) return '/inspiracion';
+      if (title.includes('ideas') || title.includes('inspiracion') || title.includes('moodboard'))
+        return '/inspiracion';
 
       // Finance
-      if (title.includes('presupuesto general') || title.includes('gastos') || title.includes('pagos') || title.includes('facturas') || title.includes('deposito') || title.includes('senal')) return '/finance';
+      if (
+        title.includes('presupuesto general') ||
+        title.includes('gastos') ||
+        title.includes('pagos') ||
+        title.includes('facturas') ||
+        title.includes('deposito') ||
+        title.includes('senal')
+      )
+        return '/finance';
 
       return null;
-    } catch { return null; }
+    } catch {
+      return null;
+    }
   }, []);
-  const handleTaskIntent = useCallback((task, fallback) => {
-    const kind = String(task?.__kind || '').toLowerCase();
-    const taskType = String(task?.type || (kind === 'subtask' ? 'subtask' : 'task')).toLowerCase();
-    if (taskType !== 'subtask') {
+  const handleTaskIntent = useCallback(
+    (task, fallback) => {
+      const kind = String(task?.__kind || '').toLowerCase();
+      const taskType = String(
+        task?.type || (kind === 'subtask' ? 'subtask' : 'task')
+      ).toLowerCase();
+      if (taskType !== 'subtask') {
+        if (typeof fallback === 'function') fallback();
+        return false;
+      }
+      const route = getQuickRouteForTask(task);
+      if (route) {
+        try {
+          navigate(route);
+        } catch {}
+        // Cerrar modales si se abri) desde el modal de "todas las tareas"
+        try {
+          setShowAllTasks(false);
+        } catch {}
+        return true;
+      }
       if (typeof fallback === 'function') fallback();
       return false;
-    }
-    const route = getQuickRouteForTask(task);
-    if (route) {
-      try { navigate(route); } catch {}
-      // Cerrar modales si se abri) desde el modal de "todas las tareas"
-      try { setShowAllTasks(false); } catch {}
-      return true;
-    }
-    if (typeof fallback === 'function') fallback();
-    return false;
-  }, [getQuickRouteForTask, navigate]);
+    },
+    [getQuickRouteForTask, navigate]
+  );
 
   // Exponer helpers en modo debug para correccin in-situ
   // (movido m�s abajo tras declarar projectStart/projectEnd para evitar TDZ)
@@ -358,17 +450,18 @@ export default function TasksRefactored() {
     );
   }
 
-
   // Etiqueta de mes para el calendario (EJ: "septiembre 2025")
   const monthLabel = useMemo(() => {
     try {
-      return new Intl.DateTimeFormat('es-ES', { month: 'long', year: 'numeric' }).format(
-        calendarDate
-      );
+      // Use current i18n language for month/year label
+      return new Intl.DateTimeFormat(currentLanguage || 'es', {
+        month: 'long',
+        year: 'numeric',
+      }).format(calendarDate);
     } catch (_) {
       return '';
     }
-  }, [calendarDate]);
+  }, [calendarDate, currentLanguage]);
 
   // Altura del contenedor del calendario (reactiva al tama�o de ventana)
   const [calendarContainerHeight, setCalendarContainerHeight] = useState(520);
@@ -414,13 +507,19 @@ export default function TasksRefactored() {
     if (Array.isArray(item.assignees)) {
       item.assignees.filter(Boolean).forEach((val) => collected.add(String(val)));
     }
-    const fallbackKeys = ['assignee', 'responsible', 'responsable', 'assignedTo', 'assigned', 'owner'];
+    const fallbackKeys = [
+      'assignee',
+      'responsible',
+      'responsable',
+      'assignedTo',
+      'assigned',
+      'owner',
+    ];
     for (const key of fallbackKeys) {
       if (item[key]) collected.add(String(item[key]));
     }
     return Array.from(collected);
   }, []);
-
 
   // Suscripcin a cambios del estado de sincronizaci�nn (online/syncing/pending)
   useEffect(() => {
@@ -453,8 +552,7 @@ export default function TasksRefactored() {
           fromStorage = true;
         }
       }
-    } catch {
-    }
+    } catch {}
     ganttZoomMetaRef.current.fromStorage = fromStorage;
     ganttZoomMetaRef.current.persistReady = fromStorage;
     return value;
@@ -536,7 +634,11 @@ export default function TasksRefactored() {
       texto.includes('bebida')
     ) {
       return 'COMIDA';
-    } else if (texto.includes('ceremon') || texto.includes('protocolo') || texto.includes('ensayo')) {
+    } else if (
+      texto.includes('ceremon') ||
+      texto.includes('protocolo') ||
+      texto.includes('ensayo')
+    ) {
       return 'CEREMONIA';
     } else if (texto.includes('decora') || texto.includes('adorno') || texto.includes('flor')) {
       return 'decoraci�n';
@@ -633,16 +735,46 @@ export default function TasksRefactored() {
 
       // Si las reglas simples no funcionan, usamos IA
       const palabrasClave = {
-  LUGAR: ['venue','location','lugar','sitio','espacio','sal�n','jard�n','terraza'],
-  INVITADOS: ['guests','invitados','personas','asistentes','confirmaciones','lista','rsvp'],
-  COMIDA: ['catering','food','comida','bebida','menu','bocadillos','pastel','torta'],
-  CEREMONIA: ['ceremonia','protocolo','votos','ensayo','celebrante','testigos','expediente'],
-  DECORACION: ['decoraci�n','flores','arreglos','centros de mesa','iluminaci�n','ambientaci�n'],
-  PAPELERIA: ['invitaciones','papeler�a','save the date','tarjetas','programa','seating plan'],
-  MUSICA: ['m�sica','dj','banda','playlist','sonido','baile','entretenimiento'],
-  FOTOGRAFO: ['fotograf�a','video','recuerdos','�lbum','sesi�n'],
-  VESTUARIO: ['vestido','traje','accesorios','zapatos','maquillaje','peluquer�a'],
-};
+        LUGAR: ['venue', 'location', 'lugar', 'sitio', 'espacio', 'sal�n', 'jard�n', 'terraza'],
+        INVITADOS: [
+          'guests',
+          'invitados',
+          'personas',
+          'asistentes',
+          'confirmaciones',
+          'lista',
+          'rsvp',
+        ],
+        COMIDA: ['catering', 'food', 'comida', 'bebida', 'menu', 'bocadillos', 'pastel', 'torta'],
+        CEREMONIA: [
+          'ceremonia',
+          'protocolo',
+          'votos',
+          'ensayo',
+          'celebrante',
+          'testigos',
+          'expediente',
+        ],
+        DECORACION: [
+          'decoraci�n',
+          'flores',
+          'arreglos',
+          'centros de mesa',
+          'iluminaci�n',
+          'ambientaci�n',
+        ],
+        PAPELERIA: [
+          'invitaciones',
+          'papeler�a',
+          'save the date',
+          'tarjetas',
+          'programa',
+          'seating plan',
+        ],
+        MUSICA: ['m�sica', 'dj', 'banda', 'playlist', 'sonido', 'baile', 'entretenimiento'],
+        FOTOGRAFO: ['fotograf�a', 'video', 'recuerdos', '�lbum', 'sesi�n'],
+        VESTUARIO: ['vestido', 'traje', 'accesorios', 'zapatos', 'maquillaje', 'peluquer�a'],
+      };
 
       // Contar coincidencias por categor�­a
       const scores = {};
@@ -795,9 +927,12 @@ export default function TasksRefactored() {
             };
             const targetRef = doc(
               db,
-              'weddings', activeWedding,
-              'tasks', String(formData.parentTaskId),
-              'subtasks', String(subId)
+              'weddings',
+              activeWedding,
+              'tasks',
+              String(formData.parentTaskId),
+              'subtasks',
+              String(subId)
             );
             await setDoc(targetRef, nestedSubtask, { merge: true });
 
@@ -830,7 +965,11 @@ export default function TasksRefactored() {
           isDisabled: false,
           dependencies: [],
           createdAt: serverTimestamp(),
-          mode: formData.parentTaskId ? (formData.unscheduled ? 'unscheduled' : 'scheduled') : undefined,
+          mode: formData.parentTaskId
+            ? formData.unscheduled
+              ? 'unscheduled'
+              : 'scheduled'
+            : undefined,
           rangeMode: formData.rangeMode || 'auto',
           autoAdjust: formData.autoAdjust || 'expand_only',
           bufferDays: Number(formData.bufferDays ?? 0),
@@ -921,9 +1060,9 @@ export default function TasksRefactored() {
 
       // Cerrar modal y limpiar
       closeModal();
-      } catch (error) {
-        console.error('Error al guardar tarea:', error);
-        toast.error(t('tasks.page.form.errors.saveFailed'));
+    } catch (error) {
+      console.error('Error al guardar tarea:', error);
+      toast.error(t('tasks.page.form.errors.saveFailed'));
     }
   };
 
@@ -1021,11 +1160,7 @@ export default function TasksRefactored() {
   }, [uniqueGanttTasks]);
 
   const ganttProjectStart = useMemo(() => {
-    const candidates = [
-      projectStart,
-      authCreationDate,
-      taskTemporalBounds.minStart,
-    ]
+    const candidates = [projectStart, authCreationDate, taskTemporalBounds.minStart]
       .map((candidate) => {
         if (!candidate) return null;
         if (candidate instanceof Date) return Number.isNaN(candidate.getTime()) ? null : candidate;
@@ -1055,11 +1190,7 @@ export default function TasksRefactored() {
   }, [meetingsState]);
 
   const ganttProjectEnd = useMemo(() => {
-    const candidates = [
-      projectEnd,
-      weddingDateFromMeetings,
-      taskTemporalBounds.maxEnd,
-    ]
+    const candidates = [projectEnd, weddingDateFromMeetings, taskTemporalBounds.maxEnd]
       .map((candidate) => {
         if (!candidate) return null;
         if (candidate instanceof Date) return Number.isNaN(candidate.getTime()) ? null : candidate;
@@ -1214,15 +1345,18 @@ export default function TasksRefactored() {
       setGanttZoom(minZoomAllowed);
     }
   }, [ganttZoom, minZoomAllowed]);
-  const handleZoomChange = useCallback((next) => {
-    const clamped = clampZoomValue(next, { min: minZoomAllowed });
-    const normalized = Math.round(clamped * 1000) / 1000;
-    const tolerance = Math.max(0.0001, minZoomAllowed * 0.02);
-    setGanttZoom((prev) => {
-      if (Math.abs(prev - normalized) < tolerance) return prev;
-      return normalized;
-    });
-  }, [minZoomAllowed]);
+  const handleZoomChange = useCallback(
+    (next) => {
+      const clamped = clampZoomValue(next, { min: minZoomAllowed });
+      const normalized = Math.round(clamped * 1000) / 1000;
+      const tolerance = Math.max(0.0001, minZoomAllowed * 0.02);
+      setGanttZoom((prev) => {
+        if (Math.abs(prev - normalized) < tolerance) return prev;
+        return normalized;
+      });
+    },
+    [minZoomAllowed]
+  );
   const handleZoomIn = useCallback(() => {
     handleZoomChange(ganttZoom + GANTT_ZOOM_STEP);
   }, [ganttZoom, handleZoomChange]);
@@ -1242,8 +1376,7 @@ export default function TasksRefactored() {
   const isZoomMax = ganttZoom >= GANTT_ZOOM_MAX - 0.001;
   const fitZoomValue = minZoomAllowed;
   const fitTolerance = fitZoomValue != null ? Math.max(0.0025, fitZoomValue * 0.1) : 0.01;
-  const isFitApplied =
-    fitZoomValue !== null && Math.abs(fitZoomValue - ganttZoom) < fitTolerance;
+  const isFitApplied = fitZoomValue !== null && Math.abs(fitZoomValue - ganttZoom) < fitTolerance;
   const handleFitToScreen = useCallback(() => {
     if (fitZoomValue == null) return;
     handleZoomChange(fitZoomValue);
@@ -1501,25 +1634,35 @@ export default function TasksRefactored() {
         });
 
       // b) Subtareas anidadas (modelo nuevo)
-      const nestedSource = (Array.isArray(nestedSubtasks) && nestedSubtasks.length > 0)
-        ? nestedSubtasks
-        : (Array.isArray(nestedSubtasksFallback) ? nestedSubtasksFallback : []);
+      const nestedSource =
+        Array.isArray(nestedSubtasks) && nestedSubtasks.length > 0
+          ? nestedSubtasks
+          : Array.isArray(nestedSubtasksFallback)
+            ? nestedSubtasksFallback
+            : [];
       const nested = nestedSource.map((s) => {
-        const mode = String(s?.mode || '').toLowerCase() || (s?.start ? 'scheduled' : 'unscheduled');
-        const start = mode === 'unscheduled'
-          ? null
-          : (s.start instanceof Date
+        const mode =
+          String(s?.mode || '').toLowerCase() || (s?.start ? 'scheduled' : 'unscheduled');
+        const start =
+          mode === 'unscheduled'
+            ? null
+            : s.start instanceof Date
               ? s.start
               : s.start && typeof s.start.toDate === 'function'
                 ? s.start.toDate()
-                : (s.start ? new Date(s.start) : null));
-        const end = mode === 'unscheduled'
-          ? null
-          : (s.end instanceof Date
+                : s.start
+                  ? new Date(s.start)
+                  : null;
+        const end =
+          mode === 'unscheduled'
+            ? null
+            : s.end instanceof Date
               ? s.end
               : s.end && typeof s.end.toDate === 'function'
                 ? s.end.toDate()
-                : (s.end ? new Date(s.end) : (start || null)));
+                : s.end
+                  ? new Date(s.end)
+                  : start || null;
         // Derivar parentId desde el path si no viene
         const parentFromPath = (() => {
           try {
@@ -1550,8 +1693,8 @@ export default function TasksRefactored() {
       const flatAll = src
         .filter((t) => String(t?.type || '') === 'subtask')
         .map((t) => {
-          const s = t?.start?.toDate ? t.start.toDate() : (t?.start ? new Date(t.start) : null);
-          const e = t?.end?.toDate ? t.end.toDate() : (t?.end ? new Date(t.end) : (s || null));
+          const s = t?.start?.toDate ? t.start.toDate() : t?.start ? new Date(t.start) : null;
+          const e = t?.end?.toDate ? t.end.toDate() : t?.end ? new Date(t.end) : s || null;
           const base = {
             id: String(t.id),
             title: t.name || t.title || fallbackSubtaskLabel,
@@ -1580,10 +1723,7 @@ export default function TasksRefactored() {
           }
           const cur = byStable.get(key);
           // Reemplazar si la nueva fuente tiene mayor prioridad o aporta fecha donde antes no hab�a
-          if (
-            priority < cur.priority ||
-            (!cur.item?.start && item?.start)
-          ) {
+          if (priority < cur.priority || (!cur.item?.start && item?.start)) {
             byStable.set(key, { item, priority });
           }
         } catch {}
@@ -1665,13 +1805,65 @@ export default function TasksRefactored() {
   }, [selectedParentId, subtaskEvents]);
 
   // Recalcular y actualizar el rango del padre basado en sus subtareas programadas
-  const computeAndUpdateParentRange = useCallback(async (parentId) => {
-    try {
-      if (!parentId) return;
-      const MS_DAY = 24 * 60 * 60 * 1000;
-      const kids = (Array.isArray(subtaskEvents) ? subtaskEvents : [])
-        .filter((st) => String(st.parentId || '') === String(parentId) && (st.start instanceof Date));
-      if (!kids.length) {
+  const computeAndUpdateParentRange = useCallback(
+    async (parentId) => {
+      try {
+        if (!parentId) return;
+        const MS_DAY = 24 * 60 * 60 * 1000;
+        const kids = (Array.isArray(subtaskEvents) ? subtaskEvents : []).filter(
+          (st) => String(st.parentId || '') === String(parentId) && st.start instanceof Date
+        );
+        if (!kids.length) {
+          let parent = {};
+          try {
+            if (activeWedding && db) {
+              const pref = doc(db, 'weddings', activeWedding, 'tasks', String(parentId));
+              const psnap = await getDoc(pref).catch(() => null);
+              if (!psnap || !psnap.exists()) throw new Error('no-parent');
+              parent = psnap.data() || {};
+            }
+          } catch (_) {
+            // Fallback: buscar en tasksState
+            try {
+              const p = (Array.isArray(tasksState) ? tasksState : []).find(
+                (t) => String(t?.id || '') === String(parentId)
+              );
+              parent = p || {};
+            } catch {}
+          }
+          const update = { computedStart: null, computedEnd: null };
+          if (
+            String(parent?.rangeMode || 'auto') === 'auto' &&
+            String(parent?.autoAdjust || 'expand_only') === 'expand_and_shrink'
+          ) {
+            update.start = parent.manualStart || parent.start || null;
+            update.end = parent.manualEnd || parent.end || null;
+          }
+          try {
+            if (activeWedding && db) {
+              const pref = doc(db, 'weddings', activeWedding, 'tasks', String(parentId));
+              await updateDoc(pref, update).catch(() => {});
+            }
+          } catch {}
+          try {
+            await updateTaskFS(String(parentId), update);
+          } catch {}
+          return;
+        }
+        const starts = kids.map((k) => k.start);
+        const ends = kids.map((k) => (k.end instanceof Date ? k.end : k.start));
+        const envStart = new Date(
+          Math.min.apply(
+            null,
+            starts.map((d) => d.getTime())
+          )
+        );
+        const envEnd = new Date(
+          Math.max.apply(
+            null,
+            ends.map((d) => d.getTime())
+          )
+        );
         let parent = {};
         try {
           if (activeWedding && db) {
@@ -1681,60 +1873,51 @@ export default function TasksRefactored() {
             parent = psnap.data() || {};
           }
         } catch (_) {
-          // Fallback: buscar en tasksState
           try {
-            const p = (Array.isArray(tasksState) ? tasksState : []).find((t) => String(t?.id||'')===String(parentId));
+            const p = (Array.isArray(tasksState) ? tasksState : []).find(
+              (t) => String(t?.id || '') === String(parentId)
+            );
             parent = p || {};
           } catch {}
         }
-        const update = { computedStart: null, computedEnd: null };
-        if (String(parent?.rangeMode || 'auto') === 'auto' && String(parent?.autoAdjust || 'expand_only') === 'expand_and_shrink') {
-          update.start = parent.manualStart || parent.start || null;
-          update.end = parent.manualEnd || parent.end || null;
+        const bufferDays = Number(parent?.bufferDays ?? 0);
+        const computedStart = new Date(envStart.getTime() - Math.max(0, bufferDays) * MS_DAY);
+        const computedEnd = new Date(envEnd.getTime() + Math.max(0, bufferDays) * MS_DAY);
+        const rangeMode = String(parent?.rangeMode || 'auto');
+        const autoAdjust = String(parent?.autoAdjust || 'expand_only');
+        const update = { computedStart, computedEnd };
+        if (rangeMode === 'auto') {
+          const prevStart = parent?.start?.toDate
+            ? parent.start.toDate()
+            : parent?.start
+              ? new Date(parent.start)
+              : null;
+          const prevEnd = parent?.end?.toDate
+            ? parent.end.toDate()
+            : parent?.end
+              ? new Date(parent.end)
+              : null;
+          if (autoAdjust === 'expand_and_shrink') {
+            update.start = computedStart;
+            update.end = computedEnd;
+          } else if (autoAdjust === 'expand_only') {
+            update.start = prevStart && prevStart <= computedStart ? prevStart : computedStart;
+            update.end = prevEnd && prevEnd >= computedEnd ? prevEnd : computedEnd;
+          }
         }
-        try { if (activeWedding && db) { const pref = doc(db, 'weddings', activeWedding, 'tasks', String(parentId)); await updateDoc(pref, update).catch(() => {}); } } catch {}
-        try { await updateTaskFS(String(parentId), update); } catch {}
-        return;
-      }
-      const starts = kids.map((k) => k.start);
-      const ends = kids.map((k) => (k.end instanceof Date ? k.end : k.start));
-      const envStart = new Date(Math.min.apply(null, starts.map((d) => d.getTime())));
-      const envEnd = new Date(Math.max.apply(null, ends.map((d) => d.getTime())));
-      let parent = {};
-      try {
-        if (activeWedding && db) {
-          const pref = doc(db, 'weddings', activeWedding, 'tasks', String(parentId));
-          const psnap = await getDoc(pref).catch(() => null);
-          if (!psnap || !psnap.exists()) throw new Error('no-parent');
-          parent = psnap.data() || {};
-        }
-      } catch (_) {
         try {
-          const p = (Array.isArray(tasksState) ? tasksState : []).find((t) => String(t?.id||'')===String(parentId));
-          parent = p || {};
+          if (activeWedding && db) {
+            const pref = doc(db, 'weddings', activeWedding, 'tasks', String(parentId));
+            await updateDoc(pref, update).catch(() => {});
+          }
         } catch {}
-      }
-      const bufferDays = Number(parent?.bufferDays ?? 0);
-      const computedStart = new Date(envStart.getTime() - Math.max(0, bufferDays) * MS_DAY);
-      const computedEnd = new Date(envEnd.getTime() + Math.max(0, bufferDays) * MS_DAY);
-      const rangeMode = String(parent?.rangeMode || 'auto');
-      const autoAdjust = String(parent?.autoAdjust || 'expand_only');
-      const update = { computedStart, computedEnd };
-      if (rangeMode === 'auto') {
-        const prevStart = parent?.start?.toDate ? parent.start.toDate() : (parent?.start ? new Date(parent.start) : null);
-        const prevEnd = parent?.end?.toDate ? parent.end.toDate() : (parent?.end ? new Date(parent.end) : null);
-        if (autoAdjust === 'expand_and_shrink') {
-          update.start = computedStart;
-          update.end = computedEnd;
-        } else if (autoAdjust === 'expand_only') {
-          update.start = (prevStart && prevStart <= computedStart) ? prevStart : computedStart;
-          update.end = (prevEnd && prevEnd >= computedEnd) ? prevEnd : computedEnd;
-        }
-      }
-      try { if (activeWedding && db) { const pref = doc(db, 'weddings', activeWedding, 'tasks', String(parentId)); await updateDoc(pref, update).catch(() => {}); } } catch {}
-      try { await updateTaskFS(String(parentId), update); } catch {}
-    } catch (_) {}
-  }, [activeWedding, db, subtaskEvents, tasksState, updateTaskFS]);
+        try {
+          await updateTaskFS(String(parentId), update);
+        } catch {}
+      } catch (_) {}
+    },
+    [activeWedding, db, subtaskEvents, tasksState, updateTaskFS]
+  );
 
   // Padres para el modal: combinar padres reales y los derivados de subtareas
   const modalParents = useMemo(() => {
@@ -1766,13 +1949,12 @@ export default function TasksRefactored() {
       for (const st of subs) {
         const pid = String(st.parentId || '');
         if (!pid) continue;
-        const cur =
-          grouped.get(pid) || {
-            id: pid,
-            name: nameById.get(pid) || fallbackTaskLabel,
-            start: st.start instanceof Date ? st.start : new Date(st.start),
-            type: 'task',
-          };
+        const cur = grouped.get(pid) || {
+          id: pid,
+          name: nameById.get(pid) || fallbackTaskLabel,
+          start: st.start instanceof Date ? st.start : new Date(st.start),
+          type: 'task',
+        };
         const stStart = st.start instanceof Date ? st.start : new Date(st.start);
         if (!cur.start || (stStart && stStart < cur.start)) cur.start = stStart;
         grouped.set(pid, cur);
@@ -1780,15 +1962,13 @@ export default function TasksRefactored() {
       for (const [pid, p] of grouped.entries()) {
         if (!byId.has(pid)) byId.set(pid, p);
       }
-      return Array.from(byId.values()).sort((a, b) => (a.start?.getTime?.() || 0) - (b.start?.getTime?.() || 0));
+      return Array.from(byId.values()).sort(
+        (a, b) => (a.start?.getTime?.() || 0) - (b.start?.getTime?.() || 0)
+      );
     } catch {
       return [];
     }
   }, [uniqueGanttTasks, subtaskEvents]);
-
-  
-
-  
 
   // Mapa id->nombre para contextualizar subtareas en la lista lateral
   const parentNameMap = useMemo(() => {
@@ -1842,7 +2022,15 @@ export default function TasksRefactored() {
       const subsByParent = new Map();
       const subs = Array.isArray(subtaskEvents) ? subtaskEvents : [];
       const today = new Date();
-      const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0, 0);
+      const todayStart = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate(),
+        0,
+        0,
+        0,
+        0
+      );
 
       const isCompleted = (sub) => {
         if (!sub) return false;
@@ -1857,17 +2045,8 @@ export default function TasksRefactored() {
         const pid = String(sub.parentId || '');
         if (!pid) continue;
         const start =
-          sub.start instanceof Date
-            ? sub.start
-            : sub.start
-              ? new Date(sub.start)
-              : null;
-        const end =
-          sub.end instanceof Date
-            ? sub.end
-            : sub.end
-              ? new Date(sub.end)
-              : start;
+          sub.start instanceof Date ? sub.start : sub.start ? new Date(sub.start) : null;
+        const end = sub.end instanceof Date ? sub.end : sub.end ? new Date(sub.end) : start;
         if (!subsByParent.has(pid)) subsByParent.set(pid, []);
         subsByParent.get(pid).push({
           ...sub,
@@ -1885,7 +2064,9 @@ export default function TasksRefactored() {
         const completed = list.filter((item) => item.isDone).length;
 
         const completionPct =
-          total > 0 ? Math.round((completed / total) * 100) : Math.round(Number(parent.progress || 0));
+          total > 0
+            ? Math.round((completed / total) * 100)
+            : Math.round(Number(parent.progress || 0));
 
         const overdue = list.filter((item) => {
           if (!item.end || !(item.end instanceof Date)) return false;
@@ -1902,8 +2083,13 @@ export default function TasksRefactored() {
         }).length;
 
         const start =
-          parent.start instanceof Date ? parent.start : parent.start ? new Date(parent.start) : null;
-        const end = parent.end instanceof Date ? parent.end : parent.end ? new Date(parent.end) : null;
+          parent.start instanceof Date
+            ? parent.start
+            : parent.start
+              ? new Date(parent.start)
+              : null;
+        const end =
+          parent.end instanceof Date ? parent.end : parent.end ? new Date(parent.end) : null;
         let timeRatio = 0;
         if (start && end) {
           const span = end.getTime() - start.getTime();
@@ -1983,7 +2169,9 @@ export default function TasksRefactored() {
       if (assignees.length === 0) includeUnassigned = true;
       assignees.forEach((name) => names.add(name));
     }
-    const ordered = Array.from(names).sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
+    const ordered = Array.from(names).sort((a, b) =>
+      a.localeCompare(b, 'es', { sensitivity: 'base' })
+    );
     const opts = ordered.map((value) => ({ value, label: value }));
     if (includeUnassigned) {
       opts.push({
@@ -2001,7 +2189,8 @@ export default function TasksRefactored() {
       if (!task) return false;
       const type = String(task.type || 'task');
       if (type !== 'task') return true;
-      if (ganttCategoryFilter !== 'ALL' && normalizeCategory(task.category) !== ganttCategoryFilter) return false;
+      if (ganttCategoryFilter !== 'ALL' && normalizeCategory(task.category) !== ganttCategoryFilter)
+        return false;
       if (ganttRiskFilter !== 'ALL') {
         const riskLevel = String(task?.risk?.level || 'ok');
         if (riskLevel !== ganttRiskFilter) return false;
@@ -2011,7 +2200,15 @@ export default function TasksRefactored() {
       if (ganttAssigneeFilter === GANTT_UNASSIGNED) return assignees.length === 0;
       return assignees.includes(ganttAssigneeFilter);
     });
-  }, [ganttDisplayTasks, filtersActive, ganttCategoryFilter, ganttRiskFilter, ganttAssigneeFilter, normalizeCategory, extractAssignees]);
+  }, [
+    ganttDisplayTasks,
+    filtersActive,
+    ganttCategoryFilter,
+    ganttRiskFilter,
+    ganttAssigneeFilter,
+    normalizeCategory,
+    extractAssignees,
+  ]);
 
   const filteredParentIds = useMemo(() => {
     const ids = new Set();
@@ -2033,13 +2230,22 @@ export default function TasksRefactored() {
       if (!sub) return false;
       const pid = String(sub.parentId || '');
       if (pid && !filteredParentIds.has(pid)) return false;
-      if (ganttCategoryFilter !== 'ALL' && normalizeCategory(sub.category) !== ganttCategoryFilter) return false;
+      if (ganttCategoryFilter !== 'ALL' && normalizeCategory(sub.category) !== ganttCategoryFilter)
+        return false;
       if (ganttAssigneeFilter === 'ALL') return true;
       const assignees = extractAssignees(sub);
       if (ganttAssigneeFilter === GANTT_UNASSIGNED) return assignees.length === 0;
       return assignees.includes(ganttAssigneeFilter);
     });
-  }, [subtaskEvents, filtersActive, filteredParentIds, ganttCategoryFilter, ganttAssigneeFilter, normalizeCategory, extractAssignees]);
+  }, [
+    subtaskEvents,
+    filtersActive,
+    filteredParentIds,
+    ganttCategoryFilter,
+    ganttAssigneeFilter,
+    normalizeCategory,
+    extractAssignees,
+  ]);
 
   const totalParentCount = useMemo(() => {
     const tasks = Array.isArray(ganttDisplayTasks) ? ganttDisplayTasks : [];
@@ -2059,7 +2265,9 @@ export default function TasksRefactored() {
 
   const ganttSizingTasks = useMemo(() => {
     const source = filtersActive ? filteredGanttTasks : ganttDisplayTasks;
-    const candidate = (Array.isArray(source) ? source : []).filter((task) => task && task.start && task.end);
+    const candidate = (Array.isArray(source) ? source : []).filter(
+      (task) => task && task.start && task.end
+    );
     if (candidate.length > 0) return candidate;
     const fallback = Array.isArray(ganttDisplayTasks)
       ? ganttDisplayTasks.filter((task) => task && task.start && task.end)
@@ -2084,14 +2292,14 @@ export default function TasksRefactored() {
       typeof range?.startPct === 'number'
         ? range.startPct
         : typeof block?.p0 === 'number'
-        ? block.p0
-        : 0;
+          ? block.p0
+          : 0;
     const endPctRaw =
       typeof range?.endPct === 'number'
         ? range.endPct
         : typeof block?.p1 === 'number'
-        ? block.p1
-        : startPct + 0.2;
+          ? block.p1
+          : startPct + 0.2;
     const endPct = endPctRaw <= startPct ? startPct + 0.2 : endPctRaw;
     return { startPct, endPct };
   }, []);
@@ -2099,9 +2307,7 @@ export default function TasksRefactored() {
   const buildTemplateMeta = useCallback((block, range, version) => {
     const adminMeta = block?.admin && typeof block.admin === 'object' ? block.admin : {};
     const templateKey = String(block?.key || block?.name || '').trim() || null;
-    const adminCategory = adminMeta?.category
-      ? String(adminMeta.category).toUpperCase()
-      : null;
+    const adminCategory = adminMeta?.category ? String(adminMeta.category).toUpperCase() : null;
     return {
       key: templateKey,
       version: Number(version) || 1,
@@ -2141,16 +2347,16 @@ export default function TasksRefactored() {
     (async () => {
       try {
         if (!activeWedding || !db) return;
-        
+
         // Prevenir múltiples intentos para la misma boda
         if (seedAttemptedRef.current.has(activeWedding)) return;
-        
+
         const hasAny = Array.isArray(tasksState) && tasksState.length > 0;
         if (hasAny) return;
-        
+
         // Marcar como intentado antes de ejecutar
         seedAttemptedRef.current.add(activeWedding);
-        
+
         await seedWeddingTasksFromTemplate({
           db,
           weddingId: activeWedding,
@@ -2166,22 +2372,18 @@ export default function TasksRefactored() {
       }
     })();
   }, [activeWedding, db, projectEnd, tasksState]);
-  
+
   // Hook de dependencias entre tareas
   const allTasksForDeps = useMemo(() => {
     const combined = [
       ...(Array.isArray(tasksState) ? tasksState : []),
-      ...(Array.isArray(subtaskEvents) ? subtaskEvents : [])
+      ...(Array.isArray(subtaskEvents) ? subtaskEvents : []),
     ];
     return combined;
   }, [tasksState, subtaskEvents]);
 
-  const { 
-    isTaskBlocked, 
-    getTaskDependencyStatus, 
-    getUnblockedTasks,
-    blockedTasksMap 
-  } = useTaskDependencies(allTasksForDeps, completedIdSet);
+  const { isTaskBlocked, getTaskDependencyStatus, getUnblockedTasks, blockedTasksMap } =
+    useTaskDependencies(allTasksForDeps, completedIdSet);
 
   // Estado para notificaciones de desbloqueo
   const [unlockNotification, setUnlockNotification] = useState(null);
@@ -2191,14 +2393,14 @@ export default function TasksRefactored() {
     async (id, nextCompleted) => {
       try {
         if (!activeWedding || !id) return;
-        
+
         if (nextCompleted && isTaskBlocked(id)) {
           const depStatus = getTaskDependencyStatus(id);
-          const missingNames = depStatus.missingDeps.map(d => d.taskTitle).join(', ');
+          const missingNames = depStatus.missingDeps.map((d) => d.taskTitle).join(', ');
           toast.warning(t('tasks.page.dependencies.blocked', { tasks: missingNames }));
           return;
         }
-        
+
         const compRef = doc(db, 'weddings', activeWedding, 'tasksCompleted', String(id));
         if (nextCompleted) {
           await setDoc(
@@ -2206,15 +2408,15 @@ export default function TasksRefactored() {
             { id: String(id), taskId: String(id), completedAt: serverTimestamp() },
             { merge: true }
           );
-          
+
           const unblocked = getUnblockedTasks(id);
           if (unblocked.length > 0) {
-            const unblockedNames = unblocked.map(t => t.title).join(', ');
+            const unblockedNames = unblocked.map((t) => t.title).join(', ');
             setUnlockNotification({
               message: `<� �Excelente! Ahora puedes trabajar en: ${unblockedNames}`,
-              timestamp: Date.now()
+              timestamp: Date.now(),
             });
-            
+
             setTimeout(() => setUnlockNotification(null), 6000);
             console.log('[Dependencies] Tareas desbloqueadas:', unblocked);
           }
@@ -2381,9 +2583,7 @@ export default function TasksRefactored() {
               const iso = new Date(raw);
               if (!isNaN(iso.getTime())) d = iso;
               else {
-                const m = raw.match(
-                  /(\d{1,2})\s+de\s+([a-zA-Z����Í��]+)\s+de\s+(\d{4})/
-                );
+                const m = raw.match(/(\d{1,2})\s+de\s+([a-zA-Z����Í��]+)\s+de\s+(\d{4})/);
                 if (m) {
                   const day = parseInt(m[1], 10);
                   const name = m[2].toLowerCase();
@@ -2449,9 +2649,7 @@ export default function TasksRefactored() {
             const iso = new Date(raw);
             if (!isNaN(iso.getTime())) d = iso;
             else {
-              const m = raw.match(
-                /(\d{1,2})\s+de\s+([a-zA-Z����Í��]+)\s+de\s+(\d{4})/
-              );
+              const m = raw.match(/(\d{1,2})\s+de\s+([a-zA-Z����Í��]+)\s+de\s+(\d{4})/);
               if (m) {
                 const day = parseInt(m[1], 10);
                 const name = m[2].toLowerCase();
@@ -2558,12 +2756,13 @@ export default function TasksRefactored() {
     })();
   }, [activeWedding, projectStart, projectEnd]);
 
-  
   // Exponer utilidades de debug en consola: mywed.tasks.*
   useEffect(() => {
     try {
       window.mywed = window.mywed || {};
-      const parents = (Array.isArray(uniqueGanttTasks) ? uniqueGanttTasks : []).filter((t)=>String(t?.type||'task')==='task');
+      const parents = (Array.isArray(uniqueGanttTasks) ? uniqueGanttTasks : []).filter(
+        (t) => String(t?.type || 'task') === 'task'
+      );
       window.mywed.tasks = {
         activeWedding,
         parentsCount: () => parents.length,
@@ -2572,27 +2771,38 @@ export default function TasksRefactored() {
             const p = parents.find((x) => String(x.id) === String(id));
             if (!p) return null;
             return { id: String(p.id), name: p.name || p.title, start: p.start, end: p.end };
-          } catch { return null; }
+          } catch {
+            return null;
+          }
         },
         getParentByName: (name) => {
           try {
             const p = parents.find((x) => (x.name || x.title) === name);
             if (!p) return null;
             return { id: String(p.id), name: p.name || p.title, start: p.start, end: p.end };
-          } catch { return null; }
+          } catch {
+            return null;
+          }
         },
         nestedCount: () => (Array.isArray(nestedSubtasks) ? nestedSubtasks.length : 0),
         subtaskEventsCount: () => (Array.isArray(subtaskEvents) ? subtaskEvents.length : 0),
-        listNestedPaths: () => (Array.isArray(nestedSubtasks) ? nestedSubtasks.map(s=>s.__path || s.id) : []),
-        sampleNested: (n=5) => (Array.isArray(nestedSubtasks) ? nestedSubtasks.slice(0,n) : []),
-        sampleSubtasks: (n=10) => (Array.isArray(subtaskEvents) ? subtaskEvents.slice(0,n) : []),
+        listNestedPaths: () =>
+          Array.isArray(nestedSubtasks) ? nestedSubtasks.map((s) => s.__path || s.id) : [],
+        sampleNested: (n = 5) => (Array.isArray(nestedSubtasks) ? nestedSubtasks.slice(0, n) : []),
+        sampleSubtasks: (n = 10) => (Array.isArray(subtaskEvents) ? subtaskEvents.slice(0, n) : []),
         byParent: () => {
           const map = {};
           const arr = Array.isArray(subtaskEvents) ? subtaskEvents : [];
           for (const st of arr) {
             const pid = String(st.parentId || '');
             if (!pid) continue;
-            (map[pid] ||= []).push({ id: st.id, title: st.title, start: st.start, end: st.end, path: st.__path });
+            (map[pid] ||= []).push({
+              id: st.id,
+              title: st.title,
+              start: st.start,
+              end: st.end,
+              path: st.__path,
+            });
           }
           return map;
         },
@@ -2600,12 +2810,14 @@ export default function TasksRefactored() {
           try {
             return {
               activeWedding,
-              parents: parents.map(p=>({id:String(p.id), name:p.name||p.title})),
+              parents: parents.map((p) => ({ id: String(p.id), name: p.name || p.title })),
               nestedTotal: Array.isArray(nestedSubtasks) ? nestedSubtasks.length : 0,
               subtaskEventsTotal: Array.isArray(subtaskEvents) ? subtaskEvents.length : 0,
-              parentsWithKids: Object.keys((window.mywed.tasks.byParent())).length,
+              parentsWithKids: Object.keys(window.mywed.tasks.byParent()).length,
             };
-          } catch (e) { return { error: String(e) }; }
+          } catch (e) {
+            return { error: String(e) };
+          }
         },
       };
       console.log('[Tasks Debug] Usa mywed.tasks.explainMissing() para ver el estado');
@@ -2637,7 +2849,6 @@ export default function TasksRefactored() {
         }}
       />
 
-      
       <div className="mt-6 mb-8" ref={ganttContainerRef}>
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
           <h2 className="text-xl font-semibold">{t('tasks.page.gantt.title')}</h2>
@@ -2880,16 +3091,16 @@ export default function TasksRefactored() {
             dependencyStatuses={blockedTasksMap}
             containerHeight={calendarColumnHeight ?? calendarContainerHeight}
             onTaskClick={(event) => {
-            if (handleTaskIntent(event)) return;
-            const eventStart = event.start instanceof Date ? event.start : new Date(event.start);
-            const eventEnd = event.end instanceof Date ? event.end : new Date(event.end);
-            setEditingId(event.id);
-            setEditingPath(event.__path || null);
-            setFormData({
-              title: event.title,
-              desc: event.desc || '',
-              category: event.category || 'OTROS',
-              startDate: eventStart.toISOString().slice(0, 10),
+              if (handleTaskIntent(event)) return;
+              const eventStart = event.start instanceof Date ? event.start : new Date(event.start);
+              const eventEnd = event.end instanceof Date ? event.end : new Date(event.end);
+              setEditingId(event.id);
+              setEditingPath(event.__path || null);
+              setFormData({
+                title: event.title,
+                desc: event.desc || '',
+                category: event.category || 'OTROS',
+                startDate: eventStart.toISOString().slice(0, 10),
                 startTime: eventStart.toTimeString().slice(0, 5),
                 endDate: eventEnd.toISOString().slice(0, 10),
                 endTime: eventEnd.toTimeString().slice(0, 5),
@@ -2942,7 +3153,7 @@ export default function TasksRefactored() {
           }}
         />
       )}
-      
+
       {showNewTask && (
         <TaskForm
           formData={formData}

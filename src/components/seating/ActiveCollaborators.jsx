@@ -6,12 +6,14 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Users, Circle, Lock } from 'lucide-react';
 
-export default function ActiveCollaborators({ 
-  collaborators = [], 
-  locks = [],
-  className = '' 
-}) {
-  const activeCount = collaborators.filter(c => !c.isCurrent).length;
+import useTranslations from '../../hooks/useTranslations';
+
+export default function ActiveCollaborators({ collaborators = [], locks = [], className = '' }) {
+  const { t, tPlural } = useTranslations();
+  const activeCount = collaborators.filter((c) => !c.isCurrent).length;
+  const headerLabel = t('common.seating.collaborators.title', { count: activeCount });
+  const unknownName = t('common.seating.collaborators.unknown');
+  const fallbackInitial = unknownName.charAt(0).toUpperCase() || 'U';
 
   if (activeCount === 0) return null;
 
@@ -24,20 +26,18 @@ export default function ActiveCollaborators({
       {/* Header */}
       <div className="flex items-center gap-2 mb-3">
         <Users className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-        <span className="text-sm font-semibold text-gray-900 dark:text-white">
-          Colaboradores Activos ({activeCount})
-        </span>
+        <span className="text-sm font-semibold text-gray-900 dark:text-white">{headerLabel}</span>
       </div>
 
       {/* Lista de colaboradores */}
       <div className="space-y-2">
         <AnimatePresence>
           {collaborators
-            .filter(c => !c.isCurrent)
+            .filter((c) => !c.isCurrent)
             .map((collab) => {
               const color = collab.color || '#3B82F6';
               const isActive = Date.now() - (collab.lastActive || 0) < 30000;
-              const userLocks = locks.filter(lock => lock.userId === collab.id);
+              const userLocks = locks.filter((lock) => lock.userId === collab.id);
 
               return (
                 <motion.div
@@ -48,25 +48,29 @@ export default function ActiveCollaborators({
                   className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                 >
                   {/* Avatar con color */}
-                  <div 
+                  <div
                     className="relative flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-white font-semibold text-sm"
                     style={{ backgroundColor: color }}
                   >
-                    {(collab.name || 'U')[0].toUpperCase()}
-                    
+                    {(collab.name || unknownName).trim().charAt(0).toUpperCase() || fallbackInitial}
+
                     {/* Indicador de activo */}
                     <motion.div
-                      animate={isActive ? {
-                        scale: [1, 1.2, 1],
-                        opacity: [1, 0.7, 1],
-                      } : {}}
+                      animate={
+                        isActive
+                          ? {
+                              scale: [1, 1.2, 1],
+                              opacity: [1, 0.7, 1],
+                            }
+                          : {}
+                      }
                       transition={{
                         duration: 2,
                         repeat: Infinity,
                       }}
                       className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white dark:border-gray-900"
-                      style={{ 
-                        backgroundColor: isActive ? '#10B981' : '#6B7280' 
+                      style={{
+                        backgroundColor: isActive ? '#10B981' : '#6B7280',
                       }}
                     />
                   </div>
@@ -74,19 +78,21 @@ export default function ActiveCollaborators({
                   {/* Info */}
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                      {collab.name || 'Usuario'}
+                      {collab.name || unknownName}
                     </p>
                     {userLocks.length > 0 && (
                       <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
                         <Lock className="w-3 h-3" />
-                        Editando {userLocks.length} {userLocks.length === 1 ? 'elemento' : 'elementos'}
+                        {tPlural('common.seating.collaborators.editing', userLocks.length, {
+                          count: userLocks.length,
+                        })}
                       </p>
                     )}
                   </div>
 
                   {/* Status indicator */}
                   <div className="flex items-center gap-1">
-                    <Circle 
+                    <Circle
                       className={`w-2 h-2 ${isActive ? 'text-green-500 fill-green-500' : 'text-gray-400 fill-gray-400'}`}
                     />
                   </div>
@@ -104,7 +110,7 @@ export default function ActiveCollaborators({
             transition={{ duration: 2, repeat: Infinity }}
             className="w-2 h-2 rounded-full bg-green-500"
           />
-          <span>Sincronizado en tiempo real</span>
+          <span>{t('common.seating.collaborators.synced')}</span>
         </div>
       </div>
     </motion.div>

@@ -677,7 +677,7 @@ const AdminDashboard = () => {
                   color="textSecondary"
                   data-testid="admin-metrics-traffic-since"
                 >
-                  Periodo desde {formatSinceDate(trafficMetrics.since)}
+                  Periodo desde {formatSinceDate(trafficMetrics.since, t)}
                 </Typography>
               </Box>
             </CardContent>
@@ -731,7 +731,7 @@ const AdminDashboard = () => {
                 className="block mt-2"
                 data-testid="admin-metrics-usergrowth-since"
               >
-                Periodo desde {formatSinceDate(userGrowthMetrics.since)}
+                Periodo desde {formatSinceDate(userGrowthMetrics.since, t)}
               </Typography>
             </CardContent>
           </Card>
@@ -809,7 +809,10 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
-const formatSinceDate = (value) => {
-  if (!value) return t('common.admin.dashboard.noData', 'sin datos');
+const formatSinceDate = (value, translate) => {
+  if (!value)
+    return (
+      translate?.('common.admin.dashboard.noData', { defaultValue: 'sin datos' }) || 'sin datos'
+    );
   return formatDate(value, 'short');
 };

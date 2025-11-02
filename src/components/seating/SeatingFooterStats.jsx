@@ -3,16 +3,11 @@
  */
 import React from 'react';
 import { motion } from 'framer-motion';
-import { 
-  CheckCircle2, 
-  Table, 
-  AlertTriangle, 
-  Sparkles, 
-  Download,
-  TrendingUp,
-} from 'lucide-react';
+import { CheckCircle2, Table, AlertTriangle, Sparkles, Download, TrendingUp } from 'lucide-react';
 
-const Stat = ({ icon: Icon, value, label, color = 'gray', trend }) => {
+import useTranslations from '../../hooks/useTranslations';
+
+const Stat = ({ icon: Icon, value, label, color = 'gray', trendLabel }) => {
   const colors = {
     green: 'text-green-500',
     amber: 'text-amber-500',
@@ -26,28 +21,22 @@ const Stat = ({ icon: Icon, value, label, color = 'gray', trend }) => {
       <Icon size={16} className={colors[color]} />
       <span className="text-white font-semibold">{value}</span>
       <span className="text-gray-400 text-sm">{label}</span>
-      
-      {trend && (
+
+      {trendLabel && (
         <motion.div
           initial={{ opacity: 0, x: -5 }}
           animate={{ opacity: 1, x: 0 }}
           className="flex items-center gap-1 text-xs text-green-500"
         >
           <TrendingUp size={12} />
-          <span>+{trend}%</span>
+          <span>{trendLabel}</span>
         </motion.div>
       )}
     </div>
   );
 };
 
-const Button = ({ 
-  children, 
-  variant = 'secondary', 
-  icon: Icon, 
-  onClick,
-  loading = false,
-}) => {
+const Button = ({ children, variant = 'secondary', icon: Icon, onClick, loading = false }) => {
   const variants = {
     primary: 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/30',
     secondary: 'bg-white/10 hover:bg-white/20 text-white border border-white/20',
@@ -83,6 +72,32 @@ export default function SeatingFooterStats({
   onExport,
   autoAssignLoading = false,
 }) {
+  const { t, format } = useTranslations();
+
+  const formatCount = React.useCallback(
+    (value) => {
+      const numeric = Number(value);
+      if (format?.number) {
+        return format.number(Number.isFinite(numeric) ? numeric : 0);
+      }
+      return Number.isFinite(numeric) ? numeric.toString() : '0';
+    },
+    [format]
+  );
+
+  const formatPercentageValue = React.useCallback(
+    (value) => {
+      const numeric = Number(value);
+      const base = format?.number
+        ? format.number(Number.isFinite(numeric) ? numeric : 0)
+        : Number.isFinite(numeric)
+          ? numeric.toString()
+          : '0';
+      return t('common.seating.footer.stats.assignedValue', { value: base });
+    },
+    [format, t]
+  );
+
   const getAssignmentColor = () => {
     if (assignedPercentage >= 95) return 'green';
     if (assignedPercentage >= 70) return 'blue';
@@ -90,32 +105,46 @@ export default function SeatingFooterStats({
     return 'red';
   };
 
-  const getTrend = () => {
+  const getTrendLabel = () => {
     // Simular tendencia basada en porcentaje
-    if (assignedPercentage > 50) return Math.floor(assignedPercentage / 10);
+    if (assignedPercentage > 50) {
+      const trend = Math.floor(assignedPercentage / 10);
+      return t('common.seating.footer.stats.trendIncrease', {
+        value: formatCount(trend),
+      });
+    }
     return null;
   };
 
+  const assignedLabel = t('common.seating.footer.stats.assigned', {
+    assigned: formatCount(assignedGuests),
+    total: formatCount(totalGuests),
+  });
+  const tablesLabel = t('common.seating.footer.stats.tables');
+  const conflictsLabel = t('common.seating.footer.stats.conflicts');
+
+  const exportLabel = t('common.seating.footer.buttons.export');
+  const autoAssignLabel = autoAssignLoading
+    ? t('common.seating.footer.buttons.autoAssignLoading')
+    : t('common.seating.footer.buttons.autoAssign');
+
   return (
-    <footer className="h-14 border-t border-white/10 bg-[#0F0F10]/95 backdrop-blur-xl
-                       flex items-center justify-between px-6 relative z-40">
+    <footer
+      className="h-14 border-t border-white/10 bg-[#0F0F10]/95 backdrop-blur-xl
+                       flex items-center justify-between px-6 relative z-40"
+    >
       {/* Estadísticas */}
       <div className="flex items-center gap-8">
         <Stat
           icon={CheckCircle2}
-          value={`${assignedPercentage}%`}
-          label={`asignados (${assignedGuests}/${totalGuests})`}
+          value={formatPercentageValue(assignedPercentage)}
+          label={assignedLabel}
           color={getAssignmentColor()}
-          trend={getTrend()}
+          trendLabel={getTrendLabel()}
         />
-        
-        <Stat
-          icon={Table}
-          value={tableCount}
-          label="mesas"
-          color="blue"
-        />
-        
+
+        <Stat icon={Table} value={formatCount(tableCount)} label={tablesLabel} color="blue" />
+
         {conflictCount > 0 && (
           <motion.div
             initial={{ scale: 0 }}
@@ -124,8 +153,8 @@ export default function SeatingFooterStats({
           >
             <Stat
               icon={AlertTriangle}
-              value={conflictCount}
-              label="conflictos"
+              value={formatCount(conflictCount)}
+              label={conflictsLabel}
               color="amber"
             />
           </motion.div>
@@ -135,16 +164,16 @@ export default function SeatingFooterStats({
       {/* CTAs Principales */}
       <div className="flex items-center gap-3">
         <Button variant="secondary" icon={Download} onClick={onExport}>
-          Exportar
+          {exportLabel}
         </Button>
-        
-        <Button 
-          variant="primary" 
-          icon={Sparkles} 
+
+        <Button
+          variant="primary"
+          icon={Sparkles}
           onClick={onAutoAssign}
           loading={autoAssignLoading}
         >
-          {autoAssignLoading ? 'Asignando...' : 'Auto-IA'}
+          {autoAssignLabel}
         </Button>
       </div>
 
@@ -155,10 +184,13 @@ export default function SeatingFooterStats({
           animate={{ width: `${assignedPercentage}%` }}
           transition={{ duration: 1, ease: 'easeOut' }}
           className={`h-full ${
-            assignedPercentage >= 95 ? 'bg-green-500' :
-            assignedPercentage >= 70 ? 'bg-blue-500' :
-            assignedPercentage >= 40 ? 'bg-amber-500' :
-            'bg-red-500'
+            assignedPercentage >= 95
+              ? 'bg-green-500'
+              : assignedPercentage >= 70
+                ? 'bg-blue-500'
+                : assignedPercentage >= 40
+                  ? 'bg-amber-500'
+                  : 'bg-red-500'
           }`}
         />
       </div>
