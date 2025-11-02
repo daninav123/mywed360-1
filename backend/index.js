@@ -969,7 +969,9 @@ process.on('uncaughtException', (err) => {
   logger.error('UncaughtException:', err);
 });
 
-startEmailSchedulerWorker();
+// TODO: Crear índice en Firestore antes de habilitar
+// https://console.firebase.google.com/v1/r/project/lovenda-98c77/firestore/indexes
+// startEmailSchedulerWorker();
 
 if (process.env.NODE_ENV !== 'test') {
   startMetricAggregatorWorker();
