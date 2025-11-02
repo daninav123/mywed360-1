@@ -23,22 +23,12 @@ const SeatingPlanTabs = ({
       icon: Church,
       count: ceremonyCount,
       description: 'Disposición de asientos para la ceremonia',
-    },
-    {
-      id: 'banquet',
-      label: 'Banquete',
-      icon: Utensils,
-      count: banquetCount,
-      description: 'Distribución de mesas para el banquete',
-    },
-  ];
-
   return (
-    <div className={`bg-white border rounded-lg overflow-hidden ${className}`}>
+    <div className="flex items-center justify-between py-4" data-tour="tabs">
       <div className="flex">
-        {tabs.map((tab) => {
+        {stats.tabs.map((tab) => {
           const Icon = tab.icon;
-          const isActive = activeTab === tab.id;
+          const isActive = tab.id === stats.activeTab;
 
           return (
             <button

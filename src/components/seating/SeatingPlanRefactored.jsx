@@ -24,6 +24,10 @@ import AutoLayoutModal from './AutoLayoutModal';
 import SeatingSearchBar from './SeatingSearchBar';
 import TemplateGalleryModal from './TemplateGalleryModal';
 import ExportWizardEnhanced from './ExportWizardEnhanced';
+import SeatingInteractiveTour from './SeatingInteractiveTour';
+import SeatingTooltips, { useTooltipState } from './SeatingTooltips';
+import DragGhostPreview, { useDragGhost } from './DragGhostPreview';
+import CollaborationCursors from './CollaborationCursors';
 import { useWedding } from '../../context/WeddingContext';
 // Importar va alias estable para permitir vi.mock en tests y usar el hook deshabilitado en test
 import { useSeatingPlan } from '../../hooks/useSeatingPlan';
@@ -395,6 +399,32 @@ const SeatingPlanRefactored = () => {
   const [autoLayoutModalOpen, setAutoLayoutModalOpen] = React.useState(false);
   const [templateGalleryOpen, setTemplateGalleryOpen] = React.useState(false);
   const [exportWizardEnhancedOpen, setExportWizardEnhancedOpen] = React.useState(false);
+  
+  // FASE 4: Tour y Tooltips
+  const [showTour, setShowTour] = React.useState(false);
+  const [tooltipState, updateTooltipState] = useTooltipState();
+  
+  // FASE 2: Drag Ghost Preview
+  const { dragState, startDrag, updateDrag, endDrag } = useDragGhost();
+  
+  // Verificar si es primera visita para tour
+  React.useEffect(() => {
+    const hasVisited = localStorage.getItem('seating-has-visited');
+    if (!hasVisited) {
+      setShowTour(true);
+      localStorage.setItem('seating-has-visited', 'true');
+    }
+  }, []);
+  
+  // Actualizar estado de tooltips
+  React.useEffect(() => {
+    updateTooltipState({
+      hasSpaceConfigured: !!safeHallSize?.width,
+      tables: safeTables,
+      assignedGuests: safeGuests.filter(g => g.tableId || g.table).length,
+      hasDraggedTable: safeTables.length > 0,
+    });
+  }, [safeHallSize, safeTables, safeGuests, updateTooltipState]);
   const otherCollaborators = React.useMemo(
     () =>
       Array.isArray(collaborators) ? collaborators.filter((member) => !member?.isCurrent) : [],
@@ -2080,6 +2110,50 @@ const SeatingPlanRefactored = () => {
             }
           }}
           canvasRef={canvasRef}
+        />
+
+        {/* FASE 4: Tour Interactivo */}
+        <SeatingInteractiveTour
+          isEnabled={true}
+          autoStart={showTour}
+          onComplete={() => {
+            setShowTour(false);
+            toast.success('¡Tour completado! Ya conoces todas las herramientas');
+          }}
+          onSkip={() => {
+            setShowTour(false);
+          }}
+        />
+
+        {/* FASE 4: Tooltips Contextuales */}
+        <SeatingTooltips
+          state={tooltipState}
+          onAction={(action) => {
+            if (action === 'start-tour') setShowTour(true);
+            if (action === 'open-space') setSpaceConfigOpen(true);
+            if (action === 'open-templates') setTemplateGalleryOpen(true);
+            if (action === 'auto-generate') handleGenerateAutoLayout('columns');
+            if (action === 'open-export') setExportWizardEnhancedOpen(true);
+          }}
+          position="bottom-right"
+        />
+
+        {/* FASE 2: Drag Ghost Preview */}
+        <DragGhostPreview
+          isDragging={dragState.isDragging}
+          draggedItem={dragState.draggedItem}
+          targetTable={dragState.targetTable}
+          position={dragState.position}
+          canDrop={dragState.canDrop}
+        />
+
+        {/* FASE 5: Collaboration Cursors */}
+        <CollaborationCursors
+          users={otherCollaborators}
+          currentUserId={activeWedding}
+          canvasRef={canvasRef}
+          scale={viewport.scale}
+          offset={viewport.offset}
         />
       </div>
     </DndProvider>
