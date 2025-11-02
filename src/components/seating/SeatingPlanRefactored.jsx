@@ -21,6 +21,7 @@ import SeatingPlanModals from './SeatingPlanModals';
 import SeatingPlanOnboardingChecklist from './SeatingPlanOnboardingChecklist';
 import SeatingPlanSummary from './SeatingPlanSummary';
 import AutoLayoutModal from './AutoLayoutModal';
+import SeatingSearchBar from './SeatingSearchBar';
 import { useWedding } from '../../context/WeddingContext';
 // Importar va alias estable para permitir vi.mock en tests y usar el hook deshabilitado en test
 import { useSeatingPlan } from '../../hooks/useSeatingPlan';
@@ -1765,6 +1766,31 @@ const SeatingPlanRefactored = () => {
                   Ocultar toolbar
                 </button>
               </div>
+              {/* FASE 2: Búsqueda avanzada */}
+              <div className="mb-4">
+                <SeatingSearchBar
+                  guests={guests}
+                  tables={tables}
+                  onGuestFound={(guest) => {
+                    // Resaltar invitado (puede implementarse después)
+                    console.log('Guest found:', guest);
+                  }}
+                  onTableFound={(table) => {
+                    // Hacer zoom a la mesa
+                    try {
+                      selectTable?.(table.id);
+                      // Trigger fit to show the table
+                      setTimeout(() => {
+                        window.dispatchEvent(new Event('seating-fit'));
+                      }, 100);
+                    } catch (e) {
+                      console.warn('Error focusing table:', e);
+                    }
+                  }}
+                  className="w-full"
+                />
+              </div>
+
               <SeatingPlanToolbar
                 tab={tab}
                 onUndo={undo}
