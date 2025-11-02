@@ -91,12 +91,32 @@ const MarketingLayout = ({ children }) => {
           </nav>
 
           <div className="hidden items-center gap-3 md:flex">
+            {/* Acceso Proveedores */}
+            <Link
+              to="/supplier/login"
+              className="rounded-md px-4 py-2 text-sm font-medium bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100 transition-colors flex items-center gap-2"
+              title="Portal de proveedores"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                />
+              </svg>
+              💼 Panel Proveedores
+            </Link>
+
+            {/* Login Parejas */}
             <Link
               to="/login"
               className="rounded-md px-4 py-2 text-sm font-medium text-muted transition-colors hover:text-body"
             >
               {safeT('nav.loginShort', 'Iniciar sesión')}
             </Link>
+
+            {/* Signup */}
             <Link
               to="/signup"
               className="inline-flex items-center justify-center rounded-md bg-[var(--color-primary)] px-4 py-2 text-sm font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5 hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
@@ -126,12 +146,23 @@ const MarketingLayout = ({ children }) => {
             ))}
           </nav>
           <div className="layout-container flex flex-col gap-2 px-4 pb-4">
+            {/* Acceso Proveedores - Mobile */}
+            <Link
+              to="/supplier/login"
+              className="w-full rounded-md bg-purple-50 border border-purple-200 text-purple-700 px-4 py-2 text-center text-sm font-medium transition-colors hover:bg-purple-100 flex items-center justify-center gap-2"
+            >
+              💼 Panel Proveedores
+            </Link>
+
+            {/* Login Parejas - Mobile */}
             <Link
               to="/login"
               className="w-full rounded-md border border-[color:var(--color-text)]/20 px-4 py-2 text-center text-sm font-medium text-[color:var(--color-text)] transition-colors hover:bg-[var(--color-accent)]/20"
             >
               {safeT('nav.loginShort', 'Iniciar sesión')}
             </Link>
+
+            {/* Signup - Mobile */}
             <Link
               to="/signup"
               className="w-full rounded-md bg-[var(--color-primary)] px-4 py-2 text-center text-sm font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5 hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
