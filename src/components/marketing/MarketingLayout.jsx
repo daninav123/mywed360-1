@@ -3,6 +3,7 @@ import { Link, NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import logoApp from '../../assets/logo-mark.svg';
+import LanguageSelector from '../ui/LanguageSelector';
 
 const linkBaseClasses =
   'px-3 py-2 text-sm font-medium transition-colors duration-150 text-muted hover:text-body border-b-2 border-transparent';
@@ -91,6 +92,9 @@ const MarketingLayout = ({ children }) => {
           </nav>
 
           <div className="hidden items-center gap-3 md:flex">
+            {/* Selector de idioma */}
+            <LanguageSelector variant="minimal" persist={false} />
+
             {/* Acceso Proveedores */}
             <Link
               to="/supplier/login"
@@ -146,6 +150,11 @@ const MarketingLayout = ({ children }) => {
             ))}
           </nav>
           <div className="layout-container flex flex-col gap-2 px-4 pb-4">
+            {/* Selector de idioma - Mobile */}
+            <div className="flex justify-center">
+              <LanguageSelector variant="minimal" persist={false} />
+            </div>
+
             {/* Acceso Proveedores - Mobile */}
             <Link
               to="/supplier/login"

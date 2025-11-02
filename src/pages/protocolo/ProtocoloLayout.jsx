@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import LanguageSelector from '../../components/ui/LanguageSelector';
 
 const SECTION_TITLES = {
   'momentos-especiales': 'Momentos Especiales',
@@ -37,9 +38,12 @@ const ProtocoloLayout = React.memo(() => {
 
   return (
     <section className="p-4 md:p-6 flex flex-col gap-6" aria-labelledby="protocolo-heading">
-      <h1 id="protocolo-heading" className="page-title">
-        {currentTitle}
-      </h1>
+      <div className="flex items-center justify-between gap-4">
+        <h1 id="protocolo-heading" className="page-title">
+          {currentTitle}
+        </h1>
+        <LanguageSelector variant="minimal" />
+      </div>
 
       <div
         className="focus:outline-none focus-visible:ring-2 ring-primary"

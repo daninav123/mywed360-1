@@ -2,6 +2,7 @@ import React, { useEffect, useMemo } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 import Card from '../../components/ui/Card';
+import LanguageSelector from '../../components/ui/LanguageSelector';
 
 // Pestañas iniciales para la sección Diseños
 const tabs = [
@@ -37,9 +38,12 @@ const DiseñosLayout = React.memo(() => {
 
   return (
     <section className="p-6 flex flex-col gap-6" aria-labelledby="disenos-heading">
-      <h1 id="disenos-heading" className="text-2xl font-bold text-body">
-        Diseños
-      </h1>
+      <div className="flex items-center justify-between gap-4">
+        <h1 id="disenos-heading" className="text-2xl font-bold text-body">
+          Diseños
+        </h1>
+        <LanguageSelector variant="minimal" />
+      </div>
 
       <nav
         role="tablist"

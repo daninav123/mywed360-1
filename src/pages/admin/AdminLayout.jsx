@@ -4,6 +4,7 @@ import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 import { ADMIN_ALLOWED_PATHS, ADMIN_NAVIGATION } from '../../config/adminNavigation';
 import { useAuth } from '../../hooks/useAuth';
+import LanguageSelector from '../../components/ui/LanguageSelector';
 
 const normalizePath = (pathname) => {
   if (!pathname) return '/admin';
@@ -34,28 +35,30 @@ const AdminLayout = () => {
     () =>
       (typeof import.meta !== 'undefined' && import.meta.env?.VITE_ADMIN_SUPPORT_EMAIL) ||
       'soporte@maloveapp.com',
-    [],
+    []
   );
   const supportPhone = useMemo(
     () =>
       (typeof import.meta !== 'undefined' && import.meta.env?.VITE_ADMIN_SUPPORT_PHONE) ||
       '+34 900 000 000',
-    [],
+    []
   );
   const securityLink = useMemo(
     () =>
       (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SECURITY_POLICY_URL) ||
       'https://lovenda.com/security',
-    [],
+    []
   );
   const adminVersion = useMemo(
-    () =>
-      (typeof import.meta !== 'undefined' && import.meta.env?.VITE_ADMIN_VERSION) || 'v1.0.0',
-    [],
+    () => (typeof import.meta !== 'undefined' && import.meta.env?.VITE_ADMIN_VERSION) || 'v1.0.0',
+    []
   );
 
   const breadcrumbs = useMemo(() => {
-    const parts = location.pathname.replace(/^\/admin\/?/, '').split('/').filter(Boolean);
+    const parts = location.pathname
+      .replace(/^\/admin\/?/, '')
+      .split('/')
+      .filter(Boolean);
     if (parts.length === 0) {
       return ['Administracion', 'Dashboard'];
     }
@@ -119,7 +122,9 @@ const AdminLayout = () => {
             <div className="flex h-full flex-col">
               <div className="px-6 py-5 border-b border-soft">
                 <h2 className="text-lg font-semibold">MaLove.App Admin</h2>
-                <p className="text-xs text-[var(--color-text-soft,#6b7280)]">Control del proyecto</p>
+                <p className="text-xs text-[var(--color-text-soft,#6b7280)]">
+                  Control del proyecto
+                </p>
               </div>
               <nav className="flex-1 overflow-y-auto px-4 py-6 space-y-6">
                 {ADMIN_NAVIGATION.map((section) => (
@@ -180,13 +185,22 @@ const AdminLayout = () => {
                   {breadcrumbs.map((crumb, index) => (
                     <React.Fragment key={crumb + '-' + index}>
                       {index > 0 && <span>/</span>}
-                      <span className={index === breadcrumbs.length - 1 ? 'text-[var(--color-text,#111827)] font-medium' : ''}>
+                      <span
+                        className={
+                          index === breadcrumbs.length - 1
+                            ? 'text-[var(--color-text,#111827)] font-medium'
+                            : ''
+                        }
+                      >
                         {crumb}
                       </span>
                     </React.Fragment>
                   ))}
                 </div>
-                <div className="text-xs text-[var(--color-text-soft,#6b7280)]" data-testid="admin-last-refresh">
+                <div
+                  className="text-xs text-[var(--color-text-soft,#6b7280)]"
+                  data-testid="admin-last-refresh"
+                >
                   Ultima actualizacion {formattedRefreshTime}
                 </div>
               </div>
@@ -197,6 +211,8 @@ const AdminLayout = () => {
                   </strong>
                   <span>{userProfile?.email}</span>
                 </span>
+                {/* Selector de idioma */}
+                <LanguageSelector variant="minimal" />
                 <button
                   type="button"
                   data-testid="admin-help-button"
@@ -224,7 +240,10 @@ const AdminLayout = () => {
         </main>
       </div>
       {showHelp && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4" data-testid="admin-help-modal">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
+          data-testid="admin-help-modal"
+        >
           <div className="w-full max-w-sm rounded-xl bg-surface p-6 shadow-xl space-y-4">
             <div className="space-y-2">
               <h2 className="text-lg font-semibold">Centro de ayuda</h2>
