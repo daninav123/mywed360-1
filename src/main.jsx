@@ -7,13 +7,14 @@ import App from './App';
 import ErrorBoundary from './components/debug/ErrorBoundary';
 import './index.css';
 // Auto-fix: Limpiar tokens expirados automáticamente
-import { setupAutoFix } from './services/autoFixAuth';
+// import { setupAutoFix } from './services/autoFixAuth'; // DESHABILITADO - Causaba lentitud
 import './utils/compatMigration';
 
-// Ejecutar auto-fix solo en desarrollo para evitar spam de logs
-if (import.meta.env.DEV) {
-  setupAutoFix();
-}
+// DESHABILITADO: autoFixAuth causaba lentitud del sistema
+// Si necesitas activarlo manualmente, usa en consola: window.setupAutoFix()
+// if (import.meta.env.DEV) {
+//   setupAutoFix();
+// }
 
 // ⚡ OPTIMIZACIÓN: Lazy load de inicializaciones no críticas
 // Estas se cargan DESPUÉS del primer render para no bloquear la UI
