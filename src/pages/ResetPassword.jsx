@@ -1,7 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { sendPasswordResetEmail } from 'firebase/auth';
+import { toast } from 'react-toastify';
 
-import { useAuth } from '../hooks/useAuth';
+import { auth } from '../firebaseConfig';
+import LanguageSelector from '../components/ui/LanguageSelector';
 import useTranslations from '../hooks/useTranslations';
 import { performanceMonitor } from '../services/PerformanceMonitor';
 
@@ -71,13 +74,20 @@ export default function ResetPassword() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-[var(--color-bg)] px-4 py-12">
+    <div className="flex items-center justify-center min-h-screen bg-[var(--color-bg)] px-4 py-12 relative">
+      {/* Selector de idioma */}
+      <div className="absolute top-4 right-4 z-10">
+        <LanguageSelector variant="minimal" persist={false} />
+      </div>
+
       <form
         onSubmit={handleSubmit}
         className="w-full max-w-md space-y-5 rounded-2xl border border-[color:var(--color-border)] bg-[var(--color-surface)] px-6 py-8 shadow-sm"
         noValidate
       >
-        <h2 className="text-2xl font-semibold text-[color:var(--color-text)]">{t('authResetPassword.title')}</h2>
+        <h2 className="text-2xl font-semibold text-[color:var(--color-text)]">
+          {t('authResetPassword.title')}
+        </h2>
         <p className="text-sm text-[color:var(--color-muted)]">
           {t('authResetPassword.description')}
         </p>
@@ -93,12 +103,22 @@ export default function ResetPassword() {
           data-testid="reset-email"
         />
         {status ? (
-          <p id={STATUS_ID} role="status" aria-live="polite" className="text-sm text-[color:var(--color-success)]">
+          <p
+            id={STATUS_ID}
+            role="status"
+            aria-live="polite"
+            className="text-sm text-[color:var(--color-success)]"
+          >
             {status}
           </p>
         ) : null}
         {error ? (
-          <p id={ERROR_ID} role="alert" aria-live="assertive" className="text-sm text-[color:var(--color-danger)]">
+          <p
+            id={ERROR_ID}
+            role="alert"
+            aria-live="assertive"
+            className="text-sm text-[color:var(--color-danger)]"
+          >
             {error}
           </p>
         ) : null}

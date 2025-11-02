@@ -1,9 +1,10 @@
-﻿import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 import AuthDivider from '../components/auth/AuthDivider';
 import RegisterForm from '../components/auth/RegisterForm';
 import SocialLoginButtons from '../components/auth/SocialLoginButtons';
+import LanguageSelector from '../components/ui/LanguageSelector';
 import useTranslations from '../hooks/useTranslations';
 import { useAuth } from '../hooks/useAuth';
 import { performanceMonitor } from '../services/PerformanceMonitor';
@@ -11,7 +12,6 @@ import { performanceMonitor } from '../services/PerformanceMonitor';
 const FORM_ERROR_ID = 'signup-form-error';
 const SOCIAL_ERROR_ID = 'signup-social-error';
 const INFO_MESSAGE_ID = 'signup-info-message';
-
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -110,7 +110,7 @@ export default function Signup() {
       has_error: issues.length > 0,
     });
 
-  if (issues.length > 0) {
+    if (issues.length > 0) {
       const firstIssue = issues[0];
       setFormError(getValidationMessage(firstIssue));
       if (firstIssue === 'missing_email') {
@@ -133,7 +133,11 @@ export default function Signup() {
           ...context,
           user_id: result?.user?.uid || null,
         });
-        setInfoMessage(t('authSignup.successMessage', { defaultValue: 'Account created successfully. Redirecting to your dashboard...' }));
+        setInfoMessage(
+          t('authSignup.successMessage', {
+            defaultValue: 'Account created successfully. Redirecting to your dashboard...',
+          })
+        );
         navigate('/home', { replace: true });
         return;
       }
@@ -206,7 +210,12 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg,#f4f5f7)] px-4 py-8">
+    <div className="min-h-screen bg-[var(--color-bg,#f4f5f7)] px-4 py-8 relative">
+      {/* Selector de idioma */}
+      <div className="absolute top-4 right-4 z-10">
+        <LanguageSelector variant="minimal" persist={false} />
+      </div>
+
       <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-5xl flex-col items-center justify-center">
         <div className="w-full max-w-5xl overflow-hidden rounded-2xl border border-soft bg-surface shadow-xl md:grid md:grid-cols-2">
           <div className="hidden bg-[color:var(--color-primary,#6366f1)]/10 p-10 md:flex md:flex-col md:justify-between md:gap-10">

@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 import AuthDivider from '../components/auth/AuthDivider';
 import SocialLoginButtons from '../components/auth/SocialLoginButtons';
+import LanguageSelector from '../components/ui/LanguageSelector';
 import { useAuth } from '../hooks/useAuth';
 import { performanceMonitor } from '../services/PerformanceMonitor';
 import useTranslations from '../hooks/useTranslations';
@@ -243,7 +244,12 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg,#f4f5f7)] px-4 py-8">
+    <div className="min-h-screen bg-[var(--color-bg,#f4f5f7)] px-4 py-8 relative">
+      {/* Selector de idioma */}
+      <div className="absolute top-4 right-4 z-10">
+        <LanguageSelector variant="minimal" persist={false} />
+      </div>
+
       <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-5xl flex-col items-center justify-center">
         <div className="w-full max-w-5xl overflow-hidden rounded-2xl border border-soft bg-surface shadow-xl md:grid md:grid-cols-2">
           <div className="hidden bg-[color:var(--color-primary,#6366f1)]/10 p-10 md:flex md:flex-col md:justify-between">
@@ -274,7 +280,10 @@ export default function Login() {
 
             <form onSubmit={handleSubmit} className="mt-6 space-y-4" noValidate>
               <div className="space-y-2">
-                <label htmlFor="login-email" className="text-sm font-medium text-[color:var(--color-text,#111827)]">
+                <label
+                  htmlFor="login-email"
+                  className="text-sm font-medium text-[color:var(--color-text,#111827)]"
+                >
                   {t('authLogin.emailLabel')}
                 </label>
                 <input
@@ -293,7 +302,10 @@ export default function Login() {
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="login-password" className="text-sm font-medium text-[color:var(--color-text,#111827)]">
+                <label
+                  htmlFor="login-password"
+                  className="text-sm font-medium text-[color:var(--color-text,#111827)]"
+                >
                   {t('authLogin.passwordLabel')}
                 </label>
                 <input
@@ -328,13 +340,21 @@ export default function Login() {
                   />
                   {t('authLogin.rememberMe')}
                 </label>
-                <Link to="/reset-password" className="text-[color:var(--color-primary,#6366f1)] hover:underline">
+                <Link
+                  to="/reset-password"
+                  className="text-[color:var(--color-primary,#6366f1)] hover:underline"
+                >
                   {t('authLogin.forgotPassword')}
                 </Link>
               </div>
 
               {formError ? (
-                <p id={FORM_ERROR_ID} role="alert" aria-live="assertive" className="text-sm text-red-600">
+                <p
+                  id={FORM_ERROR_ID}
+                  role="alert"
+                  aria-live="assertive"
+                  className="text-sm text-red-600"
+                >
                   {formError}
                 </p>
               ) : null}
