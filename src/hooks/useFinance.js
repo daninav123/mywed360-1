@@ -60,10 +60,10 @@ const AUTO_CATEGORY_RULES = [
       'save the date',
     ],
   },
-{
-  cat: 'Luna de miel',
-  keywords: ['vuelo', 'viaje', 'luna de miel', 'airbnb', 'booking', 'hotel'],
-},
+  {
+    cat: 'Luna de miel',
+    keywords: ['vuelo', 'viaje', 'luna de miel', 'airbnb', 'booking', 'hotel'],
+  },
 ];
 
 const normalizeCategoryName = (value) => normalizeBudgetCategoryName(value);
@@ -737,8 +737,7 @@ export default function useFinance() {
       .filter((item) => item.outstanding > 0)
       .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
       .slice(0, 5);
-    const forecastSurplus =
-      projection?.summary?.projectedAtWedding ?? stats?.currentBalance ?? 0;
+    const forecastSurplus = projection?.summary?.projectedAtWedding ?? stats?.currentBalance ?? 0;
     let monthsToWedding = null;
     if (
       weddingTimeline.weddingDate instanceof Date &&
@@ -751,15 +750,12 @@ export default function useFinance() {
       monthsToWedding = diff > 0 ? diff : 0;
     }
     const recommendedMonthlySaving =
-      monthsToWedding && monthsToWedding > 0
-        ? Math.max(0, budgetRemaining / monthsToWedding)
-        : 0;
+      monthsToWedding && monthsToWedding > 0 ? Math.max(0, budgetRemaining / monthsToWedding) : 0;
     const netTrendDiff =
       monthlySeries.net.length >= 2
         ? monthlySeries.net[monthlySeries.net.length - 1] - monthlySeries.net[0]
         : 0;
-    const trend =
-      netTrendDiff > 0 ? 'up' : netTrendDiff < 0 ? 'down' : 'flat';
+    const trend = netTrendDiff > 0 ? 'up' : netTrendDiff < 0 ? 'down' : 'flat';
     return {
       avgNet,
       avgIncome,
@@ -970,9 +966,7 @@ export default function useFinance() {
     const currentCategories = Array.isArray(budget.categories) ? budget.categories : [];
 
     const nextCategories = normalizedDesired.map(({ name, key }) => {
-      const existing = currentCategories.find(
-        (cat) => normalizeCategoryName(cat?.name) === key
-      );
+      const existing = currentCategories.find((cat) => normalizeCategoryName(cat?.name) === key);
       return {
         ...existing,
         name,
@@ -1052,7 +1046,9 @@ export default function useFinance() {
       const nextCategories = budget.categories.map((cat, idx) => {
         if (idx !== index) return cat;
         const nextAmount =
-          updates.amount != null ? parseMoneyValue(updates.amount, 0) : parseMoneyValue(cat.amount, 0);
+          updates.amount != null
+            ? parseMoneyValue(updates.amount, 0)
+            : parseMoneyValue(cat.amount, 0);
         return { ...cat, ...updates, amount: nextAmount };
       });
       setBudget((prev) => ({ ...prev, categories: nextCategories }));
@@ -1117,10 +1113,7 @@ export default function useFinance() {
           activeWeddingData?.region ||
           'global';
         const regionKey = normalizeCategoryName(weddingCountry) || 'global';
-        const guestCount =
-          contributions?.guestCount ||
-          activeWeddingData?.guestCount ||
-          0;
+        const guestCount = contributions?.guestCount || activeWeddingData?.guestCount || 0;
         const guestBucket = computeGuestBucket(guestCount);
 
         const normalizedHash = normalizedCategories
@@ -1135,10 +1128,7 @@ export default function useFinance() {
           capturedAt: nowIso,
           capturedAtTs: serverTimestamp(),
           currency:
-            activeWeddingData?.currency ||
-            settings?.currency ||
-            contributions?.currency ||
-            'EUR',
+            activeWeddingData?.currency || settings?.currency || contributions?.currency || 'EUR',
           wedding: {
             id: activeWedding,
             guestCount,
@@ -1172,11 +1162,7 @@ export default function useFinance() {
           doc(db, 'weddings', activeWedding, 'budgetSnapshots', snapshotId),
           snapshotPayload
         );
-        await setDoc(
-          doc(db, 'budgetSnapshots', activeWedding),
-          snapshotPayload,
-          { merge: true }
-        );
+        await setDoc(doc(db, 'budgetSnapshots', activeWedding), snapshotPayload, { merge: true });
 
         return { success: true, snapshotId };
       } catch (error) {
@@ -1213,10 +1199,7 @@ export default function useFinance() {
       contributions?.currency ||
       'EUR';
 
-    const guestCount =
-      contributions?.guestCount ||
-      activeWeddingData?.guestCount ||
-      null;
+    const guestCount = contributions?.guestCount || activeWeddingData?.guestCount || null;
 
     const styleNotes = [
       activeWeddingData?.style,
@@ -1227,8 +1210,7 @@ export default function useFinance() {
       .join('. ');
 
     const baseTotal =
-      Number(budget.total) ||
-      categories.reduce((sum, cat) => sum + (Number(cat.amount) || 0), 0);
+      Number(budget.total) || categories.reduce((sum, cat) => sum + (Number(cat.amount) || 0), 0);
 
     const payload = {
       weddingId: activeWedding,
@@ -1241,10 +1223,7 @@ export default function useFinance() {
           activeWeddingData?.province ||
           '',
         date: (() => {
-          const raw =
-            activeWeddingData?.weddingDate ||
-            activeWeddingData?.date ||
-            null;
+          const raw = activeWeddingData?.weddingDate || activeWeddingData?.date || null;
           if (!raw) return null;
           const parsed = new Date(raw);
           return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
@@ -1291,8 +1270,7 @@ export default function useFinance() {
       return normalized;
     } catch (err) {
       console.error('[useFinance] advisor request failed', err);
-      const message =
-        err?.message || 'No se pudo obtener la recomendación del consejero.';
+      const message = err?.message || 'No se pudo obtener la recomendación del consejero.';
       setAdvisorError(message);
       throw err;
     } finally {
@@ -1318,8 +1296,7 @@ export default function useFinance() {
       if (!advisor || !Array.isArray(advisor.scenarios)) {
         return { ok: false, reason: 'advisor_unavailable' };
       }
-      const scenario =
-        advisor.scenarios.find((entry) => entry.id === scenarioId) || null;
+      const scenario = advisor.scenarios.find((entry) => entry.id === scenarioId) || null;
       if (!scenario) {
         return { ok: false, reason: 'scenario_not_found' };
       }
@@ -1330,10 +1307,7 @@ export default function useFinance() {
 
       const baseTotal =
         Number(budget.total) ||
-        budget.categories.reduce(
-          (sum, cat) => sum + (Number(cat.amount) || 0),
-          0
-        );
+        budget.categories.reduce((sum, cat) => sum + (Number(cat.amount) || 0), 0);
 
       const categoryMap = new Map();
       budget.categories.forEach((cat, idx) => {
@@ -1353,9 +1327,10 @@ export default function useFinance() {
             : entry?.percentage != null && baseTotal > 0
               ? (Number(entry.percentage) / 100) * baseTotal
               : null;
-        const amount = parsedAmount != null && Number.isFinite(parsedAmount)
-          ? Math.max(0, Math.round(parsedAmount * 100) / 100)
-          : 0;
+        const amount =
+          parsedAmount != null && Number.isFinite(parsedAmount)
+            ? Math.max(0, Math.round(parsedAmount * 100) / 100)
+            : 0;
         if (categoryMap.has(key)) {
           const { idx } = categoryMap.get(key);
           updatedCategories[idx] = {
@@ -1395,13 +1370,37 @@ export default function useFinance() {
   }, [requestBudgetAdvisor]);
 
   const updateTotalBudget = useCallback(
-    (newTotal) => {
+    async (newTotal) => {
       const total = parseMoneyValue(newTotal, 0);
       setBudget((prev) => ({ ...prev, total }));
-      persistFinanceDoc({ budget: { total, categories: budget.categories } });
+
+      // 1. Actualizar finance/main (como antes)
+      await persistFinanceDoc({ budget: { total, categories: budget.categories } });
+
+      // 2. SINCRONIZACIÓN: También actualizar documento raíz de la boda
+      // Esto permite que useWeddingBasicInfo lea el presupuesto correctamente
+      if (activeWedding && db && firebaseUid) {
+        try {
+          const weddingRef = doc(db, 'weddings', activeWedding);
+          await setDoc(
+            weddingRef,
+            {
+              budget: { total },
+              presupuesto: total, // Legacy compatibility
+              updatedAt: serverTimestamp(),
+            },
+            { merge: true }
+          );
+          console.log(`[useFinance] Presupuesto sincronizado en raíz: ${total}€`);
+        } catch (error) {
+          console.warn('[useFinance] No se pudo sincronizar presupuesto en documento raíz:', error);
+          // No fallar la operación principal si esto falla
+        }
+      }
+
       return { success: true };
     },
-    [budget.categories, persistFinanceDoc]
+    [budget.categories, persistFinanceDoc, activeWedding, firebaseUid]
   );
 
   // Actualizar ajustes de presupuesto (umbrales de alerta)
@@ -1683,8 +1682,8 @@ export default function useFinance() {
           changes?.meta && typeof changes.meta === 'object'
             ? { ...changes.meta }
             : existing?.meta
-            ? { ...existing.meta }
-            : {};
+              ? { ...existing.meta }
+              : {};
         if (!payloadMeta.source) {
           const inferredSource =
             changes?.source ||
@@ -1839,7 +1838,9 @@ export default function useFinance() {
             if (Number.isNaN(date.getTime())) return undefined;
             return date.toISOString().slice(0, 10);
           };
-          const concept = (entry.concept || entry.description || `Importado ${index + 1}`).toString().trim();
+          const concept = (entry.concept || entry.description || `Importado ${index + 1}`)
+            .toString()
+            .trim();
           const payload = {
             concept,
             description: entry.description ? String(entry.description).trim() : undefined,
@@ -1848,7 +1849,9 @@ export default function useFinance() {
             status,
             category: entry.category ? String(entry.category).trim() || undefined : undefined,
             provider: entry.provider ? String(entry.provider).trim() || undefined : undefined,
-            paymentMethod: entry.paymentMethod ? String(entry.paymentMethod).trim() || undefined : undefined,
+            paymentMethod: entry.paymentMethod
+              ? String(entry.paymentMethod).trim() || undefined
+              : undefined,
             dueDate: normalizeDate(entry.dueDate) || null,
             date: normalizeDate(entry.date) || new Date().toISOString().slice(0, 10),
             paidAmount: paidAmount === null ? undefined : paidAmount,
@@ -1925,7 +1928,9 @@ export default function useFinance() {
       }));
       XLSX.utils.book_append_sheet(
         workbook,
-        XLSX.utils.json_to_sheet(transactionRows.length ? transactionRows : [{}], { skipHeader: transactionRows.length === 0 }),
+        XLSX.utils.json_to_sheet(transactionRows.length ? transactionRows : [{}], {
+          skipHeader: transactionRows.length === 0,
+        }),
         'Transacciones'
       );
 
@@ -1938,7 +1943,9 @@ export default function useFinance() {
       }));
       XLSX.utils.book_append_sheet(
         workbook,
-        XLSX.utils.json_to_sheet(categoryRows.length ? categoryRows : [{}], { skipHeader: categoryRows.length === 0 }),
+        XLSX.utils.json_to_sheet(categoryRows.length ? categoryRows : [{}], {
+          skipHeader: categoryRows.length === 0,
+        }),
         'Categorías'
       );
 
@@ -1950,7 +1957,9 @@ export default function useFinance() {
       }));
       XLSX.utils.book_append_sheet(
         workbook,
-        XLSX.utils.json_to_sheet(monthlyRows.length ? monthlyRows : [{}], { skipHeader: monthlyRows.length === 0 }),
+        XLSX.utils.json_to_sheet(monthlyRows.length ? monthlyRows : [{}], {
+          skipHeader: monthlyRows.length === 0,
+        }),
         'Mensual'
       );
 
@@ -2065,8 +2074,3 @@ export default function useFinance() {
     hasBankAccount,
   };
 }
-
-
-
-
-
