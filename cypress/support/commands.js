@@ -1,6 +1,8 @@
 import 'cypress-file-upload';
 const stubRemoved = (name) => {
-  throw new Error(`[Cypress ${name}] Helper retirado: ya no se permiten stubs. Actualiza la prueba para preparar datos reales.`);
+  throw new Error(
+    `[Cypress ${name}] Helper retirado: ya no se permiten stubs. Actualiza la prueba para preparar datos reales.`
+  );
 };
 
 Cypress.Commands.add('loginAsStubUser', () => stubRemoved('loginAsStubUser'));
@@ -90,7 +92,7 @@ Cypress.Commands.add('mockWeddingMinimal', () => {
       isActive: true,
       guestCount: 100,
       budget: 50000,
-      status: 'planning'
+      status: 'planning',
     };
 
     // Configurar localStorage
@@ -101,10 +103,10 @@ Cypress.Commands.add('mockWeddingMinimal', () => {
     win.localStorage.setItem('MaLoveApp_active_wedding', JSON.stringify(mockWedding));
     win.localStorage.setItem('MaLoveApp_weddings', JSON.stringify([mockWedding]));
     win.localStorage.setItem('MaLoveApp_test_mode', 'true');
-    
+
     cy.log('Mock wedding minimal configurado');
   });
-  
+
   // Interceptar Firebase/Firestore
   cy.intercept('POST', '**googleapis.com/**', { statusCode: 200, body: {} });
   cy.intercept('GET', '**googleapis.com/**', { statusCode: 200, body: {} });
@@ -118,7 +120,7 @@ Cypress.Commands.add('mockWeddingMinimal', () => {
  */
 Cypress.Commands.add('loginToLovenda', (email = 'test@maloveapp.com', role = 'owner') => {
   cy.visit('/');
-  
+
   cy.window().then((win) => {
     // Simular usuario logueado
     const mockUser = {
@@ -155,7 +157,7 @@ Cypress.Commands.add('loginToLovenda', (email = 'test@maloveapp.com', role = 'ow
       isActive: true,
       guestCount: 100,
       budget: 50000,
-      status: 'planning'
+      status: 'planning',
     };
 
     // Configurar las claves que useAuth busca para sesiones presembradas
@@ -163,14 +165,14 @@ Cypress.Commands.add('loginToLovenda', (email = 'test@maloveapp.com', role = 'ow
     win.localStorage.setItem('MaLoveApp_mock_user', JSON.stringify(mockUser));
     win.localStorage.setItem('MaLoveApp_user_profile', JSON.stringify(mockProfile));
     win.localStorage.setItem('MaLoveApp_auth_token', 'mock-token');
-    
+
     // Guardar la boda activa
     win.localStorage.setItem('MaLoveApp_active_wedding', JSON.stringify(mockWedding));
     win.localStorage.setItem('MaLoveApp_weddings', JSON.stringify([mockWedding]));
-    
+
     // Agregar flag para indicar que es un usuario de prueba
     win.localStorage.setItem('MaLoveApp_test_mode', 'true');
-    
+
     cy.log(`Usuario ${email} logueado con rol ${role || 'owner'} y boda activa creada`);
   });
 
@@ -179,7 +181,7 @@ Cypress.Commands.add('loginToLovenda', (email = 'test@maloveapp.com', role = 'ow
   cy.intercept('GET', '**googleapis.com/**', { statusCode: 200, body: {} });
   cy.intercept('POST', '**firestore.googleapis.com/**', { statusCode: 200, body: {} });
   cy.intercept('GET', '**firestore.googleapis.com/**', { statusCode: 200, body: {} });
-  
+
   // Interceptar llamadas a la API de upgrade
   cy.intercept('POST', '**/api/users/upgrade-role', (req) => {
     const { newRole, tier } = req.body || {};
@@ -201,22 +203,22 @@ Cypress.Commands.add('loginToLovenda', (email = 'test@maloveapp.com', role = 'ow
  */
 Cypress.Commands.add('mockWeddingNews', (pages = {}, options = {}) => {
   const { defaultBody = [] } = options;
-  
+
   // Interceptar todas las posibles rutas de la API de wedding news
   const interceptPaths = [
     '**/api/wedding-news*',
     '**/wedding-news*',
     '**localhost:4004/api/wedding-news*',
-    '**maloveapp-backend.onrender.com/api/wedding-news*'
+    '**maloveapp-backend.onrender.com/api/wedding-news*',
   ];
-  
-  interceptPaths.forEach(path => {
+
+  interceptPaths.forEach((path) => {
     cy.intercept('GET', path, (req) => {
       const url = new URL(req.url);
       const page = parseInt(url.searchParams.get('page') || '1');
-      
+
       console.log(`[Cypress] Intercepting wedding-news request: page=${page}, url=${req.url}`);
-      
+
       // Si hay datos específicos para esta página, devolverlos
       if (pages[page]) {
         console.log(`[Cypress] Returning specific data for page ${page}:`, pages[page]);
@@ -226,7 +228,7 @@ Cypress.Commands.add('mockWeddingNews', (pages = {}, options = {}) => {
         });
         return;
       }
-      
+
       // Si hay un body por defecto, usarlo
       if (pages.default !== undefined) {
         console.log(`[Cypress] Returning default data:`, pages.default);
@@ -236,7 +238,7 @@ Cypress.Commands.add('mockWeddingNews', (pages = {}, options = {}) => {
         });
         return;
       }
-      
+
       // Fallback al defaultBody de opciones
       console.log(`[Cypress] Returning fallback data:`, defaultBody);
       req.reply({
@@ -245,9 +247,11 @@ Cypress.Commands.add('mockWeddingNews', (pages = {}, options = {}) => {
       });
     });
   });
-  
+
   // Alias solo en la primera interceptación
-  cy.intercept('GET', '**/api/wedding-news*', { statusCode: 200, body: defaultBody }).as('weddingNewsRequest');
+  cy.intercept('GET', '**/api/wedding-news*', { statusCode: 200, body: defaultBody }).as(
+    'weddingNewsRequest'
+  );
 });
 
 /**
@@ -260,7 +264,7 @@ Cypress.Commands.add('mockWeddingNews', (pages = {}, options = {}) => {
  */
 Cypress.Commands.add('loginAsAdmin', (username = 'admin@maloveapp.com', password = 'admin123') => {
   cy.visit('/admin/login');
-  
+
   cy.window().then((win) => {
     // Simular admin logueado
     const mockAdmin = {
@@ -275,28 +279,32 @@ Cypress.Commands.add('loginAsAdmin', (username = 'admin@maloveapp.com', password
     win.localStorage.setItem('admin_token', mockAdmin.token);
     win.localStorage.setItem('admin_user', JSON.stringify(mockAdmin));
     win.localStorage.setItem('admin_logged_in', 'true');
-    
+
     cy.log(`Admin ${username} logueado`);
   });
-  
+
   cy.wait(500);
 });
 
 Cypress.Commands.add('closeDiagnostic', () => {
-  cy.get('body').then($body => {
+  cy.get('body').then(($body) => {
     // Buscar el panel de diagnóstico por diferentes selectores posibles
     const selectors = [
       '[data-testid="diagnostic-panel"]',
       '[id="diagnostic-panel"]',
       '.diagnostic-panel',
-      '[aria-label="Panel de diagnóstico"]'
+      '[aria-label="Panel de diagnóstico"]',
     ];
-    
+
     for (const selector of selectors) {
       if ($body.find(selector).length) {
         // Si existe el botón de cerrar, hacer clic
         cy.get(selector).within(() => {
-          cy.get('[data-testid="diagnostic-close"], [aria-label="Cerrar"], button:contains("X"), button:contains("×")').first().click({ force: true });
+          cy.get(
+            '[data-testid="diagnostic-close"], [aria-label="Cerrar"], button:contains("X"), button:contains("×")'
+          )
+            .first()
+            .click({ force: true });
         });
         break;
       }
@@ -311,13 +319,101 @@ Cypress.Commands.add('navigateToEmailInbox', () => {
   // Intentar navegar a la ruta de email
   cy.visit('/email', { failOnStatusCode: false });
   cy.wait(1000);
-  
+
   // Alternativamente, si hay un botón de navegación
-  cy.get('body').then($body => {
+  cy.get('body').then(($body) => {
     if ($body.find('[href="/email"]').length) {
       cy.get('[href="/email"]').first().click();
     } else if ($body.find('[data-testid="nav-email"]').length) {
       cy.get('[data-testid="nav-email"]').click();
+    }
+  });
+});
+
+// ============================================
+// COMANDOS I18N
+// ============================================
+
+/**
+ * Cambia el idioma de la aplicación usando el selector de idioma
+ * @param {string} languageCode - Código del idioma (ej: 'en', 'fr', 'es')
+ */
+Cypress.Commands.add('changeLanguage', (languageCode) => {
+  // Buscar y hacer clic en el selector de idioma (icono Globe)
+  cy.get('.language-selector').first().click();
+  cy.wait(300);
+
+  // Buscar el idioma en el dropdown y hacer clic
+  cy.get('.language-selector')
+    .find('button')
+    .contains(new RegExp(languageCode, 'i'))
+    .click({ force: true });
+
+  cy.wait(500); // Esperar a que se aplique el cambio
+});
+
+/**
+ * Cambia el idioma programáticamente desde la consola
+ * @param {string} languageCode - Código del idioma
+ */
+Cypress.Commands.add('setLanguageProgrammatically', (languageCode) => {
+  cy.window().then((win) => {
+    if (win.__I18N_INSTANCE__) {
+      win.__I18N_INSTANCE__.changeLanguage(languageCode);
+      win.localStorage.setItem('i18nextLng', languageCode);
+    }
+  });
+  cy.wait(500);
+});
+
+/**
+ * Verifica que el idioma actual es el esperado
+ * @param {string} expectedLanguage - Código del idioma esperado
+ */
+Cypress.Commands.add('verifyCurrentLanguage', (expectedLanguage) => {
+  cy.window().then((win) => {
+    const currentLang = win.localStorage.getItem('i18nextLng') || win.__I18N_INSTANCE__?.language;
+    expect(currentLang).to.include(expectedLanguage);
+  });
+});
+
+/**
+ * Verifica que un elemento contiene una traducción (no una clave)
+ * @param {string} selector - Selector del elemento
+ */
+Cypress.Commands.add('shouldNotContainI18nKey', (selector) => {
+  cy.get(selector)
+    .invoke('text')
+    .then((text) => {
+      // Las claves i18n tienen formato "namespace.key"
+      expect(text).to.not.match(/^[a-z]+\.[a-zA-Z.]+$/);
+    });
+});
+
+/**
+ * Activa el modo debug de i18n
+ */
+Cypress.Commands.add('enableI18nDebugMode', () => {
+  cy.setLanguageProgrammatically('en-x-i18n');
+  cy.wait(500);
+});
+
+/**
+ * Obtiene las claves faltantes de i18n
+ */
+Cypress.Commands.add('getMissingI18nKeys', () => {
+  cy.window().then((win) => {
+    return win.__I18N_MISSING_KEYS__ || [];
+  });
+});
+
+/**
+ * Limpia el log de claves faltantes
+ */
+Cypress.Commands.add('resetI18nMissingKeys', () => {
+  cy.window().then((win) => {
+    if (win.__I18N_RESET_MISSING__) {
+      win.__I18N_RESET_MISSING__();
     }
   });
 });
