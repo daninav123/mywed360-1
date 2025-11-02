@@ -1,0 +1,5 @@
+feat: add TemplateGalleryModal component
+
+- TemplateGalleryModal con 6 plantillas visuales
+- Resumen final de sesion
+- 280 lineas de componente

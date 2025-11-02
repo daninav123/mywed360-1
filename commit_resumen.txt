@@ -1,0 +1,5 @@
+docs: add resumen final de sesion
+
+- Resumen ejecutivo de toda la sesion
+- Metricas finales
+- Como usar nuevas funcionalidades

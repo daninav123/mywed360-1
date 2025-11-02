@@ -1,0 +1,8 @@
+feat: integrar TemplateGallery y ExportWizard en UI
+
+- Conectar TemplateGalleryModal al boton plantillas
+- Conectar ExportWizardEnhanced al boton exportar
+- Handler para aplicar plantillas con toast feedback
+- Handler para exportar con multiples formatos
+- Estados y callbacks integrados
+- FASE 3 completada al 80%
