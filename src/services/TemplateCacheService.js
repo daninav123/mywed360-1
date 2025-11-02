@@ -66,9 +66,28 @@ const isCacheExpired = (timestamp) => {
 
 /**
  * Guarda estadísticas de uso de la caché
+ * Optimización: Solo guarda si hay cambios desde la última vez
  */
+let lastStatsHash = '';
+
 const saveStats = () => {
   try {
+    // Crear hash simple de las stats para detectar cambios
+    const currentHash = JSON.stringify({
+      hits: cacheStats.hits,
+      misses: cacheStats.misses,
+      invalidations: cacheStats.invalidations,
+      preloads: cacheStats.preloads,
+    });
+
+    // Solo guardar si hay cambios desde la última vez
+    if (currentHash === lastStatsHash) {
+      console.log('[TemplateCacheService] Stats sin cambios, omitiendo guardado');
+      return;
+    }
+
+    lastStatsHash = currentHash;
+
     performanceMonitor.logEvent('template_cache_stats', {
       ...cacheStats,
       timestamp: Date.now(),
@@ -82,6 +101,8 @@ const saveStats = () => {
         timestamp: Date.now(),
       })
     );
+
+    console.log('[TemplateCacheService] Stats guardadas (cambios detectados)');
   } catch (error) {
     console.error('Error al guardar estadísticas de caché:', error);
   }

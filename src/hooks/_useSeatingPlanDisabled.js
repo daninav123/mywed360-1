@@ -104,8 +104,8 @@ export const useSeatingPlan = () => {
     setLockEvent(event);
   }, []);
   const consumeLockEvent = useCallback(() => setLockEvent(null), []);
-  const LOCK_TTL_MS = 45000;
-  const LOCK_HEARTBEAT_MS = 15000;
+  const LOCK_TTL_MS = 60000; // Aumentado de 45s a 60s
+  const LOCK_HEARTBEAT_MS = 30000; // Aumentado de 15s a 30s (reduce escrituras Firestore)
   const activeLockIntervalsRef = useRef(new Map());
   const ownedLocksRef = useRef(new Set());
   const [specialMomentsData, setSpecialMomentsData] = useState(null);
