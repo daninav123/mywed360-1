@@ -1986,6 +1986,142 @@
         "generic": "Error al iniciar sesión. Inténtalo de nuevo."
       }
     },
+    "publicRegistration": {
+      "form": {
+        "defaults": {
+          "country": "España"
+        },
+        "header": {
+          "title": "Regístrate como Proveedor",
+          "subtitle": "Únete a nuestra red de profesionales y conecta con parejas que buscan tus servicios"
+        },
+        "basicInfo": {
+          "title": "Información Básica",
+          "fields": {
+            "name": {
+              "label": "Nombre del negocio *",
+              "placeholder": "Ej.: Flores y Sueños"
+            },
+            "email": {
+              "label": "Correo electrónico *",
+              "placeholder": "tu@negocio.com"
+            },
+            "phone": {
+              "label": "Teléfono",
+              "placeholder": "+34 612 345 678"
+            },
+            "website": {
+              "label": "Sitio web",
+              "placeholder": "https://tunegocio.com"
+            }
+          }
+        },
+        "services": {
+          "title": "Servicios",
+          "category": {
+            "label": "Categoría principal *",
+            "placeholder": "Selecciona una categoría"
+          },
+          "optionsLabel": "Servicios que ofreces (selecciona los que apliquen)",
+          "options": {
+            "basic": "Básico",
+            "premium": "Premium",
+            "custom": "Personalizado",
+            "fullPackage": "Paquete completo",
+            "hourly": "Por horas",
+            "advisory": "Asesoramiento"
+          }
+        },
+        "location": {
+          "title": "Ubicación",
+          "fields": {
+            "city": {
+              "label": "Ciudad *",
+              "placeholder": "Ej.: Barcelona"
+            },
+            "province": {
+              "label": "Provincia *",
+              "placeholder": "Ej.: Barcelona"
+            },
+            "country": {
+              "label": "País"
+            }
+          }
+        },
+        "description": {
+          "title": "Descripción",
+          "placeholder": "Describe tu negocio, servicios, experiencia y estilo. Mínimo 50 caracteres.",
+          "counter": "{{current}} / {{max}} caracteres"
+        },
+        "prices": {
+          "title": "Rango de Precios (Opcional)",
+          "min": {
+            "label": "Precio mínimo",
+            "placeholder": "Ej.: 500"
+          },
+          "max": {
+            "label": "Precio máximo",
+            "placeholder": "Ej.: 3000"
+          },
+          "currency": {
+            "label": "Moneda",
+            "eur": "EUR (€)",
+            "usd": "USD ($)",
+            "gbp": "GBP (£)"
+          }
+        },
+        "terms": {
+          "prefix": "Acepto los",
+          "termsLink": "Términos y Condiciones",
+          "connector": "y la",
+          "privacyLink": "Política de Privacidad",
+          "suffix": "*"
+        },
+        "actions": {
+          "cancel": "Cancelar",
+          "submit": "Registrar mi negocio"
+        }
+      },
+      "validation": {
+        "name": "El nombre debe tener al menos 2 caracteres",
+        "email": "Ingresa un correo electrónico válido",
+        "category": "Selecciona una categoría",
+        "services": "Selecciona al menos un servicio",
+        "city": "Ingresa tu ciudad",
+        "province": "Ingresa tu provincia",
+        "description": "La descripción debe tener al menos 50 caracteres",
+        "acceptedTerms": "Debes aceptar los términos y condiciones",
+        "emailExists": "Este correo ya está registrado. Inicia sesión o usa otro correo."
+      },
+      "success": {
+        "title": "¡Registro Exitoso!",
+        "description": {
+          "prefix": "Hemos enviado un correo de confirmación a",
+          "suffix": "con las instrucciones para establecer tu contraseña y acceder a tu panel."
+        },
+        "nextSteps": {
+          "title": "Próximos pasos:"
+        },
+        "defaultNextSteps": [
+          "Revisa tu correo y establece tu contraseña",
+          "Completa tu perfil con fotos y detalles",
+          "Empieza a recibir solicitudes de parejas"
+        ],
+        "buttons": {
+          "goToLogin": "Ir al Login",
+          "goHome": "Volver al Inicio"
+        }
+      },
+      "dev": {
+        "linkLabel": "🔧 Link de setup (solo desarrollo):"
+      },
+      "errors": {
+        "submit": "Error al enviar el registro"
+      },
+      "alert": {
+        "error": "Error: {{message}}"
+      }
+    },
     "compare": {
       "title": "Compara proveedores",
       "summary": "Comparando {{count}} proveedor",
