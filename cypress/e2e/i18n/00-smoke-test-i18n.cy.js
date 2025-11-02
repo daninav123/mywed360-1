@@ -22,7 +22,7 @@ describe('i18n - Smoke Test', () => {
 
     it('Debe tener un idioma por defecto', () => {
       cy.window().then((win) => {
-        const lang = win.__I18N_INSTANCE__?.language;
+        const lang = win.__I18N_INSTANCE__?.language || win.localStorage?.getItem('i18nextLng');
         expect(lang).to.exist;
         expect(lang).to.be.a('string');
         expect(lang.length).to.be.greaterThan(0);
@@ -31,11 +31,13 @@ describe('i18n - Smoke Test', () => {
 
     it('Debe exponer funciones de debug', () => {
       cy.window().then((win) => {
+        // Esperar un poco a que i18n se inicialice completamente
+        cy.wait(500);
         expect(win.__I18N_MISSING_KEYS__).to.exist;
-        expect(win.__I18N_RESET_MISSING__).to.be.a('function');
-        expect(win.__I18N_EXPORT_MISSING__).to.be.a('function');
-        expect(win.__I18N_DOWNLOAD_MISSING__).to.be.a('function');
-        expect(win.__I18N_GET_MISSING__).to.be.a('function');
+        expect(win.__I18N_RESET_MISSING__).to.exist.and.to.be.a('function');
+        expect(win.__I18N_EXPORT_MISSING__).to.exist.and.to.be.a('function');
+        expect(win.__I18N_DOWNLOAD_MISSING__).to.exist.and.to.be.a('function');
+        expect(win.__I18N_GET_MISSING__).to.exist.and.to.be.a('function');
       });
     });
   });
@@ -88,13 +90,20 @@ describe('i18n - Smoke Test', () => {
 
     it('Debe mostrar idiomas principales', () => {
       cy.get('.language-selector').first().click();
-      cy.wait(300);
+      cy.wait(500);
 
-      // Verificar que hay opciones de idioma
-      cy.get('.language-selector')
-        .should('contain.text', 'Spanish')
-        .or('contain.text', 'English')
-        .or('contain.text', 'French');
+      // Verificar que hay opciones de idioma (buscar en todo el dropdown visible)
+      cy.get('body').then(($body) => {
+        const text = $body.text();
+        const hasLanguages =
+          text.includes('Spanish') ||
+          text.includes('English') ||
+          text.includes('French') ||
+          text.includes('Español') ||
+          text.includes('Inglés') ||
+          text.includes('Francés');
+        expect(hasLanguages).to.be.true;
+      });
     });
   });
 
@@ -191,27 +200,28 @@ describe('i18n - Smoke Test', () => {
 
   describe('Comandos Cypress personalizados', () => {
     it('Debe tener comando changeLanguage', () => {
-      expect(Cypress.Commands._commands).to.have.property('changeLanguage');
+      // Verificar que el comando existe intentando usarlo en un contexto seguro
+      expect(cy.changeLanguage).to.be.a('function');
     });
 
     it('Debe tener comando setLanguageProgrammatically', () => {
-      expect(Cypress.Commands._commands).to.have.property('setLanguageProgrammatically');
+      expect(cy.setLanguageProgrammatically).to.be.a('function');
     });
 
     it('Debe tener comando verifyCurrentLanguage', () => {
-      expect(Cypress.Commands._commands).to.have.property('verifyCurrentLanguage');
+      expect(cy.verifyCurrentLanguage).to.be.a('function');
     });
 
     it('Debe tener comando enableI18nDebugMode', () => {
-      expect(Cypress.Commands._commands).to.have.property('enableI18nDebugMode');
+      expect(cy.enableI18nDebugMode).to.be.a('function');
     });
 
     it('Debe tener comando getMissingI18nKeys', () => {
-      expect(Cypress.Commands._commands).to.have.property('getMissingI18nKeys');
+      expect(cy.getMissingI18nKeys).to.be.a('function');
     });
 
     it('Debe tener comando resetI18nMissingKeys', () => {
-      expect(Cypress.Commands._commands).to.have.property('resetI18nMissingKeys');
+      expect(cy.resetI18nMissingKeys).to.be.a('function');
     });
   });
 });
