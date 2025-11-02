@@ -22,6 +22,8 @@ import SeatingPlanOnboardingChecklist from './SeatingPlanOnboardingChecklist';
 import SeatingPlanSummary from './SeatingPlanSummary';
 import AutoLayoutModal from './AutoLayoutModal';
 import SeatingSearchBar from './SeatingSearchBar';
+import TemplateGalleryModal from './TemplateGalleryModal';
+import ExportWizardEnhanced from './ExportWizardEnhanced';
 import { useWedding } from '../../context/WeddingContext';
 // Importar va alias estable para permitir vi.mock en tests y usar el hook deshabilitado en test
 import { useSeatingPlan } from '../../hooks/useSeatingPlan';
@@ -391,6 +393,8 @@ const SeatingPlanRefactored = () => {
   const [viewport, setViewport] = React.useState({ scale: 1, offset: { x: 0, y: 0 } });
   const [exportWizardOpen, setExportWizardOpen] = React.useState(false);
   const [autoLayoutModalOpen, setAutoLayoutModalOpen] = React.useState(false);
+  const [templateGalleryOpen, setTemplateGalleryOpen] = React.useState(false);
+  const [exportWizardEnhancedOpen, setExportWizardEnhancedOpen] = React.useState(false);
   const otherCollaborators = React.useMemo(
     () =>
       Array.isArray(collaborators) ? collaborators.filter((member) => !member?.isCurrent) : [],
@@ -904,7 +908,28 @@ const SeatingPlanRefactored = () => {
     () => setSpaceConfigOpen(true),
     [setSpaceConfigOpen]
   );
-  const handleOpenTemplates = React.useCallback(() => setTemplateOpen(true), [setTemplateOpen]);
+  // Abrir Template Gallery mejorado
+  const handleOpenTemplates = React.useCallback(() => {
+    setTemplateGalleryOpen(true);
+  }, []);
+
+  // Handler para aplicar plantilla desde la galería
+  const handleSelectTemplate = React.useCallback(
+    (template) => {
+      try {
+        // Aplicar la plantilla según su configuración
+        if (tab === 'banquet' && template.layout) {
+          // Generar layout automático con el tipo de plantilla
+          handleGenerateAutoLayout(template.layout);
+          toast.success(`Plantilla "${template.name}" aplicada`);
+        }
+      } catch (error) {
+        console.error('Error applying template:', error);
+        toast.error('Error al aplicar plantilla');
+      }
+    },
+    [tab, handleGenerateAutoLayout]
+  );
 
   // Atajos extra: rotaci�n, alinear/distribuir, tabs, toggles y paneles
   useEffect(() => {
@@ -1813,7 +1838,7 @@ const SeatingPlanRefactored = () => {
                 onAutoAssign={handleAutoAssignClick}
                 onClearBanquet={clearBanquetLayout}
                 onOpenTemplates={handleOpenTemplates}
-                onOpenExportWizard={() => setExportWizardOpen(true)}
+                onOpenExportWizard={() => setExportWizardEnhancedOpen(true)}
                 onSaveSnapshot={(name) => {
                   try {
                     saveSnapshot?.(name);
@@ -2023,6 +2048,38 @@ const SeatingPlanRefactored = () => {
           onClose={() => setAutoLayoutModalOpen(false)}
           onGenerate={handleGenerateAutoLayout}
           analysis={guestAnalysis}
+        />
+
+        {/* FASE 3: Template Gallery Modal */}
+        <TemplateGalleryModal
+          isOpen={templateGalleryOpen}
+          onClose={() => setTemplateGalleryOpen(false)}
+          onSelectTemplate={handleSelectTemplate}
+        />
+
+        {/* FASE 3: Export Wizard Enhanced */}
+        <ExportWizardEnhanced
+          isOpen={exportWizardEnhancedOpen}
+          onClose={() => setExportWizardEnhancedOpen(false)}
+          onExport={(format, options) => {
+            try {
+              // Llamar al export correspondiente según formato
+              if (format === 'pdf') {
+                exportPDF();
+              } else if (format === 'png') {
+                exportPNG();
+              } else if (format === 'svg') {
+                exportSVG();
+              } else if (format === 'excel') {
+                exportCSV();
+              }
+              toast.success(`Exportado como ${format.toUpperCase()}`);
+            } catch (error) {
+              console.error('Export error:', error);
+              toast.error('Error al exportar');
+            }
+          }}
+          canvasRef={canvasRef}
         />
       </div>
     </DndProvider>
