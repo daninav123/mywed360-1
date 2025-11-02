@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LogIn, Mail, Lock, AlertCircle } from 'lucide-react';
+import LanguageSelector from '../../components/ui/LanguageSelector';
 import useTranslations from '../../hooks/useTranslations';
 
 /**
@@ -58,9 +59,14 @@ export default function SupplierLogin() {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center p-4"
+      className="min-h-screen flex items-center justify-center p-4 relative"
       style={{ backgroundColor: 'var(--color-bg)' }}
     >
+      {/* Selector de idioma */}
+      <div className="absolute top-4 right-4 z-10">
+        <LanguageSelector variant="minimal" persist={false} />
+      </div>
+
       <div className="max-w-md w-full">
         {/* Logo y título */}
         <div className="text-center mb-8">
