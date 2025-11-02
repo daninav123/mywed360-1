@@ -5,7 +5,7 @@
  * con su estado actual y permite hacer seguimiento.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Calendar,
   MapPin,
@@ -36,11 +36,7 @@ export default function QuoteRequestsTracker() {
   const [showComparator, setShowComparator] = useState(false);
   const [comparingCategory, setComparingCategory] = useState(null);
 
-  useEffect(() => {
-    loadQuoteRequests();
-  }, [user, activeWedding]);
-
-  const loadQuoteRequests = async () => {
+  const loadQuoteRequests = useCallback(async () => {
     if (!user || !activeWedding) {
       setRequests([]);
       setLoading(false);
@@ -80,7 +76,11 @@ export default function QuoteRequestsTracker() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, activeWedding]);
+
+  useEffect(() => {
+    loadQuoteRequests();
+  }, [loadQuoteRequests]);
 
   const filteredRequests = requests.filter((req) => {
     if (filter === 'all') return true;
