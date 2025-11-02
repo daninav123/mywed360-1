@@ -11,6 +11,7 @@ import {
   Heart,
   Camera,
   ArrowUpDown,
+  DollarSign,
 } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
