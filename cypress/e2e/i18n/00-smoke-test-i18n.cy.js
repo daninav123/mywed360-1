@@ -30,14 +30,26 @@ describe('i18n - Smoke Test', () => {
     });
 
     it('Debe exponer funciones de debug', () => {
+      // Esperar a que i18n se inicialice completamente
+      cy.wait(1000);
+
       cy.window().then((win) => {
-        // Esperar un poco a que i18n se inicialice completamente
-        cy.wait(500);
+        // Verificar que el array existe (puede estar vacío al inicio)
         expect(win.__I18N_MISSING_KEYS__).to.exist;
-        expect(win.__I18N_RESET_MISSING__).to.exist.and.to.be.a('function');
-        expect(win.__I18N_EXPORT_MISSING__).to.exist.and.to.be.a('function');
-        expect(win.__I18N_DOWNLOAD_MISSING__).to.exist.and.to.be.a('function');
-        expect(win.__I18N_GET_MISSING__).to.exist.and.to.be.a('function');
+        expect(Array.isArray(win.__I18N_MISSING_KEYS__)).to.be.true;
+
+        // Verificar funciones
+        expect(win.__I18N_RESET_MISSING__).to.exist;
+        expect(win.__I18N_RESET_MISSING__).to.be.a('function');
+
+        expect(win.__I18N_EXPORT_MISSING__).to.exist;
+        expect(win.__I18N_EXPORT_MISSING__).to.be.a('function');
+
+        expect(win.__I18N_DOWNLOAD_MISSING__).to.exist;
+        expect(win.__I18N_DOWNLOAD_MISSING__).to.be.a('function');
+
+        expect(win.__I18N_GET_MISSING__).to.exist;
+        expect(win.__I18N_GET_MISSING__).to.be.a('function');
       });
     });
   });

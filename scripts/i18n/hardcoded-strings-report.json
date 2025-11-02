@@ -1,0 +1,12 @@
+[
+  {
+    "file": "src\\components\\ui\\LanguageSelector.jsx",
+    "matches": [
+      {
+        "line": 67,
+        "content": "console.error('Error cambiando idioma:', err);",
+        "match": "Error"
+      }
+    ]
+  }
+]

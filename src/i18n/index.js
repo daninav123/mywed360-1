@@ -256,15 +256,28 @@ export const exportMissingKeys = () => {
   return organized;
 };
 
+// Inicializar funciones globales inmediatamente
 if (typeof window !== 'undefined') {
+  // Inicializar el array vacío inmediatamente
+  window.__I18N_MISSING_KEYS__ = missingKeyLog;
+
+  // Exponer instancia de i18n
   window.__I18N_INSTANCE__ = i18n;
+
+  // Función para resetear claves faltantes
   window.__I18N_RESET_MISSING__ = () => {
     missingKeyLog.length = 0;
     window.__I18N_MISSING_KEYS__ = missingKeyLog;
     return missingKeyLog;
   };
+
+  // Función para obtener copia del log
   window.__I18N_GET_MISSING__ = () => missingKeyLog.slice();
+
+  // Función para exportar claves organizadas
   window.__I18N_EXPORT_MISSING__ = exportMissingKeys;
+
+  // Función para descargar reporte JSON
   window.__I18N_DOWNLOAD_MISSING__ = () => {
     const data = exportMissingKeys();
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
