@@ -997,14 +997,44 @@ export default function useFinance() {
 
   // Actualizar configuración de aportaciones y persistir
   const updateContributions = useCallback(
-    (updates) => {
+    async (updates) => {
       setContributions((prev) => {
         const next = { ...prev, ...updates };
+
+        // 1. Persistir en finance/main (como antes)
         persistFinanceDoc({ contributions: next });
+
+        // 2. SINCRONIZACIÓN: Si actualiza guestCount, sincronizar en documento raíz
+        // Esto permite que otros sistemas lean el número de invitados correctamente
+        if (updates.guestCount !== undefined && activeWedding && db && firebaseUid) {
+          (async () => {
+            try {
+              const weddingRef = doc(db, 'weddings', activeWedding);
+              await setDoc(
+                weddingRef,
+                {
+                  guestCount: next.guestCount,
+                  updatedAt: serverTimestamp(),
+                },
+                { merge: true }
+              );
+              console.log(
+                `[useFinance] GuestCount sincronizado en raíz: ${next.guestCount} invitados`
+              );
+            } catch (error) {
+              console.warn(
+                '[useFinance] No se pudo sincronizar guestCount en documento raíz:',
+                error
+              );
+              // No fallar la operación principal si esto falla
+            }
+          })();
+        }
+
         return next;
       });
     },
-    [persistFinanceDoc]
+    [persistFinanceDoc, activeWedding, firebaseUid]
   );
 
   // Gestión de categorías de presupuesto
