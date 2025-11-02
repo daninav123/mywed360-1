@@ -262,9 +262,14 @@ describe('Cobertura de Traducciones', () => {
         cy.wait(500);
 
         cy.window().then((win) => {
-          const i18n = win.__I18N_INSTANCE__;
-          // Verificar que existen traducciones para errores comunes
-          expect(i18n).to.exist;
+          // Verificar que el sistema i18n está disponible
+          expect(win.__I18N_INSTANCE__).to.exist;
+          expect(win.__I18N_INSTANCE__).to.have.property('language');
+
+          // Verificar que el idioma está configurado
+          const currentLang = win.__I18N_INSTANCE__.language;
+          expect(currentLang).to.be.a('string');
+          expect(currentLang.length).to.be.greaterThan(0);
         });
       });
     });
