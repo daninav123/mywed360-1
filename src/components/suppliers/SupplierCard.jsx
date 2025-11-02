@@ -16,6 +16,7 @@ import {
   Star,
   Share2,
   Clock,
+  DollarSign,
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 
@@ -490,6 +491,15 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
                 </button>
               )}
             </div>
+
+            {/* Botón Solicitar Presupuesto */}
+            <button
+              onClick={() => setShowQuoteModal(true)}
+              className="w-full px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors font-medium text-sm flex items-center justify-center gap-2"
+            >
+              <DollarSign size={16} />
+              💰 {t('common.suppliers.card.hybrid.actions.requestQuote', 'Solicitar Presupuesto')}
+            </button>
 
             {/* Botón Compartir */}
             <button

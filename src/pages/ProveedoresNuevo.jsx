@@ -40,6 +40,7 @@ import FavoritesSection from '../components/suppliers/FavoritesSection';
 import CompareBar from '../components/suppliers/CompareBar';
 import RecommendedSuppliers from '../components/suppliers/RecommendedSuppliers';
 import WeddingServicesOverview from '../components/wedding/WeddingServicesOverview';
+import QuoteRequestsTracker from '../components/suppliers/QuoteRequestsTracker';
 
 const CONFIRMED_KEYWORDS = ['confirm', 'contrat', 'reserva', 'firm'];
 
@@ -822,6 +823,24 @@ const Proveedores = () => {
           <FavoritesSection />
         ) : (
           <>
+            {/* Mis Solicitudes de Presupuesto */}
+            <div className="mb-8">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 rounded-lg bg-purple-100">
+                  <DollarSign className="w-5 h-5 text-purple-600" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-gray-900">
+                    📋 Mis Solicitudes de Presupuesto
+                  </h2>
+                  <p className="text-sm text-gray-600">
+                    Compara y gestiona los presupuestos que has solicitado
+                  </p>
+                </div>
+              </div>
+              <QuoteRequestsTracker />
+            </div>
+
             {/* Servicios de tu boda - Header con progreso + Buscador integrado */}
             <div className="mb-6">
               <WeddingServicesOverview

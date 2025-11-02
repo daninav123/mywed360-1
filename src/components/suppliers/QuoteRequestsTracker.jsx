@@ -20,13 +20,16 @@ import Card from '../ui/Card';
 import Button from '../ui/Button';
 import { useAuth } from '../../hooks/useAuth';
 import { useWedding } from '../../context/WeddingContext';
+import { useWeddingServices } from '../../hooks/useWeddingServices';
 import { db } from '../../firebaseConfig';
 import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
 import QuoteComparator from './QuoteComparator';
+import { toast } from 'react-toastify';
 
 export default function QuoteRequestsTracker() {
   const { user } = useAuth();
   const { activeWedding } = useWedding();
+  const { assignSupplier } = useWeddingServices();
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all'); // all, pending, contacted, quoted
@@ -110,9 +113,39 @@ export default function QuoteRequestsTracker() {
     setShowComparator(true);
   };
 
-  const handleSelectQuote = (quote) => {
-    console.log('Quote selected:', quote);
-    // TODO: Implementar lógica de selección
+  const handleSelectQuote = async (selectedQuote) => {
+    try {
+      // Normalizar la clave de categoría
+      const categoryKey =
+        selectedQuote.supplierCategory || comparingCategory?.categoryKey || 'otros';
+
+      // Crear objeto de proveedor
+      const supplierData = {
+        id: selectedQuote.supplierId,
+        name: selectedQuote.supplierName,
+        contact: selectedQuote.supplier?.contact || {},
+        category: categoryKey,
+      };
+
+      // Asignar proveedor al servicio de la boda
+      await assignSupplier(
+        categoryKey,
+        supplierData,
+        selectedQuote, // El quote completo con pricing, terms, etc.
+        '', // notes vacío
+        'contratado' // status
+      );
+
+      toast.success(`✅ ${selectedQuote.supplierName} ha sido contratado!`);
+
+      // Cerrar comparador y recargar solicitudes
+      setShowComparator(false);
+      setComparingCategory(null);
+      await loadQuoteRequests();
+    } catch (error) {
+      console.error('Error al asignar proveedor:', error);
+      toast.error('Error al contratar el proveedor. Inténtalo de nuevo.');
+    }
   };
 
   const getStatusBadge = (status) => {
