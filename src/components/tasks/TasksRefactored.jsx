@@ -2448,47 +2448,7 @@ export default function TasksRefactored() {
   // Indicador de progreso eliminado
 
   // 1) Escuchar info de la boda para fijar projectEnd (weddings/{id}/weddingInfo.weddingDate)
-  useEffect(() => {
-    // Deshabilitado: slo usar weddings/{id}.weddingDate como fuente
-    return;
-    if (!activeWedding || !db) return;
-    try {
-      const refPrimary = doc(db, 'weddings', activeWedding, 'weddingInfo');
-      const refLegacy = doc(db, 'weddings', activeWedding, 'info', 'weddingInfo');
-      // Variacin en minsculas que algunos entornos crean: weddings/{id}/weddinginfo
-      const refLower = doc(db, 'weddings', activeWedding, 'weddinginfo');
-      const handler = (snap) => {
-        try {
-          if (!snap || !snap.exists()) return;
-          const info = snap.data() || {};
-          const raw =
-            info?.weddingDate ||
-            info?.weddingdate ||
-            info?.date ||
-            info?.eventDate ||
-            info?.eventdate ||
-            null;
-          const d =
-            raw && typeof raw?.toDate === 'function' ? raw.toDate() : raw ? new Date(raw) : null;
-          if (d && !isNaN(d.getTime())) setProjectEnd(d);
-        } catch (_) {}
-      };
-      const unsub1 = onSnapshot(refPrimary, handler, () => {});
-      const unsub2 = onSnapshot(refLegacy, handler, () => {});
-      const unsub3 = onSnapshot(refLower, handler, () => {});
-      return () => {
-        try {
-          unsub1 && unsub1();
-        } catch (_) {}
-        try {
-          unsub2 && unsub2();
-        } catch (_) {}
-        try {
-          unsub3 && unsub3();
-        } catch (_) {}
-      };
-    } catch (_) {}
-  }, [activeWedding, db]);
+  // DESHABILITADO: Solo usar weddings/{id}.weddingDate como fuente (ver useEffect más abajo)
 
   // 1a-bis) Leer weddingDate desde weddings/{id}/info/weddingInfo (ruta comn)
   useEffect(() => {
