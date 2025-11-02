@@ -4,7 +4,6 @@ import { sendPasswordResetEmail } from 'firebase/auth';
 import { toast } from 'react-toastify';
 
 import { auth } from '../firebaseConfig';
-import LanguageSelector from '../components/ui/LanguageSelector';
 import useTranslations from '../hooks/useTranslations';
 import { performanceMonitor } from '../services/PerformanceMonitor';
 
@@ -74,12 +73,7 @@ export default function ResetPassword() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-[var(--color-bg)] px-4 py-12 relative">
-      {/* Selector de idioma */}
-      <div className="absolute top-4 right-4 z-10">
-        <LanguageSelector variant="minimal" persist={false} />
-      </div>
-
+    <div className="flex items-center justify-center min-h-screen bg-[var(--color-bg)] px-4 py-12">
       <form
         onSubmit={handleSubmit}
         className="w-full max-w-md space-y-5 rounded-2xl border border-[color:var(--color-border)] bg-[var(--color-surface)] px-6 py-8 shadow-sm"
