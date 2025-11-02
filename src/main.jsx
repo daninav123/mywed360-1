@@ -10,8 +10,10 @@ import './index.css';
 import { setupAutoFix } from './services/autoFixAuth';
 import './utils/compatMigration';
 
-// Ejecutar auto-fix de autenticación
-setupAutoFix();
+// Ejecutar auto-fix solo en desarrollo para evitar spam de logs
+if (import.meta.env.DEV) {
+  setupAutoFix();
+}
 
 // ⚡ OPTIMIZACIÓN: Lazy load de inicializaciones no críticas
 // Estas se cargan DESPUÉS del primer render para no bloquear la UI
