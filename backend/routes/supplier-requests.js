@@ -291,24 +291,21 @@ router.get('/:supplierId', async (req, res) => {
 
     // TODO: Verificar autenticación del proveedor con middleware
 
+    // Para evitar índice compuesto, obtenemos todos y filtramos en memoria si hay status
     let query = db
       .collection('suppliers')
       .doc(supplierId)
       .collection('requests')
       .orderBy('receivedAt', 'desc');
 
-    // Filtrar por status si se especifica
-    if (status) {
-      query = query.where('status', '==', status);
+    // Si no hay filtro de status, podemos limitar directamente en la query
+    if (!status) {
+      query = query.limit(parseInt(limit) * parseInt(page));
     }
 
-    // Paginar
-    const snapshot = await query
-      .limit(parseInt(limit))
-      .offset((parseInt(page) - 1) * parseInt(limit))
-      .get();
+    const snapshot = await query.get();
 
-    const requests = [];
+    let requests = [];
     snapshot.forEach((doc) => {
       requests.push({
         id: doc.id,
@@ -316,13 +313,25 @@ router.get('/:supplierId', async (req, res) => {
       });
     });
 
+    // Filtrar por status en memoria si se especificó
+    if (status) {
+      requests = requests.filter((r) => r.status === status);
+    }
+
+    const totalResults = requests.length;
+
+    // Paginar en memoria
+    const startIndex = (parseInt(page) - 1) * parseInt(limit);
+    const endIndex = startIndex + parseInt(limit);
+    const paginatedRequests = requests.slice(startIndex, endIndex);
+
     res.json({
       success: true,
-      data: requests,
+      data: paginatedRequests,
       pagination: {
         page: parseInt(page),
         limit: parseInt(limit),
-        total: snapshot.size,
+        total: totalResults,
       },
     });
   } catch (error) {

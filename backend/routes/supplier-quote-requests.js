@@ -281,6 +281,118 @@ router.put('/:id/quote-requests/:requestId/status', express.json(), async (req, 
 });
 
 /**
+ * POST /api/suppliers/:id/quote-requests/:requestId/quotation
+ * Crear y enviar cotización para una solicitud (solo proveedor)
+ * Requiere autenticación de proveedor
+ */
+router.post('/:id/quote-requests/:requestId/quotation', express.json(), async (req, res) => {
+  try {
+    const { id, requestId } = req.params;
+    const { items, discount, tax, validUntil, terms, notes } = req.body;
+
+    // Validar autenticación del proveedor
+    const supplierId = req.headers['x-supplier-id'];
+    if (!supplierId || supplierId !== id) {
+      return res.status(403).json({ error: 'forbidden' });
+    }
+
+    // Validar items
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ error: 'items_required' });
+    }
+
+    // Verificar que la solicitud existe
+    const requestRef = db
+      .collection('suppliers')
+      .doc(id)
+      .collection('quote-requests')
+      .doc(requestId);
+
+    const requestDoc = await requestRef.get();
+    if (!requestDoc.exists) {
+      return res.status(404).json({ error: 'request_not_found' });
+    }
+
+    const requestData = requestDoc.data();
+
+    // Calcular totales
+    const subtotal = items.reduce((sum, item) => {
+      return sum + item.quantity * item.unitPrice;
+    }, 0);
+
+    const discountAmount =
+      discount?.type === 'percentage' ? (subtotal * discount.value) / 100 : discount?.value || 0;
+
+    const taxableAmount = subtotal - discountAmount;
+    const taxAmount = tax?.rate ? (taxableAmount * tax.rate) / 100 : 0;
+    const total = taxableAmount + taxAmount;
+
+    // Crear cotización
+    const quotation = {
+      quotationId: `QT-${Date.now()}`,
+      requestId,
+      supplierId: id,
+      supplierName: requestData.supplierName,
+
+      // Cliente
+      clientName: requestData.contacto?.nombre,
+      clientEmail: requestData.contacto?.email,
+
+      // Items
+      items: items.map((item) => ({
+        description: item.description,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        total: item.quantity * item.unitPrice,
+      })),
+
+      // Cálculos
+      subtotal,
+      discount: discount || null,
+      discountAmount,
+      tax: tax || null,
+      taxAmount,
+      total,
+
+      // Detalles
+      validUntil: validUntil || null,
+      terms: terms || '',
+      notes: notes || '',
+
+      // Estado
+      status: 'sent', // sent, viewed, accepted, rejected
+
+      // Timestamps
+      createdAt: FieldValue.serverTimestamp(),
+      sentAt: FieldValue.serverTimestamp(),
+      viewedAt: null,
+      respondedAt: null,
+      updatedAt: FieldValue.serverTimestamp(),
+    };
+
+    // Guardar cotización en la solicitud
+    await requestRef.update({
+      quotation,
+      status: 'quoted',
+      updatedAt: FieldValue.serverTimestamp(),
+    });
+
+    logger.info(`✅ Cotización creada: ${quotation.quotationId} para solicitud ${requestId}`);
+
+    // TODO: Enviar email al cliente con la cotización
+
+    return res.status(201).json({
+      success: true,
+      quotation,
+      message: 'Cotización enviada correctamente',
+    });
+  } catch (error) {
+    logger.error('Error creating quotation:', error);
+    return res.status(500).json({ error: 'internal_error' });
+  }
+});
+
+/**
  * GET /api/suppliers/:id/quote-requests/stats
  * Obtener estadísticas de solicitudes (solo proveedor)
  * Requiere autenticación de proveedor

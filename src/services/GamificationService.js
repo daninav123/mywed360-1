@@ -67,7 +67,48 @@ const FALLBACK_SAMPLE = {
   ],
 };
 
+let remoteDisabled = false;
+let remoteDisableReason = null;
+
+try {
+  if (typeof window !== 'undefined' && window.sessionStorage) {
+    const persisted = window.sessionStorage.getItem('maloveapp_gamification_disabled');
+    if (persisted) {
+      remoteDisabled = true;
+      remoteDisableReason = persisted;
+    }
+  }
+} catch (error) {
+  // Ignorar errores de storage (modo incógnito, etc.)
+}
+
+function disableRemoteGamification(reason) {
+  if (remoteDisabled) {
+    return;
+  }
+  remoteDisabled = true;
+  remoteDisableReason =
+    typeof reason === 'string' ? reason : reason?.message || reason?.status || 'remote-disabled';
+  if (typeof console !== 'undefined') {
+    console.warn(
+      '[GamificationService] Deshabilitando integración remota de gamificación:',
+      remoteDisableReason
+    );
+  }
+  if (typeof window !== 'undefined') {
+    window.__GAMIFICATION_REMOTE_DISABLED__ = remoteDisableReason;
+  }
+  try {
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      window.sessionStorage.setItem('maloveapp_gamification_disabled', remoteDisableReason);
+    }
+  } catch (error) {
+    // Ignorar errores de almacenamiento persistente
+  }
+}
+
 const shouldUseSampleData = () => {
+  if (remoteDisabled) return true;
   if (typeof window !== 'undefined' && window?.__GAMIFICATION_TEST_SUMMARY__) {
     return true;
   }
@@ -114,31 +155,79 @@ export async function awardPoints(weddingId, eventType, meta = {}, uid) {
 }
 
 export async function getStats(weddingId, uid, { historyLimit } = {}) {
+  if (remoteDisabled) {
+    throw new Error('gamification remote disabled');
+  }
   const url = new URL(`${base()}/stats`);
   if (weddingId) url.searchParams.set('weddingId', weddingId);
   if (uid) url.searchParams.set('uid', uid);
   if (historyLimit != null) url.searchParams.set('historyLimit', String(historyLimit));
-  const res = await fetch(url, { headers: await authHeader(), credentials: 'include' });
-  if (!res.ok) throw new Error('getStats failed');
+  let res;
+  try {
+    res = await fetch(url, { headers: await authHeader(), credentials: 'include' });
+  } catch (error) {
+    disableRemoteGamification(error);
+    throw error;
+  }
+  if (!res.ok) {
+    if (res.status >= 400 && res.status < 500) {
+      disableRemoteGamification(`HTTP ${res.status}`);
+    }
+    const error = new Error('getStats failed');
+    error.status = res.status;
+    throw error;
+  }
   return res.json();
 }
 
 export async function getAchievements(weddingId, uid) {
+  if (remoteDisabled) {
+    throw new Error('gamification remote disabled');
+  }
   const url = new URL(`${base()}/achievements`);
   if (weddingId) url.searchParams.set('weddingId', weddingId);
   if (uid) url.searchParams.set('uid', uid);
-  const res = await fetch(url, { headers: await authHeader(), credentials: 'include' });
-  if (!res.ok) throw new Error('getAchievements failed');
+  let res;
+  try {
+    res = await fetch(url, { headers: await authHeader(), credentials: 'include' });
+  } catch (error) {
+    disableRemoteGamification(error);
+    throw error;
+  }
+  if (!res.ok) {
+    if (res.status >= 400 && res.status < 500) {
+      disableRemoteGamification(`HTTP ${res.status}`);
+    }
+    const error = new Error('getAchievements failed');
+    error.status = res.status;
+    throw error;
+  }
   return res.json();
 }
 
 export async function getEvents(weddingId, uid, { limit } = {}) {
+  if (remoteDisabled) {
+    throw new Error('gamification remote disabled');
+  }
   const url = new URL(`${base()}/events`);
   if (weddingId) url.searchParams.set('weddingId', weddingId);
   if (uid) url.searchParams.set('uid', uid);
   if (limit != null) url.searchParams.set('limit', String(limit));
-  const res = await fetch(url, { headers: await authHeader(), credentials: 'include' });
-  if (!res.ok) throw new Error('getEvents failed');
+  let res;
+  try {
+    res = await fetch(url, { headers: await authHeader(), credentials: 'include' });
+  } catch (error) {
+    disableRemoteGamification(error);
+    throw error;
+  }
+  if (!res.ok) {
+    if (res.status >= 400 && res.status < 500) {
+      disableRemoteGamification(`HTTP ${res.status}`);
+    }
+    const error = new Error('getEvents failed');
+    error.status = res.status;
+    throw error;
+  }
   return res.json();
 }
 
@@ -237,13 +326,15 @@ function mapAchievementsPayload(payload) {
 }
 
 export async function getSummary({ weddingId, uid } = {}) {
-  const override =
-    (typeof window !== 'undefined' && window?.__GAMIFICATION_TEST_SUMMARY__) || null;
+  const override = (typeof window !== 'undefined' && window?.__GAMIFICATION_TEST_SUMMARY__) || null;
   if (override) {
     return { ...FALLBACK_SAMPLE, ...override };
   }
 
   const wantsSample = shouldUseSampleData();
+  if (remoteDisabled || wantsSample) {
+    return wantsSample ? { ...FALLBACK_SAMPLE } : { ...FALLBACK_EMPTY };
+  }
 
   try {
     const [statsResult, achievementsResult] = await Promise.allSettled([
@@ -268,7 +359,9 @@ export async function getSummary({ weddingId, uid } = {}) {
       summary.achievements = FALLBACK_SAMPLE.achievements;
     }
     if (
-      (summary.points === 0 && summary.level === 1 && summary.progressToNext === 0) &&
+      summary.points === 0 &&
+      summary.level === 1 &&
+      summary.progressToNext === 0 &&
       wantsSample
     ) {
       summary.points = FALLBACK_SAMPLE.points;
@@ -278,6 +371,7 @@ export async function getSummary({ weddingId, uid } = {}) {
 
     return summary;
   } catch (error) {
+    disableRemoteGamification(error);
     if (wantsSample) {
       return { ...FALLBACK_SAMPLE };
     }

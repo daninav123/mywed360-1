@@ -835,6 +835,55 @@
       "toast": {
         "updateError": "Failed to update service"
       }
+    },
+    "servicesOverview": {
+      "loading": "Loading services...",
+      "title": "Your wedding services",
+      "subtitle": "{{count}} personalized services for your big day",
+      "progress": "Progress",
+      "counters": {
+        "total": "Total",
+        "confirmed": "Confirmed",
+        "inEvaluation": "In review",
+        "pending": "Pending"
+      },
+      "empty": {
+        "title": "Start by finding suppliers for your wedding",
+        "hint": "Click Search suppliers on any service to begin"
+      }
+    },
+    "serviceCard": {
+      "status": {
+        "confirmed": "Confirmed",
+        "inEvaluation": "In review",
+        "pending": "Pending"
+      },
+      "confirmed": {
+        "contactLabel": "Contact:",
+        "reviewsCount": {
+          "one": "({{count}} review)",
+          "other": "({{count}} reviews)"
+        },
+        "hiredAt": "Hired on {{date}}"
+      },
+      "shortlist": {
+        "count": {
+          "one": "{{count}} supplier in your list",
+          "other": "{{count}} suppliers in your list"
+        }
+      },
+      "actions": {
+        "whatsappTitle": "Contact via WhatsApp",
+        "emailTitle": "Send email",
+        "webTitle": "Open website",
+        "viewFavorites": "View favorites ({{count}})",
+        "reviewOptions": "Review options ({{count}})",
+        "searchMore": "Search more",
+        "searchProviders": "Search suppliers"
+      },
+      "empty": {
+        "noExploration": "You haven't explored options for this service yet"
+      }
     }
   },
   "guests": {
@@ -905,7 +954,87 @@
     },
     "reports": {
       "generateError": "We couldn't generate the report. Please try again.",
-      "exported": "Report exported in {{format}} format"
+      "exported": "Report exported in {{format}} format",
+      "generator": {
+        "title": "Generate report",
+        "subtitle": "Export your financial data in PDF or Excel",
+        "typeLabel": "Report type",
+        "types": {
+          "summary": "Summary",
+          "detailed": "Detailed",
+          "supplier": "By supplier"
+        },
+        "formatLabel": "Format",
+        "formatOptions": {
+          "pdf": "PDF",
+          "excel": "Excel"
+        },
+        "rangeLabel": "Date range (optional)",
+        "range": {
+          "start": "From",
+          "end": "To"
+        },
+        "supplierLabel": "Supplier (optional)",
+        "supplierAll": "All suppliers",
+        "preview": {
+          "label": "Included:",
+          "description_one": "{{count}} transaction will be in the report",
+          "description_other": "{{count}} transactions will be in the report"
+        },
+        "button": {
+          "generate": "Generate report",
+          "generating": "Generating..."
+        }
+      },
+      "pdf": {
+        "title": "Financial report",
+        "weddingFallback": "My wedding",
+        "range": "Period: {{start}} - {{end}}",
+        "rangeStart": "Start",
+        "rangeEnd": "Current",
+        "summaryTitle": "Summary",
+        "totalExpenses": "Total expenses",
+        "totalIncome": "Total income",
+        "balance": "Balance",
+        "table": {
+          "headers": {
+            "date": "Date",
+            "concept": "Concept",
+            "supplier": "Supplier",
+            "type": "Type",
+            "amount": "Amount"
+          },
+          "type": {
+            "expense": "Expense",
+            "income": "Income"
+          }
+        },
+        "footer": {
+          "page": "Page {{current}} of {{total}}",
+          "generatedAt": "Generated on {{date}}"
+        },
+        "fileNamePrefix": "financial-report"
+      },
+      "excel": {
+        "sheetSummary": "Summary",
+        "sheetTransactions": "Transactions",
+        "sheetSuppliers": "By supplier",
+        "generatedAt": "Generated on",
+        "transactionsHeaders": {
+          "date": "Date",
+          "concept": "Concept",
+          "supplier": "Supplier",
+          "type": "Type",
+          "amount": "Amount",
+          "category": "Category"
+        },
+        "supplierHeaders": {
+          "supplier": "Supplier",
+          "transactions": "Transactions",
+          "total": "Total"
+        },
+        "fileNamePrefix": "financial-report"
+      }
     },
     "budget": {
       "errors": {
@@ -1612,11 +1741,43 @@
   },
   "pages": {
     "more": {
+      "title": "More tools",
       "sections": {
-        "providers": {
+        "guests": {
+          "title": "Guests",
+          "description": "Manage the guest list, RSVPs, and seating plan.",
           "links": {
-            "providers": "Providers",
+            "guests": "Guest manager",
+            "seating": "Seating plan"
+          }
+        },
+        "providers": {
+          "title": "Suppliers",
+          "description": "Discover suppliers, save favorites, and track contracts.",
+          "links": {
+            "providers": "Supplier directory",
             "contracts": "Contracts"
+          }
+        },
+        "protocol": {
+          "title": "Protocol",
+          "description": "Plan the timeline, special moments, and key checklists for the day.",
+          "links": {
+            "specialMoments": "Special moments",
+            "timing": "Day timeline",
+            "checklist": "Checklist",
+            "ceremonyHelp": "Ceremony guide",
+            "documents": "Documents & templates"
+          }
+        },
+        "extras": {
+          "title": "Extras",
+          "description": "Launch the wedding website and explore extra inspiration.",
+          "links": {
+            "web": "Wedding website",
+            "designs": "Designs & stationery",
+            "ideas": "Ideas & inspiration",
+            "moments": "Highlight moments"
           }
         }
       }
@@ -2207,6 +2368,45 @@
         "error": "Error: {{message}}"
       }
     },
+    "smartFilters": {
+      "title": "Smart filters",
+      "subtitle": "Detected from your wedding profile",
+      "buttons": {
+        "reset": "Redetect",
+        "resetTitle": "Detect filters from the profile again",
+        "clear": "Clear",
+        "clearTitle": "Remove all filters"
+      },
+      "empty": {
+        "title": "Complete your profile",
+        "hint": "Go to {{section}} to define budget, guests, and style."
+      },
+      "fields": {
+        "budget": {
+          "label": "Target budget",
+          "placeholder": "Enter an estimated budget",
+          "editTitle": "Edit budget"
+        },
+        "guests": {
+          "label": "Expected guests",
+          "placeholder": "Enter guest count",
+          "editTitle": "Edit guests"
+        },
+        "style": {
+          "label": "Preferred style",
+          "placeholder": "Describe the style you're looking for",
+          "editTitle": "Edit style"
+        },
+        "location": {
+          "label": "Preferred location",
+          "placeholder": "Add city or area",
+          "editTitle": "Edit location"
+        }
+      },
+      "hints": {
+        "automated": "We keep these filters in sync with your wedding information."
+      }
+    },
     "compare": {
       "title": "Compare suppliers",
       "summary": "Comparing {{count}} supplier",
@@ -2449,6 +2649,82 @@
         "board": {
           "title": "Services board",
           "description": "Review the status of each service and add options directly from this panel."
+        }
+      }
+    },
+    "card": {
+      "hybrid": {
+        "defaults": {
+          "name": "Supplier",
+          "service": "Service"
+        },
+        "location": "📍 {{city}}",
+        "imageAlt": "{{name}} logo",
+        "badges": {
+          "registered": "Verified supplier",
+          "cached": "Synced",
+          "internet": "Found online",
+          "portfolio": "Portfolio available"
+        },
+        "favorite": {
+          "add": "Add to favorites",
+          "remove": "Remove from favorites"
+        },
+        "compare": {
+          "add": "Add to compare",
+          "remove": "Remove from compare"
+        },
+        "toasts": {
+          "added": "Supplier added to favorites.",
+          "removed": "Supplier removed from favorites.",
+          "error": "We couldn't update your favorites."
+        },
+        "reviews": {
+          "count": {
+            "one": "{{count}} review",
+            "other": "{{count}} reviews"
+          }
+        },
+        "contact": {
+          "primary": "Contact supplier",
+          "whatsapp": "WhatsApp",
+          "email": "Email",
+          "phone": "Phone",
+          "noEmail": "No email available",
+          "noPhone": "No phone available",
+          "whatsappTitle": "Contact via WhatsApp",
+          "emailTitle": "Send email",
+          "whatsappMessage": "Hi {{name}}, we found your {{service}} service on {{brand}} and would love to talk.",
+          "emailSubject": "{{service}} enquiry - {{brand}}",
+          "emailBody": "Hi {{name}},\n\nWe're planning our wedding with {{brand}} and would love to receive more information about your service.\n\nThank you!"
+        },
+        "actions": {
+          "viewPortfolio": "View portfolio",
+          "viewProfile": "View profile",
+          "markConfirmed": "Mark as confirmed",
+          "requestQuote": "Request quote",
+          "share": "Share",
+          "viewWebsite": "View website",
+          "viewDetails": "View details"
+        },
+        "share": {
+          "message": "Check this supplier: {{name}} · {{service}}",
+          "toast": "Opening WhatsApp to share"
+        },
+        "followUp": {
+          "reminder": "More than 7 days ago - time to follow up",
+          "lastContact": "Last contacted {{date}} via {{method}}",
+          "lastContactNoMethod": "Last contacted {{date}}",
+          "methods": {
+            "whatsapp": "WhatsApp",
+            "email": "Email",
+            "phone": "Phone",
+            "other": "{{method}}"
+          }
+        },
+        "source": {
+          "label": "Source: {{source}}",
+          "internet": "Internet"
         }
       }
     },
@@ -3632,6 +3908,87 @@
       "resolveError": "Could not mark the alert as resolved.",
       "resolveAction": "Mark as resolved",
       "resolving": "Resolving…"
+    },
+    "cachePerformance": {
+      "confirmClear": "Are you sure you want to clear the entire cache?",
+      "common": {
+        "msValue": "{{value}} ms"
+      },
+      "noData": {
+        "title": "Cache performance",
+        "loading": "Loading...",
+        "load": "Load data"
+      },
+      "title": "Template cache performance",
+      "actions": {
+        "refresh": "Refresh",
+        "clear": "Clear cache"
+      },
+      "tabs": {
+        "stats": "Statistics",
+        "benchmark": "Benchmark",
+        "preload": "Preload",
+        "config": "Configuration"
+      },
+      "stats": {
+        "title": "General statistics",
+        "hits": "Hits",
+        "misses": "Misses",
+        "avgHitTimeLabel": "Average access time (hit):",
+        "avgMissTimeLabel": "Average access time (miss):",
+        "avgSavedTimeLabel": "Average time saved:",
+        "effectiveness": "Cache effectiveness",
+        "usageByCategory": "Usage by category",
+        "totalAccesses": "Total accesses: {{count}}",
+        "hitsCount": "{{count}} hits",
+        "missesCount": "{{count}} misses"
+      },
+      "state": {
+        "title": "Current status",
+        "memoryEntries": "Entries in memory",
+        "categoryDistribution": "Distribution by category:",
+        "localStorageSize": "LocalStorage size"
+      },
+      "templates": {
+        "title": "Most used templates",
+        "usageCount": "{{count}} uses",
+        "empty": "Not enough usage data"
+      },
+      "benchmark": {
+        "title": "Performance benchmark",
+        "running": "Running...",
+        "run": "Run benchmark",
+        "description": "The benchmark compares template access times with and without the cache enabled. This highlights the real performance improvement delivered by the system.",
+        "resultsTitle": "Benchmark results",
+        "withCache": {
+          "title": "With cache",
+          "totalTime": "Total time:",
+          "avgTime": "Average time:"
+        },
+        "withoutCache": {
+          "title": "Without cache",
+          "totalTime": "Total time:",
+          "avgTime": "Average time:"
+        },
+        "improvement": {
+          "title": "Performance improvement",
+          "timeSaved": "Time saved:",
+          "percent": "Percent improvement:"
+        }
+      },
+      "preload": {
+        "title": "Category preload test",
+        "categoryLabel": "Category",
+        "test": "Run preload",
+        "testing": "Testing...",
+        "aboutTitle": "About preloading",
+        "aboutParagraph1": "Preloading fetches templates ahead of time based on historical usage patterns, reducing perceived wait times for users.",
+        "aboutParagraph2": "Templates are automatically preloaded in the background according to frequency, category, and last access time.",
+        "resultsTitle": "Preload results: {{category}}",
+        "summary": "Loaded {{count}} templates in {{duration}}",
+        "templatesLabel": "Preloaded templates:",
+        "uncategorized": "Uncategorized"
+      }
     }
   },
   "weddings": {
@@ -3732,6 +4089,91 @@
     "register": {
       "claimedSuccess": "Profile claimed successfully! You can now manage your information.",
       "registerSuccess": "Registration successful! Welcome to the platform."
+    }
+  },
+  "diagnostics": {
+    "panel": {
+      "buttonTitle": "Diagnostics panel",
+      "heading": "🔍 MaLoveApp Diagnostics Panel",
+      "summary": {
+        "title": "📊 Overview",
+        "ok": "Services OK",
+        "warnings": "Warnings",
+        "errors": "Errors"
+      },
+      "serviceNames": {
+        "auth": "Authentication",
+        "wedding": "Wedding",
+        "finance": "Finance",
+        "tasks": "Tasks",
+        "mail": "Email",
+        "notifications": "Notifications"
+      },
+      "sections": {
+        "user": "👤 User session",
+        "wedding": "💍 Active wedding",
+        "services": "🔧 Service status",
+        "errors": "🚨 Recent errors",
+        "stats": "📈 Statistics"
+      },
+      "stats": {
+        "total": "Total errors",
+        "recent": "Recent errors ({{window}})",
+        "critical": "Critical errors",
+        "warnings": "Warnings",
+        "byTypeTitle": "By type:"
+      },
+      "status": {
+        "success": "OK",
+        "warning": "Warning",
+        "error": "Error",
+        "pending": "Pending"
+      },
+      "actions": {
+        "copyReport": "📋 Copy report",
+        "refreshConsole": "🔄 Refresh console",
+        "refreshConsoleLog": "📊 Console report updated",
+        "reloadPage": "🔄 Reload page"
+      }
+    }
+  },
+  "planner": {
+    "dashboard": {
+      "title": "Wedding Planner Dashboard",
+      "empty": {
+        "title": "You don't have any linked weddings yet",
+        "subtitle": "Create a new wedding or request access to start managing it from this dashboard.",
+        "cta": "Go to wedding management"
+      },
+      "cards": {
+        "weddings": "Active weddings",
+        "alerts": "Alerts",
+        "tasks": "Tasks",
+        "suppliers": "Suppliers"
+      },
+      "loadingShort": "loading",
+      "cardAria": "{{title}}: {{value}}",
+      "inspiration": {
+        "heading": "Recent inspiration",
+        "viewAll": "View all",
+        "error": "We couldn't load the inspiration gallery.",
+        "loadingAria": "Loading inspiration",
+        "openAria": "Open {{label}}",
+        "noImage": "No image",
+        "categories": {
+          "decoracion": "Decor",
+          "ceremonia": "Ceremony",
+          "banquete": "Reception",
+          "flores": "Flowers",
+          "vestidos": "Dresses"
+        }
+      },
+      "blog": {
+        "heading": "Featured blog posts",
+        "viewAll": "Open blog",
+        "error": "We couldn't load the latest blog posts.",
+        "loadingAria": "Loading article"
+      }
     }
   },
   "chat": {

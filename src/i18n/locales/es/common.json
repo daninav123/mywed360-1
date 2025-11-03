@@ -835,6 +835,55 @@
       "toast": {
         "updateError": "Error al actualizar servicio"
       }
+    },
+    "servicesOverview": {
+      "loading": "Cargando servicios...",
+      "title": "Servicios de tu boda",
+      "subtitle": "{{count}} servicios personalizados para tu gran día",
+      "progress": "Progreso",
+      "counters": {
+        "total": "Total",
+        "confirmed": "Confirmados",
+        "inEvaluation": "En evaluación",
+        "pending": "Pendientes"
+      },
+      "empty": {
+        "title": "Empieza buscando proveedores para tu boda",
+        "hint": "Haz clic en Buscar proveedores en cualquier servicio para comenzar"
+      }
+    },
+    "serviceCard": {
+      "status": {
+        "confirmed": "Confirmado",
+        "inEvaluation": "En evaluación",
+        "pending": "Pendiente"
+      },
+      "confirmed": {
+        "contactLabel": "Contacto:",
+        "reviewsCount": {
+          "one": "({{count}} reseña)",
+          "other": "({{count}} reseñas)"
+        },
+        "hiredAt": "Contratado el {{date}}"
+      },
+      "shortlist": {
+        "count": {
+          "one": "{{count}} proveedor en tu lista",
+          "other": "{{count}} proveedores en tu lista"
+        }
+      },
+      "actions": {
+        "whatsappTitle": "Contactar por WhatsApp",
+        "emailTitle": "Enviar email",
+        "webTitle": "Ver web",
+        "viewFavorites": "Ver favoritos ({{count}})",
+        "reviewOptions": "Revisar opciones ({{count}})",
+        "searchMore": "Buscar más",
+        "searchProviders": "Buscar proveedores"
+      },
+      "empty": {
+        "noExploration": "Aún no has explorado opciones para este servicio"
+      }
     }
   },
   "guests": {
@@ -905,7 +954,87 @@
     },
     "reports": {
       "generateError": "No pudimos generar el informe. Inténtalo de nuevo.",
-      "exported": "Informe exportado en formato {{format}}"
+      "exported": "Informe exportado en formato {{format}}",
+      "generator": {
+        "title": "Generar reporte",
+        "subtitle": "Exporta tus datos financieros en PDF o Excel",
+        "typeLabel": "Tipo de reporte",
+        "types": {
+          "summary": "Resumen",
+          "detailed": "Detallado",
+          "supplier": "Por proveedor"
+        },
+        "formatLabel": "Formato",
+        "formatOptions": {
+          "pdf": "PDF",
+          "excel": "Excel"
+        },
+        "rangeLabel": "Rango de fechas (opcional)",
+        "range": {
+          "start": "Desde",
+          "end": "Hasta"
+        },
+        "supplierLabel": "Proveedor (opcional)",
+        "supplierAll": "Todos los proveedores",
+        "preview": {
+          "label": "Se incluirán:",
+          "description_one": "{{count}} transacción en el reporte",
+          "description_other": "{{count}} transacciones en el reporte"
+        },
+        "button": {
+          "generate": "Generar reporte",
+          "generating": "Generando..."
+        }
+      },
+      "pdf": {
+        "title": "Reporte financiero",
+        "weddingFallback": "Mi boda",
+        "range": "Período: {{start}} - {{end}}",
+        "rangeStart": "Inicio",
+        "rangeEnd": "Actual",
+        "summaryTitle": "Resumen",
+        "totalExpenses": "Total gastos",
+        "totalIncome": "Total ingresos",
+        "balance": "Balance",
+        "table": {
+          "headers": {
+            "date": "Fecha",
+            "concept": "Concepto",
+            "supplier": "Proveedor",
+            "type": "Tipo",
+            "amount": "Monto"
+          },
+          "type": {
+            "expense": "Gasto",
+            "income": "Ingreso"
+          }
+        },
+        "footer": {
+          "page": "Página {{current}} de {{total}}",
+          "generatedAt": "Generado el {{date}}"
+        },
+        "fileNamePrefix": "reporte-financiero"
+      },
+      "excel": {
+        "sheetSummary": "Resumen",
+        "sheetTransactions": "Transacciones",
+        "sheetSuppliers": "Por proveedor",
+        "generatedAt": "Generado el",
+        "transactionsHeaders": {
+          "date": "Fecha",
+          "concept": "Concepto",
+          "supplier": "Proveedor",
+          "type": "Tipo",
+          "amount": "Monto",
+          "category": "Categoría"
+        },
+        "supplierHeaders": {
+          "supplier": "Proveedor",
+          "transactions": "Transacciones",
+          "total": "Total"
+        },
+        "fileNamePrefix": "reporte-financiero"
+      }
     },
     "budget": {
       "errors": {
@@ -1612,11 +1741,43 @@
   },
   "pages": {
     "more": {
+      "title": "Más herramientas",
       "sections": {
-        "providers": {
+        "guests": {
+          "title": "Invitados",
+          "description": "Gestiona la lista, las confirmaciones y el plano de mesas.",
           "links": {
-            "providers": "Proveedores",
+            "guests": "Panel de invitados",
+            "seating": "Plano de mesas"
+          }
+        },
+        "providers": {
+          "title": "Proveedores",
+          "description": "Encuentra proveedores, guarda favoritos y controla contratos.",
+          "links": {
+            "providers": "Catálogo de proveedores",
             "contracts": "Contratos"
+          }
+        },
+        "protocol": {
+          "title": "Protocolo",
+          "description": "Planifica el timing, momentos especiales y tareas clave del día.",
+          "links": {
+            "specialMoments": "Momentos especiales",
+            "timing": "Timing del día",
+            "checklist": "Checklist",
+            "ceremonyHelp": "Ayuda para la ceremonia",
+            "documents": "Documentos y plantillas"
+          }
+        },
+        "extras": {
+          "title": "Extras",
+          "description": "Diseña la web de la boda y explora inspiración adicional.",
+          "links": {
+            "web": "Web de la boda",
+            "designs": "Diseños y papelería",
+            "ideas": "Ideas e inspiración",
+            "moments": "Momentos destacados"
           }
         }
       }
@@ -2042,6 +2203,47 @@
         "websiteEmpty": "No especificado",
         "instagramEmpty": "No especificado"
       },
+      "portfolio": {
+        "categories": {
+          "all": "Todas",
+          "bodas": "Bodas",
+          "decoracion": "Decoración",
+          "flores": "Flores",
+          "ceremonia": "Ceremonia",
+          "recepcion": "Recepción",
+          "otros": "Otros"
+        },
+        "dashboard": {
+          "title": "Mi Portfolio",
+          "photoCount": "{{count}} fotos",
+          "coverPhoto": {
+            "untitled": "Sin título"
+          },
+          "zeroState": {
+            "title": "Aún no has subido fotos",
+            "description": "Muestra tu trabajo añadiendo imágenes de tus mejores eventos",
+            "cta": "Subir primera foto"
+          },
+          "actions": {
+            "addPhoto": "Añadir foto"
+          },
+          "filters": {
+            "label": "Filtrar por categoría"
+          },
+          "viewModes": {
+            "grid": "Cuadrícula",
+            "list": "Lista"
+          },
+          "loading": "Cargando portfolio..."
+        },
+        "toasts": {
+          "loadError": "Error al cargar las fotos",
+          "uploadSuccess": "Foto subida correctamente",
+          "uploadError": "Error al subir la foto",
+          "deleteSuccess": "Foto eliminada",
+          "deleteError": "Error al eliminar la foto"
+        }
+      },
       "login": {
         "title": "Error de Autenticación",
         "message": "No se pudo cargar tu perfil. Por favor, inicia sesión nuevamente.",
@@ -2205,6 +2407,45 @@
       },
       "alert": {
         "error": "Error: {{message}}"
+      }
+    },
+    "smartFilters": {
+      "title": "Filtros inteligentes",
+      "subtitle": "Detectados desde tu perfil de boda",
+      "buttons": {
+        "reset": "Redetectar",
+        "resetTitle": "Volver a detectar filtros desde el perfil",
+        "clear": "Limpiar",
+        "clearTitle": "Quitar todos los filtros"
+      },
+      "empty": {
+        "title": "Completa tu perfil",
+        "hint": "Ve a {{section}} para definir presupuesto, invitados y estilo."
+      },
+      "fields": {
+        "budget": {
+          "label": "Presupuesto objetivo",
+          "placeholder": "Ingresa un presupuesto estimado",
+          "editTitle": "Editar presupuesto"
+        },
+        "guests": {
+          "label": "Invitados previstos",
+          "placeholder": "Ingresa el número de invitados",
+          "editTitle": "Editar invitados"
+        },
+        "style": {
+          "label": "Estilo deseado",
+          "placeholder": "Describe el estilo que buscas",
+          "editTitle": "Editar estilo"
+        },
+        "location": {
+          "label": "Ubicación preferida",
+          "placeholder": "Indica la ciudad o zona",
+          "editTitle": "Editar ubicación"
+        }
+      },
+      "hints": {
+        "automated": "Actualizamos estos filtros automáticamente con la información de tu boda."
       }
     },
     "compare": {
@@ -2449,6 +2690,82 @@
         "board": {
           "title": "Colaboradores activos ({{count}})",
           "description": "Guarda los proveedores que te interesen para compararlos después."
+        }
+      }
+    },
+    "card": {
+      "hybrid": {
+        "defaults": {
+          "name": "Proveedor",
+          "service": "Servicio"
+        },
+        "location": "📍 {{city}}",
+        "imageAlt": "Logo de {{name}}",
+        "badges": {
+          "registered": "Proveedor verificado",
+          "cached": "Sincronizado",
+          "internet": "Encontrado en internet",
+          "portfolio": "Portafolio disponible"
+        },
+        "favorite": {
+          "add": "Añadir a favoritos",
+          "remove": "Quitar de favoritos"
+        },
+        "compare": {
+          "add": "Añadir a comparación",
+          "remove": "Quitar de comparación"
+        },
+        "toasts": {
+          "added": "Proveedor guardado en favoritos.",
+          "removed": "Proveedor quitado de favoritos.",
+          "error": "No pudimos actualizar tus favoritos."
+        },
+        "reviews": {
+          "count": {
+            "one": "{{count}} reseña",
+            "other": "{{count}} reseñas"
+          }
+        },
+        "contact": {
+          "primary": "Contactar proveedor",
+          "whatsapp": "WhatsApp",
+          "email": "Correo",
+          "phone": "Teléfono",
+          "noEmail": "Sin correo disponible",
+          "noPhone": "Sin teléfono disponible",
+          "whatsappTitle": "Contactar por WhatsApp",
+          "emailTitle": "Enviar correo",
+          "whatsappMessage": "Hola {{name}}, encontramos tu servicio de {{service}} en {{brand}} y nos gustaría hablar contigo.",
+          "emailSubject": "Consulta sobre {{service}} - {{brand}}",
+          "emailBody": "Hola {{name}},\n\nEstamos organizando nuestra boda con {{brand}} y nos gustaría recibir más información sobre tu servicio.\n\n¡Gracias!"
+        },
+        "actions": {
+          "viewPortfolio": "Ver portafolio",
+          "viewProfile": "Ver perfil",
+          "markConfirmed": "Marcar como confirmado",
+          "requestQuote": "Solicitar presupuesto",
+          "share": "Compartir",
+          "viewWebsite": "Ver sitio web",
+          "viewDetails": "Ver detalles"
+        },
+        "share": {
+          "message": "Revisa este proveedor: {{name}} · {{service}}",
+          "toast": "Abriendo WhatsApp para compartir"
+        },
+        "followUp": {
+          "reminder": "Hace más de 7 días - considera hacer seguimiento",
+          "lastContact": "Último contacto: {{date}} vía {{method}}",
+          "lastContactNoMethod": "Último contacto: {{date}}",
+          "methods": {
+            "whatsapp": "WhatsApp",
+            "email": "Correo",
+            "phone": "Teléfono",
+            "other": "{{method}}"
+          }
+        },
+        "source": {
+          "label": "Origen: {{source}}",
+          "internet": "Internet"
         }
       }
     },
@@ -3632,6 +3949,87 @@
       "resolveError": "No se pudo marcar la alerta como resuelta.",
       "resolveAction": "Marcar como resuelta",
       "resolving": "Resolviendo…"
+    },
+    "cachePerformance": {
+      "confirmClear": "¿Estás seguro de que deseas limpiar toda la caché?",
+      "common": {
+        "msValue": "{{value}} ms"
+      },
+      "noData": {
+        "title": "Rendimiento de caché",
+        "loading": "Cargando...",
+        "load": "Cargar datos"
+      },
+      "title": "Rendimiento de caché de plantillas",
+      "actions": {
+        "refresh": "Actualizar",
+        "clear": "Limpiar caché"
+      },
+      "tabs": {
+        "stats": "Estadísticas",
+        "benchmark": "Benchmark",
+        "preload": "Precarga",
+        "config": "Configuración"
+      },
+      "stats": {
+        "title": "Estadísticas generales",
+        "hits": "Aciertos (hits)",
+        "misses": "Fallos (misses)",
+        "avgHitTimeLabel": "Tiempo promedio de acceso (hit):",
+        "avgMissTimeLabel": "Tiempo promedio de acceso (miss):",
+        "avgSavedTimeLabel": "Tiempo ahorrado promedio:",
+        "effectiveness": "Efectividad de caché",
+        "usageByCategory": "Uso por categoría",
+        "totalAccesses": "Total accesos: {{count}}",
+        "hitsCount": "{{count}} hits",
+        "missesCount": "{{count}} misses"
+      },
+      "state": {
+        "title": "Estado actual",
+        "memoryEntries": "Entradas en memoria",
+        "categoryDistribution": "Distribución por categoría:",
+        "localStorageSize": "Tamaño en localStorage"
+      },
+      "templates": {
+        "title": "Plantillas más utilizadas",
+        "usageCount": "{{count}} usos",
+        "empty": "No hay datos de uso suficientes"
+      },
+      "benchmark": {
+        "title": "Prueba de rendimiento",
+        "running": "Ejecutando...",
+        "run": "Ejecutar benchmark",
+        "description": "El benchmark compara el tiempo de acceso a las plantillas con y sin caché activada. Esto permite medir la mejora de rendimiento real que proporciona el sistema.",
+        "resultsTitle": "Resultados del benchmark",
+        "withCache": {
+          "title": "Con caché",
+          "totalTime": "Tiempo total:",
+          "avgTime": "Tiempo promedio:"
+        },
+        "withoutCache": {
+          "title": "Sin caché",
+          "totalTime": "Tiempo total:",
+          "avgTime": "Tiempo promedio:"
+        },
+        "improvement": {
+          "title": "Mejora de rendimiento",
+          "timeSaved": "Ahorro de tiempo:",
+          "percent": "Mejora porcentual:"
+        }
+      },
+      "preload": {
+        "title": "Prueba de precarga por categoría",
+        "categoryLabel": "Categoría",
+        "test": "Probar precarga",
+        "testing": "Probando...",
+        "aboutTitle": "Acerca de la precarga",
+        "aboutParagraph1": "La precarga permite cargar anticipadamente plantillas que es probable que se necesiten en base a patrones de uso históricos. Esto mejora la experiencia al minimizar los tiempos de espera para el usuario.",
+        "aboutParagraph2": "Las plantillas se precargan automáticamente en segundo plano según su frecuencia de uso, categoría y última fecha de acceso.",
+        "resultsTitle": "Resultados de precarga: {{category}}",
+        "summary": "Se precargaron {{count}} plantillas en {{duration}}",
+        "templatesLabel": "Plantillas precargadas:",
+        "uncategorized": "Sin categoría"
+      }
     }
   },
   "weddings": {
@@ -3732,6 +4130,91 @@
     "register": {
       "claimedSuccess": "Perfil reclamado correctamente. Ya puedes gestionar tu información.",
       "registerSuccess": "Registro completado correctamente. ¡Bienvenido a la plataforma!"
+    }
+  },
+  "diagnostics": {
+    "panel": {
+      "buttonTitle": "Panel de diagnóstico",
+      "heading": "🔍 Panel de Diagnóstico MaLoveApp",
+      "summary": {
+        "title": "📊 Resumen general",
+        "ok": "Servicios OK",
+        "warnings": "Advertencias",
+        "errors": "Errores"
+      },
+      "serviceNames": {
+        "auth": "Autenticación",
+        "wedding": "Boda",
+        "finance": "Finanzas",
+        "tasks": "Tareas",
+        "mail": "Correo",
+        "notifications": "Notificaciones"
+      },
+      "sections": {
+        "user": "👤 Sesión de usuario",
+        "wedding": "💍 Boda activa",
+        "services": "🔧 Estado de servicios",
+        "errors": "🚨 Errores recientes",
+        "stats": "📈 Estadísticas"
+      },
+      "stats": {
+        "total": "Total de errores",
+        "recent": "Errores recientes ({{window}})",
+        "critical": "Errores críticos",
+        "warnings": "Advertencias",
+        "byTypeTitle": "Por tipo:"
+      },
+      "status": {
+        "success": "OK",
+        "warning": "Advertencia",
+        "error": "Error",
+        "pending": "Pendiente"
+      },
+      "actions": {
+        "copyReport": "📋 Copiar reporte",
+        "refreshConsole": "🔄 Actualizar consola",
+        "refreshConsoleLog": "📊 Reporte actualizado en consola",
+        "reloadPage": "🔄 Recargar página"
+      }
+    }
+  },
+  "planner": {
+    "dashboard": {
+      "title": "Panel de Wedding Planner",
+      "empty": {
+        "title": "Aún no tienes bodas vinculadas",
+        "subtitle": "Crea una nueva boda o solicita acceso para empezar a gestionarla desde este panel.",
+        "cta": "Ir a gestión de bodas"
+      },
+      "cards": {
+        "weddings": "Bodas activas",
+        "alerts": "Alertas",
+        "tasks": "Tareas",
+        "suppliers": "Proveedores"
+      },
+      "loadingShort": "cargando",
+      "cardAria": "{{title}}: {{value}}",
+      "inspiration": {
+        "heading": "Inspiración reciente",
+        "viewAll": "Ver todo",
+        "error": "No se pudieron cargar las imágenes de inspiración.",
+        "loadingAria": "Cargando inspiración",
+        "openAria": "Abrir {{label}}",
+        "noImage": "Sin imagen",
+        "categories": {
+          "decoracion": "Decoración",
+          "ceremonia": "Ceremonia",
+          "banquete": "Banquete",
+          "flores": "Flores",
+          "vestidos": "Vestidos"
+        }
+      },
+      "blog": {
+        "heading": "Blogs destacados",
+        "viewAll": "Abrir blog",
+        "error": "No se pudieron cargar las noticias del blog.",
+        "loadingAria": "Cargando publicación"
+      }
     }
   },
   "chat": {

@@ -1,7 +1,6 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { X, Upload } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { uploadPortfolioImage } from '../../services/portfolioStorageService';
 import useTranslations from '../../hooks/useTranslations';
 
 const CATEGORY_KEYS = ['bodas', 'decoracion', 'flores', 'ceremonia', 'recepcion', 'otros'];
@@ -33,7 +32,7 @@ export default function PhotoUploadModal({ onClose, onSuccess }) {
         value,
         label: t(`common.suppliers.portfolio.lightbox.categories.${value}`),
       })),
-    [t],
+    [t]
   );
 
   const resetFileSelection = () => {
@@ -94,37 +93,42 @@ export default function PhotoUploadModal({ onClose, onSuccess }) {
     setUploadProgress(0);
 
     try {
-      const supplierId = localStorage.getItem('supplier_id');
-
-      const imageUrls = await uploadPortfolioImage(file, supplierId, (progress) => {
-        setUploadProgress(progress);
-      });
-
       const token = localStorage.getItem('supplier_token');
-      const response = await fetch('/api/supplier-dashboard/portfolio', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          title: formData.title,
-          description: formData.description,
-          category: formData.category,
-          tags: formData.tags
+
+      // Crear FormData para enviar el archivo al backend
+      const formDataToSend = new FormData();
+      formDataToSend.append('image', file);
+      formDataToSend.append('title', formData.title);
+      formDataToSend.append('description', formData.description);
+      formDataToSend.append('category', formData.category);
+      formDataToSend.append(
+        'tags',
+        JSON.stringify(
+          formData.tags
             .split(',')
             .map((tag) => tag.trim())
-            .filter(Boolean),
-          featured: formData.featured,
-          isCover: formData.isCover,
-          original: imageUrls.original,
-          thumbnails: imageUrls.thumbnails,
-        }),
+            .filter(Boolean)
+        )
+      );
+      formDataToSend.append('featured', formData.featured);
+      formDataToSend.append('isCover', formData.isCover);
+
+      // Subir al backend (que subirá a Firebase Storage)
+      const response = await fetch('/api/supplier-dashboard/portfolio/upload', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formDataToSend,
       });
 
       if (!response.ok) {
-        throw new Error('upload_failed');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'upload_failed');
       }
+
+      const data = await response.json();
+      console.log('[PhotoUploadModal] Upload success:', data);
 
       toast.success(t('suppliers.portfolio.toasts.uploaded'));
       onSuccess();
@@ -142,7 +146,7 @@ export default function PhotoUploadModal({ onClose, onSuccess }) {
       toast.error(
         error.message === 'upload_failed'
           ? t('suppliers.portfolio.upload.errors.uploadFailed')
-          : t('suppliers.portfolio.upload.errors.generic'),
+          : t('suppliers.portfolio.upload.errors.generic')
       );
     } finally {
       setUploading(false);
@@ -239,9 +243,7 @@ export default function PhotoUploadModal({ onClose, onSuccess }) {
               </label>
               <textarea
                 value={formData.description}
-                onChange={(event) =>
-                  setFormData({ ...formData, description: event.target.value })
-                }
+                onChange={(event) => setFormData({ ...formData, description: event.target.value })}
                 placeholder={t('suppliers.portfolio.upload.form.description.placeholder')}
                 rows={3}
                 className="w-full px-4 py-2 border border-border rounded-lg bg-background text-body focus:outline-none focus:ring-2 focus:ring-primary resize-none"
@@ -287,9 +289,7 @@ export default function PhotoUploadModal({ onClose, onSuccess }) {
                 <input
                   type="checkbox"
                   checked={formData.featured}
-                  onChange={(event) =>
-                    setFormData({ ...formData, featured: event.target.checked })
-                  }
+                  onChange={(event) => setFormData({ ...formData, featured: event.target.checked })}
                   className="rounded border-border text-primary focus:ring-primary"
                   disabled={uploading}
                 />
@@ -302,9 +302,7 @@ export default function PhotoUploadModal({ onClose, onSuccess }) {
                 <input
                   type="checkbox"
                   checked={formData.isCover}
-                  onChange={(event) =>
-                    setFormData({ ...formData, isCover: event.target.checked })
-                  }
+                  onChange={(event) => setFormData({ ...formData, isCover: event.target.checked })}
                   className="rounded border-border text-primary focus:ring-primary"
                   disabled={uploading}
                 />

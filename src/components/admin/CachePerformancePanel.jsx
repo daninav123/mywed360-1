@@ -1,6 +1,7 @@
 import { Zap, BarChart2, RefreshCw, Save, Trash2, Clock } from 'lucide-react';
 import React, { useState, useEffect, useCallback } from 'react';
 
+import useTranslations from '../../hooks/useTranslations';
 import { useEmailMonitoring } from '../../hooks/useEmailMonitoring';
 import { templateCache } from '../../services/TemplateCacheService';
 import {
@@ -15,6 +16,7 @@ import { Card, Button, Progress, Tabs, TabsContent, TabsList, TabsTrigger } from
  * Disponible solo para administradores del sistema
  */
 const CachePerformancePanel = () => {
+  const { t } = useTranslations();
   // Estados
   const [cacheReport, setCacheReport] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -26,19 +28,6 @@ const CachePerformancePanel = () => {
 
   // Hooks
   const { measureCachePerformance } = useEmailMonitoring();
-
-  // Cargar informe inicial y categorías
-  useEffect(() => {
-    loadCacheReport();
-
-    // Obtener categorías disponibles
-    const cacheStats = templateCache.getCacheStats();
-    if (cacheStats.categoryHits) {
-      const categoryList = Object.keys(cacheStats.categoryHits);
-      setCategories(categoryList.length ? categoryList : ['Sin categoría']);
-      setSelectedCategory(categoryList[0] || 'Sin categoría');
-    }
-  }, []);
 
   // Cargar informe actual de caché
   const loadCacheReport = useCallback(() => {
@@ -57,6 +46,19 @@ const CachePerformancePanel = () => {
       setLoading(false);
     }
   }, [measureCachePerformance]);
+
+  // Cargar informe inicial y categorías
+  useEffect(() => {
+    loadCacheReport();
+
+    const cacheStats = templateCache.getCacheStats();
+    if (cacheStats.categoryHits) {
+      const categoryList = Object.keys(cacheStats.categoryHits);
+      const fallbackCategory = t('admin.cachePerformance.preload.uncategorized');
+      setCategories(categoryList.length ? categoryList : [fallbackCategory]);
+      setSelectedCategory(categoryList[0] || fallbackCategory);
+    }
+  }, [t, loadCacheReport]);
 
   // Iniciar prueba de rendimiento
   const handleRunBenchmark = useCallback(async () => {
@@ -101,7 +103,7 @@ const CachePerformancePanel = () => {
 
   // Limpiar toda la caché
   const handleClearCache = useCallback(() => {
-    if (window.confirm('¿Estás seguro de que deseas limpiar toda la caché?')) {
+    if (window.confirm(t('admin.cachePerformance.confirmClear'))) {
       templateCache.clearAll();
       loadCacheReport();
 
@@ -112,6 +114,13 @@ const CachePerformancePanel = () => {
 
   // Formatear un número con dos decimales
   const formatNumber = (num) => Number(num).toFixed(2);
+  const formatMsValue = (value) => {
+    const numeric = Number(value);
+    if (Number.isFinite(numeric)) {
+      return t('admin.cachePerformance.common.msValue', { value: formatNumber(numeric) });
+    }
+    return t('admin.cachePerformance.common.msValue', { value });
+  };
 
   // Renderizar gráfico básico de barras para efectividad
   const renderEffectivenessBar = () => {
@@ -122,7 +131,7 @@ const CachePerformancePanel = () => {
     return (
       <div className="mt-4">
         <div className="flex justify-between text-sm mb-1">
-          <span>Efectividad de caché</span>
+          <span>{t('admin.cachePerformance.stats.effectiveness')}</span>
           <span className="font-medium">{hitRatio}%</span>
         </div>
         <Progress value={hitRatio} className="h-2" />
@@ -138,30 +147,36 @@ const CachePerformancePanel = () => {
 
     return (
       <div className="mt-6 space-y-4 p-4 bg-gray-50 rounded-md">
-        <h3 className="text-lg font-medium">Resultados del benchmark</h3>
+        <h3 className="text-lg font-medium">
+          {t('admin.cachePerformance.benchmark.resultsTitle')}
+        </h3>
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <h4 className="font-medium text-blue-600">Con caché</h4>
+            <h4 className="font-medium text-blue-600">
+              {t('admin.cachePerformance.benchmark.withCache.title')}
+            </h4>
             <p className="text-sm">
-              Tiempo total:{' '}
-              <span className="font-medium">{formatNumber(withCache.totalTime)} ms</span>
+              {t('admin.cachePerformance.benchmark.withCache.totalTime')}{' '}
+              <span className="font-medium">{formatMsValue(withCache.totalTime)}</span>
             </p>
             <p className="text-sm">
-              Tiempo promedio:{' '}
-              <span className="font-medium">{formatNumber(withCache.avgTime)} ms</span>
+              {t('admin.cachePerformance.benchmark.withCache.avgTime')}{' '}
+              <span className="font-medium">{formatMsValue(withCache.avgTime)}</span>
             </p>
           </div>
 
           <div className="space-y-2">
-            <h4 className="font-medium text-gray-600">Sin caché</h4>
+            <h4 className="font-medium text-gray-600">
+              {t('admin.cachePerformance.benchmark.withoutCache.title')}
+            </h4>
             <p className="text-sm">
-              Tiempo total:{' '}
-              <span className="font-medium">{formatNumber(withoutCache.totalTime)} ms</span>
+              {t('admin.cachePerformance.benchmark.withoutCache.totalTime')}{' '}
+              <span className="font-medium">{formatMsValue(withoutCache.totalTime)}</span>
             </p>
             <p className="text-sm">
-              Tiempo promedio:{' '}
-              <span className="font-medium">{formatNumber(withoutCache.avgTime)} ms</span>
+              {t('admin.cachePerformance.benchmark.withoutCache.avgTime')}{' '}
+              <span className="font-medium">{formatMsValue(withoutCache.avgTime)}</span>
             </p>
           </div>
         </div>
@@ -169,15 +184,15 @@ const CachePerformancePanel = () => {
         <div className="mt-4 p-3 bg-green-50 rounded-md border border-green-100">
           <h4 className="font-medium text-green-700 flex items-center gap-2">
             <Zap size={16} />
-            Mejora de rendimiento
+            {t('admin.cachePerformance.benchmark.improvement.title')}
           </h4>
           <p className="mt-2 text-sm">
-            Ahorro de tiempo:{' '}
-            <span className="font-medium">{formatNumber(improvement.timesSaved)} ms</span>
+            {t('admin.cachePerformance.benchmark.improvement.timeSaved')}{' '}
+            <span className="font-medium">{formatMsValue(improvement.timesSaved)}</span>
           </p>
           <p className="text-sm">
-            Mejora porcentual:{' '}
-            <span className="font-medium text-green-600">{improvement.percent}%</span>
+            {t('admin.cachePerformance.benchmark.improvement.percent')}{' '}
+            <span className="font-medium text-green-600">{formatNumber(improvement.percent)}%</span>
           </p>
         </div>
       </div>
@@ -191,16 +206,22 @@ const CachePerformancePanel = () => {
     return (
       <div className="mt-4 p-4 bg-blue-50 rounded-md">
         <h4 className="font-medium text-blue-700">
-          Resultados de precarga: {preloadResults.category}
+          {t('admin.cachePerformance.preload.resultsTitle', {
+            category: preloadResults.category,
+          })}
         </h4>
         <p className="mt-1 text-sm">
-          Se precargaron <span className="font-medium">{preloadResults.templatesLoaded}</span>{' '}
-          plantillas en <span className="font-medium">{preloadResults.duration}</span>
+          {t('admin.cachePerformance.preload.summary', {
+            count: preloadResults.templatesLoaded,
+            duration: preloadResults.duration,
+          })}
         </p>
 
         {preloadResults.templates.length > 0 && (
           <div className="mt-2">
-            <p className="text-xs text-gray-600 mb-1">Plantillas precargadas:</p>
+            <p className="text-xs text-gray-600 mb-1">
+              {t('admin.cachePerformance.preload.templatesLabel')}
+            </p>
             <ul className="text-xs space-y-1 max-h-24 overflow-y-auto">
               {preloadResults.templates.map((template) => (
                 <li key={template.id} className="text-gray-700">
@@ -218,9 +239,11 @@ const CachePerformancePanel = () => {
     return (
       <Card className="p-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-medium">Rendimiento de caché</h2>
+          <h2 className="text-xl font-medium">{t('admin.cachePerformance.noData.title')}</h2>
           <Button variant="outline" size="sm" onClick={loadCacheReport} disabled={loading}>
-            {loading ? 'Cargando...' : 'Cargar datos'}
+            {loading
+              ? t('admin.cachePerformance.noData.loading')
+              : t('admin.cachePerformance.noData.load')}
           </Button>
         </div>
       </Card>
@@ -232,44 +255,46 @@ const CachePerformancePanel = () => {
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
           <Zap className="h-5 w-5 text-blue-500" />
-          <h2 className="text-xl font-medium">Rendimiento de caché de plantillas</h2>
+          <h2 className="text-xl font-medium">{t('admin.cachePerformance.title')}</h2>
         </div>
 
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={loadCacheReport} disabled={loading}>
             <RefreshCw className="h-4 w-4 mr-1" />
-            Actualizar
+            {t('admin.cachePerformance.actions.refresh')}
           </Button>
 
           <Button variant="destructive" size="sm" onClick={handleClearCache} disabled={loading}>
             <Trash2 className="h-4 w-4 mr-1" />
-            Limpiar caché
+            {t('admin.cachePerformance.actions.clear')}
           </Button>
         </div>
       </div>
 
       <Tabs defaultValue="stats">
         <TabsList className="mb-4">
-          <TabsTrigger value="stats">Estadísticas</TabsTrigger>
-          <TabsTrigger value="benchmark">Benchmark</TabsTrigger>
-          <TabsTrigger value="preload">Precarga</TabsTrigger>
-          <TabsTrigger value="config">Configuración</TabsTrigger>
+          <TabsTrigger value="stats">{t('admin.cachePerformance.tabs.stats')}</TabsTrigger>
+          <TabsTrigger value="benchmark">{t('admin.cachePerformance.tabs.benchmark')}</TabsTrigger>
+          <TabsTrigger value="preload">{t('admin.cachePerformance.tabs.preload')}</TabsTrigger>
+          <TabsTrigger value="config">{t('admin.cachePerformance.tabs.config')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="stats">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Estadísticas generales */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium">Estadísticas generales</h3>
+              <h3 className="text-lg font-medium">{t('admin.cachePerformance.stats.title')}</h3>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-4 bg-blue-50 rounded-md">
-                  <p className="text-sm text-gray-600">Aciertos (hits)</p>
+                  <p className="text-sm text-gray-600">{t('admin.cachePerformance.stats.hits')}</p>
                   <p className="text-2xl font-bold text-blue-600">{cacheReport.stats.hits}</p>
                 </div>
 
                 <div className="p-4 bg-amber-50 rounded-md">
-                  <p className="text-sm text-gray-600">Fallos (misses)</p>
+                  <p className="text-sm text-gray-600">
+                    {t('admin.cachePerformance.stats.misses')}
+                  </p>
                   <p className="text-2xl font-bold text-amber-600">{cacheReport.stats.misses}</p>
                 </div>
               </div>
@@ -278,17 +303,19 @@ const CachePerformancePanel = () => {
 
               <div className="mt-4 space-y-2">
                 <p className="text-sm">
-                  Tiempo promedio de acceso (hit):{' '}
-                  <span className="font-medium">{cacheReport.stats.avgHitTime} ms</span>
+                  {t('admin.cachePerformance.stats.avgHitTimeLabel')}{' '}
+                  <span className="font-medium">{formatMsValue(cacheReport.stats.avgHitTime)}</span>
                 </p>
                 <p className="text-sm">
-                  Tiempo promedio de acceso (miss):{' '}
-                  <span className="font-medium">{cacheReport.stats.avgMissTime} ms</span>
+                  {t('admin.cachePerformance.stats.avgMissTimeLabel')}{' '}
+                  <span className="font-medium">
+                    {formatMsValue(cacheReport.stats.avgMissTime)}
+                  </span>
                 </p>
                 <p className="text-sm">
-                  Tiempo ahorrado promedio:{' '}
+                  {t('admin.cachePerformance.stats.avgSavedTimeLabel')}{' '}
                   <span className="font-medium text-green-600">
-                    {cacheReport.stats.avgTimeSaved} ms
+                    {formatMsValue(cacheReport.stats.avgTimeSaved)}
                   </span>
                 </p>
               </div>
@@ -296,17 +323,26 @@ const CachePerformancePanel = () => {
 
             {/* Uso de caché por categoría */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium">Uso por categoría</h3>
+              <h3 className="text-lg font-medium">
+                {t('admin.cachePerformance.stats.usageByCategory')}
+              </h3>
 
               <div className="max-h-64 overflow-y-auto space-y-3">
                 {Object.entries(cacheReport.usage.byCategory).map(([category, data]) => (
                   <div key={category} className="p-3 bg-gray-50 rounded-md">
                     <p className="font-medium mb-1">{category}</p>
                     <div className="flex justify-between text-sm">
-                      <span>Total accesos: {data.total}</span>
                       <span>
-                        <span className="text-green-600">{data.hits} hits</span> /
-                        <span className="text-amber-600">{data.misses} misses</span>
+                        {t('admin.cachePerformance.stats.totalAccesses', { count: data.total })}
+                      </span>
+                      <span>
+                        <span className="text-green-600">
+                          {t('admin.cachePerformance.stats.hitsCount', { count: data.hits })}
+                        </span>{' '}
+                        /
+                        <span className="text-amber-600">
+                          {t('admin.cachePerformance.stats.missesCount', { count: data.misses })}
+                        </span>
                       </span>
                     </div>
                     {data.total > 0 && (
@@ -319,15 +355,19 @@ const CachePerformancePanel = () => {
 
             {/* Estado de la caché */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium">Estado actual</h3>
+              <h3 className="text-lg font-medium">{t('admin.cachePerformance.state.title')}</h3>
 
               <div className="space-y-3">
                 <div className="p-3 bg-gray-50 rounded-md">
-                  <p className="text-sm text-gray-600">Entradas en memoria</p>
+                  <p className="text-sm text-gray-600">
+                    {t('admin.cachePerformance.state.memoryEntries')}
+                  </p>
                   <p className="text-xl font-medium">{cacheReport.memory.entryCount}</p>
 
                   <div className="mt-2">
-                    <p className="text-xs text-gray-600 mb-1">Distribución por categoría:</p>
+                    <p className="text-xs text-gray-600 mb-1">
+                      {t('admin.cachePerformance.state.categoryDistribution')}
+                    </p>
                     {Object.entries(cacheReport.memory.byCategory).map(([category, count]) => (
                       <p key={category} className="text-xs flex justify-between">
                         <span>{category}:</span>
@@ -338,7 +378,9 @@ const CachePerformancePanel = () => {
                 </div>
 
                 <div className="p-3 bg-gray-50 rounded-md">
-                  <p className="text-sm text-gray-600">Tamaño en localStorage</p>
+                  <p className="text-sm text-gray-600">
+                    {t('admin.cachePerformance.state.localStorageSize')}
+                  </p>
                   <p className="text-xl font-medium">{cacheReport.localStorage.sizeFormatted}</p>
                 </div>
               </div>
@@ -346,7 +388,7 @@ const CachePerformancePanel = () => {
 
             {/* Plantillas más utilizadas */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium">Plantillas más utilizadas</h3>
+              <h3 className="text-lg font-medium">{t('admin.cachePerformance.templates.title')}</h3>
 
               <div className="space-y-2">
                 {cacheReport.usage.topTemplates.length > 0 ? (
@@ -363,11 +405,17 @@ const CachePerformancePanel = () => {
                           {template.name || template.id}
                         </span>
                       </div>
-                      <span className="text-sm text-gray-600">{template.useCount} usos</span>
+                      <span className="text-sm text-gray-600">
+                        {t('admin.cachePerformance.templates.usageCount', {
+                          count: template.useCount,
+                        })}
+                      </span>
                     </div>
                   ))
                 ) : (
-                  <p className="text-sm text-gray-500">No hay datos de uso suficientes</p>
+                  <p className="text-sm text-gray-500">
+                    {t('admin.cachePerformance.templates.empty')}
+                  </p>
                 )}
               </div>
             </div>
@@ -377,26 +425,25 @@ const CachePerformancePanel = () => {
         <TabsContent value="benchmark">
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-medium">Prueba de rendimiento</h3>
+              <h3 className="text-lg font-medium">{t('admin.cachePerformance.benchmark.title')}</h3>
 
               <Button onClick={handleRunBenchmark} disabled={benchmarkLoading}>
                 {benchmarkLoading ? (
                   <>
                     <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                    Ejecutando...
+                    {t('admin.cachePerformance.benchmark.running')}
                   </>
                 ) : (
                   <>
                     <BarChart2 className="h-4 w-4 mr-2" />
-                    Ejecutar benchmark
+                    {t('admin.cachePerformance.benchmark.run')}
                   </>
                 )}
               </Button>
             </div>
 
             <p className="text-sm text-gray-600">
-              El benchmark compara el tiempo de acceso a las plantillas con y sin caché activada.
-              Esto permite medir la mejora de rendimiento real que proporciona el sistema.
+              {t('admin.cachePerformance.benchmark.description')}
             </p>
 
             {renderBenchmarkResults()}
@@ -406,7 +453,9 @@ const CachePerformancePanel = () => {
         <TabsContent value="preload">
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-medium mb-4">Prueba de precarga por categoría</h3>
+              <h3 className="text-lg font-medium mb-4">
+                {t('admin.cachePerformance.preload.title')}
+              </h3>
 
               <div className="flex items-end gap-2">
                 <div className="flex-grow">
@@ -414,7 +463,7 @@ const CachePerformancePanel = () => {
                     htmlFor="category"
                     className="block text-sm font-medium text-gray-700 mb-1"
                   >
-                    Categoría
+                    {t('admin.cachePerformance.preload.categoryLabel')}
                   </label>
                   <select
                     id="category"
@@ -432,7 +481,9 @@ const CachePerformancePanel = () => {
                 </div>
 
                 <Button onClick={handleTestPreloading} disabled={loading || !selectedCategory}>
-                  {loading ? 'Probando...' : 'Probar precarga'}
+                  {loading
+                    ? t('admin.cachePerformance.preload.testing')
+                    : t('admin.cachePerformance.preload.test')}
                 </Button>
               </div>
 
@@ -442,16 +493,13 @@ const CachePerformancePanel = () => {
             <div className="p-4 bg-gray-50 rounded-md">
               <h4 className="font-medium flex items-center gap-2">
                 <Clock size={16} />
-                Acerca de la precarga
+                {t('admin.cachePerformance.preload.aboutTitle')}
               </h4>
               <p className="mt-2 text-sm text-gray-600">
-                La precarga permite cargar anticipadamente plantillas que es probable que se
-                necesiten en base a patrones de uso históricos. Esto mejora la experiencia al
-                minimizar los tiempos de espera para el usuario.
+                {t('admin.cachePerformance.preload.aboutParagraph1')}
               </p>
               <p className="mt-2 text-sm text-gray-600">
-                Las plantillas se precargan automáticamente en segundo plano según su frecuencia de
-                uso, categoría y última fecha de acceso.
+                {t('admin.cachePerformance.preload.aboutParagraph2')}
               </p>
             </div>
           </div>
@@ -459,7 +507,7 @@ const CachePerformancePanel = () => {
 
         <TabsContent value="config">
           <div className="space-y-6">
-            <h3 className="text-lg font-medium">Configuración actual</h3>
+            <h3 className="text-lg font-medium">{t('admin.cachePerformance.config.title')}</h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {Object.entries(cacheReport.config).map(([key, value]) => (
@@ -468,8 +516,8 @@ const CachePerformancePanel = () => {
                   <p className="text-sm mt-1">
                     {typeof value === 'boolean'
                       ? value
-                        ? 'Activado'
-                        : 'Desactivado'
+                        ? t('admin.cachePerformance.config.enabled')
+                        : t('admin.cachePerformance.config.disabled')
                       : String(value)}
                   </p>
                 </div>
@@ -479,16 +527,17 @@ const CachePerformancePanel = () => {
             {/* Opciones avanzadas de configuración - para futura implementación */}
             <div className="mt-8 border-t pt-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-medium">Configuración avanzada</h3>
+                <h3 className="text-lg font-medium">
+                  {t('admin.cachePerformance.config.advancedTitle')}
+                </h3>
                 <Button variant="outline" disabled>
                   <Save className="h-4 w-4 mr-2" />
-                  Guardar cambios
+                  {t('admin.cachePerformance.config.save')}
                 </Button>
               </div>
 
               <p className="text-sm text-gray-500 mb-4">
-                Estas opciones permiten ajustar el comportamiento del sistema de caché.
-                Funcionalidad en desarrollo para próximas versiones.
+                {t('admin.cachePerformance.config.advancedDescription')}
               </p>
             </div>
           </div>

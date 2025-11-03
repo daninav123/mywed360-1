@@ -351,6 +351,18 @@ function canSupplierWorkInLocation(supplier, searchLocation) {
   );
   const supplierCountry = supplier.location?.country || supplier.location?.countryCode;
 
+  console.log(`   📍 Proveedor: "${supplier.name || 'Sin nombre'}"`);
+  console.log(
+    `      City: "${supplierCity}" | State: "${supplierState}" | Country: "${supplierCountry}"`
+  );
+
+  // ⭐⭐⭐ PRIORIDAD MÁXIMA: Si la ciudad del proveedor coincide exactamente con la búsqueda, ACEPTAR INMEDIATAMENTE
+  if (supplierCity && supplierCity === searchLevel.normalized) {
+    console.log(`   🔍 Comparando ciudad: "${supplierCity}" === "${searchLevel.normalized}"`);
+    console.log(`   ✅ MATCH DIRECTO de ciudad - ACEPTADO`);
+    return true;
+  }
+
   // Si tiene país, intentar match por país
   if (supplierCountry) {
     const supplierCountryLevel = determineLocationLevel(supplierCountry);
@@ -379,10 +391,8 @@ function canSupplierWorkInLocation(supplier, searchLocation) {
       if (stateLevel.stateCode && searchLevel.stateCode) {
         return stateLevel.stateCode === searchLevel.stateCode;
       }
-      // Fallback: ciudad coincide o ciudad está en el mismo estado
-      return (
-        supplierCity === searchLevel.normalized || stateLevel.normalized === searchLevel.normalized
-      );
+      // Fallback: ciudad está en el mismo estado
+      return stateLevel.normalized === searchLevel.normalized;
     }
   }
 

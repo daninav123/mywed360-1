@@ -17,16 +17,19 @@ import {
   Eye,
   ChevronLeft,
   ChevronRight,
+  LogOut,
+  ArrowLeft,
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import useTranslations from '../../hooks/useTranslations';
 
 const STATUS_OPTIONS = [
   { value: 'all', label: 'Todas', icon: Inbox },
-  { value: 'new', label: 'Nuevas', icon: Circle },
-  { value: 'viewed', label: 'Vistas', icon: Eye },
+  { value: 'pending', label: 'Pendientes', icon: Circle },
   { value: 'contacted', label: 'Contactadas', icon: CheckCircle },
-  { value: 'archived', label: 'Archivadas', icon: Archive },
+  { value: 'quoted', label: 'Cotizadas', icon: Eye },
+  { value: 'accepted', label: 'Aceptadas', icon: CheckCircle },
+  { value: 'rejected', label: 'Rechazadas', icon: Archive },
 ];
 
 export default function SupplierRequests() {
@@ -65,9 +68,16 @@ export default function SupplierRequests() {
         params.append('status', statusFilter);
       }
 
-      const response = await fetch(`/api/supplier-requests/${supplierId}?${params.toString()}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      // Usar el endpoint correcto que lee de suppliers/{id}/quote-requests
+      const response = await fetch(
+        `/api/suppliers/${supplierId}/quote-requests?${params.toString()}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'x-supplier-id': supplierId, // Header requerido por el endpoint
+          },
+        }
+      );
 
       if (!response.ok) {
         if (response.status === 401) {
@@ -80,10 +90,34 @@ export default function SupplierRequests() {
       }
 
       const data = await response.json();
-      setRequests(data.data || []);
+
+      // Transformar datos del formato V2 al formato que espera el panel
+      const transformedRequests = (data.requests || []).map((req) => ({
+        id: req.id,
+        coupleName: req.contacto?.nombre || 'Sin nombre',
+        contactEmail: req.contacto?.email || '',
+        contactPhone: req.contacto?.telefono || '',
+        message: req.customMessage || '',
+        weddingDate: req.weddingInfo?.fecha || null,
+        guestCount: req.weddingInfo?.numeroInvitados || null,
+        budget: req.weddingInfo?.presupuestoTotal || null,
+        location: req.weddingInfo?.ciudad || null,
+        services: [req.supplierCategoryName || req.supplierCategory || 'Servicio'],
+        status: req.status || 'pending',
+        receivedAt: req.createdAt,
+        viewedAt: req.viewedAt,
+        respondedAt: req.respondedAt,
+        viewed: req.viewed || false,
+        // Campos adicionales del sistema V2
+        serviceDetails: req.serviceDetails || {},
+        supplierCategory: req.supplierCategory,
+        supplierCategoryName: req.supplierCategoryName,
+      }));
+
+      setRequests(transformedRequests);
 
       // Calcular total de páginas
-      const total = data.pagination?.total || 0;
+      const total = data.total || transformedRequests.length;
       setTotalPages(Math.ceil(total / itemsPerPage) || 1);
     } catch (error) {
       console.error('[SupplierRequests] Error loading:', error);
@@ -105,14 +139,19 @@ export default function SupplierRequests() {
         const token = localStorage.getItem('supplier_token');
         const supplierId = localStorage.getItem('supplier_id');
 
-        const response = await fetch(`/api/supplier-requests/${supplierId}/${requestId}`, {
-          method: 'PATCH',
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ status: newStatus }),
-        });
+        // Usar el endpoint correcto
+        const response = await fetch(
+          `/api/suppliers/${supplierId}/quote-requests/${requestId}/status`,
+          {
+            method: 'PUT',
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+              'x-supplier-id': supplierId,
+            },
+            body: JSON.stringify({ status: newStatus }),
+          }
+        );
 
         if (!response.ok) throw new Error('update_error');
 
@@ -144,7 +183,27 @@ export default function SupplierRequests() {
     if (!timestamp) return 'Sin fecha';
 
     try {
-      const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+      let date;
+
+      // Manejar diferentes formatos de timestamp
+      if (timestamp.toDate) {
+        // Firestore Timestamp con método toDate()
+        date = timestamp.toDate();
+      } else if (timestamp._seconds) {
+        // Firestore Timestamp serializado { _seconds, _nanoseconds }
+        date = new Date(timestamp._seconds * 1000);
+      } else if (typeof timestamp === 'string' || typeof timestamp === 'number') {
+        // ISO string o timestamp en milisegundos
+        date = new Date(timestamp);
+      } else {
+        return 'Fecha inválida';
+      }
+
+      // Verificar que la fecha es válida
+      if (isNaN(date.getTime())) {
+        return 'Fecha inválida';
+      }
+
       return new Intl.DateTimeFormat('es-ES', {
         day: '2-digit',
         month: 'short',
@@ -152,7 +211,8 @@ export default function SupplierRequests() {
         hour: '2-digit',
         minute: '2-digit',
       }).format(date);
-    } catch {
+    } catch (error) {
+      console.error('Error formateando fecha:', error, timestamp);
       return 'Fecha inválida';
     }
   }, []);
@@ -160,14 +220,14 @@ export default function SupplierRequests() {
   // Obtener badge de estado
   const getStatusBadge = useCallback((status) => {
     const badges = {
-      new: { bg: 'bg-blue-100', text: 'text-blue-800', label: 'Nueva' },
-      viewed: { bg: 'bg-yellow-100', text: 'text-yellow-800', label: 'Vista' },
-      contacted: { bg: 'bg-green-100', text: 'text-green-800', label: 'Contactada' },
-      responded: { bg: 'bg-green-100', text: 'text-green-800', label: 'Respondida' },
-      archived: { bg: 'bg-gray-100', text: 'text-gray-800', label: 'Archivada' },
+      pending: { bg: 'bg-blue-100', text: 'text-blue-800', label: 'Pendiente' },
+      contacted: { bg: 'bg-yellow-100', text: 'text-yellow-800', label: 'Contactada' },
+      quoted: { bg: 'bg-purple-100', text: 'text-purple-800', label: 'Cotizada' },
+      accepted: { bg: 'bg-green-100', text: 'text-green-800', label: 'Aceptada' },
+      rejected: { bg: 'bg-red-100', text: 'text-red-800', label: 'Rechazada' },
     };
 
-    const badge = badges[status] || badges.new;
+    const badge = badges[status] || badges.pending;
     return (
       <span className={`px-2 py-1 text-xs font-medium rounded-full ${badge.bg} ${badge.text}`}>
         {badge.label}
@@ -180,107 +240,155 @@ export default function SupplierRequests() {
     (request) => (
       <div
         key={request.id}
-        className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow"
+        className="group bg-white border border-gray-200 rounded-xl p-6 hover:shadow-2xl hover:border-indigo-300 transition-all duration-300 transform hover:-translate-y-1"
       >
-        {/* Header */}
-        <div className="flex items-start justify-between mb-4">
+        {/* Header con degradado */}
+        <div className="flex items-start justify-between mb-5 pb-4 border-b border-gray-100">
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-2">
-              <h3 className="text-lg font-semibold text-gray-900">{request.coupleName}</h3>
-              {getStatusBadge(request.status)}
+              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-bold text-sm shadow-lg">
+                {request.coupleName?.charAt(0)?.toUpperCase() || '?'}
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">
+                  {request.coupleName}
+                </h3>
+                <div className="flex items-center gap-2 mt-1">
+                  <Clock size={14} className="text-gray-400" />
+                  <span className="text-xs text-gray-500">{formatDate(request.receivedAt)}</span>
+                </div>
+              </div>
             </div>
-            <div className="flex items-center gap-4 text-sm text-gray-600">
-              <span className="flex items-center gap-1">
-                <Clock size={14} />
-                {formatDate(request.receivedAt)}
+          </div>
+          <div className="flex flex-col items-end gap-2">
+            {getStatusBadge(request.status)}
+            {request.urgency === 'urgent' && (
+              <span className="animate-pulse flex items-center gap-1 text-xs text-red-600 font-semibold bg-red-50 px-2 py-1 rounded-full">
+                ⚠️ Urgente
               </span>
-              {request.urgency === 'urgent' && (
-                <span className="flex items-center gap-1 text-red-600 font-medium">⚠️ Urgente</span>
-              )}
-            </div>
+            )}
           </div>
         </div>
 
-        {/* Detalles de la boda */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4 p-4 bg-gray-50 rounded-lg">
+        {/* Detalles de la boda con iconos coloridos */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5 p-5 bg-gradient-to-br from-gray-50 to-indigo-50 rounded-xl border border-indigo-100">
           {request.weddingDate && (
-            <div className="flex items-center gap-2 text-sm">
-              <Calendar size={16} className="text-gray-500" />
-              <span className="text-gray-700">
-                <strong>Fecha:</strong> {new Date(request.weddingDate).toLocaleDateString('es-ES')}
-              </span>
+            <div className="flex items-center gap-3 p-2 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
+              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-pink-100">
+                <Calendar size={18} className="text-pink-600" />
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 font-medium">Fecha de Boda</p>
+                <p className="text-sm font-semibold text-gray-900">
+                  {new Date(request.weddingDate).toLocaleDateString('es-ES', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                  })}
+                </p>
+              </div>
             </div>
           )}
           {request.location && (
-            <div className="flex items-center gap-2 text-sm">
-              <MapPin size={16} className="text-gray-500" />
-              <span className="text-gray-700">
-                <strong>Lugar:</strong> {request.location}
-              </span>
+            <div className="flex items-center gap-3 p-2 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
+              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-green-100">
+                <MapPin size={18} className="text-green-600" />
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 font-medium">Ubicación</p>
+                <p className="text-sm font-semibold text-gray-900">{request.location}</p>
+              </div>
             </div>
           )}
           {request.guestCount && (
-            <div className="flex items-center gap-2 text-sm">
-              <Users size={16} className="text-gray-500" />
-              <span className="text-gray-700">
-                <strong>Invitados:</strong> {request.guestCount}
-              </span>
+            <div className="flex items-center gap-3 p-2 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
+              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100">
+                <Users size={18} className="text-blue-600" />
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 font-medium">Invitados</p>
+                <p className="text-sm font-semibold text-gray-900">{request.guestCount} personas</p>
+              </div>
             </div>
           )}
           {request.budget && (
-            <div className="flex items-center gap-2 text-sm">
-              <DollarSign size={16} className="text-gray-500" />
-              <span className="text-gray-700">
-                <strong>Presupuesto:</strong> {request.budget}
-              </span>
+            <div className="flex items-center gap-3 p-2 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
+              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-amber-100">
+                <DollarSign size={18} className="text-amber-600" />
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 font-medium">Presupuesto</p>
+                <p className="text-sm font-semibold text-gray-900">{request.budget}€</p>
+              </div>
             </div>
           )}
         </div>
 
-        {/* Mensaje */}
-        <div className="mb-4">
-          <p className="text-sm text-gray-600 line-clamp-2">{request.message}</p>
-        </div>
+        {/* Mensaje con mejor diseño */}
+        {request.message && (
+          <div className="mb-5 p-4 bg-white border-l-4 border-indigo-500 rounded-lg">
+            <p className="text-xs text-gray-500 font-semibold mb-1">💬 Mensaje del Cliente</p>
+            <p className="text-sm text-gray-700 leading-relaxed">
+              {request.message.length > 150
+                ? `${request.message.substring(0, 150)}...`
+                : request.message}
+            </p>
+          </div>
+        )}
 
-        {/* Contacto */}
-        <div className="flex items-center gap-4 mb-4 text-sm text-gray-700">
+        {/* Contacto con botones destacados */}
+        <div className="flex flex-wrap gap-3 mb-5">
           <a
             href={`mailto:${request.contactEmail}`}
-            className="flex items-center gap-1 text-indigo-600 hover:text-indigo-700"
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-50 to-indigo-100 text-indigo-700 rounded-lg hover:from-indigo-100 hover:to-indigo-200 transition-all shadow-sm hover:shadow-md font-medium"
           >
-            <Mail size={14} />
-            {request.contactEmail}
+            <Mail size={16} />
+            <span className="text-sm">{request.contactEmail}</span>
           </a>
           {request.contactPhone && (
             <a
               href={`tel:${request.contactPhone}`}
-              className="flex items-center gap-1 text-indigo-600 hover:text-indigo-700"
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-50 to-green-100 text-green-700 rounded-lg hover:from-green-100 hover:to-green-200 transition-all shadow-sm hover:shadow-md font-medium"
             >
-              <Phone size={14} />
-              {request.contactPhone}
+              <Phone size={16} />
+              <span className="text-sm">{request.contactPhone}</span>
             </a>
           )}
         </div>
 
-        {/* Acciones */}
-        <div className="flex gap-2">
-          {request.status === 'new' && (
-            <button
-              onClick={() => updateRequestStatus(request.id, 'contacted')}
-              className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
-            >
-              <CheckCircle size={16} className="inline mr-1" />
-              Marcar Contactada
-            </button>
+        {/* Acciones con mejor diseño */}
+        <div className="flex flex-wrap gap-3 pt-4 border-t border-gray-100">
+          {request.status === 'pending' && (
+            <>
+              <button
+                onClick={() => updateRequestStatus(request.id, 'contacted')}
+                className="flex-1 min-w-[200px] px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all shadow-md hover:shadow-lg text-sm font-semibold transform hover:scale-105"
+              >
+                <CheckCircle size={18} className="inline mr-2" />
+                Marcar como Contactada
+              </button>
+              <button
+                onClick={() => updateRequestStatus(request.id, 'quoted')}
+                className="flex-1 min-w-[200px] px-6 py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all shadow-md hover:shadow-lg text-sm font-semibold transform hover:scale-105"
+              >
+                <Eye size={18} className="inline mr-2" />
+                Enviar Cotización
+              </button>
+            </>
           )}
           {request.status === 'contacted' && (
             <button
-              onClick={() => updateRequestStatus(request.id, 'archived')}
-              className="flex-1 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm font-medium"
+              onClick={() => updateRequestStatus(request.id, 'quoted')}
+              className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all shadow-md hover:shadow-lg text-sm font-semibold transform hover:scale-105"
             >
-              <Archive size={16} className="inline mr-1" />
-              Archivar
+              <Eye size={18} className="inline mr-2" />
+              Enviar Cotización
             </button>
+          )}
+          {(request.status === 'quoted' || request.status === 'accepted') && (
+            <div className="flex-1 px-6 py-3 bg-gradient-to-r from-green-50 to-green-100 text-green-700 rounded-lg text-sm font-semibold text-center border-2 border-green-200">
+              ✅ Solicitud {request.status === 'accepted' ? 'Aceptada' : 'Cotizada'}
+            </div>
           )}
           {request.status === 'archived' && (
             <button
@@ -319,16 +427,36 @@ export default function SupplierRequests() {
     <div className="space-y-6">
       {/* Header */}
       <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <Inbox className="h-8 w-8" />
-              <h1 className="text-3xl font-bold">Solicitudes Recibidas</h1>
-            </div>
-            <p className="text-indigo-100">
-              Gestiona las solicitudes de presupuesto de tus clientes potenciales
-            </p>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => navigate('/supplier/dashboard/' + localStorage.getItem('supplier_id'))}
+              className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+              title="Volver al dashboard"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+            <Inbox className="h-8 w-8" />
+            <h1 className="text-3xl font-bold">Solicitudes Recibidas</h1>
           </div>
+          <button
+            onClick={() => {
+              localStorage.removeItem('supplier_token');
+              localStorage.removeItem('supplier_id');
+              localStorage.removeItem('supplier_data');
+              navigate('/supplier/login');
+            }}
+            className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
+            title="Cerrar sesión"
+          >
+            <LogOut className="h-4 w-4" />
+            <span className="hidden sm:inline">Cerrar sesión</span>
+          </button>
+        </div>
+        <div className="flex items-center justify-between">
+          <p className="text-indigo-100">
+            Gestiona las solicitudes de presupuesto de tus clientes potenciales
+          </p>
           <div className="text-right">
             <div className="text-4xl font-bold">{requests.length}</div>
             <div className="text-indigo-100 text-sm">Solicitudes</div>

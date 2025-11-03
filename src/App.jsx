@@ -43,9 +43,16 @@ import SupplierSetPassword from './pages/suppliers/SupplierSetPassword';
 import SupplierRegister from './pages/suppliers/SupplierRegister';
 import SupplierDashboard from './pages/suppliers/SupplierDashboard';
 import SupplierRequestDetail from './pages/suppliers/SupplierRequestDetail';
-import SupplierRequests from './pages/suppliers/SupplierRequests';
+import SupplierRequests from './pages/suppliers/SupplierRequestsNew';
 import SupplierPlans from './pages/suppliers/SupplierPlans';
 import SupplierPortfolio from './pages/suppliers/SupplierPortfolio';
+import SupplierProducts from './pages/suppliers/SupplierProducts';
+import SupplierReviews from './pages/suppliers/SupplierReviews';
+import SupplierAnalytics from './pages/suppliers/SupplierAnalytics';
+import SupplierMessages from './pages/suppliers/SupplierMessages';
+import SupplierAvailability from './pages/suppliers/SupplierAvailability';
+import SupplierPayments from './pages/suppliers/SupplierPayments';
+import SupplierDebug from './pages/suppliers/SupplierDebug';
 import SupplierPublicPage from './pages/SupplierPublicPage';
 import Tasks from './pages/Tasks';
 import VerifyEmail from './pages/VerifyEmail.jsx';
@@ -377,6 +384,7 @@ function App() {
                           {/* Portal de proveedores */}
                           <Route path="supplier/registro" element={<SupplierRegistration />} />
                           <Route path="supplier/login" element={<SupplierLogin />} />
+                          <Route path="supplier/debug" element={<SupplierDebug />} />
                           <Route path="supplier/setup-password" element={<SupplierSetPassword />} />
                           <Route path="supplier/register" element={<SupplierRegister />} />
                           <Route path="supplier/dashboard/:id" element={<SupplierDashboard />} />
@@ -388,6 +396,30 @@ function App() {
                           <Route
                             path="supplier/dashboard/:id/portfolio"
                             element={<SupplierPortfolio />}
+                          />
+                          <Route
+                            path="supplier/dashboard/:id/products"
+                            element={<SupplierProducts />}
+                          />
+                          <Route
+                            path="supplier/dashboard/:id/reviews"
+                            element={<SupplierReviews />}
+                          />
+                          <Route
+                            path="supplier/dashboard/:id/analytics"
+                            element={<SupplierAnalytics />}
+                          />
+                          <Route
+                            path="supplier/dashboard/:id/messages"
+                            element={<SupplierMessages />}
+                          />
+                          <Route
+                            path="supplier/dashboard/:id/availability"
+                            element={<SupplierAvailability />}
+                          />
+                          <Route
+                            path="supplier/dashboard/:id/payments"
+                            element={<SupplierPayments />}
                           />
                           <Route
                             path="supplier/dashboard/:id/request/:requestId"

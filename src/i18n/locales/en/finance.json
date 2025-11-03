@@ -28,7 +28,28 @@
     "used": "utilizado",
     "categoryStatus": "Estado del Presupuesto por Categorías",
     "progress": "Progreso",
-    "exceededNote": "(Presupuesto excedido!)"
+    "exceededNote": "(Presupuesto excedido!)",
+    "avgExpense": "Gasto neto promedio mensual",
+    "burnRate": "Burn rate mensual",
+    "categoriesAtRisk": "Categorías en riesgo",
+    "estimatedDate": "Estimado:",
+    "forecastSurplus": "Saldo proyectado día de la boda",
+    "minBalance": "Punto de balance mínimo",
+    "monthsToZero": "Meses hasta agotar presupuesto",
+    "noProvider": "Proveedor sin asignar",
+    "onDate": "en",
+    "predictiveSubtitle": "Basado en la media móvil de los últimos seis meses.",
+    "predictiveTitle": "Analítica predictiva",
+    "projectedAtWedding": "Balance el día de la boda",
+    "projectionHint": "Estimaciones basadas en aportaciones configuradas, regalos esperados e importes pendientes.",
+    "projectionTitle": "Proyección financiera",
+    "recommendedSaving": "Ahorro mensual recomendado",
+    "riskDays": "Días en riesgo",
+    "totalProjectedGifts": "Regalos proyectados:",
+    "trendDown": "Tendencia negativa",
+    "trendFlat": "Tendencia estable",
+    "trendUp": "Tendencia positiva",
+    "upcomingPayments": "Pagos próximos"
   },
   "form": {
     "type": "Tipo de transacción",
@@ -66,7 +87,17 @@
       "paidAmountPositive": "El monto abonado debe ser un número positivo",
       "paidAmountExceeds": "El monto abonado no puede superar el total",
       "paidAmountRequired": "Registra cunto has pagado para marcar el estado como parcial"
-    }
+    },
+    "dueDate": "Fecha límite",
+    "dueDateOverdue": "Atención: este pago está vencido.",
+    "paidAmount": "Monto abonado",
+    "paymentMethod": "Método de pago",
+    "paymentMethodPlaceholder": "Selecciona un método",
+    "paymentTracking": "Seguimiento de pago",
+    "providerHint": "Identifica con quién se contrata o de dónde proviene el dinero.",
+    "providerPlaceholder": "Ej: Catering Gourmet, Banco BBVA...",
+    "remainingToPay": "Pendiente por pagar:",
+    "remainingToReceive": "Pendiente por recibir:"
   },
   "transactions": {
     "title": "Transacciones",
@@ -134,8 +165,48 @@
         "category": "Categoría"
       },
       "none": "Ninguna",
-      "preview": "Vista previa"
-    }
+      "preview": "Vista previa",
+      "amount": "Monto",
+      "category": "Categoría",
+      "column": "Columna",
+      "date": "Fecha",
+      "description": "Descripción",
+      "type": "Tipo (Ingreso/Gasto)",
+      "unassigned": "No asignado"
+    },
+    "confirmDelete": "¿Eliminar esta transacción?",
+    "connectBank": "Conectar Banco (Nordigen)",
+    "createSuccess": "Transacción creada",
+    "deleteError": "No se pudo eliminar",
+    "deleteSuccess": "Transacción eliminada",
+    "edit": "Editar transacción",
+    "emptyHint": "Comienza registrando tus primeros ingresos y gastos",
+    "expense": "Gasto",
+    "export": "Exportar",
+    "exportCSV": "Exportar reporte",
+    "exportError": "Error al exportar",
+    "exportSuccess": "Reporte generado",
+    "exporting": "Generando reporte…",
+    "filters": "Filtros",
+    "import": "Importar",
+    "importCSV": "Importar CSV/Excel",
+    "importError": "No se pudo importar el archivo",
+    "importPartial": "Importación parcial",
+    "importSuccess": "Importación completada",
+    "importUnsupported": "Importación no disponible",
+    "importing": "Importando…",
+    "income": "Ingreso",
+    "item": "transacción",
+    "items": "transacciones",
+    "noResults": "No se encontraron transacciones con estos filtros",
+    "overdue": "vencido",
+    "pending": "Pendiente",
+    "rowsFailed": "filas con errores",
+    "saveError": "Error al guardar",
+    "totalExpense": "Gastos",
+    "totalIncome": "Ingresos",
+    "totalTransactions": "Total",
+    "updateSuccess": "Transacción actualizada"
   },
   "charts": {
     "title": "Análisis Financiero",
@@ -164,7 +235,14 @@
       "positive": "Positiva",
       "negative": "Negativa"
     },
-    "balanceLabel": "Balance:"
+    "balanceLabel": "Balance:",
+    "bestMonth": "Mejor Mes",
+    "budgetProgressDesc": "Porcentaje de uso y exceso por categoría",
+    "budgetVsSpentDesc": "Compara lo asignado vs lo gastado por categoría",
+    "expenseDistributionDesc": "Proporción de cada categoría en el total de gastos",
+    "insightsDesc": "Análisis automático de tus finanzas",
+    "loading": "Cargando análisis…",
+    "monthlyTrendDesc": "Evolución de ingresos, gastos y balance mes a mes"
   },
   "bank": {
     "title": "Vincular cuenta bancaria",
@@ -240,7 +318,13 @@
       "refreshFailed": "No se pudo actualizar la recomendacin.",
       "applyFailed": "No se pudo aplicar el escenario recomendado.",
       "applyFailedWithReason": "No se pudo aplicar el escenario ({{reason}})."
-    }
+    },
+    "assigned": "Asignado",
+    "categories": "Categorías",
+    "emptyHint": "Crea categorías para organizar tu presupuesto de boda",
+    "totalSpent": "Total Gastado",
+    "usage": "Uso del presupuesto",
+    "used": "Utilizado"
   },
   "benchmarks": {
     "title": "Sugerencias de presupuesto basadas en bodas similares",
@@ -263,5 +347,88 @@
     "noHistory": "Necesitamos más historial para calcular la tendencia.",
     "income": "Ingresos",
     "expense": "Gastos"
+  },
+  "contributions": {
+    "confirmDelete": "¿Eliminar esta aportación?",
+    "extras": {
+      "help": "Incluye regalos familiares, aportaciones de padres, etc.",
+      "title": "Aportaciones Extras",
+      "totalLabel": "Total extras (familia, otros ingresos) (€)"
+    },
+    "gifts": {
+      "giftPerGuest": "Regalo estimado por invitado (€)",
+      "guestCount": "Número de invitados",
+      "loadHint": "Haz clic en el icono para cargar automáticamente desde tu lista de invitados",
+      "title": "Estimación de Regalos",
+      "total": "Total estimado en regalos:"
+    },
+    "initial": {
+      "personA": "Persona A (€)",
+      "personB": "Persona B (€)",
+      "title": "Aportaciones Iniciales",
+      "total": "Total inicial:"
+    },
+    "monthly": {
+      "personA": "Persona A (€/mes)",
+      "personB": "Persona B (€/mes)",
+      "title": "Aportaciones Mensuales",
+      "total": "Total mensual:"
+    },
+    "nameAmountRequired": "Nombre y monto son obligatorios",
+    "saveChanges": "Guardar Cambios",
+    "status": {
+      "confirmed": "Confirmada",
+      "pending": "Pendiente",
+      "received": "Recibida"
+    },
+    "subtitle": "Configura las aportaciones y estima los ingresos esperados",
+    "summary": {
+      "extras": "Aportaciones extras",
+      "gifts": "Regalos estimados",
+      "initial": "Aportaciones iniciales",
+      "monthly": "Aportaciones mensuales",
+      "subtitle": "Proyección total basada en tus configuraciones",
+      "title": "Resumen de Ingresos Esperados",
+      "total": "Total Esperado"
+    },
+    "tips": {
+      "balanceText": "Mantén un balance justo entre las aportaciones de ambas personas.",
+      "balanceTitle": "Aportaciones equilibradas:",
+      "emergencyText": "Considera reservar un 10-15% del presupuesto total para gastos imprevistos.",
+      "emergencyTitle": "Fondo de emergencia:",
+      "giftsText": "Es mejor subestimar los regalos de boda que sobreestimarlos.",
+      "giftsTitle": "Regalos conservadores:",
+      "reviewText": "Revisa y actualiza estas proyecciones mensualmente.",
+      "reviewTitle": "Seguimiento regular:",
+      "title": "Consejos Financieros"
+    },
+    "title": "Configuración de Aportaciones",
+    "unsaved": "Tienes cambios sin guardar",
+    "updateGuests": "Actualizar Invitados"
+  },
+  "error": {
+    "title": "Error en Gestión financiera"
+  },
+  "hero": {
+    "availableNow": "Disponible Ahora",
+    "budgetStatus": "Estado del Presupuesto",
+    "categoriesCritical": "🔴 Críticas (>90%)",
+    "categoriesOk": "✅ Categorías OK",
+    "categoriesWarning": "⚠️ En alerta (>75%)",
+    "confirmed": "confirmados",
+    "next7d": "Próximos 7d",
+    "noPayments": "Sin pagos",
+    "ofConfirmed": "De",
+    "overdue": "⚠️ Pagos Vencidos",
+    "payments": "pagos",
+    "pending": "Pendiente",
+    "runway": "Margen de caja",
+    "runwayDesc": "Hasta quedarte sin fondos",
+    "runwayUnknown": "Estable",
+    "spent": "Gastado",
+    "viewDetails": "Ver detalles →"
+  },
+  "reports": {
+    "generateError": "Error al generar el reporte. Por favor, intenta nuevamente."
   }
 }

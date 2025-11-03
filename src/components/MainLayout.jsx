@@ -20,7 +20,6 @@ import { useWedding } from '../context/WeddingContext';
 import { prefetchModule } from '../utils/prefetch';
 import NotificationWatcher from './notifications/NotificationWatcher';
 import LanguageSelector from './ui/LanguageSelector';
-import I18nDebugPanel from './i18n/I18nDebugPanel';
 import OnboardingModeSelector from './Onboarding/OnboardingModeSelector.jsx';
 import OnboardingTutorial from './Onboarding/OnboardingTutorial';
 import RoleBadge from './RoleBadge';
@@ -237,7 +236,6 @@ export default function MainLayout() {
       </main>
       <Nav />
       <ChatWidget />
-      <I18nDebugPanel />
     </div>
   );
 }

@@ -7,6 +7,9 @@ import {
   TrendingUp,
   MessageSquare,
   FileText,
+  Mail,
+  Calendar,
+  CreditCard,
   ChevronRight,
   Camera,
   ArrowRight,
@@ -14,10 +17,10 @@ import {
   X,
   Eye,
   MousePointer,
-  Mail,
   Inbox,
   Crown,
   Zap,
+  LogOut,
 } from 'lucide-react';
 import useTranslations from '../../hooks/useTranslations';
 import Spinner from '../../components/ui/Spinner';
@@ -299,17 +302,29 @@ export default function SupplierDashboard() {
               )}
             </div>
 
-            <div>
+            <div className="flex items-center gap-3">
               {!editing ? (
-                <button
-                  type="button"
-                  onClick={() => setEditing(true)}
-                  className="flex items-center gap-2 px-4 py-2 text-white rounded-md"
-                  style={{ backgroundColor: 'var(--color-primary)' }}
-                >
-                  <Edit size={18} />
-                  {t('suppliers.dashboard.buttons.editProfile')}
-                </button>
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setEditing(true)}
+                    className="flex items-center gap-2 px-4 py-2 text-white rounded-md"
+                    style={{ backgroundColor: 'var(--color-primary)' }}
+                  >
+                    <Edit size={18} />
+                    {t('suppliers.dashboard.buttons.editProfile')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="flex items-center gap-2 px-4 py-2 border rounded-md hover:bg-red-50 transition-colors"
+                    style={{ borderColor: 'var(--color-border)', color: 'var(--color-danger)' }}
+                    title="Cerrar sesión"
+                  >
+                    <LogOut size={18} />
+                    <span className="hidden sm:inline">Cerrar sesión</span>
+                  </button>
+                </>
               ) : (
                 <div className="flex gap-2">
                   <button
@@ -506,6 +521,179 @@ export default function SupplierDashboard() {
             <ArrowRight size={20} style={{ color: 'var(--color-primary)' }} />
           </div>
         </Link>
+
+        {/* Acceso rápido a Productos/Servicios */}
+        <Link
+          to={`/supplier/dashboard/${id}/products`}
+          className="block shadow-md rounded-lg p-6 mb-6 hover:shadow-lg transition-shadow"
+          style={{
+            backgroundColor: 'var(--color-surface)',
+            borderLeft: '4px solid var(--color-success)',
+          }}
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-lg" style={{ backgroundColor: 'rgba(34, 197, 94, 0.1)' }}>
+                <FileText size={24} style={{ color: 'var(--color-success)' }} />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>
+                  Mis Servicios/Productos
+                </h3>
+                <p className="text-sm" style={{ color: 'var(--color-muted)' }}>
+                  Gestiona tu catálogo para crear cotizaciones rápidamente
+                </p>
+              </div>
+            </div>
+            <ArrowRight size={20} style={{ color: 'var(--color-success)' }} />
+          </div>
+        </Link>
+
+        {/* Grid de accesos adicionales - FASE 2 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          {/* Acceso a Reseñas */}
+          <Link
+            to={`/supplier/dashboard/${id}/reviews`}
+            className="shadow-md rounded-lg p-4 hover:shadow-lg transition-shadow flex items-center justify-between"
+            style={{
+              backgroundColor: 'var(--color-surface)',
+              borderLeft: '3px solid #fbbf24',
+            }}
+          >
+            <div className="flex items-center gap-3">
+              <div
+                className="p-2 rounded-lg"
+                style={{ backgroundColor: 'rgba(251, 191, 36, 0.1)' }}
+              >
+                <MessageSquare size={20} style={{ color: '#fbbf24' }} />
+              </div>
+              <div>
+                <h3 className="font-semibold text-sm" style={{ color: 'var(--color-text)' }}>
+                  Mis Reseñas
+                </h3>
+                <p className="text-xs" style={{ color: 'var(--color-muted)' }}>
+                  Ver y responder reseñas
+                </p>
+              </div>
+            </div>
+            <ArrowRight size={16} style={{ color: '#fbbf24' }} />
+          </Link>
+
+          {/* Acceso a Analíticas */}
+          <Link
+            to={`/supplier/dashboard/${id}/analytics`}
+            className="shadow-md rounded-lg p-4 hover:shadow-lg transition-shadow flex items-center justify-between"
+            style={{
+              backgroundColor: 'var(--color-surface)',
+              borderLeft: '3px solid var(--color-info)',
+            }}
+          >
+            <div className="flex items-center gap-3">
+              <div
+                className="p-2 rounded-lg"
+                style={{ backgroundColor: 'rgba(94, 187, 255, 0.1)' }}
+              >
+                <TrendingUp size={20} style={{ color: 'var(--color-info)' }} />
+              </div>
+              <div>
+                <h3 className="font-semibold text-sm" style={{ color: 'var(--color-text)' }}>
+                  Analíticas Avanzadas
+                </h3>
+                <p className="text-xs" style={{ color: 'var(--color-muted)' }}>
+                  Gráficos y estadísticas
+                </p>
+              </div>
+            </div>
+            <ArrowRight size={16} style={{ color: 'var(--color-info)' }} />
+          </Link>
+        </div>
+
+        {/* Grid de accesos adicionales - FASE 3 */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          {/* Mensajes */}
+          <Link
+            to={`/supplier/dashboard/${id}/messages`}
+            className="shadow-md rounded-lg p-4 hover:shadow-lg transition-shadow flex items-center justify-between"
+            style={{
+              backgroundColor: 'var(--color-surface)',
+              borderLeft: '3px solid #8b5cf6',
+            }}
+          >
+            <div className="flex items-center gap-3">
+              <div
+                className="p-2 rounded-lg"
+                style={{ backgroundColor: 'rgba(139, 92, 246, 0.1)' }}
+              >
+                <Mail size={20} style={{ color: '#8b5cf6' }} />
+              </div>
+              <div>
+                <h3 className="font-semibold text-sm" style={{ color: 'var(--color-text)' }}>
+                  Mensajes
+                </h3>
+                <p className="text-xs" style={{ color: 'var(--color-muted)' }}>
+                  Chat con clientes
+                </p>
+              </div>
+            </div>
+            <ArrowRight size={16} style={{ color: '#8b5cf6' }} />
+          </Link>
+
+          {/* Disponibilidad */}
+          <Link
+            to={`/supplier/dashboard/${id}/availability`}
+            className="shadow-md rounded-lg p-4 hover:shadow-lg transition-shadow flex items-center justify-between"
+            style={{
+              backgroundColor: 'var(--color-surface)',
+              borderLeft: '3px solid #10b981',
+            }}
+          >
+            <div className="flex items-center gap-3">
+              <div
+                className="p-2 rounded-lg"
+                style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)' }}
+              >
+                <Calendar size={20} style={{ color: '#10b981' }} />
+              </div>
+              <div>
+                <h3 className="font-semibold text-sm" style={{ color: 'var(--color-text)' }}>
+                  Calendario
+                </h3>
+                <p className="text-xs" style={{ color: 'var(--color-muted)' }}>
+                  Gestionar disponibilidad
+                </p>
+              </div>
+            </div>
+            <ArrowRight size={16} style={{ color: '#10b981' }} />
+          </Link>
+
+          {/* Pagos */}
+          <Link
+            to={`/supplier/dashboard/${id}/payments`}
+            className="shadow-md rounded-lg p-4 hover:shadow-lg transition-shadow flex items-center justify-between"
+            style={{
+              backgroundColor: 'var(--color-surface)',
+              borderLeft: '3px solid #f59e0b',
+            }}
+          >
+            <div className="flex items-center gap-3">
+              <div
+                className="p-2 rounded-lg"
+                style={{ backgroundColor: 'rgba(245, 158, 11, 0.1)' }}
+              >
+                <CreditCard size={20} style={{ color: '#f59e0b' }} />
+              </div>
+              <div>
+                <h3 className="font-semibold text-sm" style={{ color: 'var(--color-text)' }}>
+                  Pagos
+                </h3>
+                <p className="text-xs" style={{ color: 'var(--color-muted)' }}>
+                  Facturas y cobros
+                </p>
+              </div>
+            </div>
+            <ArrowRight size={16} style={{ color: '#f59e0b' }} />
+          </Link>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-3">

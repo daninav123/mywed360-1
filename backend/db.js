@@ -71,9 +71,12 @@ if (!admin.apps.length) {
     projectId:
       process.env.VITE_FIREBASE_PROJECT_ID ||
       (parsedServiceAccount && parsedServiceAccount.project_id),
+    // Firebase ahora usa .firebasestorage.app por defecto
+    storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET || 'lovenda-98c77.firebasestorage.app',
   };
 
   console.log('  - Project ID:', initOptions.projectId);
+  console.log('  - Storage Bucket:', initOptions.storageBucket);
 
   if (parsedServiceAccount) {
     console.log('  ✅ Using parsed service account from env var');

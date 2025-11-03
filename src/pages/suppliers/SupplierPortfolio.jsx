@@ -61,18 +61,39 @@ export default function SupplierPortfolio() {
     setLoading(true);
     try {
       const token = localStorage.getItem('supplier_token');
-      const params = new URLSearchParams();
+      const supplierId = localStorage.getItem('supplier_id');
 
+      console.log(
+        '[SupplierPortfolio] Token:',
+        token ? `${token.substring(0, 20)}...` : 'NO TOKEN'
+      );
+      console.log('[SupplierPortfolio] Supplier ID:', supplierId);
+
+      if (!token || token === 'null' || token === 'undefined') {
+        console.error('[SupplierPortfolio] No hay token válido, redirigiendo a login');
+        navigate('/supplier/login');
+        return;
+      }
+
+      const params = new URLSearchParams();
       if (selectedCategory !== 'all') {
         params.append('category', selectedCategory);
       }
+
+      console.log(
+        '[SupplierPortfolio] Haciendo petición a:',
+        `/api/supplier-dashboard/portfolio?${params.toString()}`
+      );
 
       const response = await fetch(`/api/supplier-dashboard/portfolio?${params.toString()}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
+      console.log('[SupplierPortfolio] Respuesta status:', response.status);
+
       if (!response.ok) {
         if (response.status === 401) {
+          console.warn('[SupplierPortfolio] 401 Unauthorized, limpiando sesión');
           localStorage.removeItem('supplier_token');
           localStorage.removeItem('supplier_id');
           navigate('/supplier/login');

@@ -32,7 +32,7 @@ export default function WeddingServiceCard({
   onSearch,
 }) {
   const navigate = useNavigate();
-  const { favorites } = useFavorites();
+  const { favorites = [] } = useFavorites() || {}; // Guard contra undefined
   const { assignSupplier } = useWeddingServices();
   const [showFavoritesModal, setShowFavoritesModal] = useState(false);
   const { t, format } = useTranslations();
@@ -45,7 +45,7 @@ export default function WeddingServiceCard({
   const hasShortlist = shortlistCount > 0;
 
   // Filtrar favoritos por categoría del servicio (usar ID directo)
-  const serviceFavorites = favorites.filter((fav) => fav.supplier?.category === categoryId);
+  const serviceFavorites = (favorites || []).filter((fav) => fav.supplier?.category === categoryId);
   const hasFavorites = serviceFavorites.length > 0;
 
   // Debug SIMPLIFICADO - solo una vez al montar

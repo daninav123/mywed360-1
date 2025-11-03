@@ -12,13 +12,7 @@ import { fetchWall } from '../services/wallService';
 import { fetchBlogPosts } from '../services/blogContentService';
 import { performanceMonitor } from '../services/PerformanceMonitor';
 
-const INSPIRATION_CATEGORIES = [
-  { slug: 'decoracion', label: 'Decoración' },
-  { slug: 'ceremonia', label: 'Ceremonia' },
-  { slug: 'banquete', label: 'Banquete' },
-  { slug: 'flores', label: 'Flores' },
-  { slug: 'vestidos', label: 'Vestidos' },
-];
+const INSPIRATION_CATEGORY_SLUGS = ['decoracion', 'ceremonia', 'banquete', 'flores', 'vestidos'];
 
 const MAX_INSPIRATION_ITEMS = 4;
 const MAX_BLOG_POSTS = 3;
@@ -32,12 +26,17 @@ const toTestId = (text) =>
     .replace(/^-+|-+$/g, '') || 'item';
 
 const DashCard = ({ to, icon: Icon, title, count, loading, onClick }) => {
+  const { t } = useTranslations();
   const cardId = toTestId(title);
+  const ariaValue = loading ? t('planner.dashboard.loadingShort', 'cargando') : String(count ?? 0);
   return (
     <Link
       to={to}
       className="flex-1 min-w-[150px]"
-      aria-label={`${title}: ${loading ? 'cargando' : count}`}
+      aria-label={t('planner.dashboard.cardAria', {
+        title,
+        value: ariaValue,
+      })}
       onClick={() => onClick?.()}
       data-testid={`planner-card-${cardId}`}
     >
@@ -75,6 +74,7 @@ export default function PlannerDashboard() {
   );
   const { count: alertCount, loading: alertsLoading, error: alertsError } = usePlannerAlerts();
   const localeLang = useBrowserLang();
+  const { t, currentLanguage } = useTranslations();
 
   const [inspiration, setInspiration] = useState({
     items: [],
@@ -93,7 +93,6 @@ export default function PlannerDashboard() {
     [meetings]
   );
   const suppliers = Array.isArray(suppliersList) ? suppliersList.length : 0;
-  const { currentLanguage } = useTranslations();
 
   const logCardClick = useCallback(
     (target) => {
@@ -112,16 +111,15 @@ export default function PlannerDashboard() {
     setInspiration((prev) => ({ ...prev, loading: true, error: null }));
     (async () => {
       try {
-        const categories = INSPIRATION_CATEGORIES.slice(0, MAX_INSPIRATION_ITEMS);
+        const categories = INSPIRATION_CATEGORY_SLUGS.slice(0, MAX_INSPIRATION_ITEMS);
         const results = await Promise.all(
-          categories.map(async ({ slug, label }) => {
+          categories.map(async (slug) => {
             try {
               const photos = await fetchWall(1, slug);
               const first = Array.isArray(photos) ? photos.find(Boolean) : null;
               if (!first) return null;
               return {
                 slug,
-                label,
                 image: first.url || first.thumb || first.image || '',
               };
             } catch {
@@ -180,14 +178,20 @@ export default function PlannerDashboard() {
   const handleInspirationClick = useCallback(
     (item) => {
       try {
+        const label =
+          item?.slug && t
+            ? t(`planner.dashboard.inspiration.categories.${item.slug}`, {
+                defaultValue: item?.label || item?.slug || '',
+              })
+            : item?.label || '';
         performanceMonitor.logEvent('planner_inspiration_clicked', {
           slug: item?.slug,
-          label: item?.label,
+          label,
           activeWeddingId: activeWedding || null,
         });
       } catch {}
     },
-    [activeWedding]
+    [activeWedding, t]
   );
 
   const handleBlogClick = useCallback(
@@ -214,20 +218,22 @@ export default function PlannerDashboard() {
 
   return (
     <div className="p-4 md:p-6 max-w-7xl mx-auto space-y-8">
-      <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Panel de Wedding Planner</h1>
+      <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
+        {t('planner.dashboard.title')}
+      </h1>
 
       {activeWeddings === 0 ? (
         <Card className="p-6 text-center space-y-4">
-          <h2 className="text-xl font-semibold text-gray-800">Aún no tienes bodas vinculadas</h2>
-          <p className="text-sm text-gray-600">
-            Crea una nueva boda o solicita acceso para empezar a gestionarla desde este panel.
-          </p>
+          <h2 className="text-xl font-semibold text-gray-800">
+            {t('planner.dashboard.empty.title')}
+          </h2>
+          <p className="text-sm text-gray-600">{t('planner.dashboard.empty.subtitle')}</p>
           <Link
             to="/bodas"
             className="inline-flex items-center justify-center rounded-md bg-rose-500 px-4 py-2 text-white font-semibold hover:bg-rose-600 focus-visible:outline-none focus-visible:ring focus-visible:ring-rose-200 transition-colors"
             onClick={handleEmptyStateCta}
           >
-            Ir a gestión de bodas
+            {t('planner.dashboard.empty.cta')}
           </Link>
         </Card>
       ) : null}
@@ -237,7 +243,7 @@ export default function PlannerDashboard() {
         <DashCard
           to="/bodas"
           icon={Briefcase}
-          title="Bodas activas"
+          title={t('planner.dashboard.cards.weddings')}
           count={activeWeddings}
           loading={false}
           onClick={() => logCardClick('weddings')}
@@ -245,7 +251,7 @@ export default function PlannerDashboard() {
         <DashCard
           to="/alertas"
           icon={AlertCircle}
-          title="Alertas"
+          title={t('planner.dashboard.cards.alerts')}
           count={alertsError ? '!' : alertCount}
           loading={alertsLoading}
           onClick={() => logCardClick('alerts')}
@@ -253,7 +259,7 @@ export default function PlannerDashboard() {
         <DashCard
           to="/tasks"
           icon={CheckSquare}
-          title="Tareas"
+          title={t('planner.dashboard.cards.tasks')}
           count={pendingTasks}
           loading={meetingsLoading}
           onClick={() => logCardClick('tasks')}
@@ -261,7 +267,7 @@ export default function PlannerDashboard() {
         <DashCard
           to="/proveedores"
           icon={Building2}
-          title="Proveedores"
+          title={t('planner.dashboard.cards.suppliers')}
           count={suppliers}
           loading={suppliersLoading}
           onClick={() => logCardClick('suppliers')}
@@ -272,20 +278,18 @@ export default function PlannerDashboard() {
       <section aria-labelledby="planner-inspiration-heading">
         <div className="flex items-center justify-between gap-4 mb-4">
           <h2 id="planner-inspiration-heading" className="text-xl font-semibold text-gray-800">
-            Inspiración reciente
+            {t('planner.dashboard.inspiration.heading')}
           </h2>
           <Link
             to="/inspiracion"
             className="text-sm text-rose-500 hover:text-rose-600 font-medium"
             onClick={() => logCardClick('inspiration')}
           >
-            Ver todo
+            {t('planner.dashboard.inspiration.viewAll')}
           </Link>
         </div>
         {inspiration.error ? (
-          <p className="text-sm text-gray-500">
-            No se pudieron cargar las imágenes de inspiración.
-          </p>
+          <p className="text-sm text-gray-500">{t('planner.dashboard.inspiration.error')}</p>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {inspiration.loading
@@ -294,34 +298,41 @@ export default function PlannerDashboard() {
                     key={`inspiration-skeleton-${idx}`}
                     className="w-full h-32 bg-gray-200 rounded-lg animate-pulse"
                     role="status"
-                    aria-label="Cargando inspiración"
+                    aria-label={t('planner.dashboard.inspiration.loadingAria')}
                   />
                 ))
-              : inspiration.items.map((item) => (
-                  <button
-                    key={item.slug}
-                    type="button"
-                    onClick={() => handleInspirationClick(item)}
-                    className="relative h-32 rounded-lg overflow-hidden focus-visible:outline-none focus-visible:ring focus-visible:ring-rose-200"
-                    aria-label={`Abrir ${item.label}`}
-                  >
-                    {item.image ? (
-                      <ExternalImage
-                        src={item.image}
-                        alt={item.label}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <div className="h-full w-full bg-gray-100 flex items-center justify-center text-sm text-gray-500">
-                        Sin imagen
-                      </div>
-                    )}
-                    <span className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                    <span className="absolute bottom-2 left-2 text-sm font-semibold text-white drop-shadow">
-                      {item.label}
-                    </span>
-                  </button>
-                ))}
+              : inspiration.items.map((item) => {
+                  const itemLabel = t(`planner.dashboard.inspiration.categories.${item.slug}`, {
+                    defaultValue: item.label || item.slug,
+                  });
+                  return (
+                    <button
+                      key={item.slug}
+                      type="button"
+                      onClick={() => handleInspirationClick(item)}
+                      className="relative h-32 rounded-lg overflow-hidden focus-visible:outline-none focus-visible:ring focus-visible:ring-rose-200"
+                      aria-label={t('planner.dashboard.inspiration.openAria', {
+                        label: itemLabel,
+                      })}
+                    >
+                      {item.image ? (
+                        <ExternalImage
+                          src={item.image}
+                          alt={itemLabel}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <div className="h-full w-full bg-gray-100 flex items-center justify-center text-sm text-gray-500">
+                          {t('planner.dashboard.inspiration.noImage')}
+                        </div>
+                      )}
+                      <span className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                      <span className="absolute bottom-2 left-2 text-sm font-semibold text-white drop-shadow">
+                        {itemLabel}
+                      </span>
+                    </button>
+                  );
+                })}
           </div>
         )}
       </section>
@@ -330,18 +341,18 @@ export default function PlannerDashboard() {
       <section aria-labelledby="planner-blog-heading">
         <div className="flex items-center justify-between gap-4 mb-4">
           <h2 id="planner-blog-heading" className="text-xl font-semibold text-gray-800">
-            Blogs destacados
+            {t('planner.dashboard.blog.heading')}
           </h2>
           <Link
             to="/blog"
             className="text-sm text-rose-500 hover:text-rose-600 font-medium"
             onClick={() => logCardClick('blog')}
           >
-            Abrir blog
+            {t('planner.dashboard.blog.viewAll')}
           </Link>
         </div>
         {blogPosts.error ? (
-          <p className="text-sm text-gray-500">No se pudieron cargar las noticias del blog.</p>
+          <p className="text-sm text-gray-500">{t('planner.dashboard.blog.error')}</p>
         ) : (
           <ul className="space-y-2">
             {blogPosts.loading
@@ -350,7 +361,7 @@ export default function PlannerDashboard() {
                     key={`blog-skeleton-${idx}`}
                     className="bg-white rounded shadow p-3 animate-pulse"
                     role="status"
-                    aria-label="Cargando publicación"
+                    aria-label={t('planner.dashboard.blog.loadingAria')}
                   />
                 ))
               : blogPosts.items.map((post) => {

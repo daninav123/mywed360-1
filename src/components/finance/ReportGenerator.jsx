@@ -80,13 +80,18 @@ const ReportGenerator = ({ transactions = [], weddingInfo = {} }) => {
 
     // Header
     doc.setFontSize(20);
-    doc.text('Reporte Financiero', pageWidth / 2, 20, { align: 'center' });
+    doc.text(t('finance.reports.pdf.title'), pageWidth / 2, 20, { align: 'center' });
 
     doc.setFontSize(10);
-    doc.text(weddingInfo.name || 'Mi Boda', pageWidth / 2, 28, { align: 'center' });
+    doc.text(weddingInfo.name || t('finance.reports.pdf.weddingFallback'), pageWidth / 2, 28, {
+      align: 'center',
+    });
 
     if (dateRange.start || dateRange.end) {
-      const rangeText = `Período: ${dateRange.start || 'Inicio'} - ${dateRange.end || 'Actual'}`;
+      const rangeText = t('finance.reports.pdf.range', {
+        start: dateRange.start || t('finance.reports.pdf.rangeStart'),
+        end: dateRange.end || t('finance.reports.pdf.rangeEnd'),
+      });
       doc.text(rangeText, pageWidth / 2, 34, { align: 'center' });
     }
 
@@ -100,25 +105,35 @@ const ReportGenerator = ({ transactions = [], weddingInfo = {} }) => {
     const balance = totalIncome - totalExpenses;
 
     doc.setFontSize(12);
-    doc.text('Resumen', 14, 45);
+    doc.text(t('finance.reports.pdf.summaryTitle'), 14, 45);
 
     doc.setFontSize(10);
-    doc.text(`Total Gastos: €${totalExpenses.toFixed(2)}`, 14, 52);
-    doc.text(`Total Ingresos: €${totalIncome.toFixed(2)}`, 14, 58);
-    doc.text(`Balance: €${balance.toFixed(2)}`, 14, 64);
+    doc.text(`${t('finance.reports.pdf.totalExpenses')}: €${totalExpenses.toFixed(2)}`, 14, 52);
+    doc.text(`${t('finance.reports.pdf.totalIncome')}: €${totalIncome.toFixed(2)}`, 14, 58);
+    doc.text(`${t('finance.reports.pdf.balance')}: €${balance.toFixed(2)}`, 14, 64);
 
     // Tabla de transacciones
     const tableData = data.map((t) => [
       formatDate(t.date, 'short'),
       t.concept || t.description || '-',
       t.supplier || '-',
-      t.type === 'expense' ? 'Gasto' : 'Ingreso',
+      t.type === 'expense'
+        ? t('finance.reports.pdf.table.type.expense')
+        : t('finance.reports.pdf.table.type.income'),
       `€${t.amount.toFixed(2)}`,
     ]);
 
     doc.autoTable({
       startY: 72,
-      head: [['Fecha', 'Concepto', 'Proveedor', 'Tipo', 'Monto']],
+      head: [
+        [
+          t('finance.reports.pdf.table.headers.date'),
+          t('finance.reports.pdf.table.headers.concept'),
+          t('finance.reports.pdf.table.headers.supplier'),
+          t('finance.reports.pdf.table.headers.type'),
+          t('finance.reports.pdf.table.headers.amount'),
+        ],
+      ],
       body: tableData,
       styles: { fontSize: 8 },
       headStyles: { fillColor: [59, 130, 246] },
@@ -131,20 +146,22 @@ const ReportGenerator = ({ transactions = [], weddingInfo = {} }) => {
       doc.setPage(i);
       doc.setFontSize(8);
       doc.text(
-        `Página ${i} de ${pageCount}`,
+        t('finance.reports.pdf.footer.page', { current: i, total: pageCount }),
         pageWidth / 2,
         doc.internal.pageSize.getHeight() - 10,
         { align: 'center' }
       );
       doc.text(
-        `Generado el ${formatDate(new Date(), 'short')}`,
+        t('finance.reports.pdf.footer.generatedAt', {
+          date: formatDate(new Date(), 'short'),
+        }),
         14,
         doc.internal.pageSize.getHeight() - 10
       );
     }
 
     // Descargar
-    const fileName = `reporte-financiero-${new Date().getTime()}.pdf`;
+    const fileName = `${t('finance.reports.pdf.fileNamePrefix')}-${new Date().getTime()}.pdf`;
     doc.save(fileName);
   };
 
@@ -157,45 +174,54 @@ const ReportGenerator = ({ transactions = [], weddingInfo = {} }) => {
 
     // Hoja 1: Resumen
     const summaryData = [
-      ['Reporte Financiero'],
-      [weddingInfo.name || 'Mi Boda'],
+      [t('finance.reports.pdf.title')],
+      [weddingInfo.name || t('finance.reports.pdf.weddingFallback')],
       [],
-      ['Resumen'],
+      [t('finance.reports.pdf.summaryTitle')],
       [
-        'Total Gastos',
+        t('finance.reports.pdf.totalExpenses'),
         data.filter((t) => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0),
       ],
       [
-        'Total Ingresos',
+        t('finance.reports.pdf.totalIncome'),
         data.filter((t) => t.type === 'income').reduce((sum, t) => sum + t.amount, 0),
       ],
       [
-        'Balance',
+        t('finance.reports.pdf.balance'),
         data.filter((t) => t.type === 'income').reduce((sum, t) => sum + t.amount, 0) -
           data.filter((t) => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0),
       ],
       [],
-      ['Generado el', formatDate(new Date(), 'short')],
+      [t('finance.reports.excel.generatedAt'), formatDate(new Date(), 'short')],
     ];
 
     const wsResumen = XLSX.utils.aoa_to_sheet(summaryData);
-    XLSX.utils.book_append_sheet(wb, wsResumen, 'Resumen');
+    XLSX.utils.book_append_sheet(wb, wsResumen, t('finance.reports.excel.sheetSummary'));
 
     // Hoja 2: Transacciones
     const transactionsData = [
-      ['Fecha', 'Concepto', 'Proveedor', 'Tipo', 'Monto', 'Categoría'],
+      [
+        t('finance.reports.excel.transactionsHeaders.date'),
+        t('finance.reports.excel.transactionsHeaders.concept'),
+        t('finance.reports.excel.transactionsHeaders.supplier'),
+        t('finance.reports.excel.transactionsHeaders.type'),
+        t('finance.reports.excel.transactionsHeaders.amount'),
+        t('finance.reports.excel.transactionsHeaders.category'),
+      ],
       ...data.map((t) => [
         formatDate(t.date, 'short'),
         t.concept || t.description || '-',
         t.supplier || '-',
-        t.type === 'expense' ? 'Gasto' : 'Ingreso',
+        t.type === 'expense'
+          ? t('finance.reports.pdf.table.type.expense')
+          : t('finance.reports.pdf.table.type.income'),
         t.amount,
         t.category || '-',
       ]),
     ];
 
     const wsTransactions = XLSX.utils.aoa_to_sheet(transactionsData);
-    XLSX.utils.book_append_sheet(wb, wsTransactions, 'Transacciones');
+    XLSX.utils.book_append_sheet(wb, wsTransactions, t('finance.reports.excel.sheetTransactions'));
 
     // Hoja 3: Por Proveedor (si hay datos)
     if (reportType === 'supplier' || suppliers.length > 0) {
@@ -208,14 +234,18 @@ const ReportGenerator = ({ transactions = [], weddingInfo = {} }) => {
       });
 
       const wsSuppliers = XLSX.utils.aoa_to_sheet([
-        ['Proveedor', 'Transacciones', 'Total'],
+        [
+          t('finance.reports.excel.supplierHeaders.supplier'),
+          t('finance.reports.excel.supplierHeaders.transactions'),
+          t('finance.reports.excel.supplierHeaders.total'),
+        ],
         ...supplierSummary,
       ]);
-      XLSX.utils.book_append_sheet(wb, wsSuppliers, 'Por Proveedor');
+      XLSX.utils.book_append_sheet(wb, wsSuppliers, t('finance.reports.excel.sheetSuppliers'));
     }
 
     // Descargar
-    const fileName = `reporte-financiero-${new Date().getTime()}.xlsx`;
+    const fileName = `${t('finance.reports.excel.fileNamePrefix')}-${new Date().getTime()}.xlsx`;
     XLSX.writeFile(wb, fileName);
   };
 
@@ -223,20 +253,24 @@ const ReportGenerator = ({ transactions = [], weddingInfo = {} }) => {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h2 className="text-xl font-semibold text-gray-900">Generar Reporte</h2>
-        <p className="text-sm text-gray-600 mt-1">Exporta tus datos financieros en PDF o Excel</p>
+        <h2 className="text-xl font-semibold text-gray-900">
+          {t('finance.reports.generator.title')}
+        </h2>
+        <p className="text-sm text-gray-600 mt-1">{t('finance.reports.generator.subtitle')}</p>
       </div>
 
       {/* Configuración */}
       <div className="bg-white border border-gray-200 rounded-lg p-4 space-y-4">
         {/* Tipo de Reporte */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Tipo de Reporte</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            {t('finance.reports.generator.typeLabel')}
+          </label>
           <div className="grid grid-cols-3 gap-2">
             {[
-              { value: 'summary', label: 'Resumen' },
-              { value: 'detailed', label: 'Detallado' },
-              { value: 'supplier', label: 'Por Proveedor' },
+              { value: 'summary', label: t('finance.reports.generator.types.summary') },
+              { value: 'detailed', label: t('finance.reports.generator.types.detailed') },
+              { value: 'supplier', label: t('finance.reports.generator.types.supplier') },
             ].map(({ value, label }) => (
               <button
                 key={value}
@@ -255,7 +289,9 @@ const ReportGenerator = ({ transactions = [], weddingInfo = {} }) => {
 
         {/* Formato */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Formato</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            {t('finance.reports.generator.formatLabel')}
+          </label>
           <div className="grid grid-cols-2 gap-2">
             <button
               onClick={() => setFormat('pdf')}
@@ -266,7 +302,7 @@ const ReportGenerator = ({ transactions = [], weddingInfo = {} }) => {
               }`}
             >
               <FileText className="w-4 h-4" />
-              PDF
+              {t('finance.reports.generator.formatOptions.pdf')}
             </button>
             <button
               onClick={() => setFormat('excel')}
@@ -277,7 +313,7 @@ const ReportGenerator = ({ transactions = [], weddingInfo = {} }) => {
               }`}
             >
               <FileSpreadsheet className="w-4 h-4" />
-              Excel
+              {t('finance.reports.generator.formatOptions.excel')}
             </button>
           </div>
         </div>
@@ -286,11 +322,13 @@ const ReportGenerator = ({ transactions = [], weddingInfo = {} }) => {
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             <Calendar className="w-4 h-4 inline mr-1" />
-            Rango de Fechas (Opcional)
+            {t('finance.reports.generator.rangeLabel')}
           </label>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs text-gray-600 mb-1">Desde</label>
+              <label className="block text-xs text-gray-600 mb-1">
+                {t('finance.reports.generator.range.start')}
+              </label>
               <input
                 type="date"
                 value={dateRange.start}
@@ -299,7 +337,9 @@ const ReportGenerator = ({ transactions = [], weddingInfo = {} }) => {
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-600 mb-1">Hasta</label>
+              <label className="block text-xs text-gray-600 mb-1">
+                {t('finance.reports.generator.range.end')}
+              </label>
               <input
                 type="date"
                 value={dateRange.end}
@@ -315,14 +355,14 @@ const ReportGenerator = ({ transactions = [], weddingInfo = {} }) => {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               <Filter className="w-4 h-4 inline mr-1" />
-              Proveedor (Opcional)
+              {t('finance.reports.generator.supplierLabel')}
             </label>
             <select
               value={selectedSupplier}
               onChange={(e) => setSelectedSupplier(e.target.value)}
               className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
             >
-              <option value="">Todos los proveedores</option>
+              <option value="">{t('finance.reports.generator.supplierAll')}</option>
               {suppliers.map((supplier) => (
                 <option key={supplier} value={supplier}>
                   {supplier}
@@ -336,7 +376,8 @@ const ReportGenerator = ({ transactions = [], weddingInfo = {} }) => {
       {/* Preview Info */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
         <p className="text-sm text-blue-800">
-          <strong>Se incluirán:</strong> {transactions.length} transacciones en el reporte
+          <strong>{t('finance.reports.generator.preview.label')}</strong>{' '}
+          {t('finance.reports.generator.preview.description', { count: transactions.length })}
         </p>
       </div>
 
@@ -350,12 +391,12 @@ const ReportGenerator = ({ transactions = [], weddingInfo = {} }) => {
           {generating ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin" />
-              Generando...
+              {t('finance.reports.generator.button.generating')}
             </>
           ) : (
             <>
               <Download className="w-4 h-4" />
-              Generar Reporte
+              {t('finance.reports.generator.button.generate')}
             </>
           )}
         </Button>

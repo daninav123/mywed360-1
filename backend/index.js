@@ -82,10 +82,14 @@ import weddingNewsRouter from './routes/wedding-news.js';
 import supplierPortalRouter from './routes/supplier-portal.js';
 import supplierRegistrationRouter from './routes/supplier-registration.js';
 import supplierDashboardRouter from './routes/supplier-dashboard.js';
+import supplierMessagesRouter from './routes/supplier-messages.js';
+import supplierAvailabilityRouter from './routes/supplier-availability.js';
+import supplierPaymentsRouter from './routes/supplier-payments.js';
 import supplierPublicRouter from './routes/supplier-public.js';
 import supplierReviewsRouter from './routes/supplier-reviews.js';
 import supplierQuoteRequestsRouter from './routes/supplier-quote-requests.js';
 import supplierBudgetRouter from './routes/supplier-budget.js';
+import supplierPortfolioRouter from './routes/supplier-portfolio.js';
 import migrateSuppliersRouter from './routes/migrate-suppliers.js';
 import publicWeddingRouter from './routes/public-wedding.js';
 import weddingServicesRouter from './routes/wedding-services.js';
@@ -130,6 +134,8 @@ import weddingsRouter from './routes/weddings.js';
 import usersRouter from './routes/users.js';
 import taskTemplatesRouter from './routes/task-templates.js';
 import mobileRouter from './routes/mobile.js';
+import quoteRequestsRouter from './routes/quote-requests.js';
+import adminQuoteRequestsRouter from './routes/admin-quote-requests.js';
 
 import ipAllowlist from './middleware/ipAllowlist.js';
 import adminAuthRouter from './routes/admin-auth.js';
@@ -160,7 +166,7 @@ if (!process.env.OPENAI_API_KEY) {
 }
 
 // Puerto desde config centralizada (Render inyecta PORT)
-// const PORT = process.env.PORT ? Number(process.env.PORT) : 4004;
+// Ya se importa PORT desde config.js
 
 const app = express();
 // Detrás de proxy (Render) para que express-rate-limit use la IP correcta
@@ -641,6 +647,7 @@ app.use('/api/suppliers', suppliersHybridRouter); // Búsqueda pública, sin aut
 app.use('/api/suppliers', suppliersRegisterRouter); // No requiere auth para registro
 app.use('/api/suppliers', supplierPublicRouter); // Portfolio público (sin auth)
 app.use('/api/suppliers', supplierReviewsRouter); // Reseñas (público lectura, auth escritura)
+app.use('/api/suppliers', supplierPortfolioRouter); // Catálogo de productos/servicios (requiere auth proveedor)
 app.use('/api/suppliers', supplierQuoteRequestsRouter); // Solicitudes de presupuesto (público)
 app.use('/api/quote-requests', supplierQuoteRequestsRouter); // Rutas públicas de respuesta de presupuestos
 app.use('/api/suppliers', supplierRequestsRouter); // Solicitudes de presupuesto (legacy - mantener por compatibilidad)
@@ -682,7 +689,13 @@ app.use('/api/supplier-portal', supplierPortalRouter);
 // Supplier registration (public, no auth required)
 app.use('/api/supplier-registration', supplierRegistrationRouter);
 // Supplier dashboard (protected, JWT auth)
+console.log('[index.js] Mounting supplier-dashboard router...');
 app.use('/api/supplier-dashboard', supplierDashboardRouter);
+console.log('[index.js] Supplier-dashboard router mounted successfully');
+// Supplier Fase 3: Mensajería, Calendario y Pagos
+app.use('/api/supplier-messages', supplierMessagesRouter);
+app.use('/api/supplier-availability', supplierAvailabilityRouter);
+app.use('/api/supplier-payments', supplierPaymentsRouter);
 // Supplier requests (solicitudes de presupuesto)
 app.use('/api/supplier-requests', supplierRequestsRouter);
 // Supplier migration (temporal, para migrar proveedores existentes)
@@ -780,6 +793,26 @@ try {
   console.log('[backend] Admin dashboard routes mounted on /api/admin/dashboard');
 } catch (error) {
   console.error('[backend] Failed to load admin dashboard routes:', error.message);
+}
+
+// Quote Requests routes
+try {
+  app.use('/api/quote-requests', requireAuth, quoteRequestsRouter);
+  console.log('[backend] Quote requests routes mounted on /api/quote-requests');
+} catch (error) {
+  console.error('[backend] Failed to load quote requests routes:', error.message);
+}
+
+try {
+  app.use(
+    '/api/admin/quote-requests',
+    ipAllowlist(ADMIN_IP_ALLOWLIST),
+    requireAdmin,
+    adminQuoteRequestsRouter
+  );
+  console.log('[backend] Admin quote requests routes mounted on /api/admin/quote-requests');
+} catch (error) {
+  console.error('[backend] Failed to load admin quote requests routes:', error.message);
 }
 
 // Admin tasks - Limpieza de favoritos expirados

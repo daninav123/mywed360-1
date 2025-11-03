@@ -65,19 +65,6 @@ Object.entries(REGIONAL_PARENTS).forEach(([child, parent]) => {
   });
 });
 
-// Código de debug para visualizar qué elementos tienen traducción i18n
-// Usa 'en-x-i18n' que es válido según BCP 47 (extensión privada)
-const DEBUG_LANGUAGE_CODE = 'en-x-i18n';
-// Crear recursos vacíos para el modo debug - devolverá las claves
-resources[DEBUG_LANGUAGE_CODE] = {};
-Object.values(resources).forEach((namespaceMap) => {
-  Object.keys(namespaceMap).forEach((ns) => {
-    if (!resources[DEBUG_LANGUAGE_CODE][ns]) {
-      resources[DEBUG_LANGUAGE_CODE][ns] = {};
-    }
-  });
-});
-
 const missingKeyLog = [];
 const registerMissingKey = (languages, namespace, key, res) => {
   const normalizedLanguages = Array.isArray(languages) ? languages : [languages].filter(Boolean);
@@ -103,11 +90,6 @@ const registerMissingKey = (languages, namespace, key, res) => {
 };
 
 const LANGUAGE_METADATA = {
-  [DEBUG_LANGUAGE_CODE]: {
-    name: '🔍 i18n Debug (mostrar claves)',
-    flag: '🔍',
-    order: -1,
-  },
   ar: { name: 'Arabic', flag: 'AR', dir: 'rtl', order: 20 },
   bg: { name: 'Bulgarian', flag: 'BG', order: 20 },
   ca: { name: 'Catalan', flag: 'CA', order: 20 },
@@ -148,14 +130,7 @@ const FALLBACK_LANGUAGES = [FALLBACK_LANGUAGE, 'en'];
 
 const buildAvailableLanguages = () =>
   Object.keys(resources)
-    .filter((code) => {
-      // Incluir modo debug SIEMPRE para detectar claves faltantes
-      if (code === DEBUG_LANGUAGE_CODE) {
-        return true;
-      }
-      // Filtrar solo idiomas con traducciones válidas
-      return Object.keys(resources[code] || {}).length > 0;
-    })
+    .filter((code) => Object.keys(resources[code] || {}).length > 0)
     .map((code) => {
       const meta = LANGUAGE_METADATA[code] ?? {
         name: code,
@@ -212,6 +187,9 @@ const resolveInitialLanguage = () => {
     if (stored && resources[stored]) {
       return stored;
     }
+    if (stored) {
+      window.localStorage.removeItem('i18nextLng');
+    }
   }
   return FALLBACK_LANGUAGE;
 };
@@ -233,14 +211,7 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    fallbackLng: (code) => {
-      const candidates = Array.isArray(code) ? code : [code];
-      // En modo debug, no usar fallback para ver claves faltantes
-      if (candidates.includes(DEBUG_LANGUAGE_CODE)) {
-        return [];
-      }
-      return FALLBACK_LANGUAGES;
-    },
+    fallbackLng: () => FALLBACK_LANGUAGES,
     supportedLngs: AVAILABLE_LANGUAGES.map((lang) => lang.code),
     lng: resolveInitialLanguage(),
     detection: {
@@ -268,11 +239,7 @@ export const changeLanguage = (lng) => {
 };
 
 export const getCurrentLanguage = () => i18n.language || FALLBACK_LANGUAGE;
-const getIntlLanguage = () => {
-  const current = getCurrentLanguage();
-  // En modo debug, usar español para formateo de fechas/números
-  return current === DEBUG_LANGUAGE_CODE ? FALLBACK_LANGUAGE : current;
-};
+const getIntlLanguage = () => getCurrentLanguage();
 export const getAvailableLanguages = () => AVAILABLE_LANGUAGES.map((lang) => ({ ...lang }));
 
 export const formatDate = (date, options = {}) =>

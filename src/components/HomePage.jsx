@@ -927,7 +927,7 @@ export default function HomePage() {
           </div>
           <div className="flex items-center">
             <img
-              src={`${import.meta.env.BASE_URL}logo-app.png`}
+              src={`${import.meta.env.BASE_URL}maloveapp-logo.png`}
               alt={headerLogoAlt}
               className="w-32 h-32 object-contain"
             />

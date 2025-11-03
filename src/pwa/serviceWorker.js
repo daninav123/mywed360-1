@@ -28,7 +28,7 @@ const STATIC_ASSETS = [
   '/icon-192.png',
   '/icon-512.png',
   '/badge-72.png',
-  '/logo-app.png',
+  '/maloveapp-logo.png',
 ];
 
 // Rutas de API que se pueden cachear
@@ -505,4 +505,3 @@ self.addEventListener('notificationclick', (event) => {
 });
 
 console.log('[SW] Service Worker cargado correctamente');
-

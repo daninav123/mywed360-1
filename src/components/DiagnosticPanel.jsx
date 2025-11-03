@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
+import useTranslations from '../hooks/useTranslations';
 import errorLogger from '../utils/errorLogger';
 
 /**
@@ -7,6 +8,7 @@ import errorLogger from '../utils/errorLogger';
  * Muestra el estado de todos los servicios y errores en tiempo real
  */
 const DiagnosticPanel = () => {
+  const { t, format } = useTranslations();
   const diagnosticsDisabled = useMemo(() => {
     if (typeof window !== 'undefined') {
       if (window.Cypress) return true;
@@ -108,7 +110,7 @@ const DiagnosticPanel = () => {
               ? 'bg-yellow-500 hover:bg-yellow-600'
               : 'bg-green-500 hover:bg-green-600'
         } text-white`}
-        title="Panel de Diagnóstico"
+        title={t('diagnostics.panel.buttonTitle')}
       >
         🔍
         {stats.total > 0 && (
@@ -125,7 +127,7 @@ const DiagnosticPanel = () => {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden">
         <div className="bg-gray-800 text-white p-4 flex justify-between items-center">
-          <h2 className="text-xl font-bold">🔍 Panel de Diagnóstico MaLoveApp</h2>
+          <h2 className="text-xl font-bold">{t('diagnostics.panel.heading')}</h2>
           <button onClick={toggleVisibility} className="text-gray-300 hover:text-white text-2xl">
             ×
           </button>
@@ -134,25 +136,27 @@ const DiagnosticPanel = () => {
         <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
           {/* Resumen general */}
           <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-            <h3 className="text-lg font-semibold mb-2">📊 Resumen General</h3>
+            <h3 className="text-lg font-semibold mb-2">{t('diagnostics.panel.summary.title')}</h3>
             <div className="grid grid-cols-3 gap-4 text-center">
               <div className="bg-green-100 p-3 rounded">
                 <div className="text-2xl font-bold text-green-600">
                   {Object.values(diagnostics).filter((d) => d.status === 'success').length}
                 </div>
-                <div className="text-sm text-green-700">Servicios OK</div>
+                <div className="text-sm text-green-700">{t('diagnostics.panel.summary.ok')}</div>
               </div>
               <div className="bg-yellow-100 p-3 rounded">
                 <div className="text-2xl font-bold text-yellow-600">
                   {Object.values(diagnostics).filter((d) => d.status === 'warning').length}
                 </div>
-                <div className="text-sm text-yellow-700">Advertencias</div>
+                <div className="text-sm text-yellow-700">
+                  {t('diagnostics.panel.summary.warnings')}
+                </div>
               </div>
               <div className="bg-red-100 p-3 rounded">
                 <div className="text-2xl font-bold text-red-600">
                   {Object.values(diagnostics).filter((d) => d.status === 'error').length}
                 </div>
-                <div className="text-sm text-red-700">Errores</div>
+                <div className="text-sm text-red-700">{t('diagnostics.panel.summary.errors')}</div>
               </div>
             </div>
           </div>
@@ -160,7 +164,7 @@ const DiagnosticPanel = () => {
           {/* Contexto de usuario y boda */}
           {diagnostics.auth?.details && (
             <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-              <h3 className="text-lg font-semibold mb-2">👤 Sesión de Usuario</h3>
+              <h3 className="text-lg font-semibold mb-2">{t('diagnostics.panel.sections.user')}</h3>
               <pre className="text-sm whitespace-pre-wrap overflow-x-auto">
                 {JSON.stringify(diagnostics.auth.details, null, 2)}
               </pre>
@@ -168,7 +172,9 @@ const DiagnosticPanel = () => {
           )}
           {diagnostics.wedding?.details && (
             <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-              <h3 className="text-lg font-semibold mb-2">💍 Boda Activa</h3>
+              <h3 className="text-lg font-semibold mb-2">
+                {t('diagnostics.panel.sections.wedding')}
+              </h3>
               <pre className="text-sm whitespace-pre-wrap overflow-x-auto">
                 {JSON.stringify(diagnostics.wedding.details, null, 2)}
               </pre>
@@ -177,16 +183,23 @@ const DiagnosticPanel = () => {
 
           {/* Estado de servicios */}
           <div className="mb-6">
-            <h3 className="text-lg font-semibold mb-4">🔧 Estado de Servicios</h3>
+            <h3 className="text-lg font-semibold mb-4">
+              {t('diagnostics.panel.sections.services')}
+            </h3>
             <div className="space-y-3">
               {Object.entries(diagnostics).map(([service, data]) => (
                 <div key={service} className="border rounded-lg p-4">
                   <div className="flex items-center justify-between mb-2">
                     <span className="font-medium capitalize">
-                      {getStatusIcon(data.status)} {service}
+                      {getStatusIcon(data.status)}{' '}
+                      {t(`diagnostics.panel.serviceNames.${service}`, {
+                        defaultValue: service,
+                      })}
                     </span>
                     <span className={`text-sm font-medium ${getStatusColor(data.status)}`}>
-                      {data.status.toUpperCase()}
+                      {t(`diagnostics.panel.status.${data.status}`, {
+                        defaultValue: (data.status || '').toUpperCase(),
+                      })}
                     </span>
                   </div>
                   {data.details && (
@@ -204,7 +217,9 @@ const DiagnosticPanel = () => {
           {/* Errores recientes */}
           {errors.length > 0 && (
             <div className="mb-6">
-              <h3 className="text-lg font-semibold mb-4">🚨 Errores Recientes</h3>
+              <h3 className="text-lg font-semibold mb-4">
+                {t('diagnostics.panel.sections.errors')}
+              </h3>
               <div className="space-y-2 max-h-60 overflow-y-auto">
                 {errors
                   .slice(-10)
@@ -214,7 +229,9 @@ const DiagnosticPanel = () => {
                       <div className="flex justify-between items-start mb-1">
                         <span className="font-medium text-red-800">{error.type}</span>
                         <span className="text-xs text-red-600">
-                          {new Date(error.timestamp).toLocaleString()}
+                          {format?.datetime
+                            ? format.datetime(new Date(error.timestamp))
+                            : new Date(error.timestamp).toLocaleString()}
                         </span>
                       </div>
                       <div className="text-sm text-red-700">
@@ -230,25 +247,31 @@ const DiagnosticPanel = () => {
 
           {/* Estadísticas */}
           <div className="mb-6">
-            <h3 className="text-lg font-semibold mb-4">📈 Estadísticas</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('diagnostics.panel.sections.stats')}</h3>
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-blue-50 p-3 rounded">
                 <div className="text-lg font-bold text-blue-600">{stats.total}</div>
-                <div className="text-sm text-blue-700">Total de errores</div>
+                <div className="text-sm text-blue-700">{t('diagnostics.panel.stats.total')}</div>
               </div>
               <div className="bg-orange-50 p-3 rounded">
                 <div className="text-lg font-bold text-orange-600">{stats.recent}</div>
-                <div className="text-sm text-orange-700">Errores recientes (5min)</div>
+                <div className="text-sm text-orange-700">
+                  {t('diagnostics.panel.stats.recent', { window: '5min' })}
+                </div>
               </div>
             </div>
 
             {stats.byType && Object.keys(stats.byType).length > 0 && (
               <div className="mt-4">
-                <h4 className="font-medium mb-2">Por tipo:</h4>
+                <h4 className="font-medium mb-2">{t('diagnostics.panel.stats.byTypeTitle')}</h4>
                 <div className="space-y-1">
                   {Object.entries(stats.byType).map(([type, count]) => (
                     <div key={type} className="flex justify-between text-sm">
-                      <span>{type}</span>
+                      <span>
+                        {t(`diagnostics.panel.errorTypes.${type}`, {
+                          defaultValue: type,
+                        })}
+                      </span>
                       <span className="font-medium">{count}</span>
                     </div>
                   ))}
@@ -263,16 +286,16 @@ const DiagnosticPanel = () => {
               onClick={copyToClipboard}
               className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition-colors"
             >
-              📋 Copiar Reporte
+              {t('diagnostics.panel.actions.copyReport')}
             </button>
             <button
               onClick={() => {
                 errorLogger.printDiagnosticsReport();
-                console.log('📊 Reporte actualizado en consola');
+                console.log(t('diagnostics.panel.actions.refreshConsoleLog'));
               }}
               className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded transition-colors"
             >
-              🔄 Actualizar Consola
+              {t('diagnostics.panel.actions.refreshConsole')}
             </button>
             <button
               onClick={() => {
@@ -280,7 +303,7 @@ const DiagnosticPanel = () => {
               }}
               className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded transition-colors"
             >
-              🔄 Recargar Página
+              {t('diagnostics.panel.actions.reloadPage')}
             </button>
           </div>
         </div>
