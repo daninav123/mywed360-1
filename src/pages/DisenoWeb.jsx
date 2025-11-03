@@ -94,7 +94,14 @@ const buildLogisticsDraftFromProfile = (profile = {}) => {
     draft.schedule.push({ id: createId(), time: '', departure: '', destination: '', notes: '' });
   }
   if (draft.lodging.length === 0) {
-    draft.lodging.push({ id: createId(), name: '', distance: '', priceRange: '', link: '', amenities: '' });
+    draft.lodging.push({
+      id: createId(),
+      name: '',
+      distance: '',
+      priceRange: '',
+      link: '',
+      amenities: '',
+    });
   }
   if (draft.faqs.length === 0) {
     draft.faqs.push({ id: createId(), question: '', answer: '' });
@@ -174,9 +181,7 @@ const buildWeddingInfoFromProfile = (profile) => {
     receptionAddress: receptionInfo.direccion || '',
     receptionTime: receptionInfo.hora || '',
     transportation: transportationInfo.detalles || '',
-    shuttleSchedule: Array.isArray(transportationInfo.schedule)
-      ? transportationInfo.schedule
-      : [],
+    shuttleSchedule: Array.isArray(transportationInfo.schedule) ? transportationInfo.schedule : [],
     contactPhone: safeProfile.contactPhone || '',
     contactEmail: safeProfile.contactEmail || '',
     weddingStyle: safeProfile.weddingStyle || 'Cl�sico',
@@ -207,9 +212,8 @@ const buildFallbackHtml = (weddingInfo, template) => {
     .join(' � ');
   const contact = [weddingInfo.contactEmail, weddingInfo.contactPhone].filter(Boolean).join(' � ');
 
-  const scheduleRows = (Array.isArray(weddingInfo.shuttleSchedule)
-    ? weddingInfo.shuttleSchedule
-    : []
+  const scheduleRows = (
+    Array.isArray(weddingInfo.shuttleSchedule) ? weddingInfo.shuttleSchedule : []
   )
     .map(
       (item) => `
@@ -222,10 +226,7 @@ const buildFallbackHtml = (weddingInfo, template) => {
     )
     .join('');
 
-  const lodgingCards = (Array.isArray(weddingInfo.lodgingOptions)
-    ? weddingInfo.lodgingOptions
-    : []
-  )
+  const lodgingCards = (Array.isArray(weddingInfo.lodgingOptions) ? weddingInfo.lodgingOptions : [])
     .map((hotel) => {
       const title = hotel.name || hotel.title || 'Hospedaje recomendado';
       const distance = hotel.distance || hotel.minutes || '';
@@ -316,11 +317,14 @@ const buildFallbackHtml = (weddingInfo, template) => {
               </tr>
             </thead>
             <tbody>
-              ${scheduleRows || `
+              ${
+                scheduleRows ||
+                `
                 <tr>
                   <td colspan="4">Los horarios exactos de autobuses se publicar�n aqu�.</td>
                 </tr>
-              `}
+              `
+              }
             </tbody>
           </table>
         </div>
@@ -345,11 +349,14 @@ const buildFallbackHtml = (weddingInfo, template) => {
     <section data-enhanced="lodging">
       <div class="maloveapp-section-heading"><span>Hospedaje cercano</span></div>
       <div class="maloveapp-grid maloveapp-grid--two">
-        ${lodgingCards || `
+        ${
+          lodgingCards ||
+          `
           <div class="maloveapp-card">
             <p>Pronto a�adiremos hoteles y alojamientos recomendados cercanos a la celebraci�n.</p>
           </div>
-        `}
+        `
+        }
       </div>
     </section>
 
@@ -394,10 +401,9 @@ const ProfileSummary = ({ profile, publishDisabledReason }) => {
 
   const bride = profile?.brideInfo?.nombre?.trim();
   const groom = profile?.groomInfo?.nombre?.trim();
-  const couple =
-    [bride, groom].filter(Boolean).join(
-      ` ${t('websiteGenerator.profileSummary.conjunction', 'y')} `
-    );
+  const couple = [bride, groom]
+    .filter(Boolean)
+    .join(` ${t('websiteGenerator.profileSummary.conjunction', 'y')} `);
   const ceremonyDate = profile?.ceremonyInfo?.fecha;
   const ceremony = [profile?.ceremonyInfo?.lugar, profile?.ceremonyInfo?.hora]
     .filter(Boolean)
@@ -456,10 +462,8 @@ const ProfileSummary = ({ profile, publishDisabledReason }) => {
         {profile?.additionalInfo && (
           <div className="sm:col-span-2">
             <span className="text-gray-500">
-              {t(
-                'common.websiteGenerator.profileSummary.labels.additionalInfo',
-                'Info adicional'
-              )}:&nbsp;
+              {t('common.websiteGenerator.profileSummary.labels.additionalInfo', 'Info adicional')}
+              :&nbsp;
             </span>
             {profile.additionalInfo}
           </div>
@@ -653,10 +657,7 @@ const PromptLibraryModal = ({
     } catch (err) {
       setFormError(
         err?.message ||
-          t(
-            'common.websiteGenerator.promptLibrary.errors.save',
-            'No se pudo guardar el prompt.'
-          )
+          t('common.websiteGenerator.promptLibrary.errors.save', 'No se pudo guardar el prompt.')
       );
     } finally {
       setSaving(false);
@@ -682,10 +683,7 @@ const PromptLibraryModal = ({
     } catch (err) {
       setFormError(
         err?.message ||
-          t(
-            'common.websiteGenerator.promptLibrary.errors.delete',
-            'No se pudo eliminar el prompt.'
-          )
+          t('common.websiteGenerator.promptLibrary.errors.delete', 'No se pudo eliminar el prompt.')
       );
     } finally {
       setSaving(false);
@@ -697,10 +695,7 @@ const PromptLibraryModal = ({
       <div className="bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[85vh] overflow-hidden flex flex-col">
         <header className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
           <h3 className="text-lg font-semibold text-gray-800">
-            {t(
-              'common.websiteGenerator.promptLibrary.title',
-              'Biblioteca de prompts'
-            )}
+            {t('common.websiteGenerator.promptLibrary.title', 'Biblioteca de prompts')}
           </h3>
           <button
             type="button"
@@ -733,10 +728,7 @@ const PromptLibraryModal = ({
               ))}
             </p>
             <h4 className="text-sm font-semibold text-gray-700 mb-2">
-              {t(
-                'common.websiteGenerator.promptLibrary.builtIn.title',
-                'Prompts predeterminados'
-              )}
+              {t('common.websiteGenerator.promptLibrary.builtIn.title', 'Prompts predeterminados')}
             </h4>
             <div className="space-y-3">
               {builtInOptions.map((option) => (
@@ -754,10 +746,7 @@ const PromptLibraryModal = ({
                       onClick={() => handleUsePrompt(option)}
                       className="shrink-0 inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-full text-sm transition-colors"
                     >
-                      {t(
-                        'common.websiteGenerator.promptLibrary.builtIn.use',
-                        'Usar prompt'
-                      )}
+                      {t('common.websiteGenerator.promptLibrary.builtIn.use', 'Usar prompt')}
                     </button>
                   </div>
                   <pre className="mt-3 text-sm bg-gray-50 rounded-lg p-3 whitespace-pre-wrap text-gray-700">
@@ -771,10 +760,7 @@ const PromptLibraryModal = ({
           <section>
             <div className="flex items-center justify-between mb-3">
               <h4 className="text-sm font-semibold text-gray-700">
-                {t(
-                  'common.websiteGenerator.promptLibrary.custom.title',
-                  'Mis prompts'
-                )}
+                {t('common.websiteGenerator.promptLibrary.custom.title', 'Mis prompts')}
               </h4>
               <button
                 type="button"
@@ -782,10 +768,7 @@ const PromptLibraryModal = ({
                 className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-full text-sm transition-colors"
                 disabled={saving}
               >
-                {t(
-                  'common.websiteGenerator.promptLibrary.custom.new',
-                  'Nuevo prompt'
-                )}
+                {t('common.websiteGenerator.promptLibrary.custom.new', 'Nuevo prompt')}
               </button>
             </div>
             {loading ? (
@@ -836,10 +819,12 @@ const PromptLibraryModal = ({
                       <div className="flex flex-wrap gap-2">
                         <button
                           type="button"
-                          onClick={() => handleUsePrompt({
-                            ...item,
-                            samplePrompt: item.prompt,
-                          })}
+                          onClick={() =>
+                            handleUsePrompt({
+                              ...item,
+                              samplePrompt: item.prompt,
+                            })
+                          }
                           className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-full text-sm transition-colors"
                         >
                           {t('websiteGenerator.promptLibrary.buttons.use', 'Usar')}
@@ -898,7 +883,9 @@ const PromptLibraryModal = ({
                     <input
                       type="text"
                       value={formState.name}
-                      onChange={(event) => setFormState((prev) => ({ ...prev, name: event.target.value }))}
+                      onChange={(event) =>
+                        setFormState((prev) => ({ ...prev, name: event.target.value }))
+                      }
                       className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
                       placeholder={t(
                         'common.websiteGenerator.promptLibrary.form.placeholders.name',
@@ -908,7 +895,10 @@ const PromptLibraryModal = ({
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-gray-600 mb-1">
-                      {t('websiteGenerator.promptLibrary.form.labels.template', 'Plantilla sugerida')}
+                      {t(
+                        'websiteGenerator.promptLibrary.form.labels.template',
+                        'Plantilla sugerida'
+                      )}
                     </label>
                     <select
                       value={formState.templateKey}
@@ -977,14 +967,8 @@ const PromptLibraryModal = ({
                     disabled={saving}
                   >
                     {saving
-                      ? t(
-                          'common.websiteGenerator.promptLibrary.form.saving',
-                          'Guardando…'
-                        )
-                      : t(
-                          'common.websiteGenerator.promptLibrary.form.save',
-                          'Guardar prompt'
-                        )}
+                      ? t('common.websiteGenerator.promptLibrary.form.saving', 'Guardando…')
+                      : t('common.websiteGenerator.promptLibrary.form.save', 'Guardar prompt')}
                   </button>
                 </div>
               </form>
@@ -1006,19 +990,11 @@ const PromptLibraryModal = ({
   );
 };
 
-const LogisticsEditor = ({
-  open,
-  draft,
-  onDraftChange,
-  onClose,
-  onSave,
-  saving,
-}) => {
+const LogisticsEditor = ({ open, draft, onDraftChange, onClose, onSave, saving }) => {
   const { t } = useTranslations();
   if (!open) return null;
 
-  const updateTransportation = (value) =>
-    onDraftChange({ ...draft, transportation: value });
+  const updateTransportation = (value) => onDraftChange({ ...draft, transportation: value });
 
   const updateScheduleItem = (index, key, value) => {
     const next = draft.schedule.map((item, idx) =>
@@ -1030,7 +1006,10 @@ const LogisticsEditor = ({
   const addScheduleItem = () =>
     onDraftChange({
       ...draft,
-      schedule: [...(draft.schedule || []), { id: createId(), time: '', departure: '', destination: '', notes: '' }],
+      schedule: [
+        ...(draft.schedule || []),
+        { id: createId(), time: '', departure: '', destination: '', notes: '' },
+      ],
     });
 
   const removeScheduleItem = (index) =>
@@ -1049,7 +1028,10 @@ const LogisticsEditor = ({
   const addLodgingItem = () =>
     onDraftChange({
       ...draft,
-      lodging: [...(draft.lodging || []), { id: createId(), name: '', distance: '', priceRange: '', link: '', amenities: '' }],
+      lodging: [
+        ...(draft.lodging || []),
+        { id: createId(), name: '', distance: '', priceRange: '', link: '', amenities: '' },
+      ],
     });
 
   const removeLodgingItem = (index) =>
@@ -1062,8 +1044,7 @@ const LogisticsEditor = ({
     onDraftChange({ ...draft, travel: { ...draft.travel, [key]: value } });
 
   const updateStory = (value) => onDraftChange({ ...draft, story: value });
-  const updateAdditionalInfo = (value) =>
-    onDraftChange({ ...draft, additionalInfo: value });
+  const updateAdditionalInfo = (value) => onDraftChange({ ...draft, additionalInfo: value });
 
   const updateFaqItem = (index, key, value) => {
     const next = (draft.faqs || []).map((item, idx) =>
@@ -1117,10 +1098,7 @@ const LogisticsEditor = ({
           <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <h4 className="text-sm font-semibold text-gray-700 mb-2">
-                {t(
-                  'common.websiteGenerator.logistics.story.title',
-                  'Historia de la pareja'
-                )}
+                {t('common.websiteGenerator.logistics.story.title', 'Historia de la pareja')}
               </h4>
               <textarea
                 className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
@@ -1135,10 +1113,7 @@ const LogisticsEditor = ({
             </div>
             <div>
               <h4 className="text-sm font-semibold text-gray-700 mb-2">
-                {t(
-                  'common.websiteGenerator.logistics.notes.title',
-                  'Notas / recomendaciones'
-                )}
+                {t('common.websiteGenerator.logistics.notes.title', 'Notas / recomendaciones')}
               </h4>
               <textarea
                 className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
@@ -1155,10 +1130,7 @@ const LogisticsEditor = ({
 
           <section>
             <h4 className="text-sm font-semibold text-gray-700 mb-2">
-              {t(
-                'common.websiteGenerator.logistics.transportation.title',
-                'Transporte general'
-              )}
+              {t('common.websiteGenerator.logistics.transportation.title', 'Transporte general')}
             </h4>
             <textarea
               className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
@@ -1175,10 +1147,7 @@ const LogisticsEditor = ({
           <section>
             <div className="flex items-center justify-between mb-2">
               <h4 className="text-sm font-semibold text-gray-700">
-                {t(
-                  'common.websiteGenerator.logistics.schedule.title',
-                  'Horarios de autobuses'
-                )}
+                {t('common.websiteGenerator.logistics.schedule.title', 'Horarios de autobuses')}
               </h4>
               <button
                 type="button"
@@ -1218,15 +1187,14 @@ const LogisticsEditor = ({
                     )}
                     className="border border-gray-200 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
                     value={item.destination}
-                    onChange={(event) => updateScheduleItem(index, 'destination', event.target.value)}
+                    onChange={(event) =>
+                      updateScheduleItem(index, 'destination', event.target.value)
+                    }
                   />
                   <div className="flex items-center gap-2">
                     <input
                       type="text"
-                      placeholder={t(
-                        'common.websiteGenerator.logistics.schedule.notes',
-                        'Notas'
-                      )}
+                      placeholder={t('common.websiteGenerator.logistics.schedule.notes', 'Notas')}
                       className="flex-1 border border-gray-200 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
                       value={item.notes}
                       onChange={(event) => updateScheduleItem(index, 'notes', event.target.value)}
@@ -1247,20 +1215,14 @@ const LogisticsEditor = ({
           <section>
             <div className="flex items-center justify-between mb-2">
               <h4 className="text-sm font-semibold text-gray-700">
-                {t(
-                  'common.websiteGenerator.logistics.lodging.title',
-                  'Hospedaje recomendado'
-                )}
+                {t('common.websiteGenerator.logistics.lodging.title', 'Hospedaje recomendado')}
               </h4>
               <button
                 type="button"
                 onClick={addLodgingItem}
                 className="text-sm text-blue-600 hover:text-blue-700"
               >
-                {t(
-                  'common.websiteGenerator.logistics.lodging.add',
-                  'Añadir hospedaje'
-                )}
+                {t('common.websiteGenerator.logistics.lodging.add', 'Añadir hospedaje')}
               </button>
             </div>
             <div className="space-y-3">
@@ -1300,7 +1262,9 @@ const LogisticsEditor = ({
                       )}
                       className="border border-gray-200 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
                       value={item.priceRange}
-                      onChange={(event) => updateLodgingItem(index, 'priceRange', event.target.value)}
+                      onChange={(event) =>
+                        updateLodgingItem(index, 'priceRange', event.target.value)
+                      }
                     />
                     <input
                       type="url"
@@ -1329,10 +1293,7 @@ const LogisticsEditor = ({
                       onClick={() => removeLodgingItem(index)}
                       className="text-xs text-red-500 hover:text-red-600"
                     >
-                      {t(
-                        'common.websiteGenerator.logistics.lodging.remove',
-                        'Quitar hospedaje'
-                      )}
+                      {t('common.websiteGenerator.logistics.lodging.remove', 'Quitar hospedaje')}
                     </button>
                   </div>
                 </div>
@@ -1465,10 +1426,7 @@ const LogisticsEditor = ({
                       onClick={() => removeFaqItem(index)}
                       className="text-xs text-red-500 hover:text-red-600"
                     >
-                      {t(
-                        'common.websiteGenerator.logistics.faq.remove',
-                        'Quitar pregunta'
-                      )}
+                      {t('common.websiteGenerator.logistics.faq.remove', 'Quitar pregunta')}
                     </button>
                   </div>
                 </div>
@@ -1494,10 +1452,7 @@ const LogisticsEditor = ({
             }`}
           >
             {saving
-              ? t(
-                  'common.websiteGenerator.logisticsActions.saving',
-                  'Guardando…'
-                )
+              ? t('common.websiteGenerator.logisticsActions.saving', 'Guardando…')
               : t('websiteGenerator.logisticsActions.save', 'Guardar logística')}
           </button>
         </footer>
@@ -1565,7 +1520,9 @@ export default function DisenoWeb() {
               key={key}
               type="button"
               className={`text-left border rounded-lg p-4 transition ${
-                testTemplate === key ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-blue-300'
+                testTemplate === key
+                  ? 'border-blue-500 bg-blue-50'
+                  : 'border-gray-200 hover:border-blue-300'
               }`}
               onClick={() => {
                 setTestTemplate(key);
@@ -1604,8 +1561,9 @@ export default function DisenoWeb() {
           <iframe
             title="Vista previa"
             className="w-full h-[480px] border rounded-lg"
-            srcDoc={`<!doctype html><html><head><meta charset="utf-8"><title>Vista previa ${templates[testTemplate]?.name || 'Personalizada'}</title></head><body style="font-family:Arial,sans-serif;padding:2rem;"><h2>${templates[testTemplate]?.name || 'Plantilla personalizada'}</h2><p>${testPrompt ||
-              'Vista previa generada en modo prueba.'}</p></body></html>`}
+            srcDoc={`<!doctype html><html><head><meta charset="utf-8"><title>Vista previa ${templates[testTemplate]?.name || 'Personalizada'}</title></head><body style="font-family:Arial,sans-serif;padding:2rem;"><h2>${templates[testTemplate]?.name || 'Plantilla personalizada'}</h2><p>${
+              testPrompt || 'Vista previa generada en modo prueba.'
+            }</p></body></html>`}
           />
         )}
       </div>
@@ -1688,8 +1646,7 @@ export default function DisenoWeb() {
   }, [location.state, location.pathname, location.search, navigate]);
 
   useEffect(() => {
-    const shouldFocusPreview =
-      location.pathname.endsWith('/preview') || mode === 'preview';
+    const shouldFocusPreview = location.pathname.endsWith('/preview') || mode === 'preview';
     if (shouldFocusPreview && previewRef.current) {
       previewRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
@@ -1940,7 +1897,9 @@ export default function DisenoWeb() {
         if (reason === 'fallback-ai-disabled') {
           setError('Generacion IA deshabilitada. Usamos la plantilla base para continuar.');
         } else if (reason === 'fallback-ai-unavailable') {
-          setError('El servicio de IA no esta disponible. Usamos la plantilla base para continuar.');
+          setError(
+            'El servicio de IA no esta disponible. Usamos la plantilla base para continuar.'
+          );
         } else {
           setError('');
         }
@@ -1959,8 +1918,7 @@ export default function DisenoWeb() {
         }
       };
 
-      const aiEnabled =
-        import.meta.env.VITE_ENABLE_DIRECT_OPENAI === 'true' || import.meta.env.DEV;
+      const aiEnabled = import.meta.env.VITE_ENABLE_DIRECT_OPENAI === 'true' || import.meta.env.DEV;
       if (!aiEnabled) {
         await applyFallback('fallback-ai-disabled');
         setLoading(false);
@@ -2023,7 +1981,10 @@ export default function DisenoWeb() {
 
       await applyFallback(fallbackReason);
 
-      if (fallbackReason !== 'fallback-ai-unavailable' && fallbackReason !== 'fallback-ai-disabled') {
+      if (
+        fallbackReason !== 'fallback-ai-unavailable' &&
+        fallbackReason !== 'fallback-ai-disabled'
+      ) {
         const detail =
           fallbackReason === 'fallback-ai-rate-limit'
             ? 'La IA est� ocupada. Intenta nuevamente en unos segundos.'
@@ -2121,7 +2082,9 @@ export default function DisenoWeb() {
         const url = result.publicUrl || '';
         setPublicUrl(url);
         setShowQR(false);
-        toast.success(url ? t('messages.publishSuccessWithUrl', { url }) : t('messages.publishSuccess'));
+        toast.success(
+          url ? t('messages.publishSuccessWithUrl', { url }) : t('messages.publishSuccess')
+        );
       } else {
         toast.info(t('messages.savedNoActiveWedding'));
       }
@@ -2240,26 +2203,24 @@ export default function DisenoWeb() {
         versions={versions}
         templates={templates}
         onView={(version, templateKey) => {
-          const enhanced =
-            /maloveapp-wedding-theme/i.test(version.html || '')
-              ? version.html
-              : enhanceWeddingHtml(version.html || '', {
-                  templateKey,
-                  weddingInfo,
-                });
+          const enhanced = /maloveapp-wedding-theme/i.test(version.html || '')
+            ? version.html
+            : enhanceWeddingHtml(version.html || '', {
+                templateKey,
+                weddingInfo,
+              });
           setHtml(enhanced);
           setPublicUrl('');
           setShowQR(false);
         }}
         onEdit={(version, templateKey) => {
           setPrompt(version.prompt || '');
-          const enhanced =
-            /maloveapp-wedding-theme/i.test(version.html || '')
-              ? version.html
-              : enhanceWeddingHtml(version.html || '', {
-                  templateKey,
-                  weddingInfo,
-                });
+          const enhanced = /maloveapp-wedding-theme/i.test(version.html || '')
+            ? version.html
+            : enhanceWeddingHtml(version.html || '', {
+                templateKey,
+                weddingInfo,
+              });
           setHtml(enhanced);
           setSelectedTemplate(templateKey);
           setPublicUrl('');
@@ -2281,7 +2242,10 @@ export default function DisenoWeb() {
             setSelectedTemplate(option.templateKey);
           }
           setShowPromptModal(false);
-          setTimeout(() => generatorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+          setTimeout(
+            () => generatorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }),
+            50
+          );
         }}
         onCreate={handleCreatePrompt}
         onUpdate={handleUpdatePrompt}
@@ -2299,6 +2263,4 @@ export default function DisenoWeb() {
       />
     </div>
   );
-};
-
-export default DisenoWeb;
+}
