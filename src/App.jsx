@@ -44,6 +44,7 @@ import SupplierRegister from './pages/suppliers/SupplierRegister';
 import SupplierDashboard from './pages/suppliers/SupplierDashboard';
 import SupplierRequestDetail from './pages/suppliers/SupplierRequestDetail';
 import SupplierRequests from './pages/suppliers/SupplierRequests';
+import SupplierPlans from './pages/suppliers/SupplierPlans';
 import SupplierPortfolio from './pages/suppliers/SupplierPortfolio';
 import SupplierPublicPage from './pages/SupplierPublicPage';
 import Tasks from './pages/Tasks';
@@ -383,6 +384,7 @@ function App() {
                             path="supplier/dashboard/:id/requests"
                             element={<SupplierRequests />}
                           />
+                          <Route path="supplier/dashboard/:id/plans" element={<SupplierPlans />} />
                           <Route
                             path="supplier/dashboard/:id/portfolio"
                             element={<SupplierPortfolio />}

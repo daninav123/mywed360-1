@@ -16,6 +16,8 @@ import {
   MousePointer,
   Mail,
   Inbox,
+  Crown,
+  Zap,
 } from 'lucide-react';
 import useTranslations from '../../hooks/useTranslations';
 import Spinner from '../../components/ui/Spinner';
@@ -43,6 +45,7 @@ export default function SupplierDashboard() {
   const [requests, setRequests] = useState([]);
   const [analytics, setAnalytics] = useState(null);
   const [newRequestsCount, setNewRequestsCount] = useState(0);
+  const [currentPlan, setCurrentPlan] = useState('free');
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
   const [editing, setEditing] = useState(false);
@@ -143,6 +146,7 @@ export default function SupplierDashboard() {
       const profile = data.profile || {};
       setSupplier(profile);
       setAnalytics(data.metrics || {});
+      setCurrentPlan(profile.subscription?.plan || 'free');
 
       setFormData({
         name: profile.profile?.name || '',
@@ -337,6 +341,97 @@ export default function SupplierDashboard() {
             </div>
           </div>
         </div>
+
+        {/* Banner del Plan Actual */}
+        {currentPlan === 'free' && (
+          <div
+            className="shadow-md rounded-lg p-4 mb-6 border-l-4"
+            style={{
+              backgroundColor: 'var(--color-surface)',
+              borderLeftColor: 'var(--color-warning)',
+            }}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Zap size={24} style={{ color: 'var(--color-warning)' }} />
+                <div>
+                  <div className="font-semibold" style={{ color: 'var(--color-text)' }}>
+                    Plan FREE - Funcionalidad Limitada
+                  </div>
+                  <p className="text-sm" style={{ color: 'var(--color-muted)' }}>
+                    Mejora a BASIC para solicitudes ilimitadas, badge verificado y más visibilidad
+                  </p>
+                </div>
+              </div>
+              <Link
+                to={`/supplier/dashboard/${id}/plans`}
+                className="px-4 py-2 rounded-lg font-medium transition-colors"
+                style={{
+                  backgroundColor: 'var(--color-primary)',
+                  color: 'white',
+                }}
+              >
+                Ver Planes
+              </Link>
+            </div>
+          </div>
+        )}
+
+        {currentPlan === 'basic' && (
+          <div
+            className="shadow-md rounded-lg p-4 mb-6 border-l-4"
+            style={{
+              backgroundColor: 'var(--color-surface)',
+              borderLeftColor: 'var(--color-primary)',
+            }}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Crown size={24} style={{ color: 'var(--color-primary)' }} />
+                <div>
+                  <div className="font-semibold" style={{ color: 'var(--color-text)' }}>
+                    Plan BASIC Activo ✓
+                  </div>
+                  <p className="text-sm" style={{ color: 'var(--color-muted)' }}>
+                    ¿Quieres analíticas avanzadas y API? Descubre el plan PRO
+                  </p>
+                </div>
+              </div>
+              <Link
+                to={`/supplier/dashboard/${id}/plans`}
+                className="px-4 py-2 rounded-lg font-medium transition-colors border"
+                style={{
+                  color: 'var(--color-primary)',
+                  borderColor: 'var(--color-primary)',
+                }}
+              >
+                Ver PRO
+              </Link>
+            </div>
+          </div>
+        )}
+
+        {currentPlan === 'pro' && (
+          <div
+            className="shadow-md rounded-lg p-4 mb-6 border-l-4"
+            style={{
+              backgroundColor: 'var(--color-surface)',
+              borderLeftColor: 'var(--color-success)',
+            }}
+          >
+            <div className="flex items-center gap-3">
+              <Crown size={24} style={{ color: 'var(--color-success)' }} />
+              <div>
+                <div className="font-semibold" style={{ color: 'var(--color-text)' }}>
+                  Plan PRO Activo 🎉
+                </div>
+                <p className="text-sm" style={{ color: 'var(--color-muted)' }}>
+                  Tienes acceso completo a todas las funcionalidades premium
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Acceso rápido a Solicitudes */}
         <Link
