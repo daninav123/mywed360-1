@@ -683,6 +683,8 @@ app.use('/api/supplier-portal', supplierPortalRouter);
 app.use('/api/supplier-registration', supplierRegistrationRouter);
 // Supplier dashboard (protected, JWT auth)
 app.use('/api/supplier-dashboard', supplierDashboardRouter);
+// Supplier requests (solicitudes de presupuesto)
+app.use('/api/supplier-requests', supplierRequestsRouter);
 // Supplier migration (temporal, para migrar proveedores existentes)
 app.use('/api/migrate-suppliers', migrateSuppliersRouter);
 
