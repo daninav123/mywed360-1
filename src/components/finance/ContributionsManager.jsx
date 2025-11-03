@@ -51,7 +51,7 @@ const ContributionsManager = ({ weddingId, onUpdate }) => {
   const handleAddContribution = () => {
     if (!formData.name || !formData.amount) {
       toast.warn(
-        t('common.finance.contributions.nameAmountRequired', 'Nombre y monto son obligatorios')
+        t('finance.contributions.nameAmountRequired', 'Nombre y monto son obligatorios')
       );
       return;
     }
@@ -82,7 +82,7 @@ const ContributionsManager = ({ weddingId, onUpdate }) => {
 
   const handleDeleteContribution = (id) => {
     if (
-      window.confirm(t('common.finance.contributions.confirmDelete', '¿Eliminar esta aportación?'))
+      window.confirm(t('finance.contributions.confirmDelete', '¿Eliminar esta aportación?'))
     ) {
       saveContributions(contributions.filter((c) => c.id !== id));
     }
@@ -134,9 +134,9 @@ const ContributionsManager = ({ weddingId, onUpdate }) => {
 
   const getStatusLabel = (status) => {
     const labels = {
-      received: t('common.finance.contributions.status.received', 'Recibida'),
-      confirmed: t('common.finance.contributions.status.confirmed', 'Confirmada'),
-      pending: t('common.finance.contributions.status.pending', 'Pendiente'),
+      received: t('finance.contributions.status.received', 'Recibida'),
+      confirmed: t('finance.contributions.status.confirmed', 'Confirmada'),
+      pending: t('finance.contributions.status.pending', 'Pendiente'),
     };
     return labels[status] || labels.pending;
   };

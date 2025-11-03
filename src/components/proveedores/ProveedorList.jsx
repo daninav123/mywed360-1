@@ -51,8 +51,8 @@ const ProveedorList = ({
   const { t } = useTranslations();
 
   const handleCreateContract = (provider) => {
-    const providerName = provider?.name || t('common.suppliers.list.contractFallback');
-    const title = t('common.suppliers.list.contractTitle', { name: providerName });
+    const providerName = provider?.name || t('suppliers.list.contractFallback');
+    const title = t('suppliers.list.contractTitle', { name: providerName });
     navigate('/protocolo/documentos-legales', {
       state: {
         prefill: {
@@ -90,19 +90,19 @@ const ProveedorList = ({
   const selectedCount = Array.isArray(selected) ? selected.length : 0;
   const tabOptions = useMemo(
     () => [
-      { id: 'contratados', label: t('common.suppliers.list.tabs.contracted') },
-      { id: 'buscados', label: t('common.suppliers.list.tabs.searching') },
-      { id: 'favoritos', label: t('common.suppliers.list.tabs.favorites') },
+      { id: 'contratados', label: t('suppliers.list.tabs.contracted') },
+      { id: 'buscados', label: t('suppliers.list.tabs.searching') },
+      { id: 'favoritos', label: t('suppliers.list.tabs.favorites') },
     ],
     [t]
   );
   const statusOptions = useMemo(
     () => [
-      { value: 'Pendiente', label: t('common.suppliers.list.filters.statusOptions.pending') },
-      { value: 'Contactado', label: t('common.suppliers.list.filters.statusOptions.contacted') },
-      { value: 'Seleccionado', label: t('common.suppliers.list.filters.statusOptions.selected') },
-      { value: 'Confirmado', label: t('common.suppliers.list.filters.statusOptions.confirmed') },
-      { value: 'Rechazado', label: t('common.suppliers.list.filters.statusOptions.rejected') },
+      { value: 'Pendiente', label: t('suppliers.list.filters.statusOptions.pending') },
+      { value: 'Contactado', label: t('suppliers.list.filters.statusOptions.contacted') },
+      { value: 'Seleccionado', label: t('suppliers.list.filters.statusOptions.selected') },
+      { value: 'Confirmado', label: t('suppliers.list.filters.statusOptions.confirmed') },
+      { value: 'Rechazado', label: t('suppliers.list.filters.statusOptions.rejected') },
     ],
     [t]
   );
@@ -114,7 +114,7 @@ const ProveedorList = ({
       <div className="flex flex-wrap items-center gap-3">
         <nav
           className="flex gap-2 border-b border-gray-200"
-          aria-label={t('common.suppliers.list.tabs.aria')}
+          aria-label={t('suppliers.list.tabs.aria')}
         >
           {tabOptions.map((opt) => (
             <button
@@ -142,26 +142,26 @@ const ProveedorList = ({
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-3 items-end">
           <div className="col-span-2">
             <label className="block text-xs text-gray-500 mb-1">
-              {t('common.suppliers.list.filters.searchLabel')}
+              {t('suppliers.list.filters.searchLabel')}
             </label>
             <input
               type="text"
               value={searchTerm || ''}
               onChange={(e) => setSearchTerm?.(e.target.value)}
-              placeholder={t('common.suppliers.list.filters.searchPlaceholder')}
+              placeholder={t('suppliers.list.filters.searchPlaceholder')}
               className="w-full border rounded p-2"
             />
           </div>
           <div>
             <label className="block text-xs text-gray-500 mb-1">
-              {t('common.suppliers.list.filters.serviceLabel')}
+              {t('suppliers.list.filters.serviceLabel')}
             </label>
             <select
               className="w-full border rounded p-2"
               value={serviceFilter || ''}
               onChange={(e) => setServiceFilter?.(e.target.value)}
             >
-              <option value="">{t('common.suppliers.list.filters.allOption')}</option>
+              <option value="">{t('suppliers.list.filters.allOption')}</option>
               {services.map((s) => (
                 <option key={s} value={s}>
                   {s}
@@ -171,14 +171,14 @@ const ProveedorList = ({
           </div>
           <div>
             <label className="block text-xs text-gray-500 mb-1">
-              {t('common.suppliers.list.filters.statusLabel')}
+              {t('suppliers.list.filters.statusLabel')}
             </label>
             <select
               className="w-full border rounded p-2"
               value={statusFilter || ''}
               onChange={(e) => setStatusFilter?.(e.target.value)}
             >
-              <option value="">{t('common.suppliers.list.filters.allOption')}</option>
+              <option value="">{t('suppliers.list.filters.allOption')}</option>
               {statusOptions.map((status) => (
                 <option key={status.value} value={status.value}>
                   {status.label}
@@ -188,7 +188,7 @@ const ProveedorList = ({
           </div>
           <div>
             <label className="block text-xs text-gray-500 mb-1">
-              {t('common.suppliers.list.filters.dateFrom')}
+              {t('suppliers.list.filters.dateFrom')}
             </label>
             <input
               type="date"
@@ -199,7 +199,7 @@ const ProveedorList = ({
           </div>
           <div>
             <label className="block text-xs text-gray-500 mb-1">
-              {t('common.suppliers.list.filters.dateTo')}
+              {t('suppliers.list.filters.dateTo')}
             </label>
             <input
               type="date"
@@ -210,7 +210,7 @@ const ProveedorList = ({
           </div>
           <div>
             <label className="block text-xs text-gray-500 mb-1">
-              {t('common.suppliers.list.filters.ratingLabel')}
+              {t('suppliers.list.filters.ratingLabel')}
             </label>
             <input
               type="number"
@@ -228,7 +228,7 @@ const ProveedorList = ({
               onClick={() => clearFilters?.()}
               className="px-3 py-2 text-sm border rounded-md bg-white hover:bg-gray-50"
             >
-              {t('common.suppliers.list.filters.clear')}
+              {t('suppliers.list.filters.clear')}
             </button>
           </div>
         </div>
@@ -244,7 +244,7 @@ const ProveedorList = ({
         data-cy="selection-bar"
       >
         <span>
-          {t('common.suppliers.list.selection.count', { count: selectedCount })}
+          {t('suppliers.list.selection.count', { count: selectedCount })}
         </span>
         {typeof onOpenCompare === 'function' && (
           <button
@@ -252,7 +252,7 @@ const ProveedorList = ({
             onClick={onOpenCompare}
             className="px-3 py-1 border border-gray-300 rounded-md bg-white hover:bg-gray-50"
           >
-            {t('common.suppliers.list.selection.compare')}
+            {t('suppliers.list.selection.compare')}
           </button>
         )}
         {typeof onOpenRfq === 'function' && (
@@ -261,7 +261,7 @@ const ProveedorList = ({
             onClick={onOpenRfq}
             className="px-3 py-1 border border-indigo-200 rounded-md bg-indigo-50 text-indigo-700 hover:bg-indigo-100"
           >
-            {t('common.suppliers.list.selection.sendRfq')}
+            {t('suppliers.list.selection.sendRfq')}
           </button>
         )}
         {typeof onOpenGroupSelected === 'function' && (
@@ -270,7 +270,7 @@ const ProveedorList = ({
             onClick={onOpenGroupSelected}
             className="px-3 py-1 border border-gray-300 rounded-md bg-white hover:bg-gray-50"
           >
-            {t('common.suppliers.list.selection.group')}
+            {t('suppliers.list.selection.group')}
           </button>
         )}
         {typeof onOpenBulkStatus === 'function' && (
@@ -279,7 +279,7 @@ const ProveedorList = ({
             onClick={onOpenBulkStatus}
             className="px-3 py-1 border border-gray-300 rounded-md bg-white hover:bg-gray-50"
           >
-            {t('common.suppliers.list.selection.changeStatus')}
+            {t('suppliers.list.selection.changeStatus')}
           </button>
         )}
         {typeof onOpenDuplicates === 'function' && (
@@ -288,7 +288,7 @@ const ProveedorList = ({
             onClick={onOpenDuplicates}
             className="px-3 py-1 border border-gray-300 rounded-md bg-white hover:bg-gray-50"
           >
-            {t('common.suppliers.list.selection.duplicates')}
+            {t('suppliers.list.selection.duplicates')}
           </button>
         )}
         {typeof onClearSelection === 'function' && (
@@ -298,7 +298,7 @@ const ProveedorList = ({
             className="px-3 py-1 border border-gray-200 rounded-md text-gray-500 hover:bg-gray-100"
             data-cy="selection-clear"
           >
-            {t('common.suppliers.list.selection.clear')}
+            {t('suppliers.list.selection.clear')}
           </button>
         )}
       </div>
@@ -330,7 +330,7 @@ const ProveedorList = ({
               ))
             ) : (
               <div className="col-span-full text-center py-8 text-gray-500">
-                {t('common.suppliers.list.empty')}
+                {t('suppliers.list.empty')}
               </div>
             )}
           </div>
@@ -382,7 +382,7 @@ const ProveedorList = ({
             </List>
           ) : (
             <div className="p-4 text-sm text-gray-500">
-              {t('common.suppliers.list.loadingVirtualized')}
+              {t('suppliers.list.loadingVirtualized')}
             </div>
           )}
         </div>

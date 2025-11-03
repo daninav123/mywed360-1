@@ -22,13 +22,13 @@ export default function ProviderSearchDrawer({
       <div className="absolute right-0 top-0 bottom-0 w-[420px] bg-white border-l shadow-xl flex flex-col">
         <div className="flex items-center justify-between p-3 border-b">
           <div className="font-medium">
-            {t('common.suppliers.providerSearchDrawer.title')}
+            {t('suppliers.providerSearchDrawer.title')}
           </div>
           <button
             onClick={onClose}
             className="p-1 hover:bg-gray-100 rounded"
-            title={t('common.suppliers.providerSearchDrawer.closeTooltip')}
-            aria-label={t('common.suppliers.providerSearchDrawer.closeTooltip')}
+            title={t('suppliers.providerSearchDrawer.closeTooltip')}
+            aria-label={t('suppliers.providerSearchDrawer.closeTooltip')}
           >
             <X className="h-4 w-4" />
           </button>
@@ -46,7 +46,7 @@ export default function ProviderSearchDrawer({
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder={t('common.suppliers.providerSearchDrawer.queryPlaceholder')}
+              placeholder={t('suppliers.providerSearchDrawer.queryPlaceholder')}
               className="w-full pl-8 pr-3 py-2 border rounded text-sm"
             />
           </div>
@@ -54,26 +54,26 @@ export default function ProviderSearchDrawer({
             type="submit"
             className="px-3 py-2 text-sm border rounded hover:bg-gray-50"
           >
-            {t('common.suppliers.providerSearchDrawer.searchButton')}
+            {t('suppliers.providerSearchDrawer.searchButton')}
           </button>
         </form>
 
         <div className="p-3 flex-1 overflow-y-auto">
           {cargando && (
             <div className="text-sm text-gray-500">
-              {t('common.suppliers.providerSearchDrawer.loading')}
+              {t('suppliers.providerSearchDrawer.loading')}
             </div>
           )}
           {!cargando && !resultado && (
             <div className="text-sm text-gray-500">
-              {t('common.suppliers.providerSearchDrawer.emptyPrompt')}
+              {t('suppliers.providerSearchDrawer.emptyPrompt')}
             </div>
           )}
           {!cargando && resultado && (
             <div className="space-y-2">
               <div className="text-lg font-semibold">{resultado.nombre}</div>
               <div className="text-sm text-gray-600">
-                {t('common.suppliers.providerSearchDrawer.result.meta', {
+                {t('suppliers.providerSearchDrawer.result.meta', {
                   service: resultado.servicio,
                   location: resultado.ubicacion,
                 })}
@@ -89,7 +89,7 @@ export default function ProviderSearchDrawer({
                     target="_blank"
                     rel="noreferrer"
                   >
-                    {t('common.suppliers.providerSearchDrawer.result.web')}
+                    {t('suppliers.providerSearchDrawer.result.web')}
                   </a>
                 )}
                 {resultado.email && <span className="px-2 py-1 border rounded">{resultado.email}</span>}
@@ -104,14 +104,14 @@ export default function ProviderSearchDrawer({
             className="px-3 py-2 text-sm border rounded hover:bg-gray-50"
             onClick={onClose}
           >
-            {t('common.suppliers.providerSearchDrawer.closeButton')}
+            {t('suppliers.providerSearchDrawer.closeButton')}
           </button>
           <button
             className="px-3 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
             disabled={!resultado}
             onClick={() => typeof onGuardar === 'function' && onGuardar(resultado)}
           >
-            {t('common.suppliers.providerSearchDrawer.saveButton')}
+            {t('suppliers.providerSearchDrawer.saveButton')}
           </button>
         </div>
       </div>

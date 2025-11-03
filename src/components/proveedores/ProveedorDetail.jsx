@@ -73,12 +73,12 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
   const isCypress = typeof window !== 'undefined' && window.Cypress;
   const tabLabels = useMemo(
     () => ({
-      info: t('common.suppliers.detail.tabs.info'),
+      info: t('suppliers.detail.tabs.info'),
       communications: isCypress
-        ? t('common.suppliers.detail.tabs.followUp')
-        : t('common.suppliers.detail.tabs.communications'),
-      contracts: t('common.suppliers.detail.tabs.contracts'),
-      insights: t('common.suppliers.detail.tabs.insights'),
+        ? t('suppliers.detail.tabs.followUp')
+        : t('suppliers.detail.tabs.communications'),
+      contracts: t('suppliers.detail.tabs.contracts'),
+      insights: t('suppliers.detail.tabs.insights'),
     }),
     [isCypress, t]
   );
@@ -100,10 +100,10 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
 
   const portalAvailabilityLabel = useMemo(() => {
     const raw = String(provider?.portalAvailability || '').toLowerCase();
-    if (!raw) return t('common.suppliers.detail.portal.availability.none');
-    if (raw === 'available') return t('common.suppliers.detail.portal.availability.available');
-    if (raw === 'unavailable') return t('common.suppliers.detail.portal.availability.unavailable');
-    if (raw === 'unknown' || raw === 'pending') return t('common.suppliers.detail.portal.availability.pending');
+    if (!raw) return t('suppliers.detail.portal.availability.none');
+    if (raw === 'available') return t('suppliers.detail.portal.availability.available');
+    if (raw === 'unavailable') return t('suppliers.detail.portal.availability.unavailable');
+    if (raw === 'unknown' || raw === 'pending') return t('suppliers.detail.portal.availability.pending');
     return provider.portalAvailability;
   }, [provider?.portalAvailability, t]);
 
@@ -139,10 +139,10 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
   );
   const portalLastMessage = provider?.portalLastMessage || '';
   const displayName =
-    provider?.name || provider?.nombre || t('common.suppliers.detail.info.nameFallback');
+    provider?.name || provider?.nombre || t('suppliers.detail.info.nameFallback');
   const displayService =
-    provider?.service || provider?.servicio || t('common.suppliers.detail.info.serviceFallback');
-  const notAvailable = t('common.suppliers.detail.placeholders.notAvailable');
+    provider?.service || provider?.servicio || t('suppliers.detail.info.serviceFallback');
+  const notAvailable = t('suppliers.detail.placeholders.notAvailable');
 
   const normalizeStatusKey = useCallback((status) => {
     const value = String(status || '').trim().toLowerCase();
@@ -201,19 +201,19 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
     const list = [];
     if (providerStatus?.tasks?.pending) {
       list.push({
-        label: t('common.suppliers.detail.pendingTodos.tasks'),
+        label: t('suppliers.detail.pendingTodos.tasks'),
         value: providerStatus.tasks.pending,
       });
     }
     if (providerStatus?.actions?.needFollowUp) {
       list.push({
-        label: t('common.suppliers.detail.pendingTodos.followUps'),
+        label: t('suppliers.detail.pendingTodos.followUps'),
         value: providerStatus.actions.needFollowUp,
       });
     }
     if (Array.isArray(provider?.pendingTasks) && provider.pendingTasks.length > 0) {
       list.push({
-        label: t('common.suppliers.detail.pendingTodos.assigned'),
+        label: t('suppliers.detail.pendingTodos.assigned'),
         value: provider.pendingTasks.length,
       });
     }
@@ -223,18 +223,18 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
   const alertList = useMemo(() => {
     const alerts = [];
     if (portalStatus === 'pending')
-      alerts.push(t('common.suppliers.detail.alerts.portalPending'));
-    if (portalStatus === 'none') alerts.push(t('common.suppliers.detail.alerts.portalInactive'));
+      alerts.push(t('suppliers.detail.alerts.portalPending'));
+    if (portalStatus === 'none') alerts.push(t('suppliers.detail.alerts.portalInactive'));
     const contractsSigned = providerStatus?.contracts?.byStatus?.signed ?? 0;
     const contractsTotal = providerStatus?.contracts?.total ?? 0;
     if (contractsTotal > 0 && contractsSigned === 0) {
-      alerts.push(t('common.suppliers.detail.alerts.noContracts'));
+      alerts.push(t('suppliers.detail.alerts.noContracts'));
     }
     if ((financialSummary.pending || 0) > 0) {
-      alerts.push(t('common.suppliers.detail.alerts.pendingPayments'));
+      alerts.push(t('suppliers.detail.alerts.pendingPayments'));
     }
     if (provider?.styleBalanceAlert || providerStatus?.alerts?.style_balance_alert) {
-      alerts.push(t('common.suppliers.detail.alerts.styleBalance'));
+      alerts.push(t('suppliers.detail.alerts.styleBalance'));
     }
     return alerts;
   }, [portalStatus, providerStatus, financialSummary.pending, provider, t]);
@@ -255,7 +255,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
       if (force)
         setToast({
           type: 'error',
-          message: t('common.suppliers.detail.toasts.paySuggestionsError'),
+          message: t('suppliers.detail.toasts.paySuggestionsError'),
         });
       setPaySuggestions([]);
     } finally {
@@ -270,8 +270,8 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
     try {
       if (typeof window !== 'undefined') {
         const input = window.prompt(
-          t('common.suppliers.detail.prompts.depositAmount'),
-          t('common.suppliers.detail.prompts.depositDefault')
+          t('suppliers.detail.prompts.depositAmount'),
+          t('suppliers.detail.prompts.depositDefault')
         );
         if (input != null && input !== '') amount = Math.max(1, parseFloat(input));
       }
@@ -280,7 +280,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
       setPaying(true);
       await checkoutProviderDeposit({
         providerId: provider.id || provider.email || provider.name || 'provider',
-        providerName: provider.name || t('common.suppliers.list.contractFallback'),
+        providerName: provider.name || t('suppliers.list.contractFallback'),
         amount,
         currency: 'EUR',
         weddingId: activeWedding || null,
@@ -288,7 +288,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
     } catch (e) {
       setToast({
         type: 'error',
-        message: t('common.suppliers.detail.toasts.payStartError'),
+        message: t('suppliers.detail.toasts.payStartError'),
       });
     } finally {
       setPaying(false);
@@ -300,7 +300,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
     if (typeof window !== 'undefined') {
       try {
         const input = window.prompt(
-          t('common.suppliers.detail.prompts.manualContactNote'),
+          t('suppliers.detail.prompts.manualContactNote'),
           ''
         );
         if (input === null) {
@@ -315,12 +315,12 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
       await registerManualContact(provider.id, note);
       setToast({
         type: 'success',
-        message: t('common.suppliers.detail.toasts.manualContactSuccess'),
+        message: t('suppliers.detail.toasts.manualContactSuccess'),
       });
     } catch (e) {
       setToast({
         type: 'error',
-        message: t('common.suppliers.detail.toasts.manualContactError'),
+        message: t('suppliers.detail.toasts.manualContactError'),
       });
     }
   };
@@ -340,18 +340,18 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
         } catch {}
         setToast({
           type: 'success',
-          message: t('common.suppliers.detail.toasts.portalCopied'),
+          message: t('suppliers.detail.toasts.portalCopied'),
         });
       } else {
         setToast({
           type: 'info',
-          message: t('common.suppliers.detail.toasts.portalToken'),
+          message: t('suppliers.detail.toasts.portalToken'),
         });
       }
     } catch (e) {
       setToast({
         type: 'error',
-        message: t('common.suppliers.detail.toasts.portalError'),
+        message: t('suppliers.detail.toasts.portalError'),
       });
     }
   };
@@ -361,13 +361,13 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
     setGenerating(true);
     setGenError(null);
     try {
-      const contractName = provider?.name || t('common.suppliers.list.contractFallback');
+      const contractName = provider?.name || t('suppliers.list.contractFallback');
       const payload = {
         weddingId: activeWedding,
         payload: {
           type: 'provider_contract',
           subtype: 'basic',
-          title: t('common.suppliers.list.contractTitle', { name: contractName }),
+          title: t('suppliers.list.contractTitle', { name: contractName }),
           data: {
             supplierId: provider?.id,
             supplierName: provider?.name,
@@ -392,15 +392,15 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
         }
       }
     } catch (e) {
-      setGenError(t('common.suppliers.detail.documents.error'));
+      setGenError(t('suppliers.detail.documents.error'));
     } finally {
       setGenerating(false);
     }
   };
 
   const handleOpenLegalDocs = () => {
-    const contractName = provider?.name || t('common.suppliers.list.contractFallback');
-    const title = t('common.suppliers.list.contractTitle', { name: contractName });
+    const contractName = provider?.name || t('suppliers.list.contractFallback');
+    const title = t('suppliers.list.contractTitle', { name: contractName });
     navigate('/protocolo/documentos', {
       state: {
         prefill: {
@@ -451,12 +451,12 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
       setRatingDirty(false);
       setToast({
         type: 'success',
-        message: t('common.suppliers.detail.toasts.ratingSaved'),
+        message: t('suppliers.detail.toasts.ratingSaved'),
       });
     } catch (e) {
       setToast({
         type: 'error',
-        message: t('common.suppliers.detail.toasts.ratingError'),
+        message: t('suppliers.detail.toasts.ratingError'),
       });
     } finally {
       setSavingRating(false);
@@ -589,7 +589,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
             <button
               onClick={onClose}
               className="text-gray-500 hover:text-gray-700"
-              aria-label={t('common.suppliers.detail.closeAria')}
+              aria-label={t('suppliers.detail.closeAria')}
             >
               <X size={24} />
             </button>
@@ -654,7 +654,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                       </span>
                       {provider.depositStatus === 'paid' && (
                         <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700">
-                          {t('common.suppliers.card.depositPaid')}
+                          {t('suppliers.card.depositPaid')}
                         </span>
                       )}
                       <span className="ml-2 text-gray-500">{displayService}</span>
@@ -667,40 +667,40 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                             } else {
                               setToast({
                                 type: 'info',
-                                message: t('common.suppliers.detail.groupToast', {
+                                message: t('suppliers.detail.groupToast', {
                                   name: provider.groupName,
                                 }),
                               });
                             }
                           }}
                           className="text-xs px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 hover:bg-indigo-200 transition"
-                          title={t('common.suppliers.detail.groupButtonTitle', {
+                          title={t('suppliers.detail.groupButtonTitle', {
                             name: provider.groupName,
                           })}
                         >
-                          {t('common.suppliers.detail.groupButton', { name: provider.groupName })}
+                          {t('suppliers.detail.groupButton', { name: provider.groupName })}
                         </button>
                       )}
                       {!provider.groupId && (
                         <Button size="xs" variant="outline" onClick={() => setAssignOpen(true)}>
-                          {t('common.suppliers.card.actions.assignGroup')}
+                          {t('suppliers.card.actions.assignGroup')}
                         </Button>
                       )}
                     </div>
                     {onEdit && (
                       <Button onClick={() => onEdit(provider)} variant="outline" size="sm">
-                        <Edit2 size={16} className="mr-1" /> {t('common.suppliers.card.actions.edit')}
+                        <Edit2 size={16} className="mr-1" /> {t('suppliers.card.actions.edit')}
                       </Button>
                     )}
                     <span className="ml-2 text-xs text-gray-500">
-                      {t('common.suppliers.detail.contracts.externalNote')}
+                      {t('suppliers.detail.contracts.externalNote')}
                     </span>
                     {provider.groupId && (
                       <Button
                         onClick={async () => {
                           if (removing) return;
                           const ok = window.confirm(
-                            t('common.suppliers.detail.groupRemoveConfirm')
+                            t('suppliers.detail.groupRemoveConfirm')
                           );
                           if (!ok) return;
                           try {
@@ -709,7 +709,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                             setGroupCleared(true);
                             setToast({
                               type: 'success',
-                              message: t('common.suppliers.detail.groupRemoveSuccess'),
+                              message: t('suppliers.detail.groupRemoveSuccess'),
                             });
                           } finally {
                             setRemoving(false);
@@ -721,8 +721,8 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                         disabled={removing}
                       >
                         {removing
-                          ? t('common.suppliers.detail.groupRemoving')
-                          : t('common.suppliers.detail.groupRemove')}
+                          ? t('suppliers.detail.groupRemoving')
+                          : t('suppliers.detail.groupRemove')}
                       </Button>
                     )}
                   </div>
@@ -742,7 +742,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                           <span className="text-blue-600 font-medium">{provider.contact.charAt(0)}</span>
                         </div>
                         <div>
-                          <p className="font-medium">{t('common.suppliers.detail.info.contact')}</p>
+                          <p className="font-medium">{t('suppliers.detail.info.contact')}</p>
                           <p className="text-sm text-gray-600">{provider.contact}</p>
                         </div>
                       </div>
@@ -754,7 +754,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                           <Phone size={16} className="text-green-600" />
                         </div>
                         <div>
-                          <p className="font-medium">{t('common.suppliers.detail.info.phone')}</p>
+                          <p className="font-medium">{t('suppliers.detail.info.phone')}</p>
                           <p className="text-sm text-gray-600">{provider.phone}</p>
                         </div>
                       </div>
@@ -766,7 +766,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                           <Mail size={16} className="text-red-600" />
                         </div>
                         <div className="overflow-hidden">
-                          <p className="font-medium">{t('common.suppliers.detail.info.email')}</p>
+                          <p className="font-medium">{t('suppliers.detail.info.email')}</p>
                           <a href={`mailto:${provider.email}`} className="text-sm text-blue-600 hover:underline truncate block">
                             {provider.email}
                           </a>
@@ -780,7 +780,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                           <Globe size={16} className="text-purple-600" />
                         </div>
                         <div className="overflow-hidden">
-                          <p className="font-medium">{t('common.suppliers.detail.info.website')}</p>
+                          <p className="font-medium">{t('suppliers.detail.info.website')}</p>
                           <a
                             href={provider.link}
                             target="_blank"
@@ -799,7 +799,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                           <Calendar size={16} className="text-amber-600" />
                         </div>
                         <div>
-                          <p className="font-medium">{t('common.suppliers.detail.info.date')}</p>
+                          <p className="font-medium">{t('suppliers.detail.info.date')}</p>
                       <p className="text-sm text-gray-600">{formatDateValue(provider.date)}</p>
                         </div>
                       </div>
@@ -811,7 +811,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                           <MapPin size={16} className="text-teal-600" />
                         </div>
                         <div>
-                          <p className="font-medium">{t('common.suppliers.detail.info.location')}</p>
+                          <p className="font-medium">{t('suppliers.detail.info.location')}</p>
                           <p className="text-sm text-gray-600">{provider.location || provider.address}</p>
                         </div>
                       </div>
@@ -819,7 +819,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
 
                     {provider.priceRange && (
                       <div className="mt-3 p-3 bg-gray-50 rounded-md">
-                        <p className="font-medium">{t('common.suppliers.detail.info.priceRange')}</p>
+                        <p className="font-medium">{t('suppliers.detail.info.priceRange')}</p>
                         <p className="text-lg font-semibold text-gray-800">{provider.priceRange}</p>
                       </div>
                     )}
@@ -827,16 +827,16 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
 
                   <div className="mt-4">
                     <Button size="sm" variant="outline" onClick={handleManualContact}>
-                      {t('common.suppliers.detail.info.registerManual')}
+                      {t('suppliers.detail.info.registerManual')}
                     </Button>
                   </div>
 
                   <div className="mt-6">
-                    <p className="font-medium mb-1">{t('common.suppliers.detail.info.ratingTitle')}</p>
+                    <p className="font-medium mb-1">{t('suppliers.detail.info.ratingTitle')}</p>
                     <div className="flex items-center space-x-4">
                       {renderRatingStars(rating, true)}
                       <span className="text-sm text-gray-500">
-                        {t('common.suppliers.detail.info.ratingSummary', {
+                        {t('suppliers.detail.info.ratingSummary', {
                           value: rating.toFixed(1),
                           total: 5,
                           count: provider.ratingCount || 0,
@@ -844,8 +844,8 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                       </span>
                       <Button size="sm" variant="outline" disabled={savingRating || !ratingDirty} onClick={saveRating}>
                         {savingRating
-                          ? t('common.suppliers.detail.info.ratingSaving')
-                          : t('common.suppliers.detail.info.ratingSave')}
+                          ? t('suppliers.detail.info.ratingSaving')
+                          : t('suppliers.detail.info.ratingSave')}
                       </Button>
                     </div>
                   </div>
@@ -853,7 +853,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                   <div className="mt-6">
                     <div className="flex items-center justify-between mb-2">
                       <h3 className="text-lg font-medium">
-                        {t('common.suppliers.detail.serviceLines.title')}
+                        {t('suppliers.detail.serviceLines.title')}
                       </h3>
                       <div className="flex items-center gap-2">
                         <Button
@@ -862,7 +862,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                           onClick={() => setMergeOpen(true)}
                           disabled={!Array.isArray(provider.serviceLines) || provider.serviceLines.length === 0}
                         >
-                          {t('common.suppliers.detail.serviceLines.manage')}
+                          {t('suppliers.detail.serviceLines.manage')}
                         </Button>
                       </div>
                     </div>
@@ -872,16 +872,16 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                           <thead className="bg-gray-50 text-gray-600 uppercase text-xs tracking-wide">
                             <tr>
                               <th className="px-3 py-2 text-left font-medium">
-                                {t('common.suppliers.detail.serviceLines.headers.service')}
+                                {t('suppliers.detail.serviceLines.headers.service')}
                               </th>
                               <th className="px-3 py-2 text-left font-medium">
-                                {t('common.suppliers.detail.serviceLines.headers.status')}
+                                {t('suppliers.detail.serviceLines.headers.status')}
                               </th>
                               <th className="px-3 py-2 text-left font-medium">
-                                {t('common.suppliers.detail.serviceLines.headers.budget')}
+                                {t('suppliers.detail.serviceLines.headers.budget')}
                               </th>
                               <th className="px-3 py-2 text-left font-medium">
-                                {t('common.suppliers.detail.serviceLines.headers.notes')}
+                                {t('suppliers.detail.serviceLines.headers.notes')}
                               </th>
                             </tr>
                           </thead>
@@ -889,7 +889,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                             {provider.serviceLines.map((line) => (
                               <tr key={line.id} className="border-t border-gray-100">
                                 <td className="px-3 py-2 font-medium text-gray-800">
-                                  {line.name || t('common.suppliers.detail.serviceLines.unnamed')}
+                                  {line.name || t('suppliers.detail.serviceLines.unnamed')}
                                 </td>
                                 <td className="px-3 py-2">{line.status || notAvailable}</td>
                                 <td className="px-3 py-2">
@@ -903,7 +903,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                       </div>
                     ) : (
                       <p className="text-sm text-gray-500">
-                        {t('common.suppliers.detail.serviceLines.empty')}
+                        {t('suppliers.detail.serviceLines.empty')}
                       </p>
                     )}
                   </div>
@@ -912,59 +912,59 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                 <Card>
                     <div className="flex items-center justify-between mb-2">
                       <h3 className="text-lg font-medium">
-                        {t('common.suppliers.detail.status.title')}
+                        {t('suppliers.detail.status.title')}
                       </h3>
                       {statusLoading && (
                         <span className="text-xs text-gray-500">
-                          {t('common.suppliers.detail.status.loading')}
+                          {t('suppliers.detail.status.loading')}
                         </span>
                       )}
                     </div>
                     {!providerStatus ? (
                       <p className="text-sm text-gray-600">
-                        {t('common.suppliers.detail.status.empty')}
+                        {t('suppliers.detail.status.empty')}
                       </p>
                     ) : (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                         <div className="p-3 rounded bg-gray-50">
                           <p className="font-semibold mb-1">
-                            {t('common.suppliers.detail.status.contracts.title')}
+                            {t('suppliers.detail.status.contracts.title')}
                           </p>
                           <p>
-                            {t('common.suppliers.detail.status.contracts.total', {
+                            {t('suppliers.detail.status.contracts.total', {
                               count: providerStatus.contracts?.total ?? 0,
                             })}
                           </p>
                           <div className="mt-1 text-gray-700">
                             <p>
-                              {t('common.suppliers.detail.status.contracts.signed', {
+                              {t('suppliers.detail.status.contracts.signed', {
                                 count: providerStatus.contracts?.byStatus?.signed ?? 0,
                               })}
                             </p>
                             <p>
-                              {t('common.suppliers.detail.status.contracts.sent', {
+                              {t('suppliers.detail.status.contracts.sent', {
                                 count: providerStatus.contracts?.byStatus?.sent ?? 0,
                               })}
                             </p>
                             <p>
-                              {t('common.suppliers.detail.status.contracts.draft', {
+                              {t('suppliers.detail.status.contracts.draft', {
                                 count: providerStatus.contracts?.byStatus?.draft ?? 0,
                               })}
                             </p>
                             <p>
-                              {t('common.suppliers.detail.status.contracts.cancelled', {
+                              {t('suppliers.detail.status.contracts.cancelled', {
                                 count: providerStatus.contracts?.byStatus?.cancelled ?? 0,
                               })}
                             </p>
                           </div>
                           <p className="mt-1">
-                            {t('common.suppliers.detail.status.contracts.amountSigned', {
+                            {t('suppliers.detail.status.contracts.amountSigned', {
                               amount: providerStatus.contracts?.amountSigned ?? 0,
                             })}
                           </p>
                           {providerStatus.contracts?.lastUpdate && (
                             <p className="text-xs text-gray-500 mt-1">
-                              {t('common.suppliers.detail.status.lastUpdate', {
+                              {t('suppliers.detail.status.lastUpdate', {
                                 value: new Date(
                                   providerStatus.contracts.lastUpdate
                                 ).toLocaleString(),
@@ -974,46 +974,46 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                         </div>
                         <div className="p-3 rounded bg-gray-50">
                           <p className="font-semibold mb-1">
-                            {t('common.suppliers.detail.status.payments.title')}
+                            {t('suppliers.detail.status.payments.title')}
                           </p>
                           <p>
-                            {t('common.suppliers.detail.status.payments.total', {
+                            {t('suppliers.detail.status.payments.total', {
                               count: providerStatus.payments?.total ?? 0,
                             })}
                           </p>
                           <div className="mt-1 text-gray-700">
                             <p>
-                              {t('common.suppliers.detail.status.payments.paid', {
+                              {t('suppliers.detail.status.payments.paid', {
                                 count: providerStatus.payments?.byStatus?.paid ?? 0,
                               })}
                             </p>
                             <p>
-                              {t('common.suppliers.detail.status.payments.pending', {
+                              {t('suppliers.detail.status.payments.pending', {
                                 count:
                                   (providerStatus.payments?.byStatus?.pending ?? 0) +
                                   (providerStatus.payments?.byStatus?.authorized ?? 0),
                               })}
                             </p>
                             <p>
-                              {t('common.suppliers.detail.status.payments.failed', {
+                              {t('suppliers.detail.status.payments.failed', {
                                 count: providerStatus.payments?.byStatus?.failed ?? 0,
                               })}
                             </p>
                             <p>
-                              {t('common.suppliers.detail.status.payments.refunded', {
+                              {t('suppliers.detail.status.payments.refunded', {
                                 count: providerStatus.payments?.byStatus?.refunded ?? 0,
                               })}
                             </p>
                           </div>
                           <p className="mt-1">
-                            {t('common.suppliers.detail.status.payments.amount', {
+                            {t('suppliers.detail.status.payments.amount', {
                               paid: providerStatus.payments?.amount?.paid ?? 0,
                               pending: providerStatus.payments?.amount?.pending ?? 0,
                             })}
                           </p>
                           {providerStatus.payments?.lastUpdate && (
                             <p className="text-xs text-gray-500 mt-1">
-                              {t('common.suppliers.detail.status.lastUpdate', {
+                              {t('suppliers.detail.status.lastUpdate', {
                                 value: new Date(
                                   providerStatus.payments.lastUpdate
                                 ).toLocaleString(),
@@ -1030,27 +1030,27 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
                         <h3 className="text-lg font-medium">
-                          {t('common.suppliers.detail.portal.title')}
+                          {t('suppliers.detail.portal.title')}
                         </h3>
                         <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${portalStatusColor}`}>
                           {portalStatus === 'responded'
-                            ? t('common.suppliers.detail.portal.status.responded')
+                            ? t('suppliers.detail.portal.status.responded')
                             : portalStatus === 'pending'
-                            ? t('common.suppliers.detail.portal.status.pending')
-                            : t('common.suppliers.detail.portal.status.none')}
+                            ? t('suppliers.detail.portal.status.pending')
+                            : t('suppliers.detail.portal.status.none')}
                         </span>
                       </div>
                       <div className="text-sm text-gray-600 space-y-1">
                         <div className="flex items-center gap-2">
                           <span className="font-semibold">
-                            {t('common.suppliers.detail.portal.labels.availability')}
+                            {t('suppliers.detail.portal.labels.availability')}
                           </span>
                           <span className="text-gray-800">{portalAvailabilityLabel}</span>
                         </div>
                         {portalLastSubmitText && (
                           <div className="flex items-center gap-2">
                             <span className="font-semibold">
-                              {t('common.suppliers.detail.portal.labels.lastResponse')}
+                              {t('suppliers.detail.portal.labels.lastResponse')}
                             </span>
                             <span>{portalLastSubmitText}</span>
                           </div>
@@ -1058,7 +1058,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                         {portalLastMessage && (
                           <div>
                             <span className="font-semibold">
-                              {t('common.suppliers.detail.portal.labels.lastMessage')}
+                              {t('suppliers.detail.portal.labels.lastMessage')}
                             </span>
                             <p className="mt-1 p-2 border border-gray-200 bg-white rounded text-sm text-gray-700 line-clamp-3">
                               {portalLastMessage}
@@ -1067,12 +1067,12 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                         )}
                         {portalStatus === 'pending' && (
                           <p className="text-xs text-amber-600">
-                            {t('common.suppliers.detail.portal.pendingHint')}
+                            {t('suppliers.detail.portal.pendingHint')}
                           </p>
                         )}
                         {portalStatus === 'none' && (
                           <p className="text-xs text-gray-500">
-                            {t('common.suppliers.detail.portal.noneHint')}
+                            {t('suppliers.detail.portal.noneHint')}
                           </p>
                         )}
                       </div>
@@ -1083,11 +1083,11 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                         onClick={handleCopyPortalLink}
                         disabled={!activeWedding || !provider?.id}
                       >
-                        {t('common.suppliers.detail.portal.copyLink')}
+                        {t('suppliers.detail.portal.copyLink')}
                       </Button>
                       {portalLastSubmitText && (
                         <span className="text-xs text-emerald-600">
-                          {t('common.suppliers.detail.portal.responseRegistered')}
+                          {t('suppliers.detail.portal.responseRegistered')}
                         </span>
                       )}
                     </div>
@@ -1100,18 +1100,18 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className="text-lg font-medium">
-                        {t('common.suppliers.detail.documents.title')}
+                        {t('suppliers.detail.documents.title')}
                       </h3>
                       {genError && <p className="text-sm text-red-600 mt-1">{genError}</p>}
                     </div>
                     <div className="flex gap-2">
                       <Button onClick={handleOpenLegalDocs} variant="outline">
-                        {t('common.suppliers.detail.documents.open')}
+                        {t('suppliers.detail.documents.open')}
                       </Button>
                       <Button onClick={handleGenerateContract} disabled={!activeWedding || generating}>
                         {generating
-                          ? t('common.suppliers.detail.documents.generating')
-                          : t('common.suppliers.detail.documents.generate')}
+                          ? t('suppliers.detail.documents.generating')
+                          : t('suppliers.detail.documents.generate')}
                       </Button>
                     </div>
                   </div>
@@ -1120,14 +1120,14 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                 <Card>
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="text-lg font-medium">
-                      {t('common.suppliers.detail.rfq.title')}
+                      {t('suppliers.detail.rfq.title')}
                     </h3>
                     <div className="flex gap-2">
                       <Button
                         variant="outline"
                         onClick={() => {
                           setRfqDefaults({
-                            subject: t('common.suppliers.detail.rfq.defaultSubject', {
+                            subject: t('suppliers.detail.rfq.defaultSubject', {
                               service: displayService,
                             }).trim(),
                             body: '',
@@ -1135,17 +1135,17 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                           setRfqOpen(true);
                         }}
                       >
-                        {t('common.suppliers.detail.rfq.new')}
+                        {t('suppliers.detail.rfq.new')}
                       </Button>
                     </div>
                   </div>
                   {rfqLoading ? (
                     <p className="text-sm text-gray-500">
-                      {t('common.suppliers.detail.rfq.loading')}
+                      {t('suppliers.detail.rfq.loading')}
                     </p>
                   ) : rfqHistory.length === 0 ? (
                     <p className="text-sm text-gray-500">
-                      {t('common.suppliers.detail.rfq.empty')}
+                      {t('suppliers.detail.rfq.empty')}
                     </p>
                   ) : (
                     <ul className="divide-y">
@@ -1153,10 +1153,10 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                         <li key={r.id} className="py-2 flex items-center justify-between">
                           <div>
                             <p className="font-medium truncate max-w-[28rem]" title={r.subject}>
-                              {r.subject || t('common.suppliers.detail.rfq.noSubject')}
+                              {r.subject || t('suppliers.detail.rfq.noSubject')}
                             </p>
                             <p className="text-xs text-gray-600">
-                              {t('common.suppliers.detail.rfq.sentAt', {
+                              {t('suppliers.detail.rfq.sentAt', {
                                 email: r.email || provider?.email,
                                 date: formatDateTimeValue(r.sentAt),
                               })}
@@ -1170,7 +1170,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                               setRfqOpen(true);
                             }}
                           >
-                            {t('common.suppliers.detail.rfq.resend')}
+                            {t('suppliers.detail.rfq.resend')}
                           </Button>
                         </li>
                       ))}
@@ -1180,7 +1180,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                 <Card>
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="text-lg font-medium">
-                      {t('common.suppliers.detail.paySuggestions.title')}
+                      {t('suppliers.detail.paySuggestions.title')}
                     </h3>
                     <Button size="sm" variant="outline" onClick={() => {
                       // Forzar recarga
@@ -1188,17 +1188,17 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                       try { window.dispatchEvent(ev); } catch {}
                     }} disabled={payLoading}>
                       {payLoading
-                        ? t('common.suppliers.detail.paySuggestions.refreshing')
-                        : t('common.suppliers.detail.paySuggestions.refresh')}
+                        ? t('suppliers.detail.paySuggestions.refreshing')
+                        : t('suppliers.detail.paySuggestions.refresh')}
                     </Button>
                   </div>
                   {payLoading ? (
                     <div className="text-sm text-gray-600">
-                      {t('common.suppliers.detail.paySuggestions.loading')}
+                      {t('suppliers.detail.paySuggestions.loading')}
                     </div>
                   ) : paySuggestions.length === 0 ? (
                     <div className="text-sm text-gray-600">
-                      {t('common.suppliers.detail.paySuggestions.empty')}
+                      {t('suppliers.detail.paySuggestions.empty')}
                     </div>
                   ) : (
                     <ul className="space-y-2">
@@ -1206,10 +1206,10 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                         <li key={idx} className="p-2 border rounded flex items-center justify-between text-sm">
                           <div className="min-w-0">
                             <div className="font-medium truncate" title={s.subject}>
-                              {s.subject || t('common.suppliers.detail.paySuggestions.noSubject')}
+                              {s.subject || t('suppliers.detail.paySuggestions.noSubject')}
                             </div>
                             <div className="text-gray-600">
-                              {t('common.suppliers.detail.paySuggestions.amountDate', {
+                              {t('suppliers.detail.paySuggestions.amountDate', {
                                 amount: s.rawAmount || s.amount,
                                 currency: s.currency || '',
                                 date: formatDate(s.date, 'short'),
@@ -1220,14 +1220,14 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                             const isIncome = (s.direction || 'outgoing') === 'incoming';
                             const amt = typeof s.amount === 'number' && !Number.isNaN(s.amount) ? String(s.amount) : '';
                             const prefill = {
-                              concept: t('common.suppliers.detail.paySuggestions.prefillConcept', {
+                              concept: t('suppliers.detail.paySuggestions.prefillConcept', {
                                 name: provider?.name || '',
                               }).trim(),
                               amount: amt,
                               date: (s.date || '').slice(0, 10),
                               type: isIncome ? 'income' : 'expense',
                               category: '',
-                              description: t('common.suppliers.detail.paySuggestions.prefillDescription', {
+                              description: t('suppliers.detail.paySuggestions.prefillDescription', {
                                 subject: s.subject,
                               }),
                               provider: provider?.name || '',
@@ -1242,7 +1242,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                               }
                             } catch {}
                           }}>
-                            {t('common.suppliers.detail.paySuggestions.register')}
+                            {t('suppliers.detail.paySuggestions.register')}
                           </Button>
                         </li>
                       ))}
@@ -1256,10 +1256,10 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
               <div className="space-y-4">
                 <Card>
                   <h3 className="text-lg font-medium mb-3">
-                    {t('common.suppliers.detail.communications.title')}
+                    {t('suppliers.detail.communications.title')}
                   </h3>
                   <p className="text-gray-500">
-                    {t('common.suppliers.detail.communications.subtitle')}
+                    {t('suppliers.detail.communications.subtitle')}
                   </p>
                 </Card>
               </div>
@@ -1270,12 +1270,12 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                 <Card>
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="text-lg font-medium">
-                      {t('common.suppliers.detail.contractsTab.title')}
+                      {t('suppliers.detail.contractsTab.title')}
                     </h3>
                     <Button size="sm" variant="outline" onClick={refreshMailEvents} disabled={loadingEvents}>
                       {loadingEvents
-                        ? t('common.suppliers.detail.contractsTab.refreshing')
-                        : t('common.suppliers.detail.contractsTab.refresh')}
+                        ? t('suppliers.detail.contractsTab.refreshing')
+                        : t('suppliers.detail.contractsTab.refresh')}
                     </Button>
                   </div>
                   <EmailTrackingList
@@ -1291,7 +1291,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
 
           <div className="border-t p-4 bg-gray-50 flex justify-end space-x-3">
             <Button variant="outline" onClick={onClose}>
-              {t('common.suppliers.detail.close')}
+              {t('suppliers.detail.close')}
             </Button>
           </div>
         </div>
@@ -1309,24 +1309,24 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
         <Modal
           open={preview.open}
           onClose={() => setPreview({ open: false, url: '', type: '' })}
-          title={t('common.suppliers.detail.preview.title')}
+          title={t('suppliers.detail.preview.title')}
         >
           <div className="min-h-[60vh]">
             {preview.type === 'image' ? (
               <img
                 src={preview.url}
-                alt={t('common.suppliers.detail.preview.imageAlt')}
+                alt={t('suppliers.detail.preview.imageAlt')}
                 className="max-h-[70vh] mx-auto"
               />
             ) : preview.type === 'pdf' ? (
               <iframe
                 src={preview.url}
                 className="w-full h-[70vh]"
-                title={t('common.suppliers.detail.preview.pdfTitle')}
+                title={t('suppliers.detail.preview.pdfTitle')}
               />
             ) : (
               <a href={preview.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
-                {t('common.suppliers.detail.preview.openExternal')}
+                {t('suppliers.detail.preview.openExternal')}
               </a>
             )}
           </div>
@@ -1357,12 +1357,12 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
           if (result.type === 'merge') {
             setToast({
               type: 'success',
-              message: t('common.suppliers.detail.toasts.mergeSuccess'),
+              message: t('suppliers.detail.toasts.mergeSuccess'),
             });
           } else if (result.type === 'split') {
             setToast({
               type: 'success',
-              message: t('common.suppliers.detail.toasts.splitSuccess'),
+              message: t('suppliers.detail.toasts.splitSuccess'),
             });
           }
         }}

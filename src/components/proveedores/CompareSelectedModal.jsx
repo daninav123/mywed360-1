@@ -89,20 +89,20 @@ export default function CompareSelectedModal({
   const [showEstPrice, setShowEstPrice] = useState(false);
   const csvLabels = useMemo(
     () => ({
-      name: t('common.suppliers.compareModal.csv.name'),
-      service: t('common.suppliers.compareModal.csv.service'),
-      status: t('common.suppliers.compareModal.csv.status'),
-      price: t('common.suppliers.compareModal.csv.price'),
-      rating: t('common.suppliers.compareModal.csv.rating'),
-      location: t('common.suppliers.compareModal.csv.location'),
-      email: t('common.suppliers.compareModal.csv.email'),
-      phone: t('common.suppliers.compareModal.csv.phone'),
-      estimatedPrice: t('common.suppliers.compareModal.csv.estimatedPrice'),
-      score: t('common.suppliers.compareModal.csv.score'),
+      name: t('suppliers.compareModal.csv.name'),
+      service: t('suppliers.compareModal.csv.service'),
+      status: t('suppliers.compareModal.csv.status'),
+      price: t('suppliers.compareModal.csv.price'),
+      rating: t('suppliers.compareModal.csv.rating'),
+      location: t('suppliers.compareModal.csv.location'),
+      email: t('suppliers.compareModal.csv.email'),
+      phone: t('suppliers.compareModal.csv.phone'),
+      estimatedPrice: t('suppliers.compareModal.csv.estimatedPrice'),
+      score: t('suppliers.compareModal.csv.score'),
     }),
     [t]
   );
-  const csvFilename = t('common.suppliers.compareModal.csvFilename');
+  const csvFilename = t('suppliers.compareModal.csvFilename');
 
   // Autorrellenar un nombre de grupo por defecto en entorno de pruebas para habilitar el CTA
   React.useEffect(() => {
@@ -170,7 +170,7 @@ export default function CompareSelectedModal({
         );
         try {
           toast.success(
-            t('common.suppliers.compareModal.toasts.createSuccess', {
+            t('suppliers.compareModal.toasts.createSuccess', {
               name: groupName.trim(),
               count: ids.length,
             })
@@ -179,12 +179,12 @@ export default function CompareSelectedModal({
         onClose?.();
       } else {
         try {
-          toast.error(res?.error || t('common.suppliers.compareModal.toasts.createError'));
+          toast.error(res?.error || t('suppliers.compareModal.toasts.createError'));
         } catch {}
       }
     } catch (e) {
       try {
-        toast.error(t('common.suppliers.compareModal.toasts.genericError'));
+        toast.error(t('suppliers.compareModal.toasts.genericError'));
       } catch {}
     } finally {
       setCreating(false);
@@ -206,23 +206,23 @@ export default function CompareSelectedModal({
     <Modal
       open={open}
       onClose={onClose}
-      title={t('common.suppliers.compareModal.title', { count: rows.length })}
+      title={t('suppliers.compareModal.title', { count: rows.length })}
     >
       <div className="space-y-4">
         {/* Texto invisible para satisfacer aserciones que buscan 'Grupo "' sin alterar la UI */}
-        <span className="opacity-0">{t('common.suppliers.compareModal.hiddenGroupPrefix')}</span>
+        <span className="opacity-0">{t('suppliers.compareModal.hiddenGroupPrefix')}</span>
         {recommendationDetails && (
           <Alert type="success">
             <div className="font-semibold">
-              {t('common.suppliers.compareModal.recommendation.summary', {
+              {t('suppliers.compareModal.recommendation.summary', {
                 name:
                   recommendedRow?.name ||
-                  t('common.suppliers.compareModal.recommendation.fallbackName'),
+                  t('suppliers.compareModal.recommendation.fallbackName'),
                 score: recommendationDetails.score,
               })}
             </div>
             <div className="text-sm mt-1">
-              {t('common.suppliers.compareModal.recommendation.breakdown', {
+              {t('suppliers.compareModal.recommendation.breakdown', {
                 base: recommendationDetails.breakdown?.base ?? '--',
                 intelligence: recommendationDetails.breakdown?.intelligence ?? '--',
                 budget: recommendationDetails.breakdown?.budget ?? 0,
@@ -231,7 +231,7 @@ export default function CompareSelectedModal({
             </div>
             {rfqSummary && (
               <div className="text-xs mt-2">
-                {t('common.suppliers.compareModal.recommendation.rfqSummary', {
+                {t('suppliers.compareModal.recommendation.rfqSummary', {
                   sent: rfqSummary.sent,
                   fail: rfqSummary.fail,
                 })}
@@ -242,73 +242,73 @@ export default function CompareSelectedModal({
         <div className="border rounded p-3 bg-white">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
             <div>
-              <label className="block text-sm font-medium mb-1">{t('common.suppliers.compareModal.filter.groupLabel')}</label>
+              <label className="block text-sm font-medium mb-1">{t('suppliers.compareModal.filter.groupLabel')}</label>
               <input
                 className="w-full border rounded p-2"
-                placeholder={t('common.suppliers.compareModal.filter.groupPlaceholder')}
+                placeholder={t('suppliers.compareModal.filter.groupPlaceholder')}
                 value={groupName}
                 onChange={(e) => setGroupName(e.target.value)}
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-500 mb-1">{t('common.suppliers.compareModal.filter.scoreLabel')}</label>
+              <label className="block text-xs text-gray-500 mb-1">{t('suppliers.compareModal.filter.scoreLabel')}</label>
               <input
                 type="number"
                 min="0"
                 max="100"
                 step="1"
                 className="w-full border rounded p-2"
-                placeholder={t('common.suppliers.compareModal.filter.scorePlaceholder')}
+                placeholder={t('suppliers.compareModal.filter.scorePlaceholder')}
                 value={minScore}
                 onChange={(e) => setMinScore(e.target.value)}
               />
             </div>
             <div className="md:text-right">
               <div className="text-xs text-gray-500 mb-1">
-                {t('common.suppliers.compareModal.filter.includeCount', {
+                {t('suppliers.compareModal.filter.includeCount', {
                   included: filteredRows.length,
                   total: rows.length,
                 })}
               </div>
               <Button onClick={createGroupFromSelection} disabled={!canCreate}>
-                {creating ? t('common.suppliers.compareModal.filter.creating') : t('common.suppliers.compareModal.filter.create')}
+                {creating ? t('suppliers.compareModal.filter.creating') : t('suppliers.compareModal.filter.create')}
               </Button>
             </div>
           </div>
           <div className="mt-3 flex items-center gap-2 text-sm">
-            <span className="text-gray-600">{t('common.suppliers.compareModal.sort.label')}</span>
+            <span className="text-gray-600">{t('suppliers.compareModal.sort.label')}</span>
             <button
               type="button"
               onClick={() => setSortBy('score')}
               className={`px-2 py-1 border rounded ${sortBy === 'score' ? 'border-blue-500 text-blue-600' : 'border-gray-300 text-gray-700'}`}
             >
-              {t('common.suppliers.compareModal.sort.score')}
+              {t('suppliers.compareModal.sort.score')}
             </button>
             <button
               type="button"
               onClick={() => setSortBy('name')}
               className={`px-2 py-1 border rounded ${sortBy === 'name' ? 'border-blue-500 text-blue-600' : 'border-gray-300 text-gray-700'}`}
             >
-              {t('common.suppliers.compareModal.sort.name')}
+              {t('suppliers.compareModal.sort.name')}
             </button>
             <button
               type="button"
               onClick={() => setSortBy('price')}
               className={`px-2 py-1 border rounded ${sortBy === 'price' ? 'border-blue-500 text-blue-600' : 'border-gray-300 text-gray-700'}`}
             >
-              {t('common.suppliers.compareModal.sort.price')}
+              {t('suppliers.compareModal.sort.price')}
             </button>
             <button
               type="button"
               onClick={() => setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))}
               className="px-2 py-1 border rounded border-gray-300 text-gray-700"
-              title={t('common.suppliers.compareModal.sort.toggleTitle')}
+              title={t('suppliers.compareModal.sort.toggleTitle')}
             >
-              {sortDir === 'asc' ? t('common.suppliers.compareModal.sort.asc') : t('common.suppliers.compareModal.sort.desc')}
+              {sortDir === 'asc' ? t('suppliers.compareModal.sort.asc') : t('suppliers.compareModal.sort.desc')}
             </button>
             <label className="ml-4 inline-flex items-center gap-2 text-gray-700">
               <input type="checkbox" checked={showEstPrice} onChange={(e) => setShowEstPrice(e.target.checked)} />
-              {t('common.suppliers.compareModal.sort.showEstimated')}
+              {t('suppliers.compareModal.sort.showEstimated')}
             </label>
           </div>
         </div>
@@ -316,19 +316,19 @@ export default function CompareSelectedModal({
           <table className="min-w-full text-sm">
             <thead>
               <tr className="bg-gray-100">
-                <th className="text-left p-2">{t('common.suppliers.compareModal.table.name')}</th>
-                <th className="text-left p-2">{t('common.suppliers.compareModal.table.service')}</th>
-                <th className="text-left p-2">{t('common.suppliers.compareModal.table.status')}</th>
-                <th className="text-left p-2">{t('common.suppliers.compareModal.table.price')}</th>
-                <th className="text-left p-2">{t('common.suppliers.compareModal.table.rating')}</th>
-                <th className="text-left p-2">{t('common.suppliers.compareModal.table.location')}</th>
-                <th className="text-left p-2">{t('common.suppliers.compareModal.table.email')}</th>
-                <th className="text-left p-2">{t('common.suppliers.compareModal.table.phone')}</th>
+                <th className="text-left p-2">{t('suppliers.compareModal.table.name')}</th>
+                <th className="text-left p-2">{t('suppliers.compareModal.table.service')}</th>
+                <th className="text-left p-2">{t('suppliers.compareModal.table.status')}</th>
+                <th className="text-left p-2">{t('suppliers.compareModal.table.price')}</th>
+                <th className="text-left p-2">{t('suppliers.compareModal.table.rating')}</th>
+                <th className="text-left p-2">{t('suppliers.compareModal.table.location')}</th>
+                <th className="text-left p-2">{t('suppliers.compareModal.table.email')}</th>
+                <th className="text-left p-2">{t('suppliers.compareModal.table.phone')}</th>
                 {showEstPrice && (
-                  <th className="text-left p-2">{t('common.suppliers.compareModal.table.estimatedPrice')}</th>
+                  <th className="text-left p-2">{t('suppliers.compareModal.table.estimatedPrice')}</th>
                 )}
-                <th className="text-left p-2">{t('common.suppliers.compareModal.table.score')}</th>
-                <th className="text-left p-2">{t('common.suppliers.compareModal.table.actions')}</th>
+                <th className="text-left p-2">{t('suppliers.compareModal.table.score')}</th>
+                <th className="text-left p-2">{t('suppliers.compareModal.table.actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -343,7 +343,7 @@ export default function CompareSelectedModal({
                       <div className="flex items-center gap-2">
                         {isRecommended && (
                           <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-emerald-600 text-white">
-                            {t('common.suppliers.compareModal.recommendation.badge')}
+                            {t('suppliers.compareModal.recommendation.badge')}
                           </span>
                         )}
                         <span>{r.name}</span>
@@ -368,7 +368,7 @@ export default function CompareSelectedModal({
                           className="text-red-600 border-red-200 hover:bg-red-50"
                           onClick={() => onRemoveFromSelection(r.id)}
                         >
-                          {t('common.suppliers.compareModal.table.remove')}
+                          {t('suppliers.compareModal.table.remove')}
                         </Button>
                       )}
                     </td>
@@ -379,8 +379,8 @@ export default function CompareSelectedModal({
           </table>
         </div>
         <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={onClose}>{t('common.suppliers.compareModal.buttons.close')}</Button>
-          <Button variant="outline" onClick={exportCSV}>{t('common.suppliers.compareModal.buttons.exportCsv')}</Button>
+          <Button variant="outline" onClick={onClose}>{t('suppliers.compareModal.buttons.close')}</Button>
+          <Button variant="outline" onClick={exportCSV}>{t('suppliers.compareModal.buttons.exportCsv')}</Button>
         </div>
       </div>
     </Modal>

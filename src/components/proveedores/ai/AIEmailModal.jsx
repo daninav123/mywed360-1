@@ -62,12 +62,12 @@ const AIEmailModal = ({ isOpen, onClose, aiResult, searchQuery }) => {
         {/* Header */}
         <div className="flex justify-between items-center p-4 border-b">
           <h2 className="text-xl font-semibold">
-            {t('common.suppliers.aiEmailModal.title', { name: aiResult.name })}
+            {t('suppliers.aiEmailModal.title', { name: aiResult.name })}
           </h2>
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700"
-            aria-label={t('common.suppliers.aiEmailModal.closeAria')}
+            aria-label={t('suppliers.aiEmailModal.closeAria')}
             data-testid="close-modal-btn"
           >
             <X size={24} />
@@ -79,10 +79,10 @@ const AIEmailModal = ({ isOpen, onClose, aiResult, searchQuery }) => {
           {isSent && (
             <Alert type="success" className="mb-4" data-testid="success-alert">
               <p className="font-semibold">
-                {t('common.suppliers.aiEmailModal.success.title')}
+                {t('suppliers.aiEmailModal.success.title')}
               </p>
               <p className="text-sm mt-1">
-                {t('common.suppliers.aiEmailModal.success.message')}
+                {t('suppliers.aiEmailModal.success.message')}
               </p>
             </Alert>
           )}
@@ -90,7 +90,7 @@ const AIEmailModal = ({ isOpen, onClose, aiResult, searchQuery }) => {
           {error && (
             <Alert type="error" className="mb-4" data-testid="error-alert">
               <p className="font-semibold">
-                {t('common.suppliers.aiEmailModal.error.title')}
+                {t('suppliers.aiEmailModal.error.title')}
               </p>
               <p className="text-sm mt-1">{error}</p>
             </Alert>
@@ -100,11 +100,11 @@ const AIEmailModal = ({ isOpen, onClose, aiResult, searchQuery }) => {
             <div className="space-y-4">
               <div>
                 <p className="text-sm text-gray-600 mb-1">
-                  {t('common.suppliers.aiEmailModal.from')}{' '}
+                  {t('suppliers.aiEmailModal.from')}{' '}
                   <span className="font-medium">{userEmail}</span>
                 </p>
                 <p className="text-sm text-gray-600 mb-3">
-                  {t('common.suppliers.aiEmailModal.to')}{' '}
+                  {t('suppliers.aiEmailModal.to')}{' '}
                   <span className="font-medium">
                     {aiResult.email ||
                       `${aiResult.name.toLowerCase().replace(/\s+/g, '.')}@proveedor.com`}
@@ -114,7 +114,7 @@ const AIEmailModal = ({ isOpen, onClose, aiResult, searchQuery }) => {
 
               <div>
                 <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('common.suppliers.aiEmailModal.subject.label')}
+                  {t('suppliers.aiEmailModal.subject.label')}
                 </label>
                 <input
                   id="subject"
@@ -122,7 +122,7 @@ const AIEmailModal = ({ isOpen, onClose, aiResult, searchQuery }) => {
                   value={subject}
                   onChange={(e) => setSubject(e.target.value)}
                   className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder={t('common.suppliers.aiEmailModal.subject.placeholder')}
+                  placeholder={t('suppliers.aiEmailModal.subject.placeholder')}
                   required
                   data-testid="email-subject"
                 />
@@ -130,14 +130,14 @@ const AIEmailModal = ({ isOpen, onClose, aiResult, searchQuery }) => {
 
               <div>
                 <label htmlFor="body" className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('common.suppliers.aiEmailModal.body.label')}
+                  {t('suppliers.aiEmailModal.body.label')}
                 </label>
                 <textarea
                   id="body"
                   value={body}
                   onChange={(e) => setBody(e.target.value)}
                   className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-h-[200px]"
-                  placeholder={t('common.suppliers.aiEmailModal.body.placeholder')}
+                  placeholder={t('suppliers.aiEmailModal.body.placeholder')}
                   required
                   data-testid="email-body"
                 />
@@ -147,7 +147,7 @@ const AIEmailModal = ({ isOpen, onClose, aiResult, searchQuery }) => {
               {aiResult.aiSummary && (
                 <div className="bg-blue-50 p-3 rounded-md">
                   <p className="text-xs font-semibold text-blue-600 mb-1">
-                    {t('common.suppliers.aiEmailModal.aiSummary')}
+                    {t('suppliers.aiEmailModal.aiSummary')}
                   </p>
                   <p className="text-sm text-gray-700">{aiResult.aiSummary}</p>
                 </div>
@@ -162,12 +162,12 @@ const AIEmailModal = ({ isOpen, onClose, aiResult, searchQuery }) => {
                 className="mr-2"
                 disabled={isSending}
               >
-                {t('common.suppliers.aiEmailModal.buttons.cancel')}
+                {t('suppliers.aiEmailModal.buttons.cancel')}
               </Button>
               <Button type="submit" disabled={isSending || isSent} data-testid="send-email-btn">
                 {isSending
-                  ? t('common.suppliers.aiEmailModal.buttons.sending')
-                  : t('common.suppliers.aiEmailModal.buttons.send')}
+                  ? t('suppliers.aiEmailModal.buttons.sending')
+                  : t('suppliers.aiEmailModal.buttons.send')}
               </Button>
             </div>
           </form>

@@ -46,12 +46,12 @@ export default function PhotoUploadModal({ onClose, onSuccess }) {
     if (!selectedFile) return;
 
     if (!ACCEPTED_TYPES.includes(selectedFile.type)) {
-      toast.error(t('common.suppliers.portfolio.upload.errors.invalidType'));
+      toast.error(t('suppliers.portfolio.upload.errors.invalidType'));
       return;
     }
 
     if (selectedFile.size > MAX_FILE_SIZE) {
-      toast.error(t('common.suppliers.portfolio.upload.errors.tooLarge'));
+      toast.error(t('suppliers.portfolio.upload.errors.tooLarge'));
       return;
     }
 
@@ -81,12 +81,12 @@ export default function PhotoUploadModal({ onClose, onSuccess }) {
     event.preventDefault();
 
     if (!file) {
-      toast.error(t('common.suppliers.portfolio.upload.errors.noImage'));
+      toast.error(t('suppliers.portfolio.upload.errors.noImage'));
       return;
     }
 
     if (!formData.category) {
-      toast.error(t('common.suppliers.portfolio.upload.errors.noCategory'));
+      toast.error(t('suppliers.portfolio.upload.errors.noCategory'));
       return;
     }
 
@@ -126,7 +126,7 @@ export default function PhotoUploadModal({ onClose, onSuccess }) {
         throw new Error('upload_failed');
       }
 
-      toast.success(t('common.suppliers.portfolio.toasts.uploaded'));
+      toast.success(t('suppliers.portfolio.toasts.uploaded'));
       onSuccess();
       resetFileSelection();
       setFormData((prev) => ({
@@ -141,8 +141,8 @@ export default function PhotoUploadModal({ onClose, onSuccess }) {
       console.error('[PhotoUploadModal] upload error', error);
       toast.error(
         error.message === 'upload_failed'
-          ? t('common.suppliers.portfolio.upload.errors.uploadFailed')
-          : t('common.suppliers.portfolio.upload.errors.generic'),
+          ? t('suppliers.portfolio.upload.errors.uploadFailed')
+          : t('suppliers.portfolio.upload.errors.generic'),
       );
     } finally {
       setUploading(false);
@@ -155,7 +155,7 @@ export default function PhotoUploadModal({ onClose, onSuccess }) {
       <div className="bg-surface rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between p-6 border-b border-border">
           <h2 className="text-xl font-bold text-foreground">
-            {t('common.suppliers.portfolio.upload.title')}
+            {t('suppliers.portfolio.upload.title')}
           </h2>
           <button
             onClick={onClose}
@@ -187,7 +187,7 @@ export default function PhotoUploadModal({ onClose, onSuccess }) {
               <div className="space-y-4">
                 <img
                   src={preview}
-                  alt={formData.title || t('common.suppliers.portfolio.lightbox.image.altFallback')}
+                  alt={formData.title || t('suppliers.portfolio.lightbox.image.altFallback')}
                   className="max-h-64 mx-auto rounded-lg object-cover"
                 />
                 <button
@@ -199,20 +199,20 @@ export default function PhotoUploadModal({ onClose, onSuccess }) {
                   className="text-sm text-muted hover:text-foreground"
                   disabled={uploading}
                 >
-                  {t('common.suppliers.portfolio.upload.dropzone.change')}
+                  {t('suppliers.portfolio.upload.dropzone.change')}
                 </button>
               </div>
             ) : (
               <div>
                 <Upload className="h-12 w-12 text-muted mx-auto mb-4" />
                 <p className="text-foreground font-medium mb-2">
-                  {t('common.suppliers.portfolio.upload.dropzone.title')}
+                  {t('suppliers.portfolio.upload.dropzone.title')}
                 </p>
                 <p className="text-sm text-muted mb-4">
-                  {t('common.suppliers.portfolio.upload.dropzone.subtitle')}
+                  {t('suppliers.portfolio.upload.dropzone.subtitle')}
                 </p>
                 <p className="text-xs text-muted">
-                  {t('common.suppliers.portfolio.upload.dropzone.requirements')}
+                  {t('suppliers.portfolio.upload.dropzone.requirements')}
                 </p>
               </div>
             )}
@@ -221,13 +221,13 @@ export default function PhotoUploadModal({ onClose, onSuccess }) {
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
-                {t('common.suppliers.portfolio.upload.form.title.label')}
+                {t('suppliers.portfolio.upload.form.title.label')}
               </label>
               <input
                 type="text"
                 value={formData.title}
                 onChange={(event) => setFormData({ ...formData, title: event.target.value })}
-                placeholder={t('common.suppliers.portfolio.upload.form.title.placeholder')}
+                placeholder={t('suppliers.portfolio.upload.form.title.placeholder')}
                 className="w-full px-4 py-2 border border-border rounded-lg bg-background text-body focus:outline-none focus:ring-2 focus:ring-primary"
                 disabled={uploading}
               />
@@ -235,14 +235,14 @@ export default function PhotoUploadModal({ onClose, onSuccess }) {
 
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
-                {t('common.suppliers.portfolio.upload.form.description.label')}
+                {t('suppliers.portfolio.upload.form.description.label')}
               </label>
               <textarea
                 value={formData.description}
                 onChange={(event) =>
                   setFormData({ ...formData, description: event.target.value })
                 }
-                placeholder={t('common.suppliers.portfolio.upload.form.description.placeholder')}
+                placeholder={t('suppliers.portfolio.upload.form.description.placeholder')}
                 rows={3}
                 className="w-full px-4 py-2 border border-border rounded-lg bg-background text-body focus:outline-none focus:ring-2 focus:ring-primary resize-none"
                 disabled={uploading}
@@ -251,7 +251,7 @@ export default function PhotoUploadModal({ onClose, onSuccess }) {
 
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
-                {t('common.suppliers.portfolio.upload.form.category.label')}
+                {t('suppliers.portfolio.upload.form.category.label')}
               </label>
               <select
                 value={formData.category}
@@ -270,13 +270,13 @@ export default function PhotoUploadModal({ onClose, onSuccess }) {
 
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
-                {t('common.suppliers.portfolio.upload.form.tags.label')}
+                {t('suppliers.portfolio.upload.form.tags.label')}
               </label>
               <input
                 type="text"
                 value={formData.tags}
                 onChange={(event) => setFormData({ ...formData, tags: event.target.value })}
-                placeholder={t('common.suppliers.portfolio.upload.form.tags.placeholder')}
+                placeholder={t('suppliers.portfolio.upload.form.tags.placeholder')}
                 className="w-full px-4 py-2 border border-border rounded-lg bg-background text-body focus:outline-none focus:ring-2 focus:ring-primary"
                 disabled={uploading}
               />
@@ -294,7 +294,7 @@ export default function PhotoUploadModal({ onClose, onSuccess }) {
                   disabled={uploading}
                 />
                 <span className="text-sm text-body">
-                  {t('common.suppliers.portfolio.upload.form.featured')}
+                  {t('suppliers.portfolio.upload.form.featured')}
                 </span>
               </label>
 
@@ -309,7 +309,7 @@ export default function PhotoUploadModal({ onClose, onSuccess }) {
                   disabled={uploading}
                 />
                 <span className="text-sm text-body">
-                  {t('common.suppliers.portfolio.upload.form.isCover')}
+                  {t('suppliers.portfolio.upload.form.isCover')}
                 </span>
               </label>
             </div>
@@ -319,7 +319,7 @@ export default function PhotoUploadModal({ onClose, onSuccess }) {
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted">
-                  {t('common.suppliers.portfolio.upload.progress.uploading')}
+                  {t('suppliers.portfolio.upload.progress.uploading')}
                 </span>
                 <span className="text-foreground font-medium">
                   {format?.number ? format.number(uploadProgress) : uploadProgress}%
@@ -349,8 +349,8 @@ export default function PhotoUploadModal({ onClose, onSuccess }) {
               disabled={!file || uploading}
             >
               {uploading
-                ? t('common.suppliers.portfolio.upload.actions.submitting')
-                : t('common.suppliers.portfolio.upload.actions.submit')}
+                ? t('suppliers.portfolio.upload.actions.submitting')
+                : t('suppliers.portfolio.upload.actions.submit')}
             </button>
           </div>
         </form>

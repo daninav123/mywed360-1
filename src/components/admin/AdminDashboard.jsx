@@ -252,7 +252,7 @@ const AdminDashboard = () => {
     } catch (error) {
       console.error('[AdminDashboard] resolve alert error:', error);
       toast.error(
-        t('common.admin.alerts.resolveError', 'No se pudo marcar la alerta como resuelta.')
+        t('admin.alerts.resolveError', 'No se pudo marcar la alerta como resuelta.')
       );
     } finally {
       setResolvingAlertId(null);
@@ -459,8 +459,8 @@ const AdminDashboard = () => {
                           disabled={resolvingAlertId === alert.id}
                         >
                           {resolvingAlertId === alert.id
-                            ? t('common.admin.alerts.resolving', 'Resolviendo…')
-                            : t('common.admin.alerts.resolveAction', 'Marcar resuelta')}
+                            ? t('admin.alerts.resolving', 'Resolviendo…')
+                            : t('admin.alerts.resolveAction', 'Marcar resuelta')}
                         </Button>
                       ) : (
                         <Chip size="small" label="Resuelta" color="success" variant="outlined" />

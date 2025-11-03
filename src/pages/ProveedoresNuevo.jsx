@@ -81,7 +81,7 @@ const ShortlistList = ({ items, loading, error, t }) => {
   if (loading) {
     return (
       <Card className="border border-soft bg-surface">
-        <p className="text-sm text-muted">{t('common.suppliers.overview.shortlist.loading')}</p>
+        <p className="text-sm text-muted">{t('suppliers.overview.shortlist.loading')}</p>
       </Card>
     );
   }
@@ -89,7 +89,7 @@ const ShortlistList = ({ items, loading, error, t }) => {
   if (error) {
     return (
       <Card className="border border-danger bg-danger-soft">
-        <p className="text-sm text-danger">{t('common.suppliers.overview.shortlist.error')}</p>
+        <p className="text-sm text-danger">{t('suppliers.overview.shortlist.error')}</p>
       </Card>
     );
   }
@@ -97,7 +97,7 @@ const ShortlistList = ({ items, loading, error, t }) => {
   if (!items || items.length === 0) {
     return (
       <Card className="border border-dashed border-soft bg-surface/80">
-        <p className="text-sm text-muted">{t('common.suppliers.overview.shortlist.empty')}</p>
+        <p className="text-sm text-muted">{t('suppliers.overview.shortlist.empty')}</p>
       </Card>
     );
   }
@@ -109,11 +109,11 @@ const ShortlistList = ({ items, loading, error, t }) => {
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="space-y-1">
               <p className="text-sm font-semibold text-body">
-                {item.name || t('common.suppliers.labels.provider')}
+                {item.name || t('suppliers.labels.provider')}
               </p>
               <p className="text-xs text-muted">
-                {item.service || t('common.suppliers.labels.service')} ·{' '}
-                {t('common.suppliers.overview.shortlist.savedAt', {
+                {item.service || t('suppliers.labels.service')} ·{' '}
+                {t('suppliers.overview.shortlist.savedAt', {
                   value: formatShortDate(item.createdAt),
                 })}
               </p>
@@ -121,7 +121,7 @@ const ShortlistList = ({ items, loading, error, t }) => {
             </div>
             {item.match != null && (
               <span className="rounded-full bg-primary-soft px-2 py-0.5 text-xs font-semibold text-primary">
-                {t('common.suppliers.overview.shortlist.match', {
+                {t('suppliers.overview.shortlist.match', {
                   value: Math.round(item.match),
                 })}
               </span>
@@ -145,14 +145,14 @@ const ServiceOptionsModal = ({ open, card, onClose, t }) => {
     <Modal
       open={open}
       onClose={onClose}
-      title={t('common.suppliers.overview.modals.options.title', { label: card.label })}
+      title={t('suppliers.overview.modals.options.title', { label: card.label })}
       size="lg"
     >
       <div className="space-y-6">
         {confirmed.length > 0 && (
           <section className="space-y-2">
             <h3 className="text-sm font-semibold text-body">
-              {t('common.suppliers.overview.modals.options.confirmedTitle')}
+              {t('suppliers.overview.modals.options.confirmedTitle')}
             </h3>
             {confirmed.map((prov) => (
               <Card key={prov.id} className="border border-soft bg-surface">
@@ -160,7 +160,7 @@ const ServiceOptionsModal = ({ open, card, onClose, t }) => {
                 <p className="text-xs text-muted">
                   {prov.status && prov.status !== ''
                     ? prov.status
-                    : t('common.suppliers.overview.status.pending')}{' '}
+                    : t('suppliers.overview.status.pending')}{' '}
                   · {prov.service || card.label}
                 </p>
                 {prov.notes && <p className="mt-2 text-sm text-body/75">{prov.notes}</p>}
@@ -171,7 +171,7 @@ const ServiceOptionsModal = ({ open, card, onClose, t }) => {
 
         <section className="space-y-2">
           <h3 className="text-sm font-semibold text-body">
-            {t('common.suppliers.overview.modals.options.contactTitle')}
+            {t('suppliers.overview.modals.options.contactTitle')}
           </h3>
           {pendingCandidates.length ? (
             pendingCandidates.map((prov) => (
@@ -180,7 +180,7 @@ const ServiceOptionsModal = ({ open, card, onClose, t }) => {
                 <p className="text-xs text-muted">
                   {prov.status && prov.status !== ''
                     ? prov.status
-                    : t('common.suppliers.overview.status.pending')}{' '}
+                    : t('suppliers.overview.status.pending')}{' '}
                   · {prov.service || card.label}
                 </p>
                 {prov.notes && <p className="mt-2 text-sm text-body/75">{prov.notes}</p>}
@@ -189,7 +189,7 @@ const ServiceOptionsModal = ({ open, card, onClose, t }) => {
           ) : (
             <Card className="border border-dashed border-soft bg-surface/80">
               <p className="text-sm text-muted">
-                {t('common.suppliers.overview.modals.options.contactEmpty')}
+                {t('suppliers.overview.modals.options.contactEmpty')}
               </p>
             </Card>
           )}
@@ -197,16 +197,16 @@ const ServiceOptionsModal = ({ open, card, onClose, t }) => {
 
         <section className="space-y-2">
           <h3 className="text-sm font-semibold text-body">
-            {t('common.suppliers.overview.modals.options.shortlistTitle')}
+            {t('suppliers.overview.modals.options.shortlistTitle')}
           </h3>
           {card.shortlist && card.shortlist.length ? (
             card.shortlist.map((item) => (
               <Card key={item.id} className="border border-soft bg-surface">
                 <p className="text-sm font-medium text-body">
-                  {item.name || t('common.suppliers.labels.provider')}
+                  {item.name || t('suppliers.labels.provider')}
                 </p>
                 <p className="text-xs text-muted">
-                  {t('common.suppliers.overview.shortlist.savedAt', {
+                  {t('suppliers.overview.shortlist.savedAt', {
                     value: formatShortDate(item.createdAt),
                   })}
                 </p>
@@ -216,7 +216,7 @@ const ServiceOptionsModal = ({ open, card, onClose, t }) => {
           ) : (
             <Card className="border border-dashed border-soft bg-surface/80">
               <p className="text-sm text-muted">
-                {t('common.suppliers.overview.modals.options.shortlistEmpty')}
+                {t('suppliers.overview.modals.options.shortlistEmpty')}
               </p>
             </Card>
           )}
@@ -390,15 +390,15 @@ const Proveedores = () => {
     };
 
     if (normalizedWanted.length === 0) {
-      ensureCard(t('common.suppliers.overview.defaults.serviceGroup'));
+      ensureCard(t('suppliers.overview.defaults.serviceGroup'));
     } else {
       normalizedWanted.forEach((entry) => {
-        ensureCard(entry.name || entry.id || t('common.suppliers.overview.defaults.serviceGroup'));
+        ensureCard(entry.name || entry.id || t('suppliers.overview.defaults.serviceGroup'));
       });
     }
 
     providersSource.forEach((prov) => {
-      const label = prov.service || t('common.suppliers.overview.defaults.otherService');
+      const label = prov.service || t('suppliers.overview.defaults.otherService');
       const card = ensureCard(label);
       card.providers.push(prov);
       if (!card.confirmed && isConfirmedStatus(prov.status)) {
@@ -407,7 +407,7 @@ const Proveedores = () => {
     });
 
     (shortlist || []).forEach((item) => {
-      const label = item.service || t('common.suppliers.overview.defaults.otherService');
+      const label = item.service || t('suppliers.overview.defaults.otherService');
       const card = ensureCard(label);
       card.shortlist.push(item);
     });
@@ -444,7 +444,7 @@ const Proveedores = () => {
       }
     }
 
-    return t('common.suppliers.overview.defaults.country');
+    return t('suppliers.overview.defaults.country');
   }, [t, weddingProfile]);
 
   const performSearch = useCallback(
@@ -455,7 +455,7 @@ const Proveedores = () => {
 
       if (!trimmed && !enrichedQuery) {
         if (!silent) {
-          toast.warn(t('common.suppliers.overview.toasts.missingQuery'));
+          toast.warn(t('suppliers.overview.toasts.missingQuery'));
         }
         return;
       }
@@ -497,10 +497,10 @@ const Proveedores = () => {
         setSearchBreakdown(result.breakdown);
 
         if (result.count === 0 && !silent) {
-          toast.info(t('common.suppliers.overview.toasts.noResults'));
+          toast.info(t('suppliers.overview.toasts.noResults'));
         } else if (result.count > 0) {
           toast.success(
-            t('common.suppliers.overview.toasts.success', {
+            t('suppliers.overview.toasts.success', {
               count: result.count,
               registered: result.breakdown?.registered || 0,
               cached: result.breakdown?.cached || 0,
@@ -512,7 +512,7 @@ const Proveedores = () => {
         console.error('[Proveedores] Hybrid search failed', err);
         setAiError(err);
         if (!silent) {
-          toast.error(t('common.suppliers.overview.toasts.error'));
+          toast.error(t('suppliers.overview.toasts.error'));
         }
       } finally {
         setAiLoading(false);
@@ -714,10 +714,10 @@ const Proveedores = () => {
           docPath: activeWedding ? `weddings/${activeWedding}` : undefined,
           showNotification: false,
         });
-        toast.success(t('common.suppliers.overview.toasts.wantedServicesSaved'));
+        toast.success(t('suppliers.overview.toasts.wantedServicesSaved'));
         setServicePanelView(null);
       } catch (err) {
-        toast.error(t('common.suppliers.overview.toasts.wantedServicesError'));
+        toast.error(t('suppliers.overview.toasts.wantedServicesError'));
       }
     },
     [activeWedding, t]
@@ -727,12 +727,12 @@ const Proveedores = () => {
     async (providerData) => {
       try {
         await addProvider(providerData);
-        toast.success(t('common.suppliers.overview.toasts.providerSaved'));
+        toast.success(t('suppliers.overview.toasts.providerSaved'));
         setShowNewProviderForm(false);
         setNewProviderInitial(null);
         loadProviders();
       } catch (err) {
-        toast.error(t('common.suppliers.overview.toasts.providerError'));
+        toast.error(t('suppliers.overview.toasts.providerError'));
       }
     },
     [addProvider, loadProviders, t]
@@ -747,7 +747,7 @@ const Proveedores = () => {
         }}
         className="flex items-center gap-1"
       >
-        <Plus size={16} /> {t('common.suppliers.overview.actions.newSupplier')}
+        <Plus size={16} /> {t('suppliers.overview.actions.newSupplier')}
       </Button>
     </div>
   );
@@ -771,9 +771,9 @@ const Proveedores = () => {
 
   const servicesSummary = useMemo(
     () => ({
-      services: t('common.suppliers.overview.services.count', { count: serviceCards.length }),
-      confirmed: t('common.suppliers.overview.services.confirmedCount', { count: confirmedCount }),
-      pending: t('common.suppliers.overview.services.pendingCount', { count: pendingCount }),
+      services: t('suppliers.overview.services.count', { count: serviceCards.length }),
+      confirmed: t('suppliers.overview.services.confirmedCount', { count: confirmedCount }),
+      pending: t('suppliers.overview.services.pendingCount', { count: pendingCount }),
     }),
     [confirmedCount, pendingCount, serviceCards.length, t]
   );
@@ -781,7 +781,7 @@ const Proveedores = () => {
   return (
     <>
       <PageWrapper
-        title={t('common.suppliers.overview.title')}
+        title={t('suppliers.overview.title')}
         actions={headerActions}
         className="layout-container space-y-6"
       >
@@ -871,17 +871,17 @@ const Proveedores = () => {
                           </div>
                           <div>
                             <h2 className="text-xl font-bold text-body">
-                              {t('common.suppliers.overview.exploration.title')}
+                              {t('suppliers.overview.exploration.title')}
                             </h2>
                             <p className="text-sm text-muted">
-                              {t('common.suppliers.overview.exploration.subtitle')}
+                              {t('suppliers.overview.exploration.subtitle')}
                             </p>
                           </div>
                         </div>
                         <Button
                           variant="ghost"
                           size="sm"
-                          aria-label={t('common.suppliers.overview.exploration.collapseAria')}
+                          aria-label={t('suppliers.overview.exploration.collapseAria')}
                           onClick={() => setSearchPanelCollapsed(true)}
                           className="h-8 w-8 justify-center hover:bg-[var(--color-primary)]/10"
                         >
@@ -908,7 +908,7 @@ const Proveedores = () => {
                             {/* Selector de modo de búsqueda (DEBUG) */}
                             <div className="flex items-center gap-2">
                               <label className="text-xs font-medium text-muted whitespace-nowrap">
-                                {t('common.suppliers.overview.searchMode.label')}
+                                {t('suppliers.overview.searchMode.label')}
                               </label>
                               <select
                                 value={searchMode}
@@ -916,13 +916,13 @@ const Proveedores = () => {
                                 className="px-3 py-1.5 text-sm border border-border rounded-md bg-surface text-body focus:outline-none focus:ring-2 focus:ring-primary"
                               >
                                 <option value="auto">
-                                  {t('common.suppliers.overview.searchMode.auto')}
+                                  {t('suppliers.overview.searchMode.auto')}
                                 </option>
                                 <option value="database">
-                                  {t('common.suppliers.overview.searchMode.database')}
+                                  {t('suppliers.overview.searchMode.database')}
                                 </option>
                                 <option value="internet">
-                                  {t('common.suppliers.overview.searchMode.internet')}
+                                  {t('suppliers.overview.searchMode.internet')}
                                 </option>
                               </select>
                             </div>
@@ -938,7 +938,7 @@ const Proveedores = () => {
                                   size="sm"
                                   onClick={handleClearSearch}
                                 >
-                                  {t('common.suppliers.overview.actions.clear')}
+                                  {t('suppliers.overview.actions.clear')}
                                 </Button>
                               )}
                             </div>
@@ -1002,7 +1002,7 @@ const Proveedores = () => {
                         {searchHistory.length > 0 && (
                           <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
                             <span className="font-medium text-body">
-                              {t('common.suppliers.overview.exploration.recentSearches')}
+                              {t('suppliers.overview.exploration.recentSearches')}
                             </span>
                             {searchHistory.map((query) => (
                               <button
@@ -1041,11 +1041,11 @@ const Proveedores = () => {
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="space-y-1">
                     <h3 className="text-lg font-semibold text-body">
-                      {t('common.suppliers.overview.results.title')}
+                      {t('suppliers.overview.results.title')}
                     </h3>
                     {searchResultsQuery && (
                       <p className="text-xs text-muted">
-                        {t('common.suppliers.overview.results.query', {
+                        {t('suppliers.overview.results.query', {
                           value: searchResultsQuery,
                         })}
                       </p>
@@ -1084,15 +1084,15 @@ const Proveedores = () => {
 
                 {aiLoading ? (
                   <Card className="border border-soft bg-surface text-sm text-muted">
-                    {t('common.suppliers.overview.results.loading')}
+                    {t('suppliers.overview.results.loading')}
                   </Card>
                 ) : aiError ? (
                   <Card className="border border-danger bg-danger-soft text-sm text-danger">
-                    {aiError?.message || t('common.suppliers.overview.toasts.error')}
+                    {aiError?.message || t('suppliers.overview.toasts.error')}
                   </Card>
                 ) : aiResults.length === 0 ? (
                   <Card className="border border-dashed border-soft bg-surface/80 text-sm text-muted">
-                    {t('common.suppliers.overview.results.empty')}
+                    {t('suppliers.overview.results.empty')}
                   </Card>
                 ) : (
                   <>
@@ -1113,20 +1113,20 @@ const Proveedores = () => {
                                   : 'bg-green-50 border-green-200 text-green-900'
                             }`}
                           >
-                            {t('common.suppliers.overview.searchMode.indicator', {
+                            {t('suppliers.overview.searchMode.indicator', {
                               mode:
                                 searchMode === 'database'
-                                  ? t('common.suppliers.overview.searchMode.database')
+                                  ? t('suppliers.overview.searchMode.database')
                                   : searchMode === 'internet'
-                                    ? t('common.suppliers.overview.searchMode.internet')
-                                    : t('common.suppliers.overview.searchMode.auto'),
+                                    ? t('suppliers.overview.searchMode.internet')
+                                    : t('suppliers.overview.searchMode.auto'),
                             })}
                           </div>
 
                           {/* Breakdown de resultados */}
                           <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
                             <p className="text-sm text-blue-900 font-medium">
-                              {t('common.suppliers.overview.breakdown.title', {
+                              {t('suppliers.overview.breakdown.title', {
                                 total:
                                   searchBreakdown.registered +
                                   searchBreakdown.cached +
@@ -1173,7 +1173,7 @@ const Proveedores = () => {
                           {t('app.previous')}
                         </Button>
                         <span className="text-xs text-muted">
-                          {t('common.suppliers.overview.pagination.label', {
+                          {t('suppliers.overview.pagination.label', {
                             current: searchResultsPage,
                             total: totalSearchPages,
                           })}
@@ -1202,10 +1202,10 @@ const Proveedores = () => {
               }}
               title={
                 searchDrawerResult?.name
-                  ? t('common.suppliers.overview.drawer.titleWithName', {
+                  ? t('suppliers.overview.drawer.titleWithName', {
                       name: searchDrawerResult.name,
                     })
-                  : t('common.suppliers.overview.drawer.title')
+                  : t('suppliers.overview.drawer.title')
               }
               size="lg"
             >
@@ -1214,10 +1214,10 @@ const Proveedores = () => {
                   <div className="h-48 w-full overflow-hidden rounded-lg">
                     <img
                       src={searchDrawerResult.image || DEFAULT_PROVIDER_IMAGE}
-                      alt={t('common.suppliers.overview.drawer.imageAlt', {
+                      alt={t('suppliers.overview.drawer.imageAlt', {
                         name:
                           searchDrawerResult.name ||
-                          t('common.suppliers.overview.drawer.fallbackName'),
+                          t('suppliers.overview.drawer.fallbackName'),
                       })}
                       className="h-full w-full object-cover"
                       onError={(event) => {
@@ -1229,18 +1229,18 @@ const Proveedores = () => {
                   <div className="space-y-2">
                     <p className="text-sm text-muted">
                       {searchDrawerResult.service ||
-                        t('common.suppliers.overview.drawer.serviceUnknown')}
+                        t('suppliers.overview.drawer.serviceUnknown')}
                     </p>
                     {searchDrawerResult.location && (
                       <p className="text-sm text-muted">
-                        {t('common.suppliers.overview.drawer.location', {
+                        {t('suppliers.overview.drawer.location', {
                           value: searchDrawerResult.location,
                         })}
                       </p>
                     )}
                     {searchDrawerResult.priceRange && (
                       <p className="text-sm text-muted">
-                        {t('common.suppliers.overview.drawer.priceRange', {
+                        {t('suppliers.overview.drawer.priceRange', {
                           value: searchDrawerResult.priceRange,
                         })}
                       </p>
@@ -1267,14 +1267,14 @@ const Proveedores = () => {
                   <div className="space-y-1 text-sm text-muted">
                     {searchDrawerResult.email && (
                       <p>
-                        {t('common.suppliers.overview.drawer.email', {
+                        {t('suppliers.overview.drawer.email', {
                           value: searchDrawerResult.email,
                         })}
                       </p>
                     )}
                     {searchDrawerResult.phone && (
                       <p>
-                        {t('common.suppliers.overview.drawer.phone', {
+                        {t('suppliers.overview.drawer.phone', {
                           value: searchDrawerResult.phone,
                         })}
                       </p>
@@ -1290,7 +1290,7 @@ const Proveedores = () => {
                           window.open(searchDrawerResult.link, '_blank', 'noopener,noreferrer')
                         }
                       >
-                        {t('common.suppliers.overview.drawer.openLink')}
+                        {t('suppliers.overview.drawer.openLink')}
                       </Button>
                     )}
                     <Button type="button" onClick={() => setSearchDrawerOpen(false)}>
@@ -1300,7 +1300,7 @@ const Proveedores = () => {
                 </div>
               ) : (
                 <Card className="border border-soft bg-surface text-sm text-muted">
-                  {t('common.suppliers.overview.drawer.empty')}
+                  {t('suppliers.overview.drawer.empty')}
                 </Card>
               )}
             </Modal>

@@ -86,7 +86,7 @@ export default function MomentosPublic() {
     const initialize = async () => {
       try {
         if (!tokenParam || !weddingId) {
-          throw new Error(t('common.public.moments.public.errors.incompleteLink'));
+          throw new Error(t('public.moments.public.errors.incompleteLink'));
         }
         await firebaseReady;
         const tokenData = await validateGuestToken(weddingId, tokenParam, { albumId: ALBUM_ID });
@@ -136,7 +136,7 @@ export default function MomentosPublic() {
       type: 'guest',
       uid: guestId,
       guestId,
-      displayName: guestName || t('common.public.moments.guest.uploadStates.guestFallback'),
+      displayName: guestName || t('public.moments.guest.uploadStates.guestFallback'),
       tokenId: tokenDoc?.id || null,
       source: 'guest-public',
     }),
@@ -163,7 +163,7 @@ export default function MomentosPublic() {
 
   const handleSceneSelect = (scene) => {
     if (uploadsClosed) {
-      toast.warn(t('common.public.moments.public.toasts.uploadsClosed'));
+      toast.warn(t('public.moments.public.toasts.uploadsClosed'));
       return;
     }
     setSelectedScene(scene);
@@ -177,11 +177,11 @@ export default function MomentosPublic() {
   const handleStart = (event) => {
     event?.preventDefault();
     if (!guestName.trim()) {
-      toast.warn(t('common.public.moments.public.toasts.missingName'));
+      toast.warn(t('public.moments.public.toasts.missingName'));
       return;
     }
     if (!acceptedTerms) {
-      toast.warn(t('common.public.moments.public.toasts.missingTerms'));
+      toast.warn(t('public.moments.public.toasts.missingTerms'));
       return;
     }
     persistGuestPrefs({ guestName: guestName.trim(), guestEmail, acceptedTerms: true });
@@ -198,7 +198,7 @@ export default function MomentosPublic() {
       },
       ...prev.slice(0, 4),
     ]);
-    toast.success(t('common.public.moments.public.toasts.success'));
+    toast.success(t('public.moments.public.toasts.success'));
   };
 
   const handleCloseOverlay = () => {
@@ -211,7 +211,7 @@ export default function MomentosPublic() {
       <div className="min-h-screen flex items-center justify-center bg-slate-900 text-white">
         <div className="text-center space-y-3">
           <div className="animate-spin h-10 w-10 border-2 border-slate-600 border-t-transparent rounded-full mx-auto" />
-          <p className="text-sm text-slate-400">{t('common.public.moments.public.loading')}</p>
+          <p className="text-sm text-slate-400">{t('public.moments.public.loading')}</p>
         </div>
       </div>
     );
@@ -222,10 +222,10 @@ export default function MomentosPublic() {
       <div className="min-h-screen flex items-center justify-center bg-slate-900 text-white px-6">
         <div className="bg-white/5 backdrop-blur border border-white/10 rounded-3xl px-6 py-8 max-w-md text-center space-y-3">
           <h1 className="text-xl font-semibold text-white">
-            {t('common.public.moments.public.errorTitle')}
+            {t('public.moments.public.errorTitle')}
           </h1>
           <p className="text-sm text-slate-300">
-            {t('common.public.moments.public.errorDescription')}
+            {t('public.moments.public.errorDescription')}
           </p>
         </div>
       </div>
@@ -235,36 +235,36 @@ export default function MomentosPublic() {
   const remainingDays = uploadState?.remainingDays ?? null;
   const cleanupDays = uploadState?.cleanupDaysRemaining ?? null;
   const albumTitle =
-    album?.settings?.publicTitle || t('common.public.moments.public.hero.titleFallback');
+    album?.settings?.publicTitle || t('public.moments.public.hero.titleFallback');
   const heroRemainingLabel =
     uploadState?.closesAt && uploadState.isWindowOpen && remainingDays !== null
       ? remainingDays === 0
-        ? t('common.public.moments.public.hero.remaining.lastDay')
-        : t('common.public.moments.public.hero.remaining.days', { count: remainingDays })
+        ? t('public.moments.public.hero.remaining.lastDay')
+        : t('public.moments.public.hero.remaining.days', { count: remainingDays })
       : null;
   const cleanupDurationLabel =
     cleanupDays === null || cleanupDays < 0
       ? null
       : cleanupDays === 0
-        ? t('common.public.moments.public.status.cleanupToday')
-        : t('common.public.moments.public.status.cleanupDays', { count: cleanupDays });
+        ? t('public.moments.public.status.cleanupToday')
+        : t('public.moments.public.status.cleanupDays', { count: cleanupDays });
 
   return (
     <div className="min-h-screen bg-slate-950 text-white flex flex-col">
       <header className="px-6 pt-10 pb-6 bg-gradient-to-b from-slate-900 to-slate-950">
         <p className="text-xs uppercase tracking-[0.2em] text-blue-300 font-semibold">
-          {t('common.public.moments.public.hero.badge')}
+          {t('public.moments.public.hero.badge')}
         </p>
         <h1 className="text-3xl font-bold mt-3">
           {albumTitle}
         </h1>
         <p className="text-sm text-slate-300 mt-3 max-w-sm">
-          {t('common.public.moments.public.hero.description')}
+          {t('public.moments.public.hero.description')}
         </p>
         {uploadState?.closesAt && uploadState.isWindowOpen && heroRemainingLabel && (
           <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-blue-500/10 border border-blue-400/40 px-4 py-2 text-xs font-medium text-blue-200">
             <Sparkles size={14} />
-            {t('common.public.moments.public.hero.deadline', {
+            {t('public.moments.public.hero.deadline', {
               date: formatDateLocal(uploadState.closesAt),
               remaining: heroRemainingLabel,
             })}
@@ -272,7 +272,7 @@ export default function MomentosPublic() {
         )}
         {uploadsClosed && (
           <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-amber-500/10 border border-amber-400/40 px-4 py-2 text-xs font-medium text-amber-200">
-            {t('common.public.moments.public.hero.closed')}
+            {t('public.moments.public.hero.closed')}
           </div>
         )}
       </header>
@@ -281,10 +281,10 @@ export default function MomentosPublic() {
         <div className="px-5 py-6 space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-slate-800">
-              {t('common.public.moments.public.list.title')}
+              {t('public.moments.public.list.title')}
             </h2>
             <span className="text-xs text-slate-400">
-              {t('common.public.moments.public.list.count', { count: scenes.length })}
+              {t('public.moments.public.list.count', { count: scenes.length })}
             </span>
           </div>
 
@@ -307,7 +307,7 @@ export default function MomentosPublic() {
                   <div>
                     <p className="font-semibold text-slate-900">{scene.label || scene.id}</p>
                     <p className="text-xs text-slate-500">
-                      {t('common.public.moments.public.list.cardDescription')}
+                      {t('public.moments.public.list.cardDescription')}
                     </p>
                   </div>
                 </div>
@@ -317,7 +317,7 @@ export default function MomentosPublic() {
 
             {!scenes.length && (
               <div className="rounded-2xl border border-dashed border-slate-200 px-4 py-6 text-center text-sm text-slate-500">
-                {t('common.public.moments.public.list.empty')}
+                {t('public.moments.public.list.empty')}
               </div>
             )}
           </div>
@@ -326,7 +326,7 @@ export default function MomentosPublic() {
             <section className="bg-slate-900 text-white rounded-2xl px-4 py-4">
               <div className="flex items-center gap-2 text-sm font-semibold">
                 <UploadCloud size={18} />
-                {t('common.public.moments.public.recent.title')}
+                {t('public.moments.public.recent.title')}
               </div>
               <div className="mt-3 space-y-2">
                 {recentUploads.map((item, index) => (
@@ -337,14 +337,14 @@ export default function MomentosPublic() {
                     <div className="min-w-0">
                       <p className="truncate font-medium">{item.name}</p>
                       <p className="text-[11px] text-slate-400">
-                        {t('common.public.moments.public.recent.item', {
+                        {t('public.moments.public.recent.item', {
                           scene: item.scene,
                           size: Math.round(item.size / 1024),
                         })}
                       </p>
                     </div>
                     <span className="text-[11px] text-green-300">
-                      {t('common.public.moments.public.uploadStates.statusReview')}
+                      {t('public.moments.public.uploadStates.statusReview')}
                     </span>
                   </div>
                 ))}
@@ -354,7 +354,7 @@ export default function MomentosPublic() {
 
           {cleanupDurationLabel && (
             <p className="text-xs text-slate-400 text-center">
-              {t('common.public.moments.public.status.cleanup', {
+              {t('public.moments.public.status.cleanup', {
                 duration: cleanupDurationLabel,
               })}
             </p>
@@ -368,7 +368,7 @@ export default function MomentosPublic() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs uppercase tracking-wide text-slate-400">
-                  {t('common.public.moments.public.overlay.selected')}
+                  {t('public.moments.public.overlay.selected')}
                 </p>
                 <h3 className="text-lg font-semibold text-slate-800">
                   {selectedScene.label || selectedScene.id}
@@ -378,7 +378,7 @@ export default function MomentosPublic() {
                 type="button"
                 onClick={handleCloseOverlay}
                 className="rounded-full border border-slate-200 p-2 text-slate-500 hover:text-slate-700 hover:border-slate-300"
-                aria-label={t('common.public.moments.public.overlay.close')}
+                aria-label={t('public.moments.public.overlay.close')}
               >
                 <X size={18} />
               </button>
@@ -388,13 +388,13 @@ export default function MomentosPublic() {
               <form onSubmit={handleStart} className="mt-4 space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-700">
-                    {t('common.public.moments.public.form.nameLabel')}
+                    {t('public.moments.public.form.nameLabel')}
                   </label>
                   <input
                     type="text"
                     value={guestName}
                     onChange={(event) => setGuestName(event.target.value)}
-                    placeholder={t('common.public.moments.public.form.namePlaceholder')}
+                    placeholder={t('public.moments.public.form.namePlaceholder')}
                     className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                   />
@@ -402,13 +402,13 @@ export default function MomentosPublic() {
 
                 <div>
                   <label className="block text-sm font-medium text-slate-700">
-                    {t('common.public.moments.public.form.emailLabel')}
+                    {t('public.moments.public.form.emailLabel')}
                   </label>
                   <input
                     type="email"
                     value={guestEmail}
                     onChange={(event) => setGuestEmail(event.target.value)}
-                    placeholder={t('common.public.moments.public.form.emailPlaceholder')}
+                    placeholder={t('public.moments.public.form.emailPlaceholder')}
                     className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -422,7 +422,7 @@ export default function MomentosPublic() {
                     required
                   />
                   <span>
-                    {t('common.public.moments.public.form.termsDescription')}
+                    {t('public.moments.public.form.termsDescription')}
                   </span>
                 </label>
 
@@ -430,7 +430,7 @@ export default function MomentosPublic() {
                   type="submit"
                   className="w-full rounded-xl bg-blue-600 py-3 text-sm font-semibold text-white shadow hover:bg-blue-700 transition"
                 >
-                  {t('common.public.moments.public.overlay.start')}
+                  {t('public.moments.public.overlay.start')}
                 </button>
               </form>
             ) : (
@@ -448,7 +448,7 @@ export default function MomentosPublic() {
                 />
                 {remainingUploads !== null && (
                   <p className="mt-3 text-xs text-slate-500 text-center">
-                    {t('common.public.moments.public.overlay.remainingUploads', {
+                    {t('public.moments.public.overlay.remainingUploads', {
                       count: remainingUploads,
                     })}
                   </p>

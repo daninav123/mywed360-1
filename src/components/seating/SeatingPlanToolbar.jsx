@@ -804,7 +804,7 @@ const SeatingPlanToolbar = ({
                     onClick={handleCloseSnaps}
                     className="px-2 py-1 text-sm rounded border hover:bg-gray-50"
                   >
-                    {t('common.cancel', { defaultValue: 'Cancelar' })}
+                    {t('cancel', { defaultValue: 'Cancelar' })}
                   </button>
                 </div>
               </form>

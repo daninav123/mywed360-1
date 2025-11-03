@@ -37,7 +37,7 @@ export default function PhotoLightbox({ photo, onClose, onUpdate, onDelete }) {
   const categoryLabel = useMemo(() => {
     const option = categoryOptions.find((cat) => cat.value === photo.category);
     if (option) return option.label;
-    return photo.category || t('common.suppliers.portfolio.lightbox.categories.unknown');
+    return photo.category || t('suppliers.portfolio.lightbox.categories.unknown');
   }, [categoryOptions, photo.category, t]);
 
   const uploadedAt = useMemo(() => {
@@ -80,15 +80,15 @@ export default function PhotoLightbox({ photo, onClose, onUpdate, onDelete }) {
 
       if (!response.ok) throw new Error('update_failed');
 
-      toast.success(t('common.suppliers.portfolio.lightbox.toasts.updated'));
+      toast.success(t('suppliers.portfolio.lightbox.toasts.updated'));
       setEditing(false);
       onUpdate?.();
     } catch (error) {
       console.error('[PhotoLightbox] update error', error);
       toast.error(
         error.message === 'update_failed'
-          ? t('common.suppliers.portfolio.lightbox.toasts.updateError')
-          : t('common.suppliers.portfolio.lightbox.toasts.genericError')
+          ? t('suppliers.portfolio.lightbox.toasts.updateError')
+          : t('suppliers.portfolio.lightbox.toasts.genericError')
       );
     } finally {
       setSaving(false);
@@ -115,8 +115,8 @@ export default function PhotoLightbox({ photo, onClose, onUpdate, onDelete }) {
           className="p-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors"
           title={
             editing
-              ? t('common.suppliers.portfolio.lightbox.tooltips.cancelEdit')
-              : t('common.suppliers.portfolio.lightbox.tooltips.editPhoto')
+              ? t('suppliers.portfolio.lightbox.tooltips.cancelEdit')
+              : t('suppliers.portfolio.lightbox.tooltips.editPhoto')
           }
         >
           <Edit className="h-5 w-5" />
@@ -124,7 +124,7 @@ export default function PhotoLightbox({ photo, onClose, onUpdate, onDelete }) {
         <button
           onClick={onDelete}
           className="p-2 bg-red-500/80 hover:bg-red-500 text-white rounded-lg transition-colors"
-          title={t('common.suppliers.portfolio.lightbox.tooltips.deletePhoto')}
+          title={t('suppliers.portfolio.lightbox.tooltips.deletePhoto')}
         >
           <Trash2 className="h-5 w-5" />
         </button>
@@ -142,7 +142,7 @@ export default function PhotoLightbox({ photo, onClose, onUpdate, onDelete }) {
           <div className="lg:col-span-2 flex items-center justify-center">
             <img
               src={photo.original}
-              alt={photo.title || t('common.suppliers.portfolio.lightbox.image.altFallback')}
+              alt={photo.title || t('suppliers.portfolio.lightbox.image.altFallback')}
               className="max-w-full max-h-[70vh] object-contain rounded-lg shadow-2xl"
             />
           </div>
@@ -162,7 +162,7 @@ export default function PhotoLightbox({ photo, onClose, onUpdate, onDelete }) {
                   <div className="flex items-center gap-1 text-primary">
                     <Star className="h-4 w-4 fill-current" />
                     <span className="text-xs">
-                      {t('common.suppliers.portfolio.lightbox.tags.featured')}
+                      {t('suppliers.portfolio.lightbox.tags.featured')}
                     </span>
                   </div>
                 )}
@@ -173,7 +173,7 @@ export default function PhotoLightbox({ photo, onClose, onUpdate, onDelete }) {
               <div className="space-y-4">
                 <div>
                   <h2 className="text-2xl font-bold text-foreground mb-2">
-                    {photo.title || t('common.suppliers.portfolio.lightbox.view.noTitle')}
+                    {photo.title || t('suppliers.portfolio.lightbox.view.noTitle')}
                   </h2>
                   {photo.description && (
                     <p className="text-body whitespace-pre-wrap">{photo.description}</p>
@@ -183,7 +183,7 @@ export default function PhotoLightbox({ photo, onClose, onUpdate, onDelete }) {
                 <div className="pt-4 border-t border-border">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-sm font-medium text-foreground">
-                      {t('common.suppliers.portfolio.lightbox.view.categoryLabel')}
+                      {t('suppliers.portfolio.lightbox.view.categoryLabel')}
                     </span>
                     <span className="px-2 py-1 bg-primary/10 text-primary rounded text-sm capitalize">
                       {categoryLabel}
@@ -193,7 +193,7 @@ export default function PhotoLightbox({ photo, onClose, onUpdate, onDelete }) {
                   {Array.isArray(photo.tags) && photo.tags.length > 0 && (
                     <div>
                       <span className="text-sm font-medium text-foreground block mb-2">
-                        {t('common.suppliers.portfolio.lightbox.view.tagsLabel')}
+                        {t('suppliers.portfolio.lightbox.view.tagsLabel')}
                       </span>
                       <div className="flex flex-wrap gap-2">
                         {photo.tags.map((tag) => (
@@ -211,7 +211,7 @@ export default function PhotoLightbox({ photo, onClose, onUpdate, onDelete }) {
 
                 {uploadedAt && (
                   <div className="text-xs text-muted">
-                    {t('common.suppliers.portfolio.lightbox.meta.uploadedAt', {
+                    {t('suppliers.portfolio.lightbox.meta.uploadedAt', {
                       value: uploadedAt,
                     })}
                   </div>
@@ -221,13 +221,13 @@ export default function PhotoLightbox({ photo, onClose, onUpdate, onDelete }) {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
-                    {t('common.suppliers.portfolio.lightbox.form.title.label')}
+                    {t('suppliers.portfolio.lightbox.form.title.label')}
                   </label>
                   <input
                     type="text"
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    placeholder={t('common.suppliers.portfolio.lightbox.form.title.placeholder')}
+                    placeholder={t('suppliers.portfolio.lightbox.form.title.placeholder')}
                     className="w-full px-4 py-2 border border-border rounded-lg bg-background text-body focus:outline-none focus:ring-2 focus:ring-primary"
                     disabled={saving}
                   />
@@ -235,7 +235,7 @@ export default function PhotoLightbox({ photo, onClose, onUpdate, onDelete }) {
 
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
-                    {t('common.suppliers.portfolio.lightbox.form.description.label')}
+                    {t('suppliers.portfolio.lightbox.form.description.label')}
                   </label>
                   <textarea
                     value={formData.description}
@@ -251,7 +251,7 @@ export default function PhotoLightbox({ photo, onClose, onUpdate, onDelete }) {
 
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
-                    {t('common.suppliers.portfolio.lightbox.form.category.label')}
+                    {t('suppliers.portfolio.lightbox.form.category.label')}
                   </label>
                   <select
                     value={formData.category}
@@ -269,13 +269,13 @@ export default function PhotoLightbox({ photo, onClose, onUpdate, onDelete }) {
 
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
-                    {t('common.suppliers.portfolio.lightbox.form.tags.label')}
+                    {t('suppliers.portfolio.lightbox.form.tags.label')}
                   </label>
                   <input
                     type="text"
                     value={formData.tags}
                     onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-                    placeholder={t('common.suppliers.portfolio.lightbox.form.tags.placeholder')}
+                    placeholder={t('suppliers.portfolio.lightbox.form.tags.placeholder')}
                     className="w-full px-4 py-2 border border-border rounded-lg bg-background text-body focus:outline-none focus:ring-2 focus:ring-primary"
                     disabled={saving}
                   />
@@ -291,7 +291,7 @@ export default function PhotoLightbox({ photo, onClose, onUpdate, onDelete }) {
                       disabled={saving}
                     />
                     <span className="text-sm text-body">
-                      {t('common.suppliers.portfolio.lightbox.form.featured')}
+                      {t('suppliers.portfolio.lightbox.form.featured')}
                     </span>
                   </label>
 
@@ -304,7 +304,7 @@ export default function PhotoLightbox({ photo, onClose, onUpdate, onDelete }) {
                       disabled={saving}
                     />
                     <span className="text-sm text-body">
-                      {t('common.suppliers.portfolio.lightbox.form.isCover')}
+                      {t('suppliers.portfolio.lightbox.form.isCover')}
                     </span>
                   </label>
                 </div>
@@ -323,7 +323,7 @@ export default function PhotoLightbox({ photo, onClose, onUpdate, onDelete }) {
                     disabled={saving}
                   >
                     {saving
-                      ? t('common.suppliers.portfolio.lightbox.form.save.loading')
+                      ? t('suppliers.portfolio.lightbox.form.save.loading')
                       : t('app.save')}
                   </button>
                 </div>

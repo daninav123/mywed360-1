@@ -76,7 +76,7 @@ export default function BanquetConfigModal({ open, onApply, onClose }) {
         </div>
         <div className="flex justify-end space-x-2 mt-4">
           <button onClick={onClose} className="px-3 py-1 bg-gray-200 rounded">
-            {t('common.cancel')}
+            {t('cancel')}
           </button>
           <button onClick={apply} className="px-3 py-1 bg-blue-600 text-white rounded">
             {t('seating.banquet.generate')}

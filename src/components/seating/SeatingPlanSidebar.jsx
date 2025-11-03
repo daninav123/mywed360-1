@@ -312,8 +312,8 @@ const SeatingPlanSidebar = ({
               className="text-sm text-blue-600 hover:underline"
             >
               {showConflicts
-                ? t('common.hide', { defaultValue: 'Ocultar' })
-                : t('common.view', { defaultValue: 'Ver' })}
+                ? t('hide', { defaultValue: 'Ocultar' })
+                : t('view', { defaultValue: 'Ver' })}
             </button>
           </div>
           {showConflicts && (
@@ -385,7 +385,7 @@ const SeatingPlanSidebar = ({
                     })
                   }
                 >
-                  {t('common.all', { defaultValue: 'Todos' })}
+                  {t('all', { defaultValue: 'Todos' })}
                 </button>
                 <button
                   className="text-blue-600 hover:underline"
@@ -398,7 +398,7 @@ const SeatingPlanSidebar = ({
                     })
                   }
                 >
-                  {t('common.none', { defaultValue: 'Ninguno' })}
+                  {t('none', { defaultValue: 'Ninguno' })}
                 </button>
               </div>
               {(conflicts || []).filter((c) => conflictFilters[c.type]).length === 0 ? (
@@ -460,8 +460,8 @@ const SeatingPlanSidebar = ({
               className="text-sm text-blue-600 hover:underline"
             >
               {showGuided
-                ? t('common.hide', { defaultValue: 'Ocultar' })
-                : t('common.view', { defaultValue: 'Ver' })}
+                ? t('hide', { defaultValue: 'Ocultar' })
+                : t('view', { defaultValue: 'Ver' })}
             </button>
           </div>
           {showGuided && (
@@ -608,7 +608,7 @@ const SeatingPlanSidebar = ({
                       {t('seating.sidebar.tableType', { defaultValue: 'Tipo de mesa' })}:
                     </span>
                     <span className="font-medium">
-                      {selectedTableType?.label || t('common.custom', { defaultValue: 'Personalizada' })}
+                      {selectedTableType?.label || t('custom', { defaultValue: 'Personalizada' })}
                     </span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
@@ -714,7 +714,7 @@ const SeatingPlanSidebar = ({
                   onClick={() => setShowAvailableGuests(!showAvailableGuests)}
                   className="w-full px-3 py-2 border border-gray-300 text-gray-700 rounded text-sm hover:bg-gray-50 transition-colors"
                 >
-                  {showAvailableGuests ? t('common.hide') : t('common.show')}{' '}
+                  {showAvailableGuests ? t('hide') : t('show')}{' '}
                   {t('seating.sidebar.guests')}
                 </button>
               )}
@@ -726,7 +726,7 @@ const SeatingPlanSidebar = ({
                   className="px-3 py-2 border border-gray-300 text-gray-700 rounded text-sm hover:bg-gray-50 transition-colors flex items-center justify-center gap-1"
                   title={t('seating.sidebar.duplicateTable')}
                 >
-                  <Copy className="h-4 w-4" /> {t('common.duplicate')}
+                  <Copy className="h-4 w-4" /> {t('duplicate')}
                 </button>
                 <button
                   onClick={() => {
@@ -735,7 +735,7 @@ const SeatingPlanSidebar = ({
                   className="px-3 py-2 border border-red-300 text-red-600 rounded text-sm hover:bg-red-50 transition-colors flex items-center justify-center gap-1"
                   title={t('seating.sidebar.deleteTable')}
                 >
-                  <Trash2 className="h-4 w-4" /> {t('common.delete')}
+                  <Trash2 className="h-4 w-4" /> {t('delete')}
                 </button>
                 <button
                   onClick={() => toggleTableLocked?.(selectedTable.id)}

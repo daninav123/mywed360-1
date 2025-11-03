@@ -31,7 +31,7 @@ const GuestFilters = React.memo(
     const statusOptions = [
       {
         value: '',
-        label: t('common.guests.filters.allStatuses', 'Todos los estados'),
+        label: t('guests.filters.allStatuses', 'Todos los estados'),
       },
       { value: 'pending', label: wedding?.guestStatus?.('pending') || 'Pendiente' },
       { value: 'confirmed', label: wedding?.guestStatus?.('confirmed') || 'Confirmado' },
@@ -69,7 +69,7 @@ const GuestFilters = React.memo(
       wh('UI – BulkInvite click', { guestCount });
       if (guestCount === 0) {
         toast.info(
-          t('common.guests.filters.noGuestsForBulk', 'No hay invitados para enviar invitaciones')
+          t('guests.filters.noGuestsForBulk', 'No hay invitados para enviar invitaciones')
         );
         return;
       }
@@ -84,7 +84,7 @@ const GuestFilters = React.memo(
             <div>
               <h2 className="text-xl font-semibold text-body">{t('guests.guestList')}</h2>
               <p className="text-sm text-muted mt-1">
-                {t('common.guests.filters.totalGuests', {
+                {t('guests.filters.totalGuests', {
                   count: guestCount,
                   defaultValue:
                     guestCount === 1 ? '1 invitado en total' : `${guestCount} invitados en total`,
@@ -150,7 +150,7 @@ const GuestFilters = React.memo(
             <div>
               <Input
                 type="text"
-                placeholder={t('common.guests.filters.tablePlaceholder', 'Filtrar por mesa...')}
+                placeholder={t('guests.filters.tablePlaceholder', 'Filtrar por mesa...')}
                 value={tableFilter}
                 onChange={handleTableChange}
                 disabled={isLoading}
@@ -169,7 +169,7 @@ const GuestFilters = React.memo(
                 'Enviar SAVE THE DATE por WhatsApp'
               )}
             >
-              {t('common.guests.filters.saveTheDate.label', 'Enviar SAVE THE DATE')}
+              {t('guests.filters.saveTheDate.label', 'Enviar SAVE THE DATE')}
             </Button>
 
             <Button
@@ -183,7 +183,7 @@ const GuestFilters = React.memo(
               )}
             >
               <MessageSquare size={16} className="mr-2" />
-              {t('common.guests.filters.bulkInvite.label', 'Invitaciones masivas (API)')}
+              {t('guests.filters.bulkInvite.label', 'Invitaciones masivas (API)')}
             </Button>
           </div>
         </div>

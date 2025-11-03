@@ -18,7 +18,7 @@ export default function SupplierRegistration() {
   const [successData, setSuccessData] = useState(null);
   const [errors, setErrors] = useState({});
   const defaultCountry = useMemo(
-    () => t('common.suppliers.publicRegistration.form.defaults.country'),
+    () => t('suppliers.publicRegistration.form.defaults.country'),
     [t]
   );
 
@@ -45,27 +45,27 @@ export default function SupplierRegistration() {
     () => [
       {
         value: 'Básico',
-        label: t('common.suppliers.publicRegistration.form.services.options.basic'),
+        label: t('suppliers.publicRegistration.form.services.options.basic'),
       },
       {
         value: 'Premium',
-        label: t('common.suppliers.publicRegistration.form.services.options.premium'),
+        label: t('suppliers.publicRegistration.form.services.options.premium'),
       },
       {
         value: 'Personalizado',
-        label: t('common.suppliers.publicRegistration.form.services.options.custom'),
+        label: t('suppliers.publicRegistration.form.services.options.custom'),
       },
       {
         value: 'Paquete completo',
-        label: t('common.suppliers.publicRegistration.form.services.options.fullPackage'),
+        label: t('suppliers.publicRegistration.form.services.options.fullPackage'),
       },
       {
         value: 'Por horas',
-        label: t('common.suppliers.publicRegistration.form.services.options.hourly'),
+        label: t('suppliers.publicRegistration.form.services.options.hourly'),
       },
       {
         value: 'Asesoramiento',
-        label: t('common.suppliers.publicRegistration.form.services.options.advisory'),
+        label: t('suppliers.publicRegistration.form.services.options.advisory'),
       },
     ],
     [t]
@@ -73,7 +73,7 @@ export default function SupplierRegistration() {
 
   const fallbackNextSteps = useMemo(
     () =>
-      t('common.suppliers.publicRegistration.success.defaultNextSteps', {
+      t('suppliers.publicRegistration.success.defaultNextSteps', {
         returnObjects: true,
       }) || [],
     [t]
@@ -81,9 +81,9 @@ export default function SupplierRegistration() {
 
   const currencyOptions = useMemo(
     () => [
-      { value: 'EUR', label: t('common.suppliers.publicRegistration.form.prices.currency.eur') },
-      { value: 'USD', label: t('common.suppliers.publicRegistration.form.prices.currency.usd') },
-      { value: 'GBP', label: t('common.suppliers.publicRegistration.form.prices.currency.gbp') },
+      { value: 'EUR', label: t('suppliers.publicRegistration.form.prices.currency.eur') },
+      { value: 'USD', label: t('suppliers.publicRegistration.form.prices.currency.usd') },
+      { value: 'GBP', label: t('suppliers.publicRegistration.form.prices.currency.gbp') },
     ],
     [t]
   );
@@ -121,35 +121,35 @@ export default function SupplierRegistration() {
     const newErrors = {};
 
     if (!formData.name || formData.name.length < 2) {
-      newErrors.name = t('common.suppliers.publicRegistration.validation.name');
+      newErrors.name = t('suppliers.publicRegistration.validation.name');
     }
 
     if (!formData.email || !formData.email.includes('@')) {
-      newErrors.email = t('common.suppliers.publicRegistration.validation.email');
+      newErrors.email = t('suppliers.publicRegistration.validation.email');
     }
 
     if (!formData.category) {
-      newErrors.category = t('common.suppliers.publicRegistration.validation.category');
+      newErrors.category = t('suppliers.publicRegistration.validation.category');
     }
 
     if (formData.services.length === 0) {
-      newErrors.services = t('common.suppliers.publicRegistration.validation.services');
+      newErrors.services = t('suppliers.publicRegistration.validation.services');
     }
 
     if (!formData.city) {
-      newErrors.city = t('common.suppliers.publicRegistration.validation.city');
+      newErrors.city = t('suppliers.publicRegistration.validation.city');
     }
 
     if (!formData.province) {
-      newErrors.province = t('common.suppliers.publicRegistration.validation.province');
+      newErrors.province = t('suppliers.publicRegistration.validation.province');
     }
 
     if (!formData.description || formData.description.length < 10) {
-      newErrors.description = t('common.suppliers.publicRegistration.validation.description');
+      newErrors.description = t('suppliers.publicRegistration.validation.description');
     }
 
     if (!formData.acceptedTerms) {
-      newErrors.acceptedTerms = t('common.suppliers.publicRegistration.validation.acceptedTerms');
+      newErrors.acceptedTerms = t('suppliers.publicRegistration.validation.acceptedTerms');
     }
 
     setErrors(newErrors);
@@ -201,7 +201,7 @@ export default function SupplierRegistration() {
 
       if (!response.ok) {
         if (data.error === 'email_exists') {
-          setErrors({ email: t('common.suppliers.publicRegistration.validation.emailExists') });
+          setErrors({ email: t('suppliers.publicRegistration.validation.emailExists') });
           window.scrollTo({ top: 0, behavior: 'smooth' });
         } else if (data.details) {
           const fieldErrors = {};
@@ -211,7 +211,7 @@ export default function SupplierRegistration() {
           setErrors(fieldErrors);
           window.scrollTo({ top: 0, behavior: 'smooth' });
         } else {
-          throw new Error(data.message || t('common.suppliers.publicRegistration.errors.submit'));
+          throw new Error(data.message || t('suppliers.publicRegistration.errors.submit'));
         }
         return;
       }
@@ -220,7 +220,7 @@ export default function SupplierRegistration() {
       setSuccessData(data);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (error) {
-      alert(t('common.suppliers.publicRegistration.alert.error', { message: error.message }));
+      alert(t('suppliers.publicRegistration.alert.error', { message: error.message }));
     } finally {
       setLoading(false);
     }
@@ -236,16 +236,16 @@ export default function SupplierRegistration() {
         <div className="max-w-2xl w-full bg-white border rounded-xl p-8 text-center">
           <div className="text-green-600 text-5xl mb-4">✓</div>
           <h1 className="text-3xl font-bold mb-4">
-            {t('common.suppliers.publicRegistration.success.title')}
+            {t('suppliers.publicRegistration.success.title')}
           </h1>
           <p className="text-gray-600 mb-6">
-            {t('common.suppliers.publicRegistration.success.description.prefix')}{' '}
+            {t('suppliers.publicRegistration.success.description.prefix')}{' '}
             <strong>{formData.email}</strong>{' '}
-            {t('common.suppliers.publicRegistration.success.description.suffix')}
+            {t('suppliers.publicRegistration.success.description.suffix')}
           </p>
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 text-left">
             <h3 className="font-semibold mb-2">
-              {t('common.suppliers.publicRegistration.success.nextSteps.title')}
+              {t('suppliers.publicRegistration.success.nextSteps.title')}
             </h3>
             <ol className="list-decimal list-inside space-y-1 text-sm">
               {steps.map((step, index) => (
@@ -258,7 +258,7 @@ export default function SupplierRegistration() {
           {successData?.setupPasswordUrl && import.meta.env.DEV && (
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6 text-left">
               <p className="text-sm font-semibold text-yellow-800 mb-2">
-                {t('common.suppliers.publicRegistration.dev.linkLabel')}
+                {t('suppliers.publicRegistration.dev.linkLabel')}
               </p>
               <a
                 href={successData.setupPasswordUrl}
@@ -274,13 +274,13 @@ export default function SupplierRegistration() {
               onClick={() => navigate('/supplier/login')}
               className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
             >
-              {t('common.suppliers.publicRegistration.success.buttons.goToLogin')}
+              {t('suppliers.publicRegistration.success.buttons.goToLogin')}
             </button>
             <button
               onClick={() => navigate('/')}
               className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50"
             >
-              {t('common.suppliers.publicRegistration.success.buttons.goHome')}
+              {t('suppliers.publicRegistration.success.buttons.goHome')}
             </button>
           </div>
         </div>
@@ -293,10 +293,10 @@ export default function SupplierRegistration() {
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            {t('common.suppliers.publicRegistration.form.header.title')}
+            {t('suppliers.publicRegistration.form.header.title')}
           </h1>
           <p className="text-lg text-gray-600">
-            {t('common.suppliers.publicRegistration.form.header.subtitle')}
+            {t('suppliers.publicRegistration.form.header.subtitle')}
           </p>
         </div>
 
@@ -305,13 +305,13 @@ export default function SupplierRegistration() {
             {/* Información básica */}
             <div>
               <h2 className="text-xl font-semibold mb-4">
-                {t('common.suppliers.publicRegistration.form.basicInfo.title')}
+                {t('suppliers.publicRegistration.form.basicInfo.title')}
               </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    {t('common.suppliers.publicRegistration.form.basicInfo.fields.name.label')}
+                    {t('suppliers.publicRegistration.form.basicInfo.fields.name.label')}
                   </label>
                   <input
                     type="text"
@@ -328,7 +328,7 @@ export default function SupplierRegistration() {
 
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    {t('common.suppliers.publicRegistration.form.basicInfo.fields.email.label')}
+                    {t('suppliers.publicRegistration.form.basicInfo.fields.email.label')}
                   </label>
                   <input
                     type="email"
@@ -345,7 +345,7 @@ export default function SupplierRegistration() {
 
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    {t('common.suppliers.publicRegistration.form.basicInfo.fields.phone.label')}
+                    {t('suppliers.publicRegistration.form.basicInfo.fields.phone.label')}
                   </label>
                   <input
                     type="tel"
@@ -361,7 +361,7 @@ export default function SupplierRegistration() {
 
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    {t('common.suppliers.publicRegistration.form.basicInfo.fields.website.label')}
+                    {t('suppliers.publicRegistration.form.basicInfo.fields.website.label')}
                   </label>
                   <input
                     type="url"
@@ -380,12 +380,12 @@ export default function SupplierRegistration() {
             {/* Categoría y servicios */}
             <div>
               <h2 className="text-xl font-semibold mb-4">
-                {t('common.suppliers.publicRegistration.form.services.title')}
+                {t('suppliers.publicRegistration.form.services.title')}
               </h2>
 
               <div className="mb-4">
                 <label className="block text-sm font-medium mb-1">
-                  {t('common.suppliers.publicRegistration.form.services.category.label')}
+                  {t('suppliers.publicRegistration.form.services.category.label')}
                 </label>
                 <select
                   name="category"
@@ -394,7 +394,7 @@ export default function SupplierRegistration() {
                   className={`w-full border rounded-md px-3 py-2 ${errors.category ? 'border-red-500' : ''}`}
                 >
                   <option value="">
-                    {t('common.suppliers.publicRegistration.form.services.category.placeholder')}
+                    {t('suppliers.publicRegistration.form.services.category.placeholder')}
                   </option>
                   {categories.map((cat) => (
                     <option key={cat.value} value={cat.value}>
@@ -407,7 +407,7 @@ export default function SupplierRegistration() {
 
               <div>
                 <label className="block text-sm font-medium mb-2">
-                  {t('common.suppliers.publicRegistration.form.services.optionsLabel')}
+                  {t('suppliers.publicRegistration.form.services.optionsLabel')}
                 </label>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                   {serviceOptions.map((option) => (
@@ -428,13 +428,13 @@ export default function SupplierRegistration() {
             {/* Ubicación */}
             <div>
               <h2 className="text-xl font-semibold mb-4">
-                {t('common.suppliers.publicRegistration.form.location.title')}
+                {t('suppliers.publicRegistration.form.location.title')}
               </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    {t('common.suppliers.publicRegistration.form.location.fields.city.label')}
+                    {t('suppliers.publicRegistration.form.location.fields.city.label')}
                   </label>
                   <input
                     type="text"
@@ -451,7 +451,7 @@ export default function SupplierRegistration() {
 
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    {t('common.suppliers.publicRegistration.form.location.fields.province.label')}
+                    {t('suppliers.publicRegistration.form.location.fields.province.label')}
                   </label>
                   <input
                     type="text"
@@ -470,7 +470,7 @@ export default function SupplierRegistration() {
 
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    {t('common.suppliers.publicRegistration.form.location.fields.country.label')}
+                    {t('suppliers.publicRegistration.form.location.fields.country.label')}
                   </label>
                   <input
                     type="text"
@@ -486,7 +486,7 @@ export default function SupplierRegistration() {
             {/* Descripción */}
             <div>
               <h2 className="text-xl font-semibold mb-4">
-                {t('common.suppliers.publicRegistration.form.description.title')}
+                {t('suppliers.publicRegistration.form.description.title')}
               </h2>
 
               <textarea
@@ -495,13 +495,13 @@ export default function SupplierRegistration() {
                 onChange={handleChange}
                 rows={5}
                 className={`w-full border rounded-md px-3 py-2 ${errors.description ? 'border-red-500' : ''}`}
-                placeholder={t('common.suppliers.publicRegistration.form.description.placeholder')}
+                placeholder={t('suppliers.publicRegistration.form.description.placeholder')}
               />
               {errors.description && (
                 <p className="text-red-600 text-sm mt-1">{errors.description}</p>
               )}
               <p className="text-sm text-gray-500 mt-1">
-                {t('common.suppliers.publicRegistration.form.description.counter', {
+                {t('suppliers.publicRegistration.form.description.counter', {
                   count: formData.description.length,
                 })}
               </p>
@@ -510,13 +510,13 @@ export default function SupplierRegistration() {
             {/* Precios */}
             <div>
               <h2 className="text-xl font-semibold mb-4">
-                {t('common.suppliers.publicRegistration.form.prices.title')}
+                {t('suppliers.publicRegistration.form.prices.title')}
               </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    {t('common.suppliers.publicRegistration.form.prices.min.label')}
+                    {t('suppliers.publicRegistration.form.prices.min.label')}
                   </label>
                   <input
                     type="number"
@@ -533,7 +533,7 @@ export default function SupplierRegistration() {
 
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    {t('common.suppliers.publicRegistration.form.prices.max.label')}
+                    {t('suppliers.publicRegistration.form.prices.max.label')}
                   </label>
                   <input
                     type="number"
@@ -550,7 +550,7 @@ export default function SupplierRegistration() {
 
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    {t('common.suppliers.publicRegistration.form.prices.currency.label')}
+                    {t('suppliers.publicRegistration.form.prices.currency.label')}
                   </label>
                   <select
                     name="currency"
@@ -579,15 +579,15 @@ export default function SupplierRegistration() {
                   className={`mt-1 ${errors.acceptedTerms ? 'border-red-500' : ''}`}
                 />
                 <span className="text-sm text-gray-700">
-                  {t('common.suppliers.publicRegistration.form.terms.prefix')}{' '}
+                  {t('suppliers.publicRegistration.form.terms.prefix')}{' '}
                   <a href="/terminos" className="text-indigo-600 hover:underline">
-                    {t('common.suppliers.publicRegistration.form.terms.termsLink')}
+                    {t('suppliers.publicRegistration.form.terms.termsLink')}
                   </a>{' '}
-                  {t('common.suppliers.publicRegistration.form.terms.connector')}{' '}
+                  {t('suppliers.publicRegistration.form.terms.connector')}{' '}
                   <a href="/privacidad" className="text-indigo-600 hover:underline">
-                    {t('common.suppliers.publicRegistration.form.terms.privacyLink')}
+                    {t('suppliers.publicRegistration.form.terms.privacyLink')}
                   </a>
-                  {t('common.suppliers.publicRegistration.form.terms.suffix')}
+                  {t('suppliers.publicRegistration.form.terms.suffix')}
                 </span>
               </label>
               {errors.acceptedTerms && (
@@ -602,7 +602,7 @@ export default function SupplierRegistration() {
                 onClick={() => navigate('/')}
                 className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50"
               >
-                {t('common.suppliers.publicRegistration.form.actions.cancel')}
+                {t('suppliers.publicRegistration.form.actions.cancel')}
               </button>
               <button
                 type="submit"
@@ -610,8 +610,8 @@ export default function SupplierRegistration() {
                 className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50"
               >
                 {loading
-                  ? t('common.suppliers.publicRegistration.form.actions.submitting')
-                  : t('common.suppliers.publicRegistration.form.actions.submit')}
+                  ? t('suppliers.publicRegistration.form.actions.submitting')
+                  : t('suppliers.publicRegistration.form.actions.submit')}
               </button>
             </div>
           </form>

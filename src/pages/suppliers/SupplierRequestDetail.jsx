@@ -35,11 +35,11 @@ export default function SupplierRequestDetail() {
 
   const defaults = useMemo(
     () => ({
-      coupleName: t('common.suppliers.requestDetail.defaults.coupleName'),
-      weddingDate: t('common.suppliers.requestDetail.defaults.weddingDate'),
-      location: t('common.suppliers.requestDetail.defaults.location'),
-      minPrice: t('common.suppliers.requestDetail.defaults.minPrice'),
-      maxPrice: t('common.suppliers.requestDetail.defaults.maxPrice'),
+      coupleName: t('suppliers.requestDetail.defaults.coupleName'),
+      weddingDate: t('suppliers.requestDetail.defaults.weddingDate'),
+      location: t('suppliers.requestDetail.defaults.location'),
+      minPrice: t('suppliers.requestDetail.defaults.minPrice'),
+      maxPrice: t('suppliers.requestDetail.defaults.maxPrice'),
     }),
     [t]
   );
@@ -48,23 +48,23 @@ export default function SupplierRequestDetail() {
     () => [
       {
         id: 'standard',
-        name: t('common.suppliers.requestDetail.templates.standard.name'),
-        message: t('common.suppliers.requestDetail.templates.standard.body'),
+        name: t('suppliers.requestDetail.templates.standard.name'),
+        message: t('suppliers.requestDetail.templates.standard.body'),
       },
       {
         id: 'availability',
-        name: t('common.suppliers.requestDetail.templates.availability.name'),
-        message: t('common.suppliers.requestDetail.templates.availability.body'),
+        name: t('suppliers.requestDetail.templates.availability.name'),
+        message: t('suppliers.requestDetail.templates.availability.body'),
       },
       {
         id: 'detailed',
-        name: t('common.suppliers.requestDetail.templates.detailed.name'),
-        message: t('common.suppliers.requestDetail.templates.detailed.body'),
+        name: t('suppliers.requestDetail.templates.detailed.name'),
+        message: t('suppliers.requestDetail.templates.detailed.body'),
       },
       {
         id: 'more_info',
-        name: t('common.suppliers.requestDetail.templates.moreInfo.name'),
-        message: t('common.suppliers.requestDetail.templates.moreInfo.body'),
+        name: t('suppliers.requestDetail.templates.moreInfo.name'),
+        message: t('suppliers.requestDetail.templates.moreInfo.body'),
       },
     ],
     [t]
@@ -72,18 +72,18 @@ export default function SupplierRequestDetail() {
 
   const tips = useMemo(
     () => [
-      t('common.suppliers.requestDetail.tips.respondFast'),
-      t('common.suppliers.requestDetail.tips.personalize'),
-      t('common.suppliers.requestDetail.tips.scheduleCall'),
+      t('suppliers.requestDetail.tips.respondFast'),
+      t('suppliers.requestDetail.tips.personalize'),
+      t('suppliers.requestDetail.tips.scheduleCall'),
     ],
     [t]
   );
 
   const statusLabels = useMemo(
     () => ({
-      new: t('common.suppliers.requestDetail.status.new'),
-      viewed: t('common.suppliers.requestDetail.status.viewed'),
-      responded: t('common.suppliers.requestDetail.status.responded'),
+      new: t('suppliers.requestDetail.status.new'),
+      viewed: t('suppliers.requestDetail.status.viewed'),
+      responded: t('suppliers.requestDetail.status.responded'),
     }),
     [t]
   );
@@ -123,7 +123,7 @@ export default function SupplierRequestDetail() {
           navigate('/supplier/login');
           return;
         }
-        throw new Error(t('common.suppliers.requestDetail.errors.load'));
+        throw new Error(t('suppliers.requestDetail.errors.load'));
       }
 
       const data = await response.json();
@@ -134,7 +134,7 @@ export default function SupplierRequestDetail() {
       }
     } catch (err) {
       console.error('[SupplierRequestDetail] load error:', err);
-      setError(err.message || t('common.suppliers.requestDetail.errors.load'));
+      setError(err.message || t('suppliers.requestDetail.errors.load'));
     } finally {
       setLoading(false);
     }
@@ -148,7 +148,7 @@ export default function SupplierRequestDetail() {
     }
 
     if (!requestId) {
-      setError(t('common.suppliers.requestDetail.errors.notFound'));
+      setError(t('suppliers.requestDetail.errors.notFound'));
       setLoading(false);
       return;
     }
@@ -201,14 +201,14 @@ export default function SupplierRequestDetail() {
       });
 
       if (!response.ok) {
-        throw new Error(t('common.suppliers.requestDetail.errors.send'));
+        throw new Error(t('suppliers.requestDetail.errors.send'));
       }
 
-      window.alert(t('common.suppliers.requestDetail.alerts.sent'));
+      window.alert(t('suppliers.requestDetail.alerts.sent'));
       navigate(`/supplier/dashboard/${id}`);
     } catch (err) {
       console.error('[SupplierRequestDetail] submit error:', err);
-      window.alert(t('common.suppliers.requestDetail.alerts.error', { message: err.message }));
+      window.alert(t('suppliers.requestDetail.alerts.error', { message: err.message }));
     } finally {
       setResponding(false);
     }
@@ -226,7 +226,7 @@ export default function SupplierRequestDetail() {
             style={{ borderColor: 'var(--color-primary)' }}
           />
           <p className="mt-4" style={{ color: 'var(--color-muted)' }}>
-            {t('common.suppliers.requestDetail.loading')}
+            {t('suppliers.requestDetail.loading')}
           </p>
         </div>
       </div>
@@ -244,10 +244,10 @@ export default function SupplierRequestDetail() {
           style={{ backgroundColor: 'var(--color-surface)' }}
         >
           <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--color-danger)' }}>
-            {t('common.suppliers.requestDetail.errors.title')}
+            {t('suppliers.requestDetail.errors.title')}
           </h2>
           <p className="mb-4" style={{ color: 'var(--color-muted)' }}>
-            {error || t('common.suppliers.requestDetail.errors.notFound')}
+            {error || t('suppliers.requestDetail.errors.notFound')}
           </p>
           <button
             type="button"
@@ -255,7 +255,7 @@ export default function SupplierRequestDetail() {
             className="w-full px-4 py-2 text-white rounded-lg"
             style={{ backgroundColor: 'var(--color-primary)' }}
           >
-            {t('common.suppliers.requestDetail.navigation.back')}
+            {t('suppliers.requestDetail.navigation.back')}
           </button>
         </div>
       </div>
@@ -275,7 +275,7 @@ export default function SupplierRequestDetail() {
 
   const budgetRange =
     request.budget &&
-    t('common.suppliers.requestDetail.labels.budgetRange', {
+    t('suppliers.requestDetail.labels.budgetRange', {
       min: formatNumber(request.budget.min),
       max: formatNumber(request.budget.max),
       currency: request.budget.currency,
@@ -283,7 +283,7 @@ export default function SupplierRequestDetail() {
 
   const quotedRange =
     request.response?.quotedPrice &&
-    t('common.suppliers.requestDetail.labels.quotedRange', {
+    t('suppliers.requestDetail.labels.quotedRange', {
       min: formatNumber(request.response.quotedPrice.min),
       max: formatNumber(request.response.quotedPrice.max),
       currency: request.response.quotedPrice.currency,
@@ -299,7 +299,7 @@ export default function SupplierRequestDetail() {
           style={{ color: 'var(--color-muted)' }}
         >
           <ArrowLeft size={20} />
-          {t('common.suppliers.requestDetail.navigation.back')}
+          {t('suppliers.requestDetail.navigation.back')}
         </button>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -338,7 +338,7 @@ export default function SupplierRequestDetail() {
                 {receivedAt && (
                   <div className="text-right text-sm" style={{ color: 'var(--color-muted)' }}>
                     <Clock size={16} className="inline mr-1" />
-                    {t('common.suppliers.requestDetail.meta.receivedAt', { value: receivedAt })}
+                    {t('suppliers.requestDetail.meta.receivedAt', { value: receivedAt })}
                   </div>
                 )}
               </div>
@@ -351,7 +351,7 @@ export default function SupplierRequestDetail() {
                   <Calendar size={24} style={{ color: 'var(--color-primary)' }} />
                   <div>
                     <p className="text-sm" style={{ color: 'var(--color-muted)' }}>
-                      {t('common.suppliers.requestDetail.labels.weddingDate')}
+                      {t('suppliers.requestDetail.labels.weddingDate')}
                     </p>
                     <p className="font-semibold" style={{ color: 'var(--color-text)' }}>
                       {weddingDate}
@@ -366,7 +366,7 @@ export default function SupplierRequestDetail() {
                   <MapPin size={24} style={{ color: 'var(--color-primary)' }} />
                   <div>
                     <p className="text-sm" style={{ color: 'var(--color-muted)' }}>
-                      {t('common.suppliers.requestDetail.labels.location')}
+                      {t('suppliers.requestDetail.labels.location')}
                     </p>
                     <p className="font-semibold" style={{ color: 'var(--color-text)' }}>
                       {request.location?.city || defaults.location}
@@ -382,7 +382,7 @@ export default function SupplierRequestDetail() {
                     <Users size={24} style={{ color: 'var(--color-primary)' }} />
                     <div>
                       <p className="text-sm" style={{ color: 'var(--color-muted)' }}>
-                        {t('common.suppliers.requestDetail.labels.guests')}
+                        {t('suppliers.requestDetail.labels.guests')}
                       </p>
                       <p className="font-semibold" style={{ color: 'var(--color-text)' }}>
                         {formatNumber(request.guestCount)}
@@ -399,7 +399,7 @@ export default function SupplierRequestDetail() {
                     <Euro size={24} style={{ color: 'var(--color-primary)' }} />
                     <div>
                       <p className="text-sm" style={{ color: 'var(--color-muted)' }}>
-                        {t('common.suppliers.requestDetail.labels.budget')}
+                        {t('suppliers.requestDetail.labels.budget')}
                       </p>
                       <p className="font-semibold" style={{ color: 'var(--color-text)' }}>
                         {budgetRange}
@@ -416,7 +416,7 @@ export default function SupplierRequestDetail() {
                     style={{ color: 'var(--color-text)' }}
                   >
                     <MessageSquare size={20} />
-                    {t('common.suppliers.requestDetail.labels.messageFromCouple')}
+                    {t('suppliers.requestDetail.labels.messageFromCouple')}
                   </h3>
                   <p
                     className="whitespace-pre-wrap p-4 rounded-lg"
@@ -434,7 +434,7 @@ export default function SupplierRequestDetail() {
                     style={{ color: 'var(--color-text)' }}
                   >
                     <CheckCircle size={20} style={{ color: 'var(--color-success)' }} />
-                    {t('common.suppliers.requestDetail.labels.responseSent')}
+                    {t('suppliers.requestDetail.labels.responseSent')}
                   </h3>
                   <div
                     className="border rounded-lg p-4"
@@ -448,13 +448,13 @@ export default function SupplierRequestDetail() {
                     </p>
                     {quotedRange && (
                       <div className="text-sm" style={{ color: 'var(--color-muted)' }}>
-                        <strong>{t('common.suppliers.requestDetail.labels.quotedPrice')}</strong>{' '}
+                        <strong>{t('suppliers.requestDetail.labels.quotedPrice')}</strong>{' '}
                         {quotedRange}
                       </div>
                     )}
                     {respondedAt && (
                       <div className="text-xs mt-2" style={{ color: 'var(--color-muted)' }}>
-                        {t('common.suppliers.requestDetail.labels.sentAt', { value: respondedAt })}
+                        {t('suppliers.requestDetail.labels.sentAt', { value: respondedAt })}
                       </div>
                     )}
                   </div>
@@ -468,7 +468,7 @@ export default function SupplierRequestDetail() {
                 style={{ backgroundColor: 'var(--color-surface)' }}
               >
                 <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--color-text)' }}>
-                  {t('common.suppliers.requestDetail.response.title')}
+                  {t('suppliers.requestDetail.response.title')}
                 </h2>
 
                 <form onSubmit={handleSubmitResponse} className="space-y-6">
@@ -477,7 +477,7 @@ export default function SupplierRequestDetail() {
                       className="block text-sm font-medium mb-3"
                       style={{ color: 'var(--color-text)' }}
                     >
-                      {t('common.suppliers.requestDetail.labels.templateOptional')}
+                      {t('suppliers.requestDetail.labels.templateOptional')}
                     </label>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       {templates.map((template) => (
@@ -513,7 +513,7 @@ export default function SupplierRequestDetail() {
                       className="block text-sm font-medium mb-2"
                       style={{ color: 'var(--color-text)' }}
                     >
-                      {t('common.suppliers.requestDetail.labels.messageRequired')}
+                      {t('suppliers.requestDetail.labels.messageRequired')}
                     </label>
                     <textarea
                       value={responseData.message}
@@ -526,7 +526,7 @@ export default function SupplierRequestDetail() {
                         borderColor: 'var(--color-border)',
                         '--tw-ring-color': 'var(--color-primary)',
                       }}
-                      placeholder={t('common.suppliers.requestDetail.placeholders.message')}
+                      placeholder={t('suppliers.requestDetail.placeholders.message')}
                       required
                     />
                     <p className="text-sm mt-1" style={{ color: 'var(--color-muted)' }}>
@@ -539,7 +539,7 @@ export default function SupplierRequestDetail() {
                       className="block text-sm font-medium mb-3"
                       style={{ color: 'var(--color-text)' }}
                     >
-                      {t('common.suppliers.requestDetail.labels.quotedOptional')}
+                      {t('suppliers.requestDetail.labels.quotedOptional')}
                     </label>
                     <div className="grid grid-cols-3 gap-4">
                       <div>
@@ -547,7 +547,7 @@ export default function SupplierRequestDetail() {
                           className="block text-xs mb-1"
                           style={{ color: 'var(--color-muted)' }}
                         >
-                          {t('common.suppliers.requestDetail.labels.rangeFrom')}
+                          {t('suppliers.requestDetail.labels.rangeFrom')}
                         </label>
                         <input
                           type="number"
@@ -560,7 +560,7 @@ export default function SupplierRequestDetail() {
                           }
                           className="w-full px-3 py-2 border rounded-lg"
                           style={{ borderColor: 'var(--color-border)' }}
-                          placeholder={t('common.suppliers.requestDetail.placeholders.minAmount')}
+                          placeholder={t('suppliers.requestDetail.placeholders.minAmount')}
                           min="0"
                         />
                       </div>
@@ -569,7 +569,7 @@ export default function SupplierRequestDetail() {
                           className="block text-xs mb-1"
                           style={{ color: 'var(--color-muted)' }}
                         >
-                          {t('common.suppliers.requestDetail.labels.rangeTo')}
+                          {t('suppliers.requestDetail.labels.rangeTo')}
                         </label>
                         <input
                           type="number"
@@ -582,7 +582,7 @@ export default function SupplierRequestDetail() {
                           }
                           className="w-full px-3 py-2 border rounded-lg"
                           style={{ borderColor: 'var(--color-border)' }}
-                          placeholder={t('common.suppliers.requestDetail.placeholders.maxAmount')}
+                          placeholder={t('suppliers.requestDetail.placeholders.maxAmount')}
                           min="0"
                         />
                       </div>
@@ -591,7 +591,7 @@ export default function SupplierRequestDetail() {
                           className="block text-xs mb-1"
                           style={{ color: 'var(--color-muted)' }}
                         >
-                          {t('common.suppliers.requestDetail.labels.rangeCurrency')}
+                          {t('suppliers.requestDetail.labels.rangeCurrency')}
                         </label>
                         <select
                           value={responseData.quotedPrice.currency}
@@ -624,8 +624,8 @@ export default function SupplierRequestDetail() {
                     >
                       <Send size={20} />
                       {responding
-                        ? t('common.suppliers.requestDetail.response.submitting')
-                        : t('common.suppliers.requestDetail.response.submit')}
+                        ? t('suppliers.requestDetail.response.submitting')
+                        : t('suppliers.requestDetail.response.submit')}
                     </button>
                   </div>
                 </form>
@@ -639,7 +639,7 @@ export default function SupplierRequestDetail() {
               style={{ backgroundColor: 'var(--color-surface)' }}
             >
               <h3 className="font-semibold mb-4" style={{ color: 'var(--color-text)' }}>
-                {t('common.suppliers.requestDetail.labels.contactInfo')}
+                {t('suppliers.requestDetail.labels.contactInfo')}
               </h3>
 
               <div className="space-y-4">
@@ -648,7 +648,7 @@ export default function SupplierRequestDetail() {
                     <Mail size={20} className="mt-0.5" style={{ color: 'var(--color-primary)' }} />
                     <div>
                       <p className="text-sm" style={{ color: 'var(--color-muted)' }}>
-                        {t('common.suppliers.requestDetail.labels.email')}
+                        {t('suppliers.requestDetail.labels.email')}
                       </p>
                       <a
                         href={`mailto:${request.contactEmail}`}
@@ -666,7 +666,7 @@ export default function SupplierRequestDetail() {
                     <Phone size={20} className="mt-0.5" style={{ color: 'var(--color-primary)' }} />
                     <div>
                       <p className="text-sm" style={{ color: 'var(--color-muted)' }}>
-                        {t('common.suppliers.requestDetail.labels.phone')}
+                        {t('suppliers.requestDetail.labels.phone')}
                       </p>
                       <a
                         href={`tel:${request.contactPhone}`}
@@ -686,7 +686,7 @@ export default function SupplierRequestDetail() {
               style={{ backgroundColor: 'var(--color-primary)' }}
             >
               <h4 className="font-semibold mb-3">
-                {t('common.suppliers.requestDetail.tips.title')}
+                {t('suppliers.requestDetail.tips.title')}
               </h4>
               <ul className="space-y-2 text-sm">
                 {tips.map((tip) => (

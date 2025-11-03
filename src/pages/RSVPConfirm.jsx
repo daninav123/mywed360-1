@@ -19,14 +19,14 @@ function RSVPConfirm() {
     const fetchGuest = async () => {
       try {
         const res = await apiGet(`/api/rsvp/by-token/${token}`);
-        if (!res.ok) throw new Error(t('common.public.rsvp.errors.fetchNotFound'));
+        if (!res.ok) throw new Error(t('public.rsvp.errors.fetchNotFound'));
         const data = await res.json();
         setGuest(data);
         setStatus(data.status === 'rejected' ? 'rejected' : 'accepted');
         setCompanions(data.companions || 0);
         setAllergens(data.allergens || '');
       } catch (err) {
-        toast.error(err?.message || t('common.public.rsvp.toasts.fetchError'));
+        toast.error(err?.message || t('public.rsvp.toasts.fetchError'));
       } finally {
         setLoading(false);
       }
@@ -42,37 +42,37 @@ function RSVPConfirm() {
         companions: Number(companions),
         allergens,
       });
-      if (!res.ok) throw new Error(t('common.public.rsvp.errors.submit'));
-      toast.success(t('common.public.rsvp.toasts.submitSuccess'));
+      if (!res.ok) throw new Error(t('public.rsvp.errors.submit'));
+      toast.success(t('public.rsvp.toasts.submitSuccess'));
       setSubmitted(true);
     } catch (err) {
-      toast.error(err?.message || t('common.public.rsvp.toasts.submitError'));
+      toast.error(err?.message || t('public.rsvp.toasts.submitError'));
     }
   };
 
-  if (loading) return <div className="p-6 text-center">{t('common.public.rsvp.loading')}</div>;
-  if (!guest) return <div className="p-6 text-center">{t('common.public.rsvp.notFound')}</div>;
+  if (loading) return <div className="p-6 text-center">{t('public.rsvp.loading')}</div>;
+  if (!guest) return <div className="p-6 text-center">{t('public.rsvp.notFound')}</div>;
 
   if (submitted) {
     return (
       <div className="p-6 text-center max-w-md mx-auto">
         <h1 className="text-2xl font-bold mb-4">
-          {t('common.public.rsvp.thanksTitle', { name: guest.name })}
+          {t('public.rsvp.thanksTitle', { name: guest.name })}
         </h1>
-        <p>{t('common.public.rsvp.thanksDescription')}</p>
+        <p>{t('public.rsvp.thanksDescription')}</p>
       </div>
     );
   }
 
   return (
     <div className="p-6 max-w-md mx-auto">
-      <h1 className="text-2xl font-bold mb-6">{t('common.public.rsvp.title')}</h1>
+      <h1 className="text-2xl font-bold mb-6">{t('public.rsvp.title')}</h1>
       <p className="mb-4">
-        {t('common.public.rsvp.greeting', { name: guest.name })}
+        {t('public.rsvp.greeting', { name: guest.name })}
       </p>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="font-medium mr-4">{t('common.public.rsvp.question')}</label>
+          <label className="font-medium mr-4">{t('public.rsvp.question')}</label>
           <label className="mr-4">
             <input
               type="radio"
@@ -80,7 +80,7 @@ function RSVPConfirm() {
               checked={status === 'accepted'}
               onChange={() => setStatus('accepted')}
             />{' '}
-            {t('common.public.rsvp.statusOptions.accepted')}
+            {t('public.rsvp.statusOptions.accepted')}
           </label>
           <label>
             <input
@@ -89,12 +89,12 @@ function RSVPConfirm() {
               checked={status === 'rejected'}
               onChange={() => setStatus('rejected')}
             />{' '}
-            {t('common.public.rsvp.statusOptions.rejected')}
+            {t('public.rsvp.statusOptions.rejected')}
           </label>
         </div>
         <div>
           <label className="font-medium block mb-1">
-            {t('common.public.rsvp.companionsLabel')}
+            {t('public.rsvp.companionsLabel')}
           </label>
           <input
             type="number"
@@ -106,21 +106,21 @@ function RSVPConfirm() {
         </div>
         <div>
           <label className="font-medium block mb-1">
-            {t('common.public.rsvp.allergensLabel')}
+            {t('public.rsvp.allergensLabel')}
           </label>
           <textarea
             value={allergens}
             onChange={(e) => setAllergens(e.target.value)}
             className="border rounded px-2 py-1 w-full"
             rows={3}
-            placeholder={t('common.public.rsvp.messagePlaceholder')}
+            placeholder={t('public.rsvp.messagePlaceholder')}
           />
         </div>
         <button
           type="submit"
           className="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded"
         >
-          {t('common.public.rsvp.submit')}
+          {t('public.rsvp.submit')}
         </button>
       </form>
     </div>

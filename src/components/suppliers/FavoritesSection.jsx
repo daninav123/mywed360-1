@@ -58,13 +58,13 @@ const FavoritesSection = () => {
   }, [favorites, selectedCategory, searchQuery]);
 
   const handleRemove = async (favoriteId) => {
-    if (!window.confirm(t('common.suppliers.favorites.confirmRemove'))) return;
+    if (!window.confirm(t('suppliers.favorites.confirmRemove'))) return;
 
     try {
       await removeFavorite(favoriteId);
-      toast.success(t('common.suppliers.favorites.toasts.removed'));
+      toast.success(t('suppliers.favorites.toasts.removed'));
     } catch (error) {
-      toast.error(t('common.suppliers.favorites.toasts.removeError'));
+      toast.error(t('suppliers.favorites.toasts.removeError'));
       console.error(error);
     }
   };
@@ -75,7 +75,7 @@ const FavoritesSection = () => {
   };
 
   const handleExport = () => {
-    toast.info(t('common.suppliers.favorites.toasts.exportSoon'));
+    toast.info(t('suppliers.favorites.toasts.exportSoon'));
     // TODO: Implement PDF export
   };
 
@@ -84,7 +84,7 @@ const FavoritesSection = () => {
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4" />
-          <p className="text-muted">{t('common.suppliers.favorites.loading')}</p>
+          <p className="text-muted">{t('suppliers.favorites.loading')}</p>
         </div>
       </div>
     );
@@ -95,12 +95,12 @@ const FavoritesSection = () => {
       <Card className="text-center py-16">
         <Heart className="h-16 w-16 text-muted mx-auto mb-4" />
         <h3 className="text-xl font-semibold text-foreground mb-2">
-          {t('common.suppliers.favorites.empty.title')}
+          {t('suppliers.favorites.empty.title')}
         </h3>
-        <p className="text-muted mb-6">{t('common.suppliers.favorites.empty.description')}</p>
+        <p className="text-muted mb-6">{t('suppliers.favorites.empty.description')}</p>
         <p className="text-sm text-muted">
-          {t('common.suppliers.favorites.empty.hintPrefix')} <Heart className="inline h-4 w-4" />{' '}
-          {t('common.suppliers.favorites.empty.hintSuffix')}
+          {t('suppliers.favorites.empty.hintPrefix')} <Heart className="inline h-4 w-4" />{' '}
+          {t('suppliers.favorites.empty.hintSuffix')}
         </p>
       </Card>
     );
@@ -114,7 +114,7 @@ const FavoritesSection = () => {
             <div className="flex items-center gap-3 mb-2">
               <Heart className="h-6 w-6 text-primary fill-current" />
               <h2 className="text-2xl font-bold text-foreground">
-                {t('common.suppliers.favorites.title')}
+                {t('suppliers.favorites.title')}
               </h2>
             </div>
             <p className="text-muted">
@@ -132,7 +132,7 @@ const FavoritesSection = () => {
               onClick={handleExport}
               leftIcon={<Download className="h-4 w-4" />}
             >
-              {t('common.suppliers.favorites.actions.export')}
+              {t('suppliers.favorites.actions.export')}
             </Button>
           </div>
         </div>
@@ -145,7 +145,7 @@ const FavoritesSection = () => {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted" />
               <Input
                 type="search"
-                placeholder={t('common.suppliers.favorites.searchPlaceholder')}
+                placeholder={t('suppliers.favorites.searchPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
@@ -159,7 +159,7 @@ const FavoritesSection = () => {
                 onChange={(e) => setSelectedCategory(e.target.value)}
                 className="px-4 py-2 border border-border rounded-lg bg-surface text-body focus:outline-none focus:ring-2 focus:ring-primary"
               >
-                <option value="all">{t('common.suppliers.favorites.filters.allCategories')}</option>
+                <option value="all">{t('suppliers.favorites.filters.allCategories')}</option>
                 {categories.map((cat) => (
                   <option key={cat} value={cat} className="capitalize">
                     {cat}
@@ -184,7 +184,7 @@ const FavoritesSection = () => {
                 }}
                 className="text-primary hover:underline"
               >
-                {t('common.suppliers.favorites.filters.clear')}
+                {t('suppliers.favorites.filters.clear')}
               </button>
             </div>
           )}
@@ -194,7 +194,7 @@ const FavoritesSection = () => {
       {filteredFavorites.length === 0 ? (
         <Card className="text-center py-12">
           <Search className="h-12 w-12 text-muted mx-auto mb-4" />
-          <p className="text-muted">{t('common.suppliers.favorites.filters.empty')}</p>
+          <p className="text-muted">{t('suppliers.favorites.filters.empty')}</p>
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -210,7 +210,7 @@ const FavoritesSection = () => {
                   type="button"
                   onClick={() => handleRemove(favorite.id)}
                   className="p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors shadow-lg"
-                  title={t('common.suppliers.favorites.actions.removeTooltip')}
+                  title={t('suppliers.favorites.actions.removeTooltip')}
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
@@ -222,7 +222,7 @@ const FavoritesSection = () => {
                     setShowQuoteModal(true);
                   }}
                   className="p-2 bg-primary text-white rounded-full hover:bg-primary/90 transition-colors shadow-lg"
-                  title={t('common.suppliers.detail.actions.requestQuote')}
+                  title={t('suppliers.detail.actions.requestQuote')}
                 >
                   <Send className="h-4 w-4" />
                 </button>
@@ -231,7 +231,7 @@ const FavoritesSection = () => {
               {favorite.notes && (
                 <div className="mt-2 p-3 bg-surface rounded-lg border border-border">
                   <p className="text-sm text-muted">
-                    <strong>{t('common.suppliers.favorites.notesLabel')}</strong> {favorite.notes}
+                    <strong>{t('suppliers.favorites.notesLabel')}</strong> {favorite.notes}
                   </p>
                 </div>
               )}
@@ -239,7 +239,7 @@ const FavoritesSection = () => {
               {favorite.addedAt && (
                 <div className="mt-1">
                   <p className="text-xs text-muted text-right">
-                    {t('common.suppliers.favorites.addedAt', {
+                    {t('suppliers.favorites.addedAt', {
                       value: format.dateShort(new Date(favorite.addedAt)),
                     })}
                   </p>
@@ -280,7 +280,7 @@ const FavoritesSection = () => {
           open={showQuoteModal}
           onClose={() => setShowQuoteModal(false)}
           onSuccess={() => {
-            toast.success(t('common.suppliers.requestQuoteModal.toasts.success'));
+            toast.success(t('suppliers.requestQuoteModal.toasts.success'));
           }}
         />
       )}

@@ -45,12 +45,12 @@ export default function BulkStatusModal({ open, onClose, onApply }) {
     <Modal
       open={open}
       onClose={handleClose}
-      title={t('common.suppliers.bulkStatusModal.title')}
+      title={t('suppliers.bulkStatusModal.title')}
     >
       <div className="space-y-4">
         <div>
           <label className="block text-sm font-medium mb-1">
-            {t('common.suppliers.bulkStatusModal.label')}
+            {t('suppliers.bulkStatusModal.label')}
           </label>
           <select
             className="border rounded p-2 w-full"
@@ -66,12 +66,12 @@ export default function BulkStatusModal({ open, onClose, onApply }) {
         </div>
         <div className="flex justify-end gap-2">
           <Button variant="outline" onClick={handleClose}>
-            {t('common.suppliers.bulkStatusModal.cancel')}
+            {t('suppliers.bulkStatusModal.cancel')}
           </Button>
           <Button onClick={apply} disabled={loading}>
             {loading
-              ? t('common.suppliers.bulkStatusModal.applying')
-              : t('common.suppliers.bulkStatusModal.apply')}
+              ? t('suppliers.bulkStatusModal.applying')
+              : t('suppliers.bulkStatusModal.apply')}
           </Button>
         </div>
       </div>

@@ -9,7 +9,7 @@ const WebTemplateGallery = ({ templates, selectedTemplate, onSelect }) => {
   return (
     <div className="bg-white rounded-lg shadow p-6 mb-8">
       <h2 className="text-xl font-semibold mb-4">
-        {t('common.websiteGenerator.gallery.title', 'Selecciona un estilo para tu web')}
+        {t('websiteGenerator.gallery.title', 'Selecciona un estilo para tu web')}
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

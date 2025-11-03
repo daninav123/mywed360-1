@@ -17,7 +17,7 @@ export default function FavoriteButton({ supplier, size = 'md', showLabel = fals
     e.stopPropagation();
 
     if (!currentUser) {
-      alert(t('common.suppliers.favorites.errors.loginRequired'));
+      alert(t('suppliers.favorites.errors.loginRequired'));
       return;
     }
 
@@ -31,8 +31,8 @@ export default function FavoriteButton({ supplier, size = 'md', showLabel = fals
     } catch (error) {
       console.error('Error toggling favorite:', error);
       const fallbackMessage = favorite
-        ? t('common.suppliers.favorites.errors.removeFailed')
-        : t('common.suppliers.favorites.errors.saveFailed');
+        ? t('suppliers.favorites.errors.removeFailed')
+        : t('suppliers.favorites.errors.saveFailed');
       alert(error?.message || fallbackMessage);
     } finally {
       setLoading(false);
@@ -72,8 +72,8 @@ export default function FavoriteButton({ supplier, size = 'md', showLabel = fals
       `}
       title={
         favorite
-          ? t('common.suppliers.card.hybrid.favorite.remove', 'Quitar de favoritos')
-          : t('common.suppliers.card.hybrid.favorite.add', 'Añadir a favoritos')
+          ? t('suppliers.card.hybrid.favorite.remove', 'Quitar de favoritos')
+          : t('suppliers.card.hybrid.favorite.add', 'Añadir a favoritos')
       }
     >
       <Heart
@@ -84,8 +84,8 @@ export default function FavoriteButton({ supplier, size = 'md', showLabel = fals
       {showLabel && (
         <span className="text-sm font-medium">
           {favorite
-            ? t('common.suppliers.favorites.button.saved', 'Guardado')
-            : t('common.suppliers.favorites.button.save', 'Guardar')}
+            ? t('suppliers.favorites.button.saved', 'Guardado')
+            : t('suppliers.favorites.button.save', 'Guardar')}
         </span>
       )}
     </button>

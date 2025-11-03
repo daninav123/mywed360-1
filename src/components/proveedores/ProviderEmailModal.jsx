@@ -128,11 +128,11 @@ const ProviderEmailModal = ({ open, onClose, provider, onSent }) => {
       <Card className="w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
         <div className="flex itemás-center justify-between border-b p-4">
           <h2 className="text-xl font-semibold">
-            {t('common.suppliers.providerEmailModal.title')}
+            {t('suppliers.providerEmailModal.title')}
           </h2>
           <button
             onClick={onClose}
-            aria-label={t('common.suppliers.providerEmailModal.closeAria')}
+            aria-label={t('suppliers.providerEmailModal.closeAria')}
             className="text-gray-500 hover:text-gray-700"
           >
             <X size={20} />
@@ -148,17 +148,17 @@ const ProviderEmailModal = ({ open, onClose, provider, onSent }) => {
 
           <div className="mb-2">
             <p className="text-sm text-gray-600">
-              {t('common.suppliers.providerEmailModal.fields.fromLabel')}{' '}
+              {t('suppliers.providerEmailModal.fields.fromLabel')}{' '}
               <span className="font-medium">
-                {userEmail || t('common.suppliers.providerEmailModal.fields.unknownEmail')}
+                {userEmail || t('suppliers.providerEmailModal.fields.unknownEmail')}
               </span>
             </p>
             <p className="text-sm text-gray-600">
-              {t('common.suppliers.providerEmailModal.fields.toLabel')}{' '}
+              {t('suppliers.providerEmailModal.fields.toLabel')}{' '}
               <span className="font-medium">{provider?.email || '—'}</span>{' '}
               {!validEmail && (
                 <span className="text-xs text-red-600 ml-2">
-                  {t('common.suppliers.providerEmailModal.fields.missingEmail')}
+                  {t('suppliers.providerEmailModal.fields.missingEmail')}
                 </span>
               )}
             </p>
@@ -167,7 +167,7 @@ const ProviderEmailModal = ({ open, onClose, provider, onSent }) => {
           {templates.length > 0 && (
             <div className="mb-3">
               <label className="text-sm text-gray-700 mr-2">
-                {t('common.suppliers.providerEmailModal.templates.label')}
+                {t('suppliers.providerEmailModal.templates.label')}
               </label>
               <select
                 value={selectedTemplateIndex}
@@ -175,12 +175,12 @@ const ProviderEmailModal = ({ open, onClose, provider, onSent }) => {
                 className="text-sm border border-gray-300 rounded-md py-1 px-2"
               >
                 <option value="">
-                  {t('common.suppliers.providerEmailModal.templates.defaultOption')}
+                  {t('suppliers.providerEmailModal.templates.defaultOption')}
                 </option>
                 {templates.map((t, i) => (
                   <option key={i} value={i}>
                     {t.name ||
-                      t('common.suppliers.providerEmailModal.templates.fallback', {
+                      t('suppliers.providerEmailModal.templates.fallback', {
                         index: i + 1,
                       })}
                   </option>
@@ -191,31 +191,31 @@ const ProviderEmailModal = ({ open, onClose, provider, onSent }) => {
 
           <div className="mb-3">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              {t('common.suppliers.providerEmailModal.fields.subjectLabel')}
+              {t('suppliers.providerEmailModal.fields.subjectLabel')}
             </label>
             <input
               type="text"
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
               className="w-full p-2 border border-gray-300 rounded-md"
-              placeholder={t('common.suppliers.providerEmailModal.fields.subjectPlaceholder')}
+              placeholder={t('suppliers.providerEmailModal.fields.subjectPlaceholder')}
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              {t('common.suppliers.providerEmailModal.fields.messageLabel')}
+              {t('suppliers.providerEmailModal.fields.messageLabel')}
             </label>
             <textarea
               value={body}
               onChange={(e) => setBody(e.target.value)}
               className="w-full p-2 border border-gray-300 rounded-md min-h-[180px]"
-              placeholder={t('common.suppliers.providerEmailModal.fields.messagePlaceholder')}
+              placeholder={t('suppliers.providerEmailModal.fields.messagePlaceholder')}
             />
           </div>
           <div className="mt-4">
             <div className="flex itemás-center justify-between mb-2">
               <h3 className="text-sm font-medium text-gray-700">
-                {t('common.suppliers.providerEmailModal.preview.title')}
+                {t('suppliers.providerEmailModal.preview.title')}
               </h3>
               <label className="text-xs text-gray-600 flex itemás-center gap-2">
                 <input
@@ -223,16 +223,16 @@ const ProviderEmailModal = ({ open, onClose, provider, onSent }) => {
                   checked={showPreview}
                   onChange={(e) => setShowPreview(e.target.checked)}
                 />
-                {t('common.suppliers.providerEmailModal.preview.toggle')}
+                {t('suppliers.providerEmailModal.preview.toggle')}
               </label>
             </div>
             {showPreview && (
               <Card className="p-3 border border-gray-200 bg-white">
                 <div className="text-sm text-gray-800 mb-2">
                   <span className="font-semibold">
-                    {t('common.suppliers.providerEmailModal.preview.subjectPrefix')}
+                    {t('suppliers.providerEmailModal.preview.subjectPrefix')}
                   </span>{' '}
-                  {subject || t('common.suppliers.providerEmailModal.preview.emptySubject')}
+                  {subject || t('suppliers.providerEmailModal.preview.emptySubject')}
                 </div>
                 <div
                   className="prose prose-sm max-w-none"
@@ -244,15 +244,15 @@ const ProviderEmailModal = ({ open, onClose, provider, onSent }) => {
         </div>
         <div className="border-t p-4 flex justify-end gap-2 bg-gray-50">
           <Button variant="outline" onClick={resetDefaults} disabled={loading || !provider}>
-            {t('common.suppliers.providerEmailModal.buttons.restore')}
+            {t('suppliers.providerEmailModal.buttons.restore')}
           </Button>
           <Button variant="outline" onClick={onClose} disabled={loading}>
-            {t('common.suppliers.providerEmailModal.buttons.cancel')}
+            {t('suppliers.providerEmailModal.buttons.cancel')}
           </Button>
           <Button onClick={handleSend} disabled={loading || !validEmail}>
             {loading
-              ? t('common.suppliers.providerEmailModal.buttons.sending')
-              : t('common.suppliers.providerEmailModal.buttons.send')}
+              ? t('suppliers.providerEmailModal.buttons.sending')
+              : t('suppliers.providerEmailModal.buttons.send')}
           </Button>
         </div>
       </Card>

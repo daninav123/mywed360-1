@@ -71,7 +71,7 @@ const STATUS_STYLES = {
 
 const EmailTrackingList = ({ trackingItems = [], onViewDetails, onFilter, currentFilter }) => {
   const { t, format } = useTranslations();
-  const notAvailable = t('common.suppliers.tracking.shared.notAvailable');
+  const notAvailable = t('suppliers.tracking.shared.notAvailable');
 
   const getStatusInfo = (status) => {
     const key =
@@ -128,7 +128,7 @@ const EmailTrackingList = ({ trackingItems = [], onViewDetails, onFilter, curren
 
       {filteredItems.length === 0 ? (
         <div className="text-center py-8 text-gray-500">
-          {t('common.suppliers.tracking.list.empty')}
+          {t('suppliers.tracking.list.empty')}
         </div>
       ) : (
         <div className="space-y-3">
@@ -145,7 +145,7 @@ const EmailTrackingList = ({ trackingItems = [], onViewDetails, onFilter, curren
                   <div className="flex items-center justify-between mb-1">
                     <h3 className="font-medium text-gray-900 truncate">
                       {item.providerName ||
-                        t('common.suppliers.tracking.list.placeholders.provider')}
+                        t('suppliers.tracking.list.placeholders.provider')}
                     </h3>
                     <span
                       className={`text-xs ${statusInfo.color} ${statusInfo.bg} flex items-center gap-1 px-2 py-1 rounded-full`}
@@ -156,18 +156,18 @@ const EmailTrackingList = ({ trackingItems = [], onViewDetails, onFilter, curren
 
                     <p className="text-sm font-medium text-gray-700 mb-1 truncate">
                   {item.subject ||
-                    t('common.suppliers.tracking.list.placeholders.subject')}
+                    t('suppliers.tracking.list.placeholders.subject')}
                     </p>
 
                     <div className="flex flex-wrap items-center gap-x-4 text-xs text-gray-500">
                       <span>
-                        {t('common.suppliers.tracking.list.sentAt', {
+                        {t('suppliers.tracking.list.sentAt', {
                           value: formatDateTime(sentAt) || notAvailable,
                         })}
                       </span>
                       {updatedAt && updatedAt !== sentAt && (
                         <span>
-                          {t('common.suppliers.tracking.list.updatedAt', {
+                          {t('suppliers.tracking.list.updatedAt', {
                             value: formatDateTime(updatedAt) || notAvailable,
                           })}
                         </span>
@@ -176,7 +176,7 @@ const EmailTrackingList = ({ trackingItems = [], onViewDetails, onFilter, curren
                       {item.openCount > 0 && (
                         <span className="text-green-600 flex items-center">
                           <Eye size={12} className="mr-1" />
-                          {t('common.suppliers.tracking.list.openCount', {
+                          {t('suppliers.tracking.list.openCount', {
                             count: item.openCount,
                           })}
                         </span>
@@ -185,7 +185,7 @@ const EmailTrackingList = ({ trackingItems = [], onViewDetails, onFilter, curren
                   </div>
 
                   <Button size="sm" variant="ghost" onClick={() => onViewDetails(item)}>
-                    {t('common.suppliers.tracking.list.details')}
+                    {t('suppliers.tracking.list.details')}
                   </Button>
                 </div>
               </Card>

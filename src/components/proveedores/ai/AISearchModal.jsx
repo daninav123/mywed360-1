@@ -29,7 +29,7 @@ export default function AISearchModal({
   );
   const suggestions = useMemo(
     () =>
-      t('common.suppliers.aiSearchModal.suggestions', {
+      t('suppliers.aiSearchModal.suggestions', {
         returnObjects: true,
       }) || [],
     [t]
@@ -81,12 +81,12 @@ export default function AISearchModal({
         <div className="flex justify-between items-center p-4 border-b">
           <h2 className="text-xl font-semibold flex items-center">
             <Sparkles size={20} className="mr-2 text-blue-500" />
-            {t('common.suppliers.aiSearchModal.title')}
+            {t('suppliers.aiSearchModal.title')}
           </h2>
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700"
-            aria-label={t('common.suppliers.aiSearchModal.closeAria')}
+            aria-label={t('suppliers.aiSearchModal.closeAria')}
           >
             <X size={24} />
           </button>
@@ -100,7 +100,7 @@ export default function AISearchModal({
                 type="text"
                 value={query}
                 onChange={handleQueryChange}
-                placeholder={t('common.suppliers.aiSearchModal.inputPlaceholder')}
+                placeholder={t('suppliers.aiSearchModal.inputPlaceholder')}
                 className="w-full p-3 pl-10 pr-24 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500"
                 autoFocus
                 data-testid="ai-search-input"
@@ -114,12 +114,12 @@ export default function AISearchModal({
                 data-testid="ai-search-button"
               >
                 {isLoading
-                  ? t('common.suppliers.aiSearchModal.searching')
-                  : t('common.suppliers.aiSearchModal.search')}
+                  ? t('suppliers.aiSearchModal.searching')
+                  : t('suppliers.aiSearchModal.search')}
               </Button>
             </div>
             <p className="mt-2 text-sm text-gray-500">
-              {t('common.suppliers.aiSearchModal.example')}
+              {t('suppliers.aiSearchModal.example')}
             </p>
           </form>
 
@@ -127,7 +127,7 @@ export default function AISearchModal({
           <div className="grid grid-cols-1 md:grid-cols-1 gap-3">
             <div>
               <label className="block text-xs text-gray-500 mb-1">
-                {t('common.suppliers.aiSearchModal.filters.service')}
+                {t('suppliers.aiSearchModal.filters.service')}
               </label>
               <select
                 className="w-full p-2 border rounded"
@@ -135,7 +135,7 @@ export default function AISearchModal({
                 onChange={(e) => setServiceFilter?.(e.target.value)}
               >
                 <option value="">
-                  {t('common.suppliers.aiSearchModal.filters.all')}
+                  {t('suppliers.aiSearchModal.filters.all')}
                 </option>
                 {uniqueServices.map((s) => (
                   <option key={s} value={s}>
@@ -153,7 +153,7 @@ export default function AISearchModal({
           <div className="w-64 p-4 border-r overflow-y-auto">
             <div>
               <h3 className="text-sm font-semibold text-gray-700 mb-2">
-                {t('common.suppliers.aiSearchModal.suggestionsTitle')}
+                {t('suppliers.aiSearchModal.suggestionsTitle')}
               </h3>
               <ul className="space-y-1">
                 {suggestions.map((s, i) => (
@@ -179,10 +179,10 @@ export default function AISearchModal({
         {/* Footer */}
         <div className="border-t p-4 bg-gray-50 flex justify-between items-center">
           <div className="text-sm text-gray-500">
-            {t('common.suppliers.aiSearchModal.footer.powered')}
+            {t('suppliers.aiSearchModal.footer.powered')}
           </div>
           <Button variant="outline" onClick={onClose}>
-            {t('common.suppliers.aiSearchModal.footer.close')}
+            {t('suppliers.aiSearchModal.footer.close')}
           </Button>
         </div>
       </div>

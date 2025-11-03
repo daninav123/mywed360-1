@@ -115,11 +115,11 @@ const BlogAuthor = () => {
 
   const pageTitle = author
     ? `${author.name} | Equipo editorial Lovenda`
-    : t('common.blog.author.pageTitle', { defaultValue: 'Autor del blog' });
+    : t('blog.author.pageTitle', { defaultValue: 'Autor del blog' });
   const metaDescription =
     author?.bio ||
     author?.signature ||
-    t('common.blog.lead', {
+    t('blog.lead', {
       defaultValue:
         'Descubre tendencias, guías y consejos para organizar tu boda con la ayuda del equipo Lovenda.',
     });
@@ -158,7 +158,7 @@ const BlogAuthor = () => {
         title={
           author
             ? author.name
-            : t('common.blog.author.pageTitle', { defaultValue: 'Autor del blog' })
+            : t('blog.author.pageTitle', { defaultValue: 'Autor del blog' })
         }
         className="max-w-5xl mx-auto"
       >
@@ -167,7 +167,7 @@ const BlogAuthor = () => {
             to="/blog"
             className="text-sm text-[var(--color-primary,#6366f1)] hover:text-[var(--color-primary-dark,#4f46e5)]"
           >
-            ← {t('common.blog.author.backToBlog', { defaultValue: 'Volver al blog' })}
+            ← {t('blog.author.backToBlog', { defaultValue: 'Volver al blog' })}
           </Link>
         </div>
 
@@ -195,7 +195,7 @@ const BlogAuthor = () => {
               <div className="flex-1 space-y-2">
                 <div>
                   <p className="text-sm uppercase tracking-widest text-[var(--color-primary,#6366f1)]">
-                    {t('common.blog.author.badge', { defaultValue: 'Equipo editorial Lovenda' })}
+                    {t('blog.author.badge', { defaultValue: 'Equipo editorial Lovenda' })}
                   </p>
                   <h1 className="text-2xl font-semibold text-gray-900">{author.name}</h1>
                   {author.title ? (
@@ -227,13 +227,13 @@ const BlogAuthor = () => {
             <section className="mt-10 space-y-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-gray-900">
-                  {t('common.blog.author.latestArticles', { defaultValue: 'Artículos recientes' })}
+                  {t('blog.author.latestArticles', { defaultValue: 'Artículos recientes' })}
                 </h2>
                 <span className="text-sm text-gray-500">
                   {posts.length}{' '}
                   {posts.length === 1
-                    ? t('common.blog.author.article', { defaultValue: 'artículo' })
-                    : t('common.blog.author.articles', { defaultValue: 'artículos' })}
+                    ? t('blog.author.article', { defaultValue: 'artículo' })
+                    : t('blog.author.articles', { defaultValue: 'artículos' })}
                 </span>
               </div>
 
@@ -260,7 +260,7 @@ const BlogAuthor = () => {
             {otherAuthors.length ? (
               <section className="mt-12 rounded-2xl border border-soft bg-white p-6 shadow-sm">
                 <h3 className="text-base font-semibold text-gray-900">
-                  {t('common.blog.author.discoverOthers', {
+                  {t('blog.author.discoverOthers', {
                     defaultValue: 'Descubre otros autores',
                   })}
                 </h3>

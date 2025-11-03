@@ -129,16 +129,16 @@ export default function GroupSuggestions({
     <Modal
       open={open}
       onClose={onClose}
-      title={t('common.suppliers.groupSuggestions.title')}
+      title={t('suppliers.groupSuggestions.title')}
     >
       <div className="space-y-5">
         <div>
           <h4 className="font-semibold mb-2">
-            {t('common.suppliers.groupSuggestions.overlaps.heading')}
+            {t('suppliers.groupSuggestions.overlaps.heading')}
           </h4>
           {overlaps.length === 0 ? (
             <p className="text-sm text-gray-600">
-              {t('common.suppliers.groupSuggestions.overlaps.empty')}
+              {t('suppliers.groupSuggestions.overlaps.empty')}
             </p>
           ) : (
             <ul className="list-disc ml-5 space-y-1">
@@ -153,7 +153,7 @@ export default function GroupSuggestions({
                 return (
                   <li key={word} className="text-sm">
                     <mark className="px-1 py-0.5 bg-yellow-200 rounded">{word}</mark>{' '}
-                    {t('common.suppliers.groupSuggestions.overlaps.item', {
+                    {t('suppliers.groupSuggestions.overlaps.item', {
                       suppliers: suppliersLabel,
                     })}
                   </li>
@@ -165,11 +165,11 @@ export default function GroupSuggestions({
 
         <div>
           <h4 className="font-semibold mb-2">
-            {t('common.suppliers.groupSuggestions.splits.heading')}
+            {t('suppliers.groupSuggestions.splits.heading')}
           </h4>
           {splits.length === 0 ? (
             <p className="text-sm text-gray-600">
-              {t('common.suppliers.groupSuggestions.splits.empty')}
+              {t('suppliers.groupSuggestions.splits.empty')}
             </p>
           ) : (
             <ul className="list-disc ml-5 space-y-1">
@@ -178,7 +178,7 @@ export default function GroupSuggestions({
                 const partsLabel = sug.parts.join(' + ');
                 return (
                   <li key={idx} className="text-sm">
-                    {t('common.suppliers.groupSuggestions.splits.item', {
+                    {t('suppliers.groupSuggestions.splits.item', {
                       supplier: supplierName,
                       parts: partsLabel,
                     })}
@@ -191,11 +191,11 @@ export default function GroupSuggestions({
 
         <div>
           <h4 className="font-semibold mb-2">
-            {t('common.suppliers.groupSuggestions.outliers.heading')}
+            {t('suppliers.groupSuggestions.outliers.heading')}
           </h4>
           {outliers.length === 0 ? (
             <p className="text-sm text-gray-600">
-              {t('common.suppliers.groupSuggestions.outliers.empty')}
+              {t('suppliers.groupSuggestions.outliers.empty')}
             </p>
           ) : (
             <ul className="list-disc ml-5 space-y-1">
@@ -205,7 +205,7 @@ export default function GroupSuggestions({
                 const meanLabel = `${Math.round(o.mean)} €`;
                 return (
                   <li key={idx} className="text-sm">
-                    {t('common.suppliers.groupSuggestions.outliers.item', {
+                    {t('suppliers.groupSuggestions.outliers.item', {
                       supplier: supplierName,
                       amount: amountLabel,
                       mean: meanLabel,
@@ -219,7 +219,7 @@ export default function GroupSuggestions({
 
         <div className="flex justify-end">
           <Button variant="outline" onClick={onClose}>
-            {t('common.suppliers.groupSuggestions.close')}
+            {t('suppliers.groupSuggestions.close')}
           </Button>
         </div>
       </div>

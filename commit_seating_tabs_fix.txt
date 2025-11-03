@@ -1,0 +1,8 @@
+fix: corregir SeatingPlanTabs sintaxis y añadir data-tour
+
+- Reescrito completamente con sintaxis correcta
+- Cerrado correctamente el array de tabs
+- Añadido data-tour="tabs" para el tour interactivo
+- Eliminados imports no usados (Users, Grid)
+- Lint pasando correctamente
+- Preparado para tests E2E

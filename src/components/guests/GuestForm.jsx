@@ -29,7 +29,7 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false }) => {
     companionType: guest?.companionType || 'none',
     table: guest?.table || '',
     companionGroupId: guest?.companionGroupId || '',
-    response: guest?.response || t('common.status.pending'),
+    response: guest?.response || t('status.pending'),
     status: guest?.status || 'pending',
     dietaryRestrictions: guest?.dietaryRestrictions || '',
     notes: guest?.notes || '',
@@ -64,14 +64,14 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false }) => {
     }
 
     if (formData.companion < 0) {
-      newErrors.companion = t('common.validation.companionNegative');
+      newErrors.companion = t('validation.companionNegative');
     }
 
     if (formData.companion > 0 && formData.companionType === 'none') {
-      newErrors.companionType = t('common.validation.selectCompanionType');
+      newErrors.companionType = t('validation.selectCompanionType');
     }
     if (formData.companion === 0 && formData.companionType !== 'none') {
-      newErrors.companionType = t('common.validation.companionMismatch');
+      newErrors.companionType = t('validation.companionMismatch');
     }
 
     setErrors(newErrors);

@@ -115,17 +115,17 @@ const TrackingModal = ({ isOpen, onClose, trackingItem }) => {
 
   // Datos de ejemplo para la visualización
   const statusInfo = getStatusInfo(trackingItem.status);
-  const notAvailable = t('common.suppliers.tracking.shared.notAvailable');
+  const notAvailable = t('suppliers.tracking.shared.notAvailable');
   const fallbackRecipient =
     trackingItem.recipientEmail ||
-    t('common.suppliers.tracking.modal.placeholders.recipient');
+    t('suppliers.tracking.modal.placeholders.recipient');
 
   // Historial de actividad de ejemplo
   const activities = [
     {
       type: 'send',
       date: trackingItem.sentAt,
-      detail: t('common.suppliers.tracking.modal.activities.send', {
+      detail: t('suppliers.tracking.modal.activities.send', {
         email: fallbackRecipient,
       }),
     },
@@ -138,7 +138,7 @@ const TrackingModal = ({ isOpen, onClose, trackingItem }) => {
       date:
         trackingItem.deliveredAt ||
         new Date(new Date(trackingItem.sentAt).getTime() + 60000).toISOString(),
-      detail: t('common.suppliers.tracking.modal.activities.deliver'),
+      detail: t('suppliers.tracking.modal.activities.deliver'),
     });
   }
 
@@ -155,8 +155,8 @@ const TrackingModal = ({ isOpen, onClose, trackingItem }) => {
             : new Date(new Date(trackingItem.sentAt).getTime() + 300000 * (i + 1)).toISOString(),
         detail:
           i === 0
-            ? t('common.suppliers.tracking.modal.activities.openFirst')
-            : t('common.suppliers.tracking.modal.activities.openNth', {
+            ? t('suppliers.tracking.modal.activities.openFirst')
+            : t('suppliers.tracking.modal.activities.openNth', {
                 index: i + 1,
               }),
       });
@@ -171,7 +171,7 @@ const TrackingModal = ({ isOpen, onClose, trackingItem }) => {
         new Date(new Date(trackingItem.sentAt).getTime() + 120000).toISOString(),
       detail:
         trackingItem.errorMessage ||
-        t('common.suppliers.tracking.modal.activities.errorDefault'),
+        t('suppliers.tracking.modal.activities.errorDefault'),
     });
   }
 
@@ -184,12 +184,12 @@ const TrackingModal = ({ isOpen, onClose, trackingItem }) => {
         {/* Header */}
         <div className="flex justify-between items-center p-4 border-b">
           <h2 className="text-xl font-semibold">
-            {t('common.suppliers.tracking.modal.title')}
+            {t('suppliers.tracking.modal.title')}
           </h2>
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700"
-            aria-label={t('common.suppliers.tracking.modal.closeAria')}
+            aria-label={t('suppliers.tracking.modal.closeAria')}
           >
             <X size={24} />
           </button>
@@ -201,7 +201,7 @@ const TrackingModal = ({ isOpen, onClose, trackingItem }) => {
           <Card className="mb-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-medium">
-                {t('common.suppliers.tracking.modal.emailInfo.title')}
+                {t('suppliers.tracking.modal.emailInfo.title')}
               </h3>
               <span
                 className={`flex items-center gap-1 px-3 py-1 rounded-full ${statusInfo.bgColor} ${statusInfo.color}`}
@@ -214,32 +214,32 @@ const TrackingModal = ({ isOpen, onClose, trackingItem }) => {
             <div className="space-y-3">
               <div>
                 <p className="text-sm text-gray-500">
-                  {t('common.suppliers.tracking.modal.emailInfo.fields.subject')}
+                  {t('suppliers.tracking.modal.emailInfo.fields.subject')}
                 </p>
                 <p className="font-medium">
                   {trackingItem.subject ||
-                    t('common.suppliers.tracking.modal.placeholders.subject')}
+                    t('suppliers.tracking.modal.placeholders.subject')}
                 </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-gray-500">
-                    {t('common.suppliers.tracking.modal.emailInfo.fields.provider')}
+                    {t('suppliers.tracking.modal.emailInfo.fields.provider')}
                   </p>
                   <p className="font-medium">
                     {trackingItem.providerName ||
-                      t('common.suppliers.tracking.list.placeholders.provider')}
+                      t('suppliers.tracking.list.placeholders.provider')}
                   </p>
                 </div>
 
                 <div>
                   <p className="text-sm text-gray-500">
-                    {t('common.suppliers.tracking.modal.emailInfo.fields.recipient')}
+                    {t('suppliers.tracking.modal.emailInfo.fields.recipient')}
                   </p>
                   <p className="font-medium">
                     {trackingItem.recipientEmail ||
-                      t('common.suppliers.tracking.modal.placeholders.recipientEmail')}
+                      t('suppliers.tracking.modal.placeholders.recipientEmail')}
                   </p>
                 </div>
               </div>
@@ -247,7 +247,7 @@ const TrackingModal = ({ isOpen, onClose, trackingItem }) => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-gray-500">
-                    {t('common.suppliers.tracking.modal.emailInfo.fields.sent')}
+                    {t('suppliers.tracking.modal.emailInfo.fields.sent')}
                   </p>
                   <p className="font-medium">
                     {formatDateTime(trackingItem.sentAt) || notAvailable}
@@ -256,7 +256,7 @@ const TrackingModal = ({ isOpen, onClose, trackingItem }) => {
 
                 <div>
                   <p className="text-sm text-gray-500">
-                    {t('common.suppliers.tracking.modal.emailInfo.fields.updated')}
+                    {t('suppliers.tracking.modal.emailInfo.fields.updated')}
                   </p>
                   <p className="font-medium">
                     {formatDateTime(trackingItem.lastUpdated || trackingItem.sentAt) ||
@@ -268,10 +268,10 @@ const TrackingModal = ({ isOpen, onClose, trackingItem }) => {
               {trackingItem.openCount > 0 && (
                 <div>
                   <p className="text-sm text-gray-500">
-                    {t('common.suppliers.tracking.modal.emailInfo.fields.opens')}
+                    {t('suppliers.tracking.modal.emailInfo.fields.opens')}
                   </p>
                   <p className="font-medium text-green-600">
-                    {t('common.suppliers.tracking.modal.emailInfo.openCount', {
+                    {t('suppliers.tracking.modal.emailInfo.openCount', {
                       count: trackingItem.openCount,
                     })}
                   </p>
@@ -285,7 +285,7 @@ const TrackingModal = ({ isOpen, onClose, trackingItem }) => {
                   rel="noopener noreferrer"
                   className="text-sm text-blue-600 hover:underline inline-flex items-center gap-1"
                 >
-                  {t('common.suppliers.tracking.modal.emailInfo.websiteLink', {
+                  {t('suppliers.tracking.modal.emailInfo.websiteLink', {
                     url: trackingItem.providerWebsite,
                   })}
                 </a>
@@ -294,11 +294,11 @@ const TrackingModal = ({ isOpen, onClose, trackingItem }) => {
               {trackingItem.errorMessage && (
                 <div className="bg-red-50 p-3 rounded-md border border-red-200 text-red-700">
                   <p className="font-medium mb-1">
-                    {t('common.suppliers.tracking.modal.error.title')}
+                    {t('suppliers.tracking.modal.error.title')}
                   </p>
                   <p className="text-sm">
                     {trackingItem.errorMessage ||
-                      t('common.suppliers.tracking.modal.error.default')}
+                      t('suppliers.tracking.modal.error.default')}
                   </p>
                 </div>
               )}
@@ -308,7 +308,7 @@ const TrackingModal = ({ isOpen, onClose, trackingItem }) => {
           {/* Historial de actividad */}
           <div className="mb-6">
             <h3 className="text-lg font-medium mb-4">
-              {t('common.suppliers.tracking.modal.activity.title')}
+              {t('suppliers.tracking.modal.activity.title')}
             </h3>
 
             <div className="relative">
@@ -370,33 +370,33 @@ const TrackingModal = ({ isOpen, onClose, trackingItem }) => {
           {/* Contenido del email (ejemplo) */}
           <Card>
             <h3 className="text-lg font-medium mb-4">
-              {t('common.suppliers.tracking.modal.content.title')}
+              {t('suppliers.tracking.modal.content.title')}
             </h3>
             <div className="bg-gray-50 p-4 rounded-md border border-gray-200">
               <div className="mb-4">
                 <p>
-                  <strong>{t('common.suppliers.tracking.modal.content.fromLabel')}</strong>{' '}
-                  {t('common.suppliers.tracking.modal.content.fromValue')}
+                  <strong>{t('suppliers.tracking.modal.content.fromLabel')}</strong>{' '}
+                  {t('suppliers.tracking.modal.content.fromValue')}
                 </p>
                 <p>
-                  <strong>{t('common.suppliers.tracking.modal.content.toLabel')}</strong>{' '}
+                  <strong>{t('suppliers.tracking.modal.content.toLabel')}</strong>{' '}
                   {trackingItem.recipientEmail ||
-                    t('common.suppliers.tracking.modal.content.placeholderRecipientEmail')}
+                    t('suppliers.tracking.modal.content.placeholderRecipientEmail')}
                 </p>
                 <p>
-                  <strong>{t('common.suppliers.tracking.modal.content.subjectLabel')}</strong>{' '}
+                  <strong>{t('suppliers.tracking.modal.content.subjectLabel')}</strong>{' '}
                   {trackingItem.subject ||
-                    t('common.suppliers.tracking.modal.placeholders.subject')}
+                    t('suppliers.tracking.modal.placeholders.subject')}
                 </p>
               </div>
               <div className="border-t border-gray-200 pt-4">
-                <p>{t('common.suppliers.tracking.modal.content.body.greeting')}</p>
+                <p>{t('suppliers.tracking.modal.content.body.greeting')}</p>
                 <br />
-                <p>{t('common.suppliers.tracking.modal.content.body.intro')}</p>
-                <p>{t('common.suppliers.tracking.modal.content.body.note')}</p>
+                <p>{t('suppliers.tracking.modal.content.body.intro')}</p>
+                <p>{t('suppliers.tracking.modal.content.body.note')}</p>
                 <br />
-                <p>{t('common.suppliers.tracking.modal.content.body.farewell')}</p>
-                <p>{t('common.suppliers.tracking.modal.content.body.signature')}</p>
+                <p>{t('suppliers.tracking.modal.content.body.farewell')}</p>
+                <p>{t('suppliers.tracking.modal.content.body.signature')}</p>
               </div>
             </div>
           </Card>
@@ -407,12 +407,12 @@ const TrackingModal = ({ isOpen, onClose, trackingItem }) => {
           <div>
             <Button variant="outline" size="sm" className="flex items-center">
               <Calendar size={16} className="mr-1" />{' '}
-              {t('common.suppliers.tracking.modal.buttons.schedule')}
+              {t('suppliers.tracking.modal.buttons.schedule')}
             </Button>
           </div>
           <div className="flex space-x-3">
             <Button variant="outline" onClick={onClose}>
-              {t('common.suppliers.tracking.modal.buttons.close')}
+              {t('suppliers.tracking.modal.buttons.close')}
             </Button>
             <Button
               variant="outline"
@@ -420,7 +420,7 @@ const TrackingModal = ({ isOpen, onClose, trackingItem }) => {
               onClick={() => window.open(`mailto:${trackingItem.recipientEmail || ''}`)}
             >
               <Mail size={16} className="mr-1" />{' '}
-              {t('common.suppliers.tracking.modal.buttons.reply')}
+              {t('suppliers.tracking.modal.buttons.reply')}
             </Button>
           </div>
         </div>

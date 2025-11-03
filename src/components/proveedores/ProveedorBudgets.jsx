@@ -16,47 +16,47 @@ export default function ProveedorBudgets({ supplierId }) {
   const { t } = useTranslations();
 
   if (!supplierId) return null;
-  if (loading) return <p className="text-sm text-gray-500">{t('common.suppliers.budgets.loading')}</p>;
+  if (loading) return <p className="text-sm text-gray-500">{t('suppliers.budgets.loading')}</p>;
   if (error)
     return (
       <p className="text-sm text-red-600">
-        {t('common.suppliers.budgets.error', { message: error })}
+        {t('suppliers.budgets.error', { message: error })}
       </p>
     );
   if (!budgets.length)
-    return <p className="text-sm text-gray-500">{t('common.suppliers.budgets.empty')}</p>;
+    return <p className="text-sm text-gray-500">{t('suppliers.budgets.empty')}</p>;
 
   const handleAction = async (budgetId, action) => {
     await updateBudgetStatus(budgetId, action);
   };
 
   const statusLabelMap = {
-    pending: t('common.suppliers.budgets.status.pending'),
-    accepted: t('common.suppliers.budgets.status.accepted'),
-    rejected: t('common.suppliers.budgets.status.rejected'),
-    submitted: t('common.suppliers.budgets.status.submitted'),
+    pending: t('suppliers.budgets.status.pending'),
+    accepted: t('suppliers.budgets.status.accepted'),
+    rejected: t('suppliers.budgets.status.rejected'),
+    submitted: t('suppliers.budgets.status.submitted'),
   };
 
   return (
     <Card className="mt-4">
       <h3 className="text-lg font-medium mb-3">
-        {t('common.suppliers.budgets.title')}
+        {t('suppliers.budgets.title')}
       </h3>
       <ul className="space-y-2">
         {budgets.map((b) => {
           const isPortal = String(b.source || '').toLowerCase() === 'portal';
           const statusLabel =
-            statusLabelMap[b.status] || b.status || t('common.suppliers.budgets.status.unknown');
+            statusLabelMap[b.status] || b.status || t('suppliers.budgets.status.unknown');
           return (
             <li key={b.id} className="p-3 border rounded-md flex justify-between items-center">
               <div>
                 <div className="flex items-center gap-2">
                   <p className="font-medium">
-                    {b.description || t('common.suppliers.budgets.defaultDescription')}
+                    {b.description || t('suppliers.budgets.defaultDescription')}
                   </p>
                   {isPortal && (
                     <span className="text-xs px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700">
-                      {t('common.suppliers.budgets.portalTag')}
+                      {t('suppliers.budgets.portalTag')}
                     </span>
                   )}
                 </div>
@@ -66,7 +66,7 @@ export default function ProveedorBudgets({ supplierId }) {
                 </p>
                 {isPortal && b.status === 'submitted' && (
                   <p className="text-xs text-indigo-600 mt-1">
-                    {t('common.suppliers.budgets.portalPendingReview')}
+                    {t('suppliers.budgets.portalPendingReview')}
                   </p>
                 )}
               </div>
@@ -74,14 +74,14 @@ export default function ProveedorBudgets({ supplierId }) {
                 {b.status === 'pending' && (
                   <>
                     <Button size="sm" onClick={() => handleAction(b.id, 'accept')}>
-                      {t('common.suppliers.budgets.buttons.accept')}
+                      {t('suppliers.budgets.buttons.accept')}
                     </Button>
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => handleAction(b.id, 'reject')}
                     >
-                      {t('common.suppliers.budgets.buttons.reject')}
+                      {t('suppliers.budgets.buttons.reject')}
                     </Button>
                   </>
                 )}
@@ -106,14 +106,14 @@ export default function ProveedorBudgets({ supplierId }) {
                         };
                         const amt = normalizeAmount(b.amount);
                         const prefill = {
-                          concept: t('common.suppliers.budgets.prefillConcept', {
-                            name: b.description || prov?.name || t('common.suppliers.list.contractFallback'),
+                          concept: t('suppliers.budgets.prefillConcept', {
+                            name: b.description || prov?.name || t('suppliers.list.contractFallback'),
                           }).slice(0, 80),
                           amount: amt,
                           date: (b.createdAt && String(b.createdAt).slice(0,10)) || new Date().toISOString().slice(0,10),
                           type: 'expense',
                           category: '',
-                          description: t('common.suppliers.budgets.prefillDescription', {
+                          description: t('suppliers.budgets.prefillDescription', {
                             description: b.description || '',
                           }),
                           provider: prov?.name || '',
@@ -127,7 +127,7 @@ export default function ProveedorBudgets({ supplierId }) {
                       } catch {}
                     }}
                   >
-                    {t('common.suppliers.budgets.buttons.registerFinance')}
+                    {t('suppliers.budgets.buttons.registerFinance')}
                   </Button>
                 )}
               </div>

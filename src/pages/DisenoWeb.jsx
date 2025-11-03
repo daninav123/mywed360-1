@@ -396,7 +396,7 @@ const ProfileSummary = ({ profile, publishDisabledReason }) => {
   const groom = profile?.groomInfo?.nombre?.trim();
   const couple =
     [bride, groom].filter(Boolean).join(
-      ` ${t('common.websiteGenerator.profileSummary.conjunction', 'y')} `
+      ` ${t('websiteGenerator.profileSummary.conjunction', 'y')} `
     );
   const ceremonyDate = profile?.ceremonyInfo?.fecha;
   const ceremony = [profile?.ceremonyInfo?.lugar, profile?.ceremonyInfo?.hora]
@@ -410,13 +410,13 @@ const ProfileSummary = ({ profile, publishDisabledReason }) => {
   return (
     <div className="bg-white rounded-lg shadow p-6 mb-8">
       <h2 className="text-xl font-semibold mb-3">
-        {t('common.websiteGenerator.profileSummary.title', 'Datos del perfil aplicados')}
+        {t('websiteGenerator.profileSummary.title', 'Datos del perfil aplicados')}
       </h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-700">
         {couple && (
           <div>
             <span className="text-gray-500">
-              {t('common.websiteGenerator.profileSummary.labels.couple', 'Pareja')}:&nbsp;
+              {t('websiteGenerator.profileSummary.labels.couple', 'Pareja')}:&nbsp;
             </span>
             {couple}
           </div>
@@ -424,7 +424,7 @@ const ProfileSummary = ({ profile, publishDisabledReason }) => {
         {ceremonyDate && (
           <div>
             <span className="text-gray-500">
-              {t('common.websiteGenerator.profileSummary.labels.date', 'Fecha')}:&nbsp;
+              {t('websiteGenerator.profileSummary.labels.date', 'Fecha')}:&nbsp;
             </span>
             {ceremonyDate}
           </div>
@@ -432,7 +432,7 @@ const ProfileSummary = ({ profile, publishDisabledReason }) => {
         {ceremony && (
           <div>
             <span className="text-gray-500">
-              {t('common.websiteGenerator.profileSummary.labels.ceremony', 'Ceremonia')}:&nbsp;
+              {t('websiteGenerator.profileSummary.labels.ceremony', 'Ceremonia')}:&nbsp;
             </span>
             {ceremony}
           </div>
@@ -440,7 +440,7 @@ const ProfileSummary = ({ profile, publishDisabledReason }) => {
         {reception && (
           <div>
             <span className="text-gray-500">
-              {t('common.websiteGenerator.profileSummary.labels.reception', 'Recepción')}:&nbsp;
+              {t('websiteGenerator.profileSummary.labels.reception', 'Recepción')}:&nbsp;
             </span>
             {reception}
           </div>
@@ -448,7 +448,7 @@ const ProfileSummary = ({ profile, publishDisabledReason }) => {
         {contact && (
           <div className="sm:col-span-2">
             <span className="text-gray-500">
-              {t('common.websiteGenerator.profileSummary.labels.contact', 'Contacto')}:&nbsp;
+              {t('websiteGenerator.profileSummary.labels.contact', 'Contacto')}:&nbsp;
             </span>
             {contact}
           </div>
@@ -566,13 +566,13 @@ const PromptLibraryModal = ({
   const [formError, setFormError] = useState('');
   const promptTokens = useMemo(
     () => [
-      t('common.websiteGenerator.promptLibrary.tokens.names', '{nombres}'),
-      t('common.websiteGenerator.promptLibrary.tokens.date', '{fecha}'),
-      t('common.websiteGenerator.promptLibrary.tokens.location', '{ubicacion}'),
+      t('websiteGenerator.promptLibrary.tokens.names', '{nombres}'),
+      t('websiteGenerator.promptLibrary.tokens.date', '{fecha}'),
+      t('websiteGenerator.promptLibrary.tokens.location', '{ubicacion}'),
     ],
     [t]
   );
-  const tokenConjunction = t('common.websiteGenerator.profileSummary.conjunction', 'y');
+  const tokenConjunction = t('websiteGenerator.profileSummary.conjunction', 'y');
 
   useEffect(() => {
     if (!open) {
@@ -707,7 +707,7 @@ const PromptLibraryModal = ({
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700 transition-colors"
           >
-            {t('common.websiteGenerator.promptLibrary.close', 'Cerrar')}
+            {t('websiteGenerator.promptLibrary.close', 'Cerrar')}
           </button>
         </header>
         <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
@@ -842,7 +842,7 @@ const PromptLibraryModal = ({
                           })}
                           className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-full text-sm transition-colors"
                         >
-                          {t('common.websiteGenerator.promptLibrary.buttons.use', 'Usar')}
+                          {t('websiteGenerator.promptLibrary.buttons.use', 'Usar')}
                         </button>
                         <button
                           type="button"
@@ -850,7 +850,7 @@ const PromptLibraryModal = ({
                           className="inline-flex items-center gap-2 border border-gray-300 px-3 py-2 rounded-full text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                           disabled={saving}
                         >
-                          {t('common.websiteGenerator.promptLibrary.buttons.edit', 'Editar')}
+                          {t('websiteGenerator.promptLibrary.buttons.edit', 'Editar')}
                         </button>
                         <button
                           type="button"
@@ -858,7 +858,7 @@ const PromptLibraryModal = ({
                           className="inline-flex items-center gap-2 border border-red-200 px-3 py-2 rounded-full text-sm text-red-600 hover:bg-red-50 transition-colors"
                           disabled={saving}
                         >
-                          {t('common.websiteGenerator.promptLibrary.buttons.delete', 'Eliminar')}
+                          {t('websiteGenerator.promptLibrary.buttons.delete', 'Eliminar')}
                         </button>
                       </div>
                     </div>
@@ -893,7 +893,7 @@ const PromptLibraryModal = ({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-semibold text-gray-600 mb-1">
-                      {t('common.websiteGenerator.promptLibrary.form.labels.name', 'Nombre')}
+                      {t('websiteGenerator.promptLibrary.form.labels.name', 'Nombre')}
                     </label>
                     <input
                       type="text"
@@ -908,7 +908,7 @@ const PromptLibraryModal = ({
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-gray-600 mb-1">
-                      {t('common.websiteGenerator.promptLibrary.form.labels.template', 'Plantilla sugerida')}
+                      {t('websiteGenerator.promptLibrary.form.labels.template', 'Plantilla sugerida')}
                     </label>
                     <select
                       value={formState.templateKey}
@@ -947,7 +947,7 @@ const PromptLibraryModal = ({
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-600 mb-1">
-                    {t('common.websiteGenerator.promptLibrary.form.labels.prompt', 'Prompt')}
+                    {t('websiteGenerator.promptLibrary.form.labels.prompt', 'Prompt')}
                   </label>
                   <textarea
                     value={formState.prompt}
@@ -969,7 +969,7 @@ const PromptLibraryModal = ({
                     className="inline-flex items-center px-4 py-2 rounded-full border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
                     disabled={saving}
                   >
-                    {t('common.websiteGenerator.promptLibrary.form.cancel', 'Cancelar')}
+                    {t('websiteGenerator.promptLibrary.form.cancel', 'Cancelar')}
                   </button>
                   <button
                     type="submit"
@@ -998,7 +998,7 @@ const PromptLibraryModal = ({
             className="inline-flex items-center px-4 py-2 rounded-full border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
             disabled={saving}
           >
-            {t('common.websiteGenerator.promptLibrary.close', 'Cerrar')}
+            {t('websiteGenerator.promptLibrary.close', 'Cerrar')}
           </button>
         </footer>
       </div>
@@ -1095,7 +1095,7 @@ const LogisticsEditor = ({
         <header className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
           <div>
             <h3 className="text-lg font-semibold text-gray-800">
-              {t('common.websiteGenerator.logistics.title', 'Editar logística del sitio')}
+              {t('websiteGenerator.logistics.title', 'Editar logística del sitio')}
             </h3>
             <p className="text-sm text-gray-500">
               {t(
@@ -1109,7 +1109,7 @@ const LogisticsEditor = ({
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700 transition-colors"
           >
-            {t('common.actions.close', 'Cerrar')}
+            {t('actions.close', 'Cerrar')}
           </button>
         </header>
 
@@ -1185,7 +1185,7 @@ const LogisticsEditor = ({
                 onClick={addScheduleItem}
                 className="text-sm text-blue-600 hover:text-blue-700"
               >
-                {t('common.websiteGenerator.logistics.schedule.add', 'Añadir horario')}
+                {t('websiteGenerator.logistics.schedule.add', 'Añadir horario')}
               </button>
             </div>
             <div className="space-y-3">
@@ -1236,7 +1236,7 @@ const LogisticsEditor = ({
                       onClick={() => removeScheduleItem(index)}
                       className="text-xs text-red-500 hover:text-red-600"
                     >
-                      {t('common.actions.remove', 'Quitar')}
+                      {t('actions.remove', 'Quitar')}
                     </button>
                   </div>
                 </div>
@@ -1342,7 +1342,7 @@ const LogisticsEditor = ({
 
           <section className="space-y-3">
             <h4 className="text-sm font-semibold text-gray-700">
-              {t('common.websiteGenerator.logistics.travel.title', 'Guía de llegada')}
+              {t('websiteGenerator.logistics.travel.title', 'Guía de llegada')}
             </h4>
             <textarea
               className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
@@ -1423,14 +1423,14 @@ const LogisticsEditor = ({
           <section>
             <div className="flex items-center justify-between mb-2">
               <h4 className="text-sm font-semibold text-gray-700">
-                {t('common.websiteGenerator.logistics.faq.title', 'Preguntas frecuentes')}
+                {t('websiteGenerator.logistics.faq.title', 'Preguntas frecuentes')}
               </h4>
               <button
                 type="button"
                 onClick={addFaqItem}
                 className="text-sm text-blue-600 hover:text-blue-700"
               >
-                {t('common.websiteGenerator.logistics.faq.add', 'Añadir pregunta')}
+                {t('websiteGenerator.logistics.faq.add', 'Añadir pregunta')}
               </button>
             </div>
             <div className="space-y-3">
@@ -1483,7 +1483,7 @@ const LogisticsEditor = ({
             onClick={onClose}
             className="inline-flex items-center px-4 py-2 rounded-full border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
           >
-            {t('common.websiteGenerator.logisticsActions.cancel', 'Cancelar')}
+            {t('websiteGenerator.logisticsActions.cancel', 'Cancelar')}
           </button>
           <button
             type="button"
@@ -1498,7 +1498,7 @@ const LogisticsEditor = ({
                   'common.websiteGenerator.logisticsActions.saving',
                   'Guardando…'
                 )
-              : t('common.websiteGenerator.logisticsActions.save', 'Guardar logística')}
+              : t('websiteGenerator.logisticsActions.save', 'Guardar logística')}
           </button>
         </footer>
       </div>

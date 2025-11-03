@@ -135,7 +135,7 @@ export default function InspirationGallery({
             (activeTag || filter) === 'all' ? 'bg-blue-600 text-white' : 'bg-white'
           }`}
         >
-          {t('common.all', 'Todos')}
+          {t('all', 'Todos')}
         </button>
         {allTags.map(([tag, label]) => (
           <button
@@ -248,7 +248,7 @@ export default function InspirationGallery({
             <button
               onClick={() => setLightbox(null)}
               className="absolute -top-4 -right-4 bg-white rounded-full p-1"
-              aria-label={t('common.close', 'Cerrar')}
+              aria-label={t('close', 'Cerrar')}
             >
               <X size={20} />
             </button>

@@ -53,45 +53,45 @@ export default function SeatingPlanSummary({
   const occupancyPercent =
     capacityTarget > 0 ? Math.round((assignedPersons / capacityTarget) * 100) : 0;
 
-  const summaryTagline = t('common.seating.summary.sectionLabel', {
+  const summaryTagline = t('seating.summary.sectionLabel', {
     defaultValue: 'Resumen general',
   });
-  const assignedLabel = t('common.seating.summary.assignedTitle', {
+  const assignedLabel = t('seating.summary.assignedTitle', {
     count: formatCount(assignedPersons),
     defaultValue: `${formatCount(assignedPersons)} personas ubicadas`,
   });
   const subtitle =
     totalPersons > 0
-      ? t('common.seating.summary.assignedSubtitle', {
+      ? t('seating.summary.assignedSubtitle', {
           assigned: formatCount(assignedPersons),
           total: formatCount(totalPersons),
           defaultValue: `${formatCount(assignedPersons)} de ${formatCount(totalPersons)} invitados y acompañantes`,
         })
-      : t('common.seating.summary.noGuests', { defaultValue: 'Sin invitados cargados' });
+      : t('seating.summary.noGuests', { defaultValue: 'Sin invitados cargados' });
 
-  const pendingLabel = t('common.seating.summary.metrics.pending', { defaultValue: 'Pendientes:' });
-  const tablesLabel = t('common.seating.summary.metrics.tables', {
+  const pendingLabel = t('seating.summary.metrics.pending', { defaultValue: 'Pendientes:' });
+  const tablesLabel = t('seating.summary.metrics.tables', {
     defaultValue: 'Mesas activas:',
   });
-  const capacityLabel = t('common.seating.summary.metrics.capacity', {
+  const capacityLabel = t('seating.summary.metrics.capacity', {
     defaultValue: 'Capacidad disponible:',
   });
-  const capacitySuffix = t('common.seating.summary.metrics.capacitySuffix', {
+  const capacitySuffix = t('seating.summary.metrics.capacitySuffix', {
     defaultValue: 'pax',
   });
 
   const autoLayoutLabel =
     tableCount === 0
-      ? t('common.seating.summary.actions.generateLayout', {
+      ? t('seating.summary.actions.generateLayout', {
           defaultValue: 'Generar Layout Automático',
         })
-      : t('common.seating.summary.actions.regenerateLayout', { defaultValue: 'Regenerar Layout' });
-  const reviewPendingLabel = t('common.seating.summary.actions.reviewPending', {
+      : t('seating.summary.actions.regenerateLayout', { defaultValue: 'Regenerar Layout' });
+  const reviewPendingLabel = t('seating.summary.actions.reviewPending', {
     defaultValue: 'Revisar invitados pendientes',
   });
 
-  const mapTitle = t('common.seating.summary.map.title', { defaultValue: 'Mapa del espacio' });
-  const mapSeparator = t('common.seating.summary.map.separator', { defaultValue: '•' });
+  const mapTitle = t('seating.summary.map.title', { defaultValue: 'Mapa del espacio' });
+  const mapSeparator = t('seating.summary.map.separator', { defaultValue: '•' });
 
   // Mostrar botón si hay invitados asignados a mesas O si hasAssignedTables es true
   const showAutoLayoutButton = hasAssignedTables || assignedPersons > 0;
@@ -149,19 +149,19 @@ export default function SeatingPlanSummary({
 
         <div className="flex w-full flex-col gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 md:max-w-sm">
           <ProgressRow
-            label={t('common.seating.summary.progress.ceremony', {
+            label={t('seating.summary.progress.ceremony', {
               defaultValue: 'Ceremonia lista',
             })}
             value={ceremonyProgress}
           />
           <ProgressRow
-            label={t('common.seating.summary.progress.banquet', {
+            label={t('seating.summary.progress.banquet', {
               defaultValue: 'Banquete asignado',
             })}
             value={banquetProgress}
           />
           <ProgressRow
-            label={t('common.seating.summary.progress.occupancy', {
+            label={t('seating.summary.progress.occupancy', {
               defaultValue: 'Capacidad ocupada',
             })}
             value={occupancyPercent}

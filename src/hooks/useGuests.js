@@ -791,7 +791,7 @@ const useGuests = () => {
       const phone = utils.phoneClean(guest.phone);
       if (!phone) {
         toast.warn(
-          t('common.guests.errors.missingPhone', 'El invitado no tiene número de teléfono')
+          t('guests.errors.missingPhone', 'El invitado no tiene número de teléfono')
         );
         return;
       }

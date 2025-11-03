@@ -44,7 +44,7 @@ const AIBusquedaModal = ({
           <div className="flex items-center">
             <Sparkles className="text-purple-500 mr-2" size={20} />
             <h3 className="font-semibold text-lg text-gray-800">
-              {t('common.aiSearchModal.title')}
+              {t('aiSearchModal.title')}
             </h3>
           </div>
           <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-100">
@@ -54,17 +54,17 @@ const AIBusquedaModal = ({
 
         {/* Formulario de búsqueda */}
         <div className="p-5 border-b border-gray-200">
-          <p className="text-gray-600 mb-3">{t('common.aiSearchModal.description')}</p>
+          <p className="text-gray-600 mb-3">{t('aiSearchModal.description')}</p>
           <form onSubmit={handleSubmit} className="flex items-start gap-2">
             <div className="flex-1">
               <input
                 type="text"
                 value={consulta}
                 onChange={(e) => setConsulta(e.target.value)}
-                placeholder={t('common.aiSearchModal.placeholder')}
+                placeholder={t('aiSearchModal.placeholder')}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
               />
-              <p className="mt-1 text-xs text-gray-500">{t('common.aiSearchModal.hint')}</p>
+              <p className="mt-1 text-xs text-gray-500">{t('aiSearchModal.hint')}</p>
             </div>
             <button
               type="submit"
@@ -76,7 +76,7 @@ const AIBusquedaModal = ({
               ) : (
                 <Search className="mr-2" size={16} />
               )}
-              {t('common.aiSearchModal.submit')}
+              {t('aiSearchModal.submit')}
             </button>
           </form>
         </div>
@@ -86,7 +86,7 @@ const AIBusquedaModal = ({
           {cargando ? (
             <div className="text-center py-10">
               <RotateCw className="animate-spin h-10 w-10 text-purple-500 mx-auto mb-4" />
-              <p className="text-gray-600">{t('common.aiSearchModal.loading')}</p>
+              <p className="text-gray-600">{t('aiSearchModal.loading')}</p>
             </div>
           ) : resultado ? (
             <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
@@ -102,7 +102,7 @@ const AIBusquedaModal = ({
 
                 {resultado.web && (
                   <div>
-                    <span className="text-gray-500 text-sm">{t('common.aiSearchModal.webLabel')}</span>
+                    <span className="text-gray-500 text-sm">{t('aiSearchModal.webLabel')}</span>
                     <a
                       href={resultado.web}
                       target="_blank"
@@ -117,7 +117,7 @@ const AIBusquedaModal = ({
                 {resultado.ubicacion && (
                   <div>
                     <span className="text-gray-500 text-sm">
-                      {t('common.aiSearchModal.locationLabel')}
+                      {t('aiSearchModal.locationLabel')}
                     </span>
                     <span className="ml-2">{resultado.ubicacion}</span>
                   </div>
@@ -126,7 +126,7 @@ const AIBusquedaModal = ({
                 {resultado.contacto && (
                   <div>
                     <span className="text-gray-500 text-sm">
-                      {t('common.aiSearchModal.contactLabel')}
+                      {t('aiSearchModal.contactLabel')}
                     </span>
                     <span className="ml-2">{resultado.contacto}</span>
                   </div>
@@ -138,25 +138,25 @@ const AIBusquedaModal = ({
                   onClick={() => onGuardar(resultado)}
                   className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 shadow-sm"
                 >
-                  {t('common.aiSearchModal.saveButton')}
+                  {t('aiSearchModal.saveButton')}
                 </button>
               </div>
             </div>
           ) : consulta && !cargando ? (
             <div className="text-center py-10">
-              <p className="text-gray-600">{t('common.aiSearchModal.noResultsTitle')}</p>
+              <p className="text-gray-600">{t('aiSearchModal.noResultsTitle')}</p>
               <p className="text-sm text-gray-500 mt-1">
-                {t('common.aiSearchModal.noResultsHint')}
+                {t('aiSearchModal.noResultsHint')}
               </p>
             </div>
           ) : (
             <div className="text-center py-10">
               <Sparkles className="h-12 w-12 text-purple-300 mx-auto mb-3" />
               <h4 className="text-lg font-medium text-gray-700 mb-2">
-                {t('common.aiSearchModal.emptyTitle')}
+                {t('aiSearchModal.emptyTitle')}
               </h4>
               <p className="text-gray-500 max-w-md mx-auto">
-                {t('common.aiSearchModal.emptyDescription')}
+                {t('aiSearchModal.emptyDescription')}
               </p>
             </div>
           )}
@@ -165,7 +165,7 @@ const AIBusquedaModal = ({
         {/* Pie del modal */}
         <div className="p-4 border-t border-gray-200 bg-gray-50">
           <p className="text-xs text-gray-500 text-center">
-            {t('common.aiSearchModal.footerNotice')}
+            {t('aiSearchModal.footerNotice')}
           </p>
         </div>
       </div>

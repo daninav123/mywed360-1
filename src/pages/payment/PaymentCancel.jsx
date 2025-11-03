@@ -15,11 +15,11 @@ const PaymentCancel = () => {
         </div>
 
         <h2 className="mt-6 text-2xl font-semibold text-gray-900">
-          {t('common.public.payment.cancel.title')}
+          {t('public.payment.cancel.title')}
         </h2>
 
         <p className="mt-2 text-gray-600">
-          {t('common.public.payment.cancel.description')}
+          {t('public.payment.cancel.description')}
         </p>
 
         <div className="mt-6 bg-blue-50 rounded-lg p-4 text-left">
@@ -27,10 +27,10 @@ const PaymentCancel = () => {
             <HelpCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
             <div>
               <h3 className="text-sm font-semibold text-blue-900">
-                {t('common.public.payment.cancel.supportCard.title')}
+                {t('public.payment.cancel.supportCard.title')}
               </h3>
               <p className="mt-1 text-xs text-blue-700">
-                {t('common.public.payment.cancel.supportCard.description')}
+                {t('public.payment.cancel.supportCard.description')}
               </p>
             </div>
           </div>
@@ -42,19 +42,19 @@ const PaymentCancel = () => {
             className="flex items-center justify-center gap-2 w-full rounded-md bg-[var(--color-primary)] px-4 py-3 text-sm font-semibold text-white hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
           >
             <ArrowLeft className="h-4 w-4" />
-            {t('common.public.payment.cancel.buttons.backPricing')}
+            {t('public.payment.cancel.buttons.backPricing')}
           </Link>
           <Link
             to="/contact"
             className="block w-full rounded-md border border-gray-300 px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
           >
-            {t('common.public.payment.cancel.buttons.contactSupport')}
+            {t('public.payment.cancel.buttons.contactSupport')}
           </Link>
           <Link
             to="/"
             className="block w-full text-sm text-gray-500 hover:text-gray-700"
           >
-            {t('common.public.payment.cancel.buttons.backHome')}
+            {t('public.payment.cancel.buttons.backHome')}
           </Link>
         </div>
 
@@ -62,21 +62,21 @@ const PaymentCancel = () => {
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
               <p className="font-semibold text-gray-900">
-                {t('common.public.payment.cancel.faq.title')}
+                {t('public.payment.cancel.faq.title')}
               </p>
               <Link to="/faq" className="text-[var(--color-primary)] hover:underline">
-                {t('common.public.payment.cancel.faq.link')}
+                {t('public.payment.cancel.faq.link')}
               </Link>
             </div>
             <div>
               <p className="font-semibold text-gray-900">
-                {t('common.public.payment.cancel.support.title')}
+                {t('public.payment.cancel.support.title')}
               </p>
               <a
                 href="mailto:support@maloveapp.com"
                 className="text-[var(--color-primary)] hover:underline"
               >
-                {t('common.public.payment.cancel.support.emailLink')}
+                {t('public.payment.cancel.support.emailLink')}
               </a>
             </div>
           </div>

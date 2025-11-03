@@ -16,15 +16,15 @@ const slugify = (value) =>
         .replace(/^-+|-+$/g, '');
 
 const guessServiceFromQuery = (query, t) => {
-  const fallback = t('common.suppliers.aiSearch.services.generic');
+  const fallback = t('suppliers.aiSearch.services.generic');
   if (!query) return fallback;
   const words = query.toLowerCase().split(/[,;]+/)[0]?.trim();
   if (!words) return fallback;
-  if (words.includes('foto')) return t('common.suppliers.aiSearch.services.photo');
-  if (words.includes('video')) return t('common.suppliers.aiSearch.services.video');
-  if (words.includes('catering')) return t('common.suppliers.aiSearch.services.catering');
-  if (words.includes('dj') || words.includes('musica')) return t('common.suppliers.aiSearch.services.music');
-  if (words.includes('flor')) return t('common.suppliers.aiSearch.services.flowers');
+  if (words.includes('foto')) return t('suppliers.aiSearch.services.photo');
+  if (words.includes('video')) return t('suppliers.aiSearch.services.video');
+  if (words.includes('catering')) return t('suppliers.aiSearch.services.catering');
+  if (words.includes('dj') || words.includes('musica')) return t('suppliers.aiSearch.services.music');
+  if (words.includes('flor')) return t('suppliers.aiSearch.services.flowers');
   return query.trim();
 };
 
@@ -39,13 +39,13 @@ const generateAISummary = (item, query, t) => {
   const highlights = [];
   const queryWords = query.toLowerCase().split(' ');
   if (item.tags?.some((tag) => queryWords.includes(tag.toLowerCase()))) {
-    highlights.push(t('common.suppliers.aiSearch.aiSummary.matchesPreferences'));
+    highlights.push(t('suppliers.aiSearch.aiSummary.matchesPreferences'));
   }
   if (item.price) {
-    highlights.push(t('common.suppliers.aiSearch.aiSummary.priceRange', { price: item.price }));
+    highlights.push(t('suppliers.aiSearch.aiSummary.priceRange', { price: item.price }));
   }
   if (item.location) {
-    highlights.push(t('common.suppliers.aiSearch.aiSummary.location', { location: item.location }));
+    highlights.push(t('suppliers.aiSearch.aiSummary.location', { location: item.location }));
   }
   return highlights.join(' ');
 };
@@ -54,7 +54,7 @@ const normalizeResult = (item, index, query, t) => {
   const name = (
     item?.name ||
     item?.title ||
-    t('common.suppliers.aiSearch.defaults.suggestedName', { index: index + 1 })
+    t('suppliers.aiSearch.defaults.suggestedName', { index: index + 1 })
   ).trim();
   const service = (item?.service || item?.category || guessServiceFromQuery(query, t)).trim();
   const location = item?.location || item?.city || '';
@@ -169,29 +169,29 @@ const mapBackendErrorMessage = (payload, status, fallbackMessage, t) => {
   const statusLabel =
     status !== undefined && status !== null
       ? status
-      : t('common.suppliers.aiSearch.errors.unknownStatus');
+      : t('suppliers.aiSearch.errors.unknownStatus');
   switch (code) {
     case 'openai_failed':
-      return t('common.suppliers.aiSearch.errors.openaiFailed');
+      return t('suppliers.aiSearch.errors.openaiFailed');
     case 'openai_invalid_response':
-      return t('common.suppliers.aiSearch.errors.openaiInvalidResponse');
+      return t('suppliers.aiSearch.errors.openaiInvalidResponse');
     case 'openai_request_failed':
-      return t('common.suppliers.aiSearch.errors.openaiRequestFailed');
+      return t('suppliers.aiSearch.errors.openaiRequestFailed');
     case 'serp_unavailable':
-      return t('common.suppliers.aiSearch.errors.serpUnavailable');
+      return t('suppliers.aiSearch.errors.serpUnavailable');
     case 'rate_limited':
-      return t('common.suppliers.aiSearch.errors.rateLimited');
+      return t('suppliers.aiSearch.errors.rateLimited');
     default:
       if (detail) return detail;
       if (fallbackMessage) return fallbackMessage;
-      if (status) return t('common.suppliers.aiSearch.errors.http', { status: statusLabel });
-      return t('common.suppliers.aiSearch.errors.generic');
+      if (status) return t('suppliers.aiSearch.errors.http', { status: statusLabel });
+      return t('suppliers.aiSearch.errors.generic');
   }
 };
 
 const generateDemoResults = (query, t) => {
   const demoDatabase =
-    t('common.suppliers.aiSearch.demoResults', {
+    t('suppliers.aiSearch.demoResults', {
       returnObjects: true,
     }) || [];
 
@@ -358,8 +358,8 @@ export const useAISearch = () => {
             const message = mapBackendErrorMessage(
               payload,
               res?.status,
-              t('common.suppliers.aiSearch.errors.aiResponse', {
-                status: res?.status ?? t('common.suppliers.aiSearch.errors.unknownStatus'),
+              t('suppliers.aiSearch.errors.aiResponse', {
+                status: res?.status ?? t('suppliers.aiSearch.errors.unknownStatus'),
               }),
               t
             );
@@ -375,7 +375,7 @@ export const useAISearch = () => {
         // Detectar error de red (backend no disponible)
         if (backendError?.message?.includes('fetch') || backendError?.name === 'TypeError') {
           const networkError = new Error(
-            t('common.suppliers.aiSearch.errors.offline')
+            t('suppliers.aiSearch.errors.offline')
           );
           networkError.code = 'BACKEND_OFFLINE';
           lastError = networkError;
@@ -432,8 +432,8 @@ export const useAISearch = () => {
           const message = mapBackendErrorMessage(
             payload,
             res2.status,
-            t('common.suppliers.aiSearch.errors.externalResponse', {
-              status: res2.status ?? t('common.suppliers.aiSearch.errors.unknownStatus'),
+            t('suppliers.aiSearch.errors.externalResponse', {
+              status: res2.status ?? t('suppliers.aiSearch.errors.unknownStatus'),
             }),
             t
           );
@@ -485,8 +485,8 @@ export const useAISearch = () => {
               mapBackendErrorMessage(
                 payload,
                 resProviders.status,
-                t('common.suppliers.aiSearch.errors.internalResponse', {
-                  status: resProviders.status ?? t('common.suppliers.aiSearch.errors.unknownStatus'),
+                t('suppliers.aiSearch.errors.internalResponse', {
+                  status: resProviders.status ?? t('suppliers.aiSearch.errors.unknownStatus'),
                 }),
                 t
               ),
@@ -497,7 +497,7 @@ export const useAISearch = () => {
         }
 
         if (!lastError) {
-          const noResultsError = new Error(t('common.suppliers.aiSearch.errors.noLocalResults'));
+          const noResultsError = new Error(t('suppliers.aiSearch.errors.noLocalResults'));
           noResultsError.code = 'NO_LOCAL_RESULTS';
           lastError = noResultsError;
         }
@@ -510,7 +510,7 @@ export const useAISearch = () => {
       // Si hay error de backend offline, mostrar mensaje claro
       if (lastError?.code === 'BACKEND_OFFLINE') {
         const backendError = new Error(
-          t('common.suppliers.aiSearch.errors.backendUnavailable')
+          t('suppliers.aiSearch.errors.backendUnavailable')
         );
         backendError.code = 'BACKEND_OFFLINE';
         setResults([]);
@@ -523,7 +523,7 @@ export const useAISearch = () => {
       // Si es error de OpenAI, mostrar mensaje específico
       if (lastError?.code === 'OPENAI_API_KEY missing' || lastError?.message?.includes('OPENAI_API_KEY')) {
         const openaiError = new Error(
-          t('common.suppliers.aiSearch.errors.openaiNotConfigured')
+          t('suppliers.aiSearch.errors.openaiNotConfigured')
         );
         openaiError.code = 'OPENAI_NOT_CONFIGURED';
         setResults([]);
@@ -553,7 +553,7 @@ export const useAISearch = () => {
       setResults([]);
       setUsedFallback(false);
       const finalError = lastError || new Error(
-        t('common.suppliers.aiSearch.errors.noResults')
+        t('suppliers.aiSearch.errors.noResults')
       );
       setError(finalError);
       setLoading(false);

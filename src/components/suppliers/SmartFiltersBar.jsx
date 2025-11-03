@@ -151,10 +151,10 @@ const SmartFiltersBar = ({ weddingProfile, onFiltersChange, className = '' }) =>
           <div className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-primary" />
             <h3 className="font-semibold text-foreground">
-              {t('common.suppliers.smartFilters.title')}
+              {t('suppliers.smartFilters.title')}
             </h3>
             <span className="text-xs text-muted">
-              {t('common.suppliers.smartFilters.subtitle')}
+              {t('suppliers.smartFilters.subtitle')}
             </span>
           </div>
 
@@ -163,29 +163,29 @@ const SmartFiltersBar = ({ weddingProfile, onFiltersChange, className = '' }) =>
               variant="ghost"
               size="sm"
               onClick={handleReset}
-              title={t('common.suppliers.smartFilters.buttons.resetTitle')}
+              title={t('suppliers.smartFilters.buttons.resetTitle')}
             >
               <RotateCcw className="h-4 w-4" />
               <span className="hidden sm:inline">
-                {t('common.suppliers.smartFilters.buttons.reset')}
+                {t('suppliers.smartFilters.buttons.reset')}
               </span>
             </Button>
             <Button
               variant="ghost"
               size="sm"
               onClick={handleClear}
-              title={t('common.suppliers.smartFilters.buttons.clearTitle')}
+              title={t('suppliers.smartFilters.buttons.clearTitle')}
             >
-              {t('common.suppliers.smartFilters.buttons.clear')}
+              {t('suppliers.smartFilters.buttons.clear')}
             </Button>
           </div>
         </div>
 
         {!hasActiveFilters && (
           <div className="text-sm text-muted">
-            <p>{t('common.suppliers.smartFilters.empty.title')}</p>
+            <p>{t('suppliers.smartFilters.empty.title')}</p>
             <p className="mt-1">
-              {t('common.suppliers.smartFilters.empty.hint', { section: financeSection })}
+              {t('suppliers.smartFilters.empty.hint', { section: financeSection })}
             </p>
           </div>
         )}
@@ -204,7 +204,7 @@ const SmartFiltersBar = ({ weddingProfile, onFiltersChange, className = '' }) =>
                         onChange={(e) =>
                           setTempValues((prev) => ({ ...prev, budget: e.target.value }))
                         }
-                        placeholder={t('common.suppliers.smartFilters.fields.budget.placeholder')}
+                        placeholder={t('suppliers.smartFilters.fields.budget.placeholder')}
                         className="h-8 text-sm"
                         autoFocus
                       />
@@ -219,7 +219,7 @@ const SmartFiltersBar = ({ weddingProfile, onFiltersChange, className = '' }) =>
                     <>
                       <div className="flex-1">
                         <div className="text-xs text-muted">
-                          {t('common.suppliers.smartFilters.fields.budget.label')}
+                          {t('suppliers.smartFilters.fields.budget.label')}
                         </div>
                         <div className="font-medium text-foreground">
                           {format.number(Number(filters.budget))}
@@ -229,8 +229,8 @@ const SmartFiltersBar = ({ weddingProfile, onFiltersChange, className = '' }) =>
                         type="button"
                         onClick={() => handleStartEdit('budget')}
                         className="text-muted hover:text-primary transition-colors"
-                        title={t('common.suppliers.smartFilters.fields.budget.editTitle')}
-                        aria-label={t('common.suppliers.smartFilters.fields.budget.editTitle')}
+                        title={t('suppliers.smartFilters.fields.budget.editTitle')}
+                        aria-label={t('suppliers.smartFilters.fields.budget.editTitle')}
                       >
                         <Edit2 className="h-4 w-4" />
                       </button>
@@ -250,7 +250,7 @@ const SmartFiltersBar = ({ weddingProfile, onFiltersChange, className = '' }) =>
                         onChange={(e) =>
                           setTempValues((prev) => ({ ...prev, guests: e.target.value }))
                         }
-                        placeholder={t('common.suppliers.smartFilters.fields.guests.placeholder')}
+                        placeholder={t('suppliers.smartFilters.fields.guests.placeholder')}
                         className="h-8 text-sm"
                         autoFocus
                       />
@@ -265,7 +265,7 @@ const SmartFiltersBar = ({ weddingProfile, onFiltersChange, className = '' }) =>
                     <>
                       <div className="flex-1">
                         <div className="text-xs text-muted">
-                          {t('common.suppliers.smartFilters.fields.guests.label')}
+                          {t('suppliers.smartFilters.fields.guests.label')}
                         </div>
                         <div className="font-medium text-foreground">
                           {format.number(Number(filters.guests))}
@@ -275,8 +275,8 @@ const SmartFiltersBar = ({ weddingProfile, onFiltersChange, className = '' }) =>
                         type="button"
                         onClick={() => handleStartEdit('guests')}
                         className="text-muted hover:text-primary transition-colors"
-                        title={t('common.suppliers.smartFilters.fields.guests.editTitle')}
-                        aria-label={t('common.suppliers.smartFilters.fields.guests.editTitle')}
+                        title={t('suppliers.smartFilters.fields.guests.editTitle')}
+                        aria-label={t('suppliers.smartFilters.fields.guests.editTitle')}
                       >
                         <Edit2 className="h-4 w-4" />
                       </button>
@@ -296,7 +296,7 @@ const SmartFiltersBar = ({ weddingProfile, onFiltersChange, className = '' }) =>
                         onChange={(e) =>
                           setTempValues((prev) => ({ ...prev, style: e.target.value }))
                         }
-                        placeholder={t('common.suppliers.smartFilters.fields.style.placeholder')}
+                        placeholder={t('suppliers.smartFilters.fields.style.placeholder')}
                         className="h-8 text-sm"
                         autoFocus
                       />
@@ -311,7 +311,7 @@ const SmartFiltersBar = ({ weddingProfile, onFiltersChange, className = '' }) =>
                     <>
                       <div className="flex-1">
                         <div className="text-xs text-muted">
-                          {t('common.suppliers.smartFilters.fields.style.label')}
+                          {t('suppliers.smartFilters.fields.style.label')}
                         </div>
                         <div className="font-medium text-foreground capitalize">
                           {filters.style}
@@ -321,8 +321,8 @@ const SmartFiltersBar = ({ weddingProfile, onFiltersChange, className = '' }) =>
                         type="button"
                         onClick={() => handleStartEdit('style')}
                         className="text-muted hover:text-primary transition-colors"
-                        title={t('common.suppliers.smartFilters.fields.style.editTitle')}
-                        aria-label={t('common.suppliers.smartFilters.fields.style.editTitle')}
+                        title={t('suppliers.smartFilters.fields.style.editTitle')}
+                        aria-label={t('suppliers.smartFilters.fields.style.editTitle')}
                       >
                         <Edit2 className="h-4 w-4" />
                       </button>
@@ -342,7 +342,7 @@ const SmartFiltersBar = ({ weddingProfile, onFiltersChange, className = '' }) =>
                         onChange={(e) =>
                           setTempValues((prev) => ({ ...prev, location: e.target.value }))
                         }
-                        placeholder={t('common.suppliers.smartFilters.fields.location.placeholder')}
+                        placeholder={t('suppliers.smartFilters.fields.location.placeholder')}
                         className="h-8 text-sm"
                         autoFocus
                       />
@@ -361,7 +361,7 @@ const SmartFiltersBar = ({ weddingProfile, onFiltersChange, className = '' }) =>
                     <>
                       <div className="flex-1">
                         <div className="text-xs text-muted">
-                          {t('common.suppliers.smartFilters.fields.location.label')}
+                          {t('suppliers.smartFilters.fields.location.label')}
                         </div>
                         <div className="font-medium text-foreground capitalize">
                           {filters.location}
@@ -371,8 +371,8 @@ const SmartFiltersBar = ({ weddingProfile, onFiltersChange, className = '' }) =>
                         type="button"
                         onClick={() => handleStartEdit('location')}
                         className="text-muted hover:text-primary transition-colors"
-                        title={t('common.suppliers.smartFilters.fields.location.editTitle')}
-                        aria-label={t('common.suppliers.smartFilters.fields.location.editTitle')}
+                        title={t('suppliers.smartFilters.fields.location.editTitle')}
+                        aria-label={t('suppliers.smartFilters.fields.location.editTitle')}
                       >
                         <Edit2 className="h-4 w-4" />
                       </button>
@@ -383,7 +383,7 @@ const SmartFiltersBar = ({ weddingProfile, onFiltersChange, className = '' }) =>
             </div>
 
             <p className="text-xs text-muted">
-              {t('common.suppliers.smartFilters.hints.automated')}
+              {t('suppliers.smartFilters.hints.automated')}
             </p>
           </>
         )}

@@ -16,7 +16,7 @@ const WebGenerator = ({
   return (
     <div className="bg-white rounded-lg shadow p-6 mb-8">
       <h2 className="text-xl font-semibold mb-4">
-        {t('common.websiteGenerator.prompt.title', 'Personaliza tu web')}
+        {t('websiteGenerator.prompt.title', 'Personaliza tu web')}
       </h2>
       <p className="text-gray-600 mb-4">
         {t(
@@ -25,7 +25,7 @@ const WebGenerator = ({
         )}
         {selectedTemplate !== 'personalizada' && templates?.[selectedTemplate] && (
           <span className="block mt-2 text-blue-600">
-            {t('common.websiteGenerator.prompt.selectedTemplate.prefix', 'Usando plantilla: ')}
+            {t('websiteGenerator.prompt.selectedTemplate.prefix', 'Usando plantilla: ')}
             <strong>{templates[selectedTemplate].name}</strong>
             {t(
               'common.websiteGenerator.prompt.selectedTemplate.suffix',
@@ -41,7 +41,7 @@ const WebGenerator = ({
           onClick={onOpenPromptLibrary}
           className="inline-flex items-center gap-2 px-3 py-2 border border-blue-200 rounded-full hover:bg-blue-50 transition-colors"
         >
-          {t('common.websiteGenerator.prompt.exploreLibrary', 'Explorar biblioteca de prompts')}
+          {t('websiteGenerator.prompt.exploreLibrary', 'Explorar biblioteca de prompts')}
         </button>
         <span className="text-gray-400">
           {t(
@@ -95,7 +95,7 @@ const WebGenerator = ({
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                 ></path>
               </svg>
-              <span>{t('common.websiteGenerator.actions.generating', 'Generando...')}</span>
+              <span>{t('websiteGenerator.actions.generating', 'Generando...')}</span>
             </>
           ) : (
             <>
@@ -111,7 +111,7 @@ const WebGenerator = ({
                   clipRule="evenodd"
                 />
               </svg>
-              <span>{t('common.websiteGenerator.actions.generate', 'Generar Página Web')}</span>
+              <span>{t('websiteGenerator.actions.generate', 'Generar Página Web')}</span>
             </>
           )}
         </button>

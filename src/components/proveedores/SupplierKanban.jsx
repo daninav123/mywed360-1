@@ -80,10 +80,10 @@ export default function SupplierKanban({ proveedores = [], onMove, onClick, show
                 <header className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
                     <h4 className="text-sm font-semibold text-gray-800 truncate">
-                      {prov.name || prov.nombre || t('common.suppliers.kanban.placeholders.name')}
+                      {prov.name || prov.nombre || t('suppliers.kanban.placeholders.name')}
                     </h4>
                     <p className="text-xs text-gray-500 truncate">
-                      {prov.service || prov.servicio || t('common.suppliers.kanban.placeholders.service')}
+                      {prov.service || prov.servicio || t('suppliers.kanban.placeholders.service')}
                     </p>
                   </div>
                   {prov.intelligentScore?.score != null && (
@@ -98,7 +98,7 @@ export default function SupplierKanban({ proveedores = [], onMove, onClick, show
                   )}
                   {prov.groupName && (
                     <span className="px-2 py-0.5 rounded border border-amber-200 bg-amber-50 text-amber-700">
-                      {t('common.suppliers.kanban.badges.group', { name: prov.groupName })}
+                      {t('suppliers.kanban.badges.group', { name: prov.groupName })}
                     </span>
                   )}
                   {prov.origin && (
@@ -108,7 +108,7 @@ export default function SupplierKanban({ proveedores = [], onMove, onClick, show
                   )}
                   {showNextAction && prov?.proximaAccion && (
                     <span className="px-2 py-0.5 rounded border border-blue-200 bg-blue-50 text-blue-700">
-                      {t('common.suppliers.kanban.badges.nextAction', { value: prov.proximaAccion })}
+                      {t('suppliers.kanban.badges.nextAction', { value: prov.proximaAccion })}
                     </span>
                   )}
                 </div>
@@ -120,10 +120,10 @@ export default function SupplierKanban({ proveedores = [], onMove, onClick, show
                       e.stopPropagation();
                       onMove?.(prov, 'vacio');
                     }}
-                    title={t('common.suppliers.kanban.actions.reset')}
-                    aria-label={t('common.suppliers.kanban.actions.reset')}
+                    title={t('suppliers.kanban.actions.reset')}
+                    aria-label={t('suppliers.kanban.actions.reset')}
                   >
-                    {t('common.suppliers.kanban.actions.reset')}
+                    {t('suppliers.kanban.actions.reset')}
                   </button>
                   <button
                     type="button"
@@ -132,10 +132,10 @@ export default function SupplierKanban({ proveedores = [], onMove, onClick, show
                       e.stopPropagation();
                       onMove?.(prov, 'presupuestos');
                     }}
-                    title={t('common.suppliers.kanban.actions.budget')}
-                    aria-label={t('common.suppliers.kanban.actions.budget')}
+                    title={t('suppliers.kanban.actions.budget')}
+                    aria-label={t('suppliers.kanban.actions.budget')}
                   >
-                    {t('common.suppliers.kanban.actions.budget')}
+                    {t('suppliers.kanban.actions.budget')}
                   </button>
                   <button
                     type="button"
@@ -144,8 +144,8 @@ export default function SupplierKanban({ proveedores = [], onMove, onClick, show
                       e.stopPropagation();
                       onMove?.(prov, 'contratado');
                     }}
-                    title={t('common.suppliers.kanban.actions.hire')}
-                    aria-label={t('common.suppliers.kanban.actions.hire')}
+                    title={t('suppliers.kanban.actions.hire')}
+                    aria-label={t('suppliers.kanban.actions.hire')}
                   >
                     ✓
                   </button>
@@ -156,8 +156,8 @@ export default function SupplierKanban({ proveedores = [], onMove, onClick, show
                       e.stopPropagation();
                       onMove?.(prov, 'rechazado');
                     }}
-                    title={t('common.suppliers.kanban.actions.reject')}
-                    aria-label={t('common.suppliers.kanban.actions.reject')}
+                    title={t('suppliers.kanban.actions.reject')}
+                    aria-label={t('suppliers.kanban.actions.reject')}
                   >
                     ✕
                   </button>
@@ -166,7 +166,7 @@ export default function SupplierKanban({ proveedores = [], onMove, onClick, show
             ))}
             {(grouped[col.key] || []).length === 0 && (
               <div className="text-xs text-gray-400 italic text-center py-6 border border-dashed border-gray-200 rounded">
-                {t('common.suppliers.kanban.placeholders.empty')}
+                {t('suppliers.kanban.placeholders.empty')}
               </div>
             )}
           </div>

@@ -662,7 +662,7 @@ export default function ChatWidget() {
             email: payload.email || '',
             phone: payload.phone || '',
             link: payload.link || payload.website || payload.url || '',
-            status: payload.status || t('common.status.new'),
+            status: payload.status || t('status.new'),
             snippet: payload.snippet || payload.desc || '',
           };
           try {

@@ -99,7 +99,7 @@ const ProveedorCard = ({
   const { budgets = [] } = useSupplierBudgets(provider?.id);
   const budgetsToUse = Array.isArray(budgetsOverride) ? budgetsOverride : budgets;
   const currency = provider?.currency || 'EUR';
-  const notAvailable = t('common.suppliers.card.shared.notAvailable');
+  const notAvailable = t('suppliers.card.shared.notAvailable');
   const cardAppearanceClasses = useMemo(() => {
     switch (appearance) {
       case 'tracking':
@@ -181,7 +181,7 @@ const ProveedorCard = ({
       (raw ? 'unknown' : 'unknown');
     const label =
       normalized === 'unknown'
-        ? raw || t('common.suppliers.card.statusLabels.unknown')
+        ? raw || t('suppliers.card.statusLabels.unknown')
         : t(`common.suppliers.card.statusLabels.${normalized}`);
     return {
       label,
@@ -196,8 +196,8 @@ const ProveedorCard = ({
   }, [provider?.portalLastSubmitAt, provider?.portalToken]);
 
   const portalStatusLabel = useMemo(() => {
-    if (portalStatus === 'responded') return t('common.suppliers.card.portal.responded');
-    if (portalStatus === 'pending') return t('common.suppliers.card.portal.pending');
+    if (portalStatus === 'responded') return t('suppliers.card.portal.responded');
+    if (portalStatus === 'pending') return t('suppliers.card.portal.pending');
     return null;
   }, [portalStatus, t]);
 
@@ -250,15 +250,15 @@ const ProveedorCard = ({
       const hrs = Math.floor(min / 60);
       const days = Math.floor(hrs / 24);
       if (days > 0) {
-        return t('common.suppliers.card.tracking.lastAgo.days', { count: days });
+        return t('suppliers.card.tracking.lastAgo.days', { count: days });
       }
       if (hrs > 0) {
-        return t('common.suppliers.card.tracking.lastAgo.hours', { count: hrs });
+        return t('suppliers.card.tracking.lastAgo.hours', { count: hrs });
       }
       if (min > 0) {
-        return t('common.suppliers.card.tracking.lastAgo.minutes', { count: min });
+        return t('suppliers.card.tracking.lastAgo.minutes', { count: min });
       }
-      return t('common.suppliers.card.tracking.lastAgo.justNow');
+      return t('suppliers.card.tracking.lastAgo.justNow');
     } catch {
       return null;
     }
@@ -364,22 +364,22 @@ const ProveedorCard = ({
             userProfile?.guestCount ||
             userProfile?.guests ||
             ''
-        ) || t('common.suppliers.card.autoEmail.guestsFallback');
+        ) || t('suppliers.card.autoEmail.guestsFallback');
       const displayName =
         userProfile?.name ||
         [userProfile?.brideFirstName, userProfile?.brideLastName].filter(Boolean).join(' ') ||
         userProfile?.displayName ||
         (userProfile?.email
           ? userProfile.email.split('@')[0]
-          : t('common.suppliers.card.autoEmail.userFallback'));
+          : t('suppliers.card.autoEmail.userFallback'));
       const numericBudget = Number(provider?.presupuesto);
       const priceValue = Number.isFinite(numericBudget)
         ? format.currency(numericBudget, currency)
         : provider?.budgetRange || provider?.pricing || provider?.price || '';
       const searchQuery =
         action === 'quote'
-          ? t('common.suppliers.card.autoEmail.searchQuery.quote')
-          : t('common.suppliers.card.autoEmail.searchQuery.meeting');
+          ? t('suppliers.card.autoEmail.searchQuery.quote')
+          : t('suppliers.card.autoEmail.searchQuery.meeting');
 
       const templateData = {
         providerName: provider?.name || '',
@@ -405,16 +405,16 @@ const ProveedorCard = ({
       const baseBodyHtml = formatTemplateToHtml(aiBody);
       const appendedText =
         action === 'quote'
-          ? t('common.suppliers.card.autoEmail.appendedQuote')
-          : t('common.suppliers.card.autoEmail.appendedMeeting');
+          ? t('suppliers.card.autoEmail.appendedQuote')
+          : t('suppliers.card.autoEmail.appendedMeeting');
       const appended = `<p>${appendedText}</p>`;
-      const closing = `<p>${t('common.suppliers.card.autoEmail.closing')}</p>`;
+      const closing = `<p>${t('suppliers.card.autoEmail.closing')}</p>`;
 
       let body = '';
       if (baseBodyHtml) {
         const signature =
           userProfile?.preferences?.emailSignature ||
-          t('common.suppliers.card.autoEmail.signature');
+          t('suppliers.card.autoEmail.signature');
         body = `${baseBodyHtml}${appended}${closing}<p style="color:#888; font-size:12px;">${signature}</p>`;
       } else {
         const fallback = generateDefaultEmailBody(provider) || '';
@@ -424,8 +424,8 @@ const ProveedorCard = ({
       const target = provider?.name || provider?.service || baseSubject;
       const subject =
         action === 'quote'
-          ? t('common.suppliers.card.autoEmail.subjectQuote', { target })
-          : t('common.suppliers.card.autoEmail.subjectMeeting', { target });
+          ? t('suppliers.card.autoEmail.subjectQuote', { target })
+          : t('suppliers.card.autoEmail.subjectMeeting', { target });
 
       return { subject, body };
     },
@@ -449,7 +449,7 @@ const ProveedorCard = ({
       if (!provider?.email) {
         setAutoMessage({
           type: 'error',
-          text: t('common.suppliers.card.autoEmail.missingEmail'),
+          text: t('suppliers.card.autoEmail.missingEmail'),
         });
         return;
       }
@@ -467,8 +467,8 @@ const ProveedorCard = ({
             type: 'success',
             text:
               action === 'quote'
-                ? t('common.suppliers.card.autoEmail.successQuote')
-                : t('common.suppliers.card.autoEmail.successMeeting'),
+                ? t('suppliers.card.autoEmail.successQuote')
+                : t('suppliers.card.autoEmail.successMeeting'),
           });
           refreshTracking();
           if (emailsOpen) {
@@ -480,13 +480,13 @@ const ProveedorCard = ({
             type: 'error',
             text:
               providerEmailError ||
-              t('common.suppliers.card.autoEmail.sendErrorRetry'),
+              t('suppliers.card.autoEmail.sendErrorRetry'),
           });
         }
       } catch (err) {
         setAutoMessage({
           type: 'error',
-          text: err?.message || t('common.suppliers.card.autoEmail.sendError'),
+          text: err?.message || t('suppliers.card.autoEmail.sendError'),
         });
       } finally {
         setSendingAction(null);
@@ -524,7 +524,7 @@ const ProveedorCard = ({
         {stars}
         {count > 0 && (
           <span className="ml-1 text-xs text-gray-500">
-            {t('common.suppliers.card.rating.count', { count })}
+            {t('suppliers.card.rating.count', { count })}
           </span>
         )}
       </div>
@@ -546,8 +546,8 @@ const ProveedorCard = ({
           className="absolute top-2 left-2 text-yellow-400 hover:scale-110 transition-transform"
           title={
             provider.favorite
-              ? t('common.suppliers.card.favorite.remove')
-              : t('common.suppliers.card.favorite.add')
+              ? t('suppliers.card.favorite.remove')
+              : t('suppliers.card.favorite.add')
           }
         >
           <Star
@@ -559,7 +559,7 @@ const ProveedorCard = ({
         {hasPending ? (
           <span
             className={`absolute top-3 right-10 h-2.5 w-2.5 rounded-full shadow-inner ${pendingIndicatorClass}`}
-            title={t('common.suppliers.card.pendingTooltip')}
+            title={t('suppliers.card.pendingTooltip')}
           ></span>
         ) : null}
 
@@ -586,14 +586,14 @@ const ProveedorCard = ({
             <h3 className="text-lg font-semibold line-clamp-1">
               {provider?.name ||
                 provider?.nombre ||
-                t('common.suppliers.card.nameFallback')}
+                t('suppliers.card.nameFallback')}
             </h3>
             {Number.isFinite(scoreValue) && (
               <span
                 className="px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 text-xs font-semibold whitespace-nowrap"
-                title={t('common.suppliers.card.scoreTooltip')}
+                title={t('suppliers.card.scoreTooltip')}
               >
-                {t('common.suppliers.card.scoreLabel', { value: scoreValue })}
+                {t('suppliers.card.scoreLabel', { value: scoreValue })}
               </span>
             )}
           </div>
@@ -602,25 +602,25 @@ const ProveedorCard = ({
             <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-600">
               {matchValue != null && (
                 <span>
-                  {t('common.suppliers.card.metrics.matchLabel')}{' '}
+                  {t('suppliers.card.metrics.matchLabel')}{' '}
                   <span className="font-semibold text-gray-800">
-                    {t('common.suppliers.card.metrics.percent', { value: matchValue })}
+                    {t('suppliers.card.metrics.percent', { value: matchValue })}
                   </span>
                 </span>
               )}
               {experiencePercent != null && (
                 <span>
-                  {t('common.suppliers.card.metrics.experienceLabel')}{' '}
+                  {t('suppliers.card.metrics.experienceLabel')}{' '}
                   <span className="font-semibold text-gray-800">
-                    {t('common.suppliers.card.metrics.percent', { value: experiencePercent })}
+                    {t('suppliers.card.metrics.percent', { value: experiencePercent })}
                   </span>
                 </span>
               )}
               {responsePercent != null && (
                 <span>
-                  {t('common.suppliers.card.metrics.responseLabel')}{' '}
+                  {t('suppliers.card.metrics.responseLabel')}{' '}
                   <span className="font-semibold text-gray-800">
-                    {t('common.suppliers.card.metrics.percent', { value: responsePercent })}
+                    {t('suppliers.card.metrics.percent', { value: responsePercent })}
                   </span>
                 </span>
               )}
@@ -650,12 +650,12 @@ const ProveedorCard = ({
             <span className="text-sm font-medium text-gray-500">
               {provider?.service ||
                 provider?.servicio ||
-                t('common.suppliers.card.serviceFallback')}
+                t('suppliers.card.serviceFallback')}
             </span>
             {provider.groupName && (
               <span
                 className="text-xs px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 inline-flex items-center gap-1"
-                title={t('common.suppliers.card.groupTooltip', { name: provider.groupName })}
+                title={t('suppliers.card.groupTooltip', { name: provider.groupName })}
               >
                 <Users size={12} /> {provider.groupName}
               </span>
@@ -665,34 +665,34 @@ const ProveedorCard = ({
                 className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 inline-flex items-center gap-1"
                 title={
                   budgetInfo.accepted
-                    ? t('common.suppliers.card.budget.acceptedTooltip', {
+                    ? t('suppliers.card.budget.acceptedTooltip', {
                         amount: formatBudgetAmount(budgetInfo.accepted),
                       })
                     : budgetInfo.latest
-                    ? t('common.suppliers.card.budget.latestTooltip', {
+                    ? t('suppliers.card.budget.latestTooltip', {
                         amount: formatBudgetAmount(budgetInfo.latest),
                       })
-                    : t('common.suppliers.card.budget.genericTooltip')
+                    : t('suppliers.card.budget.genericTooltip')
                 }
               >
                 {budgetInfo.accepted
-                  ? t('common.suppliers.card.budget.accepted')
+                  ? t('suppliers.card.budget.accepted')
                   : budgetInfo.pendingCount > 0
-                  ? t('common.suppliers.card.budget.pending', { count: budgetInfo.pendingCount })
-                  : t('common.suppliers.card.budget.received')}
+                  ? t('suppliers.card.budget.pending', { count: budgetInfo.pendingCount })
+                  : t('suppliers.card.budget.received')}
               </span>
             )}
           </div>
 
           {provider.contact && (
             <p className="text-sm text-gray-600 mb-1">
-              {t('common.suppliers.card.contactLabel', { value: provider.contact })}
+              {t('suppliers.card.contactLabel', { value: provider.contact })}
             </p>
           )}
 
           {provider.phone && (
             <p className="text-sm text-gray-600 mb-1">
-              {t('common.suppliers.card.phoneLabel', { value: provider.phone })}
+              {t('suppliers.card.phoneLabel', { value: provider.phone })}
             </p>
           )}
 
@@ -714,13 +714,13 @@ const ProveedorCard = ({
 
           {provider.priceRange && (
             <p className="text-sm font-medium mt-1">
-              {t('common.suppliers.card.priceLabel', { value: provider.priceRange })}
+              {t('suppliers.card.priceLabel', { value: provider.priceRange })}
             </p>
           )}
 
           {provider.depositStatus === 'paid' && (
             <span className="inline-flex items-center mt-2 text-xs font-medium bg-green-100 text-green-700 px-2 py-0.5 rounded">
-              {t('common.suppliers.card.depositPaid')}
+              {t('suppliers.card.depositPaid')}
             </span>
           )}
 
@@ -736,7 +736,7 @@ const ProveedorCard = ({
             <div className="flex items-center mt-2 mb-2">
               <Calendar size={14} className="mr-1 text-gray-400" />
               <span className="text-sm text-gray-600">
-                {t('common.suppliers.card.dateLabel', { value: provider.date })}
+                {t('suppliers.card.dateLabel', { value: provider.date })}
               </span>
             </div>
           )}
@@ -764,7 +764,7 @@ const ProveedorCard = ({
             size="sm"
             className="flex-1"
           >
-            <Eye size={16} className="mr-1" /> {t('common.suppliers.card.actions.view')}
+            <Eye size={16} className="mr-1" /> {t('suppliers.card.actions.view')}
           </Button>
 
           <Button
@@ -775,8 +775,8 @@ const ProveedorCard = ({
             disabled={sendingEmail || !!sendingAction}
           >
             {sendingEmail && sendingAction === 'quote'
-              ? t('common.suppliers.card.autoEmail.sending')
-              : t('common.suppliers.card.actions.requestQuote')}
+              ? t('suppliers.card.autoEmail.sending')
+              : t('suppliers.card.actions.requestQuote')}
           </Button>
           <Button
             onClick={() => handleAutoEmail('meeting')}
@@ -786,8 +786,8 @@ const ProveedorCard = ({
             disabled={sendingEmail || !!sendingAction}
           >
             {sendingEmail && sendingAction === 'meeting'
-              ? t('common.suppliers.card.autoEmail.sending')
-              : t('common.suppliers.card.actions.requestMeeting')}
+              ? t('suppliers.card.autoEmail.sending')
+              : t('suppliers.card.actions.requestMeeting')}
           </Button>
 
           {/* Contratos se gestionan en la plataforma del proveedor */}
@@ -799,7 +799,7 @@ const ProveedorCard = ({
               size="sm"
               className="flex-1"
             >
-              <Edit2 size={16} className="mr-1" /> {t('common.suppliers.card.actions.edit')}
+              <Edit2 size={16} className="mr-1" /> {t('suppliers.card.actions.edit')}
             </Button>
           )}
 
@@ -813,7 +813,7 @@ const ProveedorCard = ({
               size="sm"
               className="flex-1"
             >
-              {t('common.suppliers.card.actions.viewBudget')}
+              {t('suppliers.card.actions.viewBudget')}
             </Button>
           )}
 
@@ -824,7 +824,7 @@ const ProveedorCard = ({
               size="sm"
               className="flex-1"
             >
-              {t('common.suppliers.card.actions.assignGroup')}
+              {t('suppliers.card.actions.assignGroup')}
             </Button>
           )}
 
@@ -835,7 +835,7 @@ const ProveedorCard = ({
               size="sm"
               className="flex-1 text-red-600 border-red-200 hover:bg-red-50"
             >
-              <Trash2 size={16} className="mr-1" /> {t('common.suppliers.card.actions.delete')}
+              <Trash2 size={16} className="mr-1" /> {t('suppliers.card.actions.delete')}
             </Button>
           )}
 
@@ -846,7 +846,7 @@ const ProveedorCard = ({
               size="sm"
               className="flex-1"
             >
-              <Calendar size={16} className="mr-1" /> {t('common.suppliers.card.actions.reserve')}
+              <Calendar size={16} className="mr-1" /> {t('suppliers.card.actions.reserve')}
             </Button>
           )}
         </div>
@@ -862,13 +862,13 @@ const ProveedorCard = ({
         {tracking && (
           <div className="w-full text-xs text-gray-600 mt-1 flex items-center gap-2 flex-wrap">
             <span>
-              {t('common.suppliers.card.tracking.status', { status: tracking.status || '-' })}
+              {t('suppliers.card.tracking.status', { status: tracking.status || '-' })}
             </span>
             <span>
-              {t('common.suppliers.card.tracking.last', { value: lastAgo || '-' })}
+              {t('suppliers.card.tracking.last', { value: lastAgo || '-' })}
             </span>
             <span>
-              {t('common.suppliers.card.tracking.thread', {
+              {t('suppliers.card.tracking.thread', {
                 count: (tracking.thread || []).length,
               })}
             </span>
@@ -876,9 +876,9 @@ const ProveedorCard = ({
               href="/email/inbox"
               className="ml-auto text-blue-600 hover:underline"
               onClick={(e) => e.stopPropagation()}
-              title={t('common.suppliers.card.tracking.openInboxTitle')}
+              title={t('suppliers.card.tracking.openInboxTitle')}
             >
-              {t('common.suppliers.card.tracking.openInbox')}
+              {t('suppliers.card.tracking.openInbox')}
             </a>
             {typeof onShowTracking === 'function' && (
               <button
@@ -893,7 +893,7 @@ const ProveedorCard = ({
                       providerName: provider.name,
                       subject:
                         tracking.subject ||
-                        t('common.suppliers.card.tracking.defaultSubject', {
+                        t('suppliers.card.tracking.defaultSubject', {
                           name: provider.name,
                         }),
                       status: tracking.status || 'pendiente',
@@ -906,9 +906,9 @@ const ProveedorCard = ({
                     onShowTracking(null);
                   }
                 }}
-                title={t('common.suppliers.card.tracking.detailsTitle')}
+                title={t('suppliers.card.tracking.detailsTitle')}
               >
-                {t('common.suppliers.card.tracking.details')}
+                {t('suppliers.card.tracking.details')}
               </button>
             )}
           </div>
@@ -928,28 +928,28 @@ const ProveedorCard = ({
               setEmails(list);
             }
           }}
-          title={t('common.suppliers.card.emails.toggleTitle')}
+          title={t('suppliers.card.emails.toggleTitle')}
         >
           {emailsOpen
-            ? t('common.suppliers.card.emails.hide')
-            : t('common.suppliers.card.emails.show', { count: emails.length || 0 })}
+            ? t('suppliers.card.emails.hide')
+            : t('suppliers.card.emails.show', { count: emails.length || 0 })}
         </button>
         {emailsOpen && (
           <div className="mt-1 border rounded p-2 bg-white/50 max-h-40 overflow-auto text-xs">
             {emailsLoading ? (
               <div className="text-gray-500">
-                {t('common.suppliers.card.emails.loading')}
+                {t('suppliers.card.emails.loading')}
               </div>
             ) : emails.length === 0 ? (
               <div className="text-gray-500">
-                {t('common.suppliers.card.emails.empty')}
+                {t('suppliers.card.emails.empty')}
               </div>
             ) : (
               <ul className="space-y-1">
                 {emails.map((m) => (
                   <li key={m.id} className="flex items-center justify-between gap-2">
                     <span className="truncate" title={m.subject}>
-                      {m.subject || t('common.suppliers.card.emails.noSubject')}
+                      {m.subject || t('suppliers.card.emails.noSubject')}
                     </span>
                     <span className="text-gray-500 whitespace-nowrap">
                       {formatEmailDate(m.date) || notAvailable}
@@ -964,7 +964,7 @@ const ProveedorCard = ({
                 className="text-blue-600 hover:underline"
                 onClick={(e) => e.stopPropagation()}
               >
-                {t('common.suppliers.card.emails.openInbox')}
+                {t('suppliers.card.emails.openInbox')}
               </a>
             </div>
           </div>

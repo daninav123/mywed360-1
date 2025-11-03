@@ -90,7 +90,7 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
     if (!emailData.subject || !emailData.body) {
       setErrors((prev) => ({
         ...prev,
-        email: t('common.suppliers.reservationModal.errors.emailRequired'),
+        email: t('suppliers.reservationModal.errors.emailRequired'),
       }));
       return;
     }
@@ -108,11 +108,11 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
     const newErrors = {};
 
     if (!formData.date) {
-      newErrors.date = t('common.suppliers.reservationModal.errors.dateRequired');
+      newErrors.date = t('suppliers.reservationModal.errors.dateRequired');
     }
 
     if (!formData.time) {
-      newErrors.time = t('common.suppliers.reservationModal.errors.timeRequired');
+      newErrors.time = t('suppliers.reservationModal.errors.timeRequired');
     }
 
     setErrors(newErrors);
@@ -144,12 +144,12 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
         {/* Header */}
         <div className="flex justify-between items-center p-4 border-b">
           <h2 className="text-xl font-semibold">
-            {t('common.suppliers.reservationModal.title', { name: provider.name })}
+            {t('suppliers.reservationModal.title', { name: provider.name })}
           </h2>
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700"
-            aria-label={t('common.suppliers.reservationModal.actions.closeAria')}
+            aria-label={t('suppliers.reservationModal.actions.closeAria')}
           >
             <X size={24} />
           </button>
@@ -161,7 +161,7 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
             <Card>
               <div className="mb-4">
                 <label htmlFor="date" className="block mb-1 text-sm font-medium">
-                  {t('common.suppliers.reservationModal.form.dateLabel')}
+                  {t('suppliers.reservationModal.form.dateLabel')}
                 </label>
                 <input
                   type="date"
@@ -178,7 +178,7 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
 
               <div className="mb-4">
                 <label htmlFor="time" className="block mb-1 text-sm font-medium">
-                  {t('common.suppliers.reservationModal.form.timeLabel')}
+                  {t('suppliers.reservationModal.form.timeLabel')}
                 </label>
                 <input
                   type="time"
@@ -195,7 +195,7 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
 
               <div className="mb-4">
                 <label htmlFor="contactMethod" className="block mb-1 text-sm font-medium">
-                  {t('common.suppliers.reservationModal.form.contactMethodLabel')}
+                  {t('suppliers.reservationModal.form.contactMethodLabel')}
                 </label>
                 <select
                   id="contactMethod"
@@ -205,23 +205,23 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
                   className="w-full p-2 border border-gray-300 rounded-md"
                 >
                   <option value="email">
-                    {t('common.suppliers.reservationModal.form.contactMethods.email')}
+                    {t('suppliers.reservationModal.form.contactMethods.email')}
                   </option>
                   <option value="phone">
-                    {t('common.suppliers.reservationModal.form.contactMethods.phone')}
+                    {t('suppliers.reservationModal.form.contactMethods.phone')}
                   </option>
                   <option value="presencial">
-                    {t('common.suppliers.reservationModal.form.contactMethods.inPerson')}
+                    {t('suppliers.reservationModal.form.contactMethods.inPerson')}
                   </option>
                   <option value="videollamada">
-                    {t('common.suppliers.reservationModal.form.contactMethods.videoCall')}
+                    {t('suppliers.reservationModal.form.contactMethods.videoCall')}
                   </option>
                 </select>
               </div>
 
               <div className="mb-4">
                 <label htmlFor="notes" className="block mb-1 text-sm font-medium">
-                  {t('common.suppliers.reservationModal.form.notesLabel')}
+                  {t('suppliers.reservationModal.form.notesLabel')}
                 </label>
                 <textarea
                   id="notes"
@@ -230,7 +230,7 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
                   onChange={handleChange}
                   rows="3"
                   className="w-full p-2 border border-gray-300 rounded-md"
-                  placeholder={t('common.suppliers.reservationModal.form.notesPlaceholder')}
+                  placeholder={t('suppliers.reservationModal.form.notesPlaceholder')}
                 ></textarea>
               </div>
 
@@ -238,12 +238,12 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
               <div className="mt-6 p-4 bg-blue-50 rounded-md">
                 <h3 className="font-medium mb-2 flex items-center">
                   <Calendar size={16} className="mr-1 text-blue-600" />
-                  {t('common.suppliers.reservationModal.providerInfo.title')}
+                  {t('suppliers.reservationModal.providerInfo.title')}
                 </h3>
                 {provider.contact && (
                   <p className="text-sm text-gray-700 mb-1">
                     <span className="font-medium">
-                      {t('common.suppliers.reservationModal.providerInfo.contact')}
+                      {t('suppliers.reservationModal.providerInfo.contact')}
                     </span>{' '}
                     {provider.contact}
                   </p>
@@ -251,7 +251,7 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
                 {provider.phone && (
                   <p className="text-sm text-gray-700 mb-1">
                     <span className="font-medium">
-                      {t('common.suppliers.reservationModal.providerInfo.phone')}
+                      {t('suppliers.reservationModal.providerInfo.phone')}
                     </span>{' '}
                     {provider.phone}
                   </p>
@@ -259,7 +259,7 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
                 {provider.email && (
                   <p className="text-sm text-gray-700 mb-1">
                     <span className="font-medium">
-                      {t('common.suppliers.reservationModal.providerInfo.email')}
+                      {t('suppliers.reservationModal.providerInfo.email')}
                     </span>{' '}
                     {provider.email}
                   </p>
@@ -267,7 +267,7 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
                 {provider.location && (
                   <p className="text-sm text-gray-700">
                     <span className="font-medium">
-                      {t('common.suppliers.reservationModal.providerInfo.location')}
+                      {t('suppliers.reservationModal.providerInfo.location')}
                     </span>{' '}
                     {provider.location}
                   </p>
@@ -283,11 +283,11 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
             <div className="flex items-center mb-2">
               <Mail size={18} className="mr-2 text-blue-600" />
               <h3 className="font-medium">
-                {t('common.suppliers.reservationModal.emailSection.title')}
+                {t('suppliers.reservationModal.emailSection.title')}
               </h3>
             </div>
             <p className="text-sm text-gray-600 mb-3">
-              {t('common.suppliers.reservationModal.emailSection.description')}
+              {t('suppliers.reservationModal.emailSection.description')}
             </p>
             <Button
               type="button"
@@ -296,7 +296,7 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
               className="w-full flex items-center justify-center"
             >
               <Mail size={16} className="mr-2" />
-              {t('common.suppliers.reservationModal.emailSection.button')}
+              {t('suppliers.reservationModal.emailSection.button')}
             </Button>
           </div>
         )}
@@ -307,12 +307,12 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
             <div className="flex justify-between items-center mb-3">
               <h3 className="font-medium flex items-center">
                 <Mail size={18} className="mr-2 text-blue-600" />
-                {t('common.suppliers.reservationModal.emailForm.title')}
+                {t('suppliers.reservationModal.emailForm.title')}
               </h3>
               <button
                 onClick={() => setShowEmailForm(false)}
                 className="text-gray-500 hover:text-gray-700"
-                aria-label={t('common.suppliers.reservationModal.emailForm.closeAria')}
+                aria-label={t('suppliers.reservationModal.emailForm.closeAria')}
               >
                 <X size={18} />
               </button>
@@ -321,7 +321,7 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
             <div className="space-y-3 mb-4">
               <div>
                 <label htmlFor="subject" className="block mb-1 text-sm font-medium">
-                  {t('common.suppliers.reservationModal.emailForm.subjectLabel')}
+                  {t('suppliers.reservationModal.emailForm.subjectLabel')}
                 </label>
                 <input
                   type="text"
@@ -335,7 +335,7 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
 
               <div>
                 <label htmlFor="body" className="block mb-1 text-sm font-medium">
-                  {t('common.suppliers.reservationModal.emailForm.bodyLabel')}
+                  {t('suppliers.reservationModal.emailForm.bodyLabel')}
                 </label>
                 <textarea
                   id="body"
@@ -362,8 +362,8 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
               className="w-full flex items-center justify-center"
             >
               {emailLoading
-                ? t('common.suppliers.reservationModal.emailForm.sending')
-                : t('common.suppliers.reservationModal.emailForm.send')}
+                ? t('suppliers.reservationModal.emailForm.sending')
+                : t('suppliers.reservationModal.emailForm.send')}
             </Button>
           </div>
         )}
@@ -374,11 +374,11 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
             <div className="flex items-center text-green-700 mb-2">
               <CheckCircle size={18} className="mr-2" />
               <span className="font-medium">
-                {t('common.suppliers.reservationModal.emailSuccess.title')}
+                {t('suppliers.reservationModal.emailSuccess.title')}
               </span>
             </div>
             <p className="text-sm text-gray-700">
-              {t('common.suppliers.reservationModal.emailSuccess.description', {
+              {t('suppliers.reservationModal.emailSuccess.description', {
                 name: provider.name,
                 email: userEmail,
               })}
@@ -389,10 +389,10 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
         {/* Botones de acción */}
         <div className="p-4 border-t flex justify-between">
           <Button type="button" variant="outline" onClick={onClose}>
-            {t('common.suppliers.reservationModal.actions.cancel')}
+            {t('suppliers.reservationModal.actions.cancel')}
           </Button>
           <Button type="button" onClick={handleSubmit} disabled={emailLoading}>
-            {t('common.suppliers.reservationModal.actions.confirm')}
+            {t('suppliers.reservationModal.actions.confirm')}
           </Button>
         </div>
       </div>

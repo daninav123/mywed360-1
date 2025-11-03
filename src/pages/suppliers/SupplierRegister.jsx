@@ -28,18 +28,18 @@ export default function SupplierRegister() {
   
   const categories = useMemo(
     () => [
-      { value: 'fotografia', label: t('common.suppliers.register.categories.photography') },
-      { value: 'video', label: t('common.suppliers.register.categories.video') },
-      { value: 'catering', label: t('common.suppliers.register.categories.catering') },
-      { value: 'flores', label: t('common.suppliers.register.categories.flowers') },
-      { value: 'musica', label: t('common.suppliers.register.categories.music') },
-      { value: 'peluqueria', label: t('common.suppliers.register.categories.beauty') },
-      { value: 'invitaciones', label: t('common.suppliers.register.categories.stationery') },
-      { value: 'vestidos', label: t('common.suppliers.register.categories.attire') },
-      { value: 'joyeria', label: t('common.suppliers.register.categories.jewelry') },
-      { value: 'transporte', label: t('common.suppliers.register.categories.transport') },
-      { value: 'alojamiento', label: t('common.suppliers.register.categories.accommodation') },
-      { value: 'otros', label: t('common.suppliers.register.categories.other') }
+      { value: 'fotografia', label: t('suppliers.register.categories.photography') },
+      { value: 'video', label: t('suppliers.register.categories.video') },
+      { value: 'catering', label: t('suppliers.register.categories.catering') },
+      { value: 'flores', label: t('suppliers.register.categories.flowers') },
+      { value: 'musica', label: t('suppliers.register.categories.music') },
+      { value: 'peluqueria', label: t('suppliers.register.categories.beauty') },
+      { value: 'invitaciones', label: t('suppliers.register.categories.stationery') },
+      { value: 'vestidos', label: t('suppliers.register.categories.attire') },
+      { value: 'joyeria', label: t('suppliers.register.categories.jewelry') },
+      { value: 'transporte', label: t('suppliers.register.categories.transport') },
+      { value: 'alojamiento', label: t('suppliers.register.categories.accommodation') },
+      { value: 'otros', label: t('suppliers.register.categories.other') }
     ],
     [t]
   );
@@ -58,12 +58,12 @@ export default function SupplierRegister() {
     
     // Validaciones
     if (formData.password !== formData.confirmPassword) {
-      setError(t('common.suppliers.register.errors.passwordMismatch'));
+      setError(t('suppliers.register.errors.passwordMismatch'));
       return;
     }
     
     if (formData.password.length < 6) {
-      setError(t('common.suppliers.register.errors.passwordLength'));
+      setError(t('suppliers.register.errors.passwordLength'));
       return;
     }
     
@@ -91,7 +91,7 @@ export default function SupplierRegister() {
       const data = await response.json();
       
       if (!data.success) {
-        throw new Error(data.error || t('common.suppliers.register.errors.server'));
+        throw new Error(data.error || t('suppliers.register.errors.server'));
       }
       
       // Login automático con custom token
@@ -100,8 +100,8 @@ export default function SupplierRegister() {
       // Mostrar mensaje
       toast.success(
         data.isClaimedProfile
-          ? t('common.suppliers.register.toasts.claimedSuccess')
-          : t('common.suppliers.register.toasts.registerSuccess')
+          ? t('suppliers.register.toasts.claimedSuccess')
+          : t('suppliers.register.toasts.registerSuccess')
       );
       
       // Redirigir al dashboard
@@ -109,7 +109,7 @@ export default function SupplierRegister() {
       
     } catch (err) {
       console.error('Error en registro:', err);
-      setError(err.message || t('common.suppliers.register.errors.generic'));
+      setError(err.message || t('suppliers.register.errors.generic'));
     } finally {
       setLoading(false);
     }
@@ -121,10 +121,10 @@ export default function SupplierRegister() {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">
-            {t('common.suppliers.register.title')}
+            {t('suppliers.register.title')}
           </h1>
           <p className="mt-2 text-gray-600">
-            {t('common.suppliers.register.subtitle')}
+            {t('suppliers.register.subtitle')}
           </p>
         </div>
         
@@ -135,7 +135,7 @@ export default function SupplierRegister() {
             {/* Email */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('common.suppliers.register.form.email.label')}
+                {t('suppliers.register.form.email.label')}
               </label>
               <input
                 type="email"
@@ -144,7 +144,7 @@ export default function SupplierRegister() {
                 value={formData.email}
                 onChange={handleChange}
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder={t('common.suppliers.register.form.email.placeholder')}
+                placeholder={t('suppliers.register.form.email.placeholder')}
               />
             </div>
             
@@ -152,7 +152,7 @@ export default function SupplierRegister() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {t('common.suppliers.register.form.password.label')}
+                  {t('suppliers.register.form.password.label')}
                 </label>
                 <input
                   type="password"
@@ -161,13 +161,13 @@ export default function SupplierRegister() {
                   value={formData.password}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder={t('common.suppliers.register.form.password.placeholder')}
+                  placeholder={t('suppliers.register.form.password.placeholder')}
                 />
               </div>
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {t('common.suppliers.register.form.confirmPassword.label')}
+                  {t('suppliers.register.form.confirmPassword.label')}
                 </label>
                 <input
                   type="password"
@@ -176,7 +176,7 @@ export default function SupplierRegister() {
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder={t('common.suppliers.register.form.confirmPassword.placeholder')}
+                  placeholder={t('suppliers.register.form.confirmPassword.placeholder')}
                 />
               </div>
             </div>
@@ -184,7 +184,7 @@ export default function SupplierRegister() {
             {/* Nombre del negocio */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('common.suppliers.register.form.name.label')}
+                {t('suppliers.register.form.name.label')}
               </label>
               <input
                 type="text"
@@ -193,7 +193,7 @@ export default function SupplierRegister() {
                 value={formData.name}
                 onChange={handleChange}
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder={t('common.suppliers.register.form.name.placeholder')}
+                placeholder={t('suppliers.register.form.name.placeholder')}
               />
             </div>
             
@@ -201,7 +201,7 @@ export default function SupplierRegister() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {t('common.suppliers.register.form.category.label')}
+                  {t('suppliers.register.form.category.label')}
                 </label>
                 <select
                   name="category"
@@ -220,7 +220,7 @@ export default function SupplierRegister() {
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {t('common.suppliers.register.form.location.label')}
+                  {t('suppliers.register.form.location.label')}
                 </label>
                 <input
                   type="text"
@@ -229,7 +229,7 @@ export default function SupplierRegister() {
                   value={formData.location}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder={t('common.suppliers.register.form.location.placeholder')}
+                  placeholder={t('suppliers.register.form.location.placeholder')}
                 />
               </div>
             </div>
@@ -238,7 +238,7 @@ export default function SupplierRegister() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {t('common.suppliers.register.form.phone.label')}
+                  {t('suppliers.register.form.phone.label')}
                 </label>
                 <input
                   type="tel"
@@ -246,13 +246,13 @@ export default function SupplierRegister() {
                   value={formData.phone}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder={t('common.suppliers.register.form.phone.placeholder')}
+                  placeholder={t('suppliers.register.form.phone.placeholder')}
                 />
               </div>
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {t('common.suppliers.register.form.website.label')}
+                  {t('suppliers.register.form.website.label')}
                 </label>
                 <input
                   type="url"
@@ -260,7 +260,7 @@ export default function SupplierRegister() {
                   value={formData.website}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder={t('common.suppliers.register.form.website.placeholder')}
+                  placeholder={t('suppliers.register.form.website.placeholder')}
                 />
               </div>
             </div>
@@ -268,7 +268,7 @@ export default function SupplierRegister() {
             {/* Descripción */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('common.suppliers.register.form.description.label')}
+                {t('suppliers.register.form.description.label')}
               </label>
               <textarea
                 name="description"
@@ -276,7 +276,7 @@ export default function SupplierRegister() {
                 onChange={handleChange}
                 rows={4}
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder={t('common.suppliers.register.form.description.placeholder')}
+                placeholder={t('suppliers.register.form.description.placeholder')}
               />
             </div>
             
@@ -294,19 +294,19 @@ export default function SupplierRegister() {
               className="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium transition-colors"
             >
               {loading
-                ? t('common.suppliers.register.buttons.submitting')
-                : t('common.suppliers.register.buttons.submit')}
+                ? t('suppliers.register.buttons.submitting')
+                : t('suppliers.register.buttons.submit')}
             </button>
             
             {/* Login link */}
             <div className="text-center text-sm text-gray-600">
-              {t('common.suppliers.register.login.question')}{' '}
+              {t('suppliers.register.login.question')}{' '}
               <button
                 type="button"
                 onClick={() => navigate('/supplier/login')}
                 className="text-blue-600 hover:underline font-medium"
               >
-                {t('common.suppliers.register.login.link')}
+                {t('suppliers.register.login.link')}
               </button>
             </div>
           </form>
@@ -315,10 +315,10 @@ export default function SupplierRegister() {
         {/* Beneficios */}
         <div className="mt-8 bg-white shadow-md rounded-lg p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            {t('common.suppliers.register.benefits.title')}
+            {t('suppliers.register.benefits.title')}
           </h2>
           <ul className="space-y-2 text-gray-600">
-            {t('common.suppliers.register.benefits.items', { returnObjects: true }).map((item, index) => (
+            {t('suppliers.register.benefits.items', { returnObjects: true }).map((item, index) => (
               <li key={index} className="flex items-start">
                 <span className="text-green-500 mr-2">✓</span>
                 <span>{item}</span>

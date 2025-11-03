@@ -144,10 +144,10 @@ export default function VectorEditorPage() {
     <div className="p-4 space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">
-          {t('common.designsLibrary.vectorEditor.title', 'Editor vectorial (IA)')}
+          {t('designsLibrary.vectorEditor.title', 'Editor vectorial (IA)')}
         </h1>
         <Link to="/disenos" className="text-blue-600 hover:underline">
-          {t('common.designsLibrary.myDesigns.backLink', 'Volver a Diseños')}
+          {t('designsLibrary.myDesigns.backLink', 'Volver a Diseños')}
         </Link>
       </div>
 
@@ -165,7 +165,7 @@ export default function VectorEditorPage() {
           <div className="flex flex-wrap gap-3 items-end">
             <div className="flex items-center gap-2">
               <label className="text-sm">
-                {t('common.designsLibrary.vectorEditor.controls.modeLabel', 'Modo')}
+                {t('designsLibrary.vectorEditor.controls.modeLabel', 'Modo')}
               </label>
               <select
                 value={mode}
@@ -190,7 +190,7 @@ export default function VectorEditorPage() {
               <>
                 <div>
                   <label className="block text-sm">
-                    {t('common.designsLibrary.vectorEditor.controls.color.colors', 'Colores')}
+                    {t('designsLibrary.vectorEditor.controls.color.colors', 'Colores')}
                   </label>
                   <input
                     type="number"
@@ -208,7 +208,7 @@ export default function VectorEditorPage() {
                 </div>
                 <div>
                   <label className="block text-sm">
-                    {t('common.designsLibrary.vectorEditor.controls.color.ltres', 'ltres (0-1)')}
+                    {t('designsLibrary.vectorEditor.controls.color.ltres', 'ltres (0-1)')}
                   </label>
                   <input
                     type="number"
@@ -227,7 +227,7 @@ export default function VectorEditorPage() {
                 </div>
                 <div>
                   <label className="block text-sm">
-                    {t('common.designsLibrary.vectorEditor.controls.color.qtres', 'qtres (0-1)')}
+                    {t('designsLibrary.vectorEditor.controls.color.qtres', 'qtres (0-1)')}
                   </label>
                   <input
                     type="number"
@@ -246,7 +246,7 @@ export default function VectorEditorPage() {
                 </div>
                 <div>
                   <label className="block text-sm">
-                    {t('common.designsLibrary.vectorEditor.controls.color.stroke', 'Trazo')}
+                    {t('designsLibrary.vectorEditor.controls.color.stroke', 'Trazo')}
                   </label>
                   <input
                     type="number"
@@ -296,7 +296,7 @@ export default function VectorEditorPage() {
                     'common.designsLibrary.vectorEditor.controls.vectorize.loading',
                     'Vectorizando...'
                   )
-                : t('common.designsLibrary.vectorEditor.controls.vectorize.action', 'Revectorizar')}
+                : t('designsLibrary.vectorEditor.controls.vectorize.action', 'Revectorizar')}
             </button>
             <a
               href={imageUrl}
@@ -304,7 +304,7 @@ export default function VectorEditorPage() {
               rel="noreferrer"
               className="text-sm text-gray-600 hover:underline"
             >
-              {t('common.designsLibrary.vectorEditor.controls.viewOriginal', 'Ver original')}
+              {t('designsLibrary.vectorEditor.controls.viewOriginal', 'Ver original')}
             </a>
             {activeWedding && (
               <button
@@ -370,7 +370,7 @@ export default function VectorEditorPage() {
         <div className="bg-white border rounded p-3">
           <div className="flex items-center justify-between mb-2">
             <h3 className="font-semibold">
-              {t('common.designsLibrary.vectorEditor.palette.title', 'Paleta de la boda')}
+              {t('designsLibrary.vectorEditor.palette.title', 'Paleta de la boda')}
             </h3>
             <button
               className="px-3 py-1 rounded bg-blue-600 text-white hover:bg-blue-700"
@@ -397,7 +397,7 @@ export default function VectorEditorPage() {
                 }
               }}
             >
-              {t('common.designsLibrary.vectorEditor.palette.save', 'Guardar paleta')}
+              {t('designsLibrary.vectorEditor.palette.save', 'Guardar paleta')}
             </button>
           </div>
           <div className="flex flex-wrap gap-3 items-center">
@@ -427,7 +427,7 @@ export default function VectorEditorPage() {
               className="px-2 py-1 border rounded"
               onClick={() => setPalette((prev) => [...prev, '#000000'])}
             >
-              {t('common.designsLibrary.vectorEditor.palette.addColor', '+ color')}
+              {t('designsLibrary.vectorEditor.palette.addColor', '+ color')}
             </button>
           </div>
         </div>
@@ -439,7 +439,7 @@ export default function VectorEditorPage() {
         <VectorEditor ref={editorRef} svg={svg} palette={palette} />
       ) : canVectorize && !loading ? (
         <div className="text-sm text-gray-600">
-          {t('common.designsLibrary.vectorEditor.messages.noSvg', 'No hay SVG disponible aún.')}
+          {t('designsLibrary.vectorEditor.messages.noSvg', 'No hay SVG disponible aún.')}
         </div>
       ) : null}
     </div>

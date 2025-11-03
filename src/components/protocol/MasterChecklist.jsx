@@ -24,14 +24,14 @@ const MasterChecklist = ({ weddingId, onUpdate }) => {
 
   // Categorías predefinidas
   const categories = {
-    ceremony: t('common.categories.ceremony'),
-    reception: t('common.categories.reception'),
+    ceremony: t('categories.ceremony'),
+    reception: t('categories.reception'),
     catering: t('services.catering'),
     decoration: t('services.decoration'),
     music: t('services.music'),
     photography: t('services.photography'),
     transport: t('services.transport'),
-    general: t('common.general')
+    general: t('general')
   };
 
   // Templates de tareas comunes
@@ -67,7 +67,7 @@ const MasterChecklist = ({ weddingId, onUpdate }) => {
 
   const handleAddTask = () => {
     if (!formData.title) {
-      alert(t('common.validation.titleRequired'));
+      alert(t('validation.titleRequired'));
       return;
     }
 

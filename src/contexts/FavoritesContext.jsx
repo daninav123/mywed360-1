@@ -119,20 +119,20 @@ export function FavoritesProvider({ children }) {
   // Añadir a favoritos
   const addFavorite = async (supplier, notes = '') => {
     if (!user) {
-      throw new Error(t('common.suppliers.favorites.errors.loginRequired'));
+      throw new Error(t('suppliers.favorites.errors.loginRequired'));
     }
 
     const weddingId = activeWedding;
 
     if (!weddingId) {
-      throw new Error(t('common.suppliers.favorites.errors.activeWeddingRequired'));
+      throw new Error(t('suppliers.favorites.errors.activeWeddingRequired'));
     }
 
     try {
       const token = await getAuthToken();
 
       if (!token) {
-        throw new Error(t('common.suppliers.favorites.errors.authToken'));
+        throw new Error(t('suppliers.favorites.errors.authToken'));
       }
 
       const headers = {
@@ -154,11 +154,11 @@ export function FavoritesProvider({ children }) {
       console.error('[FavoritesContext] Error añadiendo favorito:', err);
 
       if (err.response?.status === 409) {
-        throw new Error(t('common.suppliers.favorites.errors.alreadyExists'));
+        throw new Error(t('suppliers.favorites.errors.alreadyExists'));
       }
 
       throw new Error(
-        err.response?.data?.message || t('common.suppliers.favorites.errors.saveFailed')
+        err.response?.data?.message || t('suppliers.favorites.errors.saveFailed')
       );
     }
   };
@@ -166,20 +166,20 @@ export function FavoritesProvider({ children }) {
   // Eliminar de favoritos
   const removeFavorite = async (supplierId) => {
     if (!user) {
-      throw new Error(t('common.suppliers.favorites.errors.loginRequired'));
+      throw new Error(t('suppliers.favorites.errors.loginRequired'));
     }
 
     const weddingId = activeWedding;
 
     if (!weddingId) {
-      throw new Error(t('common.suppliers.favorites.errors.activeWeddingRequired'));
+      throw new Error(t('suppliers.favorites.errors.activeWeddingRequired'));
     }
 
     try {
       const token = await getAuthToken();
 
       if (!token) {
-        throw new Error(t('common.suppliers.favorites.errors.authToken'));
+        throw new Error(t('suppliers.favorites.errors.authToken'));
       }
 
       const headers = {
@@ -194,7 +194,7 @@ export function FavoritesProvider({ children }) {
     } catch (err) {
       console.error('[FavoritesContext] Error eliminando favorito:', err);
       throw new Error(
-        err.response?.data?.message || t('common.suppliers.favorites.errors.removeFailed')
+        err.response?.data?.message || t('suppliers.favorites.errors.removeFailed')
       );
     }
   };

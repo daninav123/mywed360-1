@@ -76,7 +76,7 @@ const CeremonyProtocol = ({ weddingId, onSave }) => {
 
   const handleAddEvent = () => {
     if (!formData.title) {
-      toast.warn(t('common.protocol.ceremony.titleRequired', 'El título es obligatorio'));
+      toast.warn(t('protocol.ceremony.titleRequired', 'El título es obligatorio'));
       return;
     }
 
@@ -109,7 +109,7 @@ const CeremonyProtocol = ({ weddingId, onSave }) => {
   };
 
   const handleDeleteEvent = (id) => {
-    if (window.confirm(t('common.protocol.ceremony.confirmDelete', '¿Eliminar este evento?'))) {
+    if (window.confirm(t('protocol.ceremony.confirmDelete', '¿Eliminar este evento?'))) {
       setProtocol({
         ...protocol,
         [activeTab]: protocol[activeTab].filter((e) => e.id !== id),

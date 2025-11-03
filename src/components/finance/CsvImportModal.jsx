@@ -129,10 +129,10 @@ export default function CsvImportModal({
 
         <div className="flex justify-end gap-2">
           <Button variant="outline" onClick={onClose}>
-            {t('common.cancel', { defaultValue: 'Cancelar' })}
+            {t('cancel', { defaultValue: 'Cancelar' })}
           </Button>
           <Button onClick={onImport} disabled={csvLoading}>
-            {t('common.import', { defaultValue: 'Importar' })}
+            {t('import', { defaultValue: 'Importar' })}
           </Button>
         </div>
       </div>

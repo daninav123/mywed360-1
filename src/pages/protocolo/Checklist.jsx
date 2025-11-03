@@ -111,7 +111,7 @@ export default function Checklist() {
   const [manualChecks, setManualChecks] = useState(() => [
     {
       id: 'manual-check-1',
-      title: t('common.protocol.checklist.manualDefaults.specialGifts'),
+      title: t('protocol.checklist.manualDefaults.specialGifts'),
       notes: '',
       done: false,
     },
@@ -155,21 +155,21 @@ export default function Checklist() {
 
   const categoryLabels = useMemo(
     () => ({
-      [CATEGORIES.DOCUMENTATION]: t('common.protocol.checklist.categories.documentation'),
-      [CATEGORIES.PROVIDERS]: t('common.protocol.checklist.categories.providers'),
-      [CATEGORIES.CEREMONY]: t('common.protocol.checklist.categories.ceremony'),
-      [CATEGORIES.CONTINGENCY]: t('common.protocol.checklist.categories.contingency'),
-      [CATEGORIES.PERSONAL]: t('common.protocol.checklist.categories.personal'),
-      [CATEGORIES.TECHNICAL]: t('common.protocol.checklist.categories.technical'),
+      [CATEGORIES.DOCUMENTATION]: t('protocol.checklist.categories.documentation'),
+      [CATEGORIES.PROVIDERS]: t('protocol.checklist.categories.providers'),
+      [CATEGORIES.CEREMONY]: t('protocol.checklist.categories.ceremony'),
+      [CATEGORIES.CONTINGENCY]: t('protocol.checklist.categories.contingency'),
+      [CATEGORIES.PERSONAL]: t('protocol.checklist.categories.personal'),
+      [CATEGORIES.TECHNICAL]: t('protocol.checklist.categories.technical'),
     }),
     [CATEGORIES, t]
   );
 
   const statusLabels = useMemo(
     () => ({
-      [ITEM_STATUS.PENDING]: t('common.protocol.checklist.statuses.pending'),
-      [ITEM_STATUS.IN_PROGRESS]: t('common.protocol.checklist.statuses.in-progress'),
-      [ITEM_STATUS.DONE]: t('common.protocol.checklist.statuses.done'),
+      [ITEM_STATUS.PENDING]: t('protocol.checklist.statuses.pending'),
+      [ITEM_STATUS.IN_PROGRESS]: t('protocol.checklist.statuses.in-progress'),
+      [ITEM_STATUS.DONE]: t('protocol.checklist.statuses.done'),
     }),
     [ITEM_STATUS, t]
   );
@@ -218,7 +218,7 @@ export default function Checklist() {
       if (item) {
         const statusLabel = statusLabels[status] || status;
         toast.success(
-          t('common.protocol.checklist.toasts.statusUpdated', {
+          t('protocol.checklist.toasts.statusUpdated', {
             label: item.label,
             status: statusLabel,
           })
@@ -232,7 +232,7 @@ export default function Checklist() {
     const { label, category, dueDate } = newItemData;
 
     if (!label.trim()) {
-      toast.error(t('common.protocol.checklist.toasts.missingName'));
+      toast.error(t('protocol.checklist.toasts.missingName'));
       return;
     }
 
@@ -240,7 +240,7 @@ export default function Checklist() {
       const selectedCategory = category || CATEGORIES.PERSONAL;
       const newItem = addCustomItem(label, selectedCategory, dueDate || null);
       toast.success(
-        t('common.protocol.checklist.toasts.customAdded', {
+        t('protocol.checklist.toasts.customAdded', {
           label,
         })
       );
@@ -257,10 +257,10 @@ export default function Checklist() {
       const item = items.find((i) => i.id === itemId);
       if (!item) return;
 
-      if (window.confirm(t('common.protocol.checklist.prompts.deleteCustom', { label: item.label }))) {
+      if (window.confirm(t('protocol.checklist.prompts.deleteCustom', { label: item.label }))) {
         try {
           removeCustomItem(itemId);
-          toast.success(t('common.protocol.checklist.toasts.customRemoved'));
+          toast.success(t('protocol.checklist.toasts.customRemoved'));
         } catch (error) {
           toast.error(error.message);
         }
@@ -286,7 +286,7 @@ export default function Checklist() {
     a.download = `checklist_${activeWedding || 'lovenda'}_${Date.now()}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    toast.success(t('common.protocol.checklist.toasts.exported'));
+    toast.success(t('protocol.checklist.toasts.exported'));
   }, [activeWedding, documents, items, readiness, summary, t]);
 
   const handleImport = useCallback(
@@ -314,12 +314,12 @@ export default function Checklist() {
           });
 
           toast.success(
-            t('common.protocol.checklist.toasts.imported', {
+            t('protocol.checklist.toasts.imported', {
               count: imported,
             })
           );
         } catch (error) {
-          toast.error(t('common.protocol.checklist.toasts.importError'));
+          toast.error(t('protocol.checklist.toasts.importError'));
         }
       };
       reader.readAsText(file);
@@ -420,12 +420,12 @@ export default function Checklist() {
                 {item.critical && (
                   <Badge type="error">
                     <Shield size={12} className="mr-1 inline" />
-                    {t('common.protocol.checklist.badges.critical')}
+                    {t('protocol.checklist.badges.critical')}
                   </Badge>
                 )}
                 {item.custom && (
                   <Badge type="info">
-                    {t('common.protocol.checklist.badges.custom')}
+                    {t('protocol.checklist.badges.custom')}
                   </Badge>
                 )}
                 {itemDocs.length > 0 && (
@@ -440,11 +440,11 @@ export default function Checklist() {
                 <div className="mt-1 flex items-center gap-2 text-xs text-gray-600">
                   <Calendar size={13} />
                   <span>
-                    {t('common.protocol.checklist.labels.due')} {formatDate(item.dueDate, 'short')}
+                    {t('protocol.checklist.labels.due')} {formatDate(item.dueDate, 'short')}
                   </span>
                   {isOverdue && (
                     <span className="font-semibold text-rose-600">
-                      {t('common.protocol.checklist.labels.overdue')}
+                      {t('protocol.checklist.labels.overdue')}
                     </span>
                   )}
                 </div>
@@ -454,14 +454,14 @@ export default function Checklist() {
                 <div className="mt-3 space-y-3 text-sm">
                   <textarea
                     className="w-full rounded-md border p-2 text-sm"
-                    placeholder={t('common.protocol.checklist.labels.notesPlaceholder')}
+                    placeholder={t('protocol.checklist.labels.notesPlaceholder')}
                     value={item.notes || ''}
                     onChange={(e) => setItemNotes(item.id, e.target.value)}
                     rows={3}
                   />
                   <div className="flex flex-wrap items-center gap-2">
                     <label className="text-xs font-medium text-gray-600">
-                      {t('common.protocol.checklist.labels.due')}
+                      {t('protocol.checklist.labels.due')}
                     </label>
                     <input
                       type="date"
@@ -492,7 +492,7 @@ export default function Checklist() {
               {itemDocs.length > 0 && (
                 <div className="mt-3">
                   <div className="text-xs font-medium text-gray-500">
-                    {t('common.protocol.checklist.labels.documents')}
+                    {t('protocol.checklist.labels.documents')}
                   </div>
                   <div className="mt-1 flex flex-wrap gap-1">
                     {itemDocs.map((doc) => (
@@ -511,7 +511,7 @@ export default function Checklist() {
                 className={`rounded p-1 transition ${
                   item.critical ? 'text-rose-500 hover:text-rose-600' : 'text-gray-400 hover:text-rose-500'
                 }`}
-                title={t('common.protocol.checklist.tooltips.markCritical')}
+                title={t('protocol.checklist.tooltips.markCritical')}
               >
                 <Flag size={16} />
               </button>
@@ -520,8 +520,8 @@ export default function Checklist() {
                 className="rounded p-1 text-gray-400 transition hover:text-blue-600"
                 title={
                   isEditing
-                    ? t('common.protocol.checklist.tooltips.save')
-                    : t('common.protocol.checklist.tooltips.edit')
+                    ? t('protocol.checklist.tooltips.save')
+                    : t('protocol.checklist.tooltips.edit')
                 }
               >
                 {isEditing ? <CheckSquare size={16} /> : <Edit2 size={16} />}
@@ -530,7 +530,7 @@ export default function Checklist() {
                 <button
                   onClick={() => handleRemoveCustomItem(item.id)}
                   className="rounded p-1 text-gray-400 transition hover:text-rose-600"
-                  title={t('common.protocol.checklist.tooltips.delete')}
+                  title={t('protocol.checklist.tooltips.delete')}
                 >
                   <Trash2 size={16} />
                 </button>
@@ -569,30 +569,30 @@ export default function Checklist() {
   const AddCheckpointModal = () => (
     <Modal
       open={showAddModal}
-      title={t('common.protocol.checklist.addModal.title')}
+      title={t('protocol.checklist.addModal.title')}
       onClose={() => setShowAddModal(false)}
     >
       <div className="space-y-4">
         <div>
           <label className="mb-1 block text-sm font-medium text-gray-700">
-            {t('common.protocol.checklist.addModal.nameLabel')}
+            {t('protocol.checklist.addModal.nameLabel')}
           </label>
           <input
             type="text"
             value={newCheckpoint.title}
             onChange={(e) => setNewCheckpoint((c) => ({ ...c, title: e.target.value }))}
-            placeholder={t('common.protocol.checklist.addModal.namePlaceholder')}
+            placeholder={t('protocol.checklist.addModal.namePlaceholder')}
             className="w-full rounded border px-3 py-2"
           />
         </div>
         <div>
           <label className="mb-1 block text-sm font-medium text-gray-700">
-            {t('common.protocol.checklist.addModal.notesLabel')}
+            {t('protocol.checklist.addModal.notesLabel')}
           </label>
           <textarea
             value={newCheckpoint.notes}
             onChange={(e) => setNewCheckpoint((c) => ({ ...c, notes: e.target.value }))}
-            placeholder={t('common.protocol.checklist.addModal.notesPlaceholder')}
+            placeholder={t('protocol.checklist.addModal.notesPlaceholder')}
             className="w-full rounded border px-3 py-2"
             rows={2}
           />
@@ -602,10 +602,10 @@ export default function Checklist() {
             onClick={() => setShowAddModal(false)}
             variant="secondary"
           >
-            {t('common.app.cancel')}
+            {t('app.cancel')}
           </Button>
           <Button onClick={addManualCheckpoint} disabled={!newCheckpoint.title.trim()}>
-            {t('common.app.save')}
+            {t('app.save')}
           </Button>
         </div>
       </div>
@@ -620,7 +620,7 @@ export default function Checklist() {
         icon: Users,
         accent: 'border-blue-200',
         summary: providersLoading
-          ? t('common.app.loading')
+          ? t('app.loading')
           : (() => {
               const total = providers?.length || 0;
               const confirmed = (providers || []).filter(
@@ -679,7 +679,7 @@ export default function Checklist() {
   );
 
   return (
-    <PageWrapper title={t('common.protocol.checklist.title')}>
+    <PageWrapper title={t('protocol.checklist.title')}>
       <input
         ref={fileInputRef}
         type="file"
@@ -728,7 +728,7 @@ export default function Checklist() {
                     : translate('common.protocol.checklist.readiness.pending', 'Revisa los puntos críticos antes de la boda.')}
                 </p>
                 <p className="text-sm text-gray-600">
-                  {t('common.protocol.checklist.description')}
+                  {t('protocol.checklist.description')}
                 </p>
               </div>
             </div>
@@ -868,13 +868,13 @@ export default function Checklist() {
                   onClick={() => setShowAddModal(true)}
                   startIcon={<Plus size={14} />}
                 >
-                  {t('common.protocol.checklist.buttons.addCheckpoint')}
+                  {t('protocol.checklist.buttons.addCheckpoint')}
                 </Button>
               </div>
               {manualChecks.length === 0 ? (
                 <p className="text-xs text-gray-500">
-                  {t('common.protocol.checklist.manual.empty', {
-                    button: t('common.protocol.checklist.buttons.addCheckpoint'),
+                  {t('protocol.checklist.manual.empty', {
+                    button: t('protocol.checklist.buttons.addCheckpoint'),
                   })}
                 </p>
               ) : (

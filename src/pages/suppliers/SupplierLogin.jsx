@@ -33,13 +33,13 @@ export default function SupplierLogin() {
 
       if (!response.ok) {
         if (data.error === 'invalid_credentials') {
-          throw new Error(t('common.suppliers.login.errors.invalidCredentials'));
+          throw new Error(t('suppliers.login.errors.invalidCredentials'));
         } else if (data.error === 'account_suspended') {
-          throw new Error(t('common.suppliers.login.errors.accountSuspended'));
+          throw new Error(t('suppliers.login.errors.accountSuspended'));
         } else if (data.error === 'password_not_set') {
-          throw new Error(t('common.suppliers.login.errors.passwordNotSet'));
+          throw new Error(t('suppliers.login.errors.passwordNotSet'));
         } else {
-          throw new Error(data.message || t('common.suppliers.login.errors.generic'));
+          throw new Error(data.message || t('suppliers.login.errors.generic'));
         }
       }
 
@@ -77,9 +77,9 @@ export default function SupplierLogin() {
             <LogIn size={32} />
           </div>
           <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--color-text)' }}>
-            {t('common.suppliers.login.title')}
+            {t('suppliers.login.title')}
           </h1>
-          <p style={{ color: 'var(--color-muted)' }}>{t('common.suppliers.login.subtitle')}</p>
+          <p style={{ color: 'var(--color-muted)' }}>{t('suppliers.login.subtitle')}</p>
         </div>
 
         {/* Card de login */}
@@ -94,7 +94,7 @@ export default function SupplierLogin() {
                 className="block text-sm font-medium mb-2"
                 style={{ color: 'var(--color-text)' }}
               >
-                {t('common.suppliers.login.fields.email.label')}
+                {t('suppliers.login.fields.email.label')}
               </label>
               <div className="relative">
                 <div
@@ -112,7 +112,7 @@ export default function SupplierLogin() {
                     borderColor: 'var(--color-border)',
                     '--tw-ring-color': 'var(--color-primary)',
                   }}
-                  placeholder={t('common.suppliers.login.fields.email.placeholder')}
+                  placeholder={t('suppliers.login.fields.email.placeholder')}
                   required
                 />
               </div>
@@ -124,7 +124,7 @@ export default function SupplierLogin() {
                 className="block text-sm font-medium mb-2"
                 style={{ color: 'var(--color-text)' }}
               >
-                {t('common.suppliers.login.fields.password.label')}
+                {t('suppliers.login.fields.password.label')}
               </label>
               <div className="relative">
                 <div
@@ -138,7 +138,7 @@ export default function SupplierLogin() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                  placeholder={t('common.suppliers.login.fields.password.placeholder')}
+                  placeholder={t('suppliers.login.fields.password.placeholder')}
                   required
                 />
               </div>
@@ -167,8 +167,8 @@ export default function SupplierLogin() {
               style={{ backgroundColor: 'var(--color-primary)' }}
             >
               {loading
-                ? t('common.suppliers.login.buttons.submitting')
-                : t('common.suppliers.login.buttons.submit')}
+                ? t('suppliers.login.buttons.submitting')
+                : t('suppliers.login.buttons.submit')}
             </button>
           </form>
 
@@ -179,19 +179,19 @@ export default function SupplierLogin() {
               className="text-sm hover:underline"
               style={{ color: 'var(--color-primary)' }}
             >
-              {t('common.suppliers.login.links.forgotPassword')}
+              {t('suppliers.login.links.forgotPassword')}
             </button>
 
             <div className="pt-4 border-t" style={{ borderColor: 'var(--color-border)' }}>
               <p className="text-sm mb-2" style={{ color: 'var(--color-muted)' }}>
-                {t('common.suppliers.login.links.noAccount')}
+                {t('suppliers.login.links.noAccount')}
               </p>
               <button
                 onClick={() => navigate('/supplier/registro')}
                 className="hover:underline font-medium"
                 style={{ color: 'var(--color-primary)' }}
               >
-                {t('common.suppliers.login.links.register')}
+                {t('suppliers.login.links.register')}
               </button>
             </div>
           </div>
@@ -199,7 +199,7 @@ export default function SupplierLogin() {
 
         {/* Footer */}
         <div className="mt-8 text-center text-sm" style={{ color: 'var(--color-muted)' }}>
-          <p>{t('common.suppliers.login.footer.copyright')}</p>
+          <p>{t('suppliers.login.footer.copyright')}</p>
         </div>
       </div>
     </div>

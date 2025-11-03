@@ -60,7 +60,7 @@ export default function SupplierMergeWizard({ open, onClose, provider, onComplet
     statusOptions.forEach((opt) => map.set(opt.value, opt.label));
     return map;
   }, [statusOptions]);
-  const unknownValue = t('common.suppliers.mergeWizard.lists.budgetUnknown');
+  const unknownValue = t('suppliers.mergeWizard.lists.budgetUnknown');
   const serviceLines = useMemo(() => provider?.serviceLines || [], [provider?.serviceLines]);
 
   useEffect(() => {
@@ -124,7 +124,7 @@ export default function SupplierMergeWizard({ open, onClose, provider, onComplet
       if (typeof onCompleted === 'function') onCompleted({ type: 'merge', primaryId: state.mergePrimaryId });
       onClose?.();
     } catch (e) {
-      setError(e?.message || t('common.suppliers.mergeWizard.errors.merge'));
+      setError(e?.message || t('suppliers.mergeWizard.errors.merge'));
       setSubmitting(false);
     }
   };
@@ -150,7 +150,7 @@ export default function SupplierMergeWizard({ open, onClose, provider, onComplet
       }
       const newProvider = await addProvider(newProviderPayload);
       if (!newProvider?.id) {
-        throw new Error(t('common.suppliers.mergeWizard.errors.createProvider'));
+        throw new Error(t('suppliers.mergeWizard.errors.createProvider'));
       }
 
       for (const line of selectedLines) {
@@ -170,7 +170,7 @@ export default function SupplierMergeWizard({ open, onClose, provider, onComplet
       }
       onClose?.();
     } catch (e) {
-      setError(e?.message || t('common.suppliers.mergeWizard.errors.split'));
+      setError(e?.message || t('suppliers.mergeWizard.errors.split'));
       setSubmitting(false);
     }
   };
@@ -181,18 +181,18 @@ export default function SupplierMergeWizard({ open, onClose, provider, onComplet
         <div className="space-y-3">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              {t('common.suppliers.mergeWizard.merge.primaryLabel')}
+              {t('suppliers.mergeWizard.merge.primaryLabel')}
             </label>
             <select
               className="w-full border rounded px-3 py-2 text-sm"
               value={state.mergePrimaryId}
               onChange={(e) => setState((prev) => ({ ...prev, mergePrimaryId: e.target.value }))}
             >
-              <option value="">{t('common.suppliers.mergeWizard.merge.primaryPlaceholder')}</option>
+              <option value="">{t('suppliers.mergeWizard.merge.primaryPlaceholder')}</option>
               {serviceLines.map((line) => (
                 <option key={line.id} value={line.id}>
-                  {t('common.suppliers.mergeWizard.merge.primaryOption', {
-                    name: line.name || t('common.suppliers.mergeWizard.lists.unnamed'),
+                  {t('suppliers.mergeWizard.merge.primaryOption', {
+                    name: line.name || t('suppliers.mergeWizard.lists.unnamed'),
                     status:
                       statusLabelMap.get(line.status) ||
                       line.status ||
@@ -206,25 +206,25 @@ export default function SupplierMergeWizard({ open, onClose, provider, onComplet
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t('common.suppliers.mergeWizard.merge.nameLabel')}
+                {t('suppliers.mergeWizard.merge.nameLabel')}
               </label>
               <input
                 className="w-full border rounded px-3 py-2 text-sm"
-                placeholder={t('common.suppliers.mergeWizard.merge.namePlaceholder')}
+                placeholder={t('suppliers.mergeWizard.merge.namePlaceholder')}
                 value={state.mergeName}
                 onChange={(e) => setState((prev) => ({ ...prev, mergeName: e.target.value }))}
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t('common.suppliers.mergeWizard.merge.statusLabel')}
+                {t('suppliers.mergeWizard.merge.statusLabel')}
               </label>
               <select
                 className="w-full border rounded px-3 py-2 text-sm"
                 value={state.mergeStatus}
                 onChange={(e) => setState((prev) => ({ ...prev, mergeStatus: e.target.value }))}
               >
-                <option value="">{t('common.suppliers.mergeWizard.merge.statusKeep')}</option>
+                <option value="">{t('suppliers.mergeWizard.merge.statusKeep')}</option>
                 {statusOptions.map((opt) => (
                   <option key={opt.value} value={opt.value}>
                     {opt.label}
@@ -237,22 +237,22 @@ export default function SupplierMergeWizard({ open, onClose, provider, onComplet
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t('common.suppliers.mergeWizard.merge.budgetLabel')}
+                {t('suppliers.mergeWizard.merge.budgetLabel')}
               </label>
               <input
                 className="w-full border rounded px-3 py-2 text-sm"
-                placeholder={t('common.suppliers.mergeWizard.merge.budgetPlaceholder')}
+                placeholder={t('suppliers.mergeWizard.merge.budgetPlaceholder')}
                 value={state.mergeBudget}
                 onChange={(e) => setState((prev) => ({ ...prev, mergeBudget: e.target.value }))}
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t('common.suppliers.mergeWizard.merge.notesLabel')}
+                {t('suppliers.mergeWizard.merge.notesLabel')}
               </label>
               <input
                 className="w-full border rounded px-3 py-2 text-sm"
-                placeholder={t('common.suppliers.mergeWizard.merge.notesPlaceholder')}
+                placeholder={t('suppliers.mergeWizard.merge.notesPlaceholder')}
                 value={state.mergeNotes}
                 onChange={(e) => setState((prev) => ({ ...prev, mergeNotes: e.target.value }))}
               />
@@ -267,22 +267,22 @@ export default function SupplierMergeWizard({ open, onClose, provider, onComplet
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              {t('common.suppliers.mergeWizard.split.nameLabel')}
+              {t('suppliers.mergeWizard.split.nameLabel')}
             </label>
             <input
               className="w-full border rounded px-3 py-2 text-sm"
-              placeholder={t('common.suppliers.mergeWizard.split.namePlaceholder')}
+              placeholder={t('suppliers.mergeWizard.split.namePlaceholder')}
               value={state.splitName}
               onChange={(e) => setState((prev) => ({ ...prev, splitName: e.target.value }))}
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              {t('common.suppliers.mergeWizard.split.serviceLabel')}
+              {t('suppliers.mergeWizard.split.serviceLabel')}
             </label>
             <input
               className="w-full border rounded px-3 py-2 text-sm"
-              placeholder={t('common.suppliers.mergeWizard.split.servicePlaceholder')}
+              placeholder={t('suppliers.mergeWizard.split.servicePlaceholder')}
               value={state.splitService}
               onChange={(e) => setState((prev) => ({ ...prev, splitService: e.target.value }))}
             />
@@ -292,7 +292,7 @@ export default function SupplierMergeWizard({ open, onClose, provider, onComplet
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              {t('common.suppliers.mergeWizard.split.statusLabel')}
+              {t('suppliers.mergeWizard.split.statusLabel')}
             </label>
             <select
               className="w-full border rounded px-3 py-2 text-sm"
@@ -314,7 +314,7 @@ export default function SupplierMergeWizard({ open, onClose, provider, onComplet
               onChange={(e) => setState((prev) => ({ ...prev, copyContact: e.target.checked }))}
             />
             <label htmlFor="copy-contact" className="text-sm text-gray-700">
-              {t('common.suppliers.mergeWizard.split.copyContact')}
+              {t('suppliers.mergeWizard.split.copyContact')}
             </label>
           </div>
         </div>
@@ -328,20 +328,20 @@ export default function SupplierMergeWizard({ open, onClose, provider, onComplet
     <Modal
       open={open}
       onClose={submitting ? undefined : onClose}
-      title={t('common.suppliers.mergeWizard.title')}
+      title={t('suppliers.mergeWizard.title')}
       size="large"
     >
       <div className="space-y-6">
-        <p className="text-sm text-gray-600">{t('common.suppliers.mergeWizard.description')}</p>
+        <p className="text-sm text-gray-600">{t('suppliers.mergeWizard.description')}</p>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
           <div className="border rounded-lg p-4 bg-white shadow-sm">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-semibold text-gray-700">
-                {t('common.suppliers.mergeWizard.lists.heading')}
+                {t('suppliers.mergeWizard.lists.heading')}
               </h3>
               <span className="text-xs text-gray-500">
-                {t('common.suppliers.mergeWizard.lists.selected', {
+                {t('suppliers.mergeWizard.lists.selected', {
                   selected: state.selectedIds.length,
                   total: serviceLines.length,
                 })}
@@ -349,7 +349,7 @@ export default function SupplierMergeWizard({ open, onClose, provider, onComplet
             </div>
             {serviceLines.length === 0 ? (
               <p className="text-sm text-gray-500">
-                {t('common.suppliers.mergeWizard.lists.empty')}
+                {t('suppliers.mergeWizard.lists.empty')}
               </p>
             ) : (
               <ul className="space-y-2 max-h-64 overflow-y-auto pr-1">
@@ -359,12 +359,12 @@ export default function SupplierMergeWizard({ open, onClose, provider, onComplet
                     statusLabelMap.get(line.status) || line.status || unknownValue;
                   const budgetText =
                     line.budget != null
-                      ? t('common.suppliers.mergeWizard.lists.budgetValue', {
+                      ? t('suppliers.mergeWizard.lists.budgetValue', {
                           amount: line.budget,
                         })
                       : unknownValue;
                   const nameText =
-                    line.name || t('common.suppliers.mergeWizard.lists.unnamed');
+                    line.name || t('suppliers.mergeWizard.lists.unnamed');
                   return (
                     <li
                       key={line.id}
@@ -381,7 +381,7 @@ export default function SupplierMergeWizard({ open, onClose, provider, onComplet
                       <div className="flex-1 min-w-0">
                         <p className="font-medium truncate">{nameText}</p>
                         <p className="text-xs text-gray-600">
-                          {t('common.suppliers.mergeWizard.lists.meta', {
+                          {t('suppliers.mergeWizard.lists.meta', {
                             status: statusText,
                             budget: budgetText,
                           })}
@@ -400,7 +400,7 @@ export default function SupplierMergeWizard({ open, onClose, provider, onComplet
           <div className="border rounded-lg p-4 bg-white shadow-sm space-y-4">
             <div>
               <h3 className="text-sm font-semibold text-gray-700 mb-2">
-                {t('common.suppliers.mergeWizard.actionPanel.title')}
+                {t('suppliers.mergeWizard.actionPanel.title')}
               </h3>
               <div className="flex flex-wrap gap-3">
                 <label className="inline-flex items-center gap-2 text-sm">
@@ -410,7 +410,7 @@ export default function SupplierMergeWizard({ open, onClose, provider, onComplet
                     checked={state.mode === 'merge'}
                     onChange={() => setState((prev) => ({ ...prev, mode: 'merge' }))}
                   />
-                  {t('common.suppliers.mergeWizard.actionPanel.merge')}
+                  {t('suppliers.mergeWizard.actionPanel.merge')}
                 </label>
                 <label className="inline-flex items-center gap-2 text-sm">
                   <input
@@ -419,7 +419,7 @@ export default function SupplierMergeWizard({ open, onClose, provider, onComplet
                     checked={state.mode === 'split'}
                     onChange={() => setState((prev) => ({ ...prev, mode: 'split' }))}
                   />
-                  {t('common.suppliers.mergeWizard.actionPanel.split')}
+                  {t('suppliers.mergeWizard.actionPanel.split')}
                 </label>
               </div>
             </div>
@@ -435,23 +435,23 @@ export default function SupplierMergeWizard({ open, onClose, provider, onComplet
 
         <div className="flex justify-between items-center">
           <div className="text-xs text-gray-500">
-            {t('common.suppliers.mergeWizard.warnings.irreversible')}
+            {t('suppliers.mergeWizard.warnings.irreversible')}
           </div>
           <div className="flex gap-2">
             <Button variant="outline" onClick={onClose} disabled={submitting}>
-              {t('common.suppliers.mergeWizard.buttons.cancel')}
+              {t('suppliers.mergeWizard.buttons.cancel')}
             </Button>
             {state.mode === 'merge' ? (
               <Button onClick={handleConfirmMerge} disabled={!canMerge || submitting}>
                 {submitting
-                  ? t('common.suppliers.mergeWizard.buttons.mergeSubmitting')
-                  : t('common.suppliers.mergeWizard.buttons.merge')}
+                  ? t('suppliers.mergeWizard.buttons.mergeSubmitting')
+                  : t('suppliers.mergeWizard.buttons.merge')}
               </Button>
             ) : (
               <Button onClick={handleConfirmSplit} disabled={!canSplit || submitting}>
                 {submitting
-                  ? t('common.suppliers.mergeWizard.buttons.splitSubmitting')
-                  : t('common.suppliers.mergeWizard.buttons.split')}
+                  ? t('suppliers.mergeWizard.buttons.splitSubmitting')
+                  : t('suppliers.mergeWizard.buttons.split')}
               </Button>
             )}
           </div>

@@ -18,13 +18,13 @@ export default function SearchBar({ onResults, onSearch }) {
         onChange={(e) => setType(e.target.value)}
         className="border px-2 py-1 rounded"
       >
-        <option value="hashtag">{t('common.searchBar.optionHashtag')}</option>
-        <option value="author">{t('common.searchBar.optionAuthor')}</option>
-        <option value="keyword">{t('common.searchBar.optionKeyword')}</option>
+        <option value="hashtag">{t('searchBar.optionHashtag')}</option>
+        <option value="author">{t('searchBar.optionAuthor')}</option>
+        <option value="keyword">{t('searchBar.optionKeyword')}</option>
       </select>
       <input
         type="text"
-        placeholder={t('common.searchBar.placeholder')}
+        placeholder={t('searchBar.placeholder')}
         value={q}
         onChange={(e) => setQ(e.target.value)}
         className="border px-2 py-1 flex-grow rounded"
@@ -33,7 +33,7 @@ export default function SearchBar({ onResults, onSearch }) {
         onClick={handleSearch}
         className="px-3 py-1 bg-[var(--color-primary)] text-white rounded"
       >
-        {t('common.searchBar.submit')}
+        {t('searchBar.submit')}
       </button>
     </div>
   );

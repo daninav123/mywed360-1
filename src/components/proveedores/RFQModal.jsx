@@ -26,8 +26,8 @@ export default function RFQModal({
   const { activeWedding } = useWedding();
   const localizedDefaults = useMemo(
     () => ({
-      subject: defaultSubject || t('common.suppliers.rfqModal.defaults.subject'),
-      body: defaultBody || t('common.suppliers.rfqModal.defaults.body'),
+      subject: defaultSubject || t('suppliers.rfqModal.defaults.subject'),
+      body: defaultBody || t('suppliers.rfqModal.defaults.body'),
     }),
     [defaultSubject, defaultBody, t]
   );
@@ -87,10 +87,10 @@ export default function RFQModal({
     const dateStr = (() => {
       try {
         const d = typeof dateVal?.toDate === 'function' ? dateVal.toDate() : new Date(dateVal);
-        if (Number.isNaN(d.getTime())) return t('common.suppliers.rfqModal.defaults.unknownDate');
+        if (Number.isNaN(d.getTime())) return t('suppliers.rfqModal.defaults.unknownDate');
         return formatDate(d, 'medium');
       } catch {
-        return t('common.suppliers.rfqModal.defaults.unknownDate');
+        return t('suppliers.rfqModal.defaults.unknownDate');
       }
     })();
     return {
@@ -232,7 +232,7 @@ export default function RFQModal({
   const saveCurrentAsTemplate = async () => {
     const id = await saveTemplate({
       id: tplId || undefined,
-      name: tplName || t('common.suppliers.rfqModal.templates.defaultName'),
+      name: tplName || t('suppliers.rfqModal.templates.defaultName'),
       service: tplService || '',
       subject,
       body,
@@ -244,19 +244,19 @@ export default function RFQModal({
     <Modal
       open={open}
       onClose={onClose}
-      title={t('common.suppliers.rfqModal.title', { count: targets.length })}
+      title={t('suppliers.rfqModal.title', { count: targets.length })}
     >
       <div className="space-y-4">
         {missingEmails > 0 && (
           <div className="rounded border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
-            {t('common.suppliers.rfqModal.missingEmails', { count: missingEmails })}
+            {t('suppliers.rfqModal.missingEmails', { count: missingEmails })}
           </div>
         )}
         {/* Templates */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
           <div>
             <label className="block text-xs text-gray-500 mb-1">
-              {t('common.suppliers.rfqModal.templates.label')}
+              {t('suppliers.rfqModal.templates.label')}
             </label>
             <select
               className="border rounded p-2 w-full"
@@ -264,7 +264,7 @@ export default function RFQModal({
               onChange={(e) => applyTemplate(e.target.value)}
             >
               <option value="">
-                {t('common.suppliers.rfqModal.templates.placeholder')}
+                {t('suppliers.rfqModal.templates.placeholder')}
               </option>
               {templates
                 .filter((t) => !tplService || !t.service || t.service === tplService)
@@ -278,29 +278,29 @@ export default function RFQModal({
           </div>
           <div>
             <label className="block text-xs text-gray-500 mb-1">
-              {t('common.suppliers.rfqModal.templates.nameLabel')}
+              {t('suppliers.rfqModal.templates.nameLabel')}
             </label>
             <input
               className="border rounded p-2 w-full"
               value={tplName}
               onChange={(e) => setTplName(e.target.value)}
-              placeholder={t('common.suppliers.rfqModal.templates.namePlaceholder')}
+              placeholder={t('suppliers.rfqModal.templates.namePlaceholder')}
             />
           </div>
           <div>
             <label className="block text-xs text-gray-500 mb-1">
-              {t('common.suppliers.rfqModal.templates.serviceLabel')}
+              {t('suppliers.rfqModal.templates.serviceLabel')}
             </label>
             <input
               className="border rounded p-2 w-full"
               value={tplService}
               onChange={(e) => setTplService(e.target.value)}
-              placeholder={t('common.suppliers.rfqModal.templates.servicePlaceholder')}
+              placeholder={t('suppliers.rfqModal.templates.servicePlaceholder')}
             />
           </div>
           <div className="md:col-span-3 flex gap-2 justify-end">
             <Button size="sm" variant="outline" onClick={saveCurrentAsTemplate}>
-              {t('common.suppliers.rfqModal.templates.save')}
+              {t('suppliers.rfqModal.templates.save')}
             </Button>
             {tplId && (
               <Button
@@ -311,21 +311,21 @@ export default function RFQModal({
                   setTplId('');
                 }}
               >
-                {t('common.suppliers.rfqModal.templates.delete')}
+                {t('suppliers.rfqModal.templates.delete')}
               </Button>
             )}
           </div>
         </div>
         {providers.length > 0 && targets.length !== providers.length && (
           <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 p-2 rounded">
-            {t('common.suppliers.rfqModal.missingEmails', {
+            {t('suppliers.rfqModal.missingEmails', {
               count: providers.length - targets.length,
             })}
           </p>
         )}
         <div>
           <label className="block text-sm font-medium mb-1">
-            {t('common.suppliers.rfqModal.subjectLabel')}
+            {t('suppliers.rfqModal.subjectLabel')}
           </label>
           <input
             ref={subjectRef}
@@ -337,7 +337,7 @@ export default function RFQModal({
         </div>
         <div>
           <label className="block text-sm font-medium mb-1">
-            {t('common.suppliers.rfqModal.messageLabel')}
+            {t('suppliers.rfqModal.messageLabel')}
           </label>
           <textarea
             ref={bodyRef}
@@ -352,7 +352,7 @@ export default function RFQModal({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <p className="text-xs text-gray-500 mb-1">
-              {t('common.suppliers.rfqModal.variablesLabel')}
+              {t('suppliers.rfqModal.variablesLabel')}
             </p>
             <div className="flex flex-wrap gap-2">
               {Object.keys(variables).map((v) => (
@@ -386,7 +386,7 @@ export default function RFQModal({
                       }
                     }
                   }}
-                  title={t('common.suppliers.rfqModal.variablesInsert')}
+                  title={t('suppliers.rfqModal.variablesInsert')}
                 >
                   {v}
                 </button>
@@ -401,7 +401,7 @@ export default function RFQModal({
             <div className="mt-3 border border-indigo-100 bg-indigo-50/50 rounded-md p-3">
               <div className="flex items-center justify-between mb-2">
                 <p className="text-xs font-semibold text-indigo-700">
-                  {t('common.suppliers.rfqModal.reminders.title')}
+                  {t('suppliers.rfqModal.reminders.title')}
                 </p>
                 {remindersActive ? (
                   <button
@@ -409,11 +409,11 @@ export default function RFQModal({
                     className="text-[11px] text-indigo-600 hover:underline"
                     onClick={() => setAutoReminderDays([])}
                   >
-                    {t('common.suppliers.rfqModal.reminders.clear')}
+                    {t('suppliers.rfqModal.reminders.clear')}
                   </button>
                 ) : (
                   <span className="text-[11px] text-indigo-500">
-                    {t('common.suppliers.rfqModal.reminders.none')}
+                    {t('suppliers.rfqModal.reminders.none')}
                   </span>
                 )}
               </div>
@@ -431,30 +431,30 @@ export default function RFQModal({
                         : 'bg-white border-indigo-200 text-indigo-600 hover:bg-indigo-100'
                     }`}
                   >
-                    {t('common.suppliers.rfqModal.reminders.add', { day })}
+                    {t('suppliers.rfqModal.reminders.add', { day })}
                   </button>
                 );
               })}
               </div>
               <p className="text-[11px] text-indigo-600 mt-2">
                 {remindersActive
-                  ? t('common.suppliers.rfqModal.reminders.summary', {
+                  ? t('suppliers.rfqModal.reminders.summary', {
                       days: autoReminderDays.join(', '),
                     })
-                  : t('common.suppliers.rfqModal.reminders.disabled')}
+                  : t('suppliers.rfqModal.reminders.disabled')}
               </p>
             </div>
           </div>
           <div>
             <p className="text-xs text-gray-500 mb-1">
-              {t('common.suppliers.rfqModal.attachments.title')}
+              {t('suppliers.rfqModal.attachments.title')}
             </p>
             <div className="space-y-2">
               {attachments.map((a, idx) => (
                 <div key={idx} className="flex gap-2">
                   <input
                     className="border rounded p-1 flex-1"
-                    placeholder={t('common.suppliers.rfqModal.attachments.namePlaceholder')}
+                    placeholder={t('suppliers.rfqModal.attachments.namePlaceholder')}
                     value={a.name || ''}
                     onChange={(e) => {
                       const next = attachments.slice();
@@ -464,7 +464,7 @@ export default function RFQModal({
                   />
                   <input
                     className="border rounded p-1 flex-1"
-                    placeholder={t('common.suppliers.rfqModal.attachments.urlPlaceholder')}
+                    placeholder={t('suppliers.rfqModal.attachments.urlPlaceholder')}
                     value={a.url || ''}
                     onChange={(e) => {
                       const next = attachments.slice();
@@ -477,7 +477,7 @@ export default function RFQModal({
                     variant="outline"
                     onClick={() => setAttachments(attachments.filter((_, i) => i !== idx))}
                   >
-                    {t('common.suppliers.rfqModal.attachments.remove')}
+                    {t('suppliers.rfqModal.attachments.remove')}
                   </Button>
                 </div>
               ))}
@@ -487,7 +487,7 @@ export default function RFQModal({
                   variant="outline"
                   onClick={() => setAttachments([...attachments, { name: '', url: '' }])}
                 >
-                  {t('common.suppliers.rfqModal.attachments.add')}
+                  {t('suppliers.rfqModal.attachments.add')}
                 </Button>
                 <input
                   ref={fileInputRef}
@@ -511,7 +511,7 @@ export default function RFQModal({
                       setAttachments((prev) => [...prev, ...uploaded]);
                     } catch (e) {
                       console.warn(
-                        t('common.suppliers.rfqModal.errors.upload', {
+                        t('suppliers.rfqModal.errors.upload', {
                           message: e?.message || e,
                         })
                       );
@@ -528,8 +528,8 @@ export default function RFQModal({
                   disabled={!activeWedding || uploading}
                 >
                   {uploading
-                    ? t('common.suppliers.rfqModal.attachments.uploading')
-                    : t('common.suppliers.rfqModal.attachments.upload')}
+                    ? t('suppliers.rfqModal.attachments.uploading')
+                    : t('suppliers.rfqModal.attachments.upload')}
                 </Button>
               </div>
             </div>
@@ -538,10 +538,10 @@ export default function RFQModal({
         {/* Vista previa */}
         <div className="border rounded p-3 bg-gray-50">
           <p className="text-xs text-gray-500 mb-1">
-            {t('common.suppliers.rfqModal.preview.title')}
+            {t('suppliers.rfqModal.preview.title')}
           </p>
           <p className="font-medium">
-            {t('common.suppliers.rfqModal.preview.subject')}{' '}
+            {t('suppliers.rfqModal.preview.subject')}{' '}
             {previewTarget ? interpolate(subject, previewTarget) : subject}
           </p>
           <div className="whitespace-pre-wrap text-sm mt-1">
@@ -554,12 +554,12 @@ export default function RFQModal({
           >
             {result.ok ? (
               <>
-                {t('common.suppliers.rfqModal.result.success', {
+                {t('suppliers.rfqModal.result.success', {
                   count: result.sentCount,
                 })}
                 {result.remindersCreated > 0 && result.reminders?.length ? (
                   <span className="block text-xs mt-1 text-green-700">
-                    {t('common.suppliers.rfqModal.result.reminders', {
+                    {t('suppliers.rfqModal.result.reminders', {
                       days: result.reminders.join(', '),
                     })}
                   </span>
@@ -567,7 +567,7 @@ export default function RFQModal({
               </>
             ) : (
               <>
-                {t('common.suppliers.rfqModal.result.failure', {
+                {t('suppliers.rfqModal.result.failure', {
                   count: result.errors.length,
                 })}
                 <ul className="list-disc ml-5">
@@ -579,7 +579,7 @@ export default function RFQModal({
                 </ul>
                 {result.sentCount > 0 && (
                   <p className="mt-2 text-xs text-red-700">
-                    {t('common.suppliers.rfqModal.result.failureSummary', {
+                    {t('suppliers.rfqModal.result.failureSummary', {
                       sentCount: result.sentCount,
                       reminders: result.remindersCreated,
                     })}
@@ -591,12 +591,12 @@ export default function RFQModal({
         )}
         <div className="flex justify-end gap-2">
           <Button variant="outline" onClick={onClose}>
-            {t('common.suppliers.rfqModal.buttons.close')}
+            {t('suppliers.rfqModal.buttons.close')}
           </Button>
           <Button onClick={handleSend} disabled={sending || targets.length === 0}>
             {sending
-              ? t('common.suppliers.rfqModal.buttons.sending')
-              : t('common.suppliers.rfqModal.buttons.send')}
+              ? t('suppliers.rfqModal.buttons.sending')
+              : t('suppliers.rfqModal.buttons.send')}
           </Button>
         </div>
       </div>

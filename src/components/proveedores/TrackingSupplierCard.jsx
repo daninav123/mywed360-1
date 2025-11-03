@@ -32,17 +32,17 @@ export default function TrackingSupplierCard({
   onArchive,
 }) {
   const { t } = useTranslations();
-  const notAvailable = t('common.suppliers.tracking.shared.notAvailable');
+  const notAvailable = t('suppliers.tracking.shared.notAvailable');
   const statusBadge =
     provider?.status && typeof provider.status === 'string'
       ? provider.status.trim()
       : '';
-  const displayStatus = statusBadge || t('common.suppliers.tracking.card.statusFallback');
-  const name = provider?.name || provider?.nombre || t('common.suppliers.tracking.card.nameFallback');
+  const displayStatus = statusBadge || t('suppliers.tracking.card.statusFallback');
+  const name = provider?.name || provider?.nombre || t('suppliers.tracking.card.nameFallback');
   const service =
     provider?.service ||
     provider?.servicio ||
-    t('common.suppliers.tracking.card.serviceFallback');
+    t('suppliers.tracking.card.serviceFallback');
 
   return (
     <Card
@@ -61,7 +61,7 @@ export default function TrackingSupplierCard({
       {hasPending && (
         <span
           className="absolute top-3 right-3 h-2.5 w-2.5 rounded-full bg-red-500 shadow-inner shadow-red-200"
-          title={t('common.suppliers.tracking.card.pendingTooltip')}
+          title={t('suppliers.tracking.card.pendingTooltip')}
         />
       )}
 
@@ -87,7 +87,7 @@ export default function TrackingSupplierCard({
         {provider?.priceRange && (
           <div className="text-right text-sm text-[color:var(--color-text)]/70">
             <p className="font-medium">
-              {t('common.suppliers.tracking.card.estimatedBudget')}
+              {t('suppliers.tracking.card.estimatedBudget')}
             </p>
             <p className="font-semibold text-[color:var(--color-text)]">{provider.priceRange}</p>
           </div>
@@ -99,7 +99,7 @@ export default function TrackingSupplierCard({
           <div className="flex items-center gap-2">
             <Clock size={14} className="text-[var(--color-primary)]" />
             <span className="text-xs uppercase tracking-wide text-[color:var(--color-text)]/50">
-              {t('common.suppliers.tracking.card.labels.lastContact')}
+              {t('suppliers.tracking.card.labels.lastContact')}
             </span>
             <span className="font-medium text-[color:var(--color-text)]">
               {formatField(provider?.lastContact || provider?.contactedAt, notAvailable)}
@@ -108,7 +108,7 @@ export default function TrackingSupplierCard({
           <div className="flex items-center gap-2">
             <ArrowUpRight size={14} className="text-[var(--color-primary)]" />
             <span className="text-xs uppercase tracking-wide text-[color:var(--color-text)]/50">
-              {t('common.suppliers.tracking.card.labels.nextStep')}
+              {t('suppliers.tracking.card.labels.nextStep')}
             </span>
             <span className="font-medium text-[color:var(--color-text)]">
               {formatField(provider?.nextAction, notAvailable)}
@@ -117,7 +117,7 @@ export default function TrackingSupplierCard({
           <div className="flex items-center gap-2">
             <User size={14} className="text-[var(--color-primary)]" />
             <span className="text-xs uppercase tracking-wide text-[color:var(--color-text)]/50">
-              {t('common.suppliers.tracking.card.labels.owner')}
+              {t('suppliers.tracking.card.labels.owner')}
             </span>
             <span className="font-medium text-[color:var(--color-text)]">
               {formatField(provider?.owner || provider?.responsable, notAvailable)}
@@ -126,7 +126,7 @@ export default function TrackingSupplierCard({
           <div className="flex items-center gap-2">
             <Calendar size={14} className="text-[var(--color-primary)]" />
             <span className="text-xs uppercase tracking-wide text-[color:var(--color-text)]/50">
-              {t('common.suppliers.tracking.card.labels.nextPayment')}
+              {t('suppliers.tracking.card.labels.nextPayment')}
             </span>
             <span className="font-medium text-[color:var(--color-text)]">
               {formatField(provider?.nextPaymentDate || provider?.paymentDate, notAvailable)}
@@ -163,7 +163,7 @@ export default function TrackingSupplierCard({
             onDetail?.();
           }}
         >
-          <EyeIcon size={14} className="mr-1" /> {t('common.suppliers.tracking.card.buttons.view')}
+          <EyeIcon size={14} className="mr-1" /> {t('suppliers.tracking.card.buttons.view')}
         </Button>
         <Button
           size="sm"
@@ -173,7 +173,7 @@ export default function TrackingSupplierCard({
             onPromote?.();
           }}
         >
-          <CheckCircle2 size={14} className="mr-1" /> {t('common.suppliers.tracking.card.buttons.promote')}
+          <CheckCircle2 size={14} className="mr-1" /> {t('suppliers.tracking.card.buttons.promote')}
         </Button>
         <Button
           variant="outline"
@@ -184,7 +184,7 @@ export default function TrackingSupplierCard({
             onSchedule?.();
           }}
         >
-          <Calendar size={14} className="mr-1" /> {t('common.suppliers.tracking.card.buttons.schedule')}
+          <Calendar size={14} className="mr-1" /> {t('suppliers.tracking.card.buttons.schedule')}
         </Button>
         <Button
           variant="ghost"
@@ -195,7 +195,7 @@ export default function TrackingSupplierCard({
             onArchive?.();
           }}
         >
-          <Trash2 size={14} className="mr-1" /> {t('common.suppliers.tracking.card.buttons.archive')}
+          <Trash2 size={14} className="mr-1" /> {t('suppliers.tracking.card.buttons.archive')}
         </Button>
       </footer>
     </Card>

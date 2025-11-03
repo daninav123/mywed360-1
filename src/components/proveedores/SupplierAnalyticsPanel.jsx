@@ -43,15 +43,15 @@ export default function SupplierAnalyticsPanel({
         <div>
           <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
             <TrendingUp size={18} className="text-indigo-600" />
-            {t('common.suppliers.analyticsPanel.title')}
+            {t('suppliers.analyticsPanel.title')}
           </h2>
           <p className="text-sm text-gray-600">
-            {t('common.suppliers.analyticsPanel.description')}
+            {t('suppliers.analyticsPanel.description')}
           </p>
         </div>
         {typeof onOpenReport === 'function' && (
           <Button variant="outline" size="sm" onClick={onOpenReport}>
-            {t('common.suppliers.analyticsPanel.openReport')}
+            {t('suppliers.analyticsPanel.openReport')}
           </Button>
         )}
       </div>
@@ -60,25 +60,25 @@ export default function SupplierAnalyticsPanel({
         <div className="rounded border border-slate-200 bg-slate-50 px-4 py-3">
           <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
             <Award size={16} className="text-indigo-500" />
-            {t('common.suppliers.analyticsPanel.cards.average.title')}
+            {t('suppliers.analyticsPanel.cards.average.title')}
           </div>
           <div className="mt-2 text-3xl font-bold text-slate-900">
             {loading ? '—' : `${summary.averageScore || 0}`}
           </div>
           <p className="mt-1 text-xs text-slate-500">
-            {t('common.suppliers.analyticsPanel.cards.average.targetHint')}
+            {t('suppliers.analyticsPanel.cards.average.targetHint')}
           </p>
         </div>
         <div className="rounded border border-slate-200 bg-white px-4 py-3">
           <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
             <Activity size={16} className="text-emerald-500" />
-            {t('common.suppliers.analyticsPanel.cards.portal.title')}
+            {t('suppliers.analyticsPanel.cards.portal.title')}
           </div>
           <div className="mt-2 flex items-end gap-4 text-slate-900">
             <div>
               <div className="text-2xl font-bold">{portalStats.responded || 0}</div>
               <p className="text-xs text-slate-500">
-                {t('common.suppliers.analyticsPanel.cards.portal.responses')}
+                {t('suppliers.analyticsPanel.cards.portal.responses')}
               </p>
             </div>
             <div>
@@ -86,12 +86,12 @@ export default function SupplierAnalyticsPanel({
                 {(portalStats.enabled || 0) ? Math.round(((portalStats.responded || 0) / (portalStats.enabled || 1)) * 100) : 0}%
               </div>
               <p className="text-xs text-slate-500">
-                {t('common.suppliers.analyticsPanel.cards.portal.coverage')}
+                {t('suppliers.analyticsPanel.cards.portal.coverage')}
               </p>
             </div>
           </div>
           <p className="mt-1 text-xs text-slate-500">
-            {t('common.suppliers.analyticsPanel.cards.portal.pending', {
+            {t('suppliers.analyticsPanel.cards.portal.pending', {
               count: Math.max(0, (portalStats.enabled || 0) - (portalStats.responded || 0)),
             })}
           </p>
@@ -99,19 +99,19 @@ export default function SupplierAnalyticsPanel({
         <div className="rounded border border-slate-200 bg-white px-4 py-3">
           <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
             <BarChart2 size={16} className="text-sky-500" />
-            {t('common.suppliers.analyticsPanel.cards.services.title')}
+            {t('suppliers.analyticsPanel.cards.services.title')}
           </div>
           <div className="mt-2 space-y-1">
             {serviceLeaders.length === 0 && (
               <p className="text-xs text-slate-500">
-                {t('common.suppliers.analyticsPanel.cards.services.empty')}
+                {t('suppliers.analyticsPanel.cards.services.empty')}
               </p>
             )}
             {serviceLeaders.map((service) => (
               <div key={service.service} className="flex items-center justify-between text-xs text-slate-600">
                 <span className="font-medium text-slate-700">{service.service}</span>
                 <span className="text-slate-500">
-                  {t('common.suppliers.analyticsPanel.cards.services.row', {
+                  {t('suppliers.analyticsPanel.cards.services.row', {
                     confirmed: service.confirmed,
                     total: service.total,
                     score: service.averageScore,
@@ -126,7 +126,7 @@ export default function SupplierAnalyticsPanel({
       <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <h3 className="text-sm font-semibold text-slate-700 mb-2">
-            {t('common.suppliers.analyticsPanel.distribution.title')}
+            {t('suppliers.analyticsPanel.distribution.title')}
           </h3>
           <div className="space-y-2">
             {(summary.scoreDistribution || []).map((bucket) => {
@@ -138,7 +138,7 @@ export default function SupplierAnalyticsPanel({
                   <div className="flex justify-between mb-1">
                     <span>{bucket.label}</span>
                     <span>
-                      {t('common.suppliers.analyticsPanel.distribution.bucket', {
+                      {t('suppliers.analyticsPanel.distribution.bucket', {
                         count: bucket.count || 0,
                         percent: percent || 0,
                       })}
@@ -155,27 +155,27 @@ export default function SupplierAnalyticsPanel({
             })}
             {(summary.scoreDistribution || []).length === 0 && (
               <p className="text-xs text-slate-500">
-                {t('common.suppliers.analyticsPanel.distribution.empty')}
+                {t('suppliers.analyticsPanel.distribution.empty')}
               </p>
             )}
           </div>
         </div>
         <div>
           <h3 className="text-sm font-semibold text-slate-700 mb-2">
-            {t('common.suppliers.analyticsPanel.top.title')}
+            {t('suppliers.analyticsPanel.top.title')}
           </h3>
           <div className="rounded border border-slate-200 bg-white">
             <table className="min-w-full text-xs">
               <thead className="bg-slate-50 text-slate-500 uppercase tracking-wide">
                 <tr>
                   <th className="px-3 py-2 text-left font-semibold">
-                    {t('common.suppliers.analyticsPanel.top.columns.provider')}
+                    {t('suppliers.analyticsPanel.top.columns.provider')}
                   </th>
                   <th className="px-3 py-2 text-left font-semibold">
-                    {t('common.suppliers.analyticsPanel.top.columns.service')}
+                    {t('suppliers.analyticsPanel.top.columns.service')}
                   </th>
                   <th className="px-3 py-2 text-left font-semibold">
-                    {t('common.suppliers.analyticsPanel.top.columns.score')}
+                    {t('suppliers.analyticsPanel.top.columns.score')}
                   </th>
                 </tr>
               </thead>
@@ -190,7 +190,7 @@ export default function SupplierAnalyticsPanel({
                 {(summary.topProviders || []).length === 0 && (
                   <tr>
                     <td className="px-3 py-3 text-center text-slate-500" colSpan={3}>
-                      {t('common.suppliers.analyticsPanel.top.empty')}
+                      {t('suppliers.analyticsPanel.top.empty')}
                     </td>
                   </tr>
                 )}
@@ -203,14 +203,14 @@ export default function SupplierAnalyticsPanel({
       {coverageServices.length > 0 && (
         <div className="mt-5">
           <h3 className="text-sm font-semibold text-slate-700 mb-2">
-            {t('common.suppliers.analyticsPanel.coverage.title')}
+            {t('suppliers.analyticsPanel.coverage.title')}
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs text-slate-600">
             {coverageServices.slice(0, 6).map((svc) => (
               <div key={svc.name} className="rounded border border-slate-200 px-3 py-2 bg-slate-50">
                 <div className="font-semibold text-slate-700">{svc.name}</div>
                 <div className="mt-1 flex items-center justify-between">
-                  <span>{t('common.suppliers.analyticsPanel.coverage.suppliers')}</span>
+                  <span>{t('suppliers.analyticsPanel.coverage.suppliers')}</span>
                   <span className="font-medium text-slate-800">{svc.confirmed}/{svc.suppliers}</span>
                 </div>
               </div>

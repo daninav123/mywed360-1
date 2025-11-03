@@ -11,8 +11,8 @@ import useTranslations from '../../hooks/useTranslations';
 export default function ActiveCollaborators({ collaborators = [], locks = [], className = '' }) {
   const { t, tPlural } = useTranslations();
   const activeCount = collaborators.filter((c) => !c.isCurrent).length;
-  const headerLabel = t('common.seating.collaborators.title', { count: activeCount });
-  const unknownName = t('common.seating.collaborators.unknown');
+  const headerLabel = t('seating.collaborators.title', { count: activeCount });
+  const unknownName = t('seating.collaborators.unknown');
   const fallbackInitial = unknownName.charAt(0).toUpperCase() || 'U';
 
   if (activeCount === 0) return null;
@@ -110,7 +110,7 @@ export default function ActiveCollaborators({ collaborators = [], locks = [], cl
             transition={{ duration: 2, repeat: Infinity }}
             className="w-2 h-2 rounded-full bg-green-500"
           />
-          <span>{t('common.seating.collaborators.synced')}</span>
+          <span>{t('seating.collaborators.synced')}</span>
         </div>
       </div>
     </motion.div>

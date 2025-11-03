@@ -27,7 +27,7 @@ const ProveedorForm = ({ onSubmit, onCancel, initialData }) => {
     location: '',
     date: '',
     priceRange: '',
-    status: t('common.status.pending'),
+    status: t('status.pending'),
     snippet: '',
     image: '',
   });
@@ -55,11 +55,11 @@ const ProveedorForm = ({ onSubmit, onCancel, initialData }) => {
     const newErrors = {};
 
     // Validaciones básicas
-    if (!formData.name.trim()) newErrors.name = t('common.validation.nameRequired');
-    if (!formData.service.trim()) newErrors.service = t('common.validation.serviceRequired');
-    if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = t('common.validation.emailInvalid');
+    if (!formData.name.trim()) newErrors.name = t('validation.nameRequired');
+    if (!formData.service.trim()) newErrors.service = t('validation.serviceRequired');
+    if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = t('validation.emailInvalid');
     if (formData.link && !formData.link.startsWith('http'))
-      newErrors.link = t('common.validation.linkMustStartHttp');
+      newErrors.link = t('validation.linkMustStartHttp');
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -100,11 +100,11 @@ const ProveedorForm = ({ onSubmit, onCancel, initialData }) => {
 
   // Lista de estados disponibles
   const statusOptions = [
-    t('common.status.pending'),
-    t('common.status.contacted'),
-    t('common.status.selected'),
-    t('common.status.confirmed'),
-    t('common.status.rejected')
+    t('status.pending'),
+    t('status.contacted'),
+    t('status.selected'),
+    t('status.confirmed'),
+    t('status.rejected')
   ];
 
   return (

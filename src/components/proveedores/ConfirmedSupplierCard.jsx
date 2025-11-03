@@ -28,7 +28,7 @@ export default function ConfirmedSupplierCard({
   const totalSpent = Number(provider?.spent ?? provider?.gastado) || 0;
   const pending = Math.max(totalAssigned - totalSpent, 0);
   const currency = provider?.currency || 'EUR';
-  const notAvailable = t('common.suppliers.confirmedCard.shared.notAvailable');
+  const notAvailable = t('suppliers.confirmedCard.shared.notAvailable');
 
   const displayAmount = (value) =>
     value ? format.currency(Number(value), currency) : notAvailable;
@@ -71,24 +71,24 @@ export default function ConfirmedSupplierCard({
           <h3 className="text-lg font-semibold line-clamp-1">
             {provider?.name ||
               provider?.nombre ||
-              t('common.suppliers.confirmedCard.nameFallback')}
+              t('suppliers.confirmedCard.nameFallback')}
           </h3>
           <div className="flex flex-wrap items-center gap-2 text-xs">
             <span className="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 font-medium text-emerald-700">
-              {t('common.suppliers.confirmedCard.statusBadge')}
+              {t('suppliers.confirmedCard.statusBadge')}
             </span>
             <span className="inline-flex items-center rounded-full bg-white/80 px-2 py-0.5 font-medium text-emerald-600">
               {provider?.service ||
                 provider?.servicio ||
-                t('common.suppliers.confirmedCard.serviceFallback')}
+                t('suppliers.confirmedCard.serviceFallback')}
             </span>
           </div>
         </div>
         <div className="text-right text-sm text-emerald-900/80">
-          <p className="font-medium">{t('common.suppliers.confirmedCard.nextPayment.label')}</p>
+          <p className="font-medium">{t('suppliers.confirmedCard.nextPayment.label')}</p>
           <p className="font-semibold">
             {formatDateValue(provider?.nextPaymentDate || provider?.paymentDate) ||
-              t('common.suppliers.confirmedCard.nextPayment.none')}
+              t('suppliers.confirmedCard.nextPayment.none')}
           </p>
         </div>
       </header>
@@ -97,19 +97,19 @@ export default function ConfirmedSupplierCard({
         <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
           <div>
             <p className="text-xs uppercase tracking-wide text-emerald-700/60">
-              {t('common.suppliers.confirmedCard.summary.assigned')}
+              {t('suppliers.confirmedCard.summary.assigned')}
             </p>
             <p className="text-lg font-semibold text-emerald-900">{displayAmount(totalAssigned)}</p>
           </div>
           <div>
             <p className="text-xs uppercase tracking-wide text-emerald-700/60">
-              {t('common.suppliers.confirmedCard.summary.paid')}
+              {t('suppliers.confirmedCard.summary.paid')}
             </p>
             <p className="text-lg font-semibold text-emerald-900">{displayAmount(totalSpent)}</p>
           </div>
           <div>
             <p className="text-xs uppercase tracking-wide text-emerald-700/60">
-              {t('common.suppliers.confirmedCard.summary.pending')}
+              {t('suppliers.confirmedCard.summary.pending')}
             </p>
             <p className="text-lg font-semibold text-emerald-900">{displayAmount(pending)}</p>
           </div>
@@ -142,7 +142,7 @@ export default function ConfirmedSupplierCard({
         {provider?.groupName && (
           <div className="inline-flex items-center gap-2 rounded-md bg-emerald-100 px-3 py-1 text-xs text-emerald-800">
             <ClipboardList size={12} />{' '}
-            {t('common.suppliers.confirmedCard.groupLabel', { name: provider.groupName })}
+            {t('suppliers.confirmedCard.groupLabel', { name: provider.groupName })}
           </div>
         )}
       </section>
@@ -158,7 +158,7 @@ export default function ConfirmedSupplierCard({
           }}
         >
           <CheckCircle2 size={14} className="mr-1" />{' '}
-          {t('common.suppliers.confirmedCard.actions.view')}
+          {t('suppliers.confirmedCard.actions.view')}
         </Button>
         <Button
           size="sm"
@@ -169,7 +169,7 @@ export default function ConfirmedSupplierCard({
           }}
         >
           <Wallet size={14} className="mr-1" />{' '}
-          {t('common.suppliers.confirmedCard.actions.registerPayment')}
+          {t('suppliers.confirmedCard.actions.registerPayment')}
         </Button>
         <Button
           variant="outline"
@@ -181,7 +181,7 @@ export default function ConfirmedSupplierCard({
           }}
         >
           <ClipboardList size={14} className="mr-1" />{' '}
-          {t('common.suppliers.confirmedCard.actions.viewContract')}
+          {t('suppliers.confirmedCard.actions.viewContract')}
         </Button>
         <Button
           variant="ghost"
@@ -193,7 +193,7 @@ export default function ConfirmedSupplierCard({
           }}
         >
           <ExternalLink size={14} className="mr-1" />{' '}
-          {t('common.suppliers.confirmedCard.actions.portal')}
+          {t('suppliers.confirmedCard.actions.portal')}
         </Button>
       </footer>
     </Card>

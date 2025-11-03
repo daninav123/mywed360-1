@@ -17,9 +17,9 @@ export default function SupplierPortal() {
   const [sending, setSending] = useState(false);
   const availabilityOptions = useMemo(
     () => [
-      { value: 'available', label: t('common.public.supplierPortal.availability.available') },
-      { value: 'unavailable', label: t('common.public.supplierPortal.availability.unavailable') },
-      { value: 'unknown', label: t('common.public.supplierPortal.availability.unknown') },
+      { value: 'available', label: t('public.supplierPortal.availability.available') },
+      { value: 'unavailable', label: t('public.supplierPortal.availability.unavailable') },
+      { value: 'unknown', label: t('public.supplierPortal.availability.unknown') },
     ],
     [t]
   );
@@ -76,7 +76,7 @@ export default function SupplierPortal() {
       setSent(true);
     } catch (e) {
       window.alert(
-        t('common.public.supplierPortal.alerts.submitError', {
+        t('public.supplierPortal.alerts.submitError', {
           message: String(e?.message || e),
         })
       );
@@ -88,7 +88,7 @@ export default function SupplierPortal() {
   if (state.loading)
     return (
       <div className="p-6 text-center">
-        {t('common.public.supplierPortal.loading')}
+        {t('public.supplierPortal.loading')}
       </div>
     );
   if (state.error) {
@@ -160,10 +160,10 @@ export default function SupplierPortal() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
         <div className="max-w-lg w-full bg-white border rounded-xl p-6 text-center">
           <h1 className="text-2xl font-semibold mb-2">
-            {t('common.public.supplierPortal.thanksTitle')}
+            {t('public.supplierPortal.thanksTitle')}
           </h1>
           <p className="text-gray-600">
-            {t('common.public.supplierPortal.thanksDescription')}
+            {t('public.supplierPortal.thanksDescription')}
           </p>
         </div>
       </div>
@@ -175,15 +175,15 @@ export default function SupplierPortal() {
       <div className="max-w-2xl w-full bg-white border rounded-xl p-6 shadow-sm">
         <header className="mb-6">
           <h1 className="text-2xl font-semibold">
-            {t('common.public.supplierPortal.title')}
+            {t('public.supplierPortal.title')}
           </h1>
           <p className="text-gray-600">
-            {t('common.public.supplierPortal.labels.wedding')}:{' '}
+            {t('public.supplierPortal.labels.wedding')}:{' '}
             <strong>{w.name}</strong> {w.date ? `· ${String(w.date).slice(0, 10)}` : ''}{' '}
             {w.location ? `· ${w.location}` : ''}
           </p>
           <p className="text-gray-600">
-            {t('common.public.supplierPortal.labels.supplier')}:{' '}
+            {t('public.supplierPortal.labels.supplier')}:{' '}
             <strong>{s.name}</strong> {s.service ? `· ${s.service}` : ''}
           </p>
         </header>
@@ -191,7 +191,7 @@ export default function SupplierPortal() {
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
             <label className="block text-sm font-medium mb-1">
-              {t('common.public.supplierPortal.labels.availability')}
+              {t('public.supplierPortal.labels.availability')}
             </label>
             <div className="flex gap-4 text-sm">
               {availabilityOptions.map((option) => (
@@ -210,25 +210,25 @@ export default function SupplierPortal() {
 
           <div>
             <label className="block text-sm font-medium mb-1">
-              {t('common.public.supplierPortal.labels.message')}
+              {t('public.supplierPortal.labels.message')}
             </label>
             <textarea
               className="w-full border rounded p-2"
               rows={4}
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder={t('common.public.supplierPortal.placeholders.message')}
+              placeholder={t('public.supplierPortal.placeholders.message')}
             />
           </div>
 
           <div className="border rounded p-3">
             <p className="font-medium mb-2">
-              {t('common.public.supplierPortal.labels.budget')}
+              {t('public.supplierPortal.labels.budget')}
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-2">
               <input
                 className="border rounded p-2"
-                placeholder={t('common.public.supplierPortal.placeholders.amount')}
+                placeholder={t('public.supplierPortal.placeholders.amount')}
                 type="number"
                 step="0.01"
                 value={amount}
@@ -247,7 +247,7 @@ export default function SupplierPortal() {
               </select>
               <input
                 className="border rounded p-2"
-                placeholder={t('common.public.supplierPortal.placeholders.links')}
+                placeholder={t('public.supplierPortal.placeholders.links')}
                 value={links[0]}
                 onChange={(e) => {
                   const next = [...links];
@@ -261,7 +261,7 @@ export default function SupplierPortal() {
               rows={3}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder={t('common.public.supplierPortal.placeholders.description')}
+              placeholder={t('public.supplierPortal.placeholders.description')}
             />
           </div>
 
@@ -272,8 +272,8 @@ export default function SupplierPortal() {
               className="px-4 py-2 rounded bg-indigo-600 text-white disabled:opacity-50"
             >
               {sending
-                ? t('common.public.supplierPortal.buttons.submitting')
-                : t('common.public.supplierPortal.buttons.submit')}
+                ? t('public.supplierPortal.buttons.submitting')
+                : t('public.supplierPortal.buttons.submit')}
             </button>
           </div>
         </form>

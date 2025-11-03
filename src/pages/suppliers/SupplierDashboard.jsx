@@ -74,7 +74,7 @@ export default function SupplierDashboard() {
           navigate('/supplier/login');
           return;
         }
-        throw new Error(t('common.suppliers.dashboard.errors.load'));
+        throw new Error(t('suppliers.dashboard.errors.load'));
       }
 
       const [profileData, requestsData, analyticsData] = await Promise.all([
@@ -98,7 +98,7 @@ export default function SupplierDashboard() {
       });
     } catch (err) {
       console.error('[SupplierDashboard] load error', err);
-      setErrorMessage(err.message || t('common.suppliers.dashboard.errors.load'));
+      setErrorMessage(err.message || t('suppliers.dashboard.errors.load'));
     } finally {
       setLoading(false);
     }
@@ -148,16 +148,16 @@ export default function SupplierDashboard() {
       });
 
       if (!response.ok) {
-        throw new Error(t('common.suppliers.dashboard.errors.save'));
+        throw new Error(t('suppliers.dashboard.errors.save'));
       }
 
-      window.alert(t('common.suppliers.dashboard.alerts.saveSuccess'));
+      window.alert(t('suppliers.dashboard.alerts.saveSuccess'));
       setEditing(false);
       loadDashboard();
     } catch (err) {
       console.error('[SupplierDashboard] save error', err);
       window.alert(
-        t('common.suppliers.dashboard.alerts.saveError', { message: err.message || '' })
+        t('suppliers.dashboard.alerts.saveError', { message: err.message || '' })
       );
     } finally {
       setSaving(false);
@@ -193,10 +193,10 @@ export default function SupplierDashboard() {
           style={{ backgroundColor: 'var(--color-surface)' }}
         >
           <h2 className="text-lg font-semibold mb-2" style={{ color: 'var(--color-danger)' }}>
-            {t('common.suppliers.dashboard.login.title')}
+            {t('suppliers.dashboard.login.title')}
           </h2>
           <p style={{ color: 'var(--color-muted)' }}>
-            {errorMessage || t('common.suppliers.dashboard.login.message')}
+            {errorMessage || t('suppliers.dashboard.login.message')}
           </p>
           <button
             type="button"
@@ -204,7 +204,7 @@ export default function SupplierDashboard() {
             className="mt-4 w-full text-white py-2 rounded-md"
             style={{ backgroundColor: 'var(--color-primary)' }}
           >
-            {t('common.suppliers.dashboard.login.button')}
+            {t('suppliers.dashboard.login.button')}
           </button>
         </div>
       </div>
@@ -214,7 +214,7 @@ export default function SupplierDashboard() {
   const locationLabel = useMemo(() => {
     const parts = [supplier.category, supplier.location?.city].filter(Boolean);
     if (!parts.length) {
-      return t('common.suppliers.dashboard.header.locationFallback');
+      return t('suppliers.dashboard.header.locationFallback');
     }
     return parts.join(' / ');
   }, [supplier.category, supplier.location?.city, t]);
@@ -247,7 +247,7 @@ export default function SupplierDashboard() {
                     color: 'var(--color-success)',
                   }}
                 >
-                  {t('common.suppliers.dashboard.badges.verified')}
+                  {t('suppliers.dashboard.badges.verified')}
                 </span>
               )}
             </div>
@@ -261,7 +261,7 @@ export default function SupplierDashboard() {
                   style={{ backgroundColor: 'var(--color-primary)' }}
                 >
                   <Edit size={18} />
-                  {t('common.suppliers.dashboard.buttons.editProfile')}
+                  {t('suppliers.dashboard.buttons.editProfile')}
                 </button>
               ) : (
                 <div className="flex gap-2">
@@ -274,8 +274,8 @@ export default function SupplierDashboard() {
                   >
                     <Save size={18} />
                     {saving
-                      ? t('common.suppliers.dashboard.buttons.saving')
-                      : t('common.suppliers.dashboard.buttons.save')}
+                      ? t('suppliers.dashboard.buttons.saving')
+                      : t('suppliers.dashboard.buttons.save')}
                   </button>
                   <button
                     type="button"
@@ -287,7 +287,7 @@ export default function SupplierDashboard() {
                     style={{ borderColor: 'var(--color-border)', color: 'var(--color-text)' }}
                   >
                     <X size={18} />
-                    {t('common.suppliers.dashboard.buttons.cancel')}
+                    {t('suppliers.dashboard.buttons.cancel')}
                   </button>
                 </div>
               )}
@@ -336,7 +336,7 @@ export default function SupplierDashboard() {
                 style={{ color: 'var(--color-text)' }}
               >
                 <BarChart3 size={20} />
-                {t('common.suppliers.dashboard.analytics.title')}
+                {t('suppliers.dashboard.analytics.title')}
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div
@@ -349,14 +349,14 @@ export default function SupplierDashboard() {
                   >
                     <Eye size={20} />
                     <span className="font-medium">
-                      {t('common.suppliers.dashboard.analytics.views.title')}
+                      {t('suppliers.dashboard.analytics.views.title')}
                     </span>
                   </div>
                   <p className="text-3xl font-bold" style={{ color: 'var(--color-text)' }}>
                     {views}
                   </p>
                   <p className="text-sm mt-1" style={{ color: 'var(--color-info)' }}>
-                    {t('common.suppliers.dashboard.analytics.views.subtitle')}
+                    {t('suppliers.dashboard.analytics.views.subtitle')}
                   </p>
                 </div>
 
@@ -367,14 +367,14 @@ export default function SupplierDashboard() {
                   <div className="flex items-center gap-2 mb-2" style={{ color: '#a855f7' }}>
                     <MousePointer size={20} />
                     <span className="font-medium">
-                      {t('common.suppliers.dashboard.analytics.clicks.title')}
+                      {t('suppliers.dashboard.analytics.clicks.title')}
                     </span>
                   </div>
                   <p className="text-3xl font-bold" style={{ color: 'var(--color-text)' }}>
                     {clicks}
                   </p>
                   <p className="text-sm mt-1" style={{ color: '#a855f7' }}>
-                    {t('common.suppliers.dashboard.analytics.clicks.subtitle')}
+                    {t('suppliers.dashboard.analytics.clicks.subtitle')}
                   </p>
                 </div>
 
@@ -388,14 +388,14 @@ export default function SupplierDashboard() {
                   >
                     <Mail size={20} />
                     <span className="font-medium">
-                      {t('common.suppliers.dashboard.analytics.contacts.title')}
+                      {t('suppliers.dashboard.analytics.contacts.title')}
                     </span>
                   </div>
                   <p className="text-3xl font-bold" style={{ color: 'var(--color-text)' }}>
                     {conversions}
                   </p>
                   <p className="text-sm mt-1" style={{ color: 'var(--color-success)' }}>
-                    {t('common.suppliers.dashboard.analytics.contacts.subtitle')}
+                    {t('suppliers.dashboard.analytics.contacts.subtitle')}
                   </p>
                 </div>
               </div>
@@ -408,7 +408,7 @@ export default function SupplierDashboard() {
               style={{ backgroundColor: 'var(--color-surface)' }}
             >
               <h2 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text)' }}>
-                {t('common.suppliers.dashboard.profile.title')}
+                {t('suppliers.dashboard.profile.title')}
               </h2>
 
               {editing ? (
@@ -418,7 +418,7 @@ export default function SupplierDashboard() {
                       className="block text-sm font-medium mb-1"
                       style={{ color: 'var(--color-text)' }}
                     >
-                      {t('common.suppliers.dashboard.profile.fields.name')}
+                      {t('suppliers.dashboard.profile.fields.name')}
                     </label>
                     <input
                       type="text"
@@ -434,7 +434,7 @@ export default function SupplierDashboard() {
                       className="block text-sm font-medium mb-1"
                       style={{ color: 'var(--color-text)' }}
                     >
-                      {t('common.suppliers.dashboard.profile.fields.description')}
+                      {t('suppliers.dashboard.profile.fields.description')}
                     </label>
                     <textarea
                       value={formData.description}
@@ -452,7 +452,7 @@ export default function SupplierDashboard() {
                       className="block text-sm font-medium mb-1"
                       style={{ color: 'var(--color-text)' }}
                     >
-                      {t('common.suppliers.dashboard.profile.fields.priceRange')}
+                      {t('suppliers.dashboard.profile.fields.priceRange')}
                     </label>
                     <select
                       value={formData.priceRange}
@@ -475,7 +475,7 @@ export default function SupplierDashboard() {
                       className="block text-sm font-medium mb-1"
                       style={{ color: 'var(--color-text)' }}
                     >
-                      {t('common.suppliers.dashboard.profile.fields.phone')}
+                      {t('suppliers.dashboard.profile.fields.phone')}
                     </label>
                     <input
                       type="tel"
@@ -491,7 +491,7 @@ export default function SupplierDashboard() {
                       className="block text-sm font-medium mb-1"
                       style={{ color: 'var(--color-text)' }}
                     >
-                      {t('common.suppliers.dashboard.profile.fields.website')}
+                      {t('suppliers.dashboard.profile.fields.website')}
                     </label>
                     <input
                       type="url"
@@ -509,7 +509,7 @@ export default function SupplierDashboard() {
                       className="block text-sm font-medium mb-1"
                       style={{ color: 'var(--color-text)' }}
                     >
-                      {t('common.suppliers.dashboard.profile.fields.instagram')}
+                      {t('suppliers.dashboard.profile.fields.instagram')}
                     </label>
                     <input
                       type="text"
@@ -517,7 +517,7 @@ export default function SupplierDashboard() {
                       onChange={(event) =>
                         setFormData({ ...formData, instagram: event.target.value })
                       }
-                      placeholder={t('common.suppliers.dashboard.profile.placeholders.instagram')}
+                      placeholder={t('suppliers.dashboard.profile.placeholders.instagram')}
                       className="w-full px-3 py-2 border rounded-md"
                       style={{ borderColor: 'var(--color-border)' }}
                     />
@@ -527,37 +527,37 @@ export default function SupplierDashboard() {
                 <div className="space-y-4">
                   <div>
                     <p className="text-sm font-medium" style={{ color: 'var(--color-muted)' }}>
-                      {t('common.suppliers.dashboard.profile.fields.description')}
+                      {t('suppliers.dashboard.profile.fields.description')}
                     </p>
                     <p className="mt-1" style={{ color: 'var(--color-text)' }}>
                       {supplier.business?.description ||
-                        t('common.suppliers.dashboard.profileDisplay.descriptionEmpty')}
+                        t('suppliers.dashboard.profileDisplay.descriptionEmpty')}
                     </p>
                   </div>
 
                   <div>
                     <p className="text-sm font-medium" style={{ color: 'var(--color-muted)' }}>
-                      {t('common.suppliers.dashboard.profile.fields.priceRange')}
+                      {t('suppliers.dashboard.profile.fields.priceRange')}
                     </p>
                     <p className="mt-1" style={{ color: 'var(--color-text)' }}>
                       {supplier.business?.priceRange ||
-                        t('common.suppliers.dashboard.profileDisplay.priceRangeEmpty')}
+                        t('suppliers.dashboard.profileDisplay.priceRangeEmpty')}
                     </p>
                   </div>
 
                   <div>
                     <p className="text-sm font-medium" style={{ color: 'var(--color-muted)' }}>
-                      {t('common.suppliers.dashboard.profile.fields.phone')}
+                      {t('suppliers.dashboard.profile.fields.phone')}
                     </p>
                     <p className="mt-1" style={{ color: 'var(--color-text)' }}>
                       {supplier.contact?.phone ||
-                        t('common.suppliers.dashboard.profileDisplay.phoneEmpty')}
+                        t('suppliers.dashboard.profileDisplay.phoneEmpty')}
                     </p>
                   </div>
 
                   <div>
                     <p className="text-sm font-medium" style={{ color: 'var(--color-muted)' }}>
-                      {t('common.suppliers.dashboard.profile.fields.website')}
+                      {t('suppliers.dashboard.profile.fields.website')}
                     </p>
                     <p className="mt-1" style={{ color: 'var(--color-text)' }}>
                       {supplier.contact?.website ? (
@@ -571,18 +571,18 @@ export default function SupplierDashboard() {
                           {supplier.contact.website}
                         </a>
                       ) : (
-                        t('common.suppliers.dashboard.profileDisplay.websiteEmpty')
+                        t('suppliers.dashboard.profileDisplay.websiteEmpty')
                       )}
                     </p>
                   </div>
 
                   <div>
                     <p className="text-sm font-medium" style={{ color: 'var(--color-muted)' }}>
-                      {t('common.suppliers.dashboard.profile.fields.instagram')}
+                      {t('suppliers.dashboard.profile.fields.instagram')}
                     </p>
                     <p className="mt-1" style={{ color: 'var(--color-text)' }}>
                       {supplier.contact?.instagram ||
-                        t('common.suppliers.dashboard.profileDisplay.instagramEmpty')}
+                        t('suppliers.dashboard.profileDisplay.instagramEmpty')}
                     </p>
                   </div>
                 </div>
@@ -596,12 +596,12 @@ export default function SupplierDashboard() {
               style={{ backgroundColor: 'var(--color-surface)' }}
             >
               <h3 className="font-semibold mb-3" style={{ color: 'var(--color-text)' }}>
-                {t('common.suppliers.dashboard.profileState.title')}
+                {t('suppliers.dashboard.profileState.title')}
               </h3>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span style={{ color: 'var(--color-muted)' }}>
-                    {t('common.suppliers.dashboard.profileState.registeredLabel')}
+                    {t('suppliers.dashboard.profileState.registeredLabel')}
                   </span>
                   <span
                     className="font-medium"
@@ -610,13 +610,13 @@ export default function SupplierDashboard() {
                     }}
                   >
                     {supplier.registered
-                      ? t('common.suppliers.dashboard.profileState.registeredYes')
-                      : t('common.suppliers.dashboard.profileState.registeredNo')}
+                      ? t('suppliers.dashboard.profileState.registeredYes')
+                      : t('suppliers.dashboard.profileState.registeredNo')}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span style={{ color: 'var(--color-muted)' }}>
-                    {t('common.suppliers.dashboard.profileState.statusLabel')}
+                    {t('suppliers.dashboard.profileState.statusLabel')}
                   </span>
                   <span
                     className="font-medium"
@@ -628,13 +628,13 @@ export default function SupplierDashboard() {
                     }}
                   >
                     {supplier.status === 'active'
-                      ? t('common.suppliers.dashboard.profileState.statusActive')
-                      : t('common.suppliers.dashboard.profileState.statusInactive')}
+                      ? t('suppliers.dashboard.profileState.statusActive')
+                      : t('suppliers.dashboard.profileState.statusInactive')}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span style={{ color: 'var(--color-muted)' }}>
-                    {t('common.suppliers.dashboard.profileState.matchScore')}
+                    {t('suppliers.dashboard.profileState.matchScore')}
                   </span>
                   <span className="font-medium" style={{ color: 'var(--color-primary)' }}>
                     {matchScore}/100
@@ -651,10 +651,10 @@ export default function SupplierDashboard() {
               }}
             >
               <h4 className="font-medium mb-2" style={{ color: 'var(--color-text)' }}>
-                {t('common.suppliers.dashboard.insight.title')}
+                {t('suppliers.dashboard.insight.title')}
               </h4>
               <p className="text-sm" style={{ color: 'var(--color-muted)' }}>
-                {t('common.suppliers.dashboard.insight.description')}
+                {t('suppliers.dashboard.insight.description')}
               </p>
             </div>
           </div>

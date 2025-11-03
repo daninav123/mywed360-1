@@ -29,7 +29,7 @@ export default function SupplierSetPassword() {
     if (tokenParam) setToken(tokenParam);
 
     if (!emailParam || !tokenParam) {
-      setError(t('common.suppliers.setPassword.errors.invalidLink'));
+      setError(t('suppliers.setPassword.errors.invalidLink'));
     }
   }, [searchParams, t]);
 
@@ -39,12 +39,12 @@ export default function SupplierSetPassword() {
 
     // Validaciones
     if (password.length < 8) {
-      setError(t('common.suppliers.setPassword.errors.passwordShort'));
+      setError(t('suppliers.setPassword.errors.passwordShort'));
       return;
     }
 
     if (password !== confirmPassword) {
-      setError(t('common.suppliers.setPassword.errors.passwordMismatch'));
+      setError(t('suppliers.setPassword.errors.passwordMismatch'));
       return;
     }
 
@@ -65,12 +65,12 @@ export default function SupplierSetPassword() {
 
       if (!response.ok) {
         if (data.error === 'invalid_token') {
-          throw new Error(t('common.suppliers.setPassword.errors.invalidToken'));
+          throw new Error(t('suppliers.setPassword.errors.invalidToken'));
         }
         if (data.error === 'password_too_short') {
-          throw new Error(t('common.suppliers.setPassword.errors.passwordShort'));
+          throw new Error(t('suppliers.setPassword.errors.passwordShort'));
         }
-        throw new Error(data.message || t('common.suppliers.setPassword.errors.generic'));
+        throw new Error(data.message || t('suppliers.setPassword.errors.generic'));
       }
 
       setSuccess(true);
@@ -80,7 +80,7 @@ export default function SupplierSetPassword() {
         navigate('/supplier/login');
       }, 2000);
     } catch (err) {
-      setError(err.message || t('common.suppliers.setPassword.errors.generic'));
+      setError(err.message || t('suppliers.setPassword.errors.generic'));
     } finally {
       setLoading(false);
     }
@@ -100,10 +100,10 @@ export default function SupplierSetPassword() {
             <CheckCircle size={48} />
           </div>
           <h1 className="text-3xl font-bold mb-4" style={{ color: 'var(--color-text)' }}>
-            {t('common.suppliers.setPassword.success.title')}
+            {t('suppliers.setPassword.success.title')}
           </h1>
           <p className="mb-8" style={{ color: 'var(--color-muted)' }}>
-            {t('common.suppliers.setPassword.success.description')}
+            {t('suppliers.setPassword.success.description')}
           </p>
           <div className="animate-pulse">
             <div
@@ -131,10 +131,10 @@ export default function SupplierSetPassword() {
             <Lock size={32} />
           </div>
           <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--color-text)' }}>
-            {t('common.suppliers.setPassword.title')}
+            {t('suppliers.setPassword.title')}
           </h1>
           <p style={{ color: 'var(--color-muted)' }}>
-            {t('common.suppliers.setPassword.subtitle')}
+            {t('suppliers.setPassword.subtitle')}
           </p>
         </div>
 
@@ -147,7 +147,7 @@ export default function SupplierSetPassword() {
             {/* Email (readonly) */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('common.suppliers.setPassword.fields.email')}
+                {t('suppliers.setPassword.fields.email')}
               </label>
               <input
                 type="email"
@@ -165,33 +165,33 @@ export default function SupplierSetPassword() {
             {/* Nueva contraseña */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('common.suppliers.setPassword.fields.password.label')}
+                {t('suppliers.setPassword.fields.password.label')}
               </label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                placeholder={t('common.suppliers.setPassword.fields.password.placeholder')}
+                placeholder={t('suppliers.setPassword.fields.password.placeholder')}
                 required
                 minLength={8}
               />
               <p className="mt-1 text-xs" style={{ color: 'var(--color-muted)' }}>
-                {t('common.suppliers.setPassword.fields.password.hint')}
+                {t('suppliers.setPassword.fields.password.hint')}
               </p>
             </div>
 
             {/* Confirmar contraseña */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('common.suppliers.setPassword.fields.confirm.label')}
+                {t('suppliers.setPassword.fields.confirm.label')}
               </label>
               <input
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                placeholder={t('common.suppliers.setPassword.fields.confirm.placeholder')}
+                placeholder={t('suppliers.setPassword.fields.confirm.placeholder')}
                 required
               />
             </div>
@@ -219,8 +219,8 @@ export default function SupplierSetPassword() {
               style={{ backgroundColor: 'var(--color-primary)' }}
             >
               {loading
-                ? t('common.suppliers.setPassword.buttons.submitting')
-                : t('common.suppliers.setPassword.buttons.submit')}
+                ? t('suppliers.setPassword.buttons.submitting')
+                : t('suppliers.setPassword.buttons.submit')}
             </button>
           </form>
 
@@ -231,7 +231,7 @@ export default function SupplierSetPassword() {
               className="text-sm hover:underline"
               style={{ color: 'var(--color-primary)' }}
             >
-              {t('common.suppliers.setPassword.links.login')}
+              {t('suppliers.setPassword.links.login')}
             </button>
           </div>
         </div>

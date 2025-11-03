@@ -33,7 +33,7 @@ export default function MisDiseños() {
       } catch (e) {
         console.error(e);
         setError(
-          t('common.designsLibrary.myDesigns.messages.loadError', 'No se pudo cargar tus diseños')
+          t('designsLibrary.myDesigns.messages.loadError', 'No se pudo cargar tus diseños')
         );
       } finally {
         setLoading(false);
@@ -45,7 +45,7 @@ export default function MisDiseños() {
   const handleDelete = async (it) => {
     if (
       !confirm(
-        t('common.designsLibrary.myDesigns.confirmDelete', '¿Eliminar este diseño definitivamente?')
+        t('designsLibrary.myDesigns.confirmDelete', '¿Eliminar este diseño definitivamente?')
       )
     ) {
       return;
@@ -62,7 +62,7 @@ export default function MisDiseños() {
       setItems((prev) => prev.filter((x) => x.id !== it.id));
     } catch (e) {
       console.error(e);
-      alert(t('common.designsLibrary.myDesigns.messages.deleteError', 'No se pudo eliminar'));
+      alert(t('designsLibrary.myDesigns.messages.deleteError', 'No se pudo eliminar'));
     }
   };
 
@@ -70,10 +70,10 @@ export default function MisDiseños() {
     <div className="p-4 space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">
-          {t('common.designsLibrary.myDesigns.title', 'Mis diseños')}
+          {t('designsLibrary.myDesigns.title', 'Mis diseños')}
         </h1>
         <Link to="/disenos" className="text-blue-600 hover:underline">
-          {t('common.designsLibrary.myDesigns.backLink', 'Volver a Diseños')}
+          {t('designsLibrary.myDesigns.backLink', 'Volver a Diseños')}
         </Link>
       </div>
       {!activeWedding && (
@@ -87,7 +87,7 @@ export default function MisDiseños() {
       {error && <div className="p-3 border rounded bg-red-50 text-red-700">{error}</div>}
       {loading && (
         <div className="text-sm text-gray-600">
-          {t('common.designsLibrary.myDesigns.loading', 'Cargando...')}
+          {t('designsLibrary.myDesigns.loading', 'Cargando...')}
         </div>
       )}
       {!loading && activeWedding && (
@@ -96,11 +96,11 @@ export default function MisDiseños() {
             <div key={it.id} className="border rounded overflow-hidden bg-white">
               <div className="p-2 bg-gray-50 text-xs text-gray-600 flex items-center justify-between">
                 <span>
-                  {it.type || t('common.designsLibrary.myDesigns.item.typeFallback', 'diseño')}
+                  {it.type || t('designsLibrary.myDesigns.item.typeFallback', 'diseño')}
                 </span>
                 <span>
                   {it.category ||
-                    t('common.designsLibrary.myDesigns.item.categoryFallback', 'general')}
+                    t('designsLibrary.myDesigns.item.categoryFallback', 'general')}
                 </span>
               </div>
               <div className="aspect-square w-full overflow-hidden flex items-center justify-center bg-white">
@@ -109,13 +109,13 @@ export default function MisDiseños() {
                     src={it.url}
                     alt={
                       it.category ||
-                      t('common.designsLibrary.myDesigns.item.typeFallback', 'diseño')
+                      t('designsLibrary.myDesigns.item.typeFallback', 'diseño')
                     }
                     className="max-w-full max-h-full object-contain"
                   />
                 ) : (
                   <div className="text-gray-400 text-sm">
-                    {t('common.designsLibrary.myDesigns.item.noPreview', 'Sin vista previa')}
+                    {t('designsLibrary.myDesigns.item.noPreview', 'Sin vista previa')}
                   </div>
                 )}
               </div>
@@ -127,12 +127,12 @@ export default function MisDiseños() {
                       navigate(
                         `/disenos/vector-editor?svg=${encodeURIComponent(it.url)}&category=${encodeURIComponent(
                           it.category ||
-                            t('common.designsLibrary.myDesigns.item.categoryFallback', 'general')
+                            t('designsLibrary.myDesigns.item.categoryFallback', 'general')
                         )}`
                       )
                     }
                   >
-                    {t('common.designsLibrary.myDesigns.actions.edit', 'Editar')}
+                    {t('designsLibrary.myDesigns.actions.edit', 'Editar')}
                   </button>
                 )}
                 {it.url && (
@@ -142,21 +142,21 @@ export default function MisDiseños() {
                     rel="noreferrer"
                     className="px-2 py-1 text-sm rounded border"
                   >
-                    {t('common.designsLibrary.myDesigns.actions.download', 'Descargar')}
+                    {t('designsLibrary.myDesigns.actions.download', 'Descargar')}
                   </a>
                 )}
                 <button
                   className="px-2 py-1 text-sm rounded border text-red-600"
                   onClick={() => handleDelete(it)}
                 >
-                  {t('common.designsLibrary.myDesigns.actions.delete', 'Eliminar')}
+                  {t('designsLibrary.myDesigns.actions.delete', 'Eliminar')}
                 </button>
               </div>
             </div>
           ))}
           {items.length === 0 && (
             <div className="text-sm text-gray-600">
-              {t('common.designsLibrary.myDesigns.noItems', 'No hay diseños guardados todavía.')}
+              {t('designsLibrary.myDesigns.noItems', 'No hay diseños guardados todavía.')}
             </div>
           )}
         </div>

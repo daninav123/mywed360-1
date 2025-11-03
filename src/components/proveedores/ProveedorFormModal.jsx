@@ -109,21 +109,21 @@ const ProveedorFormModal = ({
     const nuevosErrores = {};
 
     if (!formData.nombre.trim()) {
-      nuevosErrores.nombre = t('common.suppliers.formModal.errors.nameRequired');
+      nuevosErrores.nombre = t('suppliers.formModal.errors.nameRequired');
     }
 
     if (!formData.servicio.trim()) {
-      nuevosErrores.servicio = t('common.suppliers.formModal.errors.serviceRequired');
+      nuevosErrores.servicio = t('suppliers.formModal.errors.serviceRequired');
     }
 
     // Email válido si se proporciona
     if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
-      nuevosErrores.email = t('common.suppliers.formModal.errors.emailInvalid');
+      nuevosErrores.email = t('suppliers.formModal.errors.emailInvalid');
     }
 
     // Web con formato válido si se proporciona
     if (formData.web && !formData.web.startsWith('http')) {
-      nuevosErrores.web = t('common.suppliers.formModal.errors.webInvalid');
+      nuevosErrores.web = t('suppliers.formModal.errors.webInvalid');
     }
 
     setErrores(nuevosErrores);
@@ -166,7 +166,7 @@ const ProveedorFormModal = ({
       console.error('Error al guardar proveedor:', error);
       setErrores({
         ...errores,
-        general: t('common.suppliers.formModal.errors.general'),
+        general: t('suppliers.formModal.errors.general'),
       });
     } finally {
       setEnviando(false);
@@ -176,11 +176,11 @@ const ProveedorFormModal = ({
   if (!visible) return null;
 
   const statusOptions = [
-    { value: 'Nuevo', label: t('common.suppliers.formModal.status.options.new') },
-    { value: 'Contactado', label: t('common.suppliers.formModal.status.options.contacted') },
-    { value: 'Pendiente', label: t('common.suppliers.formModal.status.options.pending') },
-    { value: 'Contratado', label: t('common.suppliers.formModal.status.options.hired') },
-    { value: 'Descartado', label: t('common.suppliers.formModal.status.options.discarded') },
+    { value: 'Nuevo', label: t('suppliers.formModal.status.options.new') },
+    { value: 'Contactado', label: t('suppliers.formModal.status.options.contacted') },
+    { value: 'Pendiente', label: t('suppliers.formModal.status.options.pending') },
+    { value: 'Contratado', label: t('suppliers.formModal.status.options.hired') },
+    { value: 'Descartado', label: t('suppliers.formModal.status.options.discarded') },
   ];
 
   return (
@@ -196,13 +196,13 @@ const ProveedorFormModal = ({
         <div className="flex justify-between items-center p-5 border-b border-gray-200">
           <h3 className="font-semibold text-lg text-gray-800">
             {isEditing
-              ? t('common.suppliers.formModal.title.edit')
-              : t('common.suppliers.formModal.title.create')}
+              ? t('suppliers.formModal.title.edit')
+              : t('suppliers.formModal.title.create')}
           </h3>
           <button
             onClick={onClose}
             className="p-1 rounded-full hover:bg-gray-100"
-            aria-label={t('common.suppliers.formModal.actions.closeAria')}
+            aria-label={t('suppliers.formModal.actions.closeAria')}
           >
             <X size={20} className="text-gray-500" />
           </button>
@@ -219,14 +219,14 @@ const ProveedorFormModal = ({
             {/* Datos básicos */}
             <div className="space-y-4">
               <h4 className="font-medium text-gray-700">
-                {t('common.suppliers.formModal.sections.basic')}
+                {t('suppliers.formModal.sections.basic')}
               </h4>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Nombre */}
                 <div>
                   <label htmlFor="nombre" className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('common.suppliers.formModal.fields.name.label')}
+                    {t('suppliers.formModal.fields.name.label')}
                   </label>
                   <input
                     type="text"
@@ -237,7 +237,7 @@ const ProveedorFormModal = ({
                     className={`w-full px-3 py-2 border ${
                       errores.nombre ? 'border-red-300' : 'border-gray-300'
                     } rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500`}
-                    placeholder={t('common.suppliers.formModal.fields.name.placeholder')}
+                    placeholder={t('suppliers.formModal.fields.name.placeholder')}
                   />
                   {errores.nombre && <p className="mt-1 text-sm text-red-600">{errores.nombre}</p>}
                 </div>
@@ -248,7 +248,7 @@ const ProveedorFormModal = ({
                     htmlFor="servicio"
                     className="block text-sm font-medium text-gray-700 mb-1"
                   >
-                    {t('common.suppliers.formModal.fields.service.label')}
+                    {t('suppliers.formModal.fields.service.label')}
                   </label>
                   <input
                     type="text"
@@ -259,7 +259,7 @@ const ProveedorFormModal = ({
                     className={`w-full px-3 py-2 border ${
                       errores.servicio ? 'border-red-300' : 'border-gray-300'
                     } rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500`}
-                    placeholder={t('common.suppliers.formModal.fields.service.placeholder')}
+                    placeholder={t('suppliers.formModal.fields.service.placeholder')}
                   />
                   {errores.servicio && (
                     <p className="mt-1 text-sm text-red-600">{errores.servicio}</p>
@@ -274,11 +274,11 @@ const ProveedorFormModal = ({
                     htmlFor="presupuesto"
                     className="block text-sm font-medium text-gray-700 mb-1"
                   >
-                    {t('common.suppliers.formModal.fields.budget.label')}
+                    {t('suppliers.formModal.fields.budget.label')}
                   </label>
                   <div className="relative">
                     <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
-                      {t('common.suppliers.formModal.fields.budget.prefix')}
+                      {t('suppliers.formModal.fields.budget.prefix')}
                     </span>
                     <input
                       type="text"
@@ -287,7 +287,7 @@ const ProveedorFormModal = ({
                       value={formData.presupuesto}
                       onChange={handleChange}
                       className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                      placeholder={t('common.suppliers.formModal.fields.budget.placeholder')}
+                      placeholder={t('suppliers.formModal.fields.budget.placeholder')}
                     />
                   </div>
                 </div>
@@ -295,7 +295,7 @@ const ProveedorFormModal = ({
                 {/* Estado */}
                 <div>
                   <label htmlFor="estado" className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('common.suppliers.formModal.fields.status.label')}
+                    {t('suppliers.formModal.fields.status.label')}
                   </label>
                   <select
                     id="estado"
@@ -317,7 +317,7 @@ const ProveedorFormModal = ({
             {/* Datos de contacto */}
             <div className="pt-2 space-y-4">
               <h4 className="font-medium text-gray-700">
-                {t('common.suppliers.formModal.sections.contact')}
+                {t('suppliers.formModal.sections.contact')}
               </h4>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -327,7 +327,7 @@ const ProveedorFormModal = ({
                     htmlFor="contacto"
                     className="block text-sm font-medium text-gray-700 mb-1"
                   >
-                    {t('common.suppliers.formModal.fields.contact.label')}
+                    {t('suppliers.formModal.fields.contact.label')}
                   </label>
                   <input
                     type="text"
@@ -336,7 +336,7 @@ const ProveedorFormModal = ({
                     value={formData.contacto}
                     onChange={handleChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                    placeholder={t('common.suppliers.formModal.fields.contact.placeholder')}
+                    placeholder={t('suppliers.formModal.fields.contact.placeholder')}
                   />
                 </div>
 
@@ -346,7 +346,7 @@ const ProveedorFormModal = ({
                     htmlFor="telefono"
                     className="block text-sm font-medium text-gray-700 mb-1"
                   >
-                    {t('common.suppliers.formModal.fields.phone.label')}
+                    {t('suppliers.formModal.fields.phone.label')}
                   </label>
                   <input
                     type="text"
@@ -355,7 +355,7 @@ const ProveedorFormModal = ({
                     value={formData.telefono}
                     onChange={handleChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                    placeholder={t('common.suppliers.formModal.fields.phone.placeholder')}
+                    placeholder={t('suppliers.formModal.fields.phone.placeholder')}
                   />
                 </div>
               </div>
@@ -364,7 +364,7 @@ const ProveedorFormModal = ({
                 {/* Email */}
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('common.suppliers.formModal.fields.email.label')}
+                    {t('suppliers.formModal.fields.email.label')}
                   </label>
                   <input
                     type="email"
@@ -375,7 +375,7 @@ const ProveedorFormModal = ({
                     className={`w-full px-3 py-2 border ${
                       errores.email ? 'border-red-300' : 'border-gray-300'
                     } rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500`}
-                    placeholder={t('common.suppliers.formModal.fields.email.placeholder')}
+                    placeholder={t('suppliers.formModal.fields.email.placeholder')}
                   />
                   {errores.email && <p className="mt-1 text-sm text-red-600">{errores.email}</p>}
                 </div>
@@ -383,7 +383,7 @@ const ProveedorFormModal = ({
                 {/* Web */}
                 <div>
                   <label htmlFor="web" className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('common.suppliers.formModal.fields.web.label')}
+                    {t('suppliers.formModal.fields.web.label')}
                   </label>
                   <input
                     type="text"
@@ -394,7 +394,7 @@ const ProveedorFormModal = ({
                     className={`w-full px-3 py-2 border ${
                       errores.web ? 'border-red-300' : 'border-gray-300'
                     } rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500`}
-                    placeholder={t('common.suppliers.formModal.fields.web.placeholder')}
+                    placeholder={t('suppliers.formModal.fields.web.placeholder')}
                   />
                   {errores.web && <p className="mt-1 text-sm text-red-600">{errores.web}</p>}
                 </div>
@@ -403,7 +403,7 @@ const ProveedorFormModal = ({
               {/* Ubicación */}
               <div>
                 <label htmlFor="ubicacion" className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('common.suppliers.formModal.fields.location.label')}
+                  {t('suppliers.formModal.fields.location.label')}
                 </label>
                 <input
                   type="text"
@@ -412,14 +412,14 @@ const ProveedorFormModal = ({
                   value={formData.ubicacion}
                   onChange={handleChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                  placeholder={t('common.suppliers.formModal.fields.location.placeholder')}
+                  placeholder={t('suppliers.formModal.fields.location.placeholder')}
                 />
               </div>
 
               {/* Cita */}
               <div>
                 <label htmlFor="fechaCita" className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('common.suppliers.formModal.fields.appointment.label')}
+                  {t('suppliers.formModal.fields.appointment.label')}
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -440,13 +440,13 @@ const ProveedorFormModal = ({
             {/* Información adicional */}
             <div className="pt-2 space-y-4">
               <h4 className="font-medium text-gray-700">
-                {t('common.suppliers.formModal.sections.additional')}
+                {t('suppliers.formModal.sections.additional')}
               </h4>
 
               {/* Notas */}
               <div>
                 <label htmlFor="notas" className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('common.suppliers.formModal.fields.notes.label')}
+                  {t('suppliers.formModal.fields.notes.label')}
                 </label>
                 <textarea
                   id="notas"
@@ -455,14 +455,14 @@ const ProveedorFormModal = ({
                   onChange={handleChange}
                   rows={3}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                  placeholder={t('common.suppliers.formModal.fields.notes.placeholder')}
+                  placeholder={t('suppliers.formModal.fields.notes.placeholder')}
                 />
               </div>
 
               {/* URL de imagen */}
               <div>
                 <label htmlFor="imagen" className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('common.suppliers.formModal.fields.image.label')}
+                  {t('suppliers.formModal.fields.image.label')}
                 </label>
                 <input
                   type="text"
@@ -471,10 +471,10 @@ const ProveedorFormModal = ({
                   value={formData.imagen}
                   onChange={handleChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                  placeholder={t('common.suppliers.formModal.fields.image.placeholder')}
+                  placeholder={t('suppliers.formModal.fields.image.placeholder')}
                 />
                 <p className="mt-1 text-xs text-gray-500">
-                  {t('common.suppliers.formModal.fields.image.help')}
+                  {t('suppliers.formModal.fields.image.help')}
                 </p>
               </div>
             </div>
@@ -487,7 +487,7 @@ const ProveedorFormModal = ({
               onClick={onClose}
               className="px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
-              {t('common.suppliers.formModal.actions.cancel')}
+              {t('suppliers.formModal.actions.cancel')}
             </button>
             <button
               type="submit"
@@ -495,11 +495,11 @@ const ProveedorFormModal = ({
               className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md shadow-sm text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
             >
               {enviando
-                ? t('common.suppliers.formModal.actions.saving')
+                ? t('suppliers.formModal.actions.saving')
                 : isCypress || forceGuardar || !isEditing
-                ? t('common.suppliers.formModal.actions.save')
-                : t('common.suppliers.formModal.actions.update')}
-              <span className="sr-only">{t('common.suppliers.formModal.actions.save')}</span>
+                ? t('suppliers.formModal.actions.save')
+                : t('suppliers.formModal.actions.update')}
+              <span className="sr-only">{t('suppliers.formModal.actions.save')}</span>
             </button>
           </div>
         </form>

@@ -148,7 +148,7 @@ const BlogPost = () => {
         setPost(response?.post || null);
         if (!response?.post) {
           setError(
-            t('common.blog.post.errors.notFound', {
+            t('blog.post.errors.notFound', {
               defaultValue:
                 'No hemos encontrado este artículo. Comprueba que el enlace es correcto.',
             })
@@ -158,7 +158,7 @@ const BlogPost = () => {
         if (cancelled) return;
         console.error('[BlogPost] fetch failed', err);
         setError(
-          t('common.blog.post.errors.loadFailed', {
+          t('blog.post.errors.loadFailed', {
             defaultValue: 'No se pudo cargar el contenido. Inténtalo de nuevo más tarde.',
           })
         );
@@ -254,27 +254,27 @@ const BlogPost = () => {
 
   const pageTitle = post?.title
     ? `${post.title} | Lovenda Blog`
-    : t('common.blog.title', { defaultValue: 'Blog' });
+    : t('blog.title', { defaultValue: 'Blog' });
   const metaDescription =
     post?.excerpt ||
-    t('common.blog.lead', {
+    t('blog.lead', {
       defaultValue:
         'Descubre tendencias, guías y consejos para organizar tu boda con la ayuda del equipo Lovenda.',
     });
   const canonicalUrl = `/blog/${slug}`;
   const ctaCopy = {
-    title: t('common.blog.post.cta.title', { defaultValue: 'Organiza tu boda con Lovenda' }),
-    description: t('common.blog.post.cta.description', {
+    title: t('blog.post.cta.title', { defaultValue: 'Organiza tu boda con Lovenda' }),
+    description: t('blog.post.cta.description', {
       defaultValue:
         'Centraliza tareas, proveedores y comunicación con la plataforma que usamos para crear estas historias.',
     }),
-    primary: t('common.blog.post.cta.primary', { defaultValue: 'Solicitar demo gratis' }),
-    secondary: t('common.blog.post.cta.secondary', { defaultValue: 'Descubrir la app' }),
+    primary: t('blog.post.cta.primary', { defaultValue: 'Solicitar demo gratis' }),
+    secondary: t('blog.post.cta.secondary', { defaultValue: 'Descubrir la app' }),
   };
-  const referencesTitle = t('common.blog.post.references.title', {
+  const referencesTitle = t('blog.post.references.title', {
     defaultValue: 'Fuentes consultadas',
   });
-  const relatedTitle = t('common.blog.post.related.title', {
+  const relatedTitle = t('blog.post.related.title', {
     defaultValue: 'También te puede interesar',
   });
   const canonicalHref =
@@ -324,7 +324,7 @@ const BlogPost = () => {
         {
           '@type': 'ListItem',
           position: 1,
-          name: t('common.blog.title', { defaultValue: 'Blog' }),
+          name: t('blog.title', { defaultValue: 'Blog' }),
           item: blogUrl,
         },
         {
@@ -355,7 +355,7 @@ const BlogPost = () => {
       </Helmet>
       <PageWrapper
         title={
-          post?.title || t('common.blog.post.fallbackTitle', { defaultValue: 'Artículo del blog' })
+          post?.title || t('blog.post.fallbackTitle', { defaultValue: 'Artículo del blog' })
         }
         className="max-w-3xl mx-auto"
       >
@@ -499,7 +499,7 @@ const BlogPost = () => {
                     to={`/blog/autor/${authorProfile.slug}`}
                     className="inline-flex text-sm font-medium text-[var(--color-primary,#6366f1)] hover:text-[var(--color-primary-dark,#4f46e5)]"
                   >
-                    {t('common.blog.author.viewAll', { defaultValue: 'Ver artículos del autor' })}
+                    {t('blog.author.viewAll', { defaultValue: 'Ver artículos del autor' })}
                   </Link>
                 </div>
               </section>

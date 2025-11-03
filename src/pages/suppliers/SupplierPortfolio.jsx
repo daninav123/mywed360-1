@@ -87,7 +87,7 @@ export default function SupplierPortfolio() {
       setPhotos(portfolioPhotos);
     } catch (error) {
       console.error('[SupplierPortfolio] load error', error);
-      toast.error(t('common.suppliers.portfolio.toasts.loadError'));
+      toast.error(t('suppliers.portfolio.toasts.loadError'));
     } finally {
       setLoading(false);
     }
@@ -100,7 +100,7 @@ export default function SupplierPortfolio() {
   const handlePhotoUploaded = () => {
     setShowUploadModal(false);
     loadPhotos();
-    toast.success(t('common.suppliers.portfolio.toasts.uploaded'));
+    toast.success(t('suppliers.portfolio.toasts.uploaded'));
   };
 
   const handlePhotoClick = (photo) => {
@@ -109,7 +109,7 @@ export default function SupplierPortfolio() {
   };
 
   const handlePhotoDeleted = async (photoId) => {
-    if (!window.confirm(t('common.suppliers.portfolio.dashboard.deleteConfirm'))) return;
+    if (!window.confirm(t('suppliers.portfolio.dashboard.deleteConfirm'))) return;
 
     try {
       const token = localStorage.getItem('supplier_token');
@@ -120,14 +120,14 @@ export default function SupplierPortfolio() {
 
       if (!response.ok) throw new Error('delete_failed');
 
-      toast.success(t('common.suppliers.portfolio.toasts.deleted'));
+      toast.success(t('suppliers.portfolio.toasts.deleted'));
       loadPhotos();
     } catch (error) {
       console.error('[SupplierPortfolio] delete error', error);
       toast.error(
         error.message === 'delete_failed'
-          ? t('common.suppliers.portfolio.toasts.deleteError')
-          : t('common.suppliers.portfolio.toasts.genericError')
+          ? t('suppliers.portfolio.toasts.deleteError')
+          : t('suppliers.portfolio.toasts.genericError')
       );
     }
   };
@@ -135,7 +135,7 @@ export default function SupplierPortfolio() {
   const handlePhotoUpdated = () => {
     setShowLightbox(false);
     loadPhotos();
-    toast.success(t('common.suppliers.portfolio.toasts.updated'));
+    toast.success(t('suppliers.portfolio.toasts.updated'));
   };
 
   const totalPhotos = photos.length + (coverPhoto ? 1 : 0);
@@ -155,13 +155,13 @@ export default function SupplierPortfolio() {
   }, [coverPhoto, tPlural]);
 
   const coverPhotoTitle = useMemo(
-    () => coverPhoto?.title || t('common.suppliers.portfolio.dashboard.coverPhoto.untitled'),
+    () => coverPhoto?.title || t('suppliers.portfolio.dashboard.coverPhoto.untitled'),
     [coverPhoto, t]
   );
 
-  const zeroStateTitle = t('common.suppliers.portfolio.dashboard.zeroState.title');
-  const zeroStateDescription = t('common.suppliers.portfolio.dashboard.zeroState.description');
-  const zeroStateCta = t('common.suppliers.portfolio.dashboard.zeroState.cta');
+  const zeroStateTitle = t('suppliers.portfolio.dashboard.zeroState.title');
+  const zeroStateDescription = t('suppliers.portfolio.dashboard.zeroState.description');
+  const zeroStateCta = t('suppliers.portfolio.dashboard.zeroState.cta');
 
   const showZeroState = !coverPhoto && photos.length === 0;
 
@@ -183,11 +183,11 @@ export default function SupplierPortfolio() {
         <div className="p-4 flex items-center justify-between border-b border-border">
           <div>
             <p className="text-sm text-muted uppercase tracking-wide">
-              {t('common.suppliers.portfolio.dashboard.coverPhotoCard.title')}
+              {t('suppliers.portfolio.dashboard.coverPhotoCard.title')}
             </p>
             <h2 className="text-lg font-semibold text-foreground">{coverPhotoTitle}</h2>
             <p className="text-sm text-muted">
-              {t('common.suppliers.portfolio.dashboard.coverPhotoCard.description')}
+              {t('suppliers.portfolio.dashboard.coverPhotoCard.description')}
             </p>
           </div>
           <button
@@ -196,7 +196,7 @@ export default function SupplierPortfolio() {
             className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
           >
             <Edit className="h-4 w-4" />
-            {t('common.suppliers.portfolio.dashboard.photoCard.open')}
+            {t('suppliers.portfolio.dashboard.photoCard.open')}
           </button>
         </div>
         <button
@@ -212,7 +212,7 @@ export default function SupplierPortfolio() {
           {coverPhoto.featured && (
             <span className="absolute top-3 left-3 inline-flex items-center gap-1 bg-primary text-white px-3 py-1 rounded-md text-xs uppercase tracking-wide">
               <Star className="h-3 w-3 fill-current" />
-              {t('common.suppliers.portfolio.lightbox.tags.featured')}
+              {t('suppliers.portfolio.lightbox.tags.featured')}
             </span>
           )}
         </button>
@@ -220,12 +220,12 @@ export default function SupplierPortfolio() {
           <span className="inline-flex items-center gap-2">
             <Eye className="h-4 w-4" />
             {formatNumber(coverPhoto.views || 0)}{' '}
-            {t('common.suppliers.portfolio.dashboard.stats.views')}
+            {t('suppliers.portfolio.dashboard.stats.views')}
           </span>
           <span className="inline-flex items-center gap-2">
             <Heart className="h-4 w-4" />
             {formatNumber(coverPhoto.likes || 0)}{' '}
-            {t('common.suppliers.portfolio.dashboard.stats.likes')}
+            {t('suppliers.portfolio.dashboard.stats.likes')}
           </span>
         </div>
       </div>
@@ -233,7 +233,7 @@ export default function SupplierPortfolio() {
   };
 
   const renderPhotoCard = (photo) => {
-    const title = photo.title || t('common.suppliers.portfolio.lightbox.view.noTitle');
+    const title = photo.title || t('suppliers.portfolio.lightbox.view.noTitle');
     const description = photo.description || '';
 
     return (
@@ -259,7 +259,7 @@ export default function SupplierPortfolio() {
           {photo.featured && (
             <div className="absolute top-2 left-2 bg-primary text-white px-2 py-1 rounded-md text-xs flex items-center gap-1">
               <Star className="h-3 w-3 fill-current" />
-              {t('common.suppliers.portfolio.lightbox.tags.featured')}
+              {t('suppliers.portfolio.lightbox.tags.featured')}
             </div>
           )}
         </button>
@@ -270,7 +270,7 @@ export default function SupplierPortfolio() {
               <h3 className="text-base font-semibold text-foreground">{title}</h3>
               {photo.category && (
                 <p className="text-xs text-muted">
-                  {t('common.suppliers.portfolio.dashboard.filters.label')}:&nbsp;
+                  {t('suppliers.portfolio.dashboard.filters.label')}:&nbsp;
                   {t(`common.suppliers.portfolio.lightbox.categories.${photo.category}`, {
                     defaultValue: photo.category,
                   })}
@@ -284,7 +284,7 @@ export default function SupplierPortfolio() {
                 handlePhotoDeleted(photo.id);
               }}
               className="text-red-500 hover:text-red-600 transition-colors"
-              title={t('common.suppliers.portfolio.dashboard.photoCard.delete')}
+              title={t('suppliers.portfolio.dashboard.photoCard.delete')}
             >
               <Trash2 className="h-5 w-5" />
             </button>
@@ -313,7 +313,7 @@ export default function SupplierPortfolio() {
               className="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 border border-border rounded-md text-sm text-foreground hover:bg-muted/50 transition-colors"
             >
               <Edit className="h-4 w-4" />
-              {t('common.suppliers.portfolio.dashboard.photoCard.edit')}
+              {t('suppliers.portfolio.dashboard.photoCard.edit')}
             </button>
           </div>
         </div>
@@ -326,7 +326,7 @@ export default function SupplierPortfolio() {
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4" />
-          <p className="text-muted">{t('common.suppliers.portfolio.dashboard.loading')}</p>
+          <p className="text-muted">{t('suppliers.portfolio.dashboard.loading')}</p>
         </div>
       </div>
     );
@@ -340,7 +340,7 @@ export default function SupplierPortfolio() {
             <div className="flex items-center gap-3 mb-2">
               <Camera className="h-6 w-6 text-primary" />
               <h1 className="text-2xl font-bold text-foreground">
-                {t('common.suppliers.portfolio.dashboard.title')}
+                {t('suppliers.portfolio.dashboard.title')}
               </h1>
             </div>
             <p className="text-muted">
@@ -354,7 +354,7 @@ export default function SupplierPortfolio() {
             className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors"
           >
             <Plus className="h-5 w-5" />
-            {t('common.suppliers.portfolio.dashboard.actions.addPhoto')}
+            {t('suppliers.portfolio.dashboard.actions.addPhoto')}
           </button>
         </div>
       </div>
@@ -366,7 +366,7 @@ export default function SupplierPortfolio() {
           <Filter className="h-5 w-5 text-muted" />
           <div>
             <label htmlFor="portfolio-category" className="block text-sm text-muted">
-              {t('common.suppliers.portfolio.dashboard.filters.label')}
+              {t('suppliers.portfolio.dashboard.filters.label')}
             </label>
             <select
               id="portfolio-category"
@@ -392,8 +392,8 @@ export default function SupplierPortfolio() {
                 ? 'bg-primary text-white'
                 : 'bg-surface border border-border text-muted hover:text-foreground'
             }`}
-            title={t('common.suppliers.portfolio.dashboard.viewModes.grid')}
-            aria-label={t('common.suppliers.portfolio.dashboard.viewModes.grid')}
+            title={t('suppliers.portfolio.dashboard.viewModes.grid')}
+            aria-label={t('suppliers.portfolio.dashboard.viewModes.grid')}
           >
             <Grid className="h-5 w-5" />
           </button>
@@ -405,8 +405,8 @@ export default function SupplierPortfolio() {
                 ? 'bg-primary text-white'
                 : 'bg-surface border border-border text-muted hover:text-foreground'
             }`}
-            title={t('common.suppliers.portfolio.dashboard.viewModes.list')}
-            aria-label={t('common.suppliers.portfolio.dashboard.viewModes.list')}
+            title={t('suppliers.portfolio.dashboard.viewModes.list')}
+            aria-label={t('suppliers.portfolio.dashboard.viewModes.list')}
           >
             <List className="h-5 w-5" />
           </button>

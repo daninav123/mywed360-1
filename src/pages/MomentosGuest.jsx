@@ -52,14 +52,14 @@ export default function MomentosGuest() {
   const uploadsClosed = uploadState ? !uploadState.isWindowOpen : false;
   const remainingDays =
     typeof uploadState?.remainingDays === 'number' ? uploadState.remainingDays : null;
-  const defaultErrorMessage = t('common.public.moments.guest.errors.invalidLink');
+  const defaultErrorMessage = t('public.moments.guest.errors.invalidLink');
 
   useEffect(() => {
     let unsubscribeAlbum = null;
     const initialize = async () => {
       try {
         if (!tokenParam || !weddingId) {
-          throw new Error(t('common.public.moments.guest.errors.incompleteLink'));
+          throw new Error(t('public.moments.guest.errors.incompleteLink'));
         }
         await firebaseReady;
         const tokenData = await validateGuestToken(weddingId, tokenParam, { albumId: ALBUM_ID });
@@ -73,7 +73,7 @@ export default function MomentosGuest() {
         );
       } catch (error) {
         console.error('Validación de token de la galería de recuerdos', error);
-        setErrorMessage(error?.message || t('common.public.moments.guest.errors.invalidLink'));
+        setErrorMessage(error?.message || t('public.moments.guest.errors.invalidLink'));
         setStatus('error');
       }
     };
@@ -94,7 +94,7 @@ export default function MomentosGuest() {
     setStatus('closed');
     const closesAtLabel = uploadState?.closesAt ? formatDate(uploadState.closesAt) : null;
     setErrorMessage(
-      t('common.public.moments.guest.closedDescription', {
+      t('public.moments.guest.closedDescription', {
         date: closesAtLabel ? ` ${closesAtLabel}` : '',
       })
     );
@@ -102,7 +102,7 @@ export default function MomentosGuest() {
 
   const scenes = useMemo(() => {
     const base = getAlbumScenes(album);
-    const fallback = [{ id: 'otros', label: t('common.public.moments.guest.scenes.other') }];
+    const fallback = [{ id: 'otros', label: t('public.moments.guest.scenes.other') }];
     if (tokenDoc?.sceneTargets?.length) {
       const allowed = tokenDoc.sceneTargets.map((scene) => scene.toLowerCase());
       const filtered = base.filter((scene) => allowed.includes(scene.id.toLowerCase()));
@@ -122,7 +122,7 @@ export default function MomentosGuest() {
       type: 'guest',
       uid: guestId,
       guestId,
-      displayName: guestName || t('common.public.moments.guest.uploadStates.guestFallback'),
+      displayName: guestName || t('public.moments.guest.uploadStates.guestFallback'),
       tokenId: tokenDoc?.id || null,
       source: 'guest-portal',
     }),
@@ -132,15 +132,15 @@ export default function MomentosGuest() {
   const handleStart = (event) => {
     event.preventDefault();
     if (!guestName.trim()) {
-      toast.warn(t('common.public.moments.guest.form.errors.missingName'));
+      toast.warn(t('public.moments.guest.form.errors.missingName'));
       return;
     }
     if (!acceptedTerms) {
-      toast.warn(t('common.public.moments.guest.form.errors.missingTerms'));
+      toast.warn(t('public.moments.guest.form.errors.missingTerms'));
       return;
     }
     if (uploadsClosed) {
-      toast.warn(t('common.public.moments.guest.form.errors.uploadsClosed'));
+      toast.warn(t('public.moments.guest.form.errors.uploadsClosed'));
       setStatus('closed');
       return;
     }
@@ -155,13 +155,13 @@ export default function MomentosGuest() {
       ...prev.slice(0, 4),
     ]);
     if (nextCount === 1) {
-      toast.success(t('common.public.moments.guest.toasts.firstUpload'));
+      toast.success(t('public.moments.guest.toasts.firstUpload'));
     } else if (nextCount === 3) {
-      toast.success(t('common.public.moments.guest.toasts.thirdUpload'));
+      toast.success(t('public.moments.guest.toasts.thirdUpload'));
     } else if (nextCount === 5) {
-      toast.success(t('common.public.moments.guest.toasts.fifthUpload'));
+      toast.success(t('public.moments.guest.toasts.fifthUpload'));
     } else {
-      toast.success(t('common.public.moments.guest.toasts.default'));
+      toast.success(t('public.moments.guest.toasts.default'));
     }
   };
 
@@ -174,7 +174,7 @@ export default function MomentosGuest() {
       <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
         <div className="bg-white border border-slate-200 rounded-xl shadow-sm px-6 py-8 space-y-3 text-center">
           <div className="animate-spin h-8 w-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto"></div>
-          <p className="text-sm text-slate-600">{t('common.public.moments.guest.loading')}</p>
+          <p className="text-sm text-slate-600">{t('public.moments.guest.loading')}</p>
         </div>
       </div>
     );
@@ -185,14 +185,14 @@ export default function MomentosGuest() {
       <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
         <div className="bg-white border border-red-100 rounded-xl shadow-sm px-6 py-8 max-w-md text-center space-y-3">
           <h1 className="text-xl font-semibold text-red-600">
-            {t('common.public.moments.guest.errorTitle')}
+            {t('public.moments.guest.errorTitle')}
           </h1>
           <p className="text-sm text-slate-600">
-            {t('common.public.moments.guest.errorDescription', {
+            {t('public.moments.guest.errorDescription', {
               message: errorMessage || defaultErrorMessage,
             })}
           </p>
-          <p className="text-xs text-slate-400">{t('common.public.moments.guest.errorHint')}</p>
+          <p className="text-xs text-slate-400">{t('public.moments.guest.errorHint')}</p>
         </div>
       </div>
     );
@@ -203,18 +203,18 @@ export default function MomentosGuest() {
       <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
         <div className="bg-white border border-amber-100 rounded-xl shadow-sm px-6 py-8 max-w-md text-center space-y-3">
           <h1 className="text-xl font-semibold text-amber-600">
-            {t('common.public.moments.guest.closedTitle')}
+            {t('public.moments.guest.closedTitle')}
           </h1>
           <p className="text-sm text-slate-600">
             {errorMessage ||
-              t('common.public.moments.guest.closedDescription', {
+              t('public.moments.guest.closedDescription', {
                 date: uploadState?.closesAt
                   ? ` ${formatDateLocal(uploadState.closesAt)}`
                   : '',
               })}
           </p>
           <p className="text-xs text-slate-400">
-            {t('common.public.moments.guest.closedHint')}
+            {t('public.moments.guest.closedHint')}
           </p>
         </div>
       </div>
@@ -230,29 +230,29 @@ export default function MomentosGuest() {
         >
           <header className="space-y-2 text-center">
             <p className="text-sm uppercase tracking-wide text-blue-500 font-semibold">
-              {t('common.public.moments.guest.form.badge')}
+              {t('public.moments.guest.form.badge')}
             </p>
             <h1 className="text-2xl font-semibold text-slate-800">
-              {t('common.public.moments.guest.form.title')}
+              {t('public.moments.guest.form.title')}
             </h1>
             <p className="text-sm text-slate-500">
-              {t('common.public.moments.guest.form.description')}
+              {t('public.moments.guest.form.description')}
             </p>
             {uploadState?.closesAt && (
               <p className="text-xs text-slate-400">
-                {t('common.public.moments.guest.form.deadline', {
+                {t('public.moments.guest.form.deadline', {
                   date: formatDate(uploadState.closesAt),
                 })}
               </p>
             )}
             {uploadState?.isWindowOpen && remainingDays !== null && remainingDays >= 0 && (
               <p className="text-xs text-slate-400">
-                {t('common.public.moments.guest.form.remainingDays', { count: remainingDays })}
+                {t('public.moments.guest.form.remainingDays', { count: remainingDays })}
               </p>
             )}
             {uploadState?.compressionActive && (
               <p className="text-xs text-slate-400">
-                {t('common.public.moments.guest.form.compressionNotice')}
+                {t('public.moments.guest.form.compressionNotice')}
               </p>
             )}
           </header>
@@ -260,13 +260,13 @@ export default function MomentosGuest() {
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-slate-700">
-                {t('common.public.moments.guest.form.nameLabel')}
+                {t('public.moments.guest.form.nameLabel')}
               </label>
               <input
                 type="text"
                 value={guestName}
                 onChange={(event) => setGuestName(event.target.value)}
-                placeholder={t('common.public.moments.guest.form.namePlaceholder')}
+                placeholder={t('public.moments.guest.form.namePlaceholder')}
                 className="mt-1 w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
@@ -274,13 +274,13 @@ export default function MomentosGuest() {
 
             <div>
               <label className="block text-sm font-medium text-slate-700">
-                {t('common.public.moments.guest.form.emailLabel')}
+                {t('public.moments.guest.form.emailLabel')}
               </label>
               <input
                 type="email"
                 value={guestEmail}
                 onChange={(event) => setGuestEmail(event.target.value)}
-                placeholder={t('common.public.moments.guest.form.emailPlaceholder')}
+                placeholder={t('public.moments.guest.form.emailPlaceholder')}
                 className="mt-1 w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -294,7 +294,7 @@ export default function MomentosGuest() {
                 required
               />
               <span>
-                {t('common.public.moments.guest.form.termsLabel')}
+                {t('public.moments.guest.form.termsLabel')}
               </span>
             </label>
           </div>
@@ -303,10 +303,10 @@ export default function MomentosGuest() {
             type="submit"
             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm py-2.5 rounded-md transition"
           >
-            {t('common.public.moments.guest.form.submit')}
+            {t('public.moments.guest.form.submit')}
           </button>
           <p className="text-xs text-slate-400 text-center">
-            {t('common.public.moments.guest.form.tip')}
+            {t('public.moments.guest.form.tip')}
           </p>
         </form>
       </div>
@@ -318,13 +318,13 @@ export default function MomentosGuest() {
       ? Math.max(tokenDoc.maxUsages - (tokenDoc.usedCount || 0) - uploadedCount, 0)
       : null;
   const guestDisplayName =
-    guestName || t('common.public.moments.guest.uploadStates.guestFallback');
+    guestName || t('public.moments.guest.uploadStates.guestFallback');
   const remainingUploadsText =
     remainingUploads === null
-      ? t('common.public.moments.guest.uploadStates.remainingUploadsUnlimited')
+      ? t('public.moments.guest.uploadStates.remainingUploadsUnlimited')
       : remainingUploads === 1
-        ? t('common.public.moments.guest.uploadStates.remainingUploadsOne')
-        : t('common.public.moments.guest.uploadStates.remainingUploads', {
+        ? t('public.moments.guest.uploadStates.remainingUploadsOne')
+        : t('public.moments.guest.uploadStates.remainingUploads', {
             count: remainingUploads,
           });
 
@@ -333,32 +333,32 @@ export default function MomentosGuest() {
       <div className="max-w-3xl mx-auto space-y-6">
         <header className="bg-white border border-slate-200 rounded-2xl shadow-sm px-6 py-5 space-y-2">
           <p className="text-xs uppercase tracking-wide text-blue-500 font-semibold">
-            {t('common.public.moments.guest.uploadStates.badge')}
+            {t('public.moments.guest.uploadStates.badge')}
           </p>
           <h1 className="text-xl font-semibold text-slate-800">
-            {t('common.public.moments.guest.uploadStates.greeting', { name: guestDisplayName })}
+            {t('public.moments.guest.uploadStates.greeting', { name: guestDisplayName })}
           </h1>
           <p className="text-sm text-slate-600">
             {remainingUploadsText}{' '}
-            {t('common.public.moments.guest.uploadStates.reviewHint')}
+            {t('public.moments.guest.uploadStates.reviewHint')}
           </p>
           {uploadState?.isWindowOpen && remainingDays !== null && remainingDays >= 0 && (
             <p className="text-xs text-slate-400">
-              {t('common.public.moments.guest.uploadStates.remainingDays', {
+              {t('public.moments.guest.uploadStates.remainingDays', {
                 count: remainingDays,
               })}
             </p>
           )}
           {uploadState?.closesAt && (
             <p className="text-xs text-slate-400">
-              {t('common.public.moments.guest.uploadStates.deadline', {
+              {t('public.moments.guest.uploadStates.deadline', {
                 date: formatDate(uploadState.closesAt),
               })}
             </p>
           )}
           {uploadState?.compressionActive && (
             <p className="text-xs text-slate-400">
-              {t('common.public.moments.guest.uploadStates.compressionNotice')}
+              {t('public.moments.guest.uploadStates.compressionNotice')}
             </p>
           )}
         </header>
@@ -375,17 +375,17 @@ export default function MomentosGuest() {
 
         <section className="bg-white border border-slate-200 rounded-xl shadow-sm px-6 py-5 space-y-3">
           <h2 className="text-lg font-semibold text-slate-800">
-            {t('common.public.moments.guest.uploadStates.progressTitle')}
+            {t('public.moments.guest.uploadStates.progressTitle')}
           </h2>
           <p className="text-sm text-slate-500">
-            {t('common.public.moments.guest.uploadStates.progressDescription', {
+            {t('public.moments.guest.uploadStates.progressDescription', {
               count: uploadedCount,
             })}
           </p>
           {recentUploads.length > 0 && (
             <div className="space-y-2">
               <p className="text-xs text-slate-400 uppercase tracking-wide font-semibold">
-                {t('common.public.moments.guest.uploadStates.recentUploadsTitle')}
+                {t('public.moments.guest.uploadStates.recentUploadsTitle')}
               </p>
               {recentUploads.map((item, index) => (
                 <div
@@ -395,21 +395,21 @@ export default function MomentosGuest() {
                   <div className="min-w-0">
                     <p className="font-medium text-slate-700 truncate">{item.name}</p>
                     <p className="text-xs text-slate-400">
-                      {t('common.public.moments.guest.uploadStates.uploadStatus', {
+                      {t('public.moments.guest.uploadStates.uploadStatus', {
                         scene: item.scene,
                         size: Math.round(item.size / 1024),
                       })}
                     </p>
                   </div>
                   <span className="text-xs text-green-600 font-semibold">
-                    {t('common.public.moments.guest.uploadStates.uploadReview')}
+                    {t('public.moments.guest.uploadStates.uploadReview')}
                   </span>
                 </div>
               ))}
             </div>
           )}
           <p className="text-xs text-slate-400">
-            {t('common.public.moments.guest.uploadStates.uploadsEmpty')}
+            {t('public.moments.guest.uploadStates.uploadsEmpty')}
           </p>
         </section>
       </div>

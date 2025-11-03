@@ -17,7 +17,7 @@ export default function GroupAllocationModal({ open, onClose, group, providers =
 
   const handleAdd = async () => {
     await addAllocation({
-      part: t('common.suppliers.groupAllocationModal.table.newPartLabel'),
+      part: t('suppliers.groupAllocationModal.table.newPartLabel'),
       supplierId: providers[0]?.id || '',
       amount: 0,
       notes: '',
@@ -31,7 +31,7 @@ export default function GroupAllocationModal({ open, onClose, group, providers =
     <Modal
       open={open}
       onClose={onClose}
-      title={t('common.suppliers.groupAllocationModal.title')}
+      title={t('suppliers.groupAllocationModal.title')}
     >
       <div className="space-y-4">
         <div
@@ -39,12 +39,12 @@ export default function GroupAllocationModal({ open, onClose, group, providers =
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm">{t('common.suppliers.groupAllocationModal.summary.totalLabel')}</p>
+              <p className="text-sm">{t('suppliers.groupAllocationModal.summary.totalLabel')}</p>
               <p className="text-xl font-semibold">{total.toFixed(2)} €</p>
             </div>
             <div className="text-right">
               <p className="text-sm">
-                {t('common.suppliers.groupAllocationModal.summary.targetLabel')}
+                {t('suppliers.groupAllocationModal.summary.targetLabel')}
               </p>
               {!editingBudget ? (
                 <button
@@ -52,10 +52,10 @@ export default function GroupAllocationModal({ open, onClose, group, providers =
                   onClick={() => setEditingBudget(true)}
                 >
                   {targetBudget > 0
-                    ? t('common.suppliers.groupAllocationModal.summary.targetValue', {
+                    ? t('suppliers.groupAllocationModal.summary.targetValue', {
                         amount: targetBudget.toFixed(2),
                       })
-                    : t('common.suppliers.groupAllocationModal.summary.noTarget')}
+                    : t('suppliers.groupAllocationModal.summary.noTarget')}
                 </button>
               ) : (
                 <div className="flex items-center gap-2">
@@ -78,7 +78,7 @@ export default function GroupAllocationModal({ open, onClose, group, providers =
                       setEditingBudget(false);
                     }}
                   >
-                    {t('common.suppliers.groupAllocationModal.summary.save')}
+                    {t('suppliers.groupAllocationModal.summary.save')}
                   </Button>
                 </div>
               )}
@@ -86,7 +86,7 @@ export default function GroupAllocationModal({ open, onClose, group, providers =
           </div>
           {exceeded && (
             <p className="text-sm mt-2">
-              {t('common.suppliers.groupAllocationModal.summary.overBudget', {
+              {t('suppliers.groupAllocationModal.summary.overBudget', {
                 amount: (total - targetBudget).toFixed(2),
               })}
             </p>
@@ -122,7 +122,7 @@ export default function GroupAllocationModal({ open, onClose, group, providers =
               <input
                 className="col-span-3 border rounded p-1"
                 value={it.notes || ''}
-                placeholder={t('common.suppliers.groupAllocationModal.table.notesPlaceholder')}
+                placeholder={t('suppliers.groupAllocationModal.table.notesPlaceholder')}
                 onChange={(e) => updateAllocation(it.id, { notes: e.target.value })}
               />
               <div className="col-span-1 text-right">
@@ -132,23 +132,23 @@ export default function GroupAllocationModal({ open, onClose, group, providers =
                   className="text-red-600 border-red-200"
                   onClick={() => removeAllocation(it.id)}
                 >
-                  {t('common.suppliers.groupAllocationModal.table.remove')}
+                  {t('suppliers.groupAllocationModal.table.remove')}
                 </Button>
               </div>
             </div>
           ))}
           {items.length === 0 && (
             <p className="text-sm text-gray-600">
-              {t('common.suppliers.groupAllocationModal.empty')}
+              {t('suppliers.groupAllocationModal.empty')}
             </p>
           )}
         </div>
         <div className="flex justify-between">
           <Button variant="outline" onClick={handleAdd}>
-            {t('common.suppliers.groupAllocationModal.add')}
+            {t('suppliers.groupAllocationModal.add')}
           </Button>
           <Button onClick={onClose}>
-            {t('common.suppliers.groupAllocationModal.close')}
+            {t('suppliers.groupAllocationModal.close')}
           </Button>
         </div>
       </div>

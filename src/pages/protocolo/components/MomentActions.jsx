@@ -35,22 +35,22 @@ export default function MomentActions({
       {
         id: MENU_ITEMS.duplicateHere,
         icon: Copy,
-        label: t('common.protocol.specialMoments.menu.duplicateHere'),
+        label: t('protocol.specialMoments.menu.duplicateHere'),
       },
       {
         id: MENU_ITEMS.duplicateElse,
         icon: FolderPlus,
-        label: t('common.protocol.specialMoments.menu.duplicateElse'),
+        label: t('protocol.specialMoments.menu.duplicateElse'),
       },
       {
         id: MENU_ITEMS.move,
         icon: MoveRight,
-        label: t('common.protocol.specialMoments.menu.move'),
+        label: t('protocol.specialMoments.menu.move'),
       },
       {
         id: MENU_ITEMS.delete,
         icon: Trash2,
-        label: t('common.protocol.specialMoments.menu.delete'),
+        label: t('protocol.specialMoments.menu.delete'),
         tone: 'danger',
       },
     ],
@@ -123,7 +123,7 @@ export default function MomentActions({
             className="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-200 bg-white text-gray-500 transition hover:border-gray-300 hover:text-gray-700 disabled:pointer-events-none disabled:opacity-40"
             onClick={onMoveUp}
             disabled={!canMoveUp}
-            title={t('common.protocol.specialMoments.tooltips.moveUp')}
+            title={t('protocol.specialMoments.tooltips.moveUp')}
           >
             <ChevronUp size={16} />
           </button>
@@ -132,7 +132,7 @@ export default function MomentActions({
             className="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-200 bg-white text-gray-500 transition hover:border-gray-300 hover:text-gray-700 disabled:pointer-events-none disabled:opacity-40"
             onClick={onMoveDown}
             disabled={!canMoveDown}
-            title={t('common.protocol.specialMoments.tooltips.moveDown')}
+            title={t('protocol.specialMoments.tooltips.moveDown')}
           >
             <ChevronDown size={16} />
           </button>

@@ -93,7 +93,7 @@ export default function SeatingFooterStats({
         : Number.isFinite(numeric)
           ? numeric.toString()
           : '0';
-      return t('common.seating.footer.stats.assignedValue', { value: base });
+      return t('seating.footer.stats.assignedValue', { value: base });
     },
     [format, t]
   );
@@ -109,24 +109,24 @@ export default function SeatingFooterStats({
     // Simular tendencia basada en porcentaje
     if (assignedPercentage > 50) {
       const trend = Math.floor(assignedPercentage / 10);
-      return t('common.seating.footer.stats.trendIncrease', {
+      return t('seating.footer.stats.trendIncrease', {
         value: formatCount(trend),
       });
     }
     return null;
   };
 
-  const assignedLabel = t('common.seating.footer.stats.assigned', {
+  const assignedLabel = t('seating.footer.stats.assigned', {
     assigned: formatCount(assignedGuests),
     total: formatCount(totalGuests),
   });
-  const tablesLabel = t('common.seating.footer.stats.tables');
-  const conflictsLabel = t('common.seating.footer.stats.conflicts');
+  const tablesLabel = t('seating.footer.stats.tables');
+  const conflictsLabel = t('seating.footer.stats.conflicts');
 
-  const exportLabel = t('common.seating.footer.buttons.export');
+  const exportLabel = t('seating.footer.buttons.export');
   const autoAssignLabel = autoAssignLoading
-    ? t('common.seating.footer.buttons.autoAssignLoading')
-    : t('common.seating.footer.buttons.autoAssign');
+    ? t('seating.footer.buttons.autoAssignLoading')
+    : t('seating.footer.buttons.autoAssign');
 
   return (
     <footer

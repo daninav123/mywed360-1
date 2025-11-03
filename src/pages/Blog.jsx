@@ -217,24 +217,24 @@ function Blog() {
   const searchQuery = searchTerm.trim();
 
   return (
-    <PageWrapper title={t('common.blog.title')} className="max-w-5xl mx-auto">
-      <p className="text-sm text-gray-600 mb-6">{t('common.blog.lead')}</p>
+    <PageWrapper title={t('blog.title')} className="max-w-5xl mx-auto">
+      <p className="text-sm text-gray-600 mb-6">{t('blog.lead')}</p>
 
       <div className="mb-6">
         <label htmlFor="blog-search" className="sr-only">
-          {t('common.blog.search.label')}
+          {t('blog.search.label')}
         </label>
         <input
           id="blog-search"
           type="search"
           value={searchTerm}
           onChange={(event) => setSearchTerm(event.target.value)}
-          placeholder={t('common.blog.search.placeholder')}
+          placeholder={t('blog.search.placeholder')}
           className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary,#6366f1)]"
         />
         {isFiltering ? (
           <p className="mt-2 text-xs text-gray-500">
-            {t('common.blog.search.matches', { query: searchQuery })}
+            {t('blog.search.matches', { query: searchQuery })}
           </p>
         ) : null}
       </div>
@@ -252,7 +252,7 @@ function Blog() {
             post={post}
             onOpen={handleOpenPost}
             onOpenAuthor={handleOpenAuthor}
-            ctaLabel={t('common.blog.card.viewDetails')}
+            ctaLabel={t('blog.card.viewDetails')}
             ref={!isFiltering && index === visiblePosts.length - 1 ? lastCardRef : null}
           />
         ))}
@@ -260,7 +260,7 @@ function Blog() {
 
       {!loading && visiblePosts.length === 0 && !errorKey ? (
         <div className="border border-dashed border-gray-300 rounded-md p-6 text-center text-sm text-gray-500">
-          {isFiltering ? t('common.blog.empty.filtered') : t('common.blog.empty.all')}
+          {isFiltering ? t('blog.empty.filtered') : t('blog.empty.all')}
         </div>
       ) : null}
 
@@ -268,7 +268,7 @@ function Blog() {
         <div
           className="flex justify-center mt-8"
           role="status"
-          aria-label={t('common.blog.loadingAria')}
+          aria-label={t('blog.loadingAria')}
         >
           <Spinner />
         </div>

@@ -73,10 +73,10 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
             <Loader2 size={40} className="text-blue-500" />
           </div>
           <p className="text-lg font-medium text-gray-700">
-            {t('common.suppliers.aiResultList.loading.title')}
+            {t('suppliers.aiResultList.loading.title')}
           </p>
           <p className="text-sm text-gray-500 mt-2">
-            {t('common.suppliers.aiResultList.loading.subtitle', { query })}
+            {t('suppliers.aiResultList.loading.subtitle', { query })}
           </p>
         </div>
       </div>
@@ -90,11 +90,11 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
             <X size={24} className="text-red-500" />
           </div>
           <p className="text-lg font-medium text-gray-700">
-            {t('common.suppliers.aiResultList.error.title')}
+            {t('suppliers.aiResultList.error.title')}
           </p>
           <p className="text-sm text-gray-500 mt-2 text-center max-w-md">{error}</p>
           <Button className="mt-4" size="sm" variant="outline" type="button">
-            {t('common.suppliers.aiResultList.error.retry')}
+            {t('suppliers.aiResultList.error.retry')}
           </Button>
         </div>
       </div>
@@ -110,10 +110,10 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
             <Search size={24} className="text-blue-500" />
           </div>
           <p className="text-lg font-medium text-gray-700">
-            {t('common.suppliers.aiResultList.emptyQuery.title')}
+            {t('suppliers.aiResultList.emptyQuery.title')}
           </p>
           <p className="text-sm text-gray-500 mt-2 text-center max-w-md">
-            {t('common.suppliers.aiResultList.emptyQuery.description')}
+            {t('suppliers.aiResultList.emptyQuery.description')}
           </p>
         </div>
       </div>
@@ -188,10 +188,10 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
             <Search size={24} className="text-yellow-600" />
           </div>
           <p className="text-lg font-medium text-gray-700">
-            {t('common.suppliers.aiResultList.noResults.title')}
+            {t('suppliers.aiResultList.noResults.title')}
           </p>
           <p className="text-sm text-gray-500 mt-2 text-center max-w-md">
-            {t('common.suppliers.aiResultList.noResults.description', { query })}
+            {t('suppliers.aiResultList.noResults.description', { query })}
           </p>
         </div>
       </div>
@@ -204,16 +204,16 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
         <div className="w-full flex items-start gap-2 p-3 border border-amber-200 bg-amber-50 text-amber-800 rounded">
           <AlertTriangle size={18} className="mt-0.5" />
           <div className="text-sm">
-            {t('common.suppliers.aiResultList.fallbackNotice')}
+            {t('suppliers.aiResultList.fallbackNotice')}
           </div>
         </div>
       )}
       {/* Resumen de la búsqueda */}
       <div className="mb-4">
         <p className="text-sm text-gray-500">
-          {t('common.suppliers.aiResultList.summary.prefix')}
+          {t('suppliers.aiResultList.summary.prefix')}
           <span className="font-medium">{displayResults.length}</span>
-          {t('common.suppliers.aiResultList.summary.suffix')}
+          {t('suppliers.aiResultList.summary.suffix')}
         </p>
         <p className="text-lg font-medium">"{query}"</p>
       </div>
@@ -223,7 +223,7 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
         <Card key={result.id} className="relative overflow-hidden">
           {/* Indicador de porcentaje de coincidencia */}
           <div className="absolute top-2 right-2 bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-full">
-            {t('common.suppliers.aiResultList.matchBadge', { value: result.match })}
+            {t('suppliers.aiResultList.matchBadge', { value: result.match })}
           </div>
 
           <div className="flex flex-col md:flex-row gap-4">
@@ -263,7 +263,7 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
               {result.location && (
                 <p className="text-sm text-gray-600 mb-2">
                   <span className="font-medium">
-                    {t('common.suppliers.aiResultList.locationLabel')}
+                    {t('suppliers.aiResultList.locationLabel')}
                   </span>{' '}
                   {result.location}
                 </p>
@@ -275,7 +275,7 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
                   <a
                     href={`mailto:${result.email}`}
                     className="flex items-center text-sm text-blue-600 hover:text-blue-800 hover:underline"
-                    title={t('common.suppliers.aiResultList.links.emailTitle')}
+                    title={t('suppliers.aiResultList.links.emailTitle')}
                   >
                     <Mail size={14} className="mr-1" />
                     {result.email}
@@ -285,7 +285,7 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
                   <a
                     href={`tel:${result.phone}`}
                     className="flex items-center text-sm text-green-600 hover:text-green-800 hover:underline"
-                    title={t('common.suppliers.aiResultList.links.phoneTitle')}
+                    title={t('suppliers.aiResultList.links.phoneTitle')}
                   >
                     <Phone size={14} className="mr-1" />
                     {result.phone}
@@ -297,10 +297,10 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center text-sm text-pink-600 hover:text-pink-800 hover:underline"
-                    title={t('common.suppliers.aiResultList.links.instagramTitle')}
+                    title={t('suppliers.aiResultList.links.instagramTitle')}
                   >
                     <Instagram size={14} className="mr-1" />
-                    {t('common.suppliers.aiResultList.links.instagramLabel')}
+                    {t('suppliers.aiResultList.links.instagramLabel')}
                   </a>
                 )}
               </div>
@@ -311,7 +311,7 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
               {result.aiSummary && (
                 <div className="bg-blue-50 p-3 rounded-md mb-3">
                   <p className="text-xs font-semibold text-blue-600 mb-1">
-                    {t('common.suppliers.aiResultList.aiAnalysis')}
+                    {t('suppliers.aiResultList.aiAnalysis')}
                   </p>
                   <p className="text-sm text-gray-700">{result.aiSummary}</p>
                 </div>
@@ -321,11 +321,11 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
               <div className="flex flex-wrap gap-2 mt-2">
                 <Button onClick={() => onSelect(result, 'view')} variant="outline" size="sm">
                   <ArrowRight size={16} className="mr-1" />
-                  {t('common.suppliers.aiResultList.buttons.view')}
+                  {t('suppliers.aiResultList.buttons.view')}
                 </Button>
                 <Button onClick={() => onSelect(result, 'add')} size="sm">
                   <Plus size={16} className="mr-1" />
-                  {t('common.suppliers.aiResultList.buttons.add')}
+                  {t('suppliers.aiResultList.buttons.add')}
                 </Button>
                 <Button
                   onClick={() => onSelect(result, 'email')}
@@ -335,7 +335,7 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
                   data-testid="email-provider-btn"
                 >
                   <Mail size={16} className="mr-1" />
-                  {t('common.suppliers.aiResultList.buttons.email')}
+                  {t('suppliers.aiResultList.buttons.email')}
                 </Button>
                 <Button
                   onClick={() => onSelect(result, 'select')}
@@ -344,7 +344,7 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
                   className="border-green-600 text-green-600 hover:bg-green-50"
                 >
                   <Check size={16} className="mr-1" />
-                  {t('common.suppliers.aiResultList.buttons.select')}
+                  {t('suppliers.aiResultList.buttons.select')}
                 </Button>
               </div>
             </div>

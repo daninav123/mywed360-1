@@ -52,40 +52,40 @@ export default function AssignSupplierToGroupModal({ open, onClose, provider }) 
     <Modal
       open={open}
       onClose={() => onClose?.()}
-      title={t('common.suppliers.assignModal.title', { count: provider ? 1 : 0 })}
+      title={t('suppliers.assignModal.title', { count: provider ? 1 : 0 })}
     >
       <div className="space-y-4">
         <div className="flex items-center gap-4">
           <label className="text-sm inline-flex items-center gap-2">
             <input type="radio" checked={mode === 'assign'} onChange={() => setMode('assign')} />
-            {t('common.suppliers.assignModal.modeAssign')}
+            {t('suppliers.assignModal.modeAssign')}
           </label>
           <label className="text-sm inline-flex items-center gap-2">
             <input type="radio" checked={mode === 'create'} onChange={() => setMode('create')} />
-            {t('common.suppliers.assignModal.modeCreate')}
+            {t('suppliers.assignModal.modeCreate')}
           </label>
         </div>
 
         {mode === 'assign' ? (
           (!groups || groups.length === 0) ? (
             <p className="text-sm text-gray-600">
-              {t('common.suppliers.assignModal.emptyGroups')}
+              {t('suppliers.assignModal.emptyGroups')}
             </p>
           ) : (
             <div>
               <label className="block text-sm text-gray-700 mb-1">
-                {t('common.suppliers.assignModal.groupLabel')}
+                {t('suppliers.assignModal.groupLabel')}
               </label>
               <select
                 className="w-full border rounded p-2"
                 value={groupId}
                 onChange={(e) => setGroupId(e.target.value)}
               >
-                <option value="">{t('common.suppliers.assignModal.groupPlaceholder')}</option>
+                <option value="">{t('suppliers.assignModal.groupPlaceholder')}</option>
                 {groups.map((g) => (
                   <option key={g.id} value={g.id}>
                     {g.name || g.id}{' '}
-                    {t('common.suppliers.assignModal.membersCount', {
+                    {t('suppliers.assignModal.membersCount', {
                       count: (g.memberIds || []).length,
                     })}
                   </option>
@@ -96,11 +96,11 @@ export default function AssignSupplierToGroupModal({ open, onClose, provider }) 
         ) : (
           <div>
             <label className="block text-sm text-gray-700 mb-1">
-              {t('common.suppliers.assignModal.newGroupLabel')}
+              {t('suppliers.assignModal.newGroupLabel')}
             </label>
             <input
               className="w-full border rounded p-2"
-              placeholder={t('common.suppliers.assignModal.newGroupPlaceholder')}
+              placeholder={t('suppliers.assignModal.newGroupPlaceholder')}
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
@@ -108,12 +108,12 @@ export default function AssignSupplierToGroupModal({ open, onClose, provider }) 
         )}
         <div className="flex justify-end gap-2">
           <Button variant="outline" onClick={() => onClose?.()}>
-            {t('common.suppliers.assignModal.cancel')}
+            {t('suppliers.assignModal.cancel')}
           </Button>
           <Button onClick={confirm} disabled={!canAssign}>
             {mode === 'assign'
-              ? t('common.suppliers.assignModal.confirmAssign')
-              : t('common.suppliers.assignModal.confirmCreate')}
+              ? t('suppliers.assignModal.confirmAssign')
+              : t('suppliers.assignModal.confirmCreate')}
           </Button>
         </div>
       </div>

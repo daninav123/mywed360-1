@@ -25,34 +25,34 @@ const WebsitePreview = ({
   const statusMessage = useMemo(() => {
     if (checkingSlug) {
       return {
-        text: t('common.websitePreview.status.checking', 'Comprobando…'),
+        text: t('websitePreview.status.checking', 'Comprobando…'),
         tone: 'neutral',
       };
     }
     switch (slugStatus) {
       case 'invalid':
         return {
-          text: t('common.websitePreview.status.invalid', 'Slug inválido'),
+          text: t('websitePreview.status.invalid', 'Slug inválido'),
           tone: 'error',
         };
       case 'reserved':
         return {
-          text: t('common.websitePreview.status.reserved', 'Slug reservado'),
+          text: t('websitePreview.status.reserved', 'Slug reservado'),
           tone: 'error',
         };
       case 'taken':
         return {
-          text: t('common.websitePreview.status.taken', 'Ocupado'),
+          text: t('websitePreview.status.taken', 'Ocupado'),
           tone: 'error',
         };
       case 'available':
         return {
-          text: t('common.websitePreview.status.available', 'Disponible'),
+          text: t('websitePreview.status.available', 'Disponible'),
           tone: 'success',
         };
       case 'unknown':
         return {
-          text: t('common.websitePreview.status.unknown', 'No pudimos verificar'),
+          text: t('websitePreview.status.unknown', 'No pudimos verificar'),
           tone: 'neutral',
         };
       default:
@@ -64,7 +64,7 @@ const WebsitePreview = ({
     return (
       <div className="bg-white rounded-lg shadow p-6 mb-8">
         <h2 className="text-xl font-semibold mb-3">
-          {t('common.websitePreview.empty.title', 'Vista previa de tu página web')}
+          {t('websitePreview.empty.title', 'Vista previa de tu página web')}
         </h2>
         <p className="text-sm text-gray-600">
           {t(
@@ -79,7 +79,7 @@ const WebsitePreview = ({
               onClick={onEditLogistics}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-blue-200 text-blue-700 hover:bg-blue-50 transition-colors"
             >
-              {t('common.websitePreview.empty.editLogistics', 'Editar logística antes de generar')}
+              {t('websitePreview.empty.editLogistics', 'Editar logística antes de generar')}
             </button>
           </div>
         )}
@@ -127,7 +127,7 @@ const WebsitePreview = ({
     if (!shareUrl) return;
     try {
       await navigator.clipboard.writeText(shareUrl);
-      toast.success(t('common.websitePreview.toasts.linkCopied', 'Enlace copiado al portapapeles'));
+      toast.success(t('websitePreview.toasts.linkCopied', 'Enlace copiado al portapapeles'));
     } catch {
       toast.info(shareUrl);
     }
@@ -143,7 +143,7 @@ const WebsitePreview = ({
   return (
     <div className="bg-white rounded-lg shadow p-6 mb-8">
       <h2 className="text-xl font-semibold mb-4">
-        {t('common.websitePreview.previewTitle', 'Vista previa de tu página web')}
+        {t('websitePreview.previewTitle', 'Vista previa de tu página web')}
       </h2>
 
       <div className="border rounded-lg overflow-hidden shadow-lg">
@@ -152,11 +152,11 @@ const WebsitePreview = ({
           <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
           <div className="w-3 h-3 bg-green-500 rounded-full"></div>
           <div className="flex-1 text-center text-sm text-gray-600">
-            {t('common.websitePreview.windowTitle', 'Vista previa - Tu web de boda')}
+            {t('websitePreview.windowTitle', 'Vista previa - Tu web de boda')}
           </div>
         </div>
         <iframe
-          title={t('common.websitePreview.previewFrameTitle', 'Vista previa')}
+          title={t('websitePreview.previewFrameTitle', 'Vista previa')}
           srcDoc={html}
           sandbox="allow-same-origin allow-scripts"
           className="w-full h-[600px] border-none"
@@ -194,7 +194,7 @@ const WebsitePreview = ({
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                 ></path>
               </svg>
-              <span>{t('common.websitePreview.actions.publish.loading', 'Publicando...')}</span>
+              <span>{t('websitePreview.actions.publish.loading', 'Publicando...')}</span>
             </>
           ) : (
             <>
@@ -210,7 +210,7 @@ const WebsitePreview = ({
                   clipRule="evenodd"
                 />
               </svg>
-              <span>{t('common.websitePreview.actions.publish.default', 'Publicar página')}</span>
+              <span>{t('websitePreview.actions.publish.default', 'Publicar página')}</span>
             </>
           )}
         </button>
@@ -229,7 +229,7 @@ const WebsitePreview = ({
             <path d="M17.414 2.586a2 2 0 010 2.828l-1.121 1.121-2.828-2.828 1.121-1.121a2 2 0 012.828 0z" />
             <path d="M2 13.5V17h3.5l9.193-9.193-3.5-3.5L2 13.5z" />
           </svg>
-          <span>{t('common.websitePreview.actions.editLogistics', 'Editar logística')}</span>
+          <span>{t('websitePreview.actions.editLogistics', 'Editar logística')}</span>
         </button>
 
         <button
@@ -246,7 +246,7 @@ const WebsitePreview = ({
             <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
             <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
           </svg>
-          <span>{t('common.websitePreview.actions.openNewTab', 'Abrir en nueva pestaña')}</span>
+          <span>{t('websitePreview.actions.openNewTab', 'Abrir en nueva pestaña')}</span>
         </button>
 
         <button
@@ -263,7 +263,7 @@ const WebsitePreview = ({
             <path d="M3 3a1 1 0 011-1h2a1 1 0 110 2H5v12h10V4h-1a1 1 0 110-2h2a1 1 0 011 1v14a2 2 0 01-2 2H5a2 2 0 01-2-2V3z" />
             <path d="M7 9a1 1 0 011-1h1V4a1 1 0 112 0v4h1a1 1 0 01.707 1.707l-3 3a1 1 0 01-1.414 0l-3-3A1 1 0 017 9z" />
           </svg>
-          <span>{t('common.websitePreview.actions.downloadHtml', 'Descargar HTML')}</span>
+          <span>{t('websitePreview.actions.downloadHtml', 'Descargar HTML')}</span>
         </button>
       </div>
 
@@ -275,13 +275,13 @@ const WebsitePreview = ({
         )}
         <div className="flex flex-wrap items-center gap-3">
           <label className="text-sm text-gray-600" htmlFor="publish-slug">
-            {t('common.websitePreview.slug.label', 'Slug público')}
+            {t('websitePreview.slug.label', 'Slug público')}
           </label>
           <input
             id="publish-slug"
             value={publishSlug}
             onChange={(event) => onSlugChange?.(event.target.value)}
-            placeholder={t('common.websitePreview.slug.placeholder', 'mi-boda-ana-luis')}
+            placeholder={t('websitePreview.slug.placeholder', 'mi-boda-ana-luis')}
             className="border rounded px-3 py-2 text-sm"
           />
           {message && <span className={`text-sm ${statusClass}`}>{message.text}</span>}
@@ -289,7 +289,7 @@ const WebsitePreview = ({
 
         {slugSuggestions.length > 0 && (
           <div className="flex flex-wrap items-center gap-2 text-sm text-gray-600">
-            <span>{t('common.websitePreview.slug.suggestions', 'Sugerencias:')}</span>
+            <span>{t('websitePreview.slug.suggestions', 'Sugerencias:')}</span>
             {slugSuggestions.map((suggestion) => (
               <button
                 key={suggestion}
@@ -314,7 +314,7 @@ const WebsitePreview = ({
             disabled={copyDisabled}
             className="bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded disabled:opacity-50"
           >
-            {t('common.websitePreview.actions.copyLink', 'Copiar enlace')}
+            {t('websitePreview.actions.copyLink', 'Copiar enlace')}
           </button>
           <button
             type="button"
@@ -322,8 +322,8 @@ const WebsitePreview = ({
             className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded"
           >
             {showQR
-              ? t('common.websitePreview.actions.hideQr', 'Ocultar QR')
-              : t('common.websitePreview.actions.showQr', 'Mostrar QR')}
+              ? t('websitePreview.actions.hideQr', 'Ocultar QR')
+              : t('websitePreview.actions.showQr', 'Mostrar QR')}
           </button>
         </div>
 
@@ -331,19 +331,19 @@ const WebsitePreview = ({
           <div className="mt-2 p-4 border rounded inline-block">
             <div className="flex items-center justify-between mb-2">
               <div className="text-sm text-gray-600">
-                {t('common.websitePreview.qr.title', 'QR de la web pública')}
+                {t('websitePreview.qr.title', 'QR de la web pública')}
               </div>
               <button
                 type="button"
                 onClick={onHideQR}
                 className="text-gray-500 hover:text-gray-700"
               >
-                {t('common.websitePreview.qr.close', 'Cerrar')}
+                {t('websitePreview.qr.close', 'Cerrar')}
               </button>
             </div>
             <img
               src={qrUrl}
-              alt={t('common.websitePreview.qr.alt', 'QR')}
+              alt={t('websitePreview.qr.alt', 'QR')}
               width={220}
               height={220}
             />

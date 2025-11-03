@@ -49,10 +49,10 @@ export default function TableConfigModal({ open, table, onSave, onClose }) {
         </label>
         <div className="flex justify-end mt-4 space-x-2">
           <button onClick={onClose} className="px-3 py-1 bg-gray-200 rounded">
-            {t('common.cancel')}
+            {t('cancel')}
           </button>
           <button onClick={save} className="px-3 py-1 bg-blue-600 text-white rounded">
-            {t('common.save')}
+            {t('save')}
           </button>
         </div>
       </div>
