@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   BarChart3,
@@ -54,7 +54,17 @@ export default function SupplierDashboard() {
     priceRange: '',
   });
 
-  const formatNumber = useCallback((value) => format.number(value || 0), [format]);
+  // formatNumber estable usando useCallback con dependencia de format.number (función)
+  const formatNumber = useCallback(
+    (value) => {
+      try {
+        return format?.number ? format.number(value || 0) : (value || 0).toLocaleString();
+      } catch {
+        return String(value || 0);
+      }
+    },
+    [format?.number]
+  );
 
   // Calcular locationLabel con useMemo ANTES de cualquier return condicional
   const locationLabel = useMemo(() => {
@@ -66,11 +76,29 @@ export default function SupplierDashboard() {
     return parts.join(' / ');
   }, [supplier, t]);
 
-  // Métricas formateadas
-  const views = formatNumber(supplier?.metrics?.views || 0);
-  const clicks = formatNumber(supplier?.metrics?.clicks || 0);
-  const conversions = formatNumber(supplier?.metrics?.conversions || 0);
-  const matchScore = formatNumber(supplier?.metrics?.matchScore || 0);
+  // Métricas formateadas - MEMOIZADAS para evitar re-renders
+  const views = useMemo(
+    () => formatNumber(supplier?.metrics?.views || 0),
+    [supplier?.metrics?.views, formatNumber]
+  );
+  const clicks = useMemo(
+    () => formatNumber(supplier?.metrics?.clicks || 0),
+    [supplier?.metrics?.clicks, formatNumber]
+  );
+  const conversions = useMemo(
+    () => formatNumber(supplier?.metrics?.conversions || 0),
+    [supplier?.metrics?.conversions, formatNumber]
+  );
+  const matchScore = useMemo(
+    () => formatNumber(supplier?.metrics?.matchScore || 0),
+    [supplier?.metrics?.matchScore, formatNumber]
+  );
+
+  // Usar ref para evitar dependencia de t que cambia
+  const tRef = useRef(t);
+  useEffect(() => {
+    tRef.current = t;
+  }, [t]);
 
   const loadDashboard = useCallback(async () => {
     setLoading(true);
@@ -95,7 +123,7 @@ export default function SupplierDashboard() {
           navigate('/supplier/login');
           return;
         }
-        throw new Error(t('suppliers.dashboard.errors.load'));
+        throw new Error(tRef.current('suppliers.dashboard.errors.load'));
       }
 
       const [profileData, requestsData, analyticsData] = await Promise.all([
@@ -119,12 +147,13 @@ export default function SupplierDashboard() {
       });
     } catch (err) {
       console.error('[SupplierDashboard] load error', err);
-      setErrorMessage(err.message || t('suppliers.dashboard.errors.load'));
+      setErrorMessage(err.message || tRef.current('suppliers.dashboard.errors.load'));
     } finally {
       setLoading(false);
     }
-  }, [navigate, t]);
+  }, [navigate]);
 
+  // useEffect sin loadDashboard en dependencias para evitar bucle
   useEffect(() => {
     const token = localStorage.getItem('supplier_token');
     const supplierId = localStorage.getItem('supplier_id');
@@ -140,7 +169,8 @@ export default function SupplierDashboard() {
     }
 
     loadDashboard();
-  }, [id, navigate, loadDashboard]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, navigate]);
 
   const handleSave = async () => {
     setSaving(true);
