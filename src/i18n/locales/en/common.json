@@ -1954,6 +1954,244 @@
       "provider": "Provider",
       "service": "Service"
     },
+    "dashboard": {
+      "header": {
+        "locationFallback": "Location not specified"
+      },
+      "badges": {
+        "verified": "Verified ✓"
+      },
+      "buttons": {
+        "editProfile": "Edit profile",
+        "save": "Save",
+        "saving": "Saving...",
+        "cancel": "Cancel"
+      },
+      "analytics": {
+        "title": "Analytics",
+        "views": {
+          "title": "Views",
+          "subtitle": "Last 30 days"
+        },
+        "clicks": {
+          "title": "Clicks",
+          "subtitle": "Interested contacts"
+        },
+        "contacts": {
+          "title": "Contacts",
+          "subtitle": "Requests received"
+        }
+      },
+      "profile": {
+        "title": "My profile",
+        "fields": {
+          "name": "Business name",
+          "description": "Description",
+          "priceRange": "Price range",
+          "phone": "Phone",
+          "website": "Website",
+          "instagram": "Instagram"
+        },
+        "placeholders": {
+          "instagram": "@yourbusiness"
+        },
+        "priceRange": {
+          "placeholder": "Select a range",
+          "economy": "€ - Economy",
+          "medium": "€€ - Mid range",
+          "premium": "€€€ - Premium",
+          "luxury": "€€€€ - Luxury"
+        }
+      },
+      "profileDisplay": {
+        "descriptionEmpty": "No description",
+        "priceRangeEmpty": "Not specified",
+        "phoneEmpty": "Not specified",
+        "websiteEmpty": "Not specified",
+        "instagramEmpty": "Not specified"
+      },
+      "login": {
+        "title": "Authentication error",
+        "message": "We couldn't load your profile. Please sign in again.",
+        "button": "Back to login"
+      },
+      "errors": {
+        "load": "We couldn't load the dashboard. Please try again.",
+        "save": "We couldn't save your changes. Please try again."
+      },
+      "alerts": {
+        "saveSuccess": "Profile updated successfully",
+        "saveError": "Save failed: {{message}}"
+      }
+    },
+    "login": {
+      "title": "Supplier Portal",
+      "subtitle": "Sign in to manage your profile and incoming requests",
+      "fields": {
+        "email": {
+          "label": "Email address",
+          "placeholder": "you@example.com"
+        },
+        "password": {
+          "label": "Password",
+          "placeholder": "Your password"
+        }
+      },
+      "buttons": {
+        "submit": "Sign in",
+        "submitting": "Signing in..."
+      },
+      "links": {
+        "forgotPassword": "Forgot your password?",
+        "noAccount": "Don't have an account yet?",
+        "register": "Register here"
+      },
+      "footer": {
+        "copyright": "© 2025 MaLove.App · Wedding supplier platform"
+      },
+      "errors": {
+        "invalidCredentials": "Incorrect email or password",
+        "accountSuspended": "Your account has been suspended. Please contact support.",
+        "passwordNotSet": "You need to set a password. Check your email inbox.",
+        "generic": "We couldn't sign you in. Please try again."
+      }
+    },
+    "publicRegistration": {
+      "form": {
+        "defaults": {
+          "country": "Spain"
+        },
+        "header": {
+          "title": "Register as a Supplier",
+          "subtitle": "Join our professional network and connect with couples who need your services"
+        },
+        "basicInfo": {
+          "title": "Basic Information",
+          "fields": {
+            "name": {
+              "label": "Business name *",
+              "placeholder": "e.g. Bloom & Co"
+            },
+            "email": {
+              "label": "Email address *",
+              "placeholder": "you@business.com"
+            },
+            "phone": {
+              "label": "Phone",
+              "placeholder": "+34 612 345 678"
+            },
+            "website": {
+              "label": "Website",
+              "placeholder": "https://yourbusiness.com"
+            }
+          }
+        },
+        "services": {
+          "title": "Services",
+          "category": {
+            "label": "Primary category *",
+            "placeholder": "Select a category"
+          },
+          "optionsLabel": "Services you offer (select all that apply)",
+          "options": {
+            "basic": "Basic",
+            "premium": "Premium",
+            "custom": "Custom",
+            "fullPackage": "Full package",
+            "hourly": "Hourly",
+            "advisory": "Consulting"
+          }
+        },
+        "location": {
+          "title": "Location",
+          "fields": {
+            "city": {
+              "label": "City *",
+              "placeholder": "e.g. Barcelona"
+            },
+            "province": {
+              "label": "Province *",
+              "placeholder": "e.g. Barcelona"
+            },
+            "country": {
+              "label": "Country"
+            }
+          }
+        },
+        "description": {
+          "title": "Description",
+          "placeholder": "Describe your business, services, experience and style. Minimum 50 characters.",
+          "counter": "{{current}} / {{max}} characters"
+        },
+        "prices": {
+          "title": "Price range (optional)",
+          "min": {
+            "label": "Minimum price",
+            "placeholder": "e.g. 500"
+          },
+          "max": {
+            "label": "Maximum price",
+            "placeholder": "e.g. 3000"
+          },
+          "currency": {
+            "label": "Currency",
+            "eur": "EUR (€)",
+            "usd": "USD ($)",
+            "gbp": "GBP (£)"
+          }
+        },
+        "terms": {
+          "prefix": "I accept the",
+          "termsLink": "Terms & Conditions",
+          "connector": "and the",
+          "privacyLink": "Privacy Policy",
+          "suffix": "*"
+        },
+        "actions": {
+          "cancel": "Cancel",
+          "submit": "Register my business"
+        }
+      },
+      "validation": {
+        "name": "The business name must be at least 2 characters long",
+        "email": "Enter a valid email address",
+        "category": "Select a category",
+        "services": "Select at least one service",
+        "city": "Enter your city",
+        "province": "Enter your province",
+        "description": "The description must contain at least 50 characters",
+        "acceptedTerms": "You must accept the terms and conditions",
+        "emailExists": "This email is already registered. Sign in or use another email."
+      },
+      "success": {
+        "title": "Registration complete!",
+        "description": {
+          "prefix": "We've sent a confirmation email to",
+          "suffix": "with the instructions to set your password and access your dashboard."
+        },
+        "nextSteps": {
+          "title": "Next steps:"
+        },
+        "defaultNextSteps": [
+          "Check your email and set your password",
+          "Complete your profile with photos and details",
+          "Start receiving enquiries from couples"
+        ],
+        "buttons": {
+          "goToLogin": "Go to login",
+          "goHome": "Back to home"
+        }
+      },
+      "dev": {
+        "linkLabel": "🔧 Setup link (development only):"
+      },
+      "errors": {
+        "submit": "The registration could not be submitted"
+      },
+      "alert": {
+        "error": "Error: {{message}}"
+      }
+    },
     "compare": {
       "title": "Compare suppliers",
       "summary": "Comparing {{count}} supplier",

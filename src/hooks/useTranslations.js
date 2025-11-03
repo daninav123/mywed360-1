@@ -34,6 +34,14 @@ const useTranslations = () => {
       };
     }
 
+    // Permitir prefijos explícitos con "common." sin duplicar la ruta
+    if (key.startsWith('common.')) {
+      return {
+        key: key.slice('common.'.length),
+        opts,
+      };
+    }
+
     return { key, opts };
   };
 

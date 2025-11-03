@@ -2054,6 +2054,21 @@
       "alerts": {
         "saveSuccess": "Perfil actualizado correctamente",
         "saveError": "Error al guardar: {{message}}"
+      },
+      "profileState": {
+        "title": "Estado del Perfil",
+        "registeredLabel": "Proveedor registrado",
+        "registeredYes": "Sí",
+        "registeredNo": "No",
+        "statusLabel": "Estado",
+        "statusActive": "Activo",
+        "statusInactive": "Inactivo",
+        "statusPending": "Pendiente",
+        "matchScore": "Puntuación de coincidencia"
+      },
+      "insight": {
+        "title": "Recomendaciones",
+        "description": "Completa tu perfil para mejorar tu visibilidad y recibir más solicitudes"
       }
     },
     "publicRegistration": {
