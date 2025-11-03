@@ -1986,6 +1986,76 @@
         "generic": "Error al iniciar sesión. Inténtalo de nuevo."
       }
     },
+    "dashboard": {
+      "header": {
+        "locationFallback": "Ubicación no especificada"
+      },
+      "badges": {
+        "verified": "Verificado ✓"
+      },
+      "buttons": {
+        "editProfile": "Editar perfil",
+        "save": "Guardar",
+        "saving": "Guardando...",
+        "cancel": "Cancelar"
+      },
+      "analytics": {
+        "title": "Analíticas",
+        "views": {
+          "title": "Vistas",
+          "subtitle": "Últimos 30 días"
+        },
+        "clicks": {
+          "title": "Clics",
+          "subtitle": "Contactos interesados"
+        },
+        "contacts": {
+          "title": "Contactos",
+          "subtitle": "Solicitudes recibidas"
+        }
+      },
+      "profile": {
+        "title": "Mi Perfil",
+        "fields": {
+          "name": "Nombre del negocio",
+          "description": "Descripción",
+          "priceRange": "Rango de precios",
+          "phone": "Teléfono",
+          "website": "Sitio web",
+          "instagram": "Instagram"
+        },
+        "placeholders": {
+          "instagram": "@tunegocio"
+        },
+        "priceRange": {
+          "placeholder": "Selecciona un rango",
+          "economy": "€ - Económico",
+          "medium": "€€ - Medio",
+          "premium": "€€€ - Premium",
+          "luxury": "€€€€ - Lujo"
+        }
+      },
+      "profileDisplay": {
+        "descriptionEmpty": "Sin descripción",
+        "priceRangeEmpty": "No especificado",
+        "phoneEmpty": "No especificado",
+        "websiteEmpty": "No especificado",
+        "instagramEmpty": "No especificado"
+      },
+      "login": {
+        "title": "Error de Autenticación",
+        "message": "No se pudo cargar tu perfil. Por favor, inicia sesión nuevamente.",
+        "button": "Volver al Login"
+      },
+      "errors": {
+        "load": "No se pudo cargar el dashboard. Inténtalo de nuevo.",
+        "save": "No se pudo guardar los cambios. Inténtalo de nuevo."
+      },
+      "alerts": {
+        "saveSuccess": "Perfil actualizado correctamente",
+        "saveError": "Error al guardar: {{message}}"
+      }
+    },
     "publicRegistration": {
       "form": {
         "defaults": {
