@@ -10,21 +10,26 @@ import {
   ChevronRight,
   Camera,
   ArrowRight,
+  Save,
+  X,
+  Eye,
+  MousePointer,
+  Mail,
 } from 'lucide-react';
 import useTranslations from '../../hooks/useTranslations';
 import Spinner from '../../components/ui/Spinner';
 
 const PRICE_RANGE_OPTIONS = [
-  { value: '', labelKey: 'common.suppliers.dashboard.profile.priceRange.placeholder' },
-  { value: '\u20AC', labelKey: 'common.suppliers.dashboard.profile.priceRange.economy' },
-  { value: '\u20AC\u20AC', labelKey: 'common.suppliers.dashboard.profile.priceRange.medium' },
+  { value: '', labelKey: 'suppliers.dashboard.profile.priceRange.placeholder' },
+  { value: '\u20AC', labelKey: 'suppliers.dashboard.profile.priceRange.economy' },
+  { value: '\u20AC\u20AC', labelKey: 'suppliers.dashboard.profile.priceRange.medium' },
   {
     value: '\u20AC\u20AC\u20AC',
-    labelKey: 'common.suppliers.dashboard.profile.priceRange.premium',
+    labelKey: 'suppliers.dashboard.profile.priceRange.premium',
   },
   {
     value: '\u20AC\u20AC\u20AC\u20AC',
-    labelKey: 'common.suppliers.dashboard.profile.priceRange.luxury',
+    labelKey: 'suppliers.dashboard.profile.priceRange.luxury',
   },
 ];
 
@@ -50,6 +55,22 @@ export default function SupplierDashboard() {
   });
 
   const formatNumber = useCallback((value) => format.number(value || 0), [format]);
+
+  // Calcular locationLabel con useMemo ANTES de cualquier return condicional
+  const locationLabel = useMemo(() => {
+    if (!supplier) return t('suppliers.dashboard.header.locationFallback');
+    const parts = [supplier.category, supplier.location?.city].filter(Boolean);
+    if (!parts.length) {
+      return t('suppliers.dashboard.header.locationFallback');
+    }
+    return parts.join(' / ');
+  }, [supplier, t]);
+
+  // Métricas formateadas
+  const views = formatNumber(supplier?.metrics?.views || 0);
+  const clicks = formatNumber(supplier?.metrics?.clicks || 0);
+  const conversions = formatNumber(supplier?.metrics?.conversions || 0);
+  const matchScore = formatNumber(supplier?.metrics?.matchScore || 0);
 
   const loadDashboard = useCallback(async () => {
     setLoading(true);
@@ -156,9 +177,7 @@ export default function SupplierDashboard() {
       loadDashboard();
     } catch (err) {
       console.error('[SupplierDashboard] save error', err);
-      window.alert(
-        t('suppliers.dashboard.alerts.saveError', { message: err.message || '' })
-      );
+      window.alert(t('suppliers.dashboard.alerts.saveError', { message: err.message || '' }));
     } finally {
       setSaving(false);
     }
@@ -210,19 +229,6 @@ export default function SupplierDashboard() {
       </div>
     );
   }
-
-  const locationLabel = useMemo(() => {
-    const parts = [supplier.category, supplier.location?.city].filter(Boolean);
-    if (!parts.length) {
-      return t('suppliers.dashboard.header.locationFallback');
-    }
-    return parts.join(' / ');
-  }, [supplier.category, supplier.location?.city, t]);
-
-  const views = formatNumber(supplier.metrics?.views);
-  const clicks = formatNumber(supplier.metrics?.clicks);
-  const conversions = formatNumber(supplier.metrics?.conversions);
-  const matchScore = formatNumber(supplier.metrics?.matchScore);
 
   return (
     <div className="min-h-screen py-8" style={{ backgroundColor: 'var(--color-bg)' }}>
