@@ -280,4 +280,103 @@ router.post('/:supplierId/request-quote', express.json(), async (req, res) => {
   }
 });
 
+/**
+ * GET /api/supplier-requests/:supplierId
+ * Obtener solicitudes de un proveedor
+ */
+router.get('/:supplierId', async (req, res) => {
+  try {
+    const { supplierId } = req.params;
+    const { status, limit = 20, page = 1 } = req.query;
+
+    // TODO: Verificar autenticación del proveedor con middleware
+
+    let query = db
+      .collection('suppliers')
+      .doc(supplierId)
+      .collection('requests')
+      .orderBy('receivedAt', 'desc');
+
+    // Filtrar por status si se especifica
+    if (status) {
+      query = query.where('status', '==', status);
+    }
+
+    // Paginar
+    const snapshot = await query
+      .limit(parseInt(limit))
+      .offset((parseInt(page) - 1) * parseInt(limit))
+      .get();
+
+    const requests = [];
+    snapshot.forEach((doc) => {
+      requests.push({
+        id: doc.id,
+        ...doc.data(),
+      });
+    });
+
+    res.json({
+      success: true,
+      data: requests,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total: snapshot.size,
+      },
+    });
+  } catch (error) {
+    logger.error('Error fetching requests:', error);
+    res.status(500).json({ error: 'internal_server_error' });
+  }
+});
+
+/**
+ * PATCH /api/supplier-requests/:supplierId/:requestId
+ * Actualizar estado de solicitud
+ */
+router.patch('/:supplierId/:requestId', express.json(), async (req, res) => {
+  try {
+    const { supplierId, requestId } = req.params;
+    const { status, response } = req.body;
+
+    // TODO: Verificar autenticación del proveedor
+
+    const updateData = {
+      updatedAt: FieldValue.serverTimestamp(),
+    };
+
+    if (status) {
+      updateData.status = status;
+      if (status === 'responded') {
+        updateData.respondedAt = FieldValue.serverTimestamp();
+      }
+      if (status === 'viewed') {
+        updateData.viewedAt = FieldValue.serverTimestamp();
+      }
+    }
+
+    if (response) {
+      updateData.response = response;
+    }
+
+    await db
+      .collection('suppliers')
+      .doc(supplierId)
+      .collection('requests')
+      .doc(requestId)
+      .update(updateData);
+
+    logger.info(`Request ${requestId} updated for supplier ${supplierId}`);
+
+    res.json({
+      success: true,
+      message: 'Solicitud actualizada correctamente',
+    });
+  } catch (error) {
+    logger.error('Error updating request:', error);
+    res.status(500).json({ error: 'internal_server_error' });
+  }
+});
+
 export default router;

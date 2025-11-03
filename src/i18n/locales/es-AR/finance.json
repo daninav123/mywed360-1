@@ -28,14 +28,14 @@
     "used": "utilizado",
     "categoryStatus": "Estado del Presupuesto por Categorías",
     "progress": "Progreso",
-    "exceededNote": "(Presupuesto excedido!)"
+    "exceededNote": "¡Presupuesto excedido!"
   },
   "form": {
     "type": "Tipo de transacción",
     "concept": "Concepto",
-    "conceptPlaceholder": "Ej: Pago de catering, Regalo de boda...",
-    "amount": "Monto ()",
-    "amountLabel": "Monto:",
+    "conceptPlaceholder": "Ej.: Pago de catering, regalo de boda...",
+    "amount": "Monto",
+    "amountLabel": "Monto",
     "date": "Fecha",
     "category": "Categoría",
     "selectCategory": "Selecciona una categoría",
@@ -65,7 +65,7 @@
       "categoryRequired": "La categoría es obligatoria",
       "paidAmountPositive": "El monto abonado debe ser un número positivo",
       "paidAmountExceeds": "El monto abonado no puede superar el total",
-      "paidAmountRequired": "Registra cunto has pagado para marcar el estado como parcial"
+      "paidAmountRequired": "Registra cuánto has pagado para marcar el estado como parcial"
     }
   },
   "transactions": {
@@ -117,7 +117,7 @@
     "balanceLabel": "Balance:",
     "pendingAmount": "Pendiente:",
     "overdueAmount": "Vencido:",
-    "outstandingExpense": "Pendiente:",
+    "outstandingExpense": "Gasto pendiente:",
     "outstandingIncome": "Por recibir:",
     "alerts": {
       "title": "Pagos importantes",
@@ -125,7 +125,7 @@
       "upcoming": "Pagos próximos (7 días):"
     },
     "csv": {
-      "title": "Importar CSV - Mapeo de columnas",
+      "title": "Importar CSV - mapeo de columnas",
       "fields": {
         "date": "Fecha",
         "description": "Descripción",
@@ -140,26 +140,26 @@
   "charts": {
     "title": "Análisis Financiero",
     "subtitle": "Visualizaciones y tendencias de tus finanzas de boda",
-    "totalTransactions": "Total Transacciones",
-    "activeCategories": "Categorías Activas",
-    "budgetEfficiency": "Eficiencia Presupuesto",
-    "projectedBalance": "Balance Proyectado",
-    "budgetVsSpentByCategory": "Presupuesto vs Gastado por Categoría",
+    "totalTransactions": "Total de transacciones",
+    "activeCategories": "Categorías activas",
+    "budgetEfficiency": "Eficiencia del presupuesto",
+    "projectedBalance": "Balance proyectado",
+    "budgetVsSpentByCategory": "Presupuesto vs. gasto por categoría",
     "budgeted": "Presupuestado",
     "spent": "Gastado",
-    "expenseDistributionByCategory": "Distribucin de Gastos por Categoría",
-    "monthlyTrend": "Tendencia Mensual de Ingresos y Gastos",
+    "expenseDistributionByCategory": "Distribución de gastos por categoría",
+    "monthlyTrend": "Tendencia mensual de ingresos y gastos",
     "income": "Ingresos",
     "expenses": "Gastos",
     "balance": "Balance",
-    "budgetProgressByCategory": "Progreso del Presupuesto por Categoría",
+    "budgetProgressByCategory": "Progreso del presupuesto por categoría",
     "used": "Usado",
     "excess": "Exceso",
-    "insights": "Insights Financieros",
-    "highestExpense": "Mayor Gasto",
-    "mostEfficient": "Más Eficiente",
+    "insights": "Ideas financieras",
+    "highestExpense": "Mayor gasto",
+    "mostEfficient": "Más eficiente",
     "noData": "No hay datos suficientes",
-    "currentTrend": "Tendencia Actual",
+    "currentTrend": "Tendencia actual",
     "trend": {
       "positive": "Positiva",
       "negative": "Negativa"
@@ -168,9 +168,9 @@
   },
   "bank": {
     "title": "Vincular cuenta bancaria",
-    "country": "Pas",
+    "country": "País",
     "countries": {
-      "es": "Espaa",
+      "es": "España",
       "fr": "Francia",
       "de": "Alemania",
       "it": "Italia",
@@ -178,23 +178,23 @@
     },
     "bankLabel": "Banco",
     "selectBank": "Selecciona un banco",
-    "selectBankPlaceholder": "Selecciona un banco&",
+    "selectBankPlaceholder": "Selecciona un banco",
     "loadBanks": "Cargar bancos",
     "connect": "Conectar",
-    "errorLoad": "No se pudieron cargar bancos. Es posible que el backend no tenga habilitada la integracin Nordigen o la ruta /api/bank an no est desplegada.",
-    "errorStart": "No se pudo iniciar la vinculacin",
-    "noRequisition": "No hay requisicin iniciada",
+    "errorLoad": "No se pudieron cargar los bancos. Es posible que el backend no tenga habilitada la integración Nordigen o que la ruta /api/bank aún no esté desplegada.",
+    "errorStart": "No se pudo iniciar la vinculación",
+    "noRequisition": "No hay requisición iniciada",
     "errorCheck": "No se pudo consultar el estado",
     "selectWedding": "Selecciona una boda activa",
     "linked": "Cuenta vinculada",
     "errorSave": "No se pudo guardar la cuenta",
     "requirements": {
-      "title": "Requisitos backend:",
+      "title": "Requisitos del backend:",
       "env": "Definir NORDIGEN_SECRET_ID, NORDIGEN_SECRET_KEY y NORDIGEN_BASE_URL",
       "route": "Backend con ruta /api/bank desplegada"
     },
-    "alternative": "Alternativa temporal: importa movimientos manualmente desde Finanzas  Transacciones  \"Importar Banco\".",
-    "requisition": "Requisition:",
+    "alternative": "Alternativa temporal: importa movimientos manualmente desde Finanzas > Transacciones > \"Importar banco\".",
+    "requisition": "Requisición:",
     "checkStatus": "Comprobar estado",
     "availableAccounts": "Cuentas disponibles",
     "useThis": "Usar esta cuenta"
@@ -211,7 +211,7 @@
     "categoriesTitle": "Categorías de presupuesto",
     "empty": "No hay categorías de presupuesto",
     "createFirst": "Crear primera categoría",
-    "category": "categoría",
+    "category": "Categoría",
     "overallProgress": "Progreso del presupuesto",
     "advisor": "Consejero",
     "advisorShort": "IA",
@@ -219,42 +219,42 @@
     "exceeded": "Excedido",
     "thresholds": {
       "warn": "Aviso (en riesgo) %",
-      "danger": "Crtico (exceso) %"
+      "danger": "Crítico (exceso) %"
     },
-    "perGuestHint": "H {{value}} / invitado ({{count}} eventos)",
+    "perGuestHint": "≈ {{value}} / invitado ({{count}} eventos)",
     "modal": {
       "editTitle": "Editar categoría",
       "newTitle": "Nueva categoría",
       "name": "Nombre de la categoría",
       "namePlaceholder": "Ej.: Catering, música, flores...",
-      "amountLabel": "Presupuesto asignado ()",
+      "amountLabel": "Presupuesto asignado",
       "amountPlaceholder": "0,00"
     },
     "errors": {
       "nameRequired": "El nombre de la categoría es obligatorio",
       "amountInvalid": "El monto debe ser un número válido"
     },
-    "confirmDelete": "Ests seguro de eliminar la categoría \"{{category}}\"?",
+    "confirmDelete": "¿Estás seguro de eliminar la categoría \"{{category}}\"?",
     "advisorErrors": {
-      "requestFailed": "No se pudo obtener la recomendacin del consejero.",
-      "refreshFailed": "No se pudo actualizar la recomendacin.",
+      "requestFailed": "No se pudo obtener la recomendación del consejero.",
+      "refreshFailed": "No se pudo actualizar la recomendación.",
       "applyFailed": "No se pudo aplicar el escenario recomendado.",
       "applyFailedWithReason": "No se pudo aplicar el escenario ({{reason}})."
     }
   },
   "benchmarks": {
     "title": "Sugerencias de presupuesto basadas en bodas similares",
-    "subtitle": "Basado en {{count}} presupuestos confirmados. Media estimada: {{average}}  Confianza: {{confidence}}.",
-    "loading": "Calculando sugerencias de presupuesto&",
+    "subtitle": "Basado en {{count}} presupuestos confirmados. Media estimada: {{average}} · Confianza: {{confidence}}.",
+    "loading": "Calculando sugerencias de presupuesto...",
     "applyMedian": "Aplicar mediana (p50)",
     "applyP75": "Aplicar percentil 75",
     "saveSnapshot": "Guardar presupuesto"
   },
   "cashflow": {
     "title": "Cronograma de caja",
-    "subtitle": "Prximos pagos y balance proyectado",
+    "subtitle": "Próximos pagos y balance proyectado",
     "remaining": "Presupuesto restante",
-    "burnRate": "Burn rate mensual",
+    "burnRate": "Ritmo de gasto mensual",
     "monthsToZero": "{{months}} meses hasta agotar",
     "upcoming": "Pagos próximos (45 días)",
     "noUpcoming": "Sin pagos pendientes en las próximas semanas.",

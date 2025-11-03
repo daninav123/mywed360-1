@@ -1,11 +1,11 @@
 {
   "seating": {
-    "title": "Distribucin de Mesas",
+    "title": "Distribución de mesas",
     "newTable": "Nueva mesa",
     "editTable": "Editar mesa",
     "deleteTable": "Eliminar mesa",
     "assignGuests": "Asignar invitados",
-    "autoAssign": "Asignacin automtica",
+    "autoAssign": "Asignación automática",
     "noTables": "No hay mesas configuradas",
     "createFirst": "Crear primera mesa",
     "form": {
@@ -37,10 +37,10 @@
       "assigned_other": "{{count}} asignados",
       "capacity_full": "Completa",
       "capacity_available": "{{available}} disponibles",
-      "dragHint": "Arrastra invitados aqu",
-      "autoAssignSuccess": "Asignacin automtica completada",
+      "dragHint": "Arrastra invitados aquí",
+      "autoAssignSuccess": "Asignación automática completada",
       "conflictDetected": "Conflicto detectado",
-      "validationError": "Error de validacin"
+      "validationError": "Error de validación"
     },
     "toolbar": {
       "save": "Guardar",
@@ -51,21 +51,21 @@
       "print": "Imprimir",
       "settings": "Configuración"
     },
-    "configureCeremony": "Configurar Ceremonia",
+    "configureCeremony": "Configurar ceremonia",
     "ceremony": {
       "rows": "Filas",
       "seatsPerRow": "Sillas por fila",
       "spacing": "Espacio entre sillas (cm)",
-      "aisleAfter": "Pasillo despus de col",
+      "aisleAfter": "Pasillo después de la columna",
       "vipReservations": "Reservas VIP",
       "reservedRows": "Filas reservadas (ej. 1,2)",
       "reservedLabel": "Etiqueta para asientos reservados",
       "lockVipSeats": "Bloquear asientos VIP hasta asignarlos manualmente",
-      "notesPlaceholder": "Ej. Reservar para padrinos y padres",
+      "notesPlaceholder": "Ej.: reservar para padrinos y padres",
       "totalSeats": "Total de sillas",
       "saveConfiguration": "Guardar configuración"
     },
-    "configureBanquet": "Configurar Banquete",
+    "configureBanquet": "Configurar banquete",
     "banquet": {
       "tableRows": "Filas de mesas",
       "tableCols": "Columnas de mesas",
@@ -75,7 +75,7 @@
       "generate": "Generar"
     },
     "space": {
-      "dimensions": "Dimensiones del Saln",
+      "dimensions": "Dimensiones del salón",
       "width": "Ancho (cm)",
       "height": "Alto (cm)"
     },
@@ -87,19 +87,19 @@
         "tableName": "Mesa {{number}}"
       },
       "toasts": {
-        "fullAssignment": "< 100% de invitados asignados! Felicitaciones!",
-        "autoAssignSuccess": "Asignacin automtica completada",
-        "autoAssignError": "No pudimos completar la asignacin automtica. Intenta nuevamente.",
+        "fullAssignment": "¡100 % de invitados asignados! ¡Felicitaciones!",
+        "autoAssignSuccess": "Asignación automática completada",
+        "autoAssignError": "No pudimos completar la asignación automática. Intenta nuevamente.",
         "addTableSuccess": "Mesa agregada correctamente",
         "addTableError": "No pudimos agregar la mesa{{message}}",
         "capacityUpdated": "Capacidad actualizada a {{value}}",
         "duplicateTable": "Mesa duplicada",
         "rotateTable": "Mesa rotada",
         "deleteTable": "Mesa eliminada",
-        "removeGuest": "Invitado removido de la mesa"
+        "removeGuest": "Invitado quitado de la mesa"
       },
       "errors": {
-        "addTableUnavailable": "No es posible agregar mesas en este momento."
+        "addTableUnavailable": "Esta acción no está disponible por ahora. Recarga e inténtalo de nuevo."
       },
       "guestSidebar": {
         "header": {
@@ -110,7 +110,7 @@
           "summary": "Resumen",
           "recommendations": "Recomendaciones",
           "conflicts": "Conflictos",
-          "staff": "Staff",
+          "staff": "Equipo",
           "history": "Historial"
         },
         "summary": {
@@ -120,9 +120,9 @@
             "pending": "Pendientes",
             "vipPending": "VIP pendientes",
             "tablesNearlyFull": "Mesas casi llenas",
-            "companionSeats": "Asientos acompaantes",
+            "companionSeats": "Asientos acompañantes",
             "conflicts": "Conflictos",
-            "snapshots": "Snapshots guardados"
+            "snapshots": "Instantáneas guardadas"
           },
           "viewPending": "Ver pendientes en detalle"
         },
@@ -135,37 +135,37 @@
             "familia": "Familia cercana",
             "pending": "Pendiente"
           },
-          "score": "Score {{value}}",
+          "score": "Puntuación {{value}}",
           "suggestedTable": "Mesa sugerida:",
           "capacityAvailable_one": "Capacidad disponible: {{count}} asiento",
           "capacityAvailable_other": "Capacidad disponible: {{count}} asientos",
-          "capacityUnknown": "Capacidad disponible:  asiento(s)"
+          "capacityUnknown": "Capacidad disponible: sin datos"
         },
         "conflicts": {
           "emptyTitle": "Sin conflictos",
           "emptyDescription": "No se detectaron problemas en las mesas.",
           "tableFallback": "Mesa",
           "messageFallback": "Conflicto detectado en la mesa.",
-          "severityHigh": "Crtico",
-          "severityMedium": "Atencin",
+          "severityHigh": "Crítico",
+          "severityMedium": "Atención",
           "actions": {
             "reassign": "Reubicar {{guest}}",
-            "fixPosition": "Ajustar mesa",
+            "fixPosition": "Ajustar la mesa",
             "generic": "Acción sugerida"
           }
         },
         "staff": {
-          "emptyTitle": "Sin staff registrado",
-          "emptyDescription": "Agrega tags o roles para identificar rpidamente al personal y proveedores.",
-          "memberFallback": "Miembro del staff",
+          "emptyTitle": "Sin equipo registrado",
+          "emptyDescription": "Agrega etiquetas o roles para identificar rápidamente al personal y proveedores.",
+          "memberFallback": "Miembro del equipo",
           "assigned": "Asignado",
           "noTable": "Sin mesa",
           "pending": "Pendiente de ubicación",
           "tableLabel": "Mesa: {{table}}"
         },
         "history": {
-          "emptyTitle": "Sin snapshots guardados",
-          "emptyDescription": "Guarda un snapshot desde la barra de herramientas para crear un historial de avances.",
+          "emptyTitle": "Sin instantáneas guardadas",
+          "emptyDescription": "Guarda una instantánea desde la barra de herramientas para crear un historial de avances.",
           "load": "Cargar",
           "delete": "Eliminar"
         },

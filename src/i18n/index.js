@@ -21,6 +21,50 @@ const resources = Object.entries(localeModules).reduce((acc, [path, module]) => 
   return acc;
 }, {});
 
+const deepMerge = (base, override) => {
+  if (base === null || base === undefined) {
+    return override;
+  }
+  if (override === null || override === undefined) {
+    return base;
+  }
+  if (
+    Array.isArray(base) ||
+    Array.isArray(override) ||
+    typeof base !== 'object' ||
+    typeof override !== 'object'
+  ) {
+    return override;
+  }
+
+  const result = { ...base };
+  for (const [key, value] of Object.entries(override)) {
+    result[key] = deepMerge(base[key], value);
+  }
+  return result;
+};
+
+const REGIONAL_PARENTS = {
+  'es-AR': 'es',
+  'es-MX': 'es',
+  'fr-CA': 'fr',
+};
+
+Object.entries(REGIONAL_PARENTS).forEach(([child, parent]) => {
+  if (!resources[parent]) {
+    return;
+  }
+
+  resources[child] ??= {};
+
+  Object.entries(resources[parent]).forEach(([namespace, parentData]) => {
+    const childData = resources[child][namespace] ?? {};
+    const parentClone = JSON.parse(JSON.stringify(parentData));
+    const merged = deepMerge(parentClone, childData);
+    resources[child][namespace] = merged;
+  });
+});
+
 // Código de debug para visualizar qué elementos tienen traducción i18n
 // Usa 'en-x-i18n' que es válido según BCP 47 (extensión privada)
 const DEBUG_LANGUAGE_CODE = 'en-x-i18n';

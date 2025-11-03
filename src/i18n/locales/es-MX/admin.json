@@ -10,12 +10,12 @@
       "roles": {
         "admin": "Administrador",
         "owner": "Propietario",
-        "planner": "Wedding Planner",
+        "planner": "Organizador/a de bodas",
         "assistant": "Asistente"
       }
     },
     "settings": "Configuración",
-    "analytics": "Analíticas",
+    "analytics": "Análisis",
     "logs": "Registros",
     "messages": {
       "updated": "Configuración actualizada",

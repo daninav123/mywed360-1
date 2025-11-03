@@ -1,7 +1,6 @@
 {
   "chat": {
-    "title": "Chat",
-    "placeholder": "Añade tus traducciones aquí",
+    "title": "Chat IA",
     "close": "Cerrar chat",
     "open": "Abrir chat",
     "sendMessage": "Enviar mensaje",
@@ -82,6 +81,5 @@
       "wedding": "boda",
       "yourPlanning": "tu planificación"
     }
-  },
-  "_note": "Translate from es/chat.json"
+  }
 }

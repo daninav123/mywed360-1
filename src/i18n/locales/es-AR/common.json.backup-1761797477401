@@ -1,33 +1,33 @@
 {
   "app": {
     "name": "MaLove.App",
-    "brandName": "MaLoveApp",
-    "tagline": "Your perfect wedding, digitally organized",
-    "loading": "Loading...",
+    "brandName": "Lovenda",
+    "tagline": "Tu boda perfecta, organizada digitalmente",
+    "loading": "Cargando...",
     "error": "Error",
-    "success": "Success",
-    "cancel": "Cancel",
-    "save": "Save",
-    "delete": "Delete",
-    "edit": "Edit",
-    "add": "Add",
-    "search": "Search",
-    "filter": "Filter",
-    "close": "Close",
+    "success": "Éxito",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "add": "Añadir",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "close": "Cerrar",
     "open": "Open",
-    "yes": "Yes",
+    "yes": "Sí",
     "no": "No",
     "ok": "OK",
-    "back": "Back",
-    "next": "Next",
-    "previous": "Previous",
+    "back": "Volver",
+    "next": "Siguiente",
+    "previous": "Anterior",
     "continue": "Continue",
     "finish": "Finish"
   },
-  "add": "Add",
-  "delete": "Delete",
-  "save": "Save",
-  "cancel": "Cancel",
+  "add": "Añadir",
+  "delete": "Eliminar",
+  "save": "Guardar",
+  "cancel": "Cancelar",
   "navigation": {
     "home": "Home",
     "dashboard": "Dashboard",
@@ -77,7 +77,7 @@
     "invalidEmail": "Invalid email format"
   },
   "authLogin": {
-    "title": "Access your account",
+    "title": "Colaboradores activos ({{count}})",
     "subtitle": "Use your email and password or choose a social provider.",
     "emailLabel": "Email address",
     "passwordLabel": "Password",
@@ -90,8 +90,8 @@
     "noAccount": "Don't have an account?",
     "registerLink": "Create one",
     "hero": {
-      "title": "Manage everything from a single dashboard",
-      "description": "Access your guests, tasks, budgets, and documents in seconds. Track event progress and keep your team in sync.",
+      "title": "Colaboradores activos ({{count}})",
+      "description": "Guarda los proveedores que te interesen para compararlos después.",
       "features": [
         "Sync vendors and contracts.",
         "Automate emails and personalized reminders.",
@@ -109,7 +109,7 @@
     "social": {
       "divider": "or continue with",
       "button": "Continue with {{provider}}",
-      "pending": "Continue the sign-in flow in the {{provider}} window."
+      "pending": "Pendientes:"
     }
   },
   "protocol": {
@@ -118,8 +118,8 @@
       "confirmDelete": "Delete this event?"
     },
     "specialMoments": {
-      "title": "Special Moments",
-      "description": "Plan each key moment with the right music and timing.",
+      "title": "Colaboradores activos ({{count}})",
+      "description": "Guarda los proveedores que te interesen para compararlos después.",
       "buttons": {
         "addSection": "Add section",
         "addMoment": "Add moment",
@@ -128,7 +128,7 @@
         "use": "Use",
         "searchWithAI": "Search with AI",
         "confirm": "Confirm",
-        "clear": "Clear",
+        "clear": "Limpiar filtros",
         "remove": "Remove"
       },
       "tooltips": {
@@ -244,7 +244,7 @@
         "duplicateHere": "Duplicate in this section",
         "duplicateElse": "Duplicate in another section",
         "move": "Move to another section",
-        "delete": "Delete moment"
+        "delete": "Eliminar"
       },
       "player": {
         "show": "Player",
@@ -255,7 +255,7 @@
         "volume": "Volume"
       },
       "ai": {
-        "loading": "Fetching recommendations...",
+        "loading": "Cargando tus proveedores guardados...",
         "error": "Could not fetch recommendations. Try again.",
         "resultsTitle": "AI recommendations",
         "preferencesPrefix": "Preferences",
@@ -288,7 +288,7 @@
         }
       },
       "search": {
-        "loading": "Searching...",
+        "loading": "Cargando tus proveedores guardados...",
         "error": "Could not search songs. Try again later.",
         "resultsTitle": "Results"
       },
@@ -300,7 +300,7 @@
         "momentTitle": "New moment"
       },
       "empty": {
-        "title": "There are no moments in this section.",
+        "title": "Colaboradores activos ({{count}})",
         "subtitle": "Click \"Add moment\" to create one."
       },
       "prompts": {
@@ -358,8 +358,8 @@
       }
     },
     "checklist": {
-      "title": "Last-minute checklist",
-      "description": "Quick summary of the must-do items right before the event.",
+      "title": "Colaboradores activos ({{count}})",
+      "description": "Guarda los proveedores que te interesen para compararlos después.",
       "manualDefaults": {
         "specialGifts": "Gifts prepared for the special moments"
       },
@@ -368,14 +368,14 @@
         "view": "View"
       },
       "statuses": {
-        "pending": "pending",
+        "pending": "Pendientes:",
         "in-progress": "in progress",
         "done": "completed"
       },
       "categories": {
         "documentation": "Documentation",
         "providers": "Suppliers",
-        "ceremony": "Ceremony",
+        "ceremony": "Ceremonia lista",
         "contingency": "Contingency",
         "personal": "Personal",
         "technical": "Technical"
@@ -393,22 +393,22 @@
         "manualTitle": "Manual checkpoints"
       },
       "manual": {
-        "empty": "Add checkpoints with the \"{{button}}\" button.",
+        "empty": "Ningún proveedor coincide con los filtros actuales.",
         "toggleDone": "Mark done",
         "togglePending": "Mark pending",
-        "removeTooltip": "Delete"
+        "removeTooltip": "Quitar de favoritos"
       },
       "providersCard": {
-        "title": "Suppliers",
+        "title": "Colaboradores activos ({{count}})",
         "confirmed": "Confirmed:",
-        "pending": "Pending: {{count}}",
+        "pending": "Pendientes:",
         "link": "View"
       },
       "momentsCard": {
-        "title": "Moments (music)",
-        "assigned": "Songs assigned:",
+        "title": "Colaboradores activos ({{count}})",
+        "assigned": "asignados ({{assigned}}/{{total}})",
         "missing": "Missing assignments: {{count}}",
-        "empty": "No moments configured"
+        "empty": "Ningún proveedor coincide con los filtros actuales."
       },
       "toasts": {
         "statusUpdated": "\"{{label}}\" marked as {{status}}",
@@ -427,17 +427,17 @@
         "warn": "Could not import {{label}}"
       },
       "addModal": {
-        "title": "Add checkpoint",
+        "title": "Colaboradores activos ({{count}})",
         "nameLabel": "Checkpoint name",
         "namePlaceholder": "E.g. Gifts prepared for the special moments",
-        "notesLabel": "Notes (optional)",
+        "notesLabel": "Notas:",
         "notesPlaceholder": "Details or reminders"
       },
       "tooltips": {
         "markCritical": "Mark as critical",
         "edit": "Edit",
-        "save": "Save",
-        "delete": "Delete"
+        "save": "Guardar",
+        "delete": "Eliminar"
       }
     }
   },
@@ -452,8 +452,8 @@
           "contactSupport": "Contact support",
           "goDashboard": "Go to dashboard"
         },
-        "title": "Payment completed successfully",
-        "description": "Your subscription has been activated.",
+        "title": "Colaboradores activos ({{count}})",
+        "description": "Guarda los proveedores que te interesen para compararlos después.",
         "detailsHeading": "Purchase details:",
         "statusLabel": "Status:",
         "status": {
@@ -464,11 +464,11 @@
         "emailNotice": "You'll receive a confirmation email with your purchase details."
       },
       "cancel": {
-        "title": "Payment cancelled",
-        "description": "You cancelled the payment process. No charge was made.",
+        "title": "Colaboradores activos ({{count}})",
+        "description": "Guarda los proveedores que te interesen para compararlos después.",
         "supportCard": {
-          "title": "Did you have any issues?",
-          "description": "If you experienced an error or have questions about our plans, our team is ready to help."
+          "title": "Colaboradores activos ({{count}})",
+          "description": "Guarda los proveedores que te interesen para compararlos después."
         },
         "buttons": {
           "backPricing": "Back to plans",
@@ -476,11 +476,11 @@
           "backHome": "Return to home"
         },
         "faq": {
-          "title": "Need help?",
+          "title": "Colaboradores activos ({{count}})",
           "link": "View FAQs"
         },
         "support": {
-          "title": "Support",
+          "title": "Colaboradores activos ({{count}})",
           "emailLink": "Send email"
         }
       }
@@ -493,9 +493,9 @@
       }
     },
     "rsvp": {
-      "loading": "Loading...",
+      "loading": "Cargando tus proveedores guardados...",
       "notFound": "Guest not found",
-      "title": "RSVP confirmation",
+      "title": "Colaboradores activos ({{count}})",
       "greeting": "Hi {{name}}, please let us know if you will attend.",
       "question": "Will you attend?",
       "statusOptions": {
@@ -519,10 +519,10 @@
       }
     },
     "supplierPortal": {
-      "loading": "Loading...",
+      "loading": "Cargando tus proveedores guardados...",
       "error": "Link is invalid or has expired",
       "errorWithReason": "Link is invalid or has expired ({{reason}})",
-      "title": "Supplier portal",
+      "title": "Colaboradores activos ({{count}})",
       "thanksTitle": "Thank you!",
       "thanksDescription": "We have received your response. We will get in touch shortly.",
       "labels": {
@@ -533,18 +533,18 @@
         "budget": "Budget (optional)",
         "amount": "Amount",
         "links": "File link (Drive, Dropbox)",
-        "description": "Budget description or details"
+        "description": "Guarda los proveedores que te interesen para compararlos después."
       },
       "availability": {
         "available": "Available",
         "unavailable": "Not available",
-        "unknown": "To be confirmed"
+        "unknown": "Usuario"
       },
       "placeholders": {
         "message": "Comments, questions, or conditions",
         "amount": "Amount",
         "links": "File link (Drive, Dropbox)",
-        "description": "Budget description or details"
+        "description": "Guarda los proveedores que te interesen para compararlos después."
       },
       "buttons": {
         "submit": "Send",
@@ -555,13 +555,13 @@
       }
     },
     "weddingSite": {
-      "loading": "Loading...",
+      "loading": "Cargando tus proveedores guardados...",
       "alerts": {
         "success": "Thank you for your response!",
         "error": "We couldn't submit the form."
       },
       "defaults": {
-        "title": "Our wedding",
+        "title": "Colaboradores activos ({{count}})",
         "storyTitle": "Our story",
         "timelineTitle": "Schedule",
         "galleryTitle": "Gallery",
@@ -590,10 +590,10 @@
       }
     },
     "publicWedding": {
-      "loading": "Loading...",
+      "loading": "Cargando tus proveedores guardados...",
       "error": "Unavailable ({{reason}})",
       "defaults": {
-        "title": "Our wedding",
+        "title": "Colaboradores activos ({{count}})",
         "storyTitle": "Our story",
         "timelineTitle": "Schedule",
         "galleryTitle": "Gallery",
@@ -602,7 +602,7 @@
     },
     "moments": {
       "guest": {
-        "loading": "Preparing your space to share memories...",
+        "loading": "Cargando tus proveedores guardados...",
         "errorTitle": "We could not open the memories gallery",
         "errorDescription": "{{message}}",
         "errorHint": "If you believe this is a mistake, ask the couple for a new link.",
@@ -615,8 +615,8 @@
         "closedHint": "If you still have memories to share, let the couple know so they can reopen the link.",
         "form": {
           "badge": "Collaborative memories",
-          "title": "Thanks for capturing memories!",
-          "description": "Upload your favourite photos from the event. The host will review them and showcase them in the live slideshow.",
+          "title": "Colaboradores activos ({{count}})",
+          "description": "Guarda los proveedores que te interesen para compararlos después.",
           "deadline": "The gallery accepts new photos until {{date}}.",
           "remainingDays": {
             "one": "You have 1 day left to share memories.",
@@ -668,7 +668,7 @@
         }
       },
       "public": {
-        "loading": "Preparing the gallery...",
+        "loading": "Cargando tus proveedores guardados...",
         "error": "This link is no longer valid. Ask the couple for a new one.",
         "errorTitle": "We couldn't open the gallery",
         "errorDescription": "This link is no longer valid or has been revoked. Ask the couple for a new one.",
@@ -679,7 +679,7 @@
         "hero": {
           "badge": "Memories gallery",
           "titleFallback": "Share your best moments",
-          "description": "Pick a moment for your memories and upload them straight from your phone.",
+          "description": "Guarda los proveedores que te interesen para compararlos después.",
           "deadline": "Available until {{date}} · {{remaining}}",
           "remaining": {
             "lastDay": "Final day",
@@ -688,8 +688,8 @@
           "closed": "Uploads have finished for this gallery."
         },
         "form": {
-          "title": "Share your memories",
-          "description": "Upload your favourite photos with a message and they'll appear in the shared gallery.",
+          "title": "Colaboradores activos ({{count}})",
+          "description": "Guarda los proveedores que te interesen para compararlos después.",
           "nameLabel": "Your name",
           "namePlaceholder": "E.g. Laura G.",
           "emailLabel": "Email (optional)",
@@ -702,13 +702,13 @@
           "tip": "Pro tip! Pick the matching scene to help the couple organise their photos."
         },
         "list": {
-          "title": "Featured moments",
+          "title": "Colaboradores activos ({{count}})",
           "count": "{{count}} moments available",
           "cardDescription": "Upload your photos or videos for this moment instantly.",
-          "empty": "The hosts haven't configured specific moments yet. Come back later to share your memories."
+          "empty": "Ningún proveedor coincide con los filtros actuales."
         },
         "recent": {
-          "title": "Latest contributions",
+          "title": "Colaboradores activos ({{count}})",
           "item": "{{scene}} · {{size}} KB"
         },
         "status": {
@@ -723,8 +723,8 @@
           "remainingUploads": "You can upload {{count, plural, one {1 additional file} other {{count} additional files}} with this link."
         },
         "uploadStates": {
-          "title": "Shared memories",
-          "description": "Thanks for collaborating. Your photos will be reviewed before everyone can see them.",
+          "title": "Colaboradores activos ({{count}})",
+          "description": "Guarda los proveedores que te interesen para compararlos después.",
           "recentUploads": "Latest uploads",
           "statusReview": "Under review",
           "dropzoneTitle": "Drag & drop your photos here",
@@ -740,7 +740,7 @@
     }
   },
   "authSignup": {
-    "title": "Create your account",
+    "title": "Colaboradores activos ({{count}})",
     "subtitle": "Register with your email or continue with your favourite social account.",
     "emailLabel": "Email address",
     "passwordLabel": "Password",
@@ -756,8 +756,8 @@
     "alreadyHaveAccount": "Already have an account?",
     "loginLink": "Sign in",
     "hero": {
-      "title": "Welcome to MaLoveApp",
-      "description": "Centralise tasks, guests, and vendors in one place. Our assistant guides you every step so your wedding runs perfectly.",
+      "title": "Colaboradores activos ({{count}})",
+      "description": "Guarda los proveedores que te interesen para compararlos después.",
       "features": [
         "Smart timeline so you never miss a task.",
         "Automated emails and reminders for guests.",
@@ -784,7 +784,7 @@
     "social": {
       "divider": "or continue with",
       "button": "Continue with {{provider}}",
-      "pending": "Complete the sign-up flow in the {{provider}} window."
+      "pending": "Pendientes:"
     }
   },
   "passwordStrength": {
@@ -795,7 +795,7 @@
       "strong": "Strong",
       "veryStrong": "Excellent"
     },
-    "title": "Password strength",
+    "title": "Colaboradores activos ({{count}})",
     "suggestions": {
       "start": "Enter a password with at least 8 characters.",
       "length8": "Use at least 8 characters.",
@@ -824,17 +824,6 @@
     },
     "share": {
       "linkCopied": "Link copied"
-    },
-    "manageServices": {
-      "title": "Manage services",
-      "subtitle": "Select the services you need for your wedding",
-      "primaryTitle": "Main services",
-      "otherTitle": "Other services",
-      "tip": "Selected services will appear as cards on your dashboard. They are also added automatically when you save a supplier as a favorite.",
-      "saveAndClose": "Save and close",
-      "toast": {
-        "updateError": "Failed to update service"
-      }
     }
   },
   "guests": {
@@ -849,23 +838,23 @@
       "noGuestsForBulk": "There are no guests to send invitations",
       "totalGuests": "{{count}} guest in total",
       "totalGuests_plural": "{{count}} guests in total",
-      "searchPlaceholder": "Search by name, email or phone...",
+      "searchPlaceholder": "Buscar por nombre, categoría o ciudad",
       "tablePlaceholder": "Filter by table...",
       "saveTheDate": {
-        "title": "Send SAVE THE DATE via WhatsApp",
+        "title": "Colaboradores activos ({{count}})",
         "label": "Send SAVE THE DATE"
       },
       "bulkInvite": {
-        "title": "Send the formal invitation via WhatsApp API",
+        "title": "Colaboradores activos ({{count}})",
         "label": "Bulk invitations (API)"
       }
     },
     "errors": {
-      "missingPhone": "Guest phone number is missing"
+      "missingPhone": "El invitado no tiene nÃºmero de telÃ©fono"
     }
   },
   "providers": {
-    "provider": "Provider",
+    "provider": "Proveedor",
     "providers": "Providers",
     "addProvider": "Add Provider",
     "editProvider": "Edit Provider",
@@ -900,7 +889,7 @@
       "status": {
         "received": "Received",
         "confirmed": "Confirmed",
-        "pending": "Pending"
+        "pending": "Pendientes:"
       }
     },
     "reports": {
@@ -922,7 +911,7 @@
   "seating": {
     "seatingPlan": "Seating Plan",
     "table": "Table",
-    "tables": "Tables",
+    "tables": "mesas",
     "seat": "Seat",
     "seats": "Seats",
     "addTable": "Add Table",
@@ -932,63 +921,63 @@
     "tableCapacity": "Table Capacity",
     "assignGuest": "Assign Guest",
     "unassignGuest": "Unassign Guest",
-    "autoAssign": "Auto Assign",
+    "autoAssign": "Auto-IA",
     "ceremonyLayout": "Ceremony Layout",
     "receptionLayout": "Reception Layout",
     "viewLayout": "View Layout",
     "editLayout": "Edit Layout",
-    "saveLayout": "Save Layout",
-    "resetLayout": "Reset Layout",
+    "saveLayout": "Guardar plano",
+    "resetLayout": "Reiniciar plano",
     "summary": {
-      "sectionLabel": "Overview",
-      "assignedTitle": "{{count}} guests seated",
-      "assignedSubtitle": "{{assigned}} of {{total}} guests and companions",
-      "noGuests": "No guests added yet",
+      "sectionLabel": "Resumen general",
+      "assignedTitle": "{{count}} personas ubicadas",
+      "assignedSubtitle": "{{assigned}} de {{total}} invitados y acompañantes",
+      "noGuests": "Sin invitados cargados",
       "metrics": {
-        "pending": "Pending:",
-        "tables": "Active tables:",
-        "capacity": "Available capacity:",
+        "pending": "Pendientes:",
+        "tables": "mesas",
+        "capacity": "Capacidad disponible:",
         "capacitySuffix": "pax"
       },
       "actions": {
-        "generateLayout": "Generate Auto Layout",
-        "regenerateLayout": "Regenerate Layout",
-        "reviewPending": "Review pending guests"
+        "generateLayout": "Generar layout automático",
+        "regenerateLayout": "Regenerar layout",
+        "reviewPending": "Revisar invitados pendientes"
       },
       "progress": {
-        "ceremony": "Ceremony ready",
-        "banquet": "Banquet assigned",
-        "occupancy": "Capacity used"
+        "ceremony": "Ceremonia lista",
+        "banquet": "Banquete asignado",
+        "occupancy": "Capacidad ocupada"
       },
       "map": {
-        "title": "Venue map",
+        "title": "Colaboradores activos ({{count}})",
         "separator": "•"
       }
     },
     "footer": {
       "stats": {
         "assignedValue": "{{value}}%",
-        "assigned": "assigned ({{assigned}}/{{total}})",
-        "tables": "tables",
-        "conflicts": "conflicts",
+        "assigned": "asignados ({{assigned}}/{{total}})",
+        "tables": "mesas",
+        "conflicts": "conflictos",
         "trendIncrease": "+{{value}}%"
       },
       "buttons": {
-        "export": "Export",
-        "autoAssign": "Auto AI",
-        "autoAssignLoading": "Assigning..."
+        "export": "Exportar",
+        "autoAssign": "Auto-IA",
+        "autoAssignLoading": "Asignando..."
       }
     },
     "collaborators": {
-      "title": "Active collaborators ({{count}})",
-      "unknown": "User",
-      "editing_one": "Editing {{count}} element",
-      "editing_other": "Editing {{count}} elements",
-      "synced": "Synced in real time"
+      "title": "Colaboradores activos ({{count}})",
+      "unknown": "Usuario",
+      "editing_one": "Editando {{count}} elemento",
+      "editing_other": "Editando {{count}} elementos",
+      "synced": "Sincronizado en tiempo real"
     },
     "toolbar": {
       "syncing": "Syncing...",
-      "synced": "Synced",
+      "synced": "Sincronizado en tiempo real",
       "syncError": "Sync error",
       "offline": "Offline",
       "undo": "Undo",
@@ -1013,16 +1002,16 @@
       "spaceConfig": "Configure space",
       "space": "Space",
       "ceremonyConfig": "Configure ceremony",
-      "ceremony": "Ceremony",
+      "ceremony": "Ceremonia lista",
       "banquetConfig": "Configure banquet",
-      "banquet": "Banquet",
+      "banquet": "Banquete asignado",
       "clearBanquet": "Clear layout",
-      "clear": "Clear",
+      "clear": "Limpiar filtros",
       "templates": "Templates",
-      "export": "Export",
+      "export": "Exportar",
       "capacityTooltip": "Global capacity",
       "capacityShort": "Cap",
-      "autoAssign": "Auto-assign guests",
+      "autoAssign": "Auto-IA",
       "autoAssignShort": "Auto-assign",
       "backgroundConfig": "Configure background",
       "background": "Background",
@@ -1040,20 +1029,20 @@
       "hotkeys": "Shortcuts"
     },
     "snapshots": {
-      "title": "Snapshots",
+      "title": "Colaboradores activos ({{count}})",
       "button": "Snapshots",
       "manage": "Manage snapshots",
       "nameLabel": "Name",
       "namePlaceholder": "e.g. Base layout",
       "saveCurrent": "Save current",
-      "empty": "No snapshots",
+      "empty": "Ningún proveedor coincide con los filtros actuales.",
       "load": "Load",
-      "delete": "Delete",
+      "delete": "Eliminar",
       "nameRequired": "Enter a name"
     },
     "sidebar": {
       "tools": "Tools",
-      "pending": "Pending ({{count}})",
+      "pending": "Pendientes:",
       "hideGuests": "Hide guests",
       "showGuests": "Show guests",
       "searchGuests": "Search guests...",
@@ -1111,7 +1100,7 @@
       "csv": "CSV"
     },
     "hotkeys": {
-      "title": "Keyboard Shortcuts",
+      "title": "Colaboradores activos ({{count}})",
       "items": {
         "undoRedo": "Undo / Redo",
         "tools": "Tools (Pan, Move, Perimeter, Doors, Obstacles, Aisles)",
@@ -1161,7 +1150,7 @@
     "upcomingTasks": "Upcoming Tasks"
   },
   "profile": {
-    "synced": "Synced",
+    "synced": "Sincronizado en tiempo real",
     "subscription": {
       "type": "Subscription type",
       "free": "Free",
@@ -1212,7 +1201,7 @@
   "status": {
     "active": "Active",
     "inactive": "Inactive",
-    "pending": "Pending",
+    "pending": "Pendientes:",
     "approved": "Approved",
     "rejected": "Rejected",
     "completed": "Completed",
@@ -1244,10 +1233,10 @@
     "linkCopyError": "Could not generate/copy link"
   },
   "common": {
-    "add": "Add",
-    "cancel": "Cancel",
-    "delete": "Delete",
-    "save": "Save",
+    "add": "Añadir",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "save": "Guardar",
     "suppliers": {
       "overview": {
         "defaults": {
@@ -1258,50 +1247,50 @@
         "actions": {
           "manageServices": "Manage services",
           "newSupplier": "New supplier",
-          "clear": "Clear"
+          "clear": "Limpiar filtros"
         },
         "services": {
           "count": "{{count}} services",
           "confirmedCount": "{{count}} confirmed",
           "pendingCount": "{{count}} pending",
-          "title": "Hired services",
+          "title": "Colaboradores activos ({{count}})",
           "shortlistCount": "{{count}} in list",
           "reviewShortlist": "Review shortlist",
           "emptyShortlist": "No suppliers in the list",
           "exploreHint": "Explore suppliers to add to your list"
         },
-        "title": "Supplier management",
+        "title": "Colaboradores activos ({{count}})",
         "metrics": {
           "totalProviders": "Total suppliers",
           "confirmed": "Confirmed",
-          "pending": "Pending",
+          "pending": "Pendientes:",
           "shortlist": "Shortlist"
         },
         "exploration": {
-          "title": "Explore suppliers",
+          "title": "Colaboradores activos ({{count}})",
           "subtitle": "Search and discover suppliers for your event",
           "collapseAria": "Collapse exploration section",
-          "searchPlaceholder": "Search suppliers...",
+          "searchPlaceholder": "Buscar por nombre, categoría o ciudad",
           "recentSearches": "Recent searches"
         },
         "status": {
-          "pending": "Pending",
+          "pending": "Pendientes:",
           "confirmed": "Confirmed"
         },
         "shortlist": {
-          "loading": "Loading list...",
+          "loading": "Cargando tus proveedores guardados...",
           "error": "Error loading list",
-          "empty": "You have no saved suppliers",
+          "empty": "Ningún proveedor coincide con los filtros actuales.",
           "savedAt": "Saved {{value}}",
           "match": "{{value}}% match"
         },
         "modals": {
           "board": {
-            "title": "Services board",
-            "description": "Manage all your hired services"
+            "title": "Colaboradores activos ({{count}})",
+            "description": "Guarda los proveedores que te interesen para compararlos después."
           },
           "options": {
-            "title": "Options for {{label}}",
+            "title": "Colaboradores activos ({{count}})",
             "confirmedTitle": "Confirmed",
             "contactTitle": "Contacted / In negotiation",
             "contactEmpty": "No suppliers contacted yet",
@@ -1310,8 +1299,8 @@
           }
         },
         "drawer": {
-          "title": "Supplier details",
-          "empty": "Select a supplier to view details"
+          "title": "Colaboradores activos ({{count}})",
+          "empty": "Ningún proveedor coincide con los filtros actuales."
         },
         "toasts": {
           "missingQuery": "Please enter a search term",
@@ -1325,16 +1314,16 @@
         }
       },
       "smartFilters": {
-        "title": "Smart filters",
+        "title": "Colaboradores activos ({{count}})",
         "subtitle": "(from your profile)",
         "buttons": {
           "reset": "Reset",
           "resetTitle": "Reset to profile values",
-          "clear": "Clear all",
+          "clear": "Limpiar filtros",
           "clearTitle": "Clear all filters"
         },
         "empty": {
-          "title": "We couldn't detect filters in your wedding profile.",
+          "title": "Colaboradores activos ({{count}})",
           "hint": "Go to {{section}} to set budget, guests and style."
         },
         "fields": {
@@ -1364,78 +1353,69 @@
         }
       },
       "favorites": {
-        "title": "Saved suppliers",
-        "loading": "Loading your saved suppliers...",
-        "confirmRemove": "Remove this supplier from favorites?",
-        "stats_one": "{{filtered}} of {{total}} saved supplier",
-        "stats_other": "{{filtered}} of {{total}} saved suppliers",
-        "searchPlaceholder": "Search by name, category or city",
+        "title": "Colaboradores activos ({{count}})",
+        "loading": "Cargando tus proveedores guardados...",
+        "confirmRemove": "¿Quieres quitar este proveedor de favoritos?",
+        "stats_one": "{{filtered}} de {{total}} proveedor guardado",
+        "stats_other": "{{filtered}} de {{total}} proveedores guardados",
+        "searchPlaceholder": "Buscar por nombre, categoría o ciudad",
         "actions": {
-          "export": "Export shortlist",
-          "removeTooltip": "Remove from favorites"
+          "export": "Exportar",
+          "removeTooltip": "Quitar de favoritos"
         },
         "filters": {
-          "allCategories": "All categories",
-          "results_one": "{{count}} supplier matches your filters",
-          "results_other": "{{count}} suppliers match your filters",
-          "clear": "Clear filters",
-          "empty": "No suppliers match the current filters."
+          "allCategories": "Todas las categorías",
+          "results_one": "{{count}} proveedor coincide con tus filtros",
+          "results_other": "{{count}} proveedores coinciden con tus filtros",
+          "clear": "Limpiar filtros",
+          "empty": "Ningún proveedor coincide con los filtros actuales."
         },
         "empty": {
-          "title": "No saved suppliers yet",
-          "description": "Save the vendors you love to compare them later.",
-          "hintPrefix": "Use the",
-          "hintSuffix": "icon to add them to your list."
+          "title": "Colaboradores activos ({{count}})",
+          "description": "Guarda los proveedores que te interesen para compararlos después.",
+          "hintPrefix": "Usa el icono",
+          "hintSuffix": "para añadirlos a tu lista."
         },
         "toasts": {
-          "removed": "Supplier removed from favorites",
-          "removeError": "We couldn't remove the supplier. Try again.",
-          "exportSoon": "Export coming soon. We're working on it!"
+          "removed": "Proveedor quitado de favoritos",
+          "removeError": "No pudimos quitar el proveedor. Intenta nuevamente.",
+          "exportSoon": "La exportación estará disponible pronto. ¡Estamos trabajando en ello!"
         },
-        "notesLabel": "Notes:",
-        "addedAt": "Saved {{value}}",
+        "notesLabel": "Notas:",
+        "addedAt": "Guardado {{value}}",
         "button": {
-          "save": "Save",
-          "saved": "Saved"
+          "save": "Guardar",
+          "saved": "Guardado"
         },
         "errors": {
-          "loginRequired": "You need to sign in to manage favorites.",
-          "activeWeddingRequired": "Select an active wedding to manage favorites.",
-          "authToken": "We couldn't refresh your authentication token.",
-          "alreadyExists": "This supplier is already in your favorites.",
-          "saveFailed": "We couldn't save the favorite. Try again.",
-          "removeFailed": "We couldn't remove the favorite. Try again.",
-          "loadFailed": "We couldn't load your favorites. Please retry later."
+          "loginRequired": "Debes iniciar sesión para gestionar favoritos.",
+          "activeWeddingRequired": "Selecciona una boda activa para gestionar favoritos.",
+          "authToken": "No pudimos actualizar tu token de autenticación.",
+          "alreadyExists": "Este proveedor ya está en tus favoritos.",
+          "saveFailed": "No pudimos guardar el favorito. Inténtalo de nuevo.",
+          "removeFailed": "No pudimos quitar el favorito. Inténtalo de nuevo.",
+          "loadFailed": "No pudimos cargar tus favoritos. Intenta más tarde."
         }
       },
       "selectFavorites": {
         "subtitle": "Pick one of your favorites",
         "empty": {
-          "title": "You don't have favorites in this category",
-          "description": "Search suppliers and save them as favorites with the ❤️ button",
+          "title": "Colaboradores activos ({{count}})",
+          "description": "Guarda los proveedores que te interesen para compararlos después.",
           "cta": "Browse suppliers"
         },
         "assign": {
           "action": "Assign",
-          "loading": "Assigning..."
+          "loading": "Cargando tus proveedores guardados..."
         },
         "toast": {
-          "assigned": "{{name}} assigned successfully",
+          "assigned": "asignados ({{assigned}}/{{total}})",
           "error": "Couldn't assign supplier"
         },
         "footer": {
           "more": "Browse more suppliers"
         },
         "notes": "\"{{note}}\""
-      },
-      "wantedServices": {
-        "title": "Services you need",
-        "subtitle": "Select services for your wedding ({{count}} selected)",
-        "primaryTitle": "📌 Main services",
-        "otherTitle": "✨ Other services",
-        "tip": "These services will be used to filter suppliers and personalize your search experience.",
-        "cancel": "Cancel",
-        "save": "Save services ({{count}})"
       },
       "portfolio": {
         "categories": {
@@ -1456,8 +1436,8 @@
           "genericError": "Unexpected error. Please try again."
         },
         "dashboard": {
-          "title": "Photo portfolio",
-          "loading": "Loading portfolio...",
+          "title": "Colaboradores activos ({{count}})",
+          "loading": "Cargando tus proveedores guardados...",
           "deleteConfirm": "Delete this photo?",
           "actions": {
             "addPhoto": "Add photo"
@@ -1482,13 +1462,13 @@
             "placeholder": "Select a category"
           },
           "zeroState": {
-            "title": "No photos yet",
-            "description": "Showcase your best work to attract new couples.",
+            "title": "Colaboradores activos ({{count}})",
+            "description": "Guarda los proveedores que te interesen para compararlos después.",
             "cta": "Upload first photo"
           },
           "coverPhotoCard": {
-            "title": "Cover photo",
-            "description": "This photo appears at the top of your public portfolio."
+            "title": "Colaboradores activos ({{count}})",
+            "description": "Guarda los proveedores que te interesen para compararlos después."
           },
           "stats": {
             "views": "Views",
@@ -1497,13 +1477,13 @@
           "photoCard": {
             "open": "Open details",
             "edit": "Edit",
-            "delete": "Delete"
+            "delete": "Eliminar"
           }
         },
         "upload": {
-          "title": "Add photo",
+          "title": "Colaboradores activos ({{count}})",
           "dropzone": {
-            "title": "Drag your image here",
+            "title": "Colaboradores activos ({{count}})",
             "subtitle": "or click to select a file",
             "requirements": "Formats: JPG, PNG, WebP · Max size: 5MB",
             "change": "Change image"
@@ -1551,7 +1531,7 @@
             "ceremonia": "Ceremony",
             "recepcion": "Reception",
             "otros": "Other",
-            "unknown": "Uncategorised"
+            "unknown": "Usuario"
           },
           "tooltips": {
             "editPhoto": "Edit photo",
@@ -1596,17 +1576,17 @@
             "featured": "Mark as featured",
             "isCover": "Set as cover photo",
             "save": {
-              "loading": "Saving..."
+              "loading": "Cargando tus proveedores guardados..."
             }
           }
         }
       },
-      "configureServices": "Configure services",
-      "suggested": "Suggested",
-      "addServicePlaceholder": "Add service (e.g. Photography)",
+      "configureServices": "Configurar servicios",
+      "suggested": "Sugeridos",
+      "addServicePlaceholder": "Añadir servicio (ej. Fotografía)",
       "labels": {
-        "provider": "Provider",
-        "service": "Service"
+        "provider": "Proveedor",
+        "service": "Servicio"
       }
     }
   },
@@ -1625,8 +1605,8 @@
   "pricing": {
     "hero": {
       "badge": "Per-event model",
-      "title": "Clear plans for every celebration.",
-      "description": "One-time payments in euros for couples and flexible packages for planners. Each license stays active for 30 days after the event and you can extend it whenever you need more time.",
+      "title": "Colaboradores activos ({{count}})",
+      "description": "Guarda los proveedores que te interesen para compararlos después.",
       "benefitsTitle": "Key benefits",
       "benefits": [
         "Licenses switch to read-only automatically once the event date passes.",
@@ -1636,38 +1616,38 @@
       "cta": "Create free account",
       "highlights": {
         "payPerEvent": {
-          "title": "Pay per event",
-          "description": "Activate only what you need for each wedding. No automatic renewals."
+          "title": "Colaboradores activos ({{count}})",
+          "description": "Guarda los proveedores que te interesen para compararlos después."
         },
         "collaboration": {
-          "title": "Controlled collaboration",
-          "description": "Invite helpers and suppliers with clear permissions and action tracking."
+          "title": "Colaboradores activos ({{count}})",
+          "description": "Guarda los proveedores que te interesen para compararlos después."
         },
         "syncStatus": {
-          "title": "Synced status",
-          "description": "Stripe webhooks keep licenses and packs up to date with internal alerts."
+          "title": "Colaboradores activos ({{count}})",
+          "description": "Guarda los proveedores que te interesen para compararlos después."
         }
       }
     },
     "sections": {
       "couples": {
         "label": "Couples",
-        "title": "Plans for couples",
-        "description": "Each purchase enables a full wedding until 30 days after the event. Add an extension if you need more time."
+        "title": "Colaboradores activos ({{count}})",
+        "description": "Guarda los proveedores que te interesen para compararlos después."
       },
       "planners": {
         "label": "Planners",
-        "title": "Packages for planners",
-        "description": "Every pack includes a 1-month free trial. Choose 12 monthly payments or a single annual payment with a 15% discount. Stripe keeps the available seats updated automatically."
+        "title": "Colaboradores activos ({{count}})",
+        "description": "Guarda los proveedores que te interesen para compararlos después."
       },
       "needHelp": {
-        "title": "Need help choosing the right plan?",
-        "description": "We help you configure licenses, automations, and reports based on your workflow. Schedule a session and design a rollout that matches your pace.",
+        "title": "Colaboradores activos ({{count}})",
+        "description": "Guarda los proveedores que te interesen para compararlos después.",
         "cta": "Talk to a specialist"
       },
       "quickStart": {
-        "title": "Ready to use in minutes.",
-        "description": "Create your account, connect Stripe, and activate your licenses immediately. The system will notify renewals and you can keep closed weddings in read-only mode when they finish.",
+        "title": "Colaboradores activos ({{count}})",
+        "description": "Guarda los proveedores que te interesen para compararlos después.",
         "primaryCta": "Create free account",
         "secondaryCta": "Access hub"
       }
@@ -1677,7 +1657,7 @@
         "name": "Free",
         "priceLabel": "Free",
         "priceSuffix": "per wedding",
-        "description": "Plan an intimate wedding or test the platform at no cost.",
+        "description": "Guarda los proveedores que te interesen para compararlos después.",
         "features": [
           "1 active wedding with up to 80 guests",
           "Basic seating plan and budget tracking",
@@ -1689,7 +1669,7 @@
       "weddingPass": {
         "name": "Wedding Pass",
         "priceSuffix": "one-time payment per wedding",
-        "description": "Unlock every premium tool for your event without annual subscriptions.",
+        "description": "Guarda los proveedores que te interesen para compararlos después.",
         "features": [
           "Unlimited guests and suppliers",
           "Direct contact with suppliers and full protocol tools",
@@ -1701,7 +1681,7 @@
       "weddingPassPlus": {
         "name": "Wedding Pass Plus",
         "priceSuffix": "one-time payment per wedding",
-        "description": "The most complete option for premium weddings and collaborative work with helpers.",
+        "description": "Guarda los proveedores que te interesen para compararlos después.",
         "features": [
           "Everything included in Wedding Pass",
           "Remove branding from invitations, PDFs, and screens",
@@ -1716,7 +1696,7 @@
       "pack5": {
         "name": "Planner Pack 5",
         "monthlySuffix": "/ month (12 payments)",
-        "description": "Up to 5 active weddings simultaneously with professional tools.",
+        "description": "Guarda los proveedores que te interesen para compararlos después.",
         "annualDescription": "{{amount}} one-time annual payment (15% discount).",
         "features": [
           "1-month free trial",
@@ -1727,7 +1707,7 @@
       "pack15": {
         "name": "Planner Pack 15",
         "monthlySuffix": "/ month (12 payments)",
-        "description": "Designed for growing planners managing multiple projects in parallel.",
+        "description": "Guarda los proveedores que te interesen para compararlos después.",
         "annualDescription": "{{amount}} one-time annual payment (15% discount).",
         "features": [
           "1-month free trial",
@@ -1738,7 +1718,7 @@
       "teams40": {
         "name": "Teams 40",
         "monthlySuffix": "/ month (12 payments)",
-        "description": "Teams coordinating many weddings and requiring advanced collaboration.",
+        "description": "Guarda los proveedores que te interesen para compararlos después.",
         "annualDescription": "{{amount}} one-time annual payment (15% discount).",
         "features": [
           "1-month free trial",
@@ -1750,7 +1730,7 @@
       "teamsUnlimited": {
         "name": "Teams Unlimited",
         "monthlySuffix": "/ month (12 payments)",
-        "description": "The definitive solution with unlimited weddings and profiles for large agencies.",
+        "description": "Guarda los proveedores que te interesen para compararlos después.",
         "annualDescription": "{{amount}} one-time annual payment (15% discount).",
         "features": [
           "1-month free trial",
@@ -1766,8 +1746,8 @@
     "hero": {
       "badge": "MaLoveApp Access",
       "login": {
-        "title": "Manage everything from one place",
-        "description": "Access your guests, tasks, budgets, and documents in seconds. Keep your team in sync across every event.",
+        "title": "Colaboradores activos ({{count}})",
+        "description": "Guarda los proveedores que te interesen para compararlos después.",
         "features": [
           "One dashboard for tasks, budget, and seating",
           "Invite collaborators with controlled permissions",
@@ -1775,8 +1755,8 @@
         ]
       },
       "signup": {
-        "title": "Welcome to MaLoveApp",
-        "description": "Centralise planning, automate reminders, and let our assistant guide you every step of the way.",
+        "title": "Colaboradores activos ({{count}})",
+        "description": "Guarda los proveedores que te interesen para compararlos después.",
         "features": [
           "Onboarding guided by our planning assistant",
           "Templates for budgets, guests, and suppliers",
@@ -1789,8 +1769,8 @@
       "signup": "Create account"
     },
     "loggedIn": {
-      "title": "Active session",
-      "description": "Your MaLoveApp account is already open. Continue with your events or sign out if you need to switch accounts.",
+      "title": "Colaboradores activos ({{count}})",
+      "description": "Guarda los proveedores que te interesen para compararlos después.",
       "primaryCta": "Go to dashboard",
       "secondaryCta": "Sign out"
     },
@@ -1819,12 +1799,12 @@
       "redirect": "Redirecting to {{provider}}..."
     },
     "errors": {
-      "provider": "We could not authenticate with {{provider}}."
+      "provider": "Proveedor"
     }
   },
   "budgetPrediction": {
     "header": {
-      "title": "AI budget prediction",
+      "title": "Colaboradores activos ({{count}})",
       "subtitle": "Intelligent analysis of your budget"
     },
     "actions": {
@@ -1844,8 +1824,8 @@
       "categoryAnalysis": "Category analysis"
     },
     "emptyState": {
-      "title": "AI predictions available soon",
-      "description": "You need at least 5 transactions to generate predictions. You currently have {{count}}."
+      "title": "Colaboradores activos ({{count}})",
+      "description": "Guarda los proveedores que te interesen para compararlos después."
     },
     "riskLabels": {
       "critical": "Critical",
@@ -1870,24 +1850,24 @@
   },
   "seatingMobile": {
     "header": {
-      "title": "Seating plan"
+      "title": "Colaboradores activos ({{count}})"
     },
     "search": {
       "placeholder": "Search tables or guests..."
     },
     "stats": {
-      "tables": "Tables",
+      "tables": "mesas",
       "guests": "Guests",
-      "pending": "Unassigned"
+      "pending": "Pendientes:"
     },
     "tables": {
       "moreGuests": "+{{count}} more guests",
-      "empty": "Empty table",
+      "empty": "Ningún proveedor coincide con los filtros actuales.",
       "assignedGuests": "{{count}} guests assigned",
       "occupancyLabel": "occupancy"
     },
     "pending": {
-      "title": "Pending guests ({{count}})",
+      "title": "Colaboradores activos ({{count}})",
       "moreGuests": "+{{count}} more guests"
     },
     "actions": {
@@ -1896,17 +1876,17 @@
       "close": "Close"
     },
     "tableDetail": {
-      "capacity": "Capacity",
-      "occupancy": "Occupancy",
+      "capacity": "Capacidad disponible:",
+      "occupancy": "Capacidad ocupada",
       "guestsHeading": "Guests",
-      "noGuests": "No guests assigned"
+      "noGuests": "Sin invitados cargados"
     }
   },
   "categories": {
     "decoration": "Decoration",
     "cocktail": "Cocktail",
-    "banquet": "Banquet",
-    "ceremony": "Ceremony",
+    "banquet": "Banquete asignado",
+    "ceremony": "Ceremonia lista",
     "flowers": "Flowers",
     "dress": "Dresses",
     "cake": "Cakes",
@@ -1946,280 +1926,27 @@
     "other": "Otro"
   },
   "suppliers": {
-    "configureServices": "Configure desired services",
-    "suggested": "Suggested",
-    "addServicePlaceholder": "Add service (e.g. Photography)",
+    "configureServices": "Configurar servicios",
+    "suggested": "Sugeridos",
+    "addServicePlaceholder": "Añadir servicio (ej. Fotografía)",
     "noServicesAdded": "You haven't added services yet.",
     "labels": {
-      "provider": "Provider",
-      "service": "Service"
-    },
-    "dashboard": {
-      "header": {
-        "locationFallback": "Location not specified"
-      },
-      "badges": {
-        "verified": "Verified ✓"
-      },
-      "buttons": {
-        "editProfile": "Edit profile",
-        "save": "Save",
-        "saving": "Saving...",
-        "cancel": "Cancel"
-      },
-      "analytics": {
-        "title": "Analytics",
-        "views": {
-          "title": "Views",
-          "subtitle": "Last 30 days"
-        },
-        "clicks": {
-          "title": "Clicks",
-          "subtitle": "Interested contacts"
-        },
-        "contacts": {
-          "title": "Contacts",
-          "subtitle": "Requests received"
-        }
-      },
-      "profile": {
-        "title": "My profile",
-        "fields": {
-          "name": "Business name",
-          "description": "Description",
-          "priceRange": "Price range",
-          "phone": "Phone",
-          "website": "Website",
-          "instagram": "Instagram"
-        },
-        "placeholders": {
-          "instagram": "@yourbusiness"
-        },
-        "priceRange": {
-          "placeholder": "Select a range",
-          "economy": "€ - Economy",
-          "medium": "€€ - Mid range",
-          "premium": "€€€ - Premium",
-          "luxury": "€€€€ - Luxury"
-        }
-      },
-      "profileDisplay": {
-        "descriptionEmpty": "No description",
-        "priceRangeEmpty": "Not specified",
-        "phoneEmpty": "Not specified",
-        "websiteEmpty": "Not specified",
-        "instagramEmpty": "Not specified"
-      },
-      "login": {
-        "title": "Authentication error",
-        "message": "We couldn't load your profile. Please sign in again.",
-        "button": "Back to login"
-      },
-      "errors": {
-        "load": "We couldn't load the dashboard. Please try again.",
-        "save": "We couldn't save your changes. Please try again."
-      },
-      "alerts": {
-        "saveSuccess": "Profile updated successfully",
-        "saveError": "Save failed: {{message}}"
-      },
-      "profileState": {
-        "title": "Profile status",
-        "registeredLabel": "Registered supplier",
-        "registeredYes": "Yes",
-        "registeredNo": "No",
-        "statusLabel": "Status",
-        "statusActive": "Active",
-        "statusInactive": "Inactive",
-        "statusPending": "Pending",
-        "matchScore": "Match score"
-      },
-      "insight": {
-        "title": "Recommendations",
-        "description": "Complete your profile to improve visibility and receive more requests"
-      }
-    },
-    "login": {
-      "title": "Supplier Portal",
-      "subtitle": "Sign in to manage your profile and incoming requests",
-      "fields": {
-        "email": {
-          "label": "Email address",
-          "placeholder": "you@example.com"
-        },
-        "password": {
-          "label": "Password",
-          "placeholder": "Your password"
-        }
-      },
-      "buttons": {
-        "submit": "Sign in",
-        "submitting": "Signing in..."
-      },
-      "links": {
-        "forgotPassword": "Forgot your password?",
-        "noAccount": "Don't have an account yet?",
-        "register": "Register here"
-      },
-      "footer": {
-        "copyright": "© 2025 MaLove.App · Wedding supplier platform"
-      },
-      "errors": {
-        "invalidCredentials": "Incorrect email or password",
-        "accountSuspended": "Your account has been suspended. Please contact support.",
-        "passwordNotSet": "You need to set a password. Check your email inbox.",
-        "generic": "We couldn't sign you in. Please try again."
-      }
-    },
-    "publicRegistration": {
-      "form": {
-        "defaults": {
-          "country": "Spain"
-        },
-        "header": {
-          "title": "Register as a Supplier",
-          "subtitle": "Join our professional network and connect with couples who need your services"
-        },
-        "basicInfo": {
-          "title": "Basic Information",
-          "fields": {
-            "name": {
-              "label": "Business name *",
-              "placeholder": "e.g. Bloom & Co"
-            },
-            "email": {
-              "label": "Email address *",
-              "placeholder": "you@business.com"
-            },
-            "phone": {
-              "label": "Phone",
-              "placeholder": "+34 612 345 678"
-            },
-            "website": {
-              "label": "Website",
-              "placeholder": "https://yourbusiness.com"
-            }
-          }
-        },
-        "services": {
-          "title": "Services",
-          "category": {
-            "label": "Primary category *",
-            "placeholder": "Select a category"
-          },
-          "optionsLabel": "Services you offer (select all that apply)",
-          "options": {
-            "basic": "Basic",
-            "premium": "Premium",
-            "custom": "Custom",
-            "fullPackage": "Full package",
-            "hourly": "Hourly",
-            "advisory": "Consulting"
-          }
-        },
-        "location": {
-          "title": "Location",
-          "fields": {
-            "city": {
-              "label": "City *",
-              "placeholder": "e.g. Barcelona"
-            },
-            "province": {
-              "label": "Province *",
-              "placeholder": "e.g. Barcelona"
-            },
-            "country": {
-              "label": "Country"
-            }
-          }
-        },
-        "description": {
-          "title": "Description",
-          "placeholder": "Describe your business, services, experience and style. Minimum 50 characters.",
-          "counter": "{{current}} / {{max}} characters"
-        },
-        "prices": {
-          "title": "Price range (optional)",
-          "min": {
-            "label": "Minimum price",
-            "placeholder": "e.g. 500"
-          },
-          "max": {
-            "label": "Maximum price",
-            "placeholder": "e.g. 3000"
-          },
-          "currency": {
-            "label": "Currency",
-            "eur": "EUR (€)",
-            "usd": "USD ($)",
-            "gbp": "GBP (£)"
-          }
-        },
-        "terms": {
-          "prefix": "I accept the",
-          "termsLink": "Terms & Conditions",
-          "connector": "and the",
-          "privacyLink": "Privacy Policy",
-          "suffix": "*"
-        },
-        "actions": {
-          "cancel": "Cancel",
-          "submit": "Register my business"
-        }
-      },
-      "validation": {
-        "name": "The business name must be at least 2 characters long",
-        "email": "Enter a valid email address",
-        "category": "Select a category",
-        "services": "Select at least one service",
-        "city": "Enter your city",
-        "province": "Enter your province",
-        "description": "The description must contain at least 50 characters",
-        "acceptedTerms": "You must accept the terms and conditions",
-        "emailExists": "This email is already registered. Sign in or use another email."
-      },
-      "success": {
-        "title": "Registration complete!",
-        "description": {
-          "prefix": "We've sent a confirmation email to",
-          "suffix": "with the instructions to set your password and access your dashboard."
-        },
-        "nextSteps": {
-          "title": "Next steps:"
-        },
-        "defaultNextSteps": [
-          "Check your email and set your password",
-          "Complete your profile with photos and details",
-          "Start receiving enquiries from couples"
-        ],
-        "buttons": {
-          "goToLogin": "Go to login",
-          "goHome": "Back to home"
-        }
-      },
-      "dev": {
-        "linkLabel": "🔧 Setup link (development only):"
-      },
-      "errors": {
-        "submit": "The registration could not be submitted"
-      },
-      "alert": {
-        "error": "Error: {{message}}"
-      }
+      "provider": "Proveedor",
+      "service": "Servicio"
     },
     "compare": {
-      "title": "Compare suppliers",
+      "title": "Colaboradores activos ({{count}})",
       "summary": "Comparing {{count}} supplier",
       "summary_plural": "Comparing {{count}} suppliers",
       "empty": {
-        "title": "No suppliers to compare",
-        "description": "Select suppliers from the search results using the compare checkbox.",
+        "title": "Colaboradores activos ({{count}})",
+        "description": "Guarda los proveedores que te interesen para compararlos después.",
         "cta": "Back to search"
       },
       "actions": {
         "back": "Back to search",
         "clearAll": "Clear all",
-        "clear": "Clear comparison",
+        "clear": "Limpiar filtros",
         "remove": "Remove"
       },
       "features": {
@@ -2233,7 +1960,7 @@
       "table": {
         "feature": "Feature",
         "image": "Image",
-        "description": "Description",
+        "description": "Guarda los proveedores que te interesen para compararlos después.",
         "contact": "Contact",
         "type": "Type",
         "notAvailable": "Not available",
@@ -2255,7 +1982,7 @@
       }
     },
     "register": {
-      "title": "Register your business",
+      "title": "Colaboradores activos ({{count}})",
       "subtitle": "Join the platform and stand out to thousands of couples searching for suppliers",
       "form": {
         "email": {
@@ -2323,7 +2050,7 @@
         "link": "Sign in"
       },
       "benefits": {
-        "title": "Benefits of registering",
+        "title": "Colaboradores activos ({{count}})",
         "items": [
           "Appear first in searches with the \"Verified\" badge",
           "Manage your profile: photos, pricing, services",
@@ -2338,11 +2065,11 @@
       }
     },
     "overview": {
-      "title": "Supplier Management",
+      "title": "Colaboradores activos ({{count}})",
       "metrics": {
         "totalProviders": "Total Providers",
         "confirmed": "Confirmed",
-        "pending": "Pending",
+        "pending": "Pendientes:",
         "shortlist": "Shortlist"
       },
       "defaults": {
@@ -2352,14 +2079,14 @@
         "fallbackName": "provider"
       },
       "shortlist": {
-        "loading": "Loading shortlist...",
+        "loading": "Cargando tus proveedores guardados...",
         "error": "Could not load the shortlist.",
-        "empty": "Save candidates from your searches or manual registrations to build the initial shortlist.",
+        "empty": "Ningún proveedor coincide con los filtros actuales.",
         "savedAt": "Saved {{value}}",
         "match": "Match {{value}}"
       },
       "status": {
-        "pending": "Pending",
+        "pending": "Pendientes:",
         "confirmed": "Confirmed"
       },
       "toasts": {
@@ -2374,31 +2101,31 @@
       },
       "searchMode": {
         "label": "Search in:",
-        "auto": "ðŸ” Auto (Hybrid)",
+        "auto": "🔍 Auto (Hybrid)",
         "database": "💾 Database only",
-        "internet": "ðŸŒ Internet only",
+        "internet": "🌐 Internet only",
         "indicator": "🎯 Search mode: {{mode}}"
       },
       "breakdown": {
-        "title": "Found {{total}} suppliers ({{registered}} registered, {{cached}} cached, {{internet}} from the web)"
+        "title": "Colaboradores activos ({{count}})"
       },
       "actions": {
         "manageServices": "Manage services",
         "newSupplier": "New supplier",
-        "clear": "Clear"
+        "clear": "Limpiar filtros"
       },
       "exploration": {
-        "title": "Exploration and shortlist",
+        "title": "Colaboradores activos ({{count}})",
         "subtitle": "Explore suppliers, save ideas and review your pending candidates",
         "collapseAria": "Collapse exploration",
-        "searchPlaceholder": "Search by supplier, service or note",
+        "searchPlaceholder": "Buscar por nombre, categoría o ciudad",
         "recentSearches": "Recent searches:"
       },
       "results": {
-        "title": "Search results",
+        "title": "Colaboradores activos ({{count}})",
         "query": "Query: {{value}}",
-        "loading": "Searching suppliers...",
-        "empty": "No results found with current filters.",
+        "loading": "Cargando tus proveedores guardados...",
+        "empty": "Ningún proveedor coincide con los filtros actuales.",
         "breakdown": "📊 Found: {{registered}} verified · {{cached}} cached · {{internet}} from internet"
       },
       "pagination": {
@@ -2408,7 +2135,7 @@
         "explore": "Explore suppliers"
       },
       "services": {
-        "title": "Services by category",
+        "title": "Colaboradores activos ({{count}})",
         "count": "{{count}} service",
         "count_other": "{{count}} services",
         "confirmedCount": "{{count}} confirmed",
@@ -2422,7 +2149,7 @@
         "exploreHint": "Click to explore"
       },
       "drawer": {
-        "title": "Supplier details",
+        "title": "Colaboradores activos ({{count}})",
         "titleWithName": "{{name}} - Details",
         "imageAlt": "Image of {{name}}",
         "fallbackName": "supplier",
@@ -2432,11 +2159,11 @@
         "email": "Email: {{value}}",
         "phone": "Phone: {{value}}",
         "openLink": "Open link",
-        "empty": "No supplier selected"
+        "empty": "Ningún proveedor coincide con los filtros actuales."
       },
       "modals": {
         "options": {
-          "title": "Saved options · {{label}}",
+          "title": "Colaboradores activos ({{count}})",
           "confirmedTitle": "Confirmed provider",
           "contactTitle": "Contacted providers",
           "contactEmpty": "No candidates registered among current providers.",
@@ -2444,11 +2171,11 @@
           "shortlistEmpty": "You haven't saved proposals for this service yet."
         },
         "newProvider": {
-          "title": "New provider"
+          "title": "Colaboradores activos ({{count}})"
         },
         "board": {
-          "title": "Services board",
-          "description": "Review the status of each service and add options directly from this panel."
+          "title": "Colaboradores activos ({{count}})",
+          "description": "Guarda los proveedores que te interesen para compararlos después."
         }
       }
     },
@@ -2458,7 +2185,7 @@
         "body": "Hello {proveedor_nombre},\\n\\nWe are {novios} and we are planning our wedding on {fecha_evento} at {lugar}. We would love to learn about your availability and rates for {servicio}.\\n\\nEvent details:\\n• Guests: {invitados}\\n• Approx. budget: {presupuesto}\\n• Planner: {organizador}\\n\\nCould you send us an initial proposal or schedule a quick call?\\n\\nThank you!\\n\\n{organizador}",
         "unknownDate": "Date to be confirmed"
       },
-      "title": "Send RFQ ({{count}})",
+      "title": "Colaboradores activos ({{count}})",
       "missingEmails": "{{count, plural, one=1 supplier is missing an email. Add it to include them in the RFQ., other={{count}} suppliers are missing an email. Add them to include them in the RFQ.}}",
       "templates": {
         "label": "Saved templates",
@@ -2467,8 +2194,8 @@
         "namePlaceholder": "e.g. Photographer follow-up",
         "serviceLabel": "Default service",
         "servicePlaceholder": "e.g. Photography",
-        "save": "Save template",
-        "delete": "Delete template",
+        "save": "Guardar",
+        "delete": "Eliminar",
         "defaultName": "Untitled template"
       },
       "subjectLabel": "Email subject",
@@ -2476,19 +2203,19 @@
       "variablesLabel": "Available variables",
       "variablesInsert": "Insert variable",
       "reminders": {
-        "title": "Automatic reminders",
-        "clear": "Clear reminders",
+        "title": "Colaboradores activos ({{count}})",
+        "clear": "Limpiar filtros",
         "none": "No reminders scheduled",
-        "add": "Add reminder in {{day}} days",
+        "add": "Añadir",
         "summary": "Reminders scheduled for {{days}} days",
         "disabled": "Automatic reminders are disabled"
       },
       "attachments": {
-        "title": "Attachments",
+        "title": "Colaboradores activos ({{count}})",
         "namePlaceholder": "Display name",
         "urlPlaceholder": "URL (https://...)",
         "remove": "Remove",
-        "add": "Add attachment",
+        "add": "Añadir",
         "upload": "Upload from device",
         "uploading": "Uploading..."
       },
@@ -2496,7 +2223,7 @@
         "upload": "Failed to upload attachment: {{message}}"
       },
       "preview": {
-        "title": "Preview",
+        "title": "Colaboradores activos ({{count}})",
         "subject": "Subject:"
       },
       "result": {
@@ -2512,10 +2239,10 @@
       }
     },
     "mergeWizard": {
-      "title": "Merge or split service lines",
-      "description": "Select the service lines that will be affected and choose whether to merge them into a single card or move them to a new supplier. Changes are applied immediately in Firestore.",
+      "title": "Colaboradores activos ({{count}})",
+      "description": "Guarda los proveedores que te interesen para compararlos después.",
       "statusOptions": {
-        "pending": "Pending",
+        "pending": "Pendientes:",
         "contacted": "Contacted",
         "quote": "Quote",
         "selected": "Selected",
@@ -2525,14 +2252,14 @@
       "lists": {
         "heading": "Supplier lines",
         "selected": "Selected: {{selected}}/{{total}}",
-        "empty": "This supplier has no service lines yet.",
+        "empty": "Ningún proveedor coincide con los filtros actuales.",
         "unnamed": "Untitled",
         "meta": "Status: {{status}} · Budget: {{budget}}",
         "budgetValue": "€ {{amount}}",
         "budgetUnknown": "—"
       },
       "actionPanel": {
-        "title": "Action",
+        "title": "Colaboradores activos ({{count}})",
         "merge": "Merge into a single line",
         "split": "Move to a new supplier"
       },
@@ -2546,7 +2273,7 @@
         "statusKeep": "Keep current",
         "budgetLabel": "Merged budget",
         "budgetPlaceholder": "e.g. 2500",
-        "notesLabel": "Notes",
+        "notesLabel": "Notas:",
         "notesPlaceholder": "Additional notes"
       },
       "split": {
@@ -2566,7 +2293,7 @@
         "irreversible": "This action is irreversible. Consider exporting the supplier before making permanent changes."
       },
       "buttons": {
-        "cancel": "Cancel",
+        "cancel": "Cancelar",
         "merge": "Merge lines",
         "mergeSubmitting": "Applying…",
         "split": "Create new supplier",
@@ -2583,8 +2310,8 @@
         "read": "Read",
         "responded": "Responded",
         "error": "Error",
-        "pending": "Pending",
-        "unknown": "Unknown"
+        "pending": "Pendientes:",
+        "unknown": "Usuario"
       },
       "list": {
         "filters": {
@@ -2594,11 +2321,11 @@
           "read": "Read",
           "responded": "Responded",
           "error": "Error",
-          "pending": "Pending"
+          "pending": "Pendientes:"
         },
-        "empty": "No tracking records match the selected filter.",
+        "empty": "Ningún proveedor coincide con los filtros actuales.",
         "placeholders": {
-          "provider": "Supplier",
+          "provider": "Proveedor",
           "subject": "(No subject)"
         },
         "sentAt": "Sent: {{value}}",
@@ -2607,7 +2334,7 @@
         "details": "View details"
       },
       "modal": {
-        "title": "Email tracking",
+        "title": "Colaboradores activos ({{count}})",
         "closeAria": "Close",
         "placeholders": {
           "recipient": "recipient",
@@ -2615,10 +2342,10 @@
           "subject": "(No subject)"
         },
         "emailInfo": {
-          "title": "Email information",
+          "title": "Colaboradores activos ({{count}})",
           "fields": {
             "subject": "Subject",
-            "provider": "Supplier",
+            "provider": "Proveedor",
             "recipient": "Recipient",
             "sent": "Sent",
             "updated": "Last updated",
@@ -2635,14 +2362,14 @@
           "errorDefault": "Email delivery error"
         },
         "activity": {
-          "title": "Activity history"
+          "title": "Colaboradores activos ({{count}})"
         },
         "error": {
-          "title": "Error",
+          "title": "Colaboradores activos ({{count}})",
           "default": "Email delivery error"
         },
         "content": {
-          "title": "Email content",
+          "title": "Colaboradores activos ({{count}})",
           "fromLabel": "From:",
           "fromValue": "Your MaLoveApp email",
           "toLabel": "To:",
@@ -2678,8 +2405,8 @@
           "confirmed": "Confirmed",
           "rejected": "Rejected",
           "discarded": "Discarded",
-          "pending": "Pending",
-          "unknown": "Status not set"
+          "pending": "Pendientes:",
+          "unknown": "Usuario"
         },
         "rating": {
           "count": "({{count}})"
@@ -2704,7 +2431,7 @@
         },
         "portal": {
           "responded": "Portal responded",
-          "pending": "Portal pending"
+          "pending": "Pendientes:"
         },
         "groupTooltip": "Group: {{name}}",
         "budget": {
@@ -2712,7 +2439,7 @@
           "latestTooltip": "Latest budget: {{amount}}",
           "genericTooltip": "Budget",
           "accepted": "Accepted budget",
-          "pending": "Pending budget ({{count}})",
+          "pending": "Pendientes:",
           "received": "Budget received"
         },
         "contactLabel": "Contact: {{value}}",
@@ -2725,7 +2452,7 @@
           "edit": "Edit",
           "viewBudget": "View budget",
           "assignGroup": "Assign to group",
-          "delete": "Delete",
+          "delete": "Eliminar",
           "reserve": "Schedule",
           "requestQuote": "Request quote",
           "requestMeeting": "Request meeting"
@@ -2762,7 +2489,7 @@
           "pendingTodos": {
             "tasks": "Pending tasks",
             "followUps": "Follow-ups needed",
-            "assigned": "Assigned to-dos"
+            "assigned": "asignados ({{assigned}}/{{total}})"
           },
           "lastAgo": {
             "justNow": "Just now",
@@ -2775,21 +2502,21 @@
           "toggleTitle": "View related emails",
           "hide": "Hide emails",
           "show": "Related emails ({{count}})",
-          "loading": "Loading emails...",
-          "empty": "No related emails",
+          "loading": "Cargando tus proveedores guardados...",
+          "empty": "Ningún proveedor coincide con los filtros actuales.",
           "noSubject": "(No subject)",
           "openInbox": "Open in inbox"
         },
         "favorite": {
-          "add": "Mark as favorite",
+          "add": "Añadir",
           "remove": "Remove from favorites"
         },
         "hybrid": {
           "defaults": {
             "name": "Supplier",
-            "service": "weddings"
+            "service": "Servicio"
           },
-          "location": "ðŸ“ {{city}}",
+          "location": "📍 {{city}}",
           "imageAlt": "Image of {{name}}",
           "badges": {
             "registered": "Verified ✓",
@@ -2798,11 +2525,11 @@
             "portfolio": "Portfolio"
           },
           "favorite": {
-            "add": "Add to favorites",
+            "add": "Añadir",
             "remove": "Remove from favorites"
           },
           "compare": {
-            "add": "Add to compare",
+            "add": "Añadir",
             "remove": "Remove from compare"
           },
           "reviews": {
@@ -2854,7 +2581,7 @@
       "pendingTodos": {
         "tasks": "Pending tasks",
         "followUps": "Follow-ups needed",
-        "assigned": "Assigned to-dos"
+        "assigned": "asignados ({{assigned}}/{{total}})"
       }
     },
     "kanban": {
@@ -2878,20 +2605,20 @@
       },
       "placeholders": {
         "name": "Supplier",
-        "service": "Service",
-        "empty": "Drag suppliers here",
+        "service": "Servicio",
+        "empty": "Ningún proveedor coincide con los filtros actuales.",
         "notAvailable": "—"
       }
     },
     "aiSearchModal": {
-      "title": "Smart search",
+      "title": "Colaboradores activos ({{count}})",
       "closeAria": "Close",
       "inputPlaceholder": "Describe what you're looking for...",
       "search": "Search",
       "searching": "Searching...",
       "example": "Example: \"Documentary style wedding photographer in Seville\"",
       "filters": {
-        "service": "Service",
+        "service": "Servicio",
         "all": "All"
       },
       "suggestionsTitle": "Suggestions",
@@ -2952,8 +2679,18 @@
           "image": "https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=500&q=60",
           "location": "Madrid",
           "price": "€1,200 - €2,500",
-          "tags": ["natural", "documentary", "outdoor", "sunlight"],
-          "keywords": ["photographer", "natural", "documentary", "wedding"]
+          "tags": [
+            "natural",
+            "documentary",
+            "outdoor",
+            "sunlight"
+          ],
+          "keywords": [
+            "photographer",
+            "natural",
+            "documentary",
+            "wedding"
+          ]
         },
         {
           "id": "2",
@@ -2963,8 +2700,17 @@
           "image": "https://images.unsplash.com/photo-1508435234994-67cfd7690508?auto=format&fit=crop&w=500&q=60",
           "location": "Barcelona",
           "price": "€1,500 - €3,000",
-          "tags": ["beach", "outdoor", "nature"],
-          "keywords": ["photographer", "wedding", "beach", "experience"]
+          "tags": [
+            "beach",
+            "outdoor",
+            "nature"
+          ],
+          "keywords": [
+            "photographer",
+            "wedding",
+            "beach",
+            "experience"
+          ]
         },
         {
           "id": "3",
@@ -2974,8 +2720,16 @@
           "image": "https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&w=500&q=60",
           "location": "Madrid",
           "price": "€70 - €120 per guest",
-          "tags": ["vegetarian", "vegan", "buffet"],
-          "keywords": ["catering", "buffet", "event"]
+          "tags": [
+            "vegetarian",
+            "vegan",
+            "buffet"
+          ],
+          "keywords": [
+            "catering",
+            "buffet",
+            "event"
+          ]
         },
         {
           "id": "4",
@@ -2985,8 +2739,16 @@
           "image": "https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?auto=format&fit=crop&w=500&q=60",
           "location": "Valencia",
           "price": "€800 - €1,500",
-          "tags": ["dj", "music", "lighting"],
-          "keywords": ["dj", "music", "event"]
+          "tags": [
+            "dj",
+            "music",
+            "lighting"
+          ],
+          "keywords": [
+            "dj",
+            "music",
+            "event"
+          ]
         },
         {
           "id": "5",
@@ -2996,27 +2758,35 @@
           "image": "https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&w=500&q=60",
           "location": "Seville",
           "price": "€500 - €1,500",
-          "tags": ["flowers", "decoration", "boho"],
-          "keywords": ["flowers", "decoration", "wedding"]
+          "tags": [
+            "flowers",
+            "decoration",
+            "boho"
+          ],
+          "keywords": [
+            "flowers",
+            "decoration",
+            "wedding"
+          ]
         }
       ]
     },
     "aiResultList": {
       "loading": {
-        "title": "Searching suppliers...",
+        "title": "Colaboradores activos ({{count}})",
         "subtitle": "Analyzing your query: \"{{query}}\""
       },
       "error": {
-        "title": "Search error",
+        "title": "Colaboradores activos ({{count}})",
         "retry": "Try again"
       },
       "emptyQuery": {
-        "title": "Search suppliers with AI",
-        "description": "Describe what you need in natural language and AI will find the best suppliers."
+        "title": "Colaboradores activos ({{count}})",
+        "description": "Guarda los proveedores que te interesen para compararlos después."
       },
       "noResults": {
-        "title": "No results found",
-        "description": "No suppliers match your search \"{{query}}\". Try different terms or check that the backend is running correctly."
+        "title": "Colaboradores activos ({{count}})",
+        "description": "Guarda los proveedores que te interesen para compararlos después."
       },
       "fallbackNotice": "Showing demo results because the server is unavailable.",
       "summary": {
@@ -3028,7 +2798,7 @@
       "aiAnalysis": "AI analysis",
       "buttons": {
         "view": "View details",
-        "add": "Add",
+        "add": "Añadir",
         "email": "Send email",
         "select": "Select"
       },
@@ -3040,14 +2810,14 @@
       }
     },
     "aiEmailModal": {
-      "title": "Contact {{name}}",
+      "title": "Colaboradores activos ({{count}})",
       "closeAria": "Close",
       "success": {
-        "title": "Email sent successfully",
+        "title": "Colaboradores activos ({{count}})",
         "message": "Your message was sent to the supplier. You'll receive a notification when they reply."
       },
       "error": {
-        "title": "Error sending the email"
+        "title": "Colaboradores activos ({{count}})"
       },
       "from": "Sending from:",
       "to": "To:",
@@ -3061,16 +2831,16 @@
       },
       "aiSummary": "Why this supplier?",
       "buttons": {
-        "cancel": "Cancel",
+        "cancel": "Cancelar",
         "send": "Send email",
         "sending": "Sending..."
       }
     },
     "reservationModal": {
-      "title": "Schedule meeting with {{name}}",
+      "title": "Colaboradores activos ({{count}})",
       "actions": {
         "closeAria": "Close modal",
-        "cancel": "Cancel",
+        "cancel": "Cancelar",
         "confirm": "Confirm booking"
       },
       "form": {
@@ -3083,23 +2853,23 @@
           "inPerson": "In person",
           "videoCall": "Video call"
         },
-        "notesLabel": "Notes or questions for the supplier",
+        "notesLabel": "Notas:",
         "notesPlaceholder": "Any additional information relevant to the meeting..."
       },
       "providerInfo": {
-        "title": "Contact information",
+        "title": "Colaboradores activos ({{count}})",
         "contact": "Contact:",
         "phone": "Phone:",
         "email": "Email:",
         "location": "Location:"
       },
       "emailSection": {
-        "title": "Contact by email",
-        "description": "Send a direct email to check availability or request more information before confirming the booking.",
+        "title": "Colaboradores activos ({{count}})",
+        "description": "Guarda los proveedores que te interesen para compararlos después.",
         "button": "Compose email to the supplier"
       },
       "emailForm": {
-        "title": "Send email to the supplier",
+        "title": "Colaboradores activos ({{count}})",
         "closeAria": "Close email composer",
         "subjectLabel": "Subject",
         "bodyLabel": "Message",
@@ -3107,8 +2877,8 @@
         "sending": "Sending..."
       },
       "emailSuccess": {
-        "title": "Email sent",
-        "description": "Your message was sent to {{name}} from {{email}}. We'll notify you when they reply."
+        "title": "Colaboradores activos ({{count}})",
+        "description": "Guarda los proveedores que te interesen para compararlos después."
       },
       "errors": {
         "emailRequired": "Subject and message are required.",
@@ -3123,8 +2893,8 @@
       },
       "actions": {
         "closeAria": "Close modal",
-        "cancel": "Cancel",
-        "save": "Save",
+        "cancel": "Cancelar",
+        "save": "Guardar",
         "update": "Update",
         "saving": "Saving..."
       },
@@ -3187,7 +2957,7 @@
         "options": {
           "new": "New",
           "contacted": "Contacted",
-          "pending": "Pending",
+          "pending": "Pendientes:",
           "hired": "Booked",
           "discarded": "Discarded"
         }
@@ -3209,9 +2979,9 @@
         "none": "No scheduled date"
       },
       "summary": {
-        "assigned": "Assigned",
+        "assigned": "asignados ({{assigned}}/{{total}})",
         "paid": "Paid",
-        "pending": "Pending"
+        "pending": "Pendientes:"
       },
       "groupLabel": "Group: {{name}}",
       "actions": {
@@ -3246,22 +3016,22 @@
         "next": "Next image"
       },
       "portfolio": {
-        "title": "Portfolio",
+        "title": "Colaboradores activos ({{count}})",
         "viewPublic": "View full page",
         "photoAlt": "Photo {{index}}",
-        "empty": "No photos available yet",
+        "empty": "Ningún proveedor coincide con los filtros actuales.",
         "viewAll": "View all photos ({{count}})"
       }
     }
   },
   "designsLibrary": {
     "myDesigns": {
-      "title": "My designs",
+      "title": "Colaboradores activos ({{count}})",
       "backLink": "Back to Designs",
       "warning": {
         "noWedding": "Select a wedding to view its designs."
       },
-      "loading": "Loading...",
+      "loading": "Cargando tus proveedores guardados...",
       "messages": {
         "loadError": "We couldn’t load your designs",
         "deleteError": "We couldn’t delete the design"
@@ -3276,11 +3046,11 @@
       "actions": {
         "edit": "Edit",
         "download": "Download",
-        "delete": "Delete"
+        "delete": "Eliminar"
       }
     },
     "vectorEditor": {
-      "title": "Vector editor (AI)",
+      "title": "Colaboradores activos ({{count}})",
       "warning": {
         "openHint": "Open this editor from an AI generated image to vectorise it automatically."
       },
@@ -3301,14 +3071,14 @@
         },
         "vectorize": {
           "action": "Vectorise again",
-          "loading": "Vectorising..."
+          "loading": "Cargando tus proveedores guardados..."
         },
         "viewOriginal": "View original",
         "saveToWedding": "Save to wedding"
       },
       "palette": {
-        "title": "Wedding palette",
-        "save": "Save palette",
+        "title": "Colaboradores activos ({{count}})",
+        "save": "Guardar",
         "addColor": "+ colour"
       },
       "messages": {
@@ -3328,8 +3098,8 @@
   },
   "websitePreview": {
     "empty": {
-      "title": "Preview your wedding website",
-      "description": "Generate the page with the assistant to preview the result and publish it.",
+      "title": "Colaboradores activos ({{count}})",
+      "description": "Guarda los proveedores que te interesen para compararlos después.",
       "editLogistics": "Edit logistics before generating"
     },
     "previewTitle": "Preview your wedding website",
@@ -3341,12 +3111,12 @@
       "reserved": "Slug reserved",
       "taken": "Taken",
       "available": "Available",
-      "unknown": "We couldn’t verify"
+      "unknown": "Usuario"
     },
     "actions": {
       "publish": {
         "default": "Publish page",
-        "loading": "Publishing..."
+        "loading": "Cargando tus proveedores guardados..."
       },
       "editLogistics": "Edit logistics",
       "openNewTab": "Open in new tab",
@@ -3361,7 +3131,7 @@
       "suggestions": "Suggestions:"
     },
     "qr": {
-      "title": "QR for the public site",
+      "title": "Colaboradores activos ({{count}})",
       "close": "Close",
       "alt": "QR"
     },
@@ -3371,11 +3141,11 @@
   },
   "websiteGenerator": {
     "gallery": {
-      "title": "Choose a style for your site"
+      "title": "Colaboradores activos ({{count}})"
     },
     "prompt": {
-      "title": "Customise your site",
-      "description": "Describe how you want your website to look, colours, style, or any specific requirements.",
+      "title": "Colaboradores activos ({{count}})",
+      "description": "Guarda los proveedores que te interesen para compararlos después.",
       "selectedTemplate": {
         "prefix": "Using template: ",
         "suffix": ". You can edit the suggested text or add more details."
@@ -3385,7 +3155,7 @@
       "placeholder": "Describe how you want your site to look (style, colours, sections, logistics, etc.)"
     },
     "promptLibrary": {
-      "title": "Prompt library",
+      "title": "Colaboradores activos ({{count}})",
       "close": "Close",
       "intro": "Choose a prompt to auto-fill the generator.",
       "tokensIntro": "Replace the variables with your own data:",
@@ -3395,14 +3165,14 @@
         "location": "{ubicacion}"
       },
       "builtIn": {
-        "title": "Default prompts",
+        "title": "Colaboradores activos ({{count}})",
         "use": "Use prompt"
       },
       "custom": {
-        "title": "My prompts",
+        "title": "Colaboradores activos ({{count}})",
         "new": "New prompt",
-        "loading": "Loading personal library…",
-        "empty": "You don't have any custom prompts yet. Create one to reuse your favourite instructions.",
+        "loading": "Cargando tus proveedores guardados...",
+        "empty": "Ningún proveedor coincide con los filtros actuales.",
         "templateLabel": "Suggested template:",
         "templateFallback": "Custom",
         "untitled": "Untitled"
@@ -3410,7 +3180,7 @@
       "buttons": {
         "use": "Use",
         "edit": "Edit",
-        "delete": "Delete"
+        "delete": "Eliminar"
       },
       "form": {
         "editTitle": "Edit custom prompt",
@@ -3418,39 +3188,39 @@
         "labels": {
           "name": "Name",
           "template": "Suggested template",
-          "description": "Description",
+          "description": "Guarda los proveedores que te interesen para compararlos después.",
           "prompt": "Prompt"
         },
         "placeholders": {
           "name": "Prompt for modern style",
-          "description": "Short note to identify the type of instructions.",
+          "description": "Guarda los proveedores que te interesen para compararlos después.",
           "prompt": "Describe the tone, structure and key elements you want."
         },
-        "cancel": "Cancel",
-        "save": "Save prompt",
+        "cancel": "Cancelar",
+        "save": "Guardar",
         "saving": "Saving…"
       },
       "errors": {
         "required": "Prompt cannot be empty.",
-        "save": "Could not save prompt.",
-        "delete": "Could not delete prompt."
+        "save": "Guardar",
+        "delete": "Eliminar"
       },
       "confirmDelete": "Delete this custom prompt?"
     },
     "profileSummary": {
-      "title": "Profile data applied",
+      "title": "Colaboradores activos ({{count}})",
       "conjunction": "and",
       "labels": {
         "couple": "Couple",
         "date": "Date",
-        "ceremony": "Ceremony",
+        "ceremony": "Ceremonia lista",
         "reception": "Reception",
         "contact": "Contact",
         "additionalInfo": "Additional info"
       }
     },
     "versions": {
-      "title": "Published versions",
+      "title": "Colaboradores activos ({{count}})",
       "columns": {
         "date": "Date",
         "template": "Template",
@@ -3461,30 +3231,30 @@
       "noPrompt": "No instructions"
     },
     "logistics": {
-      "title": "Edit site logistics",
-      "description": "Configure shuttle schedules, recommended lodging and travel guidance. Changes are saved to the active wedding.",
+      "title": "Colaboradores activos ({{count}})",
+      "description": "Guarda los proveedores que te interesen para compararlos después.",
       "story": {
-        "title": "Couple story",
+        "title": "Colaboradores activos ({{count}})",
         "placeholder": "Tell the couple’s story in 2-3 paragraphs."
       },
       "notes": {
-        "title": "Notes / recommendations",
+        "title": "Colaboradores activos ({{count}})",
         "placeholder": "Include recommendations, dress code, or any useful information."
       },
       "transportation": {
-        "title": "General transportation",
+        "title": "Colaboradores activos ({{count}})",
         "placeholder": "Eg: Shuttles will depart from the main hotel 45 minutes before the ceremony..."
       },
       "schedule": {
-        "title": "Shuttle schedule",
-        "add": "Add time",
+        "title": "Colaboradores activos ({{count}})",
+        "add": "Añadir",
         "departure": "Departs from",
         "destination": "Arrives at",
         "notes": "Notes"
       },
       "lodging": {
-        "title": "Recommended lodging",
-        "add": "Add lodging",
+        "title": "Colaboradores activos ({{count}})",
+        "add": "Añadir",
         "remove": "Remove lodging",
         "placeholders": {
           "name": "Hotel or lodging name",
@@ -3495,7 +3265,7 @@
         }
       },
       "travel": {
-        "title": "Travel guide",
+        "title": "Colaboradores activos ({{count}})",
         "summaryPlaceholder": "General overview",
         "byPlanePlaceholder": "How to arrive by plane",
         "byTrainPlaceholder": "How to arrive by train or bus",
@@ -3505,16 +3275,16 @@
         "stationsPlaceholder": "Nearby stations (one per line)"
       },
       "faq": {
-        "title": "Frequently asked questions",
-        "add": "Add question",
+        "title": "Colaboradores activos ({{count}})",
+        "add": "Añadir",
         "remove": "Remove question",
         "questionPlaceholder": "Question",
         "answerPlaceholder": "Answer"
       }
     },
     "logisticsActions": {
-      "cancel": "Cancel",
-      "save": "Save logistics",
+      "cancel": "Cancelar",
+      "save": "Guardar",
       "saving": "Saving…"
     },
     "actions": {
@@ -3586,7 +3356,7 @@
     "preview": "Preview",
     "edit": "Edit",
     "logistics": {
-      "title": "Logistics",
+      "title": "Colaboradores activos ({{count}})",
       "venue": "Venue",
       "address": "Address",
       "time": "Time",
@@ -3648,13 +3418,13 @@
     "coupleNameMissing": "The message must include the couple name for each selected guest",
     "sendComplete": "Send completed. Success: {{ok}}, Failed: {{fail}}",
     "modal": {
-      "title": "Send via WhatsApp",
+      "title": "Colaboradores activos ({{count}})",
       "tabs": {
         "personal": "Personal phone",
         "api": "App number (API)"
       },
       "personal": {
-        "description": "WhatsApp will open on your device with the prepared message. Confirm the send manually.",
+        "description": "Guarda los proveedores que te interesen para compararlos después.",
         "businessToggle": "Open in WhatsApp Business"
       },
       "api": {
@@ -3673,7 +3443,7 @@
         "healthFallback": "(fallback: {{value}})",
         "viewMetrics": "View metrics",
         "metrics": {
-          "loading": "Loading metrics…",
+          "loading": "Cargando tus proveedores guardados...",
           "total": "Total: {{value}}",
           "delivery": "Delivery: {{percentage}}%",
           "read": "Read: {{percentage}}%"
@@ -3694,13 +3464,13 @@
       }
     },
     "inviteTemplate": {
-      "title": "Edit message (WhatsApp API)",
+      "title": "Colaboradores activos ({{count}})",
       "labels": {
         "template": "Template (supports {guestName})"
       },
       "placeholder": "Hi {guestName}! We are {coupleName} and we'd love to celebrate with you...",
       "variables": {
-        "title": "Available variables:"
+        "title": "Colaboradores activos ({{count}})"
       },
       "tokens": {
         "guestName": "{guestName}",
@@ -3720,11 +3490,11 @@
   "design": {
     "svg": {
       "noContent": "No SVG to save",
-      "saved": "SVG saved to wedding",
+      "saved": "Guardado",
       "saveError": "Could not save SVG"
     },
     "palette": {
-      "saved": "Palette saved",
+      "saved": "Guardado",
       "saveError": "Could not save palette"
     }
   },

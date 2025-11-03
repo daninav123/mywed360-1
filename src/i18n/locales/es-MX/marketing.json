@@ -1,25 +1,40 @@
 {
+  "nav": {
+    "home": "Inicio",
+    "app": "La App",
+    "pricing": "Precios",
+    "login": "Iniciar sesión / Registro",
+    "loginShort": "Iniciar sesión",
+    "signupShort": "Crear cuenta",
+    "plans": "Planes",
+    "accessCenter": "Centro de acceso",
+    "contact": "Contacto",
+    "legal": "Legal"
+  },
+  "common": {
+    "copyright": "© {year} MaLove.App. Todos los derechos reservados.",
+    "logoAlt": "Logo MaLove.App",
+    "contactLabel": "Contacto MaLove.App"
+  },
   "marketing": {
     "landing": {
       "hero": {
-        "title": "Organiza la boda perfecta",
-        "subtitle": "La plataforma todo en uno para bodas",
-        "cta": "Comienza gratis",
         "brandLabel": "MaLove.App",
         "logoAlt": "Logotipo de MaLove.App",
-        "badge": "Plataforma integral para planificar bodas",
+        "badge": "Plataforma todo en uno para planear bodas",
+        "title": "Coordina tu boda soñada en menos tiempo con herramientas profesionales listas para tu equipo.",
         "description": [
-          "MaLove.App unifica la planificación, las finanzas, la comunicación y el diseño en un solo espacio de trabajo.",
-          "Simplifica tus tareas diarias, involucra a los proveedores y brinda a cada invitado una experiencia memorable."
+          "MaLove.App combina planificación, finanzas, comunicación y diseño en un espacio centralizado.",
+          "Simplifica tareas diarias, involucra a proveedores y ofrece a tus invitados una experiencia memorable."
         ],
         "actions": {
-          "primary": "Comenzar gratis",
-          "secondary": "Descubre todo lo que incluye la app"
+          "primary": "Empezar gratis",
+          "secondary": "Ver todo lo que incluye la app"
         },
         "highlights": [
           {
             "value": "360°",
-            "label": "Visibilidad total del evento"
+            "label": "Visión integral del evento"
           },
           {
             "value": "+50",
@@ -33,7 +48,7 @@
         "widget": {
           "summaryLabel": "Resumen general",
           "eventName": "Boda Valeria & Tomás",
-          "growth": "+18 % esta semana",
+          "growth": "+18% semana",
           "confirmedGuests": {
             "label": "Invitados confirmados",
             "value": "132"
@@ -44,63 +59,56 @@
             "pendingInvoices": "4 facturas pendientes"
           },
           "tasks": {
-            "label": "Tareas críticas de la semana",
+            "label": "Tareas críticas esta semana",
             "items": [
               {
                 "day": "21",
-                "text": "Confirma la degustación del menú y envía comentarios al catering."
+                "text": "Confirmar degustación del menú y enviar feedback al catering."
               },
               {
                 "day": "22",
-                "text": "Diseña el plano VIP de mesas y compártelo con protocolo."
+                "text": "Generar plano de mesas para invitados VIP y compartir con protocolo."
               }
             ]
           },
           "assistant": {
             "label": "Asistente MaLove.App",
-            "message": "\"Tu cronograma está completado al 82 %. Envía el recordatorio de hospedaje antes del lunes y confirma a los proveedores restantes.\""
+            "message": "\"Tu cronograma está en 82 %. Recomiendo enviar el recordatorio de alojamiento antes del lunes y confirmar proveedores restantes.\""
           }
         }
       },
-      "features": {
-        "title": "Todo lo que necesitas",
-        "guests": "Gestión de invitados",
-        "finance": "Control financiero",
-        "tasks": "Organización de tareas",
-        "seating": "Plan de mesas"
-      },
       "modules": {
         "title": "Todo lo que necesitas en un solo lugar",
-        "description": "MaLove.App agiliza la logística con módulos colaborativos para organizadores, proveedores e invitados.",
+        "description": "MaLove.App simplifica la logística con módulos colaborativos listos para organizadores, proveedores e invitados.",
         "items": [
           {
             "title": "Gestión integral de invitados",
-            "description": "Centraliza confirmaciones, mesas y preferencias con información siempre sincronizada."
+            "description": "Centraliza confirmaciones, mesas y preferencias en un único lugar con información siempre sincronizada."
           },
           {
-            "title": "Control financiero",
-            "description": "Da seguimiento a presupuestos, pagos y contratos con recordatorios inteligentes y reportes claros."
+            "title": "Finanzas con control total",
+            "description": "Sigue presupuesto, pagos y contratos con recordatorios automáticos y reportes claros para tu equipo."
           },
           {
-            "title": "Diseño y comunicación",
-            "description": "Sitio web, invitaciones y campañas de correo listas para enviar desde un mismo flujo."
+            "title": "Diseños y comunicación",
+            "description": "Invitaciones, emails y sitio web de boda listos para compartir desde un mismo flujo de trabajo."
           }
         ]
       },
       "planner": {
         "badge": "Diseñado para organizadores",
         "title": "Control total de tu cartera de eventos sin hojas de cálculo.",
-        "description": "MaLove.App facilita la gestión de múltiples bodas con tableros, plantillas reutilizables y reportes exportables. Coordina a tu equipo y mantente un paso adelante con una sola plataforma.",
+        "description": "MaLove.App facilita la gestión de múltiples bodas con paneles, plantillas reutilizables y reportes exportables para tu agencia. Organiza a tu equipo y mantente un paso adelante con una sola plataforma.",
         "highlights": [
           {
             "key": "portfolio",
-            "title": "Portafolio multievento",
-            "description": "Gestiona eventos simultáneos con tableros independientes. Cambia de boda en un clic sin perder contexto."
+            "title": "Portafolio multi boda",
+            "description": "Gestiona eventos simultáneos con paneles independientes. Cambia de boda en un clic sin perder el contexto."
           },
           {
             "key": "kits",
-            "title": "Kits reutilizables",
-            "description": "Duplica checklists, presupuestos y plantillas de comunicación para replicar tus mejores flujos en segundos."
+            "title": "Kits repetibles",
+            "description": "Duplica checklists, presupuestos y plantillas de comunicación para replicar tus flujos favoritos en segundos."
           },
           {
             "key": "alerts",
@@ -115,9 +123,9 @@
           "portfolioBadge": "2 nuevas este mes",
           "statusLabel": "Estado de clientes",
           "statusItems": [
-            "⬢ Ana & Diego – cronograma: 92 %",
-            "⬢ Laura & Marco – pagos: 3 facturas pendientes",
-            "⬢ Carolina & Javier – invitados: 156 confirmados"
+            "⬢ Ana & Diego - cronograma: 92 %",
+            "⬢ Laura & Marco - pagos: 3 facturas pendientes",
+            "⬢ Carolina & Javier - invitados: 156 confirmados"
           ],
           "performanceLabel": "Rendimiento mensual",
           "performanceNote": "Tiempo promedio por boda: 38 % menos que el año pasado."
@@ -126,11 +134,11 @@
       "benefits": {
         "badge": "Beneficios clave",
         "title": "Una operación cuidada de principio a fin",
-        "description": "Pensada para organizadores que necesitan visibilidad y parejas que buscan tranquilidad. MaLove.App automatiza tareas repetitivas y mantiene a todos alineados.",
+        "description": "Diseñada para organizadores que necesitan visibilidad y parejas que buscan tranquilidad. MaLove.App automatiza tareas repetitivas y mantiene a todos alineados.",
         "items": {
           "timelines": {
-            "title": "Cronogramas bajo control",
-            "description": "Listas dinámicas, recordatorios inteligentes y agendas compartibles para tu equipo."
+            "title": "Tiempos bajo control",
+            "description": "Listas de verificación dinámicas, recordatorios inteligentes y cronologías listas para compartir con tu equipo."
           },
           "collaboration": {
             "title": "Colaboración real",
@@ -138,28 +146,28 @@
           },
           "branding": {
             "title": "Diseño consistente",
-            "description": "Sitio web, invitaciones y comunicaciones con tu branding en minutos."
+            "description": "Sitio web de boda, invitaciones y comunicaciones con tu branding en minutos."
           },
           "security": {
-            "title": "Datos protegidos",
-            "description": "Infraestructura en la nube y permisos granulares para resguardar contratos, pagos y contactos."
+            "title": "Datos seguros",
+            "description": "Infraestructura cloud y permisos granulares para resguardar contratos, pagos y contactos."
           }
         }
       },
       "stories": {
         "badge": "Historias reales",
         "title": "MaLove.App impulsa a organizadores y parejas alrededor del mundo",
-        "description": "Más de 12 mil bodas se gestionan con MaLove.App. Cada equipo aprovecha automatizaciones, insights y plantillas para dedicar más tiempo a la creatividad.",
+        "description": "Más de 12 mil bodas se gestionan en MaLove.App. Cada equipo aprovecha automatizaciones, insights y plantillas para dedicar más tiempo a la creatividad.",
         "testimonials": [
           {
-            "quote": "Integramos MaLove.App a nuestro proceso y ahora compartimos tableros con proveedores clave. El equipo llega preparado a cada reunión.",
+            "quote": "Integramos MaLove.App con nuestro proceso y ahora disponemos de paneles compartidos con proveedores clave. El equipo llega a cada reunión preparado.",
             "name": "Martina R.",
-            "role": "Organizadora boutique en Madrid"
+            "role": "Organizador/a boutique en Madrid"
           },
           {
-            "quote": "Como pareja necesitábamos claridad. Los recordatorios y el portal de invitados nos ayudaron a responder rápido y sin correos duplicados.",
+            "quote": "Como pareja necesitábamos claridad. Los recordatorios y la web de invitados nos permitieron responder rápido y sin correos duplicados.",
             "name": "David y Sofía",
-            "role": "Celebración de 250 invitados, Bogotá"
+            "role": "Evento 250 invitados, Bogotá"
           }
         ],
         "trust": {
@@ -174,57 +182,50 @@
         "items": [
           {
             "question": "¿Puedo probar MaLove.App gratis?",
-            "answer": "Sí. El plan Essentials es gratuito para siempre e incluye funciones clave (invitados, tareas, sitio web). El plan Professional ofrece 14 días de prueba con integraciones avanzadas."
+            "answer": "Sí. El plan Essentials es gratuito para siempre y desbloquea funciones clave (invitados, tareas, sitio web). El plan Professional tiene 14 días de prueba con integraciones avanzadas."
           },
           {
             "question": "¿MaLove.App funciona para organizadores con múltiples eventos?",
-            "answer": "Por supuesto. El panel multievento te permite alternar bodas, compartir permisos con colaboradores y automatizar actualizaciones con tus proveedores en cada proyecto."
+            "answer": "Claro. El panel multi evento permite alternar bodas, compartir permisos con colaboradores y automatizar actualizaciones con proveedores de cada evento."
           },
           {
             "question": "¿Qué soporte recibo durante la implementación?",
-            "answer": "Contamos con onboarding guiado, biblioteca de plantillas y consultorías opcionales. El plan Enterprise incluye un gerente dedicado y sesiones de capacitación para tu equipo."
+            "answer": "Ofrecemos onboarding guiado, biblioteca de plantillas y consultorías opcionales. El plan Enterprise incluye gestor dedicado y sesiones de entrenamiento para equipos."
           }
         ],
         "form": {
           "title": "Solicita una demo personalizada",
-          "description": "Cuéntanos sobre tu operación y agenda una videollamada con nuestro equipo. Recibirás recomendaciones para tu flujo actual y una guía de inicio rápido.",
+          "description": "Cuéntanos sobre tu operación y agenda una videollamada con nuestro equipo. Recibirás recomendaciones basadas en tu flujo actual y una guía de configuración rápida.",
           "fields": {
             "name": {
               "label": "Nombre completo",
               "placeholder": "Tu nombre"
             },
             "email": {
-              "label": "Correo de contacto",
-              "placeholder": "tú@tuagencia.com"
+              "label": "Correo electrónico de contacto",
+              "placeholder": "hola@tuagencia.com"
             }
           },
           "messages": {
             "submit": "Agendar demo",
             "submitting": "Enviando solicitud...",
-            "success": "¡Gracias! Nos pondremos en contacto en menos de 24 horas.",
-            "error": "Completa tu nombre y correo para solicitar la demo."
+            "success": "Gracias. Nuestro equipo se pondrá en contacto contigo en menos de 24 horas.",
+            "error": "Completa nombre y correo para solicitar una demo."
           },
-          "consent": "Al enviar aceptas recibir comunicaciones relacionadas con MaLove.App. Puedes cancelar la suscripción cuando lo desees."
+          "consent": "Al enviar aceptas recibir comunicaciones relacionadas con MaLove.App. Puedes cancelar la suscripción en cualquier momento."
         }
       },
       "cta": {
-        "title": "Listo para usar en minutos.",
-        "description": "Crea tu cuenta, importa la lista de invitados y activa automatizaciones que te acompañen desde el primer día.",
-        "primary": "Crear cuenta gratis",
+        "title": "Lista para usar en minutos.",
+        "description": "Crea tu cuenta, importa tu lista de invitados y activa automatizaciones que te acompañen desde el primer día.",
+        "primary": "Crear cuenta gratuita",
         "secondary": "Comparar planes"
       }
     },
-    "pricing": {
-      "title": "Precios simples y transparentes",
-      "free": "Gratis",
-      "pro": "Profesional",
-      "enterprise": "Empresa",
-      "cta": "Empezar ahora"
-    },
     "appOverview": {
       "hero": {
-        "title": "La app que reúne todo tu flujo de planificación en un solo lugar.",
-        "description": "Desde la primera checklist hasta el informe final, MaLove.App acompaña a los equipos profesionales y a las parejas que buscan control total del evento.",
+        "title": "La app que reune todo tu flujo de planificacion en un solo lugar.",
+        "description": "Desde el primer checklist hasta el informe final, MaLove.App acompaña a equipos profesionales y parejas que buscan tener control total del evento.",
         "stats": [
           {
             "value": "12k+",
@@ -236,61 +237,765 @@
           },
           {
             "value": "30%",
-            "label": "tiempo ahorrado en coordinación logística"
+            "label": "tiempo ahorrado en coordinacion logistica"
           }
         ],
         "workspace": {
-          "badge": "Espacio de trabajo MaLove.App",
+          "badge": "MaLove.App Workspace",
           "title": "Un ecosistema conectado",
-          "description": "Módulos sincronizados, roles personalizados y permisos granulares para colaborar sin perder contexto.",
-          "tags": ["Panel", "Invitados", "Finanzas", "Comunicación", "Diseño", "Automatizaciones"]
+          "description": "Modulos sincronizados, roles personalizados y permisos granulares para colaborar sin perder contexto.",
+          "tags": ["Panel", "Invitados", "Finanzas", "Comunicacion", "Diseno", "Automatizaciones"]
         }
       },
       "modules": {
-        "title": "Módulos clave listos para tu equipo",
-        "description": "Cada módulo está diseñado para conectarse con el resto, eliminar la información dispersa y mantener a todos en la misma página.",
+        "title": "Modulos clave listos para tu equipo",
+        "description": "Cada modulo esta disenado para integrarse con el resto, evitando informacion dispersa y manteniendo a todos en la misma pagina.",
         "items": [
           {
-            "title": "Tablero colaborativo",
-            "description": "Tareas, hitos y recordatorios en un tablero central que se actualiza en tiempo real."
+            "title": "Panel colaborativo",
+            "description": "Tareas, hitos y recordatorios en un panel centralizado que se actualiza en tiempo real."
           },
           {
             "title": "CRM de proveedores",
-            "description": "Compara propuestas, gestiona contratos y da seguimiento a pagos y entregables."
+            "description": "Compara propuestas, gestiona contratos y lleva seguimiento de pagos y entregables."
           },
           {
-            "title": "Gestión financiera",
-            "description": "Presupuestos inteligentes, control de gastos y reportes detallados por categoría."
+            "title": "Gestion financiera",
+            "description": "Presupuestos inteligentes, control de gastos y reportes detallados por categoria."
           },
           {
-            "title": "Experiencia de invitados",
-            "description": "Sitio web, RSVP automático, seating interactivo y mensajes personalizados en un solo flujo."
+            "title": "Experiencia para invitados",
+            "description": "Sitio web, RSVP automatico, mesas interactivas y mensajes personalizados en un solo flujo."
           },
           {
-            "title": "Automatización de correos",
-            "description": "Flujos preconfigurados, segmentos dinámicos y métricas para medir la interacción."
+            "title": "Automatizacion de emails",
+            "description": "Flujos preconfigurados, segmentos dinamicos y metricas para medir engagement."
           },
           {
             "title": "Asistente inteligente",
-            "description": "Recomendaciones con IA para crear agendas, checklists y responder preguntas contextuales."
+            "description": "Recomendaciones con IA para crear agendas, checklist y resolver preguntas contextuales."
           }
         ]
       },
       "integrations": {
-        "title": "Integraciones y automatizaciones que trabajan para ti.",
-        "description": "Conecta MaLove.App con servicios de pago, calendarios y herramientas de comunicación. Configura disparadores automáticos para RSVP, confirmaciones de proveedores o seguimientos de tareas.",
+        "title": "Integraciones y automatizaciones que trabajan por ti.",
+        "description": "Conecta MaLove.App con servicios de pago, calendarios y herramientas de comunicacion. Configura disparadores automaticos para RSVP, confirmaciones de proveedores o seguimiento de tareas.",
         "items": [
           "Integraciones con Google Calendar, Gmail y suites de productividad.",
           "Automatizaciones visuales con condiciones y plantillas reutilizables.",
-          "API para desarrollos internos y conexiones con sistemas externos."
+          "API para desarrollos internos y conexion con sistemas externos."
         ],
         "cta": {
           "title": "Acceso inmediato",
-          "description": "Cada cuenta incluye una prueba gratuita y una demo guiada con nuestro equipo de onboarding.",
-          "button": "Solicita una demo"
+          "description": "Todas las cuentas incluyen prueba gratuita y demo guiada con nuestro equipo de onboarding.",
+          "button": "Solicitar demo"
         }
+      }
+    },
+    "pricing": {
+      "title": "Precios simples y transparentes",
+      "free": "Gratis",
+      "pro": "Profesional",
+      "enterprise": "Empresa",
+      "cta": "Empezar ahora"
+    }
+  },
+  "planners": {
+    "meta": {
+      "title": "MaLove.App para organizadores | Opera múltiples bodas en un solo espacio de trabajo",
+      "description": "Coordina bodas con tu equipo, centraliza proveedores y automatiza flujos de trabajo con la plataforma profesional MaLove.App.",
+      "canonical": "https://malove.app/para-planners",
+      "ogTitle": "MaLove.App para organizadores | Opera múltiples bodas en un solo espacio de trabajo",
+      "ogDescription": "Gestiona proyectos, finanzas y comunicación con herramientas diseñadas para organizadores de bodas.",
+      "image": "https://malove.app/maloveapp-logo.png",
+      "twitterTitle": "MaLove.App para organizadores | Opera múltiples bodas en un solo espacio de trabajo",
+      "twitterDescription": "Simplifica la operación de tu agencia de bodas con paneles, automatizaciones y herramientas colaborativas."
+    },
+    "hero": {
+      "logoAlt": "MaLove.App",
+      "brand": "MaLove.App",
+      "badge": "Para organizadores de bodas",
+      "title": "Gestiona todas tus bodas desde una sola plataforma profesional",
+      "description": [
+        "MaLove.App es el software definitivo para organizadores de bodas. Panel multi-boda, plantillas reutilizables, equipo colaborativo y analíticas en tiempo real.",
+        "Tus clientes acceden automáticamente a funciones premium. Sin costes ocultos."
+      ],
+      "primaryCta": "Prueba gratis 14 días",
+      "secondaryCta": "Ver planes",
+      "stats": {
+        "label": "Tu panel",
+        "title": "Vista de organizadores",
+        "badge": "8 bodas activas",
+        "cards": [
+          {
+            "title": "Ana & Diego",
+            "subtitle": "Progreso: 92%",
+            "badge": "En curso"
+          },
+          {
+            "title": "Laura & Marco",
+            "subtitle": "3 pagos pendientes",
+            "badge": "Atención"
+          },
+          {
+            "title": "Carolina & Javier",
+            "subtitle": "156 confirmados",
+            "badge": "Invitados"
+          }
+        ]
+      }
+    },
+    "benefits": {
+      "sectionTitle": "Todo lo que necesitas para gestionar bodas profesionalmente",
+      "sectionDescription": "Herramientas diseñadas específicamente para organizadores de bodas",
+      "multiWedding": {
+        "title": "Gestión Multi-Boda",
+        "description": "Panel unificado para gestionar todas tus bodas activas. Cambia entre eventos con un clic."
+      },
+      "team": {
+        "title": "Equipo Colaborativo",
+        "description": "Invita a colaboradores, asigna tareas y mantén a todo tu equipo sincronizado en tiempo real."
+      },
+      "templates": {
+        "title": "Plantillas Reutilizables",
+        "description": "Duplica listas de verificación, presupuestos y flujos de trabajo exitosos para estandarizar tu operación."
+      },
+      "analytics": {
+        "title": "Analíticas avanzadas",
+        "description": "Reportes de rendimiento, indicadores clave (KPIs) por boda y panel consolidado para toda tu agencia."
+      },
+      "premiumClients": {
+        "title": "Tus Clientes en Premium",
+        "description": "Las parejas que gestionas acceden automáticamente a funciones premium sin coste adicional."
+      },
+      "marketplace": {
+        "title": "Visibilidad en marketplace",
+        "description": "Aparece destacado en nuestro marketplace de organizadores para captar nuevos clientes."
+      }
+    },
+    "plans": {
+      "badge": "Planes para organizadores",
+      "sectionTitle": "Elige el plan que se adapta a tu agencia",
+      "sectionDescription": "Todos los planes incluyen actualizaciones gratuitas y soporte",
+      "freeLabel": "Gratis",
+      "exploratory": {
+        "name": "Exploratorio",
+        "badge": "Prueba Gratis",
+        "suffix": "para siempre",
+        "description": "Perfecto para conocer la plataforma",
+        "weddings": "0 bodas reales",
+        "features": [
+          "Acceso demo completo",
+          "Explorar todas las funcionalidades",
+          "Datos de prueba precargados",
+          "Ideal para onboarding",
+          "Sin tarjeta de crédito"
+        ],
+        "cta": "Empezar gratis"
+      },
+      "studio": {
+        "name": "Studio",
+        "badge": "Organizadores independientes",
+        "suffix": "/año",
+        "description": "Para organizadores que gestionan pocas bodas al año",
+        "weddings": "Hasta 5 bodas activas",
+        "features": [
+          "5 bodas activas simultáneas",
+          "Plantillas duplicables",
+          "Prioridad en marketplace",
+          "Tus clientes en modo premium",
+          "Exportación ilimitada",
+          "Soporte prioritario"
+        ],
+        "cta": "Comenzar con Studio"
+      },
+      "studioPlus": {
+        "name": "Studio Plus",
+        "badge": "Más Colaboradores",
+        "suffix": "/año",
+        "description": "Studio con equipo y soporte especializado",
+        "weddings": "Hasta 5 bodas + 7 colaboradores",
+        "features": [
+          "Todo lo de Studio",
+          "+ 7 colaboradores incluidos",
+          "Concierge de proveedores",
+          "Negociaciones preferentes",
+          "Sesiones con especialistas",
+          "Analíticas avanzadas"
+        ],
+        "cta": "Elegir Studio Plus"
+      },
+      "agency": {
+        "name": "Agency",
+        "badge": "Agencias Boutique",
+        "suffix": "/año",
+        "description": "Para agencias pequeñas con múltiples bodas",
+        "weddings": "Hasta 10 bodas activas",
+        "features": [
+          "10 bodas activas simultáneas",
+          "10 colaboradores",
+          "Marketplace Pro",
+          "Automatizaciones multi-cliente",
+          "Reportes personalizados",
+          "Analíticas consolidadas"
+        ],
+        "cta": "Comenzar con Agency"
+      },
+      "agencyPlus": {
+        "name": "Agency Plus",
+        "badge": "Marca blanca",
+        "suffix": "/año",
+        "description": "Agency con tu marca y soporte dedicado",
+        "weddings": "Hasta 10 bodas + White Label",
+        "features": [
+          "Todo lo de Agency",
+          "Marca blanca completa",
+          "Sin marca MaLove.App",
+          "Integraciones API",
+          "Soporte dedicado 24/7",
+          "Onboarding personalizado"
+        ],
+        "cta": "Elegir Agency Plus"
+      },
+      "teams": {
+        "name": "Teams",
+        "badge": "Equipos Grandes",
+        "suffix": "/año",
+        "description": "Para agencias con alto volumen",
+        "weddings": "Hasta 40 bodas activas",
+        "features": [
+          "40 bodas activas simultáneas",
+          "1 organizador principal + 3 adicionales",
+          "Gestión de equipos",
+          "Panel consolidado",
+          "Asignación de tareas",
+          "Reportes de productividad"
+        ],
+        "cta": "Comenzar con Teams"
+      },
+      "teamsUnlimited": {
+        "name": "Teams Unlimited",
+        "badge": "Empresas",
+        "suffix": "/año",
+        "description": "Sin límites, máxima personalización",
+        "weddings": "Bodas ilimitadas",
+        "features": [
+          "Bodas ilimitadas",
+          "Colaboradores ilimitados",
+          "Marca blanca + dominio personalizado",
+          "API personalizada",
+          "Soporte 24/7 dedicado",
+          "Formación personalizada"
+        ],
+        "cta": "Contactar para Teams Unlimited"
+      }
+    },
+    "useCases": {
+      "badge": "Casos de Uso",
+      "sectionTitle": "Encuentra tu plan ideal según tu operación",
+      "recommendedLabel": "Recomendado",
+      "independent": {
+        "title": "Organizadores independientes",
+        "description": "Gestiona 1-5 bodas al año con organización profesional",
+        "recommended": "Studio o Studio Plus"
+      },
+      "boutique": {
+        "title": "Agencias Boutique",
+        "description": "Equipo pequeño gestionando 5-15 bodas anuales",
+        "recommended": "Agency o Agency Plus"
+      },
+      "established": {
+        "title": "Agencias Establecidas",
+        "description": "Equipos grandes con +30 bodas al año",
+        "recommended": "Teams o Teams Unlimited"
+      }
+    },
+    "testimonials": {
+      "0": {
+        "quote": "MaLove.App transformó nuestra operación. Antes usábamos Excel y perdíamos horas en tareas manuales. Ahora todo está centralizado y automatizado.",
+        "name": "María González",
+        "role": "Directora en Momentos Perfectos"
+      },
+      "1": {
+        "quote": "El mejor ROI que hemos tenido. Recuperamos la inversión en el primer mes solo por el tiempo ahorrado en coordinación con clientes.",
+        "name": "Carlos Ruiz",
+        "role": "Organizador de bodas independiente"
+      },
+      "2": {
+        "quote": "Las plantillas reutilizables son un cambio radical. Duplicamos una boda exitosa y tenemos todo listo en minutos.",
+        "name": "Ana Martínez",
+        "role": "Fundadora de Eventos Especiales"
+      },
+      "badge": "Testimonios",
+      "sectionTitle": "Organizadores de bodas que ya confían en nosotros"
+    },
+    "demo": {
+      "badge": "Demo Personalizada",
+      "title": "Agenda una demo con nuestro equipo",
+      "description": "Te mostraremos cómo MaLove.App puede transformar la gestión de tu agencia. Sin compromiso.",
+      "checklist": [
+        "Revisión de tu flujo actual de trabajo",
+        "Recomendaciones personalizadas",
+        "Estimación de ROI para tu agencia",
+        "Respuestas a todas tus preguntas"
+      ],
+      "form": {
+        "title": "Solicita tu demo",
+        "description": "Completa el formulario y te contactaremos en menos de 24 horas.",
+        "fields": {
+          "name": {
+            "label": "Nombre completo *",
+            "placeholder": "Tu nombre"
+          },
+          "email": {
+            "label": "Correo electrónico *",
+            "placeholder": "tu@email.com"
+          },
+          "company": {
+            "label": "Agencia/Negocio",
+            "placeholder": "Nombre de tu agencia"
+          }
+        },
+        "submit": "Solicitar demo",
+        "submitting": "Enviando...",
+        "messages": {
+          "success": "¡Gracias! Te contactaremos pronto para agendar tu demo personalizada.",
+          "error": "Por favor completa todos los campos obligatorios."
+        }
+      }
+    },
+    "finalCta": {
+      "title": "Empieza a gestionar tus bodas profesionalmente hoy",
+      "description": "Prueba gratis durante 14 días. Sin tarjeta de crédito. Cancela cuando quieras.",
+      "primary": "Comenzar prueba gratis",
+      "secondary": "Ver todos los planes"
+    }
+  },
+  "partners": {
+    "meta": {
+      "title": "Programa de Partners | MaLove.App",
+      "description": "Únete al programa de partners de MaLove.App y gana comisiones recurrentes con recursos de marketing, formación y soporte dedicado.",
+      "canonical": "https://malove.app/partners",
+      "ogTitle": "Programa de Partners | MaLove.App",
+      "ogDescription": "Gana ingresos recurrentes recomendando MaLove.App a organizadores y proveedores con materiales de apoyo y seguimiento en tiempo real.",
+      "image": "https://malove.app/maloveapp-logo.png",
+      "twitterTitle": "Programa de Partners | MaLove.App",
+      "twitterDescription": "Genera comisiones recurrentes recomendando la plataforma todo en uno para planificar bodas."
+    },
+    "hero": {
+      "logoAlt": "MaLove.App",
+      "brand": "MaLove.App",
+      "badge": "Programa de Partners",
+      "title": "Gana comisiones ayudando a parejas a organizar su boda perfecta",
+      "description": [
+        "Únete a nuestro programa de partners y recibe comisiones recurrentes por cada cliente que refieras a MaLove.App.",
+        "Sin inversión inicial. Comisiones atractivas. Material de marketing incluido."
+      ],
+      "cta": "Solicitar Acceso al Programa"
+    },
+    "benefits": {
+      "title": "Por qué ser Partner de MaLove.App",
+      "subtitle": "Beneficios diseñados para maximizar tu potencial de ingresos",
+      "items": [
+        {
+          "icon": "commissions",
+          "title": "Comisiones Atractivas",
+          "description": "Gana comisiones recurrentes por cada suscripción que vendas."
+        },
+        {
+          "icon": "analytics",
+          "title": "Panel de seguimiento",
+          "description": "Monitorea tus conversiones, comisiones y estadísticas en tiempo real."
+        },
+        {
+          "icon": "materials",
+          "title": "Material de Marketing",
+          "description": "Acceso a presentaciones, demos y recursos para facilitar tus ventas."
+        },
+        {
+          "icon": "support",
+          "title": "Soporte Dedicado",
+          "description": "Equipo de soporte disponible para ayudarte con tus clientes."
+        },
+        {
+          "icon": "training",
+          "title": "Formación Incluida",
+          "description": "Capacitación completa sobre la plataforma y mejores prácticas de venta."
+        },
+        {
+          "icon": "unlimited",
+          "title": "Sin Límites",
+          "description": "No hay techo en tus comisiones. Cuanto más vendas, más ganas."
+        }
+      ]
+    },
+    "process": {
+      "badge": "Proceso Simple",
+      "title": "Cómo funciona",
+      "subtitle": "En 4 pasos empiezas a generar ingresos",
+      "steps": [
+        {
+          "step": "1",
+          "title": "Únete al Programa",
+          "description": "Completa el formulario de solicitud y espera nuestra aprobación."
+        },
+        {
+          "step": "2",
+          "title": "Recibe Formación",
+          "description": "Accede a materiales y sesiones de capacitación sobre la plataforma."
+        },
+        {
+          "step": "3",
+          "title": "Comparte tu Link",
+          "description": "Recibe tu enlace único de afiliado para rastrear tus conversiones."
+        },
+        {
+          "step": "4",
+          "title": "Gana Comisiones",
+          "description": "Recibe comisiones recurrentes por cada cliente que se suscriba."
+        }
+      ]
+    },
+    "profiles": {
+      "badge": "Perfil Ideal",
+      "title": "¿Eres un buen candidato?",
+      "subtitle": "Buscamos profesionales con conexiones en el sector nupcial",
+      "items": [
+        {
+          "icon": "consultants",
+          "title": "Consultores de Bodas",
+          "description": "Asesores que trabajan con parejas y pueden recomendar herramientas profesionales."
+        },
+        {
+          "icon": "influencers",
+          "title": "Influencers del Sector",
+          "description": "Creadores de contenido con audiencia interesada en organización de bodas."
+        },
+        {
+          "icon": "eventPros",
+          "title": "Profesionales de Eventos",
+          "description": "Organizadores de eventos que pueden introducir MaLove.App en su red de contactos."
+        }
+      ]
+    },
+    "form": {
+      "anchor": "partners-form",
+      "badge": "Solicitud de Acceso",
+      "title": "Únete al Programa de Partners",
+      "description": "Completa el formulario y nuestro equipo revisará tu solicitud. Te contactaremos en menos de 48 horas.",
+      "fields": {
+        "name": {
+          "label": "Nombre completo *",
+          "placeholder": "Tu nombre"
+        },
+        "email": {
+          "label": "Correo electrónico *",
+          "placeholder": "tu@email.com"
+        },
+        "experience": {
+          "label": "Experiencia en el sector",
+          "placeholder": "Selecciona una opción",
+          "options": [
+            {
+              "value": "consultant",
+              "label": "Consultor/a de bodas"
+            },
+            {
+              "value": "influencer",
+              "label": "Influencer / Creador de contenido"
+            },
+            {
+              "value": "event-pro",
+              "label": "Profesional de eventos"
+            },
+            {
+              "value": "supplier",
+              "label": "Proveedor de servicios de boda"
+            },
+            {
+              "value": "other",
+              "label": "Otro"
+            }
+          ]
+        },
+        "about": {
+          "label": "Cuéntanos sobre ti",
+          "placeholder": "Describe tu experiencia, tu red de contactos y por qué quieres ser partner..."
+        }
+      },
+      "submit": "Enviar solicitud",
+      "submitting": "Enviando...",
+      "messages": {
+        "success": "¡Gracias por tu interés! Revisaremos tu solicitud y te contactaremos pronto.",
+        "error": "Por favor completa todos los campos obligatorios."
+      },
+      "consent": "Al enviar este formulario aceptas que revisemos tu perfil y nos pongamos en contacto contigo. No compartimos tu información con terceros."
+    },
+    "finalCta": {
+      "title": "¿Listo para empezar a generar ingresos recurrentes?",
+      "description": "Únete a nuestro programa de partners y empieza a ganar comisiones hoy mismo.",
+      "primary": "Solicitar Acceso Ahora"
+    },
+    "structuredData": {
+      "@context": "https://schema.org",
+      "@type": "ProgramMembership",
+      "name": "Programa de Partners de MaLove.App",
+      "description": "Únete al programa de partners de MaLove.App y genera comisiones recurrentes recomendando nuestra plataforma de planificación de bodas.",
+      "url": "https://malove.app/partners",
+      "hostingOrganization": {
+        "@type": "Organization",
+        "name": "MaLove.App",
+        "url": "https://malove.app",
+        "logo": "https://malove.app/maloveapp-logo.png",
+        "sameAs": [
+          "https://www.linkedin.com/company/maloveapp",
+          "https://www.instagram.com/malove.app",
+          "https://www.facebook.com/maloveapp"
+        ]
       }
     }
   },
-  "_note": "Translate from es/marketing.json"
+  "suppliers": {
+    "meta": {
+      "title": "MaLove.App para proveedores | Consigue parejas cualificadas",
+      "description": "Crea tu portafolio en MaLove.App, llega a parejas en tu zona y recibe solicitudes cualificadas con métricas y mensajería centralizadas.",
+      "ogTitle": "MaLove.App para proveedores | Consigue parejas cualificadas",
+      "ogDescription": "Gestiona tu presencia, paga solo por visualizaciones y convierte parejas en clientes con herramientas profesionales.",
+      "twitterTitle": "MaLove.App para proveedores | Consigue parejas cualificadas",
+      "twitterDescription": "Destaca tu negocio de bodas, recibe leads cualificados y obtén estadísticas en tiempo real.",
+      "canonical": "https://malove.app/para-proveedores",
+      "image": "https://malove.app/maloveapp-logo.png"
+    },
+    "hero": {
+      "brand": "MaLove.App",
+      "logoAlt": "Logo MaLove.App",
+      "badge": "Para Proveedores de Bodas",
+      "title": "Conecta con parejas que buscan tus servicios",
+      "description": [
+        "MaLove.App te ayuda a llegar a miles de parejas organizando su boda. Sistema de pago por visualización sin suscripciones mensuales ni comisiones por contrato.",
+        "Crea tu portafolio profesional, recibe solicitudes cualificadas y gestiona todo desde tu panel."
+      ],
+      "primaryCta": "Registra tu negocio gratis",
+      "secondaryCta": "Ver cómo funciona",
+      "stats": {
+        "label": "Tu panel",
+        "title": "Panel de Proveedor",
+        "growthBadge": "+24% este mes",
+        "metrics": [
+          {
+            "icon": "eye",
+            "label": "Visualizaciones",
+            "value": "1,248",
+            "hint": "156 tokens disponibles"
+          },
+          {
+            "icon": "messageSquare",
+            "label": "Solicitudes",
+            "value": "47",
+            "hint": "12 pendientes de respuesta"
+          },
+          {
+            "icon": "star",
+            "label": "Valoración",
+            "value": "4.9",
+            "hint": "Basado en 28 reseñas"
+          }
+        ]
+      }
+    },
+    "benefits": {
+      "title": "Por qué proveedores eligen MaLove.App",
+      "subtitle": "Herramientas profesionales para hacer crecer tu negocio de bodas",
+      "items": [
+        {
+          "icon": "users",
+          "title": "Llega a miles de parejas",
+          "description": "Aparece en las búsquedas cuando parejas buscan servicios como el tuyo en tu zona."
+        },
+        {
+          "icon": "camera",
+          "title": "Portafolio profesional",
+          "description": "Crea tu página pública con galería de fotos, servicios, precios y reseñas."
+        },
+        {
+          "icon": "messageSquare",
+          "title": "Recibe solicitudes directas",
+          "description": "Las parejas te contactan directamente desde la plataforma con su información y necesidades."
+        },
+        {
+          "icon": "barChart",
+          "title": "Panel de gestión",
+          "description": "Gestiona todas tus solicitudes, conversaciones y proyectos desde un panel."
+        },
+        {
+          "icon": "trendingUp",
+          "title": "Sin comisiones",
+          "description": "Solo pagas por visualización. No cobramos comisión por contrato cerrado."
+        },
+        {
+          "icon": "shield",
+          "title": "Verificación profesional",
+          "description": "Badge de proveedor verificado que aumenta la confianza de potenciales clientes."
+        }
+      ]
+    },
+    "howItWorks": {
+      "badge": "Proceso Simple",
+      "title": "Cómo funciona",
+      "description": "En 5 pasos estás listo para recibir solicitudes de parejas",
+      "steps": [
+        {
+          "title": "Regístrate gratis",
+          "description": "Crea tu cuenta de proveedor sin coste ni compromiso."
+        },
+        {
+          "title": "Completa tu perfil",
+          "description": "Añade fotos de tu trabajo, servicios, precios y zona de cobertura."
+        },
+        {
+          "title": "Compra créditos",
+          "description": "Adquiere tokens de visualización según tus necesidades. Sin suscripciones mensuales."
+        },
+        {
+          "title": "Aparece en búsquedas",
+          "description": "Cuando una pareja busca tu categoría, apareces en los resultados y se consume 1 token."
+        },
+        {
+          "title": "Recibe solicitudes",
+          "description": "Las parejas interesadas te envían solicitudes de presupuesto con toda su información."
+        }
+      ]
+    },
+    "tokens": {
+      "badge": "Sistema de Tokens",
+      "title": "Pago por visualización, sin sorpresas",
+      "description": "Solo pagas cuando tu perfil aparece en los resultados de búsqueda de una pareja",
+      "howTitle": "¿Cómo funcionan los tokens?",
+      "howList": [
+        "Compras un pack de tokens según tus necesidades (ej: 100, 500, 1000 tokens)",
+        "Cuando una pareja busca servicios en tu categoría, tu perfil puede aparecer",
+        "Si apareces en sus resultados, se consume 1 token",
+        "Los tokens no caducan: los usas a tu ritmo",
+        "Puedes pausar tu perfil cuando quieras sin perder tokens"
+      ],
+      "includedTitle": "Lo que está incluido",
+      "included": [
+        "Sistema de pago por visualización (tokens)",
+        "Sin suscripción mensual fija",
+        "Compra solo los tokens que necesites",
+        "Los tokens no caducan",
+        "Sin comisiones por contrato cerrado",
+        "Panel y mensajería incluidos",
+        "Página pública personalizable",
+        "Actualización de portafolio ilimitada"
+      ],
+      "notice": "💡 Los precios de los packs de tokens se anunciarán próximamente"
+    },
+    "testimonials": {
+      "badge": "Testimonios",
+      "title": "Proveedores que ya confían en nosotros",
+      "items": [
+        {
+          "quote": "Desde que estoy en MaLove.App recibo solicitudes cualificadas cada semana. Las parejas llegan con información clara y presupuesto definido.",
+          "name": "Carlos Mendoza",
+          "role": "Fotógrafo de bodas",
+          "rating": 5
+        },
+        {
+          "quote": "Me gusta el sistema de tokens. Solo pago cuando me ven. No como otras plataformas donde pagas suscripción mensual aunque no consigas clientes.",
+          "name": "Laura Vega",
+          "role": "Organizadora de bodas",
+          "rating": 5
+        },
+        {
+          "quote": "El panel es muy completo. Gestiono todas mis solicitudes, conversaciones y contratos desde un solo sitio.",
+          "name": "Roberto Jiménez",
+          "role": "Catering & Eventos",
+          "rating": 5
+        }
+      ]
+    },
+    "categoriesSection": {
+      "badge": "Categorías Disponibles",
+      "title": "¿Tu negocio encaja en MaLove.App?",
+      "description": "Trabajamos con todo tipo de proveedores del sector nupcial",
+      "list": [
+        "Fotografía y Video",
+        "Catering y Banquetes",
+        "Locales y espacios",
+        "Música y DJ",
+        "Decoración y Flores",
+        "Vestidos y Trajes",
+        "Belleza y Estilismo",
+        "Invitaciones y Papelería",
+        "Pastelería",
+        "Transporte",
+        "Animación",
+        "Organizador/a de bodas",
+        "Otro"
+      ],
+      "formTitle": "Solicita más información",
+      "formDescription": "Completa este formulario y nuestro equipo se pondrá en contacto contigo para explicarte todo el proceso."
+    },
+    "form": {
+      "fields": {
+        "name": {
+          "label": "Nombre completo *",
+          "placeholder": "Tu nombre"
+        },
+        "email": {
+          "label": "Correo electrónico *",
+          "placeholder": "tu@email.com"
+        },
+        "business": {
+          "label": "Nombre del negocio *",
+          "placeholder": "Nombre de tu empresa"
+        },
+        "category": {
+          "label": "Categoría",
+          "placeholder": "Selecciona una categoría"
+        }
+      },
+      "submit": "Solicitar información",
+      "submitting": "Enviando...",
+      "consent": "Al enviar este formulario aceptas que nos pongamos en contacto contigo para informarte sobre MaLove.App para proveedores.",
+      "messages": {
+        "success": "¡Gracias! Nos pondremos en contacto contigo en menos de 24 horas.",
+        "error": "Por favor completa todos los campos obligatorios."
+      }
+    },
+    "finalCta": {
+      "title": "Empieza a recibir solicitudes de parejas hoy",
+      "description": "Regístrate gratis, completa tu perfil y empieza a aparecer en las búsquedas de miles de parejas.",
+      "primary": "Registrarme ahora",
+      "secondary": "Ver más detalles"
+    },
+    "structuredData": {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "name": "MaLove.App para proveedores",
+      "serviceType": "Generación de leads cualificados para proveedores de bodas",
+      "provider": {
+        "@type": "Organization",
+        "name": "MaLove.App",
+        "url": "https://malove.app",
+        "logo": "https://malove.app/maloveapp-logo.png"
+      },
+      "areaServed": {
+        "@type": "Country",
+        "name": "España"
+      },
+      "serviceAudience": {
+        "@type": "Audience",
+        "audienceType": "Proveedores y profesionales de bodas"
+      },
+      "offers": {
+        "@type": "Offer",
+        "url": "https://malove.app/para-proveedores",
+        "priceCurrency": "EUR",
+        "availability": "https://schema.org/InStock",
+        "description": "Sistema de pago por visualización con herramientas de portafolio, analítica y mensajería integrada."
+      }
+    }
+  }
 }
