@@ -195,6 +195,46 @@ router.post('/auth/set-password', express.json(), async (req, res) => {
 });
 
 // ============================================
+// DASHBOARD: Obtener datos completos del dashboard (por ID)
+// ============================================
+router.get('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const token = req.headers.authorization?.split(' ')[1];
+
+    if (!token) {
+      return res.status(401).json({ error: 'unauthorized' });
+    }
+
+    // Verificar token y obtener datos del proveedor
+    const supplierDoc = await db.collection('suppliers').doc(id).get();
+
+    if (!supplierDoc.exists) {
+      return res.status(404).json({ error: 'supplier_not_found' });
+    }
+
+    const supplierData = supplierDoc.data();
+
+    // Obtener métricas básicas
+    const metrics = {
+      views: supplierData.stats?.views || 0,
+      clicks: supplierData.stats?.clicks || 0,
+      contacts: supplierData.stats?.contacts || 0,
+      matchScore: supplierData.matchScore || 0,
+    };
+
+    return res.json({
+      success: true,
+      profile: supplierData,
+      metrics: metrics,
+    });
+  } catch (error) {
+    logger.error('Error loading dashboard:', error);
+    return res.status(500).json({ error: 'internal_error' });
+  }
+});
+
+// ============================================
 // PROFILE: Ver perfil propio
 // ============================================
 router.get('/profile', requireSupplierAuth, async (req, res) => {
