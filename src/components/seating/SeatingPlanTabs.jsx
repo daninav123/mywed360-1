@@ -3,7 +3,7 @@
  * Navegación entre ceremonia y banquete con indicadores visuales
  */
 
-import { Church, Utensils, Users, Grid } from 'lucide-react';
+import { Church, Utensils } from 'lucide-react';
 import React from 'react';
 
 const SeatingPlanTabs = ({
@@ -11,7 +11,6 @@ const SeatingPlanTabs = ({
   onTabChange,
   ceremonyCount = 0,
   banquetCount = 0,
-  // New: completion percentage for each tab (0-100)
   ceremonyProgress = 0,
   banquetProgress = 0,
   className = '',
@@ -23,12 +22,22 @@ const SeatingPlanTabs = ({
       icon: Church,
       count: ceremonyCount,
       description: 'Disposición de asientos para la ceremonia',
+    },
+    {
+      id: 'banquet',
+      label: 'Banquete',
+      icon: Utensils,
+      count: banquetCount,
+      description: 'Distribución de mesas para el banquete',
+    },
+  ];
+
   return (
-    <div className="flex items-center justify-between py-4" data-tour="tabs">
+    <div className={`bg-white border rounded-lg overflow-hidden ${className}`} data-tour="tabs">
       <div className="flex">
-        {stats.tabs.map((tab) => {
+        {tabs.map((tab) => {
           const Icon = tab.icon;
-          const isActive = tab.id === stats.activeTab;
+          const isActive = activeTab === tab.id;
 
           return (
             <button
