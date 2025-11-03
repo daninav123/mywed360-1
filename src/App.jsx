@@ -43,6 +43,7 @@ import SupplierSetPassword from './pages/suppliers/SupplierSetPassword';
 import SupplierRegister from './pages/suppliers/SupplierRegister';
 import SupplierDashboard from './pages/suppliers/SupplierDashboard';
 import SupplierRequestDetail from './pages/suppliers/SupplierRequestDetail';
+import SupplierRequests from './pages/suppliers/SupplierRequests';
 import SupplierPortfolio from './pages/suppliers/SupplierPortfolio';
 import SupplierPublicPage from './pages/SupplierPublicPage';
 import Tasks from './pages/Tasks';
@@ -378,6 +379,10 @@ function App() {
                           <Route path="supplier/setup-password" element={<SupplierSetPassword />} />
                           <Route path="supplier/register" element={<SupplierRegister />} />
                           <Route path="supplier/dashboard/:id" element={<SupplierDashboard />} />
+                          <Route
+                            path="supplier/dashboard/:id/requests"
+                            element={<SupplierRequests />}
+                          />
                           <Route
                             path="supplier/dashboard/:id/portfolio"
                             element={<SupplierPortfolio />}

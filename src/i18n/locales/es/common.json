@@ -982,8 +982,8 @@
     "collaborators": {
       "title": "Colaboradores activos ({{count}})",
       "unknown": "Usuario",
-      "editing_one": "Editando {{count}} elemento",
-      "editing_other": "Editando {{count}} elementos",
+      "editing_one": "Editando {{count}} bloqueo",
+      "editing_other": "Editando {{count}} bloqueos",
       "synced": "Sincronizado en tiempo real"
     },
     "toolbar": {
@@ -3761,5 +3761,10 @@
   "general": "General",
   "notes": "Notas",
   "apply": "Aplicar",
-  "pagination": "Paginacin"
+  "pagination": "Paginacin",
+  "planModern": {
+    "header": {
+      "userFallback": "Usuario"
+    }
+  }
 }

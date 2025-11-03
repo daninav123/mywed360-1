@@ -982,8 +982,8 @@
     "collaborators": {
       "title": "Active collaborators ({{count}})",
       "unknown": "User",
-      "editing_one": "Editing {{count}} element",
-      "editing_other": "Editing {{count}} elements",
+      "editing_one": "Editing {{count}} lock",
+      "editing_other": "Editing {{count}} locks",
       "synced": "Synced in real time"
     },
     "toolbar": {
@@ -3761,5 +3761,10 @@
   "general": "General",
   "notes": "Notas",
   "apply": "Aplicar",
-  "pagination": "Paginacin"
+  "pagination": "Paginacin",
+  "planModern": {
+    "header": {
+      "userFallback": "User"
+    }
+  }
 }

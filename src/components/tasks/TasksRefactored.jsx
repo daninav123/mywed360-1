@@ -10,7 +10,15 @@ import {
   updateDoc,
 } from 'firebase/firestore';
 // View mode string kept for internal sizing logic (no external lib)
-import React, { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+} from 'react';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 

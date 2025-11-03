@@ -15,6 +15,7 @@ import {
   Eye,
   MousePointer,
   Mail,
+  Inbox,
 } from 'lucide-react';
 import useTranslations from '../../hooks/useTranslations';
 import Spinner from '../../components/ui/Spinner';
@@ -41,6 +42,7 @@ export default function SupplierDashboard() {
   const [supplier, setSupplier] = useState(null);
   const [requests, setRequests] = useState([]);
   const [analytics, setAnalytics] = useState(null);
+  const [newRequestsCount, setNewRequestsCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
   const [editing, setEditing] = useState(false);
@@ -104,38 +106,43 @@ export default function SupplierDashboard() {
     setLoading(true);
     try {
       const token = localStorage.getItem('supplier_token');
-      const headers = { Authorization: `Bearer ${token}` };
+      if (!token) {
+        navigate('/supplier/login');
+        return;
+      }
 
-      const [profileRes, requestsRes, analyticsRes] = await Promise.all([
-        fetch('/api/supplier-dashboard/profile', { headers }),
-        fetch('/api/supplier-dashboard/requests?limit=10', { headers }),
-        fetch('/api/supplier-dashboard/analytics?period=30d', { headers }),
-      ]);
+      const response = await fetch(`/api/supplier-dashboard/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-      if (!profileRes.ok || !requestsRes.ok || !analyticsRes.ok) {
-        if (
-          profileRes.status === 401 ||
-          requestsRes.status === 401 ||
-          analyticsRes.status === 401
-        ) {
+      if (!response.ok) {
+        if (response.status === 401) {
           localStorage.removeItem('supplier_token');
           localStorage.removeItem('supplier_id');
           navigate('/supplier/login');
           return;
         }
-        throw new Error(tRef.current('suppliers.dashboard.errors.load'));
+        throw new Error('load_error');
       }
 
-      const [profileData, requestsData, analyticsData] = await Promise.all([
-        profileRes.json(),
-        requestsRes.json(),
-        analyticsRes.json(),
-      ]);
+      const data = await response.json();
 
-      const profile = profileData.profile || {};
+      // Cargar contador de solicitudes nuevas
+      try {
+        const requestsResponse = await fetch(`/api/supplier-requests/${id}?status=new&limit=1`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (requestsResponse.ok) {
+          const requestsData = await requestsResponse.json();
+          setNewRequestsCount(requestsData.pagination?.total || 0);
+        }
+      } catch (err) {
+        console.error('[SupplierDashboard] Error loading requests count:', err);
+      }
+
+      const profile = data.profile || {};
       setSupplier(profile);
-      setRequests(requestsData.requests || []);
-      setAnalytics(analyticsData.metrics || {});
+      setAnalytics(data.metrics || {});
 
       setFormData({
         name: profile.profile?.name || '',
@@ -330,6 +337,50 @@ export default function SupplierDashboard() {
             </div>
           </div>
         </div>
+
+        {/* Acceso rápido a Solicitudes */}
+        <Link
+          to={`/supplier/dashboard/${id}/requests`}
+          className="block shadow-md rounded-lg p-6 mb-6 hover:shadow-lg transition-shadow"
+          style={{
+            backgroundColor: 'var(--color-surface)',
+            borderLeft: '4px solid var(--color-primary)',
+          }}
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div
+                className="p-3 rounded-lg"
+                style={{ backgroundColor: 'rgba(109, 40, 217, 0.1)' }}
+              >
+                <Inbox size={24} style={{ color: 'var(--color-primary)' }} />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>
+                    Mis Solicitudes
+                  </h3>
+                  {newRequestsCount > 0 && (
+                    <span
+                      className="inline-flex items-center justify-center px-2 py-1 text-xs font-bold rounded-full"
+                      style={{
+                        backgroundColor: 'var(--color-primary)',
+                        color: 'white',
+                        minWidth: '24px',
+                      }}
+                    >
+                      {newRequestsCount}
+                    </span>
+                  )}
+                </div>
+                <p className="text-sm" style={{ color: 'var(--color-muted)' }}>
+                  Gestiona las solicitudes de presupuesto de tus clientes potenciales
+                </p>
+              </div>
+            </div>
+            <ArrowRight size={20} style={{ color: 'var(--color-primary)' }} />
+          </div>
+        </Link>
 
         {/* Acceso rápido al Portfolio */}
         <Link

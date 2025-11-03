@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Camera,
@@ -25,6 +25,10 @@ const VIEW_MODES = ['grid', 'list'];
 export default function SupplierPortfolio() {
   const navigate = useNavigate();
   const { t, tPlural, format } = useTranslations();
+
+  // Usar ref para t para evitar que loadPhotos se recree constantemente
+  const tRef = useRef(t);
+  tRef.current = t;
 
   const [photos, setPhotos] = useState([]);
   const [coverPhoto, setCoverPhoto] = useState(null);
@@ -87,15 +91,16 @@ export default function SupplierPortfolio() {
       setPhotos(portfolioPhotos);
     } catch (error) {
       console.error('[SupplierPortfolio] load error', error);
-      toast.error(t('suppliers.portfolio.toasts.loadError'));
+      toast.error(tRef.current('suppliers.portfolio.toasts.loadError'));
     } finally {
       setLoading(false);
     }
-  }, [navigate, selectedCategory, t]);
+  }, [navigate, selectedCategory]);
 
   useEffect(() => {
     loadPhotos();
-  }, [loadPhotos]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedCategory]);
 
   const handlePhotoUploaded = () => {
     setShowUploadModal(false);
@@ -219,13 +224,11 @@ export default function SupplierPortfolio() {
         <div className="flex items-center gap-6 px-4 py-3 text-sm text-muted border-t border-border">
           <span className="inline-flex items-center gap-2">
             <Eye className="h-4 w-4" />
-            {formatNumber(coverPhoto.views || 0)}{' '}
-            {t('suppliers.portfolio.dashboard.stats.views')}
+            {formatNumber(coverPhoto.views || 0)} {t('suppliers.portfolio.dashboard.stats.views')}
           </span>
           <span className="inline-flex items-center gap-2">
             <Heart className="h-4 w-4" />
-            {formatNumber(coverPhoto.likes || 0)}{' '}
-            {t('suppliers.portfolio.dashboard.stats.likes')}
+            {formatNumber(coverPhoto.likes || 0)} {t('suppliers.portfolio.dashboard.stats.likes')}
           </span>
         </div>
       </div>
