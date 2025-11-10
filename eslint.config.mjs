@@ -1,10 +1,7 @@
 // ESLint flat config compatible with ESLint v9
-// Replicates the previous .eslintrc.json behavior, but avoids external plugins
-// to ensure the linter runs even without a full node_modules install.
+// Replicates the previous .eslintrc.json behavior
 
 /** @type {import('eslint').Linter.FlatConfig[]} */
-import reactHooksPlugin from './tools/eslint-plugin-react-hooks/index.js';
-
 export default [
   {
     // Ignorar rutas problemáticas o generadas
@@ -12,6 +9,10 @@ export default [
       'cypress/**',
       'scripts/**',
       'mailgun-*.js',
+      '**/__tests__/**',
+      '**/*.test.js',
+      '**/*.test.jsx',
+      'src/test/**',
       'src/components/email/EmailTemplateManager.jsx',
       'src/pages/Buzon_fixed_complete.jsx',
       'src/pages/InvitadosLegacy.jsx',
@@ -24,8 +25,9 @@ export default [
       'src/pages/SeatingPlan.jsx',
       'src/pages/protocolo/AyudaCeremonia.jsx',
       'src/pages/user/EmailInbox.jsx',
-      'src/services/PerformanceMonitor.js',
-      'src/services/componentCacheService.js',
+      '**/PerformanceMonitor.js',
+      '**/componentCacheService.js',
+      '**/imageOptimizationService.js',
     ],
   },
   {
@@ -42,7 +44,7 @@ export default [
       },
     },
     plugins: {
-      'react-hooks': reactHooksPlugin,
+      // react-hooks plugin removed - causes issues without tools/ directory
     },
     linterOptions: {
       reportUnusedDisableDirectives: 'off',

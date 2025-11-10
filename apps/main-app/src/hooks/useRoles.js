@@ -56,7 +56,6 @@ export default function useRoles(weddingId) {
       setRoles(initial);
       setLoading(false);
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [weddingId]);
 
   // Asignar rol
@@ -83,4 +82,3 @@ export default function useRoles(weddingId) {
 
   return { roles, loading, assignRole, removeRole };
 }
-
