@@ -1,0 +1,153 @@
+﻿// Plantilla de tareas por defecto para una boda
+// Fechas relativas: offsets en d?as respecto a una fecha base (fecha boda o hoy)
+
+const parents = [
+  {
+    id: 'fundamentos',
+    title: 'Fundamentos',
+    category: 'FUNDAMENTOS',
+    phaseStartPct: 0,
+    phaseEndPct: 20,
+    startOffsetDays: -150,
+    durationDays: 30,
+    children: [
+      { id: 'difundir', title: 'Difundir la noticia y organizar la planificaci?n (perfil, invitar pareja, anillo, presupuesto inicial)', startOffsetDays: -148, durationDays: 7 },
+      { id: 'invitados-v1', title: 'Crear primera versi?n de la lista de invitados', startOffsetDays: -145, durationDays: 7 },
+      { id: 'lugares-investigar', title: 'Investigar lugares de celebraci?n y comenzar visitas', startOffsetDays: -142, durationDays: 14 },
+      { id: 'cortejo', title: 'Decidir cortejo nupcial', startOffsetDays: -135, durationDays: 5 },
+    ],
+  },
+  {
+    id: 'proveedores-clave',
+    title: 'Proveedores Clave',
+    category: 'PROVEEDORES',
+    phaseStartPct: 10,
+    phaseEndPct: 80,
+    startOffsetDays: -140,
+    durationDays: 120,
+    children: [
+      { id: 'fotografia', title: 'Fotograf?a (contacto inicial, cierre de contrato a mitad)', startOffsetDays: -138, durationDays: 60 },
+      { id: 'videografia', title: 'Videograf?a (decisi?n temprana, reuniones finales hacia el final)', startOffsetDays: -135, durationDays: 90 },
+      { id: 'catering', title: 'Catering (investigaci?n, prueba de men?, cierre)', startOffsetDays: -120, durationDays: 90 },
+      { id: 'florista', title: 'Florista (inspiraci?n y primeras ideas, confirmaci?n final)', startOffsetDays: -115, durationDays: 80 },
+      { id: 'musica', title: 'M?sica (reserva banda/DJ, reuni?n final)', startOffsetDays: -130, durationDays: 100 },
+      { id: 'reposteria', title: 'Reposter?a (b?squeda, prueba de sabores, pedido final)', startOffsetDays: -100, durationDays: 80 },
+    ],
+  },
+  {
+    id: 'vestuario-moda',
+    title: 'Vestuario y Moda',
+    category: 'VESTUARIO',
+    phaseStartPct: 15,
+    phaseEndPct: 90,
+    startOffsetDays: -130,
+    durationDays: 140,
+    children: [
+      { id: 'novia', title: 'Novia (visitas iniciales, decisi?n intermedia, pruebas finales)', startOffsetDays: -130, durationDays: 130 },
+      { id: 'novio', title: 'Novio (compra a mitad, ajustes finales)', startOffsetDays: -100, durationDays: 90 },
+      { id: 'cortejo-vestuario', title: 'Cortejo (definir vestidos/trajes, tallas y ajustes)', startOffsetDays: -90, durationDays: 100 },
+    ],
+  },
+  {
+    id: 'estilo-detalles',
+    title: 'Estilo y Detalles',
+    category: 'DETALLES',
+    phaseStartPct: 20,
+    phaseEndPct: 95,
+    startOffsetDays: -120,
+    durationDays: 150,
+    children: [
+      { id: 'invitaciones-digitales', title: 'Invitaciones digitales y save-the-dates', startOffsetDays: -110, durationDays: 30 },
+      { id: 'invitaciones-fisicas', title: 'Invitaciones f?sicas y papeler?a', startOffsetDays: -90, durationDays: 45 },
+      { id: 'decoracion-diy', title: 'Decoraci?n y DIY', startOffsetDays: -100, durationDays: 100 },
+      { id: 'recuerdos-regalos', title: 'Recuerdos y regalos', startOffsetDays: -80, durationDays: 60 },
+    ],
+  },
+  {
+    id: 'organizacion-logistica',
+    title: 'Organizaci?n y Log?stica',
+    category: 'LOGISTICA',
+    phaseStartPct: 30,
+    phaseEndPct: 100,
+    startOffsetDays: -100,
+    durationDays: 200,
+    children: [
+      { id: 'transporte', title: 'Transporte (definir pronto, confirmar al final)', startOffsetDays: -60, durationDays: 70 },
+      { id: 'extras-basicos', title: 'Extras y b?sicos del d?a (acumular y revisar)', startOffsetDays: -50, durationDays: 60 },
+      { id: 'confirmaciones-proveedores', title: 'Confirmaciones con proveedores (?ltimas semanas)', startOffsetDays: -21, durationDays: 14 },
+      { id: 'plan-b-clima', title: 'Plan B clima', startOffsetDays: -7, durationDays: 5 },
+      { id: 'ensayo-general', title: 'Ensayo general', startOffsetDays: -2, durationDays: 1 },
+    ],
+  },
+  {
+    id: 'celebraciones-emociones',
+    title: 'Celebraciones y Emociones',
+    category: 'EVENTOS',
+    phaseStartPct: 40,
+    phaseEndPct: 95,
+    startOffsetDays: -90,
+    durationDays: 160,
+    children: [
+      { id: 'eventos-adicionales', title: 'Eventos adicionales (preboda, brunch?)', startOffsetDays: -30, durationDays: 20 },
+      { id: 'despedidas', title: 'Despedidas (planificaci?n y celebraci?n)', startOffsetDays: -21, durationDays: 14 },
+      { id: 'votos-discursos', title: 'Votos y discursos (escribir y repasar)', startOffsetDays: -14, durationDays: 10 },
+    ],
+  },
+  {
+    id: 'belleza-cuidado',
+    title: 'Belleza y Cuidado',
+    category: 'BELLEZA',
+    phaseStartPct: 60,
+    phaseEndPct: 95,
+    startOffsetDays: -60,
+    durationDays: 150,
+    children: [
+      { id: 'reservas-belleza', title: 'Reservas peluquer?a/maquillaje con antelaci?n', startOffsetDays: -60, durationDays: 30 },
+      { id: 'pruebas-belleza', title: 'Pruebas intermedias', startOffsetDays: -30, durationDays: 20 },
+      { id: 'rutinas-cuidado', title: 'Rutinas de cuidado personal (?ltimos meses)', startOffsetDays: -45, durationDays: 45 },
+    ],
+  },
+  {
+    id: 'anillos',
+    title: 'Anillos y Joyas',
+    category: 'ANILLOS',
+    phaseStartPct: 70,
+    phaseEndPct: 95,
+    startOffsetDays: -50,
+    durationDays: 90,
+    children: [
+      { id: 'comprar-anillos', title: 'Comprar anillos (diseno, tallas y recogida)', startOffsetDays: -45, durationDays: 30 },
+      { id: 'joyeria-seguro', title: 'Revisar seguros y mantenimiento de joyeria', startOffsetDays: -30, durationDays: 20 },
+    ],
+  },
+  {
+    id: 'luna-miel',
+    title: 'Luna de Miel',
+    category: 'VIAJE',
+    phaseStartPct: 75,
+    phaseEndPct: 105,
+    startOffsetDays: -40,
+    durationDays: 140,
+    children: [
+      { id: 'planificar-luna-miel', title: 'Planificar luna de miel (eleccion, reservas y documentacion)', startOffsetDays: -40, durationDays: 70 },
+      { id: 'maletas-itinerario', title: 'Preparar itinerario, maletas y checklist de viaje', startOffsetDays: -14, durationDays: 21 },
+    ],
+  },
+  {
+    id: 'despues-boda',
+    title: 'Despu?s de la Boda',
+    category: 'POST_EVENTO',
+    phaseStartPct: 100,
+    phaseEndPct: 110,
+    startOffsetDays: 1,
+    durationDays: 30,
+    children: [
+      { id: 'disfrutar-matrimonio', title: 'Disfrutar inicio del matrimonio', startOffsetDays: 1, durationDays: 7 },
+      { id: 'album-recuerdos', title: 'Organizar ?lbum y recuerdos', startOffsetDays: 7, durationDays: 21 },
+    ],
+  },
+];
+
+export default parents;
+
+

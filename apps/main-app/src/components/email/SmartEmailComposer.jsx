@@ -1,0 +1,427 @@
+﻿import { CalendarClock, Clock, FileText, Lightbulb, Send } from 'lucide-react';
+import {
+  Box,
+  Grid,
+  Paper,
+  Typography,
+  TextField,
+  Button,
+  Divider,
+  IconButton,
+  Tooltip,
+  Collapse,
+  Alert,
+  Snackbar,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from '@mui/material';
+import LightbulbOutlined from '@mui/icons-material/LightbulbOutlined';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+
+import EmailRecommendationsPanel from './EmailRecommendationsPanel';
+import EmailRecommendationService from '../../services/EmailRecommendationService';
+import { safeRender, ensureNotPromise, safeMap } from '../../utils/promiseSafeRenderer';
+import useTranslations from '../../hooks/useTranslations';
+
+/**
+ * Componente para componer correos con recomendaciones inteligentes integradas
+ * @param {Object} props - Propiedades del componente
+ * @param {Object} props.provider - Proveedor al que se enviará el correo (opcional)
+ * @param {string} props.searchQuery - Consulta de búsqueda original (opcional)
+ * @param {Function} props.onSend - Función llamada al enviar el correo
+ * @param {Function} props.onCancel - Función llamada al cancelar
+ * @param {Array} props.templates - Lista de plantillas disponibles (opcional)
+ */
+const SmartEmailComposer = ({
+  provider,
+  searchQuery,
+  onSend,
+  onCancel,
+  templates = [],
+  initialValues = {},
+}) => {
+  const { t, tVars } = useTranslations();
+  const tEmail = useCallback((key, options) => t(key, { ns: 'email', ...options }), [t]);
+  const tEmailVars = useCallback(
+    (key, variables) => tVars(key, { ns: 'email', ...variables }),
+    [tVars]
+  );
+  const placeholders = useMemo(
+    () => ({
+      provider: tEmail('smartComposer.placeholders.provider'),
+      service: tEmail('smartComposer.placeholders.service'),
+      date: tEmail('smartComposer.placeholders.date'),
+      event: tEmail('smartComposer.placeholders.event'),
+    }),
+    [tEmail]
+  );
+  const applyTemplateTokens = useCallback(
+    (templateStr) => {
+      if (typeof templateStr !== 'string') return templateStr;
+      return templateStr
+        .replace(/\[Proveedor\]/g, provider?.name || placeholders.provider)
+        .replace(/\[Servicio\]/g, provider?.service || placeholders.service)
+        .replace(/\[Fecha\]/g, placeholders.date)
+        .replace(/\[Evento\]/g, placeholders.event);
+    },
+    [provider, placeholders]
+  );
+
+  // Estado del formulario
+  const [recipient, setRecipient] = useState(initialValues.to || provider?.email || '');
+  const [subject, setSubject] = useState(initialValues.subject || '');
+  const [message, setMessage] = useState(initialValues.body || initialValues.message || '');
+  const [selectedTemplate, setSelectedTemplate] = useState(initialValues.templateId || '');
+  const [scheduledTime, setScheduledTime] = useState(initialValues.scheduledTime || '');
+
+  // Estado de las recomendaciones
+  const [showRecommendations, setShowRecommendations] = useState(false);
+  const [feedback, setFeedback] = useState(null);
+  const [category, setCategory] = useState(initialValues.category || provider?.service || null);
+
+  // Para seguimiento de recomendaciones aplicadas
+  const [appliedRecommendations, setAppliedRecommendations] = useState([]);
+
+  // Servicio de recomendaciones
+  const recommendationService = new EmailRecommendationService();
+
+  useEffect(() => {
+    setRecipient(initialValues.to || provider?.email || '');
+    setSubject(initialValues.subject || '');
+    setMessage(initialValues.body || initialValues.message || '');
+    setSelectedTemplate(initialValues.templateId || '');
+    setScheduledTime(initialValues.scheduledTime || '');
+    setCategory(initialValues.category || provider?.service || null);
+  }, [initialValues, provider]);
+
+  useEffect(() => {
+    setRecipient(initialValues.to || provider?.email || '');
+    setSubject(initialValues.subject || '');
+    setMessage(initialValues.body || initialValues.message || '');
+    setSelectedTemplate(initialValues.templateId || '');
+    setScheduledTime(initialValues.scheduledTime || '');
+    setCategory(initialValues.category || provider?.service || null);
+  }, [initialValues, provider]);
+  // Cargar plantilla inicial si hay proveedor y categoría
+  useEffect(() => {
+    if (provider && category && templates.length > 0) {
+      const categoryTemplate = templates.find((t) => t.category === category);
+      if (categoryTemplate) {
+        setSelectedTemplate(categoryTemplate.id);
+        setSubject(applyTemplateTokens(categoryTemplate.subjectTemplate));
+        setMessage(applyTemplateTokens(categoryTemplate.messageTemplate));
+      }
+    }
+  }, [provider, category, templates, applyTemplateTokens]);
+
+  // Manejar envío del correo
+  const handleSend = () => {
+    if (!recipient || !subject || !message) {
+      setFeedback({
+        type: 'error',
+        message: tEmail('smartComposer.feedback.missingFields'),
+      });
+      return;
+    }
+
+    // Preparar datos del correo
+    const emailData = {
+      to: recipient,
+      subject,
+      message,
+      scheduledTime: scheduledTime || null,
+      provider,
+      searchQuery,
+      wasCustomized: appliedRecommendations.length > 0,
+      appliedRecommendations,
+    };
+
+    // Llamar a la función de envío proporcionada por el padre
+    if (onSend) {
+      onSend(emailData);
+    }
+  };
+
+  // Manejar aplicación de recomendaciones
+  const handleApplyRecommendation = (type, data) => {
+    // Registrar la recomendación aplicada
+    setAppliedRecommendations([
+      ...appliedRecommendations,
+      { type, timestamp: new Date().toISOString() },
+    ]);
+
+    // Aplicar la recomendación según su tipo
+    switch (type) {
+      case 'subject': {
+        const newSubject = applyTemplateTokens(data);
+        if (newSubject) {
+          setSubject(newSubject);
+          setFeedback({
+            type: 'success',
+            message: tEmail('smartComposer.feedback.subjectApplied'),
+          });
+        }
+        break;
+      }
+
+      case 'template': {
+        const template = templates.find((t) => t.category === data || t.id === data);
+        if (template) {
+          setSelectedTemplate(template.id);
+
+          const templateMessage = applyTemplateTokens(template.messageTemplate);
+
+          setMessage(templateMessage);
+          setFeedback({
+            type: 'success',
+            message: tEmailVars('smartComposer.feedback.templateApplied', {
+              name: template.name,
+            }),
+          });
+        }
+        break;
+      }
+
+      case 'time': {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        let hour = 10;
+        if (data.bestTimeSlot === 'morning') hour = 10;
+        else if (data.bestTimeSlot === 'afternoon') hour = 14;
+        else if (data.bestTimeSlot === 'evening') hour = 18;
+        else if (data.bestTimeSlot === 'night') hour = 21;
+
+        const scheduledDate = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, '0')}-${String(tomorrow.getDate()).padStart(2, '0')}T${String(hour).padStart(2, '0')}:00`;
+
+        setScheduledTime(scheduledDate);
+        setFeedback({
+          type: 'success',
+          message: tEmailVars('smartComposer.feedback.timeApplied', {
+            hour,
+            slot: data.bestTimeSlotName,
+          }),
+        });
+        break;
+      }
+
+      default: {
+        console.log('Tipo de recomendación no implementado:', type, data);
+        break;
+      }
+    }
+  };
+
+  // Cambiar plantilla seleccionada
+  const handleTemplateChange = (e) => {
+    const templateId = e.target.value;
+    setSelectedTemplate(templateId);
+
+    if (templateId) {
+      const template = templates.find((t) => t.id === templateId);
+      if (template) {
+        // Actualizar el mensaje con la plantilla
+        const templateMessage = applyTemplateTokens(template.messageTemplate);
+
+        setMessage(templateMessage);
+      }
+    }
+  };
+
+  // Cerrar alerta de feedback
+  const handleCloseFeedback = () => {
+    setFeedback(null);
+  };
+
+  return (
+    <Box sx={{ p: 2 }} data-testid="smart-composer-modal">
+      <Typography variant="h5" gutterBottom component="div">
+        {tEmail('smartComposer.title')}
+        {provider && (
+          <Typography component="span" variant="subtitle1" sx={{ ml: 1 }}>
+            {tEmailVars('smartComposer.titleWithProvider', { name: provider.name })}
+          </Typography>
+        )}
+      </Typography>
+
+      <Grid container spacing={2}>
+        <Grid item xs={12} md={showRecommendations ? 7 : 12}>
+          <Paper sx={{ p: 2 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+              <Typography variant="h6">
+                {tEmail('smartComposer.sections.message')}
+              </Typography>
+              <Tooltip
+                title={
+                  showRecommendations
+                    ? tEmail('smartComposer.toggles.hide')
+                    : tEmail('smartComposer.toggles.show')
+                }
+              >
+                <IconButton onClick={() => setShowRecommendations(!showRecommendations)}>
+                  {showRecommendations ? <Lightbulb color="primary" /> : <LightbulbOutlined />}
+                </IconButton>
+              </Tooltip>
+            </Box>
+
+            <Grid container spacing={2}>
+              {/* Destinatario */}
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label={tEmail('smartComposer.fields.to.label')}
+                  value={recipient}
+                  onChange={(e) => setRecipient(e.target.value)}
+                  variant="outlined"
+                  placeholder={tEmail('smartComposer.fields.to.placeholder')}
+                  inputProps={{ 'data-testid': 'smart-recipient' }}
+                />
+              </Grid>
+
+              {/* Asunto */}
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label={tEmail('smartComposer.fields.subject.label')}
+                  value={subject}
+                  onChange={(e) => setSubject(e.target.value)}
+                  variant="outlined"
+                  placeholder={tEmail('smartComposer.fields.subject.placeholder')}
+                  inputProps={{ 'data-testid': 'smart-subject' }}
+                />
+              </Grid>
+
+              {/* Selección de plantilla */}
+              {templates.length > 0 && (
+                <Grid item xs={12}>
+                  <FormControl fullWidth>
+                    <InputLabel id="template-select-label">
+                      {tEmail('smartComposer.templates.label')}
+                    </InputLabel>
+                    <Select
+                      labelId="template-select-label"
+                      value={selectedTemplate}
+                      label={tEmail('smartComposer.templates.label')}
+                      onChange={handleTemplateChange}
+                    >
+                      <MenuItem value="">
+                        <em>{tEmail('smartComposer.templates.none')}</em>
+                      </MenuItem>
+                      {templates.map((template) => (
+                        <MenuItem key={template.id} value={template.id}>
+                          {template.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+              )}
+
+              {/* Mensaje */}
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  multiline
+                  rows={8}
+                  label={tEmail('smartComposer.fields.message.label')}
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  variant="outlined"
+                  placeholder={tEmail('smartComposer.fields.message.placeholder')}
+                  inputProps={{ 'data-testid': 'smart-body' }}
+                />
+              </Grid>
+
+              {/* Programación de envío */}
+              <Grid item xs={12}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <AccessTime color="action" />
+                  <Typography variant="body2" color="text.secondary">
+                    {tEmail('smartComposer.schedule.label')}
+                  </Typography>
+                  <TextField
+                    type="datetime-local"
+                    inputProps={{ 'data-testid': 'smart-schedule' }}
+                    value={scheduledTime}
+                    onChange={(e) => setScheduledTime(e.target.value)}
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    sx={{ ml: 1 }}
+                    size="small"
+                  />
+                  {scheduledTime && (
+                    <Button size="small" onClick={() => setScheduledTime('')} sx={{ ml: 1 }}>
+                      {tEmail('smartComposer.schedule.clear')}
+                    </Button>
+                  )}
+                </Box>
+              </Grid>
+
+              {/* Botones de acción */}
+              <Grid item xs={12}>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
+                  <Button variant="outlined" onClick={onCancel}>
+                    {tEmail('smartComposer.buttons.cancel')}
+                  </Button>
+                  <Button
+                    variant="contained"
+                    startIcon={scheduledTime ? <Schedule /> : <Send />}
+                    onClick={handleSend}
+                  >
+                    {scheduledTime
+                      ? tEmail('smartComposer.buttons.schedule')
+                      : tEmail('smartComposer.buttons.send')}
+                  </Button>
+                </Box>
+              </Grid>
+            </Grid>
+          </Paper>
+        </Grid>
+
+        {/* Panel de recomendaciones */}
+        {showRecommendations && (
+          <Grid item xs={12} md={5}>
+            <Paper sx={{ height: '100%', overflow: 'auto' }}>
+              <EmailRecommendationsPanel
+                category={category}
+                searchQuery={searchQuery}
+                onApplyRecommendation={handleApplyRecommendation}
+              />
+            </Paper>
+          </Grid>
+        )}
+      </Grid>
+
+      {/* Alertas de feedback */}
+      <Snackbar
+        open={!!feedback}
+        autoHideDuration={6000}
+        onClose={handleCloseFeedback}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={handleCloseFeedback}
+          severity={feedback?.type || 'info'}
+          sx={{ width: '100%' }}
+        >
+          {feedback?.message}
+        </Alert>
+      </Snackbar>
+    </Box>
+  );
+};
+
+export default SmartEmailComposer;
+
+
+
+
+
+
+
+
+
+

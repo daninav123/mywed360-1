@@ -1,0 +1,1011 @@
+{
+  "marketing": {
+    "landing": {
+      "hero": {
+        "title": "Organiza tu boda perfecta",
+        "subtitle": "La plataforma todo-en-uno para bodas",
+        "cta": "Empieza gratis",
+        "brandLabel": "MaLove.App",
+        "logoAlt": "MaLove.App logo",
+        "badge": "All-in-one wedding planning platform",
+        "description": [
+          "MaLove.App unifies planning, finances, communication, and design in one workspace.",
+          "Streamline daily tasks, engage vendors, and deliver a memorable experience for every guest."
+        ],
+        "actions": {
+          "primary": "Start for free",
+          "secondary": "See everything the app includes"
+        },
+        "highlights": [
+          {
+            "value": "360°",
+            "label": "Full event visibility"
+          },
+          {
+            "value": "+50",
+            "label": "Active integrations"
+          },
+          {
+            "value": "24/7",
+            "label": "Access from any device"
+          }
+        ],
+        "widget": {
+          "summaryLabel": "Overview",
+          "eventName": "Valeria & Tomás Wedding",
+          "growth": "+18% this week",
+          "confirmedGuests": {
+            "label": "Confirmed guests",
+            "value": "132"
+          },
+          "budget": {
+            "label": "Budget executed",
+            "value": "$18.4k",
+            "pendingInvoices": "4 invoices pending"
+          },
+          "tasks": {
+            "label": "Critical tasks this week",
+            "items": [
+              {
+                "day": "21",
+                "text": "Confirm menu tasting and send feedback to catering."
+              },
+              {
+                "day": "22",
+                "text": "Draft VIP seating plan and share it with protocol."
+              }
+            ]
+          },
+          "assistant": {
+            "label": "MaLove.App assistant",
+            "message": "\"Your timeline is 82% complete. Send the lodging reminder before Monday and confirm the remaining vendors.\""
+          }
+        }
+      },
+      "features": {
+        "title": "Todo lo que necesitas",
+        "guests": "Gestión de invitados",
+        "finance": "Control financiero",
+        "tasks": "Organización de tareas",
+        "seating": "Plan de mesas"
+      },
+      "modules": {
+        "title": "Everything you need in one place",
+        "description": "MaLove.App streamlines logistics with collaborative modules for planners, vendors, and guests.",
+        "items": [
+          {
+            "title": "Guest management",
+            "description": "Centralize RSVPs, seating, and preferences in one place with always-synced information."
+          },
+          {
+            "title": "Finance control",
+            "description": "Track budgets, payments, and contracts with smart reminders and clear reports for your team."
+          },
+          {
+            "title": "Design and communication",
+            "description": "Wedding website, invitations, and email campaigns ready to send from a single workflow."
+          }
+        ]
+      },
+      "planner": {
+        "badge": "Built for planners",
+        "title": "Total control of your event portfolio without spreadsheets.",
+        "description": "MaLove.App makes it easy to run multiple weddings with dashboards, reusable templates, and exportable reports. Coordinate your team and stay ahead with a single platform.",
+        "highlights": [
+          {
+            "key": "portfolio",
+            "title": "Multi-wedding portfolio",
+            "description": "Manage simultaneous events with independent boards. Switch weddings in one click without losing context."
+          },
+          {
+            "key": "kits",
+            "title": "Repeatable kits",
+            "description": "Duplicate checklists, budgets, and communication templates to reuse your best workflows in seconds."
+          },
+          {
+            "key": "alerts",
+            "title": "Proactive alerts",
+            "description": "Get notified about critical tasks, expiring contracts, and pending payments for every client."
+          }
+        ],
+        "dashboard": {
+          "title": "Planner view",
+          "portfolioLabel": "Current portfolio",
+          "portfolioValue": "8 active weddings",
+          "portfolioBadge": "2 new this month",
+          "statusLabel": "Client status",
+          "statusItems": [
+            "⬢ Ana & Diego – timeline: 92%",
+            "⬢ Laura & Marco – payments: 3 invoices pending",
+            "⬢ Carolina & Javier – guests: 156 confirmed"
+          ],
+          "performanceLabel": "Monthly performance",
+          "performanceNote": "Average time per wedding: 38% less than last year."
+        }
+      },
+      "benefits": {
+        "badge": "Key benefits",
+        "title": "A carefully managed operation from start to finish",
+        "description": "Designed for planners who need visibility and couples who want peace of mind. MaLove.App automates repetitive tasks and keeps everyone aligned.",
+        "items": {
+          "timelines": {
+            "title": "Timelines under control",
+            "description": "Dynamic checklists, smart reminders, and shareable schedules for your team."
+          },
+          "collaboration": {
+            "title": "Real collaboration",
+            "description": "Roles for planners, assistants, vendors, and guests with personalized views."
+          },
+          "branding": {
+            "title": "Consistent design",
+            "description": "Wedding website, invitations, and communications with your branding in minutes."
+          },
+          "security": {
+            "title": "Secure data",
+            "description": "Cloud infrastructure and granular permissions to protect contracts, payments, and contacts."
+          }
+        }
+      },
+      "stories": {
+        "badge": "Real stories",
+        "title": "MaLove.App empowers planners and couples worldwide",
+        "description": "More than 12k weddings are managed in MaLove.App. Every team leverages automations, insights, and templates to spend more time on creativity.",
+        "testimonials": [
+          {
+            "quote": "We integrated MaLove.App into our process and now share dashboards with key vendors. The team arrives prepared to every meeting.",
+            "name": "Martina R.",
+            "role": "Boutique planner in Madrid"
+          },
+          {
+            "quote": "As a couple we needed clarity. The reminders and guest portal let us respond fast without duplicate emails.",
+            "name": "David & Sofía",
+            "role": "250-guest celebration, Bogotá"
+          }
+        ],
+        "trust": {
+          "title": "Trusted by MaLove.App",
+          "brands": ["Lumiere Events", "Novia Atelier", "Festiva Group", "Urban Weddings"],
+          "note": "200+ active planners across Europe and LATAM rely on MaLove.App to standardize processes and deliver memorable experiences."
+        }
+      },
+      "faq": {
+        "badge": "Frequently asked questions",
+        "title": "Everything you need to know before getting started",
+        "items": [
+          {
+            "question": "Can I try MaLove.App for free?",
+            "answer": "Yes. The Essentials plan is free forever and unlocks core features (guests, tasks, website). The Professional plan offers a 14-day trial with advanced integrations."
+          },
+          {
+            "question": "Does MaLove.App work for planners running multiple events?",
+            "answer": "Absolutely. The multi-event dashboard lets you switch weddings, share permissions with collaborators, and automate updates with vendors for each event."
+          },
+          {
+            "question": "What onboarding support will I receive?",
+            "answer": "We provide guided onboarding, a template library, and optional consulting. The Enterprise plan includes a dedicated manager and training sessions for your team."
+          }
+        ],
+        "form": {
+          "title": "Request a personalized demo",
+          "description": "Tell us about your operation and schedule a video call with our team. You will receive recommendations tailored to your current workflow and a quick-start guide.",
+          "fields": {
+            "name": {
+              "label": "Full name",
+              "placeholder": "Your name"
+            },
+            "email": {
+              "label": "Contact email",
+              "placeholder": "you@youragency.com"
+            }
+          },
+          "messages": {
+            "submit": "Schedule demo",
+            "submitting": "Sending request...",
+            "success": "Thank you! Our team will reach out in less than 24 hours.",
+            "error": "Please fill in your name and email to request a demo."
+          },
+          "consent": "By submitting you agree to receive MaLove.App related communications. You can unsubscribe at any time."
+        }
+      },
+      "cta": {
+        "title": "Ready to use in minutes.",
+        "description": "Create your account, import your guest list, and enable automations that support you from day one.",
+        "primary": "Create free account",
+        "secondary": "Compare plans"
+      }
+    },
+    "pricing": {
+      "title": "Precios simples y transparentes",
+      "free": "Gratis",
+      "pro": "Profesional",
+      "enterprise": "Empresa",
+      "cta": "Empezar ahora"
+    },
+    "appOverview": {
+      "hero": {
+        "title": "The app that brings your entire planning flow together in one place.",
+        "description": "From the first checklist to the final report, MaLove.App supports professional teams and couples who want complete control of their event.",
+        "stats": [
+          {
+            "value": "12k+",
+            "label": "weddings planned with MaLove.App"
+          },
+          {
+            "value": "4.8/5",
+            "label": "average planner satisfaction"
+          },
+          {
+            "value": "30%",
+            "label": "time saved in logistics coordination"
+          }
+        ],
+        "workspace": {
+          "badge": "MaLove.App Workspace",
+          "title": "A connected ecosystem",
+          "description": "Synced modules, personalised roles, and granular permissions so you can collaborate without losing context.",
+          "tags": ["Dashboard", "Guests", "Finance", "Communication", "Design", "Automations"]
+        }
+      },
+      "modules": {
+        "title": "Key modules ready for your team",
+        "description": "Each module is designed to connect with the rest, eliminating scattered information and keeping everyone on the same page.",
+        "items": [
+          {
+            "title": "Collaborative dashboard",
+            "description": "Tasks, milestones, and reminders in a central board that updates in real time."
+          },
+          {
+            "title": "Provider CRM",
+            "description": "Compare proposals, manage contracts, and track payments and deliverables."
+          },
+          {
+            "title": "Financial management",
+            "description": "Smart budgets, spending control, and detailed reports by category."
+          },
+          {
+            "title": "Guest experience",
+            "description": "Website, automatic RSVP, interactive seating, and personalised messages in a single flow."
+          },
+          {
+            "title": "Email automation",
+            "description": "Prebuilt flows, dynamic segments, and metrics to measure engagement."
+          },
+          {
+            "title": "Intelligent assistant",
+            "description": "AI-powered recommendations to build agendas, checklists, and answer contextual questions."
+          }
+        ]
+      },
+      "integrations": {
+        "title": "Integrations and automations that work for you.",
+        "description": "Connect MaLove.App with payment services, calendars, and communication tools. Configure automatic triggers for RSVP, provider confirmations, or task follow-ups.",
+        "items": [
+          "Integrations with Google Calendar, Gmail, and productivity suites.",
+          "Visual automations with conditions and reusable templates.",
+          "API for internal developments and connections to external systems."
+        ],
+        "cta": {
+          "title": "Immediate access",
+          "description": "Every account includes a free trial and a guided demo with our onboarding team.",
+          "button": "Request demo"
+        }
+      }
+    }
+  },
+  "_note": "Translate from es/marketing.json",
+  "nav": {
+    "home": "Home",
+    "app": "The App",
+    "pricing": "Pricing",
+    "login": "Login / Sign up",
+    "loginShort": "Log in",
+    "signupShort": "Sign up",
+    "plans": "Plans",
+    "accessCenter": "Access Center",
+    "contact": "Contact",
+    "legal": "Legal"
+  },
+  "common": {
+    "copyright": "© {year} MaLove.App. All rights reserved.",
+    "logoAlt": "MaLove.App Logo",
+    "contactLabel": "Contact MaLove.App"
+  },
+  "planners": {
+    "meta": {
+      "title": "MaLove.App for planners | Run multiple weddings from a single workspace",
+      "description": "Coordinate weddings with your team, centralize vendors, and automate workflows with the professional MaLove.App platform.",
+      "canonical": "https://malove.app/para-planners",
+      "ogTitle": "MaLove.App for planners | Run multiple weddings from a single workspace",
+      "ogDescription": "Manage projects, finances, and communication with tools built for wedding planners.",
+      "image": "https://malove.app/maloveapp-logo.png",
+      "twitterTitle": "MaLove.App for planners | Run multiple weddings from a single workspace",
+      "twitterDescription": "Streamline your wedding planning agency with dashboards, automations, and collaborative tools."
+    },
+    "hero": {
+      "logoAlt": "MaLove.App",
+      "brand": "MaLove.App",
+      "badge": "For Wedding Planners",
+      "title": "Manage every wedding from one professional platform",
+      "description": [
+        "MaLove.App is the definitive software for wedding planners—multi-wedding dashboard, reusable templates, collaborative teamwork, and real-time analytics.",
+        "Your clients automatically access premium features. No hidden fees."
+      ],
+      "primaryCta": "Start free for 14 days",
+      "secondaryCta": "View plans",
+      "stats": {
+        "label": "Your Dashboard",
+        "title": "Planner View",
+        "badge": "8 active weddings",
+        "cards": [
+          {
+            "title": "Ana & Diego",
+            "subtitle": "Progress: 92%",
+            "badge": "In progress"
+          },
+          {
+            "title": "Laura & Marco",
+            "subtitle": "3 pending payments",
+            "badge": "Attention"
+          },
+          {
+            "title": "Carolina & Javier",
+            "subtitle": "156 confirmed",
+            "badge": "Guests"
+          }
+        ]
+      }
+    },
+    "benefits": {
+      "sectionTitle": "Everything you need to run weddings professionally",
+      "sectionDescription": "Tools crafted specifically for wedding planners",
+      "multiWedding": {
+        "title": "Multi-wedding management",
+        "description": "Unified dashboard to manage all your active weddings. Switch between events with one click."
+      },
+      "team": {
+        "title": "Collaborative team",
+        "description": "Invite collaborators, assign tasks, and keep your entire team in sync in real time."
+      },
+      "templates": {
+        "title": "Reusable templates",
+        "description": "Duplicate checklists, budgets, and successful workflows to standardize your operation."
+      },
+      "analytics": {
+        "title": "Advanced analytics",
+        "description": "Performance reports, KPIs per wedding, and a consolidated dashboard for your agency."
+      },
+      "premiumClients": {
+        "title": "Clients on premium",
+        "description": "Couples you manage automatically get premium features at no extra cost."
+      },
+      "marketplace": {
+        "title": "Marketplace visibility",
+        "description": "Be featured in our planner marketplace to win new clients."
+      }
+    },
+    "plans": {
+      "badge": "Plans for Planners",
+      "sectionTitle": "Choose the plan that fits your agency",
+      "sectionDescription": "All plans include free updates and support",
+      "freeLabel": "Free",
+      "exploratory": {
+        "name": "Exploratory",
+        "badge": "Free trial",
+        "suffix": "forever",
+        "description": "Perfect for getting to know the platform",
+        "weddings": "0 real weddings",
+        "features": [
+          "Full demo access",
+          "Explore every feature",
+          "Preloaded sample data",
+          "Perfect for onboarding",
+          "No credit card required"
+        ],
+        "cta": "Start for free"
+      },
+      "studio": {
+        "name": "Studio",
+        "badge": "Independent planners",
+        "suffix": "/year",
+        "description": "For planners handling a handful of weddings each year",
+        "weddings": "Up to 5 active weddings",
+        "features": [
+          "5 active weddings at once",
+          "Duplicable templates",
+          "Marketplace priority",
+          "Your clients in premium mode",
+          "Unlimited exports",
+          "Priority support"
+        ],
+        "cta": "Start with Studio"
+      },
+      "studioPlus": {
+        "name": "Studio Plus",
+        "badge": "More collaborators",
+        "suffix": "/year",
+        "description": "Studio with team capacity and specialized support",
+        "weddings": "Up to 5 weddings + 7 collaborators",
+        "features": [
+          "Everything in Studio",
+          "+7 collaborators included",
+          "Vendor concierge",
+          "Preferred negotiations",
+          "Sessions with specialists",
+          "Advanced analytics"
+        ],
+        "cta": "Choose Studio Plus"
+      },
+      "agency": {
+        "name": "Agency",
+        "badge": "Boutique agencies",
+        "suffix": "/year",
+        "description": "For boutique agencies managing multiple weddings",
+        "weddings": "Up to 10 active weddings",
+        "features": [
+          "10 active weddings at once",
+          "10 collaborators",
+          "Marketplace PRO",
+          "Multi-client automations",
+          "Custom reports",
+          "Consolidated analytics"
+        ],
+        "cta": "Start with Agency"
+      },
+      "agencyPlus": {
+        "name": "Agency Plus",
+        "badge": "White label",
+        "suffix": "/year",
+        "description": "Agency with your branding and dedicated support",
+        "weddings": "Up to 10 weddings + white label",
+        "features": [
+          "Everything in Agency",
+          "Full white label",
+          "No MaLove.App branding",
+          "API integrations",
+          "24/7 dedicated support",
+          "Personalized onboarding"
+        ],
+        "cta": "Choose Agency Plus"
+      },
+      "teams": {
+        "name": "Teams",
+        "badge": "Large teams",
+        "suffix": "/year",
+        "description": "For agencies with high volume",
+        "weddings": "Up to 40 active weddings",
+        "features": [
+          "40 active weddings at once",
+          "1 lead planner + 3 additional",
+          "Team management",
+          "Consolidated dashboard",
+          "Task assignment",
+          "Productivity reports"
+        ],
+        "cta": "Start with Teams"
+      },
+      "teamsUnlimited": {
+        "name": "Teams Unlimited",
+        "badge": "Enterprise",
+        "suffix": "/year",
+        "description": "No limits, maximum customization",
+        "weddings": "Unlimited weddings",
+        "features": [
+          "Unlimited weddings",
+          "Unlimited collaborators",
+          "White label + custom domain",
+          "Custom API",
+          "24/7 dedicated support",
+          "Personalized training"
+        ],
+        "cta": "Contact for Enterprise"
+      }
+    },
+    "useCases": {
+      "badge": "Use Cases",
+      "sectionTitle": "Find the ideal plan for your operation",
+      "recommendedLabel": "Recommended",
+      "independent": {
+        "title": "Independent planners",
+        "description": "Manage 1-5 weddings per year with professional organization",
+        "recommended": "Studio or Studio Plus"
+      },
+      "boutique": {
+        "title": "Boutique agencies",
+        "description": "Small team handling 5-15 weddings annually",
+        "recommended": "Agency or Agency Plus"
+      },
+      "established": {
+        "title": "Established agencies",
+        "description": "Large teams with 30+ weddings per year",
+        "recommended": "Teams or Teams Unlimited"
+      }
+    },
+    "testimonials": {
+      "0": {
+        "quote": "MaLove.App transformed our operation. We used to rely on spreadsheets and lost hours on manual tasks. Now everything is centralized and automated.",
+        "name": "María González",
+        "role": "Director at Momentos Perfectos"
+      },
+      "1": {
+        "quote": "Best ROI we've seen. We recovered the investment in the first month just from the time saved coordinating with clients.",
+        "name": "Carlos Ruiz",
+        "role": "Independent Wedding Planner"
+      },
+      "2": {
+        "quote": "Reusable templates are a game changer. We clone a successful wedding and have the entire setup ready in minutes.",
+        "name": "Ana Martínez",
+        "role": "Founder, Eventos Especiales"
+      },
+      "badge": "Testimonials",
+      "sectionTitle": "Wedding planners already trust us"
+    },
+    "demo": {
+      "badge": "Personalized Demo",
+      "title": "Schedule a demo with our team",
+      "description": "We'll show you how MaLove.App can transform your agency operations. No commitment.",
+      "checklist": [
+        "Review of your current workflow",
+        "Personalized recommendations",
+        "ROI estimation for your agency",
+        "Answers to all your questions"
+      ],
+      "form": {
+        "title": "Request your demo",
+        "description": "Fill out the form and we'll contact you in under 24 hours.",
+        "fields": {
+          "name": {
+            "label": "Full name *",
+            "placeholder": "Your name"
+          },
+          "email": {
+            "label": "Email *",
+            "placeholder": "you@email.com"
+          },
+          "company": {
+            "label": "Agency/Business",
+            "placeholder": "Your agency name"
+          }
+        },
+        "submit": "Request demo",
+        "submitting": "Sending...",
+        "messages": {
+          "success": "Thank you! We'll reach out soon to schedule your personalized demo.",
+          "error": "Please fill in all required fields."
+        }
+      }
+    },
+    "finalCta": {
+      "title": "Start managing your weddings professionally today",
+      "description": "Try it free for 14 days. No credit card required. Cancel anytime.",
+      "primary": "Start free trial",
+      "secondary": "See all plans"
+    }
+  },
+  "partners": {
+    "meta": {
+      "title": "Partner Program | MaLove.App",
+      "description": "Join the MaLove.App partner program and earn recurring commissions with marketing resources, training, and dedicated support.",
+      "canonical": "https://malove.app/partners",
+      "ogTitle": "Partner Program | MaLove.App",
+      "ogDescription": "Earn recurring revenue by recommending MaLove.App to planners and vendors with enablement materials and real-time tracking.",
+      "image": "https://malove.app/maloveapp-logo.png",
+      "twitterTitle": "Partner Program | MaLove.App",
+      "twitterDescription": "Generate recurring commissions by promoting the all-in-one wedding planning platform."
+    },
+    "hero": {
+      "logoAlt": "MaLove.App",
+      "brand": "MaLove.App",
+      "badge": "Partner Program",
+      "title": "Earn commissions by helping couples plan their perfect wedding",
+      "description": [
+        "Join our partner program and receive recurring commissions for every client you refer to MaLove.App.",
+        "No upfront investment. Attractive payouts. Marketing assets included."
+      ],
+      "cta": "Request Program Access"
+    },
+    "benefits": {
+      "title": "Why become a MaLove.App partner?",
+      "subtitle": "Benefits designed to maximise your earning potential",
+      "items": [
+        {
+          "icon": "commissions",
+          "title": "Attractive commissions",
+          "description": "Earn recurring commissions for every subscription you sell."
+        },
+        {
+          "icon": "analytics",
+          "title": "Tracking dashboard",
+          "description": "Monitor conversions, commissions, and stats in real time."
+        },
+        {
+          "icon": "materials",
+          "title": "Marketing collateral",
+          "description": "Access presentations, demos, and assets to accelerate your sales."
+        },
+        {
+          "icon": "support",
+          "title": "Dedicated support",
+          "description": "A partner success team ready to help you with prospects."
+        },
+        {
+          "icon": "training",
+          "title": "Included training",
+          "description": "Full onboarding on the platform and best practices to sell it."
+        },
+        {
+          "icon": "unlimited",
+          "title": "No limits",
+          "description": "There is no cap on your commissions—the more you sell, the more you earn."
+        }
+      ]
+    },
+    "process": {
+      "badge": "Simple process",
+      "title": "How it works",
+      "subtitle": "Start earning in 4 easy steps",
+      "steps": [
+        {
+          "step": "1",
+          "title": "Join the program",
+          "description": "Submit the application form and wait for our approval."
+        },
+        {
+          "step": "2",
+          "title": "Get trained",
+          "description": "Access materials and training sessions about the platform."
+        },
+        {
+          "step": "3",
+          "title": "Share your link",
+          "description": "Receive your unique affiliate link to track conversions."
+        },
+        {
+          "step": "4",
+          "title": "Earn commissions",
+          "description": "Collect recurring commissions for every customer who subscribes."
+        }
+      ]
+    },
+    "profiles": {
+      "badge": "Ideal profile",
+      "title": "Are you a good fit?",
+      "subtitle": "We look for professionals connected to the wedding industry",
+      "items": [
+        {
+          "icon": "consultants",
+          "title": "Wedding consultants",
+          "description": "Advisors who work with couples and can recommend professional tools."
+        },
+        {
+          "icon": "influencers",
+          "title": "Industry influencers",
+          "description": "Creators with an audience interested in wedding planning."
+        },
+        {
+          "icon": "eventPros",
+          "title": "Event professionals",
+          "description": "Planners who can introduce MaLove.App within their network."
+        }
+      ]
+    },
+    "form": {
+      "anchor": "partners-form",
+      "badge": "Access request",
+      "title": "Join the Partner Program",
+      "description": "Complete the form and our team will review your application. We will contact you within 48 hours.",
+      "fields": {
+        "name": {
+          "label": "Full name *",
+          "placeholder": "Your name"
+        },
+        "email": {
+          "label": "Email *",
+          "placeholder": "you@email.com"
+        },
+        "experience": {
+          "label": "Industry experience",
+          "placeholder": "Choose an option",
+          "options": [
+            {
+              "value": "consultant",
+              "label": "Wedding consultant"
+            },
+            {
+              "value": "influencer",
+              "label": "Influencer / Content creator"
+            },
+            {
+              "value": "event-pro",
+              "label": "Event professional"
+            },
+            {
+              "value": "supplier",
+              "label": "Wedding vendor"
+            },
+            {
+              "value": "other",
+              "label": "Other"
+            }
+          ]
+        },
+        "about": {
+          "label": "Tell us about you",
+          "placeholder": "Describe your experience, network, and why you want to become a partner..."
+        }
+      },
+      "submit": "Submit application",
+      "submitting": "Sending...",
+      "messages": {
+        "success": "Thanks for your interest! We will review your application and get in touch shortly.",
+        "error": "Please fill in all required fields."
+      },
+      "consent": "By submitting you agree that we review your profile and contact you regarding the MaLove.App partner program. We never share your information with third parties."
+    },
+    "finalCta": {
+      "title": "Ready to start earning recurring revenue?",
+      "description": "Join our partner program and start earning commissions today.",
+      "primary": "Request access now"
+    },
+    "structuredData": {
+      "@context": "https://schema.org",
+      "@type": "ProgramMembership",
+      "name": "MaLove.App Partner Program",
+      "description": "Join the MaLove.App partner program and earn recurring commissions by recommending our wedding planning platform.",
+      "url": "https://malove.app/partners",
+      "hostingOrganization": {
+        "@type": "Organization",
+        "name": "MaLove.App",
+        "url": "https://malove.app",
+        "logo": "https://malove.app/maloveapp-logo.png",
+        "sameAs": [
+          "https://www.linkedin.com/company/maloveapp",
+          "https://www.instagram.com/malove.app",
+          "https://www.facebook.com/maloveapp"
+        ]
+      }
+    }
+  },
+  "suppliers": {
+    "meta": {
+      "title": "MaLove.App for suppliers | Reach qualified couples",
+      "description": "Publish your portfolio on MaLove.App, reach couples in your area and receive qualified enquiries with centralised metrics and messaging.",
+      "ogTitle": "MaLove.App for suppliers | Reach qualified couples",
+      "ogDescription": "Manage your presence, pay only per view and convert couples into clients with professional tools.",
+      "twitterTitle": "MaLove.App for suppliers | Reach qualified couples",
+      "twitterDescription": "Showcase your wedding business, receive qualified leads and get real-time analytics.",
+      "canonical": "https://malove.app/para-proveedores",
+      "image": "https://malove.app/maloveapp-logo.png"
+    },
+    "hero": {
+      "brand": "MaLove.App",
+      "logoAlt": "MaLove.App logo",
+      "badge": "For Wedding Suppliers",
+      "title": "Connect with couples looking for your services",
+      "description": [
+        "MaLove.App helps you reach thousands of couples planning their wedding. Pay-per-view model with no monthly subscriptions or commission fees.",
+        "Build a professional portfolio, receive qualified requests and manage everything from your dashboard."
+      ],
+      "primaryCta": "Create your profile for free",
+      "secondaryCta": "See how it works",
+      "stats": {
+        "label": "Your dashboard",
+        "title": "Supplier panel",
+        "growthBadge": "+24% this month",
+        "metrics": [
+          {
+            "icon": "eye",
+            "label": "Profile views",
+            "value": "1,248",
+            "hint": "156 tokens available"
+          },
+          {
+            "icon": "messageSquare",
+            "label": "Requests",
+            "value": "47",
+            "hint": "12 waiting for reply"
+          },
+          {
+            "icon": "star",
+            "label": "Rating",
+            "value": "4.9",
+            "hint": "Based on 28 reviews"
+          }
+        ]
+      }
+    },
+    "benefits": {
+      "title": "Why suppliers choose MaLove.App",
+      "subtitle": "Professional tools to grow your wedding business",
+      "items": [
+        {
+          "icon": "users",
+          "title": "Reach thousands of couples",
+          "description": "Appear in search results when couples look for services like yours in their area."
+        },
+        {
+          "icon": "camera",
+          "title": "Professional portfolio",
+          "description": "Create a public page with photo gallery, services, pricing and reviews."
+        },
+        {
+          "icon": "messageSquare",
+          "title": "Direct enquiries",
+          "description": "Couples contact you directly within the platform with their needs and contact details."
+        },
+        {
+          "icon": "barChart",
+          "title": "Management dashboard",
+          "description": "Track enquiries, conversations and projects from a single panel."
+        },
+        {
+          "icon": "trendingUp",
+          "title": "No commission fees",
+          "description": "Only pay per view. We never charge commission on signed contracts."
+        },
+        {
+          "icon": "shield",
+          "title": "Verified supplier badge",
+          "description": "Increase trust with a verification badge for potential clients."
+        }
+      ]
+    },
+    "howItWorks": {
+      "badge": "Simple process",
+      "title": "How it works",
+      "description": "Five steps to start receiving wedding enquiries",
+      "steps": [
+        {
+          "title": "Sign up for free",
+          "description": "Create your supplier account with no cost or obligation."
+        },
+        {
+          "title": "Complete your profile",
+          "description": "Add photos, services, pricing and coverage areas."
+        },
+        {
+          "title": "Buy credits",
+          "description": "Purchase view tokens according to your needs. No monthly subscriptions."
+        },
+        {
+          "title": "Appear in searches",
+          "description": "When a couple looks for your category, your profile can show up and uses 1 token."
+        },
+        {
+          "title": "Receive enquiries",
+          "description": "Interested couples send you quote requests with all their information."
+        }
+      ]
+    },
+    "tokens": {
+      "badge": "Token system",
+      "title": "Pay per view, no surprises",
+      "description": "You only pay when your profile appears in a couple’s search results",
+      "howTitle": "How do tokens work?",
+      "howList": [
+        "Purchase token packs that fit your goals (e.g. 100, 500, 1,000 tokens)",
+        "When a couple searches your category, your profile can be shown",
+        "If you appear in their results, 1 token is consumed",
+        "Tokens never expire—you use them at your own pace",
+        "Pause your profile whenever you want without losing tokens"
+      ],
+      "includedTitle": "What’s included",
+      "included": [
+        "Pay-per-view token model",
+        "No fixed monthly subscription",
+        "Buy exactly the tokens you need",
+        "Tokens never expire",
+        "No commission on booked contracts",
+        "Dashboard and messaging included",
+        "Customisable public portfolio page",
+        "Unlimited portfolio updates"
+      ],
+      "notice": "💡 Pricing for token packs will be announced soon"
+    },
+    "testimonials": {
+      "badge": "Testimonials",
+      "title": "Suppliers already growing with MaLove.App",
+      "items": [
+        {
+          "quote": "Since joining MaLove.App I receive qualified enquiries every week. Couples arrive with clear information and defined budgets.",
+          "name": "Carlos Mendoza",
+          "role": "Wedding photographer",
+          "rating": 5
+        },
+        {
+          "quote": "I love the token system. I only pay when I am seen, unlike other platforms with monthly fees even if you get no clients.",
+          "name": "Laura Vega",
+          "role": "Wedding planner",
+          "rating": 5
+        },
+        {
+          "quote": "The dashboard is complete. I manage enquiries, chats and contracts from a single place.",
+          "name": "Roberto Jiménez",
+          "role": "Catering & events",
+          "rating": 5
+        }
+      ]
+    },
+    "categoriesSection": {
+      "badge": "Available categories",
+      "title": "Does your business fit MaLove.App?",
+      "description": "We work with every kind of wedding supplier",
+      "list": [
+        "Photography & Video",
+        "Catering & Banquets",
+        "Venues",
+        "Music & DJs",
+        "Decor & Flowers",
+        "Dresses & Suits",
+        "Beauty & Styling",
+        "Invitations & Stationery",
+        "Cakes & Desserts",
+        "Transportation",
+        "Entertainment",
+        "Wedding Planner",
+        "Other"
+      ],
+      "formTitle": "Request more information",
+      "formDescription": "Fill in the form and our team will reach out to explain every step."
+    },
+    "form": {
+      "fields": {
+        "name": {
+          "label": "Full name *",
+          "placeholder": "Your name"
+        },
+        "email": {
+          "label": "Email *",
+          "placeholder": "you@email.com"
+        },
+        "business": {
+          "label": "Business name *",
+          "placeholder": "Your company"
+        },
+        "category": {
+          "label": "Category",
+          "placeholder": "Select a category"
+        }
+      },
+      "submit": "Request information",
+      "submitting": "Sending...",
+      "consent": "By submitting you agree to be contacted about MaLove.App for suppliers.",
+      "messages": {
+        "success": "Thank you! We will get in touch within 24 hours.",
+        "error": "Please fill in all the required fields."
+      }
+    },
+    "finalCta": {
+      "title": "Start receiving wedding enquiries today",
+      "description": "Register for free, complete your profile and appear in thousands of searches.",
+      "primary": "Register now",
+      "secondary": "See more details"
+    },
+    "structuredData": {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "name": "MaLove.App for suppliers",
+      "serviceType": "Qualified lead generation for wedding suppliers",
+      "provider": {
+        "@type": "Organization",
+        "name": "MaLove.App",
+        "url": "https://malove.app",
+        "logo": "https://malove.app/maloveapp-logo.png"
+      },
+      "areaServed": {
+        "@type": "Country",
+        "name": "Spain"
+      },
+      "serviceAudience": {
+        "@type": "Audience",
+        "audienceType": "Wedding suppliers and professionals"
+      },
+      "offers": {
+        "@type": "Offer",
+        "url": "https://malove.app/para-proveedores",
+        "priceCurrency": "EUR",
+        "availability": "https://schema.org/InStock",
+        "description": "Pay-per-view system with portfolio, analytics and integrated messaging tools."
+      }
+    }
+  }
+}
