@@ -46,12 +46,19 @@ export function useUserCollection(collectionName, fallback = []) {
       );
     };
 
-    const uid = auth.currentUser?.uid;
+    const uid = auth?.currentUser?.uid;
     if (uid) {
       init(uid);
       return () => {
         if (typeof unsubFS === 'function') unsubFS();
       };
+    }
+
+    // Si no hay auth disponible, usar fallback
+    if (!auth) {
+      setData(lsGet(collectionName, fallback));
+      setLoading(false);
+      return;
     }
 
     const handler = () => setData(lsGet(collectionName, fallback));
@@ -119,5 +126,3 @@ export function useUserCollection(collectionName, fallback = []) {
 
   return { data, loading, addItem, updateItem, deleteItem };
 }
-
-
