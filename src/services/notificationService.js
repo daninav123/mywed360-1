@@ -17,7 +17,7 @@ const NOTIFICATION_TYPES = {
   RSVP_REMINDER: 'rsvp_reminder',
   INFO_UPDATE: 'info_update',
   PAYMENT_REMINDER: 'payment_reminder',
-  THANK_YOU: 'thank_you'
+  THANK_YOU: 'thank_you',
 };
 
 class NotificationService {
@@ -26,7 +26,7 @@ class NotificationService {
     const docRef = await addDoc(ref, {
       ...notification,
       createdAt: new Date().toISOString(),
-      sent: false
+      sent: false,
     });
     return { id: docRef.id, ...notification };
   }
@@ -35,7 +35,7 @@ class NotificationService {
     return this.create(weddingId, {
       ...notification,
       scheduled: true,
-      sendAt: sendAt.toISOString()
+      sendAt: sendAt.toISOString(),
     });
   }
 
@@ -45,7 +45,7 @@ class NotificationService {
       where('sent', '==', false)
     );
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
   }
 
   async markSent(weddingId, notificationId) {
@@ -141,12 +141,12 @@ export const isQuietHoursActive = () => {
   // Verificar si estamos en quiet hours
   const prefs = getNotificationPrefs();
   if (!prefs.quietHours?.enabled) return false;
-  
+
   try {
     const now = new Date();
     const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
     const { start, end } = prefs.quietHours;
-    
+
     // Si quiet hours cruza medianoche
     if (start > end) {
       return currentTime >= start || currentTime < end;
@@ -165,7 +165,7 @@ export const showNotification = (notification) => {
     console.log('Notificación silenciada por quiet hours');
     return notification;
   }
-  
+
   // Mostrar notificación en el navegador (si está soportado)
   if ('Notification' in window && Notification.permission === 'granted') {
     new Notification(notification.message || 'Notificación', {
@@ -174,12 +174,12 @@ export const showNotification = (notification) => {
       tag: notification.id || Date.now().toString(),
     });
   }
-  
+
   // También podríamos emitir un evento personalizado para que otros componentes lo escuchen
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new CustomEvent('maloveapp:notification', { detail: notification }));
   }
-  
+
   return notification;
 };
 
@@ -187,26 +187,66 @@ export const shouldNotify = (notification) => {
   // Lógica simple para determinar si se debe mostrar una notificación
   // Puede ser extendida con preferencias de usuario, quiet hours, etc.
   if (!notification) return false;
-  
+
   // Verificar quiet hours
   if (isQuietHoursActive()) return false;
-  
+
   // Si el usuario tiene el contexto de auth, verificar preferencias
   if (authContext?.preferences?.notificationsEnabled === false) {
     return false;
   }
-  
+
   // Verificar preferencias específicas por tipo
   const prefs = getNotificationPrefs();
   const notifType = notification.type || 'system';
   const category = notification.category || 'updates';
-  
+
   if (prefs[notifType]?.[category] === false) {
     return false;
   }
-  
+
   // Por defecto, permitir notificaciones
   return true;
+};
+
+export const markNotificationRead = async (weddingId, notificationId) => {
+  // Marcar notificación como leída
+  if (!weddingId || !notificationId) {
+    console.warn('markNotificationRead: weddingId y notificationId son requeridos');
+    return false;
+  }
+
+  try {
+    const ref = doc(db, 'weddings', weddingId, 'notifications', notificationId);
+    await updateDoc(ref, {
+      read: true,
+      readAt: new Date().toISOString(),
+    });
+    return true;
+  } catch (error) {
+    console.error('Error marcando notificación como leída:', error);
+    return false;
+  }
+};
+
+export const deleteNotification = async (weddingId, notificationId) => {
+  // Eliminar notificación
+  if (!weddingId || !notificationId) {
+    console.warn('deleteNotification: weddingId y notificationId son requeridos');
+    return false;
+  }
+
+  try {
+    const ref = doc(db, 'weddings', weddingId, 'notifications', notificationId);
+    await updateDoc(ref, {
+      deleted: true,
+      deletedAt: new Date().toISOString(),
+    });
+    return true;
+  } catch (error) {
+    console.error('Error eliminando notificación:', error);
+    return false;
+  }
 };
 
 export default notificationServiceInstance;

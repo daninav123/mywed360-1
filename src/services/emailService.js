@@ -38,12 +38,12 @@ function buildEmailFromProfile(profile = {}) {
   if (!profile || typeof profile !== 'object') {
     return `usuario@${MAILGUN_DOMAIN}`;
   }
-  
+
   // Prioridad 1: Si ya tiene maLoveEmail configurado, usarlo
   if (profile.maLoveEmail && profile.maLoveEmail.includes('@')) {
     return profile.maLoveEmail;
   }
-  
+
   // Prioridad 2: Construir desde emailUsername
   const alias = slugify(profile.emailAlias || profile.emailUsername || '');
   if (alias) {
@@ -105,8 +105,7 @@ function writeLocal(key, value) {
 function normalizeMail(mail, fallbackFolder) {
   if (!mail || typeof mail !== 'object') return null;
   const copy = { ...mail };
-  copy.id =
-    copy.id || `email_${Date.now()}_${Math.random().toString(16).slice(2, 10)}`;
+  copy.id = copy.id || `email_${Date.now()}_${Math.random().toString(16).slice(2, 10)}`;
   copy.folder = copy.folder || fallbackFolder || 'inbox';
   copy.read = Boolean(copy.read);
   copy.tags = Array.isArray(copy.tags) ? copy.tags : [];
@@ -252,8 +251,7 @@ export async function getMails(input = 'inbox') {
       if (response?.ok) {
         const payload = await safeJson(response);
         const list =
-          (payload && (payload.data || payload.emails)) ||
-          (Array.isArray(payload) ? payload : []);
+          (payload && (payload.data || payload.emails)) || (Array.isArray(payload) ? payload : []);
         if (Array.isArray(list)) {
           return filterByFolder(list, folder);
         }
@@ -284,7 +282,10 @@ export async function getMail(emailId) {
   if (!emailId) return null;
   if (USE_BACKEND) {
     try {
-      const response = await apiGet(`/api/mail/${encodeURIComponent(emailId)}`, getRequestOptions({ silent: true }));
+      const response = await apiGet(
+        `/api/mail/${encodeURIComponent(emailId)}`,
+        getRequestOptions({ silent: true })
+      );
       if (response?.ok) {
         const payload = await safeJson(response);
         if (payload) return normalizeMail(payload, payload.folder);
@@ -334,7 +335,8 @@ async function sendMailViaBackend(mail) {
     }
     return {
       success: false,
-      error: (payload && (payload.message || payload.error)) || `sendMailViaBackend ${response?.status}`,
+      error:
+        (payload && (payload.message || payload.error)) || `sendMailViaBackend ${response?.status}`,
     };
   } catch (error) {
     return { success: false, error: error.message };
@@ -343,14 +345,20 @@ async function sendMailViaBackend(mail) {
 
 async function sendMailWithMailgun(mail) {
   try {
-    const response = await apiPost('/api/mail', { ...mail, provider: 'mailgun' }, getRequestOptions({ silent: true }));
+    const response = await apiPost(
+      '/api/mail',
+      { ...mail, provider: 'mailgun' },
+      getRequestOptions({ silent: true })
+    );
     const payload = await safeJson(response);
     if (response?.ok) {
       return { success: true, ...(payload?.data || payload || {}) };
     }
     return {
       success: false,
-      error: (payload && (payload.message || payload.error)) || `sendMailWithMailgun ${response?.status}`,
+      error:
+        (payload && (payload.message || payload.error)) ||
+        `sendMailWithMailgun ${response?.status}`,
     };
   } catch (error) {
     return { success: false, error: error.message };
@@ -435,6 +443,10 @@ export async function markAsRead(emailId, isRead = true) {
   return { success: true };
 }
 
+export async function markAsUnread(emailId) {
+  return markAsRead(emailId, false);
+}
+
 export async function deleteMail(emailId) {
   if (!emailId) return { success: false, error: 'email_id_required' };
   if (USE_BACKEND) {
@@ -496,8 +508,7 @@ export async function updateMailTags(emailId, { add = [], remove = [] } = {}) {
       if (!response?.ok) {
         const payload = await safeJson(response);
         const message =
-          (payload && (payload.message || payload.error)) ||
-          `updateMailTags ${response?.status}`;
+          (payload && (payload.message || payload.error)) || `updateMailTags ${response?.status}`;
         const error = new Error(message);
         error.status = response?.status;
         error.body = payload;
@@ -620,7 +631,10 @@ export async function searchEmails(term = '', options = {}) {
   if (USE_BACKEND) {
     try {
       const params = new URLSearchParams({ q: query, ...options });
-      const response = await apiGet(`/api/mail/search?${params.toString()}`, getRequestOptions({ silent: true }));
+      const response = await apiGet(
+        `/api/mail/search?${params.toString()}`,
+        getRequestOptions({ silent: true })
+      );
       if (response?.ok) {
         const payload = await safeJson(response);
         const list = (payload && (payload.data || payload.emails)) || payload;
@@ -633,7 +647,8 @@ export async function searchEmails(term = '', options = {}) {
   const local = readLocal(MAIL_STORAGE_KEY, []);
   return local.filter((mail) => {
     if (!mail) return false;
-    const haystack = `${mail.subject || ''} ${mail.body || ''} ${mail.from || ''} ${mail.to || ''}`.toLowerCase();
+    const haystack =
+      `${mail.subject || ''} ${mail.body || ''} ${mail.from || ''} ${mail.to || ''}`.toLowerCase();
     return haystack.includes(query.toLowerCase());
   });
 }
@@ -670,16 +685,45 @@ export const getEmailStats = getEmailStatistics;
 export async function logAIEmailActivity(id, context = {}) {
   try {
     if (USE_BACKEND) {
-      await apiPost(
-        '/api/email/ai/log',
-        { id, context },
-        getRequestOptions({ silent: true })
-      );
+      await apiPost('/api/email/ai/log', { id, context }, getRequestOptions({ silent: true }));
     }
   } catch (error) {
     console.warn('[EmailService] logAIEmailActivity backend call failed', error);
   }
   return { success: true };
+}
+
+export async function createEmailAlias(aliasData) {
+  // Crear un alias de email para el usuario
+  if (!aliasData || !aliasData.alias) {
+    return { success: false, error: 'alias_required' };
+  }
+
+  if (USE_BACKEND) {
+    try {
+      const response = await apiPost(
+        '/api/mail/alias',
+        aliasData,
+        getRequestOptions({ silent: true })
+      );
+      return { success: true, alias: response };
+    } catch (error) {
+      console.error('[EmailService] createEmailAlias failed:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  // Fallback: guardar localmente
+  const aliases = readLocal('email_aliases') || [];
+  const newAlias = {
+    id: `alias_${Date.now()}`,
+    ...aliasData,
+    createdAt: new Date().toISOString(),
+  };
+  aliases.push(newAlias);
+  writeLocal('email_aliases', aliases);
+
+  return { success: true, alias: newAlias };
 }
 
 export default {
@@ -721,4 +765,6 @@ export default {
   getEmailStats,
   logAIEmailActivity,
   updateMailTags,
+  createEmailAlias,
+  markAsUnread,
 };
