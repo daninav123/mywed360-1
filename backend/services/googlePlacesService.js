@@ -4,21 +4,15 @@
  */
 
 import fetch from 'node-fetch';
-import {
-  getHighCoverageCategories,
-  getMediumCoverageCategories,
-  getLowCoverageCategories,
-  getGooglePlacesType,
-  findCategoryByKeyword,
-} from '../../shared/supplierCategories.js';
+import * as supplierCategories from '../../shared/supplierCategories.js';
 
 // Configuración de API
 const GOOGLE_PLACES_API_KEY = process.env.GOOGLE_PLACES_API_KEY;
 
 // Categorías desde archivo centralizado
-const HIGH_COVERAGE_CATEGORIES = getHighCoverageCategories().flatMap((cat) => cat.keywords);
-const MEDIUM_COVERAGE_CATEGORIES = getMediumCoverageCategories().flatMap((cat) => cat.keywords);
-const LOW_COVERAGE_CATEGORIES = getLowCoverageCategories().flatMap((cat) => cat.keywords);
+const HIGH_COVERAGE_CATEGORIES = supplierCategories.getHighCoverageCategories().flatMap((cat) => cat.keywords);
+const MEDIUM_COVERAGE_CATEGORIES = supplierCategories.getMediumCoverageCategories().flatMap((cat) => cat.keywords);
+const LOW_COVERAGE_CATEGORIES = supplierCategories.getLowCoverageCategories().flatMap((cat) => cat.keywords);
 
 /**
  * Determina si debemos usar Google Places para esta categoría
@@ -39,7 +33,7 @@ function mapServiceToPlaceType(service) {
   const serviceLower = (service || '').toLowerCase().trim();
 
   // Intentar encontrar categoría por keyword
-  const category = findCategoryByKeyword(service);
+  const category = supplierCategories.findCategoryByKeyword(service);
   if (category && category.googlePlacesType) {
     return category.googlePlacesType;
   }
