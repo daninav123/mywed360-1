@@ -1195,4 +1195,7 @@ router.post('/reviews/:reviewId/report', requireSupplierAuth, express.json(), as
   }
 });
 
+// Exportar middleware para uso en otros módulos
+export { requireSupplierAuth };
+
 export default router;
