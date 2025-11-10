@@ -6,7 +6,7 @@ import { useParams } from 'react-router-dom';
 import ExternalImage from '@/components/ExternalImage';
 
 import useTranslations from '../hooks/useTranslations';
-import { db } from '../lib/firebase';
+import { db } from '../firebaseConfig';
 import sanitizeHtml from '../utils/sanitizeHtml';
 
 /*

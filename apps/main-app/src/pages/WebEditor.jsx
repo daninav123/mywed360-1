@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 
 import { useAuth } from '../hooks/useAuth';
 import useTranslations from '../hooks/useTranslations';
-import { db } from '../lib/firebase';
+import { db } from '../firebaseConfig';
 
 /*
   Editor interno para la página web de la boda.

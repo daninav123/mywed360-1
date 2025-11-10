@@ -5,7 +5,7 @@
 
 import { doc, getDoc, collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
 
-import { db } from '../lib/firebase';
+import { db } from '../firebaseConfig';
 
 /**
  * Devuelve el documento de métricas agregadas (resumen) para un usuario

@@ -21,9 +21,6 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
-      '@malove/ui-components': path.resolve(__dirname, '../../packages/ui-components/src'),
-      '@malove/utils': path.resolve(__dirname, '../../packages/utils/src'),
-      '@malove/hooks': path.resolve(__dirname, '../../packages/hooks/src'),
     },
   },
   build: {

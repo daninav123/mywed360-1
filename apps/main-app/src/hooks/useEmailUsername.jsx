@@ -1,7 +1,7 @@
 import { doc, getDoc, setDoc, query, collection, where, getDocs } from 'firebase/firestore';
 import { useState, useCallback } from 'react';
 
-import { auth, db as firestore } from '../lib/firebase';
+import { auth, db as firestore } from '../firebaseConfig';
 
 /**
  * Hook para gestionar la verificación y configuración de nombres de usuario para correo electrónico

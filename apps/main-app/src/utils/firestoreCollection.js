@@ -12,7 +12,7 @@ import {
   serverTimestamp,
 } from 'firebase/firestore';
 
-import { auth, db } from '../lib/firebase';
+import { auth, db } from '../firebaseConfig';
 
 const colRef = (name) => {
   const uid = auth.currentUser?.uid;

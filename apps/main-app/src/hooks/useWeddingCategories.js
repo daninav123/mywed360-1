@@ -9,7 +9,7 @@ import { doc, updateDoc, getDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import { useAuth } from './useAuth';
 import { useWedding } from '../context/WeddingContext';
-import { SUPPLIER_CATEGORIES } from '../../shared/supplierCategories';
+import { SUPPLIER_CATEGORIES } from '../shared/supplierCategories';
 import { toast } from 'react-toastify';
 
 export function useWeddingCategories() {

@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuites name="Mocha Tests" time="0.064" tests="2" failures="0" skipped="2">
-  <testsuite name="Root Suite" timestamp="2025-10-12T21:01:49" tests="0" file="cypress\e2e\seating\seating-conflicts.cy.js" time="0.000" failures="0">
-  </testsuite>
-  <testsuite name="Seating plan · validación de conflictos" timestamp="2025-10-12T21:01:49" tests="2" time="0.045" failures="0">
-  </testsuite>
-</testsuites>

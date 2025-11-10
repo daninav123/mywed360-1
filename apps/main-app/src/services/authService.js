@@ -23,7 +23,7 @@ import {
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 
-import { auth, db } from '../lib/firebase';
+import { auth, db } from '../firebaseConfig';
 
 // Configuración del servicio
 const AUTH_CONFIG = {

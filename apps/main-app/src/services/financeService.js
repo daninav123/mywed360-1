@@ -17,7 +17,7 @@ import {
   serverTimestamp,
 } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
-import { SUPPLIER_CATEGORIES } from '../../shared/supplierCategories';
+import { SUPPLIER_CATEGORIES } from '../shared/supplierCategories';
 
 /**
  * ⚡ DINÁMICO: Mapeo de iconos para categorías de finanzas

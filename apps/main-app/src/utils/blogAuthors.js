@@ -3,7 +3,7 @@ import {
   listAuthorProfiles as sharedList,
   findAuthorById as sharedFindById,
   findAuthorBySlug as sharedFindBySlug,
-} from '../../shared/blogAuthors.js';
+} from '../shared/blogAuthors.js';
 
 export const blogAuthorProfiles = AUTHOR_PROFILES;
 

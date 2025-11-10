@@ -1,4 +1,4 @@
-import { SUPPLIER_CATEGORIES } from '../../shared/supplierCategories';
+import { SUPPLIER_CATEGORIES } from '../shared/supplierCategories';
 
 /**
  * ⚡ DINÁMICO: Mapeo de alias generado desde SUPPLIER_CATEGORIES

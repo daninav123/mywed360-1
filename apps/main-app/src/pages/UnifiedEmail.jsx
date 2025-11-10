@@ -15,7 +15,7 @@ import UsernameWizard from '../components/UsernameWizard';
 import { useWedding } from '../context/WeddingContext';
 import useEmailUsername from '../hooks/useEmailUsername';
 import useWeddingCollection from '../hooks/useWeddingCollection';
-import { auth } from '../lib/firebase';
+import { auth } from '../firebaseConfig';
 import EmailRecommendationService from '../services/EmailRecommendationService';
 import {
   getMails,

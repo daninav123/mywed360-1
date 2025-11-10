@@ -138,14 +138,6 @@ export default function TransactionImportModal({
   const loadXLSX = async () => {
     const mod = await import('xlsx');
     const XLSX = mod.default || mod;
-    try {
-      const cpexcel = await import('xlsx/dist/cpexcel.full.mjs');
-      if (typeof XLSX.set_cptable === 'function') {
-        XLSX.set_cptable(cpexcel.default || cpexcel);
-      }
-    } catch (cpexcelError) {
-      console.warn('[TransactionImportModal] No se pudo cargar cpexcel, se usará la tabla por defecto.', cpexcelError);
-    }
     return XLSX;
   };
 

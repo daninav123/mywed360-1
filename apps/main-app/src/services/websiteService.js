@@ -9,7 +9,7 @@ import {
   setDoc,
 } from 'firebase/firestore';
 
-import { db, firebaseReady } from '../lib/firebase';
+import { db, firebaseReady } from '../firebaseConfig';
 import { get as apiGet, post as apiPost } from './apiClient';
 
 const RESERVED_SLUGS = new Set(['www', 'api', 'mg', 'mail', 'cdn', 'static', 'assets', 'admin']);

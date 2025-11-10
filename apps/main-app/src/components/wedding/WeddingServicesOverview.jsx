@@ -7,7 +7,7 @@ import useProveedores from '../../hooks/useProveedores';
 import useSupplierShortlist from '../../hooks/useSupplierShortlist';
 import { useWeddingCategories } from '../../hooks/useWeddingCategories';
 import { useWeddingServices } from '../../hooks/useWeddingServices';
-import { SUPPLIER_CATEGORIES } from '../../../shared/supplierCategories';
+import { SUPPLIER_CATEGORIES } from '../../shared/supplierCategories';
 import ManageServicesModal from './ManageServicesModal';
 import { Settings } from 'lucide-react';
 import Button from '../ui/Button';

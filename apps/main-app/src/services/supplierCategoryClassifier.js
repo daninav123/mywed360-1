@@ -9,7 +9,7 @@
  * Usa un sistema de scoring para encontrar la mejor coincidencia.
  */
 
-import { SUPPLIER_CATEGORIES, findCategoryByKeyword } from '../../shared/supplierCategories';
+import { SUPPLIER_CATEGORIES, findCategoryByKeyword } from '../shared/supplierCategories';
 
 /**
  * Normaliza texto para comparación

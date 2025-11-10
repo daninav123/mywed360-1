@@ -7,7 +7,7 @@
 import { useFavorites } from '../contexts/FavoritesContext';
 import { useWeddingCategories } from './useWeddingCategories';
 import { toast } from 'react-toastify';
-import { SUPPLIER_CATEGORIES } from '../../shared/supplierCategories';
+import { SUPPLIER_CATEGORIES } from '../shared/supplierCategories';
 
 export function useFavoritesWithAutoCategory() {
   const favorites = useFavorites();

@@ -2,7 +2,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { useEffect, useState, useCallback } from 'react';
 
-import { auth, db } from '../lib/firebase';
+import { auth, db } from '../firebaseConfig';
 import {
   addItem as addItemFS,
   updateItem as updateItemFS,

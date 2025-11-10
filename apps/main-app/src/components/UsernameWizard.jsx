@@ -2,7 +2,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { useEffect, useState } from 'react';
 
 import useEmailUsername from '../hooks/useEmailUsername';
-import { auth } from '../lib/firebase';
+import { auth } from '../firebaseConfig';
 import Alert from './ui/Alert';
 import Button from './ui/Button';
 import Spinner from './ui/Spinner';

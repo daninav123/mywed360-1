@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { X, CheckCircle, Circle } from 'lucide-react';
-import { SUPPLIER_CATEGORIES } from '../../../shared/supplierCategories';
+import { SUPPLIER_CATEGORIES } from '../../shared/supplierCategories';
 import Button from '../ui/Button';
 import useTranslations from '../../hooks/useTranslations';
 

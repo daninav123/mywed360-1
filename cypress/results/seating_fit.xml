@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuites name="Mocha Tests" time="11.936" tests="1" failures="0">
-  <testsuite name="Root Suite" timestamp="2025-10-12T20:48:38" tests="0" file="cypress\e2e\seating\seating_fit.cy.js" time="0.000" failures="0">
-  </testsuite>
-  <testsuite name="Seating Plan - Fit to Content" timestamp="2025-10-12T20:48:38" tests="1" time="11.919" failures="0">
-    <testcase name="Seating Plan - Fit to Content ajusta escala y offset al contenido con el botón ⌂" time="10.968" classname="ajusta escala y offset al contenido con el botón ⌂">
-    </testcase>
-  </testsuite>
-</testsuites>

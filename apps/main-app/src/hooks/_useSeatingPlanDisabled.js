@@ -12,7 +12,7 @@ import {
   updateDoc,
 } from 'firebase/firestore';
 import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
+import { jsPDF } from 'jspdf';
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 
 import { useWedding } from '../context/WeddingContext';
