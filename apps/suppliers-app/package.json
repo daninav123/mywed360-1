@@ -11,6 +11,8 @@
     "lint:fix": "eslint src --fix"
   },
   "dependencies": {
+    "@tailwindcss/forms": "^0.5.10",
+    "@tailwindcss/typography": "^0.5.19",
     "chart.js": "^4.5.0",
     "date-fns": "^4.1.0",
     "dompurify": "^3.2.6",
