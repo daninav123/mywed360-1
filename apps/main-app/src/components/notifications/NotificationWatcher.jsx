@@ -1,7 +1,7 @@
 import { onAuthStateChanged } from 'firebase/auth';
 import { useEffect, useRef } from 'react';
 
-import { auth } from '../../firebaseConfig';
+import { auth, firebaseReady } from '../../firebaseConfig';
 import { useWedding } from '../../context/WeddingContext';
 import {
   showNotification,
@@ -16,6 +16,11 @@ export default function NotificationWatcher({ intervalMs = 20000 }) {
   const uid = auth?.currentUser?.uid || null;
 
   useEffect(() => {
+    // Verificar que auth está inicializado
+    if (!auth) {
+      console.warn('[NotificationWatcher] Firebase Auth no está inicializado todavía');
+      return;
+    }
     let active = true;
     let started = false;
     let intervalId = null;
@@ -34,7 +39,7 @@ export default function NotificationWatcher({ intervalMs = 20000 }) {
         if (!activeWedding) {
           return;
         }
-        
+
         const notifications = await fetchNotifications(activeWedding);
         const list = Array.isArray(notifications) ? notifications : [];
         if (!Array.isArray(list)) return;
@@ -171,7 +176,8 @@ export default function NotificationWatcher({ intervalMs = 20000 }) {
 
     if (auth?.currentUser?.uid) {
       startPolling();
-    } else {
+    } else if (auth) {
+      // Solo suscribirse si auth está disponible
       const unsub = onAuthStateChanged(auth, (u) => {
         if (u) {
           startPolling();
