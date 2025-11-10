@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🧹 Limpiar Token de Autenticación</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+    h1 {
+      margin-top: 0;
+      font-size: 2em;
+    }
+    button {
+      background: white;
+      color: #667eea;
+      border: none;
+      padding: 15px 30px;
+      font-size: 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      margin: 10px 0;
+      width: 100%;
+      transition: transform 0.2s;
+    }
+    button:hover {
+      transform: scale(1.05);
+    }
+    button:active {
+      transform: scale(0.95);
+    }
+    .danger {
+      background: #ef4444;
+      color: white;
+    }
+    .success {
+      background: #10b981;
+      color: white;
+    }
+    .status {
+      padding: 20px;
+      border-radius: 10px;
+      margin: 20px 0;
+      background: rgba(255, 255, 255, 0.2);
+    }
+    .status.error {
+      background: rgba(239, 68, 68, 0.3);
+    }
+    .status.success {
+      background: rgba(16, 185, 129, 0.3);
+    }
+    pre {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 15px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 12px;
+    }
+    .info {
+      font-size: 14px;
+      opacity: 0.9;
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🧹 Limpiar Token de Autenticación</h1>
+    
+    <div class="info">
+      Esta página te ayuda a solucionar errores 401 (Unauthorized) limpiando tokens de autenticación expirados.
+    </div>
+
+    <div id="status"></div>
+
+    <button onclick="checkToken()">🔍 Verificar Token</button>
+    <button onclick="clearToken()" class="danger">🗑️ Limpiar Token</button>
+    <button onclick="clearAllAuth()" class="danger">🧹 Limpiar Todo (Auth completa)</button>
+    <button onclick="reloadApp()" class="success">🔄 Recargar Aplicación</button>
+  </div>
+
+  <script type="module">
+    // Importar Firebase (si está disponible)
+    window.checkToken = async function() {
+      const statusDiv = document.getElementById('status');
+      statusDiv.className = 'status';
+      statusDiv.innerHTML = '<strong>🔍 Verificando...</strong>';
+
+      try {
+        // Verificar localStorage
+        const storedToken = localStorage.getItem('mw360_auth_token');
+        
+        if (!storedToken) {
+          statusDiv.className = 'status';
+          statusDiv.innerHTML = '<strong>ℹ️ No hay token almacenado</strong><br>No se encontró token en localStorage.';
+          return;
+        }
+
+        // Decodificar token
+        try {
+          const parts = storedToken.split('.');
+          if (parts.length !== 3) {
+            throw new Error('Formato de token inválido');
+          }
+
+          const payload = JSON.parse(atob(parts[1]));
+          const exp = new Date(payload.exp * 1000);
+          const iat = new Date(payload.iat * 1000);
+          const now = new Date();
+
+          const isExpired = exp < now;
+          const timeLeft = Math.floor((exp - now) / 1000 / 60); // minutos
+          const tokenAge = Math.floor((now - iat) / 1000 / 60); // minutos
+
+          statusDiv.className = `status ${isExpired ? 'error' : 'success'}`;
+          statusDiv.innerHTML = `
+            <strong>${isExpired ? '❌ Token EXPIRADO' : '✅ Token VÁLIDO'}</strong><br><br>
+            <strong>Detalles:</strong><br>
+            • Emitido: ${iat.toLocaleString()}<br>
+            • Expira: ${exp.toLocaleString()}<br>
+            • Edad del token: ${tokenAge} minutos<br>
+            • Tiempo restante: ${isExpired ? 'EXPIRADO' : `${timeLeft} minutos`}<br>
+            • UID: ${payload.sub || payload.uid}<br>
+            • Email: ${payload.email || 'N/A'}
+            ${isExpired ? '<br><br><strong>⚠️ DEBES LIMPIAR ESTE TOKEN</strong>' : ''}
+          `;
+        } catch (e) {
+          statusDiv.className = 'status error';
+          statusDiv.innerHTML = `<strong>❌ Error decodificando token</strong><br>${e.message}`;
+        }
+      } catch (error) {
+        statusDiv.className = 'status error';
+        statusDiv.innerHTML = `<strong>❌ Error:</strong><br>${error.message}`;
+      }
+    };
+
+    window.clearToken = function() {
+      const statusDiv = document.getElementById('status');
+      statusDiv.className = 'status';
+      statusDiv.innerHTML = '<strong>🗑️ Limpiando token...</strong>';
+
+      try {
+        localStorage.removeItem('mw360_auth_token');
+        
+        statusDiv.className = 'status success';
+        statusDiv.innerHTML = '<strong>✅ Token eliminado</strong><br>El token de localStorage ha sido limpiado.';
+      } catch (error) {
+        statusDiv.className = 'status error';
+        statusDiv.innerHTML = `<strong>❌ Error:</strong><br>${error.message}`;
+      }
+    };
+
+    window.clearAllAuth = function() {
+      const statusDiv = document.getElementById('status');
+      statusDiv.className = 'status';
+      statusDiv.innerHTML = '<strong>🧹 Limpiando toda la autenticación...</strong>';
+
+      try {
+        // Limpiar token
+        localStorage.removeItem('mw360_auth_token');
+        
+        // Limpiar otros datos de Firebase
+        const keys = Object.keys(localStorage);
+        const authKeys = keys.filter(k => 
+          k.includes('firebase') || 
+          k.includes('auth') || 
+          k.includes('token')
+        );
+        
+        let removed = [];
+        authKeys.forEach(key => {
+          if (!key.includes('persist')) { // Mantener persistencia
+            localStorage.removeItem(key);
+            removed.push(key);
+          }
+        });
+
+        statusDiv.className = 'status success';
+        statusDiv.innerHTML = `
+          <strong>✅ Autenticación limpiada</strong><br><br>
+          <strong>Items eliminados (${removed.length}):</strong><br>
+          ${removed.map(k => `• ${k}`).join('<br>')}
+          <br><br>
+          <strong>⚠️ Ahora debes recargar la aplicación</strong>
+        `;
+      } catch (error) {
+        statusDiv.className = 'status error';
+        statusDiv.innerHTML = `<strong>❌ Error:</strong><br>${error.message}`;
+      }
+    };
+
+    window.reloadApp = function() {
+      const statusDiv = document.getElementById('status');
+      statusDiv.className = 'status';
+      statusDiv.innerHTML = '<strong>🔄 Recargando aplicación...</strong>';
+      
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 500);
+    };
+
+    // Auto-verificar al cargar
+    window.addEventListener('load', () => {
+      setTimeout(checkToken, 500);
+    });
+  </script>
+</body>
+</html>

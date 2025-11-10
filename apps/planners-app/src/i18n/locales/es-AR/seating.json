@@ -1,0 +1,180 @@
+{
+  "seating": {
+    "title": "Distribución de mesas",
+    "newTable": "Nueva mesa",
+    "editTable": "Editar mesa",
+    "deleteTable": "Eliminar mesa",
+    "assignGuests": "Asignar invitados",
+    "autoAssign": "Asignación automática",
+    "noTables": "No hay mesas configuradas",
+    "createFirst": "Crear primera mesa",
+    "form": {
+      "tableName": "Nombre de la mesa",
+      "capacity": "Capacidad",
+      "shape": "Forma",
+      "notes": "Notas"
+    },
+    "shapes": {
+      "round": "Redonda",
+      "rectangular": "Rectangular",
+      "square": "Cuadrada"
+    },
+    "messages": {
+      "created": "Mesa creada correctamente",
+      "updated": "Mesa actualizada correctamente",
+      "deleted": "Mesa eliminada correctamente",
+      "assigned": "Invitados asignados correctamente",
+      "error": "Error al procesar la mesa",
+      "saved": "Guardado",
+      "loading": "Cargando...",
+      "noGuests": "Sin invitados",
+      "selectTable": "Seleccionar mesa",
+      "unassigned": "Sin asignar",
+      "ceremony": "Ceremonia",
+      "banquet": "Banquete",
+      "total": "Total",
+      "assigned_one": "{{count}} asignado",
+      "assigned_other": "{{count}} asignados",
+      "capacity_full": "Completa",
+      "capacity_available": "{{available}} disponibles",
+      "dragHint": "Arrastra invitados aquí",
+      "autoAssignSuccess": "Asignación automática completada",
+      "conflictDetected": "Conflicto detectado",
+      "validationError": "Error de validación"
+    },
+    "toolbar": {
+      "save": "Guardar",
+      "undo": "Deshacer",
+      "redo": "Rehacer",
+      "zoom": "Zoom",
+      "export": "Exportar",
+      "print": "Imprimir",
+      "settings": "Configuración"
+    },
+    "configureCeremony": "Configurar ceremonia",
+    "ceremony": {
+      "rows": "Filas",
+      "seatsPerRow": "Sillas por fila",
+      "spacing": "Espacio entre sillas (cm)",
+      "aisleAfter": "Pasillo después de la columna",
+      "vipReservations": "Reservas VIP",
+      "reservedRows": "Filas reservadas (ej. 1,2)",
+      "reservedLabel": "Etiqueta para asientos reservados",
+      "lockVipSeats": "Bloquear asientos VIP hasta asignarlos manualmente",
+      "notesPlaceholder": "Ej.: reservar para padrinos y padres",
+      "totalSeats": "Total de sillas",
+      "saveConfiguration": "Guardar configuración"
+    },
+    "configureBanquet": "Configurar banquete",
+    "banquet": {
+      "tableRows": "Filas de mesas",
+      "tableCols": "Columnas de mesas",
+      "seatsPerTable": "Asientos por mesa",
+      "spacingX": "Espacio X",
+      "spacingY": "Espacio Y",
+      "generate": "Generar"
+    },
+    "space": {
+      "dimensions": "Dimensiones del salón",
+      "width": "Ancho (cm)",
+      "height": "Alto (cm)"
+    },
+    "planModern": {
+      "header": {
+        "userFallback": "Usuario"
+      },
+      "defaults": {
+        "tableName": "Mesa {{number}}"
+      },
+      "toasts": {
+        "fullAssignment": "¡100 % de invitados asignados! ¡Felicitaciones!",
+        "autoAssignSuccess": "Asignación automática completada",
+        "autoAssignError": "No pudimos completar la asignación automática. Intenta nuevamente.",
+        "addTableSuccess": "Mesa agregada correctamente",
+        "addTableError": "No pudimos agregar la mesa{{message}}",
+        "capacityUpdated": "Capacidad actualizada a {{value}}",
+        "duplicateTable": "Mesa duplicada",
+        "rotateTable": "Mesa rotada",
+        "deleteTable": "Mesa eliminada",
+        "removeGuest": "Invitado quitado de la mesa"
+      },
+      "errors": {
+        "addTableUnavailable": "Esta acción no está disponible por ahora. Recarga e inténtalo de nuevo."
+      },
+      "guestSidebar": {
+        "header": {
+          "title": "Panel de invitados",
+          "subtitle": "Controla pendientes, recomendaciones y actividades del equipo."
+        },
+        "tabs": {
+          "summary": "Resumen",
+          "recommendations": "Recomendaciones",
+          "conflicts": "Conflictos",
+          "staff": "Equipo",
+          "history": "Historial"
+        },
+        "summary": {
+          "metrics": {
+            "totalGuests": "Invitados totales",
+            "assigned": "Asignados",
+            "pending": "Pendientes",
+            "vipPending": "VIP pendientes",
+            "tablesNearlyFull": "Mesas casi llenas",
+            "companionSeats": "Asientos acompañantes",
+            "conflicts": "Conflictos",
+            "snapshots": "Instantáneas guardadas"
+          },
+          "viewPending": "Ver pendientes en detalle"
+        },
+        "recommendations": {
+          "emptyTitle": "Sin recomendaciones",
+          "emptyDescription": "Todos los invitados pendientes ya tienen sugerencias aplicadas.",
+          "guestFallback": "Invitado",
+          "clusters": {
+            "vip": "VIP pendiente",
+            "familia": "Familia cercana",
+            "pending": "Pendiente"
+          },
+          "score": "Puntuación {{value}}",
+          "suggestedTable": "Mesa sugerida:",
+          "capacityAvailable_one": "Capacidad disponible: {{count}} asiento",
+          "capacityAvailable_other": "Capacidad disponible: {{count}} asientos",
+          "capacityUnknown": "Capacidad disponible: sin datos"
+        },
+        "conflicts": {
+          "emptyTitle": "Sin conflictos",
+          "emptyDescription": "No se detectaron problemas en las mesas.",
+          "tableFallback": "Mesa",
+          "messageFallback": "Conflicto detectado en la mesa.",
+          "severityHigh": "Crítico",
+          "severityMedium": "Atención",
+          "actions": {
+            "reassign": "Reubicar {{guest}}",
+            "fixPosition": "Ajustar la mesa",
+            "generic": "Acción sugerida"
+          }
+        },
+        "staff": {
+          "emptyTitle": "Sin equipo registrado",
+          "emptyDescription": "Agrega etiquetas o roles para identificar rápidamente al personal y proveedores.",
+          "memberFallback": "Miembro del equipo",
+          "assigned": "Asignado",
+          "noTable": "Sin mesa",
+          "pending": "Pendiente de ubicación",
+          "tableLabel": "Mesa: {{table}}"
+        },
+        "history": {
+          "emptyTitle": "Sin instantáneas guardadas",
+          "emptyDescription": "Guarda una instantánea desde la barra de herramientas para crear un historial de avances.",
+          "load": "Cargar",
+          "delete": "Eliminar"
+        },
+        "actions": {
+          "viewTable": "Ver mesa",
+          "assign": "Asignar"
+        }
+      }
+    }
+  },
+  "_note": "Translate from es/seating.json"
+}

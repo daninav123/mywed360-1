@@ -1,0 +1,244 @@
+import React from 'react';
+import { createPortal } from 'react-dom';
+
+import useTranslations from '../../hooks/useTranslations';
+import { categories } from './CalendarComponents.jsx';
+
+const TaskForm = ({
+  formData,
+  editingId,
+  handleChange,
+  handleSaveTask,
+  handleDeleteTask,
+  closeModal,
+  setFormData,
+  parentOptions = [],
+}) => {
+  const { t } = useTranslations();
+
+  const getCategoryLabel = (key, fallback) =>
+    t(`tasks.categories.${key}`, { defaultValue: fallback || key });
+
+  const modal = (
+    <div
+      className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-[9999]"
+      onClick={closeModal}
+    >
+      <div
+        className="bg-white rounded-lg w-full max-w-md p-6 space-y-4 shadow-lg relative z-[10000]"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h3 className="text-xl font-semibold">
+          {editingId ? t('tasks.page.form.title.edit') : t('tasks.page.form.title.create')}
+        </h3>
+        <div className="space-y-3">
+          <input
+            name="title"
+            onChange={handleChange}
+            value={formData.title}
+            placeholder={t('tasks.page.form.fields.title')}
+            className="w-full border rounded px-3 py-1"
+          />
+          <textarea
+            name="desc"
+            onChange={handleChange}
+            value={formData.desc}
+            placeholder={t('tasks.page.form.fields.description')}
+            className="w-full border rounded px-3 py-1"
+          />
+          <input
+            name="assignee"
+            onChange={handleChange}
+            value={formData.assignee || ''}
+            placeholder={t('tasks.page.form.fields.assignee')}
+            className="w-full border rounded px-3 py-1"
+          />
+          <select
+            name="category"
+            onChange={handleChange}
+            value={formData.category}
+            className="w-full border rounded px-3 py-1"
+          >
+            {Object.entries(categories).map(([key, cat]) => (
+              <option key={key} value={key}>
+                {getCategoryLabel(key, cat.name)}
+              </option>
+            ))}
+          </select>
+          <div className="flex space-x-2">
+            <div className="flex-1">
+              <label className="text-xs">{t('tasks.page.form.fields.start')}</label>
+              <input
+                type="date"
+                name="startDate"
+                value={formData.startDate}
+                onChange={handleChange}
+                className="w-full border rounded px-2 py-1"
+                disabled={formData.long && formData.parentTaskId && formData.unscheduled}
+              />
+            </div>
+            <div className="flex-1">
+              <label className="text-xs invisible">time</label>
+              <input
+                type="time"
+                name="startTime"
+                value={formData.startTime}
+                onChange={handleChange}
+                className="w-full border rounded px-2 py-1"
+                disabled={formData.long && formData.parentTaskId && formData.unscheduled}
+              />
+            </div>
+          </div>
+          <div className="flex space-x-2">
+            <div className="flex-1">
+              <label className="text-xs">{t('tasks.page.form.fields.end')}</label>
+              <input
+                type="date"
+                name="endDate"
+                value={formData.endDate}
+                onChange={handleChange}
+                className="w-full border rounded px-2 py-1"
+                disabled={formData.long && formData.parentTaskId && formData.unscheduled}
+              />
+            </div>
+            <div className="flex-1">
+              <label className="text-xs invisible">time</label>
+              <input
+                type="time"
+                name="endTime"
+                value={formData.endTime}
+                onChange={handleChange}
+                className="w-full border rounded px-2 py-1"
+                disabled={formData.long && formData.parentTaskId && formData.unscheduled}
+              />
+            </div>
+          </div>
+          <label className="flex items-center space-x-2 text-sm">
+            <input
+              type="checkbox"
+              name="long"
+              checked={formData.long}
+              onChange={(e) => setFormData({ ...formData, long: e.target.checked })}
+            />
+            <span>{t('tasks.page.form.fields.long')}</span>
+          </label>
+          {formData.long && (
+            <div>
+              <label className="text-xs">{t('tasks.page.form.fields.parent')}</label>
+              <select
+                name="parentTaskId"
+                value={formData.parentTaskId || ''}
+                onChange={handleChange}
+                className="w-full border rounded px-3 py-1"
+              >
+                <option value="">{t('tasks.page.form.fields.rootOption')}</option>
+                {Array.isArray(parentOptions) &&
+                  parentOptions.map((opt) => (
+                    <option key={opt.id} value={opt.id}>
+                      {opt.name}
+                    </option>
+                  ))}
+              </select>
+              {formData.parentTaskId && (
+                <label className="flex items-center space-x-2 text-sm mt-2">
+                  <input
+                    type="checkbox"
+                    checked={!!formData.unscheduled}
+                    onChange={(e) => setFormData({ ...formData, unscheduled: e.target.checked })}
+                  />
+                  <span>{t('tasks.page.form.fields.unscheduled')}</span>
+                </label>
+              )}
+              {!formData.parentTaskId && (
+                <div className="mt-3 space-y-2 border-t pt-3">
+                  <div className="text-xs text-gray-600">
+                    {t('tasks.page.form.fields.rangeHeading')}
+                  </div>
+                  <div className="grid grid-cols-3 gap-2 text-sm">
+                    <select
+                      value={formData.rangeMode || 'auto'}
+                      onChange={(e) => setFormData({ ...formData, rangeMode: e.target.value })}
+                      className="border rounded px-2 py-1"
+                    >
+                      <option value="auto">{t('tasks.page.form.fields.rangeMode.auto')}</option>
+                      <option value="manual">
+                        {t('tasks.page.form.fields.rangeMode.manual')}
+                      </option>
+                    </select>
+                    <select
+                      value={formData.autoAdjust || 'expand_only'}
+                      onChange={(e) => setFormData({ ...formData, autoAdjust: e.target.value })}
+                      className="border rounded px-2 py-1"
+                      disabled={(formData.rangeMode || 'auto') !== 'auto'}
+                    >
+                      <option value="expand_only">
+                        {t('tasks.page.form.fields.autoAdjust.expand_only')}
+                      </option>
+                      <option value="expand_and_shrink">
+                        {t('tasks.page.form.fields.autoAdjust.expand_and_shrink')}
+                      </option>
+                      <option value="none">
+                        {t('tasks.page.form.fields.autoAdjust.none')}
+                      </option>
+                    </select>
+                    <input
+                      type="number"
+                      min="0"
+                      className="border rounded px-2 py-1"
+                      value={Number(formData.bufferDays ?? 0)}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          bufferDays: Math.max(0, Number(e.target.value || 0)),
+                        })
+                      }
+                      placeholder={t('tasks.page.form.fields.bufferDays')}
+                      disabled={(formData.rangeMode || 'auto') !== 'auto'}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+          <label className="flex items-center space-x-2 text-sm">
+            <input
+              type="checkbox"
+              name="completed"
+              checked={!!formData.completed}
+              onChange={(e) => setFormData({ ...formData, completed: e.target.checked })}
+            />
+            <span>{t('tasks.page.form.fields.completed')}</span>
+          </label>
+        </div>
+        <div className="flex justify-end space-x-2">
+          {editingId && (
+            <button
+              type="button"
+              onMouseDown={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDeleteTask();
+              }}
+              className="px-4 py-2 rounded bg-red-600 text-white mr-auto"
+            >
+              {t('tasks.page.form.buttons.delete')}
+            </button>
+          )}
+          <button onClick={closeModal} className="px-4 py-2 rounded bg-gray-300">
+            {t('tasks.page.form.buttons.cancel')}
+          </button>
+          <button onClick={handleSaveTask} className="px-4 py-2 rounded bg-blue-600 text-white">
+            {t('tasks.page.form.buttons.save')}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  if (typeof document !== 'undefined' && document.body) {
+    return createPortal(modal, document.body);
+  }
+  return modal;
+};
+
+export default TaskForm;

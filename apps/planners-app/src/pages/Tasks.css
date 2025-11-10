@@ -1,0 +1,26 @@
+/* Mostrar la columna de Nombre y ocultar las columnas From/To */
+/* Header: ocultar 2ª y 3ª columnas */
+._3_ygE > ._1nBOt > ._WuQ0f:nth-child(2),
+._3_ygE > ._1nBOt > ._WuQ0f:nth-child(3) {
+  display: none !important;
+}
+/* Body: ocultar 2ª y 3ª columnas */
+._3ZbQT > ._34SS0 > ._3lLk3:nth-child(2),
+._3ZbQT > ._34SS0 > ._3lLk3:nth-child(3) {
+  display: none !important;
+}
+
+/* Ajustes de layout y legibilidad */
+/* Ajustar tamaño de texto del header para evitar solapes */
+._9w8d5,
+._2q1Kt {
+  font-size: 0.75rem !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Evitar solapes: ocultar etiquetas fuera de la barra (solo mostrar texto dentro) */
+._3KcaM {
+  display: none !important;
+}
