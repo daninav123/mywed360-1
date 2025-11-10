@@ -124,6 +124,7 @@ const probarConexionFirestore = async () => {
 let isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
 let reconnectAttempts = 0;
 const MAX_RECONNECT_ATTEMPTS = 3;
+let connectionListenersCleanup = null;
 
 const configurarListenerConexion = () => {
   if (typeof window === 'undefined') return;
@@ -160,8 +161,17 @@ const configurarListenerConexion = () => {
     }
   };
 
-  window.addEventListener('online', () => handleConnectionChange(true));
-  window.addEventListener('offline', () => handleConnectionChange(false));
+  const onlineHandler = () => handleConnectionChange(true);
+  const offlineHandler = () => handleConnectionChange(false);
+
+  window.addEventListener('online', onlineHandler);
+  window.addEventListener('offline', offlineHandler);
+
+  // Guardar función de limpieza
+  connectionListenersCleanup = () => {
+    window.removeEventListener('online', onlineHandler);
+    window.removeEventListener('offline', offlineHandler);
+  };
 
   // Estado inicial
   if (!navigator.onLine) {
@@ -169,11 +179,12 @@ const configurarListenerConexion = () => {
   }
 
   // ✅ Listener para Realtime Database (si está habilitado)
+  let realtimeUnsubscribe = null;
   if (import.meta.env.VITE_ENABLE_REALTIME_DB === 'true') {
     try {
       const dbRealtime = getDatabase();
       const estadoConexion = ref(dbRealtime, '.info/connected');
-      onValue(estadoConexion, (snapshot) => {
+      realtimeUnsubscribe = onValue(estadoConexion, (snapshot) => {
         if (snapshot.val() === true) {
           console.log('✅ Realtime Database conectado');
         } else {
@@ -184,6 +195,13 @@ const configurarListenerConexion = () => {
       console.warn('No se pudo configurar el listener de Realtime Database:', error);
     }
   }
+
+  // Agregar cleanup de realtime a la función de limpieza
+  const originalCleanup = connectionListenersCleanup;
+  connectionListenersCleanup = () => {
+    originalCleanup?.();
+    realtimeUnsubscribe?.();
+  };
 };
 
 // Inicializa los servicios de Firebase
@@ -307,4 +325,21 @@ const firebaseReady = FIREBASE_CONFIGURED
 
 const getFirebaseAuth = () => auth;
 
-export { auth, db, storage, analytics, firebaseReady, getFirebaseAuth, isOnline };
+// Función para limpiar listeners (útil para hot-reload o unmount de la app)
+const cleanupFirebaseListeners = () => {
+  if (connectionListenersCleanup) {
+    connectionListenersCleanup();
+    connectionListenersCleanup = null;
+  }
+};
+
+export {
+  auth,
+  db,
+  storage,
+  analytics,
+  firebaseReady,
+  getFirebaseAuth,
+  isOnline,
+  cleanupFirebaseListeners,
+};

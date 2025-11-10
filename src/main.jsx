@@ -26,13 +26,18 @@ setTimeout(() => {
   import('./pwa/setupPwaToasts');
   import('./utils/webVitals');
 
-  // 🚨 DIAGNÓSTICO DE RENDIMIENTO (solo en desarrollo)
+  // 🚨 DIAGNÓSTICO DE RENDIMIENTO (solo en desarrollo) - DESHABILITADO POR DEFECTO
+  // El auto-start puede causar problemas de rendimiento y congelamiento
+  // Para activarlo manualmente, usa en consola: window.__performanceDiagnostic__.start()
   if (import.meta.env.DEV) {
     import('./utils/performanceDiagnostic').then((module) => {
-      console.log('%c🔍 Diagnóstico de rendimiento activado', 'color: #00ff00; font-weight: bold');
-      console.log('Usa en consola: window.__performanceDiagnostic__.report()');
-      // Auto-start después de 5 segundos
-      setTimeout(() => module.startDiagnostic(), 5000);
+      console.log(
+        '%c🔍 Diagnóstico de rendimiento disponible',
+        'color: #00aa00; font-weight: bold'
+      );
+      console.log('Para activar: window.__performanceDiagnostic__.start()');
+      console.log('Para reporte: window.__performanceDiagnostic__.report()');
+      // NO auto-iniciar - solo cargar las herramientas
     });
   }
 

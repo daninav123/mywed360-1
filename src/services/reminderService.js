@@ -38,7 +38,10 @@ export function initReminderService({ days = DEFAULT_DAYS, enabled: en = true } 
     stopReminderService();
     return;
   }
-  if (intervalId) return; // Ya iniciado
+  // Si ya está iniciado, detenerlo primero para evitar múltiples intervalos
+  if (intervalId) {
+    stopReminderService();
+  }
   intervalId = setInterval(() => runReminderJob(days), CHECK_INTERVAL_MS);
   // Ejecutar inmediatamente en el arranque
   runReminderJob(days);

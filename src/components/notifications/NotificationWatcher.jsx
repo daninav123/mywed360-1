@@ -19,6 +19,7 @@ export default function NotificationWatcher({ intervalMs = 20000 }) {
     let active = true;
     let started = false;
     let intervalId = null;
+    let authUnsubscribe = null;
 
     try {
       const raw = localStorage.getItem('maloveapp_notif_seen');
@@ -34,7 +35,7 @@ export default function NotificationWatcher({ intervalMs = 20000 }) {
         if (!activeWedding) {
           return;
         }
-        
+
         const notifications = await fetchNotifications(activeWedding);
         const list = Array.isArray(notifications) ? notifications : [];
         if (!Array.isArray(list)) return;
@@ -169,22 +170,38 @@ export default function NotificationWatcher({ intervalMs = 20000 }) {
       );
     };
 
-    if (auth?.currentUser?.uid) {
+    // Verificar que auth esté disponible antes de usarlo
+    if (!auth) {
+      console.warn('[NotificationWatcher] Auth no disponible');
+      return;
+    }
+
+    if (auth.currentUser?.uid) {
       startPolling();
     } else {
-      const unsub = onAuthStateChanged(auth, (u) => {
-        if (u) {
+      authUnsubscribe = onAuthStateChanged(auth, (u) => {
+        if (u && active) {
           startPolling();
-          unsub();
+          if (authUnsubscribe) {
+            authUnsubscribe();
+            authUnsubscribe = null;
+          }
         }
       });
     }
 
     return () => {
       active = false;
-      if (intervalId) clearInterval(intervalId);
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
+      if (authUnsubscribe) {
+        authUnsubscribe();
+        authUnsubscribe = null;
+      }
     };
-  }, [intervalMs, uid]);
+  }, [intervalMs, uid, activeWedding]);
 
   return null;
 }

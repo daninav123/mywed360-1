@@ -8,7 +8,7 @@
     "npm": ">=10.0.0"
   },
   "scripts": {
-    "postinstall": "node scripts/safe-postinstall.js",
+    "postinstall:disabled": "node scripts/safe-postinstall.js",
     "start": "node backend/index.js",
     "backend:ci": "node backend/index.js",
     "frontend:ci": "vite --host --port 5173 --strictPort",
@@ -102,7 +102,10 @@
     "mobile:lint": "npm --prefix mobile run lint"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^7.3.4",
+    "@mui/material": "^7.3.5",
     "@mui/utils": "^7.1.1",
     "@mui/x-date-pickers": "^8.5.3",
     "@myno_21/pinterest-scraper": "^1.0.4",
