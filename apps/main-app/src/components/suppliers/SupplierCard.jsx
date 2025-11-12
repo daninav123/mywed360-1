@@ -200,9 +200,7 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(`${shareText}\n\n${shareUrl}`)}`;
     window.open(whatsappUrl, '_blank');
 
-    toast.success(
-      t('suppliers.card.hybrid.share.toast', 'Abriendo WhatsApp para compartir')
-    );
+    toast.success(t('suppliers.card.hybrid.share.toast', 'Abriendo WhatsApp para compartir'));
   };
 
   return (
@@ -489,40 +487,93 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
           </>
         ) : (
           <>
-            {/* Proveedores de internet */}
-            <div className="flex gap-2">
-              {supplier.contact?.website || supplier.sources?.[0]?.url ? (
-                <a
-                  href={supplier.contact?.website || supplier.sources?.[0]?.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors font-medium text-sm flex items-center justify-center gap-2"
-                >
-                  <ExternalLink size={16} />
-                  {t('suppliers.card.hybrid.actions.viewWebsite')}
-                </a>
-              ) : null}
+            {/* Proveedores de internet - Botones completos */}
 
-              {supplier.contact?.phone && (
-                <button
-                  onClick={handleContactWhatsApp}
-                  className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-sm"
-                  title={t('suppliers.card.hybrid.contact.whatsappTitle')}
-                >
-                  <MessageCircle size={16} />
-                </button>
-              )}
+            {/* Botón Contactar */}
+            <div className="relative">
+              <button
+                onClick={() => setShowContactMenu(!showContactMenu)}
+                className="w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors font-medium text-sm flex items-center justify-center gap-2"
+              >
+                <MessageCircle size={16} />
+                {t('suppliers.card.hybrid.contact.primary', 'Contactar')}
+              </button>
 
-              {supplier.contact?.email && (
-                <button
-                  onClick={handleContactEmail}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm"
-                  title={t('suppliers.card.hybrid.contact.emailTitle')}
-                >
-                  <Mail size={16} />
-                </button>
+              {/* Menú de opciones de contacto */}
+              {showContactMenu && (
+                <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-10 overflow-hidden">
+                  {supplier.contact?.phone && (
+                    <button
+                      onClick={handleContactWhatsApp}
+                      className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-2 text-sm"
+                    >
+                      <MessageCircle size={16} className="text-green-600" />
+                      {t('suppliers.card.hybrid.contact.whatsapp', 'WhatsApp')}
+                    </button>
+                  )}
+                  {supplier.contact?.email && (
+                    <button
+                      onClick={handleContactEmail}
+                      className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-2 text-sm border-t"
+                    >
+                      <Mail size={16} className="text-blue-600" />
+                      {t('suppliers.card.hybrid.contact.email', 'Email')}
+                    </button>
+                  )}
+                  {supplier.contact?.phone && (
+                    <button
+                      onClick={handleContactPhone}
+                      className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-2 text-sm border-t"
+                    >
+                      <Phone size={16} className="text-purple-600" />
+                      {t('suppliers.card.hybrid.contact.phone', 'Llamar')}
+                    </button>
+                  )}
+                  {supplier.contact?.website && (
+                    <a
+                      href={supplier.contact.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-2 text-sm border-t"
+                    >
+                      <ExternalLink size={16} className="text-gray-600" />
+                      {t('suppliers.card.hybrid.actions.viewWebsite', 'Visitar Web')}
+                    </a>
+                  )}
+                </div>
               )}
             </div>
+
+            {/* Botón Solicitar Presupuesto */}
+            <button
+              onClick={() => setShowQuoteModal(true)}
+              className="w-full px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors font-medium text-sm flex items-center justify-center gap-2"
+            >
+              <DollarSign size={16} />
+              💰 {t('suppliers.card.hybrid.actions.requestQuote', 'Solicitar Presupuesto')}
+            </button>
+
+            {/* Botón Ver sitio web (si no tiene otras opciones) */}
+            {!supplier.contact?.phone && !supplier.contact?.email && supplier.contact?.website && (
+              <a
+                href={supplier.contact.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors font-medium text-sm flex items-center justify-center gap-2"
+              >
+                <ExternalLink size={16} />
+                {t('suppliers.card.hybrid.actions.viewWebsite', 'Ver Sitio Web')}
+              </a>
+            )}
+
+            {/* Botón Compartir */}
+            <button
+              onClick={handleShare}
+              className="w-full mt-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors font-medium text-sm flex items-center justify-center gap-2"
+            >
+              <Share2 size={16} />
+              {t('suppliers.card.hybrid.actions.share', 'Compartir')}
+            </button>
           </>
         )}
       </div>
@@ -532,14 +583,11 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
         <div className="mt-2 pt-2 border-t border-gray-200">
           <p className="text-xs text-gray-500">
             {t('suppliers.card.hybrid.source.label', {
-              source:
-                supplier.sources?.[0]?.platform ||
-                t('suppliers.card.hybrid.source.internet'),
+              source: supplier.sources?.[0]?.platform || t('suppliers.card.hybrid.source.internet'),
             })}
           </p>
         </div>
       )}
-
 
       {/* Modal de Detalles */}
       <SupplierDetailModal

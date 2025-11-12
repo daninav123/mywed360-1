@@ -119,12 +119,18 @@ const RequestQuoteModal = ({ supplier, open, onClose, onSuccess }) => {
           email: basicInfo.emailContacto,
           telefono: basicInfo.telefonoContacto,
         },
-        // Info del proveedor
+        // Info del proveedor (incluye datos completos para proveedores de internet)
         proveedor: {
           id: supplier.id || supplier.slug,
           name: supplier.name,
           category: supplier.category,
           categoryName: supplier.categoryName,
+          // ✨ Info adicional para proveedores de internet (Google Places)
+          email: supplier.contact?.email || supplier.email || null,
+          phone: supplier.contact?.phone || supplier.phone || null,
+          website: supplier.contact?.website || supplier.website || null,
+          address: supplier.location?.address || supplier.address || null,
+          source: supplier.source || supplier.priority || null,
         },
         // Detalles del servicio
         serviceDetails: serviceData,

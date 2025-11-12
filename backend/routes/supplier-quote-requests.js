@@ -35,13 +35,39 @@ router.post('/:id/quote-requests', express.json(), async (req, res) => {
       return res.status(400).json({ error: 'name_required' });
     }
 
-    // Verificar que el proveedor existe
+    // Verificar que el proveedor existe (registrado o internet)
     const supplierDoc = await db.collection('suppliers').doc(id).get();
-    if (!supplierDoc.exists) {
-      return res.status(404).json({ error: 'supplier_not_found' });
-    }
 
-    const supplier = supplierDoc.data();
+    let supplier;
+    let isInternetSupplier = false;
+
+    if (!supplierDoc.exists) {
+      // ✨ Proveedor de internet (Google Places) - Usar info del payload
+      if (!proveedor || !proveedor.name) {
+        return res.status(400).json({
+          error: 'supplier_info_required',
+          message: 'Para proveedores de internet, se requiere info básica en el payload',
+        });
+      }
+
+      isInternetSupplier = true;
+      supplier = {
+        name: proveedor.name,
+        profile: { name: proveedor.name },
+        contact: {
+          email: proveedor.email || null,
+          phone: proveedor.phone || null,
+          website: proveedor.website || null,
+        },
+        category: proveedor.category,
+        source: 'internet',
+      };
+
+      logger.info(`🌐 Solicitud para proveedor de internet: ${proveedor.name}`);
+    } else {
+      // Proveedor registrado en Firestore
+      supplier = supplierDoc.data();
+    }
 
     // Generar token único para respuesta pública
     const responseToken = generateResponseToken();
@@ -96,22 +122,50 @@ router.post('/:id/quote-requests', express.json(), async (req, res) => {
       updatedAt: FieldValue.serverTimestamp(),
     };
 
-    // Guardar en la subcolección del proveedor
-    const docRef = await db
-      .collection('suppliers')
-      .doc(id)
-      .collection('quote-requests')
-      .add(quoteRequestData);
+    let docRef;
+    let requestId;
 
-    logger.info(
-      `✅ Nueva solicitud presupuesto V2: ${docRef.id} para proveedor ${id} (${proveedor?.categoryName || 'sin categoría'})`
-    );
+    // Guardar en Firestore solo para proveedores registrados
+    if (!isInternetSupplier) {
+      // Guardar en la subcolección del proveedor
+      docRef = await db
+        .collection('suppliers')
+        .doc(id)
+        .collection('quote-requests')
+        .add(quoteRequestData);
+
+      requestId = docRef.id;
+
+      logger.info(
+        `✅ Nueva solicitud presupuesto V2: ${requestId} para proveedor registrado ${id} (${proveedor?.categoryName || 'sin categoría'})`
+      );
+    } else {
+      // Para proveedores de internet, guardar en colección global
+      docRef = await db.collection('quote-requests-internet').add({
+        ...quoteRequestData,
+        isInternetSupplier: true,
+        supplierInfo: {
+          name: supplier.name,
+          email: supplier.contact?.email,
+          phone: supplier.contact?.phone,
+          website: supplier.contact?.website,
+        },
+      });
+
+      requestId = docRef.id;
+
+      logger.info(
+        `✅ Nueva solicitud presupuesto para proveedor de internet: ${requestId} - ${supplier.name}`
+      );
+    }
 
     // Enviar email de notificación al proveedor
-    if (supplier.contact?.email || supplier.email) {
+    const supplierEmail = supplier.contact?.email || supplier.email;
+
+    if (supplierEmail) {
       try {
         await sendQuoteRequestEmail({
-          supplierEmail: supplier.contact?.email || supplier.email,
+          supplierEmail,
           supplierName: supplier.profile?.name || supplier.name || 'Proveedor',
           clientName: contacto.nombre,
           clientEmail: contacto.email,
@@ -124,11 +178,12 @@ router.post('/:id/quote-requests', express.json(), async (req, res) => {
           serviceDetails: serviceDetails || {},
           customMessage: customMessage || '',
           responseUrl: quoteRequestData.responseUrl,
-          requestId: docRef.id,
+          requestId,
+          isInternetSupplier,
         });
 
         logger.info(
-          `📧 Email enviado a ${supplier.contact?.email || supplier.email} para solicitud ${docRef.id}`
+          `📧 Email enviado a ${supplierEmail} para solicitud ${requestId}${isInternetSupplier ? ' (proveedor de internet)' : ''}`
         );
       } catch (emailError) {
         // No fallar la solicitud si el email falla
@@ -140,24 +195,27 @@ router.post('/:id/quote-requests', express.json(), async (req, res) => {
       );
     }
 
-    // Incrementar contador de solicitudes (analytics)
-    try {
-      await db
-        .collection('suppliers')
-        .doc(id)
-        .update({
-          'metrics.quote_requests': FieldValue.increment(1),
-          updatedAt: FieldValue.serverTimestamp(),
-        });
-    } catch (err) {
-      logger.warn('Error updating supplier quote_requests counter:', err);
+    // Incrementar contador de solicitudes solo para proveedores registrados
+    if (!isInternetSupplier) {
+      try {
+        await db
+          .collection('suppliers')
+          .doc(id)
+          .update({
+            'metrics.quote_requests': FieldValue.increment(1),
+            updatedAt: FieldValue.serverTimestamp(),
+          });
+      } catch (err) {
+        logger.warn('Error updating supplier quote_requests counter:', err);
+      }
     }
 
     return res.status(201).json({
       success: true,
-      requestId: docRef.id,
+      requestId,
       message:
         'Solicitud enviada correctamente. El proveedor se pondrá en contacto contigo pronto.',
+      isInternetSupplier,
     });
   } catch (error) {
     logger.error('Error creating quote request:', error);
