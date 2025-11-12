@@ -8,16 +8,17 @@ on:
         required: false
         default: true
         type: boolean
-  push:
-    branches:
-      - windows
+  # push:
+  #   branches:
+  #     - windows
+  # ⚠️ Deshabilitado: Los E2E tests son lentos y deben ejecutarse manualmente
 
 permissions:
   contents: read
 
 jobs:
   e2e-seating:
-    if: ${{ github.event_name == 'workflow_dispatch' || github.ref_name == 'windows' }}
+    if: ${{ github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
