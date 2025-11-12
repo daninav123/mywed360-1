@@ -1,8 +1,5 @@
 name: E2E Tests
 
-env:
-  ENABLE_E2E: 'false'
-
 on:
   push:
     branches: [  – ** –  ]
@@ -21,7 +18,8 @@ on:
 
 jobs:
   e2e-tests:
-    if: ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.enable_e2e == 'true') || env.ENABLE_E2E == 'true' }}
+    # Solo corre si se ejecuta manualmente con enable_e2e='true' o si la variable de repo ENABLE_E2E='true'
+    if: ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.enable_e2e == 'true') || vars.ENABLE_E2E == 'true' }}
     runs-on: ubuntu-latest
     
     steps:
