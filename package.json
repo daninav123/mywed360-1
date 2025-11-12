@@ -200,6 +200,7 @@
     "lint-staged": "^15.2.10",
     "postcss": "^8.5.6",
     "prettier": "^3.3.3",
+    "puppeteer": "^24.29.1",
     "sharp": "^0.34.3",
     "start-server-and-test": "^2.0.1",
     "sucrase": "^3.34.0",

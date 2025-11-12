@@ -40,7 +40,8 @@ const PRICE_RANGE_OPTIONS = [
 ];
 
 export default function SupplierDashboard() {
-  const { id } = useParams();
+  const { supplierId } = useParams();  // Corregido: usar supplierId en lugar de id
+  const id = supplierId;  // Alias para no cambiar todo el código
   const navigate = useNavigate();
   const { t, format } = useTranslations();
 
@@ -113,7 +114,7 @@ export default function SupplierDashboard() {
     try {
       const token = localStorage.getItem('supplier_token');
       if (!token) {
-        navigate('/supplier/login');
+        navigate('/login');
         return;
       }
 
@@ -125,7 +126,7 @@ export default function SupplierDashboard() {
         if (response.status === 401) {
           localStorage.removeItem('supplier_token');
           localStorage.removeItem('supplier_id');
-          navigate('/supplier/login');
+          navigate('/login');
           return;
         }
         throw new Error('load_error');
@@ -173,12 +174,18 @@ export default function SupplierDashboard() {
     const supplierId = localStorage.getItem('supplier_id');
 
     if (!token || !supplierId) {
-      navigate('/supplier/login');
+      console.log('❌ [DASHBOARD] No hay token o supplier ID, redirigiendo a login');
+      navigate('/login');
       return;
     }
 
+    console.log('✅ [DASHBOARD] Token encontrado, cargando dashboard...');
+    console.log('✅ [DASHBOARD] ID de URL:', id);
+    console.log('✅ [DASHBOARD] ID guardado:', supplierId);
+
     if (id !== supplierId) {
-      navigate(`/supplier/dashboard/${supplierId}`);
+      console.log('⚠️ [DASHBOARD] IDs no coinciden, redirigiendo...');
+      navigate(`/dashboard/${supplierId}`);
       return;
     }
 
@@ -231,7 +238,7 @@ export default function SupplierDashboard() {
     localStorage.removeItem('supplier_token');
     localStorage.removeItem('supplier_id');
     localStorage.removeItem('supplier_data');
-    navigate('/supplier/login');
+    navigate('/login');
   };
 
   if (loading) {
@@ -379,7 +386,7 @@ export default function SupplierDashboard() {
                 </div>
               </div>
               <Link
-                to={`/supplier/dashboard/${id}/plans`}
+                to="/plans"
                 className="px-4 py-2 rounded-lg font-medium transition-colors"
                 style={{
                   backgroundColor: 'var(--color-primary)',
@@ -413,7 +420,7 @@ export default function SupplierDashboard() {
                 </div>
               </div>
               <Link
-                to={`/supplier/dashboard/${id}/plans`}
+                to="/plans"
                 className="px-4 py-2 rounded-lg font-medium transition-colors border"
                 style={{
                   color: 'var(--color-primary)',
@@ -450,7 +457,7 @@ export default function SupplierDashboard() {
 
         {/* Acceso rápido a Solicitudes */}
         <Link
-          to={`/supplier/dashboard/${id}/requests`}
+          to="/requests"
           className="block shadow-md rounded-lg p-6 mb-6 hover:shadow-lg transition-shadow"
           style={{
             backgroundColor: 'var(--color-surface)',
@@ -494,7 +501,7 @@ export default function SupplierDashboard() {
 
         {/* Acceso rápido al Portfolio */}
         <Link
-          to={`/supplier/dashboard/${id}/portfolio`}
+          to="/portfolio"
           className="block shadow-md rounded-lg p-6 mb-6 hover:shadow-lg transition-shadow"
           style={{
             backgroundColor: 'var(--color-surface)',
@@ -524,7 +531,7 @@ export default function SupplierDashboard() {
 
         {/* Acceso rápido a Productos/Servicios */}
         <Link
-          to={`/supplier/dashboard/${id}/products`}
+          to="/products"
           className="block shadow-md rounded-lg p-6 mb-6 hover:shadow-lg transition-shadow"
           style={{
             backgroundColor: 'var(--color-surface)',
@@ -553,7 +560,7 @@ export default function SupplierDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           {/* Acceso a Reseñas */}
           <Link
-            to={`/supplier/dashboard/${id}/reviews`}
+            to="/reviews"
             className="shadow-md rounded-lg p-4 hover:shadow-lg transition-shadow flex items-center justify-between"
             style={{
               backgroundColor: 'var(--color-surface)',
@@ -581,7 +588,7 @@ export default function SupplierDashboard() {
 
           {/* Acceso a Analíticas */}
           <Link
-            to={`/supplier/dashboard/${id}/analytics`}
+            to="/analytics"
             className="shadow-md rounded-lg p-4 hover:shadow-lg transition-shadow flex items-center justify-between"
             style={{
               backgroundColor: 'var(--color-surface)',
@@ -612,7 +619,7 @@ export default function SupplierDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           {/* Mensajes */}
           <Link
-            to={`/supplier/dashboard/${id}/messages`}
+            to="/messages"
             className="shadow-md rounded-lg p-4 hover:shadow-lg transition-shadow flex items-center justify-between"
             style={{
               backgroundColor: 'var(--color-surface)',
@@ -640,7 +647,7 @@ export default function SupplierDashboard() {
 
           {/* Disponibilidad */}
           <Link
-            to={`/supplier/dashboard/${id}/availability`}
+            to="/availability"
             className="shadow-md rounded-lg p-4 hover:shadow-lg transition-shadow flex items-center justify-between"
             style={{
               backgroundColor: 'var(--color-surface)',
@@ -668,7 +675,7 @@ export default function SupplierDashboard() {
 
           {/* Pagos */}
           <Link
-            to={`/supplier/dashboard/${id}/payments`}
+            to="/payments"
             className="shadow-md rounded-lg p-4 hover:shadow-lg transition-shadow flex items-center justify-between"
             style={{
               backgroundColor: 'var(--color-surface)',

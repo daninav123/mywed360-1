@@ -3,7 +3,8 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { AuthProvider } from './context/AuthContext';
+// Los proveedores usan JWT, no Firebase Auth
+// import { AuthProvider } from './context/AuthContext';
 
 // Lazy load pages - usando las rutas REALES de main-app
 const SupplierLogin = lazy(() => import('./pages/suppliers/SupplierLogin'));
@@ -31,8 +32,8 @@ const LoadingSpinner = () => (
 function App() {
   return (
     <HelmetProvider>
-      <AuthProvider>
-        <BrowserRouter>
+      {/* Proveedores usan JWT, no AuthProvider de Firebase */}
+      <BrowserRouter>
           <Suspense fallback={<LoadingSpinner />}>
             <Routes>
               {/* Default route */}
@@ -72,7 +73,6 @@ function App() {
             draggable
           />
         </BrowserRouter>
-      </AuthProvider>
     </HelmetProvider>
   );
 }

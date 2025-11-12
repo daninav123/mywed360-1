@@ -460,37 +460,14 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
               )}
             </div>
 
-            {/* Botones secundarios */}
-            <div className="flex gap-2">
-              {/* Botón Ver Portfolio (solo si tiene slug y portfolio) */}
-              {supplier.hasPortfolio && supplier.slug && (
-                <Link
-                  to={`/proveedor/${supplier.slug}`}
-                  className="flex-1 px-4 py-2 border-2 border-purple-600 text-purple-600 rounded-md hover:bg-purple-50 transition-colors font-medium text-sm flex items-center justify-center gap-2"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <Camera size={16} />
-                  {t('suppliers.card.hybrid.actions.viewPortfolio')}
-                </Link>
-              )}
-              {onViewDetails && (
-                <button
-                  onClick={() => onViewDetails(supplier)}
-                  className="flex-1 px-4 py-2 border border-green-600 text-green-600 rounded-md hover:bg-green-50 transition-colors font-medium text-sm"
-                >
-                  {t('suppliers.card.hybrid.actions.viewProfile')}
-                </button>
-              )}
-              {onMarkAsConfirmed && (
-                <button
-                  onClick={() => onMarkAsConfirmed(supplier)}
-                  className="flex-1 px-4 py-2 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-50 transition-colors font-medium text-sm flex items-center justify-center gap-1"
-                >
-                  <CheckCircle size={16} />
-                  {t('suppliers.card.hybrid.actions.markConfirmed')}
-                </button>
-              )}
-            </div>
+            {/* Botón Ver Detalles */}
+            <button
+              onClick={() => setShowDetailModal(true)}
+              className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium text-sm flex items-center justify-center gap-2"
+            >
+              <ExternalLink size={16} />
+              Ver detalles completos
+            </button>
 
             {/* Botón Solicitar Presupuesto */}
             <button
@@ -563,15 +540,6 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
         </div>
       )}
 
-      {/* Botón Ver Detalles */}
-      <div className="mt-4 pt-4 border-t border-gray-200">
-        <button
-          onClick={() => setShowDetailModal(true)}
-          className="w-full py-2 px-4 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors font-medium"
-        >
-          {t('suppliers.card.hybrid.actions.viewDetails')}
-        </button>
-      </div>
 
       {/* Modal de Detalles */}
       <SupplierDetailModal

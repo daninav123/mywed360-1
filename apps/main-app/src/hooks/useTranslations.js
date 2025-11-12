@@ -92,9 +92,9 @@ const useTranslations = () => {
             ? 'declined'
             : 'pending';
       const map = {
-        confirmed: translate('guests.confirmed'),
-        pending: translate('guests.pending'),
-        declined: translate('guests.declined'),
+        confirmed: 'Confirmado',
+        pending: 'Pendiente',
+        declined: 'Rechazado',
       };
       return map[norm] || status;
     },

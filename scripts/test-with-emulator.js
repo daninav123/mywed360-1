@@ -4,8 +4,7 @@
  * Uso: node scripts/test-with-emulator.js [--specs=pattern]
  */
 
-const { spawn } = require('child_process');
-const path = require('path');
+import { spawn } from 'child_process';
 
 const args = process.argv.slice(2);
 const specsArg = args.find(arg => arg.startsWith('--specs='));

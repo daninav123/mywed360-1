@@ -6,8 +6,16 @@
 import fetch from 'node-fetch';
 import * as supplierCategories from '../../shared/supplierCategories.js';
 
-// Configuración de API
-const GOOGLE_PLACES_API_KEY = process.env.GOOGLE_PLACES_API_KEY;
+// Configuración de API - probar ambas variables
+const GOOGLE_PLACES_API_KEY = process.env.GOOGLE_PLACES_API_KEY || process.env.VITE_GOOGLE_PLACES_API_KEY;
+
+// Log para debug
+if (!GOOGLE_PLACES_API_KEY) {
+  console.warn('⚠️ [GOOGLE PLACES SERVICE] No se encontró API Key en process.env');
+  console.warn('   Verificar variables: GOOGLE_PLACES_API_KEY o VITE_GOOGLE_PLACES_API_KEY');
+} else {
+  console.log(`✅ [GOOGLE PLACES SERVICE] API Key configurada: ${GOOGLE_PLACES_API_KEY.substring(0, 15)}...`);
+}
 
 // Categorías desde archivo centralizado
 const HIGH_COVERAGE_CATEGORIES = supplierCategories.getHighCoverageCategories().flatMap((cat) => cat.keywords);
@@ -19,11 +27,15 @@ const LOW_COVERAGE_CATEGORIES = supplierCategories.getLowCoverageCategories().fl
  */
 function shouldUseGooglePlaces(service) {
   const serviceLower = (service || '').toLowerCase().trim();
-
-  return (
-    HIGH_COVERAGE_CATEGORIES.includes(serviceLower) ||
-    MEDIUM_COVERAGE_CATEGORIES.includes(serviceLower)
-  );
+  
+  // ✨ SIEMPRE buscar en Google Places - tiene mejor cobertura que Tavily
+  return true;
+  
+  // Legacy: solo buscar para categorías específicas
+  // return (
+  //   HIGH_COVERAGE_CATEGORIES.includes(serviceLower) ||
+  //   MEDIUM_COVERAGE_CATEGORIES.includes(serviceLower)
+  // );
 }
 
 /**

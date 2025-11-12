@@ -16,6 +16,7 @@ import {
   Loader2,
   FileText,
   Save,
+  CheckCircle,
 } from 'lucide-react';
 import Modal from '../Modal';
 import Button from '../ui/Button';
@@ -87,6 +88,15 @@ const SupplierDetailModal = ({
 
   if (!open || !supplier) return null;
 
+  // Normalizar datos del supplier
+  const normalizedSupplier = {
+    ...supplier,
+    category: supplier.category || supplier.service || supplier.profile?.category || 'Servicio desconocido',
+    location: typeof supplier.location === 'object' && supplier.location !== null
+      ? supplier.location
+      : { city: '', province: '', country: '' },
+  };
+
   const images =
     supplier.media?.portfolio?.length > 0
       ? supplier.media.portfolio
@@ -97,23 +107,36 @@ const SupplierDetailModal = ({
   return (
     <Modal open={open} onClose={onClose} size="xl">
       <div className="max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 z-10 bg-surface border-b border-border px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+        {/* Header */}
+        <div className="sticky top-0 z-10 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-4">
             {supplier.media?.logo && (
               <img
                 src={supplier.media.logo}
                 alt={supplier.name}
-                className="h-12 w-12 rounded-full object-cover"
+                className="h-16 w-16 rounded-full object-cover border-2 border-gray-200"
               />
             )}
             <div>
-              <h2 className="text-2xl font-bold">{supplier.name}</h2>
-              <p className="text-sm text-muted capitalize">{supplier.category}</p>
+              <div className="flex items-center gap-2">
+                <h2 className="text-2xl font-bold text-gray-900">{supplier.name}</h2>
+                {supplier.registered && (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    <CheckCircle size={14} />
+                    Verificado
+                  </span>
+                )}
+              </div>
+              <p className="text-sm text-gray-600 capitalize mt-1">{normalizedSupplier.category}</p>
             </div>
           </div>
-          <Button variant="ghost" size="sm" onClick={onClose} aria-label={t('app.close')}>
-            <X className="h-5 w-5" />
-          </Button>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            aria-label="Cerrar"
+          >
+            <X className="h-6 w-6 text-gray-500" />
+          </button>
         </div>
 
         <div className="p-6 space-y-6">
@@ -132,7 +155,7 @@ const SupplierDetailModal = ({
                       setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1))
                     }
                     className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full"
-                    aria-label={t('suppliers.detail.gallery.previous')}
+                    aria-label="Anterior"
                   >
                     <ChevronLeft className="h-6 w-6" />
                   </button>
@@ -142,7 +165,7 @@ const SupplierDetailModal = ({
                       setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1))
                     }
                     className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full"
-                    aria-label={t('suppliers.detail.gallery.next')}
+                    aria-label="Siguiente"
                   >
                     <ChevronRight className="h-6 w-6" />
                   </button>
@@ -154,7 +177,7 @@ const SupplierDetailModal = ({
           <div className="flex items-center justify-between gap-3">
             <div className="flex gap-2">
               {supplier.registered && (
-                <Badge variant="success">{t('suppliers.detail.badges.verified')}</Badge>
+                <Badge variant="success">Verificado</Badge>
               )}
               {supplier.badge && <Badge variant="info">{supplier.badge}</Badge>}
             </div>
@@ -165,13 +188,11 @@ const SupplierDetailModal = ({
                 onClick={() => onFavoriteToggle?.(supplier)}
               >
                 <Heart className={`h-4 w-4 ${isFavorite ? 'fill-current' : ''}`} />
-                {isFavorite
-                  ? t('suppliers.detail.actions.saved')
-                  : t('suppliers.detail.actions.save')}
+                {isFavorite ? 'Guardado' : 'Guardar'}
               </Button>
               <Button variant="primary" size="sm" onClick={() => onRequestQuote?.(supplier)}>
                 <Send className="h-4 w-4" />
-                {t('suppliers.detail.actions.requestQuote')}
+                Solicitar Cotización
               </Button>
             </div>
           </div>
@@ -179,7 +200,7 @@ const SupplierDetailModal = ({
           {supplier.description && (
             <div>
               <h3 className="text-lg font-semibold mb-3">
-                {t('suppliers.detail.sections.about', { name: supplier.name })}
+                {supplier.name}
               </h3>
               <p className="text-body leading-relaxed">{supplier.description}</p>
             </div>
@@ -190,7 +211,7 @@ const SupplierDetailModal = ({
               <div className="flex gap-3 p-4 bg-surface rounded-lg border">
                 <MapPin className="h-5 w-5 text-primary" />
                 <div>
-                  <p className="font-medium">{t('suppliers.detail.info.location')}</p>
+                  <p className="font-medium">Ubicación</p>
                   <p className="text-sm text-muted">
                     {[supplier.location.city, supplier.location.province]
                       .filter(Boolean)
@@ -203,7 +224,7 @@ const SupplierDetailModal = ({
               <div className="flex gap-3 p-4 bg-surface rounded-lg border">
                 <DollarSign className="h-5 w-5 text-primary" />
                 <div>
-                  <p className="font-medium">{t('suppliers.detail.info.price')}</p>
+                  <p className="font-medium">Precio</p>
                   <p className="text-sm text-muted">{supplier.pricing.priceRange}</p>
                 </div>
               </div>
@@ -212,11 +233,9 @@ const SupplierDetailModal = ({
               <div className="flex gap-3 p-4 bg-surface rounded-lg border">
                 <Star className="h-5 w-5 text-primary" />
                 <div>
-                  <p className="font-medium">{t('suppliers.detail.info.rating')}</p>
+                  <p className="font-medium">Calificación</p>
                   <p className="text-sm text-muted">
-                    {t('suppliers.detail.info.ratingValue', {
-                      value: supplier.rating.toFixed(1),
-                    })}
+                    {supplier.rating.toFixed(1)}
                   </p>
                 </div>
               </div>
@@ -225,7 +244,7 @@ const SupplierDetailModal = ({
 
           <div>
             <h3 className="text-lg font-semibold mb-3">
-              {t('suppliers.detail.sections.contact')}
+              Contacto
             </h3>
             <div className="space-y-3">
               {supplier.contact?.email && (
@@ -236,7 +255,7 @@ const SupplierDetailModal = ({
                   <Mail className="h-5 w-5 text-primary" />
                   <div>
                     <p className="text-sm font-medium">
-                      {t('suppliers.detail.contact.email')}
+                      Correo electrónico
                     </p>
                     <p className="text-sm text-muted">{supplier.contact.email}</p>
                   </div>
@@ -250,7 +269,7 @@ const SupplierDetailModal = ({
                   <Phone className="h-5 w-5 text-primary" />
                   <div>
                     <p className="text-sm font-medium">
-                      {t('suppliers.detail.contact.phone')}
+                      Teléfono
                     </p>
                     <p className="text-sm text-muted">{supplier.contact.phone}</p>
                   </div>
@@ -266,7 +285,7 @@ const SupplierDetailModal = ({
                   <Globe className="h-5 w-5 text-primary" />
                   <div className="flex-1">
                     <p className="text-sm font-medium">
-                      {t('suppliers.detail.contact.website')}
+                      Sitio web
                     </p>
                     <p className="text-sm text-muted truncate">{supplier.contact.website}</p>
                   </div>
@@ -334,20 +353,27 @@ const SupplierDetailModal = ({
           </div>
 
           {/* Sección Portfolio */}
-          {supplier.hasPortfolio && supplier.slug && (
-            <div>
+          {(supplier.hasPortfolio && supplier.slug) || portfolioPhotos.length > 0 ? (
+            <div className="bg-purple-50 p-6 rounded-lg border border-purple-200">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold flex items-center gap-2">
-                  <Camera className="h-5 w-5 text-purple-600" />
-                  {t('suppliers.detail.portfolio.title')}
-                </h3>
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                    <Camera className="h-5 w-5 text-purple-600" />
+                    Portfolio
+                  </h3>
+                  {portfolioPhotos.length > 0 && (
+                    <p className="text-sm text-gray-600 mt-1">
+                      {portfolioPhotos.length} fotos disponibles
+                    </p>
+                  )}
+                </div>
                 <a
                   href={`/proveedor/${supplier.slug}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm text-purple-600 hover:text-purple-700 flex items-center gap-1"
+                  className="text-sm text-purple-600 hover:text-purple-700 flex items-center gap-1 font-medium"
                 >
-                  {t('suppliers.detail.portfolio.viewPublic')}
+                  Ver página completa
                   <ExternalLink className="h-4 w-4" />
                 </a>
               </div>
@@ -357,32 +383,27 @@ const SupplierDetailModal = ({
                   <Loader2 className="h-8 w-8 animate-spin text-primary" />
                 </div>
               ) : portfolioPhotos.length > 0 ? (
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  {portfolioPhotos.slice(0, 6).map((photo, index) => (
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {portfolioPhotos.map((photo, index) => (
                     <div
                       key={photo.id || index}
-                      className="relative aspect-square rounded-lg overflow-hidden cursor-pointer group"
+                      className="relative aspect-square rounded-lg overflow-hidden cursor-pointer group border border-gray-200 hover:border-purple-300 transition-all"
                       onClick={() => {
                         setLightboxIndex(index);
                         setLightboxOpen(true);
                       }}
                     >
                       <img
-                        src={photo.url}
-                        alt={
-                          photo.title ||
-                          t('suppliers.detail.portfolio.photoAlt', {
-                            index: index + 1,
-                          })
-                        }
-                        className="w-full h-full object-cover transition-transform group-hover:scale-110"
+                        src={photo.thumbnails?.medium || photo.original || photo.url}
+                        alt={photo.title || `Foto ${index + 1}`}
+                        className="w-full h-full object-cover transition-transform group-hover:scale-105"
                       />
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all flex items-center justify-center">
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all flex items-center justify-center">
                         <Camera className="h-8 w-8 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
                       </div>
                       {photo.featured && (
-                        <div className="absolute top-2 right-2 bg-purple-600 text-white text-xs px-2 py-1 rounded-full">
-                          {t('suppliers.portfolio.lightbox.tags.featured')}
+                        <div className="absolute top-2 right-2 bg-purple-600 text-white text-xs px-2 py-1 rounded-full font-medium">
+                          ⭐ Destacada
                         </div>
                       )}
                     </div>
@@ -392,7 +413,7 @@ const SupplierDetailModal = ({
                 <div className="text-center py-8 bg-gray-50 rounded-lg">
                   <Camera className="h-12 w-12 text-gray-400 mx-auto mb-2" />
                   <p className="text-sm text-gray-600">
-                    {t('suppliers.detail.portfolio.empty')}
+                    No hay fotos disponibles
                   </p>
                 </div>
               )}
@@ -405,14 +426,12 @@ const SupplierDetailModal = ({
                     rel="noopener noreferrer"
                     className="text-sm text-purple-600 hover:text-purple-700 font-medium"
                   >
-                    {t('suppliers.detail.portfolio.viewAll', {
-                      count: portfolioPhotos.length,
-                    })}
+                    Ver todas las fotos ({portfolioPhotos.length})
                   </a>
                 </div>
               )}
             </div>
-          )}
+          ) : null}
         </div>
       </div>
 

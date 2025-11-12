@@ -1185,7 +1185,7 @@ function Invitados() {
       <div className="max-w-7xl mx-auto space-y-6">
         <div className="page-header">
           <div>
-            <h1 className="page-title">{t('guests.guestList')}</h1>
+            <h1 className="page-title">Lista de invitados</h1>
             <p className="text-muted mt-1">Gestiona tu lista de invitados de forma eficiente</p>
           </div>
         </div>
@@ -1379,7 +1379,7 @@ function Invitados() {
                 {t('app.close', { defaultValue: 'Cerrar' })}
               </Button>
               <Button onClick={handlePrintRsvpPdf}>
-                {t('guests.rsvp.printPdf', { defaultValue: 'Imprimir / PDF' })}
+                Imprimir / PDF
               </Button>
             </div>
           </div>

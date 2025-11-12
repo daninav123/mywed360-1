@@ -48,8 +48,15 @@ export default function SupplierLogin() {
       localStorage.setItem('supplier_id', data.supplier.id);
       localStorage.setItem('supplier_data', JSON.stringify(data.supplier));
 
-      // Redirigir al dashboard
-      navigate(`/supplier/dashboard/${data.supplier.id}`);
+      console.log('✅ [LOGIN] Token guardado, redirigiendo...');
+      console.log('✅ [LOGIN] Supplier ID:', data.supplier.id);
+      console.log('✅ [LOGIN] URL destino:', `/dashboard/${data.supplier.id}`);
+
+      // Redirigir al dashboard (ruta corregida)
+      // Usamos window.location.href como respaldo más confiable
+      const dashboardUrl = `/dashboard/${data.supplier.id}`;
+      console.log('🚀 [LOGIN] Ejecutando redirección...');
+      window.location.href = dashboardUrl;
     } catch (err) {
       setError(err.message);
     } finally {

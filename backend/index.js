@@ -136,6 +136,7 @@ import taskTemplatesRouter from './routes/task-templates.js';
 import mobileRouter from './routes/mobile.js';
 import quoteRequestsRouter from './routes/quote-requests.js';
 import adminQuoteRequestsRouter from './routes/admin-quote-requests.js';
+import googlePlacesRouter from './routes/google-places.js';
 
 import ipAllowlist from './middleware/ipAllowlist.js';
 import adminAuthRouter from './routes/admin-auth.js';
@@ -643,6 +644,7 @@ app.use('/api/ai-suppliers', authMiddleware(), aiSuppliersRouter);
 app.use('/api/ai-suppliers-web', authMiddleware(), aiSuppliersWebRouter);
 app.use('/api/ai-suppliers-real', authMiddleware(), aiSuppliersRealRouter);
 app.use('/api/ai-suppliers-tavily', authMiddleware(), aiSuppliersTavilyRouter);
+app.use('/api/google-places', googlePlacesRouter); // Proxy para Google Places API
 app.use('/api/suppliers', suppliersHybridRouter); // Búsqueda pública, sin auth
 app.use('/api/suppliers', suppliersRegisterRouter); // No requiere auth para registro
 app.use('/api/suppliers', supplierPublicRouter); // Portfolio público (sin auth)

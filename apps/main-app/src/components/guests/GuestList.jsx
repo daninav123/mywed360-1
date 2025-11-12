@@ -202,19 +202,19 @@ const GuestList = React.memo(
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="bg-white p-4 rounded-lg shadow-sm border">
             <div className="text-2xl font-bold text-primary">{stats.total}</div>
-            <div className="text-sm text-muted">{t('guests.totalGuests')}</div>
+            <div className="text-sm text-muted">Total invitados</div>
           </div>
           <div className="bg-white p-4 rounded-lg shadow-sm border">
             <div className="text-2xl font-bold text-green-600">{stats.confirmed}</div>
-            <div className="text-sm text-muted">{t('guests.confirmedGuests')}</div>
+            <div className="text-sm text-muted">Confirmados</div>
           </div>
           <div className="bg-white p-4 rounded-lg shadow-sm border">
             <div className="text-2xl font-bold text-yellow-600">{stats.pending}</div>
-            <div className="text-sm text-muted">{t('guests.pendingGuests')}</div>
+            <div className="text-sm text-muted">Pendientes</div>
           </div>
           <div className="bg-white p-4 rounded-lg shadow-sm border">
             <div className="text-2xl font-bold text-purple-600">{stats.totalAttendees}</div>
-            <div className="text-sm text-muted">{t('guests.stats.totalAttendees')}</div>
+            <div className="text-sm text-muted">Total asistentes</div>
           </div>
         </div>
 
@@ -222,11 +222,11 @@ const GuestList = React.memo(
         {filteredGuests.length === 0 ? (
           <div className="text-center py-12 bg-gray-50 rounded-lg">
             <User size={48} className="mx-auto text-muted mb-4" />
-            <h3 className="text-lg font-medium text-body mb-2">{t('guests.empty.title')}</h3>
+            <h3 className="text-lg font-medium text-body mb-2">No hay invitados</h3>
             <p className="text-muted">
               {searchTerm || statusFilter || tableFilter
-                ? t('guests.empty.searchHint')
-                : t('guests.empty.defaultHint')}
+                ? 'No se encontraron invitados con los filtros aplicados'
+                : 'Empieza añadiendo invitados a tu lista'}
             </p>
           </div>
         ) : (

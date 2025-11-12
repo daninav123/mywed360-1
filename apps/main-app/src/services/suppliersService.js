@@ -1,8 +1,11 @@
 // services/suppliersService.js
 // Servicio para búsqueda híbrida de proveedores (Fase 2)
 
-import { auth } from '../firebaseConfig';
+import { db, auth } from '../firebaseConfig';
 import { classifySuppliers } from './supplierCategoryClassifier';
+import { searchGooglePlaces } from './webSearchService';
+
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4004';
 
 /**
  * Buscar proveedores con el nuevo sistema híbrido
@@ -80,11 +83,12 @@ export async function searchSuppliersHybrid(
     const controller = new AbortController();
     const timeoutId = setTimeout(() => {
       controller.abort();
-      console.error('⏱️ [searchSuppliersHybrid] Timeout después de 30s');
+      console.log('🔍 [searchSuppliersHybrid] Iniciando búsqueda:', payload);
     }, 30000);
 
     try {
-      const response = await fetch('/api/suppliers/search', {
+      // 1. Llamar al backend (Firestore + Tavily)
+      const backendPromise = fetch('/api/suppliers/search', {
         method: 'POST',
         headers,
         credentials: 'include',
@@ -92,11 +96,31 @@ export async function searchSuppliersHybrid(
         signal: controller.signal,
       });
 
-      clearTimeout(timeoutId);
+      // 2. Llamar a Google Places en paralelo (si hay query)
+      let googlePlacesPromise = Promise.resolve({ results: [] });
+      const searchQuery = payload.query;
+      const searchLocation = payload.location;
+      const searchService = payload.service;
+      
+      console.log(`🔎 [searchSuppliersHybrid] Query: "${searchQuery}", Location: "${searchLocation}", Service: "${searchService}"`);
+      
+      if (searchQuery && searchQuery.length > 2) {
+        console.log('🌐 [searchSuppliersHybrid] Buscando también en Google Places...');
+        // Detectar si es nombre específico (una palabra sin espacios o empieza con mayúscula)
+        const isSpecificName = !searchQuery.includes(' ') || /^[A-Z]/.test(searchQuery);
+        console.log(`🎯 [searchSuppliersHybrid] Es nombre específico: ${isSpecificName}`);
+        googlePlacesPromise = searchGooglePlaces(searchQuery, searchLocation, searchService, isSpecificName);
+      } else {
+        console.log(`⚠️ [searchSuppliersHybrid] Query muy corto o vacío: "${searchQuery}"`);
+      }
+
+      // 3. Esperar ambas búsquedas
+      const [response, googleResults] = await Promise.all([backendPromise, googlePlacesPromise]);
 
       const elapsed = Date.now() - startTime;
       console.log(`✅ [searchSuppliersHybrid] Respuesta recibida en ${elapsed}ms`);
 
+      // Validar response
       if (!response.ok) {
         const error = await response.json().catch(() => ({}));
         console.error('❌ [searchSuppliersHybrid] Error del servidor:', error);
@@ -107,16 +131,59 @@ export async function searchSuppliersHybrid(
       console.log('📊 [searchSuppliersHybrid] Datos recibidos:', {
         count: data.count,
         breakdown: data.breakdown,
-        suppliersLength: data.suppliers?.length,
+        suppliersLength: data.suppliers?.length || 0,
+        googlePlacesCount: googleResults.results?.length || 0,
       });
 
-      // 🤖 CLASIFICACIÓN AUTOMÁTICA: Asignar categoría a cada proveedor
-      if (data.suppliers && Array.isArray(data.suppliers)) {
-        console.log('🤖 [searchSuppliersHybrid] Clasificando proveedores automáticamente...');
-        data.suppliers = classifySuppliers(data.suppliers);
+      // 4. Combinar resultados de backend + Google Places
+      let allSuppliers = data.suppliers || [];
+
+      if (googleResults.results && googleResults.results.length > 0) {
+        console.log(`✅ [searchSuppliersHybrid] Añadiendo ${googleResults.results.length} resultados de Google Places`);
+
+        // Transformar resultados de Google Places al formato esperado
+        const googleSuppliersFormatted = googleResults.results.map(place => ({
+          id: place.id,
+          name: place.name,
+          companyName: place.name,
+          category: place.category || service || 'Proveedor',
+          service: place.category || service,
+          address: place.address,
+          location: place.location,
+          phone: place.phone,
+          website: place.website,
+          rating: place.rating || 0,
+          reviewCount: place.reviewCount || 0,
+          photos: place.photo ? [place.photo] : [],
+          priceLevel: place.priceLevel,
+          source: 'google_places',
+          isExternal: true,
+          externalId: place.id,
+        }));
+
+        allSuppliers = [...allSuppliers, ...googleSuppliersFormatted];
       }
 
-      return data;
+      // 5. Clasificar automáticamente si hay proveedores
+      if (allSuppliers.length > 0) {
+        console.log('🤖 [searchSuppliersHybrid] Clasificando proveedores automáticamente...');
+        allSuppliers = classifySuppliers(allSuppliers);
+      }
+
+      // 6. Actualizar breakdown con Google Places
+      const updatedBreakdown = {
+        ...data.breakdown,
+        googlePlaces: googleResults.results?.length || 0,
+        total: allSuppliers.length,
+      };
+
+      return {
+        success: true,
+        count: allSuppliers.length,
+        breakdown: updatedBreakdown,
+        suppliers: allSuppliers,
+        hasGoogleResults: googleResults.results?.length > 0,
+      };
     } catch (fetchError) {
       clearTimeout(timeoutId);
 

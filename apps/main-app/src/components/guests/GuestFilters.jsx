@@ -82,7 +82,7 @@ const GuestFilters = React.memo(
           {/* Título y contador */}
           <div className="flex justify-between items-center">
             <div>
-              <h2 className="text-xl font-semibold text-body">{t('guests.guestList')}</h2>
+              <h2 className="text-xl font-semibold text-body">Lista de invitados</h2>
               <p className="text-sm text-muted mt-1">
                 {t('guests.filters.totalGuests', {
                   count: guestCount,
@@ -100,7 +100,7 @@ const GuestFilters = React.memo(
               data-testid="guest-add-manual"
             >
               <Plus size={20} className="mr-2" />
-              {t('guests.addGuest')}
+              Añadir invitado
             </Button>
           </div>
 
