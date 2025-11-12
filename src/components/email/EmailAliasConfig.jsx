@@ -6,7 +6,7 @@ import useTranslations from '../../hooks/useTranslations';
 
 /**
  * EmailAliasConfig - Configurar alias de email personalizado
- * 
+ *
  * Permite al usuario elegir su alias para @malove.app
  * Ejemplo: usuario elige "ana" → ana@malove.app
  */
@@ -30,12 +30,11 @@ const EmailAliasConfig = ({ user, onClose, onSuccess }) => {
       if (onClose) onClose();
       return;
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.uid]);
 
   useEffect(() => {
     if (!user?.uid || !db) return;
-    
+
     // Cargar email actual
     (async () => {
       try {
@@ -44,7 +43,7 @@ const EmailAliasConfig = ({ user, onClose, onSuccess }) => {
           const data = userDoc.data();
           const current = data.maLoveEmail || data.emailUsername || '';
           setCurrentEmail(current);
-          
+
           // Extraer el alias actual si tiene el dominio configurado
           if (current.includes(domainSuffix)) {
             const username = current.split('@')[0];
@@ -69,7 +68,7 @@ const EmailAliasConfig = ({ user, onClose, onSuccess }) => {
 
   const checkAvailability = async (value) => {
     if (!db || !user?.uid) return;
-    
+
     const validationError = validateAlias(value);
     if (validationError) {
       setAvailable(false);
@@ -79,13 +78,13 @@ const EmailAliasConfig = ({ user, onClose, onSuccess }) => {
 
     setChecking(true);
     setError('');
-    
+
     try {
       const emailUsername = value.toLowerCase().trim();
-      
+
       // Verificar en la colección emailUsernames
       const usernameDoc = await getDoc(doc(db, 'emailUsernames', emailUsername));
-      
+
       if (usernameDoc.exists()) {
         const data = usernameDoc.data();
         // Permitir si es el mismo usuario
@@ -127,12 +126,12 @@ const EmailAliasConfig = ({ user, onClose, onSuccess }) => {
 
   const handleSubmit = async (e) => {
     e?.preventDefault?.();
-    
+
     if (!db || !user?.uid) {
       setError(tAlias('errors.config'));
       return;
     }
-    
+
     const validationError = validateAlias(alias);
     if (validationError) {
       setError(validationError);
@@ -246,7 +245,7 @@ const EmailAliasConfig = ({ user, onClose, onSuccess }) => {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               {tAlias('fields.alias.label')}
             </label>
-            
+
             <div className="flex items-center gap-2">
               <input
                 type="text"
@@ -257,27 +256,25 @@ const EmailAliasConfig = ({ user, onClose, onSuccess }) => {
                   available === true
                     ? 'border-green-300 focus:ring-green-500'
                     : available === false
-                    ? 'border-red-300 focus:ring-red-500'
-                    : 'border-gray-300 focus:ring-blue-500'
+                      ? 'border-red-300 focus:ring-red-500'
+                      : 'border-gray-300 focus:ring-blue-500'
                 }`}
                 disabled={loading}
                 autoFocus
               />
               <span className="text-gray-600 font-mono">{domainSuffix}</span>
-              
+
               {checking && (
                 <div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-600 border-t-transparent" />
               )}
-              
-              {!checking && available === true && (
-                <Check className="text-green-600" size={20} />
-              )}
-              
+
+              {!checking && available === true && <Check className="text-green-600" size={20} />}
+
               {!checking && available === false && (
                 <AlertCircle className="text-red-600" size={20} />
               )}
             </div>
-            
+
             {/* Reglas */}
             <ul className="mt-2 text-xs text-gray-500 space-y-1">
               {aliasRules.map((rule, index) => (

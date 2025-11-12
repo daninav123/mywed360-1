@@ -48,7 +48,6 @@ export default function EmailInsights({ mailId, userId, email }) {
       // Evita bucle: lanzar una sola vez
       if (!analyzing) analyzeNow();
     } catch {}
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mailId, insights]);
 
   // Fallback local de análisis (heurístico simple)
@@ -264,13 +263,21 @@ export default function EmailInsights({ mailId, userId, email }) {
       <div className="mt-4 flex flex-wrap gap-2">
         <button
           className="rounded border px-2 py-1 text-xs hover:bg-gray-50"
-          onClick={() => { try { navigate && navigate('/tasks'); } catch {} }}
+          onClick={() => {
+            try {
+              navigate && navigate('/tasks');
+            } catch {}
+          }}
         >
           Ver tareas
         </button>
         <button
           className="rounded border px-2 py-1 text-xs hover:bg-gray-50"
-          onClick={() => { try { navigate && navigate('/protocolo/timing'); } catch {} }}
+          onClick={() => {
+            try {
+              navigate && navigate('/protocolo/timing');
+            } catch {}
+          }}
         >
           Ver Timing
         </button>

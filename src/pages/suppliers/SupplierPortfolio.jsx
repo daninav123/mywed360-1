@@ -120,7 +120,6 @@ export default function SupplierPortfolio() {
 
   useEffect(() => {
     loadPhotos();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCategory]);
 
   const handlePhotoUploaded = () => {

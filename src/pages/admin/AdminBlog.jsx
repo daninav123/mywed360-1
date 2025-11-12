@@ -175,7 +175,6 @@ const AdminBlog = () => {
     loadPosts('all');
     loadScheduled();
     loadPlan();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

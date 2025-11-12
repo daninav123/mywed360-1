@@ -17,6 +17,7 @@
     "dev:admin": "cd apps/admin-app && npm run dev",
     "dev:all": "concurrently -k -n backend,main,suppliers,planners,admin -c blue,magenta,yellow,green,red \"npm run backend\" \"npm run dev:main\" \"npm run dev:suppliers\" \"npm run dev:planners\" \"npm run dev:admin\"",
     "install:all": "npm install && cd apps/main-app && npm install && cd ../suppliers-app && npm install && cd ../planners-app && npm install && cd ../admin-app && npm install && cd ../..",
+    "build": "npm run build:main",
     "build:main": "cd apps/main-app && npm run build",
     "build:suppliers": "cd apps/suppliers-app && npm run build",
     "build:planners": "cd apps/planners-app && npm run build",

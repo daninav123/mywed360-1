@@ -52,12 +52,10 @@ export default function CreateWeddingAI() {
         style_default: form.style,
       });
     } catch {}
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const isOwnerLike = hasRole('owner', 'pareja', 'admin');
-  const forbiddenRole =
-    !isLoading && (!!currentUser || !!userProfile) && !isOwnerLike;
+  const forbiddenRole = !isLoading && (!!currentUser || !!userProfile) && !isOwnerLike;
 
   const isWedding = form.eventType === 'boda';
   const relatedEventLabel = useMemo(
@@ -418,7 +416,8 @@ export default function CreateWeddingAI() {
                 </div>
                 {form.relatedEvents.length > 0 && (
                   <p className="mt-1 text-xs text-gray-500">
-                    Seleccionado: {form.relatedEvents.map((value) => relatedEventLabel[value]).join(', ')}
+                    Seleccionado:{' '}
+                    {form.relatedEvents.map((value) => relatedEventLabel[value]).join(', ')}
                   </p>
                 )}
               </div>
@@ -473,10 +472,10 @@ export default function CreateWeddingAI() {
                 {loading
                   ? 'Creando…'
                   : step === 2
-                  ? isWedding
-                    ? 'Crear boda'
-                    : 'Crear evento'
-                  : 'Siguiente'}
+                    ? isWedding
+                      ? 'Crear boda'
+                      : 'Crear evento'
+                    : 'Siguiente'}
               </button>
             </div>
           </div>

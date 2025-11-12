@@ -1,11 +1,4 @@
-import {
-  AlertTriangle,
-  Clock,
-  Lightbulb,
-  ShieldCheck,
-  Sparkles,
-  Users,
-} from 'lucide-react';
+import { AlertTriangle, Clock, Lightbulb, ShieldCheck, Sparkles, Users } from 'lucide-react';
 import React, { useEffect, useMemo, useState } from 'react';
 import useTranslations from '../../hooks/useTranslations';
 
@@ -30,23 +23,23 @@ const normalize = (value) => {
 const isStaffGuest = (guest) => {
   if (!guest) return false;
   if (guest.isStaff || guest.staff === true || guest.isVendor) return true;
-  const candidateFields = [
-    guest.role,
-    guest.segment,
-    guest.category,
-    guest.group,
-    guest.type,
-  ];
+  const candidateFields = [guest.role, guest.segment, guest.category, guest.group, guest.type];
   const tags = Array.isArray(guest.tags) ? guest.tags : [];
-  const haystack = [
-    ...candidateFields,
-    ...tags,
-    guest.notes,
-    guest.occupation,
-  ]
+  const haystack = [...candidateFields, ...tags, guest.notes, guest.occupation]
     .filter(Boolean)
     .map((value) => normalize(value));
-  const keywords = ['staff', 'proveedor', 'vendor', 'supplier', 'crew', 'catering', 'fotografo', 'video', 'dj', 'musica'];
+  const keywords = [
+    'staff',
+    'proveedor',
+    'vendor',
+    'supplier',
+    'crew',
+    'catering',
+    'fotografo',
+    'video',
+    'dj',
+    'musica',
+  ];
   return haystack.some((field) => keywords.some((keyword) => field.includes(keyword)));
 };
 
@@ -55,14 +48,13 @@ const RecommendationCard = ({ item, onAssign, onFocus, t, tPlural }) => {
   const top = Array.isArray(item.topRecommendations) ? item.topRecommendations[0] : null;
   if (!top) return null;
   const guestName =
-    item.guest.name || t('planModern.guestSidebar.recommendations.guestFallback', { ns: 'seating' });
+    item.guest.name ||
+    t('planModern.guestSidebar.recommendations.guestFallback', { ns: 'seating' });
   const clusterKey =
-    item.cluster === 'vip'
-      ? 'vip'
-      : item.cluster === 'familia'
-        ? 'familia'
-        : 'pending';
-  const clusterLabel = t(`planModern.guestSidebar.recommendations.clusters.${clusterKey}`, { ns: 'seating' });
+    item.cluster === 'vip' ? 'vip' : item.cluster === 'familia' ? 'familia' : 'pending';
+  const clusterLabel = t(`planModern.guestSidebar.recommendations.clusters.${clusterKey}`, {
+    ns: 'seating',
+  });
   const scoreLabel = t('planModern.guestSidebar.recommendations.score', {
     ns: 'seating',
     value: Math.round(top.score || 0),
@@ -81,9 +73,7 @@ const RecommendationCard = ({ item, onAssign, onFocus, t, tPlural }) => {
         <div className="space-y-0.5">
           <p className="text-sm font-semibold text-slate-900">{guestName}</p>
           {item.cluster && (
-            <p className="text-[11px] uppercase tracking-wide text-slate-500">
-              {clusterLabel}
-            </p>
+            <p className="text-[11px] uppercase tracking-wide text-slate-500">{clusterLabel}</p>
           )}
         </div>
         <span className="px-2 py-0.5 rounded-full text-[10px] bg-emerald-50 text-emerald-600 font-semibold">
@@ -136,8 +126,7 @@ const ConflictCard = ({ suggestion, onExecute, onFocus, t }) => {
       ? t('planModern.guestSidebar.conflicts.severityHigh', { ns: 'seating' })
       : t('planModern.guestSidebar.conflicts.severityMedium', { ns: 'seating' });
   const tableName =
-    suggestion.tableName ||
-    t('planModern.guestSidebar.conflicts.tableFallback', { ns: 'seating' });
+    suggestion.tableName || t('planModern.guestSidebar.conflicts.tableFallback', { ns: 'seating' });
   const conflictMessage =
     suggestion.conflict?.message ||
     t('planModern.guestSidebar.conflicts.messageFallback', { ns: 'seating' });
@@ -200,9 +189,7 @@ const StaffCard = ({ guest, onFocus, t }) => {
       <header className="flex items-center justify-between gap-2">
         <div>
           <p className="text-sm font-semibold text-slate-900">{guestName}</p>
-          {guest.role && (
-            <p className="text-[11px] text-slate-500 capitalize">{guest.role}</p>
-          )}
+          {guest.role && <p className="text-[11px] text-slate-500 capitalize">{guest.role}</p>}
         </div>
         <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${badge}`}>
           {statusLabel}
@@ -283,7 +270,6 @@ export default function SeatingGuestSidebar({
 
   useEffect(() => {
     refreshSnapshots();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [listSnapshots]);
 
   const stats = useMemo(() => {
@@ -393,7 +379,9 @@ export default function SeatingGuestSidebar({
         <EmptyState
           icon={Lightbulb}
           title={t('planModern.guestSidebar.recommendations.emptyTitle', { ns: 'seating' })}
-          description={t('planModern.guestSidebar.recommendations.emptyDescription', { ns: 'seating' })}
+          description={t('planModern.guestSidebar.recommendations.emptyDescription', {
+            ns: 'seating',
+          })}
         />
       ) : (
         topRecommendations.map((item, index) => (
@@ -442,7 +430,12 @@ export default function SeatingGuestSidebar({
         />
       ) : (
         staffGuests.map((guest) => (
-          <StaffCard key={guest.id || guest.email || guest.phone} guest={guest} onFocus={onFocusTable} t={t} />
+          <StaffCard
+            key={guest.id || guest.email || guest.phone}
+            guest={guest}
+            onFocus={onFocusTable}
+            t={t}
+          />
         ))
       )}
     </div>
@@ -519,7 +512,9 @@ export default function SeatingGuestSidebar({
               key={tab.id}
               type="button"
               className={`flex items-center gap-1 rounded-full px-3 py-1.5 text-xs transition ${
-                isActive ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                isActive
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
               onClick={() => setActiveTab(tab.id)}
             >

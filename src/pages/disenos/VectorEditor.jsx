@@ -69,7 +69,6 @@ export default function VectorEditorPage() {
 
   useEffect(() => {
     if (imageUrl) doVectorize();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [imageUrl]);
 
   // Cargar SVG existente si se pasa ?svg=...

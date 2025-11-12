@@ -177,14 +177,12 @@ export default function EmailInbox() {
     if (profile) {
       loadEmails();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [folder, profile]);
 
   // Carga inicial defensiva (en tests el servicio puede estar mockeado y no requerir perfil)
   useEffect(() => {
     // Si ya hay un perfil, la otra useEffect se encargará; si no, intentamos igualmente
     loadEmails();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Fallback defensivo: si por cualquier motivo loading quedase atascado (mocks, timeouts de pruebas),

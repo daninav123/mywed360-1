@@ -13,11 +13,7 @@ import {
 import { useMemo, useState } from 'react';
 
 import useTranslations from '../../hooks/useTranslations';
-import {
-  checkUsernameAvailability,
-  sendEmail,
-  validateEmail,
-} from '../../services/mailgunService';
+import { checkUsernameAvailability, sendEmail, validateEmail } from '../../services/mailgunService';
 
 /**
  * Herramienta para verificar la integracion con Mailgun:
@@ -37,7 +33,6 @@ function MailgunTester() {
       subject: tEmail('mailgunTester.sections.send.placeholders.subject'),
       text: tEmail('mailgunTester.sections.send.placeholders.text'),
     }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [i18n.language]
   );
 
@@ -108,9 +103,7 @@ function MailgunTester() {
         message: result.isValid
           ? tEmail('mailgunTester.validation.success')
           : tEmailVars('mailgunTester.validation.invalid', {
-              reason:
-                result.reason ||
-                tEmail('mailgunTester.sections.validate.defaultReason'),
+              reason: result.reason || tEmail('mailgunTester.sections.validate.defaultReason'),
             }),
         severity: result.isValid ? 'success' : 'warning',
       });

@@ -45,7 +45,11 @@ function toCSV(rows, includeEstPrice = false, labels) {
   const csv = [headers.join(',')]
     .concat(
       rows.map((r) => {
-        const score = Number.isFinite(r?.aiMatch) ? r.aiMatch : Number.isFinite(r?.match) ? r.match : '';
+        const score = Number.isFinite(r?.aiMatch)
+          ? r.aiMatch
+          : Number.isFinite(r?.match)
+            ? r.match
+            : '';
         const base = [
           r.name,
           r.service,
@@ -56,10 +60,10 @@ function toCSV(rows, includeEstPrice = false, labels) {
           r.email || '',
           r.phone || '',
         ];
-        const withPrice = includeEstPrice ? [...base, computePriceValue(r), score] : [...base, score];
-        return withPrice
-          .map(esc)
-          .join(',');
+        const withPrice = includeEstPrice
+          ? [...base, computePriceValue(r), score]
+          : [...base, score];
+        return withPrice.map(esc).join(',');
       })
     )
     .join('\n');
@@ -111,7 +115,6 @@ export default function CompareSelectedModal({
         setGroupName('Grupo E2E');
       }
     } catch {}
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
   const computeScore = (p) => {
@@ -151,7 +154,11 @@ export default function CompareSelectedModal({
 
   const recommendedRow = useMemo(() => {
     if (!recommendedId) return null;
-    return displayRows.find((row) => row.id === recommendedId) || providers.find((p) => p.id === recommendedId) || null;
+    return (
+      displayRows.find((row) => row.id === recommendedId) ||
+      providers.find((p) => p.id === recommendedId) ||
+      null
+    );
   }, [recommendedId, displayRows, providers]);
 
   const canCreate = groupName.trim().length > 1 && filteredRows.length > 0 && !creating;
@@ -161,12 +168,16 @@ export default function CompareSelectedModal({
     try {
       setCreating(true);
       const ids = filteredRows.map((r) => r.id);
-      const createFn = typeof createGroupOverride === 'function' ? createGroupOverride : createGroup;
+      const createFn =
+        typeof createGroupOverride === 'function' ? createGroupOverride : createGroup;
       const res = await createFn({ name: groupName.trim(), memberIds: ids });
       if (res?.success && res?.id) {
-        const upd = typeof updateProviderOverride === 'function' ? updateProviderOverride : updateProvider;
+        const upd =
+          typeof updateProviderOverride === 'function' ? updateProviderOverride : updateProvider;
         await Promise.all(
-          filteredRows.map((p) => upd(p.id, { ...p, groupId: res.id, groupName: groupName.trim() }).catch(() => {}))
+          filteredRows.map((p) =>
+            upd(p.id, { ...p, groupId: res.id, groupName: groupName.trim() }).catch(() => {})
+          )
         );
         try {
           toast.success(
@@ -216,8 +227,7 @@ export default function CompareSelectedModal({
             <div className="font-semibold">
               {t('suppliers.compareModal.recommendation.summary', {
                 name:
-                  recommendedRow?.name ||
-                  t('suppliers.compareModal.recommendation.fallbackName'),
+                  recommendedRow?.name || t('suppliers.compareModal.recommendation.fallbackName'),
                 score: recommendationDetails.score,
               })}
             </div>
@@ -242,7 +252,9 @@ export default function CompareSelectedModal({
         <div className="border rounded p-3 bg-white">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
             <div>
-              <label className="block text-sm font-medium mb-1">{t('suppliers.compareModal.filter.groupLabel')}</label>
+              <label className="block text-sm font-medium mb-1">
+                {t('suppliers.compareModal.filter.groupLabel')}
+              </label>
               <input
                 className="w-full border rounded p-2"
                 placeholder={t('suppliers.compareModal.filter.groupPlaceholder')}
@@ -251,7 +263,9 @@ export default function CompareSelectedModal({
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-500 mb-1">{t('suppliers.compareModal.filter.scoreLabel')}</label>
+              <label className="block text-xs text-gray-500 mb-1">
+                {t('suppliers.compareModal.filter.scoreLabel')}
+              </label>
               <input
                 type="number"
                 min="0"
@@ -271,7 +285,9 @@ export default function CompareSelectedModal({
                 })}
               </div>
               <Button onClick={createGroupFromSelection} disabled={!canCreate}>
-                {creating ? t('suppliers.compareModal.filter.creating') : t('suppliers.compareModal.filter.create')}
+                {creating
+                  ? t('suppliers.compareModal.filter.creating')
+                  : t('suppliers.compareModal.filter.create')}
               </Button>
             </div>
           </div>
@@ -304,10 +320,16 @@ export default function CompareSelectedModal({
               className="px-2 py-1 border rounded border-gray-300 text-gray-700"
               title={t('suppliers.compareModal.sort.toggleTitle')}
             >
-              {sortDir === 'asc' ? t('suppliers.compareModal.sort.asc') : t('suppliers.compareModal.sort.desc')}
+              {sortDir === 'asc'
+                ? t('suppliers.compareModal.sort.asc')
+                : t('suppliers.compareModal.sort.desc')}
             </button>
             <label className="ml-4 inline-flex items-center gap-2 text-gray-700">
-              <input type="checkbox" checked={showEstPrice} onChange={(e) => setShowEstPrice(e.target.checked)} />
+              <input
+                type="checkbox"
+                checked={showEstPrice}
+                onChange={(e) => setShowEstPrice(e.target.checked)}
+              />
               {t('suppliers.compareModal.sort.showEstimated')}
             </label>
           </div>
@@ -325,7 +347,9 @@ export default function CompareSelectedModal({
                 <th className="text-left p-2">{t('suppliers.compareModal.table.email')}</th>
                 <th className="text-left p-2">{t('suppliers.compareModal.table.phone')}</th>
                 {showEstPrice && (
-                  <th className="text-left p-2">{t('suppliers.compareModal.table.estimatedPrice')}</th>
+                  <th className="text-left p-2">
+                    {t('suppliers.compareModal.table.estimatedPrice')}
+                  </th>
                 )}
                 <th className="text-left p-2">{t('suppliers.compareModal.table.score')}</th>
                 <th className="text-left p-2">{t('suppliers.compareModal.table.actions')}</th>
@@ -335,10 +359,7 @@ export default function CompareSelectedModal({
               {displayRows.map((r) => {
                 const isRecommended = recommendedId && r.id === recommendedId;
                 return (
-                  <tr
-                    key={r.id}
-                    className={`border-b ${isRecommended ? 'bg-emerald-50/80' : ''}`}
-                  >
+                  <tr key={r.id} className={`border-b ${isRecommended ? 'bg-emerald-50/80' : ''}`}>
                     <td className="p-2 font-medium">
                       <div className="flex items-center gap-2">
                         {isRecommended && (
@@ -379,8 +400,12 @@ export default function CompareSelectedModal({
           </table>
         </div>
         <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={onClose}>{t('suppliers.compareModal.buttons.close')}</Button>
-          <Button variant="outline" onClick={exportCSV}>{t('suppliers.compareModal.buttons.exportCsv')}</Button>
+          <Button variant="outline" onClick={onClose}>
+            {t('suppliers.compareModal.buttons.close')}
+          </Button>
+          <Button variant="outline" onClick={exportCSV}>
+            {t('suppliers.compareModal.buttons.exportCsv')}
+          </Button>
         </div>
       </div>
     </Modal>

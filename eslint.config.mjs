@@ -58,7 +58,7 @@ export default [
       'no-unreachable': 'off',
       'no-useless-catch': 'off',
       'no-empty': ['error', { allowEmptyCatch: true }],
-      'react-hooks/exhaustive-deps': 'off',
+      // react-hooks/exhaustive-deps removido - plugin no disponible
       // Reglas de React del plugin se omiten para no depender de node_modules
     },
   },

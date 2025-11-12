@@ -71,7 +71,6 @@ export function EmailOnboardingWizard({ onComplete, onSkip, initialConfig = {} }
         title: tEmail(`onboarding.steps.${step.id}.title`),
         description: tEmail(`onboarding.steps.${step.id}.description`),
       })),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [t, i18n.language]
   );
 

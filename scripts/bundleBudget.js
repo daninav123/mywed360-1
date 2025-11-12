@@ -8,8 +8,12 @@
  *   node scripts/bundleBudget.js --maxBytes=2000000
  */
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 function parseArgs() {
   const out = { maxBytes: 2_000_000, metric: 'gzip' };
@@ -62,12 +66,20 @@ function main() {
     }
   }
   const mb = (n) => (n / (1024 * 1024)).toFixed(2);
-  console.log(`[bundleBudget] JS total (${metric}): ${total} bytes (${mb(total)} MB). Max: ${maxBytes} (${mb(maxBytes)} MB)`);
+  console.log(
+    `[bundleBudget] JS total (${metric}): ${total} bytes (${mb(total)} MB). Max: ${maxBytes} (${mb(maxBytes)} MB)`
+  );
   if (total > maxBytes) {
-    console.error(`[bundleBudget] Budget exceeded by ${total - maxBytes} bytes (${mb(total - maxBytes)} MB)`);
+    console.error(
+      `[bundleBudget] Budget exceeded by ${total - maxBytes} bytes (${mb(total - maxBytes)} MB)`
+    );
     process.exit(1);
   }
 }
 
-try { main(); } catch (e) { console.error('[bundleBudget] error:', e?.message || e); process.exit(1); }
-
+try {
+  main();
+} catch (e) {
+  console.error('[bundleBudget] error:', e?.message || e);
+  process.exit(1);
+}

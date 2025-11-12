@@ -56,7 +56,6 @@ export default function WeddingServiceCard({
         console.log(`  [${idx}] "${fav.supplier?.category}" - ${fav.supplier?.name}`);
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Solo ejecutar una vez al montar
 
   // Función para asignar proveedor

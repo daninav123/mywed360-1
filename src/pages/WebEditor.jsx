@@ -50,7 +50,6 @@ export default function WebEditor() {
         console.error(e);
       }
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uid]);
 
   const saveInfo = async () => {

@@ -8,8 +8,12 @@
  Usage: node scripts/validateI18n.js
  Exit code 1 on problems.
 */
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const LOCALES_DIR = path.resolve(process.cwd(), 'src/i18n/locales');
 const LOCALES = ['en', 'es'];
@@ -52,7 +56,7 @@ function readJson(file) {
   try {
     let txt = fs.readFileSync(file, 'utf8');
     // Strip BOM if present
-    if (txt.charCodeAt(0) === 0xFEFF) txt = txt.slice(1);
+    if (txt.charCodeAt(0) === 0xfeff) txt = txt.slice(1);
     return JSON.parse(txt);
   } catch (e) {
     console.error(`✖ Invalid JSON: ${file}`);
@@ -107,7 +111,8 @@ function main() {
         const header = strict ? '✖ Missing keys' : '⚠ Missing keys';
         console[strict ? 'error' : 'warn'](`${header} in ${loc}/${rel}:`);
         missing.slice(0, 20).forEach((k) => console[strict ? 'error' : 'warn']('  -', k));
-        if (missing.length > 20) console[strict ? 'error' : 'warn'](`  …and ${missing.length - 20} more`);
+        if (missing.length > 20)
+          console[strict ? 'error' : 'warn'](`  …and ${missing.length - 20} more`);
         if (strict) hadError = true;
       }
       if (extra.length) {

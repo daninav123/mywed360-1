@@ -53,7 +53,6 @@ export default function SaveTheDateModal({
     }
     setMessages(map);
     setStats(null);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
   useEffect(() => {
@@ -215,7 +214,8 @@ export default function SaveTheDateModal({
           />
           {coupleName && (
             <p className="text-xs text-gray-500 mt-1">
-              Incluye siempre la firma de la pareja (“{coupleName}”) para que el destinatario identifique quién envía el mensaje.
+              Incluye siempre la firma de la pareja (“{coupleName}”) para que el destinatario
+              identifique quién envía el mensaje.
             </p>
           )}
           <div className="mt-2 flex justify-end">

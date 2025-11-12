@@ -42,7 +42,6 @@ const UsernameWizard = () => {
     });
 
     return () => unsubscribe();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (stepLoading) return null; // evita parpadeo

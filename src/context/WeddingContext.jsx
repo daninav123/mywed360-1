@@ -168,7 +168,6 @@ export function WeddingProvider({ children }) {
         uid: 'cypress-test',
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Solo ejecutar una vez al montar
 
   // ⚡ OPTIMIZACIÓN: Consolidar inicialización y localStorage en un solo useEffect

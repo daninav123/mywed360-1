@@ -71,7 +71,6 @@ const SmartFiltersBar = ({ weddingProfile, onFiltersChange, className = '' }) =>
     if (onFiltersChange) {
       onFiltersChange(detected);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [weddingProfile]);
 
   const handleStartEdit = (field) => {
@@ -150,12 +149,8 @@ const SmartFiltersBar = ({ weddingProfile, onFiltersChange, className = '' }) =>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-primary" />
-            <h3 className="font-semibold text-foreground">
-              {t('suppliers.smartFilters.title')}
-            </h3>
-            <span className="text-xs text-muted">
-              {t('suppliers.smartFilters.subtitle')}
-            </span>
+            <h3 className="font-semibold text-foreground">{t('suppliers.smartFilters.title')}</h3>
+            <span className="text-xs text-muted">{t('suppliers.smartFilters.subtitle')}</span>
           </div>
 
           <div className="flex items-center gap-2">
@@ -166,9 +161,7 @@ const SmartFiltersBar = ({ weddingProfile, onFiltersChange, className = '' }) =>
               title={t('suppliers.smartFilters.buttons.resetTitle')}
             >
               <RotateCcw className="h-4 w-4" />
-              <span className="hidden sm:inline">
-                {t('suppliers.smartFilters.buttons.reset')}
-              </span>
+              <span className="hidden sm:inline">{t('suppliers.smartFilters.buttons.reset')}</span>
             </Button>
             <Button
               variant="ghost"
@@ -382,9 +375,7 @@ const SmartFiltersBar = ({ weddingProfile, onFiltersChange, className = '' }) =>
               )}
             </div>
 
-            <p className="text-xs text-muted">
-              {t('suppliers.smartFilters.hints.automated')}
-            </p>
+            <p className="text-xs text-muted">{t('suppliers.smartFilters.hints.automated')}</p>
           </>
         )}
       </div>

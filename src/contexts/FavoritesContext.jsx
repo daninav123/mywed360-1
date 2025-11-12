@@ -113,7 +113,6 @@ export function FavoritesProvider({ children }) {
     if (user?.uid && activeWedding && !hasLoadedRef.current) {
       loadFavorites();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.uid, activeWedding]); // loadFavorites no incluido para evitar loop
 
   // Añadir a favoritos
@@ -157,9 +156,7 @@ export function FavoritesProvider({ children }) {
         throw new Error(t('suppliers.favorites.errors.alreadyExists'));
       }
 
-      throw new Error(
-        err.response?.data?.message || t('suppliers.favorites.errors.saveFailed')
-      );
+      throw new Error(err.response?.data?.message || t('suppliers.favorites.errors.saveFailed'));
     }
   };
 
@@ -193,9 +190,7 @@ export function FavoritesProvider({ children }) {
       setFavorites((prev) => prev.filter((fav) => fav.supplierId !== supplierId));
     } catch (err) {
       console.error('[FavoritesContext] Error eliminando favorito:', err);
-      throw new Error(
-        err.response?.data?.message || t('suppliers.favorites.errors.removeFailed')
-      );
+      throw new Error(err.response?.data?.message || t('suppliers.favorites.errors.removeFailed'));
     }
   };
 

@@ -131,7 +131,10 @@ const SeatingPlanCanvas = ({
       setScale(newScale);
       setMinScale(newScale);
       setOffset(newOffset);
-      try { typeof onViewportChange === 'function' && onViewportChange({ scale: newScale, offset: newOffset }); } catch {}
+      try {
+        typeof onViewportChange === 'function' &&
+          onViewportChange({ scale: newScale, offset: newOffset });
+      } catch {}
     } catch (e) {
       // fallback
       setScale(1);
@@ -142,7 +145,9 @@ const SeatingPlanCanvas = ({
   // Permitir que la Toolbar dispare "Ajustar a pantalla" vía evento global
   useEffect(() => {
     const handler = () => {
-      try { fitToContent(); } catch {}
+      try {
+        fitToContent();
+      } catch {}
     };
     window.addEventListener('seating-fit', handler);
     return () => window.removeEventListener('seating-fit', handler);
@@ -260,7 +265,10 @@ const SeatingPlanCanvas = ({
         try {
           const rect = canvasRef.current.getBoundingClientRect();
           const startScreen = { x: e.clientX - rect.left, y: e.clientY - rect.top };
-          const startWorld = { x: (e.clientX - rect.left - offset.x) / scale, y: (e.clientY - rect.top - offset.y) / scale };
+          const startWorld = {
+            x: (e.clientX - rect.left - offset.x) / scale,
+            y: (e.clientY - rect.top - offset.y) / scale,
+          };
           setIsSelecting(true);
           setSelStart(startScreen);
           setSelEnd(startScreen);
@@ -274,18 +282,40 @@ const SeatingPlanCanvas = ({
             window.removeEventListener('pointermove', move);
             window.removeEventListener('pointerup', up);
             const r = canvasRef.current.getBoundingClientRect();
-            const endWorld = { x: (ev.clientX - r.left - offset.x) / scale, y: (ev.clientY - r.top - offset.y) / scale };
+            const endWorld = {
+              x: (ev.clientX - r.left - offset.x) / scale,
+              y: (ev.clientY - r.top - offset.y) / scale,
+            };
             const minX = Math.min(selWorldStart.x, endWorld.x);
             const maxX = Math.max(selWorldStart.x, endWorld.x);
             const minY = Math.min(selWorldStart.y, endWorld.y);
             const maxY = Math.max(selWorldStart.y, endWorld.y);
             const rectBox = { minX, minY, maxX, maxY };
             const getBox = (t) => {
-              if (t.shape === 'circle') { const r0 = (t.diameter || 60) / 2; return { minX: (t.x || 0) - r0, minY: (t.y || 0) - r0, maxX: (t.x || 0) + r0, maxY: (t.y || 0) + r0 }; }
-              const hw = (t.width || 80) / 2, hh = (t.height || t.length || 60) / 2; return { minX: (t.x || 0) - hw, minY: (t.y || 0) - hh, maxX: (t.x || 0) + hw, maxY: (t.y || 0) + hh };
+              if (t.shape === 'circle') {
+                const r0 = (t.diameter || 60) / 2;
+                return {
+                  minX: (t.x || 0) - r0,
+                  minY: (t.y || 0) - r0,
+                  maxX: (t.x || 0) + r0,
+                  maxY: (t.y || 0) + r0,
+                };
+              }
+              const hw = (t.width || 80) / 2,
+                hh = (t.height || t.length || 60) / 2;
+              return {
+                minX: (t.x || 0) - hw,
+                minY: (t.y || 0) - hh,
+                maxX: (t.x || 0) + hw,
+                maxY: (t.y || 0) + hh,
+              };
             };
-            const overlap = (a, b) => !(a.maxX <= b.minX || a.minX >= b.maxX || a.maxY <= b.minY || a.minY >= b.maxY);
-            const ids = (tables || []).filter(Boolean).filter((t) => overlap(getBox(t), rectBox)).map((t) => t.id);
+            const overlap = (a, b) =>
+              !(a.maxX <= b.minX || a.minX >= b.maxX || a.maxY <= b.minY || a.minY >= b.maxY);
+            const ids = (tables || [])
+              .filter(Boolean)
+              .filter((t) => overlap(getBox(t), rectBox))
+              .map((t) => t.id);
             try {
               if (!append) {
                 // Replace selection: clear then add all
@@ -294,10 +324,15 @@ const SeatingPlanCanvas = ({
               } else {
                 // Additive selection
                 const current = new Set((selectedIds || []).map(String));
-                ids.filter((id) => !current.has(String(id))).forEach((id) => onSelectTable && onSelectTable(id, true));
+                ids
+                  .filter((id) => !current.has(String(id)))
+                  .forEach((id) => onSelectTable && onSelectTable(id, true));
               }
             } catch {}
-            setIsSelecting(false); setSelStart(null); setSelEnd(null); setSelWorldStart(null);
+            setIsSelecting(false);
+            setSelStart(null);
+            setSelEnd(null);
+            setSelWorldStart(null);
           };
           window.addEventListener('pointermove', move);
           window.addEventListener('pointerup', up);
@@ -347,7 +382,10 @@ const SeatingPlanCanvas = ({
         try {
           const rect = canvasRef.current.getBoundingClientRect();
           const startScreen = { x: e.clientX - rect.left, y: e.clientY - rect.top };
-          const startWorld = { x: (e.clientX - rect.left - offset.x) / scale, y: (e.clientY - rect.top - offset.y) / scale };
+          const startWorld = {
+            x: (e.clientX - rect.left - offset.x) / scale,
+            y: (e.clientY - rect.top - offset.y) / scale,
+          };
           setIsSelecting(true);
           setSelStart(startScreen);
           setSelEnd(startScreen);
@@ -361,7 +399,10 @@ const SeatingPlanCanvas = ({
             window.removeEventListener('pointermove', move);
             window.removeEventListener('pointerup', up);
             const r = canvasRef.current.getBoundingClientRect();
-            const endWorld = { x: (ev.clientX - r.left - offset.x) / scale, y: (ev.clientY - r.top - offset.y) / scale };
+            const endWorld = {
+              x: (ev.clientX - r.left - offset.x) / scale,
+              y: (ev.clientY - r.top - offset.y) / scale,
+            };
             const minX = Math.min(selWorldStart.x, endWorld.x);
             const maxX = Math.max(selWorldStart.x, endWorld.x);
             const minY = Math.min(selWorldStart.y, endWorld.y);
@@ -369,27 +410,56 @@ const SeatingPlanCanvas = ({
             const dx = Math.abs((selEnd?.x || 0) - (selStart?.x || 0));
             const dy = Math.abs((selEnd?.y || 0) - (selStart?.y || 0));
             if (dx < 4 && dy < 4) {
-              try { typeof onSelectTable === 'function' && onSelectTable(null, false); } catch {}
-              setIsSelecting(false); setSelStart(null); setSelEnd(null); setSelWorldStart(null);
+              try {
+                typeof onSelectTable === 'function' && onSelectTable(null, false);
+              } catch {}
+              setIsSelecting(false);
+              setSelStart(null);
+              setSelEnd(null);
+              setSelWorldStart(null);
               return;
             }
             const rectBox = { minX, minY, maxX, maxY };
             const getBox = (t) => {
-              if (t.shape === 'circle') { const r0 = (t.diameter || 60) / 2; return { minX: (t.x || 0) - r0, minY: (t.y || 0) - r0, maxX: (t.x || 0) + r0, maxY: (t.y || 0) + r0 }; }
-              const hw = (t.width || 80) / 2, hh = (t.height || t.length || 60) / 2; return { minX: (t.x || 0) - hw, minY: (t.y || 0) - hh, maxX: (t.x || 0) + hw, maxY: (t.y || 0) + hh };
+              if (t.shape === 'circle') {
+                const r0 = (t.diameter || 60) / 2;
+                return {
+                  minX: (t.x || 0) - r0,
+                  minY: (t.y || 0) - r0,
+                  maxX: (t.x || 0) + r0,
+                  maxY: (t.y || 0) + r0,
+                };
+              }
+              const hw = (t.width || 80) / 2,
+                hh = (t.height || t.length || 60) / 2;
+              return {
+                minX: (t.x || 0) - hw,
+                minY: (t.y || 0) - hh,
+                maxX: (t.x || 0) + hw,
+                maxY: (t.y || 0) + hh,
+              };
             };
-            const overlap = (a, b) => !(a.maxX <= b.minX || a.minX >= b.maxX || a.maxY <= b.minY || a.minY >= b.maxY);
-            const ids = (tables || []).filter(Boolean).filter((t) => overlap(getBox(t), rectBox)).map((t) => t.id);
+            const overlap = (a, b) =>
+              !(a.maxX <= b.minX || a.minX >= b.maxX || a.maxY <= b.minY || a.minY >= b.maxY);
+            const ids = (tables || [])
+              .filter(Boolean)
+              .filter((t) => overlap(getBox(t), rectBox))
+              .map((t) => t.id);
             try {
               if (!shift) {
                 typeof onSelectTable === 'function' && onSelectTable(null, false);
                 ids.forEach((id) => onSelectTable && onSelectTable(id, true));
               } else {
                 const current = new Set((selectedIds || []).map(String));
-                ids.filter((id) => !current.has(String(id))).forEach((id) => onSelectTable && onSelectTable(id, true));
+                ids
+                  .filter((id) => !current.has(String(id)))
+                  .forEach((id) => onSelectTable && onSelectTable(id, true));
               }
             } catch {}
-            setIsSelecting(false); setSelStart(null); setSelEnd(null); setSelWorldStart(null);
+            setIsSelecting(false);
+            setSelStart(null);
+            setSelEnd(null);
+            setSelWorldStart(null);
           };
           window.addEventListener('pointermove', move);
           window.addEventListener('pointerup', up);
@@ -489,7 +559,6 @@ const SeatingPlanCanvas = ({
       // eslint-disable-next-line no-empty
     } catch (_) {}
     // Ejecutar solo al montar
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Enfocar una mesa concreta (centrar en pantalla)
@@ -520,7 +589,9 @@ const SeatingPlanCanvas = ({
 
   // Notificar cambios de viewport a quien lo necesite
   useEffect(() => {
-    try { typeof onViewportChange === 'function' && onViewportChange({ scale, offset }); } catch {}
+    try {
+      typeof onViewportChange === 'function' && onViewportChange({ scale, offset });
+    } catch {}
   }, [scale, offset, onViewportChange]);
 
   // Atajos de teclado para zoom: Ctrl/Cmd + '+', '-', '0'
@@ -646,7 +717,9 @@ const SeatingPlanCanvas = ({
               className="px-2 py-0.5 rounded border hover:bg-gray-50"
               title="Limpiar selección (Esc)"
               onClick={() => {
-                try { typeof onSelectTable === 'function' && onSelectTable(null, false); } catch {}
+                try {
+                  typeof onSelectTable === 'function' && onSelectTable(null, false);
+                } catch {}
               }}
             >
               Limpiar
@@ -659,7 +732,9 @@ const SeatingPlanCanvas = ({
                 try {
                   if (Array.isArray(tables) && tables.length) {
                     typeof onSelectTable === 'function' && onSelectTable(null, false);
-                    tables.filter(Boolean).forEach((t) => onSelectTable && onSelectTable(t.id, true));
+                    tables
+                      .filter(Boolean)
+                      .forEach((t) => onSelectTable && onSelectTable(t.id, true));
                   }
                 } catch {}
               }}

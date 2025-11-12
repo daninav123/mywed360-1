@@ -129,7 +129,6 @@ export default function SupplierRequests() {
 
   useEffect(() => {
     loadRequests();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage, statusFilter]);
 
   // Actualizar estado de solicitud

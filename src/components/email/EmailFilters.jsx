@@ -32,7 +32,6 @@ const EmailFilters = ({ onApplyFilters, onResetFilters, initialFilters = {} }) =
       { id: 'invitation', name: tEmail('filters.labels.invitation'), color: 'bg-purple-500' },
       { id: 'provider', name: tEmail('filters.labels.provider'), color: 'bg-yellow-500' },
     ],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [i18n.language]
   );
 
