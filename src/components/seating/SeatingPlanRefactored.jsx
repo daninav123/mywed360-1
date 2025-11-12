@@ -22,7 +22,7 @@ import SeatingPlanOnboardingChecklist from './SeatingPlanOnboardingChecklist';
 import SeatingPlanSummary from './SeatingPlanSummary';
 import AutoLayoutModal from './AutoLayoutModal';
 import SeatingSearchBar from './SeatingSearchBar';
-import TemplateGalleryModal from './TemplateGalleryModal';
+import SeatingTemplateGallery, { SEATING_TEMPLATES } from './SeatingTemplateGallery';
 import ExportWizardEnhanced from './ExportWizardEnhanced';
 import SeatingInteractiveTour from './SeatingInteractiveTour';
 import SeatingTooltips, { useTooltipState } from './SeatingTooltips';
@@ -399,14 +399,14 @@ const SeatingPlanRefactored = () => {
   const [autoLayoutModalOpen, setAutoLayoutModalOpen] = React.useState(false);
   const [templateGalleryOpen, setTemplateGalleryOpen] = React.useState(false);
   const [exportWizardEnhancedOpen, setExportWizardEnhancedOpen] = React.useState(false);
-  
+
   // FASE 4: Tour y Tooltips
   const [showTour, setShowTour] = React.useState(false);
   const [tooltipState, updateTooltipState] = useTooltipState();
-  
+
   // FASE 2: Drag Ghost Preview
   const { dragState, startDrag, updateDrag, endDrag } = useDragGhost();
-  
+
   // Verificar si es primera visita para tour
   React.useEffect(() => {
     const hasVisited = localStorage.getItem('seating-has-visited');
@@ -415,13 +415,13 @@ const SeatingPlanRefactored = () => {
       localStorage.setItem('seating-has-visited', 'true');
     }
   }, []);
-  
+
   // Actualizar estado de tooltips
   React.useEffect(() => {
     updateTooltipState({
       hasSpaceConfigured: !!safeHallSize?.width,
       tables: safeTables,
-      assignedGuests: safeGuests.filter(g => g.tableId || g.table).length,
+      assignedGuests: safeGuests.filter((g) => g.tableId || g.table).length,
       hasDraggedTable: safeTables.length > 0,
     });
   }, [safeHallSize, safeTables, safeGuests, updateTooltipState]);
@@ -945,20 +945,64 @@ const SeatingPlanRefactored = () => {
 
   // Handler para aplicar plantilla desde la galería
   const handleSelectTemplate = React.useCallback(
-    (template) => {
+    async (template) => {
       try {
         // Aplicar la plantilla según su configuración
-        if (tab === 'banquet' && template.layout) {
-          // Generar layout automático con el tipo de plantilla
-          handleGenerateAutoLayout(template.layout);
-          toast.success(`Plantilla "${template.name}" aplicada`);
+        if (tab === 'banquet') {
+          // Si el template tiene un layoutType específico, usarlo
+          if (template.layoutType === 'imperial') {
+            // Para mesa imperial, crear una mesa larga
+            await clearBanquetLayout();
+            const imperialTable = {
+              id: 'imperial-1',
+              name: 'Mesa Imperial',
+              shape: 'rectangular',
+              width: template.config.tableLength || 400,
+              height: template.config.tableWidth || 100,
+              x: safeHallSize.width / 2 - (template.config.tableLength || 400) / 2,
+              y: safeHallSize.height / 2 - (template.config.tableWidth || 100) / 2,
+              capacity: template.guests,
+              seats: template.guests,
+            };
+            await applyBanquetTables([imperialTable]);
+          } else if (template.layoutType === 'theater') {
+            // Para teatro, cambiar a ceremonia y generar filas
+            setTab('ceremony');
+            await generateSeatGrid(template.config);
+          } else {
+            // Para otros layouts, usar el generador automático
+            await handleGenerateAutoLayout(template.layoutType);
+          }
+
+          // Configurar capacidades y formas según el template
+          if (template.tables > 0 && template.tableCapacity) {
+            // TODO: Aplicar capacidad a todas las mesas generadas
+          }
+
+          toast.success(`Plantilla "${template.name}" aplicada con éxito`);
+        } else if (tab === 'ceremony' && template.layoutType === 'theater') {
+          // Aplicar configuración de teatro a ceremonia
+          await generateSeatGrid(template.config);
+          toast.success(`Configuración de ceremonia aplicada`);
+        } else {
+          toast.warning('Cambia a la pestaña Banquete para aplicar esta plantilla');
         }
+
+        setTemplateGalleryOpen(false);
       } catch (error) {
         console.error('Error applying template:', error);
         toast.error('Error al aplicar plantilla');
       }
     },
-    [tab, handleGenerateAutoLayout]
+    [
+      tab,
+      handleGenerateAutoLayout,
+      clearBanquetLayout,
+      applyBanquetTables,
+      generateSeatGrid,
+      setTab,
+      safeHallSize,
+    ]
   );
 
   // Atajos extra: rotaci�n, alinear/distribuir, tabs, toggles y paneles
@@ -2081,10 +2125,12 @@ const SeatingPlanRefactored = () => {
         />
 
         {/* FASE 3: Template Gallery Modal */}
-        <TemplateGalleryModal
+        <SeatingTemplateGallery
           isOpen={templateGalleryOpen}
           onClose={() => setTemplateGalleryOpen(false)}
           onSelectTemplate={handleSelectTemplate}
+          currentGuests={safeGuests.length}
+          currentTables={safeTables.length}
         />
 
         {/* FASE 3: Export Wizard Enhanced */}

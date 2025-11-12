@@ -1,8 +1,10 @@
 /**
  * ExportWizardEnhanced - Wizard avanzado de exportación con preview
  * FASE 3: Experiencia Premium
+ *
+ * Integra todos los pasos modulares del wizard de exportación
  */
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   X,
   Download,
@@ -15,86 +17,165 @@ import {
   Type,
   Layout,
   Check,
+  ChevronLeft,
+  ChevronRight,
+  Loader,
+  Share2,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
+import { toast } from 'react-toastify';
 
-const EXPORT_FORMATS = [
-  {
-    id: 'pdf',
-    name: 'PDF Alta Calidad',
-    description: 'Ideal para imprimir',
-    icon: FileText,
-    color: 'from-red-500 to-rose-600',
-    options: ['orientation', 'includeNames', 'colors', 'logo'],
-  },
-  {
-    id: 'png',
-    name: 'Imagen PNG',
-    description: 'Para compartir digital',
-    icon: ImageIcon,
-    color: 'from-blue-500 to-indigo-600',
-    options: ['resolution', 'includeNames', 'colors'],
-  },
-  {
-    id: 'svg',
-    name: 'SVG Editable',
-    description: 'Para diseñadores',
-    icon: Layout,
-    color: 'from-purple-500 to-violet-600',
-    options: ['includeNames'],
-  },
-  {
-    id: 'excel',
-    name: 'Excel con Lista',
-    description: 'Tabla de asignaciones',
-    icon: Table,
-    color: 'from-green-500 to-emerald-600',
-    options: ['includeEmails', 'includePhones'],
-  },
-];
+// Importar componentes modulares
+import {
+  EXPORT_FORMATS,
+  STYLE_TEMPLATES,
+  WIZARD_STEPS,
+  DEFAULT_EXPORT_OPTIONS,
+  PAPER_SIZES,
+} from './exportWizard/constants';
+import StyleStep from './exportWizard/StyleStep';
+import ContentStep from './exportWizard/ContentStep';
 
-const TEMPLATES = [
-  { id: 'minimal', name: 'Minimalista', preview: '⚫️⚫️⚫️' },
-  { id: 'elegant', name: 'Elegante', preview: '✨⚫️✨' },
-  { id: 'colorful', name: 'Colorido', preview: '🔴🟢🔵' },
-];
+// Función para aplicar estilos personalizados al canvas
+const applyCustomStyles = (element, customStyle, exportOptions) => {
+  if (!element) return;
 
-const RESOLUTIONS = [
-  { id: '1x', name: 'Standard (1x)', width: 1920 },
-  { id: '2x', name: 'Retina (2x)', width: 3840 },
-  { id: '4x', name: 'Ultra (4x)', width: 7680 },
-];
+  // Aplicar colores
+  element.style.backgroundColor = customStyle.colors.background;
+  element.style.fontFamily = customStyle.font;
+  element.style.fontSize = `${customStyle.fontSize}px`;
 
-export default function ExportWizardEnhanced({ isOpen, onClose, onExport, canvasRef }) {
-  const [step, setStep] = useState(1); // 1: Format, 2: Options, 3: Preview
-  const [selectedFormat, setSelectedFormat] = useState(null);
-  const [options, setOptions] = useState({
-    orientation: 'landscape',
-    includeNames: true,
-    colors: 'default',
-    logo: false,
-    resolution: '2x',
-    fontSize: 12,
-    includeEmails: false,
-    includePhones: false,
-    template: 'elegant',
+  // Aplicar colores a elementos específicos
+  const tables = element.querySelectorAll('.table-element, .seating-table');
+  tables.forEach((table) => {
+    table.style.fill = customStyle.colors.primary;
+    table.style.stroke = customStyle.colors.accent;
   });
 
-  const handleFormatSelect = (format) => {
-    setSelectedFormat(format);
-    setStep(2);
-  };
+  const texts = element.querySelectorAll('text, .guest-name, .table-name');
+  texts.forEach((text) => {
+    text.style.fill = customStyle.colors.text || customStyle.colors.primary;
+    text.style.fontSize = `${customStyle.fontSize}px`;
+  });
 
-  const handleOptionToggle = (key) => {
-    setOptions((prev) => ({ ...prev, [key]: !prev[key] }));
-  };
+  // Mostrar/ocultar elementos según opciones
+  if (!exportOptions.includeNames) {
+    const names = element.querySelectorAll('.guest-name');
+    names.forEach((name) => (name.style.display = 'none'));
+  }
 
-  const handleExport = async () => {
+  if (!exportOptions.includeNumbers) {
+    const numbers = element.querySelectorAll('.table-number');
+    numbers.forEach((num) => (num.style.display = 'none'));
+  }
+
+  if (!exportOptions.includeGrid) {
+    const grid = element.querySelector('.grid-background');
+    if (grid) grid.style.display = 'none';
+  }
+};
+
+export default function ExportWizardEnhanced({
+  isOpen,
+  onClose,
+  onExport,
+  canvasRef,
+  guests = [],
+  tables = [],
+  hallSize = { width: 1800, height: 1200 },
+  weddingInfo = {},
+}) {
+  const [currentStep, setCurrentStep] = useState(0);
+  const [selectedFormat, setSelectedFormat] = useState('pdf');
+  const [selectedStyle, setSelectedStyle] = useState('elegant');
+  const [customStyle, setCustomStyle] = useState(STYLE_TEMPLATES.elegant);
+  const [exportOptions, setExportOptions] = useState({
+    ...DEFAULT_EXPORT_OPTIONS,
+    title: weddingInfo.coupleName || 'Distribución de Invitados',
+    subtitle: weddingInfo.date || new Date().toLocaleDateString(),
+  });
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const previewRef = useRef(null);
+
+  // Limpiar preview URL al cerrar
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
+
+  // Generar preview cuando lleguemos al paso de preview
+  useEffect(() => {
+    if (currentStep === 3 && canvasRef?.current) {
+      generatePreview();
+    }
+  }, [currentStep, customStyle, exportOptions]);
+
+  // Generar preview del canvas
+  const generatePreview = async () => {
+    if (!canvasRef?.current) return;
+
     try {
-      await onExport(selectedFormat.id, options);
-      onClose();
+      const canvas = canvasRef.current;
+      const clonedCanvas = canvas.cloneNode(true);
+      applyCustomStyles(clonedCanvas, customStyle, exportOptions);
+
+      const previewCanvas = await html2canvas(clonedCanvas, {
+        backgroundColor: customStyle.colors.background,
+        scale: 2,
+        logging: false,
+      });
+
+      const blob = await new Promise((resolve) => previewCanvas.toBlob(resolve, 'image/png'));
+
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      const url = URL.createObjectURL(blob);
+      setPreviewUrl(url);
+    } catch (error) {
+      console.error('Error generating preview:', error);
+      toast.error('Error generando vista previa');
+    }
+  };
+
+  // Navegar entre pasos
+  const goToStep = (step) => {
+    if (step >= 0 && step < WIZARD_STEPS.length) {
+      setCurrentStep(step);
+    }
+  };
+
+  const nextStep = () => goToStep(currentStep + 1);
+  const prevStep = () => goToStep(currentStep - 1);
+
+  // Ejecutar exportación
+  const handleExport = async () => {
+    setIsGenerating(true);
+
+    try {
+      // Callback para el componente padre
+      if (onExport) {
+        await onExport(selectedFormat, {
+          style: customStyle,
+          options: exportOptions,
+        });
+      }
+
+      toast.success(`Exportado como ${EXPORT_FORMATS[selectedFormat].name} correctamente`);
+
+      // Cerrar wizard después de exportar
+      setTimeout(() => {
+        onClose();
+      }, 1000);
     } catch (error) {
       console.error('Export error:', error);
+      toast.error('Error al exportar');
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -123,11 +204,8 @@ export default function ExportWizardEnhanced({ isOpen, onClose, onExport, canvas
           <div className="px-6 py-5 bg-gradient-to-r from-indigo-500 to-purple-600">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-2xl font-bold text-white">Asistente de Exportación</h2>
-                <p className="text-indigo-100 text-sm mt-1">
-                  Paso {step} de 3:{' '}
-                  {step === 1 ? 'Formato' : step === 2 ? 'Opciones' : 'Vista Previa'}
-                </p>
+                <h2 className="text-2xl font-bold text-white">Asistente de Exportación Premium</h2>
+                <p className="text-indigo-100 text-sm mt-1">{WIZARD_STEPS[currentStep].label}</p>
               </div>
               <button
                 onClick={onClose}
@@ -137,248 +215,354 @@ export default function ExportWizardEnhanced({ isOpen, onClose, onExport, canvas
               </button>
             </div>
 
-            {/* Progress Bar */}
-            <div className="mt-4 flex gap-2">
-              {[1, 2, 3].map((s) => (
-                <div
-                  key={s}
-                  className={`flex-1 h-1 rounded-full transition-colors ${
-                    s <= step ? 'bg-white' : 'bg-white/30'
-                  }`}
-                />
-              ))}
+            {/* Progress Stepper */}
+            <div className="mt-4">
+              <div className="flex items-center justify-between">
+                {WIZARD_STEPS.map((step, index) => {
+                  const Icon = step.icon;
+                  const isActive = index === currentStep;
+                  const isCompleted = index < currentStep;
+
+                  return (
+                    <div key={step.id} className="flex items-center flex-1">
+                      <button
+                        onClick={() => index < currentStep && goToStep(index)}
+                        disabled={index > currentStep}
+                        className={`
+                          flex items-center justify-center w-10 h-10 rounded-full
+                          transition-all ${
+                            isActive
+                              ? 'bg-white text-indigo-600 scale-110'
+                              : isCompleted
+                                ? 'bg-white/30 text-white'
+                                : 'bg-white/10 text-white/50'
+                          }
+                          ${index < currentStep ? 'cursor-pointer hover:bg-white/40' : ''}
+                        `}
+                      >
+                        {isCompleted ? <Check className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
+                      </button>
+                      {index < WIZARD_STEPS.length - 1 && (
+                        <div
+                          className={`flex-1 h-0.5 mx-2 transition-colors ${
+                            index < currentStep ? 'bg-white/30' : 'bg-white/10'
+                          }`}
+                        />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="flex justify-between mt-2">
+                {WIZARD_STEPS.map((step, index) => (
+                  <span
+                    key={step.id}
+                    className={`text-xs flex-1 text-center ${
+                      index === currentStep ? 'text-white font-medium' : 'text-white/70'
+                    }`}
+                  >
+                    {step.label}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
 
           {/* Content */}
           <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
-            {/* Step 1: Format Selection */}
-            {step === 1 && (
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-              >
-                <h3 className="text-lg font-semibold text-gray-900 mb-6">
-                  Selecciona el formato de exportación
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {EXPORT_FORMATS.map((format) => {
-                    const Icon = format.icon;
-                    return (
-                      <button
-                        key={format.id}
-                        onClick={() => handleFormatSelect(format)}
-                        className="group relative p-6 border-2 border-gray-200 rounded-xl hover:border-indigo-400 transition-all duration-300 text-left"
-                      >
-                        <div
-                          className={`absolute inset-0 bg-gradient-to-br ${format.color} opacity-0 group-hover:opacity-10 rounded-xl transition-opacity`}
-                        />
-                        <div className="relative">
-                          <div
-                            className={`inline-flex p-3 rounded-lg bg-gradient-to-br ${format.color} mb-4`}
-                          >
-                            <Icon className="w-6 h-6 text-white" />
-                          </div>
-                          <h4 className="font-bold text-gray-900 mb-2">{format.name}</h4>
-                          <p className="text-sm text-gray-600">{format.description}</p>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </motion.div>
-            )}
-
-            {/* Step 2: Options */}
-            {step === 2 && selectedFormat && (
-              <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
-                <h3 className="text-lg font-semibold text-gray-900 mb-6">
-                  Personaliza tu exportación
-                </h3>
-
-                <div className="space-y-6">
-                  {/* Orientación (si aplica) */}
-                  {selectedFormat.options.includes('orientation') && (
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-3">
-                        <Layout className="w-4 h-4 inline mr-2" />
-                        Orientación
-                      </label>
-                      <div className="grid grid-cols-2 gap-3">
-                        {['landscape', 'portrait'].map((orient) => (
-                          <button
-                            key={orient}
-                            onClick={() => setOptions((prev) => ({ ...prev, orientation: orient }))}
-                            className={`p-4 border-2 rounded-lg transition-all ${
-                              options.orientation === orient
-                                ? 'border-indigo-500 bg-indigo-50'
-                                : 'border-gray-200 hover:border-gray-300'
-                            }`}
-                          >
-                            <div
-                              className={`mb-2 ${orient === 'landscape' ? 'w-16 h-10' : 'w-10 h-16'} bg-gray-300 rounded mx-auto`}
-                            />
-                            <div className="text-sm font-medium text-gray-900 capitalize">
-                              {orient}
-                            </div>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Resolución (PNG) */}
-                  {selectedFormat.options.includes('resolution') && (
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-3">
-                        <Settings className="w-4 h-4 inline mr-2" />
-                        Resolución
-                      </label>
-                      <div className="grid grid-cols-3 gap-3">
-                        {RESOLUTIONS.map((res) => (
-                          <button
-                            key={res.id}
-                            onClick={() => setOptions((prev) => ({ ...prev, resolution: res.id }))}
-                            className={`p-3 border-2 rounded-lg transition-all ${
-                              options.resolution === res.id
-                                ? 'border-indigo-500 bg-indigo-50'
-                                : 'border-gray-200 hover:border-gray-300'
-                            }`}
-                          >
-                            <div className="font-bold text-gray-900">{res.name}</div>
-                            <div className="text-xs text-gray-600 mt-1">{res.width}px</div>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Template de colores */}
-                  {selectedFormat.options.includes('colors') && (
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-3">
-                        <Palette className="w-4 h-4 inline mr-2" />
-                        Estilo Visual
-                      </label>
-                      <div className="grid grid-cols-3 gap-3">
-                        {TEMPLATES.map((tmpl) => (
-                          <button
-                            key={tmpl.id}
-                            onClick={() => setOptions((prev) => ({ ...prev, template: tmpl.id }))}
-                            className={`p-4 border-2 rounded-lg transition-all ${
-                              options.template === tmpl.id
-                                ? 'border-indigo-500 bg-indigo-50'
-                                : 'border-gray-200 hover:border-gray-300'
-                            }`}
-                          >
-                            <div className="text-2xl mb-2">{tmpl.preview}</div>
-                            <div className="text-sm font-medium text-gray-900">{tmpl.name}</div>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Opciones de texto */}
+            <AnimatePresence mode="wait">
+              {/* Step 0: Format Selection */}
+              {currentStep === 0 && (
+                <motion.div
+                  key="format"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  className="space-y-6"
+                >
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-3">
-                      <Type className="w-4 h-4 inline mr-2" />
-                      Contenido
-                    </label>
-                    <div className="space-y-3">
-                      {selectedFormat.options.includes('includeNames') && (
-                        <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
-                          <input
-                            type="checkbox"
-                            checked={options.includeNames}
-                            onChange={() => handleOptionToggle('includeNames')}
-                            className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500"
-                          />
-                          <div>
-                            <div className="font-medium text-gray-900">
-                              Incluir nombres de invitados
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                      Selecciona el formato de exportación
+                    </h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      Elige el formato que mejor se adapte a tus necesidades
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    {Object.values(EXPORT_FORMATS).map((format) => {
+                      const Icon = format.icon;
+                      const isSelected = selectedFormat === format.id;
+
+                      return (
+                        <motion.button
+                          key={format.id}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => setSelectedFormat(format.id)}
+                          className={`
+                            relative p-4 rounded-xl border-2 text-left transition-all
+                            ${
+                              isSelected
+                                ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20'
+                                : 'border-gray-200 dark:border-gray-700 hover:border-gray-300'
+                            }
+                          `}
+                        >
+                          {isSelected && (
+                            <motion.div
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              className="absolute top-2 right-2 w-6 h-6 bg-indigo-500 rounded-full flex items-center justify-center"
+                            >
+                              <Check className="w-4 h-4 text-white" />
+                            </motion.div>
+                          )}
+
+                          <div className="flex items-start gap-3">
+                            <div
+                              className="w-12 h-12 rounded-lg flex items-center justify-center"
+                              style={{ backgroundColor: `${format.color}20` }}
+                            >
+                              <Icon className="w-6 h-6" style={{ color: format.color }} />
                             </div>
-                            <div className="text-sm text-gray-600">
-                              Mostrar quién está en cada mesa
+
+                            <div className="flex-1">
+                              <h4 className="font-semibold text-gray-900 dark:text-white">
+                                {format.name}
+                              </h4>
+                              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                {format.description}
+                              </p>
+                              <div className="flex flex-wrap gap-1 mt-2">
+                                {format.features.map((feature, idx) => (
+                                  <span
+                                    key={idx}
+                                    className="text-xs px-2 py-0.5 bg-gray-100 dark:bg-gray-800 rounded"
+                                  >
+                                    {feature}
+                                  </span>
+                                ))}
+                              </div>
                             </div>
                           </div>
-                        </label>
-                      )}
-                      {selectedFormat.options.includes('includeEmails') && (
-                        <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
-                          <input
-                            type="checkbox"
-                            checked={options.includeEmails}
-                            onChange={() => handleOptionToggle('includeEmails')}
-                            className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500"
-                          />
-                          <div>
-                            <div className="font-medium text-gray-900">Incluir emails</div>
-                            <div className="text-sm text-gray-600">Útil para envíos masivos</div>
-                          </div>
-                        </label>
-                      )}
-                      {selectedFormat.options.includes('logo') && (
-                        <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
-                          <input
-                            type="checkbox"
-                            checked={options.logo}
-                            onChange={() => handleOptionToggle('logo')}
-                            className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500"
-                          />
-                          <div>
-                            <div className="font-medium text-gray-900">Incluir tu logo</div>
-                            <div className="text-sm text-gray-600">Personalizar con tu marca</div>
-                          </div>
-                        </label>
-                      )}
+                        </motion.button>
+                      );
+                    })}
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Step 1: Style */}
+              {currentStep === 1 && (
+                <motion.div
+                  key="style"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                >
+                  <StyleStep
+                    selectedStyle={selectedStyle}
+                    setSelectedStyle={setSelectedStyle}
+                    customStyle={customStyle}
+                    setCustomStyle={setCustomStyle}
+                  />
+                </motion.div>
+              )}
+
+              {/* Step 2: Content */}
+              {currentStep === 2 && (
+                <motion.div
+                  key="content"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                >
+                  <ContentStep
+                    selectedFormat={selectedFormat}
+                    exportOptions={exportOptions}
+                    setExportOptions={setExportOptions}
+                  />
+                </motion.div>
+              )}
+
+              {/* Step 3: Preview */}
+              {currentStep === 3 && (
+                <motion.div
+                  key="preview"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  className="space-y-6"
+                >
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+                      <Eye className="w-5 h-5 text-indigo-500" />
+                      Vista Previa
+                    </h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      Así se verá tu exportación con la configuración actual
+                    </p>
+                  </div>
+
+                  <div className="border-2 border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-gray-50 dark:bg-gray-900">
+                    {previewUrl ? (
+                      <img
+                        ref={previewRef}
+                        src={previewUrl}
+                        alt="Vista previa"
+                        className="w-full h-auto"
+                        style={{ maxHeight: '400px', objectFit: 'contain' }}
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center h-96 text-gray-400">
+                        <Loader className="w-8 h-8 animate-spin" />
+                        <span className="ml-3">Generando vista previa...</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                      <h4 className="font-medium text-gray-700 dark:text-gray-300 mb-2">Formato</h4>
+                      <p className="text-gray-900 dark:text-white">
+                        {EXPORT_FORMATS[selectedFormat].name}
+                      </p>
+                    </div>
+                    <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                      <h4 className="font-medium text-gray-700 dark:text-gray-300 mb-2">Estilo</h4>
+                      <p className="text-gray-900 dark:text-white">
+                        {STYLE_TEMPLATES[selectedStyle].name}
+                      </p>
                     </div>
                   </div>
-                </div>
-              </motion.div>
-            )}
+                </motion.div>
+              )}
 
-            {/* Step 3: Preview */}
-            {step === 3 && (
-              <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
-                <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-                  <Eye className="w-5 h-5" />
-                  Vista Previa
-                </h3>
-                <div className="bg-gray-100 rounded-lg p-8 min-h-[400px] flex items-center justify-center">
-                  <div className="text-center text-gray-500">
-                    <Eye className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                    <p className="font-medium mb-2">Vista previa del seating plan</p>
-                    <p className="text-sm">Formato: {selectedFormat?.name}</p>
-                    <p className="text-sm">Orientación: {options.orientation}</p>
-                  </div>
-                </div>
-              </motion.div>
-            )}
+              {/* Step 4: Export */}
+              {currentStep === 4 && (
+                <motion.div
+                  key="export"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  className="text-center py-12"
+                >
+                  {isGenerating ? (
+                    <div>
+                      <Loader className="w-16 h-16 mx-auto text-indigo-500 animate-spin" />
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mt-4">
+                        Generando exportación...
+                      </h3>
+                      <p className="text-gray-500 dark:text-gray-400 mt-2">
+                        Esto puede tomar unos segundos
+                      </p>
+                    </div>
+                  ) : (
+                    <div>
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="w-20 h-20 mx-auto bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center"
+                      >
+                        <Check className="w-10 h-10 text-green-500" />
+                      </motion.div>
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mt-4">
+                        ¡Exportación lista!
+                      </h3>
+                      <p className="text-gray-500 dark:text-gray-400 mt-2">
+                        Tu archivo se ha generado correctamente
+                      </p>
+                      <div className="flex gap-3 justify-center mt-6">
+                        <button
+                          onClick={() => window.print()}
+                          className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                        >
+                          <FileText className="w-4 h-4" />
+                          Imprimir
+                        </button>
+                        <button
+                          onClick={handleExport}
+                          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                        >
+                          <Download className="w-4 h-4" />
+                          Descargar de nuevo
+                        </button>
+                        <button
+                          onClick={() => {
+                            navigator.share &&
+                              navigator.share({
+                                title: exportOptions.title,
+                                text: 'Distribución de invitados',
+                              });
+                          }}
+                          className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                        >
+                          <Share2 className="w-4 h-4" />
+                          Compartir
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* Footer */}
-          <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
-            <button
-              onClick={() => (step > 1 ? setStep(step - 1) : onClose())}
-              className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900"
-            >
-              {step === 1 ? 'Cancelar' : 'Atrás'}
-            </button>
-            <button
-              onClick={() => (step < 3 ? setStep(step + 1) : handleExport())}
-              className="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors flex items-center gap-2"
-            >
-              {step === 3 ? (
-                <>
-                  <Download className="w-4 h-4" />
-                  Exportar
-                </>
-              ) : (
-                'Siguiente'
+          <div className="px-6 py-4 bg-gray-50 dark:bg-gray-800 border-t dark:border-gray-700 flex items-center justify-between">
+            <div className="flex gap-3">
+              {currentStep > 0 && currentStep < 4 && (
+                <button
+                  onClick={prevStep}
+                  className="flex items-center gap-2 px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  Anterior
+                </button>
               )}
-            </button>
+            </div>
+
+            <div className="flex gap-3">
+              {currentStep < 3 && (
+                <button
+                  onClick={nextStep}
+                  className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                >
+                  Siguiente
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              )}
+
+              {currentStep === 3 && (
+                <button
+                  onClick={handleExport}
+                  disabled={isGenerating}
+                  className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isGenerating ? (
+                    <>
+                      <Loader className="w-4 h-4 animate-spin" />
+                      Generando...
+                    </>
+                  ) : (
+                    <>
+                      <Download className="w-4 h-4" />
+                      Exportar
+                    </>
+                  )}
+                </button>
+              )}
+
+              {currentStep === 4 && (
+                <button
+                  onClick={onClose}
+                  className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                >
+                  Finalizar
+                </button>
+              )}
+            </div>
           </div>
         </motion.div>
       </div>
