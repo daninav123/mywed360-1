@@ -5,32 +5,42 @@
 
 import fetch from 'node-fetch';
 import * as supplierCategories from '../../shared/supplierCategories.js';
+import { detectCategory, getCategoryName } from './categoryDetector.js';
 
 // Configuración de API - probar ambas variables
-const GOOGLE_PLACES_API_KEY = process.env.GOOGLE_PLACES_API_KEY || process.env.VITE_GOOGLE_PLACES_API_KEY;
+const GOOGLE_PLACES_API_KEY =
+  process.env.GOOGLE_PLACES_API_KEY || process.env.VITE_GOOGLE_PLACES_API_KEY;
 
 // Log para debug
 if (!GOOGLE_PLACES_API_KEY) {
   console.warn('⚠️ [GOOGLE PLACES SERVICE] No se encontró API Key en process.env');
   console.warn('   Verificar variables: GOOGLE_PLACES_API_KEY o VITE_GOOGLE_PLACES_API_KEY');
 } else {
-  console.log(`✅ [GOOGLE PLACES SERVICE] API Key configurada: ${GOOGLE_PLACES_API_KEY.substring(0, 15)}...`);
+  console.log(
+    `✅ [GOOGLE PLACES SERVICE] API Key configurada: ${GOOGLE_PLACES_API_KEY.substring(0, 15)}...`
+  );
 }
 
 // Categorías desde archivo centralizado
-const HIGH_COVERAGE_CATEGORIES = supplierCategories.getHighCoverageCategories().flatMap((cat) => cat.keywords);
-const MEDIUM_COVERAGE_CATEGORIES = supplierCategories.getMediumCoverageCategories().flatMap((cat) => cat.keywords);
-const LOW_COVERAGE_CATEGORIES = supplierCategories.getLowCoverageCategories().flatMap((cat) => cat.keywords);
+const HIGH_COVERAGE_CATEGORIES = supplierCategories
+  .getHighCoverageCategories()
+  .flatMap((cat) => cat.keywords);
+const MEDIUM_COVERAGE_CATEGORIES = supplierCategories
+  .getMediumCoverageCategories()
+  .flatMap((cat) => cat.keywords);
+const LOW_COVERAGE_CATEGORIES = supplierCategories
+  .getLowCoverageCategories()
+  .flatMap((cat) => cat.keywords);
 
 /**
  * Determina si debemos usar Google Places para esta categoría
  */
 function shouldUseGooglePlaces(service) {
   const serviceLower = (service || '').toLowerCase().trim();
-  
+
   // ✨ SIEMPRE buscar en Google Places - tiene mejor cobertura que Tavily
   return true;
-  
+
   // Legacy: solo buscar para categorías específicas
   // return (
   //   HIGH_COVERAGE_CATEGORIES.includes(serviceLower) ||
@@ -203,6 +213,10 @@ async function getPlaceDetails(placeId) {
   // Formatear teléfono
   const phone = place.formatted_phone_number || place.international_phone_number || null;
 
+  // 🤖 Detectar categoría automáticamente
+  const detectedCategory = detectCategory(place, '');
+  const categoryName = getCategoryName(detectedCategory);
+
   return {
     name: place.name,
     contact: {
@@ -227,6 +241,10 @@ async function getPlaceDetails(placeId) {
         width: photo.width,
         height: photo.height,
       })) || [],
+    // ✨ Categoría detectada automáticamente
+    category: detectedCategory,
+    categoryName: categoryName,
+    // Metadatos
     verified: true, // Google Places son negocios verificados
     registered: false,
     status: 'google-verified',
