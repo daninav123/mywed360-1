@@ -1,10 +1,11 @@
 name: E2E Tests
 
 on:
-  push:
-    branches: ['**']
-  pull_request:
-    branches: ['**']
+  # push:
+  #   branches: ['**']
+  # pull_request:
+  #   branches: ['**']
+  # ⚠️ Deshabilitado: Los E2E tests son lentos y solo deben ejecutarse manualmente
   workflow_dispatch:
     inputs:
       enable_e2e:
