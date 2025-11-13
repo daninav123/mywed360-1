@@ -398,13 +398,7 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
           }
           
           // ✅ Otros errores (usar caché)
-          if (import.meta.env.DEV)
-            // console.debug('[useWeddingCollection] usando caché local por error en snapshot', {
-              sub: subName,
-              wedding: weddingId,
-              code: err?.code,
-              message: err?.message,
-            });
+          // if (import.meta.env.DEV) console.debug('[useWeddingCollection] usando caché local por error en snapshot', { sub: subName, wedding: weddingId, code: err?.code, message: err?.message });
           setData(lsGet(weddingId, subName, fallback));
           setLoading(false);
           try {
