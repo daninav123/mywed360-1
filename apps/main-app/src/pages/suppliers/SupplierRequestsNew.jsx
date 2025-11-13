@@ -681,7 +681,7 @@ export default function SupplierRequestsNew() {
       </div>
 
       {/* Modal de Cotización */}
-      {// console.log('[SupplierRequests] Modal state:', quotationModal)}
+      {/* console.log('[SupplierRequests] Modal state:', quotationModal) */}
       <CreateQuotationModal
         isOpen={quotationModal.isOpen}
         onClose={() => {
