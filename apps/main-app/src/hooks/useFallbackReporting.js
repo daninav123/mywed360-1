@@ -66,10 +66,7 @@ export function useFallbackReporting() {
         if (response?.ok) {
           const result = await response.json();
           if (import.meta.env.DEV) {
-            // console.debug(`[useFallbackReporting] Reported to backend:`, {
-              service,
-              count: result.count,
-            });
+            // console.debug(`[useFallbackReporting] Reported to backend:`, { service, count: result.count });
           }
         } else {
           // Falló el reporte, pero no es crítico
