@@ -199,6 +199,7 @@
     "jest-axe": "^10.0.0",
     "jsdom": "^26.1.0",
     "lint-staged": "^15.2.10",
+    "playwright": "^1.56.1",
     "postcss": "^8.5.6",
     "prettier": "^3.3.3",
     "puppeteer": "^24.29.1",
