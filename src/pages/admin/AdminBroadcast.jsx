@@ -143,7 +143,7 @@ const AdminBroadcast = () => {
                   setScheduleDate('');
                   setScheduleTime('');
                 } catch (e) {
-                  console.warn('[AdminBroadcast] create broadcast failed:', e);
+                  // console.warn('[AdminBroadcast] create broadcast failed:', e);
                 }
               }}
               className="rounded-md bg-[color:var(--color-primary,#6366f1)] px-4 py-2 text-sm font-semibold text-[color:var(--color-on-primary,#ffffff)] hover:bg-[color:var(--color-primary-dark,#4f46e5)]"

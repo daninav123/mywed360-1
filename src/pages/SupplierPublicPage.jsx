@@ -50,7 +50,7 @@ export default function SupplierPublicPage() {
       setSupplier(data.supplier);
       setPortfolio(data.portfolio || []);
     } catch (error) {
-      console.error('Error loading supplier:', error);
+      // console.error('Error loading supplier:', error);
       toast.error('Error al cargar el proveedor');
     } finally {
       setLoading(false);

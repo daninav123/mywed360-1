@@ -41,8 +41,8 @@ const SUPPLIER_TYPE_MAPPING = {
  */
 export const searchGooglePlaces = async (query, location = null, category = null, isSpecificName = false) => {
   try {
-    console.log(`🌐 [Google Places Frontend] Llamando al proxy del backend...`);
-    console.log(`   Query: "${query}", Location: "${location}", Category: "${category}", IsSpecificName: ${isSpecificName}`);
+    // console.log(`🌐 [Google Places Frontend] Llamando al proxy del backend...`);
+    // console.log(`   Query: "${query}", Location: "${location}", Category: "${category}", IsSpecificName: ${isSpecificName}`);
     
     // Llamar al proxy del backend in lugar de directamente a Google
     const response = await axios.post(
@@ -58,7 +58,7 @@ export const searchGooglePlaces = async (query, location = null, category = null
       }
     );
 
-    console.log(`✅ [Google Places Frontend] Respuesta del proxy:`, {
+    // console.log(`✅ [Google Places Frontend] Respuesta del proxy:`, {
       count: response.data.count || 0,
       source: response.data.source,
     });
@@ -68,7 +68,7 @@ export const searchGooglePlaces = async (query, location = null, category = null
       source: response.data.source || 'google_places',
     };
   } catch (error) {
-    console.error('❌ [Google Places Frontend] Error llamando al proxy:', error.message);
+    // console.error('❌ [Google Places Frontend] Error llamando al proxy:', error.message);
     return { results: [], source: 'google_places' };
   }
 };
@@ -120,7 +120,7 @@ export const getPlaceDetails = async (placeId) => {
       })),
     };
   } catch (error) {
-    console.error('Error getting place details:', error);
+    // console.error('Error getting place details:', error);
     return null;
   }
 };
@@ -139,7 +139,7 @@ export const searchPinterest = async (query) => {
       source: 'pinterest',
     };
   } catch (error) {
-    console.error('Error searching Pinterest:', error);
+    // console.error('Error searching Pinterest:', error);
     return { results: [], source: 'pinterest' };
   }
 };
@@ -158,7 +158,7 @@ export const searchUnsplash = async (query) => {
       source: 'unsplash',
     };
   } catch (error) {
-    console.error('Error searching Unsplash:', error);
+    // console.error('Error searching Unsplash:', error);
     return { results: [], source: 'unsplash' };
   }
 };
@@ -177,7 +177,7 @@ export const searchBodasNet = async (query, category = null) => {
       source: 'bodas_net',
     };
   } catch (error) {
-    console.error('Error searching Bodas.net:', error);
+    // console.error('Error searching Bodas.net:', error);
     return { results: [], source: 'bodas_net' };
   }
 };
@@ -250,7 +250,7 @@ export const searchWeb = async (query, options = {}) => {
       }, {}),
     };
   } catch (error) {
-    console.error('Error in combined web search:', error);
+    // console.error('Error in combined web search:', error);
     return { combined: [], bySource: {} };
   }
 };

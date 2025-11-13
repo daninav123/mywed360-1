@@ -59,7 +59,7 @@ const EmailSetupForm = ({
         setError(`El nombre "${trimmed}" ya est� en uso. Por favor elige otro.`);
       }
     } catch (err) {
-      console.error('Error al comprobar disponibilidad:', err);
+      // console.error('Error al comprobar disponibilidad:', err);
       if (lastCheckIdRef.current !== checkId) return;
       setAvailabilityStatus('unavailable');
       setError('No se pudo verificar la disponibilidad. Int�ntalo nuevamente.');
@@ -88,7 +88,7 @@ const EmailSetupForm = ({
         }
       }
     } catch (err) {
-      console.error('Error al guardar alias:', err);
+      // console.error('Error al guardar alias:', err);
       setError('Error al guardar. Int�ntalo de nuevo m�s tarde.');
     } finally {
       setIsSaving(false);

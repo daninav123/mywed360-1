@@ -485,7 +485,7 @@ const SeatingPlanRefactored = () => {
         await Promise.resolve(baseHandleSelectTable(id, multi));
       };
       run().catch((error) => {
-        console.warn('[SeatingPlan] handleSelectTable error:', error);
+        // console.warn('[SeatingPlan] handleSelectTable error:', error);
       });
     },
     [baseHandleSelectTable, ensureTableLock, releaseTableLocksExcept, selectedIds]
@@ -519,7 +519,7 @@ const SeatingPlanRefactored = () => {
   // Auto-generar mesas de ejemplo si no hay ninguna en Banquete
   useEffect(() => {
     if (tab === 'banquet' && tables && tables.length === 0 && safeHallSize?.width > 0) {
-      console.log('🔧 SEATING DEBUG: No hay mesas. Generando ejemplo automático...');
+      // console.log('🔧 SEATING DEBUG: No hay mesas. Generando ejemplo automático...');
 
       // Generar 6 mesas de ejemplo en grid 3x2
       const exampleTables = [];
@@ -546,12 +546,12 @@ const SeatingPlanRefactored = () => {
         }
       }
 
-      console.log('🔧 SEATING DEBUG: Mesas de ejemplo creadas:', exampleTables);
+      // console.log('🔧 SEATING DEBUG: Mesas de ejemplo creadas:', exampleTables);
 
       // Aplicar las mesas usando el hook
       if (typeof applyBanquetTables === 'function') {
         applyBanquetTables(exampleTables).then(() => {
-          console.log('✅ SEATING DEBUG: Mesas aplicadas correctamente');
+          // console.log('✅ SEATING DEBUG: Mesas aplicadas correctamente');
           toast.info('Mesas de ejemplo generadas. Personaliza desde "Configurar Banquete"');
         });
       }
@@ -907,7 +907,7 @@ const SeatingPlanRefactored = () => {
           toast.success('Exportaci�n generada correctamente.');
         }
       } catch (error) {
-        console.error('Error generando exportaci�n avanzada', error);
+        // console.error('Error generando exportaci�n avanzada', error);
         toast.error('No se pudo generar la exportaci�n avanzada.');
       }
     },
@@ -1032,7 +1032,7 @@ const SeatingPlanRefactored = () => {
 
         setTemplateGalleryOpen(false);
       } catch (error) {
-        console.error('Error applying template:', error);
+        // console.error('Error applying template:', error);
         toast.error('Error al aplicar plantilla');
       }
     },
@@ -1254,7 +1254,7 @@ const SeatingPlanRefactored = () => {
           toast.success('Invitado asignado a la mesa');
           return;
         } catch (e) {
-          console.warn('Capacity check error', e);
+          // console.warn('Capacity check error', e);
           // fallback: intentar asignar igualmente
           moveGuest(guestId, tableId);
           try {
@@ -1283,7 +1283,7 @@ const SeatingPlanRefactored = () => {
         toClear.forEach((g) => moveGuest(g.id, null));
         toast.info(`${toClear.length} invitado(s) desasignado(s)`);
       } catch (e) {
-        console.warn('Unassign error', e);
+        // console.warn('Unassign error', e);
         toast.error('Error al desasignar invitados');
       }
     },
@@ -1344,7 +1344,7 @@ const SeatingPlanRefactored = () => {
         moveGuest(guestId, null);
         toast.info('Invitado desasignado');
       } catch (e) {
-        console.warn('Unassign single guest error', e);
+        // console.warn('Unassign single guest error', e);
         toast.error('No se pudo desasignar el invitado');
       }
     },
@@ -1405,7 +1405,7 @@ const SeatingPlanRefactored = () => {
           }
         } catch (e) {
           // Silencioso para no molestar al usuario; solo log
-          console.warn('Auto-assign error', e);
+          // console.warn('Auto-assign error', e);
         }
       }, 50);
     },
@@ -1452,7 +1452,7 @@ const SeatingPlanRefactored = () => {
               toast.warn(`Autoasignaci�n: ${res.error}`);
             }
           } catch (e) {
-            console.warn('Auto-assign error', e);
+            // console.warn('Auto-assign error', e);
           }
         }, 50);
       }
@@ -1492,7 +1492,7 @@ const SeatingPlanRefactored = () => {
               toast.warn(`Autoasignaci�n: ${res.error}`);
             }
           } catch (e) {
-            console.warn('Auto-assign error', e);
+            // console.warn('Auto-assign error', e);
           }
         }, 50);
       }
@@ -1569,7 +1569,7 @@ const SeatingPlanRefactored = () => {
           toast.error(result.message || 'No se pudo generar el layout');
         }
       } catch (error) {
-        console.error('Error generando auto layout:', error);
+        // console.error('Error generando auto layout:', error);
         toast.error('Error generando el layout automático');
       }
     },
@@ -1914,7 +1914,7 @@ const SeatingPlanRefactored = () => {
                   tables={tables}
                   onGuestFound={(guest) => {
                     // Resaltar invitado (puede implementarse después)
-                    console.log('Guest found:', guest);
+                    // console.log('Guest found:', guest);
                   }}
                   onTableFound={(table) => {
                     // Hacer zoom a la mesa
@@ -1925,7 +1925,7 @@ const SeatingPlanRefactored = () => {
                         window.dispatchEvent(new Event('seating-fit'));
                       }, 100);
                     } catch (e) {
-                      console.warn('Error focusing table:', e);
+                      // console.warn('Error focusing table:', e);
                     }
                   }}
                   className="w-full"
@@ -2193,7 +2193,7 @@ const SeatingPlanRefactored = () => {
               }
               toast.success(`Exportado como ${format.toUpperCase()}`);
             } catch (error) {
-              console.error('Export error:', error);
+              // console.error('Export error:', error);
               toast.error('Error al exportar');
             }
           }}

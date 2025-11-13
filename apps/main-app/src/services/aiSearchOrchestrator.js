@@ -59,7 +59,7 @@ Responde SOLO con JSON válido:
     const result = JSON.parse(response.data.choices[0].message.content);
     return result;
   } catch (error) {
-    console.error('Error analyzing search intent with AI:', error);
+    // console.error('Error analyzing search intent with AI:', error);
     return analyzeSearchIntentBasic(query);
   }
 };
@@ -184,7 +184,7 @@ export const enrichResultsWithAI = async (results, query) => {
 
     return results;
   } catch (error) {
-    console.error('Error enriching results with AI:', error);
+    // console.error('Error enriching results with AI:', error);
     return results;
   }
 };
@@ -207,7 +207,7 @@ export const universalSearch = async (query, weddingId, userId) => {
     // 1. Analizar intención con IA
     const intent = await analyzeSearchIntent(query);
     
-    console.log('🤖 Search Intent:', intent);
+    // console.log('🤖 Search Intent:', intent);
 
     // 2. Búsqueda local (siempre)
     const localPromise = searchLocal(query, weddingId, userId);
@@ -258,7 +258,7 @@ export const universalSearch = async (query, weddingId, userId) => {
       sources: intent.sources,
     };
   } catch (error) {
-    console.error('Error in universal search:', error);
+    // console.error('Error in universal search:', error);
     
     // Fallback: solo búsqueda local
     const localResults = await searchLocal(query, weddingId, userId);
@@ -308,7 +308,7 @@ export const generateSearchSuggestions = async (partialQuery, context = {}) => {
 
     return JSON.parse(response.data.choices[0].message.content);
   } catch (error) {
-    console.error('Error generating suggestions:', error);
+    // console.error('Error generating suggestions:', error);
     return [];
   }
 };

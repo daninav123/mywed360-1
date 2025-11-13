@@ -81,7 +81,7 @@ export async function uploadEmailAttachments(
       const validSize = size >= 0 && size <= MAX_BYTES;
       const validType = isAllowedType(file);
       if (!validSize || !validType) {
-        console.warn('uploadEmailAttachments: rejected file', {
+        // console.warn('uploadEmailAttachments: rejected file', {
           name: safeName,
           size,
           validSize,
@@ -106,7 +106,7 @@ export async function uploadEmailAttachments(
     }
     return results;
   } catch (e) {
-    console.error('uploadEmailAttachments error:', e);
+    // console.error('uploadEmailAttachments error:', e);
     // Si falla Storage, devolvemos sin URLs para que el backend use fallback
     return Array.from(files).map((f) => ({
       filename: f?.name || 'adjunto',

@@ -142,14 +142,14 @@ export default function DevSeedGuests() {
             { merge: true }
           );
         } catch (e) {
-          console.warn('No se pudo crear/actualizar finance/main:', e);
+          // console.warn('No se pudo crear/actualizar finance/main:', e);
         }
 
         setStatus(
           `✅ Insertados ${totalGuests} invitados y ${tablesNeeded} mesas en la boda ${weddingId}`
         );
       } catch (e) {
-        console.error(e);
+        // console.error(e);
         setStatus('❌ Error durante el seeding');
         setDetails(e?.message || String(e));
       }

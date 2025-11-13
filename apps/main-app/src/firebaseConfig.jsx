@@ -33,14 +33,14 @@ const inferredStorageBucket =
   (rawFirebaseConfig.projectId ? `${rawFirebaseConfig.projectId}.appspot.com` : '');
 
 if (!rawFirebaseConfig.authDomain && inferredAuthDomain && typeof console !== 'undefined') {
-  console.warn(
+  // console.warn(
     '[firebaseConfig] VITE_FIREBASE_AUTH_DOMAIN ausente; usando dominio inferido:',
     inferredAuthDomain
   );
 }
 
 if (!rawFirebaseConfig.storageBucket && inferredStorageBucket && typeof console !== 'undefined') {
-  console.warn(
+  // console.warn(
     '[firebaseConfig] VITE_FIREBASE_STORAGE_BUCKET ausente; usando bucket inferido:',
     inferredStorageBucket
   );
@@ -64,7 +64,7 @@ if (typeof window !== 'undefined') {
   if (missing.length) {
     // Aviso en consola para facilitar configuración local
     // No expone valores; solo lista claves faltantes
-    console.warn('[firebaseConfig] Variables VITE_* faltantes:', missing.join(', '));
+    // console.warn('[firebaseConfig] Variables VITE_* faltantes:', missing.join(', '));
   }
 }
 
@@ -133,7 +133,7 @@ const configurarListenerConexion = () => {
     isOnline = online;
 
     if (online) {
-      console.log('🟢 Conexión de red restaurada');
+      // console.log('🟢 Conexión de red restaurada');
       reconnectAttempts = 0;
 
       // Intentar habilitar red de Firestore
@@ -141,21 +141,21 @@ const configurarListenerConexion = () => {
         try {
           const { enableNetwork } = await import('firebase/firestore');
           await enableNetwork(db);
-          console.log('✅ Firestore reconectado exitosamente');
+          // console.log('✅ Firestore reconectado exitosamente');
 
           if (window.mostrarErrorUsuario) {
             window.mostrarErrorUsuario('Conectado a internet', 3000);
           }
         } catch (error) {
-          console.warn('⚠️ Error reconectando Firestore:', error.message);
+          // console.warn('⚠️ Error reconectando Firestore:', error.message);
         }
       }
     } else {
-      console.log('🔴 Conexión de red perdida - modo offline');
+      // console.log('🔴 Conexión de red perdida - modo offline');
       reconnectAttempts++;
 
       if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
-        console.log(`🔄 Reintento ${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS}`);
+        // console.log(`🔄 Reintento ${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS}`);
       }
     }
   };
@@ -165,7 +165,7 @@ const configurarListenerConexion = () => {
 
   // Estado inicial
   if (!navigator.onLine) {
-    console.log('⚠️ Iniciando en modo offline');
+    // console.log('⚠️ Iniciando en modo offline');
   }
 
   // ✅ Listener para Realtime Database (si está habilitado)
@@ -175,13 +175,13 @@ const configurarListenerConexion = () => {
       const estadoConexion = ref(dbRealtime, '.info/connected');
       onValue(estadoConexion, (snapshot) => {
         if (snapshot.val() === true) {
-          console.log('✅ Realtime Database conectado');
+          // console.log('✅ Realtime Database conectado');
         } else {
-          console.log('⚠️ Realtime Database desconectado');
+          // console.log('⚠️ Realtime Database desconectado');
         }
       });
     } catch (error) {
-      console.warn('No se pudo configurar el listener de Realtime Database:', error);
+      // console.warn('No se pudo configurar el listener de Realtime Database:', error);
     }
   }
 };
@@ -203,9 +203,9 @@ const inicializarFirebase = async () => {
     try {
       const { setPersistence, browserLocalPersistence } = await import('firebase/auth');
       await setPersistence(auth, browserLocalPersistence);
-      console.log('✅ Firebase Auth usando persistencia local (mantiene sesión entre recargas)');
+      // console.log('✅ Firebase Auth usando persistencia local (mantiene sesión entre recargas)');
     } catch (pErr) {
-      console.warn('No se pudo establecer la persistencia de auth:', pErr);
+      // console.warn('No se pudo establecer la persistencia de auth:', pErr);
     }
     auth.languageCode = 'es';
     if (typeof window !== 'undefined') window.auth = auth;
@@ -241,7 +241,7 @@ const inicializarFirebase = async () => {
               localCache: memoryLocalCache(),
             });
           } catch (finalError) {
-            console.error('❌ Error crítico inicializando Firestore:', finalError);
+            // console.error('❌ Error crítico inicializando Firestore:', finalError);
             db = getFirestore(app);
           }
         }
@@ -258,7 +258,7 @@ const inicializarFirebase = async () => {
         // connectFirestoreEmulator(db, 'localhost', 8080);
       }
     } catch (emulatorError) {
-      console.warn('No se pudo configurar el emulador:', emulatorError);
+      // console.warn('No se pudo configurar el emulador:', emulatorError);
     }
 
     // Probar conectividad: solo lectura para no requerir auth
@@ -280,14 +280,14 @@ const inicializarFirebase = async () => {
           analytics = getAnalytics(app);
         }
       } catch (error) {
-        console.warn('Error al inicializar Analytics:', error);
+        // console.warn('Error al inicializar Analytics:', error);
       }
     }
 
     // Listener de conexión
     configurarListenerConexion();
   } catch (error) {
-    console.error('Error al inicializar Firebase:', error);
+    // console.error('Error al inicializar Firebase:', error);
     if (typeof window !== 'undefined' && window.mostrarErrorUsuario) {
       window.mostrarErrorUsuario(
         'Error al conectar con el servidor. La aplicación funcionará en modo fuera de línea.',
@@ -301,7 +301,7 @@ const inicializarFirebase = async () => {
 // Al importar este módulo iniciamos Firebase y exportamos la promesa
 const firebaseReady = FIREBASE_CONFIGURED
   ? inicializarFirebase().catch((error) => {
-      console.error('Error crítico al inicializar Firebase:', error);
+      // console.error('Error crítico al inicializar Firebase:', error);
       throw error;
     })
   : Promise.resolve();

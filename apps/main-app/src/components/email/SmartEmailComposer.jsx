@@ -208,7 +208,7 @@ const SmartEmailComposer = ({
       }
 
       default: {
-        console.log('Tipo de recomendación no implementado:', type, data);
+        // console.log('Tipo de recomendación no implementado:', type, data);
         break;
       }
     }

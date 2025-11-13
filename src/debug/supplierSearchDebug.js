@@ -50,22 +50,22 @@ const createConsoleApi = () => {
     last: () => state.events[state.events.length - 1] || null,
     clear: () => {
       state.events = [];
-      console.info('[ai-suppliers] Historial de eventos limpiado.');
+      // console.info('[ai-suppliers] Historial de eventos limpiado.');
       return true;
     },
     watch: () => {
       state.verbose = true;
-      console.info('[ai-suppliers] Modo verbose activado.');
+      // console.info('[ai-suppliers] Modo verbose activado.');
       return true;
     },
     mute: () => {
       state.verbose = false;
-      console.info('[ai-suppliers] Modo verbose desactivado.');
+      // console.info('[ai-suppliers] Modo verbose desactivado.');
       return true;
     },
     on: (handler) => {
       if (typeof handler !== 'function') {
-        console.warn('[ai-suppliers] on(handler) requiere una función.');
+        // console.warn('[ai-suppliers] on(handler) requiere una función.');
         return () => {};
       }
       state.listeners.add(handler);
@@ -112,14 +112,14 @@ const emitEvent = (type, payload) => {
     state.events.splice(0, state.events.length - MAX_EVENTS);
   }
   if (state.verbose && typeof console !== 'undefined' && console.debug) {
-    console.debug(`[ai-suppliers] ${type}`, entry.payload);
+    // console.debug(`[ai-suppliers] ${type}`, entry.payload);
   }
   state.listeners.forEach((listener) => {
     try {
       listener(entry);
     } catch (err) {
       if (state.verbose && console?.warn) {
-        console.warn('[ai-suppliers] listener error', err);
+        // console.warn('[ai-suppliers] listener error', err);
       }
     }
   });
@@ -158,14 +158,14 @@ export const supplierDebug = {
       summary: api.summary,
       lastResults: api.lastResults,
       log: (type, payload) => {
-        console.warn(
+        // console.warn(
           'mywed.aiSearch.log() está destinado a lectura. Usa supplierDebug.log directamente si necesitas registrar eventos.'
         );
         return emitEvent(type, payload);
       },
     };
     if (console?.info) {
-      console.info(
+      // console.info(
         '🛰️  Debug IA Proveedores listo. Usa mywed.aiSearch.history(), mywed.aiSearch.summary(), mywed.aiSearch.watch().'
       );
     }

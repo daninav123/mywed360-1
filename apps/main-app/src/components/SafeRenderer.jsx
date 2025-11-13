@@ -31,7 +31,7 @@ const SafeRenderer = ({ render, fallback = null, errorFallback = null }) => {
           setContent(result);
         }
       } catch (err) {
-        console.error('Error en SafeRenderer:', err);
+        // console.error('Error en SafeRenderer:', err);
         setError(err);
         setContent(errorFallback || 'Error al renderizar contenido');
       } finally {
@@ -57,7 +57,7 @@ const SafeRenderer = ({ render, fallback = null, errorFallback = null }) => {
 
   // Si el contenido es una Promesa (no debería pasar, pero por seguridad)
   if (content && typeof content.then === 'function') {
-    console.warn('SafeRenderer: Se detectó una Promesa no resuelta, retornando fallback');
+    // console.warn('SafeRenderer: Se detectó una Promesa no resuelta, retornando fallback');
     return fallback || null;
   }
 
@@ -89,7 +89,7 @@ export const useSafeAsync = (asyncFunction, defaultValue = null) => {
           setValue(result);
         }
       } catch (err) {
-        console.error('Error en useSafeAsync:', err);
+        // console.error('Error en useSafeAsync:', err);
         setError(err);
         setValue(defaultValue);
       } finally {
@@ -114,13 +114,13 @@ export const safeExecute = (fn, fallback = '') => {
 
     // Si es una Promesa, retornar el fallback
     if (result && typeof result.then === 'function') {
-      console.warn('safeExecute: Función retornó una Promesa, usando fallback');
+      // console.warn('safeExecute: Función retornó una Promesa, usando fallback');
       return fallback;
     }
 
     return result;
   } catch (error) {
-    console.error('Error en safeExecute:', error);
+    // console.error('Error en safeExecute:', error);
     return fallback;
   }
 };

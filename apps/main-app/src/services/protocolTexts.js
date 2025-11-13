@@ -91,7 +91,7 @@ class ProtocolTextsService {
         ...doc.data()
       }));
     } catch (error) {
-      console.error('Error getting texts:', error);
+      // console.error('Error getting texts:', error);
       throw error;
     }
   }
@@ -113,7 +113,7 @@ class ProtocolTextsService {
         ...textDoc.data()
       };
     } catch (error) {
-      console.error('Error getting text:', error);
+      // console.error('Error getting text:', error);
       throw error;
     }
   }
@@ -132,7 +132,7 @@ class ProtocolTextsService {
 
       return { id: textId, ...textData };
     } catch (error) {
-      console.error('Error saving text:', error);
+      // console.error('Error saving text:', error);
       throw error;
     }
   }
@@ -175,7 +175,7 @@ class ProtocolTextsService {
 
       return { initialized: true, count: promises.length };
     } catch (error) {
-      console.error('Error initializing templates:', error);
+      // console.error('Error initializing templates:', error);
       throw error;
     }
   }
@@ -193,7 +193,7 @@ class ProtocolTextsService {
         content: text.content
       }));
     } catch (error) {
-      console.error('Error exporting texts:', error);
+      // console.error('Error exporting texts:', error);
       throw error;
     }
   }
@@ -210,7 +210,7 @@ class ProtocolTextsService {
         text.content.toLowerCase().includes(searchTerm.toLowerCase())
       );
     } catch (error) {
-      console.error('Error searching texts:', error);
+      // console.error('Error searching texts:', error);
       throw error;
     }
   }
@@ -235,7 +235,7 @@ export function useProtocolTexts(weddingId) {
         const data = await protocolTextsService.getTexts(weddingId);
         setTexts(data);
       } catch (error) {
-        console.error('Error loading texts:', error);
+        // console.error('Error loading texts:', error);
       } finally {
         setLoading(false);
       }

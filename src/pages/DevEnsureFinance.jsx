@@ -27,13 +27,13 @@ export default function DevEnsureFinance() {
             );
             ok++;
           } catch (e) {
-            console.warn('Fallo en', wid, e);
+            // console.warn('Fallo en', wid, e);
             fail++;
           }
         }
         setStatus(`✅ Finance asegurado en ${ok}/${ids.length} bodas. Fallos: ${fail}`);
       } catch (e) {
-        console.error(e);
+        // console.error(e);
         setStatus('❌ Error al asegurar finance para todas las bodas');
         setDetails(e?.message || String(e));
       }

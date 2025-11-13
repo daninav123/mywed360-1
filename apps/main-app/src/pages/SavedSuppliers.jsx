@@ -106,7 +106,7 @@ export default function SavedSuppliers() {
                 <SupplierCard
                   supplier={favorite.supplier}
                   onContact={(data) => {
-                    console.log('Contacting supplier', data);
+                    // console.log('Contacting supplier', data);
                   }}
                 />
 

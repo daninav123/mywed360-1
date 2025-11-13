@@ -164,7 +164,7 @@ const SeatingCanvas = forwardRef(function SeatingCanvas(
 
   // DEBUG: Log de renderizado
   React.useEffect(() => {
-    console.log('🎨 SEATING CANVAS RENDER:', {
+    // console.log('🎨 SEATING CANVAS RENDER:', {
       tab,
       tables: tables?.length || 0,
       seats: seats?.length || 0,
@@ -173,7 +173,7 @@ const SeatingCanvas = forwardRef(function SeatingCanvas(
       offset,
     });
     if (tab === 'banquet') {
-      console.log('📊 Mesas en banquete:', tables);
+      // console.log('📊 Mesas en banquete:', tables);
     }
   }, [tab, tables, seats, hallSize, scale, offset]);
 

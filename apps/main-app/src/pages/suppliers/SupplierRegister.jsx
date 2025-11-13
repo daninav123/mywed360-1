@@ -108,7 +108,7 @@ export default function SupplierRegister() {
       navigate(`/supplier/dashboard/${data.supplierId}`);
       
     } catch (err) {
-      console.error('Error en registro:', err);
+      // console.error('Error en registro:', err);
       setError(err.message || t('suppliers.register.errors.generic'));
     } finally {
       setLoading(false);

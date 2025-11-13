@@ -67,7 +67,7 @@ class RSVPSeatingSync {
 
       return { success: true, action: 'synced' };
     } catch (error) {
-      console.error('Error syncing guest to seating:', error);
+      // console.error('Error syncing guest to seating:', error);
       return { success: false, error: error.message };
     }
   }
@@ -85,7 +85,7 @@ class RSVPSeatingSync {
       const snapshot = await getDocs(seatingQuery);
       return !snapshot.empty;
     } catch (error) {
-      console.error('Error checking guest seating:', error);
+      // console.error('Error checking guest seating:', error);
       return false;
     }
   }
@@ -119,7 +119,7 @@ class RSVPSeatingSync {
 
       return true;
     } catch (error) {
-      console.error('Error removing guest from seating:', error);
+      // console.error('Error removing guest from seating:', error);
       return false;
     }
   }
@@ -139,7 +139,7 @@ class RSVPSeatingSync {
 
       return true;
     } catch (error) {
-      console.error('Error marking guest needs seating:', error);
+      // console.error('Error marking guest needs seating:', error);
       return false;
     }
   }
@@ -174,7 +174,7 @@ class RSVPSeatingSync {
 
       return true;
     } catch (error) {
-      console.error('Error updating seating from guest:', error);
+      // console.error('Error updating seating from guest:', error);
       return false;
     }
   }
@@ -211,7 +211,7 @@ class RSVPSeatingSync {
 
       return results;
     } catch (error) {
-      console.error('Error syncing all guests:', error);
+      // console.error('Error syncing all guests:', error);
       throw error;
     }
   }
@@ -264,14 +264,14 @@ class RSVPSeatingSync {
             results.created++;
           }
         } catch (error) {
-          console.error('Error syncing seating to guest:', error);
+          // console.error('Error syncing seating to guest:', error);
           results.errors++;
         }
       }
 
       return results;
     } catch (error) {
-      console.error('Error syncing seating to guests:', error);
+      // console.error('Error syncing seating to guests:', error);
       throw error;
     }
   }
@@ -332,7 +332,7 @@ class RSVPSeatingSync {
 
       return conflicts;
     } catch (error) {
-      console.error('Error detecting conflicts:', error);
+      // console.error('Error detecting conflicts:', error);
       throw error;
     }
   }
@@ -372,7 +372,7 @@ class RSVPSeatingSync {
 
       return { success: false, error: 'Resolution not supported' };
     } catch (error) {
-      console.error('Error resolving conflict:', error);
+      // console.error('Error resolving conflict:', error);
       return { success: false, error: error.message };
     }
   }
@@ -387,7 +387,7 @@ class RSVPSeatingSync {
       const tablesSnapshot = await getDocs(tablesRef);
 
       if (tablesSnapshot.empty) {
-        console.log('[findAvailableTable] No tables found');
+        // console.log('[findAvailableTable] No tables found');
         return null;
       }
 
@@ -421,10 +421,10 @@ class RSVPSeatingSync {
         }
       });
 
-      console.log('[findAvailableTable] Best table:', bestTable, 'with', maxSpace, 'spaces');
+      // console.log('[findAvailableTable] Best table:', bestTable, 'with', maxSpace, 'spaces');
       return bestTable;
     } catch (error) {
-      console.error('[findAvailableTable] Error:', error);
+      // console.error('[findAvailableTable] Error:', error);
       return null;
     }
   }
@@ -435,7 +435,7 @@ class RSVPSeatingSync {
   async assignGuestToTable(weddingId, guestId, tableId) {
     try {
       if (!weddingId || !guestId || !tableId) {
-        console.error('[assignGuestToTable] Missing parameters:', { weddingId, guestId, tableId });
+        // console.error('[assignGuestToTable] Missing parameters:', { weddingId, guestId, tableId });
         return false;
       }
 
@@ -444,7 +444,7 @@ class RSVPSeatingSync {
       const guestSnap = await getDoc(guestRef);
 
       if (!guestSnap.exists()) {
-        console.error('[assignGuestToTable] Guest not found:', guestId);
+        // console.error('[assignGuestToTable] Guest not found:', guestId);
         return false;
       }
 
@@ -453,7 +453,7 @@ class RSVPSeatingSync {
       const tableSnap = await getDoc(tableRef);
 
       if (!tableSnap.exists()) {
-        console.error('[assignGuestToTable] Table not found:', tableId);
+        // console.error('[assignGuestToTable] Table not found:', tableId);
         return false;
       }
 
@@ -471,10 +471,10 @@ class RSVPSeatingSync {
         { merge: true }
       );
 
-      console.log('[assignGuestToTable] Guest assigned:', { guestId, tableId });
+      // console.log('[assignGuestToTable] Guest assigned:', { guestId, tableId });
       return true;
     } catch (error) {
-      console.error('[assignGuestToTable] Error:', error);
+      // console.error('[assignGuestToTable] Error:', error);
       return false;
     }
   }
@@ -490,7 +490,7 @@ class RSVPSeatingSync {
         timestamp: serverTimestamp(),
       });
     } catch (error) {
-      console.error('Error logging sync action:', error);
+      // console.error('Error logging sync action:', error);
     }
   }
 
@@ -505,7 +505,7 @@ class RSVPSeatingSync {
         timestamp: serverTimestamp(),
       });
     } catch (error) {
-      console.error('Error saving sync report:', error);
+      // console.error('Error saving sync report:', error);
     }
   }
 }
@@ -530,7 +530,7 @@ export function useRSVPSeatingSync(weddingId) {
       setLastSync(new Date());
       return results;
     } catch (error) {
-      console.error('Error syncing:', error);
+      // console.error('Error syncing:', error);
       throw error;
     } finally {
       setSyncing(false);
@@ -543,7 +543,7 @@ export function useRSVPSeatingSync(weddingId) {
       setConflicts(detected);
       return detected;
     } catch (error) {
-      console.error('Error detecting conflicts:', error);
+      // console.error('Error detecting conflicts:', error);
       throw error;
     }
   }, [weddingId]);
@@ -558,7 +558,7 @@ export function useRSVPSeatingSync(weddingId) {
         }
         return result;
       } catch (error) {
-        console.error('Error resolving conflict:', error);
+        // console.error('Error resolving conflict:', error);
         throw error;
       }
     },

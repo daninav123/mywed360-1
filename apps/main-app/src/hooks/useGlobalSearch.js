@@ -56,7 +56,7 @@ export default function useGlobalSearch({
         initialized: true,
       });
     } catch (error) {
-      console.error('Error al inicializar datos para búsqueda global:', error);
+      // console.error('Error al inicializar datos para búsqueda global:', error);
     } finally {
       setResults((prev) => ({ ...prev, loading: false }));
     }

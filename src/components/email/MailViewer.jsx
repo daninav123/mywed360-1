@@ -107,7 +107,7 @@ export default function MailViewer({
             return;
           }
         } catch (fetchErr) {
-          console.error('Descarga autenticada falló', fetchErr);
+          // console.error('Descarga autenticada falló', fetchErr);
         }
       }
 
@@ -127,7 +127,7 @@ export default function MailViewer({
         }
       }, 0);
     } catch (e) {
-      console.error('No se pudo descargar adjunto', e);
+      // console.error('No se pudo descargar adjunto', e);
     }
   };
 
@@ -258,7 +258,7 @@ export default function MailViewer({
                 try {
                   mail.attachments.forEach((att, i) => downloadAttachment(att, i));
                 } catch (e) {
-                  console.error('Descarga múltiple falló', e);
+                  // console.error('Descarga múltiple falló', e);
                 }
               }}
             >

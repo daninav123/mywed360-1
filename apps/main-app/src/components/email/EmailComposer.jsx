@@ -44,7 +44,7 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
     try {
       EmailService?.setAuthContext?.(authContext);
     } catch (e) {
-      console.error('[EmailComposer] Error setting auth context:', e);
+      // console.error('[EmailComposer] Error setting auth context:', e);
     }
   }, [authContext]);
   const [to, setTo] = useState(initialValues.to || '');
@@ -80,7 +80,7 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
         const availableTemplates = await EmailService.getEmailTemplates();
         setTemplates(availableTemplates || []);
       } catch (err) {
-        console.error('[EmailComposer] Failed to load templates:', err);
+        // console.error('[EmailComposer] Failed to load templates:', err);
       }
     };
 
@@ -202,7 +202,7 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
   const handleSend = async () => {
     // Prevenir envío duplicado con referencia (más robusto que state)
     if (sending || sendingRef.current) {
-      console.log('[EmailComposer] Send already in progress, ignoring.');
+      // console.log('[EmailComposer] Send already in progress, ignoring.');
       return;
     }
     sendingRef.current = true;
@@ -305,7 +305,7 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
         throw new Error(tEmail('composer.errors.sendFailed'));
       }
     } catch (err) {
-      console.error('[EmailComposer] Failed to send email:', err);
+      // console.error('[EmailComposer] Failed to send email:', err);
       sendingRef.current = false;
       setError(
         tEmailVars('composer.errors.sendFailedWithDetails', {

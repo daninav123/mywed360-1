@@ -136,7 +136,7 @@ const RequestQuoteModal = ({ supplier, open, onClose, onSuccess }) => {
         requestedAt: new Date().toISOString(),
       };
 
-      console.log('📤 Enviando solicitud de presupuesto:', payload);
+      // console.log('📤 Enviando solicitud de presupuesto:', payload);
 
       const response = await fetch(
         `/api/suppliers/${supplier.id || supplier.slug}/quote-requests`,
@@ -161,7 +161,7 @@ const RequestQuoteModal = ({ supplier, open, onClose, onSuccess }) => {
         toast.error(data.error || '❌ Error al enviar solicitud');
       }
     } catch (error) {
-      console.error('💥 Error enviando solicitud:', error);
+      // console.error('💥 Error enviando solicitud:', error);
       toast.error('❌ Error al enviar solicitud. Inténtalo de nuevo.');
     } finally {
       setLoading(false);

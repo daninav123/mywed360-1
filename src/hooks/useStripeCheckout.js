@@ -28,7 +28,7 @@ export function useStripeCheckout() {
         throw new Error('No se recibió URL de checkout');
       }
     } catch (err) {
-      console.error('Error en checkout:', err);
+      // console.error('Error en checkout:', err);
       setError(err.message);
       setIsLoading(false);
     }

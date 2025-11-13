@@ -38,18 +38,18 @@ const CACHEABLE_API_ROUTES = ['/api/mail', '/api/tasks', '/api/finance', '/api/p
  * Instalar Service Worker y cachear recursos estáticos
  */
 self.addEventListener('install', (event) => {
-  console.log('[SW] Instalando Service Worker...');
-  console.log(`[SW] Cache base version ${CACHE_NAME}`);
+  // console.log('[SW] Instalando Service Worker...');
+  // console.log(`[SW] Cache base version ${CACHE_NAME}`);
 
   event.waitUntil(
     caches
       .open(STATIC_CACHE)
       .then((cache) => {
-        console.log('[SW] Cacheando recursos estáticos');
+        // console.log('[SW] Cacheando recursos estáticos');
         return cache.addAll(STATIC_ASSETS);
       })
       .then(() => {
-        console.log('[SW] Service Worker instalado correctamente');
+        // console.log('[SW] Service Worker instalado correctamente');
         // Ejecutar limpieza de compartidos antiguos en instalación
         try {
           cleanupOldShares();
@@ -57,7 +57,7 @@ self.addEventListener('install', (event) => {
         return self.skipWaiting();
       })
       .catch((error) => {
-        console.error('[SW] Error instalando Service Worker:', error);
+        // console.error('[SW] Error instalando Service Worker:', error);
       })
   );
 });
@@ -66,7 +66,7 @@ self.addEventListener('install', (event) => {
  * Activar Service Worker y limpiar cachés antiguos
  */
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Activando Service Worker...');
+  // console.log('[SW] Activando Service Worker...');
 
   event.waitUntil(
     caches
@@ -79,14 +79,14 @@ self.addEventListener('activate', (event) => {
               cacheName !== DYNAMIC_CACHE &&
               cacheName !== API_CACHE
             ) {
-              console.log('[SW] Eliminando caché antiguo:', cacheName);
+              // console.log('[SW] Eliminando caché antiguo:', cacheName);
               return caches.delete(cacheName);
             }
           })
         );
       })
       .then(() => {
-        console.log('[SW] Service Worker activado');
+        // console.log('[SW] Service Worker activado');
         return self.clients.claim();
       })
   );
@@ -181,7 +181,7 @@ async function handleShareTargetRequest(event) {
     const redirectUrl = `/email/compose?${qs.toString()}`;
     return Response.redirect(redirectUrl, 303);
   } catch (err) {
-    console.error('[SW] Error manejando share_target:', err);
+    // console.error('[SW] Error manejando share_target:', err);
     return new Response('Error al compartir', { status: 500 });
   }
 }
@@ -258,7 +258,7 @@ async function cleanupOldShares() {
     db.close();
     return removed;
   } catch (e) {
-    console.warn('[SW] cleanupOldShares error', e);
+    // console.warn('[SW] cleanupOldShares error', e);
     return 0;
   }
 }
@@ -279,7 +279,7 @@ async function cacheFirstStrategy(request, cacheName) {
 
     return networkResponse;
   } catch (error) {
-    console.error('[SW] Error en cache-first:', error);
+    // console.error('[SW] Error en cache-first:', error);
     return getOfflineFallback(request);
   }
 }
@@ -298,7 +298,7 @@ async function networkFirstStrategy(request, cacheName) {
 
     return networkResponse;
   } catch (error) {
-    console.log('[SW] Red no disponible, buscando en caché:', request.url);
+    // console.log('[SW] Red no disponible, buscando en caché:', request.url);
 
     const cachedResponse = await caches.match(request);
     if (cachedResponse) {
@@ -458,7 +458,7 @@ async function clearAllCaches() {
  */
 function handleBackgroundSync(data) {
   // Implementar lógica de sincronización cuando vuelva la conexión
-  console.log('[SW] Sincronización en background:', data);
+  // console.log('[SW] Sincronización en background:', data);
 }
 
 /**
@@ -504,4 +504,4 @@ self.addEventListener('notificationclick', (event) => {
   );
 });
 
-console.log('[SW] Service Worker cargado correctamente');
+// console.log('[SW] Service Worker cargado correctamente');

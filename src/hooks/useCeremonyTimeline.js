@@ -130,13 +130,13 @@ export default function useCeremonyTimeline() {
             setLoading(false);
           },
           (err) => {
-            console.warn('[useCeremonyTimeline] onSnapshot error', err);
+            // console.warn('[useCeremonyTimeline] onSnapshot error', err);
             setError(err);
             setLoading(false);
           },
         );
       } catch (err) {
-        console.warn('[useCeremonyTimeline] listen error', err);
+        // console.warn('[useCeremonyTimeline] listen error', err);
         setError(err);
         setLoading(false);
       }
@@ -152,7 +152,7 @@ export default function useCeremonyTimeline() {
   const saveSections = useCallback(
     async (nextSections) => {
       if (!activeWedding) {
-        console.warn('[useCeremonyTimeline] saveSections without active wedding');
+        // console.warn('[useCeremonyTimeline] saveSections without active wedding');
         return;
       }
       const ref = doc(db, 'weddings', activeWedding, 'ceremonyTimeline', 'main');
@@ -176,7 +176,7 @@ export default function useCeremonyTimeline() {
           ),
         });
       } catch (err) {
-        console.warn('[useCeremonyTimeline] saveSections error', err);
+        // console.warn('[useCeremonyTimeline] saveSections error', err);
         setError(err);
       }
     },

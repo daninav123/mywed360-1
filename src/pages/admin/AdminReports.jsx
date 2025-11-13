@@ -75,7 +75,7 @@ const AdminReports = () => {
       // Limpiar mensaje después de 5 segundos
       setTimeout(() => setSuccess(''), 5000);
     } catch (err) {
-      console.error('[AdminReports] Error generando reporte:', err);
+      // console.error('[AdminReports] Error generando reporte:', err);
       setError(err.message || 'Error al generar el reporte');
     } finally {
       setGenerating(false);

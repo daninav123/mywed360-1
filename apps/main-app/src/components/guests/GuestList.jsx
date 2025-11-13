@@ -69,7 +69,7 @@ const GuestList = React.memo(
           return matchesSearch && matchesStatus && matchesTable;
         });
       } catch (e) {
-        if (import.meta.env.DEV) console.error('[GuestList] filter error', e);
+        if (import.meta.env.DEV) // console.error('[GuestList] filter error', e);
         return [];
       }
     }, [safeGuests, searchTerm, statusFilter, tableFilter]);
@@ -104,7 +104,7 @@ const GuestList = React.memo(
           totalAttendees: confirmed + totalCompanions,
         };
       } catch (e) {
-        if (import.meta.env.DEV) console.error('[GuestList] stats error', e);
+        if (import.meta.env.DEV) // console.error('[GuestList] stats error', e);
         return { total: 0, confirmed: 0, pending: 0, declined: 0, totalAttendees: 0 };
       }
     }, [safeGuests]);

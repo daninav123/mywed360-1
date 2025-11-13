@@ -50,7 +50,7 @@ const OnboardingTutorial = ({ onComplete }) => {
           }
         }
       } catch (error) {
-        console.error('Error al cargar datos del perfil:', error);
+        // console.error('Error al cargar datos del perfil:', error);
       }
     };
 
@@ -367,7 +367,7 @@ const OnboardingTutorial = ({ onComplete }) => {
             });
           }
         } catch (calErr) {
-          console.error('No se pudo crear evento en el calendario:', calErr);
+          // console.error('No se pudo crear evento en el calendario:', calErr);
         }
       }
       */
@@ -380,7 +380,7 @@ const OnboardingTutorial = ({ onComplete }) => {
       // Llamar al callback cuando se completa
       onComplete && onComplete();
     } catch (error) {
-      console.error('Error al guardar datos de onboarding:', error);
+      // console.error('Error al guardar datos de onboarding:', error);
     } finally {
       setLoading(false);
     }

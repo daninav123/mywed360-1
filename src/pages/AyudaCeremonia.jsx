@@ -60,7 +60,7 @@ export default function AyudaCeremonia() {
   };
 
   const handleAIAdjust = () => {
-    console.log('Ajustar con IA:', text);
+    // console.log('Ajustar con IA:', text);
   };
 
   if (isLoading) {

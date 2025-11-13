@@ -54,7 +54,7 @@ export async function fetchInspiration(category = '', page = 1) {
       }));
       results.push(...mapped);
     } catch (e) {
-      console.warn('Unsplash error', e.message);
+      // console.warn('Unsplash error', e.message);
     }
   }
 
@@ -79,7 +79,7 @@ export async function fetchInspiration(category = '', page = 1) {
       }));
       results.push(...mapped);
     } catch (e) {
-      console.warn('Pexels error', e.message);
+      // console.warn('Pexels error', e.message);
     }
   }
 
@@ -105,7 +105,7 @@ export async function fetchInspiration(category = '', page = 1) {
       }));
       results.push(...mapped);
     } catch (e) {
-      console.warn('Pixabay error', e.message);
+      // console.warn('Pixabay error', e.message);
     }
   }
 
@@ -131,7 +131,7 @@ export async function fetchInspiration(category = '', page = 1) {
       }));
       results.push(...mapped);
     } catch (e) {
-      console.warn('YouTube error', e.message);
+      // console.warn('YouTube error', e.message);
     }
   }
 

@@ -38,7 +38,7 @@ const ImportSupplierModal = ({ supplier, weddingId, isOpen, onClose, onSuccess }
         setFullDetails(details);
       }
     } catch (err) {
-      console.error('Error loading details:', err);
+      // console.error('Error loading details:', err);
     } finally {
       setLoadingDetails(false);
     }
@@ -102,7 +102,7 @@ const ImportSupplierModal = ({ supplier, weddingId, isOpen, onClose, onSuccess }
       const suppliersRef = collection(db, 'weddings', weddingId, 'suppliers');
       const docRef = await addDoc(suppliersRef, supplierData);
 
-      console.log('✅ Proveedor importado:', docRef.id);
+      // console.log('✅ Proveedor importado:', docRef.id);
 
       // Callback de éxito
       if (onSuccess) {
@@ -111,7 +111,7 @@ const ImportSupplierModal = ({ supplier, weddingId, isOpen, onClose, onSuccess }
 
       onClose();
     } catch (err) {
-      console.error('Error importing supplier:', err);
+      // console.error('Error importing supplier:', err);
       setError('Error al importar el proveedor. Inténtalo de nuevo.');
     } finally {
       setLoading(false);

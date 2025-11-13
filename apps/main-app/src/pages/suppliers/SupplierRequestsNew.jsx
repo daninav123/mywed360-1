@@ -125,7 +125,7 @@ export default function SupplierRequestsNew() {
 
       setRequests(transformedRequests);
     } catch (error) {
-      console.error('[SupplierRequests] Error loading:', error);
+      // console.error('[SupplierRequests] Error loading:', error);
       toast.error('Error cargando solicitudes');
     } finally {
       setLoading(false);
@@ -161,7 +161,7 @@ export default function SupplierRequestsNew() {
         toast.success('Estado actualizado correctamente');
         loadRequests();
       } catch (error) {
-        console.error('[SupplierRequests] Error updating:', error);
+        // console.error('[SupplierRequests] Error updating:', error);
         toast.error('Error actualizando estado');
       }
     },
@@ -417,7 +417,7 @@ export default function SupplierRequestsNew() {
                     variant="secondary"
                     size="sm"
                     onClick={() => {
-                      console.log('[Button] Opening quotation modal for request:', request.id);
+                      // console.log('[Button] Opening quotation modal for request:', request.id);
                       setQuotationModal({ isOpen: true, request });
                     }}
                     className="flex-1"
@@ -441,7 +441,7 @@ export default function SupplierRequestsNew() {
                     variant="primary"
                     size="sm"
                     onClick={() => {
-                      console.log('[Button] Opening quotation modal for request:', request.id);
+                      // console.log('[Button] Opening quotation modal for request:', request.id);
                       setQuotationModal({ isOpen: true, request });
                     }}
                     className="flex-1"
@@ -681,11 +681,11 @@ export default function SupplierRequestsNew() {
       </div>
 
       {/* Modal de Cotización */}
-      {console.log('[SupplierRequests] Modal state:', quotationModal)}
+      {// console.log('[SupplierRequests] Modal state:', quotationModal)}
       <CreateQuotationModal
         isOpen={quotationModal.isOpen}
         onClose={() => {
-          console.log('[Modal] Closing');
+          // console.log('[Modal] Closing');
           setQuotationModal({ isOpen: false, request: null });
         }}
         request={quotationModal.request}

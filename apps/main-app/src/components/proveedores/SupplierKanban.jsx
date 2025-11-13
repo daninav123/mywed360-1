@@ -46,7 +46,7 @@ export default function SupplierKanban({ proveedores = [], onMove, onClick, show
       const prov = (proveedores || []).find((p) => p.id === parsed.id);
       if (prov) onMove?.(prov, targetKey);
     } catch (err) {
-      console.warn('[SupplierKanban] drop error', err);
+      // console.warn('[SupplierKanban] drop error', err);
     }
   };
 

@@ -55,7 +55,7 @@ export default function VectorEditorPage() {
       const data = await res.json();
       setSvg(data.svg || '');
     } catch (e) {
-      console.error(e);
+      // console.error(e);
       setError(
         t(
           'common.designsLibrary.vectorEditor.messages.vectorizeError',
@@ -84,7 +84,7 @@ export default function VectorEditorPage() {
         const text = await res.text();
         if (!ignore) setSvg(text);
       } catch (e) {
-        console.error('Cargar SVG error', e);
+        // console.error('Cargar SVG error', e);
         if (!ignore)
           setError(
             t(
@@ -128,7 +128,7 @@ export default function VectorEditorPage() {
           }
         }
       } catch (e) {
-        console.warn(
+        // console.warn(
           t(
             'common.designsLibrary.vectorEditor.messages.paletteLoadWarning',
             'No se pudo cargar la paleta'
@@ -344,7 +344,7 @@ export default function VectorEditorPage() {
                       )
                     );
                   } catch (e) {
-                    console.error('Guardar SVG error', e);
+                    // console.error('Guardar SVG error', e);
                     toast.error(
                       t(
                         'common.designsLibrary.vectorEditor.toasts.saveError',
@@ -387,7 +387,7 @@ export default function VectorEditorPage() {
                     )
                   );
                 } catch (e) {
-                  console.error(e);
+                  // console.error(e);
                   toast.error(
                     t(
                       'common.designsLibrary.vectorEditor.toasts.paletteSaveError',

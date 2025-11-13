@@ -33,7 +33,7 @@ export default function WeddingFormModal({ open, onClose, onSave }) {
       await onSave(values);
       onClose();
     } catch (err) {
-      console.error(err);
+      // console.error(err);
       toast.error(t('wedding.form.saveError'));
     } finally {
       setSaving(false);

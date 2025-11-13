@@ -39,7 +39,7 @@ const PartnerStats = () => {
         setData(result);
         setError('');
       } catch (err) {
-        console.error('[PartnerStats] Error:', err);
+        // console.error('[PartnerStats] Error:', err);
         setError('Error de conexión. Por favor, intenta más tarde.');
       } finally {
         setLoading(false);

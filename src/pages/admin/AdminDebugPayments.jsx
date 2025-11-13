@@ -38,7 +38,7 @@ const AdminDebugPayments = () => {
       const result = await res.json();
       setData(result);
     } catch (err) {
-      console.error('[AdminDebugPayments] Error:', err);
+      // console.error('[AdminDebugPayments] Error:', err);
       setError(err.message || 'Error al cargar datos de pagos');
     } finally {
       setLoading(false);

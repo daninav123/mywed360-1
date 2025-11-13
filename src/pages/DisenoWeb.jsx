@@ -1679,7 +1679,7 @@ export default function DisenoWeb() {
         setCustomPrompts(Array.isArray(promptLibrary) ? promptLibrary : []);
       } catch (err) {
         if (!cancelled) {
-          console.warn('loadWebsiteContext error', err);
+          // console.warn('loadWebsiteContext error', err);
         }
       } finally {
         if (!cancelled) {
@@ -1796,12 +1796,12 @@ export default function DisenoWeb() {
           },
         });
       } catch (logErr) {
-        console.warn('recordWebsiteEvent logistics', logErr);
+        // console.warn('recordWebsiteEvent logistics', logErr);
       }
       toast.success(t('messages.logisticsUpdated'));
       setShowLogisticsEditor(false);
     } catch (err) {
-      console.error('Error guardando log�stica', err);
+      // console.error('Error guardando log�stica', err);
       toast.error(t('errors.saveLogisticsError'));
     } finally {
       setSavingLogistics(false);
@@ -1822,7 +1822,7 @@ export default function DisenoWeb() {
         });
         setCustomPrompts(Array.isArray(updated) ? updated : []);
       } catch (err) {
-        console.error('createWebsitePrompt', err);
+        // console.error('createWebsitePrompt', err);
         throw err;
       } finally {
         setPromptLibraryLoading(false);
@@ -1847,7 +1847,7 @@ export default function DisenoWeb() {
         });
         setCustomPrompts(Array.isArray(updated) ? updated : []);
       } catch (err) {
-        console.error('updateWebsitePrompt', err);
+        // console.error('updateWebsitePrompt', err);
         throw err;
       } finally {
         setPromptLibraryLoading(false);
@@ -1865,7 +1865,7 @@ export default function DisenoWeb() {
         const updated = await deleteWebsitePrompt({ uid, promptId: id });
         setCustomPrompts(Array.isArray(updated) ? updated : []);
       } catch (err) {
-        console.error('deleteWebsitePrompt', err);
+        // console.error('deleteWebsitePrompt', err);
         throw err;
       } finally {
         setPromptLibraryLoading(false);
@@ -1914,7 +1914,7 @@ export default function DisenoWeb() {
             },
           });
         } catch (logErr) {
-          console.warn('recordWebsiteEvent website_generated (fallback)', logErr);
+          // console.warn('recordWebsiteEvent website_generated (fallback)', logErr);
         }
       };
 
@@ -1968,10 +1968,10 @@ export default function DisenoWeb() {
           },
         });
       } catch (logErr) {
-        console.warn('Log website ai run', logErr);
+        // console.warn('Log website ai run', logErr);
       }
     } catch (err) {
-      console.error('Error en la generaci�n de la p�gina:', err);
+      // console.error('Error en la generaci�n de la p�gina:', err);
       let fallbackReason = 'fallback-ai-error';
       if (err?.status === 503) {
         fallbackReason = 'fallback-ai-unavailable';
@@ -2004,7 +2004,7 @@ export default function DisenoWeb() {
           },
         });
       } catch (logErr) {
-        console.warn('recordWebsiteEvent website_generation_failed', logErr);
+        // console.warn('recordWebsiteEvent website_generation_failed', logErr);
       }
     } finally {
       setLoading(false);
@@ -2072,7 +2072,7 @@ export default function DisenoWeb() {
               faqEntries: logisticsMetrics.faqs.length,
             },
           }).catch(() => {});
-          console.warn('No se pudo activar la URL p�blica.', result.error);
+          // console.warn('No se pudo activar la URL p�blica.', result.error);
           toast.error(t('errors.activateUrlError'));
           if (versions[0]?.html) {
             setHtml(versions[0].html);
@@ -2110,7 +2110,7 @@ export default function DisenoWeb() {
         },
       }).catch(() => {});
     } catch (err) {
-      console.error('Error al publicar la p�gina', err);
+      // console.error('Error al publicar la p�gina', err);
       await recordWebsiteEvent({
         uid,
         weddingId: activeWedding,

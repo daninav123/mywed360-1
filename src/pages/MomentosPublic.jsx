@@ -59,7 +59,7 @@ export default function MomentosPublic() {
       if (stored?.guestEmail) setGuestEmail(stored.guestEmail);
       if (stored?.acceptedTerms) setAcceptedTerms(Boolean(stored.acceptedTerms));
     } catch (error) {
-      console.warn('[MomentosPublic] no se pudo leer preferencias almacenadas', error);
+      // console.warn('[MomentosPublic] no se pudo leer preferencias almacenadas', error);
     }
   }, [storageKey]);
 
@@ -75,7 +75,7 @@ export default function MomentosPublic() {
         };
         window.localStorage.setItem(storageKey, JSON.stringify(payload));
       } catch (error) {
-        console.warn('[MomentosPublic] no se pudo guardar preferencias', error);
+        // console.warn('[MomentosPublic] no se pudo guardar preferencias', error);
       }
     },
     [acceptedTerms, guestEmail, guestName, storageKey]
@@ -99,7 +99,7 @@ export default function MomentosPublic() {
           ALBUM_ID
         );
       } catch (error) {
-        console.error('[MomentosPublic] token validation error', error);
+        // console.error('[MomentosPublic] token validation error', error);
         setStatus('error');
       }
     };

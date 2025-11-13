@@ -51,9 +51,9 @@ export default function WeddingServiceCard({
   // Debug SIMPLIFICADO - solo una vez al montar
   useEffect(() => {
     if (categoryId === 'fotografia' && favorites.length > 0) {
-      console.log('🔍 DEBUG FOTOGRAFÍA - Categorías guardadas:');
+      // console.log('🔍 DEBUG FOTOGRAFÍA - Categorías guardadas:');
       favorites.forEach((fav, idx) => {
-        console.log(`  [${idx}] "${fav.supplier?.category}" - ${fav.supplier?.name}`);
+        // console.log(`  [${idx}] "${fav.supplier?.category}" - ${fav.supplier?.name}`);
       });
     }
   }, []); // Solo ejecutar una vez al montar

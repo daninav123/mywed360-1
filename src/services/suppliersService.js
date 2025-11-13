@@ -73,14 +73,14 @@ export async function searchSuppliersHybrid(
       filters: filters && typeof filters === 'object' ? filters : {},
     };
 
-    console.log('🔍 [searchSuppliersHybrid] Iniciando búsqueda:', payload);
+    // console.log('🔍 [searchSuppliersHybrid] Iniciando búsqueda:', payload);
     const startTime = Date.now();
 
     // ⭐ NUEVO: Timeout de 30 segundos
     const controller = new AbortController();
     const timeoutId = setTimeout(() => {
       controller.abort();
-      console.error('⏱️ [searchSuppliersHybrid] Timeout después de 30s');
+      // console.error('⏱️ [searchSuppliersHybrid] Timeout después de 30s');
     }, 30000);
 
     try {
@@ -95,16 +95,16 @@ export async function searchSuppliersHybrid(
       clearTimeout(timeoutId);
 
       const elapsed = Date.now() - startTime;
-      console.log(`✅ [searchSuppliersHybrid] Respuesta recibida en ${elapsed}ms`);
+      // console.log(`✅ [searchSuppliersHybrid] Respuesta recibida en ${elapsed}ms`);
 
       if (!response.ok) {
         const error = await response.json().catch(() => ({}));
-        console.error('❌ [searchSuppliersHybrid] Error del servidor:', error);
+        // console.error('❌ [searchSuppliersHybrid] Error del servidor:', error);
         throw new Error(error.error || `Error ${response.status}: ${response.statusText}`);
       }
 
       const data = await response.json();
-      console.log('📊 [searchSuppliersHybrid] Datos recibidos:', {
+      // console.log('📊 [searchSuppliersHybrid] Datos recibidos:', {
         count: data.count,
         breakdown: data.breakdown,
         suppliersLength: data.suppliers?.length,
@@ -112,7 +112,7 @@ export async function searchSuppliersHybrid(
 
       // 🤖 CLASIFICACIÓN AUTOMÁTICA: Asignar categoría a cada proveedor
       if (data.suppliers && Array.isArray(data.suppliers)) {
-        console.log('🤖 [searchSuppliersHybrid] Clasificando proveedores automáticamente...');
+        // console.log('🤖 [searchSuppliersHybrid] Clasificando proveedores automáticamente...');
         data.suppliers = classifySuppliers(data.suppliers);
       }
 
@@ -121,7 +121,7 @@ export async function searchSuppliersHybrid(
       clearTimeout(timeoutId);
 
       if (fetchError.name === 'AbortError') {
-        console.error('⏱️ [searchSuppliersHybrid] Request abortado por timeout');
+        // console.error('⏱️ [searchSuppliersHybrid] Request abortado por timeout');
         throw new Error(
           'La búsqueda está tardando demasiado. Por favor, intenta con términos más específicos.'
         );
@@ -129,7 +129,7 @@ export async function searchSuppliersHybrid(
       throw fetchError;
     }
   } catch (error) {
-    console.error('💥 [searchSuppliersHybrid] Error en búsqueda híbrida:', error);
+    // console.error('💥 [searchSuppliersHybrid] Error en búsqueda híbrida:', error);
     throw error;
   }
 }
@@ -159,7 +159,7 @@ export async function trackSupplierAction(supplierId, action, userIdOrMetadata =
     });
   } catch (error) {
     // No propagar error, es tracking
-    console.warn('Error tracking action:', error);
+    // console.warn('Error tracking action:', error);
   }
 }
 
@@ -180,7 +180,7 @@ export async function getSupplierDetails(supplierId) {
     const data = await response.json();
     return data.supplier;
   } catch (error) {
-    console.error('Error obteniendo detalles:', error);
+    // console.error('Error obteniendo detalles:', error);
     throw error;
   }
 }
@@ -210,7 +210,7 @@ export async function searchSuppliersTavily(query, location, budget, service) {
 
     return await response.json();
   } catch (error) {
-    console.error('Error en Tavily:', error);
+    // console.error('Error en Tavily:', error);
     throw error;
   }
 }

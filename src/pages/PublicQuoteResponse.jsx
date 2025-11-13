@@ -79,7 +79,7 @@ export default function PublicQuoteResponse() {
         setError(data.error || 'No se pudo cargar la solicitud');
       }
     } catch (err) {
-      console.error('Error loading quote request:', err);
+      // console.error('Error loading quote request:', err);
       setError('Error de conexión. Intenta de nuevo más tarde.');
     } finally {
       setLoading(false);
@@ -174,7 +174,7 @@ export default function PublicQuoteResponse() {
         alert(data.error || 'Error al enviar presupuesto');
       }
     } catch (err) {
-      console.error('Error submitting quote:', err);
+      // console.error('Error submitting quote:', err);
       alert('Error de conexión. Intenta de nuevo.');
     } finally {
       setSubmitting(false);

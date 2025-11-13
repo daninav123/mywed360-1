@@ -29,7 +29,7 @@ export function useFavoritesWithAutoCategory() {
           { autoClose: 3000 }
         );
       } catch (error) {
-        console.error('Error auto-añadiendo categoría:', error);
+        // console.error('Error auto-añadiendo categoría:', error);
         // No lanzar error, el favorito ya se guardó correctamente
       }
     }

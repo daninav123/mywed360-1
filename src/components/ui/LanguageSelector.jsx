@@ -48,7 +48,7 @@ const LanguageSelector = ({
             await updateUserProfile({ preferences: { ...prefs, language: languageCode } });
           }
         } catch (e) {
-          console.warn('Could not update local user profile language', e);
+          // console.warn('Could not update local user profile language', e);
         }
 
         // Persist in Firestore (if user available)
@@ -60,11 +60,11 @@ const LanguageSelector = ({
             });
           }
         } catch (e) {
-          console.warn('Could not save language to Firestore; using localStorage only', e);
+          // console.warn('Could not save language to Firestore; using localStorage only', e);
         }
       }
     } catch (err) {
-      console.error('Error cambiando idioma:', err);
+      // console.error('Error cambiando idioma:', err);
     } finally {
       setIsChanging(false);
       setIsOpen(false);

@@ -305,7 +305,7 @@ const MomentosEspeciales = () => {
         setResults([]);
       }
     } catch (err) {
-      console.error('Error buscando Canciones', err);
+      // console.error('Error buscando Canciones', err);
       setErrorSearch(t('protocol.specialMoments.search.error'));
       setResults([]);
     } finally {
@@ -1278,7 +1278,7 @@ const MomentosEspeciales = () => {
       }
       setAiSongs(enriched);
     } catch (e) {
-      console.error('AI songs error', e);
+      // console.error('AI songs error', e);
       setAiError(t('protocol.specialMoments.ai.error'));
       setAiSongs([]);
     } finally {

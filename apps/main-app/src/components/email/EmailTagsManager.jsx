@@ -38,7 +38,7 @@ const EmailTagsManager = ({ emailId, onTagsChange }) => {
       const emailTags = getEmailTagsDetails(uid, emailId);
       setTags(Array.isArray(emailTags) ? emailTags : []);
     } catch (error) {
-      console.warn('EmailTagsManager: error loading tags', error);
+      // console.warn('EmailTagsManager: error loading tags', error);
       setAllTags([]);
       setTags([]);
     }
@@ -51,7 +51,7 @@ const EmailTagsManager = ({ emailId, onTagsChange }) => {
       try {
         await apiPost(`/api/email/${emailId}/tag`, { tagId }, apiOptions());
       } catch (error) {
-        console.warn('EmailTagsManager: backend add tag failed', error);
+        // console.warn('EmailTagsManager: backend add tag failed', error);
       }
 
       let updatedTags = [];
@@ -62,7 +62,7 @@ const EmailTagsManager = ({ emailId, onTagsChange }) => {
           updatedTags = payload?.data?.tagsDetails || payload?.data?.tags || [];
         }
       } catch (error) {
-        console.warn('EmailTagsManager: backend refresh failed', error);
+        // console.warn('EmailTagsManager: backend refresh failed', error);
       }
 
       if (!Array.isArray(updatedTags) || updatedTags.length === 0) {
@@ -75,7 +75,7 @@ const EmailTagsManager = ({ emailId, onTagsChange }) => {
       setIsSelectingTag(false);
       if (onTagsChange) onTagsChange(normalized);
     } catch (error) {
-      console.error('Error al añadir etiqueta:', error);
+      // console.error('Error al añadir etiqueta:', error);
     }
   };
 
@@ -86,7 +86,7 @@ const EmailTagsManager = ({ emailId, onTagsChange }) => {
       try {
         await apiDel(`/api/email/${emailId}/tag/${tagId}`, apiOptions());
       } catch (error) {
-        console.warn('EmailTagsManager: backend remove tag failed', error);
+        // console.warn('EmailTagsManager: backend remove tag failed', error);
       }
 
       let updatedTags = [];
@@ -97,7 +97,7 @@ const EmailTagsManager = ({ emailId, onTagsChange }) => {
           updatedTags = payload?.data?.tagsDetails || payload?.data?.tags || [];
         }
       } catch (error) {
-        console.warn('EmailTagsManager: backend refresh failed', error);
+        // console.warn('EmailTagsManager: backend refresh failed', error);
       }
 
       if (!Array.isArray(updatedTags) || updatedTags.length === 0) {
@@ -109,7 +109,7 @@ const EmailTagsManager = ({ emailId, onTagsChange }) => {
       setTags(normalized);
       if (onTagsChange) onTagsChange(normalized);
     } catch (error) {
-      console.error('Error al quitar etiqueta:', error);
+      // console.error('Error al quitar etiqueta:', error);
     }
   };
 

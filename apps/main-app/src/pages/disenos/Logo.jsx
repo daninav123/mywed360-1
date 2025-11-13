@@ -96,7 +96,7 @@ export default function Logo() {
         category="logo"
         templates={logoTemplates}
         onImageGenerated={async (image) => {
-          console.log('Nuevo logo generado:', image);
+          // console.log('Nuevo logo generado:', image);
           // Actualizamos el logo en el contexto de usuario si se desea
           try {
             if (!activeWedding) return;
@@ -105,7 +105,7 @@ export default function Logo() {
             // Notificar a la aplicación que el logo ha cambiado
             window.dispatchEvent(new Event('maloveapp-profile-updated'));
           } catch (err) {
-            console.error('Error al guardar el logo en el perfil:', err);
+            // console.error('Error al guardar el logo en el perfil:', err);
           }
         }}
       />

@@ -105,7 +105,7 @@ export function classifySupplier(supplier) {
   if (supplier.service || supplier.category) {
     const declaredCategory = findCategoryByKeyword(supplier.service || supplier.category);
     if (declaredCategory) {
-      console.log(`✅ [Classifier] Categoría declarada: ${declaredCategory.id}`);
+      // console.log(`✅ [Classifier] Categoría declarada: ${declaredCategory.id}`);
       return {
         category: declaredCategory.id,
         categoryName: declaredCategory.name,
@@ -157,7 +157,7 @@ export function classifySupplier(supplier) {
 
   // 6. Si el score es muy bajo, asignar a "otros"
   if (bestMatch.score < 10) {
-    console.log(`⚠️ [Classifier] Score muy bajo (${bestMatch.score}), asignando a 'otros'`);
+    // console.log(`⚠️ [Classifier] Score muy bajo (${bestMatch.score}), asignando a 'otros'`);
     return {
       category: 'otros',
       categoryName: 'Otros',
@@ -181,7 +181,7 @@ export function classifySupplier(supplier) {
       confidence: Math.round(c.score),
     }));
 
-  console.log(
+  // console.log(
     `✅ [Classifier] Proveedor "${supplier.name}" → ${bestMatch.categoryName} (${Math.round(bestMatch.score)}%)`
   );
 
@@ -205,7 +205,7 @@ export function classifySuppliers(suppliers) {
     return [];
   }
 
-  console.log(`🔄 [Classifier] Clasificando ${suppliers.length} proveedores...`);
+  // console.log(`🔄 [Classifier] Clasificando ${suppliers.length} proveedores...`);
 
   const classified = suppliers.map((supplier) => {
     const classification = classifySupplier(supplier);
@@ -226,7 +226,7 @@ export function classifySuppliers(suppliers) {
     return acc;
   }, {});
 
-  console.log(`✅ [Classifier] Clasificación completada:`, stats);
+  // console.log(`✅ [Classifier] Clasificación completada:`, stats);
 
   return classified;
 }
@@ -242,11 +242,11 @@ export function reclassifySupplier(supplier, newCategory) {
   const category = SUPPLIER_CATEGORIES.find((c) => c.id === newCategory);
 
   if (!category) {
-    console.warn(`⚠️ [Classifier] Categoría inválida: ${newCategory}`);
+    // console.warn(`⚠️ [Classifier] Categoría inválida: ${newCategory}`);
     return supplier;
   }
 
-  console.log(`🔄 [Classifier] Reclasificando "${supplier.name}" → ${category.name}`);
+  // console.log(`🔄 [Classifier] Reclasificando "${supplier.name}" → ${category.name}`);
 
   return {
     ...supplier,

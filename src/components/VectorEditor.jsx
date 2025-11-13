@@ -187,7 +187,7 @@ const VectorEditor = forwardRef(function VectorEditor({ svg, onExport, palette =
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     } catch (e) {
-      console.error('SVG to PDF error', e);
+      // console.error('SVG to PDF error', e);
       alert('No se pudo exportar a PDF');
     }
   };

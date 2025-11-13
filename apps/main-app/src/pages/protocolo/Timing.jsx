@@ -68,7 +68,7 @@ const Timing = () => {
 
       persistTimeline(initial);
     } catch (e) {
-      console.warn('No se pudo inicializar el timing por defecto:', e);
+      // console.warn('No se pudo inicializar el timing por defecto:', e);
     }
   }, [activeWedding, loading, timeline]);
 
@@ -111,7 +111,7 @@ const Timing = () => {
       await setDoc(doc(db, 'weddings', activeWedding), { timing: next }, { merge: true });
       setTimeline(next);
     } catch (e) {
-      console.error('No se pudo guardar el timing:', e);
+      // console.error('No se pudo guardar el timing:', e);
     }
   };
 

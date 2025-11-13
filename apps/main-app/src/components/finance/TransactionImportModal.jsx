@@ -182,7 +182,7 @@ export default function TransactionImportModal({
       setFieldMap((prev) => ({ ...autoMapHeaders(cleanHeaders), ...prev }));
       setError(null);
     } catch (err) {
-      console.error('[TransactionImportModal] parse error', err);
+      // console.error('[TransactionImportModal] parse error', err);
       setFileMeta(null);
       setHeaders([]);
       setRows([]);
@@ -290,7 +290,7 @@ export default function TransactionImportModal({
         );
       }
     } catch (err) {
-      console.error('[TransactionImportModal] import error', err);
+      // console.error('[TransactionImportModal] import error', err);
       setError(err?.message || 'No se pudo completar la importación.');
     } finally {
       setSubmitting(false);

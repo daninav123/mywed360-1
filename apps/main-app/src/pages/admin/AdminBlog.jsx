@@ -113,7 +113,7 @@ const AdminBlog = () => {
       });
       setScheduledPosts(scheduled || []);
     } catch (error) {
-      console.error('[AdminBlog] loadScheduled failed', error);
+      // console.error('[AdminBlog] loadScheduled failed', error);
       toast.error('No se pudieron cargar las noticias programadas.');
     } finally {
       setLoadingScheduled(false);
@@ -128,7 +128,7 @@ const AdminBlog = () => {
       });
       setPlanEntries(entries || []);
     } catch (error) {
-      console.error('[AdminBlog] loadPlan failed', error);
+      // console.error('[AdminBlog] loadPlan failed', error);
       toast.error('No se pudo cargar el plan editorial.');
     } finally {
       setLoadingPlan(false);
@@ -144,7 +144,7 @@ const AdminBlog = () => {
       });
       setPosts(apiPosts || []);
     } catch (error) {
-      console.error('[AdminBlog] loadPosts failed', error);
+      // console.error('[AdminBlog] loadPosts failed', error);
       toast.error('No se pudieron cargar las noticias del blog.');
     } finally {
       setLoadingList(false);
@@ -164,7 +164,7 @@ const AdminBlog = () => {
       }
       await Promise.all([loadPlan(), loadScheduled(), loadPosts(listStatusFilter)]);
     } catch (error) {
-      console.error('[AdminBlog] trigger automation failed', error);
+      // console.error('[AdminBlog] trigger automation failed', error);
       toast.error('No se pudo ejecutar la automatización del plan.');
     } finally {
       setTriggeringPlan(false);
@@ -218,7 +218,7 @@ const AdminBlog = () => {
       setGenerateForm(defaultGenerateForm);
       loadScheduled();
     } catch (error) {
-      console.error('[AdminBlog] generate failed', error);
+      // console.error('[AdminBlog] generate failed', error);
       toast.error('No se pudo generar el artículo. Revisa el log de servidor.');
     } finally {
       setGenerating(false);
@@ -261,7 +261,7 @@ const AdminBlog = () => {
       toast.success('Cambios guardados.');
       loadScheduled();
     } catch (error) {
-      console.error('[AdminBlog] save failed', error);
+      // console.error('[AdminBlog] save failed', error);
       toast.error('No se pudieron guardar los cambios.');
     } finally {
       setSaving(false);
@@ -277,7 +277,7 @@ const AdminBlog = () => {
       toast.success('Artículo publicado.');
       loadScheduled();
     } catch (error) {
-      console.error('[AdminBlog] publish failed', error);
+      // console.error('[AdminBlog] publish failed', error);
       toast.error('No se pudo publicar el artículo.');
     } finally {
       setPublishing(false);
@@ -300,7 +300,7 @@ const AdminBlog = () => {
       toast.success('Artículo programado.');
       loadScheduled();
     } catch (error) {
-      console.error('[AdminBlog] schedule failed', error);
+      // console.error('[AdminBlog] schedule failed', error);
       toast.error('No se pudo programar el artículo.');
     }
   };
@@ -313,7 +313,7 @@ const AdminBlog = () => {
       toast.info('Artículo archivado.');
       loadScheduled();
     } catch (error) {
-      console.error('[AdminBlog] archive failed', error);
+      // console.error('[AdminBlog] archive failed', error);
       toast.error('No se pudo archivar el artículo.');
     }
   };

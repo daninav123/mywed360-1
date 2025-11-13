@@ -133,7 +133,7 @@ export default function EmailInbox() {
               }
             }
           } catch (automationError) {
-            console.warn('[EmailInbox] automation processing failed', automationError);
+            // console.warn('[EmailInbox] automation processing failed', automationError);
           }
           return; // evitar fallback legacy si la página funcionó
         } catch (pageErr) {
@@ -162,10 +162,10 @@ export default function EmailInbox() {
           }
         }
       } catch (automationError) {
-        console.warn('[EmailInbox] automation processing failed', automationError);
+        // console.warn('[EmailInbox] automation processing failed', automationError);
       }
     } catch (e) {
-      console.error(e);
+      // console.error(e);
       setError('No se pudieron cargar los emails');
     } finally {
       setLoading(false);
@@ -223,7 +223,7 @@ export default function EmailInbox() {
             setNextCursor(page.nextCursor || null);
             setHasMore(Boolean(page.nextCursor));
           } catch (err) {
-            console.warn('[EmailInbox] auto loadMore failed', err);
+            // console.warn('[EmailInbox] auto loadMore failed', err);
           } finally {
             setLoadingMore(false);
             pending = false;

@@ -22,7 +22,7 @@ export function SyncPanel({ weddingId }) {
       const results = await syncAll();
       setSyncResults(results);
     } catch (error) {
-      console.error('Error syncing:', error);
+      // console.error('Error syncing:', error);
     }
   };
 
@@ -31,7 +31,7 @@ export function SyncPanel({ weddingId }) {
       await resolveConflict(conflict, resolution);
       await detectConflicts();
     } catch (error) {
-      console.error('Error resolving conflict:', error);
+      // console.error('Error resolving conflict:', error);
     }
   };
 

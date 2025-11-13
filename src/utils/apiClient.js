@@ -160,7 +160,7 @@ export function handleApiError(error, showNotification = null) {
       statusCode: error.statusCode,
     };
 
-    console.error('[API Error]', message, details);
+    // console.error('[API Error]', message, details);
 
     if (showNotification) {
       showNotification({
@@ -175,7 +175,7 @@ export function handleApiError(error, showNotification = null) {
   }
 
   // Error genérico
-  console.error('[Unexpected Error]', error);
+  // console.error('[Unexpected Error]', error);
   if (showNotification) {
     showNotification({
       type: 'error',

@@ -56,7 +56,7 @@ class RSVPSeatingSync {
 
       return { success: true, action: 'synced' };
     } catch (error) {
-      console.error('Error syncing guest to seating:', error);
+      // console.error('Error syncing guest to seating:', error);
       return { success: false, error: error.message };
     }
   }
@@ -74,7 +74,7 @@ class RSVPSeatingSync {
       const snapshot = await getDocs(seatingQuery);
       return !snapshot.empty;
     } catch (error) {
-      console.error('Error checking guest seating:', error);
+      // console.error('Error checking guest seating:', error);
       return false;
     }
   }
@@ -108,7 +108,7 @@ class RSVPSeatingSync {
 
       return true;
     } catch (error) {
-      console.error('Error removing guest from seating:', error);
+      // console.error('Error removing guest from seating:', error);
       return false;
     }
   }
@@ -128,7 +128,7 @@ class RSVPSeatingSync {
 
       return true;
     } catch (error) {
-      console.error('Error marking guest needs seating:', error);
+      // console.error('Error marking guest needs seating:', error);
       return false;
     }
   }
@@ -163,7 +163,7 @@ class RSVPSeatingSync {
 
       return true;
     } catch (error) {
-      console.error('Error updating seating from guest:', error);
+      // console.error('Error updating seating from guest:', error);
       return false;
     }
   }
@@ -202,7 +202,7 @@ class RSVPSeatingSync {
 
       return results;
     } catch (error) {
-      console.error('Error syncing all guests:', error);
+      // console.error('Error syncing all guests:', error);
       throw error;
     }
   }
@@ -257,14 +257,14 @@ class RSVPSeatingSync {
             results.created++;
           }
         } catch (error) {
-          console.error('Error syncing seating to guest:', error);
+          // console.error('Error syncing seating to guest:', error);
           results.errors++;
         }
       }
 
       return results;
     } catch (error) {
-      console.error('Error syncing seating to guests:', error);
+      // console.error('Error syncing seating to guests:', error);
       throw error;
     }
   }
@@ -327,7 +327,7 @@ class RSVPSeatingSync {
 
       return conflicts;
     } catch (error) {
-      console.error('Error detecting conflicts:', error);
+      // console.error('Error detecting conflicts:', error);
       throw error;
     }
   }
@@ -367,7 +367,7 @@ class RSVPSeatingSync {
 
       return { success: false, error: 'Resolution not supported' };
     } catch (error) {
-      console.error('Error resolving conflict:', error);
+      // console.error('Error resolving conflict:', error);
       return { success: false, error: error.message };
     }
   }
@@ -400,7 +400,7 @@ class RSVPSeatingSync {
         timestamp: serverTimestamp()
       });
     } catch (error) {
-      console.error('Error logging sync action:', error);
+      // console.error('Error logging sync action:', error);
     }
   }
 
@@ -415,7 +415,7 @@ class RSVPSeatingSync {
         timestamp: serverTimestamp()
       });
     } catch (error) {
-      console.error('Error saving sync report:', error);
+      // console.error('Error saving sync report:', error);
     }
   }
 }
@@ -440,7 +440,7 @@ export function useRSVPSeatingSync(weddingId) {
       setLastSync(new Date());
       return results;
     } catch (error) {
-      console.error('Error syncing:', error);
+      // console.error('Error syncing:', error);
       throw error;
     } finally {
       setSyncing(false);
@@ -453,7 +453,7 @@ export function useRSVPSeatingSync(weddingId) {
       setConflicts(detected);
       return detected;
     } catch (error) {
-      console.error('Error detecting conflicts:', error);
+      // console.error('Error detecting conflicts:', error);
       throw error;
     }
   }, [weddingId]);
@@ -467,7 +467,7 @@ export function useRSVPSeatingSync(weddingId) {
       }
       return result;
     } catch (error) {
-      console.error('Error resolving conflict:', error);
+      // console.error('Error resolving conflict:', error);
       throw error;
     }
   }, [weddingId]);

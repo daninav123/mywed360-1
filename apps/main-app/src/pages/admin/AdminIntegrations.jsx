@@ -140,7 +140,7 @@ const AdminIntegrations = () => {
                       }));
                     }
                   } catch (e) {
-                    console.warn('[AdminIntegrations] retry failed:', e);
+                    // console.warn('[AdminIntegrations] retry failed:', e);
                   } finally {
                     setShowRetry('');
                   }

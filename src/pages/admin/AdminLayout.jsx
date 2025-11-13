@@ -90,7 +90,7 @@ const AdminLayout = () => {
     try {
       await logout();
     } catch (error) {
-      console.error('Error al cerrar sesion admin:', error);
+      // console.error('Error al cerrar sesion admin:', error);
     }
     navigate('/admin/login', { replace: true });
   };

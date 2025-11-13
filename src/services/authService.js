@@ -70,7 +70,7 @@ const getUserProfile = async (uid) => {
     }
     return null;
   } catch (error) {
-    console.error('Error obteniendo perfil de usuario:', error);
+    // console.error('Error obteniendo perfil de usuario:', error);
     return null;
   }
 };
@@ -117,7 +117,7 @@ const createOrUpdateUserProfile = async (user, additionalData = {}) => {
     await setDoc(userRef, profileData, { merge: true });
     return profileData;
   } catch (error) {
-    console.error('Error creando/actualizando perfil:', error);
+    // console.error('Error creando/actualizando perfil:', error);
     throw new AuthError(
       'profile-update-failed',
       'Error al actualizar el perfil del usuario',
@@ -139,7 +139,7 @@ const updateUserActivity = () => {
     updateDoc(userRef, {
       lastActivity: serverTimestamp(),
     }).catch((error) => {
-      console.warn('Error actualizando actividad:', error);
+      // console.warn('Error actualizando actividad:', error);
     });
   }
 };
@@ -173,7 +173,7 @@ const refreshAuthToken = async (forceRefresh = false) => {
     const token = await getIdToken(auth.currentUser, forceRefresh);
     const tokenResult = await getIdTokenResult(auth.currentUser, forceRefresh);
 
-    console.log('[AuthService] Token refrescado correctamente');
+    // console.log('[AuthService] Token refrescado correctamente');
 
     // Programar siguiente refresh
     scheduleTokenRefresh();
@@ -184,7 +184,7 @@ const refreshAuthToken = async (forceRefresh = false) => {
       claims: tokenResult.claims,
     };
   } catch (error) {
-    console.error('[AuthService] Error refrescando token:', error);
+    // console.error('[AuthService] Error refrescando token:', error);
     throw new AuthError('token-refresh-failed', 'Error al refrescar el token', error);
   }
 };
@@ -199,7 +199,7 @@ const scheduleTokenRefresh = () => {
 
   tokenRefreshTimer = setTimeout(() => {
     refreshAuthToken(true).catch((error) => {
-      console.error('[AuthService] Error en refresh automático:', error);
+      // console.error('[AuthService] Error en refresh automático:', error);
       // Si falla el refresh, cerrar sesión
       signOut(auth);
     });
@@ -225,7 +225,7 @@ const startSessionMonitoring = () => {
 
   sessionCheckTimer = setInterval(() => {
     if (isSessionExpired()) {
-      console.log('[AuthService] Sesión expirada por inactividad');
+      // console.log('[AuthService] Sesión expirada por inactividad');
       signOut(auth);
     }
   }, AUTH_CONFIG.SESSION_CHECK_INTERVAL);
@@ -297,10 +297,10 @@ export const login = async (email, password, rememberMe = true) => {
     const userData = { ...user, ...profile };
     currentUserData = userData;
 
-    console.log('[AuthService] Login exitoso:', user.email);
+    // console.log('[AuthService] Login exitoso:', user.email);
     return userData;
   } catch (error) {
-    console.error('[AuthService] Error en login:', error);
+    // console.error('[AuthService] Error en login:', error);
 
     let errorMessage = 'Error al iniciar sesión';
     switch (error.code) {
@@ -348,10 +348,10 @@ export const register = async (email, password, additionalData = {}) => {
     // Enviar email de verificación
     await sendEmailVerification(user);
 
-    console.log('[AuthService] Registro exitoso:', user.email);
+    // console.log('[AuthService] Registro exitoso:', user.email);
     return { ...user, ...profile };
   } catch (error) {
-    console.error('[AuthService] Error en registro:', error);
+    // console.error('[AuthService] Error en registro:', error);
 
     let errorMessage = 'Error al crear la cuenta';
     switch (error.code) {
@@ -388,9 +388,9 @@ export const logout = async () => {
     currentUserData = null;
     await signOut(auth);
 
-    console.log('[AuthService] Logout exitoso');
+    // console.log('[AuthService] Logout exitoso');
   } catch (error) {
-    console.error('[AuthService] Error en logout:', error);
+    // console.error('[AuthService] Error en logout:', error);
     throw new AuthError('logout-failed', 'Error al cerrar sesión', error);
   }
 };
@@ -442,7 +442,7 @@ export const onAuthStateChange = (callback) => {
         updateUserActivity();
         callback(userData);
       } catch (error) {
-        console.error('[AuthService] Error procesando cambio de estado:', error);
+        // console.error('[AuthService] Error procesando cambio de estado:', error);
         callback(null);
       }
     } else {
@@ -475,9 +475,9 @@ export const reauthenticate = async (password) => {
     const credential = EmailAuthProvider.credential(auth.currentUser.email, password);
     await reauthenticateWithCredential(auth.currentUser, credential);
 
-    console.log('[AuthService] Reautenticación exitosa');
+    // console.log('[AuthService] Reautenticación exitosa');
   } catch (error) {
-    console.error('[AuthService] Error en reautenticación:', error);
+    // console.error('[AuthService] Error en reautenticación:', error);
     throw new AuthError('reauthentication-failed', 'Error al reautenticar', error);
   }
 };
@@ -490,9 +490,9 @@ export const reauthenticate = async (password) => {
 export const sendPasswordReset = async (email) => {
   try {
     await sendPasswordResetEmail(auth, email);
-    console.log('[AuthService] Email de restablecimiento enviado');
+    // console.log('[AuthService] Email de restablecimiento enviado');
   } catch (error) {
-    console.error('[AuthService] Error enviando email de restablecimiento:', error);
+    // console.error('[AuthService] Error enviando email de restablecimiento:', error);
     throw new AuthError(
       'password-reset-failed',
       'Error al enviar email de restablecimiento',
@@ -531,10 +531,10 @@ export const updateUserProfile = async (updates) => {
     const updatedProfile = await getUserProfile(auth.currentUser.uid);
     currentUserData = { ...auth.currentUser, ...updatedProfile };
 
-    console.log('[AuthService] Perfil actualizado correctamente');
+    // console.log('[AuthService] Perfil actualizado correctamente');
     return currentUserData;
   } catch (error) {
-    console.error('[AuthService] Error actualizando perfil:', error);
+    // console.error('[AuthService] Error actualizando perfil:', error);
     throw new AuthError('profile-update-failed', 'Error al actualizar el perfil', error);
   }
 };

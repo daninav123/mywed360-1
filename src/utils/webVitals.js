@@ -16,7 +16,7 @@ let hasWarned = false;
 
 const debugLog = (...args) => {
   if (import.meta.env?.DEV) {
-    console.info('[webVitals]', ...args);
+    // console.info('[webVitals]', ...args);
   }
 };
 

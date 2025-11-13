@@ -31,7 +31,7 @@ export default function MisDiseños() {
         arr.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
         setItems(arr);
       } catch (e) {
-        console.error(e);
+        // console.error(e);
         setError(
           t('designsLibrary.myDesigns.messages.loadError', 'No se pudo cargar tus diseños')
         );
@@ -61,7 +61,7 @@ export default function MisDiseños() {
       await deleteDoc(doc(db, 'weddings', activeWedding, 'designs', it.id));
       setItems((prev) => prev.filter((x) => x.id !== it.id));
     } catch (e) {
-      console.error(e);
+      // console.error(e);
       alert(t('designsLibrary.myDesigns.messages.deleteError', 'No se pudo eliminar'));
     }
   };

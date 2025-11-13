@@ -11,7 +11,7 @@ const LazyComponentLoader = ({
 }) => {
   const LazyComponent = lazy(() =>
     importFunction().catch((error) => {
-      console.error('Error cargando componente lazy:', error);
+      // console.error('Error cargando componente lazy:', error);
       return { default: () => errorFallback };
     })
   );

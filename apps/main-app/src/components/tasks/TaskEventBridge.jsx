@@ -56,7 +56,7 @@ export default function TaskEventBridge() {
               );
             }
             // eslint-disable-next-line no-console
-            console.log('[TaskEventBridge] Tarea creada', docRef.id);
+            // console.log('[TaskEventBridge] Tarea creada', docRef.id);
             return;
           }
 
@@ -85,12 +85,12 @@ export default function TaskEventBridge() {
             const patch = { title: t.title, desc: t.desc, category: t.category, start, end };
             Object.keys(patch).forEach((k) => patch[k] == null && delete patch[k]);
             await updateDoc(doc(db, 'weddings', activeWedding, 'tasks', targetId), patch);
-            console.log('[TaskEventBridge] Tarea actualizada', targetId);
+            // console.log('[TaskEventBridge] Tarea actualizada', targetId);
             return;
           }
           if (action === 'delete') {
             await deleteDoc(doc(db, 'weddings', activeWedding, 'tasks', targetId));
-            console.log('[TaskEventBridge] Tarea eliminada', targetId);
+            // console.log('[TaskEventBridge] Tarea eliminada', targetId);
             return;
           }
           if (action === 'complete') {
@@ -100,9 +100,9 @@ export default function TaskEventBridge() {
                 { id: String(targetId), taskId: String(targetId), completedAt: serverTimestamp() },
                 { merge: true }
               );
-              console.log('[TaskEventBridge] Tarea completada', targetId);
+              // console.log('[TaskEventBridge] Tarea completada', targetId);
             } catch (e) {
-              console.warn('[TaskEventBridge] No se pudo marcar completada', e);
+              // console.warn('[TaskEventBridge] No se pudo marcar completada', e);
             }
             return;
           }
@@ -133,7 +133,7 @@ export default function TaskEventBridge() {
                 { merge: true }
               );
             }
-            console.log('[TaskEventBridge] Reunión creada', docRef.id);
+            // console.log('[TaskEventBridge] Reunión creada', docRef.id);
             return;
           }
 
@@ -161,17 +161,17 @@ export default function TaskEventBridge() {
             const patch = { title: m.title, desc: m.desc, start, end };
             Object.keys(patch).forEach((k) => patch[k] == null && delete patch[k]);
             await updateDoc(doc(db, 'weddings', activeWedding, 'meetings', targetId), patch);
-            console.log('[TaskEventBridge] Reunión actualizada', targetId);
+            // console.log('[TaskEventBridge] Reunión actualizada', targetId);
             return;
           }
           if (action === 'delete') {
             await deleteDoc(doc(db, 'weddings', activeWedding, 'meetings', targetId));
-            console.log('[TaskEventBridge] Reunión eliminada', targetId);
+            // console.log('[TaskEventBridge] Reunión eliminada', targetId);
             return;
           }
         }
       } catch (e) {
-        console.error('[TaskEventBridge] Error al manejar evento mywed360-tasks', e);
+        // console.error('[TaskEventBridge] Error al manejar evento mywed360-tasks', e);
       }
     };
 

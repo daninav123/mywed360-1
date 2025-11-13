@@ -58,7 +58,7 @@ class EmailRecommendationService {
 
       return recommendations;
     } catch (error) {
-      console.error('Error generando recomendaciones:', error);
+      // console.error('Error generando recomendaciones:', error);
       return this._getDefaultRecommendations();
     }
   }
@@ -573,7 +573,7 @@ class EmailRecommendationService {
 
       localStorage.setItem(this.storageKeyRecommendations, JSON.stringify(savedRecommendations));
     } catch (error) {
-      console.error('Error guardando recomendaciones:', error);
+      // console.error('Error guardando recomendaciones:', error);
     }
   }
 
@@ -624,7 +624,7 @@ class EmailRecommendationService {
     try {
       return JSON.parse(localStorage.getItem(this.storageKeyRecommendations) || '[]');
     } catch (error) {
-      console.error('Error obteniendo historial de recomendaciones:', error);
+      // console.error('Error obteniendo historial de recomendaciones:', error);
       return [];
     }
   }
@@ -649,7 +649,7 @@ class EmailRecommendationService {
       localStorage.setItem(this.storageKeyRecommendations, JSON.stringify(savedRecommendations));
       return true;
     } catch (error) {
-      console.error('Error marcando recomendación como aplicada:', error);
+      // console.error('Error marcando recomendación como aplicada:', error);
       return false;
     }
   }

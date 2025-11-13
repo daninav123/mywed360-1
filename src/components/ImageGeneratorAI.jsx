@@ -131,7 +131,7 @@ const ImageGeneratorAI = ({
           }
         }
       } catch (err) {
-        console.warn('Proxy AI-image no disponible, usando OpenAI directo:', err);
+        // console.warn('Proxy AI-image no disponible, usando OpenAI directo:', err);
       }
 
       // 2) Fallback directo a OpenAI (si estҬ)�) �)"Ҭ)a�)� habilitado)
@@ -156,7 +156,7 @@ const ImageGeneratorAI = ({
       if (!url) throw new Error('No se recibiҬ)�) �)"Ҭ)a�)� URL de imagen');
       handleImageGenerated(url);
     } catch (err) {
-      console.error('Error al generar imagen:', err);
+      // console.error('Error al generar imagen:', err);
       setError(err.message || 'Error al generar la imagen');
       setToast({ type: 'error', message: 'Error al generar la imagen. Intenta con otro prompt.' });
     } finally {
@@ -225,7 +225,7 @@ const ImageGeneratorAI = ({
       });
       setToast({ type: 'success', message: 'diseұo guardado en la boda' });
     } catch (e) {
-      console.error('Guardar diseұo error', e);
+      // console.error('Guardar diseұo error', e);
       setToast({ type: 'error', message: 'No se pudo guardar el diseұo' });
     }
   };
@@ -258,7 +258,7 @@ const ImageGeneratorAI = ({
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
     } catch (err) {
-      console.error('Error al descargar la imagen:', err);
+      // console.error('Error al descargar la imagen:', err);
       const aFallback = document.createElement('a');
       aFallback.href = imageUrl;
       aFallback.target = '_blank';
@@ -284,7 +284,7 @@ const ImageGeneratorAI = ({
       if (!blob || blob.size === 0) throw new Error('PDF vacҬ)�) �)"Ҭ)a�)�o');
       saveAs(blob, fileName || `mywed360-${category}-${Date.now()}.pdf`);
     } catch (err) {
-      console.error('Error al descargar PDF:', err);
+      // console.error('Error al descargar PDF:', err);
       setToast({ type: 'error', message: 'No se pudo generar el PDF' });
     }
   };

@@ -18,7 +18,7 @@ export default function NotificationWatcher({ intervalMs = 20000 }) {
   useEffect(() => {
     // Verificar que auth está inicializado
     if (!auth) {
-      console.warn('[NotificationWatcher] Firebase Auth no está inicializado todavía');
+      // console.warn('[NotificationWatcher] Firebase Auth no está inicializado todavía');
       return;
     }
     let active = true;
@@ -153,7 +153,7 @@ export default function NotificationWatcher({ intervalMs = 20000 }) {
         } catch {}
       } catch (error) {
         if (import.meta.env?.DEV) {
-          console.debug('[NotificationWatcher] load error, usando cache local', error?.message);
+          // console.debug('[NotificationWatcher] load error, usando cache local', error?.message);
         }
       }
     };

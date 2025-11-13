@@ -43,7 +43,7 @@ export default function WeddingSite() {
         const schSnap = await getDocs(collection(db, 'users', uid, 'schedule'));
         setSchedule(schSnap.docs.map((d) => d.data()).sort((a, b) => a.time.localeCompare(b.time)));
       } catch (e) {
-        console.error(e);
+        // console.error(e);
       }
     })();
   }, [uid]);
@@ -71,7 +71,7 @@ export default function WeddingSite() {
       toast.success(t('wedding.site.rsvpSuccess'));
       setRsvp({ name: '', guests: 1, response: 'yes', message: '' });
     } catch (err) {
-      console.error(err);
+      // console.error(err);
       toast.error(t('wedding.site.rsvpError'));
     }
   };

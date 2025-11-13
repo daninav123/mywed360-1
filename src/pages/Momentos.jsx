@@ -120,7 +120,7 @@ export default function Momentos() {
             unsubAlbum = unsubscribe;
           })
           .catch((error) => {
-            console.error('listenAlbum error', error);
+            // console.error('listenAlbum error', error);
           });
         listenPhotos(activeWedding, (items) => setPhotos(items), {
           albumId: ALBUM_ID,
@@ -129,7 +129,7 @@ export default function Momentos() {
           .then((unsubscribe) => {
             unsubPhotos = unsubscribe;
           })
-          .catch((error) => console.error('listenPhotos error', error));
+          .catch((error) => // console.error('listenPhotos error', error));
         listenGuestTokens(
           activeWedding,
           (items) => {
@@ -143,7 +143,7 @@ export default function Momentos() {
           .then((unsubscribe) => {
             unsubTokens = unsubscribe;
           })
-          .catch((error) => console.error('listenGuestTokens error', error));
+          .catch((error) => // console.error('listenGuestTokens error', error));
 
         listenGuestProgress(
           activeWedding,
@@ -153,10 +153,10 @@ export default function Momentos() {
           .then((unsubscribe) => {
             unsubGuestProgress = unsubscribe;
           })
-          .catch((error) => console.error('listenGuestProgress error', error));
+          .catch((error) => // console.error('listenGuestProgress error', error));
       })
       .catch((error) => {
-        console.error('Error inicializando la galería de recuerdos', error);
+        // console.error('Error inicializando la galería de recuerdos', error);
         toast.error('No se pudo cargar la galería de recuerdos. Revisa tu conexión o permisos.');
         setLoadingAlbum(false);
       });
@@ -188,7 +188,7 @@ export default function Momentos() {
       albumId: ALBUM_ID,
       eventDate: weddingEventDate ? weddingEventDate : null,
     }).catch((error) => {
-      console.warn('[Momentos] syncAlbumEventDate error', error);
+      // console.warn('[Momentos] syncAlbumEventDate error', error);
     });
   }, [activeWedding, album?.id, weddingEventDateKey]);
 
@@ -229,7 +229,7 @@ export default function Momentos() {
       setShareUrl(url);
       toast.success('Nuevo enlace generado');
     } catch (error) {
-      console.error('createGuestToken', error);
+      // console.error('createGuestToken', error);
       toast.error(error?.message || 'No se pudo generar el enlace, reinténtalo más tarde.');
     }
   };
@@ -245,7 +245,7 @@ export default function Momentos() {
       });
       toast.success('Foto aprobada');
     } catch (error) {
-      console.error('approve photo error', error);
+      // console.error('approve photo error', error);
       toast.error('No se pudo aprobar la foto');
     }
   };
@@ -267,7 +267,7 @@ export default function Momentos() {
       });
       toast.info('Foto rechazada');
     } catch (error) {
-      console.error('reject photo error', error);
+      // console.error('reject photo error', error);
       toast.error('No se pudo rechazar la foto');
     }
   };
@@ -283,7 +283,7 @@ export default function Momentos() {
       });
       toast.success('La foto volvió a pendiente');
     } catch (error) {
-      console.error('reset photo error', error);
+      // console.error('reset photo error', error);
       toast.error('No se pudo revertir el estado');
     }
   };
@@ -297,7 +297,7 @@ export default function Momentos() {
       await updateAlbumSettings(activeWedding, { scenes: nextScenes }, ALBUM_ID);
       toast.success('Escenas actualizadas');
     } catch (error) {
-      console.error('update scenes error', error);
+      // console.error('update scenes error', error);
       toast.error('No se pudieron guardar las escenas');
     }
   };

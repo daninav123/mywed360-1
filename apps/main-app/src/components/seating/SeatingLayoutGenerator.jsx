@@ -65,8 +65,8 @@ const createTable = (config) => {
 
   // Debug: Log primera mesa para verificar propiedades
   if (number === 1) {
-    console.log('[createTable] Mesa 1 creada:', table);
-    console.log('[createTable] Shape y diameter:', {
+    // console.log('[createTable] Mesa 1 creada:', table);
+    // console.log('[createTable] Shape y diameter:', {
       shape: table.shape,
       diameter: table.diameter,
       radius: table.radius,
@@ -470,7 +470,7 @@ export function generateRandomLayout(config = {}) {
 
     // Si no se pudo colocar después de max intentos, usar grid fallback
     if (!placed) {
-      console.warn(`No se pudo colocar mesa ${i + 1} aleatoriamente, usando grid`);
+      // console.warn(`No se pudo colocar mesa ${i + 1} aleatoriamente, usando grid`);
       const gridTables = generateGridLayout({ ...cfg, tableCount: cfg.tableCount - tables.length });
       tables.push(...gridTables.slice(0, cfg.tableCount - tables.length));
       break;
@@ -487,7 +487,7 @@ export function generateRandomLayout(config = {}) {
  * @returns {array} Array de mesas generadas
  */
 export function generateLayout(type, config = {}) {
-  console.log('[LayoutGenerator] Generando layout:', type, config);
+  // console.log('[LayoutGenerator] Generando layout:', type, config);
 
   switch (type) {
     case 'grid':
@@ -503,7 +503,7 @@ export function generateLayout(type, config = {}) {
     case 'random':
       return generateRandomLayout(config);
     default:
-      console.warn('[LayoutGenerator] Tipo desconocido, usando grid');
+      // console.warn('[LayoutGenerator] Tipo desconocido, usando grid');
       return generateGridLayout(config);
   }
 }

@@ -29,7 +29,7 @@ export default function FavoriteButton({ supplier, size = 'md', showLabel = fals
         await addToFavorites(supplier);
       }
     } catch (error) {
-      console.error('Error toggling favorite:', error);
+      // console.error('Error toggling favorite:', error);
       const fallbackMessage = favorite
         ? t('suppliers.favorites.errors.removeFailed')
         : t('suppliers.favorites.errors.saveFailed');

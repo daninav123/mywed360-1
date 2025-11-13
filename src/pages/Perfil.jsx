@@ -213,7 +213,7 @@ function Perfil() {
       }
       setPlannerEmail('');
     } catch (err) {
-      console.error(err);
+      // console.error(err);
       toast.error(t('profile.errors.creatingInvite', { defaultValue: 'Error creando invitación' }));
     } finally {
       setInviteLoading(false);
@@ -259,7 +259,7 @@ function Perfil() {
         setLastSavedAt(new Date());
       } catch {}
     } catch (e) {
-      console.error(e);
+      // console.error(e);
       toast.error(t('profile.errors.savingProfile', { defaultValue: 'Error al guardar el perfil' }));
     }
   };
@@ -317,7 +317,7 @@ function Perfil() {
           }
         }
       } catch (e) {
-        console.error('Error cargando perfil', e);
+        // console.error('Error cargando perfil', e);
         toast.error(t('profile.errors.loadingProfile', { defaultValue: 'Error al cargar el perfil' }));
       }
     };

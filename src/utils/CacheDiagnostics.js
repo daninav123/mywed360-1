@@ -41,7 +41,7 @@ export async function runCacheBenchmark(templateIds = [], iterations = 5) {
       const { templates } = await EmailService.getEmailTemplates();
       templateIds = templates.map((t) => t.id);
     } catch (error) {
-      console.error('Error al cargar plantillas para benchmark:', error);
+      // console.error('Error al cargar plantillas para benchmark:', error);
       return { error: 'No se pudieron cargar plantillas para diagnóstico' };
     }
   }

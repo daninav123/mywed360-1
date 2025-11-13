@@ -204,7 +204,7 @@ const AdminAlerts = () => {
                     setSelected((prev) => (prev ? { ...prev, resolved: true } : prev));
                   } catch (e) {
                     // eslint-disable-next-line no-console
-                    console.warn('[AdminAlerts] resolve failed:', e);
+                    // console.warn('[AdminAlerts] resolve failed:', e);
                   } finally {
                     setShowResolve(false);
                   }

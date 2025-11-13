@@ -239,7 +239,7 @@ export default function TasksRefactored() {
           await migrateFlatSubtasksToNested(activeWedding);
         }
       } catch (error) {
-        console.warn('[Tasks] migration failed', error);
+        // console.warn('[Tasks] migration failed', error);
         // Si falla, permitir reintentar
         if (activeWedding) {
           migrationAttemptedRef.current.delete(activeWedding);
@@ -594,7 +594,7 @@ export default function TasksRefactored() {
               ? addMonths(projectEnd, -12)
               : null;
         const res = await fixParentBlockDates(activeWedding, startForBlocks, projectEnd);
-        console.log('[Debug] fixParentBlockDates', res);
+        // console.log('[Debug] fixParentBlockDates', res);
         return res;
       };
     } catch (_) {}
@@ -802,7 +802,7 @@ export default function TasksRefactored() {
 
       return maxScore > 0 ? maxCat : 'OTROS';
     } catch (error) {
-      console.error('Error al asignar categor�­a:', error);
+      // console.error('Error al asignar categor�­a:', error);
       return 'OTROS';
     }
   };
@@ -1069,14 +1069,14 @@ export default function TasksRefactored() {
       // Cerrar modal y limpiar
       closeModal();
     } catch (error) {
-      console.error('Error al guardar tarea:', error);
+      // console.error('Error al guardar tarea:', error);
       toast.error(t('tasks.page.form.errors.saveFailed'));
     }
   };
 
   const handleDeleteTask = () => {
     try {
-      console.log('[Tasks] Eliminar clicado', { editingId, isProcess: !!formData.long });
+      // console.log('[Tasks] Eliminar clicado', { editingId, isProcess: !!formData.long });
       if (!editingId) {
         closeModal();
         return;
@@ -1114,10 +1114,10 @@ export default function TasksRefactored() {
       ops.push(Promise.resolve(deleteTaskFS(editingId)).catch(() => {}));
       ops.push(Promise.resolve(deleteMeetingFS(editingId)).catch(() => {}));
       Promise.allSettled(ops)
-        .then(() => console.log('[Tasks] Eliminaci�³n completada', editingId))
+        .then(() => // console.log('[Tasks] Eliminaci�³n completada', editingId))
         .catch(() => {});
     } catch (error) {
-      console.error('Error eliminando tarea/proceso:', error);
+      // console.error('Error eliminando tarea/proceso:', error);
       try {
         closeModal();
       } catch (_) {}
@@ -2138,7 +2138,7 @@ export default function TasksRefactored() {
 
       return map;
     } catch (error) {
-      console.warn('[Tasks] Error calculando mapa de riesgo', error);
+      // console.warn('[Tasks] Error calculando mapa de riesgo', error);
       return new Map();
     }
   }, [ganttBaseTasks, subtaskEvents, completedIdSet]);
@@ -2342,7 +2342,7 @@ export default function TasksRefactored() {
         forceRefresh: true,
       });
     } catch (error) {
-      console.warn('[Tasks] seed defaults failed', error);
+      // console.warn('[Tasks] seed defaults failed', error);
     } finally {
       setSeedingDefaults(false);
     }
@@ -2372,7 +2372,7 @@ export default function TasksRefactored() {
           skipIfSeeded: true,
         });
       } catch (error) {
-        console.warn('[Tasks] automatic seed failed', error);
+        // console.warn('[Tasks] automatic seed failed', error);
         // Si falla, permitir reintentar en el próximo mount
         if (activeWedding) {
           seedAttemptedRef.current.delete(activeWedding);
@@ -2426,7 +2426,7 @@ export default function TasksRefactored() {
             });
 
             setTimeout(() => setUnlockNotification(null), 6000);
-            console.log('[Dependencies] Tareas desbloqueadas:', unblocked);
+            // console.log('[Dependencies] Tareas desbloqueadas:', unblocked);
           }
         } else {
           await deleteDoc(compRef).catch(() => {});
@@ -2500,7 +2500,7 @@ export default function TasksRefactored() {
             }
             if (d && !isNaN(d.getTime())) {
               try {
-                console.log('[Tasks] projectEnd from root', d);
+                // console.log('[Tasks] projectEnd from root', d);
               } catch (_) {}
               setProjectEnd(d);
             }
@@ -2578,7 +2578,7 @@ export default function TasksRefactored() {
             }
             if (d && !isNaN(d.getTime())) {
               try {
-                console.log('[Tasks] projectEnd from subdoc info/weddingInfo', d);
+                // console.log('[Tasks] projectEnd from subdoc info/weddingInfo', d);
               } catch (_) {}
               setProjectEnd(d);
             }
@@ -2788,7 +2788,7 @@ export default function TasksRefactored() {
           }
         },
       };
-      console.log('[Tasks Debug] Usa mywed.tasks.explainMissing() para ver el estado');
+      // console.log('[Tasks Debug] Usa mywed.tasks.explainMissing() para ver el estado');
     } catch {}
   }, [activeWedding, uniqueGanttTasks, nestedSubtasks, subtaskEvents]);
 
@@ -2984,7 +2984,7 @@ export default function TasksRefactored() {
                   normalizeDate(task.to) ||
                   eventStart;
                 if (!eventStart || !eventEnd) {
-                  console.warn('[Tasks] Gantt task sin fechas v�lidas al abrir detalle', task);
+                  // console.warn('[Tasks] Gantt task sin fechas v�lidas al abrir detalle', task);
                   return;
                 }
                 setEditingId(task.id);
@@ -3005,7 +3005,7 @@ export default function TasksRefactored() {
                 }));
                 setShowNewTask(true);
               } catch (error) {
-                console.error('Error al manejar clic en tarea:', error);
+                // console.error('Error al manejar clic en tarea:', error);
               }
             }}
           />
@@ -3116,7 +3116,7 @@ export default function TasksRefactored() {
               }));
               setShowNewTask(true);
             } catch (error) {
-              console.error('Error al abrir tarea desde el modal:', error);
+              // console.error('Error al abrir tarea desde el modal:', error);
             }
           }}
         />

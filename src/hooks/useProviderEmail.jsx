@@ -80,7 +80,7 @@ export const useProviderEmail = () => {
 
       return { email: emailData };
     } catch (err) {
-      console.error('Error al enviar email al proveedor:', err);
+      // console.error('Error al enviar email al proveedor:', err);
       setError('No se pudo enviar el email. Inténtalo de nuevo más tarde.');
       return null;
     } finally {

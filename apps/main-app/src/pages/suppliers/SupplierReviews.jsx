@@ -39,7 +39,7 @@ export default function SupplierReviews() {
         setReviews(data.reviews);
       }
     } catch (error) {
-      console.error('Error loading reviews:', error);
+      // console.error('Error loading reviews:', error);
     } finally {
       setLoading(false);
     }
@@ -59,7 +59,7 @@ export default function SupplierReviews() {
         setStats(data.stats);
       }
     } catch (error) {
-      console.error('Error loading stats:', error);
+      // console.error('Error loading stats:', error);
     }
   };
 
@@ -87,7 +87,7 @@ export default function SupplierReviews() {
         loadReviews();
       }
     } catch (error) {
-      console.error('Error responding to review:', error);
+      // console.error('Error responding to review:', error);
     } finally {
       setSubmitting(false);
     }
@@ -106,7 +106,7 @@ export default function SupplierReviews() {
       });
       loadReviews();
     } catch (error) {
-      console.error('Error reporting review:', error);
+      // console.error('Error reporting review:', error);
     }
   };
 

@@ -49,7 +49,7 @@ const AdminSettings = () => {
         setFlags((prev) => prev.map((f) => (f.id === showFlagConfirm.id ? { ...f, enabled: !f.enabled } : f)));
       }
     } catch (e) {
-      console.warn('[AdminSettings] toggle flag failed:', e);
+      // console.warn('[AdminSettings] toggle flag failed:', e);
     } finally {
       setShowFlagConfirm(null);
     }
@@ -64,7 +64,7 @@ const AdminSettings = () => {
         )
       );
     } catch (e) {
-      console.warn('[AdminSettings] save template failed:', e);
+      // console.warn('[AdminSettings] save template failed:', e);
     }
   };
 
@@ -224,7 +224,7 @@ const AdminSettings = () => {
                   try {
                     await rotateSecret(showSecretModal);
                   } catch (e) {
-                    console.warn('[AdminSettings] rotate secret failed:', e);
+                    // console.warn('[AdminSettings] rotate secret failed:', e);
                   } finally {
                     setShowSecretModal('');
                     setRotateStep(0);

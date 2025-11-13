@@ -136,7 +136,7 @@ class SeatingAnalytics {
 
       return event;
     } catch (error) {
-      console.error('Error tracking event:', error);
+      // console.error('Error tracking event:', error);
       return null;
     }
   }
@@ -158,9 +158,9 @@ class SeatingAnalytics {
 
       await Promise.all(promises);
       
-      console.log(`Flushed ${batch.length} analytics events`);
+      // console.log(`Flushed ${batch.length} analytics events`);
     } catch (error) {
-      console.error('Error flushing analytics:', error);
+      // console.error('Error flushing analytics:', error);
       // Restaurar eventos si falló
       this.eventQueue.unshift(...this.eventQueue);
     }
@@ -273,7 +273,7 @@ class SeatingAnalytics {
 
       return stats;
     } catch (error) {
-      console.error('Error getting event stats:', error);
+      // console.error('Error getting event stats:', error);
       return null;
     }
   }

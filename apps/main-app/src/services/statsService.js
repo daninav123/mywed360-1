@@ -30,7 +30,7 @@ const getUserStats = (userId) => {
     const stats = localStorage.getItem(`maloveapp_email_stats_${userId}`);
     return stats ? JSON.parse(stats) : {};
   } catch (error) {
-    console.error('Error al recuperar estadísticas:', error);
+    // console.error('Error al recuperar estadísticas:', error);
     return {};
   }
 };
@@ -82,7 +82,7 @@ const generateUserStats = async (userId) => {
 
     return stats;
   } catch (error) {
-    console.error('Error al generar estadísticas:', error);
+    // console.error('Error al generar estadísticas:', error);
     return {
       error: true,
       message: 'No se pudieron generar las estadísticas',

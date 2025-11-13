@@ -329,7 +329,7 @@ const AdminTaskTemplates = () => {
       setUserTasks(data.tasks || []);
       setUserTasksMeta(data.meta || {});
     } catch (err) {
-      console.error('Error loading user tasks:', err);
+      // console.error('Error loading user tasks:', err);
     } finally {
       setLoadingUserTasks(false);
     }
@@ -346,7 +346,7 @@ const AdminTaskTemplates = () => {
       setForm(prev => ({ ...prev, blocksJson: JSON.stringify(blocks, null, 2) }));
       setEditingBlock(null);
     } catch (e) {
-      console.error('Error saving block edit:', e);
+      // console.error('Error saving block edit:', e);
     }
   };
 
@@ -357,7 +357,7 @@ const AdminTaskTemplates = () => {
       setForm(prev => ({ ...prev, blocksJson: JSON.stringify(blocks, null, 2) }));
       setEditingItem(null);
     } catch (e) {
-      console.error('Error saving item edit:', e);
+      // console.error('Error saving item edit:', e);
     }
   };
 
@@ -386,7 +386,7 @@ const AdminTaskTemplates = () => {
       setSelectedBlockForAdd(null);
       setNewSubtask({ title: '', startPct: 0, endPct: 0, priority: 'medium' });
     } catch (e) {
-      console.error('Error adding subtask:', e);
+      // console.error('Error adding subtask:', e);
     }
   };
 
@@ -398,7 +398,7 @@ const AdminTaskTemplates = () => {
       blocks[blockIndex].items.splice(itemIndex, 1);
       setForm(prev => ({ ...prev, blocksJson: JSON.stringify(blocks, null, 2) }));
     } catch (e) {
-      console.error('Error deleting item:', e);
+      // console.error('Error deleting item:', e);
     }
   };
 
@@ -413,7 +413,7 @@ const AdminTaskTemplates = () => {
       setSelectedDependencies(task.dependsOn || []);
       setShowDependenciesModal(true);
     } catch (e) {
-      console.error('Error opening dependencies modal:', e);
+      // console.error('Error opening dependencies modal:', e);
     }
   };
 
@@ -442,7 +442,7 @@ const AdminTaskTemplates = () => {
           }]);
         }
       } catch (e) {
-        console.error('Error toggling dependency:', e);
+        // console.error('Error toggling dependency:', e);
       }
     }
   };
@@ -462,7 +462,7 @@ const AdminTaskTemplates = () => {
         setSelectedDependencies([]);
       }
     } catch (e) {
-      console.error('Error saving dependencies:', e);
+      // console.error('Error saving dependencies:', e);
     }
   };
 

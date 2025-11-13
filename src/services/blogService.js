@@ -77,7 +77,7 @@ async function fetchFromBackend({ page, pageSize, language, skipLocalCandidates 
   ];
   let candidates = Array.from(new Set(rawCandidates.filter((v) => v !== undefined && v !== null)));
   if (skipLocalCandidates) {
-    console.info('[blogService] Local backend in backoff, saltando candidatos locales');
+    // console.info('[blogService] Local backend in backoff, saltando candidatos locales');
     candidates = candidates.filter(
       (candidate) =>
         candidate && !/^https?:\/\/localhost(?::4004)?$/i.test(candidate) && candidate !== ''
@@ -102,7 +102,7 @@ async function fetchFromBackend({ page, pageSize, language, skipLocalCandidates 
   const axios = (await import('axios')).default;
   for (const base of candidates) {
     if (!candidateAvailable(base)) {
-      console.info('[blogService] candidato wedding-news en backoff', { base });
+      // console.info('[blogService] candidato wedding-news en backoff', { base });
       continue;
     }
     try {
@@ -118,7 +118,7 @@ async function fetchFromBackend({ page, pageSize, language, skipLocalCandidates 
         timeout: timeoutMs,
         validateStatus: () => true,
       });
-      console.info('[blogService] candidato wedding-news', {
+      // console.info('[blogService] candidato wedding-news', {
         base,
         status: resp.status,
         isArray: Array.isArray(resp.data),
@@ -134,7 +134,7 @@ async function fetchFromBackend({ page, pageSize, language, skipLocalCandidates 
       sawError = true;
       backoffCandidate(base);
     } catch (error) {
-      console.warn('[blogService] error al consultar wedding-news', {
+      // console.warn('[blogService] error al consultar wedding-news', {
         base,
         message: error?.message,
       });
@@ -168,7 +168,7 @@ async function fetchFromNewsApi(page, pageSize, lang) {
 
   const resp = await axios.get('https://newsapi.org/v2/everything', endpointOpts);
   if (resp.status === 426) {
-    console.warn('NewsAPI 426 Upgrade Required -> plan gratuito limitado a primera pagina.');
+    // console.warn('NewsAPI 426 Upgrade Required -> plan gratuito limitado a primera pagina.');
     return [];
   }
   if (resp.status >= 400) {
@@ -614,13 +614,13 @@ export async function fetchWeddingNews(page = 1, pageSize = 10, language = 'es')
   });
 
   if (rssData === null) {
-    console.warn('[blogService] Backend wedding-news unavailable');
+    // console.warn('[blogService] Backend wedding-news unavailable');
     if (_backendAvailable()) {
       _backoffBackend(2 * 60_000);
     }
     if (!API_KEY) {
       if (fallbackBatch.length) {
-        console.info('[blogService] usando fallback wedding-news', {
+        // console.info('[blogService] usando fallback wedding-news', {
           page,
           lang,
           size: fallbackBatch.length,
@@ -640,7 +640,7 @@ export async function fetchWeddingNews(page = 1, pageSize = 10, language = 'es')
 
   if (!API_KEY) {
     if (fallbackBatch.length) {
-      console.info('[blogService] usando fallback wedding-news', {
+      // console.info('[blogService] usando fallback wedding-news', {
         page,
         lang,
         size: fallbackBatch.length,
@@ -654,7 +654,7 @@ export async function fetchWeddingNews(page = 1, pageSize = 10, language = 'es')
     const news = await fetchFromNewsApi(page, pageSize, lang);
     if (!news.length) {
       if (fallbackBatch.length) {
-        console.info('[blogService] usando fallback wedding-news', {
+        // console.info('[blogService] usando fallback wedding-news', {
           page,
           lang,
           size: fallbackBatch.length,
@@ -668,9 +668,9 @@ export async function fetchWeddingNews(page = 1, pageSize = 10, language = 'es')
       lang
     );
   } catch (error) {
-    console.warn('[blogService] NewsAPI fallback failed', error);
+    // console.warn('[blogService] NewsAPI fallback failed', error);
     if (fallbackBatch.length) {
-      console.info('[blogService] usando fallback wedding-news', {
+      // console.info('[blogService] usando fallback wedding-news', {
         page,
         lang,
         size: fallbackBatch.length,
@@ -697,7 +697,7 @@ async function maybeTranslatePosts(posts, lang) {
       copy.title = await translateText(copy.title, lang, '');
       copy.description = await translateText(copy.description, lang, '');
     } catch (error) {
-      console.warn('[blogService] translateText failed', error);
+      // console.warn('[blogService] translateText failed', error);
     }
     translated.push(copy);
   }

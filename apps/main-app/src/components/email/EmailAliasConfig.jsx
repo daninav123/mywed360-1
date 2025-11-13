@@ -26,7 +26,7 @@ const EmailAliasConfig = ({ user, onClose, onSuccess }) => {
   // Protección: Si no hay usuario, cerrar el modal (solo una vez)
   useEffect(() => {
     if (!user?.uid) {
-      console.warn('[EmailAliasConfig] No user provided, closing modal');
+      // console.warn('[EmailAliasConfig] No user provided, closing modal');
       if (onClose) onClose();
       return;
     }
@@ -52,7 +52,7 @@ const EmailAliasConfig = ({ user, onClose, onSuccess }) => {
           }
         }
       } catch (err) {
-        console.error('Error loading current email:', err);
+        // console.error('Error loading current email:', err);
       }
     })();
   }, [user?.uid]);
@@ -99,7 +99,7 @@ const EmailAliasConfig = ({ user, onClose, onSuccess }) => {
         setAvailable(true);
       }
     } catch (err) {
-      console.error('[EmailAliasConfig] Failed to check availability:', err);
+      // console.error('[EmailAliasConfig] Failed to check availability:', err);
       setError(tAlias('errors.checkFailed'));
       setAvailable(false);
     } finally {
@@ -177,7 +177,7 @@ const EmailAliasConfig = ({ user, onClose, onSuccess }) => {
         onClose();
       }
     } catch (err) {
-      console.error('[EmailAliasConfig] Failed to save alias:', err);
+      // console.error('[EmailAliasConfig] Failed to save alias:', err);
       setError(tAlias('errors.saveFailed'));
     } finally {
       setLoading(false);

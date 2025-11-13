@@ -78,7 +78,7 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
           window.dispatchEvent(new Event('maloveapp-suppliers'));
         }
       } catch (searchError) {
-        console.error('[ProviderSearchModal] Search error:', searchError);
+        // console.error('[ProviderSearchModal] Search error:', searchError);
         setToast({
           message: tEmail('providerSearch.messages.errorRetry'),
           type: 'error',

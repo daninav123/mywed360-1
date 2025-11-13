@@ -81,7 +81,7 @@ export default function WhatsAppSender({
       onBatchCreated?.(res);
       onClose?.();
     } catch (e) {
-      console.error(e);
+      // console.error(e);
       setError('No se pudo crear el lote');
     } finally {
       setSending(false);

@@ -28,7 +28,7 @@ export async function createInvitationPrintBatch({
     return { success: true, ...json };
   } catch (error) {
     if (import.meta.env.DEV) {
-      console.warn('[printService] createInvitationPrintBatch error', error);
+      // console.warn('[printService] createInvitationPrintBatch error', error);
     }
     return { success: false, error: error?.message || 'print-batch-error' };
   }

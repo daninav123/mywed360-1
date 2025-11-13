@@ -90,7 +90,7 @@ function disableRemoteGamification(reason) {
   remoteDisableReason =
     typeof reason === 'string' ? reason : reason?.message || reason?.status || 'remote-disabled';
   if (typeof console !== 'undefined') {
-    console.warn(
+    // console.warn(
       '[GamificationService] Deshabilitando integración remota de gamificación:',
       remoteDisableReason
     );
@@ -131,7 +131,7 @@ async function getAuthToken() {
   try {
     return await user.getIdToken(true);
   } catch (error) {
-    console.warn('[GamificationService] No se pudo refrescar el token, usando caché:', error);
+    // console.warn('[GamificationService] No se pudo refrescar el token, usando caché:', error);
     return await user.getIdToken().catch(() => {
       throw new Error('GamificationService: no se pudo obtener el token de autenticación');
     });

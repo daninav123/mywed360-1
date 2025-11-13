@@ -121,7 +121,7 @@ class FinanceService {
         ...budgetDoc.data(),
       };
     } catch (error) {
-      console.error('Error getting budget:', error);
+      // console.error('Error getting budget:', error);
       throw error;
     }
   }
@@ -144,7 +144,7 @@ class FinanceService {
 
       return true;
     } catch (error) {
-      console.error('Error saving budget:', error);
+      // console.error('Error saving budget:', error);
       throw error;
     }
   }
@@ -171,7 +171,7 @@ class FinanceService {
         ...doc.data(),
       }));
     } catch (error) {
-      console.error('Error getting expenses:', error);
+      // console.error('Error getting expenses:', error);
       throw error;
     }
   }
@@ -194,7 +194,7 @@ class FinanceService {
         ...expenseData,
       };
     } catch (error) {
-      console.error('Error creating expense:', error);
+      // console.error('Error creating expense:', error);
       throw error;
     }
   }
@@ -213,7 +213,7 @@ class FinanceService {
 
       return true;
     } catch (error) {
-      console.error('Error updating expense:', error);
+      // console.error('Error updating expense:', error);
       throw error;
     }
   }
@@ -227,7 +227,7 @@ class FinanceService {
       await deleteDoc(expenseRef);
       return true;
     } catch (error) {
-      console.error('Error deleting expense:', error);
+      // console.error('Error deleting expense:', error);
       throw error;
     }
   }
@@ -249,7 +249,7 @@ class FinanceService {
 
       return true;
     } catch (error) {
-      console.error('Error recording payment:', error);
+      // console.error('Error recording payment:', error);
       throw error;
     }
   }
@@ -292,7 +292,7 @@ class FinanceService {
 
       return status;
     } catch (error) {
-      console.error('Error updating expense status:', error);
+      // console.error('Error updating expense status:', error);
       throw error;
     }
   }
@@ -347,7 +347,7 @@ class FinanceService {
         expensesCount: expenses.length,
       };
     } catch (error) {
-      console.error('Error calculating budget stats:', error);
+      // console.error('Error calculating budget stats:', error);
       throw error;
     }
   }
@@ -387,7 +387,7 @@ class FinanceService {
 
       return stats;
     } catch (error) {
-      console.error('Error generating report:', error);
+      // console.error('Error generating report:', error);
       throw error;
     }
   }
@@ -411,7 +411,7 @@ class FinanceService {
         Notas: expense.notes || '',
       }));
     } catch (error) {
-      console.error('Error exporting data:', error);
+      // console.error('Error exporting data:', error);
       throw error;
     }
   }
@@ -447,7 +447,7 @@ export function useFinance(weddingId) {
         setExpenses(expensesData);
         setStats(statsData);
       } catch (error) {
-        console.error('Error loading finance data:', error);
+        // console.error('Error loading finance data:', error);
       } finally {
         setLoading(false);
       }

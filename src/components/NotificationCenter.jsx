@@ -70,7 +70,7 @@ const NotificationCenter = () => {
       setNotifications(notificationData.notifications || []);
       setUnreadCount(notificationData.unreadCount || 0);
     } catch (error) {
-      console.error('Error al cargar notificaciones:', error);
+      // console.error('Error al cargar notificaciones:', error);
     } finally {
       setIsLoading(false);
     }
@@ -155,7 +155,7 @@ const NotificationCenter = () => {
               }
               removeToast(toastElement);
             } catch (err) {
-              console.error('toast action failed', err);
+              // console.error('toast action failed', err);
             }
           });
           container && container.appendChild(b);
@@ -289,7 +289,7 @@ const NotificationCenter = () => {
         setUnreadCount((prev) => Math.max(0, prev - 1));
       }
     } catch (error) {
-      console.error('Error al eliminar notificación:', error);
+      // console.error('Error al eliminar notificación:', error);
     }
   };
 
@@ -303,7 +303,7 @@ const NotificationCenter = () => {
 
       setUnreadCount(0);
     } catch (error) {
-      console.error('Error al marcar todas como leídas:', error);
+      // console.error('Error al marcar todas como leídas:', error);
     }
   };
 
@@ -427,7 +427,7 @@ const NotificationCenter = () => {
                                   )
                                 );
                               } catch (err) {
-                                console.error('accept meeting failed', err);
+                                // console.error('accept meeting failed', err);
                               }
                             }}
                           >
@@ -473,7 +473,7 @@ const NotificationCenter = () => {
                                   )
                                 );
                               } catch (err) {
-                                console.error('accept task failed', err);
+                                // console.error('accept task failed', err);
                               }
                             }}
                           >
@@ -517,7 +517,7 @@ const NotificationCenter = () => {
                                   )
                                 );
                               } catch (err) {
-                                console.error('accept budget failed', err);
+                                // console.error('accept budget failed', err);
                               }
                             }}
                           >

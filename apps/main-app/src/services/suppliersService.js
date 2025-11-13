@@ -76,14 +76,14 @@ export async function searchSuppliersHybrid(
       filters: filters && typeof filters === 'object' ? filters : {},
     };
 
-    console.log('🔍 [searchSuppliersHybrid] Iniciando búsqueda:', payload);
+    // console.log('🔍 [searchSuppliersHybrid] Iniciando búsqueda:', payload);
     const startTime = Date.now();
 
     // ⭐ NUEVO: Timeout de 30 segundos
     const controller = new AbortController();
     const timeoutId = setTimeout(() => {
       controller.abort();
-      console.log('🔍 [searchSuppliersHybrid] Iniciando búsqueda:', payload);
+      // console.log('⏱️ [searchSuppliersHybrid] Búsqueda abortada por timeout (30s)');
     }, 30000);
 
     try {
@@ -102,33 +102,33 @@ export async function searchSuppliersHybrid(
       const searchLocation = payload.location;
       const searchService = payload.service;
       
-      console.log(`🔎 [searchSuppliersHybrid] Query: "${searchQuery}", Location: "${searchLocation}", Service: "${searchService}"`);
+      // console.log(`🔎 [searchSuppliersHybrid] Query: "${searchQuery}", Location: "${searchLocation}", Service: "${searchService}"`);
       
       if (searchQuery && searchQuery.length > 2) {
-        console.log('🌐 [searchSuppliersHybrid] Buscando también en Google Places...');
+        // console.log('🌐 [searchSuppliersHybrid] Buscando también en Google Places...');
         // Detectar si es nombre específico (una palabra sin espacios o empieza con mayúscula)
         const isSpecificName = !searchQuery.includes(' ') || /^[A-Z]/.test(searchQuery);
-        console.log(`🎯 [searchSuppliersHybrid] Es nombre específico: ${isSpecificName}`);
+        // console.log(`🎯 [searchSuppliersHybrid] Es nombre específico: ${isSpecificName}`);
         googlePlacesPromise = searchGooglePlaces(searchQuery, searchLocation, searchService, isSpecificName);
       } else {
-        console.log(`⚠️ [searchSuppliersHybrid] Query muy corto o vacío: "${searchQuery}"`);
+        // console.log(`⚠️ [searchSuppliersHybrid] Query muy corto o vacío: "${searchQuery}"`);
       }
 
       // 3. Esperar ambas búsquedas
       const [response, googleResults] = await Promise.all([backendPromise, googlePlacesPromise]);
 
       const elapsed = Date.now() - startTime;
-      console.log(`✅ [searchSuppliersHybrid] Respuesta recibida en ${elapsed}ms`);
+      // console.log(`✅ [searchSuppliersHybrid] Respuesta recibida en ${elapsed}ms`);
 
       // Validar response
       if (!response.ok) {
         const error = await response.json().catch(() => ({}));
-        console.error('❌ [searchSuppliersHybrid] Error del servidor:', error);
+        // console.error('❌ [searchSuppliersHybrid] Error del servidor:', error);
         throw new Error(error.error || `Error ${response.status}: ${response.statusText}`);
       }
 
       const data = await response.json();
-      console.log('📊 [searchSuppliersHybrid] Datos recibidos:', {
+      // console.log('📊 [searchSuppliersHybrid] Datos recibidos:', {
         count: data.count,
         breakdown: data.breakdown,
         suppliersLength: data.suppliers?.length || 0,
@@ -139,7 +139,7 @@ export async function searchSuppliersHybrid(
       let allSuppliers = data.suppliers || [];
 
       if (googleResults.results && googleResults.results.length > 0) {
-        console.log(`✅ [searchSuppliersHybrid] Añadiendo ${googleResults.results.length} resultados de Google Places`);
+        // console.log(`✅ [searchSuppliersHybrid] Añadiendo ${googleResults.results.length} resultados de Google Places`);
 
         // Transformar resultados de Google Places al formato esperado
         const googleSuppliersFormatted = googleResults.results.map(place => ({
@@ -166,7 +166,7 @@ export async function searchSuppliersHybrid(
 
       // 5. Clasificar automáticamente si hay proveedores
       if (allSuppliers.length > 0) {
-        console.log('🤖 [searchSuppliersHybrid] Clasificando proveedores automáticamente...');
+        // console.log('🤖 [searchSuppliersHybrid] Clasificando proveedores automáticamente...');
         allSuppliers = classifySuppliers(allSuppliers);
       }
 
@@ -188,7 +188,7 @@ export async function searchSuppliersHybrid(
       clearTimeout(timeoutId);
 
       if (fetchError.name === 'AbortError') {
-        console.error('⏱️ [searchSuppliersHybrid] Request abortado por timeout');
+        // console.error('⏱️ [searchSuppliersHybrid] Request abortado por timeout');
         throw new Error(
           'La búsqueda está tardando demasiado. Por favor, intenta con términos más específicos.'
         );
@@ -196,7 +196,7 @@ export async function searchSuppliersHybrid(
       throw fetchError;
     }
   } catch (error) {
-    console.error('💥 [searchSuppliersHybrid] Error en búsqueda híbrida:', error);
+    // console.error('💥 [searchSuppliersHybrid] Error en búsqueda híbrida:', error);
     throw error;
   }
 }
@@ -226,7 +226,7 @@ export async function trackSupplierAction(supplierId, action, userIdOrMetadata =
     });
   } catch (error) {
     // No propagar error, es tracking
-    console.warn('Error tracking action:', error);
+    // console.warn('Error tracking action:', error);
   }
 }
 
@@ -247,7 +247,7 @@ export async function getSupplierDetails(supplierId) {
     const data = await response.json();
     return data.supplier;
   } catch (error) {
-    console.error('Error obteniendo detalles:', error);
+    // console.error('Error obteniendo detalles:', error);
     throw error;
   }
 }
@@ -277,7 +277,7 @@ export async function searchSuppliersTavily(query, location, budget, service) {
 
     return await response.json();
   } catch (error) {
-    console.error('Error en Tavily:', error);
+    // console.error('Error en Tavily:', error);
     throw error;
   }
 }

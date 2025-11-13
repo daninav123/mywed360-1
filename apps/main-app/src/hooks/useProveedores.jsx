@@ -254,7 +254,7 @@ export const useProveedores = () => {
             });
             lines.sort((a, b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
           } catch (err) {
-            console.warn('[useProveedores] no se pudieron cargar líneas de servicio', err);
+            // console.warn('[useProveedores] no se pudieron cargar líneas de servicio', err);
           }
           return { ...prov, serviceLines: lines };
         })
@@ -310,7 +310,7 @@ export const useProveedores = () => {
       applyFiltersRef.current(enrichedProviders);
       setLoading(false);
     } catch (err) {
-      console.error('Error al cargar los proveedores:', err);
+      // console.error('Error al cargar los proveedores:', err);
       try {
         setProviders([]);
         applyFiltersRef.current([]);
@@ -392,7 +392,7 @@ export const useProveedores = () => {
         syncServiceLinesLocally(providerId, (prev) => [...prev, nextLine]);
         return docRef.id;
       } catch (err) {
-        console.warn('[useProveedores] addServiceLine failed', err);
+        // console.warn('[useProveedores] addServiceLine failed', err);
         throw err;
       }
     },
@@ -411,7 +411,7 @@ export const useProveedores = () => {
         );
         return true;
       } catch (err) {
-        console.warn('[useProveedores] updateServiceLine failed', err);
+        // console.warn('[useProveedores] updateServiceLine failed', err);
         return false;
       }
     },
@@ -428,7 +428,7 @@ export const useProveedores = () => {
         syncServiceLinesLocally(providerId, (prev) => prev.filter((line) => line.id !== lineId));
         return true;
       } catch (err) {
-        console.warn('[useProveedores] deleteServiceLine failed', err);
+        // console.warn('[useProveedores] deleteServiceLine failed', err);
         return false;
       }
     },
@@ -453,7 +453,7 @@ export const useProveedores = () => {
             const mergeRef = doc(ref, mergeId);
             await deleteDoc(mergeRef);
           } catch (err) {
-            console.warn('[useProveedores] merge remove line failed', err);
+            // console.warn('[useProveedores] merge remove line failed', err);
           }
         }
 
@@ -463,7 +463,7 @@ export const useProveedores = () => {
         });
         return true;
       } catch (err) {
-        console.warn('[useProveedores] mergeServiceLines failed', err);
+        // console.warn('[useProveedores] mergeServiceLines failed', err);
         return false;
       }
     },
@@ -486,7 +486,7 @@ export const useProveedores = () => {
         };
         await addDoc(ref, payload);
       } catch (err) {
-        console.warn('[useProveedores] addMeetingEntry failed', err);
+        // console.warn('[useProveedores] addMeetingEntry failed', err);
       }
     },
     [getMeetingsCollectionSafe]
@@ -539,7 +539,7 @@ export const useProveedores = () => {
 
         return newProvider;
       } catch (err) {
-        console.error('Error al añadir proveedor:', err);
+        // console.error('Error al añadir proveedor:', err);
         setError('No se pudo añadir el proveedor. Inténtalo de nuevo más tarde.');
         return null;
       }
@@ -640,7 +640,7 @@ export const useProveedores = () => {
               status: 'Confirmado',
             });
           } catch (err) {
-            console.warn('[useProveedores] recordSupplierInsight failed', err);
+            // console.warn('[useProveedores] recordSupplierInsight failed', err);
           }
         }
 
@@ -648,7 +648,7 @@ export const useProveedores = () => {
         loadProviders();
         return true;
       } catch (err) {
-        console.error('Error al actualizar proveedor:', err);
+        // console.error('Error al actualizar proveedor:', err);
         setError('Error al actualizar el proveedor. Inténtalo de nuevo.');
         return false;
       } finally {
@@ -692,7 +692,7 @@ export const useProveedores = () => {
             });
           }
         } catch (err) {
-          console.error('Error al guardar reserva', err);
+          // console.error('Error al guardar reserva', err);
         }
       }
 
@@ -733,7 +733,7 @@ export const useProveedores = () => {
         loadProviders();
         return true;
       } catch (err) {
-        console.error('Error al eliminar proveedor:', err);
+        // console.error('Error al eliminar proveedor:', err);
         setError('No se pudo eliminar el proveedor. Inténtalo de nuevo más tarde.');
         return false;
       }
@@ -763,7 +763,7 @@ export const useProveedores = () => {
             await updateDoc(providerRef, { favorite: newFav, updated: serverTimestamp() });
           }
         } catch (err) {
-          console.error('Error al marcar favorito', err);
+          // console.error('Error al marcar favorito', err);
         }
       }
     },

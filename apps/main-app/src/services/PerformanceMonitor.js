@@ -82,7 +82,7 @@ class PerformanceMonitor {
       log_level: this.config.logLevel,
     });
 
-    console.info("[perfmon] Monitor de rendimiento inicializado");
+    // console.info("[perfmon] Monitor de rendimiento inicializado");
     // Try to derive user context from localStorage (best-effort)
     try {
       const raw = localStorage.getItem('authUser');
@@ -162,7 +162,7 @@ class PerformanceMonitor {
     }
 
     if (this.config.logLevel >= 3) {
-      console.debug(`📊 Evento: ${name}`, data);
+      // console.debug(`📊 Evento: ${name}`, data);
     }
   }
 
@@ -191,7 +191,7 @@ class PerformanceMonitor {
     // NO registrar en consola aquí para evitar bucles con errorLogger
     // errorLogger ya maneja el logging a consola
     if (this.config.logLevel >= 2 && typeof console.warn === 'function') {
-      console.warn(`[PerformanceMonitor] ${errorType}:`, error?.message || error);
+      // console.warn(`[PerformanceMonitor] ${errorType}:`, error?.message || error);
     }
 
     // Enviar inmediatamente si es un error crítico
@@ -257,7 +257,7 @@ class PerformanceMonitor {
     }
 
     if (this.config.logLevel >= 3) {
-      console.debug(`⏱️ Tiempo ${metricName}: ${durationMs.toFixed(2)}ms`);
+      // console.debug(`⏱️ Tiempo ${metricName}: ${durationMs.toFixed(2)}ms`);
     }
 
     // Si la operación es lenta (> 1 segundo), registrar como evento
@@ -372,12 +372,12 @@ class PerformanceMonitor {
         });
 
         if (!response.ok) {
-          console.warn('Error al enviar métricas:', response.statusText);
+          // console.warn('Error al enviar métricas:', response.statusText);
         }
       } else {
         // Si no hay URL, guardar localmente para desarrollo
         if (this.config.logLevel >= 2) {
-          console.info("[perfmon] Monitor de rendimiento inicializado");
+          // console.info("[perfmon] Monitor de rendimiento inicializado");
         }
 
         // Almacenar últimas métricas en localStorage para debugging
@@ -388,7 +388,7 @@ class PerformanceMonitor {
         }
       }
     } catch (error) {
-      console.error('Error al procesar métricas:', error);
+      // console.error('Error al procesar métricas:', error);
 
       // Restaurar eventos y errores no enviados
       this.metrics.events = [...metricsToSend.events, ...this.metrics.events];

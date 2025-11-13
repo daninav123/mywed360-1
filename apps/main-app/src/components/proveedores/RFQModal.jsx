@@ -510,7 +510,7 @@ export default function RFQModal({
                       }
                       setAttachments((prev) => [...prev, ...uploaded]);
                     } catch (e) {
-                      console.warn(
+                      // console.warn(
                         t('suppliers.rfqModal.errors.upload', {
                           message: e?.message || e,
                         })

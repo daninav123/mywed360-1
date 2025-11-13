@@ -23,7 +23,7 @@ export default function AcceptInvitation() {
         setTimeout(() => navigate(`/bodas/${weddingId}`), 2000);
       })
       .catch((err) => {
-        console.error(err);
+        // console.error(err);
         setErrorMessage(err?.message || '');
         setStatusKey('error');
       });

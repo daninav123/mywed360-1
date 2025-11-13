@@ -71,7 +71,7 @@ const AdminPortfolio = () => {
       
       toast.success(t('admin.portfolio.exported', { total: result.total }));
     } catch (error) {
-      console.error('[AdminPortfolio] Export error:', error);
+      // console.error('[AdminPortfolio] Export error:', error);
       toast.error(t('admin.portfolio.exportError', { message: error.message }));
     } finally {
       setExporting(false);

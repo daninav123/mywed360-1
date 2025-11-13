@@ -144,7 +144,7 @@ const AdminLogin = () => {
       setBlockedUntil(null);
       navigate('/admin/dashboard', { replace: true });
     } catch (submitError) {
-      console.error('[AdminLogin] Error durante el login admin:', submitError);
+      // console.error('[AdminLogin] Error durante el login admin:', submitError);
       setError('No fue posible iniciar sesión. Inténtalo de nuevo.');
     } finally {
       setIsSubmitting(false);
@@ -192,7 +192,7 @@ const AdminLogin = () => {
       setMfaCode('');
       navigate('/admin/dashboard', { replace: true });
     } catch (mfaSubmitError) {
-      console.error('[AdminLogin] Error al validar MFA:', mfaSubmitError);
+      // console.error('[AdminLogin] Error al validar MFA:', mfaSubmitError);
       setMfaError('No fue posible validar el código. Inténtalo de nuevo.');
     } finally {
       setIsVerifyingMfa(false);
@@ -206,7 +206,7 @@ const AdminLogin = () => {
     try {
       await logout();
     } catch (logoutError) {
-      console.warn('[AdminLogin] No se pudo cancelar la sesión MFA:', logoutError);
+      // console.warn('[AdminLogin] No se pudo cancelar la sesión MFA:', logoutError);
     }
   };
 

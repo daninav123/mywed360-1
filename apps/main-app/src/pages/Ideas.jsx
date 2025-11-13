@@ -139,7 +139,7 @@ export default function Ideas() {
 
         setPhotos(Array.isArray(loadedPhotos) ? loadedPhotos : []);
       } catch (error) {
-        console.warn('[Ideas] Error cargando datos iniciales', error);
+        // console.warn('[Ideas] Error cargando datos iniciales', error);
       } finally {
         setLoading(false);
         isLoadedRef.current = true;
@@ -287,7 +287,7 @@ export default function Ideas() {
         autoClose: 2000,
       });
     } catch (error) {
-      console.error('[Ideas] Error subiendo fotos', error);
+      // console.error('[Ideas] Error subiendo fotos', error);
       toast.update(uploadingToast, {
         render: 'No se pudieron subir las fotos.',
         type: 'error',
@@ -558,7 +558,7 @@ function IdeasBlogSection() {
           setDraft({ title: normalized[0].title, content: normalized[0].content });
         }
       } catch (error) {
-        console.warn('[IdeasBlogSection] Error cargando posts', error);
+        // console.warn('[IdeasBlogSection] Error cargando posts', error);
       } finally {
         setLoading(false);
         isLoadedRef.current = true;
@@ -575,7 +575,7 @@ function IdeasBlogSection() {
       mergeWithExisting: true,
       showNotification: false,
     })
-      .catch((error) => console.warn('[IdeasBlogSection] Error guardando posts', error))
+      .catch((error) => // console.warn('[IdeasBlogSection] Error guardando posts', error))
       .finally(() => setIsSaving(false));
   }, [posts, docPath, useFirestore]);
 

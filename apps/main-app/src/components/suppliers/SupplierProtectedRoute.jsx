@@ -14,16 +14,16 @@ export default function SupplierProtectedRoute({ children }) {
     const token = getSupplierToken();
     const supplierId = getSupplierId();
 
-    console.log('[SupplierProtectedRoute] Verificando autenticación...');
-    console.log(
+    // console.log('[SupplierProtectedRoute] Verificando autenticación...');
+    // console.log(
       '[SupplierProtectedRoute] Token:',
       token ? `${token.substring(0, 20)}...` : 'NO TOKEN'
     );
-    console.log('[SupplierProtectedRoute] Supplier ID:', supplierId);
-    console.log('[SupplierProtectedRoute] Location:', location.pathname);
+    // console.log('[SupplierProtectedRoute] Supplier ID:', supplierId);
+    // console.log('[SupplierProtectedRoute] Location:', location.pathname);
 
     const authenticated = isSupplierAuthenticated();
-    console.log('[SupplierProtectedRoute] Autenticado:', authenticated);
+    // console.log('[SupplierProtectedRoute] Autenticado:', authenticated);
 
     setIsAuth(authenticated);
     setIsChecking(false);
@@ -41,7 +41,7 @@ export default function SupplierProtectedRoute({ children }) {
   }
 
   if (!isAuth) {
-    console.warn('[SupplierProtectedRoute] No autenticado, redirigiendo a /supplier/login');
+    // console.warn('[SupplierProtectedRoute] No autenticado, redirigiendo a /supplier/login');
     return <Navigate to="/supplier/login" state={{ from: location }} replace />;
   }
 

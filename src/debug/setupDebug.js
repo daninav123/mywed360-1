@@ -23,7 +23,7 @@ function triggerViteHardReload() {
   window.__viteForceReloadLock = true;
   setTimeout(() => {
     try {
-      console.warn('[debug] Vite detectó dependencias optimizadas obsoletas. Recargando la página…');
+      // console.warn('[debug] Vite detectó dependencias optimizadas obsoletas. Recargando la página…');
     } catch {}
     window.location.reload();
   }, 60);
@@ -57,7 +57,7 @@ if (typeof window !== 'undefined') {
         } catch (e) {
           // NO usar console.error para evitar recursión
           if (typeof console.warn === 'function') {
-            console.warn('[setupDebug] Error al registrar window_error', e);
+            // console.warn('[setupDebug] Error al registrar window_error', e);
           }
         } finally {
           isHandlingError = false;
@@ -86,7 +86,7 @@ if (typeof window !== 'undefined') {
       } catch (e) {
         // NO usar console.error para evitar recursión
         if (typeof console.warn === 'function') {
-          console.warn('[setupDebug] Error al registrar unhandledrejection', e);
+          // console.warn('[setupDebug] Error al registrar unhandledrejection', e);
         }
       } finally {
         isHandlingRejection = false;

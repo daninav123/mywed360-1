@@ -37,13 +37,13 @@ async function getAuthToken({ refresh = true } = {}) {
   try {
     // Verificar que auth esté disponible
     if (!auth) {
-      console.error('[apiClient] Firebase auth no está inicializado');
+      // console.error('[apiClient] Firebase auth no está inicializado');
       return null;
     }
     
     const user = auth.currentUser;
     if (!user) {
-      if (DEBUG) console.log('[apiClient] No hay usuario autenticado');
+      if (DEBUG) // console.log('[apiClient] No hay usuario autenticado');
       // Si no hay usuario, limpiar token almacenado
       try {
         window.localStorage.removeItem(TOKEN_STORAGE_KEY);
@@ -51,13 +51,13 @@ async function getAuthToken({ refresh = true } = {}) {
       return null;
     }
 
-    if (DEBUG) console.log('[apiClient] Usuario encontrado:', user.uid);
+    if (DEBUG) // console.log('[apiClient] Usuario encontrado:', user.uid);
 
     // Siempre intentar obtener token fresco de Firebase
     // No confiar en el token almacenado porque puede estar expirado
     if (user.getIdToken) {
       try {
-        if (DEBUG) console.log('[apiClient] Solicitando token fresco...');
+        if (DEBUG) // console.log('[apiClient] Solicitando token fresco...');
         const token = await user.getIdToken(true); // Siempre refrescar
         if (token) {
           if (DEBUG) {
@@ -65,14 +65,14 @@ async function getAuthToken({ refresh = true } = {}) {
             try {
               const payload = JSON.parse(atob(token.split('.')[1]));
               const exp = new Date(payload.exp * 1000);
-              console.log('[apiClient] Token obtenido, expira:', exp.toLocaleString());
+              // console.log('[apiClient] Token obtenido, expira:', exp.toLocaleString());
             } catch {}
           }
           rememberToken(token);
           return token;
         }
       } catch (err) {
-        console.error('[apiClient] Error refreshing auth token:', err.message || err);
+        // console.error('[apiClient] Error refreshing auth token:', err.message || err);
         // Limpiar token expirado
         try {
           window.localStorage.removeItem(TOKEN_STORAGE_KEY);
@@ -80,19 +80,19 @@ async function getAuthToken({ refresh = true } = {}) {
         
         // Intentar obtener token sin refrescar (puede fallar si está expirado)
         try {
-          if (DEBUG) console.log('[apiClient] Intentando token sin refresh...');
+          if (DEBUG) // console.log('[apiClient] Intentando token sin refresh...');
           const fallbackToken = await user.getIdToken(false);
           if (fallbackToken) {
             rememberToken(fallbackToken);
             return fallbackToken;
           }
         } catch (fallbackErr) {
-          console.error('[apiClient] Error obtaining cached auth token:', fallbackErr.message || fallbackErr);
+          // console.error('[apiClient] Error obtaining cached auth token:', fallbackErr.message || fallbackErr);
         }
       }
     }
   } catch (err) {
-    console.error('[apiClient] No se pudo obtener token de autenticación:', err);
+    // console.error('[apiClient] No se pudo obtener token de autenticación:', err);
   }
   return null;
 }
@@ -272,7 +272,7 @@ function remapLegacyEndpoint(path, method = 'GET', body) {
       return { path: '/api/email/calendar-event', method: 'POST', body };
     }
   } catch (err) {
-    console.warn('[apiClient] remap legacy endpoint falló', err);
+    // console.warn('[apiClient] remap legacy endpoint falló', err);
   }
 
   return { path, method, body };

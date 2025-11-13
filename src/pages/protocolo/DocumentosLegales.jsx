@@ -232,7 +232,7 @@ function downloadAsDoc(filename, html) {
     a.remove();
     URL.revokeObjectURL(url);
   } catch (e) {
-    console.warn('No se pudo descargar la plantilla', e);
+    // console.warn('No se pudo descargar la plantilla', e);
   }
 }
 
@@ -263,7 +263,7 @@ async function downloadAsPdf(filename, html) {
     doc.save(filename.endsWith('.pdf') ? filename : `${filename}.pdf`);
     container.remove();
   } catch (e) {
-    console.warn('No se pudo generar PDF, abriendo impresión como fallback', e);
+    // console.warn('No se pudo generar PDF, abriendo impresión como fallback', e);
     const w = window.open('', '_blank');
     if (w) {
       w.document.write(html);
@@ -360,7 +360,7 @@ export default function DocumentosLegales() {
         }
       } catch (error) {
         if (!cancelled) {
-          console.warn('[DocumentosLegales] No se pudo cargar progreso legal remoto', error);
+          // console.warn('[DocumentosLegales] No se pudo cargar progreso legal remoto', error);
         }
       } finally {
         if (!cancelled) {
@@ -504,7 +504,7 @@ export default function DocumentosLegales() {
         );
         saveLegalProgress(activeWedding, safeProgress);
       } catch (error) {
-        console.warn('[DocumentosLegales] No se pudo sincronizar progreso legal', error);
+        // console.warn('[DocumentosLegales] No se pudo sincronizar progreso legal', error);
       } finally {
         progressWriteTimerRef.current = null;
       }
@@ -727,7 +727,7 @@ export default function DocumentosLegales() {
                               toast.success(tr('documents.uploaded', 'Archivo subido'));
                             } catch {}
                           } catch (err) {
-                            console.warn('Upload requirement failed', err);
+                            // console.warn('Upload requirement failed', err);
                             try {
                               toast.error(
                                 tr('documents.uploadFailed', 'No se pudo subir el archivo')
@@ -791,7 +791,7 @@ export default function DocumentosLegales() {
                                     });
                                 } catch (e) {
                                   storageDeletedOk = false;
-                                  console.warn('No se pudo borrar del Storage:', e);
+                                  // console.warn('No se pudo borrar del Storage:', e);
                                 }
                               }
                               if (fileMeta.documentId && activeWedding) {
@@ -807,7 +807,7 @@ export default function DocumentosLegales() {
                                   );
                                 } catch (err) {
                                   firestoreDeletedOk = false;
-                                  console.warn('No se pudo borrar el documento de Firestore:', err);
+                                  // console.warn('No se pudo borrar el documento de Firestore:', err);
                                 }
                               }
                               updateProgress((current) => {

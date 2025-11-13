@@ -49,7 +49,7 @@ export default function ComposeModal({ onClose, from, initial = {}, userId = nul
       await sendMail({ to, subject, body, attachments: uploaded.length ? uploaded : attachments });
       onClose();
     } catch (err) {
-      console.error('Error enviando correo:', err);
+      // console.error('Error enviando correo:', err);
       setError(String(err?.message || err) || 'No se pudo enviar el correo');
     } finally {
       setSending(false);

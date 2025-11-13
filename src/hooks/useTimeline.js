@@ -130,7 +130,7 @@ export default function useTimeline() {
         setAutomaticAlerts(data.automaticAlerts);
       }
     }, (error) => {
-      console.warn('Error al cargar timeline:', error);
+      // console.warn('Error al cargar timeline:', error);
     });
 
     unsubRef.current = unsub;
@@ -161,7 +161,7 @@ export default function useTimeline() {
         { merge: true }
       );
     } catch (error) {
-      console.error('Error al guardar timeline:', error);
+      // console.error('Error al guardar timeline:', error);
     } finally {
       setSyncInProgress(false);
     }

@@ -33,7 +33,7 @@ const EmailNotificationBadge = () => {
         const unreadEmails = emails.filter((email) => !email.read);
         setUnreadCount(unreadEmails.length);
       } catch (error) {
-        console.error('Error al comprobar correos no leídos:', error);
+        // console.error('Error al comprobar correos no leídos:', error);
       } finally {
         setLoading(false);
       }
@@ -53,7 +53,7 @@ const EmailNotificationBadge = () => {
     try {
       navigate('/email');
     } catch (error) {
-      console.error('No se pudo navegar al inbox', error);
+      // console.error('No se pudo navegar al inbox', error);
     }
   };
 

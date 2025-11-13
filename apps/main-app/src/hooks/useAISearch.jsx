@@ -199,7 +199,7 @@ const generateDemoResults = (query, t) => {
   const databaseArray = Array.isArray(demoDatabase) ? demoDatabase : [];
   
   if (databaseArray.length === 0) {
-    console.warn('[useAISearch] demoResults no es un array o está vacío, devolviendo array vacío');
+    // console.warn('[useAISearch] demoResults no es un array o está vacío, devolviendo array vacío');
     return [];
   }
 
@@ -242,12 +242,12 @@ const SEARCH_PROVIDER = 'tavily'; // String(import.meta?.env?.VITE_SEARCH_PROVID
 // DEBUG: Sistema completo de diagnóstico de variables de entorno
   // ⭐ OPTIMIZADO: Solo mostrar en DEV y cuando hay errores
   if (import.meta.env.DEV && (!import.meta.env?.VITE_SEARCH_PROVIDER || !import.meta.env?.VITE_BACKEND_BASE_URL)) {
-    console.log('🔍 [DEBUG] Diagnóstico de Variables de Entorno');
-    console.log('🎯 VITE_SEARCH_PROVIDER:', import.meta.env?.VITE_SEARCH_PROVIDER);
-    console.log('🎯 VITE_ENABLE_AI_SUPPLIERS:', import.meta.env?.VITE_ENABLE_AI_SUPPLIERS);
-    console.log('🎯 VITE_BACKEND_BASE_URL:', import.meta.env?.VITE_BACKEND_BASE_URL);
-    console.log('✅ SEARCH_PROVIDER procesado:', SEARCH_PROVIDER);
-    console.log('✅ ENABLE_BACKEND_AI procesado:', ENABLE_BACKEND_AI);
+    // console.log('🔍 [DEBUG] Diagnóstico de Variables de Entorno');
+    // console.log('🎯 VITE_SEARCH_PROVIDER:', import.meta.env?.VITE_SEARCH_PROVIDER);
+    // console.log('🎯 VITE_ENABLE_AI_SUPPLIERS:', import.meta.env?.VITE_ENABLE_AI_SUPPLIERS);
+    // console.log('🎯 VITE_BACKEND_BASE_URL:', import.meta.env?.VITE_BACKEND_BASE_URL);
+    // console.log('✅ SEARCH_PROVIDER procesado:', SEARCH_PROVIDER);
+    // console.log('✅ ENABLE_BACKEND_AI procesado:', ENABLE_BACKEND_AI);
   }
 
 export const useAISearch = () => {
@@ -303,8 +303,8 @@ export const useAISearch = () => {
             endpoint = '/api/ai-suppliers-real'; // Google Custom Search
           }
           
-          console.log('[useAISearch] 🚀 Usando endpoint:', endpoint);
-          console.log('[useAISearch] 📊 Proveedor:', SEARCH_PROVIDER);
+          // console.log('[useAISearch] 🚀 Usando endpoint:', endpoint);
+          // console.log('[useAISearch] 📊 Proveedor:', SEARCH_PROVIDER);
           
           const res = await apiPost(
             endpoint,
@@ -313,9 +313,9 @@ export const useAISearch = () => {
           );
           if (res?.ok) {
             const data = await res.json().catch(() => null);
-            console.log('[useAISearch] ✅ Respuesta exitosa de ai-suppliers:', data);
-            console.log('[useAISearch] 🖼️ Primera imagen:', data?.[0]?.image);
-            console.log('[useAISearch] 📦 Primer resultado completo:', data?.[0]);
+            // console.log('[useAISearch] ✅ Respuesta exitosa de ai-suppliers:', data);
+            // console.log('[useAISearch] 🖼️ Primera imagen:', data?.[0]?.image);
+            // console.log('[useAISearch] 📦 Primer resultado completo:', data?.[0]);
             const arr = Array.isArray(data) ? data : [];
             if (arr.length) {
               const normalized = arr
@@ -340,18 +340,18 @@ export const useAISearch = () => {
                   )
                 );
               if (normalized.length) {
-                console.log('[useAISearch] ✅ Proveedores normalizados:', normalized.length);
+                // console.log('[useAISearch] ✅ Proveedores normalizados:', normalized.length);
                 const refined = refineResults(normalized, { service: inferredService, location, t });
                 setResults(refined);
                 setLoading(false);
                 return refined;
               }
             } else {
-              console.warn('[useAISearch] ⚠️ Backend respondió OK pero sin resultados');
+              // console.warn('[useAISearch] ⚠️ Backend respondió OK pero sin resultados');
             }
           } else {
             const payload = await res.json().catch(() => null);
-            console.error('[useAISearch] ❌ ai-suppliers backend respondió error', {
+            // console.error('[useAISearch] ❌ ai-suppliers backend respondió error', {
               status: res?.status,
               payload,
             });
@@ -369,8 +369,8 @@ export const useAISearch = () => {
           }
         }
       } catch (backendError) {
-        console.warn('Fallo consultando ai-suppliers', backendError);
-        console.debug('[useAISearch] ai-suppliers excepción', backendError?.message, backendError);
+        // console.warn('Fallo consultando ai-suppliers', backendError);
+        // console.debug('[useAISearch] ai-suppliers excepción', backendError?.message, backendError);
         
         // Detectar error de red (backend no disponible)
         if (backendError?.message?.includes('fetch') || backendError?.name === 'TypeError') {
@@ -443,7 +443,7 @@ export const useAISearch = () => {
           else if (!lastError.message || lastError.message === payload?.error) lastError = err;
         }
       } catch (searchErr) {
-        console.warn('Fallo consultando search-suppliers', searchErr);
+        // console.warn('Fallo consultando search-suppliers', searchErr);
         if (!lastError) {
           lastError = searchErr instanceof Error ? searchErr : new Error(String(searchErr || 'Error'));
         }
@@ -502,7 +502,7 @@ export const useAISearch = () => {
           lastError = noResultsError;
         }
       } catch (providerErr) {
-        console.warn('Fallo consultando providers/search', providerErr);
+        // console.warn('Fallo consultando providers/search', providerErr);
         if (!lastError) {
           lastError = providerErr instanceof Error ? providerErr : new Error(String(providerErr || 'Error'));
         }
@@ -535,7 +535,7 @@ export const useAISearch = () => {
 
       // Solo usar fallback si se solicita explícitamente
       if (allowFallback) {
-        console.info('[useAISearch] Usando resultados de demostración (fallback solicitado explícitamente)');
+        // console.info('[useAISearch] Usando resultados de demostración (fallback solicitado explícitamente)');
         const demoResults = generateDemoResults(query, t);
         const refined = refineResults(demoResults, {
           service: inferredService,

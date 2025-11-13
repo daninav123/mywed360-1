@@ -84,7 +84,7 @@ const AdminRevolut = () => {
       setTransfers(Array.isArray(data?.transfers) ? data.transfers : []);
       setMeta(data?.meta || null);
     } catch (err) {
-      console.error('[AdminRevolut] Failed to load overview:', err);
+      // console.error('[AdminRevolut] Failed to load overview:', err);
       setError('No se pudo cargar la información de Revolut. Intenta de nuevo más tarde.');
     } finally {
       setLoading(false);
@@ -108,7 +108,7 @@ const AdminRevolut = () => {
       setMeta((current) => data?.meta || current);
       toast.success('Sincronización con Revolut solicitada.');
     } catch (err) {
-      console.error('[AdminRevolut] Sync failed:', err);
+      // console.error('[AdminRevolut] Sync failed:', err);
       toast.error('No se pudo solicitar la sincronización. Revisa los logs.');
     } finally {
       setSyncing(false);
@@ -122,7 +122,7 @@ const AdminRevolut = () => {
       setAccount(updated ?? DEFAULT_REVOLUT_ACCOUNT);
       toast.success('Webhooks rearmados correctamente.');
     } catch (err) {
-      console.error('[AdminRevolut] Webhook refresh failed:', err);
+      // console.error('[AdminRevolut] Webhook refresh failed:', err);
       toast.error('No se pudo rearmar los webhooks de Revolut.');
     } finally {
       setRefreshingWebhooks(false);
@@ -143,7 +143,7 @@ const AdminRevolut = () => {
         toast.warn('No se pudo desconectar la cuenta. Verifica el backend.');
       }
     } catch (err) {
-      console.error('[AdminRevolut] Disconnect failed:', err);
+      // console.error('[AdminRevolut] Disconnect failed:', err);
       toast.error('Error al desconectar la cuenta de Revolut.');
     } finally {
       setDisconnecting(false);
@@ -161,7 +161,7 @@ const AdminRevolut = () => {
         toast.warn('No se recibió enlace de autorización. Revisa el backend.');
       }
     } catch (err) {
-      console.error('[AdminRevolut] Connect link failed:', err);
+      // console.error('[AdminRevolut] Connect link failed:', err);
       toast.error('No se pudo solicitar el enlace de conexión.');
     } finally {
       setConnecting(false);

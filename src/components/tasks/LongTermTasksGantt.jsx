@@ -840,7 +840,7 @@ export default function LongTermTasksGantt({
   const emitParentSelect = useCallback(
     (parentTask) => {
       if (!parentTask || !parentTask.id) {
-        console.warn('[Gantt] Tarea padre sin id válida, se ignora selección', parentTask);
+        // console.warn('[Gantt] Tarea padre sin id válida, se ignora selección', parentTask);
         return;
       }
       if (typeof onParentSelect === 'function') {

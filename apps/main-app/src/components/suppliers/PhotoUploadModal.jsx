@@ -128,7 +128,7 @@ export default function PhotoUploadModal({ onClose, onSuccess }) {
       }
 
       const data = await response.json();
-      console.log('[PhotoUploadModal] Upload success:', data);
+      // console.log('[PhotoUploadModal] Upload success:', data);
 
       toast.success(t('suppliers.portfolio.toasts.uploaded'));
       onSuccess();
@@ -142,7 +142,7 @@ export default function PhotoUploadModal({ onClose, onSuccess }) {
         isCover: false,
       }));
     } catch (error) {
-      console.error('[PhotoUploadModal] upload error', error);
+      // console.error('[PhotoUploadModal] upload error', error);
       toast.error(
         error.message === 'upload_failed'
           ? t('suppliers.portfolio.upload.errors.uploadFailed')

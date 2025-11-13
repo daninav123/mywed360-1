@@ -94,7 +94,7 @@ export default function ExportWizardEnhanced({ isOpen, onClose, onExport, canvas
       await onExport(selectedFormat.id, options);
       onClose();
     } catch (error) {
-      console.error('Export error:', error);
+      // console.error('Export error:', error);
     }
   };
 

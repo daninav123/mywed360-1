@@ -77,7 +77,7 @@ export default function SeatingPlanPost() {
 
       return `Incluye las siguientes mesas con sus invitados:\n${tableInfo.join('\n')}`;
     } catch (err) {
-      console.error('Error al obtener información de asientos:', err);
+      // console.error('Error al obtener información de asientos:', err);
       return '';
     }
   };
@@ -103,7 +103,7 @@ export default function SeatingPlanPost() {
         category="seating-plan"
         templates={seatingPlanTemplates}
         onImageGenerated={(image) => {
-          console.log('Nuevo cartel de seating plan generado:', image);
+          // console.log('Nuevo cartel de seating plan generado:', image);
         }}
       />
     </div>

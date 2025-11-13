@@ -47,7 +47,7 @@ export default function WebEditor() {
         const galSnap = await getDocs(collection(db, 'users', uid, 'gallery'));
         setGallery(galSnap.docs.map((d) => ({ id: d.id, ...d.data() })));
       } catch (e) {
-        console.error(e);
+        // console.error(e);
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -59,7 +59,7 @@ export default function WebEditor() {
       await setDoc(doc(db, 'users', uid), { weddingInfo: info }, { merge: true });
       toast.success(t('messages.saveSuccess'));
     } catch (err) {
-      console.error(err);
+      // console.error(err);
       toast.error(t('messages.saveError'));
     }
     setLoading(false);
@@ -85,7 +85,7 @@ export default function WebEditor() {
       );
       toast.success(t('messages.saveSuccess'));
     } catch (e) {
-      console.error(e);
+      // console.error(e);
       toast.error(t('errors.generic'));
     }
     setLoading(false);
@@ -132,7 +132,7 @@ export default function WebEditor() {
       const text = data.choices?.[0]?.message?.content?.trim();
       if (text) setInfo((prev) => ({ ...prev, story: text }));
     } catch (err) {
-      console.error(err);
+      // console.error(err);
       toast.error(t('errors.openaiError'));
     }
     setAiLoading(false);
@@ -183,7 +183,7 @@ export default function WebEditor() {
       } catch {}
       if (Array.isArray(arr)) setSchedule(arr.map((item, i) => ({ ...item, temp: i })));
     } catch (err) {
-      console.error(err);
+      // console.error(err);
       toast.error(t('errors.openaiError'));
     }
     setAiLoading(false);
@@ -208,7 +208,7 @@ export default function WebEditor() {
       );
       toast.success(t('messages.saveSuccess'));
     } catch (e) {
-      console.error(e);
+      // console.error(e);
       toast.error(t('errors.generic'));
     }
     setLoading(false);

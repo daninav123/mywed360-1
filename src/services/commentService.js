@@ -34,7 +34,7 @@ const loadAllComments = (userId) => {
     const raw = store.getItem(getStorageKey(userId));
     return raw ? JSON.parse(raw) : {};
   } catch (error) {
-    console.error('Error leyendo comentarios de localStorage', error);
+    // console.error('Error leyendo comentarios de localStorage', error);
     return {};
   }
 };
@@ -45,7 +45,7 @@ const saveAllComments = (userId, mapping) => {
   try {
     store.setItem(getStorageKey(userId), JSON.stringify(mapping));
   } catch (error) {
-    console.error('Error guardando comentarios de localStorage', error);
+    // console.error('Error guardando comentarios de localStorage', error);
   }
 };
 
@@ -81,7 +81,7 @@ export async function getComments(userId, emailId) {
     }
     return comments.length ? comments : local;
   } catch (error) {
-    console.warn('getComments fallback to local', error?.message || error);
+    // console.warn('getComments fallback to local', error?.message || error);
     return local;
   }
 }
@@ -105,7 +105,7 @@ export async function addComment(userId, emailId, comment) {
       });
       return getComments(userId, emailId);
     } catch (error) {
-      console.warn('addComment Firestore failed, using local fallback', error?.message || error);
+      // console.warn('addComment Firestore failed, using local fallback', error?.message || error);
     }
   }
 
@@ -125,7 +125,7 @@ export async function deleteComment(userId, emailId, commentId) {
       await deleteDoc(ref);
       return getComments(userId, emailId);
     } catch (error) {
-      console.warn('deleteComment Firestore failed, using local fallback', error?.message || error);
+      // console.warn('deleteComment Firestore failed, using local fallback', error?.message || error);
     }
   }
 

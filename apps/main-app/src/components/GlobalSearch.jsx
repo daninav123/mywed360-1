@@ -145,7 +145,7 @@ const GlobalSearch = () => {
           providers: providerResults.slice(0, 5),
         });
       } catch (error) {
-        console.error('Error en búsqueda global:', error);
+        // console.error('Error en búsqueda global:', error);
       } finally {
         setIsLoading(false);
       }

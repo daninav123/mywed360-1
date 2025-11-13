@@ -55,28 +55,28 @@ const AdminUsers = () => {
 
   const fetchUsers = useCallback(async () => {
     const load = async () => {
-      console.log(' [AdminUsers] Starting to load users...');
+      // console.log(' [AdminUsers] Starting to load users...');
       setLoading(true);
       try {
         const data = await getUsersData();
-        console.log('  Data received from backend:', data);
-        console.log('  - Items count:', data.items?.length || 0);
-        console.log('  - First item:', data.items?.[0]);
-        console.log('  - Meta:', data.meta);
-        console.log('  - Role summary:', data.roleSummary);
+        // console.log('  Data received from backend:', data);
+        // console.log('  - Items count:', data.items?.length || 0);
+        // console.log('  - First item:', data.items?.[0]);
+        // console.log('  - Meta:', data.meta);
+        // console.log('  - Role summary:', data.roleSummary);
         
         setUsers(data.items || []);
         setRoleSummary(data.roleSummary || { owner: 0, planner: 0, assistant: 0 });
         
-        console.log('  - Users state updated:', data.items?.length || 0, 'users');
+        // console.log('  - Users state updated:', data.items?.length || 0, 'users');
       } catch (err) {
-        console.error('  Error loading users:', err);
-        console.error('  - Error message:', err.message);
-        console.error('  - Error stack:', err.stack);
+        // console.error('  Error loading users:', err);
+        // console.error('  - Error message:', err.message);
+        // console.error('  - Error stack:', err.stack);
         setError(err.message || 'Error cargando usuarios');
       } finally {
         setLoading(false);
-        console.log('  - Loading finished');
+        // console.log('  - Loading finished');
       }
     };
     load();
@@ -97,7 +97,7 @@ const AdminUsers = () => {
         setRoleSummaryError('');
       }
     } catch (error) {
-      console.warn('[AdminUsers] role summary error', error);
+      // console.warn('[AdminUsers] role summary error', error);
       setRoleSummary(createEmptyRoleSummary());
       setRoleSummaryError('No se pudo cargar el resumen por rol.');
     } finally {
@@ -133,7 +133,7 @@ const AdminUsers = () => {
       setSuspendReason('');
       setSelectedUser(null);
     } catch (error) {
-      console.error('[AdminUsers] Failed to suspend user', error);
+      // console.error('[AdminUsers] Failed to suspend user', error);
       toast.error(t('admin.users.suspendError', { message: error.message }));
     } finally {
       setIsSuspending(false);
@@ -160,7 +160,7 @@ const AdminUsers = () => {
       setReactivateNotes('');
       setSelectedUser(null);
     } catch (error) {
-      console.error('[AdminUsers] Failed to reactivate user', error);
+      // console.error('[AdminUsers] Failed to reactivate user', error);
       toast.error(t('admin.users.reactivateError', { message: error.message }));
     } finally {
       setIsReactivating(false);

@@ -40,7 +40,7 @@ export default function EmailNotification() {
         setUnreadCount(unread);
         setShowNotification(unread > 0);
       } catch (error) {
-        console.error('Error al comprobar correos nuevos:', error);
+        // console.error('Error al comprobar correos nuevos:', error);
       }
     }
 
@@ -78,7 +78,7 @@ export default function EmailNotification() {
           setShowNotification(false);
           navigate('/email');
         } catch (e) {
-          console.error('No se pudo navegar al buzón', e);
+          // console.error('No se pudo navegar al buzón', e);
         }
       }}
     >

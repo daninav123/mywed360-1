@@ -50,7 +50,7 @@ const AdminSupport = () => {
       
       toast.success(t('admin.support.responseSuccess'));
     } catch (error) {
-      console.error('[AdminSupport] Error sending response:', error);
+      // console.error('[AdminSupport] Error sending response:', error);
       toast.error(t('admin.support.responseError', { message: error.message }));
     } finally {
       setResponding(false);

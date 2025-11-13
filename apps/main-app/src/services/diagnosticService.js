@@ -26,7 +26,7 @@ class DiagnosticService {
       webhooks: await this.testWebhooks(),
     };
 
-    console.log('Resultados del diagnóstico de emails:', results);
+    // console.log('Resultados del diagnóstico de emails:', results);
     console.groupEnd();
 
     return results;
@@ -44,7 +44,7 @@ class DiagnosticService {
       apiQuota: await this.checkAPIQuota(),
     };
 
-    console.log('Resultados del diagnóstico de IA:', results);
+    // console.log('Resultados del diagnóstico de IA:', results);
     console.groupEnd();
 
     return results;
@@ -63,7 +63,7 @@ class DiagnosticService {
       rules: await this.testFirestoreRules(),
     };
 
-    console.log('Resultados del diagnóstico de Firebase:', results);
+    // console.log('Resultados del diagnóstico de Firebase:', results);
     console.groupEnd();
 
     return results;
@@ -471,7 +471,7 @@ class DiagnosticService {
    * Ejecuta un diagnóstico completo del sistema
    */
   async runFullDiagnostic() {
-    console.log('🔍 Iniciando diagnóstico completo del sistema...');
+    // console.log('🔍 Iniciando diagnóstico completo del sistema...');
 
     const results = {
       timestamp: new Date().toISOString(),
@@ -480,7 +480,7 @@ class DiagnosticService {
       firebase: await this.diagnoseFirebase(),
     };
 
-    console.log('📊 Diagnóstico completo finalizado:', results);
+    // console.log('📊 Diagnóstico completo finalizado:', results);
 
     return results;
   }

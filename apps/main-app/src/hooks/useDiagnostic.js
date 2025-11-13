@@ -84,10 +84,10 @@ export const useDiagnostic = () => {
   const runEmailDiagnostic = useCallback(async () => {
     try {
       const result = await diagnosticService.diagnoseEmailSystem();
-      console.log('📧 Diagnóstico de emails completado:', result);
+      // console.log('📧 Diagnóstico de emails completado:', result);
       return result;
     } catch (error) {
-      console.error('Error en diagnóstico de emails:', error);
+      // console.error('Error en diagnóstico de emails:', error);
       return { status: 'error', error: error.message };
     }
   }, []);
@@ -95,10 +95,10 @@ export const useDiagnostic = () => {
   const runAIDiagnostic = useCallback(async () => {
     try {
       const result = await diagnosticService.diagnoseAIChat();
-      console.log('🤖 Diagnóstico de IA completado:', result);
+      // console.log('🤖 Diagnóstico de IA completado:', result);
       return result;
     } catch (error) {
-      console.error('Error en diagnóstico de IA:', error);
+      // console.error('Error en diagnóstico de IA:', error);
       return { status: 'error', error: error.message };
     }
   }, []);
@@ -106,10 +106,10 @@ export const useDiagnostic = () => {
   const runFirebaseDiagnostic = useCallback(async () => {
     try {
       const result = await diagnosticService.diagnoseFirebase();
-      console.log('🔥 Diagnóstico de Firebase completado:', result);
+      // console.log('🔥 Diagnóstico de Firebase completado:', result);
       return result;
     } catch (error) {
-      console.error('Error en diagnóstico de Firebase:', error);
+      // console.error('Error en diagnóstico de Firebase:', error);
       return { status: 'error', error: error.message };
     }
   }, []);
@@ -117,11 +117,11 @@ export const useDiagnostic = () => {
   const runFullDiagnostic = useCallback(async () => {
     try {
       const result = await diagnosticService.runFullDiagnostic();
-      console.log('🔍 Diagnóstico completo finalizado:', result);
+      // console.log('🔍 Diagnóstico completo finalizado:', result);
       updateData(); // Actualizar después del diagnóstico
       return result;
     } catch (error) {
-      console.error('Error en diagnóstico completo:', error);
+      // console.error('Error en diagnóstico completo:', error);
       return { status: 'error', error: error.message };
     }
   }, [updateData]);
@@ -132,7 +132,7 @@ export const useDiagnostic = () => {
       await errorLogger.copyErrorsToClipboard();
       return true;
     } catch (error) {
-      console.error('Error al copiar reporte:', error);
+      // console.error('Error al copiar reporte:', error);
       return false;
     }
   }, []);

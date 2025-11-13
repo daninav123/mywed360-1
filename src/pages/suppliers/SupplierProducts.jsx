@@ -31,22 +31,22 @@ export default function SupplierProducts() {
       const token = localStorage.getItem('supplier_token');
       const supplierId = localStorage.getItem('supplier_id');
 
-      console.log('[SupplierProducts] Token:', token ? `${token.substring(0, 20)}...` : 'NO TOKEN');
-      console.log('[SupplierProducts] Supplier ID:', supplierId);
+      // console.log('[SupplierProducts] Token:', token ? `${token.substring(0, 20)}...` : 'NO TOKEN');
+      // console.log('[SupplierProducts] Supplier ID:', supplierId);
 
       if (!token || token === 'null' || token === 'undefined') {
-        console.error('[SupplierProducts] No hay token válido, redirigiendo a login');
+        // console.error('[SupplierProducts] No hay token válido, redirigiendo a login');
         navigate('/supplier/login');
         return;
       }
 
       if (!supplierId || supplierId === 'null' || supplierId === 'undefined') {
-        console.error('[SupplierProducts] No hay supplier ID válido, redirigiendo a login');
+        // console.error('[SupplierProducts] No hay supplier ID válido, redirigiendo a login');
         navigate('/supplier/login');
         return;
       }
 
-      console.log(
+      // console.log(
         '[SupplierProducts] Haciendo petición a:',
         `/api/suppliers/${supplierId}/products`
       );
@@ -58,11 +58,11 @@ export default function SupplierProducts() {
         },
       });
 
-      console.log('[SupplierProducts] Respuesta status:', response.status);
+      // console.log('[SupplierProducts] Respuesta status:', response.status);
 
       if (!response.ok) {
         if (response.status === 401) {
-          console.warn('[SupplierProducts] 401 Unauthorized, limpiando sesión');
+          // console.warn('[SupplierProducts] 401 Unauthorized, limpiando sesión');
           localStorage.removeItem('supplier_token');
           localStorage.removeItem('supplier_id');
           navigate('/supplier/login');
@@ -74,7 +74,7 @@ export default function SupplierProducts() {
       const data = await response.json();
       setProducts(data.products || []);
     } catch (error) {
-      console.error('Error:', error);
+      // console.error('Error:', error);
       toast.error('Error cargando productos');
     } finally {
       setLoading(false);
@@ -148,7 +148,7 @@ export default function SupplierProducts() {
       setShowModal(false);
       loadProducts();
     } catch (error) {
-      console.error('Error:', error);
+      // console.error('Error:', error);
       toast.error('Error guardando producto');
     }
   };
@@ -174,7 +174,7 @@ export default function SupplierProducts() {
       toast.success('Producto eliminado');
       loadProducts();
     } catch (error) {
-      console.error('Error:', error);
+      // console.error('Error:', error);
       toast.error('Error eliminando producto');
     }
   };

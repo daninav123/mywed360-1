@@ -31,7 +31,7 @@ export default function FinanceEventBridge() {
             createdAt: serverTimestamp(),
           };
           await addDoc(colRef, payload);
-          console.log('[FinanceEventBridge] Transacción creada');
+          // console.log('[FinanceEventBridge] Transacción creada');
           return;
         }
 
@@ -72,14 +72,14 @@ export default function FinanceEventBridge() {
           };
           Object.keys(patch).forEach((k) => patch[k] === undefined && delete patch[k]);
           await updateDoc(doc(db, 'weddings', activeWedding, 'transactions', targetId), patch);
-          console.log('[FinanceEventBridge] Transacción actualizada', targetId);
+          // console.log('[FinanceEventBridge] Transacción actualizada', targetId);
         } else if (action === 'delete') {
           await deleteDoc(doc(db, 'weddings', activeWedding, 'transactions', targetId));
-          console.log('[FinanceEventBridge] Transacción eliminada', targetId);
+          // console.log('[FinanceEventBridge] Transacción eliminada', targetId);
         }
       } catch (e) {
         // eslint-disable-next-line no-console
-        console.error('[FinanceEventBridge] Error al manejar evento mywed360-finance', e);
+        // console.error('[FinanceEventBridge] Error al manejar evento mywed360-finance', e);
       }
     };
 

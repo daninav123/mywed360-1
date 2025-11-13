@@ -49,7 +49,7 @@ export const getUserFolders = (userId) => {
 
     return JSON.parse(foldersJson);
   } catch (error) {
-    console.error('Error al obtener carpetas:', error);
+    // console.error('Error al obtener carpetas:', error);
     return [];
   }
 };
@@ -87,7 +87,7 @@ export const createFolder = (userId, folderName) => {
 
     return newFolder;
   } catch (error) {
-    console.error('Error al crear carpeta:', error);
+    // console.error('Error al crear carpeta:', error);
     throw error;
   }
 };
@@ -125,7 +125,7 @@ export const renameFolder = (userId, folderId, newName) => {
 
     return updatedFolders.find((folder) => folder.id === folderId);
   } catch (error) {
-    console.error('Error al renombrar carpeta:', error);
+    // console.error('Error al renombrar carpeta:', error);
     throw error;
   }
 };
@@ -157,7 +157,7 @@ export const deleteFolder = (userId, folderId) => {
 
     return true;
   } catch (error) {
-    console.error('Error al eliminar carpeta:', error);
+    // console.error('Error al eliminar carpeta:', error);
     throw error;
   }
 };
@@ -195,7 +195,7 @@ const getEmailFolderMapping = (userId) => {
 
     return JSON.parse(mappingJson);
   } catch (error) {
-    console.error('Error al obtener mapeo de correos a carpetas:', error);
+    // console.error('Error al obtener mapeo de correos a carpetas:', error);
     return {};
   }
 };
@@ -223,7 +223,7 @@ async function mirrorFoldersToCloud(userId, folders) {
       { auth: true, silent: true }
     );
   } catch (error) {
-    console.warn('[folderService] sync folders failed', error?.message || error);
+    // console.warn('[folderService] sync folders failed', error?.message || error);
   }
 }
 
@@ -236,7 +236,7 @@ async function mirrorFolderMappingToCloud(userId, mapping) {
       { auth: true, silent: true }
     );
   } catch (error) {
-    console.warn('[folderService] sync folder mapping failed', error?.message || error);
+    // console.warn('[folderService] sync folder mapping failed', error?.message || error);
   }
 }
 
@@ -256,7 +256,7 @@ async function refreshFoldersFromCloud(userId) {
       _getStorage().setItem(mappingKey, JSON.stringify(payload.mapping));
     }
   } catch (error) {
-    console.warn('[folderService] refresh folders failed', error?.message || error);
+    // console.warn('[folderService] refresh folders failed', error?.message || error);
   }
 }
 
@@ -271,7 +271,7 @@ async function refreshFolderMappingFromCloud(userId) {
       _getStorage().setItem(storageKey, JSON.stringify(payload.mapping));
     }
   } catch (error) {
-    console.warn('[folderService] refresh folder mapping failed', error?.message || error);
+    // console.warn('[folderService] refresh folder mapping failed', error?.message || error);
   }
 }
 
@@ -304,7 +304,7 @@ export const assignEmailToFolder = (userId, emailId, folderId) => {
 
     return true;
   } catch (error) {
-    console.error('Error al asignar correo a carpeta:', error);
+    // console.error('Error al asignar correo a carpeta:', error);
     throw error;
   }
 };
@@ -328,7 +328,7 @@ export const removeEmailFromFolder = (userId, emailId) => {
 
     return true;
   } catch (error) {
-    console.error('Error al quitar correo de carpeta:', error);
+    // console.error('Error al quitar correo de carpeta:', error);
     throw error;
   }
 };
@@ -359,7 +359,7 @@ const removeEmailsFromFolder = (userId, folderId) => {
 
     return true;
   } catch (error) {
-    console.error('Error al eliminar correos de carpeta:', error);
+    // console.error('Error al eliminar correos de carpeta:', error);
     throw error;
   }
 };
@@ -375,7 +375,7 @@ export const getEmailFolder = (userId, emailId) => {
     const mapping = getEmailFolderMapping(userId);
     return mapping[emailId] || null;
   } catch (error) {
-    console.error('Error al obtener carpeta de correo:', error);
+    // console.error('Error al obtener carpeta de correo:', error);
     return null;
   }
 };
@@ -395,7 +395,7 @@ export const getEmailsInFolder = (userId, folderId) => {
       .filter(([_, mappedFolderId]) => mappedFolderId === folderId)
       .map(([emailId, _]) => emailId);
   } catch (error) {
-    console.error('Error al obtener correos de carpeta:', error);
+    // console.error('Error al obtener correos de carpeta:', error);
     return [];
   }
 };
@@ -424,7 +424,7 @@ export const updateFolderUnreadCount = (userId, folderId, unreadCount) => {
     // Devolver carpeta actualizada o null si no encontrada
     return updatedFolders.find((folder) => folder.id === folderId) || null;
   } catch (error) {
-    console.error('Error al actualizar contador de no leídos:', error);
+    // console.error('Error al actualizar contador de no leídos:', error);
     return false;
   }
 };

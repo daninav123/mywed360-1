@@ -35,7 +35,7 @@ export default function useSupplierGroups() {
         setLoading(false);
       },
       (err) => {
-        console.error('Error leyendo supplierGroups:', err);
+        // console.error('Error leyendo supplierGroups:', err);
         setError(err.message);
         setLoading(false);
       }
@@ -64,7 +64,7 @@ export default function useSupplierGroups() {
         );
         return { success: true, id: ref.id };
       } catch (e) {
-        console.error('Error creando grupo proveedores:', e);
+        // console.error('Error creando grupo proveedores:', e);
         return { success: false, error: e.message };
       }
     },
@@ -92,7 +92,7 @@ export default function useSupplierGroups() {
         await deleteDoc(gRef);
         return { success: true };
       } catch (e) {
-        console.error('Error disolviendo grupo proveedores:', e);
+        // console.error('Error disolviendo grupo proveedores:', e);
         return { success: false, error: e.message };
       }
     },
@@ -121,7 +121,7 @@ export default function useSupplierGroups() {
         }
         return { success: true };
       } catch (e) {
-        console.error('Error quitando miembro del grupo:', e);
+        // console.error('Error quitando miembro del grupo:', e);
         return { success: false, error: e.message };
       }
     },
@@ -151,7 +151,7 @@ export default function useSupplierGroups() {
         );
         return { success: true };
       } catch (e) {
-        console.error('Error añadiendo miembros al grupo:', e);
+        // console.error('Error añadiendo miembros al grupo:', e);
         return { success: false, error: e.message };
       }
     },
@@ -183,7 +183,7 @@ export default function useSupplierGroups() {
         );
         return { success: true };
       } catch (e) {
-        console.error('Error actualizando grupo de proveedores:', e);
+        // console.error('Error actualizando grupo de proveedores:', e);
         return { success: false, error: e.message };
       }
     },

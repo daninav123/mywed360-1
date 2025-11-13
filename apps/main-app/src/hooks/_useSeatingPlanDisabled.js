@@ -228,7 +228,7 @@ export const useSeatingPlan = () => {
           }
         });
       } catch (error) {
-        console.warn('[useSeatingPlan] releaseLock error:', error);
+        // console.warn('[useSeatingPlan] releaseLock error:', error);
       }
     },
     [activeWedding, canPersist]
@@ -356,7 +356,7 @@ export const useSeatingPlan = () => {
         await setDoc(presenceDoc, basePayload, { merge: true });
         if (!cancelled) setCollaborationStatus('online');
       } catch (error) {
-        console.warn('[useSeatingPlan] presence set error:', error);
+        // console.warn('[useSeatingPlan] presence set error:', error);
         if (!cancelled) setCollaborationStatus('error');
       }
     };
@@ -367,7 +367,7 @@ export const useSeatingPlan = () => {
         tab,
         status: 'editing',
       }).catch((error) => {
-        console.warn('[useSeatingPlan] presence heartbeat error:', error);
+        // console.warn('[useSeatingPlan] presence heartbeat error:', error);
       });
     }, 20000);
     const presenceCollection = collection(db, 'weddings', activeWedding, 'seatingPresence');
@@ -403,7 +403,7 @@ export const useSeatingPlan = () => {
         setCollaborators(list);
       },
       (error) => {
-        console.warn('[useSeatingPlan] presence snapshot error:', error);
+        // console.warn('[useSeatingPlan] presence snapshot error:', error);
       }
     );
     return () => {
@@ -456,7 +456,7 @@ export const useSeatingPlan = () => {
         setLocks(list);
       },
       (error) => {
-        console.warn('[useSeatingPlan] locks snapshot error:', error);
+        // console.warn('[useSeatingPlan] locks snapshot error:', error);
       }
     );
     return () => {
@@ -548,7 +548,7 @@ export const useSeatingPlan = () => {
   const setGuests = useCallback((updater) => {
     // Este setter no hace nada real porque los guests vienen de useGuests
     // pero lo mantenemos para compatibilidad
-    console.warn('[useSeatingPlan] setGuests called but guests come from useGuests hook');
+    // console.warn('[useSeatingPlan] setGuests called but guests come from useGuests hook');
   }, []);
 
   // Estados de modales
@@ -671,7 +671,7 @@ export const useSeatingPlan = () => {
           }
         }
       } catch (err) {
-        console.warn('No se pudieron cargar dimensiones del sal�n:', err);
+        // console.warn('No se pudieron cargar dimensiones del sal�n:', err);
       }
     };
     loadHallDimensions();
@@ -712,11 +712,11 @@ export const useSeatingPlan = () => {
             setBackground(data.background || null);
           }
         } catch (err) {
-          console.warn('[useSeatingPlan] banquet snapshot error:', err);
+          // console.warn('[useSeatingPlan] banquet snapshot error:', err);
         }
       },
       (error) => {
-        console.warn('[useSeatingPlan] banquet snapshot error:', error);
+        // console.warn('[useSeatingPlan] banquet snapshot error:', error);
       }
     );
     return () => {
@@ -793,11 +793,11 @@ export const useSeatingPlan = () => {
             }));
           }
         } catch (err) {
-          console.warn('[useSeatingPlan] ceremony snapshot error:', err);
+          // console.warn('[useSeatingPlan] ceremony snapshot error:', err);
         }
       },
       (err) => {
-        console.warn('[useSeatingPlan] ceremony snapshot error:', err);
+        // console.warn('[useSeatingPlan] ceremony snapshot error:', err);
       }
     );
     return () => {
@@ -870,7 +870,7 @@ export const useSeatingPlan = () => {
           markPendingWrite('ceremony');
           await setDoc(ref, payload, { merge: true });
         } catch (e) {
-          console.warn('[useSeatingPlan] Autosave ceremony error:', e);
+          // console.warn('[useSeatingPlan] Autosave ceremony error:', e);
         }
       }, 800);
       return () => {
@@ -925,7 +925,7 @@ export const useSeatingPlan = () => {
           markPendingWrite('banquet');
           await setDoc(ref, payload, { merge: true });
         } catch (e) {
-          console.warn('[useSeatingPlan] Autosave banquet error:', e);
+          // console.warn('[useSeatingPlan] Autosave banquet error:', e);
         }
       }, 800);
       return () => {
@@ -1213,8 +1213,8 @@ export const useSeatingPlan = () => {
 
   const addTable = (table = {}) => {
     try {
-      console.log('[addTable] Input:', table);
-      console.log('[addTable] Current tab:', tab);
+      // console.log('[addTable] Input:', table);
+      // console.log('[addTable] Current tab:', tab);
 
       const typeHint =
         table.tableType || (table.shape === 'circle' ? 'round' : inferTableType(table));
@@ -1226,19 +1226,19 @@ export const useSeatingPlan = () => {
       });
 
       const sanitized = sanitizeTable(base, { forceAuto: base.autoCapacity });
-      console.log('[addTable] Sanitized table:', sanitized);
+      // console.log('[addTable] Sanitized table:', sanitized);
 
       if (tab === 'ceremony') {
         setTablesCeremony((prev) => {
           const newTables = [...prev, sanitized];
-          console.log('[addTable] New ceremony tables:', newTables);
+          // console.log('[addTable] New ceremony tables:', newTables);
           return newTables;
         });
       } else {
         setTablesBanquet((prev) => {
           const newTables = [...prev, sanitized];
-          console.log('[addTable] New banquet tables:', newTables);
-          console.log('[addTable] Previous count:', prev.length, '� New count:', newTables.length);
+          // console.log('[addTable] New banquet tables:', newTables);
+          // console.log('[addTable] Previous count:', prev.length, '� New count:', newTables.length);
           return newTables;
         });
       }
@@ -1247,10 +1247,10 @@ export const useSeatingPlan = () => {
       try {
         pushHistory();
       } catch (e) {
-        console.warn('[addTable] Error pushing to history:', e);
+        // console.warn('[addTable] Error pushing to history:', e);
       }
     } catch (error) {
-      console.error('[addTable] Error:', error);
+      // console.error('[addTable] Error:', error);
       throw error;
     }
   };
@@ -1258,7 +1258,7 @@ export const useSeatingPlan = () => {
   // Actualizar mesa (por ID)
   const updateTable = (tableId, updates = {}) => {
     try {
-      console.log('[updateTable] Updating table:', tableId, 'with:', updates);
+      // console.log('[updateTable] Updating table:', tableId, 'with:', updates);
 
       const setFn = tab === 'ceremony' ? setTablesCeremony : setTablesBanquet;
 
@@ -1281,7 +1281,7 @@ export const useSeatingPlan = () => {
               forceAuto: updated.autoCapacity ?? table.autoCapacity,
             });
 
-            console.log('[updateTable] Updated table:', sanitized);
+            // console.log('[updateTable] Updated table:', sanitized);
             return sanitized;
           }
           return table;
@@ -1292,10 +1292,10 @@ export const useSeatingPlan = () => {
       try {
         pushHistory();
       } catch (e) {
-        console.warn('[updateTable] Error pushing to history:', e);
+        // console.warn('[updateTable] Error pushing to history:', e);
       }
     } catch (error) {
-      console.error('[updateTable] Error:', error);
+      // console.error('[updateTable] Error:', error);
       throw error;
     }
   };
@@ -1490,7 +1490,7 @@ export const useSeatingPlan = () => {
         unassignedGuests: result.unassignedGuests || [],
       };
     } catch (error) {
-      console.error('[generateAutoLayoutFromGuests] Error:', error);
+      // console.error('[generateAutoLayoutFromGuests] Error:', error);
       return {
         success: false,
         message: 'Error generando el layout automático',
@@ -1506,7 +1506,7 @@ export const useSeatingPlan = () => {
     try {
       return analyzeGuestAssignments(guests);
     } catch (error) {
-      console.error('[analyzeCurrentGuests] Error:', error);
+      // console.error('[analyzeCurrentGuests] Error:', error);
       return {
         tables: [],
         unassignedGuests: [],
@@ -1534,7 +1534,7 @@ export const useSeatingPlan = () => {
     allowOvercapacity = false,
   } = {}) => {
     try {
-      console.log('[setupSeatingPlanAutomatically] Iniciando generación automática...');
+      // console.log('[setupSeatingPlanAutomatically] Iniciando generación automática...');
 
       // PASO 1: Analizar invitados actuales
       const analysis = analyzeCurrentGuests();
@@ -1547,7 +1547,7 @@ export const useSeatingPlan = () => {
         };
       }
 
-      console.log('[setupSeatingPlanAutomatically] Invitados encontrados:', analysis.totalGuests);
+      // console.log('[setupSeatingPlanAutomatically] Invitados encontrados:', analysis.totalGuests);
 
       // PASO 2: Determinar layout óptimo automáticamente
       let layoutType = layoutPreference;
@@ -1563,7 +1563,7 @@ export const useSeatingPlan = () => {
         } else {
           layoutType = 'columns';
         }
-        console.log(
+        // console.log(
           '[setupSeatingPlanAutomatically] Layout seleccionado automáticamente:',
           layoutType
         );
@@ -1573,14 +1573,14 @@ export const useSeatingPlan = () => {
       const layoutResult = generateAutoLayoutFromGuests(layoutType);
 
       if (!layoutResult.success) {
-        console.error(
+        // console.error(
           '[setupSeatingPlanAutomatically] Error generando layout:',
           layoutResult.message
         );
         return layoutResult;
       }
 
-      console.log('[setupSeatingPlanAutomatically] Layout generado:', {
+      // console.log('[setupSeatingPlanAutomatically] Layout generado:', {
         mesas: layoutResult.tablesGenerated,
         asignados: layoutResult.guestsAssigned,
       });
@@ -1588,12 +1588,12 @@ export const useSeatingPlan = () => {
       // PASO 4: Esperar un momento para que el estado se actualice
       await new Promise((resolve) => setTimeout(resolve, 500));
 
-      console.log('[setupSeatingPlanAutomatically] Iniciando auto-asignación...');
+      // console.log('[setupSeatingPlanAutomatically] Iniciando auto-asignación...');
 
       // PASO 5: Auto-asignar invitados pendientes
       const assignResult = await autoAssignGuests();
 
-      console.log('[setupSeatingPlanAutomatically] Auto-asignación completada:', {
+      // console.log('[setupSeatingPlanAutomatically] Auto-asignación completada:', {
         resultado: assignResult,
         asignados: assignResult.assigned || 0,
         ok: assignResult.ok,
@@ -1615,7 +1615,7 @@ export const useSeatingPlan = () => {
         },
       };
     } catch (error) {
-      console.error('[setupSeatingPlanAutomatically] Error:', error);
+      // console.error('[setupSeatingPlanAutomatically] Error:', error);
       return {
         success: false,
         message: 'Error en la generación automática. Inténtalo de nuevo.',
@@ -1633,7 +1633,7 @@ export const useSeatingPlan = () => {
         table: tableId == null ? null : String(tableId),
       });
     } catch (error) {
-      console.error('[moveGuest] Error actualizando invitado:', error);
+      // console.error('[moveGuest] Error actualizando invitado:', error);
     }
   };
   const moveGuestToSeat = (guestId, tableId, _seatIdx) => {
@@ -1686,17 +1686,17 @@ export const useSeatingPlan = () => {
   // Auto-asignación y sugerencias básicas
   const autoAssignGuests = async () => {
     try {
-      console.log('[autoAssignGuests] Iniciando... Total guests:', guests.length);
+      // console.log('[autoAssignGuests] Iniciando... Total guests:', guests.length);
 
       const pending = guests.filter((g) => !g.tableId && !g.table);
-      console.log('[autoAssignGuests] Invitados pendientes:', pending.length);
+      // console.log('[autoAssignGuests] Invitados pendientes:', pending.length);
 
       if (pending.length === 0) {
-        console.log('[autoAssignGuests] No hay invitados pendientes');
+        // console.log('[autoAssignGuests] No hay invitados pendientes');
         return { ok: true, method: 'local', assigned: 0 };
       }
 
-      console.log('[autoAssignGuests] Mesas disponibles:', tablesBanquet.length);
+      // console.log('[autoAssignGuests] Mesas disponibles:', tablesBanquet.length);
 
       const occ = new Map();
       guests.forEach((g) => {
@@ -1707,7 +1707,7 @@ export const useSeatingPlan = () => {
       let assigned = 0;
 
       // Actualizar invitados en la gestión ✨
-      console.log('[autoAssignGuests] Comenzando asignación...');
+      // console.log('[autoAssignGuests] Comenzando asignación...');
       for (const g of pending) {
         const table = tablesBanquet.find((t) => {
           const cap = parseInt(t.seats, 10) || globalMaxSeats || 0;
@@ -1720,7 +1720,7 @@ export const useSeatingPlan = () => {
           occ.set(tid, (occ.get(tid) || 0) + 1 + (parseInt(g.companion, 10) || 0));
           assigned += 1 + (parseInt(g.companion, 10) || 0);
 
-          console.log(`[autoAssignGuests] Asignando invitado ${g.id} a mesa ${table.id}`);
+          // console.log(`[autoAssignGuests] Asignando invitado ${g.id} a mesa ${table.id}`);
 
           // Actualizar en la gestión de invitados
           try {
@@ -1729,15 +1729,15 @@ export const useSeatingPlan = () => {
               table: String(table.id),
             });
           } catch (updateError) {
-            console.error(`[autoAssignGuests] Error actualizando invitado ${g.id}:`, updateError);
+            // console.error(`[autoAssignGuests] Error actualizando invitado ${g.id}:`, updateError);
           }
         }
       }
 
-      console.log(`[autoAssignGuests] Asignación completada: ${assigned} invitados asignados`);
+      // console.log(`[autoAssignGuests] Asignación completada: ${assigned} invitados asignados`);
       return { ok: true, method: 'local', assigned };
     } catch (e) {
-      console.error('[autoAssignGuests] Error:', e);
+      // console.error('[autoAssignGuests] Error:', e);
       return { ok: false, error: 'auto-assign-failed' };
     }
   };
@@ -2441,7 +2441,7 @@ export const useSeatingPlan = () => {
       link.href = canvas.toDataURL();
       link.click();
     } catch (error) {
-      console.error('Error exportando PNG:', error);
+      // console.error('Error exportando PNG:', error);
     }
   };
   const exportPDF = async () => {
@@ -2465,7 +2465,7 @@ export const useSeatingPlan = () => {
       }
       pdf.save(`seating-plan-${tab}-${Date.now()}.pdf`);
     } catch (error) {
-      console.error('Error exportando PDF:', error);
+      // console.error('Error exportando PDF:', error);
     }
   };
   const exportCSV = async (options = {}) => {
@@ -2515,7 +2515,7 @@ export const useSeatingPlan = () => {
       URL.revokeObjectURL(url);
       return { format: 'csv', blob, mimeType: 'text/csv', filename: exportName };
     } catch (e) {
-      console.warn('CSV export failed', e);
+      // console.warn('CSV export failed', e);
       if (returnBlob) throw e;
       return null;
     }
@@ -2564,7 +2564,7 @@ export const useSeatingPlan = () => {
       URL.revokeObjectURL(url);
       return { format: 'svg', blob, mimeType: 'image/svg+xml', filename: exportName };
     } catch (e) {
-      console.warn('SVG export failed', e);
+      // console.warn('SVG export failed', e);
       if (returnBlob) throw e;
       return null;
     }
@@ -2583,7 +2583,7 @@ export const useSeatingPlan = () => {
         reader.readAsDataURL(blob);
       });
     } catch (error) {
-      console.warn('No se pudo cargar el logotipo para la exportaci�n', error);
+      // console.warn('No se pudo cargar el logotipo para la exportaci�n', error);
       return null;
     }
   };
@@ -3557,7 +3557,7 @@ export const useSeatingPlan = () => {
 
     const toArtifact = (result) =>
       Promise.resolve(result).catch((error) => {
-        console.warn('[useSeatingPlan] export artifact failed', error);
+        // console.warn('[useSeatingPlan] export artifact failed', error);
         if (wantsPersistence) throw error;
         return null;
       });
@@ -3612,7 +3612,7 @@ export const useSeatingPlan = () => {
         anchor.click();
         URL.revokeObjectURL(url);
       } catch (error) {
-        console.warn('[useSeatingPlan] local download failed', error);
+        // console.warn('[useSeatingPlan] local download failed', error);
       }
     };
 
@@ -3692,7 +3692,7 @@ export const useSeatingPlan = () => {
         { merge: true }
       );
     } catch (error) {
-      console.error('[useSeatingPlan] exportAdvancedReport upload error', error);
+      // console.error('[useSeatingPlan] exportAdvancedReport upload error', error);
       await setDoc(
         exportDocRef,
         {
@@ -3756,7 +3756,7 @@ export const useSeatingPlan = () => {
           { merge: true }
         );
       } catch (err) {
-        console.error('Error guardando dimensiones del salón:', err);
+        // console.error('Error guardando dimensiones del salón:', err);
       }
     }
   };
@@ -3800,7 +3800,7 @@ export const useSeatingPlan = () => {
           { merge: true }
         );
       } catch (e) {
-        console.warn('saveGlobalMaxGuests failed', e);
+        // console.warn('saveGlobalMaxGuests failed', e);
       }
     }
   };
@@ -3839,7 +3839,7 @@ export const useSeatingPlan = () => {
           { merge: true }
         );
       } catch (e) {
-        console.warn('saveBackground failed', e);
+        // console.warn('saveBackground failed', e);
       }
     }
   };

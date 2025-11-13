@@ -70,7 +70,7 @@ export default function PostDiseno() {
 
       return customInfo;
     } catch (err) {
-      console.error('Error al obtener informaci�n del perfil:', err);
+      // console.error('Error al obtener informaci�n del perfil:', err);
       return '';
     }
   };
@@ -96,7 +96,7 @@ export default function PostDiseno() {
         category="social-media"
         templates={socialMediaTemplates}
         onImageGenerated={(image) => {
-          console.log('Nuevo dise�o para redes sociales generado:', image);
+          // console.log('Nuevo dise�o para redes sociales generado:', image);
         }}
       />
     </div>

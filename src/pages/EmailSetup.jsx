@@ -39,7 +39,7 @@ const EmailSetup = () => {
         const username = await getCurrentUsername();
         setCurrentUsername(username);
       } catch (err) {
-        console.error('Error al cargar el nombre de usuario:', err);
+        // console.error('Error al cargar el nombre de usuario:', err);
         setGeneralError('Error al cargar tus datos de correo electr�nico');
       } finally {
         setIsLoading(false);
@@ -78,7 +78,7 @@ const EmailSetup = () => {
       }
       return success;
     } catch (err) {
-      console.error('Error al guardar el nombre de usuario:', err);
+      // console.error('Error al guardar el nombre de usuario:', err);
       setGeneralError('Ha ocurrido un error al guardar tu direcci�n de correo.');
       return false;
     }
@@ -250,7 +250,7 @@ const EmailSetup = () => {
           }, 2000);
         })
         .catch((err) => {
-          console.warn('No se pudo copiar al portapapeles', err);
+          // console.warn('No se pudo copiar al portapapeles', err);
         });
     },
     []

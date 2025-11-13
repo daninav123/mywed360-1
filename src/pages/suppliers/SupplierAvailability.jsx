@@ -41,7 +41,7 @@ export default function SupplierAvailability() {
         setBlockedDates(data.blockedDates);
       }
     } catch (error) {
-      console.error('Error loading blocked dates:', error);
+      // console.error('Error loading blocked dates:', error);
     } finally {
       setLoading(false);
     }
@@ -72,7 +72,7 @@ export default function SupplierAvailability() {
         loadBlockedDates();
       }
     } catch (error) {
-      console.error('Error blocking dates:', error);
+      // console.error('Error blocking dates:', error);
     }
   };
 
@@ -85,7 +85,7 @@ export default function SupplierAvailability() {
       });
       loadBlockedDates();
     } catch (error) {
-      console.error('Error unblocking date:', error);
+      // console.error('Error unblocking date:', error);
     }
   };
 

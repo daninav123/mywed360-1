@@ -212,7 +212,7 @@ export const useImageOptimization = (files = [], options = {}) => {
           savings: (((files[i].size - optimized.size) / files[i].size) * 100).toFixed(1),
         });
       } catch (error) {
-        console.error(`Error optimizando imagen ${files[i].name}:`, error);
+        // console.error(`Error optimizando imagen ${files[i].name}:`, error);
         results.push({
           original: files[i],
           optimized: null,

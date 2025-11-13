@@ -28,7 +28,7 @@ export default function useSupplierBudgets(supplierId) {
         setLoading(false);
       },
       (err) => {
-        console.error('Error cargando presupuestos proveedor:', err);
+        // console.error('Error cargando presupuestos proveedor:', err);
         setError(err.message);
         setLoading(false);
       }
@@ -49,7 +49,7 @@ export default function useSupplierBudgets(supplierId) {
         if (!resp.ok) throw new Error(json.error || 'Error');
         return { success: true };
       } catch (err) {
-        console.error('Error actualizando presupuesto:', err);
+        // console.error('Error actualizando presupuesto:', err);
         return { success: false, error: err.message };
       }
     },

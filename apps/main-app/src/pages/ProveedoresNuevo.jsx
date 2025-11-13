@@ -490,8 +490,8 @@ const Proveedores = () => {
           filters // filters completos
         );
 
-        console.log('🔍 [Hybrid Search] Resultados:', result);
-        console.log('📊 Breakdown:', result.breakdown);
+        // console.log('🔍 [Hybrid Search] Resultados:', result);
+        // console.log('📊 Breakdown:', result.breakdown);
 
         setAiResults(result.suppliers || []);
         setSearchBreakdown(result.breakdown);
@@ -509,7 +509,7 @@ const Proveedores = () => {
           );
         }
       } catch (err) {
-        console.error('[Proveedores] Hybrid search failed', err);
+        // console.error('[Proveedores] Hybrid search failed', err);
         setAiError(err);
         if (!silent) {
           toast.error(t('suppliers.overview.toasts.error'));
@@ -693,13 +693,13 @@ const Proveedores = () => {
             notes: `Contratado el ${new Date().toLocaleDateString()}`,
           });
         } catch (err) {
-          console.log('[Shortlist] Ya existe o error:', err);
+          // console.log('[Shortlist] Ya existe o error:', err);
         }
 
         // Recargar proveedores
         loadProviders();
       } catch (error) {
-        console.error('[MarkAsConfirmed] Error:', error);
+        // console.error('[MarkAsConfirmed] Error:', error);
         toast.error(`Error al marcar ${supplier.name} como contratado`);
       }
     },

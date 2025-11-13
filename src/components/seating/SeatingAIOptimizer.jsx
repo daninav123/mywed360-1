@@ -214,7 +214,7 @@ const SeatingAIOptimizer = ({ isOpen, onClose, guests = [], tables = [], onApply
 
       toast.success('Optimización completada con éxito');
     } catch (error) {
-      console.error('Error en optimización:', error);
+      // console.error('Error en optimización:', error);
       toast.error('Error al optimizar el seating plan');
     } finally {
       setIsOptimizing(false);
@@ -640,7 +640,7 @@ export const useOpenAIOptimization = () => {
       setIsConnected(response.ok);
       return response.ok;
     } catch (error) {
-      console.error('Error checking OpenAI connection:', error);
+      // console.error('Error checking OpenAI connection:', error);
       setIsConnected(false);
       return false;
     }
@@ -685,7 +685,7 @@ export const useOpenAIOptimization = () => {
 
         return data.choices[0].message.content;
       } catch (error) {
-        console.error('Error calling OpenAI:', error);
+        // console.error('Error calling OpenAI:', error);
         throw error;
       }
     },

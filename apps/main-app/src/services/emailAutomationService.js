@@ -127,7 +127,7 @@ async function fetchRemoteSchedule(force = false) {
 async function refreshRemoteSchedule(force = false) {
   if (!supportsRemoteScheduler()) return null;
   return fetchRemoteSchedule(force).catch((error) => {
-    console.warn('[emailAutomation] remote schedule sync failed', error?.message || error);
+    // console.warn('[emailAutomation] remote schedule sync failed', error?.message || error);
     throw error;
   });
 }
@@ -174,7 +174,7 @@ export async function syncAutomationStateFromServer(force = false) {
   try {
     return await fetchAutomationStateRemote(force);
   } catch (error) {
-    console.warn('[emailAutomation] sync state failed', error?.message || error);
+    // console.warn('[emailAutomation] sync state failed', error?.message || error);
     return getAutomationState();
   }
 }
@@ -193,7 +193,7 @@ async function recordAutoReplyRemote(payload) {
     await post(STATE_AUTOREPLY_ENDPOINT, body, { auth: true, silent: true });
     lastRemoteStateSync = 0;
   } catch (error) {
-    console.warn('[emailAutomation] record auto-reply failed', error?.message || error);
+    // console.warn('[emailAutomation] record auto-reply failed', error?.message || error);
   }
 }
 
@@ -211,7 +211,7 @@ async function recordClassificationRemote(mail, classification) {
       { auth: true, silent: true },
     );
   } catch (error) {
-    console.warn('[emailAutomation] record classification failed', error?.message || error);
+    // console.warn('[emailAutomation] record classification failed', error?.message || error);
   }
 }
 
@@ -366,7 +366,7 @@ async function persistAutomationConfigRemote(config) {
     lastConfigSync = Date.now();
     return remoteConfig;
   } catch (error) {
-    console.warn('[emailAutomation] persist remote config failed', error?.message || error);
+    // console.warn('[emailAutomation] persist remote config failed', error?.message || error);
     throw error;
   }
 }
@@ -391,7 +391,7 @@ export async function syncAutomationConfigFromServer(force = false) {
       setAutomationConfigCache(merged, { syncTimestamp: updatedAt, recordSync: true });
       return merged;
     } catch (error) {
-      console.warn('[emailAutomation] sync config failed', error?.message || error);
+      // console.warn('[emailAutomation] sync config failed', error?.message || error);
       return getAutomationConfig();
     } finally {
       configSyncPromise = null;
@@ -451,7 +451,7 @@ async function getSendMailFn() {
       module?.sendMail || module?.sendEmail || (module?.default && module.default.sendMail);
     return typeof candidate === 'function' ? candidate : null;
   } catch (error) {
-    console.warn('[emailAutomation] unable to load sendMail function', error);
+    // console.warn('[emailAutomation] unable to load sendMail function', error);
     return null;
   }
 }
@@ -479,7 +479,7 @@ async function runScheduledQueueOnce() {
       await processScheduledEmails(sendMailFn);
     }
   } catch (error) {
-    console.warn('[emailAutomation] scheduled queue processing failed', error);
+    // console.warn('[emailAutomation] scheduled queue processing failed', error);
   } finally {
     queueProcessing = false;
   }
@@ -698,7 +698,7 @@ async function callClassificationAPI(mail) {
     const isTestEnv =
       typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'test';
     if (!isTestEnv) {
-      console.warn('[emailAutomation] classification API request failed', error);
+      // console.warn('[emailAutomation] classification API request failed', error);
     }
     performanceMonitor?.logError?.('email_classification_api', error, {
       mailId: payload?.id || payload?.mailId || null,
@@ -972,7 +972,7 @@ async function maybeAutoReply(mail, classification, config, state, sendMail) {
     });
     return true;
   } catch (error) {
-    console.warn('[emailAutomation] auto-reply failed', error);
+    // console.warn('[emailAutomation] auto-reply failed', error);
     return false;
   }
 }
@@ -1006,7 +1006,7 @@ export async function processIncomingEmails(emails = [], options = {}) {
       }
       await maybeAutoReply(clone, classification, config, state, sendMail);
     } catch (error) {
-      console.warn('[emailAutomation] processing mail failed', error);
+      // console.warn('[emailAutomation] processing mail failed', error);
     }
     processed.push(clone);
   }
@@ -1122,7 +1122,7 @@ export function cancelScheduledEmail(id) {
         return true;
       })
       .catch((error) => {
-        console.warn('[emailAutomation] cancel schedule failed', error);
+        // console.warn('[emailAutomation] cancel schedule failed', error);
         throw error;
       });
   }

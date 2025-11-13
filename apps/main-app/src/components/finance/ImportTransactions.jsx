@@ -68,7 +68,7 @@ const ImportTransactions = ({ onImportComplete, onCancel }) => {
       // Auto-detectar columnas
       autoDetectColumns(headers);
     } catch (err) {
-      console.error('Error parsing file:', err);
+      // console.error('Error parsing file:', err);
       setError(`Error al procesar el archivo: ${err.message}`);
       setPreviewData(null);
     } finally {
@@ -142,7 +142,7 @@ const ImportTransactions = ({ onImportComplete, onCancel }) => {
         await onImportComplete(transactions);
       }
     } catch (err) {
-      console.error('Error importing transactions:', err);
+      // console.error('Error importing transactions:', err);
       setError(`Error al importar: ${err.message}`);
     } finally {
       setImporting(false);

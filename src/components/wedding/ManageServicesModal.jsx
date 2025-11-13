@@ -13,8 +13,8 @@ export default function ManageServicesModal({ open, onClose }) {
   // Debug: Ver qué categorías tenemos y cuáles están activas
   React.useEffect(() => {
     if (open) {
-      console.log('🎯 ===== ManageServicesModal SE ESTÁ ABRIENDO =====');
-      console.log('📋 Total categorías disponibles:', allCategories.length);
+      // console.log('🎯 ===== ManageServicesModal SE ESTÁ ABRIENDO =====');
+      // console.log('📋 Total categorías disponibles:', allCategories.length);
 
       // Verificar cada categoría
       const activeStatus = allCategories.map((cat) => ({
@@ -24,31 +24,31 @@ export default function ManageServicesModal({ open, onClose }) {
       }));
 
       const activeCats = activeStatus.filter((c) => c.isActive);
-      console.log('✅ Servicios ACTIVOS:', activeCats.length);
-      console.log('   ', activeCats.map((c) => c.name).join(', '));
+      // console.log('✅ Servicios ACTIVOS:', activeCats.length);
+      // console.log('   ', activeCats.map((c) => c.name).join(', '));
 
       const inactiveCats = activeStatus.filter((c) => !c.isActive);
-      console.log('❌ Servicios INACTIVOS:', inactiveCats.length);
-      console.log('   ', inactiveCats.map((c) => c.name).join(', '));
+      // console.log('❌ Servicios INACTIVOS:', inactiveCats.length);
+      // console.log('   ', inactiveCats.map((c) => c.name).join(', '));
 
-      console.log('🎯 ===============================================');
+      // console.log('🎯 ===============================================');
     }
   }, [open, allCategories, isCategoryActive]);
 
   if (!open) return null;
 
-  console.log('🚀 ManageServicesModal está renderizando...');
+  // console.log('🚀 ManageServicesModal está renderizando...');
 
   const handleToggle = async (categoryId) => {
-    console.log('🎯 [ManageServicesModal] handleToggle:', categoryId);
-    console.log('   Estado actual:', isCategoryActive(categoryId) ? 'ACTIVO' : 'INACTIVO');
+    // console.log('🎯 [ManageServicesModal] handleToggle:', categoryId);
+    // console.log('   Estado actual:', isCategoryActive(categoryId) ? 'ACTIVO' : 'INACTIVO');
 
     setToggling(categoryId);
     try {
       await toggleCategory(categoryId);
-      console.log('   âœ… toggleCategory completado');
+      // console.log('   âœ… toggleCategory completado');
     } catch (error) {
-      console.error('   âŒ Error en toggleCategory:', error);
+      // console.error('   âŒ Error en toggleCategory:', error);
       toast.error(
         t('wedding.manageServices.toast.updateError', {
           defaultValue: 'Error al actualizar servicio',
@@ -56,7 +56,7 @@ export default function ManageServicesModal({ open, onClose }) {
       );
     } finally {
       setToggling(null);
-      console.log('   ðŸ”“ Toggle desbloqueado');
+      // console.log('   ðŸ”“ Toggle desbloqueado');
     }
   };
 

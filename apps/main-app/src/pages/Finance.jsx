@@ -168,7 +168,7 @@ function Finance() {
   const handleCaptureSnapshot = async () => {
     const result = await captureBudgetSnapshot({ status: 'confirmed', source: 'manual' });
     if (!result?.success && result?.error) {
-      console.warn('[Finance] captureBudgetSnapshot failed', result.error);
+      // console.warn('[Finance] captureBudgetSnapshot failed', result.error);
     }
   };
 

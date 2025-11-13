@@ -139,7 +139,7 @@ const AdminDashboard = () => {
             'No se pudo cargar el resumen administrativo.'
           )
         );
-        console.warn('[AdminDashboard] overview load error:', error);
+        // console.warn('[AdminDashboard] overview load error:', error);
       } finally {
         if (!cancelled) setLoadingOverview(false);
       }
@@ -167,7 +167,7 @@ const AdminDashboard = () => {
           setMetricsError('');
         }
       } catch (error) {
-        console.warn('[AdminDashboard] metrics load error:', error);
+        // console.warn('[AdminDashboard] metrics load error:', error);
         if (!cancelled) {
           setMetricsSummary((prev) => ({ ...prev, error: 'No disponible' }));
           setMetricsError('No se pudieron obtener las métricas en tiempo real.');
@@ -250,7 +250,7 @@ const AdminDashboard = () => {
         )
       );
     } catch (error) {
-      console.error('[AdminDashboard] resolve alert error:', error);
+      // console.error('[AdminDashboard] resolve alert error:', error);
       toast.error(
         t('admin.alerts.resolveError', 'No se pudo marcar la alerta como resuelta.')
       );

@@ -90,7 +90,7 @@ const BlogAuthor = () => {
         }
       } catch (err) {
         if (cancel) return;
-        console.error('[BlogAuthor] load failed', err);
+        // console.error('[BlogAuthor] load failed', err);
         setError('common.blog.author.errors.loadFailed');
       } finally {
         if (!cancel) setLoading(false);

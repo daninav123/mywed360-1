@@ -102,7 +102,7 @@ const ComposeEmail = () => {
         );
         setAttachments((prev) => [...prev, ...files]);
       } catch (e) {
-        console.warn('[ComposeEmail] Failed to load shared files', e);
+        // console.warn('[ComposeEmail] Failed to load shared files', e);
       }
     };
 
@@ -167,7 +167,7 @@ const ComposeEmail = () => {
       // Redirigir tras breve demora
       setTimeout(() => navigate('/'), 500);
     } catch (err) {
-      console.error('[ComposeEmail] Failed to send email:', err);
+      // console.error('[ComposeEmail] Failed to send email:', err);
       setError(
         tEmailVars('composer.errors.sendFailedWithDetails', {
           details: err?.message || '',

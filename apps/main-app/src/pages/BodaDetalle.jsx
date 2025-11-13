@@ -161,7 +161,7 @@ export default function BodaDetalle() {
       await updateWeddingModulePermissions(id, nextPermissions);
       performanceMonitor?.logEvent?.('wedding_permissions_updated', { weddingId: id });
     } catch (error) {
-      console.error('[BodaDetalle] No se pudieron actualizar los permisos', error);
+      // console.error('[BodaDetalle] No se pudieron actualizar los permisos', error);
       toast.error(t('wedding.permissions.updateError'));
     } finally {
       setSavingPermissions(false);
@@ -190,7 +190,7 @@ export default function BodaDetalle() {
       }
       setWedding((prev) => (prev ? { ...prev, active: nextActive } : prev));
     } catch (error) {
-      console.error('[BodaDetalle] No se pudo actualizar el estado de la boda', error);
+      // console.error('[BodaDetalle] No se pudo actualizar el estado de la boda', error);
       toast.error(t('wedding.status.updateError'));
     } finally {
       setUpdatingState(false);

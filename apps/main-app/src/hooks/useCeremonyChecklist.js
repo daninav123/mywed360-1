@@ -83,13 +83,13 @@ export default function useCeremonyChecklist() {
             setLoading(false);
           },
           (err) => {
-            console.warn('[useCeremonyChecklist] onSnapshot error', err);
+            // console.warn('[useCeremonyChecklist] onSnapshot error', err);
             setError(err);
             setLoading(false);
           },
         );
       } catch (err) {
-        console.warn('[useCeremonyChecklist] listen error', err);
+        // console.warn('[useCeremonyChecklist] listen error', err);
         setError(err);
         setLoading(false);
       }
@@ -105,7 +105,7 @@ export default function useCeremonyChecklist() {
   const saveItems = useCallback(
     async (nextItems) => {
       if (!activeWedding) {
-        console.warn('[useCeremonyChecklist] saveItems without active wedding');
+        // console.warn('[useCeremonyChecklist] saveItems without active wedding');
         return;
       }
       const ref = doc(db, 'weddings', activeWedding, 'ceremonyChecklist', 'main');
@@ -136,7 +136,7 @@ export default function useCeremonyChecklist() {
           total: sanitized.length,
         });
       } catch (err) {
-        console.warn('[useCeremonyChecklist] saveItems error', err);
+        // console.warn('[useCeremonyChecklist] saveItems error', err);
         setError(err);
       }
     },
@@ -178,7 +178,7 @@ async function preloadDocuments(weddingId) {
     });
     return map;
   } catch (err) {
-    console.warn('[useCeremonyChecklist] preloadDocuments error', err);
+    // console.warn('[useCeremonyChecklist] preloadDocuments error', err);
     return {};
   }
 }

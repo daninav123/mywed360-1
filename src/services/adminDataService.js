@@ -569,19 +569,19 @@ const normalizeSupplierListItems = (items) => {
 };
 
 async function fetchAdminEndpoint(path) {
-  console.log(`🔍 [adminDataService] Fetching admin endpoint: ${path}`);
+  // console.log(`🔍 [adminDataService] Fetching admin endpoint: ${path}`);
   try {
     const response = await apiGet(path, getAdminFetchOptions({ auth: false, silent: true }));
-    console.log(`  - Response status: ${response.status}`);
-    console.log(`  - Response ok: ${response.ok}`);
+    // console.log(`  - Response status: ${response.status}`);
+    // console.log(`  - Response ok: ${response.ok}`);
 
     let data = null;
     if (response.status !== 204) {
       try {
         data = await response.json();
-        console.log(`  - Data received:`, data);
+        // console.log(`  - Data received:`, data);
       } catch (jsonError) {
-        console.error(`  ❌ Failed to parse JSON:`, jsonError);
+        // console.error(`  ❌ Failed to parse JSON:`, jsonError);
         data = null;
       }
     }
@@ -813,21 +813,21 @@ export const getPortfolioData = async (opts = {}) => {
 };
 
 export const getUsersData = async (opts = {}) => {
-  console.log(' [getUsersData] Called with options:', opts);
+  // console.log(' [getUsersData] Called with options:', opts);
   const limit = Number.isFinite(opts.limit) ? Number(opts.limit) : 100;
-  console.log(`  - Fetching users with limit: ${limit}`);
+  // console.log(`  - Fetching users with limit: ${limit}`);
   
   const data = await fetchAdminEndpoint(
     `${ADMIN_BASE_PATH}/users?limit=${encodeURIComponent(limit)}`,
   );
   
-  console.log('  - Raw data from backend:', data);
+  // console.log('  - Raw data from backend:', data);
   const items = toArray(data?.items);
   const meta = toObject(data?.meta);
   
-  console.log(`  Returning ${items.length} users`);
-  console.log('  - Meta:', meta);
-  console.log('  - First user:', items[0]);
+  // console.log(`  Returning ${items.length} users`);
+  // console.log('  - Meta:', meta);
+  // console.log('  - First user:', items[0]);
   
   return { items, meta };
 };

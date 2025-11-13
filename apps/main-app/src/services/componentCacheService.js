@@ -49,7 +49,7 @@ const cleanExpiredEntries = () => {
 
   if (cleaned > 0) {
     cacheStats.evictions += cleaned;
-    console.log(`[ComponentCache] Limpiadas ${cleaned} entradas expiradas`);
+    // console.log(`[ComponentCache] Limpiadas ${cleaned} entradas expiradas`);
   }
 };
 
@@ -189,7 +189,7 @@ export const useCacheInvalidation = (componentName) => {
         }
       }
 
-      console.log(`[ComponentCache] Invalidadas ${invalidated} entradas para ${componentName}`);
+      // console.log(`[ComponentCache] Invalidadas ${invalidated} entradas para ${componentName}`);
     },
     [componentName]
   );
@@ -242,7 +242,7 @@ export const clearCache = () => {
   const size = globalCache.size;
   globalCache.clear();
   cacheStats.evictions += size;
-  console.log(`[ComponentCache] Limpiado caché completo (${size} entradas)`);
+  // console.log(`[ComponentCache] Limpiado caché completo (${size} entradas)`);
 };
 
 /**

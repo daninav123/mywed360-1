@@ -56,7 +56,7 @@ export async function uploadPortfolioImage(file, supplierId, onProgress) {
       storagePath, // Guardar para poder eliminar después
     };
   } catch (error) {
-    console.error('Error uploading image:', error);
+    // console.error('Error uploading image:', error);
     throw error;
   }
 }
@@ -77,10 +77,10 @@ export async function deletePortfolioImage(storagePath) {
   } catch (error) {
     // Si el archivo no existe, no es un error crítico
     if (error.code === 'storage/object-not-found') {
-      console.warn('Image not found in storage, skipping deletion');
+      // console.warn('Image not found in storage, skipping deletion');
       return;
     }
-    console.error('Error deleting image:', error);
+    // console.error('Error deleting image:', error);
     throw error;
   }
 }

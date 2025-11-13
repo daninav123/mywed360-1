@@ -29,8 +29,8 @@ setTimeout(() => {
   // 🚨 DIAGNÓSTICO DE RENDIMIENTO (solo en desarrollo)
   if (import.meta.env.DEV) {
     import('./utils/performanceDiagnostic').then((module) => {
-      console.log('%c🔍 Diagnóstico de rendimiento activado', 'color: #00ff00; font-weight: bold');
-      console.log('Usa en consola: window.__performanceDiagnostic__.report()');
+      // console.log('%c🔍 Diagnóstico de rendimiento activado', 'color: #00ff00; font-weight: bold');
+      // console.log('Usa en consola: window.__performanceDiagnostic__.report()');
       // Auto-start después de 5 segundos
       setTimeout(() => module.startDiagnostic(), 5000);
     });

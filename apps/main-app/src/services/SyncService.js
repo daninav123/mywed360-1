@@ -57,7 +57,7 @@ export const saveData = async (key, data, userOptions = {}) => {
               }
             }
           } catch (e) {
-            console.warn('[SyncService] docPath inválido, usando fallback:', options.docPath, e);
+            // console.warn('[SyncService] docPath inválido, usando fallback:', options.docPath, e);
           }
         }
         if (!docRef) {
@@ -95,7 +95,7 @@ export const saveData = async (key, data, userOptions = {}) => {
             showNotification('Datos guardados en la nube', 'success');
           }
         } catch (error) {
-          console.error('Error al guardar en Firestore:', error);
+          // console.error('Error al guardar en Firestore:', error);
           syncState.pendingChanges = true;
 
           if (options.showNotification) {
@@ -122,7 +122,7 @@ export const saveData = async (key, data, userOptions = {}) => {
 
     return true;
   } catch (error) {
-    console.error('Error al guardar datos:', error);
+    // console.error('Error al guardar datos:', error);
 
     if (options.showNotification) {
       showNotification('Error al guardar datos', 'error');
@@ -169,7 +169,7 @@ export const loadData = async (key, userOptions = {}) => {
                 }
               }
             } catch (e) {
-              console.warn('[SyncService] docPath inválido, usando fallback:', options.docPath, e);
+              // console.warn('[SyncService] docPath inválido, usando fallback:', options.docPath, e);
             }
           }
           if (!docRef) {
@@ -198,7 +198,7 @@ export const loadData = async (key, userOptions = {}) => {
             return docSnap.data()[targetField];
           }
         } catch (error) {
-          console.warn('Error al cargar de Firestore, intentando localStorage:', error);
+          // console.warn('Error al cargar de Firestore, intentando localStorage:', error);
         }
       }
     }
@@ -215,7 +215,7 @@ export const loadData = async (key, userOptions = {}) => {
 
           return parsedData;
         } catch (e) {
-          console.error('Error al analizar datos de localStorage:', e);
+          // console.error('Error al analizar datos de localStorage:', e);
         }
       }
     }
@@ -224,7 +224,7 @@ export const loadData = async (key, userOptions = {}) => {
     notifySyncStateChange();
     return null;
   } catch (error) {
-    console.error('Error al cargar datos:', error);
+    // console.error('Error al cargar datos:', error);
     syncState.isSyncing = false;
     notifySyncStateChange();
     return null;
@@ -251,7 +251,7 @@ export const syncPendingData = async () => {
         showNotification: false, // No mostrar notificación para cada item
       });
     } catch (error) {
-      console.error('Error al sincronizar item pendiente:', error);
+      // console.error('Error al sincronizar item pendiente:', error);
       success = false;
     }
   }
@@ -290,7 +290,7 @@ const showNotification = (message, type = 'info') => {
   if (typeof window.toast === 'function') {
     window.toast[type](message);
   } else {
-    console.log(`[${type.toUpperCase()}] ${message}`);
+    // console.log(`[${type.toUpperCase()}] ${message}`);
   }
 };
 

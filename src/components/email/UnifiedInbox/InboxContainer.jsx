@@ -112,7 +112,7 @@ const InboxContainer = () => {
     try {
       startEmailScheduler({ immediate: true });
     } catch (schedulerError) {
-      console.warn('InboxContainer: no se pudo iniciar el scheduler de emails', schedulerError);
+      // console.warn('InboxContainer: no se pudo iniciar el scheduler de emails', schedulerError);
     }
   }, []);
 
@@ -133,7 +133,7 @@ const InboxContainer = () => {
           setEmailTemplates(Array.isArray(templates) ? templates : []);
         }
       } catch (templateError) {
-        console.warn('No se pudieron cargar las plantillas de email:', templateError);
+        // console.warn('No se pudieron cargar las plantillas de email:', templateError);
       }
     })();
     return () => {
@@ -364,7 +364,7 @@ const InboxContainer = () => {
       const stored = getUserFolders(effectiveUserId);
       mergedFolders = Array.isArray(stored) ? stored : [];
     } catch (folderError) {
-      console.error('Error leyendo carpetas personalizadas locales:', folderError);
+      // console.error('Error leyendo carpetas personalizadas locales:', folderError);
       mergedFolders = [];
     }
 
@@ -388,7 +388,7 @@ const InboxContainer = () => {
         }
       }
     } catch (apiError) {
-      console.warn('InboxContainer: no se pudieron obtener carpetas desde API', apiError);
+      // console.warn('InboxContainer: no se pudieron obtener carpetas desde API', apiError);
     }
 
     let enhancedFolders = mergedFolders;
@@ -411,12 +411,12 @@ const InboxContainer = () => {
         try {
           updateFolderUnreadCount(effectiveUserId, folderItem.id, unread);
         } catch (updateError) {
-          console.warn('InboxContainer: no se pudo actualizar unread local', updateError);
+          // console.warn('InboxContainer: no se pudo actualizar unread local', updateError);
         }
         return { ...folderItem, unread };
       });
     } catch (unreadError) {
-      console.warn('InboxContainer: no se pudieron calcular los unread de carpetas personalizadas', unreadError);
+      // console.warn('InboxContainer: no se pudieron calcular los unread de carpetas personalizadas', unreadError);
     }
 
     setCustomFolders(Array.isArray(enhancedFolders) ? enhancedFolders : []);
@@ -450,7 +450,7 @@ const InboxContainer = () => {
           const sendMailFn = EmailService?.sendMail || EmailService?.sendEmail;
           processedList = await processIncomingEmails(list, { sendMail: sendMailFn });
         } catch (automationError) {
-          console.warn('InboxContainer: no se pudo aplicar automatizacion de emails', automationError);
+          // console.warn('InboxContainer: no se pudo aplicar automatizacion de emails', automationError);
           processedList = list;
         }
 
@@ -473,7 +473,7 @@ const InboxContainer = () => {
             try {
               updateFolderUnreadCount(resolvedUserId, folderId, unread);
             } catch (updateError) {
-              console.warn('InboxContainer: no se pudo actualizar unread tras refresh', updateError);
+              // console.warn('InboxContainer: no se pudo actualizar unread tras refresh', updateError);
             }
             setCustomFolders((prev) => {
               if (!Array.isArray(prev) || !prev.length) return prev;
@@ -488,7 +488,7 @@ const InboxContainer = () => {
           }
         }
       } catch (err) {
-        console.error('Error cargando emails:', err);
+        // console.error('Error cargando emails:', err);
         setError('No se pudieron cargar los emails');
       } finally {
         setLoading(false);
@@ -557,7 +557,7 @@ const InboxContainer = () => {
     try {
       await Promise.all([refreshEmails(targetFolder), refreshCounts()]);
     } catch (refreshError) {
-      console.warn('Error refrescando datos de email:', refreshError);
+      // console.warn('Error refrescando datos de email:', refreshError);
     }
   }, [folder, refreshEmails, refreshCounts]);
 
@@ -590,7 +590,7 @@ const InboxContainer = () => {
           await Promise.all([refreshEmails(folder), refreshCounts()]);
         }
       } catch (err) {
-        console.error('Error inicializando EmailService:', err);
+        // console.error('Error inicializando EmailService:', err);
         setError('Error inicializando servicio de email');
       } finally {
         if (!cancelled) setLoading(false);
@@ -616,7 +616,7 @@ const InboxContainer = () => {
       if (/404/.test(msg)) {
         setEmails((prev) => prev.map((e) => (e.id === emailId ? { ...e, read: true } : e)));
       } else {
-        console.error('Error marcando como leído:', err);
+        // console.error('Error marcando como leído:', err);
       }
     }
   }, [refreshCounts]);
@@ -643,7 +643,7 @@ const InboxContainer = () => {
         }
         await refreshAllData();
       } catch (err) {
-        console.error('Error moviendo email:', err);
+        // console.error('Error moviendo email:', err);
         throw err;
       }
     },
@@ -662,7 +662,7 @@ const InboxContainer = () => {
         }
         await refreshAllData();
       } catch (err) {
-        console.error('Error eliminando email definitivamente:', err);
+        // console.error('Error eliminando email definitivamente:', err);
         throw err;
       }
     },
@@ -683,7 +683,7 @@ const InboxContainer = () => {
           setViewMode('list');
         }
       } catch (err) {
-        console.error('Error procesando eliminacion de email:', err);
+        // console.error('Error procesando eliminacion de email:', err);
       }
     },
     [deleteEmailForever, moveEmailToFolder, isTrash, selectedEmailId]
@@ -708,7 +708,7 @@ const InboxContainer = () => {
           setViewMode('list');
         }
       } catch (err) {
-        console.error('Error restaurando email:', err);
+        // console.error('Error restaurando email:', err);
       }
     },
     [emails, moveEmailToFolder, selectedEmailId]
@@ -726,7 +726,7 @@ const InboxContainer = () => {
       try {
         await EmailService.setMailImportant(emailId, Boolean(nextValue));
       } catch (error) {
-        console.error('Error actualizando estado importante:', error);
+        // console.error('Error actualizando estado importante:', error);
         setEmails(previous);
       }
     },
@@ -738,7 +738,7 @@ const InboxContainer = () => {
       await EmailService.emptyTrash();
       await refreshAllData();
     } catch (err) {
-      console.error('Error vaciando papelera:', err);
+      // console.error('Error vaciando papelera:', err);
     } finally {
       setShowEmptyTrashModal(false);
     }
@@ -762,7 +762,7 @@ const InboxContainer = () => {
           await loadCustomFolders();
           return true;
         } catch (apiError) {
-          console.error('Error creando carpeta personalizada (API):', apiError);
+          // console.error('Error creando carpeta personalizada (API):', apiError);
           throw apiError;
         }
       }
@@ -771,7 +771,7 @@ const InboxContainer = () => {
         await loadCustomFolders();
         return created;
       } catch (err) {
-        console.error('Error creando carpeta personalizada:', err);
+        // console.error('Error creando carpeta personalizada:', err);
         throw err;
       }
     },
@@ -796,7 +796,7 @@ const InboxContainer = () => {
           await loadCustomFolders();
           return true;
         } catch (apiError) {
-          console.error('Error renombrando carpeta personalizada (API):', apiError);
+          // console.error('Error renombrando carpeta personalizada (API):', apiError);
           throw apiError;
         }
       }
@@ -805,7 +805,7 @@ const InboxContainer = () => {
         await loadCustomFolders();
         return updated;
       } catch (err) {
-        console.error('Error renombrando carpeta personalizada:', err);
+        // console.error('Error renombrando carpeta personalizada:', err);
         throw err;
       }
     },
@@ -833,7 +833,7 @@ const InboxContainer = () => {
           }
           return true;
         } catch (apiError) {
-          console.error('Error eliminando carpeta personalizada (API):', apiError);
+          // console.error('Error eliminando carpeta personalizada (API):', apiError);
           throw apiError;
         }
       }
@@ -849,7 +849,7 @@ const InboxContainer = () => {
         }
         return result;
       } catch (err) {
-        console.error('Error eliminando carpeta personalizada:', err);
+        // console.error('Error eliminando carpeta personalizada:', err);
         throw err;
       }
     },
@@ -1022,7 +1022,7 @@ const InboxContainer = () => {
           trackOperation?.('email_sent', { success: true, mode: 'basic' });
         }
       } catch (error) {
-        console.error('Error al enviar email:', error);
+        // console.error('Error al enviar email:', error);
         trackOperation?.('email_sent', { success: false, mode: 'basic', error: error.message });
       }
     },
@@ -1065,7 +1065,7 @@ const InboxContainer = () => {
 
         trackOperation?.('email_sent', { success: true, mode: 'smart' });
       } catch (error) {
-        console.error('Error al enviar email IA:', error);
+        // console.error('Error al enviar email IA:', error);
         trackOperation?.('email_sent', { success: false, mode: 'smart', error: error.message });
       }
     },
@@ -1104,9 +1104,9 @@ const InboxContainer = () => {
             location: eventData.location,
           });
         } catch (fallbackError) {
-          console.warn('No se pudo crear el evento en calendario:', fallbackError);
+          // console.warn('No se pudo crear el evento en calendario:', fallbackError);
         }
-        console.warn('Fallo al registrar el evento en backend, usando fallback local.', error);
+        // console.warn('Fallo al registrar el evento en backend, usando fallback local.', error);
       } finally {
         closeCalendarIntegration();
       }
@@ -1127,7 +1127,7 @@ const InboxContainer = () => {
           apiAuthOptions({ silent: true })
         );
       } catch (error) {
-        console.warn('No se pudo registrar el feedback de email:', error);
+        // console.warn('No se pudo registrar el feedback de email:', error);
       }
     },
     [user]
@@ -1407,7 +1407,7 @@ const InboxContainer = () => {
                         }
                       }
                       if (!ok) {
-                        console.warn('analyze failed for', mailId, 'candidates:', candidates);
+                        // console.warn('analyze failed for', mailId, 'candidates:', candidates);
                       }
                       return ok;
                     };
@@ -1420,12 +1420,12 @@ const InboxContainer = () => {
                         const ok = await tryAnalyze(id, emailObj);
                         if (ok) success++;
                       }
-                      console.log(`[IA] Analizados ${success}/${ids.length} correos en ${folder}`);
+                      // console.log(`[IA] Analizados ${success}/${ids.length} correos en ${folder}`);
                     } else {
-                      console.log(`[IA] Análisis backend desactivado (VITE_ENABLE_EMAIL_ANALYZE!=1). Usar panel por-email.`);
+                      // console.log(`[IA] Análisis backend desactivado (VITE_ENABLE_EMAIL_ANALYZE!=1). Usar panel por-email.`);
                     }
                   } catch (e) {
-                    console.error('Error analizando correos', e);
+                    // console.error('Error analizando correos', e);
                   } finally {
                     setAnalyzing(false);
                   }
@@ -1681,7 +1681,7 @@ const InboxContainer = () => {
           user={user}
           onClose={() => setShowEmailAliasConfig(false)}
           onSuccess={(newEmail) => {
-            console.log('✅ Email configurado:', newEmail);
+            // console.log('✅ Email configurado:', newEmail);
             alert(`Email configurado correctamente: ${newEmail}\n\nRecarga la página para que los cambios surtan efecto.`);
             setShowEmailAliasConfig(false);
           }}

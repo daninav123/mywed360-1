@@ -46,7 +46,7 @@ const SubscriptionDashboard = () => {
       const data = await response.json();
       setSubscription(data.subscription);
     } catch (err) {
-      console.error('Error fetching subscription:', err);
+      // console.error('Error fetching subscription:', err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -61,7 +61,7 @@ const SubscriptionDashboard = () => {
       // Redirigir al portal de Stripe
       window.location.href = portalUrl;
     } catch (err) {
-      console.error('Error opening customer portal:', err);
+      // console.error('Error opening customer portal:', err);
       setError(err.message);
       setManagingSubscription(false);
     }

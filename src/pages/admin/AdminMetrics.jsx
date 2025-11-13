@@ -59,7 +59,7 @@ const AdminMetrics = () => {
         setEconomicMetrics(economicData);
         setHttpSummary(httpData);
       } catch (error) {
-        console.error('[AdminMetrics] Error loading metrics:', error);
+        // console.error('[AdminMetrics] Error loading metrics:', error);
       }
       setLoading(false);
     };

@@ -13,7 +13,7 @@ const initialState = () => {
       collection: 'userMenus',
     });
   } catch (error) {
-    console.error('Error al cargar el diseño del menú:', error);
+    // console.error('Error al cargar el diseño del menú:', error);
     return { entradas: [], principales: [], postres: [], bebidas: [] };
   }
 };
@@ -65,7 +65,7 @@ export default function MenuDiseno() {
         });
         if (loaded && typeof loaded === 'object') setMenu(loaded);
       } catch (error) {
-        console.error('Error al cargar el diseño del menú:', error);
+        // console.error('Error al cargar el diseño del menú:', error);
       }
     })();
   }, []);
@@ -172,7 +172,7 @@ export default function MenuDiseno() {
         templates={menuTemplates}
         customPrompt={generateCustomPrompt()}
         onImageGenerated={(image) => {
-          console.log('Nuevo diseño de menú generado:', image);
+          // console.log('Nuevo diseño de menú generado:', image);
         }}
       />
     </div>

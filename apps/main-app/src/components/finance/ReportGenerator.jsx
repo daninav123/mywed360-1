@@ -58,7 +58,7 @@ const ReportGenerator = ({ transactions = [], weddingInfo = {} }) => {
         await generateExcelReport(filteredTransactions);
       }
     } catch (error) {
-      console.error('Error generating report:', error);
+      // console.error('Error generating report:', error);
       toast.error(
         t(
           'finance.reports.generateError',

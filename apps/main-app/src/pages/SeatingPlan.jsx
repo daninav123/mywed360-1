@@ -6,7 +6,7 @@ import SeatingPlanModern from '../components/seating/SeatingPlanModern.jsx';
  * Usa exclusivamente el diseño moderno (floating UI)
  */
 export default function SeatingPlan() {
-  console.log('🎨 Seating Plan: Diseño Moderno (UI Flotante)');
+  // console.log('🎨 Seating Plan: Diseño Moderno (UI Flotante)');
 
   return <SeatingPlanModern />;
 }

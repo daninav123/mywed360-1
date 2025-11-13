@@ -87,7 +87,7 @@ export default function Inspiration() {
             return legacyRemote;
           }
         } catch (error) {
-          console.warn('[Inspiration] No se pudo leer favoritos legacy remotos:', error);
+          // console.warn('[Inspiration] No se pudo leer favoritos legacy remotos:', error);
         }
       }
       try {

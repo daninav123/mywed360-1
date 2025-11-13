@@ -19,7 +19,7 @@ if (DSN) {
       if (typeof window !== 'undefined') window.__sentry = Sentry;
     } catch (e) {
       // Paquete no instalado o error de init; continuar sin Sentry
-      console.warn('[Sentry] init opcional no disponible:', e?.message || e);
+      // console.warn('[Sentry] init opcional no disponible:', e?.message || e);
     }
   })();
 }

@@ -6,7 +6,7 @@
  */
 
 if (import.meta.env.DEV) {
-  console.warn('[BudgetApprovalHarness] Este archivo es un guardarraíl; usa src/pages/test/BudgetApprovalHarness.jsx');
+  // console.warn('[BudgetApprovalHarness] Este archivo es un guardarraíl; usa src/pages/test/BudgetApprovalHarness.jsx');
 }
 
 export default function BudgetApprovalHarnessGuardRail() {

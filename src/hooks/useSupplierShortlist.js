@@ -36,7 +36,7 @@ export default function useSupplierShortlist() {
       try {
         localStorage.setItem(storageKey, JSON.stringify(nextItems));
       } catch (err) {
-        console.warn('[useSupplierShortlist] persistLocal failed', err);
+        // console.warn('[useSupplierShortlist] persistLocal failed', err);
       }
     },
     [storageKey]
@@ -54,7 +54,7 @@ export default function useSupplierShortlist() {
       }
       return null;
     } catch (err) {
-      console.warn('[useSupplierShortlist] loadFromCache failed', err);
+      // console.warn('[useSupplierShortlist] loadFromCache failed', err);
       return null;
     }
   }, [storageKey]);
@@ -78,7 +78,7 @@ export default function useSupplierShortlist() {
       setItems(list);
       persistLocal(list);
     } catch (err) {
-      console.warn('[useSupplierShortlist] load failed', err);
+      // console.warn('[useSupplierShortlist] load failed', err);
       const cached = loadFromCache();
       if (!cached) setError(err);
     } finally {
@@ -107,7 +107,7 @@ export default function useSupplierShortlist() {
         });
         return ref.id;
       } catch (err) {
-        console.warn('[useSupplierShortlist] addEntry failed', err);
+        // console.warn('[useSupplierShortlist] addEntry failed', err);
         throw err;
       }
     },
@@ -128,7 +128,7 @@ export default function useSupplierShortlist() {
           return next;
         });
       } catch (err) {
-        console.warn('[useSupplierShortlist] markReviewed failed', err);
+        // console.warn('[useSupplierShortlist] markReviewed failed', err);
       }
     },
     [collectionRef, persistLocal]
@@ -146,7 +146,7 @@ export default function useSupplierShortlist() {
           return next;
         });
       } catch (err) {
-        console.warn('[useSupplierShortlist] removeEntry failed', err);
+        // console.warn('[useSupplierShortlist] removeEntry failed', err);
       }
     },
     [collectionRef, persistLocal]

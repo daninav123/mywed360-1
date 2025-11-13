@@ -63,15 +63,15 @@ export async function fetchPublishedTaskTemplate({ forceRefresh = false } = {}) 
           const normalized = normalizeTemplate(data);
           cachedTemplate = normalized;
           cachedAt = now;
-          console.warn('[taskTemplateClient] Usando plantilla legacy de config/taskTemplate. Migrar a adminTaskTemplates.');
+          // console.warn('[taskTemplateClient] Usando plantilla legacy de config/taskTemplate. Migrar a adminTaskTemplates.');
           return normalized;
         }
       }
     } catch (legacyError) {
-      console.warn('[taskTemplateClient] Fallback legacy falló:', legacyError);
+      // console.warn('[taskTemplateClient] Fallback legacy falló:', legacyError);
     }
   } catch (error) {
-    console.warn('[taskTemplateClient] fetchPublishedTaskTemplate failed', error);
+    // console.warn('[taskTemplateClient] fetchPublishedTaskTemplate failed', error);
   }
 
   // Último fallback: plantilla hardcodeada

@@ -32,7 +32,7 @@ export default function GuestEventBridge() {
             createdAt: serverTimestamp(),
           };
           await addDoc(colRef, payload);
-          console.log('[GuestEventBridge] Invitado creado');
+          // console.log('[GuestEventBridge] Invitado creado');
           return;
         }
 
@@ -67,17 +67,17 @@ export default function GuestEventBridge() {
           };
           Object.keys(patch).forEach((k) => patch[k] == null && delete patch[k]);
           await updateDoc(doc(db, 'weddings', activeWedding, 'guests', targetId), patch);
-          console.log('[GuestEventBridge] Invitado actualizado', targetId);
+          // console.log('[GuestEventBridge] Invitado actualizado', targetId);
           return;
         }
         if (action === 'delete') {
           await deleteDoc(doc(db, 'weddings', activeWedding, 'guests', targetId));
-          console.log('[GuestEventBridge] Invitado eliminado', targetId);
+          // console.log('[GuestEventBridge] Invitado eliminado', targetId);
           return;
         }
       } catch (e) {
         // eslint-disable-next-line no-console
-        console.error('[GuestEventBridge] Error al manejar evento mywed360-guests', e);
+        // console.error('[GuestEventBridge] Error al manejar evento mywed360-guests', e);
       }
     };
 

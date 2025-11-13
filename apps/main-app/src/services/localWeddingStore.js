@@ -20,7 +20,7 @@ const readStore = () => {
       return parsed;
     }
   } catch (error) {
-    console.warn('[localWeddingStore] readStore error', error);
+    // console.warn('[localWeddingStore] readStore error', error);
   }
   return { users: {} };
 };
@@ -32,7 +32,7 @@ const writeStore = (store) => {
     global.localStorage.setItem(STORE_KEY, JSON.stringify(store));
     global.dispatchEvent?.(new CustomEvent(LOCAL_WEDDINGS_EVENT));
   } catch (error) {
-    console.warn('[localWeddingStore] writeStore error', error);
+    // console.warn('[localWeddingStore] writeStore error', error);
   }
 };
 

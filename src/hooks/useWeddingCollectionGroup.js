@@ -25,7 +25,7 @@ export function useWeddingCollectionGroup(groupName, weddingId) {
         try {
           let arr = snap.docs.map((d) => ({ ...d.data(), id: d.id, __path: d.ref.path }));
           try {
-            console.log(`[CG:${groupName}] raw=${arr.length}`, arr.slice(0, 3).map((x) => x.__path || x.id));
+            // console.log(`[CG:${groupName}] raw=${arr.length}`, arr.slice(0, 3).map((x) => x.__path || x.id));
           } catch {}
           // Filtrar por boda: por campo weddingId si existe o por ruta
           arr = arr.filter((doc) => {
@@ -38,7 +38,7 @@ export function useWeddingCollectionGroup(groupName, weddingId) {
             }
           });
           try {
-            console.log(`[CG:${groupName}] wedding=${weddingId} afterFilter=${arr.length}`, arr.slice(0, 3).map((x) => x.__path || x.id));
+            // console.log(`[CG:${groupName}] wedding=${weddingId} afterFilter=${arr.length}`, arr.slice(0, 3).map((x) => x.__path || x.id));
             window.mywed = window.mywed || {};
             window.mywed._cg = window.mywed._cg || {};
             window.mywed._cg[groupName] = { total: arr.length, sample: arr.slice(0, 10) };

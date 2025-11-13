@@ -117,7 +117,7 @@ const AdminSuppliers = () => {
       const data = await getAdminSupplierAnalytics({ topLimit: 8 });
       setAnalytics(data);
     } catch (error) {
-      console.error('[AdminSuppliers] analytics error', error);
+      // console.error('[AdminSuppliers] analytics error', error);
       setAnalytics(DEFAULT_SUPPLIER_ANALYTICS);
       setAnalyticsError('No se pudo cargar la analítica de proveedores.');
     } finally {
@@ -132,7 +132,7 @@ const AdminSuppliers = () => {
       const data = await getAdminSupplierList({ ...filters, limit: 150 });
       setListData(data);
     } catch (error) {
-      console.error('[AdminSuppliers] list error', error);
+      // console.error('[AdminSuppliers] list error', error);
       setListData(DEFAULT_SUPPLIER_LIST);
       setListError('No se pudo cargar el listado de proveedores.');
     } finally {

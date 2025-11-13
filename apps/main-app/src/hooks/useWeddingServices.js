@@ -19,7 +19,7 @@ async function getAuthToken() {
     }
     return null;
   } catch (err) {
-    console.error('[useWeddingServices] Error obteniendo token:', err);
+    // console.error('[useWeddingServices] Error obteniendo token:', err);
     return null;
   }
 }
@@ -50,7 +50,7 @@ export function useWeddingServices() {
       const token = await getAuthToken();
 
       if (!token) {
-        console.warn('[useWeddingServices] No se pudo obtener token');
+        // console.warn('[useWeddingServices] No se pudo obtener token');
         setServices([]);
         setLoading(false);
         return;
@@ -60,7 +60,7 @@ export function useWeddingServices() {
       });
       setServices(response.data.services || []);
     } catch (err) {
-      console.error('Error loading services:', err);
+      // console.error('Error loading services:', err);
       setError('Error al cargar servicios');
       setServices([]);
     } finally {
@@ -105,7 +105,7 @@ export function useWeddingServices() {
       await loadServices();
       return response.data;
     } catch (err) {
-      console.error('Error assigning supplier:', err);
+      // console.error('Error assigning supplier:', err);
       throw new Error(err.response?.data?.error || 'Error al asignar proveedor');
     }
   };
@@ -127,7 +127,7 @@ export function useWeddingServices() {
       // Recargar servicios
       await loadServices();
     } catch (err) {
-      console.error('Error updating service status:', err);
+      // console.error('Error updating service status:', err);
       throw new Error(err.response?.data?.error || 'Error al actualizar estado');
     }
   };
@@ -148,7 +148,7 @@ export function useWeddingServices() {
       // Recargar servicios
       await loadServices();
     } catch (err) {
-      console.error('Error removing assigned supplier:', err);
+      // console.error('Error removing assigned supplier:', err);
       throw new Error(err.response?.data?.error || 'Error al eliminar proveedor');
     }
   };
@@ -176,7 +176,7 @@ export function useWeddingServices() {
       await loadServices();
       return response.data;
     } catch (err) {
-      console.error('Error adding payment:', err);
+      // console.error('Error adding payment:', err);
       throw new Error(err.response?.data?.error || 'Error al registrar pago');
     }
   };

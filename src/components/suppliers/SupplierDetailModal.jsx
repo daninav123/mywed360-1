@@ -76,7 +76,7 @@ const SupplierDetailModal = ({
           }
         }
       } catch (error) {
-        console.error('Error loading portfolio:', error);
+        // console.error('Error loading portfolio:', error);
       } finally {
         setLoadingPortfolio(false);
       }

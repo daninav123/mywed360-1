@@ -128,7 +128,7 @@ export default function Contratos() {
         if (uploaded && uploaded[0]?.url) docUrl = uploaded[0].url;
       }
     } catch (err) {
-      console.warn('Upload contrato fallҳ, usando URL temporal');
+      // console.warn('Upload contrato fallҳ, usando URL temporal');
     }
     const { docFile, ...rest } = newContract;
     const contractObj = { id: `ct${Date.now()}`, ...rest, docUrl };
@@ -168,7 +168,7 @@ export default function Contratos() {
       a.click();
       URL.revokeObjectURL(url);
     } catch (e) {
-      console.error('Export CSV error', e);
+      // console.error('Export CSV error', e);
     }
   };
 
@@ -214,7 +214,7 @@ export default function Contratos() {
               if (uploaded && uploaded[0]?.url) docUrl = uploaded[0].url;
             }
           } catch (eUp) {
-            console.warn('No se pudo adjuntar documento base', eUp);
+            // console.warn('No se pudo adjuntar documento base', eUp);
           }
         }
         const contractObj = {
@@ -241,7 +241,7 @@ export default function Contratos() {
       setAttachBaseDoc(true);
       setToast({ message: 'Contratos generados', type: 'success' });
     } catch (err) {
-      console.error('Error generando contratos genҩricos', err);
+      // console.error('Error generando contratos genҩricos', err);
       setToast({ message: 'Error al generar contratos', type: 'error' });
     }
   };

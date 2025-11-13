@@ -220,7 +220,7 @@ class GamificationService {
   async triggerEvent(userId, weddingId, eventType, metadata = {}) {
     try {
       if (!userId || !weddingId) {
-        console.warn('GamificationService: userId and weddingId are required');
+        // console.warn('GamificationService: userId and weddingId are required');
         return null;
       }
 
@@ -230,7 +230,7 @@ class GamificationService {
       );
 
       if (!achievement) {
-        console.warn(`GamificationService: No achievement found for event: ${eventType}`);
+        // console.warn(`GamificationService: No achievement found for event: ${eventType}`);
         return null;
       }
 
@@ -240,7 +240,7 @@ class GamificationService {
       const progress = progressDoc.data() || { totalPoints: 0, achievements: [] };
 
       if (progress.achievements?.includes(achievement.id)) {
-        console.log(`Achievement ${achievement.id} already unlocked`);
+        // console.log(`Achievement ${achievement.id} already unlocked`);
         return null;
       }
 
@@ -275,7 +275,7 @@ class GamificationService {
         levelInfo: getLevelInfo(progress.totalPoints + achievement.points)
       };
     } catch (error) {
-      console.error('Error triggering gamification event:', error);
+      // console.error('Error triggering gamification event:', error);
       return null;
     }
   }
@@ -302,7 +302,7 @@ class GamificationService {
         level: getLevelInfo(data.totalPoints || 0)
       };
     } catch (error) {
-      console.error('Error getting user progress:', error);
+      // console.error('Error getting user progress:', error);
       return null;
     }
   }
@@ -319,7 +319,7 @@ class GamificationService {
         Object.values(ACHIEVEMENTS).find(a => a.id === id)
       ).filter(Boolean);
     } catch (error) {
-      console.error('Error getting unlocked achievements:', error);
+      // console.error('Error getting unlocked achievements:', error);
       return [];
     }
   }
@@ -362,7 +362,7 @@ class GamificationService {
       try {
         callback(event);
       } catch (error) {
-        console.error('Error in gamification listener:', error);
+        // console.error('Error in gamification listener:', error);
       }
     });
   }
@@ -414,7 +414,7 @@ export function useGamification(userId) {
         }));
 
         // Mostrar notificaci�n (opcional)
-        console.log('<� Achievement unlocked:', event.achievement.name);
+        // console.log('<� Achievement unlocked:', event.achievement.name);
       }
     });
 

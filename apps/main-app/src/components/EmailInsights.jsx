@@ -27,7 +27,7 @@ export default function EmailInsights({ mailId, userId, email }) {
         const json = await res.json();
         if (!ignore) setInsights(json);
       } catch (err) {
-        console.error('Error obteniendo insights:', err);
+        // console.error('Error obteniendo insights:', err);
         if (!ignore) setInsights(null);
       } finally {
         if (!ignore) setLoading(false);
@@ -198,7 +198,7 @@ export default function EmailInsights({ mailId, userId, email }) {
           };
           window.dispatchEvent(new CustomEvent('maloveapp-tasks', { detail: { meeting } }));
         } catch (err) {
-          console.warn('No se pudo despachar Reunión:', err);
+          // console.warn('No se pudo despachar Reunión:', err);
         }
       });
     }

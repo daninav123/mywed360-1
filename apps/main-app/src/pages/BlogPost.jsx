@@ -156,7 +156,7 @@ const BlogPost = () => {
         }
       } catch (err) {
         if (cancelled) return;
-        console.error('[BlogPost] fetch failed', err);
+        // console.error('[BlogPost] fetch failed', err);
         setError(
           t('blog.post.errors.loadFailed', {
             defaultValue: 'No se pudo cargar el contenido. Inténtalo de nuevo más tarde.',
@@ -229,7 +229,7 @@ const BlogPost = () => {
         }
       } catch (err) {
         if (!cancelled) {
-          console.error('[BlogPost] related fetch failed', err);
+          // console.error('[BlogPost] related fetch failed', err);
           setRelatedPosts([]);
         }
       } finally {

@@ -158,7 +158,7 @@ export default function SaveTheDateModal({
           // eslint-disable-next-line no-await-in-loop
           await new Promise((r) => setTimeout(r, 200));
         } catch (error) {
-          console.error('[SaveTheDateModal] error enviando mensaje', error);
+          // console.error('[SaveTheDateModal] error enviando mensaje', error);
           fail++;
           failIds.push(g.id);
         }

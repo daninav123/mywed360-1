@@ -137,7 +137,7 @@ export default function ExportWizardEnhanced({
       const url = URL.createObjectURL(blob);
       setPreviewUrl(url);
     } catch (error) {
-      console.error('Error generating preview:', error);
+      // console.error('Error generating preview:', error);
       toast.error('Error generando vista previa');
     }
   };
@@ -172,7 +172,7 @@ export default function ExportWizardEnhanced({
         onClose();
       }, 1000);
     } catch (error) {
-      console.error('Export error:', error);
+      // console.error('Export error:', error);
       toast.error('Error al exportar');
     } finally {
       setIsGenerating(false);

@@ -131,7 +131,7 @@ const EmailSettings = () => {
           setScheduledEmails(Array.isArray(scheduled) ? scheduled : []);
         }
       } catch (error) {
-        console.error('Unable to load scheduled emails queue', error);
+        // console.error('Unable to load scheduled emails queue', error);
       }
     },
     []
@@ -158,7 +158,7 @@ const EmailSettings = () => {
       try {
         await refreshScheduledEmailsState(true);
       } catch (error) {
-        console.error('Unable to load scheduled emails queue', error);
+        // console.error('Unable to load scheduled emails queue', error);
       }
 
       try {
@@ -173,7 +173,7 @@ const EmailSettings = () => {
         }
       } catch (error) {
         if (!cancelled) {
-          console.error('Unable to sync automation configuration', error);
+          // console.error('Unable to sync automation configuration', error);
           setConfigSyncError(tEmail('settings.autoReply.errors.sync'));
         }
       } finally {
@@ -247,7 +247,7 @@ const EmailSettings = () => {
     try {
       await cancelScheduledEmail(id);
     } catch (error) {
-      console.error('Unable to cancel scheduled email', error);
+      // console.error('Unable to cancel scheduled email', error);
     } finally {
       await refreshScheduledEmailsState(true);
     }
@@ -283,7 +283,7 @@ const EmailSettings = () => {
         setTimeout(() => setSuccess(false), 3000);
       }
     } catch (aliasError) {
-      console.error('Error changing email alias:', aliasError);
+      // console.error('Error changing email alias:', aliasError);
       setError(
         tEmailVars('settings.alias.changeError', {
           message: aliasError?.message || 'unknown',

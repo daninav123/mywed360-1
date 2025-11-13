@@ -880,7 +880,7 @@ const AdminDiscounts = () => {
           setError('');
         }
       } catch (err) {
-        console.error('[AdminDiscounts] load failed:', err);
+        // console.error('[AdminDiscounts] load failed:', err);
         if (!cancelled) {
           setError('No se pudieron obtener los enlaces de descuento.');
           setLinks([]);
@@ -985,7 +985,7 @@ const AdminDiscounts = () => {
       await navigator.clipboard.writeText(text);
       toast.success(t('admin.clipboard.copied'));
     } catch (copyError) {
-      console.warn('[AdminDiscounts] clipboard copy failed:', copyError);
+      // console.warn('[AdminDiscounts] clipboard copy failed:', copyError);
       toast.error(t('admin.clipboard.copyError'));
     }
   };
@@ -998,7 +998,7 @@ const AdminDiscounts = () => {
       await copyToClipboard(result.url);
       toast.success(t('admin.partner.linkGenerated', { url: result.url }));
     } catch (err) {
-      console.error('[AdminDiscounts] generate partner link failed:', err);
+      // console.error('[AdminDiscounts] generate partner link failed:', err);
       toast.error(err.message || t('admin.partner.linkError'));
     }
   };
@@ -1067,7 +1067,7 @@ const AdminDiscounts = () => {
       setShowCreateManagerModal(false);
       resetManagerForm();
     } catch (err) {
-      console.error('[AdminDiscounts] create manager failed:', err);
+      // console.error('[AdminDiscounts] create manager failed:', err);
       setCreateManagerError(err.message || 'Error al crear el jefe comercial.');
     } finally {
       setCreatingManager(false);
@@ -1128,7 +1128,7 @@ const AdminDiscounts = () => {
       setShowCreateCommercialModal(false);
       resetCommercialForm();
     } catch (err) {
-      console.error('[AdminDiscounts] create commercial failed:', err);
+      // console.error('[AdminDiscounts] create commercial failed:', err);
       setCreateCommercialError(err.message || 'Error al crear el comercial.');
     } finally {
       setCreatingCommercial(false);
@@ -1202,7 +1202,7 @@ const AdminDiscounts = () => {
       resetForm();
       setShowCreateModal(false);
     } catch (err) {
-      console.error('[AdminDiscounts] create failed:', err);
+      // console.error('[AdminDiscounts] create failed:', err);
       setFormError(err.message || 'Error al crear el codigo de descuento');
     } finally {
       setCreating(false);
@@ -1277,7 +1277,7 @@ const AdminDiscounts = () => {
       setShowEditModal(false);
       setEditingDiscount(null);
     } catch (err) {
-      console.error('[AdminDiscounts] update failed:', err);
+      // console.error('[AdminDiscounts] update failed:', err);
       setEditError(err.message || 'Error al actualizar el codigo de descuento');
     } finally {
       setUpdating(false);

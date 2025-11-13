@@ -65,7 +65,7 @@ const FavoritesSection = () => {
       toast.success(t('suppliers.favorites.toasts.removed'));
     } catch (error) {
       toast.error(t('suppliers.favorites.toasts.removeError'));
-      console.error(error);
+      // console.error(error);
     }
   };
 

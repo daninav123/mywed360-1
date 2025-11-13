@@ -77,7 +77,7 @@ export async function mapAuthError(error, options = {}) {
           };
         }
       } catch (lookupError) {
-        console.warn('[authErrorMapper] No se pudieron obtener los metodos asociados:', lookupError);
+        // console.warn('[authErrorMapper] No se pudieron obtener los metodos asociados:', lookupError);
       }
     }
 

@@ -30,7 +30,7 @@ export default function SupplierReviews({ supplierId }) {
       setReviews(data.reviews || []);
       setStats(data.stats || {});
     } catch (error) {
-      console.error('Error loading reviews:', error);
+      // console.error('Error loading reviews:', error);
       toast.error('Error al cargar las reseñas');
     } finally {
       setLoading(false);
@@ -71,7 +71,7 @@ export default function SupplierReviews({ supplierId }) {
       setNewReview({ rating: 5, comment: '', weddingDate: '', serviceType: '' });
       loadReviews();
     } catch (error) {
-      console.error('Error creating review:', error);
+      // console.error('Error creating review:', error);
       toast.error('Error al enviar la reseña');
     }
   };
@@ -87,7 +87,7 @@ export default function SupplierReviews({ supplierId }) {
         prev.map((r) => (r.id === reviewId ? { ...r, helpful: (r.helpful || 0) + 1 } : r))
       );
     } catch (error) {
-      console.error('Error marking helpful:', error);
+      // console.error('Error marking helpful:', error);
     }
   };
 

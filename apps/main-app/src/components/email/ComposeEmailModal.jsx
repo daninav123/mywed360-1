@@ -75,7 +75,7 @@ const ComposeEmailModal = ({ isOpen, onClose, userEmail, replyTo }) => {
         setSuccess(false);
       }, 1500);
     } catch (error) {
-      console.error('Error al enviar correo:', error);
+      // console.error('Error al enviar correo:', error);
       setError(`Error al enviar el correo: ${error.message}`);
     } finally {
       setSending(false);

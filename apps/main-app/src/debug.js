@@ -47,6 +47,6 @@ exec('netstat -ano | findstr "5173 5174"', (error, stdout, stderr) => {
       'utf8'
     );
 
-    console.log('Información de depuración guardada en src/debug_info.json');
+    // console.log('Información de depuración guardada en src/debug_info.json');
   });
 });

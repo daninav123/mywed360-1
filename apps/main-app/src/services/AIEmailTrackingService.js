@@ -47,7 +47,7 @@ class AIEmailTrackingService {
 
       return activityId;
     } catch (error) {
-      console.error('Error registrando actividad de email AI:', error);
+      // console.error('Error registrando actividad de email AI:', error);
       return null;
     }
   }
@@ -86,7 +86,7 @@ class AIEmailTrackingService {
 
       return true;
     } catch (error) {
-      console.error('Error actualizando actividad AI con respuesta:', error);
+      // console.error('Error actualizando actividad AI con respuesta:', error);
       return false;
     }
   }
@@ -131,7 +131,7 @@ class AIEmailTrackingService {
         return incluir;
       });
     } catch (error) {
-      console.error('Error obteniendo actividades AI:', error);
+      // console.error('Error obteniendo actividades AI:', error);
       return [];
     }
   }
@@ -205,7 +205,7 @@ class AIEmailTrackingService {
 
       return metrics;
     } catch (error) {
-      console.error('Error actualizando métricas:', error);
+      // console.error('Error actualizando métricas:', error);
       return null;
     }
   }
@@ -224,7 +224,7 @@ class AIEmailTrackingService {
 
       return this.updateOverallMetrics();
     } catch (error) {
-      console.error('Error obteniendo métricas AI:', error);
+      // console.error('Error obteniendo métricas AI:', error);
       return null;
     }
   }
@@ -299,7 +299,7 @@ class AIEmailTrackingService {
         })),
       };
     } catch (error) {
-      console.error('Error obteniendo datos de comparación:', error);
+      // console.error('Error obteniendo datos de comparación:', error);
       return {
         ai: { total: 0, responded: 0, responseRate: '0.00', avgResponseTime: '0.0' },
         nonAi: { total: 0, responded: 0, responseRate: '0.00', avgResponseTime: '0.0' },

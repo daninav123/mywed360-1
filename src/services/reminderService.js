@@ -59,11 +59,11 @@ async function runReminderJob(days) {
 
     // Validar que sentMails e inboxMails sean arrays
     if (!Array.isArray(sentMails)) {
-      console.warn('sentMails no es un array, saltando job de recordatorios');
+      // console.warn('sentMails no es un array, saltando job de recordatorios');
       return;
     }
     if (!Array.isArray(inboxMails)) {
-      console.warn('inboxMails no es un array, usando array vacío');
+      // console.warn('inboxMails no es un array, usando array vacío');
       inboxMails = [];
     }
 
@@ -98,10 +98,10 @@ async function runReminderJob(days) {
         const updated = stored.map((m) => (m.id === mail.id ? mail : m));
         localStorage.setItem('maloveapp_mails', JSON.stringify(updated));
       } catch (e) {
-        console.error('Error actualizando estado de recordatorio:', e);
+        // console.error('Error actualizando estado de recordatorio:', e);
       }
     }
   } catch (err) {
-    console.error('Error en job de recordatorios:', err);
+    // console.error('Error en job de recordatorios:', err);
   }
 }

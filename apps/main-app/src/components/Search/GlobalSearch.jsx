@@ -71,7 +71,7 @@ const GlobalSearch = ({ isOpen, onClose }) => {
         setResults(searchResults);
         setSelectedIndex(0);
       } catch (error) {
-        console.error('Error en búsqueda:', error);
+        // console.error('Error en búsqueda:', error);
         setResults([]);
       } finally {
         setIsSearching(false);
@@ -143,7 +143,7 @@ const GlobalSearch = ({ isOpen, onClose }) => {
   };
 
   const handleImportSuccess = (importedSupplier) => {
-    console.log('✅ Proveedor importado:', importedSupplier);
+    // console.log('✅ Proveedor importado:', importedSupplier);
     // Podríamos navegar a la página de proveedores
     navigate('/proveedores');
     onClose();

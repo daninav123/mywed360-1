@@ -48,7 +48,7 @@ export const useWidgets = () => {
         setWidgets(DEFAULT_WIDGETS);
       }
     } catch (error) {
-      console.error('Error loading widgets:', error);
+      // console.error('Error loading widgets:', error);
       setWidgets(DEFAULT_WIDGETS);
     }
   }, []);
@@ -59,7 +59,7 @@ export const useWidgets = () => {
       try {
         localStorage.setItem(WIDGETS_STORAGE_KEY, JSON.stringify(widgets));
       } catch (error) {
-        console.error('Error saving widgets:', error);
+        // console.error('Error saving widgets:', error);
       }
     }
   }, [widgets]);

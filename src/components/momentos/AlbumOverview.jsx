@@ -201,7 +201,7 @@ export default function AlbumOverview({
       })
       .catch((error) => {
         if (!cancelled) {
-          console.error('[AlbumOverview] Error generando QR', error);
+          // console.error('[AlbumOverview] Error generando QR', error);
           setQrError('No se pudo generar el c�digo QR');
           setQrDataUrl('');
         }

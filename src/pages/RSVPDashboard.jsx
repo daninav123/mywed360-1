@@ -96,7 +96,7 @@ export default function RSVPDashboard() {
       );
       return () => unsub();
     } catch (error) {
-      console.warn('[RSVPDashboard] reminderLog listener error', error);
+      // console.warn('[RSVPDashboard] reminderLog listener error', error);
     }
   }, [activeWedding]);
 
@@ -447,7 +447,7 @@ export default function RSVPDashboard() {
                                 await navigator.clipboard.writeText(link);
                                 toast.success(t('rsvp.linkCopied'));
                               } catch (e) {
-                                console.error(e);
+                                // console.error(e);
                                 toast.error(t('rsvp.linkCopyError'));
                               }
                             }}

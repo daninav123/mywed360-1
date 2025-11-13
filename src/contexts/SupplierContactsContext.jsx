@@ -18,7 +18,7 @@ export function SupplierContactsProvider({ children }) {
         setContacts(JSON.parse(stored));
       }
     } catch (error) {
-      console.error('Error loading supplier contacts:', error);
+      // console.error('Error loading supplier contacts:', error);
     }
   }, [activeWedding]);
 
@@ -31,7 +31,7 @@ export function SupplierContactsProvider({ children }) {
       try {
         localStorage.setItem(storageKey, JSON.stringify(newContacts));
       } catch (error) {
-        console.error('Error saving supplier contacts:', error);
+        // console.error('Error saving supplier contacts:', error);
       }
     },
     [activeWedding]

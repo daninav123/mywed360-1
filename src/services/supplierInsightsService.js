@@ -20,7 +20,7 @@ export async function fetchSupplierInsights(supplierId) {
     if (!snap.exists()) return null;
     return snap.data();
   } catch (error) {
-    console.warn('[supplierInsights] fetch failed', error);
+    // console.warn('[supplierInsights] fetch failed', error);
     return null;
   }
 }
@@ -93,6 +93,6 @@ export async function recordSupplierInsight({
       status: status || 'Desconocido',
     });
   } catch (error) {
-    console.warn('[supplierInsights] record failed', error);
+    // console.warn('[supplierInsights] record failed', error);
   }
 }

@@ -33,7 +33,7 @@ export function useFallbackReporting() {
   const reportFallback = useCallback(
     async (service, error, metadata = {}) => {
       // Log local inmediato para debugging
-      console.warn(`[Fallback] ${service}:`, error);
+      // console.warn(`[Fallback] ${service}:`, error);
 
       // Extraer información del error
       const errorMessage = error instanceof Error ? error.message : String(error);
@@ -66,19 +66,19 @@ export function useFallbackReporting() {
         if (response?.ok) {
           const result = await response.json();
           if (import.meta.env.DEV) {
-            console.debug(`[useFallbackReporting] Reported to backend:`, {
+            // console.debug(`[useFallbackReporting] Reported to backend:`, {
               service,
               count: result.count,
             });
           }
         } else {
           // Falló el reporte, pero no es crítico
-          console.debug(`[useFallbackReporting] Failed to report (non-critical):`, response?.status);
+          // console.debug(`[useFallbackReporting] Failed to report (non-critical):`, response?.status);
         }
       } catch (reportError) {
         // Fallar silenciosamente al reportar fallbacks
         // No queremos que un error al reportar cause más problemas
-        console.debug('[useFallbackReporting] Report error (non-critical):', reportError.message);
+        // console.debug('[useFallbackReporting] Report error (non-critical):', reportError.message);
       }
     },
     [user]

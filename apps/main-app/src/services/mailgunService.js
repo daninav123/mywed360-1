@@ -87,7 +87,7 @@ export async function sendEmail(options) {
       response: data,
     };
   } catch (error) {
-    console.error('Error en Cloud Function sendEmail:', error);
+    // console.error('Error en Cloud Function sendEmail:', error);
     throw error;
   }
 }
@@ -119,7 +119,7 @@ export async function validateEmail(email) {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error('Error en la validación de correo:', error);
+    // console.error('Error en la validación de correo:', error);
     throw error;
   }
 }
@@ -156,7 +156,7 @@ export async function checkUsernameAvailability(username) {
     // En producción, se debería verificar contra una base de datos de usuarios existentes
     return validationResult.is_valid && !validationResult.is_disposable_address;
   } catch (error) {
-    console.error('Error al verificar disponibilidad de nombre de usuario:', error);
+    // console.error('Error al verificar disponibilidad de nombre de usuario:', error);
     // En caso de error, asumimos que no está disponible por precaución
     return false;
   }
@@ -194,7 +194,7 @@ export async function createForwardingRoute(address, forwardTo) {
   try {
     return { available: true };
   } catch (error) {
-    console.error('Error en Mailgun createForwardingRoute:', error);
+    // console.error('Error en Mailgun createForwardingRoute:', error);
     throw error;
   }
 }
@@ -231,7 +231,7 @@ export async function getMailEvents(emailAddress, eventType = 'delivered', limit
     const data = await response.json();
     return data.items || [];
   } catch (error) {
-    console.error('Error al obtener eventos de correo:', error);
+    // console.error('Error al obtener eventos de correo:', error);
     throw error;
   }
 }
@@ -257,7 +257,7 @@ export async function fetchMailgunDomainStatus() {
       mx: { valid: true, status: 'valid' },
     };
   } catch (error) {
-    console.error('Error al obtener estado del dominio:', error);
+    // console.error('Error al obtener estado del dominio:', error);
     throw error;
   }
 }
@@ -285,7 +285,7 @@ export async function sendAliasVerificationEmail(alias) {
       alias: alias,
     };
   } catch (error) {
-    console.error('Error al enviar email de verificación:', error);
+    // console.error('Error al enviar email de verificación:', error);
     throw error;
   }
 }

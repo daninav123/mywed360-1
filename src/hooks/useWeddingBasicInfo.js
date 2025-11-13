@@ -41,7 +41,7 @@ export function useWeddingBasicInfo() {
           fecha = activeWeddingData.date;
         }
       } catch (error) {
-        console.warn('Error parseando fecha:', error);
+        // console.warn('Error parseando fecha:', error);
       }
     }
 

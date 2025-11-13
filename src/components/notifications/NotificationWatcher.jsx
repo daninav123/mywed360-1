@@ -148,7 +148,7 @@ export default function NotificationWatcher({ intervalMs = 20000 }) {
         } catch {}
       } catch (error) {
         if (import.meta.env?.DEV) {
-          console.debug('[NotificationWatcher] load error, usando cache local', error?.message);
+          // console.debug('[NotificationWatcher] load error, usando cache local', error?.message);
         }
       }
     };

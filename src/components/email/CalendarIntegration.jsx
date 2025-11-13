@@ -219,7 +219,7 @@ const CalendarIntegration = ({ email, onClose, onSave }) => {
         providerId: email.providerId || null,
       });
     } catch (err) {
-      console.error('[CalendarIntegration] Failed to analyze email:', err);
+      // console.error('[CalendarIntegration] Failed to analyze email:', err);
       setError(tEmail('calendarIntegration.errors.analyzeFailed'));
     } finally {
       setLoading(false);

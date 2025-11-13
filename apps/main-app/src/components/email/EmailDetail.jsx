@@ -85,7 +85,7 @@ const EmailDetail = ({
         minute: '2-digit',
       });
     } catch (e) {
-      console.error('Error al formatear fecha:', e);
+      // console.error('Error al formatear fecha:', e);
       return dateStr;
     }
   };
@@ -241,7 +241,7 @@ const EmailDetail = ({
                 emailId={email.id}
                 onTagsChange={(tags) => {
                   // Podríamos actualizar el estado local si es necesario
-                  console.log('Etiquetas actualizadas:', tags);
+                  // console.log('Etiquetas actualizadas:', tags);
                 }}
                 isSmallScreen={isSmallScreen}
               />

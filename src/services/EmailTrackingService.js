@@ -306,7 +306,7 @@ export function tagProviderEmail_old(emailId, providerId) {
     addTagToEmail(uid, emailId, 'provider');
     return true;
   } catch (err) {
-    console.warn('tagProviderEmail_old: fallo al etiquetar correo como proveedor', err);
+    // console.warn('tagProviderEmail_old: fallo al etiquetar correo como proveedor', err);
     return false;
   }
 }

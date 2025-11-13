@@ -109,7 +109,7 @@ export async function fetchWall(page = 1, query = 'wedding') {
   } else {
     // Si falló hace menos de 30 minutos, usar datos demo directamente
     if (lastFailure && now - parseInt(lastFailure) < 30 * 60 * 1000) {
-      console.log('wallService: usando datos demo (circuit breaker activo)');
+      // console.log('wallService: usando datos demo (circuit breaker activo)');
       return DEMO_IMAGES;
     }
   }
@@ -151,7 +151,7 @@ export async function fetchWall(page = 1, query = 'wedding') {
   } catch (err) {
     // Marcar timestamp del fallo para activar circuit breaker
     localStorage.setItem(lastFailureKey, now.toString());
-    console.warn('wallService: endpoint no disponible, usando datos demo');
+    // console.warn('wallService: endpoint no disponible, usando datos demo');
     return DEMO_IMAGES;
   }
 }

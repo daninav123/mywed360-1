@@ -20,11 +20,11 @@ export function wh(step, data = {}) {
     if (data && typeof data === 'object' && Object.keys(data).length) {
       console.table(data);
     } else if (data !== undefined) {
-      console.log(data);
+      // console.log(data);
     }
     console.groupEnd();
   } catch (e) {
-    console.log(`[WH] ${step}`, data);
+    // console.log(`[WH] ${step}`, data);
   }
 }
 

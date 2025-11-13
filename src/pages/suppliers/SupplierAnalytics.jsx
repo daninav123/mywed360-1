@@ -71,7 +71,7 @@ export default function SupplierAnalytics() {
         setMetrics(metricsData.metrics);
       }
     } catch (error) {
-      console.error('Error loading analytics:', error);
+      // console.error('Error loading analytics:', error);
     } finally {
       setLoading(false);
     }

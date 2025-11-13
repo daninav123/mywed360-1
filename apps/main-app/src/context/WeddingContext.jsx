@@ -50,11 +50,11 @@ async function ensureFinance(weddingId) {
         { merge: true }
       );
       if (import.meta.env.DEV) {
-        console.debug('[WeddingContext] finance/main creado para', weddingId);
+        // console.debug('[WeddingContext] finance/main creado para', weddingId);
       }
     }
   } catch (error) {
-    console.warn('[WeddingContext] No se pudo asegurar finance/main', weddingId, error);
+    // console.warn('[WeddingContext] No se pudo asegurar finance/main', weddingId, error);
   }
 }
 
@@ -93,7 +93,7 @@ export function WeddingProvider({ children }) {
         const activeWedding =
           mockWedding.activeWedding?.id || (weddings.length > 0 ? weddings[0].id : '');
         if (import.meta.env.DEV) {
-          console.log('[WeddingContext] Usando mock de window.__MOCK_WEDDING__', {
+          // console.log('[WeddingContext] Usando mock de window.__MOCK_WEDDING__', {
             weddings,
             activeWedding,
           });
@@ -111,7 +111,7 @@ export function WeddingProvider({ children }) {
         activeWedding: activeWedding?.id || '',
       };
     } catch (e) {
-      console.warn('Error loading test weddings:', e);
+      // console.warn('Error loading test weddings:', e);
       return { weddings: [], activeWedding: '' };
     }
   }, [isTestMode]);
@@ -276,7 +276,7 @@ export function WeddingProvider({ children }) {
       try {
         await firebaseReady;
       } catch (error) {
-        console.warn('[WeddingContext] firebaseReady rejected', error);
+        // console.warn('[WeddingContext] firebaseReady rejected', error);
       }
 
       if (!db || !authUid) {
@@ -322,12 +322,12 @@ export function WeddingProvider({ children }) {
             }
           },
           (error) => {
-            console.warn('[WeddingContext] users/{uid}/weddings snapshot error', error);
+            // console.warn('[WeddingContext] users/{uid}/weddings snapshot error', error);
             applyLocal(localUid);
           }
         );
       } catch (error) {
-        console.warn('[WeddingContext] listen subcollection weddings failed', error);
+        // console.warn('[WeddingContext] listen subcollection weddings failed', error);
         applyLocal(localUid);
       }
     };
@@ -338,7 +338,7 @@ export function WeddingProvider({ children }) {
       cancelled = true;
       if (typeof unsub === 'function') {
         if (import.meta.env.DEV) {
-          console.log('[WeddingContext] Limpiando listener de weddings');
+          // console.log('[WeddingContext] Limpiando listener de weddings');
         }
         unsub();
       }
@@ -470,7 +470,7 @@ export function WeddingProvider({ children }) {
             ).catch(() => {});
           }
         } catch (error) {
-          console.warn('[WeddingContext] No se pudo sincronizar activeWeddingId', error);
+          // console.warn('[WeddingContext] No se pudo sincronizar activeWeddingId', error);
         }
       }
 

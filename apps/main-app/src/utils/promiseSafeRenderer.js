@@ -12,7 +12,7 @@ import { useState } from 'react';
  */
 export function ensureNotPromise(value) {
   if (value && typeof value === 'object' && typeof value.then === 'function') {
-    console.warn('Promesa detectada en renderizado JSX, retornando null para evitar error');
+    // console.warn('Promesa detectada en renderizado JSX, retornando null para evitar error');
     return null;
   }
   return value;
@@ -61,7 +61,7 @@ export function safeExecute(fn, ...args) {
     const result = fn(...args);
     return ensureNotPromise(result);
   } catch (error) {
-    console.error('Error en safeExecute:', error);
+    // console.error('Error en safeExecute:', error);
     return null;
   }
 }

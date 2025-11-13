@@ -5,7 +5,7 @@ import Modal from '../Modal';
 import Button from '../ui/Button';
 
 export default function CreateQuotationModal({ isOpen, onClose, request, onQuotationCreated }) {
-  console.log('[CreateQuotationModal] Render:', { isOpen, hasRequest: !!request });
+  // console.log('[CreateQuotationModal] Render:', { isOpen, hasRequest: !!request });
 
   const [items, setItems] = useState([{ description: '', quantity: 1, unitPrice: 0 }]);
   const [portfolioProducts, setPortfolioProducts] = useState([]);
@@ -43,7 +43,7 @@ export default function CreateQuotationModal({ isOpen, onClose, request, onQuota
         setPortfolioProducts(data.products || []);
       }
     } catch (error) {
-      console.error('Error loading portfolio:', error);
+      // console.error('Error loading portfolio:', error);
     }
   };
 
@@ -139,7 +139,7 @@ export default function CreateQuotationModal({ isOpen, onClose, request, onQuota
 
       onClose();
     } catch (error) {
-      console.error('Error:', error);
+      // console.error('Error:', error);
       toast.error('Error enviando cotización');
     } finally {
       setLoading(false);

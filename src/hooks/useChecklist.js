@@ -202,7 +202,7 @@ export default function useChecklist() {
         
         setDocuments(docs);
       } catch (error) {
-        console.warn('Error al cargar documentos:', error);
+        // console.warn('Error al cargar documentos:', error);
       }
     };
 
@@ -223,7 +223,7 @@ export default function useChecklist() {
       });
       setDocuments(docs);
     }, (error) => {
-      console.warn('Error en listener de documentos:', error);
+      // console.warn('Error en listener de documentos:', error);
     });
 
     unsubDocsRef.current = unsub;
@@ -261,7 +261,7 @@ export default function useChecklist() {
       }
       setLoading(false);
     }, (error) => {
-      console.warn('Error al cargar checklist:', error);
+      // console.warn('Error al cargar checklist:', error);
       setLoading(false);
     });
 
@@ -291,7 +291,7 @@ export default function useChecklist() {
         { merge: true }
       );
     } catch (error) {
-      console.error('Error al guardar checklist:', error);
+      // console.error('Error al guardar checklist:', error);
     } finally {
       setSyncInProgress(false);
     }

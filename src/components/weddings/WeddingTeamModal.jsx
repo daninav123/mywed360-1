@@ -145,7 +145,7 @@ export default function WeddingTeamModal({ open, onClose, weddingId, weddingName
         }
       } catch (error) {
         if (!aborted) {
-          console.warn('[WeddingTeamModal] planner suggestions failed', error);
+          // console.warn('[WeddingTeamModal] planner suggestions failed', error);
           setPlannerCandidates(DEFAULT_PLANNERS);
           setPlannersError('No pudimos cargar planners recomendados. Mostramos opciones de demostración.');
         }

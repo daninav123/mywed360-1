@@ -144,7 +144,7 @@ export default function SupplierDashboard() {
           setNewRequestsCount(requestsData.pagination?.total || 0);
         }
       } catch (err) {
-        console.error('[SupplierDashboard] Error loading requests count:', err);
+        // console.error('[SupplierDashboard] Error loading requests count:', err);
       }
 
       const profile = data.profile || {};
@@ -161,7 +161,7 @@ export default function SupplierDashboard() {
         priceRange: profile.business?.priceRange || '',
       });
     } catch (err) {
-      console.error('[SupplierDashboard] load error', err);
+      // console.error('[SupplierDashboard] load error', err);
       setErrorMessage(err.message || tRef.current('suppliers.dashboard.errors.load'));
     } finally {
       setLoading(false);
@@ -174,17 +174,17 @@ export default function SupplierDashboard() {
     const supplierId = localStorage.getItem('supplier_id');
 
     if (!token || !supplierId) {
-      console.log('❌ [DASHBOARD] No hay token o supplier ID, redirigiendo a login');
+      // console.log('❌ [DASHBOARD] No hay token o supplier ID, redirigiendo a login');
       navigate('/login');
       return;
     }
 
-    console.log('✅ [DASHBOARD] Token encontrado, cargando dashboard...');
-    console.log('✅ [DASHBOARD] ID de URL:', id);
-    console.log('✅ [DASHBOARD] ID guardado:', supplierId);
+    // console.log('✅ [DASHBOARD] Token encontrado, cargando dashboard...');
+    // console.log('✅ [DASHBOARD] ID de URL:', id);
+    // console.log('✅ [DASHBOARD] ID guardado:', supplierId);
 
     if (id !== supplierId) {
-      console.log('⚠️ [DASHBOARD] IDs no coinciden, redirigiendo...');
+      // console.log('⚠️ [DASHBOARD] IDs no coinciden, redirigiendo...');
       navigate(`/dashboard/${supplierId}`);
       return;
     }
@@ -227,7 +227,7 @@ export default function SupplierDashboard() {
       setEditing(false);
       loadDashboard();
     } catch (err) {
-      console.error('[SupplierDashboard] save error', err);
+      // console.error('[SupplierDashboard] save error', err);
       window.alert(t('suppliers.dashboard.alerts.saveError', { message: err.message || '' }));
     } finally {
       setSaving(false);

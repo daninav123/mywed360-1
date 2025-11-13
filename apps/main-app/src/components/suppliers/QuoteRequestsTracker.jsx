@@ -72,7 +72,7 @@ export default function QuoteRequestsTracker() {
 
       setRequests(allRequests);
     } catch (error) {
-      console.error('Error loading quote requests:', error);
+      // console.error('Error loading quote requests:', error);
     } finally {
       setLoading(false);
     }
@@ -143,7 +143,7 @@ export default function QuoteRequestsTracker() {
       setComparingCategory(null);
       await loadQuoteRequests();
     } catch (error) {
-      console.error('Error al asignar proveedor:', error);
+      // console.error('Error al asignar proveedor:', error);
       toast.error('Error al contratar el proveedor. Inténtalo de nuevo.');
     }
   };

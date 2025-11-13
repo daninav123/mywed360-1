@@ -59,7 +59,7 @@ export default function SupplierMessages() {
         }
       }
     } catch (error) {
-      console.error('Error loading conversations:', error);
+      // console.error('Error loading conversations:', error);
     } finally {
       setLoading(false);
     }
@@ -80,7 +80,7 @@ export default function SupplierMessages() {
         setMessages(data.messages);
       }
     } catch (error) {
-      console.error('Error loading messages:', error);
+      // console.error('Error loading messages:', error);
     }
   };
 
@@ -110,7 +110,7 @@ export default function SupplierMessages() {
         loadConversations(); // Actualizar última vista de conversaciones
       }
     } catch (error) {
-      console.error('Error sending message:', error);
+      // console.error('Error sending message:', error);
     } finally {
       setSending(false);
     }
@@ -126,7 +126,7 @@ export default function SupplierMessages() {
       loadConversations();
       setSelectedConversation(null);
     } catch (error) {
-      console.error('Error archiving conversation:', error);
+      // console.error('Error archiving conversation:', error);
     }
   };
 

@@ -47,7 +47,7 @@ export default function MenuCatering() {
         collection: 'userSpecialMenus',
       });
     } catch (error) {
-      console.error('Error al cargar menús especiales:', error);
+      // console.error('Error al cargar menús especiales:', error);
       return { vegetariano: [], infantil: [], sinGluten: [], sinLacteos: [], otros: [] };
     }
   });
@@ -97,7 +97,7 @@ export default function MenuCatering() {
         category="special-menus"
         templates={cateringTemplates}
         onImageGenerated={(image) => {
-          console.log('Nuevos diseños de menús especiales generados:', image);
+          // console.log('Nuevos diseños de menús especiales generados:', image);
         }}
       />
     </div>

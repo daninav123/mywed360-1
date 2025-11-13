@@ -39,7 +39,7 @@ export function useSeatingSync(weddingId, options = {}) {
     if (!enabled || !weddingId) return;
 
     try {
-      console.log('[useSeatingSync] Sincronizando Seating → Guest', { guestId, seatAssignment });
+      // console.log('[useSeatingSync] Sincronizando Seating → Guest', { guestId, seatAssignment });
 
       const guestRef = doc(db, 'weddings', weddingId, 'guests', guestId);
       
@@ -51,7 +51,7 @@ export function useSeatingSync(weddingId, options = {}) {
         lastSyncedFrom: 'seating',
       });
 
-      console.log('[useSeatingSync] ✅ Guest actualizado');
+      // console.log('[useSeatingSync] ✅ Guest actualizado');
 
       // Emitir evento para que otros componentes se actualicen
       window.dispatchEvent(new CustomEvent(SYNC_EVENT, {
@@ -60,7 +60,7 @@ export function useSeatingSync(weddingId, options = {}) {
 
       onSyncComplete?.({ source: 'seating', guestId });
     } catch (error) {
-      console.error('[useSeatingSync] Error sincronizando a guest:', error);
+      // console.error('[useSeatingSync] Error sincronizando a guest:', error);
       onSyncError?.({ source: 'seating', guestId, error });
       throw error;
     }
@@ -74,13 +74,13 @@ export function useSeatingSync(weddingId, options = {}) {
     if (!enabled || !weddingId) return;
 
     try {
-      console.log('[useSeatingSync] Sincronizando Guest → Seating', { guestId, seatAssignment });
+      // console.log('[useSeatingSync] Sincronizando Guest → Seating', { guestId, seatAssignment });
 
       const seatingRef = doc(db, 'weddings', weddingId, 'seatingPlan', 'banquet');
       const seatingSnap = await getDoc(seatingRef);
 
       if (!seatingSnap.exists()) {
-        console.warn('[useSeatingSync] Seating plan no existe, creando...');
+        // console.warn('[useSeatingSync] Seating plan no existe, creando...');
         await updateDoc(seatingRef, {
           tables: [],
           updatedAt: new Date().toISOString(),
@@ -119,11 +119,11 @@ export function useSeatingSync(weddingId, options = {}) {
             };
             updated = true;
           } else {
-            console.warn('[useSeatingSync] Mesa llena, no se puede asignar');
+            // console.warn('[useSeatingSync] Mesa llena, no se puede asignar');
             throw new Error('Mesa llena');
           }
         } else {
-          console.warn('[useSeatingSync] Mesa no encontrada:', seatAssignment.tableId);
+          // console.warn('[useSeatingSync] Mesa no encontrada:', seatAssignment.tableId);
         }
       } else {
         updated = true; // Remoción exitosa
@@ -136,7 +136,7 @@ export function useSeatingSync(weddingId, options = {}) {
           lastSyncedFrom: 'guests',
         });
 
-        console.log('[useSeatingSync] ✅ Seating plan actualizado');
+        // console.log('[useSeatingSync] ✅ Seating plan actualizado');
 
         // Emitir evento
         window.dispatchEvent(new CustomEvent(SYNC_EVENT, {
@@ -146,7 +146,7 @@ export function useSeatingSync(weddingId, options = {}) {
         onSyncComplete?.({ source: 'guests', guestId });
       }
     } catch (error) {
-      console.error('[useSeatingSync] Error sincronizando a seating:', error);
+      // console.error('[useSeatingSync] Error sincronizando a seating:', error);
       onSyncError?.({ source: 'guests', guestId, error });
       throw error;
     }
@@ -161,7 +161,7 @@ export function useSeatingSync(weddingId, options = {}) {
     isSyncingRef.current = true;
 
     try {
-      console.log('[useSeatingSync] Iniciando sincronización masiva...');
+      // console.log('[useSeatingSync] Iniciando sincronización masiva...');
 
       const [guestsSnap, seatingSnap] = await Promise.all([
         getDocs(collection(db, 'weddings', weddingId, 'guests')),
@@ -214,7 +214,7 @@ export function useSeatingSync(weddingId, options = {}) {
           });
 
           changesCount++;
-          console.log('[useSeatingSync] Corrigiendo guest:', guestId, {
+          // console.log('[useSeatingSync] Corrigiendo guest:', guestId, {
             from: guestTableId,
             to: seatingTableId,
           });
@@ -223,16 +223,16 @@ export function useSeatingSync(weddingId, options = {}) {
 
       if (changesCount > 0) {
         await batch.commit();
-        console.log(`[useSeatingSync] ✅ ${changesCount} invitados sincronizados`);
+        // console.log(`[useSeatingSync] ✅ ${changesCount} invitados sincronizados`);
       } else {
-        console.log('[useSeatingSync] ✅ No hay discrepancias');
+        // console.log('[useSeatingSync] ✅ No hay discrepancias');
       }
 
       onSyncComplete?.({ type: 'full', changesCount });
       
       return { success: true, changesCount };
     } catch (error) {
-      console.error('[useSeatingSync] Error en sincronización masiva:', error);
+      // console.error('[useSeatingSync] Error en sincronización masiva:', error);
       onSyncError?.({ type: 'full', error });
       throw error;
     } finally {
@@ -261,7 +261,7 @@ export function useSeatingSync(weddingId, options = {}) {
 
     const handleSyncEvent = (event) => {
       const { source } = event.detail;
-      console.log('[useSeatingSync] Evento de sincronización detectado:', source);
+      // console.log('[useSeatingSync] Evento de sincronización detectado:', source);
       
       // No reaccionar a eventos propios para evitar loops
       if (source === 'auto-sync') return;

@@ -46,14 +46,14 @@ class EmailCache {
       }
 
       this.initialized = true;
-      console.log('EmailCache: Inicializado con éxito');
+      // console.log('EmailCache: Inicializado con éxito');
 
       // Programar limpieza periódica de caché
       setInterval(() => this.cleanExpiredItems(), 5 * 60 * 1000); // Cada 5 minutos
 
       return true;
     } catch (error) {
-      console.error('EmailCache: Error al inicializar', error);
+      // console.error('EmailCache: Error al inicializar', error);
       this.memoryCache = {};
       this.initialized = true;
       return false;
@@ -74,14 +74,14 @@ class EmailCache {
 
       _getStorage().setItem(this.storageKey, JSON.stringify(dataToSave));
     } catch (error) {
-      console.error('EmailCache: Error al persistir caché', error);
+      // console.error('EmailCache: Error al persistir caché', error);
       // Si falla por tamaño, intentamos limpiar la caché
       if (error.name === 'QuotaExceededError') {
         this.invalidateOldest();
         try {
           this._persist(); // Intentar de nuevo
         } catch (retryError) {
-          console.error('EmailCache: Error persistente al guardar caché', retryError);
+          // console.error('EmailCache: Error persistente al guardar caché', retryError);
         }
       }
     }
@@ -196,7 +196,7 @@ class EmailCache {
     });
 
     if (cleaned > 0) {
-      console.log(`EmailCache: Limpiados ${cleaned} items expirados`);
+      // console.log(`EmailCache: Limpiados ${cleaned} items expirados`);
       this._persist();
     }
   }
@@ -219,7 +219,7 @@ class EmailCache {
       delete this.memoryCache[item.key];
     });
 
-    console.log(`EmailCache: Eliminados ${toRemove} items antiguos para liberar espacio`);
+    // console.log(`EmailCache: Eliminados ${toRemove} items antiguos para liberar espacio`);
   }
 
   /**

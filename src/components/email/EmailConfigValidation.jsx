@@ -48,7 +48,7 @@ const EmailConfigValidation = ({ emailAddress, onValidationComplete }) => {
         );
       }
     } catch (err) {
-      console.error('Error validating email config:', err);
+      // console.error('Error validating email config:', err);
       setError(tEmail('configValidation.errors.validateGeneric'));
     } finally {
       setValidating(false);
@@ -78,7 +78,7 @@ const EmailConfigValidation = ({ emailAddress, onValidationComplete }) => {
         );
       }
     } catch (err) {
-      console.error('Error sending test email:', err);
+      // console.error('Error sending test email:', err);
       setError(tEmail('configValidation.errors.sendTestGeneric'));
     } finally {
       setSendingTest(false);

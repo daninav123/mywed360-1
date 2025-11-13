@@ -150,7 +150,7 @@ export default function TaskSidePanel({
           });
           setComments(next);
         } catch (error) {
-          console.error('Error procesando comentarios de tarea:', error);
+          // console.error('Error procesando comentarios de tarea:', error);
           setComments([]);
           setCommentError('No se pudieron procesar los comentarios.');
         } finally {
@@ -158,7 +158,7 @@ export default function TaskSidePanel({
         }
       },
       (error) => {
-        console.error('Error cargando comentarios de tarea:', error);
+        // console.error('Error cargando comentarios de tarea:', error);
         setComments([]);
         setLoadingComments(false);
         setCommentError('No se pudieron cargar los comentarios.');
@@ -198,7 +198,7 @@ export default function TaskSidePanel({
       });
       setEditingParentStart(false);
     } catch (e) {
-      console.error('Error actualizando inicio de tarea padre:', e);
+      // console.error('Error actualizando inicio de tarea padre:', e);
     }
   };
 
@@ -213,7 +213,7 @@ export default function TaskSidePanel({
       });
       setEditingParentEnd(false);
     } catch (e) {
-      console.error('Error actualizando fin de tarea padre:', e);
+      // console.error('Error actualizando fin de tarea padre:', e);
     }
   };
 
@@ -225,7 +225,7 @@ export default function TaskSidePanel({
         updatedAt: serverTimestamp(),
       });
     } catch (e) {
-      console.error('Error alternando done en subtarea:', e);
+      // console.error('Error alternando done en subtarea:', e);
     }
   };
 
@@ -242,7 +242,7 @@ export default function TaskSidePanel({
       await addDoc(collection(db, 'weddings', weddingId, 'tasks', parent.id, 'subtasks'), payload);
       setNewSubTitle('');
     } catch (e) {
-      console.error('Error creando subtarea:', e);
+      // console.error('Error creando subtarea:', e);
     }
   };
 
@@ -250,7 +250,7 @@ export default function TaskSidePanel({
     try {
       await deleteDoc(doc(db, 'weddings', weddingId, 'tasks', parent.id, 'subtasks', sub.id));
     } catch (e) {
-      console.error('Error eliminando subtarea:', e);
+      // console.error('Error eliminando subtarea:', e);
     }
   };
 
@@ -327,7 +327,7 @@ export default function TaskSidePanel({
           },
         });
       } catch (error) {
-        console.warn('No se pudo registrar la notificacion remota del comentario', error);
+        // console.warn('No se pudo registrar la notificacion remota del comentario', error);
       }
 
       notificationService.showNotification({
@@ -351,7 +351,7 @@ export default function TaskSidePanel({
       try {
         await deleteDoc(doc(db, 'weddings', weddingId, 'tasks', parent.id, 'comments', commentId));
       } catch (error) {
-        console.error('Error eliminando comentario de tarea:', error);
+        // console.error('Error eliminando comentario de tarea:', error);
         setCommentError('No se pudo eliminar el comentario.');
       }
     },

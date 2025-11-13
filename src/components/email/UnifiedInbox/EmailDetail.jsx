@@ -139,7 +139,7 @@ const EmailDetail = ({
       try {
         onToggleImportant(nextValue);
       } catch (error) {
-        console.error('No se pudo actualizar el estado importante', error);
+        // console.error('No se pudo actualizar el estado importante', error);
       }
     }
   };
@@ -187,7 +187,7 @@ const EmailDetail = ({
   // Manejar la descarga de un archivo adjunto
   const handleDownloadAttachment = (attachment) => {
     // Aquí implementaríamos la lógica de descarga
-    console.log('Descargando:', attachment.filename);
+    // console.log('Descargando:', attachment.filename);
     // Idealmente, esto conectaría con un endpoint de la API
   };
 

@@ -32,7 +32,7 @@ const PaymentSuccess = () => {
         return () => clearTimeout(timeout);
       })
       .catch((error) => {
-        console.error('Error verifying payment session:', error);
+        // console.error('Error verifying payment session:', error);
         setStatus('error');
       });
   }, [searchParams, navigate]);

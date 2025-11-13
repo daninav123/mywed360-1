@@ -83,7 +83,7 @@ const searchGuests = async (queryText, weddingId) => {
     
     return results;
   } catch (error) {
-    console.error('Error buscando invitados:', error);
+    // console.error('Error buscando invitados:', error);
     return [];
   }
 };
@@ -122,7 +122,7 @@ const searchSuppliers = async (queryText, weddingId) => {
     
     return results;
   } catch (error) {
-    console.error('Error buscando proveedores:', error);
+    // console.error('Error buscando proveedores:', error);
     return [];
   }
 };
@@ -161,7 +161,7 @@ const searchTasks = async (queryText, weddingId) => {
     
     return results;
   } catch (error) {
-    console.error('Error buscando tareas:', error);
+    // console.error('Error buscando tareas:', error);
     return [];
   }
 };
@@ -200,7 +200,7 @@ const searchBudget = async (queryText, weddingId) => {
     
     return results;
   } catch (error) {
-    console.error('Error buscando en presupuesto:', error);
+    // console.error('Error buscando en presupuesto:', error);
     return [];
   }
 };
@@ -274,7 +274,7 @@ export const searchAll = async (queryText, weddingId, userId) => {
     // Limitar a top 15 resultados
     return allResults.slice(0, 15);
   } catch (error) {
-    console.error('Error en búsqueda global:', error);
+    // console.error('Error en búsqueda global:', error);
     return [];
   }
 };

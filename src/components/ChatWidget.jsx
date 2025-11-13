@@ -22,7 +22,7 @@ import { getBackendBase } from '../utils/backendBase';
 const chatDebug = (...args) => {
   if (typeof window !== 'undefined' && (window.mywed360Debug || window.lovendaDebug)) {
     // eslint-disable-next-line no-console
-    console.debug('[ChatWidget]', ...args);
+    // console.debug('[ChatWidget]', ...args);
   }
 };
 
@@ -832,7 +832,7 @@ export default function ChatWidget() {
       const controller = new AbortController();
       timeoutId = setTimeout(() => {
         controller.abort();
-        console.error('Timeout en la llamada a la API de IA');
+        // console.error('Timeout en la llamada a la API de IA');
         toast.error(t('chat.errors.timeout') + '. Reintentando con respuesta local...');
       }, 30000); // 30 segundos máximo para mejor UX
 
@@ -866,7 +866,7 @@ export default function ChatWidget() {
           error: backendFallback?.error || `http_${response.status}`,
           details: backendFallback?.details || backendFallback?.message || null,
         };
-        console.warn(
+        // console.warn(
           '[ChatWidget] Backend IA respondió',
           response.status,
           response.statusText,
@@ -879,7 +879,7 @@ export default function ChatWidget() {
       let _anyAction = false;
 
       // Debug: Log completo de la respuesta del backend
-      console.log('ðŸ¤– Respuesta completa del backend IA:', data);
+      // console.log('ðŸ¤– Respuesta completa del backend IA:', data);
       chatDebug('Respuesta del backend:', JSON.stringify(data, null, 2));
 
       // --- Procesar comandos si existen ---
@@ -1002,21 +1002,21 @@ export default function ChatWidget() {
       // Manejar respuesta del backend (exitosa o con error)
       if (data.error && data.reply) {
         text = data.reply;
-        console.warn('Backend AI error:', data.error, data.details);
+        // console.warn('Backend AI error:', data.error, data.details);
       } else if (data.reply) {
         text = data.reply;
       } else if (data.extracted && Object.keys(data.extracted).length) {
         text = t('chat.messages.dataExtracted') + ':\n' + JSON.stringify(data.extracted, null, 2);
       } else if (data.error) {
         text = 'Error: ' + data.error;
-        console.error('Backend AI error:', data.error, data.details);
+        // console.error('Backend AI error:', data.error, data.details);
       } else {
         text = t('chat.messages.noDataExtracted');
       }
       const botMsg = { from: 'bot', text };
       setMessages((prev) => compactMessages([...prev, botMsg]));
     } catch (error) {
-      console.error('Error en chat de IA:', error);
+      // console.error('Error en chat de IA:', error);
       // Respuesta de emergencia local cuando falla la conexión con el backend
       let errMsg;
       if (
@@ -1024,21 +1024,21 @@ export default function ChatWidget() {
         error.message.includes('Timeout') ||
         error.message.includes('abort')
       ) {
-        console.error('Timeout en la llamada a la API de IA:', error.message);
+        // console.error('Timeout en la llamada a la API de IA:', error.message);
         errMsg = {
           from: 'assistant',
           text: t('chat.messages.connectionIssue'),
         };
         toast.error(t('chat.errors.timeout'), { autoClose: 3000 });
       } else if (error.message.includes('fetch') || error.message.includes('network')) {
-        console.error('Error de red en la llamada a la API de IA:', error.message);
+        // console.error('Error de red en la llamada a la API de IA:', error.message);
         errMsg = {
           from: 'system',
           text: t('chat.messages.connectionError'),
         };
         toast.error(t('chat.errors.connection'), { autoClose: 3000 });
       } else {
-        console.error('Error genérico en la API de IA:', error.message);
+        // console.error('Error genérico en la API de IA:', error.message);
         errMsg = {
           from: 'system',
           text: tVars('chat.messages.genericError', { error: error.message }),

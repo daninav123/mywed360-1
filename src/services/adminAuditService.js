@@ -71,12 +71,12 @@ export async function recordAdminSecurityEvent(event) {
     const res = await apiPost(ADMIN_AUDIT_ENDPOINT, buildPayload(event), opts);
 
     if (!res?.ok && import.meta && import.meta.env && import.meta.env.DEV) {
-      console.warn('[adminAuditService] No se pudo registrar el evento', res?.status);
+      // console.warn('[adminAuditService] No se pudo registrar el evento', res?.status);
     }
     return !!res?.ok;
   } catch (error) {
     if (import.meta && import.meta.env && import.meta.env.DEV) {
-      console.warn('[adminAuditService] Error enviando evento de auditoria', error);
+      // console.warn('[adminAuditService] Error enviando evento de auditoria', error);
     }
     return false;
   }

@@ -127,7 +127,7 @@ function Blog() {
         }
       } catch (err) {
         if (cancelled) return;
-        console.error('[Blog] load initial failed', err);
+        // console.error('[Blog] load initial failed', err);
         setErrorKey('common.blog.errors.loadFailed');
       } finally {
         if (!cancelled) {
@@ -157,7 +157,7 @@ function Blog() {
       setNextCursor(response?.nextCursor || null);
       setHasMore(Boolean(response?.nextCursor));
     } catch (err) {
-      console.error('[Blog] load more failed', err);
+      // console.error('[Blog] load more failed', err);
       setHasMore(false);
     } finally {
       setLoading(false);

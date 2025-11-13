@@ -316,7 +316,7 @@ function Invitados() {
         alert(`Error: ${result.error}`);
       }
     } catch (error) {
-      console.error('Error guardando invitado:', error);
+      // console.error('Error guardando invitado:', error);
       alert('Error inesperado al guardar el invitado');
     } finally {
       setIsSaving(false);
@@ -327,7 +327,7 @@ function Invitados() {
   const handleSendSelectedBroadcast = async () => {
     try {
       if (import.meta.env.DEV)
-        console.log('[Invitados] handleSendSelectedBroadcast click', {
+        // console.log('[Invitados] handleSendSelectedBroadcast click', {
           selectedCount: selectedIds.length,
         });
       if (!selectedIds.length) {
@@ -361,7 +361,7 @@ function Invitados() {
       }
       alert('No se pudo completar la difusión: ' + (r?.error || 'desconocido'));
     } catch (e) {
-      console.warn('Error en difusión (Móvil):', e);
+      // console.warn('Error en difusión (Móvil):', e);
       alert('Error en la difusión');
     }
   };
@@ -384,7 +384,7 @@ function Invitados() {
         alert('No se pudo actualizar el estado');
       }
     } catch (e) {
-      console.warn('Error actualizando estado:', e);
+      // console.warn('Error actualizando estado:', e);
       alert('Error actualizando estado del invitado');
     }
   };
@@ -443,7 +443,7 @@ function Invitados() {
       await Promise.all(targets.map((guest) => updateGuest(guest.id, { table: trimmed })));
       alert(`Mesa asignada a ${targets.length} invitado(s).`);
     } catch (error) {
-      console.error('Error reasignando mesa en bloque', error);
+      // console.error('Error reasignando mesa en bloque', error);
       alert('No se ha podido reasignar la mesa.');
     } finally {
       setIsSaving(false);
@@ -462,7 +462,7 @@ function Invitados() {
           notify(`Se cargaron ${result.count || 0} invitado(s) de ejemplo.`, 'success');
         }
       } catch (error) {
-        console.error('[Invitados] loadSampleGuests error', error);
+        // console.error('[Invitados] loadSampleGuests error', error);
         notify('Error cargando los invitados de ejemplo', 'error');
       } finally {
         setIsLoadingSamples(false);
@@ -533,7 +533,7 @@ function Invitados() {
         }
       }, 600);
     } catch (error) {
-      console.error('[Invitados] handleStartScan error', error);
+      // console.error('[Invitados] handleStartScan error', error);
       setScanError('No se pudo acceder a la c�mara.');
       stopScanning();
     }
@@ -578,7 +578,7 @@ function Invitados() {
         setCheckInGuest(updated || null);
       }, 150);
     } catch (error) {
-      console.error('[Invitados] handleConfirmCheckIn error', error);
+      // console.error('[Invitados] handleConfirmCheckIn error', error);
       notify('Error registrando el check-in.', 'error');
     } finally {
       setCheckInLoading(false);
@@ -615,7 +615,7 @@ function Invitados() {
         setCheckInGuest(updated || null);
       }, 150);
     } catch (error) {
-      console.error('[Invitados] handleConfirmCheckOut error', error);
+      // console.error('[Invitados] handleConfirmCheckOut error', error);
       notify('Error revirtiendo el check-in.', 'error');
     } finally {
       setCheckInLoading(false);
@@ -644,7 +644,7 @@ function Invitados() {
         )
       );
     } catch (error) {
-      console.warn('[Invitados] error actualizando estado Save The Date', error);
+      // console.warn('[Invitados] error actualizando estado Save The Date', error);
     }
   };
 
@@ -687,7 +687,7 @@ function Invitados() {
       alert(res?.error || 'No se pudo enviar la invitaci�n');
       return { success: false };
     } catch (error) {
-      console.error('Error enviando invitaciones formales', error);
+      // console.error('Error enviando invitaciones formales', error);
       alert('Error enviando las invitaciones');
       return { success: false };
     }
@@ -759,7 +759,7 @@ function Invitados() {
       alert('Pedido de impresi�n generado correctamente.');
       return { success: true };
     } catch (error) {
-      console.error('Error registrando entrega f�sica', error);
+      // console.error('Error registrando entrega f�sica', error);
       alert('No se pudo registrar la entrega.');
       return { success: false };
     }
@@ -769,7 +769,7 @@ function Invitados() {
   const handleSendSelectedApi = async () => {
     try {
       if (import.meta.env.DEV)
-        console.log('[Invitados] handleSendSelectedApi click', {
+        // console.log('[Invitados] handleSendSelectedApi click', {
           selectedCount: selectedIds.length,
         });
       if (!selectedIds.length) {
@@ -779,7 +779,7 @@ function Invitados() {
       const res = await inviteSelectedWhatsAppApi(selectedIds, undefined, {
         coupleName: coupleLabel,
       });
-      if (import.meta.env.DEV) console.log('[Invitados] handleSendSelectedApi result', res);
+      if (import.meta.env.DEV) // console.log('[Invitados] handleSendSelectedApi result', res);
       if (res?.cancelled) {
         alert('Acción cancelada');
         return;
@@ -815,7 +815,7 @@ function Invitados() {
         })
       );
     } catch (e) {
-      console.warn('Error envío seleccionados (API):', e);
+      // console.warn('Error envío seleccionados (API):', e);
       alert(t('guests.whatsapp.selectedUnexpected', { defaultValue: 'Error enviando a seleccionados' }));
     }
   };
@@ -824,7 +824,7 @@ function Invitados() {
   const handleSendSelectedMobile = async () => {
     try {
       if (import.meta.env.DEV)
-        console.log('[Invitados] handleSendSelectedMobile click', {
+        // console.log('[Invitados] handleSendSelectedMobile click', {
           selectedCount: selectedIds.length,
         });
       if (!selectedIds.length) {
@@ -879,7 +879,7 @@ function Invitados() {
         );
         return;
       } catch (e) {
-        console.warn('Extensión WhatsApp Web no disponible o falló, usando fallback:', e);
+        // console.warn('Extensión WhatsApp Web no disponible o falló, usando fallback:', e);
         const fr = await inviteSelectedWhatsAppDeeplink(selectedIds, custom || undefined);
         if (fr?.success)
           alert(
@@ -891,7 +891,7 @@ function Invitados() {
         return;
       }
     } catch (e) {
-      console.warn('Error envío seleccionados (Móvil):', e);
+      // console.warn('Error envío seleccionados (Móvil):', e);
       alert(
         t('guests.whatsapp.mobileUnexpected', {
           defaultValue: 'Error enviando a seleccionados (Móvil)',
@@ -955,7 +955,7 @@ function Invitados() {
         alert('Error programando envíos: ' + (result?.error || 'desconocido'));
       }
     } catch (e) {
-      console.warn('Error programando envíos:', e);
+      // console.warn('Error programando envíos:', e);
       alert('Error programando envíos');
     }
   };
@@ -966,7 +966,7 @@ function Invitados() {
       setWhatsGuest(guest || null);
       setShowWhatsModal(true);
     } catch (e) {
-      console.warn('No se pudo abrir el modal de WhatsApp:', e);
+      // console.warn('No se pudo abrir el modal de WhatsApp:', e);
     }
   };
 
@@ -1009,7 +1009,7 @@ function Invitados() {
       );
       setShowGuestModal(false);
     } catch (error) {
-      console.error('Error importando invitados:', error);
+      // console.error('Error importando invitados:', error);
       alert('Ocurrió un error al importar los invitados');
     }
   };
@@ -1069,7 +1069,7 @@ function Invitados() {
       );
       setShowBulkModal(false);
     } catch (err) {
-      console.error('Error en alta masiva:', err);
+      // console.error('Error en alta masiva:', err);
       notify('Ocurri� un error al procesar la alta masiva', 'error');
     }
   };
@@ -1169,7 +1169,7 @@ function Invitados() {
         } catch (_) {}
       };
     } catch (err) {
-      console.error('Error generando PDF:', err);
+      // console.error('Error generando PDF:', err);
       alert('No se pudo generar el documento de impresi�n');
     }
   };

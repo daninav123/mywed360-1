@@ -432,7 +432,7 @@ const distributeIncrease = (amounts, indices, delta) => {
     try {
       await onRequestAdvisor();
     } catch (err) {
-      console.error('[BudgetManager] advisor request failed', err);
+      // console.error('[BudgetManager] advisor request failed', err);
       toast.error(err?.message || t('finance.budget.advisorErrors.requestFailed'));
     } finally {
       setLocalAdvisorLoading(false);
@@ -452,7 +452,7 @@ const distributeIncrease = (amounts, indices, delta) => {
         setLocalAdvisorLoading(true);
         await onRefreshAdvisor();
       } catch (err) {
-        console.error('[BudgetManager] advisor refresh failed', err);
+        // console.error('[BudgetManager] advisor refresh failed', err);
         toast.error(err?.message || t('finance.budget.advisorErrors.refreshFailed'));
       } finally {
         setLocalAdvisorLoading(false);
@@ -480,7 +480,7 @@ const distributeIncrease = (amounts, indices, delta) => {
         setShowAdvisorModal(false);
       }
     } catch (err) {
-      console.error('[BudgetManager] apply advisor scenario failed', err);
+      // console.error('[BudgetManager] apply advisor scenario failed', err);
       toast.error(err?.message || t('finance.budget.advisorErrors.applyFailed'));
     }
   };

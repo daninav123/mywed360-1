@@ -28,8 +28,8 @@ export default function WeddingServicesOverview({ onSearch, searchPanel }) {
   // ⭐ CRÍTICO: useMemo con dependencia en activeCategories
   // Para que React re-renderice cuando cambian los servicios activos
   const activeServices = useMemo(() => {
-    console.log('🔄 [WeddingServicesOverview] Recalculando servicios activos...');
-    console.log('   activeCategories:', activeCategories);
+    // console.log('🔄 [WeddingServicesOverview] Recalculando servicios activos...');
+    // console.log('   activeCategories:', activeCategories);
 
     // Mapear TODAS las categorías y verificar cuáles están activas
     const allServices = SUPPLIER_CATEGORIES.map((cat) => ({
@@ -42,8 +42,8 @@ export default function WeddingServicesOverview({ onSearch, searchPanel }) {
     // Filtrar solo las activas
     const active = allServices.filter((s) => s.isActive);
 
-    console.log('   ✅ Servicios activos:', active.length);
-    console.log(
+    // console.log('   ✅ Servicios activos:', active.length);
+    // console.log(
       '   IDs:',
       active.map((s) => s.id)
     );

@@ -35,7 +35,7 @@ export function useWeddingCategories() {
       return;
     }
 
-    console.log('🔄 [useWeddingCategories] Iniciando listener en tiempo real...');
+    // console.log('🔄 [useWeddingCategories] Iniciando listener en tiempo real...');
     setLoading(true);
 
     const weddingRef = doc(db, 'users', user.uid, 'weddings', activeWedding);
@@ -44,23 +44,23 @@ export function useWeddingCategories() {
     const unsubscribe = onSnapshot(
       weddingRef,
       (snapshot) => {
-        console.log('📡 [useWeddingCategories] Snapshot recibido');
+        // console.log('📡 [useWeddingCategories] Snapshot recibido');
 
         if (snapshot.exists()) {
           const data = snapshot.data();
           const categories = data.activeCategories || DEFAULT_CATEGORIES;
 
-          console.log('   ✅ Categorías actualizadas:', categories);
+          // console.log('   ✅ Categorías actualizadas:', categories);
           setActiveCategories(categories);
         } else {
-          console.log('   ⚠️ Documento no existe, usando defaults');
+          // console.log('   ⚠️ Documento no existe, usando defaults');
           setActiveCategories(DEFAULT_CATEGORIES);
         }
 
         setLoading(false);
       },
       (error) => {
-        console.error('❌ [useWeddingCategories] Error en snapshot:', error);
+        // console.error('❌ [useWeddingCategories] Error en snapshot:', error);
         setActiveCategories(DEFAULT_CATEGORIES);
         setLoading(false);
       }
@@ -68,7 +68,7 @@ export function useWeddingCategories() {
 
     // Cleanup: Desuscribirse cuando el componente se desmonte o cambien las dependencias
     return () => {
-      console.log('🔌 [useWeddingCategories] Deteniendo listener...');
+      // console.log('🔌 [useWeddingCategories] Deteniendo listener...');
       unsubscribe();
     };
   }, [user?.uid, activeWedding]);
@@ -80,9 +80,9 @@ export function useWeddingCategories() {
     }
 
     try {
-      console.log('📝 [useWeddingCategories] Actualizando categorías activas...');
-      console.log('   Antes:', activeCategories);
-      console.log('   Después:', categories);
+      // console.log('📝 [useWeddingCategories] Actualizando categorías activas...');
+      // console.log('   Antes:', activeCategories);
+      // console.log('   Después:', categories);
 
       const weddingRef = doc(db, 'users', user.uid, 'weddings', activeWedding);
       await updateDoc(weddingRef, {
@@ -92,11 +92,11 @@ export function useWeddingCategories() {
 
       // ⚠️ CRÍTICO: Crear una NUEVA referencia del array para que React detecte el cambio
       setActiveCategories([...categories]);
-      console.log('   ✅ Estado actualizado en hook (nueva referencia del array)');
-      console.log('   Nueva referencia:', [...categories]);
+      // console.log('   ✅ Estado actualizado en hook (nueva referencia del array)');
+      // console.log('   Nueva referencia:', [...categories]);
       // No mostrar toast aquí - se muestra en addCategory/removeCategory
     } catch (error) {
-      console.error('Error updating active categories:', error);
+      // console.error('Error updating active categories:', error);
       toast.error('Error al actualizar servicios');
       throw error;
     }
@@ -104,27 +104,27 @@ export function useWeddingCategories() {
 
   // Añadir una categoría (por ejemplo, al guardar favorito de nueva categoría)
   const addCategory = async (categoryId) => {
-    console.log('➕ [useWeddingCategories] addCategory:', categoryId);
+    // console.log('➕ [useWeddingCategories] addCategory:', categoryId);
 
     if (!activeCategories.includes(categoryId)) {
       const newCategories = [...activeCategories, categoryId];
       const category = SUPPLIER_CATEGORIES.find((c) => c.id === categoryId);
 
-      console.log('   Añadiendo categoría:', category?.name);
+      // console.log('   Añadiendo categoría:', category?.name);
       await updateActiveCategories(newCategories);
 
       toast.success(`✅ "${category?.name || categoryId}" añadido`);
     } else {
-      console.log('   ⚠️ Ya está activa, no se hace nada');
+      // console.log('   ⚠️ Ya está activa, no se hace nada');
     }
   };
 
   // Remover una categoría
   const removeCategory = async (categoryId) => {
-    console.log('➖ [useWeddingCategories] removeCategory:', categoryId);
+    // console.log('➖ [useWeddingCategories] removeCategory:', categoryId);
 
     const category = SUPPLIER_CATEGORIES.find((c) => c.id === categoryId);
-    console.log('   Removiendo categoría:', category?.name);
+    // console.log('   Removiendo categoría:', category?.name);
 
     const newCategories = activeCategories.filter((id) => id !== categoryId);
     await updateActiveCategories(newCategories);

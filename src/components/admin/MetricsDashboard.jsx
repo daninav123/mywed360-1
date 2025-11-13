@@ -69,7 +69,7 @@ function MetricsDashboard() {
             localMetrics = JSON.parse(storedMetrics);
           }
         } catch (e) {
-          console.log('No se encontraron mtricas locales');
+          // console.log('No se encontraron mtricas locales');
         }
 
         // Si hay un endpoint de mtricas configurado, obtener de all
@@ -123,7 +123,7 @@ function MetricsDashboard() {
             }
           }
         } catch {}
-        console.error('Error al cargar mtricas:', err);
+        // console.error('Error al cargar mtricas:', err);
         setError('No se pudieron cargar las mtricas.');
         setMetrics({
           timeSeriesData: [],

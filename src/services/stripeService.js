@@ -37,7 +37,7 @@ export async function createCheckoutSession({ productId, weddingId = null }) {
     return await response.json();
 
   } catch (error) {
-    console.error('Error en createCheckoutSession:', error);
+    // console.error('Error en createCheckoutSession:', error);
     throw error;
   }
 }
@@ -85,7 +85,7 @@ export async function getCheckoutSession(sessionId) {
     return await response.json();
 
   } catch (error) {
-    console.error('Error en getCheckoutSession:', error);
+    // console.error('Error en getCheckoutSession:', error);
     throw error;
   }
 }
@@ -117,7 +117,7 @@ export async function createCustomerPortalSession() {
     return url;
 
   } catch (error) {
-    console.error('Error en createCustomerPortalSession:', error);
+    // console.error('Error en createCustomerPortalSession:', error);
     throw error;
   }
 }

@@ -18,7 +18,7 @@ export function SupplierNotesProvider({ children }) {
         setNotes(JSON.parse(stored));
       }
     } catch (error) {
-      console.error('Error loading supplier notes:', error);
+      // console.error('Error loading supplier notes:', error);
     }
   }, [activeWedding]);
 
@@ -31,7 +31,7 @@ export function SupplierNotesProvider({ children }) {
       try {
         localStorage.setItem(storageKey, JSON.stringify(newNotes));
       } catch (error) {
-        console.error('Error saving supplier notes:', error);
+        // console.error('Error saving supplier notes:', error);
       }
     },
     [activeWedding]

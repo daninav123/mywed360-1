@@ -20,7 +20,7 @@ async function getAuthToken() {
     }
     return await user.getIdToken();
   } catch (error) {
-    console.error('[quoteRequests] Error obteniendo token:', error);
+    // console.error('[quoteRequests] Error obteniendo token:', error);
     throw error;
   }
 }
@@ -51,7 +51,7 @@ export async function createQuoteRequest(requestData) {
       },
     });
 
-    console.log('✅ [quoteRequests] Solicitud creada:', response.data.requestId);
+    // console.log('✅ [quoteRequests] Solicitud creada:', response.data.requestId);
 
     return {
       success: true,
@@ -59,7 +59,7 @@ export async function createQuoteRequest(requestData) {
       message: response.data.message,
     };
   } catch (error) {
-    console.error('❌ [quoteRequests] Error creando solicitud:', error);
+    // console.error('❌ [quoteRequests] Error creando solicitud:', error);
 
     if (error.response?.status === 401) {
       throw new Error('No estás autenticado. Por favor, inicia sesión.');
@@ -96,11 +96,11 @@ export async function getQuoteRequests(weddingId, status = null) {
       params,
     });
 
-    console.log(`📋 [quoteRequests] ${response.data.count} solicitudes encontradas`);
+    // console.log(`📋 [quoteRequests] ${response.data.count} solicitudes encontradas`);
 
     return response.data.requests || [];
   } catch (error) {
-    console.error('❌ [quoteRequests] Error obteniendo solicitudes:', error);
+    // console.error('❌ [quoteRequests] Error obteniendo solicitudes:', error);
     throw new Error('Error al obtener solicitudes de presupuesto');
   }
 }
@@ -123,7 +123,7 @@ export async function getQuoteRequest(requestId) {
 
     return response.data.request;
   } catch (error) {
-    console.error('❌ [quoteRequests] Error obteniendo solicitud:', error);
+    // console.error('❌ [quoteRequests] Error obteniendo solicitud:', error);
     throw new Error('Error al obtener detalles de la solicitud');
   }
 }
@@ -151,11 +151,11 @@ export async function updateQuoteRequestStatus(requestId, status, notes = null) 
       }
     );
 
-    console.log(`✅ [quoteRequests] Solicitud ${requestId} actualizada a: ${status}`);
+    // console.log(`✅ [quoteRequests] Solicitud ${requestId} actualizada a: ${status}`);
 
     return response.data;
   } catch (error) {
-    console.error('❌ [quoteRequests] Error actualizando estado:', error);
+    // console.error('❌ [quoteRequests] Error actualizando estado:', error);
     throw new Error('Error al actualizar el estado de la solicitud');
   }
 }
@@ -176,11 +176,11 @@ export async function cancelQuoteRequest(requestId) {
       },
     });
 
-    console.log(`❌ [quoteRequests] Solicitud ${requestId} cancelada`);
+    // console.log(`❌ [quoteRequests] Solicitud ${requestId} cancelada`);
 
     return response.data;
   } catch (error) {
-    console.error('❌ [quoteRequests] Error cancelando solicitud:', error);
+    // console.error('❌ [quoteRequests] Error cancelando solicitud:', error);
     throw new Error('Error al cancelar la solicitud');
   }
 }

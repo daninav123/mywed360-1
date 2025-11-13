@@ -62,7 +62,7 @@ const useGuests = () => {
     activeWedding = weddingContext?.activeWedding;
     weddingsList = Array.isArray(weddingContext?.weddings) ? weddingContext.weddings : [];
   } catch (error) {
-    console.error('Error accediendo al contexto de bodas en useGuests:', error);
+    // console.error('Error accediendo al contexto de bodas en useGuests:', error);
     activeWedding = null;
     weddingsList = [];
   }
@@ -165,7 +165,7 @@ const useGuests = () => {
           window.dispatchEvent(new CustomEvent('maloveapp-assistant-sync', { detail: payload }));
         } catch (error) {
           if (import.meta.env.DEV) {
-            console.warn('[useGuests] notifyAssistant error', error);
+            // console.warn('[useGuests] notifyAssistant error', error);
           }
         }
       }
@@ -188,7 +188,7 @@ const useGuests = () => {
           window.dispatchEvent(new CustomEvent('maloveapp-seating-sync', { detail: payload }));
         } catch (error) {
           if (import.meta.env.DEV) {
-            console.warn('[useGuests] broadcastSeatingSync error', error);
+            // console.warn('[useGuests] broadcastSeatingSync error', error);
           }
         }
       }
@@ -337,7 +337,7 @@ const useGuests = () => {
         new CustomEvent('maloveapp-guests-updated', { detail: { guests, count: guests.length } })
       );
     } catch (error) {
-      console.error('Error sincronizando invitados:', error);
+      // console.error('Error sincronizando invitados:', error);
     }
   }, [guests]);
 
@@ -460,7 +460,7 @@ const useGuests = () => {
         } catch {}
         return { success: true, guest: newGuest };
       } catch (error) {
-        console.error('Error a�adiendo invitado:', error);
+        // console.error('Error a�adiendo invitado:', error);
         return { success: false, error: error.message };
       }
     },
@@ -549,7 +549,7 @@ const useGuests = () => {
         }
         return { success: true, guest: updatedGuest };
       } catch (error) {
-        console.error('Error actualizando invitado:', error);
+        // console.error('Error actualizando invitado:', error);
         return { success: false, error: error.message };
       }
     },
@@ -573,7 +573,7 @@ const useGuests = () => {
         } catch {}
         return { success: true };
       } catch (error) {
-        console.error('Error eliminando invitado:', error);
+        // console.error('Error eliminando invitado:', error);
         return { success: false, error: error.message };
       }
     },
@@ -680,7 +680,7 @@ const useGuests = () => {
               dataset = await response.json();
             }
           } catch (error) {
-            console.warn('[useGuests] fetch fixtures fallback error', error);
+            // console.warn('[useGuests] fetch fixtures fallback error', error);
           }
         }
         if (!Array.isArray(dataset) || !dataset.length) {
@@ -721,7 +721,7 @@ const useGuests = () => {
               try {
                 await deleteItem(current.id);
               } catch (error) {
-                console.warn('[useGuests] error clearing guest during loadSampleGuests', error);
+                // console.warn('[useGuests] error clearing guest during loadSampleGuests', error);
               }
             }
             seatingSyncLockRef.current = previousLock;
@@ -747,7 +747,7 @@ const useGuests = () => {
         } catch {}
         return { success: true, count: created.length, guests: created };
       } catch (error) {
-        console.warn('[useGuests] loadSampleGuests error', error);
+        // console.warn('[useGuests] loadSampleGuests error', error);
         return { success: false, error: error?.message || 'load-fixture-failed' };
       }
     },
@@ -777,7 +777,7 @@ const useGuests = () => {
         }
       } catch (err) {
         if (import.meta.env.DEV) {
-          console.warn('[useGuests] seating sync handler error', err);
+          // console.warn('[useGuests] seating sync handler error', err);
         }
       }
     };
@@ -1339,7 +1339,7 @@ const useGuests = () => {
 
         return { success: false, error: 'import-failed' };
       } catch (error) {
-        console.error('[useGuests] importFromContacts error', error);
+        // console.error('[useGuests] importFromContacts error', error);
         return {
           success: false,
           error: error?.message || 'import-error',

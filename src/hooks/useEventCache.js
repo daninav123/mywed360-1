@@ -13,7 +13,7 @@ function useEventCache() {
       const savedCache = localStorage.getItem('event-detection-cache');
       return savedCache ? JSON.parse(savedCache) : {};
     } catch (error) {
-      console.error('Error al cargar caché de eventos:', error);
+      // console.error('Error al cargar caché de eventos:', error);
       return {};
     }
   });
@@ -60,7 +60,7 @@ function useEventCache() {
       try {
         localStorage.setItem('event-detection-cache', JSON.stringify(newCache));
       } catch (error) {
-        console.error('Error al guardar caché de eventos:', error);
+        // console.error('Error al guardar caché de eventos:', error);
       }
     },
     [cache]
@@ -89,7 +89,7 @@ function useEventCache() {
         try {
           localStorage.setItem('event-detection-cache', JSON.stringify(newCache));
         } catch (error) {
-          console.error('Error al actualizar caché de eventos:', error);
+          // console.error('Error al actualizar caché de eventos:', error);
         }
 
         return null;
@@ -112,7 +112,7 @@ function useEventCache() {
     try {
       localStorage.removeItem('event-detection-cache');
     } catch (error) {
-      console.error('Error al limpiar caché de eventos:', error);
+      // console.error('Error al limpiar caché de eventos:', error);
     }
   }, []);
 

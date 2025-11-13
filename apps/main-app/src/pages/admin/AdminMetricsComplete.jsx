@@ -66,7 +66,7 @@ const AdminMetricsComplete = () => {
         ]);
         setData({ main, product });
       } catch (error) {
-        console.error('Error loading metrics:', error);
+        // console.error('Error loading metrics:', error);
       }
       setLoading(false);
     };

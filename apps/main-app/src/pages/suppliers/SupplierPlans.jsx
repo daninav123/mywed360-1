@@ -118,7 +118,7 @@ export default function SupplierPlans() {
         setCurrentPlan(data.profile?.subscription?.plan || 'free');
       }
     } catch (error) {
-      console.error('[SupplierPlans] Error loading:', error);
+      // console.error('[SupplierPlans] Error loading:', error);
     } finally {
       setLoading(false);
     }
@@ -137,7 +137,7 @@ export default function SupplierPlans() {
         setCurrentPlan(planId);
       }, 1500);
     } catch (error) {
-      console.error('[SupplierPlans] Error upgrading:', error);
+      // console.error('[SupplierPlans] Error upgrading:', error);
       toast.error('Error al procesar el cambio de plan');
     }
   };

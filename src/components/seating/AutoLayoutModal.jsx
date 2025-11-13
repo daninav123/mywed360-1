@@ -23,7 +23,7 @@ export default function AutoLayoutModal({ isOpen, onClose, onGenerate, analysis 
       await onGenerate(selectedLayout);
       onClose();
     } catch (error) {
-      console.error('Error generando layout:', error);
+      // console.error('Error generando layout:', error);
     } finally {
       setIsGenerating(false);
     }

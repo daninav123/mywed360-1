@@ -61,7 +61,7 @@ const WeddingAccountLink = () => {
       setSuccess(`Invitación enviada. Código: ${code}`);
       setEmailInvite('');
     } catch (err) {
-      console.error(err);
+      // console.error(err);
       setError(err.message);
     } finally {
       setLoading(false);

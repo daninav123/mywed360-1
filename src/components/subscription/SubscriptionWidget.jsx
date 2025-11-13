@@ -32,7 +32,7 @@ const SubscriptionWidget = () => {
         setSubscription(data.subscription);
       }
     } catch (err) {
-      console.error('Error fetching subscription:', err);
+      // console.error('Error fetching subscription:', err);
     } finally {
       setLoading(false);
     }

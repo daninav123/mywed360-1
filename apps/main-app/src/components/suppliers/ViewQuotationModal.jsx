@@ -27,7 +27,7 @@ export default function ViewQuotationModal({ isOpen, onClose, quotation, onRespo
 
       onClose();
     } catch (error) {
-      console.error('Error:', error);
+      // console.error('Error:', error);
       toast.error('Error al procesar la respuesta');
     } finally {
       setLoading(false);

@@ -31,7 +31,7 @@ window.setInterval = function (...args) {
     args: args[1], // delay
   });
 
-  console.warn(`⚠️ [Diagnostic] Interval creado. Total activos: ${intervalCount}`, {
+  // console.warn(`⚠️ [Diagnostic] Interval creado. Total activos: ${intervalCount}`, {
     id,
     delay: args[1],
     stack: stack?.split('\n').slice(2, 4).join('\n'),
@@ -46,7 +46,7 @@ window.clearInterval = function (id) {
   if (activeIntervals.has(id)) {
     intervalCount--;
     activeIntervals.delete(id);
-    console.log(`✅ [Diagnostic] Interval limpiado. Total activos: ${intervalCount}`);
+    // console.log(`✅ [Diagnostic] Interval limpiado. Total activos: ${intervalCount}`);
   }
   return originalClearInterval(id);
 };
@@ -87,7 +87,7 @@ export function trackRender(componentName) {
   const timeSinceLast = now - lastRenderTime;
 
   if (timeSinceLast < 100) {
-    console.warn(
+    // console.warn(
       `🔥 [Diagnostic] Re-render rápido detectado: ${componentName} (${timeSinceLast}ms)`
     );
   }
@@ -126,7 +126,7 @@ export function monitorFirestore() {
 export function generateReport() {
   console.group('📊 REPORTE DE RENDIMIENTO');
 
-  console.log('🔄 INTERVALS:', {
+  // console.log('🔄 INTERVALS:', {
     total: intervalCount,
     activos: activeIntervals.size,
     detalles: Array.from(activeIntervals.entries()).map(([id, info]) => ({
@@ -137,27 +137,27 @@ export function generateReport() {
     })),
   });
 
-  console.log('⏰ TIMEOUTS:', {
+  // console.log('⏰ TIMEOUTS:', {
     total: timeoutCount,
     activos: activeTimeouts.size,
   });
 
-  console.log('🎨 RENDERS:', {
+  // console.log('🎨 RENDERS:', {
     total: renderCount,
     ultimo: new Date(lastRenderTime).toLocaleTimeString(),
   });
 
-  console.log('💾 MEMORIA:', getMemoryInfo());
+  // console.log('💾 MEMORIA:', getMemoryInfo());
 
-  console.log('🔥 FIRESTORE LISTENERS:', monitorFirestore());
+  // console.log('🔥 FIRESTORE LISTENERS:', monitorFirestore());
 
   // Advertencias
   if (intervalCount > 5) {
-    console.error('🚨 CRÍTICO: Demasiados intervals activos!', intervalCount);
+    // console.error('🚨 CRÍTICO: Demasiados intervals activos!', intervalCount);
   }
 
   if (renderCount > 100) {
-    console.warn('⚠️ ADVERTENCIA: Muchos re-renders detectados:', renderCount);
+    // console.warn('⚠️ ADVERTENCIA: Muchos re-renders detectados:', renderCount);
   }
 
   console.groupEnd();
@@ -174,7 +174,7 @@ export function generateReport() {
 let diagnosticInterval = null;
 
 export function startDiagnostic() {
-  console.log('🔍 Diagnóstico iniciado. Generando reporte cada 10 segundos...');
+  // console.log('🔍 Diagnóstico iniciado. Generando reporte cada 10 segundos...');
 
   if (diagnosticInterval) {
     clearInterval(diagnosticInterval);
@@ -185,40 +185,40 @@ export function startDiagnostic() {
 
   // Reportes periódicos
   diagnosticInterval = setInterval(() => {
-    console.log('⏱️ Reporte automático:');
+    // console.log('⏱️ Reporte automático:');
     generateReport();
   }, 10000);
 
-  console.log('Para detener: stopDiagnostic()');
-  console.log('Para reporte manual: generateReport()');
+  // console.log('Para detener: stopDiagnostic()');
+  // console.log('Para reporte manual: generateReport()');
 }
 
 export function stopDiagnostic() {
   if (diagnosticInterval) {
     clearInterval(diagnosticInterval);
     diagnosticInterval = null;
-    console.log('✋ Diagnóstico detenido');
+    // console.log('✋ Diagnóstico detenido');
   }
 }
 
 // Función de emergencia: Limpiar TODOS los intervals
 export function emergencyCleanup() {
-  console.warn('🚨 LIMPIEZA DE EMERGENCIA - Deteniendo todos los intervals');
+  // console.warn('🚨 LIMPIEZA DE EMERGENCIA - Deteniendo todos los intervals');
 
   const allIntervalIds = Array.from(activeIntervals.keys());
   allIntervalIds.forEach((id) => {
     try {
       clearInterval(id);
-      console.log(`🧹 Limpiado interval ${id}`);
+      // console.log(`🧹 Limpiado interval ${id}`);
     } catch (e) {
-      console.error(`Error limpiando interval ${id}:`, e);
+      // console.error(`Error limpiando interval ${id}:`, e);
     }
   });
 
   activeIntervals.clear();
   intervalCount = 0;
 
-  console.log('✅ Limpieza completa. Intervals activos:', intervalCount);
+  // console.log('✅ Limpieza completa. Intervals activos:', intervalCount);
 }
 
 // Exponer funciones en window para fácil acceso desde consola
@@ -232,7 +232,7 @@ if (typeof window !== 'undefined') {
     getActiveTimeouts: () => Array.from(activeTimeouts.entries()),
   };
 
-  console.log('✅ Diagnostic tools disponibles en: window.__performanceDiagnostic__');
+  // console.log('✅ Diagnostic tools disponibles en: window.__performanceDiagnostic__');
 }
 
 export default {

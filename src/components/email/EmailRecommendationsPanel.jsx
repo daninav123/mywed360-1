@@ -54,7 +54,7 @@ const EmailRecommendationsPanel = ({ category, searchQuery, onApplyRecommendatio
         const data = recommendationService.generateRecommendations(category, searchQuery);
         setRecommendations(data);
       } catch (err) {
-        console.error('Error generating recommendations:', err);
+        // console.error('Error generating recommendations:', err);
         setError(tEmail('recommendations.errors.generate'));
       } finally {
         setLoading(false);

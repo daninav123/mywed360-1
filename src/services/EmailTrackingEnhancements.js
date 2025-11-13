@@ -12,7 +12,7 @@ export function tagProviderEmail(emailId, providerId) {
     addTagToEmail(userId, emailId, providerTagId);
     return true;
   } catch (e) {
-    console.warn('[EmailTrackingEnhancements] tagProviderEmail failed:', e?.message || e);
+    // console.warn('[EmailTrackingEnhancements] tagProviderEmail failed:', e?.message || e);
     return false;
   }
 }

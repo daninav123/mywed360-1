@@ -177,7 +177,7 @@ const useForm = (initialValues = {}, validationRules = {}, onSubmit) => {
           await onSubmit(values);
           return true;
         } catch (error) {
-          console.error('Error al enviar formulario:', error);
+          // console.error('Error al enviar formulario:', error);
           return false;
         } finally {
           setIsSubmitting(false);

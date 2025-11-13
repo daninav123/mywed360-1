@@ -230,7 +230,7 @@ i18n
     applyDocumentAttributes(i18n.language || FALLBACK_LANGUAGE);
   })
   .catch((error) => {
-    console.error('[i18n] initialization failed', error);
+    // console.error('[i18n] initialization failed', error);
   });
 
 export const changeLanguage = (lng) => {

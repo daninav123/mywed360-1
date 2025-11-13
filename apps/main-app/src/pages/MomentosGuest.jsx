@@ -72,7 +72,7 @@ export default function MomentosGuest() {
           ALBUM_ID
         );
       } catch (error) {
-        console.error('Validación de token de la galería de recuerdos', error);
+        // console.error('Validación de token de la galería de recuerdos', error);
         setErrorMessage(error?.message || t('public.moments.guest.errors.invalidLink'));
         setStatus('error');
       }

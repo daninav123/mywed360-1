@@ -55,7 +55,7 @@ export default function Invitaciones() {
       setGeneratedText(text);
       setToast({ message: 'Invitación generada', type: 'success' });
     } catch (err) {
-      console.error(err);
+      // console.error(err);
       setToast({ message: 'Error generando invitación', type: 'error' });
     } finally {
       setLoading(false);

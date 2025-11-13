@@ -94,9 +94,9 @@ export default function Buzon() {
         const tracking = loadTrackingRecords();
         setTrackingRecords(tracking);
 
-        console.log('Servicio de correo inicializado:', email);
+        // console.log('Servicio de correo inicializado:', email);
       } catch (error) {
-        console.error('Error al inicializar el servicio de correo:', error);
+        // console.error('Error al inicializar el servicio de correo:', error);
         setServiceStatus({ initialized: false, error: error.message });
       }
     }
@@ -114,10 +114,10 @@ export default function Buzon() {
     const loadEmails = async () => {
       try {
         const emails = await getMails(folder);
-        console.log('Correos cargados:', emails);
+        // console.log('Correos cargados:', emails);
         setMails(emails);
       } catch (error) {
-        console.error('Error al cargar correos:', error);
+        // console.error('Error al cargar correos:', error);
       }
     };
 
@@ -131,7 +131,7 @@ export default function Buzon() {
       const emails = await getMails(folder);
       setMails(emails);
     } catch (error) {
-      console.error('Error al refrescar correos:', error);
+      // console.error('Error al refrescar correos:', error);
     }
   }, [folder, serviceStatus.initialized]);
 
@@ -152,7 +152,7 @@ export default function Buzon() {
         setProfile(updatedProfile);
       }
     } catch (error) {
-      console.error('Error al crear alias:', error);
+      // console.error('Error al crear alias:', error);
       setAliasStatus({ loading: false, error: error.message, success: false });
     }
   };
@@ -197,7 +197,7 @@ export default function Buzon() {
         refresh();
       }
     } catch (e) {
-      console.error('Error al enviar correo:', e);
+      // console.error('Error al enviar correo:', e);
       toast.error(t('email.sendError', { message: e.message || 'Intenta nuevamente más tarde' }));
     }
   };

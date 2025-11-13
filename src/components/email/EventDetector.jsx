@@ -49,7 +49,7 @@ function EventDetector({ emailContent, emailSubject, onEventDetected }) {
       const { type, events, chunkId, isDone, error } = e.data;
 
       if (type === 'error') {
-        console.error('Error en worker:', error);
+        // console.error('Error en worker:', error);
       } else if (type === 'result') {
         // Procesar eventos detectados
         if (events && events.length > 0) {
@@ -103,7 +103,7 @@ function EventDetector({ emailContent, emailSubject, onEventDetected }) {
       const cachedEvents = getCachedEvents(contentHash);
 
       if (cachedEvents && cachedEvents.length > 0) {
-        console.log('Usando eventos en caché');
+        // console.log('Usando eventos en caché');
         setDetectedEvents(cachedEvents);
         return;
       }
@@ -161,7 +161,7 @@ function EventDetector({ emailContent, emailSubject, onEventDetected }) {
           });
         });
       } catch (error) {
-        console.error('Error al detectar eventos:', error);
+        // console.error('Error al detectar eventos:', error);
         setIsAnalyzing(false);
         setProgress(0);
       }

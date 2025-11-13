@@ -25,7 +25,7 @@ const EmailComments = ({ emailId }) => {
       const list = await CommentService.getComments(userId, emailId);
       setComments(Array.isArray(list) ? list : []);
     } catch (error) {
-      console.error('No se pudieron cargar los comentarios', error);
+      // console.error('No se pudieron cargar los comentarios', error);
     } finally {
       setLoading(false);
     }
@@ -48,7 +48,7 @@ const EmailComments = ({ emailId }) => {
       setNewComment('');
       await loadComments();
     } catch (error) {
-      console.error('No se pudo guardar el comentario', error);
+      // console.error('No se pudo guardar el comentario', error);
     } finally {
       setSaving(false);
     }
@@ -59,7 +59,7 @@ const EmailComments = ({ emailId }) => {
       await CommentService.deleteComment(userId, emailId, commentId);
       setComments((prev) => prev.filter((comment) => comment.id !== commentId));
     } catch (error) {
-      console.error('No se pudo eliminar el comentario', error);
+      // console.error('No se pudo eliminar el comentario', error);
       await loadComments();
     }
   };

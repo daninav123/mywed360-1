@@ -136,7 +136,7 @@ export async function createWedding(uid, extraData = {}) {
     const financeRef = doc(db, 'weddings', weddingId, 'finance', 'main');
     await setDoc(financeRef, { movements: [], createdAt: Timestamp.now() }, { merge: true });
   } catch (e) {
-    console.warn('No se pudo inicializar finance/main para', weddingId, e);
+    // console.warn('No se pudo inicializar finance/main para', weddingId, e);
   }
   // Guardar enlace rápido en el perfil del usuario (crea si no existe)
   await setDoc(
@@ -170,7 +170,7 @@ export async function createWedding(uid, extraData = {}) {
       { merge: true }
     );
   } catch (e) {
-    console.warn('No se pudo registrar la boda en users/{uid}/weddings:', e);
+    // console.warn('No se pudo registrar la boda en users/{uid}/weddings:', e);
   }
 
   // Seed de tareas predeterminadas (padres en Gantt, subtareas en lista)
@@ -181,7 +181,7 @@ export async function createWedding(uid, extraData = {}) {
       if (base?.weddingDate) await fixParentBlockDates(weddingId);
     } catch (_) {}
   } catch (e) {
-    console.warn('No se pudieron crear las tareas predeterminadas para', weddingId, e);
+    // console.warn('No se pudieron crear las tareas predeterminadas para', weddingId, e);
     try {
       performanceMonitor?.logEvent?.('event_creation_seed_failed', {
         weddingId,
@@ -211,7 +211,7 @@ export async function createWedding(uid, extraData = {}) {
       } catch {}
     });
   } catch (error) {
-    console.warn('[WeddingService] No se pudo encolar la sincronizacion CRM', error);
+    // console.warn('[WeddingService] No se pudo encolar la sincronizacion CRM', error);
   }
 
   return weddingId;
@@ -298,7 +298,7 @@ export async function seedDefaultTasksForWedding(weddingId, weddingData) {
       skipIfSeeded: true,
     });
   } catch (error) {
-    console.warn('[WeddingService] seed default tasks failed', error);
+    // console.warn('[WeddingService] seed default tasks failed', error);
   }
 }
 
@@ -450,7 +450,7 @@ export async function acceptInvitation(code, uid) {
         { merge: true }
       );
     } catch (e) {
-      console.warn('No se pudo vincular la boda en users/{uid}/weddings:', e);
+      // console.warn('No se pudo vincular la boda en users/{uid}/weddings:', e);
     }
   }
   // eliminar invitación o marcar como aceptada
@@ -624,7 +624,7 @@ export async function fixParentBlockDates(weddingId, ganttStart = null, ganttEnd
       );
     } catch (_) {}
   } catch (e) {
-    console.warn('fixParentBlockDates error:', e);
+    // console.warn('fixParentBlockDates error:', e);
   }
   return { updated };
 }

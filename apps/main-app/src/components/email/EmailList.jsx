@@ -91,7 +91,7 @@ const EmailList = ({
         return date.toDateString();
       }
     } catch (e) {
-      console.error('Error al formatear fecha:', e);
+      // console.error('Error al formatear fecha:', e);
       return dateStr;
     }
   };

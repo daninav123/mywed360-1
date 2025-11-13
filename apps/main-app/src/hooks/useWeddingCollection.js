@@ -45,7 +45,7 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
     try {
       return lsGet(weddingId, subName, fallback);
     } catch (error) {
-      console.error('Error inicializando datos desde localStorage:', error);
+      // console.error('Error inicializando datos desde localStorage:', error);
       return fallback;
     }
   });
@@ -78,7 +78,7 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
       // Verificar auth de forma segura - usar auth de Firebase, no el contexto local
       const firebaseUser = auth?.currentUser;
       if (!firebaseUser?.uid) {
-        console.log('Usuario no autenticado en Firebase, omitiendo migración de invitados');
+        // console.log('Usuario no autenticado en Firebase, omitiendo migración de invitados');
         return;
       }
 
@@ -152,10 +152,10 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
         // Si hay operaciones en cola, confirmamos
         if (writes > 0) {
           await batch.commit();
-          console.log(`[migración] Invitados fusionados en weddings/${weddingId}/guests`);
+          // console.log(`[migración] Invitados fusionados en weddings/${weddingId}/guests`);
         }
       } catch (err) {
-        console.warn('Error migrando invitados antiguos:', err);
+        // console.warn('Error migrando invitados antiguos:', err);
       }
     }
     migrateGuests();
@@ -168,7 +168,7 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
       // Verificar auth de forma segura - usar auth de Firebase, no el contexto local
       const firebaseUser = auth?.currentUser;
       if (!firebaseUser?.uid) {
-        console.log('Usuario no autenticado en Firebase, omitiendo migración de proveedores');
+        // console.log('Usuario no autenticado en Firebase, omitiendo migración de proveedores');
         return;
       }
 
@@ -233,10 +233,10 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
 
         if (writes > 0) {
           await batch.commit();
-          console.log(`[migración] Proveedores fusionados en weddings/${weddingId}/suppliers`);
+          // console.log(`[migración] Proveedores fusionados en weddings/${weddingId}/suppliers`);
         }
       } catch (err) {
-        console.warn('Error migrando proveedores antiguos:', err);
+        // console.warn('Error migrando proveedores antiguos:', err);
       }
     }
     migrateSuppliers();
@@ -285,7 +285,7 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
         }
       } catch {}
       if (import.meta.env.DEV)
-        console.log(
+        // console.log(
           `[useWeddingCollection] Iniciando listener para weddings/${weddingId}/${subName}`
         );
       // ⭐ OPTIMIZADO: Debounce para reducir actualizaciones excesivas
@@ -326,7 +326,7 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
               setData(arr);
               setLoading(false);
             } catch (snapError) {
-              console.error('[useWeddingCollection] Error procesando snapshot:', snapError);
+              // console.error('[useWeddingCollection] Error procesando snapshot:', snapError);
               setLoading(false);
             }
           }, 100);
@@ -339,7 +339,7 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
           
           // ✅ Error de conexión/red (no crítico)
           if (isUnavailable) {
-            console.warn(`⚠️ [useWeddingCollection] Firestore temporalmente no disponible para ${subName}`);
+            // console.warn(`⚠️ [useWeddingCollection] Firestore temporalmente no disponible para ${subName}`);
             // Usar caché mientras se recupera
             const cached = lsGet(weddingId, subName, fallback);
             setData(cached);
@@ -347,7 +347,7 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
             
             // Reintentar después de 5 segundos
             setTimeout(() => {
-              console.log(`🔄 Reintentando conexión para ${subName}...`);
+              // console.log(`🔄 Reintentando conexión para ${subName}...`);
               if (typeof unsub === 'function') {
                 try {
                   unsub();
@@ -360,7 +360,7 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
           
           // ✅ Error de índices (no crítico, usar caché)
           if (isFailedPrecondition) {
-            console.warn(`⚠️ [useWeddingCollection] Índice faltante para ${subName}, usando caché`);
+            // console.warn(`⚠️ [useWeddingCollection] Índice faltante para ${subName}, usando caché`);
             setData(lsGet(weddingId, subName, fallback));
             setLoading(false);
             return;
@@ -380,7 +380,7 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
                     if (typeof unsub === 'function') unsub();
                   } catch {}
                   if (import.meta.env.DEV)
-                    console.debug(
+                    // console.debug(
                       '[useWeddingCollection] reintento de listener tras autofix en 3000ms',
                       { sub: subName, wedding: weddingId }
                     );
@@ -388,10 +388,10 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
                   return;
                 } else {
                   const text = await resp.text().catch(() => '');
-                  console.warn('[auto-fix] Backend rechazó autofix', resp?.status, text);
+                  // console.warn('[auto-fix] Backend rechazó autofix', resp?.status, text);
                 }
               } catch (permErr) {
-                console.warn('[auto-fix] Error llamando autofix backend:', permErr);
+                // console.warn('[auto-fix] Error llamando autofix backend:', permErr);
               }
             })();
             
@@ -403,7 +403,7 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
           
           // ✅ Otros errores (usar caché)
           if (import.meta.env.DEV)
-            console.debug('[useWeddingCollection] usando caché local por error en snapshot', {
+            // console.debug('[useWeddingCollection] usando caché local por error en snapshot', {
               sub: subName,
               wedding: weddingId,
               code: err?.code,
@@ -427,7 +427,7 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
 
     // Verificar que db esté disponible
     if (!db) {
-      console.warn('Firebase db no está disponible, usando datos de fallback');
+      // console.warn('Firebase db no está disponible, usando datos de fallback');
       setData(fallback);
       setLoading(false);
       return;
@@ -435,7 +435,7 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
 
     if (!firebaseUid) {
       if (import.meta.env.DEV) {
-        console.info(
+        // console.info(
           `[useWeddingCollection] Sin auth Firebase; usando solo caché local para ${subName}`
         );
       }
@@ -450,7 +450,7 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
     firebaseReady
       .then(() => listen())
       .catch((err) => {
-        console.error('[useWeddingCollection] Error en firebaseReady:', err);
+        // console.error('[useWeddingCollection] Error en firebaseReady:', err);
         setData(lsGet(weddingId, subName, fallback));
         setLoading(false);
         setError(err);
@@ -510,14 +510,14 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
 
           return saved;
         } catch (err) {
-          console.warn('addItem Firestore failed, usando localStorage:', err);
+          // console.warn('addItem Firestore failed, usando localStorage:', err);
           // Si falla, continuamos al modo offline
         }
       }
 
       // 2) Modo offline o fallo de permisos: persistimos en localStorage
       if (!weddingId) {
-        console.warn('addItem: sin weddingId activo; se guarda solo en localStorage');
+        // console.warn('addItem: sin weddingId activo; se guarda solo en localStorage');
       }
 
       const offlineItem = { ...item, id: item.id || Date.now() };
@@ -546,11 +546,11 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
           });
           return;
         } catch (err) {
-          console.warn('updateItem Firestore failed, usando localStorage:', err);
+          // console.warn('updateItem Firestore failed, usando localStorage:', err);
         }
       }
       if (!weddingId)
-        console.warn('updateItem: sin weddingId activo; se guarda solo en localStorage');
+        // console.warn('updateItem: sin weddingId activo; se guarda solo en localStorage');
       setData((prev) => {
         const next = prev.map((d) => (d.id === id ? { ...d, ...changes } : d));
         lastLocalWriteRef.current = Date.now();
@@ -575,11 +575,11 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
           });
           return;
         } catch (err) {
-          console.warn('deleteItem Firestore failed, usando localStorage:', err);
+          // console.warn('deleteItem Firestore failed, usando localStorage:', err);
         }
       }
       if (!weddingId)
-        console.warn('deleteItem: sin weddingId activo; se guarda solo en localStorage');
+        // console.warn('deleteItem: sin weddingId activo; se guarda solo en localStorage');
       setData((prev) => {
         const next = prev.filter((d) => d.id !== id);
         lastLocalWriteRef.current = Date.now();

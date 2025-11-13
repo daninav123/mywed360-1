@@ -309,7 +309,7 @@ export default function Checklist() {
               addCustomItem(item.label, item.category || CATEGORIES.PERSONAL, item.dueDate || null);
               imported += 1;
             } catch (error) {
-              console.warn(error);
+              // console.warn(error);
             }
           });
 

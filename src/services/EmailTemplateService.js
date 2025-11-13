@@ -247,7 +247,7 @@ Muchas gracias,
   logTemplateUsage(category, aiResult, wasCustomized) {
     // Aquí se implementaría la lógica para registrar el uso de plantillas
     // y mejorar las recomendaciones futuras
-    console.log('Template usage logged:', {
+    // console.log('Template usage logged:', {
       category,
       aiResultId: aiResult?.id,
       wasCustomized,

@@ -83,7 +83,7 @@ export default function useCeremonyTexts() {
           { merge: true },
         );
       } catch (err) {
-        console.warn('[useCeremonyTexts] persist failed', err);
+        // console.warn('[useCeremonyTexts] persist failed', err);
         setError(err);
       }
     },
@@ -124,7 +124,7 @@ export default function useCeremonyTexts() {
         setLoading(false);
       },
       (err) => {
-        console.warn('[useCeremonyTexts] snapshot error', err);
+        // console.warn('[useCeremonyTexts] snapshot error', err);
         setError(err);
         setLoading(false);
       },

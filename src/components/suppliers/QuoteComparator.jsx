@@ -116,7 +116,7 @@ export default function QuoteComparator({ quotes, request, onSelect, onClose }) 
         }
       }, 500);
     } catch (error) {
-      console.error('Error confirming selection:', error);
+      // console.error('Error confirming selection:', error);
       toast.error('Error al guardar la selección. Intenta de nuevo.');
     } finally {
       setConfirming(false);

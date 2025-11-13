@@ -132,7 +132,7 @@ export default function Bodas() {
       userCacheRef.current.set(userId, profile);
       return profile;
     } catch (error) {
-      console.warn('[Bodas] No se pudo cargar el perfil', userId, error);
+      // console.warn('[Bodas] No se pudo cargar el perfil', userId, error);
       userCacheRef.current.set(userId, null);
       return null;
     }
@@ -195,7 +195,7 @@ export default function Bodas() {
           weddingDate: wedding.weddingDate || wedding.date || null,
         });
       } catch (error) {
-        console.error('[Bodas] sync CRM error', error);
+        // console.error('[Bodas] sync CRM error', error);
         toast.error(t('weddings.syncCrmError'));
       } finally {
         markSyncing(weddingId, false);
@@ -316,7 +316,7 @@ export default function Bodas() {
     try {
       await bulkSyncWeddings(ids, { source: 'multi-wedding-dashboard' });
     } catch (error) {
-      console.error('[Bodas] bulk CRM sync error', error);
+      // console.error('[Bodas] bulk CRM sync error', error);
       toast.error(t('weddings.bulkSyncError'));
     } finally {
       setBulkSyncing(false);
@@ -347,7 +347,7 @@ export default function Bodas() {
       setActiveWedding(weddingId);
       navigate(`/bodas/${weddingId}`);
     } catch (err) {
-      console.error('Error creando nueva boda:', err);
+      // console.error('Error creando nueva boda:', err);
       toast.error(t('weddings.createError'));
     }
   };
@@ -384,7 +384,7 @@ export default function Bodas() {
         setActiveWedding('');
       }
     } catch (err) {
-      console.error('No se pudo actualizar el estado de la boda', err);
+      // console.error('No se pudo actualizar el estado de la boda', err);
       toast.error(t('weddings.updateStatusError'));
     }
   };

@@ -33,7 +33,7 @@ const CalendarSync = () => {
       const data = await res.json();
       if (data?.ok) setFeed(data);
     } catch (e) {
-      console.error('calendar token error', e);
+      // console.error('calendar token error', e);
       setError(e?.message || t('tasks.page.calendarSync.errors.fetch'));
       setFeed(null);
     } finally {

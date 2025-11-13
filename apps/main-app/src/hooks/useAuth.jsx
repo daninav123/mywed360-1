@@ -87,7 +87,7 @@ const resolveAuth = () => {
     const resolved = (typeof getFirebaseAuth === 'function' && getFirebaseAuth()) || null;
     if (resolved) return resolved;
   } catch (error) {
-    console.warn('[useAuth] getFirebaseAuth falló, se intentará usar auth importado.', error);
+    // console.warn('[useAuth] getFirebaseAuth falló, se intentará usar auth importado.', error);
   }
   return auth || null;
 };
@@ -179,7 +179,7 @@ export const AuthProvider = ({ children }) => {
         try {
           storedProfile = JSON.parse(storedRaw);
         } catch (parseError) {
-          console.warn('[useAuth] No se pudo parsear el perfil guardado. Se generará uno nuevo.');
+          // console.warn('[useAuth] No se pudo parsear el perfil guardado. Se generará uno nuevo.');
           window.localStorage.removeItem('MaLoveApp_user_profile');
         }
       }
@@ -245,7 +245,7 @@ export const AuthProvider = ({ children }) => {
       try {
         window.localStorage.setItem('MaLoveApp_user_profile', JSON.stringify(profile));
       } catch (storageError) {
-        console.warn('[useAuth] No se pudo guardar el perfil en localStorage:', storageError);
+        // console.warn('[useAuth] No se pudo guardar el perfil en localStorage:', storageError);
       }
 
       setUserProfile(profile);
@@ -271,7 +271,7 @@ export const AuthProvider = ({ children }) => {
           );
         }
       } catch (e) {
-        console.warn('[useAuth] No se pudo persistir el perfil en Firestore:', e);
+        // console.warn('[useAuth] No se pudo persistir el perfil en Firestore:', e);
       }
       return profile;
     },
@@ -299,7 +299,7 @@ export const AuthProvider = ({ children }) => {
       try {
         return await fetchSignInMethodsForEmail(activeAuth, targetEmail);
       } catch (fetchError) {
-        console.warn('[useAuth] No se pudieron obtener los metodos de acceso asociados:', fetchError);
+        // console.warn('[useAuth] No se pudieron obtener los metodos de acceso asociados:', fetchError);
         return [];
       }
     };
@@ -348,7 +348,7 @@ export const AuthProvider = ({ children }) => {
 
         // Verificar si la sesión ha expirado
         if (expiresAt && expiresAt.getTime() <= Date.now()) {
-          console.log('[useAuth] Sesión admin expirada, limpiando localStorage');
+          // console.log('[useAuth] Sesión admin expirada, limpiando localStorage');
 
           try {
             localStorage.removeItem(ADMIN_SESSION_TOKEN_KEY);
@@ -381,7 +381,7 @@ export const AuthProvider = ({ children }) => {
           });
         } catch {}
 
-        console.log('[useAuth] ✅ Sesión admin restaurada correctamente', {
+        // console.log('[useAuth] ✅ Sesión admin restaurada correctamente', {
           email: adminUser.email,
           expiresAt: expiresAt ? expiresAt.toLocaleString() : 'no expira',
           hasToken: !!storedToken,
@@ -390,7 +390,7 @@ export const AuthProvider = ({ children }) => {
 
         return true;
       } catch (error) {
-        console.warn('[useAuth] No se pudo restaurar la sesion admin:', error);
+        // console.warn('[useAuth] No se pudo restaurar la sesion admin:', error);
         return false;
       }
     };
@@ -441,7 +441,7 @@ export const AuthProvider = ({ children }) => {
           try {
             parsedUser = JSON.parse(rawUser);
           } catch (err) {
-            console.warn('[useAuth] No se pudo parsear maloveapp_user:', err);
+            // console.warn('[useAuth] No se pudo parsear maloveapp_user:', err);
           }
         }
 
@@ -464,7 +464,7 @@ export const AuthProvider = ({ children }) => {
           try {
             storedProfile = JSON.parse(rawProfile);
           } catch (err) {
-            console.warn('[useAuth] No se pudo parsear el perfil almacenado:', err);
+            // console.warn('[useAuth] No se pudo parsear el perfil almacenado:', err);
           }
         }
 
@@ -487,7 +487,7 @@ export const AuthProvider = ({ children }) => {
         try {
           ls.setItem('MaLoveApp_user_profile', JSON.stringify(resolvedProfile));
         } catch (storageError) {
-          console.warn('[useAuth] No se pudo persistir el perfil mock en localStorage:', storageError);
+          // console.warn('[useAuth] No se pudo persistir el perfil mock en localStorage:', storageError);
         }
 
         try {
@@ -501,7 +501,7 @@ export const AuthProvider = ({ children }) => {
 
         return true;
       } catch (error) {
-        console.warn('[useAuth] No se pudo restaurar la sesion mock de pruebas:', error);
+        // console.warn('[useAuth] No se pudo restaurar la sesion mock de pruebas:', error);
         return false;
       }
     };
@@ -523,7 +523,7 @@ export const AuthProvider = ({ children }) => {
         // 1) Respeta el flag de ventana para desactivar explícitamente el autologin (tests que validan la UI de login)
         if (shouldDisableCypressAutoLogin()) {
           window.__MALOVEAPP_DISABLE_AUTOLOGIN__ = false;
-          console.info('[useAuth] Cypress auto-login deshabilitado por flag.');
+          // console.info('[useAuth] Cypress auto-login deshabilitado por flag.');
           setCurrentUser(null);
           setUserProfile(null);
           setLoading(false);
@@ -593,7 +593,7 @@ export const AuthProvider = ({ children }) => {
               ls.setItem('isLoggedIn', 'true');
             }
           } catch (mockError) {
-            console.warn('[useAuth] No se pudo inicializar la sesion mock:', mockError);
+            // console.warn('[useAuth] No se pudo inicializar la sesion mock:', mockError);
           }
         }
 
@@ -604,25 +604,25 @@ export const AuthProvider = ({ children }) => {
       try {
         await firebaseReady;
       } catch (error) {
-        console.warn('[useAuth] Error al esperar firebaseReady:', error);
+        // console.warn('[useAuth] Error al esperar firebaseReady:', error);
       }
 
       if (cancelled) return;
 
       const activeAuth = resolveAuth();
       if (!activeAuth || typeof activeAuth.onAuthStateChanged !== 'function') {
-        console.warn('[useAuth] Auth no disponible; la sesion permanecera sin iniciar.');
+        // console.warn('[useAuth] Auth no disponible; la sesion permanecera sin iniciar.');
         setLoading(false);
         return;
       }
 
       unsubscribe = onAuthStateChanged(activeAuth, (firebaseUser) => {
-        console.log('[useAuth] Firebase auth state changed:', firebaseUser?.email || 'No user');
+        // console.log('[useAuth] Firebase auth state changed:', firebaseUser?.email || 'No user');
 
         // ✅ Verificar sesión admin PRIMERO (prioridad sobre Firebase user)
         const adminRestored = restoreAdminSession();
         if (adminRestored) {
-          console.log('[useAuth] Sesión admin restaurada, ignorando usuario Firebase');
+          // console.log('[useAuth] Sesión admin restaurada, ignorando usuario Firebase');
           setLoading(false);
           return;
         }
@@ -635,7 +635,7 @@ export const AuthProvider = ({ children }) => {
               firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'Usuario',
             photoURL: firebaseUser.photoURL || null,
           };
-          console.log('[useAuth] Usuario autenticado:', user.uid);
+          // console.log('[useAuth] Usuario autenticado:', user.uid);
           setCurrentUser(user);
 
           const profile = persistProfileForUser(firebaseUser) || null;
@@ -649,7 +649,7 @@ export const AuthProvider = ({ children }) => {
             });
           } catch {}
         } else {
-          console.log('[useAuth] No hay usuario autenticado');
+          // console.log('[useAuth] No hay usuario autenticado');
           const mockRestored = restoreMockSession();
 
           if (!mockRestored) {
@@ -725,13 +725,13 @@ export const AuthProvider = ({ children }) => {
       try {
         const userCredential = await createUserWithEmailAndPassword(activeAuth, email, password);
         const user = userCredential.user;
-        console.log('[useAuth] Registro exitoso:', user.uid);
+        // console.log('[useAuth] Registro exitoso:', user.uid);
 
         persistProfileForUser(user, { role, forceRole: true });
 
         return { success: true, user };
       } catch (error) {
-        console.error('Error al registrar usuario:', error);
+        // console.error('Error al registrar usuario:', error);
         const mapped = await mapAuthErrorMessage(error, { email });
         return { success: false, error: mapped.message, code: mapped.code };
       }
@@ -790,14 +790,14 @@ export const AuthProvider = ({ children }) => {
           });
           return { success: true, user: mockUser };
         } catch (mockError) {
-          console.warn('[useAuth] Login mock falló:', mockError);
+          // console.warn('[useAuth] Login mock falló:', mockError);
           return { success: false, error: 'mock_login_failed' };
         }
       }
 
       const activeAuth = resolveAuth();
       if (!activeAuth) {
-        console.error('[useAuth] Auth no disponible durante login.');
+        // console.error('[useAuth] Auth no disponible durante login.');
         // Fallback de desarrollo cuando Firebase Auth no está configurado
         try {
           const env = (typeof import.meta !== 'undefined' && import.meta.env) ? import.meta.env : (typeof process !== 'undefined' ? process.env : {});
@@ -837,13 +837,13 @@ export const AuthProvider = ({ children }) => {
         const userCredential = await signInWithEmailAndPassword(activeAuth, email, password);
         const user = userCredential.user;
 
-        console.log('[useAuth] Login exitoso con Firebase Auth:', user.uid);
+        // console.log('[useAuth] Login exitoso con Firebase Auth:', user.uid);
 
         persistProfileForUser(user, { role: userProfile?.role });
 
         return { success: true, user };
       } catch (error) {
-        console.error('Error al iniciar sesion:', error);
+        // console.error('Error al iniciar sesion:', error);
         // Fallback de desarrollo: permitir sesión local si Firebase no está disponible (no productivo)
         try {
           const env = (typeof import.meta !== 'undefined' && import.meta.env) ? import.meta.env : (typeof process !== 'undefined' ? process.env : {});
@@ -876,7 +876,7 @@ export const AuthProvider = ({ children }) => {
             return { success: true, user: mockUser };
           }
         } catch (fallbackErr) {
-          console.warn('[useAuth] Fallback de login local falló:', fallbackErr);
+          // console.warn('[useAuth] Fallback de login local falló:', fallbackErr);
         }
         const mapped = await mapAuthErrorMessage(error, { email });
         return { success: false, error: mapped.message, code: mapped.code };
@@ -935,9 +935,9 @@ export const AuthProvider = ({ children }) => {
         } else {
           localStorage.removeItem(ADMIN_SESSION_ID_KEY);
         }
-        console.log('[useAuth] Sesión admin persistida en localStorage');
+        // console.log('[useAuth] Sesión admin persistida en localStorage');
       } catch (storageError) {
-        console.warn('[useAuth] No se pudo persistir la sesión admin:', storageError);
+        // console.warn('[useAuth] No se pudo persistir la sesión admin:', storageError);
       }
 
       return {
@@ -1048,7 +1048,7 @@ export const AuthProvider = ({ children }) => {
           sessionId: response.sessionId,
         });
       } catch (error) {
-        console.error('Error al iniciar sesión admin:', error);
+        // console.error('Error al iniciar sesión admin:', error);
         return {
           success: false,
           error: error?.message || 'No se pudo iniciar sesión.',
@@ -1122,7 +1122,7 @@ export const AuthProvider = ({ children }) => {
           sessionId: response.sessionId,
         });
       } catch (error) {
-        console.error('Error completando MFA admin:', error);
+        // console.error('Error completando MFA admin:', error);
         return {
           success: false,
           error: error?.message || 'Código inválido.',
@@ -1242,7 +1242,7 @@ export const AuthProvider = ({ children }) => {
     try {
       await sendPasswordResetEmail(activeAuth, email);
     } catch (error) {
-      console.error('Error al enviar restablecimiento de contrasena:', error);
+      // console.error('Error al enviar restablecimiento de contrasena:', error);
       const mapped = await mapAuthErrorMessage(error, { email });
       const message = mapped.message || error?.message || 'No se pudo enviar el enlace de restablecimiento.';
       const enrichedError = new Error(message);
@@ -1267,7 +1267,7 @@ export const AuthProvider = ({ children }) => {
         // Para usuarios mock/test, generar token compatible
         if (currentUser.uid === 'cypress-test' || currentUser.uid.startsWith('mock-')) {
           const mockToken = `mock-${currentUser.uid}-${currentUser.email}`;
-          console.log(' Token mock generado para:', currentUser.email);
+          // console.log(' Token mock generado para:', currentUser.email);
           return mockToken;
         }
 
@@ -1276,16 +1276,16 @@ export const AuthProvider = ({ children }) => {
         const fbUser = activeAuth?.currentUser;
         if (fbUser?.getIdToken) {
           const token = await fbUser.getIdToken(forceRefresh);
-          console.log(' Token Firebase obtenido');
+          // console.log(' Token Firebase obtenido');
           return token;
         }
 
         // Fallback: generar token mock si no hay método getIdToken
         const fallbackToken = `mock-${currentUser.uid}-${currentUser.email}`;
-        console.log(' Token fallback generado para:', currentUser.email);
+        // console.log(' Token fallback generado para:', currentUser.email);
         return fallbackToken;
       } catch (error) {
-        console.error('Error obteniendo token:', error);
+        // console.error('Error obteniendo token:', error);
         throw error;
       }
     },
@@ -1304,14 +1304,14 @@ export const AuthProvider = ({ children }) => {
         await signOut(activeAuth);
       }
     } catch (error) {
-      console.error('Error al cerrar sesión:', error);
+      // console.error('Error al cerrar sesión:', error);
       signOutError = error;
     }
 
     try {
       await logoutAdminRequest(adminSessionToken);
     } catch (error) {
-      console.warn('[useAuth] No se pudo invalidar la sesión admin en backend:', error);
+      // console.warn('[useAuth] No se pudo invalidar la sesión admin en backend:', error);
     }
 
     setPendingAdminSession(null);
@@ -1344,7 +1344,7 @@ export const AuthProvider = ({ children }) => {
         } catch {}
       }
     } catch (storageError) {
-      console.warn('No se pudieron limpiar las claves de sesión legacy:', storageError);
+      // console.warn('No se pudieron limpiar las claves de sesión legacy:', storageError);
     }
 
     stopReminderService();
@@ -1356,7 +1356,7 @@ export const AuthProvider = ({ children }) => {
     setAdminSessionId(null);
 
     if (!signOutError) {
-      console.log('✅ Sesión cerrada correctamente');
+      // console.log('✅ Sesión cerrada correctamente');
       return { success: true };
     }
 
@@ -1390,7 +1390,7 @@ export const AuthProvider = ({ children }) => {
       try { window.localStorage.setItem('MaLoveApp_user_profile', JSON.stringify(merged)); } catch {}
       return { success: true, profile: merged };
     } catch (e) {
-      console.warn('[useAuth] reloadUserProfile failed:', e);
+      // console.warn('[useAuth] reloadUserProfile failed:', e);
       return { success: false, error: e?.message || 'reload_failed' };
     }
   }, [currentUser, userProfile]);
@@ -1445,7 +1445,7 @@ export const AuthProvider = ({ children }) => {
       await reloadUserProfile();
       return { success: true, role: json?.role, subscription: json?.subscription };
     } catch (e) {
-      console.warn('[useAuth] upgradeRole failed:', e);
+      // console.warn('[useAuth] upgradeRole failed:', e);
       return { success: false, error: e?.message || 'upgrade_failed' };
     }
   }, [currentUser, getIdToken, reloadUserProfile]);
@@ -1470,11 +1470,11 @@ export const AuthProvider = ({ children }) => {
           );
         }
       } catch (e) {
-        console.warn('[useAuth] No se pudo persistir updateUserProfile en Firestore:', e);
+        // console.warn('[useAuth] No se pudo persistir updateUserProfile en Firestore:', e);
       }
       return { success: true, profile: updatedProfile };
     } catch (error) {
-      console.error('Error al actualizar perfil:', error);
+      // console.error('Error al actualizar perfil:', error);
       return { success: false, error: error.message };
     }
   };
@@ -1555,7 +1555,7 @@ export const useAuth = () => {
     try {
       if (import.meta?.env?.DEV && !__authWarnedOutside) {
         __authWarnedOutside = true;
-        console.debug('[useAuth] Llamado fuera de AuthProvider. Usando fallback no-auth.');
+        // console.debug('[useAuth] Llamado fuera de AuthProvider. Usando fallback no-auth.');
       }
     } catch {}
     // Fallback seguro para evitar crasheos en rutas pblicas o durante HMR

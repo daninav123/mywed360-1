@@ -223,7 +223,7 @@ export const useSeatingPlan = () => {
           }
         });
       } catch (error) {
-        console.warn('[useSeatingPlan] releaseLock error:', error);
+        // console.warn('[useSeatingPlan] releaseLock error:', error);
       }
     },
     [activeWedding, canPersist]
@@ -351,7 +351,7 @@ export const useSeatingPlan = () => {
         await setDoc(presenceDoc, basePayload, { merge: true });
         if (!cancelled) setCollaborationStatus('online');
       } catch (error) {
-        console.warn('[useSeatingPlan] presence set error:', error);
+        // console.warn('[useSeatingPlan] presence set error:', error);
         if (!cancelled) setCollaborationStatus('error');
       }
     };
@@ -362,7 +362,7 @@ export const useSeatingPlan = () => {
         tab,
         status: 'editing',
       }).catch((error) => {
-        console.warn('[useSeatingPlan] presence heartbeat error:', error);
+        // console.warn('[useSeatingPlan] presence heartbeat error:', error);
       });
     }, 20000);
     const presenceCollection = collection(db, 'weddings', activeWedding, 'seatingPresence');
@@ -398,7 +398,7 @@ export const useSeatingPlan = () => {
         setCollaborators(list);
       },
       (error) => {
-        console.warn('[useSeatingPlan] presence snapshot error:', error);
+        // console.warn('[useSeatingPlan] presence snapshot error:', error);
       }
     );
     return () => {
@@ -451,7 +451,7 @@ export const useSeatingPlan = () => {
         setLocks(list);
       },
       (error) => {
-        console.warn('[useSeatingPlan] locks snapshot error:', error);
+        // console.warn('[useSeatingPlan] locks snapshot error:', error);
       }
     );
     return () => {
@@ -649,7 +649,7 @@ export const useSeatingPlan = () => {
           }
         }
       } catch (err) {
-        console.warn('No se pudieron cargar dimensiones del sal�n:', err);
+        // console.warn('No se pudieron cargar dimensiones del sal�n:', err);
       }
     };
     loadHallDimensions();
@@ -692,11 +692,11 @@ export const useSeatingPlan = () => {
             setBackground(data.background || null);
           }
         } catch (err) {
-          console.warn('[useSeatingPlan] banquet snapshot error:', err);
+          // console.warn('[useSeatingPlan] banquet snapshot error:', err);
         }
       },
       (error) => {
-        console.warn('[useSeatingPlan] banquet snapshot error:', error);
+        // console.warn('[useSeatingPlan] banquet snapshot error:', error);
       }
     );
     return () => {
@@ -773,11 +773,11 @@ export const useSeatingPlan = () => {
             }));
           }
         } catch (err) {
-          console.warn('[useSeatingPlan] ceremony snapshot error:', err);
+          // console.warn('[useSeatingPlan] ceremony snapshot error:', err);
         }
       },
       (err) => {
-        console.warn('[useSeatingPlan] ceremony snapshot error:', err);
+        // console.warn('[useSeatingPlan] ceremony snapshot error:', err);
       }
     );
     return () => {
@@ -850,7 +850,7 @@ export const useSeatingPlan = () => {
           markPendingWrite('ceremony');
           await setDoc(ref, payload, { merge: true });
         } catch (e) {
-          console.warn('[useSeatingPlan] Autosave ceremony error:', e);
+          // console.warn('[useSeatingPlan] Autosave ceremony error:', e);
         }
       }, 800);
       return () => {
@@ -905,7 +905,7 @@ export const useSeatingPlan = () => {
           markPendingWrite('banquet');
           await setDoc(ref, payload, { merge: true });
         } catch (e) {
-          console.warn('[useSeatingPlan] Autosave banquet error:', e);
+          // console.warn('[useSeatingPlan] Autosave banquet error:', e);
         }
       }, 800);
       return () => {
@@ -1193,8 +1193,8 @@ export const useSeatingPlan = () => {
 
   const addTable = (table = {}) => {
     try {
-      console.log('[addTable] Input:', table);
-      console.log('[addTable] Current tab:', tab);
+      // console.log('[addTable] Input:', table);
+      // console.log('[addTable] Current tab:', tab);
 
       const typeHint =
         table.tableType || (table.shape === 'circle' ? 'round' : inferTableType(table));
@@ -1206,19 +1206,19 @@ export const useSeatingPlan = () => {
       });
 
       const sanitized = sanitizeTable(base, { forceAuto: base.autoCapacity });
-      console.log('[addTable] Sanitized table:', sanitized);
+      // console.log('[addTable] Sanitized table:', sanitized);
 
       if (tab === 'ceremony') {
         setTablesCeremony((prev) => {
           const newTables = [...prev, sanitized];
-          console.log('[addTable] New ceremony tables:', newTables);
+          // console.log('[addTable] New ceremony tables:', newTables);
           return newTables;
         });
       } else {
         setTablesBanquet((prev) => {
           const newTables = [...prev, sanitized];
-          console.log('[addTable] New banquet tables:', newTables);
-          console.log('[addTable] Previous count:', prev.length, '� New count:', newTables.length);
+          // console.log('[addTable] New banquet tables:', newTables);
+          // console.log('[addTable] Previous count:', prev.length, '� New count:', newTables.length);
           return newTables;
         });
       }
@@ -1227,10 +1227,10 @@ export const useSeatingPlan = () => {
       try {
         pushHistory();
       } catch (e) {
-        console.warn('[addTable] Error pushing to history:', e);
+        // console.warn('[addTable] Error pushing to history:', e);
       }
     } catch (error) {
-      console.error('[addTable] Error:', error);
+      // console.error('[addTable] Error:', error);
       throw error;
     }
   };
@@ -1425,7 +1425,7 @@ export const useSeatingPlan = () => {
         unassignedGuests: result.unassignedGuests || [],
       };
     } catch (error) {
-      console.error('[generateAutoLayoutFromGuests] Error:', error);
+      // console.error('[generateAutoLayoutFromGuests] Error:', error);
       return {
         success: false,
         message: 'Error generando el layout automático',
@@ -1441,7 +1441,7 @@ export const useSeatingPlan = () => {
     try {
       return analyzeGuestAssignments(guests);
     } catch (error) {
-      console.error('[analyzeCurrentGuests] Error:', error);
+      // console.error('[analyzeCurrentGuests] Error:', error);
       return {
         tables: [],
         unassignedGuests: [],
@@ -2250,7 +2250,7 @@ export const useSeatingPlan = () => {
       link.href = canvas.toDataURL();
       link.click();
     } catch (error) {
-      console.error('Error exportando PNG:', error);
+      // console.error('Error exportando PNG:', error);
     }
   };
   const exportPDF = async () => {
@@ -2274,7 +2274,7 @@ export const useSeatingPlan = () => {
       }
       pdf.save(`seating-plan-${tab}-${Date.now()}.pdf`);
     } catch (error) {
-      console.error('Error exportando PDF:', error);
+      // console.error('Error exportando PDF:', error);
     }
   };
   const exportCSV = async (options = {}) => {
@@ -2324,7 +2324,7 @@ export const useSeatingPlan = () => {
       URL.revokeObjectURL(url);
       return { format: 'csv', blob, mimeType: 'text/csv', filename: exportName };
     } catch (e) {
-      console.warn('CSV export failed', e);
+      // console.warn('CSV export failed', e);
       if (returnBlob) throw e;
       return null;
     }
@@ -2373,7 +2373,7 @@ export const useSeatingPlan = () => {
       URL.revokeObjectURL(url);
       return { format: 'svg', blob, mimeType: 'image/svg+xml', filename: exportName };
     } catch (e) {
-      console.warn('SVG export failed', e);
+      // console.warn('SVG export failed', e);
       if (returnBlob) throw e;
       return null;
     }
@@ -2392,7 +2392,7 @@ export const useSeatingPlan = () => {
         reader.readAsDataURL(blob);
       });
     } catch (error) {
-      console.warn('No se pudo cargar el logotipo para la exportaci�n', error);
+      // console.warn('No se pudo cargar el logotipo para la exportaci�n', error);
       return null;
     }
   };
@@ -3366,7 +3366,7 @@ export const useSeatingPlan = () => {
 
     const toArtifact = (result) =>
       Promise.resolve(result).catch((error) => {
-        console.warn('[useSeatingPlan] export artifact failed', error);
+        // console.warn('[useSeatingPlan] export artifact failed', error);
         if (wantsPersistence) throw error;
         return null;
       });
@@ -3421,7 +3421,7 @@ export const useSeatingPlan = () => {
         anchor.click();
         URL.revokeObjectURL(url);
       } catch (error) {
-        console.warn('[useSeatingPlan] local download failed', error);
+        // console.warn('[useSeatingPlan] local download failed', error);
       }
     };
 
@@ -3501,7 +3501,7 @@ export const useSeatingPlan = () => {
         { merge: true }
       );
     } catch (error) {
-      console.error('[useSeatingPlan] exportAdvancedReport upload error', error);
+      // console.error('[useSeatingPlan] exportAdvancedReport upload error', error);
       await setDoc(
         exportDocRef,
         {
@@ -3565,7 +3565,7 @@ export const useSeatingPlan = () => {
           { merge: true }
         );
       } catch (err) {
-        console.error('Error guardando dimensiones del salón:', err);
+        // console.error('Error guardando dimensiones del salón:', err);
       }
     }
   };
@@ -3609,7 +3609,7 @@ export const useSeatingPlan = () => {
           { merge: true }
         );
       } catch (e) {
-        console.warn('saveGlobalMaxGuests failed', e);
+        // console.warn('saveGlobalMaxGuests failed', e);
       }
     }
   };
@@ -3648,7 +3648,7 @@ export const useSeatingPlan = () => {
           { merge: true }
         );
       } catch (e) {
-        console.warn('saveBackground failed', e);
+        // console.warn('saveBackground failed', e);
       }
     }
   };

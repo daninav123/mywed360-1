@@ -257,7 +257,7 @@ export async function getMails(input = 'inbox') {
         }
       }
     } catch (error) {
-      console.warn('[EmailService] Backend getMails failed, falling back to local data', error);
+      // console.warn('[EmailService] Backend getMails failed, falling back to local data', error);
     }
   }
   const stored = readLocal(MAIL_STORAGE_KEY, []);
@@ -291,7 +291,7 @@ export async function getMail(emailId) {
         if (payload) return normalizeMail(payload, payload.folder);
       }
     } catch (error) {
-      console.warn('[EmailService] Backend getMail failed, using local cache', error);
+      // console.warn('[EmailService] Backend getMail failed, using local cache', error);
     }
   }
   const local = readLocal(MAIL_STORAGE_KEY, []);
@@ -436,7 +436,7 @@ export async function markAsRead(emailId, isRead = true) {
         getRequestOptions({ silent: true })
       );
     } catch (error) {
-      console.warn('[EmailService] markAsRead backend call failed', error);
+      // console.warn('[EmailService] markAsRead backend call failed', error);
     }
   }
   updateLocalMail(emailId, { read: Boolean(isRead) });
@@ -453,7 +453,7 @@ export async function deleteMail(emailId) {
     try {
       await apiDel(`/api/mail/${encodeURIComponent(emailId)}`, getRequestOptions({ silent: true }));
     } catch (error) {
-      console.warn('[EmailService] deleteMail backend call failed', error);
+      // console.warn('[EmailService] deleteMail backend call failed', error);
     }
   }
   removeLocalMail(emailId);
@@ -470,7 +470,7 @@ export async function setFolder(emailId, folder) {
         getRequestOptions({ silent: true })
       );
     } catch (error) {
-      console.warn('[EmailService] setFolder backend call failed', error);
+      // console.warn('[EmailService] setFolder backend call failed', error);
     }
   }
   updateLocalMail(emailId, { folder });
@@ -489,7 +489,7 @@ export async function setMailImportant(emailId, important = true) {
         getRequestOptions({ silent: true })
       );
     } catch (error) {
-      console.warn('[EmailService] setMailImportant backend call failed', error);
+      // console.warn('[EmailService] setMailImportant backend call failed', error);
     }
   }
   updateLocalMail(emailId, { important: Boolean(important) });
@@ -515,7 +515,7 @@ export async function updateMailTags(emailId, { add = [], remove = [] } = {}) {
         throw error;
       }
     } catch (error) {
-      console.error('[EmailService] updateMailTags backend call failed', error);
+      // console.error('[EmailService] updateMailTags backend call failed', error);
       throw error;
     }
   }
@@ -533,7 +533,7 @@ export async function emptyTrash() {
     try {
       await apiDel('/api/email/trash/empty', getRequestOptions({ silent: true }));
     } catch (error) {
-      console.warn('[EmailService] emptyTrash backend call failed', error);
+      // console.warn('[EmailService] emptyTrash backend call failed', error);
     }
   }
   const stored = readLocal(MAIL_STORAGE_KEY, []);
@@ -578,7 +578,7 @@ export async function getEmailTemplates(forceRefresh = false) {
         }
       }
     } catch (error) {
-      console.warn('[EmailService] getEmailTemplates backend call failed', error);
+      // console.warn('[EmailService] getEmailTemplates backend call failed', error);
     }
   }
   if (!forceRefresh) {
@@ -641,7 +641,7 @@ export async function searchEmails(term = '', options = {}) {
         if (Array.isArray(list)) return list.map((mail) => normalizeMail(mail));
       }
     } catch (error) {
-      console.warn('[EmailService] searchEmails backend call failed', error);
+      // console.warn('[EmailService] searchEmails backend call failed', error);
     }
   }
   const local = readLocal(MAIL_STORAGE_KEY, []);
@@ -666,7 +666,7 @@ export async function getEmailStatistics() {
         if (payload) return payload;
       }
     } catch (error) {
-      console.warn('[EmailService] getEmailStatistics backend call failed', error);
+      // console.warn('[EmailService] getEmailStatistics backend call failed', error);
     }
   }
   const all = readLocal(MAIL_STORAGE_KEY, []);
@@ -688,7 +688,7 @@ export async function logAIEmailActivity(id, context = {}) {
       await apiPost('/api/email/ai/log', { id, context }, getRequestOptions({ silent: true }));
     }
   } catch (error) {
-    console.warn('[EmailService] logAIEmailActivity backend call failed', error);
+    // console.warn('[EmailService] logAIEmailActivity backend call failed', error);
   }
   return { success: true };
 }
@@ -708,7 +708,7 @@ export async function createEmailAlias(aliasData) {
       );
       return { success: true, alias: response };
     } catch (error) {
-      console.error('[EmailService] createEmailAlias failed:', error);
+      // console.error('[EmailService] createEmailAlias failed:', error);
       return { success: false, error: error.message };
     }
   }

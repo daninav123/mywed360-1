@@ -43,7 +43,7 @@ export default function ConfigEventBridge() {
         }
       } catch (e) {
         // eslint-disable-next-line no-console
-        console.warn('[ConfigEventBridge] persist error', e);
+        // console.warn('[ConfigEventBridge] persist error', e);
       }
     };
 

@@ -92,7 +92,7 @@ function EmailAdminDashboard() {
           tab: activeTab,
         });
       } catch (error) {
-        console.error('Error al cargar estadsticas:', error);
+        // console.error('Error al cargar estadsticas:', error);
       } finally {
         setIsLoading(false);
       }

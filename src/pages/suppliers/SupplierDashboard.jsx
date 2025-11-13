@@ -143,7 +143,7 @@ export default function SupplierDashboard() {
           setNewRequestsCount(requestsData.pagination?.total || 0);
         }
       } catch (err) {
-        console.error('[SupplierDashboard] Error loading requests count:', err);
+        // console.error('[SupplierDashboard] Error loading requests count:', err);
       }
 
       const profile = data.profile || {};
@@ -160,7 +160,7 @@ export default function SupplierDashboard() {
         priceRange: profile.business?.priceRange || '',
       });
     } catch (err) {
-      console.error('[SupplierDashboard] load error', err);
+      // console.error('[SupplierDashboard] load error', err);
       setErrorMessage(err.message || tRef.current('suppliers.dashboard.errors.load'));
     } finally {
       setLoading(false);
@@ -219,7 +219,7 @@ export default function SupplierDashboard() {
       setEditing(false);
       loadDashboard();
     } catch (err) {
-      console.error('[SupplierDashboard] save error', err);
+      // console.error('[SupplierDashboard] save error', err);
       window.alert(t('suppliers.dashboard.alerts.saveError', { message: err.message || '' }));
     } finally {
       setSaving(false);

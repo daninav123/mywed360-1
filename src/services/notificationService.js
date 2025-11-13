@@ -108,7 +108,7 @@ export const getNotifications = async (weddingId) => {
   try {
     return await notificationServiceInstance.getPending(weddingId);
   } catch (error) {
-    console.error('Error obteniendo notificaciones:', error);
+    // console.error('Error obteniendo notificaciones:', error);
     return [];
   }
 };
@@ -121,7 +121,7 @@ export const getNotificationPrefs = () => {
       return { ...DEFAULT_NOTIFICATION_PREFS, ...JSON.parse(stored) };
     }
   } catch (error) {
-    console.error('Error cargando preferencias:', error);
+    // console.error('Error cargando preferencias:', error);
   }
   return DEFAULT_NOTIFICATION_PREFS;
 };
@@ -132,7 +132,7 @@ export const saveNotificationPrefs = (prefs) => {
     localStorage.setItem('maloveapp_notification_prefs', JSON.stringify(prefs));
     return true;
   } catch (error) {
-    console.error('Error guardando preferencias:', error);
+    // console.error('Error guardando preferencias:', error);
     return false;
   }
 };
@@ -154,7 +154,7 @@ export const isQuietHoursActive = () => {
     // Quiet hours normal
     return currentTime >= start && currentTime < end;
   } catch (error) {
-    console.error('Error verificando quiet hours:', error);
+    // console.error('Error verificando quiet hours:', error);
     return false;
   }
 };
@@ -162,7 +162,7 @@ export const isQuietHoursActive = () => {
 export const showNotification = (notification) => {
   // Verificar quiet hours
   if (isQuietHoursActive()) {
-    console.log('Notificación silenciada por quiet hours');
+    // console.log('Notificación silenciada por quiet hours');
     return notification;
   }
 
@@ -212,7 +212,7 @@ export const shouldNotify = (notification) => {
 export const markNotificationRead = async (weddingId, notificationId) => {
   // Marcar notificación como leída
   if (!weddingId || !notificationId) {
-    console.warn('markNotificationRead: weddingId y notificationId son requeridos');
+    // console.warn('markNotificationRead: weddingId y notificationId son requeridos');
     return false;
   }
 
@@ -224,7 +224,7 @@ export const markNotificationRead = async (weddingId, notificationId) => {
     });
     return true;
   } catch (error) {
-    console.error('Error marcando notificación como leída:', error);
+    // console.error('Error marcando notificación como leída:', error);
     return false;
   }
 };
@@ -232,7 +232,7 @@ export const markNotificationRead = async (weddingId, notificationId) => {
 export const deleteNotification = async (weddingId, notificationId) => {
   // Eliminar notificación
   if (!weddingId || !notificationId) {
-    console.warn('deleteNotification: weddingId y notificationId son requeridos');
+    // console.warn('deleteNotification: weddingId y notificationId son requeridos');
     return false;
   }
 
@@ -244,7 +244,7 @@ export const deleteNotification = async (weddingId, notificationId) => {
     });
     return true;
   } catch (error) {
-    console.error('Error eliminando notificación:', error);
+    // console.error('Error eliminando notificación:', error);
     return false;
   }
 };

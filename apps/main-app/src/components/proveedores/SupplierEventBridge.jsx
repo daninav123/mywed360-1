@@ -35,7 +35,7 @@ export default function SupplierEventBridge() {
             updated: serverTimestamp(),
           };
           await addDoc(colRef, payload);
-          console.log('[SupplierEventBridge] Proveedor creado');
+          // console.log('[SupplierEventBridge] Proveedor creado');
           return;
         }
 
@@ -72,14 +72,14 @@ export default function SupplierEventBridge() {
           };
           Object.keys(patch).forEach((k) => patch[k] == null && delete patch[k]);
           await updateDoc(doc(db, 'weddings', activeWedding, 'suppliers', targetId), patch);
-          console.log('[SupplierEventBridge] Proveedor actualizado', targetId);
+          // console.log('[SupplierEventBridge] Proveedor actualizado', targetId);
         } else if (action === 'delete') {
           await deleteDoc(doc(db, 'weddings', activeWedding, 'suppliers', targetId));
-          console.log('[SupplierEventBridge] Proveedor eliminado', targetId);
+          // console.log('[SupplierEventBridge] Proveedor eliminado', targetId);
         }
       } catch (e) {
         // eslint-disable-next-line no-console
-        console.error('[SupplierEventBridge] Error al manejar evento mywed360-suppliers', e);
+        // console.error('[SupplierEventBridge] Error al manejar evento mywed360-suppliers', e);
       }
     };
 

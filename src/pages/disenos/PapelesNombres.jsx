@@ -61,7 +61,7 @@ export default function PapelesNombres() {
 
       return `Incluye ejemplos para los siguientes nombres: ${selectedGuests.join(', ')}`;
     } catch (err) {
-      console.error('Error al obtener información de invitados:', err);
+      // console.error('Error al obtener información de invitados:', err);
       return '';
     }
   };
@@ -87,7 +87,7 @@ export default function PapelesNombres() {
         category="place-cards"
         templates={nameCardsTemplates}
         onImageGenerated={(image) => {
-          console.log('Nuevos marcadores de mesa generados:', image);
+          // console.log('Nuevos marcadores de mesa generados:', image);
         }}
       />
     </div>

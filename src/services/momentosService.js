@@ -178,7 +178,7 @@ const optimizeImageFile = async (
       wasCompressed: force ? blob.size <= file.size : blob.size < file.size,
     };
   } catch (error) {
-    console.warn('[momentosService] optimizeImageFile no pudo comprimir', error);
+    // console.warn('[momentosService] optimizeImageFile no pudo comprimir', error);
     return null;
   }
 };
@@ -305,7 +305,7 @@ const generateImageThumbnail = async (
     });
     return { file: thumbFile, size: thumbFile.size };
   } catch (error) {
-    console.warn('[momentosService] generateImageThumbnail error', error);
+    // console.warn('[momentosService] generateImageThumbnail error', error);
     return null;
   }
 };

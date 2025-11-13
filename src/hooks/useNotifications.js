@@ -58,7 +58,7 @@ export default function useNotifications({
           setNotifications((prev) => [...prev, ...fetchedNotifications]);
         }
       } catch (err) {
-        console.error('Error al cargar notificaciones:', err);
+        // console.error('Error al cargar notificaciones:', err);
         setError('No se pudieron cargar las notificaciones');
       } finally {
         setLoading(false);
@@ -106,7 +106,7 @@ export default function useNotifications({
             setNotifications((prev) => [...newNotifications, ...prev]);
           }
         } catch (err) {
-          console.error('Error en polling de notificaciones:', err);
+          // console.error('Error en polling de notificaciones:', err);
         }
       };
 
@@ -126,7 +126,7 @@ export default function useNotifications({
         );
         return true;
       } catch (err) {
-        console.error('Error al marcar notificación como leída:', err);
+        // console.error('Error al marcar notificación como leída:', err);
         setError('No se pudo actualizar la notificación');
         return false;
       }
@@ -149,7 +149,7 @@ export default function useNotifications({
 
       return true;
     } catch (err) {
-      console.error('Error al marcar todas como leídas:', err);
+      // console.error('Error al marcar todas como leídas:', err);
       setError('No se pudieron actualizar las notificaciones');
       return false;
     }
@@ -163,7 +163,7 @@ export default function useNotifications({
         setNotifications((prev) => prev.filter((notif) => notif.id !== notificationId));
         return true;
       } catch (err) {
-        console.error('Error al eliminar notificación:', err);
+        // console.error('Error al eliminar notificación:', err);
         setError('No se pudo eliminar la notificación');
         return false;
       }

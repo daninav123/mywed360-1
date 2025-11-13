@@ -63,14 +63,14 @@ export default function SupplierPortfolio() {
       const token = localStorage.getItem('supplier_token');
       const supplierId = localStorage.getItem('supplier_id');
 
-      console.log(
+      // console.log(
         '[SupplierPortfolio] Token:',
         token ? `${token.substring(0, 20)}...` : 'NO TOKEN'
       );
-      console.log('[SupplierPortfolio] Supplier ID:', supplierId);
+      // console.log('[SupplierPortfolio] Supplier ID:', supplierId);
 
       if (!token || token === 'null' || token === 'undefined') {
-        console.error('[SupplierPortfolio] No hay token válido, redirigiendo a login');
+        // console.error('[SupplierPortfolio] No hay token válido, redirigiendo a login');
         navigate('/supplier/login');
         return;
       }
@@ -80,7 +80,7 @@ export default function SupplierPortfolio() {
         params.append('category', selectedCategory);
       }
 
-      console.log(
+      // console.log(
         '[SupplierPortfolio] Haciendo petición a:',
         `/api/supplier-dashboard/portfolio?${params.toString()}`
       );
@@ -89,11 +89,11 @@ export default function SupplierPortfolio() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      console.log('[SupplierPortfolio] Respuesta status:', response.status);
+      // console.log('[SupplierPortfolio] Respuesta status:', response.status);
 
       if (!response.ok) {
         if (response.status === 401) {
-          console.warn('[SupplierPortfolio] 401 Unauthorized, limpiando sesión');
+          // console.warn('[SupplierPortfolio] 401 Unauthorized, limpiando sesión');
           localStorage.removeItem('supplier_token');
           localStorage.removeItem('supplier_id');
           navigate('/supplier/login');
@@ -111,7 +111,7 @@ export default function SupplierPortfolio() {
       setCoverPhoto(cover || null);
       setPhotos(portfolioPhotos);
     } catch (error) {
-      console.error('[SupplierPortfolio] load error', error);
+      // console.error('[SupplierPortfolio] load error', error);
       toast.error(tRef.current('suppliers.portfolio.toasts.loadError'));
     } finally {
       setLoading(false);
@@ -148,7 +148,7 @@ export default function SupplierPortfolio() {
       toast.success(t('suppliers.portfolio.toasts.deleted'));
       loadPhotos();
     } catch (error) {
-      console.error('[SupplierPortfolio] delete error', error);
+      // console.error('[SupplierPortfolio] delete error', error);
       toast.error(
         error.message === 'delete_failed'
           ? t('suppliers.portfolio.toasts.deleteError')

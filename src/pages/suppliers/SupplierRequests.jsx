@@ -120,7 +120,7 @@ export default function SupplierRequests() {
       const total = data.total || transformedRequests.length;
       setTotalPages(Math.ceil(total / itemsPerPage) || 1);
     } catch (error) {
-      console.error('[SupplierRequests] Error loading:', error);
+      // console.error('[SupplierRequests] Error loading:', error);
       toast.error(tRef.current('suppliers.requests.errors.loadError'));
     } finally {
       setLoading(false);
@@ -157,7 +157,7 @@ export default function SupplierRequests() {
         toast.success(tRef.current('suppliers.requests.success.statusUpdated'));
         loadRequests();
       } catch (error) {
-        console.error('[SupplierRequests] Error updating:', error);
+        // console.error('[SupplierRequests] Error updating:', error);
         toast.error(tRef.current('suppliers.requests.errors.updateError'));
       }
     },
@@ -211,7 +211,7 @@ export default function SupplierRequests() {
         minute: '2-digit',
       }).format(date);
     } catch (error) {
-      console.error('Error formateando fecha:', error, timestamp);
+      // console.error('Error formateando fecha:', error, timestamp);
       return 'Fecha inválida';
     }
   }, []);

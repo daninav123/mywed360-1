@@ -93,7 +93,7 @@ export default function EnhancedExportModal({
         onClose?.();
       }, 1500);
     } catch (error) {
-      console.error('Export error:', error);
+      // console.error('Export error:', error);
     } finally {
       setIsExporting(false);
     }

@@ -60,7 +60,7 @@ const AdminPayouts = () => {
       const payload = await getCommercePayoutPreview(targetPeriod);
       setData(payload);
     } catch (err) {
-      console.error('[AdminPayouts] Failed to load preview:', err);
+      // console.error('[AdminPayouts] Failed to load preview:', err);
       setError(err?.message || 'No se pudo generar la prevision.');
     } finally {
       setLoading(false);
@@ -83,7 +83,7 @@ const AdminPayouts = () => {
       setCommitMessage(`Liquidación guardada${versionLabel} para ${periodLabel}.`);
       await loadPreview(period, { resetCommit: false });
     } catch (err) {
-      console.error('[AdminPayouts] Failed to commit payouts:', err);
+      // console.error('[AdminPayouts] Failed to commit payouts:', err);
       setCommitError(err?.message || 'No se pudo guardar la liquidación.');
     } finally {
       setSaving(false);

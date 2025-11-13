@@ -38,7 +38,7 @@ export default function RecommendedSuppliers({ onClose }) {
                 results.push(...response.suppliers.slice(0, 2));
               }
             } catch (err) {
-              console.log('Error fetching by category:', err);
+              // console.log('Error fetching by category:', err);
             }
           }
         }
@@ -58,7 +58,7 @@ export default function RecommendedSuppliers({ onClose }) {
               results.push(...response.suppliers.slice(0, 2));
             }
           } catch (err) {
-            console.log('Error fetching by style:', err);
+            // console.log('Error fetching by style:', err);
           }
         }
 
@@ -76,7 +76,7 @@ export default function RecommendedSuppliers({ onClose }) {
               results.push(...response.suppliers.slice(0, 3));
             }
           } catch (err) {
-            console.log('Error fetching popular:', err);
+            // console.log('Error fetching popular:', err);
           }
         }
 
@@ -92,7 +92,7 @@ export default function RecommendedSuppliers({ onClose }) {
 
         setRecommendations(uniqueResults);
       } catch (error) {
-        console.error('Error fetching recommendations:', error);
+        // console.error('Error fetching recommendations:', error);
         setRecommendations([]);
       } finally {
         setLoading(false);
@@ -156,8 +156,8 @@ export default function RecommendedSuppliers({ onClose }) {
           <SupplierCard
             key={supplier.id || supplier.slug}
             supplier={supplier}
-            onContact={(info) => console.log('Contact:', info)}
-            onViewDetails={(s) => console.log('View details:', s)}
+            onContact={(info) => // console.log('Contact:', info)}
+            onViewDetails={(s) => // console.log('View details:', s)}
           />
         ))}
       </div>

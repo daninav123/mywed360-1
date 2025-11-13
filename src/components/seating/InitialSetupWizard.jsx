@@ -169,7 +169,7 @@ export default function InitialSetupWizard({
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
-                            console.log('[Button Click] Cambiar dimensiones');
+                            // console.log('[Button Click] Cambiar dimensiones');
                             onOpenHallConfig?.();
                           }}
                           type="button"
@@ -218,7 +218,7 @@ export default function InitialSetupWizard({
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
-                            console.log('[Button Click] Cambiar plantilla');
+                            // console.log('[Button Click] Cambiar plantilla');
                             onOpenTemplates?.();
                           }}
                           type="button"

@@ -89,7 +89,7 @@ export default function ContactSupplierModal({ supplier, onClose }) {
         onClose();
       }, 3000);
     } catch (err) {
-      console.error('Error al enviar solicitud:', err);
+      // console.error('Error al enviar solicitud:', err);
       setError(err.message || 'Error al enviar la solicitud. Inténtalo de nuevo.');
     } finally {
       setLoading(false);

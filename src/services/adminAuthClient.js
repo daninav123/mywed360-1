@@ -61,7 +61,7 @@ export async function logoutAdmin(sessionToken) {
   } catch (error) {
     // Si el backend ya invalidó la sesión, no es crítico para el frontend.
     if (error?.code !== 'admin_request_failed') {
-      console.warn('[adminAuthClient] logout admin fallback:', error);
+      // console.warn('[adminAuthClient] logout admin fallback:', error);
     }
   }
   return { success: true };

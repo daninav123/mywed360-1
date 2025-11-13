@@ -63,7 +63,7 @@ const ContactsImporterFixed = ({ onImported }) => {
       setRows(imported);
       setStep('review');
     } catch (err) {
-      console.error(err);
+      // console.error(err);
       toast.error(t('guests.contacts.errorAccess', { defaultValue: 'No se pudo acceder a los contactos.' }));
     }
   };
@@ -159,7 +159,7 @@ const ContactsImporterFixed = ({ onImported }) => {
       setRows(imported);
       setStep('review');
     } catch (err) {
-      console.error('Error leyendo CSV:', err);
+      // console.error('Error leyendo CSV:', err);
       toast.error(
         t('guests.contacts.csvReadError', {
           defaultValue: 'No se pudo leer el archivo CSV.',

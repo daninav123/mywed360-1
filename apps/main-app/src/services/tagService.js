@@ -63,7 +63,7 @@ export const getUserTags = (userId) => {
 
     return [...SYSTEM_TAGS, ...customTags];
   } catch (error) {
-    console.error('Error al obtener etiquetas:', error);
+    // console.error('Error al obtener etiquetas:', error);
     return [...SYSTEM_TAGS];
   }
 };
@@ -86,7 +86,7 @@ export const getCustomTags = (userId) => {
     runtimeCustomTags[userId] = fromStorage; // cache interna
     return fromStorage;
   } catch (error) {
-    console.error('Error al obtener etiquetas personalizadas:', error);
+    // console.error('Error al obtener etiquetas personalizadas:', error);
     return runtimeCustomTags[userId] || [];
   }
 };
@@ -141,7 +141,7 @@ export const createTag = (userId, tagName, color = '#64748b') => {
 
     return newTag;
   } catch (error) {
-    console.error('Error al crear etiqueta:', error);
+    // console.error('Error al crear etiqueta:', error);
     throw error;
   }
 };
@@ -179,7 +179,7 @@ export const deleteTag = (userId, tagId) => {
 
     return true;
   } catch (error) {
-    console.error('Error al eliminar etiqueta:', error);
+    // console.error('Error al eliminar etiqueta:', error);
     throw error;
   }
 };
@@ -213,7 +213,7 @@ const getEmailTagsMapping = (userId) => {
     const storageKey = `${EMAIL_TAGS_MAPPING_KEY}_${userId}`;
     return loadJson(storageKey, {});
   } catch (error) {
-    console.error('Error al obtener mapeo de correos a etiquetas:', error);
+    // console.error('Error al obtener mapeo de correos a etiquetas:', error);
     return {};
   }
 };
@@ -242,7 +242,7 @@ async function mirrorTagsToCloud(userId, tags) {
       { auth: true, silent: true }
     );
   } catch (error) {
-    console.warn('[tagService] sync tags failed', error?.message || error);
+    // console.warn('[tagService] sync tags failed', error?.message || error);
   }
 }
 
@@ -255,7 +255,7 @@ async function mirrorTagsMappingToCloud(userId, mapping) {
       { auth: true, silent: true }
     );
   } catch (error) {
-    console.warn('[tagService] sync tags mapping failed', error?.message || error);
+    // console.warn('[tagService] sync tags mapping failed', error?.message || error);
   }
 }
 
@@ -275,7 +275,7 @@ async function refreshTagsFromCloud(userId) {
       saveJson(mappingKey, payload.mapping);
     }
   } catch (error) {
-    console.warn('[tagService] refresh tags failed', error?.message || error);
+    // console.warn('[tagService] refresh tags failed', error?.message || error);
   }
 }
 
@@ -290,7 +290,7 @@ async function refreshTagsMappingFromCloud(userId) {
       saveJson(storageKey, payload.mapping);
     }
   } catch (error) {
-    console.warn('[tagService] refresh tags mapping failed', error?.message || error);
+    // console.warn('[tagService] refresh tags mapping failed', error?.message || error);
   }
 }
 
@@ -338,7 +338,7 @@ export const addTagToEmail = (userId, emailId, tagId) => {
     }
     return true;
   } catch (error) {
-    console.error('Error al asignar etiqueta a correo:', error);
+    // console.error('Error al asignar etiqueta a correo:', error);
     throw error;
   }
 };
@@ -374,7 +374,7 @@ export const removeTagFromEmail = (userId, emailId, tagId) => {
     } catch {}
     return true;
   } catch (error) {
-    console.error('Error al quitar etiqueta de correo:', error);
+    // console.error('Error al quitar etiqueta de correo:', error);
     throw error;
   }
 };
@@ -401,7 +401,7 @@ export const removeTagFromAllEmails = (userId, tagId) => {
 
     return true;
   } catch (error) {
-    console.error('Error al quitar etiqueta de todos los correos:', error);
+    // console.error('Error al quitar etiqueta de todos los correos:', error);
     throw error;
   }
 };
@@ -417,7 +417,7 @@ export const getEmailTags = (userId, emailId) => {
     const mapping = getEmailTagsMapping(userId);
     return mapping[emailId] || [];
   } catch (error) {
-    console.error('Error al obtener etiquetas de correo:', error);
+    // console.error('Error al obtener etiquetas de correo:', error);
     return [];
   }
 };
@@ -438,7 +438,7 @@ export const getEmailTagsDetails = (userId, emailId) => {
       .map((tagId) => allTags.find((tag) => tag.id === tagId))
       .filter((tag) => tag !== undefined); // Filtrar etiquetas que ya no existen
   } catch (error) {
-    console.error('Error al obtener detalles de etiquetas:', error);
+    // console.error('Error al obtener detalles de etiquetas:', error);
     return [];
   }
 };
@@ -458,7 +458,7 @@ export const getEmailsByTag = (userId, tagId) => {
       .filter(([_, tagIds]) => tagIds.includes(tagId))
       .map(([emailId, _]) => emailId);
   } catch (error) {
-    console.error('Error al obtener correos por etiqueta:', error);
+    // console.error('Error al obtener correos por etiqueta:', error);
     return [];
   }
 };

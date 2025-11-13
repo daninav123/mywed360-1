@@ -18,7 +18,7 @@ async function getAuthToken() {
         const refreshed = await authContext.getIdToken(true);
         if (refreshed) return refreshed;
       } catch (err) {
-        console.warn('[whatsappService] No se pudo refrescar token desde authContext:', err);
+        // console.warn('[whatsappService] No se pudo refrescar token desde authContext:', err);
       }
       return authContext.getIdToken();
     });
@@ -34,12 +34,12 @@ async function getAuthToken() {
           const refreshed = await user.getIdToken(true);
           if (refreshed) return refreshed;
         } catch (err) {
-          console.warn('[whatsappService] No se pudo refrescar token Firebase:', err);
+          // console.warn('[whatsappService] No se pudo refrescar token Firebase:', err);
         }
         return user.getIdToken();
       }
     } catch (error) {
-      console.warn('[whatsappService] Error importando firebaseConfig:', error);
+      // console.warn('[whatsappService] Error importando firebaseConfig:', error);
     }
     return null;
   });
@@ -49,7 +49,7 @@ async function getAuthToken() {
       const token = await resolver();
       if (token) return token;
     } catch (error) {
-      console.warn('[whatsappService] Error obteniendo token de autenticación:', error);
+      // console.warn('[whatsappService] Error obteniendo token de autenticación:', error);
     }
   }
 
@@ -100,7 +100,7 @@ export async function sendText({
     const base = BASE ? BASE.replace(/\/$/, '') : '';
     const url = base ? `${base}/api/whatsapp/send` : `/api/whatsapp/send`;
     if (import.meta.env.DEV)
-      console.log('[whatsappService] sendText →', {
+      // console.log('[whatsappService] sendText →', {
         url,
         hasAuth: !!token,
         to,
@@ -125,14 +125,14 @@ export async function sendText({
     });
     const json = await res.json().catch(() => ({}));
     if (import.meta.env.DEV)
-      console.log('[whatsappService] sendText ←', { status: res.status, ok: res.ok, body: json });
+      // console.log('[whatsappService] sendText ←', { status: res.status, ok: res.ok, body: json });
     if (!res.ok || json.success === false) {
       const msg = json?.error || `HTTP ${res.status}`;
       return { success: false, error: msg };
     }
     return json;
   } catch (e) {
-    if (import.meta.env.DEV) console.warn('[whatsappService] sendText exception', e);
+    if (import.meta.env.DEV) // console.warn('[whatsappService] sendText exception', e);
     return { success: false, error: e.message || 'error' };
   }
 }

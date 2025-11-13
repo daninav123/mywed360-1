@@ -21,7 +21,7 @@ export default function DownloadBundle({
       setItems(Array.isArray(links) ? links : []);
       toast.success(`Se generaron ${links?.length || 0} enlaces de descarga`);
     } catch (error) {
-      console.error('DownloadBundle error', error);
+      // console.error('DownloadBundle error', error);
       toast.error('No se pudieron generar los enlaces de descarga');
     } finally {
       setIsLoading(false);

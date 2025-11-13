@@ -36,7 +36,7 @@ export default function SelectFromFavoritesModal({
         error?.message ||
           t('suppliers.selectFavorites.toast.error', 'Error al asignar proveedor')
       );
-      console.error(error);
+      // console.error(error);
     } finally {
       setLoading(false);
       setSelectedSupplier(null);

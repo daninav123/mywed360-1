@@ -75,10 +75,10 @@ export const trackOnboardingEvent = async (userId, weddingId, eventName, metadat
 
     // Log para debugging en desarrollo
     if (process.env.NODE_ENV === 'development') {
-      console.log('📊 Onboarding Event:', eventName, metadata);
+      // console.log('📊 Onboarding Event:', eventName, metadata);
     }
   } catch (error) {
-    console.error('Error tracking onboarding event:', error);
+    // console.error('Error tracking onboarding event:', error);
   }
 };
 
@@ -106,7 +106,7 @@ export const getOnboardingProgress = async (userId, weddingId) => {
       progress: calculateProgress(data),
     };
   } catch (error) {
-    console.error('Error getting onboarding progress:', error);
+    // console.error('Error getting onboarding progress:', error);
     return null;
   }
 };
@@ -166,7 +166,7 @@ export const isFirstTime = (key) => {
  */
 export const resetOnboardingProgress = async (userId, weddingId) => {
   if (process.env.NODE_ENV !== 'development') {
-    console.warn('Reset only available in development');
+    // console.warn('Reset only available in development');
     return;
   }
 
@@ -190,9 +190,9 @@ export const resetOnboardingProgress = async (userId, weddingId) => {
         .forEach(key => localStorage.removeItem(key));
     }
 
-    console.log('✅ Onboarding progress reset');
+    // console.log('✅ Onboarding progress reset');
   } catch (error) {
-    console.error('Error resetting onboarding:', error);
+    // console.error('Error resetting onboarding:', error);
   }
 };
 

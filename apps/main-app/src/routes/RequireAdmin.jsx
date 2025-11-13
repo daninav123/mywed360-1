@@ -49,7 +49,7 @@ const RequireAdmin = () => {
         reason,
       }).catch((error) => {
         if (typeof process !== 'undefined' && process.env?.NODE_ENV !== 'production') {
-          console.warn('[RequireAdmin] No se pudo registrar el evento de seguridad:', error);
+          // console.warn('[RequireAdmin] No se pudo registrar el evento de seguridad:', error);
         }
       });
     }

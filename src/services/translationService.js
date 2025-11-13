@@ -26,7 +26,7 @@ export async function translateText(text, targetLang = 'es', sourceLang = '') {
     const translated = res.data.data.translations[0].translatedText;
     return translated || text;
   } catch (e) {
-    console.warn('Translation error', e.message);
+    // console.warn('Translation error', e.message);
     return text;
   }
 }

@@ -109,7 +109,7 @@ const UnifiedEmail = () => {
         setHasMore(Boolean(page.nextCursor));
       }
     } catch (err) {
-      console.error('Error cargando correos:', err);
+      // console.error('Error cargando correos:', err);
       setError('No se pudieron cargar los correos');
     } finally {
       setLoading(false);
@@ -135,7 +135,7 @@ const UnifiedEmail = () => {
       setNextCursor(page.nextCursor || null);
       setHasMore(Boolean(page.nextCursor));
     } catch (e) {
-      console.warn('loadMore failed', e);
+      // console.warn('loadMore failed', e);
     } finally {
       setLoadingMore(false);
     }
@@ -171,7 +171,7 @@ const UnifiedEmail = () => {
         } catch {}
       }
     } catch (e) {
-      console.warn('UnifiedEmail: error detectando respuesta de proveedor', e);
+      // console.warn('UnifiedEmail: error detectando respuesta de proveedor', e);
     }
   }, [emails, providers]);
 
@@ -185,7 +185,7 @@ const UnifiedEmail = () => {
         try {
           await ensureContractFromEmail(email, activeWedding);
         } catch (error) {
-          console.warn('UnifiedEmail: error al guardar contrato desde correo', error);
+          // console.warn('UnifiedEmail: error al guardar contrato desde correo', error);
         }
       }
     };
@@ -241,7 +241,7 @@ const UnifiedEmail = () => {
       const folders = getUserFolders(userId);
       setCustomFolders(folders);
     } catch (e) {
-      console.warn('No se pudieron cargar carpetas personalizadas', e);
+      // console.warn('No se pudieron cargar carpetas personalizadas', e);
     }
   }, [userId]);
 
@@ -252,7 +252,7 @@ const UnifiedEmail = () => {
       const tags = getUserTags(userId);
       setAllTags(tags);
     } catch (e) {
-      console.warn('No se pudieron cargar etiquetas', e);
+      // console.warn('No se pudieron cargar etiquetas', e);
     }
   }, [userId]);
   const handleMarkRead = async (mail) => {
@@ -261,7 +261,7 @@ const UnifiedEmail = () => {
       setEmails((prev) => prev.map((m) => (m.id === mail.id ? { ...m, read: true } : m)));
       setSelected((prev) => (prev ? { ...prev, read: true } : prev));
     } catch (err) {
-      console.error('Error marcando le)do:', err);
+      // console.error('Error marcando le)do:', err);
       toast.error(t('email.markReadError'));
     }
   };
@@ -272,7 +272,7 @@ const UnifiedEmail = () => {
       setEmails((prev) => prev.filter((m) => m.id !== mail.id));
       setSelected(null);
     } catch (err) {
-      console.error('Error eliminando correo:', err);
+      // console.error('Error eliminando correo:', err);
       toast.error(t('email.deleteError'));
     }
   };
@@ -288,7 +288,7 @@ const UnifiedEmail = () => {
         setSelected((prev) => (prev && prev.id === mail.id ? { ...prev, read: false } : prev));
       }
     } catch (e) {
-      console.warn('Error alternando le)do', e);
+      // console.warn('Error alternando le)do', e);
     }
   }
 
@@ -297,7 +297,7 @@ const UnifiedEmail = () => {
       if (!userId || !mail?.id || !folderId) return;
       const ok = assignEmailToFolder(userId, mail.id, folderId);
       if (ok) {
-        console.log('Correo movido a carpeta');
+        // console.log('Correo movido a carpeta');
       }
       // Best-effort: reflejar en backend
       try {
@@ -305,7 +305,7 @@ const UnifiedEmail = () => {
         await setMailFolder(mail.id, `custom:${folderId}`);
       } catch {}
     } catch (e) {
-      console.error('Error moviendo correo a carpeta', e);
+      // console.error('Error moviendo correo a carpeta', e);
     }
   };
 

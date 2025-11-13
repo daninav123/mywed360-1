@@ -33,7 +33,7 @@ const fetchVersions = async (uid, weddingId) => {
         }))
       );
     } catch (err) {
-      console.warn('websiteService.fetchVersions wedding', err);
+      // console.warn('websiteService.fetchVersions wedding', err);
     }
   }
 
@@ -167,7 +167,7 @@ const fetchUserDoc = async (uid) => {
     const snapshot = await getDoc(doc(db, 'users', uid));
     if (snapshot.exists()) return snapshot.data() || {};
   } catch (err) {
-    console.warn('websiteService.fetchUserDoc', err);
+    // console.warn('websiteService.fetchUserDoc', err);
   }
   return {};
 };
@@ -181,7 +181,7 @@ const fetchWeddingDoc = async (weddingId) => {
       return data.weddingInfo ? { ...data.weddingInfo } : {};
     }
   } catch (err) {
-    console.warn('websiteService.fetchWeddingDoc', err);
+    // console.warn('websiteService.fetchWeddingDoc', err);
   }
   return {};
 };
@@ -192,7 +192,7 @@ export const loadWebsiteContext = async ({ uid, weddingId }) => {
   try {
     await firebaseReady;
   } catch (err) {
-    console.warn('websiteService.loadWebsiteContext firebaseReady', err);
+    // console.warn('websiteService.loadWebsiteContext firebaseReady', err);
   }
 
   const [userDoc, weddingInfo, prompts] = await Promise.all([
@@ -293,7 +293,7 @@ export const checkSlugAvailability = async (slug) => {
 
     if (response.ok || response.status === 403) return { status: 'taken' };
   } catch (err) {
-    console.warn('websiteService.checkSlugAvailability', err);
+    // console.warn('websiteService.checkSlugAvailability', err);
     return { status: 'unknown' };
   }
 
@@ -322,7 +322,7 @@ export const saveWebsiteVersion = async ({ uid, weddingId, html, prompt, slug })
         author: uid,
       });
     } catch (err) {
-      console.warn('websiteService.saveWebsiteVersion wedding', err);
+      // console.warn('websiteService.saveWebsiteVersion wedding', err);
     }
   }
 
@@ -354,7 +354,7 @@ export const publishWeddingSite = async ({ weddingId, html, slug }) => {
 
     return { ok: true, publicUrl, data };
   } catch (err) {
-    console.warn('websiteService.publishWeddingSite', err);
+    // console.warn('websiteService.publishWeddingSite', err);
     return { ok: false, error: err };
   }
 };
@@ -402,7 +402,7 @@ export const logWebsiteAiRun = async ({ uid, weddingId, prompt, templateKey }) =
     });
     return ref.id;
   } catch (err) {
-    console.warn('logWebsiteAiRun', err);
+    // console.warn('logWebsiteAiRun', err);
     return null;
   }
 };
@@ -417,7 +417,7 @@ export const recordWebsiteEvent = async ({ uid, weddingId, event, payload }) => 
       createdAt: serverTimestamp(),
     });
   } catch (err) {
-    console.warn('recordWebsiteEvent', err);
+    // console.warn('recordWebsiteEvent', err);
     throw err;
   }
 };

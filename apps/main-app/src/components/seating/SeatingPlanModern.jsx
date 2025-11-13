@@ -178,7 +178,7 @@ export default function SeatingPlanModern() {
       await autoAssignGuests();
       toast.success(t('planModern.toasts.autoAssignSuccess'));
     } catch (error) {
-      console.error('[auto-assign] error:', error);
+      // console.error('[auto-assign] error:', error);
       toast.error(t('planModern.toasts.autoAssignError'));
     } finally {
       setAutoAssignLoading(false);
@@ -188,20 +188,20 @@ export default function SeatingPlanModern() {
   // Handler to add a table
   const handleAddTable = useCallback(() => {
     try {
-      console.log('[handleAddTable] state before adding:');
-      console.log('- tab:', tab);
-      console.log('- tables.length:', tables?.length || 0);
-      console.log('- addTable available:', !!addTable);
+      // console.log('[handleAddTable] state before adding:');
+      // console.log('- tab:', tab);
+      // console.log('- tables.length:', tables?.length || 0);
+      // console.log('- addTable available:', !!addTable);
 
       if (!addTable) {
         toast.error(t('planModern.errors.addTableUnavailable'));
-        console.error('[addTable] handler missing in useSeatingPlan');
+        // console.error('[addTable] handler missing in useSeatingPlan');
         return;
       }
 
       // Asegurar que estamos en tab banquet
       if (tab !== 'banquet') {
-        console.warn('[handleAddTable] Not in banquet tab, switching...');
+        // console.warn('[handleAddTable] Not in banquet tab, switching...');
         setTab('banquet');
       }
 
@@ -218,17 +218,17 @@ export default function SeatingPlanModern() {
         name: t('planModern.defaults.tableName', { number: (tables?.length || 0) + 1 }),
       };
 
-      console.log('[handleAddTable] adding table:', newTable);
+      // console.log('[handleAddTable] adding table:', newTable);
       addTable(newTable);
       toast.success(t('planModern.toasts.addTableSuccess'));
 
       // Verify state after the async update
       setTimeout(() => {
-        console.log('[handleAddTable] state after async check:');
-        console.log('- tables.length:', tables?.length || 0);
+        // console.log('[handleAddTable] state after async check:');
+        // console.log('- tables.length:', tables?.length || 0);
       }, 100);
     } catch (error) {
-      console.error('[handleAddTable] Error:', error);
+      // console.error('[handleAddTable] Error:', error);
       const details = error?.message ? `: ${error.message}` : '';
       toast.error(t('planModern.toasts.addTableError', { message: details }));
     }
@@ -236,7 +236,7 @@ export default function SeatingPlanModern() {
 
   // Debug: Detectar cambios en tables
   useEffect(() => {
-    console.log('[SeatingPlanModern] tables changed:', {
+    // console.log('[SeatingPlanModern] tables changed:', {
       length: tables?.length || 0,
       tab,
       tables: tables?.map((t) => ({ id: t.id, name: t.name, x: t.x, y: t.y })),
@@ -344,7 +344,7 @@ export default function SeatingPlanModern() {
         toast.error(result.message || 'Error en la generación automática');
       }
     } catch (error) {
-      console.error('[handleGenerarTodoAutomatico] Error:', error);
+      // console.error('[handleGenerarTodoAutomatico] Error:', error);
       toast.error('Error inesperado. Inténtalo de nuevo.');
     } finally {
       setIsGeneratingAuto(false);
@@ -617,7 +617,7 @@ export default function SeatingPlanModern() {
           onClose={() => setLayoutGeneratorOpen(false)}
           onGenerate={(layoutType, config) => {
             // Generar y aplicar layout
-            console.log('[LayoutGenerator] Generating:', layoutType, config);
+            // console.log('[LayoutGenerator] Generating:', layoutType, config);
             const generatedTables = generateLayout(layoutType, config);
             if (generatedTables && generatedTables.length > 0) {
               generateBanquetLayout(generatedTables);

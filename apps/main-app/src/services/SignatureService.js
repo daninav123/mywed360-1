@@ -13,7 +13,7 @@ async function getAuthToken() {
     try {
       return await user.getIdToken(true);
     } catch (err) {
-      console.warn('[SignatureService] Error refrescando token, usando cache:', err);
+      // console.warn('[SignatureService] Error refrescando token, usando cache:', err);
       return await user.getIdToken();
     }
   } catch (error) {

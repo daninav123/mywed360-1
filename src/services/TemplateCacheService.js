@@ -82,7 +82,7 @@ const saveStats = () => {
 
     // Solo guardar si hay cambios desde la última vez
     if (currentHash === lastStatsHash) {
-      console.log('[TemplateCacheService] Stats sin cambios, omitiendo guardado');
+      // console.log('[TemplateCacheService] Stats sin cambios, omitiendo guardado');
       return;
     }
 
@@ -102,9 +102,9 @@ const saveStats = () => {
       })
     );
 
-    console.log('[TemplateCacheService] Stats guardadas (cambios detectados)');
+    // console.log('[TemplateCacheService] Stats guardadas (cambios detectados)');
   } catch (error) {
-    console.error('Error al guardar estadísticas de caché:', error);
+    // console.error('Error al guardar estadísticas de caché:', error);
   }
 };
 
@@ -145,7 +145,7 @@ export const registerTemplateUsage = (templateId, category) => {
 
     return usageData[templateId].count;
   } catch (error) {
-    console.error('Error al registrar uso de plantilla:', error);
+    // console.error('Error al registrar uso de plantilla:', error);
     return 0;
   }
 };
@@ -164,7 +164,7 @@ export const getTemplatesToPreload = () => {
       .sort((a, b) => b[1].count - a[1].count) // Ordenar por uso (mayor primero)
       .map(([id, _]) => id);
   } catch (error) {
-    console.error('Error al determinar plantillas para precargar:', error);
+    // console.error('Error al determinar plantillas para precargar:', error);
     return [];
   }
 };
@@ -192,7 +192,7 @@ export const getMostUsedCategories = () => {
       .sort((a, b) => b[1] - a[1])
       .map(([category, _]) => category);
   } catch (error) {
-    console.error('Error al obtener categorías más usadas:', error);
+    // console.error('Error al obtener categorías más usadas:', error);
     return [];
   }
 };
@@ -242,7 +242,7 @@ const cleanupCache = () => {
       }
     }
   } catch (error) {
-    console.error('Error al limpiar caché:', error);
+    // console.error('Error al limpiar caché:', error);
   }
 };
 
@@ -280,7 +280,7 @@ export const initCache = () => {
 export const cacheAllTemplates = (templates, updateLocalStorage = true) => {
   // Validación: asegurar que templates sea un array
   if (!Array.isArray(templates)) {
-    console.warn('cacheAllTemplates: se esperaba un array', { templates });
+    // console.warn('cacheAllTemplates: se esperaba un array', { templates });
     return;
   }
   // Guardar en caché de memoria
@@ -313,7 +313,7 @@ export const cacheAllTemplates = (templates, updateLocalStorage = true) => {
 
       cacheStats.saves++;
     } catch (error) {
-      console.error('Error al guardar plantillas en localStorage:', error);
+      // console.error('Error al guardar plantillas en localStorage:', error);
     }
   }
 
@@ -369,7 +369,7 @@ export const cacheTemplate = (template) => {
 
     cacheStats.saves++;
   } catch (error) {
-    console.error('Error al guardar plantilla en localStorage:', error);
+    // console.error('Error al guardar plantilla en localStorage:', error);
   }
 
   performanceMonitor.logEvent('template_cached', {
@@ -408,7 +408,7 @@ export const invalidateTemplate = (templateId) => {
   try {
     localStorage.removeItem(getCacheKey('id', templateId));
   } catch (error) {
-    console.error('Error al eliminar plantilla de localStorage:', error);
+    // console.error('Error al eliminar plantilla de localStorage:', error);
   }
 
   performanceMonitor.logEvent('template_cache_invalidated', {
@@ -436,7 +436,7 @@ export const invalidateAllTemplates = () => {
       }
     }
   } catch (error) {
-    console.error('Error al invalidar caché en localStorage:', error);
+    // console.error('Error al invalidar caché en localStorage:', error);
   }
 
   performanceMonitor.logEvent('template_cache_reset', {
@@ -489,7 +489,7 @@ export const getCachedTemplates = (bypassCache = false) => {
       }
     }
   } catch (error) {
-    console.error('Error al leer caché de localStorage:', error);
+    // console.error('Error al leer caché de localStorage:', error);
   }
 
   cacheStats.misses++;
@@ -546,7 +546,7 @@ export const getCachedTemplate = (templateId, bypassCache = false) => {
       }
     }
   } catch (error) {
-    console.error('Error al leer caché de plantilla de localStorage:', error);
+    // console.error('Error al leer caché de plantilla de localStorage:', error);
   }
 
   cacheStats.misses++;
@@ -653,7 +653,7 @@ export const preloadPopularTemplates = async (fetchFunction) => {
           });
         }
       } catch (error) {
-        console.error(`Error al precargar plantilla ${templateId}:`, error);
+        // console.error(`Error al precargar plantilla ${templateId}:`, error);
         performanceMonitor.logEvent('template_preload_error', {
           id: templateId,
           error: error.message,
@@ -665,7 +665,7 @@ export const preloadPopularTemplates = async (fetchFunction) => {
       preloaded: cacheStats.preloads,
     });
   } catch (error) {
-    console.error('Error al precargar plantillas populares:', error);
+    // console.error('Error al precargar plantillas populares:', error);
   }
 };
 

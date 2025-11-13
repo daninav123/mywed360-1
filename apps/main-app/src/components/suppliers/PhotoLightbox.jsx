@@ -84,7 +84,7 @@ export default function PhotoLightbox({ photo, onClose, onUpdate, onDelete }) {
       setEditing(false);
       onUpdate?.();
     } catch (error) {
-      console.error('[PhotoLightbox] update error', error);
+      // console.error('[PhotoLightbox] update error', error);
       toast.error(
         error.message === 'update_failed'
           ? t('suppliers.portfolio.lightbox.toasts.updateError')

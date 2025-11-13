@@ -30,7 +30,7 @@ async function getAuthToken() {
 
     return null;
   } catch (err) {
-    console.error('[FavoritesContext] Error obteniendo token:', err);
+    // console.error('[FavoritesContext] Error obteniendo token:', err);
     return null;
   }
 }
@@ -80,7 +80,7 @@ export function FavoritesProvider({ children }) {
         const token = await getAuthToken();
 
         if (!token) {
-          console.warn('[FavoritesContext] No se pudo obtener token');
+          // console.warn('[FavoritesContext] No se pudo obtener token');
           setFavorites([]);
           return;
         }
@@ -94,10 +94,10 @@ export function FavoritesProvider({ children }) {
         setFavorites(response.data.favorites || []);
       } catch (err) {
         if (err.response?.status === 401 || err.response?.status === 500) {
-          console.warn('[FavoritesContext] Favoritos no disponibles (error auth)');
+          // console.warn('[FavoritesContext] Favoritos no disponibles (error auth)');
           setFavorites([]);
         } else {
-          console.error('[FavoritesContext] Error cargando favoritos:', err);
+          // console.error('[FavoritesContext] Error cargando favoritos:', err);
           setError('Error al cargar favoritos');
           setFavorites([]);
         }
@@ -150,7 +150,7 @@ export function FavoritesProvider({ children }) {
 
       return response.data.favorite;
     } catch (err) {
-      console.error('[FavoritesContext] Error añadiendo favorito:', err);
+      // console.error('[FavoritesContext] Error añadiendo favorito:', err);
 
       if (err.response?.status === 409) {
         throw new Error(t('suppliers.favorites.errors.alreadyExists'));
@@ -189,7 +189,7 @@ export function FavoritesProvider({ children }) {
       // Actualizar estado local
       setFavorites((prev) => prev.filter((fav) => fav.supplierId !== supplierId));
     } catch (err) {
-      console.error('[FavoritesContext] Error eliminando favorito:', err);
+      // console.error('[FavoritesContext] Error eliminando favorito:', err);
       throw new Error(err.response?.data?.message || t('suppliers.favorites.errors.removeFailed'));
     }
   };

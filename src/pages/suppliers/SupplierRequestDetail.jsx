@@ -133,7 +133,7 @@ export default function SupplierRequestDetail() {
         setShowResponseForm(true);
       }
     } catch (err) {
-      console.error('[SupplierRequestDetail] load error:', err);
+      // console.error('[SupplierRequestDetail] load error:', err);
       setError(err.message || t('suppliers.requestDetail.errors.load'));
     } finally {
       setLoading(false);
@@ -207,7 +207,7 @@ export default function SupplierRequestDetail() {
       window.alert(t('suppliers.requestDetail.alerts.sent'));
       navigate(`/supplier/dashboard/${id}`);
     } catch (err) {
-      console.error('[SupplierRequestDetail] submit error:', err);
+      // console.error('[SupplierRequestDetail] submit error:', err);
       window.alert(t('suppliers.requestDetail.alerts.error', { message: err.message }));
     } finally {
       setResponding(false);

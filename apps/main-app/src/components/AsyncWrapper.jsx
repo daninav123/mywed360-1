@@ -35,7 +35,7 @@ const AsyncWrapper = ({
           setContent(asyncFunction);
         }
       } catch (err) {
-        console.error('Error en AsyncWrapper:', err);
+        // console.error('Error en AsyncWrapper:', err);
         setError(err);
       } finally {
         setLoading(false);

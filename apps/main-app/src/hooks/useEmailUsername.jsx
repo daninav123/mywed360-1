@@ -61,7 +61,7 @@ const useEmailUsername = () => {
 
       return querySnapshot.empty; // Disponible si la consulta no devuelve resultados
     } catch (err) {
-      console.error('Error al comprobar disponibilidad del nombre:', err);
+      // console.error('Error al comprobar disponibilidad del nombre:', err);
       setError('Error al verificar disponibilidad. Inténtalo de nuevo.');
       return false;
     } finally {
@@ -116,7 +116,7 @@ const useEmailUsername = () => {
 
         return true;
       } catch (err) {
-        console.error('Error al reservar nombre de usuario:', err);
+        // console.error('Error al reservar nombre de usuario:', err);
         setError('Error al guardar el nombre de usuario. Inténtalo de nuevo.');
         return false;
       } finally {
@@ -153,7 +153,7 @@ const useEmailUsername = () => {
 
       return null;
     } catch (err) {
-      console.error('Error al obtener nombre de usuario:', err);
+      // console.error('Error al obtener nombre de usuario:', err);
       setError('Error al cargar información de usuario');
       return null;
     } finally {

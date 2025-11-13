@@ -41,7 +41,7 @@ const CachePerformancePanel = () => {
         entries: report.memory.entryCount,
       });
     } catch (error) {
-      console.error('Error generando informe de caché:', error);
+      // console.error('Error generando informe de caché:', error);
     } finally {
       setLoading(false);
     }
@@ -74,7 +74,7 @@ const CachePerformancePanel = () => {
         timesSaved: results.improvement.timesSaved,
       });
     } catch (error) {
-      console.error('Error ejecutando benchmark:', error);
+      // console.error('Error ejecutando benchmark:', error);
     } finally {
       setBenchmarkLoading(false);
     }
@@ -95,7 +95,7 @@ const CachePerformancePanel = () => {
         templatesLoaded: results.templatesLoaded,
       });
     } catch (error) {
-      console.error(`Error probando precarga de categoría ${selectedCategory}:`, error);
+      // console.error(`Error probando precarga de categoría ${selectedCategory}:`, error);
     } finally {
       setLoading(false);
     }

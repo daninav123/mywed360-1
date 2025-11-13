@@ -100,7 +100,7 @@ const UserManagement = () => {
     handleCloseDialog();
 
     // En un entorno real, aquí se enviarían los datos a una API
-    console.log('Usuario actualizado:', selectedUser);
+    // console.log('Usuario actualizado:', selectedUser);
   };
 
   // Eliminar usuario
@@ -110,14 +110,14 @@ const UserManagement = () => {
       setUsers(users.filter((user) => user.id !== userId));
 
       // En un entorno real, aquí se enviaría la petición a una API
-      console.log('Usuario eliminado:', userId);
+      // console.log('Usuario eliminado:', userId);
     }
   };
 
   // Exportar datos de usuarios
   const handleExportUsers = () => {
     // En un entorno real, aquí se generaría un CSV o Excel
-    console.log('Exportando datos de usuarios:', filteredUsers);
+    // console.log('Exportando datos de usuarios:', filteredUsers);
     toast.success(t('admin.users.exportSuccess'));
   };
 

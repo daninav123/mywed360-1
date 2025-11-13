@@ -281,7 +281,7 @@ export const SeatingConflictToasts = {
       label: 'Ver mesa',
       onClick: () => {
         // Navigate to table
-        console.log('Navigate to table:', tableName);
+        // console.log('Navigate to table:', tableName);
       }
     }
   }),
@@ -294,7 +294,7 @@ export const SeatingConflictToasts = {
     action: {
       label: 'Ver invitado',
       onClick: () => {
-        console.log('Navigate to guest:', guestName);
+        // console.log('Navigate to guest:', guestName);
       }
     }
   }),

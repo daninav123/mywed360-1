@@ -95,7 +95,7 @@ const EmailFeedbackCollector = ({ onSubmit, isMinimized = false, emailId = null 
         setIsExpanded(false);
       }, 3000);
     } catch (error) {
-      console.error('Error al enviar feedback:', error);
+      // console.error('Error al enviar feedback:', error);
       performanceMonitor.logError('feedback_submission', error, { emailId });
       alert(tEmail('feedback.messages.submitError'));
     } finally {

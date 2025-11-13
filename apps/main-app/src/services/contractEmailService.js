@@ -95,7 +95,7 @@ const checkExistingContract = async (weddingId, emailId) => {
     const snap = await getDocs(q);
     return !snap.empty;
   } catch (error) {
-    console.warn('[contractEmailService] checkExistingContract error', error);
+    // console.warn('[contractEmailService] checkExistingContract error', error);
     return false;
   }
 };
@@ -155,7 +155,7 @@ export async function ensureContractFromEmail(email, weddingId) {
     saveProcessed(weddingId, processed);
     return true;
   } catch (error) {
-    console.error('[contractEmailService] ensureContractFromEmail error', error);
+    // console.error('[contractEmailService] ensureContractFromEmail error', error);
     return false;
   }
 }

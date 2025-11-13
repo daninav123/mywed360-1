@@ -97,7 +97,7 @@ const EmailTemplateManager = ({ onSelectTemplate, onClose }) => {
       const normalized = Array.isArray(data) ? data.map(sanitizeTemplate) : [];
       setTemplates(normalized);
     } catch (err) {
-      console.error('EmailTemplateManager.loadTemplates', err);
+      // console.error('EmailTemplateManager.loadTemplates', err);
       setError('No se pudieron cargar las plantillas de email');
     } finally {
       setLoading(false);
@@ -127,7 +127,7 @@ const EmailTemplateManager = ({ onSelectTemplate, onClose }) => {
       setTemplates((prev) => prev.filter((tpl) => tpl.id !== id));
       setSuccess('Plantilla eliminada');
     } catch (err) {
-      console.error('EmailTemplateManager.delete', err);
+      // console.error('EmailTemplateManager.delete', err);
       setError('No se pudo eliminar la plantilla');
     }
   }
@@ -141,7 +141,7 @@ const EmailTemplateManager = ({ onSelectTemplate, onClose }) => {
       setTemplates(normalized);
       setSuccess('Plantillas restablecidas');
     } catch (err) {
-      console.error('EmailTemplateManager.reset', err);
+      // console.error('EmailTemplateManager.reset', err);
       setError('No se pudieron restablecer las plantillas');
     } finally {
       setLoading(false);
@@ -167,7 +167,7 @@ const EmailTemplateManager = ({ onSelectTemplate, onClose }) => {
       setSuccess('Plantilla guardada correctamente');
       handleCancelEdit();
     } catch (err) {
-      console.error('EmailTemplateManager.save', err);
+      // console.error('EmailTemplateManager.save', err);
       setError('No se pudo guardar la plantilla');
     }
   }

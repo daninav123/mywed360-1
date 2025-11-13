@@ -75,7 +75,7 @@ const EmailStats = ({ userId }) => {
       const daily = await getDailyStats(userId, 30);
       setDailyStats(Array.isArray(daily) ? daily : []);
     } catch (error) {
-      console.error('Error al cargar estadísticas:', error);
+      // console.error('Error al cargar estadísticas:', error);
       setError('No se pudieron cargar las estadísticas');
     } finally {
       setLoading(false);

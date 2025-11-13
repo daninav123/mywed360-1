@@ -81,7 +81,7 @@ function MailgunTester() {
         }),
         severity: 'success',
       });
-      console.log('Respuesta del servidor:', result);
+      // console.log('Respuesta del servidor:', result);
     } catch (error) {
       setNotification({
         open: true,
@@ -90,7 +90,7 @@ function MailgunTester() {
         }),
         severity: 'error',
       });
-      console.error('Error al enviar:', error);
+      // console.error('Error al enviar:', error);
     } finally {
       setSending(false);
     }

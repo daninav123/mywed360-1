@@ -22,7 +22,7 @@ class ErrorBoundary extends React.Component {
       performanceMonitor.logError('react_error', error, { componentStack: info.componentStack });
     } catch (e) {
       // En caso de fallo en el monitor, al menos mostramos por consola
-      console.error('Error report failed:', e);
+      // console.error('Error report failed:', e);
     }
   }
 

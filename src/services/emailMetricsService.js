@@ -20,7 +20,7 @@ export async function getAggregatedStats(userId) {
     if (!snap.exists()) return null;
     return snap.data();
   } catch (err) {
-    console.error('Error obteniendo métricas agregadas:', err);
+    // console.error('Error obteniendo métricas agregadas:', err);
     return null;
   }
 }
@@ -47,7 +47,7 @@ export async function getDailyStats(userId, days = 30) {
     // Devolver ordenado ascendente por fecha
     return list.reverse();
   } catch (err) {
-    console.error('Error obteniendo métricas diarias:', err);
+    // console.error('Error obteniendo métricas diarias:', err);
     return [];
   }
 }

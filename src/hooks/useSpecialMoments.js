@@ -182,7 +182,7 @@ export default function useSpecialMoments() {
           { merge: true }
         );
       } catch (e) {
-        console.warn('No se pudieron guardar Momentos Especiales en Firestore:', e?.message || e);
+        // console.warn('No se pudieron guardar Momentos Especiales en Firestore:', e?.message || e);
       }
     })();
   }, [blocks, moments, activeWedding]);
@@ -289,7 +289,7 @@ export default function useSpecialMoments() {
     setMoments((prev) => {
       const currentList = prev[blockId] || [];
       if (currentList.length >= MAX_MOMENTS_PER_BLOCK) {
-        console.warn('[useSpecialMoments] se alcanzó el límite de momentos para el bloque', blockId);
+        // console.warn('[useSpecialMoments] se alcanzó el límite de momentos para el bloque', blockId);
         return prev;
       }
       const next = { ...prev };
@@ -401,7 +401,7 @@ export default function useSpecialMoments() {
       const targetBlock = toBlock || fromBlock;
       const destList = prev[targetBlock] || [];
       if (destList.length >= MAX_MOMENTS_PER_BLOCK) {
-        console.warn('[useSpecialMoments] no se puede duplicar, bloque completo', targetBlock);
+        // console.warn('[useSpecialMoments] no se puede duplicar, bloque completo', targetBlock);
         return prev;
       }
 
@@ -483,7 +483,7 @@ export default function useSpecialMoments() {
 
       const destList = prev[toBlockId] || [];
       if (toBlockId !== fromBlockId && destList.length >= MAX_MOMENTS_PER_BLOCK) {
-        console.warn('[useSpecialMoments] no se puede mover, bloque destino completo', toBlockId);
+        // console.warn('[useSpecialMoments] no se puede mover, bloque destino completo', toBlockId);
         return prev;
       }
 

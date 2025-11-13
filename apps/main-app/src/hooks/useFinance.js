@@ -287,14 +287,14 @@ export default function useFinance() {
           await setDoc(ref, patch, { merge: true });
           savedRemotely = true;
         } catch (e) {
-          console.warn('[useFinance] No se pudo persistir finance/main en Firestore:', e);
+          // console.warn('[useFinance] No se pudo persistir finance/main en Firestore:', e);
         }
       }
       try {
         updateLocalFinance(localUid, activeWedding, patch);
       } catch (error) {
         if (!savedRemotely) {
-          console.warn('[useFinance] No se pudo persistir finance/main localmente:', error);
+          // console.warn('[useFinance] No se pudo persistir finance/main localmente:', error);
         }
       }
     },
@@ -315,7 +315,7 @@ export default function useFinance() {
           showNotification: false,
         });
       } catch (error) {
-        console.warn('[useFinance] No se pudieron sincronizar wantedServices', error);
+        // console.warn('[useFinance] No se pudieron sincronizar wantedServices', error);
       }
     },
     [activeWedding, providerTemplates]
@@ -361,11 +361,11 @@ export default function useFinance() {
           const deduped = dedupeServiceList(normalized);
           setProviderTemplates((prev) => (arraysShallowEqual(prev, deduped) ? prev : deduped));
         } catch (err) {
-          console.warn('[useFinance] Error procesando wantedServices:', err);
+          // console.warn('[useFinance] Error procesando wantedServices:', err);
         }
       },
       (err) => {
-        console.warn('[useFinance] Error escuchando wantedServices:', err);
+        // console.warn('[useFinance] Error escuchando wantedServices:', err);
         setProviderTemplates((prev) => (prev.length ? [] : prev));
       }
     );
@@ -678,7 +678,7 @@ export default function useFinance() {
         },
       };
     } catch (e) {
-      console.warn('[useFinance] projection computation error:', e);
+      // console.warn('[useFinance] projection computation error:', e);
       return null;
     }
   }, [transactions, contributions, totalIncome, totalSpent, weddingTimeline]);
@@ -810,7 +810,7 @@ export default function useFinance() {
         } catch (_) {}
       }
     } catch (err) {
-      console.error('Error cargando número de invitados:', err);
+      // console.error('Error cargando número de invitados:', err);
       setError('Error cargando datos del perfil');
     } finally {
       setIsLoading(false);
@@ -937,7 +937,7 @@ export default function useFinance() {
         });
       },
       (err) => {
-        console.warn('[useFinance] Error leyendo finance/main:', err);
+        // console.warn('[useFinance] Error leyendo finance/main:', err);
         applyLocalFinance();
       }
     );
@@ -1018,11 +1018,11 @@ export default function useFinance() {
                 },
                 { merge: true }
               );
-              console.log(
+              // console.log(
                 `[useFinance] GuestCount sincronizado en raíz: ${next.guestCount} invitados`
               );
             } catch (error) {
-              console.warn(
+              // console.warn(
                 '[useFinance] No se pudo sincronizar guestCount en documento raíz:',
                 error
               );
@@ -1196,7 +1196,7 @@ export default function useFinance() {
 
         return { success: true, snapshotId };
       } catch (error) {
-        console.error('[useFinance] captureBudgetSnapshot failed', error);
+        // console.error('[useFinance] captureBudgetSnapshot failed', error);
         return { success: false, error: error?.message || 'snapshot_failed' };
       }
     },
@@ -1299,7 +1299,7 @@ export default function useFinance() {
       persistFinanceDoc({ aiAdvisor: normalized });
       return normalized;
     } catch (err) {
-      console.error('[useFinance] advisor request failed', err);
+      // console.error('[useFinance] advisor request failed', err);
       const message = err?.message || 'No se pudo obtener la recomendación del consejero.';
       setAdvisorError(message);
       throw err;
@@ -1421,9 +1421,9 @@ export default function useFinance() {
             },
             { merge: true }
           );
-          console.log(`[useFinance] Presupuesto sincronizado en raíz: ${total}€`);
+          // console.log(`[useFinance] Presupuesto sincronizado en raíz: ${total}€`);
         } catch (error) {
-          console.warn('[useFinance] No se pudo sincronizar presupuesto en documento raíz:', error);
+          // console.warn('[useFinance] No se pudo sincronizar presupuesto en documento raíz:', error);
           // No fallar la operación principal si esto falla
         }
       }
@@ -1584,7 +1584,7 @@ export default function useFinance() {
 
         return { success: true, data: saved };
       } catch (err) {
-        console.error('Error creando transacción:', err);
+        // console.error('Error creando transacción:', err);
         return { success: false, error: err.message };
       } finally {
         setIsLoading(false);
@@ -1746,7 +1746,7 @@ export default function useFinance() {
         });
         return { success: true };
       } catch (err) {
-        console.error('Error actualizando transacción:', err);
+        // console.error('Error actualizando transacción:', err);
         return { success: false, error: err.message };
       }
     },
@@ -1766,7 +1766,7 @@ export default function useFinance() {
         });
         return { success: true };
       } catch (err) {
-        console.error('Error eliminando transacción:', err);
+        // console.error('Error eliminando transacción:', err);
         return { success: false, error: err.message };
       }
     },
@@ -1815,7 +1815,7 @@ export default function useFinance() {
 
         return { success: true, imported: bankTransactions.length };
       } catch (err) {
-        console.warn('Error importando transacciones bancarias:', err);
+        // console.warn('Error importando transacciones bancarias:', err);
         setHasBankAccount(false);
         setError(err?.message || 'Error importando transacciones bancarias');
         return { success: false, error: err.message };
@@ -2031,7 +2031,7 @@ export default function useFinance() {
       const fileName = `finanzas-${activeWedding || 'evento'}.xlsx`;
       return { success: true, blob, fileName };
     } catch (error) {
-      console.error('[useFinance] exportFinanceReport error:', error);
+      // console.error('[useFinance] exportFinanceReport error:', error);
       return { success: false, error: error?.message || 'No se pudo generar el reporte' };
     }
   }, [transactions, stats, budgetUsage, monthlySeries, predictiveInsights, activeWedding]);

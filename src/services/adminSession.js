@@ -20,7 +20,7 @@ export function getAdminSessionToken() {
     }
     return window.localStorage.getItem(ADMIN_SESSION_TOKEN_KEY) || null;
   } catch (error) {
-    console.warn('[adminSession] No se pudo leer el token de sesión admin:', error);
+    // console.warn('[adminSession] No se pudo leer el token de sesión admin:', error);
     return null;
   }
 }
@@ -47,9 +47,9 @@ export function setAdminSession(token, rememberMe = false, profile = null, sessi
       window.localStorage.setItem(ADMIN_SESSION_ID_KEY, sessionId);
     }
     
-    console.log(`[adminSession] Sesión guardada (recordar: ${rememberMe}, expira: ${new Date(expiryTime).toLocaleString()})`);
+    // console.log(`[adminSession] Sesión guardada (recordar: ${rememberMe}, expira: ${new Date(expiryTime).toLocaleString()})`);
   } catch (error) {
-    console.warn('[adminSession] No se pudo guardar la sesión admin:', error);
+    // console.warn('[adminSession] No se pudo guardar la sesión admin:', error);
   }
 }
 
@@ -62,9 +62,9 @@ export function clearAdminSession() {
     window.localStorage.removeItem(ADMIN_SESSION_EXPIRY_KEY);
     window.localStorage.removeItem(ADMIN_PROFILE_KEY);
     window.localStorage.removeItem(ADMIN_SESSION_ID_KEY);
-    console.log('[adminSession] Sesión admin eliminada');
+    // console.log('[adminSession] Sesión admin eliminada');
   } catch (error) {
-    console.warn('[adminSession] No se pudo eliminar la sesión admin:', error);
+    // console.warn('[adminSession] No se pudo eliminar la sesión admin:', error);
   }
 }
 

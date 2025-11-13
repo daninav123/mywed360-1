@@ -76,7 +76,7 @@ const TagsManager = ({ onClose }) => {
       // Notificar éxito
       toast.success(`Etiqueta "${newTagName.trim()}" creada con éxito`);
     } catch (error) {
-      console.error('Error al crear etiqueta:', error);
+      // console.error('Error al crear etiqueta:', error);
       toast.error(`Error: ${error.message || 'No se pudo crear la etiqueta'}`);
     }
   };
@@ -96,7 +96,7 @@ const TagsManager = ({ onClose }) => {
         // Notificar éxito
         toast.success(`Etiqueta "${tagName}" eliminada con éxito`);
       } catch (error) {
-        console.error('Error al eliminar etiqueta:', error);
+        // console.error('Error al eliminar etiqueta:', error);
         toast.error(`Error: ${error.message || 'No se pudo eliminar la etiqueta'}`);
       }
     }

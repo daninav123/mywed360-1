@@ -43,13 +43,13 @@ const BudgetPrediction = ({ transactions = [], budget = {}, weddingDate }) => {
           return;
         }
       } catch (err) {
-        console.log('IA backend no disponible, usando an�lisis local');
+        // console.log('IA backend no disponible, usando an�lisis local');
       }
 
       // Fallback: solo an�lisis local
       setPrediction(localAnalysis);
     } catch (error) {
-      console.error('Error generating prediction:', error);
+      // console.error('Error generating prediction:', error);
     } finally {
       setPredicting(false);
     }

@@ -13,7 +13,7 @@ class ErrorBoundary extends Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    console.error('Error en componente:', error, errorInfo);
+    // console.error('Error en componente:', error, errorInfo);
     try {
       if (typeof window !== 'undefined') {
         window.__MYWED_LAST_ERROR = {

@@ -11,9 +11,9 @@ export default function SeatingPlan() {
 
     // Si está en 'true', limpiar automáticamente
     if (saved === 'true') {
-      console.log('🧹 AUTO-LIMPIEZA: Removiendo flag de diseño moderno');
+      // console.log('🧹 AUTO-LIMPIEZA: Removiendo flag de diseño moderno');
       localStorage.removeItem('seating_modern_design');
-      console.log('✅ Usando diseño clásico por defecto');
+      // console.log('✅ Usando diseño clásico por defecto');
       return false;
     }
 
@@ -29,7 +29,7 @@ export default function SeatingPlan() {
         setUseModernDesign((prev) => {
           const newValue = !prev;
           localStorage.setItem('seating_modern_design', String(newValue));
-          console.log('🎨 Diseño moderno:', newValue ? 'ACTIVADO' : 'DESACTIVADO');
+          // console.log('🎨 Diseño moderno:', newValue ? 'ACTIVADO' : 'DESACTIVADO');
           return newValue;
         });
       }

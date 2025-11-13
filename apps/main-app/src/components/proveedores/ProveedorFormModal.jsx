@@ -133,15 +133,15 @@ const ProveedorFormModal = ({
   // Enviar el formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form submitted');
+    // console.log('Form submitted');
 
     // Validar
     if (!validarFormulario()) {
-      console.log('Validation failed');
+      // console.log('Validation failed');
       return;
     }
 
-    console.log('Validation passed, sending data', formData);
+    // console.log('Validation passed, sending data', formData);
     setEnviando(true);
 
     try {
@@ -163,7 +163,7 @@ const ProveedorFormModal = ({
       await onGuardar(datosFinales);
       onClose();
     } catch (error) {
-      console.error('Error al guardar proveedor:', error);
+      // console.error('Error al guardar proveedor:', error);
       setErrores({
         ...errores,
         general: t('suppliers.formModal.errors.general'),

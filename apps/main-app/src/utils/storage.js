@@ -44,7 +44,7 @@ export const loadJson = (key, defaultValue = null) => {
     if (!raw) return defaultValue;
     return JSON.parse(raw);
   } catch (error) {
-    console.error(`storage.loadJson error for key ${key}:`, error);
+    // console.error(`storage.loadJson error for key ${key}:`, error);
     return defaultValue;
   }
 };
@@ -62,7 +62,7 @@ export const saveJson = (key, value) => {
     store.setItem(key, JSON.stringify(value));
     return true;
   } catch (error) {
-    console.error(`storage.saveJson error for key ${key}:`, error);
+    // console.error(`storage.saveJson error for key ${key}:`, error);
     return false;
   }
 };
@@ -77,6 +77,6 @@ export const removeKey = (key) => {
       typeof window !== 'undefined' && window.localStorage ? window.localStorage : _getStorage();
     store.removeItem(key);
   } catch (error) {
-    console.error(`storage.removeKey error for key ${key}:`, error);
+    // console.error(`storage.removeKey error for key ${key}:`, error);
   }
 };

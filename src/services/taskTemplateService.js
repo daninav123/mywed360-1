@@ -28,7 +28,7 @@ export async function getActiveTaskTemplate() {
         }
       }
     } catch (backendError) {
-      console.warn('[taskTemplateService] Backend no disponible, usando Firestore directo:', backendError.message);
+      // console.warn('[taskTemplateService] Backend no disponible, usando Firestore directo:', backendError.message);
     }
 
     // Fallback: consulta directa a Firestore
@@ -43,7 +43,7 @@ export async function getActiveTaskTemplate() {
     const snapshot = await getDocs(q);
 
     if (snapshot.empty) {
-      console.warn('[taskTemplateService] No hay plantilla publicada, usando seed por defecto');
+      // console.warn('[taskTemplateService] No hay plantilla publicada, usando seed por defecto');
       return null;
     }
 
@@ -59,7 +59,7 @@ export async function getActiveTaskTemplate() {
       action: 'getActiveTaskTemplate',
       message: error.message,
     });
-    console.error('[taskTemplateService] Error obteniendo plantilla activa:', error);
+    // console.error('[taskTemplateService] Error obteniendo plantilla activa:', error);
     return null;
   }
 }
@@ -72,14 +72,14 @@ export async function getActiveTaskTemplate() {
  */
 export function transformTemplateToTasks(template, weddingDate) {
   if (!template || !template.blocks || !Array.isArray(template.blocks)) {
-    console.warn('[taskTemplateService] Plantilla inválida, usando seed por defecto');
+    // console.warn('[taskTemplateService] Plantilla inválida, usando seed por defecto');
     return transformLegacySeedToTasks(defaultWeddingTasks, weddingDate);
   }
 
   const wDate = weddingDate instanceof Date ? weddingDate : new Date(weddingDate);
   
   if (isNaN(wDate.getTime())) {
-    console.error('[taskTemplateService] Fecha de boda inválida');
+    // console.error('[taskTemplateService] Fecha de boda inválida');
     return [];
   }
 
@@ -164,7 +164,7 @@ function transformLegacySeedToTasks(legacySeed, weddingDate) {
   const wDate = weddingDate instanceof Date ? weddingDate : new Date(weddingDate);
   
   if (isNaN(wDate.getTime())) {
-    console.error('[taskTemplateService] Fecha de boda inválida');
+    // console.error('[taskTemplateService] Fecha de boda inválida');
     return [];
   }
 
@@ -246,7 +246,7 @@ export async function migrateDefaultSeedToFirebase() {
     const existingSnapshot = await getDocs(existingQuery);
 
     if (!existingSnapshot.empty) {
-      console.log('[taskTemplateService] Plantilla v1 ya existe, saltando migración');
+      // console.log('[taskTemplateService] Plantilla v1 ya existe, saltando migración');
       return existingSnapshot.docs[0].id;
     }
 
@@ -311,7 +311,7 @@ export async function migrateDefaultSeedToFirebase() {
     };
 
     const docRef = await addDoc(templatesRef, templateData);
-    console.log('[taskTemplateService] Plantilla v1 creada con ID:', docRef.id);
+    // console.log('[taskTemplateService] Plantilla v1 creada con ID:', docRef.id);
 
     return docRef.id;
   } catch (error) {
@@ -319,7 +319,7 @@ export async function migrateDefaultSeedToFirebase() {
       action: 'migrateDefaultSeedToFirebase',
       message: error.message,
     });
-    console.error('[taskTemplateService] Error migrando seed:', error);
+    // console.error('[taskTemplateService] Error migrando seed:', error);
     throw error;
   }
 }
@@ -336,19 +336,19 @@ export async function getTasksForNewWedding(weddingDate) {
     const template = await getActiveTaskTemplate();
 
     if (template) {
-      console.log('[taskTemplateService] Usando plantilla activa:', template.id);
+      // console.log('[taskTemplateService] Usando plantilla activa:', template.id);
       return transformTemplateToTasks(template, weddingDate);
     }
 
     // Fallback a seed hardcodeado
-    console.warn('[taskTemplateService] No hay plantilla activa, usando seed por defecto');
+    // console.warn('[taskTemplateService] No hay plantilla activa, usando seed por defecto');
     return transformLegacySeedToTasks(defaultWeddingTasks, weddingDate);
   } catch (error) {
     errorLogger?.logError?.('TaskTemplateServiceError', {
       action: 'getTasksForNewWedding',
       message: error.message,
     });
-    console.error('[taskTemplateService] Error obteniendo tareas:', error);
+    // console.error('[taskTemplateService] Error obteniendo tareas:', error);
     
     // Fallback final
     return transformLegacySeedToTasks(defaultWeddingTasks, weddingDate);

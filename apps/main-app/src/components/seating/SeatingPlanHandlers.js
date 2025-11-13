@@ -18,7 +18,7 @@ export const createAddDrawingElementHandler = (setDrawingElements) => {
       createdAt: Date.now(),
     };
     setDrawingElements((prev) => [...prev, newElement]);
-    console.log('[DrawingTools] Elemento añadido:', newElement);
+    // console.log('[DrawingTools] Elemento añadido:', newElement);
   };
 };
 
@@ -28,7 +28,7 @@ export const createAddDrawingElementHandler = (setDrawingElements) => {
 export const createDeleteDrawingElementHandler = (setDrawingElements) => {
   return (elementId) => {
     setDrawingElements((prev) => prev.filter((el) => el.id !== elementId));
-    console.log('[DrawingTools] Elemento eliminado:', elementId);
+    // console.log('[DrawingTools] Elemento eliminado:', elementId);
   };
 };
 
@@ -60,7 +60,7 @@ export const createApplyTemplateHandler = ({
     if (!templateResult) return;
 
     try {
-      console.log('[Template] Aplicando plantilla:', templateResult.template);
+      // console.log('[Template] Aplicando plantilla:', templateResult.template);
 
       // Asegurar que estamos en tab banquet
       if (tab !== 'banquet') {
@@ -74,7 +74,7 @@ export const createApplyTemplateHandler = ({
         } else {
           templateResult.tables.forEach((table) => addTable(table));
         }
-        console.log(`[Template] ${templateResult.tables.length} mesas añadidas`);
+        // console.log(`[Template] ${templateResult.tables.length} mesas añadidas`);
       }
 
       // Aplicar zonas especiales
@@ -86,14 +86,14 @@ export const createApplyTemplateHandler = ({
         }));
 
         setDrawingElements((prev) => [...prev, ...zonesWithIds]);
-        console.log(`[Template] ${zonesWithIds.length} zonas añadidas`);
+        // console.log(`[Template] ${zonesWithIds.length} zonas añadidas`);
       }
 
       toast.success(`✨ Plantilla "${templateResult.template}" aplicada correctamente`, {
         autoClose: 3000,
       });
     } catch (error) {
-      console.error('[Template] Error aplicando plantilla:', error);
+      // console.error('[Template] Error aplicando plantilla:', error);
       toast.error('Error al aplicar la plantilla');
     }
   };
