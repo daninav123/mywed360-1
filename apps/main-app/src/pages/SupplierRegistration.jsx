@@ -93,7 +93,9 @@ export default function SupplierRegistration() {
     fetch('/api/supplier-registration/categories')
       .then((res) => res.json())
       .then((data) => setCategories(data.categories || []))
-      .catch((err) => // console.error('Error loading categories:', err));
+      .catch((err) => {
+        // console.error('Error loading categories:', err)
+      });
   }, []);
 
   const handleChange = (e) => {
