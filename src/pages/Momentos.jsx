@@ -144,7 +144,7 @@ export default function Momentos() {
             unsubTokens = unsubscribe;
           })
           .catch((error) => {
-            // console.error('listenGuestTokens error', error)
+            // console.error('listenGuestTokens error', error);
           });
 
         listenGuestProgress(
