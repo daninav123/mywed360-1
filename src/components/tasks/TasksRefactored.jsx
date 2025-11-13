@@ -1110,11 +1110,16 @@ export default function TasksRefactored() {
           ops.push(deleteDoc(doc(db, 'users', uid, 'tasks', editingId)));
           ops.push(deleteDoc(doc(db, 'users', uid, 'meetings', editingId)));
         }
-      } catch (_) {}
+      } catch (_) {
+        // Error ignored
+      }
+
       ops.push(Promise.resolve(deleteTaskFS(editingId)).catch(() => {}));
       ops.push(Promise.resolve(deleteMeetingFS(editingId)).catch(() => {}));
       Promise.allSettled(ops)
-        .then(() => // console.log('[Tasks] Eliminaci�³n completada', editingId))
+        .then(() => {
+          // console.log('[Tasks] Eliminación completada', editingId)
+        })
         .catch(() => {});
     } catch (error) {
       // console.error('Error eliminando tarea/proceso:', error);
