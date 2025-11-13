@@ -5,11 +5,11 @@ import { ItemTypes } from './GuestItem';
 import { inferTableType } from '../utils/seatingTables';
 
 const TABLE_TYPE_COLORS = {
-  round: '#fef3c7',
-  square: '#e0f2fe',
-  imperial: '#fee2e2',
-  cocktail: '#d6d3ff',
-  auxiliary: '#e5e7eb',
+  round: '#86efac', // Verde claro brillante - MÁS VISIBLE ✨
+  square: '#7dd3fc', // Azul claro brillante - MÁS VISIBLE ✨
+  imperial: '#fca5a5', // Rojo claro brillante - MÁS VISIBLE ✨
+  cocktail: '#c4b5fd', // Púrpura claro brillante - MÁS VISIBLE ✨
+  auxiliary: '#d1d5db', // Gris claro - MÁS VISIBLE ✨
 };
 
 // Basic draggable table (circle or rectangle)
@@ -294,16 +294,13 @@ function TableItem({
     return list;
   }, [guests, table.id, table.name, table.assignedGuests]);
   const tableType = table.tableType || inferTableType(table);
-  const seatDots =
-    tableType === 'cocktail' || tableType === 'auxiliary' ? 0 : guestsList.length; // mostramos iniciales alrededor
+  const seatDots = tableType === 'cocktail' || tableType === 'auxiliary' ? 0 : guestsList.length; // mostramos iniciales alrededor
   // Tamaño base: diámetro para circular o ancho/alto para rectangular
   const sizeX = table.shape === 'circle' ? table.diameter || 60 : table.width || 80;
   const sizeY =
     table.shape === 'circle' ? table.diameter || 60 : table.height || table.length || 60;
   const disabled = table.enabled === false || table.locked || isLockedByOther;
-  const tableColor = disabled
-    ? '#e5e7eb'
-    : TABLE_TYPE_COLORS[tableType] || TABLE_TYPE_COLORS.round;
+  const tableColor = disabled ? '#e5e7eb' : TABLE_TYPE_COLORS[tableType] || TABLE_TYPE_COLORS.round;
 
   const style = {
     position: 'absolute',
@@ -313,14 +310,14 @@ function TableItem({
     height: sizeY * scale,
     backgroundColor: tableColor,
     border: selected
-      ? '3px solid #2563eb'
+      ? '4px solid #2563eb' // Aumentado de 3px a 4px ⬆️
       : isLockedByOther
-        ? `2px dashed ${lockedColor || '#6b7280'}`
+        ? `3px dashed ${lockedColor || '#6b7280'}` // Aumentado de 2px a 3px ⬆️
         : danger
-          ? '2px solid #ef4444'
+          ? '3px solid #ef4444' // Aumentado de 2px a 3px ⬆️
           : highlightScore > 0
-            ? '2px solid #10b981'
-            : '2px solid #f59e0b',
+            ? '3px solid #10b981' // Aumentado de 2px a 3px ⬆️
+            : '3px solid #f59e0b', // Aumentado de 2px a 3px - BORDE MÁS VISIBLE ⬆️
     borderRadius: table.shape === 'circle' ? '50%' : '6px',
     display: 'flex',
     alignItems: 'center',
@@ -347,7 +344,9 @@ function TableItem({
       }}
       data-testid={`table-item-${table.id}`}
       style={{ ...style, backgroundColor: isOver ? '#d1fae5' : style.backgroundColor }}
-      onPointerDown={disabled || !canMove || table.locked || eventsDisabled ? undefined : handlePointerDown}
+      onPointerDown={
+        disabled || !canMove || table.locked || eventsDisabled ? undefined : handlePointerDown
+      }
       onContextMenu={(e) => {
         e.preventDefault();
         if (isLockedByOther || eventsDisabled) return;
@@ -546,7 +545,8 @@ function TableItem({
         })()}
 
       {/* Numeración de asientos opcional */}
-      {showNumbers && !designFocusMode &&
+      {showNumbers &&
+        !designFocusMode &&
         table.seats &&
         table.seats > 0 &&
         (() => {
@@ -621,4 +621,3 @@ function TableItem({
 }
 
 export default React.memo(TableItem);
-

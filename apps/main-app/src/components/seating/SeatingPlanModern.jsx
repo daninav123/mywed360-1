@@ -1,4 +1,4 @@
-﻿/**
+/**
  * SeatingPlanModern - New floating layout version
  * Wrapper integrating the new visual design with existing functionality
  */
@@ -25,6 +25,22 @@ import SeatingPlanModals from './SeatingPlanModals';
 import SeatingGuestDrawer from './SeatingGuestDrawer';
 import SeatingExportWizard from './SeatingExportWizard';
 
+// FASE 1: Layout Generator
+import LayoutGeneratorModal from './LayoutGeneratorModal';
+import { generateLayout, LAYOUT_TYPES } from './SeatingLayoutGenerator';
+
+// FASE 2: Drawing Tools & Templates
+import DrawingTools, { DRAWING_TOOLS } from './DrawingTools';
+import DrawingElements from './DrawingElements';
+import TemplateSelector from './WeddingTemplates';
+import { createSeatingPlanDrawingHandlers } from './SeatingPlanHandlers';
+
+// FASE 3: Snap Guides & Minimap
+import SnapGuides from './SnapGuides';
+import useSnapGuides from './useSnapGuides';
+import Minimap from './Minimap';
+import BanquetConfigAdvanced from './BanquetConfigAdvanced';
+
 // Hooks
 import { useSeatingPlan } from '../../hooks/useSeatingPlan';
 import { useWedding } from '../../context/WeddingContext';
@@ -35,7 +51,7 @@ import useTranslations from '../../hooks/useTranslations';
 export default function SeatingPlanModern() {
   const { t } = useTranslations();
   const { activeWedding } = useWedding();
-  
+
   // Hook principal de seating
   const {
     // Basic state
@@ -47,7 +63,7 @@ export default function SeatingPlanModern() {
     seats,
     selectedTable,
     guests,
-    
+
     // Modals
     ceremonyConfigOpen,
     setCeremonyConfigOpen,
@@ -57,7 +73,7 @@ export default function SeatingPlanModern() {
     setSpaceConfigOpen,
     templateOpen,
     setTemplateOpen,
-    
+
     // Main actions
     handleSelectTable,
     addTable,
@@ -68,31 +84,32 @@ export default function SeatingPlanModern() {
     redo,
     canUndo,
     canRedo,
-    
+
     // Generation
     generateSeatGrid,
     generateBanquetLayout,
-    
+    setupSeatingPlanAutomatically, // Generación TODO automática ✨
+
     // Export
     exportPDF,
     exportPNG,
     exportCSV,
-    
+
     // Dimensions
     saveHallDimensions,
-    
+
     // Draw mode
     drawMode,
     setDrawMode,
-    
+
     // Transformations
     moveTable,
     rotateSelected,
-    
+
     // Guests
     moveGuest,
     moveGuestToSeat,
-    
+
     // Auto-assignment
     autoAssignGuests,
     conflicts,
@@ -106,7 +123,20 @@ export default function SeatingPlanModern() {
   const [exportWizardOpen, setExportWizardOpen] = useState(false);
   const [guestDrawerOpen, setGuestDrawerOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  
+
+  // FASE 1: Layout Generator
+  const [layoutGeneratorOpen, setLayoutGeneratorOpen] = useState(false);
+
+  // FASE 2: Drawing Tools & Templates
+  const [activeTool, setActiveTool] = useState(DRAWING_TOOLS.SELECT);
+  const [drawingElements, setDrawingElements] = useState([]);
+  const [templateSelectorOpen, setTemplateSelectorOpen] = useState(false);
+
+  // FASE 3: Snap Guides & Minimap
+  const snapGuides = useSnapGuides(tables);
+  const [showMinimap, setShowMinimap] = useState(true); // Visible por defecto
+  const [banquetConfig, setBanquetConfig] = useState({});
+
   // Phase 3: Theme and celebration
   const { theme, isDark, toggleTheme } = useTheme();
   const [showConfetti, setShowConfetti] = useState(false);
@@ -115,10 +145,9 @@ export default function SeatingPlanModern() {
   // Calculate statistics
   const stats = useMemo(() => {
     const totalGuests = guests?.length || 0;
-    const assignedGuests = guests?.filter(g => g.tableId || g.table)?.length || 0;
-    const assignedPercentage = totalGuests > 0 
-      ? Math.round((assignedGuests / totalGuests) * 100) 
-      : 0;
+    const assignedGuests = guests?.filter((g) => g.tableId || g.table)?.length || 0;
+    const assignedPercentage =
+      totalGuests > 0 ? Math.round((assignedGuests / totalGuests) * 100) : 0;
     const tableCount = tables?.length || 0;
     const conflictCount = conflicts?.length || 0;
 
@@ -163,19 +192,19 @@ export default function SeatingPlanModern() {
       console.log('- tab:', tab);
       console.log('- tables.length:', tables?.length || 0);
       console.log('- addTable available:', !!addTable);
-      
+
       if (!addTable) {
         toast.error(t('planModern.errors.addTableUnavailable'));
         console.error('[addTable] handler missing in useSeatingPlan');
         return;
       }
-      
+
       // Asegurar que estamos en tab banquet
       if (tab !== 'banquet') {
         console.warn('[handleAddTable] Not in banquet tab, switching...');
         setTab('banquet');
       }
-      
+
       const newTable = {
         id: `table-${Date.now()}`,
         x: (hallSize?.width || 1800) / 2 - 50,
@@ -188,11 +217,11 @@ export default function SeatingPlanModern() {
         number: (tables?.length || 0) + 1,
         name: t('planModern.defaults.tableName', { number: (tables?.length || 0) + 1 }),
       };
-      
+
       console.log('[handleAddTable] adding table:', newTable);
       addTable(newTable);
       toast.success(t('planModern.toasts.addTableSuccess'));
-      
+
       // Verify state after the async update
       setTimeout(() => {
         console.log('[handleAddTable] state after async check:');
@@ -204,76 +233,159 @@ export default function SeatingPlanModern() {
       toast.error(t('planModern.toasts.addTableError', { message: details }));
     }
   }, [addTable, hallSize, tables, tab, setTab, t]);
-  
+
   // Debug: Detectar cambios en tables
   useEffect(() => {
     console.log('[SeatingPlanModern] tables changed:', {
       length: tables?.length || 0,
       tab,
-      tables: tables?.map(t => ({ id: t.id, name: t.name, x: t.x, y: t.y }))
+      tables: tables?.map((t) => ({ id: t.id, name: t.name, x: t.x, y: t.y })),
     });
   }, [tables, tab]);
 
   // Handler para duplicar mesa
-  const handleDuplicate = useCallback((tableId) => {
-    duplicateTable(tableId);
-    toast.success(t('planModern.toasts.duplicateTable'));
-  }, [duplicateTable, t]);
+  const handleDuplicate = useCallback(
+    (tableId) => {
+      duplicateTable(tableId);
+      toast.success(t('planModern.toasts.duplicateTable'));
+    },
+    [duplicateTable, t]
+  );
 
   // Handler para rotar mesa
-  const handleRotate = useCallback((tableId) => {
-    rotateSelected();
-    toast.success(t('planModern.toasts.rotateTable'));
-  }, [rotateSelected, t]);
+  const handleRotate = useCallback(
+    (tableId) => {
+      rotateSelected();
+      toast.success(t('planModern.toasts.rotateTable'));
+    },
+    [rotateSelected, t]
+  );
 
   // Handler para toggle lock
-  const handleToggleLock = useCallback((tableId) => {
-    toggleTableLocked(tableId);
-  }, [toggleTableLocked]);
+  const handleToggleLock = useCallback(
+    (tableId) => {
+      toggleTableLocked(tableId);
+    },
+    [toggleTableLocked]
+  );
 
   // Handler para eliminar mesa
-  const handleDelete = useCallback((tableId) => {
-    deleteTable(tableId);
-    toast.success(t('planModern.toasts.deleteTable'));
-  }, [deleteTable, t]);
+  const handleDelete = useCallback(
+    (tableId) => {
+      deleteTable(tableId);
+      toast.success(t('planModern.toasts.deleteTable'));
+    },
+    [deleteTable, t]
+  );
 
   // Handler para cambiar capacidad
-  const handleCapacityChange = useCallback((tableId, newCapacity) => {
-    // Buscar la mesa y actualizar
-    const tableToUpdate = tables?.find(t => t.id === tableId);
-    if (tableToUpdate) {
-      // TODO: provide an updateTable method in useSeatingPlan
-      // Por ahora solo mostramos feedback
-      toast.info(t('planModern.toasts.capacityUpdated', { value: newCapacity }));
-    }
-  }, [tables, t]);
+  const handleCapacityChange = useCallback(
+    (tableId, newCapacity) => {
+      // Buscar la mesa y actualizar
+      const tableToUpdate = tables?.find((t) => t.id === tableId);
+      if (tableToUpdate) {
+        // TODO: provide an updateTable method in useSeatingPlan
+        // Por ahora solo mostramos feedback
+        toast.info(t('planModern.toasts.capacityUpdated', { value: newCapacity }));
+      }
+    },
+    [tables, t]
+  );
 
   // Handler para remover invitado
-  const handleRemoveGuest = useCallback((tableId, guestId) => {
-    // Mover invitado de vuelta a sin asignar
-    const guest = guests?.find(g => g.id === guestId);
-    if (guest) {
-      moveGuest(guestId, null, null);
-      toast.success(t('planModern.toasts.removeGuest'));
+  const handleRemoveGuest = useCallback(
+    (tableId, guestId) => {
+      // Mover invitado de vuelta a sin asignar
+      const guest = guests?.find((g) => g.id === guestId);
+      if (guest) {
+        moveGuest(guestId, null, null);
+        toast.success(t('planModern.toasts.removeGuest'));
+      }
+    },
+    [guests, moveGuest, t]
+  );
+
+  // Handler para generación TODO automática ✨
+  const [isGeneratingAuto, setIsGeneratingAuto] = useState(false);
+
+  const handleGenerarTodoAutomatico = useCallback(async () => {
+    try {
+      setIsGeneratingAuto(true);
+
+      toast.info('🔮 Analizando invitados y generando plan...', {
+        autoClose: 2000,
+      });
+
+      const result = await setupSeatingPlanAutomatically({
+        layoutPreference: 'auto',
+        tableCapacity: 8,
+      });
+
+      if (result.success) {
+        toast.success(
+          <div>
+            <strong>✨ {result.message}</strong>
+            <div style={{ marginTop: '8px', fontSize: '13px' }}>
+              📊 {result.stats.mesas} mesas creadas
+              <br />
+              👥 {result.stats.invitadosAsignados} invitados asignados
+              <br />
+              🎨 Layout: {result.stats.layoutUsado}
+              {result.stats.invitadosPendientes > 0 && (
+                <>
+                  <br />⏳ {result.stats.invitadosPendientes} pendientes
+                </>
+              )}
+            </div>
+          </div>,
+          { autoClose: 6000 }
+        );
+      } else {
+        toast.error(result.message || 'Error en la generación automática');
+      }
+    } catch (error) {
+      console.error('[handleGenerarTodoAutomatico] Error:', error);
+      toast.error('Error inesperado. Inténtalo de nuevo.');
+    } finally {
+      setIsGeneratingAuto(false);
     }
-  }, [guests, moveGuest, t]);
+  }, [setupSeatingPlanAutomatically]);
 
   // Handler para abrir drawer de invitados
   const handleOpenDrawMode = useCallback(() => {
     setGuestDrawerOpen(true);
   }, []);
 
+  // FASE 2: Handlers para Drawing Tools usando el helper
+  const drawingHandlers = useMemo(() => {
+    return createSeatingPlanDrawingHandlers({
+      tab,
+      setTab,
+      generateBanquetLayout,
+      addTable,
+      drawingElements,
+      setDrawingElements,
+    });
+  }, [tab, setTab, generateBanquetLayout, addTable, drawingElements]);
+
+  const {
+    handleAddDrawingElement,
+    handleDeleteDrawingElement,
+    handleSelectDrawingElement,
+    handleApplyTemplate,
+    handleClearDrawingElements,
+  } = drawingHandlers;
+
   // Obtener mesa seleccionada con datos completos
   const selectedTableData = useMemo(() => {
     if (!selectedTable) return null;
-    
-    const table = tables?.find(t => t.id === selectedTable);
+
+    const table = tables?.find((t) => t.id === selectedTable);
     if (!table) return null;
 
     // Obtener invitados asignados a esta mesa
-    const assignedGuests = guests?.filter(g => 
-      g.tableId === table.id || g.table === table.id
-    ) || [];
+    const assignedGuests =
+      guests?.filter((g) => g.tableId === table.id || g.table === table.id) || [];
 
     return {
       ...table,
@@ -299,17 +411,12 @@ export default function SeatingPlanModern() {
             tableCount={stats.tableCount}
             ceremonySeats={seats?.length || 0}
             userName={userName}
-            themeToggle={
-              <ThemeToggle isDark={isDark} onToggle={toggleTheme} />
-            }
+            themeToggle={<ThemeToggle isDark={isDark} onToggle={toggleTheme} />}
           />
         </SeatingLayoutFloating.Header>
 
         {/* Confetti Celebration */}
-        <ConfettiCelebration 
-          show={showConfetti} 
-          onComplete={() => setShowConfetti(false)} 
-        />
+        <ConfettiCelebration show={showConfetti} onComplete={() => setShowConfetti(false)} />
 
         {/* Main Canvas Area */}
         <SeatingLayoutFloating.Main>
@@ -325,8 +432,34 @@ export default function SeatingPlanModern() {
             canUndo={canUndo}
             canRedo={canRedo}
             onOpenSettings={() => setSettingsOpen(true)}
-            onOpenTemplates={() => setTemplateOpen(true)}
+            onOpenTemplates={() => setTemplateSelectorOpen(true)}
+            onOpenLayoutGenerator={() => setLayoutGeneratorOpen(true)}
+            onToggleDrawingTools={() =>
+              setActiveTool(
+                activeTool === DRAWING_TOOLS.SELECT ? DRAWING_TOOLS.PERIMETER : DRAWING_TOOLS.SELECT
+              )
+            }
+            hasDrawingElements={drawingElements.length > 0}
+            onClearDrawing={handleClearDrawingElements}
+            onToggleMinimap={() => setShowMinimap(!showMinimap)}
+            showMinimap={showMinimap}
+            onGenerarTodoAutomatico={handleGenerarTodoAutomatico}
+            isGeneratingAuto={isGeneratingAuto}
           />
+
+          {/* FASE 2: Drawing Tools (solo en banquet) */}
+          {tab === 'banquet' && (
+            <DrawingTools
+              activeTool={activeTool}
+              onToolSelect={setActiveTool}
+              onAddElement={handleAddDrawingElement}
+              onDeleteElement={handleDeleteDrawingElement}
+              elements={drawingElements}
+              canvasRef={canvasRef}
+              scale={1}
+              offset={{ x: 0, y: 0 }}
+            />
+          )}
 
           {/* Canvas Principal */}
           <SeatingLayoutFloating.Canvas>
@@ -342,8 +475,24 @@ export default function SeatingPlanModern() {
               drawMode={drawMode}
               guests={guests}
               moveTable={moveTable}
-              // Additional props as needed
-            />
+            >
+              {/* FASE 2: Drawing Elements (solo en banquet) */}
+              {tab === 'banquet' && (
+                <DrawingElements
+                  elements={drawingElements}
+                  scale={1}
+                  onSelectElement={handleSelectDrawingElement}
+                  selectedIds={drawingElements.filter((el) => el.selected).map((el) => el.id)}
+                />
+              )}
+
+              {/* FASE 3: Snap Guides (alineación automática) */}
+              <SnapGuides
+                guides={snapGuides.guides}
+                canvasWidth={hallSize?.width || 2000}
+                canvasHeight={hallSize?.height || 1500}
+              />
+            </SeatingPlanCanvas>
           </SeatingLayoutFloating.Canvas>
 
           {/* Inspector Flotante (condicional) */}
@@ -359,12 +508,56 @@ export default function SeatingPlanModern() {
               onCapacityChange={handleCapacityChange}
             />
           )}
-          
+
           {/* Botón flotante de añadir mesa (siempre visible) */}
-          <QuickAddTableButton 
-            onAdd={handleAddTable} 
-            position="bottom-right" 
-          />
+          <QuickAddTableButton onAdd={handleAddTable} position="bottom-right" />
+
+          {/* ✨ BOTÓN GENERAR TODO AUTOMÁTICAMENTE (solo si no hay mesas) */}
+          {tab === 'banquet' && tables?.length === 0 && guests?.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ delay: 0.5, duration: 0.5, type: 'spring' }}
+              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-40"
+            >
+              <button
+                onClick={handleGenerarTodoAutomatico}
+                disabled={isGeneratingAuto}
+                className="group relative bg-gradient-to-r from-indigo-600 to-purple-600 
+                         hover:from-indigo-700 hover:to-purple-700
+                         text-white font-bold px-8 py-6 rounded-2xl shadow-2xl
+                         transform transition-all duration-300
+                         hover:scale-105 hover:shadow-indigo-500/50
+                         disabled:opacity-50 disabled:cursor-not-allowed
+                         flex flex-col items-center gap-3"
+              >
+                <span className="text-4xl">✨</span>
+                <span className="text-xl">Generar Plan Automáticamente</span>
+                <span className="text-sm opacity-90">
+                  {isGeneratingAuto
+                    ? '🔮 Generando...'
+                    : `📊 ${guests?.length || 0} invitados detectados`}
+                </span>
+
+                {/* Efecto de brillo animado */}
+                <div
+                  className="absolute inset-0 bg-white/20 rounded-2xl opacity-0 
+                              group-hover:opacity-100 transition-opacity duration-300"
+                />
+              </button>
+            </motion.div>
+          )}
+
+          {/* FASE 3: Minimap (navegación rápida) */}
+          {showMinimap && tab === 'banquet' && (
+            <Minimap
+              tables={tables || []}
+              hallSize={hallSize}
+              viewport={{ x: 0, y: 0, width: 800, height: 600 }}
+              scale={1}
+              position="bottom-left"
+            />
+          )}
         </SeatingLayoutFloating.Main>
 
         {/* Footer */}
@@ -400,7 +593,7 @@ export default function SeatingPlanModern() {
         {/* Guest Drawer */}
         {guestDrawerOpen && (
           <SeatingGuestDrawer
-            guests={guests?.filter(g => !g.tableId && !g.table) || []}
+            guests={guests?.filter((g) => !g.tableId && !g.table) || []}
             onClose={() => setGuestDrawerOpen(false)}
             onDragGuest={moveGuest}
           />
@@ -417,6 +610,46 @@ export default function SeatingPlanModern() {
             guests={guests}
           />
         )}
+
+        {/* FASE 1: Layout Generator Modal */}
+        <LayoutGeneratorModal
+          isOpen={layoutGeneratorOpen}
+          onClose={() => setLayoutGeneratorOpen(false)}
+          onGenerate={(layoutType, config) => {
+            // Generar y aplicar layout
+            console.log('[LayoutGenerator] Generating:', layoutType, config);
+            const generatedTables = generateLayout(layoutType, config);
+            if (generatedTables && generatedTables.length > 0) {
+              generateBanquetLayout(generatedTables);
+              toast.success(`✨ ${generatedTables.length} mesas generadas`);
+            }
+            setLayoutGeneratorOpen(false);
+          }}
+          currentConfig={{
+            tableCount: tables?.length || 12,
+            hallWidth: hallSize?.width || 1800,
+            hallHeight: hallSize?.height || 1200,
+          }}
+        />
+
+        {/* FASE 2: Template Selector Modal */}
+        <TemplateSelector
+          isOpen={templateSelectorOpen}
+          onClose={() => setTemplateSelectorOpen(false)}
+          onSelectTemplate={handleApplyTemplate}
+          guestCount={stats.totalGuests}
+        />
+
+        {/* FASE 3: Banquet Config Advanced Modal */}
+        <BanquetConfigAdvanced
+          isOpen={banquetConfigOpen}
+          onClose={() => setBanquetConfigOpen(false)}
+          config={banquetConfig}
+          onSave={(newConfig) => {
+            setBanquetConfig(newConfig);
+            toast.success('⚙️ Configuración guardada');
+          }}
+        />
       </SeatingLayoutFloating>
     </DndProvider>
   );

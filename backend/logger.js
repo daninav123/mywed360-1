@@ -1,4 +1,5 @@
 import winston from 'winston';
+import DailyRotateFile from 'winston-daily-rotate-file';
 import fs from 'fs';
 import path from 'path';
 
@@ -11,7 +12,8 @@ if (!fs.existsSync(logsDir)) {
 // Configuración de Winston para mostrar los logs en consola y guardarlos en archivo
 const { combine, timestamp, colorize, printf, errors, json } = winston.format;
 
-const redactEnabled = String(process.env.LOG_REDACT || '').toLowerCase() === 'true' || process.env.LOG_REDACT === '1';
+const redactEnabled =
+  String(process.env.LOG_REDACT || '').toLowerCase() === 'true' || process.env.LOG_REDACT === '1';
 
 function redactText(s) {
   try {
@@ -52,11 +54,24 @@ const logger = winston.createLogger({
     new winston.transports.Console({
       format: combine(colorize(), humanFormat),
     }),
-    // Archivo para errores
-    new winston.transports.File({
-      filename: 'logs/error.log',
+    // Archivo para errores con rotación diaria y límite de tamaño
+    new DailyRotateFile({
+      filename: 'logs/error-%DATE%.log',
+      datePattern: 'YYYY-MM-DD',
       level: 'error',
       format: combine(timestamp(), json()),
+      maxSize: '100m', // Rotación automática cuando alcance 100MB
+      maxFiles: '14d', // Mantener logs de los últimos 14 días
+      zippedArchive: true, // Comprimir logs antiguos
+    }),
+    // Archivo para todos los logs con rotación
+    new DailyRotateFile({
+      filename: 'logs/combined-%DATE%.log',
+      datePattern: 'YYYY-MM-DD',
+      format: combine(timestamp(), json()),
+      maxSize: '100m',
+      maxFiles: '7d', // Mantener logs combinados de los últimos 7 días
+      zippedArchive: true,
     }),
   ],
 });

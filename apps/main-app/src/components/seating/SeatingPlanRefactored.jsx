@@ -399,14 +399,14 @@ const SeatingPlanRefactored = () => {
   const [autoLayoutModalOpen, setAutoLayoutModalOpen] = React.useState(false);
   const [templateGalleryOpen, setTemplateGalleryOpen] = React.useState(false);
   const [exportWizardEnhancedOpen, setExportWizardEnhancedOpen] = React.useState(false);
-  
+
   // FASE 4: Tour y Tooltips
   const [showTour, setShowTour] = React.useState(false);
   const [tooltipState, updateTooltipState] = useTooltipState();
-  
+
   // FASE 2: Drag Ghost Preview
   const { dragState, startDrag, updateDrag, endDrag } = useDragGhost();
-  
+
   // Verificar si es primera visita para tour
   React.useEffect(() => {
     const hasVisited = localStorage.getItem('seating-has-visited');
@@ -415,13 +415,13 @@ const SeatingPlanRefactored = () => {
       localStorage.setItem('seating-has-visited', 'true');
     }
   }, []);
-  
+
   // Actualizar estado de tooltips
   React.useEffect(() => {
     updateTooltipState({
       hasSpaceConfigured: !!safeHallSize?.width,
       tables: safeTables,
-      assignedGuests: safeGuests.filter(g => g.tableId || g.table).length,
+      assignedGuests: safeGuests.filter((g) => g.tableId || g.table).length,
       hasDraggedTable: safeTables.length > 0,
     });
   }, [safeHallSize, safeTables, safeGuests, updateTooltipState]);
@@ -949,16 +949,17 @@ const SeatingPlanRefactored = () => {
       try {
         // Aplicar la plantilla según su configuración
         if (tab === 'banquet' && template.layout) {
-          // Generar layout automático con el tipo de plantilla
-          handleGenerateAutoLayout(template.layout);
-          toast.success(`Plantilla "${template.name}" aplicada`);
+          // TODO: Re-enable auto layout generation after fixing initialization order
+          // handleGenerateAutoLayout(template.layout);
+          console.log('Template selected:', template);
+          toast.success(`Plantilla "${template.name}" seleccionada`);
         }
       } catch (error) {
         console.error('Error applying template:', error);
         toast.error('Error al aplicar plantilla');
       }
     },
-    [tab, handleGenerateAutoLayout]
+    [tab]
   );
 
   // Atajos extra: rotaci�n, alinear/distribuir, tabs, toggles y paneles
@@ -2132,7 +2133,8 @@ const SeatingPlanRefactored = () => {
             if (action === 'start-tour') setShowTour(true);
             if (action === 'open-space') setSpaceConfigOpen(true);
             if (action === 'open-templates') setTemplateGalleryOpen(true);
-            if (action === 'auto-generate') handleGenerateAutoLayout('columns');
+            // TODO: Re-enable after fixing initialization order
+            // if (action === 'auto-generate') handleGenerateAutoLayout('columns');
             if (action === 'open-export') setExportWizardEnhancedOpen(true);
           }}
           position="bottom-right"

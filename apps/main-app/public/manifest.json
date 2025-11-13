@@ -1,0 +1,22 @@
+{
+  "short_name": "MaLoveApp",
+  "name": "MaLoveApp - Tu Boda Digital",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#6366f1",
+  "description": "Planifica tu boda perfecta con MaLoveApp"
+}

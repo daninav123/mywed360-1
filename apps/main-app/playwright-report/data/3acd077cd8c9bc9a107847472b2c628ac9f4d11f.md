@@ -1,0 +1,249 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+    - region "Notifications Alt+T"
+    - generic [ref=e3]:
+        - generic [ref=e4]:
+            - button "Configuración" [ref=e6] [cursor=pointer]:
+                - img [ref=e7]
+            - generic "Menú de usuario" [ref=e11] [cursor=pointer]:
+                - img "Lovenda" [ref=e12]
+        - main [ref=e13]:
+            - generic [ref=e14]:
+                - generic [ref=e15]:
+                    - generic [ref=e16]:
+                        - img [ref=e17]
+                        - img [ref=e20]
+                        - generic [ref=e22]: Seating Plan
+                    - generic [ref=e23]:
+                        - button "Banquete 2" [ref=e24] [cursor=pointer]:
+                            - generic [ref=e25]:
+                                - text: Banquete
+                                - generic [ref=e26]: '2'
+                        - button "Ceremonia 120" [ref=e27] [cursor=pointer]:
+                            - generic [ref=e28]:
+                                - text: Ceremonia
+                                - generic [ref=e29]: '120'
+                    - generic [ref=e31]:
+                        - generic [ref=e32]:
+                            - img [ref=e33]
+                            - generic [ref=e38]: '0'
+                            - generic [ref=e39]: invitados
+                        - button "Activar modo claro" [ref=e41] [cursor=pointer]:
+                            - img [ref=e43]
+                        - generic [ref=e46]: U
+                - main [ref=e47]:
+                    - complementary [ref=e48]:
+                        - button "Mover" [ref=e49] [cursor=pointer]:
+                            - img [ref=e50]
+                            - generic:
+                                - generic:
+                                    - generic: Mover
+                                    - generic: '1'
+                        - button "Añadir mesa" [ref=e55] [cursor=pointer]:
+                            - img [ref=e56]
+                            - generic:
+                                - generic:
+                                    - generic: Añadir mesa
+                                    - generic: A
+                        - button "Dibujar áreas" [ref=e57] [cursor=pointer]:
+                            - img [ref=e58]
+                            - generic:
+                                - generic:
+                                    - generic: Dibujar áreas
+                                    - generic: D
+                        - button "Plantillas" [ref=e61] [cursor=pointer]:
+                            - img [ref=e62]
+                            - generic:
+                                - generic:
+                                    - generic: Plantillas
+                                    - generic: T
+                        - button "Auto-IA" [ref=e66] [cursor=pointer]:
+                            - img [ref=e67]
+                            - generic [ref=e69]: AI
+                            - generic:
+                                - generic:
+                                    - generic: Auto-IA
+                                    - generic: Shift+A
+                        - button "Deshacer" [disabled] [ref=e70]:
+                            - img [ref=e71]
+                            - generic:
+                                - generic:
+                                    - generic: Deshacer
+                                    - generic: Ctrl+Z
+                        - button "Rehacer" [disabled] [ref=e74]:
+                            - img [ref=e75]
+                            - generic:
+                                - generic:
+                                    - generic: Rehacer
+                                    - generic: Ctrl+Y
+                        - button "Configuración" [ref=e78] [cursor=pointer]:
+                            - img [ref=e79]
+                            - generic:
+                                - generic:
+                                    - generic: Configuración
+                                    - generic: ','
+                    - generic [ref=e85]:
+                        - main "Lienzo de plano" [ref=e86]:
+                            - img [ref=e88]
+                            - generic "Silla 1" [ref=e89] [cursor=pointer]
+                            - generic "Silla 2" [ref=e90] [cursor=pointer]
+                            - generic "Silla 3" [ref=e91] [cursor=pointer]
+                            - generic "Silla 4" [ref=e92] [cursor=pointer]
+                            - generic "Silla 5" [ref=e93] [cursor=pointer]
+                            - generic "Silla 6" [ref=e94] [cursor=pointer]
+                            - generic "Silla 7" [ref=e95] [cursor=pointer]
+                            - generic "Silla 8" [ref=e96] [cursor=pointer]
+                            - generic "Silla 9" [ref=e97] [cursor=pointer]
+                            - generic "Silla 10" [ref=e98] [cursor=pointer]
+                            - generic "Silla 11" [ref=e99] [cursor=pointer]
+                            - generic "Silla 12" [ref=e100] [cursor=pointer]
+                            - generic "Silla 13" [ref=e101] [cursor=pointer]
+                            - generic "Silla 14" [ref=e102] [cursor=pointer]
+                            - generic "Silla 15" [ref=e103] [cursor=pointer]
+                            - generic "Silla 16" [ref=e104] [cursor=pointer]
+                            - generic "Silla 17" [ref=e105] [cursor=pointer]
+                            - generic "Silla 18" [ref=e106] [cursor=pointer]
+                            - generic "Silla 19" [ref=e107] [cursor=pointer]
+                            - generic "Silla 20" [ref=e108] [cursor=pointer]
+                            - generic "Silla 21" [ref=e109] [cursor=pointer]
+                            - generic "Silla 22" [ref=e110] [cursor=pointer]
+                            - generic "Silla 23" [ref=e111] [cursor=pointer]
+                            - generic "Silla 24" [ref=e112] [cursor=pointer]
+                            - generic "Silla 25" [ref=e113] [cursor=pointer]
+                            - generic "Silla 26" [ref=e114] [cursor=pointer]
+                            - generic "Silla 27" [ref=e115] [cursor=pointer]
+                            - generic "Silla 28" [ref=e116] [cursor=pointer]
+                            - generic "Silla 29" [ref=e117] [cursor=pointer]
+                            - generic "Silla 30" [ref=e118] [cursor=pointer]
+                            - generic "Silla 31" [ref=e119] [cursor=pointer]
+                            - generic "Silla 32" [ref=e120] [cursor=pointer]
+                            - generic "Silla 33" [ref=e121] [cursor=pointer]
+                            - generic "Silla 34" [ref=e122] [cursor=pointer]
+                            - generic "Silla 35" [ref=e123] [cursor=pointer]
+                            - generic "Silla 36" [ref=e124] [cursor=pointer]
+                            - generic "Silla 37" [ref=e125] [cursor=pointer]
+                            - generic "Silla 38" [ref=e126] [cursor=pointer]
+                            - generic "Silla 39" [ref=e127] [cursor=pointer]
+                            - generic "Silla 40" [ref=e128] [cursor=pointer]
+                            - generic "Silla 41" [ref=e129] [cursor=pointer]
+                            - generic "Silla 42" [ref=e130] [cursor=pointer]
+                            - generic "Silla 43" [ref=e131] [cursor=pointer]
+                            - generic "Silla 44" [ref=e132] [cursor=pointer]
+                            - generic "Silla 45" [ref=e133] [cursor=pointer]
+                            - generic "Silla 46" [ref=e134] [cursor=pointer]
+                            - generic "Silla 47" [ref=e135] [cursor=pointer]
+                            - generic "Silla 48" [ref=e136] [cursor=pointer]
+                            - generic "Silla 49" [ref=e137] [cursor=pointer]
+                            - generic "Silla 50" [ref=e138] [cursor=pointer]
+                            - generic "Silla 51" [ref=e139] [cursor=pointer]
+                            - generic "Silla 52" [ref=e140] [cursor=pointer]
+                            - generic "Silla 53" [ref=e141] [cursor=pointer]
+                            - generic "Silla 54" [ref=e142] [cursor=pointer]
+                            - generic "Silla 55" [ref=e143] [cursor=pointer]
+                            - generic "Silla 56" [ref=e144] [cursor=pointer]
+                            - generic "Silla 57" [ref=e145] [cursor=pointer]
+                            - generic "Silla 58" [ref=e146] [cursor=pointer]
+                            - generic "Silla 59" [ref=e147] [cursor=pointer]
+                            - generic "Silla 60" [ref=e148] [cursor=pointer]
+                            - generic "Silla 61" [ref=e149] [cursor=pointer]
+                            - generic "Silla 62" [ref=e150] [cursor=pointer]
+                            - generic "Silla 63" [ref=e151] [cursor=pointer]
+                            - generic "Silla 64" [ref=e152] [cursor=pointer]
+                            - generic "Silla 65" [ref=e153] [cursor=pointer]
+                            - generic "Silla 66" [ref=e154] [cursor=pointer]
+                            - generic "Silla 67" [ref=e155] [cursor=pointer]
+                            - generic "Silla 68" [ref=e156] [cursor=pointer]
+                            - generic "Silla 69" [ref=e157] [cursor=pointer]
+                            - generic "Silla 70" [ref=e158] [cursor=pointer]
+                            - generic "Silla 71" [ref=e159] [cursor=pointer]
+                            - generic "Silla 72" [ref=e160] [cursor=pointer]
+                            - generic "Silla 73" [ref=e161] [cursor=pointer]
+                            - generic "Silla 74" [ref=e162] [cursor=pointer]
+                            - generic "Silla 75" [ref=e163] [cursor=pointer]
+                            - generic "Silla 76" [ref=e164] [cursor=pointer]
+                            - generic "Silla 77" [ref=e165] [cursor=pointer]
+                            - generic "Silla 78" [ref=e166] [cursor=pointer]
+                            - generic "Silla 79" [ref=e167] [cursor=pointer]
+                            - generic "Silla 80" [ref=e168] [cursor=pointer]
+                            - generic "Silla 81" [ref=e169] [cursor=pointer]
+                            - generic "Silla 82" [ref=e170] [cursor=pointer]
+                            - generic "Silla 83" [ref=e171] [cursor=pointer]
+                            - generic "Silla 84" [ref=e172] [cursor=pointer]
+                            - generic "Silla 85" [ref=e173] [cursor=pointer]
+                            - generic "Silla 86" [ref=e174] [cursor=pointer]
+                            - generic "Silla 87" [ref=e175] [cursor=pointer]
+                            - generic "Silla 88" [ref=e176] [cursor=pointer]
+                            - generic "Silla 89" [ref=e177] [cursor=pointer]
+                            - generic "Silla 90" [ref=e178] [cursor=pointer]
+                            - generic "Silla 91" [ref=e179] [cursor=pointer]
+                            - generic "Silla 92" [ref=e180] [cursor=pointer]
+                            - generic "Silla 93" [ref=e181] [cursor=pointer]
+                            - generic "Silla 94" [ref=e182] [cursor=pointer]
+                            - generic "Silla 95" [ref=e183] [cursor=pointer]
+                            - generic "Silla 96" [ref=e184] [cursor=pointer]
+                            - generic "Silla 97" [ref=e185] [cursor=pointer]
+                            - generic "Silla 98" [ref=e186] [cursor=pointer]
+                            - generic "Silla 99" [ref=e187] [cursor=pointer]
+                            - generic "Silla 100" [ref=e188] [cursor=pointer]
+                            - generic "Silla 101" [ref=e189] [cursor=pointer]
+                            - generic "Silla 102" [ref=e190] [cursor=pointer]
+                            - generic "Silla 103" [ref=e191] [cursor=pointer]
+                            - generic "Silla 104" [ref=e192] [cursor=pointer]
+                            - generic "Silla 105" [ref=e193] [cursor=pointer]
+                            - generic "Silla 106" [ref=e194] [cursor=pointer]
+                            - generic "Silla 107" [ref=e195] [cursor=pointer]
+                            - generic "Silla 108" [ref=e196] [cursor=pointer]
+                            - generic "Silla 109" [ref=e197] [cursor=pointer]
+                            - generic "Silla 110" [ref=e198] [cursor=pointer]
+                            - generic "Silla 111" [ref=e199] [cursor=pointer]
+                            - generic "Silla 112" [ref=e200] [cursor=pointer]
+                            - generic "Silla 113" [ref=e201] [cursor=pointer]
+                            - generic "Silla 114" [ref=e202] [cursor=pointer]
+                            - generic "Silla 115" [ref=e203] [cursor=pointer]
+                            - generic "Silla 116" [ref=e204] [cursor=pointer]
+                            - generic "Silla 117" [ref=e205] [cursor=pointer]
+                            - generic "Silla 118" [ref=e206] [cursor=pointer]
+                            - generic "Silla 119" [ref=e207] [cursor=pointer]
+                            - generic "Silla 120" [ref=e208] [cursor=pointer]
+                        - generic [ref=e209]:
+                            - generic [ref=e210]: 18.0 × 12.0 m
+                            - generic [ref=e211]: 'Pasillo: 80 cm'
+                        - generic [ref=e212]:
+                            - button "+" [ref=e213] [cursor=pointer]
+                            - button "âˆ’" [ref=e214] [cursor=pointer]
+                            - button "Ajustar lienzo" [ref=e215] [cursor=pointer]: âŒ‚
+                    - button "Añadir mesa (A)" [ref=e216] [cursor=pointer]:
+                        - img [ref=e217]
+                - generic [ref=e219]:
+                    - generic [ref=e220]:
+                        - generic [ref=e221]:
+                            - img [ref=e222]
+                            - generic [ref=e225]: 0%
+                            - generic [ref=e226]: asignados (0/0)
+                        - generic [ref=e227]:
+                            - img [ref=e228]
+                            - generic [ref=e230]: '2'
+                            - generic [ref=e231]: mesas
+                        - generic [ref=e233]:
+                            - img [ref=e234]
+                            - generic [ref=e236]: '175'
+                            - generic [ref=e237]: conflictos
+                    - generic [ref=e238]:
+                        - button "Exportar" [ref=e239] [cursor=pointer]:
+                            - img [ref=e240]
+                            - text: Exportar
+                        - button "Asignación automática" [ref=e243] [cursor=pointer]:
+                            - img [ref=e244]
+                            - text: Asignación automática
+        - navigation [ref=e247]:
+            - generic [ref=e248]:
+                - button "Inicio" [ref=e249] [cursor=pointer]
+                - button "Tareas" [ref=e250] [cursor=pointer]
+                - button "Finanzas" [ref=e251] [cursor=pointer]
+                - button "Más" [ref=e252] [cursor=pointer]
+        - button "Abrir chat" [ref=e253] [cursor=pointer]:
+            - img [ref=e254]
+    - button "🔍" [ref=e256] [cursor=pointer]
+```

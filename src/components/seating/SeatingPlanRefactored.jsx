@@ -516,6 +516,48 @@ const SeatingPlanRefactored = () => {
       });
   }, [safeAreas]);
 
+  // Auto-generar mesas de ejemplo si no hay ninguna en Banquete
+  useEffect(() => {
+    if (tab === 'banquet' && tables && tables.length === 0 && safeHallSize?.width > 0) {
+      console.log('🔧 SEATING DEBUG: No hay mesas. Generando ejemplo automático...');
+
+      // Generar 6 mesas de ejemplo en grid 3x2
+      const exampleTables = [];
+      const margin = 150;
+      const spacing = 200;
+      const radius = 60;
+
+      for (let row = 0; row < 2; row++) {
+        for (let col = 0; col < 3; col++) {
+          const id = `mesa-${row * 3 + col + 1}`;
+          exampleTables.push({
+            id,
+            name: `Mesa ${row * 3 + col + 1}`,
+            shape: 'circle',
+            x: margin + col * (radius * 2 + spacing),
+            y: margin + row * (radius * 2 + spacing),
+            radius,
+            diameter: radius * 2,
+            seats: 8,
+            capacity: 8,
+            guests: [],
+            locked: false,
+          });
+        }
+      }
+
+      console.log('🔧 SEATING DEBUG: Mesas de ejemplo creadas:', exampleTables);
+
+      // Aplicar las mesas usando el hook
+      if (typeof applyBanquetTables === 'function') {
+        applyBanquetTables(exampleTables).then(() => {
+          console.log('✅ SEATING DEBUG: Mesas aplicadas correctamente');
+          toast.info('Mesas de ejemplo generadas. Personaliza desde "Configurar Banquete"');
+        });
+      }
+    }
+  }, [tab, tables, safeHallSize, applyBanquetTables]);
+
   const seatingProgress = React.useMemo(() => {
     const tableIds = new Set(
       safeTables

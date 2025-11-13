@@ -39,23 +39,22 @@ export default function TableWithPhysics({
     },
   };
 
-  const currentVariant = isDragging 
-    ? 'dragging' 
-    : isSelected 
-      ? 'selected' 
-      : 'idle';
+  const currentVariant = isDragging ? 'dragging' : isSelected ? 'selected' : 'idle';
 
   return (
-    <motion.g
+    <motion.div
       variants={bounceVariants}
       initial="idle"
       animate={currentVariant}
       whileHover={{ scale: 1.02 }}
       onClick={onSelect}
-      style={{ cursor: 'pointer' }}
+      style={{
+        cursor: 'pointer',
+        display: 'contents', // No afecta el layout
+      }}
       {...props}
     >
       {children}
-    </motion.g>
+    </motion.div>
   );
 }

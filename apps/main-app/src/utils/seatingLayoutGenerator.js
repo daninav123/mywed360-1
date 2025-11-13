@@ -40,6 +40,7 @@ export const analyzeGuestAssignments = (guests = []) => {
     unassignedGuests,
     totalTables: tableMap.size,
     totalAssigned: guests.length - unassignedGuests.length,
+    totalGuests: guests.length, // ✨ Añadir total de invitados
   };
 };
 

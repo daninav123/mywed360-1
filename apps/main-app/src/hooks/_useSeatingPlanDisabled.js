@@ -25,6 +25,7 @@ import {
   inferTableType,
 } from '../utils/seatingTables';
 import { generateAutoLayout, analyzeGuestAssignments } from '../utils/seatingLayoutGenerator';
+import useGuests from './useGuests';
 
 // Utilidad para normalizar IDs de mesas
 export const normalizeId = (id) => {
@@ -34,6 +35,10 @@ export const normalizeId = (id) => {
 
 export const useSeatingPlan = () => {
   const { activeWedding } = useWedding();
+
+  // Obtener invitados reales de la gestión de invitados ✨
+  const { guests: guestsFromManagement, updateGuest: updateGuestInManagement } = useGuests();
+
   // Detectar entorno de test (Cypress o Vitest) para evitar persistencia en Firestore
   const isVitest =
     (typeof import.meta !== 'undefined' &&
@@ -527,7 +532,24 @@ export const useSeatingPlan = () => {
   const [selectedTable, setSelectedTable] = useState(null);
   const [configTable, setConfigTable] = useState(null);
   const [preview, setPreview] = useState(null);
-  const [guests, setGuests] = useState([]);
+
+  // Sincronizar invitados de gestión con asignaciones del seating plan ✨
+  const guests = useMemo(() => {
+    // Si no hay invitados de gestión, retornar array vacío
+    if (!guestsFromManagement || guestsFromManagement.length === 0) {
+      return [];
+    }
+
+    // Retornar los invitados de gestión (ya tienen las asignaciones de mesas)
+    return guestsFromManagement;
+  }, [guestsFromManagement]);
+
+  // Setter para guests (mantener compatibilidad con código existente)
+  const setGuests = useCallback((updater) => {
+    // Este setter no hace nada real porque los guests vienen de useGuests
+    // pero lo mantenemos para compatibilidad
+    console.warn('[useSeatingPlan] setGuests called but guests come from useGuests hook');
+  }, []);
 
   // Estados de modales
   const [ceremonyConfigOpen, setCeremonyConfigOpen] = useState(false);
@@ -1233,6 +1255,51 @@ export const useSeatingPlan = () => {
     }
   };
 
+  // Actualizar mesa (por ID)
+  const updateTable = (tableId, updates = {}) => {
+    try {
+      console.log('[updateTable] Updating table:', tableId, 'with:', updates);
+
+      const setFn = tab === 'ceremony' ? setTablesCeremony : setTablesBanquet;
+
+      setFn((prev) => {
+        return prev.map((table) => {
+          if (String(table.id) === String(tableId)) {
+            // Aplicar actualizaciones manteniendo la forma correcta
+            const updated = {
+              ...table,
+              ...updates,
+            };
+
+            // Si cambia capacidad, actualizar también seats
+            if (updates.capacity !== undefined) {
+              updated.seats = updates.capacity;
+            }
+
+            // Sanitizar la mesa actualizada
+            const sanitized = sanitizeTable(updated, {
+              forceAuto: updated.autoCapacity ?? table.autoCapacity,
+            });
+
+            console.log('[updateTable] Updated table:', sanitized);
+            return sanitized;
+          }
+          return table;
+        });
+      });
+
+      // Añadir al historial
+      try {
+        pushHistory();
+      } catch (e) {
+        console.warn('[updateTable] Error pushing to history:', e);
+      }
+    } catch (error) {
+      console.error('[updateTable] Error:', error);
+      throw error;
+    }
+  };
+
   // Áreas (perímetro/puertas/obstáculos/pasillos)
   const addArea = (area) => {
     const normalize = (a) => (Array.isArray(a) || a?.points ? a : []);
@@ -1453,19 +1520,121 @@ export const useSeatingPlan = () => {
     setTablesBanquet([]);
   };
 
+  /**
+   * Genera TODO el Seating Plan automáticamente en un solo paso
+   * 1. Analiza invitados de gestión
+   * 2. Determina layout óptimo
+   * 3. Genera mesas automáticamente
+   * 4. Asigna invitados a las mesas
+   * ✨ OBJETIVO: Mínimo esfuerzo del usuario
+   */
+  const setupSeatingPlanAutomatically = async ({
+    layoutPreference = 'auto',
+    tableCapacity = 8,
+    allowOvercapacity = false,
+  } = {}) => {
+    try {
+      console.log('[setupSeatingPlanAutomatically] Iniciando generación automática...');
+
+      // PASO 1: Analizar invitados actuales
+      const analysis = analyzeCurrentGuests();
+
+      if (analysis.totalGuests === 0) {
+        return {
+          success: false,
+          message:
+            'No hay invitados para asignar. Añade invitados en Gestión de Invitados primero.',
+        };
+      }
+
+      console.log('[setupSeatingPlanAutomatically] Invitados encontrados:', analysis.totalGuests);
+
+      // PASO 2: Determinar layout óptimo automáticamente
+      let layoutType = layoutPreference;
+
+      if (layoutType === 'auto') {
+        // Algoritmo inteligente según número de invitados
+        if (analysis.totalGuests < 40) {
+          layoutType = 'circular';
+        } else if (analysis.totalGuests < 80) {
+          layoutType = 'columns';
+        } else if (analysis.totalGuests < 150) {
+          layoutType = 'with-aisle';
+        } else {
+          layoutType = 'columns';
+        }
+        console.log(
+          '[setupSeatingPlanAutomatically] Layout seleccionado automáticamente:',
+          layoutType
+        );
+      }
+
+      // PASO 3: Generar layout desde invitados
+      const layoutResult = generateAutoLayoutFromGuests(layoutType);
+
+      if (!layoutResult.success) {
+        console.error(
+          '[setupSeatingPlanAutomatically] Error generando layout:',
+          layoutResult.message
+        );
+        return layoutResult;
+      }
+
+      console.log('[setupSeatingPlanAutomatically] Layout generado:', {
+        mesas: layoutResult.tablesGenerated,
+        asignados: layoutResult.guestsAssigned,
+      });
+
+      // PASO 4: Esperar un momento para que el estado se actualice
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      console.log('[setupSeatingPlanAutomatically] Iniciando auto-asignación...');
+
+      // PASO 5: Auto-asignar invitados pendientes
+      const assignResult = await autoAssignGuests();
+
+      console.log('[setupSeatingPlanAutomatically] Auto-asignación completada:', {
+        resultado: assignResult,
+        asignados: assignResult.assigned || 0,
+        ok: assignResult.ok,
+      });
+
+      // PASO 6: Calcular estadísticas finales
+      const finalAnalysis = analyzeCurrentGuests();
+
+      // PASO 7: Retornar resultado completo
+      return {
+        success: true,
+        message: '¡Seating Plan generado automáticamente!',
+        stats: {
+          mesas: layoutResult.tablesGenerated || 0,
+          invitadosAsignados: assignResult.assigned || 0,
+          invitadosPendientes: finalAnalysis.unassignedGuests?.length || 0,
+          layoutUsado: layoutType,
+          totalInvitados: analysis.totalGuests,
+        },
+      };
+    } catch (error) {
+      console.error('[setupSeatingPlanAutomatically] Error:', error);
+      return {
+        success: false,
+        message: 'Error en la generación automática. Inténtalo de nuevo.',
+        error: error.message,
+      };
+    }
+  };
+
   // Invitados y asientos
-  const moveGuest = (guestId, tableId) => {
-    setGuests((prev) =>
-      prev.map((g) =>
-        String(g.id) === String(guestId)
-          ? {
-              ...g,
-              tableId: tableId == null ? null : tableId,
-              table: tableId == null ? null : String(tableId),
-            }
-          : g
-      )
-    );
+  const moveGuest = async (guestId, tableId) => {
+    try {
+      // Actualizar el invitado en la gestión de invitados ✨
+      await updateGuestInManagement(guestId, {
+        tableId: tableId == null ? null : tableId,
+        table: tableId == null ? null : String(tableId),
+      });
+    } catch (error) {
+      console.error('[moveGuest] Error actualizando invitado:', error);
+    }
   };
   const moveGuestToSeat = (guestId, tableId, _seatIdx) => {
     moveGuest(guestId, tableId);
@@ -1517,8 +1686,18 @@ export const useSeatingPlan = () => {
   // Auto-asignación y sugerencias básicas
   const autoAssignGuests = async () => {
     try {
+      console.log('[autoAssignGuests] Iniciando... Total guests:', guests.length);
+
       const pending = guests.filter((g) => !g.tableId && !g.table);
-      if (pending.length === 0) return { ok: true, method: 'local', assigned: 0 };
+      console.log('[autoAssignGuests] Invitados pendientes:', pending.length);
+
+      if (pending.length === 0) {
+        console.log('[autoAssignGuests] No hay invitados pendientes');
+        return { ok: true, method: 'local', assigned: 0 };
+      }
+
+      console.log('[autoAssignGuests] Mesas disponibles:', tablesBanquet.length);
+
       const occ = new Map();
       guests.forEach((g) => {
         const tid = g?.tableId != null ? String(g.tableId) : null;
@@ -1526,25 +1705,39 @@ export const useSeatingPlan = () => {
         occ.set(tid, (occ.get(tid) || 0) + 1 + (parseInt(g.companion, 10) || 0));
       });
       let assigned = 0;
-      const updated = [...guests];
-      pending.forEach((g) => {
+
+      // Actualizar invitados en la gestión ✨
+      console.log('[autoAssignGuests] Comenzando asignación...');
+      for (const g of pending) {
         const table = tablesBanquet.find((t) => {
           const cap = parseInt(t.seats, 10) || globalMaxSeats || 0;
           const used = occ.get(String(t.id)) || 0;
           return cap === 0 || used + 1 + (parseInt(g.companion, 10) || 0) <= cap;
         });
+
         if (table) {
           const tid = String(table.id);
           occ.set(tid, (occ.get(tid) || 0) + 1 + (parseInt(g.companion, 10) || 0));
           assigned += 1 + (parseInt(g.companion, 10) || 0);
-          const idx = updated.findIndex((x) => String(x.id) === String(g.id));
-          if (idx >= 0)
-            updated[idx] = { ...updated[idx], tableId: table.id, table: String(table.id) };
+
+          console.log(`[autoAssignGuests] Asignando invitado ${g.id} a mesa ${table.id}`);
+
+          // Actualizar en la gestión de invitados
+          try {
+            await updateGuestInManagement(g.id, {
+              tableId: table.id,
+              table: String(table.id),
+            });
+          } catch (updateError) {
+            console.error(`[autoAssignGuests] Error actualizando invitado ${g.id}:`, updateError);
+          }
         }
-      });
-      setGuests(updated);
+      }
+
+      console.log(`[autoAssignGuests] Asignación completada: ${assigned} invitados asignados`);
       return { ok: true, method: 'local', assigned };
     } catch (e) {
+      console.error('[autoAssignGuests] Error:', e);
       return { ok: false, error: 'auto-assign-failed' };
     }
   };
@@ -3861,6 +4054,7 @@ export const useSeatingPlan = () => {
     duplicateTable,
     toggleTableLocked,
     addTable,
+    updateTable, // NUEVA FUNCIÓN AGREGADA
     addArea,
     updateArea,
     deleteArea,
@@ -3879,6 +4073,9 @@ export const useSeatingPlan = () => {
     generateBanquetLayout,
     applyBanquetTables,
     clearBanquetLayout,
+    setupSeatingPlanAutomatically, // Generación TODO automática ✨
+    generateAutoLayoutFromGuests,
+    analyzeCurrentGuests,
 
     // Exportaciones
     exportPNG,

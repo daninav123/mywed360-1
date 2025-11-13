@@ -6,10 +6,19 @@ import SeatingPlanModern from '../components/seating/SeatingPlanModern.jsx';
 export default function SeatingPlan() {
   // Feature flag para el nuevo diseño
   const [useModernDesign, setUseModernDesign] = useState(() => {
-    // Leer preferencia del localStorage
+    // FORZAR limpieza y usar diseño clásico
     const saved = localStorage.getItem('seating_modern_design');
-    // ACTIVADO POR DEFECTO - cambiar a 'true' para siempre usar diseño moderno
-    return saved !== null ? saved === 'true' : true; // ← true = diseño moderno por defecto
+
+    // Si está en 'true', limpiar automáticamente
+    if (saved === 'true') {
+      console.log('🧹 AUTO-LIMPIEZA: Removiendo flag de diseño moderno');
+      localStorage.removeItem('seating_modern_design');
+      console.log('✅ Usando diseño clásico por defecto');
+      return false;
+    }
+
+    // DESACTIVADO POR DEFECTO - usar diseño clásico que está completamente funcional
+    return false; // ← SIEMPRE false = diseño clásico
   });
 
   // Toggle con atajo de teclado: Ctrl+Shift+M
@@ -38,3 +47,4 @@ export default function SeatingPlan() {
   return <SeatingPlanRefactored />;
 }
 
+// Force reload - timestamp: 2025-11-13 01:06

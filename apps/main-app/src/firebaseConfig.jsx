@@ -201,9 +201,9 @@ const inicializarFirebase = async () => {
       window.auth = auth;
     }
     try {
-      const { setPersistence, inMemoryPersistence } = await import('firebase/auth');
-      await setPersistence(auth, inMemoryPersistence);
-      console.log('✅ Firebase Auth usando persistencia en memoria (evita QuotaExceededError)');
+      const { setPersistence, browserLocalPersistence } = await import('firebase/auth');
+      await setPersistence(auth, browserLocalPersistence);
+      console.log('✅ Firebase Auth usando persistencia local (mantiene sesión entre recargas)');
     } catch (pErr) {
       console.warn('No se pudo establecer la persistencia de auth:', pErr);
     }

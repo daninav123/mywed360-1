@@ -657,10 +657,12 @@ export const useSeatingPlan = () => {
 
   useEffect(() => {
     if (!activeWedding || !canPersist) return () => {};
+    let isMounted = true; // Flag para evitar actualizaciones después del desmontaje
     const ref = fsDoc(db, 'weddings', activeWedding, 'seatingPlan', 'banquet');
     const unsubscribe = onSnapshot(
       ref,
       (snap) => {
+        if (!isMounted) return; // Ignorar si ya se desmontó
         try {
           if (!snap.exists()) {
             setTablesBanquet([]);

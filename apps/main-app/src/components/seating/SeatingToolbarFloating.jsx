@@ -13,17 +13,12 @@ import {
   Redo2,
   Settings,
   Layers,
+  LayoutGrid,
+  PenTool,
+  Map,
 } from 'lucide-react';
 
-const ToolbarButton = ({ 
-  icon: Icon, 
-  label, 
-  onClick, 
-  isActive, 
-  disabled, 
-  shortcut,
-  badge 
-}) => {
+const ToolbarButton = ({ icon: Icon, label, onClick, isActive, disabled, shortcut, badge }) => {
   return (
     <motion.button
       onClick={onClick}
@@ -34,48 +29,49 @@ const ToolbarButton = ({
         relative group w-12 h-12 rounded-lg
         flex items-center justify-center
         transition-all duration-200
-        ${isActive 
-          ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/50' 
-          : disabled
-            ? 'bg-transparent text-gray-600 cursor-not-allowed opacity-40'
-            : 'bg-transparent text-gray-400 hover:bg-white/10 hover:text-white'
+        ${
+          isActive
+            ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/50'
+            : disabled
+              ? 'bg-transparent text-gray-600 cursor-not-allowed opacity-40'
+              : 'bg-transparent text-gray-400 hover:bg-white/10 hover:text-white'
         }
       `}
       aria-label={label}
       title={label}
     >
       <Icon size={20} strokeWidth={2} />
-      
+
       {/* Badge (ej: BETA) */}
       {badge && (
         <span className="absolute -top-1 -right-1 bg-amber-500 text-white text-[9px] font-bold px-1 rounded">
           {badge}
         </span>
       )}
-      
+
       {/* Tooltip */}
-      <div className="absolute left-full ml-3 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg 
+      <div
+        className="absolute left-full ml-3 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg 
                       opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity
-                      whitespace-nowrap z-50 shadow-xl">
+                      whitespace-nowrap z-50 shadow-xl"
+      >
         <div className="flex items-center gap-2">
           <span>{label}</span>
           {shortcut && (
-            <kbd className="px-2 py-0.5 bg-gray-800 rounded text-xs font-mono">
-              {shortcut}
-            </kbd>
+            <kbd className="px-2 py-0.5 bg-gray-800 rounded text-xs font-mono">{shortcut}</kbd>
           )}
         </div>
         {/* Arrow */}
-        <div className="absolute right-full top-1/2 -translate-y-1/2 
-                        border-4 border-transparent border-r-gray-900" />
+        <div
+          className="absolute right-full top-1/2 -translate-y-1/2 
+                        border-4 border-transparent border-r-gray-900"
+        />
       </div>
     </motion.button>
   );
 };
 
-const ToolbarDivider = () => (
-  <div className="h-px bg-white/10 my-2 mx-2" />
-);
+const ToolbarDivider = () => <div className="h-px bg-white/10 my-2 mx-2" />;
 
 export default function SeatingToolbarFloating({
   mode,
@@ -89,6 +85,14 @@ export default function SeatingToolbarFloating({
   canRedo,
   onOpenSettings,
   onOpenTemplates,
+  onOpenLayoutGenerator, // FASE 1
+  onToggleDrawingTools, // FASE 2
+  hasDrawingElements, // FASE 2
+  onClearDrawing, // FASE 2
+  onToggleMinimap, // FASE 3
+  showMinimap = false, // FASE 3
+  onGenerarTodoAutomatico, // FASE 4 - Generación completa ✨
+  isGeneratingAuto = false, // FASE 4
 }) {
   const tools = [
     {
@@ -118,6 +122,31 @@ export default function SeatingToolbarFloating({
       label: 'Plantillas',
       shortcut: 'T',
       onClick: onOpenTemplates,
+    },
+    {
+      id: 'layout-generator',
+      icon: LayoutGrid,
+      label: 'Auto-generar Layout',
+      shortcut: 'L',
+      badge: 'NEW',
+      onClick: onOpenLayoutGenerator,
+    },
+    {
+      id: 'auto-complete',
+      icon: Sparkles,
+      label: isGeneratingAuto ? 'Generando...' : 'Generar TODO Automático',
+      shortcut: 'Ctrl+G',
+      badge: '✨',
+      onClick: onGenerarTodoAutomatico,
+      disabled: isGeneratingAuto,
+    },
+    {
+      id: 'drawing-tools',
+      icon: PenTool,
+      label: 'Herramientas de Dibujo',
+      shortcut: 'B',
+      badge: hasDrawingElements ? `${hasDrawingElements}` : null,
+      onClick: onToggleDrawingTools,
     },
   ];
 
@@ -152,6 +181,14 @@ export default function SeatingToolbarFloating({
   ];
 
   const settings = [
+    {
+      id: 'minimap',
+      icon: Map,
+      label: showMinimap ? 'Ocultar Minimap' : 'Mostrar Minimap',
+      shortcut: 'M',
+      onClick: onToggleMinimap,
+      isActive: showMinimap,
+    },
     {
       id: 'settings',
       icon: Settings,

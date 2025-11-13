@@ -55,13 +55,13 @@ const SeatingCanvas = forwardRef(function SeatingCanvas(
   _forwardedRef
 ) {
   const containerRef = useRef(null);
-  
+
   // FASE 1: Estados para Physics, Snap Guides y Selección Múltiple
   const [draggingTableId, setDraggingTableId] = useState(null);
   const [snapGuides, setSnapGuides] = useState([]);
   const [marqueeStart, setMarqueeStart] = useState(null);
   const [marqueeEnd, setMarqueeEnd] = useState(null);
-  
+
   // Helpers locales de validación
   const getTableBox = (table) => {
     if (!table) return { minX: 0, minY: 0, maxX: 0, maxY: 0 };
@@ -162,6 +162,21 @@ const SeatingCanvas = forwardRef(function SeatingCanvas(
             ? 'line'
             : drawMode;
 
+  // DEBUG: Log de renderizado
+  React.useEffect(() => {
+    console.log('🎨 SEATING CANVAS RENDER:', {
+      tab,
+      tables: tables?.length || 0,
+      seats: seats?.length || 0,
+      hallSize,
+      scale,
+      offset,
+    });
+    if (tab === 'banquet') {
+      console.log('📊 Mesas en banquete:', tables);
+    }
+  }, [tab, tables, seats, hallSize, scale, offset]);
+
   return (
     <div
       className="flex-grow border border-gray-300 h-[800px] relative overflow-hidden" // adjusted height
@@ -196,21 +211,46 @@ const SeatingCanvas = forwardRef(function SeatingCanvas(
       )}
       {/* Área del salón (solo banquete) */}
       {tab === 'banquet' && hallSize && (
-        <div
-          style={{
-            position: 'absolute',
-            left: 0,
-            top: 0,
-            width: hallSize.width,
-            height: hallSize.height,
-            border: '3px dashed #4b5563',
-            background: '#ffffff',
-            transform: `translate(${offset.x}px, ${offset.y}px) scale(${scale})`,
-            transformOrigin: 'top left',
-            pointerEvents: 'none',
-            zIndex: 0,
-          }}
-        />
+        <>
+          <div
+            style={{
+              position: 'absolute',
+              left: 0,
+              top: 0,
+              width: hallSize.width,
+              height: hallSize.height,
+              border: '4px solid #3b82f6', // Borde azul más visible
+              background: '#f8fafc', // Fondo muy claro
+              transform: `translate(${offset.x}px, ${offset.y}px) scale(${scale})`,
+              transformOrigin: 'top left',
+              pointerEvents: 'none',
+              zIndex: 0,
+            }}
+          />
+          {/* DEBUG: Indicador de centro */}
+          <div
+            style={{
+              position: 'absolute',
+              left: (hallSize.width / 2) * scale + offset.x - 30,
+              top: (hallSize.height / 2) * scale + offset.y - 30,
+              width: 60,
+              height: 60,
+              borderRadius: '50%',
+              background: 'rgba(239, 68, 68, 0.3)',
+              border: '3px solid #ef4444',
+              pointerEvents: 'none',
+              zIndex: 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '10px',
+              fontWeight: 'bold',
+              color: '#ef4444',
+            }}
+          >
+            CENTRO
+          </div>
+        </>
       )}
 
       {/* Canvas libre */}
@@ -317,14 +357,13 @@ const SeatingCanvas = forwardRef(function SeatingCanvas(
           const lockedBy = lockInfo?.displayName || lockInfo?.userId || null;
           const lockedColor = lockInfo?.color;
           const lockedIsCurrent = lockInfo?.clientId === currentClientId;
-          const tableCanMove =
-            canMoveTables && (!lockedBy || lockedIsCurrent);
-          
-          const isSelected = 
+          const tableCanMove = canMoveTables && (!lockedBy || lockedIsCurrent);
+
+          const isSelected =
             (selectedTable && selectedTable.id === t.id) ||
             (selectedIds && selectedIds.some((id) => String(id) === String(t.id)));
           const isDragging = draggingTableId === t.id;
-          
+
           // Wrapped table con physics
           const tableElement = (
             <TableItem
@@ -337,7 +376,7 @@ const SeatingCanvas = forwardRef(function SeatingCanvas(
                 // Calcular snap guides mientras se mueve
                 const threshold = 10;
                 const guides = [];
-                tables.forEach(other => {
+                tables.forEach((other) => {
                   if (other.id === id) return;
                   // Guía vertical
                   if (Math.abs(other.x - newX) < threshold) {
@@ -376,7 +415,7 @@ const SeatingCanvas = forwardRef(function SeatingCanvas(
               designFocusMode={designFocusMode}
             />
           );
-          
+
           // FASE 1: Envolver con TableWithPhysics para bounce effect
           return (
             <TableWithPhysics
@@ -453,23 +492,19 @@ const SeatingCanvas = forwardRef(function SeatingCanvas(
           });
           return lines;
         })()}
-      
+
       {/* FASE 1: Snap Guides - Líneas de alineación animadas */}
       {tab === 'banquet' && snapGuides.length > 0 && (
-        <SnapGuides 
-          guides={snapGuides} 
+        <SnapGuides
+          guides={snapGuides}
           canvasWidth={hallSize?.width || 2000}
           canvasHeight={hallSize?.height || 1500}
         />
       )}
-      
+
       {/* FASE 1: Selection Marquee - Selección múltiple */}
       {marqueeStart && marqueeEnd && (
-        <SelectionMarquee
-          start={marqueeStart}
-          end={marqueeEnd}
-          visible={true}
-        />
+        <SelectionMarquee start={marqueeStart} end={marqueeEnd} visible={true} />
       )}
     </div>
   );
