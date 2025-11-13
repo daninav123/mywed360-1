@@ -23,7 +23,8 @@ const guessServiceFromQuery = (query, t) => {
   if (words.includes('foto')) return t('suppliers.aiSearch.services.photo');
   if (words.includes('video')) return t('suppliers.aiSearch.services.video');
   if (words.includes('catering')) return t('suppliers.aiSearch.services.catering');
-  if (words.includes('dj') || words.includes('musica')) return t('suppliers.aiSearch.services.music');
+  if (words.includes('dj') || words.includes('musica'))
+    return t('suppliers.aiSearch.services.music');
   if (words.includes('flor')) return t('suppliers.aiSearch.services.flowers');
   return query.trim();
 };
@@ -167,9 +168,7 @@ const mapBackendErrorMessage = (payload, status, fallbackMessage, t) => {
   const code = payload?.error || payload?.code;
   const detail = payload?.details || payload?.message || '';
   const statusLabel =
-    status !== undefined && status !== null
-      ? status
-      : t('suppliers.aiSearch.errors.unknownStatus');
+    status !== undefined && status !== null ? status : t('suppliers.aiSearch.errors.unknownStatus');
   switch (code) {
     case 'openai_failed':
       return t('suppliers.aiSearch.errors.openaiFailed');
@@ -197,7 +196,7 @@ const generateDemoResults = (query, t) => {
 
   // Asegurarse de que demoDatabase es un array
   const databaseArray = Array.isArray(demoDatabase) ? demoDatabase : [];
-  
+
   if (databaseArray.length === 0) {
     // console.warn('[useAISearch] demoResults no es un array o está vacío, devolviendo array vacío');
     return [];
@@ -210,7 +209,7 @@ const generateDemoResults = (query, t) => {
         priceRange: item.price ?? item.priceRange,
         match: ensureMatchScore(item.match, index),
         aiSummary: item.aiSummary || generateAISummary(item, query, t),
-        },
+      },
       index,
       query,
       t
@@ -224,9 +223,7 @@ const rawBackendFlag =
   import.meta?.env?.VITE_AI_SUPPLIERS_ENABLED;
 
 const ENABLE_BACKEND_AI =
-  rawBackendFlag === undefined ||
-  rawBackendFlag === null ||
-  String(rawBackendFlag).trim() === ''
+  rawBackendFlag === undefined || rawBackendFlag === null || String(rawBackendFlag).trim() === ''
     ? true
     : String(rawBackendFlag)
         .trim()
@@ -240,15 +237,18 @@ const ENABLE_BACKEND_AI =
 const SEARCH_PROVIDER = 'tavily'; // String(import.meta?.env?.VITE_SEARCH_PROVIDER || 'false').toLowerCase();
 
 // DEBUG: Sistema completo de diagnóstico de variables de entorno
-  // ⭐ OPTIMIZADO: Solo mostrar en DEV y cuando hay errores
-  if (import.meta.env.DEV && (!import.meta.env?.VITE_SEARCH_PROVIDER || !import.meta.env?.VITE_BACKEND_BASE_URL)) {
-    // console.log('🔍 [DEBUG] Diagnóstico de Variables de Entorno');
-    // console.log('🎯 VITE_SEARCH_PROVIDER:', import.meta.env?.VITE_SEARCH_PROVIDER);
-    // console.log('🎯 VITE_ENABLE_AI_SUPPLIERS:', import.meta.env?.VITE_ENABLE_AI_SUPPLIERS);
-    // console.log('🎯 VITE_BACKEND_BASE_URL:', import.meta.env?.VITE_BACKEND_BASE_URL);
-    // console.log('✅ SEARCH_PROVIDER procesado:', SEARCH_PROVIDER);
-    // console.log('✅ ENABLE_BACKEND_AI procesado:', ENABLE_BACKEND_AI);
-  }
+// ⭐ OPTIMIZADO: Solo mostrar en DEV y cuando hay errores
+if (
+  import.meta.env.DEV &&
+  (!import.meta.env?.VITE_SEARCH_PROVIDER || !import.meta.env?.VITE_BACKEND_BASE_URL)
+) {
+  // console.log('🔍 [DEBUG] Diagnóstico de Variables de Entorno');
+  // console.log('🎯 VITE_SEARCH_PROVIDER:', import.meta.env?.VITE_SEARCH_PROVIDER);
+  // console.log('🎯 VITE_ENABLE_AI_SUPPLIERS:', import.meta.env?.VITE_ENABLE_AI_SUPPLIERS);
+  // console.log('🎯 VITE_BACKEND_BASE_URL:', import.meta.env?.VITE_BACKEND_BASE_URL);
+  // console.log('✅ SEARCH_PROVIDER procesado:', SEARCH_PROVIDER);
+  // console.log('✅ ENABLE_BACKEND_AI procesado:', ENABLE_BACKEND_AI);
+}
 
 export const useAISearch = () => {
   const [results, setResults] = useState([]);
@@ -279,10 +279,17 @@ export const useAISearch = () => {
         profile.receptionVenue ||
         '';
       const budget =
-        profile.budget || profile.estimatedBudget || profile.totalBudget || profile.presupuesto || '';
+        profile.budget ||
+        profile.estimatedBudget ||
+        profile.totalBudget ||
+        profile.presupuesto ||
+        '';
       const inferredService = (opts && opts.service) || guessServiceFromQuery(query, t);
       const allowFallback = opts?.allowFallback === true;
-      const enrichedQuery = [query, inferredService, location, budget].filter(Boolean).join(' ').trim();
+      const enrichedQuery = [query, inferredService, location, budget]
+        .filter(Boolean)
+        .join(' ')
+        .trim();
 
       let lastError = null;
 
@@ -296,16 +303,16 @@ export const useAISearch = () => {
         if (ENABLE_BACKEND_AI) {
           // Elegir endpoint según configuración
           let endpoint = '/api/ai-suppliers'; // Por defecto: solo GPT (datos generados)
-          
+
           if (SEARCH_PROVIDER === 'tavily') {
             endpoint = '/api/ai-suppliers-tavily'; // Tavily Search (RECOMENDADO)
           } else if (SEARCH_PROVIDER === 'google') {
             endpoint = '/api/ai-suppliers-real'; // Google Custom Search
           }
-          
+
           // console.log('[useAISearch] 🚀 Usando endpoint:', endpoint);
           // console.log('[useAISearch] 📊 Proveedor:', SEARCH_PROVIDER);
-          
+
           const res = await apiPost(
             endpoint,
             { query, service: inferredService, budget, profile, location },
@@ -341,7 +348,11 @@ export const useAISearch = () => {
                 );
               if (normalized.length) {
                 // console.log('[useAISearch] ✅ Proveedores normalizados:', normalized.length);
-                const refined = refineResults(normalized, { service: inferredService, location, t });
+                const refined = refineResults(normalized, {
+                  service: inferredService,
+                  location,
+                  t,
+                });
                 setResults(refined);
                 setLoading(false);
                 return refined;
@@ -351,10 +362,7 @@ export const useAISearch = () => {
             }
           } else {
             const payload = await res.json().catch(() => null);
-            // console.error('[useAISearch] ❌ ai-suppliers backend respondió error', {
-              status: res?.status,
-              payload,
-            });
+            // console.error('[useAISearch] ❌ ai-suppliers backend respondió error', { status: res?.status, payload });
             const message = mapBackendErrorMessage(
               payload,
               res?.status,
@@ -371,15 +379,13 @@ export const useAISearch = () => {
       } catch (backendError) {
         // console.warn('Fallo consultando ai-suppliers', backendError);
         // console.debug('[useAISearch] ai-suppliers excepción', backendError?.message, backendError);
-        
+
         // Detectar error de red (backend no disponible)
         if (backendError?.message?.includes('fetch') || backendError?.name === 'TypeError') {
-          const networkError = new Error(
-            t('suppliers.aiSearch.errors.offline')
-          );
+          const networkError = new Error(t('suppliers.aiSearch.errors.offline'));
           networkError.code = 'BACKEND_OFFLINE';
           lastError = networkError;
-          
+
           // Reportar fallback al sistema de monitoreo
           await reportFallback('ai-suppliers', networkError, {
             endpoint: '/api/ai-suppliers',
@@ -387,8 +393,11 @@ export const useAISearch = () => {
             service: inferredService,
           });
         } else {
-          lastError = backendError instanceof Error ? backendError : new Error(String(backendError || 'Error'));
-          
+          lastError =
+            backendError instanceof Error
+              ? backendError
+              : new Error(String(backendError || 'Error'));
+
           // Reportar otros errores de API
           await reportFallback('ai-suppliers', lastError, {
             endpoint: '/api/ai-suppliers',
@@ -445,7 +454,8 @@ export const useAISearch = () => {
       } catch (searchErr) {
         // console.warn('Fallo consultando search-suppliers', searchErr);
         if (!lastError) {
-          lastError = searchErr instanceof Error ? searchErr : new Error(String(searchErr || 'Error'));
+          lastError =
+            searchErr instanceof Error ? searchErr : new Error(String(searchErr || 'Error'));
         }
       }
 
@@ -470,10 +480,16 @@ export const useAISearch = () => {
             const items = Array.isArray(payload?.items) ? payload.items : [];
             if (items.length) {
               const normalized = items
-                .map((item, index) => normalizeProviderRecord(item, index, query, inferredService, t))
+                .map((item, index) =>
+                  normalizeProviderRecord(item, index, query, inferredService, t)
+                )
                 .filter(Boolean);
               if (normalized.length) {
-                const refined = refineResults(normalized, { service: inferredService, location, t });
+                const refined = refineResults(normalized, {
+                  service: inferredService,
+                  location,
+                  t,
+                });
                 setResults(refined);
                 setLoading(false);
                 return refined;
@@ -489,7 +505,7 @@ export const useAISearch = () => {
                   status: resProviders.status ?? t('suppliers.aiSearch.errors.unknownStatus'),
                 }),
                 t
-              ),
+              )
             );
             if (payload?.error) providerError.code = payload.error;
             if (!lastError) lastError = providerError;
@@ -504,14 +520,13 @@ export const useAISearch = () => {
       } catch (providerErr) {
         // console.warn('Fallo consultando providers/search', providerErr);
         if (!lastError) {
-          lastError = providerErr instanceof Error ? providerErr : new Error(String(providerErr || 'Error'));
+          lastError =
+            providerErr instanceof Error ? providerErr : new Error(String(providerErr || 'Error'));
         }
       }
       // Si hay error de backend offline, mostrar mensaje claro
       if (lastError?.code === 'BACKEND_OFFLINE') {
-        const backendError = new Error(
-          t('suppliers.aiSearch.errors.backendUnavailable')
-        );
+        const backendError = new Error(t('suppliers.aiSearch.errors.backendUnavailable'));
         backendError.code = 'BACKEND_OFFLINE';
         setResults([]);
         setUsedFallback(false);
@@ -521,10 +536,11 @@ export const useAISearch = () => {
       }
 
       // Si es error de OpenAI, mostrar mensaje específico
-      if (lastError?.code === 'OPENAI_API_KEY missing' || lastError?.message?.includes('OPENAI_API_KEY')) {
-        const openaiError = new Error(
-          t('suppliers.aiSearch.errors.openaiNotConfigured')
-        );
+      if (
+        lastError?.code === 'OPENAI_API_KEY missing' ||
+        lastError?.message?.includes('OPENAI_API_KEY')
+      ) {
+        const openaiError = new Error(t('suppliers.aiSearch.errors.openaiNotConfigured'));
         openaiError.code = 'OPENAI_NOT_CONFIGURED';
         setResults([]);
         setUsedFallback(false);
@@ -552,9 +568,7 @@ export const useAISearch = () => {
       // Si llegamos aquí, no hay resultados reales
       setResults([]);
       setUsedFallback(false);
-      const finalError = lastError || new Error(
-        t('suppliers.aiSearch.errors.noResults')
-      );
+      const finalError = lastError || new Error(t('suppliers.aiSearch.errors.noResults'));
       setError(finalError);
       setLoading(false);
       return [];
@@ -599,8 +613,11 @@ function refineResults(list, ctx) {
     const location = String(src.location || '').toLowerCase();
     const base = typeof src.match === 'number' ? src.match : 60;
     const serviceMatch =
-      serviceRef && service ? includesWord(service, serviceRef) || includesWord(serviceRef, service) : false;
-    const locMatch = locRef && location ? location.includes(locRef) || locRef.includes(location) : false;
+      serviceRef && service
+        ? includesWord(service, serviceRef) || includesWord(serviceRef, service)
+        : false;
+    const locMatch =
+      locRef && location ? location.includes(locRef) || locRef.includes(location) : false;
     let boost = 0;
     if (serviceRef) boost += serviceMatch ? 10 : -5;
     if (locRef) boost += locMatch ? 15 : -10;

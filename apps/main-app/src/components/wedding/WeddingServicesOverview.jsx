@@ -43,10 +43,7 @@ export default function WeddingServicesOverview({ onSearch, searchPanel }) {
     const active = allServices.filter((s) => s.isActive);
 
     // console.log('   ✅ Servicios activos:', active.length);
-    // console.log(
-      '   IDs:',
-      active.map((s) => s.id)
-    );
+    // console.log('   IDs:', active.map((s) => s.id));
 
     return active;
   }, [activeCategories, isCategoryActive]); // ← DEPENDENCIAS CRÍTICAS
