@@ -65,9 +65,12 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
       setLoading(false);
       return;
     }
-    
+
     // Asegurar inicialización completa de Firebase antes de lanzar cualquier lógica
-    const ENABLE_LEGACY_FALLBACKS = String((import.meta.env && import.meta.env.VITE_ENABLE_LEGACY_FALLBACKS) ?? 'true').toLowerCase() === 'true';
+    const ENABLE_LEGACY_FALLBACKS =
+      String(
+        (import.meta.env && import.meta.env.VITE_ENABLE_LEGACY_FALLBACKS) ?? 'true'
+      ).toLowerCase() === 'true';
     // Intento de migración automática de invitados antiguos
     async function migrateGuests() {
       if (!ENABLE_LEGACY_FALLBACKS) return; // desactivado por flag
@@ -289,13 +292,13 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
       // if (import.meta.env.DEV) console.log(`[useWeddingCollection] Iniciando listener para weddings/${weddingId}/${subName}`);
       // ⭐ OPTIMIZADO: Debounce para reducir actualizaciones excesivas
       let debounceTimer = null;
-      
+
       unsub = onSnapshot(
         q,
         (snap) => {
           // Limpiar timer anterior
           if (debounceTimer) clearTimeout(debounceTimer);
-          
+
           // ⭐ Debounce de 100ms para evitar actualizaciones rápidas
           debounceTimer = setTimeout(() => {
             try {
@@ -337,7 +340,7 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
           const isPermissionDenied = err.code === 'permission-denied';
           const isUnavailable = err.code === 'unavailable';
           const isFailedPrecondition = err.code === 'failed-precondition';
-          
+
           // ✅ Error de conexión/red (no crítico)
           if (isUnavailable) {
             // console.warn(`⚠️ [useWeddingCollection] Firestore temporalmente no disponible para ${subName}`);
@@ -345,7 +348,7 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
             const cached = lsGet(weddingId, subName, fallback);
             setData(cached);
             setLoading(false);
-            
+
             // Reintentar después de 5 segundos
             setTimeout(() => {
               // console.log(`🔄 Reintentando conexión para ${subName}...`);
@@ -358,7 +361,7 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
             }, 5000);
             return;
           }
-          
+
           // ✅ Error de índices (no crítico, usar caché)
           if (isFailedPrecondition) {
             // console.warn(`⚠️ [useWeddingCollection] Índice faltante para ${subName}, usando caché`);
@@ -366,7 +369,7 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
             setLoading(false);
             return;
           }
-          
+
           // ✅ Error de permisos (intentar auto-fix)
           if (isPermissionDenied) {
             (async () => {
@@ -391,13 +394,13 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
                 // console.warn('[auto-fix] Error llamando autofix backend:', permErr);
               }
             })();
-            
+
             // Usar fallback mientras tanto
             setData(fallback);
             setLoading(false);
             return;
           }
-          
+
           // ✅ Otros errores (usar caché)
           // if (import.meta.env.DEV) console.debug('[useWeddingCollection] usando caché local por error en snapshot', { sub: subName, wedding: weddingId, code: err?.code, message: err?.message });
           setData(lsGet(weddingId, subName, fallback));
@@ -425,11 +428,7 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
     }
 
     if (!firebaseUid) {
-      if (import.meta.env.DEV) {
-        // console.info(
-          `[useWeddingCollection] Sin auth Firebase; usando solo caché local para ${subName}`
-        );
-      }
+      // if (import.meta.env.DEV) console.info(`[useWeddingCollection] Sin auth Firebase; usando solo caché local para ${subName}`);
       const cached = lsGet(weddingId, subName, fallback);
       setData(Array.isArray(cached) ? cached : fallback);
       setLoading(false);
@@ -542,12 +541,12 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
       }
       if (!weddingId)
         // console.warn('updateItem: sin weddingId activo; se guarda solo en localStorage');
-      setData((prev) => {
-        const next = prev.map((d) => (d.id === id ? { ...d, ...changes } : d));
-        lastLocalWriteRef.current = Date.now();
-        lsSet(weddingId, subName, next);
-        return next;
-      });
+        setData((prev) => {
+          const next = prev.map((d) => (d.id === id ? { ...d, ...changes } : d));
+          lastLocalWriteRef.current = Date.now();
+          lsSet(weddingId, subName, next);
+          return next;
+        });
     },
     [subName, weddingId]
   );
@@ -571,12 +570,12 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
       }
       if (!weddingId)
         // console.warn('deleteItem: sin weddingId activo; se guarda solo en localStorage');
-      setData((prev) => {
-        const next = prev.filter((d) => d.id !== id);
-        lastLocalWriteRef.current = Date.now();
-        lsSet(weddingId, subName, next);
-        return next;
-      });
+        setData((prev) => {
+          const next = prev.filter((d) => d.id !== id);
+          lastLocalWriteRef.current = Date.now();
+          lsSet(weddingId, subName, next);
+          return next;
+        });
     },
     [subName, weddingId]
   );
