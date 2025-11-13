@@ -379,11 +379,7 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
                   try {
                     if (typeof unsub === 'function') unsub();
                   } catch {}
-                  if (import.meta.env.DEV)
-                    // console.debug(
-                      '[useWeddingCollection] reintento de listener tras autofix en 3000ms',
-                      { sub: subName, wedding: weddingId }
-                    );
+                  // if (import.meta.env.DEV) console.debug('[useWeddingCollection] reintento de listener tras autofix en 3000ms', { sub: subName, wedding: weddingId });
                   setTimeout(() => listen(), 3000);
                   return;
                 } else {
