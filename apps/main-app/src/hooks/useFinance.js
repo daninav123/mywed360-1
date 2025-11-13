@@ -1018,14 +1018,9 @@ export default function useFinance() {
                 },
                 { merge: true }
               );
-              // console.log(
-                `[useFinance] GuestCount sincronizado en raíz: ${next.guestCount} invitados`
-              );
+              // console.log(`[useFinance] GuestCount sincronizado en raíz: ${next.guestCount} invitados`);
             } catch (error) {
-              // console.warn(
-                '[useFinance] No se pudo sincronizar guestCount en documento raíz:',
-                error
-              );
+              // console.warn('[useFinance] No se pudo sincronizar guestCount en documento raíz:', error);
               // No fallar la operación principal si esto falla
             }
           })();
