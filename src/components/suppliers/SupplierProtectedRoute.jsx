@@ -15,10 +15,6 @@ export default function SupplierProtectedRoute({ children }) {
     const supplierId = getSupplierId();
 
     // console.log('[SupplierProtectedRoute] Verificando autenticación...');
-    // console.log(
-      '[SupplierProtectedRoute] Token:',
-      token ? `${token.substring(0, 20)}...` : 'NO TOKEN'
-    );
     // console.log('[SupplierProtectedRoute] Supplier ID:', supplierId);
     // console.log('[SupplierProtectedRoute] Location:', location.pathname);
 

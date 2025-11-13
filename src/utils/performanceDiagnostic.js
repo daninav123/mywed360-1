@@ -31,11 +31,6 @@ window.setInterval = function (...args) {
     args: args[1], // delay
   });
 
-  // console.warn(`⚠️ [Diagnostic] Interval creado. Total activos: ${intervalCount}`, {
-    id,
-    delay: args[1],
-    stack: stack?.split('\n').slice(2, 4).join('\n'),
-  });
 
   return id;
 };
@@ -87,9 +82,6 @@ export function trackRender(componentName) {
   const timeSinceLast = now - lastRenderTime;
 
   if (timeSinceLast < 100) {
-    // console.warn(
-      `🔥 [Diagnostic] Re-render rápido detectado: ${componentName} (${timeSinceLast}ms)`
-    );
   }
 
   lastRenderTime = now;
@@ -126,26 +118,8 @@ export function monitorFirestore() {
 export function generateReport() {
   console.group('📊 REPORTE DE RENDIMIENTO');
 
-  // console.log('🔄 INTERVALS:', {
-    total: intervalCount,
-    activos: activeIntervals.size,
-    detalles: Array.from(activeIntervals.entries()).map(([id, info]) => ({
-      id,
-      edad: ((Date.now() - info.created) / 1000).toFixed(1) + 's',
-      delay: info.args + 'ms',
-      origen: info.stack?.split('\n')[3],
-    })),
-  });
 
-  // console.log('⏰ TIMEOUTS:', {
-    total: timeoutCount,
-    activos: activeTimeouts.size,
-  });
 
-  // console.log('🎨 RENDERS:', {
-    total: renderCount,
-    ultimo: new Date(lastRenderTime).toLocaleTimeString(),
-  });
 
   // console.log('💾 MEMORIA:', getMemoryInfo());
 

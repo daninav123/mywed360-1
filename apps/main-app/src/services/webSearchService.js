@@ -58,10 +58,6 @@ export const searchGooglePlaces = async (query, location = null, category = null
       }
     );
 
-    // console.log(`✅ [Google Places Frontend] Respuesta del proxy:`, {
-      count: response.data.count || 0,
-      source: response.data.source,
-    });
 
     return {
       results: response.data.results || [],

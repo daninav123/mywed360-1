@@ -327,9 +327,6 @@ function Invitados() {
   const handleSendSelectedBroadcast = async () => {
     try {
       if (import.meta.env.DEV)
-        // console.log('[Invitados] handleSendSelectedBroadcast click', {
-          selectedCount: selectedIds.length,
-        });
       if (!selectedIds.length) {
         alert(t('guests.noneSelected', { defaultValue: 'No hay invitados seleccionados' }));
         return;
@@ -769,9 +766,6 @@ function Invitados() {
   const handleSendSelectedApi = async () => {
     try {
       if (import.meta.env.DEV)
-        // console.log('[Invitados] handleSendSelectedApi click', {
-          selectedCount: selectedIds.length,
-        });
       if (!selectedIds.length) {
         alert(t('guests.noneSelected', { defaultValue: 'No hay invitados seleccionados' }));
         return;
@@ -824,9 +818,6 @@ function Invitados() {
   const handleSendSelectedMobile = async () => {
     try {
       if (import.meta.env.DEV)
-        // console.log('[Invitados] handleSendSelectedMobile click', {
-          selectedCount: selectedIds.length,
-        });
       if (!selectedIds.length) {
         alert('No hay invitados seleccionados');
         return;

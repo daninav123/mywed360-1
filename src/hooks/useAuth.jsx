@@ -381,12 +381,6 @@ export const AuthProvider = ({ children }) => {
           });
         } catch {}
 
-        // console.log('[useAuth] ✅ Sesión admin restaurada correctamente', {
-          email: adminUser.email,
-          expiresAt: expiresAt ? expiresAt.toLocaleString() : 'no expira',
-          hasToken: !!storedToken,
-          sessionId: sessionId || 'ninguno',
-        });
 
         return true;
       } catch (error) {

@@ -104,11 +104,6 @@ export async function searchSuppliersHybrid(
       }
 
       const data = await response.json();
-      // console.log('📊 [searchSuppliersHybrid] Datos recibidos:', {
-        count: data.count,
-        breakdown: data.breakdown,
-        suppliersLength: data.suppliers?.length,
-      });
 
       // 🤖 CLASIFICACIÓN AUTOMÁTICA: Asignar categoría a cada proveedor
       if (data.suppliers && Array.isArray(data.suppliers)) {

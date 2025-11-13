@@ -866,12 +866,6 @@ export default function ChatWidget() {
           error: backendFallback?.error || `http_${response.status}`,
           details: backendFallback?.details || backendFallback?.message || null,
         };
-        // console.warn(
-          '[ChatWidget] Backend IA respondió',
-          response.status,
-          response.statusText,
-          data.error || '(sin detalle)'
-        );
         toast.warn(t('chat.messages.offlineTemporary'), { autoClose: 2500 });
       }
 

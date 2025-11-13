@@ -90,10 +90,6 @@ function disableRemoteGamification(reason) {
   remoteDisableReason =
     typeof reason === 'string' ? reason : reason?.message || reason?.status || 'remote-disabled';
   if (typeof console !== 'undefined') {
-    // console.warn(
-      '[GamificationService] Deshabilitando integración remota de gamificación:',
-      remoteDisableReason
-    );
   }
   if (typeof window !== 'undefined') {
     window.__GAMIFICATION_REMOTE_DISABLED__ = remoteDisableReason;

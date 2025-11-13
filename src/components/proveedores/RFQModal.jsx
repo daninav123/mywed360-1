@@ -510,11 +510,6 @@ export default function RFQModal({
                       }
                       setAttachments((prev) => [...prev, ...uploaded]);
                     } catch (e) {
-                      // console.warn(
-                        t('suppliers.rfqModal.errors.upload', {
-                          message: e?.message || e,
-                        })
-                      );
                     } finally {
                       setUploading(false);
                       if (fileInputRef.current) fileInputRef.current.value = '';

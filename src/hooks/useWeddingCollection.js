@@ -285,9 +285,6 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
         }
       } catch {}
       if (import.meta.env.DEV)
-        // console.log(
-          `[useWeddingCollection] Iniciando listener para weddings/${weddingId}/${subName}`
-        );
       // ⭐ OPTIMIZADO: Debounce para reducir actualizaciones excesivas
       let debounceTimer = null;
       
@@ -435,9 +432,6 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
 
     if (!firebaseUid) {
       if (import.meta.env.DEV) {
-        // console.info(
-          `[useWeddingCollection] Sin auth Firebase; usando solo caché local para ${subName}`
-        );
       }
       const cached = lsGet(weddingId, subName, fallback);
       setData(Array.isArray(cached) ? cached : fallback);

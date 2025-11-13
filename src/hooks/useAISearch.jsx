@@ -351,10 +351,6 @@ export const useAISearch = () => {
             }
           } else {
             const payload = await res.json().catch(() => null);
-            // console.error('[useAISearch] ❌ ai-suppliers backend respondió error', {
-              status: res?.status,
-              payload,
-            });
             const message = mapBackendErrorMessage(
               payload,
               res?.status,

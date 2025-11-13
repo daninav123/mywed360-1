@@ -46,10 +46,6 @@ export default function SupplierProducts() {
         return;
       }
 
-      // console.log(
-        '[SupplierProducts] Haciendo petición a:',
-        `/api/suppliers/${supplierId}/products`
-      );
 
       const response = await fetch(`/api/suppliers/${supplierId}/products`, {
         headers: {

@@ -152,12 +152,6 @@ export default function SupplierCard({ supplier, onContact, onViewDetails, onMar
 
     setIsFavoriting(true);
     try {
-      // console.log('🔍 [SupplierCard] Guardando favorito con:', {
-        name: supplier.name,
-        category: supplier.category,
-        service: supplier.service,
-        fullSupplier: supplier,
-      });
       await toggleFavorite(supplier);
 
       if (isFav) {

@@ -78,6 +78,7 @@ import emailTemplatesRouter from './routes/email-templates.js';
 import logger from './logger.js';
 import instagramWallRouter from './routes/instagram-wall.js';
 import imageProxyRouter from './routes/image-proxy.js';
+import proxyRouter from './routes/proxy.js';
 import weddingNewsRouter from './routes/wedding-news.js';
 import supplierPortalRouter from './routes/supplier-portal.js';
 import supplierRegistrationRouter from './routes/supplier-registration.js';
@@ -645,6 +646,7 @@ app.use('/api/ai-suppliers-web', authMiddleware(), aiSuppliersWebRouter);
 app.use('/api/ai-suppliers-real', authMiddleware(), aiSuppliersRealRouter);
 app.use('/api/ai-suppliers-tavily', authMiddleware(), aiSuppliersTavilyRouter);
 app.use('/api/google-places', googlePlacesRouter); // Proxy para Google Places API
+app.use('/api/proxy', authMiddleware(), proxyRouter); // Proxy seguro para API keys (Translation, OpenAI, Tavily)
 app.use('/api/suppliers', suppliersHybridRouter); // Búsqueda pública, sin auth
 app.use('/api/suppliers', suppliersRegisterRouter); // No requiere auth para registro
 app.use('/api/suppliers', supplierPublicRouter); // Portfolio público (sin auth)

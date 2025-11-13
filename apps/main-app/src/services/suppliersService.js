@@ -128,12 +128,6 @@ export async function searchSuppliersHybrid(
       }
 
       const data = await response.json();
-      // console.log('📊 [searchSuppliersHybrid] Datos recibidos:', {
-        count: data.count,
-        breakdown: data.breakdown,
-        suppliersLength: data.suppliers?.length || 0,
-        googlePlacesCount: googleResults.results?.length || 0,
-      });
 
       // 4. Combinar resultados de backend + Google Places
       let allSuppliers = data.suppliers || [];

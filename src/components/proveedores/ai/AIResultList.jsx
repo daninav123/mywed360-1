@@ -172,11 +172,6 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
   // DEBUG: Ver qué resultados llegan
   if (displayResults.length > 0) {
     // console.log('[AIResultList] ✅ Mostrando', displayResults.length, 'resultados reales');
-    // console.log('[AIResultList] Primer resultado:', {
-      name: displayResults[0]?.name,
-      service: displayResults[0]?.service,
-      hasImage: !!displayResults[0]?.image
-    });
   }
   
   // Si no hay resultados reales y query existe, mostrar mensaje

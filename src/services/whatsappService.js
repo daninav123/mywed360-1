@@ -100,13 +100,6 @@ export async function sendText({
     const base = BASE ? BASE.replace(/\/$/, '') : '';
     const url = base ? `${base}/api/whatsapp/send` : `/api/whatsapp/send`;
     if (import.meta.env.DEV)
-      // console.log('[whatsappService] sendText →', {
-        url,
-        hasAuth: !!token,
-        to,
-        hasMessage: !!message,
-        base,
-      });
     const res = await fetch(url, {
       method: 'POST',
       headers,

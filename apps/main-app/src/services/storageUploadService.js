@@ -81,12 +81,6 @@ export async function uploadEmailAttachments(
       const validSize = size >= 0 && size <= MAX_BYTES;
       const validType = isAllowedType(file);
       if (!validSize || !validType) {
-        // console.warn('uploadEmailAttachments: rejected file', {
-          name: safeName,
-          size,
-          validSize,
-          validType,
-        });
         // No subimos ficheros inválidos; omitimos de resultados
         continue;
       }

@@ -181,9 +181,6 @@ export function classifySupplier(supplier) {
       confidence: Math.round(c.score),
     }));
 
-  // console.log(
-    `✅ [Classifier] Proveedor "${supplier.name}" → ${bestMatch.categoryName} (${Math.round(bestMatch.score)}%)`
-  );
 
   return {
     category: bestMatch.category,
