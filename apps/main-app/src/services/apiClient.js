@@ -2,7 +2,6 @@
 import { auth } from '../firebaseConfig';
 import { performanceMonitor } from './PerformanceMonitor';
 
-
 function backendBase() {
   try {
     if (typeof window !== 'undefined' && window.Cypress && window.Cypress.env) {
@@ -33,17 +32,17 @@ function readStoredToken() {
 
 async function getAuthToken({ refresh = true } = {}) {
   const DEBUG = false; // Cambiar a true para debugging detallado
-  
+
   try {
     // Verificar que auth esté disponible
     if (!auth) {
       // console.error('[apiClient] Firebase auth no está inicializado');
       return null;
     }
-    
+
     const user = auth.currentUser;
     if (!user) {
-      if (DEBUG) // console.log('[apiClient] No hay usuario autenticado');
+      // if (DEBUG) console.log('[apiClient] No hay usuario autenticado');
       // Si no hay usuario, limpiar token almacenado
       try {
         window.localStorage.removeItem(TOKEN_STORAGE_KEY);
@@ -51,7 +50,7 @@ async function getAuthToken({ refresh = true } = {}) {
       return null;
     }
 
-    if (DEBUG) // console.log('[apiClient] Usuario encontrado:', user.uid);
+    // if (DEBUG) console.log('[apiClient] Usuario encontrado:', user.uid);
 
     // Siempre intentar obtener token fresco de Firebase
     // No confiar en el token almacenado porque puede estar expirado
@@ -77,7 +76,7 @@ async function getAuthToken({ refresh = true } = {}) {
         try {
           window.localStorage.removeItem(TOKEN_STORAGE_KEY);
         } catch {}
-        
+
         // Intentar obtener token sin refrescar (puede fallar si está expirado)
         try {
           // if (DEBUG) console.log('[apiClient] Intentando token sin refresh...');
@@ -101,11 +100,11 @@ async function getAuthToken({ refresh = true } = {}) {
 
 async function buildHeaders(opts = {}) {
   const base = { 'Content-Type': 'application/json', ...(opts.headers || {}) };
-  
+
   // Por defecto, intentar enviar token si hay usuario autenticado
   // Solo NO enviar si explícitamente se pasa auth: false
   const shouldAuth = opts.auth !== false;
-  
+
   if (shouldAuth) {
     const token = await getAuthToken();
     if (token) {
@@ -116,7 +115,7 @@ async function buildHeaders(opts = {}) {
       throw new Error('[apiClient] Authentication required to call this endpoint');
     }
   }
-  
+
   return base;
 }
 
@@ -133,7 +132,8 @@ function url(path) {
   return path.startsWith('/') ? path : `/${path}`;
 }
 
-const isCypressRuntime = () => typeof window !== 'undefined' && typeof window.Cypress !== 'undefined';
+const isCypressRuntime = () =>
+  typeof window !== 'undefined' && typeof window.Cypress !== 'undefined';
 
 function remapLegacyEndpoint(path, method = 'GET', body) {
   if (!isCypressRuntime() || typeof path !== 'string') {
@@ -184,7 +184,11 @@ function remapLegacyEndpoint(path, method = 'GET', body) {
     if (method === 'POST' && basePath.endsWith('/unread')) {
       const parts = basePath.split('/');
       const id = parts[3] || parts[2];
-      return { path: `/api/email/${encodeURIComponent(id)}/unread`, method: 'PUT', body: undefined };
+      return {
+        path: `/api/email/${encodeURIComponent(id)}/unread`,
+        method: 'PUT',
+        body: undefined,
+      };
     }
 
     if (method === 'PUT' && basePath.startsWith('/api/mail/') && basePath.endsWith('/folder')) {
@@ -284,7 +288,7 @@ export async function get(path, opts = {}) {
   const remapped = remapLegacyEndpoint(path, 'GET', undefined);
   const silent = !!opts.silent;
   const u = url(remapped.path);
-  const u2 = silent ? (u + (u.includes('?') ? '&' : '?') + 'x-suppress-error-logging=1') : u;
+  const u2 = silent ? u + (u.includes('?') ? '&' : '?') + 'x-suppress-error-logging=1' : u;
   const fetchOptions = {
     method: remapped.method || 'GET',
     headers: await buildHeaders(opts),
@@ -300,7 +304,7 @@ export async function post(path, body, opts = {}) {
   const remapped = remapLegacyEndpoint(path, 'POST', body);
   const silent = !!opts.silent;
   const u = url(remapped.path);
-  const u2 = silent ? (u + (u.includes('?') ? '&' : '?') + 'x-suppress-error-logging=1') : u;
+  const u2 = silent ? u + (u.includes('?') ? '&' : '?') + 'x-suppress-error-logging=1' : u;
   const hasRemappedBody = Object.prototype.hasOwnProperty.call(remapped, 'body');
   const finalMethod = remapped.method || 'POST';
   const finalBody =
@@ -326,11 +330,14 @@ export async function post(path, body, opts = {}) {
   }
   const res = await fetch(u2, fetchOptions);
   try {
-    const isParseDialog = String(u2 || '').endsWith('/api/ai/parse-dialog') || String(path || '').includes('/api/ai/parse-dialog');
+    const isParseDialog =
+      String(u2 || '').endsWith('/api/ai/parse-dialog') ||
+      String(path || '').includes('/api/ai/parse-dialog');
     if (isParseDialog && res && res.ok) {
-      const seemsCommand = /\b(agrega|añade|anade|crea|programa|planifica|borra|elimina|actualiza|modifica|cambia|mueve|reprograma|marca|completa|asigna|busca|importa|env[ií]a|enviar)\b/i.test(
-        (body && body.text) || ''
-      );
+      const seemsCommand =
+        /\b(agrega|añade|anade|crea|programa|planifica|borra|elimina|actualiza|modifica|cambia|mueve|reprograma|marca|completa|asigna|busca|importa|env[ií]a|enviar)\b/i.test(
+          (body && body.text) || ''
+        );
       res
         .clone()
         .json()
@@ -346,11 +353,18 @@ export async function post(path, body, opts = {}) {
                 (ex.budgetMovements && ex.budgetMovements.length)
             );
             if (seemsCommand && !hasAny) {
-              performanceMonitor.logError('chat_command_unhandled', 'No se encontró comando ejecutable', {
+              performanceMonitor.logError(
+                'chat_command_unhandled',
+                'No se encontró comando ejecutable',
+                {
+                  text: (body && body.text) || '',
+                }
+              );
+              performanceMonitor.incrementCounter('chat_unhandled');
+              performanceMonitor.logEvent('chat_alert', {
+                reason: 'unhandled_command',
                 text: (body && body.text) || '',
               });
-              performanceMonitor.incrementCounter('chat_unhandled');
-              performanceMonitor.logEvent('chat_alert', { reason: 'unhandled_command', text: (body && body.text) || '' });
               performanceMonitor.flushMetrics?.();
             }
           } catch {}
@@ -365,7 +379,7 @@ export async function put(path, body, opts = {}) {
   const remapped = remapLegacyEndpoint(path, 'PUT', body);
   const silent = !!opts.silent;
   const u = url(remapped.path);
-  const u2 = silent ? (u + (u.includes('?') ? '&' : '?') + 'x-suppress-error-logging=1') : u;
+  const u2 = silent ? u + (u.includes('?') ? '&' : '?') + 'x-suppress-error-logging=1' : u;
   const hasRemappedBody = Object.prototype.hasOwnProperty.call(remapped, 'body');
   const finalMethod = remapped.method || 'PUT';
   const finalBody =
@@ -397,7 +411,7 @@ export async function del(path, opts = {}) {
   const remapped = remapLegacyEndpoint(path, 'DELETE', undefined);
   const silent = !!opts.silent;
   const u = url(remapped.path);
-  const u2 = silent ? (u + (u.includes('?') ? '&' : '?') + 'x-suppress-error-logging=1') : u;
+  const u2 = silent ? u + (u.includes('?') ? '&' : '?') + 'x-suppress-error-logging=1' : u;
   const hasRemappedBody = Object.prototype.hasOwnProperty.call(remapped, 'body');
   const finalMethod = remapped.method || 'DELETE';
   const finalBody =
@@ -444,12 +458,7 @@ export function buildAuthHeaders(user, extra = {}) {
     token = user.trim();
   } else if (user && typeof user === 'object') {
     token =
-      user.token ||
-      user.accessToken ||
-      user.idToken ||
-      user.authToken ||
-      user.bearerToken ||
-      null;
+      user.token || user.accessToken || user.idToken || user.authToken || user.bearerToken || null;
     if (!token && typeof user.getIdToken === 'function') {
       // Guardar referencia para resolución lazy en buildHeaders mediante auth=true
       opts.auth = opts.auth !== undefined ? opts.auth : true;
