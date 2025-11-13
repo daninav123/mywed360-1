@@ -283,11 +283,10 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
         if (constraints.length && typeof fQuery === 'function') {
           q = fQuery(colRef, ...constraints);
         }
-      } catch {}
-      if (import.meta.env.DEV)
-        // console.log(
-          `[useWeddingCollection] Iniciando listener para weddings/${weddingId}/${subName}`
-        );
+      } catch {
+        // Error ignored
+      }
+      // if (import.meta.env.DEV) console.log(`[useWeddingCollection] Iniciando listener para weddings/${weddingId}/${subName}`);
       // ⭐ OPTIMIZADO: Debounce para reducir actualizaciones excesivas
       let debounceTimer = null;
       
@@ -319,7 +318,9 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
                     const bs = String(bv);
                     return as.localeCompare(bs) * dirMul;
                   });
-                } catch {}
+                } catch (e) {
+                  // Sort error ignored
+                }
               }
               lastLocalWriteRef.current = Date.now();
               lsSet(weddingId, subName, arr);
