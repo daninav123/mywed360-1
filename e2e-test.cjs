@@ -41,7 +41,7 @@ async function runE2ETest() {
   try {
     console.log('📍 Navegando a http://localhost:5173...');
     const response = await page.goto('http://localhost:5173', {
-      waitUntil: 'networkidle',
+      waitUntil: 'load',
       timeout: 30000
     });
     

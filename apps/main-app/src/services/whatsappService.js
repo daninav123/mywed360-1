@@ -99,8 +99,8 @@ export async function sendText({
     };
     const base = BASE ? BASE.replace(/\/$/, '') : '';
     const url = base ? `${base}/api/whatsapp/send` : `/api/whatsapp/send`;
-    if (import.meta.env.DEV)
-    const res = await fetch(url, {
+    // if (import.meta.env.DEV) console.log('[WhatsAppService] Sending message:', { to, message, url });
+    const response = await fetch(url, {
       method: 'POST',
       headers,
       body: JSON.stringify({
@@ -118,15 +118,16 @@ export async function sendText({
     });
     const json = await res.json().catch(() => ({}));
     if (import.meta.env.DEV)
-      // console.log('[whatsappService] sendText ←', { status: res.status, ok: res.ok, body: json });
-    if (!res.ok || json.success === false) {
-      const msg = json?.error || `HTTP ${res.status}`;
-      return { success: false, error: msg };
-    }
+      if (!res.ok || json.success === false) {
+        // console.log('[whatsappService] sendText ←', { status: res.status, ok: res.ok, body: json });
+        const msg = json?.error || `HTTP ${res.status}`;
+        return { success: false, error: msg };
+      }
     return json;
   } catch (e) {
-    if (import.meta.env.DEV) // console.warn('[whatsappService] sendText exception', e);
-    return { success: false, error: e.message || 'error' };
+    if (import.meta.env.DEV)
+      // console.warn('[whatsappService] sendText exception', e);
+      return { success: false, error: e.message || 'error' };
   }
 }
 
