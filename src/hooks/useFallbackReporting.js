@@ -8,10 +8,10 @@ import { post as apiPost } from '../services/apiClient';
 
 /**
  * Hook para reportar activaciones de fallback al sistema de monitoreo
- * 
+ *
  * @example
  * const { reportFallback } = useFallbackReporting();
- * 
+ *
  * try {
  *   const result = await fetchFromAPI();
  * } catch (error) {
@@ -24,7 +24,7 @@ export function useFallbackReporting() {
 
   /**
    * Reporta activación de fallback al backend
-   * 
+   *
    * @param {string} service - Nombre del servicio que falló (ej: 'ai-suppliers', 'email-service')
    * @param {Error|string} error - Error que causó el fallback
    * @param {object} metadata - Metadata adicional (endpoint, query params, etc)
@@ -66,10 +66,7 @@ export function useFallbackReporting() {
         if (response?.ok) {
           const result = await response.json();
           if (import.meta.env.DEV) {
-            // console.debug(`[useFallbackReporting] Reported to backend:`, {
-              service,
-              count: result.count,
-            });
+            // console.debug(`[useFallbackReporting] Reported to backend:`, { service, count: result.count });
           }
         } else {
           // Falló el reporte, pero no es crítico

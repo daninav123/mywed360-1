@@ -89,8 +89,7 @@ function disableRemoteGamification(reason) {
   remoteDisabled = true;
   remoteDisableReason =
     typeof reason === 'string' ? reason : reason?.message || reason?.status || 'remote-disabled';
-  if (typeof console !== 'undefined') {
-  }
+  // if (typeof console !== 'undefined') - debug removed
   if (typeof window !== 'undefined') {
     window.__GAMIFICATION_REMOTE_DISABLED__ = remoteDisableReason;
   }

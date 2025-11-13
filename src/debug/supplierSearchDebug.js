@@ -161,8 +161,7 @@ export const supplierDebug = {
         return emitEvent(type, payload);
       },
     };
-    if (console?.info) {
-    }
+    // if (console?.info) - debug removed
   },
 };
 
@@ -171,4 +170,3 @@ if (typeof window !== 'undefined') {
 }
 
 export default supplierDebug;
-

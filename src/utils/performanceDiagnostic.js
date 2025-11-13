@@ -31,7 +31,6 @@ window.setInterval = function (...args) {
     args: args[1], // delay
   });
 
-
   return id;
 };
 
@@ -81,8 +80,7 @@ export function trackRender(componentName) {
   const now = Date.now();
   const timeSinceLast = now - lastRenderTime;
 
-  if (timeSinceLast < 100) {
-  }
+  // if (timeSinceLast < 100) - debug removed
 
   lastRenderTime = now;
 }
@@ -117,9 +115,6 @@ export function monitorFirestore() {
 // Reporte completo
 export function generateReport() {
   console.group('📊 REPORTE DE RENDIMIENTO');
-
-
-
 
   // console.log('💾 MEMORIA:', getMemoryInfo());
 
