@@ -156,8 +156,12 @@ export default function RecommendedSuppliers({ onClose }) {
           <SupplierCard
             key={supplier.id || supplier.slug}
             supplier={supplier}
-            onContact={(info) => // console.log('Contact:', info)}
-            onViewDetails={(s) => // console.log('View details:', s)}
+            onContact={(info) => {
+              // console.log('Contact:', info)
+            }}
+            onViewDetails={(s) => {
+              // console.log('View details:', s)
+            }}
           />
         ))}
       </div>

@@ -65,7 +65,7 @@ const normalizeWeddingDate = (value) => {
   return parsed;
 };
 
-const formatDate = (date) => date ? formatDateUtil(date, 'custom') : '';
+const formatDate = (date) => (date ? formatDateUtil(date, 'custom') : '');
 
 export default function Momentos() {
   const { activeWedding, weddingsReady, activeWeddingData } = useWedding();
@@ -89,11 +89,7 @@ export default function Momentos() {
           null
       ) || null
     );
-  }, [
-    activeWeddingData?.weddingDate,
-    activeWeddingData?.date,
-    activeWeddingData?.eventDate,
-  ]);
+  }, [activeWeddingData?.weddingDate, activeWeddingData?.date, activeWeddingData?.eventDate]);
   const weddingEventDateKey = weddingEventDate ? weddingEventDate.toISOString() : null;
 
   useEffect(() => {
@@ -129,7 +125,9 @@ export default function Momentos() {
           .then((unsubscribe) => {
             unsubPhotos = unsubscribe;
           })
-          .catch((error) => // console.error('listenPhotos error', error));
+          .catch(() => {
+            // Error ignored
+          });
         listenGuestTokens(
           activeWedding,
           (items) => {
@@ -143,17 +141,20 @@ export default function Momentos() {
           .then((unsubscribe) => {
             unsubTokens = unsubscribe;
           })
-          .catch((error) => // console.error('listenGuestTokens error', error));
+          .catch(() => {
+            // Error ignored
+          });
 
-        listenGuestProgress(
-          activeWedding,
-          (records) => setGuestProgress(records),
-          { albumId: ALBUM_ID, limit: 100 }
-        )
+        listenGuestProgress(activeWedding, (records) => setGuestProgress(records), {
+          albumId: ALBUM_ID,
+          limit: 100,
+        })
           .then((unsubscribe) => {
             unsubGuestProgress = unsubscribe;
           })
-          .catch((error) => // console.error('listenGuestProgress error', error));
+          .catch(() => {
+            // Error ignored
+          });
       })
       .catch((error) => {
         // console.error('Error inicializando la galería de recuerdos', error);
@@ -174,12 +175,8 @@ export default function Momentos() {
   useEffect(() => {
     if (!activeWedding || !album) return;
     const albumEventDate = getAlbumEventDate(album);
-    const albumDateKey = albumEventDate
-      ? albumEventDate.toISOString().slice(0, 10)
-      : null;
-    const weddingDateKey = weddingEventDate
-      ? weddingEventDate.toISOString().slice(0, 10)
-      : null;
+    const albumDateKey = albumEventDate ? albumEventDate.toISOString().slice(0, 10) : null;
+    const weddingDateKey = weddingEventDate ? weddingEventDate.toISOString().slice(0, 10) : null;
 
     if (!weddingEventDate && !albumEventDate) return;
     if (albumDateKey === weddingDateKey) return;
@@ -214,10 +211,7 @@ export default function Momentos() {
 
   const scenes = getAlbumScenes(album);
   const sceneSummary = summarizeByScene(approvedPhotos);
-  const uploadState = useMemo(
-    () => (album ? getGalleryUploadState(album) : null),
-    [album]
-  );
+  const uploadState = useMemo(() => (album ? getGalleryUploadState(album) : null), [album]);
   const handleCreateToken = async () => {
     if (!activeWedding) return;
     try {
@@ -253,7 +247,7 @@ export default function Momentos() {
   const handleReject = async (photo) => {
     const reason =
       typeof window !== 'undefined'
-      ? window.prompt('Motivo del rechazo', 'No cumple con la guía de la galería')
+        ? window.prompt('Motivo del rechazo', 'No cumple con la guía de la galería')
         : 'Rechazado';
     if (reason === null) return;
     try {
@@ -347,7 +341,8 @@ export default function Momentos() {
           )}
           {uploadState?.compressionActive && uploadState.isWindowOpen && (
             <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
-              Hemos superado los 30&nbsp;GB de espacio. Las nuevas fotos se comprimen automáticamente para optimizar el almacenamiento en Firebase.
+              Hemos superado los 30&nbsp;GB de espacio. Las nuevas fotos se comprimen
+              automáticamente para optimizar el almacenamiento en Firebase.
             </div>
           )}
           <AlbumOverview
@@ -387,9 +382,7 @@ export default function Momentos() {
             </div>
             <div className="text-sm text-gray-500">
               {approvedPhotos.length} fotos aprobadas ·{' '}
-              {sceneSummary?.scenes
-                ? Object.keys(sceneSummary.scenes).length
-                : scenes.length}{' '}
+              {sceneSummary?.scenes ? Object.keys(sceneSummary.scenes).length : scenes.length}{' '}
               escenas cubiertas
             </div>
           </div>
@@ -401,9 +394,7 @@ export default function Momentos() {
         </div>
       )}
 
-      {activeTab === 'downloads' && (
-        <DownloadBundle fetchLinks={handleFetchDownloadLinks} />
-      )}
+      {activeTab === 'downloads' && <DownloadBundle fetchLinks={handleFetchDownloadLinks} />}
     </PageWrapper>
   );
 }

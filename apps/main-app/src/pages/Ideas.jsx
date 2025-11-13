@@ -392,11 +392,7 @@ export default function Ideas() {
             <DragDropContext onDragEnd={handleDragEnd}>
               <Droppable droppableId="ideas-notes">
                 {(provided) => (
-                  <ul
-                    ref={provided.innerRef}
-                    {...provided.droppableProps}
-                    className="space-y-2"
-                  >
+                  <ul ref={provided.innerRef} {...provided.droppableProps} className="space-y-2">
                     {folderNotes.map((note, index) => (
                       <Draggable key={note.id} draggableId={note.id} index={index}>
                         {(dragProvided, snapshot) => (
@@ -405,7 +401,9 @@ export default function Ideas() {
                             {...dragProvided.draggableProps}
                             {...dragProvided.dragHandleProps}
                             className={`border rounded-md p-3 bg-white shadow-sm transition ${
-                              snapshot.isDragging ? 'shadow-lg ring-2 ring-[var(--color-primary)]' : ''
+                              snapshot.isDragging
+                                ? 'shadow-lg ring-2 ring-[var(--color-primary)]'
+                                : ''
                             }`}
                           >
                             <div className="flex items-start justify-between gap-3">
@@ -423,13 +421,9 @@ export default function Ideas() {
                                 </p>
                               )}
                               <div className="flex flex-col gap-2 text-xs text-gray-500 items-end">
-                                <span>
-                                  Creada: {formatDate(note.createdAt, 'custom')}
-                                </span>
+                                <span>Creada: {formatDate(note.createdAt, 'custom')}</span>
                                 {note.updatedAt && note.updatedAt !== note.createdAt && (
-                                  <span>
-                                    Editada: {formatDate(note.updatedAt, 'custom')}
-                                  </span>
+                                  <span>Editada: {formatDate(note.updatedAt, 'custom')}</span>
                                 )}
                                 <div className="flex gap-2">
                                   {editingNoteId === note.id ? (
@@ -575,7 +569,9 @@ function IdeasBlogSection() {
       mergeWithExisting: true,
       showNotification: false,
     })
-      .catch((error) => // console.warn('[IdeasBlogSection] Error guardando posts', error))
+      .catch(() => {
+        // console.warn('[IdeasBlogSection] Error guardando posts', error)
+      })
       .finally(() => setIsSaving(false));
   }, [posts, docPath, useFirestore]);
 
