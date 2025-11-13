@@ -51,7 +51,7 @@ async function getAuthToken({ refresh = true } = {}) {
       return null;
     }
 
-    if (DEBUG) // console.log('[apiClient] Usuario encontrado:', user.uid);
+    // if (DEBUG) console.log('[apiClient] Usuario encontrado:', user.uid);
 
     // Siempre intentar obtener token fresco de Firebase
     // No confiar en el token almacenado porque puede estar expirado
@@ -86,8 +86,10 @@ async function getAuthToken({ refresh = true } = {}) {
             rememberToken(fallbackToken);
             return fallbackToken;
           }
-        } catch (fallbackErr) {
-          // console.error('[apiClient] Error obtaining cached auth token:', fallbackErr.message || fallbackErr);
+        } catch (error) {
+          // if (DEBUG) console.warn('[apiClient] Fallo obteniendo token:', error.message);
+          const cached = window.localStorage?.getItem('fb_auth_token');
+          if (cached) return cached;
         }
       }
     }
