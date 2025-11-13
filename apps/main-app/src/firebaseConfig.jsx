@@ -33,17 +33,11 @@ const inferredStorageBucket =
   (rawFirebaseConfig.projectId ? `${rawFirebaseConfig.projectId}.appspot.com` : '');
 
 if (!rawFirebaseConfig.authDomain && inferredAuthDomain && typeof console !== 'undefined') {
-  // console.warn(
-    '[firebaseConfig] VITE_FIREBASE_AUTH_DOMAIN ausente; usando dominio inferido:',
-    inferredAuthDomain
-  );
+  // console.warn('[firebaseConfig] VITE_FIREBASE_AUTH_DOMAIN ausente; usando dominio inferido:', inferredAuthDomain);
 }
 
 if (!rawFirebaseConfig.storageBucket && inferredStorageBucket && typeof console !== 'undefined') {
-  // console.warn(
-    '[firebaseConfig] VITE_FIREBASE_STORAGE_BUCKET ausente; usando bucket inferido:',
-    inferredStorageBucket
-  );
+  // console.warn('[firebaseConfig] VITE_FIREBASE_STORAGE_BUCKET ausente; usando bucket inferido:', inferredStorageBucket);
 }
 
 const firebaseConfig = {

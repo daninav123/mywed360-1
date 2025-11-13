@@ -379,8 +379,9 @@ export const AuthProvider = ({ children }) => {
             role: 'admin',
             provider: 'admin-local',
           });
-        } catch {}
-
+        } catch {
+          // Error parsing session data
+        }
 
         return true;
       } catch (error) {

@@ -92,8 +92,7 @@ export function WeddingProvider({ children }) {
         const weddings = Array.isArray(mockWedding.weddings) ? mockWedding.weddings : [];
         const activeWedding =
           mockWedding.activeWedding?.id || (weddings.length > 0 ? weddings[0].id : '');
-        if (import.meta.env.DEV) {
-        }
+        // Debug logging removed
         return { weddings, activeWedding };
       }
 

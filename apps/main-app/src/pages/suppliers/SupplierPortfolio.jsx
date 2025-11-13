@@ -63,10 +63,7 @@ export default function SupplierPortfolio() {
       const token = localStorage.getItem('supplier_token');
       const supplierId = localStorage.getItem('supplier_id');
 
-      // console.log(
-        '[SupplierPortfolio] Token:',
-        token ? `${token.substring(0, 20)}...` : 'NO TOKEN'
-      );
+      // console.log('[SupplierPortfolio] Token:', token ? `${token.substring(0, 20)}...` : 'NO TOKEN');
       // console.log('[SupplierPortfolio] Supplier ID:', supplierId);
 
       if (!token || token === 'null' || token === 'undefined') {

@@ -283,8 +283,10 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
         if (constraints.length && typeof fQuery === 'function') {
           q = fQuery(colRef, ...constraints);
         }
-      } catch {}
-      if (import.meta.env.DEV)
+      } catch {
+        // Error ignored
+      }
+      // if (import.meta.env.DEV) - debug removed
       // ⭐ OPTIMIZADO: Debounce para reducir actualizaciones excesivas
       let debounceTimer = null;
       
@@ -375,12 +377,10 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
                 if (resp?.ok) {
                   try {
                     if (typeof unsub === 'function') unsub();
-                  } catch {}
-                  if (import.meta.env.DEV)
-                    // console.debug(
-                      '[useWeddingCollection] reintento de listener tras autofix en 3000ms',
-                      { sub: subName, wedding: weddingId }
-                    );
+                  } catch {
+                    // Error ignored
+                  }
+                  // if (import.meta.env.DEV) console.debug('[useWeddingCollection] reintento de listener tras autofix en 3000ms', { sub: subName, wedding: weddingId });
                   setTimeout(() => listen(), 3000);
                   return;
                 } else {
@@ -399,18 +399,14 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
           }
           
           // ✅ Otros errores (usar caché)
-          if (import.meta.env.DEV)
-            // console.debug('[useWeddingCollection] usando caché local por error en snapshot', {
-              sub: subName,
-              wedding: weddingId,
-              code: err?.code,
-              message: err?.message,
-            });
+          // if (import.meta.env.DEV) console.debug('[useWeddingCollection] usando caché local por error en snapshot', { sub: subName, wedding: weddingId, code: err?.code, message: err?.message });
           setData(lsGet(weddingId, subName, fallback));
           setLoading(false);
           try {
             setError(err);
-          } catch {}
+          } catch {
+            // Error setting error state
+          }
         }
       );
     };

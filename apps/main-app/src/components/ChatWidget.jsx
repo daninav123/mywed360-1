@@ -1,4 +1,4 @@
-﻿import { motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Star } from 'lucide-react';
 import { MessageSquare } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
@@ -866,12 +866,7 @@ export default function ChatWidget() {
           error: backendFallback?.error || `http_${response.status}`,
           details: backendFallback?.details || backendFallback?.message || null,
         };
-        // console.warn(
-          '[ChatWidget] Backend IA respondió',
-          response.status,
-          response.statusText,
-          data.error || '(sin detalle)'
-        );
+        // console.warn('[ChatWidget] Backend IA respondió', response.status, response.statusText, data.error || '(sin detalle)');
         toast.warn(t('chat.messages.offlineTemporary'), { autoClose: 2500 });
       }
 

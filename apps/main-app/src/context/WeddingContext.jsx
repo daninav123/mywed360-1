@@ -92,12 +92,7 @@ export function WeddingProvider({ children }) {
         const weddings = Array.isArray(mockWedding.weddings) ? mockWedding.weddings : [];
         const activeWedding =
           mockWedding.activeWedding?.id || (weddings.length > 0 ? weddings[0].id : '');
-        if (import.meta.env.DEV) {
-          // console.log('[WeddingContext] Usando mock de window.__MOCK_WEDDING__', {
-            weddings,
-            activeWedding,
-          });
-        }
+        // if (import.meta.env.DEV) console.log('[WeddingContext] Usando mock de window.__MOCK_WEDDING__', { weddings, activeWedding });
         return { weddings, activeWedding };
       }
 
