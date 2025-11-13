@@ -263,9 +263,7 @@ export default function RFQModal({
               value={tplId}
               onChange={(e) => applyTemplate(e.target.value)}
             >
-              <option value="">
-                {t('suppliers.rfqModal.templates.placeholder')}
-              </option>
+              <option value="">{t('suppliers.rfqModal.templates.placeholder')}</option>
               {templates
                 .filter((t) => !tplService || !t.service || t.service === tplService)
                 .map((t) => (
@@ -351,9 +349,7 @@ export default function RFQModal({
         {/* Variables y adjuntos */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <p className="text-xs text-gray-500 mb-1">
-              {t('suppliers.rfqModal.variablesLabel')}
-            </p>
+            <p className="text-xs text-gray-500 mb-1">{t('suppliers.rfqModal.variablesLabel')}</p>
             <div className="flex flex-wrap gap-2">
               {Object.keys(variables).map((v) => (
                 <button
@@ -425,16 +421,16 @@ export default function RFQModal({
                       key={day}
                       type="button"
                       onClick={() => toggleReminder(day)}
-                    className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
-                      active
-                        ? 'bg-indigo-600 border-indigo-600 text-white shadow-sm'
-                        : 'bg-white border-indigo-200 text-indigo-600 hover:bg-indigo-100'
-                    }`}
-                  >
-                    {t('suppliers.rfqModal.reminders.add', { day })}
-                  </button>
-                );
-              })}
+                      className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
+                        active
+                          ? 'bg-indigo-600 border-indigo-600 text-white shadow-sm'
+                          : 'bg-white border-indigo-200 text-indigo-600 hover:bg-indigo-100'
+                      }`}
+                    >
+                      {t('suppliers.rfqModal.reminders.add', { day })}
+                    </button>
+                  );
+                })}
               </div>
               <p className="text-[11px] text-indigo-600 mt-2">
                 {remindersActive
@@ -510,11 +506,7 @@ export default function RFQModal({
                       }
                       setAttachments((prev) => [...prev, ...uploaded]);
                     } catch (e) {
-                      // console.warn(
-                        t('suppliers.rfqModal.errors.upload', {
-                          message: e?.message || e,
-                        })
-                      );
+                      console.error(`Error subiendo: ${e?.message || e}`);
                     } finally {
                       setUploading(false);
                       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -537,9 +529,7 @@ export default function RFQModal({
         </div>
         {/* Vista previa */}
         <div className="border rounded p-3 bg-gray-50">
-          <p className="text-xs text-gray-500 mb-1">
-            {t('suppliers.rfqModal.preview.title')}
-          </p>
+          <p className="text-xs text-gray-500 mb-1">{t('suppliers.rfqModal.preview.title')}</p>
           <p className="font-medium">
             {t('suppliers.rfqModal.preview.subject')}{' '}
             {previewTarget ? interpolate(subject, previewTarget) : subject}

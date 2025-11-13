@@ -77,10 +77,7 @@ export default function SupplierPortfolio() {
         params.append('category', selectedCategory);
       }
 
-      // console.log(
-        '[SupplierPortfolio] Haciendo petición a:',
-        `/api/supplier-dashboard/portfolio?${params.toString()}`
-      );
+      // console.log('[SupplierPortfolio] Haciendo petición a:', `/api/supplier-dashboard/portfolio?${params.toString()}`);
 
       const response = await fetch(`/api/supplier-dashboard/portfolio?${params.toString()}`, {
         headers: { Authorization: `Bearer ${token}` },
