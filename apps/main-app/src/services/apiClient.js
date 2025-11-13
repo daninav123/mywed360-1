@@ -51,7 +51,7 @@ async function getAuthToken({ refresh = true } = {}) {
       return null;
     }
 
-    // if (DEBUG) console.log('[apiClient] Usuario encontrado:', user.uid);
+    if (DEBUG) // console.log('[apiClient] Usuario encontrado:', user.uid);
 
     // Siempre intentar obtener token fresco de Firebase
     // No confiar en el token almacenado porque puede estar expirado
@@ -80,7 +80,7 @@ async function getAuthToken({ refresh = true } = {}) {
         
         // Intentar obtener token sin refrescar (puede fallar si está expirado)
         try {
-          if (DEBUG) // console.log('[apiClient] Intentando token sin refresh...');
+          // if (DEBUG) console.log('[apiClient] Intentando token sin refresh...');
           const fallbackToken = await user.getIdToken(false);
           if (fallbackToken) {
             rememberToken(fallbackToken);
