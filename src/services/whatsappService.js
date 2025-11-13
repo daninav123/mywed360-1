@@ -99,7 +99,7 @@ export async function sendText({
     };
     const base = BASE ? BASE.replace(/\/$/, '') : '';
     const url = base ? `${base}/api/whatsapp/send` : `/api/whatsapp/send`;
-    if (import.meta.env.DEV)
+    // if (import.meta.env.DEV) - debug removed
     const res = await fetch(url, {
       method: 'POST',
       headers,

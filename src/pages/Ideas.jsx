@@ -568,7 +568,9 @@ function IdeasBlogSection() {
       mergeWithExisting: true,
       showNotification: false,
     })
-      .catch((error) => // console.warn('[IdeasBlogSection] Error guardando posts', error))
+      .catch((error) => {
+        // console.warn('[IdeasBlogSection] Error guardando posts', error)
+      })
       .finally(() => setIsSaving(false));
   }, [posts, docPath, useFirestore]);
 

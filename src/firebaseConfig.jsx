@@ -32,11 +32,8 @@ const inferredStorageBucket =
   rawFirebaseConfig.storageBucket ||
   (rawFirebaseConfig.projectId ? `${rawFirebaseConfig.projectId}.appspot.com` : '');
 
-if (!rawFirebaseConfig.authDomain && inferredAuthDomain && typeof console !== 'undefined') {
-}
-
-if (!rawFirebaseConfig.storageBucket && inferredStorageBucket && typeof console !== 'undefined') {
-}
+// if (!rawFirebaseConfig.authDomain && inferredAuthDomain && typeof console !== 'undefined') - debug removed
+// if (!rawFirebaseConfig.storageBucket && inferredStorageBucket && typeof console !== 'undefined') - debug removed
 
 const firebaseConfig = {
   ...rawFirebaseConfig,

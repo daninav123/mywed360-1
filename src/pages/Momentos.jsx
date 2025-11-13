@@ -143,7 +143,9 @@ export default function Momentos() {
           .then((unsubscribe) => {
             unsubTokens = unsubscribe;
           })
-          .catch((error) => // console.error('listenGuestTokens error', error));
+          .catch((error) => {
+            // console.error('listenGuestTokens error', error)
+          });
 
         listenGuestProgress(
           activeWedding,
@@ -153,7 +155,9 @@ export default function Momentos() {
           .then((unsubscribe) => {
             unsubGuestProgress = unsubscribe;
           })
-          .catch((error) => // console.error('listenGuestProgress error', error));
+          .catch((error) => {
+            // console.error('listenGuestProgress error', error)
+          });
       })
       .catch((error) => {
         // console.error('Error inicializando la galería de recuerdos', error);
