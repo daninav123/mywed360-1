@@ -57,7 +57,7 @@ async function getAuthToken({ refresh = true } = {}) {
     // No confiar en el token almacenado porque puede estar expirado
     if (user.getIdToken) {
       try {
-        if (DEBUG) // console.log('[apiClient] Solicitando token fresco...');
+        // if (DEBUG) console.log('[apiClient] Solicitando token fresco...');
         const token = await user.getIdToken(true); // Siempre refrescar
         if (token) {
           if (DEBUG) {
