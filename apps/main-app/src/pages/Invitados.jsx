@@ -326,10 +326,8 @@ function Invitados() {
   // Difusión (lista de difusión vía extensión)
   const handleSendSelectedBroadcast = async () => {
     try {
-      onOpenChange: () => {},
-      onClick: () => {
-        // console.log('[Invitados] handleSendSelectedBroadcast click', { selectedIds });
-        if (!selectedIds.length) {
+      // console.log('[Invitados] handleSendSelectedBroadcast click', { selectedIds });
+      if (!selectedIds.length) {
         alert(t('guests.noneSelected', { defaultValue: 'No hay invitados seleccionados' }));
         return;
       }
@@ -767,10 +765,7 @@ function Invitados() {
   // Enviar API a seleccionados
   const handleSendSelectedApi = async () => {
     try {
-      if (import.meta.env.DEV)
-        // console.log('[Invitados] handleSendSelectedApi click', {
-          selectedCount: selectedIds.length,
-        });
+      // if (import.meta.env.DEV) console.log('[Invitados] handleSendSelectedApi click', { selectedCount: selectedIds.length });
       if (!selectedIds.length) {
         alert(t('guests.noneSelected', { defaultValue: 'No hay invitados seleccionados' }));
         return;
