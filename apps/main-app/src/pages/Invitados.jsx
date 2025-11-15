@@ -39,8 +39,9 @@ import { toE164, schedule as scheduleWhats } from '../services/whatsappService';
  */
 function Invitados() {
   // Detectar si estamos en modo test
-  const isTestMode = typeof window !== 'undefined' && (window.Cypress || window.__MALOVEAPP_TEST_MODE__);
-  
+  const isTestMode =
+    typeof window !== 'undefined' && (window.Cypress || window.__MALOVEAPP_TEST_MODE__);
+
   // Estados para modales
   const [showGuestModal, setShowGuestModal] = useState(false);
   const [editingGuest, setEditingGuest] = useState(null);
@@ -152,7 +153,8 @@ function Invitados() {
       const connectorRaw = t('guests.saveTheDate.connector', { defaultValue: 'and' }) || 'and';
       const connector = connectorRaw.trim() || 'and';
 
-      const defaultPrimary = t('guests.saveTheDate.primaryFallback', { defaultValue: 'us' }) || 'us';
+      const defaultPrimary =
+        t('guests.saveTheDate.primaryFallback', { defaultValue: 'us' }) || 'us';
       const defaultCoupleLabel =
         t('guests.saveTheDate.coupleFallback', { defaultValue: 'our wedding' }) || 'our wedding';
 
@@ -160,7 +162,9 @@ function Invitados() {
       const secondaryName = p1 && p2 ? p2 : '';
       const p2Suffix = secondaryName ? ` ${connector} ${secondaryName}` : '';
 
-      const coupleName = secondaryName ? `${primaryName}${p2Suffix}` : primaryName || defaultCoupleLabel;
+      const coupleName = secondaryName
+        ? `${primaryName}${p2Suffix}`
+        : primaryName || defaultCoupleLabel;
 
       const dateRaw =
         wi.weddingDate || wi.date || wList.weddingDate || wList.date || wi.ceremonyDate || '';
@@ -213,10 +217,7 @@ function Invitados() {
   const defaultInvitationAsset = React.useMemo(() => {
     const wi = activeWeddingInfo?.weddingInfo || {};
     return (
-      wi.invitationAssetUrl ||
-      wi.invitationAsset ||
-      activeWeddingInfo?.invitation?.assetUrl ||
-      ''
+      wi.invitationAssetUrl || wi.invitationAsset || activeWeddingInfo?.invitation?.assetUrl || ''
     );
   }, [activeWeddingInfo]);
 
@@ -242,11 +243,7 @@ function Invitados() {
     const info = activeWeddingInfo?.weddingInfo || {};
     const contact = info.printingContact || {};
     const addressBlock =
-      info.printingAddress ||
-      info.ownerAddress ||
-      info.postalAddress ||
-      info.addressObject ||
-      {};
+      info.printingAddress || info.ownerAddress || info.postalAddress || info.addressObject || {};
     const line1 =
       addressBlock.line1 ||
       addressBlock.addressLine1 ||
@@ -262,8 +259,7 @@ function Invitados() {
       '';
     const city = addressBlock.city || info.addressCity || '';
     const state = addressBlock.state || info.addressState || '';
-    const postalCode =
-      addressBlock.postalCode || addressBlock.zip || info.addressZip || '';
+    const postalCode = addressBlock.postalCode || addressBlock.zip || info.addressZip || '';
     const country = addressBlock.country || info.addressCountry || '';
     return {
       name: contact.name || info.printingContactName || info.ownerName || coupleLabel,
@@ -416,11 +412,7 @@ function Invitados() {
       return;
     }
     const currentTables = Array.from(
-      new Set(
-        (guests || [])
-          .filter((g) => selectedIds.includes(g.id))
-          .map((g) => g.table || '')
-      )
+      new Set((guests || []).filter((g) => selectedIds.includes(g.id)).map((g) => g.table || ''))
     );
     const promptLabel =
       currentTables.length === 1 && currentTables[0]
@@ -452,18 +444,18 @@ function Invitados() {
     setIsLoadingSamples(true);
     try {
       const result = await loadSampleGuests({ fixture: 'guests-demo.json', replace: true });
-        if (!result?.success) {
-          const reason = result?.error ? ` (${result.error})` : '';
-          notify(`No se pudieron cargar los invitados de ejemplo${reason}`, 'warning');
-        } else {
-          notify(`Se cargaron ${result.count || 0} invitado(s) de ejemplo.`, 'success');
-        }
-      } catch (error) {
-        // console.error('[Invitados] loadSampleGuests error', error);
-        notify('Error cargando los invitados de ejemplo', 'error');
-      } finally {
-        setIsLoadingSamples(false);
+      if (!result?.success) {
+        const reason = result?.error ? ` (${result.error})` : '';
+        notify(`No se pudieron cargar los invitados de ejemplo${reason}`, 'warning');
+      } else {
+        notify(`Se cargaron ${result.count || 0} invitado(s) de ejemplo.`, 'success');
       }
+    } catch (error) {
+      // console.error('[Invitados] loadSampleGuests error', error);
+      notify('Error cargando los invitados de ejemplo', 'error');
+    } finally {
+      setIsLoadingSamples(false);
+    }
   }, [isLoadingSamples, loadSampleGuests, notify]);
 
   const stopScanning = React.useCallback(() => {
@@ -773,7 +765,7 @@ function Invitados() {
       const res = await inviteSelectedWhatsAppApi(selectedIds, undefined, {
         coupleName: coupleLabel,
       });
-      if (import.meta.env.DEV) // console.log('[Invitados] handleSendSelectedApi result', res);
+      // if (import.meta.env.DEV) console.log('[Invitados] handleSendSelectedApi result', res);
       if (res?.cancelled) {
         alert('Acción cancelada');
         return;
@@ -810,17 +802,16 @@ function Invitados() {
       );
     } catch (e) {
       // console.warn('Error envío seleccionados (API):', e);
-      alert(t('guests.whatsapp.selectedUnexpected', { defaultValue: 'Error enviando a seleccionados' }));
+      alert(
+        t('guests.whatsapp.selectedUnexpected', { defaultValue: 'Error enviando a seleccionados' })
+      );
     }
   };
 
   // Enviar por móvil personal (preferir "una sola acción" vía extensión)
   const handleSendSelectedMobile = async () => {
     try {
-      if (import.meta.env.DEV)
-        // console.log('[Invitados] handleSendSelectedMobile click', {
-          selectedCount: selectedIds.length,
-        });
+      // if (import.meta.env.DEV) console.log('[Invitados] handleSendSelectedMobile click', { selectedCount: selectedIds.length });
       if (!selectedIds.length) {
         alert('No hay invitados seleccionados');
         return;
@@ -968,7 +959,6 @@ function Invitados() {
     setShowWhatsModal(false);
     setWhatsGuest(null);
   };
-
 
   // Importar contactos seleccionados
   const handleImportedGuests = async (importedGuests) => {
@@ -1372,9 +1362,7 @@ function Invitados() {
               <Button variant="outline" onClick={handleCloseRsvpSummary}>
                 {t('app.close', { defaultValue: 'Cerrar' })}
               </Button>
-              <Button onClick={handlePrintRsvpPdf}>
-                Imprimir / PDF
-              </Button>
+              <Button onClick={handlePrintRsvpPdf}>Imprimir / PDF</Button>
             </div>
           </div>
         </Modal>
@@ -1395,9 +1383,7 @@ function Invitados() {
               </div>
               <div className="bg-white p-4 rounded-lg border">
                 <div className="text-xs uppercase text-muted">Pendientes</div>
-                <div className="text-2xl font-semibold text-yellow-600">
-                  {checkInStats.pending}
-                </div>
+                <div className="text-2xl font-semibold text-yellow-600">{checkInStats.pending}</div>
               </div>
               <div className="bg-white p-4 rounded-lg border">
                 <div className="text-xs uppercase text-muted">Total</div>
@@ -1440,17 +1426,22 @@ function Invitados() {
               <div className="space-y-3">
                 <div className="bg-white border rounded-lg p-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                   <div>
-                    <h3 className="text-lg font-semibold">{checkInGuest.name || 'Invitado sin nombre'}</h3>
+                    <h3 className="text-lg font-semibold">
+                      {checkInGuest.name || 'Invitado sin nombre'}
+                    </h3>
                     <p className="text-sm text-muted">
                       {checkInGuest.email || 'Sin email'} � {checkInGuest.phone || 'Sin tel�fono'}
                     </p>
                     <p className="text-sm">
-                      Mesa:{' '}
-                      <span className="font-medium">{checkInGuest.table || 'Pendiente'}</span>
+                      Mesa: <span className="font-medium">{checkInGuest.table || 'Pendiente'}</span>
                     </p>
                     <p className="text-sm">
                       Estado:{' '}
-                      <span className={checkInGuest.checkedIn ? 'text-green-600 font-medium' : 'text-muted'}>
+                      <span
+                        className={
+                          checkInGuest.checkedIn ? 'text-green-600 font-medium' : 'text-muted'
+                        }
+                      >
                         {checkInGuest.checkedIn ? 'Presente' : 'Pendiente'}
                       </span>
                     </p>
@@ -1459,8 +1450,7 @@ function Invitados() {
                     </p>
                     {checkInGuest.checkedInAt && (
                       <p className="text-xs text-muted">
-                        Registrado el{' '}
-                        {new Date(checkInGuest.checkedInAt).toLocaleString()}
+                        Registrado el {new Date(checkInGuest.checkedInAt).toLocaleString()}
                       </p>
                     )}
                   </div>
@@ -1482,35 +1472,36 @@ function Invitados() {
                   </div>
                 </div>
 
-                {Array.isArray(checkInGuest.checkInHistory) && checkInGuest.checkInHistory.length > 0 && (
-                  <div className="bg-white border rounded-lg p-4">
-                    <h4 className="font-semibold text-sm mb-2">Historial reciente</h4>
-                    <ul className="space-y-1 max-h-40 overflow-auto text-sm">
-                      {checkInGuest.checkInHistory
-                        .slice()
-                        .reverse()
-                        .slice(0, 8)
-                        .map((entry, idx) => {
-                          let formatted = entry.at || '';
-                          if (entry?.at) {
-                            try {
-                              formatted = new Date(entry.at).toLocaleString();
-                            } catch {
-                              formatted = entry.at;
+                {Array.isArray(checkInGuest.checkInHistory) &&
+                  checkInGuest.checkInHistory.length > 0 && (
+                    <div className="bg-white border rounded-lg p-4">
+                      <h4 className="font-semibold text-sm mb-2">Historial reciente</h4>
+                      <ul className="space-y-1 max-h-40 overflow-auto text-sm">
+                        {checkInGuest.checkInHistory
+                          .slice()
+                          .reverse()
+                          .slice(0, 8)
+                          .map((entry, idx) => {
+                            let formatted = entry.at || '';
+                            if (entry?.at) {
+                              try {
+                                formatted = new Date(entry.at).toLocaleString();
+                              } catch {
+                                formatted = entry.at;
+                              }
                             }
-                          }
-                          return (
-                            <li key={`${entry.at || idx}`} className="flex justify-between gap-2">
-                              <span>
-                                {formatted || 'Sin registro'} � {entry.method || 'manual'}
-                              </span>
-                              <span className="text-muted text-xs">{entry.by || 'sistema'}</span>
-                            </li>
-                          );
-                        })}
-                    </ul>
-                  </div>
-                )}
+                            return (
+                              <li key={`${entry.at || idx}`} className="flex justify-between gap-2">
+                                <span>
+                                  {formatted || 'Sin registro'} � {entry.method || 'manual'}
+                                </span>
+                                <span className="text-muted text-xs">{entry.by || 'sistema'}</span>
+                              </li>
+                            );
+                          })}
+                      </ul>
+                    </div>
+                  )}
               </div>
             )}
           </div>
@@ -1540,7 +1531,6 @@ function Invitados() {
           onSendWhatsApp={handleSendFormalInvites}
           onMarkDelivery={handleMarkFormalDelivery}
         />
-
 
         <WhatsAppSender
           open={showWhatsBatch}
