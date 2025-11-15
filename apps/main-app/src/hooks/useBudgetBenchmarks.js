@@ -57,18 +57,18 @@ const formatSuggestion = (categories, strategy) => {
 };
 
 const readBenchmarkDocument = async (regionKey, bucket) => {
-  const docRef = doc(db, 'budgetBenchmarks', `${regionKey}_${bucket}`);
-  const snap = await getDoc(docRef);
-  if (!snap.exists()) return null;
-  return snap.data();
+  try {
+    const docRef = doc(db, 'budgetBenchmarks', `${regionKey}_${bucket}`);
+    const snap = await getDoc(docRef);
+    if (!snap.exists()) return null;
+    return snap.data();
+  } catch (error) {
+    // Silenciar errores de permisos - benchmarks son opcionales
+    return null;
+  }
 };
 
-export default function useBudgetBenchmarks({
-  country,
-  region,
-  guestCount,
-  enabled = true,
-} = {}) {
+export default function useBudgetBenchmarks({ country, region, guestCount, enabled = true } = {}) {
   const [state, setState] = useState({
     loading: enabled,
     data: null,
