@@ -977,16 +977,24 @@ export default function useFinance() {
                 .map((catId) => SUPPLIER_CATEGORIES.find((c) => c.id === catId)?.name)
                 .filter(Boolean);
 
-              // Actualizar weddings/{id} con wantedServices
-              const mainWeddingRef = doc(db, 'weddings', activeWedding);
-              await updateDoc(mainWeddingRef, {
-                wantedServices: categoryNames,
-                activeCategories: activeCategories,
-                updatedAt: new Date().toISOString(),
-                _autoMigrated: true,
-              });
+              console.log('[useFinance] 📝 Convirtiendo a nombres:', categoryNames);
 
-              // console.log('[useFinance] ✅ Migración automática completada', categoryNames);
+              // Actualizar weddings/{id} con wantedServices (usar setDoc con merge)
+              const mainWeddingRef = doc(db, 'weddings', activeWedding);
+              const { setDoc } = await import('firebase/firestore');
+
+              await setDoc(
+                mainWeddingRef,
+                {
+                  wantedServices: categoryNames,
+                  activeCategories: activeCategories,
+                  updatedAt: new Date().toISOString(),
+                  _autoMigrated: true,
+                },
+                { merge: true }
+              );
+
+              console.log('[useFinance] ✅ Migración automática completada', categoryNames);
 
               // Actualizar providerTemplates localmente para que se sincronicen las categorías
               setProviderTemplates(categoryNames);
