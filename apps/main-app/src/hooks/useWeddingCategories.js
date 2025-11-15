@@ -90,6 +90,20 @@ export function useWeddingCategories() {
         updatedAt: new Date().toISOString(),
       });
 
+      // 🔄 SYNC: Sincronizar con weddings/{id} para que Finance pueda leerlo
+      const mainWeddingRef = doc(db, 'weddings', activeWedding);
+
+      // Convertir IDs de categorías a nombres completos para wantedServices
+      const categoryNames = categories
+        .map((catId) => SUPPLIER_CATEGORIES.find((c) => c.id === catId)?.name)
+        .filter(Boolean);
+
+      await updateDoc(mainWeddingRef, {
+        wantedServices: categoryNames,
+        activeCategories: categories, // También guardamos los IDs por compatibilidad
+        updatedAt: new Date().toISOString(),
+      });
+
       // ⚠️ CRÍTICO: Crear una NUEVA referencia del array para que React detecte el cambio
       setActiveCategories([...categories]);
       // console.log('   ✅ Estado actualizado en hook (nueva referencia del array)');
