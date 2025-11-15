@@ -56,8 +56,10 @@ const getEnv = (key, fallback) => {
 
 // Detectar modo test
 const isTestMode = () => {
-  return getEnv('VITE_TEST_MODE', 'false') === 'true' || 
-         (typeof window !== 'undefined' && window.Cypress);
+  return (
+    getEnv('VITE_TEST_MODE', 'false') === 'true' ||
+    (typeof window !== 'undefined' && window.Cypress)
+  );
 };
 
 const isMockAuthEnabled = () => {
@@ -73,7 +75,9 @@ const ADMIN_SESSION_ID_KEY = 'MaLoveApp_admin_session_id';
 const ADMIN_ALLOWED_DOMAINS = getEnv('VITE_ADMIN_ALLOWED_DOMAINS', 'lovenda.com');
 const isCypressRuntime = () => typeof window !== 'undefined' && !!window.Cypress;
 // Flag para desactivar explícitamente el autologin/mock en Cypress (por defecto desactivado)
-const CYPRESS_AUTOLOGIN_DISABLED = String(getEnv('VITE_DISABLE_CYPRESS_AUTOLOGIN', '1')).toLowerCase();
+const CYPRESS_AUTOLOGIN_DISABLED = String(
+  getEnv('VITE_DISABLE_CYPRESS_AUTOLOGIN', '1')
+).toLowerCase();
 
 const parseDomainList = (value) =>
   String(value || '')
@@ -133,15 +137,17 @@ const SOCIAL_PROVIDER_READABLE = {
 const SOCIAL_AUTH_ERROR_MESSAGES = {
   'auth/account-exists-with-different-credential':
     'Ya existe una cuenta con este correo asociada a otro proveedor. Inicia sesión con el proveedor original y vincúlalo desde tu perfil.',
-  'auth/popup-blocked': 'El navegador bloqueó la ventana emergente. Permite las ventanas emergentes e inténtalo de nuevo.',
-  'auth/popup-closed-by-user': 'La ventana de autenticación se cerró antes de completar el proceso.',
-  'auth/cancelled-popup-request': 'Se canceló un intento previo de inicio de sesión. Vuelve a intentarlo.',
+  'auth/popup-blocked':
+    'El navegador bloqueó la ventana emergente. Permite las ventanas emergentes e inténtalo de nuevo.',
+  'auth/popup-closed-by-user':
+    'La ventana de autenticación se cerró antes de completar el proceso.',
+  'auth/cancelled-popup-request':
+    'Se canceló un intento previo de inicio de sesión. Vuelve a intentarlo.',
   'auth/unauthorized-domain':
     'Este dominio no está autorizado en la consola de Firebase. Contacta con soporte técnico.',
 };
 
-const getReadableProvider = (providerId = '') =>
-  SOCIAL_PROVIDER_READABLE[providerId] || providerId;
+const getReadableProvider = (providerId = '') => SOCIAL_PROVIDER_READABLE[providerId] || providerId;
 
 const getReadableAuthMethod = (providerId = '') => {
   if (!providerId) return 'otro proveedor';
@@ -336,7 +342,7 @@ export const AuthProvider = ({ children }) => {
 
         const rawExpires = localStorage.getItem(ADMIN_SESSION_EXPIRES_KEY);
         const sessionId = localStorage.getItem(ADMIN_SESSION_ID_KEY);
-        
+
         // rawExpires es un timestamp numérico, no un ISO string
         let expiresAt = null;
         if (rawExpires) {
@@ -413,7 +419,7 @@ export const AuthProvider = ({ children }) => {
             const parsed = JSON.parse(cypressUser);
             if (parsed?.uid && parsed?.email) {
               setCurrentUser(parsed);
-              
+
               // Restaurar el perfil también
               const profileRaw = ls.getItem('MaLoveApp_user_profile');
               if (profileRaw) {
@@ -426,7 +432,7 @@ export const AuthProvider = ({ children }) => {
             }
           } catch {}
         }
-        
+
         const rawUser =
           ls.getItem('maloveapp_user') ||
           ls.getItem('maloveapp_user') ||
@@ -546,7 +552,10 @@ export const AuthProvider = ({ children }) => {
         })();
 
         // 3) Si la variable de entorno desactiva autologin PERO hay sesión sembrada, intenta restaurarla igualmente
-        if ((CYPRESS_AUTOLOGIN_DISABLED === '1' || CYPRESS_AUTOLOGIN_DISABLED === 'true') && !hasSeededSession) {
+        if (
+          (CYPRESS_AUTOLOGIN_DISABLED === '1' || CYPRESS_AUTOLOGIN_DISABLED === 'true') &&
+          !hasSeededSession
+        ) {
           setCurrentUser(null);
           setUserProfile(null);
           setLoading(false);
@@ -628,14 +637,20 @@ export const AuthProvider = ({ children }) => {
           const user = {
             uid: firebaseUser.uid,
             email: firebaseUser.email,
-            displayName:
-              firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'Usuario',
+            displayName: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'Usuario',
             photoURL: firebaseUser.photoURL || null,
           };
           // console.log('[useAuth] Usuario autenticado:', user.uid);
           setCurrentUser(user);
 
           const profile = persistProfileForUser(firebaseUser) || null;
+
+          // 🔄 MIGRACIÓN AUTOMÁTICA DE CATEGORÍAS
+          try {
+            migrateCategoriesOnce(firebaseUser.uid).catch((err) => {
+              console.warn('[useAuth] Error en migración de categorías:', err);
+            });
+          } catch {}
 
           try {
             performanceMonitor?.setUserContext?.({
@@ -668,7 +683,7 @@ export const AuthProvider = ({ children }) => {
       }
     };
   }, [persistProfileForUser]);
-// Actualizar diagnóstico de autenticación
+  // Actualizar diagnóstico de autenticación
   useEffect(() => {
     if (loading) return;
     if (currentUser) {
@@ -750,7 +765,8 @@ export const AuthProvider = ({ children }) => {
       const isCypressEnv = typeof window !== 'undefined' && !!window.Cypress;
       const shouldBypassCypressMock = (() => {
         try {
-          if (typeof window !== 'undefined' && window.__MALOVEAPP_DISABLE_AUTOLOGIN__ === true) return true;
+          if (typeof window !== 'undefined' && window.__MALOVEAPP_DISABLE_AUTOLOGIN__ === true)
+            return true;
         } catch {}
         const v = String(getEnv('VITE_DISABLE_CYPRESS_AUTOLOGIN', '1')).toLowerCase();
         return v === '1' || v === 'true';
@@ -797,7 +813,12 @@ export const AuthProvider = ({ children }) => {
         // console.error('[useAuth] Auth no disponible durante login.');
         // Fallback de desarrollo cuando Firebase Auth no está configurado
         try {
-          const env = (typeof import.meta !== 'undefined' && import.meta.env) ? import.meta.env : (typeof process !== 'undefined' ? process.env : {});
+          const env =
+            typeof import.meta !== 'undefined' && import.meta.env
+              ? import.meta.env
+              : typeof process !== 'undefined'
+                ? process.env
+                : {};
           const isProd = String(env?.MODE || env?.NODE_ENV || '').toLowerCase() === 'production';
           if (!isProd) {
             const ls = typeof window !== 'undefined' ? window.localStorage : null;
@@ -843,7 +864,12 @@ export const AuthProvider = ({ children }) => {
         // console.error('Error al iniciar sesion:', error);
         // Fallback de desarrollo: permitir sesión local si Firebase no está disponible (no productivo)
         try {
-          const env = (typeof import.meta !== 'undefined' && import.meta.env) ? import.meta.env : (typeof process !== 'undefined' ? process.env : {});
+          const env =
+            typeof import.meta !== 'undefined' && import.meta.env
+              ? import.meta.env
+              : typeof process !== 'undefined'
+                ? process.env
+                : {};
           const isProd = String(env?.MODE || env?.NODE_ENV || '').toLowerCase() === 'production';
           if (!isProd) {
             const ls = typeof window !== 'undefined' ? window.localStorage : null;
@@ -893,8 +919,8 @@ export const AuthProvider = ({ children }) => {
         sessionExpiresAt instanceof Date
           ? sessionExpiresAt
           : sessionExpiresAt
-          ? new Date(sessionExpiresAt)
-          : null;
+            ? new Date(sessionExpiresAt)
+            : null;
       const normalizedExpiry =
         expiryDate && !Number.isNaN(expiryDate.getTime()) ? expiryDate : null;
 
@@ -985,7 +1011,7 @@ export const AuthProvider = ({ children }) => {
 
         // Llamar directamente al endpoint de login admin
         const loginResponse = await apiPost('/api/admin/login', { email, password, rememberMe });
-        
+
         if (!loginResponse.ok) {
           const errorData = await loginResponse.json().catch(() => ({}));
           throw new Error(errorData.message || 'Error al iniciar sesión como administrador');
@@ -1081,7 +1107,8 @@ export const AuthProvider = ({ children }) => {
       }
 
       // Usar rememberMe pasado o el guardado en pendingAdminSession
-      const shouldRemember = rememberMe !== undefined ? rememberMe : (pendingAdminSession.rememberMe || false);
+      const shouldRemember =
+        rememberMe !== undefined ? rememberMe : pendingAdminSession.rememberMe || false;
 
       try {
         const response = await verifyAdminMfaRequest({
@@ -1241,7 +1268,8 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       // console.error('Error al enviar restablecimiento de contrasena:', error);
       const mapped = await mapAuthErrorMessage(error, { email });
-      const message = mapped.message || error?.message || 'No se pudo enviar el enlace de restablecimiento.';
+      const message =
+        mapped.message || error?.message || 'No se pudo enviar el enlace de restablecimiento.';
       const enrichedError = new Error(message);
       enrichedError.code = mapped.code || error?.code;
       enrichedError.original = error;
@@ -1292,7 +1320,7 @@ export const AuthProvider = ({ children }) => {
   /**
    * Cerrar sesión
    * @returns {Promise<Object>} Resultado del cierre de sesión
-  */
+   */
   const logout = useCallback(async () => {
     let signOutError = null;
     try {
@@ -1384,7 +1412,9 @@ export const AuthProvider = ({ children }) => {
       const data = snap.data() || {};
       const merged = { ...(userProfile || {}), ...data, id: uid };
       setUserProfile(merged);
-      try { window.localStorage.setItem('MaLoveApp_user_profile', JSON.stringify(merged)); } catch {}
+      try {
+        window.localStorage.setItem('MaLoveApp_user_profile', JSON.stringify(merged));
+      } catch {}
       return { success: true, profile: merged };
     } catch (e) {
       // console.warn('[useAuth] reloadUserProfile failed:', e);
@@ -1393,59 +1423,62 @@ export const AuthProvider = ({ children }) => {
   }, [currentUser, userProfile]);
 
   // Upgrade de rol vía backend y refresco de perfil
-  const upgradeRole = useCallback(async ({ newRole, tier }) => {
-    try {
-      if (!currentUser?.uid) return { success: false, error: 'not_authenticated' };
-      
-      // En Cypress, manejar la actualización localmente si no hay backend
-      if (typeof window !== 'undefined' && window.Cypress) {
+  const upgradeRole = useCallback(
+    async ({ newRole, tier }) => {
+      try {
+        if (!currentUser?.uid) return { success: false, error: 'not_authenticated' };
+
+        // En Cypress, manejar la actualización localmente si no hay backend
+        if (typeof window !== 'undefined' && window.Cypress) {
+          const base = typeof getBackendBase === 'function' ? getBackendBase() : '';
+          if (!base) {
+            // Simular la actualización del rol localmente para Cypress
+            const updatedProfile = { ...userProfile, role: newRole };
+            setUserProfile(updatedProfile);
+
+            // Persistir en localStorage
+            try {
+              window.localStorage.setItem('MaLoveApp_user_profile', JSON.stringify(updatedProfile));
+            } catch {}
+
+            return {
+              success: true,
+              role: newRole,
+              subscription: { tier: tier || 'free' },
+            };
+          }
+        }
+
         const base = typeof getBackendBase === 'function' ? getBackendBase() : '';
-        if (!base) {
-          // Simular la actualización del rol localmente para Cypress
-          const updatedProfile = { ...userProfile, role: newRole };
-          setUserProfile(updatedProfile);
-          
-          // Persistir en localStorage
-          try {
-            window.localStorage.setItem('MaLoveApp_user_profile', JSON.stringify(updatedProfile));
-          } catch {}
-          
-          return { 
-            success: true, 
-            role: newRole, 
-            subscription: { tier: tier || 'free' } 
+        if (!base) return { success: false, error: 'backend_base_unavailable' };
+        const endpoint = `${base}/api/users/upgrade-role`;
+        const token = await getIdToken();
+        const resp = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ newRole, tier }),
+          credentials: 'include',
+        });
+        const json = await resp.json().catch(() => ({}));
+        if (!resp.ok || json?.success === false) {
+          return {
+            success: false,
+            error: json?.error?.message || `upgrade_failed_${resp.status}`,
+            code: json?.error?.code || 'upgrade_failed',
           };
         }
+        await reloadUserProfile();
+        return { success: true, role: json?.role, subscription: json?.subscription };
+      } catch (e) {
+        // console.warn('[useAuth] upgradeRole failed:', e);
+        return { success: false, error: e?.message || 'upgrade_failed' };
       }
-      
-      const base = typeof getBackendBase === 'function' ? getBackendBase() : '';
-      if (!base) return { success: false, error: 'backend_base_unavailable' };
-      const endpoint = `${base}/api/users/upgrade-role`;
-      const token = await getIdToken();
-      const resp = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ newRole, tier }),
-        credentials: 'include',
-      });
-      const json = await resp.json().catch(() => ({}));
-      if (!resp.ok || json?.success === false) {
-        return {
-          success: false,
-          error: json?.error?.message || `upgrade_failed_${resp.status}`,
-          code: json?.error?.code || 'upgrade_failed',
-        };
-      }
-      await reloadUserProfile();
-      return { success: true, role: json?.role, subscription: json?.subscription };
-    } catch (e) {
-      // console.warn('[useAuth] upgradeRole failed:', e);
-      return { success: false, error: e?.message || 'upgrade_failed' };
-    }
-  }, [currentUser, getIdToken, reloadUserProfile]);
+    },
+    [currentUser, getIdToken, reloadUserProfile]
+  );
 
   /**
    * Actualizar el perfil del usuario
@@ -1460,11 +1493,7 @@ export const AuthProvider = ({ children }) => {
       try {
         if (db && currentUser?.uid) {
           const userRef = doc(db, 'users', currentUser.uid);
-          await setDoc(
-            userRef,
-            { ...profileData, updatedAt: serverTimestamp() },
-            { merge: true }
-          );
+          await setDoc(userRef, { ...profileData, updatedAt: serverTimestamp() }, { merge: true });
         }
       } catch (e) {
         // console.warn('[useAuth] No se pudo persistir updateUserProfile en Firestore:', e);
