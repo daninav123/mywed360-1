@@ -22,7 +22,6 @@ setTimeout(() => {
   import('./sentry');
   import('./debug/setupDebug');
   import('./utils/consoleCommands');
-  import('./utils/migrateCategoriesSync');
   import('./debug/devServiceWorkerCleanup');
   import('./pwa/setupPwaToasts');
   import('./utils/webVitals');
