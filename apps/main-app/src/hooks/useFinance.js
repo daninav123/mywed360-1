@@ -957,7 +957,7 @@ export default function useFinance() {
 
       (async () => {
         try {
-          const { doc, getDoc, updateDoc } = await import('firebase/firestore');
+          const { doc, getDoc } = await import('firebase/firestore');
           const { SUPPLIER_CATEGORIES } = await import('../shared/supplierCategories');
 
           const userWeddingRef = doc(db, 'users', firebaseUid, 'weddings', activeWedding);
