@@ -1563,20 +1563,14 @@ export const useSeatingPlan = () => {
         } else {
           layoutType = 'columns';
         }
-        // console.log(
-          '[setupSeatingPlanAutomatically] Layout seleccionado automáticamente:',
-          layoutType
-        );
+        // console.log('[setupSeatingPlanAutomatically] Layout seleccionado automáticamente:', layoutType);
       }
 
       // PASO 3: Generar layout desde invitados
       const layoutResult = generateAutoLayoutFromGuests(layoutType);
 
       if (!layoutResult.success) {
-        // console.error(
-          '[setupSeatingPlanAutomatically] Error generando layout:',
-          layoutResult.message
-        );
+        // console.error('[setupSeatingPlanAutomatically] Error generando layout:', layoutResult.message);
         return layoutResult;
       }
 
@@ -1590,11 +1584,7 @@ export const useSeatingPlan = () => {
       // PASO 5: Auto-asignar invitados pendientes
       const assignResult = await autoAssignGuests();
 
-      // console.log('[setupSeatingPlanAutomatically] Auto-asignación completada:', {
-        resultado: assignResult,
-        asignados: assignResult.assigned || 0,
-        ok: assignResult.ok,
-      });
+      // console.log('[setupSeatingPlanAutomatically] Auto-asignación completada:', { resultado: assignResult, asignados: assignResult.assigned || 0, ok: assignResult.ok });
 
       // PASO 6: Calcular estadísticas finales
       const finalAnalysis = analyzeCurrentGuests();
