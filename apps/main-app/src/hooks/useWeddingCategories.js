@@ -5,7 +5,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { doc, updateDoc, getDoc, onSnapshot } from 'firebase/firestore';
+import { doc, setDoc, getDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import { useAuth } from './useAuth';
 import { useWedding } from '../context/WeddingContext';
@@ -29,31 +29,32 @@ export function useWeddingCategories() {
   // ⚡ OPTIMIZACIÓN: Usar onSnapshot para actualización en tiempo real
   // Esto permite que las tarjetas se actualicen instantáneamente sin recargar
   useEffect(() => {
-    if (!user?.uid || !activeWedding) {
+    if (!activeWedding) {
       setLoading(false);
       setActiveCategories(DEFAULT_CATEGORIES);
       return;
     }
 
-    // console.log('🔄 [useWeddingCategories] Iniciando listener en tiempo real...');
+    console.log('🔄 [useWeddingCategories] Iniciando listener en weddings/{id}...');
     setLoading(true);
 
-    const weddingRef = doc(db, 'users', user.uid, 'weddings', activeWedding);
+    // ✅ LEER DESDE DOCUMENTO COMPARTIDO: weddings/{id}
+    const weddingRef = doc(db, 'weddings', activeWedding);
 
     // ✅ LISTENER EN TIEMPO REAL: Se actualiza automáticamente cuando cambia Firestore
     const unsubscribe = onSnapshot(
       weddingRef,
       (snapshot) => {
-        // console.log('📡 [useWeddingCategories] Snapshot recibido');
+        console.log('📡 [useWeddingCategories] Snapshot recibido desde weddings/{id}');
 
         if (snapshot.exists()) {
           const data = snapshot.data();
           const categories = data.activeCategories || DEFAULT_CATEGORIES;
 
-          // console.log('   ✅ Categorías actualizadas:', categories);
+          console.log('   ✅ Categorías actualizadas:', categories);
           setActiveCategories(categories);
         } else {
-          // console.log('   ⚠️ Documento no existe, usando defaults');
+          console.log('   ⚠️ Documento no existe, usando defaults');
           setActiveCategories(DEFAULT_CATEGORIES);
         }
 
@@ -68,41 +69,40 @@ export function useWeddingCategories() {
 
     // Cleanup: Desuscribirse cuando el componente se desmonte o cambien las dependencias
     return () => {
-      // console.log('🔌 [useWeddingCategories] Deteniendo listener...');
+      console.log('🔌 [useWeddingCategories] Deteniendo listener...');
       unsubscribe();
     };
-  }, [user?.uid, activeWedding]);
+  }, [activeWedding]);
 
   // Actualizar categorías activas
   const updateActiveCategories = async (categories) => {
-    if (!user?.uid || !activeWedding) {
-      throw new Error('Usuario o boda no disponible');
+    if (!activeWedding) {
+      throw new Error('Boda no disponible');
     }
 
     try {
-      // console.log('📝 [useWeddingCategories] Actualizando categorías activas...');
-      // console.log('   Antes:', activeCategories);
-      // console.log('   Después:', categories);
-
-      const weddingRef = doc(db, 'users', user.uid, 'weddings', activeWedding);
-      await updateDoc(weddingRef, {
-        activeCategories: categories,
-        updatedAt: new Date().toISOString(),
-      });
-
-      // 🔄 SYNC: Sincronizar con weddings/{id} para que Finance pueda leerlo
-      const mainWeddingRef = doc(db, 'weddings', activeWedding);
+      console.log('📝 [useWeddingCategories] Actualizando en weddings/{id}...');
+      console.log('   Categorías:', categories);
 
       // Convertir IDs de categorías a nombres completos para wantedServices
       const categoryNames = categories
         .map((catId) => SUPPLIER_CATEGORIES.find((c) => c.id === catId)?.name)
         .filter(Boolean);
 
-      await updateDoc(mainWeddingRef, {
-        wantedServices: categoryNames,
-        activeCategories: categories, // También guardamos los IDs por compatibilidad
-        updatedAt: new Date().toISOString(),
-      });
+      console.log('   Nombres para wantedServices:', categoryNames);
+
+      // ✅ ESCRIBIR EN DOCUMENTO COMPARTIDO: weddings/{id}
+      const weddingRef = doc(db, 'weddings', activeWedding);
+
+      await setDoc(
+        weddingRef,
+        {
+          activeCategories: categories,
+          wantedServices: categoryNames,
+          updatedAt: new Date().toISOString(),
+        },
+        { merge: true }
+      );
 
       // ⚠️ CRÍTICO: Crear una NUEVA referencia del array para que React detecte el cambio
       setActiveCategories([...categories]);
