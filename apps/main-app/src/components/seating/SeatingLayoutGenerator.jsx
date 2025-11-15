@@ -66,12 +66,7 @@ const createTable = (config) => {
   // Debug: Log primera mesa para verificar propiedades
   if (number === 1) {
     // console.log('[createTable] Mesa 1 creada:', table);
-    // console.log('[createTable] Shape y diameter:', {
-      shape: table.shape,
-      diameter: table.diameter,
-      radius: table.radius,
-      width: table.width,
-    });
+    // console.log('[createTable] Shape y diameter:', { shape: table.shape, diameter: table.diameter, radius: table.radius, width: table.width });
   }
 
   return table;
