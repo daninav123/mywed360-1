@@ -236,11 +236,7 @@ export default function SeatingPlanModern() {
 
   // Debug: Detectar cambios en tables
   useEffect(() => {
-    // console.log('[SeatingPlanModern] tables changed:', {
-      length: tables?.length || 0,
-      tab,
-      tables: tables?.map((t) => ({ id: t.id, name: t.name, x: t.x, y: t.y })),
-    });
+    // console.log('[SeatingPlanModern] tables changed:', { length: tables?.length || 0, tab, tables: tables?.map((t) => ({ id: t.id, name: t.name, x: t.x, y: t.y })) });
   }, [tables, tab]);
 
   // Handler para duplicar mesa

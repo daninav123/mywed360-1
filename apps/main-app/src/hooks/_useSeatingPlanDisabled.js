@@ -1580,10 +1580,7 @@ export const useSeatingPlan = () => {
         return layoutResult;
       }
 
-      // console.log('[setupSeatingPlanAutomatically] Layout generado:', {
-        mesas: layoutResult.tablesGenerated,
-        asignados: layoutResult.guestsAssigned,
-      });
+      // console.log('[setupSeatingPlanAutomatically] Layout generado:', { mesas: layoutResult.tablesGenerated, asignados: layoutResult.guestsAssigned });
 
       // PASO 4: Esperar un momento para que el estado se actualice
       await new Promise((resolve) => setTimeout(resolve, 500));
