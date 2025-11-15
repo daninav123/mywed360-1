@@ -128,13 +128,7 @@ export default function VectorEditorPage() {
           }
         }
       } catch (e) {
-        // console.warn(
-          t(
-            'common.designsLibrary.vectorEditor.messages.paletteLoadWarning',
-            'No se pudo cargar la paleta'
-          ),
-          e
-        );
+        // console.warn(t('common.designsLibrary.vectorEditor.messages.paletteLoadWarning', 'No se pudo cargar la paleta'), e);
       }
     };
     loadBrand();
