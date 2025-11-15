@@ -950,6 +950,54 @@ export default function useFinance() {
 
   useEffect(() => {
     if (!activeWedding) return;
+
+    // 🔄 MIGRACIÓN AUTO: Si providerTemplates está vacío, intentar cargar desde activeCategories
+    if ((!providerTemplates || providerTemplates.length === 0) && firebaseUid && db) {
+      console.log('[useFinance] 🔍 providerTemplates vacío, verificando activeCategories...');
+
+      (async () => {
+        try {
+          const { doc, getDoc, updateDoc } = await import('firebase/firestore');
+          const { SUPPLIER_CATEGORIES } = await import('../shared/supplierCategories');
+
+          const userWeddingRef = doc(db, 'users', firebaseUid, 'weddings', activeWedding);
+          const userWeddingSnap = await getDoc(userWeddingRef);
+
+          if (userWeddingSnap.exists()) {
+            const activeCategories = userWeddingSnap.data()?.activeCategories || [];
+
+            if (activeCategories.length > 0) {
+              console.log(
+                '[useFinance] ✅ Encontradas activeCategories, sincronizando...',
+                activeCategories
+              );
+
+              // Convertir a nombres
+              const categoryNames = activeCategories
+                .map((catId) => SUPPLIER_CATEGORIES.find((c) => c.id === catId)?.name)
+                .filter(Boolean);
+
+              // Actualizar weddings/{id} con wantedServices
+              const mainWeddingRef = doc(db, 'weddings', activeWedding);
+              await updateDoc(mainWeddingRef, {
+                wantedServices: categoryNames,
+                activeCategories: activeCategories,
+                updatedAt: new Date().toISOString(),
+                _autoMigrated: true,
+              });
+
+              // console.log('[useFinance] ✅ Migración automática completada', categoryNames);
+
+              // Actualizar providerTemplates localmente para que se sincronicen las categorías
+              setProviderTemplates(categoryNames);
+            }
+          }
+        } catch (error) {
+          console.error('[useFinance] ❌ Error en migración automática:', error);
+        }
+      })();
+    }
+
     if (!Array.isArray(providerTemplates) || providerTemplates.length === 0) return;
 
     const normalizedDesired = [];
@@ -993,7 +1041,7 @@ export default function useFinance() {
       persistFinanceDoc({ budget: { total: nextState.total, categories: nextCategories } });
       return nextState;
     });
-  }, [activeWedding, providerTemplates, budget.categories, persistFinanceDoc]);
+  }, [activeWedding, providerTemplates, budget.categories, persistFinanceDoc, firebaseUid]);
 
   // Actualizar configuración de aportaciones y persistir
   const updateContributions = useCallback(
