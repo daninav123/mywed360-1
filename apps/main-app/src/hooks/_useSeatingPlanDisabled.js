@@ -1066,27 +1066,35 @@ export const useSeatingPlan = () => {
     }
 
     const ref = fsDoc(db, 'weddings', activeWedding, 'specialMoments', 'main');
-    const unsubscribe = onSnapshot(ref, (snap) => {
-      if (!snap.exists()) {
+    const unsubscribe = onSnapshot(
+      ref,
+      (snap) => {
+        if (!snap.exists()) {
+          setSpecialMomentsData(null);
+          return;
+        }
+        const data = snap.data() || {};
+        const rawBlocks = Array.isArray(data?.blocks) ? data.blocks : [];
+        const payload =
+          data?.moments && typeof data.moments === 'object'
+            ? data.moments
+            : Object.fromEntries(
+                Object.entries(data).filter(
+                  ([key]) => !['updatedAt', 'blocks', 'migratedFrom'].includes(key)
+                )
+              );
+        const resolvedBlocks = rawBlocks.length ? rawBlocks : buildBlocksFromMoments(payload);
+        setSpecialMomentsData({
+          blocks: resolvedBlocks,
+          moments: normalizeSpecialMoments(payload),
+        });
+      },
+      (error) => {
+        // Silenciar errores de permisos - special moments son opcionales
+        // console.warn('[_useSeatingPlanDisabled] Error cargando special moments:', error);
         setSpecialMomentsData(null);
-        return;
       }
-      const data = snap.data() || {};
-      const rawBlocks = Array.isArray(data?.blocks) ? data.blocks : [];
-      const payload =
-        data?.moments && typeof data.moments === 'object'
-          ? data.moments
-          : Object.fromEntries(
-              Object.entries(data).filter(
-                ([key]) => !['updatedAt', 'blocks', 'migratedFrom'].includes(key)
-              )
-            );
-      const resolvedBlocks = rawBlocks.length ? rawBlocks : buildBlocksFromMoments(payload);
-      setSpecialMomentsData({
-        blocks: resolvedBlocks,
-        moments: normalizeSpecialMoments(payload),
-      });
-    });
+    );
 
     specialMomentsUnsubRef.current = unsubscribe;
     return () => {
