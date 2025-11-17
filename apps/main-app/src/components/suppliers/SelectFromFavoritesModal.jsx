@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { X, Heart, Star, MapPin, CheckCircle, Search } from 'lucide-react';
+import { X, Heart, Star, MapPin, CheckCircle, Search, Trash2, FileText, Image } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../ui/Button';
 import { toast } from 'react-toastify';
 import useTranslations from '../../hooks/useTranslations';
+import { useFavorites } from '../../contexts/FavoritesContext';
 
 export default function SelectFromFavoritesModal({
   open,
@@ -14,8 +15,10 @@ export default function SelectFromFavoritesModal({
 }) {
   const [loading, setLoading] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
   const navigate = useNavigate();
   const { t } = useTranslations();
+  const { removeFavorite } = useFavorites();
 
   if (!open) return null;
 
@@ -33,14 +36,45 @@ export default function SelectFromFavoritesModal({
       onClose();
     } catch (error) {
       toast.error(
-        error?.message ||
-          t('suppliers.selectFavorites.toast.error', 'Error al asignar proveedor')
+        error?.message || t('suppliers.selectFavorites.toast.error', 'Error al asignar proveedor')
       );
       // console.error(error);
     } finally {
       setLoading(false);
       setSelectedSupplier(null);
     }
+  };
+
+  const handleDelete = async (supplierId, supplierName) => {
+    if (
+      !confirm(
+        t('suppliers.selectFavorites.delete.confirm', {
+          name: supplierName,
+          defaultValue: '¿Eliminar {{name}} de favoritos?',
+        })
+      )
+    ) {
+      return;
+    }
+
+    setDeletingId(supplierId);
+    try {
+      await removeFavorite(supplierId);
+      toast.success(
+        t('suppliers.selectFavorites.delete.success', { defaultValue: 'Eliminado de favoritos' })
+      );
+    } catch (error) {
+      toast.error(
+        t('suppliers.selectFavorites.delete.error', { defaultValue: 'Error al eliminar' })
+      );
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  const handleRequestQuote = (supplier) => {
+    onClose();
+    navigate(`/proveedores?service=${supplier.category}&quote=${supplier.id}`);
   };
 
   return (
@@ -97,14 +131,39 @@ export default function SelectFromFavoritesModal({
                 const supplier = favorite.supplier;
                 const isLoading = loading && selectedSupplier === supplier.id;
 
+                const portfolioImage =
+                  supplier.portfolio?.[0]?.url ||
+                  supplier.profileImage ||
+                  supplier.coverImage ||
+                  null;
+                const isDeleting = deletingId === supplier.id;
+
                 return (
                   <div
                     key={supplier.id || favorite.id}
-                    className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                    className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow"
                   >
-                    <div className="flex items-start justify-between gap-4">
+                    <div className="flex gap-4">
+                      {/* Imagen del portfolio */}
+                      {portfolioImage ? (
+                        <div className="w-32 h-32 flex-shrink-0">
+                          <img
+                            src={portfolioImage}
+                            alt={supplier.name}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.target.style.display = 'none';
+                            }}
+                          />
+                        </div>
+                      ) : (
+                        <div className="w-32 h-32 flex-shrink-0 bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center">
+                          <Image className="h-12 w-12 text-purple-300" />
+                        </div>
+                      )}
+
                       {/* Supplier info */}
-                      <div className="flex-1 min-w-0">
+                      <div className="flex-1 min-w-0 p-4">
                         <h3 className="font-semibold text-gray-900 mb-1">{supplier.name}</h3>
 
                         {/* Rating */}
@@ -143,35 +202,76 @@ export default function SelectFromFavoritesModal({
                           </div>
                         )}
 
+                        {/* Portfolio count */}
+                        {supplier.portfolio && supplier.portfolio.length > 0 && (
+                          <div className="flex items-center gap-1 text-sm text-purple-600 mb-2">
+                            <Image className="h-4 w-4" />
+                            <span>
+                              {supplier.portfolio.length}{' '}
+                              {t('suppliers.selectFavorites.portfolioPhotos', {
+                                count: supplier.portfolio.length,
+                                defaultValue: 'foto(s)',
+                              })}
+                            </span>
+                          </div>
+                        )}
+
                         {/* Notes */}
                         {favorite.notes && (
-                          <p className="text-sm text-gray-600 italic mt-2">
-                            {t('suppliers.selectFavorites.notes', {
-                              note: favorite.notes,
-                            })}
+                          <p className="text-sm text-gray-600 italic mt-2 bg-yellow-50 p-2 rounded">
+                            💭 {favorite.notes}
                           </p>
                         )}
-                      </div>
 
-                      {/* Assign button */}
-                      <Button
-                        onClick={() => handleAssign(supplier)}
-                        disabled={isLoading}
-                        size="sm"
-                        className="flex-shrink-0"
-                      >
-                        {isLoading ? (
-                          <>
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                            {t('suppliers.selectFavorites.assign.loading', 'Asignando...')}
-                          </>
-                        ) : (
-                          <>
-                            <CheckCircle className="h-4 w-4 mr-2" />
-                            {t('suppliers.selectFavorites.assign.action', 'Asignar')}
-                          </>
-                        )}
-                      </Button>
+                        {/* Botones de acción */}
+                        <div className="flex flex-wrap gap-2 mt-3">
+                          <Button
+                            onClick={() => handleAssign(supplier)}
+                            disabled={isLoading || isDeleting}
+                            size="sm"
+                            className="flex-1 min-w-[120px]"
+                          >
+                            {isLoading && selectedSupplier === supplier.id ? (
+                              <>
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                                {t('suppliers.selectFavorites.assign.loading', 'Asignando...')}
+                              </>
+                            ) : (
+                              <>
+                                <CheckCircle className="h-4 w-4 mr-2" />
+                                {t('suppliers.selectFavorites.assign.action', 'Asignar')}
+                              </>
+                            )}
+                          </Button>
+
+                          <Button
+                            onClick={() => handleRequestQuote(supplier)}
+                            disabled={isLoading || isDeleting}
+                            size="sm"
+                            variant="outline"
+                            className="flex-1 min-w-[120px]"
+                          >
+                            <FileText className="h-4 w-4 mr-2" />
+                            {t('suppliers.selectFavorites.requestQuote', {
+                              defaultValue: 'Presupuesto',
+                            })}
+                          </Button>
+
+                          <Button
+                            onClick={() => handleDelete(supplier.id, supplier.name)}
+                            disabled={isLoading || isDeleting}
+                            size="sm"
+                            variant="ghost"
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                          >
+                            {isDeleting ? (
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600" />
+                            ) : (
+                              <Trash2 className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 );

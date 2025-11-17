@@ -7,10 +7,22 @@ import useTranslations from '../../hooks/useTranslations';
 
 const detectFiltersFromProfile = (weddingProfile) => {
   if (!weddingProfile) {
-    return { budget: null, guests: null, style: null, location: null };
+    return { budget: null, guests: null, style: null, location: null, ceremonyType: null };
   }
 
   const profile = weddingProfile.weddingInfo || weddingProfile;
+  const eventProfile = weddingProfile.eventProfile || profile.eventProfile;
+
+  // Detectar estilo (puede venir de preferences o eventProfile)
+  const style =
+    profile.style ||
+    profile.weddingStyle ||
+    profile.theme ||
+    weddingProfile.preferences?.style ||
+    null;
+
+  // Detectar tipo de ceremonia
+  const ceremonyType = eventProfile?.ceremonyType || profile.ceremonyType || null;
 
   return {
     budget:
@@ -24,15 +36,18 @@ const detectFiltersFromProfile = (weddingProfile) => {
       profile.guestEstimate ||
       profile.expectedGuests ||
       profile.guests ||
+      eventProfile?.guestCountRange ||
       null,
-    style: profile.style || profile.weddingStyle || profile.theme || null,
+    style,
     location:
       profile.location?.city ||
       profile.city ||
       profile.celebrationPlace ||
       profile.receptionVenue ||
       profile.ceremonyPlace ||
+      profile.ceremonyLocation ||
       null,
+    ceremonyType,
   };
 };
 
@@ -150,12 +165,8 @@ const SmartFiltersBar = ({ weddingProfile, onFiltersChange, className = '' }) =>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-primary" />
-            <h3 className="font-semibold text-foreground">
-              {t('suppliers.smartFilters.title')}
-            </h3>
-            <span className="text-xs text-muted">
-              {t('suppliers.smartFilters.subtitle')}
-            </span>
+            <h3 className="font-semibold text-foreground">{t('suppliers.smartFilters.title')}</h3>
+            <span className="text-xs text-muted">{t('suppliers.smartFilters.subtitle')}</span>
           </div>
 
           <div className="flex items-center gap-2">
@@ -166,9 +177,7 @@ const SmartFiltersBar = ({ weddingProfile, onFiltersChange, className = '' }) =>
               title={t('suppliers.smartFilters.buttons.resetTitle')}
             >
               <RotateCcw className="h-4 w-4" />
-              <span className="hidden sm:inline">
-                {t('suppliers.smartFilters.buttons.reset')}
-              </span>
+              <span className="hidden sm:inline">{t('suppliers.smartFilters.buttons.reset')}</span>
             </Button>
             <Button
               variant="ghost"
@@ -382,9 +391,7 @@ const SmartFiltersBar = ({ weddingProfile, onFiltersChange, className = '' }) =>
               )}
             </div>
 
-            <p className="text-xs text-muted">
-              {t('suppliers.smartFilters.hints.automated')}
-            </p>
+            <p className="text-xs text-muted">{t('suppliers.smartFilters.hints.automated')}</p>
           </>
         )}
       </div>
