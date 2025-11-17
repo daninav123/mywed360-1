@@ -374,9 +374,4 @@ router.post('/weddings/:weddingId/services/:serviceId/payments', requireAuth, as
       remaining,
     });
   } catch (error) {
-    console.error('Error registering payment:', error);
-    res.status(500).json({ error: 'Error al registrar pago' });
-  }
-});
-
 export default router;
