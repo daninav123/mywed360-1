@@ -208,6 +208,17 @@ export default function WeddingServicesOverview({ onSearch, searchPanel }) {
           const confirmed = confirmedByService[serviceKey];
           const shortlistCount = shortlistCountByService[serviceKey] || 0;
 
+          // Encontrar servicios vinculados
+          const currentServiceData = services.find((s) => s.category === service.id);
+          const linkedServicesList = (currentServiceData?.linkedServices || [])
+            .map((linkedId) => {
+              const linkedService = services.find((s) => s.id === linkedId);
+              return linkedService
+                ? { id: linkedService.category, name: linkedService.name }
+                : null;
+            })
+            .filter(Boolean);
+
           return (
             <WeddingServiceCard
               key={service.id}
@@ -215,6 +226,8 @@ export default function WeddingServicesOverview({ onSearch, searchPanel }) {
               serviceName={service.name}
               confirmedProvider={confirmed}
               shortlistCount={shortlistCount}
+              linkedServices={linkedServicesList}
+              allServices={services}
               onSearch={onSearch}
             />
           );

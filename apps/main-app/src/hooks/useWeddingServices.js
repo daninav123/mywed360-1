@@ -197,6 +197,48 @@ export function useWeddingServices() {
     return !!getAssignedSupplier(serviceId);
   };
 
+  // Vincular servicios (mismo proveedor)
+  const linkServices = async (mainServiceId, linkedServiceIds) => {
+    if (!user || !activeWedding) {
+      throw new Error('Usuario o boda no disponible');
+    }
+
+    try {
+      const token = await getAuthToken();
+      await axios.post(
+        `${API_URL}/api/weddings/${activeWedding}/services/${mainServiceId}/link`,
+        { linkedServices: linkedServiceIds },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      // Recargar servicios
+      await loadServices();
+    } catch (err) {
+      // console.error('Error linking services:', err);
+      throw new Error(err.response?.data?.error || 'Error al vincular servicios');
+    }
+  };
+
+  // Desvincular servicios
+  const unlinkServices = async (serviceId) => {
+    if (!user || !activeWedding) {
+      throw new Error('Usuario o boda no disponible');
+    }
+
+    try {
+      const token = await getAuthToken();
+      await axios.delete(`${API_URL}/api/weddings/${activeWedding}/services/${serviceId}/link`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      // Recargar servicios
+      await loadServices();
+    } catch (err) {
+      // console.error('Error unlinking services:', err);
+      throw new Error(err.response?.data?.error || 'Error al desvincular servicios');
+    }
+  };
+
   // Cargar servicios cuando cambia el usuario o la boda
   useEffect(() => {
     loadServices();
@@ -213,6 +255,8 @@ export function useWeddingServices() {
     getService,
     getAssignedSupplier,
     hasAssignedSupplier,
+    linkServices,
+    unlinkServices,
     refreshServices: loadServices,
   };
 }

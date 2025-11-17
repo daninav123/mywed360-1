@@ -11,11 +11,14 @@ import {
   ExternalLink,
   MessageCircle,
   Heart,
+  Link as LinkIcon,
+  Unlink,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useFavorites } from '../../contexts/FavoritesContext';
 import { useWeddingServices } from '../../hooks/useWeddingServices';
 import SelectFromFavoritesModal from '../suppliers/SelectFromFavoritesModal';
+import LinkServicesModal from './LinkServicesModal';
 import { toast } from 'react-toastify';
 import useTranslations from '../../hooks/useTranslations';
 
@@ -29,12 +32,15 @@ export default function WeddingServiceCard({
   service, // Retrocompatibilidad
   confirmedProvider,
   shortlistCount = 0,
+  linkedServices = [], // Servicios vinculados a este
+  allServices = [], // Todos los servicios para el modal de vincular
   onSearch,
 }) {
   const navigate = useNavigate();
   const { favorites = [] } = useFavorites() || {}; // Guard contra undefined
-  const { assignSupplier } = useWeddingServices();
+  const { assignSupplier, linkServices, unlinkServices } = useWeddingServices();
   const [showFavoritesModal, setShowFavoritesModal] = useState(false);
+  const [showLinkModal, setShowLinkModal] = useState(false);
   const { t, format } = useTranslations();
 
   // Usar serviceId si está disponible, sino usar service
@@ -69,6 +75,26 @@ export default function WeddingServiceCard({
     }
   };
 
+  // Función para vincular servicios
+  const handleLinkServices = async (selectedServiceIds) => {
+    try {
+      await linkServices(categoryId, selectedServiceIds);
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  // Función para desvincular
+  const handleUnlink = async () => {
+    if (!confirm('¿Desvincular este servicio de los demás?')) return;
+    try {
+      await unlinkServices(categoryId);
+      toast.success('Servicio desvinculado');
+    } catch (error) {
+      toast.error(error.message || 'Error al desvincular');
+    }
+  };
+
   // Iconos por servicio
   const serviceIcons = {
     fotografia: '📸',
@@ -97,7 +123,21 @@ export default function WeddingServiceCard({
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <span className="text-2xl">{icon}</span>
-          <h3 className="font-semibold text-lg text-gray-900">{displayName}</h3>
+          <div>
+            <div className="flex items-center gap-2">
+              <h3 className="font-semibold text-lg text-gray-900">{displayName}</h3>
+              {linkedServices.length > 0 && (
+                <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-medium flex items-center gap-1">
+                  <LinkIcon className="h-3 w-3" />+{linkedServices.length}
+                </span>
+              )}
+            </div>
+            {linkedServices.length > 0 && (
+              <p className="text-xs text-gray-600 mt-0.5">
+                Incluye: {linkedServices.map((s) => s.name).join(', ')}
+              </p>
+            )}
+          </div>
         </div>
 
         {/* Estado */}
@@ -191,7 +231,27 @@ export default function WeddingServiceCard({
           </div>
 
           {/* Botones de acción */}
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
+            {linkedServices.length > 0 && (
+              <button
+                onClick={handleUnlink}
+                className="px-3 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors text-sm flex items-center gap-1"
+                title="Desvincular servicios"
+              >
+                <Unlink size={16} />
+                Desvincular
+              </button>
+            )}
+            {linkedServices.length === 0 && allServices.length > 1 && (
+              <button
+                onClick={() => setShowLinkModal(true)}
+                className="px-3 py-2 border border-purple-600 text-purple-600 rounded-md hover:bg-purple-50 transition-colors text-sm flex items-center gap-1"
+                title="Vincular con otros servicios"
+              >
+                <LinkIcon size={16} />
+                Vincular
+              </button>
+            )}
             {confirmedProvider.phone && (
               <button
                 onClick={() =>
@@ -324,6 +384,19 @@ export default function WeddingServiceCard({
         serviceName={displayName}
         favorites={serviceFavorites}
         onAssign={handleAssign}
+      />
+
+      {/* Modal de vincular servicios */}
+      <LinkServicesModal
+        open={showLinkModal}
+        onClose={() => setShowLinkModal(false)}
+        currentService={{
+          id: categoryId,
+          name: displayName,
+          assignedSupplier: confirmedProvider,
+        }}
+        allServices={allServices}
+        onLink={handleLinkServices}
       />
     </div>
   );
