@@ -19,6 +19,7 @@ import Button from '../ui/Button';
 import { toast } from 'react-toastify';
 import useTranslations from '../../hooks/useTranslations';
 import { useFavorites } from '../../contexts/FavoritesContext';
+import { useSupplierContacts } from '../../contexts/SupplierContactsContext';
 import useActiveWeddingInfo from '../../hooks/useActiveWeddingInfo';
 import RequestQuoteModal from './RequestQuoteModal';
 import ImageGalleryModal from './ImageGalleryModal';
@@ -44,8 +45,9 @@ export default function SelectFromFavoritesModal({
   const [showComparison, setShowComparison] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
-  const { t } = useTranslations();
+  const { t, format } = useTranslations();
   const { removeFavorite, updateFavoriteNotes } = useFavorites();
+  const { getLastContact, needsFollowUp } = useSupplierContacts();
   const { info: weddingProfile } = useActiveWeddingInfo();
 
   // Filtrar y ordenar favoritos - DEBE estar ANTES del early return
@@ -384,7 +386,29 @@ export default function SelectFromFavoritesModal({
 
                       {/* Supplier info */}
                       <div className="flex-1 min-w-0 p-4">
-                        <h3 className="font-semibold text-gray-900 mb-1">{supplier.name}</h3>
+                        <div className="flex items-start justify-between gap-2 mb-1">
+                          <h3 className="font-semibold text-gray-900">{supplier.name}</h3>
+
+                          {/* Badge de seguimiento */}
+                          {(() => {
+                            const lastContact = getLastContact(supplier.id);
+                            const shouldFollowUp = needsFollowUp(supplier.id);
+                            const contactDate = lastContact?.timestamp
+                              ? new Date(lastContact.timestamp)
+                              : null;
+                            const isValidContactDate =
+                              contactDate && !Number.isNaN(contactDate.getTime());
+
+                            if (shouldFollowUp && lastContact) {
+                              return (
+                                <span className="text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full font-medium flex-shrink-0">
+                                  ⏰ Seguimiento
+                                </span>
+                              );
+                            }
+                            return null;
+                          })()}
+                        </div>
 
                         {/* Rating */}
                         {supplier.rating > 0 && (
@@ -421,6 +445,44 @@ export default function SelectFromFavoritesModal({
                             {supplier.priceRange}
                           </div>
                         )}
+
+                        {/* Último contacto */}
+                        {(() => {
+                          const lastContact = getLastContact(supplier.id);
+                          if (!lastContact) return null;
+
+                          const contactDate = lastContact.timestamp
+                            ? new Date(lastContact.timestamp)
+                            : null;
+                          const isValidContactDate =
+                            contactDate && !Number.isNaN(contactDate.getTime());
+
+                          if (!isValidContactDate) return null;
+
+                          const formattedDate =
+                            typeof format?.dateShort === 'function'
+                              ? format.dateShort(contactDate)
+                              : contactDate.toLocaleDateString();
+
+                          const methodIcons = {
+                            whatsapp: '💬',
+                            email: '📧',
+                            phone: '📞',
+                            other: '📝',
+                          };
+
+                          const icon = methodIcons[lastContact.method] || methodIcons.other;
+
+                          return (
+                            <div className="text-xs text-gray-500 bg-blue-50 px-2 py-1 rounded flex items-center gap-1 mb-2">
+                              <span>{icon}</span>
+                              <span>Último contacto: {formattedDate}</span>
+                              {lastContact.method && (
+                                <span className="text-gray-400">vía {lastContact.method}</span>
+                              )}
+                            </div>
+                          );
+                        })()}
 
                         {/* Portfolio count */}
                         {supplier.portfolio && supplier.portfolio.length > 0 && (
