@@ -5,6 +5,8 @@ import Button from '../ui/Button';
 import { toast } from 'react-toastify';
 import useTranslations from '../../hooks/useTranslations';
 import { useFavorites } from '../../contexts/FavoritesContext';
+import useActiveWeddingInfo from '../../hooks/useActiveWeddingInfo';
+import RequestQuoteModal from './RequestQuoteModal';
 
 export default function SelectFromFavoritesModal({
   open,
@@ -16,9 +18,12 @@ export default function SelectFromFavoritesModal({
   const [loading, setLoading] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
+  const [showQuoteModal, setShowQuoteModal] = useState(false);
+  const [quoteSupplier, setQuoteSupplier] = useState(null);
   const navigate = useNavigate();
   const { t } = useTranslations();
   const { removeFavorite } = useFavorites();
+  const { info: weddingProfile } = useActiveWeddingInfo();
 
   if (!open) return null;
 
@@ -73,8 +78,8 @@ export default function SelectFromFavoritesModal({
   };
 
   const handleRequestQuote = (supplier) => {
-    onClose();
-    navigate(`/proveedores?service=${supplier.category}&quote=${supplier.id}`);
+    setQuoteSupplier(supplier);
+    setShowQuoteModal(true);
   };
 
   return (
@@ -297,6 +302,28 @@ export default function SelectFromFavoritesModal({
           </div>
         )}
       </div>
+
+      {/* Modal de Solicitar Presupuesto */}
+      {quoteSupplier && (
+        <RequestQuoteModal
+          supplier={quoteSupplier}
+          weddingInfo={weddingProfile}
+          open={showQuoteModal}
+          onClose={() => {
+            setShowQuoteModal(false);
+            setQuoteSupplier(null);
+          }}
+          onSuccess={() => {
+            toast.success(
+              t('suppliers.requestQuoteModal.toasts.success', {
+                defaultValue: 'Presupuesto solicitado correctamente',
+              })
+            );
+            setShowQuoteModal(false);
+            setQuoteSupplier(null);
+          }}
+        />
+      )}
     </div>
   );
 }
