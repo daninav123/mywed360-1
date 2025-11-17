@@ -12,6 +12,7 @@ import {
   ChevronDown,
   Edit3,
   Check,
+  GitCompare,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../ui/Button';
@@ -39,6 +40,8 @@ export default function SelectFromFavoritesModal({
   const [sortBy, setSortBy] = useState('recent'); // recent, rating, price, distance
   const [editingNoteId, setEditingNoteId] = useState(null);
   const [editedNote, setEditedNote] = useState('');
+  const [selectedForCompare, setSelectedForCompare] = useState([]);
+  const [showComparison, setShowComparison] = useState(false);
   const navigate = useNavigate();
   const { t } = useTranslations();
   const { removeFavorite, updateFavoriteNotes } = useFavorites();
@@ -152,6 +155,37 @@ export default function SelectFromFavoritesModal({
     }
   };
 
+  const handleToggleCompare = (supplierId) => {
+    setSelectedForCompare((prev) => {
+      if (prev.includes(supplierId)) {
+        return prev.filter((id) => id !== supplierId);
+      } else {
+        // Máximo 3 proveedores para comparar
+        if (prev.length >= 3) {
+          toast.warning(
+            t('suppliers.selectFavorites.compare.maxReached', {
+              defaultValue: 'Máximo 3 proveedores para comparar',
+            })
+          );
+          return prev;
+        }
+        return [...prev, supplierId];
+      }
+    });
+  };
+
+  const handleCompare = () => {
+    if (selectedForCompare.length < 2) {
+      toast.warning(
+        t('suppliers.selectFavorites.compare.minRequired', {
+          defaultValue: 'Selecciona al menos 2 proveedores',
+        })
+      );
+      return;
+    }
+    setShowComparison(true);
+  };
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-xl flex flex-col">
@@ -181,6 +215,16 @@ export default function SelectFromFavoritesModal({
               </select>
               <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
             </div>
+            {/* Botón Comparar */}
+            {selectedForCompare.length > 0 && (
+              <button
+                onClick={handleCompare}
+                className="px-3 py-1.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium flex items-center gap-2"
+              >
+                <GitCompare className="h-4 w-4" />
+                Comparar ({selectedForCompare.length})
+              </button>
+            )}
             <button
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -238,6 +282,16 @@ export default function SelectFromFavoritesModal({
                     className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow"
                   >
                     <div className="flex gap-4">
+                      {/* Checkbox para comparar */}
+                      <div className="flex items-start pt-4">
+                        <input
+                          type="checkbox"
+                          checked={selectedForCompare.includes(supplier.id)}
+                          onChange={() => handleToggleCompare(supplier.id)}
+                          className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
+                          title="Seleccionar para comparar"
+                        />
+                      </div>
                       {/* Imagen del portfolio */}
                       {portfolioImage ? (
                         <div
@@ -478,6 +532,169 @@ export default function SelectFromFavoritesModal({
           initialIndex={0}
           onClose={() => setShowGallery(false)}
         />
+      )}
+
+      {/* Modal de Comparación */}
+      {showComparison && (
+        <div className="fixed inset-0 bg-black/50 z-[60] flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg max-w-6xl w-full max-h-[90vh] overflow-hidden shadow-xl flex flex-col">
+            {/* Header Comparación */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <div className="flex items-center gap-2">
+                <GitCompare className="h-6 w-6 text-blue-600" />
+                <h2 className="text-xl font-bold text-gray-900">
+                  Comparar Proveedores ({selectedForCompare.length})
+                </h2>
+              </div>
+              <button
+                onClick={() => setShowComparison(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            {/* Tabla de Comparación */}
+            <div className="flex-1 overflow-auto p-6">
+              <div
+                className="grid gap-4"
+                style={{ gridTemplateColumns: `repeat(${selectedForCompare.length}, 1fr)` }}
+              >
+                {selectedForCompare.map((supplierId) => {
+                  const favorite = favorites.find((f) => f.supplier.id === supplierId);
+                  if (!favorite) return null;
+                  const supplier = favorite.supplier;
+
+                  return (
+                    <div
+                      key={supplier.id}
+                      className="border border-gray-200 rounded-lg p-4 space-y-3"
+                    >
+                      {/* Imagen */}
+                      <div className="w-full h-32 bg-gray-100 rounded-lg overflow-hidden">
+                        {supplier.portfolio?.[0]?.url ? (
+                          <img
+                            src={supplier.portfolio[0].url}
+                            alt={supplier.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-100 to-pink-100">
+                            <Image className="h-12 w-12 text-purple-300" />
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Nombre */}
+                      <h3 className="font-bold text-lg text-gray-900 truncate">{supplier.name}</h3>
+
+                      {/* Rating */}
+                      <div className="space-y-1">
+                        <p className="text-xs font-semibold text-gray-500 uppercase">Valoración</p>
+                        {supplier.rating > 0 ? (
+                          <div className="flex items-center gap-1">
+                            <Star className="h-4 w-4 text-yellow-400" fill="currentColor" />
+                            <span className="font-medium">{supplier.rating.toFixed(1)}</span>
+                            {supplier.reviewCount > 0 && (
+                              <span className="text-sm text-gray-500">
+                                ({supplier.reviewCount})
+                              </span>
+                            )}
+                          </div>
+                        ) : (
+                          <p className="text-sm text-gray-400">Sin valoraciones</p>
+                        )}
+                      </div>
+
+                      {/* Precio */}
+                      <div className="space-y-1">
+                        <p className="text-xs font-semibold text-gray-500 uppercase">Precio</p>
+                        {supplier.priceRange ? (
+                          <p className="font-medium text-purple-600">{supplier.priceRange}</p>
+                        ) : (
+                          <p className="text-sm text-gray-400">No especificado</p>
+                        )}
+                      </div>
+
+                      {/* Ubicación */}
+                      <div className="space-y-1">
+                        <p className="text-xs font-semibold text-gray-500 uppercase">Ubicación</p>
+                        {supplier.location?.city ? (
+                          <div className="flex items-center gap-1">
+                            <MapPin className="h-3 w-3 text-gray-400" />
+                            <p className="text-sm">
+                              {supplier.location.city}
+                              {supplier.location.province && `, ${supplier.location.province}`}
+                            </p>
+                          </div>
+                        ) : (
+                          <p className="text-sm text-gray-400">No especificada</p>
+                        )}
+                      </div>
+
+                      {/* Portfolio */}
+                      <div className="space-y-1">
+                        <p className="text-xs font-semibold text-gray-500 uppercase">Portfolio</p>
+                        {supplier.portfolio?.length > 0 ? (
+                          <p className="text-sm">
+                            {supplier.portfolio.length} foto
+                            {supplier.portfolio.length !== 1 ? 's' : ''}
+                          </p>
+                        ) : (
+                          <p className="text-sm text-gray-400">Sin fotos</p>
+                        )}
+                      </div>
+
+                      {/* Notas */}
+                      {favorite.notes && (
+                        <div className="space-y-1">
+                          <p className="text-xs font-semibold text-gray-500 uppercase">Notas</p>
+                          <p className="text-sm italic bg-yellow-50 p-2 rounded">
+                            {favorite.notes}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Botones */}
+                      <div className="pt-3 border-t space-y-2">
+                        <Button
+                          onClick={() => {
+                            setShowComparison(false);
+                            handleAssign(supplier);
+                          }}
+                          size="sm"
+                          className="w-full"
+                        >
+                          <CheckCircle className="h-4 w-4 mr-2" />
+                          Asignar
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            setShowComparison(false);
+                            handleRequestQuote(supplier);
+                          }}
+                          size="sm"
+                          variant="outline"
+                          className="w-full"
+                        >
+                          <FileText className="h-4 w-4 mr-2" />
+                          Presupuesto
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="p-6 border-t bg-gray-50">
+              <Button variant="outline" onClick={() => setShowComparison(false)} className="w-full">
+                Cerrar comparación
+              </Button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
