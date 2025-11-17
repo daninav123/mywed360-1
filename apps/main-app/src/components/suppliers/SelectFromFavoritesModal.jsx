@@ -13,6 +13,8 @@ import {
   Edit3,
   Check,
   GitCompare,
+  Tag,
+  Plus,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../ui/Button';
@@ -44,7 +46,20 @@ export default function SelectFromFavoritesModal({
   const [selectedForCompare, setSelectedForCompare] = useState([]);
   const [showComparison, setShowComparison] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [supplierTags, setSupplierTags] = useState({});
+  const [editingTagsId, setEditingTagsId] = useState(null);
+  const [newTag, setNewTag] = useState('');
   const navigate = useNavigate();
+
+  // Tags predefinidos
+  const PRESET_TAGS = [
+    { id: 'economico', label: 'Económico', color: 'green' },
+    { id: 'mejor-portfolio', label: 'Mejor portfolio', color: 'purple' },
+    { id: 'rapido', label: 'Respondió rápido', color: 'blue' },
+    { id: 'recomendado', label: 'Recomendado', color: 'yellow' },
+    { id: 'alta-calidad', label: 'Alta calidad', color: 'pink' },
+    { id: 'flexible', label: 'Flexible', color: 'indigo' },
+  ];
   const { t, format } = useTranslations();
   const { removeFavorite, updateFavoriteNotes } = useFavorites();
   const { getLastContact, needsFollowUp } = useSupplierContacts();
@@ -203,6 +218,47 @@ export default function SelectFromFavoritesModal({
       return;
     }
     setShowComparison(true);
+  };
+
+  const handleAddTag = (supplierId, tagId) => {
+    setSupplierTags((prev) => {
+      const currentTags = prev[supplierId] || [];
+      if (currentTags.includes(tagId)) {
+        return { ...prev, [supplierId]: currentTags.filter((t) => t !== tagId) };
+      }
+      return { ...prev, [supplierId]: [...currentTags, tagId] };
+    });
+  };
+
+  const handleAddCustomTag = (supplierId, tag) => {
+    if (!tag.trim()) return;
+    setSupplierTags((prev) => {
+      const currentTags = prev[supplierId] || [];
+      const customTag = `custom_${tag.trim()}`;
+      if (currentTags.includes(customTag)) return prev;
+      return { ...prev, [supplierId]: [...currentTags, customTag] };
+    });
+    setNewTag('');
+    setEditingTagsId(null);
+  };
+
+  const handleRemoveTag = (supplierId, tagId) => {
+    setSupplierTags((prev) => ({
+      ...prev,
+      [supplierId]: (prev[supplierId] || []).filter((t) => t !== tagId),
+    }));
+  };
+
+  const getTagColor = (tagId) => {
+    if (tagId.startsWith('custom_')) return 'gray';
+    const preset = PRESET_TAGS.find((t) => t.id === tagId);
+    return preset?.color || 'gray';
+  };
+
+  const getTagLabel = (tagId) => {
+    if (tagId.startsWith('custom_')) return tagId.replace('custom_', '');
+    const preset = PRESET_TAGS.find((t) => t.id === tagId);
+    return preset?.label || tagId;
   };
 
   return (
@@ -483,6 +539,121 @@ export default function SelectFromFavoritesModal({
                             </div>
                           );
                         })()}
+
+                        {/* Tags */}
+                        <div className="flex flex-wrap gap-1 mb-2">
+                          {(supplierTags[supplier.id] || []).map((tagId) => {
+                            const color = getTagColor(tagId);
+                            const colorClasses = {
+                              green: 'bg-green-100 text-green-700',
+                              purple: 'bg-purple-100 text-purple-700',
+                              blue: 'bg-blue-100 text-blue-700',
+                              yellow: 'bg-yellow-100 text-yellow-700',
+                              pink: 'bg-pink-100 text-pink-700',
+                              indigo: 'bg-indigo-100 text-indigo-700',
+                              gray: 'bg-gray-100 text-gray-700',
+                            };
+
+                            return (
+                              <span
+                                key={tagId}
+                                className={`text-xs px-2 py-0.5 rounded-full flex items-center gap-1 ${colorClasses[color]}`}
+                              >
+                                <Tag className="h-3 w-3" />
+                                {getTagLabel(tagId)}
+                                <button
+                                  onClick={() => handleRemoveTag(supplier.id, tagId)}
+                                  className="hover:opacity-70"
+                                >
+                                  <X className="h-3 w-3" />
+                                </button>
+                              </span>
+                            );
+                          })}
+
+                          {editingTagsId === supplier.id ? (
+                            <div className="flex gap-1 items-center">
+                              <input
+                                type="text"
+                                value={newTag}
+                                onChange={(e) => setNewTag(e.target.value)}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') {
+                                    handleAddCustomTag(supplier.id, newTag);
+                                  } else if (e.key === 'Escape') {
+                                    setEditingTagsId(null);
+                                    setNewTag('');
+                                  }
+                                }}
+                                placeholder="Tag personalizado..."
+                                className="text-xs px-2 py-0.5 border rounded w-32 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                                autoFocus
+                              />
+                              <button
+                                onClick={() => handleAddCustomTag(supplier.id, newTag)}
+                                className="text-green-600 hover:text-green-700"
+                              >
+                                <Check className="h-3 w-3" />
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setEditingTagsId(null);
+                                  setNewTag('');
+                                }}
+                                className="text-gray-400 hover:text-gray-600"
+                              >
+                                <X className="h-3 w-3" />
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => setEditingTagsId(supplier.id)}
+                              className="text-xs px-2 py-0.5 border border-dashed border-gray-300 rounded-full text-gray-500 hover:border-gray-400 hover:text-gray-700 flex items-center gap-1"
+                            >
+                              <Plus className="h-3 w-3" />
+                              Tag
+                            </button>
+                          )}
+                        </div>
+
+                        {/* Tags predefinidos (mostrar si está editando) */}
+                        {editingTagsId === supplier.id && (
+                          <div className="flex flex-wrap gap-1 mb-2 p-2 bg-gray-50 rounded">
+                            {PRESET_TAGS.map((tag) => {
+                              const isActive = (supplierTags[supplier.id] || []).includes(tag.id);
+                              const colorClasses = {
+                                green: isActive
+                                  ? 'bg-green-600 text-white'
+                                  : 'bg-green-100 text-green-700',
+                                purple: isActive
+                                  ? 'bg-purple-600 text-white'
+                                  : 'bg-purple-100 text-purple-700',
+                                blue: isActive
+                                  ? 'bg-blue-600 text-white'
+                                  : 'bg-blue-100 text-blue-700',
+                                yellow: isActive
+                                  ? 'bg-yellow-600 text-white'
+                                  : 'bg-yellow-100 text-yellow-700',
+                                pink: isActive
+                                  ? 'bg-pink-600 text-white'
+                                  : 'bg-pink-100 text-pink-700',
+                                indigo: isActive
+                                  ? 'bg-indigo-600 text-white'
+                                  : 'bg-indigo-100 text-indigo-700',
+                              };
+
+                              return (
+                                <button
+                                  key={tag.id}
+                                  onClick={() => handleAddTag(supplier.id, tag.id)}
+                                  className={`text-xs px-2 py-1 rounded-full transition-colors ${colorClasses[tag.color]}`}
+                                >
+                                  {tag.label}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        )}
 
                         {/* Portfolio count */}
                         {supplier.portfolio && supplier.portfolio.length > 0 && (
