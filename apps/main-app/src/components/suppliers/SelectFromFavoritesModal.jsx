@@ -44,6 +44,32 @@ export default function SelectFromFavoritesModal({
   const { removeFavorite, updateFavoriteNotes } = useFavorites();
   const { info: weddingProfile } = useActiveWeddingInfo();
 
+  // Ordenar favoritos - DEBE estar ANTES del early return
+  const sortedFavorites = useMemo(() => {
+    const sorted = [...favorites];
+    switch (sortBy) {
+      case 'rating':
+        return sorted.sort((a, b) => (b.supplier?.rating || 0) - (a.supplier?.rating || 0));
+      case 'price':
+        // Ordenar por precio mínimo del rango
+        return sorted.sort((a, b) => {
+          const priceA = a.supplier?.priceRange?.match(/\d+/)?.[0] || Infinity;
+          const priceB = b.supplier?.priceRange?.match(/\d+/)?.[0] || Infinity;
+          return Number(priceA) - Number(priceB);
+        });
+      case 'distance':
+        // Por ahora solo por ciudad
+        return sorted.sort((a, b) => {
+          const cityA = a.supplier?.location?.city || '';
+          const cityB = b.supplier?.location?.city || '';
+          return cityA.localeCompare(cityB);
+        });
+      case 'recent':
+      default:
+        return sorted.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+    }
+  }, [favorites, sortBy]);
+
   if (!open) return null;
 
   const handleAssign = async (supplier) => {
@@ -125,32 +151,6 @@ export default function SelectFromFavoritesModal({
       );
     }
   };
-
-  // Ordenar favoritos
-  const sortedFavorites = useMemo(() => {
-    const sorted = [...favorites];
-    switch (sortBy) {
-      case 'rating':
-        return sorted.sort((a, b) => (b.supplier?.rating || 0) - (a.supplier?.rating || 0));
-      case 'price':
-        // Ordenar por precio mínimo del rango
-        return sorted.sort((a, b) => {
-          const priceA = a.supplier?.priceRange?.match(/\d+/)?.[0] || Infinity;
-          const priceB = b.supplier?.priceRange?.match(/\d+/)?.[0] || Infinity;
-          return Number(priceA) - Number(priceB);
-        });
-      case 'distance':
-        // Por ahora solo por ciudad
-        return sorted.sort((a, b) => {
-          const cityA = a.supplier?.location?.city || '';
-          const cityB = b.supplier?.location?.city || '';
-          return cityA.localeCompare(cityB);
-        });
-      case 'recent':
-      default:
-        return sorted.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
-    }
-  }, [favorites, sortBy]);
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
