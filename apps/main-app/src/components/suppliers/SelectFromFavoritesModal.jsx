@@ -15,6 +15,9 @@ import {
   GitCompare,
   Tag,
   Plus,
+  GripVertical,
+  Grid3x3,
+  List,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../ui/Button';
@@ -49,6 +52,10 @@ export default function SelectFromFavoritesModal({
   const [supplierTags, setSupplierTags] = useState({});
   const [editingTagsId, setEditingTagsId] = useState(null);
   const [newTag, setNewTag] = useState('');
+  const [draggedItem, setDraggedItem] = useState(null);
+  const [customOrder, setCustomOrder] = useState([]);
+  const [filterByTag, setFilterByTag] = useState(null);
+  const [viewMode, setViewMode] = useState('extended'); // 'compact' | 'extended'
   const navigate = useNavigate();
 
   // Tags predefinidos
@@ -84,28 +91,54 @@ export default function SelectFromFavoritesModal({
       });
     }
 
-    // Luego ordenar
-    const sorted = [...filtered];
-    switch (sortBy) {
-      case 'rating':
-        return sorted.sort((a, b) => (b.supplier?.rating || 0) - (a.supplier?.rating || 0));
-      case 'price':
-        return sorted.sort((a, b) => {
-          const priceA = a.supplier?.priceRange?.match(/\d+/)?.[0] || Infinity;
-          const priceB = b.supplier?.priceRange?.match(/\d+/)?.[0] || Infinity;
-          return Number(priceA) - Number(priceB);
-        });
-      case 'distance':
-        return sorted.sort((a, b) => {
-          const cityA = a.supplier?.location?.city || '';
-          const cityB = b.supplier?.location?.city || '';
-          return cityA.localeCompare(cityB);
-        });
-      case 'recent':
-      default:
-        return sorted.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+    // Filtrar por tag si está seleccionado
+    if (filterByTag) {
+      filtered = filtered.filter((fav) => {
+        const tags = supplierTags[fav.supplier.id] || [];
+        return tags.includes(filterByTag);
+      });
     }
-  }, [favorites, sortBy, searchQuery]);
+
+    // Luego ordenar
+    let sorted = [...filtered];
+
+    // Si hay orden custom y sortBy es 'custom', usar ese orden
+    if (sortBy === 'custom' && customOrder.length > 0) {
+      sorted = sorted.sort((a, b) => {
+        const indexA = customOrder.indexOf(a.supplier.id);
+        const indexB = customOrder.indexOf(b.supplier.id);
+        if (indexA === -1 && indexB === -1) return 0;
+        if (indexA === -1) return 1;
+        if (indexB === -1) return -1;
+        return indexA - indexB;
+      });
+    } else {
+      switch (sortBy) {
+        case 'rating':
+          sorted = sorted.sort((a, b) => (b.supplier?.rating || 0) - (a.supplier?.rating || 0));
+          break;
+        case 'price':
+          sorted = sorted.sort((a, b) => {
+            const priceA = a.supplier?.priceRange?.match(/\d+/)?.[0] || Infinity;
+            const priceB = b.supplier?.priceRange?.match(/\d+/)?.[0] || Infinity;
+            return Number(priceA) - Number(priceB);
+          });
+          break;
+        case 'distance':
+          sorted = sorted.sort((a, b) => {
+            const cityA = a.supplier?.location?.city || '';
+            const cityB = b.supplier?.location?.city || '';
+            return cityA.localeCompare(cityB);
+          });
+          break;
+        case 'recent':
+        default:
+          sorted = sorted.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+      }
+    }
+
+    return sorted;
+  }, [favorites, sortBy, searchQuery, customOrder, filterByTag, supplierTags]);
 
   if (!open) return null;
 
@@ -261,6 +294,47 @@ export default function SelectFromFavoritesModal({
     return preset?.label || tagId;
   };
 
+  // Drag & Drop handlers
+  const handleDragStart = (e, supplier) => {
+    setDraggedItem(supplier);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDrop = (e, targetSupplier) => {
+    e.preventDefault();
+    if (!draggedItem || draggedItem.id === targetSupplier.id) return;
+
+    const currentOrder = customOrder.length > 0 ? customOrder : favorites.map((f) => f.supplier.id);
+    const draggedIndex = currentOrder.indexOf(draggedItem.id);
+    const targetIndex = currentOrder.indexOf(targetSupplier.id);
+
+    const newOrder = [...currentOrder];
+    newOrder.splice(draggedIndex, 1);
+    newOrder.splice(targetIndex, 0, draggedItem.id);
+
+    setCustomOrder(newOrder);
+    setSortBy('custom');
+    setDraggedItem(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedItem(null);
+  };
+
+  // Obtener todos los tags únicos
+  const allTags = useMemo(() => {
+    const tags = new Set();
+    Object.values(supplierTags).forEach((tagArray) => {
+      tagArray.forEach((tag) => tags.add(tag));
+    });
+    return Array.from(tags);
+  }, [supplierTags]);
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-xl flex flex-col">
@@ -287,9 +361,55 @@ export default function SelectFromFavoritesModal({
                 <option value="rating">⭐ Mejor valorados</option>
                 <option value="price">💰 Menor precio</option>
                 <option value="distance">📍 Ubicación</option>
+                <option value="custom">🎯 Mi orden</option>
               </select>
               <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
             </div>
+            {/* Filtrar por Tag */}
+            {allTags.length > 0 && (
+              <div className="relative">
+                <select
+                  value={filterByTag || ''}
+                  onChange={(e) => setFilterByTag(e.target.value || null)}
+                  className="pl-3 pr-8 py-1.5 text-xs border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 appearance-none cursor-pointer"
+                >
+                  <option value="">Todos los tags</option>
+                  {allTags.map((tagId) => (
+                    <option key={tagId} value={tagId}>
+                      {getTagLabel(tagId)}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 h-3 w-3 text-gray-400 pointer-events-none" />
+              </div>
+            )}
+
+            {/* Toggle Vista */}
+            <div className="flex border border-gray-300 rounded-md overflow-hidden">
+              <button
+                onClick={() => setViewMode('compact')}
+                className={`px-2 py-1.5 text-sm transition-colors ${
+                  viewMode === 'compact'
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-white text-gray-700 hover:bg-gray-50'
+                }`}
+                title="Vista compacta"
+              >
+                <List className="h-4 w-4" />
+              </button>
+              <button
+                onClick={() => setViewMode('extended')}
+                className={`px-2 py-1.5 text-sm transition-colors border-l ${
+                  viewMode === 'extended'
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-white text-gray-700 hover:bg-gray-50'
+                }`}
+                title="Vista extendida"
+              >
+                <Grid3x3 className="h-4 w-4" />
+              </button>
+            </div>
+
             {/* Botón Comparar */}
             {selectedForCompare.length > 0 && (
               <button
@@ -394,12 +514,106 @@ export default function SelectFromFavoritesModal({
                   null;
                 const isDeleting = deletingId === supplier.id;
 
-                return (
+                return viewMode === 'compact' ? (
+                  // Vista Compacta
                   <div
                     key={supplier.id || favorite.id}
-                    className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow"
+                    draggable={sortBy === 'custom'}
+                    onDragStart={(e) => handleDragStart(e, supplier)}
+                    onDragOver={handleDragOver}
+                    onDrop={(e) => handleDrop(e, supplier)}
+                    onDragEnd={handleDragEnd}
+                    className={`border border-gray-200 rounded-lg p-3 hover:shadow-md transition-all flex items-center gap-3 ${
+                      draggedItem?.id === supplier.id ? 'opacity-50' : ''
+                    } ${sortBy === 'custom' ? 'cursor-move' : ''}`}
+                  >
+                    {sortBy === 'custom' && (
+                      <GripVertical className="h-5 w-5 text-gray-400 flex-shrink-0" />
+                    )}
+                    <input
+                      type="checkbox"
+                      checked={selectedForCompare.includes(supplier.id)}
+                      onChange={() => handleToggleCompare(supplier.id)}
+                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer flex-shrink-0"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-semibold text-gray-900 truncate">{supplier.name}</h3>
+                        {(() => {
+                          const shouldFollowUp = needsFollowUp(supplier.id);
+                          if (shouldFollowUp) {
+                            return (
+                              <span className="text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full font-medium flex-shrink-0">
+                                ⏰
+                              </span>
+                            );
+                          }
+                          return null;
+                        })()}
+                      </div>
+                      <div className="flex items-center gap-3 text-sm text-gray-600 mt-1">
+                        {supplier.location?.city && (
+                          <span className="flex items-center gap-1">
+                            <MapPin className="h-3 w-3" />
+                            {supplier.location.city}
+                          </span>
+                        )}
+                        {supplier.priceRange && (
+                          <span className="text-purple-600 font-medium">{supplier.priceRange}</span>
+                        )}
+                        {supplier.rating > 0 && (
+                          <span className="flex items-center gap-1">
+                            <Star className="h-3 w-3 text-yellow-400" fill="currentColor" />
+                            {supplier.rating.toFixed(1)}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <Button
+                        onClick={() => handleAssign(supplier)}
+                        size="sm"
+                        disabled={isLoading || isDeleting}
+                      >
+                        <CheckCircle className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        onClick={() => handleRequestQuote(supplier)}
+                        size="sm"
+                        variant="outline"
+                        disabled={isLoading || isDeleting}
+                      >
+                        <FileText className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        onClick={() => handleDelete(supplier.id, supplier.name)}
+                        size="sm"
+                        variant="outline"
+                        disabled={isLoading || isDeleting}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  // Vista Extendida (original)
+                  <div
+                    key={supplier.id || favorite.id}
+                    draggable={sortBy === 'custom'}
+                    onDragStart={(e) => handleDragStart(e, supplier)}
+                    onDragOver={handleDragOver}
+                    onDrop={(e) => handleDrop(e, supplier)}
+                    onDragEnd={handleDragEnd}
+                    className={`border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-all ${
+                      draggedItem?.id === supplier.id ? 'opacity-50' : ''
+                    } ${sortBy === 'custom' ? 'cursor-move' : ''}`}
                   >
                     <div className="flex gap-4">
+                      {sortBy === 'custom' && (
+                        <div className="flex items-center px-2">
+                          <GripVertical className="h-6 w-6 text-gray-400" />
+                        </div>
+                      )}
                       {/* Checkbox para comparar */}
                       <div className="flex items-start pt-4">
                         <input
