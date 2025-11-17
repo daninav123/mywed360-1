@@ -42,26 +42,43 @@ export default function SelectFromFavoritesModal({
   const [editedNote, setEditedNote] = useState('');
   const [selectedForCompare, setSelectedForCompare] = useState([]);
   const [showComparison, setShowComparison] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
   const { t } = useTranslations();
   const { removeFavorite, updateFavoriteNotes } = useFavorites();
   const { info: weddingProfile } = useActiveWeddingInfo();
 
-  // Ordenar favoritos - DEBE estar ANTES del early return
-  const sortedFavorites = useMemo(() => {
-    const sorted = [...favorites];
+  // Filtrar y ordenar favoritos - DEBE estar ANTES del early return
+  const filteredAndSortedFavorites = useMemo(() => {
+    // Primero filtrar por búsqueda
+    let filtered = favorites;
+
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = favorites.filter((fav) => {
+        const supplier = fav.supplier;
+        return (
+          supplier.name?.toLowerCase().includes(query) ||
+          supplier.location?.city?.toLowerCase().includes(query) ||
+          supplier.location?.province?.toLowerCase().includes(query) ||
+          supplier.priceRange?.toLowerCase().includes(query) ||
+          fav.notes?.toLowerCase().includes(query)
+        );
+      });
+    }
+
+    // Luego ordenar
+    const sorted = [...filtered];
     switch (sortBy) {
       case 'rating':
         return sorted.sort((a, b) => (b.supplier?.rating || 0) - (a.supplier?.rating || 0));
       case 'price':
-        // Ordenar por precio mínimo del rango
         return sorted.sort((a, b) => {
           const priceA = a.supplier?.priceRange?.match(/\d+/)?.[0] || Infinity;
           const priceB = b.supplier?.priceRange?.match(/\d+/)?.[0] || Infinity;
           return Number(priceA) - Number(priceB);
         });
       case 'distance':
-        // Por ahora solo por ciudad
         return sorted.sort((a, b) => {
           const cityA = a.supplier?.location?.city || '';
           const cityB = b.supplier?.location?.city || '';
@@ -71,7 +88,7 @@ export default function SelectFromFavoritesModal({
       default:
         return sorted.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
     }
-  }, [favorites, sortBy]);
+  }, [favorites, sortBy, searchQuery]);
 
   if (!open) return null;
 
@@ -234,9 +251,52 @@ export default function SelectFromFavoritesModal({
           </div>
         </div>
 
+        {/* Barra de búsqueda (solo si hay >3 favoritos) */}
+        {favorites.length > 3 && (
+          <div className="px-6 pt-4 pb-2">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Buscar por nombre, ubicación, precio..."
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+            {searchQuery && (
+              <p className="text-xs text-gray-500 mt-2">
+                {filteredAndSortedFavorites.length} resultado(s) de {favorites.length}
+              </p>
+            )}
+          </div>
+        )}
+
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-6">
-          {favorites.length === 0 ? (
+          {filteredAndSortedFavorites.length === 0 && searchQuery ? (
+            // No results
+            <div className="text-center py-12">
+              <Search className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                No se encontraron resultados
+              </h3>
+              <p className="text-gray-600 mb-6">
+                No hay favoritos que coincidan con &quot;{searchQuery}&quot;
+              </p>
+              <Button onClick={() => setSearchQuery('')} variant="outline">
+                Limpiar búsqueda
+              </Button>
+            </div>
+          ) : favorites.length === 0 ? (
             // Empty state
             <div className="text-center py-12">
               <Heart className="h-16 w-16 text-gray-300 mx-auto mb-4" />
@@ -265,7 +325,7 @@ export default function SelectFromFavoritesModal({
           ) : (
             // List of favorites
             <div className="space-y-4">
-              {sortedFavorites.map((favorite) => {
+              {filteredAndSortedFavorites.map((favorite) => {
                 const supplier = favorite.supplier;
                 const isLoading = loading && selectedSupplier === supplier.id;
 
