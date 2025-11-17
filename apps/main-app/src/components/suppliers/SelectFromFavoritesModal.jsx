@@ -15,6 +15,8 @@ import {
   GitCompare,
   Tag,
   Plus,
+  Share2,
+  Copy,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../ui/Button';
@@ -261,6 +263,65 @@ export default function SelectFromFavoritesModal({
     return preset?.label || tagId;
   };
 
+  const handleShareWithPartner = async () => {
+    // Generar resumen de favoritos para compartir
+    const summary = favorites
+      .map((fav) => {
+        const s = fav.supplier;
+        return `• ${s.name}${s.location?.city ? ` (${s.location.city})` : ''}${s.priceRange ? ` - ${s.priceRange}` : ''}`;
+      })
+      .join('\n');
+
+    const shareText = `💍 Favoritos de ${serviceName}\n\nHe seleccionado estos ${favorites.length} proveedores:\n\n${summary}\n\n¿Qué opinas?`;
+
+    // Intentar usar Web Share API si está disponible
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `Favoritos de ${serviceName}`,
+          text: shareText,
+        });
+        toast.success(
+          t('suppliers.selectFavorites.share.success', { defaultValue: 'Compartido correctamente' })
+        );
+      } catch (error) {
+        if (error.name !== 'AbortError') {
+          // Si falla, copiar al portapapeles
+          copyToClipboard(shareText);
+        }
+      }
+    } else {
+      // Copiar al portapapeles
+      copyToClipboard(shareText);
+    }
+  };
+
+  const copyToClipboard = async (text) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success(
+        t('suppliers.selectFavorites.share.copied', {
+          defaultValue: 'Lista copiada al portapapeles. Envíala a tu pareja!',
+        })
+      );
+    } catch (error) {
+      // Fallback para navegadores sin clipboard API
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+      toast.success(
+        t('suppliers.selectFavorites.share.copied', {
+          defaultValue: 'Lista copiada. Envíala a tu pareja!',
+        })
+      );
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-xl flex flex-col">
@@ -298,6 +359,18 @@ export default function SelectFromFavoritesModal({
               >
                 <GitCompare className="h-4 w-4" />
                 Comparar ({selectedForCompare.length})
+              </button>
+            )}
+
+            {/* Botón Compartir con Pareja */}
+            {favorites.length > 0 && (
+              <button
+                onClick={handleShareWithPartner}
+                className="px-3 py-1.5 bg-pink-600 text-white rounded-md hover:bg-pink-700 transition-colors text-sm font-medium flex items-center gap-2"
+                title="Compartir lista con tu pareja"
+              >
+                <Share2 className="h-4 w-4" />
+                Compartir
               </button>
             )}
             <button
