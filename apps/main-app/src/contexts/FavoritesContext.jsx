@@ -157,9 +157,7 @@ export function FavoritesProvider({ children }) {
         throw new Error(t('suppliers.favorites.errors.alreadyExists'));
       }
 
-      throw new Error(
-        err.response?.data?.message || t('suppliers.favorites.errors.saveFailed')
-      );
+      throw new Error(err.response?.data?.message || t('suppliers.favorites.errors.saveFailed'));
     }
   };
 
@@ -193,9 +191,7 @@ export function FavoritesProvider({ children }) {
       setFavorites((prev) => prev.filter((fav) => fav.supplierId !== supplierId));
     } catch (err) {
       // console.error('[FavoritesContext] Error eliminando favorito:', err);
-      throw new Error(
-        err.response?.data?.message || t('suppliers.favorites.errors.removeFailed')
-      );
+      throw new Error(err.response?.data?.message || t('suppliers.favorites.errors.removeFailed'));
     }
   };
 
@@ -229,6 +225,42 @@ export function FavoritesProvider({ children }) {
     return favorites.find((fav) => fav.supplierId === supplierId);
   };
 
+  // Actualizar notas de un favorito
+  const updateFavoriteNotes = async (supplierId, notes) => {
+    if (!user) {
+      throw new Error(t('suppliers.favorites.errors.loginRequired'));
+    }
+
+    const weddingId = activeWedding;
+
+    if (!weddingId) {
+      throw new Error(t('suppliers.favorites.errors.activeWeddingRequired'));
+    }
+
+    try {
+      const token = await getAuthToken();
+
+      if (!token) {
+        throw new Error(t('suppliers.favorites.errors.authToken'));
+      }
+
+      const headers = {
+        Authorization: `Bearer ${token}`,
+        'x-wedding-id': weddingId,
+      };
+
+      await axios.patch(`${API_URL}/api/favorites/${supplierId}`, { notes }, { headers });
+
+      // Actualizar estado local
+      setFavorites((prev) =>
+        prev.map((fav) => (fav.supplierId === supplierId ? { ...fav, notes } : fav))
+      );
+    } catch (err) {
+      // console.error('[FavoritesContext] Error actualizando notas:', err);
+      throw new Error(err.response?.data?.message || t('suppliers.favorites.errors.updateFailed'));
+    }
+  };
+
   const value = {
     favorites,
     loading,
@@ -238,6 +270,7 @@ export function FavoritesProvider({ children }) {
     toggleFavorite,
     isFavorite,
     getFavorite,
+    updateFavoriteNotes,
     refreshFavorites: loadFavorites,
     count: favorites.length,
   };

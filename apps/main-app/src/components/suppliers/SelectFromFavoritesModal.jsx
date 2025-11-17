@@ -1,5 +1,18 @@
-import React, { useState } from 'react';
-import { X, Heart, Star, MapPin, CheckCircle, Search, Trash2, FileText, Image } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import {
+  X,
+  Heart,
+  Star,
+  MapPin,
+  CheckCircle,
+  Search,
+  Trash2,
+  FileText,
+  Image,
+  ChevronDown,
+  Edit3,
+  Check,
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../ui/Button';
 import { toast } from 'react-toastify';
@@ -7,6 +20,7 @@ import useTranslations from '../../hooks/useTranslations';
 import { useFavorites } from '../../contexts/FavoritesContext';
 import useActiveWeddingInfo from '../../hooks/useActiveWeddingInfo';
 import RequestQuoteModal from './RequestQuoteModal';
+import ImageGalleryModal from './ImageGalleryModal';
 
 export default function SelectFromFavoritesModal({
   open,
@@ -20,9 +34,14 @@ export default function SelectFromFavoritesModal({
   const [deletingId, setDeletingId] = useState(null);
   const [showQuoteModal, setShowQuoteModal] = useState(false);
   const [quoteSupplier, setQuoteSupplier] = useState(null);
+  const [showGallery, setShowGallery] = useState(false);
+  const [galleryImages, setGalleryImages] = useState([]);
+  const [sortBy, setSortBy] = useState('recent'); // recent, rating, price, distance
+  const [editingNoteId, setEditingNoteId] = useState(null);
+  const [editedNote, setEditedNote] = useState('');
   const navigate = useNavigate();
   const { t } = useTranslations();
-  const { removeFavorite } = useFavorites();
+  const { removeFavorite, updateFavoriteNotes } = useFavorites();
   const { info: weddingProfile } = useActiveWeddingInfo();
 
   if (!open) return null;
@@ -82,6 +101,57 @@ export default function SelectFromFavoritesModal({
     setShowQuoteModal(true);
   };
 
+  const handleViewGallery = (portfolio) => {
+    setGalleryImages(portfolio || []);
+    setShowGallery(true);
+  };
+
+  const handleStartEditNote = (favoriteId, currentNote) => {
+    setEditingNoteId(favoriteId);
+    setEditedNote(currentNote || '');
+  };
+
+  const handleSaveNote = async (supplierId) => {
+    try {
+      await updateFavoriteNotes(supplierId, editedNote);
+      toast.success(
+        t('suppliers.selectFavorites.notes.updated', { defaultValue: 'Nota actualizada' })
+      );
+      setEditingNoteId(null);
+      setEditedNote('');
+    } catch (error) {
+      toast.error(
+        t('suppliers.selectFavorites.notes.error', { defaultValue: 'Error al actualizar nota' })
+      );
+    }
+  };
+
+  // Ordenar favoritos
+  const sortedFavorites = useMemo(() => {
+    const sorted = [...favorites];
+    switch (sortBy) {
+      case 'rating':
+        return sorted.sort((a, b) => (b.supplier?.rating || 0) - (a.supplier?.rating || 0));
+      case 'price':
+        // Ordenar por precio mínimo del rango
+        return sorted.sort((a, b) => {
+          const priceA = a.supplier?.priceRange?.match(/\d+/)?.[0] || Infinity;
+          const priceB = b.supplier?.priceRange?.match(/\d+/)?.[0] || Infinity;
+          return Number(priceA) - Number(priceB);
+        });
+      case 'distance':
+        // Por ahora solo por ciudad
+        return sorted.sort((a, b) => {
+          const cityA = a.supplier?.location?.city || '';
+          const cityB = b.supplier?.location?.city || '';
+          return cityA.localeCompare(cityB);
+        });
+      case 'recent':
+      default:
+        return sorted.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+    }
+  }, [favorites, sortBy]);
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-xl flex flex-col">
@@ -96,9 +166,28 @@ export default function SelectFromFavoritesModal({
               </p>
             </div>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
-            <X size={24} />
-          </button>
+          <div className="flex items-center gap-2">
+            {/* Ordenar */}
+            <div className="relative">
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="pl-3 pr-8 py-1.5 text-sm border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 appearance-none cursor-pointer"
+              >
+                <option value="recent">📅 Recientes</option>
+                <option value="rating">⭐ Mejor valorados</option>
+                <option value="price">💰 Menor precio</option>
+                <option value="distance">📍 Ubicación</option>
+              </select>
+              <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+            </div>
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <X size={24} />
+            </button>
+          </div>
         </div>
 
         {/* Content */}
@@ -132,7 +221,7 @@ export default function SelectFromFavoritesModal({
           ) : (
             // List of favorites
             <div className="space-y-4">
-              {favorites.map((favorite) => {
+              {sortedFavorites.map((favorite) => {
                 const supplier = favorite.supplier;
                 const isLoading = loading && selectedSupplier === supplier.id;
 
@@ -151,15 +240,27 @@ export default function SelectFromFavoritesModal({
                     <div className="flex gap-4">
                       {/* Imagen del portfolio */}
                       {portfolioImage ? (
-                        <div className="w-32 h-32 flex-shrink-0">
+                        <div
+                          className="w-32 h-32 flex-shrink-0 cursor-pointer relative group"
+                          onClick={() =>
+                            supplier.portfolio?.length > 0 && handleViewGallery(supplier.portfolio)
+                          }
+                        >
                           <img
                             src={portfolioImage}
                             alt={supplier.name}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover transition-transform group-hover:scale-105"
                             onError={(e) => {
                               e.target.style.display = 'none';
                             }}
                           />
+                          {supplier.portfolio?.length > 1 && (
+                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                              <span className="text-white text-sm font-medium">
+                                Ver {supplier.portfolio.length} fotos
+                              </span>
+                            </div>
+                          )}
                         </div>
                       ) : (
                         <div className="w-32 h-32 flex-shrink-0 bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center">
@@ -221,11 +322,56 @@ export default function SelectFromFavoritesModal({
                           </div>
                         )}
 
-                        {/* Notes */}
-                        {favorite.notes && (
-                          <p className="text-sm text-gray-600 italic mt-2 bg-yellow-50 p-2 rounded">
-                            💭 {favorite.notes}
-                          </p>
+                        {/* Notes - Editable */}
+                        {editingNoteId === (favorite.id || supplier.id) ? (
+                          <div className="mt-2 flex gap-2">
+                            <input
+                              type="text"
+                              value={editedNote}
+                              onChange={(e) => setEditedNote(e.target.value)}
+                              className="flex-1 text-sm border border-purple-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                              placeholder="Escribe una nota..."
+                              autoFocus
+                            />
+                            <button
+                              onClick={() => handleSaveNote(supplier.id)}
+                              className="px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+                            >
+                              <Check className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={() => setEditingNoteId(null)}
+                              className="px-2 py-1 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors"
+                            >
+                              <X className="h-4 w-4" />
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="mt-2">
+                            {favorite.notes ? (
+                              <div className="flex items-start gap-2 bg-yellow-50 p-2 rounded group">
+                                <p className="flex-1 text-sm text-gray-600 italic">
+                                  💭 {favorite.notes}
+                                </p>
+                                <button
+                                  onClick={() =>
+                                    handleStartEditNote(favorite.id || supplier.id, favorite.notes)
+                                  }
+                                  className="opacity-0 group-hover:opacity-100 transition-opacity text-purple-600 hover:text-purple-700"
+                                >
+                                  <Edit3 className="h-4 w-4" />
+                                </button>
+                              </div>
+                            ) : (
+                              <button
+                                onClick={() => handleStartEditNote(favorite.id || supplier.id, '')}
+                                className="text-sm text-purple-600 hover:text-purple-700 flex items-center gap-1"
+                              >
+                                <Edit3 className="h-3 w-3" />
+                                Agregar nota
+                              </button>
+                            )}
+                          </div>
                         )}
 
                         {/* Botones de acción */}
@@ -322,6 +468,15 @@ export default function SelectFromFavoritesModal({
             setShowQuoteModal(false);
             setQuoteSupplier(null);
           }}
+        />
+      )}
+
+      {/* Galería de imágenes */}
+      {showGallery && (
+        <ImageGalleryModal
+          images={galleryImages}
+          initialIndex={0}
+          onClose={() => setShowGallery(false)}
         />
       )}
     </div>
