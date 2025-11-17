@@ -10,6 +10,16 @@ export const EVENT_STYLE_OPTIONS = [
   { value: 'rustico', label: 'Rústico' },
   { value: 'glam', label: 'Glam' },
   { value: 'minimal', label: 'Minimalista' },
+  { value: 'aire-libre', label: 'Al aire libre' },
+  { value: 'playa', label: 'Playa' },
+  { value: 'jardin', label: 'Jardín' },
+  { value: 'vintage', label: 'Vintage' },
+  { value: 'industrial', label: 'Industrial' },
+  { value: 'romantico', label: 'Romántico' },
+  { value: 'tropical', label: 'Tropical' },
+  { value: 'destino', label: 'Destino' },
+  { value: 'intimo', label: 'Íntimo' },
+  { value: 'campestre', label: 'Campestre' },
 ];
 
 export const GUEST_COUNT_OPTIONS = [
