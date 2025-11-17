@@ -374,4 +374,112 @@ router.post('/weddings/:weddingId/services/:serviceId/payments', requireAuth, as
       remaining,
     });
   } catch (error) {
+    console.error('Error registering payment:', error);
+    res.status(500).json({ error: 'Error al registrar pago' });
+  }
+});
+
+/**
+ * POST /api/weddings/:weddingId/services/:serviceId/link
+ * Vincular servicios cuando son del mismo proveedor
+ */
+router.post('/weddings/:weddingId/services/:serviceId/link', requireAuth, async (req, res) => {
+  try {
+    const { weddingId, serviceId } = req.params;
+    const { linkedServices } = req.body; // Array de IDs de servicios a vincular
+    const userId = req.user.uid;
+
+    if (!linkedServices || !Array.isArray(linkedServices)) {
+      return res.status(400).json({ error: 'linkedServices debe ser un array' });
+    }
+
+    // Verificar acceso a la boda
+    const weddingRef = db.collection('users').doc(userId).collection('weddings').doc(weddingId);
+    const weddingDoc = await weddingRef.get();
+
+    if (!weddingDoc.exists) {
+      return res.status(404).json({ error: 'Boda no encontrada' });
+    }
+
+    // Actualizar el servicio principal para agregar linkedServices
+    const serviceRef = weddingRef.collection('services').doc(serviceId);
+    const serviceDoc = await serviceRef.get();
+
+    if (!serviceDoc.exists) {
+      return res.status(404).json({ error: 'Servicio no encontrado' });
+    }
+
+    // Actualizar servicio principal
+    await serviceRef.update({
+      linkedServices: linkedServices,
+      updatedAt: new Date().toISOString(),
+    });
+
+    // Marcar los servicios vinculados como \"linkedTo\"
+    const updatePromises = linkedServices.map((linkedId) => {
+      const linkedRef = weddingRef.collection('services').doc(linkedId);
+      return linkedRef.update({
+        linkedTo: serviceId,
+        updatedAt: new Date().toISOString(),
+      });
+    });
+    await Promise.all(updatePromises);
+
+    res.json({ success: true, linkedServices });
+  } catch (error) {
+    console.error('Error vinculando servicios:', error);
+    res.status(500).json({ error: 'Error al vincular servicios' });
+  }
+});
+
+/**
+ * DELETE /api/weddings/:weddingId/services/:serviceId/link
+ * Desvincular servicios
+ */
+router.delete('/weddings/:weddingId/services/:serviceId/link', requireAuth, async (req, res) => {
+  try {
+    const { weddingId, serviceId } = req.params;
+    const userId = req.user.uid;
+
+    // Verificar acceso a la boda
+    const weddingRef = db.collection('users').doc(userId).collection('weddings').doc(weddingId);
+    const weddingDoc = await weddingRef.get();
+
+    if (!weddingDoc.exists) {
+      return res.status(404).json({ error: 'Boda no encontrada' });
+    }
+
+    // Obtener el servicio para ver qué servicios tiene vinculados
+    const serviceRef = weddingRef.collection('services').doc(serviceId);
+    const serviceDoc = await serviceRef.get();
+
+    if (!serviceDoc.exists) {
+      return res.status(404).json({ error: 'Servicio no encontrado' });
+    }
+
+    const linkedServices = serviceDoc.data().linkedServices || [];
+
+    // Limpiar linkedServices del servicio principal
+    await serviceRef.update({
+      linkedServices: [],
+      updatedAt: new Date().toISOString(),
+    });
+
+    // Limpiar linkedTo de los servicios vinculados
+    const updatePromises = linkedServices.map((linkedId) => {
+      const linkedRef = weddingRef.collection('services').doc(linkedId);
+      return linkedRef.update({
+        linkedTo: null,
+        updatedAt: new Date().toISOString(),
+      });
+    });
+    await Promise.all(updatePromises);
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error desvinculando servicios:', error);
+    res.status(500).json({ error: 'Error al desvincular servicios' });
+  }
+});
+
 export default router;
