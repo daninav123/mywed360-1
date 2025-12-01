@@ -1,7 +1,7 @@
 import express from 'express';
 import { db } from '../db.js';
 import { FieldValue } from 'firebase-admin/firestore';
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 import { requireSupplierAuth } from './supplier-dashboard.js';
 import Stripe from 'stripe';
 

@@ -27,7 +27,7 @@
 
 import express from 'express';
 import OpenAI from 'openai';
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 import admin from 'firebase-admin';
 
 const router = express.Router();

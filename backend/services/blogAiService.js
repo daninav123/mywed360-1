@@ -400,8 +400,14 @@ Devuelve JSON válido con esta estructura:
       source: 'openai',
     };
   } catch (error) {
-    console.error('[blogAiService] generateBlogArticle failed:', error?.message || error);
-    return { ...fallbackArticle(input), source: 'error', error: error?.message || 'unknown-error' };
+    const errorMsg = error?.message || String(error);
+    const errorCode = error?.code || error?.status || 'unknown';
+    console.error('[blogAiService] generateBlogArticle failed:', {
+      message: errorMsg,
+      code: errorCode,
+      type: error?.constructor?.name,
+    });
+    return { ...fallbackArticle(input), source: 'error', error: errorMsg, code: errorCode };
   }
 }
 
@@ -542,15 +548,22 @@ Useful references to keep context (do not translate URLs): ${JSON.stringify(
         },
       };
     } catch (error) {
+      const errorMsg = error?.message || String(error);
+      const errorCode = error?.code || error?.status || 'unknown';
       console.error(
-        '[blogAiService] translateBlogArticleToLanguages failed for %s -> %s: %s',
+        '[blogAiService] translateBlogArticleToLanguages failed for %s -> %s:',
         fromLanguage,
         target,
-        error?.message || error
+        {
+          message: errorMsg,
+          code: errorCode,
+          type: error?.constructor?.name,
+        }
       );
       results[target] = {
         status: 'failed',
-        error: error?.message || 'translation-error',
+        error: errorMsg,
+        code: errorCode,
       };
     }
   }
@@ -687,10 +700,17 @@ export async function generateCoverImageFromPrompt(prompt, options = {}) {
           originalUrl: imageUrl,
         };
       } catch (uploadError) {
-        console.error('[blogAiService] cover upload failed:', uploadError?.message || uploadError);
+        const uploadErrorMsg = uploadError?.message || String(uploadError);
+        const uploadErrorCode = uploadError?.code || uploadError?.status || 'unknown';
+        console.error('[blogAiService] cover upload failed:', {
+          message: uploadErrorMsg,
+          code: uploadErrorCode,
+          type: uploadError?.constructor?.name,
+        });
         storageInfo = {
           bucket: bucketName,
-          error: uploadError?.message || 'upload-failed',
+          error: uploadErrorMsg,
+          code: uploadErrorCode,
           originalUrl: imageUrl,
         };
       }
@@ -714,12 +734,19 @@ export async function generateCoverImageFromPrompt(prompt, options = {}) {
       },
     };
   } catch (error) {
-    console.error('[blogAiService] generateCoverImageFromPrompt failed:', error?.message || error);
+    const errorMsg = error?.message || String(error);
+    const errorCode = error?.code || error?.status || 'unknown';
+    console.error('[blogAiService] generateCoverImageFromPrompt failed:', {
+      message: errorMsg,
+      code: errorCode,
+      type: error?.constructor?.name,
+    });
     return {
       status: 'failed',
       url: null,
       provider: 'openai',
-      error: error?.message || 'unknown-error',
+      error: errorMsg,
+      code: errorCode,
     };
   }
 }

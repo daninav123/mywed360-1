@@ -6,7 +6,7 @@
 
 import express from 'express';
 import OpenAI from 'openai';
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 
 const router = express.Router();
 
@@ -14,7 +14,8 @@ let openai = null;
 let openAIConfig = { apiKey: null, projectId: null };
 
 const resolveApiKey = () => process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY || '';
-const resolveProjectId = () => process.env.OPENAI_PROJECT_ID || process.env.VITE_OPENAI_PROJECT_ID || '';
+const resolveProjectId = () =>
+  process.env.OPENAI_PROJECT_ID || process.env.VITE_OPENAI_PROJECT_ID || '';
 
 const ensureOpenAIClient = () => {
   const apiKey = resolveApiKey().trim();
@@ -65,8 +66,17 @@ router.post('/', async (req, res) => {
   // Derivar ubicación desde distintos posibles campos del perfil
   const formattedLocation =
     location ||
-    (profile && (profile.celebrationPlace || profile.location || profile.city || profile.ceremonyLocation || profile.receptionVenue)) ||
-    (profile && profile.weddingInfo && (profile.weddingInfo.celebrationPlace || profile.weddingInfo.location || profile.weddingInfo.city)) ||
+    (profile &&
+      (profile.celebrationPlace ||
+        profile.location ||
+        profile.city ||
+        profile.ceremonyLocation ||
+        profile.receptionVenue)) ||
+    (profile &&
+      profile.weddingInfo &&
+      (profile.weddingInfo.celebrationPlace ||
+        profile.weddingInfo.location ||
+        profile.weddingInfo.city)) ||
     'Espana';
 
   const locationPrompt = formattedLocation
@@ -75,9 +85,15 @@ router.post('/', async (req, res) => {
   const inferredBudget =
     budget ||
     (profile && (profile.budget || profile.estimatedBudget || profile.totalBudget)) ||
-    (profile && profile.weddingInfo && (profile.weddingInfo.budget || profile.weddingInfo.estimatedBudget || profile.weddingInfo.totalBudget)) ||
+    (profile &&
+      profile.weddingInfo &&
+      (profile.weddingInfo.budget ||
+        profile.weddingInfo.estimatedBudget ||
+        profile.weddingInfo.totalBudget)) ||
     '';
-  const budgetPrompt = inferredBudget ? `El presupuesto es ${inferredBudget}.` : 'No hay un presupuesto especificado.';
+  const budgetPrompt = inferredBudget
+    ? `El presupuesto es ${inferredBudget}.`
+    : 'No hay un presupuesto especificado.';
 
   const prompt = `Busca en internet proveedores reales de ${servicioSeleccionado || 'servicios para bodas'} para la siguiente consulta:
 
@@ -119,23 +135,23 @@ IMPORTANTE: Devuelve SOLO el array JSON, sin texto adicional antes o después.`;
       temperature: 0.3,
       response_format: { type: 'json_object' },
       messages: [
-        { 
-          role: 'system', 
+        {
+          role: 'system',
           content: `Eres un buscador experto de proveedores de bodas con acceso a internet.
 Buscas información actualizada y verificada.
 Siempre devuelves resultados en formato JSON válido.
-Solo incluyes proveedores que existen realmente y tienen presencia web verificable.` 
+Solo incluyes proveedores que existen realmente y tienen presencia web verificable.`,
         },
-        { 
-          role: 'user', 
-          content: `${prompt}\n\nDevuelve el resultado en formato JSON con la estructura: {"providers": [array de proveedores]}` 
+        {
+          role: 'user',
+          content: `${prompt}\n\nDevuelve el resultado en formato JSON con la estructura: {"providers": [array de proveedores]}`,
         },
       ],
     });
 
     const content = completion.choices?.[0]?.message?.content || '';
     let results = [];
-    
+
     try {
       const parsed = JSON.parse(content);
       // El response_format json_object devuelve {providers: [...]}
@@ -147,11 +163,11 @@ Solo incluyes proveedores que existen realmente y tienen presencia web verificab
         logger.warn('[ai-suppliers] formato JSON inesperado', { parsed });
       }
     } catch (parseError) {
-      logger.error('[ai-suppliers] Error parseando respuesta', { 
+      logger.error('[ai-suppliers] Error parseando respuesta', {
         error: parseError.message,
-        content: content.substring(0, 500) 
+        content: content.substring(0, 500),
       });
-      
+
       // Intentar extraer substring que parezca un array JSON
       const match = content.match(/\[.*\]/s);
       if (match) {
@@ -164,20 +180,20 @@ Solo incluyes proveedores que existen realmente y tienen presencia web verificab
     }
 
     if (!Array.isArray(results) || results.length === 0) {
-      logger.error('[ai-suppliers] Sin resultados válidos', { 
+      logger.error('[ai-suppliers] Sin resultados válidos', {
         hasContent: !!content,
-        contentPreview: content.substring(0, 200)
+        contentPreview: content.substring(0, 200),
       });
-      return res.status(502).json({ 
-        error: 'openai_invalid_response', 
+      return res.status(502).json({
+        error: 'openai_invalid_response',
         message: 'La IA no devolvió proveedores válidos. Intenta reformular la búsqueda.',
-        raw: content.substring(0, 500)
+        raw: content.substring(0, 500),
       });
     }
 
-    logger.info('[ai-suppliers] Resultados obtenidos exitosamente', { 
+    logger.info('[ai-suppliers] Resultados obtenidos exitosamente', {
       count: results.length,
-      firstProvider: results[0]?.title || 'N/A'
+      firstProvider: results[0]?.title || 'N/A',
     });
 
     res.json(results);

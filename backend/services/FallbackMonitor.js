@@ -2,7 +2,7 @@
 // Sistema de monitoreo de fallbacks para detectar problemas en servicios externos
 
 import { db } from '../db.js';
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 
 /**
  * Configuración de umbrales por servicio
@@ -19,7 +19,7 @@ const DEFAULT_THRESHOLDS = {
   'image-generation': { maxPerHour: 5, severity: 'medium', category: 'AI Services' },
   'whatsapp-api': { maxPerHour: 10, severity: 'medium', category: 'Messaging' },
   'payment-gateway': { maxPerHour: 2, severity: 'critical', category: 'Payments' },
-  'default': { maxPerHour: 10, severity: 'medium', category: 'System' },
+  default: { maxPerHour: 10, severity: 'medium', category: 'System' },
 };
 
 class FallbackMonitor {
@@ -284,10 +284,7 @@ class FallbackMonitor {
         stats[service].errors[errorKey] = (stats[service].errors[errorKey] || 0) + 1;
 
         // Guardar último error
-        if (
-          !stats[service].lastTimestamp ||
-          data.timestamp > stats[service].lastTimestamp
-        ) {
+        if (!stats[service].lastTimestamp || data.timestamp > stats[service].lastTimestamp) {
           stats[service].lastError = data.errorMessage || data.error;
           stats[service].lastTimestamp = data.timestamp;
         }

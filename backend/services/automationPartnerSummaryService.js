@@ -1,6 +1,6 @@
 import admin from 'firebase-admin';
 
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 import { calculateCommission } from '../utils/commission.js';
 import { sendWhatsAppText, toE164 } from './whatsappService.js';
 
@@ -232,7 +232,11 @@ export const updatePartnerSummaryConfig = async (payload = {}, actor = {}) => {
   if (typeof config.sendHourUtc !== 'number' || config.sendHourUtc < 0 || config.sendHourUtc > 23) {
     throw new Error('sendHourUtc inválido');
   }
-  if (typeof config.sendMinuteUtc !== 'number' || config.sendMinuteUtc < 0 || config.sendMinuteUtc > 59) {
+  if (
+    typeof config.sendMinuteUtc !== 'number' ||
+    config.sendMinuteUtc < 0 ||
+    config.sendMinuteUtc > 59
+  ) {
     throw new Error('sendMinuteUtc inválido');
   }
   if (typeof config.thresholdPending !== 'number' || config.thresholdPending < 0) {
@@ -341,7 +345,7 @@ export const runPartnerSummaryAutomation = async ({ dryRun = false } = {}, actor
 
     const { lifetimeCompleted, periodCompleted, periodExistingDoc } = await fetchPayoutTotals(
       partnerId,
-      periodKey,
+      periodKey
     );
 
     const pendingAmount = Math.max(periodCommission - periodCompleted, 0);
@@ -421,9 +425,7 @@ export const runPartnerSummaryAutomation = async ({ dryRun = false } = {}, actor
           sent += 1;
         } else {
           errors += 1;
-          notes.push(
-            `partner:${partnerId} envio_error:${resp?.error || 'unknown_response'}`,
-          );
+          notes.push(`partner:${partnerId} envio_error:${resp?.error || 'unknown_response'}`);
         }
       } catch (error) {
         errors += 1;
@@ -450,12 +452,12 @@ export const runPartnerSummaryAutomation = async ({ dryRun = false } = {}, actor
             notes: notes.slice(0, MAX_NOTES),
           },
         },
-        { merge: true },
+        { merge: true }
       );
     } catch (error) {
       logger.warn(
         '[automation-partner-summary] no se pudo actualizar lastRun',
-        error?.message || error,
+        error?.message || error
       );
     }
   }

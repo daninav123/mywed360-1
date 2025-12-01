@@ -3,7 +3,7 @@
 
 import express from 'express';
 import OpenAI from 'openai';
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 
 const router = express.Router();
 
@@ -42,10 +42,7 @@ router.post('/generate', async (req, res) => {
   const parsedTemperature = Number.parseFloat(temperature);
   const safeTemperature = Number.isFinite(parsedTemperature) ? parsedTemperature : 0.55;
   const finalModel =
-    model ||
-    process.env.OPENAI_MODEL_WEBSITE ||
-    process.env.OPENAI_MODEL ||
-    'gpt-4o';
+    model || process.env.OPENAI_MODEL_WEBSITE || process.env.OPENAI_MODEL || 'gpt-4o';
 
   try {
     const completion = await openai.chat.completions.create({

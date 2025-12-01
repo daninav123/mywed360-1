@@ -8,56 +8,30 @@ import { searchWeb, getUserLocation } from './webSearchService';
  */
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4004';
-const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY || '';
 
 /**
  * Analizar query con IA para extraer intención
  */
 export const analyzeSearchIntent = async (query) => {
-  if (!OPENAI_API_KEY) {
-    // Fallback sin IA: detección simple por keywords
-    return analyzeSearchIntentBasic(query);
-  }
-
   try {
+    // Usar endpoint backend (más seguro)
     const response = await axios.post(
-      'https://api.openai.com/v1/chat/completions',
-      {
-        model: 'gpt-3.5-turbo',
-        messages: [
-          {
-            role: 'system',
-            content: `Eres un asistente que analiza búsquedas de usuarios de una app de bodas.
-Extrae: tipo de búsqueda (local, web, inspiración, venue), categoría de proveedor, ubicación, y si necesita búsqueda web.
-
-Responde SOLO con JSON válido:
-{
-  "searchType": "local" | "web" | "inspiration" | "mixed",
-  "category": "fotografo" | "catering" | "flores" | "musica" | "venue" | null,
-  "location": string | null,
-  "needsWeb": boolean,
-  "sources": ["google_places", "pinterest", "unsplash"],
-  "intent": "search_supplier" | "search_guest" | "search_task" | "search_inspiration" | "search_venue"
-}`
-          },
-          {
-            role: 'user',
-            content: `Analiza esta búsqueda: "${query}"`
-          }
-        ],
-        temperature: 0.3,
-        max_tokens: 200,
-      },
+      `${BACKEND_URL}/api/ai/search/analyze-intent`,
+      { query },
       {
         headers: {
-          'Authorization': `Bearer ${OPENAI_API_KEY}`,
           'Content-Type': 'application/json',
+          // El auth token se añade automáticamente por el interceptor de axios
         },
       }
     );
 
-    const result = JSON.parse(response.data.choices[0].message.content);
-    return result;
+    if (response.data?.success && response.data?.data) {
+      return response.data.data;
+    }
+
+    // Fallback si el backend no tiene respuesta válida
+    return analyzeSearchIntentBasic(query);
   } catch (error) {
     // console.error('Error analyzing search intent with AI:', error);
     return analyzeSearchIntentBasic(query);
@@ -69,7 +43,7 @@ Responde SOLO con JSON válido:
  */
 const analyzeSearchIntentBasic = (query) => {
   const lowerQuery = query.toLowerCase();
-  
+
   // Detectar categorías primero
   const categories = {
     fotografo: /fotógraf|photo|camara/i,
@@ -105,14 +79,16 @@ const analyzeSearchIntentBasic = (query) => {
   const isInspiration = inspirationKeywords.test(lowerQuery);
 
   // Detectar si parece un nombre propio (comienza con mayúscula o tiene varias palabras capitalizadas)
-  const looksLikeProperName = /^[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+/.test(query) || 
-                               /[A-ZÁÉÍÓÚÑ][a-z]+\s+[A-ZÁÉÍÓÚÑ][a-z]+/.test(query);
-  
+  const looksLikeProperName =
+    /^[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+/.test(query) || /[A-ZÁÉÍÓÚÑ][a-z]+\s+[A-ZÁÉÍÓÚÑ][a-z]+/.test(query);
+
   // Si no tiene categoría ni es inspiración, y tiene más de 3 caracteres, probablemente es un nombre específico
   // Incluso si está en minúsculas (ej: "audioprobe")
-  const isSpecificName = (looksLikeProperName || (!category && !isInspiration && query.length > 3 && !query.includes(' '))) && 
-                         !category && 
-                         !isInspiration;
+  const isSpecificName =
+    (looksLikeProperName ||
+      (!category && !isInspiration && query.length > 3 && !query.includes(' '))) &&
+    !category &&
+    !isInspiration;
 
   // Decidir si necesita web
   const needsWeb = !!(category || location || isInspiration || isSpecificName);
@@ -127,12 +103,18 @@ const analyzeSearchIntentBasic = (query) => {
   }
 
   return {
-    searchType: isInspiration ? 'inspiration' : (needsWeb ? 'mixed' : 'local'),
+    searchType: isInspiration ? 'inspiration' : needsWeb ? 'mixed' : 'local',
     category,
     location,
     needsWeb,
     sources: sources.length > 0 ? sources : ['google_places'],
-    intent: isSpecificName ? 'search_specific_name' : (category ? 'search_supplier' : (isInspiration ? 'search_inspiration' : 'search_local')),
+    intent: isSpecificName
+      ? 'search_specific_name'
+      : category
+        ? 'search_supplier'
+        : isInspiration
+          ? 'search_inspiration'
+          : 'search_local',
     isSpecificName,
   };
 };
@@ -141,45 +123,31 @@ const analyzeSearchIntentBasic = (query) => {
  * Enriquecer resultados con IA
  */
 export const enrichResultsWithAI = async (results, query) => {
-  if (!OPENAI_API_KEY || results.length === 0) {
+  if (results.length === 0) {
     return results;
   }
 
   try {
+    // Usar endpoint backend (más seguro)
     const response = await axios.post(
-      'https://api.openai.com/v1/chat/completions',
-      {
-        model: 'gpt-3.5-turbo',
-        messages: [
-          {
-            role: 'system',
-            content: 'Analiza estos resultados de búsqueda y proporciona insights útiles para cada uno. Responde en español.'
-          },
-          {
-            role: 'user',
-            content: `Query: "${query}"\n\nResultados: ${JSON.stringify(results.slice(0, 3).map(r => ({
-              name: r.title || r.name,
-              category: r.category || r.type,
-              rating: r.rating,
-            })))}\n\nProporciona un breve insight (máx 50 palabras) sobre cuál podría ser mejor opción y por qué.`
-          }
-        ],
-        temperature: 0.7,
-        max_tokens: 150,
-      },
+      `${BACKEND_URL}/api/ai/search/enrich-results`,
+      { results, query },
       {
         headers: {
-          'Authorization': `Bearer ${OPENAI_API_KEY}`,
           'Content-Type': 'application/json',
         },
       }
     );
 
-    const aiInsight = response.data.choices[0].message.content;
-    
-    // Añadir insight al primer resultado
-    if (results[0]) {
-      results[0].aiInsight = aiInsight;
+    if (response.data?.success && response.data?.data) {
+      const { results: enrichedResults, enrichment } = response.data.data;
+
+      // Añadir enrichment al primer resultado
+      if (enrichedResults[0] && enrichment) {
+        enrichedResults[0].aiInsight = enrichment.reasoning || enrichment.topPick;
+      }
+
+      return enrichedResults;
     }
 
     return results;
@@ -206,7 +174,7 @@ export const universalSearch = async (query, weddingId, userId) => {
   try {
     // 1. Analizar intención con IA
     const intent = await analyzeSearchIntent(query);
-    
+
     // console.log('🤖 Search Intent:', intent);
 
     // 2. Búsqueda local (siempre)
@@ -214,11 +182,15 @@ export const universalSearch = async (query, weddingId, userId) => {
 
     // 3. Búsqueda web (si es necesario)
     let webPromise = Promise.resolve({ combined: [], bySource: {} });
-    
+
     if (intent.needsWeb) {
       // Obtener ubicación del usuario si busca proveedores
       let userLocation = null;
-      if (intent.intent === 'search_supplier' || intent.intent === 'search_venue' || intent.intent === 'search_specific_name') {
+      if (
+        intent.intent === 'search_supplier' ||
+        intent.intent === 'search_venue' ||
+        intent.intent === 'search_specific_name'
+      ) {
         userLocation = await getUserLocation();
       }
 
@@ -235,7 +207,7 @@ export const universalSearch = async (query, weddingId, userId) => {
     const [localResults, webResults] = await Promise.all([localPromise, webPromise]);
 
     // 5. Combinar y ordenar resultados
-    const webResultsFormatted = webResults.combined.map(r => ({
+    const webResultsFormatted = webResults.combined.map((r) => ({
       ...r,
       title: r.name,
       isExternal: true,
@@ -259,7 +231,7 @@ export const universalSearch = async (query, weddingId, userId) => {
     };
   } catch (error) {
     // console.error('Error in universal search:', error);
-    
+
     // Fallback: solo búsqueda local
     const localResults = await searchLocal(query, weddingId, userId);
     return {
@@ -276,37 +248,27 @@ export const universalSearch = async (query, weddingId, userId) => {
  * Generar sugerencias de búsqueda con IA
  */
 export const generateSearchSuggestions = async (partialQuery, context = {}) => {
-  if (!OPENAI_API_KEY || partialQuery.length < 2) {
+  if (partialQuery.length < 2) {
     return [];
   }
 
   try {
+    // Usar endpoint backend (más seguro)
     const response = await axios.post(
-      'https://api.openai.com/v1/chat/completions',
-      {
-        model: 'gpt-3.5-turbo',
-        messages: [
-          {
-            role: 'system',
-            content: 'Eres un asistente de búsqueda para una app de bodas. Sugiere 5 búsquedas relevantes basadas en lo que el usuario está escribiendo. Responde SOLO con un array JSON de strings.'
-          },
-          {
-            role: 'user',
-            content: `Usuario está escribiendo: "${partialQuery}"\nContexto: ${JSON.stringify(context)}\n\nSugiere 5 búsquedas completas.`
-          }
-        ],
-        temperature: 0.7,
-        max_tokens: 100,
-      },
+      `${BACKEND_URL}/api/ai/search/generate-suggestions`,
+      { partialQuery, context },
       {
         headers: {
-          'Authorization': `Bearer ${OPENAI_API_KEY}`,
           'Content-Type': 'application/json',
         },
       }
     );
 
-    return JSON.parse(response.data.choices[0].message.content);
+    if (response.data?.success && response.data?.data?.suggestions) {
+      return response.data.data.suggestions;
+    }
+
+    return [];
   } catch (error) {
     // console.error('Error generating suggestions:', error);
     return [];

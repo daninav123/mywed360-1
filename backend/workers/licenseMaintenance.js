@@ -1,11 +1,14 @@
 import admin from 'firebase-admin';
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 
 if (!admin.apps.length) {
   try {
     admin.initializeApp();
   } catch (error) {
-    logger.warn('[licenseMaintenance] Firebase Admin ya inicializado o no disponible', error?.message);
+    logger.warn(
+      '[licenseMaintenance] Firebase Admin ya inicializado o no disponible',
+      error?.message
+    );
   }
 }
 
@@ -40,13 +43,16 @@ const diffInDays = (futureDate, from = new Date()) => {
 const queueNotification = async (docId, payload) => {
   try {
     const queueId = `${docId}_${payload.kind}_${payload.key || 'default'}`;
-    await db.collection('notificationsQueue').doc(queueId).set(
-      {
-        ...payload,
-        updatedAt: FieldValue.serverTimestamp(),
-      },
-      { merge: true },
-    );
+    await db
+      .collection('notificationsQueue')
+      .doc(queueId)
+      .set(
+        {
+          ...payload,
+          updatedAt: FieldValue.serverTimestamp(),
+        },
+        { merge: true }
+      );
   } catch (error) {
     logger.warn('[licenseMaintenance] No se pudo registrar notificación', error?.message);
   }
@@ -186,7 +192,7 @@ export const startLicenseMaintenanceWorker = () => {
   if (String(process.env.NODE_ENV || '').toLowerCase() === 'test') return;
   started = true;
 
-  const intervalMs = Number(process.env.LICENSE_WORKER_INTERVAL_MS || (6 * 60 * 60 * 1000));
+  const intervalMs = Number(process.env.LICENSE_WORKER_INTERVAL_MS || 6 * 60 * 60 * 1000);
   const initialDelay = Number(process.env.LICENSE_WORKER_INITIAL_DELAY_MS || 15000);
 
   setTimeout(() => {

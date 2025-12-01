@@ -4248,6 +4248,16 @@
   "planModern": {
     "header": {
       "userFallback": "Usuario"
+    },
+    "toasts": {
+      "fullAssignment": "🎉 ¡Todos los invitados han sido asignados!",
+      "capacityUpdated": "Capacidad actualizada: {{value}} asientos",
+      "tableAdded": "Mesa añadida correctamente",
+      "tableDeleted": "Mesa eliminada",
+      "guestMoved": "Invitado movido a mesa {{tableNumber}}",
+      "layoutGenerated": "Layout generado: {{count}} mesas creadas",
+      "autoAssignmentComplete": "Auto-asignación completada: {{assigned}} invitados asignados",
+      "error": "Ha ocurrido un error. Por favor, inténtalo de nuevo"
     }
   }
 }

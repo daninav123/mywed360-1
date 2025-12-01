@@ -1,7 +1,7 @@
 import express from 'express';
 import { db } from '../db.js';
 import { FieldValue } from 'firebase-admin/firestore';
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 import { sendBudgetStatusEmail } from '../services/budgetEmailService.js';
 
 const router = express.Router();
@@ -55,11 +55,7 @@ router.put('/:wId/suppliers/:sId/budget', async (req, res) => {
 
     // Si se acepta, crear transacción en finanzas (collection financeTransactions)
     if (newStatus === 'accepted') {
-      const financeRef = db
-        .collection('weddings')
-        .doc(wId)
-        .collection('transactions')
-        .doc();
+      const financeRef = db.collection('weddings').doc(wId).collection('transactions').doc();
 
       await financeRef.set({
         supplierId: sId,

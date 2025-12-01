@@ -5,7 +5,7 @@ import express from 'express';
 import { z } from 'zod';
 
 import { fallbackMonitor } from '../services/FallbackMonitor.js';
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 
 const router = express.Router();
 

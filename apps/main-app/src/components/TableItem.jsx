@@ -1,5 +1,6 @@
 import React, { useRef, useMemo, useCallback } from 'react';
 import { useDrop } from 'react-dnd';
+import { Crown } from 'lucide-react';
 
 import { ItemTypes } from './GuestItem';
 import { inferTableType } from '../utils/seatingTables';
@@ -179,6 +180,8 @@ function TableItem({
     let lastPos = { x: table.x ?? 0, y: table.y ?? 0 };
     let moved = false;
     const move = (ev) => {
+      ev.stopPropagation(); // ⬅️ Prevenir que el canvas también se mueva
+      ev.preventDefault(); // ⬅️ Prevenir scrolling y otros comportamientos
       // Convertir puntero actual a coords locales y luego a mundo
       const local = { x: ev.clientX - containerRect.left, y: ev.clientY - containerRect.top };
       const pointerWorld = {
@@ -191,6 +194,7 @@ function TableItem({
       moved = true;
     };
     const up = (ev) => {
+      ev.stopPropagation(); // ⬅️ Prevenir propagación en pointerup también
       window.removeEventListener('pointermove', move);
       window.removeEventListener('pointerup', up);
       // Usar la última posición calculada si hubo movimiento; si no, calcular desde pointerup
@@ -227,7 +231,11 @@ function TableItem({
     const countFromGuests = guests.reduce((sum, g) => {
       const matches = (() => {
         if (g.tableId !== undefined && g.tableId !== null) {
-          return String(g.tableId) === String(table.id);
+          // Comparar con table.id O table.name (porque el id puede ser un timestamp)
+          return (
+            String(g.tableId) === String(table.id) ||
+            (table.name && String(g.tableId) === String(table.name))
+          );
         }
         if (g.table !== undefined && g.table !== null && String(g.table).trim() !== '') {
           // puede ser nombre de mesa o número en string
@@ -242,6 +250,7 @@ function TableItem({
       const comp = parseInt(g.companion, 10) || 0;
       return sum + 1 + comp;
     }, 0);
+
     if (countFromGuests) return countFromGuests;
     // Conteo alternativo para propiedad assignedGuests (banquete)
     if (Array.isArray(table.assignedGuests) && table.assignedGuests.length) {
@@ -255,7 +264,11 @@ function TableItem({
     // Primero, obtenemos los invitados de la lista global
     const list = guests.filter((g) => {
       if (g.tableId !== undefined && g.tableId !== null) {
-        return String(g.tableId) === String(table.id);
+        // Comparar con table.id O table.name (porque el id puede ser un timestamp)
+        return (
+          String(g.tableId) === String(table.id) ||
+          (table.name && String(g.tableId) === String(table.name))
+        );
       }
       if (g.table !== undefined && g.table !== null && String(g.table).trim() !== '') {
         return (
@@ -300,7 +313,10 @@ function TableItem({
   const sizeY =
     table.shape === 'circle' ? table.diameter || 60 : table.height || table.length || 60;
   const disabled = table.enabled === false || table.locked || isLockedByOther;
-  const tableColor = disabled ? '#e5e7eb' : TABLE_TYPE_COLORS[tableType] || TABLE_TYPE_COLORS.round;
+
+  // Color especial para mesa presidencial
+  const baseColor = disabled ? '#e5e7eb' : TABLE_TYPE_COLORS[tableType] || TABLE_TYPE_COLORS.round;
+  const tableColor = table.isPresidential && !disabled ? '#fef3c7' : baseColor;
 
   const style = {
     position: 'absolute',
@@ -308,16 +324,23 @@ function TableItem({
     top: (table.y ?? 0) * scale + offset.y - (sizeY * scale) / 2,
     width: sizeX * scale,
     height: sizeY * scale,
+    // Gradient dorado para mesa presidencial
+    background:
+      table.isPresidential && !disabled
+        ? 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)'
+        : tableColor,
     backgroundColor: tableColor,
     border: selected
-      ? '4px solid #2563eb' // Aumentado de 3px a 4px ⬆️
-      : isLockedByOther
-        ? `3px dashed ${lockedColor || '#6b7280'}` // Aumentado de 2px a 3px ⬆️
-        : danger
-          ? '3px solid #ef4444' // Aumentado de 2px a 3px ⬆️
-          : highlightScore > 0
-            ? '3px solid #10b981' // Aumentado de 2px a 3px ⬆️
-            : '3px solid #f59e0b', // Aumentado de 2px a 3px - BORDE MÁS VISIBLE ⬆️
+      ? '4px solid #2563eb'
+      : table.isPresidential && !disabled
+        ? '4px solid #fbbf24' // Borde dorado para presidencial ⬆️
+        : isLockedByOther
+          ? `3px dashed ${lockedColor || '#6b7280'}`
+          : danger
+            ? '3px solid #ef4444'
+            : highlightScore > 0
+              ? '3px solid #10b981'
+              : '3px solid #f59e0b',
     borderRadius: table.shape === 'circle' ? '50%' : '6px',
     display: 'flex',
     alignItems: 'center',
@@ -326,15 +349,21 @@ function TableItem({
     userSelect: 'none',
     boxShadow: selected
       ? '0 0 0 3px rgba(37,99,235,0.25)'
-      : highlightScore > 0
-        ? '0 0 0 3px rgba(16,185,129,0.25)'
-        : isLockedBySelf
-          ? `0 0 0 3px ${lockedColor || 'rgba(59,130,246,0.35)'}`
-          : 'none',
+      : table.isPresidential && !disabled
+        ? '0 8px 20px rgba(251,191,36,0.4)' // Shadow dorado para presidencial ✨
+        : highlightScore > 0
+          ? '0 0 0 3px rgba(16,185,129,0.25)'
+          : isLockedBySelf
+            ? `0 0 0 3px ${lockedColor || 'rgba(59,130,246,0.35)'}`
+            : 'none',
     transform: `rotate(${table.angle || 0}deg)`,
     transformOrigin: 'center center',
     pointerEvents: eventsDisabled ? 'none' : 'auto',
+    opacity: 1,
+    visibility: 'visible',
   };
+
+  const canDrag = !disabled && canMove && !table.locked && !eventsDisabled;
 
   return (
     <div
@@ -344,9 +373,7 @@ function TableItem({
       }}
       data-testid={`table-item-${table.id}`}
       style={{ ...style, backgroundColor: isOver ? '#d1fae5' : style.backgroundColor }}
-      onPointerDown={
-        disabled || !canMove || table.locked || eventsDisabled ? undefined : handlePointerDown
-      }
+      onPointerDown={canDrag ? handlePointerDown : undefined}
       onContextMenu={(e) => {
         e.preventDefault();
         if (isLockedByOther || eventsDisabled) return;
@@ -412,6 +439,20 @@ function TableItem({
           title={dangerReason || 'Problema de validación'}
         >
           !
+        </div>
+      )}
+      {/* Corona flotante para mesa presidencial */}
+      {!designFocusMode && table.isPresidential && !disabled && (
+        <div
+          className="absolute -top-2 -right-2"
+          style={{
+            transform: `rotate(${-(Number(table.angle) || 0)}deg)`,
+            transformOrigin: 'center',
+            zIndex: 40,
+          }}
+          title="Mesa Presidencial"
+        >
+          <Crown size={24} color="#fbbf24" fill="#fef3c7" strokeWidth={2} />
         </div>
       )}
       {!designFocusMode && isLockedByOther && (

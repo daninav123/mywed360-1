@@ -1,5 +1,5 @@
 import express from 'express';
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 import { z, validate } from '../utils/validation.js';
 
 const router = express.Router();
@@ -22,14 +22,23 @@ router.get('/', async (req, res) => {
 
 const checkoutSchema = z.object({
   amount: z.coerce.number().positive(),
-  currency: z.string().regex(/^[A-Za-z]{3}$/).default('EUR'),
+  currency: z
+    .string()
+    .regex(/^[A-Za-z]{3}$/)
+    .default('EUR'),
   description: z.string().min(1).default('Pago'),
   weddingId: z.string().min(1).nullable().optional(),
   metadata: z.record(z.any()).default({}),
 });
 router.post('/checkout', validate(checkoutSchema), async (req, res) => {
   try {
-    const { amount, currency = 'EUR', description = 'Pago', weddingId = null, metadata = {} } = req.body;
+    const {
+      amount,
+      currency = 'EUR',
+      description = 'Pago',
+      weddingId = null,
+      metadata = {},
+    } = req.body;
     const cents = Math.max(100, Math.floor(Number(amount) * 100));
     const STRIPE_KEY = process.env.STRIPE_SECRET_KEY;
     if (!STRIPE_KEY) {
@@ -45,7 +54,7 @@ router.post('/checkout', validate(checkoutSchema), async (req, res) => {
     }
     const stripe = new Stripe(STRIPE_KEY);
     // Añadir providerId/amount a la URL de retorno para poder marcar estado en el frontend
-    const base = (process.env.FRONTEND_BASE_URL || 'http://localhost:5173');
+    const base = process.env.FRONTEND_BASE_URL || 'http://localhost:5173';
     const providerId = (metadata && (metadata.providerId || metadata.provider_id)) || '';
     const amountParam = String(amount || '');
     const successPath = `/proveedores?payment=success${providerId ? `&providerId=${encodeURIComponent(String(providerId))}` : ''}${amountParam ? `&amount=${encodeURIComponent(amountParam)}` : ''}`;
@@ -54,7 +63,16 @@ router.post('/checkout', validate(checkoutSchema), async (req, res) => {
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       payment_method_types: ['card'],
-      line_items: [{ price_data: { currency: currency.toLowerCase(), product_data: { name: description }, unit_amount: cents }, quantity: 1 }],
+      line_items: [
+        {
+          price_data: {
+            currency: currency.toLowerCase(),
+            product_data: { name: description },
+            unit_amount: cents,
+          },
+          quantity: 1,
+        },
+      ],
       success_url: base + successPath,
       cancel_url: base + cancelPath,
       metadata: { ...metadata, weddingId: weddingId || metadata.weddingId || '' },
@@ -69,7 +87,10 @@ router.post('/checkout', validate(checkoutSchema), async (req, res) => {
 // POST /api/payments/intent (placeholder)
 const intentSchema = z.object({
   amount: z.coerce.number().positive(),
-  currency: z.string().regex(/^[A-Za-z]{3}$/).default('EUR'),
+  currency: z
+    .string()
+    .regex(/^[A-Za-z]{3}$/)
+    .default('EUR'),
   contractId: z.string().min(1).nullable().optional(),
 });
 router.post('/intent', validate(intentSchema), async (req, res) => {

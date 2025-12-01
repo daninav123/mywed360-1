@@ -55,13 +55,13 @@ const SeatingCanvas = forwardRef(function SeatingCanvas(
   _forwardedRef
 ) {
   const containerRef = useRef(null);
-  
+
   // FASE 1: Estados para Physics, Snap Guides y Selección Múltiple
   const [draggingTableId, setDraggingTableId] = useState(null);
   const [snapGuides, setSnapGuides] = useState([]);
   const [marqueeStart, setMarqueeStart] = useState(null);
   const [marqueeEnd, setMarqueeEnd] = useState(null);
-  
+
   // Helpers locales de validación
   const getTableBox = (table) => {
     if (!table) return { minX: 0, minY: 0, maxX: 0, maxY: 0 };
@@ -248,7 +248,7 @@ const SeatingCanvas = forwardRef(function SeatingCanvas(
           let dangerReason = '';
           if (validationsEnabled) {
             try {
-              const aisle = typeof hallSize?.aisleMin === 'number' ? hallSize.aisleMin : 80;
+              const aisle = typeof hallSize?.aisleMin === 'number' ? hallSize.aisleMin : 40; // Reducido de 80 a 40cm
               const selfBox = getTableBox(t);
               const padded = expandBox(selfBox, aisle / 2);
 
@@ -317,14 +317,13 @@ const SeatingCanvas = forwardRef(function SeatingCanvas(
           const lockedBy = lockInfo?.displayName || lockInfo?.userId || null;
           const lockedColor = lockInfo?.color;
           const lockedIsCurrent = lockInfo?.clientId === currentClientId;
-          const tableCanMove =
-            canMoveTables && (!lockedBy || lockedIsCurrent);
-          
-          const isSelected = 
+          const tableCanMove = canMoveTables && (!lockedBy || lockedIsCurrent);
+
+          const isSelected =
             (selectedTable && selectedTable.id === t.id) ||
             (selectedIds && selectedIds.some((id) => String(id) === String(t.id)));
           const isDragging = draggingTableId === t.id;
-          
+
           // Wrapped table con physics
           const tableElement = (
             <TableItem
@@ -333,24 +332,36 @@ const SeatingCanvas = forwardRef(function SeatingCanvas(
               scale={scale}
               offset={offset}
               containerRef={containerRef}
-              onMove={(id, newX, newY) => {
+              onMove={(id, posOrX, optionsOrY) => {
+                // Manejar ambos formatos: (id, {x, y}, {finalize}) o (id, x, y)
+                let newPos, options;
+                if (typeof posOrX === 'object' && posOrX !== null && 'x' in posOrX) {
+                  // Nuevo formato: (id, {x, y}, {finalize})
+                  newPos = posOrX;
+                  options = optionsOrY || {};
+                } else {
+                  // Formato antiguo: (id, x, y) - convertir a nuevo formato
+                  newPos = { x: posOrX, y: optionsOrY };
+                  options = { finalize: true };
+                }
+
                 // Calcular snap guides mientras se mueve
                 const threshold = 10;
                 const guides = [];
-                tables.forEach(other => {
+                tables.forEach((other) => {
                   if (other.id === id) return;
                   // Guía vertical
-                  if (Math.abs(other.x - newX) < threshold) {
+                  if (Math.abs(other.x - newPos.x) < threshold) {
                     guides.push({ type: 'vertical', position: other.x });
                   }
                   // Guía horizontal
-                  if (Math.abs(other.y - newY) < threshold) {
+                  if (Math.abs(other.y - newPos.y) < threshold) {
                     guides.push({ type: 'horizontal', position: other.y });
                   }
                 });
                 setSnapGuides(guides);
                 setDraggingTableId(id);
-                moveTable(id, newX, newY);
+                moveTable(id, newPos, options);
               }}
               onAssignGuest={onAssignGuest}
               onAssignGuestSeat={(tableId, seatIndex, guestId) =>
@@ -376,7 +387,7 @@ const SeatingCanvas = forwardRef(function SeatingCanvas(
               designFocusMode={designFocusMode}
             />
           );
-          
+
           // FASE 1: Envolver con TableWithPhysics para bounce effect
           return (
             <TableWithPhysics
@@ -396,6 +407,8 @@ const SeatingCanvas = forwardRef(function SeatingCanvas(
         selectedTable &&
         (() => {
           const lines = [];
+          const addedVertical = new Set();
+          const addedHorizontal = new Set();
           const sx =
             selectedTable.shape === 'circle'
               ? (selectedTable.diameter || 60) / 2
@@ -411,22 +424,28 @@ const SeatingCanvas = forwardRef(function SeatingCanvas(
           const selTop = ((selectedTable.y || 0) - sy) * scale + offset.y;
           const selBottom = ((selectedTable.y || 0) + sy) * scale + offset.y;
           const tolPx = 8;
-          const addV = (x) =>
+          const addV = (x) => {
+            if (addedVertical.has(x)) return;
+            addedVertical.add(x);
             lines.push(
               <div
-                key={`gv-${x}`}
+                key={`gv-${x}-${addedVertical.size}`}
                 className="absolute top-0 bottom-0 border-l-2 border-blue-400 pointer-events-none"
                 style={{ left: x, opacity: 0.4 }}
               />
             );
-          const addH = (y) =>
+          };
+          const addH = (y) => {
+            if (addedHorizontal.has(y)) return;
+            addedHorizontal.add(y);
             lines.push(
               <div
-                key={`gh-${y}`}
+                key={`gh-${y}-${addedHorizontal.size}`}
                 className="absolute left-0 right-0 border-t-2 border-blue-400 pointer-events-none"
                 style={{ top: y, opacity: 0.4 }}
               />
             );
+          };
           (tables || []).forEach((t) => {
             if (!t || String(t.id) === String(selectedTable.id)) return;
             const tx = (t.x || 0) * scale + offset.x;
@@ -453,23 +472,19 @@ const SeatingCanvas = forwardRef(function SeatingCanvas(
           });
           return lines;
         })()}
-      
+
       {/* FASE 1: Snap Guides - Líneas de alineación animadas */}
       {tab === 'banquet' && snapGuides.length > 0 && (
-        <SnapGuides 
-          guides={snapGuides} 
+        <SnapGuides
+          guides={snapGuides}
           canvasWidth={hallSize?.width || 2000}
           canvasHeight={hallSize?.height || 1500}
         />
       )}
-      
+
       {/* FASE 1: Selection Marquee - Selección múltiple */}
       {marqueeStart && marqueeEnd && (
-        <SelectionMarquee
-          start={marqueeStart}
-          end={marqueeEnd}
-          visible={true}
-        />
+        <SelectionMarquee start={marqueeStart} end={marqueeEnd} visible={true} />
       )}
     </div>
   );

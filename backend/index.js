@@ -50,6 +50,7 @@ import mailSearchRouter from './routes/mail-search.js';
 import aiRouter from './routes/ai.js';
 import aiAssignRouter from './routes/ai-assign.js';
 import aiImageRouter from './routes/ai-image.js';
+import aiSearchRouter from './routes/ai-search.js';
 import aiSuppliersRouter from './routes/ai-suppliers.js';
 import aiSuppliersWebRouter from './routes/ai-suppliers-web.js';
 import aiSuppliersRealRouter from './routes/ai-suppliers-real-search.js';
@@ -75,7 +76,7 @@ import diagnosticRouter from './routes/diagnostic.js';
 import simpleTestRouter from './routes/simple-test.js';
 import testHelpersRouter from './routes/test-helpers.js';
 import emailTemplatesRouter from './routes/email-templates.js';
-import logger from './logger.js';
+import logger from './utils/logger.js';
 import instagramWallRouter from './routes/instagram-wall.js';
 import imageProxyRouter from './routes/image-proxy.js';
 import proxyRouter from './routes/proxy.js';
@@ -657,6 +658,7 @@ app.use('/api/quote-requests', supplierQuoteRequestsRouter); // Rutas públicas 
 app.use('/api/suppliers', supplierRequestsRouter); // Solicitudes de presupuesto (legacy - mantener por compatibilidad)
 app.use('/api/favorites', authMiddleware(), favoritesRouter); // Favoritos requiere auth
 app.use('/api/ai/budget-estimate', authMiddleware(), aiBudgetRouter);
+app.use('/api/ai/search', requireAuth, aiSearchRouter); // Búsqueda inteligente con IA
 app.use('/api/ai', authMiddleware(), aiRouter);
 app.use('/api/ai-assign', requireAuth, aiAssignRouter);
 app.use('/api/ai-songs', requireAuth, aiSongsRouter);

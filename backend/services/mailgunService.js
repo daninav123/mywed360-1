@@ -1,6 +1,6 @@
 import mailgun from 'mailgun-js';
 import dotenv from 'dotenv';
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 
 dotenv.config();
 

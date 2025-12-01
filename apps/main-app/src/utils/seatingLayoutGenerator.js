@@ -67,8 +67,29 @@ export const generateColumnsLayout = (tables, hallSize = { width: 1800, height: 
   const { rows, cols } = calculateGridDimensions(tables.length);
   const marginX = 120;
   const marginY = 160;
-  const gapX = (hallSize.width - marginX * 2) / (cols + 1);
-  const gapY = (hallSize.height - marginY * 2) / (rows + 1);
+  const tableDiameter = 120; // Diámetro típico de mesa redonda
+  const minSpacing = 120; // Espaciado mínimo entre mesas
+  const absoluteMinSpacing = 100; // ⬅️ Espaciado mínimo ABSOLUTO (validaciones + expansión 40cm)
+
+  // Calcular espaciado considerando el tamaño de las mesas
+  const availableWidth = hallSize.width - marginX * 2;
+  const availableHeight = hallSize.height - marginY * 2;
+  const totalTableWidth = cols * tableDiameter + (cols - 1) * minSpacing;
+  const totalTableHeight = rows * tableDiameter + (rows - 1) * minSpacing;
+
+  // Si no caben con el espaciado mínimo, reducir proporcionalmente pero NUNCA menos de 100cm
+  const spacingX =
+    totalTableWidth > availableWidth
+      ? Math.max(absoluteMinSpacing, (availableWidth - cols * tableDiameter) / (cols - 1 || 1))
+      : minSpacing;
+  const spacingY =
+    totalTableHeight > availableHeight
+      ? Math.max(absoluteMinSpacing, (availableHeight - rows * tableDiameter) / (rows - 1 || 1))
+      : minSpacing;
+
+  // Centrar el grid
+  const startX = marginX + (availableWidth - (cols * tableDiameter + (cols - 1) * spacingX)) / 2;
+  const startY = marginY + (availableHeight - (rows * tableDiameter + (rows - 1) * spacingY)) / 2;
 
   return tables.map((table, index) => {
     const row = Math.floor(index / cols);
@@ -76,9 +97,10 @@ export const generateColumnsLayout = (tables, hallSize = { width: 1800, height: 
 
     return {
       ...table,
-      x: marginX + (col + 1) * gapX,
-      y: marginY + (row + 1) * gapY,
+      x: startX + tableDiameter / 2 + col * (tableDiameter + spacingX),
+      y: startY + tableDiameter / 2 + row * (tableDiameter + spacingY),
       seats: table.totalSeats || 8,
+      diameter: tableDiameter,
       shape: 'circle',
       tableType: 'round',
       autoCapacity: false,
@@ -94,7 +116,17 @@ export const generateCircularLayout = (tables, hallSize = { width: 1800, height:
 
   const centerX = hallSize.width / 2;
   const centerY = hallSize.height / 2;
-  const radius = Math.min(hallSize.width, hallSize.height) * 0.35;
+  const tableDiameter = 120;
+
+  // Calcular radio considerando el tamaño de las mesas y espaciado mínimo
+  // El radio debe ser suficiente para que las mesas no se toquen en la circunferencia
+  const minSpacing = 100;
+  const absoluteMinSpacing = 100; // ⬅️ Espaciado mínimo ABSOLUTO (validaciones + expansión 40cm)
+  const circumference = tables.length * (tableDiameter + Math.max(minSpacing, absoluteMinSpacing));
+  const calculatedRadius = circumference / (2 * Math.PI);
+  const maxRadius = Math.min(hallSize.width, hallSize.height) * 0.4;
+  const radius = Math.min(calculatedRadius, maxRadius);
+
   const angleStep = (2 * Math.PI) / tables.length;
 
   return tables.map((table, index) => {
@@ -105,6 +137,7 @@ export const generateCircularLayout = (tables, hallSize = { width: 1800, height:
       x: centerX + radius * Math.cos(angle),
       y: centerY + radius * Math.sin(angle),
       seats: table.totalSeats || 8,
+      diameter: tableDiameter,
       shape: 'circle',
       tableType: 'round',
       autoCapacity: false,
@@ -123,10 +156,20 @@ export const generateAisleLayout = (tables, hallSize = { width: 1800, height: 12
 
   const marginX = 100;
   const marginY = 160;
-  const aisleWidth = 200; // Pasillo central
+  const tableDiameter = 120;
+  const minSpacing = 120;
+  const absoluteMinSpacing = 100; // ⬅️ Espaciado mínimo ABSOLUTO (validaciones + expansión 40cm)
+  const aisleWidth = 250; // Pasillo central más ancho
   const sideWidth = (hallSize.width - marginX * 2 - aisleWidth) / 2;
-  const gapX = sideWidth / (colsPerSide + 1);
-  const gapY = (hallSize.height - marginY * 2) / (rows + 1);
+
+  // Espaciado considerando el tamaño de las mesas, NUNCA menos de 100cm
+  const availableWidthPerSide = sideWidth - tableDiameter;
+  const spacingX =
+    colsPerSide > 1
+      ? Math.max(absoluteMinSpacing, availableWidthPerSide / colsPerSide)
+      : minSpacing;
+  const availableHeight = hallSize.height - marginY * 2 - rows * tableDiameter;
+  const spacingY = rows > 1 ? Math.max(absoluteMinSpacing, availableHeight / rows) : minSpacing;
 
   return tables.map((table, index) => {
     const row = Math.floor(index / (colsPerSide * 2));
@@ -135,16 +178,22 @@ export const generateAisleLayout = (tables, hallSize = { width: 1800, height: 12
 
     let x;
     if (isLeftSide) {
-      x = marginX + (colInSide + 1) * gapX;
+      x = marginX + tableDiameter / 2 + colInSide * (tableDiameter + spacingX);
     } else {
-      x = marginX + sideWidth + aisleWidth + (colInSide + 1) * gapX;
+      x =
+        marginX +
+        sideWidth +
+        aisleWidth +
+        tableDiameter / 2 +
+        colInSide * (tableDiameter + spacingX);
     }
 
     return {
       ...table,
       x,
-      y: marginY + (row + 1) * gapY,
+      y: marginY + tableDiameter / 2 + row * (tableDiameter + spacingY),
       seats: table.totalSeats || 8,
+      diameter: tableDiameter,
       shape: 'circle',
       tableType: 'round',
       autoCapacity: false,
@@ -159,18 +208,25 @@ export const generateUShapeLayout = (tables, hallSize = { width: 1800, height: 1
   if (!tables || tables.length === 0) return [];
 
   const margin = 120;
+  const tableDiameter = 120;
+  const minSpacing = 120;
+  const absoluteMinSpacing = 100; // ⬅️ Espaciado mínimo ABSOLUTO (validaciones + expansión 40cm)
   const tablesPerSide = Math.ceil(tables.length / 3);
 
   const positions = [];
-  const gapX = (hallSize.width - margin * 2) / (tablesPerSide + 1);
-  const gapY = (hallSize.height - margin * 2) / 3;
+  const availableWidth = hallSize.width - margin * 2 - tableDiameter;
+  const availableHeight = hallSize.height - margin * 2 - tableDiameter;
+
+  const spacingX =
+    tablesPerSide > 1 ? Math.max(absoluteMinSpacing, availableWidth / tablesPerSide) : minSpacing;
+  const spacingY = Math.max(absoluteMinSpacing, availableHeight / 3);
 
   // Lado superior (horizontal)
   const topCount = Math.ceil(tablesPerSide);
   for (let i = 0; i < topCount && positions.length < tables.length; i++) {
     positions.push({
-      x: margin + (i + 1) * gapX,
-      y: margin + gapY,
+      x: margin + tableDiameter / 2 + i * spacingX,
+      y: margin + tableDiameter / 2,
     });
   }
 
@@ -178,8 +234,8 @@ export const generateUShapeLayout = (tables, hallSize = { width: 1800, height: 1
   const rightCount = Math.ceil((tables.length - topCount) / 2);
   for (let i = 0; i < rightCount && positions.length < tables.length; i++) {
     positions.push({
-      x: hallSize.width - margin,
-      y: margin + (i + 2) * gapY,
+      x: hallSize.width - margin - tableDiameter / 2,
+      y: margin + tableDiameter / 2 + (i + 1) * spacingY,
     });
   }
 
@@ -187,16 +243,17 @@ export const generateUShapeLayout = (tables, hallSize = { width: 1800, height: 1
   const bottomCount = tables.length - positions.length;
   for (let i = 0; i < bottomCount; i++) {
     positions.push({
-      x: hallSize.width - margin - (i + 1) * gapX,
-      y: hallSize.height - margin,
+      x: hallSize.width - margin - tableDiameter / 2 - i * spacingX,
+      y: hallSize.height - margin - tableDiameter / 2,
     });
   }
 
   return tables.map((table, index) => ({
     ...table,
-    x: positions[index]?.x || margin,
-    y: positions[index]?.y || margin,
+    x: positions[index]?.x || margin + tableDiameter / 2,
+    y: positions[index]?.y || margin + tableDiameter / 2,
     seats: table.totalSeats || 8,
+    diameter: tableDiameter,
     shape: 'circle',
     tableType: 'round',
     autoCapacity: false,
@@ -210,8 +267,9 @@ export const generateRandomLayout = (tables, hallSize = { width: 1800, height: 1
   if (!tables || tables.length === 0) return [];
 
   const margin = 120;
-  const minDistance = 150;
-  const maxAttempts = 100;
+  const tableDiameter = 120;
+  const minDistance = tableDiameter + 80; // Diámetro de mesa + espaciado mínimo
+  const maxAttempts = 200; // Más intentos para encontrar posición válida
 
   const positions = [];
 
@@ -220,8 +278,10 @@ export const generateRandomLayout = (tables, hallSize = { width: 1800, height: 1
     let attempts = 0;
 
     while (!position && attempts < maxAttempts) {
-      const testX = margin + Math.random() * (hallSize.width - margin * 2);
-      const testY = margin + Math.random() * (hallSize.height - margin * 2);
+      const testX =
+        margin + tableDiameter / 2 + Math.random() * (hallSize.width - margin * 2 - tableDiameter);
+      const testY =
+        margin + tableDiameter / 2 + Math.random() * (hallSize.height - margin * 2 - tableDiameter);
 
       // Verificar distancia mínima con otras mesas
       const tooClose = positions.some((pos) => {
@@ -237,7 +297,19 @@ export const generateRandomLayout = (tables, hallSize = { width: 1800, height: 1
       attempts++;
     }
 
-    positions.push(position || { x: margin, y: margin });
+    // Si no se encuentra posición, usar grid como fallback
+    if (!position) {
+      const gridIndex = positions.length;
+      const cols = Math.ceil(Math.sqrt(tables.length));
+      const row = Math.floor(gridIndex / cols);
+      const col = gridIndex % cols;
+      position = {
+        x: margin + tableDiameter / 2 + col * (tableDiameter + 100),
+        y: margin + tableDiameter / 2 + row * (tableDiameter + 100),
+      };
+    }
+
+    positions.push(position);
   });
 
   return tables.map((table, index) => ({
@@ -245,6 +317,7 @@ export const generateRandomLayout = (tables, hallSize = { width: 1800, height: 1
     x: positions[index].x,
     y: positions[index].y,
     seats: table.totalSeats || 8,
+    diameter: tableDiameter,
     shape: 'circle',
     tableType: 'round',
     autoCapacity: false,
@@ -262,9 +335,27 @@ export const generateChevronLayout = (tables, hallSize = { width: 1800, height: 
 
   const marginX = 120;
   const marginY = 160;
-  const gapX = (hallSize.width - marginX * 2) / (tablesPerRow + 1);
-  const gapY = (hallSize.height - marginY * 2) / (rows + 1);
-  const chevronOffset = 60; // Offset para crear el patrón en espiga
+  const tableDiameter = 120;
+  const minSpacing = 100;
+  const chevronOffset = 80; // Offset para crear el patrón en espiga
+
+  // Calcular espaciado considerando el tamaño de las mesas
+  const availableWidth = hallSize.width - marginX * 2 - Math.abs(chevronOffset) * 2;
+  const availableHeight = hallSize.height - marginY * 2;
+  const totalTableWidth = tablesPerRow * tableDiameter + (tablesPerRow - 1) * minSpacing;
+  const totalTableHeight = rows * tableDiameter + (rows - 1) * minSpacing;
+
+  const spacingX =
+    totalTableWidth > availableWidth
+      ? (availableWidth - tablesPerRow * tableDiameter) / (tablesPerRow - 1 || 1)
+      : minSpacing;
+  const spacingY =
+    totalTableHeight > availableHeight
+      ? (availableHeight - rows * tableDiameter) / (rows - 1 || 1)
+      : minSpacing;
+
+  const startX = marginX + tableDiameter / 2;
+  const startY = marginY + tableDiameter / 2;
 
   return tables.map((table, index) => {
     const row = Math.floor(index / tablesPerRow);
@@ -275,9 +366,10 @@ export const generateChevronLayout = (tables, hallSize = { width: 1800, height: 
 
     return {
       ...table,
-      x: marginX + (col + 1) * gapX + offset,
-      y: marginY + (row + 1) * gapY,
+      x: startX + col * (tableDiameter + spacingX) + offset,
+      y: startY + row * (tableDiameter + spacingY),
       seats: table.totalSeats || 8,
+      diameter: tableDiameter,
       shape: 'circle',
       tableType: 'round',
       autoCapacity: false,
@@ -295,12 +387,43 @@ export const generateAutoLayout = (
 ) => {
   const analysis = analyzeGuestAssignments(guests);
 
+  // Si no hay mesas asignadas pero sí invitados, generar mesas automáticamente
   if (analysis.totalTables === 0) {
-    return {
-      tables: [],
-      unassignedGuests: analysis.unassignedGuests,
-      message: 'No hay mesas asignadas todavía',
-    };
+    if (analysis.totalGuests === 0) {
+      return {
+        tables: [],
+        unassignedGuests: [],
+        message: 'No hay invitados para generar mesas',
+      };
+    }
+
+    // Generar mesas basándose en el número de invitados
+    // Asumiendo 8-10 personas por mesa
+    const guestsPerTable = 10;
+    const numTables = Math.ceil(analysis.totalGuests / guestsPerTable);
+
+    // Crear mesas con estructura completa
+    const timestamp = Date.now();
+    const generatedTables = [];
+    for (let i = 0; i < numTables; i++) {
+      const tableNumber = i + 1;
+      generatedTables.push({
+        id: `table-${timestamp}-${i}`,
+        name: `Mesa ${tableNumber}`,
+        guests: [],
+        totalSeats: guestsPerTable,
+        // Campos adicionales necesarios para el renderizado
+        seats: guestsPerTable,
+        shape: 'circle',
+        tableType: 'round',
+        enabled: true,
+        autoCapacity: false,
+      });
+    }
+
+    // Usar las mesas generadas
+    analysis.tables = generatedTables;
+    analysis.totalTables = numTables;
   }
 
   let tables = [];

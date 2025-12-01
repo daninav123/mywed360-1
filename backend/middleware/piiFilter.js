@@ -3,7 +3,7 @@
  * Previene exposición accidental de información personal identificable
  */
 
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 
 /**
  * Lista de campos considerados PII que deben filtrarse en logs y respuestas públicas
@@ -38,10 +38,10 @@ const PII_FIELDS = [
  */
 export function maskPII(obj, fieldsToMask = []) {
   if (!obj || typeof obj !== 'object') return obj;
-  
+
   const masked = { ...obj };
   const allFields = [...PII_FIELDS, ...fieldsToMask];
-  
+
   for (const key of Object.keys(masked)) {
     if (allFields.includes(key)) {
       const value = masked[key];
@@ -54,7 +54,7 @@ export function maskPII(obj, fieldsToMask = []) {
       masked[key] = maskPII(masked[key], fieldsToMask);
     }
   }
-  
+
   return masked;
 }
 
@@ -66,21 +66,21 @@ export function maskPII(obj, fieldsToMask = []) {
  */
 export function filterPII(obj, fieldsToKeep = []) {
   if (!obj || typeof obj !== 'object') return obj;
-  
+
   const filtered = {};
-  
+
   for (const key of Object.keys(obj)) {
     // Si está en whitelist, mantenerlo
     if (fieldsToKeep.includes(key)) {
       filtered[key] = obj[key];
       continue;
     }
-    
+
     // Si es PII, omitirlo
     if (PII_FIELDS.includes(key)) {
       continue;
     }
-    
+
     // Si es objeto anidado, filtrar recursivamente
     if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
       filtered[key] = filterPII(obj[key], fieldsToKeep);
@@ -88,34 +88,34 @@ export function filterPII(obj, fieldsToKeep = []) {
       filtered[key] = obj[key];
     }
   }
-  
+
   return filtered;
 }
 
 /**
  * Middleware para filtrar PII en respuestas a endpoints públicos
  * Uso: router.get('/public-endpoint', filterPublicPII, handler)
- * 
+ *
  * @param {Object} options - Configuración
  * @param {Array} options.allowedFields - Campos permitidos en respuesta
  */
 export function filterPublicPII(options = {}) {
   const { allowedFields = ['name', 'status', 'companions', 'allergens'] } = options;
-  
+
   return (req, res, next) => {
     // Guardar el método json original
     const originalJson = res.json.bind(res);
-    
+
     // Override res.json para filtrar PII
-    res.json = function(data) {
+    res.json = function (data) {
       if (data && data.data && typeof data.data === 'object') {
         // Filtrar PII del data object
         data.data = filterPII(data.data, allowedFields);
       }
-      
+
       return originalJson(data);
     };
-    
+
     next();
   };
 }
@@ -129,23 +129,21 @@ export function piiSafeLogging(req, res, next) {
   const originalInfo = logger.info.bind(logger);
   const originalError = logger.error.bind(logger);
   const originalWarn = logger.warn.bind(logger);
-  
+
   // Override logger methods para esta request
   req.logger = {
     info: (message, data) => {
       originalInfo(message, data ? maskPII(data) : undefined);
     },
     error: (message, error) => {
-      const maskedError = error && typeof error === 'object' 
-        ? maskPII(error) 
-        : error;
+      const maskedError = error && typeof error === 'object' ? maskPII(error) : error;
       originalError(message, maskedError);
     },
     warn: (message, data) => {
       originalWarn(message, data ? maskPII(data) : undefined);
-    }
+    },
   };
-  
+
   next();
 }
 
@@ -156,10 +154,10 @@ export function piiSafeLogging(req, res, next) {
  */
 export function maskEmail(email) {
   if (!email || typeof email !== 'string') return '';
-  
+
   const [local, domain] = email.split('@');
   if (!local || !domain) return '***@***';
-  
+
   // Mostrar solo primeras 2 letras del local y dominio completo
   return `${local.substring(0, 2)}***@${domain}`;
 }
@@ -171,12 +169,12 @@ export function maskEmail(email) {
  */
 export function maskPhone(phone) {
   if (!phone || typeof phone !== 'string') return '';
-  
+
   // Limpiar caracteres no numéricos
   const cleaned = phone.replace(/\D/g, '');
-  
+
   if (cleaned.length < 6) return '***';
-  
+
   // Mostrar solo últimos 3 dígitos
   return '***' + cleaned.substring(cleaned.length - 3);
 }
@@ -189,7 +187,7 @@ export function auditPIIAccess(req, res, next) {
   const user = req.user || req.userId;
   const endpoint = req.path;
   const method = req.method;
-  
+
   // Log de acceso a datos sensibles
   logger.info('🔒 PII Access Audit', {
     user: user || 'anonymous',
@@ -198,7 +196,7 @@ export function auditPIIAccess(req, res, next) {
     timestamp: new Date().toISOString(),
     ip: req.ip || req.headers['x-forwarded-for'],
   });
-  
+
   next();
 }
 

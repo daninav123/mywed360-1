@@ -2,7 +2,7 @@ import express from 'express';
 import axios from 'axios';
 import dotenv from 'dotenv';
 import path from 'path';
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 
 // Cargar variables .env por si este archivo se ejecuta aislado
 dotenv.config({ path: path.resolve(process.cwd(), '../.env') });
@@ -25,14 +25,19 @@ router.post('/', async (req, res) => {
       const z = mod.z || mod.default;
       const schema = z.object({
         prompt: z.string().min(1).max(2000),
-        size: z.enum(['1024x1024','1792x1024','1024x1792']).optional().default('1024x1024'),
-        quality: z.enum(['standard','hd']).optional().default('hd'),
+        size: z.enum(['1024x1024', '1792x1024', '1024x1792']).optional().default('1024x1024'),
+        quality: z.enum(['standard', 'hd']).optional().default('hd'),
       });
       const parsed = schema.safeParse({ prompt, size, quality });
-      if (!parsed.success) return res.status(400).json({ error: 'invalid-payload', details: parsed.error.issues?.map(i=>i.message).join('; ') });
+      if (!parsed.success)
+        return res.status(400).json({
+          error: 'invalid-payload',
+          details: parsed.error.issues?.map((i) => i.message).join('; '),
+        });
       ({ prompt, size, quality } = parsed.data);
     } else {
-      if (!prompt || typeof prompt !== 'string') return res.status(400).json({ error: 'prompt required' });
+      if (!prompt || typeof prompt !== 'string')
+        return res.status(400).json({ error: 'prompt required' });
     }
   } catch {}
   if (!OPENAI_API_KEY) {
@@ -47,14 +52,14 @@ router.post('/', async (req, res) => {
         prompt,
         n: 1,
         size,
-        quality
+        quality,
       },
       {
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${OPENAI_API_KEY}`
+          Authorization: `Bearer ${OPENAI_API_KEY}`,
         },
-        timeout: 15000
+        timeout: 15000,
       }
     );
 
@@ -70,7 +75,6 @@ router.post('/', async (req, res) => {
 });
 
 // ---------- PDF vectorizado ----------
-
 
 // Lazy imports dentro de los handlers para evitar fallos de arranque si faltan binarios nativos (canvas, etc.)
 
@@ -95,10 +99,13 @@ router.post('/vector-pdf', async (req, res) => {
     SVGtoPDF = svg2pdfMod.default || svg2pdfMod;
   } catch (e) {
     logger.error('vector-pdf setup failed', e);
-    return res.status(501).json({ error: 'feature-disabled', details: 'Raster/vector PDF generation not available on this environment' });
+    return res.status(501).json({
+      error: 'feature-disabled',
+      details: 'Raster/vector PDF generation not available on this environment',
+    });
   }
   try {
-    const mod = await import('zod').catch(()=>null);
+    const mod = await import('zod').catch(() => null);
     if (mod) {
       const z = mod.z || mod.default;
       const schema = z.object({
@@ -108,7 +115,11 @@ router.post('/vector-pdf', async (req, res) => {
         dpi: z.number().min(72).max(1200).optional().default(300),
       });
       const parsed = schema.safeParse({ url, widthMm, heightMm, dpi });
-      if (!parsed.success) return res.status(400).json({ error: 'invalid-payload', details: parsed.error.issues?.map(i=>i.message).join('; ') });
+      if (!parsed.success)
+        return res.status(400).json({
+          error: 'invalid-payload',
+          details: parsed.error.issues?.map((i) => i.message).join('; '),
+        });
       ({ url, widthMm, heightMm, dpi } = parsed.data);
     } else {
       if (!url) return res.status(400).json({ error: 'url required' });
@@ -136,7 +147,7 @@ router.post('/vector-pdf', async (req, res) => {
       numberofcolors: 32,
       strokewidth: 1,
       ltres: 0.1,
-      qtres: 0.1
+      qtres: 0.1,
     });
 
     // 5. Convertir dimensiones a puntos tipográficos
@@ -184,15 +195,22 @@ router.post('/vectorize-svg', async (req, res) => {
     ImageTracer = itMod?.default || itMod;
   } catch (e) {
     logger.error('vectorize-svg setup failed', e);
-    return res.status(501).json({ error: 'feature-disabled', details: 'SVG vectorization not available on this environment' });
+    return res.status(501).json({
+      error: 'feature-disabled',
+      details: 'SVG vectorization not available on this environment',
+    });
   }
   try {
-    const mod = await import('zod').catch(()=>null);
-    if (mod){
+    const mod = await import('zod').catch(() => null);
+    if (mod) {
       const z = mod.z || mod.default;
       const schema = z.object({ url: z.string().url(), options: z.record(z.any()).optional() });
       const parsed = schema.safeParse({ url, options });
-      if (!parsed.success) return res.status(400).json({ error: 'invalid-payload', details: parsed.error.issues?.map(i=>i.message).join('; ') });
+      if (!parsed.success)
+        return res.status(400).json({
+          error: 'invalid-payload',
+          details: parsed.error.issues?.map((i) => i.message).join('; '),
+        });
       ({ url, options } = parsed.data);
     } else {
       if (!url) return res.status(400).json({ error: 'url required' });
@@ -242,11 +260,14 @@ router.post('/svg-to-pdf', async (req, res) => {
       SVGtoPDF = svg2pdfMod.default || svg2pdfMod;
     } catch (e) {
       logger.error('svg-to-pdf setup failed', e);
-      return res.status(501).json({ error: 'feature-disabled', details: 'SVG to PDF not available on this environment' });
+      return res.status(501).json({
+        error: 'feature-disabled',
+        details: 'SVG to PDF not available on this environment',
+      });
     }
     let { svg, widthMm = 210, heightMm = 297 } = req.body || {};
     try {
-      const mod = await import('zod').catch(()=>null);
+      const mod = await import('zod').catch(() => null);
       if (mod) {
         const z = mod.z || mod.default;
         const schema = z.object({
@@ -255,7 +276,11 @@ router.post('/svg-to-pdf', async (req, res) => {
           heightMm: z.number().min(10).max(2000).optional().default(297),
         });
         const parsed = schema.safeParse({ svg, widthMm, heightMm });
-        if (!parsed.success) return res.status(400).json({ error: 'invalid-payload', details: parsed.error.issues?.map(i=>i.message).join('; ') });
+        if (!parsed.success)
+          return res.status(400).json({
+            error: 'invalid-payload',
+            details: parsed.error.issues?.map((i) => i.message).join('; '),
+          });
         ({ svg, widthMm, heightMm } = parsed.data);
       } else {
         if (!svg || typeof svg !== 'string') return res.status(400).json({ error: 'svg required' });
@@ -301,7 +326,10 @@ router.post('/vectorize-mono', async (req, res) => {
       potrace = mod.default || mod;
     } catch (e) {
       logger.error('vectorize-mono setup failed', e);
-      return res.status(501).json({ error: 'feature-disabled', details: 'Monochrome vectorization not available on this environment' });
+      return res.status(501).json({
+        error: 'feature-disabled',
+        details: 'Monochrome vectorization not available on this environment',
+      });
     }
     const imgResp = await axios.get(url, { responseType: 'arraybuffer' });
     const buf = Buffer.from(imgResp.data);

@@ -10,7 +10,7 @@
  */
 
 import { db } from '../db.js';
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 
 /**
  * Limpia favoritos expirados de TODAS las bodas

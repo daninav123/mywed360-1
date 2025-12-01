@@ -7,7 +7,7 @@
 import express from 'express';
 import crypto from 'crypto';
 import admin from 'firebase-admin';
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 import { seenOrMark } from '../utils/idempotency.js';
 
 const router = express.Router();
@@ -28,7 +28,7 @@ const NOTIFICATION_TYPES = {
   CONSUMPTION_REQUEST: 'CONSUMPTION_REQUEST',
   RENEWAL_EXTENDED: 'RENEWAL_EXTENDED',
   REVOKE: 'REVOKE',
-  TEST: 'TEST'
+  TEST: 'TEST',
 };
 
 // Mapeo de product IDs a planes internos
@@ -44,15 +44,18 @@ const PRODUCT_ID_TO_PLAN = {
  */
 async function verifyReceiptWithApple(receiptData, isProduction = true) {
   const sharedSecret = process.env.APP_STORE_SHARED_SECRET;
-  
+
   if (!sharedSecret) {
     logger.warn('[app-store] APP_STORE_SHARED_SECRET no configurado');
     return null;
   }
 
   // Intentar primero con producción, luego sandbox
-  const urls = isProduction 
-    ? ['https://buy.itunes.apple.com/verifyReceipt', 'https://sandbox.itunes.apple.com/verifyReceipt']
+  const urls = isProduction
+    ? [
+        'https://buy.itunes.apple.com/verifyReceipt',
+        'https://sandbox.itunes.apple.com/verifyReceipt',
+      ]
     : ['https://sandbox.itunes.apple.com/verifyReceipt'];
 
   for (const url of urls) {
@@ -62,32 +65,31 @@ async function verifyReceiptWithApple(receiptData, isProduction = true) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           'receipt-data': receiptData,
-          'password': sharedSecret,
-          'exclude-old-transactions': true
-        })
+          password: sharedSecret,
+          'exclude-old-transactions': true,
+        }),
       });
 
       const result = await response.json();
-      
+
       // Status codes: https://developer.apple.com/documentation/appstorereceipts/status
       if (result.status === 0) {
         logger.info('[app-store] Receipt verificado exitosamente', { url });
         return result;
       }
-      
+
       if (result.status === 21007) {
         // Receipt es de sandbox pero estamos en producción
         logger.info('[app-store] Receipt es de sandbox, reintentando...');
         continue;
       }
-      
+
       logger.warn('[app-store] Verificación falló', { status: result.status, url });
-      
     } catch (error) {
       logger.error('[app-store] Error verificando receipt', { error: error.message, url });
     }
   }
-  
+
   return null;
 }
 
@@ -98,9 +100,9 @@ function parseTransactionInfo(signedTransactionInfo) {
   // En v2, viene como JWT firmado
   // Para simplificar, asumimos que ya viene decodificado en data
   // En producción, deberías verificar la firma JWT con la clave pública de Apple
-  
+
   if (!signedTransactionInfo) return null;
-  
+
   try {
     // Si viene como string JWT, decodificarlo
     if (typeof signedTransactionInfo === 'string') {
@@ -130,23 +132,25 @@ async function upsertSubscription(transactionInfo, notificationType, userId = nu
       expiresDate,
       webOrderLineItemId,
       bundleId,
-      environment
+      environment,
     } = transactionInfo;
 
     const planInfo = PRODUCT_ID_TO_PLAN[productId] || {
       plan: 'premium',
       interval: 'month',
-      amount: 9.99
+      amount: 9.99,
     };
 
     // Calcular el monthly amount (normalizar a mensual)
-    const monthlyAmount = planInfo.interval === 'year' 
-      ? planInfo.amount / 12 
-      : planInfo.amount;
+    const monthlyAmount = planInfo.interval === 'year' ? planInfo.amount / 12 : planInfo.amount;
 
     // Determinar el estado según el tipo de notificación
     let status = 'active';
-    if ([NOTIFICATION_TYPES.EXPIRED, NOTIFICATION_TYPES.GRACE_PERIOD_EXPIRED].includes(notificationType)) {
+    if (
+      [NOTIFICATION_TYPES.EXPIRED, NOTIFICATION_TYPES.GRACE_PERIOD_EXPIRED].includes(
+        notificationType
+      )
+    ) {
       status = 'expired';
     } else if (notificationType === NOTIFICATION_TYPES.DID_FAIL_TO_RENEW) {
       status = 'past_due';
@@ -161,22 +165,22 @@ async function upsertSubscription(transactionInfo, notificationType, userId = nu
       status,
       plan: planInfo.plan,
       interval: planInfo.interval,
-      
+
       // IDs de Apple
       transactionId,
       originalTransactionId: originalTransactionId || transactionId,
       productId,
       webOrderLineItemId: webOrderLineItemId || null,
-      
+
       // Fechas (convertir de milliseconds)
       purchaseDate: admin.firestore.Timestamp.fromMillis(purchaseDate),
       expiresDate: expiresDate ? admin.firestore.Timestamp.fromMillis(expiresDate) : null,
-      
+
       // Financiero
       monthlyAmount,
       amount: planInfo.amount,
       currency: 'EUR', // Ajustar según tu región
-      
+
       // Metadata
       bundleId: bundleId || 'com.maloveapp.app',
       environment: environment || 'Production',
@@ -193,7 +197,7 @@ async function upsertSubscription(transactionInfo, notificationType, userId = nu
     // Usar originalTransactionId como document ID para evitar duplicados
     const docId = originalTransactionId || transactionId;
     const docRef = db.collection('subscriptions').doc(docId);
-    
+
     // Si es la primera vez, agregar createdAt
     const existingDoc = await docRef.get();
     if (!existingDoc.exists) {
@@ -201,22 +205,25 @@ async function upsertSubscription(transactionInfo, notificationType, userId = nu
     }
 
     await docRef.set(subscriptionData, { merge: true });
-    
+
     // Si tenemos userId, actualizar también el perfil del usuario
     if (userId) {
-      await db.collection('users').doc(userId).set({
-        subscription: planInfo.plan,
-        subscriptionStatus: status,
-        subscriptionPlatform: 'ios',
-        subscriptionUpdatedAt: admin.firestore.FieldValue.serverTimestamp()
-      }, { merge: true });
+      await db.collection('users').doc(userId).set(
+        {
+          subscription: planInfo.plan,
+          subscriptionStatus: status,
+          subscriptionPlatform: 'ios',
+          subscriptionUpdatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        },
+        { merge: true }
+      );
     }
 
     logger.info('[app-store] Suscripción actualizada', {
       docId,
       productId,
       status,
-      userId: userId || 'unknown'
+      userId: userId || 'unknown',
     });
 
     return docId;
@@ -234,7 +241,7 @@ async function logAppStoreEvent(notificationType, data) {
     await db.collection('appStoreEvents').add({
       notificationType,
       data,
-      receivedAt: admin.firestore.FieldValue.serverTimestamp()
+      receivedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
   } catch (error) {
     logger.warn('[app-store] Error logging event', error);
@@ -248,7 +255,7 @@ async function logAppStoreEvent(notificationType, data) {
 router.post('/webhook', express.json({ limit: '1mb' }), async (req, res) => {
   try {
     const notification = req.body;
-    
+
     // Validación básica
     if (!notification || !notification.notificationType) {
       logger.warn('[app-store] Webhook sin notificationType');
@@ -256,7 +263,7 @@ router.post('/webhook', express.json({ limit: '1mb' }), async (req, res) => {
     }
 
     const { notificationType, data, notificationUUID } = notification;
-    
+
     // Idempotencia: evitar procesar la misma notificación dos veces
     if (notificationUUID) {
       const isDuplicate = await seenOrMark(`appstore:${notificationUUID}`, 24 * 60 * 60);
@@ -271,7 +278,7 @@ router.post('/webhook', express.json({ limit: '1mb' }), async (req, res) => {
 
     // Parsear la información de la transacción
     const transactionInfo = parseTransactionInfo(data?.signedTransactionInfo);
-    
+
     if (!transactionInfo) {
       logger.warn('[app-store] No se pudo parsear transactionInfo');
       return res.status(200).json({ status: 'ok', message: 'no_transaction_info' });
@@ -288,7 +295,7 @@ router.post('/webhook', express.json({ limit: '1mb' }), async (req, res) => {
       type: notificationType,
       transactionId: transactionInfo.transactionId,
       productId: transactionInfo.productId,
-      userId: userId || 'unknown'
+      userId: userId || 'unknown',
     });
 
     // Procesar según el tipo de notificación
@@ -327,7 +334,6 @@ router.post('/webhook', express.json({ limit: '1mb' }), async (req, res) => {
     }
 
     res.status(200).json({ status: 'ok' });
-
   } catch (error) {
     logger.error('[app-store] Error procesando webhook', error);
     res.status(500).json({ error: 'internal_error' });
@@ -355,7 +361,7 @@ router.post('/verify-receipt', express.json(), async (req, res) => {
 
     // Obtener la última transacción del receipt
     const latestReceipt = result.latest_receipt_info?.[0];
-    
+
     if (latestReceipt) {
       // Convertir formato de Apple a nuestro formato
       const transactionInfo = {
@@ -365,7 +371,7 @@ router.post('/verify-receipt', express.json(), async (req, res) => {
         purchaseDate: parseInt(latestReceipt.purchase_date_ms),
         expiresDate: parseInt(latestReceipt.expires_date_ms),
         bundleId: result.receipt?.bundle_id,
-        environment: result.environment
+        environment: result.environment,
       };
 
       await upsertSubscription(transactionInfo, 'MANUAL_VERIFICATION', userId);
@@ -374,13 +380,12 @@ router.post('/verify-receipt', express.json(), async (req, res) => {
         valid: true,
         subscription: {
           productId: transactionInfo.productId,
-          expiresDate: new Date(transactionInfo.expiresDate).toISOString()
-        }
+          expiresDate: new Date(transactionInfo.expiresDate).toISOString(),
+        },
       });
     } else {
       res.json({ valid: false });
     }
-
   } catch (error) {
     logger.error('[app-store] Error verificando receipt', error);
     res.status(500).json({ error: 'verification_failed' });
@@ -395,7 +400,8 @@ router.get('/subscription/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
 
-    const snapshot = await db.collection('subscriptions')
+    const snapshot = await db
+      .collection('subscriptions')
       .where('userId', '==', userId)
       .where('platform', '==', 'ios')
       .orderBy('updatedAt', 'desc')
@@ -418,7 +424,6 @@ router.get('/subscription/:userId', async (req, res) => {
     }
 
     res.json({ subscription });
-
   } catch (error) {
     logger.error('[app-store] Error obteniendo suscripción', error);
     res.status(500).json({ error: 'fetch_failed' });

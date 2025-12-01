@@ -82,6 +82,7 @@ const SeatingPlanToolbar = ({
   const [showHotkeys, setShowHotkeys] = useState(false);
   const [snapshotName, setSnapshotName] = useState('');
   const [snapshotError, setSnapshotError] = useState('');
+  const [showResetConfirm, setShowResetConfirm] = useState(false); // ✅ NUEVO
   const exportRef = useRef(null);
   const alignRef = useRef(null);
   const snapsRef = useRef(null);
@@ -435,14 +436,14 @@ const SeatingPlanToolbar = ({
             <button
               type="button"
               data-testid="clear-banquet-btn"
-              onClick={onClearBanquet}
+              onClick={() => setShowResetConfirm(true)}
               className="flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-red-50 text-red-600"
-              title={t('seating.toolbar.clearBanquet', { defaultValue: 'Vaciar plano' })}
-              aria-label={t('seating.toolbar.clearBanquet', { defaultValue: 'Vaciar plano' })}
+              title={t('seating.toolbar.resetPlan', { defaultValue: 'Rehacer desde 0' })}
+              aria-label={t('seating.toolbar.resetPlan', { defaultValue: 'Rehacer desde 0' })}
             >
               <Trash className="h-4 w-4" />
               <span className="hidden sm:inline">
-                {t('seating.toolbar.clear', { defaultValue: 'Vaciar' })}
+                {t('seating.toolbar.reset', { defaultValue: 'Rehacer' })}
               </span>
             </button>
           )}
@@ -705,10 +706,10 @@ const SeatingPlanToolbar = ({
                     setShowExportMenu(false);
                   }}
                   className="w-full text-left px-3 py-2 hover:bg-gray-50 text-sm"
-              >
-                Tarjetas
-              </button>
-            )}
+                >
+                  Tarjetas
+                </button>
+              )}
               <div className="border-t my-1" />
               <button
                 type="button"
@@ -724,29 +725,90 @@ const SeatingPlanToolbar = ({
             </div>
           )}
         </div>
-
       </div>
-
 
       {showHotkeys && (
         <div className="px-3 pb-3">
           <div className="bg-white border rounded shadow w-[22rem] max-w-[92vw] p-3 text-xs leading-5">
-            <div className="font-semibold text-gray-800 mb-1">{t('seating.hotkeys.title', { defaultValue: 'Atajos de teclado' })}</div>
+            <div className="font-semibold text-gray-800 mb-1">
+              {t('seating.hotkeys.title', { defaultValue: 'Atajos de teclado' })}
+            </div>
             <div className="grid grid-cols-2 gap-x-4 gap-y-1">
-              <div className="text-gray-600">Ctrl/Cmd + Z / Y</div><div>{t('seating.hotkeys.items.undoRedo', { defaultValue: 'Deshacer / Rehacer' })}</div>
-              <div className="text-gray-600">1..6</div><div>{t('seating.hotkeys.items.tools', { defaultValue: 'Herramientas (Pan, Mover, Per�metro, Puertas, Obst�culos, Pasillos)' })}</div>
-              <div className="text-gray-600">Ctrl/Cmd + + / - / 0</div><div>{t('seating.hotkeys.items.zoomFit', { defaultValue: 'Zoom in / out / Ajustar' })}</div>
-              <div className="text-gray-600">Ctrl/Cmd + A</div><div>{t('seating.hotkeys.items.selectAll', { defaultValue: 'Seleccionar todo' })}</div>
-              <div className="text-gray-600">Esc</div><div>{t('seating.hotkeys.items.escape', { defaultValue: 'Limpiar selecci�n / cerrar men�s' })}</div>
-              <div className="text-gray-600">Q / E</div><div>{t('seating.hotkeys.items.rotate', { defaultValue: 'Rotar -5� / +5� (Shift: �15�)' })}</div>
-              <div className="text-gray-600">Alt + �/�/�/�</div><div>{t('seating.hotkeys.items.align', { defaultValue: 'Alinear (inicio/fin)' })}</div>
-              <div className="text-gray-600">Shift + Alt + �/�/�/�</div><div>{t('seating.hotkeys.items.distribute', { defaultValue: 'Distribuir (X/Y)' })}</div>
-              <div className="text-gray-600">Ctrl/Cmd + �/�</div><div>{t('seating.hotkeys.items.tabs', { defaultValue: 'Cambiar pesta�a (Ceremonia/Banquete)' })}</div>
-              <div className="text-gray-600">R / N / V</div><div>{t('seating.hotkeys.items.toggles', { defaultValue: 'Reglas / N�meros / Validaciones' })}</div>
-              <div className="text-gray-600">P / S</div><div>{t('seating.hotkeys.items.panels', { defaultValue: 'Plantillas / Configurar espacio' })}</div>
-              <div className="text-gray-600">Enter / Esc</div><div>{t('seating.hotkeys.items.drawFinalizeCancel', { defaultValue: 'Finalizar / Cancelar dibujo' })}</div>
-              <div className="text-gray-600">Backspace/Delete</div><div>{t('seating.hotkeys.items.backspaceDelete', { defaultValue: 'Deshacer punto / Eliminar mesa' })}</div>
-              <div className="text-gray-600">Tab (per�metro)</div><div>{t('seating.hotkeys.items.tabExactLength', { defaultValue: 'Longitud exacta del segmento' })}</div>
+              <div className="text-gray-600">Ctrl/Cmd + Z / Y</div>
+              <div>
+                {t('seating.hotkeys.items.undoRedo', { defaultValue: 'Deshacer / Rehacer' })}
+              </div>
+              <div className="text-gray-600">1..6</div>
+              <div>
+                {t('seating.hotkeys.items.tools', {
+                  defaultValue:
+                    'Herramientas (Pan, Mover, Per�metro, Puertas, Obst�culos, Pasillos)',
+                })}
+              </div>
+              <div className="text-gray-600">Ctrl/Cmd + + / - / 0</div>
+              <div>
+                {t('seating.hotkeys.items.zoomFit', { defaultValue: 'Zoom in / out / Ajustar' })}
+              </div>
+              <div className="text-gray-600">Ctrl/Cmd + A</div>
+              <div>
+                {t('seating.hotkeys.items.selectAll', { defaultValue: 'Seleccionar todo' })}
+              </div>
+              <div className="text-gray-600">Esc</div>
+              <div>
+                {t('seating.hotkeys.items.escape', {
+                  defaultValue: 'Limpiar selecci�n / cerrar men�s',
+                })}
+              </div>
+              <div className="text-gray-600">Q / E</div>
+              <div>
+                {t('seating.hotkeys.items.rotate', {
+                  defaultValue: 'Rotar -5� / +5� (Shift: �15�)',
+                })}
+              </div>
+              <div className="text-gray-600">Alt + �/�/�/�</div>
+              <div>
+                {t('seating.hotkeys.items.align', { defaultValue: 'Alinear (inicio/fin)' })}
+              </div>
+              <div className="text-gray-600">Shift + Alt + �/�/�/�</div>
+              <div>
+                {t('seating.hotkeys.items.distribute', { defaultValue: 'Distribuir (X/Y)' })}
+              </div>
+              <div className="text-gray-600">Ctrl/Cmd + �/�</div>
+              <div>
+                {t('seating.hotkeys.items.tabs', {
+                  defaultValue: 'Cambiar pesta�a (Ceremonia/Banquete)',
+                })}
+              </div>
+              <div className="text-gray-600">R / N / V</div>
+              <div>
+                {t('seating.hotkeys.items.toggles', {
+                  defaultValue: 'Reglas / N�meros / Validaciones',
+                })}
+              </div>
+              <div className="text-gray-600">P / S</div>
+              <div>
+                {t('seating.hotkeys.items.panels', {
+                  defaultValue: 'Plantillas / Configurar espacio',
+                })}
+              </div>
+              <div className="text-gray-600">Enter / Esc</div>
+              <div>
+                {t('seating.hotkeys.items.drawFinalizeCancel', {
+                  defaultValue: 'Finalizar / Cancelar dibujo',
+                })}
+              </div>
+              <div className="text-gray-600">Backspace/Delete</div>
+              <div>
+                {t('seating.hotkeys.items.backspaceDelete', {
+                  defaultValue: 'Deshacer punto / Eliminar mesa',
+                })}
+              </div>
+              <div className="text-gray-600">Tab (per�metro)</div>
+              <div>
+                {t('seating.hotkeys.items.tabExactLength', {
+                  defaultValue: 'Longitud exacta del segmento',
+                })}
+              </div>
             </div>
           </div>
         </div>
@@ -843,11 +905,51 @@ const SeatingPlanToolbar = ({
             </div>
           )}
         </div>
+
+        {/* ✅ NUEVO: Modal de confirmación para resetear */}
+        {showResetConfirm && (
+          <div
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+            onClick={() => setShowResetConfirm(false)}
+          >
+            <div
+              className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                {t('seating.reset.title', { defaultValue: '¿Rehacer desde 0?' })}
+              </h3>
+              <p className="text-sm text-gray-600 mb-4">
+                {t('seating.reset.message', {
+                  defaultValue:
+                    'Esta acción eliminará TODAS las mesas, áreas y configuración del Seating Plan. Esta acción no se puede deshacer.',
+                })}
+              </p>
+              <div className="flex gap-3 justify-end">
+                <button
+                  type="button"
+                  onClick={() => setShowResetConfirm(false)}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+                >
+                  {t('cancel', { defaultValue: 'Cancelar' })}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClearBanquet?.();
+                    setShowResetConfirm(false);
+                  }}
+                  className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
+                >
+                  {t('seating.reset.confirm', { defaultValue: 'Sí, rehacer desde 0' })}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
 export default React.memo(SeatingPlanToolbar);
-
-

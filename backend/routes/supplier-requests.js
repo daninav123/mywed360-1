@@ -1,6 +1,6 @@
 import express from 'express';
 import { db, FieldValue } from '../config/firebase.js';
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 import { sendEmail } from '../services/mailgunService.js';
 
 const router = express.Router();

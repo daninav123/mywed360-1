@@ -1,6 +1,6 @@
 import admin from 'firebase-admin';
 import { randomUUID } from 'crypto';
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 import { sendMailAndPersist } from './mailSendService.js';
 
 const weddingsCollection = () => admin.firestore().collection('weddings');
@@ -21,7 +21,9 @@ function getSignaturePortalBase() {
   const candidates = [
     process.env.SIGNATURE_PORTAL_BASE_URL,
     process.env.PUBLIC_APP_URL ? `${process.env.PUBLIC_APP_URL.replace(/\/$/, '')}/firma` : null,
-    process.env.FRONTEND_BASE_URL ? `${process.env.FRONTEND_BASE_URL.replace(/\/$/, '')}/firma` : null,
+    process.env.FRONTEND_BASE_URL
+      ? `${process.env.FRONTEND_BASE_URL.replace(/\/$/, '')}/firma`
+      : null,
   ].filter(Boolean);
   const chosen = candidates.length ? candidates[0] : DEFAULT_PORTAL;
   return chosen.replace(/\/$/, '');
@@ -32,7 +34,8 @@ function deriveDocumentStatus(signers) {
   const statuses = signers.map((s) => String(s.status || 'pending').toLowerCase());
   if (statuses.every((st) => st === 'completed')) return 'completed';
   if (statuses.some((st) => st === 'declined')) return 'needs_attention';
-  if (statuses.some((st) => st === 'sent' || st === 'viewed' || st === 'in_progress')) return 'in_progress';
+  if (statuses.some((st) => st === 'sent' || st === 'viewed' || st === 'in_progress'))
+    return 'in_progress';
   return statuses.some((st) => st !== 'pending') ? 'in_progress' : 'pending';
 }
 
@@ -84,7 +87,11 @@ async function getWeddingInfo(weddingId) {
       date: data.eventDate || data.date || data.fecha || null,
     };
   } catch (err) {
-    logger.warn('[signatureService] No se pudo obtener información de la boda', weddingId, err?.message || err);
+    logger.warn(
+      '[signatureService] No se pudo obtener información de la boda',
+      weddingId,
+      err?.message || err
+    );
     return {};
   }
 }
@@ -110,7 +117,14 @@ function buildEmailBody({ signerName, docTitle, signUrl, actorName, weddingName 
   return lines.join('\n');
 }
 
-async function dispatchSignatureEmails({ signers, documentMeta, weddingId, requestId, actor, disableEmail }) {
+async function dispatchSignatureEmails({
+  signers,
+  documentMeta,
+  weddingId,
+  requestId,
+  actor,
+  disableEmail,
+}) {
   const summary = {
     total: Array.isArray(signers) ? signers.length : 0,
     attempted: 0,
@@ -144,7 +158,7 @@ async function dispatchSignatureEmails({ signers, documentMeta, weddingId, reque
     return summary;
   }
 
-  const hasEmails = signers.some((signer) => (signer.originalEmail || signer.email));
+  const hasEmails = signers.some((signer) => signer.originalEmail || signer.email);
   if (!hasEmails) {
     summary.reason = 'missing-email';
     summary.skipped = signers.length;
@@ -210,14 +224,17 @@ async function dispatchSignatureEmails({ signers, documentMeta, weddingId, reque
       } catch (err) {
         summary.failed += 1;
         const message = err?.message || String(err);
-        logger.error('[signatureService] Error enviando correo de firma', { email: recipientEmail, error: message });
+        logger.error('[signatureService] Error enviando correo de firma', {
+          email: recipientEmail,
+          error: message,
+        });
         summary.details.push({
           signerId: signer.id,
           status: 'failed',
           error: message,
         });
       }
-    }),
+    })
   );
 
   summary.sentSignerIds = Array.from(sentIds);
@@ -269,14 +286,15 @@ export async function createSignatureRequest(weddingId, documentMeta, signers = 
     signers: normalizedSigners,
     createdAt,
     updatedAt: createdAt,
-    createdBy: actor && (actor.uid || actor.email || actor.name)
-      ? {
-          uid: actor.uid || null,
-          email: actor.email || null,
-          name: actor.name || null,
-          role: actor.role || null,
-        }
-      : null,
+    createdBy:
+      actor && (actor.uid || actor.email || actor.name)
+        ? {
+            uid: actor.uid || null,
+            email: actor.email || null,
+            name: actor.name || null,
+            role: actor.role || null,
+          }
+        : null,
     lastDispatch: null,
   };
 
@@ -324,13 +342,14 @@ export async function createSignatureRequest(weddingId, documentMeta, signers = 
       lastDispatch: {
         at: nowTs,
         ...counts,
-        actor: actor && (actor.uid || actor.email || actor.name)
-          ? {
-              uid: actor.uid || null,
-              email: actor.email || null,
-              name: actor.name || null,
-            }
-          : null,
+        actor:
+          actor && (actor.uid || actor.email || actor.name)
+            ? {
+                uid: actor.uid || null,
+                email: actor.email || null,
+                name: actor.name || null,
+              }
+            : null,
       },
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
@@ -340,13 +359,14 @@ export async function createSignatureRequest(weddingId, documentMeta, signers = 
       lastDispatch: {
         at: nowTs,
         ...counts,
-        actor: actor && (actor.uid || actor.email || actor.name)
-          ? {
-              uid: actor.uid || null,
-              email: actor.email || null,
-              name: actor.name || null,
-            }
-          : null,
+        actor:
+          actor && (actor.uid || actor.email || actor.name)
+            ? {
+                uid: actor.uid || null,
+                email: actor.email || null,
+                name: actor.name || null,
+              }
+            : null,
       },
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
@@ -393,7 +413,9 @@ export async function updateSignatureStatus(weddingId, signatureId, updates = {}
       const nextStatus = updates.status ? String(updates.status).toLowerCase() : current.status;
       const completedAt =
         toTimestamp(updates.completedAt) ||
-        (nextStatus === 'completed' && !current.completedAt ? admin.firestore.Timestamp.now() : current.completedAt);
+        (nextStatus === 'completed' && !current.completedAt
+          ? admin.firestore.Timestamp.now()
+          : current.completedAt);
       const nowTs = admin.firestore.Timestamp.now();
 
       const updatedSigner = {

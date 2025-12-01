@@ -13,7 +13,7 @@ export default function Minimap({
   scale = 1,
   onViewportChange,
   position = 'bottom-right',
-  size = { width: 200, height: 150 },
+  size = { width: 160, height: 120 },
 }) {
   // Calcular escala del minimap
   const minimapScale = useMemo(() => {
@@ -62,9 +62,9 @@ export default function Minimap({
   // Posición del minimap en la pantalla
   const positionStyles = {
     'bottom-right': 'bottom-4 right-4',
-    'bottom-left': 'bottom-4 left-4',
+    'bottom-left': 'bottom-20 left-24', // Más arriba y a la derecha para no chocar con toolbar
     'top-right': 'top-20 right-4',
-    'top-left': 'top-20 left-4',
+    'top-left': 'top-20 left-24',
   };
 
   return (
@@ -72,7 +72,7 @@ export default function Minimap({
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.8 }}
-      className={`fixed ${positionStyles[position]} z-50`}
+      className={`fixed ${positionStyles[position]} z-20`}
     >
       <div className="bg-gray-900/90 backdrop-blur-sm border border-gray-700 rounded-lg p-2 shadow-2xl">
         {/* Header */}
@@ -120,7 +120,7 @@ export default function Minimap({
             };
 
             return (
-              <g key={`${table.id}-${tableIndex}`}>
+              <g key={`minimap-table-${table.id}-${tableIndex}`}>
                 {isCircle ? (
                   <circle
                     cx={tableX + tableWidth / 2}

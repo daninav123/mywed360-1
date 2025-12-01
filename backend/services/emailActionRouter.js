@@ -1,6 +1,6 @@
 import { db } from '../db.js';
 import { FieldValue } from 'firebase-admin/firestore';
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 
 /**
  * Try to parse a date-time string into Date, return null if invalid
@@ -37,10 +37,7 @@ async function resolveSupplierId({ weddingId, senderEmail, supplierHint }) {
   try {
     if (!weddingId) return null;
     let supplierId = null;
-    const col = db
-      .collection('weddings')
-      .doc(weddingId)
-      .collection('suppliers');
+    const col = db.collection('weddings').doc(weddingId).collection('suppliers');
 
     // 1) Supplier by exact email
     if (senderEmail) {
@@ -87,11 +84,7 @@ async function createMeeting({ weddingId, title, when, mailId, category, supplie
     createdAt: FieldValue.serverTimestamp(),
     updatedAt: FieldValue.serverTimestamp(),
   };
-  const ref = await db
-    .collection('weddings')
-    .doc(weddingId)
-    .collection('meetings')
-    .doc();
+  const ref = await db.collection('weddings').doc(weddingId).collection('meetings').doc();
   await ref.set(payload, { merge: true });
   return ref.id;
 }
@@ -117,11 +110,7 @@ async function createTask({ weddingId, title, due, mailId, category, supplierId 
     createdAt: FieldValue.serverTimestamp(),
     updatedAt: FieldValue.serverTimestamp(),
   };
-  const ref = await db
-    .collection('weddings')
-    .doc(weddingId)
-    .collection('tasks')
-    .doc();
+  const ref = await db.collection('weddings').doc(weddingId).collection('tasks').doc();
   await ref.set(payload, { merge: true });
   return ref.id;
 }
@@ -149,14 +138,24 @@ async function upsertSupplierBudget({
   // Try to find existing by same description and close amount (string or number)
   let amountNum = null;
   try {
-    amountNum = typeof amount === 'number' ? amount : Number(String(amount).replace(/[^0-9.,-]/g, '').replace(',', '.'));
+    amountNum =
+      typeof amount === 'number'
+        ? amount
+        : Number(
+            String(amount)
+              .replace(/[^0-9.,-]/g, '')
+              .replace(',', '.')
+          );
     if (!isFinite(amountNum)) amountNum = null;
   } catch {}
 
   let targetDocId = null;
   try {
     const snap = await budgetsCol.limit(25).get();
-    const norm = (s) => String(s || '').trim().toLowerCase();
+    const norm = (s) =>
+      String(s || '')
+        .trim()
+        .toLowerCase();
     const descNorm = norm(description);
     snap.forEach((d) => {
       const data = d.data() || {};
@@ -190,11 +189,7 @@ async function upsertSupplierBudget({
   // If accepted, create a finance transaction
   if (status === 'accepted') {
     try {
-      const txRef = db
-        .collection('weddings')
-        .doc(weddingId)
-        .collection('transactions')
-        .doc();
+      const txRef = db.collection('weddings').doc(weddingId).collection('transactions').doc();
       await txRef.set({
         supplierId,
         budgetId: docRef.id,
@@ -206,7 +201,10 @@ async function upsertSupplierBudget({
         createdAt: FieldValue.serverTimestamp(),
       });
     } catch (e) {
-      logger.warn('[emailActionRouter] could not create finance transaction for accepted budget:', e?.message || e);
+      logger.warn(
+        '[emailActionRouter] could not create finance transaction for accepted budget:',
+        e?.message || e
+      );
     }
   }
 
@@ -216,13 +214,7 @@ async function upsertSupplierBudget({
 /**
  * Apply AI insights to system entities (tasks, meetings, budgets) derived from an inbound email.
  */
-export async function applyEmailInsightsToSystem({
-  weddingId,
-  sender,
-  mailId,
-  insights,
-  subject,
-}) {
+export async function applyEmailInsightsToSystem({ weddingId, sender, mailId, insights, subject }) {
   if (!weddingId || !insights) return { meetings: 0, tasks: 0, budgets: 0 };
 
   let appliedMeetings = 0;
@@ -241,7 +233,10 @@ export async function applyEmailInsightsToSystem({
   // Stamp supplierId on mail if found
   try {
     if (resolvedSupplierId) {
-      await db.collection('mails').doc(mailId).set({ supplierId: resolvedSupplierId }, { merge: true });
+      await db
+        .collection('mails')
+        .doc(mailId)
+        .set({ supplierId: resolvedSupplierId }, { merge: true });
     }
   } catch {}
 
@@ -267,9 +262,25 @@ export async function applyEmailInsightsToSystem({
       const due = t?.due || null;
       // If due provided, we can also create a small meeting as a reminder in calendar
       if (due) {
-        try { await createMeeting({ weddingId, title, when: due, mailId, category: 'TAREAS', supplierId: resolvedSupplierId }); } catch {}
+        try {
+          await createMeeting({
+            weddingId,
+            title,
+            when: due,
+            mailId,
+            category: 'TAREAS',
+            supplierId: resolvedSupplierId,
+          });
+        } catch {}
       }
-      await createTask({ weddingId, title, due, mailId, category: 'TAREAS', supplierId: resolvedSupplierId });
+      await createTask({
+        weddingId,
+        title,
+        due,
+        mailId,
+        category: 'TAREAS',
+        supplierId: resolvedSupplierId,
+      });
       appliedTasks++;
     }
   } catch (e) {
@@ -280,11 +291,13 @@ export async function applyEmailInsightsToSystem({
   try {
     const budgets = Array.isArray(insights.budgets) ? insights.budgets : [];
     if (budgets.length) {
-      const supplierId = resolvedSupplierId || await resolveSupplierId({
-        weddingId,
-        senderEmail: sender,
-        supplierHint: budgets[0]?.client || budgets[0]?.supplier || null,
-      });
+      const supplierId =
+        resolvedSupplierId ||
+        (await resolveSupplierId({
+          weddingId,
+          senderEmail: sender,
+          supplierHint: budgets[0]?.client || budgets[0]?.supplier || null,
+        }));
       // Stamp supplierId on the mail itself for better linkage
       try {
         if (supplierId) {
@@ -295,11 +308,14 @@ export async function applyEmailInsightsToSystem({
         const status = (b?.status || '').toString().toLowerCase();
         const normalizedStatus = ['accepted', 'rejected', 'pending'].includes(status)
           ? status
-          : (/aceptad/i.test(status || subject || '') ? 'accepted'
-            : (/rechazad|declin|denegad/i.test(status || subject || '') ? 'rejected' : 'pending'));
+          : /aceptad/i.test(status || subject || '')
+            ? 'accepted'
+            : /rechazad|declin|denegad/i.test(status || subject || '')
+              ? 'rejected'
+              : 'pending';
         await upsertSupplierBudget({
           weddingId,
-          supplierId: supplierId || (b?.supplierId || b?.clientId) || 'unknown',
+          supplierId: supplierId || b?.supplierId || b?.clientId || 'unknown',
           description: b?.description || subject || 'Presupuesto',
           amount: b?.amount,
           currency: b?.currency || 'EUR',

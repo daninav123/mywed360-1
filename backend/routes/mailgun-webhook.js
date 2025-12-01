@@ -1,7 +1,7 @@
 import express from 'express';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 import { db } from '../db.js';
 import admin from 'firebase-admin';
 import { Buffer } from 'buffer';
@@ -46,7 +46,10 @@ router.post('/', async (req, res) => {
   try {
     // Validar tipo de contenido permitido
     const ct = String(req.headers['content-type'] || '').toLowerCase();
-    if (ct && !(ct.includes('application/json') || ct.includes('application/x-www-form-urlencoded'))) {
+    if (
+      ct &&
+      !(ct.includes('application/json') || ct.includes('application/x-www-form-urlencoded'))
+    ) {
       return res.status(415).json({ success: false, message: 'Unsupported content type' });
     }
 
@@ -55,7 +58,9 @@ router.post('/', async (req, res) => {
     let approxSize = 0;
     try {
       if (req.body) {
-        approxSize = Buffer.byteLength(typeof req.body === 'string' ? req.body : JSON.stringify(req.body));
+        approxSize = Buffer.byteLength(
+          typeof req.body === 'string' ? req.body : JSON.stringify(req.body)
+        );
       } else {
         approxSize = Number(req.headers['content-length'] || 0);
       }
@@ -119,25 +124,43 @@ router.post('/', async (req, res) => {
         messageId: event?.message?.headers?.['message-id'] || event?.MessageId || null,
         raw: event || {},
       });
-    } catch (e) { logger.warn('No se pudo persistir mailgunEvents', e?.message || e); }
+    } catch (e) {
+      logger.warn('No se pudo persistir mailgunEvents', e?.message || e);
+    }
 
     // Actualizar mails por Message-Id si aplica
     try {
-      const hdrMid = (event?.message && (event.message['message-id'] || (event.message.headers && event.message.headers['message-id']))) || event?.MessageId || null;
-      const normalize = (s) => String(s || '').trim().toLowerCase().replace(/^<|>$/g, '');
+      const hdrMid =
+        (event?.message &&
+          (event.message['message-id'] ||
+            (event.message.headers && event.message.headers['message-id']))) ||
+        event?.MessageId ||
+        null;
+      const normalize = (s) =>
+        String(s || '')
+          .trim()
+          .toLowerCase()
+          .replace(/^<|>$/g, '');
       const mid = normalize(hdrMid);
       if (mid) {
         const snap = await db.collection('mails').where('messageId', '==', mid).limit(5).get();
         const kind = String(event?.event || event?.eventName || '').toLowerCase();
-        const ts = Number(event?.timestamp || Math.floor(Date.now()/1000));
+        const ts = Number(event?.timestamp || Math.floor(Date.now() / 1000));
         const dateIso = new Date(ts * 1000).toISOString();
         const updates = { lastEvent: kind, lastEventAt: dateIso };
         if (kind === 'delivered') updates.deliveredAt = dateIso;
-        if (kind === 'opened' || kind === 'open') updates.openedAt = dateIso, updates.openCount = admin.firestore.FieldValue.increment(1);
-        if (kind === 'clicked' || kind === 'click') updates.clickCount = admin.firestore.FieldValue.increment(1);
+        if (kind === 'opened' || kind === 'open')
+          ((updates.openedAt = dateIso),
+            (updates.openCount = admin.firestore.FieldValue.increment(1)));
+        if (kind === 'clicked' || kind === 'click')
+          updates.clickCount = admin.firestore.FieldValue.increment(1);
         if (kind === 'failed') {
           updates.failedAt = dateIso;
-          updates.failedReason = (event['delivery-status'] && (event['delivery-status'].message || event['delivery-status'].description)) || event.reason || null;
+          updates.failedReason =
+            (event['delivery-status'] &&
+              (event['delivery-status'].message || event['delivery-status'].description)) ||
+            event.reason ||
+            null;
         }
         for (const doc of snap.docs) {
           await db.collection('mails').doc(doc.id).set(updates, { merge: true });
@@ -155,16 +178,24 @@ router.post('/', async (req, res) => {
     try {
       const recipient = String(event?.recipient || '').toLowerCase();
       if (recipient) {
-        let userSnap = await db.collection('users').where('myWed360Email', '==', recipient).limit(1).get();
+        let userSnap = await db
+          .collection('users')
+          .where('myWed360Email', '==', recipient)
+          .limit(1)
+          .get();
         if (userSnap.empty) {
           const legacy = recipient.replace(/@mywed360\.com$/i, '@mywed360');
-          userSnap = await db.collection('users').where('myWed360Email', '==', legacy).limit(1).get();
+          userSnap = await db
+            .collection('users')
+            .where('myWed360Email', '==', legacy)
+            .limit(1)
+            .get();
         }
         if (!userSnap.empty) {
           const uid = userSnap.docs[0].id;
-          const ts = Number(event?.timestamp || Math.floor(Date.now()/1000));
+          const ts = Number(event?.timestamp || Math.floor(Date.now() / 1000));
           const date = new Date(ts * 1000);
-          const dayKey = date.toISOString().slice(0,10);
+          const dayKey = date.toISOString().slice(0, 10);
           const kind = String(event?.event || event?.eventName || '').toLowerCase();
           const inc = admin.firestore.FieldValue.increment(1);
           const zero = admin.firestore.FieldValue.increment(0);
@@ -175,15 +206,26 @@ router.post('/', async (req, res) => {
           else if (kind === 'accepted') totals.totalAccepted = inc;
           else if (kind === 'clicked' || kind === 'click') totals.totalClicked = inc;
           if (Object.keys(totals).length) {
-            await db.collection('emailMetrics').doc(uid).set({ updatedAt: new Date().toISOString(), ...totals }, { merge: true });
-            await db.collection('emailMetrics').doc(uid).collection('daily').doc(dayKey).set({
-              date: dayKey,
-              delivered: totals.totalDelivered || zero,
-              opened: totals.totalOpened || zero,
-              failed: totals.totalFailed || zero,
-              accepted: totals.totalAccepted || zero,
-              clicked: totals.totalClicked || zero,
-            }, { merge: true });
+            await db
+              .collection('emailMetrics')
+              .doc(uid)
+              .set({ updatedAt: new Date().toISOString(), ...totals }, { merge: true });
+            await db
+              .collection('emailMetrics')
+              .doc(uid)
+              .collection('daily')
+              .doc(dayKey)
+              .set(
+                {
+                  date: dayKey,
+                  delivered: totals.totalDelivered || zero,
+                  opened: totals.totalOpened || zero,
+                  failed: totals.totalFailed || zero,
+                  accepted: totals.totalAccepted || zero,
+                  clicked: totals.totalClicked || zero,
+                },
+                { merge: true }
+              );
           }
         }
       }
@@ -202,4 +244,3 @@ router.post('/', async (req, res) => {
 });
 
 export default router;
-

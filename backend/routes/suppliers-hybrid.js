@@ -10,7 +10,7 @@ import OpenAI from 'openai';
 import { db, admin } from '../db.js';
 import axios from 'axios';
 import crypto from 'crypto';
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 import searchAnalyticsService from '../services/searchAnalyticsService.js';
 
 const router = express.Router();

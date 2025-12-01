@@ -5,7 +5,7 @@
 
 import express from 'express';
 import OpenAI from 'openai';
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 
 const router = express.Router();
 
@@ -40,7 +40,7 @@ const ensureOpenAIClient = () => {
 async function searchGoogle(query, location) {
   const apiKey = resolveGoogleKey();
   const cx = resolveGoogleCX();
-  
+
   if (!apiKey || !cx) {
     throw new Error('Google Search API no configurada (GOOGLE_SEARCH_API_KEY, GOOGLE_SEARCH_CX)');
   }
@@ -56,9 +56,9 @@ async function searchGoogle(query, location) {
     const data = await response.json();
     return data.items || [];
   } catch (error) {
-    logger.error('[ai-suppliers-real] Error en búsqueda Google', { 
+    logger.error('[ai-suppliers-real] Error en búsqueda Google', {
       message: error.message,
-      query: searchQuery 
+      query: searchQuery,
     });
     throw error;
   }
@@ -70,13 +70,15 @@ async function structureResults(searchResults, query, service, location, budget)
     return [];
   }
 
-  const resultsText = searchResults.map((item, idx) => {
-    return `[${idx + 1}]
+  const resultsText = searchResults
+    .map((item, idx) => {
+      return `[${idx + 1}]
 Título: ${item.title}
 URL: ${item.link}
 Snippet: ${item.snippet || 'N/A'}
 `;
-  }).join('\n\n');
+    })
+    .join('\n\n');
 
   const prompt = `Analiza los siguientes resultados de búsqueda web REALES y extrae información de proveedores de bodas para el servicio "${service}" en ${location}.
 
@@ -117,22 +119,23 @@ IMPORTANTE: Solo incluye proveedores reales que aparecen en los resultados. Usa 
       messages: [
         {
           role: 'system',
-          content: 'Eres un experto en extraer y estructurar información de proveedores de bodas desde resultados de búsqueda web. Solo devuelves información que aparece explícitamente en los resultados.'
+          content:
+            'Eres un experto en extraer y estructurar información de proveedores de bodas desde resultados de búsqueda web. Solo devuelves información que aparece explícitamente en los resultados.',
         },
         {
           role: 'user',
-          content: prompt
-        }
+          content: prompt,
+        },
       ],
     });
 
     const content = completion.choices?.[0]?.message?.content || '{}';
     const parsed = JSON.parse(content);
-    
+
     return parsed.providers || [];
   } catch (error) {
-    logger.error('[ai-suppliers-real] Error estructurando resultados', { 
-      message: error.message 
+    logger.error('[ai-suppliers-real] Error estructurando resultados', {
+      message: error.message,
     });
     return [];
   }
@@ -146,44 +149,42 @@ router.post('/', async (req, res) => {
 
   if (!hasOpenAI || !openai) {
     logger.error('[ai-suppliers-real] OpenAI no disponible');
-    return res.status(500).json({ 
+    return res.status(500).json({
       error: 'OPENAI_API_KEY missing',
-      message: 'Configura OPENAI_API_KEY en el backend para usar búsqueda IA'
+      message: 'Configura OPENAI_API_KEY en el backend para usar búsqueda IA',
     });
   }
 
   if (!hasGoogle) {
     logger.error('[ai-suppliers-real] Google Search API no configurada');
-    return res.status(500).json({ 
+    return res.status(500).json({
       error: 'GOOGLE_SEARCH_NOT_CONFIGURED',
-      message: 'Configura GOOGLE_SEARCH_API_KEY y GOOGLE_SEARCH_CX para búsqueda real. Ver: https://developers.google.com/custom-search/v1/overview'
+      message:
+        'Configura GOOGLE_SEARCH_API_KEY y GOOGLE_SEARCH_CX para búsqueda real. Ver: https://developers.google.com/custom-search/v1/overview',
     });
   }
 
   const { query, service = '', budget = '', profile = {}, location = '' } = req.body || {};
-  
+
   if (!query || typeof query !== 'string' || !query.trim()) {
     return res.status(400).json({ error: 'query is required' });
   }
 
-  const formattedLocation = location || 
-    profile?.celebrationPlace || 
-    profile?.location || 
-    profile?.city || 
-    'España';
+  const formattedLocation =
+    location || profile?.celebrationPlace || profile?.location || profile?.city || 'España';
 
   try {
     logger.info('[ai-suppliers-real] Iniciando búsqueda real', {
       query,
       service,
-      location: formattedLocation
+      location: formattedLocation,
     });
 
     // 1. Búsqueda web real
     const searchResults = await searchGoogle(query, formattedLocation);
-    
+
     logger.info('[ai-suppliers-real] Resultados de Google obtenidos', {
-      count: searchResults.length
+      count: searchResults.length,
     });
 
     if (searchResults.length === 0) {
@@ -201,21 +202,20 @@ router.post('/', async (req, res) => {
 
     logger.info('[ai-suppliers-real] Proveedores estructurados', {
       count: structuredProviders.length,
-      firstProvider: structuredProviders[0]?.title || 'N/A'
+      firstProvider: structuredProviders[0]?.title || 'N/A',
     });
 
     res.json(structuredProviders);
-
   } catch (error) {
     logger.error('[ai-suppliers-real] Error en búsqueda', {
       message: error.message,
-      stack: error.stack
+      stack: error.stack,
     });
-    
-    res.status(500).json({ 
+
+    res.status(500).json({
       error: 'search_failed',
       message: error.message,
-      details: 'Error realizando búsqueda real de proveedores'
+      details: 'Error realizando búsqueda real de proveedores',
     });
   }
 });

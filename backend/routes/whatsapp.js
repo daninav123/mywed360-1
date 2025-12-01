@@ -1,31 +1,32 @@
 import express from 'express';
 
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 
 import admin from 'firebase-admin';
 
 import { requireAuth } from '../middleware/authMiddleware.js';
 
-import { sendWhatsAppText, updateDeliveryStatusFromTwilio, providerStatus, handleIncomingMessage, ensureTestSession, toE164 } from '../services/whatsappService.js';
+import {
+  sendWhatsAppText,
+  updateDeliveryStatusFromTwilio,
+  providerStatus,
+  handleIncomingMessage,
+  ensureTestSession,
+  toE164,
+} from '../services/whatsappService.js';
 
 const router = express.Router();
 
 // Estado de proveedor
 
 router.get('/provider-status', (req, res) => {
-
   try {
-
     const status = providerStatus();
 
     res.json({ success: true, ...status });
-
   } catch (e) {
-
     res.status(500).json({ success: false, error: e.message });
-
   }
-
 });
 
 // Healthcheck simple del módulo de WhatsApp
@@ -33,13 +34,10 @@ router.get('/provider-status', (req, res) => {
 // Devuelve siempre 200 con información básica de estado y fallback
 
 router.get('/health', (req, res) => {
-
   try {
-
     const status = providerStatus();
 
     res.status(200).json({
-
       success: true,
 
       service: 'whatsapp',
@@ -47,13 +45,9 @@ router.get('/health', (req, res) => {
       time: new Date().toISOString(),
 
       status,
-
     });
-
   } catch (e) {
-
     res.status(200).json({
-
       success: false,
 
       service: 'whatsapp',
@@ -62,12 +56,13 @@ router.get('/health', (req, res) => {
 
       error: e?.message || 'unknown',
 
-      status: { configured: false, provider: process.env.WHATSAPP_PROVIDER || 'unknown', fallback: 'deeplink' },
-
+      status: {
+        configured: false,
+        provider: process.env.WHATSAPP_PROVIDER || 'unknown',
+        fallback: 'deeplink',
+      },
     });
-
   }
-
 });
 
 // ----- MODO TEST (sin número verificado) -----
@@ -77,25 +72,21 @@ router.get('/health', (req, res) => {
 // POST /api/whatsapp/test/session  { phone, weddingId, guestId }
 
 router.post('/test/session', requireAuth, async (req, res) => {
-
   try {
-
     const { z } = await import('zod');
 
-    const parsed = z.object({
+    const parsed = z
+      .object({
+        phone: z.string().min(5),
 
-      phone: z.string().min(5),
+        weddingId: z.string().min(1),
 
-      weddingId: z.string().min(1),
-
-      guestId: z.string().min(1),
-
-    }).safeParse(req.body || {});
+        guestId: z.string().min(1),
+      })
+      .safeParse(req.body || {});
 
     if (!parsed.success) {
-
       return res.status(400).json({ success: false, error: parsed.error.issues });
-
     }
 
     const { phone, weddingId, guestId } = parsed.data;
@@ -109,15 +100,11 @@ router.post('/test/session', requireAuth, async (req, res) => {
     if (!ok) return res.status(500).json({ success: false, error: 'no se pudo crear sesión' });
 
     res.json({ success: true, phoneE164: e164 });
-
   } catch (e) {
-
     logger.error('[whatsapp] /test/session error:', e);
 
     res.status(500).json({ success: false, error: e.message || 'error' });
-
   }
-
 });
 
 // Simula un mensaje entrante desde WhatsApp sin pasar por Twilio
@@ -125,14 +112,15 @@ router.post('/test/session', requireAuth, async (req, res) => {
 // POST /api/whatsapp/test/inbound  { phone, body }
 
 router.post('/test/inbound', requireAuth, async (req, res) => {
-
   try {
-
     const { z } = await import('zod');
 
-    const parsed = z.object({ phone: z.string().min(5), body: z.string().min(1) }).safeParse(req.body || {});
+    const parsed = z
+      .object({ phone: z.string().min(5), body: z.string().min(1) })
+      .safeParse(req.body || {});
 
-    if (!parsed.success) return res.status(400).json({ success: false, error: parsed.error.issues });
+    if (!parsed.success)
+      return res.status(400).json({ success: false, error: parsed.error.issues });
 
     const { phone, body } = parsed.data;
 
@@ -143,27 +131,28 @@ router.post('/test/inbound', requireAuth, async (req, res) => {
     const replies = [];
 
     const replyFn = async (toE164, message) => {
-
       replies.push({ toE164, body: message });
 
       try {
-
         await admin.firestore().collection('mensajeria_test_replies').add({
-
           to: toE164,
 
           body: message,
 
           created_at: admin.firestore.FieldValue.serverTimestamp(),
-
         });
 
         const sessId = (toE164 || '').replace(/^\+/, '');
 
-        await admin.firestore().collection('whatsapp_sessions').doc(sessId).set({ lastTestReply: message, lastReplyAt: admin.firestore.FieldValue.serverTimestamp() }, { merge: true });
-
+        await admin
+          .firestore()
+          .collection('whatsapp_sessions')
+          .doc(sessId)
+          .set(
+            { lastTestReply: message, lastReplyAt: admin.firestore.FieldValue.serverTimestamp() },
+            { merge: true }
+          );
       } catch {}
-
     };
 
     const payload = { From: `whatsapp:${e164}`, Body: String(body || '') }; // forma Twilio-like
@@ -171,15 +160,11 @@ router.post('/test/inbound', requireAuth, async (req, res) => {
     await handleIncomingMessage(payload, { replyFn });
 
     res.json({ success: true, replies });
-
   } catch (e) {
-
     logger.error('[whatsapp] /test/inbound error:', e);
 
     res.status(500).json({ success: false, error: e.message || 'error' });
-
   }
-
 });
 
 // Métricas agregadas de WhatsApp por boda y rango de fechas
@@ -187,9 +172,7 @@ router.post('/test/inbound', requireAuth, async (req, res) => {
 // GET /api/whatsapp/metrics?weddingId=...&from=ISO&to=ISO&groupBy=day
 
 router.get('/metrics', requireAuth, async (req, res) => {
-
   try {
-
     const weddingId = req.query.weddingId || null;
 
     const fromIso = req.query.from || null;
@@ -199,9 +182,14 @@ router.get('/metrics', requireAuth, async (req, res) => {
     const groupBy = (req.query.groupBy || 'day').toLowerCase();
 
     const toDate = (iso) => {
-
-      try { if (!iso) return null; const d = new Date(iso); if (isNaN(d.getTime())) return null; return d; } catch { return null; }
-
+      try {
+        if (!iso) return null;
+        const d = new Date(iso);
+        if (isNaN(d.getTime())) return null;
+        return d;
+      } catch {
+        return null;
+      }
     };
 
     const createdFromDate = toDate(fromIso);
@@ -217,11 +205,17 @@ router.get('/metrics', requireAuth, async (req, res) => {
     const snap = await q.limit(2000).get();
 
     const byStatus = {
+      scheduled: 0,
+      processing: 0,
+      queued: 0,
+      sent: 0,
+      delivered: 0,
+      read: 0,
 
-      scheduled: 0, processing: 0, queued: 0, sent: 0, delivered: 0, read: 0,
-
-      failed: 0, undelivered: 0, error: 0, other: 0,
-
+      failed: 0,
+      undelivered: 0,
+      error: 0,
+      other: 0,
     };
 
     const errors = {};
@@ -231,7 +225,6 @@ router.get('/metrics', requireAuth, async (req, res) => {
     let total = 0;
 
     const getDayKey = (data) => {
-
       const ts = data.created_at || data.scheduled_at || data.sent_at || data.updated_at || null;
 
       const d = ts && ts.toDate ? ts.toDate() : null;
@@ -239,11 +232,9 @@ router.get('/metrics', requireAuth, async (req, res) => {
       if (!d) return 'unknown';
 
       return d.toISOString().slice(0, 10);
-
     };
 
     snap.forEach((doc) => {
-
       const data = doc.data() || {};
 
       // Filtrado por rango temporal en memoria para evitar índice compuesto
@@ -258,18 +249,29 @@ router.get('/metrics', requireAuth, async (req, res) => {
 
       const st = (data.estado || 'other').toLowerCase();
 
-      if (byStatus[st] !== undefined) byStatus[st] += 1; else byStatus.other += 1;
+      if (byStatus[st] !== undefined) byStatus[st] += 1;
+      else byStatus.other += 1;
 
       if (data.error_code) errors[data.error_code] = (errors[data.error_code] || 0) + 1;
 
       const day = getDayKey(data);
 
-      if (!seriesByDay[day]) seriesByDay[day] = { total: 0, scheduled: 0, queued: 0, sent: 0, delivered: 0, read: 0, failed: 0, undelivered: 0, error: 0 };
+      if (!seriesByDay[day])
+        seriesByDay[day] = {
+          total: 0,
+          scheduled: 0,
+          queued: 0,
+          sent: 0,
+          delivered: 0,
+          read: 0,
+          failed: 0,
+          undelivered: 0,
+          error: 0,
+        };
 
       seriesByDay[day].total += 1;
 
       if (seriesByDay[day][st] !== undefined) seriesByDay[day][st] += 1;
-
     });
 
     const totalAttempted = total - byStatus.scheduled - byStatus.processing; // intentados (cola/emitidos)
@@ -291,7 +293,6 @@ router.get('/metrics', requireAuth, async (req, res) => {
       .map((k) => ({ day: k, ...seriesByDay[k] }));
 
     return res.json({
-
       success: true,
 
       timeRange: { from: fromIso || null, to: toIso || null },
@@ -301,43 +302,32 @@ router.get('/metrics', requireAuth, async (req, res) => {
       byStatus,
 
       rates: {
-
         deliveryRate,
 
         readRate,
-
       },
 
       series,
 
       errors,
-
     });
-
   } catch (e) {
-
     logger.error('[whatsapp] metrics error:', e);
 
     res.status(500).json({ success: false, error: e.message || 'error' });
-
   }
-
 });
 
 // Cron: procesa mensajes programados (requiere token)
 
 router.post('/cron-run', async (req, res) => {
-
   try {
-
     const provided = req.headers['x-cron-token'] || req.query.token;
 
     const expected = process.env.WHATSAPP_CRON_TOKEN || '';
 
     if (!expected || provided !== expected) {
-
       return res.status(401).json({ success: false, error: 'unauthorized' });
-
     }
 
     const now = admin.firestore.Timestamp.now();
@@ -358,16 +348,16 @@ router.post('/cron-run', async (req, res) => {
 
       .get();
 
-    let processed = 0, queued = 0, failed = 0;
+    let processed = 0,
+      queued = 0,
+      failed = 0;
 
     for (const doc of snap.docs) {
-
       const ref = doc.ref;
 
       // Lock via transaction
 
       const ok = await admin.firestore().runTransaction(async (tx) => {
-
         const current = await tx.get(ref);
 
         if (!current.exists) return false;
@@ -377,17 +367,22 @@ router.post('/cron-run', async (req, res) => {
         if (data.estado !== 'scheduled') return false;
 
         if (!data.to || !data.message) {
-
-          tx.update(ref, { estado: 'error', error_code: 'invalid-payload', updated_at: admin.firestore.FieldValue.serverTimestamp() });
+          tx.update(ref, {
+            estado: 'error',
+            error_code: 'invalid-payload',
+            updated_at: admin.firestore.FieldValue.serverTimestamp(),
+          });
 
           return false;
-
         }
 
-        tx.update(ref, { estado: 'processing', locked_at: admin.firestore.FieldValue.serverTimestamp(), updated_at: admin.firestore.FieldValue.serverTimestamp() });
+        tx.update(ref, {
+          estado: 'processing',
+          locked_at: admin.firestore.FieldValue.serverTimestamp(),
+          updated_at: admin.firestore.FieldValue.serverTimestamp(),
+        });
 
         return true;
-
       });
 
       if (!ok) continue;
@@ -395,111 +390,124 @@ router.post('/cron-run', async (req, res) => {
       processed++;
 
       try {
-
         const data = (await ref.get()).data();
 
-        const result = await sendWhatsAppText({ to: data.to, message: data.message, weddingId: data.weddingId, guestId: data.invitado_id, templateId: data.plantilla_id, metadata: data.metadata || {} });
+        const result = await sendWhatsAppText({
+          to: data.to,
+          message: data.message,
+          weddingId: data.weddingId,
+          guestId: data.invitado_id,
+          templateId: data.plantilla_id,
+          metadata: data.metadata || {},
+        });
 
         if (result?.success) {
-
           queued++;
 
-          await ref.set({ estado: 'queued', triggered_sid: result.sid || null, updated_at: admin.firestore.FieldValue.serverTimestamp() }, { merge: true });
-
+          await ref.set(
+            {
+              estado: 'queued',
+              triggered_sid: result.sid || null,
+              updated_at: admin.firestore.FieldValue.serverTimestamp(),
+            },
+            { merge: true }
+          );
         } else {
-
           failed++;
 
-          await ref.set({ estado: 'error', error_code: result?.error || 'send-failed', updated_at: admin.firestore.FieldValue.serverTimestamp() }, { merge: true });
-
+          await ref.set(
+            {
+              estado: 'error',
+              error_code: result?.error || 'send-failed',
+              updated_at: admin.firestore.FieldValue.serverTimestamp(),
+            },
+            { merge: true }
+          );
         }
 
         // backoff suave
 
-        await new Promise(r => setTimeout(r, 250));
-
+        await new Promise((r) => setTimeout(r, 250));
       } catch (e) {
-
         failed++;
 
-        await ref.set({ estado: 'error', error_code: e.message || 'exception', updated_at: admin.firestore.FieldValue.serverTimestamp() }, { merge: true });
-
+        await ref.set(
+          {
+            estado: 'error',
+            error_code: e.message || 'exception',
+            updated_at: admin.firestore.FieldValue.serverTimestamp(),
+          },
+          { merge: true }
+        );
       }
-
     }
 
     return res.json({ success: true, processed, queued, failed });
-
   } catch (e) {
-
     logger.error('[whatsapp] cron-run error:', e);
 
     res.status(500).json({ success: false, error: e.message || 'error' });
-
   }
-
 });
 
 // Envío de mensaje WhatsApp via API (número de la app)
 
 router.post('/send', requireAuth, async (req, res) => {
-
   try {
-
     const { z } = await import('zod');
 
-    const parsed = z.object({
+    const parsed = z
+      .object({
+        to: z.string().min(5),
 
-      to: z.string().min(5),
+        message: z.string().min(1),
 
-      message: z.string().min(1),
+        weddingId: z.string().optional(),
 
-      weddingId: z.string().optional(),
+        guestId: z.string().optional(),
 
-      guestId: z.string().optional(),
+        templateId: z.string().optional(),
 
-      templateId: z.string().optional(),
+        scheduleAt: z.string().optional(),
 
-      scheduleAt: z.string().optional(),
+        metadata: z.record(z.any()).optional(),
+      })
+      .safeParse(req.body || {});
 
-      metadata: z.record(z.any()).optional(),
-
-    }).safeParse(req.body || {});
-
-    if (!parsed.success) return res.status(400).json({ success: false, error: parsed.error.issues });
+    if (!parsed.success)
+      return res.status(400).json({ success: false, error: parsed.error.issues });
 
     const { to, message, weddingId, guestId, templateId, scheduleAt, metadata } = parsed.data;
 
-    const result = await sendWhatsAppText({ to, message, weddingId, guestId, templateId, scheduleAt, metadata });
+    const result = await sendWhatsAppText({
+      to,
+      message,
+      weddingId,
+      guestId,
+      templateId,
+      scheduleAt,
+      metadata,
+    });
 
     if (!result.success) {
-
       return res.status(500).json(result);
-
     }
 
     res.json(result);
-
   } catch (e) {
-
     logger.error('[whatsapp] Error en /send:', e);
 
     res.status(500).json({ success: false, error: e.message || 'error' });
-
   }
-
 });
 
 // Envío masivo directo (procesa inmediatamente cada mensaje)
 
 router.post('/send-batch', requireAuth, async (req, res) => {
-
   try {
-
     const { z } = await import('zod');
 
     const schema = z.object({
-
       weddingId: z.string().min(1).optional(),
 
       defaultMetadata: z.record(z.any()).optional(),
@@ -507,9 +515,7 @@ router.post('/send-batch', requireAuth, async (req, res) => {
       items: z
 
         .array(
-
           z.object({
-
             to: z.string().min(5),
 
             message: z.string().min(1),
@@ -521,21 +527,16 @@ router.post('/send-batch', requireAuth, async (req, res) => {
             templateId: z.string().optional(),
 
             metadata: z.record(z.any()).optional(),
-
           })
-
         )
 
         .min(1),
-
     });
 
     const parsed = schema.safeParse(req.body || {});
 
     if (!parsed.success) {
-
       return res.status(400).json({ success: false, error: parsed.error.issues });
-
     }
 
     const { weddingId: fallbackWeddingId, defaultMetadata, items } = parsed.data;
@@ -547,23 +548,18 @@ router.post('/send-batch', requireAuth, async (req, res) => {
     let fail = 0;
 
     for (const item of items) {
-
       try {
-
         const toNormalized = toE164(item.to, process.env.DEFAULT_COUNTRY_CODE || '');
 
         if (!toNormalized) {
-
           fail += 1;
 
           results.push({ success: false, to: item.to, error: 'invalid-phone' });
 
           continue;
-
         }
 
         const response = await sendWhatsAppText({
-
           to: toNormalized,
 
           message: item.message,
@@ -575,72 +571,73 @@ router.post('/send-batch', requireAuth, async (req, res) => {
           templateId: item.templateId || null,
 
           metadata: { ...(defaultMetadata || {}), ...(item.metadata || {}) },
-
         });
 
         if (response?.success) {
-
           ok += 1;
 
-          results.push({ success: true, to: toNormalized, guestId: item.guestId || null, sid: response.sid || null });
-
+          results.push({
+            success: true,
+            to: toNormalized,
+            guestId: item.guestId || null,
+            sid: response.sid || null,
+          });
         } else {
-
           fail += 1;
 
-          results.push({ success: false, to: toNormalized, guestId: item.guestId || null, error: response?.error || 'send-failed' });
-
+          results.push({
+            success: false,
+            to: toNormalized,
+            guestId: item.guestId || null,
+            error: response?.error || 'send-failed',
+          });
         }
 
         await new Promise((resolve) => setTimeout(resolve, 150));
-
       } catch (err) {
-
         fail += 1;
 
-        results.push({ success: false, to: item.to, guestId: item.guestId || null, error: err?.message || 'exception' });
-
+        results.push({
+          success: false,
+          to: item.to,
+          guestId: item.guestId || null,
+          error: err?.message || 'exception',
+        });
       }
-
     }
 
     return res.json({ success: fail === 0, ok, fail, count: items.length, results });
-
   } catch (e) {
-
     logger.error('[whatsapp] Error en /send-batch:', e);
 
     res.status(500).json({ success: false, error: e.message || 'error' });
-
   }
-
 });
 
-// Crear lote de mensajes (no envía todavía)  
+// Crear lote de mensajes (no envía todavía)
 
 // POST /api/whatsapp/batch  { weddingId, guestIds:[], messageTemplate }
 
-// Crear lote de mensajes (no env?a todav?a)  
+// Crear lote de mensajes (no env?a todav?a)
 
 // POST /api/whatsapp/batch  { weddingId, guestIds:[], messageTemplate }
 
 router.post('/batch', requireAuth, async (req, res) => {
-
   try {
-
     const { z } = await import('zod');
 
-    const parsed = z.object({
+    const parsed = z
+      .object({
+        weddingId: z.string().min(1),
 
-      weddingId: z.string().min(1),
+        guestIds: z.array(z.string().min(1)).min(1),
 
-      guestIds: z.array(z.string().min(1)).min(1),
+        messageTemplate: z.string().optional(),
+      })
+      .safeParse(req.body || {});
 
-      messageTemplate: z.string().optional(),
-
-    }).safeParse(req.body || {});
-
-    if (!parsed.success) return res.status(400).json({ success: false, error: parsed.error.issues });
+    if (!parsed.success)
+      return res.status(400).json({ success: false, error: parsed.error.issues });
 
     const { weddingId, guestIds, messageTemplate = '' } = parsed.data;
 
@@ -713,7 +710,7 @@ router.post('/batch', requireAuth, async (req, res) => {
       entry.success = Boolean(sendResult?.success);
       entry.sid = sendResult?.sid || null;
       entry.providerStatus = sendResult?.status || null;
-      entry.error = entry.success ? null : (sendResult?.error || entry.error || 'unknown-error');
+      entry.error = entry.success ? null : sendResult?.error || entry.error || 'unknown-error';
 
       if (entry.success) {
         successCount += 1;
@@ -739,7 +736,7 @@ router.post('/batch', requireAuth, async (req, res) => {
               },
               updatedAt: admin.firestore.FieldValue.serverTimestamp(),
             },
-            { merge: true },
+            { merge: true }
           );
         } catch (updateError) {
           logger.warn('[whatsapp] No se pudo actualizar el invitado tras enviar WhatsApp', {
@@ -785,48 +782,45 @@ router.post('/batch', requireAuth, async (req, res) => {
       },
       items: results,
     });
-
   } catch (e) {
-
     logger.error('[whatsapp] /batch error:', e);
 
     res.status(500).json({ success: false, error: e.message || 'error' });
-
   }
-
 });
 
 // Programación de envíos (en cola) — no envía inmediatamente
 
 router.post('/schedule', requireAuth, async (req, res) => {
-
   try {
-
     const { z } = await import('zod');
 
-    const parsed = z.object({
+    const parsed = z
+      .object({
+        items: z
+          .array(
+            z.object({
+              to: z.string().min(5).optional(),
 
-      items: z.array(z.object({
+              message: z.string().min(1),
 
-        to: z.string().min(5).optional(),
+              weddingId: z.string().optional(),
 
-        message: z.string().min(1),
+              guestId: z.string().optional(),
 
-        weddingId: z.string().optional(),
+              templateId: z.string().optional(),
 
-        guestId: z.string().optional(),
+              metadata: z.record(z.any()).optional(),
+            })
+          )
+          .min(1),
 
-        templateId: z.string().optional(),
+        scheduledAt: z.union([z.string(), z.date()]),
+      })
+      .safeParse(req.body || {});
 
-        metadata: z.record(z.any()).optional(),
-
-      })).min(1),
-
-      scheduledAt: z.union([z.string(), z.date()]),
-
-    }).safeParse(req.body || {});
-
-    if (!parsed.success) return res.status(400).json({ success: false, error: parsed.error.issues });
+    if (!parsed.success)
+      return res.status(400).json({ success: false, error: parsed.error.issues });
 
     const { items = [], scheduledAt } = parsed.data;
 
@@ -837,55 +831,51 @@ router.post('/schedule', requireAuth, async (req, res) => {
     const col = admin.firestore().collection('mensajeria_log');
 
     for (const it of items) {
-
       const ref = col.doc();
 
-      batch.set(ref, {
+      batch.set(
+        ref,
+        {
+          canal: 'whatsapp',
 
-        canal: 'whatsapp',
+          modo: 'api',
 
-        modo: 'api',
+          estado: 'scheduled',
 
-        estado: 'scheduled',
+          proveedor: 'twilio',
 
-        proveedor: 'twilio',
+          weddingId: it.weddingId || null,
 
-        weddingId: it.weddingId || null,
+          invitado_id: it.guestId || null,
 
-        invitado_id: it.guestId || null,
+          plantilla_id: it.templateId || null,
 
-        plantilla_id: it.templateId || null,
+          message: it.message || '',
 
-        message: it.message || '',
+          mensaje_preview: (it.message || '').slice(0, 500),
 
-        mensaje_preview: (it.message || '').slice(0, 500),
+          scheduled_at: admin.firestore.Timestamp.fromDate(scheduledTs),
 
-        scheduled_at: admin.firestore.Timestamp.fromDate(scheduledTs),
+          created_at: admin.firestore.FieldValue.serverTimestamp(),
 
-        created_at: admin.firestore.FieldValue.serverTimestamp(),
+          updated_at: admin.firestore.FieldValue.serverTimestamp(),
 
-        updated_at: admin.firestore.FieldValue.serverTimestamp(),
+          to: it.to || null,
 
-        to: it.to || null,
-
-        metadata: it.metadata || {},
-
-      }, { merge: true });
-
+          metadata: it.metadata || {},
+        },
+        { merge: true }
+      );
     }
 
     await batch.commit();
 
     res.json({ success: true, count: items.length });
-
   } catch (e) {
-
     logger.error('[whatsapp] Error en /schedule:', e);
 
     res.status(500).json({ success: false, error: e.message || 'error' });
-
   }
-
 });
 
 // Webhook de estados Twilio (statusCallback)
@@ -893,18 +883,19 @@ router.post('/schedule', requireAuth, async (req, res) => {
 // Twilio envía application/x-www-form-urlencoded por defecto; index.js ya tiene express.urlencoded
 
 router.post('/webhook/twilio', async (req, res) => {
-
   try {
-
     // Verificación de firma Twilio (si está configurado TWILIO_AUTH_TOKEN)
 
     try {
       const authToken = process.env.TWILIO_AUTH_TOKEN || '';
       const enforce = String(process.env.TWILIO_SIGNATURE_CHECK || 'true').toLowerCase();
-      const shouldVerify = !!authToken && (enforce === 'true' || enforce === '1' || enforce === 'yes');
+      const shouldVerify =
+        !!authToken && (enforce === 'true' || enforce === '1' || enforce === 'yes');
       if (shouldVerify) {
         const signature = req.get('X-Twilio-Signature') || req.get('x-twilio-signature') || '';
-        const absUrl = process.env.WHATSAPP_STATUS_CALLBACK_URL || `${req.protocol}://${req.get('host')}${req.originalUrl}`;
+        const absUrl =
+          process.env.WHATSAPP_STATUS_CALLBACK_URL ||
+          `${req.protocol}://${req.get('host')}${req.originalUrl}`;
         const twModule = await import('twilio');
         const tw = twModule.default || twModule;
         const ok = tw.validateRequest(authToken, signature, absUrl, req.body || {});
@@ -923,31 +914,24 @@ router.post('/webhook/twilio', async (req, res) => {
 
     // Procesar en paralelo sin bloquear la respuesta a Twilio
 
-    try { updateDeliveryStatusFromTwilio(payload).catch(() => {}); } catch {}
+    try {
+      updateDeliveryStatusFromTwilio(payload).catch(() => {});
+    } catch {}
 
     try {
-
       const hasBody = typeof payload.Body === 'string' || typeof payload.body === 'string';
 
       if (hasBody) {
-
         handleIncomingMessage(payload).catch(() => {});
-
       }
-
     } catch {}
 
     res.status(200).send('OK');
-
   } catch (e) {
-
     logger.error('[whatsapp] Error en webhook Twilio:', e);
 
     res.status(200).send('OK'); // Responder 200 para evitar reintentos agresivos del proveedor
-
   }
-
 });
 
 export default router;
-

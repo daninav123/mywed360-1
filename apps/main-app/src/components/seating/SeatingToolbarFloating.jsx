@@ -16,9 +16,23 @@ import {
   LayoutGrid,
   PenTool,
   Map,
+  MessageCircle,
+  BarChart3,
+  List,
+  Trophy,
+  Users,
 } from 'lucide-react';
 
-const ToolbarButton = ({ icon: Icon, label, onClick, isActive, disabled, shortcut, badge }) => {
+const ToolbarButton = ({
+  icon: Icon,
+  label,
+  onClick,
+  isActive,
+  disabled,
+  shortcut,
+  badge,
+  highlight,
+}) => {
   return (
     <motion.button
       onClick={onClick}
@@ -34,7 +48,9 @@ const ToolbarButton = ({ icon: Icon, label, onClick, isActive, disabled, shortcu
             ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/50'
             : disabled
               ? 'bg-transparent text-gray-600 cursor-not-allowed opacity-40'
-              : 'bg-transparent text-gray-400 hover:bg-white/10 hover:text-white'
+              : highlight
+                ? 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 hover:text-emerald-300'
+                : 'bg-transparent text-gray-400 hover:bg-white/10 hover:text-white'
         }
       `}
       aria-label={label}
@@ -44,7 +60,7 @@ const ToolbarButton = ({ icon: Icon, label, onClick, isActive, disabled, shortcu
 
       {/* Badge (ej: BETA) */}
       {badge && (
-        <span className="absolute -top-1 -right-1 bg-amber-500 text-white text-[9px] font-bold px-1 rounded">
+        <span className="absolute -top-1 -right-1 bg-emerald-500 text-white text-[9px] font-bold px-1 rounded animate-pulse">
           {badge}
         </span>
       )}
@@ -93,8 +109,23 @@ export default function SeatingToolbarFloating({
   showMinimap = false, // FASE 3
   onGenerarTodoAutomatico, // FASE 4 - Generación completa ✨
   isGeneratingAuto = false, // FASE 4
+  onOpenAIChat, // AI Assistant
+  onOpenHeatmap, // Heatmap
+  onOpenListView, // Lista móvil
+  onOpenAchievements, // Logros
+  achievementsProgress, // Progreso de logros
+  pendingGuestsCount = 0, // Número de invitados sin mesa
 }) {
   const tools = [
+    {
+      id: 'guests',
+      icon: Users,
+      label: `Invitados pendientes${pendingGuestsCount > 0 ? ` (${pendingGuestsCount})` : ''}`,
+      shortcut: 'G',
+      badge: pendingGuestsCount > 0 ? String(pendingGuestsCount) : null,
+      highlight: pendingGuestsCount > 0,
+      onClick: onOpenDrawMode,
+    },
     {
       id: 'move',
       icon: Move,
@@ -108,13 +139,6 @@ export default function SeatingToolbarFloating({
       label: 'Añadir mesa',
       shortcut: 'A',
       onClick: onAddTable,
-    },
-    {
-      id: 'draw',
-      icon: Pencil,
-      label: 'Dibujar áreas',
-      shortcut: 'D',
-      onClick: onOpenDrawMode,
     },
     {
       id: 'templates',
@@ -135,7 +159,7 @@ export default function SeatingToolbarFloating({
       id: 'auto-complete',
       icon: Sparkles,
       label: isGeneratingAuto ? 'Generando...' : 'Generar TODO Automático',
-      shortcut: 'Ctrl+G',
+      shortcut: navigator.platform.includes('Mac') ? 'Cmd+G' : 'Ctrl+G',
       badge: '✨',
       onClick: onGenerarTodoAutomatico,
       disabled: isGeneratingAuto,
@@ -158,6 +182,14 @@ export default function SeatingToolbarFloating({
       shortcut: 'Shift+A',
       badge: 'AI',
       onClick: onAutoAssign,
+    },
+    {
+      id: 'ai-chat',
+      icon: MessageCircle,
+      label: 'Chat Asistente IA',
+      shortcut: 'Ctrl+K',
+      badge: '🤖',
+      onClick: onOpenAIChat,
     },
   ];
 
@@ -182,6 +214,30 @@ export default function SeatingToolbarFloating({
 
   const settings = [
     {
+      id: 'achievements',
+      icon: Trophy,
+      label: 'Ver Logros',
+      shortcut: 'J',
+      badge: achievementsProgress?.percentage ? `${achievementsProgress.percentage}%` : '🏆',
+      onClick: onOpenAchievements,
+    },
+    {
+      id: 'list-view',
+      icon: List,
+      label: 'Vista de Lista',
+      shortcut: 'V',
+      badge: '📱',
+      onClick: onOpenListView,
+    },
+    {
+      id: 'heatmap',
+      icon: BarChart3,
+      label: 'Ver Mapa de Ocupación',
+      shortcut: 'H',
+      badge: '🔥',
+      onClick: onOpenHeatmap,
+    },
+    {
       id: 'minimap',
       icon: Map,
       label: showMinimap ? 'Ocultar Minimap' : 'Mostrar Minimap',
@@ -203,7 +259,7 @@ export default function SeatingToolbarFloating({
       initial={{ x: -100, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-      className="fixed left-4 top-1/2 -translate-y-1/2 z-30
+      className="fixed left-4 top-1/2 -translate-y-1/2 z-40
                  w-16 bg-[#1A1A1D]/95 backdrop-blur-xl
                  border border-white/10 rounded-2xl shadow-2xl
                  py-3 px-2

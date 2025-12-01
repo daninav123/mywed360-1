@@ -1,6 +1,6 @@
 import { addDays, formatISO, parseISO, startOfDay } from 'date-fns';
 
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 import { getOpenAiClient } from './blogAiService.js';
 
 const DEFAULT_TOPICS_MODEL =
@@ -166,11 +166,17 @@ export async function generateDailyTopicPlan({
       },
     };
   } catch (error) {
-    logger.error('[blogTopicPlanner] generateDailyTopicPlan failed:', error?.message || error);
+    const errorMsg = error?.message || String(error);
+    const errorCode = error?.code || error?.status || 'unknown';
+    logger.error('[blogTopicPlanner] generateDailyTopicPlan failed:', {
+      message: errorMsg,
+      code: errorCode,
+      type: error?.constructor?.name,
+    });
     return {
       source: 'fallback',
       entries: createFallbackPlan(normalizedStart, normalizedDays, languageCode),
-      raw: { error: error?.message || 'unknown-error' },
+      raw: { error: errorMsg, code: errorCode },
     };
   }
 }

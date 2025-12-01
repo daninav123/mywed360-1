@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 const Confetto = ({ index, windowWidth, windowHeight }) => {
   const colors = ['#6366F1', '#8B5CF6', '#EC4899', '#F59E0B', '#10B981'];
   const color = colors[Math.floor(Math.random() * colors.length)];
-  
+
   const startX = Math.random() * windowWidth;
   const endX = startX + (Math.random() - 0.5) * 200;
   const rotation = Math.random() * 720 - 360;
@@ -65,8 +65,11 @@ export default function ConfettiCelebration({ show, onComplete }) {
       }, 4000);
 
       return () => clearTimeout(timer);
+    } else {
+      // Reset confetti cuando show es false
+      setConfetti([]);
     }
-  }, [show, onComplete]);
+  }, [show]); // Removed onComplete from dependencies to prevent infinite loop
 
   return (
     <AnimatePresence>

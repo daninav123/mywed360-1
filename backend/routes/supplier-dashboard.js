@@ -8,30 +8,21 @@ import { FieldValue } from 'firebase-admin/firestore';
 import admin from 'firebase-admin';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 import multer from 'multer';
 import { notifyNewQuoteRequest, notifyNewReview } from '../services/supplierNotifications.js';
 
 const router = express.Router();
 
 // LOG DE CARGA DEL MÓDULO - ACTUALIZADO CON BUCKET CORRECTO
-console.log(
-  '🔵 [supplier-dashboard.js] Módulo cargado correctamente en:',
-  new Date().toISOString()
-);
-console.log(
-  '🔵 [supplier-dashboard.js] VITE_FIREBASE_STORAGE_BUCKET:',
-  process.env.VITE_FIREBASE_STORAGE_BUCKET
-);
-console.log('🔵 [supplier-dashboard.js] Bucket por defecto: lovenda-98c77.firebasestorage.app');
-console.log(
-  '🔵 [supplier-dashboard.js] Bucket que se usará:',
-  process.env.VITE_FIREBASE_STORAGE_BUCKET || 'lovenda-98c77.firebasestorage.app'
-);
+logger.info('[supplier-dashboard] Módulo cargado', {
+  timestamp: new Date().toISOString(),
+  storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET || 'lovenda-98c77.firebasestorage.app',
+});
 
 // Log TODAS las peticiones que lleguen a este router
 router.use((req, res, next) => {
-  console.log(`🟢 [supplier-dashboard ROUTER] Petición recibida: ${req.method} ${req.path}`);
+  logger.debug(`[supplier-dashboard] ${req.method} ${req.path}`);
   next();
 });
 

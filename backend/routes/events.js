@@ -1,6 +1,6 @@
 import express from 'express';
 import admin from 'firebase-admin';
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 
 // Suponemos que firebase-admin ya está inicializado en otro punto del backend
 const db = admin.firestore();
@@ -77,7 +77,12 @@ router.get('/search', async (req, res) => {
       const location = data.location || data.place || '';
       const hay = `${title} ${location}`.toLowerCase();
       if (hay.includes(q)) {
-        out.push({ id: d.id, title: title || 'Evento', dateTime: data.date || data.dateTime || data.start || null, location });
+        out.push({
+          id: d.id,
+          title: title || 'Evento',
+          dateTime: data.date || data.dateTime || data.start || null,
+          location,
+        });
       }
     });
     res.json(out.slice(0, 50));

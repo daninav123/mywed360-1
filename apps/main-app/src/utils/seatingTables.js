@@ -143,10 +143,10 @@ export function createTableFromType(tableType = 'round', overrides = {}) {
         });
 
   return {
-    id: Date.now(),
+    id: overrides.id != null ? overrides.id : Date.now(), // ✅ Respetar ID si se proporciona
     name: overrides.name || '',
-    x: Number(overrides.x) || 120,
-    y: Number(overrides.y) || 120,
+    x: overrides.x != null ? Number(overrides.x) : 120,
+    y: overrides.y != null ? Number(overrides.y) : 120,
     shape: type.shape,
     tableType: type.id,
     autoCapacity: overrides.autoCapacity ?? true,
@@ -169,8 +169,8 @@ export function sanitizeTable(rawTable = {}, { forceAuto = false } = {}) {
     forceAuto || rawTable.autoCapacity === true || rawTable.seats == null
       ? true
       : rawTable.autoCapacity === false
-      ? false
-      : false;
+        ? false
+        : false;
 
   const base = {
     ...rawTable,
@@ -242,4 +242,3 @@ export function updateTableWithField(table, field, value) {
       return next;
   }
 }
-

@@ -11,7 +11,7 @@ import {
   cancelSubscription,
 } from '../services/stripeService.js';
 import { getProductsByType } from '../config/stripe-products.js';
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 
 const router = express.Router();
 
@@ -190,7 +190,7 @@ router.get('/products/:type', (req, res) => {
     const products = getProductsByType(type);
 
     // Filtrar stripePriceId por seguridad
-    const publicProducts = products.map(product => ({
+    const publicProducts = products.map((product) => ({
       id: product.id,
       name: product.name,
       price: product.price,

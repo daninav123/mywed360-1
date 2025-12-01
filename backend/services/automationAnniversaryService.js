@@ -1,6 +1,6 @@
 import admin from 'firebase-admin';
 
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 import { sendWhatsAppText, toE164 } from './whatsappService.js';
 
 const firestore = admin.firestore();
@@ -100,9 +100,7 @@ const extractCoupleNames = (data) => {
     return data.partnerNames.filter(Boolean).join(' & ');
   }
   if (Array.isArray(data.owners) && data.owners.length) {
-    const names = data.owners
-      .map((owner) => owner?.name || owner?.displayName)
-      .filter(Boolean);
+    const names = data.owners.map((owner) => owner?.name || owner?.displayName).filter(Boolean);
     if (names.length) return names.join(' & ');
   }
   if (typeof data.name === 'string' && data.name.trim()) {
@@ -229,7 +227,11 @@ export async function updateAnniversaryConfig(payload = {}, actor = {}) {
   if (typeof config.sendHourUtc !== 'number' || config.sendHourUtc < 0 || config.sendHourUtc > 23) {
     throw new Error('sendHourUtc inválido');
   }
-  if (typeof config.sendMinuteUtc !== 'number' || config.sendMinuteUtc < 0 || config.sendMinuteUtc > 59) {
+  if (
+    typeof config.sendMinuteUtc !== 'number' ||
+    config.sendMinuteUtc < 0 ||
+    config.sendMinuteUtc > 59
+  ) {
     throw new Error('sendMinuteUtc inválido');
   }
   if (typeof config.template !== 'string' || !config.template.trim()) {
@@ -261,7 +263,10 @@ const fetchCandidateWeddings = async (startUtc, endUtc) => {
       return query.docs;
     }
   } catch (error) {
-    logger.warn('[automation-anniversary] query directa falló, se usará fallback', error?.message || error);
+    logger.warn(
+      '[automation-anniversary] query directa falló, se usará fallback',
+      error?.message || error
+    );
   }
 
   const fallbackSnap = await firestore.collection('weddings').limit(FALLBACK_LIMIT).get();
@@ -276,7 +281,15 @@ const fetchCandidateWeddings = async (startUtc, endUtc) => {
 export async function runAnniversaryAutomation({ dryRun = false } = {}, actor = {}) {
   const { config } = await getAnniversaryConfig();
   if (!config.enabled && !dryRun) {
-    return { success: true, processed: 0, sent: 0, skipped: 0, errors: 0, dryRun, notes: ['automation_disabled'] };
+    return {
+      success: true,
+      processed: 0,
+      sent: 0,
+      skipped: 0,
+      errors: 0,
+      dryRun,
+      notes: ['automation_disabled'],
+    };
   }
 
   const now = new Date();
@@ -306,8 +319,7 @@ export async function runAnniversaryAutomation({ dryRun = false } = {}, actor = 
     }
 
     const marketingOptIn =
-      data.preferences?.marketingOptIn !== false &&
-      data.eventProfile?.marketingOptIn !== false;
+      data.preferences?.marketingOptIn !== false && data.eventProfile?.marketingOptIn !== false;
 
     if (!marketingOptIn) {
       skipped += 1;
@@ -421,10 +433,13 @@ export async function runAnniversaryAutomation({ dryRun = false } = {}, actor = 
             notes: notes.slice(0, MAX_NOTES),
           },
         },
-        { merge: true },
+        { merge: true }
       );
     } catch (error) {
-      logger.warn('[automation-anniversary] no se pudo actualizar lastRun', error?.message || error);
+      logger.warn(
+        '[automation-anniversary] no se pudo actualizar lastRun',
+        error?.message || error
+      );
     }
   }
 

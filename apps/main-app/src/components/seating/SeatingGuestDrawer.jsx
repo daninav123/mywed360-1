@@ -1,11 +1,4 @@
-import {
-  LayoutGrid,
-  LayoutList,
-  Search,
-  Target,
-  Users,
-  X,
-} from 'lucide-react';
+import { LayoutGrid, LayoutList, Search, Target, Users, X } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 
 const badgeToneClasses = {
@@ -92,11 +85,7 @@ export default function SeatingGuestDrawer({
       }
       if (group) {
         const g1 = String(
-          guest?.group ||
-            guest?.groupName ||
-            guest?.companionGroupId ||
-            guest?.segment ||
-            ''
+          guest?.group || guest?.groupName || guest?.companionGroupId || guest?.segment || ''
         ).toLowerCase();
         if (!g1.includes(group.toLowerCase())) return false;
       }
@@ -131,7 +120,8 @@ export default function SeatingGuestDrawer({
     const companions = Number.parseInt(guest?.companion, 10);
     const pax = 1 + (Number.isFinite(companions) ? companions : 0);
     const sideLabel = guest?.side ? `Lado ${guest.side}` : 'Sin lado';
-    const groupLabel = guest?.groupName || guest?.group ? `Grupo ${guest.groupName || guest.group}` : null;
+    const groupLabel =
+      guest?.groupName || guest?.group ? `Grupo ${guest.groupName || guest.group}` : null;
     const meta = [sideLabel, groupLabel].filter(Boolean).join(' • ');
     const containerClasses = [
       'border rounded transition-colors flex flex-col gap-2',
@@ -207,7 +197,7 @@ export default function SeatingGuestDrawer({
   return (
     <div className="fixed inset-0 z-50">
       <div className="absolute inset-0 bg-black/30" onClick={onClose} />
-      <div className="absolute right-0 top-0 bottom-0 w-[380px] bg-white border-l shadow-xl flex flex-col">
+      <div className="absolute right-0 top-0 bottom-0 w-[340px] bg-white border-l shadow-xl flex flex-col">
         <div className="flex items-center justify-between p-3 border-b">
           <div className="flex items-center gap-2">
             <Users className="h-4 w-4" />
@@ -303,11 +293,7 @@ export default function SeatingGuestDrawer({
           </div>
         </div>
 
-        <div
-          className={`flex-1 overflow-y-auto ${
-            viewMode === 'cards' ? 'p-3' : 'p-3 space-y-2'
-          }`}
-        >
+        <div className={`flex-1 overflow-y-auto ${viewMode === 'cards' ? 'p-3' : 'p-3 space-y-2'}`}>
           {availableGuests.length === 0 ? (
             <div className="text-xs text-gray-500">
               No hay invitados pendientes con los filtros seleccionados.

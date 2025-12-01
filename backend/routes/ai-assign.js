@@ -5,7 +5,7 @@
 // Asigna de forma sencilla el primer invitado sin mesa a cada mesa libre.
 
 import express from 'express';
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 
 const router = express.Router();
 
@@ -18,7 +18,7 @@ router.post('/', (req, res) => {
   // guests que ya tienen mesa (guestId en tabla)
   const seatedIds = tables.map((t) => t.guestId).filter(Boolean);
   const unseatedGuests = guests.filter((g) => !seatedIds.includes(g.id));
-  const freeTables = tables.filter((t) => !t.guestId && (t.enabled !== false));
+  const freeTables = tables.filter((t) => !t.guestId && t.enabled !== false);
 
   const assignments = {};
   let idx = 0;

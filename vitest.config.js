@@ -19,7 +19,12 @@ export default defineConfig({
       'backend/**/*.{test,spec}.{js,ts}',
       'functions/**/*.{test,spec}.{js,ts}',
     ],
-    exclude: ['**/node_modules/**', '**/dist/**'],
+    exclude: [
+      '**/node_modules/**',
+      '**/dist/**',
+      // Excluir tests de Firestore rules (requieren emulador)
+      '**/firestore.rules*.test.js',
+    ],
     passWithNoTests: false,
     testTimeout: 30000,
     hookTimeout: 10000,
@@ -34,9 +39,7 @@ export default defineConfig({
     ],
 
     // Reporters
-    reporters: [
-      'default',
-    ],
+    reporters: ['default'],
 
     // Setups para front (src) y mocks globales controlados
     setupFiles: ['src/test/setup.js', 'backend/vitest.setup.js'],
@@ -68,7 +71,7 @@ export default defineConfig({
     alias: {
       '@': resolve(__dirname, './src'),
       // Permitir imports absolutos tipo 'src/...'
-      'src': resolve(__dirname, './src'),
+      src: resolve(__dirname, './src'),
     },
   },
 });

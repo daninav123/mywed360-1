@@ -1,4 +1,4 @@
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 
 function normalizeIp(ip) {
   if (!ip) return '';
@@ -32,7 +32,13 @@ export default function ipAllowlist(allowed = []) {
   return (req, res, next) => {
     if (disabled) return next();
     try {
-      const ipRaw = (req.ip || (Array.isArray(req.ips) && req.ips[0]) || req.headers['x-forwarded-for'] || req.socket?.remoteAddress || '').toString();
+      const ipRaw = (
+        req.ip ||
+        (Array.isArray(req.ips) && req.ips[0]) ||
+        req.headers['x-forwarded-for'] ||
+        req.socket?.remoteAddress ||
+        ''
+      ).toString();
       const ip = normalizeIp(ipRaw);
       const ok = list.some((rule) => {
         const r = rule.toLowerCase();
@@ -41,12 +47,19 @@ export default function ipAllowlist(allowed = []) {
         return ip === normalizeIp(r);
       });
       if (ok) return next();
-      try { logger.warn(`[Allowlist] IP no permitido: ${ip} for ${req.method} ${req.originalUrl}`); } catch {}
-      return res.status(403).json({ success: false, error: { code: 'ip_not_allowed', message: 'IP not allowed' } });
+      try {
+        logger.warn(`[Allowlist] IP no permitido: ${ip} for ${req.method} ${req.originalUrl}`);
+      } catch {}
+      return res
+        .status(403)
+        .json({ success: false, error: { code: 'ip_not_allowed', message: 'IP not allowed' } });
     } catch (e) {
-      try { logger.error('[Allowlist] Error evaluando allowlist', e); } catch {}
-      return res.status(500).json({ success: false, error: { code: 'allowlist_error', message: 'Internal error' } });
+      try {
+        logger.error('[Allowlist] Error evaluando allowlist', e);
+      } catch {}
+      return res
+        .status(500)
+        .json({ success: false, error: { code: 'allowlist_error', message: 'Internal error' } });
     }
   };
 }
-

@@ -1,7 +1,7 @@
 ﻿import express from 'express';
 import { db } from '../db.js';
 import OpenAI from 'openai';
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 import { extractTextForMail } from '../services/attachmentText.js';
 import { classifyEmailContent } from '../services/emailClassification.js';
 
@@ -34,19 +34,23 @@ function heuristicAnalyze({ subject = '', body = '' }) {
   const contracts = [];
   const payments = [];
 
-
   try {
     // Detectar fechas simples (YYYY-MM-DD o DD/MM/YYYY)
     const dateRegex = /(\b\d{4}-\d{2}-\d{2}\b)|(\b\d{1,2}[\/.-]\d{1,2}[\/.-]\d{2,4}\b)/gi;
     const timeRegex = /(\b\d{1,2}[:\.]\d{2}\b)|(\b\d{1,2}\s*(am|pm)\b)/gi;
-    const moneyRegex = /(\b[€$]\s?\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})?\b)|(\b\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})?\s?(€|eur|usd)\b)/gi;
-    const providerKeywords = /(fot[oó]grafo|catering|m[úu]sica|dj|flor(?:ista|er[íi]a)|invitaciones|pastel(?:er[íi]a)?|joyer[íi]a|transporte|decoraci[óo]n|lugar|finca|banquete)/gi;
+    const moneyRegex =
+      /(\b[€$]\s?\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})?\b)|(\b\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})?\s?(€|eur|usd)\b)/gi;
+    const providerKeywords =
+      /(fot[oó]grafo|catering|m[úu]sica|dj|flor(?:ista|er[íi]a)|invitaciones|pastel(?:er[íi]a)?|joyer[íi]a|transporte|decoraci[óo]n|lugar|finca|banquete)/gi;
 
     // Reuniones simples por presencia de fecha y posible hora
     const dateMatches = text.match(dateRegex) || [];
     if (dateMatches.length) {
       dateMatches.slice(0, 3).forEach((d) => {
-        const around = text.substring(Math.max(0, text.indexOf(d) - 40), Math.min(text.length, text.indexOf(d) + 40));
+        const around = text.substring(
+          Math.max(0, text.indexOf(d) - 40),
+          Math.min(text.length, text.indexOf(d) + 40)
+        );
         const time = (around.match(timeRegex) || [])[0] || null;
         const when = `${d}${time ? ' ' + time : ''}`;
         meetings.push({ title: 'Reunión', date: when, when });
@@ -81,11 +85,18 @@ function heuristicAnalyze({ subject = '', body = '' }) {
 // POST /api/email-insights/classify  { subject, body }
 router.post('/classify', async (req, res) => {
   try {
-    const { subject = '', body = '', mailId = '', persist = true, ownerUid = null } = req.body || {};
+    const {
+      subject = '',
+      body = '',
+      mailId = '',
+      persist = true,
+      ownerUid = null,
+    } = req.body || {};
     if (!subject && !body) return res.status(400).json({ error: 'subject_or_body_required' });
 
     const normalizedMailId = typeof mailId === 'string' && mailId.trim() ? mailId.trim() : null;
-    const normalizedOwnerUid = typeof ownerUid === 'string' && ownerUid.trim() ? ownerUid.trim() : null;
+    const normalizedOwnerUid =
+      typeof ownerUid === 'string' && ownerUid.trim() ? ownerUid.trim() : null;
 
     const result = await classifyEmailContent({
       subject,
@@ -144,7 +155,7 @@ router.post('/analyze', async (req, res) => {
   "contracts": [{\"party\": string, \"type\": string, \"action\": string}],\n  \"payments\": [{\"amount\": string, \"currency\": string|null, \"direction\": \"incoming|outgoing\"|null, \"method\": string|null, \"date\": string|null, \"note\": string|null}]
 }
 Responde SOLO el JSON. Email:
-Asunto: ${subject}\nCuerpo: ${body.slice(0, 5000)}${Array.isArray(attachmentsText) && attachmentsText.length ? "\nAdjuntos extraídos:" + attachmentsText.map(a=>`\n[${a.filename||'archivo'}] ${a.text.slice(0, 3000)}`).join('') : ''}`;
+Asunto: ${subject}\nCuerpo: ${body.slice(0, 5000)}${Array.isArray(attachmentsText) && attachmentsText.length ? '\nAdjuntos extraídos:' + attachmentsText.map((a) => `\n[${a.filename || 'archivo'}] ${a.text.slice(0, 3000)}`).join('') : ''}`;
 
         const completion = await openai.chat.completions.create({
           model: process.env.OPENAI_MODEL || 'gpt-3.5-turbo',
@@ -155,7 +166,9 @@ Asunto: ${subject}\nCuerpo: ${body.slice(0, 5000)}${Array.isArray(attachmentsTex
           ],
         });
         const content = completion.choices?.[0]?.message?.content || '';
-        try { insights = JSON.parse(content); } catch {
+        try {
+          insights = JSON.parse(content);
+        } catch {
           const match = content.match(/\{[\s\S]*\}$/);
           if (match) insights = JSON.parse(match[0]);
         }
@@ -186,7 +199,8 @@ router.post('/reanalyze/:mailId', async (req, res) => {
   try {
     const { mailId } = req.params;
     if (!mailId) return res.status(400).json({ error: 'mailId required' });
-    let subject = '', body = '';
+    let subject = '',
+      body = '';
     try {
       const snap = await db.collection('mails').doc(mailId).get();
       if (snap.exists) {
@@ -200,12 +214,14 @@ router.post('/reanalyze/:mailId', async (req, res) => {
     const apiKey = process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY || '';
     let insights = null;
     let attachmentsText = [];
-    try { attachmentsText = await extractTextForMail(mailId); } catch {}
+    try {
+      attachmentsText = await extractTextForMail(mailId);
+    } catch {}
 
     if (apiKey) {
       try {
         const openai = new OpenAI({ apiKey, project: process.env.OPENAI_PROJECT_ID });
-        const prompt = `Eres un asistente de boda. A partir del siguiente email, extrae acciones estructuradas en JSON con este esquema exacto:\n{\n  "tasks": [{"title": string, "due": string|null}],\n  "meetings": [{"title": string, "date": string|null, "when": string|null}],\n  "budgets": [{"client": string, "amount": string, "currency": string|null}],\n  "contracts": [{\"party\": string, \"type\": string, \"action\": string}],\n  \"payments\": [{\"amount\": string, \"currency\": string|null, \"direction\": \"incoming|outgoing\"|null, \"method\": string|null, \"date\": string|null, \"note\": string|null}]\n}\nResponde SOLO el JSON. Email:\nAsunto: ${subject}\nCuerpo: ${body.slice(0, 5000)}${Array.isArray(attachmentsText) && attachmentsText.length ? "\nAdjuntos extraídos:" + attachmentsText.map(a=>`\n[${a.filename||'archivo'}] ${a.text.slice(0, 3000)}`).join('') : ''}`;
+        const prompt = `Eres un asistente de boda. A partir del siguiente email, extrae acciones estructuradas en JSON con este esquema exacto:\n{\n  "tasks": [{"title": string, "due": string|null}],\n  "meetings": [{"title": string, "date": string|null, "when": string|null}],\n  "budgets": [{"client": string, "amount": string, "currency": string|null}],\n  "contracts": [{\"party\": string, \"type\": string, \"action\": string}],\n  \"payments\": [{\"amount\": string, \"currency\": string|null, \"direction\": \"incoming|outgoing\"|null, \"method\": string|null, \"date\": string|null, \"note\": string|null}]\n}\nResponde SOLO el JSON. Email:\nAsunto: ${subject}\nCuerpo: ${body.slice(0, 5000)}${Array.isArray(attachmentsText) && attachmentsText.length ? '\nAdjuntos extraídos:' + attachmentsText.map((a) => `\n[${a.filename || 'archivo'}] ${a.text.slice(0, 3000)}`).join('') : ''}`;
         const completion = await openai.chat.completions.create({
           model: process.env.OPENAI_MODEL || 'gpt-3.5-turbo',
           temperature: 0,
@@ -215,7 +231,9 @@ router.post('/reanalyze/:mailId', async (req, res) => {
           ],
         });
         const content = completion.choices?.[0]?.message?.content || '';
-        try { insights = JSON.parse(content); } catch {
+        try {
+          insights = JSON.parse(content);
+        } catch {
           const match = content.match(/\{[\s\S]*\}$/);
           if (match) insights = JSON.parse(match[0]);
         }
@@ -225,7 +243,9 @@ router.post('/reanalyze/:mailId', async (req, res) => {
     }
 
     if (!insights) insights = heuristicAnalyze({ subject, body });
-    try { await db.collection('emailInsights').doc(mailId).set(insights, { merge: true }); } catch {}
+    try {
+      await db.collection('emailInsights').doc(mailId).set(insights, { merge: true });
+    } catch {}
     return res.json(insights);
   } catch (err) {
     console.error('reanalyze failed', err);

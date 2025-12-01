@@ -5,7 +5,7 @@
 
 import express from 'express';
 import OpenAI from 'openai';
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 
 const router = express.Router();
 
@@ -16,7 +16,7 @@ const resolveOpenAIKey = () => process.env.OPENAI_API_KEY || process.env.VITE_OP
 const ensureOpenAIClient = () => {
   const apiKey = resolveOpenAIKey().trim();
   if (!apiKey || openai) return !!openai;
-  
+
   try {
     openai = new OpenAI({ apiKey });
     return true;
@@ -38,7 +38,7 @@ async function searchWithTavily(query, location, options = {}) {
 
   // Construir query optimizada
   const searchQuery = `${query} ${location} proveedor bodas -"boda de" -"invitados boda"`;
-  
+
   logger.info('[ai-suppliers-web] Búsqueda en Tavily', { query: searchQuery });
 
   const response = await fetch('https://api.tavily.com/search', {
@@ -60,9 +60,9 @@ async function searchWithTavily(query, location, options = {}) {
 
   if (!response.ok) {
     const error = await response.text();
-    logger.error('[ai-suppliers-web] Error en Tavily', { 
+    logger.error('[ai-suppliers-web] Error en Tavily', {
       status: response.status,
-      error 
+      error,
     });
     throw new Error(`Tavily API error: ${response.status}`);
   }
@@ -128,7 +128,8 @@ Devuelve formato: {"providers": [array de proveedores]}`;
     messages: [
       {
         role: 'system',
-        content: 'Eres un experto en extraer y estructurar información de proveedores de bodas desde resultados de búsqueda web.',
+        content:
+          'Eres un experto en extraer y estructurar información de proveedores de bodas desde resultados de búsqueda web.',
       },
       {
         role: 'user',
@@ -138,7 +139,7 @@ Devuelve formato: {"providers": [array de proveedores]}`;
   });
 
   const content = completion.choices?.[0]?.message?.content || '';
-  
+
   try {
     const parsed = JSON.parse(content);
     if (parsed.providers && Array.isArray(parsed.providers)) {
@@ -179,46 +180,40 @@ router.post('/', async (req, res) => {
 
     if (!webResults || webResults.length === 0) {
       logger.warn('[ai-suppliers-web] Sin resultados de Tavily');
-      return res.status(404).json({ 
+      return res.status(404).json({
         error: 'no_results',
-        message: 'No se encontraron proveedores en la búsqueda web. Intenta con otros términos.' 
+        message: 'No se encontraron proveedores en la búsqueda web. Intenta con otros términos.',
       });
     }
 
-    logger.info('[ai-suppliers-web] Resultados de Tavily obtenidos', { 
-      count: webResults.length 
+    logger.info('[ai-suppliers-web] Resultados de Tavily obtenidos', {
+      count: webResults.length,
     });
 
     // 2. Procesar resultados con IA para extraer datos estructurados
-    const providers = await processResultsWithAI(
-      webResults,
-      service,
-      formattedLocation,
-      budget
-    );
+    const providers = await processResultsWithAI(webResults, service, formattedLocation, budget);
 
     if (!providers || providers.length === 0) {
       logger.warn('[ai-suppliers-web] No se pudieron procesar proveedores');
-      return res.status(502).json({ 
+      return res.status(502).json({
         error: 'processing_failed',
-        message: 'Se encontraron resultados pero no se pudieron procesar. Intenta de nuevo.' 
+        message: 'Se encontraron resultados pero no se pudieron procesar. Intenta de nuevo.',
       });
     }
 
-    logger.info('[ai-suppliers-web] Proveedores procesados exitosamente', { 
+    logger.info('[ai-suppliers-web] Proveedores procesados exitosamente', {
       count: providers.length,
-      firstProvider: providers[0]?.title || 'N/A'
+      firstProvider: providers[0]?.title || 'N/A',
     });
 
     // Añadir metadata
-    const response = providers.map(p => ({
+    const response = providers.map((p) => ({
       ...p,
       source: 'web-search',
       verified: true, // Resultados de búsqueda web real
     }));
 
     res.json(response);
-
   } catch (err) {
     logger.error('[ai-suppliers-web] Error en búsqueda web', {
       message: err?.message,
@@ -227,15 +222,15 @@ router.post('/', async (req, res) => {
 
     // Si falla Tavily, devolver error específico
     if (err.message?.includes('TAVILY_API_KEY')) {
-      return res.status(501).json({ 
+      return res.status(501).json({
         error: 'tavily_not_configured',
-        message: 'Búsqueda web no disponible. Configura TAVILY_API_KEY en el backend.' 
+        message: 'Búsqueda web no disponible. Configura TAVILY_API_KEY en el backend.',
       });
     }
 
-    res.status(500).json({ 
-      error: 'web_search_failed', 
-      details: err?.message || 'unknown' 
+    res.status(500).json({
+      error: 'web_search_failed',
+      details: err?.message || 'unknown',
     });
   }
 });

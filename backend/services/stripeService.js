@@ -4,7 +4,7 @@
 
 import Stripe from 'stripe';
 import { db } from '../db.js';
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 import { getProductById, getProductByPriceId } from '../config/stripe-products.js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
@@ -24,19 +24,19 @@ export async function createCheckoutSession({
 }) {
   try {
     const product = getProductById(productId);
-    
+
     if (!product) {
       throw new Error(`Producto no encontrado: ${productId}`);
     }
-    
+
     if (product.type === 'free') {
       throw new Error('No se puede crear checkout para plan gratuito');
     }
-    
+
     if (!product.stripePriceId) {
       throw new Error(`Producto ${productId} no tiene stripePriceId configurado`);
     }
-    
+
     const sessionConfig = {
       payment_method_types: ['card'],
       mode: product.type === 'subscription' ? 'subscription' : 'payment',
@@ -55,23 +55,26 @@ export async function createCheckoutSession({
         weddingId: weddingId || '',
         environment: process.env.NODE_ENV || 'development',
       },
-      subscription_data: product.type === 'subscription' ? {
-        metadata: {
-          productId,
-          userId,
-          weddingId: weddingId || '',
-        },
-      } : undefined,
+      subscription_data:
+        product.type === 'subscription'
+          ? {
+              metadata: {
+                productId,
+                userId,
+                weddingId: weddingId || '',
+              },
+            }
+          : undefined,
     };
-    
+
     const session = await stripe.checkout.sessions.create(sessionConfig);
-    
+
     logger.info('[stripe] Checkout session created', {
       sessionId: session.id,
       productId,
       userId,
     });
-    
+
     return {
       sessionId: session.id,
       url: session.url,
@@ -91,7 +94,7 @@ export async function createCustomerPortalSession({ customerId, returnUrl }) {
       customer: customerId,
       return_url: returnUrl,
     });
-    
+
     return {
       url: session.url,
     };
@@ -107,15 +110,15 @@ export async function createCustomerPortalSession({ customerId, returnUrl }) {
 export async function handleCheckoutCompleted(session) {
   try {
     const { productId, userId, weddingId } = session.metadata;
-    
+
     if (!productId || !userId) {
       logger.warn('[stripe] Missing metadata in checkout session', { sessionId: session.id });
       return;
     }
-    
+
     const product = getProductById(productId);
     const paymentIntent = session.payment_intent;
-    
+
     // Guardar pago en Firestore
     const paymentData = {
       userId,
@@ -138,9 +141,9 @@ export async function handleCheckoutCompleted(session) {
         source: 'stripe_webhook',
       },
     };
-    
+
     await db.collection('_system').doc('config').collection('payments').add(paymentData);
-    
+
     // Actualizar suscripción del usuario
     if (product?.type === 'subscription') {
       await updateUserSubscription({
@@ -151,10 +154,10 @@ export async function handleCheckoutCompleted(session) {
         status: 'active',
       });
     }
-    
+
     // Activar características del producto
     await activateProductFeatures({ userId, weddingId, productId });
-    
+
     logger.info('[stripe] Checkout completed processed', {
       sessionId: session.id,
       userId,
@@ -172,14 +175,14 @@ export async function handleCheckoutCompleted(session) {
 export async function handleSubscriptionUpdated(subscription) {
   try {
     const { productId, userId } = subscription.metadata;
-    
+
     if (!userId) {
       logger.warn('[stripe] Missing userId in subscription metadata', {
         subscriptionId: subscription.id,
       });
       return;
     }
-    
+
     await updateUserSubscription({
       userId,
       productId,
@@ -187,7 +190,7 @@ export async function handleSubscriptionUpdated(subscription) {
       customerId: subscription.customer,
       status: subscription.status,
     });
-    
+
     logger.info('[stripe] Subscription updated', {
       subscriptionId: subscription.id,
       userId,
@@ -205,14 +208,14 @@ export async function handleSubscriptionUpdated(subscription) {
 export async function handleSubscriptionDeleted(subscription) {
   try {
     const { userId, productId } = subscription.metadata;
-    
+
     if (!userId) {
       logger.warn('[stripe] Missing userId in subscription metadata', {
         subscriptionId: subscription.id,
       });
       return;
     }
-    
+
     await updateUserSubscription({
       userId,
       productId,
@@ -220,10 +223,10 @@ export async function handleSubscriptionDeleted(subscription) {
       customerId: subscription.customer,
       status: 'canceled',
     });
-    
+
     // Desactivar características premium
     await deactivateProductFeatures({ userId, productId });
-    
+
     logger.info('[stripe] Subscription canceled', {
       subscriptionId: subscription.id,
       userId,
@@ -239,7 +242,7 @@ export async function handleSubscriptionDeleted(subscription) {
  */
 async function updateUserSubscription({ userId, productId, subscriptionId, customerId, status }) {
   const userRef = db.collection('users').doc(userId);
-  
+
   const subscriptionData = {
     productId,
     subscriptionId,
@@ -247,7 +250,7 @@ async function updateUserSubscription({ userId, productId, subscriptionId, custo
     status,
     updatedAt: new Date(),
   };
-  
+
   await userRef.set(
     {
       subscription: subscriptionData,
@@ -263,7 +266,7 @@ async function updateUserSubscription({ userId, productId, subscriptionId, custo
 async function activateProductFeatures({ userId, weddingId, productId }) {
   const product = getProductById(productId);
   const userRef = db.collection('users').doc(userId);
-  
+
   const features = {
     plan: productId,
     maxWeddings: product?.maxWeddings || 1,
@@ -272,9 +275,9 @@ async function activateProductFeatures({ userId, weddingId, productId }) {
     prioritySupport: productId !== 'free',
     updatedAt: new Date(),
   };
-  
+
   await userRef.set({ features }, { merge: true });
-  
+
   // Si es para una boda específica
   if (weddingId) {
     const weddingRef = db.collection('weddings').doc(weddingId);
@@ -296,7 +299,7 @@ async function activateProductFeatures({ userId, weddingId, productId }) {
  */
 async function deactivateProductFeatures({ userId, productId }) {
   const userRef = db.collection('users').doc(userId);
-  
+
   await userRef.set(
     {
       features: {
@@ -318,11 +321,11 @@ async function deactivateProductFeatures({ userId, productId }) {
 export async function getUserSubscription(userId) {
   try {
     const userDoc = await db.collection('users').doc(userId).get();
-    
+
     if (!userDoc.exists) {
       return null;
     }
-    
+
     const userData = userDoc.data();
     return userData.subscription || null;
   } catch (error) {
@@ -339,11 +342,11 @@ export async function cancelSubscription(subscriptionId) {
     const subscription = await stripe.subscriptions.update(subscriptionId, {
       cancel_at_period_end: true,
     });
-    
+
     logger.info('[stripe] Subscription set to cancel at period end', {
       subscriptionId,
     });
-    
+
     return subscription;
   } catch (error) {
     logger.error('[stripe] Error canceling subscription', error);

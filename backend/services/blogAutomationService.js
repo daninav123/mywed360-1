@@ -1,7 +1,7 @@
 import admin from 'firebase-admin';
 import { addDays, formatISO, parseISO, startOfDay } from 'date-fns';
 
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 import { db } from '../db.js';
 import {
   computeDefaultTags,

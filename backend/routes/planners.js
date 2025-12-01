@@ -3,7 +3,7 @@
 
 import express from 'express';
 import admin from 'firebase-admin';
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 
 const router = express.Router();
 
@@ -22,20 +22,20 @@ const mapPlannerDoc = (doc) => {
       typeof data.rating === 'number'
         ? data.rating
         : typeof data.score === 'number'
-        ? data.score
-        : null,
+          ? data.score
+          : null,
     weddingsActive:
       typeof data.weddingsActive === 'number'
         ? data.weddingsActive
         : typeof data.activeWeddings === 'number'
-        ? data.activeWeddings
-        : 0,
+          ? data.activeWeddings
+          : 0,
     tags: Array.isArray(data.tags) ? data.tags : Array.isArray(data.styles) ? data.styles : [],
     specialties: Array.isArray(data.specialties)
       ? data.specialties
       : Array.isArray(data.services)
-      ? data.services
-      : [],
+        ? data.services
+        : [],
     email: data.email || data.contactEmail || '',
     phone: data.phone || data.contactPhone || '',
     website: data.website || data.site || '',
@@ -59,9 +59,7 @@ router.get('/suggestions', async (req, res) => {
     });
 
     if (!planners.length) {
-      logger.warn(
-        `[planners] Colección "${COLLECTION}" vacía o sin planners publicados.`
-      );
+      logger.warn(`[planners] Colección "${COLLECTION}" vacía o sin planners publicados.`);
       return res.json([]);
     }
 

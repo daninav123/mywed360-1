@@ -14,6 +14,8 @@ export default function Button({
   type = 'button',
   startIcon,
   leftIcon,
+  rightIcon,
+  endIcon,
   ...props
 }) {
   const baseClasses =
@@ -64,6 +66,7 @@ export default function Button({
     >
       {(startIcon || leftIcon) && <span className="mr-2">{startIcon || leftIcon}</span>}
       {children}
+      {(rightIcon || endIcon) && <span className="ml-2">{rightIcon || endIcon}</span>}
     </button>
   );
 }

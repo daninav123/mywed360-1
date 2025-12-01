@@ -4,7 +4,7 @@ import { db } from '../db.js';
 import { FieldValue } from 'firebase-admin/firestore';
 import crypto from 'crypto';
 import { requireAuth } from '../middleware/authMiddleware.js';
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 
 const router = express.Router();
 
@@ -27,8 +27,15 @@ router.post('/weddings/:wId/suppliers/:sId/portal-token', requireAuth, async (re
     });
     // Save a reference on supplier (best-effort; not unique)
     try {
-      await db.collection('weddings').doc(wId).collection('suppliers').doc(sId)
-        .set({ portalToken: token, portalTokenCreatedAt: FieldValue.serverTimestamp() }, { merge: true });
+      await db
+        .collection('weddings')
+        .doc(wId)
+        .collection('suppliers')
+        .doc(sId)
+        .set(
+          { portalToken: token, portalTokenCreatedAt: FieldValue.serverTimestamp() },
+          { merge: true }
+        );
     } catch {}
 
     const base = process.env.PUBLIC_APP_BASE_URL || '';
@@ -68,12 +75,30 @@ router.get('/:token', async (req, res) => {
     // Fetch last RFQ or budgets (best-effort)
     let budgets = [];
     try {
-      const bSnap = await db.collection('weddings').doc(weddingId).collection('suppliers').doc(supplierId).collection('budgets').orderBy('createdAt', 'desc').limit(5).get();
-      budgets = bSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+      const bSnap = await db
+        .collection('weddings')
+        .doc(weddingId)
+        .collection('suppliers')
+        .doc(supplierId)
+        .collection('budgets')
+        .orderBy('createdAt', 'desc')
+        .limit(5)
+        .get();
+      budgets = bSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
     } catch {}
     return res.json({
-      wedding: { id: weddingId, name: wedding?.name || wedding?.title || 'Boda', date: wedding?.date || wedding?.eventDate || null, location: wedding?.location || wedding?.celebrationPlace || '' },
-      supplier: { id: supplierId, name: supplier?.name || '', service: supplier?.service || '', email: supplier?.email || '' },
+      wedding: {
+        id: weddingId,
+        name: wedding?.name || wedding?.title || 'Boda',
+        date: wedding?.date || wedding?.eventDate || null,
+        location: wedding?.location || wedding?.celebrationPlace || '',
+      },
+      supplier: {
+        id: supplierId,
+        name: supplier?.name || '',
+        service: supplier?.service || '',
+        email: supplier?.email || '',
+      },
       budgets,
     });
   } catch (e) {
@@ -101,7 +126,7 @@ router.post('/:token/submit', express.json({ limit: '1mb' }), async (req, res) =
   try {
     ({ availability, message, budget } = bodySchema.parse(req.body || {}));
   } catch (e) {
-    const msg = e?.issues ? e.issues.map(i => i.message).join(', ') : 'invalid body';
+    const msg = e?.issues ? e.issues.map((i) => i.message).join(', ') : 'invalid body';
     return res.status(400).json({ error: msg });
   }
   try {
@@ -119,7 +144,7 @@ router.post('/:token/submit', express.json({ limit: '1mb' }), async (req, res) =
       await bRef.set({
         description: String(budget.description || ''),
         amount: Number(budget.amount || 0),
-        currency: String((budget.currency || 'EUR')).toUpperCase(),
+        currency: String(budget.currency || 'EUR').toUpperCase(),
         links: Array.isArray(budget.links) ? budget.links : [],
         source: 'portal',
         status: 'submitted',

@@ -8,7 +8,7 @@
 
 import express from 'express';
 import admin from 'firebase-admin';
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 
 const router = express.Router();
 
@@ -25,7 +25,7 @@ router.post('/register', async (req, res) => {
       });
     }
 
-    console.log(`\n📝 [REGISTER] Nuevo proveedor: ${name} (${email})`);
+    logger.info(`[REGISTER] Nuevo proveedor: ${name} (${email})`);
 
     const db = admin.firestore();
 
@@ -59,7 +59,7 @@ router.post('/register', async (req, res) => {
       const existingDoc = existingProfileSnapshot.docs[0];
       supplierId = existingDoc.id;
 
-      console.log(`✅ [CLAIM] Perfil existente encontrado: ${supplierId}`);
+      logger.info(`[CLAIM] Perfil existente encontrado: ${supplierId}`);
 
       // Crear usuario en Firebase Auth
       const userRecord = await admin.auth().createUser({
@@ -87,10 +87,10 @@ router.post('/register', async (req, res) => {
         });
 
       isClaimedProfile = true;
-      console.log(`✅ [CLAIM] Perfil reclamado por ${userRecord.uid}`);
+      logger.info(`[CLAIM] Perfil reclamado por ${userRecord.uid}`);
     } else {
       // ❌ NO EXISTE: Crear nuevo perfil
-      console.log(`🆕 [NEW] Creando nuevo perfil para ${name}`);
+      logger.info(`[NEW] Creando nuevo perfil para ${name}`);
 
       // Crear usuario en Firebase Auth
       const userRecord = await admin.auth().createUser({
@@ -194,7 +194,7 @@ router.post('/register', async (req, res) => {
           },
         });
 
-      console.log(`✅ [NEW] Perfil creado: ${supplierId}`);
+      logger.info(`[NEW] Perfil creado: ${supplierId}`);
     }
 
     // 3. Generar token personalizado para login automático
@@ -220,7 +220,7 @@ router.post('/register', async (req, res) => {
       },
     });
   } catch (error) {
-    console.error('❌ [REGISTER] Error:', error);
+    logger.error('[REGISTER] Error:', error);
     logger.error('[suppliers-register] Error en registro', {
       message: error.message,
       stack: error.stack,
@@ -286,7 +286,7 @@ router.post('/login', async (req, res) => {
       },
     });
   } catch (error) {
-    console.error('❌ [LOGIN] Error:', error);
+    logger.error('[LOGIN] Error:', error);
     res.status(500).json({
       success: false,
       error: error.message,
@@ -336,7 +336,7 @@ router.get('/profile/:id', async (req, res) => {
       supplier,
     });
   } catch (error) {
-    console.error('Error getting profile:', error);
+    logger.error('Error getting profile:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });
@@ -415,14 +415,14 @@ router.put('/profile/:id', async (req, res) => {
 
     await docRef.update(updates);
 
-    console.log(`✅ [UPDATE] Perfil actualizado: ${id}`);
+    logger.info(`[UPDATE] Perfil actualizado: ${id}`);
 
     res.json({
       success: true,
       message: 'Perfil actualizado correctamente',
     });
   } catch (error) {
-    console.error('Error updating profile:', error);
+    logger.error('Error updating profile:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });

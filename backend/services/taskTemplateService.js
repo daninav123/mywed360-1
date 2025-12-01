@@ -1,6 +1,6 @@
 import admin from 'firebase-admin';
 
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 
 const ALLOWED_STATUSES = new Set(['draft', 'published', 'archived']);
 const PRIORITY_VALUES = new Set(['low', 'medium', 'high']);
@@ -195,11 +195,7 @@ function sanitizeTaskItem(rawItem, fallbackId, seen) {
     return { item: null, descendants: 0 };
   }
 
-  const title = sanitizeString(
-    rawItem.title || rawItem.name || rawItem.label || '',
-    280,
-    ''
-  );
+  const title = sanitizeString(rawItem.title || rawItem.name || rawItem.label || '', 280, '');
   if (!title) return { item: null, descendants: 0 };
 
   const id = makeId(rawItem.id || rawItem.key, fallbackId, seen);
@@ -208,11 +204,7 @@ function sanitizeTaskItem(rawItem, fallbackId, seen) {
   const startPct = normalizePct(rawItem.startPct ?? rawItem.relativeStartPct, null);
   const endPct = normalizePct(rawItem.endPct ?? rawItem.relativeEndPct, null);
 
-  const childResult = sanitizeTaskItems(
-    rawItem.children ?? rawItem.subtasks ?? [],
-    id,
-    seen
-  );
+  const childResult = sanitizeTaskItems(rawItem.children ?? rawItem.subtasks ?? [], id, seen);
 
   const item = {
     id,
@@ -227,7 +219,10 @@ function sanitizeTaskItem(rawItem, fallbackId, seen) {
     startOffsetDays: clampInt(rawItem.startOffsetDays ?? rawItem.leadStartDays, -730, 730, null),
     endOffsetDays: clampInt(rawItem.endOffsetDays ?? rawItem.leadEndDays, -730, 730, null),
     leadTimeDays: clampInt(rawItem.leadTimeDays ?? rawItem.leadTime, -730, 730, null),
-    assigneeSuggestion: sanitizeOptionalString(rawItem.assigneeSuggestion ?? rawItem.ownerSuggestion, 80),
+    assigneeSuggestion: sanitizeOptionalString(
+      rawItem.assigneeSuggestion ?? rawItem.ownerSuggestion,
+      80
+    ),
     dependencies: sanitizeStringArray(rawItem.dependencies, 20, 60),
     checklist: sanitizeChecklist(rawItem.checklist),
     priority: PRIORITY_VALUES.has(rawItem.priority) ? rawItem.priority : null,
@@ -268,17 +263,13 @@ function sanitizeBlock(rawBlock, index, seenBlocks) {
   const key = blockKeyCandidate || sanitizeString(rawBlock.id || name, 120, id);
 
   const rawStart = rawBlock.startPct ?? rawBlock.p0 ?? rawBlock.range?.startPct ?? 0;
-  const rawEnd = rawBlock.endPct ?? rawBlock.p1 ?? rawBlock.range?.endPct ?? (Number(rawStart) + 0.2);
+  const rawEnd = rawBlock.endPct ?? rawBlock.p1 ?? rawBlock.range?.endPct ?? Number(rawStart) + 0.2;
   const startPct = normalizePct(rawStart, 0);
   const endPct = normalizePct(rawEnd, startPct + 0.1);
   const adminMeta = sanitizeAdminMeta(rawBlock.admin);
 
   const taskSeenIds = new Set();
-  const tasksResult = sanitizeTaskItems(
-    rawBlock.tasks ?? rawBlock.items ?? [],
-    id,
-    taskSeenIds
-  );
+  const tasksResult = sanitizeTaskItems(rawBlock.tasks ?? rawBlock.items ?? [], id, taskSeenIds);
 
   return {
     block: {
@@ -391,7 +382,10 @@ export function normalizeTemplateDoc(doc) {
       id: doc.id,
       version: ensureVersionNumber(data.version, sanitized.version ?? 1) ?? 1,
       status: sanitizeStatus(data.status, sanitized.status || 'draft'),
-      name: sanitized.name || sanitizeOptionalString(data.name, 120) || `Plantilla v${ensureVersionNumber(data.version, 1) || 1}`,
+      name:
+        sanitized.name ||
+        sanitizeOptionalString(data.name, 120) ||
+        `Plantilla v${ensureVersionNumber(data.version, 1) || 1}`,
       notes: sanitized.notes || sanitizeOptionalString(data.notes, 2000) || '',
       schemaVersion: sanitized.schemaVersion || data.schemaVersion || SCHEMA_VERSION,
       blocks: sanitized.blocks,
@@ -437,20 +431,16 @@ function addMonths(base, delta) {
 }
 
 function computeTaskPreview(item, ctx) {
-  const {
-    blockStartPct,
-    blockEndPct,
-    computeDate,
-    total,
-    index,
-  } = ctx;
+  const { blockStartPct, blockEndPct, computeDate, total, index } = ctx;
 
   const ratioSpan = Math.max(0.05, blockEndPct - blockStartPct);
-  const defaultStartPct = blockStartPct + ratioSpan * 0.1 + (ratioSpan * 0.8 * index) / Math.max(total - 1, 1);
+  const defaultStartPct =
+    blockStartPct + ratioSpan * 0.1 + (ratioSpan * 0.8 * index) / Math.max(total - 1, 1);
   const startPct = typeof item.startPct === 'number' ? item.startPct : defaultStartPct;
-  const endPct = typeof item.endPct === 'number'
-    ? item.endPct
-    : Math.min(blockEndPct, startPct + Math.min(0.35, ratioSpan * 0.4));
+  const endPct =
+    typeof item.endPct === 'number'
+      ? item.endPct
+      : Math.min(blockEndPct, startPct + Math.min(0.35, ratioSpan * 0.4));
 
   const startDate = computeDate(startPct);
   const endDate = computeDate(endPct);
@@ -502,7 +492,12 @@ export function generateTemplatePreview(template, options = {}) {
   });
 
   const weddingDate = parseDate(options.weddingDate) || new Date();
-  const planningMonths = clampNumber(options.monthsBefore ?? options.planningMonths ?? 12, 3, 24, 12);
+  const planningMonths = clampNumber(
+    options.monthsBefore ?? options.planningMonths ?? 12,
+    3,
+    24,
+    12
+  );
 
   const endBase = weddingDate;
   const startBase = addMonths(endBase, -planningMonths);
@@ -513,8 +508,12 @@ export function generateTemplatePreview(template, options = {}) {
   };
 
   const blocks = sanitized.blocks.map((block) => {
-    const blockStartPct = typeof block.startPct === 'number' ? block.startPct : block.range?.startPct ?? 0;
-    const blockEndPct = typeof block.endPct === 'number' ? block.endPct : block.range?.endPct ?? (blockStartPct + 0.2);
+    const blockStartPct =
+      typeof block.startPct === 'number' ? block.startPct : (block.range?.startPct ?? 0);
+    const blockEndPct =
+      typeof block.endPct === 'number'
+        ? block.endPct
+        : (block.range?.endPct ?? blockStartPct + 0.2);
     const blockStartDate = computeDate(blockStartPct);
     const blockEndDate = computeDate(blockEndPct);
     const items = Array.isArray(block.items) ? block.items : [];

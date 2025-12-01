@@ -3,7 +3,7 @@ import admin from 'firebase-admin';
 import { z } from 'zod';
 
 import { db } from '../db.js';
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 import {
   ensureUniqueSlug,
   generateBlogAssets,

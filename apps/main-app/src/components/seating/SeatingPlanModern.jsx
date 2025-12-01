@@ -6,6 +6,7 @@ import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { toast } from 'react-toastify';
+import { motion } from 'framer-motion';
 
 // New design components
 import SeatingLayoutFloating from './SeatingLayoutFloating';
@@ -40,6 +41,20 @@ import SnapGuides from './SnapGuides';
 import useSnapGuides from './useSnapGuides';
 import Minimap from './Minimap';
 import BanquetConfigAdvanced from './BanquetConfigAdvanced';
+
+// AI Assistant
+import AIAssistantChat from './AIAssistantChat';
+
+// Heatmap
+import OccupancyHeatmapModal from './OccupancyHeatmapModal';
+
+// Lista móvil
+import TableListMobileModal from './TableListMobileModal';
+
+// Sistema de logros
+import AchievementUnlocked from './AchievementUnlocked';
+import AchievementsModal from './AchievementsModal';
+import { useAchievements } from '../../hooks/useAchievements';
 
 // Hooks
 import { useSeatingPlan } from '../../hooks/useSeatingPlan';
@@ -124,6 +139,11 @@ export default function SeatingPlanModern() {
   const [guestDrawerOpen, setGuestDrawerOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
 
+  // Calcular invitados sin mesa asignada
+  const pendingGuestsCount = useMemo(() => {
+    return (guests || []).filter((g) => !g.tableId && !g.table).length;
+  }, [guests]);
+
   // FASE 1: Layout Generator
   const [layoutGeneratorOpen, setLayoutGeneratorOpen] = useState(false);
 
@@ -134,13 +154,33 @@ export default function SeatingPlanModern() {
 
   // FASE 3: Snap Guides & Minimap
   const snapGuides = useSnapGuides(tables);
-  const [showMinimap, setShowMinimap] = useState(true); // Visible por defecto
+  const [showMinimap, setShowMinimap] = useState(false); // Oculto por defecto para no saturar UI
   const [banquetConfig, setBanquetConfig] = useState({});
 
   // Phase 3: Theme and celebration
   const { theme, isDark, toggleTheme } = useTheme();
   const [showConfetti, setShowConfetti] = useState(false);
   const [previousPercentage, setPreviousPercentage] = useState(0);
+
+  // AI Assistant state
+  const [aiChatOpen, setAiChatOpen] = useState(false);
+
+  // Heatmap state
+  const [heatmapOpen, setHeatmapOpen] = useState(false);
+
+  // Lista móvil state
+  const [listViewOpen, setListViewOpen] = useState(false);
+
+  // Sistema de logros - TEMPORALMENTE DESACTIVADO por loops infinitos
+  // const achievements = useAchievements(activeWedding);
+  const achievements = {
+    unlockedAchievements: [],
+    progress: { percentage: 0, totalPoints: 0 },
+    nextAchievement: null,
+    trackEvent: () => {},
+    updateSessionData: () => {},
+  };
+  const [achievementsModalOpen, setAchievementsModalOpen] = useState(false);
 
   // Calculate statistics
   const stats = useMemo(() => {
@@ -167,9 +207,23 @@ export default function SeatingPlanModern() {
       toast.success(t('planModern.toasts.fullAssignment'), {
         autoClose: 3000,
       });
+      setPreviousPercentage(stats.assignedPercentage);
+    } else if (stats.assignedPercentage !== previousPercentage) {
+      setPreviousPercentage(stats.assignedPercentage);
     }
-    setPreviousPercentage(stats.assignedPercentage);
-  }, [stats.assignedPercentage, previousPercentage, stats.totalGuests, t]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stats.assignedPercentage, stats.totalGuests]);
+
+  // Trackear cambios para logros - DESACTIVADO temporalmente
+  // useEffect(() => {
+  //   achievements.updateSessionData({
+  //     totalGuests: stats.totalGuests,
+  //     assignedGuests: stats.assignedGuests,
+  //     conflictsCount: stats.conflictCount,
+  //     totalTables: stats.tableCount,
+  //   });
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [stats.totalGuests, stats.assignedGuests, stats.conflictCount, stats.tableCount]);
 
   // Handler para Auto-IA
   const handleAutoAssign = useCallback(async () => {
@@ -317,7 +371,12 @@ export default function SeatingPlanModern() {
         tableCapacity: 8,
       });
 
+      console.log('📊 Resultado de generación:', result);
+
       if (result.success) {
+        // Track achievement: layout generated - DESACTIVADO temporalmente
+        // achievements.trackEvent('layout_generated');
+
         toast.success(
           <div>
             <strong>✨ {result.message}</strong>
@@ -336,6 +395,16 @@ export default function SeatingPlanModern() {
           </div>,
           { autoClose: 6000 }
         );
+
+        // IMPORTANTE: Esperar y recargar si NO se asignaron invitados
+        if (result.stats.invitadosAsignados === 0 && result.stats.invitadosPendientes > 0) {
+          console.log('⚠️ No se asignaron invitados, recargando en 2 segundos...');
+          toast.info('🔄 Refrescando datos...', { autoClose: 1500 });
+
+          setTimeout(() => {
+            window.location.reload();
+          }, 2000);
+        }
       } else {
         toast.error(result.message || 'Error en la generación automática');
       }
@@ -441,6 +510,12 @@ export default function SeatingPlanModern() {
             showMinimap={showMinimap}
             onGenerarTodoAutomatico={handleGenerarTodoAutomatico}
             isGeneratingAuto={isGeneratingAuto}
+            onOpenAIChat={() => setAiChatOpen(true)}
+            onOpenHeatmap={() => setHeatmapOpen(true)}
+            pendingGuestsCount={pendingGuestsCount}
+            onOpenListView={() => setListViewOpen(true)}
+            onOpenAchievements={() => setAchievementsModalOpen(true)}
+            achievementsProgress={achievements.progress}
           />
 
           {/* FASE 2: Drawing Tools (solo en banquet) */}
@@ -544,6 +619,38 @@ export default function SeatingPlanModern() {
             </motion.div>
           )}
 
+          {/* 🆕 BOTÓN FLOTANTE: ASIGNAR INVITADOS (SIEMPRE VISIBLE PARA DEBUG) */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="fixed top-24 right-6 z-50"
+          >
+            <button
+              onClick={handleGenerarTodoAutomatico}
+              disabled={isGeneratingAuto}
+              className="group bg-gradient-to-r from-green-500 to-emerald-600 
+                       hover:from-green-600 hover:to-emerald-700
+                       text-white font-semibold px-6 py-4 rounded-xl shadow-lg
+                       transform transition-all duration-200
+                       hover:scale-105 hover:shadow-xl
+                       disabled:opacity-50 disabled:cursor-not-allowed
+                       flex items-center gap-3"
+              title={`Asignar automáticamente todos los invitados a las mesas (${navigator.platform.includes('Mac') ? 'Cmd' : 'Ctrl'}+G)`}
+            >
+              <span className="text-2xl">🎯</span>
+              <div className="flex flex-col items-start">
+                <span className="text-sm font-bold">
+                  {isGeneratingAuto ? '⏳ Asignando...' : 'Asignar Invitados'}
+                </span>
+                <span className="text-xs opacity-90">
+                  {stats.totalGuests > 0
+                    ? `${stats.totalGuests - stats.assignedGuests} sin asignar`
+                    : 'Cargando...'}
+                </span>
+              </div>
+            </button>
+          </motion.div>
+
           {/* FASE 3: Minimap (navegación rápida) */}
           {showMinimap && tab === 'banquet' && (
             <Minimap
@@ -587,13 +694,13 @@ export default function SeatingPlanModern() {
         />
 
         {/* Guest Drawer */}
-        {guestDrawerOpen && (
-          <SeatingGuestDrawer
-            guests={guests?.filter((g) => !g.tableId && !g.table) || []}
-            onClose={() => setGuestDrawerOpen(false)}
-            onDragGuest={moveGuest}
-          />
-        )}
+        <SeatingGuestDrawer
+          open={guestDrawerOpen}
+          guests={guests || []}
+          selectedTableId={selectedTable?.id}
+          onClose={() => setGuestDrawerOpen(false)}
+          onAssignGuest={moveGuest}
+        />
 
         {/* Export Wizard */}
         {exportWizardOpen && (
@@ -632,7 +739,11 @@ export default function SeatingPlanModern() {
         <TemplateSelector
           isOpen={templateSelectorOpen}
           onClose={() => setTemplateSelectorOpen(false)}
-          onSelectTemplate={handleApplyTemplate}
+          onSelectTemplate={(template) => {
+            handleApplyTemplate(template);
+            // Track achievement: template used - DESACTIVADO temporalmente
+            // achievements.trackEvent('template_used');
+          }}
           guestCount={stats.totalGuests}
         />
 
@@ -646,6 +757,62 @@ export default function SeatingPlanModern() {
             toast.success('⚙️ Configuración guardada');
           }}
         />
+
+        {/* AI Assistant Chat */}
+        <AIAssistantChat
+          isOpen={aiChatOpen}
+          onClose={() => setAiChatOpen(false)}
+          guests={guests || []}
+          tables={tables || []}
+          onSuggestion={(suggestion) => {
+            // console.log('[AI Suggestion]:', suggestion);
+            toast.info('Sugerencia IA aplicada');
+          }}
+        />
+
+        {/* Occupancy Heatmap Modal */}
+        <OccupancyHeatmapModal
+          isOpen={heatmapOpen}
+          onClose={() => setHeatmapOpen(false)}
+          tables={tables || []}
+          guests={guests || []}
+          onTableClick={(tableId) => {
+            handleSelectTable(tableId, false);
+          }}
+        />
+
+        {/* Table List Mobile Modal */}
+        <TableListMobileModal
+          isOpen={listViewOpen}
+          onClose={() => setListViewOpen(false)}
+          tables={tables || []}
+          guests={guests || []}
+          onTableClick={(tableId) => {
+            handleSelectTable(tableId, false);
+          }}
+          onUnassignGuest={moveGuest}
+          onDeleteTable={deleteTable}
+          onDuplicateTable={duplicateTable}
+        />
+
+        {/* Achievements Modal */}
+        <AchievementsModal
+          isOpen={achievementsModalOpen}
+          onClose={() => setAchievementsModalOpen(false)}
+          achievementsData={{
+            unlockedAchievements: achievements.unlockedAchievements,
+            progress: achievements.progress,
+            nextAchievement: achievements.nextAchievement,
+          }}
+        />
+
+        {/* Achievement Unlocked Notification - DESACTIVADO temporalmente */}
+        {/* {achievements.recentlyUnlocked && (
+          <AchievementUnlocked
+            achievement={achievements.recentlyUnlocked}
+            onClose={() => {}}
+          />
+        )} */}
       </SeatingLayoutFloating>
     </DndProvider>
   );

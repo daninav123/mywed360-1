@@ -1,5 +1,5 @@
 import admin from 'firebase-admin';
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 
 if (!admin.apps.length) {
   try {
@@ -37,12 +37,7 @@ const isExpired = (value, graceMs = 0) => {
 };
 
 const getWeddingIdFromRequest = (req, paramHint) => {
-  const hints = [
-    paramHint,
-    'weddingId',
-    'wId',
-    'id',
-  ].filter(Boolean);
+  const hints = [paramHint, 'weddingId', 'wId', 'id'].filter(Boolean);
 
   for (const key of hints) {
     if (req.params?.[key]) return String(req.params[key]);
@@ -69,7 +64,11 @@ const fetchWeddingLicense = async (weddingId) => {
 const fetchPlannerPack = async (plannerId) => {
   if (!plannerId) return null;
   try {
-    const snap = await db.collection('plannerPacks').where('plannerId', '==', String(plannerId)).limit(10).get();
+    const snap = await db
+      .collection('plannerPacks')
+      .where('plannerId', '==', String(plannerId))
+      .limit(10)
+      .get();
     if (snap.empty) return null;
     const packs = snap.docs
       .map((doc) => ({ id: doc.id, ...doc.data() }))
@@ -102,7 +101,10 @@ export const requireActiveWeddingLicense = (options = {}) => {
         if (allowMissing) return next();
         return res.status(400).json({
           success: false,
-          error: { code: 'wedding-id-missing', message: 'No se pudo determinar la boda solicitada.' },
+          error: {
+            code: 'wedding-id-missing',
+            message: 'No se pudo determinar la boda solicitada.',
+          },
         });
       }
 
@@ -111,7 +113,10 @@ export const requireActiveWeddingLicense = (options = {}) => {
         if (allowMissing) return next();
         return res.status(403).json({
           success: false,
-          error: { code: 'wedding-license-required', message: 'La boda requiere una licencia activa.' },
+          error: {
+            code: 'wedding-license-required',
+            message: 'La boda requiere una licencia activa.',
+          },
         });
       }
 
@@ -122,8 +127,12 @@ export const requireActiveWeddingLicense = (options = {}) => {
       if (expired && licenseStatus !== 'read_only') {
         try {
           await db.collection('weddingLicenses').doc(license.id).set(
-            { status: 'read_only', expiredAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp() },
-            { merge: true },
+            {
+              status: 'read_only',
+              expiredAt: FieldValue.serverTimestamp(),
+              updatedAt: FieldValue.serverTimestamp(),
+            },
+            { merge: true }
           );
           license.status = 'read_only';
         } catch (error) {
@@ -134,14 +143,23 @@ export const requireActiveWeddingLicense = (options = {}) => {
       if (license.status === 'read_only' && !allowReadOnly) {
         return res.status(403).json({
           success: false,
-          error: { code: 'wedding-license-read-only', message: 'La licencia de la boda expiró. Solo lectura.' },
+          error: {
+            code: 'wedding-license-read-only',
+            message: 'La licencia de la boda expiró. Solo lectura.',
+          },
         });
       }
 
-      if (license.status && !['active', 'trial', 'read_only'].includes(String(license.status).toLowerCase())) {
+      if (
+        license.status &&
+        !['active', 'trial', 'read_only'].includes(String(license.status).toLowerCase())
+      ) {
         return res.status(403).json({
           success: false,
-          error: { code: 'wedding-license-invalid', message: 'La licencia de la boda no está activa.' },
+          error: {
+            code: 'wedding-license-invalid',
+            message: 'La licencia de la boda no está activa.',
+          },
         });
       }
 
@@ -173,7 +191,8 @@ export const requirePlannerPackAccess = (options = {}) => {
       if (req.userProfile?.role === 'admin') return next();
 
       const plannerId =
-        (plannerParam && (req.params?.[plannerParam] || req.body?.[plannerParam] || req.query?.[plannerParam])) ||
+        (plannerParam &&
+          (req.params?.[plannerParam] || req.body?.[plannerParam] || req.query?.[plannerParam])) ||
         req.user?.uid ||
         null;
 
@@ -181,7 +200,10 @@ export const requirePlannerPackAccess = (options = {}) => {
         if (allowMissing) return next();
         return res.status(400).json({
           success: false,
-          error: { code: 'planner-id-missing', message: 'No se pudo determinar el planner solicitado.' },
+          error: {
+            code: 'planner-id-missing',
+            message: 'No se pudo determinar el planner solicitado.',
+          },
         });
       }
 
@@ -190,7 +212,10 @@ export const requirePlannerPackAccess = (options = {}) => {
         if (allowMissing) return next();
         return res.status(403).json({
           success: false,
-          error: { code: 'planner-pack-required', message: 'Se requiere un paquete de planner activo.' },
+          error: {
+            code: 'planner-pack-required',
+            message: 'Se requiere un paquete de planner activo.',
+          },
         });
       }
 
@@ -198,22 +223,35 @@ export const requirePlannerPackAccess = (options = {}) => {
       if (status === 'trial' && !allowTrial) {
         return res.status(403).json({
           success: false,
-          error: { code: 'planner-pack-trial', message: 'El período de prueba no permite esta acción.' },
+          error: {
+            code: 'planner-pack-trial',
+            message: 'El período de prueba no permite esta acción.',
+          },
         });
       }
 
       if (['canceled', 'past_due', 'read_only', 'quota_exhausted'].includes(status)) {
         return res.status(403).json({
           success: false,
-          error: { code: 'planner-pack-inactive', message: 'Tu paquete de planner no está activo.' },
+          error: {
+            code: 'planner-pack-inactive',
+            message: 'Tu paquete de planner no está activo.',
+          },
         });
       }
 
-      if (requireQuota && typeof pack.quotaTotal === 'number' && typeof pack.quotaUsed === 'number') {
+      if (
+        requireQuota &&
+        typeof pack.quotaTotal === 'number' &&
+        typeof pack.quotaUsed === 'number'
+      ) {
         if (pack.quotaUsed >= pack.quotaTotal) {
           return res.status(403).json({
             success: false,
-            error: { code: 'planner-pack-quota-exhausted', message: 'Has alcanzado el límite de bodas activas de tu paquete.' },
+            error: {
+              code: 'planner-pack-quota-exhausted',
+              message: 'Has alcanzado el límite de bodas activas de tu paquete.',
+            },
           });
         }
       }
@@ -224,7 +262,10 @@ export const requirePlannerPackAccess = (options = {}) => {
       logger.error('[licenseGuard] Error validando pack de planner', error);
       return res.status(500).json({
         success: false,
-        error: { code: 'planner-pack-validation-error', message: 'No se pudo validar el paquete del planner.' },
+        error: {
+          code: 'planner-pack-validation-error',
+          message: 'No se pudo validar el paquete del planner.',
+        },
       });
     }
   };

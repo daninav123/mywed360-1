@@ -1,6 +1,6 @@
 import { db } from '../db.js';
 import { FieldValue } from 'firebase-admin/firestore';
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 
 /**
  * Guarda o actualiza un presupuesto de proveedor dentro de la ruta

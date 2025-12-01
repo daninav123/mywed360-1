@@ -1,7 +1,7 @@
 import express from 'express';
 import { randomUUID } from 'crypto';
 
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 import { db } from '../db.js';
 
 const router = express.Router();
@@ -125,7 +125,8 @@ function sanitizeString(value, fallback = '') {
 
 function buildTemplateResponse(template) {
   const data = { ...template };
-  data.lastModified = template.updatedAt || template.lastModified || template.createdAt || new Date().toISOString();
+  data.lastModified =
+    template.updatedAt || template.lastModified || template.createdAt || new Date().toISOString();
   return data;
 }
 
@@ -138,9 +139,14 @@ async function loadCustomTemplates(ownerUid) {
       .orderBy('updatedAt', 'desc')
       .limit(50)
       .get();
-    return snap.docs.map((doc) => buildTemplateResponse({ id: doc.id, ...doc.data(), owner: ownerUid, editable: true }));
+    return snap.docs.map((doc) =>
+      buildTemplateResponse({ id: doc.id, ...doc.data(), owner: ownerUid, editable: true })
+    );
   } catch (error) {
-    logger.warn('[email-templates] No se pudieron cargar plantillas personalizadas', error?.message || error);
+    logger.warn(
+      '[email-templates] No se pudieron cargar plantillas personalizadas',
+      error?.message || error
+    );
     return [];
   }
 }
@@ -152,7 +158,11 @@ async function loadTemplateById(id) {
     if (!snap.exists) return null;
     return buildTemplateResponse({ id: snap.id, ...snap.data(), editable: true });
   } catch (error) {
-    logger.warn('[email-templates] No se pudo obtener plantilla personalizada', id, error?.message || error);
+    logger.warn(
+      '[email-templates] No se pudo obtener plantilla personalizada',
+      id,
+      error?.message || error
+    );
     return null;
   }
 }
@@ -199,9 +209,7 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const template =
-      EMAIL_TEMPLATES.find((t) => t.id === id) ||
-      (await loadTemplateById(id));
+    const template = EMAIL_TEMPLATES.find((t) => t.id === id) || (await loadTemplateById(id));
 
     if (!template) {
       return res.status(404).json({
@@ -318,10 +326,14 @@ router.put('/:id', async (req, res) => {
     }
 
     const updates = {};
-    if (typeof req.body?.name === 'string') updates.name = sanitizeString(req.body.name, existing.name);
-    if (typeof req.body?.subject === 'string') updates.subject = sanitizeString(req.body.subject, existing.subject);
-    if (typeof req.body?.body === 'string') updates.body = sanitizeString(req.body.body, existing.body);
-    if (typeof req.body?.category === 'string') updates.category = sanitizeString(req.body.category, existing.category);
+    if (typeof req.body?.name === 'string')
+      updates.name = sanitizeString(req.body.name, existing.name);
+    if (typeof req.body?.subject === 'string')
+      updates.subject = sanitizeString(req.body.subject, existing.subject);
+    if (typeof req.body?.body === 'string')
+      updates.body = sanitizeString(req.body.body, existing.body);
+    if (typeof req.body?.category === 'string')
+      updates.category = sanitizeString(req.body.category, existing.category);
 
     if (!Object.keys(updates).length) {
       return res.status(400).json({ success: false, error: 'no-fields-to-update' });

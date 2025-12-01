@@ -2,30 +2,39 @@
 // Nota: Este servicio usa Firebase Admin inicializado por authMiddleware
 
 import admin from 'firebase-admin';
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 
-const colForWedding = (weddingId) => admin.firestore().collection('weddings').doc(String(weddingId));
+const colForWedding = (weddingId) =>
+  admin.firestore().collection('weddings').doc(String(weddingId));
 
 export async function listRules(weddingId) {
   if (!weddingId) throw new Error('weddingId requerido');
   const snap = await colForWedding(weddingId).collection('automationRules').get();
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
 }
 
 export async function upsertRule(weddingId, rule) {
   if (!weddingId) throw new Error('weddingId requerido');
   if (!rule || !rule.id) {
-    const ref = await colForWedding(weddingId).collection('automationRules').add({
-      ...rule,
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-    });
+    const ref = await colForWedding(weddingId)
+      .collection('automationRules')
+      .add({
+        ...rule,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
     return { id: ref.id, ...rule };
   }
-  await colForWedding(weddingId).collection('automationRules').doc(rule.id).set({
-    ...rule,
-    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-  }, { merge: true });
+  await colForWedding(weddingId)
+    .collection('automationRules')
+    .doc(rule.id)
+    .set(
+      {
+        ...rule,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      },
+      { merge: true }
+    );
   return rule;
 }
 
@@ -45,13 +54,13 @@ export async function evaluateTrigger(weddingId, trigger) {
         const daysBefore = Number(rule.trigger.offset || -7);
         const now = new Date();
         const deadline = new Date(trigger.deadline || now);
-        const diffDays = Math.ceil((deadline - now) / (1000*60*60*24));
+        const diffDays = Math.ceil((deadline - now) / (1000 * 60 * 60 * 24));
         if (diffDays <= Math.abs(daysBefore)) {
           actions.push({
             type: 'send_notification',
             channel: 'email',
             template: 'rsvp_reminder',
-            metadata: { diffDays, deadline: deadline.toISOString() }
+            metadata: { diffDays, deadline: deadline.toISOString() },
           });
         }
       }

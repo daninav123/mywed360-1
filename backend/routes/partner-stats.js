@@ -1,7 +1,7 @@
 import express from 'express';
 import crypto from 'crypto';
 import { db } from '../db.js';
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 import { calculateCommission, normalizeCommissionRules } from '../utils/commission.js';
 
 const router = express.Router();
@@ -43,34 +43,37 @@ function generatePartnerToken(code) {
  */
 router.get('/:token', async (req, res) => {
   const { token } = req.params;
-  
+
   if (!token || token.length < 16) {
     return res.status(400).json({ error: 'invalid_token' });
   }
 
   try {
     // Buscar el código de descuento por token
-    const discountSnapshot = await db.collection('_system').doc('config').collection('discounts')
+    const discountSnapshot = await db
+      .collection('_system')
+      .doc('config')
+      .collection('discounts')
       .where('partnerToken', '==', token)
       .limit(1)
       .get();
 
     if (discountSnapshot.empty) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         error: 'not_found',
-        message: 'Código de descuento no encontrado o token inválido'
+        message: 'Código de descuento no encontrado o token inválido',
       });
     }
 
     const discountDoc = discountSnapshot.docs[0];
     const discountData = discountDoc.data();
-    
+
     // Verificar que esté activo (soporta 'active' y 'activo')
     const status = (discountData.status || '').toLowerCase();
     if (status !== 'active' && status !== 'activo') {
       return res.status(403).json({
         error: 'inactive',
-        message: 'Este código de descuento está desactivado'
+        message: 'Este código de descuento está desactivado',
       });
     }
 
@@ -81,7 +84,7 @@ router.get('/:token', async (req, res) => {
       if (now < validFrom) {
         return res.status(403).json({
           error: 'not_started',
-          message: `Este código estará disponible desde el ${validFrom.toLocaleDateString('es-ES')}`
+          message: `Este código estará disponible desde el ${validFrom.toLocaleDateString('es-ES')}`,
         });
       }
     }
@@ -90,13 +93,16 @@ router.get('/:token', async (req, res) => {
       if (now > validUntil) {
         return res.status(403).json({
           error: 'expired',
-          message: `Este código expiró el ${validUntil.toLocaleDateString('es-ES')}`
+          message: `Este código expiró el ${validUntil.toLocaleDateString('es-ES')}`,
         });
       }
     }
 
     // Buscar todos los pagos que usaron este código
-    const paymentsSnapshot = await db.collection('_system').doc('config').collection('payments')
+    const paymentsSnapshot = await db
+      .collection('_system')
+      .doc('config')
+      .collection('payments')
       .where('discountCode', '==', discountData.code)
       .where('status', 'in', ['paid', 'succeeded', 'completed'])
       .get();
@@ -105,7 +111,8 @@ router.get('/:token', async (req, res) => {
     const commissionRules = normalizeCommissionRules(discountData.commissionRules || null, {
       defaultCurrency: currency,
     });
-    const commissionStartDate = toDateSafe(discountData.validFrom) || toDateSafe(discountData.createdAt);
+    const commissionStartDate =
+      toDateSafe(discountData.validFrom) || toDateSafe(discountData.createdAt);
 
     const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
     const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59);
@@ -122,13 +129,15 @@ router.get('/:token', async (req, res) => {
     for (const paymentDoc of paymentsSnapshot.docs) {
       const rawPayment = paymentDoc.data() || {};
       const amount = Number(rawPayment.amount ?? rawPayment.total ?? 0);
-      
+
       if (!Number.isFinite(amount) || amount <= 0) continue;
 
-      const paymentDate = toDateSafe(rawPayment.createdAt)
-        || toDateSafe(rawPayment.paidAt)
-        || toDateSafe(rawPayment.completedAt)
-        || (commissionStartDate || now);
+      const paymentDate =
+        toDateSafe(rawPayment.createdAt) ||
+        toDateSafe(rawPayment.paidAt) ||
+        toDateSafe(rawPayment.completedAt) ||
+        commissionStartDate ||
+        now;
 
       const normalizedPayment = {
         ...rawPayment,
@@ -141,9 +150,11 @@ router.get('/:token', async (req, res) => {
       totalRevenue += amount;
       totalUses++;
 
-      const userId = normalizedPayment.userId || normalizedPayment.uid || normalizedPayment.user?.uid;
-      const userEmail = normalizedPayment.email || normalizedPayment.user?.email || normalizedPayment.userEmail;
-      
+      const userId =
+        normalizedPayment.userId || normalizedPayment.uid || normalizedPayment.user?.uid;
+      const userEmail =
+        normalizedPayment.email || normalizedPayment.user?.email || normalizedPayment.userEmail;
+
       if (userId && !userIds.has(userId)) {
         userIds.add(userId);
         users.push({
@@ -166,8 +177,16 @@ router.get('/:token', async (req, res) => {
       startDate: commissionStartDate || null,
     };
 
-    const commissionSummary = calculateCommission(paymentRecords, commissionRules, commissionOptions);
-    const commissionLastMonth = calculateCommission(lastMonthPayments, commissionRules, commissionOptions);
+    const commissionSummary = calculateCommission(
+      paymentRecords,
+      commissionRules,
+      commissionOptions
+    );
+    const commissionLastMonth = calculateCommission(
+      lastMonthPayments,
+      commissionRules,
+      commissionOptions
+    );
 
     const response = {
       code: discountData.code,
@@ -193,7 +212,7 @@ router.get('/:token', async (req, res) => {
       users: users
         .sort((a, b) => b.date - a.date)
         .slice(0, 50)
-        .map(u => ({
+        .map((u) => ({
           email: u.email,
           amount: u.amount,
           date: u.date.toISOString().split('T')[0],
@@ -207,14 +226,16 @@ router.get('/:token', async (req, res) => {
       },
     };
 
-    logger.info(`[partner-stats] Token ${token.substring(0, 8)}... accessed for code ${discountData.code}`);
-    
+    logger.info(
+      `[partner-stats] Token ${token.substring(0, 8)}... accessed for code ${discountData.code}`
+    );
+
     return res.json(response);
   } catch (error) {
     logger.error('[partner-stats] Error fetching stats:', error);
-    return res.status(500).json({ 
+    return res.status(500).json({
       error: 'server_error',
-      message: 'Error al obtener estadísticas'
+      message: 'Error al obtener estadísticas',
     });
   }
 });
@@ -231,7 +252,11 @@ router.post('/generate-token', async (req, res) => {
   }
 
   try {
-    const discountRef = db.collection('_system').doc('config').collection('discounts').doc(discountId);
+    const discountRef = db
+      .collection('_system')
+      .doc('config')
+      .collection('discounts')
+      .doc(discountId);
     const discountDoc = await discountRef.get();
 
     if (!discountDoc.exists) {

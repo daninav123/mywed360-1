@@ -1,6 +1,6 @@
 import express from 'express';
 import admin from 'firebase-admin';
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 import { requireAuth } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
@@ -18,10 +18,15 @@ router.post('/:weddingId/permissions/autofix', requireAuth, async (req, res) => 
     const role = String(req?.userProfile?.role || '').toLowerCase();
 
     if (!weddingId) {
-      return res.status(400).json({ success: false, error: { code: 'bad_request', message: 'weddingId requerido' } });
+      return res
+        .status(400)
+        .json({ success: false, error: { code: 'bad_request', message: 'weddingId requerido' } });
     }
     if (!uid) {
-      return res.status(401).json({ success: false, error: { code: 'unauthenticated', message: 'Usuario no autenticado' } });
+      return res.status(401).json({
+        success: false,
+        error: { code: 'unauthenticated', message: 'Usuario no autenticado' },
+      });
     }
 
     const isAdmin = role === 'admin';
@@ -32,7 +37,9 @@ router.post('/:weddingId/permissions/autofix', requireAuth, async (req, res) => 
     const wedRef = db.collection('weddings').doc(weddingId);
     const wedSnap = await wedRef.get();
     if (!wedSnap.exists) {
-      return res.status(404).json({ success: false, error: { code: 'not_found', message: 'Boda no encontrada' } });
+      return res
+        .status(404)
+        .json({ success: false, error: { code: 'not_found', message: 'Boda no encontrada' } });
     }
     const wdata = wedSnap.data() || {};
 
@@ -40,7 +47,8 @@ router.post('/:weddingId/permissions/autofix', requireAuth, async (req, res) => 
     const owners = Array.isArray(wdata.ownerIds) ? wdata.ownerIds : [];
     const planners = Array.isArray(wdata.plannerIds) ? wdata.plannerIds : [];
     const assistants = Array.isArray(wdata.assistantIds) ? wdata.assistantIds : [];
-    const alreadyLinked = owners.includes(uid) || planners.includes(uid) || assistants.includes(uid);
+    const alreadyLinked =
+      owners.includes(uid) || planners.includes(uid) || assistants.includes(uid);
 
     // Comprobar relación en subcolección del usuario
     let listedInUserSubcol = false;
@@ -52,7 +60,10 @@ router.post('/:weddingId/permissions/autofix', requireAuth, async (req, res) => 
 
     if (!isAdmin && !listedInUserSubcol && !alreadyLinked) {
       // No hay relación previa -> denegar por seguridad
-      return res.status(403).json({ success: false, error: { code: 'forbidden', message: 'No tienes relación con esta boda' } });
+      return res.status(403).json({
+        success: false,
+        error: { code: 'forbidden', message: 'No tienes relación con esta boda' },
+      });
     }
 
     // Si ya está en plannerIds, devolver idempotente
@@ -63,16 +74,24 @@ router.post('/:weddingId/permissions/autofix', requireAuth, async (req, res) => 
     // Añadir como planner (idempotente con arrayUnion)
     try {
       const { FieldValue } = await import('firebase-admin/firestore');
-      await wedRef.set({ plannerIds: FieldValue.arrayUnion(uid), updatedAt: FieldValue.serverTimestamp() }, { merge: true });
+      await wedRef.set(
+        { plannerIds: FieldValue.arrayUnion(uid), updatedAt: FieldValue.serverTimestamp() },
+        { merge: true }
+      );
       logger.info(`[autofix] planner añadido ${uid} -> wedding ${weddingId}`);
       return res.json({ success: true, action: 'added', role: 'planner', weddingId, uid });
     } catch (e) {
       logger.error('[autofix] error añadiendo planner:', e);
-      return res.status(500).json({ success: false, error: { code: 'internal_error', message: 'No se pudo actualizar la boda' } });
+      return res.status(500).json({
+        success: false,
+        error: { code: 'internal_error', message: 'No se pudo actualizar la boda' },
+      });
     }
   } catch (e) {
     logger.error('[autofix] exception:', e);
-    return res.status(500).json({ success: false, error: { code: 'internal_error', message: 'Error interno' } });
+    return res
+      .status(500)
+      .json({ success: false, error: { code: 'internal_error', message: 'Error interno' } });
   }
 });
 
@@ -86,7 +105,10 @@ router.post('/dev/seed', requireAuth, async (req, res) => {
     const allowProd = String(process.env.ENABLE_DEV_SEED || 'false').toLowerCase() === 'true';
     const isProd = String(process.env.NODE_ENV || 'production').toLowerCase() === 'production';
     if (isProd && !allowProd) {
-      return res.status(403).json({ ok: false, error: { code: 'forbidden', message: 'dev/seed deshabilitado en producción' } });
+      return res.status(403).json({
+        ok: false,
+        error: { code: 'forbidden', message: 'dev/seed deshabilitado en producción' },
+      });
     }
 
     const uid = req?.user?.uid;
@@ -102,7 +124,8 @@ router.post('/dev/seed', requireAuth, async (req, res) => {
 
     for (const it of items) {
       try {
-        const id = (typeof it?.id === 'string' && it.id.trim()) || db.collection('weddings').doc().id;
+        const id =
+          (typeof it?.id === 'string' && it.id.trim()) || db.collection('weddings').doc().id;
         const wedRef = db.collection('weddings').doc(id);
         const base = {
           name: it?.name || 'Boda',
@@ -119,15 +142,19 @@ router.post('/dev/seed', requireAuth, async (req, res) => {
         batch.set(wedRef, base, { merge: true });
 
         const subRef = db.collection('users').doc(uid).collection('weddings').doc(id);
-        batch.set(subRef, {
-          id,
-          name: base.name,
-          weddingDate: base.weddingDate,
-          location: base.location,
-          progress: base.progress,
-          active: base.active,
-          createdAt: admin.firestore.FieldValue.serverTimestamp(),
-        }, { merge: true });
+        batch.set(
+          subRef,
+          {
+            id,
+            name: base.name,
+            weddingDate: base.weddingDate,
+            location: base.location,
+            progress: base.progress,
+            active: base.active,
+            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+          },
+          { merge: true }
+        );
 
         created.push(id);
       } catch (e) {
@@ -137,11 +164,27 @@ router.post('/dev/seed', requireAuth, async (req, res) => {
 
     await batch.commit();
 
-    const activeId = activeIdReq && created.includes(activeIdReq) ? activeIdReq : (created[0] || null);
+    const activeId =
+      activeIdReq && created.includes(activeIdReq) ? activeIdReq : created[0] || null;
     if (activeId) {
       try {
-        await db.collection('users').doc(uid).set({ activeWeddingId: activeId, hasActiveWedding: true, lastActiveWeddingAt: admin.firestore.FieldValue.serverTimestamp() }, { merge: true });
-        await db.collection('users').doc(uid).collection('weddings').doc(activeId).set({ active: true, lastAccessedAt: admin.firestore.FieldValue.serverTimestamp() }, { merge: true });
+        await db.collection('users').doc(uid).set(
+          {
+            activeWeddingId: activeId,
+            hasActiveWedding: true,
+            lastActiveWeddingAt: admin.firestore.FieldValue.serverTimestamp(),
+          },
+          { merge: true }
+        );
+        await db
+          .collection('users')
+          .doc(uid)
+          .collection('weddings')
+          .doc(activeId)
+          .set(
+            { active: true, lastAccessedAt: admin.firestore.FieldValue.serverTimestamp() },
+            { merge: true }
+          );
       } catch (e) {
         logger.warn('[dev/seed] could not set active wedding for user', e);
       }
@@ -150,6 +193,8 @@ router.post('/dev/seed', requireAuth, async (req, res) => {
     return res.json({ ok: true, created, activeId });
   } catch (e) {
     logger.error('[dev/seed] exception:', e);
-    return res.status(500).json({ ok: false, error: { code: 'internal_error', message: 'Error interno' } });
+    return res
+      .status(500)
+      .json({ ok: false, error: { code: 'internal_error', message: 'Error interno' } });
   }
 });

@@ -8,7 +8,7 @@ import express from 'express';
 import { db } from '../db.js';
 import { requireAuth } from '../middleware/authMiddleware.js';
 import { sendQuoteRequestEmail } from '../services/quoteRequestEmailService.js';
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 
 const router = express.Router();
 

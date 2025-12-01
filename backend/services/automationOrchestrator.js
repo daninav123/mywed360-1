@@ -1,7 +1,7 @@
 import { randomUUID } from 'crypto';
 import admin from 'firebase-admin';
 
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 import { listRules } from './automationService.js';
 
 const SUPPORTED_CHANNELS = new Set(['email', 'chat', 'whatsapp']);
@@ -168,7 +168,7 @@ function interpolateValue(value, event, context) {
   }
   if (value && typeof value === 'object') {
     return Object.fromEntries(
-      Object.entries(value).map(([key, val]) => [key, interpolateValue(val, event, context)]),
+      Object.entries(value).map(([key, val]) => [key, interpolateValue(val, event, context)])
     );
   }
   return value;
@@ -182,7 +182,12 @@ function conditionsFromMap(scope, map, prefix = '') {
   const conditions = [];
   Object.entries(map || {}).forEach(([key, rawValue]) => {
     const path = prefix ? `${prefix}.${key}` : key;
-    if (rawValue && typeof rawValue === 'object' && !Array.isArray(rawValue) && !isConditionLeaf(rawValue)) {
+    if (
+      rawValue &&
+      typeof rawValue === 'object' &&
+      !Array.isArray(rawValue) &&
+      !isConditionLeaf(rawValue)
+    ) {
       conditions.push(...conditionsFromMap(scope, rawValue, path));
       return;
     }
@@ -489,10 +494,13 @@ function evaluateOperator(value, operator, expected, options = {}) {
     case 'regex':
     case 'matches': {
       if (value == null) return false;
-      const flagsToUse = regexFlags != null ? regexFlags : (caseInsensitive ? 'i' : undefined);
-      const pattern = expected instanceof RegExp
-        ? expected
-        : (flagsToUse != null ? new RegExp(String(expected), flagsToUse) : new RegExp(String(expected)));
+      const flagsToUse = regexFlags != null ? regexFlags : caseInsensitive ? 'i' : undefined;
+      const pattern =
+        expected instanceof RegExp
+          ? expected
+          : flagsToUse != null
+            ? new RegExp(String(expected), flagsToUse)
+            : new RegExp(String(expected));
       return pattern.test(String(value));
     }
     case 'gt': {
@@ -563,7 +571,7 @@ function evaluateCondition(event, condition) {
   if (condition.comparePath) {
     expected = getValueAtPath(
       getScopedSource(event, condition.compareTarget || scope),
-      condition.comparePath,
+      condition.comparePath
     );
   }
 
@@ -591,12 +599,7 @@ function ruleMatchesEvent(rule, event) {
     rule?.conditions?.channel ??
     null;
   const typeSpec =
-    rule.type ??
-    rule.types ??
-    rule.trigger?.type ??
-    rule.trigger?.types ??
-    rule.eventTypes ??
-    null;
+    rule.type ?? rule.types ?? rule.trigger?.type ?? rule.trigger?.types ?? rule.eventTypes ?? null;
   const actorRoleSpec =
     rule.actorRole ??
     rule.actorRoles ??
@@ -800,7 +803,7 @@ async function evaluateRulesForEvent(event) {
     } catch (error) {
       logger.warn(
         `[automationOrchestrator] rule ${rawRule?.id || 'unknown'} evaluation failed`,
-        error?.message || error,
+        error?.message || error
       );
     }
   }

@@ -1,7 +1,7 @@
 import express from 'express';
 import admin from 'firebase-admin';
 import { v4 as uuidv4 } from 'uuid';
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 import mailgunJs from 'mailgun-js';
 import { requirePlanner, optionalAuth } from '../middleware/authMiddleware.js';
 import { incCounter } from '../services/metrics.js';
@@ -29,17 +29,35 @@ const router = express.Router();
 function createMailgunClients() {
   const MAILGUN_API_KEY = process.env.VITE_MAILGUN_API_KEY || process.env.MAILGUN_API_KEY;
   const MAILGUN_DOMAIN = process.env.VITE_MAILGUN_DOMAIN || process.env.MAILGUN_DOMAIN;
-  const MAILGUN_SENDING_DOMAIN = process.env.VITE_MAILGUN_SENDING_DOMAIN || process.env.MAILGUN_SENDING_DOMAIN;
-  const MAILGUN_EU_REGION = (process.env.VITE_MAILGUN_EU_REGION || process.env.MAILGUN_EU_REGION || '').toString();
-  try { logger.info('Mailgun cfg (rsvp): ' + JSON.stringify({
-    apiKey: MAILGUN_API_KEY ? MAILGUN_API_KEY.substring(0,5) + '***' : 'none',
-    domain: MAILGUN_DOMAIN || 'none', sendingDomain: MAILGUN_SENDING_DOMAIN || 'none', eu: MAILGUN_EU_REGION
-  })); } catch {}
+  const MAILGUN_SENDING_DOMAIN =
+    process.env.VITE_MAILGUN_SENDING_DOMAIN || process.env.MAILGUN_SENDING_DOMAIN;
+  const MAILGUN_EU_REGION = (
+    process.env.VITE_MAILGUN_EU_REGION ||
+    process.env.MAILGUN_EU_REGION ||
+    ''
+  ).toString();
+  try {
+    logger.info(
+      'Mailgun cfg (rsvp): ' +
+        JSON.stringify({
+          apiKey: MAILGUN_API_KEY ? MAILGUN_API_KEY.substring(0, 5) + '***' : 'none',
+          domain: MAILGUN_DOMAIN || 'none',
+          sendingDomain: MAILGUN_SENDING_DOMAIN || 'none',
+          eu: MAILGUN_EU_REGION,
+        })
+    );
+  } catch {}
   if (!MAILGUN_API_KEY || !MAILGUN_DOMAIN) return { mailgun: null, mailgunAlt: null };
   const commonHostCfg = MAILGUN_EU_REGION === 'true' ? { host: 'api.eu.mailgun.net' } : {};
   try {
-    const mailgun = mailgunJs({ apiKey: MAILGUN_API_KEY, domain: MAILGUN_DOMAIN, ...commonHostCfg });
-    const mailgunAlt = MAILGUN_SENDING_DOMAIN ? mailgunJs({ apiKey: MAILGUN_API_KEY, domain: MAILGUN_SENDING_DOMAIN, ...commonHostCfg }) : null;
+    const mailgun = mailgunJs({
+      apiKey: MAILGUN_API_KEY,
+      domain: MAILGUN_DOMAIN,
+      ...commonHostCfg,
+    });
+    const mailgunAlt = MAILGUN_SENDING_DOMAIN
+      ? mailgunJs({ apiKey: MAILGUN_API_KEY, domain: MAILGUN_SENDING_DOMAIN, ...commonHostCfg })
+      : null;
     return { mailgun, mailgunAlt };
   } catch (e) {
     logger.warn('Mailgun init fail (rsvp): ' + e.message);
@@ -82,7 +100,7 @@ router.get('/by-token/:token', async (req, res) => {
 
     const snap = await guestRef.get();
     const data = snap.data() || {};
-    
+
     // Filtrar PII - solo exponer datos necesarios para RSVP p�blico
     const guestData = {
       name: data.name || '',
@@ -90,7 +108,7 @@ router.get('/by-token/:token', async (req, res) => {
       companions: data.companions ?? data.companion ?? 0,
       allergens: data.allergens || '',
     };
-    
+
     return sendSuccess(req, res, guestData);
   } catch (err) {
     logger.error('rsvp-get-by-token', err);
@@ -120,7 +138,11 @@ router.put('/by-token/:token', async (req, res) => {
       companions = parsed.companions;
       allergens = parsed.allergens;
     } catch (validationError) {
-      return sendValidationError(req, res, validationError.errors || [{ message: 'invalid-status' }]);
+      return sendValidationError(
+        req,
+        res,
+        validationError.errors || [{ message: 'invalid-status' }]
+      );
     }
 
     const guestRef = await findGuestRefByToken(token);
@@ -137,7 +159,9 @@ router.put('/by-token/:token', async (req, res) => {
     });
 
     try {
-      await incCounter('rsvp_update_status_total', { status }, 1, 'RSVP status updates', ['status']);
+      await incCounter('rsvp_update_status_total', { status }, 1, 'RSVP status updates', [
+        'status',
+      ]);
     } catch {}
 
     try {
@@ -174,15 +198,18 @@ router.put('/by-token/:token', async (req, res) => {
         if (al.includes('lactos')) dietary.lactoseIntolerant += 1;
       });
       const statsRef = db.collection('weddings').doc(weddingId).collection('rsvp').doc('stats');
-      await statsRef.set({
-        totalInvitations,
-        totalResponses,
-        confirmedAttendees,
-        declinedInvitations,
-        pendingResponses,
-        dietaryRestrictions: dietary,
-        lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
-      }, { merge: true });
+      await statsRef.set(
+        {
+          totalInvitations,
+          totalResponses,
+          confirmedAttendees,
+          declinedInvitations,
+          pendingResponses,
+          dietaryRestrictions: dietary,
+          lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
+        },
+        { merge: true }
+      );
     } catch (aggErr) {
       logger.warn('rsvp-stats-update-failed', aggErr.message);
     }
@@ -203,7 +230,11 @@ router.post('/generate-link', requirePlanner, async (req, res) => {
       return sendValidationError(req, res, [{ message: 'weddingId and guestId required' }]);
     }
 
-    const guestRef = db.collection('weddings').doc(String(weddingId)).collection('guests').doc(String(guestId));
+    const guestRef = db
+      .collection('weddings')
+      .doc(String(weddingId))
+      .collection('guests')
+      .doc(String(guestId));
     const snap = await guestRef.get();
     if (!snap.exists) {
       return sendNotFoundError(req, res, 'Invitado');
@@ -213,18 +244,32 @@ router.post('/generate-link', requirePlanner, async (req, res) => {
     let token = (data.token || '').toString();
     if (!token) {
       token = uuidv4();
-      await db.collection('rsvpTokens').doc(token).set({
-        weddingId: String(weddingId),
-        guestId: String(guestId),
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
-        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-      }, { merge: true });
-      await guestRef.set({ token, updatedAt: admin.firestore.FieldValue.serverTimestamp() }, { merge: true });
+      await db
+        .collection('rsvpTokens')
+        .doc(token)
+        .set(
+          {
+            weddingId: String(weddingId),
+            guestId: String(guestId),
+            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+          },
+          { merge: true }
+        );
+      await guestRef.set(
+        { token, updatedAt: admin.firestore.FieldValue.serverTimestamp() },
+        { merge: true }
+      );
     }
 
     const baseUrl = process.env.FRONTEND_BASE_URL || 'http://localhost:5173';
     const link = `${baseUrl.replace(/\/$/, '')}/rsvp/${token}`;
-    return sendSuccess(req, res, { token, link, weddingId: String(weddingId), guestId: String(guestId) });
+    return sendSuccess(req, res, {
+      token,
+      link,
+      weddingId: String(weddingId),
+      guestId: String(guestId),
+    });
   } catch (err) {
     logger.error('rsvp-generate-link', err);
     return sendInternalError(req, res, err);
@@ -234,7 +279,13 @@ router.post('/generate-link', requirePlanner, async (req, res) => {
 // POST /api/rsvp/reminders  { weddingId, limit?, dryRun?, minIntervalMinutes?, force? }
 router.post('/reminders', requirePlanner, async (req, res) => {
   try {
-    let { weddingId, limit = 100, dryRun = true, minIntervalMinutes = 1440, force = false } = req.body || {};
+    let {
+      weddingId,
+      limit = 100,
+      dryRun = true,
+      minIntervalMinutes = 1440,
+      force = false,
+    } = req.body || {};
     // Validación opcional con Zod
     try {
       const zod = await import('zod');
@@ -244,7 +295,7 @@ router.post('/reminders', requirePlanner, async (req, res) => {
         limit: z.coerce.number().int().min(1).max(1000).optional().default(100),
         dryRun: z.coerce.boolean().optional().default(true),
         minIntervalMinutes: z.coerce.number().int().min(0).max(10080).optional().default(1440),
-        force: z.coerce.boolean().optional().default(false)
+        force: z.coerce.boolean().optional().default(false),
       });
       const parsed = Schema.parse(req.body || {});
       weddingId = parsed.weddingId;
@@ -259,12 +310,17 @@ router.post('/reminders', requirePlanner, async (req, res) => {
     }
 
     // Rate limiting por ejecuci�n global del recordatorio
-    const metaRef = db.collection('weddings').doc(weddingId).collection('rsvp').doc('remindersMeta');
+    const metaRef = db
+      .collection('weddings')
+      .doc(weddingId)
+      .collection('rsvp')
+      .doc('remindersMeta');
     const metaSnap = await metaRef.get();
     const now = Date.now();
     if (!force && metaSnap.exists) {
       const lastRunAt = metaSnap.get('lastRunAt')?.toMillis?.() || 0;
-      if (now - lastRunAt < 5 * 60 * 1000) { // 5 min
+      if (now - lastRunAt < 5 * 60 * 1000) {
+        // 5 min
         return sendRateLimitError(req, res);
       }
     }
@@ -272,22 +328,30 @@ router.post('/reminders', requirePlanner, async (req, res) => {
     // Cargar invitados y filtrar en memoria (pending + email)
     const guestsSnap = await db.collection('weddings').doc(weddingId).collection('guests').get();
     let candidates = [];
-    guestsSnap.forEach(doc => {
+    guestsSnap.forEach((doc) => {
       const g = doc.data() || {};
       const status = g.status || 'pending';
       const email = (g.email || '').toString().trim();
       const lastReminderAt = g.lastReminderAt?.toMillis?.() || 0;
-      if (status === 'pending' && email && (!minIntervalMinutes || (now - lastReminderAt) >= (minIntervalMinutes * 60 * 1000))) {
+      if (
+        status === 'pending' &&
+        email &&
+        (!minIntervalMinutes || now - lastReminderAt >= minIntervalMinutes * 60 * 1000)
+      ) {
         candidates.push({ id: doc.id, ref: doc.ref, data: g, email });
       }
     });
     if (candidates.length > limit) candidates = candidates.slice(0, limit);
 
     // Preparar clientes Mailgun si se va a enviar real
-    const { mailgun, mailgunAlt } = dryRun ? { mailgun: null, mailgunAlt: null } : createMailgunClients();
+    const { mailgun, mailgunAlt } = dryRun
+      ? { mailgun: null, mailgunAlt: null }
+      : createMailgunClients();
     const baseUrl = process.env.FRONTEND_BASE_URL || 'http://localhost:5173';
 
-    let attempted = 0, sent = 0, skipped = 0;
+    let attempted = 0,
+      sent = 0,
+      skipped = 0;
     const errors = [];
     const batch = db.batch();
 
@@ -298,11 +362,16 @@ router.post('/reminders', requirePlanner, async (req, res) => {
         let token = (c.data.token || '').toString();
         if (!token) {
           token = uuidv4();
-          batch.set(db.collection('rsvpTokens').doc(token), {
-            weddingId, guestId: c.id,
-            createdAt: admin.firestore.FieldValue.serverTimestamp(),
-            updatedAt: admin.firestore.FieldValue.serverTimestamp()
-          }, { merge: true });
+          batch.set(
+            db.collection('rsvpTokens').doc(token),
+            {
+              weddingId,
+              guestId: c.id,
+              createdAt: admin.firestore.FieldValue.serverTimestamp(),
+              updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+            },
+            { merge: true }
+          );
           batch.set(c.ref, { token }, { merge: true });
         }
 
@@ -319,7 +388,13 @@ router.post('/reminders', requirePlanner, async (req, res) => {
 
         if (!dryRun) {
           if (mailgun) {
-            const mailData = { from: 'notificaciones@maloveapp.com', to: c.email, subject, html: bodyHtml, text: rsvpLink };
+            const mailData = {
+              from: 'notificaciones@maloveapp.com',
+              to: c.email,
+              subject,
+              html: bodyHtml,
+              text: rsvpLink,
+            };
             try {
               await mailgun.messages().send(mailData);
             } catch (e1) {
@@ -332,13 +407,26 @@ router.post('/reminders', requirePlanner, async (req, res) => {
           } else {
             // Fallback: registrar en colección mails (simulación)
             batch.set(db.collection('mails').doc(), {
-              from: 'notificaciones@maloveapp.com', to: c.email, subject,
-              body: `RSVP: ${rsvpLink}`, html: bodyHtml, date: new Date().toISOString(), folder: 'sent', read: true
+              from: 'notificaciones@maloveapp.com',
+              to: c.email,
+              subject,
+              body: `RSVP: ${rsvpLink}`,
+              html: bodyHtml,
+              date: new Date().toISOString(),
+              folder: 'sent',
+              read: true,
             });
           }
           sent++;
           // Marcar recordatorio en invitado
-          batch.set(c.ref, { lastReminderAt: admin.firestore.FieldValue.serverTimestamp(), remindersCount: (c.data.remindersCount || 0) + 1 }, { merge: true });
+          batch.set(
+            c.ref,
+            {
+              lastReminderAt: admin.firestore.FieldValue.serverTimestamp(),
+              remindersCount: (c.data.remindersCount || 0) + 1,
+            },
+            { merge: true }
+          );
         } else {
           skipped++;
         }
@@ -348,23 +436,51 @@ router.post('/reminders', requirePlanner, async (req, res) => {
       }
     }
 
-    batch.set(metaRef, { lastRunAt: admin.firestore.FieldValue.serverTimestamp(), lastCount: attempted }, { merge: true });
+    batch.set(
+      metaRef,
+      { lastRunAt: admin.firestore.FieldValue.serverTimestamp(), lastCount: attempted },
+      { merge: true }
+    );
     await batch.commit();
 
     // Métricas de recordatorios
     try {
-      await incCounter('rsvp_reminders_total', { type: 'attempted' }, attempted, 'RSVP reminders processed', ['type']);
-      await incCounter('rsvp_reminders_total', { type: 'sent' }, sent, 'RSVP reminders processed', ['type']);
-      await incCounter('rsvp_reminders_total', { type: 'skipped' }, skipped, 'RSVP reminders processed', ['type']);
+      await incCounter(
+        'rsvp_reminders_total',
+        { type: 'attempted' },
+        attempted,
+        'RSVP reminders processed',
+        ['type']
+      );
+      await incCounter('rsvp_reminders_total', { type: 'sent' }, sent, 'RSVP reminders processed', [
+        'type',
+      ]);
+      await incCounter(
+        'rsvp_reminders_total',
+        { type: 'skipped' },
+        skipped,
+        'RSVP reminders processed',
+        ['type']
+      );
       if (errors.length) {
-        await incCounter('rsvp_reminders_total', { type: 'errors' }, errors.length, 'RSVP reminders processed', ['type']);
+        await incCounter(
+          'rsvp_reminders_total',
+          { type: 'errors' },
+          errors.length,
+          'RSVP reminders processed',
+          ['type']
+        );
       }
     } catch {}
 
     return sendSuccess(req, res, { weddingId, attempted, sent, skipped, errors });
   } catch (err) {
     logger.error('rsvp-reminders', err);
-    try { await incCounter('rsvp_reminders_total', { type: 'failed' }, 1, 'RSVP reminders processed', ['type']); } catch {}
+    try {
+      await incCounter('rsvp_reminders_total', { type: 'failed' }, 1, 'RSVP reminders processed', [
+        'type',
+      ]);
+    } catch {}
     return sendInternalError(req, res, err);
   }
 });
@@ -398,8 +514,12 @@ router.post('/dev/create', async (req, res) => {
     // Crear invitado en Firestore
     const guestId = uuidv4();
     const token = uuidv4();
-    const guestRef = db.collection('weddings').doc(String(weddingId)).collection('guests').doc(guestId);
-    
+    const guestRef = db
+      .collection('weddings')
+      .doc(String(weddingId))
+      .collection('guests')
+      .doc(guestId);
+
     await guestRef.set({
       name: String(name),
       phone: phone || '',
@@ -414,16 +534,19 @@ router.post('/dev/create', async (req, res) => {
     });
 
     // Crear índice de token
-    await db.collection('rsvpTokens').doc(token).set({
-      weddingId: String(weddingId),
-      guestId,
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-    });
+    await db
+      .collection('rsvpTokens')
+      .doc(token)
+      .set({
+        weddingId: String(weddingId),
+        guestId,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
 
     const baseUrl = process.env.FRONTEND_BASE_URL || 'http://localhost:5173';
     const link = `${baseUrl.replace(/\/$/, '')}/rsvp/${token}`;
-    
+
     logger.info(`Dev guest created: ${guestId} for wedding ${weddingId}`);
     return sendSuccess(req, res, { token, link, guestId, weddingId: String(weddingId) });
   } catch (err) {
@@ -432,10 +555,14 @@ router.post('/dev/create', async (req, res) => {
   }
 });
 
-
-
 // Asegurar usuario mock con rol planner para E2E (retirado)
 router.post('/dev/ensure-planner', (req, res) => {
   logger.warn('rsvp-dev-ensure-planner disabled: requiere asignaci�n real de roles');
-  return sendError(req, res, 'dev-endpoint-removed', 'El endpoint /api/rsvp/dev/ensure-planner ha sido retirado. Configura roles planner reales.', 410);
+  return sendError(
+    req,
+    res,
+    'dev-endpoint-removed',
+    'El endpoint /api/rsvp/dev/ensure-planner ha sido retirado. Configura roles planner reales.',
+    410
+  );
 });

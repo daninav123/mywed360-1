@@ -45,34 +45,72 @@ export default function QuoteRequestsTracker() {
 
     setLoading(true);
     try {
-      // Buscar en todas las solicitudes del usuario
-      // Nota: En producción, esto debería estar indexado por userId en Firestore
-      const suppliersSnapshot = await getDocs(collection(db, 'suppliers'));
-
       const allRequests = [];
+
+      // 1. Buscar en solicitudes de proveedores REGISTRADOS
+      const suppliersSnapshot = await getDocs(collection(db, 'suppliers'));
 
       for (const supplierDoc of suppliersSnapshot.docs) {
         const quoteRequestsRef = collection(db, 'suppliers', supplierDoc.id, 'quote-requests');
-        const q = query(
-          quoteRequestsRef,
+
+        try {
+          const q = query(
+            quoteRequestsRef,
+            where('userId', '==', user.uid),
+            orderBy('createdAt', 'desc')
+          );
+
+          const snapshot = await getDocs(q);
+
+          snapshot.forEach((doc) => {
+            allRequests.push({
+              id: doc.id,
+              supplierId: supplierDoc.id,
+              isRegistered: true,
+              ...doc.data(),
+            });
+          });
+        } catch (err) {
+          // Puede fallar si no existe el índice, continuar con el siguiente
+          // console.warn('Error en proveedor', supplierDoc.id, err);
+        }
+      }
+
+      // 2. Buscar en solicitudes de proveedores de INTERNET (Google Places)
+      try {
+        const internetRequestsRef = collection(db, 'quote-requests-internet');
+        const qInternet = query(
+          internetRequestsRef,
           where('userId', '==', user.uid),
           orderBy('createdAt', 'desc')
         );
 
-        const snapshot = await getDocs(q);
+        const internetSnapshot = await getDocs(qInternet);
 
-        snapshot.forEach((doc) => {
+        internetSnapshot.forEach((doc) => {
           allRequests.push({
             id: doc.id,
-            supplierId: supplierDoc.id,
+            supplierId: doc.data().supplierId,
+            isRegistered: false,
+            isInternetSupplier: true,
             ...doc.data(),
           });
         });
+      } catch (err) {
+        // Puede fallar si no existe el índice
+        console.warn('Error cargando solicitudes de internet:', err);
       }
+
+      // Ordenar por fecha (más recientes primero)
+      allRequests.sort((a, b) => {
+        const dateA = a.createdAt?.toDate?.() || new Date(0);
+        const dateB = b.createdAt?.toDate?.() || new Date(0);
+        return dateB - dateA;
+      });
 
       setRequests(allRequests);
     } catch (error) {
-      // console.error('Error loading quote requests:', error);
+      console.error('Error loading quote requests:', error);
     } finally {
       setLoading(false);
     }

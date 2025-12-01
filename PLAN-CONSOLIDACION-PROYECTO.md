@@ -134,11 +134,11 @@ Closes #issue
 - [ ] Formularios críticos
 - [ ] Autenticación y logout
 
-#### 4.2 Tests Automatizados (si existen)
+#### 4.2 Tests Unitarios
 
-- [ ] Ejecutar suite de tests
-- [ ] Arreglar tests rotos
-- [ ] Añadir tests para bugs corregidos
+- [ ] Ejecutar suite de tests unitarios
+- [ ] Arreglar tests unitarios rotos
+- [ ] Añadir tests unitarios para bugs corregidos
 
 ---
 
@@ -209,14 +209,15 @@ Closes #issue
 ### Completo (Ideal):
 
 - [ ] Sin warnings en consola
-- [ ] Todos los tests pasan
+- [ ] Tests unitarios pasan
+- [ ] QA manual documentado
 - [ ] Código documentado
 - [ ] Sin dependencias vulnerables
 - [ ] Performance optimizada
 
 ### Excelencia (Aspiracional):
 
-- [ ] Coverage de tests >80%
+- [ ] Coverage de tests unitarios >80%
 - [ ] Lighthouse score >90
 - [ ] Bundle size optimizado
 - [ ] CI/CD configurado
@@ -377,11 +378,8 @@ performance.now()     // Medir tiempo
 ### Para Testing:
 
 ```bash
-# Tests
+# Tests unitarios
 npm test
-
-# E2E
-npm run cypress:open
 
 # Lint
 npm run lint
@@ -437,15 +435,15 @@ npm run preview
 
 ## 📊 Métricas
 
-- Tests: 45/50 pasando (90%)
-- Coverage: 75%
+- Tests unitarios: 45/50 pasando (90%)
+- QA manual: Documentado
 - Lighthouse: 85/100
 - Bundle: 500KB
 
 ## ⏭️ Próximos Pasos
 
-- [ ] Arreglar 5 tests fallando
-- [ ] Mejorar coverage a 80%
+- [ ] Arreglar 5 tests unitarios fallando
+- [ ] Completar documentación QA manual
 - [ ] Lighthouse >90
 ```
 
@@ -456,12 +454,13 @@ npm run preview
 ### Corto Plazo (Esta semana):
 
 - [ ] **Sin errores críticos** en producción
-- [ ] **Tests básicos** funcionando
+- [ ] **Tests unitarios básicos** funcionando
+- [ ] **QA manual** documentado
 - [ ] **Documentación mínima** actualizada
 
 ### Medio Plazo (Este mes):
 
-- [ ] **Coverage >80%** en componentes principales
+- [ ] **Coverage unitario >80%** en componentes principales
 - [ ] **Performance optimizada** (Lighthouse >85)
 - [ ] **CI/CD** configurado
 
@@ -529,7 +528,8 @@ Antes de considerar la consolidación completa:
 ### Calidad:
 
 - [ ] Código limpio y documentado
-- [ ] Tests básicos pasan
+- [ ] Tests unitarios básicos pasan
+- [ ] QA manual documentado
 - [ ] No hay warnings molestos
 
 ### Performance:

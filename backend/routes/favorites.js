@@ -1,6 +1,6 @@
 import express from 'express';
 import { db } from '../db.js';
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 
 const router = express.Router();
 

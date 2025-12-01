@@ -1,7 +1,8 @@
 /**
- * SeatingPlan refactorizado � Componente principal
+ * SeatingPlan refactorizado - Componente principal
+ * Versión refactorizada con utilidades y hooks separados
  */
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useCallback, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { toast } from 'react-toastify';
@@ -28,113 +29,44 @@ import SeatingInteractiveTour from './SeatingInteractiveTour';
 import SeatingTooltips, { useTooltipState } from './SeatingTooltips';
 import DragGhostPreview, { useDragGhost } from './DragGhostPreview';
 import CollaborationCursors from './CollaborationCursors';
+
+// ✅ NUEVOS COMPONENTES UX
+import SeatingPropertiesSidebar from './SeatingPropertiesSidebar';
+import ModeIndicator, { useModeCursor } from './ModeIndicator';
+import ValidationCoach, {
+  createSuggestionFromValidation,
+  createImprovementSuggestions,
+} from './ValidationCoach';
+import TemplateGallery from './TemplateGallery';
+import ContextualToolbar from './ContextualToolbar';
+import * as AutoFixUtils from '../../utils/seatingAutoFix';
+
 import { useWedding } from '../../context/WeddingContext';
-// Importar va alias estable para permitir vi.mock en tests y usar el hook deshabilitado en test
 import { useSeatingPlan } from '../../hooks/useSeatingPlan';
+import { useSeatingUIState } from '../../hooks/useSeatingUIState';
 
 import { post as apiPost } from '../../services/apiClient';
+import { resolveAreaType, generateAreaSummary } from '../../utils/seatingAreas';
+import {
+  determineOnboardingStep,
+  ONBOARDING_STEP_KEYS,
+  ONBOARDING_STEP_ID_MAP,
+  createDefaultOnboardingState,
+} from '../../utils/seatingOnboarding';
+import {
+  ensureSafeArray,
+  ensureSafeHallSize,
+  isHallReady,
+  getPendingGuests,
+  createExportSnapshot,
+  createTableLocksMap,
+  getOtherCollaborators,
+} from '../../utils/seatingLayout';
 
-const AREA_TYPE_META = {
-  boundary: { label: 'Per�metro', color: '#2563eb', order: 1 },
-  aisle: { label: 'Pasillos', color: '#0ea5e9', order: 2 },
-  door: { label: 'Puertas', color: '#16a34a', order: 3 },
-  obstacle: { label: 'Obst�culos', color: '#f97316', order: 4 },
-  stage: { label: 'Escenario', color: '#9333ea', order: 5 },
-  vendor: { label: 'Zona proveedor', color: '#6366f1', order: 6 },
-  kids: { label: '�rea infantil', color: '#f59e0b', order: 7 },
-  free: { label: '�rea libre', color: '#4b5563', order: 8 },
-  default: { label: '�rea', color: '#6b7280', order: 99 },
-};
-
-const AREA_ALIAS = {
-  rectangle: 'obstacle',
-  rect: 'obstacle',
-  square: 'obstacle',
-  line: 'aisle',
-  walkway: 'aisle',
-  path: 'aisle',
-  boundary: 'boundary',
-  perimeter: 'boundary',
-  door: 'door',
-  doorway: 'door',
-  obstacle: 'obstacle',
-  aisle: 'aisle',
-  free: 'free',
-  curve: 'free',
-  stage: 'stage',
-  vendor: 'vendor',
-  suppliers: 'vendor',
-  kids: 'kids',
-  kidsarea: 'kids',
-  play: 'kids',
-};
-
-const resolveAreaType = (area) => {
-  const rawType =
-    typeof area?.type === 'string'
-      ? area.type
-      : typeof area?.semantic === 'string'
-        ? area.semantic
-        : typeof area?.kind === 'string'
-          ? area.kind
-          : typeof area?.label === 'string'
-            ? area.label
-            : null;
-  let normalized = typeof rawType === 'string' ? rawType.trim().toLowerCase() : null;
-  if (!normalized && area && typeof area.drawMode === 'string') {
-    normalized = area.drawMode.trim().toLowerCase();
-  }
-  if (!normalized && Array.isArray(area)) normalized = 'free';
-  if (!normalized) normalized = 'free';
-  normalized = AREA_ALIAS[normalized] || normalized;
-  if (!AREA_TYPE_META[normalized]) return 'free';
-  return normalized;
-};
-
-const createDefaultOnboardingState = () => ({
-  dismissed: false,
-  steps: {
-    spaceConfigured: false,
-    guestsImported: false,
-    firstAssignment: false,
-  },
-});
-
-const determineOnboardingStep = (steps) => {
-  if (!steps?.spaceConfigured) return 'space';
-  if (!steps?.guestsImported) return 'guests';
-  if (!steps?.firstAssignment) return 'assign';
-  return null;
-};
-
-const sanitizeOnboardingState = (value) => {
-  if (!value || typeof value !== 'object') {
-    return createDefaultOnboardingState();
-  }
-  const steps = value.steps && typeof value.steps === 'object' ? value.steps : {};
-  return {
-    dismissed: value.dismissed === true,
-    steps: {
-      spaceConfigured: steps.spaceConfigured === true,
-      guestsImported: steps.guestsImported === true,
-      firstAssignment: steps.firstAssignment === true,
-    },
-  };
-};
-
-const onboardingStatesEqual = (a, b) =>
-  a.dismissed === b.dismissed &&
-  !!a.steps?.spaceConfigured === !!b.steps?.spaceConfigured &&
-  !!a.steps?.guestsImported === !!b.steps?.guestsImported &&
-  !!a.steps?.firstAssignment === !!b.steps?.firstAssignment;
-
-const ONBOARDING_STEP_KEYS = ['spaceConfigured', 'guestsImported', 'firstAssignment'];
-
-const ONBOARDING_STEP_ID_MAP = {
-  space: 'spaceConfigured',
-  guests: 'guestsImported',
-  assign: 'firstAssignment',
-};
+// Las constantes y funciones se movieron a:
+// - utils/seatingAreas.js
+// - utils/seatingOnboarding.js
+// - utils/seatingLayout.js
 
 const SeatingPlanRefactored = () => {
   const { activeWedding } = useWedding();
@@ -194,6 +126,7 @@ const SeatingPlanRefactored = () => {
     toggleTableLocked,
     applyBanquetTables,
     clearBanquetLayout,
+    resetSeatingPlan, // ✅ NUEVO: Reset completo
     autoAssignGuests,
     autoAssignGuestsRules,
     conflicts,
@@ -234,190 +167,95 @@ const SeatingPlanRefactored = () => {
     analyzeCurrentGuests,
   } = useSeatingPlan();
 
-  // Mostrar/ocultar mesas
-  const [showTables, setShowTables] = React.useState(true);
-  const [focusTableId, setFocusTableId] = React.useState(null);
-  const toggleShowTables = () => setShowTables((s) => !s);
-  // Mostrar/ocultar reglas
-  const [showRulers, setShowRulers] = React.useState(true);
-  // Modal de fondo
-  const [backgroundOpen, setBackgroundOpen] = React.useState(false);
-  // Modal de capacidad global
-  const [capacityOpen, setCapacityOpen] = React.useState(false);
-  // Mostrar numeraci�n de asientos
-  const [showSeatNumbers, setShowSeatNumbers] = React.useState(false);
-  const [guidedGuestId, setGuidedGuestId] = React.useState(null);
-  const [isMobile, setIsMobile] = React.useState(false);
-  const [guestSidebarOpen, setGuestSidebarOpen] = React.useState(true);
-  const [showAdvancedTools, setShowAdvancedTools] = React.useState(true);
-  const [showLibraryPanel, setShowLibraryPanel] = React.useState(true);
-  const [showInspectorPanel, setShowInspectorPanel] = React.useState(true);
-  const [showSmartPanelPinned, setShowSmartPanelPinned] = React.useState(true);
-  const [onboardingPrefs, setOnboardingPrefs] = React.useState(() =>
-    createDefaultOnboardingState()
-  );
-  const [showOverview, setShowOverview] = React.useState(true);
-  const [designFocusMode, setDesignFocusMode] = React.useState(false);
+  // Hook personalizado para manejar todo el estado de UI
+  const {
+    showTables,
+    setShowTables,
+    toggleShowTables,
+    showRulers,
+    setShowRulers,
+    showSeatNumbers,
+    setShowSeatNumbers,
+    showAdvancedTools,
+    setShowAdvancedTools,
+    showLibraryPanel,
+    setShowLibraryPanel,
+    showInspectorPanel,
+    setShowInspectorPanel,
+    showSmartPanelPinned,
+    setShowSmartPanelPinned,
+    showOverview,
+    setShowOverview,
+    designFocusMode,
+    setDesignFocusMode,
+    backgroundOpen,
+    setBackgroundOpen,
+    capacityOpen,
+    setCapacityOpen,
+    guestDrawerOpen,
+    setGuestDrawerOpen,
+    exportWizardOpen,
+    setExportWizardOpen,
+    autoLayoutModalOpen,
+    setAutoLayoutModalOpen,
+    templateGalleryOpen,
+    setTemplateGalleryOpen,
+    exportWizardEnhancedOpen,
+    setExportWizardEnhancedOpen,
+    showTour,
+    setShowTour,
+    viewport,
+    setViewport,
+    focusTableId,
+    setFocusTableId,
+    guestSidebarOpen,
+    setGuestSidebarOpen,
+    isMobile,
+    ceremonyActiveRow,
+    setCeremonyActiveRow,
+    guidedGuestId,
+    setGuidedGuestId,
+    onboardingPrefs,
+    setOnboardingPrefs,
+    gridColumns,
+  } = useSeatingUIState(activeWedding);
+
+  // Valores seguros para evitar crashes por undefined
+  const safeAreas = ensureSafeArray(areas);
+  const safeTables = ensureSafeArray(tables);
+  const safeSeats = ensureSafeArray(seats);
+  const safeGuests = ensureSafeArray(guests);
+  const safeHallSize = ensureSafeHallSize(hallSize);
+
+  // Valores computados
   const smartPanelEligible = tab === 'banquet';
   const showSmartPanel = smartPanelEligible && showSmartPanelPinned;
-  const showGuestSidebar = guestSidebarOpen && !isMobile;
-  const [ceremonyActiveRow, setCeremonyActiveRow] = React.useState(0);
-  // handler para fondo r�pido (prompt)
-  // Valores seguros para evitar crashes por undefined
-  const safeAreas = Array.isArray(areas) ? areas : [];
-  const safeTables = Array.isArray(tables) ? tables : [];
-  const safeSeats = Array.isArray(seats) ? seats : [];
-  const safeGuests = Array.isArray(guests) ? guests : [];
-  const safeHallSize =
-    hallSize && typeof hallSize.width === 'number' && typeof hallSize.height === 'number'
-      ? hallSize
-      : { width: 1800, height: 1200 };
 
+  // Snapshot de exportación usando utilidad
   const exportPreviewSnapshot = useMemo(
-    () => ({
-      tab,
-      hallSize: safeHallSize,
-      tables: safeTables,
-      seats: safeSeats,
-      guestsCount: safeGuests.length,
-      areas: safeAreas,
-    }),
-    [tab, safeHallSize, safeTables, safeSeats, safeGuests, safeAreas]
+    () => createExportSnapshot({ tab, hallSize, tables, seats, guests, areas }),
+    [tab, hallSize, tables, seats, guests, areas]
   );
 
-  const uiPrefsKey = React.useMemo(
-    () => `seatingPlan:${activeWedding || 'default'}:ui-prefs`,
-    [activeWedding]
-  );
+  // Estado del hall
+  const hallReady = isHallReady(safeHallSize);
 
-  const gridColumns = React.useMemo(() => {
-    const cols = [];
-    if (showLibraryPanel) cols.push('18rem');
-    cols.push('1fr');
-    if (showSmartPanel && !isMobile) cols.push('18rem');
-    if (showInspectorPanel) cols.push('20rem');
-    if (showGuestSidebar) cols.push('22rem');
-    return cols.join(' ');
-  }, [showLibraryPanel, showSmartPanel, showInspectorPanel, showGuestSidebar, isMobile]);
-
-  const persistUiPrefs = React.useCallback(
-    (patch) => {
-      if (typeof window === 'undefined' || !patch || typeof patch !== 'object') return;
-      try {
-        const currentRaw = window.localStorage.getItem(uiPrefsKey);
-        let base = {};
-        if (currentRaw) {
-          try {
-            const parsed = JSON.parse(currentRaw);
-            if (parsed && typeof parsed === 'object') {
-              base = parsed;
-            }
-          } catch (_) {
-            base = {};
-          }
-        }
-        window.localStorage.setItem(uiPrefsKey, JSON.stringify({ ...base, ...patch }));
-      } catch (_) {}
-    },
-    [uiPrefsKey]
-  );
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    try {
-      const raw = window.localStorage.getItem(uiPrefsKey);
-      if (!raw) return;
-      const data = JSON.parse(raw);
-      if (!data || typeof data !== 'object') return;
-      if (Object.prototype.hasOwnProperty.call(data, 'showRulers')) {
-        setShowRulers(!!data.showRulers);
-      }
-      if (Object.prototype.hasOwnProperty.call(data, 'showSeatNumbers')) {
-        setShowSeatNumbers(!!data.showSeatNumbers);
-      }
-      if (Object.prototype.hasOwnProperty.call(data, 'showTables')) {
-        setShowTables(!!data.showTables);
-      }
-      if (Object.prototype.hasOwnProperty.call(data, 'showAdvancedTools')) {
-        setShowAdvancedTools(!!data.showAdvancedTools);
-      }
-      if (Object.prototype.hasOwnProperty.call(data, 'showLibraryPanel')) {
-        setShowLibraryPanel(data.showLibraryPanel !== false);
-      }
-      if (Object.prototype.hasOwnProperty.call(data, 'showInspectorPanel')) {
-        setShowInspectorPanel(data.showInspectorPanel !== false);
-      }
-      if (Object.prototype.hasOwnProperty.call(data, 'showSmartPanelPinned')) {
-        setShowSmartPanelPinned(data.showSmartPanelPinned !== false);
-      }
-      if (Object.prototype.hasOwnProperty.call(data, 'showOverview')) {
-        setShowOverview(data.showOverview !== false);
-      }
-      if (Object.prototype.hasOwnProperty.call(data, 'designFocusMode')) {
-        setDesignFocusMode(!!data.designFocusMode);
-      }
-      if (Object.prototype.hasOwnProperty.call(data, 'onboarding')) {
-        const next = sanitizeOnboardingState(data.onboarding);
-        setOnboardingPrefs((prev) => (onboardingStatesEqual(prev, next) ? prev : next));
-      }
-    } catch (_) {}
-  }, [uiPrefsKey]);
-
-  useEffect(() => {
-    persistUiPrefs({
-      showRulers,
-      showSeatNumbers,
-      showTables,
-      showAdvancedTools,
-      showLibraryPanel,
-      showInspectorPanel,
-      showSmartPanelPinned,
-      showOverview,
-      designFocusMode,
-      onboarding: onboardingPrefs,
-    });
-  }, [
-    showRulers,
-    showSeatNumbers,
-    showTables,
-    showAdvancedTools,
-    showLibraryPanel,
-    showInspectorPanel,
-    showSmartPanelPinned,
-    showOverview,
-    designFocusMode,
-    onboardingPrefs,
-    persistUiPrefs,
-  ]);
-
-  const isHallReady = Number.isFinite(safeHallSize?.width) && Number.isFinite(safeHallSize?.height);
-
-  // Drawer de invitados pendientes y viewport del canvas
-  const [guestDrawerOpen, setGuestDrawerOpen] = React.useState(false);
-  const [viewport, setViewport] = React.useState({ scale: 1, offset: { x: 0, y: 0 } });
-  const [exportWizardOpen, setExportWizardOpen] = React.useState(false);
-  const [autoLayoutModalOpen, setAutoLayoutModalOpen] = React.useState(false);
-  const [templateGalleryOpen, setTemplateGalleryOpen] = React.useState(false);
-  const [exportWizardEnhancedOpen, setExportWizardEnhancedOpen] = React.useState(false);
-
-  // FASE 4: Tour y Tooltips
-  const [showTour, setShowTour] = React.useState(false);
+  // Tooltips
   const [tooltipState, updateTooltipState] = useTooltipState();
 
-  // FASE 2: Drag Ghost Preview
+  // Drag Ghost Preview
   const { dragState, startDrag, updateDrag, endDrag } = useDragGhost();
 
-  // Verificar si es primera visita para tour
-  React.useEffect(() => {
-    const hasVisited = localStorage.getItem('seating-has-visited');
-    if (!hasVisited) {
-      setShowTour(true);
-      localStorage.setItem('seating-has-visited', 'true');
-    }
-  }, []);
+  // ✅ NUEVOS ESTADOS UX
+  const [showTemplateGalleryNew, setShowTemplateGalleryNew] = useState(false);
+  const [suggestions, setSuggestions] = useState([]);
+  const [showModeIndicator, setShowModeIndicator] = useState(true);
+
+  // Cursor dinámico según modo
+  const modeCursor = useModeCursor(drawMode);
 
   // Actualizar estado de tooltips
-  React.useEffect(() => {
+  useEffect(() => {
     updateTooltipState({
       hasSpaceConfigured: !!safeHallSize?.width,
       tables: safeTables,
@@ -425,50 +263,77 @@ const SeatingPlanRefactored = () => {
       hasDraggedTable: safeTables.length > 0,
     });
   }, [safeHallSize, safeTables, safeGuests, updateTooltipState]);
-  const otherCollaborators = React.useMemo(
-    () =>
-      Array.isArray(collaborators) ? collaborators.filter((member) => !member?.isCurrent) : [],
-    [collaborators]
-  );
+
+  // ✅ NUEVO: Generar sugerencias desde validaciones
   useEffect(() => {
-    const updateIsMobile = () => {
-      try {
-        setIsMobile(window.innerWidth <= 1024);
-      } catch (_e) {
-        setIsMobile(false);
-      }
-    };
-    updateIsMobile();
-    window.addEventListener('resize', updateIsMobile);
-    return () => window.removeEventListener('resize', updateIsMobile);
-  }, []);
-
-  useEffect(() => {
-    if (isMobile) {
-      setGuestSidebarOpen(false);
+    if (!validationsEnabled || tab !== 'banquet') {
+      setSuggestions([]);
+      return;
     }
-  }, [isMobile]);
 
-  // Invitados pendientes sin mesa
-  const pendingGuests = React.useMemo(() => {
-    try {
-      return safeGuests.filter((g) => !g?.table && !g?.tableId);
-    } catch (_) {
-      return [];
-    }
-  }, [safeGuests]);
+    const newSuggestions = [];
+    const processedPairs = new Set();
 
-  const tableLocks = React.useMemo(() => {
-    const map = new Map();
-    if (Array.isArray(locks)) {
-      locks.forEach((lock) => {
-        if (lock.resourceType === 'table') {
-          map.set(String(lock.resourceId), lock);
+    // Por cada mesa, verificar validaciones
+    safeTables.forEach((table) => {
+      // Verificar distancia con otras mesas
+      safeTables.forEach((other) => {
+        if (table.id === other.id) return;
+
+        // Evitar duplicados (par ya procesado)
+        const pairKey = [table.id, other.id].sort().join('-');
+        if (processedPairs.has(pairKey)) return;
+        processedPairs.add(pairKey);
+
+        const dx = table.x - other.x;
+        const dy = table.y - other.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        // 140cm = 120cm diámetro promedio + 20cm margen mínimo
+        const minDistance = 140;
+
+        if (distance < minDistance && distance > 0) {
+          newSuggestions.push({
+            id: `spacing-${pairKey}`,
+            severity: 'suggestion',
+            title: '💡 Espacio entre mesas',
+            message: `Las mesas están un poco juntas (${Math.round(distance)}cm).`,
+            details: 'Considera separarlas a 100cm para mejor circulación.',
+            canAutoFix: true,
+            autoFixLabel: 'Separar automáticamente',
+            autoFixAction: {
+              type: 'adjust-spacing',
+              tables: [String(table.id), String(other.id)],
+              targetSpacing: 220, // 220cm entre centros = 100cm libres
+            },
+          });
         }
       });
+    });
+
+    // Sugerencias de mejora
+    if (safeTables.length > 0 && safeGuests.length > 0) {
+      try {
+        const improvements = createImprovementSuggestions(safeTables, safeGuests, safeHallSize);
+        if (Array.isArray(improvements)) {
+          newSuggestions.push(...improvements);
+        }
+      } catch (error) {
+        console.error('Error generando sugerencias de mejora:', error);
+      }
     }
-    return map;
-  }, [locks]);
+
+    // Máximo 3 sugerencias visibles a la vez
+    setSuggestions(newSuggestions.slice(0, 3));
+  }, [safeTables, validationsEnabled, tab, safeGuests, safeHallSize]);
+
+  // Colaboradores y locks
+  const otherCollaborators = useMemo(() => getOtherCollaborators(collaborators), [collaborators]);
+
+  const tableLocks = useMemo(() => createTableLocksMap(locks), [locks]);
+
+  // Invitados pendientes
+  const pendingGuests = useMemo(() => getPendingGuests(safeGuests), [safeGuests]);
 
   const handleSelectTable = React.useCallback(
     (id, multi = false) => {
@@ -491,30 +356,8 @@ const SeatingPlanRefactored = () => {
     [baseHandleSelectTable, ensureTableLock, releaseTableLocksExcept, selectedIds]
   );
 
-  const areaSummary = React.useMemo(() => {
-    if (!Array.isArray(safeAreas) || safeAreas.length === 0) return [];
-    const counts = new Map();
-    safeAreas.forEach((area) => {
-      if (!area) return;
-      const type = resolveAreaType(area);
-      counts.set(type, (counts.get(type) || 0) + 1);
-    });
-    return Array.from(counts.entries())
-      .map(([type, count]) => {
-        const meta = AREA_TYPE_META[type] || AREA_TYPE_META.default;
-        return {
-          type,
-          count,
-          label: meta.label,
-          color: meta.color,
-          order: meta.order ?? 99,
-        };
-      })
-      .sort((a, b) => {
-        if (a.order !== b.order) return a.order - b.order;
-        return a.label.localeCompare(b.label, 'es');
-      });
-  }, [safeAreas]);
+  // Resumen de áreas usando utilidad
+  const areaSummary = useMemo(() => generateAreaSummary(safeAreas), [safeAreas]);
 
   const seatingProgress = React.useMemo(() => {
     const tableIds = new Set(
@@ -1111,6 +954,105 @@ const SeatingPlanRefactored = () => {
   );
   const handleCloseTemplates = React.useCallback(() => setTemplateOpen(false), [setTemplateOpen]);
 
+  // ✅ NUEVOS HANDLERS UX
+  const handleAutoFix = React.useCallback(
+    (suggestion) => {
+      const { autoFixAction } = suggestion;
+      if (!autoFixAction) return;
+
+      try {
+        switch (autoFixAction.type) {
+          case 'adjust-spacing':
+            AutoFixUtils.adjustTableSpacing(
+              safeTables,
+              autoFixAction.tables,
+              autoFixAction.targetSpacing || 100,
+              moveTable
+            );
+            toast.success('Espaciado ajustado correctamente');
+            break;
+
+          case 'move-inside-boundary':
+            const tableToMove = safeTables.find((t) => t.id === autoFixAction.tableId);
+            if (tableToMove) {
+              AutoFixUtils.moveTableInsideBoundary(tableToMove, safeAreas, safeHallSize, moveTable);
+              toast.success('Mesa movida dentro del perímetro');
+            }
+            break;
+
+          case 'find-free-spot':
+            const tableToRelocate = safeTables.find((t) => t.id === autoFixAction.tableId);
+            if (tableToRelocate) {
+              const found = AutoFixUtils.findAndMoveToFreeSpot(
+                tableToRelocate,
+                safeTables,
+                safeAreas,
+                safeHallSize,
+                moveTable
+              );
+              if (found) {
+                toast.success('Posición libre encontrada');
+              } else {
+                toast.warning('No se encontró posición libre');
+              }
+            }
+            break;
+
+          case 'optimize-layout':
+            AutoFixUtils.optimizeLayout(safeTables, safeGuests, safeHallSize, applyBanquetTables);
+            toast.success('Layout optimizado');
+            break;
+
+          default:
+            console.warn('Auto-fix no implementado:', autoFixAction.type);
+        }
+      } catch (error) {
+        console.error('Error en auto-fix:', error);
+        toast.error('Error al aplicar la corrección');
+      }
+    },
+    [safeTables, safeAreas, safeHallSize, safeGuests, moveTable, applyBanquetTables]
+  );
+
+  const handleUpdateTableFromSidebar = React.useCallback(
+    (tableId, updates) => {
+      const table = safeTables.find((t) => t.id === tableId);
+      if (!table) return;
+
+      // Actualizar posición si cambió
+      if (updates.x !== undefined || updates.y !== undefined) {
+        moveTable(tableId, {
+          x: updates.x ?? table.x,
+          y: updates.y ?? table.y,
+        });
+      }
+
+      // Otros updates se pueden manejar aquí
+      // Por ahora, moveTable es suficiente para la mayoría
+    },
+    [safeTables, moveTable]
+  );
+
+  const handleSelectTemplateNew = React.useCallback(
+    async (template) => {
+      setShowTemplateGalleryNew(false);
+
+      try {
+        // Generar layout según plantilla
+        if (typeof generateAutoLayoutFromGuests === 'function') {
+          const result = await generateAutoLayoutFromGuests(template.layout);
+          if (result?.success) {
+            toast.success(`Layout "${template.name}" aplicado`);
+          }
+        }
+      } catch (error) {
+        console.error('Error aplicando plantilla:', error);
+        toast.error('Error al aplicar la plantilla');
+      }
+    },
+    [generateAutoLayoutFromGuests]
+  );
+
   const handleConfigureTable = React.useCallback(
     (t) => {
       setConfigTable(t);
@@ -1557,56 +1499,89 @@ const SeatingPlanRefactored = () => {
     ) : null;
 
   const renderCanvas = (className = 'h-full') => (
-    <SeatingPlanCanvas
-      tab={tab}
-      areas={safeAreas}
-      tables={showTables ? safeTables : []}
-      seats={safeSeats}
-      hallSize={safeHallSize}
-      selectedTable={selectedTable}
-      onSelectTable={handleSelectTable}
-      onTableDimensionChange={handleTableDimensionChange}
-      onToggleEnabled={handleToggleEnabled}
-      onAddArea={addArea}
-      onAddTable={addTable}
-      drawMode={drawMode}
-      onDrawModeChange={setDrawMode}
-      canvasRef={canvasRef}
-      className={className}
-      moveTable={moveTable}
-      onToggleSeat={toggleSeatEnabled}
-      onAssignGuest={handleAssignGuest}
-      onAssignGuestSeat={(tableId, seatIdx, guestId) => {
-        try {
-          moveGuestToSeat(guestId, tableId, seatIdx);
-          toast.success(`Invitado a asiento ${seatIdx + 1}`);
-        } catch (_) {
-          handleAssignGuest(tableId, guestId);
-        }
-      }}
-      onAssignCeremonySeat={async (seatId, guestId) => {
-        try {
-          await assignGuestToCeremonySeat(seatId, guestId);
-          toast.success('Invitado asignado a silla');
-        } catch (_) {}
-      }}
-      guests={safeGuests}
-      onDeleteArea={deleteArea}
-      onUpdateArea={updateArea}
-      showRulers={showRulers}
-      gridStep={gridStep}
-      selectedIds={selectedIds}
-      showSeatNumbers={showSeatNumbers}
-      background={background}
-      globalMaxSeats={globalMaxSeats}
-      tableLocks={tableLocks}
-      currentClientId={collabClientId}
-      validationsEnabled={validationsEnabled}
-      designFocusMode={designFocusMode}
-      suggestions={guidedGuestId ? suggestTablesForGuest?.(guidedGuestId) || null : null}
-      focusTableId={focusTableId}
-      onViewportChange={(vp) => setViewport(vp)}
-    />
+    <div className="relative h-full" style={{ cursor: modeCursor }}>
+      <SeatingPlanCanvas
+        tab={tab}
+        areas={safeAreas}
+        tables={showTables ? safeTables : []}
+        seats={safeSeats}
+        hallSize={safeHallSize}
+        selectedTable={selectedTable}
+        onSelectTable={handleSelectTable}
+        onTableDimensionChange={handleTableDimensionChange}
+        onToggleEnabled={handleToggleEnabled}
+        onAddArea={addArea}
+        onAddTable={addTable}
+        drawMode={drawMode}
+        onDrawModeChange={setDrawMode}
+        canvasRef={canvasRef}
+        className={className}
+        moveTable={moveTable}
+        onToggleSeat={toggleSeatEnabled}
+        onAssignGuest={handleAssignGuest}
+        onAssignGuestSeat={(tableId, seatIdx, guestId) => {
+          try {
+            moveGuestToSeat(guestId, tableId, seatIdx);
+            toast.success(`Invitado a asiento ${seatIdx + 1}`);
+          } catch (_) {
+            handleAssignGuest(tableId, guestId);
+          }
+        }}
+        onAssignCeremonySeat={async (seatId, guestId) => {
+          try {
+            await assignGuestToCeremonySeat(seatId, guestId);
+            toast.success('Invitado asignado a silla');
+          } catch (_) {}
+        }}
+        guests={safeGuests}
+        onDeleteArea={deleteArea}
+        onUpdateArea={updateArea}
+        showRulers={showRulers}
+        gridStep={gridStep}
+        selectedIds={selectedIds}
+        showSeatNumbers={showSeatNumbers}
+        background={background}
+        globalMaxSeats={globalMaxSeats}
+        tableLocks={tableLocks}
+        currentClientId={collabClientId}
+        validationsEnabled={validationsEnabled}
+        designFocusMode={designFocusMode}
+        suggestions={guidedGuestId ? suggestTablesForGuest?.(guidedGuestId) || null : null}
+        focusTableId={focusTableId}
+        onViewportChange={(vp) => setViewport(vp)}
+      />
+
+      {/* ✅ NUEVO: Sidebar de propiedades */}
+      {(selectedTable || selectedIds.length > 0) && (
+        <SeatingPropertiesSidebar
+          selectedTable={selectedTable}
+          selectedIds={selectedIds}
+          tables={safeTables}
+          guests={safeGuests}
+          onUpdateTable={handleUpdateTableFromSidebar}
+          onDeleteTable={deleteTable}
+          onDuplicateTable={duplicateTable}
+          onToggleLock={toggleTableLocked}
+          onClose={() => handleSelectTable(null)}
+          onAssignGuest={(tableId) => {
+            setGuestDrawerOpen(true);
+          }}
+          onRemoveGuest={(guestId) => {
+            moveGuest(guestId, null);
+          }}
+        />
+      )}
+
+      {/* ✅ NUEVO: Validaciones Coach */}
+      <ValidationCoach
+        suggestions={suggestions}
+        onDismiss={(id) => {
+          setSuggestions((prev) => prev.filter((s) => s.id !== id));
+        }}
+        onAutoFix={handleAutoFix}
+        position="bottom-right"
+      />
+    </div>
   );
 
   const renderInspector = (wrapperClassName = 'h-full', panelClassName = 'h-full') =>
@@ -1847,63 +1822,43 @@ const SeatingPlanRefactored = () => {
                 />
               </div>
 
-              <SeatingPlanToolbar
-                tab={tab}
-                onUndo={undo}
-                onRedo={redo}
+              {/* ✅ NUEVO: Toolbar Contextual */}
+              <ContextualToolbar
+                tables={safeTables}
+                selectedTable={selectedTable}
+                selectedIds={selectedIds}
+                drawMode={drawMode}
                 canUndo={canUndo}
                 canRedo={canRedo}
-                drawMode={drawMode}
-                onChangeDrawMode={setDrawMode}
-                onExportPDF={exportPDF}
-                onExportPNG={exportPNG}
-                onExportCSV={exportCSV}
-                onExportSVG={exportSVG}
-                onExportPlaceCards={() => exportPlaceCardsPDF?.()}
-                onExportPoster={() => exportPosterA2?.()}
-                onOpenCeremonyConfig={handleOpenCeremonyConfig}
-                onOpenBanquetConfig={handleOpenBanquetConfig}
-                onOpenSpaceConfig={handleOpenSpaceConfig}
-                onFitToContent={() => window.dispatchEvent(new Event('seating-fit'))}
-                onOpenBackground={() => setBackgroundOpen(true)}
-                onAutoAssign={handleAutoAssignClick}
-                onClearBanquet={clearBanquetLayout}
-                onOpenTemplates={handleOpenTemplates}
-                onOpenExportWizard={() => setExportWizardEnhancedOpen(true)}
-                onSaveSnapshot={(name) => {
-                  try {
-                    saveSnapshot?.(name);
-                  } catch (_) {}
-                }}
-                onLoadSnapshot={(name) => {
-                  try {
-                    loadSnapshot?.(name);
-                  } catch (_) {}
-                }}
-                onDeleteSnapshot={(name) => {
-                  try {
-                    deleteSnapshot?.(name);
-                  } catch (_) {}
-                }}
-                scoringWeights={scoringWeights}
-                onUpdateScoringWeights={(p) => setScoringWeights?.(p)}
-                showTables={showTables}
-                onToggleShowTables={toggleShowTables}
-                showRulers={showRulers}
-                onToggleRulers={() => setShowRulers((v) => !v)}
-                snapEnabled={!!snapToGrid}
-                onToggleSnap={() => setSnapToGrid((v) => !v)}
-                gridStep={gridStep}
-                showSeatNumbers={showSeatNumbers}
-                onToggleSeatNumbers={() => setShowSeatNumbers((v) => !v)}
-                onRotateLeft={() => rotateSelected(-5)}
-                onRotateRight={() => rotateSelected(5)}
-                onAlign={(axis, mode) => alignSelected(axis, mode)}
-                onDistribute={(axis) => distributeSelected(axis)}
                 validationsEnabled={validationsEnabled}
-                onToggleValidations={() => setValidationsEnabled((v) => !v)}
                 globalMaxSeats={globalMaxSeats}
-                onOpenCapacity={() => setCapacityOpen(true)}
+                onGenerateAuto={() => {
+                  if (typeof generateAutoLayoutFromGuests === 'function') {
+                    generateAutoLayoutFromGuests('columns');
+                  }
+                }}
+                onOpenTemplates={() => setShowTemplateGalleryNew(true)}
+                onOpenSpaceConfig={handleOpenSpaceConfig}
+                onChangeDrawMode={setDrawMode}
+                onUndo={undo}
+                onRedo={redo}
+                onDuplicateTable={duplicateTable}
+                onDeleteTable={deleteTable}
+                onRotateTable={(id, degrees) => rotateSelected(degrees)}
+                onToggleLock={toggleTableLocked}
+                onAlignTables={() => alignSelected('horizontal', 'start')}
+                onDistributeTables={() => distributeSelected('x')}
+                onToggleValidations={(enabled) => setValidationsEnabled(enabled)}
+                onOpenCapacity={() => setBanquetConfigOpen(true)}
+                onOpenAdvanced={() => setShowAdvancedTools(true)}
+              />
+
+              {/* ✅ NUEVO: Indicador de Modo */}
+              <ModeIndicator
+                mode={drawMode}
+                show={
+                  showModeIndicator && !templateOpen && !ceremonyConfigOpen && !banquetConfigOpen
+                }
               />
             </div>
           </div>
@@ -2156,6 +2111,19 @@ const SeatingPlanRefactored = () => {
           canvasRef={canvasRef}
           scale={viewport.scale}
           offset={viewport.offset}
+        />
+
+        {/* ✅ NUEVO: Galería de Plantillas */}
+        <TemplateGallery
+          isOpen={showTemplateGalleryNew}
+          onClose={() => setShowTemplateGalleryNew(false)}
+          onSelectTemplate={handleSelectTemplateNew}
+          onCustomGenerate={() => {
+            setShowTemplateGalleryNew(false);
+            if (typeof generateAutoLayoutFromGuests === 'function') {
+              generateAutoLayoutFromGuests('columns');
+            }
+          }}
         />
       </div>
     </DndProvider>

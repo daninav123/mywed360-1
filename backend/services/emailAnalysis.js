@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 import path from 'path';
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 
 dotenv.config({ path: path.resolve(process.cwd(), '../.env') });
 
@@ -25,20 +25,27 @@ async function ensureOpenAI() {
  * @param {string} params.body - Cuerpo (texto plano preferido)
  * @returns {Promise<Object>} JSON con tasks, meetings, budgets, contracts...
  */
-export async function analyzeEmail({ subject = '', body = '', attachments = [], attachmentsText = [] }) {
+export async function analyzeEmail({
+  subject = '',
+  body = '',
+  attachments = [],
+  attachmentsText = [],
+}) {
   await ensureOpenAI();
   if (!openai) {
     logger.warn('OPENAI_API_KEY no definido; análisis omitido');
     return { tasks: [], meetings: [], budgets: [], contracts: [] };
   }
 
-  const INCLUDE_ATTACHMENTS = (process.env.EMAIL_ANALYSIS_INCLUDE_ATTACHMENTS ? process.env.EMAIL_ANALYSIS_INCLUDE_ATTACHMENTS !== 'false' : true);
+  const INCLUDE_ATTACHMENTS = process.env.EMAIL_ANALYSIS_INCLUDE_ATTACHMENTS
+    ? process.env.EMAIL_ANALYSIS_INCLUDE_ATTACHMENTS !== 'false'
+    : true;
   const PER_FILE_LIMIT = parseInt(process.env.EMAIL_ANALYSIS_MAX_ATTACHMENT_CHARS || '5000', 10);
   const TOTAL_LIMIT = parseInt(process.env.EMAIL_ANALYSIS_TOTAL_CHARS || '20000', 10);
 
   function truncate(s, n) {
     const str = String(s || '');
-    return str.length > n ? (str.slice(0, n) + '\n[...truncated...]') : str;
+    return str.length > n ? str.slice(0, n) + '\n[...truncated...]' : str;
   }
 
   let attachmentsBlock = '';
@@ -47,7 +54,10 @@ export async function analyzeEmail({ subject = '', body = '', attachments = [], 
       const blocks = [];
       let used = 0;
       for (const a of attachmentsText) {
-        const piece = truncate(a.text || '', Math.min(PER_FILE_LIMIT, Math.max(1000, PER_FILE_LIMIT)));
+        const piece = truncate(
+          a.text || '',
+          Math.min(PER_FILE_LIMIT, Math.max(1000, PER_FILE_LIMIT))
+        );
         if (!piece) continue;
         const header = `\n\n[ADJUNTO] ${a.filename || 'archivo'} (${a.mime || 'desconocido'})\n`;
         const chunk = header + piece + '\n';
@@ -61,12 +71,13 @@ export async function analyzeEmail({ subject = '', body = '', attachments = [], 
     }
   } catch {}
 
-  const promptUser = `Email recibido:\nAsunto: ${subject}\nCuerpo:\n${body}${Array.isArray(attachments) && attachments.length ? "\nAdjuntos (" + attachments.length + "):\n" + attachments.map((a, i) => "- " + (a.filename || a.name || ("adjunto" + (i+1))) + " (" + (a.type || a.contentType || "desconocido") + ")").join("\\n") : ""}${attachmentsBlock}\n---\nSi los adjuntos incluyen presupuestos, convocatorias o contratos, tenlos en cuenta. Extrae acciones relevantes (tareas, reuniones, presupuestos, contratos). Devuelve JSON tal como se indica en la función.`;
+  const promptUser = `Email recibido:\nAsunto: ${subject}\nCuerpo:\n${body}${Array.isArray(attachments) && attachments.length ? '\nAdjuntos (' + attachments.length + '):\n' + attachments.map((a, i) => '- ' + (a.filename || a.name || 'adjunto' + (i + 1)) + ' (' + (a.type || a.contentType || 'desconocido') + ')').join('\\n') : ''}${attachmentsBlock}\n---\nSi los adjuntos incluyen presupuestos, convocatorias o contratos, tenlos en cuenta. Extrae acciones relevantes (tareas, reuniones, presupuestos, contratos). Devuelve JSON tal como se indica en la función.`;
 
   const functions = [
     {
       name: 'extractEmailActions',
-      description: 'Extrae acciones desde un correo para generar tareas, reuniones, presupuestos, contratos',
+      description:
+        'Extrae acciones desde un correo para generar tareas, reuniones, presupuestos, contratos',
       parameters: {
         type: 'object',
         properties: {
@@ -77,10 +88,10 @@ export async function analyzeEmail({ subject = '', body = '', attachments = [], 
               properties: {
                 title: { type: 'string' },
                 due: { type: 'string', description: 'Fecha ISO o vacío' },
-                priority: { type: 'string', enum: ['alta','media','baja'], default: 'media' }
+                priority: { type: 'string', enum: ['alta', 'media', 'baja'], default: 'media' },
               },
-              required: ['title']
-            }
+              required: ['title'],
+            },
           },
           meetings: {
             type: 'array',
@@ -89,10 +100,10 @@ export async function analyzeEmail({ subject = '', body = '', attachments = [], 
               properties: {
                 title: { type: 'string' },
                 date: { type: 'string', description: 'Fecha/hora ISO' },
-                participants: { type: 'array', items: { type: 'string' } }
+                participants: { type: 'array', items: { type: 'string' } },
               },
-              required: ['title','date']
-            }
+              required: ['title', 'date'],
+            },
           },
           budgets: {
             type: 'array',
@@ -102,12 +113,22 @@ export async function analyzeEmail({ subject = '', body = '', attachments = [], 
                 client: { type: 'string' },
                 amount: { type: 'number' },
                 currency: { type: 'string', default: 'EUR' },
-                status: { type: 'string', enum: ['pending','accepted','rejected'], description: 'Estado detectado del presupuesto' },
-                supplierId: { type: 'string', description: 'Opcional, si se deduce un ID conocido' },
-                description: { type: 'string', description: 'Resumen del presupuesto (p.ej., asunto)' }
+                status: {
+                  type: 'string',
+                  enum: ['pending', 'accepted', 'rejected'],
+                  description: 'Estado detectado del presupuesto',
+                },
+                supplierId: {
+                  type: 'string',
+                  description: 'Opcional, si se deduce un ID conocido',
+                },
+                description: {
+                  type: 'string',
+                  description: 'Resumen del presupuesto (p.ej., asunto)',
+                },
               },
-              required: ['client','amount']
-            }
+              required: ['client', 'amount'],
+            },
           },
           contracts: {
             type: 'array',
@@ -116,15 +137,15 @@ export async function analyzeEmail({ subject = '', body = '', attachments = [], 
               properties: {
                 party: { type: 'string' },
                 type: { type: 'string' },
-                action: { type: 'string', description: 'review, sign, send, etc.' }
+                action: { type: 'string', description: 'review, sign, send, etc.' },
               },
-              required: ['party','type']
-            }
-          }
+              required: ['party', 'type'],
+            },
+          },
         },
-        required: []
-      }
-    }
+        required: [],
+      },
+    },
   ];
 
   try {
@@ -133,10 +154,10 @@ export async function analyzeEmail({ subject = '', body = '', attachments = [], 
       temperature: 0,
       messages: [
         { role: 'system', content: 'Eres un asistente que produce JSON estructurado' },
-        { role: 'user', content: promptUser }
+        { role: 'user', content: promptUser },
       ],
       functions,
-      function_call: { name: 'extractEmailActions' }
+      function_call: { name: 'extractEmailActions' },
     });
     const msg = completion.choices?.[0]?.message;
     let extracted = {};
@@ -153,4 +174,3 @@ export async function analyzeEmail({ subject = '', body = '', attachments = [], 
     return { error: true, message: err.message };
   }
 }
-

@@ -5,7 +5,7 @@ import express from 'express';
 import { z } from 'zod';
 import { db } from '../db.js';
 import { FieldValue } from 'firebase-admin/firestore';
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 import crypto from 'crypto';
 import { generateSupplierSlug } from '../utils/slugGenerator.js';
 

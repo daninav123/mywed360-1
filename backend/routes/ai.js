@@ -7,7 +7,7 @@ import path from 'path';
 // Cargar variables de entorno desde el .env raíz
 dotenv.config({ path: path.resolve(process.cwd(), '../.env') });
 import express from 'express';
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 import axios from 'axios';
 import admin from 'firebase-admin';
 import {
@@ -46,8 +46,7 @@ async function ensureOpenAI() {
 }
 
 // Al arrancar intentamos inicializar, pero si las variables aún no están cargadas no fallamos
-ensureOpenAI().catch(err => console.error('❌ Error al inicializar OpenAI:', err.message));
-
+ensureOpenAI().catch((err) => console.error('❌ Error al inicializar OpenAI:', err.message));
 
 // ---------- Firestore (optional) ----------
 let db = null;
@@ -97,13 +96,13 @@ router.get('/debug-env', requireAdmin, (req, res) => {
     NODE_ENV: process.env.NODE_ENV || 'NOT_SET',
     ALLOWED_ORIGIN: process.env.ALLOWED_ORIGIN ? 'SET' : 'NOT_SET',
     MAILGUN_API_KEY: process.env.MAILGUN_API_KEY ? 'SET' : 'NOT_SET',
-    PORT: process.env.PORT || 'NOT_SET'
+    PORT: process.env.PORT || 'NOT_SET',
   };
-  
+
   logger.info('🔍 Debug env vars requested by admin');
   return sendSuccess(req, res, {
     environment: envVars,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 });
 
@@ -119,7 +118,10 @@ router.post('/parse-dialog', async (req, res) => {
       const z = mod.z || mod.default;
       const schema = z.object({
         text: z.string().min(1).max(5000),
-        history: z.array(z.object({ role: z.string().optional(), content: z.string() })).optional().default([]),
+        history: z
+          .array(z.object({ role: z.string().optional(), content: z.string() }))
+          .optional()
+          .default([]),
         context: z
           .object({
             eventType: z.string().max(64).optional(),
@@ -228,7 +230,7 @@ router.post('/parse-dialog', async (req, res) => {
                   start: { type: 'string', description: 'Fecha/hora inicio ISO' },
                   end: { type: 'string', description: 'Fecha/hora fin ISO' },
                   date: { type: 'string', description: 'Fecha ISO shorthand' },
-                  when: { type: 'string', description: 'Expresión natural de fecha/hora' }
+                  when: { type: 'string', description: 'Expresión natural de fecha/hora' },
                 },
               },
             },
@@ -250,12 +252,18 @@ router.post('/parse-dialog', async (req, res) => {
               items: {
                 type: 'object',
                 properties: {
-                  entity: { type: 'string', enum: ['task','meeting','guest','movement','table','config','supplier'] },
-                  action: { type: 'string', enum: ['add','update','delete','complete','move','set','search'] },
-                  payload: { type: 'object' }
+                  entity: {
+                    type: 'string',
+                    enum: ['task', 'meeting', 'guest', 'movement', 'table', 'config', 'supplier'],
+                  },
+                  action: {
+                    type: 'string',
+                    enum: ['add', 'update', 'delete', 'complete', 'move', 'set', 'search'],
+                  },
+                  payload: { type: 'object' },
                 },
-                required: ['entity','action','payload']
-              }
+                required: ['entity', 'action', 'payload'],
+              },
             },
           },
         },
@@ -282,7 +290,7 @@ router.post('/parse-dialog', async (req, res) => {
         functions,
         function_call: { name: 'extractWeddingData' },
       }),
-      new Promise((_, reject) => setTimeout(() => reject(new Error('timeout-openai')), 10000))
+      new Promise((_, reject) => setTimeout(() => reject(new Error('timeout-openai')), 10000)),
     ]);
 
     logger.info('🧠 OpenAI respondió');
@@ -315,9 +323,11 @@ router.post('/parse-dialog', async (req, res) => {
             ...conversationMessages,
             { role: 'assistant', content: `He extraído estos datos: ${JSON.stringify(extracted)}` },
             { role: 'user', content: 'Por favor, responde de forma cercana en español.' },
-          ]
+          ],
         }),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout-openai-summary')), 10000))
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('timeout-openai-summary')), 10000)
+        ),
       ]);
       logger.info('🧠 Resumen generado');
       reply = summaryCompletion.choices?.[0]?.message?.content || '';
@@ -327,12 +337,17 @@ router.post('/parse-dialog', async (req, res) => {
 
     // Guardar en Firestore si está configurado
     if (db) {
-      db.collection('aiParsedDialogs').doc().set({ text, extracted, reply, createdAt: admin.firestore.FieldValue.serverTimestamp() })
-      .catch(err => logger.warn('Firestore set failed', err));
-    // No esperamos a que Firestore termine para responder
+      db.collection('aiParsedDialogs')
+        .doc()
+        .set({ text, extracted, reply, createdAt: admin.firestore.FieldValue.serverTimestamp() })
+        .catch((err) => logger.warn('Firestore set failed', err));
+      // No esperamos a que Firestore termine para responder
     }
 
-    logger.info('✅ parse-dialog completado', { extractedKeys: Object.keys(extracted), replyLen: reply.length });
+    logger.info('✅ parse-dialog completado', {
+      extractedKeys: Object.keys(extracted),
+      replyLen: reply.length,
+    });
     return sendSuccess(req, res, { extracted, reply });
   } catch (err) {
     logger.error('❌ parse-dialog error', err);

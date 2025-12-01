@@ -199,7 +199,9 @@ export async function awardPoints(weddingId, uid, eventType, meta = {}) {
     const levelDef = calcLevel(totalPoints);
     const progressToNext = calcProgressToNext(totalPoints, levelDef);
 
-    const prevUnlockedSet = new Set(Array.isArray(base.milestonesUnlocked) ? base.milestonesUnlocked : []);
+    const prevUnlockedSet = new Set(
+      Array.isArray(base.milestonesUnlocked) ? base.milestonesUnlocked : []
+    );
     const evaluationContext = {
       totalPoints,
       counters,
@@ -295,38 +297,57 @@ export async function getStats(weddingId, uid, { historyLimit = 10 } = {}) {
   if (!weddingId) throw new Error('weddingId requerido');
   if (!uid) throw new Error('uid requerido');
 
-  const snapshot = await userGamDoc(weddingId, uid).get();
-  const base = snapshot.exists ? snapshot.data() : null;
-  const totalPoints = base?.totalPoints || 0;
-  const levelDef = calcLevel(totalPoints);
-  const progressToNext =
-    typeof base?.progressToNext === 'number'
-      ? base.progressToNext
-      : calcProgressToNext(totalPoints, levelDef);
+  try {
+    const snapshot = await userGamDoc(weddingId, uid).get();
+    const base = snapshot.exists ? snapshot.data() : null;
+    const totalPoints = base?.totalPoints || 0;
+    const levelDef = calcLevel(totalPoints);
+    const progressToNext =
+      typeof base?.progressToNext === 'number'
+        ? base.progressToNext
+        : calcProgressToNext(totalPoints, levelDef);
 
-  const stats = {
-    totalPoints,
-    level: base?.level || levelDef.level,
-    levelName: base?.levelName || levelDef.name,
-    progressToNext,
-    milestonesUnlocked: Array.isArray(base?.milestonesUnlocked) ? base.milestonesUnlocked : [],
-    counters: base?.counters || {},
-    nextLevelTarget: base?.nextLevelTarget || getNextLevelTarget(levelDef),
-    lastEvent: base?.lastEvent
-      ? {
-          ...base.lastEvent,
-          createdAt: serializeTimestamp(base.lastEvent.createdAt),
-        }
-      : null,
-    updatedAt: serializeTimestamp(base?.updatedAt),
-    history: [],
-  };
+    const stats = {
+      totalPoints,
+      level: base?.level || levelDef.level,
+      levelName: base?.levelName || levelDef.name,
+      progressToNext,
+      milestonesUnlocked: Array.isArray(base?.milestonesUnlocked) ? base.milestonesUnlocked : [],
+      counters: base?.counters || {},
+      nextLevelTarget: base?.nextLevelTarget || getNextLevelTarget(levelDef),
+      lastEvent: base?.lastEvent
+        ? {
+            ...base.lastEvent,
+            createdAt: serializeTimestamp(base.lastEvent.createdAt),
+          }
+        : null,
+      updatedAt: serializeTimestamp(base?.updatedAt),
+      history: [],
+    };
 
-  if (historyLimit > 0) {
-    stats.history = await getEvents(weddingId, uid, historyLimit);
+    // Intentar obtener historial, pero no fallar si hay error
+    if (historyLimit > 0) {
+      try {
+        stats.history = await getEvents(weddingId, uid, historyLimit);
+      } catch (historyError) {
+        console.warn(
+          '[getStats] Error obteniendo historial (usando fallback):',
+          historyError.message
+        );
+        stats.history = [];
+      }
+    }
+
+    return stats;
+  } catch (error) {
+    console.error('[getStats] Error obteniendo stats:', error);
+    // Si no existe el documento, retornar estado por defecto en lugar de error
+    if (error.code === 'not-found' || error.message?.includes('not found')) {
+      console.info('[getStats] Documento no existe, retornando estado por defecto');
+      return DEFAULT_STATE;
+    }
+    throw error;
   }
-
-  return stats;
 }
 
 export async function getAchievements(weddingId, uid) {
@@ -354,7 +375,39 @@ export async function getEvents(weddingId, uid, limit = 20) {
 
   query = query.orderBy('createdAt', 'desc').limit(sanitizedLimit);
 
-  const snapshot = await query.get();
-  return snapshot.docs.map((doc) => mapEventRecord(doc));
-}
+  try {
+    const snapshot = await query.get();
+    return snapshot.docs.map((doc) => mapEventRecord(doc));
+  } catch (error) {
+    // Si falla por índice faltante, intentar sin orderBy
+    if (
+      error.code === 9 ||
+      error.message?.includes('index') ||
+      error.message?.includes('FAILED_PRECONDITION')
+    ) {
+      console.warn('[getEvents] Índice faltante, intentando query simple:', error.message);
+      try {
+        // Query simple sin orderBy
+        let fallbackQuery = weddingEventsCollection(weddingId);
+        if (uid) {
+          fallbackQuery = fallbackQuery.where('uid', '==', String(uid));
+        }
+        fallbackQuery = fallbackQuery.limit(sanitizedLimit);
 
+        const fallbackSnapshot = await fallbackQuery.get();
+        const events = fallbackSnapshot.docs.map((doc) => mapEventRecord(doc));
+        // Ordenar en memoria
+        return events.sort((a, b) => {
+          const aTime = new Date(a.createdAt || 0).getTime();
+          const bTime = new Date(b.createdAt || 0).getTime();
+          return bTime - aTime;
+        });
+      } catch (fallbackError) {
+        console.error('[getEvents] Error en query fallback:', fallbackError);
+        return [];
+      }
+    }
+    console.error('[getEvents] Error obteniendo eventos:', error);
+    return [];
+  }
+}

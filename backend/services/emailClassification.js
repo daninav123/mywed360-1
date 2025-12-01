@@ -2,7 +2,7 @@ import { FieldValue } from 'firebase-admin/firestore';
 import OpenAI from 'openai';
 
 import { db } from '../db.js';
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 
 const DEFAULT_MODEL = process.env.OPENAI_MODEL || 'gpt-3.5-turbo';
 const CLASSIFICATION_TIMEOUT_MS = Number(process.env.EMAIL_CLASSIFY_TIMEOUT_MS || 7000);
@@ -23,7 +23,9 @@ function heuristicClassify({ subject = '', body = '' }) {
       folder = folder || 'Contratos';
     }
 
-    if (/(proveedor|catering|fot(?:ó|o)grafo|dj|m(?:ú|u)sica|flor|banquete|venue|servicio)/.test(text)) {
+    if (
+      /(proveedor|catering|fot(?:ó|o)grafo|dj|m(?:ú|u)sica|flor|banquete|venue|servicio)/.test(text)
+    ) {
       tags.add('Proveedor');
       folder = folder || 'Proveedores';
     }
@@ -100,12 +102,15 @@ Cuerpo: ${(body || '').slice(0, 3000)}`;
         messages: [
           {
             role: 'system',
-            content: 'Responde solo JSON válido con los campos "tags" (array de strings) y "folder" (string o null).',
+            content:
+              'Responde solo JSON válido con los campos "tags" (array de strings) y "folder" (string o null).',
           },
           { role: 'user', content: prompt },
         ],
       }),
-      new Promise((_, reject) => setTimeout(() => reject(new Error('timeout-openai-classify')), CLASSIFICATION_TIMEOUT_MS)),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('timeout-openai-classify')), CLASSIFICATION_TIMEOUT_MS)
+      ),
     ]);
 
     const content = completion.choices?.[0]?.message?.content || '';
@@ -132,24 +137,30 @@ async function persistClassification({ mailId, ownerUid, payload }) {
   };
 
   try {
-    await db
-      .collection('emailInsights')
-      .doc(mailId)
-      .set(
-        {
-          classification: classificationDoc,
-          mailId,
-        },
-        { merge: true }
-      );
+    await db.collection('emailInsights').doc(mailId).set(
+      {
+        classification: classificationDoc,
+        mailId,
+      },
+      { merge: true }
+    );
   } catch (error) {
-    logger.warn('[email-classification] No se pudo guardar en emailInsights', error?.message || error);
+    logger.warn(
+      '[email-classification] No se pudo guardar en emailInsights',
+      error?.message || error
+    );
   }
 
   try {
-    await db.collection('mails').doc(mailId).set({ aiClassification: classificationDoc }, { merge: true });
+    await db
+      .collection('mails')
+      .doc(mailId)
+      .set({ aiClassification: classificationDoc }, { merge: true });
   } catch (error) {
-    logger.warn('[email-classification] No se pudo actualizar mails.aiClassification', error?.message || error);
+    logger.warn(
+      '[email-classification] No se pudo actualizar mails.aiClassification',
+      error?.message || error
+    );
   }
 
   if (ownerUid) {
@@ -161,7 +172,10 @@ async function persistClassification({ mailId, ownerUid, payload }) {
         .doc(mailId)
         .set({ aiClassification: classificationDoc }, { merge: true });
     } catch (error) {
-      logger.warn('[email-classification] No se pudo actualizar la subcolección del usuario', error?.message || error);
+      logger.warn(
+        '[email-classification] No se pudo actualizar la subcolección del usuario',
+        error?.message || error
+      );
     }
   }
 }
@@ -177,12 +191,21 @@ async function persistClassification({ mailId, ownerUid, payload }) {
  * @param {string|null} [params.ownerUid=null]
  * @returns {Promise<{tags:string[], folder:string|null, source:string, confidence?:number, reason?:string}>}
  */
-export async function classifyEmailContent({ subject = '', body = '', mailId = null, persist = true, ownerUid = null } = {}) {
+export async function classifyEmailContent({
+  subject = '',
+  body = '',
+  mailId = null,
+  persist = true,
+  ownerUid = null,
+} = {}) {
   const trimmedSubject = typeof subject === 'string' ? subject : '';
   const trimmedBody = typeof body === 'string' ? body : '';
 
   if (!trimmedSubject && !trimmedBody) {
-    const fallback = normalizeClassificationPayload(heuristicClassify({ subject: trimmedSubject, body: trimmedBody }), 'heuristic');
+    const fallback = normalizeClassificationPayload(
+      heuristicClassify({ subject: trimmedSubject, body: trimmedBody }),
+      'heuristic'
+    );
     return fallback;
   }
 

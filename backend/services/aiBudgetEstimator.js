@@ -3,7 +3,7 @@ import crypto from 'node:crypto';
 import { FieldValue } from 'firebase-admin/firestore';
 
 import { db } from '../db.js';
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 
 const MODEL_VERSION = 'budget-heuristic-v1.0';
 const DEFAULT_CURRENCY = 'EUR';
@@ -124,17 +124,45 @@ const SERVICE_PROFILES = [
 ];
 
 const LOCATION_FACTORS = [
-  { name: 'gran-ciudad', test: /(madrid|barcelona|lisboa|paris|porto|milán|milano|london|milan)/i, multiplier: 1.15 },
-  { name: 'costero-premium', test: /(ibiza|mallorca|marbella|costa|amalfi|cancún|cancun|tulum|santorini)/i, multiplier: 1.22 },
-  { name: 'ciudad', test: /(valencia|sevilla|bilbao|zaragoza|granada|alicante|malaga|málaga|oporto)/i, multiplier: 1.08 },
-  { name: 'rural', test: /(pueblo|rural|campo|finca|hacienda|sierra|la rioja|asturias)/i, multiplier: 0.95 },
+  {
+    name: 'gran-ciudad',
+    test: /(madrid|barcelona|lisboa|paris|porto|milán|milano|london|milan)/i,
+    multiplier: 1.15,
+  },
+  {
+    name: 'costero-premium',
+    test: /(ibiza|mallorca|marbella|costa|amalfi|cancún|cancun|tulum|santorini)/i,
+    multiplier: 1.22,
+  },
+  {
+    name: 'ciudad',
+    test: /(valencia|sevilla|bilbao|zaragoza|granada|alicante|malaga|málaga|oporto)/i,
+    multiplier: 1.08,
+  },
+  {
+    name: 'rural',
+    test: /(pueblo|rural|campo|finca|hacienda|sierra|la rioja|asturias)/i,
+    multiplier: 0.95,
+  },
 ];
 
 const STYLE_FACTORS = [
-  { name: 'lujo', test: /(lujo|luxury|premium|alta gama|high-end|exclusivo|glam)/i, multiplier: 1.18 },
+  {
+    name: 'lujo',
+    test: /(lujo|luxury|premium|alta gama|high-end|exclusivo|glam)/i,
+    multiplier: 1.18,
+  },
   { name: 'boho', test: /(boho|bohemio|bohemian)/i, multiplier: 1.05 },
-  { name: 'minimalista', test: /(minimalista|minimal|intimo|íntimo|small|reducido|ahorro|económico|economico)/i, multiplier: 0.9 },
-  { name: 'tematica', test: /(tematic|temática|tematico|temático|destino|destination)/i, multiplier: 1.12 },
+  {
+    name: 'minimalista',
+    test: /(minimalista|minimal|intimo|íntimo|small|reducido|ahorro|económico|economico)/i,
+    multiplier: 0.9,
+  },
+  {
+    name: 'tematica',
+    test: /(tematic|temática|tematico|temático|destino|destination)/i,
+    multiplier: 1.12,
+  },
 ];
 
 const PRIORITY_FACTORS = {
@@ -169,7 +197,9 @@ function roundCurrency(value) {
 }
 
 function detectServiceProfile(serviceRef = {}) {
-  const rawType = (serviceRef.type || serviceRef.serviceType || serviceRef.category || '').toString().toLowerCase();
+  const rawType = (serviceRef.type || serviceRef.serviceType || serviceRef.category || '')
+    .toString()
+    .toLowerCase();
   const rawName = (serviceRef.name || serviceRef.label || '').toString().toLowerCase();
   for (const profile of SERVICE_PROFILES) {
     if (profile.aliases.some((alias) => rawType.includes(alias) || rawName.includes(alias))) {
@@ -438,7 +468,12 @@ function buildReasoning({
   return reasons;
 }
 
-function computeConfidence({ base = 0.55, historyCount = 0, comparisonCount = 0, hasTarget = false }) {
+function computeConfidence({
+  base = 0.55,
+  historyCount = 0,
+  comparisonCount = 0,
+  hasTarget = false,
+}) {
   let confidence = base;
   if (historyCount >= 12) confidence += 0.16;
   else if (historyCount >= 6) confidence += 0.12;
@@ -464,7 +499,9 @@ export async function buildBudgetEstimate(payload = {}, context = {}) {
   const eventContext = payload.eventContext || {};
   const serviceContext = payload.serviceContext || {};
   const budgetSnapshot = payload.budgetSnapshot || {};
-  const comparisonVendors = Array.isArray(payload.comparisonVendors) ? payload.comparisonVendors : [];
+  const comparisonVendors = Array.isArray(payload.comparisonVendors)
+    ? payload.comparisonVendors
+    : [];
 
   const profile = detectServiceProfile(serviceRef);
   const guestCount = safeNumber(eventContext.guestCount, safeNumber(budgetSnapshot.guestCount, 0));
@@ -476,13 +513,18 @@ export async function buildBudgetEstimate(payload = {}, context = {}) {
   const priorityFactor = detectPriorityFactor(serviceContext.priority);
 
   const baseRange = computeBaseEstimate({ profile, guestCount, totalBudget });
-  let adjustedRange = applyMultipliers(baseRange, [locationFactor.multiplier, styleFactor.multiplier, priorityFactor]);
+  let adjustedRange = applyMultipliers(baseRange, [
+    locationFactor.multiplier,
+    styleFactor.multiplier,
+    priorityFactor,
+  ]);
   adjustedRange = integrateTarget(adjustedRange, serviceContext.targetRange);
 
   const comparisonSummary = comparisonVendors.length
     ? {
         count: comparisonVendors.length,
-        avg: comparisonVendors.reduce((acc, item) => acc + (safeNumber(item?.quotedAmount) || 0), 0) /
+        avg:
+          comparisonVendors.reduce((acc, item) => acc + (safeNumber(item?.quotedAmount) || 0), 0) /
           comparisonVendors.length,
         label: comparisonVendors
           .map((c) => c.vendorId || c.providerId || c.name || c.provider || 'Proveedor')
@@ -495,7 +537,8 @@ export async function buildBudgetEstimate(payload = {}, context = {}) {
     adjustedRange = integrateComparison(adjustedRange, comparisonVendors);
   }
 
-  const currency = payload.currency || eventContext.currency || budgetSnapshot.currency || DEFAULT_CURRENCY;
+  const currency =
+    payload.currency || eventContext.currency || budgetSnapshot.currency || DEFAULT_CURRENCY;
 
   const cityBucket = locationFactor.name;
 
@@ -527,7 +570,10 @@ export async function buildBudgetEstimate(payload = {}, context = {}) {
   const confidence = computeConfidence({
     historyCount: historical.length,
     comparisonCount: comparisonVendors.length,
-    hasTarget: Boolean(serviceContext?.targetRange && (serviceContext.targetRange.min || serviceContext.targetRange.max)),
+    hasTarget: Boolean(
+      serviceContext?.targetRange &&
+        (serviceContext.targetRange.min || serviceContext.targetRange.max)
+    ),
   });
 
   return {
@@ -629,9 +675,12 @@ export function normalizePayload(body = {}) {
     errors.push('serviceRef.type o serviceRef.name son obligatorios');
   }
 
-  const eventContext = body.eventContext && typeof body.eventContext === 'object' ? body.eventContext : {};
-  const serviceContext = body.serviceContext && typeof body.serviceContext === 'object' ? body.serviceContext : {};
-  const budgetSnapshot = body.budgetSnapshot && typeof body.budgetSnapshot === 'object' ? body.budgetSnapshot : {};
+  const eventContext =
+    body.eventContext && typeof body.eventContext === 'object' ? body.eventContext : {};
+  const serviceContext =
+    body.serviceContext && typeof body.serviceContext === 'object' ? body.serviceContext : {};
+  const budgetSnapshot =
+    body.budgetSnapshot && typeof body.budgetSnapshot === 'object' ? body.budgetSnapshot : {};
   const comparisonVendors = Array.isArray(body.comparisonVendors) ? body.comparisonVendors : [];
 
   if (eventContext.date && Number.isNaN(Date.parse(eventContext.date))) {
@@ -679,4 +728,3 @@ export function normalizePayload(body = {}) {
     data: normalized,
   };
 }
-

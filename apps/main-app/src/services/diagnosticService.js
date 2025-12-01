@@ -243,59 +243,17 @@ class DiagnosticService {
 
   /**
    * Test de configuración de OpenAI
+   * ACTUALIZADO: OpenAI ahora solo se usa desde backend por seguridad
    */
   async testOpenAIConfig() {
-    try {
-      const allowDirect = import.meta.env.VITE_ENABLE_DIRECT_OPENAI === 'true';
-      if (!allowDirect) {
-        return {
-          status: 'warning',
-          message: 'OpenAI directo deshabilitado (usa backend /api/ai)',
-          details: {},
-        };
-      }
-      const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
-
-      if (!apiKey) {
-        return {
-          status: 'error',
-          message: 'API Key de OpenAI no configurada',
-        };
-      }
-
-      // Test básico de la API
-      const response = await fetch('https://api.openai.com/v1/models', {
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        return {
-          status: 'success',
-          message: 'OpenAI API configurada correctamente',
-          details: {
-            modelsAvailable: data.data?.length || 0,
-            keyPrefix: apiKey.substring(0, 10) + '...',
-          },
-        };
-      } else {
-        const error = await response.text();
-        return {
-          status: 'error',
-          message: `Error en OpenAI API: ${response.status}`,
-          details: { error, status: response.status },
-        };
-      }
-    } catch (error) {
-      return {
-        status: 'error',
-        message: 'Error al probar OpenAI',
-        details: { error: error.message },
-      };
-    }
+    return {
+      status: 'info',
+      message: 'OpenAI se gestiona desde el backend por seguridad',
+      details: {
+        backend: 'Todas las llamadas a OpenAI se hacen desde /api/ai/*',
+        security: 'API Key no expuesta en cliente',
+      },
+    };
   }
 
   /**

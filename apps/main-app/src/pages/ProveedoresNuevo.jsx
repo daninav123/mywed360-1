@@ -12,6 +12,9 @@ import {
   Camera,
   ArrowUpDown,
   DollarSign,
+  Filter,
+  Grid,
+  List,
 } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -36,12 +39,12 @@ import useSupplierShortlist from '../hooks/useSupplierShortlist';
 import { loadData, saveData } from '../services/SyncService';
 import { searchSuppliersHybrid, trackSupplierAction } from '../services/suppliersService';
 import SupplierCard from '../components/suppliers/SupplierCard';
-import SmartFiltersBar from '../components/suppliers/SmartFiltersBar';
 import FavoritesSection from '../components/suppliers/FavoritesSection';
 import CompareBar from '../components/suppliers/CompareBar';
-import RecommendedSuppliers from '../components/suppliers/RecommendedSuppliers';
-import WeddingServicesOverview from '../components/wedding/WeddingServicesOverview';
-import QuoteRequestsTracker from '../components/suppliers/QuoteRequestsTracker';
+import MyServicesSection from '../components/suppliers/MyServicesSection';
+import AdvancedFiltersModal from '../components/suppliers/AdvancedFiltersModal';
+import SearchTabContent from '../components/suppliers/SearchTabContent';
+import ServicesProgressBar from '../components/suppliers/ServicesProgressBar';
 
 const CONFIRMED_KEYWORDS = ['confirm', 'contrat', 'reserva', 'firm'];
 
@@ -279,12 +282,14 @@ const Proveedores = () => {
   const [searchResultsQuery, setSearchResultsQuery] = useState('');
   const [searchResultsPage, setSearchResultsPage] = useState(1);
   const [searchCompleted, setSearchCompleted] = useState(false);
-  const [activeTab, setActiveTab] = useState('search'); // 'search' | 'favorites'
+  const [activeTab, setActiveTab] = useState('search'); // 'search' | 'services'
 
-  // Estado para filtros inteligentes
-  const [smartFilters, setSmartFilters] = useState(null);
+  // Estado para filtros avanzados
+  const [showFiltersModal, setShowFiltersModal] = useState(false);
+  const [advancedFilters, setAdvancedFilters] = useState({});
   const [hasPortfolioFilter, setHasPortfolioFilter] = useState(false);
   const [sortBy, setSortBy] = useState('relevance'); // 'relevance', 'rating', 'price', 'reviews'
+  const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'list'
 
   useEffect(() => {
     loadProviders();
@@ -473,20 +478,21 @@ const Proveedores = () => {
         setAiLoading(true);
         setAiError(null);
 
-        // Usar nuevo sistema híbrido (BD propia → bodas.net → internet)
-        // Usar smartFilters si están disponibles, sino usar perfil
+        // Usar nuevo sistema híbrido con filtros avanzados
         const filters = {
           searchMode,
-          budget: smartFilters?.budget ?? weddingProfile?.budget,
-          guests: smartFilters?.guests ?? weddingProfile?.guestCount,
-          style: smartFilters?.style ?? weddingProfile?.style,
+          budget: advancedFilters?.budget ?? weddingProfile?.budget,
+          guests: advancedFilters?.guests ?? weddingProfile?.guestCount,
+          style: advancedFilters?.style ?? weddingProfile?.style,
+          rating: advancedFilters?.rating ?? 0,
+          priceRange: advancedFilters?.priceRange ?? '',
         };
 
         const result = await searchSuppliersHybrid(
           trimmed, // service/category
-          smartFilters?.location || resolvedLocation, // location (puede ser override)
+          advancedFilters?.location || resolvedLocation, // location
           enrichedQuery || '', // query adicional
-          filters.budget, // budget (puede ser override)
+          filters.budget, // budget
           filters // filters completos
         );
 
@@ -525,7 +531,7 @@ const Proveedores = () => {
       setSearchTerm,
       weddingProfile,
       searchMode,
-      smartFilters,
+      advancedFilters,
       t,
     ]
   );
@@ -738,19 +744,7 @@ const Proveedores = () => {
     [addProvider, loadProviders, t]
   );
 
-  const headerActions = (
-    <div className="flex flex-wrap gap-2">
-      <Button
-        onClick={() => {
-          setNewProviderInitial(null);
-          setShowNewProviderForm(true);
-        }}
-        className="flex items-center gap-1"
-      >
-        <Plus size={16} /> {t('suppliers.overview.actions.newSupplier')}
-      </Button>
-    </div>
-  );
+  const headerActions = null; // Botón movido a cada servicio individual
 
   // Stats calculations
   const confirmedCount = useMemo(() => {
@@ -778,6 +772,47 @@ const Proveedores = () => {
     [confirmedCount, pendingCount, serviceCards.length, t]
   );
 
+  // Contador de filtros activos
+  const activeFiltersCount = useMemo(() => {
+    return Object.values(advancedFilters).filter((v) => {
+      if (typeof v === 'boolean') return v;
+      if (typeof v === 'number') return v > 0;
+      if (typeof v === 'string') return v.trim() !== '';
+      return false;
+    }).length;
+  }, [advancedFilters]);
+
+  // Handler para aplicar filtros
+  const handleApplyFilters = useCallback(
+    (filters) => {
+      setAdvancedFilters(filters);
+      setHasPortfolioFilter(filters.hasPortfolio || false);
+      // Si hay una búsqueda activa, re-ejecutarla con los nuevos filtros
+      if (searchInput) {
+        performSearch(searchInput, { saveHistory: false, silent: true });
+      }
+    },
+    [searchInput, performSearch]
+  );
+
+  // Handler para buscar un servicio específico desde "Mis Servicios"
+  const handleSearchService = useCallback(
+    (serviceName) => {
+      setSearchInput(serviceName);
+      setActiveTab('search');
+      setTimeout(() => {
+        performSearch(serviceName, { saveHistory: true });
+      }, 100);
+    },
+    [performSearch]
+  );
+
+  // Handler para añadir proveedor manual con servicio pre-seleccionado
+  const handleAddManualProvider = useCallback((serviceName) => {
+    setNewProviderInitial({ service: serviceName });
+    setShowNewProviderForm(true);
+  }, []);
+
   return (
     <>
       <PageWrapper
@@ -786,6 +821,9 @@ const Proveedores = () => {
         className="layout-container space-y-6"
       >
         {error && <Card className="border border-danger bg-danger-soft text-danger">{error}</Card>}
+
+        {/* Barra de Progreso - Siempre visible */}
+        <ServicesProgressBar serviceCards={serviceCards} />
 
         {/* Tabs */}
         <Card className="p-1">
@@ -804,508 +842,70 @@ const Proveedores = () => {
               </div>
             </button>
             <button
-              onClick={() => setActiveTab('favorites')}
+              onClick={() => setActiveTab('services')}
               className={`flex-1 py-3 px-6 rounded-lg font-medium transition-colors ${
-                activeTab === 'favorites'
+                activeTab === 'services'
                   ? 'bg-primary text-white'
                   : 'bg-transparent text-muted hover:bg-surface'
               }`}
             >
               <div className="flex items-center justify-center gap-2">
-                <Heart className="h-5 w-5" />
-                <span>Mis Favoritos</span>
+                <Building2 className="h-5 w-5" />
+                <span>Mis Servicios</span>
               </div>
             </button>
           </div>
         </Card>
 
         {/* Contenido según tab activo */}
-        {activeTab === 'favorites' ? (
-          <FavoritesSection />
+        {activeTab === 'services' ? (
+          <MyServicesSection
+            serviceCards={serviceCards}
+            onSearchService={handleSearchService}
+            onAddManualProvider={handleAddManualProvider}
+            onViewFavorites={() => setActiveTab('search')}
+            loading={loading}
+          />
         ) : (
-          <>
-            {/* Mis Solicitudes de Presupuesto */}
-            <div className="mb-8">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 rounded-lg bg-purple-100">
-                  <DollarSign className="w-5 h-5 text-purple-600" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold text-gray-900">
-                    📋 Mis Solicitudes de Presupuesto
-                  </h2>
-                  <p className="text-sm text-gray-600">
-                    Compara y gestiona los presupuestos que has solicitado
-                  </p>
-                </div>
-              </div>
-              <QuoteRequestsTracker />
-            </div>
-
-            {/* Servicios de tu boda - Header con progreso + Buscador integrado */}
-            <div className="mb-6">
-              <WeddingServicesOverview
-                onSearch={(service) => {
-                  // Cuando se hace click en "Buscar proveedores" de un servicio
-                  setSearchInput(service);
-                  setSearchPanelCollapsed(false);
-                  setActiveTab('search');
-                  // Scroll al panel de búsqueda
-                  setTimeout(() => {
-                    document.querySelector('[data-search-panel]')?.scrollIntoView({
-                      behavior: 'smooth',
-                      block: 'start',
-                    });
-                  }, 100);
-                }}
-                searchPanel={
-                  !searchPanelCollapsed ? (
-                    <Card
-                      data-search-panel
-                      className="p-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft shadow-lg"
-                    >
-                      <div className="flex flex-wrap items-start justify-between gap-3 mb-6">
-                        <div className="flex items-center gap-3">
-                          <div className="p-3 rounded-xl bg-[var(--color-primary)]/15">
-                            <Search className="w-6 h-6 text-[color:var(--color-primary)]" />
-                          </div>
-                          <div>
-                            <h2 className="text-xl font-bold text-body">
-                              {t('suppliers.overview.exploration.title')}
-                            </h2>
-                            <p className="text-sm text-muted">
-                              {t('suppliers.overview.exploration.subtitle')}
-                            </p>
-                          </div>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          aria-label={t('suppliers.overview.exploration.collapseAria')}
-                          onClick={() => setSearchPanelCollapsed(true)}
-                          className="h-8 w-8 justify-center hover:bg-[var(--color-primary)]/10"
-                        >
-                          <ChevronUp className="h-4 w-4" />
-                        </Button>
-                      </div>
-
-                      <div className="space-y-6">
-                        <form onSubmit={handleSearchSubmit} className="space-y-3">
-                          <div className="flex flex-wrap items-center gap-3">
-                            <div className="relative flex-1 min-w-[220px]">
-                              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted" />
-                              <Input
-                                type="search"
-                                value={searchInput}
-                                onChange={(event) => setSearchInput(event.target.value)}
-                                placeholder={t(
-                                  'common.suppliers.overview.exploration.searchPlaceholder'
-                                )}
-                                className="pl-10"
-                              />
-                            </div>
-
-                            {/* Selector de modo de búsqueda (DEBUG) */}
-                            <div className="flex items-center gap-2">
-                              <label className="text-xs font-medium text-muted whitespace-nowrap">
-                                {t('suppliers.overview.searchMode.label')}
-                              </label>
-                              <select
-                                value={searchMode}
-                                onChange={(e) => setSearchMode(e.target.value)}
-                                className="px-3 py-1.5 text-sm border border-border rounded-md bg-surface text-body focus:outline-none focus:ring-2 focus:ring-primary"
-                              >
-                                <option value="auto">
-                                  {t('suppliers.overview.searchMode.auto')}
-                                </option>
-                                <option value="database">
-                                  {t('suppliers.overview.searchMode.database')}
-                                </option>
-                                <option value="internet">
-                                  {t('suppliers.overview.searchMode.internet')}
-                                </option>
-                              </select>
-                            </div>
-
-                            <div className="flex flex-wrap items-center gap-2">
-                              <Button type="submit" size="sm" leftIcon={<Search size={16} />}>
-                                {t('app.search')}
-                              </Button>
-                              {searchInput && (
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={handleClearSearch}
-                                >
-                                  {t('suppliers.overview.actions.clear')}
-                                </Button>
-                              )}
-                            </div>
-                          </div>
-                        </form>
-
-                        {/* Smart Filters Bar */}
-                        <SmartFiltersBar
-                          weddingProfile={weddingProfile}
-                          onFiltersChange={setSmartFilters}
-                        />
-
-                        {/* Filtros y Ordenamiento */}
-                        <div className="flex flex-col sm:flex-row gap-3">
-                          {/* Filtro Con Portfolio */}
-                          <div className="flex items-center gap-3 p-3 bg-purple-50 border border-purple-200 rounded-lg flex-1">
-                            <input
-                              type="checkbox"
-                              id="hasPortfolioFilter"
-                              checked={hasPortfolioFilter}
-                              onChange={(e) => setHasPortfolioFilter(e.target.checked)}
-                              className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
-                            />
-                            <label
-                              htmlFor="hasPortfolioFilter"
-                              className="flex items-center gap-2 text-sm font-medium text-purple-900 cursor-pointer"
-                            >
-                              <Camera size={16} />
-                              Solo con portfolio
-                            </label>
-                            {hasPortfolioFilter && filteredResults.length > 0 && (
-                              <span className="ml-auto text-xs text-purple-700">
-                                {filteredResults.length}
-                              </span>
-                            )}
-                          </div>
-
-                          {/* Ordenar por */}
-                          <div className="flex items-center gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                            <ArrowUpDown size={16} className="text-blue-900" />
-                            <label
-                              htmlFor="sortBy"
-                              className="text-sm font-medium text-blue-900 whitespace-nowrap"
-                            >
-                              Ordenar:
-                            </label>
-                            <select
-                              id="sortBy"
-                              value={sortBy}
-                              onChange={(e) => setSortBy(e.target.value)}
-                              className="px-3 py-1.5 text-sm border border-blue-300 rounded-md bg-white text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            >
-                              <option value="relevance">Relevancia</option>
-                              <option value="rating">Rating ⭐</option>
-                              <option value="price">Precio €</option>
-                              <option value="reviews">Más reseñas</option>
-                            </select>
-                          </div>
-                        </div>
-
-                        {searchHistory.length > 0 && (
-                          <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
-                            <span className="font-medium text-body">
-                              {t('suppliers.overview.exploration.recentSearches')}
-                            </span>
-                            {searchHistory.map((query) => (
-                              <button
-                                key={query}
-                                type="button"
-                                onClick={() => {
-                                  setSearchInput(query);
-                                  setSearchTerm(query);
-                                }}
-                                className="px-3 py-1.5 rounded-full border border-soft bg-surface hover:border-primary hover:text-primary hover:bg-[var(--color-primary)]/5 transition-all duration-200"
-                              >
-                                {query}
-                              </button>
-                            ))}
-                          </div>
-                        )}
-
-                        <ShortlistList
-                          items={shortlist}
-                          loading={shortlistLoading}
-                          error={shortlistError}
-                          t={t}
-                        />
-
-                        {/* Recomendaciones IA - Solo mostrar si no hay búsqueda activa */}
-                        {!aiLoading && !searchCompleted && <RecommendedSuppliers />}
-                      </div>
-                    </Card>
-                  ) : null
-                }
-              />
-            </div>
-
-            {(aiLoading || searchCompleted) && (
-              <section className="space-y-3">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div className="space-y-1">
-                    <h3 className="text-lg font-semibold text-body">
-                      {t('suppliers.overview.results.title')}
-                    </h3>
-                    {searchResultsQuery && (
-                      <p className="text-xs text-muted">
-                        {t('suppliers.overview.results.query', {
-                          value: searchResultsQuery,
-                        })}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Badges de estadísticas mejoradas */}
-                  {!aiLoading && filteredResults.length > 0 && (
-                    <div className="flex flex-wrap items-center gap-2">
-                      {/* Total de resultados */}
-                      <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
-                        📊 {filteredResults.length}{' '}
-                        {filteredResults.length === 1 ? 'resultado' : 'resultados'}
-                      </span>
-
-                      {/* Ordenamiento activo */}
-                      {sortBy !== 'relevance' && (
-                        <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-800">
-                          {sortBy === 'rating' && '⭐ Por rating'}
-                          {sortBy === 'price' && '€ Por precio'}
-                          {sortBy === 'reviews' && '💬 Por reseñas'}
-                        </span>
-                      )}
-
-                      {/* Filtro portfolio activo */}
-                      {hasPortfolioFilter && (
-                        <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-800">
-                          📷 Con portfolio
-                        </span>
-                      )}
-                    </div>
-                  )}
-                </div>
-
-                {/* Mensaje de fallback eliminado - ya no se usa */}
-
-                {aiLoading ? (
-                  <Card className="border border-soft bg-surface text-sm text-muted">
-                    {t('suppliers.overview.results.loading')}
-                  </Card>
-                ) : aiError ? (
-                  <Card className="border border-danger bg-danger-soft text-sm text-danger">
-                    {aiError?.message || t('suppliers.overview.toasts.error')}
-                  </Card>
-                ) : aiResults.length === 0 ? (
-                  <Card className="border border-dashed border-soft bg-surface/80 text-sm text-muted">
-                    {t('suppliers.overview.results.empty')}
-                  </Card>
-                ) : (
-                  <>
-                    {/* Mostrar breakdown de resultados + modo de búsqueda */}
-                    {searchBreakdown &&
-                      searchBreakdown.registered +
-                        searchBreakdown.cached +
-                        searchBreakdown.internet >
-                        0 && (
-                        <div className="mb-4 space-y-2">
-                          {/* Indicador de modo de búsqueda activo */}
-                          <div
-                            className={`p-2 border rounded-lg text-xs font-medium ${
-                              searchMode === 'database'
-                                ? 'bg-purple-50 border-purple-200 text-purple-900'
-                                : searchMode === 'internet'
-                                  ? 'bg-orange-50 border-orange-200 text-orange-900'
-                                  : 'bg-green-50 border-green-200 text-green-900'
-                            }`}
-                          >
-                            {t('suppliers.overview.searchMode.indicator', {
-                              mode:
-                                searchMode === 'database'
-                                  ? t('suppliers.overview.searchMode.database')
-                                  : searchMode === 'internet'
-                                    ? t('suppliers.overview.searchMode.internet')
-                                    : t('suppliers.overview.searchMode.auto'),
-                            })}
-                          </div>
-
-                          {/* Breakdown de resultados */}
-                          <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                            <p className="text-sm text-blue-900 font-medium">
-                              {t('suppliers.overview.breakdown.title', {
-                                total:
-                                  searchBreakdown.registered +
-                                  searchBreakdown.cached +
-                                  searchBreakdown.internet,
-                                registered: searchBreakdown.registered,
-                                cached: searchBreakdown.cached,
-                                internet: searchBreakdown.internet,
-                              })}
-                            </p>
-                          </div>
-                        </div>
-                      )}
-
-                    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                      {paginatedResults.map((supplier) => (
-                        <SupplierCard
-                          key={supplier.id || supplier.slug || Math.random()}
-                          supplier={supplier}
-                          onContact={(contactInfo) => {
-                            // contactInfo puede ser { method, supplier } o simplemente supplier
-                            const sup = contactInfo.supplier || contactInfo;
-                            trackSupplierAction(sup.id || sup.slug, 'contact', {
-                              method: contactInfo.method || 'unknown',
-                            });
-                          }}
-                          onViewDetails={(s) => {
-                            trackSupplierAction(s.id || s.slug, 'click');
-                            handleSelectSearchResult(s);
-                          }}
-                          onMarkAsConfirmed={handleMarkAsConfirmed}
-                        />
-                      ))}
-                    </div>
-
-                    {totalSearchPages > 1 && (
-                      <div className="flex items-center justify-between gap-3 pt-2">
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant="outline"
-                          onClick={handlePrevSearchPage}
-                          disabled={searchResultsPage === 1}
-                        >
-                          {t('app.previous')}
-                        </Button>
-                        <span className="text-xs text-muted">
-                          {t('suppliers.overview.pagination.label', {
-                            current: searchResultsPage,
-                            total: totalSearchPages,
-                          })}
-                        </span>
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant="outline"
-                          onClick={handleNextSearchPage}
-                          disabled={searchResultsPage === totalSearchPages}
-                        >
-                          {t('app.next')}
-                        </Button>
-                      </div>
-                    )}
-                  </>
-                )}
-              </section>
-            )}
-
-            <Modal
-              open={searchDrawerOpen}
-              onClose={() => {
-                setSearchDrawerOpen(false);
-                setSearchDrawerResult(null);
-              }}
-              title={
-                searchDrawerResult?.name
-                  ? t('suppliers.overview.drawer.titleWithName', {
-                      name: searchDrawerResult.name,
-                    })
-                  : t('suppliers.overview.drawer.title')
-              }
-              size="lg"
-            >
-              {searchDrawerResult ? (
-                <div className="space-y-4">
-                  <div className="h-48 w-full overflow-hidden rounded-lg">
-                    <img
-                      src={searchDrawerResult.image || DEFAULT_PROVIDER_IMAGE}
-                      alt={t('suppliers.overview.drawer.imageAlt', {
-                        name:
-                          searchDrawerResult.name ||
-                          t('suppliers.overview.drawer.fallbackName'),
-                      })}
-                      className="h-full w-full object-cover"
-                      onError={(event) => {
-                        event.currentTarget.src = DEFAULT_PROVIDER_IMAGE;
-                      }}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <p className="text-sm text-muted">
-                      {searchDrawerResult.service ||
-                        t('suppliers.overview.drawer.serviceUnknown')}
-                    </p>
-                    {searchDrawerResult.location && (
-                      <p className="text-sm text-muted">
-                        {t('suppliers.overview.drawer.location', {
-                          value: searchDrawerResult.location,
-                        })}
-                      </p>
-                    )}
-                    {searchDrawerResult.priceRange && (
-                      <p className="text-sm text-muted">
-                        {t('suppliers.overview.drawer.priceRange', {
-                          value: searchDrawerResult.priceRange,
-                        })}
-                      </p>
-                    )}
-                    {searchDrawerResult.aiSummary && (
-                      <p className="text-sm text-body/75">{searchDrawerResult.aiSummary}</p>
-                    )}
-                    {searchDrawerResult.snippet && (
-                      <p className="text-sm text-body/75">{searchDrawerResult.snippet}</p>
-                    )}
-                    <div className="flex flex-wrap gap-2 pt-1">
-                      {Array.isArray(searchDrawerResult.tags) &&
-                        searchDrawerResult.tags.slice(0, 8).map((tag) => (
-                          <span
-                            key={tag}
-                            className="rounded-full border border-soft bg-surface px-2 py-0.5 text-xs text-muted"
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                    </div>
-                  </div>
-
-                  <div className="space-y-1 text-sm text-muted">
-                    {searchDrawerResult.email && (
-                      <p>
-                        {t('suppliers.overview.drawer.email', {
-                          value: searchDrawerResult.email,
-                        })}
-                      </p>
-                    )}
-                    {searchDrawerResult.phone && (
-                      <p>
-                        {t('suppliers.overview.drawer.phone', {
-                          value: searchDrawerResult.phone,
-                        })}
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="flex justify-end gap-2">
-                    {searchDrawerResult.link && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() =>
-                          window.open(searchDrawerResult.link, '_blank', 'noopener,noreferrer')
-                        }
-                      >
-                        {t('suppliers.overview.drawer.openLink')}
-                      </Button>
-                    )}
-                    <Button type="button" onClick={() => setSearchDrawerOpen(false)}>
-                      {t('app.close')}
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <Card className="border border-soft bg-surface text-sm text-muted">
-                  {t('suppliers.overview.drawer.empty')}
-                </Card>
-              )}
-            </Modal>
-          </>
+          <SearchTabContent
+            searchInput={searchInput}
+            setSearchInput={setSearchInput}
+            handleSearchSubmit={handleSearchSubmit}
+            handleClearSearch={handleClearSearch}
+            onOpenFilters={() => setShowFiltersModal(true)}
+            activeFiltersCount={activeFiltersCount}
+            aiLoading={aiLoading}
+            aiError={aiError}
+            searchCompleted={searchCompleted}
+            filteredResults={filteredResults}
+            paginatedResults={paginatedResults}
+            searchResultsPage={searchResultsPage}
+            totalSearchPages={totalSearchPages}
+            handlePrevSearchPage={handlePrevSearchPage}
+            handleNextSearchPage={handleNextSearchPage}
+            sortBy={sortBy}
+            setSortBy={setSortBy}
+            viewMode={viewMode}
+            setViewMode={setViewMode}
+            onViewDetails={handleSelectSearchResult}
+            onContact={(contactInfo) => {
+              const sup = contactInfo.supplier || contactInfo;
+              trackSupplierAction(sup.id || sup.slug, 'contact', {
+                method: contactInfo.method || 'unknown',
+              });
+            }}
+            onMarkAsConfirmed={handleMarkAsConfirmed}
+            t={t}
+          />
         )}
+
+        {/* Modal de Filtros Avanzados */}
+        <AdvancedFiltersModal
+          open={showFiltersModal}
+          onClose={() => setShowFiltersModal(false)}
+          onApply={handleApplyFilters}
+          initialFilters={advancedFilters}
+        />
       </PageWrapper>
 
       <ServiceOptionsModal

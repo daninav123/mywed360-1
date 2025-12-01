@@ -1,4 +1,4 @@
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 
 const TAVILY_API_KEY =
   process.env.TAVILY_API_KEY || process.env.VITE_TAVILY_API_KEY || process.env.SEARCH_API_KEY || '';
@@ -103,16 +103,23 @@ export async function researchTopic({
     };
   } catch (error) {
     if (timeoutHandle) clearTimeout(timeoutHandle);
+    const errorMsg = error?.message || String(error);
+    const errorCode = error?.code || error?.status || 'unknown';
+
     if (supportsAbort && error?.name === 'AbortError') {
       logger.error('[blogResearch] Tavily request timed out after %dms', timeoutMs);
     } else {
-      logger.error('[blogResearch] Tavily research failed:', error?.message || error);
+      logger.error('[blogResearch] Tavily research failed:', {
+        message: errorMsg,
+        code: errorCode,
+        type: error?.constructor?.name,
+      });
     }
     return {
       provider: 'tavily-error',
       summary: '',
       references: [],
-      raw: { error: error?.message || 'unknown-error' },
+      raw: { error: errorMsg, code: errorCode },
     };
   }
 }

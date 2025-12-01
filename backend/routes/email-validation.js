@@ -4,22 +4,26 @@
 
 import express from 'express';
 import { sendSuccess, sendError, sendValidationError } from '../utils/apiResponse.js';
-import { 
-  validateEmailConfiguration, 
+import {
+  validateEmailConfiguration,
   sendTestEmail,
   validateSPF,
   validateDKIM,
-  validateDMARC
+  validateDMARC,
 } from '../services/emailValidationService.js';
 import { z } from 'zod';
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 
 const router = express.Router();
 
 // Validación de schema para dominio
 const validateDomainSchema = z.object({
-  domain: z.string().min(3).max(255).regex(/^[a-z0-9.-]+\.[a-z]{2,}$/i, 'Formato de dominio inválido'),
-  dkimSelector: z.string().min(1).max(50).optional().default('k1')
+  domain: z
+    .string()
+    .min(3)
+    .max(255)
+    .regex(/^[a-z0-9.-]+\.[a-z]{2,}$/i, 'Formato de dominio inválido'),
+  dkimSelector: z.string().min(1).max(50).optional().default('k1'),
 });
 
 /**
@@ -71,11 +75,13 @@ router.post('/validate-spf', async (req, res) => {
  */
 router.post('/validate-dkim', async (req, res) => {
   try {
-    const parsed = z.object({
-      domain: z.string().min(3),
-      selector: z.string().optional().default('k1')
-    }).safeParse(req.body);
-    
+    const parsed = z
+      .object({
+        domain: z.string().min(3),
+        selector: z.string().optional().default('k1'),
+      })
+      .safeParse(req.body);
+
     if (!parsed.success) {
       return sendValidationError(req, res, parsed.error.errors);
     }
@@ -116,7 +122,7 @@ router.post('/send-test', async (req, res) => {
   try {
     const schema = z.object({
       from: z.string().email(),
-      to: z.string().email()
+      to: z.string().email(),
     });
 
     const parsed = schema.safeParse(req.body);
@@ -128,7 +134,7 @@ router.post('/send-test', async (req, res) => {
 
     // Obtener cliente de Mailgun del contexto (debe estar configurado en index.js)
     const mailgunClient = req.app.get('mailgunClient');
-    
+
     if (!mailgunClient) {
       return sendError(
         req,
@@ -148,7 +154,7 @@ router.post('/send-test', async (req, res) => {
     return sendSuccess(req, res, {
       sent: true,
       messageId: result.messageId,
-      message: 'Email de prueba enviado correctamente'
+      message: 'Email de prueba enviado correctamente',
     });
   } catch (error) {
     logger.error('Error in send-test:', error);

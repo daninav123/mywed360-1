@@ -1,6 +1,6 @@
 import express from 'express';
 import admin from 'firebase-admin';
-import logger from '../logger.js';
+import logger from '../utils/logger.js';
 
 if (!admin.apps.length) {
   try {
@@ -37,7 +37,8 @@ async function buildPublicPayload(weddingId, includeHtml = true) {
   if (!publicCfg.enabled) return { error: 'not_public' };
   try {
     const expiresAt = publicCfg.expiresAt?.toMillis?.() || publicCfg.expiresAt || null;
-    if (publicCfg.isDefaultSlug && expiresAt && Date.now() > Number(expiresAt)) return { error: 'expired' };
+    if (publicCfg.isDefaultSlug && expiresAt && Date.now() > Number(expiresAt))
+      return { error: 'expired' };
   } catch {}
 
   let weddingInfo = {};
@@ -50,7 +51,8 @@ async function buildPublicPayload(weddingId, includeHtml = true) {
     id: docSnap.id,
     name: wedding.name || weddingInfo.brideAndGroom || weddingInfo.coupleName || '',
     date: wedding.date || wedding.weddingDate || weddingInfo.weddingDate || weddingInfo.date || '',
-    location: wedding.location || weddingInfo.celebrationPlace || weddingInfo.ceremonyLocation || '',
+    location:
+      wedding.location || weddingInfo.celebrationPlace || weddingInfo.ceremonyLocation || '',
     story: weddingInfo.story || wedding.story || '',
   };
 
@@ -68,28 +70,32 @@ async function buildPublicPayload(weddingId, includeHtml = true) {
   if (sections.showTimeline) {
     try {
       const tlSnap = await ref.collection('timeline').get();
-      result.timeline = tlSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+      result.timeline = tlSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
     } catch {}
   }
   if (sections.showGallery) {
     try {
       const gSnap = await ref.collection('gallery').get();
-      result.gallery = gSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+      result.gallery = gSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
     } catch {}
   }
   if (sections.showVendors) {
     try {
       const sSnap = await ref.collection('suppliers').get();
-      result.suppliers = sSnap.docs.map(d => {
+      result.suppliers = sSnap.docs.map((d) => {
         const s = d.data() || {};
-        return { id: d.id, name: s.name || s.displayName || '', category: s.category || s.type || '' };
+        return {
+          id: d.id,
+          name: s.name || s.displayName || '',
+          category: s.category || s.type || '',
+        };
       });
     } catch {}
   }
   if (sections.showGuests) {
     try {
       const gSnap = await ref.collection('guests').get();
-      result.guests = gSnap.docs.map(d => {
+      result.guests = gSnap.docs.map((d) => {
         const g = d.data() || {};
         return { id: d.id, name: g.name || g.nombre || '', status: g.status || 'pending' };
       });
@@ -116,8 +122,9 @@ function renderHtmlFromPayload(payload) {
   const gallery = payload?.gallery || [];
   const title = w.name || 'Nuestra Boda';
   const subtitle = [w.date, w.location].filter(Boolean).join(' � ');
-  const esc = (s) => String(s || '').replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
-  return (`<!doctype html>
+  const esc = (s) =>
+    String(s || '').replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]);
+  return `<!doctype html>
 <html lang="es">
 <head>
   <meta charset="utf-8" />
@@ -157,20 +164,32 @@ function renderHtmlFromPayload(payload) {
 
   ${w.story ? `<section class="wrap"><h2>Nuestra Historia</h2><p class="muted" style="white-space:pre-line">${esc(w.story)}</p></section>` : ''}
 
-  ${timeline.length ? `<section class="wrap"><h2>Programa</h2>
-    <div class="card">${timeline.map(t=>`<div style="display:flex;gap:12px;align-items:flex-start;margin:8px 0">
-      <div style="width:90px;color:var(--muted);font-size:14px">${esc(t.time||t.hour||'')}</div>
-      <div><div style="font-weight:600">${esc(t.label||t.title||'')}</div>
-      ${t.desc?`<div class="muted" style="font-size:14px">${esc(t.desc)}</div>`:''}</div></div>`).join('')}</div>
-  </section>` : ''}
+  ${
+    timeline.length
+      ? `<section class="wrap"><h2>Programa</h2>
+    <div class="card">${timeline
+      .map(
+        (t) => `<div style="display:flex;gap:12px;align-items:flex-start;margin:8px 0">
+      <div style="width:90px;color:var(--muted);font-size:14px">${esc(t.time || t.hour || '')}</div>
+      <div><div style="font-weight:600">${esc(t.label || t.title || '')}</div>
+      ${t.desc ? `<div class="muted" style="font-size:14px">${esc(t.desc)}</div>` : ''}</div></div>`
+      )
+      .join('')}</div>
+  </section>`
+      : ''
+  }
 
-  ${gallery.length ? `<section class="wrap"><h2>Galer�a</h2>
-    <div class="grid">${gallery.map(g=>`<img src="${esc(g.url||g.src||'')}" alt="Foto"/>`).join('')}</div>
-  </section>` : ''}
+  ${
+    gallery.length
+      ? `<section class="wrap"><h2>Galer�a</h2>
+    <div class="grid">${gallery.map((g) => `<img src="${esc(g.url || g.src || '')}" alt="Foto"/>`).join('')}</div>
+  </section>`
+      : ''
+  }
 
-  <footer>� ${new Date().getFullYear()} ${esc(w.name||'')}</footer>
+  <footer>� ${new Date().getFullYear()} ${esc(w.name || '')}</footer>
 </body>
-</html>`);
+</html>`;
 }
 
 async function getHtmlForWeddingIdOrSlug(idOrSlug) {
@@ -249,19 +268,48 @@ router.post('/:weddingId/publish', async (req, res) => {
       slug = String(slug).toLowerCase().trim();
       const valid = /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(slug);
       if (!valid) return res.status(400).json({ error: 'slug-invalid' });
-      const excluded = (process.env.PUBLIC_SITES_EXCLUDED_SUBDOMAINS || 'www,api,mail,mg,cdn,static,assets,admin').split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
+      const excluded = (
+        process.env.PUBLIC_SITES_EXCLUDED_SUBDOMAINS || 'www,api,mail,mg,cdn,static,assets,admin'
+      )
+        .split(',')
+        .map((s) => s.trim().toLowerCase())
+        .filter(Boolean);
       if (excluded.includes(slug)) return res.status(400).json({ error: 'slug-reserved' });
       const q = await db.collection('weddings').where('publicSite.slug', '==', slug).limit(1).get();
-      if (!q.empty && q.docs[0].id !== weddingId) return res.status(409).json({ error: 'slug-taken' });
+      if (!q.empty && q.docs[0].id !== weddingId)
+        return res.status(409).json({ error: 'slug-taken' });
     }
 
     const infoSnap = await ref.collection('weddingInfo').limit(1).get();
-    const info = !infoSnap.empty ? (infoSnap.docs[0].data() || {}) : {};
-    const toSlug = s => String(s||'').toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
-    const first = s => String(s||'').trim().split(/\s+/)[0] || '';
-    const fmt = d => { try{ const dt=new Date(d); return `${dt.getFullYear()}${String(dt.getMonth()+1).padStart(2,'0')}${String(dt.getDate()).padStart(2,'0')}` }catch{ return '' } };
+    const info = !infoSnap.empty ? infoSnap.docs[0].data() || {} : {};
+    const toSlug = (s) =>
+      String(s || '')
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/\p{Diacritic}/gu, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+    const first = (s) =>
+      String(s || '')
+        .trim()
+        .split(/\s+/)[0] || '';
+    const fmt = (d) => {
+      try {
+        const dt = new Date(d);
+        return `${dt.getFullYear()}${String(dt.getMonth() + 1).padStart(2, '0')}${String(dt.getDate()).padStart(2, '0')}`;
+      } catch {
+        return '';
+      }
+    };
     const eventDateRaw = data.weddingDate || data.date || info.weddingDate || info.date || null;
-    const suggested = [toSlug(first(info?.brideInfo?.nombre || info?.brideName || info?.bride)), toSlug(first(info?.groomInfo?.nombre || info?.groomName || info?.groom)), fmt(eventDateRaw || Date.now())].filter(Boolean).join('-') || weddingId;
+    const suggested =
+      [
+        toSlug(first(info?.brideInfo?.nombre || info?.brideName || info?.bride)),
+        toSlug(first(info?.groomInfo?.nombre || info?.groomName || info?.groom)),
+        fmt(eventDateRaw || Date.now()),
+      ]
+        .filter(Boolean)
+        .join('-') || weddingId;
 
     let isDefaultSlug = false;
     if (!slug) {
@@ -271,10 +319,15 @@ router.post('/:weddingId/publish', async (req, res) => {
       isDefaultSlug = true;
     }
 
-    const excluded = (process.env.PUBLIC_SITES_EXCLUDED_SUBDOMAINS || 'www,api,mail,mg,cdn,static,assets,admin').split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
-    if (excluded.includes(slug)) slug = `${slug}-${weddingId.slice(0,6)}`;
+    const excluded = (
+      process.env.PUBLIC_SITES_EXCLUDED_SUBDOMAINS || 'www,api,mail,mg,cdn,static,assets,admin'
+    )
+      .split(',')
+      .map((s) => s.trim().toLowerCase())
+      .filter(Boolean);
+    if (excluded.includes(slug)) slug = `${slug}-${weddingId.slice(0, 6)}`;
     const q2 = await db.collection('weddings').where('publicSite.slug', '==', slug).limit(1).get();
-    if (!q2.empty && q2.docs[0].id !== weddingId) slug = `${slug}-${weddingId.slice(0,6)}`;
+    if (!q2.empty && q2.docs[0].id !== weddingId) slug = `${slug}-${weddingId.slice(0, 6)}`;
 
     let expiresAt = null;
     try {
@@ -304,7 +357,8 @@ router.post('/:weddingId/publish', async (req, res) => {
 
     const path = `/p/${slug || weddingId}`;
     const baseDomain = process.env.PUBLIC_SITES_BASE_DOMAIN || '';
-    const publicUrl = baseDomain && (slug || weddingId) ? `https://${(slug || weddingId)}.${baseDomain}` : null;
+    const publicUrl =
+      baseDomain && (slug || weddingId) ? `https://${slug || weddingId}.${baseDomain}` : null;
     return res.json({ ok: true, publicPath: path, publicUrl, suggested });
   } catch (err) {
     logger.error('public-wedding:publish', err);

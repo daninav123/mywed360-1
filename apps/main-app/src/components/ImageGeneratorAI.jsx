@@ -131,30 +131,9 @@ const ImageGeneratorAI = ({
           }
         }
       } catch (err) {
-        // console.warn('Proxy AI-image no disponible, usando OpenAI directo:', err);
+        // Si falla el proxy, propagar el error
+        throw new Error('Servicio de generación de imágenes no disponible. Intenta más tarde.');
       }
-
-      // 2) Fallback directo a OpenAI (si estҬ)�) �)"Ҭ)a�)� habilitado)
-      const allowDirect =
-        import.meta.env.VITE_ENABLE_DIRECT_OPENAI === 'true' || import.meta.env.DEV;
-      if (!allowDirect) throw new Error('OpenAI directo deshabilitado por configuraciҬ)�) �)"Ҭ)a�)�n');
-
-      const response = await fetch('https://api.openai.com/v1/images/generations', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`,
-        },
-        body: JSON.stringify({ model: 'dall-e-3', prompt, n: 1, size: '1024x1024', quality: 'hd' }),
-      });
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error?.message || 'Error al generar la imagen');
-      }
-      const data = await response.json();
-      const url = data?.data?.[0]?.url;
-      if (!url) throw new Error('No se recibiҬ)�) �)"Ҭ)a�)� URL de imagen');
-      handleImageGenerated(url);
     } catch (err) {
       // console.error('Error al generar imagen:', err);
       setError(err.message || 'Error al generar la imagen');
@@ -474,5 +453,3 @@ const ImageGeneratorAI = ({
 };
 
 export default ImageGeneratorAI;
-
-

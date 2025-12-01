@@ -8,13 +8,24 @@ async function loadPinterestScraper() {
   if (pinterestSearchPins !== null) return pinterestSearchPins;
   try {
     const mod = await import('@myno_21/pinterest-scraper');
-    pinterestSearchPins = mod.searchPins || (mod.default && mod.default.searchPins);
+
+    // Intentar diferentes formas de acceder a searchPins según estructura de la librería
+    pinterestSearchPins =
+      mod.searchPins || // Named export directo
+      mod.default?.searchPins || // Default export con searchPins
+      mod.default || // Default export que es la función directamente
+      (typeof mod === 'function' ? mod : null); // Módulo es la función
+
     if (typeof pinterestSearchPins !== 'function') {
-      console.warn('Pinterest scraper no expone searchPins; deshabilitado');
+      console.warn(
+        '[instagram-wall] Pinterest scraper no expone searchPins; usando fallback a Unsplash'
+      );
       pinterestSearchPins = async () => [];
+    } else {
+      console.log('[instagram-wall] Pinterest scraper cargado correctamente');
     }
   } catch (err) {
-    console.warn('Pinterest scraper no disponible:', err.message);
+    console.warn('[instagram-wall] Pinterest scraper no disponible, usando fallback:', err.message);
     pinterestSearchPins = async () => [];
   }
   return pinterestSearchPins;
@@ -36,28 +47,39 @@ const PINTEREST_TOKEN = process.env.PINTEREST_TOKEN || process.env.VITE_PINTERES
 
 // Mapeo simple de palabras clave a categorías
 const KEYWORD_MAP = {
-  ceremonia: ['ceremony','altar','vows','ceremonia','boda','arco'],
-  decoración: ['decor','decoración','centerpiece','mesa','table','floral','flor','ornament'],
-  cóctel: ['cocktail','drinks','bar','cóctel'],
-  banquete: ['reception','banquet','cena','dinner','banquete'],
-  disco: ['dance','disco','party','baile'],
-  flores: ['flower','flor','bouquet','ramo'],
-  vestido: ['dress','vestido','gown','traje'],
-  pastel: ['cake','pastel','tarta'],
-  fotografía: ['photo','fotografía','camera','fotógrafo'],
+  ceremonia: ['ceremony', 'altar', 'vows', 'ceremonia', 'boda', 'arco'],
+  decoración: ['decor', 'decoración', 'centerpiece', 'mesa', 'table', 'floral', 'flor', 'ornament'],
+  cóctel: ['cocktail', 'drinks', 'bar', 'cóctel'],
+  banquete: ['reception', 'banquet', 'cena', 'dinner', 'banquete'],
+  disco: ['dance', 'disco', 'party', 'baile'],
+  flores: ['flower', 'flor', 'bouquet', 'ramo'],
+  vestido: ['dress', 'vestido', 'gown', 'traje'],
+  pastel: ['cake', 'pastel', 'tarta'],
+  fotografía: ['photo', 'fotografía', 'camera', 'fotógrafo'],
 };
 
-function inferCategory(text=''){
+function inferCategory(text = '') {
   const lower = text.toLowerCase();
-  for(const [cat,keywords] of Object.entries(KEYWORD_MAP)){
-    if(keywords.some(k=> lower.includes(k))) return cat;
+  for (const [cat, keywords] of Object.entries(KEYWORD_MAP)) {
+    if (keywords.some((k) => lower.includes(k))) return cat;
   }
   return 'inspiration';
 }
 
 function picsumPlaceholders(page = 1, query = 'wedding', count = 15) {
   const start = (page - 1) * count;
-  const BASE_TAGS = ['ceremonia','decoración','cóctel','banquete','disco','flores','vestido','pastel','fotografía','inspiration'];
+  const BASE_TAGS = [
+    'ceremonia',
+    'decoración',
+    'cóctel',
+    'banquete',
+    'disco',
+    'flores',
+    'vestido',
+    'pastel',
+    'fotografía',
+    'inspiration',
+  ];
   return Array.from({ length: count }, (_, idx) => {
     const id = start + idx;
     const url = `https://picsum.photos/seed/${encodeURIComponent(query)}-${id}/800/600`;
@@ -69,11 +91,10 @@ function picsumPlaceholders(page = 1, query = 'wedding', count = 15) {
       like_count: 0,
       comments_count: 0,
       provider: 'picsum',
-      categories: [BASE_TAGS[(start+idx)%BASE_TAGS.length]],
+      categories: [BASE_TAGS[(start + idx) % BASE_TAGS.length]],
     };
   });
 }
-
 
 async function discoverUnsplash(page = 1, query = 'wedding') {
   // Si no hay clave, intentar endpoint público no autenticado de Unsplash
@@ -82,13 +103,13 @@ async function discoverUnsplash(page = 1, query = 'wedding') {
       const { data } = await axios.get('https://unsplash.com/napi/search/photos', {
         params: { query, page, per_page: 15 },
         headers: {
-          'User-Agent': 'Mozilla/5.0 (myWed360 dev)'
+          'User-Agent': 'Mozilla/5.0 (myWed360 dev)',
         },
         timeout: 10000,
       });
-      const results = (data?.results || data?.photos?.results || []);
-      if(results.length){
-        return results.map((img)=>({
+      const results = data?.results || data?.photos?.results || [];
+      if (results.length) {
+        return results.map((img) => ({
           id: `unsplash_${img.id}`,
           permalink: `https://unsplash.com/photos/${img.id}`,
           media_url: img.urls?.regular || img.urls?.small,
@@ -98,7 +119,7 @@ async function discoverUnsplash(page = 1, query = 'wedding') {
           provider: 'unsplash_public',
         }));
       }
-    } catch(err){
+    } catch (err) {
       console.warn('Unsplash public endpoint error', err.message);
     }
     // Si sigue fallando, usar Picsum
@@ -148,19 +169,22 @@ async function discoverPexels(page = 1, query = 'wedding') {
 
 async function discoverPinterest(page = 1, query = 'wedding') {
   // Si hay token, usa API oficial v5
-  if(PINTEREST_TOKEN){
-    try{
-      const { data } = await axios.get('https://api.pinterest.com/v5/search/pins',{
-        headers:{ Authorization:`Bearer ${PINTEREST_TOKEN}` },
-        params:{ query, page_size: 15 },
+  if (PINTEREST_TOKEN) {
+    try {
+      const { data } = await axios.get('https://api.pinterest.com/v5/search/pins', {
+        headers: { Authorization: `Bearer ${PINTEREST_TOKEN}` },
+        params: { query, page_size: 15 },
         timeout: 10000,
       });
       const items = data.items || data.data || [];
-      return items.map((pin,idx)=>{
+      return items.map((pin, idx) => {
         const catMeta = pin.board?.category || pin.rich_metadata?.aggregated_pin_data?.category;
         const desc = pin.title || pin.description || pin.rich_metadata?.description || '';
         const category = catMeta || inferCategory(desc);
-        const imgUrl = pin.media?.images?.originals?.url || pin.images?.originals?.url || pin.media?.images?.original?.url;
+        const imgUrl =
+          pin.media?.images?.originals?.url ||
+          pin.images?.originals?.url ||
+          pin.media?.images?.original?.url;
         return {
           id: `pinterest_${pin.id}`,
           permalink: pin.link || pin.url || `https://www.pinterest.com/pin/${pin.id}`,
@@ -173,7 +197,7 @@ async function discoverPinterest(page = 1, query = 'wedding') {
           description: desc,
         };
       });
-    }catch(err){
+    } catch (err) {
       console.error('Pinterest API error', err.response?.data || err.message);
       // fallback a scraper
     }
@@ -218,23 +242,25 @@ router.post('/', async (req, res) => {
     const { page = 1, query = 'wedding' } = req.body || {};
     // Mapeo de categorías a consultas más descriptivas de bodas
     const CATEGORY_QUERY_MAP = {
-      'decoración': 'wedding decor ideas wedding decoration',
-      'cóctel': 'wedding cocktail hour drinks',
-      'banquete': 'wedding reception banquet',
-      'ceremonia': 'wedding ceremony ideas',
-      'disco': 'wedding dance floor',
-      'flores': 'wedding flowers bouquet',
-      'vestido': 'wedding dress bridal gown',
-      'pastel': 'wedding cake ideas',
-      'fotografía': 'wedding photography ideas',
-      'inspiration': 'wedding inspiration ideas'
+      decoración: 'wedding decor ideas wedding decoration',
+      cóctel: 'wedding cocktail hour drinks',
+      banquete: 'wedding reception banquet',
+      ceremonia: 'wedding ceremony ideas',
+      disco: 'wedding dance floor',
+      flores: 'wedding flowers bouquet',
+      vestido: 'wedding dress bridal gown',
+      pastel: 'wedding cake ideas',
+      fotografía: 'wedding photography ideas',
+      inspiration: 'wedding inspiration ideas',
     };
 
     const baseKeywords = CATEGORY_QUERY_MAP[(query || '').toLowerCase()] || query;
     // Aseguramos temática boda
-    const searchQuery = /\b(boda|wedding)\b/i.test(baseKeywords) ? baseKeywords : `${baseKeywords} boda wedding`;
+    const searchQuery = /\b(boda|wedding)\b/i.test(baseKeywords)
+      ? baseKeywords
+      : `${baseKeywords} boda wedding`;
     // Aseguramos que la búsqueda siempre sea temática de bodas
-    
+
     const cacheKey = `${searchQuery}_${page}`;
     if (cache.has(cacheKey)) {
       const cached = cache.get(cacheKey);
@@ -278,17 +304,18 @@ router.post('/', async (req, res) => {
     }
 
     // --- Nueva lógica de filtrado nupcial ligero ---
-    const WEDDING_RE = /(wedding|boda|bridal|bride|groom|novia|novio|ceremony|reception|matrimonio|casamiento)/i;
-    const prelim = posts.filter((p)=>{
-      const text = `${p.description||''} ${p.alt||''} ${p.permalink||''}`.toLowerCase();
+    const WEDDING_RE =
+      /(wedding|boda|bridal|bride|groom|novia|novio|ceremony|reception|matrimonio|casamiento)/i;
+    const prelim = posts.filter((p) => {
+      const text = `${p.description || ''} ${p.alt || ''} ${p.permalink || ''}`.toLowerCase();
       return WEDDING_RE.test(text);
     });
     // Si el filtrado deja muy pocos resultados (<8), relajamos la restricción y usamos la lista original
     posts = prelim.length >= 8 ? prelim : posts;
 
     // Asignar categoría inferida si falta, se usa para mostrar badge en frontend
-    posts = posts.map((p)=>{
-      if(!p.categories || p.categories.length===0){
+    posts = posts.map((p) => {
+      if (!p.categories || p.categories.length === 0) {
         const cat = inferCategory(p.description || p.alt || p.permalink || '');
         p.categories = [cat];
       }
