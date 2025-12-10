@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Editor, Frame, Element, useEditor } from '@craftjs/core';
 import '../styles/craft-canvas-background.css';
+import '../styles/hide-craft-dev-tools.css';
 import { Toolbox } from '../components/web/craft/Toolbox';
 import { SettingsPanel } from '../components/web/craft/SettingsPanel';
 import { CraftHeroSection } from '../components/web/craft/CraftHeroSection';
@@ -72,72 +73,79 @@ const EditorHeader = ({
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          {/* Selector de tema */}
-          <ThemeSelector temaActual={tema} onTemaChange={onTemaChange} />
+        <div className="flex items-center gap-4">
+          {/* Grupo 1: Tema y Estilos */}
+          <div className="flex items-center gap-2 pr-4 border-r border-gray-300">
+            <ThemeSelector temaActual={tema} onTemaChange={onTemaChange} />
+            <button
+              onClick={onMostrarEstilos}
+              className="px-3 py-2 bg-purple-50 border border-purple-300 text-purple-700 rounded-lg hover:bg-purple-100 transition-colors text-sm font-medium"
+              title="Personalizar colores, fuentes y decoraciones"
+            >
+              ✨ Estilos
+            </button>
+          </div>
 
-          {/* Botón personalizar */}
-          <button
-            onClick={onMostrarEstilos}
-            className="px-4 py-2 bg-white border-2 border-purple-300 text-purple-700 rounded-lg hover:bg-purple-50 transition-colors font-semibold"
-          >
-            ✨ Personalizar
-          </button>
-
-          {/* Botón Vista Previa */}
-          <button
-            onClick={() =>
-              window.open(
-                `/preview-web?webId=${new URLSearchParams(window.location.search).get('webId')}`,
-                '_blank'
-              )
-            }
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-semibold flex items-center gap-2"
-            title="Ver vista previa de la web con todos los estilos aplicados"
-          >
-            👁️ Vista Previa
-          </button>
-
-          {/* Toggle edición */}
-          <button
-            onClick={() => setEnabled(!enabled)}
-            className={`
-              px-4 py-2 rounded-lg font-semibold transition-colors
-              ${
-                enabled
-                  ? 'bg-green-100 text-green-700 border-2 border-green-300'
-                  : 'bg-gray-100 text-gray-700 border-2 border-gray-300'
+          {/* Grupo 2: Vista */}
+          <div className="flex items-center gap-2 pr-4 border-r border-gray-300">
+            <button
+              onClick={() =>
+                window.open(
+                  `/preview-web?webId=${new URLSearchParams(window.location.search).get('webId')}`,
+                  '_blank'
+                )
               }
-            `}
-          >
-            {enabled ? '✏️ Editando' : '🔒 Bloqueado'}
-          </button>
+              className="px-3 py-2 bg-blue-50 border border-blue-300 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors text-sm font-medium"
+              title="Ver vista previa de la web"
+            >
+              👁️ Previa
+            </button>
+            <button
+              onClick={() => setEnabled(!enabled)}
+              className={`
+                px-3 py-2 rounded-lg text-sm font-medium transition-colors border
+                ${
+                  enabled
+                    ? 'bg-green-50 text-green-700 border-green-300 hover:bg-green-100'
+                    : 'bg-gray-50 text-gray-600 border-gray-300 hover:bg-gray-100'
+                }
+              `}
+              title={enabled ? 'Desactivar edición' : 'Activar edición'}
+            >
+              {enabled ? '✏️ Editando' : '🔒 Bloqueado'}
+            </button>
+          </div>
 
-          <button
-            onClick={onSave}
-            disabled={guardando}
-            className={`
-              px-4 py-2 rounded-lg font-semibold transition-colors
-              ${
-                guardando
-                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : 'bg-green-500 text-white hover:bg-green-600'
-              }
-            `}
-          >
-            {guardando ? '⏳ Guardando...' : '💾 Guardar'}
-          </button>
+          {/* Grupo 3: Acciones */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={onSave}
+              disabled={guardando}
+              className={`
+                px-4 py-2 rounded-lg text-sm font-semibold transition-colors
+                ${
+                  guardando
+                    ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                    : 'bg-green-500 text-white hover:bg-green-600 shadow-sm'
+                }
+              `}
+              title="Guardar cambios"
+            >
+              {guardando ? '⏳ Guardando...' : '💾 Guardar'}
+            </button>
 
-          {ultimoGuardado && (
-            <span className="text-xs text-gray-500">Guardado {ultimoGuardado}</span>
-          )}
+            {ultimoGuardado && (
+              <span className="text-xs text-gray-500 whitespace-nowrap">{ultimoGuardado}</span>
+            )}
 
-          <button
-            onClick={onPublish}
-            className="px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:shadow-lg transition-all font-bold"
-          >
-            ✨ Publicar
-          </button>
+            <button
+              onClick={onPublish}
+              className="px-5 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:shadow-lg transition-all text-sm font-bold"
+              title="Publicar web para que los invitados la vean"
+            >
+              ✨ Publicar
+            </button>
+          </div>
         </div>
       </div>
     </header>
