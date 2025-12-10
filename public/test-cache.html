@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Caché - Timestamp</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #00ff00;
+        }
+        h1 {
+            text-align: center;
+            border-bottom: 2px solid #00ff00;
+            padding-bottom: 10px;
+        }
+        .info {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 1px solid #00ff00;
+        }
+        .timestamp {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffff00;
+            text-align: center;
+            padding: 20px;
+            background: #333;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .instructions {
+            background: #2a2a2a;
+            padding: 15px;
+            border-left: 4px solid #ff6600;
+            margin: 10px 0;
+        }
+        button {
+            background: #00ff00;
+            color: #000;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            width: 100%;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        button:hover {
+            background: #00cc00;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 TEST DE CACHÉ DEL NAVEGADOR</h1>
+    
+    <div class="timestamp" id="timestamp">
+        Cargando...
+    </div>
+
+    <div class="info">
+        <h3>📋 Estado Actual:</h3>
+        <p><strong>Servidor compilado:</strong> <span id="serverTime">2025-12-01 14:53:22 UTC+01:00</span></p>
+        <p><strong>Archivo corregido:</strong> ✅ DisenoWeb.jsx línea 1651 (sin variable 'mode')</p>
+        <p><strong>Tu navegador cargó esta página:</strong> <span id="loadTime"></span></p>
+    </div>
+
+    <div class="instructions">
+        <h3>⚠️ SI ESTE TIMESTAMP ES ANTERIOR A 14:53:22</h3>
+        <p>Tu navegador está usando caché antiguo. Sigue estos pasos:</p>
+    </div>
+
+    <button onclick="clearAndReload()">🧹 LIMPIAR CACHÉ Y RECARGAR</button>
+    <button onclick="location.href='/'">🏠 IR A LA APLICACIÓN</button>
+
+    <div class="info">
+        <h3>🔧 Pasos Manuales (si el botón no funciona):</h3>
+        <ol>
+            <li><strong>Cierra TODAS las pestañas</strong> de localhost:5173</li>
+            <li><strong>Cierra el navegador completamente</strong> (Cmd+Q en Mac, Alt+F4 en Windows)</li>
+            <li><strong>Abre el navegador de nuevo</strong></li>
+            <li><strong>Ve a Configuración del navegador</strong></li>
+            <li><strong>Busca "Borrar datos de navegación"</strong></li>
+            <li>Selecciona <strong>SOLO "Caché"</strong> y <strong>"Última hora"</strong></li>
+            <li>Click en <strong>"Borrar datos"</strong></li>
+            <li>Visita <code>http://localhost:5173</code></li>
+        </ol>
+    </div>
+
+    <script>
+        const now = new Date();
+        const timestamp = now.toLocaleString('es-ES', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+        });
+        
+        document.getElementById('timestamp').textContent = timestamp;
+        document.getElementById('loadTime').textContent = timestamp;
+
+        async function clearAndReload() {
+            console.log('🧹 Iniciando limpieza...');
+            
+            // Limpiar Service Workers
+            if ('serviceWorker' in navigator) {
+                const registrations = await navigator.serviceWorker.getRegistrations();
+                for (const registration of registrations) {
+                    await registration.unregister();
+                }
+                console.log('✅ Service workers limpiados');
+            }
+
+            // Limpiar Caches
+            if ('caches' in window) {
+                const cacheNames = await caches.keys();
+                await Promise.all(cacheNames.map(name => caches.delete(name)));
+                console.log('✅ Caches limpiados');
+            }
+
+            alert('✅ Caché limpiado. La página se recargará ahora.\n\nDespués de la recarga, cierra TODAS las pestañas y el navegador completamente, luego ábrelo de nuevo.');
+            
+            // Recargar con timestamp para evitar caché
+            window.location.href = '/?nocache=' + Date.now();
+        }
+
+        // Verificar si hay diferencia de tiempo
+        const serverTime = new Date('2025-12-01T14:53:22');
+        const diff = (now - serverTime) / 1000 / 60; // diferencia en minutos
+
+        if (diff > 5) {
+            console.warn('⚠️ Tu navegador puede estar usando caché antiguo');
+        }
+    </script>
+</body>
+</html>

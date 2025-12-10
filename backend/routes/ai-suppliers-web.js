@@ -12,13 +12,16 @@ const router = express.Router();
 // Cliente OpenAI para procesar y estructurar resultados
 let openai = null;
 const resolveOpenAIKey = () => process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY || '';
+const resolveProjectId = () =>
+  process.env.OPENAI_PROJECT_ID || process.env.VITE_OPENAI_PROJECT_ID || '';
 
 const ensureOpenAIClient = () => {
   const apiKey = resolveOpenAIKey().trim();
+  const projectId = resolveProjectId().trim();
   if (!apiKey || openai) return !!openai;
 
   try {
-    openai = new OpenAI({ apiKey });
+    openai = new OpenAI({ apiKey, project: projectId || undefined });
     return true;
   } catch {
     return false;

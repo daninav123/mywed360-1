@@ -1,4 +1,4 @@
-import { Users, Briefcase, Clock, Layers } from 'lucide-react';
+import { Users, Briefcase, Clock, Layers, User, Heart } from 'lucide-react';
 import React, { useState } from 'react';
 import { Link, Outlet } from 'react-router-dom';
 
@@ -60,9 +60,7 @@ export default function More() {
           >
             <Users size={32} className="text-primary mb-2" />
             <h2 className="font-semibold mb-1">{t('pages.more.sections.guests.title')}</h2>
-            <p className="text-sm text-muted">
-              {t('pages.more.sections.guests.description')}
-            </p>
+            <p className="text-sm text-muted">{t('pages.more.sections.guests.description')}</p>
           </button>
           {openMenu === 'invitados' && (
             <div
@@ -91,9 +89,7 @@ export default function More() {
           >
             <Briefcase size={32} className="text-primary mb-2" />
             <h2 className="font-semibold mb-1">{t('pages.more.sections.providers.title')}</h2>
-            <p className="text-sm text-muted">
-              {t('pages.more.sections.providers.description')}
-            </p>
+            <p className="text-sm text-muted">{t('pages.more.sections.providers.description')}</p>
           </button>
           {openMenu === 'proveedores' && (
             <div
@@ -122,9 +118,7 @@ export default function More() {
           >
             <Clock size={32} className="text-primary mb-2" />
             <h2 className="font-semibold mb-1">{t('pages.more.sections.protocol.title')}</h2>
-            <p className="text-sm text-muted">
-              {t('pages.more.sections.protocol.description')}
-            </p>
+            <p className="text-sm text-muted">{t('pages.more.sections.protocol.description')}</p>
           </button>
           {openMenu === 'protocolo' && (
             <div
@@ -174,9 +168,7 @@ export default function More() {
           >
             <Layers size={32} className="text-primary mb-2" />
             <h2 className="font-semibold mb-1">{t('pages.more.sections.extras.title')}</h2>
-            <p className="text-sm text-muted">
-              {t('pages.more.sections.extras.description')}
-            </p>
+            <p className="text-sm text-muted">{t('pages.more.sections.extras.description')}</p>
           </button>
           {openMenu === 'extras' && (
             <div
@@ -200,6 +192,39 @@ export default function More() {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Perfil y Configuración */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+        <Link
+          to="/info-boda"
+          className="bg-[var(--color-surface)] border border-soft p-4 rounded shadow hover:shadow-md flex flex-col text-left transition-shadow"
+        >
+          <Heart size={32} className="text-primary mb-2" />
+          <h2 className="font-semibold mb-1">
+            {t('pages.more.sections.weddingInfo.title', { defaultValue: 'Información de la Boda' })}
+          </h2>
+          <p className="text-sm text-muted">
+            {t('pages.more.sections.weddingInfo.description', {
+              defaultValue: 'Configura fecha, lugar, menú, FAQs y más',
+            })}
+          </p>
+        </Link>
+
+        <Link
+          to="/perfil"
+          className="bg-[var(--color-surface)] border border-soft p-4 rounded shadow hover:shadow-md flex flex-col text-left transition-shadow"
+        >
+          <User size={32} className="text-primary mb-2" />
+          <h2 className="font-semibold mb-1">
+            {t('pages.more.sections.profile.title', { defaultValue: 'Perfil de Usuario' })}
+          </h2>
+          <p className="text-sm text-muted">
+            {t('pages.more.sections.profile.description', {
+              defaultValue: 'Tu cuenta, facturación y colaboradores',
+            })}
+          </p>
+        </Link>
       </div>
 
       {/* Notificaciones Push removidas para evitar duplicidad con el centro de notificaciones */}

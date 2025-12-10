@@ -345,5 +345,51 @@ service cloud.firestore {
     match /projectMetrics_events/{docId} {
       allow read, write: if false;
     }
+
+    // Craft.js webs - cada usuario puede gestionar sus propias webs
+    match /craft-webs/{webId} {
+      // Permitir lectura si:
+      // 1. El usuario está autenticado Y es el dueño
+      // 2. La web está publicada (para vista pública - sin autenticación)
+      allow read: if (request.auth != null && resource.data.userId == request.auth.uid) ||
+                     (resource.data.published == true);
+      
+      // Permitir list (queries) para:
+      // 1. Usuarios autenticados (para verificar slugs)
+      // 2. Queries públicas de webs publicadas (sin autenticación)
+      allow list: if request.auth != null || resource.data.published == true;
+      
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
+    }
+
+    // RSVP de webs Craft.js - confirmaciones públicas de asistencia
+    match /craft-webs-rsvp/{rsvpId} {
+      // Lectura pública para ver invitados y respuestas
+      allow read: if true;
+      
+      // List/query público para buscar invitados
+      allow list: if true;
+      
+      // Crear RSVP público (sin autenticación)
+      allow create: if true;
+      
+      // Actualizar respuestas RSVP (sin autenticación)
+      allow update: if true;
+      
+      // Solo el propietario de la web puede eliminar
+      allow delete: if request.auth != null;
+    }
+    
+    // Permitir lectura y actualización pública de guests para RSVP
+    match /weddings/{weddingId}/guests/{guestId} {
+      // Lectura pública para validar invitados en RSVP
+      allow read, list: if true;
+      
+      // Actualización pública para confirmar asistencia vía RSVP
+      // Solo permitir actualizar campos específicos de confirmación
+      allow update: if request.resource.data.diff(resource.data).affectedKeys()
+        .hasOnly(['status', 'confirmed', 'companions', 'dietaryRestrictions', 'notes', 'updatedAt']);
+    }
   }
 }

@@ -1,7 +1,12 @@
 import React from 'react';
 
-const Input = React.forwardRef(({ className = '', label, error, id, ...props }, ref) => {
+const Input = React.forwardRef(({ className = '', label, error, id, type, ...props }, ref) => {
   const inputId = id || `input-${Math.random().toString(36).substr(2, 9)}`;
+  const isTextarea = type === 'textarea';
+
+  const sharedClasses = `w-full px-3 py-2 rounded-md shadow-sm border focus:outline-none focus:ring-2 ${
+    error ? 'border-[var(--color-danger)]' : 'border-[color:var(--color-text)]/20'
+  } bg-[var(--color-surface)] text-[color:var(--color-text)]`;
 
   return (
     <div className={`w-full ${className}`}>
@@ -13,17 +18,28 @@ const Input = React.forwardRef(({ className = '', label, error, id, ...props }, 
           {label}
         </label>
       )}
-      <input
-        id={inputId}
-        ref={ref}
-        className={`w-full px-3 py-2 rounded-md shadow-sm border focus:outline-none focus:ring-2 ${
-          error ? 'border-[var(--color-danger)]' : 'border-[color:var(--color-text)]/20'
-        } bg-[var(--color-surface)] text-[color:var(--color-text)]`}
-        aria-invalid={!!error}
-        aria-describedby={error ? `${inputId}-error` : undefined}
-        style={{ '--tw-ring-color': error ? 'var(--color-danger)' : 'var(--color-primary)' }}
-        {...props}
-      />
+      {isTextarea ? (
+        <textarea
+          id={inputId}
+          ref={ref}
+          className={`${sharedClasses} min-h-[120px]`}
+          aria-invalid={!!error}
+          aria-describedby={error ? `${inputId}-error` : undefined}
+          style={{ '--tw-ring-color': error ? 'var(--color-danger)' : 'var(--color-primary)' }}
+          {...props}
+        />
+      ) : (
+        <input
+          id={inputId}
+          ref={ref}
+          type={type}
+          className={sharedClasses}
+          aria-invalid={!!error}
+          aria-describedby={error ? `${inputId}-error` : undefined}
+          style={{ '--tw-ring-color': error ? 'var(--color-danger)' : 'var(--color-primary)' }}
+          {...props}
+        />
+      )}
       {error && (
         <p
           id={`${inputId}-error`}

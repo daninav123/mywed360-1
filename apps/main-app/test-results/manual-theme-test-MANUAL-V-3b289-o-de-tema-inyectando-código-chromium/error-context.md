@@ -1,0 +1,123 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+    - region "Notifications Alt+T"
+    - generic [ref=e3]:
+        - generic [ref=e4]:
+            - button "Configuración" [ref=e6] [cursor=pointer]:
+                - img [ref=e7]
+            - generic "Menú de usuario" [ref=e11] [cursor=pointer]:
+                - img "Lovenda" [ref=e12]
+        - main [ref=e13]:
+            - button "Rehacer tutorial" [ref=e14] [cursor=pointer]
+            - generic [ref=e15]:
+                - generic [ref=e17]:
+                    - generic [ref=e18]:
+                        - heading "Bienvenidos, Dani y Pepa" [level=1] [ref=e19]
+                        - paragraph [ref=e20]: Cada detalle hace que tu boda sea inolvidable
+                    - img "Logo de la boda" [ref=e22]
+                - generic [ref=e25]:
+                    - paragraph [ref=e26]: Progreso de tareas
+                    - paragraph [ref=e29]: 13% completado
+                    - paragraph
+                - generic [ref=e30]:
+                    - button "Buscar proveedor" [ref=e31] [cursor=pointer]:
+                        - generic [ref=e32]:
+                            - img [ref=e33]
+                            - generic [ref=e36]: Buscar proveedor
+                        - img [ref=e37]
+                    - button "Añadir invitado" [ref=e39] [cursor=pointer]:
+                        - generic [ref=e40]:
+                            - img [ref=e41]
+                            - generic [ref=e46]: Añadir invitado
+                        - img [ref=e47]
+                    - button "Registrar movimiento" [ref=e49] [cursor=pointer]:
+                        - generic [ref=e50]:
+                            - img [ref=e51]
+                            - generic [ref=e53]: Registrar movimiento
+                        - img [ref=e54]
+                    - button "Nueva nota" [ref=e56] [cursor=pointer]:
+                        - generic [ref=e57]:
+                            - img [ref=e58]
+                            - generic [ref=e59]: Nueva nota
+                        - img [ref=e60]
+                - generic [ref=e62]:
+                    - generic [ref=e63]:
+                        - generic [ref=e64]:
+                            - img [ref=e65]
+                            - paragraph [ref=e70]: Invitados confirmados
+                        - paragraph [ref=e71]: 1 / 250
+                    - generic [ref=e72]:
+                        - generic [ref=e73]:
+                            - img [ref=e74]
+                            - paragraph [ref=e76]: Presupuesto gastado
+                        - paragraph [ref=e77]: 0,00 €
+                    - generic [ref=e78]:
+                        - generic [ref=e79]:
+                            - img [ref=e80]
+                            - paragraph [ref=e83]: Proveedores contratados
+                        - paragraph [ref=e84]: 1 / 4
+                    - generic [ref=e85]:
+                        - generic [ref=e86]:
+                            - img [ref=e87]
+                            - paragraph [ref=e89]: Tareas completadas
+                        - paragraph [ref=e90]: 0 / 388
+                - generic [ref=e91]:
+                    - generic [ref=e92]:
+                        - link "Inspiración para tu boda" [ref=e93] [cursor=pointer]:
+                            - /url: /inspiracion
+                            - button "Inspiración para tu boda" [ref=e94]
+                        - generic [ref=e95]:
+                            - button [ref=e96] [cursor=pointer]:
+                                - img [ref=e97]
+                            - button [ref=e99] [cursor=pointer]:
+                                - img [ref=e100]
+                    - generic [ref=e102]:
+                        - link "Decoración" [ref=e103] [cursor=pointer]:
+                            - /url: /inspiracion?tag=decoracion
+                            - paragraph [ref=e105]: Decoración
+                        - link "Cóctel" [ref=e106] [cursor=pointer]:
+                            - /url: /inspiracion?tag=coctel
+                            - paragraph [ref=e108]: Cóctel
+                        - link "Banquete asignado" [ref=e109] [cursor=pointer]:
+                            - /url: /inspiracion?tag=banquete
+                            - paragraph [ref=e111]: Banquete asignado
+                        - link "Ceremonia lista" [ref=e112] [cursor=pointer]:
+                            - /url: /inspiracion?tag=ceremonia
+                            - paragraph [ref=e114]: Ceremonia lista
+                        - link "Flores" [ref=e115] [cursor=pointer]:
+                            - /url: /inspiracion?tag=flores
+                            - paragraph [ref=e117]: Flores
+                        - link "Vestidos" [ref=e118] [cursor=pointer]:
+                            - /url: /inspiracion?tag=vestido
+                            - paragraph [ref=e120]: Vestidos
+                        - link "Pasteles" [ref=e121] [cursor=pointer]:
+                            - /url: /inspiracion?tag=pastel
+                            - paragraph [ref=e123]: Pasteles
+                        - link "Fotografía" [ref=e124] [cursor=pointer]:
+                            - /url: /inspiracion?tag=fotografia
+                            - paragraph [ref=e126]: Fotografía
+                - generic [ref=e127]:
+                    - link "Blog" [ref=e129] [cursor=pointer]:
+                        - /url: /blog
+                        - button "Blog" [ref=e130]
+                    - generic [ref=e131]: No se pudieron encontrar cuatro noticias con imagen en tu idioma en este momento. Inténtalo más tarde.
+                - navigation [ref=e132]:
+                    - generic [ref=e133]:
+                        - button "Inicio" [ref=e134] [cursor=pointer]: Inicio
+                        - button "Tareas" [ref=e136] [cursor=pointer]
+                        - button "Finanzas" [ref=e137] [cursor=pointer]
+                        - button "Más" [ref=e138] [cursor=pointer]
+        - navigation [ref=e139]:
+            - generic [ref=e140]:
+                - button "Inicio" [ref=e141] [cursor=pointer]: Inicio
+                - button "Tareas" [ref=e143] [cursor=pointer]
+                - button "Finanzas" [ref=e144] [cursor=pointer]
+                - button "Más" [ref=e145] [cursor=pointer]
+        - button "Abrir chat" [ref=e146] [cursor=pointer]:
+            - img [ref=e147]
+    - button "🔍 99+" [ref=e149] [cursor=pointer]:
+        - text: 🔍
+        - generic [ref=e150]: 99+
+```

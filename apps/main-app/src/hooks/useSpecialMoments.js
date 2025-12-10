@@ -15,6 +15,7 @@ const STORAGE_KEY = 'mywed360SpecialMoments';
 
 export const RESPONSABLES_LIMIT = 12;
 export const SUPPLIERS_LIMIT = 12;
+export const SONG_CANDIDATES_LIMIT = 10; // Máximo de canciones candidatas por momento
 
 // Bloques por defecto (alineados con pginas existentes)
 const DEFAULT_BLOCKS = [
@@ -28,13 +29,31 @@ const DEFAULT_BLOCKS = [
 
 export const MAX_MOMENTS_PER_BLOCK = 200;
 
-// Estructura inicial por defecto
+// Estructura inicial por defecto con soporte para canciones candidatas
 const withRecipientDefaults = (list = []) =>
   (Array.isArray(list) ? list : []).map((item = {}) => ({
     ...item,
     recipientId: item.recipientId ?? '',
     recipientName: item.recipientName ?? '',
     recipientRole: item.recipientRole ?? '',
+    // Sistema de canciones candidatas
+    songCandidates: Array.isArray(item.songCandidates) ? item.songCandidates : [],
+    selectedSongId: item.selectedSongId ?? null,
+    // Mantener retrocompatibilidad: si hay 'song' pero no songCandidates, migrar
+    ...(item.song && (!item.songCandidates || item.songCandidates.length === 0)
+      ? {
+          songCandidates: [
+            {
+              id: `legacy-${Date.now()}`,
+              title: item.song,
+              artist: '',
+              source: 'manual',
+              addedAt: new Date().toISOString(),
+            },
+          ],
+          selectedSongId: `legacy-${Date.now()}`,
+        }
+      : {}),
   }));
 
 const defaultData = {
@@ -89,20 +108,172 @@ const defaultData = {
         state: 'pendiente',
         key: '',
       },
-      { id: 4, order: 4, title: 'Lectura 2', song: '', time: '', duration: '', type: 'lectura', location: '', responsables: [], requirements: '', suppliers: [], optional: false, state: 'pendiente', key: '' },
-      { id: 5, order: 5, title: 'Intercambio de Anillos', song: '', time: '', duration: '', type: 'anillos', location: '', responsables: [], requirements: '', suppliers: [], optional: false, state: 'pendiente', key: '' },
-      { id: 6, order: 6, title: 'Salida', song: '', time: '', duration: '', type: 'salida', location: '', responsables: [], requirements: '', suppliers: [], optional: false, state: 'pendiente', key: '' },
+      {
+        id: 4,
+        order: 4,
+        title: 'Lectura 2',
+        song: '',
+        time: '',
+        duration: '',
+        type: 'lectura',
+        location: '',
+        responsables: [],
+        requirements: '',
+        suppliers: [],
+        optional: false,
+        state: 'pendiente',
+        key: '',
+      },
+      {
+        id: 5,
+        order: 5,
+        title: 'Intercambio de Anillos',
+        song: '',
+        time: '',
+        duration: '',
+        type: 'anillos',
+        location: '',
+        responsables: [],
+        requirements: '',
+        suppliers: [],
+        optional: false,
+        state: 'pendiente',
+        key: '',
+      },
+      {
+        id: 6,
+        order: 6,
+        title: 'Salida',
+        song: '',
+        time: '',
+        duration: '',
+        type: 'salida',
+        location: '',
+        responsables: [],
+        requirements: '',
+        suppliers: [],
+        optional: false,
+        state: 'pendiente',
+        key: '',
+      },
     ]),
-    coctail: withRecipientDefaults([{ id: 7, order: 1, title: 'Entrada', song: '', time: '', duration: '', type: 'entrada', location: '', responsables: [], requirements: '', suppliers: [], optional: false, state: 'pendiente', key: '' }]),
+    coctail: withRecipientDefaults([
+      {
+        id: 7,
+        order: 1,
+        title: 'Entrada',
+        song: '',
+        time: '',
+        duration: '',
+        type: 'entrada',
+        location: '',
+        responsables: [],
+        requirements: '',
+        suppliers: [],
+        optional: false,
+        state: 'pendiente',
+        key: '',
+      },
+    ]),
     banquete: withRecipientDefaults([
-      { id: 8, order: 1, title: 'Entrada Novios', song: '', time: '', duration: '', type: 'entrada', location: '', responsables: [], requirements: '', suppliers: [], optional: false, state: 'pendiente', key: '' },
-      { id: 9, order: 2, title: 'Corte Pastel', song: '', time: '', duration: '', type: 'corte_pastel', location: '', responsables: [], requirements: '', suppliers: [], optional: false, state: 'pendiente', key: 'corte_tarta' },
-      { id: 10, order: 3, title: 'Discursos', song: '', time: '', duration: '', type: 'discurso', location: '', responsables: [], requirements: '', suppliers: [], optional: false, state: 'pendiente', key: '' },
+      {
+        id: 8,
+        order: 1,
+        title: 'Entrada Novios',
+        song: '',
+        time: '',
+        duration: '',
+        type: 'entrada',
+        location: '',
+        responsables: [],
+        requirements: '',
+        suppliers: [],
+        optional: false,
+        state: 'pendiente',
+        key: '',
+      },
+      {
+        id: 9,
+        order: 2,
+        title: 'Corte Pastel',
+        song: '',
+        time: '',
+        duration: '',
+        type: 'corte_pastel',
+        location: '',
+        responsables: [],
+        requirements: '',
+        suppliers: [],
+        optional: false,
+        state: 'pendiente',
+        key: 'corte_tarta',
+      },
+      {
+        id: 10,
+        order: 3,
+        title: 'Discursos',
+        song: '',
+        time: '',
+        duration: '',
+        type: 'discurso',
+        location: '',
+        responsables: [],
+        requirements: '',
+        suppliers: [],
+        optional: false,
+        state: 'pendiente',
+        key: '',
+      },
     ]),
     disco: withRecipientDefaults([
-      { id: 11, order: 1, title: 'Primer Baile', song: '', time: '', duration: '', type: 'baile', location: '', responsables: [], requirements: '', suppliers: [], optional: false, state: 'pendiente', key: 'primer_baile' },
-      { id: 12, order: 2, title: 'Animar pista', song: '', time: '', duration: '', type: 'otro', location: '', responsables: [], requirements: '', suppliers: [], optional: false, state: 'pendiente', key: '' },
-      { id: 13, order: 3, title: 'Último tema', song: '', time: '', duration: '', type: 'otro', location: '', responsables: [], requirements: '', suppliers: [], optional: false, state: 'pendiente', key: '' },
+      {
+        id: 11,
+        order: 1,
+        title: 'Primer Baile',
+        song: '',
+        time: '',
+        duration: '',
+        type: 'baile',
+        location: '',
+        responsables: [],
+        requirements: '',
+        suppliers: [],
+        optional: false,
+        state: 'pendiente',
+        key: 'primer_baile',
+      },
+      {
+        id: 12,
+        order: 2,
+        title: 'Animar pista',
+        song: '',
+        time: '',
+        duration: '',
+        type: 'otro',
+        location: '',
+        responsables: [],
+        requirements: '',
+        suppliers: [],
+        optional: false,
+        state: 'pendiente',
+        key: '',
+      },
+      {
+        id: 13,
+        order: 3,
+        title: 'Último tema',
+        song: '',
+        time: '',
+        duration: '',
+        type: 'otro',
+        location: '',
+        responsables: [],
+        requirements: '',
+        suppliers: [],
+        optional: false,
+        state: 'pendiente',
+        key: '',
+      },
     ]),
   },
 };
@@ -135,7 +306,8 @@ function load() {
       }
       // Asegurar blocks por defecto si faltan
       return {
-        blocks: Array.isArray(parsed.blocks) && parsed.blocks.length ? parsed.blocks : DEFAULT_BLOCKS,
+        blocks:
+          Array.isArray(parsed.blocks) && parsed.blocks.length ? parsed.blocks : DEFAULT_BLOCKS,
         moments: parsed.moments || defaultData.moments,
       };
     }
@@ -148,8 +320,9 @@ export default function useSpecialMoments() {
   const initial = load();
   const initialBlocks =
     Array.isArray(initial.blocks) && initial.blocks.length ? initial.blocks : DEFAULT_BLOCKS;
-  const initialMoments =
-    initial.moments ? normalizeMomentsStructure(initial.moments) : defaultData.moments;
+  const initialMoments = initial.moments
+    ? normalizeMomentsStructure(initial.moments)
+    : defaultData.moments;
   const [blocks, setBlocks] = useState(initialBlocks);
   const [moments, setMoments] = useState(initialMoments);
   const lastRemoteRef = useRef(null);
@@ -176,11 +349,7 @@ export default function useSpecialMoments() {
     (async () => {
       try {
         const ref = doc(db, 'weddings', activeWedding, 'specialMoments', 'main');
-        await setDoc(
-          ref,
-          { blocks, moments, updatedAt: serverTimestamp() },
-          { merge: true }
-        );
+        await setDoc(ref, { blocks, moments, updatedAt: serverTimestamp() }, { merge: true });
       } catch (e) {
         // console.warn('No se pudieron guardar Momentos Especiales en Firestore:', e?.message || e);
       }
@@ -194,7 +363,9 @@ export default function useSpecialMoments() {
         if (e && e.key === STORAGE_KEY && typeof e.newValue === 'string') {
           const parsed = JSON.parse(e.newValue);
           setBlocks(parsed.blocks || DEFAULT_BLOCKS);
-          setMoments(parsed.moments ? normalizeMomentsStructure(parsed.moments) : defaultData.moments);
+          setMoments(
+            parsed.moments ? normalizeMomentsStructure(parsed.moments) : defaultData.moments
+          );
         }
       } catch {}
     };
@@ -202,7 +373,7 @@ export default function useSpecialMoments() {
     return () => window.removeEventListener('storage', onStorage);
   }, []);
 
-    // Migracin puntual desde 'momentosEspeciales' a 'specialMoments'
+  // Migracin puntual desde 'momentosEspeciales' a 'specialMoments'
   useEffect(() => {
     (async () => {
       try {
@@ -215,21 +386,40 @@ export default function useSpecialMoments() {
         if (!snapOld.exists()) return;
         const data = snapOld.data() || {};
         if (data.moments) {
-          const nextBlocks = Array.isArray(data.blocks) && data.blocks.length ? data.blocks : DEFAULT_BLOCKS;
+          const nextBlocks =
+            Array.isArray(data.blocks) && data.blocks.length ? data.blocks : DEFAULT_BLOCKS;
           const nextMoments = normalizeMomentsStructure(data.moments || {});
           setBlocks(nextBlocks);
           setMoments((prev) => ({ ...prev, ...nextMoments }));
-          await setDoc(refNew, { blocks: nextBlocks, moments: nextMoments, migratedFrom: 'momentosEspeciales', updatedAt: serverTimestamp() }, { merge: true });
+          await setDoc(
+            refNew,
+            {
+              blocks: nextBlocks,
+              moments: nextMoments,
+              migratedFrom: 'momentosEspeciales',
+              updatedAt: serverTimestamp(),
+            },
+            { merge: true }
+          );
         } else {
           const { updatedAt: _updatedAt, ...payload } = data;
           setBlocks(DEFAULT_BLOCKS);
           const normalizedPayload = normalizeMomentsStructure(payload);
           setMoments((prev) => ({ ...prev, ...normalizedPayload }));
-          await setDoc(refNew, { blocks: DEFAULT_BLOCKS, moments: payload, migratedFrom: 'momentosEspeciales', updatedAt: serverTimestamp() }, { merge: true });
+          await setDoc(
+            refNew,
+            {
+              blocks: DEFAULT_BLOCKS,
+              moments: payload,
+              migratedFrom: 'momentosEspeciales',
+              updatedAt: serverTimestamp(),
+            },
+            { merge: true }
+          );
         }
       } catch {}
     })();
-  }, [activeWedding]);// Suscribirse a Firestore para sincronización en vivo
+  }, [activeWedding]); // Suscribirse a Firestore para sincronización en vivo
   useEffect(() => {
     if (!activeWedding) {
       // Si no hay boda activa, cancelar cualquier suscripcin previa
@@ -248,7 +438,8 @@ export default function useSpecialMoments() {
       const data = snap.data() || {};
       // Compatibilidad: aceptar tanto forma nueva { moments, blocks } como la antigua plana
       if (data.moments) {
-        const nextBlocks = Array.isArray(data.blocks) && data.blocks.length ? data.blocks : DEFAULT_BLOCKS;
+        const nextBlocks =
+          Array.isArray(data.blocks) && data.blocks.length ? data.blocks : DEFAULT_BLOCKS;
         const nextMoments = normalizeMomentsStructure(data.moments || {});
         setBlocks(nextBlocks);
         setMoments((prev) => {
@@ -256,7 +447,11 @@ export default function useSpecialMoments() {
           Object.entries(nextMoments).forEach(([blockId, list]) => {
             merged[blockId] = list;
           });
-          try { lastRemoteRef.current = JSON.stringify({ blocks: nextBlocks, moments: merged }); } catch { lastRemoteRef.current = null; }
+          try {
+            lastRemoteRef.current = JSON.stringify({ blocks: nextBlocks, moments: merged });
+          } catch {
+            lastRemoteRef.current = null;
+          }
           return merged;
         });
       } else {
@@ -269,7 +464,11 @@ export default function useSpecialMoments() {
           Object.entries(normalizedPayload).forEach(([blockId, list]) => {
             merged[blockId] = list;
           });
-          try { lastRemoteRef.current = JSON.stringify({ blocks: DEFAULT_BLOCKS, moments: merged }); } catch { lastRemoteRef.current = null; }
+          try {
+            lastRemoteRef.current = JSON.stringify({ blocks: DEFAULT_BLOCKS, moments: merged });
+          } catch {
+            lastRemoteRef.current = null;
+          }
           return merged;
         });
       }
@@ -285,81 +484,90 @@ export default function useSpecialMoments() {
     };
   }, [activeWedding]);
 
-  const addMoment = useCallback((blockId, moment) => {
-    setMoments((prev) => {
-      const currentList = prev[blockId] || [];
-      if (currentList.length >= MAX_MOMENTS_PER_BLOCK) {
-        // console.warn('[useSpecialMoments] se alcanzó el límite de momentos para el bloque', blockId);
-        return prev;
-      }
-      const next = { ...prev };
-      next[blockId] = [
-        ...currentList,
-        {
-          // defaults seguros para nuevo modelo
-          id: Date.now(),
-          order: currentList.length + 1,
-          title: 'Nuevo momento',
-          song: '',
-          time: '',
-          duration: '',
-          type: 'otro',
-          location: '',
-          responsables: [],
-          requirements: '',
-          suppliers: [],
-          optional: false,
-          state: 'pendiente',
-          key: '',
-          recipientId: '',
-          recipientName: '',
-          recipientRole: '',
-          ...moment,
-        },
-      ];
-      try {
-        performanceMonitor.logEvent('special_moment_added', {
-          weddingId: activeWedding,
-          blockId,
-          momentType: moment?.type || 'otro',
-        });
-      } catch {}
-      return next;
-    });
-  }, [activeWedding]);
-
-  const removeMoment = useCallback((blockId, momentId) => {
-    setMoments((prev) => {
-      const next = { ...prev };
-      next[blockId] = prev[blockId].filter((m) => m.id !== momentId);
-      try {
-        performanceMonitor.logEvent('special_moment_removed', {
-          weddingId: activeWedding,
-          blockId,
-        });
-      } catch {}
-      return next;
-    });
-  }, [activeWedding]);
-
-  const updateMoment = useCallback((blockId, momentId, changes) => {
-    setMoments((prev) => {
-      const next = { ...prev };
-      next[blockId] = (prev[blockId] || []).map((m) =>
-        m.id === momentId ? { ...m, ...changes } : m
-      );
-      if (changes?.state) {
+  const addMoment = useCallback(
+    (blockId, moment) => {
+      setMoments((prev) => {
+        const currentList = prev[blockId] || [];
+        if (currentList.length >= MAX_MOMENTS_PER_BLOCK) {
+          // console.warn('[useSpecialMoments] se alcanzó el límite de momentos para el bloque', blockId);
+          return prev;
+        }
+        const next = { ...prev };
+        next[blockId] = [
+          ...currentList,
+          {
+            // defaults seguros para nuevo modelo
+            id: Date.now(),
+            order: currentList.length + 1,
+            title: 'Nuevo momento',
+            song: '',
+            time: '',
+            duration: '',
+            type: 'otro',
+            location: '',
+            responsables: [],
+            requirements: '',
+            suppliers: [],
+            optional: false,
+            state: 'pendiente',
+            key: '',
+            recipientId: '',
+            recipientName: '',
+            recipientRole: '',
+            ...moment,
+          },
+        ];
         try {
-          performanceMonitor.logEvent('special_moment_state_changed', {
+          performanceMonitor.logEvent('special_moment_added', {
             weddingId: activeWedding,
             blockId,
-            state: changes.state,
+            momentType: moment?.type || 'otro',
           });
         } catch {}
-      }
-      return next;
-    });
-  }, [activeWedding]);
+        return next;
+      });
+    },
+    [activeWedding]
+  );
+
+  const removeMoment = useCallback(
+    (blockId, momentId) => {
+      setMoments((prev) => {
+        const next = { ...prev };
+        next[blockId] = prev[blockId].filter((m) => m.id !== momentId);
+        try {
+          performanceMonitor.logEvent('special_moment_removed', {
+            weddingId: activeWedding,
+            blockId,
+          });
+        } catch {}
+        return next;
+      });
+    },
+    [activeWedding]
+  );
+
+  const updateMoment = useCallback(
+    (blockId, momentId, changes) => {
+      setMoments((prev) => {
+        const next = { ...prev };
+        next[blockId] = (prev[blockId] || []).map((m) =>
+          m.id === momentId ? { ...m, ...changes } : m
+        );
+        if (changes?.state) {
+          try {
+            performanceMonitor.logEvent('special_moment_state_changed', {
+              weddingId: activeWedding,
+              blockId,
+              state: changes.state,
+            });
+          } catch {}
+        }
+        return next;
+      });
+    },
+    [activeWedding]
+  );
 
   // Reordenar (arriba/abajo) un momento dentro de su bloque
   const reorderMoment = useCallback((blockId, momentId, direction = 'up') => {
@@ -488,10 +696,10 @@ export default function useSpecialMoments() {
       }
 
       const next = { ...prev };
-      
+
       // Remover del bloque origen
       next[fromBlockId] = sourceList.filter((m) => m.id !== momentId);
-      
+
       // Añadir al bloque destino
       const updatedMoment = { ...moment };
       if (toBlockId === fromBlockId) {
@@ -508,7 +716,7 @@ export default function useSpecialMoments() {
         next[toBlockId] = newList.map((m, i) => ({ ...m, order: i + 1 }));
         next[fromBlockId] = next[fromBlockId].map((m, i) => ({ ...m, order: i + 1 }));
       }
-      
+
       return next;
     });
   }, []);
@@ -516,31 +724,31 @@ export default function useSpecialMoments() {
   // Validar un momento y devolver errores
   const validateMoment = useCallback((moment) => {
     const errors = [];
-    
+
     // Campos críticos para ciertos tipos de momentos
     if (!moment.title || moment.title.trim() === '') {
       errors.push('Título es requerido');
     }
-    
+
     // Validar según el tipo
     if (moment.type === 'entrada' || moment.type === 'salida') {
       if (!moment.song || moment.song.trim() === '') {
         errors.push('Música es requerida para entradas y salidas');
       }
     }
-    
+
     if (moment.type === 'lectura' || moment.type === 'votos') {
       if (!moment.responsables || moment.responsables.length === 0) {
         errors.push('Se requiere al menos un responsable para lecturas y votos');
       }
     }
-    
+
     if (moment.type === 'baile' && moment.key === 'primer_baile') {
       if (!moment.song || moment.song.trim() === '') {
         errors.push('Canción del primer baile es requerida');
       }
     }
-    
+
     // Validar coherencia de tiempos si existen
     if (moment.time && moment.duration) {
       const timePattern = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
@@ -548,33 +756,155 @@ export default function useSpecialMoments() {
         errors.push('Formato de hora inválido (use HH:MM)');
       }
     }
-    
+
     // Validar límites
     if (moment.responsables && moment.responsables.length > RESPONSABLES_LIMIT) {
       errors.push(`Máximo ${RESPONSABLES_LIMIT} responsables permitidos`);
     }
-    
+
     if (moment.suppliers && moment.suppliers.length > SUPPLIERS_LIMIT) {
       errors.push(`Máximo ${SUPPLIERS_LIMIT} proveedores permitidos`);
     }
-    
+
     return errors;
   }, []);
 
   // Obtener todos los errores de validación para un bloque
-  const getMomentValidationErrors = useCallback((blockId) => {
-    const blockMoments = moments[blockId] || [];
-    const errors = {};
-    
-    blockMoments.forEach((moment) => {
-      const momentErrors = validateMoment(moment);
-      if (momentErrors.length > 0) {
-        errors[moment.id] = momentErrors;
-      }
+  const getMomentValidationErrors = useCallback(
+    (blockId) => {
+      const blockMoments = moments[blockId] || [];
+      const errors = {};
+
+      blockMoments.forEach((moment) => {
+        const momentErrors = validateMoment(moment);
+        if (momentErrors.length > 0) {
+          errors[moment.id] = momentErrors;
+        }
+      });
+
+      return errors;
+    },
+    [moments, validateMoment]
+  );
+
+  // === GESTIÓN DE CANCIONES CANDIDATAS ===
+
+  // Agregar una canción candidata a un momento
+  const addSongCandidate = useCallback((blockId, momentId, song) => {
+    setMoments((prev) => {
+      const next = { ...prev };
+      next[blockId] = (prev[blockId] || []).map((m) => {
+        if (m.id !== momentId) return m;
+
+        const candidates = Array.isArray(m.songCandidates) ? [...m.songCandidates] : [];
+
+        // Verificar límite
+        if (candidates.length >= SONG_CANDIDATES_LIMIT) {
+          return m;
+        }
+
+        // Verificar duplicados (por título + artista)
+        const isDuplicate = candidates.some(
+          (c) => c.title === song.title && c.artist === song.artist
+        );
+        if (isDuplicate) return m;
+
+        // Agregar nueva candidata
+        const newCandidate = {
+          id: song.id || `song-${Date.now()}`,
+          title: song.title || '',
+          artist: song.artist || '',
+          previewUrl: song.previewUrl || '',
+          trackUrl: song.trackUrl || '',
+          artwork: song.artwork || '',
+          source: song.source || 'search', // search | suggestion | ai | manual | spotify
+          addedAt: new Date().toISOString(),
+        };
+
+        candidates.push(newCandidate);
+
+        // Si es la primera canción, seleccionarla automáticamente
+        const selectedSongId = m.selectedSongId || newCandidate.id;
+
+        return {
+          ...m,
+          songCandidates: candidates,
+          selectedSongId,
+        };
+      });
+      return next;
     });
-    
-    return errors;
-  }, [moments, validateMoment]);
+  }, []);
+
+  // Eliminar una canción candidata
+  const removeSongCandidate = useCallback((blockId, momentId, songId) => {
+    setMoments((prev) => {
+      const next = { ...prev };
+      next[blockId] = (prev[blockId] || []).map((m) => {
+        if (m.id !== momentId) return m;
+
+        const candidates = (m.songCandidates || []).filter((c) => c.id !== songId);
+
+        // Si eliminamos la canción seleccionada, seleccionar la primera disponible
+        let selectedSongId = m.selectedSongId;
+        if (selectedSongId === songId) {
+          selectedSongId = candidates.length > 0 ? candidates[0].id : null;
+        }
+
+        return {
+          ...m,
+          songCandidates: candidates,
+          selectedSongId,
+        };
+      });
+      return next;
+    });
+  }, []);
+
+  // Seleccionar una canción como la activa (temporal)
+  const selectSong = useCallback((blockId, momentId, songId) => {
+    setMoments((prev) => {
+      const next = { ...prev };
+      next[blockId] = (prev[blockId] || []).map((m) => {
+        if (m.id !== momentId) return m;
+
+        // Verificar que la canción existe en las candidatas
+        const exists = (m.songCandidates || []).some((c) => c.id === songId);
+        if (!exists) return m;
+
+        return { ...m, selectedSongId: songId, isDefinitive: false };
+      });
+      return next;
+    });
+  }, []);
+
+  // Marcar una canción como DEFINITIVA (la elección final)
+  const markSongAsDefinitive = useCallback((blockId, momentId, songId) => {
+    setMoments((prev) => {
+      const next = { ...prev };
+      next[blockId] = (prev[blockId] || []).map((m) => {
+        if (m.id !== momentId) return m;
+
+        // Verificar que la canción existe en las candidatas
+        const exists = (m.songCandidates || []).some((c) => c.id === songId);
+        if (!exists) return m;
+
+        return {
+          ...m,
+          selectedSongId: songId,
+          isDefinitive: true,
+          definitiveMarkedAt: new Date().toISOString(),
+        };
+      });
+      return next;
+    });
+  }, []);
+
+  // Obtener la canción seleccionada de un momento
+  const getSelectedSong = useCallback((moment) => {
+    if (!moment || !moment.songCandidates) return null;
+    return moment.songCandidates.find((c) => c.id === moment.selectedSongId) || null;
+  }, []);
 
   return {
     // datos
@@ -597,5 +927,12 @@ export default function useSpecialMoments() {
     validateMoment,
     getMomentValidationErrors,
     maxMomentsPerBlock: MAX_MOMENTS_PER_BLOCK,
+    // canciones candidatas
+    addSongCandidate,
+    removeSongCandidate,
+    selectSong,
+    markSongAsDefinitive,
+    getSelectedSong,
+    songCandidatesLimit: SONG_CANDIDATES_LIMIT,
   };
 }

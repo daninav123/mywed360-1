@@ -13,21 +13,27 @@ let openai = null;
 let openAIConfig = { apiKey: null };
 
 const resolveApiKey = () => process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY || '';
+const resolveProjectId = () =>
+  process.env.OPENAI_PROJECT_ID || process.env.VITE_OPENAI_PROJECT_ID || '';
 const resolveGoogleKey = () => process.env.GOOGLE_SEARCH_API_KEY || '';
 const resolveGoogleCX = () => process.env.GOOGLE_SEARCH_CX || '';
 
 const ensureOpenAIClient = () => {
   const apiKey = resolveApiKey().trim();
+  const projectId = resolveProjectId().trim();
   if (!apiKey) {
     openai = null;
-    openAIConfig = { apiKey: null };
+    openAIConfig = { apiKey: null, projectId: null };
     return false;
   }
-  if (openai && openAIConfig.apiKey === apiKey) return true;
+  if (openai && openAIConfig.apiKey === apiKey && openAIConfig.projectId === projectId) return true;
   try {
-    openai = new OpenAI({ apiKey });
-    openAIConfig = { apiKey };
-    logger.info('[ai-suppliers-real] Cliente OpenAI inicializado');
+    openai = new OpenAI({ apiKey, project: projectId || undefined });
+    openAIConfig = { apiKey, projectId };
+    logger.info('[ai-suppliers-real] Cliente OpenAI inicializado', {
+      apiKeyPrefix: apiKey.slice(0, 8),
+      projectId: projectId || null,
+    });
     return true;
   } catch (error) {
     openai = null;

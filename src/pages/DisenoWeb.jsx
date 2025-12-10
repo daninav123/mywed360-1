@@ -1461,8 +1461,10 @@ const LogisticsEditor = ({ open, draft, onDraftChange, onClose, onSave, saving }
   );
 };
 
+// Fixed: mode and uid variables
 export default function DisenoWeb() {
   const { currentUser } = useAuth();
+  const uid = currentUser?.uid;
   const { activeWedding } = useWedding();
   const { t } = useTranslations();
   const location = useLocation();
@@ -1646,11 +1648,11 @@ export default function DisenoWeb() {
   }, [location.state, location.pathname, location.search, navigate]);
 
   useEffect(() => {
-    const shouldFocusPreview = location.pathname.endsWith('/preview') || mode === 'preview';
+    const shouldFocusPreview = location.pathname.endsWith('/preview');
     if (shouldFocusPreview && previewRef.current) {
       previewRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-  }, [location.pathname, mode, html]);
+  }, [location.pathname, html]);
 
   useEffect(() => {
     let cancelled = false;

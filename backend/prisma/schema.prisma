@@ -1,0 +1,385 @@
+// ====================================
+// 🗄️ MaLoveApp - Prisma Schema
+// ====================================
+// Reemplaza Firebase Firestore
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ====================================
+// 👤 Users & Authentication
+// ====================================
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  passwordHash  String?   // Null para OAuth
+  displayName   String?
+  photoURL      String?
+  phoneNumber   String?
+  emailVerified Boolean   @default(false)
+  
+  // Auth metadata
+  provider      String    @default("email") // email, google, facebook
+  lastLogin     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  // Relaciones
+  weddings      Wedding[]
+  guests        Guest[]
+  suppliers     Supplier[]
+  planners      Planner[]
+  
+  // Tokens
+  refreshTokens RefreshToken[]
+  
+  @@index([email])
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([token])
+  @@map("refresh_tokens")
+}
+
+// ====================================
+// 💒 Weddings
+// ====================================
+
+model Wedding {
+  id                  String    @id @default(uuid())
+  userId              String
+  
+  // Información básica
+  coupleName          String
+  weddingDate         DateTime
+  celebrationPlace    String?
+  celebrationAddress  String?
+  banquetPlace        String?
+  receptionAddress    String?
+  schedule            String?   // Formato: "17:00/19:00"
+  
+  // Configuración
+  numGuests           Int       @default(0)
+  weddingStyle        String?
+  colorScheme         String?
+  
+  // RSVP
+  rsvpDeadline        DateTime?
+  
+  // Información adicional
+  giftAccount         String?
+  transportation      String?
+  importantInfo       String?
+  
+  // Estado
+  status              String    @default("active") // active, completed, cancelled
+  
+  // Metadata
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  
+  // Relaciones
+  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  guests              Guest[]
+  suppliers           WeddingSupplier[]
+  seatingPlan         SeatingPlan?
+  budget              Budget?
+  craftWebs           CraftWeb[]
+  
+  @@index([userId])
+  @@index([weddingDate])
+  @@index([status])
+  @@map("weddings")
+}
+
+// ====================================
+// 👥 Guests
+// ====================================
+
+model Guest {
+  id                  String    @id @default(uuid())
+  weddingId           String
+  userId              String?
+  
+  // Información del invitado
+  name                String
+  email               String?
+  phone               String?
+  
+  // RSVP
+  confirmed           Boolean   @default(false)
+  status              String    @default("pending") // pending, confirmed, declined
+  companions          Int       @default(0)
+  dietaryRestrictions String?
+  notes               String?
+  
+  // Seating
+  tableNumber         Int?
+  seatNumber          Int?
+  
+  // Metadata
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  
+  // Relaciones
+  wedding             Wedding   @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  user                User?     @relation(fields: [userId], references: [id])
+  
+  @@index([weddingId])
+  @@index([email])
+  @@index([status])
+  @@map("guests")
+}
+
+// ====================================
+// 🏢 Suppliers
+// ====================================
+
+model Supplier {
+  id              String    @id @default(uuid())
+  userId          String
+  
+  // Información del proveedor
+  businessName    String
+  category        String
+  description     String?
+  
+  // Contacto
+  email           String
+  phone           String?
+  website         String?
+  address         String?
+  city            String?
+  country         String?
+  
+  // Redes sociales
+  instagram       String?
+  facebook        String?
+  
+  // Servicios
+  services        Json?     // Array de servicios
+  priceRange      String?
+  
+  // Rating
+  rating          Float     @default(0)
+  reviewCount     Int       @default(0)
+  
+  // Estado
+  verified        Boolean   @default(false)
+  featured        Boolean   @default(false)
+  active          Boolean   @default(true)
+  
+  // Metadata
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  // Relaciones
+  user            User      @relation(fields: [userId], references: [id])
+  weddings        WeddingSupplier[]
+  portfolio       SupplierPortfolio[]
+  
+  @@index([userId])
+  @@index([category])
+  @@index([city])
+  @@index([verified])
+  @@index([featured])
+  @@map("suppliers")
+}
+
+model SupplierPortfolio {
+  id          String    @id @default(uuid())
+  supplierId  String
+  
+  // Información de la imagen
+  imageUrl    String
+  title       String?
+  description String?
+  category    String?
+  
+  // Metadata
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  // Relaciones
+  supplier    Supplier  @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  
+  @@index([supplierId])
+  @@map("supplier_portfolio")
+}
+
+// ====================================
+// 📋 Wedding-Supplier (Many-to-Many)
+// ====================================
+
+model WeddingSupplier {
+  id          String    @id @default(uuid())
+  weddingId   String
+  supplierId  String
+  
+  // Estado de la contratación
+  status      String    @default("contacted") // contacted, quoted, hired, cancelled
+  budget      Float?
+  notes       String?
+  
+  // Metadata
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  // Relaciones
+  wedding     Wedding   @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  supplier    Supplier  @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  
+  @@unique([weddingId, supplierId])
+  @@index([weddingId])
+  @@index([supplierId])
+  @@map("wedding_suppliers")
+}
+
+// ====================================
+// 🎨 Seating Plan
+// ====================================
+
+model SeatingPlan {
+  id          String    @id @default(uuid())
+  weddingId   String    @unique
+  
+  // Configuración
+  layout      Json      // Layout del salón
+  tables      Json      // Configuración de mesas
+  
+  // Metadata
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  // Relaciones
+  wedding     Wedding   @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  
+  @@map("seating_plans")
+}
+
+// ====================================
+// 💰 Budget
+// ====================================
+
+model Budget {
+  id          String    @id @default(uuid())
+  weddingId   String    @unique
+  
+  // Presupuesto
+  totalBudget Float
+  items       Json      // Array de items de presupuesto
+  
+  // Metadata
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  // Relaciones
+  wedding     Wedding   @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  
+  @@map("budgets")
+}
+
+// ====================================
+// 🌐 Craft Webs
+// ====================================
+
+model CraftWeb {
+  id          String    @id @default(uuid())
+  weddingId   String
+  userId      String
+  
+  // Información de la web
+  slug        String    @unique
+  title       String
+  published   Boolean   @default(false)
+  
+  // Contenido
+  structure   Json      // Estructura Craft.js
+  theme       Json      // Tema/estilos
+  
+  // Metadata
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  publishedAt DateTime?
+  
+  // Relaciones
+  wedding     Wedding   @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  
+  @@index([weddingId])
+  @@index([slug])
+  @@index([published])
+  @@map("craft_webs")
+}
+
+// ====================================
+// 📨 RSVP Responses
+// ====================================
+
+model RsvpResponse {
+  id          String    @id @default(uuid())
+  webId       String    // ID de la web (slug)
+  guestId     String?   // ID del invitado (si existe)
+  
+  // Información de la respuesta
+  name        String
+  email       String
+  status      String    // confirmed, declined
+  companions  Int       @default(0)
+  dietaryRestrictions String?
+  notes       String?
+  
+  // Metadata
+  createdAt   DateTime  @default(now())
+  
+  @@index([webId])
+  @@index([email])
+  @@map("rsvp_responses")
+}
+
+// ====================================
+// 👨‍💼 Planners
+// ====================================
+
+model Planner {
+  id              String    @id @default(uuid())
+  userId          String
+  
+  // Información del planner
+  businessName    String
+  description     String?
+  
+  // Contacto
+  email           String
+  phone           String?
+  website         String?
+  
+  // Estado
+  active          Boolean   @default(true)
+  
+  // Metadata
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  // Relaciones
+  user            User      @relation(fields: [userId], references: [id])
+  
+  @@index([userId])
+  @@map("planners")
+}

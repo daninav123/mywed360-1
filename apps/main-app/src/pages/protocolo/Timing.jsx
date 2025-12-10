@@ -1,417 +1,444 @@
-import { doc, onSnapshot, setDoc } from 'firebase/firestore';
-import React, { useEffect, useState } from 'react';
-
-import { Card } from '../../components/ui';
+import React, { useState, useMemo } from 'react';
+import {
+  Clock,
+  Music,
+  Star,
+  ChevronRight,
+  Plus,
+  FileText,
+  Calendar,
+  Check,
+  Play,
+} from 'lucide-react';
+import { Link } from 'react-router-dom';
+import PageWrapper from '../../components/PageWrapper';
 import { Button } from '../../components/ui';
-import { useWedding } from '../../context/WeddingContext';
-import { db } from '../../firebaseConfig';
 import useSpecialMoments from '../../hooks/useSpecialMoments';
-import CeremonyTimeline from '../../components/protocolo/CeremonyTimeline';
+import TimelineAlerts from '../../components/protocolo/TimelineAlerts';
+import VisualTimeline from '../../components/protocolo/VisualTimeline';
+import SpotifyPlaylistGenerator from '../../components/protocolo/SpotifyPlaylistGenerator';
 
-// Bloques por defecto para inicializar el Timing
-const DEFAULT_BLOCKS = [
-  { id: 'ceremonia', name: 'Ceremonia' },
-  { id: 'coctel', name: 'Cóctel' },
-  { id: 'banquete', name: 'Banquete' },
-  { id: 'disco', name: 'Disco' },
-];
-
-const STATUS_OPTIONS = [
-  { value: 'on-time', label: 'A tiempo' },
-  { value: 'slightly-delayed', label: 'Ligero retraso' },
-  { value: 'delayed', label: 'Retrasado' },
-];
-
+/**
+ * Timing - Vista timeline/resumen del día de la boda
+ * Sincronizada automáticamente con Momentos Especiales vía useSpecialMoments
+ */
 const Timing = () => {
-  const { activeWedding } = useWedding();
   const {
-    moments: specialMoments,
+    moments,
+    blocks,
+    activeBlockId,
+    setActiveBlockId,
     addMoment,
     updateMoment,
     removeMoment,
-    reorderMoment,
-    moveMoment,
-    duplicateMoment,
+    getSelectedSong,
   } = useSpecialMoments();
-  const [timeline, setTimeline] = useState([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (!activeWedding) return;
-    setLoading(true);
-    const ref = doc(db, 'weddings', activeWedding);
-    const unsub = onSnapshot(ref, (snap) => {
-      const data = snap.data() || {};
-      const t = Array.isArray(data?.timing) ? data.timing : [];
-      setTimeline(t);
-      setLoading(false);
+  const [expandedBlocks, setExpandedBlocks] = useState(['banquete']);
+
+  // Calcular estadísticas globales
+  const globalStats = useMemo(() => {
+    let totalMoments = 0;
+    let withDefinitiveSong = 0;
+    let withTime = 0;
+
+    Object.values(moments).forEach((blockMoments) => {
+      totalMoments += blockMoments.length;
+      blockMoments.forEach((m) => {
+        if (m.isDefinitive) withDefinitiveSong++;
+        if (m.time) withTime++;
+      });
     });
-    return () => unsub();
-  }, [activeWedding]);
 
-  // Inicializar automáticamente los bloques de timing si no existen
-  useEffect(() => {
-    try {
-      if (!activeWedding) return;
-      if (loading) return;
-      if (Array.isArray(timeline) && timeline.length > 0) return;
+    return {
+      total: totalMoments,
+      withDefinitiveSong,
+      withTime,
+      percentage: totalMoments > 0 ? Math.round((withDefinitiveSong / totalMoments) * 100) : 0,
+    };
+  }, [moments]);
 
-      // Crear bloques por defecto alineados con Momentos Especiales
-      const initial = DEFAULT_BLOCKS.map((b) => ({
-        id: b.id,
-        name: b.name,
-        startTime: '',
-        endTime: '',
-        status: 'on-time',
-        moments: [],
-      }));
+  // Calcular progreso por bloque
+  const blockProgress = useMemo(() => {
+    return blocks.map((block) => {
+      const blockMoments = moments[block.id] || [];
+      const total = blockMoments.length;
+      const configured = blockMoments.filter((m) => m.isDefinitive && m.time).length;
 
-      persistTimeline(initial);
-    } catch (e) {
-      // console.warn('No se pudo inicializar el timing por defecto:', e);
-    }
-  }, [activeWedding, loading, timeline]);
+      // Calcular hora de inicio y fin del bloque
+      const times = blockMoments
+        .filter((m) => m.time)
+        .map((m) => m.time)
+        .sort();
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'on-time':
-        return 'bg-green-100 text-green-800';
-      case 'slightly-delayed':
-        return 'bg-blue-100 text-blue-800';
-      case 'delayed':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
+      const startTime = times[0] || '';
+      const endTime = times[times.length - 1] || '';
 
-  const getStatusLabel = (status) => {
-    switch (status) {
-      case 'on-time':
-        return 'A tiempo';
-      case 'slightly-delayed':
-        return 'Ligero retraso';
-      case 'delayed':
-        return 'Retrasado';
-      default:
-        return 'Sin estado';
-    }
-  };
-
-  const mapBlockIdToMomentsKey = (blockId) => {
-    if (!blockId) return '';
-    // Normalizar ids entre timing ('coctel') y momentos ('coctail')
-    if (String(blockId).toLowerCase() === 'coctel') return 'coctail';
-    return String(blockId).toLowerCase();
-  };
-
-  const persistTimeline = async (next) => {
-    try {
-      if (!activeWedding) return;
-      await setDoc(doc(db, 'weddings', activeWedding), { timing: next }, { merge: true });
-      setTimeline(next);
-    } catch (e) {
-      // console.error('No se pudo guardar el timing:', e);
-    }
-  };
-
-  const updateTimingMoment = (blockId, momentId, newTime) => {
-    const next = timeline.map((block) => {
-      if (block.id !== blockId) return block;
-      const moments = Array.isArray(block.moments) ? block.moments : [];
       return {
-        ...block,
-        moments: moments.map((m) => (m.id === momentId ? { ...m, time: newTime } : m)),
+        id: block.id,
+        name: block.name,
+        total,
+        configured,
+        startTime,
+        endTime,
+        percentage: total > 0 ? Math.round((configured / total) * 100) : 0,
       };
     });
-    persistTimeline(next);
-  };
+  }, [blocks, moments]);
 
-  const updateBlockStatus = (blockId, status) => {
-    const next = timeline.map((block) =>
-      block.id === blockId ? { ...block, status } : block,
+  const toggleBlock = (blockId) => {
+    setExpandedBlocks((prev) =>
+      prev.includes(blockId) ? prev.filter((id) => id !== blockId) : [...prev, blockId]
     );
-    persistTimeline(next);
   };
 
-  const addMomentToBlock = (blockId) => {
-    const next = timeline.map((block) => {
-      if (block.id !== blockId) return block;
-      const moments = Array.isArray(block.moments) ? block.moments : [];
-      const newMoment = {
-        id: Date.now(),
-        name: `Nuevo momento ${moments.length + 1}`,
-        time: '',
-        duration: '',
-        status: 'on-time',
-      };
-      return { ...block, moments: [...moments, newMoment] };
+  const handleAddMoment = (blockId) => {
+    const blockMoments = moments[blockId] || [];
+    const nextOrder = blockMoments.length + 1;
+
+    addMoment(blockId, {
+      order: nextOrder,
+      title: `Nuevo momento ${nextOrder}`,
+      type: 'musical',
+      time: '',
     });
-    persistTimeline(next);
+
+    // Expandir el bloque automáticamente
+    if (!expandedBlocks.includes(blockId)) {
+      setExpandedBlocks((prev) => [...prev, blockId]);
+    }
   };
 
-  if (loading) {
-    return (
-      <div className="p-6">
-        <p className="text-gray-500">Cargando timing...</p>
-      </div>
-    );
-  }
+  const calculateDuration = (startTime, endTime) => {
+    if (!startTime || !endTime) return null;
+
+    try {
+      const [startHour, startMin] = startTime.split(':').map(Number);
+      const [endHour, endMin] = endTime.split(':').map(Number);
+
+      const startMinutes = startHour * 60 + startMin;
+      const endMinutes = endHour * 60 + endMin;
+      const diff = endMinutes - startMinutes;
+
+      if (diff < 0) return null;
+
+      const hours = Math.floor(diff / 60);
+      const minutes = diff % 60;
+
+      if (hours === 0) return `${minutes}min`;
+      if (minutes === 0) return `${hours}h`;
+      return `${hours}h ${minutes}min`;
+    } catch {
+      return null;
+    }
+  };
 
   return (
-    <div className="p-4 md:p-6 space-y-6">
-      <CeremonyTimeline />
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-800">Timing de la Boda</h1>
-        <Button
-          onClick={() => {
-            const name = prompt('Nombre del nuevo bloque (ej. Bienvenida)');
-            if (!name) return;
-            const start = prompt('Hora de inicio (HH:MM)');
-            if (start == null) return;
-            const end = prompt('Hora de fin (HH:MM)');
-            if (end == null) return;
-            const slug = String(name)
-              .toLowerCase()
-              .normalize('NFD')
-              .replace(/\p{Diacritic}/gu, '')
-              .replace(/[^a-z0-9]+/g, '-')
-              .replace(/(^-|-$)/g, '');
-            const id = slug || `bloque-${Date.now()}`;
-            const next = [
-              ...timeline,
-              { id, name, startTime: start, endTime: end, status: 'on-time', moments: [] },
-            ];
-            persistTimeline(next);
-          }}
-        >
-          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-            />
-          </svg>
-          Añadir Bloque
-        </Button>
-      </div>
-
-      <Card className="p-4">
-        <p className="text-gray-600">
-          Organiza la línea de tiempo de tu boda. Este cronograma se genera automáticamente a partir
-          del tutorial inicial y puedes ajustarlo aquí.
-        </p>
-      </Card>
-
-      {timeline.length === 0 ? (
-        <Card className="p-4">
-          <p className="text-gray-600">
-            Aún no hay bloques de timing. Completa el tutorial inicial o crea los bloques
-            manualmente.
+    <PageWrapper title="Timeline de tu Boda">
+      <div className="max-w-7xl mx-auto space-y-6">
+        {/* Header con estadísticas */}
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">Timeline del Día de tu Boda</h1>
+          <p className="text-sm text-gray-600 mb-3">
+            Organiza el cronograma completo de tu celebración
           </p>
-        </Card>
-      ) : (
-        <div className="space-y-6">
-          {timeline.map((block) => (
-            <Card key={block.id || block.name} className="overflow-hidden">
-              <div className="px-6 py-4 border-b flex justify-between items-center">
-                <h3 className="text-lg font-medium">{block.name}</h3>
-                <div className="flex items-center space-x-4">
-                  <select
-                    className={`px-3 py-1 rounded-full text-xs font-medium focus:outline-none ${getStatusColor(block.status)}`}
-                    value={block.status || 'on-time'}
-                    onChange={(e) => updateBlockStatus(block.id, e.target.value)}
-                  >
-                    {STATUS_OPTIONS.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                  <button
-                    className="text-sm text-gray-600 hover:underline"
-                    onClick={() => {
-                      const newStart = prompt(
-                        'Nueva hora de inicio (HH:MM):',
-                        block.startTime || ''
-                      );
-                      if (newStart == null) return;
-                      const newEnd = prompt('Nueva hora de fin (HH:MM):', block.endTime || '');
-                      if (newEnd == null) return;
-                      const next = timeline.map((b) =>
-                        b.id === block.id ? { ...b, startTime: newStart, endTime: newEnd } : b
-                      );
-                      persistTimeline(next);
-                    }}
-                    title="Editar horas del bloque"
-                  >
-                    {block.startTime} - {block.endTime}
-                  </button>
-                </div>
-              </div>
+          <Link to="/protocolo/dia-de-la-boda">
+            <Button className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600">
+              <Play size={16} className="mr-2" />
+              Activar Modo Día de la Boda
+            </Button>
+          </Link>
+        </div>
 
-              {(() => {
-                const key = mapBlockIdToMomentsKey(block.id);
-                const list = Array.isArray(specialMoments[key]) ? specialMoments[key] : [];
-                if (list.length === 0) {
-                  return (
-                    <div className="px-6 py-3 text-sm text-gray-600">
-                      Sin momentos definidos para este bloque.
-                    </div>
-                  );
-                }
-                return (
-                  <div className="divide-y">
-                    {list.map((m, idx) => (
-                      <div
-                        key={m.id}
-                        className="p-4 hover:bg-gray-50 transition-colors"
-                        draggable
-                        onDragStart={(e) => {
-                          e.dataTransfer.effectAllowed = 'move';
-                          e.dataTransfer.setData('id', String(m.id));
-                        }}
-                        onDragOver={(e) => e.preventDefault()}
-                        onDrop={(e) => {
-                          const draggedId = Number(e.dataTransfer.getData('id'));
-                          if (draggedId && draggedId !== m.id) {
-                            moveMoment(key, draggedId, idx);
-                          }
-                        }}
-                      >
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center space-x-3">
-                              <div
-                                className={`w-3 h-3 rounded-full ${getStatusColor(block.status || 'on-time').split(' ')[0]}`}
-                              ></div>
-                              <input
-                                className="font-medium bg-transparent border-b border-dashed focus:outline-none"
-                                value={m.title || ''}
-                                onChange={(e) => updateMoment(key, m.id, { title: e.target.value })}
-                                placeholder="Título del momento"
-                              />
-                            </div>
-                            <div className="ml-6 mt-1 text-sm text-gray-600">
-                              <span className="inline-block mr-4">
-                                <span className="font-medium">Hora:</span>{' '}
-                                <input
-                                  className="w-20 bg-transparent border-b border-dashed focus:outline-none"
-                                  placeholder="hh:mm"
-                                  value={m.time || ''}
-                                  onChange={(e) =>
-                                    updateMoment(key, m.id, { time: e.target.value })
-                                  }
-                                />
+        {/* Estadísticas globales */}
+        <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-gray-900">{globalStats.total}</div>
+              <div className="text-xs text-gray-600">Momentos totales</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-green-600">
+                {globalStats.withDefinitiveSong}
+              </div>
+              <div className="text-xs text-gray-600">Con canción ⭐</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-blue-600">{globalStats.withTime}</div>
+              <div className="text-xs text-gray-600">Con horario</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-purple-600">{globalStats.percentage}%</div>
+              <div className="text-xs text-gray-600">Completado</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Sistema de alertas inteligentes */}
+        <TimelineAlerts moments={moments} blocks={blocks} />
+
+        {/* Vista timeline visual */}
+        <VisualTimeline blocks={blocks} moments={moments} />
+
+        {/* Generador de playlist de Spotify */}
+        <SpotifyPlaylistGenerator moments={moments} blocks={blocks} />
+
+        {/* Bloques de timing */}
+        <div className="space-y-4">
+          {blockProgress.map((block) => {
+            const isExpanded = expandedBlocks.includes(block.id);
+            const blockMoments = (moments[block.id] || []).sort(
+              (a, b) => (a.order || 0) - (b.order || 0)
+            );
+            const duration = calculateDuration(block.startTime, block.endTime);
+
+            return (
+              <div
+                key={block.id}
+                className="bg-white rounded-lg border-2 border-gray-200 overflow-hidden hover:shadow-lg transition-all"
+              >
+                {/* Header del bloque - Clickeable */}
+                <div
+                  className="p-4 cursor-pointer hover:bg-gray-50 transition-colors"
+                  onClick={() => toggleBlock(block.id)}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3 flex-1">
+                      <div className="flex items-center gap-2">
+                        <ChevronRight
+                          size={20}
+                          className={`text-gray-400 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+                        />
+                        <Calendar size={20} className="text-blue-500" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-lg font-semibold text-gray-900">{block.name}</h3>
+                        <div className="flex items-center gap-4 text-sm text-gray-600 mt-1">
+                          {block.startTime && block.endTime && (
+                            <>
+                              <span className="flex items-center gap-1">
+                                <Clock size={14} />
+                                {block.startTime} - {block.endTime}
                               </span>
-                              <span className="inline-block">
-                                <span className="font-medium">Duración:</span>{' '}
-                                <input
-                                  className="w-24 bg-transparent border-b border-dashed focus:outline-none"
-                                  placeholder="ej. 10 min"
-                                  value={m.duration || ''}
-                                  onChange={(e) =>
-                                    updateMoment(key, m.id, { duration: e.target.value })
-                                  }
-                                />
-                              </span>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <button
-                              className="text-xs px-2 py-1 bg-gray-100 rounded disabled:opacity-50"
-                              disabled={idx === 0}
-                              onClick={() => reorderMoment(key, m.id, 'up')}
-                            >
-                              ▲
-                            </button>
-                            <button
-                              className="text-xs px-2 py-1 bg-gray-100 rounded disabled:opacity-50"
-                              disabled={idx === list.length - 1}
-                              onClick={() => reorderMoment(key, m.id, 'down')}
-                            >
-                              ▼
-                            </button>
-                            <button
-                              className="p-1 text-red-600 hover:text-red-800"
-                              title="Eliminar"
-                              onClick={() => removeMoment(key, m.id)}
-                            >
-                              <svg
-                                className="w-5 h-5"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                />
-                              </svg>
-                            </button>
-                          </div>
+                              {duration && <span className="text-gray-500">· {duration}</span>}
+                            </>
+                          )}
+                          <span>
+                            {block.configured}/{block.total} configurados
+                          </span>
                         </div>
                       </div>
-                    ))}
+                    </div>
+
+                    {/* Barra de progreso */}
+                    <div className="flex items-center gap-3">
+                      <div className="w-32 bg-gray-200 rounded-full h-2">
+                        <div
+                          className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all"
+                          style={{ width: `${block.percentage}%` }}
+                        />
+                      </div>
+                      <span className="text-sm font-semibold text-gray-600 w-12">
+                        {block.percentage}%
+                      </span>
+                    </div>
                   </div>
-                );
-              })()}
+                </div>
 
-              <div className="px-6 py-3 bg-gray-50 flex justify-between items-center">
-                <button
-                  className="text-sm text-red-600 hover:text-red-800 font-medium"
-                  onClick={() => {
-                    if (!confirm(`Eliminar bloque "${block.name}"?`)) return;
-                    const next = timeline.filter((b) => b.id !== block.id);
-                    persistTimeline(next);
-                  }}
-                >
-                  Eliminar bloque
-                </button>
-                <button
-                  className="text-sm text-blue-600 hover:text-blue-800 font-medium"
-                  onClick={() => {
-                    const key = mapBlockIdToMomentsKey(block.id);
-                    const current = Array.isArray(specialMoments[key]) ? specialMoments[key] : [];
-                    const nextOrder = (current.length || 0) + 1;
-                    addMoment(key, {
-                      order: nextOrder,
-                      title: `Nuevo momento ${nextOrder}`,
-                      time: '',
-                    });
-                  }}
-                >
-                  + Añadir momento
-                </button>
+                {/* Contenido expandible */}
+                {isExpanded && (
+                  <div className="border-t border-gray-200">
+                    {blockMoments.length === 0 ? (
+                      <div className="p-8 text-center">
+                        <Music size={48} className="mx-auto text-gray-300 mb-3" />
+                        <p className="text-gray-600 mb-4">No hay momentos en este bloque</p>
+                        <Button size="sm" onClick={() => handleAddMoment(block.id)}>
+                          <Plus size={16} className="mr-1" />
+                          Añadir primer momento
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="divide-y divide-gray-100">
+                        {blockMoments.map((moment, idx) => {
+                          const selectedSong = getSelectedSong(moment);
+                          const nextMoment = blockMoments[idx + 1];
+                          const momentDuration = nextMoment
+                            ? calculateDuration(moment.time, nextMoment.time)
+                            : null;
+
+                          return (
+                            <div key={moment.id} className="p-4 hover:bg-gray-50 transition-colors">
+                              <div className="flex items-start gap-4">
+                                {/* Orden */}
+                                <div className="flex-shrink-0">
+                                  <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                                    {moment.order || idx + 1}
+                                  </div>
+                                </div>
+
+                                {/* Info principal */}
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <h4 className="font-medium text-gray-900">{moment.title}</h4>
+                                    {moment.isDefinitive && (
+                                      <div className="flex items-center gap-1 px-2 py-0.5 bg-amber-100 border border-amber-300 rounded text-xs font-semibold text-amber-800">
+                                        <Star size={12} fill="currentColor" />
+                                        Definitiva
+                                      </div>
+                                    )}
+                                  </div>
+
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                                    {/* Hora */}
+                                    <div className="flex items-center gap-2">
+                                      <Clock size={14} className="text-gray-400" />
+                                      <input
+                                        type="time"
+                                        value={moment.time || ''}
+                                        onChange={(e) =>
+                                          updateMoment(block.id, moment.id, {
+                                            time: e.target.value,
+                                          })
+                                        }
+                                        className="flex-1 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                      />
+                                      {momentDuration && (
+                                        <span className="text-xs text-gray-500">
+                                          ({momentDuration})
+                                        </span>
+                                      )}
+                                    </div>
+
+                                    {/* Canción o Playlist */}
+                                    <div className="flex items-center gap-2">
+                                      <Music size={14} className="text-gray-400" />
+                                      {(() => {
+                                        const musicType = moment.musicType || 'song';
+
+                                        if (musicType === 'playlist' && moment.playlistUrl) {
+                                          return (
+                                            <div className="flex-1 flex items-center gap-2">
+                                              <span className="px-2 py-0.5 bg-green-100 text-green-800 text-xs font-semibold rounded">
+                                                📋 Playlist
+                                              </span>
+                                              <Link
+                                                to="/protocolo/momentos-especiales"
+                                                className="text-green-600 hover:text-green-800 hover:underline truncate text-xs"
+                                              >
+                                                Ambiente configurado
+                                              </Link>
+                                            </div>
+                                          );
+                                        }
+
+                                        if (musicType === 'none') {
+                                          return (
+                                            <span className="flex-1 text-gray-400 text-xs">
+                                              🔇 Sin música
+                                            </span>
+                                          );
+                                        }
+
+                                        // Modo canción
+                                        if (selectedSong) {
+                                          return (
+                                            <Link
+                                              to="/protocolo/momentos-especiales"
+                                              className="flex-1 text-blue-600 hover:text-blue-800 hover:underline truncate"
+                                            >
+                                              {selectedSong.title} - {selectedSong.artist}
+                                            </Link>
+                                          );
+                                        }
+
+                                        return (
+                                          <Link
+                                            to="/protocolo/momentos-especiales"
+                                            className="flex-1 text-gray-400 hover:text-blue-600 hover:underline"
+                                          >
+                                            Sin canción → Configurar
+                                          </Link>
+                                        );
+                                      })()}
+                                    </div>
+                                  </div>
+
+                                  {/* Notas editables */}
+                                  <div className="mt-2">
+                                    <div className="flex items-start gap-2">
+                                      <FileText size={14} className="text-gray-400 mt-2" />
+                                      <textarea
+                                        value={moment.notes || ''}
+                                        onChange={(e) =>
+                                          updateMoment(block.id, moment.id, {
+                                            notes: e.target.value,
+                                          })
+                                        }
+                                        placeholder="Añadir notas (ej: pétalos, cámara especial, etc.)"
+                                        className="flex-1 px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                                        rows={2}
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* Acciones */}
+                                <div className="flex-shrink-0">
+                                  <Link
+                                    to="/protocolo/momentos-especiales"
+                                    className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+                                  >
+                                    Editar →
+                                  </Link>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+
+                        {/* Botón añadir momento */}
+                        <div className="p-4 bg-gray-50 flex justify-center">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleAddMoment(block.id)}
+                          >
+                            <Plus size={16} className="mr-1" />
+                            Añadir momento
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
-            </Card>
-          ))}
+            );
+          })}
         </div>
-      )}
 
-      <Card className="p-4 bg-blue-50">
-        <div className="space-y-2">
-          <h3 className="font-medium text-blue-800 flex items-center">
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            Consejo de planificación
-          </h3>
-          <p className="text-sm text-blue-700">
-            Asegúrate de incluir tiempos de transición entre eventos. Como regla general, añade un
-            10-15% de tiempo extra a cada bloque para imprevistos.
-          </p>
+        {/* Enlace a Momentos Especiales */}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-start gap-3">
+            <Music className="text-blue-600 flex-shrink-0" size={20} />
+            <div className="flex-1">
+              <h3 className="font-semibold text-blue-900 mb-1">
+                ¿Necesitas configurar las canciones?
+              </h3>
+              <p className="text-sm text-blue-700 mb-3">
+                Ve a la página de Momentos Especiales para elegir y configurar las canciones
+                definitivas para cada momento.
+              </p>
+              <Link to="/protocolo/momentos-especiales">
+                <Button size="sm">
+                  <Music size={16} className="mr-1" />
+                  Ir a Momentos Especiales
+                </Button>
+              </Link>
+            </div>
+          </div>
         </div>
-      </Card>
-    </div>
+      </div>
+    </PageWrapper>
   );
 };
 

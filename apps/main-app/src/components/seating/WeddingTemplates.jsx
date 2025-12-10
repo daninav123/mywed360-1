@@ -131,6 +131,7 @@ export function generateFromTemplate(templateId, config = {}) {
 
   const {
     guestCount = 100,
+    currentTableCount = 0,
     hallWidth = 2000,
     hallHeight = 1600,
     includePresidential = true,
@@ -142,9 +143,10 @@ export function generateFromTemplate(templateId, config = {}) {
   const tables = [];
   const zones = [];
 
-  // Calcular número de mesas necesarias
+  // Usar número de mesas actual o calcular necesarias
   const avgCapacity = 8;
-  const tableCount = Math.ceil(guestCount / avgCapacity);
+  const calculatedTables = Math.ceil(guestCount / avgCapacity);
+  const tableCount = currentTableCount > 0 ? currentTableCount : calculatedTables;
 
   switch (templateId) {
     case 'imperial': {
@@ -171,7 +173,7 @@ export function generateFromTemplate(templateId, config = {}) {
       for (let i = 0; i < tableCount; i++) {
         const angle = angleStep * (i + 1);
         tables.push({
-          id: `table-${i + 1}`,
+          id: i + 1, // ID numérico
           name: `Mesa ${i + 1}`,
           shape: 'circle',
           x: hallWidth / 2 + radius * Math.cos(angle),
@@ -208,7 +210,7 @@ export function generateFromTemplate(templateId, config = {}) {
           const radius = 150;
 
           tables.push({
-            id: `table-${tables.length + 1}`,
+            id: tables.length + 1,
             name: `Mesa ${tables.length + 1}`,
             shape: Math.random() > 0.5 ? 'circle' : 'oval',
             x: clusterX + radius * Math.cos(angle) + (Math.random() - 0.5) * 50,
@@ -238,7 +240,7 @@ export function generateFromTemplate(templateId, config = {}) {
 
       for (let i = 0; i < longTableCount; i++) {
         tables.push({
-          id: `long-table-${i + 1}`,
+          id: i + 1,
           name: `Mesa Larga ${i + 1}`,
           shape: 'rectangle',
           x: 300 + (i * (hallWidth - 600)) / (longTableCount - 1),
@@ -247,6 +249,126 @@ export function generateFromTemplate(templateId, config = {}) {
           height: tableLength,
           capacity: 20,
           angle: 0,
+        });
+      }
+      break;
+    }
+
+    case 'banquetHall': {
+      // Grid tradicional con pasillos
+      const cols = Math.ceil(Math.sqrt(tableCount));
+      const rows = Math.ceil(tableCount / cols);
+      const spacingX = (hallWidth - 400) / cols;
+      const spacingY = (hallHeight - 400) / rows;
+
+      for (let i = 0; i < tableCount; i++) {
+        const col = i % cols;
+        const row = Math.floor(i / cols);
+
+        tables.push({
+          id: i + 1,
+          name: `Mesa ${i + 1}`,
+          shape: 'circle',
+          x: 200 + col * spacingX + spacingX / 2,
+          y: 200 + row * spacingY + spacingY / 2,
+          diameter: 120,
+          capacity: avgCapacity,
+        });
+      }
+      break;
+    }
+
+    case 'minimalist': {
+      // Grid limpio con mucho espacio
+      const cols = Math.min(4, Math.ceil(Math.sqrt(tableCount)));
+      const rows = Math.ceil(tableCount / cols);
+      const spacingX = (hallWidth - 200) / (cols + 1);
+      const spacingY = (hallHeight - 200) / (rows + 1);
+
+      for (let i = 0; i < tableCount; i++) {
+        const col = i % cols;
+        const row = Math.floor(i / cols);
+
+        tables.push({
+          id: i + 1,
+          name: `Mesa ${i + 1}`,
+          shape: 'square',
+          x: 100 + (col + 1) * spacingX,
+          y: 100 + (row + 1) * spacingY,
+          width: 100,
+          height: 100,
+          capacity: avgCapacity,
+        });
+      }
+      break;
+    }
+
+    case 'beach': {
+      // Semicírculo mirando al "frente"
+      const radius = Math.min(hallWidth, hallHeight) * 0.4;
+      const angleSpan = Math.PI; // 180 grados
+      const angleStep = angleSpan / (tableCount + 1);
+      const centerX = hallWidth / 2;
+      const centerY = hallHeight * 0.7;
+
+      for (let i = 0; i < tableCount; i++) {
+        const angle = angleStep * (i + 1);
+        tables.push({
+          id: i + 1,
+          name: `Mesa ${i + 1}`,
+          shape: 'circle',
+          x: centerX + radius * Math.cos(Math.PI - angle),
+          y: centerY - radius * Math.sin(Math.PI - angle) * 0.6,
+          diameter: 100,
+          capacity: avgCapacity,
+        });
+      }
+
+      // Zona para la vista (mar/ceremonia)
+      zones.push({
+        type: 'zone',
+        subtype: 'VIEW',
+        x: hallWidth / 2 - 300,
+        y: 50,
+        width: 600,
+        height: 150,
+      });
+      break;
+    }
+
+    case 'rustic': {
+      // Mesas mixtas estilo granja
+      const longTables = Math.floor(tableCount / 3);
+      const roundTables = tableCount - longTables;
+
+      // Mesas largas en el centro
+      for (let i = 0; i < longTables; i++) {
+        tables.push({
+          id: i + 1,
+          name: `Mesa Larga ${i + 1}`,
+          shape: 'rectangle',
+          x: hallWidth / 2,
+          y: 200 + i * 180,
+          width: 400,
+          height: 80,
+          capacity: 12,
+        });
+      }
+
+      // Mesas redondas alrededor
+      const radius = 300;
+      const angleStep = (Math.PI * 2) / roundTables;
+
+      for (let i = 0; i < roundTables; i++) {
+        const angle = angleStep * i;
+        tables.push({
+          id: longTables + i + 1,
+          name: `Mesa ${longTables + i + 1}`,
+          shape: 'circle',
+          x: hallWidth / 2 + radius * Math.cos(angle),
+          y: hallHeight / 2 + radius * Math.sin(angle),
+          diameter: 120,
+          capacity: avgCapacity,
         });
       }
       break;
@@ -282,7 +404,7 @@ export function generateFromTemplate(templateId, config = {}) {
         }
 
         tables.push({
-          id: `high-table-${i + 1}`,
+          id: i + 1,
           name: `Mesa Alta ${i + 1}`,
           shape: 'circle',
           x,
@@ -302,8 +424,8 @@ export function generateFromTemplate(templateId, config = {}) {
         const row = Math.floor(i / cols);
 
         tables.push({
-          id: `table-${i + 1}`,
-          name: `Mesa ${i + 1}`,
+          id: highTableCount + i + 1,
+          name: `Mesa ${highTableCount + i + 1}`,
           shape: 'circle',
           x: 400 + col * 200,
           y: 300 + row * 200,
@@ -336,7 +458,7 @@ export function generateFromTemplate(templateId, config = {}) {
         const row = Math.floor(i / cols);
 
         tables.push({
-          id: `table-${i + 1}`,
+          id: i + 1,
           name: `Mesa ${i + 1}`,
           shape: 'circle',
           x: 200 + col * spacingX + spacingX / 2,
@@ -381,7 +503,14 @@ export function generateFromTemplate(templateId, config = {}) {
 }
 
 // Componente selector de plantillas
-export default function TemplateSelector({ onSelectTemplate, guestCount = 100, isOpen, onClose }) {
+export default function TemplateSelector({
+  onSelectTemplate,
+  guestCount = 100,
+  guests = [],
+  hallSize = {},
+  isOpen,
+  onClose,
+}) {
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [customConfig, setCustomConfig] = useState({
     includePresidential: true,
@@ -392,13 +521,31 @@ export default function TemplateSelector({ onSelectTemplate, guestCount = 100, i
 
   if (!isOpen) return null;
 
+  // Calcular mesas reales desde los invitados asignados
+  const assignedGuests = guests.filter((g) => g.table || g.tableId);
+  const uniqueTables = new Set(assignedGuests.map((g) => g.table || g.tableId).filter(Boolean));
+  const realTableCount = uniqueTables.size;
+
   const handleApplyTemplate = () => {
-    if (!selectedTemplate) return;
+    console.log('[TemplateSelector] 🎯 Aplicando plantilla:', selectedTemplate);
+    console.log('[TemplateSelector] 📐 Hall dimensions:', hallSize);
+
+    if (!selectedTemplate) {
+      console.warn('[TemplateSelector] ❌ No hay plantilla seleccionada');
+      return;
+    }
 
     const result = generateFromTemplate(selectedTemplate, {
       guestCount,
+      currentTableCount: realTableCount,
+      hallWidth: hallSize?.width || 1800,
+      hallHeight: hallSize?.height || 1200,
       ...customConfig,
     });
+
+    console.log('[TemplateSelector] ✅ Resultado generado:', result);
+    console.log('[TemplateSelector] 📊 Mesas generadas:', result?.tables?.length || 0);
+    console.log('[TemplateSelector] 🎨 Zonas generadas:', result?.zones?.length || 0);
 
     onSelectTemplate(result);
     onClose();
@@ -425,6 +572,14 @@ export default function TemplateSelector({ onSelectTemplate, guestCount = 100, i
               const [minCap, maxCap] = template.capacity;
               const isRecommended = guestCount >= minCap && guestCount <= maxCap;
 
+              // Usar mesas reales desde asignaciones o calcular estimación
+              const avgCapacity = 8;
+              const calculatedTables = Math.ceil(guestCount / avgCapacity);
+              const displayTables = realTableCount > 0 ? realTableCount : calculatedTables;
+              const tableLabel = realTableCount > 0 ? 'mesas asignadas' : 'mesas estimadas';
+              const assignedGuestsCount = assignedGuests.length;
+              const unassignedCount = guestCount - assignedGuestsCount;
+
               return (
                 <button
                   key={id}
@@ -440,7 +595,7 @@ export default function TemplateSelector({ onSelectTemplate, guestCount = 100, i
                 >
                   {isRecommended && (
                     <span className="absolute -top-2 -right-2 px-2 py-1 text-xs bg-green-500 text-white rounded-full">
-                      Recomendado
+                      Recomendada
                     </span>
                   )}
 
@@ -449,8 +604,19 @@ export default function TemplateSelector({ onSelectTemplate, guestCount = 100, i
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     {template.description}
                   </p>
-                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
-                    {minCap}-{maxCap} invitados
+                  <p className="text-xs font-medium text-indigo-600 dark:text-indigo-400 mt-2">
+                    {displayTables} {tableLabel}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    {assignedGuestsCount} asignados de {guestCount}
+                  </p>
+                  {unassignedCount > 0 && (
+                    <p className="text-xs text-orange-500 dark:text-orange-400 mt-1">
+                      ⚠️ {unassignedCount} sin asignar
+                    </p>
+                  )}
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                    Ideal: {minCap}-{maxCap} invitados
                   </p>
                 </button>
               );

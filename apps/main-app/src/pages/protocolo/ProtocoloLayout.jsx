@@ -4,6 +4,7 @@ import LanguageSelector from '../../components/ui/LanguageSelector';
 
 const SECTION_TITLES = {
   'momentos-especiales': 'Momentos Especiales',
+  'musica-limpia': 'Música para tu Boda',
   timing: 'Timing',
   checklist: 'Checklist',
   'ayuda-ceremonia': 'Ayuda ceremonia',

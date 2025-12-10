@@ -7,6 +7,7 @@ let openaiClient = null;
 
 const OPENAI_API_KEY =
   process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY || process.env.OPENAI_TOKEN || '';
+const OPENAI_PROJECT_ID = process.env.OPENAI_PROJECT_ID || process.env.VITE_OPENAI_PROJECT_ID || '';
 const FALLBACK_COVER_PROMPT =
   'Editorial wedding photography, elegant pastel palette, minimal styling, soft natural light';
 const DEFAULT_IMAGE_MODEL = process.env.OPENAI_IMAGE_MODEL || 'gpt-image-1';
@@ -20,7 +21,7 @@ const SUPPORTED_TRANSLATION_LANGUAGES = (process.env.BLOG_SUPPORTED_LANGUAGES ||
 async function ensureOpenAI() {
   if (openaiClient || !OPENAI_API_KEY) return openaiClient;
   const { default: OpenAI } = await import('openai');
-  openaiClient = new OpenAI({ apiKey: OPENAI_API_KEY });
+  openaiClient = new OpenAI({ apiKey: OPENAI_API_KEY, project: OPENAI_PROJECT_ID || undefined });
   return openaiClient;
 }
 

@@ -33,23 +33,29 @@ import admin from 'firebase-admin';
 const router = express.Router();
 
 let openai = null;
-let openAIConfig = { apiKey: null };
+let openAIConfig = { apiKey: null, projectId: null };
 
 const resolveOpenAIKey = () => process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY || '';
+const resolveProjectId = () =>
+  process.env.OPENAI_PROJECT_ID || process.env.VITE_OPENAI_PROJECT_ID || '';
 const resolveTavilyKey = () => process.env.TAVILY_API_KEY || '';
 
 const ensureOpenAIClient = () => {
   const apiKey = resolveOpenAIKey().trim();
+  const projectId = resolveProjectId().trim();
   if (!apiKey) {
     openai = null;
-    openAIConfig = { apiKey: null };
+    openAIConfig = { apiKey: null, projectId: null };
     return false;
   }
-  if (openai && openAIConfig.apiKey === apiKey) return true;
+  if (openai && openAIConfig.apiKey === apiKey && openAIConfig.projectId === projectId) return true;
   try {
-    openai = new OpenAI({ apiKey });
-    openAIConfig = { apiKey };
-    logger.info('[ai-suppliers-tavily] Cliente OpenAI inicializado');
+    openai = new OpenAI({ apiKey, project: projectId || undefined });
+    openAIConfig = { apiKey, projectId };
+    logger.info('[ai-suppliers-tavily] Cliente OpenAI inicializado', {
+      apiKeyPrefix: apiKey.slice(0, 8),
+      projectId: projectId || null,
+    });
     return true;
   } catch (error) {
     openai = null;

@@ -116,7 +116,7 @@ export const useSeatingPlan = () => {
   const ownedLocksRef = useRef(new Set());
   const [specialMomentsData, setSpecialMomentsData] = useState(null);
   const specialMomentsUnsubRef = useRef(null);
-  const [tab, setTab] = useState('ceremony');
+  const [tab, setTab] = useState('banquet');
 
   const buildBlocksFromMoments = (moments = {}) => {
     return Object.keys(moments || {})

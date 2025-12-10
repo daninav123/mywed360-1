@@ -103,6 +103,7 @@ export default function SeatingPlanModern() {
     // Generation
     generateSeatGrid,
     generateBanquetLayout,
+    applyBanquetTables,
     setupSeatingPlanAutomatically, // Generación TODO automática ✨
 
     // Export
@@ -427,11 +428,13 @@ export default function SeatingPlanModern() {
       tab,
       setTab,
       generateBanquetLayout,
+      applyBanquetTables,
       addTable,
       drawingElements,
       setDrawingElements,
+      hallSize,
     });
-  }, [tab, setTab, generateBanquetLayout, addTable, drawingElements]);
+  }, [tab, setTab, generateBanquetLayout, applyBanquetTables, addTable, drawingElements, hallSize]);
 
   const {
     handleAddDrawingElement,
@@ -745,6 +748,8 @@ export default function SeatingPlanModern() {
             // achievements.trackEvent('template_used');
           }}
           guestCount={stats.totalGuests}
+          guests={guests || []}
+          hallSize={hallSize}
         />
 
         {/* FASE 3: Banquet Config Advanced Modal */}

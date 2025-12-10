@@ -2,9 +2,12 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
-import WebGenerator from '../components/web/WebGenerator';
-import WebTemplateGallery from '../components/web/WebTemplateGallery';
 import WebsitePreview from '../components/web/WebsitePreview';
+import SimpleWebDesigner, {
+  SimpleTemplateSelector,
+  SimplePromptEditor,
+} from '../components/web/SimpleWebDesigner';
+import VariablesEditor from '../components/web/VariablesEditor';
 import { useWedding } from '../context/WeddingContext';
 import { useAuth } from '../hooks/useAuth';
 import useTranslations from '../hooks/useTranslations';
@@ -170,10 +173,57 @@ const buildWeddingInfoFromProfile = (profile) => {
     lodgingOptions = [],
   } = safeProfile;
 
-  return {
-    bride: brideInfo.nombre || 'Nombre de la novia',
-    groom: groomInfo.nombre || 'Nombre del novio',
-    date: ceremonyInfo.fecha || '',
+  // Formatear fecha si viene en formato Date
+  const formatDate = (fecha) => {
+    if (!fecha) return '';
+    try {
+      // Si es un timestamp de Firebase
+      if (fecha.seconds) {
+        const date = new Date(fecha.seconds * 1000);
+        return date.toLocaleDateString('es-ES', {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric',
+        });
+      }
+      // Si es un string de fecha
+      if (typeof fecha === 'string') {
+        const date = new Date(fecha);
+        if (!isNaN(date.getTime())) {
+          return date.toLocaleDateString('es-ES', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+          });
+        }
+        return fecha; // Devolver el string tal cual si no se puede parsear
+      }
+      return fecha.toString();
+    } catch (e) {
+      return fecha;
+    }
+  };
+
+  // Construir nombres de la pareja
+  const nombresPareja = [brideInfo.nombre, groomInfo.nombre].filter(Boolean).join(' y ') || '';
+
+  const variables = {
+    // Variables principales para el editor simple
+    nombres: nombresPareja,
+    fecha: formatDate(ceremonyInfo.fecha),
+    ubicacion: ceremonyInfo.ciudad || ceremonyInfo.lugar || '',
+    ceremoniaLugar: ceremonyInfo.lugar || '',
+    ceremoniaHora: ceremonyInfo.hora || '',
+    recepcionLugar: receptionInfo.lugar || '',
+    recepcionHora: receptionInfo.hora || '',
+    historia: safeProfile.story || safeProfile.ourStory || '',
+    email: safeProfile.contactEmail || '',
+    telefono: safeProfile.contactPhone || '',
+
+    // Datos legacy para compatibilidad
+    bride: brideInfo.nombre || '',
+    groom: groomInfo.nombre || '',
+    date: formatDate(ceremonyInfo.fecha),
     ceremonyTime: ceremonyInfo.hora || '',
     ceremonyLocation: ceremonyInfo.lugar || '',
     ceremonyAddress: ceremonyInfo.direccion || '',
@@ -184,10 +234,10 @@ const buildWeddingInfoFromProfile = (profile) => {
     shuttleSchedule: Array.isArray(transportationInfo.schedule) ? transportationInfo.schedule : [],
     contactPhone: safeProfile.contactPhone || '',
     contactEmail: safeProfile.contactEmail || '',
-    weddingStyle: safeProfile.weddingStyle || 'Cl�sico',
-    colorScheme: safeProfile.colorScheme || 'Blanco y dorado',
-    additionalInfo: safeProfile.additionalInfo || '',
-    story: safeProfile.story || '',
+    weddingStyle: safeProfile.weddingStyle || safeProfile.estilo || 'Clásico',
+    colorScheme: safeProfile.colorScheme || safeProfile.colores || 'Blanco y dorado',
+    additionalInfo: safeProfile.additionalInfo || safeProfile.informacionAdicional || '',
+    story: safeProfile.story || safeProfile.ourStory || '',
     lodgingOptions: Array.isArray(lodgingOptions) ? lodgingOptions : [],
     travelGuide: {
       summary: travelInfo.summary || '',
@@ -203,17 +253,22 @@ const buildWeddingInfoFromProfile = (profile) => {
 };
 
 const buildFallbackHtml = (weddingInfo, template) => {
+  // Validar que weddingInfo no sea undefined
+  const safeWeddingInfo = weddingInfo || {};
+
   const styleNote = template?.tokens?.style || 'estilo personalizado';
-  const ceremony = [weddingInfo.ceremonyLocation, weddingInfo.ceremonyTime]
+  const ceremony = [safeWeddingInfo.ceremonyLocation, safeWeddingInfo.ceremonyTime]
     .filter(Boolean)
-    .join(' � ');
-  const reception = [weddingInfo.receptionVenue, weddingInfo.receptionTime]
+    .join(' · ');
+  const reception = [safeWeddingInfo.receptionVenue, safeWeddingInfo.receptionTime]
     .filter(Boolean)
-    .join(' � ');
-  const contact = [weddingInfo.contactEmail, weddingInfo.contactPhone].filter(Boolean).join(' � ');
+    .join(' · ');
+  const contact = [safeWeddingInfo.contactEmail, safeWeddingInfo.contactPhone]
+    .filter(Boolean)
+    .join(' · ');
 
   const scheduleRows = (
-    Array.isArray(weddingInfo.shuttleSchedule) ? weddingInfo.shuttleSchedule : []
+    Array.isArray(safeWeddingInfo.shuttleSchedule) ? safeWeddingInfo.shuttleSchedule : []
   )
     .map(
       (item) => `
@@ -226,7 +281,9 @@ const buildFallbackHtml = (weddingInfo, template) => {
     )
     .join('');
 
-  const lodgingCards = (Array.isArray(weddingInfo.lodgingOptions) ? weddingInfo.lodgingOptions : [])
+  const lodgingCards = (
+    Array.isArray(safeWeddingInfo.lodgingOptions) ? safeWeddingInfo.lodgingOptions : []
+  )
     .map((hotel) => {
       const title = hotel.name || hotel.title || 'Hospedaje recomendado';
       const distance = hotel.distance || hotel.minutes || '';
@@ -244,17 +301,17 @@ const buildFallbackHtml = (weddingInfo, template) => {
     })
     .join('');
 
-  const travel = weddingInfo.travelGuide || {};
-  const mapAddress = [weddingInfo.ceremonyAddress, weddingInfo.receptionAddress]
+  const travel = safeWeddingInfo.travelGuide || {};
+  const mapAddress = [safeWeddingInfo.ceremonyAddress, safeWeddingInfo.receptionAddress]
     .filter(Boolean)
     .join(' / ');
   const mapSection = mapAddress
     ? `
     <section data-enhanced="mapa" id="mapa">
-      <div class="maloveapp-section-heading"><span>Mapa de la celebraci�n</span></div>
+      <div class="maloveapp-section-heading"><span>Mapa de la celebración</span></div>
       <div class="maloveapp-card">
         <iframe
-          title="Ubicaci�n de la boda"
+          title="Ubicación de la boda"
           src="https://maps.google.com/maps?q=${encodeURIComponent(mapAddress)}&output=embed"
           width="100%"
           height="320"
@@ -265,7 +322,7 @@ const buildFallbackHtml = (weddingInfo, template) => {
       </div>
     </section>`
     : '';
-  const faqEntries = (Array.isArray(weddingInfo.faqs) ? weddingInfo.faqs : [])
+  const faqEntries = (Array.isArray(safeWeddingInfo.faqs) ? safeWeddingInfo.faqs : [])
     .map(
       (faq) => `
       <div class="maloveapp-faq__item">
@@ -291,13 +348,13 @@ const buildFallbackHtml = (weddingInfo, template) => {
       <div class="maloveapp-grid maloveapp-grid--two">
         <div class="maloveapp-card">
           <h3>Ceremonia</h3>
-          <p>${ceremony || 'Pronto m�s detalles'}</p>
-          ${weddingInfo.ceremonyAddress ? `<small>${weddingInfo.ceremonyAddress}</small>` : ''}
+          <p>${ceremony || 'Pronto más detalles'}</p>
+          ${safeWeddingInfo.ceremonyAddress ? `<small>${safeWeddingInfo.ceremonyAddress}</small>` : ''}
         </div>
         <div class="maloveapp-card">
-          <h3>Recepci�n</h3>
-          <p>${reception || 'Pronto m�s detalles'}</p>
-          ${weddingInfo.receptionAddress ? `<small>${weddingInfo.receptionAddress}</small>` : ''}
+          <h3>Recepción</h3>
+          <p>${reception || 'Pronto más detalles'}</p>
+          ${safeWeddingInfo.receptionAddress ? `<small>${safeWeddingInfo.receptionAddress}</small>` : ''}
         </div>
       </div>
     </section>
@@ -305,7 +362,7 @@ const buildFallbackHtml = (weddingInfo, template) => {
     <section data-enhanced="transport" id="transporte">
       <div class="maloveapp-section-heading"><span>Transporte y autobuses</span></div>
       <div class="maloveapp-card">
-        <p>${weddingInfo.transportation || 'Habr� servicio de transporte para invitados. Consulta los horarios en la tabla.'}</p>
+        <p>${safeWeddingInfo.transportation || 'Habrá servicio de transporte para invitados. Consulta los horarios en la tabla.'}</p>
         <div class="maloveapp-table-wrapper">
           <table>
             <thead>
@@ -342,8 +399,8 @@ const buildFallbackHtml = (weddingInfo, template) => {
 
     <section data-enhanced="story">
       <div class="maloveapp-section-heading"><span>Nuestra historia</span></div>
-      <p>${weddingInfo.story || weddingInfo.additionalInfo || 'Pronto compartiremos detalles de nuestra historia.'}</p>
-      <p>Inspiraci�n visual: ${styleNote}.</p>
+      <p>${safeWeddingInfo.story || safeWeddingInfo.additionalInfo || 'Pronto compartiremos detalles de nuestra historia.'}</p>
+      <p>Inspiración visual: ${styleNote}.</p>
     </section>
 
     <section data-enhanced="lodging">
@@ -390,7 +447,7 @@ const buildFallbackHtml = (weddingInfo, template) => {
     </section>
   </main>
   <footer>
-    Con cari�o, ${weddingInfo.bride || ''} y ${weddingInfo.groom || ''}.
+    Con cariño, ${safeWeddingInfo.bride || ''} y ${safeWeddingInfo.groom || ''}.
   </footer>
   `;
 };
@@ -1463,6 +1520,7 @@ const LogisticsEditor = ({ open, draft, onDraftChange, onClose, onSave, saving }
 
 export default function DisenoWeb() {
   const { currentUser } = useAuth();
+  const uid = currentUser?.uid;
   const { activeWedding } = useWedding();
   const { t } = useTranslations();
   const location = useLocation();
@@ -1498,6 +1556,12 @@ export default function DisenoWeb() {
   const [missingBasics, setMissingBasics] = useState(false);
   const [customPrompts, setCustomPrompts] = useState([]);
   const [promptLibraryLoading, setPromptLibraryLoading] = useState(false);
+
+  // 🎨 Estados simplificados
+  const [currentStep, setCurrentStep] = useState(1); // 1: Plantilla, 2: Contenido, 3: Preview, 4: Publicar
+  const [webVariables, setWebVariables] = useState({}); // Variables editables específicas para la web
+  const [showVariablesEditor, setShowVariablesEditor] = useState(false);
+
   const isTestEnv = typeof window !== 'undefined' && !!window.Cypress;
   const [testTemplate, setTestTemplate] = useState('personalizada');
   const [testPrompt, setTestPrompt] = useState('');
@@ -1646,11 +1710,11 @@ export default function DisenoWeb() {
   }, [location.state, location.pathname, location.search, navigate]);
 
   useEffect(() => {
-    const shouldFocusPreview = location.pathname.endsWith('/preview') || mode === 'preview';
+    const shouldFocusPreview = location.pathname.endsWith('/preview');
     if (shouldFocusPreview && previewRef.current) {
       previewRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-  }, [location.pathname, mode, html]);
+  }, [location.pathname, html]);
 
   useEffect(() => {
     let cancelled = false;
@@ -1735,6 +1799,9 @@ export default function DisenoWeb() {
     const sample = templates[templateKey]?.prompt;
     if (sample) {
       setPrompt(sample);
+    }
+    if (currentStep === 1) {
+      setCurrentStep(2);
     }
   };
 
@@ -1884,40 +1951,39 @@ export default function DisenoWeb() {
       setPrompt(userInstructions);
     }
 
-    try {
-      const applyFallback = async (reason) => {
-        const fallbackHtml = buildFallbackHtml(weddingInfo, templateDescriptor);
-        const enhanced = enhanceWeddingHtml(fallbackHtml, {
-          templateKey: selectedTemplate,
-          weddingInfo,
+    // Mover applyFallback FUERA del try para que sea accesible en el catch
+    const applyFallback = async (reason) => {
+      const fallbackHtml = buildFallbackHtml(weddingInfo, templateDescriptor);
+      const enhanced = enhanceWeddingHtml(fallbackHtml, {
+        templateKey: selectedTemplate,
+        weddingInfo,
+      });
+      setHtml(enhanced);
+      setPublicUrl('');
+      setShowQR(false);
+      if (reason === 'fallback-ai-disabled') {
+        setError('Generacion IA deshabilitada. Usamos la plantilla base para continuar.');
+      } else if (reason === 'fallback-ai-unavailable') {
+        setError('El servicio de IA no esta disponible. Usamos la plantilla base para continuar.');
+      } else {
+        setError('');
+      }
+      try {
+        await recordWebsiteEvent({
+          uid,
+          weddingId: activeWedding,
+          event: 'website_generated',
+          payload: {
+            template: selectedTemplate,
+            via: reason,
+          },
         });
-        setHtml(enhanced);
-        setPublicUrl('');
-        setShowQR(false);
-        if (reason === 'fallback-ai-disabled') {
-          setError('Generacion IA deshabilitada. Usamos la plantilla base para continuar.');
-        } else if (reason === 'fallback-ai-unavailable') {
-          setError(
-            'El servicio de IA no esta disponible. Usamos la plantilla base para continuar.'
-          );
-        } else {
-          setError('');
-        }
-        try {
-          await recordWebsiteEvent({
-            uid,
-            weddingId: activeWedding,
-            event: 'website_generated',
-            payload: {
-              template: selectedTemplate,
-              via: reason,
-            },
-          });
-        } catch (logErr) {
-          // console.warn('recordWebsiteEvent website_generated (fallback)', logErr);
-        }
-      };
+      } catch (logErr) {
+        // console.warn('recordWebsiteEvent website_generated (fallback)', logErr);
+      }
+    };
 
+    try {
       const aiEnabled = import.meta.env.VITE_ENABLE_DIRECT_OPENAI === 'true' || import.meta.env.DEV;
       if (!aiEnabled) {
         await applyFallback('fallback-ai-disabled');
@@ -2133,100 +2199,137 @@ export default function DisenoWeb() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Dise�o Web de Boda</h1>
-
-      {missingBasics && (
-        <div className="mb-6 border-l-4 border-amber-500 bg-amber-50 px-4 py-3 rounded">
-          <p className="text-sm text-amber-700">
-            Necesitamos los nombres de la pareja y la fecha de la boda para completar la p�gina web.
-            <Link to="/perfil" className="ml-1 underline font-medium">
-              Completar datos en Perfil
-            </Link>
-          </p>
-        </div>
-      )}
-
-      <ProfileSummary profile={profile} publishDisabledReason={publishDisabledReason} />
-
-      <div className="flex justify-end mb-6">
-        <button
-          type="button"
-          onClick={() => setShowLogisticsEditor(true)}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-blue-200 text-blue-700 hover:bg-blue-50 transition-colors"
-        >
-          Editar log�stica del sitio
-        </button>
-      </div>
-
-      <WebTemplateGallery
+    <>
+      <SimpleWebDesigner
+        currentStep={currentStep}
+        onStepChange={setCurrentStep}
         templates={templates}
         selectedTemplate={selectedTemplate}
-        onSelect={handleTemplateSelect}
-      />
-
-      <div ref={generatorRef}>
-        <WebGenerator
-          prompt={prompt}
-          onPromptChange={setPrompt}
-          onGenerate={generateWeb}
-          loading={loading}
-          selectedTemplate={selectedTemplate}
-          templates={templates}
-          error={error}
-          onOpenPromptLibrary={() => setShowPromptModal(true)}
-        />
-      </div>
-
-      <div ref={previewRef}>
-        <WebsitePreview
-          html={html}
-          onPublish={publishWeb}
-          publishSlug={publishSlug}
-          onSlugChange={setPublishSlug}
-          slugStatus={slugStatus}
-          checkingSlug={checkingSlug}
-          slugSuggestions={slugSuggestions}
-          onSuggestionSelect={setPublishSlug}
-          publicUrl={publicUrl}
-          showQR={showQR}
-          onShowQR={() => setShowQR(true)}
-          onHideQR={() => setShowQR(false)}
-          onEditLogistics={() => setShowLogisticsEditor(true)}
-          publishDisabled={publishDisabled}
-          publishDisabledReason={publishDisabledReason}
-          isPublishing={isPublishing}
-        />
-      </div>
-
-      <VersionsTable
-        versions={versions}
-        templates={templates}
-        onView={(version, templateKey) => {
-          const enhanced = /maloveapp-wedding-theme/i.test(version.html || '')
-            ? version.html
-            : enhanceWeddingHtml(version.html || '', {
-                templateKey,
-                weddingInfo,
-              });
-          setHtml(enhanced);
-          setPublicUrl('');
-          setShowQR(false);
+        onTemplateSelect={handleTemplateSelect}
+        prompt={prompt}
+        onPromptChange={setPrompt}
+        variables={{
+          ...buildWeddingInfoFromProfile(profile),
+          ...webVariables,
         }}
-        onEdit={(version, templateKey) => {
-          setPrompt(version.prompt || '');
-          const enhanced = /maloveapp-wedding-theme/i.test(version.html || '')
-            ? version.html
-            : enhanceWeddingHtml(version.html || '', {
-                templateKey,
-                weddingInfo,
-              });
-          setHtml(enhanced);
-          setSelectedTemplate(templateKey);
-          setPublicUrl('');
-          setShowQR(false);
-        }}
-      />
+        onGenerateClick={generateWeb}
+        loading={loading}
+        html={html}
+      >
+        {/* Alerta de Datos Faltantes */}
+        {missingBasics && (
+          <div className="mb-4 border-l-4 border-amber-400 bg-amber-50 px-4 py-3 rounded">
+            <p className="text-sm text-amber-800">
+              ⚠️ Necesitamos los nombres y la fecha de la boda.
+              <Link to="/perfil" className="ml-1 underline font-medium">
+                Completar datos →
+              </Link>
+            </p>
+          </div>
+        )}
+
+        {/* Resumen de Perfil */}
+        <ProfileSummary profile={profile} publishDisabledReason={publishDisabledReason} />
+
+        {/* PASO 1: Plantillas */}
+        {currentStep === 1 && (
+          <SimpleTemplateSelector
+            templates={templates}
+            selectedTemplate={selectedTemplate}
+            onSelect={handleTemplateSelect}
+          />
+        )}
+
+        {/* PASO 2: Editor de Contenido */}
+        {currentStep === 2 && (
+          <>
+            <SimplePromptEditor
+              prompt={prompt}
+              onChange={setPrompt}
+              variables={{
+                ...buildWeddingInfoFromProfile(profile),
+                ...webVariables,
+              }}
+              onEditVariable={() => setShowVariablesEditor(true)}
+            />
+
+            <div className="mt-6 flex justify-center">
+              <button
+                onClick={() => {
+                  generateWeb();
+                  setCurrentStep(3);
+                }}
+                disabled={loading || !prompt.trim()}
+                className="px-8 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? 'Generando...' : 'Generar mi web'}
+              </button>
+            </div>
+          </>
+        )}
+
+        {/* PASO 3: Vista Previa */}
+        {currentStep === 3 && html && (
+          <div ref={previewRef}>
+            <WebsitePreview
+              html={html}
+              onPublish={() => setCurrentStep(4)}
+              publishSlug={publishSlug}
+              onSlugChange={setPublishSlug}
+              slugStatus={slugStatus}
+              checkingSlug={checkingSlug}
+              slugSuggestions={slugSuggestions}
+              onSuggestionSelect={setPublishSlug}
+              publicUrl={publicUrl}
+              showQR={showQR}
+              onShowQR={() => setShowQR(true)}
+              onHideQR={() => setShowQR(false)}
+              onEditLogistics={() => setShowLogisticsEditor(true)}
+              publishDisabled={publishDisabled}
+              publishDisabledReason={publishDisabledReason}
+              isPublishing={false}
+            />
+          </div>
+        )}
+
+        {/* PASO 4: Publicar */}
+        {currentStep === 4 && (
+          <div ref={previewRef}>
+            <WebsitePreview
+              html={html}
+              onPublish={publishWeb}
+              publishSlug={publishSlug}
+              onSlugChange={setPublishSlug}
+              slugStatus={slugStatus}
+              checkingSlug={checkingSlug}
+              slugSuggestions={slugSuggestions}
+              onSuggestionSelect={setPublishSlug}
+              publicUrl={publicUrl}
+              showQR={showQR}
+              onShowQR={() => setShowQR(true)}
+              onHideQR={() => setShowQR(false)}
+              onEditLogistics={() => setShowLogisticsEditor(true)}
+              publishDisabled={publishDisabled}
+              publishDisabledReason={publishDisabledReason}
+              isPublishing={isPublishing}
+            />
+          </div>
+        )}
+      </SimpleWebDesigner>
+
+      {/* Modales Fuera del Designer */}
+      {showVariablesEditor && (
+        <VariablesEditor
+          profile={profile}
+          webOverrides={webVariables}
+          onSave={(vars) => {
+            setWebVariables(vars);
+            setShowVariablesEditor(false);
+            toast.success('✅ Variables guardadas');
+          }}
+          onClose={() => setShowVariablesEditor(false)}
+        />
+      )}
 
       <PromptLibraryModal
         open={showPromptModal}
@@ -2242,10 +2345,6 @@ export default function DisenoWeb() {
             setSelectedTemplate(option.templateKey);
           }
           setShowPromptModal(false);
-          setTimeout(
-            () => generatorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }),
-            50
-          );
         }}
         onCreate={handleCreatePrompt}
         onUpdate={handleUpdatePrompt}
@@ -2261,6 +2360,6 @@ export default function DisenoWeb() {
         onSave={handleSaveLogistics}
         saving={savingLogistics}
       />
-    </div>
+    </>
   );
 }

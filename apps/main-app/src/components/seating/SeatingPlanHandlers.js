@@ -53,28 +53,49 @@ export const createApplyTemplateHandler = ({
   tab,
   setTab,
   generateBanquetLayout,
+  applyBanquetTables,
   addTable,
   setDrawingElements,
 }) => {
   return (templateResult) => {
-    if (!templateResult) return;
+    console.log('[Template] 🎯 Handler llamado con:', templateResult);
+
+    if (!templateResult) {
+      console.warn('[Template] ❌ templateResult es null/undefined');
+      return;
+    }
 
     try {
-      // console.log('[Template] Aplicando plantilla:', templateResult.template);
+      console.log('[Template] ✅ Aplicando plantilla:', templateResult.template);
+      console.log('[Template] 📊 Mesas a crear:', templateResult.tables?.length || 0);
+      console.log('[Template] 🎨 Zonas a crear:', templateResult.zones?.length || 0);
 
       // Asegurar que estamos en tab banquet
       if (tab !== 'banquet') {
+        console.log('[Template] 🔄 Cambiando a tab banquet');
         setTab('banquet');
       }
 
-      // Aplicar mesas de la plantilla
+      // Aplicar mesas de la plantilla (REEMPLAZAR todas las existentes)
       if (templateResult.tables && templateResult.tables.length > 0) {
-        if (typeof generateBanquetLayout === 'function') {
-          generateBanquetLayout(templateResult.tables);
+        console.log('[Template] 🪑 Reemplazando mesas existentes con plantilla...');
+        console.log('[Template] 🆕 Nuevas mesas de plantilla:', templateResult.tables.length);
+
+        // Las plantillas vienen con mesas ya posicionadas
+        // Usar applyBanquetTables para REEMPLAZAR (no añadir)
+        if (typeof applyBanquetTables === 'function') {
+          console.log('[Template] ✅ Usando applyBanquetTables para reemplazar');
+          applyBanquetTables(templateResult.tables);
+          console.log(`[Template] ✅ ${templateResult.tables.length} mesas reemplazadas`);
         } else {
+          console.error('[Template] ❌ applyBanquetTables no está disponible');
+          console.warn(
+            '[Template] ⚠️ Usando fallback addTable (esto añadirá en lugar de reemplazar)'
+          );
           templateResult.tables.forEach((table) => addTable(table));
         }
-        // console.log(`[Template] ${templateResult.tables.length} mesas añadidas`);
+      } else {
+        console.warn('[Template] ⚠️ No hay mesas para añadir');
       }
 
       // Aplicar zonas especiales
@@ -86,14 +107,14 @@ export const createApplyTemplateHandler = ({
         }));
 
         setDrawingElements((prev) => [...prev, ...zonesWithIds]);
-        // console.log(`[Template] ${zonesWithIds.length} zonas añadidas`);
+        console.log(`[Template] ✅ ${zonesWithIds.length} zonas añadidas`);
       }
 
       toast.success(`✨ Plantilla "${templateResult.template}" aplicada correctamente`, {
         autoClose: 3000,
       });
     } catch (error) {
-      // console.error('[Template] Error aplicando plantilla:', error);
+      console.error('[Template] ❌ Error aplicando plantilla:', error);
       toast.error('Error al aplicar la plantilla');
     }
   };
@@ -116,6 +137,7 @@ export const createSeatingPlanDrawingHandlers = ({
   tab,
   setTab,
   generateBanquetLayout,
+  applyBanquetTables,
   addTable,
   drawingElements,
   setDrawingElements,
@@ -128,6 +150,7 @@ export const createSeatingPlanDrawingHandlers = ({
       tab,
       setTab,
       generateBanquetLayout,
+      applyBanquetTables,
       addTable,
       setDrawingElements,
     }),

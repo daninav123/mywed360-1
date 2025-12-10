@@ -1,0 +1,210 @@
+/* Animaciones de aparición al hacer scroll */
+
+.fade-in-up {
+  opacity: 0;
+  transform: translateY(30px);
+  transition:
+    opacity 0.8s ease-out,
+    transform 0.8s ease-out;
+}
+
+.fade-in-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.fade-in {
+  opacity: 0;
+  transition: opacity 1s ease-out;
+}
+
+.fade-in.visible {
+  opacity: 1;
+}
+
+.scale-in {
+  opacity: 0;
+  transform: scale(0.9);
+  transition:
+    opacity 0.6s ease-out,
+    transform 0.6s ease-out;
+}
+
+.scale-in.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.slide-in-left {
+  opacity: 0;
+  transform: translateX(-50px);
+  transition:
+    opacity 0.7s ease-out,
+    transform 0.7s ease-out;
+}
+
+.slide-in-left.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.slide-in-right {
+  opacity: 0;
+  transform: translateX(50px);
+  transition:
+    opacity 0.7s ease-out,
+    transform 0.7s ease-out;
+}
+
+.slide-in-right.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Parallax smooth */
+.parallax-section {
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  transition: transform 0.1s ease-out;
+}
+
+/* Formas orgánicas */
+.organic-shape {
+  border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+  transition: border-radius 0.3s ease;
+}
+
+.organic-shape:hover {
+  border-radius: 70% 30% 30% 70% / 70% 70% 30% 30%;
+}
+
+/* Efectos hover en imágenes */
+.image-hover-zoom {
+  overflow: hidden;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.image-hover-zoom img {
+  transition:
+    transform 0.5s ease,
+    filter 0.3s ease;
+}
+
+.image-hover-zoom:hover img {
+  transform: scale(1.05);
+  filter: brightness(1.1);
+}
+
+.image-hover-zoom:hover {
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* Botones con efecto floral */
+.btn-floral {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.btn-floral::before {
+  content: '✿';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0) rotate(0deg);
+  font-size: 2rem;
+  opacity: 0;
+  transition: all 0.4s ease;
+}
+
+.btn-floral:hover::before {
+  transform: translate(-50%, -50%) scale(1) rotate(360deg);
+  opacity: 0.3;
+}
+
+.btn-floral:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Fondos de acuarela */
+.watercolor-bg {
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 209, 220, 0.1) 0%,
+    rgba(247, 241, 227, 0.2) 50%,
+    rgba(209, 196, 233, 0.1) 100%
+  );
+}
+
+.watercolor-bg::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(255, 182, 193, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(221, 160, 221, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(255, 228, 225, 0.2) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+/* Texto con gradiente */
+.gradient-text {
+  background: linear-gradient(
+    135deg,
+    var(--color-primary, #9333ea) 0%,
+    var(--color-secondary, #ec4899) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Contador animado */
+@keyframes pulse-soft {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+}
+
+.countdown-item {
+  animation: pulse-soft 2s ease-in-out infinite;
+}
+
+/* Divisores decorativos */
+.decorative-divider {
+  margin: 3rem auto;
+  text-align: center;
+  position: relative;
+}
+
+.decorative-divider::before,
+.decorative-divider::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 40%;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--color-primary, #9333ea), transparent);
+}
+
+.decorative-divider::before {
+  left: 0;
+}
+
+.decorative-divider::after {
+  right: 0;
+}

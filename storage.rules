@@ -32,6 +32,51 @@ service firebase.storage {
       allow write: if request.auth != null;
     }
     
+    // Web hero images - main cover images for wedding websites
+    match /web-hero-images/{weddingId}/{imageId} {
+      // Lectura pública para mostrar en webs publicadas
+      allow read: if true;
+      
+      // Solo usuarios autenticados pueden subir
+      // Validar tamaño (máximo 10MB para portadas) y tipo de archivo
+      allow write: if request.auth != null &&
+                     request.resource.size < 10 * 1024 * 1024 &&
+                     request.resource.contentType.matches('image/.*');
+      
+      // Solo usuarios autenticados pueden eliminar
+      allow delete: if request.auth != null;
+    }
+    
+    // Web galleries - photo galleries for wedding websites
+    match /web-galleries/{weddingId}/{imageId} {
+      // Lectura pública para mostrar en webs publicadas
+      allow read: if true;
+      
+      // Solo usuarios autenticados pueden subir
+      // Validar tamaño (máximo 5MB) y tipo de archivo
+      allow write: if request.auth != null &&
+                     request.resource.size < 5 * 1024 * 1024 &&
+                     request.resource.contentType.matches('image/.*');
+      
+      // Solo usuarios autenticados pueden eliminar
+      allow delete: if request.auth != null;
+    }
+    
+    // Web backgrounds - for page backgrounds in web builder
+    match /web-backgrounds/{imageId} {
+      // Lectura pública para mostrar en webs publicadas
+      allow read: if true;
+      
+      // Solo usuarios autenticados pueden subir
+      // Validar tamaño (máximo 10MB para fondos) y tipo de archivo
+      allow write: if request.auth != null &&
+                     request.resource.size < 10 * 1024 * 1024 &&
+                     request.resource.contentType.matches('image/.*');
+      
+      // Solo usuarios autenticados pueden eliminar
+      allow delete: if request.auth != null;
+    }
+    
     // Default: deny all
     match /{allPaths=**} {
       allow read, write: if false;

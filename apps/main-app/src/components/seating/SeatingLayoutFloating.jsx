@@ -6,11 +6,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 
 export default function SeatingLayoutFloating({ children, className = '' }) {
-  return (
-    <div className="fixed inset-0 bg-[#0F0F10] overflow-hidden flex flex-col">
-      {children}
-    </div>
-  );
+  return <div className="h-screen flex flex-col bg-gray-50 overflow-hidden">{children}</div>;
 }
 
 // Sub-componentes para estructura
@@ -20,7 +16,7 @@ SeatingLayoutFloating.Header = function Header({ children }) {
 
 SeatingLayoutFloating.Main = function Main({ children }) {
   return (
-    <main className="flex-1 relative overflow-hidden">
+    <main className="flex-1 relative bg-white border-t border-gray-200 overflow-hidden">
       {children}
     </main>
   );
@@ -31,11 +27,7 @@ SeatingLayoutFloating.Footer = function Footer({ children }) {
 };
 
 SeatingLayoutFloating.Canvas = function Canvas({ children, className = '' }) {
-  return (
-    <div className={`absolute inset-0 ${className}`}>
-      {children}
-    </div>
-  );
+  return <div className={`absolute inset-0 overflow-hidden ${className}`}>{children}</div>;
 };
 
 SeatingLayoutFloating.Overlay = function Overlay({ children, position = 'center' }) {
@@ -49,9 +41,7 @@ SeatingLayoutFloating.Overlay = function Overlay({ children, position = 'center'
 
   return (
     <div className={`absolute ${positions[position]} pointer-events-none z-20`}>
-      <div className="pointer-events-auto">
-        {children}
-      </div>
+      <div className="pointer-events-auto">{children}</div>
     </div>
   );
 };

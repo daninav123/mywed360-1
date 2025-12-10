@@ -5,8 +5,8 @@ import { Button } from '../ui';
 import { Input } from '../ui';
 
 /**
- * Formulario optimizado para a�adir/editar invitados
- * Componente reutilizable con validaci�n y UX mejorada
+ * Formulario optimizado para añadir/editar invitados
+ * Componente reutilizable con validación y UX mejorada
  */
 const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false }) => {
   const { t, wedding } = useTranslations();
@@ -17,7 +17,7 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false }) => {
     email: guest?.email || '',
     phone: guest?.phone || '',
     address: guest?.address || '',
-    // Campos de direcci�n detallada (opcionales)
+    // Campos de dirección detallada (opcionales)
     addressStreet: guest?.addressStreet || '',
     addressStreet2: guest?.addressStreet2 || '',
     addressCity: guest?.addressCity || '',
@@ -35,10 +35,10 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false }) => {
     notes: guest?.notes || '',
   });
 
-  // Estado de validaci�n
+  // Estado de validación
   const [errors, setErrors] = useState({});
 
-  // Direcci�n completa (desplegable) y helper para componer
+  // Dirección completa (desplegable) y helper para componer
   const [showAddressDetails, setShowAddressDetails] = useState(false);
   const composeAddress = (fd) => {
     const parts = [];
@@ -48,7 +48,7 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false }) => {
     const stateLine = [fd.addressState, fd.addressCountry].filter(Boolean).join(', ').trim();
     if (cityLine) parts.push(cityLine);
     if (stateLine) parts.push(stateLine);
-    return parts.join(' � ');
+    return parts.join(', ');
   };
 
   // Validar formulario
@@ -83,7 +83,7 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false }) => {
     (field, value) => {
       setFormData((prev) => {
         const next = { ...prev, [field]: value };
-        // Si se editan campos de direcci�n detallada, recomponer 'address'
+        // Si se editan campos de dirección detallada, recomponer 'address'
         if (
           field === 'addressStreet' ||
           field === 'addressStreet2' ||
@@ -111,7 +111,7 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false }) => {
     [errors]
   );
 
-  // Manejar env�o del formulario
+  // Manejar envío del formulario
   const handleSubmit = useCallback(
     (e) => {
       e.preventDefault();
@@ -128,7 +128,7 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false }) => {
         createdAt: guest?.createdAt || new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
-      // Si hay direcci�n detallada y el resumen est� vac�o, componerlo
+      // Si hay dirección detallada y el resumen está vacío, componerlo
       const hasDetailed =
         formData.addressStreet ||
         formData.addressStreet2 ||
@@ -171,7 +171,7 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false }) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {/* Informaci�n b�sica */}
+      {/* Información básica */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-body mb-1">
@@ -187,7 +187,6 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false }) => {
           />
           {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
         </div>
-
       </div>
 
       {/* Contacto */}
@@ -226,7 +225,7 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false }) => {
         </div>
       </div>
 
-      {/* Direcci�n */}
+      {/* Dirección */}
       <div>
         <label className="block text-sm font-medium text-body mb-1">
           {t('guests.guestAddress')}
@@ -235,7 +234,7 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false }) => {
           type="text"
           value={formData.address}
           onChange={(e) => handleChange('address', e.target.value)}
-          placeholder="Direcci�n completa (opcional)"
+          placeholder="Dirección completa (opcional)"
           disabled={isLoading}
         />
         <div className="mt-2">
@@ -245,13 +244,13 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false }) => {
             onClick={() => setShowAddressDetails((v) => !v)}
             disabled={isLoading}
           >
-            {showAddressDetails ? 'Ocultar direcci�n completa' : 'A�adir direcci�n completa'}
+            {showAddressDetails ? 'Ocultar dirección completa' : 'Añadir dirección completa'}
           </button>
           {showAddressDetails && (
             <div className="mt-3 p-3 border rounded-md bg-gray-50">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-body mb-1">Calle y n�mero</label>
+                  <label className="block text-xs font-medium text-body mb-1">Calle y número</label>
                   <Input
                     type="text"
                     value={formData.addressStreet}
@@ -261,12 +260,14 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false }) => {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-body mb-1">Piso, puerta, etc.</label>
+                  <label className="block text-xs font-medium text-body mb-1">
+                    Piso, puerta, etc.
+                  </label>
                   <Input
                     type="text"
                     value={formData.addressStreet2}
                     onChange={(e) => handleChange('addressStreet2', e.target.value)}
-                    placeholder="Ej. 3�B"
+                    placeholder="Ej. 3ºB"
                     disabled={isLoading}
                   />
                 </div>
@@ -281,7 +282,9 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false }) => {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-body mb-1">Provincia/Estado</label>
+                  <label className="block text-xs font-medium text-body mb-1">
+                    Provincia/Estado
+                  </label>
                   <Input
                     type="text"
                     value={formData.addressState}
@@ -291,7 +294,7 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false }) => {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-body mb-1">C�digo Postal</label>
+                  <label className="block text-xs font-medium text-body mb-1">Código Postal</label>
                   <Input
                     type="text"
                     value={formData.addressZip}
@@ -301,29 +304,27 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false }) => {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-body mb-1">Pa�s</label>
+                  <label className="block text-xs font-medium text-body mb-1">País</label>
                   <Input
                     type="text"
                     value={formData.addressCountry}
                     onChange={(e) => handleChange('addressCountry', e.target.value)}
-                    placeholder="Ej. Espa�a"
+                    placeholder="Ej. España"
                     disabled={isLoading}
                   />
                 </div>
               </div>
               <p className="text-[11px] text-muted mt-2">
-                El campo "Direcci�n" se compone autom�ticamente a partir de estos datos.
+                El campo "Dirección" se compone automáticamente a partir de estos datos.
               </p>
             </div>
           )}
         </div>
       </div>
-      {/* Acompa�antes y mesa */}
+      {/* Acompañantes y mesa */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
-          <label className="block text-sm font-medium text-body mb-1">
-            {t('guests.plusOne')}
-          </label>
+          <label className="block text-sm font-medium text-body mb-1">{t('guests.plusOne')}</label>
           <Input
             type="number"
             min="0"
@@ -337,11 +338,9 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false }) => {
           {errors.companion && <p className="text-red-500 text-xs mt-1">{errors.companion}</p>}
         </div>
 
-        {/* Grupo de acompa�antes */}
+        {/* Grupo de acompañantes */}
         <div>
-          <label className="block text-sm font-medium text-body mb-1">
-            Grupo de acompa�antes
-          </label>
+          <label className="block text-sm font-medium text-body mb-1">Grupo de acompañantes</label>
           <div className="flex space-x-2">
             <Input
               value={formData.companionGroupId}
@@ -361,16 +360,14 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false }) => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-body mb-1">
-            Tipo de acompa�ante
-          </label>
+          <label className="block text-sm font-medium text-body mb-1">Tipo de acompañante</label>
           <select
             value={formData.companionType}
             onChange={(e) => handleChange('companionType', e.target.value)}
             className={`w-full border border-soft rounded-md px-3 py-2 focus:outline-none focus:ring-2 ring-primary ${errors.companionType ? 'border-red-500' : ''}`}
             disabled={isLoading}
           >
-            <option value="none">Sin acompa�ante</option>
+            <option value="none">Sin acompañante</option>
             <option value="partner">Pareja</option>
             <option value="child">Hijo/a(s)</option>
             <option value="plus_one">+1</option>
@@ -388,25 +385,120 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false }) => {
             type="text"
             value={formData.table}
             onChange={(e) => handleChange('table', e.target.value)}
-            placeholder="N�mero o nombre de mesa"
+            placeholder="Número o nombre de mesa"
             disabled={isLoading}
           />
         </div>
       </div>
 
-      {/* Restricciones diet�ticas */}
+      {/* Restricciones dietéticas */}
       <div>
         <label className="block text-sm font-medium text-body mb-1">
           {t('guests.dietaryRestrictions')}
         </label>
-        <textarea
-          value={formData.dietaryRestrictions}
-          onChange={(e) => handleChange('dietaryRestrictions', e.target.value)}
-          placeholder="Alergias, intolerancias o preferencias alimentarias..."
-          className="w-full border border-soft rounded-md px-3 py-2 focus:outline-none focus:ring-2 ring-primary resize-none"
-          rows="2"
-          disabled={isLoading}
-        />
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 p-3 border border-soft rounded-md">
+          <label className="flex items-center space-x-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={formData.dietaryRestrictions?.includes('vegetariano') || false}
+              onChange={(e) => {
+                const restrictions = formData.dietaryRestrictions || '';
+                const newRestrictions = e.target.checked
+                  ? restrictions + (restrictions ? ', ' : '') + 'vegetariano'
+                  : restrictions.replace(/,?\s*vegetariano/g, '').trim();
+                handleChange('dietaryRestrictions', newRestrictions);
+              }}
+              className="w-4 h-4 text-primary"
+              disabled={isLoading}
+            />
+            <span className="text-sm">Vegetariano</span>
+          </label>
+
+          <label className="flex items-center space-x-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={formData.dietaryRestrictions?.includes('vegano') || false}
+              onChange={(e) => {
+                const restrictions = formData.dietaryRestrictions || '';
+                const newRestrictions = e.target.checked
+                  ? restrictions + (restrictions ? ', ' : '') + 'vegano'
+                  : restrictions.replace(/,?\s*vegano/g, '').trim();
+                handleChange('dietaryRestrictions', newRestrictions);
+              }}
+              className="w-4 h-4 text-primary"
+              disabled={isLoading}
+            />
+            <span className="text-sm">Vegano</span>
+          </label>
+
+          <label className="flex items-center space-x-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={
+                formData.dietaryRestrictions?.includes('celíaco') ||
+                formData.dietaryRestrictions?.includes('celiaco') ||
+                false
+              }
+              onChange={(e) => {
+                const restrictions = formData.dietaryRestrictions || '';
+                const newRestrictions = e.target.checked
+                  ? restrictions + (restrictions ? ', ' : '') + 'celíaco'
+                  : restrictions.replace(/,?\s*celí?aco/g, '').trim();
+                handleChange('dietaryRestrictions', newRestrictions);
+              }}
+              className="w-4 h-4 text-primary"
+              disabled={isLoading}
+            />
+            <span className="text-sm">Celíaco</span>
+          </label>
+
+          <label className="flex items-center space-x-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={formData.dietaryRestrictions?.includes('sin lactosa') || false}
+              onChange={(e) => {
+                const restrictions = formData.dietaryRestrictions || '';
+                const newRestrictions = e.target.checked
+                  ? restrictions + (restrictions ? ', ' : '') + 'sin lactosa'
+                  : restrictions.replace(/,?\s*sin lactosa/g, '').trim();
+                handleChange('dietaryRestrictions', newRestrictions);
+              }}
+              className="w-4 h-4 text-primary"
+              disabled={isLoading}
+            />
+            <span className="text-sm">Sin lactosa</span>
+          </label>
+
+          <label className="flex items-center space-x-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={formData.dietaryRestrictions?.includes('sin gluten') || false}
+              onChange={(e) => {
+                const restrictions = formData.dietaryRestrictions || '';
+                const newRestrictions = e.target.checked
+                  ? restrictions + (restrictions ? ', ' : '') + 'sin gluten'
+                  : restrictions.replace(/,?\s*sin gluten/g, '').trim();
+                handleChange('dietaryRestrictions', newRestrictions);
+              }}
+              className="w-4 h-4 text-primary"
+              disabled={isLoading}
+            />
+            <span className="text-sm">Sin gluten</span>
+          </label>
+        </div>
+
+        <div className="mt-3">
+          <Input
+            type="text"
+            value={formData.dietaryRestrictions || ''}
+            onChange={(e) => handleChange('dietaryRestrictions', e.target.value)}
+            placeholder="Otras restricciones, alergias o especificaciones..."
+            disabled={isLoading}
+          />
+          <p className="text-xs text-muted mt-1">
+            Usa el campo de arriba para especificar alergias, intolerancias u otras restricciones
+          </p>
+        </div>
       </div>
 
       {/* Notas adicionales */}
@@ -415,14 +507,14 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false }) => {
         <textarea
           value={formData.notes}
           onChange={(e) => handleChange('notes', e.target.value)}
-          placeholder="Informaci�n adicional sobre el invitado..."
+          placeholder="Información adicional sobre el invitado..."
           className="w-full border border-soft rounded-md px-3 py-2 focus:outline-none focus:ring-2 ring-primary resize-none"
           rows="2"
           disabled={isLoading}
         />
       </div>
 
-      {/* Botones de acci�n */}
+      {/* Botones de acción */}
       <div className="flex justify-end space-x-3 pt-4 border-t">
         <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>
           {t('app.cancel')}
@@ -443,4 +535,3 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false }) => {
 };
 
 export default GuestForm;
-

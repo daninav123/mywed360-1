@@ -28,6 +28,7 @@ import HomeUser from './pages/HomeUser.jsx';
 import Invitaciones from './pages/Invitaciones';
 import More from './pages/More';
 import Perfil from './pages/Perfil';
+import InfoBoda from './pages/InfoBoda';
 import GestionProveedores from './pages/GestionProveedores.jsx';
 import SavedSuppliers from './pages/SavedSuppliers.jsx';
 import SupplierCompare from './pages/SupplierCompare.jsx';
@@ -81,6 +82,8 @@ import AdminPayouts from './pages/admin/AdminPayouts.jsx';
 import PartnerStats from './pages/PartnerStats.jsx';
 import WebEditor from './pages/WebEditor';
 import WeddingSite from './pages/WeddingSite';
+import PublicWeb from './pages/PublicWeb';
+import PublicRSVP from './pages/PublicRSVP';
 import RequireAdmin from './routes/RequireAdmin.jsx';
 import MarketingAppOverview from './pages/marketing/AppOverview.jsx';
 import MarketingPricing from './pages/marketing/Pricing.jsx';
@@ -108,10 +111,17 @@ const EmailSetup = React.lazy(() => import('./pages/EmailSetup'));
 // (dedupe) Invitaciones ya importado arriba
 const Contratos = React.lazy(() => import('./pages/Contratos'));
 const DisenoWeb = React.lazy(() => import('./pages/DisenoWeb'));
+const WebBuilderPage = React.lazy(() => import('./pages/WebBuilderPage'));
+const WebBuilderPageCraft = React.lazy(() => import('./pages/WebBuilderPageCraft'));
+const WebBuilderDashboard = React.lazy(() => import('./pages/WebBuilderDashboard'));
+const WebPreview = React.lazy(() => import('./pages/WebPreview'));
 // Protocolo
 const ProtocoloLayout = React.lazy(() => import('./pages/protocolo/ProtocoloLayout'));
-const MomentosEspeciales = React.lazy(() => import('./pages/protocolo/MomentosEspeciales'));
+const MomentosEspecialesSimple = React.lazy(
+  () => import('./pages/protocolo/MomentosEspecialesSimple')
+);
 const ProtocoloTiming = React.lazy(() => import('./pages/protocolo/Timing'));
+const WeddingDayMode = React.lazy(() => import('./pages/protocolo/WeddingDayMode'));
 const ProtocoloChecklist = React.lazy(() => import('./pages/protocolo/Checklist'));
 const ProtocoloAyuda = React.lazy(() => import('./pages/protocolo/AyudaCeremonia'));
 const DocumentosLegales = React.lazy(() => import('./pages/protocolo/DocumentosLegales'));
@@ -374,6 +384,8 @@ function App() {
                           {/* Rutas públicas */}
                           <Route path="w/:uid" element={<WeddingSite />} />
                           <Route path="p/:slug" element={<PublicWedding />} />
+                          <Route path="web/:slug" element={<PublicWeb />} />
+                          <Route path="rsvp/:slug" element={<PublicRSVP />} />
 
                           {/* Respuesta pública de presupuestos (proveedores responden por email) */}
                           <Route
@@ -478,6 +490,9 @@ function App() {
                               />
                               <Route path="subscription" element={<SubscriptionDashboard />} />
 
+                              {/* Ruta directa a música limpia (sin layout) */}
+                              <Route path="musica-boda" element={<MomentosEspecialesSimple />} />
+
                               {/* Protocolo */}
                               <Route path="protocolo" element={<ProtocoloLayout />}>
                                 <Route
@@ -486,9 +501,10 @@ function App() {
                                 />
                                 <Route
                                   path="momentos-especiales"
-                                  element={<MomentosEspeciales />}
+                                  element={<MomentosEspecialesSimple />}
                                 />
                                 <Route path="timing" element={<ProtocoloTiming />} />
+                                <Route path="dia-de-la-boda" element={<WeddingDayMode />} />
                                 <Route path="checklist" element={<ProtocoloChecklist />} />
                                 <Route path="ayuda-ceremonia" element={<ProtocoloAyuda />} />
                                 <Route path="documentos" element={<DocumentosLegales />} />
@@ -515,12 +531,20 @@ function App() {
 
                               {/* Extras */}
                               <Route path="perfil" element={<Perfil />} />
+                              <Route path="info-boda" element={<InfoBoda />} />
                               <Route path="notificaciones" element={<Notificaciones />} />
                               <Route path="diseno-web" element={<DisenoWeb />} />
                               <Route
                                 path="diseno-web/preview"
                                 element={<DisenoWeb mode="preview" />}
                               />
+                              <Route path="web-builder" element={<WebBuilderPage />} />
+                              <Route
+                                path="web-builder-dashboard"
+                                element={<WebBuilderDashboard />}
+                              />
+                              <Route path="web-builder-craft" element={<WebBuilderPageCraft />} />
+                              <Route path="preview-web" element={<WebPreview />} />
                               <Route path="web" element={<WebEditor />} />
                               <Route path="ideas" element={<Ideas />} />
                               <Route path="inspiracion" element={<Inspiration />} />

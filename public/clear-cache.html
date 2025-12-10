@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Limpieza de Caché - MaLoveApp</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .status {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            background: #e3f2fd;
+            border-left: 4px solid #2196F3;
+        }
+        .success {
+            background: #e8f5e9;
+            border-left-color: #4CAF50;
+        }
+        .error {
+            background: #ffebee;
+            border-left-color: #f44336;
+        }
+        button {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        button:hover {
+            background: #1976D2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧹 Limpieza Completa de Caché</h1>
+        <div id="status"></div>
+        <button onclick="location.href='/'">Volver a la Aplicación</button>
+    </div>
+
+    <script>
+        const statusDiv = document.getElementById('status');
+
+        function addStatus(message, type = 'status') {
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.textContent = message;
+            statusDiv.appendChild(div);
+        }
+
+        async function clearEverything() {
+            addStatus('🔄 Iniciando limpieza completa...', 'status');
+
+            // 1. Limpiar Service Workers
+            if ('serviceWorker' in navigator) {
+                try {
+                    const registrations = await navigator.serviceWorker.getRegistrations();
+                    for (const registration of registrations) {
+                        await registration.unregister();
+                    }
+                    addStatus(`✅ ${registrations.length} service worker(s) desregistrado(s)`, 'success');
+                } catch (error) {
+                    addStatus(`❌ Error limpiando service workers: ${error.message}`, 'error');
+                }
+            }
+
+            // 2. Limpiar todos los caches
+            if ('caches' in window) {
+                try {
+                    const cacheNames = await caches.keys();
+                    await Promise.all(cacheNames.map(name => caches.delete(name)));
+                    addStatus(`✅ ${cacheNames.length} caché(s) eliminado(s)`, 'success');
+                } catch (error) {
+                    addStatus(`❌ Error limpiando caches: ${error.message}`, 'error');
+                }
+            }
+
+            // 3. Limpiar localStorage (solo claves relacionadas con caché)
+            try {
+                const keysToRemove = [];
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key && (key.includes('cache') || key.includes('vite') || key.includes('hmr'))) {
+                        keysToRemove.push(key);
+                    }
+                }
+                keysToRemove.forEach(key => localStorage.removeItem(key));
+                addStatus(`✅ ${keysToRemove.length} entrada(s) de localStorage eliminada(s)`, 'success');
+            } catch (error) {
+                addStatus(`❌ Error limpiando localStorage: ${error.message}`, 'error');
+            }
+
+            // 4. Limpiar sessionStorage
+            try {
+                sessionStorage.clear();
+                addStatus('✅ sessionStorage limpiado', 'success');
+            } catch (error) {
+                addStatus(`❌ Error limpiando sessionStorage: ${error.message}`, 'error');
+            }
+
+            addStatus('✨ Limpieza completada. Por favor, cierra todas las pestañas de la aplicación y ábrela de nuevo.', 'success');
+        }
+
+        // Ejecutar automáticamente al cargar
+        clearEverything();
+    </script>
+</body>
+</html>

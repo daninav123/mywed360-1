@@ -5,14 +5,17 @@ import logger from '../utils/logger.js';
 dotenv.config({ path: path.resolve(process.cwd(), '../.env') });
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY || '';
+const OPENAI_PROJECT_ID = process.env.OPENAI_PROJECT_ID || process.env.VITE_OPENAI_PROJECT_ID || '';
 
 let openai = null;
 async function ensureOpenAI() {
   if (openai || !OPENAI_API_KEY) return;
   try {
     const { default: OpenAI } = await import('openai');
-    openai = new OpenAI({ apiKey: OPENAI_API_KEY });
-    console.log('✅ Cliente OpenAI inicializado en emailAnalysis');
+    openai = new OpenAI({ apiKey: OPENAI_API_KEY, project: OPENAI_PROJECT_ID || undefined });
+    console.log('✅ Cliente OpenAI inicializado en emailAnalysis', {
+      projectId: OPENAI_PROJECT_ID || null,
+    });
   } catch (err) {
     console.error('❌ Error inicializando OpenAI en emailAnalysis:', err);
   }

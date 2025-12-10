@@ -22,6 +22,7 @@ import { requireAdmin } from '../middleware/authMiddleware.js';
 // Definir la API key directamente como respaldo si no se encuentra en las variables de entorno
 // Soportar variables de entorno tanto OPENAI_API_KEY como VITE_OPENAI_API_KEY
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY || '';
+const OPENAI_PROJECT_ID = process.env.OPENAI_PROJECT_ID || process.env.VITE_OPENAI_PROJECT_ID || '';
 
 const router = express.Router();
 
@@ -38,8 +39,10 @@ async function ensureOpenAI() {
   }
   try {
     const { default: OpenAI } = await import('openai');
-    openai = new OpenAI({ apiKey: OPENAI_API_KEY });
-    console.log('✅ Cliente OpenAI inicializado correctamente.');
+    openai = new OpenAI({ apiKey: OPENAI_API_KEY, project: OPENAI_PROJECT_ID || undefined });
+    console.log('✅ Cliente OpenAI inicializado correctamente.', {
+      projectId: OPENAI_PROJECT_ID || null,
+    });
   } catch (err) {
     console.error('Error al inicializar OpenAI SDK:', err.message);
   }
