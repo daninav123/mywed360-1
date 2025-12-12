@@ -11,7 +11,9 @@
     "pending": "Pendiente",
     "in_progress": "En progreso",
     "completed": "Completada",
-    "cancelled": "Cancelada"
+    "cancelled": "Cancelada",
+    "all": "Todos",
+    "new": "Nueva"
   },
   "priority": {
     "low": "Baja",
@@ -19,13 +21,35 @@
     "high": "Alta",
     "urgent": "Urgente"
   },
+  "categories": {
+    "LUGAR": "Lugar",
+    "INVITADOS": "Invitados",
+    "COMIDA": "Catering",
+    "DECORACION": "Decoración",
+    "PAPELERIA": "Papelería",
+    "MUSICA": "Música",
+    "FOTOGRAFO": "Fotografía",
+    "VESTUARIO": "Vestuario",
+    "OTROS": "Otros",
+    "decoration": "Decoración",
+    "cocktail": "Cóctel",
+    "banquet": "Banquete",
+    "ceremony": "Ceremonia",
+    "flowers": "Flores",
+    "dress": "Vestimenta",
+    "cake": "Tarta",
+    "photography": "Fotografía",
+    "reception": "Recepción"
+  },
   "form": {
     "title": "Título",
     "description": "Descripción",
     "assignee": "Asignado a",
     "dueDate": "Fecha límite",
     "category": "Categoría",
-    "tags": "Etiquetas"
+    "tags": "Etiquetas",
+    "status": "Estado",
+    "priority": "Prioridad"
   },
   "messages": {
     "created": "Tarea creada correctamente",
@@ -37,7 +61,10 @@
     "overdue": "Tarea atrasada",
     "dueToday": "Vence hoy",
     "dueTomorrow": "Vence mañana",
-    "noDueDate": "Sin fecha límite"
+    "noDueDate": "Sin fecha límite",
+    "loading": "Cargando...",
+    "saving": "Guardando...",
+    "saved": "Guardado correctamente"
   },
   "filters": {
     "all": "Todas",
@@ -46,7 +73,9 @@
     "overdue": "Atrasadas",
     "today": "Hoy",
     "thisWeek": "Esta semana",
-    "thisMonth": "Este mes"
+    "thisMonth": "Este mes",
+    "categoryAll": "Todas las categorías",
+    "assigneeAll": "Todos"
   },
   "calendar": {
     "month": "Mes",
@@ -334,6 +363,26 @@
         "overdueSubtasks": "{{count}} subtareas vencidas",
         "progressBehind": "Progreso por debajo del ritmo esperado",
         "completed": "Bloque completado"
+      }
+    }
+  },
+  "buttons": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "add": "Añadir",
+    "close": "Cerrar",
+    "confirm": "Confirmar",
+    "back": "Volver",
+    "next": "Siguiente"
+  },
+  "tasks": {
+    "page": {
+      "calendar": {
+        "fallback": {
+          "eventUntitled": "Event Untitled"
+        }
       }
     }
   }

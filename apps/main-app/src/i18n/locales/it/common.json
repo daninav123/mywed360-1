@@ -22,7 +22,11 @@
     "next": "Avanti",
     "previous": "Precedente",
     "continue": "Continua",
-    "finish": "Fine"
+    "finish": "Fine",
+    "update": "Update",
+    "create": "Create",
+    "saving": "Saving",
+    "savedSuccessfully": "Saved Successfully"
   },
   "navigation": {
     "home": "Home",
@@ -45,7 +49,8 @@
     "weddings": "Matrimoni",
     "emailInbox": "Posta in arrivo",
     "darkMode": "Modalit scura",
-    "userMenu": "Menú utente"
+    "userMenu": "Menú utente",
+    "weddingInfo": "Wedding Info"
   },
   "auth": {
     "login": "Login",
@@ -246,7 +251,50 @@
       "existing": "Existing groups",
       "none": "No groups yet."
     },
-    "selectedCount": "Selected: {{count}}"
+    "selectedCount": "Selected: {{count}}",
+    "status": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "declined": "Declined"
+    },
+    "contacts": {
+      "unsupported": "Unsupported",
+      "noName": "No Name",
+      "importedFromPicker": "Imported From Picker",
+      "errorAccess": "Error Access",
+      "csvEmpty": "Csv Empty",
+      "importedFromCsv": "Imported From Csv",
+      "csvReadError": "Csv Read Error",
+      "importCount": "Import Count",
+      "selectContacts": "Select Contacts",
+      "importCsv": "Import Csv",
+      "supportedColumns": "Supported Columns"
+    },
+    "fields": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "table": "Table",
+      "tableOptional": "Table Optional"
+    },
+    "examples": {
+      "table": "Table"
+    },
+    "noneSelected": "None Selected",
+    "whatsapp": {
+      "selectedApiError": "Selected Api Error",
+      "bulkApiDone": "Bulk Api Done",
+      "apiStartFailed": "Api Start Failed",
+      "selectedUnexpected": "Selected Unexpected",
+      "customPrompt": "Custom Prompt",
+      "webStarted": "Web Started",
+      "extensionMissingConfirm": "Extension Missing Confirm",
+      "chatsOpened": "Chats Opened",
+      "oneClickFailed": "One Click Failed",
+      "mobileUnexpected": "Mobile Unexpected",
+      "batchCreated": "Batch Created",
+      "dm": "Dm"
+    }
   },
   "providers": {
     "provider": "Provider",
@@ -307,7 +355,24 @@
       "used": "used",
       "categoryStatus": "Budget Status by Categories",
       "progress": "Progress",
-      "exceededNote": "(Budget exceeded!)"
+      "exceededNote": "(Budget exceeded!)",
+      "projectionTitle": "Projection Title",
+      "projectionHint": "Projection Hint",
+      "projectedAtWedding": "Projected At Wedding",
+      "predictiveTitle": "Predictive Title",
+      "predictiveSubtitle": "Predictive Subtitle",
+      "trendUp": "Trend Up",
+      "trendDown": "Trend Down",
+      "trendFlat": "Trend Flat",
+      "burnRate": "Burn Rate",
+      "avgExpense": "Avg Expense",
+      "monthsToZero": "Months To Zero",
+      "estimatedDate": "Estimated Date",
+      "forecastSurplus": "Forecast Surplus",
+      "recommendedSaving": "Recommended Saving",
+      "categoriesAtRisk": "Categories At Risk",
+      "upcomingPayments": "Upcoming Payments",
+      "noProvider": "No Provider"
     },
     "form": {
       "type": "Transaction type",
@@ -345,7 +410,15 @@
         "paidAmountPositive": "Paid amount must be a positive number",
         "paidAmountExceeds": "Paid amount cannot exceed the total",
         "paidAmountRequired": "Register how much you paid to mark the status as partial"
-      }
+      },
+      "providerPlaceholder": "Provider Placeholder",
+      "providerHint": "Provider Hint",
+      "paymentMethod": "Payment Method",
+      "paymentMethodPlaceholder": "Payment Method Placeholder",
+      "paymentTracking": "Payment Tracking",
+      "dueDate": "Due Date",
+      "dueDateOverdue": "Due Date Overdue",
+      "paidAmount": "Paid Amount"
     },
     "budget": {
       "title": "Budget management",
@@ -389,7 +462,13 @@
         "refreshFailed": "No se pudo actualizar la recomendacin.",
         "applyFailed": "No se pudo aplicar el escenario recomendado.",
         "applyFailedWithReason": "No se pudo aplicar el escenario ({{reason}})."
-      }
+      },
+      "used": "Used",
+      "assigned": "Assigned",
+      "totalSpent": "Total Spent",
+      "usage": "Usage",
+      "categories": "Categories",
+      "emptyHint": "Empty Hint"
     },
     "benchmarks": {
       "title": "Budget suggestions based on similar weddings",
@@ -491,7 +570,14 @@
         "positive": "Positive",
         "negative": "Negative"
       },
-      "balanceLabel": "Balance:"
+      "balanceLabel": "Balance:",
+      "budgetVsSpentDesc": "Budget Vs Spent Desc",
+      "expenseDistributionDesc": "Expense Distribution Desc",
+      "monthlyTrendDesc": "Monthly Trend Desc",
+      "budgetProgressDesc": "Budget Progress Desc",
+      "insightsDesc": "Insights Desc",
+      "bestMonth": "Best Month",
+      "loading": "Loading"
     },
     "bank": {
       "title": "Link bank account",
@@ -592,8 +678,77 @@
           "category": "Category"
         },
         "none": "None",
-        "preview": "Preview"
+        "preview": "Preview",
+        "date": "Date",
+        "description": "Description",
+        "type": "Type",
+        "category": "Category",
+        "amount": "Amount",
+        "unassigned": "Unassigned",
+        "column": "Column"
+      },
+      "expense": "Expense",
+      "income": "Income",
+      "items": "Items",
+      "connectBank": "Connect Bank",
+      "importing": "Importing",
+      "importCSV": "Import C S V",
+      "exporting": "Exporting",
+      "exportCSV": "Export C S V",
+      "emptyHint": "Empty Hint",
+      "confirmDelete": "Confirm Delete",
+      "deleteSuccess": "Delete Success",
+      "deleteError": "Delete Error",
+      "totalTransactions": "Total Transactions",
+      "totalIncome": "Total Income",
+      "totalExpense": "Total Expense",
+      "pending": "Pending",
+      "overdue": "Overdue",
+      "import": "Import",
+      "exportSuccess": "Export Success",
+      "exportError": "Export Error",
+      "export": "Export",
+      "filters": "Filters",
+      "noResults": "No Results",
+      "edit": "Edit",
+      "updateSuccess": "Update Success",
+      "createSuccess": "Create Success",
+      "saveError": "Save Error",
+      "importUnsupported": "Import Unsupported",
+      "importSuccess": "Import Success",
+      "item": "Item",
+      "importPartial": "Import Partial",
+      "rowsFailed": "Rows Failed",
+      "importError": "Import Error"
+    },
+    "hero": {
+      "availableNow": "Available Now",
+      "ofConfirmed": "Of Confirmed",
+      "confirmed": "Confirmed",
+      "runway": "Runway",
+      "runwayDesc": "Runway Desc",
+      "runwayUnknown": "Runway Unknown",
+      "next7d": "Next7d",
+      "payments": "Payments",
+      "noPayments": "No Payments",
+      "overdue": "Overdue",
+      "viewDetails": "View Details",
+      "budgetStatus": "Budget Status",
+      "categoriesOk": "Categories Ok",
+      "categoriesWarning": "Categories Warning",
+      "categoriesCritical": "Categories Critical",
+      "spent": "Spent",
+      "pending": "Pending"
+    },
+    "reports": {
+      "generator": {
+        "preview": {
+          "description": "Description"
+        }
       }
+    },
+    "error": {
+      "title": "Title"
     }
   },
   "seating": {
@@ -667,7 +822,9 @@
       "distribute": "Distribute",
       "distributeHorizontal": "Horizontal",
       "distributeVertical": "Vertical",
-      "hotkeys": "Shortcuts"
+      "hotkeys": "Shortcuts",
+      "resetPlan": "Reset Plan",
+      "reset": "Reset"
     },
     "snapshots": {
       "title": "Snapshots",
@@ -718,7 +875,16 @@
       "usePanelToAssign": "Use this panel to assign guests.",
       "guests": "Guests",
       "duplicateTable": "Duplicate table",
-      "deleteTable": "Delete table"
+      "deleteTable": "Delete table",
+      "goTo": "Go To",
+      "scope": "Scope",
+      "tableType": "Table Type",
+      "capacity": "Capacity",
+      "assignedCount": "Assigned Count",
+      "autoCapacity": "Auto Capacity",
+      "manualCapacity": "Manual Capacity",
+      "capacityExceeded": "Capacity Exceeded",
+      "capacityRemaining": "Capacity Remaining"
     },
     "tools": {
       "pan": "Pan",
@@ -738,7 +904,8 @@
     "export": {
       "pdf": "PDF",
       "png": "PNG",
-      "csv": "CSV"
+      "csv": "CSV",
+      "advanced": "Advanced"
     },
     "hotkeys": {
       "title": "Keyboard Shortcuts",
@@ -758,6 +925,48 @@
         "backspaceDelete": "Remove point / Delete table",
         "tabExactLength": "Exact segment length"
       }
+    },
+    "configureBanquet": "Configure Banquet",
+    "banquet": {
+      "tableRows": "Table Rows",
+      "tableCols": "Table Cols",
+      "seatsPerTable": "Seats Per Table",
+      "spacingX": "Spacing X",
+      "spacingY": "Spacing Y",
+      "generate": "Generate"
+    },
+    "configureCeremony": "Configure Ceremony",
+    "ceremony": {
+      "rows": "Rows",
+      "seatsPerRow": "Seats Per Row",
+      "spacing": "Spacing",
+      "aisleAfter": "Aisle After",
+      "vipReservations": "Vip Reservations",
+      "reservedRows": "Reserved Rows",
+      "reservedLabel": "Reserved Label",
+      "lockVipSeats": "Lock Vip Seats",
+      "notesPlaceholder": "Notes Placeholder",
+      "totalSeats": "Total Seats",
+      "saveConfiguration": "Save Configuration"
+    },
+    "space": {
+      "dimensions": "Dimensions",
+      "width": "Width",
+      "height": "Height"
+    },
+    "form": {
+      "tableName": "Table Name",
+      "shape": "Shape",
+      "capacity": "Capacity"
+    },
+    "shapes": {
+      "round": "Round",
+      "rectangular": "Rectangular"
+    },
+    "reset": {
+      "title": "Title",
+      "message": "Message",
+      "confirm": "Confirm"
     }
   },
   "email": {
@@ -783,7 +992,22 @@
     "send": "Send",
     "saveDraft": "Save Draft",
     "emailSettings": "Email Settings",
-    "emailSignature": "Email Signature"
+    "emailSignature": "Email Signature",
+    "viewer": {
+      "back": "Back",
+      "unstar": "Unstar",
+      "star": "Star",
+      "reply": "Reply",
+      "forward": "Forward",
+      "noSubject": "No Subject",
+      "from": "From",
+      "date": "Date",
+      "to": "To",
+      "replyPlaceholder": "Reply Placeholder",
+      "sendReply": "Send Reply",
+      "quickReply": "Quick Reply",
+      "addToCalendar": "Add To Calendar"
+    }
   },
   "tasks": {
     "task": "Task",
@@ -806,7 +1030,225 @@
     "low": "Low",
     "todoList": "To-Do List",
     "completedTasks": "Completed Tasks",
-    "upcomingTasks": "Upcoming Tasks"
+    "upcomingTasks": "Upcoming Tasks",
+    "templates": {
+      "confirmMenu": "Confirm Menu",
+      "reviewDecoration": "Review Decoration",
+      "confirmPlaylist": "Confirm Playlist",
+      "coordinatePhotographer": "Coordinate Photographer",
+      "verifyTransport": "Verify Transport",
+      "confirmSeating": "Confirm Seating",
+      "reviewTableSetup": "Review Table Setup",
+      "soundCheck": "Sound Check",
+      "confirmKidsMenu": "Confirm Kids Menu",
+      "prepareEmergencyKit": "Prepare Emergency Kit"
+    },
+    "confirmDelete": "Confirm Delete",
+    "page": {
+      "allTasks": {
+        "defaults": {
+          "task": "Task"
+        },
+        "filters": {
+          "categoryAll": "Category All",
+          "assigneeAll": "Assignee All",
+          "status": {
+            "all": "All",
+            "pending": "Pending",
+            "completed": "Completed"
+          },
+          "clear": "Clear",
+          "results": "Results"
+        },
+        "badges": {
+          "noDate": "No Date",
+          "assigned": "Assigned"
+        },
+        "orphans": "Orphans",
+        "title": "Title",
+        "searchPlaceholder": "Search Placeholder",
+        "empty": {
+          "columns": "Columns",
+          "filters": "Filters"
+        }
+      },
+      "calendarSync": {
+        "errors": {
+          "auth": "Auth",
+          "fetch": "Fetch"
+        },
+        "title": "Title",
+        "loading": "Loading",
+        "actions": {
+          "subscribe": "Subscribe",
+          "addGoogle": "Add Google",
+          "copyUrl": "Copy Url",
+          "close": "Close"
+        },
+        "labels": {
+          "ics": "Ics"
+        },
+        "footnote": "Footnote",
+        "button": "Button"
+      },
+      "common": {
+        "errors": {
+          "generic": "Generic"
+        },
+        "fallbacks": {
+          "task": "Task",
+          "untitledTask": "Untitled Task",
+          "untitled": "Untitled"
+        },
+        "noWeddingTitle": "No Wedding Title",
+        "noWeddingDescription": "No Wedding Description"
+      },
+      "calendar": {
+        "title": "Title",
+        "errors": {
+          "title": "Title",
+          "description": "Description"
+        },
+        "fallback": {
+          "eventUntitled": "Event Untitled"
+        },
+        "empty": "Empty",
+        "zoom": {
+          "less": "Less",
+          "label": "Label",
+          "more": "More",
+          "reset": "Reset"
+        }
+      },
+      "list": {
+        "pagination": {
+          "prev": "Prev",
+          "next": "Next",
+          "page": "Page"
+        },
+        "sectionTitle": "Section Title",
+        "defaults": {
+          "parent": "Parent"
+        },
+        "actions": {
+          "viewInGantt": "View In Gantt"
+        },
+        "badges": {
+          "blocked": "Blocked",
+          "overdue": "Overdue"
+        },
+        "labels": {
+          "assigned": "Assigned"
+        },
+        "empty": {
+          "upcoming": "Upcoming",
+          "filters": "Filters"
+        },
+        "dependencies": {
+          "blocked": "Blocked",
+          "resolved": "Resolved",
+          "pendingTitle": "Pending Title",
+          "completedTitle": "Completed Title"
+        }
+      },
+      "form": {
+        "title": {
+          "edit": "Edit",
+          "create": "Create"
+        },
+        "fields": {
+          "title": "Title",
+          "description": "Description",
+          "assignee": "Assignee",
+          "start": "Start",
+          "end": "End",
+          "long": "Long",
+          "parent": "Parent",
+          "rootOption": "Root Option",
+          "unscheduled": "Unscheduled",
+          "rangeHeading": "Range Heading",
+          "rangeMode": {
+            "auto": "Auto",
+            "manual": "Manual"
+          },
+          "autoAdjust": {
+            "expand_only": "Expand Only",
+            "expand_and_shrink": "Expand And Shrink",
+            "none": "None"
+          },
+          "bufferDays": "Buffer Days",
+          "completed": "Completed"
+        },
+        "buttons": {
+          "delete": "Delete",
+          "cancel": "Cancel",
+          "save": "Save"
+        },
+        "validation": {
+          "titleRequired": "Title Required",
+          "startRequired": "Start Required",
+          "endRequired": "End Required",
+          "invalidDates": "Invalid Dates",
+          "endAfterStart": "End After Start"
+        },
+        "errors": {
+          "saveFailed": "Save Failed"
+        }
+      },
+      "notifications": {
+        "overdueTitle": "Overdue Title",
+        "upcomingTitle": "Upcoming Title",
+        "overdueMessage": "Overdue Message",
+        "upcomingMessage": "Upcoming Message",
+        "blocks": {
+          "delayed": "Delayed",
+          "overdueSubtasks": "Overdue Subtasks",
+          "progressBehind": "Progress Behind",
+          "completed": "Completed"
+        }
+      },
+      "header": {
+        "title": "Title",
+        "viewAll": "View All",
+        "newTask": "New Task"
+      },
+      "sidePanel": {
+        "subtasks": {
+          "default": "Default"
+        }
+      },
+      "gantt": {
+        "filters": {
+          "assigneeUnassigned": "Assignee Unassigned",
+          "categoryAll": "Category All",
+          "categoryNone": "Category None",
+          "assigneeAll": "Assignee All",
+          "statusAll": "Status All",
+          "statusCritical": "Status Critical",
+          "statusWarning": "Status Warning",
+          "statusOk": "Status Ok"
+        },
+        "title": "Title",
+        "controls": {
+          "showSubtasks": "Show Subtasks",
+          "zoomLabel": "Zoom Label",
+          "fit": "Fit",
+          "clearFilters": "Clear Filters"
+        },
+        "empty": {
+          "noScheduled": "No Scheduled"
+        }
+      },
+      "dependencies": {
+        "blocked": "Blocked"
+      }
+    },
+    "calendar": {
+      "month": "Month",
+      "week": "Week",
+      "day": "Day",
+      "today": "Today"
+    }
   },
   "profile": {
     "synced": "Synced",
@@ -814,6 +1256,49 @@
       "type": "Subscription type",
       "free": "Free",
       "premium": "Premium"
+    },
+    "errors": {
+      "userNotFound": "User Not Found",
+      "invalidWeddingDate": "Invalid Wedding Date",
+      "weddingNotFound": "Wedding Not Found",
+      "savingProfile": "Saving Profile",
+      "loadingProfile": "Loading Profile",
+      "sessionNotReady": "Session Not Ready",
+      "creatingInvite": "Creating Invite",
+      "invalidEmail": "Invalid Email",
+      "invalidWhatsapp": "Invalid Whatsapp"
+    },
+    "lastSaved": "Last Saved",
+    "wedding": {
+      "title": "Title",
+      "images": "Images",
+      "webUrl": "Web Url",
+      "important": "Important",
+      "notesPlaceholder": "Notes Placeholder"
+    },
+    "collaborators": {
+      "linkCopied": "Link Copied",
+      "linkCreated": "Link Created",
+      "title": "Title",
+      "plannerEmail": "Planner Email",
+      "creating": "Creating",
+      "createLink": "Create Link",
+      "linkGenerated": "Link Generated",
+      "user": "User",
+      "role": "Role",
+      "actions": "Actions",
+      "roleOwner": "Role Owner",
+      "rolePlanner": "Role Planner",
+      "roleHelper": "Role Helper"
+    },
+    "success": {
+      "saved": "Saved"
+    },
+    "account": {
+      "title": "Title"
+    },
+    "billing": {
+      "title": "Title"
     }
   },
   "forms": {
@@ -848,7 +1333,42 @@
     "confirmDelete": "Are you sure you want to delete?",
     "unsavedChanges": "You have unsaved changes",
     "sessionExpired": "Your session has expired",
-    "pleaseLogin": "Please log in"
+    "pleaseLogin": "Please log in",
+    "auth": "Auth",
+    "currentUser": "Current User",
+    "uid": "Uid",
+    "email": "Email",
+    "emailVerified": "Email Verified",
+    "noUser": "No User",
+    "tokenObtained": "Token Obtained",
+    "tokenLength": "Token Length",
+    "tokenPreview": "Token Preview",
+    "issuer": "Issuer",
+    "subject": "Subject",
+    "audience": "Audience",
+    "expires": "Expires",
+    "issued": "Issued",
+    "expiresIn": "Expires In",
+    "tokenExpired": "Token Expired",
+    "tokenExpiringSoon": "Token Expiring Soon",
+    "tokenValid": "Token Valid",
+    "tokenParseError": "Token Parse Error",
+    "backendStatus": "Backend Status",
+    "backendOk": "Backend Ok",
+    "notAvailable": "Not Available",
+    "backendEmails": "Backend Emails",
+    "backendError": "Backend Error",
+    "backendErrorJson": "Backend Error Json",
+    "backendErrorText": "Backend Error Text",
+    "fetchError": "Fetch Error",
+    "tokenNull": "Token Null",
+    "tokenError": "Token Error",
+    "tokenStack": "Token Stack",
+    "localStorageTokenExists": "Local Storage Token Exists",
+    "localStorageTokenLength": "Local Storage Token Length",
+    "localStorageTokenMissing": "Local Storage Token Missing",
+    "localStorageError": "Local Storage Error",
+    "diagnosticDone": "Diagnostic Done"
   },
   "dates": {
     "today": "Today",
@@ -871,7 +1391,17 @@
     "completed": "Completed",
     "cancelled": "Cancelled",
     "draft": "Draft",
-    "published": "Published"
+    "published": "Published",
+    "new": "New",
+    "contacted": "Contacted",
+    "selected": "Selected",
+    "confirmed": "Confirmed",
+    "configured": "Configured",
+    "notConfigured": "Not Configured",
+    "userExists": "User Exists",
+    "userMissing": "User Missing",
+    "emailVerified": "Email Verified",
+    "emailUnverified": "Email Unverified"
   },
   "inspiration": {
     "alt": "inspiration",
@@ -981,7 +1511,66 @@
     "view": "View",
     "cancel": "Cancel",
     "delete": "Delete",
-    "duplicate": "Duplicate"
+    "duplicate": "Duplicate",
+    "websiteGenerator": {
+      "profileSummary": {
+        "labels": {
+          "additionalInfo": "Additional Info"
+        }
+      },
+      "promptLibrary": {
+        "errors": {
+          "save": "Save",
+          "delete": "Delete"
+        },
+        "title": "Title",
+        "builtIn": {
+          "title": "Title",
+          "use": "Use"
+        },
+        "custom": {
+          "title": "Title",
+          "new": "New"
+        },
+        "form": {
+          "saving": "Saving",
+          "save": "Save"
+        }
+      },
+      "logistics": {
+        "story": {
+          "title": "Title"
+        },
+        "notes": {
+          "title": "Title"
+        },
+        "transportation": {
+          "title": "Title"
+        },
+        "schedule": {
+          "title": "Title",
+          "notes": "Notes"
+        },
+        "lodging": {
+          "title": "Title",
+          "add": "Add",
+          "remove": "Remove"
+        },
+        "faq": {
+          "remove": "Remove"
+        }
+      },
+      "logisticsActions": {
+        "saving": "Saving"
+      }
+    },
+    "designsLibrary": {
+      "vectorEditor": {
+        "messages": {
+          "paletteLoadWarning": "Palette Load Warning"
+        }
+      }
+    }
   },
   "pages": {
     "momentos": {
@@ -1374,6 +1963,37 @@
       "occupancy": "Ocupacin",
       "guestsHeading": "Invitados",
       "noGuests": "No hay invitados asignados"
+    },
+    "tabs": {
+      "unassigned": "Unassigned",
+      "recommendations": "Recommendations",
+      "conflicts": "Conflicts",
+      "staff": "Staff",
+      "history": "History",
+      "noUnassigned": "No Unassigned",
+      "noRecommendations": "No Recommendations",
+      "noConflicts": "No Conflicts",
+      "noConflictsDesc": "No Conflicts Desc",
+      "noStaff": "No Staff",
+      "noHistory": "No History"
+    },
+    "guestPanel": {
+      "title": "Title"
+    },
+    "bottomPanel": {
+      "minimize": "Minimize",
+      "maximize": "Maximize",
+      "close": "Close"
+    },
+    "fab": {
+      "addTable": "Add Table",
+      "addGuest": "Add Guest",
+      "export": "Export",
+      "import": "Import",
+      "undo": "Undo",
+      "redo": "Redo",
+      "close": "Close",
+      "open": "Open"
     }
   },
   "categories": {
@@ -1384,7 +2004,8 @@
     "flowers": "Flores",
     "dress": "Vestidos",
     "cake": "Pasteles",
-    "photography": "Fotografía"
+    "photography": "Fotografía",
+    "reception": "Reception"
   },
   "services": {
     "catering": "Catering",
@@ -1423,7 +2044,934 @@
     "configureServices": "Configurar servicios deseados",
     "suggested": "Sugeridos",
     "addServicePlaceholder": "Añadir servicio (ej. Fotografía)",
-    "noServicesAdded": "An no has aadido servicios."
+    "noServicesAdded": "An no has aadido servicios.",
+    "budgets": {
+      "status": {
+        "pending": "Pending",
+        "accepted": "Accepted",
+        "rejected": "Rejected",
+        "submitted": "Submitted",
+        "unknown": "Unknown"
+      },
+      "loading": "Loading",
+      "error": "Error",
+      "empty": "Empty",
+      "title": "Title",
+      "defaultDescription": "Default Description",
+      "portalTag": "Portal Tag",
+      "portalPendingReview": "Portal Pending Review",
+      "buttons": {
+        "accept": "Accept",
+        "reject": "Reject",
+        "registerFinance": "Register Finance"
+      },
+      "prefillConcept": "Prefill Concept",
+      "prefillDescription": "Prefill Description"
+    },
+    "detail": {
+      "status": {
+        "title": "Status",
+        "loading": "Loading...",
+        "empty": "No data",
+        "contracts": {
+          "title": "Contracts",
+          "total": "Total",
+          "signed": "Signed",
+          "sent": "Sent",
+          "draft": "Draft",
+          "cancelled": "Cancelled",
+          "amountSigned": "Signed amount"
+        },
+        "lastUpdate": "Last update",
+        "payments": {
+          "title": "Payments",
+          "total": "Total",
+          "paid": "Paid",
+          "pending": "Pending",
+          "failed": "Failed",
+          "refunded": "Refunded",
+          "amount": "Amount"
+        }
+      },
+      "tabs": {
+        "info": "Info",
+        "followUp": "Follow Up",
+        "communications": "Communications",
+        "contracts": "Contracts",
+        "insights": "Insights"
+      },
+      "portal": {
+        "availability": {
+          "none": "None",
+          "available": "Available",
+          "unavailable": "Unavailable",
+          "pending": "Pending"
+        },
+        "title": "Title",
+        "status": {
+          "responded": "Responded",
+          "pending": "Pending",
+          "none": "None"
+        },
+        "labels": {
+          "availability": "Availability",
+          "lastResponse": "Last Response",
+          "lastMessage": "Last Message"
+        },
+        "pendingHint": "Pending Hint",
+        "noneHint": "None Hint",
+        "copyLink": "Copy Link",
+        "responseRegistered": "Response Registered"
+      },
+      "pendingTodos": {
+        "tasks": "Tasks",
+        "followUps": "Follow Ups",
+        "assigned": "Assigned"
+      },
+      "alerts": {
+        "portalPending": "Portal Pending",
+        "portalInactive": "Portal Inactive",
+        "noContracts": "No Contracts",
+        "pendingPayments": "Pending Payments",
+        "styleBalance": "Style Balance"
+      },
+      "toasts": {
+        "paySuggestionsError": "Pay Suggestions Error",
+        "payStartError": "Pay Start Error",
+        "manualContactSuccess": "Manual Contact Success",
+        "manualContactError": "Manual Contact Error",
+        "portalCopied": "Portal Copied",
+        "portalToken": "Portal Token",
+        "portalError": "Portal Error",
+        "ratingSaved": "Rating Saved",
+        "ratingError": "Rating Error",
+        "mergeSuccess": "Merge Success",
+        "splitSuccess": "Split Success"
+      },
+      "prompts": {
+        "depositAmount": "Deposit Amount",
+        "depositDefault": "Deposit Default",
+        "manualContactNote": "Manual Contact Note"
+      },
+      "documents": {
+        "error": "Error",
+        "title": "Title",
+        "open": "Open",
+        "generating": "Generating",
+        "generate": "Generate"
+      },
+      "closeAria": "Close Aria",
+      "groupToast": "Group Toast",
+      "groupButtonTitle": "Group Button Title",
+      "groupButton": "Group Button",
+      "contracts": {
+        "externalNote": "External Note"
+      },
+      "groupRemoveConfirm": "Group Remove Confirm",
+      "groupRemoveSuccess": "Group Remove Success",
+      "groupRemoving": "Group Removing",
+      "groupRemove": "Group Remove",
+      "info": {
+        "contact": "Contact",
+        "phone": "Phone",
+        "email": "Email",
+        "website": "Website",
+        "date": "Date",
+        "location": "Location",
+        "priceRange": "Price Range",
+        "registerManual": "Register Manual",
+        "ratingTitle": "Rating Title",
+        "ratingSummary": "Rating Summary",
+        "ratingSaving": "Rating Saving",
+        "ratingSave": "Rating Save"
+      },
+      "serviceLines": {
+        "title": "Title",
+        "manage": "Manage",
+        "headers": {
+          "service": "Service",
+          "status": "Status",
+          "budget": "Budget",
+          "notes": "Notes"
+        },
+        "unnamed": "Unnamed",
+        "empty": "Empty"
+      },
+      "rfq": {
+        "title": "Title",
+        "defaultSubject": "Default Subject",
+        "new": "New",
+        "loading": "Loading",
+        "empty": "Empty",
+        "noSubject": "No Subject",
+        "sentAt": "Sent At",
+        "resend": "Resend"
+      },
+      "paySuggestions": {
+        "title": "Title",
+        "refreshing": "Refreshing",
+        "refresh": "Refresh",
+        "loading": "Loading",
+        "empty": "Empty",
+        "noSubject": "No Subject",
+        "amountDate": "Amount Date",
+        "prefillConcept": "Prefill Concept",
+        "prefillDescription": "Prefill Description",
+        "register": "Register"
+      },
+      "communications": {
+        "title": "Title",
+        "subtitle": "Subtitle"
+      },
+      "contractsTab": {
+        "title": "Title",
+        "refreshing": "Refreshing",
+        "refresh": "Refresh"
+      },
+      "close": "Close",
+      "preview": {
+        "title": "Title",
+        "imageAlt": "Image Alt",
+        "pdfTitle": "Pdf Title",
+        "openExternal": "Open External"
+      },
+      "actions": {
+        "requestQuote": "Request Quote"
+      }
+    },
+    "assignModal": {
+      "selectedWithNames": "Selected With Names",
+      "selectedNone": "Selected None",
+      "title": "Title",
+      "modeAssign": "Mode Assign",
+      "modeCreate": "Mode Create",
+      "emptyGroups": "Empty Groups",
+      "groupLabel": "Group Label",
+      "groupPlaceholder": "Group Placeholder",
+      "membersCount": "Members Count",
+      "newGroupLabel": "New Group Label",
+      "newGroupPlaceholder": "New Group Placeholder",
+      "cancel": "Cancel",
+      "confirmAssign": "Confirm Assign",
+      "confirmCreate": "Confirm Create"
+    },
+    "bulkStatusModal": {
+      "title": "Title",
+      "label": "Label",
+      "cancel": "Cancel",
+      "applying": "Applying",
+      "apply": "Apply"
+    },
+    "compareModal": {
+      "csv": {
+        "name": "Name",
+        "service": "Service",
+        "status": "Status",
+        "price": "Price",
+        "rating": "Rating",
+        "location": "Location",
+        "email": "Email",
+        "phone": "Phone",
+        "estimatedPrice": "Estimated Price",
+        "score": "Score"
+      },
+      "csvFilename": "Csv Filename",
+      "toasts": {
+        "createSuccess": "Create Success",
+        "createError": "Create Error",
+        "genericError": "Generic Error"
+      },
+      "title": "Title",
+      "hiddenGroupPrefix": "Hidden Group Prefix",
+      "recommendation": {
+        "summary": "Summary",
+        "fallbackName": "Fallback Name",
+        "breakdown": "Breakdown",
+        "rfqSummary": "Rfq Summary",
+        "badge": "Badge"
+      },
+      "filter": {
+        "groupLabel": "Group Label",
+        "groupPlaceholder": "Group Placeholder",
+        "scoreLabel": "Score Label",
+        "scorePlaceholder": "Score Placeholder",
+        "includeCount": "Include Count",
+        "creating": "Creating",
+        "create": "Create"
+      },
+      "sort": {
+        "label": "Label",
+        "score": "Score",
+        "name": "Name",
+        "price": "Price",
+        "toggleTitle": "Toggle Title",
+        "asc": "Asc",
+        "desc": "Desc",
+        "showEstimated": "Show Estimated"
+      },
+      "table": {
+        "name": "Name",
+        "service": "Service",
+        "status": "Status",
+        "price": "Price",
+        "rating": "Rating",
+        "location": "Location",
+        "email": "Email",
+        "phone": "Phone",
+        "estimatedPrice": "Estimated Price",
+        "score": "Score",
+        "actions": "Actions",
+        "remove": "Remove"
+      },
+      "buttons": {
+        "close": "Close",
+        "exportCsv": "Export Csv"
+      }
+    },
+    "groupAllocationModal": {
+      "table": {
+        "newPartLabel": "New Part Label",
+        "notesPlaceholder": "Notes Placeholder",
+        "remove": "Remove"
+      },
+      "title": "Title",
+      "summary": {
+        "totalLabel": "Total Label",
+        "targetLabel": "Target Label",
+        "targetValue": "Target Value",
+        "noTarget": "No Target",
+        "save": "Save",
+        "overBudget": "Over Budget"
+      },
+      "empty": "Empty",
+      "add": "Add",
+      "close": "Close"
+    },
+    "groupCreateModal": {
+      "title": "Title",
+      "nameLabel": "Name Label",
+      "namePlaceholder": "Name Placeholder",
+      "notesLabel": "Notes Label",
+      "notesPlaceholder": "Notes Placeholder",
+      "cancel": "Cancel",
+      "confirm": "Confirm"
+    },
+    "groupSuggestions": {
+      "title": "Title",
+      "overlaps": {
+        "heading": "Heading",
+        "empty": "Empty",
+        "item": "Item"
+      },
+      "splits": {
+        "heading": "Heading",
+        "empty": "Empty",
+        "item": "Item"
+      },
+      "outliers": {
+        "heading": "Heading",
+        "empty": "Empty",
+        "item": "Item"
+      },
+      "close": "Close"
+    },
+    "list": {
+      "contractFallback": "Contract Fallback",
+      "contractTitle": "Contract Title",
+      "tabs": {
+        "contracted": "Contracted",
+        "searching": "Searching",
+        "favorites": "Favorites",
+        "aria": "Aria"
+      },
+      "filters": {
+        "statusOptions": {
+          "pending": "Pending",
+          "contacted": "Contacted",
+          "selected": "Selected",
+          "confirmed": "Confirmed",
+          "rejected": "Rejected"
+        },
+        "searchLabel": "Search Label",
+        "searchPlaceholder": "Search Placeholder",
+        "serviceLabel": "Service Label",
+        "allOption": "All Option",
+        "statusLabel": "Status Label",
+        "dateFrom": "Date From",
+        "dateTo": "Date To",
+        "ratingLabel": "Rating Label",
+        "clear": "Clear"
+      },
+      "selection": {
+        "count": "Count",
+        "compare": "Compare",
+        "sendRfq": "Send Rfq",
+        "group": "Group",
+        "changeStatus": "Change Status",
+        "duplicates": "Duplicates",
+        "clear": "Clear"
+      },
+      "empty": "Empty",
+      "loadingVirtualized": "Loading Virtualized"
+    },
+    "card": {
+      "shared": {
+        "notAvailable": "Not Available"
+      },
+      "statusLabels": {
+        "unknown": "Unknown"
+      },
+      "portal": {
+        "responded": "Responded",
+        "pending": "Pending"
+      },
+      "tracking": {
+        "lastAgo": {
+          "days": "Days",
+          "hours": "Hours",
+          "minutes": "Minutes",
+          "justNow": "Just Now"
+        },
+        "status": "Status",
+        "last": "Last",
+        "thread": "Thread",
+        "openInboxTitle": "Open Inbox Title",
+        "openInbox": "Open Inbox",
+        "defaultSubject": "Default Subject",
+        "detailsTitle": "Details Title",
+        "details": "Details"
+      },
+      "autoEmail": {
+        "guestsFallback": "Guests Fallback",
+        "userFallback": "User Fallback",
+        "searchQuery": {
+          "quote": "Quote",
+          "meeting": "Meeting"
+        },
+        "appendedQuote": "Appended Quote",
+        "appendedMeeting": "Appended Meeting",
+        "closing": "Closing",
+        "signature": "Signature",
+        "subjectQuote": "Subject Quote",
+        "subjectMeeting": "Subject Meeting",
+        "missingEmail": "Missing Email",
+        "successQuote": "Success Quote",
+        "successMeeting": "Success Meeting",
+        "sendErrorRetry": "Send Error Retry",
+        "sendError": "Send Error",
+        "sending": "Sending"
+      },
+      "rating": {
+        "count": "Count"
+      },
+      "favorite": {
+        "remove": "Remove",
+        "add": "Add"
+      },
+      "pendingTooltip": "Pending Tooltip",
+      "nameFallback": "Name Fallback",
+      "scoreTooltip": "Score Tooltip",
+      "scoreLabel": "Score Label",
+      "metrics": {
+        "matchLabel": "Match Label",
+        "percent": "Percent",
+        "experienceLabel": "Experience Label",
+        "responseLabel": "Response Label"
+      },
+      "serviceFallback": "Service Fallback",
+      "groupTooltip": "Group Tooltip",
+      "budget": {
+        "acceptedTooltip": "Accepted Tooltip",
+        "latestTooltip": "Latest Tooltip",
+        "genericTooltip": "Generic Tooltip",
+        "accepted": "Accepted",
+        "pending": "Pending",
+        "received": "Received"
+      },
+      "contactLabel": "Contact Label",
+      "phoneLabel": "Phone Label",
+      "priceLabel": "Price Label",
+      "depositPaid": "Deposit Paid",
+      "dateLabel": "Date Label",
+      "actions": {
+        "view": "View",
+        "requestQuote": "Request Quote",
+        "requestMeeting": "Request Meeting",
+        "edit": "Edit",
+        "viewBudget": "View Budget",
+        "assignGroup": "Assign Group",
+        "delete": "Delete",
+        "reserve": "Reserve"
+      },
+      "emails": {
+        "toggleTitle": "Toggle Title",
+        "hide": "Hide",
+        "show": "Show",
+        "loading": "Loading",
+        "empty": "Empty",
+        "noSubject": "No Subject",
+        "openInbox": "Open Inbox"
+      }
+    },
+    "providerEmailModal": {
+      "title": "Title",
+      "closeAria": "Close Aria",
+      "fields": {
+        "fromLabel": "From Label",
+        "unknownEmail": "Unknown Email",
+        "toLabel": "To Label",
+        "missingEmail": "Missing Email",
+        "subjectLabel": "Subject Label",
+        "subjectPlaceholder": "Subject Placeholder",
+        "messageLabel": "Message Label",
+        "messagePlaceholder": "Message Placeholder"
+      },
+      "templates": {
+        "label": "Label",
+        "defaultOption": "Default Option",
+        "fallback": "Fallback"
+      },
+      "preview": {
+        "title": "Title",
+        "toggle": "Toggle",
+        "subjectPrefix": "Subject Prefix",
+        "emptySubject": "Empty Subject"
+      },
+      "buttons": {
+        "restore": "Restore",
+        "cancel": "Cancel",
+        "sending": "Sending",
+        "send": "Send"
+      }
+    },
+    "providerSearchDrawer": {
+      "title": "Title",
+      "closeTooltip": "Close Tooltip",
+      "queryPlaceholder": "Query Placeholder",
+      "searchButton": "Search Button",
+      "loading": "Loading",
+      "emptyPrompt": "Empty Prompt",
+      "result": {
+        "meta": "Meta",
+        "web": "Web"
+      },
+      "closeButton": "Close Button",
+      "saveButton": "Save Button"
+    },
+    "analyticsPanel": {
+      "title": "Title",
+      "description": "Description",
+      "openReport": "Open Report",
+      "cards": {
+        "average": {
+          "title": "Title",
+          "targetHint": "Target Hint"
+        },
+        "portal": {
+          "title": "Title",
+          "responses": "Responses",
+          "coverage": "Coverage",
+          "pending": "Pending"
+        },
+        "services": {
+          "title": "Title",
+          "empty": "Empty",
+          "row": "Row"
+        }
+      },
+      "distribution": {
+        "title": "Title",
+        "bucket": "Bucket",
+        "empty": "Empty"
+      },
+      "top": {
+        "title": "Title",
+        "columns": {
+          "provider": "Provider",
+          "service": "Service",
+          "score": "Score"
+        },
+        "empty": "Empty"
+      },
+      "coverage": {
+        "title": "Title",
+        "suppliers": "Suppliers"
+      }
+    },
+    "wantedServices": {
+      "title": "Title",
+      "subtitle": "Subtitle",
+      "primaryTitle": "Primary Title",
+      "otherTitle": "Other Title",
+      "tip": "Tip",
+      "cancel": "Cancel",
+      "save": "Save"
+    },
+    "favorites": {
+      "errors": {
+        "loginRequired": "Login Required",
+        "removeFailed": "Remove Failed",
+        "saveFailed": "Save Failed",
+        "activeWeddingRequired": "Active Wedding Required",
+        "authToken": "Auth Token",
+        "alreadyExists": "Already Exists",
+        "updateFailed": "Update Failed"
+      },
+      "button": {
+        "saved": "Saved",
+        "save": "Save"
+      },
+      "confirmRemove": "Confirm Remove",
+      "toasts": {
+        "removed": "Removed",
+        "removeError": "Remove Error",
+        "exportSoon": "Export Soon"
+      },
+      "loading": "Loading",
+      "empty": {
+        "title": "Title",
+        "description": "Description",
+        "hintPrefix": "Hint Prefix",
+        "hintSuffix": "Hint Suffix"
+      },
+      "title": "Title",
+      "actions": {
+        "export": "Export",
+        "removeTooltip": "Remove Tooltip"
+      },
+      "searchPlaceholder": "Search Placeholder",
+      "filters": {
+        "allCategories": "All Categories",
+        "clear": "Clear",
+        "empty": "Empty"
+      },
+      "notesLabel": "Notes Label",
+      "addedAt": "Added At"
+    },
+    "requestQuoteModal": {
+      "toasts": {
+        "success": "Success"
+      }
+    },
+    "portfolio": {
+      "lightbox": {
+        "categories": {
+          "unknown": "Unknown"
+        },
+        "toasts": {
+          "updated": "Updated",
+          "updateError": "Update Error",
+          "genericError": "Generic Error"
+        },
+        "tooltips": {
+          "cancelEdit": "Cancel Edit",
+          "editPhoto": "Edit Photo",
+          "deletePhoto": "Delete Photo"
+        },
+        "image": {
+          "altFallback": "Alt Fallback"
+        },
+        "tags": {
+          "featured": "Featured"
+        },
+        "view": {
+          "noTitle": "No Title",
+          "categoryLabel": "Category Label",
+          "tagsLabel": "Tags Label"
+        },
+        "meta": {
+          "uploadedAt": "Uploaded At"
+        },
+        "form": {
+          "title": {
+            "label": "Label",
+            "placeholder": "Placeholder"
+          },
+          "description": {
+            "label": "Label"
+          },
+          "category": {
+            "label": "Label"
+          },
+          "tags": {
+            "label": "Label",
+            "placeholder": "Placeholder"
+          },
+          "featured": "Featured",
+          "isCover": "Is Cover",
+          "save": {
+            "loading": "Loading"
+          }
+        }
+      },
+      "upload": {
+        "errors": {
+          "invalidType": "Invalid Type",
+          "tooLarge": "Too Large",
+          "noImage": "No Image",
+          "noCategory": "No Category",
+          "uploadFailed": "Upload Failed",
+          "generic": "Generic"
+        },
+        "title": "Title",
+        "dropzone": {
+          "change": "Change",
+          "title": "Title",
+          "subtitle": "Subtitle",
+          "requirements": "Requirements"
+        },
+        "form": {
+          "title": {
+            "label": "Label",
+            "placeholder": "Placeholder"
+          },
+          "description": {
+            "label": "Label",
+            "placeholder": "Placeholder"
+          },
+          "category": {
+            "label": "Label"
+          },
+          "tags": {
+            "label": "Label",
+            "placeholder": "Placeholder"
+          },
+          "featured": "Featured",
+          "isCover": "Is Cover"
+        },
+        "progress": {
+          "uploading": "Uploading"
+        },
+        "actions": {
+          "submitting": "Submitting",
+          "submit": "Submit"
+        }
+      },
+      "toasts": {
+        "uploaded": "Uploaded",
+        "deleted": "Deleted",
+        "deleteError": "Delete Error",
+        "genericError": "Generic Error",
+        "updated": "Updated"
+      },
+      "dashboard": {
+        "deleteConfirm": "Delete Confirm",
+        "coverPhoto": {
+          "untitled": "Untitled"
+        },
+        "zeroState": {
+          "title": "Title",
+          "description": "Description",
+          "cta": "Cta"
+        },
+        "coverPhotoCard": {
+          "title": "Title",
+          "description": "Description"
+        },
+        "photoCard": {
+          "open": "Open",
+          "delete": "Delete",
+          "edit": "Edit"
+        },
+        "stats": {
+          "views": "Views",
+          "likes": "Likes"
+        },
+        "filters": {
+          "label": "Label"
+        },
+        "loading": "Loading",
+        "title": "Title",
+        "actions": {
+          "addPhoto": "Add Photo"
+        },
+        "viewModes": {
+          "grid": "Grid",
+          "list": "List"
+        }
+      }
+    },
+    "selectFavorites": {
+      "toast": {
+        "assigned": "Assigned",
+        "error": "Error"
+      },
+      "delete": {
+        "confirm": "Confirm",
+        "success": "Success",
+        "error": "Error"
+      },
+      "notes": {
+        "updated": "Updated",
+        "error": "Error"
+      },
+      "compare": {
+        "maxReached": "Max Reached",
+        "minRequired": "Min Required"
+      },
+      "subtitle": "Subtitle",
+      "empty": {
+        "cta": "Cta"
+      },
+      "portfolioPhotos": "Portfolio Photos",
+      "assign": {
+        "loading": "Loading",
+        "action": "Action"
+      },
+      "requestQuote": "Request Quote",
+      "footer": {
+        "more": "More"
+      }
+    },
+    "saved": {
+      "title": "Title",
+      "count": {
+        "zero": "Zero"
+      },
+      "buttons": {
+        "export": "Export"
+      },
+      "empty": {
+        "title": "Title",
+        "description": "Description",
+        "cta": "Cta"
+      },
+      "addedAt": "Added At",
+      "tips": {
+        "title": "Title",
+        "compare": "Compare",
+        "contact": "Contact",
+        "review": "Review",
+        "export": "Export"
+      }
+    },
+    "publicRegistration": {
+      "form": {
+        "actions": {
+          "submitting": "Submitting"
+        }
+      }
+    },
+    "requestDetail": {
+      "defaults": {
+        "coupleName": "Couple Name",
+        "weddingDate": "Wedding Date",
+        "location": "Location",
+        "minPrice": "Min Price",
+        "maxPrice": "Max Price"
+      },
+      "templates": {
+        "standard": {
+          "name": "Name",
+          "body": "Body"
+        },
+        "availability": {
+          "name": "Name",
+          "body": "Body"
+        },
+        "detailed": {
+          "name": "Name",
+          "body": "Body"
+        },
+        "moreInfo": {
+          "name": "Name",
+          "body": "Body"
+        }
+      },
+      "tips": {
+        "respondFast": "Respond Fast",
+        "personalize": "Personalize",
+        "scheduleCall": "Schedule Call",
+        "title": "Title"
+      },
+      "status": {
+        "new": "New",
+        "viewed": "Viewed",
+        "responded": "Responded"
+      },
+      "errors": {
+        "load": "Load",
+        "notFound": "Not Found",
+        "send": "Send",
+        "title": "Title"
+      },
+      "alerts": {
+        "sent": "Sent",
+        "error": "Error"
+      },
+      "loading": "Loading",
+      "navigation": {
+        "back": "Back"
+      },
+      "labels": {
+        "budgetRange": "Budget Range",
+        "quotedRange": "Quoted Range",
+        "weddingDate": "Wedding Date",
+        "location": "Location",
+        "guests": "Guests",
+        "budget": "Budget",
+        "messageFromCouple": "Message From Couple",
+        "responseSent": "Response Sent",
+        "quotedPrice": "Quoted Price",
+        "sentAt": "Sent At",
+        "templateOptional": "Template Optional",
+        "messageRequired": "Message Required",
+        "quotedOptional": "Quoted Optional",
+        "rangeFrom": "Range From",
+        "rangeTo": "Range To",
+        "rangeCurrency": "Range Currency",
+        "contactInfo": "Contact Info",
+        "email": "Email",
+        "phone": "Phone"
+      },
+      "meta": {
+        "receivedAt": "Received At"
+      },
+      "response": {
+        "title": "Title",
+        "submitting": "Submitting",
+        "submit": "Submit"
+      },
+      "placeholders": {
+        "message": "Message",
+        "minAmount": "Min Amount",
+        "maxAmount": "Max Amount"
+      }
+    },
+    "setPassword": {
+      "errors": {
+        "invalidLink": "Invalid Link",
+        "passwordShort": "Password Short",
+        "passwordMismatch": "Password Mismatch",
+        "invalidToken": "Invalid Token",
+        "generic": "Generic"
+      },
+      "success": {
+        "title": "Title",
+        "description": "Description"
+      },
+      "title": "Title",
+      "subtitle": "Subtitle",
+      "fields": {
+        "email": "Email",
+        "password": {
+          "label": "Label",
+          "placeholder": "Placeholder",
+          "hint": "Hint"
+        },
+        "confirm": {
+          "label": "Label",
+          "placeholder": "Placeholder"
+        }
+      },
+      "buttons": {
+        "submitting": "Submitting",
+        "submit": "Submit"
+      },
+      "links": {
+        "login": "Login"
+      }
+    }
   },
   "validation": {
     "nameRequired": "El nombre es obligatorio",
@@ -1438,5 +2986,417 @@
   "general": "General",
   "notes": "Notas",
   "apply": "Aplicar",
-  "pagination": "Paginacin"
+  "pagination": "Paginacin",
+  "chat": {
+    "messages": {
+      "meetingRescheduled": "Meeting Rescheduled",
+      "changesApplied": "Changes Applied",
+      "offlineTemporary": "Offline Temporary",
+      "dataExtracted": "Data Extracted",
+      "noDataExtracted": "No Data Extracted",
+      "connectionIssue": "Connection Issue",
+      "connectionError": "Connection Error"
+    },
+    "defaults": {
+      "guest": "Guest",
+      "pending": "Pending",
+      "movement": "Movement",
+      "supplier": "Supplier"
+    },
+    "commands": {
+      "guestAdded": "Guest Added",
+      "guestUpdated": "Guest Updated",
+      "guestDeleted": "Guest Deleted",
+      "movementAdded": "Movement Added",
+      "movementUpdated": "Movement Updated",
+      "movementDeleted": "Movement Deleted",
+      "suppliersNotFound": "Suppliers Not Found",
+      "suppliersSearchError": "Suppliers Search Error",
+      "supplierAdded": "Supplier Added",
+      "supplierUpdated": "Supplier Updated",
+      "supplierDeleted": "Supplier Deleted",
+      "configUpdated": "Config Updated"
+    },
+    "connecting": "Connecting",
+    "errors": {
+      "timeout": "Timeout",
+      "noToken": "No Token",
+      "connection": "Connection",
+      "communication": "Communication"
+    },
+    "title": "Title",
+    "markedImportant": "Marked Important",
+    "markImportant": "Mark Important",
+    "sendMessage": "Send Message",
+    "messagePlaceholder": "Message Placeholder",
+    "send": "Send",
+    "close": "Close"
+  },
+  "freedraw": {
+    "cancel": "Cancel",
+    "cancelShort": "Cancel Short",
+    "finish": "Finish",
+    "finishShort": "Finish Short"
+  },
+  "home": {
+    "progress": {
+      "status": {
+        "complete": "Complete",
+        "ahead": "Ahead",
+        "behind": "Behind",
+        "onTrack": "On Track"
+      },
+      "tasksLabel": "Tasks Label",
+      "loading": "Loading",
+      "error": "Error",
+      "completion": "Completion",
+      "expected": "Expected"
+    },
+    "header": {
+      "titleFallback": "Title Fallback",
+      "title": "Title",
+      "subtitle": "Subtitle",
+      "logoAlt": "Logo Alt",
+      "redo": {
+        "confirm": "Confirm",
+        "success": "Success",
+        "error": "Error",
+        "button": "Button"
+      }
+    },
+    "stats": {
+      "budgetValueWithTotal": "Budget Value With Total",
+      "budgetValue": "Budget Value",
+      "confirmedGuests": "Confirmed Guests",
+      "budgetSpent": "Budget Spent",
+      "providers": "Providers",
+      "tasksCompleted": "Tasks Completed",
+      "tasksAssigned": "Tasks Assigned",
+      "providersAssigned": "Providers Assigned"
+    },
+    "quickActions": {
+      "provider": "Provider",
+      "guest": "Guest",
+      "movement": "Movement",
+      "note": "Note"
+    },
+    "news": {
+      "error": "Error"
+    },
+    "providers": {
+      "fallbackName": "Fallback Name",
+      "addSuccess": "Add Success",
+      "addError": "Add Error"
+    },
+    "blog": {
+      "title": "Title",
+      "source": "Source"
+    },
+    "modals": {
+      "guest": {
+        "title": "Title",
+        "name": "Name",
+        "side": "Side",
+        "sideBride": "Side Bride",
+        "sideGroom": "Side Groom",
+        "sideBoth": "Side Both",
+        "contact": "Contact",
+        "missingName": "Missing Name",
+        "contactNote": "Contact Note",
+        "note": "Note",
+        "success": "Success",
+        "error": "Error",
+        "unknownError": "Unknown Error"
+      },
+      "shared": {
+        "cancel": "Cancel",
+        "goToGuests": "Go To Guests",
+        "save": "Save",
+        "goToFinance": "Go To Finance",
+        "goToIdeas": "Go To Ideas"
+      },
+      "movement": {
+        "title": "Title",
+        "concept": "Concept",
+        "amount": "Amount",
+        "date": "Date",
+        "type": "Type",
+        "expense": "Expense",
+        "income": "Income",
+        "success": "Success"
+      },
+      "note": {
+        "title": "Title",
+        "placeholder": "Placeholder",
+        "success": "Success"
+      }
+    }
+  },
+  "previous": "Previous",
+  "next": "Next",
+  "searchBar": {
+    "optionHashtag": "Option Hashtag",
+    "optionAuthor": "Option Author",
+    "optionKeyword": "Option Keyword",
+    "placeholder": "Placeholder",
+    "submit": "Submit"
+  },
+  "admin": {
+    "cachePerformance": {
+      "config": {
+        "title": "Title",
+        "enabled": "Enabled",
+        "disabled": "Disabled",
+        "advancedTitle": "Advanced Title",
+        "save": "Save",
+        "advancedDescription": "Advanced Description"
+      }
+    }
+  },
+  "import": "Import",
+  "all": "All",
+  "close": "Close",
+  "aiSearchModal": {
+    "title": "Title",
+    "description": "Description",
+    "placeholder": "Placeholder",
+    "hint": "Hint",
+    "submit": "Submit",
+    "loading": "Loading",
+    "webLabel": "Web Label",
+    "locationLabel": "Location Label",
+    "contactLabel": "Contact Label",
+    "saveButton": "Save Button",
+    "noResultsTitle": "No Results Title",
+    "noResultsHint": "No Results Hint",
+    "emptyTitle": "Empty Title",
+    "emptyDescription": "Empty Description",
+    "footerNotice": "Footer Notice"
+  },
+  "initialWizard": {
+    "sections": {
+      "complete": {
+        "points": "Points",
+        "title": "Title",
+        "description": "Description"
+      },
+      "dimensions": {
+        "title": "Title",
+        "change": "Change",
+        "prompt": "Prompt",
+        "cta": "Cta"
+      },
+      "template": {
+        "title": "Title",
+        "selectedPrefix": "Selected Prefix",
+        "change": "Change",
+        "prompt": "Prompt"
+      }
+    },
+    "buttons": {
+      "back": "Back",
+      "skipNow": "Skip Now",
+      "configureHall": "Configure Hall",
+      "chooseTemplate": "Choose Template",
+      "next": "Next",
+      "doLater": "Do Later",
+      "startPlanning": "Start Planning"
+    }
+  },
+  "planModern": {
+    "guestSidebar": {
+      "recommendations": {
+        "guestFallback": "Guest Fallback",
+        "score": "Score",
+        "capacityUnknown": "Capacity Unknown",
+        "suggestedTable": "Suggested Table",
+        "emptyTitle": "Empty Title",
+        "emptyDescription": "Empty Description"
+      },
+      "actions": {
+        "viewTable": "View Table",
+        "assign": "Assign"
+      },
+      "conflicts": {
+        "severityHigh": "Severity High",
+        "severityMedium": "Severity Medium",
+        "tableFallback": "Table Fallback",
+        "messageFallback": "Message Fallback",
+        "actions": {
+          "reassign": "Reassign",
+          "fixPosition": "Fix Position",
+          "generic": "Generic"
+        },
+        "emptyTitle": "Empty Title",
+        "emptyDescription": "Empty Description"
+      },
+      "staff": {
+        "memberFallback": "Member Fallback",
+        "assigned": "Assigned",
+        "noTable": "No Table",
+        "tableLabel": "Table Label",
+        "pending": "Pending",
+        "emptyTitle": "Empty Title",
+        "emptyDescription": "Empty Description"
+      },
+      "history": {
+        "load": "Load",
+        "delete": "Delete",
+        "emptyTitle": "Empty Title",
+        "emptyDescription": "Empty Description"
+      },
+      "summary": {
+        "metrics": {
+          "totalGuests": "Total Guests",
+          "assigned": "Assigned",
+          "pending": "Pending",
+          "vipPending": "Vip Pending",
+          "tablesNearlyFull": "Tables Nearly Full",
+          "companionSeats": "Companion Seats",
+          "conflicts": "Conflicts",
+          "snapshots": "Snapshots"
+        },
+        "viewPending": "View Pending"
+      },
+      "header": {
+        "title": "Title",
+        "subtitle": "Subtitle"
+      }
+    },
+    "toasts": {
+      "autoAssignSuccess": "Auto Assign Success",
+      "autoAssignError": "Auto Assign Error",
+      "addTableSuccess": "Add Table Success",
+      "addTableError": "Add Table Error",
+      "duplicateTable": "Duplicate Table",
+      "rotateTable": "Rotate Table",
+      "deleteTable": "Delete Table",
+      "removeGuest": "Remove Guest"
+    },
+    "errors": {
+      "addTableUnavailable": "Add Table Unavailable"
+    },
+    "defaults": {
+      "tableName": "Table Name"
+    }
+  },
+  "hide": "Hide",
+  "view": "View",
+  "none": "None",
+  "custom": "Custom",
+  "show": "Show",
+  "duplicate": "Duplicate",
+  "blog": {
+    "title": "Title",
+    "lead": "Lead",
+    "search": {
+      "label": "Label",
+      "placeholder": "Placeholder",
+      "matches": "Matches"
+    },
+    "card": {
+      "viewDetails": "View Details"
+    },
+    "empty": {
+      "filtered": "Filtered",
+      "all": "All"
+    },
+    "loadingAria": "Loading Aria",
+    "author": {
+      "pageTitle": "Page Title",
+      "backToBlog": "Back To Blog",
+      "badge": "Badge",
+      "latestArticles": "Latest Articles",
+      "article": "Article",
+      "articles": "Articles",
+      "discoverOthers": "Discover Others",
+      "viewAll": "View All"
+    },
+    "post": {
+      "errors": {
+        "notFound": "Not Found",
+        "loadFailed": "Load Failed"
+      },
+      "cta": {
+        "title": "Title",
+        "description": "Description",
+        "primary": "Primary",
+        "secondary": "Secondary"
+      },
+      "references": {
+        "title": "Title"
+      },
+      "related": {
+        "title": "Title"
+      },
+      "fallbackTitle": "Fallback Title"
+    }
+  },
+  "actions": {
+    "remove": "Remove"
+  },
+  "notifications": {
+    "title": "Title",
+    "filters": {
+      "all": "All",
+      "unread": "Unread"
+    },
+    "push": {
+      "enableSuccess": "Enable Success",
+      "enableError": "Enable Error",
+      "enable": "Enable",
+      "disableSuccess": "Disable Success",
+      "disableError": "Disable Error",
+      "disable": "Disable",
+      "testSuccess": "Test Success",
+      "testError": "Test Error",
+      "test": "Test"
+    },
+    "empty": "Empty",
+    "markRead": "Mark Read",
+    "delete": "Delete"
+  },
+  "notificationPreferences": {
+    "loadError": "Load Error",
+    "saveSuccess": "Save Success",
+    "saveError": "Save Error",
+    "title": "Title",
+    "loading": "Loading",
+    "channels": {
+      "title": "Title",
+      "description": "Description",
+      "email": "Email",
+      "inapp": "Inapp",
+      "push": "Push"
+    },
+    "quietHours": {
+      "title": "Title",
+      "description": "Description",
+      "startPlaceholder": "Start Placeholder",
+      "from": "From",
+      "endPlaceholder": "End Placeholder"
+    },
+    "saving": "Saving",
+    "save": "Save"
+  },
+  "authResetPassword": {
+    "validation": {
+      "missingEmail": "Missing Email"
+    },
+    "success": "Success",
+    "error": "Error",
+    "title": "Title",
+    "description": "Description",
+    "emailPlaceholder": "Email Placeholder",
+    "submitting": "Submitting",
+    "submit": "Submit"
+  },
+  "title": "Title",
+  "sections": {
+    "firebase": "Firebase",
+    "token": "Token",
+    "tokenPayload": "Token Payload",
+    "backend": "Backend",
+    "localStorage": "Local Storage"
+  }
 }

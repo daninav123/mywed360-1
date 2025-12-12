@@ -11,13 +11,35 @@
     "pending": "Pendiente",
     "in_progress": "En progreso",
     "completed": "Completada",
-    "cancelled": "Cancelada"
+    "cancelled": "Cancelada",
+    "new": "New",
+    "all": "All"
   },
   "priority": {
-    "low": "Baja",
-    "medium": "Media",
-    "high": "Alta",
-    "urgent": "Urgente"
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High",
+    "urgent": "Urgent"
+  },
+  "categories": {
+    "LUGAR": "Venue",
+    "INVITADOS": "Guests",
+    "COMIDA": "Catering",
+    "DECORACION": "Decoration",
+    "PAPELERIA": "Stationery",
+    "MUSICA": "Music",
+    "FOTOGRAFO": "Photography",
+    "VESTUARIO": "Attire",
+    "OTROS": "Other",
+    "decoration": "Decoration",
+    "cocktail": "Cocktail",
+    "banquet": "Banquet",
+    "ceremony": "Ceremony",
+    "flowers": "Flowers",
+    "dress": "Attire",
+    "cake": "Cake",
+    "photography": "Photography",
+    "reception": "Reception"
   },
   "form": {
     "title": "Título",
@@ -334,6 +356,22 @@
         "overdueSubtasks": "{{count}} overdue subtasks",
         "progressBehind": "Progress is behind the expected pace",
         "completed": "Block completed"
+      }
+    }
+  },
+  "buttons": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add"
+  },
+  "tasks": {
+    "page": {
+      "calendar": {
+        "fallback": {
+          "eventUntitled": "Event Untitled"
+        }
       }
     }
   }

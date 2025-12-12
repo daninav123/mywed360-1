@@ -339,5 +339,40 @@
       }
     }
   },
-  "_note": "Translate from es/tasks.json"
+  "_note": "Translate from es/tasks.json",
+  "categories": {
+    "LUGAR": "Venue",
+    "INVITADOS": "Guests",
+    "COMIDA": "Catering",
+    "DECORACION": "Decoration",
+    "PAPELERIA": "Stationery",
+    "MUSICA": "Music",
+    "FOTOGRAFO": "Photography",
+    "VESTUARIO": "Attire",
+    "OTROS": "Other",
+    "decoration": "Decoration",
+    "cocktail": "Cocktail",
+    "banquet": "Banquet",
+    "ceremony": "Ceremony",
+    "flowers": "Flowers",
+    "dress": "Attire",
+    "cake": "Cake",
+    "photography": "Photography",
+    "reception": "Reception"
+  },
+  "status": {
+    "new": "New",
+    "pending": "Pending",
+    "in_progress": "In Progress",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "all": "All"
+  },
+  "buttons": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add"
+  }
 }

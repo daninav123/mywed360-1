@@ -98,5 +98,13 @@
         "success": "Note saved"
       }
     }
+  },
+  "progress": {
+    "status": {
+      "complete": "Complete",
+      "ahead": "Ahead",
+      "behind": "Behind",
+      "onTrack": "On Track"
+    }
   }
 }

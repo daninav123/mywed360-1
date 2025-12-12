@@ -263,5 +263,12 @@
     "noHistory": "Necesitamos más historial para calcular la tendencia.",
     "income": "Ingresos",
     "expense": "Gastos"
+  },
+  "contributions": {
+    "status": {
+      "received": "Received",
+      "confirmed": "Confirmed",
+      "pending": "Pending"
+    }
   }
 }
