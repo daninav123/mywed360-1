@@ -111,7 +111,7 @@ class KeyMonitorService {
         const response = await fetch(keyConfig.testUrl, {
           method: 'GET',
           headers: {
-            'Authorization': `Bearer ${key}`,
+            Authorization: `Bearer ${key}`,
             'Content-Type': 'application/json',
           },
           timeout: 5000,
@@ -211,9 +211,7 @@ class KeyMonitorService {
    */
   hasCriticalErrors() {
     return Array.from(this.statusCache.values()).some(
-      (status) =>
-        status.critical &&
-        (status.status === 'missing' || status.status === 'invalid')
+      (status) => status.critical && (status.status === 'missing' || status.status === 'invalid')
     );
   }
 
