@@ -111,7 +111,7 @@ async function testApiKey(api) {
       const response = await fetch(api.testUrl, {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${key}`,
+          Authorization: `Bearer ${key}`,
           'Content-Type': 'application/json',
         },
         timeout: 5000,
@@ -156,9 +156,13 @@ async function testApiKey(api) {
 }
 
 async function main() {
-  console.log(`\n${colors.cyan}═══════════════════════════════════════════════════════${colors.reset}`);
+  console.log(
+    `\n${colors.cyan}═══════════════════════════════════════════════════════${colors.reset}`
+  );
   console.log(`${colors.cyan}  VERIFICACIÓN DE API KEYS - MaLoveApp${colors.reset}`);
-  console.log(`${colors.cyan}═══════════════════════════════════════════════════════${colors.reset}\n`);
+  console.log(
+    `${colors.cyan}═══════════════════════════════════════════════════════${colors.reset}\n`
+  );
 
   const results = [];
   let criticalErrors = 0;
@@ -183,9 +187,13 @@ async function main() {
   }
 
   // Resumen
-  console.log(`\n${colors.cyan}═══════════════════════════════════════════════════════${colors.reset}`);
+  console.log(
+    `\n${colors.cyan}═══════════════════════════════════════════════════════${colors.reset}`
+  );
   console.log(`${colors.cyan}RESUMEN${colors.reset}`);
-  console.log(`${colors.cyan}═══════════════════════════════════════════════════════${colors.reset}\n`);
+  console.log(
+    `${colors.cyan}═══════════════════════════════════════════════════════${colors.reset}\n`
+  );
 
   const valid = results.filter((r) => r.result.status === 'valid').length;
   const configured = results.filter((r) => r.result.status === 'configured').length;
@@ -200,9 +208,13 @@ async function main() {
 
   // Recomendaciones
   if (criticalErrors > 0 || missing > 0) {
-    console.log(`\n${colors.red}═══════════════════════════════════════════════════════${colors.reset}`);
+    console.log(
+      `\n${colors.red}═══════════════════════════════════════════════════════${colors.reset}`
+    );
     console.log(`${colors.red}⚠️ ACCIONES REQUERIDAS${colors.reset}`);
-    console.log(`${colors.red}═══════════════════════════════════════════════════════${colors.reset}\n`);
+    console.log(
+      `${colors.red}═══════════════════════════════════════════════════════${colors.reset}\n`
+    );
 
     for (const { api, result } of results) {
       if (result.status === 'missing' || result.status === 'invalid') {
@@ -230,13 +242,13 @@ async function main() {
 
 function getApiUrl(apiName) {
   const urls = {
-    'OpenAI': 'https://platform.openai.com/account/api-keys',
-    'Tavily': 'https://tavily.com/api',
+    OpenAI: 'https://platform.openai.com/account/api-keys',
+    Tavily: 'https://tavily.com/api',
     'Stripe (Secret)': 'https://dashboard.stripe.com/apikeys',
     'Stripe (Publishable)': 'https://dashboard.stripe.com/apikeys',
-    'Mailgun': 'https://app.mailgun.com/app/account/security/api_keys',
-    'Firebase': 'https://console.firebase.google.com',
-    'Twilio': 'https://www.twilio.com/console/account/keys',
+    Mailgun: 'https://app.mailgun.com/app/account/security/api_keys',
+    Firebase: 'https://console.firebase.google.com',
+    Twilio: 'https://www.twilio.com/console/account/keys',
     'Google Places': 'https://console.cloud.google.com/apis/credentials',
   };
   return urls[apiName] || 'https://console.cloud.google.com';

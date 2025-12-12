@@ -13,6 +13,7 @@
 **Ubicación:** `backend/services/applePaymentService.js:125`
 
 **Problema Actual:**
+
 ```javascript
 // ⚠️ SIMPLIFICADO - Sin verificación real
 console.log('⚠️ ADVERTENCIA: Verificación de firma Apple simplificada');
@@ -20,6 +21,7 @@ console.log('⚠️ ADVERTENCIA: Verificación de firma Apple simplificada');
 ```
 
 **Solución Recomendada:**
+
 ```javascript
 import jwt from 'jsonwebtoken';
 import axios from 'axios';
@@ -76,6 +78,7 @@ function extractPublicKeyFromCertificate(cert) {
 ```
 
 **Tareas:**
+
 - [ ] Instalar dependencias: `npm install pkijs asn1js`
 - [ ] Implementar verificación de certificados
 - [ ] Crear tests unitarios
@@ -88,6 +91,7 @@ function extractPublicKeyFromCertificate(cert) {
 **Ubicación:** `backend/routes/supplier-quote-requests.js:237`
 
 **Problema Actual:**
+
 ```javascript
 // TODO: Implementar middleware de auth
 const supplierId = req.headers['x-supplier-id'];
@@ -97,6 +101,7 @@ if (!supplierId || supplierId !== id) {
 ```
 
 **Solución Recomendada:**
+
 ```javascript
 // middleware/supplierAuth.js
 import jwt from 'jsonwebtoken';
@@ -141,7 +146,7 @@ export async function requireSupplierAuth(req, res, next) {
 router.get('/:id/quote-requests', requireSupplierAuth, async (req, res) => {
   // El middleware ya verificó que req.supplier es válido
   const { id } = req.params;
-  
+
   // Verificar que el proveedor accede solo sus propios datos
   if (req.supplier.id !== id) {
     return res.status(403).json({ error: 'forbidden' });
@@ -152,6 +157,7 @@ router.get('/:id/quote-requests', requireSupplierAuth, async (req, res) => {
 ```
 
 **Tareas:**
+
 - [ ] Crear middleware `middleware/supplierAuth.js`
 - [ ] Aplicar a todas las rutas de proveedores
 - [ ] Crear tests de autenticación
@@ -164,11 +170,13 @@ router.get('/:id/quote-requests', requireSupplierAuth, async (req, res) => {
 **Ubicación:** `backend/routes/supplier-requests.js:292`
 
 **Problema Actual:**
+
 ```javascript
 // TODO: Verificar autenticación del proveedor con middleware
 ```
 
 **Solución:**
+
 ```javascript
 // Aplicar middleware a todas las rutas sensibles
 router.get('/:supplierId', requireSupplierAuth, async (req, res) => {
@@ -197,6 +205,7 @@ router.patch('/:supplierId/:requestId', requireSupplierAuth, async (req, res) =>
 **Problema:** Falta verificación consistente de permisos
 
 **Solución:**
+
 ```javascript
 // middleware/roleAuth.js
 export const ROLES = {
@@ -210,27 +219,23 @@ export const ROLES = {
 export function requireRole(...allowedRoles) {
   return async (req, res, next) => {
     const userRole = req.user?.role;
-    
+
     if (!userRole || !allowedRoles.includes(userRole)) {
-      return res.status(403).json({ 
+      return res.status(403).json({
         error: 'insufficient_permissions',
         required: allowedRoles,
         current: userRole,
       });
     }
-    
+
     next();
   };
 }
 
 // Uso
-router.delete('/admin/users/:userId', 
-  requireAuth, 
-  requireRole(ROLES.ADMIN), 
-  async (req, res) => {
-    // Solo admins pueden acceder
-  }
-);
+router.delete('/admin/users/:userId', requireAuth, requireRole(ROLES.ADMIN), async (req, res) => {
+  // Solo admins pueden acceder
+});
 ```
 
 ---
@@ -238,6 +243,7 @@ router.delete('/admin/users/:userId',
 ## 🔐 Checklist de Seguridad
 
 ### Autenticación
+
 - [ ] JWT tokens con expiración
 - [ ] Refresh tokens implementados
 - [ ] Logout borra tokens
@@ -245,12 +251,14 @@ router.delete('/admin/users/:userId',
 - [ ] Rate limiting en login
 
 ### Autorización
+
 - [ ] Middleware de roles
 - [ ] Verificación de permisos en cada endpoint
 - [ ] Validación de ownership de recursos
 - [ ] Auditoría de accesos
 
 ### Datos Sensibles
+
 - [ ] API keys en variables de entorno
 - [ ] Contraseñas hasheadas
 - [ ] PII encriptado en tránsito (HTTPS)
@@ -258,6 +266,7 @@ router.delete('/admin/users/:userId',
 - [ ] GDPR compliance
 
 ### Validación
+
 - [ ] Input validation en todos los endpoints
 - [ ] Output encoding
 - [ ] CSRF protection
@@ -265,6 +274,7 @@ router.delete('/admin/users/:userId',
 - [ ] SQL injection prevention (Firestore)
 
 ### Infraestructura
+
 - [ ] HTTPS en producción
 - [ ] CORS configurado correctamente
 - [ ] Helmet.js para headers de seguridad
@@ -275,30 +285,33 @@ router.delete('/admin/users/:userId',
 
 ## 📊 Matriz de Riesgos
 
-| Riesgo | Severidad | Probabilidad | Mitigación |
-|--------|-----------|--------------|-----------|
-| API Keys expiradas | 🔴 Alta | 🔴 Alta | Rotación automática |
-| Firma Apple no verificada | 🔴 Alta | 🟡 Media | Implementar verificación |
-| Auth de proveedores débil | 🔴 Alta | 🟡 Media | Middleware robusto |
-| Acceso no autorizado | 🔴 Alta | 🟡 Media | Verificación de permisos |
-| Inyección de datos | 🟠 Media | 🟡 Media | Validación de input |
-| XSS en frontend | 🟠 Media | 🟡 Media | DOMPurify + CSP |
+| Riesgo                    | Severidad | Probabilidad | Mitigación               |
+| ------------------------- | --------- | ------------ | ------------------------ |
+| API Keys expiradas        | 🔴 Alta   | 🔴 Alta      | Rotación automática      |
+| Firma Apple no verificada | 🔴 Alta   | 🟡 Media     | Implementar verificación |
+| Auth de proveedores débil | 🔴 Alta   | 🟡 Media     | Middleware robusto       |
+| Acceso no autorizado      | 🔴 Alta   | 🟡 Media     | Verificación de permisos |
+| Inyección de datos        | 🟠 Media  | 🟡 Media     | Validación de input      |
+| XSS en frontend           | 🟠 Media  | 🟡 Media     | DOMPurify + CSP          |
 
 ---
 
 ## 🚀 Plan de Implementación
 
 ### Fase 1 (Semana 1) - CRÍTICO
+
 - [ ] Renovar API keys
 - [ ] Implementar verificación Apple
 - [ ] Crear middleware de auth de proveedores
 
 ### Fase 2 (Semana 2) - ALTO
+
 - [ ] Aplicar middleware a todas las rutas
 - [ ] Auditoría de permisos
 - [ ] Tests de seguridad
 
 ### Fase 3 (Semana 3) - MEDIO
+
 - [ ] Implementar rotación automática de keys
 - [ ] Crear dashboard de auditoría
 - [ ] Documentar políticas de seguridad

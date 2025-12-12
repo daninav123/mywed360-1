@@ -8,22 +8,23 @@
 
 ## 📋 Tabla de API Keys en Uso
 
-| Servicio | Variable | Estado | Renovación | Contacto |
-|----------|----------|--------|-----------|----------|
-| OpenAI | `OPENAI_API_KEY` | ❌ EXPIRADA | Urgente | [platform.openai.com](https://platform.openai.com) |
-| Tavily | `TAVILY_API_KEY` | ⚠️ NO CONFIGURADA | Urgente | [tavily.com](https://tavily.com) |
-| Stripe | `STRIPE_SECRET_KEY` | ✅ Activa | Revisar | [stripe.com](https://stripe.com) |
-| Stripe | `STRIPE_PUBLISHABLE_KEY` | ✅ Activa | Revisar | [stripe.com](https://stripe.com) |
-| Mailgun | `MAILGUN_API_KEY` | ✅ Activa | Revisar | [mailgun.com](https://mailgun.com) |
-| Firebase | `FIREBASE_API_KEY` | ✅ Activa | Revisar | Firebase Console |
-| Twilio | `TWILIO_AUTH_TOKEN` | ✅ Activa | Revisar | [twilio.com](https://twilio.com) |
-| Google Places | `GOOGLE_PLACES_API_KEY` | ✅ Activa | Revisar | Google Cloud Console |
+| Servicio      | Variable                 | Estado            | Renovación | Contacto                                           |
+| ------------- | ------------------------ | ----------------- | ---------- | -------------------------------------------------- |
+| OpenAI        | `OPENAI_API_KEY`         | ❌ EXPIRADA       | Urgente    | [platform.openai.com](https://platform.openai.com) |
+| Tavily        | `TAVILY_API_KEY`         | ⚠️ NO CONFIGURADA | Urgente    | [tavily.com](https://tavily.com)                   |
+| Stripe        | `STRIPE_SECRET_KEY`      | ✅ Activa         | Revisar    | [stripe.com](https://stripe.com)                   |
+| Stripe        | `STRIPE_PUBLISHABLE_KEY` | ✅ Activa         | Revisar    | [stripe.com](https://stripe.com)                   |
+| Mailgun       | `MAILGUN_API_KEY`        | ✅ Activa         | Revisar    | [mailgun.com](https://mailgun.com)                 |
+| Firebase      | `FIREBASE_API_KEY`       | ✅ Activa         | Revisar    | Firebase Console                                   |
+| Twilio        | `TWILIO_AUTH_TOKEN`      | ✅ Activa         | Revisar    | [twilio.com](https://twilio.com)                   |
+| Google Places | `GOOGLE_PLACES_API_KEY`  | ✅ Activa         | Revisar    | Google Cloud Console                               |
 
 ---
 
 ## 🚨 Errores Actuales
 
 ### OpenAI API Key - CRÍTICO
+
 ```
 Error: 401 Incorrect API key provided: sk-proj-****...
 Timestamp: 2025-12-12 00:21:53
@@ -31,12 +32,14 @@ Impact: Funcionalidades de IA no operativas
 ```
 
 **Solución:**
+
 1. Ir a [platform.openai.com/account/api-keys](https://platform.openai.com/account/api-keys)
 2. Crear nueva API key
 3. Reemplazar en `.env` y variables de entorno
 4. Reiniciar servicios
 
 ### Tavily API Key - CRÍTICO
+
 ```
 Warning: Tavily API key missing, returning empty research payload
 Timestamp: 2025-12-12 00:21:53
@@ -44,6 +47,7 @@ Impact: Búsqueda de investigación no disponible
 ```
 
 **Solución:**
+
 1. Registrarse en [tavily.com](https://tavily.com)
 2. Crear API key
 3. Agregar a `.env` como `TAVILY_API_KEY`
@@ -54,6 +58,7 @@ Impact: Búsqueda de investigación no disponible
 ## 📝 Archivos de Configuración
 
 ### `.env` (Local)
+
 ```bash
 # OpenAI
 OPENAI_API_KEY=sk-proj-YOUR_KEY_HERE
@@ -87,6 +92,7 @@ GOOGLE_PLACES_API_KEY=your_google_places_key
 ```
 
 ### `.env.example` (Plantilla)
+
 ```bash
 # OpenAI - https://platform.openai.com/account/api-keys
 OPENAI_API_KEY=sk-proj-YOUR_KEY_HERE
@@ -124,17 +130,20 @@ GOOGLE_PLACES_API_KEY=your_google_places_key
 ## 🔄 Proceso de Renovación
 
 ### Paso 1: Verificar Expiración
+
 ```bash
 # Script para verificar estado de keys
 node scripts/check-api-keys-status.js
 ```
 
 ### Paso 2: Generar Nueva Key
+
 - Ir al panel de administración del servicio
 - Crear nueva API key
 - Copiar la key completa
 
 ### Paso 3: Actualizar Configuración
+
 ```bash
 # Actualizar .env local
 echo "OPENAI_API_KEY=sk-proj-NEW_KEY" >> .env
@@ -144,6 +153,7 @@ echo "OPENAI_API_KEY=sk-proj-NEW_KEY" >> .env
 ```
 
 ### Paso 4: Reiniciar Servicios
+
 ```bash
 # Backend
 npm run backend
@@ -156,6 +166,7 @@ npm run dev:all
 ```
 
 ### Paso 5: Verificar Funcionamiento
+
 ```bash
 # Tests de integración
 npm run test:ai-suppliers
@@ -170,6 +181,7 @@ tail -f logs/combined-*.log
 ## 🛡️ Mejores Prácticas de Seguridad
 
 ### 1. **Nunca Commitear Keys**
+
 ```bash
 # ✅ Correcto - .gitignore
 .env
@@ -182,6 +194,7 @@ git commit -m "Add API keys"
 ```
 
 ### 2. **Usar Variables de Entorno**
+
 ```javascript
 // ✅ Correcto
 const apiKey = process.env.OPENAI_API_KEY;
@@ -191,28 +204,29 @@ const apiKey = 'sk-proj-hardcoded-key';
 ```
 
 ### 3. **Rotar Keys Regularmente**
+
 - OpenAI: Cada 90 días
 - Stripe: Cada 180 días
 - Otros: Cada 180 días
 - En caso de leak: Inmediatamente
 
 ### 4. **Usar Secrets Manager**
+
 ```javascript
 // Ejemplo con Google Secret Manager
 const secretManager = require('@google-cloud/secret-manager');
 
 async function getSecret(secretId) {
-  const [version] = await secretManager
-    .secretManagerServiceClient()
-    .accessSecretVersion({
-      name: `projects/PROJECT_ID/secrets/${secretId}/versions/latest`,
-    });
+  const [version] = await secretManager.secretManagerServiceClient().accessSecretVersion({
+    name: `projects/PROJECT_ID/secrets/${secretId}/versions/latest`,
+  });
 
   return version.payload.data.toString('utf8');
 }
 ```
 
 ### 5. **Monitorizar Uso**
+
 ```bash
 # Verificar uso de OpenAI
 curl https://api.openai.com/v1/usage \
@@ -228,12 +242,14 @@ curl https://api.stripe.com/v1/charges \
 ## 📊 Dashboard de Monitorización
 
 ### Crear alertas para:
+
 - ❌ Keys expiradas
 - ⚠️ Uso anómalo
 - 🔴 Errores de autenticación
 - 📈 Límites de cuota alcanzados
 
 ### Implementar en `backend/services/KeyMonitorService.js`:
+
 ```javascript
 class KeyMonitorService {
   async checkKeyStatus() {
@@ -259,6 +275,7 @@ class KeyMonitorService {
 ## 🔔 Alertas Automáticas
 
 ### Configurar en `backend/middleware/keyAlerts.js`:
+
 ```javascript
 // Alertar si key está próxima a expirar
 if (daysUntilExpiry < 30) {
@@ -292,13 +309,13 @@ if (error.code === 401) {
 
 ## 📞 Contactos de Soporte
 
-| Servicio | Soporte | Documentación |
-|----------|---------|---------------|
-| OpenAI | [support.openai.com](https://support.openai.com) | [platform.openai.com/docs](https://platform.openai.com/docs) |
-| Tavily | [tavily.com/contact](https://tavily.com/contact) | [docs.tavily.com](https://docs.tavily.com) |
-| Stripe | [stripe.com/support](https://stripe.com/support) | [stripe.com/docs](https://stripe.com/docs) |
+| Servicio | Soporte                                                            | Documentación                                                |
+| -------- | ------------------------------------------------------------------ | ------------------------------------------------------------ |
+| OpenAI   | [support.openai.com](https://support.openai.com)                   | [platform.openai.com/docs](https://platform.openai.com/docs) |
+| Tavily   | [tavily.com/contact](https://tavily.com/contact)                   | [docs.tavily.com](https://docs.tavily.com)                   |
+| Stripe   | [stripe.com/support](https://stripe.com/support)                   | [stripe.com/docs](https://stripe.com/docs)                   |
 | Firebase | [firebase.google.com/support](https://firebase.google.com/support) | [firebase.google.com/docs](https://firebase.google.com/docs) |
-| Twilio | [twilio.com/help](https://twilio.com/help) | [twilio.com/docs](https://twilio.com/docs) |
+| Twilio   | [twilio.com/help](https://twilio.com/help)                         | [twilio.com/docs](https://twilio.com/docs)                   |
 
 ---
 
