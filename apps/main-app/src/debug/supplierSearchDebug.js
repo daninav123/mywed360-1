@@ -158,16 +158,12 @@ export const supplierDebug = {
       summary: api.summary,
       lastResults: api.lastResults,
       log: (type, payload) => {
-        // console.warn(
-          'mywed.aiSearch.log() está destinado a lectura. Usa supplierDebug.log directamente si necesitas registrar eventos.'
-        );
+        // console.warn('mywed.aiSearch.log() está destinado a lectura. Usa supplierDebug.log directamente si necesitas registrar eventos.');
         return emitEvent(type, payload);
       },
     };
     if (console?.info) {
-      // console.info(
-        '🛰️  Debug IA Proveedores listo. Usa mywed.aiSearch.history(), mywed.aiSearch.summary(), mywed.aiSearch.watch().'
-      );
+      // console.info('🛰️  Debug IA Proveedores listo. Usa mywed.aiSearch.history(), mywed.aiSearch.summary(), mywed.aiSearch.watch().');
     }
   },
 };

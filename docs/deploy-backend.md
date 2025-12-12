@@ -18,7 +18,7 @@
 1. Verifica que backend/index.js usa `process.env.PORT` y expone `/health`.
 2. Render YAML: se incluye `render.yaml` en la raíz.
 3. En Render:
-   - New + > Blueprint > selecciona el repo mywed360 y la rama `windows`.
+   - New + > Blueprint > selecciona el repo MaLove.App y la rama `windows`.
    - Render detectará `render.yaml`.
    - Configura las variables no sincronizadas (API keys/domains) en Settings > Environment.
 4. Deploy: Render construirá con `npm ci` y lanzará `node backend/index.js`.

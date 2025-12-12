@@ -1692,7 +1692,7 @@ const AdminDiscounts = () => {
                           <button
                             onClick={() => handleGeneratePartnerLink(link.id, link.code)}
                             className="flex items-center gap-1 text-purple-600 hover:text-purple-800 font-medium text-sm"
-                            title="Generar enlace de estad�sticas"
+                            title="Generar enlace de estadísticas"
                           >
                             <ExternalLink className="w-4 h-4" />
                             Generar
@@ -1731,7 +1731,7 @@ const AdminDiscounts = () => {
 
       {showCreateCommercialModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-8">
-          <div className="w-full max-w-lg rounded-xl bg-surface p-6 shadow-xl">
+          <div className="w-full max-w-lg rounded-xl bg-surface p-6 shadow-md">
             <header className="mb-4">
               <h2 className="text-lg font-semibold">Crear comercial</h2>
               <p className="text-sm text-[var(--color-text-soft,#6b7280)]">
@@ -1827,7 +1827,7 @@ const AdminDiscounts = () => {
 
       {showCreateManagerModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-8">
-          <div className="w-full max-w-lg rounded-xl bg-surface p-6 shadow-xl">
+          <div className="w-full max-w-lg rounded-xl bg-surface p-6 shadow-md">
             <header className="mb-4">
               <h2 className="text-lg font-semibold">Crear jefe de comerciales</h2>
               <p className="text-sm text-[var(--color-text-soft,#6b7280)]">
@@ -1908,7 +1908,7 @@ const AdminDiscounts = () => {
       {/* Modal crear c�digo */}
       {showCreateModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-8">
-          <div className="w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-xl bg-surface p-6 shadow-xl">
+          <div className="w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-xl bg-surface p-6 shadow-md">
             <header className="mb-4">
               <h2 className="text-lg font-semibold">Crear c�digo de descuento</h2>
               <p className="text-sm text-[var(--color-text-soft,#6b7280)]">
@@ -2090,54 +2090,6 @@ const AdminDiscounts = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">Jefe de comerciales (opcional)</label>
-                <div className="grid gap-2 sm:grid-cols-3">
-                  <input
-                    type="text"
-                    value={formData.salesManager.name}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        salesManager: { ...prev.salesManager, name: e.target.value },
-                      }))
-                    }
-                    placeholder="Nombre"
-                    className="rounded-md border border-soft px-3 py-2 text-sm"
-                    disabled={creating}
-                  />
-                  <input
-                    type="email"
-                    value={formData.salesManager.email}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        salesManager: { ...prev.salesManager, email: e.target.value },
-                      }))
-                    }
-                    placeholder="Email"
-                    className="rounded-md border border-soft px-3 py-2 text-sm"
-                    disabled={creating}
-                  />
-                  <input
-                    type="tel"
-                    value={formData.salesManager.phone}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        salesManager: { ...prev.salesManager, phone: e.target.value },
-                      }))
-                    }
-                    placeholder="Teléfono"
-                    className="rounded-md border border-soft px-3 py-2 text-sm"
-                    disabled={creating}
-                  />
-                </div>
-                <p className="text-xs text-gray-500 mt-1">
-                  Se usará como punto de contacto para seguimiento y coaching del comercial.
-                </p>
-              </div>
-
-              <div>
                 <label className="block text-sm font-medium mb-1">Notas (opcional)</label>
                 <textarea
                   value={formData.notes}
@@ -2186,7 +2138,7 @@ const AdminDiscounts = () => {
       {/* Modal editar c�digo */}
       {showEditModal && editingDiscount && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-8">
-          <div className="w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-xl bg-surface p-6 shadow-xl">
+          <div className="w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-xl bg-surface p-6 shadow-md">
             <header className="mb-4">
               <h2 className="text-lg font-semibold">Editar c�digo: {editingDiscount.code}</h2>
               <p className="text-sm text-[var(--color-text-soft,#6b7280)]">

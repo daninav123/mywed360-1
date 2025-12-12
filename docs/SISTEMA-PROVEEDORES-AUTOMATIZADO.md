@@ -217,7 +217,7 @@ async function searchSuppliers(query, location, service) {
 ## 📞 SOPORTE
 
 **Documentado por:** Cascade AI  
-**Repositorio:** https://github.com/Daniel-Navarro-Campos/mywed360  
+**Repositorio:** https://github.com/Daniel-Navarro-Campos/MaLove.App  
 **Contacto:** Ver equipo en README.md
 
 ---

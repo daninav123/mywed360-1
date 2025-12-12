@@ -200,7 +200,7 @@ export const PublishModal = ({ isOpen, onClose, onPublish, currentSlug = '', web
               ${
                 isPublishing || !slug || isAvailable === false
                   ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:shadow-lg'
+                  : 'bg-[var(--color-primary)] text-white hover:shadow-lg'
               }
             `}
           >

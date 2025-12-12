@@ -8,7 +8,7 @@ const templateMetadata = {
     category: 'flexible',
     rating: 5,
     icon: '🎨',
-    color: 'from-purple-500 to-pink-500',
+    color: 'bg-[var(--color-primary)]',
     tags: ['Personalizable', 'Única'],
     popular: true,
   },

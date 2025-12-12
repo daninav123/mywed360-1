@@ -400,7 +400,7 @@ docs/
 ```bash
 # Backend
 SUPPLIER_JWT_SECRET=tu-secret-super-seguro-cambiar-en-prod
-PUBLIC_APP_BASE_URL=https://mywed360.com
+PUBLIC_APP_BASE_URL=https://MaLove.App.com
 
 # Firebase
 FIREBASE_PROJECT_ID=...

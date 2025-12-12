@@ -352,7 +352,7 @@ export default function SupplierPortfolio() {
 
   return (
     <div className="space-y-6">
-      <div className="bg-gradient-to-r from-primary/5 to-accent/5 border border-primary/20 rounded-lg p-6">
+      <div className="bg-[var(--color-primary)]accent/5 border border-primary/20 rounded-lg p-6">
         <div className="flex items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-3 mb-2">

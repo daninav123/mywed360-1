@@ -157,7 +157,7 @@ export default function SeatingSearchBar({
                        border border-gray-200 z-50 overflow-hidden"
           >
             {/* Header */}
-            <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-indigo-50 to-purple-50">
+            <div className="p-4 border-b border-gray-200 bg-[var(--color-primary)]">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-sm font-semibold text-gray-800">Buscar Invitado</h3>
                 <button

@@ -193,7 +193,7 @@ const PublishPanel = ({ config, onPublish, isLoading = false }) => {
             ${
               publishing || isLoading
                 ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
-                : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:shadow-lg hover:scale-105'
+                : 'bg-[var(--color-primary)] text-white hover:shadow-lg hover:scale-105'
             }
           `}
         >

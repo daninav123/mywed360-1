@@ -12,7 +12,7 @@
 - Menú inferior → `Más` → **Invitados** → `/invitados` (`Invitados.jsx`).
 - Modal de resumen RSVP (`RSVPDashboard.jsx`) accesible desde la misma pantalla.
 - Invitaciones para colaboradores → `/accept-invitation/:code` (`AcceptInvitation.jsx`).
-- Eventos globales `mywed360-guests` se capturan en `GuestEventBridge` (MainLayout) para refrescar vistas.
+- Eventos globales `MaLove.App-guests` se capturan en `GuestEventBridge` (MainLayout) para refrescar vistas.
 
 ## 3. Paso a paso UX
 ### Gestión principal (`Invitados.jsx`)
@@ -35,8 +35,8 @@
   - Email: `SendEmailModal` usa `sendMail`/`scheduleMail`, adjunta invitación digital y registra log en `guestMessages` (`channel=email`).
 - Impresión física: `POST /api/print/invitations` con `assetUrl`, sobre personalizado (nombre/dirección) y `printBatchId` para seguimiento.
 - Resumen RSVP: modal embudo (confirmados/pendientes/declinados), tabla, exportación CSV/PDF y shortcut a recordatorios.
-- Compatibilidad offline: sincroniza `localStorage.mywed360Guests`, emite `mywed360-guests-updated`, muestra toast al recuperar conexión y permite cargar fixtures QA.
-- Eventos y automatizaciones: `GuestEventBridge` propaga `mywed360-guests`; Seating emite `mywed360-seating` (pendiente persistencia) para actualizar `seatAssignment`.
+- Compatibilidad offline: sincroniza `localStorage.MaLove.AppGuests`, emite `MaLove.App-guests-updated`, muestra toast al recuperar conexión y permite cargar fixtures QA.
+- Eventos y automatizaciones: `GuestEventBridge` propaga `MaLove.App-guests`; Seating emite `MaLove.App-seating` (pendiente persistencia) para actualizar `seatAssignment`.
 
 ### Dashboard RSVP (`RSVPDashboard.jsx`)
 - Fuente: `weddings/{id}/rsvp/stats` + `weddings/{id}/guests`.
@@ -48,7 +48,7 @@
 - `weddings/{id}/guests/{guestId}`: datos personales, RSVP, acompañantes, restricciones, `seatAssignment`, `messageStats`, historial.
 - Colecciones auxiliares: `guestMessages`, `guestImports`, `guestSegments`, `rsvpReminderQueue`.
 - `guestMessages` registra `{ channel, status, templateId, scheduledAt, batchId }` para cada envío.
-- `useGuests` + `SyncService` gestionan cache local y emiten eventos (`mywed360-guests-updated`).
+- `useGuests` + `SyncService` gestionan cache local y emiten eventos (`MaLove.App-guests-updated`).
 
 ## 5. Reglas de negocio
 - Sin boda activa no se permite crear invitados (salvo modo DEV).
@@ -133,7 +133,7 @@
 6. **Offline-First** ✅
    - Sincronización con localStorage
    - `src/services/SyncService.js` ✅
-   - Eventos `mywed360-guests-updated`
+   - Eventos `MaLove.App-guests-updated`
 
 7. **Tests E2E** 🟡
    - `cypress/e2e/guests/` (4 archivos)

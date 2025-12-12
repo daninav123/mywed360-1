@@ -1,5 +1,0 @@
-feat: seating - add TemplateGalleryModal + sesion docs
-
-- TemplateGalleryModal con 6 plantillas visuales
-- Documentacion completa de sesion
-- 280 lineas de codigo modal

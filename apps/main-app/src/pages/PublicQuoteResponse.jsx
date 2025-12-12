@@ -238,7 +238,7 @@ export default function PublicQuoteResponse() {
   // Formulario principal
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <div className="max-w-4xl mx-auto">
+      <div className="mshadow-md mx-auto">
         {/* Header */}
         <Card className="mb-6">
           <div className="flex items-center gap-4">
@@ -258,7 +258,7 @@ export default function PublicQuoteResponse() {
         </Card>
 
         {/* Info de la boda */}
-        <Card className="mb-6 bg-gradient-to-r from-purple-50 to-indigo-50">
+        <Card className="mb-6 bg-[var(--color-primary)]">
           <h3 className="font-semibold text-gray-900 mb-3">📋 Información del Evento</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
             {requestData?.weddingInfo?.fecha && (
@@ -537,7 +537,7 @@ export default function PublicQuoteResponse() {
           </Card>
 
           {/* Footer */}
-          <Card className="bg-gradient-to-r from-indigo-50 to-purple-50 border-2 border-indigo-200">
+          <Card className="bg-[var(--color-primary)] border-2 border-indigo-200">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
               <div className="text-sm text-gray-700">
                 <p className="font-semibold mb-1">Antes de enviar, verifica que:</p>

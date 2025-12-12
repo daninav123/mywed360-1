@@ -43,7 +43,7 @@ const GiftListSection = ({ config, editable = false, onChange }) => {
   ];
 
   return (
-    <section className="py-16 px-4 bg-gradient-to-br from-purple-50 to-pink-50">
+    <section className="py-16 px-4 bg-[var(--color-primary)]/10">
       <div className="max-w-4xl mx-auto">
         {/* Título */}
         {editable ? (
@@ -152,7 +152,7 @@ const GiftListSection = ({ config, editable = false, onChange }) => {
               rel="noopener noreferrer"
               className="
                 inline-block px-8 py-3
-                bg-gradient-to-r from-purple-500 to-pink-500
+                bg-[var(--color-primary)]
                 text-white font-bold rounded-lg
                 hover:shadow-lg transition-all
                 transform hover:scale-105
@@ -164,7 +164,7 @@ const GiftListSection = ({ config, editable = false, onChange }) => {
         )}
 
         {editable && (
-          <div className="mt-6 p-4 bg-blue-50 rounded-lg text-sm text-blue-700">
+          <div className="mt-6 p-4 50 rounded-lg text-sm text-blue-700">
             💡 Personaliza los regalos y añade un enlace a tu lista completa
           </div>
         )}

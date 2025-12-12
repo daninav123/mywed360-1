@@ -84,10 +84,10 @@ export const BudgetAlerts = ({ transactions, budgetLimits = {} }) => {
             key={index}
             className={`p-3 rounded-lg border ${
               alert.type === 'error'
-                ? 'bg-[var(--color-danger)]/10 border-[color:var(--color-danger)]/30'
+                ? 'border-[color:var(--color-danger)]/30'
                 : alert.type === 'warning'
-                  ? 'bg-[var(--color-warning)]/10 border-[color:var(--color-warning)]/30'
-                  : 'bg-[var(--color-success)]/10 border-[color:var(--color-success)]/30'
+                  ? 'border-[color:var(--color-warning)]/30'
+                  : 'border-[color:var(--color-success)]/30'
             }`}
           >
             <div className="flex items-start gap-2">

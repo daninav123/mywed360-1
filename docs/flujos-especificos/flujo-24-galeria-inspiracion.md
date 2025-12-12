@@ -5,7 +5,7 @@
 > - `Inspiration.jsx` controla el scroll infinito, la personalizacion por tags y el tracking de interacciones.
 > - `InspirationGallery.jsx` renderiza el grid responsivo, el lightbox y la sincronizacion de favoritos.
 > - Servicios `wallService`, `inspirationService` y `SyncService` coordinan el fetch externo, la normalizacion y el almacenamiento local/Firestore.
-> - Prefetch desde `PlannerDashboard`, eventos custom (`mywed360-important-note`) y accesibilidad basica (aria-labels, key handlers).
+> - Prefetch desde `PlannerDashboard`, eventos custom (`MaLove.App-important-note`) y accesibilidad basica (aria-labels, key handlers).
 > - Conector oficial Pinterest/Instagram (`backend/services/socialFeeds.js`) con cache LRU reutilizado por `/api/instagram-wall`.
 
 > Pendiente o incompleto:
@@ -102,7 +102,7 @@ Este flujo describe la experiencia completa de inspiracion visual: desde la prev
 - **Flujo 14 (Checklist)** ofrece atajos a tags especificos tras completar tareas.
 - **Flujo 5 (Proveedores)** dispara deep-links segun categoria de proveedor buscada.
 - **Flujo 16 (Asistente IA)** usa los favoritos para proponer ideas en chat y envía feedback al guardar/descartar.
-- Eventos `mywed360-important-note` permiten destacar imagenes en dashboard o comunicaciones.
+- Eventos `MaLove.App-important-note` permiten destacar imagenes en dashboard o comunicaciones.
 
 ## 9. Metricas y monitorizacion
 - Eventos: `inspiration_gallery_view`, `inspiration_wall_loaded`, `inspiration_tag_selected`, `inspiration_search_performed`, `inspiration_item_faved`, `inspiration_item_viewed`, `inspiration_lightbox_open`, `inspiration_contrast_pack_clicked`, `inspiration_no_go_blocked`.

@@ -157,7 +157,7 @@ const VariablesEditor = ({ profile, webOverrides = {}, onSave, onClose }) => {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
       <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
           <div>
             <h3 className="text-xl font-semibold text-gray-900">📝 Variables de la Web</h3>
             <p className="text-sm text-gray-600 mt-1">
@@ -194,7 +194,7 @@ const VariablesEditor = ({ profile, webOverrides = {}, onSave, onClose }) => {
             {variableFields.map((field) => (
               <div
                 key={field.key}
-                className={`${field.multiline ? 'md:col-span-2' : ''} bg-white border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors`}
+                className={`${field.multiline ? 'md:col-span-2' : ''} bg-white border border-gray-200 rounded-lg p-4`}
               >
                 <div className="flex items-center justify-between mb-2">
                   <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
@@ -240,12 +240,12 @@ const VariablesEditor = ({ profile, webOverrides = {}, onSave, onClose }) => {
           </div>
 
           {/* Ejemplo de uso */}
-          <div className="mt-6 bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-4">
+          <div className="mt-6 bg-[var(--color-primary)] border border-purple-200 rounded-lg p-4">
             <h4 className="font-semibold text-purple-900 mb-2 flex items-center gap-2">
               <span className="text-lg">✨</span>
               Ejemplo de uso en el prompt
             </h4>
-            <div className="bg-white/80 rounded-lg p-3 font-mono text-sm text-gray-700">
+            <div className="bg-white rounded-lg p-3 font-mono text-sm text-gray-700">
               <p>
                 "Crea una web elegante para la boda de{' '}
                 <code className="text-purple-600">{'{nombres}'}</code> que se celebrará el{' '}

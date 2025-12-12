@@ -40,7 +40,7 @@
 
 ### CalendarSync / iCal
 - Feed iCal v2.0 (`webcal://`), timezone por defecto UTC (ajustable al perfil).
-- Campos por evento: `UID={taskId}@mywed360`, `DTSTART`, `DTEND`, `SUMMARY`, `DESCRIPTION`, `STATUS`; la descripción incluye enlaces a la tarea.
+- Campos por evento: `UID={taskId}@MaLove.App`, `DTSTART`, `DTEND`, `SUMMARY`, `DESCRIPTION`, `STATUS`; la descripción incluye enlaces a la tarea.
 - Tokens en `weddings/{id}/calendarTokens/{tokenId}` `{ token, createdAt, lastUsedAt, revoked }`; al revocar se genera token nuevo.
 - Enlaces sin uso expiran tras 90 días; la UI ofrece acción "Regenerar".
 

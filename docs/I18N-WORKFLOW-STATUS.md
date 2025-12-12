@@ -17,6 +17,7 @@ El sistema de internacionalización está completamente configurado para los nue
 ## 🌍 Archivos de Traducción Creados
 
 ### Ubicación
+
 ```
 /apps/main-app/src/i18n/locales/{idioma}/workflow.json
 ```
@@ -24,11 +25,13 @@ El sistema de internacionalización está completamente configurado para los nue
 ### Idiomas Disponibles (33 total)
 
 **Principales con traducciones completas:**
+
 - ✅ **es** (Español - España)
 - ✅ **en** (English)
 - ✅ **fr** (Français)
 
 **Idiomas con traducciones base:**
+
 - de (German), it (Italian), pt (Portuguese)
 - es-AR, es-MX, fr-CA (variantes regionales)
 - ar, bg, ca, cs, da, el, et, eu, fi, hr, hu, is, lt, lv, mt, nl, no, pl, ro, ru, sk, sl, sv, tr
@@ -40,6 +43,7 @@ El sistema de internacionalización está completamente configurado para los nue
 **Namespace:** `workflow`
 
 **Módulos incluidos:**
+
 1. `eventosRelacionados` - Eventos Relacionados
 2. `weddingTeam` - Wedding Team
 3. `tramitesLegales` - Trámites Legales
@@ -59,10 +63,18 @@ El sistema de internacionalización está completamente configurado para los nue
 const SUPPORTED_NAMESPACES = (() => {
   // ...
   if (!namespaces.size) {
-    ['common', 'finance', 'tasks', 'seating', 'email', 'admin', 
-     'marketing', 'chat', 'workflow', 'auth'].forEach((ns) =>
-      namespaces.add(ns)
-    );
+    [
+      'common',
+      'finance',
+      'tasks',
+      'seating',
+      'email',
+      'admin',
+      'marketing',
+      'chat',
+      'workflow',
+      'auth',
+    ].forEach((ns) => namespaces.add(ns));
   }
   // ...
 })();
@@ -77,7 +89,7 @@ import { useTranslation } from 'react-i18next';
 
 function EventosRelacionados() {
   const { t } = useTranslation('workflow');
-  
+
   return (
     <div>
       <h1>{t('eventosRelacionados.title')}</h1>
@@ -110,15 +122,15 @@ Cada módulo incluye:
     "subtitle": "Gestiona despedidas, ensayos y otros eventos",
     "addEvent": "Añadir evento",
     "eventTypes": {
-      "despedida_soltero": "Despedida de soltero",
+      "despedida_soltero": "Despedida de soltero"
       // ... más tipos
     },
     "form": {
-      "eventType": "Tipo de evento",
+      "eventType": "Tipo de evento"
       // ... más campos
     },
     "messages": {
-      "created": "Evento creado",
+      "created": "Evento creado"
       // ... más mensajes
     }
   }
@@ -129,16 +141,17 @@ Cada módulo incluye:
 
 ## ✅ Estado de Implementación por Módulo
 
-| Módulo | Archivo | Traducciones | i18n Hook | Estado |
-|--------|---------|--------------|-----------|--------|
-| Eventos Relacionados | `EventosRelacionados.jsx` | ✅ | ⏳ | Texto ES hardcoded |
-| Wedding Team | `WeddingTeam.jsx` | ✅ | ⏳ | Texto ES hardcoded |
-| Trámites Legales | `TramitesLegales.jsx` | ✅ | ⏳ | Texto ES hardcoded |
-| Invitados Especiales | `InvitadosEspeciales.jsx` | ✅ | ⏳ | Texto ES hardcoded |
-| Día de Boda | `DiaDeBoda.jsx` | ✅ | ⏳ | Texto ES hardcoded |
-| Post-Boda | `PostBoda.jsx` | ✅ | ⏳ | Texto ES hardcoded |
+| Módulo               | Archivo                   | Traducciones | i18n Hook | Estado             |
+| -------------------- | ------------------------- | ------------ | --------- | ------------------ |
+| Eventos Relacionados | `EventosRelacionados.jsx` | ✅           | ⏳        | Texto ES hardcoded |
+| Wedding Team         | `WeddingTeam.jsx`         | ✅           | ⏳        | Texto ES hardcoded |
+| Trámites Legales     | `TramitesLegales.jsx`     | ✅           | ⏳        | Texto ES hardcoded |
+| Invitados Especiales | `InvitadosEspeciales.jsx` | ✅           | ⏳        | Texto ES hardcoded |
+| Día de Boda          | `DiaDeBoda.jsx`           | ✅           | ⏳        | Texto ES hardcoded |
+| Post-Boda            | `PostBoda.jsx`            | ✅           | ⏳        | Texto ES hardcoded |
 
 **Leyenda:**
+
 - ✅ Completado
 - ⏳ Pendiente (traducciones disponibles, implementación futura)
 
@@ -149,30 +162,31 @@ Cada módulo incluye:
 Para implementar completamente i18n en los componentes:
 
 1. **Importar hook de traducción**
+
    ```javascript
    import { useTranslation } from 'react-i18next';
    const { t } = useTranslation('workflow');
    ```
 
 2. **Reemplazar texto hardcoded**
+
    ```javascript
    // Antes:
    <h1>Eventos Relacionados</h1>
-   
+
    // Después:
    <h1>{t('eventosRelacionados.title')}</h1>
    ```
 
 3. **Actualizar constantes**
+
    ```javascript
    // Antes:
-   const TIPOS_EVENTO = [
-     { id: 'despedida_soltero', nombre: 'Despedida de soltero' }
-   ];
-   
+   const TIPOS_EVENTO = [{ id: 'despedida_soltero', nombre: 'Despedida de soltero' }];
+
    // Después:
    const TIPOS_EVENTO = [
-     { id: 'despedida_soltero', nombre: t('eventosRelacionados.eventTypes.despedida_soltero') }
+     { id: 'despedida_soltero', nombre: t('eventosRelacionados.eventTypes.despedida_soltero') },
    ];
    ```
 
@@ -181,18 +195,21 @@ Para implementar completamente i18n en los componentes:
 ## 🔍 Verificación
 
 ### Build
+
 ```bash
 npm run build
 # ✅ Exitoso - Sin errores de i18n
 ```
 
 ### Archivos JSON
+
 ```bash
 find src/i18n/locales -name "workflow.json" | wc -l
 # ✅ 33 archivos creados
 ```
 
 ### Validación JSON
+
 ```bash
 python3 -m json.tool workflow.json
 # ✅ Todos los archivos válidos
@@ -202,13 +219,13 @@ python3 -m json.tool workflow.json
 
 ## 📊 Cobertura de Traducciones
 
-| Característica | ES | EN | FR | Otros 30 |
-|---------------|----|----|----|----|
-| Títulos | ✅ | ✅ | ✅ | ✅ |
-| Formularios | ✅ | ✅ | ✅ | ✅ |
-| Mensajes | ✅ | ✅ | ✅ | ✅ |
-| Categorías | ✅ | ✅ | ✅ | ✅ |
-| Estados | ✅ | ✅ | ✅ | ✅ |
+| Característica | ES  | EN  | FR  | Otros 30 |
+| -------------- | --- | --- | --- | -------- |
+| Títulos        | ✅  | ✅  | ✅  | ✅       |
+| Formularios    | ✅  | ✅  | ✅  | ✅       |
+| Mensajes       | ✅  | ✅  | ✅  | ✅       |
+| Categorías     | ✅  | ✅  | ✅  | ✅       |
+| Estados        | ✅  | ✅  | ✅  | ✅       |
 
 **Total de claves traducidas:** ~350 por idioma  
 **Cobertura:** 100% para los 6 módulos del workflow
@@ -218,6 +235,7 @@ python3 -m json.tool workflow.json
 ## 🛠️ Sistema i18n Global
 
 ### Configuración
+
 - ✅ Sistema i18n inicializado
 - ✅ 33 idiomas soportados
 - ✅ Fallback: ES → EN
@@ -225,6 +243,7 @@ python3 -m json.tool workflow.json
 - ✅ Persistencia en localStorage
 
 ### Namespaces Disponibles
+
 - `common` - Traducciones comunes
 - `finance` - Módulo de finanzas
 - `tasks` - Módulo de tareas

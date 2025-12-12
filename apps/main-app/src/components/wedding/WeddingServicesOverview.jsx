@@ -126,7 +126,7 @@ export default function WeddingServicesOverview({ onSearch, searchPanel }) {
   return (
     <div className="space-y-6">
       {/* Estadísticas generales */}
-      <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6">
+      <div className="bg-[var(--color-primary)] rounded-lg p-6">
         <div className="flex items-center justify-between mb-2">
           <h2 className="text-2xl font-bold text-gray-900">
             {t('wedding.servicesOverview.title', { defaultValue: 'Servicios de tu boda' })}

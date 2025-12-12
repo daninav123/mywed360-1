@@ -357,6 +357,6 @@ Voy a ejecutar el roadmap completo sistemáticamente:
 ---
 
 **Mantenido por:** Daniel Navarro Campos  
-**Repositorio:** https://github.com/Daniel-Navarro-Campos/mywed360  
+**Repositorio:** https://github.com/Daniel-Navarro-Campos/MaLove.App  
 **Rama:** windows  
 **Modo:** 🔥 EJECUCIÓN CONTINUA ACTIVADA 🔥

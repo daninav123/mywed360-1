@@ -37,7 +37,7 @@ const AchievementsTracker = ({
   return (
     <div className="space-y-4">
       {/* Header con progreso global */}
-      <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg p-4 text-white">
+      <div className="bg-[var(--color-primary)] rounded-lg p-4 text-white">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <Trophy className="w-6 h-6" />
@@ -141,7 +141,7 @@ const AchievementsTracker = ({
               animate={{ opacity: 1 }}
               className={`relative rounded-lg border-2 p-4 transition-all ${
                 unlocked
-                  ? 'bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-800'
+                  ? 'bg-[var(--color-primary)] dark:bg-[var(--color-primary)] border-green-200 dark:border-green-800'
                   : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 opacity-60'
               }`}
             >

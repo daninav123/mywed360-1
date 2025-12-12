@@ -101,7 +101,7 @@ const ZoomControls = ({ zoom, onZoomIn, onZoomOut, onFitToScreen }) => (
     animate={{ opacity: 1, x: 0 }}
     className="absolute top-4 right-4 z-10
                flex flex-col gap-2
-               bg-[#1A1A1D]/90 backdrop-blur-xl
+               bg-[#1A1A1D]
                border border-white/20 rounded-lg
                p-2 shadow-xl"
   >
@@ -115,7 +115,7 @@ const ZoomControls = ({ zoom, onZoomIn, onZoomOut, onFitToScreen }) => (
       <ZoomIn size={16} />
     </button>
     
-    <div className="text-xs text-center text-gray-400 py-1">
+    <div className="text-xs text-gray-400">
       {Math.round(zoom * 100)}%
     </div>
     
@@ -153,7 +153,7 @@ const MiniMap = ({ width, height, tables, currentViewport, onNavigate }) => {
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ opacity: 1, scale: 1 }}
       className="absolute top-4 left-20 z-10
-                 bg-[#1A1A1D]/90 backdrop-blur-xl
+                 bg-[#1A1A1D]
                  border border-white/20 rounded-lg
                  p-2 shadow-xl"
     >

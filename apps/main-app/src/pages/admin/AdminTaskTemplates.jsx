@@ -528,10 +528,10 @@ const AdminTaskTemplates = () => {
               return (
                 <div
                   key={blockIndex}
-                  className="flex-shrink-0 w-80 rounded-lg border border-gray-200 bg-white shadow-sm"
+                  className="flex-shrink-0 w-80 rounded-lg border border-gray-200 bg-white"
                 >
                   {/* Cabecera - Tarea Padre */}
-                  <div className="bg-gradient-to-r from-blue-500 to-blue-600 px-4 py-3 rounded-t-lg">
+                  <div className="bg-[var(--color-primary)] px-4 py-3 rounded-t-lg">
                     <div className="flex items-center justify-between">
                       {editingBlock === `${blockIndex}-name` ? (
                         <input

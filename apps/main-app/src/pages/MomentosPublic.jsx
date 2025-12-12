@@ -220,7 +220,7 @@ export default function MomentosPublic() {
   if (status === 'error') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-900 text-white px-6">
-        <div className="bg-white/5 backdrop-blur border border-white/10 rounded-3xl px-6 py-8 max-w-md text-center space-y-3">
+        <div className="bg-white/5  border border-white/10 rounded-3xl px-6 py-8 max-w-md text-center space-y-3">
           <h1 className="text-xl font-semibold text-white">
             {t('public.moments.public.errorTitle')}
           </h1>
@@ -251,7 +251,7 @@ export default function MomentosPublic() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-white flex flex-col">
-      <header className="px-6 pt-10 pb-6 bg-gradient-to-b from-slate-900 to-slate-950">
+      <header className="px-6 pt-10 pb-6 bg-[var(--color-primary)]">
         <p className="text-xs uppercase tracking-[0.2em] text-blue-300 font-semibold">
           {t('public.moments.public.hero.badge')}
         </p>
@@ -364,7 +364,7 @@ export default function MomentosPublic() {
 
       {selectedScene && (
         <div className="fixed inset-0 z-40 flex flex-col bg-black/60">
-          <div className="mt-auto bg-white rounded-t-3xl px-5 py-6 shadow-2xl">
+          <div className="mt-auto bg-white rounded-t-3xl px-5 py-6 shadow-md">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs uppercase tracking-wide text-slate-400">

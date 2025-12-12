@@ -197,7 +197,7 @@ const SubscriptionDashboard = () => {
 
         {/* Plan Actual */}
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-          <div className="bg-gradient-to-r from-purple-600 to-blue-600 p-6">
+          <div className="bg-[var(--color-primary)] p-6">
             <div className="flex items-start justify-between">
               <div>
                 <div className="flex items-center gap-3">

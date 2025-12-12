@@ -22,7 +22,7 @@ En `.env`:
 
 ```
 MAILGUN_API_KEY=key-... ✓
-MAILGUN_DOMAIN=mg.mywed360.com ✓
+MAILGUN_DOMAIN=mg.MaLove.App.com ✓
 FRONTEND_URL=http://localhost:5173 ✓
 ```
 

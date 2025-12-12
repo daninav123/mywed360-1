@@ -210,7 +210,7 @@ export default function QuoteComparator({ quotes, request, onSelect, onClose }) 
 
       {/* Análisis automático */}
       {showAnalysis && (
-        <Card className="bg-gradient-to-r from-indigo-50 to-purple-50 border-2 border-indigo-200">
+        <Card className="bg-[var(--color-primary)] border-2 border-indigo-200">
           <div className="flex items-start gap-4">
             <div className="bg-indigo-600 text-white rounded-full p-3 flex-shrink-0">🤖</div>
             <div className="flex-1">

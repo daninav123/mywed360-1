@@ -14,14 +14,14 @@
 > Configuracion de respuestas automaticas ahora se sincroniza via `/api/email-automation/config` (Firestore), evitando depender de localStorage.
 
 ## 1. Objetivo y alcance
-- Centralizar recepción y envío de emails vinculados a la boda, con soporte para alias `@mywed360`, plantillas e IA de apoyo.
+- Centralizar recepción y envío de emails vinculados a la boda, con soporte para alias `@MaLove.App`, plantillas e IA de apoyo.
 - Permitir colaboración interna (comentarios, etiquetado, notas) y disparar acciones en otros módulos (tareas, agenda, proveedores).
 - Ofrecer analítica básica (volumen, aperturas, respuestas) y monitoreo del rendimiento del flujo.
 - Alinear copy, plantillas y automatizaciones con `weddingProfile` y `weddingInsights`, generando mensajes que reflejen el estilo principal y los contrastes aprobados (sin caer en no-go items).
 
 ## 2. Entradas y rutas
 - **Entrada principal:** menú usuario (avatar) → “Buzón de emails” (`/email`, `UnifiedInbox/InboxContainer.jsx`). `EmailNotification` y `EmailNotificationBadge` apuntan al mismo destino.
-- **Rutas auxiliares:** `/email/compose` y `/email/compose/:action/:id` (editor clásico y respuestas), `/email/setup` (alias `@mywed360`), `/email/settings` y `/email/configuracion`, `/email/plantillas`, `/email/stats` y `/email/estadisticas`, `/email/test` (diagnóstico Mailgun), `/email-admin` (dashboard admin).
+- **Rutas auxiliares:** `/email/compose` y `/email/compose/:action/:id` (editor clásico y respuestas), `/email/setup` (alias `@MaLove.App`), `/email/settings` y `/email/configuracion`, `/email/plantillas`, `/email/stats` y `/email/estadisticas`, `/email/test` (diagnóstico Mailgun), `/email-admin` (dashboard admin).
 - Navegación contextual: `GlobalSearch` enlaza a `/email#mailId`; `ProviderSearchModal` desde la bandeja permite componer correos IA a proveedores (Flujo 5).
 
 ## 3. Paso a paso UX
@@ -89,7 +89,7 @@
 ## 4. Persistencia y datos
 - Correos: `services/emailService.js` prioriza backend (`/api/mail/*`). Sin backend, cae a Firestore (`users/{uid}/mails` y colección global `mails`) o memoria/localStorage (`memoryStore.mails`). El campo `folder` se actualiza con `EmailService.setFolder` (cuando se integre) y se usa para determinar `inbox`/`sent`/`trash`/personalizadas. No existe colección `weddings/{id}/emails`.
 - Alias: `hooks/useEmailUsername.jsx` escribe en `emailUsernames/{alias}` y `users/{uid}` (`emailUsername`, `myWed360Email`).
-- Configuración auto-respuesta / clasificación / cola: claves en `localStorage` (`mywed360.email.automation.*`, `mywed360.email.automation.schedule`…).
+- Configuración auto-respuesta / clasificación / cola: claves en `localStorage` (`MaLove.App.email.automation.*`, `MaLove.App.email.automation.schedule`…).
 - Contexto de personalización: `emailContext` se persistirá en `weddings/{id}/emailContext` con `{ language, tone, vibeKeywords[], specialInterests[], noGoItems[], contrastNotes[] }`. Se actualizará cuando cambien `weddingInsights` y expondrá versión para cache (`version`).
 - Etiquetas y carpetas personalizadas: `tagService.js` (`maloveapp_email_tags_*`) y `folderService.js` (`maloveapp_email_folders_{uid}` + `maloveapp_email_folder_mapping_{uid}`) almacenan en `localStorage` con espejo opcional a Firestore; la UI principal todavía no consume dichos datos.
 - Plantillas: API `/api/email-templates` (via `services/emailTemplatesService.js`); fallback a catálogo estático `services/emailTemplates.js`. No existe sincronización automática con Firestore.

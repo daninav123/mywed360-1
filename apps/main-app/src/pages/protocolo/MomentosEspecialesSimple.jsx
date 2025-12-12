@@ -145,7 +145,7 @@ const MomentosEspecialesSimple = () => {
         </div>
 
         {/* Banner informativo compacto */}
-        <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-3">
+        <div className="bg-[var(--color-primary)] border border-blue-200 rounded-lg p-3">
           <div className="flex items-center gap-3">
             <div className="flex-shrink-0">
               <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">

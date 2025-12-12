@@ -1,7 +1,5 @@
 # MaLove.APP – Monorepo (Frontend + Backend + Docs)
 
-MaLove.APP – Monorepo (Frontend + Backend + Docs)
-
 ## Propósito del producto
 
 MaLove.App funciona como wedding planner digital. Capturamos el estilo, prioridades y restricciones únicas de cada boda para guiar a las parejas y planners hacia las mejores decisiones en cada etapa. El perfil de la boda alimenta las recomendaciones del checklist, los proveedores sugeridos, el presupuesto y los contenidos generados por IA.  
@@ -10,7 +8,7 @@ Más detalles y playbooks en `docs/personalizacion/README.md`.
 Este repositorio contiene el frontend (React + Vite + Tailwind, PWA), el backend (Express) y documentación operativa. Sirve como punto de entrada para desarrollo local, CI/CD y despliegues.
 
 Resumen de módulos:
-- Frontend: React 18 + Vite + TailwindCSS (PWA, offline-first) en `src/`
+- Frontend: React 18 + Vite + TailwindCSS (PWA, offline-first) en `apps/main-app/src/`
 - Backend: Express + middleware de seguridad en `backend/`
 - Funciones/Utilities: scripts y helpers en `scripts/`, `functions/`
 - Documentación: guías técnicas y operativas en `docs/`
@@ -20,17 +18,14 @@ Resumen de módulos:
 1. [Características](#características)
 2. [Instalación](#instalación)
 3. [Scripts de desarrollo](#scripts-de-desarrollo)
-4. [Arquitectura](#arquitectura)
-5. [PWA / Offline](#pwa--offline)
-6. [Pruebas y CI](#pruebas-y-ci)
-7. [Contribuir](#contribuir)
+4. [Observabilidad y Alertas](#observabilidad-y-alertas)
 
 ---
 
 ## Quick Start (Monorepo)
 
 1) Clonar e instalar dependencias
-   - `git clone ... && cd mywed360 && npm install`
+   - `git clone <repository-url> && cd maloveapp && npm install`
 
 2) Variables de entorno
    - Frontend: ver `docs/ENVIRONMENT.md`

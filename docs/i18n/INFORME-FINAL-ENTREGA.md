@@ -324,7 +324,7 @@ window.location.reload();
 ## 📊 ESTRUCTURA DE ARCHIVOS
 
 ```
-mywed360/
+MaLove.App/
 ├── src/
 │   ├── i18n/
 │   │   ├── index.js                    ← Configuración principal

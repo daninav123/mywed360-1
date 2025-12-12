@@ -1,7 +1,7 @@
 import express from 'express';
 
 import { db } from '../db.js';
-import computeSupplierScore, { aggregateServiceStats } from '../../src/utils/supplierScore.js';
+import computeSupplierScore, { aggregateServiceStats } from '../utils/supplierScore.js';
 
 const router = express.Router();
 

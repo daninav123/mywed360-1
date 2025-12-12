@@ -1,27 +1,140 @@
-# Roadmap - Lovenda/MaLoveApp
+# Roadmap - MaLove.App
 
-> Documento canonico que integra backlog, plan de sprints y estado por flujo. Actualiza esta fuente unica cuando haya cambios para evitar divergencias.
+> **Documento Oficial:** Integra backlog, plan de sprints y estado por flujo. 
+> 
+> **Última actualización:** Diciembre 2024
 >
-> Snapshot historico: `docs/roadmap-2025-v2.md` (09/10/2025). Mantén este archivo como referencia principal.
+> **Documento maestro de referencia:** [`docs/WORKFLOW-USUARIO.md`](./WORKFLOW-USUARIO.md) - Define el flujo completo del usuario
+>
+> Snapshots históricos: `docs/archive/roadmap-2025-v2.md`, `docs/archive/NUEVO-ROADMAP-PRIORIZADO-2025.md`
 
-## Resumen ejecutivo
-### Objetivos trimestrales
-- Estabilizar el core operativo (Seating Plan, RSVP, reglas de negocio).
-- Completar modulos prioritarios (Tasks/Checklist, Emails, Notificaciones) con calidad de produccion.
-- Habilitar primeras capacidades de IA aplicadas a Diseno Web y Proveedores.
+---
 
-### KPIs y metas
-- Retencion de planners +10%.
-- Exportaciones listas para imprenta con <2% de incidencias rechazadas.
-- NPS planners = 45.
-- Cobertura E2E critica = 90% en CI.
+## 🎯 Resumen Ejecutivo Q1 2025
 
-### Estado actual por flujo
-- Implementado/parcial: flujos 3, 5, 7, 9, 10, 11 (sub-secciones), 12 y 19.
-- Pendiente/por definir: integraciones IA avanzadas, marketplace de plantillas, automatizaciones push/SMS completas.
-- Ejecucion priorizada: ver docs/TODO.md (Seating plan, protocolo 11A-11E, asistente IA y modulo Momentos).
+### Estrategia: User-Centric Development
+Todas las features se priorizan según su impacto en el **WORKFLOW-USUARIO.md** (9 fases, desde pre-planificación hasta post-boda).
 
-> El detalle historico que antes vivia en docs/roadmap-unificado.md y docs/ROADMAP_DIFF.md se consolido aqui para mantener una unica referencia.
+### Objetivos Trimestrales (Q1 2025)
+
+**🔴 Alta Prioridad - Quick Wins**
+1. **FASE 0: Pre-Planificación** ⭐ NUEVO
+   - Cuestionario inicial de visión
+   - Generador de timeline personalizado
+   - Impacto: Define toda la experiencia posterior
+
+2. **FASE 1.3: Wizard de Diseño Completo**
+   - Quiz de estilo interactivo
+   - Generador de paletas de colores
+   - Impacto: Reduce tasa de abandono en onboarding
+
+3. **FASE 2.6: Pruebas y Ensayos** ⭐ NUEVO
+   - Calendario de pruebas y citas
+   - Impacto: Mejora organización, reduce olvidos
+
+4. **FASE 3.1.5: Shot List Fotográfico** ⭐ NUEVO
+   - Generador de lista de fotos deseadas
+   - Impacto: Alto valor percibido, esfuerzo bajo
+
+5. **FASE 5.3: Regalos y Lista de Deseos** ⭐ NUEVO
+   - Lista digital multi-tienda
+   - Impacto: Feature esperada, potencial ingresos
+
+6. **FASE 6.2: Transporte y Logística** ⭐ NUEVO
+   - Gestión completa de transporte/alojamiento
+   - Impacto: Crítico para invitados
+
+7. **FASE 7.3: Álbum Colaborativo en Vivo**
+   - Upload desde móvil + slideshow tiempo real
+   - Impacto: Diferenciador competitivo
+
+### KPIs y Metas 2025
+
+**Retención y Engagement:**
+- Retención de planners: +15% (actual +10%)
+- NPS usuarios: 50+ (actual 45)
+- Completitud de workflow: 75% (actual 45%)
+
+**Calidad:**
+- Cobertura E2E crítica: 90% en CI
+- Exportaciones listas: <2% rechazos
+- Bugs críticos en producción: 0
+
+**Nuevas Features:**
+- Q1: 7 features alta prioridad
+- Q2: 5 features media prioridad
+- Q3-Q4: 6 features baja prioridad
+
+### Estado Actual por Workflow (Diciembre 2024)
+
+| Fase Workflow | % Completado | Nuevas Subfases | Estado |
+|---------------|--------------|-----------------|--------|
+| 0. Pre-Planificación | 0% | 2 nuevas | 🔴 No iniciado |
+| 1. Planificación Inicial | 70% | Mejorar diseño | 🟢 Producción |
+| 2. Búsqueda y Contratación | 75% | Pruebas/Ensayos | 🟢 Producción |
+| 3. Diseño Experiencia | 60% | Team + Shot List | 🟡 Desarrollo |
+| 4. Trámites Legales | 0% | - | 🔴 Pendiente |
+| 5. Confirmaciones | 70% | Regalos + Accesibilidad | 🟢 Producción |
+| 6. Pre-Boda | 5% | Transporte + Eventos | 🔴 Pendiente |
+| 7. Día de la Boda | 50% | Álbum Colaborativo | 🟡 Desarrollo |
+| 8. Post-Boda | 0% | Contenido + Luna Miel | 🔴 Pendiente |
+
+**Implementado/parcial:** Flujos 1, 2, 3 (parcial), 5, 7 (parcial)  
+**Alta prioridad Q1:** Fases 0, 1.3, 2.6, 3.1.5, 5.3, 6.2, 7.3  
+**Ejecución priorizada:** Ver [`docs/WORKFLOW-USUARIO.md`](./WORKFLOW-USUARIO.md) para roadmap completo
+
+---
+
+## 📋 Plan de Desarrollo Q1-Q4 2025
+
+### Q1 2025 (Enero-Marzo) - Foundation & Quick Wins
+**Objetivo:** Implementar 7 features de alta prioridad del workflow
+
+**Sprint 1-2 (Enero):**
+- FASE 0: Cuestionario inicial + Timeline personalizado
+- FASE 1.3: Wizard de diseño (quiz + paletas)
+
+**Sprint 3-4 (Febrero):**
+- FASE 3.1.5: Shot List fotográfico
+- FASE 2.6: Calendario de pruebas y ensayos
+
+**Sprint 5-6 (Marzo):**
+- FASE 5.3: Lista de regalos digital
+- FASE 6.2: Transporte y logística básico
+- FASE 7.3: Álbum colaborativo MVP
+
+### Q2 2025 (Abril-Junio) - Depth & Collaboration
+**Objetivo:** Implementar 5 features de media prioridad
+
+- FASE 3.0: Wedding Team y colaboración
+- FASE 4: Trámites legales (checklist por país)
+- FASE 5.4: Invitados especiales/accesibilidad
+- FASE 6.3: Eventos múltiples (pre y post boda)
+- FASE 6.4: Gestión de niños
+
+### Q3-Q4 2025 (Julio-Diciembre) - Polish & Scale
+**Objetivo:** Completar ciclo post-boda y features adicionales
+
+- FASE 6.1: Logística final completa
+- FASE 8: Post-boda (contenido, agradecimientos, archivo)
+- Luna de miel y features diferenciadores
+- Optimizaciones y mejoras basadas en feedback
+
+---
+
+## 🔗 Referencias Cruzadas
+
+- **Workflow del Usuario:** [`docs/WORKFLOW-USUARIO.md`](./WORKFLOW-USUARIO.md) - Documento maestro
+- **Análisis de Gaps:** [`docs/ANALISIS-GAPS-WORKFLOW.md`](./ANALISIS-GAPS-WORKFLOW.md) - Detalle de 18 elementos nuevos
+- **Auditoría de Documentación:** [`docs/AUDITORIA-DOCUMENTACION.md`](./AUDITORIA-DOCUMENTACION.md)
+- **Guía de Estilo:** [`../STYLE_GUIDE.md`](../STYLE_GUIDE.md)
+
+---
+
+## 📊 Detalle por Flujo Técnico
+
+> Los siguientes flujos técnicos se mantienen por compatibilidad. 
+> Consultar WORKFLOW-USUARIO.md para la visión orientada al usuario.
 
 ## Detalle por flujo
 
@@ -520,7 +633,7 @@
 - **[archivo]** docs\flujos-especificos\flujo-31-estilo-global.md
 - **[conclusion]** pendiente
 - **[pendiente (doc)]**
-  - reutilizar `weddings/{id}/branding/main.palette` en los generadores (web, invitaciones, assets), sincronizar cambios de `mywed360Profile` con Firestore sin depender de eventos locales y exponer UI dedicada para editar estilo global dentro de `/perfil`.
+  - reutilizar `weddings/{id}/branding/main.palette` en los generadores (web, invitaciones, assets), sincronizar cambios de `MaLove.AppProfile` con Firestore sin depender de eventos locales y exponer UI dedicada para editar estilo global dentro de `/perfil`.
 - **[E2E specs]** 1/1 presentes
   - [ok] cypress/e2e/style/style-global.cy.js
 - **[roadmap/pending (doc)]**

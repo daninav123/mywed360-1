@@ -29,7 +29,7 @@
 ## 4. Persistencia y datos
 - Firestore `weddings/{id}/notifications/{notificationId}`: payload básico, estado leído.
 - `users/{uid}/notificationPreferences`: canales y categorías + horario silencioso.
-- LocalStorage (`mywed360-notifications`) usado para evitar duplicidades en modo offline.
+- LocalStorage (`MaLove.App-notifications`) usado para evitar duplicidades en modo offline.
 - Logs backend (Mailgun/Twilio) para fallos push/email.
 
 ## 5. Reglas de negocio

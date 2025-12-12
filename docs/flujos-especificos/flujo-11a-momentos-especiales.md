@@ -1,7 +1,7 @@
 # 11A. Momentos Especiales de la Boda
 
 > Componentes clave: `src/pages/protocolo/MomentosEspeciales.jsx`, `src/hooks/useSpecialMoments.js`, `src/data/musicInspiration.js`
-> Persistencia: `weddings/{id}/specialMoments/main` (blocks + moments) y localStorage `mywed360SpecialMoments`
+> Persistencia: `weddings/{id}/specialMoments/main` (blocks + moments) y localStorage `MaLove.AppSpecialMoments`
 > Pendiente: campos avanzados (responsables, suppliers), drag&drop, alertas guiadas y destinatarios por momento.
 
 ## 1. Objetivo y alcance

@@ -27,6 +27,7 @@ function getNavItems(role, t) {
       return [
         { path: '/home', label: t('navigation.home') },
         { path: '/tasks', label: t('navigation.tasks') },
+        { path: '/timeline', label: 'Timeline' },
         { path: '/finance', label: t('navigation.finance') },
         { path: '/more', label: t('navigation.more') },
       ];

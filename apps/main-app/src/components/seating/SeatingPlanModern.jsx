@@ -104,7 +104,7 @@ export default function SeatingPlanModern() {
     generateSeatGrid,
     generateBanquetLayout,
     applyBanquetTables,
-    setupSeatingPlanAutomatically, // Generación TODO automática ✨
+    setupSeatingPlanAutomatically, // Generación TODO automática 
 
     // Export
     exportPDF,
@@ -356,14 +356,14 @@ export default function SeatingPlanModern() {
     [guests, moveGuest, t]
   );
 
-  // Handler para generación TODO automática ✨
+  // Handler para generación TODO automática 
   const [isGeneratingAuto, setIsGeneratingAuto] = useState(false);
 
   const handleGenerarTodoAutomatico = useCallback(async () => {
     try {
       setIsGeneratingAuto(true);
 
-      toast.info('🔮 Analizando invitados y generando plan...', {
+      toast.info(' Analizando invitados y generando plan...', {
         autoClose: 2000,
       });
 
@@ -372,7 +372,7 @@ export default function SeatingPlanModern() {
         tableCapacity: 8,
       });
 
-      console.log('📊 Resultado de generación:', result);
+      console.log(' Resultado de generación:', result);
 
       if (result.success) {
         // Track achievement: layout generated - DESACTIVADO temporalmente
@@ -380,16 +380,16 @@ export default function SeatingPlanModern() {
 
         toast.success(
           <div>
-            <strong>✨ {result.message}</strong>
+            <strong> {result.message}</strong>
             <div style={{ marginTop: '8px', fontSize: '13px' }}>
-              📊 {result.stats.mesas} mesas creadas
+              {result.stats.mesas} mesas creadas
               <br />
-              👥 {result.stats.invitadosAsignados} invitados asignados
+              {result.stats.invitadosAsignados} invitados asignados
               <br />
-              🎨 Layout: {result.stats.layoutUsado}
+              Layout: {result.stats.layoutUsado}
               {result.stats.invitadosPendientes > 0 && (
                 <>
-                  <br />⏳ {result.stats.invitadosPendientes} pendientes
+                  <br /> {result.stats.invitadosPendientes} pendientes
                 </>
               )}
             </div>
@@ -399,8 +399,8 @@ export default function SeatingPlanModern() {
 
         // IMPORTANTE: Esperar y recargar si NO se asignaron invitados
         if (result.stats.invitadosAsignados === 0 && result.stats.invitadosPendientes > 0) {
-          console.log('⚠️ No se asignaron invitados, recargando en 2 segundos...');
-          toast.info('🔄 Refrescando datos...', { autoClose: 1500 });
+          console.log(' No se asignaron invitados, recargando en 2 segundos...');
+          toast.info(' Refrescando datos...', { autoClose: 1500 });
 
           setTimeout(() => {
             window.location.reload();
@@ -586,7 +586,7 @@ export default function SeatingPlanModern() {
           {/* Botón flotante de añadir mesa (siempre visible) */}
           <QuickAddTableButton onAdd={handleAddTable} position="bottom-right" />
 
-          {/* ✨ BOTÓN GENERAR TODO AUTOMÁTICAMENTE (solo si no hay mesas) */}
+          {/*  BOTÓN GENERAR TODO AUTOMÁTICAMENTE (solo si no hay mesas) */}
           {tab === 'banquet' && tables?.length === 0 && guests?.length > 0 && (
             <motion.div
               initial={{ opacity: 0, scale: 0.8, y: 20 }}
@@ -597,8 +597,7 @@ export default function SeatingPlanModern() {
               <button
                 onClick={handleGenerarTodoAutomatico}
                 disabled={isGeneratingAuto}
-                className="group relative bg-gradient-to-r from-indigo-600 to-purple-600 
-                         hover:from-indigo-700 hover:to-purple-700
+                className="group relative bg-[var(--color-primary)] 
                          text-white font-bold px-8 py-6 rounded-2xl shadow-2xl
                          transform transition-all duration-300
                          hover:scale-105 hover:shadow-indigo-500/50

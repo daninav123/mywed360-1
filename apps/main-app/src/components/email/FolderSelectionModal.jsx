@@ -98,7 +98,7 @@ const FolderSelectionModal = ({
 
   return (
     <div
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 bg-black/50  z-50 flex items-center justify-center p-4"
       onClick={handleOutsideClick}
       role="dialog"
       aria-modal="true"
@@ -138,7 +138,7 @@ const FolderSelectionModal = ({
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Buscar carpetas..."
-              className="w-full py-2 pl-10 pr-4 border rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-800"
+              className="w-full py-2 pl-10 pr-4 border rounded-md focus:ring-blue-500 focus:bg-[var(--color-primary)]"
               aria-describedby="folder-modal-description"
               aria-controls="folder-list"
             />
@@ -182,7 +182,7 @@ const FolderSelectionModal = ({
                 <Folder size={18} className="text-blue-600 mr-2" aria-hidden="true" />
                 <span className="flex-grow text-gray-800">{folder.name}</span>
                 <button
-                  className="p-1 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="p-1 bg-[var(--color-primary)] hover:bg-blue-200 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   onClick={(e) => {
                     e.stopPropagation();
                     onSelectFolder(folder.id);

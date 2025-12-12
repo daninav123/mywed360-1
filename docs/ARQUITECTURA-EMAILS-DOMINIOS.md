@@ -185,7 +185,7 @@ Estos alias **NO** pueden ser usados:
 - `info`
 - `ayuda`
 - `sistema`
-- `mywed360`
+- `MaLove.App`
 - `staff`
 - `test`
 - `prueba`

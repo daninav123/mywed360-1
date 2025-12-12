@@ -240,13 +240,13 @@ export default function SupplierRequests() {
     (request) => (
       <div
         key={request.id}
-        className="group bg-white border border-gray-200 rounded-xl p-6 hover:shadow-2xl hover:border-indigo-300 transition-all duration-300 transform hover:-translate-y-1"
+        className="group bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md hover:border-indigo-300 transition-all duration-300 transform hover:-translate-y-1"
       >
-        {/* Header con degradado */}
+        {/* Header */}
         <div className="flex items-start justify-between mb-5 pb-4 border-b border-gray-100">
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-2">
-              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-bold text-sm shadow-lg">
+              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--color-primary)] text-white font-bold text-sm shadow-lg">
                 {request.coupleName?.charAt(0)?.toUpperCase() || '?'}
               </div>
               <div>
@@ -270,8 +270,8 @@ export default function SupplierRequests() {
           </div>
         </div>
 
-        {/* Detalles de la boda con iconos coloridos */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5 p-5 bg-gradient-to-br from-gray-50 to-indigo-50 rounded-xl border border-indigo-100">
+        {/* Detalles de la boda */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5 p-5 bg-white border border-gray-200 rounded-xl">
           {request.weddingDate && (
             <div className="flex items-center gap-3 p-2 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
               <div className="flex items-center justify-center w-10 h-10 rounded-full bg-pink-100">
@@ -324,9 +324,9 @@ export default function SupplierRequests() {
           )}
         </div>
 
-        {/* Mensaje con mejor diseño */}
+        {/* Mensaje */}
         {request.message && (
-          <div className="mb-5 p-4 bg-white border-l-4 border-indigo-500 rounded-lg">
+          <div className="mb-5 p-4 bg-white bg-[var(--color-primary)]">
             <p className="text-xs text-gray-500 font-semibold mb-1">💬 Mensaje del Cliente</p>
             <p className="text-sm text-gray-700 leading-relaxed">
               {request.message.length > 150
@@ -336,11 +336,11 @@ export default function SupplierRequests() {
           </div>
         )}
 
-        {/* Contacto con botones destacados */}
+        {/* Contacto */}
         <div className="flex flex-wrap gap-3 mb-5">
           <a
             href={`mailto:${request.contactEmail}`}
-            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-50 to-indigo-100 text-indigo-700 rounded-lg hover:from-indigo-100 hover:to-indigo-200 transition-all shadow-sm hover:shadow-md font-medium"
+            className="flex items-center gap-2 px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary)] transition-colors text-sm font-medium"
           >
             <Mail size={16} />
             <span className="text-sm">{request.contactEmail}</span>
@@ -348,7 +348,7 @@ export default function SupplierRequests() {
           {request.contactPhone && (
             <a
               href={`tel:${request.contactPhone}`}
-              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-50 to-green-100 text-green-700 rounded-lg hover:from-green-100 hover:to-green-200 transition-all shadow-sm hover:shadow-md font-medium"
+              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
             >
               <Phone size={16} />
               <span className="text-sm">{request.contactPhone}</span>
@@ -356,20 +356,20 @@ export default function SupplierRequests() {
           )}
         </div>
 
-        {/* Acciones con mejor diseño */}
+        {/* Acciones */}
         <div className="flex flex-wrap gap-3 pt-4 border-t border-gray-100">
           {request.status === 'pending' && (
             <>
               <button
                 onClick={() => updateRequestStatus(request.id, 'contacted')}
-                className="flex-1 min-w-[200px] px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all shadow-md hover:shadow-lg text-sm font-semibold transform hover:scale-105"
+                className="flex-1 min-w-[200px] px-6 py-3 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary)] transition-all shadow-md hover:shadow-lg text-sm font-semibold transform hover:scale-105"
               >
                 <CheckCircle size={18} className="inline mr-2" />
                 Marcar como Contactada
               </button>
               <button
                 onClick={() => updateRequestStatus(request.id, 'quoted')}
-                className="flex-1 min-w-[200px] px-6 py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all shadow-md hover:shadow-lg text-sm font-semibold transform hover:scale-105"
+                className="flex-1 min-w-[200px] px-6 py-3 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary)] transition-all shadow-md hover:shadow-lg text-sm font-semibold transform hover:scale-105"
               >
                 <Eye size={18} className="inline mr-2" />
                 Enviar Cotización
@@ -379,14 +379,14 @@ export default function SupplierRequests() {
           {request.status === 'contacted' && (
             <button
               onClick={() => updateRequestStatus(request.id, 'quoted')}
-              className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all shadow-md hover:shadow-lg text-sm font-semibold transform hover:scale-105"
+              className="flex-1 px-6 py-3 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary)] transition-all shadow-md hover:shadow-lg text-sm font-semibold transform hover:scale-105"
             >
               <Eye size={18} className="inline mr-2" />
               Enviar Cotización
             </button>
           )}
           {(request.status === 'quoted' || request.status === 'accepted') && (
-            <div className="flex-1 px-6 py-3 bg-gradient-to-r from-green-50 to-green-100 text-green-700 rounded-lg text-sm font-semibold text-center border-2 border-green-200">
+            <div className="flex-1 px-6 py-3 bg-green-100 text-green-800 rounded-lg text-sm font-semibold text-center border-2 border-green-200">
               ✅ Solicitud {request.status === 'accepted' ? 'Aceptada' : 'Cotizada'}
             </div>
           )}
@@ -426,7 +426,7 @@ export default function SupplierRequests() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg p-6">
+      <div className="bg-[var(--color-primary)] text-white rounded-lg p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <button

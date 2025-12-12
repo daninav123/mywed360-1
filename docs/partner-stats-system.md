@@ -41,7 +41,7 @@ Proveer transparencia a partners comerciales sobre el rendimiento de sus código
 function generatePartnerToken(code) {
   return crypto
     .createHash('sha256')
-    .update(`${code}-mywed360-partner-${process.env.JWT_SECRET || 'fallback-secret'}`)
+    .update(`${code}-MaLove.App-partner-${process.env.JWT_SECRET || 'fallback-secret'}`)
     .digest('hex')
     .substring(0, 32);
 }

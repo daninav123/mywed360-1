@@ -34,7 +34,7 @@
 - **Listado de bodas**: `WeddingContext.jsx` suscribe `users/{uid}/weddings` (Firestore) y normaliza permisos con `ensureWeddingAccessMetadata`. Cachea resultado en localStorage `maloveapp_cached_weddings`.
 - **Boda activa**: se persiste en `maloveapp_active_wedding` + clave por usuario; al cambiarla se sincroniza `users/{uid}` y `users/{uid}/weddings/{id}` (`lastAccessedAt`).
 - **Subcolecciones**: `useFirestoreCollection('meetings')` y `'suppliers'` delegan en `useWeddingCollection` para leer `weddings/{activeWedding}/meetings|suppliers`, con fallback offline localStorage (`maloveapp_{wid}_{sub}`) y suscripci�n `onSnapshot`.
-- **Alertas**: `usePlannerAlerts` agrega notificaciones sin leer para las bodas del planner filtrando `payload.weddingId`; escucha `window` `mywed360-notif` para refrescos r�pidos.
+- **Alertas**: `usePlannerAlerts` agrega notificaciones sin leer para las bodas del planner filtrando `payload.weddingId`; escucha `window` `MaLove.App-notif` para refrescos r�pidos.
 - **Notificaciones**: `notifications` (colecci�n global + cach� local) guarda `payload` enriquecido (weddingId, category, severity, source). Opci�n: contadores agregados `weddings/{id}/counters/alerts` para evitar agregados costosos.
 
 ## 5. Reglas de negocio y permisos

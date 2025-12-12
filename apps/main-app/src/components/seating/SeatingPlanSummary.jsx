@@ -129,7 +129,7 @@ export default function SeatingPlanSummary({
               <button
                 type="button"
                 onClick={onOpenAutoLayout}
-                className="inline-flex w-fit items-center gap-2 rounded-full bg-gradient-to-r from-blue-600 to-blue-500 px-5 py-2 text-sm font-semibold text-white shadow-md transition hover:from-blue-700 hover:to-blue-600 hover:shadow-lg"
+                className="inline-flex w-fit items-center gap-2 rounded-full bg-[var(--color-primary)] px-5 py-2 text-sm font-semibold text-white shadow-md transition hover:shadow-lg"
               >
                 <Sparkles className="h-4 w-4" />
                 {autoLayoutLabel}

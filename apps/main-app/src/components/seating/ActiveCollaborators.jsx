@@ -93,7 +93,7 @@ export default function ActiveCollaborators({ collaborators = [], locks = [], cl
                   {/* Status indicator */}
                   <div className="flex items-center gap-1">
                     <Circle
-                      className={`w-2 h-2 ${isActive ? 'text-green-500 fill-green-500' : 'text-gray-400 fill-gray-400'}`}
+                      className={`w-2 h-2 ${isActive ? 'text-[var(--color-primary)]' : 'text-gray-400 fill-gray-400'}`}
                     />
                   </div>
                 </motion.div>

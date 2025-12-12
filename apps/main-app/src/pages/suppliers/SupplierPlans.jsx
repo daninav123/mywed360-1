@@ -175,13 +175,13 @@ export default function SupplierPlans() {
     return (
       <div
         key={planKey}
-        className={`relative bg-white rounded-2xl shadow-lg p-8 ${
+        className={`relative bg-white rounded-2xl shadow-md p-8 ${
           plan.popular ? 'ring-4 ring-indigo-500 scale-105' : 'border border-gray-200'
         } transition-transform hover:scale-105`}
       >
         {plan.popular && (
           <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-            <span className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-1 rounded-full text-sm font-bold flex items-center gap-1">
+            <span className="bg-[var(--color-primary)] text-white px-4 py-1 rounded-full text-sm font-bold flex items-center gap-1">
               <Star size={14} fill="currentColor" />
               MÁS POPULAR
             </span>
@@ -235,7 +235,7 @@ export default function SupplierPlans() {
             isCurrentPlan
               ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
               : plan.popular
-                ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700'
+                ? 'bg-[var(--color-primary)] text-white hover:from-indigo-700 hover:to-purple-700'
                 : 'bg-gray-900 text-white hover:bg-gray-800'
           }`}
         >
@@ -254,7 +254,7 @@ export default function SupplierPlans() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-indigo-50 py-12 px-4">
+    <div className="min-h-screen bg-white py-12 px-4">
       <div className="max-w-7xl mx-auto">
         {/* Back button */}
         <button
@@ -308,7 +308,7 @@ export default function SupplierPlans() {
         </div>
 
         {/* FAQ Section */}
-        <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
+        <div className="bg-white rounded-2xl shadow-md p-8 mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
             Preguntas Frecuentes
           </h2>
@@ -349,7 +349,7 @@ export default function SupplierPlans() {
         </div>
 
         {/* Benefits Banner */}
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl shadow-lg p-8 text-white">
+        <div className="bg-[var(--color-primary)] rounded-2xl shadow-md p-8 text-white">
           <div className="text-center mb-6">
             <h2 className="text-3xl font-bold mb-2">¿Por qué mejorar tu plan?</h2>
             <p className="text-indigo-100">

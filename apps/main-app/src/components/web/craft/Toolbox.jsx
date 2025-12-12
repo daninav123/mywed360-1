@@ -114,7 +114,7 @@ export const Toolbox = () => {
             key={idx}
             ref={(ref) => connectors.create(ref, <Element canvas is={comp.component} />)}
             className="
-              bg-gradient-to-r from-blue-50 to-purple-50
+              bg-[var(--color-primary)]
               border-2 border-gray-200 rounded-lg p-3
               cursor-move hover:border-blue-400 hover:shadow-md
               transition-all transform hover:scale-105

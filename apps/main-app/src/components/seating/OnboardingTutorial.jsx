@@ -163,7 +163,7 @@ export default function OnboardingTutorial({ onComplete, onSkip }) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
+        className="fixed inset-0 bg-black/60  z-[100]"
         onClick={handleSkip}
       />
 
@@ -181,13 +181,13 @@ export default function OnboardingTutorial({ onComplete, onSkip }) {
             zIndex: 101,
             pointerEvents: 'none',
           }}
-          className="rounded-lg border-4 border-indigo-500 shadow-2xl shadow-indigo-500/50"
+          className="rounded-lg bg-[var(--color-primary)]md shadow-indigo-500/50"
         >
           {/* Pulso animado */}
           <motion.div
             animate={{ scale: [1, 1.1, 1], opacity: [0.5, 0.8, 0.5] }}
             transition={{ duration: 2, repeat: Infinity }}
-            className="absolute inset-0 bg-indigo-500/20 rounded-lg"
+            className="absolute inset-0 bg-[var(--color-primary)]/20 rounded-lg"
           />
         </motion.div>
       )}
@@ -215,21 +215,21 @@ export default function OnboardingTutorial({ onComplete, onSkip }) {
               }
         }
         onClick={(e) => e.stopPropagation()}
-        className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-[400px]"
+        className="bg-white dark:bg-gray-900 rounded-2xl shadow-md w-[400px]"
       >
         {/* Progress bar */}
         <div className="h-2 bg-gray-200 dark:bg-gray-800 rounded-t-2xl overflow-hidden">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${progress}%` }}
-            className="h-full bg-gradient-to-r from-indigo-600 to-purple-600"
+            className="h-full bg-[var(--color-primary)]"
           />
         </div>
 
         <div className="p-6">
           {/* Header con icono */}
           <div className="flex items-start gap-4 mb-4">
-            <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center">
+            <div className="flex-shrink-0 w-12 h-12 bg-[var(--color-primary)] rounded-xl flex items-center justify-center">
               <Icon className="w-6 h-6 text-white" />
             </div>
             <div className="flex-1">
@@ -284,7 +284,7 @@ export default function OnboardingTutorial({ onComplete, onSkip }) {
               
               <button
                 onClick={handleNext}
-                className="px-6 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-medium hover:shadow-lg hover:shadow-indigo-500/50 transition-all flex items-center gap-2"
+                className="px-6 py-2 bg-[var(--color-primary)] text-white rounded-lg font-medium hover:shadow-lg hover:shadow-indigo-500/50 transition-all flex items-center gap-2"
               >
                 {isLast ? (
                   <>

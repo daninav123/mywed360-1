@@ -186,7 +186,7 @@ const PublicRSVP = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--color-primary)] flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-purple-600 mx-auto mb-4"></div>
           <p className="text-gray-600 text-lg">Cargando...</p>
@@ -197,7 +197,7 @@ const PublicRSVP = () => {
 
   if (!webData) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--color-primary)] flex items-center justify-center">
         <div className="text-center">
           <div className="text-6xl mb-4">😕</div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Web no encontrada</h1>
@@ -208,7 +208,7 @@ const PublicRSVP = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 py-12 px-4">
+    <div className="min-h-screen bg-[var(--color-primary)] py-12 px-4">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
@@ -218,7 +218,7 @@ const PublicRSVP = () => {
 
         {/* PASO 1: Buscar por nombre */}
         {step === 1 && (
-          <div className="bg-white rounded-xl shadow-lg p-8">
+          <div className="bg-white rounded-xl shadow-md p-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">¿Cuál es tu nombre?</h2>
             <p className="text-gray-600 mb-6">
               Introduce tu nombre completo tal como aparece en la invitación
@@ -237,7 +237,7 @@ const PublicRSVP = () => {
               <button
                 type="submit"
                 disabled={searching}
-                className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-50"
+                className="w-full px-6 py-3 bg-[var(--color-primary)] text-white rounded-lg font-semibold hover:shadow-md transition-all disabled:opacity-50"
               >
                 {searching ? 'Buscando...' : 'Continuar'}
               </button>
@@ -251,7 +251,7 @@ const PublicRSVP = () => {
 
         {/* PASO 2: Formulario de confirmación */}
         {step === 2 && guestData && (
-          <div className="bg-white rounded-xl shadow-lg p-8">
+          <div className="bg-white rounded-xl shadow-md p-8">
             <div className="mb-6">
               <h2 className="text-2xl font-bold text-gray-900">¡Hola, {guestData.nombre}!</h2>
               <p className="text-gray-600">Por favor, confirma tu asistencia</p>
@@ -285,7 +285,7 @@ const PublicRSVP = () => {
                     onClick={() => setFormData({ ...formData, asistira: true })}
                     className={`px-6 py-4 rounded-lg font-semibold transition-all ${
                       formData.asistira === true
-                        ? 'bg-green-600 text-white shadow-lg'
+                        ? 'bg-green-600 text-white shadow-md'
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   >
@@ -298,7 +298,7 @@ const PublicRSVP = () => {
                     }
                     className={`px-6 py-4 rounded-lg font-semibold transition-all ${
                       formData.asistira === false
-                        ? 'bg-red-600 text-white shadow-lg'
+                        ? 'bg-red-600 text-white shadow-md'
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   >
@@ -523,7 +523,7 @@ const PublicRSVP = () => {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-50"
+                  className="flex-1 px-6 py-3 bg-[var(--color-primary)] text-white rounded-lg font-semibold hover:shadow-md transition-all disabled:opacity-50"
                 >
                   {submitting ? 'Guardando...' : '✅ Confirmar Asistencia'}
                 </button>
@@ -534,7 +534,7 @@ const PublicRSVP = () => {
 
         {/* PASO 3: Confirmación */}
         {step === 3 && (
-          <div className="bg-white rounded-xl shadow-lg p-8 text-center">
+          <div className="bg-white rounded-xl shadow-md p-8 text-center">
             <div className="text-6xl mb-4">{formData.asistira ? '🎉' : '😔'}</div>
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
               {formData.asistira ? '¡Confirmación Recibida!' : 'Gracias por Informarnos'}
@@ -558,7 +558,7 @@ const PublicRSVP = () => {
 
             <a
               href={`/web/${slug}`}
-              className="inline-block px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all"
+              className="inline-block px-6 py-3 bg-[var(--color-primary)] text-white rounded-lg font-semibold hover:shadow-md transition-all"
             >
               Volver a la Web
             </a>

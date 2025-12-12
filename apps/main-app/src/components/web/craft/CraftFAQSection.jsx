@@ -155,7 +155,7 @@ export const CraftFAQSection = ({
           <div className="flex flex-wrap justify-center gap-4">
             <a
               href="mailto:contacto@ejemplo.com"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:shadow-lg transition-all font-semibold"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--color-primary)] text-white rounded-lg hover:shadow-lg transition-all font-semibold"
             >
               📧 Enviar Email
             </a>

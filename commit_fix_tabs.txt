@@ -1,7 +1,0 @@
-fix: restaurar SeatingPlanTabs y añadir data-tour
-
-- Restaurado SeatingPlanTabs.jsx desde Git
-- Añadido data-tour="tabs" correctamente
-- Arreglado error de sintaxis corrupta
-- Lint pasando en componentes seating
-- Preparado para tests E2E

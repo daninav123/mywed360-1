@@ -20,7 +20,7 @@ const WebDesignStepper = ({ currentStep, onStepClick }) => {
       case 'completed':
         return 'bg-green-500 border-green-500 text-white';
       case 'current':
-        return 'bg-blue-600 border-blue-600 text-white ring-4 ring-blue-100';
+        return 'bg-blue-600 text-white ring-4 ring-blue-100';
       case 'pending':
         return 'bg-gray-100 border-gray-300 text-gray-400';
       default:
@@ -33,7 +33,7 @@ const WebDesignStepper = ({ currentStep, onStepClick }) => {
   };
 
   return (
-    <div className="bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 rounded-2xl shadow-lg px-8 py-6 mb-8">
+    <div className="bg-white rounded-2xl shadow-lg px-8 py-6 mb-8">
       <div className="max-w-4xl mx-auto">
         {/* Steps */}
         <div className="relative">
@@ -140,7 +140,7 @@ const WebDesignStepper = ({ currentStep, onStepClick }) => {
             </div>
             <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden max-w-xs">
               <div
-                className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-500 ease-in-out"
+                className="h-full bg-[var(--color-primary)] transition-all duration-500 ease-in-out"
                 style={{ width: `${((currentStep - 1) / (steps.length - 1)) * 100}%` }}
               />
             </div>

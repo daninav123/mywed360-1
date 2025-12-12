@@ -56,7 +56,7 @@ const ProveedorCardNuevo = ({ proveedor, onClick, onToggleFavorito, onEditar, on
       onClick={() => onClick(proveedor)}
     >
       {/* Cabecera con imagen y acciones */}
-      <div className="relative h-36 bg-gradient-to-r from-blue-500 to-purple-500">
+      <div className="relative h-36 bg-[var(--color-primary)]">
         {proveedor.imagen && (
           <img
             src={proveedor.imagen}

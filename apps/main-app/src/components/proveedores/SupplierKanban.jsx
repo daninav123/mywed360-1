@@ -55,7 +55,7 @@ export default function SupplierKanban({ proveedores = [], onMove, onClick, show
       {columns.map((col) => (
         <div
           key={col.key}
-          className="rounded-2xl border border-dashed border-[color:var(--color-text)]/15 bg-white/75 backdrop-blur-sm flex flex-col shadow-sm"
+          className="rounded-2xl border border-dashed border-[color:var(--color-text)]/15 bg-white/75  flex flex-col shadow-sm"
           onDragOver={(e) => e.preventDefault()}
           onDrop={(e) => handleDrop(e, col.key)}
         >
@@ -107,7 +107,7 @@ export default function SupplierKanban({ proveedores = [], onMove, onClick, show
                     </span>
                   )}
                   {showNextAction && prov?.proximaAccion && (
-                    <span className="px-2 py-0.5 rounded border border-blue-200 bg-blue-50 text-blue-700">
+                    <span className="px-2 py-0.5 rounded bg-[var(--color-primary)] text-blue-700">
                       {t('suppliers.kanban.badges.nextAction', { value: prov.proximaAccion })}
                     </span>
                   )}

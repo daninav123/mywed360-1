@@ -120,10 +120,10 @@ const SetupChecklist = ({ onDismiss }) => {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-lg border-2 border-purple-200 overflow-hidden">
+    <div className="bg-white rounded-lg shadow border-2 border-purple-200 overflow-hidden">
       {/* Header */}
       <div 
-        className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-3 cursor-pointer"
+        className="bg-[var(--color-primary)] text-white px-4 py-3 cursor-pointer"
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <div className="flex items-center justify-between">
@@ -161,7 +161,7 @@ const SetupChecklist = ({ onDismiss }) => {
       {/* Progress Bar */}
       <div className="bg-gray-100">
         <div 
-          className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 transition-all duration-500"
+          className="bg-[var(--color-primary)] h-2 transition-all duration-500"
           style={{ width: `${progress}%` }}
         />
       </div>

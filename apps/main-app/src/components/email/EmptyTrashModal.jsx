@@ -14,12 +14,12 @@ const EmptyTrashModal = ({ isOpen, onConfirm, onClose }) => {
 
   return (
     <div
-      className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50 p-4"
+      className="fixed inset-0 flex items-center justify-center bg-black/50  z-50 p-4"
       role="dialog"
       aria-modal="true"
       data-testid="empty-trash-modal"
     >
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-sm">
+      <div className="bg-white rounded-lg w-full max-w-sm">
         <div className="flex items-center justify-between px-4 py-2 border-b">
           <h2 className="text-lg font-semibold">Vaciar papelera</h2>
           <button

@@ -74,7 +74,7 @@ export default function Minimap({
       exit={{ opacity: 0, scale: 0.8 }}
       className={`fixed ${positionStyles[position]} z-20`}
     >
-      <div className="bg-gray-900/90 backdrop-blur-sm border border-gray-700 rounded-lg p-2 shadow-2xl">
+      <div className="bg-gray-900/90  border border-gray-700 rounded-lg p-2 shadow-2xl">
         {/* Header */}
         <div className="text-xs text-gray-400 mb-1 px-1 flex items-center justify-between">
           <span>Minimap</span>

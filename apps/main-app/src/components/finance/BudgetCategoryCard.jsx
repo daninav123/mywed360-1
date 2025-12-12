@@ -31,11 +31,11 @@ export default function BudgetCategoryCard({
       ? 'border-[var(--color-warning)]/40'
       : 'border-[var(--color-success)]/30';
 
-  const gradientFrom = isDanger
-    ? 'from-[var(--color-danger)]/10'
+  const bgColor = isDanger
+    ? 'bg-[var(--color-danger)]/10'
     : isWarning
-      ? 'from-[var(--color-warning)]/10'
-      : 'from-[var(--color-success)]/10';
+      ? 'bg-[var(--color-warning)]/10'
+      : 'bg-[var(--color-success)]/10';
 
   const barColor = isDanger
     ? 'bg-[var(--color-danger)]'
@@ -53,7 +53,7 @@ export default function BudgetCategoryCard({
 
   return (
     <div
-      className={`relative overflow-hidden rounded-xl border-2 ${borderColor} bg-gradient-to-br ${gradientFrom} to-transparent backdrop-blur-sm transition-all duration-300 hover:shadow-lg hover:scale-[1.02]`}
+      className={`relative rounded-xl border-2 ${borderColor} ${bgColor} bg-[var(--color-surface)] shadow-md transition-all duration-300 hover:shadow-lg`}
     >
       {/* Header */}
       <div className="p-4 border-b border-[color:var(--color-text)]/10">
@@ -100,7 +100,7 @@ export default function BudgetCategoryCard({
               className={`${barColor} h-full rounded-full transition-all duration-500 ease-out relative`}
               style={{ width: `${progressPercent}%` }}
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" />
+              <div className="absolute inset-0 bg-[var(--color-primary)]/20 to-transparent animate-shimmer" />
             </div>
           </div>
           <div className="flex items-center justify-between text-xs">

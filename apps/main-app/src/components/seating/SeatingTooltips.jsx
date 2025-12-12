@@ -123,11 +123,11 @@ export default function SeatingTooltips({ state = {}, onAction, position = 'bott
   };
 
   const colorClasses = {
-    blue: 'from-blue-500 to-cyan-600',
-    indigo: 'from-indigo-500 to-purple-600',
-    purple: 'from-purple-500 to-pink-600',
-    green: 'from-green-500 to-emerald-600',
-    orange: 'from-orange-500 to-red-600',
+    blue: 'bg-blue-500',
+    indigo: 'bg-indigo-500',
+    purple: 'bg-purple-500',
+    green: 'bg-green-500',
+    orange: 'bg-orange-500',
   };
 
   if (!activeTooltip) return null;
@@ -144,12 +144,12 @@ export default function SeatingTooltips({ state = {}, onAction, position = 'bott
         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
         className={`fixed ${positionClasses[position]} z-[9998] max-w-sm`}
       >
-        <div className="bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden">
+        <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
           {/* Header con gradiente */}
           <div className={`bg-gradient-to-r ${colorClass} p-4 text-white`}>
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
+                <div className="p-2 bg-white/20 rounded-lg ">
                   <Icon className="w-5 h-5" />
                 </div>
                 <h3 className="font-bold text-lg">{activeTooltip.title}</h3>

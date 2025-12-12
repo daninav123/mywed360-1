@@ -118,12 +118,7 @@ async function fetchFromBackend({ page, pageSize, language, skipLocalCandidates 
         timeout: timeoutMs,
         validateStatus: () => true,
       });
-      // console.info('[blogService] candidato wedding-news', {
-        base,
-        status: resp.status,
-        isArray: Array.isArray(resp.data),
-        length: Array.isArray(resp.data) ? resp.data.length : undefined,
-      });
+      // console.info('[blogService] candidato wedding-news', { base, status: resp.status, isArray: Array.isArray(resp.data), length: Array.isArray(resp.data) ? resp.data.length : undefined });
       if (resp.status < 400 && Array.isArray(resp.data)) {
         clearCandidateBackoff(base);
         if (resp.data.length > 0) return resp.data;
@@ -134,10 +129,7 @@ async function fetchFromBackend({ page, pageSize, language, skipLocalCandidates 
       sawError = true;
       backoffCandidate(base);
     } catch (error) {
-      // console.warn('[blogService] error al consultar wedding-news', {
-        base,
-        message: error?.message,
-      });
+      // console.warn('[blogService] error al consultar wedding-news', { base, message: error?.message });
       sawError = true;
       backoffCandidate(
         base,
@@ -620,11 +612,7 @@ export async function fetchWeddingNews(page = 1, pageSize = 10, language = 'es')
     }
     if (!API_KEY) {
       if (fallbackBatch.length) {
-        // console.info('[blogService] usando fallback wedding-news', {
-          page,
-          lang,
-          size: fallbackBatch.length,
-        });
+        // console.info('[blogService] usando fallback wedding-news', { page, lang, size: fallbackBatch.length });
         return fallbackBatch;
       }
       return [];
@@ -640,11 +628,7 @@ export async function fetchWeddingNews(page = 1, pageSize = 10, language = 'es')
 
   if (!API_KEY) {
     if (fallbackBatch.length) {
-      // console.info('[blogService] usando fallback wedding-news', {
-        page,
-        lang,
-        size: fallbackBatch.length,
-      });
+      // console.info('[blogService] usando fallback wedding-news', { page, lang, size: fallbackBatch.length });
       return fallbackBatch;
     }
     return [];
@@ -654,11 +638,7 @@ export async function fetchWeddingNews(page = 1, pageSize = 10, language = 'es')
     const news = await fetchFromNewsApi(page, pageSize, lang);
     if (!news.length) {
       if (fallbackBatch.length) {
-        // console.info('[blogService] usando fallback wedding-news', {
-          page,
-          lang,
-          size: fallbackBatch.length,
-        });
+        // console.info('[blogService] usando fallback wedding-news', { page, lang, size: fallbackBatch.length });
         return fallbackBatch;
       }
       return [];
@@ -670,11 +650,7 @@ export async function fetchWeddingNews(page = 1, pageSize = 10, language = 'es')
   } catch (error) {
     // console.warn('[blogService] NewsAPI fallback failed', error);
     if (fallbackBatch.length) {
-      // console.info('[blogService] usando fallback wedding-news', {
-        page,
-        lang,
-        size: fallbackBatch.length,
-      });
+      // console.info('[blogService] usando fallback wedding-news', { page, lang, size: fallbackBatch.length });
       return fallbackBatch;
     }
     return [];

@@ -157,7 +157,7 @@ const SmartFiltersBar = ({ weddingProfile, onFiltersChange, className = '' }) =>
   const financeSection = t('navigation.finance');
 
   const containerClassName =
-    `bg-gradient-to-r from-primary/5 to-accent/5 border-primary/20 ${className}`.trim();
+    `bg-[var(--color-primary)]accent/5 border-primary/20 ${className}`.trim();
 
   return (
     <Card className={containerClassName}>

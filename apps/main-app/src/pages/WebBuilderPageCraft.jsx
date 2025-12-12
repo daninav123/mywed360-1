@@ -79,7 +79,7 @@ const EditorHeader = ({
             <ThemeSelector temaActual={tema} onTemaChange={onTemaChange} />
             <button
               onClick={onMostrarEstilos}
-              className="px-3 py-2 bg-purple-50 border border-purple-300 text-purple-700 rounded-lg hover:bg-purple-100 transition-colors text-sm font-medium"
+              className="px-3 py-2 bg-purple-50 bg-[var(--color-primary)] text-purple-700 rounded-lg hover:bg-purple-100 transition-colors text-sm font-medium"
               title="Personalizar colores, fuentes y decoraciones"
             >
               ✨ Estilos
@@ -140,7 +140,7 @@ const EditorHeader = ({
 
             <button
               onClick={onPublish}
-              className="px-5 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:shadow-lg transition-all text-sm font-bold"
+              className="px-5 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:shadow-md transition-all text-sm font-bold"
               title="Publicar web para que los invitados la vean"
             >
               ✨ Publicar
@@ -417,12 +417,11 @@ const WebBuilderPageCraft = () => {
       Object.keys(parsedJson).forEach((nodeId) => {
         const node = parsedJson[nodeId];
         if (node.props?.className && node.props.className.includes('bg-white')) {
-          // Reemplazar bg-white por bg-white/10 backdrop-blur-md
-          const oldClassName = node.props.className;
+          // Reemplazar bg-white por bg-white/10           const oldClassName = node.props.className;
           node.props.className = node.props.className
-            .replace(/bg-white\/95\s+backdrop-blur-sm/g, 'bg-white/10 backdrop-blur-md')
-            .replace(/bg-white\s/g, 'bg-white/10 backdrop-blur-md ')
-            .replace(/bg-white$/g, 'bg-white/10 backdrop-blur-md');
+            .replace(/bg-white\/95\s+/g, 'bg-white/10 ')
+            .replace(/bg-white\s/g, 'bg-white/10  ')
+            .replace(/bg-white$/g, 'bg-white/10 ');
           if (oldClassName !== node.props.className) {
             cambios++;
           }
@@ -561,7 +560,7 @@ const WebBuilderPageCraft = () => {
                       '--color-texto-claro': tema?.colores?.textoClaro || '#FFFFFF',
                       '--fuente-titulo': tema?.fuentes?.titulo || 'Arial',
                       '--fuente-texto': tema?.fuentes?.texto || 'Arial',
-                      backgroundColor: 'transparent', // Transparente para que se vea el fondo del padre
+                      ndColor: 'transparent', // Transparente para que se vea el fondo del padre
                     }}
                   >
                     <Frame>
@@ -570,7 +569,7 @@ const WebBuilderPageCraft = () => {
                         is="div"
                         className="min-h-screen w-full"
                         style={{
-                          backgroundColor: 'transparent',
+                          ndColor: 'transparent',
                           position: 'relative',
                         }}
                         data-cy="canvas-root"

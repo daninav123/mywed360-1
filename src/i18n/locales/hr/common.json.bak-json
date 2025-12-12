@@ -1,9 +1,0 @@
-{
-  "app": {
-    "name": "MaLove.App",
-    "brandName": "Lovenda",
-    "loading": "Loading...",
-    "error": "Error",
-    "success": "Success"
-  }
-}

@@ -69,12 +69,12 @@ const ToolbarButton = ({
       <div
         className="absolute left-full ml-3 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg 
                       opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity
-                      whitespace-nowrap z-50 shadow-xl"
+                      whitespace-nowrap z-50 shadow-md"
       >
         <div className="flex items-center gap-2">
           <span>{label}</span>
           {shortcut && (
-            <kbd className="px-2 py-0.5 bg-gray-800 rounded text-xs font-mono">{shortcut}</kbd>
+            <kbd className="px-2 py-0.5 bg-[var(--color-primary)]xs font-mono">{shortcut}</kbd>
           )}
         </div>
         {/* Arrow */}
@@ -261,7 +261,7 @@ export default function SeatingToolbarFloating({
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
       className="fixed left-4 top-1/2 -translate-y-1/2 z-40
                  w-16 bg-[#1A1A1D]/95 backdrop-blur-xl
-                 border border-white/10 rounded-2xl shadow-2xl
+                 border border-white/10 rounded-2xl shadow-md
                  py-3 px-2
                  flex flex-col items-center gap-1"
     >

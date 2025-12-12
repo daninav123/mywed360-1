@@ -283,7 +283,7 @@ Colección: suppliers/{supplierId}/portfolio
 - [ ] Añadir páginas de proveedores al sitemap.xml
   ```xml
   <url>
-    <loc>https://mywed360.com/p/nombre-proveedor</loc>
+    <loc>https://MaLove.App.com/p/nombre-proveedor</loc>
     <lastmod>2025-01-15</lastmod>
     <priority>0.8</priority>
   </url>

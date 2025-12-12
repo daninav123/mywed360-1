@@ -200,7 +200,7 @@ export default function InitialSetupWizard({
                 )}
 
                 {currentStep === 1 && (
-                  <div className="bg-purple-50 dark:bg-purple-900/20 rounded-xl p-6 border-2 border-dashed border-purple-300 dark:border-purple-700">
+                  <div className="bg-white dark:bg-gray-900 rounded-xl p-6 border-2 border-[var(--color-primary)]">
                     <h3 className="font-semibold text-[var(--color-text)] mb-3 flex items-center gap-2">
                       <LayoutGrid className="w-5 h-5 text-[var(--color-primary)]" />
                       {t('initialWizard.sections.template.title', { ns: 'seating' })}

@@ -40,7 +40,7 @@ const EXPORT_FORMATS = [
     name: 'SVG Editable',
     description: 'Para diseñadores',
     icon: Layout,
-    color: 'from-purple-500 to-violet-600',
+    color: 'bg-[var(--color-primary)]',
     options: ['includeNames'],
   },
   {
@@ -109,7 +109,7 @@ export default function ExportWizardEnhanced({ isOpen, onClose, onExport, canvas
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
-          className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+          className="absolute inset-0 bg-black/60 "
         />
 
         {/* Modal */}
@@ -117,10 +117,10 @@ export default function ExportWizardEnhanced({ isOpen, onClose, onExport, canvas
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
-          className="relative w-full max-w-5xl max-h-[90vh] bg-white rounded-2xl shadow-2xl overflow-hidden"
+          className="relative w-full max-w-5xl max-h-[90vh] bg-white rounded-2xl shadow-md overflow-hidden"
         >
           {/* Header */}
-          <div className="px-6 py-5 bg-gradient-to-r from-indigo-500 to-purple-600">
+          <div className="px-6 py-5 bg-[var(--color-primary)]">
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-2xl font-bold text-white">Asistente de Exportación</h2>
@@ -172,11 +172,11 @@ export default function ExportWizardEnhanced({ isOpen, onClose, onExport, canvas
                         className="group relative p-6 border-2 border-gray-200 rounded-xl hover:border-indigo-400 transition-all duration-300 text-left"
                       >
                         <div
-                          className={`absolute inset-0 bg-gradient-to-br ${format.color} opacity-0 group-hover:opacity-10 rounded-xl transition-opacity`}
+                          className={`absolute inset-0 bg-[var(--color-primary)] group-hover:opacity-10 rounded-xl transition-opacity`}
                         />
                         <div className="relative">
                           <div
-                            className={`inline-flex p-3 rounded-lg bg-gradient-to-br ${format.color} mb-4`}
+                            className={`inline-flex p-3 rounded-lg bg-[var(--color-primary)] mb-4`}
                           >
                             <Icon className="w-6 h-6 text-white" />
                           </div>

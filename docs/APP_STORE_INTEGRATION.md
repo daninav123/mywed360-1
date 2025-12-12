@@ -41,10 +41,10 @@ La integraci�n con App Store permite que el **panel de administraci�n vea au
 
 | Product ID | Tipo | Precio | Duraci�n |
 |------------|------|--------|----------|
-| `com.mywed360.premium.monthly` | Auto-Renewable Subscription | �9.99 | 1 mes |
-| `com.mywed360.premium.yearly` | Auto-Renewable Subscription | �99.99 | 1 a�o |
-| `com.mywed360.premium_plus.monthly` | Auto-Renewable Subscription | �19.99 | 1 mes |
-| `com.mywed360.premium_plus.yearly` | Auto-Renewable Subscription | �199.99 | 1 a�o |
+| `com.MaLove.App.premium.monthly` | Auto-Renewable Subscription | �9.99 | 1 mes |
+| `com.MaLove.App.premium.yearly` | Auto-Renewable Subscription | �99.99 | 1 a�o |
+| `com.MaLove.App.premium_plus.monthly` | Auto-Renewable Subscription | �19.99 | 1 mes |
+| `com.MaLove.App.premium_plus.yearly` | Auto-Renewable Subscription | �199.99 | 1 a�o |
 
 ### **Paso 2: Obtener Shared Secret**
 
@@ -149,7 +149,7 @@ Content-Type: application/json
 {
   "valid": true,
   "subscription": {
-    "productId": "com.mywed360.premium.monthly",
+    "productId": "com.MaLove.App.premium.monthly",
     "expiresDate": "2025-11-22T19:45:00.000Z"
   }
 }
@@ -178,7 +178,7 @@ let base64Receipt = receiptData.base64EncodedString()
     "platform": "ios",
     "status": "active",
     "plan": "premium",
-    "productId": "com.mywed360.premium.monthly",
+    "productId": "com.MaLove.App.premium.monthly",
     "purchaseDate": "2025-10-22T19:00:00.000Z",
     "expiresDate": "2025-11-22T19:00:00.000Z",
     "monthlyAmount": 9.99,
@@ -198,7 +198,7 @@ let base64Receipt = receiptData.base64EncodedString()
   // IDs de Apple
   transactionId: "1234567890",
   originalTransactionId: "0987654321", // Document ID
-  productId: "com.mywed360.premium.monthly",
+  productId: "com.MaLove.App.premium.monthly",
   
   // Estado
   status: "active" | "expired" | "past_due" | "refunded" | "canceled",
@@ -437,12 +437,12 @@ Configura tus product IDs en `app-store-webhook.js`:
 
 ```javascript
 const PRODUCT_ID_TO_PLAN = {
-  'com.mywed360.premium.monthly': { 
+  'com.MaLove.App.premium.monthly': { 
     plan: 'premium', 
     interval: 'month', 
     amount: 9.99 
   },
-  'com.mywed360.premium.yearly': { 
+  'com.MaLove.App.premium.yearly': { 
     plan: 'premium', 
     interval: 'year', 
     amount: 99.99 

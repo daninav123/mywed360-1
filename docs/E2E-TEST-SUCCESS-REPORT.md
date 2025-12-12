@@ -343,7 +343,7 @@ npx cypress run --spec "cypress/e2e/**/*-real.cy.js"
 
 ## 📞 Contacto y Soporte
 
-**Repositorio:** https://github.com/Daniel-Navarro-Campos/mywed360  
+**Repositorio:** https://github.com/Daniel-Navarro-Campos/MaLove.App  
 **Documentación:** `docs/E2E-MIGRATION-PROGRESS.md`  
 **Este Reporte:** `docs/E2E-TEST-SUCCESS-REPORT.md`
 

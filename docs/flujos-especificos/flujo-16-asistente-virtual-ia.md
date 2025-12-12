@@ -27,7 +27,7 @@
    - Si detecta `profileGaps`, `style_balance_alert` o `recommendation_conflict`, inicia follow-ups automáticos con CTA para resolverlos (crear tarea, abrir proveedor, ajustar presupuesto).
    - Fallback offline personalizado menciona el tipo de evento y guía rutas manuales.
 3. **Notas importantes**
-   - Cada mensaje puede marcarse “⭐ importante”; se guarda en `importantNotes` y dispara evento `mywed360-important-note`.
+   - Cada mensaje puede marcarse “⭐ importante”; se guarda en `importantNotes` y dispara evento `MaLove.App-important-note`.
 4. **Persistencia**
    - `chatSummary` almacena conversaciones compactadas.
    - Si se dispone de token (OAuth vigente) se intenta llamar a `/api/ai/parse-dialog` (con fallback local contextual); si falla, se usa fallback local con mensajes predefinidos.
@@ -59,7 +59,7 @@ oGoItems; si el usuario insiste, solicita confirmación adicional y registra la 
 ## 8. Métricas y monitorización (MVP)
 - Eventos básicos: `chat_opened`, `chat_message_sent`, `chat_mark_important` (registrados localmente).
 - No hay agregadores centralizados; se prevé usar `assistantMetrics` en la fase de orquestador.
-- Logs locales mediante `window.mywed360Debug` para diagnóstico.
+- Logs locales mediante `window.MaLove.AppDebug` para diagnóstico.
 
 ## 9. Pruebas recomendadas
 - Unitarias: utilidades del widget (parser de comandos, compactación, marcado importante, calculo de follow-ups y etiqueta de contrastes).

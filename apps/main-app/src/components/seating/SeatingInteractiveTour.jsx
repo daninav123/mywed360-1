@@ -202,7 +202,7 @@ export default function SeatingInteractiveTour({
       {tourCompleted && (
         <button
           onClick={startTour}
-          className="fixed bottom-6 right-6 p-4 bg-gradient-to-r from-indigo-500 to-purple-600 
+          className="fixed bottom-6 right-6 p-4 bg-[var(--color-primary)] 
                      text-white rounded-full shadow-lg hover:shadow-xl transition-all
                      hover:scale-110 z-[9999] group"
           title="Ver tour de nuevo"

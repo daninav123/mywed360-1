@@ -47,7 +47,7 @@ const GuestItem = ({ guest, onRemove }) => (
                bg-white/5 hover:bg-white/10 transition-colors group"
   >
     <div className="flex items-center gap-2">
-      <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 
+      <div className="w-6 h-6 rounded-full bg-[var(--color-surface)]e-600 
                       flex items-center justify-center text-white text-xs font-medium">
         {guest.name?.charAt(0)?.toUpperCase() || 'I'}
       </div>

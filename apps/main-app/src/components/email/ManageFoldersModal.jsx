@@ -31,17 +31,17 @@ const ManageFoldersModal = ({ isOpen, onClose, folders = [], onDeleteFolder }) =
 
   return (
     <div
-      className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50 p-4"
+      className="fixed inset-0 flex items-center justify-center bg-black/50  z-50 p-4"
       role="dialog"
       aria-modal="true"
       data-testid="folders-manager-modal"
     >
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-md">
+      <div className="bg-white rounded-lg w-full max-w-md">
         {/* Cabecera */}
         <div className="flex items-center justify-between px-4 py-2 border-b">
           <h2 className="text-lg font-semibold">Gestor de carpetas</h2>
           <button
-            className="text-gray-500 hover:text-gray-700 p-1 rounded"
+            className="text-[var(--color-primary)] p-1 rounded"
             aria-label="Cerrar"
             data-testid="close-modal-button"
             onClick={onClose}

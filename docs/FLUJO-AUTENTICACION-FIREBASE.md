@@ -16,7 +16,7 @@ import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
 
 const firebaseConfig = {
   projectId: 'maloveapp',
-  authDomain: 'mywed360.firebaseapp.com',
+  authDomain: 'MaLove.App.firebaseapp.com',
   // ... resto de configuración
 };
 

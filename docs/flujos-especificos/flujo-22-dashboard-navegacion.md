@@ -59,10 +59,10 @@
 
 | Tarjeta | Que muestra | Fuente de datos actual | Destino final esperado | Notas |
 |---------|-------------|------------------------|------------------------|-------|
-| Invitados confirmados | Numero de invitados con `status/response = "confirmado"` | `localStorage.mywed360Guests` (seed de QA) | `weddings/{id}/guests` (Firestore) con agregados `guestsStats.confirmed` | Para planner/assistant aparece en 3.er lugar; para owners es la primera tarjeta. |
+| Invitados confirmados | Numero de invitados con `status/response = "confirmado"` | `localStorage.MaLove.AppGuests` (seed de QA) | `weddings/{id}/guests` (Firestore) con agregados `guestsStats.confirmed` | Para planner/assistant aparece en 3.er lugar; para owners es la primera tarjeta. |
 | Presupuesto gastado | `totalSpent` y, si existe, `totalBudget` (`gastado / presupuesto`) | `useFinance().stats` (lee `weddings/{id}/finance/main`) | Mismo hook, pero con datos en vivo post migraciones (CSV/Excel, contribuciones) | Formatea con `toLocaleString`; cuando no hay presupuesto, solo muestra el monto gastado. |
 | Proveedores contratados | Proveedores habilitados frente a objetivo (`asignados / totalNecesario`) | `localStorage.lovendaProviders` (seed) con total fijo `8` | Subcoleccion `weddings/{id}/suppliers` + metas configurables por plan | Ordenada segundo para owners; planners ven "Proveedores asignados" (solo numero). |
-| Tareas completadas | Tareas marcadas como hechas frente al total (`completadas / totales`) | `localStorage.tasksCompleted`, `localStorage.mywed360Meetings`, `localStorage.lovendaLongTasks` | `weddings/{id}/tasks` con agregados (`tasksStats.completed/total`) | Los planners ven "Tareas asignadas" (totales) + esta tarjeta en puesto cuarto. |
+| Tareas completadas | Tareas marcadas como hechas frente al total (`completadas / totales`) | `localStorage.tasksCompleted`, `localStorage.MaLove.AppMeetings`, `localStorage.lovendaLongTasks` | `weddings/{id}/tasks` con agregados (`tasksStats.completed/total`) | Los planners ven "Tareas asignadas" (totales) + esta tarjeta en puesto cuarto. |
 
 - Todas las tarjetas comparten el mismo tratamiento visual (`Card` con icono lucide e incremento hover).
 - Actualmente no son clicables; la iteraci�n siguiente enlazar� cada tarjeta con su m�dulo (`/invitados`, `/finance`, `/proveedores`, `/tasks`).
@@ -72,8 +72,8 @@
 
 | Bot�n | Acci�n | Comportamiento actual | Persistencia provisional | Observaciones |
 |-------|--------|-----------------------|--------------------------|---------------|
-| Buscar proveedor | Abre `ProviderSearchModal`, permite buscar por servicio/presupuesto y seleccionar un resultado. | Guarda el proveedor elegido en `localStorage.lovendaProviders`, emite `mywed360-providers` y muestra `toast.success`. | Migrar� a `weddings/{id}/suppliers` con seeds propios. | Se elimin� el CTA Ir a proveedores; todo sucede dentro del modal. |
-| A�adir invitado | Captura nombre, parte y contacto en un formulario liviano. | Inserta el registro en `localStorage.mywed360Guests` y muestra `toast.success`. | Futuro: creaci�n directa en `weddings/{id}/guests`. | No redirige; pensado para alta r�pida. |
+| Buscar proveedor | Abre `ProviderSearchModal`, permite buscar por servicio/presupuesto y seleccionar un resultado. | Guarda el proveedor elegido en `localStorage.lovendaProviders`, emite `MaLove.App-providers` y muestra `toast.success`. | Migrar� a `weddings/{id}/suppliers` con seeds propios. | Se elimin� el CTA Ir a proveedores; todo sucede dentro del modal. |
+| A�adir invitado | Captura nombre, parte y contacto en un formulario liviano. | Inserta el registro en `localStorage.MaLove.AppGuests` y muestra `toast.success`. | Futuro: creaci�n directa en `weddings/{id}/guests`. | No redirige; pensado para alta r�pida. |
 | A�adir movimiento | Permite registrar concepto, monto, fecha y tipo. | Guarda en `localStorage.quickMovements`, dispara `toast.success`. | Evolucionar� a `finance/main.movements` o `finance/main/transactions`. | Mantiene compatibilidad con seeds de QA. |
 | Nueva nota | Editor breve para ideas r�pidas. | Guarda en `localStorage.lovendaNotes` y confirma con `toast.success`. | Destino futuro `weddings/{id}/ideas`/`notes`. | Sin navegaci�n adicional. |
 

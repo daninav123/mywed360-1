@@ -187,7 +187,7 @@ function Invitados() {
 
       const message = t('guests.saveTheDate.message', {
         defaultValue:
-          'Hola somos {{p1}}{{p2Suffix}}, tenemos un notici�n s�per importante que compartir contigo. �Nos casamos! Res�rvate el {{date}} porque queremos contar contigo.',
+          '¡Hola! Somos {{p1}}{{p2Suffix}}, tenemos un notición súper importante que compartir contigo. ¡Nos casamos! Resérvate el {{date}} porque queremos contar contigo.',
         p1: primaryName,
         p2Suffix,
         date: fechaFmt,
@@ -198,10 +198,10 @@ function Invitados() {
       return {
         saveTheDateMessage: t('guests.saveTheDate.messageFallback', {
           defaultValue:
-            '�Hola! Tenemos un notici�n s�per importante que compartir contigo. �Nos casamos! �Res�rvate la fecha porque queremos contar contigo!',
+            '¡Hola! Tenemos un notición súper importante que compartir contigo. ¡Nos casamos! ¡Resérvate la fecha porque queremos contar contigo!',
         }),
         coupleLabel:
-          t('guests.saveTheDate.coupleFallback', { defaultValue: 'our wedding' }) || 'our wedding',
+          t('guests.saveTheDate.coupleFallback', { defaultValue: 'nuestra boda' }) || 'nuestra boda',
       };
     }
   }, [weddings, activeWedding, activeWeddingInfo, t]);
@@ -210,7 +210,7 @@ function Invitados() {
 
   const defaultInvitationMessage = React.useMemo(
     () =>
-      '�Hola {guestName}! Somos {coupleName} y te enviamos la invitaci�n oficial de nuestra boda. Adjuntamos la tarjeta con todos los detalles y esperamos tu respuesta.',
+      '¡Hola {guestName}! Somos {coupleName} y te enviamos la invitación oficial de nuestra boda. Adjuntamos la tarjeta con todos los detalles y esperamos tu respuesta.',
     [coupleLabel]
   );
 

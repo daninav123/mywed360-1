@@ -152,7 +152,7 @@ suspended            → Cuenta suspendida por admin
 
 ### **Registro público:**
 ```
-https://mywed360.com/supplier/registro
+https://MaLove.App.com/supplier/registro
 http://localhost:5173/supplier/registro
 ```
 

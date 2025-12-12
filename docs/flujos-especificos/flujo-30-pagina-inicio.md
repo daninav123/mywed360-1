@@ -27,10 +27,10 @@
    - Tarjetas clicables abren modales para buscar proveedor, anadir invitado, registrar movimiento o crear nota.
    - Cada modal ejecuta la accion principal sin abandonar la Home (crea proveedor en el buscador, inserta invitado, registra movimiento o guarda nota).
    - Cada modal incluye un boton secundario que redirige al modulo completo correspondiente (`/proveedores`, `/invitados`, `/finance`, `/ideas`) para continuar la gestion desde la pagina dedicada.
-   - Persisten en `localStorage` (`lovendaProviders` via modal, `mywed360Guests`, `quickMovements`, `lovendaNotes`).
+   - Persisten en `localStorage` (`lovendaProviders` via modal, `MaLove.AppGuests`, `quickMovements`, `lovendaNotes`).
 5. **Metricas clave**  
    - Cuatro cards resumen invitados confirmados, gasto vs presupuesto, proveedores contratados y tareas completadas (o asignadas para planners).
-   - Datos combinan `useFinance().stats`, arrays guardados en `localStorage` (`lovendaProviders`, `tasksCompleted`, `mywed360Meetings`, `lovendaLongTasks`) y calculos memorizados.
+   - Datos combinan `useFinance().stats`, arrays guardados en `localStorage` (`lovendaProviders`, `tasksCompleted`, `MaLove.AppMeetings`, `lovendaLongTasks`) y calculos memorizados.
 6. **Inspiracion**  
    - Carrusel horizontal precargado via `fetchWall(page=1, tag)` para ocho categorias (decoracion, banquete, etc.), enlaza a `/inspiracion?tag=...`.
    - Al hacer click en cada tarjeta se navega a la pagina de inspiracion con el query `tag` seleccionado, activando el filtro correspondiente dentro de la vista de inspiracion.
@@ -53,9 +53,9 @@
 ## 4. Persistencia y datos
 - `localStorage`
   - `maloveapp_active_wedding_name`, `maloveapp_progress` (snapshot de Gamificación + cálculo temporal): saludo y progreso.
-  - `mywed360Guests`: lista de invitados; cada modal de invitado incorpora registros con `id` (timestamp).
+  - `MaLove.AppGuests`: lista de invitados; cada modal de invitado incorpora registros con `id` (timestamp).
   - `lovendaProviders`: proveedores contratados; usado para conteo.
-  - `tasksCompleted`, `mywed360Meetings`, `lovendaLongTasks`: fuentes para tareas totales/completadas.
+  - `tasksCompleted`, `MaLove.AppMeetings`, `lovendaLongTasks`: fuentes para tareas totales/completadas.
   - `quickMovements`: movimientos financieros rapidos (solo local).
   - `lovendaNotes`: notas rapidas.
 - Servicios remotos

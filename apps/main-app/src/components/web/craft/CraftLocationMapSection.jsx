@@ -67,14 +67,14 @@ export const CraftLocationMapSection = ({
                   href={googleMapsUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:shadow-lg transition-all font-semibold text-center"
+                  className="block w-full px-6 py-3 bg-[var(--color-primary)] text-white rounded-lg hover:shadow-lg transition-all font-semibold text-center"
                 >
                   🗺️ Abrir en Google Maps
                 </a>
               )}
 
               <button
-                className="w-full px-6 py-3 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors font-semibold"
+                className="w-full px-6 py-3 bg-[var(--color-primary)] text-white rounded-lg hover:shadow-lg transition-all font-semibold"
                 onClick={() => alert('Función de añadir al calendario próximamente')}
               >
                 📅 Añadir al Calendario

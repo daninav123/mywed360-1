@@ -86,12 +86,12 @@ const VisualTimeline = ({ blocks, moments }) => {
 
   const getBlockColor = (blockId) => {
     const colors = {
-      ceremonia: 'from-blue-500 to-blue-600',
-      coctail: 'from-purple-500 to-purple-600',
-      banquete: 'from-pink-500 to-pink-600',
-      disco: 'from-orange-500 to-orange-600',
+      ceremonia: 'bg-blue-500',
+      coctail: 'bg-purple-500',
+      banquete: 'bg-pink-500',
+      disco: 'bg-orange-500',
     };
-    return colors[blockId] || 'from-gray-500 to-gray-600';
+    return colors[blockId] || 'bg-gray-500';
   };
 
   if (timelineData.blocks.length === 0) {
@@ -110,7 +110,7 @@ const VisualTimeline = ({ blocks, moments }) => {
   return (
     <div className="bg-white border-2 border-gray-200 rounded-lg overflow-hidden">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-50 to-purple-50 border-b border-gray-200 p-4">
+      <div className="bg-[var(--color-primary)] border-b border-gray-200 p-4">
         <div className="flex items-center justify-between">
           <div>
             <h3 className="font-semibold text-gray-900 flex items-center gap-2">

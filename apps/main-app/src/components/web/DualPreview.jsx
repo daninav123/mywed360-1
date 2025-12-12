@@ -27,7 +27,7 @@ const DualPreview = ({ html, onRefresh }) => {
   const DeviceFrame = ({ html, width, className = '' }) => (
     <div className={`relative ${className}`}>
       <div
-        className="bg-white rounded-lg shadow-2xl overflow-hidden border-4 border-gray-200"
+        className="bg-white rounded-lg shadow-md overflow-hidden border-4 border-gray-200"
         style={{ width: width === 'auto' ? '100%' : width }}
       >
         {/* Device Header (solo para móvil y tablet) */}
@@ -127,7 +127,7 @@ const DualPreview = ({ html, onRefresh }) => {
       </div>
 
       {/* Preview Area */}
-      <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-8 min-h-[700px] flex items-center justify-center">
+      <div className="bg-[var(--color-primary)] rounded-xl p-8 min-h-[700px] flex items-center justify-center">
         {viewMode === 'dual' ? (
           <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
             {/* Desktop */}

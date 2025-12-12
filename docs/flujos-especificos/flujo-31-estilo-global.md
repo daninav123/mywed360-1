@@ -2,7 +2,7 @@
 
 > Implementado (oct-2025): tokens base en `src/index.css`, selector oscuro/claro (`src/components/ThemeToggle.jsx`), wizard de creacion (`CreateWeddingAI.jsx`), asistente conversacional (`CreateWeddingAssistant.jsx`), ficha de boda (`BodaDetalle.jsx`), contexto de IA (`ChatWidget.jsx`, `backend/routes/ai.js`), recomendaciones IA de proveedores (`src/utils/providerRecommendation.js`), generador web (`src/services/websiteService.js`, `src/utils/websitePromptBuilder.js`) y editor de paleta (`src/pages/disenos/VectorEditor.jsx`).
 >
-> Pendiente inmediato: reutilizar `weddings/{id}/branding/main.palette` en los generadores (web, invitaciones, assets), sincronizar cambios de `mywed360Profile` con Firestore sin depender de eventos locales y exponer UI dedicada para editar estilo global dentro de `/perfil`.
+> Pendiente inmediato: reutilizar `weddings/{id}/branding/main.palette` en los generadores (web, invitaciones, assets), sincronizar cambios de `MaLove.AppProfile` con Firestore sin depender de eventos locales y exponer UI dedicada para editar estilo global dentro de `/perfil`.
 >
 > Backlog: soportar variaciones por subevento (recepcion, preboda), publicar libreria de tokens reutilizables para IA y front, ampliar coverage de pruebas (paleta, sincronizacion offline) y anadir alertas cuando el estilo no coincide con la configuracion de plantillas activas.
 
@@ -16,7 +16,7 @@
 - `/crear-evento-asistente` (`CreateWeddingAssistant.jsx`): chat step-by-step, paso `style`, mismos options.
 - `/perfil` (`Perfil.jsx`): card Datos de la boda con inputs `weddingStyle` y `colorScheme`.
 - `/disenos/vector-editor` (`VectorEditor.jsx`): editor para guardar `branding/main.palette`.
-- Chat global (`ChatWidget.jsx`): comandos IA `entity=config` que actualizan `mywed360Profile.weddingInfo`.
+- Chat global (`ChatWidget.jsx`): comandos IA `entity=config` que actualizan `MaLove.AppProfile.weddingInfo`.
 - Tema global visible desde cualquier vista: `ThemeToggle.jsx` inserta/remueve clase `dark` en `<html>`.
 
 ## 3. Paso a paso UX
@@ -42,7 +42,7 @@
 - `weddings/{id}.weddingInfo.weddingStyle`: texto libre (perfil).  
 - `weddings/{id}.weddingInfo.colorScheme`: descripcion o lista de colores.  
 - `weddings/{id}/branding/main` documento con `{ palette: string[], updatedAt }`.  
-- LocalStorage `mywed360Profile`: cache usado por `ChatWidget` y exportado a Firestore por `ConfigEventBridge`.  
+- LocalStorage `MaLove.AppProfile`: cache usado por `ChatWidget` y exportado a Firestore por `ConfigEventBridge`.  
 - Variables CSS globales (`:root` y `.dark` en `src/index.css`), usadas por componentes UI.
 
 ## 5. Reglas de negocio
@@ -55,7 +55,7 @@
 ## 6. Estados especiales y errores
 - Falta de estilo => fallback `Clasico` y `Blanco y dorado` en generador web (`sanitizeProfile`).  
 - Sin paleta guardada => `VectorEditor` usa array por defecto (azules, verdes, neutros).  
-- Offline: `ConfigEventBridge` almacena localmente y sincroniza cuando se emite `mywed360-profile`.  
+- Offline: `ConfigEventBridge` almacena localmente y sincroniza cuando se emite `MaLove.App-profile`.  
 - Fallback IA (sin OpenAI) construye respuestas con estilo y ubicacion (`backend/routes/ai.js:describeEvent`); Cypress cubre que el copy incluya estilo.
 
 ## 7. Integracion con otros flujos
@@ -93,7 +93,7 @@
 
 ## 12. Pendientes detectados en codigo (2025-10-13)
 - `src/pages/disenos/VectorEditor.jsx`: usa `alert` en vez de toasts y no maneja errores Firebase detallados; falta instrumentation y fallback cuando no hay boda activa.  
-- `src/components/config/ConfigEventBridge.jsx`: solo escucha evento `mywed360-profile`; algunas pantallas (p.ej. guardado de logo) emiten `mywed360-profile-updated`, por lo que la sincronizacion no siempre corre. Evaluar ampliar listeners.  
+- `src/components/config/ConfigEventBridge.jsx`: solo escucha evento `MaLove.App-profile`; algunas pantallas (p.ej. guardado de logo) emiten `MaLove.App-profile-updated`, por lo que la sincronizacion no siempre corre. Evaluar ampliar listeners.  
 - `src/services/websiteService.js`: `normalizeProfile` no consume `branding/main.palette`, dejando la web sin colores personalizados.  
 - No existe repositorio central de CSS tokens (`docs/diseno/README.md` referencia `src/styles/tokens.css` pero el archivo no existe).
 ## Cobertura E2E implementada

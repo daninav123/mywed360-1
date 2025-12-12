@@ -6,7 +6,6 @@ import FinanceOverview from '../components/finance/FinanceOverview';
 import FinanceCashflowTimeline from '../components/finance/FinanceCashflowTimeline';
 import PaymentSuggestions from '../components/finance/PaymentSuggestions.jsx';
 import TransactionManager from '../components/finance/TransactionManager';
-import PageWrapper from '../components/PageWrapper';
 import PageTabs from '../components/ui/PageTabs';
 
 // Lazy load analytics charts to reduce initial bundle
@@ -173,26 +172,22 @@ function Finance() {
   };
 
   return (
-    <PageWrapper
-      title={t('navigation.finance', { defaultValue: 'Finanzas' })}
-      className="max-w-7xl mx-auto"
-    >
+    <div className="p-4 md:p-6 max-w-7xl mx-auto">
+      {/* Header de página con card blanco */}
+      <div className="bg-[var(--color-surface)] rounded-xl shadow-md p-6 mb-6 border border-[color:var(--color-text)]/10">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-800">{t('navigation.finance', { defaultValue: 'Finanzas' })}</h1>
+        <p className="text-gray-500 mt-1">Gestión financiera de tu boda</p>
+      </div>
+
       <div className="space-y-6">
         {/* Mostrar errores si existen */}
         {error && (
-          <div
-            className="rounded-md p-4 bg-[var(--color-danger)]/10 border border-[color:var(--color-danger)]/30"
-            aria-live="polite"
-          >
-            <div className="flex">
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-[color:var(--color-danger)]">
-                  {t("finance.error.title", { defaultValue: "Error en Gestión financiera" })}
-                </h3>
-                <div className="mt-2 text-sm text-[color:var(--color-danger)]/90">
-                  <p>{error}</p>
-                </div>
-              </div>
+          <div className="bg-[var(--color-surface)] rounded-xl shadow-md p-6 mb-6 border border-[color:var(--color-text)]/10">
+            <h3 className="text-sm font-medium text-[color:var(--color-danger)]">
+              {t("finance.error.title", { defaultValue: "Error en Gestión financiera" })}
+            </h3>
+            <div className="mt-2 text-sm text-[color:var(--color-danger)]/90">
+              <p>{error}</p>
             </div>
           </div>
         )}
@@ -303,7 +298,7 @@ function Finance() {
           </div>
         )}
       </div>
-    </PageWrapper>
+    </div>
   );
 }
 

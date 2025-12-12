@@ -115,9 +115,9 @@ const WeddingDayMode = () => {
 
   return (
     <PageWrapper title="Modo Día de la Boda">
-      <div className="max-w-4xl mx-auto space-y-4">
+      <div className="mshadow-md mx-auto space-y-4">
         {/* Header con hora actual */}
-        <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg p-6 text-center">
+        <div className="bg-[var(--color-primary)] text-white rounded-lg p-6 text-center">
           <h1 className="text-3xl font-bold mb-2">¡Día de la Boda!</h1>
           <div className="text-5xl font-bold mb-2">
             {currentTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
@@ -145,7 +145,7 @@ const WeddingDayMode = () => {
           </div>
           <div className="w-full bg-gray-200 rounded-full h-3">
             <div
-              className="bg-gradient-to-r from-purple-500 to-pink-500 h-3 rounded-full transition-all duration-500"
+              className="bg-[var(--color-primary)] h-3 rounded-full transition-all duration-500"
               style={{ width: `${timelineStatus.percentage}%` }}
             />
           </div>
@@ -153,7 +153,7 @@ const WeddingDayMode = () => {
 
         {/* Momento actual */}
         {timelineStatus.currentMoment && (
-          <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-300 rounded-lg overflow-hidden">
+          <div className="bg-white border-2 border-green-300 rounded-lg overflow-hidden">
             <div className="bg-green-600 text-white px-4 py-2 flex items-center gap-2">
               <Play size={20} />
               <span className="font-bold">MOMENTO ACTUAL</span>
@@ -214,7 +214,7 @@ const WeddingDayMode = () => {
 
         {/* Siguiente momento */}
         {timelineStatus.nextMoment && (
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-300 rounded-lg overflow-hidden">
+          <div className="bg-white border-2 border-blue-300 rounded-lg overflow-hidden">
             <div className="bg-blue-600 text-white px-4 py-2 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <ArrowRight size={20} />

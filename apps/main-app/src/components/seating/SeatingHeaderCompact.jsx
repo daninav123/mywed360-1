@@ -94,7 +94,7 @@ export default function SeatingHeaderCompact({
 
           {/* Avatar */}
           <div
-            className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 
+            className="w-8 h-8 rounded-full bg-[var(--color-primary)] 
                           flex items-center justify-center text-white text-sm font-medium"
           >
             {userName.charAt(0).toUpperCase()}

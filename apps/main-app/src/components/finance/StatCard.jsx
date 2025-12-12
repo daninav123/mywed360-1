@@ -9,11 +9,11 @@ const toneToVar = {
   danger: 'var(--color-danger)',
 };
 
-const toneToGradient = {
-  primary: 'from-[#5ebbff]/20 via-[#5ebbff]/5 to-transparent',
-  success: 'from-[#22c55e]/20 via-[#22c55e]/5 to-transparent',
-  warning: 'from-[#f59e0b]/20 via-[#f59e0b]/5 to-transparent',
-  danger: 'from-[#ef4444]/20 via-[#ef4444]/5 to-transparent',
+const toneToBg = {
+  primary: 'bg-[var(--color-primary)]/10',
+  success: 'bg-[var(--color-success)]/10',
+  warning: 'bg-[var(--color-warning)]/10',
+  danger: 'bg-[var(--color-danger)]/10',
 };
 
 export default function StatCard({
@@ -38,7 +38,7 @@ export default function StatCard({
   sparklineData,
 }) {
   const color = toneToVar[tone] || toneToVar.primary;
-  const gradient = toneToGradient[tone] || toneToGradient.primary;
+  const bgTone = toneToBg[tone] || toneToBg.primary;
   const clickable = typeof onClick === 'function';
 
   const padding = compact ? 'p-5 md:p-6' : 'p-6 md:p-7';
@@ -122,24 +122,16 @@ export default function StatCard({
 
   return (
     <Card
-      className={`${padding} group relative overflow-hidden bg-gradient-to-br ${gradient} backdrop-blur-xl border-soft shadow-lg ${clickable ? 'cursor-pointer transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 hover:scale-[1.02] focus-within:ring-2 focus-within:ring-[color:var(--color-primary)]/50' : 'transition-all duration-300'} ${className}`}
+      className={`${padding} group relative bg-[var(--color-surface)] ${bgTone} rounded-xl shadow-md border border-[color:var(--color-text)]/10 ${clickable ? 'cursor-pointer transition-all duration-300 hover:shadow-lg focus-within:ring-2 focus-within:ring-[color:var(--color-primary)]/50' : 'transition-all duration-300'} ${className}`}
       onClick={onClick}
       role={role}
       tabIndex={tabIndex}
       title={tooltip}
     >
-      {/* Gradiente superior con efecto shimmer */}
+      {/* Barra de color superior */}
       <div 
-        className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r opacity-90 group-hover:opacity-100 transition-opacity duration-300" 
-        style={{ 
-          backgroundImage: `linear-gradient(90deg, ${color}, color-mix(in srgb, ${color} 70%, white))` 
-        }} 
-      />
-      
-      {/* Efecto de luz de fondo */}
-      <div 
-        className="absolute -top-24 -right-24 w-48 h-48 rounded-full blur-3xl opacity-20 group-hover:opacity-30 transition-opacity duration-500"
-        style={{ backgroundColor: color }}
+        className="absolute inset-x-0 top-0 h-1 opacity-90 rounded-t-xl" 
+        style={{ backgroundColor: color }} 
       />
       
       <div className="flex items-start justify-between gap-4 relative z-10">

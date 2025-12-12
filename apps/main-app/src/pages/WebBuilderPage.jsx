@@ -260,7 +260,7 @@ const WebBuilderPage = () => {
                 onClick={handleGenerarAutomatico}
                 disabled={loading}
                 className="
-                  px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 
+                  px-8 py-4 bg-[var(--color-primary)] 
                   text-white rounded-xl font-semibold text-lg
                   hover:shadow-xl transition-all transform hover:scale-105
                   disabled:opacity-50 disabled:cursor-not-allowed

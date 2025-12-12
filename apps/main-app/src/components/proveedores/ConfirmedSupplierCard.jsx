@@ -53,7 +53,7 @@ export default function ConfirmedSupplierCard({
 
   return (
     <Card
-      className={`relative border border-emerald-200 bg-emerald-50/80 backdrop-blur-sm transition ${
+      className={`relative bg-[var(--color-primary)]emerald-50/80  transition ${
         selected ? 'ring-2 ring-emerald-400' : ''
       }`}
     >
@@ -147,7 +147,7 @@ export default function ConfirmedSupplierCard({
         )}
       </section>
 
-      <footer className="mt-4 flex flex-wrap gap-2 border-t border-emerald-200/60 pt-3">
+      <footer className="mt-4 flex flex-wrap gap-2 bg-[var(--color-primary)] pt-3">
         <Button
           variant="outline"
           size="sm"

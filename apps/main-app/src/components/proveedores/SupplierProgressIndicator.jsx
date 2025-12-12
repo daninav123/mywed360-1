@@ -32,7 +32,7 @@ export default function SupplierProgressIndicator({
   );
 
   return (
-    <section className="relative w-full max-w-xs rounded-2xl border border-soft bg-white/80 p-4 shadow-sm backdrop-blur-sm">
+    <section className="relative w-full max-w-xs rounded-2xl border border-soft bg-white/80 p-4 shadow-sm ">
       <header className="flex items-center justify-between text-sm font-semibold text-muted">
         <span>{headline || 'Avance hacia el contrato'}</span>
         <ChevronRight size={16} className="text-muted" />
@@ -46,7 +46,7 @@ export default function SupplierProgressIndicator({
               borderColor: 'rgba(148, 163, 184, 0.14)',
             }}
           />
-          <div className="absolute inset-3 rounded-full border border-soft bg-white/80 backdrop-blur-sm" />
+          <div className="absolute inset-3 rounded-full border border-soft bg-white/80 " />
           <div className="relative flex flex-col items-center justify-center">
             <span className="text-4xl font-semibold text-primary">{formatPercent(safeProgress)}</span>
             <span className="mt-1 text-xs font-medium uppercase tracking-wide text-muted">
@@ -80,7 +80,7 @@ export default function SupplierProgressIndicator({
                 <div className="flex items-center gap-2">
                   <span className="font-semibold text-[13px]">{stage.label}</span>
                   {(Number(stage.count) || 0) > 0 && (
-                    <span className="rounded-full border border-current/30 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
+                    <span className="rounded-full bg-[var(--color-primary)].5 text-[10px] font-semibold uppercase tracking-wide">
                       {stage.count}
                     </span>
                   )}

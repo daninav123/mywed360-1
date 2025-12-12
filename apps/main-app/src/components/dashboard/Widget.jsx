@@ -114,7 +114,7 @@ export const Widget = ({ widget, index, isEditing, onRemove, onMove, onConfigUpd
           isEditing ? 'ring-2 ring-blue-400 ring-opacity-50 hover:ring-blue-400' : 'hover:shadow-md'
         }`}
       >
-        <div className="p-4 border-b border-gray-100 bg-gradient-to-r from-white to-gray-50">
+        <div className="p-4 border-b border-gray-100 bg-[var(--color-primary)]">
           <div className="flex justify-between items-center">
             <h3 className="text-base font-semibold text-gray-800 flex items-center gap-2">
               {widget.type === 'calendar' && <span className="text-blue-500">📅</span>}

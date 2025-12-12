@@ -47,7 +47,7 @@ const AnalyticsDashboard = ({ slug, isLoading = false }) => {
       {/* Métricas principales */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {/* Visitantes */}
-        <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg shadow-md p-6 border-l-4 border-blue-600">
+        <div className="bg-blue-100 rounded-lg shadow-md p-6 border-l-4 border-blue-600">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-600 text-sm font-semibold">Visitantes</p>
@@ -58,7 +58,7 @@ const AnalyticsDashboard = ({ slug, isLoading = false }) => {
         </div>
 
         {/* Comparticiones */}
-        <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg shadow-md p-6 border-l-4 border-green-600">
+        <div className="bg-green-100 rounded-lg shadow-md p-6 border-l-4 border-green-600">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-600 text-sm font-semibold">Comparticiones</p>
@@ -69,7 +69,7 @@ const AnalyticsDashboard = ({ slug, isLoading = false }) => {
         </div>
 
         {/* Confirmaciones */}
-        <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg shadow-md p-6 border-l-4 border-purple-600">
+        <div className="bg-purple-100 rounded-lg shadow-md p-6 border-l-4 border-purple-600">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-600 text-sm font-semibold">Confirmaciones</p>

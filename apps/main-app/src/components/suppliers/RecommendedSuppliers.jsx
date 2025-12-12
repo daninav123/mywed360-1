@@ -129,7 +129,7 @@ export default function RecommendedSuppliers({ onClose }) {
   }
 
   return (
-    <div className="p-6 border border-purple-200 bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg">
+    <div className="p-6 border border-purple-200 bg-[var(--color-primary)] rounded-lg">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Sparkles className="h-5 w-5 text-purple-600 animate-pulse" />

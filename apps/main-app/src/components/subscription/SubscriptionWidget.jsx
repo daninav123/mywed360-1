@@ -63,7 +63,7 @@ const SubscriptionWidget = () => {
 
   if (!subscription) {
     return (
-      <div className="bg-gradient-to-br from-purple-600 to-blue-600 rounded-xl shadow-lg p-6 text-white">
+      <div className="bg-[var(--color-primary)] rounded-xl shadow-lg p-6 text-white">
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">

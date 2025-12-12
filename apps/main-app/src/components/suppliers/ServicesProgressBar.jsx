@@ -22,11 +22,11 @@ const ServicesProgressBar = ({ serviceCards = [] }) => {
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold text-gray-900">Progreso General</h3>
-          <span className="text-2xl font-bold text-purple-600">{progress.percentage}%</span>
+          <span className="text-2xl font-bold text-[var(--color-primary)]">{progress.percentage}%</span>
         </div>
         <div className="w-full bg-white rounded-full h-3 overflow-hidden">
           <div
-            className="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-500"
+            className="h-full bg-[var(--color-primary)] transition-all duration-500"
             style={{ width: `${progress.percentage}%` }}
           />
         </div>

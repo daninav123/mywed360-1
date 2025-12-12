@@ -1,0 +1,709 @@
+/**
+ * WeddingTeam - Gestión del equipo de boda
+ * FASE 6.1 del WORKFLOW-USUARIO.md
+ */
+import React, { useState, useEffect, useCallback } from 'react';
+import { Users, UserPlus, Crown, Heart, CheckCircle2, Plus, Edit2, Trash2, Phone, Mail, ClipboardList } from 'lucide-react';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { db } from '../firebaseConfig';
+import { useWedding } from '../context/WeddingContext';
+import PageWrapper from '../components/PageWrapper';
+import { toast } from 'react-toastify';
+
+const TEAM_ROLES = [
+  {
+    id: 'coordinador',
+    name: 'Coordinador/a de boda',
+    icon: '👔',
+    description: 'Gestiona y coordina todos los aspectos del día',
+    responsibilities: [
+      'Coordinar con todos los proveedores',
+      'Gestionar timeline del día',
+      'Resolver imprevistos',
+      'Supervisar montaje y desmontaje',
+      'Coordinar llegadas de invitados'
+    ]
+  },
+  {
+    id: 'padrinos',
+    name: 'Padrinos',
+    icon: '👑',
+    description: 'Acompañan y apoyan a los novios',
+    responsibilities: [
+      'Acompañar en la ceremonia',
+      'Firmar como testigos',
+      'Dar discurso en el banquete',
+      'Ayudar con la organización',
+      'Apoyo emocional a los novios'
+    ]
+  },
+  {
+    id: 'damas',
+    name: 'Damas de honor',
+    icon: '👗',
+    description: 'Apoyan a la novia antes y durante el día',
+    responsibilities: [
+      'Ayudar con preparativos novia',
+      'Organizar despedida de soltera',
+      'Sostener el ramo en ceremonia',
+      'Ayudar con el vestido',
+      'Apoyo emocional'
+    ]
+  },
+  {
+    id: 'testigos',
+    name: 'Testigos',
+    icon: '✍️',
+    description: 'Testigos oficiales de la ceremonia',
+    responsibilities: [
+      'Firmar documentos legales',
+      'Acompañar en ceremonia',
+      'Ayudar con organización',
+      'Discurso opcional'
+    ]
+  },
+  {
+    id: 'maestro',
+    name: 'Maestro de ceremonias',
+    icon: '🎤',
+    description: 'Presenta y coordina el programa del día',
+    responsibilities: [
+      'Presentar momentos clave',
+      'Coordinar discursos',
+      'Animar la celebración',
+      'Mantener timeline',
+      'Interactuar con invitados'
+    ]
+  },
+  {
+    id: 'flower-kids',
+    name: 'Niños de arras/flores',
+    icon: '🌸',
+    description: 'Participan en la ceremonia',
+    responsibilities: [
+      'Llevar anillos/arras',
+      'Lanzar pétalos',
+      'Ensayar ceremonia',
+      'Coordinarse con padres'
+    ]
+  },
+  {
+    id: 'organizador',
+    name: 'Organizador de apoyo',
+    icon: '📋',
+    description: 'Ayuda en tareas específicas de organización',
+    responsibilities: [
+      'Tareas específicas asignadas',
+      'Apoyo logístico',
+      'Coordinación puntual',
+      'Backup de coordinador'
+    ]
+  },
+  {
+    id: 'otro',
+    name: 'Otro rol',
+    icon: '⭐',
+    description: 'Rol personalizado',
+    responsibilities: [
+      'Responsabilidades personalizadas'
+    ]
+  }
+];
+
+const MemberCard = ({ member, onEdit, onDelete, onToggleTask }) => {
+  const roleConfig = TEAM_ROLES.find(r => r.id === member.role) || TEAM_ROLES[7];
+  const completedTasks = member.tasks?.filter(t => t.completed).length || 0;
+  const totalTasks = member.tasks?.length || 0;
+  const progress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+
+  return (
+    <div className="bg-white border border-gray-200 rounded-lg p-5 hover:shadow-md transition-shadow">
+      <div className="flex items-start justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center text-2xl">
+            {roleConfig.icon}
+          </div>
+          <div>
+            <h3 className="font-semibold text-gray-800">{member.name}</h3>
+            <p className="text-sm text-gray-600">{roleConfig.name}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => onEdit(member)}
+            className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+          >
+            <Edit2 className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => onDelete(member.id)}
+            className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+
+      {(member.phone || member.email) && (
+        <div className="space-y-1 text-sm text-gray-700 mb-3">
+          {member.phone && (
+            <div className="flex items-center gap-2">
+              <Phone className="w-4 h-4" />
+              <span>{member.phone}</span>
+            </div>
+          )}
+          {member.email && (
+            <div className="flex items-center gap-2">
+              <Mail className="w-4 h-4" />
+              <span className="truncate">{member.email}</span>
+            </div>
+          )}
+        </div>
+      )}
+
+      {totalTasks > 0 && (
+        <div className="mb-3">
+          <div className="flex items-center justify-between text-sm mb-2">
+            <span className="text-gray-600">Progreso de tareas</span>
+            <span className="font-medium text-gray-800">{completedTasks}/{totalTasks}</span>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full h-2">
+            <div
+              className="bg-purple-600 h-2 rounded-full transition-all"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        </div>
+      )}
+
+      {member.tasks && member.tasks.length > 0 && (
+        <div className="space-y-1">
+          <p className="text-xs font-medium text-gray-600 mb-2">Tareas:</p>
+          {member.tasks.slice(0, 3).map((task) => (
+            <button
+              key={task.id}
+              onClick={() => onToggleTask(member.id, task.id)}
+              className="w-full flex items-start gap-2 text-left text-sm hover:bg-gray-50 p-1 rounded transition-colors"
+            >
+              <div className={`flex-shrink-0 w-4 h-4 rounded border-2 mt-0.5 ${
+                task.completed ? 'bg-purple-600 border-purple-600' : 'border-gray-300'
+              }`}>
+                {task.completed && <CheckCircle2 className="w-3 h-3 text-white" />}
+              </div>
+              <span className={task.completed ? 'line-through text-gray-500' : 'text-gray-700'}>
+                {task.text}
+              </span>
+            </button>
+          ))}
+          {member.tasks.length > 3 && (
+            <p className="text-xs text-gray-500 pl-6">+{member.tasks.length - 3} más...</p>
+          )}
+        </div>
+      )}
+
+      {member.notes && (
+        <div className="text-xs text-gray-600 mt-3 pt-3 border-t border-gray-200">
+          {member.notes}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const MemberModal = ({ member, onSave, onClose }) => {
+  const [formData, setFormData] = useState(
+    member || {
+      role: 'padrinos',
+      name: '',
+      phone: '',
+      email: '',
+      notes: '',
+      tasks: []
+    }
+  );
+
+  const [newTask, setNewTask] = useState('');
+  const selectedRole = TEAM_ROLES.find(r => r.id === formData.role) || TEAM_ROLES[0];
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!formData.name) {
+      toast.error('El nombre es obligatorio');
+      return;
+    }
+    onSave(formData);
+  };
+
+  const handleAddTask = () => {
+    if (!newTask.trim()) return;
+    
+    const task = {
+      id: `task-${Date.now()}`,
+      text: newTask.trim(),
+      completed: false
+    };
+    
+    setFormData({
+      ...formData,
+      tasks: [...(formData.tasks || []), task]
+    });
+    setNewTask('');
+  };
+
+  const handleRemoveTask = (taskId) => {
+    setFormData({
+      ...formData,
+      tasks: formData.tasks.filter(t => t.id !== taskId)
+    });
+  };
+
+  const handleLoadDefaultTasks = () => {
+    const defaultTasks = selectedRole.responsibilities.map((resp, idx) => ({
+      id: `task-${Date.now()}-${idx}`,
+      text: resp,
+      completed: false
+    }));
+    setFormData({
+      ...formData,
+      tasks: defaultTasks
+    });
+    toast.success('Tareas por defecto cargadas');
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold text-gray-800">
+              {member ? 'Editar miembro' : 'Nuevo miembro del equipo'}
+            </h2>
+            <button onClick={onClose} className="text-gray-400 hover:text-gray-600">✕</button>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Rol en la boda
+              </label>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                {TEAM_ROLES.map((role) => (
+                  <button
+                    key={role.id}
+                    type="button"
+                    onClick={() => setFormData({ ...formData, role: role.id })}
+                    className={`p-3 rounded-lg border-2 transition-all ${
+                      formData.role === role.id
+                        ? 'border-purple-500 bg-purple-50'
+                        : 'border-gray-200 hover:border-purple-300'
+                    }`}
+                  >
+                    <span className="text-2xl mb-1 block">{role.icon}</span>
+                    <span className="text-xs text-gray-700 line-clamp-2">{role.name}</span>
+                  </button>
+                ))}
+              </div>
+              <p className="text-xs text-gray-600 mt-2">{selectedRole.description}</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Nombre completo *
+              </label>
+              <input
+                type="text"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                placeholder="Nombre y apellidos"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                required
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Teléfono
+                </label>
+                <input
+                  type="tel"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  placeholder="+34 600 000 000"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  placeholder="email@ejemplo.com"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                />
+              </div>
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Tareas y responsabilidades
+                </label>
+                {formData.tasks.length === 0 && (
+                  <button
+                    type="button"
+                    onClick={handleLoadDefaultTasks}
+                    className="text-xs text-purple-600 hover:text-purple-700"
+                  >
+                    Cargar tareas por defecto
+                  </button>
+                )}
+              </div>
+
+              <div className="space-y-2 mb-2">
+                {formData.tasks?.map((task) => (
+                  <div key={task.id} className="flex items-center gap-2 text-sm">
+                    <span className="flex-1 text-gray-700">{task.text}</span>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveTask(task.id)}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={newTask}
+                  onChange={(e) => setNewTask(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddTask())}
+                  placeholder="Nueva tarea..."
+                  className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                />
+                <button
+                  type="button"
+                  onClick={handleAddTask}
+                  className="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors"
+                >
+                  <Plus className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Notas adicionales
+              </label>
+              <textarea
+                value={formData.notes}
+                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                placeholder="Cualquier información adicional..."
+                rows={3}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2"
+              />
+            </div>
+
+            <div className="flex gap-2 pt-4">
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+              >
+                {member ? 'Guardar' : 'Crear'}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default function WeddingTeam() {
+  const { activeWedding } = useWedding();
+  const [teamMembers, setTeamMembers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [editingMember, setEditingMember] = useState(null);
+  const [filterRole, setFilterRole] = useState('all');
+
+  useEffect(() => {
+    if (!activeWedding) {
+      setLoading(false);
+      return;
+    }
+
+    const loadData = async () => {
+      try {
+        const docRef = doc(db, 'weddings', activeWedding, 'team', 'members');
+        const docSnap = await getDoc(docRef);
+        
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          setTeamMembers(data.members || []);
+        }
+      } catch (error) {
+        console.error('Error loading team data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, [activeWedding]);
+
+  const saveData = useCallback(async (newMembers) => {
+    if (!activeWedding) return;
+
+    try {
+      const docRef = doc(db, 'weddings', activeWedding, 'team', 'members');
+      await setDoc(docRef, {
+        members: newMembers,
+        updatedAt: new Date(),
+      }, { merge: true });
+    } catch (error) {
+      console.error('Error saving team data:', error);
+      toast.error('Error al guardar');
+    }
+  }, [activeWedding]);
+
+  const handleSave = useCallback((formData) => {
+    let newMembers;
+    
+    if (editingMember) {
+      newMembers = teamMembers.map(m => 
+        m.id === editingMember.id ? { ...formData, id: m.id } : m
+      );
+      toast.success('Miembro actualizado');
+    } else {
+      const newMember = {
+        ...formData,
+        id: `member-${Date.now()}`,
+      };
+      newMembers = [...teamMembers, newMember];
+      toast.success('Miembro añadido');
+    }
+
+    setTeamMembers(newMembers);
+    saveData(newMembers);
+    setShowModal(false);
+    setEditingMember(null);
+  }, [teamMembers, editingMember, saveData]);
+
+  const handleDelete = useCallback((id) => {
+    if (!confirm('¿Eliminar este miembro del equipo?')) return;
+    
+    const newMembers = teamMembers.filter(m => m.id !== id);
+    setTeamMembers(newMembers);
+    saveData(newMembers);
+    toast.success('Miembro eliminado');
+  }, [teamMembers, saveData]);
+
+  const handleToggleTask = useCallback((memberId, taskId) => {
+    const newMembers = teamMembers.map(m => {
+      if (m.id === memberId) {
+        return {
+          ...m,
+          tasks: m.tasks.map(t => 
+            t.id === taskId ? { ...t, completed: !t.completed } : t
+          )
+        };
+      }
+      return m;
+    });
+    
+    setTeamMembers(newMembers);
+    saveData(newMembers);
+  }, [teamMembers, saveData]);
+
+  if (loading) {
+    return (
+      <PageWrapper>
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Cargando equipo...</p>
+          </div>
+        </div>
+      </PageWrapper>
+    );
+  }
+
+  const filteredMembers = filterRole === 'all' 
+    ? teamMembers 
+    : teamMembers.filter(m => m.role === filterRole);
+
+  const totalTasks = teamMembers.reduce((sum, m) => sum + (m.tasks?.length || 0), 0);
+  const completedTasks = teamMembers.reduce((sum, m) => 
+    sum + (m.tasks?.filter(t => t.completed).length || 0), 0
+  );
+  const progressPercent = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+
+  const roleStats = TEAM_ROLES.map(role => ({
+    ...role,
+    count: teamMembers.filter(m => m.role === role.id).length
+  })).filter(r => r.count > 0);
+
+  return (
+    <PageWrapper>
+      <div className="max-w-6xl mx-auto py-8 px-4">
+        <div className="space-y-6">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="p-3 bg-white rounded-lg shadow-sm">
+                  <Users className="w-6 h-6 text-purple-600" />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-800">Wedding Team</h1>
+                  <p className="text-sm text-gray-600">
+                    Gestiona tu equipo y sus responsabilidades
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  setEditingMember(null);
+                  setShowModal(true);
+                }}
+                className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+              >
+                <UserPlus className="w-5 h-5" />
+                Añadir miembro
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="bg-white rounded-lg p-3 border border-gray-200">
+                <div className="text-2xl font-bold text-gray-800">{teamMembers.length}</div>
+                <div className="text-xs text-gray-600">Miembros</div>
+              </div>
+              <div className="bg-white rounded-lg p-3 border border-gray-200">
+                <div className="text-2xl font-bold text-gray-800">{roleStats.length}</div>
+                <div className="text-xs text-gray-600">Roles cubiertos</div>
+              </div>
+              <div className="bg-white rounded-lg p-3 border border-gray-200">
+                <div className="text-2xl font-bold text-gray-800">{totalTasks}</div>
+                <div className="text-xs text-gray-600">Tareas totales</div>
+              </div>
+              <div className="bg-white rounded-lg p-3 border border-gray-200">
+                <div className="text-2xl font-bold text-gray-800">{Math.round(progressPercent)}%</div>
+                <div className="text-xs text-gray-600">Completado</div>
+              </div>
+            </div>
+
+            {totalTasks > 0 && (
+              <div className="mt-4">
+                <div className="flex items-center justify-between text-sm mb-2">
+                  <span className="text-gray-700 font-medium">Progreso general del equipo</span>
+                  <span className="text-gray-600">{completedTasks}/{totalTasks} tareas</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-3">
+                  <div
+                    className="bg-purple-600 h-3 rounded-full transition-all"
+                    style={{ width: `${progressPercent}%` }}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Role Filter */}
+          {teamMembers.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => setFilterRole('all')}
+                className={`px-4 py-2 rounded-lg transition-colors ${
+                  filterRole === 'all'
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                Todos ({teamMembers.length})
+              </button>
+              {roleStats.map((role) => (
+                <button
+                  key={role.id}
+                  onClick={() => setFilterRole(role.id)}
+                  className={`px-4 py-2 rounded-lg transition-colors ${
+                    filterRole === role.id
+                      ? 'bg-purple-600 text-white'
+                      : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  {role.icon} {role.name} ({role.count})
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Team Members */}
+          {teamMembers.length === 0 ? (
+            <div className="bg-white border-2 border-dashed border-gray-300 rounded-lg p-12 text-center">
+              <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-gray-700 mb-2">
+                No hay miembros en el equipo
+              </h3>
+              <p className="text-sm text-gray-600 mb-4">
+                Añade a las personas que te ayudarán a organizar y coordinar la boda
+              </p>
+              <button
+                onClick={() => setShowModal(true)}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+              >
+                <UserPlus className="w-5 h-5" />
+                Añadir primer miembro
+              </button>
+            </div>
+          ) : filteredMembers.length === 0 ? (
+            <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
+              <p className="text-gray-600">No hay miembros con este rol</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filteredMembers.map((member) => (
+                <MemberCard
+                  key={member.id}
+                  member={member}
+                  onEdit={(m) => {
+                    setEditingMember(m);
+                    setShowModal(true);
+                  }}
+                  onDelete={handleDelete}
+                  onToggleTask={handleToggleTask}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Modal */}
+        {showModal && (
+          <MemberModal
+            member={editingMember}
+            onSave={handleSave}
+            onClose={() => {
+              setShowModal(false);
+              setEditingMember(null);
+            }}
+          />
+        )}
+      </div>
+    </PageWrapper>
+  );
+}

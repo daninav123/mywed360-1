@@ -35,14 +35,14 @@ npm install cypress --save-dev
 
 ### 2. Verifica que tienes usuario de prueba
 
-**Email:** `test@mywed360.com`  
+**Email:** `test@malove.app`  
 **Password:** `Test123456`
 
 Si NO lo tienes:
 
 1. Ve a Firebase Console
 2. Authentication → Users → Add User
-3. Email: test@mywed360.com
+3. Email: test@malove.app
 4. Password: Test123456
 5. El usuario necesita **una boda creada**
 
@@ -158,7 +158,7 @@ Si NO ves estos logs → El componente NO se está re-renderizando.
 ```powershell
 # Crear usuario en Firebase Console:
 # Authentication → Users → Add User
-Email: test@mywed360.com
+Email: test@malove.app
 Password: Test123456
 ```
 
@@ -186,7 +186,7 @@ npm run dev
 **Solución:**
 
 1. Abre http://localhost:5173/proveedores
-2. Login con test@mywed360.com
+2. Login con test@malove.app
 3. Click en "Gestionar servicios"
 4. Activa al menos 2-3 servicios
 5. Vuelve a ejecutar el test

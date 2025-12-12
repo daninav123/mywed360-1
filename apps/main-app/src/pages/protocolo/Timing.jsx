@@ -143,7 +143,7 @@ const Timing = () => {
             Organiza el cronograma completo de tu celebración
           </p>
           <Link to="/protocolo/dia-de-la-boda">
-            <Button className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600">
+            <Button className="bg-[var(--color-primary)] hover:bg-[var(--color-primary)]">
               <Play size={16} className="mr-2" />
               Activar Modo Día de la Boda
             </Button>
@@ -151,7 +151,7 @@ const Timing = () => {
         </div>
 
         {/* Estadísticas globales */}
-        <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-4">
+        <div className="bg-white border border-gray-200 rounded-lg p-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="text-center">
               <div className="text-2xl font-bold text-gray-900">{globalStats.total}</div>
@@ -195,7 +195,7 @@ const Timing = () => {
             return (
               <div
                 key={block.id}
-                className="bg-white rounded-lg border-2 border-gray-200 overflow-hidden hover:shadow-lg transition-all"
+                className="bg-white rounded-lg border-2 border-gray-200 overflow-hidden hover:shadow-md transition-all"
               >
                 {/* Header del bloque - Clickeable */}
                 <div
@@ -234,7 +234,7 @@ const Timing = () => {
                     <div className="flex items-center gap-3">
                       <div className="w-32 bg-gray-200 rounded-full h-2">
                         <div
-                          className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all"
+                          className="bg-[var(--color-primary)] h-2 rounded-full transition-all"
                           style={{ width: `${block.percentage}%` }}
                         />
                       </div>
@@ -271,7 +271,7 @@ const Timing = () => {
                               <div className="flex items-start gap-4">
                                 {/* Orden */}
                                 <div className="flex-shrink-0">
-                                  <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                                  <div className="w-8 h-8 bg-[var(--color-primary)] rounded-full flex items-center justify-center text-white text-sm font-bold">
                                     {moment.order || idx + 1}
                                   </div>
                                 </div>

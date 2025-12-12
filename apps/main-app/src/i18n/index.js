@@ -162,9 +162,18 @@ const SUPPORTED_NAMESPACES = (() => {
   });
 
   if (!namespaces.size) {
-    ['common', 'finance', 'tasks', 'seating', 'email', 'admin', 'marketing', 'chat', 'workflow', 'auth'].forEach((ns) =>
-      namespaces.add(ns)
-    );
+    [
+      'common',
+      'finance',
+      'tasks',
+      'seating',
+      'email',
+      'admin',
+      'marketing',
+      'chat',
+      'workflow',
+      'auth',
+    ].forEach((ns) => namespaces.add(ns));
   }
 
   return Array.from(namespaces).sort((a, b) => {

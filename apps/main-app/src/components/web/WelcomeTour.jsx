@@ -99,7 +99,7 @@ const WelcomeTour = ({ onComplete, onSkip, show }) => {
   return (
     <>
       {/* Overlay */}
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 transition-opacity" />
+      <div className="fixed inset-0 bg-black/50  z-40 transition-opacity" />
 
       {/* Highlight for current step */}
       {step.highlight && (
@@ -113,11 +113,11 @@ const WelcomeTour = ({ onComplete, onSkip, show }) => {
 
       {/* Tour Card */}
       <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-lg px-4">
-        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300">
+        <div className="bg-white rounded-2xl shadow-md overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300">
           {/* Progress Bar */}
           <div className="h-2 bg-gray-200">
             <div
-              className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-500"
+              className="h-full bg-[var(--color-primary)] transition-all duration-500"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -179,7 +179,7 @@ const WelcomeTour = ({ onComplete, onSkip, show }) => {
                 </button>
                 <button
                   onClick={handleNext}
-                  className="flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all active:scale-95"
+                  className="flex items-center gap-2 px-6 py-2 bg-[var(--color-primary)] text-white rounded-lg font-semibold hover:shadow-lg transition-all active:scale-95"
                 >
                   <span>{step.action}</span>
                   {isLast ? <Check size={20} /> : <ChevronRight size={20} />}
@@ -189,7 +189,7 @@ const WelcomeTour = ({ onComplete, onSkip, show }) => {
           </div>
 
           {/* Decorative Element */}
-          <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-gradient-to-br from-blue-400 to-purple-400 rounded-full opacity-20 blur-3xl" />
+          <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-[var(--color-primary)] rounded-full opacity-20 blur-3xl" />
           <div className="absolute -top-20 -left-20 w-40 h-40 bg-gradient-to-br from-pink-400 to-purple-400 rounded-full opacity-20 blur-3xl" />
         </div>
       </div>

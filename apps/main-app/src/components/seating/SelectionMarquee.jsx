@@ -25,7 +25,7 @@ export default function SelectionMarquee({ start, end, visible }) {
         height,
         pointerEvents: 'none',
       }}
-      className="border-2 border-indigo-500 rounded-lg
+      className="bg-[var(--color-primary)] rounded-lg
                  bg-indigo-500/10 backdrop-blur-sm"
     >
       {/* Corners animados */}

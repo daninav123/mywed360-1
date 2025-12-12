@@ -18,10 +18,10 @@ El código backend está **100% listo y funcional**. Solo necesita configuració
 - [ ] Ir a [App Store Connect](https://appstoreconnect.apple.com)
 - [ ] Seleccionar tu app → **Features** → **In-App Purchases**
 - [ ] Crear productos (Auto-Renewable Subscriptions):
-  - [ ] `com.mywed360.premium.monthly` - €9.99/mes
-  - [ ] `com.mywed360.premium.yearly` - €99.99/año
-  - [ ] `com.mywed360.premium_plus.monthly` - €19.99/mes
-  - [ ] `com.mywed360.premium_plus.yearly` - €199.99/año
+  - [ ] `com.MaLove.App.premium.monthly` - €9.99/mes
+  - [ ] `com.MaLove.App.premium.yearly` - €99.99/año
+  - [ ] `com.MaLove.App.premium_plus.monthly` - €19.99/mes
+  - [ ] `com.MaLove.App.premium_plus.yearly` - €199.99/año
 
 - [ ] Crear **Subscription Group** (ej: "Premium Plans")
 - [ ] Asignar todos los productos al grupo

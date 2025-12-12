@@ -28,7 +28,7 @@
 ## 🗂️ Estructura del Proyecto
 
 ```
-mywed360_windows/
+MaLove.App_windows/
 ├── apps/
 │   ├── main-app/              → malove.app
 │   │   ├── src/

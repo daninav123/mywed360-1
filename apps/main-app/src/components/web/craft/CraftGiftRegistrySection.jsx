@@ -110,7 +110,7 @@ export const CraftGiftRegistrySection = ({
 
         {/* Opción de efectivo */}
         {mostrarOpcionEfectivo && (
-          <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl shadow-md p-8 border-2 border-purple-200">
+          <div className="bg-[var(--color-primary)] rounded-xl shadow-md p-8 border-2 border-purple-200">
             <div className="max-w-3xl mx-auto text-center">
               <div className="text-5xl mb-4">💰</div>
               <h3

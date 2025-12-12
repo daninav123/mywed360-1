@@ -34,7 +34,7 @@ export default function AILayoutAnalyzer({ tables, hallSize, guests, onApplyOpti
     >
       {/* Header */}
       <div className="flex items-center gap-3 mb-4">
-        <div className="p-2 bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg">
+        <div className="p-2 bg-[var(--color-primary)] rounded-lg">
           <Sparkles className="w-5 h-5 text-white" />
         </div>
         <div>
@@ -57,10 +57,10 @@ export default function AILayoutAnalyzer({ tables, hallSize, guests, onApplyOpti
       ) : (
         <>
           {/* Score */}
-          <div className="mb-4 p-4 rounded-lg bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20">
+          <div className="mb-4 p-4 rounded-lg bg-[var(--color-primary)]/10">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Puntuación</span>
-              <span className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              <span className="text-3xl font-bold text-[color:var(--color-primary)]">
                 {analysis.emoji} {analysis.score}/{analysis.maxScore}
               </span>
             </div>
@@ -68,7 +68,7 @@ export default function AILayoutAnalyzer({ tables, hallSize, guests, onApplyOpti
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${(analysis.score / analysis.maxScore) * 100}%` }}
-                className="h-full rounded-full bg-gradient-to-r from-purple-600 to-pink-600"
+                className="h-full rounded-full bg-[var(--color-primary)]"
               />
             </div>
             <p className="text-xs text-gray-600 dark:text-gray-400 mt-2 text-center">

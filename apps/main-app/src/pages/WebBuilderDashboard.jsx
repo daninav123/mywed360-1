@@ -137,7 +137,7 @@ const WebBuilderDashboard = () => {
             </div>
             <button
               onClick={handleCreateNew}
-              className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:shadow-lg transition-all font-semibold flex items-center gap-2"
+              className="px-6 py-3 bg-[var(--color-primary)] text-white rounded-lg hover:shadow-md transition-all font-semibold flex items-center gap-2"
             >
               <span className="text-xl">+</span>
               Crear Nueva Web
@@ -168,7 +168,7 @@ const WebBuilderDashboard = () => {
                 className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow overflow-hidden"
               >
                 {/* Preview */}
-                <div className="h-48 bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center relative">
+                <div className="h-48 bg-[var(--color-primary)] flex items-center justify-center relative">
                   {web.published && (
                     <div className="absolute top-3 right-3">
                       <span className="px-3 py-1 bg-green-500 text-white text-xs font-semibold rounded-full">

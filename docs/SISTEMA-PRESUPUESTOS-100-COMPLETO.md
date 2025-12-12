@@ -161,7 +161,7 @@ Success: "Presupuesto enviado ✓"
 │ • Aceptar y contratar              │
 │                                    │
 │ [👀 Ver Presupuesto]               │
-│ https://app.mywed360.com/proveedores│
+│ https://app.MaLove.App.com/proveedores│
 └────────────────────────────────────┘
 ```
 
@@ -332,7 +332,7 @@ Recomendación automática
 ### **Email al Proveedor:**
 
 ```
-De: solicitudes@mywed360.com
+De: solicitudes@MaLove.App.com
 Para: proveedor@email.com
 Asunto: 💼 Nueva solicitud de [Cliente]
 
@@ -359,7 +359,7 @@ Variables tracking:
 ### **Email al Usuario:**
 
 ```
-De: notificaciones@mywed360.com
+De: notificaciones@MaLove.App.com
 Para: usuario@email.com
 Asunto: 🎉 [Proveedor] respondió tu solicitud
 
@@ -658,13 +658,13 @@ El sistema está completo, pero se puede mejorar con:
 ```env
 # Mailgun (requerido para emails)
 MAILGUN_API_KEY=key-abc123...
-MAILGUN_DOMAIN=mg.mywed360.com
+MAILGUN_DOMAIN=mg.MaLove.App.com
 
 # Frontend URL (para links en emails)
-FRONTEND_URL=https://app.mywed360.com
+FRONTEND_URL=https://app.MaLove.App.com
 
 # Backend URL (para responseUrl)
-BACKEND_URL=https://api.mywed360.com
+BACKEND_URL=https://api.MaLove.App.com
 ```
 
 **Verificar funcionamiento:**

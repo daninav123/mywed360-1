@@ -64,8 +64,8 @@ const CleanSongPicker = ({ isOpen, onClose, onSelect, momentTitle = '' }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[85vh] flex flex-col overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60">
+      <div className="bg-white rounded-xl shadow-md max-w-3xl w-full max-h-[85vh] flex flex-col overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
           <div>
@@ -164,7 +164,7 @@ const CleanSongPicker = ({ isOpen, onClose, onSelect, momentTitle = '' }) => {
                   <div className="flex items-center gap-4">
                     {/* Artwork */}
                     <div className="flex-shrink-0">
-                      <div className="w-20 h-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg overflow-hidden shadow-sm">
+                      <div className="w-20 h-20 bg-[var(--color-primary)] rounded-lg overflow-hidden shadow-sm">
                         {song.artwork ? (
                           <img
                             src={song.artwork}

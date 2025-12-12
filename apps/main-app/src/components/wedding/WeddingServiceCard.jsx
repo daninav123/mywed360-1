@@ -165,7 +165,7 @@ export default function WeddingServiceCard({
       {hasConfirmed ? (
         // Proveedor confirmado
         <div className="space-y-3">
-          <div className="border-l-4 border-green-500 bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-lg">
+          <div className="border-l-4 border-green-500 bg-[var(--color-primary)] p-4 rounded-lg">
             <div className="flex items-start justify-between mb-2">
               <p className="font-bold text-gray-900 text-lg">{confirmedProvider.name}</p>
               <span className="bg-green-600 text-white text-xs px-2 py-1 rounded-full">

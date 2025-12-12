@@ -181,7 +181,7 @@ const BlogAuthor = () => {
           <>
             <header className="flex flex-col gap-4 rounded-2xl border border-soft bg-white p-6 shadow-sm md:flex-row md:items-center">
               <div className="flex-shrink-0">
-                <div className="h-24 w-24 overflow-hidden rounded-full border border-soft bg-gradient-to-br from-indigo-200 to-pink-200">
+                <div className="h-24 w-24 overflow-hidden rounded-full border border-soft bg-[var(--color-primary)]">
                   {authorAvatar ? (
                     <img
                       src={authorAvatar}

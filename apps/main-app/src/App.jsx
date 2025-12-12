@@ -56,6 +56,18 @@ import SupplierPayments from './pages/suppliers/SupplierPayments';
 import SupplierDebug from './pages/suppliers/SupplierDebug';
 import SupplierPublicPage from './pages/SupplierPublicPage';
 import Tasks from './pages/Tasks';
+import TimelinePage from './pages/TimelinePage';
+import PhotoShotListPage from './pages/PhotoShotListPage';
+import PruebasEnsayos from './pages/PruebasEnsayos';
+import DesignWizard from './pages/DesignWizard';
+import TransporteLogistica from './pages/TransporteLogistica';
+import GestionNinos from './pages/GestionNinos';
+import WeddingTeam from './pages/WeddingTeam';
+import EventosRelacionados from './pages/EventosRelacionados';
+import TramitesLegales from './pages/TramitesLegales';
+import InvitadosEspeciales from './pages/InvitadosEspeciales';
+import DiaDeBoda from './pages/DiaDeBoda';
+import PostBoda from './pages/PostBoda';
 import VerifyEmail from './pages/VerifyEmail.jsx';
 import Login from './pages/Login.jsx';
 import Signup from './pages/Signup.jsx';
@@ -463,6 +475,18 @@ function App() {
                             <Route element={<MainLayout />}>
                               <Route path="home" element={<HomeUser />} />
                               <Route path="tasks" element={<Tasks />} />
+                              <Route path="timeline" element={<TimelinePage />} />
+                              <Route path="shot-list" element={<PhotoShotListPage />} />
+                              <Route path="pruebas-ensayos" element={<PruebasEnsayos />} />
+                              <Route path="design-wizard" element={<DesignWizard />} />
+                              <Route path="transporte" element={<TransporteLogistica />} />
+                              <Route path="gestion-ninos" element={<GestionNinos />} />
+                              <Route path="wedding-team" element={<WeddingTeam />} />
+                              <Route path="eventos-relacionados" element={<EventosRelacionados />} />
+                              <Route path="tramites-legales" element={<TramitesLegales />} />
+                              <Route path="invitados-especiales" element={<InvitadosEspeciales />} />
+                              <Route path="dia-de-boda" element={<DiaDeBoda />} />
+                              <Route path="post-boda" element={<PostBoda />} />
                               <Route path="bodas" element={<Bodas />} />
                               <Route path="bodas/:id" element={<BodaDetalle />} />
                               <Route path="finance" element={<Finance />} />

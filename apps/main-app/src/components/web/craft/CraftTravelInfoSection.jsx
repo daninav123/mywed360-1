@@ -198,7 +198,7 @@ export const CraftTravelInfoSection = ({
                     href={hotel.web}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mt-4 block w-full text-center px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:shadow-lg transition-all font-semibold"
+                    className="mt-4 block w-full text-center px-4 py-2 bg-[var(--color-primary)]/100 text-white rounded-lg hover:shadow-lg transition-all font-semibold"
                   >
                     Reservar
                   </a>
@@ -302,7 +302,7 @@ export const CraftTravelInfoSection = ({
           </p>
           <a
             href="mailto:contacto@ejemplo.com"
-            className="inline-block mt-4 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:shadow-lg transition-all font-semibold"
+            className="inline-block mt-4 px-6 py-3 bg-[var(--color-primary)]/100 text-white rounded-lg hover:shadow-lg transition-all font-semibold"
           >
             📧 Contáctanos
           </a>

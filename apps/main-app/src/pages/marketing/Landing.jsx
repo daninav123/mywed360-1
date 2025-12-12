@@ -523,7 +523,7 @@ const Landing = () => {
                   </h3>
                 </div>
                 {heroWidget.growth ? (
-                  <span className="rounded-full bg-[var(--color-primary)]/10 px-3 py-1 text-xs font-semibold text-[var(--color-primary)]">
+                  <span className="rounded-full bg-[var(--color-primary)]3 py-1 text-xs font-semibold text-[var(--color-primary)]">
                     {heroWidget.growth}
                   </span>
                 ) : null}
@@ -574,7 +574,7 @@ const Landing = () => {
             </div>
           ) : null}
           {heroWidgetAssistant.label ? (
-            <div className="ml-auto mt-6 w-5/6 rounded-[1.5rem] border border-soft bg-white/90 p-5 shadow-lg shadow-[var(--color-primary)]/10 backdrop-blur">
+            <div className="ml-auto mt-6 w-5/6 rounded-[1.5rem] border border-soft bg-white/90 p-5 shadow-lg shadow-[var(--color-primary)]/10 ">
               <p className="text-xs font-medium uppercase tracking-wider text-muted">
                 {heroWidgetAssistant.label}
               </p>
@@ -651,7 +651,7 @@ const Landing = () => {
                     {plannerDashboard.portfolioValue}
                   </p>
                   {plannerDashboard.portfolioBadge ? (
-                    <span className="rounded-full bg-[var(--color-primary)]/10 px-2 py-1 text-xs text-[var(--color-primary)]">
+                    <span className="rounded-full bg-[var(--color-primary)]2 py-1 text-xs text-[var(--color-primary)]">
                       {plannerDashboard.portfolioBadge}
                     </span>
                   ) : null}
@@ -713,56 +713,54 @@ const Landing = () => {
         </div>
       </section>
 
-      <section className="layout-container mt-24 space-y-10 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg shadow-[var(--color-primary)]/15">
-        <div className="grid gap-10 lg:grid-cols-[1.3fr,0.7fr] lg:items-center">
-          <div>
-            {stories.badge ? (
-              <span className="rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[var(--color-primary)]">
-                {stories.badge}
-              </span>
-            ) : null}
-            <h2 className="mt-5 text-3xl font-semibold text-body">
-              {stories.title || 'Historias reales'}
-            </h2>
-            {stories.description ? (
-              <p className="mt-3 text-base text-muted">{stories.description}</p>
-            ) : null}
-            <div className="mt-6 grid gap-4 md:grid-cols-2">
-              {testimonials.map((testimonial) => (
-                <article
-                  key={testimonial.name}
-                  className="flex h-full flex-col gap-3 rounded-2xl border border-soft bg-white/95 p-6 shadow-sm shadow-[var(--color-primary)]/10"
-                >
-                  <Quote className="h-5 w-5 text-[var(--color-primary)]" />
-                  <p className="text-sm text-body">{testimonial.quote}</p>
-                  <div>
-                    <p className="text-sm font-semibold text-body">{testimonial.name}</p>
-                    <p className="text-xs text-muted">{testimonial.role}</p>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </div>
-          <div className="rounded-3xl border border-soft bg-white/95 p-6 shadow-lg shadow-[var(--color-primary)]/15">
-            {trust.title ? (
-              <p className="text-xs font-semibold uppercase tracking-widest text-muted">
-                {trust.title}
-              </p>
-            ) : null}
-            <div className="mt-6 grid gap-6 text-center text-sm font-medium text-muted sm:grid-cols-2">
-              {trustBrands.map((brand) => (
-                <div
-                  key={brand}
-                  className="rounded-xl border border-soft bg-primary-soft/40 py-4 text-muted"
-                >
-                  {brand}
+      <section className="layout-container mt-24 space-y-10 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg shadow-[var(--color-primary)]/15 lg:grid-cols-[1fr,1fr]">
+        <div>
+          {stories.badge ? (
+            <span className="rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[var(--color-primary)]">
+              {stories.badge}
+            </span>
+          ) : null}
+          <h2 className="mt-5 text-3xl font-semibold text-body">
+            {stories.title || 'Historias reales'}
+          </h2>
+          {stories.description ? (
+            <p className="mt-3 text-base text-muted">{stories.description}</p>
+          ) : null}
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
+            {testimonials.map((testimonial) => (
+              <article
+                key={testimonial.name}
+                className="flex h-full flex-col gap-3 rounded-2xl border border-soft bg-white/95 p-6 shadow-sm shadow-[var(--color-primary)]/10"
+              >
+                <Quote className="h-5 w-5 text-[var(--color-primary)]" />
+                <p className="text-sm text-body">{testimonial.quote}</p>
+                <div>
+                  <p className="text-sm font-semibold text-body">{testimonial.name}</p>
+                  <p className="text-xs text-muted">{testimonial.role}</p>
                 </div>
-              ))}
-            </div>
-            {trust.note ? (
-              <p className="mt-6 text-xs text-muted">{trust.note}</p>
-            ) : null}
+              </article>
+            ))}
           </div>
+        </div>
+        <div className="rounded-3xl border border-soft bg-white/95 p-6 shadow-lg shadow-[var(--color-primary)]/15">
+          {trust.title ? (
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted">
+              {trust.title}
+            </p>
+          ) : null}
+          <div className="mt-6 grid gap-6 text-center text-sm font-medium text-muted sm:grid-cols-2">
+            {trustBrands.map((brand) => (
+              <div
+                key={brand}
+                className="rounded-xl border border-soft bg-primary-soft/40 py-4 text-muted"
+              >
+                {brand}
+              </div>
+            ))}
+          </div>
+          {trust.note ? (
+            <p className="mt-6 text-xs text-muted">{trust.note}</p>
+          ) : null}
         </div>
       </section>
 
@@ -845,7 +843,7 @@ const Landing = () => {
         </div>
       </section>
 
-      <section className="layout-container mt-24 rounded-3xl border border-[var(--color-primary)]/45 bg-[var(--color-primary)] px-8 py-10 text-white shadow-lg shadow-[var(--color-primary)]/30 md:px-12">
+      <section className="layout-container mt-24 rounded-3xl border border-[var(--color-primary)]/45 bg-[var(--color-primary)] text-white shadow-lg shadow-[var(--color-primary)]/30 md:px-12">
         <div className="grid gap-10 md:grid-cols-[2fr,1fr] md:items-center">
           <div>
             <h2 className="text-3xl font-semibold">{cta.title || 'Lista para usar en minutos.'}</h2>

@@ -78,14 +78,10 @@ export default function FinanceOverview({
         onNavigate={handleNavigate}
       />
 
-      {/* Analítica Predictiva - Estilo dashboard premium */}
+      {/* Analítica Predictiva */}
       {predictiveInsights && (
-        <Card className="relative p-6 md:p-8 bg-gradient-to-br from-[var(--color-surface)] via-[var(--color-surface)]/95 to-[var(--color-surface)]/90 backdrop-blur-xl border-soft shadow-xl space-y-6 overflow-hidden">
-          {/* Efecto de fondo decorativo */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-[var(--color-primary)]/10 to-transparent rounded-full blur-3xl -z-0" />
-          <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-[var(--color-info)]/10 to-transparent rounded-full blur-3xl -z-0" />
-          
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 relative z-10">
+        <Card className="bg-[var(--color-surface)] rounded-xl shadow-md border border-[color:var(--color-text)]/10 p-6 md:p-8 space-y-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             <div>
               <h3 className="text-xl md:text-2xl font-bold text-body tracking-tight">
                 {t('finance.overview.predictiveTitle', { defaultValue: 'Analítica predictiva' })}
@@ -115,8 +111,8 @@ export default function FinanceOverview({
             )}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-5 relative z-10">
-            <div className="group p-5 rounded-xl bg-gradient-to-br from-[var(--color-danger)]/15 via-[var(--color-danger)]/5 to-transparent border border-[color:var(--color-danger)]/30 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-5">
+            <div className="p-5 rounded-xl bg-[var(--color-danger)]/10 border border-[color:var(--color-danger)]/30">
               <p className="text-xs text-[color:var(--color-danger)] font-bold uppercase tracking-wider mb-2">
                 {t('finance.overview.burnRate', { defaultValue: 'Burn rate mensual' })}
               </p>
@@ -129,7 +125,7 @@ export default function FinanceOverview({
                 })}
               </p>
             </div>
-            <div className="group p-5 rounded-xl bg-gradient-to-br from-[var(--color-warning)]/15 via-[var(--color-warning)]/5 to-transparent border border-[color:var(--color-warning)]/30 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5">
+            <div className="p-5 rounded-xl bg-[var(--color-warning)]/10 border border-[color:var(--color-warning)]/30">
               <p className="text-xs text-[color:var(--color-warning)] font-bold uppercase tracking-wider mb-2">
                 {t('finance.overview.monthsToZero', {
                   defaultValue: 'Meses hasta agotar presupuesto',
@@ -145,7 +141,7 @@ export default function FinanceOverview({
                 </p>
               )}
             </div>
-            <div className="group p-5 rounded-xl bg-gradient-to-br from-[var(--color-success)]/15 via-[var(--color-success)]/5 to-transparent border border-[color:var(--color-success)]/30 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5">
+            <div className="p-5 rounded-xl bg-[var(--color-success)]/10 border border-[color:var(--color-success)]/30">
               <p className="text-xs text-[color:var(--color-success)] font-bold uppercase tracking-wider mb-2">
                 {t('finance.overview.forecastSurplus', {
                   defaultValue: 'Saldo proyectado día de la boda',
@@ -155,7 +151,7 @@ export default function FinanceOverview({
                 {formatCurrency(predictiveInsights.forecastSurplus || 0)}
               </p>
             </div>
-            <div className="group p-5 rounded-xl bg-gradient-to-br from-[var(--color-primary)]/15 via-[var(--color-primary)]/5 to-transparent border border-[color:var(--color-primary)]/30 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5">
+            <div className="p-5 rounded-xl bg-[var(--color-primary)]/10 border border-[color:var(--color-primary)]/30">
               <p className="text-xs text-[color:var(--color-primary)] font-bold uppercase tracking-wider mb-2">
                 {t('finance.overview.recommendedSaving', {
                   defaultValue: 'Ahorro mensual recomendado',
@@ -224,7 +220,7 @@ export default function FinanceOverview({
       )}
 
       {/* 💰 PRESUPUESTO POR CATEGORÍAS - Vista compacta */}
-      <Card className="p-6 md:p-7 bg-gradient-to-br from-[var(--color-surface)] to-[var(--color-surface)]/95 backdrop-blur-xl border-soft shadow-lg">
+      <Card className="p-6 md:p-7 bg-[var(--color-primary)] from-[var(--color-surface)] to-[var(--color-surface)]/95 backdrop-blur-xl border-soft shadow-lg">
         <h3 className="text-xl md:text-2xl font-bold text-body tracking-tight mb-5">
           {t('finance.overview.categoryStatus', {
             defaultValue: 'Estado del Presupuesto por Categorías',
@@ -257,10 +253,10 @@ export default function FinanceOverview({
                     <div
                       className={`h-2.5 rounded-full transition-all duration-500 ${
                         percentage >= 100
-                          ? 'bg-gradient-to-r from-[var(--color-danger)] to-red-600 shadow-lg'
+                          ? 'bg-[var(--color-primary)] from-[var(--color-danger)] to-red-600 shadow-lg'
                           : percentage >= warnThreshold
-                            ? 'bg-gradient-to-r from-[var(--color-warning)] to-orange-500 shadow-md'
-                            : 'bg-gradient-to-r from-[var(--color-success)] to-emerald-500 shadow-md'
+                            ? 'bg-[var(--color-primary)] from-[var(--color-warning)] to-orange-500 shadow-md'
+                            : 'bg-[var(--color-primary)] from-[var(--color-success)] to-emerald-500 shadow-md'
                       }`}
                       style={{ width: `${Math.min(percentage, 100)}%` }}
                     />

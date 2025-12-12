@@ -273,5 +273,5 @@ Tiempo:        1 día de 91 días (1.1%)
 ---
 
 **Mantenido por:** Daniel Navarro Campos  
-**Repositorio:** https://github.com/Daniel-Navarro-Campos/mywed360  
+**Repositorio:** https://github.com/Daniel-Navarro-Campos/MaLove.App  
 **Rama de trabajo:** windows

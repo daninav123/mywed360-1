@@ -284,12 +284,12 @@ Fields:
   ],
   
   media: {
-    logo: "https://storage.googleapis.com/mywed360/suppliers/alfonso-calza/logo.jpg",
-    cover: "https://storage.googleapis.com/mywed360/suppliers/alfonso-calza/cover.jpg",
+    logo: "https://storage.googleapis.com/MaLove.App/suppliers/alfonso-calza/logo.jpg",
+    cover: "https://storage.googleapis.com/MaLove.App/suppliers/alfonso-calza/cover.jpg",
     portfolio: [
-      "https://storage.googleapis.com/mywed360/suppliers/alfonso-calza/img1.jpg",
-      "https://storage.googleapis.com/mywed360/suppliers/alfonso-calza/img2.jpg",
-      "https://storage.googleapis.com/mywed360/suppliers/alfonso-calza/img3.jpg"
+      "https://storage.googleapis.com/MaLove.App/suppliers/alfonso-calza/img1.jpg",
+      "https://storage.googleapis.com/MaLove.App/suppliers/alfonso-calza/img2.jpg",
+      "https://storage.googleapis.com/MaLove.App/suppliers/alfonso-calza/img3.jpg"
     ]
   },
   

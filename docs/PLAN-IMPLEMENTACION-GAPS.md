@@ -88,7 +88,7 @@
   ```
   src/hooks/useSeatingSync.js
   - Actualizar seatAssignment en ambas direcciones
-  - Eventos: mywed360-seating, mywed360-guests
+  - Eventos: MaLove.App-seating, MaLove.App-guests
   - Persistencia en Firestore
   ```
 

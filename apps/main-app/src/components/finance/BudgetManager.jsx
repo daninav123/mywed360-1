@@ -502,7 +502,7 @@ const distributeIncrease = (amounts, indices, delta) => {
     <div className="space-y-6">
       {/* Stats Cards Premium */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="p-4 bg-gradient-to-br from-[var(--color-primary)]/10 to-transparent border-[var(--color-primary)]/30">
+        <Card className="p-4 bg-[var(--color-surface)] border-[var(--color-primary)]/30">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-primary)] mb-1">
@@ -514,7 +514,7 @@ const distributeIncrease = (amounts, indices, delta) => {
           </div>
         </Card>
 
-        <Card className="p-4 bg-gradient-to-br from-[var(--color-danger)]/10 to-transparent border-[var(--color-danger)]/30">
+        <Card className="p-4 bg-[var(--color-surface)] border-[var(--color-danger)]/30">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-danger)] mb-1">
@@ -528,7 +528,7 @@ const distributeIncrease = (amounts, indices, delta) => {
           </div>
         </Card>
 
-        <Card className="p-4 bg-gradient-to-br from-[var(--color-success)]/10 to-transparent border-[var(--color-success)]/30">
+        <Card className="p-4 bg-[var(--color-surface)] border-[var(--color-success)]/30">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-success)] mb-1">
@@ -542,7 +542,7 @@ const distributeIncrease = (amounts, indices, delta) => {
           </div>
         </Card>
 
-        <Card className="p-4 bg-gradient-to-br from-[var(--color-warning)]/10 to-transparent border-[var(--color-warning)]/30">
+        <Card className="p-4 bg-[var(--color-surface)] border-[var(--color-warning)]/30">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-warning)] mb-1">
@@ -558,7 +558,7 @@ const distributeIncrease = (amounts, indices, delta) => {
       </div>
 
       {/* Actions Bar */}
-      <Card className="p-4 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
+      <Card className="p-4 bg-[var(--color-surface)]/80 border-soft">
         <div className="flex justify-between items-center flex-wrap gap-3">
           <div>
             <h2 className="text-xl font-semibold text-[color:var(--color-text)]">
@@ -576,7 +576,7 @@ const distributeIncrease = (amounts, indices, delta) => {
 
       {/* Categories Grid */}
       {categories.length === 0 ? (
-        <Card className="p-12 text-center bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
+        <Card className="p-12 text-center bg-[var(--color-surface)]/80 border-soft">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--color-text)]/5 mb-4">
             <PieChart className="w-8 h-8 text-[color:var(--color-text)]/40" />
           </div>
@@ -683,7 +683,7 @@ const distributeIncrease = (amounts, indices, delta) => {
                 return (
                   <div
                     key={scenario.id || idx}
-                    className="rounded-lg border border-[color:var(--color-text)]/15 bg-white/70 shadow-sm"
+                    className="rounded-lg border border-[color:var(--color-text)]/15 bg-white shadow-md"
                   >
                     <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 px-4 py-3 border-b border-[color:var(--color-text)]/10">
                       <div>

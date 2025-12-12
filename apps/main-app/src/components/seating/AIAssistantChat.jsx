@@ -195,7 +195,7 @@ Responde siempre en español, de forma amigable y profesional.`;
         className="fixed right-4 bottom-4 w-96 h-[600px] bg-white dark:bg-gray-800 rounded-lg shadow-2xl border border-gray-200 dark:border-gray-700 flex flex-col z-50"
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-indigo-500 to-purple-600">
+        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-[var(--color-primary)]">
           <div className="flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-white" />
             <h3 className="font-semibold text-white">Asistente IA</h3>

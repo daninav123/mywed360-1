@@ -309,7 +309,7 @@ export default function QuoteRequestsTracker() {
 
       {/* Sección de comparar presupuestos */}
       {categoriesToCompare.length > 0 && (
-        <Card className="bg-gradient-to-r from-purple-50 to-indigo-50 border-2 border-purple-200">
+        <Card className="bg-[var(--color-primary)]digo-50 border-2 border-purple-200">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">

@@ -27,7 +27,7 @@ const WebSearchResults = ({ results, onImport, onSelect }) => {
     <div className="space-y-4">
       {/* AI Insight */}
       {results[0]?.aiInsight && (
-        <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-4 border border-purple-200">
+        <div className="bg-[var(--color-primary)] rounded-lg p-4 border border-purple-200">
           <div className="flex items-start gap-3">
             <Sparkles className="h-5 w-5 text-purple-600 flex-shrink-0 mt-0.5" />
             <div>

@@ -90,8 +90,8 @@ const FinanceCashflowTimeline = ({
   const monthsToZero = predictiveInsights?.monthsToZero || null;
 
   return (
-    <div className="rounded-2xl border border-soft bg-gradient-to-br from-[var(--color-surface)] to-[var(--color-surface)]/95 backdrop-blur-xl shadow-xl overflow-hidden">
-      <header className="border-b border-soft px-6 py-5 flex flex-wrap items-center justify-between gap-4 bg-gradient-to-r from-[var(--color-primary)]/5 to-transparent">
+    <div className="rounded-xl border border-[color:var(--color-text)]/10 bg-[var(--color-surface)] shadow-md overflow-hidden">
+      <header className="border-b border-soft px-6 py-5 flex flex-wrap items-center justify-between gap-4 bg-[var(--color-primary)]/5">
         <div className="space-y-1.5">
           <h2 className="text-lg md:text-xl font-bold text-body tracking-tight">
             {t('finance.cashflow.title', { defaultValue: 'Cronograma de caja' })}
@@ -134,7 +134,7 @@ const FinanceCashflowTimeline = ({
       <div className="grid gap-6 p-6 md:grid-cols-2">
         <section className="space-y-4">
           <div className="flex items-center gap-2">
-            <div className="w-1 h-6 bg-gradient-to-b from-[var(--color-danger)] to-red-600 rounded-full" />
+            <div className="w-1 h-6 bg-[var(--color-danger)] rounded-full" />
             <h3 className="text-sm font-bold uppercase tracking-wider text-body">
               {t('finance.cashflow.upcoming', { defaultValue: 'Pagos próximos (45 días)' })}
             </h3>
@@ -152,7 +152,7 @@ const FinanceCashflowTimeline = ({
               {upcomingWithinWindow.map((payment, index) => (
                 <li
                   key={`${payment.concept}-${payment.dueDate}-${index}`}
-                  className="group flex items-center justify-between rounded-xl border border-soft bg-gradient-to-r from-white/90 to-white/70 hover:from-[var(--color-danger)]/5 hover:to-transparent px-4 py-3 text-sm shadow-sm hover:shadow-md transition-all duration-200"
+                  className="group flex items-center justify-between rounded-xl border border-soft bg-[var(--color-primary)] hover:bg-[var(--color-danger)]/5 px-4 py-3 text-sm shadow-sm hover:shadow-md transition-all duration-200"
                 >
                   <div className="flex-1">
                     <p className="font-semibold text-body group-hover:text-[color:var(--color-danger)] transition-colors duration-200">
@@ -184,7 +184,7 @@ const FinanceCashflowTimeline = ({
         <section className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="w-1 h-6 bg-gradient-to-b from-[var(--color-primary)] to-blue-600 rounded-full" />
+              <div className="w-1 h-6 bg-[var(--color-primary)] rounded-full" />
               <h3 className="text-sm font-bold uppercase tracking-wider text-body">
                 {t('finance.cashflow.netTimeline', {
                   defaultValue: 'Flujo neto mensual (6 meses)',
@@ -228,8 +228,8 @@ const FinanceCashflowTimeline = ({
                     <div
                       className={`h-3 rounded-full transition-all duration-500 shadow-md ${
                         bar.positive
-                          ? 'bg-gradient-to-r from-[var(--color-success)] to-emerald-500'
-                          : 'bg-gradient-to-r from-[var(--color-danger)] to-red-600'
+                          ? 'bg-[var(--color-success)]'
+                          : 'bg-[var(--color-danger)]'
                       }`}
                       style={{ width: `${Math.max(bar.width * 100, 5)}%` }}
                     />
@@ -253,20 +253,20 @@ const FinanceCashflowTimeline = ({
 
       {/* 📊 PROYECCIÓN FINANCIERA INTEGRADA */}
       {projection?.summary && (
-        <div className="border-t border-soft px-6 py-6 bg-gradient-to-r from-[var(--color-primary)]/5 to-transparent">
+        <div className="border-t border-soft px-6 py-6 bg-[var(--color-primary)]/5">
           <div className="mb-4">
             <h3 className="text-lg md:text-xl font-bold text-body tracking-tight mb-1">
               {t('finance.overview.projectionTitle', { defaultValue: 'Proyección financiera' })}
             </h3>
             <p className="text-xs text-muted font-medium">
               {t('finance.overview.projectionHint', {
-                defaultValue:
-                  'Estimaciones basadas en aportaciones configuradas, regalos esperados e importes pendientes.',
+                defaultValue: 'Estimaciones basadas en aportaciones configuradas, regalos esperados e importes pendientes.',
               })}
             </p>
           </div>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
-            <div className="group bg-gradient-to-br from-[var(--color-success)]/15 via-[var(--color-success)]/5 to-transparent border border-[color:var(--color-success)]/30 rounded-xl p-4 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5">
+            <div className="group bg-[var(--color-success)]/15 border border-[color:var(--color-success)]/30 rounded-xl p-4 shadow-md hover:shadow-md transition-all duration-300 hover:-translate-y-0.5">
               <p className="text-xs uppercase tracking-wider text-[color:var(--color-success)] font-bold mb-2">
                 {t('finance.overview.projectedAtWedding', {
                   defaultValue: 'Balance el día de la boda',
@@ -274,34 +274,6 @@ const FinanceCashflowTimeline = ({
               </p>
               <p className="text-xl md:text-2xl font-bold text-[color:var(--color-success)]">
                 {formatCurrency(projection.summary.projectedAtWedding ?? 0)}
-              </p>
-            </div>
-            <div className="group bg-gradient-to-br from-[var(--color-warning)]/15 via-[var(--color-warning)]/5 to-transparent border border-[color:var(--color-warning)]/30 rounded-xl p-4 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5">
-              <p className="text-xs uppercase tracking-wider text-[color:var(--color-warning)] font-bold mb-2">
-                {t('finance.overview.minBalance', { defaultValue: 'Punto de balance mínimo' })}
-              </p>
-              <p className="text-xl md:text-2xl font-bold text-[color:var(--color-warning)]">
-                {formatCurrency(projection.summary.minProjectedBalance ?? 0)}
-              </p>
-              {projection.summary.minProjectedBalanceDate && (
-                <p className="text-xs text-muted mt-1">
-                  {t('finance.overview.onDate', { defaultValue: 'en' })}{' '}
-                  {projection.summary.minProjectedBalanceDate}
-                </p>
-              )}
-            </div>
-            <div className="group bg-gradient-to-br from-[var(--color-text)]/10 via-[var(--color-text)]/5 to-transparent border border-[color:var(--color-text)]/20 rounded-xl p-4 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5">
-              <p className="text-xs uppercase tracking-wider text-body font-bold mb-2">
-                {t('finance.overview.riskDays', { defaultValue: 'Días en riesgo' })}
-              </p>
-              <p className="text-xl md:text-2xl font-bold text-body">
-                {projection.summary.riskDays ?? 0}
-              </p>
-              <p className="text-xs text-muted mt-1">
-                {t('finance.overview.totalProjectedGifts', {
-                  defaultValue: 'Regalos proyectados:',
-                })}{' '}
-                {formatCurrency(projection.summary.totalProjectedGifts ?? 0)}
               </p>
             </div>
           </div>

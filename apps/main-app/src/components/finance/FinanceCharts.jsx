@@ -147,7 +147,7 @@ export default function FinanceCharts({ transactions = [], budgetUsage = [], sta
     <div className="space-y-6">
       {/* Stats Cards Premium */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="p-4 bg-gradient-to-br from-[var(--color-primary)]/10 to-transparent border-[var(--color-primary)]/30">
+        <Card className="p-4 bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/30">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-primary)] mb-1">
@@ -159,7 +159,7 @@ export default function FinanceCharts({ transactions = [], budgetUsage = [], sta
           </div>
         </Card>
 
-        <Card className="p-4 bg-gradient-to-br from-[var(--color-success)]/10 to-transparent border-[var(--color-success)]/30">
+        <Card className="p-4 bg-[var(--color-success)]/10 border border-[var(--color-success)]/30">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-success)] mb-1">
@@ -171,7 +171,7 @@ export default function FinanceCharts({ transactions = [], budgetUsage = [], sta
           </div>
         </Card>
 
-        <Card className="p-4 bg-gradient-to-br from-[var(--color-warning)]/10 to-transparent border-[var(--color-warning)]/30">
+        <Card className="p-4 bg-[var(--color-warning)]/10 border border-[var(--color-warning)]/30">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-warning)] mb-1">
@@ -183,7 +183,7 @@ export default function FinanceCharts({ transactions = [], budgetUsage = [], sta
           </div>
         </Card>
 
-        <Card className={`p-4 bg-gradient-to-br ${safeStats.currentBalance >= 0 ? 'from-[var(--color-success)]' : 'from-[var(--color-danger)]'}/10 to-transparent ${safeStats.currentBalance >= 0 ? 'border-[var(--color-success)]' : 'border-[var(--color-danger)]'}/30`}>
+        <Card className={`p-4 ${safeStats.currentBalance >= 0 ? 'bg-[var(--color-success)]' : 'bg-[var(--color-danger)]'}/10 border ${safeStats.currentBalance >= 0 ? 'border-[var(--color-success)]' : 'border-[var(--color-danger)]'}/30`}>
           <div className="flex items-center justify-between">
             <div>
               <p className={`text-xs font-bold uppercase tracking-wider ${safeStats.currentBalance >= 0 ? 'text-[color:var(--color-success)]' : 'text-[color:var(--color-danger)]'} mb-1`}>
@@ -200,7 +200,7 @@ export default function FinanceCharts({ transactions = [], budgetUsage = [], sta
 
       {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="p-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft shadow-lg hover:shadow-xl transition-shadow duration-300">
+        <Card className="p-6 bg-[var(--color-surface)] border border-[color:var(--color-text)]/10 shadow-md hover:shadow-lg transition-shadow duration-300">
           <div className="flex items-start justify-between mb-4">
             <div>
               <h3 className="text-lg font-semibold text-[color:var(--color-text)] mb-1">
@@ -250,7 +250,7 @@ export default function FinanceCharts({ transactions = [], budgetUsage = [], sta
           </div>
         </Card>
 
-        <Card className="p-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft shadow-lg hover:shadow-xl transition-shadow duration-300">
+        <Card className="p-6 bg-[var(--color-surface)] border border-[color:var(--color-text)]/10 shadow-md hover:shadow-lg transition-shadow duration-300">
           <div className="flex items-start justify-between mb-4">
             <div>
               <h3 className="text-lg font-semibold text-[color:var(--color-text)] mb-1">
@@ -293,7 +293,7 @@ export default function FinanceCharts({ transactions = [], budgetUsage = [], sta
           </div>
         </Card>
 
-        <Card className="p-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft shadow-lg hover:shadow-xl transition-shadow duration-300">
+        <Card className="p-6 bg-[var(--color-surface)] border border-[color:var(--color-text)]/10 shadow-md hover:shadow-lg transition-shadow duration-300">
           <div className="flex items-start justify-between mb-4">
             <div>
               <h3 className="text-lg font-semibold text-[color:var(--color-text)] mb-1">
@@ -355,7 +355,7 @@ export default function FinanceCharts({ transactions = [], budgetUsage = [], sta
           </div>
         </Card>
 
-        <Card className="p-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft shadow-lg hover:shadow-xl transition-shadow duration-300">
+        <Card className="p-6 bg-[var(--color-surface)] border border-[color:var(--color-text)]/10 shadow-md hover:shadow-lg transition-shadow duration-300">
           <div className="flex items-start justify-between mb-4">
             <div>
               <h3 className="text-lg font-semibold text-[color:var(--color-text)] mb-1">
@@ -415,7 +415,7 @@ export default function FinanceCharts({ transactions = [], budgetUsage = [], sta
       </div>
 
       {/* Insights Premium */}
-      <Card className="p-6 bg-gradient-to-br from-[var(--color-primary)]/5 to-transparent backdrop-blur-md border-soft shadow-lg">
+      <Card className="p-6 bg-[var(--color-surface)] border border-[color:var(--color-text)]/10 shadow-md">
         <div className="flex items-center gap-3 mb-6">
           <div className="p-3 rounded-xl bg-[var(--color-primary)]/15">
             <Lightbulb className="w-6 h-6 text-[color:var(--color-primary)]" />
@@ -431,7 +431,7 @@ export default function FinanceCharts({ transactions = [], budgetUsage = [], sta
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {expenseDistribution.length > 0 && (
-            <div className="p-5 rounded-xl bg-gradient-to-br from-[var(--color-danger)]/10 to-transparent border-2 border-[var(--color-danger)]/20 hover:border-[var(--color-danger)]/40 transition-colors duration-300">
+            <div className="p-5 rounded-xl bg-[var(--color-danger)]/10 border-2 border-[var(--color-danger)]/20">
               <div className="flex items-center gap-2 mb-3">
                 <AlertCircle className="w-5 h-5 text-[color:var(--color-danger)]" />
                 <h4 className="font-bold text-[color:var(--color-danger)]">
@@ -448,7 +448,7 @@ export default function FinanceCharts({ transactions = [], budgetUsage = [], sta
           )}
 
           {safeBudget.length > 0 && (
-            <div className="p-5 rounded-xl bg-gradient-to-br from-[var(--color-success)]/10 to-transparent border-2 border-[var(--color-success)]/20 hover:border-[var(--color-success)]/40 transition-colors duration-300">
+            <div className="p-5 rounded-xl bg-[var(--color-success)]/10 border-2 border-[var(--color-success)]/20">
               <div className="flex items-center gap-2 mb-3">
                 <Target className="w-5 h-5 text-[color:var(--color-success)]" />
                 <h4 className="font-bold text-[color:var(--color-success)]">
@@ -477,7 +477,7 @@ export default function FinanceCharts({ transactions = [], budgetUsage = [], sta
           )}
 
           {monthlyTrend.length > 0 && (
-            <div className="p-5 rounded-xl bg-gradient-to-br from-[var(--color-primary)]/10 to-transparent border-2 border-[var(--color-primary)]/20 hover:border-[var(--color-primary)]/40 transition-colors duration-300">
+            <div className="p-5 rounded-xl bg-[var(--color-primary)]/10 border-2 border-[var(--color-primary)]/20">
               <div className="flex items-center gap-2 mb-3">
                 <TrendingUp className="w-5 h-5 text-[color:var(--color-primary)]" />
                 <h4 className="font-bold text-[color:var(--color-primary)]">

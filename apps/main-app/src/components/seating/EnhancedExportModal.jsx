@@ -111,7 +111,7 @@ export default function EnhancedExportModal({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 bg-black/50  z-50 flex items-center justify-center p-4"
       onClick={onClose}
     >
       <motion.div
@@ -122,7 +122,7 @@ export default function EnhancedExportModal({
         className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-w-2xl w-full"
       >
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-6 py-4 rounded-t-2xl">
+        <div className="bg-[var(--color-primary)] text-white px-6 py-4 rounded-t-2xl">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Download className="w-6 h-6" />
@@ -361,7 +361,7 @@ export default function EnhancedExportModal({
                   px-6 py-2 rounded-lg font-medium transition-all duration-200 flex items-center gap-2
                   ${exportSuccess
                     ? 'bg-green-600 text-white'
-                    : 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white hover:shadow-lg hover:shadow-blue-500/50'
+                    : 'bg-[var(--color-primary)] text-white hover:shadow-lg hover:shadow-blue-500/50'
                   }
                   disabled:opacity-50
                 `}

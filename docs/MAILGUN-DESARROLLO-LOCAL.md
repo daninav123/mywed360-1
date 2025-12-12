@@ -4,7 +4,7 @@
 
 Las Routes de Mailgun apuntan a:
 ```
-https://mywed360-backend.onrender.com/api/inbound/mailgun
+https://MaLove.App-backend.onrender.com/api/inbound/mailgun
 ```
 
 Pero estás trabajando en:
@@ -87,7 +87,7 @@ Si prefieres trabajar con el backend desplegado:
 ### **Verificar que Render esté corriendo**
 
 ```bash
-curl https://mywed360-backend.onrender.com/health
+curl https://MaLove.App-backend.onrender.com/health
 ```
 
 Si responde 200 OK, entonces la Route ya está bien configurada.
@@ -95,7 +95,7 @@ Si responde 200 OK, entonces la Route ya está bien configurada.
 ### **Si Render no responde:**
 
 1. Ve a: https://dashboard.render.com/
-2. Selecciona tu servicio `mywed360-backend`
+2. Selecciona tu servicio `MaLove.App-backend`
 3. Ve a **Logs** para ver errores
 4. Si está en "Sleeping", espera a que despierte (puede tardar ~1 min)
 5. Re-despliega si es necesario: Click **Manual Deploy** → **Deploy latest commit**

@@ -18,7 +18,7 @@ export const ThemeSelector = ({ temaActual, onTemaChange }) => {
       <button
         onClick={() => setMostrarModal(true)}
         className="
-          px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white 
+          px-4 py-2 bg-[var(--color-primary)] text-white 
           rounded-lg hover:shadow-lg transition-all font-semibold
           flex items-center gap-2
         "

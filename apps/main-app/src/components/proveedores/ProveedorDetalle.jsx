@@ -54,7 +54,7 @@ const ProveedorDetalle = ({
   return (
     <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
       {/* Cabecera con imagen de fondo */}
-      <div className="relative h-48 bg-gradient-to-r from-blue-500 to-purple-500">
+      <div className="relative h-48 bg-[var(--color-primary)]">
         {proveedor.imagen && (
           <img
             src={proveedor.imagen}

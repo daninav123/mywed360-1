@@ -69,15 +69,39 @@ const BASE_STEPS = [
   {
     id: 'ceremonyType',
     field: 'ceremonyType',
-    question: 'Y sobre la ceremonia, �c�mo te gustar�a que fuese?',
+    question: 'Y sobre la ceremonia, ¿cómo te gustaría que fuese?',
     type: 'options',
     optionsKey: 'ceremonyType',
     condition: (form) => form.eventType === 'boda',
   },
   {
+    id: 'budget',
+    field: 'budget',
+    question: '¿Cuál es tu presupuesto aproximado para el evento? (ejemplo: 15000 o "flexible")',
+    optional: false,
+  },
+  {
+    id: 'timeAvailable',
+    field: 'timeAvailable',
+    question: '¿Cuánto tiempo tienes para organizar todo? (meses aproximados)',
+    optional: false,
+  },
+  {
+    id: 'priorities',
+    field: 'priorities',
+    question: 'Ordena tus 3 prioridades principales: 1) Fotografía/Video, 2) Comida/Catering, 3) Decoración, 4) Música, 5) Locación (escribe los números en orden, ejemplo: 1,3,2)',
+    optional: false,
+  },
+  {
+    id: 'concerns',
+    field: 'concerns',
+    question: '¿Hay algo que te preocupe especialmente o quieras asegurarte de que salga perfecto?',
+    optional: true,
+  },
+  {
     id: 'notes',
     field: 'notes',
-    question: '�Quieres a�adir alg�n detalle importante o inspiraci�n que debamos tener en cuenta?',
+    question: '¿Quieres añadir algún detalle importante o inspiración que debamos tener en cuenta?',
     optional: true,
   },
 ];
@@ -91,6 +115,10 @@ const INITIAL_FORM = {
   guestCountRange: GUEST_COUNT_OPTIONS[0].value,
   formalityLevel: FORMALITY_OPTIONS[0].value,
   ceremonyType: CEREMONY_TYPE_OPTIONS[0].value,
+  budget: '',
+  timeAvailable: '',
+  priorities: '',
+  concerns: '',
   notes: '',
 };
 
@@ -175,6 +203,36 @@ const stepParsers = {
         ok: false,
         message: 'Indica al menos una ciudad o zona aproximada.',
       };
+    }
+    return { ok: true, value, display: value };
+  },
+  budget: (input) => {
+    const value = input.trim();
+    if (!value) {
+      return { ok: false, message: 'Por favor indica un presupuesto aproximado o escribe "flexible".' };
+    }
+    return { ok: true, value, display: value };
+  },
+  timeAvailable: (input) => {
+    const value = input.trim();
+    const months = parseInt(value, 10);
+    if (isNaN(months) || months < 1) {
+      return { ok: false, message: 'Indica cuántos meses aproximados (ejemplo: 6, 12, 18).' };
+    }
+    return { ok: true, value: `${months}`, display: `${months} meses` };
+  },
+  priorities: (input) => {
+    const value = input.trim();
+    const pattern = /^\d,\d,\d$/;
+    if (!pattern.test(value)) {
+      return { ok: false, message: 'Escribe 3 números separados por comas (ejemplo: 1,3,2).' };
+    }
+    return { ok: true, value, display: value };
+  },
+  concerns: (input) => {
+    const value = input.trim();
+    if (!value) {
+      return { ok: true, value: '', display: 'Sin preocupaciones específicas' };
     }
     return { ok: true, value, display: value };
   },
@@ -401,6 +459,14 @@ export default function CreateWeddingAssistant() {
           notes: form.notes || '',
         },
         preferences: { style: form.style },
+        onboarding: {
+          budget: form.budget || '',
+          timeAvailable: form.timeAvailable || '',
+          priorities: form.priorities || '',
+          concerns: form.concerns || '',
+          completedAt: new Date().toISOString(),
+          method: 'assistant',
+        },
       };
       const weddingId = await createWedding(currentUser.uid, payload);
       setLastCreatedId(weddingId);

@@ -168,7 +168,7 @@ const EventTimeline = ({ events = [], startTime, onEventComplete }) => {
 
       {/* Reloj en vivo */}
       {isLive && (
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg p-6 text-center">
+        <div className="bg-[var(--color-primary)] text-white rounded-lg p-6 text-center">
           <p className="text-sm mb-2 opacity-90">Hora Actual</p>
           <p className="text-4xl font-bold">
             {currentTime.toLocaleTimeString(currentLanguage || 'es')}

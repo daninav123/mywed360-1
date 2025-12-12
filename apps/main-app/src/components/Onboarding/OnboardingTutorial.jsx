@@ -62,7 +62,7 @@ const OnboardingTutorial = ({ onComplete }) => {
       title: 'Bienvenido a MaLoveApp!',
       content: (
         <div className="text-center">
-          <div className="mx-auto w-32 h-32 bg-blue-100 rounded-full flex items-center justify-center mb-6">
+          <div className="mx-auto w-32 h-32 bg-100 rounded-full flex items-center justify-center mb-6">
             <img src="/icon-192.png" alt="MaLoveApp" className="w-20 h-20" />
           </div>
           <h2 className="text-2xl font-bold mb-4">Comienza a planificar tu boda!</h2>
@@ -121,7 +121,7 @@ const OnboardingTutorial = ({ onComplete }) => {
       content: (
         <div>
           <div className="mb-6 flex items-center justify-center">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+            <div className="w-16 h-16 bg-100 rounded-full flex items-center justify-center">
               <Users className="w-8 h-8 text-blue-600" />
             </div>
           </div>
@@ -154,7 +154,7 @@ const OnboardingTutorial = ({ onComplete }) => {
       content: (
         <div>
           <div className="mb-6 flex items-center justify-center">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+            <div className="w-16 h-16 bg-100 rounded-full flex items-center justify-center">
               <ShoppingBag className="w-8 h-8 text-blue-600" />
             </div>
           </div>
@@ -188,7 +188,7 @@ const OnboardingTutorial = ({ onComplete }) => {
       content: (
         <div>
           <div className="mb-6 flex items-center justify-center">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+            <div className="w-16 h-16 bg-100 rounded-full flex items-center justify-center">
               <Calendar className="w-8 h-8 text-blue-600" />
             </div>
           </div>
@@ -222,7 +222,7 @@ const OnboardingTutorial = ({ onComplete }) => {
       content: (
         <div>
           <div className="mb-6 flex items-center justify-center">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+            <div className="w-16 h-16 bg-100 rounded-full flex items-center justify-center">
               <Image className="w-8 h-8 text-blue-600" />
             </div>
           </div>
@@ -390,7 +390,7 @@ const OnboardingTutorial = ({ onComplete }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
         {/* Encabezado */}
-        <div className="bg-gradient-to-r from-pink-500 to-rose-500 text-white px-6 py-4 rounded-t-lg flex justify-between items-start">
+        <div className="bg-[var(--color-primary)] text-white px-6 py-4 rounded-t-lg flex justify-between items-start">
           <div>
             <h3 className="font-semibold text-lg">{steps[currentStep].title}</h3>
             <div className="flex mt-2">

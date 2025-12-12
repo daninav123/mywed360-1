@@ -13,8 +13,8 @@ Objetivo: que cualquier persona nueva pueda instalar, configurar y ejecutar el p
 
 ```bash
 # Clonar
-git clone https://github.com/Daniel-Navarro-Campos/mywed360.git
-cd mywed360
+git clone https://github.com/Daniel-Navarro-Campos/MaLove.App.git
+cd MaLove.App
 
 # Instalar dependencias
 npm install

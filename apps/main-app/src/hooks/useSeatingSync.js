@@ -214,10 +214,7 @@ export function useSeatingSync(weddingId, options = {}) {
           });
 
           changesCount++;
-          // console.log('[useSeatingSync] Corrigiendo guest:', guestId, {
-            from: guestTableId,
-            to: seatingTableId,
-          });
+          // console.log('[useSeatingSync] Corrigiendo guest:', guestId, { from: guestTableId, to: seatingTableId });
         }
       });
 

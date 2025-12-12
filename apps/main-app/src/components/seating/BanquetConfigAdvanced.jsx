@@ -70,7 +70,7 @@ export default function BanquetConfigAdvanced({ isOpen, onClose, config, onSave 
             </div>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
+              className="p-2 hover:bg-[var(--color-primary)] transition-colors"
             >
               <X size={20} className="text-gray-400" />
             </button>

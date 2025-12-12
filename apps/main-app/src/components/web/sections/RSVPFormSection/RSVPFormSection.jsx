@@ -49,7 +49,7 @@ const RSVPFormSection = ({ config, editable = false, onChange }) => {
   };
 
   return (
-    <section className="py-16 px-4 bg-gradient-to-br from-pink-50 to-purple-50">
+    <section className="py-16 px-4 bg-[var(--color-primary)]/10">
       <div className="max-w-2xl mx-auto">
         {/* Título */}
         {editable ? (
@@ -193,8 +193,7 @@ const RSVPFormSection = ({ config, editable = false, onChange }) => {
               <button
                 type="submit"
                 className="
-                  w-full bg-gradient-to-r from-pink-500 to-purple-600
-                  text-white font-bold py-3 rounded-lg
+                  w-full bg-[var(--color-primary)] text-white font-bold py-3 rounded-lg
                   hover:shadow-lg transition-all
                   transform hover:scale-105
                 "
@@ -206,7 +205,7 @@ const RSVPFormSection = ({ config, editable = false, onChange }) => {
         </form>
 
         {editable && (
-          <div className="mt-6 p-4 bg-blue-50 rounded-lg text-sm text-blue-700">
+          <div className="mt-6 p-4 50 rounded-lg text-sm text-blue-700">
             💡 Este es un preview del formulario. Los usuarios podrán rellenarlo en la web
             publicada.
           </div>

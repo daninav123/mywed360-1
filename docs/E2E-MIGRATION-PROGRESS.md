@@ -305,7 +305,7 @@ Migrar el 100% de los tests E2E de mocks/stubs a integración real con Firebase,
 
 ## 📞 Contacto y Soporte
 
-**Repositorio:** https://github.com/Daniel-Navarro-Campos/mywed360  
+**Repositorio:** https://github.com/Daniel-Navarro-Campos/MaLove.App  
 **Rama de trabajo:** `windows`  
 **Documentación:** `docs/E2E-TESTING-STRATEGY.md`
 

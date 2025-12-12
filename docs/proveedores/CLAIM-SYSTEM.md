@@ -200,7 +200,7 @@ async function sendClaimVerificationEmail(email, name, code) {
   });
   
   const data = {
-    from: 'MyWed360 <noreply@mywed360.com>',
+    from: 'MyWed360 <noreply@MaLove.App.com>',
     to: email,
     subject: 'Verifica tu perfil en MyWed360',
     html: `

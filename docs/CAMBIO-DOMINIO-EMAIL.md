@@ -45,13 +45,13 @@ email: `${alias}@malove.app`
 #### `docs/flujos-especificos/flujo-7-comunicacion-emails.md`
 
 **Cambios:**
-- Línea 17: Actualizado de `@mywed360` a `@malove.app`
+- Línea 17: Actualizado de `@MaLove.App` a `@malove.app`
 - Línea 24: Actualizado en rutas auxiliares
 
 #### `docs/AUDITORIA-DOCUMENTACION-MAILS.md`
 
 **Cambios:**
-- Sección de Onboarding: `@mywed360` → `@malove.app`
+- Sección de Onboarding: `@MaLove.App` → `@malove.app`
 - Tabla de requisitos: Actualizada referencia
 
 #### `docs/manual-usuario.md`

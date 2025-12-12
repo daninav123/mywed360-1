@@ -149,7 +149,7 @@ const SmartPromptEditor = ({
 
       {/* Smart Suggestions */}
       {showSuggestions && suggestions.length > 0 && (
-        <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-xl p-4">
+        <div className="bg-[var(--color-primary)] border border-purple-200 rounded-xl p-4">
           <div className="flex items-start gap-2 mb-3">
             <Lightbulb size={18} className="text-purple-600 mt-0.5" />
             <div>
@@ -172,7 +172,7 @@ const SmartPromptEditor = ({
       )}
 
       {/* Variables Section */}
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+      <div className="bg-blue-50 border 200 rounded-xl p-4">
         <div className="flex items-start gap-2 mb-3">
           <Sparkles size={18} className="text-blue-600 mt-0.5" />
           <div className="flex-1">
@@ -186,7 +186,7 @@ const SmartPromptEditor = ({
             <button
               key={variable.key}
               onClick={() => insertVariable(variable.key)}
-              className="group text-left px-3 py-2 bg-white hover:bg-blue-100 rounded-lg border border-blue-200 hover:border-blue-400 transition-all"
+              className="group text-left px-3 py-2 bg-white hover:bg-blue-100 rounded-lg border 200 hover:400 transition-all"
               title={variable.desc}
             >
               <code className="text-xs font-mono text-purple-600 font-semibold">
@@ -211,7 +211,7 @@ const SmartPromptEditor = ({
             <button
               key={index}
               onClick={() => onChange(example.text)}
-              className="text-left p-3 bg-gradient-to-br from-gray-50 to-gray-100 hover:from-blue-50 hover:to-purple-50 rounded-lg border border-gray-200 hover:border-blue-300 transition-all group"
+              className="text-left p-3 bg-white rounded-lg border border-gray-200 hover:border-blue-300 transition-all group"
             >
               <div className="font-semibold text-sm text-gray-900 mb-1 group-hover:text-blue-900">
                 {example.title}

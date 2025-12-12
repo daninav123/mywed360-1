@@ -189,7 +189,7 @@ const GlobalSearch = ({ isOpen, onClose }) => {
     <>
       {/* Backdrop */}
       <div 
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 animate-fade-in"
+        className="fixed inset-0 bg-black/50  z-50 animate-fade-in"
         onClick={onClose}
       />
 
@@ -228,7 +228,7 @@ const GlobalSearch = ({ isOpen, onClose }) => {
             {/* Intent badge (si hay búsqueda web) */}
             {searchData?.intent?.needsWeb && query && (
               <div className="px-4 pb-3">
-                <div className="inline-flex items-center gap-2 px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-xs">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-[var(--color-primary)]ded-full text-xs">
                   <Sparkles className="h-3 w-3" />
                   Búsqueda web con IA activada
                   {searchData.intent.category && (

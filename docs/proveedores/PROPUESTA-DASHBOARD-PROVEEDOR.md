@@ -534,7 +534,7 @@ suppliers/{supplierId}/templates/{templateId}
 
 ### **Email automático:**
 ```
-De: notifications@mywed360.com
+De: notifications@MaLove.App.com
 Para: proveedor@email.com
 Asunto: 🆕 Nueva solicitud de presupuesto
 

@@ -59,7 +59,7 @@ MX @ mxb.mailgun.org (Priority: 10)
 
 #### **3.1 URL del Webhook**
 ```
-https://mywed360-backend.onrender.com/api/inbound/mailgun
+https://MaLove.App-backend.onrender.com/api/inbound/mailgun
 ```
 
 #### **3.2 Eventos a Suscribir**
@@ -87,8 +87,8 @@ Dashboard → **Receiving** → **Routes** → **Create Route**
 match_recipient(".*@malove.app")
 
 // Actions
-forward("https://mywed360-backend.onrender.com/api/inbound/mailgun")
-store(notify="https://mywed360-backend.onrender.com/api/inbound/mailgun")
+forward("https://MaLove.App-backend.onrender.com/api/inbound/mailgun")
+store(notify="https://MaLove.App-backend.onrender.com/api/inbound/mailgun")
 ```
 
 #### **4.2 Ruta Específica para Usuario**
@@ -100,7 +100,7 @@ Para `dani@malove.app`:
 match_recipient("dani@malove.app")
 
 // Actions
-forward("https://mywed360-backend.onrender.com/api/inbound/mailgun")
+forward("https://MaLove.App-backend.onrender.com/api/inbound/mailgun")
 ```
 
 ---
@@ -245,7 +245,7 @@ tail -f logs/backend.log | grep mailSendService
 tail -f logs/backend.log | grep mailgun-inbound
 
 # Test manual del webhook
-curl -X POST https://mywed360-backend.onrender.com/api/inbound/mailgun \
+curl -X POST https://MaLove.App-backend.onrender.com/api/inbound/mailgun \
   -F sender="test@example.com" \
   -F recipient="dani@malove.app" \
   -F subject="Test" \
@@ -331,7 +331,7 @@ Si encuentras problemas:
 
 3. **Test de Conectividad:**
    ```bash
-   curl -v https://mywed360-backend.onrender.com/api/inbound/mailgun
+   curl -v https://MaLove.App-backend.onrender.com/api/inbound/mailgun
    ```
 
 ---

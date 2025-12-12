@@ -104,18 +104,8 @@ export default function FinanceHeroSection({
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
       {/* HERO CARD - Disponible Ahora */}
-      <Card className="relative overflow-hidden bg-gradient-to-br from-[var(--color-surface)] to-[var(--color-surface)]/95 backdrop-blur-xl border-2 shadow-2xl p-6 md:p-8">
-        {/* Fondo decorativo dinámico */}
-        <div 
-          className="absolute -top-32 -right-32 w-96 h-96 rounded-full blur-3xl opacity-20 transition-all duration-500"
-          style={{ backgroundColor: colorMap[healthColor] }}
-        />
-        <div 
-          className="absolute -bottom-24 -left-24 w-64 h-64 rounded-full blur-3xl opacity-15 transition-all duration-500"
-          style={{ backgroundColor: colorMap[healthColor] }}
-        />
-
-        <div className="relative z-10 space-y-6">
+      <Card className="bg-[var(--color-surface)] rounded-xl shadow-md border border-[color:var(--color-text)]/10 p-6 md:p-8">
+        <div className="space-y-6">
           {/* Header - Disponible Ahora */}
           <div className="flex items-start justify-between">
             <div className="flex-1">
@@ -130,7 +120,7 @@ export default function FinanceHeroSection({
               ) : (
                 <>
                   <h1 
-                    className="text-4xl md:text-6xl font-black tracking-tight transition-colors duration-300"
+                    className="text-3xl md:text-4xl font-bold tracking-tight transition-colors duration-300"
                     style={{ color: colorMap[healthColor] }}
                   >
                     {formatCurrency(availableNow)}
@@ -141,13 +131,7 @@ export default function FinanceHeroSection({
                 </>
               )}
             </div>
-            <div 
-              className="p-4 md:p-5 rounded-2xl shadow-xl transition-all duration-300 hover:scale-110"
-              style={{ 
-                backgroundColor: `color-mix(in srgb, ${colorMap[healthColor]} 15%, var(--color-surface))`,
-                boxShadow: `0 8px 24px color-mix(in srgb, ${colorMap[healthColor]} 30%, transparent)`
-              }}
-            >
+            <div className="p-4 md:p-5 rounded-2xl bg-[var(--color-text)]/5 shadow-md">
               {isHealthy ? (
                 <TrendingUp className="w-8 h-8 md:w-10 md:h-10" style={{ color: colorMap[healthColor] }} />
               ) : (
@@ -169,7 +153,7 @@ export default function FinanceHeroSection({
                 </div>
                 {runway ? (
                   <>
-                    <p className="text-2xl font-black text-body">{runway}d</p>
+                    <p className="text-xl font-bold text-body">{runway}d</p>
                     <p className="text-xs text-muted mt-1">
                       {t('finance.hero.runwayDesc', { defaultValue: 'Hasta quedarte sin fondos' })}
                     </p>
@@ -191,7 +175,7 @@ export default function FinanceHeroSection({
                 </div>
                 {paymentAnalysis.upcoming7d.length > 0 ? (
                   <>
-                    <p className="text-2xl font-black text-[color:var(--color-warning)]">
+                    <p className="text-xl font-bold text-[color:var(--color-warning)]">
                       {formatCurrency(paymentAnalysis.upcoming7d.reduce((sum, p) => sum + p.outstanding, 0))}
                     </p>
                     <p className="text-xs text-muted mt-1">
@@ -233,7 +217,7 @@ export default function FinanceHeroSection({
       </Card>
 
       {/* Estado de Categorías */}
-      <Card className="bg-gradient-to-br from-[var(--color-surface)] to-[var(--color-surface)]/90 backdrop-blur-xl border-soft shadow-xl p-6">
+      <Card className="bg-[var(--color-surface)] rounded-xl shadow-md border border-[color:var(--color-text)]/10 p-6">
         <div className="space-y-5">
           <div>
             <p className="text-sm font-bold uppercase tracking-wider text-muted mb-4">
@@ -247,7 +231,7 @@ export default function FinanceHeroSection({
               <p className="text-xs font-bold uppercase tracking-wider text-muted mb-1">
                 {t('finance.hero.categoriesOk', { defaultValue: '✅ Categorías OK' })}
               </p>
-              <p className="text-3xl font-black text-[color:var(--color-success)]">
+              <p className="text-2xl font-bold text-[color:var(--color-success)]">
                 {categoryStatus.ok}
               </p>
             </div>
@@ -260,7 +244,7 @@ export default function FinanceHeroSection({
                 <p className="text-xs font-bold uppercase tracking-wider text-muted mb-1">
                   {t('finance.hero.categoriesWarning', { defaultValue: '⚠️ En alerta (>75%)' })}
                 </p>
-                <p className="text-3xl font-black text-[color:var(--color-warning)]">
+                <p className="text-2xl font-bold text-[color:var(--color-warning)]">
                   {categoryStatus.warning}
                 </p>
               </div>
@@ -274,7 +258,7 @@ export default function FinanceHeroSection({
                 <p className="text-xs font-bold uppercase tracking-wider text-muted mb-1">
                   {t('finance.hero.categoriesCritical', { defaultValue: '🔴 Críticas (>90%)' })}
                 </p>
-                <p className="text-3xl font-black text-[color:var(--color-danger)]">
+                <p className="text-2xl font-bold text-[color:var(--color-danger)]">
                   {categoryStatus.critical}
                 </p>
               </div>

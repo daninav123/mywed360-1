@@ -110,7 +110,7 @@ export const CraftTestimonialsSection = ({
             </h3>
             <p className="text-gray-600 mb-4">Nos encantaría saber lo que significamos para ti</p>
             <button
-              className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:shadow-lg transition-all font-semibold"
+              className="px-6 py-3 bg-[var(--color-primary)] text-white rounded-lg hover:shadow-lg transition-all font-semibold"
               onClick={() => alert('Función de añadir testimonio próximamente')}
             >
               💝 Compartir Mensaje

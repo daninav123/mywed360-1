@@ -38,7 +38,7 @@ export default function ViewQuotationModal({ isOpen, onClose, quotation, onRespo
     <Modal isOpen={isOpen} onClose={onClose} title="Cotización Recibida" size="lg">
       <div className="space-y-6">
         {/* Header Info */}
-        <Card className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20">
+        <Card className="bg-[var(--color-primary)] dark:bg-[var(--color-primary)]">
           <div className="flex items-start justify-between">
             <div>
               <div className="flex items-center gap-2 mb-2">

@@ -116,9 +116,9 @@ export default function SupplierPublicPage() {
         <link rel="canonical" href={`${window.location.origin}/p/${slug}`} />
       </Helmet>
 
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-nd">
         {/* Hero Section con Foto de Portada */}
-        <div className="relative h-96 bg-gradient-to-br from-primary/20 to-accent/20">
+        <div className="relative h-96 bg-[var(--color-primary)]accent/20">
           {coverPhoto && (
             <img
               src={coverPhoto.original}
@@ -126,11 +126,11 @@ export default function SupplierPublicPage() {
               className="w-full h-full object-cover"
             />
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+          <div className="absolute inset-0 bg-[var(--color-primary)]black/30 to-transparent" />
 
           {/* Nombre del Proveedor */}
           <div className="absolute bottom-0 left-0 right-0 p-8">
-            <div className="max-w-7xl mx-auto">
+            <div className="mshadow-md mx-auto">
               <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">{supplier.name}</h1>
               <p className="text-xl text-white/90">
                 {supplier.profile?.category || 'Servicios de boda'}
@@ -162,7 +162,7 @@ export default function SupplierPublicPage() {
         </div>
 
         {/* Contenido Principal */}
-        <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="mshadow-md mx-auto px-4 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Columna Principal - Portfolio */}
             <div className="lg:col-span-2 space-y-8">

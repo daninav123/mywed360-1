@@ -271,7 +271,7 @@ X-RateLimit-Reset: 1634567890
 El token se genera usando SHA-256:
 
 ```javascript
-token = SHA256(code + "-mywed360-partner-" + JWT_SECRET).substring(0, 32)
+token = SHA256(code + "-MaLove.App-partner-" + JWT_SECRET).substring(0, 32)
 ```
 
 **Características:**
@@ -313,4 +313,4 @@ token = SHA256(code + "-mywed360-partner-" + JWT_SECRET).substring(0, 32)
 Para dudas o incidencias:
 - **Email:** soporte@maloveapp.com
 - **Documentación:** `/docs/partner-stats-system.md`
-- **Repositorio:** https://github.com/Daniel-Navarro-Campos/mywed360
+- **Repositorio:** https://github.com/Daniel-Navarro-Campos/MaLove.App

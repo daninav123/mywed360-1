@@ -649,7 +649,7 @@ export default function SelectFromFavoritesModal({
                           )}
                         </div>
                       ) : (
-                        <div className="w-32 h-32 flex-shrink-0 bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center">
+                        <div className="w-32 h-32 flex-shrink-0 bg-[var(--color-primary)] flex items-center justify-center">
                           <Image className="h-12 w-12 text-purple-300" />
                         </div>
                       )}
@@ -1086,7 +1086,7 @@ export default function SelectFromFavoritesModal({
                             className="w-full h-full object-cover"
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-100 to-pink-100">
+                          <div className="w-full h-full flex items-center justify-center bg-[var(--color-primary)]">
                             <Image className="h-12 w-12 text-purple-300" />
                           </div>
                         )}

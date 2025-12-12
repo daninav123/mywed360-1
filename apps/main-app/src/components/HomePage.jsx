@@ -930,7 +930,7 @@ export default function HomePage() {
 
         {/* Progress Section */}
         <section className="z-10 w-full p-6">
-          <Card className="bg-[var(--color-surface)]/70 backdrop-blur-md p-4 w-full flex flex-col gap-4">
+          <Card className="bg-[var(--color-surface)]/70  p-4 w-full flex flex-col gap-4">
             <div>
               <p className="text-sm text-[color:var(--color-text)]/70 mb-2">{progressTasksLabel}</p>
               <Progress
@@ -972,7 +972,7 @@ export default function HomePage() {
                 key={idx}
                 role="button"
                 onClick={() => setActiveModal(action.key)}
-                className="flex items-center justify-between p-4 bg-[var(--color-surface)]/80 backdrop-blur-md hover:shadow-lg transition transform hover:scale-105 cursor-pointer"
+                className="flex items-center justify-between p-4 bg-[var(--color-surface)]/80  hover:shadow-lg transition transform hover:scale-105 cursor-pointer"
               >
                 <div className="flex items-center space-x-3">
                   <Icon className="text-[var(--color-primary)]" />
@@ -991,7 +991,7 @@ export default function HomePage() {
             return (
               <Card
                 key={idx}
-                className="p-4 bg-[var(--color-surface)]/80 backdrop-blur-md hover:shadow-lg transition transform hover:scale-105"
+                className="p-4 bg-[var(--color-surface)]/80  hover:shadow-lg transition transform hover:scale-105"
               >
                 <div className="flex items-center space-x-2">
                   <Icon className="text-[var(--color-primary)]" />
@@ -1016,13 +1016,13 @@ export default function HomePage() {
             <div className="flex space-x-2">
               <button
                 onClick={scrollPrev}
-                className="p-2 rounded-full bg-[var(--color-surface)]/80 backdrop-blur-md"
+                className="p-2 rounded-full bg-[var(--color-surface)]/80 "
               >
                 <ChevronLeft className="text-[var(--color-primary)]" />
               </button>
               <button
                 onClick={scrollNext}
-                className="p-2 rounded-full bg-[var(--color-surface)]/80 backdrop-blur-md"
+                className="p-2 rounded-full bg-[var(--color-surface)]/80 "
               >
                 <ChevronRight className="text-[var(--color-primary)]" />
               </button>
@@ -1039,12 +1039,13 @@ export default function HomePage() {
                 className="snap-start flex-shrink-0 w-64 h-64 relative rounded-lg overflow-hidden group"
               >
                 <ExternalImage
-                  src={img.src}
-                  alt={img.alt}
-                  className="w-full h-full object-cover transition transform group-hover:scale-110"
+                  src={img.url}
+                  alt={img.name}
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-4">
-                  <p className="text-white font-medium">{img.alt}</p>
+                <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors" />
+                <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+                  <h3 className="text-lg font-bold">{img.name}</h3>
                 </div>
               </Link>
             ))}
@@ -1081,7 +1082,7 @@ export default function HomePage() {
                   <Card
                     key={post.id}
                     onClick={() => navigate(post.slug ? `/blog/${post.slug}` : '/blog')}
-                    className="cursor-pointer p-0 overflow-hidden bg-[var(--color-surface)]/80 backdrop-blur-md hover:shadow-lg transition"
+                    className="cursor-pointer p-0 overflow-hidden bg-[var(--color-surface)]/80  hover:shadow-lg transition"
                   >
                     {post.coverUrl && (
                       <ExternalImage

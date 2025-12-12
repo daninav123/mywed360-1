@@ -97,7 +97,7 @@ const SpotifyPlaylistGenerator = ({ moments, blocks }) => {
   return (
     <div className="bg-white border-2 border-gray-200 rounded-lg overflow-hidden">
       {/* Header */}
-      <div className="bg-gradient-to-r from-green-500 to-emerald-500 text-white p-4">
+      <div className="bg-[var(--color-success)] text-white p-4">
         <div className="flex items-center justify-between">
           <div>
             <h3 className="font-semibold flex items-center gap-2">
@@ -148,7 +148,7 @@ const SpotifyPlaylistGenerator = ({ moments, blocks }) => {
                 className="border border-gray-200 rounded-lg p-3 hover:bg-gray-50 transition-colors"
               >
                 <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                  <div className="flex-shrink-0 w-8 h-8 bg-[var(--color-success)] rounded-full flex items-center justify-center text-white text-sm font-bold">
                     {idx + 1}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -188,7 +188,7 @@ const SpotifyPlaylistGenerator = ({ moments, blocks }) => {
           </div>
 
           {/* Info para el DJ */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+          <div className="bg-[var(--color-primary)] p-3">
             <p className="text-xs text-blue-900 font-medium mb-2">
               💡 Comparte esta lista con tu DJ
             </p>

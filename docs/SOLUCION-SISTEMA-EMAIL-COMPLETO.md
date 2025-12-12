@@ -138,7 +138,7 @@ await mailgun.messages.create(MAILGUN_DOMAIN, {
   // Campos de email
   emailUsername: 'dani',           // ← username personalizado
   maLoveEmail: 'dani@malove.app',  // ← email completo MaLoveApp
-  myWed360Email: 'dani@mywed360',  // ← legacy (opcional)
+  myWed360Email: 'dani@MaLove.App',  // ← legacy (opcional)
   
   // Otros
   role: 'particular',

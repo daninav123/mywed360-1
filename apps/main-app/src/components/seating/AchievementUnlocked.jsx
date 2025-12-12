@@ -18,11 +18,8 @@ const AchievementUnlocked = ({ achievement, onClose }) => {
         animate={{ x: 0, opacity: 1 }}
         exit={{ x: 400, opacity: 0 }}
         transition={{ type: 'spring', damping: 20 }}
-        className="fixed top-4 right-4 z-50 w-80 bg-gradient-to-br from-yellow-400 via-orange-400 to-red-500 rounded-xl shadow-2xl overflow-hidden"
+        className="fixed top-4 right-4 z-50 w-80 bg-[var(--color-primary)] rounded-xl shadow-2xl overflow-hidden"
       >
-        {/* Fondo animado con brillos */}
-        <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent" />
-
         {/* Partículas flotantes */}
         <div className="absolute inset-0 overflow-hidden">
           {[...Array(8)].map((_, i) => (
@@ -56,13 +53,13 @@ const AchievementUnlocked = ({ achievement, onClose }) => {
                 initial={{ scale: 0, rotate: -180 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ delay: 0.2, type: 'spring', damping: 12 }}
-                className="w-10 h-10 bg-white/90 rounded-full flex items-center justify-center"
+                className="w-10 h-10 bg-white rounded-full flex items-center justify-center"
               >
                 <Trophy className="w-6 h-6 text-yellow-600" />
               </motion.div>
               <div>
-                <h3 className="text-white font-bold text-sm">¡Logro Desbloqueado!</h3>
-                <span className={`text-xs px-2 py-0.5 rounded-full bg-white/20 text-white`}>
+                <h3 className="text-black font-bold text-sm">¡Logro Desbloqueado!</h3>
+                <span className={`text-xs px-2 py-0.5 rounded-full bg-white text-black`}>
                   {category.label}
                 </span>
               </div>

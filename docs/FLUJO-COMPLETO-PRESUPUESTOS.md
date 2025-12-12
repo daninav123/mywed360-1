@@ -57,7 +57,7 @@ Proveedor recibe:
   de Fotografía para su boda el 15 jun 2025.
 
   Responde aquí:
-  👉 https://app.mywed360.com/responder-presupuesto/abc123...
+  👉 https://app.MaLove.App.com/responder-presupuesto/abc123...
 
   Detalles:
   - Fecha: 15 jun 2025

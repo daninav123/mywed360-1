@@ -50,7 +50,7 @@ export default function QuoteSelectionConfirmModal({
         </div>
 
         {/* Resumen del proveedor seleccionado */}
-        <Card className="bg-gradient-to-r from-indigo-50 to-purple-50 border-2 border-indigo-300">
+        <Card className="bg-[var(--color-primary)] border-2 border-indigo-300">
           <div className="flex items-start justify-between mb-4">
             <div>
               <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
@@ -168,7 +168,7 @@ export default function QuoteSelectionConfirmModal({
             variant="primary"
             onClick={handleConfirm}
             disabled={loading}
-            className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+            className="flex-1 bg-[var(--color-primary)] hover:from-indigo-700 hover:to-purple-700"
           >
             {loading ? (
               <>

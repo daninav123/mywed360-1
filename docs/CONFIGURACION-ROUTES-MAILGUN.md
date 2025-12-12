@@ -40,15 +40,15 @@ Expression Type: Match Recipient
 Match Recipient: match_recipient(".*@malove.app")
 
 Actions:
-✓ forward("https://mywed360-backend.onrender.com/api/inbound/mailgun")
-✓ store(notify="https://mywed360-backend.onrender.com/api/inbound/mailgun")
+✓ forward("https://MaLove.App-backend.onrender.com/api/inbound/mailgun")
+✓ store(notify="https://MaLove.App-backend.onrender.com/api/inbound/mailgun")
 ✓ stop()
 ```
 
 **Copiar y pegar en "Actions":**
 ```
-forward("https://mywed360-backend.onrender.com/api/inbound/mailgun")
-store(notify="https://mywed360-backend.onrender.com/api/inbound/mailgun")
+forward("https://MaLove.App-backend.onrender.com/api/inbound/mailgun")
+store(notify="https://MaLove.App-backend.onrender.com/api/inbound/mailgun")
 stop()
 ```
 
@@ -70,8 +70,8 @@ Expression Type: Match Recipient
 Match Recipient: match_recipient("dani@malove.app")
 
 Actions:
-✓ forward("https://mywed360-backend.onrender.com/api/inbound/mailgun")
-✓ store(notify="https://mywed360-backend.onrender.com/api/inbound/mailgun")
+✓ forward("https://MaLove.App-backend.onrender.com/api/inbound/mailgun")
+✓ store(notify="https://MaLove.App-backend.onrender.com/api/inbound/mailgun")
 ✓ stop()
 ```
 
@@ -174,7 +174,7 @@ Cuerpo: Probando el sistema de emails
 
 ### **Producción (Render)**
 ```
-https://mywed360-backend.onrender.com/api/inbound/mailgun
+https://MaLove.App-backend.onrender.com/api/inbound/mailgun
 ```
 
 ### **Desarrollo Local (para testing)**
@@ -200,7 +200,7 @@ Evalúa Routes configuradas
 Match: match_recipient(".*@malove.app")
     ↓
 Ejecuta Actions:
-  1. forward() → POST https://mywed360-backend.onrender.com/api/inbound/mailgun
+  1. forward() → POST https://MaLove.App-backend.onrender.com/api/inbound/mailgun
   2. store() → Guarda en Mailgun (backup)
   3. stop() → No evalúa más routes
     ↓
@@ -248,7 +248,7 @@ Si tienes problemas:
 
 3. **Test manual del webhook:**
    ```bash
-   curl -X POST https://mywed360-backend.onrender.com/api/inbound/mailgun \
+   curl -X POST https://MaLove.App-backend.onrender.com/api/inbound/mailgun \
      -F sender="test@example.com" \
      -F recipient="dani@malove.app" \
      -F subject="Test" \

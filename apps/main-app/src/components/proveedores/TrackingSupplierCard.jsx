@@ -46,7 +46,7 @@ export default function TrackingSupplierCard({
 
   return (
     <Card
-      className={`relative border border-dashed border-[var(--color-primary)]/35 bg-white/80 backdrop-blur-sm transition-all ${
+      className={`relative border border-dashed border-[var(--color-primary)]/35 bg-white/80  transition-all ${
         selected ? 'ring-2 ring-[var(--color-primary)]' : ''
       }`}
     >
@@ -71,7 +71,7 @@ export default function TrackingSupplierCard({
             {name}
           </h3>
           <div className="flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center rounded-full bg-[var(--color-primary)]/10 px-2 py-0.5 text-xs font-medium text-[var(--color-primary)]">
+            <span className="inline-flex items-center rounded-full bg-[var(--color-primary)].5 text-xs font-medium text-[var(--color-primary)]">
               {service}
             </span>
             <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">

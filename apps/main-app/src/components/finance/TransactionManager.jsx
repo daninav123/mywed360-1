@@ -251,7 +251,7 @@ export default function TransactionManager({
       <div className="space-y-6">
         {/* Stats Cards Premium */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card className="p-4 bg-gradient-to-br from-[var(--color-primary)]/10 to-transparent border-[var(--color-primary)]/30">
+          <Card className="p-4 bg-[var(--color-surface)] border-[var(--color-primary)]/30">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-primary)] mb-1">
@@ -263,7 +263,7 @@ export default function TransactionManager({
             </div>
           </Card>
 
-          <Card className="p-4 bg-gradient-to-br from-[var(--color-success)]/10 to-transparent border-[var(--color-success)]/30">
+          <Card className="p-4 bg-[var(--color-surface)] border-[var(--color-success)]/30">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-success)] mb-1">
@@ -277,7 +277,7 @@ export default function TransactionManager({
             </div>
           </Card>
 
-          <Card className="p-4 bg-gradient-to-br from-[var(--color-danger)]/10 to-transparent border-[var(--color-danger)]/30">
+          <Card className="p-4 bg-[var(--color-surface)] border-[var(--color-danger)]/30">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-danger)] mb-1">
@@ -291,7 +291,7 @@ export default function TransactionManager({
             </div>
           </Card>
 
-          <Card className="p-4 bg-gradient-to-br from-[var(--color-warning)]/10 to-transparent border-[var(--color-warning)]/30">
+          <Card className="p-4 bg-[var(--color-surface)] border-[var(--color-warning)]/30">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-warning)] mb-1">
@@ -313,7 +313,7 @@ export default function TransactionManager({
         </div>
 
         {/* Actions Bar */}
-        <Card className="p-4 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
+        <Card className="p-4 bg-[var(--color-surface)] border-soft">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div className="flex items-center gap-3 flex-wrap">
               <Button
@@ -373,7 +373,7 @@ export default function TransactionManager({
 
         {/* Filters */}
         {showFilters && (
-          <Card className="p-4 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
+          <Card className="p-4 bg-[var(--color-surface)] border-soft">
             <TransactionFilterBar
               t={t}
               searchTerm={searchTerm}
@@ -397,7 +397,7 @@ export default function TransactionManager({
         )}
 
         {/* Transaction List */}
-        <Card className="overflow-hidden bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
+        <Card className="overflow-hidden bg-[var(--color-surface)] border-soft">
           {isLoading ? (
             <div className="p-8 text-center">{t('app.loading', { defaultValue: 'Cargando...' })}</div>
           ) : filteredTransactions.length === 0 ? (

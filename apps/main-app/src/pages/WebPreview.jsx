@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Editor, Frame, Element } from '@craftjs/core';
 import { loadWeb } from '../services/webBuilder/craftWebService';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../context/AuthContext';
 import { TEMA_DEFAULT } from '../components/web/craft/themes';
 
 // Importar todos los componentes Craft

@@ -103,7 +103,7 @@ const ProveedorCard = ({
   const cardAppearanceClasses = useMemo(() => {
     switch (appearance) {
       case 'tracking':
-        return 'bg-white/80 border-dashed border-[var(--color-primary)]/40 backdrop-blur-sm';
+        return 'bg-white/80 border-dashed border-[var(--color-primary)]/40 ';
       case 'confirmed':
         return 'bg-emerald-50 border-emerald-200';
       default:
@@ -719,7 +719,7 @@ const ProveedorCard = ({
           )}
 
           {provider.depositStatus === 'paid' && (
-            <span className="inline-flex items-center mt-2 text-xs font-medium bg-green-100 text-green-700 px-2 py-0.5 rounded">
+            <span className="inline-flex items-center mt-2 text-xs font-medium bg-[var(--color-primary)].5 rounded">
               {t('suppliers.card.depositPaid')}
             </span>
           )}

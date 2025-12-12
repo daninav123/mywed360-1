@@ -38,7 +38,7 @@ const Stat = ({ icon: Icon, value, label, color = 'gray', trendLabel }) => {
 
 const Button = ({ children, variant = 'secondary', icon: Icon, onClick, loading = false }) => {
   const variants = {
-    primary: 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/30',
+    primary: 'bg-[var(--color-primary)] text-white shadow-lg shadow-indigo-600/30',
     secondary: 'bg-white/10 hover:bg-white/20 text-white border border-white/20',
   };
 

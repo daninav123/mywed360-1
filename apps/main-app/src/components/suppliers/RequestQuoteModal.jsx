@@ -217,7 +217,7 @@ const RequestQuoteModal = ({ supplier, open, onClose, onSuccess }) => {
           </div>
           <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-indigo-500 to-indigo-600 transition-all duration-300"
+              className="h-full bg-[var(--color-primary)] transition-all duration-300"
               style={{ width: `${progress}%` }}
             />
           </div>

@@ -14,7 +14,7 @@ FIRESTORE (BD propia) → GOOGLE PLACES (verificados) → TAVILY (complemento)
 
 1. Ve a [Google Cloud Console](https://console.cloud.google.com/)
 2. Crea un nuevo proyecto o selecciona uno existente
-3. Nombre sugerido: `mywed360-places` o similar
+3. Nombre sugerido: `MaLove.App-places` o similar
 
 ---
 

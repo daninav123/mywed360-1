@@ -60,7 +60,7 @@ const TimelineSection = ({ config, editable = false, onChange }) => {
         {/* Timeline */}
         <div className="relative">
           {/* Línea vertical */}
-          <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-gradient-to-b from-pink-300 to-purple-300" />
+          <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-[var(--color-primary)]" />
 
           {/* Eventos */}
           <div className="space-y-8">

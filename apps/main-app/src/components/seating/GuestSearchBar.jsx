@@ -121,7 +121,7 @@ export default function GuestSearchBar({
             
             {/* Menú de filtros */}
             <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-gray-800 
-                            rounded-lg shadow-xl border border-gray-200 dark:border-gray-700
+                            rounded-lg shadow-md border border-gray-200 dark:border-gray-700
                             opacity-0 invisible group-hover:opacity-100 group-hover:visible
                             transition-all duration-200 z-50">
               <button
@@ -164,7 +164,7 @@ export default function GuestSearchBar({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 
-                       rounded-lg shadow-2xl border border-gray-200 dark:border-gray-700
+                       rounded-lg shadow-md border border-gray-200 dark:border-gray-700
                        max-h-96 overflow-y-auto z-50"
           >
             <div className="p-2">
@@ -217,7 +217,7 @@ export default function GuestSearchBar({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 
-                       rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 p-4 z-50"
+                       rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-4 z-50"
           >
             <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
               No se encontraron invitados

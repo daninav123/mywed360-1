@@ -260,7 +260,7 @@ Los tests usan:
 
 ```javascript
 const TEST_USER = {
-  email: 'test@mywed360.com',
+  email: 'test@MaLove.App.com',
   password: 'Test123456',
 };
 ```

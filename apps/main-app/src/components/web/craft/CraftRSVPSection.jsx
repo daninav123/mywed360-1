@@ -66,7 +66,7 @@ export const CraftRSVPSection = ({
               />
               <button
                 disabled
-                className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all w-full sm:w-auto opacity-50"
+                className="px-6 py-3 bg-[var(--color-primary)]/100 text-white rounded-lg font-semibold hover:shadow-lg transition-all w-full sm:w-auto opacity-50"
               >
                 Continuar
               </button>
@@ -76,7 +76,7 @@ export const CraftRSVPSection = ({
             <div className="text-center">
               <a
                 href={rsvpUrl}
-                className="inline-block px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-bold text-lg hover:shadow-xl transition-all transform hover:scale-105"
+                className="inline-block px-8 py-4 bg-[var(--color-primary)]/100 text-white rounded-lg font-bold text-lg hover:shadow-xl transition-all transform hover:scale-105"
               >
                 ✨ Confirmar Asistencia
               </a>

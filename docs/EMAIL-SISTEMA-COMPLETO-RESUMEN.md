@@ -64,8 +64,8 @@ MAILGUN_EU_REGION=true
    Match Expression: match_recipient(".*@malove.app")
    
    Actions:
-   - forward("https://mywed360-backend.onrender.com/api/inbound/mailgun")
-   - store(notify="https://mywed360-backend.onrender.com/api/inbound/mailgun")
+   - forward("https://MaLove.App-backend.onrender.com/api/inbound/mailgun")
+   - store(notify="https://MaLove.App-backend.onrender.com/api/inbound/mailgun")
    ```
 4. Click **Create Route**
 

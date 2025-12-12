@@ -477,7 +477,7 @@ const BlogPost = () => {
 
             {authorProfile?.bio ? (
               <section className="flex gap-4 rounded-2xl border border-soft bg-surface p-4">
-                <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-full border border-soft bg-gradient-to-br from-indigo-200 to-pink-200">
+                <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-full border border-soft bg-[var(--color-primary)]">
                   {authorProfile.avatar ? (
                     <img
                       src={authorProfile.avatar}

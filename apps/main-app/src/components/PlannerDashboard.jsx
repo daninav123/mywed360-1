@@ -326,7 +326,7 @@ export default function PlannerDashboard() {
                           {t('planner.dashboard.inspiration.noImage')}
                         </div>
                       )}
-                      <span className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                      <span className="absolute inset-0 bg-[var(--color-primary)]transparent" />
                       <span className="absolute bottom-2 left-2 text-sm font-semibold text-white drop-shadow">
                         {itemLabel}
                       </span>
